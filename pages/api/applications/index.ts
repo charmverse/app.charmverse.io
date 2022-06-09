@@ -50,7 +50,8 @@ async function getApplications (req: NextApiRequest, res: NextApiResponse<Applic
         bountyId: bountyId as string
       },
       include: {
-        transactions: true
+        transactions: true,
+        thread: true
       }
     }));
   return res.status(200).json(applicationsOrSubmissions);

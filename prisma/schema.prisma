@@ -300,6 +300,7 @@ model Application {
   submission      String?
   submissionNodes String?
   transactions    Transaction[]
+  thread          Thread?
 
   @@unique([bountyId, createdBy])
 }
@@ -461,19 +462,21 @@ model PagePermission {
   @@unique([public, pageId], name: "public_pageId")
 }
 
-model Thread {
-  id        String    @id @default(uuid()) @db.Uuid
-  createdAt DateTime  @default(now())
-  pageId    String    @db.Uuid
-  page      Page      @relation(fields: [pageId], references: [id], onDelete: Cascade)
-  context   String
-  userId    String    @db.Uuid()
-  user      User      @relation(fields: [userId], references: [id])
-  comments  Comment[]
-  resolved  Boolean
-  spaceId   String    @db.Uuid
-  space     Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  updatedAt DateTime?
+model Thread {  
+  id              String          @id @default(uuid()) @db.Uuid
+  createdAt       DateTime        @default(now())
+  pageId          String?         @db.Uuid
+  page            Page?           @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  applicationId   String?         @db.Uuid()
+  application     Application?    @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  context         String
+  userId          String          @db.Uuid()
+  user            User            @relation(fields: [userId], references: [id])
+  comments        Comment[]
+  resolved        Boolean
+  spaceId         String          @db.Uuid
+  space           Space           @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  updatedAt       DateTime?
 }
 
 model Comment {

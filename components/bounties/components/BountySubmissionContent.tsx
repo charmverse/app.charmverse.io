@@ -4,6 +4,7 @@ import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import { getDisplayName } from 'lib/users';
 import { useContributors } from 'hooks/useContributors';
 import Typography from '@mui/material/Typography';
+import ApplicationThread from './ApplicationThread';
 
 interface Props {
   bounty: Bounty
@@ -25,6 +26,7 @@ export default function BountySubmissionContent ({ bounty, submission }: Props) 
         content={submission?.submissionNodes ? JSON.parse(submission?.submissionNodes) : ''}
         readOnly
       />
+      <ApplicationThread />
     </Box>
   );
 }
