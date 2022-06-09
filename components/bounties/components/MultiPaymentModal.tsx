@@ -9,7 +9,7 @@ import { MetaTransactionData } from '@gnosis.pm/safe-core-sdk-types';
 import { useBounties } from 'hooks/useBounties';
 import { eToNumber } from 'lib/utilities/numbers';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Checkbox, List, ListItem, Typography } from '@mui/material';
 import UserDisplay from 'components/common/UserDisplay';
 import { useContributors } from 'hooks/useContributors';
@@ -51,32 +51,35 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
   const gnosisSafeChainId = multiSigWallet?.chainId;
 
   // If the bounty is on the same chain as the gnosis safe and the rewardToken of the bounty is the same as the native currency of the gnosis safe chain
-  const transactions: TransactionWithMetadata[] = bounties
-    .filter(bounty => {
-      return bounty.chainId === gnosisSafeChainId
+  const transactions: TransactionWithMetadata[] = useMemo(
+    () => bounties
+      .filter(bounty => {
+        return bounty.chainId === gnosisSafeChainId
         && bounty.rewardToken === RPC[Chains[gnosisSafeChainId]]?.nativeCurrency.symbol;
-    })
-    .map(bounty => {
-      return bounty.applications.map(application => {
-        if (application.status === 'complete') {
-          const value = ethers.utils.parseUnits(eToNumber(bounty.rewardAmount), 18).toString();
-          return {
-            to: application.walletAddress as string,
-            value,
-            // This has to be 0x don't change it
-            data: '0x',
-            applicationId: application.id,
-            userId: application.createdBy,
-            chainId: bounty.chainId,
-            rewardAmount: bounty.rewardAmount,
-            rewardToken: bounty.rewardToken,
-            title: bounty.title
-          };
-        }
-        return false;
-      }).filter(isTruthy);
-    })
-    .flat();
+      })
+      .map(bounty => {
+        return bounty.applications.map(application => {
+          if (application.status === 'complete') {
+            const value = ethers.utils.parseUnits(eToNumber(bounty.rewardAmount), 18).toString();
+            return {
+              to: application.walletAddress as string,
+              value,
+              // This has to be 0x don't change it
+              data: '0x',
+              applicationId: application.id,
+              userId: application.createdBy,
+              chainId: bounty.chainId,
+              rewardAmount: bounty.rewardAmount,
+              rewardToken: bounty.rewardToken,
+              title: bounty.title
+            };
+          }
+          return false;
+        }).filter(isTruthy);
+      })
+      .flat(),
+    [bounties, gnosisSafeAddress, gnosisSafeChainId]
+  );
 
   useEffect(() => {
     const applicationIds = transactions.map(transaction => transaction.applicationId);
