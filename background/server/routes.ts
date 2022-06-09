@@ -2,7 +2,7 @@ import Koa from 'koa';
 import log from 'lib/log';
 
 export async function healthCheck (ctx: Koa.Context) {
-  ctx.body = 'pong';
+  ctx.body = 'hello world';
 }
 
 export async function errorHandler (ctx: Koa.Context, next: () => Promise<any>) {

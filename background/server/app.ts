@@ -5,7 +5,7 @@ import * as routes from './routes';
 const app = new Koa();
 const router = new Router();
 
-router.get('/ping', routes.healthCheck);
+router.get('/', routes.healthCheck);
 
 app
   .use(routes.errorHandler)
