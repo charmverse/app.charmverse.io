@@ -20,7 +20,7 @@ import { getSnapshotSpace, SnapshotReceipt, SnapshotSpace, SnapshotVotingMode, S
 import { ExternalServiceError, SystemError, UnknownError } from 'lib/utilities/errors';
 import { DateTime } from 'luxon';
 import { useEffect, useState } from 'react';
-import { getChainById } from '../../../../../../connectors';
+import { getChainById } from 'connectors';
 import ConnectSnapshot from './ConnectSnapshot';
 import InputVotingStrategies from './InputVotingStrategies';
 
