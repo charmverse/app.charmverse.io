@@ -17,7 +17,7 @@ export default function PublicProfilePage () {
 
   return (
     <>
-      <NexusPageTitle subPage='My Public Profile' />
+      <NexusPageTitle subPage='Public Profile' />
       <PublicProfile user={user} updateUser={setUser} />
     </>
   );
