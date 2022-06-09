@@ -41,7 +41,7 @@ export default function BountyList () {
 
   const [space] = useCurrentSpace();
 
-  const [savedBountyFilters, setSavedBountyFilters] = useLocalStorage<BountyStatus []>(`${space?.id}-bounty-filters`, ['open', 'inProgress']);
+  const [savedBountyFilters, setSavedBountyFilters] = useLocalStorage<BountyStatus[]>(`${space?.id}-bounty-filters`, ['open', 'inProgress']);
 
   // Filter out the old bounty filters
   useEffect(() => {
@@ -110,32 +110,40 @@ export default function BountyList () {
         </Box>
 
         {/* Filters for the bounties */}
-        <Box display='flex' alignContent='center' justifyContent='flex-start' mb={3}>
-          <InputBountyStatus
-            onChange={(statuses) => {
-              setSavedBountyFilters(sortSelected(statuses));
-            }}
-            renderSelectedInValue={true}
-            renderSelectedInOption={true}
-            defaultValues={savedBountyFilters}
-          />
-        </Box>
+
+        {
+          bounties.length > 0 && (
+            <Box display='flex' alignContent='center' justifyContent='flex-start' mb={3}>
+              <InputBountyStatus
+                onChange={(statuses) => {
+                  setSavedBountyFilters(sortSelected(statuses));
+                }}
+                renderSelectedInValue={true}
+                renderSelectedInOption={true}
+                defaultValues={savedBountyFilters}
+              />
+            </Box>
+          )
+        }
 
         {/* Onboarding video when no bounties exist */}
         {
             bounties.length === 0 && (
-              <div>
+              <>
+                <Typography variant='h6' sx={{ mb: 2 }}>Getting started with bounties</Typography>
+                <div>
 
-                <iframe
-                  src='https://tiny.charmverse.io/bounties'
-                  style={{ maxWidth: '100%', border: '0 none' }}
-                  height='395px'
-                  width='700px'
-                  title='Bounties | Getting started with Charmverse'
-                >
-                </iframe>
+                  <iframe
+                    src='https://tiny.charmverse.io/bounties'
+                    style={{ maxWidth: '100%', border: '0 none' }}
+                    height='395px'
+                    width='700px'
+                    title='Bounties | Getting started with Charmverse'
+                  >
+                  </iframe>
 
-              </div>
+                </div>
+              </>
             )
           }
 
