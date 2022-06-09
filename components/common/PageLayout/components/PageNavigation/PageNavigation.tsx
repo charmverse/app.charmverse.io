@@ -16,6 +16,7 @@ import { ComponentProps, Dispatch, ReactNode, SetStateAction, SyntheticEvent, us
 import { useDrop } from 'react-dnd';
 import { checkForEmpty } from 'components/common/CharmEditor/utils';
 import { addPageAndRedirect, NewPageInput } from 'lib/pages';
+import sortBy from 'lodash/sortBy';
 import TreeNode, { MenuNode, ParentMenuNode } from './components/TreeNode';
 
 const StyledTreeRoot = styled(TreeRoot)<{ isFavorites?: boolean }>`
@@ -48,7 +49,10 @@ function mapTree (items: MenuNode[], key: 'parentId', rootPageIds?: string[]): P
       // Make sure its not a database page or a focalboard card
       if (tempItems[index].type === 'page') {
         tempItems[index].children.push(node);
-        sortArrayByObjectProperty(tempItems[index].children, 'index');
+        tempItems[index].children = sortBy(
+          tempItems[index].children,
+          ['index', 'createdAt']
+        );
       }
     }
     // If its a root page always show it
@@ -60,9 +64,10 @@ function mapTree (items: MenuNode[], key: 'parentId', rootPageIds?: string[]): P
     }
   }
 
-  sortArrayByObjectProperty(roots, 'index');
-
-  return roots;
+  return sortBy(
+    roots,
+    ['index', 'createdAt']
+  );
 }
 
 type TreeRootProps = {
@@ -136,6 +141,7 @@ function PageNavigation ({
       parentId: page.parentId,
       path: page.path,
       type: page.type,
+      createdAt: page.createdAt,
       deletedAt: page.deletedAt
     }));
 
@@ -153,17 +159,16 @@ function PageNavigation ({
     const parentId = containerItem.parentId;
 
     setPages(_pages => {
-      const siblings = Object.values(_pages).filter(isTruthy)
-        .filter((page) => page && page.parentId === parentId && page.id !== droppedItem.id)
-        .sort((s1, s2) => s1.index > s2.index ? 1 : -1);
-
+      const siblings = sortBy(
+        Object.values(_pages).filter(isTruthy)
+          .filter((page) => page && page.parentId === parentId && page.id !== droppedItem.id),
+        ['index', 'createdAt']
+      );
       const droppedPage = _pages[droppedItem.id];
       if (!droppedPage) {
         throw new Error('canot find dropped page');
       }
-      const isDraggingDown: boolean = droppedPage.index > containerItem.index;
-      let originIndex = isDraggingDown ? containerItem.index : containerItem.index - 1;
-      originIndex = Math.max(originIndex, 0);
+      const originIndex: number = siblings.findIndex(sibling => sibling.id === containerItem.id);
       siblings.splice(originIndex, 0, droppedPage);
       siblings.forEach((page, _index) => {
         page.index = _index;

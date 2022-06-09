@@ -11,7 +11,7 @@ import { useTreeItem } from '@mui/lab/TreeItem';
 import PageTreeItem from './PageTreeItem';
 import BoardViewTreeItem from './BoardViewTreeItem';
 
-export type MenuNode = Pick<Page, 'id' | 'title' | 'icon' | 'index' | 'parentId' | 'path' | 'type' | 'deletedAt'> & { isEmptyContent: boolean };
+export type MenuNode = Pick<Page, 'id' | 'title' | 'icon' | 'index' | 'parentId' | 'path' | 'type' | 'createdAt' | 'deletedAt'> & { isEmptyContent: boolean };
 
 export type ParentMenuNode = MenuNode & {
   children: ParentMenuNode[];
@@ -78,9 +78,16 @@ function DraggableTreeNode ({ item, onDropAdjacent, onDropChild, pathPrefix, add
       setIsAdjacent(_isAdjacent);
     },
     collect: monitor => {
+      let canDropItem: boolean = true;
+      try {
+        canDropItem = monitor.canDrop();
+      }
+      catch {
+        canDropItem = false;
+      }
       return {
         isOverCurrent: monitor.isOver({ shallow: true }),
-        canDrop: monitor.canDrop()
+        canDrop: canDropItem
       };
     }
   }));
