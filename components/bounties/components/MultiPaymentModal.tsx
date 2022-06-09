@@ -6,7 +6,6 @@ import Box from '@mui/material/Box';
 import charmClient from 'charmClient';
 import { bindTrigger, bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 import { MetaTransactionData } from '@gnosis.pm/safe-core-sdk-types';
-import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useBounties } from 'hooks/useBounties';
 import { eToNumber } from 'lib/utilities/numbers';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -18,9 +17,9 @@ import { BountyWithDetails } from 'models';
 import { Bounty } from '@prisma/client';
 import { Chains, RPC } from 'connectors';
 import useGnosisSigner from 'hooks/useWeb3Signer';
-import { SafeInfoResponse } from '@gnosis.pm/safe-service-client';
-import { useUser } from 'hooks/useUser';
-import { getSafesForAddresses } from 'lib/gnosis';
+import { useWeb3React } from '@web3-react/core';
+import useSWR from 'swr';
+import { getSafesForAddress } from 'lib/gnosis';
 import { BountyAmount } from './BountyStatusBadge';
 import MultiPaymentButton, { MultiPaymentResult } from './MultiPaymentButton';
 
@@ -33,42 +32,30 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
   const [isLoading, setIsLoading] = useState(false);
   const { setBounties, setCurrentBounty, currentBountyId } = useBounties();
   const popupState = usePopupState({ variant: 'popover', popupId: 'multi-payment-modal' });
-  const [paymentMethods] = usePaymentMethods();
   const [currentSpace] = useCurrentSpace();
-  // Find the first gnosis safe payment method
-  const gnosisPayment = paymentMethods.find(p => p.walletType === 'gnosis');
-  const safeAddress = gnosisPayment?.gnosisSafeAddress;
   const [transactions, setTransactions] = useState<TransactionWithMetadata[]>([]);
   const [selectedApplicationIds, setSelectedApplicationIds] = useState<string[]>(transactions.map(transaction => transaction.applicationId));
   const [contributors] = useContributors();
-  const gnosisSigner = useGnosisSigner();
-  const [currentUser] = useUser();
-  const [safeInfos, setSafeInfos] = useState<({
-    chainId: number;
-  } & SafeInfoResponse)[]>([]);
+  const { account, chainId } = useWeb3React();
+  const signer = useGnosisSigner();
+  const { data: safeInfos } = useSWR(
+    (signer && account) ? `/connected-gnosis-safes/${account}` : null,
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    () => getSafesForAddress({ signer: signer!, chainId: chainId!, address: account! })
+  );
 
-  useEffect(() => {
-    async function main () {
-      if (gnosisSigner && currentUser) {
-        setSafeInfos(await getSafesForAddresses(gnosisSigner, currentUser.addresses));
-      }
-    }
-    main();
-
-    return () => {
-      setSafeInfos([]);
-    };
-  }, [gnosisSigner, currentUser]);
-
-  const ownedSafeAddresses = safeInfos.map(safeInfo => safeInfo.address);
+  // use first multisig wallet
+  const multiSigWallet = (safeInfos || [])[0];
+  const gnosisSafeAddress = multiSigWallet?.address;
+  const gnosisSafeChainId = multiSigWallet?.chainId;
 
   useEffect(() => {
     const _transactions: TransactionWithMetadata[] = [];
-    if (gnosisPayment) {
+    if (gnosisSafeAddress) {
 
       bounties.forEach(bounty => {
         // If the bounty is on the same chain as the gnosis safe and the rewardToken of the bounty is the same as the native currency of the gnosis safe chain
-        if (bounty.chainId === gnosisPayment?.chainId && bounty.rewardToken === RPC[Chains[gnosisPayment?.chainId]]?.nativeCurrency.symbol) {
+        if (bounty.chainId === gnosisSafeChainId && bounty.rewardToken === RPC[Chains[gnosisSafeChainId]]?.nativeCurrency.symbol) {
           bounty.applications.forEach(application => {
             if (application.status === 'complete') {
               const value = ethers.utils.parseUnits(eToNumber(bounty.rewardAmount), 18).toString();
@@ -92,7 +79,7 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
 
     setTransactions(_transactions);
     setSelectedApplicationIds(_transactions.map(transaction => transaction.applicationId));
-  }, [bounties, gnosisPayment]);
+  }, [bounties, multiSigWallet]);
 
   // A record to keep track of application id an its corresponding transaction
   const applicationTransactionRecord: Record<string, TransactionWithMetadata> = {};
@@ -101,14 +88,14 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
   });
 
   async function onPaymentSuccess (result: MultiPaymentResult) {
-    if (gnosisPayment) {
+    if (gnosisSafeAddress) {
       setIsLoading(true);
       await Promise.all(
         result.transactions.map(async (transaction) => {
           await charmClient.recordTransaction({
             applicationId: transaction.applicationId,
             transactionId: result.txHash,
-            chainId: gnosisPayment.chainId.toString()
+            chainId: gnosisSafeChainId.toString()
           });
           await charmClient.paySubmission(transaction.applicationId);
         })
@@ -131,7 +118,7 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
     }
   }
 
-  if (!safeAddress || !ownedSafeAddresses.includes(safeAddress) || transactions.length === 0) {
+  if (!gnosisSafeAddress || transactions.length === 0) {
     return null;
   }
 
@@ -149,12 +136,12 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
         <DialogTitle onClose={popupState.close}>Batch Payments</DialogTitle>
         <Box pb={2}>
           <List>
-            {transactions.map(({ title, chainId, rewardAmount, rewardToken, userId, applicationId }) => {
+            {transactions.map(({ title, chainId: _chainId, rewardAmount, rewardToken, userId, applicationId }) => {
               const user = contributors.find(contributor => contributor.id === userId);
               const isChecked = selectedApplicationIds.includes(applicationId);
               if (user) {
                 return (
-                  <ListItem key={`${userId}.${chainId}.${applicationId}`}>
+                  <ListItem key={`${userId}.${_chainId}.${applicationId}`}>
                     <Checkbox
                       disableFocusRipple
                       disableRipple
@@ -193,7 +180,7 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
                       </Box>
                       <BountyAmount
                         bounty={{
-                          chainId,
+                          chainId: _chainId,
                           rewardAmount,
                           rewardToken
                         }}
@@ -208,8 +195,8 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
           </List>
         </Box>
         <MultiPaymentButton
-          chainId={gnosisPayment.chainId}
-          safeAddress={safeAddress}
+          chainId={gnosisSafeChainId}
+          safeAddress={gnosisSafeAddress}
           transactions={selectedApplicationIds.map(selectedApplicationId => applicationTransactionRecord[selectedApplicationId])}
           onSuccess={onPaymentSuccess}
           isLoading={isLoading}
