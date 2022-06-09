@@ -23,6 +23,10 @@ export async function updateSubmission ({ submissionId, submissionContent }: Sub
     throw new UnauthorisedActionError();
   }
 
+  if (!submissionContent.walletAddress) {
+    throw new MissingDataError('You must provide a wallet address in your submission');
+  }
+
   return prisma.application.update({
     where: {
       id: submissionId

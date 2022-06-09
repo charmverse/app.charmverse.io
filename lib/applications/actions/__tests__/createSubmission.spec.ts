@@ -31,7 +31,8 @@ describe('createSubmission', () => {
       userId: user.id,
       submissionContent: {
         submission: 'My submission',
-        submissionNodes: '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My submission"}]}]}'
+        submissionNodes: '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My submission"}]}]}',
+        walletAddress: '0x123456789'
       }
     });
 
@@ -59,7 +60,8 @@ describe('createSubmission', () => {
           userId: user.id,
           submissionContent: {
             submission: 'My submission',
-            submissionNodes: '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My submission"}]}]}'
+            submissionNodes: '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My submission"}]}]}',
+            walletAddress: '0x123456789'
           }
         });
 
@@ -87,7 +89,8 @@ describe('createSubmission', () => {
         userId: user.id,
         submissionContent: {
           submission: 'My submission',
-          submissionNodes: '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My submission"}]}]}'
+          submissionNodes: '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My submission"}]}]}',
+          walletAddress: '0x123456789'
         }
       });
       throw new ExpectedAnError();
@@ -106,7 +109,8 @@ describe('createSubmission', () => {
         userId: user.id,
         submissionContent: {
           submission: 'My submission',
-          submissionNodes: '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My submission"}]}]}'
+          submissionNodes: '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My submission"}]}]}',
+          walletAddress: '0x123456789'
         }
       });
       throw new ExpectedAnError();
@@ -132,7 +136,8 @@ describe('createSubmission', () => {
         userId: user.id,
         submissionContent: {
           submission: 'My submission',
-          submissionNodes: '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My submission"}]}]}'
+          submissionNodes: '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My submission"}]}]}',
+          walletAddress: '0x123456789'
         }
       });
       throw new ExpectedAnError();
@@ -160,7 +165,8 @@ describe('createSubmission', () => {
         userId: secondUser.id,
         submissionContent: {
           submission: 'My submission',
-          submissionNodes: '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My submission"}]}]}'
+          submissionNodes: '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My submission"}]}]}',
+          walletAddress: '0x123456789'
         }
       });
       throw new ExpectedAnError();
@@ -186,7 +192,8 @@ describe('createSubmission', () => {
         userId: user.id,
         submissionContent: {
           submission: '',
-          submissionNodes: ''
+          submissionNodes: '',
+          walletAddress: ''
         }
       });
       throw new ExpectedAnError();

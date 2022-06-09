@@ -27,7 +27,7 @@ export interface ApplicationWithBounty extends Application {
   bounty: Bounty
 }
 
-export type SubmissionContent = Partial<Pick<Application, 'submission' | 'submissionNodes' | 'walletAddress'>>
+export type SubmissionContent = Pick<Application, 'submission' | 'submissionNodes'> & { walletAddress: string }
 
 export interface SubmissionCreationData {
   bountyId: string,
