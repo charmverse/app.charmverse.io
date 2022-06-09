@@ -35,16 +35,12 @@ function PoapSection (props: PoapSectionProps) {
   const { openWalletSelectorModal } = useContext(Web3Connection);
   const isPublic = isPublicUser(user);
   const { data: poapData, mutate: mutatePoaps } = useSWRImmutable(`/poaps/${user.id}`, () => {
-    return isPublicUser(user) ? Promise.resolve({ visiblePoaps: [], hiddenPoaps: [] }) : charmClient.getUserPoaps();
+    return isPublicUser(user) ? Promise.resolve({ visiblePoaps: user.visiblePoaps || [], hiddenPoaps: [] }) : charmClient.getUserPoaps();
   });
 
   const hasConnectedWallet: boolean = !isPublic && user.addresses.length !== 0;
 
-  let poaps = poapData?.visiblePoaps || [];
-
-  if (isPublic) {
-    poaps = user.visiblePoaps;
-  }
+  const poaps = poapData?.visiblePoaps || [];
 
   return (
     <StyledBox p={2}>
