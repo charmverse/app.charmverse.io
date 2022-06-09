@@ -132,6 +132,10 @@ class CharmClient {
     return http.GET<Page>(`/api/public/view/${viewId}`);
   }
 
+  duplicatePage (pageId: string) {
+    return http.POST<IPageWithPermissions>(`/api/pages/${pageId}/duplicate`);
+  }
+
   getBlockViewsByPageId (pageId: string) {
     return http.GET<Block []>(`/api/blocks/views/${pageId}`);
   }

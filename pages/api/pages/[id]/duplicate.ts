@@ -42,7 +42,6 @@ async function duplicatePage (req: NextApiRequest, res: NextApiResponse<IPageWit
     data: {
       id: createdPageId,
       parentId: page.parentId,
-      createdBy: userId,
       updatedBy: userId,
       title: `${page.title} (copy)`,
       content: page.content ?? undefined,
@@ -61,7 +60,8 @@ async function duplicatePage (req: NextApiRequest, res: NextApiResponse<IPageWit
         connect: {
           id: page.spaceId as string
         }
-      }
+      },
+      boardId: page.type === 'board' ? createdPageId : null
     } as Prisma.PageCreateInput
   })];
 
@@ -122,29 +122,44 @@ async function duplicatePage (req: NextApiRequest, res: NextApiResponse<IPageWit
       });
 
       blockCreateManyInput.push(
-        createBoard({
-          fields: boardBlock.fields as Record<string, any>,
-          id: createdPageId,
-          parentId: boardBlock.parentId,
-          rootId: createdPageId,
-          schema: 1,
-          spaceId: boardBlock.spaceId,
-          title: boardBlock.title,
-          type: 'board',
-          createdBy: userId,
-          updatedBy: userId
-        }) as any
+        {
+          ...createBoard({
+            fields: boardBlock.fields as Record<string, any>,
+            id: createdPageId,
+            parentId: boardBlock.parentId,
+            rootId: createdPageId,
+            schema: 1,
+            spaceId: boardBlock.spaceId,
+            title: `${boardBlock.title} (copy)`,
+            type: 'board',
+            createdBy: userId,
+            updatedBy: userId
+          }),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          deletedAt: null
+        }
       );
 
       // Array to hold the new card block ids
       const duplicatedCardBlockIds: string[] = [];
 
-      const duplicatedCardBlocksInput = Object
+      Object
         .values(cardBlocksRecord)
         .forEach(cardBlock => {
           const cardPage = cardPagesRecord[cardBlock.id];
           const duplicateCardId = v4();
-          blockCreateManyInput.push(createBlock({ ...cardBlock as any, type: 'card', fields: cardBlock.fields as Record<string, any>, id: duplicateCardId }) as any);
+          blockCreateManyInput.push(({
+            ...createBlock({ ...cardBlock as any, type: 'card', fields: cardBlock.fields as Record<string, any>, id: duplicateCardId }),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            deletedAt: null,
+            parentId: createdPageId,
+            rootId: createdPageId,
+            schema: 1,
+            spaceId: cardBlock.spaceId,
+            type: 'card'
+          }));
           // Populate the card page inputs when populating the card block inputs
           pageCreateManyInput.push({
             id: duplicateCardId,
@@ -163,23 +178,26 @@ async function duplicatePage (req: NextApiRequest, res: NextApiResponse<IPageWit
           });
         });
 
-      blockCreateManyInput.push(...duplicatedCardBlocksInput as any);
-
-      blockCreateManyInput.push(...viewBlocks.map(viewBlock => createBoardView({
-        fields: {
-          ...viewBlock.fields as Record<string, any>,
-          cardOrder: duplicatedCardBlockIds
-        },
-        parentId: createdPageId,
-        rootId: createdPageId,
-        schema: 1,
-        spaceId: viewBlock.spaceId,
-        title: viewBlock.title,
-        type: 'view',
-        createdBy: userId,
-        updatedBy: userId,
-        id: v4()
-      }) as any));
+      blockCreateManyInput.push(...viewBlocks.map(viewBlock => ({
+        ...createBoardView({
+          fields: {
+            ...viewBlock.fields as Record<string, any>,
+            cardOrder: duplicatedCardBlockIds
+          },
+          parentId: createdPageId,
+          rootId: createdPageId,
+          schema: 1,
+          spaceId: viewBlock.spaceId,
+          title: viewBlock.title,
+          type: 'view',
+          createdBy: userId,
+          updatedBy: userId,
+          id: v4()
+        }),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        deletedAt: null
+      })));
     }
 
     transactions.push(prisma.block.createMany({
