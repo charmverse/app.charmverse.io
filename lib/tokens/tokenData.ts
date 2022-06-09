@@ -1,6 +1,6 @@
 import * as http from 'adapters/http';
 import { PaymentMethod } from '@prisma/client';
-import { CryptoLogoPaths, CryptoCurrency, CryptoCurrencyList } from 'connectors';
+import { TokenLogoPaths, CryptoCurrency, CryptoCurrencyList } from 'connectors';
 
 export interface ITokenMetadataRequest {
   chainId: number,
@@ -78,7 +78,7 @@ export function getTokenInfo (paymentMethods: PaymentMethod[], symbolOrAddress: 
     method.contractAddress === symbolOrAddress || method.tokenSymbol === symbolOrAddress
   ));
 
-  const tokenLogo = paymentMethod?.tokenLogo || CryptoLogoPaths[symbolOrAddress as CryptoCurrency];
+  const tokenLogo = paymentMethod?.tokenLogo || TokenLogoPaths[symbolOrAddress as CryptoCurrency];
   const tokenSymbol = paymentMethod?.tokenSymbol || symbolOrAddress;
   const tokenName = paymentMethod?.tokenName || CryptoCurrencyList[symbolOrAddress as CryptoCurrency];
 

@@ -6,7 +6,7 @@ import { usePages } from 'hooks/usePages'
 import { BountyStatusChip } from 'components/bounties/components/BountyStatusBadge'
 import { useBounties } from 'hooks/useBounties'
 import { BOUNTY_LABELS, PageContent } from 'models'
-import { CryptoCurrency, CryptoLogoPaths } from 'connectors'
+import { CryptoCurrency, TokenLogoPaths } from 'connectors'
 import Image from 'next/image'
 import React, { useState } from 'react'
 import styled from '@emotion/styled'
@@ -214,10 +214,10 @@ const KanbanCard = React.memo((props: Props) => {
             gap: 0.25,
           }}>
             <CurrencyIcon>
-              {CryptoLogoPaths[linkedBounty.rewardToken as CryptoCurrency] && (<img
+              {TokenLogoPaths[linkedBounty.rewardToken as CryptoCurrency] && (<img
                 loading='lazy'
                 height={20}
-                src={CryptoLogoPaths[linkedBounty.rewardToken as CryptoCurrency]}
+                src={TokenLogoPaths[linkedBounty.rewardToken as CryptoCurrency]}
               />)}
             </CurrencyIcon>
             <Box sx={{
