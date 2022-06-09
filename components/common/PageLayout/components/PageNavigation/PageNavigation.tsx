@@ -9,13 +9,13 @@ import { useLocalStorage } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
-import { sortArrayByObjectProperty } from 'lib/utilities/array';
 import { isTruthy } from 'lib/utilities/types';
 import { Page, PageContent } from 'models';
 import { ComponentProps, Dispatch, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo, memo } from 'react';
 import { useDrop } from 'react-dnd';
 import { checkForEmpty } from 'components/common/CharmEditor/utils';
 import { addPageAndRedirect, NewPageInput } from 'lib/pages';
+import sortBy from 'lodash/sortBy';
 import TreeNode, { MenuNode, ParentMenuNode } from './components/TreeNode';
 
 const StyledTreeRoot = styled(TreeRoot)<{ isFavorites?: boolean }>`
@@ -23,6 +23,13 @@ const StyledTreeRoot = styled(TreeRoot)<{ isFavorites?: boolean }>`
   width: 100%;
   overflow-y: auto;
 `;
+
+const sortNodes = (nodes: Array<Page | ParentMenuNode>) => {
+  return [
+    ...sortBy(nodes.filter(node => node.index >= 0), ['index', 'createdAt']),
+    ...sortBy(nodes.filter(node => node.index < 0), ['createdAt'])
+  ];
+};
 
 function mapTree (items: MenuNode[], key: 'parentId', rootPageIds?: string[]): ParentMenuNode[] {
   const tempItems = items.map((item): ParentMenuNode => {
@@ -48,7 +55,7 @@ function mapTree (items: MenuNode[], key: 'parentId', rootPageIds?: string[]): P
       // Make sure its not a database page or a focalboard card
       if (tempItems[index].type === 'page') {
         tempItems[index].children.push(node);
-        sortArrayByObjectProperty(tempItems[index].children, 'index');
+        tempItems[index].children = sortNodes(tempItems[index].children) as ParentMenuNode[];
       }
     }
     // If its a root page always show it
@@ -60,9 +67,7 @@ function mapTree (items: MenuNode[], key: 'parentId', rootPageIds?: string[]): P
     }
   }
 
-  sortArrayByObjectProperty(roots, 'index');
-
-  return roots;
+  return sortNodes(roots) as ParentMenuNode[];
 }
 
 type TreeRootProps = {
@@ -92,6 +97,7 @@ function TreeRoot ({ children, setPages, isFavorites, ...rest }: TreeRootProps) 
       canDrop: monitor.canDrop()
     })
   }));
+
   const theme = useTheme();
   const isActive = canDrop && isOverCurrent;
   return (
@@ -135,18 +141,17 @@ function PageNavigation ({
       parentId: page.parentId,
       path: page.path,
       type: page.type,
+      createdAt: page.createdAt,
       deletedAt: page.deletedAt
     }));
 
   const pageHash = JSON.stringify(pagesArray);
-  // console.log(pageHash);
 
   const mappedItems = useMemo(() => {
     return mapTree(pagesArray, 'parentId', rootPageIds);
   }, [pageHash, rootPageIds]);
 
   const onDropAdjacent = useCallback((droppedItem: ParentMenuNode, containerItem: MenuNode) => {
-
     if (droppedItem.id === containerItem?.id) {
       return;
     }
@@ -154,12 +159,15 @@ function PageNavigation ({
     const parentId = containerItem.parentId;
 
     setPages(_pages => {
-      const siblings = Object.values(_pages).filter(isTruthy).filter((page) => page && page.parentId === parentId && page.id !== droppedItem.id);
-      const originIndex = siblings.findIndex((page) => page.id === containerItem.id);
+      const unsortedSiblings: Page[] = Object.values(_pages).filter(isTruthy)
+        .filter((page) => page && page.parentId === parentId && page.id !== droppedItem.id);
+      const siblings: Page[] = sortNodes(unsortedSiblings) as Page[];
+
       const droppedPage = _pages[droppedItem.id];
       if (!droppedPage) {
         throw new Error('canot find dropped page');
       }
+      const originIndex: number = siblings.findIndex(sibling => sibling.id === containerItem.id);
       siblings.splice(originIndex, 0, droppedPage);
       siblings.forEach((page, _index) => {
         page.index = _index;
@@ -201,6 +209,7 @@ function PageNavigation ({
       index, // send it to the end
       parentId
     });
+
     setPages(_pages => ({
       ..._pages,
       [droppedItem.id]: {
