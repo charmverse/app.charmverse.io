@@ -57,7 +57,8 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
   if ((typeof updateContent.index === 'number' || updateContent.parentId !== undefined) && permissions.edit_position !== true) {
     throw new ActionNotPermittedError('You do not have permission to reposition this page');
   }
-
+  // Allow user with View & Comment permission to edit the page content
+  // This is required as in order to create a comment, the page needs to be updated
   else if (permissions.edit_content !== true && permissions.comment !== true) {
     throw new ActionNotPermittedError('You do not have permission to update this page');
   }
