@@ -1,0 +1,15 @@
+import Koa from 'koa';
+import Router from '@koa/router';
+import * as routes from './routes';
+
+const app = new Koa();
+const router = new Router();
+
+router.get('/ping', routes.healthCheck);
+
+app
+  .use(routes.errorHandler)
+  .use(router.routes())
+  .use(router.allowedMethods());
+
+export default app;

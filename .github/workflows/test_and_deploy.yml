@@ -68,6 +68,9 @@ jobs:
       - name: Add Datadog API Key
         run: sed -i 's/{API_KEY}/${{ secrets.DATADOG_API_KEY }}/g' .ebextensions/99_datadog.config
 
+      - name: Configure npm task
+        run: sed -i 's/{NPM_RUN_COMMAND}/start:prod/g' .ebextensions/00_env_vars.config
+
       - name: Package
         run: cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
 

@@ -30,6 +30,9 @@ jobs:
       - name: Add Datadog API Key
         run: sed -i 's/{API_KEY}/${{ secrets.DATADOG_API_KEY }}/g' .ebextensions/99_datadog.config
 
+      - name: Configure npm task
+        run: sed -i 's/{NPM_RUN_COMMAND}/cron:staging/g' .ebextensions/00_env_vars.config
+
       - name: Change start command
         # use -i- otherwise sed thinks "Dockerfile" is a command line argument, then we have to clean up Dockerfile-
         run: sed -i- 's/start:prod/start:staging/g' Dockerfile && rm Dockerfile-
