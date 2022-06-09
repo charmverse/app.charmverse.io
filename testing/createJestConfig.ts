@@ -1,6 +1,7 @@
 
 import nextJest from 'next/jest';
 import * as path from 'path';
+import { esmModules } from '../next.config';
 
 const createJestConfig = nextJest({ dir: path.join(__dirname, '../') });
 
@@ -12,7 +13,13 @@ interface JestConfig {
 export default async function overriddenConfig (_config: any) {
   return async function defaultExport () {
     const config: JestConfig = await createJestConfig(_config)();
-    config.transformIgnorePatterns = ['/.next/'];
+    config.transformIgnorePatterns = [
+      '/.next/',
+      // ignore all node_modules except for bangle.dev
+      `/node_modules/(?!(${esmModules.join('|')}))(.*)`,
+      // CSS modules are mocked so they don't need to be transformed
+      '^.+\\.module\\.(css|sass|scss)$'
+    ];
     return config;
   };
 }

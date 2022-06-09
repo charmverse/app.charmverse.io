@@ -5,7 +5,6 @@ import { useRouter } from 'next/router';
 import NavigateNextIcon from '@mui/icons-material/ArrowRightAlt';
 import Button from 'components/common/Button';
 import Grid from '@mui/material/Grid';
-import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import MuiLink from '@mui/material/Link';
 import Tooltip from '@mui/material/Tooltip';
@@ -16,23 +15,13 @@ import NextLink from 'next/link';
 import { useState } from 'react';
 import CreateWorkspaceForm from 'components/common/CreateSpaceForm';
 import { Modal } from 'components/common/Modal';
-import Avatar from 'components/common/Avatar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
-import { getDisplayName } from 'lib/users';
 import WorkspaceAvatar from './WorkspaceAvatar';
 
 const AvatarLink = styled(NextLink)`
   cursor: pointer;
-`;
-
-const MyAvatar = styled(Avatar)<{ active: boolean }>`
-  border: 2px solid ${({ theme }) => theme.palette.sidebar.background};
-  &:hover {
-    box-shadow: 0 0 0 3px ${({ theme }) => theme.palette.sidebar.avatarHighlight};
-  }
-  ${({ active, theme }) => active && `box-shadow: 0 0 0 3px ${theme.palette.sidebar.avatarHighlight};`}
 `;
 
 const WorkspacesContainer = styled.div`
@@ -66,8 +55,6 @@ export default function Workspaces () {
     setUser(_user);
     router.push(`/${newSpace.domain}`);
   }
-
-  const userName = user ? getDisplayName(user) : '';
 
   return (
     <WorkspacesContainer>

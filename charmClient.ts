@@ -15,7 +15,7 @@ import { IUser, UserWorkspace } from 'components/common/BoardEditor/focalboard/s
 import { IWorkspace } from 'components/common/BoardEditor/focalboard/src/blocks/workspace';
 import { OctoUtils } from 'components/common/BoardEditor/focalboard/src/octoUtils';
 import { InviteLinkPopulated } from 'pages/api/invites/index';
-import { FiatCurrency, IPairQuote } from 'models/Currency';
+import { FiatCurrency, IPairQuote } from 'connectors';
 import type { FailedImportsError } from 'lib/notion/types';
 import { GetPoapsResponse, UpdatePoapsRequest } from 'lib/poap';
 // TODO: Maybe move these types to another place so that we dont import from backend
@@ -41,10 +41,6 @@ import { PublicUser } from 'pages/api/public/profile/[userPath]';
 import { SuggestionAction } from 'lib/bounties';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
-
-export interface PopulatedBounty extends Bounty {
-  applications: Application[];
-}
 
 //
 // CharmClient is the client interface to the server APIs
@@ -396,7 +392,7 @@ class CharmClient {
     updater(fbBlocks);
   }
 
-  listBounties (spaceId: string): Promise<PopulatedBounty[]> {
+  listBounties (spaceId: string): Promise<BountyWithDetails[]> {
     return http.GET('/api/bounties', { spaceId });
   }
 
@@ -428,15 +424,6 @@ class CharmClient {
   async updateBounty (bountyId: string, bounty: Partial<Bounty>): Promise<BountyWithDetails> {
 
     const data = await http.PUT<BountyWithDetails>(`/api/bounties/${bountyId}`, bounty);
-
-    return data;
-  }
-
-  async changeBountyStatus (bountyId: string, newStatus: BountyStatus): Promise<BountyWithDetails> {
-
-    const data = await http.PUT<BountyWithDetails>(`/api/bounties/${bountyId}`, {
-      status: newStatus
-    });
 
     return data;
   }
@@ -476,7 +463,7 @@ class CharmClient {
     return http.POST<Application>('/api/submissions', content);
   }
 
-  async updateSubmission ({ submissionId, content }: {submissionId: string, content: SubmissionContent}): Promise<Application> {
+  async updateSubmission ({ submissionId, content }: { submissionId: string, content: SubmissionContent }): Promise<Application> {
 
     return http.PUT<Application>(`/api/submissions/${submissionId}`, content);
   }

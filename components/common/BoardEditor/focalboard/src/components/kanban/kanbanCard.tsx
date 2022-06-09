@@ -3,12 +3,13 @@
 import { Box } from '@mui/material'
 import { useCurrentSpace } from 'hooks/useCurrentSpace'
 import { usePages } from 'hooks/usePages'
-import { BountyStatusColours } from 'components/bounties/components/BountyStatusBadge'
+import { BountyStatusChip } from 'components/bounties/components/BountyStatusBadge'
 import { useBounties } from 'hooks/useBounties'
 import { BOUNTY_LABELS, PageContent } from 'models'
-import { CryptoCurrency, CryptoLogoPaths } from 'models/Currency'
+import { CryptoCurrency, CryptoLogoPaths } from 'connectors'
 import Image from 'next/image'
 import React, { useState } from 'react'
+import styled from '@emotion/styled'
 import { useIntl } from 'react-intl'
 import { mutate } from 'swr'
 import { Board, IPropertyTemplate } from '../../blocks/board'
@@ -45,6 +46,23 @@ type Props = {
   showCard: (cardId?: string) => void
   isManualSort: boolean
 }
+
+const BountyFooter = styled.div`
+  border-top: 1px solid ${({ theme }) => theme.palette.divider};
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding-top: ${({ theme }) => theme.spacing(1)};
+`;
+
+const CurrencyIcon = styled.span`
+  margin-right: ${({ theme }) => theme.spacing(.5)};
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
 
 const KanbanCard = React.memo((props: Props) => {
   const { card, board } = props
@@ -164,17 +182,15 @@ const KanbanCard = React.memo((props: Props) => {
         }
 
         <div className='octo-icontitle'>
-          <Box sx={{
-            display: "flex",
-          }}>
+            <div>
             {cardPage?.icon ? <PageIcon isEditorEmpty={checkForEmpty(cardPage?.content as PageContent)} pageType="page" icon={cardPage.icon} /> : undefined}
+            </div>
             <div
               key='__title'
               className='octo-titletext'
             >
               {cardPage?.title || intl.formatMessage({ id: 'KanbanCard.untitled', defaultMessage: 'Untitled' })}
             </div>
-          </Box>
         </div>
         {visiblePropertyTemplates.map((template) => (
           <Tooltip
@@ -192,31 +208,18 @@ const KanbanCard = React.memo((props: Props) => {
             />
           </Tooltip>
         ))}
-        {linkedBounty && <Box sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          width: "100%"
-        }}>
+        {linkedBounty && <BountyFooter>
           <Box sx={{
             display: "flex",
             gap: 0.25,
           }}>
-            <Box
-              mr={0.25}
-              component='span'
-              sx={{
-                width: 15,
-                display: 'flex',
-                alignItems: 'center'
-              }}
-            >
-              {CryptoLogoPaths[linkedBounty.rewardToken as CryptoCurrency] && (<Image
+            <CurrencyIcon>
+              {CryptoLogoPaths[linkedBounty.rewardToken as CryptoCurrency] && (<img
                 loading='lazy'
-                width={15}
-                height={15}
+                height={20}
                 src={CryptoLogoPaths[linkedBounty.rewardToken as CryptoCurrency]}
               />)}
-            </Box>
+            </CurrencyIcon>
             <Box sx={{
               display: "flex",
               gap: 0.25
@@ -226,16 +229,8 @@ const KanbanCard = React.memo((props: Props) => {
               </Box>
             </Box>
           </Box>
-          <Box style={{
-            color: BountyStatusColours[linkedBounty.status],
-          }} sx={{
-            fontWeight: "bold",
-            textTransform: "uppercase",
-            fontSize: 12
-          }}>
-            {BOUNTY_LABELS[linkedBounty.status]}
-          </Box>
-        </Box>}
+          <BountyStatusChip size='small' status={linkedBounty.status} />
+        </BountyFooter>}
       </div>
       {showConfirmationDialogBox && <ConfirmationDialogBox dialogBox={confirmDialogProps} />}
     </>

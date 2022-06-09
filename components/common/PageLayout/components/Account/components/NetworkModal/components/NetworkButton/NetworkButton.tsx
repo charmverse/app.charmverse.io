@@ -3,7 +3,7 @@ import Button from 'components/common/Button';
 import Tooltip from '@mui/material/Tooltip';
 import styled from '@emotion/styled';
 import { useWeb3React } from '@web3-react/core';
-import { Chains, RPC } from 'connectors';
+import { Chains, RPC, CryptoLogoPaths } from 'connectors';
 import { greyColor2 } from 'theme/colors';
 
 type Props = {
@@ -32,7 +32,7 @@ function NetworkButton ({ chain, requestNetworkChange }: Props) {
         <Button
           startIcon={(
             // @ts-ignore
-            <ImageIcon src={RPC[chain].iconUrls[0]} />
+            <ImageIcon src={CryptoLogoPaths[chain]} />
           )}
           color='secondary'
           variant='outlined'

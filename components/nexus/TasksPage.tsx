@@ -65,7 +65,7 @@ export default function TasksPage () {
           </Box>
         </Grid>
         <Grid item xs={12} sm={6}>
-          <Box display='flex' alignItems='center' justifyContent={{ xs: 'flex-start', md: 'flex-end' }} gap={2}>
+          <Box display='flex' alignItems='center' justifyContent={{ xs: 'flex-start', md: 'flex-end' }} gap={{ sm: 2, xs: 1 }}>
             <NotifyMeButton />
             <SnoozeButton />
           </Box>

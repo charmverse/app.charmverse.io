@@ -1,6 +1,8 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import { IconButton, Tooltip, InputAdornment } from '@mui/material';
 import Grid from '@mui/material/Grid';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import Alert from '@mui/material/Alert';
 import TextField from '@mui/material/TextField';
 import PrimaryButton from 'components/common/PrimaryButton';
@@ -8,13 +10,14 @@ import FieldLabel from 'components/common/form/FieldLabel';
 import Avatar from 'components/settings/workspace/LargeAvatar';
 import Divider from '@mui/material/Divider';
 import { useUser } from 'hooks/useUser';
-import { Prisma, Space } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { useState, ChangeEvent } from 'react';
 import { DialogTitle } from 'components/common/Modal';
 import { useForm } from 'react-hook-form';
 import { DOMAIN_BLACKLIST } from 'lib/spaces';
 import charmClient from 'charmClient';
 import log from 'lib/log';
+import randomName from 'lib/utilities/randomName';
 
 export const schema = yup.object({
   id: yup.string(),
@@ -45,7 +48,6 @@ interface Props {
 export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit, onCancel, submitText }: Props) {
 
   const [user] = useUser();
-
   const [saveError, setSaveError] = useState<any | null>(null);
   const {
     register,
@@ -54,7 +56,7 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
     watch,
     formState: { errors, touchedFields }
   } = useForm<FormValues>({
-    defaultValues,
+    defaultValues: defaultValues || getDefaultName(),
     resolver: yupResolver(schema)
   });
 
@@ -101,6 +103,12 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
 
   }
 
+  function randomizeName () {
+    const { name, domain } = getDefaultName();
+    setValue('name', name);
+    setValue('domain', domain);
+  }
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <DialogTitle onClose={onCancel}>Create a workspace</DialogTitle>
@@ -126,6 +134,17 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
             fullWidth
             error={!!errors.name}
             helperText={errors.name?.message}
+            InputProps={defaultValues ? {} : {
+              endAdornment: (
+                <InputAdornment position='end'>
+                  <Tooltip arrow placement='top' title='Regenerate random name'>
+                    <IconButton size='small' onClick={randomizeName}>
+                      <RefreshIcon fontSize='small' />
+                    </IconButton>
+                  </Tooltip>
+                </InputAdornment>
+              )
+            }}
           />
         </Grid>
         <Grid item>
@@ -157,4 +176,12 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
 
 export function getDomainFromName (name: string) {
   return name.replace(/[\p{P}\p{S}]/gu, '').replace(/\s/g, '-').toLowerCase();
+}
+
+function getDefaultName (): { name: string, domain: string } {
+  const name = randomName();
+  return {
+    name,
+    domain: name
+  };
 }

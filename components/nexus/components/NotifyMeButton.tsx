@@ -33,7 +33,7 @@ export default function SnoozeButton () {
           variant='outlined'
           startIcon={<EmailIcon fontSize='small' />}
           // required to vertically align this button with its siblings
-          sx={{ display: 'flex' }}
+          sx={{ display: 'flex', fontSize: { xs: '12px', sm: '14px' } }}
           {...bindTrigger(popupState)}
         >
           {user?.email ? 'Notification Settings' : 'Notify Me'}
