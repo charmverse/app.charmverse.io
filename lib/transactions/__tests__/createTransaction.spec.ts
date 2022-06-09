@@ -26,7 +26,8 @@ beforeAll(async () => {
     userId: user.id,
     submissionContent: {
       submission: 'Hello World',
-      submissionNodes: '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My submission"}]}]}'
+      submissionNodes: '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My submission"}]}]}',
+      walletAddress: '0x123456789'
     }
   });
 });

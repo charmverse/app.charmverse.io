@@ -6,11 +6,10 @@ import { useContributors } from 'hooks/useContributors';
 import Typography from '@mui/material/Typography';
 
 interface Props {
-  bounty: Bounty
-  submission: Application
+  submission: Application;
 }
 
-export default function BountySubmissionContent ({ bounty, submission }: Props) {
+export default function BountySubmissionContent ({ submission }: Props) {
 
   const [contributors] = useContributors();
 

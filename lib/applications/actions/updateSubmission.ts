@@ -1,13 +1,13 @@
 import { Application } from '@prisma/client';
-import { DataNotFoundError, MissingDataError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { prisma } from 'db';
+import { DataNotFoundError, MissingDataError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { getApplication } from '../getApplication';
-import { SubmissionContent, SubmissionUpdateData } from '../interfaces';
+import { SubmissionUpdateData } from '../interfaces';
 import { submissionIsEditable } from '../shared';
 
 export async function updateSubmission ({ submissionId, submissionContent }: SubmissionUpdateData): Promise<Application> {
-  // Undefined is ok, but not null or string values
-  const isEmpty = Object.values(submissionContent).indexOf(null) > -1 || (submissionContent.submission?.length ?? 1) < 1 || (typeof submissionContent.submissionNodes === 'string' && (submissionContent.submissionNodes?.length ?? 1) < -1);
+  // Undefined is ok, but not null or empty string values
+  const isEmpty = Object.values(submissionContent).indexOf(null as any) > -1 || (submissionContent.submission?.length ?? 1) < 1 || (typeof submissionContent.submissionNodes === 'string' && (submissionContent.submissionNodes?.length ?? 1) < 1);
 
   if (isEmpty) {
     throw new MissingDataError('You cannot provide an empty submission');
@@ -21,6 +21,10 @@ export async function updateSubmission ({ submissionId, submissionContent }: Sub
 
   if (!submissionIsEditable({ bounty: existingSubmission.bounty, submission: existingSubmission })) {
     throw new UnauthorisedActionError();
+  }
+
+  if (!submissionContent.walletAddress) {
+    throw new MissingDataError('You must provide a wallet address in your submission');
   }
 
   return prisma.application.update({

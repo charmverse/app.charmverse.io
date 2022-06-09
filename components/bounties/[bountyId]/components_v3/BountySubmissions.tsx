@@ -278,7 +278,7 @@ export default function BountySubmissions ({ bounty }: Props) {
       {
       /* Modal for viewing the content */
         <Modal open={currentViewedSubmission !== null} onClose={() => setCurrentViewedSubmission(null)} size='large'>
-          <BountySubmissionContent bounty={bounty} submission={currentViewedSubmission as Application} />
+          <BountySubmissionContent submission={currentViewedSubmission as Application} />
         </Modal>
     }
 

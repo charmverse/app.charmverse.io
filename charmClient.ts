@@ -453,7 +453,7 @@ class CharmClient {
     return http.POST<Application>('/api/submissions', content);
   }
 
-  async updateSubmission ({ submissionId, content }: {submissionId: string, content: SubmissionContent}): Promise<Application> {
+  async updateSubmission ({ submissionId, content }: { submissionId: string, content: SubmissionContent }): Promise<Application> {
 
     return http.PUT<Application>(`/api/submissions/${submissionId}`, content);
   }
