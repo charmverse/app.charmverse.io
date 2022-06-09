@@ -34,7 +34,7 @@ function PoapSection (props: PoapSectionProps) {
   const managePoapModalState = usePopupState({ variant: 'popover', popupId: 'poap-modal' });
   const { openWalletSelectorModal } = useContext(Web3Connection);
   const isPublic = isPublicUser(user);
-  const { data: poapData, mutate: mutatePoaps } = useSWRImmutable(`/poaps/${user.id}`, () => {
+  const { data: poapData, mutate: mutatePoaps } = useSWRImmutable(`/poaps/${user.id}/${isPublic}`, () => {
     return isPublicUser(user) ? Promise.resolve({ visiblePoaps: [], hiddenPoaps: [] }) : charmClient.getUserPoaps();
   });
 
