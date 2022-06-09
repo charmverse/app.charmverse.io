@@ -242,7 +242,7 @@ export const CryptoCurrencyList = Object.values(RPC).reduce((acc, chain) => {
   return acc;
 }, {} as Record<CryptoCurrency, string>);
 
-export const CryptoLogoPaths = Object.values(RPC).reduce((acc, chain) => {
+export const TokenLogoPaths = Object.values(RPC).reduce((acc, chain) => {
   acc[chain.nativeCurrency.symbol] = chain.iconUrl;
   return acc;
 }, {} as Record<CryptoCurrency, string>);
@@ -277,7 +277,7 @@ export function getChainById (chainId: number): IChainDetails | undefined {
   return RPCList.find(rpc => rpc.chainId === chainId);
 }
 
-const supportedChains = [
+const supportedChains: Blockchain[] = [
   'ETHEREUM',
   'POLYGON',
   'AVALANCHE',
@@ -290,7 +290,7 @@ const supportedChains = [
   'GOERLI',
   'RINKEBY',
   'MUMBAI'
-] as const;
+];
 
 const supportedChainIds = supportedChains.map((_) => Chains[_]);
 
