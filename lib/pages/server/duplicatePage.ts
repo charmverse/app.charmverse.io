@@ -5,7 +5,7 @@ import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
 import { v4 } from 'uuid';
 import { prisma } from 'db';
 import { createBlock } from 'lib/focalboard/block';
-import { getPage, PageNotFoundError } from './server';
+import { getPage, PageNotFoundError } from '.';
 
 export async function duplicatePage (pageId: string, userId: string) {
   const page = await getPage(pageId);
@@ -154,8 +154,8 @@ export async function duplicatePage (pageId: string, userId: string) {
             spaceId: cardPage.spaceId,
             path: `page-${duplicateCardId}`
           });
+          duplicatedCardBlockIds.push(duplicateCardId);
         });
-
       blockCreateManyInput.push(...viewBlocks.map(viewBlock => ({
         ...createBoardView({
           fields: {

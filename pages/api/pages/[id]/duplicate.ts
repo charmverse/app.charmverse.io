@@ -1,6 +1,5 @@
-
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { duplicatePage } from 'lib/pages/duplicate';
+import { duplicatePage } from 'lib/pages/server/duplicatePage';
 import { IPageWithPermissions } from 'lib/pages/server';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
