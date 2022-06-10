@@ -1,6 +1,6 @@
 import PageContainer from 'components/common/PageLayout/components/PageContainer';
 import { useTheme } from '@emotion/react';
-import { AppBar } from 'components/common/PageLayout/PageLayout';
+import { AppBar, HeaderSpacer } from 'components/common/PageLayout/PageLayout';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
@@ -111,6 +111,7 @@ export default function PublicPage () {
         </AppBar>
 
         <PageContainer>
+          <HeaderSpacer />
           {currentPage?.type === 'board'
             ? (
               <BoardPage page={currentPage} setPage={() => {}} readonly={true} />

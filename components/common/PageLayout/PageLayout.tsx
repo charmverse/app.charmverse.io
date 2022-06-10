@@ -74,7 +74,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: prop => prop !== 'open' &&
     })
   }));
 
-const HeaderSpacer = styled.div`
+export const HeaderSpacer = styled.div`
   min-height: ${headerHeight}px;
 `;
 
