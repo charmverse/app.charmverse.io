@@ -14,7 +14,7 @@ import { Page, PageContent } from 'models';
 import { ComponentProps, Dispatch, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo, memo } from 'react';
 import { useDrop } from 'react-dnd';
 import { checkForEmpty } from 'components/common/CharmEditor/utils';
-import { addPageAndRedirect, NewPageInput } from 'lib/pages';
+import { addPageAndRedirect, NewPageInput, IPageWithPermissions } from 'lib/pages';
 import sortBy from 'lodash/sortBy';
 import TreeNode, { MenuNode, ParentMenuNode } from './components/TreeNode';
 
@@ -73,7 +73,7 @@ function mapTree (items: MenuNode[], key: 'parentId', rootPageIds?: string[]): P
 type TreeRootProps = {
   children: ReactNode,
   isFavorites?: boolean,
-  setPages: Dispatch<SetStateAction<Record<string, Page | undefined>>>
+  setPages: Dispatch<SetStateAction<Record<string, IPageWithPermissions | undefined>>>
 } & ComponentProps<typeof TreeView>;
 
 function TreeRoot ({ children, setPages, isFavorites, ...rest }: TreeRootProps) {
@@ -131,7 +131,7 @@ function PageNavigation ({
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${space!.id}.expanded-pages`, []);
 
   const pagesArray: MenuNode[] = Object.values(pages)
-    .filter((page): page is Page => Boolean(isTruthy(page) && (page.type === 'board' || page.type === 'page' || rootPageIds?.includes(page.id))))
+    .filter((page): page is IPageWithPermissions => isTruthy(page && (page.type === 'board' || page.type === 'page' || rootPageIds?.includes(page.id))))
     .map((page): MenuNode => ({
       id: page.id,
       title: page.title,
