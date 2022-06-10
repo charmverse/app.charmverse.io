@@ -153,7 +153,7 @@ class CharmClient {
   }
 
   createPage (pageOpts: Prisma.PageCreateInput) {
-    return http.POST<Page>('/api/pages', pageOpts);
+    return http.POST<IPageWithPermissions>('/api/pages', pageOpts);
   }
 
   getPage (pageId: string, spaceId?:string) {
