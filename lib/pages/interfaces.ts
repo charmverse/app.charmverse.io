@@ -21,4 +21,6 @@ export interface PageLink {
 export interface PagesRequest {
   spaceId: string;
   userId?: string;
+  archived?: boolean
+  pageIds?: string[]
 }

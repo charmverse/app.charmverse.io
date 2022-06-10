@@ -1,8 +1,8 @@
-import { Page, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { IPageWithPermissions, PagesRequest } from '../interfaces';
 
-function generateAccessiblePagesQuery ({ spaceId, userId }: PagesRequest): Prisma.PageFindManyArgs {
+function generateAccessiblePagesQuery ({ spaceId, userId, archived }: PagesRequest): Prisma.PageFindManyArgs {
 
   // Return only pages with public permissions
   if (!userId) {
@@ -17,6 +17,14 @@ function generateAccessiblePagesQuery ({ spaceId, userId }: PagesRequest): Prism
       }
     };
   }
+
+  const archivedQuery = archived ? {
+    deletedAt: {
+      not: null
+    }
+  } : {
+    deletedAt: null
+  };
 
   return {
     where: {
@@ -68,7 +76,8 @@ function generateAccessiblePagesQuery ({ spaceId, userId }: PagesRequest): Prism
             }
           }
         }
-      ]
+      ],
+      ...archivedQuery
     },
     include: {
       permissions: {
@@ -80,8 +89,8 @@ function generateAccessiblePagesQuery ({ spaceId, userId }: PagesRequest): Prism
   };
 }
 
-export async function getAccessiblePages ({ spaceId, userId }: {spaceId: string, userId?: string}): Promise<IPageWithPermissions[]> {
+export async function getAccessiblePages ({ spaceId, userId, archived = false }: PagesRequest): Promise<IPageWithPermissions[]> {
   return prisma.page.findMany(
-    generateAccessiblePagesQuery({ spaceId, userId })
+    generateAccessiblePagesQuery({ spaceId, userId, archived })
   ) as any as Promise<IPageWithPermissions[]>;
 }

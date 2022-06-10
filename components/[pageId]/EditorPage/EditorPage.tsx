@@ -6,8 +6,10 @@ import { addCard } from 'components/common/BoardEditor/focalboard/src/store/card
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { setCurrent } from 'components/common/BoardEditor/focalboard/src/store/views';
 import ErrorPage from 'components/common/errors/ErrorPage';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
+import { useUser } from 'hooks/useUser';
 import { Board } from 'lib/focalboard/board';
 import debouncePromise from 'lib/utilities/debouncePromise';
 import log from 'loglevel';
@@ -23,13 +25,14 @@ interface Props {
 
 export default function EditorPage (
   { shouldLoadPublicPage, pageId, onPageLoad }: Props
-
 ) {
   const dispatch = useAppDispatch();
   const { setIsEditing, pages, setPages, getPagePermissions } = usePages();
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
-
+  const [space] = useCurrentSpace();
+  const [isAccessDenied, setIsAccessDenied] = useState(false);
+  const [user] = useUser();
   const currentPagePermissions = getPagePermissions(pageId);
 
   async function loadPublicPage (publicPageId: string) {
@@ -85,21 +88,36 @@ export default function EditorPage (
   const pagesLoaded = Object.keys(pages).length > 0;
 
   useEffect(() => {
+    async function main () {
+      setIsAccessDenied(false);
+      if (pageId && shouldLoadPublicPage) {
+        loadPublicPage(pageId as string);
+      }
+      else if (pageId && pagesLoaded && space) {
+        try {
+          const page = await charmClient.getPage(pageId, space.id);
+          if (page) {
+            setPages((_pages) => ({ ..._pages, [page.id]: page }));
+            setPageNotFound(false);
+            onPageLoad?.(page.id);
+          }
+          else {
+            setPageNotFound(true);
+          }
+        }
+        catch (err: any) {
+          // An error will be thrown if page doesn't exist or if you dont have read permission for the page
+          if (err.errorType === 'Access denied') {
+            setIsAccessDenied(true);
+          }
+          // If the page doesn't exist an error will be thrown
+          setPageNotFound(true);
+        }
+      }
+    }
 
-    if (pageId && shouldLoadPublicPage) {
-      loadPublicPage(pageId as string);
-    }
-    else if (pageId && pagesLoaded) {
-      const pageByPath = pages[pageId];
-      if (pageByPath) {
-        setTitleState(pageByPath.title);
-        onPageLoad?.(pageByPath.id);
-      }
-      else {
-        setPageNotFound(true);
-      }
-    }
-  }, [pageId, pagesLoaded]);
+    main();
+  }, [pageId, pagesLoaded, space, user]);
 
   const debouncedPageUpdate = debouncePromise(async (updates: Prisma.PageUpdateInput) => {
     setIsEditing(true);
@@ -134,7 +152,10 @@ export default function EditorPage (
     [pageId, currentPage?.headerImage, currentPage?.icon, currentPage?.title, currentPage?.deletedAt]
   );
 
-  if (pageNotFound) {
+  if (isAccessDenied) {
+    return <ErrorPage message={'Sorry, you don\'t have access to this page'} />;
+  }
+  else if (pageNotFound) {
     return <ErrorPage message={'Sorry, that page doesn\'t exist'} />;
   }
   // Handle public page
