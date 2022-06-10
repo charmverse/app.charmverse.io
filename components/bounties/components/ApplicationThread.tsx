@@ -33,10 +33,10 @@ const ContextBorder = styled.div`
 
 const StyledApplicationThread = styled(Paper)`
   overflow: 'auto'
-  padding: ${({ theme }) => theme.spacing(2)};
+  padding: ${({ theme }) => theme.spacing(4)};
+  margin-top: ${({ theme }) => theme.spacing(2)};
   background: ${({ theme }) => theme.palette.background.light};
-  width: 500px;
-  max-height: 350px;
+  width: 100%;
 `;
 
 const ThreadHeader = styled.div`
@@ -101,7 +101,7 @@ function AddCommentCharmEditor (
   const { addComment } = useThreads();
 
   return (
-    <Box display='flex' px={1} pb={1} sx={sx} flexDirection='column' gap={1} mt={thread.comments && thread.comments.length !== 0 ? 1 : 0}>
+    <Box display='flex' px={1} pb={1} sx={sx} flexDirection='column' gap={1} mt={thread && thread.comments && thread.comments.length !== 0 ? 1 : 0}>
       <InlineCharmEditor
         style={{
           backgroundColor: theme.palette.background.default
@@ -135,7 +135,7 @@ function EditCommentCharmEditor ({ disabled, isEditable, thread, commentId, onCo
   const [commentContent, setCommentContent] = useState<PageContent | null>(null);
   const isEmpty = checkForEmpty(commentContent);
   const { editComment } = useThreads();
-  debugger;
+
   const comment = thread.comments.find(_comment => _comment.id === commentId) as CommentWithUser;
 
   return (
@@ -259,7 +259,7 @@ const ApplicationThread = forwardRef<HTMLDivElement, ApplicationThreadProps>(({ 
 
   const view = useEditorViewContext();
 
-  const threadId = thread.id;
+  const threadId = thread?.id;
 
   function resetState () {
     setEditedCommentId(null);
@@ -299,18 +299,13 @@ const ApplicationThread = forwardRef<HTMLDivElement, ApplicationThreadProps>(({ 
     menuState.close();
   }
 
-  if (!thread) {
-    return null;
-  }
-  debugger;
   return (
     <StyledApplicationThread id={`thread.${threadId}`} ref={ref}>
       <div>
         <ThreadHeader>
-          <ThreadCreatedDate createdAt={thread.createdAt} />
+          <ThreadCreatedDate createdAt={thread?.createdAt} />
         </ThreadHeader>
-        {thread.comments && thread.comments.map((comment, commentIndex) => {
-          debugger;
+        {thread && thread.comments && thread.comments.map((comment, commentIndex) => {
           const isEditable = comment.id === editedCommentId;
           return (
             <ThreadCommentListItem
@@ -430,7 +425,7 @@ const ApplicationThread = forwardRef<HTMLDivElement, ApplicationThreadProps>(({ 
           pb: 1,
           flexDirection: 'column',
           gap: 1,
-          mt: thread.comments && thread.comments.length !== 0 ? 1 : 0
+          mt: thread && thread.comments && thread.comments.length !== 0 ? 1 : 0
         }}
         disabled={!!editedCommentId || isMutating}
         thread={thread}

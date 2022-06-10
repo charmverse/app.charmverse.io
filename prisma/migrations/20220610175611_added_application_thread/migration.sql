@@ -5,6 +5,9 @@
 
 */
 -- AlterTable
+ALTER TABLE "Comment" ALTER COLUMN "pageId" DROP NOT NULL;
+
+-- AlterTable
 ALTER TABLE "Thread" ADD COLUMN     "applicationId" UUID,
 ALTER COLUMN "pageId" DROP NOT NULL;
 

@@ -30,9 +30,7 @@ export default function BountySubmissionContent ({ bounty, submission }: Props) 
         content={submission?.submissionNodes ? JSON.parse(submission?.submissionNodes) : ''}
         readOnly
       />
-      {
-        thread && <ApplicationThread applicationId={submission.id} thread={thread} />
-      }
+      <ApplicationThread applicationId={submission.id} thread={thread} />
     </Box>
   );
 }

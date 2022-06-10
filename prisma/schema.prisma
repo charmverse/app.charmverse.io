@@ -487,8 +487,8 @@ model Comment {
   content   Json?
   userId    String    @db.Uuid
   user      User      @relation(fields: [userId], references: [id])
-  pageId    String    @db.Uuid
-  page      Page      @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  pageId    String?   @db.Uuid
+  page      Page?     @relation(fields: [pageId], references: [id], onDelete: Cascade)
   spaceId   String    @db.Uuid
   space     Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   updatedAt DateTime?
