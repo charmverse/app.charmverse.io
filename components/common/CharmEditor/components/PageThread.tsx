@@ -359,7 +359,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                           fontSize='small'
                         />
                       )}
-                      disabled={isMutating || !permissions.comment || (thread.userId !== user?.id)}
+                      disabled={isMutating || !permissions.comment}
                       onClick={async () => {
                         setIsMutating(true);
                         await resolveThread(threadId);
