@@ -27,8 +27,10 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
 
   // watch changes to the page in case permissions get updated
   useEffect(() => {
-    refreshPermissions();
-  }, [pages[currentPageId]]);
+    if (popupState.isOpen) {
+      refreshPermissions();
+    }
+  }, [pages[currentPageId], popupState.isOpen]);
 
   return (
     <>
