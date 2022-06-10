@@ -1,10 +1,16 @@
 import PageContainer from 'components/common/PageLayout/components/PageContainer';
+import { useTheme } from '@emotion/react';
 import { AppBar } from 'components/common/PageLayout/PageLayout';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
+import { Box, Tooltip, IconButton } from '@mui/material';
+import SunIcon from '@mui/icons-material/WbSunny';
+import MoonIcon from '@mui/icons-material/DarkMode';
 import CurrentPageFavicon from 'components/common/PageLayout/components/CurrentPageFavicon';
-import Header from 'components/common/PageLayout/components/Header';
+import { StyledToolbar } from 'components/common/PageLayout/components/Header';
+import Account from 'components/common/PageLayout/components/Account';
+import PageTitleWithBreadcrumbs from 'components/common/PageLayout/components/Header/PageTitleWithBreadcrumbs';
 import charmClient from 'charmClient';
 import { Card } from 'components/common/BoardEditor/focalboard/src/blocks/card';
 import { addBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
@@ -12,13 +18,14 @@ import { addCard } from 'components/common/BoardEditor/focalboard/src/store/card
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { setCurrent } from 'components/common/BoardEditor/focalboard/src/store/views';
 import ErrorPage from 'components/common/errors/ErrorPage';
-import { usePages, PagesMap } from 'hooks/usePages';
+import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { Board } from 'lib/focalboard/board';
 import { useEffect, useState } from 'react';
 import { useSpaces } from 'hooks/useSpaces';
 import BoardPage from 'components/[pageId]/BoardPage';
 import DocumentPage from 'components/[pageId]/DocumentPage';
+import { useColorMode } from 'context/darkMode';
 
 const LayoutContainer = styled.div`
   display: flex;
@@ -27,6 +34,8 @@ const LayoutContainer = styled.div`
 
 export default function PublicPage () {
 
+  const theme = useTheme();
+  const colorMode = useColorMode();
   const router = useRouter();
   const pageIdOrPath = router.query.pageId as string;
   const dispatch = useAppDispatch();
@@ -76,10 +85,29 @@ export default function PublicPage () {
       <LayoutContainer>
 
         <AppBar sidebarWidth={0} position='fixed' open={false}>
-          <Header
-            open={false}
-            openSidebar={() => {}}
-          />
+
+          <StyledToolbar variant='dense'>
+            <Box sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: 1,
+              width: '100%'
+            }}
+            >
+              <PageTitleWithBreadcrumbs />
+              <Box display='flex' alignItems='center'>
+                {/** dark mode toggle */}
+                <Tooltip title={theme.palette.mode === 'dark' ? 'Light mode' : 'Dark mode'} arrow placement='bottom'>
+                  <IconButton sx={{ mx: 1 }} onClick={colorMode.toggleColorMode} color='inherit'>
+                    {theme.palette.mode === 'dark' ? <SunIcon color='secondary' /> : <MoonIcon color='secondary' />}
+                  </IconButton>
+                </Tooltip>
+                {/** user account */}
+                <Account />
+              </Box>
+            </Box>
+          </StyledToolbar>
         </AppBar>
 
         <PageContainer>

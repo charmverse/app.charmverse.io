@@ -25,14 +25,14 @@ import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
 import { useRouter } from 'next/router';
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import Account from '../Account';
 import ShareButton from '../ShareButton';
 import PageTitleWithBreadcrumbs from './PageTitleWithBreadcrumbs';
 
 export const headerHeight = 56;
 
-const StyledToolbar = styled(Toolbar)`
+export const StyledToolbar = styled(Toolbar)`
   background-color: ${({ theme }) => theme.palette.background.default};
   height: ${headerHeight}px;
   min-height: ${headerHeight}px;
@@ -57,11 +57,13 @@ function CommentThreadsListButton () {
   );
 }
 
-export default function Header (
-  { open, openSidebar, hideSidebarOnSmallScreen }:
-  {
-    open: boolean, openSidebar: () => void, hideSidebarOnSmallScreen?: boolean }
-) {
+interface HeaderProps {
+  open: boolean;
+  openSidebar: () => void;
+  hideSidebarOnSmallScreen?: boolean;
+}
+
+export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }: HeaderProps) {
   const router = useRouter();
   const colorMode = useColorMode();
   const { pages, currentPageId } = usePages();
@@ -124,6 +126,7 @@ export default function Header (
       >
         <MenuIcon />
       </IconButton>
+
       <Box sx={{
         display: 'flex',
         justifyContent: 'space-between',
