@@ -3,6 +3,7 @@ import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { safeInsert } from '@bangle.dev/utils';
 import { ContentCopy as DuplicateIcon, DeleteOutlined as DeleteIcon, MoreHoriz as MoreHorizIcon } from '@mui/icons-material';
 import { ListItemIcon, ListItemText, Menu, MenuItem, MenuProps } from '@mui/material';
+import { Page } from '@prisma/client';
 import charmClient from 'charmClient';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
@@ -99,9 +100,12 @@ function Component ({ menuState }: { menuState: PluginState }) {
         });
         const newTr = safeInsert(newNode, node.nodeEnd)(tr);
         view.dispatch(newTr.scrollIntoView());
-        setPages((_pages) => ({ ..._pages, [duplicatedPage.id]: duplicatedPage }));
         dispatch(initialLoad());
-        await mutate(`pages/${currentSpace.id}`);
+        await mutate(`pages/${currentSpace.id}`, (_pages: Page[]) => {
+          return [..._pages, duplicatedPage];
+        }, {
+          revalidate: true
+        });
       }
     }
     else if (node) {
