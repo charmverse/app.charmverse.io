@@ -1,5 +1,7 @@
 import Box from '@mui/material/Box';
 import { Application, Bounty } from '@prisma/client';
+import useSWRImmutable from 'swr/immutable';
+import charmClient from 'charmClient';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import { getDisplayName } from 'lib/users';
 import { useContributors } from 'hooks/useContributors';
@@ -17,6 +19,8 @@ export default function BountySubmissionContent ({ bounty, submission }: Props) 
 
   const submitter = contributors.find(c => c.id === submission.createdBy);
 
+  const { data: thread } = useSWRImmutable(`/applications/${submission.id}/threads`, () => charmClient.getApplicationThread(submission.id));
+
   return (
     <Box flexGrow={1}>
       <Typography variant='h6'>
@@ -26,7 +30,9 @@ export default function BountySubmissionContent ({ bounty, submission }: Props) 
         content={submission?.submissionNodes ? JSON.parse(submission?.submissionNodes) : ''}
         readOnly
       />
-      <ApplicationThread />
+      {
+        thread && <ApplicationThread applicationId={submission.id} thread={thread} />
+      }
     </Box>
   );
 }
