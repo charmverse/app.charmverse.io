@@ -174,10 +174,11 @@ export async function generateBountyWithSingleApplication ({ applicationStatus, 
 export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'createdBy'>): Promise<IPageWithPermissions> {
   return prisma.page.create({
     data: {
+      id: options.id ?? v4(),
       contentText: '',
       path: options.path ?? `page-${v4()}`,
       title: options.title || 'Example',
-      type: 'page',
+      type: options.type ?? 'page',
       updatedBy: options.createdBy,
       content: options.content as Prisma.InputJsonObject,
       author: {
@@ -191,7 +192,8 @@ export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'cre
         }
       },
       parentId: options.parentId,
-      deletedAt: options.deletedAt ?? null
+      deletedAt: options.deletedAt ?? null,
+      boardId: options.boardId ?? null
     },
     include: {
       permissions: {
@@ -207,7 +209,7 @@ export function createBlock (options: Partial<Block> & Pick<Block, 'createdBy' |
   return prisma.block.create({
     data: {
       title: options.title || 'Example',
-      type: 'card',
+      type: options.type ?? 'card',
       user: {
         connect: {
           id: options.createdBy
@@ -221,10 +223,10 @@ export function createBlock (options: Partial<Block> & Pick<Block, 'createdBy' |
       },
       rootId: options.rootId,
       deletedAt: options.deletedAt ?? null,
-      fields: {},
+      fields: options.fields ?? {},
       parentId: options.parentId || options.rootId,
       schema: 0,
-      id: v4()
+      id: options.id ?? v4()
     }
   });
 }

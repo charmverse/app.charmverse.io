@@ -39,7 +39,10 @@ export const jestConfig = {
   //   "**/?(*.)+(spec|test).[tj]s?(x)"
   ],
 
-  testTimeout: 30000
+  testTimeout: 30000,
+  transform: {
+    '^.+\\.(ts)$': 'ts-jest'
+  }
 
 };
 

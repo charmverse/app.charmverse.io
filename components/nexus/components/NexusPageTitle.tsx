@@ -22,11 +22,11 @@ export default function PageTitle ({ subPage }: { subPage?: string }) {
     >
       {subPage ? (
         <>
-          <Link color='secondary' href='/nexus' sx={{ display: 'flex', alignItems: 'center' }}>
+          {/* <Link color='secondary' href='/nexus' sx={{ display: 'flex', alignItems: 'center' }}>
             <ChevronLeft />
             {MyNexus}
           </Link>
-          <Divider sx={{ borderRightWidth: '2px' }} orientation='vertical' flexItem />
+          <Divider sx={{ borderRightWidth: '2px' }} orientation='vertical' flexItem /> */}
           <Box component='span' alignItems='center' sx={{ fontWeight: 'bold' }}>
             {subPage}
           </Box>
