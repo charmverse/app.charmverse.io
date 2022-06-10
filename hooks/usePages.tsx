@@ -17,7 +17,7 @@ import useIsAdmin from './useIsAdmin';
 
 export type LinkedPage = (Page & {children: LinkedPage[], parent: null | LinkedPage});
 
-export type PagesMap = Record<string, Page | undefined>;
+export type PagesMap = Record<string, IPageWithPermissions | undefined>;
 
 type IContext = {
   currentPageId: string,
@@ -114,6 +114,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
 
   async function refreshPage (pageId: string): Promise<IPageWithPermissions> {
     const freshPageVersion = await charmClient.getPage(pageId);
+    console.log('perms', freshPageVersion.permissions);
     _setPages(_pages => ({
       ..._pages,
       [freshPageVersion.id]: freshPageVersion
@@ -138,13 +139,6 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
       setPages(data.reduce((acc, page) => ({ ...acc, [page.id]: page }), {}) || {});
     }
   }, [data]);
-
-  useEffect(() => {
-    if (currentPageId) {
-      refreshPage(currentPageId);
-    }
-
-  }, [currentPageId]);
 
   return (
     <PagesContext.Provider value={value}>

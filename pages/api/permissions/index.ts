@@ -7,7 +7,6 @@ import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 import nc from 'next-connect';
-import { getPage } from '../../../lib/pages/server';
 import { PermissionNotFoundError } from '../../../lib/permissions/pages/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -19,7 +18,7 @@ handler.use(requireUser)
   .use(requireKeys<PagePermission>(['pageId'], 'body'))
   .post(addPagePermission);
 
-async function findPagePermissions (req: NextApiRequest, res: NextApiResponse<IPagePermissionWithAssignee []>) {
+async function findPagePermissions (req: NextApiRequest, res: NextApiResponse<IPagePermissionWithAssignee[]>) {
 
   const { pageId } = req.query as any as IPagePermissionRequest;
 

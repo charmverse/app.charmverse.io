@@ -141,7 +141,7 @@ class CharmClient {
   }
 
   getPages (spaceId: string) {
-    return http.GET<Page[]>(`/api/spaces/${spaceId}/pages`);
+    return http.GET<IPageWithPermissions[]>(`/api/spaces/${spaceId}/pages`);
   }
 
   getArchivedPages (spaceId: string) {
@@ -590,7 +590,7 @@ class CharmClient {
     return http.GET('/api/permissions/query', request);
   }
 
-  listPagePermissions (pageId: string): Promise<IPagePermissionWithAssignee []> {
+  listPagePermissions (pageId: string): Promise<IPagePermissionWithAssignee[]> {
     return http.GET('/api/permissions', { pageId });
   }
 
