@@ -138,7 +138,6 @@ function StandardPageTitle () {
 
 export default function PageTitleWithBreadcrumbs () {
   const router = useRouter();
-  console.log('router', router.route);
   if (router.route === '/[domain]/bounties/[bountyId]') {
     return <BountyPageTitle />;
   }

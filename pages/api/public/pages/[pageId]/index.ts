@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { Block, Page } from '@prisma/client';
+import { Block, Page, Space } from '@prisma/client';
 import { prisma } from 'db';
 import { isUUID } from 'lib/utilities/strings';
 import { NotFoundError } from 'lib/middleware/errors';
@@ -13,6 +13,7 @@ export interface PublicPageResponse {
   boardPage: Page | null;
   pageBlock: Block | null;
   boardBlock: Block | null;
+  space: Space;
 }
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -73,11 +74,22 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
     });
   }
 
+  const space = await prisma.space.findFirst({
+    where: {
+      id: page.spaceId!
+    }
+  });
+
+  if (!space) {
+    throw new NotFoundError('Space not found');
+  }
+
   return res.status(200).json({
     page,
     boardPage,
     pageBlock,
-    boardBlock
+    boardBlock,
+    space
   });
 }
 
