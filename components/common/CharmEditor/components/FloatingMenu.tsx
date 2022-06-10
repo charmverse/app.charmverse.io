@@ -14,9 +14,12 @@ import { MenuGroup } from './@bangle.dev/react-menu/MenuGroup';
 import { queryIsSelectionAroundInlineComment } from './inlineComment';
 import { InlineCommentSubMenu } from './inlineComment/InlineComment.components';
 
+export type FloatingMenuVariant = 'defaultMenu' | 'linkSubMenu' | 'inlineCommentSubMenu' | 'commentOnlyMenu';
+
 export default function FloatingMenuComponent (
   {
-    pluginKey, disableComments = false, inline = false }: {disableComments?: boolean, pluginKey: PluginKey, inline?: boolean
+    pluginKey, enableComments = true, inline = false }:
+    {enableComments?: boolean, pluginKey: PluginKey, inline?: boolean
   }
 ) {
   const { showMessage } = useSnackbar();
@@ -27,6 +30,16 @@ export default function FloatingMenuComponent (
     <FloatingMenu
       menuKey={pluginKey}
       renderMenuType={({ type }) => {
+
+        if (type as FloatingMenuVariant === 'commentOnlyMenu' && permissions.comment) {
+          return (
+            <Menu>
+
+              <InlineCommentButton enableComments menuKey={pluginKey} />
+            </Menu>
+          );
+        }
+
         if (type === 'defaultMenu') {
           return (
             <Menu>
@@ -37,7 +50,7 @@ export default function FloatingMenuComponent (
                 <StrikeButton />
                 <UnderlineButton />
                 <FloatingLinkButton menuKey={pluginKey} />
-                {!inline && permissions.edit_content && !disableComments && <InlineCommentButton menuKey={pluginKey} />}
+                {!inline && permissions.comment && enableComments && <InlineCommentButton enableComments menuKey={pluginKey} />}
               </MenuGroup>
               {!inline && (
               <MenuGroup isLastGroup>
@@ -71,17 +84,23 @@ export default function FloatingMenuComponent (
   );
 }
 
-export const floatingMenuPlugin = ({ key, readOnly }:{key: PluginKey, readOnly?: boolean}) => {
+export function floatingMenuPlugin ({ key, readOnly, enableComments = true }:{key: PluginKey, readOnly?: boolean, enableComments?: boolean}) {
   return floatingMenu.plugins({
     key,
     calculateType: (state) => {
-      if (readOnly) {
-        return null;
-      }
+
       if (state.selection.empty
         || (state.selection as NodeSelection)?.node?.type?.name.match(
           /(image)|(cryptoPrice)|(iframe)|(page)|(mention)|(tabIndent)|(codeBlock)/
         )) {
+        return null;
+      }
+
+      if (readOnly && enableComments) {
+        return 'commentOnlyMenu';
+      }
+
+      if (readOnly) {
         return null;
       }
 
@@ -123,4 +142,4 @@ export const floatingMenuPlugin = ({ key, readOnly }:{key: PluginKey, readOnly?:
       return 'defaultMenu';
     }
   });
-};
+}

@@ -1,42 +1,57 @@
 import { Page, Prisma } from '@prisma/client';
 import charmClient from 'charmClient';
 import ErrorPage from 'components/common/errors/ErrorPage';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
+import { useUser } from 'hooks/useUser';
 import debouncePromise from 'lib/utilities/debouncePromise';
 import log from 'loglevel';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import BoardPage from '../BoardPage';
 import DocumentPage from '../DocumentPage';
 
-interface Props {
-  pageId: string
-}
+export default function EditorPage ({ pageId }: { pageId: string }) {
 
-export default function EditorPage (
-  { pageId }: Props
-
-) {
   const { setIsEditing, pages, setCurrentPageId, setPages, getPagePermissions } = usePages();
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
-
+  const [space] = useCurrentSpace();
+  const [isAccessDenied, setIsAccessDenied] = useState(false);
+  const [user] = useUser();
   const currentPagePermissions = getPagePermissions(pageId);
 
   const pagesLoaded = Object.keys(pages).length > 0;
 
   useEffect(() => {
-    if (pageId && pagesLoaded) {
-      const pageByPath = pages[pageId];
-      if (pageByPath) {
-        setTitleState(pageByPath.title);
-        setCurrentPageId(pageByPath.id);
-      }
-      else {
-        setPageNotFound(true);
+    async function main () {
+      setIsAccessDenied(false);
+      if (pageId && pagesLoaded && space) {
+        try {
+          const page = await charmClient.getPage(pageId, space.id);
+          if (page) {
+            setPages((_pages) => ({ ..._pages, [page.id]: page }));
+            setPageNotFound(false);
+            setCurrentPageId(page.id);
+            setTitleState(page.title);
+          }
+          else {
+            setPageNotFound(true);
+          }
+        }
+        catch (err: any) {
+          // An error will be thrown if page doesn't exist or if you dont have read permission for the page
+          if (err.errorType === 'Access denied') {
+            setIsAccessDenied(true);
+          }
+          // If the page doesn't exist an error will be thrown
+          setPageNotFound(true);
+        }
       }
     }
-  }, [pageId, pagesLoaded]);
+    main();
+
+  }, [pageId, pagesLoaded, space, user]);
 
   const debouncedPageUpdate = debouncePromise(async (updates: Prisma.PageUpdateInput) => {
     setIsEditing(true);
@@ -71,7 +86,10 @@ export default function EditorPage (
     [pageId, currentPage?.headerImage, currentPage?.icon, currentPage?.title, currentPage?.deletedAt]
   );
 
-  if (pageNotFound) {
+  if (isAccessDenied) {
+    return <ErrorPage message={'Sorry, you don\'t have access to this page'} />;
+  }
+  else if (pageNotFound) {
     return <ErrorPage message={'Sorry, that page doesn\'t exist'} />;
   }
   // Wait for permission load

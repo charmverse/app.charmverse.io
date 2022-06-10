@@ -14,11 +14,13 @@ handler
 
 async function getPages (req: NextApiRequest, res: NextApiResponse<Page[]>) {
   const spaceId = req.query.id as string;
+  const archived = req.query.archived as string === 'true';
   const userId = req.session?.user?.id;
 
   const accessiblePages = await getAccessiblePages({
     spaceId,
-    userId
+    userId,
+    archived
   });
 
   return res.status(200).json(accessiblePages);

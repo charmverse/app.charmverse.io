@@ -19,7 +19,7 @@ export default function BlocksEditorPage () {
     return null;
   }
 
-  return <EditorPage pageId={pageId} />;
+  return <EditorPage pageId={pageId ?? pagePath} />;
 
 }
 

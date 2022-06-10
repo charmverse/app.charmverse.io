@@ -8,8 +8,6 @@ import { useRouter } from 'next/router';
 import * as React from 'react';
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
-import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { isTruthy } from 'lib/utilities/types';
 import useRefState from 'hooks/useRefState';
 import { useCurrentSpace } from './useCurrentSpace';
@@ -29,9 +27,7 @@ type IContext = {
   isEditing: boolean
   refreshPage: (pageId: string) => Promise<IPageWithPermissions>
   setIsEditing: React.Dispatch<React.SetStateAction<boolean>>
-  getPagePermissions: (pageId: string) => IPagePermissionFlags,
-  deletePage: (pageId: string) => Promise<void>,
-  restorePage: (pageId: string, route?: boolean) => Promise<void>,
+  getPagePermissions: (pageId: string, page?: IPageWithPermissions) => IPagePermissionFlags,
 };
 
 const refreshInterval = 1000 * 5 * 60; // 5 minutes
@@ -44,14 +40,11 @@ export const PagesContext = createContext<Readonly<IContext>>({
   isEditing: true,
   setIsEditing: () => { },
   getPagePermissions: () => new AllowedPagePermissions(),
-  refreshPage: () => Promise.resolve({} as any),
-  deletePage: () => undefined as any,
-  restorePage: () => undefined as any
+  refreshPage: () => Promise.resolve({} as any)
 });
 
 export function PagesProvider ({ children }: { children: ReactNode }) {
 
-  const dispatch = useAppDispatch();
   const isAdmin = useIsAdmin();
   const [isEditing, setIsEditing] = useState(false);
   const [spaceFromUrl] = useCurrentSpace();
@@ -78,50 +71,14 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     return res;
   };
 
-  async function deletePage (pageId: string) {
-    const { pageIds } = await charmClient.deletePage(pageId);
-    _setPages((_pages) => {
-      pageIds.forEach(_pageId => {
-        delete _pages[_pageId];
-      });
-      return { ..._pages };
-    });
-    // If the current page has been deleted permanently route to the first alive page
-    if (pageIds.includes(currentPageId)) {
-      router.push(`/${router.query.domain}/${Object.values(pages).find(page => page?.type !== 'card' && page?.deletedAt === null)?.path}`);
-    }
-  }
-
-  async function restorePage (pageId: string) {
-    const { pageIds } = await charmClient.restorePage(pageId);
-    _setPages((_pages) => {
-      pageIds.forEach(_pageId => {
-        if (_pages[_pageId]) {
-          _pages[_pageId] = {
-            ..._pages[_pageId],
-            deletedAt: null
-          } as Page;
-        }
-      });
-      // Severe the link with parent if its not of type card
-      if (_pages[pageId] && _pages[pageId]?.type !== 'card') {
-        (_pages[pageId] as Page).parentId = null;
-      }
-      return { ..._pages };
-    });
-
-    // TODO: Better focalboard blocks api to only fetch blocks by id
-    dispatch(initialLoad());
-  }
-
   /**
    * Will return permissions for the currently connected user
    * @param pageId
    */
-  function getPagePermissions (pageId: string): IPagePermissionFlags {
+  function getPagePermissions (pageId: string, page?: IPageWithPermissions): IPagePermissionFlags {
     const computedPermissions = new AllowedPagePermissions();
 
-    const targetPage = pages[pageId] as IPageWithPermissions;
+    const targetPage = (pages[pageId] as IPageWithPermissions) ?? page;
 
     // Return empty permission set so this silently fails
     if (!targetPage) {
@@ -173,9 +130,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     setCurrentPageId,
     setPages: _setPages,
     getPagePermissions,
-    refreshPage,
-    deletePage,
-    restorePage
+    refreshPage
   }), [currentPageId, isEditing, router, pages, user]);
 
   useEffect(() => {

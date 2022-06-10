@@ -76,26 +76,24 @@ function permissionsQuery (request: IPagePermissionUserRequest): Prisma.PagePerm
           pageId: request.pageId
         }
       ]
-    },
-    include: {
-      page: true
     }
   };
 }
 
-export async function computeUserPagePermissions (request: IPagePermissionUserRequest): Promise<IPagePermissionFlags> {
+export async function computeUserPagePermissions ({ pageId, allowAdminBypass = true, userId }:
+  IPagePermissionUserRequest): Promise<IPagePermissionFlags> {
 
   const [foundSpaceRole, permissions] = await Promise.all([
     // Check if user is a space admin for this page so they gain full rights
     // eslint-disable-next-line max-len
-    (prisma.page.findFirst(pageWithSpaceRoleQuery(request)) as any as Promise<IPageWithNestedSpaceRole>).then(page => {
-      return page?.space?.spaceRoles?.find(spaceRole => spaceRole.userId === request.userId);
+    (prisma.page.findFirst(pageWithSpaceRoleQuery({ pageId, userId })) as any as Promise<IPageWithNestedSpaceRole>).then(page => {
+      return page?.space?.spaceRoles?.find(spaceRole => spaceRole.userId === userId);
     }),
-    prisma.pagePermission.findMany(permissionsQuery(request))
+    prisma.pagePermission.findMany(permissionsQuery({ pageId, userId }))
   ]);
 
   // TODO DELETE LATER when we remove admin access to workspace
-  if (foundSpaceRole && foundSpaceRole.isAdmin === true) {
+  if (foundSpaceRole && foundSpaceRole.isAdmin === true && allowAdminBypass) {
 
     const fullPermissions = Object.keys(PageOperations) as PageOperationType [];
 

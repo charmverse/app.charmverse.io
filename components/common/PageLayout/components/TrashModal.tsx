@@ -6,10 +6,15 @@ import { Page, PageContent } from 'models';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RestoreIcon from '@mui/icons-material/Restore';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { MouseEvent, memo, useMemo, useState, useCallback } from 'react';
+import { MouseEvent, memo, useMemo, useState, useCallback, useEffect } from 'react';
 import { DateTime } from 'luxon';
 import Link from 'next/link';
 import { fancyTrim } from 'lib/utilities/strings';
+import charmClient from 'charmClient';
+import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
+import { mutate } from 'swr';
+import { useRouter } from 'next/router';
 import PageIcon from './PageIcon';
 
 const PageArchivedDate = memo<{date: Date, title: string}>(({ date, title }) => {
@@ -62,26 +67,76 @@ const ArchivedPageItem = memo<
     });
 
 export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, isOpen: boolean}) {
-  const { pages, deletePage, restorePage, getPagePermissions } = usePages();
+  const [archivedPages, setArchivedPages] = useState<Record<string, Page>>({});
   const [isMutating, setIsMutating] = useState(false);
   const [searchText, setSearchText] = useState('');
-  const archivedPages = useMemo(() => {
-    const _archivedPages: Page[] = [];
-    Object
-      .values(pages).forEach(page => {
-        if (page && page.deletedAt !== null && getPagePermissions(page.id).delete) {
-          const pageTitle = page.title || 'Untitled';
-          _archivedPages.push({ ...page, title: pageTitle });
-        }
+  const [space] = useCurrentSpace();
+  const { pages, getPagePermissions, setPages, currentPageId } = usePages();
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+
+  useEffect(() => {
+    async function main () {
+      if (space) {
+        const _archivedPages: Page[] = [];
+        (await charmClient.getArchivedPages(space.id)).forEach(archivedPage => {
+          if (archivedPage && archivedPage.deletedAt !== null && getPagePermissions(archivedPage.id, archivedPage).delete) {
+            const pageTitle = archivedPage.title || 'Untitled';
+            _archivedPages.push({ ...archivedPage, title: pageTitle });
+          }
+        });
+        setArchivedPages(_archivedPages.sort((deletedPageA, deletedPageB) => deletedPageA.deletedAt && deletedPageB.deletedAt
+          ? new Date(deletedPageB.deletedAt).getTime() - new Date(deletedPageA.deletedAt).getTime()
+          : 0).reduce((obj, cur) => ({ ...obj, [cur.id]: cur }), {}));
+      }
+    }
+    main();
+  }, [space]);
+
+  async function restorePage (pageId: string) {
+    if (space) {
+      const { pageIds: restoredPageIds } = await charmClient.restorePage(pageId);
+      setArchivedPages((_archivedPages) => {
+        restoredPageIds.forEach(restoredPageId => {
+          if (_archivedPages[restoredPageId]) {
+            delete _archivedPages[restoredPageId];
+          }
+        });
+        return { ..._archivedPages };
       });
 
-    return _archivedPages.sort((deletedPageA, deletedPageB) => deletedPageA.deletedAt && deletedPageB.deletedAt
-      ? new Date(deletedPageB.deletedAt).getTime() - new Date(deletedPageA.deletedAt).getTime()
-      : 0);
-  }, [pages]);
+      await mutate(`pages/${space.id}`);
+      dispatch(initialLoad());
+    }
+  }
+
+  async function deletePage (pageId: string) {
+    const { pageIds: deletePageIds } = await charmClient.deletePage(pageId);
+    setArchivedPages((_archivedPages) => {
+      deletePageIds.forEach(deletePageId => {
+        if (_archivedPages[deletePageId]) {
+          delete _archivedPages[deletePageId];
+        }
+      });
+      return { ..._archivedPages };
+    });
+    setPages((unArchivedPages) => {
+      // Some deleted pages might still stay on the archived page state
+      deletePageIds.forEach(deletedPageId => {
+        if (unArchivedPages[deletedPageId]) {
+          delete unArchivedPages[deletedPageId];
+        }
+      });
+      return { ...unArchivedPages };
+    });
+    // If the current page has been deleted permanently route to the first alive page
+    if (deletePageIds.includes(currentPageId)) {
+      router.push(`/${router.query.domain}/${Object.values(pages).find(page => page?.type !== 'card' && page?.deletedAt === null)?.path}`);
+    }
+  }
 
   const searchTextMatchedPages = useMemo(() => {
-    return archivedPages.filter(archivedPage => archivedPage.title.toLowerCase().startsWith(searchText.toLowerCase()));
+    return Object.values(archivedPages).filter(archivedPage => archivedPage.title.toLowerCase().startsWith(searchText.toLowerCase()));
   }, [archivedPages, searchText]);
 
   const onRestorePage = useCallback(async (e: MouseEvent<HTMLButtonElement, MouseEvent>, pageId: string) => {
@@ -98,6 +153,8 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
     setIsMutating(false);
   }, [isMutating]);
 
+  const archivedPagesExist = Object.keys(archivedPages).length !== 0;
+
   // Remove the pages you dont have delete access of
   return (
     <Modal
@@ -107,9 +164,9 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
         <Box width='100%'>
           <Box mb={1} display='flex' justifyContent='space-between'>
             Trash
-            <Typography variant='body2' color='secondary'>{archivedPages.length} pages</Typography>
+            <Typography variant='body2' color='secondary'>{Object.keys(archivedPages).length} pages</Typography>
           </Box>
-          {archivedPages.length !== 0 && (
+          { archivedPagesExist && (
           <TextField
             placeholder='Filter by page title...'
             fullWidth
@@ -120,7 +177,7 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
         </Box>
       )}
     >
-      {archivedPages.length === 0
+      {!archivedPagesExist
         ? <Typography sx={{ pl: 4 }} variant='subtitle1' color='secondary'>No archived pages</Typography>
         : (
           <List>
