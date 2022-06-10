@@ -8,13 +8,13 @@ import { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/foca
 import { IWorkspace } from 'components/common/BoardEditor/focalboard/src/blocks/workspace';
 import { OctoUtils } from 'components/common/BoardEditor/focalboard/src/octoUtils';
 import { IUser, UserWorkspace } from 'components/common/BoardEditor/focalboard/src/user';
+import { FiatCurrency, IPairQuote } from 'connectors';
 import type { FailedImportsError } from 'lib/notion/types';
 import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee, IPagePermissionWithSource } from 'lib/permissions/pages/page-permission-interfaces';
 import { GetPoapsResponse, UpdatePoapsRequest } from 'lib/poap';
 import { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { getDisplayName } from 'lib/users';
 import { BountyWithDetails, Contributor, LoggedInUser, PageContent } from 'models';
-import { FiatCurrency, IPairQuote } from 'models/Currency';
 import type { ServerBlockFields } from 'pages/api/blocks';
 import { InviteLinkPopulated } from 'pages/api/invites/index';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
@@ -457,7 +457,7 @@ class CharmClient {
     return http.POST<Application>('/api/submissions', content);
   }
 
-  async updateSubmission ({ submissionId, content }: {submissionId: string, content: SubmissionContent}): Promise<Application> {
+  async updateSubmission ({ submissionId, content }: { submissionId: string, content: SubmissionContent }): Promise<Application> {
 
     return http.PUT<Application>(`/api/submissions/${submissionId}`, content);
   }

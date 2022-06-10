@@ -14,7 +14,7 @@ import CharmEditor, { ICharmEditorOutput, UpdatePageContent } from 'components/c
 import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
 import { InputSearchContributor } from 'components/common/form/InputSearchContributor';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
-import { getChainById } from 'connectors';
+import { getChainById, CryptoCurrency } from 'connectors';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
@@ -24,7 +24,6 @@ import { useUser } from 'hooks/useUser';
 import { SystemError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
 import { BountyWithDetails, PageContent } from 'models';
-import { CryptoCurrency } from 'models/Currency';
 import { useEffect, useState } from 'react';
 import { useForm, UseFormWatch } from 'react-hook-form';
 import * as yup from 'yup';

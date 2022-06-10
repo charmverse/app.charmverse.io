@@ -44,6 +44,16 @@ export class UnknownError extends SystemError {
   }
 }
 
+export class InvalidStateError extends SystemError {
+  constructor (message: string = 'Something went wrong') {
+    super({
+      message,
+      errorType: 'Unable to respond',
+      severity: 'error'
+    });
+  }
+}
+
 export class ApiError extends SystemError {
 
   constructor (errorInfo: Pick<ISystemErrorInput, 'errorType' | 'message'>) {

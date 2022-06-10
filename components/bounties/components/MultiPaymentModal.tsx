@@ -15,15 +15,15 @@ import UserDisplay from 'components/common/UserDisplay';
 import { useContributors } from 'hooks/useContributors';
 import { BountyWithDetails } from 'models';
 import { Bounty } from '@prisma/client';
-import { Chains, RPC } from 'connectors';
+import { getChainById } from 'connectors';
 import useGnosisSigner from 'hooks/useWeb3Signer';
 import { useWeb3React } from '@web3-react/core';
 import useSWR from 'swr';
 import { getSafesForAddress } from 'lib/gnosis';
 import { shortenHex } from 'lib/utilities/strings';
 import { isTruthy } from 'lib/utilities/types';
-import { BountyAmount } from './BountyStatusBadge';
 import MultiPaymentButton, { MultiPaymentResult } from './MultiPaymentButton';
+import { BountyAmount } from './BountyStatusBadge';
 
 interface TransactionWithMetadata extends MetaTransactionData, Pick<Bounty, 'rewardToken' | 'rewardAmount' | 'chainId' | 'title'>{
   applicationId: string
@@ -55,7 +55,7 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
     () => bounties
       .filter(bounty => {
         return bounty.chainId === gnosisSafeChainId
-        && bounty.rewardToken === RPC[Chains[gnosisSafeChainId]]?.nativeCurrency.symbol;
+        && bounty.rewardToken === getChainById(gnosisSafeChainId)?.nativeCurrency.symbol;
       })
       .map(bounty => {
         return bounty.applications.map(application => {

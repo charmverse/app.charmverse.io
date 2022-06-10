@@ -24,7 +24,7 @@ import { plugins as imagePlugins } from 'components/common/CharmEditor/component
 import * as codeBlock from 'components/common/CharmEditor/components/@bangle.dev/base-components/code-block';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
 import { PageContent } from 'models';
-import { CryptoCurrency, FiatCurrency } from 'models/Currency';
+import { CryptoCurrency, FiatCurrency } from 'connectors';
 import { markdownSerializer } from '@bangle.dev/markdown';
 import PageThreadsList from 'components/[pageId]/DocumentPage/components/PageThreadsList';
 import { Grow } from '@mui/material';

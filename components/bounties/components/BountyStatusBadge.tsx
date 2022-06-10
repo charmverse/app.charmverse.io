@@ -1,4 +1,3 @@
-import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
@@ -38,25 +37,24 @@ export const BountyStatusColors: Record<BountyStatus, BrandColor> = {
   paid: 'gray'
 };
 
-const BountyStatusBox = styled(Box)<{ status: BountyStatus }>`
-  padding-left: 10px;
-  padding-right: 15px;
-  border-radius: 15px;
-  height: 32px;
-  text-align: center;
-  font-weight: bold;
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
+const StyledBountyStatusChip = styled(Chip)<{ status: BountyStatus }>`
   background-color: ${({ status, theme }) => {
     // @ts-ignore
     return theme.palette[BountyStatusColors[status]].main;
   }};
-`;
-
-const BountyIcon = styled.span`
-  display: flex;
-  opacity: 0.5;
+  .MuiChip-icon {
+    display: flex;
+    opacity: 0.5;
+  }
+  .MuiChip-iconSmall svg {
+    font-size: 1.2rem;
+  }
+  .MuiChip-label {
+    font-weight: 600;
+  }
+  .MuiChip-labelMedium {
+    font-size: 0.98rem;
+  }
 `;
 
 export interface IBountyBadgeProps {
@@ -65,47 +63,19 @@ export interface IBountyBadgeProps {
   truncate?: boolean
 }
 
-export function BountyStatusChip ({ status, onDelete }: {status: BountyStatus, onDelete?: (status: BountyStatus) => void}) {
-
-  const theme = useTheme();
-
+export function BountyStatusChip ({
+  showIcon,
+  size,
+  status
+}: { showIcon?: boolean, size?: 'small', status: BountyStatus }) {
   return (
-    <Chip
+    <StyledBountyStatusChip
+      size={size}
+      status={status}
       label={BOUNTY_LABELS[status]}
       variant='filled'
-      onDelete={onDelete}
-      size='small'
-      sx={{
-        fontWeight: 'bold',
-        backgroundColor: () => {
-          return theme.palette[BountyStatusColors[status]]?.main;
-        }
-      }}
+      icon={<span>{BOUNTY_STATUS_ICONS[status]}</span>}
     />
-  );
-}
-
-export function BountyStatusChipWithIcon ({
-  status
-}: { status: BountyStatus }) {
-  return (
-
-    <BountyStatusBox status={status}>
-      <BountyIcon>
-        {BOUNTY_STATUS_ICONS[status]}
-      </BountyIcon>
-
-      <Typography
-        component='span'
-        sx={{
-          fontWeight: 600
-        }}
-        variant='body1'
-        pl={1}
-      >
-        {BOUNTY_LABELS[status]}
-      </Typography>
-    </BountyStatusBox>
   );
 }
 
@@ -128,21 +98,7 @@ export default function BountyStatusBadgeWrapper ({ truncate = false, bounty, la
           }}
           >
             <BountyAmount bounty={bounty} truncate={truncate} />
-            <BountyStatusBox status={bounty.status}>
-              <BountyIcon>
-                {BOUNTY_STATUS_ICONS[bounty.status]}
-              </BountyIcon>
-              <Typography
-                component='span'
-                sx={{
-                  fontWeight: 600
-                }}
-                variant='body1'
-                pl={1}
-              >
-                {BOUNTY_LABELS[bounty.status]}
-              </Typography>
-            </BountyStatusBox>
+            <BountyStatusChip status={bounty.status} />
           </Box>
         </Grid>
       </Grid>
@@ -159,7 +115,7 @@ export default function BountyStatusBadgeWrapper ({ truncate = false, bounty, la
             </IconButton>
           </Link>
         </Box>
-        <BountyStatusChipWithIcon status={bounty.status} />
+        <BountyStatusChip status={bounty.status} />
       </Box>
     );
   }
@@ -167,11 +123,15 @@ export default function BountyStatusBadgeWrapper ({ truncate = false, bounty, la
 
 export function BountyAmount ({ bounty, truncate = false }: { bounty: Pick<Bounty, 'rewardAmount' | 'rewardToken' | 'chainId'>, truncate?: boolean }) {
 
-  const chainName = bounty ? getChainById(bounty.chainId)?.chainName || '' : '';
+  const chainInfo = getChainById(bounty.chainId);
+  const chainName = chainInfo?.chainName || '';
   const [paymentMethods] = usePaymentMethods();
   const tokenInfo = getTokenInfo(paymentMethods, bounty.rewardToken);
 
   const tooltip = `${chainName} (${tokenInfo.tokenSymbol})`;
+
+  // prefer our standard iconUrl for native tokens
+  const tokenLogo = tokenInfo.isContract ? tokenInfo.tokenLogo : (chainInfo?.iconUrl || tokenInfo.tokenLogo);
 
   return (
     <Tooltip arrow placement='top' title={bounty.rewardAmount === 0 ? '' : tooltip}>
@@ -204,19 +164,12 @@ export function BountyAmount ({ bounty, truncate = false }: { bounty: Pick<Bount
                   }}
                 >
                   {
-              tokenInfo.tokenLogo && (
+              tokenLogo && (
                 <Box component='span' sx={{ width: '25px', height: '25px' }}>
-                  {
-                    (tokenInfo.isContract ? (
-                      <img alt='' width='100%' height='100%' src={tokenInfo.tokenLogo} />
-                    ) : (
-                      <img
-                        width='100%'
-                        height='100%'
-                        src={tokenInfo.tokenLogo}
-                      />
-                    ))
-                  }
+                  <img
+                    height='100%'
+                    src={tokenLogo}
+                  />
                 </Box>
               )
             }

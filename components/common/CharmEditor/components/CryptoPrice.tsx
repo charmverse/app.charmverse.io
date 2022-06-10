@@ -7,13 +7,12 @@ import { Box, Card, CardContent, CardActions, CircularProgress, IconButton, Typo
 import { useEffect, useState } from 'react';
 import { InputSearchCurrency } from 'components/common/form/InputSearchCurrency';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
-import { CryptoCurrency, FiatCurrency, IPairQuote } from 'models/Currency';
+import { CryptoCurrency, FiatCurrency, IPairQuote, CryptoCurrencies, getChainById } from 'connectors';
 import { formatMoney } from 'lib/utilities/formatting';
 import { RelativeTime } from 'components/common/RelativeTime';
 import { CoinLogoAndTicker } from 'components/common/CoinLogoAndTicker';
 import charmClient from 'charmClient';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import { CryptoCurrencies, getChainById } from 'connectors';
 import { getTokenInfo } from 'lib/tokens/tokenData';
 import { isTruthy } from 'lib/utilities/types';
 
