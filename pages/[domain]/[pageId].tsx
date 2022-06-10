@@ -6,24 +6,21 @@ import { usePages } from 'hooks/usePages';
 import { useRouter } from 'next/router';
 import { ReactElement } from 'react';
 
-interface Props {
-  shouldLoadPublicPage: boolean
-}
+export default function BlocksEditorPage () {
 
-export default function BlocksEditorPage ({ shouldLoadPublicPage = false }: Props) {
-  const { setCurrentPageId, pages } = usePages();
+  const { pages } = usePages();
   const router = useRouter();
 
-  if (shouldLoadPublicPage) {
-    const pageId = router.query.pageId as string;
-    return <EditorPage shouldLoadPublicPage={true} onPageLoad={(_pageId) => setCurrentPageId(_pageId)} pageId={pageId} />;
-  }
-
-  // Handle non public page
   const pagePath = router.query.pageId as string;
   const pageIdList = Object.values(pages ?? {}) as Page[];
   const pageId = pageIdList.find(p => p.path === pagePath)?.id;
-  return <EditorPage shouldLoadPublicPage={false} onPageLoad={(_pageId) => setCurrentPageId(_pageId)} pageId={pageId ?? pagePath} />;
+
+  if (!pageId) {
+    return null;
+  }
+
+  return <EditorPage pageId={pageId ?? pagePath} />;
+
 }
 
 BlocksEditorPage.getLayout = (page: ReactElement) => {

@@ -1,6 +1,6 @@
-import PageView from 'pages/[domain]/[pageId]';
 import { useRouter } from 'next/router';
 import { generatePath } from 'lib/utilities/strings';
+import PageView from '../[pageId]';
 
 export default function PublicBoardView () {
   const router = useRouter();
@@ -18,5 +18,5 @@ export default function PublicBoardView () {
     return null;
   }
 
-  return <PageView shouldLoadPublicPage />;
+  return <PageView />;
 }

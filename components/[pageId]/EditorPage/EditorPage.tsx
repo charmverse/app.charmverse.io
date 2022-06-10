@@ -1,33 +1,19 @@
 import { Page, Prisma } from '@prisma/client';
 import charmClient from 'charmClient';
-import { Card } from 'components/common/BoardEditor/focalboard/src/blocks/card';
-import { addBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
-import { addCard } from 'components/common/BoardEditor/focalboard/src/store/cards';
-import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { setCurrent } from 'components/common/BoardEditor/focalboard/src/store/views';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
-import { Board } from 'lib/focalboard/board';
 import debouncePromise from 'lib/utilities/debouncePromise';
 import log from 'loglevel';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import BoardPage from '../BoardPage';
 import DocumentPage from '../DocumentPage';
 
-interface Props {
-  shouldLoadPublicPage?: boolean,
-  onPageLoad?: (pageId: string) => void,
-  pageId: string
-}
+export default function EditorPage ({ pageId }: { pageId: string }) {
 
-export default function EditorPage (
-  { shouldLoadPublicPage, pageId, onPageLoad }: Props
-) {
-  const dispatch = useAppDispatch();
-  const { setIsEditing, pages, setPages, getPagePermissions } = usePages();
+  const { setIsEditing, pages, setCurrentPageId, setPages, getPagePermissions } = usePages();
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
   const [space] = useCurrentSpace();
@@ -35,71 +21,19 @@ export default function EditorPage (
   const [user] = useUser();
   const currentPagePermissions = getPagePermissions(pageId);
 
-  async function loadPublicPage (publicPageId: string) {
-
-    try {
-      const { pages: publicPages, blocks } = await charmClient.getPublicPage(publicPageId);
-
-      const rootPage = publicPages.find(page => page.id === publicPageId);
-      if (rootPage) {
-        setTitleState(rootPage?.title);
-        onPageLoad?.(rootPage?.id);
-      }
-      const cardBlock = blocks.find(block => block.type === 'card');
-      const boardBlock = blocks.find(block => block.type === 'board');
-
-      if (cardBlock) {
-        dispatch(setCurrent(cardBlock.id));
-        dispatch(addCard(cardBlock as unknown as Card));
-      }
-      if (boardBlock) {
-        dispatch(addBoard(boardBlock as unknown as Board));
-      }
-
-      const foundPageContent: Record<string, Page> = publicPages.reduce((record, page) => ({ ...record, [page.id]: page }), {});
-
-      const spaceId = foundPageContent[publicPageId]?.spaceId;
-
-      if (spaceId) {
-        const publicPagesInSpace = await charmClient.getPages(spaceId);
-        const mapped = publicPagesInSpace.reduce((pageMap: Record<string, Page>, page) => {
-          pageMap[page.id] = page;
-          return pageMap;
-        }, {});
-
-        setPages({
-          ...mapped,
-          ...foundPageContent
-        });
-      }
-      else {
-        setPages(foundPageContent);
-      }
-
-      setPageNotFound(false);
-      onPageLoad?.(publicPageId);
-    }
-    catch (err) {
-      setPageNotFound(true);
-    }
-
-  }
-
   const pagesLoaded = Object.keys(pages).length > 0;
 
   useEffect(() => {
     async function main () {
       setIsAccessDenied(false);
-      if (pageId && shouldLoadPublicPage) {
-        loadPublicPage(pageId as string);
-      }
-      else if (pageId && pagesLoaded && space) {
+      if (pageId && pagesLoaded && space) {
         try {
           const page = await charmClient.getPage(pageId, space.id);
           if (page) {
             setPages((_pages) => ({ ..._pages, [page.id]: page }));
             setPageNotFound(false);
-            onPageLoad?.(page.id);
+            setCurrentPageId(page.id);
+            setTitleState(page.title);
           }
           else {
             setPageNotFound(true);
@@ -115,8 +49,8 @@ export default function EditorPage (
         }
       }
     }
-
     main();
+
   }, [pageId, pagesLoaded, space, user]);
 
   const debouncedPageUpdate = debouncePromise(async (updates: Prisma.PageUpdateInput) => {
@@ -130,7 +64,7 @@ export default function EditorPage (
   }, 500);
 
   const setPage = useCallback(async (updates: Partial<Page>) => {
-    if (!pageId || shouldLoadPublicPage) {
+    if (!pageId) {
       return;
     }
     if (updates.hasOwnProperty('title')) {
@@ -157,14 +91,6 @@ export default function EditorPage (
   }
   else if (pageNotFound) {
     return <ErrorPage message={'Sorry, that page doesn\'t exist'} />;
-  }
-  // Handle public page
-  else if (shouldLoadPublicPage === true && memoizedCurrentPage) {
-    return currentPage?.type === 'board' ? (
-      <BoardPage page={memoizedCurrentPage} setPage={setPage} readonly={true} />
-    ) : (
-      <DocumentPage page={memoizedCurrentPage} setPage={setPage} readOnly={true} />
-    );
   }
   // Wait for permission load
   else if (!memoizedCurrentPage || !currentPagePermissions) {

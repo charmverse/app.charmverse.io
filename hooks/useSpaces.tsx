@@ -1,5 +1,6 @@
 import { ReactNode, createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { Space } from '@prisma/client';
+import { useRouter } from 'next/router';
 import charmClient from 'charmClient';
 import { useUser } from './useUser';
 
@@ -12,9 +13,10 @@ export function SpacesProvider ({ children }: { children: ReactNode }) {
   const [user, _, isUserLoaded] = useUser();
   const [spaces, setSpaces] = useState<Space[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    if (user) {
+    if (user && router.route !== '/share/[pageId]') {
       setIsLoaded(false);
       charmClient.getSpaces()
         .then(_spaces => {

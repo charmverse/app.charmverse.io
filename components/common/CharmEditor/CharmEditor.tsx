@@ -379,7 +379,7 @@ function CharmEditor (
             // This fixes the placeholder and cursor not being aligned
             top: -34
           }}
-          show={isEmpty}
+          show={isEmpty && !readOnly}
         />
       )}
       state={state}
@@ -494,7 +494,7 @@ function CharmEditor (
       </Grow>
       )}
       {!disabledPageSpecificFeatures && <InlineCommentThread pluginKey={inlineCommentPluginKey} />}
-      <DevTools />
+      {!readOnly && <DevTools />}
     </StyledReactBangleEditor>
   );
 }

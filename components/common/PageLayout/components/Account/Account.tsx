@@ -65,7 +65,7 @@ function Account (): JSX.Element {
   if (isUserLoaded && !user) {
     return (
       <AccountCard>
-        <AccountButton sx={{ mt: 4 }} href='/'>Join CharmVerse</AccountButton>
+        <AccountButton href='/'>Join CharmVerse</AccountButton>
       </AccountCard>
     );
   }

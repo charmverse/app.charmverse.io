@@ -11,12 +11,13 @@ import useSWR from 'swr';
 import { isTruthy } from 'lib/utilities/types';
 import useRefState from 'hooks/useRefState';
 import { useCurrentSpace } from './useCurrentSpace';
+import { useSpaces } from './useSpaces';
 import { useUser } from './useUser';
 import useIsAdmin from './useIsAdmin';
 
 export type LinkedPage = (Page & {children: LinkedPage[], parent: null | LinkedPage});
 
-type PagesMap = Record<string, Page | undefined>;
+export type PagesMap = Record<string, Page | undefined>;
 
 type IContext = {
   currentPageId: string,
@@ -43,17 +44,24 @@ export const PagesContext = createContext<Readonly<IContext>>({
 });
 
 export function PagesProvider ({ children }: { children: ReactNode }) {
+
+  const isAdmin = useIsAdmin();
   const [isEditing, setIsEditing] = useState(false);
-  const [space] = useCurrentSpace();
+  const [spaceFromUrl] = useCurrentSpace();
   const [pages, pagesRef, setPages] = useRefState<IContext['pages']>({});
   const [currentPageId, setCurrentPageId] = useState<string>('');
   const router = useRouter();
   const [user] = useUser();
-  const { data, mutate } = useSWR(() => space ? `pages/${space?.id}` : 'publicPage', () => {
-    return space ? charmClient.getPages((space as Space).id) : [];
-  }, { refreshInterval });
 
-  const isAdmin = useIsAdmin();
+  // retrieve space for public pages
+  const [spaces] = useSpaces();
+  const publicPageSpace = router.route === '/share/[pageId]' ? spaces[0] : null;
+  const space = spaceFromUrl || publicPageSpace;
+
+  const { data, mutate } = useSWR(() => space ? `pages/${space?.id}` : null, () => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return charmClient.getPages(space!.id);
+  }, { refreshInterval });
 
   const _setPages: Dispatch<SetStateAction<PagesMap>> = (_pages) => {
     const res = _pages instanceof Function ? _pages(pagesRef.current) : _pages;
@@ -106,10 +114,10 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
 
   async function refreshPage (pageId: string): Promise<IPageWithPermissions> {
     const freshPageVersion = await charmClient.getPage(pageId);
-    _setPages({
-      ...pages,
+    _setPages(_pages => ({
+      ..._pages,
       [freshPageVersion.id]: freshPageVersion
-    });
+    }));
 
     return freshPageVersion;
   }

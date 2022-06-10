@@ -13,11 +13,11 @@ export class SpaceAccessDeniedError extends SystemError {
 
 export class NotFoundError extends SystemError {
 
-  constructor () {
+  constructor (message = 'Data not found') {
     super({
       severity: 'warning',
       errorType: 'Data not found',
-      message: 'Data not found'
+      message
     });
   }
 }

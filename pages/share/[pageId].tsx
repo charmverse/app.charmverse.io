@@ -1,11 +1,7 @@
-import BlocksEditorPage from 'pages/[domain]/[pageId]';
-import PageContainer from 'components/common/PageLayout/components/PageContainer';
+
+import PublicPageComponent from 'components/share/PublicPage';
 
 export default function PublicPage () {
 
-  return (
-    <PageContainer>
-      <BlocksEditorPage shouldLoadPublicPage />
-    </PageContainer>
-  );
+  return <PublicPageComponent />;
 }
