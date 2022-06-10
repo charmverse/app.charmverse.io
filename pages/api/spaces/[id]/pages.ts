@@ -20,7 +20,6 @@ async function getPages (req: NextApiRequest, res: NextApiResponse<Page[]>) {
     spaceId,
     userId
   });
-  console.log('accessiblePages', accessiblePages);
 
   return res.status(200).json(accessiblePages);
 }

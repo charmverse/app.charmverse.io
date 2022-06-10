@@ -7,6 +7,8 @@ import { useRouter } from 'next/router';
 import { ReactNode } from 'react';
 import { StyledPageIcon } from '../PageIcon';
 
+const NEXUS_ROUTES = ['/nexus', '/profile', '/integrations'];
+
 const BreadCrumb = styled.span`
   display: inline-flex;
   :after {
@@ -44,8 +46,7 @@ interface PageBreadCrumb {
   title: string;
 }
 
-function WorkspacePageTitle ({ basePath }: { basePath: string }) {
-  const router = useRouter();
+function DocumentPageTitle ({ basePath }: { basePath: string }) {
   const { currentPageId, pages, isEditing } = usePages();
 
   const currentPage = pages[currentPageId];
@@ -112,13 +113,12 @@ function WorkspacePageTitle ({ basePath }: { basePath: string }) {
   );
 }
 
-function BountyPageTitle () {
-  const router = useRouter();
+function BountyPageTitle ({ basePath }: { basePath: string }) {
   const [pageTitle] = usePageTitle();
   return (
     <PageTitleWrapper>
       <BreadCrumb>
-        <Link href={`/${router.query.domain}/bounties`}>
+        <Link href={`${basePath}/bounties`}>
           Bounties
         </Link>
       </BreadCrumb>
@@ -127,7 +127,27 @@ function BountyPageTitle () {
   );
 }
 
-function StandardPageTitle () {
+function NexusPageTitle ({ route }: { route: string }) {
+  const [pageTitle] = usePageTitle();
+
+  // show /nexus as the parent page
+  const showNexusParent = route !== '/nexus';
+
+  return (
+    <PageTitleWrapper>
+      {showNexusParent && (
+        <BreadCrumb>
+          <Link href='/nexus'>
+            My Nexus
+          </Link>
+        </BreadCrumb>
+      )}
+      {pageTitle}
+    </PageTitleWrapper>
+  );
+}
+
+function DefaultPageTitle () {
   const [pageTitle] = usePageTitle();
   return (
     <PageTitleWrapper>
@@ -136,21 +156,28 @@ function StandardPageTitle () {
   );
 }
 
+function EmptyPageTitle () {
+  return <div></div>;
+}
+
 export default function PageTitleWithBreadcrumbs () {
   const router = useRouter();
   if (router.route === '/[domain]/bounties/[bountyId]') {
-    return <BountyPageTitle />;
+    return <BountyPageTitle basePath={`/${router.query.domain}`} />;
   }
   else if (router.route === '/[domain]/[pageId]') {
-    return <WorkspacePageTitle basePath={`/${router.query.domain}`} />;
+    return <DocumentPageTitle basePath={`/${router.query.domain}`} />;
   }
   else if (router.route === '/share/[pageId]') {
-    return <WorkspacePageTitle basePath='/share' />;
+    return <DocumentPageTitle basePath='/share' />;
   }
-  else if (router.route.startsWith('/nexus') || router.route.startsWith('/u/')) {
-    return <div></div>;
+  else if (NEXUS_ROUTES.includes(router.route)) {
+    return <NexusPageTitle route={router.route} />;
+  }
+  else if (router.route.startsWith('/u/')) {
+    return <EmptyPageTitle />;
   }
   else {
-    return <StandardPageTitle />;
+    return <DefaultPageTitle />;
   }
 }
