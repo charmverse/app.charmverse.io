@@ -1,10 +1,23 @@
 import { Block, Page } from '@prisma/client';
 import { prisma } from 'db';
+import { ExpectedAnError } from 'testing/errors';
 import { createBlock, createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { duplicatePage } from '../duplicatePage';
+import { PageNotFoundError } from '../errors';
 
 describe('duplicatePage', () => {
+
+  it('should fail if the page doesn\'t exist', async () => {
+    try {
+      await duplicatePage(v4(), v4());
+      throw new ExpectedAnError();
+    }
+    catch (err) {
+      expect(err).toBeInstanceOf(PageNotFoundError);
+    }
+  });
+
   it('Should duplicate a single page', async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken();
     const page = await createPage({

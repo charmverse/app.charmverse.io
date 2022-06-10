@@ -7,7 +7,7 @@ import { prisma } from 'db';
 import { createBlock } from 'lib/focalboard/block';
 import { getPage, PageNotFoundError } from '.';
 
-export async function duplicatePage (pageId: string, userId: string) {
+export async function duplicatePage (pageId: string, userId: string, parentId?: string) {
   const page = await getPage(pageId);
 
   if (!page) {
@@ -19,7 +19,7 @@ export async function duplicatePage (pageId: string, userId: string) {
   const transactions: PrismaPromise<any>[] = [prisma.page.create({
     data: {
       id: createdPageId,
-      parentId: page.parentId,
+      parentId: parentId ?? page.parentId,
       updatedBy: userId,
       title: `${page.title} (copy)`,
       content: page.content ?? undefined,

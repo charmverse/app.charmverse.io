@@ -14,6 +14,7 @@ handler.use(requireUser)
 async function duplicatePageRoute (req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
   const pageId = req.query.id as string;
   const userId = req.session.user.id;
+  const { parentId } = req.body as {parentId: string};
 
   const permissions = await computeUserPagePermissions({
     pageId,
@@ -24,7 +25,7 @@ async function duplicatePageRoute (req: NextApiRequest, res: NextApiResponse<IPa
     throw new ActionNotPermittedError('You are not allowed to edit this page.');
   }
 
-  const pageWithPermissions = await duplicatePage(pageId, userId);
+  const pageWithPermissions = await duplicatePage(pageId, userId, parentId);
 
   return res.status(200).json(pageWithPermissions);
 }

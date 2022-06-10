@@ -8,7 +8,6 @@ import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/sto
 import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
-import { useSpaces } from 'hooks/useSpaces';
 import log from 'lib/log';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import reactDOM from 'react-dom';
@@ -29,7 +28,7 @@ const menuPosition: Partial<MenuProps> = {
 function Component ({ menuState }: { menuState: PluginState }) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'user-role' });
   const view = useEditorViewContext();
-  const { currentPageId, pages } = usePages();
+  const { currentPageId, pages, setPages } = usePages();
   const currentPage = pages[currentPageId];
   const [currentSpace] = useCurrentSpace();
   const dispatch = useAppDispatch();
@@ -94,14 +93,15 @@ function Component ({ menuState }: { menuState: PluginState }) {
     const tr = view.state.tr;
     if (node?.node.type.name === 'page' && currentPage) {
       if (currentSpace && node?.node.attrs.id) {
-        const duplicatedPage = await charmClient.duplicatePage(node?.node.attrs.id);
+        const duplicatedPage = await charmClient.duplicatePage(node?.node.attrs.id, currentPage.id);
         const newNode = view.state.schema.nodes.page.create({
           id: duplicatedPage.id
         });
         const newTr = safeInsert(newNode, node.nodeEnd)(tr);
         view.dispatch(newTr.scrollIntoView());
-        mutate(`pages/${currentSpace.id}`);
+        setPages((_pages) => ({ ..._pages, [duplicatedPage.id]: duplicatedPage }));
         dispatch(initialLoad());
+        await mutate(`pages/${currentSpace.id}`);
       }
     }
     else if (node) {
