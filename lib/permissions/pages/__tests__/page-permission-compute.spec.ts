@@ -75,6 +75,39 @@ describe('computeUserPagePermissions', () => {
 
   });
 
+  it('should return only permissions an admin user has been explicity assigned if allowAdminBypass is set to false', async () => {
+
+    const { user: adminUser, space: localSpace } = await generateUserAndSpaceWithApiToken(undefined, true);
+
+    const page = await createPage({
+      createdBy: adminUser.id,
+      spaceId: localSpace.id,
+      title: 'Page without permissions'
+    });
+
+    await upsertPermission(page.id, {
+      permissionLevel: 'view',
+      pageId: page.id,
+      userId: adminUser.id
+    });
+
+    const permissions = await computeUserPagePermissions({
+      pageId: page.id,
+      userId: adminUser.id,
+      allowAdminBypass: false
+    });
+
+    (Object.keys(PageOperations) as PageOperationType[]).forEach(op => {
+      if (op === 'read') {
+        expect(permissions.read).toBe(true);
+      }
+      else {
+        expect(permissions[op]).toBe(false);
+      }
+    });
+
+  });
+
   it('should return empty permissions if the page does not exist', async () => {
     const inexistentPageId = v4();
 

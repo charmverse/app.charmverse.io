@@ -141,5 +141,10 @@ export default function RowActionsMenu ({ pluginKey }: { pluginKey: PluginKey })
 
   const menuState: PluginState = usePluginState(pluginKey);
 
+  // Fixes the case where undefined menu state throws an error
+  if (!menuState) {
+    return null;
+  }
+
   return reactDOM.createPortal(<Component menuState={menuState} />, menuState.tooltipDOM);
 }

@@ -103,8 +103,9 @@ export function InlineCommentButton({
     position: "relative"
   }}/>,
   menuKey,
+  enableComments,
   ...props
-}: ButtonProps & {menuKey: PluginKey}) {
+}: ButtonProps & {menuKey: PluginKey, enableComments: boolean}) {
   const view = useEditorViewContext();
   
   const onMouseDown = useCallback(
@@ -136,7 +137,7 @@ export function InlineCommentButton({
       onMouseDown={onMouseDown}
       hints={hints}
       // Figure out when the button will be disabled
-      isDisabled={!view.editable || queryIsInlineCommentActive()(view.state)}
+      isDisabled={!enableComments}
     >
       {children}
     </MenuButton>

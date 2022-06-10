@@ -1,4 +1,4 @@
-import { ApplicationStatus, Block, Bounty, BountyStatus, Page, Prisma, Space, SpaceApiToken, Transaction } from '@prisma/client';
+import { ApplicationStatus, Block, Bounty, BountyStatus, Page, Prisma, Space, SpaceApiToken, Thread, Transaction, Comment } from '@prisma/client';
 import { prisma } from 'db';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import { IPageWithPermissions } from 'lib/pages';
@@ -203,6 +203,72 @@ export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'cre
       }
     }
   });
+}
+
+export async function generateCommentWithThreadAndPage ({ userId, spaceId, commentContent }: {
+  userId: string,
+  spaceId: string,
+  commentContent: string
+}): Promise<{page: Page, thread: Thread, comment: Comment}> {
+
+  const page = await createPage({
+    createdBy: userId,
+    spaceId
+  });
+
+  const thread = await prisma.thread.create({
+    data: {
+      context: 'Random context',
+      resolved: false,
+      page: {
+        connect: {
+          id: page.id
+        }
+      },
+      user: {
+        connect: {
+          id: userId
+        }
+      },
+      space: {
+        connect: {
+          id: spaceId
+        }
+      }
+    }
+  });
+
+  const comment = await prisma.comment.create({
+    data: {
+      page: {
+        connect: {
+          id: page.id
+        }
+      },
+      content: commentContent,
+      thread: {
+        connect: {
+          id: thread.id
+        }
+      },
+      user: {
+        connect: {
+          id: userId
+        }
+      },
+      space: {
+        connect: {
+          id: spaceId
+        }
+      }
+    }
+  });
+
+  return {
+    page,
+    thread,
+    comment
+  };
 }
 
 export function createBlock (options: Partial<Block> & Pick<Block, 'createdBy' | 'rootId'>): Promise<Block> {

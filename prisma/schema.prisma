@@ -420,6 +420,7 @@ enum PagePermissionLevel {
 enum PageOperations {
   read
   delete
+  comment
   edit_position
   edit_content
   edit_isPublic

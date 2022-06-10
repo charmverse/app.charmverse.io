@@ -21,16 +21,15 @@ import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDoma
 // TODO: Maybe move these types to another place so that we dont import from backend
 import { ReviewDecision, SubmissionContent, SubmissionCreationData } from 'lib/applications/interfaces';
 import { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
-import { AddCommentRequest } from 'pages/api/comments';
 import { ConnectDiscordPayload, ConnectDiscordResponse } from 'pages/api/discord/connect';
 import { ImportDiscordRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
 import { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
-import { CommentWithUser, ThreadWithComments } from 'pages/api/pages/[id]/threads';
 import { ListSpaceRolesResponse } from 'pages/api/roles';
 import { GetTasksResponse } from 'pages/api/tasks/list';
 import { GetTasksStateResponse, UpdateTasksState } from 'pages/api/tasks/state';
 import { TelegramAccount } from 'pages/api/telegram/connect';
-import { StartThreadRequest } from 'pages/api/threads';
+import { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
+import { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import { UpdateThreadRequest } from 'pages/api/threads/[id]';
 import { TokenGateWithRoles } from 'pages/api/token-gates';
 
@@ -602,7 +601,7 @@ class CharmClient {
     return http.DELETE('/api/permissions', { permissionId });
   }
 
-  startThread (request: StartThreadRequest): Promise<ThreadWithComments> {
+  startThread (request: Omit<ThreadCreate, 'userId'>): Promise<ThreadWithCommentsAndAuthors> {
     return http.POST('/api/threads', request);
   }
 
@@ -614,7 +613,7 @@ class CharmClient {
     return http.PUT(`/api/threads/${threadId}`, request);
   }
 
-  addComment (request: AddCommentRequest): Promise<CommentWithUser> {
+  addComment (request: Omit<CommentCreate, 'userId'>): Promise<CommentWithUser> {
     return http.POST('/api/comments', request);
   }
 
@@ -626,7 +625,7 @@ class CharmClient {
     return http.DELETE(`/api/comments/${commentId}`);
   }
 
-  getPageThreads (pageId: string): Promise<ThreadWithComments[]> {
+  getPageThreads (pageId: string): Promise<ThreadWithCommentsAndAuthors[]> {
     return http.GET(`/api/pages/${pageId}/threads`);
   }
 
