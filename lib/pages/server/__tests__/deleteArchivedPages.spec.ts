@@ -2,7 +2,7 @@ import { createBlock, createPage } from 'testing/setupDatabase';
 import { prisma } from 'db';
 import { DateTime } from 'luxon';
 import { v4 } from 'uuid';
-import { deleteArchivedPages } from '../server/deleteArchivedPages';
+import { deleteArchivedPages } from '../deleteArchivedPages';
 
 describe('deleteArchivedPages', () => {
   it('Should delete the archived pages older than 30 days', async () => {
