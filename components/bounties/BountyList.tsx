@@ -1,6 +1,5 @@
 import { Box, Grid, Typography } from '@mui/material';
 import { BountyStatus } from '@prisma/client';
-import { PopulatedBounty } from 'charmClient';
 import Button from 'components/common/Button';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { BountiesContext } from 'hooks/useBounties';
@@ -10,6 +9,7 @@ import { sortArrayByObjectProperty } from 'lib/utilities/array';
 import { useContext, useMemo, useState, useEffect } from 'react';
 import { CSVLink } from 'react-csv';
 import useIsAdmin from 'hooks/useIsAdmin';
+import { BountyWithDetails } from 'models';
 import { BountyCard } from './components/BountyCard';
 import BountyModal from './components/BountyModal';
 import InputBountyStatus from './components/InputBountyStatus';
@@ -17,7 +17,7 @@ import MultiPaymentModal from './components/MultiPaymentModal';
 
 const bountyOrder: BountyStatus[] = ['open', 'inProgress', 'complete', 'paid', 'suggestion'];
 
-function filterBounties (bounties: PopulatedBounty[], statuses: BountyStatus[]): PopulatedBounty[] {
+function filterBounties (bounties: BountyWithDetails[], statuses: BountyStatus[]): BountyWithDetails[] {
   return bounties?.filter(bounty => statuses.indexOf(bounty.status) > -1) ?? [];
 }
 
@@ -41,7 +41,7 @@ export default function BountyList () {
 
   const [space] = useCurrentSpace();
 
-  const [savedBountyFilters, setSavedBountyFilters] = useLocalStorage<BountyStatus []>(`${space?.id}-bounty-filters`, ['open', 'inProgress']);
+  const [savedBountyFilters, setSavedBountyFilters] = useLocalStorage<BountyStatus[]>(`${space?.id}-bounty-filters`, ['open', 'inProgress']);
 
   // Filter out the old bounty filters
   useEffect(() => {
@@ -85,19 +85,19 @@ export default function BountyList () {
 
   return (
     <ScrollableWindow>
-      <Box py={3} sx={{ px: { xs: '40px', sm: '80px' } }}>
+      <Box py={3} sx={{ px: { xs: '40px', sm: '80px' }, minHeight: '80vh' }}>
         <Box display='flex' justifyContent='space-between' mb={3}>
           <Typography variant='h1'>Bounty list</Typography>
           <Box display='flex' justifyContent='flex-end'>
             { !!csvData.length
             && (
               <CSVLink data={csvData} filename='Gnosis Safe Airdrop.csv' style={{ textDecoration: 'none' }}>
-                <Button variant='outlined'>
+                <Button color='secondary' variant='outlined'>
                   Export to CSV
                 </Button>
               </CSVLink>
             )}
-            {/* <MultiPaymentModal bounties={[]}/> */}
+            <MultiPaymentModal bounties={bounties} />
             <Button
               sx={{ ml: 1 }}
               onClick={() => {
@@ -110,30 +110,63 @@ export default function BountyList () {
         </Box>
 
         {/* Filters for the bounties */}
-        <Box display='flex' alignContent='center' justifyContent='flex-start' mb={3}>
-          <InputBountyStatus
-            onChange={(statuses) => {
-              setSavedBountyFilters(sortSelected(statuses));
-            }}
-            renderSelectedInValue={true}
-            renderSelectedInOption={true}
-            defaultValues={savedBountyFilters}
-          />
-        </Box>
 
-        <Grid container spacing={1}>
-          {
-            sortedBounties.length === 0
-              ? <Typography paragraph={true}>No bounties were found</Typography>
-              : sortedBounties.map(bounty => {
-                return (
-                  <Grid key={bounty.id} item>
-                    <BountyCard truncate={false} key={bounty.id} bounty={bounty} />
-                  </Grid>
-                );
-              })
+        {
+          bounties.length > 0 && (
+            <Box display='flex' alignContent='center' justifyContent='flex-start' mb={3}>
+              <InputBountyStatus
+                onChange={(statuses) => {
+                  setSavedBountyFilters(sortSelected(statuses));
+                }}
+                renderSelectedInValue={true}
+                renderSelectedInOption={true}
+                defaultValues={savedBountyFilters}
+              />
+            </Box>
+          )
+        }
+
+        {/* Onboarding video when no bounties exist */}
+        {
+            bounties.length === 0 && (
+              <>
+                <Typography variant='h6' sx={{ mb: 2 }}>Getting started with bounties</Typography>
+                <div>
+
+                  <iframe
+                    src='https://tiny.charmverse.io/bounties'
+                    style={{ maxWidth: '100%', border: '0 none' }}
+                    height='395px'
+                    width='700px'
+                    title='Bounties | Getting started with Charmverse'
+                  >
+                  </iframe>
+
+                </div>
+              </>
+            )
           }
-        </Grid>
+
+        {/* Current filter status doesn't have any matching bounties */}
+        {
+            bounties.length > 0 && sortedBounties.length === 0 && <Typography paragraph={true}>No bounties were found</Typography>
+          }
+
+        {/* List of bounties based on current filter */}
+        {
+            sortedBounties.length > 0 && (
+              <Grid container spacing={1}>
+                {sortedBounties.map(bounty => {
+                  return (
+                    <Grid key={bounty.id} item>
+                      <BountyCard truncate={false} key={bounty.id} bounty={bounty} />
+                    </Grid>
+                  );
+                })}
+              </Grid>
+            )
+          }
+
         {
           /**
            * Remove later to its own popup modal

@@ -11,8 +11,7 @@ interface Props {
 }
 
 export default function BlocksEditorPage ({ shouldLoadPublicPage = false }: Props) {
-
-  const { currentPageId, setCurrentPageId, pages, refreshPage } = usePages();
+  const { setCurrentPageId, pages } = usePages();
   const router = useRouter();
 
   if (shouldLoadPublicPage) {
@@ -24,14 +23,7 @@ export default function BlocksEditorPage ({ shouldLoadPublicPage = false }: Prop
   const pagePath = router.query.pageId as string;
   const pageIdList = Object.values(pages ?? {}) as Page[];
   const pageId = pageIdList.find(p => p.path === pagePath)?.id;
-
-  if (pageId) {
-
-    return <EditorPage shouldLoadPublicPage={false} onPageLoad={(_pageId) => setCurrentPageId(_pageId)} pageId={pageId} />;
-  }
-
-  return null;
-
+  return <EditorPage shouldLoadPublicPage={false} onPageLoad={(_pageId) => setCurrentPageId(_pageId)} pageId={pageId ?? pagePath} />;
 }
 
 BlocksEditorPage.getLayout = (page: ReactElement) => {

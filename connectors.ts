@@ -2,7 +2,6 @@ import { InjectedConnector } from '@web3-react/injected-connector';
 import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 import { WalletLinkConnector } from '@web3-react/walletlink-connector';
 import { uniqueValues } from 'lib/utilities/array';
-import { CryptoCurrency } from './models/Currency';
 
 enum Chains {
   ETHEREUM = 1,
@@ -29,16 +28,16 @@ export interface IChainDetails {
     address: string;
     logoURI: string;
   };
-  rpcUrls: readonly string [];
-  blockExplorerUrls: readonly string [];
+  rpcUrls: readonly string[];
+  blockExplorerUrls: readonly string[];
   gnosisUrl?: string;
-  iconUrls: readonly string [];
+  iconUrl: string;
   testnet?: boolean;
 }
 
 // Gnosis endpoints: https://docs.gnosis-safe.io/backend/available-services
 
-const RPC: Record<string, IChainDetails> = {
+const RPC = {
   ETHEREUM: {
     chainId: 1,
     chainName: 'Ethereum',
@@ -52,7 +51,7 @@ const RPC: Record<string, IChainDetails> = {
     },
     blockExplorerUrls: ['https://etherscan.io'],
     gnosisUrl: 'https://safe-transaction.mainnet.gnosis.io',
-    iconUrls: ['/networkLogos/ethereum.svg'],
+    iconUrl: '/images/cryptoLogos/eth-diamond-purple.png',
     rpcUrls: ['https://main-light.eth.linkpool.io']
   },
   BSC: {
@@ -69,7 +68,7 @@ const RPC: Record<string, IChainDetails> = {
     rpcUrls: ['https://bsc-dataseed.binance.org'],
     blockExplorerUrls: ['https://bscscan.com'],
     gnosisUrl: 'https://safe-transaction.bsc.gnosis.io',
-    iconUrls: ['/networkLogos/bsc.svg']
+    iconUrl: '/images/cryptoLogos/binance-coin-bnb-logo.svg'
   },
   POLYGON: {
     chainId: 137,
@@ -85,7 +84,7 @@ const RPC: Record<string, IChainDetails> = {
     rpcUrls: ['https://polygon-rpc.com'],
     blockExplorerUrls: ['https://polygonscan.com'],
     gnosisUrl: 'https://safe-transaction.polygon.gnosis.io',
-    iconUrls: ['/networkLogos/polygon.svg']
+    iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg'
   },
   AVALANCHE: {
     chainId: 43114,
@@ -101,7 +100,7 @@ const RPC: Record<string, IChainDetails> = {
     rpcUrls: ['https://api.avax.network/ext/bc/C/rpc'],
     blockExplorerUrls: ['https://snowtrace.io'],
     gnosisUrl: 'https://safe-transaction.avalanche.gnosis.io',
-    iconUrls: ['/networkLogos/avalanche.svg']
+    iconUrl: '/images/cryptoLogos/avalanche-avax-logo.svg'
   },
   XDAI: {
     chainId: 100,
@@ -117,7 +116,7 @@ const RPC: Record<string, IChainDetails> = {
     rpcUrls: ['https://rpc.xdaichain.com'],
     blockExplorerUrls: ['https://blockscout.com/poa/xdai'],
     gnosisUrl: 'https://safe-transaction.xdai.gnosis.io',
-    iconUrls: ['/networkLogos/xdai.svg']
+    iconUrl: '/images/cryptoLogos/gnosis-xdai-logo.svg'
   },
   FANTOM: {
     chainId: 250,
@@ -132,7 +131,7 @@ const RPC: Record<string, IChainDetails> = {
     },
     rpcUrls: ['https://rpc.ftm.tools'],
     blockExplorerUrls: ['https://ftmscan.com'],
-    iconUrls: ['/networkLogos/fantom.svg']
+    iconUrl: '/images/cryptoLogos/fantom.svg'
   },
   ARBITRUM: {
     chainId: 42161,
@@ -148,7 +147,7 @@ const RPC: Record<string, IChainDetails> = {
     rpcUrls: ['https://arb1.arbitrum.io/rpc'],
     blockExplorerUrls: ['https://arbiscan.io'],
     gnosisUrl: 'https://safe-transaction.arbitrum.gnosis.io',
-    iconUrls: ['/networkLogos/arbitrum.svg']
+    iconUrl: '/images/cryptoLogos/arbitrum.svg'
   },
   CELO: {
     chainId: 42220,
@@ -163,7 +162,7 @@ const RPC: Record<string, IChainDetails> = {
     },
     rpcUrls: ['https://forno.celo.org'],
     blockExplorerUrls: ['https://explorer.celo.org'],
-    iconUrls: ['/networkLogos/celo.svg']
+    iconUrl: '/images/cryptoLogos/celo-celo-logo.svg'
   },
   HARMONY: {
     chainId: 1666600000,
@@ -178,7 +177,7 @@ const RPC: Record<string, IChainDetails> = {
     },
     rpcUrls: ['https://api.harmony.one'],
     blockExplorerUrls: ['https://explorer.harmony.one'],
-    iconUrls: ['/networkLogos/harmony.svg']
+    iconUrl: '/images/cryptoLogos/harmony-one-logo.svg'
   },
   GOERLI: {
     chainId: 5,
@@ -194,7 +193,7 @@ const RPC: Record<string, IChainDetails> = {
     rpcUrls: ['https://goerli-light.eth.linkpool.io/'],
     blockExplorerUrls: ['https://goerli.etherscan.io/'],
     gnosisUrl: 'https://safe-transaction.goerli.gnosis.io',
-    iconUrls: ['/networkLogos/ethereum.svg'],
+    iconUrl: '/images/cryptoLogos/eth-diamond-purple.png',
     testnet: true
   },
   RINKEBY: {
@@ -210,7 +209,7 @@ const RPC: Record<string, IChainDetails> = {
     },
     blockExplorerUrls: ['https://rinkeby-explorer.arbitrum.io/#/'],
     gnosisUrl: 'https://safe-transaction.rinkeby.gnosis.io',
-    iconUrls: ['/networkLogos/ethereum.svg'],
+    iconUrl: '/images/cryptoLogos/eth-diamond-purple.png',
     rpcUrls: ['https://rinkeby-light.eth.linkpool.io/'],
     testnet: true
   },
@@ -227,7 +226,7 @@ const RPC: Record<string, IChainDetails> = {
     },
     rpcUrls: ['https://rpc-mumbai.matic.today'],
     blockExplorerUrls: ['https://mumbai.polygonscan.com'],
-    iconUrls: ['/networkLogos/polygon.svg'],
+    iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
     testnet: true
   }
 } as const;
@@ -236,15 +235,49 @@ export type Blockchain = keyof typeof RPC;
 
 export const RPCList = Object.values(RPC);
 
+export type CryptoCurrency = typeof RPC[Blockchain]['nativeCurrency']['symbol'];
+
+export const CryptoCurrencyList = Object.values(RPC).reduce((acc, chain) => {
+  acc[chain.nativeCurrency.symbol] = chain.nativeCurrency.name;
+  return acc;
+}, {} as Record<CryptoCurrency, string>);
+
+export const TokenLogoPaths = Object.values(RPC).reduce((acc, chain) => {
+  acc[chain.nativeCurrency.symbol] = chain.iconUrl;
+  return acc;
+}, {} as Record<CryptoCurrency, string>);
+
 export const CryptoCurrencies = uniqueValues<CryptoCurrency>(RPCList.map(chain => {
   return chain.nativeCurrency.symbol as CryptoCurrency;
 }));
+
+export const FiatCurrencyList = {
+  USD: 'US Dollar',
+  GBP: 'British Pound Sterling',
+  EUR: 'Euro',
+  JPY: 'Japanese Yen'
+};
+
+export type FiatCurrency = keyof typeof FiatCurrencyList;
+
+export type Currency = CryptoCurrency | FiatCurrency;
+
+export interface ICurrencyPair {
+  base: CryptoCurrency | string;
+  quote: FiatCurrency;
+}
+
+export interface IPairQuote extends ICurrencyPair {
+  amount: number;
+  receivedOn?: number | Date;
+  source?: string;
+}
 
 export function getChainById (chainId: number): IChainDetails | undefined {
   return RPCList.find(rpc => rpc.chainId === chainId);
 }
 
-const supportedChains = [
+const supportedChains: Blockchain[] = [
   'ETHEREUM',
   'POLYGON',
   'AVALANCHE',
@@ -257,7 +290,7 @@ const supportedChains = [
   'GOERLI',
   'RINKEBY',
   'MUMBAI'
-] as const;
+];
 
 const supportedChainIds = supportedChains.map((_) => Chains[_]);
 

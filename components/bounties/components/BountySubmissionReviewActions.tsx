@@ -5,7 +5,7 @@ import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import { IconButton } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
+import Button from 'components/common/Button';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { Application, Bounty } from '@prisma/client';

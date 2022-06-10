@@ -1,8 +1,8 @@
-import { User } from '@prisma/client';
 
 declare module 'iron-session' {
   interface IronSessionData {
-    user: User;
+    // this data is only useful for authentication - it is not kept up-to-date!
+    user: { id: string };
   }
 }
 

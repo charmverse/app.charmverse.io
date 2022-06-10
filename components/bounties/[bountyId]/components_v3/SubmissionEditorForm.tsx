@@ -32,7 +32,7 @@ interface Props {
   onSubmit: (submission: Application) => void
 }
 
-export default function BountySubmissionForm ({ submission, onSubmit, bounty }: Props) {
+export default function BountySubmissionForm ({ submission, onSubmit: onSubmitProp, bounty }: Props) {
   const [user] = useUser();
 
   const {
@@ -55,47 +55,40 @@ export default function BountySubmissionForm ({ submission, onSubmit, bounty }: 
 
   //  const defaultWalletAddress = submission.walletAddress ?? ;
 
-  async function submitted (values: FormValues) {
+  async function onSubmit (values: FormValues) {
     setFormError(null);
-    if (submission) {
-      // Update
-      charmClient.updateSubmission({ submissionId: submission.id, content: values })
-        .then(updated => {
-          onSubmit(updated);
-        })
-        .catch(err => {
-          setFormError(err);
+    let application: Application;
+    try {
+      if (submission) {
+        // Update
+        application = await charmClient.updateSubmission({
+          submissionId: submission.id,
+          content: values
         });
-
-    }
-    else {
-      // create
-      charmClient.createSubmission({
-        bountyId: bounty.id,
-        submissionContent: {
-          submission: values.submission,
-          submissionNodes: values.submissionNodes
-        }
-      })
-        .then(created => {
-          onSubmit(created);
-        })
-        .catch(err => {
-          setFormError(err);
+      }
+      else {
+        // create
+        application = await charmClient.createSubmission({
+          bountyId: bounty.id,
+          submissionContent: values
         });
+      }
+      onSubmitProp(application);
     }
-
+    catch (err: any) {
+      setFormError(err);
+    }
   }
 
   //  console.log('Submission', submission.submissionNodes, typeof submission.submissionNodes);
 
   return (
     <Box>
-      <form onSubmit={handleSubmit(formValue => submitted(formValue as any))} style={{ margin: 'auto' }}>
+      <form onSubmit={handleSubmit(onSubmit)} style={{ margin: 'auto' }}>
         <Grid container direction='column' spacing={3}>
           <Grid item>
             <InlineCharmEditor
-              content={submission?.submissionNodes ? JSON.parse(submission?.submissionNodes) : ''}
+              content={submission?.submissionNodes ? JSON.parse(submission?.submissionNodes) : null}
               onContentChange={content => {
                 setValue('submission', content.rawText, {
                   shouldValidate: true

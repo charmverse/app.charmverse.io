@@ -1,18 +1,13 @@
 
-import { Bounty, BountyStatus, PageOperations, PagePermissionLevel, Space, User } from '@prisma/client';
-import { computeUserPagePermissions, permissionTemplates, upsertPermission } from 'lib/permissions/pages';
-import { createPage, generateUserAndSpaceWithApiToken, generateBountyWithSingleApplication, generateSpaceUser, generateBounty } from 'testing/setupDatabase';
+import { Space, User } from '@prisma/client';
+import { generateUserAndSpaceWithApiToken, generateBountyWithSingleApplication } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { ExpectedAnError } from 'testing/errors';
-import { UserIsNotSpaceMemberError } from 'lib/users/errors';
-import { DataNotFoundError, InvalidInputError, UnauthorisedActionError, LimitReachedError, PositiveNumbersOnlyError, DuplicateDataError, StringTooShortError, MissingDataError } from 'lib/utilities/errors';
+import { DataNotFoundError, InvalidInputError, UnauthorisedActionError, MissingDataError } from 'lib/utilities/errors';
 import { createBounty } from 'lib/bounties/createBounty';
 import { prisma } from 'db';
 import { generateSubmissionContent } from 'testing/generate-stubs';
-import { createApplication } from '../createApplication';
-import { MINIMUM_APPLICATION_MESSAGE_CHARACTERS } from '../../shared';
-import { createSubmission } from '../createSubmission';
-import { SubmissionContent, SubmissionUpdateData } from '../../interfaces';
+import { SubmissionContent } from '../../interfaces';
 import { updateSubmission } from '../updateSubmission';
 
 let user: User;
@@ -38,7 +33,8 @@ describe('updateSubmission', () => {
 
     const submissionUpdate: SubmissionContent = {
       submission: 'New content',
-      submissionNodes: '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"New content"}]}]}'
+      submissionNodes: '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"New content"}]}]}',
+      walletAddress: '0x123456789'
     };
 
     const updated = await updateSubmission({
@@ -62,7 +58,8 @@ describe('updateSubmission', () => {
 
     const submissionUpdate: SubmissionContent = {
       submission: 'New content',
-      submissionNodes: '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"New content"}]}]}'
+      submissionNodes: '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"New content"}]}]}',
+      walletAddress: '0x123456789'
     };
 
     const updated = await updateSubmission({
@@ -99,7 +96,8 @@ describe('updateSubmission', () => {
 
     const submissionUpdate: SubmissionContent = {
       submission: '',
-      submissionNodes: null
+      submissionNodes: null,
+      walletAddress: '0x0'
     };
 
     try {

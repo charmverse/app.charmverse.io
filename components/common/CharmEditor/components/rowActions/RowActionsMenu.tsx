@@ -1,11 +1,18 @@
-import { MoreHoriz as MoreHorizIcon, ContentCopy as DuplicateIcon, DeleteOutlined as DeleteIcon } from '@mui/icons-material';
-import { usePluginState, useEditorViewContext } from '@bangle.dev/react';
-import { ListItemIcon, ListItemText, Menu, MenuItem, MenuProps } from '@mui/material';
 import { PluginKey } from '@bangle.dev/core';
+import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { safeInsert } from '@bangle.dev/utils';
-import reactDOM from 'react-dom';
-import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/hooks';
+import { ContentCopy as DuplicateIcon, DeleteOutlined as DeleteIcon, MoreHoriz as MoreHorizIcon } from '@mui/icons-material';
+import { ListItemIcon, ListItemText, Menu, MenuItem, MenuProps } from '@mui/material';
+import { Page } from '@prisma/client';
+import charmClient from 'charmClient';
+import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePages } from 'hooks/usePages';
 import log from 'lib/log';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import reactDOM from 'react-dom';
+import { mutate } from 'swr';
 import type { PluginState } from './rowActions';
 
 const menuPosition: Partial<MenuProps> = {
@@ -20,9 +27,12 @@ const menuPosition: Partial<MenuProps> = {
 };
 
 function Component ({ menuState }: { menuState: PluginState }) {
-
   const popupState = usePopupState({ variant: 'popover', popupId: 'user-role' });
   const view = useEditorViewContext();
+  const { currentPageId, pages, setPages } = usePages();
+  const currentPage = pages[currentPageId];
+  const [currentSpace] = useCurrentSpace();
+  const dispatch = useAppDispatch();
 
   function _getNode () {
     if (!menuState.rowPos || !menuState.rowDOM) {
@@ -79,15 +89,31 @@ function Component ({ menuState }: { menuState: PluginState }) {
     }
   }
 
-  function duplicateRow () {
+  async function duplicateRow () {
     const node = _getNode();
-    if (node) {
+    const tr = view.state.tr;
+    if (node?.node.type.name === 'page' && currentPage) {
+      if (currentSpace && node?.node.attrs.id) {
+        const duplicatedPage = await charmClient.duplicatePage(node?.node.attrs.id, currentPage.id);
+        const newNode = view.state.schema.nodes.page.create({
+          id: duplicatedPage.id
+        });
+        const newTr = safeInsert(newNode, node.nodeEnd)(tr);
+        view.dispatch(newTr.scrollIntoView());
+        dispatch(initialLoad());
+        await mutate(`pages/${currentSpace.id}`, (_pages: Page[]) => {
+          return [..._pages, duplicatedPage];
+        }, {
+          revalidate: true
+        });
+      }
+    }
+    else if (node) {
       const copy = node.node.copy(node.node.content);
-      const tr = view.state.tr;
       const newTr = safeInsert(copy, node.nodeEnd)(tr);
       view.dispatch(newTr.scrollIntoView());
-      popupState.close();
     }
+    popupState.close();
   }
 
   return (

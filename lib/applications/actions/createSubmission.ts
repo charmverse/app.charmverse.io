@@ -30,10 +30,15 @@ export async function createSubmission ({ bountyId, submissionContent, userId }:
     throw new MissingDataError('You must provide content in your submission');
   }
 
+  if (!submissionContent.walletAddress) {
+    throw new MissingDataError('You must provide a wallet address in your submission');
+  }
+
   return prisma.application.create({
     data: {
       message: '',
       status: 'review',
+      walletAddress: submissionContent.walletAddress,
       submission: submissionContent.submission,
       submissionNodes: typeof submissionContent.submissionNodes === 'object' ? JSON.stringify(submissionContent.submissionNodes) : submissionContent.submissionNodes,
       bounty: {

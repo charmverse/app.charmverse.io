@@ -1,7 +1,11 @@
 import styled from '@emotion/styled';
 import { Box, Button } from '@mui/material';
+import charmClient from 'charmClient';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
+import { mutate } from 'swr';
 
 const StyledPageDeleteBanner = styled(Box)<{card?: boolean}>`
   position: fixed;
@@ -16,7 +20,23 @@ const StyledPageDeleteBanner = styled(Box)<{card?: boolean}>`
 
 export default function PageDeleteBanner ({ pageId }: {pageId: string}) {
   const [isMutating, setIsMutating] = useState(false);
-  const { restorePage, deletePage } = usePages();
+  const [space] = useCurrentSpace();
+  const router = useRouter();
+  const { pages } = usePages();
+
+  async function restorePage () {
+    if (space) {
+      await charmClient.restorePage(pageId);
+      await mutate(`pages/${space.id}`);
+    }
+  }
+
+  async function deletePage () {
+    if (space) {
+      await charmClient.deletePage(pageId);
+      router.push(`/${router.query.domain}/${Object.values(pages).find(page => page?.type !== 'card' && page?.deletedAt === null)?.path}`);
+    }
+  }
 
   const isShowingCard = new URLSearchParams(window.location.search).get('cardId');
 
@@ -34,7 +54,7 @@ export default function PageDeleteBanner ({ pageId }: {pageId: string}) {
           disabled={isMutating}
           onClick={async () => {
             setIsMutating(true);
-            await restorePage(pageId);
+            await restorePage();
             setIsMutating(false);
           }}
           variant='outlined'
@@ -45,7 +65,7 @@ export default function PageDeleteBanner ({ pageId }: {pageId: string}) {
           disabled={isMutating}
           onClick={async () => {
             setIsMutating(true);
-            await deletePage(pageId);
+            await deletePage();
             setIsMutating(false);
           }}
           variant='outlined'

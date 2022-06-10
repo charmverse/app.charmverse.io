@@ -1,12 +1,8 @@
-import { Page, PagePermission, Space, User } from '@prisma/client';
-import { generateUserAndSpaceWithApiToken, createPage, generateSpaceUser } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
-import { prisma } from 'db';
-import { IPagePermissionWithSource, setupPermissionsAfterPagePermissionAdded, setupPermissionsAfterPageRepositioned, upsertPermission } from 'lib/permissions/pages';
-import { getPage } from '../getPage';
+import { IPagePermissionWithSource, setupPermissionsAfterPagePermissionAdded, upsertPermission } from 'lib/permissions/pages';
+import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { } from '..';
 import { IPageWithPermissions } from '../../interfaces';
 import { getAccessiblePages } from '../getAccessiblePages';
-import {} from '..';
 
 describe('getAccessiblePage', () => {
 
@@ -15,8 +11,8 @@ describe('getAccessiblePage', () => {
     const { user: adminUser, space } = await generateUserAndSpaceWithApiToken(undefined, true);
 
     // Page without any permission
-    const page1 = await createPage({ createdBy: adminUser.id, spaceId: space.id });
-    const page2 = await createPage({ createdBy: adminUser.id, spaceId: space.id });
+    await createPage({ createdBy: adminUser.id, spaceId: space.id });
+    await createPage({ createdBy: adminUser.id, spaceId: space.id });
 
     const pages = await getAccessiblePages({ userId: adminUser.id, spaceId: space.id });
 

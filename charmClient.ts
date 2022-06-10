@@ -1,49 +1,45 @@
 
 import {
-  Application, Block, Bounty, BountyStatus, InviteLink, Page, PaymentMethod, Prisma,
-  Role, Space, TokenGate, User, TelegramUser, UserGnosisSafe, TokenGateToRole, UserDetails, PagePermissionLevel
+  Application, Block, Bounty, InviteLink, Page, PagePermissionLevel, PaymentMethod, Prisma,
+  Role, Space, TelegramUser, TokenGate, TokenGateToRole, User, UserDetails, UserGnosisSafe
 } from '@prisma/client';
-import { Contributor, LoggedInUser, BountyWithDetails, PageContent } from 'models';
-import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee, IPagePermissionWithSource } from 'lib/permissions/pages/page-permission-interfaces';
-import { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
-import { getDisplayName } from 'lib/users';
 import * as http from 'adapters/http';
-import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
-import type { ServerBlockFields } from 'pages/api/blocks';
 import { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/focalboard/src/blocks/block';
-import { IUser, UserWorkspace } from 'components/common/BoardEditor/focalboard/src/user';
 import { IWorkspace } from 'components/common/BoardEditor/focalboard/src/blocks/workspace';
 import { OctoUtils } from 'components/common/BoardEditor/focalboard/src/octoUtils';
-import { InviteLinkPopulated } from 'pages/api/invites/index';
-import { FiatCurrency, IPairQuote } from 'models/Currency';
+import { IUser, UserWorkspace } from 'components/common/BoardEditor/focalboard/src/user';
+import { FiatCurrency, IPairQuote } from 'connectors';
 import type { FailedImportsError } from 'lib/notion/types';
+import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee, IPagePermissionWithSource } from 'lib/permissions/pages/page-permission-interfaces';
 import { GetPoapsResponse, UpdatePoapsRequest } from 'lib/poap';
+import { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
+import { getDisplayName } from 'lib/users';
+import { BountyWithDetails, Contributor, LoggedInUser, PageContent } from 'models';
+import type { ServerBlockFields } from 'pages/api/blocks';
+import { InviteLinkPopulated } from 'pages/api/invites/index';
+import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 // TODO: Maybe move these types to another place so that we dont import from backend
-import { ImportDiscordRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
+import { ReviewDecision, SubmissionContent, SubmissionCreationData } from 'lib/applications/interfaces';
+import { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import { ConnectDiscordPayload, ConnectDiscordResponse } from 'pages/api/discord/connect';
+import { ImportDiscordRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
+import { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
+import { ListSpaceRolesResponse } from 'pages/api/roles';
+import { GetTasksResponse } from 'pages/api/tasks/list';
+import { GetTasksStateResponse, UpdateTasksState } from 'pages/api/tasks/state';
 import { TelegramAccount } from 'pages/api/telegram/connect';
 import { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
 import { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import { UpdateThreadRequest } from 'pages/api/threads/[id]';
-import { ModifyChildPagesResponse, IPageWithPermissions, PageLink } from 'lib/pages';
 import { TokenGateWithRoles } from 'pages/api/token-gates';
-import { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
-import { ListSpaceRolesResponse } from 'pages/api/roles';
-import { ReviewDecision, SubmissionContent, SubmissionCreationData } from 'lib/applications/interfaces';
-import { UpdateTasksState, GetTasksStateResponse } from 'pages/api/tasks/state';
-import { GetTasksResponse } from 'pages/api/tasks/list';
 
-import { PublicSpaceInfo } from 'lib/spaces/interfaces';
 import { ApplicationWithTransactions } from 'lib/applications/actions';
+import { SuggestionAction } from 'lib/bounties';
+import { PublicSpaceInfo } from 'lib/spaces/interfaces';
 import { TransactionCreationData } from 'lib/transactions/interface';
 import { PublicUser } from 'pages/api/public/profile/[userPath]';
-import { SuggestionAction } from 'lib/bounties';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
-
-export interface PopulatedBounty extends Bounty {
-  applications: Application[];
-}
 
 //
 // CharmClient is the client interface to the server APIs
@@ -135,12 +131,20 @@ class CharmClient {
     return http.GET<Page>(`/api/public/view/${viewId}`);
   }
 
+  duplicatePage (pageId: string, parentId: string) {
+    return http.POST<IPageWithPermissions>(`/api/pages/${pageId}/duplicate`, { parentId });
+  }
+
   getBlockViewsByPageId (pageId: string) {
     return http.GET<Block []>(`/api/blocks/views/${pageId}`);
   }
 
   getPages (spaceId: string) {
     return http.GET<Page[]>(`/api/spaces/${spaceId}/pages`);
+  }
+
+  getArchivedPages (spaceId: string) {
+    return http.GET<IPageWithPermissions[]>(`/api/spaces/${spaceId}/pages?archived=true`);
   }
 
   getPageLink (pageId: string) {
@@ -385,7 +389,7 @@ class CharmClient {
     updater(fbBlocks);
   }
 
-  listBounties (spaceId: string): Promise<PopulatedBounty[]> {
+  listBounties (spaceId: string): Promise<BountyWithDetails[]> {
     return http.GET('/api/bounties', { spaceId });
   }
 
@@ -417,15 +421,6 @@ class CharmClient {
   async updateBounty (bountyId: string, bounty: Partial<Bounty>): Promise<BountyWithDetails> {
 
     const data = await http.PUT<BountyWithDetails>(`/api/bounties/${bountyId}`, bounty);
-
-    return data;
-  }
-
-  async changeBountyStatus (bountyId: string, newStatus: BountyStatus): Promise<BountyWithDetails> {
-
-    const data = await http.PUT<BountyWithDetails>(`/api/bounties/${bountyId}`, {
-      status: newStatus
-    });
 
     return data;
   }
@@ -465,7 +460,7 @@ class CharmClient {
     return http.POST<Application>('/api/submissions', content);
   }
 
-  async updateSubmission ({ submissionId, content }: {submissionId: string, content: SubmissionContent}): Promise<Application> {
+  async updateSubmission ({ submissionId, content }: { submissionId: string, content: SubmissionContent }): Promise<Application> {
 
     return http.PUT<Application>(`/api/submissions/${submissionId}`, content);
   }
