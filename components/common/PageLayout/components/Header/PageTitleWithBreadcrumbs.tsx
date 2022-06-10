@@ -44,7 +44,7 @@ interface PageBreadCrumb {
   title: string;
 }
 
-function WorkspacePageTitle () {
+function WorkspacePageTitle ({ basePath }: { basePath: string }) {
   const router = useRouter();
   const { currentPageId, pages, isEditing } = usePages();
 
@@ -75,7 +75,7 @@ function WorkspacePageTitle () {
       {displayedCrumbs.map(crumb => (
         <BreadCrumb key={crumb.path}>
           {crumb.path ? (
-            <Link href={`/${router.query.domain}/${crumb.path}`}>
+            <Link href={`${basePath}/${crumb.path}`}>
               <PageTitleWrapper sx={{ maxWidth: 160 }}>
                 {crumb.icon && <PageIcon icon={crumb.icon} />}
                 {crumb.title || 'Untitled'}
@@ -138,11 +138,15 @@ function StandardPageTitle () {
 
 export default function PageTitleWithBreadcrumbs () {
   const router = useRouter();
+  console.log('router', router.route);
   if (router.route === '/[domain]/bounties/[bountyId]') {
     return <BountyPageTitle />;
   }
   else if (router.route === '/[domain]/[pageId]') {
-    return <WorkspacePageTitle />;
+    return <WorkspacePageTitle basePath={`/${router.query.domain}`} />;
+  }
+  else if (router.route === '/share/[pageId]') {
+    return <WorkspacePageTitle basePath='/share' />;
   }
   else if (router.route.startsWith('/nexus') || router.route.startsWith('/u/')) {
     return <div></div>;

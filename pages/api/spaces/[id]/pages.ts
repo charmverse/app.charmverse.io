@@ -1,10 +1,9 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { Page } from '@prisma/client';
-import { prisma } from 'db';
 import {} from 'lib/permissions/pages';
 import { getAccessiblePages } from 'lib/pages/server';
 

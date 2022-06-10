@@ -38,6 +38,7 @@ import { PublicSpaceInfo } from 'lib/spaces/interfaces';
 import { ApplicationWithTransactions } from 'lib/applications/actions';
 import { TransactionCreationData } from 'lib/transactions/interface';
 import { PublicUser } from 'pages/api/public/profile/[userPath]';
+import { PublicPageResponse } from 'pages/api/public/pages/[pageId]';
 import { SuggestionAction } from 'lib/bounties';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
@@ -192,8 +193,8 @@ class CharmClient {
     return http.DELETE(`/api/profile/gnosis-safes/${walletId}`);
   }
 
-  getPublicPage (pageId: string) {
-    return http.GET<{pages: Page[], blocks: Block[]}>(`/api/public/pages/${pageId}`);
+  getPublicPage (pageIdOrPath: string) {
+    return http.GET<PublicPageResponse>(`/api/public/pages/${pageIdOrPath}`);
   }
 
   createInviteLink (link: Partial<InviteLink>) {

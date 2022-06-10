@@ -9,8 +9,8 @@ import * as React from 'react';
 import { CommentThreadsListDisplayProvider } from 'hooks/useCommentThreadsListDisplay';
 import Header, { headerHeight } from './components/Header';
 import Sidebar from './components/Sidebar';
-import Favicon from './components/Favicon';
 import PageContainer from './components/PageContainer';
+import CurrentPageFavicon from './components/CurrentPageFavicon';
 
 const openedMixin = (theme: Theme, sidebarWidth: number) => ({
   width: '100%',
@@ -35,7 +35,7 @@ const closedMixin = (theme: Theme) => ({
   width: 0
 });
 
-const AppBar = styled(MuiAppBar, { shouldForwardProp: (prop: string) => prop !== 'sidebarWidth' && prop !== 'open' })
+export const AppBar = styled(MuiAppBar, { shouldForwardProp: (prop: string) => prop !== 'sidebarWidth' && prop !== 'open' })
   // eslint-disable-next-line no-unexpected-multiline
   <{ open: boolean, sidebarWidth: number }>(({ sidebarWidth, theme, open }) => ({
     background: 'transparent',
@@ -140,12 +140,6 @@ function PageLayout ({ hideSidebarOnSmallScreen = false, sidebarWidth = 300, chi
       </LayoutContainer>
     </>
   );
-}
-
-function CurrentPageFavicon () {
-  const { currentPageId, pages } = usePages();
-  const currentPage = pages[currentPageId];
-  return <Favicon pageIcon={currentPage?.icon} />;
 }
 
 export default PageLayout;

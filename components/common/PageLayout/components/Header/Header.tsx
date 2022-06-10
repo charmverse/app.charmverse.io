@@ -115,8 +115,8 @@ export default function Header (
         edge='start'
         sx={{
           display: {
-            xs: hideSidebarOnSmallScreen ? 'none' : 'block',
-            md: 'block'
+            xs: hideSidebarOnSmallScreen ? 'none' : 'inline-flex',
+            md: 'inline-flex'
           },
           marginRight: '36px',
           ...(open && { display: 'none' })
