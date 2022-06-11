@@ -89,13 +89,13 @@ export default function ShareToWeb ({ pageId, pagePermissions }: Props) {
     }
     else if (currentPage?.type === 'page' || currentPage?.type === 'card') {
       const shareLinkToSet = (typeof window !== 'undefined')
-        ? `${window.location.origin}/share/${currentPage.path}` : '';
+        ? `${window.location.origin}/share/${space?.domain}/${currentPage.path}` : '';
       setShareLink(shareLinkToSet);
     }
     else if (currentPage?.type === 'board') {
       const viewIdToProvide = router.query.viewId;
       const shareLinkToSet = (typeof window !== 'undefined')
-        ? `${window.location.origin}/share/${currentPage.path}?viewId=${viewIdToProvide}` : '';
+        ? `${window.location.origin}/share/${space?.domain}/${currentPage.path}?viewId=${viewIdToProvide}` : '';
       setShareLink(shareLinkToSet);
     }
   }

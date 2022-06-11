@@ -22,19 +22,32 @@ handler.get(getPublicPage);
 
 async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPageResponse>) {
 
-  const { pageId } = req.query;
+  const pageId = typeof req.query.pageId === 'string' && req.query.pageId;
 
-  if (typeof pageId !== 'string') {
+  let page: Page | null = null;
+
+  if (pageId) {
+    if (isUUID(pageId)) {
+      page = await prisma.page.findFirst({ where: { deletedAt: null, id: pageId } });
+    }
     return res.status(400).json({ error: 'Please provide a valid page ID' } as any);
   }
-
-  const query = isUUID(pageId)
-    ? { deletedAt: null, id: pageId }
-    : { deletedAt: null, path: pageId };
-
-  const page = await prisma.page.findFirst({
-    where: query
-  });
+  else if (req.query.pageId instanceof Array) {
+    const spaceDomain = req.query.pageId[0];
+    const pagePath = req.query.pageId[1];
+    if (spaceDomain && pagePath) {
+      const space = await prisma.space.findUnique({ where: { domain: spaceDomain } });
+      if (space) {
+        page = await prisma.page.findFirst({
+          where: {
+            deletedAt: null,
+            spaceId: space.id,
+            path: pagePath
+          }
+        });
+      }
+    }
+  }
 
   if (!page) {
     throw new NotFoundError('Page not found');

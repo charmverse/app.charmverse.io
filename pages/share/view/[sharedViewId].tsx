@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import { generatePath } from 'lib/utilities/strings';
-import PageView from '../[pageId]';
+import PageView from '../[...pageId]';
 
 export default function PublicBoardView () {
   const router = useRouter();
