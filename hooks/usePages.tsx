@@ -55,7 +55,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
 
   // retrieve space for public pages
   const [spaces] = useSpaces();
-  const publicPageSpace = router.route === '/share/[pageId]' ? spaces[0] : null;
+  const publicPageSpace = router.route === '/share/[...pageId]' ? spaces[0] : null;
   const space = spaceFromUrl || publicPageSpace;
 
   const { data, mutate } = useSWR(() => space ? `pages/${space?.id}` : null, () => {
