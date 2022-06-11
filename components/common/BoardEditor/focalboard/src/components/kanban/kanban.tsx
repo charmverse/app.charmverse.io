@@ -11,7 +11,7 @@ import withScrolling, {createHorizontalStrength, createVerticalStrength} from 'r
 import {Board, IPropertyOption, IPropertyTemplate, BoardGroup} from '../../blocks/board'
 import {Card} from '../../blocks/card'
 import {BoardView} from '../../blocks/boardView'
-import mutator from '../../mutator'
+import mutator, { BlockChange } from '../../mutator'
 import {Utils, IDType} from '../../utils'
 //import Button from '../../widgets/buttons/button'
 import Button from '@mui/material/Button'
@@ -200,16 +200,16 @@ const Kanban = (props: Props) => {
 
         await mutator.performAsUndoGroup(async () => {
             // Update properties of dragged cards
-            const awaits = []
+            const blockUpdates: BlockChange[] = []
             for (const draggedCard of draggedCards) {
                 Utils.log(`draggedCard: ${draggedCard.title}, column: ${optionId}`)
                 const oldOptionId = draggedCard.fields.properties[groupByProperty!.id]
                 if (optionId !== oldOptionId) {
-                    awaits.push(mutator.changePropertyValue(draggedCard, groupByProperty!.id, optionId, description))
+                    blockUpdates.push(mutator.changePropertyValue(draggedCard, groupByProperty!.id, optionId, description, false) as BlockChange)
                 }
             }
-            await Promise.all(awaits)
-            await mutator.changeViewCardOrder(activeView, cardOrder, description)
+            blockUpdates.push(mutator.changeViewCardOrder(activeView, cardOrder, description, false) as BlockChange)
+            await mutator.updateBlocks(blockUpdates.map(b => b.newBlock), blockUpdates.map(b => b.block), description)
         })
     }, [cards, activeView, groupByProperty, props.selectedCardIds])
 
