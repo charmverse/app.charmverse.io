@@ -63,6 +63,8 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     return charmClient.getPages(space!.id);
   }, { refreshInterval });
 
+  console.log(data);
+
   const _setPages: Dispatch<SetStateAction<PagesMap>> = (_pages) => {
     const res = _pages instanceof Function ? _pages(pagesRef.current) : _pages;
     mutate(() => Object.values(res).filter(isTruthy), {

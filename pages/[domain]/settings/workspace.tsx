@@ -38,6 +38,8 @@ export default function WorkspaceSettings () {
   const isAdmin = isSpaceAdmin(user, space?.id);
   const [isUpdatingPagePermission, setIsUpdatingPagePermission] = useState(false);
   const workspaceRemoveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-remove' });
+  const workspaceLeaveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-leave' });
+
   const {
     register,
     handleSubmit,
@@ -129,13 +131,25 @@ export default function WorkspaceSettings () {
               helperText={errors.domain?.message}
             />
           </Grid>
-          {isAdmin && (
+          {isAdmin ? (
             <Grid item display='flex' justifyContent='space-between'>
               <PrimaryButton disabled={!isDirty} type='submit'>
                 Save
               </PrimaryButton>
               <Button variant='outlined' color='error' onClick={deleteWorkspace}>
                 Delete Workspace
+              </Button>
+            </Grid>
+          ) : (
+            <Grid item display='flex'>
+              <Button
+                variant='outlined'
+                color='error'
+                onClick={() => {
+                  workspaceLeaveModalState.open();
+                }}
+              >
+                Leave Workspace
               </Button>
             </Grid>
           )}
@@ -239,6 +253,20 @@ export default function WorkspaceSettings () {
             const nextSpace = spaces.filter(s => s.id !== space.id)[0];
             window.location.href = nextSpace ? `/${nextSpace.domain}` : '/';
           }
+        }}
+      />
+      )}
+      {space && (
+      <ConfirmDeleteModal
+        title='Leave workspace'
+        onClose={() => {
+          workspaceLeaveModalState.close();
+        }}
+        open={workspaceLeaveModalState.isOpen}
+        buttonText={`Leave ${space.name}`}
+        question={`Are you sure you want to leave ${space.name}?`}
+        onConfirm={async () => {
+
         }}
       />
       )}
