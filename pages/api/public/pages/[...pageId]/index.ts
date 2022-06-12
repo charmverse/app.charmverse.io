@@ -22,30 +22,32 @@ handler.get(getPublicPage);
 
 async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPageResponse>) {
 
-  const pageId = typeof req.query.pageId === 'string' && req.query.pageId;
+  const { pageId: pageIdOrPath } = req.query as {pageId: string[]};
+
+  const isPageId = typeof pageIdOrPath[0] === 'string' && isUUID(pageIdOrPath[0]);
 
   let page: Page | null = null;
 
-  if (pageId) {
-    if (isUUID(pageId)) {
-      page = await prisma.page.findFirst({ where: { deletedAt: null, id: pageId } });
-    }
-    return res.status(400).json({ error: 'Please provide a valid page ID' } as any);
+  if (isPageId) {
+    page = await prisma.page.findFirst({ where: { deletedAt: null, id: pageIdOrPath[0] } });
   }
-  else if (req.query.pageId instanceof Array) {
-    const spaceDomain = req.query.pageId[0];
-    const pagePath = req.query.pageId[1];
-    if (spaceDomain && pagePath) {
-      const space = await prisma.space.findUnique({ where: { domain: spaceDomain } });
-      if (space) {
-        page = await prisma.page.findFirst({
-          where: {
-            deletedAt: null,
-            spaceId: space.id,
-            path: pagePath
-          }
-        });
-      }
+  // Tuple array of path segments [spaceDomain, pagePath]
+
+  const [spaceDomain, pagePath] = pageIdOrPath;
+
+  if (spaceDomain && pagePath) {
+    const space = await prisma.space.findUnique({ where: { domain: spaceDomain } });
+    if (space) {
+      page = await prisma.page.findFirst({
+        where: {
+          deletedAt: null,
+          spaceId: space.id,
+          space: {
+            domain: spaceDomain
+          },
+          path: pagePath.trim()
+        }
+      });
     }
   }
 

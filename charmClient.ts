@@ -201,6 +201,7 @@ class CharmClient {
   }
 
   getPublicPage (pageIdOrPath: string) {
+    console.log('ID or path', pageIdOrPath);
     return http.GET<PublicPageResponse>(`/api/public/pages/${pageIdOrPath}`);
   }
 
