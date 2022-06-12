@@ -1,10 +1,17 @@
-import Link from 'components/common/Link';
-import { Box, Divider, Typography } from '@mui/material';
-import ChevronLeft from '@mui/icons-material/ChevronLeft';
+import { Box, Typography } from '@mui/material';
+import { useWeb3React } from '@web3-react/core';
+import charmClient from 'charmClient';
+import Button from 'components/common/Button';
+import { useUser } from 'hooks/useUser';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
 
 export default function PageTitle ({ subPage }: { subPage?: string }) {
-
   const MyNexus = 'My Nexus';
+  const { account } = useWeb3React();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [, setUser] = useUser();
+  const router = useRouter();
 
   return (
     <Typography
@@ -21,18 +28,33 @@ export default function PageTitle ({ subPage }: { subPage?: string }) {
       }}
     >
       {subPage ? (
-        <>
-          {/* <Link color='secondary' href='/nexus' sx={{ display: 'flex', alignItems: 'center' }}>
-            <ChevronLeft />
-            {MyNexus}
-          </Link>
-          <Divider sx={{ borderRightWidth: '2px' }} orientation='vertical' flexItem /> */}
-          <Box component='span' alignItems='center' sx={{ fontWeight: 'bold' }}>
-            {subPage}
+        <Box component='span' alignItems='center' sx={{ fontWeight: 'bold' }}>
+          {subPage}
+        </Box>
+      )
+        : (
+          <Box display='flex' justifyContent='space-between' width='100%' alignItems='center'>
+            <Box component='span' sx={{ fontWeight: 'bold' }}>{MyNexus}</Box>
+            {/* user cant be logged out so long as their wallet is connected (TODO: fix!) */}
+            {!account && (
+            <Box display='flex' justifyContent='flex-end' mt={2}>
+              <Button
+                variant='outlined'
+                color='secondary'
+                loading={isLoggingOut}
+                onClick={async () => {
+                  setIsLoggingOut(true);
+                  await charmClient.logout();
+                  setUser(null);
+                  router.push('/');
+                }}
+              >
+                Logout
+              </Button>
+            </Box>
+            )}
           </Box>
-        </>
-      ) : <Box component='span' sx={{ fontWeight: 'bold' }}>{MyNexus}</Box>}
+        ) }
     </Typography>
   );
-
 }
