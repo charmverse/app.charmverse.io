@@ -108,6 +108,10 @@ class CharmClient {
     return http.PUT<Space>(`/api/spaces/${spaceOpts.id}`, spaceOpts);
   }
 
+  leaveSpace (spaceId: string) {
+    return http.POST(`/api/spaces/${spaceId}/leave`);
+  }
+
   getSpaces () {
     return http.GET<Space[]>('/api/spaces');
   }

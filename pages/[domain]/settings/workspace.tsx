@@ -266,7 +266,9 @@ export default function WorkspaceSettings () {
         buttonText={`Leave ${space.name}`}
         question={`Are you sure you want to leave ${space.name}?`}
         onConfirm={async () => {
-
+          await charmClient.leaveSpace(space.id);
+          const nextSpace = spaces.filter(s => s.id !== space.id)[0];
+          window.location.href = nextSpace ? `/${nextSpace.domain}` : '/';
         }}
       />
       )}
