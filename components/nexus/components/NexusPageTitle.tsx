@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material';
+import { Box, Tooltip, Typography } from '@mui/material';
 import { useWeb3React } from '@web3-react/core';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
@@ -35,24 +35,24 @@ export default function PageTitle ({ subPage }: { subPage?: string }) {
         : (
           <Box display='flex' justifyContent='space-between' width='100%' alignItems='center'>
             <Box component='span' sx={{ fontWeight: 'bold' }}>{MyNexus}</Box>
-            {/* user cant be logged out so long as their wallet is connected (TODO: fix!) */}
-            {!account && (
-            <Box display='flex' justifyContent='flex-end' mt={2}>
-              <Button
-                variant='outlined'
-                color='secondary'
-                loading={isLoggingOut}
-                onClick={async () => {
-                  setIsLoggingOut(true);
-                  await charmClient.logout();
-                  setUser(null);
-                  router.push('/');
-                }}
-              >
-                Logout
-              </Button>
-            </Box>
-            )}
+            <Tooltip arrow placement='top' title={account ? 'User cant be logged out so long as their wallet is connected' : ''}>
+              <Box display='flex' justifyContent='flex-end' mt={2}>
+                <Button
+                  disabled={account}
+                  variant='outlined'
+                  color='secondary'
+                  loading={isLoggingOut}
+                  onClick={async () => {
+                    setIsLoggingOut(true);
+                    await charmClient.logout();
+                    setUser(null);
+                    router.push('/');
+                  }}
+                >
+                  Logout
+                </Button>
+              </Box>
+            </Tooltip>
           </Box>
         ) }
     </Typography>
