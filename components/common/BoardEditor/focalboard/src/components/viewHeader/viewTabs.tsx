@@ -10,7 +10,6 @@ import { IDType, Utils } from '../../utils';
 import { BoardView, createBoardView } from '../../blocks/boardView';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-import { generatePath } from 'lib/utilities/strings';
 import { iconForViewType } from '../viewMenu'
 import mutator from '../../mutator'
 import Button from 'components/common/Button'
@@ -57,7 +56,7 @@ function ViewTabs({ board, activeView, intl, readonly, showView, views }: ViewTa
   const shownViews = views.slice(0, SHOWN_VIEWS)
   let restViews = views.slice(SHOWN_VIEWS);
 
-  // If the current view index is more than what we can show in the screen 
+  // If the current view index is more than what we can show in the screen
   if (currentViewIndex >= SHOWN_VIEWS) {
     const replacedView = shownViews[SHOWN_VIEWS - 1]
     // Replace the current view as the last view of the shown views
@@ -94,8 +93,13 @@ function ViewTabs({ board, activeView, intl, readonly, showView, views }: ViewTa
   }
 
   function getViewUrl(viewId: string) {
-    let boardUrl = generatePath(router.pathname, router.query)
-    return `${boardUrl}?viewId=${viewId}`
+    return {
+      pathname: router.pathname,
+      query: {
+        ...router.query,
+        viewId
+      }
+    };
   }
 
   const handleDuplicateView = useCallback(() => {
@@ -174,7 +178,7 @@ function ViewTabs({ board, activeView, intl, readonly, showView, views }: ViewTa
         />
       ))}
       {restViews.length !== 0 && <Tab component="div" disableRipple label={
-        <Button 
+        <Button
           variant='text'
           size='small'
           color="secondary"
@@ -220,7 +224,7 @@ function ViewTabs({ board, activeView, intl, readonly, showView, views }: ViewTa
               href={getViewUrl(view.id)}
             >
               <Box sx={{ display: "flex", gap: 1 }}>
-                {iconForViewType(view.fields.viewType)} 
+                {iconForViewType(view.fields.viewType)}
                 <Typography>
                   {view.title}
                 </Typography>

@@ -1,4 +1,4 @@
-import { generatePath } from 'lib/utilities/strings';
+import { getUriWithParam } from 'lib/utilities/strings';
 import { Page } from 'models';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState, useMemo } from 'react';
@@ -51,10 +51,13 @@ export default function BoardPage ({ page, setPage, readonly }: Props) {
     const isCorrectBoardView = boardViews.length > 0 && boardViews[0].parentId === boardId;
 
     if (!urlViewId && isCorrectBoardView) {
-      const newPath = generatePath(router.pathname, { ...router.query, boardId });
       router.replace({
-        pathname: newPath,
-        query: { viewId: boardViews[0].id, cardId: shownCardId }
+        pathname: router.pathname,
+        query: {
+          ...router.query,
+          viewId: boardViews[0].id,
+          cardId: router.query.cardId
+        }
       });
       return;
     }
@@ -110,17 +113,7 @@ export default function BoardPage ({ page, setPage, readonly }: Props) {
   });
 
   const showCard = useCallback((cardId?: string) => {
-    const newPath = generatePath(router.pathname, router.query);
-
-    const query: any = { viewId: router.query.viewId };
-    if (cardId) {
-      query.cardId = cardId;
-    }
-
-    if (readonly) {
-      query.r = Utils.getReadToken();
-    }
-    const newUrl = `${newPath}?${new URLSearchParams(query).toString()}`;
+    const newUrl = getUriWithParam(window.location.href, { cardId });
     silentlyUpdateURL(newUrl);
     setShownCardId(cardId);
   }, [router.query]);
@@ -149,7 +142,6 @@ export default function BoardPage ({ page, setPage, readonly }: Props) {
           groupByProperty={property}
           dateDisplayProperty={displayProperty}
           views={boardViews}
-          showShared={clientConfig?.enablePublicSharedBoards || false}
         />
         {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
           <RootPortal>
