@@ -26,7 +26,6 @@ export function BountyCard ({ truncate = true, bounty }: IBountyInput) {
     >
       <Link href={bountyUrl} passHref>
         <CardActionArea
-          href={bountyUrl}
           sx={{
             display: 'flex',
             flexDirection: 'column',
