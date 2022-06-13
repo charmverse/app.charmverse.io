@@ -1,9 +1,9 @@
 import { prisma } from 'db';
 import { PageContent } from 'models';
 import { extractMentions } from './extractMentions';
-import { MentionedTasks } from './interfaces';
+import { MentionedTask } from './interfaces';
 
-export async function getMentionedTasks (userId: string): Promise<MentionedTasks[]> {
+export async function getMentionedTasks (userId: string): Promise<MentionedTask[]> {
   // Get all the space the user is part of
   const spaceRoles = await prisma.spaceRole.findMany({
     where: {
@@ -24,20 +24,29 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
     },
     select: {
       content: true,
-      id: true
+      id: true,
+      space: {
+        select: {
+          domain: true,
+          id: true
+        }
+      }
     }
   });
 
-  const mentionedTasks: MentionedTasks[] = [];
+  const mentionedTasks: MentionedTask[] = [];
 
   for (const page of pages) {
     const content = page.content as PageContent;
-    if (content) {
-      const mentionIds = extractMentions(content);
-      mentionIds.forEach(mentionId => {
+    if (content && page.space) {
+      const mentions = extractMentions(content);
+      mentions.forEach(mention => {
         mentionedTasks.push({
-          mentionId,
-          pageId: page.id
+          mentionId: mention.id,
+          createdAt: mention.createdAt,
+          pageId: page.id,
+          spaceId: page.space?.id as string,
+          spaceDomain: page.space?.domain as string
         });
       });
     }

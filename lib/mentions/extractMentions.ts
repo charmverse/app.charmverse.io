@@ -6,7 +6,7 @@ import { PageContent } from 'models';
  * @returns An array of mention ids
  */
 export function extractMentions (content: PageContent) {
-  const mentionIds: string[] = [];
+  const mentions: {id: string, createdAt: string}[] = [];
 
   function recurse (parentNode: PageContent) {
     if (parentNode.content) {
@@ -14,11 +14,11 @@ export function extractMentions (content: PageContent) {
     }
 
     if (parentNode.type === 'mention' && parentNode.attrs) {
-      mentionIds.push(parentNode.attrs.id);
+      mentions.push({ id: parentNode.attrs.id, createdAt: parentNode.attrs.createdAt });
     }
   }
 
   recurse(content);
 
-  return mentionIds;
+  return mentions;
 }

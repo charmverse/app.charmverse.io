@@ -9,7 +9,8 @@ export function selectMention (key: PluginKey<SuggestPluginState>, mentionValue:
     const mentionNode = state.schema.nodes.mention.create({
       value: mentionValue,
       type: mentionType,
-      id: v4()
+      id: v4(),
+      createdAt: new Date()
     });
     const suggestPluginState = key.getState(state);
     if (suggestPluginState) {
