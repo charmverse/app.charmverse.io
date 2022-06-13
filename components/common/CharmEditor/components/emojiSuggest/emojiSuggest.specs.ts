@@ -1,6 +1,7 @@
 
 import { domSerializationHelpers, RawSpecs, BaseRawMarkSpec } from '@bangle.dev/core';
 import { getTwitterEmoji } from 'components/common/Emoji';
+import log from 'lib/log';
 import { markName } from './emojiSuggest.constants';
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
 
@@ -50,7 +51,7 @@ function emojiSpec ({ defaultEmoji = '😃' }: { defaultEmoji?: string } = {}): 
           state.text(node.attrs.emoji);
         }
         catch (err) {
-          console.log('Conversion err', err);
+          log.warn('Conversion err', err);
         }
       }
     }

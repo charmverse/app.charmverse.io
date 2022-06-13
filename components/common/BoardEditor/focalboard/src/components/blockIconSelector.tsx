@@ -77,7 +77,6 @@ const BlockIconSelector = React.memo((props: Props) => {
                         icon={<DeleteIcon/>}
                         name={intl.formatMessage({id: 'ViewTitle.remove-icon', defaultMessage: 'Remove icon'})}
                         onClick={() => {
-                            console.log('remove icon', onRemoveIcon, setPage)
                           onRemoveIcon()
                           setPage && setPage({icon: null})
                         }}

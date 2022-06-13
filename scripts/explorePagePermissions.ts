@@ -34,7 +34,7 @@ export async function queryBoard (pageId: string): Promise<true> {
   })).map(item => item.permissions);
 
   // console.log('\r\n\r\n---Root', root!.permissions);
-  console.log('Cards', cards);
+  // console.log('Cards', cards);
 
   return true;
 }

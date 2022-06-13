@@ -1,6 +1,7 @@
 import { RawPlugins, RawSpecs, NodeView } from '@bangle.dev/core';
 import { DOMOutputSpec, keymap, newlineInCode, splitBlock, createParagraphNear, EditorState, EditorView, Transaction, chainCommands } from '@bangle.dev/pm';
 import { parentHasDirectParentOfType } from '@bangle.dev/pm-commands';
+import log from 'lib/log';
 
 import { createObject, filter, insertEmpty } from '@bangle.dev/utils';
 
@@ -55,7 +56,7 @@ export function columnSpec (): RawSpecs {
     },
     markdown: {
       toMarkdown: (state, node) => {
-        console.log('Column triggered', node);
+        log.warn('Column triggered but no markdown support', node);
       }
     }
   };
