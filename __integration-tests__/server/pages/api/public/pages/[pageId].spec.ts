@@ -1,9 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Page, Space, User } from '@prisma/client';
 import request from 'supertest';
 import { baseUrl } from 'testing/mockApiCall';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { upsertPermission } from 'lib/permissions/pages';
+import { prisma } from 'db';
 
 let nonAdminUser: User;
 let nonAdminUserSpace: Space;
@@ -40,6 +40,12 @@ describe('GET /api/public/pages/[pageId] - Load public page', () => {
       .expect(200)).body as {page: Page};
 
     expect(foundPage.page.contentText).toBe(exampleText);
+
+    await prisma.page.delete({
+      where: {
+        id: page.id
+      }
+    });
   });
 
   it('should return the public page if provided the space domain + page path and respond 200', async () => {
@@ -61,6 +67,12 @@ describe('GET /api/public/pages/[pageId] - Load public page', () => {
       .expect(200)).body as {page: Page};
 
     expect(foundPage.page.contentText).toBe(exampleText);
+
+    await prisma.page.delete({
+      where: {
+        id: page.id
+      }
+    });
   });
 
   it('should throw a not found error if the page is not public and respond with 404', async () => {
@@ -74,6 +86,12 @@ describe('GET /api/public/pages/[pageId] - Load public page', () => {
     await request(baseUrl)
       .get(`/api/public/pages/${page.id}`)
       .expect(404);
+
+    await prisma.page.delete({
+      where: {
+        id: page.id
+      }
+    });
   });
 
 });

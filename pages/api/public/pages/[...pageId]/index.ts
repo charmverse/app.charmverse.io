@@ -41,7 +41,6 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
       page = await prisma.page.findFirst({
         where: {
           deletedAt: null,
-          spaceId: space.id,
           space: {
             domain: spaceDomain
           },
