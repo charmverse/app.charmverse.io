@@ -15,8 +15,8 @@ import PageBanner from './components/PageBanner';
 import CharmEditor, { ICharmEditorOutput } from '../../common/CharmEditor/CharmEditor';
 import PageDeleteBanner from './components/PageDeleteBanner';
 
-export const Container = styled(Box)<{ top: number }>`
-  width: 860px;
+export const Container = styled(Box)<{ top: number, fullWidth?: boolean }>`
+  width: ${({ fullWidth }) => fullWidth ? '100%' : '860px'};
   max-width: 100%;
   margin: 0 auto ${({ top }) => top + 100}px;
   position: relative;
@@ -84,6 +84,7 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
         {page.headerImage && <PageBanner headerImage={page.headerImage} setPage={setPage} />}
         <Container
           top={pageTop}
+          fullWidth={page.fullWidth ?? false}
         >
           <CharmEditor
             key={page.id}
