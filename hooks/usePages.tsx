@@ -1,4 +1,4 @@
-import { Page, PageOperations, Role, Space } from '@prisma/client';
+import { Page, PageOperations, Role } from '@prisma/client';
 import charmClient from 'charmClient';
 import { IPageWithPermissions } from 'lib/pages';
 import { IPagePermissionFlags, PageOperationType } from 'lib/permissions/pages';
