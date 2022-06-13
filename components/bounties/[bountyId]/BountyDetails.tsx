@@ -4,7 +4,6 @@ import { BountyApplicantList } from 'components/bounties/[bountyId]/components/B
 import BountyDescription from 'components/bounties/[bountyId]/components_v3/BountyDescription';
 import BountyHeader from 'components/bounties/[bountyId]/components_v3/BountyHeader';
 import BountySubmissions from 'components/bounties/[bountyId]/components_v3/BountySubmissions';
-import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { useBounties } from 'hooks/useBounties';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useEffect } from 'react';

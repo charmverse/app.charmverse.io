@@ -1,7 +1,6 @@
 import BountyList from 'components/bounties/BountyList';
-import PageLayout from 'components/common/PageLayout';
+import getPageLayout from 'components/common/PageLayout/getLayout';
 import { setTitle } from 'hooks/usePageTitle';
-import { ReactElement } from 'react';
 
 export default function BountyPage () {
 
@@ -13,10 +12,4 @@ export default function BountyPage () {
 
 }
 
-BountyPage.getLayout = (page: ReactElement) => {
-  return (
-    <PageLayout>
-      {page}
-    </PageLayout>
-  );
-};
+BountyPage.getLayout = getPageLayout;
