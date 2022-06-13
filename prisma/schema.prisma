@@ -52,6 +52,11 @@ model Space {
   threads                    Thread[]
   comments                   Comment[]
   defaultPagePermissionGroup PagePermissionLevel?
+  // All role, user, space, space permissions for this space
+  permittedGroups            SpacePermission[]    @relation(name: "permittedGroups")
+  // Space permissions this space has (for itself or other spaces)
+  spacePermissions   SpacePermission[] @relation(name: "spacePermissions")
+
 }
 
 model SpaceApiToken {
@@ -150,6 +155,7 @@ model User {
   identityType      IdentityType?
   notificationState UserNotificationState?
   UserNotification  UserNotification[]
+  SpacePermissions  SpacePermission[]
 }
 
 model UserNotificationState {
@@ -380,6 +386,7 @@ model Role {
   permissions      PagePermission[]
   source           RoleSource?
   sourceId         String?
+  SpacePermissions  SpacePermission[]
 
   TokenGateToRole TokenGateToRole[]
   @@unique([spaceId, name])
@@ -407,6 +414,7 @@ model SpaceRoleToRole {
   @@unique([spaceRoleId, roleId])
 }
 
+// Various types of permissions in our system
 enum PagePermissionLevel {
   full_access
   editor
@@ -461,6 +469,31 @@ model PagePermission {
   @@unique([public, pageId], name: "public_pageId")
 }
 
+
+enum SpaceOperation {
+  createPage
+}
+
+model SpacePermission {
+  id            String    @id @default(uuid()) @db.Uuid
+  createdAt DateTime  @default(now())
+  operations    SpaceOperation[]
+  forSpaceId    String    @db.Uuid
+  forSpace      Space     @relation(fields: [forSpaceId], references: [id], onDelete: Cascade, name: "permittedGroups")
+  // Linkable groups
+  roleId        String?   @db.Uuid
+  role          Role?     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  spaceId       String?   @db.Uuid
+  space         Space?    @relation(fields: [spaceId], references: [id], onDelete: Cascade, name: "spacePermissions")
+  userId        String    @db.Uuid
+  user          User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, forSpaceId], name: "userId_forSpaceId")
+  @@unique([roleId, forSpaceId], name: "roleId_forSpaceId")
+  @@unique([spaceId, forSpaceId], name: "spaceId_forSpaceId")
+}
+
+
 model Thread {
   id        String    @id @default(uuid()) @db.Uuid
   createdAt DateTime  @default(now())
@@ -490,3 +523,4 @@ model Comment {
   space     Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   updatedAt DateTime?
 }
+
