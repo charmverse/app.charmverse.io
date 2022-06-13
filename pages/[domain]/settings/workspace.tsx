@@ -33,7 +33,7 @@ export default function WorkspaceSettings () {
   setTitle('Workspace Options');
   const router = useRouter();
   const [space, setSpace] = useCurrentSpace();
-  const [spaces] = useSpaces();
+  const [spaces, setSpaces] = useSpaces();
   const [user] = useUser();
   const isAdmin = isSpaceAdmin(user, space?.id);
   const [isUpdatingPagePermission, setIsUpdatingPagePermission] = useState(false);
@@ -250,8 +250,9 @@ export default function WorkspaceSettings () {
         onConfirm={async () => {
           if (isAdmin) {
             await charmClient.deleteSpace(space.id);
-            const nextSpace = spaces.filter(s => s.id !== space.id)[0];
-            window.location.href = nextSpace ? `/${nextSpace.domain}` : '/';
+            const filteredSpaces = spaces.filter(s => s.id !== space.id);
+            setSpaces(filteredSpaces);
+            window.location.href = filteredSpaces.length !== 0 ? `/${filteredSpaces[0].domain}` : '/signup';
           }
         }}
       />
@@ -267,8 +268,9 @@ export default function WorkspaceSettings () {
         question={`Are you sure you want to leave ${space.name}?`}
         onConfirm={async () => {
           await charmClient.leaveSpace(space.id);
-          const nextSpace = spaces.filter(s => s.id !== space.id)[0];
-          window.location.href = nextSpace ? `/${nextSpace.domain}` : '/';
+          const filteredSpaces = spaces.filter(s => s.id !== space.id);
+          setSpaces(filteredSpaces);
+          window.location.href = filteredSpaces.length !== 0 ? `/${filteredSpaces[0].domain}` : '/signup';
         }}
       />
       )}

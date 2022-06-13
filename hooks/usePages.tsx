@@ -1,4 +1,4 @@
-import { Page, PageOperations, Role, Space } from '@prisma/client';
+import { Page, PageOperations, Role } from '@prisma/client';
 import charmClient from 'charmClient';
 import { IPageWithPermissions } from 'lib/pages';
 import { IPagePermissionFlags, PageOperationType } from 'lib/permissions/pages';
@@ -62,8 +62,6 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return charmClient.getPages(space!.id);
   }, { refreshInterval });
-
-  console.log(data);
 
   const _setPages: Dispatch<SetStateAction<PagesMap>> = (_pages) => {
     const res = _pages instanceof Function ? _pages(pagesRef.current) : _pages;
