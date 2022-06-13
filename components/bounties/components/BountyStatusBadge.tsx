@@ -64,10 +64,9 @@ export interface IBountyBadgeProps {
 }
 
 export function BountyStatusChip ({
-  showIcon,
   size,
   status
-}: { showIcon?: boolean, size?: 'small', status: BountyStatus }) {
+}: { size?: 'small', status: BountyStatus }) {
   return (
     <StyledBountyStatusChip
       size={size}

@@ -29,7 +29,7 @@ const menuPosition: Partial<MenuProps> = {
 function Component ({ menuState }: { menuState: PluginState }) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'user-role' });
   const view = useEditorViewContext();
-  const { currentPageId, pages, setPages } = usePages();
+  const { currentPageId, pages } = usePages();
   const currentPage = pages[currentPageId];
   const [currentSpace] = useCurrentSpace();
   const dispatch = useAppDispatch();

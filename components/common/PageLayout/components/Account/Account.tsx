@@ -9,7 +9,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import Avatar from 'components/common/Avatar';
 import { useUser } from 'hooks/useUser';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
-import { getChainById, RPC } from 'connectors';
+import { getChainById } from 'connectors';
 import { useContext } from 'react';
 import NetworkModal from 'components/common/PageLayout/components/Account/components/NetworkModal';
 import styled from '@emotion/styled';

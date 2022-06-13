@@ -1,5 +1,5 @@
 
-import { closeOutBounty, getBounty, reviewBountySuggestion } from 'lib/bounties';
+import { getBounty, reviewBountySuggestion } from 'lib/bounties';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
