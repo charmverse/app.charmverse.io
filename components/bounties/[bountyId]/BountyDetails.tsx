@@ -10,7 +10,7 @@ import { useEffect } from 'react';
 
 export default function BountyDetails () {
 
-  const [_, setPageTitle] = usePageTitle();
+  const [, setPageTitle] = usePageTitle();
   const { currentBounty, currentBountyId } = useBounties();
 
   useEffect(() => {

@@ -3,7 +3,7 @@ import ScrollableWindow from 'components/common/PageLayout/components/Scrollable
 import { useBounties } from 'hooks/useBounties';
 import getPageLayout from 'components/common/PageLayout/getLayout';
 import { useRouter } from 'next/router';
-import { ReactElement, useEffect } from 'react';
+import { useEffect } from 'react';
 
 export default function BountyPage () {
 

@@ -1,6 +1,7 @@
 import { Bounty } from '@prisma/client';
 import charmClient from 'charmClient';
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
+import useRefState from 'hooks/useRefState';
 import { BountyWithDetails } from '../models';
 import { useCurrentSpace } from './useCurrentSpace';
 
@@ -30,7 +31,7 @@ export const BountiesContext = createContext<Readonly<IContext>>({
 
 export function BountiesProvider ({ children }: { children: ReactNode }) {
   const [space] = useCurrentSpace();
-  const [bounties, setBounties] = useState<BountyWithDetails[]>([]);
+  const [bounties, bountiesRef, setBounties] = useRefState<BountyWithDetails[]>([]);
   useEffect(() => {
     if (space) {
       setBounties([]);
@@ -79,6 +80,11 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
     setCurrentBountyId(id);
 
     if (id) {
+      const bountyFromCache = bountiesRef.current.find(b => b.id === id);
+      if (bountyFromCache) {
+        setCurrentBounty(bountyFromCache);
+      }
+      // get latest state just in case
       const refreshed = await charmClient.getBounty(id);
       refreshBountyList(refreshed);
       setCurrentBounty(refreshed);
