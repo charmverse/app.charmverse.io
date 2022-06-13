@@ -45,9 +45,12 @@
     "import/prefer-default-export": "off",
     "import/extensions": "off",
     "import/no-unresolved": "off",
-    "import/no-extraneous-dependencies": ["error", {
-      "devDependencies": true
-    }],
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "devDependencies": true
+      }
+    ],
     "jsx-a11y/anchor-is-valid": "off",
     "jsx-a11y/no-static-element-interactions": "off",
     "jsx-quotes": [
@@ -64,10 +67,10 @@
         "ignoreTemplateLiterals": true
       }
     ],
-    "no-alert": "off",
+    "no-alert": "warn",
+    "no-console": "error",
     "no-confusing-arrow": "off",
     "no-else-return": "off",
-
     "no-multiple-empty-lines": [
       "error",
       {
