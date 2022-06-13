@@ -61,7 +61,7 @@ async function verifyWallet (req: NextApiRequest, res: NextApiResponse) {
             spaceRoleId: createdSpaceRole.id
           }))
         });
-        console.log('Gave user access to workspace', { tokenGateId: tokenGate.id, userId: user.id });
+        log.debug('Gave user access to workspace', { tokenGateId: tokenGate.id, userId: user.id });
       }
     }
     const space = await prisma.space.findFirst({

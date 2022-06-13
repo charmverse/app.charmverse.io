@@ -44,7 +44,7 @@ export default function BoardPage ({ page, setPage, readonly }: Props) {
   const accessibleCards = useMemo(() => cards.filter(card => pages[card.id]), [cards, Object.keys(pages).toString()]);
 
   useEffect(() => {
-    const boardId = page.boardId!;
+    const boardId = page.boardId;
     const urlViewId = router.query.viewId as string;
 
     // Ensure boardViews is for our boardId before redirecting
@@ -59,8 +59,10 @@ export default function BoardPage ({ page, setPage, readonly }: Props) {
       return;
     }
 
-    dispatch(setCurrentBoard(boardId));
-    dispatch(setCurrentView(urlViewId || ''));
+    if (boardId) {
+      dispatch(setCurrentBoard(boardId));
+      dispatch(setCurrentView(urlViewId || ''));
+    }
 
   }, [page.boardId, router.query.viewId, boardViews]);
 
