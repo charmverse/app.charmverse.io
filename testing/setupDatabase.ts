@@ -61,7 +61,8 @@ export async function generateUserAndSpaceWithApiToken (walletAddress: string = 
     space = await prisma.space.create({
       data: {
         name: 'Example space',
-        domain: v4(),
+        // Adding prefix avoids this being evaluated as uuid
+        domain: `domain-${v4()}`,
         author: {
           connect: {
             id: user.id
@@ -175,7 +176,7 @@ export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'cre
   return prisma.page.create({
     data: {
       id: options.id ?? v4(),
-      contentText: '',
+      contentText: options.contentText ?? '',
       path: options.path ?? `page-${v4()}`,
       title: options.title || 'Example',
       type: options.type ?? 'page',

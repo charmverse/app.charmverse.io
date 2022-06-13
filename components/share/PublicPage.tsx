@@ -37,7 +37,7 @@ export default function PublicPage () {
   const theme = useTheme();
   const colorMode = useColorMode();
   const router = useRouter();
-  const pageIdOrPath = router.query.pageId as string;
+  const pageIdOrPath = router.query.pageId instanceof Array ? router.query.pageId.join('/') : router.query.pageId as string;
   const dispatch = useAppDispatch();
   const { pages, currentPageId, setCurrentPageId } = usePages();
   const [, setSpaces] = useSpaces();

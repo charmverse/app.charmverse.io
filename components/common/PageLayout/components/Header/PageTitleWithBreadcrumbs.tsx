@@ -168,8 +168,8 @@ export default function PageTitleWithBreadcrumbs () {
   else if (router.route === '/[domain]/[pageId]') {
     return <DocumentPageTitle basePath={`/${router.query.domain}`} />;
   }
-  else if (router.route === '/share/[pageId]') {
-    return <DocumentPageTitle basePath='/share' />;
+  else if (router.route === '/share/[...pageId]') {
+    return <DocumentPageTitle basePath={`/share/${(router.query.pageId as string[])[0]}`} />;
   }
   else if (NEXUS_ROUTES.includes(router.route)) {
     return <NexusPageTitle route={router.route} />;
