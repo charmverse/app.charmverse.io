@@ -26,7 +26,7 @@ import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
 import { useRouter } from 'next/router';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import Account from '../Account';
 import ShareButton from '../ShareButton';
 import PageTitleWithBreadcrumbs from './PageTitleWithBreadcrumbs';
@@ -74,18 +74,11 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
   const [pageMenuAnchorElement, setPageMenuAnchorElement] = useState<null | Element>(null);
   const pageMenuAnchor = useRef();
   const currentPage = currentPageId ? pages[currentPageId] : undefined;
-  const [isFullWidth, setIsFullWidth] = useState(currentPage?.fullWidth ?? false);
   const isFavorite = currentPage && user?.favorites.some(({ pageId }) => pageId === currentPage.id);
 
   const isPage = router.route.includes('pageId');
   const pageType = (currentPage as Page)?.type;
   const isExportablePage = pageType === 'card' || pageType === 'page';
-
-  useEffect(() => {
-    if (currentPage) {
-      setIsFullWidth(currentPage.fullWidth ?? false);
-    }
-  }, [currentPage]);
 
   async function toggleFavorite () {
     if (!currentPage || !user) return;
@@ -115,6 +108,8 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
       URL.revokeObjectURL(downloadLink);
     }
   }
+
+  const isFullWidth = currentPage?.fullWidth ?? false;
 
   return (
     <StyledToolbar variant='dense'>
@@ -203,17 +198,11 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
                       size='small'
                       checked={isFullWidth}
                       onChange={async () => {
-                        try {
-                          await charmClient.updatePage({
-                            id: currentPage.id,
-                            fullWidth: !isFullWidth
-                          });
-                          setPages((_pages) => ({ ..._pages, [currentPageId]: { ...currentPage, fullWidth: !isFullWidth } }));
-                          setIsFullWidth(!isFullWidth);
-                        }
-                        catch (_) {
-                          //
-                        }
+                        await charmClient.updatePage({
+                          id: currentPage.id,
+                          fullWidth: !isFullWidth
+                        });
+                        setPages((_pages) => ({ ..._pages, [currentPageId]: { ...currentPage, fullWidth: !isFullWidth } }));
                       }}
                     />
                   </ListItemButton>
