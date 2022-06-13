@@ -8,7 +8,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import SunIcon from '@mui/icons-material/WbSunny';
-import { Divider, Switch } from '@mui/material';
+import { Divider, FormControlLabel, Switch } from '@mui/material';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
@@ -191,19 +191,28 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
                   <PublishToSnapshot page={currentPage as Page} />
                   <Divider />
                   <ListItemButton>
-                    <ListItemText>
-                      Full Width
-                    </ListItemText>
-                    <Switch
-                      size='small'
-                      checked={isFullWidth}
-                      onChange={async () => {
-                        await charmClient.updatePage({
-                          id: currentPage.id,
-                          fullWidth: !isFullWidth
-                        });
-                        setPages((_pages) => ({ ..._pages, [currentPageId]: { ...currentPage, fullWidth: !isFullWidth } }));
+                    <FormControlLabel
+                      sx={{
+                        marginLeft: 0.5,
+                        width: '100%',
+                        display: 'flex',
+                        justifyContent: 'space-between'
                       }}
+                      labelPlacement='start'
+                      control={(
+                        <Switch
+                          size='small'
+                          checked={isFullWidth}
+                          onChange={async () => {
+                            await charmClient.updatePage({
+                              id: currentPage.id,
+                              fullWidth: !isFullWidth
+                            });
+                            setPages((_pages) => ({ ..._pages, [currentPageId]: { ...currentPage, fullWidth: !isFullWidth } }));
+                          }}
+                        />
+                      )}
+                      label='Full Width'
                     />
                   </ListItemButton>
                 </List>
