@@ -1,7 +1,8 @@
 import styled from '@emotion/styled';
 import { Box, Collapse, Menu, MenuItem, ListItemText, ListItemIcon, Paper, Typography, Button, ListItem, IconButton, ButtonProps, Tooltip, SxProps } from '@mui/material';
 import { useTheme } from '@emotion/react';
-import type { CommentWithUser, ThreadWithComments } from 'pages/api/pages/[id]/threads';
+import { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
+import { CommentWithUser } from 'lib/comments/interfaces';
 import UserDisplay from 'components/common/UserDisplay';
 import { usePages } from 'hooks/usePages';
 import { useThreads } from 'hooks/useThreads';
@@ -99,7 +100,7 @@ function AddCommentCharmEditor (
   const theme = useTheme();
   const isEmpty = checkForEmpty(commentContent);
   const { addComment, threads } = useThreads();
-  const thread = threads[threadId] as ThreadWithComments;
+  const thread = threads[threadId] as ThreadWithCommentsAndAuthors;
 
   return (
     <Box display='flex' px={1} pb={1} sx={sx} flexDirection='column' gap={1} mt={thread.comments.length !== 0 ? 1 : 0}>
@@ -137,7 +138,7 @@ function EditCommentCharmEditor ({ disabled, isEditable, threadId, commentId, on
   const [commentContent, setCommentContent] = useState<PageContent | null>(null);
   const isEmpty = checkForEmpty(commentContent);
   const { editComment, threads } = useThreads();
-  const thread = threads[threadId] as ThreadWithComments;
+  const thread = threads[threadId] as ThreadWithCommentsAndAuthors;
   const comment = thread.comments.find(_comment => _comment.id === commentId) as CommentWithUser;
 
   return (
@@ -203,7 +204,7 @@ interface PageThreadProps {
   showFindButton?: boolean;
 }
 
-const ThreadCreatedDate = memo<{createdAt: Date}>(({ createdAt }) => {
+function ThreadCreatedDate ({ createdAt }: {createdAt: Date}) {
   return (
     <Tooltip arrow placement='bottom' title={new Date(createdAt).toLocaleString()}>
       <Typography
@@ -220,7 +221,7 @@ const ThreadCreatedDate = memo<{createdAt: Date}>(({ createdAt }) => {
       </Typography>
     </Tooltip>
   );
-});
+}
 
 const CommentDate = memo<{createdAt: Date, updatedAt?: Date | null}>(({ createdAt, updatedAt }) => {
   return (
@@ -262,7 +263,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
 
   const permissions = currentPageId ? getPagePermissions(currentPageId) : new AllowedPagePermissions();
   const view = useEditorViewContext();
-  const thread = threadId ? threads[threadId] : null;
+  const thread = threadId ? threads[threadId] as ThreadWithCommentsAndAuthors : null;
 
   function resetState () {
     setEditedCommentId(null);
@@ -358,7 +359,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                           fontSize='small'
                         />
                       )}
-                      disabled={isMutating || !permissions.edit_content || (thread.userId !== user?.id)}
+                      disabled={isMutating || !permissions.comment}
                       onClick={async () => {
                         setIsMutating(true);
                         await resolveThread(threadId);
@@ -366,7 +367,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                         setIsMutating(false);
                       }}
                     />
-                  ) : (comment.userId === user?.id && permissions.edit_content)
+                  ) : (comment.userId === user?.id && permissions.comment)
                   && (
                     <IconButton
                       className='comment-actions'
@@ -444,7 +445,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
           </MenuItem>
         </Menu>
       </div>
-      {permissions.edit_content && (
+      {permissions.comment && (
         <AddCommentCharmEditor
           key={thread.comments[thread.comments.length - 1]?.id}
           readOnly={Boolean(editedCommentId)}

@@ -1,5 +1,6 @@
-import { Application, Page, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { v4 } from 'uuid';
+import { SubmissionContent } from 'lib/applications/interfaces';
 
 export function generatePageToCreateStub (options: {
   userId:string,
@@ -26,9 +27,10 @@ export function generatePageToCreateStub (options: {
   };
 }
 
-export function generateSubmissionContent (): Pick<Application, 'submission' | 'submissionNodes'> {
+export function generateSubmissionContent (): SubmissionContent {
   return {
     submission: 'My submission and all of its content',
-    submissionNodes: '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My submission and all of its content"}]}]}'
+    submissionNodes: '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My submission and all of its content"}]}]}',
+    walletAddress: '0x123456789'
   };
 }

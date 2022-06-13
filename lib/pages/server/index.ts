@@ -1,4 +1,5 @@
 export * from './getPage';
+export * from './duplicatePage';
 export * from './errors';
 export * from './resolvePageTree';
 export * from './generatePageLink';

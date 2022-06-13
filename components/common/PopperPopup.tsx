@@ -1,13 +1,13 @@
 import { Popover, PopoverProps } from '@mui/material';
 import Paper from '@mui/material/Paper';
-import PopupState, { bindPopover, bindToggle } from 'material-ui-popup-state';
+import { bindPopover, bindToggle } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useRef } from 'react';
 
 interface PopperPopupProps {
   popupContent: React.ReactNode;
   children?: React.ReactNode | null;
-  autoOpen?: boolean
+  autoOpen?: boolean;
 }
 
 export default function PopperPopup (props: PopperPopupProps) {
@@ -38,7 +38,7 @@ export default function PopperPopup (props: PopperPopupProps) {
     }
   }, [toggleRef, autoOpen]);
 
-  return autoOpen ? (
+  return (
     <div ref={toggleRef}>
       {children && (
       <div {...bindToggle(popupState)}>
@@ -53,17 +53,5 @@ export default function PopperPopup (props: PopperPopupProps) {
         </Paper>
       </Popover>
     </div>
-  ) : (
-    <PopupState variant='popper'>
-      {(_popupState) => (
-        <div>
-          {children && (
-          <div {...bindToggle(_popupState)}>
-            {children}
-          </div>
-          )}
-        </div>
-      )}
-    </PopupState>
   );
 }

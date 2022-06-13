@@ -5,17 +5,17 @@
 
 .textItemIcon {
   content: '';
-  //content: url(/svgs/types/text_type.svg);
+  //content: url(/images/prosemirror/types/text_type.svg);
 }
 
 .ProseMirror-menu-dropdown.cellColorDropDown {
-  //content: url(/svgs/color_palette.svg);
+  //content: url(/images/prosemirror/color_palette.svg);
   width: 24px;
   height: 24px;
   display: block;
   background-color: rgb(var(--sidebar-text-rgb));
   mask-position: center center;
-  mask-image: url(/svgs/color_palette.svg);
+  mask-image: url(/images/prosemirror/color_palette.svg);
   mask-size: cover;
   content: '';
 
@@ -46,7 +46,7 @@
     .colorItemButton.default {
       content: '';
       display: block;
-      mask-image: url(/svgs/no_entry.svg);
+      mask-image: url(/images/prosemirror/no_entry.svg);
       mask-size: cover;
       background-color: rgba(var(--sidebar-text-rgb), .5) !important;
       width: 100%;
@@ -111,15 +111,15 @@
       height: 100%;
       width: 100%;
       mask-size: cover;
-      mask-image: url(/svgs/sort_down_empty.svg);
+      mask-image: url(/images/prosemirror/sort_down_empty.svg);
     }
 
     &.sortedDown::after {
-      mask-image: url(/svgs/sorted_down.svg);
+      mask-image: url(/images/prosemirror/sorted_down.svg);
     }
 
     &.sortedUp::after {
-      mask-image: url(/svgs/sorted_up.svg);
+      mask-image: url(/images/prosemirror/sorted_up.svg);
     }
   }
 }
@@ -157,20 +157,20 @@
 
   .sort-down-icon,
   .insert-left-icon {
-    mask-image: url(/svgs/down_arrow.svg);
+    mask-image: url(/images/prosemirror/down_arrow.svg);
   }
 
   .sort-up-icon,
   .insert-right-icon {
-    mask-image: url(/svgs/up_arrow.svg);
+    mask-image: url(/images/prosemirror/up_arrow.svg);
   }
 
   .delete-colum-icon {
-    mask-image: url(/svgs/trash_can_black.svg);
+    mask-image: url(/images/prosemirror/trash_can_black.svg);
   }
 
   .filters-colum-icon {
-    mask-image: url(/svgs/filter.svg);
+    mask-image: url(/images/prosemirror/filter.svg);
   }
 }
 
@@ -237,7 +237,7 @@
 
   .buttonContent::after {
     background-color: white;
-    mask-image: url(/svgs/drag-handle-vertical.svg);
+    mask-image: url(/images/prosemirror/drag-handle-vertical.svg);
     mask-repeat: no-repeat;
     mask-position: center center;
     height: 100%;
@@ -251,7 +251,7 @@
 
   .buttonContent {
     background-color: white;
-    mask-image: url(/svgs/drag-handle-vertical.svg);
+    mask-image: url(/images/prosemirror/drag-handle-vertical.svg);
     mask-repeat: no-repeat;
     mask-position: center center;
     content: '';
@@ -270,8 +270,8 @@
 
 .addAfterButton:hover,
 .rowRearrangement tr:hover .addRowAfterMarker,
-.addAfterButton:hover~.addRowAfterMarker,
-.addAfterButton:hover~.addColAfterMarker {
+.addAfterButton:hover ~ .addRowAfterMarker,
+.addAfterButton:hover ~ .addColAfterMarker {
   background-color: rgb(var(--button-bg-rgb));
 }
 
@@ -282,7 +282,7 @@
   display: block;
   background-color: rgb(var(--sidebar-text-rgb));
   mask-position: center center;
-  mask-image: url(/svgs/trash_can.svg);
+  mask-image: url(/images/prosemirror/trash_can.svg);
   mask-size: cover;
 
   &:hover {
@@ -291,56 +291,56 @@
 }
 
 // .numberItemIcon {
-//   content: url(/svgs/types/number_type.svg);
+//   content: url(/images/prosemirror/types/number_type.svg);
 // }
 
 // .dateItemIcon {
-//   content: url(/svgs/types/date.svg);
+//   content: url(/images/prosemirror/types/date.svg);
 // }
 
 // .checkboxItemIcon {
-//   content: url(/svgs/types/checkbox_type.svg);
+//   content: url(/images/prosemirror/types/checkbox_type.svg);
 // }
 
 // .labelsItemIcon {
-//   content: url(/svgs/types/label.svg);
+//   content: url(/images/prosemirror/types/label.svg);
 // }
 
 // .currencyItemIcon {
-//   content: url(/svgs/types/currency.svg);
+//   content: url(/images/prosemirror/types/currency.svg);
 // }
 
 
 
 .colItem.textType .select-dropdown-item-icon,
 .column-chooser .selected-icon.textType {
-  //content: url(/svgs/types/text_type.svg);
+  //content: url(/images/prosemirror/types/text_type.svg);
   content: '';
 }
 
 // .colItem.numberType .select-dropdown-item-icon,
 // .column-chooser .selected-icon.numberType {
-//   content: url(/svgs/types/number_type.svg);
+//   content: url(/images/prosemirror/types/number_type.svg);
 // }
 
 // .colItem.dateType .select-dropdown-item-icon,
 // .column-chooser .selected-icon.dateType {
-//   content: url(/svgs/types/date.svg);
+//   content: url(/images/prosemirror/types/date.svg);
 // }
 
 // .colItem.labelsType .select-dropdown-item-icon,
 // .column-chooser .selected-icon.labelsType {
-//   content: url(/svgs/types/label.svg);
+//   content: url(/images/prosemirror/types/label.svg);
 // }
 
 // .colItem.checkboxType .select-dropdown-item-icon,
 // .column-chooser .selected-icon.checkboxType {
-//   content: url(/svgs/types/checkbox_type.svg);
+//   content: url(/images/prosemirror/types/checkbox_type.svg);
 // }
 
 // .colItem.currencyType .select-dropdown-item-icon,
 // .column-chooser .selected-icon.currencyType {
-//   content: url(/svgs/types/currency.svg);
+//   content: url(/images/prosemirror/types/currency.svg);
 // }
 
 // tool tips

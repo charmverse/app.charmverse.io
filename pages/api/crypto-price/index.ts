@@ -6,7 +6,7 @@ import { prisma } from 'db';
 import { onError, onNoMatch, requireUserOrSharePage } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { gettingStartedPageContent } from 'seedData';
-import { CryptoCurrency, FiatCurrency } from 'models/Currency';
+import { CryptoCurrency, FiatCurrency } from 'connectors';
 import { pricingGetter } from 'lib/crypto-price/getters';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

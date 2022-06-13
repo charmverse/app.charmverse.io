@@ -5,75 +5,48 @@ import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser }
 import { withSessionRoute } from 'lib/session/withSession';
 import { prisma } from 'db';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
-import { PageContent } from 'models';
+import { CommentCreate, addComment } from 'lib/comments';
+import { DataNotFoundError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
-  .post(requireKeys(['content'], 'body'), addComment);
+  .post(requireKeys(['content', 'threadId'], 'body'), addCommentController);
 
-export interface AddCommentRequest {
-  content: PageContent
-  threadId: string
-  pageId: string
-}
-
-async function addComment (req: NextApiRequest, res: NextApiResponse) {
-  const { pageId, threadId, content } = req.body as AddCommentRequest;
+async function addCommentController (req: NextApiRequest, res: NextApiResponse) {
+  const { threadId, content } = req.body as CommentCreate;
   const userId = req.session.user.id;
 
-  const permissionSet = await computeUserPagePermissions({
-    pageId,
-    userId
+  const thread = await prisma.thread.findUnique({
+    where: {
+      id: threadId
+    },
+    select: {
+      pageId: true
+    }
   });
 
-  if (!permissionSet.edit_content) {
+  if (!thread) {
+    throw new DataNotFoundError(`Thread with id ${threadId} not found`);
+  }
+
+  const permissionSet = await computeUserPagePermissions({
+    pageId: thread.pageId,
+    userId,
+    allowAdminBypass: false
+  });
+
+  if (!permissionSet.comment) {
     throw new ActionNotPermittedError();
   }
 
-  const page = await prisma.page.findUnique({
-    where: {
-      id: pageId
-    },
-    select: {
-      space: {
-        select: {
-          id: true
-        }
-      }
-    }
+  const createdComment = await addComment({
+    threadId,
+    userId,
+    content
   });
 
-  const comment = await prisma.comment.create({
-    data: {
-      content,
-      thread: {
-        connect: {
-          id: threadId
-        }
-      },
-      page: {
-        connect: {
-          id: pageId
-        }
-      },
-      user: {
-        connect: {
-          id: userId
-        }
-      },
-      space: {
-        connect: {
-          id: page?.space?.id
-        }
-      }
-    },
-    include: {
-      user: true
-    }
-  });
-
-  return res.status(200).json(comment);
+  return res.status(201).json(createdComment);
 }
 
 export default withSessionRoute(handler);

@@ -1,4 +1,4 @@
-import { CryptoCurrency, FiatCurrency, IPairQuote } from 'models/Currency';
+import { CryptoCurrency, FiatCurrency, IPairQuote } from 'connectors';
 import fetch from 'adapters/http/fetch';
 
 const CoinMarketCapCryptoMapping: Record<CryptoCurrency | string, number> = {

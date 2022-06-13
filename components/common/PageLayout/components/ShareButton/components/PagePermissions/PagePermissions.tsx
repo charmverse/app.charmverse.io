@@ -1,22 +1,20 @@
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
-import { useTheme } from '@emotion/react';
 import Button from '@mui/material/Button';
 import InputAdornment from '@mui/material/InputAdornment';
 import Input from '@mui/material/OutlinedInput';
 import Typography from '@mui/material/Typography';
-import { Space } from '@prisma/client';
 import charmClient from 'charmClient';
 import { SmallSelect } from 'components/common/form/InputEnumToOptions';
 import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
-import { IPagePermissionFlags, IPagePermissionWithAssignee, PagePermissionLevelType } from 'lib/permissions/pages/page-permission-interfaces';
+import { IPagePermissionWithAssignee, PagePermissionLevelType } from 'lib/permissions/pages/page-permission-interfaces';
 import { permissionLevels } from 'lib/permissions/pages/page-permission-mapping';
 import { getDisplayName } from 'lib/users/getDisplayName';
 import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import AddPagePermissionsForm from './AddPagePermissionsForm';
 
 const permissionDisplayOrder = ['space', 'role', 'user'];
@@ -47,7 +45,7 @@ const StyledInput = styled(Input)`
  * @sideEffect Removes the permission from currrent space from the list so it can be handled in its own row
  * @param pagePermissions
  */
-function sortPagePermissions (pagePermissions: IPagePermissionWithAssignee[], space?: Space):
+function sortPagePermissions (pagePermissions: IPagePermissionWithAssignee[]):
   (IPagePermissionWithAssignee & {displayName: string})[] {
   const sortedPermissions = pagePermissions
     .filter(permission => {
@@ -91,7 +89,6 @@ interface Props {
 
 export default function PagePermissions ({ pageId, pagePermissions, refreshPermissions }: Props) {
 
-  const theme = useTheme();
   const { pages, getPagePermissions } = usePages();
   const [space] = useCurrentSpace();
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-a-permission' });

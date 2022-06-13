@@ -1,6 +1,5 @@
 import { Autocomplete, Box, TextField, Typography } from '@mui/material';
-import { CryptoCurrencies } from 'connectors';
-import { CryptoCurrency } from 'models/Currency';
+import { CryptoCurrencies, CryptoCurrency } from 'connectors';
 import Modal from 'components/common/Modal';
 import { useEffect, useState } from 'react';
 import uniq from 'lodash/uniq';

@@ -13,11 +13,11 @@ export class SpaceAccessDeniedError extends SystemError {
 
 export class NotFoundError extends SystemError {
 
-  constructor () {
+  constructor (message = 'Data not found') {
     super({
       severity: 'warning',
       errorType: 'Data not found',
-      message: 'Data not found'
+      message
     });
   }
 }
@@ -39,6 +39,16 @@ export class UnknownError extends SystemError {
       errorType: 'Unknown',
       message: 'Something went wrong!',
       error,
+      severity: 'error'
+    });
+  }
+}
+
+export class InvalidStateError extends SystemError {
+  constructor (message: string = 'Something went wrong') {
+    super({
+      message,
+      errorType: 'Unable to respond',
       severity: 'error'
     });
   }

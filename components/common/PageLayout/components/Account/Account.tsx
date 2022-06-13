@@ -9,7 +9,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import Avatar from 'components/common/Avatar';
 import { useUser } from 'hooks/useUser';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
-import { Chains, RPC } from 'connectors';
+import { getChainById, RPC } from 'connectors';
 import { useContext } from 'react';
 import NetworkModal from 'components/common/PageLayout/components/Account/components/NetworkModal';
 import styled from '@emotion/styled';
@@ -65,7 +65,7 @@ function Account (): JSX.Element {
   if (isUserLoaded && !user) {
     return (
       <AccountCard>
-        <AccountButton sx={{ mt: 4 }} href='/'>Join CharmVerse</AccountButton>
+        <AccountButton href='/'>Join CharmVerse</AccountButton>
       </AccountCard>
     );
   }
@@ -85,15 +85,16 @@ function Account (): JSX.Element {
   }
 
   const isConnectedWithWallet = (account && chainId);
+  const chain = chainId ? getChainById(chainId) : null;
 
   return (
     <AccountCard>
       <StyledButtonGroup variant='contained' disableElevation>
         {isConnectedWithWallet && (
-          <Tooltip title={RPC[Chains[chainId]].chainName} arrow>
+          <Tooltip title={chain?.chainName ?? ''} arrow>
             <NetworkButton onClick={networkModalState.open}>
               <SvgIcon component='object' sx={{ display: 'flex', justifyContent: 'center' }}>
-                <img alt='' src={RPC[Chains[chainId]].iconUrls[0]} style={{ height: '100%' }} />
+                <img alt='' src={chain?.iconUrl} style={{ height: '100%' }} />
               </SvgIcon>
             </NetworkButton>
           </Tooltip>

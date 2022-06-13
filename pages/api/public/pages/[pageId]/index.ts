@@ -2,73 +2,94 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { Block, Page } from '@prisma/client';
+import { Block, Page, Space } from '@prisma/client';
 import { prisma } from 'db';
+import { isUUID } from 'lib/utilities/strings';
+import { NotFoundError } from 'lib/middleware/errors';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
+
+export interface PublicPageResponse {
+  page: Page;
+  boardPage: Page | null;
+  pageBlock: Block | null;
+  boardBlock: Block | null;
+  space: Space;
+}
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.get(getPublicPage);
 
-async function getPublicPage (req: NextApiRequest, res: NextApiResponse<{pages: Page[], blocks: Block[]}>) {
+async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPageResponse>) {
 
   const { pageId } = req.query;
 
-  if (pageId === undefined) {
+  if (typeof pageId !== 'string') {
     return res.status(400).json({ error: 'Please provide a valid page ID' } as any);
   }
 
-  const pages: Page[] = [];
-  const blocks: Block[] = [];
+  const query = isUUID(pageId)
+    ? { deletedAt: null, id: pageId }
+    : { deletedAt: null, path: pageId };
+
   const page = await prisma.page.findFirst({
-    where: {
-      deletedAt: null,
-      id: pageId as string
-    }
+    where: query
   });
 
-  const computed = await computeUserPagePermissions({
-    pageId: pageId as string
-  });
-
-  if (page === null || computed.read !== true) {
-    return res.status(404).json({ error: 'Page not found' } as any);
+  if (!page) {
+    throw new NotFoundError('Page not found');
   }
 
-  pages.push(page);
+  const computed = await computeUserPagePermissions({
+    pageId: page.id
+  });
+
+  if (computed.read !== true) {
+    throw new NotFoundError('Page not found');
+  }
+
+  let boardPage: Page | null = null;
+  let boardBlock: Block | null = null;
+  let pageBlock: Block | null = null;
 
   if (page.type === 'card' && page.parentId) {
-    const boardPage = await prisma.page.findFirst({
+    boardPage = await prisma.page.findFirst({
       where: {
         deletedAt: null,
         id: page.parentId
       }
     });
-    const cardBlock = await prisma.block.findFirst({
+    pageBlock = await prisma.block.findFirst({
       where: {
         deletedAt: null,
         id: page.id
       }
     });
 
-    const board = await prisma.block.findFirst({
+    boardBlock = await prisma.block.findFirst({
       where: {
         deletedAt: null,
         id: page.parentId
       }
     });
+  }
 
-    if (cardBlock && board) {
-      blocks.push(cardBlock, board);
+  const space = await prisma.space.findFirst({
+    where: {
+      id: page.spaceId!
     }
-    if (boardPage) {
-      pages.push(boardPage);
-    }
+  });
+
+  if (!space) {
+    throw new NotFoundError('Space not found');
   }
 
   return res.status(200).json({
-    pages,
-    blocks
+    page,
+    boardPage,
+    pageBlock,
+    boardBlock,
+    space
   });
 }
 

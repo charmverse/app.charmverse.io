@@ -38,13 +38,13 @@ export interface UserDetailsProps {
   updateUser?: Dispatch<SetStateAction<LoggedInUser | null>>;
 }
 
-const isPublicUser = (user: PublicUser | LoggedInUser): user is PublicUser => user.hasOwnProperty('profile');
+export const isPublicUser = (user: PublicUser | LoggedInUser): user is PublicUser => user.hasOwnProperty('profile');
 
 export default function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
   const { account } = useWeb3React();
-
-  const { data: userDetails, mutate } = useSWRImmutable(`/userDetails/${user.id}`, () => {
-    return isPublicUser(user) ? user.profile : charmClient.getUserDetails();
+  const isPublic = isPublicUser(user);
+  const { data: userDetails, mutate } = useSWRImmutable(`/userDetails/${user.id}/${isPublic}`, () => {
+    return isPublic ? user.profile : charmClient.getUserDetails();
   });
 
   const ENSName = useENSName(account);

@@ -90,7 +90,7 @@ export function InlineCommentSubMenu ({ pluginKey }: {pluginKey: PluginKey}) {
     if (!isEmpty) {
       e.preventDefault();
       const threadWithComment = await charmClient.startThread({
-        content: commentContent,
+        comment: commentContent,
         context: extractTextFromSelection(),
         pageId: currentPageId
       });
