@@ -1,3 +1,4 @@
+import { NotificationType } from '@prisma/client';
 import { prisma } from 'db';
 import { MarkMentionTask } from './interfaces';
 
@@ -15,7 +16,7 @@ export async function markMentionedTasks (mentions: MarkMentionTask[], userId: s
   await prisma.userNotification.createMany({
     data: mentionsNotNotified.map(mention => ({
       taskId: mention.mentionId,
-      type: 'mention',
+      type: 'mention' as NotificationType,
       userId,
       createdAt: mention.createdAt
     }))
