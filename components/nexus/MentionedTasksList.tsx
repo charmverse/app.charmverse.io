@@ -38,70 +38,44 @@ function MentionedTaskRow (
           }}
         />
       ) : null}
-      <Card key={mentionId} sx={{ width: '100%', opacity: marked ? 0.75 : 1, p: 1.5, my: 2, borderLeft: 0, borderRight: 0 }} variant='outlined'>
-        <Grid justifyContent='space-between' alignItems='center' container>
-          <Grid
-            item
-            xs={2}
-            sx={{
-              fontSize: { xs: 14, sm: 'inherit' },
-              display: 'flex',
-              alignItems: 'center',
-              gap: 2
-            }}
-          >
-            <Typography variant='body2'>
-              <Link
-                sx={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 0.5
-                }}
-                href={baseUrl ? `${baseUrl}/${spaceDomain}` : ''}
-                external
-                target='_blank'
-              >{spaceName} <OpenInNewIcon fontSize='small' />
-              </Link>
-            </Typography>
+      <Link href={baseUrl ? `${baseUrl}/${spaceDomain}/${pagePath}?mentionId=${mentionId}` : ''}>
+        <Card key={mentionId} sx={{ width: '100%', opacity: marked ? 0.75 : 1, p: 1.5, my: 2, borderLeft: 0, borderRight: 0 }} variant='outlined'>
+          <Grid justifyContent='space-between' alignItems='center' container>
+            <Grid
+              item
+              xs={2}
+            >
+              <UserDisplay avatarSize='small' user={createdBy as User} />
+            </Grid>
+            <Grid
+              item
+              xs={3}
+              sx={{
+                fontSize: { xs: 14, sm: 'inherit' }
+              }}
+            >
+              <Box sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 0.5
+              }}
+              >
+                <Typography fontWeight='bold' variant='subtitle1'>{pageTitle}</Typography> in <Typography fontWeight='bold' variant='subtitle1'>{spaceName}</Typography> <OpenInNewIcon fontSize='small' />
+              </Box>
+            </Grid>
+            <Grid
+              item
+              xs={2}
+              sx={{
+                fontSize: { xs: 14, sm: 'inherit' }
+              }}
+            >
+              {DateTime.fromISO(createdAt).toRelative({ base: DateTime.now() })}
+            </Grid>
+
           </Grid>
-          <Grid
-            item
-            xs={2}
-            sx={{
-              fontSize: { xs: 14, sm: 'inherit' }
-            }}
-          >
-            <Typography variant='body2'>
-              <Link
-                sx={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 0.5
-                }}
-                href={baseUrl ? `${baseUrl}/${spaceDomain}/${pagePath}?mentionId=${mentionId}` : ''}
-                external
-                target='_blank'
-              >{pageTitle} <OpenInNewIcon fontSize='small' />
-              </Link>
-            </Typography>
-          </Grid>
-          <Grid
-            item
-            xs={2}
-            sx={{
-              fontSize: { xs: 14, sm: 'inherit' }
-            }}
-          >
-            {DateTime.fromISO(createdAt).toRelative({ base: DateTime.now() })}
-          </Grid>
-          <Grid
-            item
-            xs={2}
-          >
-            <UserDisplay avatarSize='small' linkToProfile user={createdBy as User} />
-          </Grid>
-        </Grid>
-      </Card>
+        </Card>
+      </Link>
     </Box>
   );
 }
