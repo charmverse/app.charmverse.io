@@ -10,6 +10,12 @@ describe('getUriWithParam()', () => {
     expect(result).toBe(`${baseUrl}&cardId=baz`);
   });
 
+  it('should replace a property from the query string', () => {
+    const result = getUriWithParam(`${baseUrl}&cardId=foo`, { cardId: 'baz' });
+
+    expect(result).toEqual(`${baseUrl}&cardId=baz`);
+  });
+
   it('should remove a property from the query string', () => {
     const result = getUriWithParam(`${baseUrl}&cardId=foo`, { cardId: undefined });
 
