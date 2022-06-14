@@ -92,13 +92,13 @@ function ThreadHeaderButton ({ disabled = false, onClick, text, startIcon, ...pr
 }
 
 function AddCommentCharmEditor (
-  { sx, thread, disabled, onClick, readOnly }:
-  {onClick: (cb: () => void) => void, readOnly: boolean, disabled: boolean, thread: ThreadWithCommentsAndAuthors, sx: SxProps}
+  { sx, applicationId, thread, disabled, onClick, readOnly }:
+  {onClick: (cb: () => void) => void, readOnly: boolean, disabled: boolean, applicationId: string, thread: ThreadWithCommentsAndAuthors, sx: SxProps}
 ) {
   const [commentContent, setCommentContent] = useState<PageContent | null>(null);
   const theme = useTheme();
   const isEmpty = checkForEmpty(commentContent);
-  const { addComment } = useThreads();
+  const { addComment, setThreads } = useThreads();
 
   return (
     <Box display='flex' px={1} pb={1} sx={sx} flexDirection='column' gap={1} mt={thread && thread.comments && thread.comments.length !== 0 ? 1 : 0}>
@@ -117,9 +117,19 @@ function AddCommentCharmEditor (
           disabled={disabled || isEmpty}
           size='small'
           onClick={() => {
-            onClick(() => {
-              if (commentContent) {
+            onClick(async () => {
+              if (!commentContent) {
+                return;
+              }
+              if (thread) {
                 addComment(thread.id, commentContent);
+              }
+              else {
+                const threadWithComment = await charmClient.startThread({
+                  comment: commentContent,
+                  applicationId
+                });
+                setThreads((_threads) => ({ ..._threads, [threadWithComment.id]: threadWithComment }));
               }
             });
           }}
@@ -428,6 +438,7 @@ const ApplicationThread = forwardRef<HTMLDivElement, ApplicationThreadProps>(({ 
           mt: thread && thread.comments && thread.comments.length !== 0 ? 1 : 0
         }}
         disabled={!!editedCommentId || isMutating}
+        applicationId={applicationId}
         thread={thread}
         onClick={(cb) => {
           if (editedCommentId) {

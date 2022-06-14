@@ -19,6 +19,7 @@ export interface ThreadStatusUpdate {
  */
 export interface ThreadCreate {
   comment: string | PageContent;
+  applicationId: string;
   pageId: string;
   userId: string;
   context: string;
