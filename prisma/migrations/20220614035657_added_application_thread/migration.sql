@@ -9,7 +9,8 @@ ALTER TABLE "Comment" ALTER COLUMN "pageId" DROP NOT NULL;
 
 -- AlterTable
 ALTER TABLE "Thread" ADD COLUMN     "applicationId" UUID,
-ALTER COLUMN "pageId" DROP NOT NULL;
+ALTER COLUMN "pageId" DROP NOT NULL,
+ALTER COLUMN "context" DROP NOT NULL;
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Thread_applicationId_key" ON "Thread"("applicationId");

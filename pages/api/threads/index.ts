@@ -9,25 +9,28 @@ import nc from 'next-connect';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
-  .post(requireKeys<ThreadCreate>(['context', 'pageId', 'comment'], 'body'), startThread);
+  .post(requireKeys<ThreadCreate>(['comment'], 'body'), startThread);
 
 async function startThread (req: NextApiRequest, res: NextApiResponse<ThreadWithCommentsAndAuthors>) {
 
-  const { comment, context, pageId } = req.body as ThreadCreate;
+  const { applicationId, comment, context, pageId } = req.body as ThreadCreate;
 
   const userId = req.session.user.id;
 
-  const permissionSet = await computeUserPagePermissions({
-    pageId,
-    userId,
-    allowAdminBypass: false
-  });
+  if (pageId) {
+    const permissionSet = await computeUserPagePermissions({
+      pageId,
+      userId,
+      allowAdminBypass: false
+    });
 
-  if (!permissionSet.comment) {
-    throw new ActionNotPermittedError();
+    if (!permissionSet.comment) {
+      throw new ActionNotPermittedError();
+    }
   }
 
   const newThread = await createThread({
+    applicationId,
     comment,
     context,
     pageId,

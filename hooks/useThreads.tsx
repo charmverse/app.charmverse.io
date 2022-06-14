@@ -9,11 +9,11 @@ type IContext = {
   isValidating: boolean,
   threads: Record<string, ThreadWithCommentsAndAuthors | undefined>,
   setThreads: Dispatch<SetStateAction<Record<string, ThreadWithCommentsAndAuthors | undefined>>>,
-  addComment: (threadId: string, commentContent: PageContent) => Promise<void>,
+  addComment: (threadId: string, commentContent: PageContent, thread?: ThreadWithCommentsAndAuthors | undefined) => Promise<void>,
   editComment: (threadId: string, commentId: string, commentContent: PageContent) => Promise<void>,
-  deleteComment: (threadId: string, commentId: string) => Promise<void>,
+  deleteComment: (threadId: string, commentId: string, thread?: ThreadWithCommentsAndAuthors) => Promise<void>,
   resolveThread: (threadId: string) => Promise<void>,
-  deleteThread: (threadId: string) => Promise<void>,
+  deleteThread: (threadId: string, thread?: ThreadWithCommentsAndAuthors) => Promise<void>,
 };
 
 export const ThreadsContext = createContext<Readonly<IContext>>({
@@ -36,20 +36,24 @@ export function ThreadsProvider ({ children }: { children: ReactNode }) {
     setThreads(data?.reduce((acc, page) => ({ ...acc, [page.id]: page }), {}) || {});
   }, [data]);
 
-  async function addComment (threadId: string, commentContent: PageContent) {
-    const thread = threads[threadId];
+  async function addComment (threadId: string, commentContent: PageContent, thread?: ThreadWithCommentsAndAuthors | undefined) {
+    if (!thread) {
+      thread = threads[threadId];
+    }
+
     if (thread) {
       try {
         const comment = await charmClient.addComment({
           content: commentContent,
           threadId: thread.id
         });
-
-        setThreads((_threads) => ({ ..._threads,
-          [thread.id]: {
-            ...thread,
-            comments: [...thread.comments, comment]
-          } }));
+        if (thread.pageId) {
+          setThreads((_threads) => ({ ..._threads,
+            [thread.id]: {
+              ...thread,
+              comments: [...thread.comments, comment]
+            } }));
+        }
       }
       catch (_) {
         //
@@ -57,17 +61,26 @@ export function ThreadsProvider ({ children }: { children: ReactNode }) {
     }
   }
 
-  async function editComment (threadId: string, editedCommentId: string, commentContent: PageContent) {
-    const thread = threads[threadId];
+  async function editComment (
+    threadId: string,
+    editedCommentId: string,
+    commentContent: PageContent,
+    thread?: ThreadWithCommentsAndAuthors | undefined
+  ) {
+    if (!thread) {
+      thread = threads[threadId];
+    }
     if (thread) {
       try {
         await charmClient.editComment(editedCommentId, commentContent);
-        setThreads((_threads) => ({ ..._threads,
-          [thread.id]: {
-            ...thread,
-            comments: thread.comments
-              .map(comment => comment.id === editedCommentId ? ({ ...comment, content: commentContent, updatedAt: new Date() }) : comment)
-          } }));
+        if (thread.pageId) {
+          setThreads((_threads) => ({ ..._threads,
+            [thread.id]: {
+              ...thread,
+              comments: thread.comments
+                .map(comment => comment.id === editedCommentId ? ({ ...comment, content: commentContent, updatedAt: new Date() }) : comment)
+            } }));
+        }
       }
       catch (_) {
         //
@@ -75,18 +88,26 @@ export function ThreadsProvider ({ children }: { children: ReactNode }) {
     }
   }
 
-  async function deleteComment (threadId: string, commentId: string) {
-    const thread = threads[threadId];
+  async function deleteComment (
+    threadId: string,
+    commentId: string,
+    thread?: ThreadWithCommentsAndAuthors
+  ) {
+    if (!thread) {
+      thread = threads[threadId];
+    }
     if (thread) {
       const comment = thread.comments.find(_comment => _comment.id === commentId);
       if (comment) {
         try {
           await charmClient.deleteComment(comment.id);
-          const threadWithoutComment = {
-            ...thread,
-            comments: thread.comments.filter(_comment => _comment.id !== comment.id)
-          };
-          setThreads((_threads) => ({ ..._threads, [thread.id]: threadWithoutComment }));
+          if (thread.pageId) {
+            const threadWithoutComment = {
+              ...thread,
+              comments: thread.comments.filter(_comment => _comment.id !== comment.id)
+            };
+            setThreads((_threads) => ({ ..._threads, [thread.id]: threadWithoutComment }));
+          }
         }
         catch (_) {
           //
@@ -115,14 +136,18 @@ export function ThreadsProvider ({ children }: { children: ReactNode }) {
     }
   }
 
-  async function deleteThread (threadId: string) {
-    const thread = threads[threadId];
+  async function deleteThread (threadId: string, thread?: ThreadWithCommentsAndAuthors) {
+    if (!thread) {
+      thread = threads[threadId];
+    }
 
     if (thread) {
       try {
         await charmClient.deleteThread(thread.id);
-        delete threads[thread.id];
-        setThreads({ ...threads });
+        if (thread.pageId) {
+          delete threads[thread.id];
+          setThreads({ ...threads });
+        }
       }
       catch (_) {
         //

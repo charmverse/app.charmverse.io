@@ -19,10 +19,10 @@ export interface ThreadStatusUpdate {
  */
 export interface ThreadCreate {
   comment: string | PageContent;
-  applicationId: string;
-  pageId: string;
+  applicationId?: string;
+  pageId?: string;
   userId: string;
-  context: string;
+  context?: string;
 }
 
 export interface ThreadWithCommentsAndAuthors extends Thread {

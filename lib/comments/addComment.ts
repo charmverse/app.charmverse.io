@@ -14,6 +14,7 @@ export async function addComment ({ content, threadId, userId }: CommentCreate):
     },
     include: {
       user: true,
+      application: true,
       page: true
     }
   });
@@ -22,8 +23,18 @@ export async function addComment ({ content, threadId, userId }: CommentCreate):
     throw new DataNotFoundError(`Thread with id ${threadId} not found`);
   }
 
-  if (!thread.page) {
-    throw new DataNotFoundError(`Linked page for ${threadId} not found`);
+  if (!thread.page && !thread.application) {
+    throw new DataNotFoundError(`Linked entity for ${threadId} not found`);
+  }
+
+  let pageConnect = {};
+
+  if (thread.page) {
+    pageConnect = {
+      connect: {
+        id: thread.pageId
+      }
+    };
   }
 
   const createdComment = await prisma.comment.create({
@@ -44,12 +55,7 @@ export async function addComment ({ content, threadId, userId }: CommentCreate):
           id: thread.spaceId
         }
       },
-      page: {
-        connect: {
-          id: thread.pageId
-        }
-      }
-
+      page: pageConnect
     },
     include: {
       user: true

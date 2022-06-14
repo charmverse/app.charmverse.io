@@ -30,14 +30,16 @@ async function addCommentController (req: NextApiRequest, res: NextApiResponse) 
     throw new DataNotFoundError(`Thread with id ${threadId} not found`);
   }
 
-  const permissionSet = await computeUserPagePermissions({
-    pageId: thread.pageId,
-    userId,
-    allowAdminBypass: false
-  });
+  if (thread.pageId) {
+    const permissionSet = await computeUserPagePermissions({
+      pageId: thread.pageId,
+      userId,
+      allowAdminBypass: false
+    });
 
-  if (!permissionSet.comment) {
-    throw new ActionNotPermittedError();
+    if (!permissionSet.comment) {
+      throw new ActionNotPermittedError();
+    }
   }
 
   const createdComment = await addComment({

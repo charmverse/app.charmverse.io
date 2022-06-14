@@ -30,14 +30,15 @@ async function deleteThreadController (req: NextApiRequest, res: NextApiResponse
     throw new DataNotFoundError(`Could not find thread with id ${threadId}`);
   }
 
-  const permissionSet = await computeUserPagePermissions({
-    pageId: thread.pageId,
-    userId,
-    allowAdminBypass: false
-  });
-
-  if (!permissionSet.comment) {
-    throw new ActionNotPermittedError();
+  if (thread.pageId) {
+    const permissionSet = await computeUserPagePermissions({
+      pageId: thread.pageId,
+      userId,
+      allowAdminBypass: false
+    });
+    if (!permissionSet.comment) {
+      throw new ActionNotPermittedError();
+    }
   }
 
   await deleteThread(threadId);

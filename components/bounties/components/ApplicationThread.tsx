@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import { Box, Collapse, Menu, MenuItem, ListItemText, ListItemIcon, Paper, Typography, Button, ListItem, IconButton, ButtonProps, Tooltip, SxProps } from '@mui/material';
 import { useTheme } from '@emotion/react';
+import useSWRImmutable from 'swr/immutable';
 import charmClient from 'charmClient';
 import { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import { CommentWithUser } from 'lib/comments/interfaces';
@@ -11,7 +12,6 @@ import { forwardRef, memo, MouseEvent, useState } from 'react';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import { PageContent } from 'models';
-import { removeInlineCommentMark } from 'lib/inline-comments/removeInlineCommentMark';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { DateTime } from 'luxon';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
@@ -91,9 +91,18 @@ function ThreadHeaderButton ({ disabled = false, onClick, text, startIcon, ...pr
   );
 }
 
+type AddCommentCharmEditorProps = {
+  onClick: (cb: () => void) => void;
+  readOnly: boolean;
+  disabled: boolean;
+  applicationId: string;
+  spaceId: string;
+  thread: ThreadWithCommentsAndAuthors | undefined;
+  sx: SxProps;
+};
+
 function AddCommentCharmEditor (
-  { sx, applicationId, thread, disabled, onClick, readOnly }:
-  {onClick: (cb: () => void) => void, readOnly: boolean, disabled: boolean, applicationId: string, thread: ThreadWithCommentsAndAuthors, sx: SxProps}
+  { sx, applicationId, spaceId, thread, disabled, onClick, readOnly }: AddCommentCharmEditorProps
 ) {
   const [commentContent, setCommentContent] = useState<PageContent | null>(null);
   const theme = useTheme();
@@ -122,15 +131,15 @@ function AddCommentCharmEditor (
                 return;
               }
               if (thread) {
-                addComment(thread.id, commentContent);
+                await addComment(thread.id, commentContent, thread);
               }
               else {
-                const threadWithComment = await charmClient.startThread({
+                await charmClient.startThread({
                   comment: commentContent,
                   applicationId
                 });
-                setThreads((_threads) => ({ ..._threads, [threadWithComment.id]: threadWithComment }));
               }
+              setCommentContent(null);
             });
           }}
         >
@@ -207,7 +216,10 @@ function EditCommentCharmEditor ({ disabled, isEditable, thread, commentId, onCo
 
 interface ApplicationThreadProps {
   applicationId: string;
-  thread: ThreadWithCommentsAndAuthors;
+  spaceId: string;
+  submissionId: string;
+  canComment: boolean;
+  thread: ThreadWithCommentsAndAuthors | undefined;
   showFindButton?: boolean;
 }
 
@@ -258,9 +270,10 @@ const CommentDate = memo<{createdAt: Date, updatedAt?: Date | null}>(({ createdA
   );
 });
 
-const ApplicationThread = forwardRef<HTMLDivElement, ApplicationThreadProps>(({ showFindButton = false, applicationId, thread }, ref) => {
+const ApplicationThread = forwardRef<HTMLDivElement, ApplicationThreadProps>((props: ApplicationThreadProps, ref) => {
+  const { showFindButton = false, applicationId, canComment, spaceId, submissionId } = props;
   const { deleteThread, deleteComment } = useThreads();
-
+  const { data: thread, mutate } = useSWRImmutable(`/applications/${submissionId}/threads`, () => charmClient.getApplicationThread(submissionId));
   const [user] = useUser();
   const [isMutating, setIsMutating] = useState(false);
   const [editedCommentId, setEditedCommentId] = useState<null | string>(null);
@@ -293,16 +306,17 @@ const ApplicationThread = forwardRef<HTMLDivElement, ApplicationThreadProps>(({ 
       // If we delete the last comment, delete the whole thread
       if (thread.comments.length === 1) {
         setIsMutating(true);
-        await deleteThread(threadId);
-        removeInlineCommentMark(view, thread.id, true);
+        await deleteThread(thread.id, thread);
+        await mutate();
         setIsMutating(false);
       }
       else {
         setIsMutating(true);
-        deleteComment(threadId, actionComment.id);
+        await deleteComment(thread.id, actionComment.id, thread);
         if (editedCommentId === actionComment.id) {
           resetState();
         }
+        await mutate();
         setIsMutating(false);
       }
     }
@@ -313,7 +327,7 @@ const ApplicationThread = forwardRef<HTMLDivElement, ApplicationThreadProps>(({ 
     <StyledApplicationThread id={`thread.${threadId}`} ref={ref}>
       <div>
         <ThreadHeader>
-          <ThreadCreatedDate createdAt={thread?.createdAt} />
+          { thread && <ThreadCreatedDate createdAt={thread.createdAt} /> }
         </ThreadHeader>
         {thread && thread.comments && thread.comments.map((comment, commentIndex) => {
           const isEditable = comment.id === editedCommentId;
@@ -328,7 +342,7 @@ const ApplicationThread = forwardRef<HTMLDivElement, ApplicationThreadProps>(({ 
                   gap={1}
                   onClick={() => {
                     if (showFindButton) {
-                      scrollToThread(threadId);
+                      scrollToThread(thread.id);
                     }
                   }}
                 >
@@ -371,7 +385,7 @@ const ApplicationThread = forwardRef<HTMLDivElement, ApplicationThreadProps>(({ 
                   display='flex'
                   onClick={() => {
                     if (showFindButton) {
-                      scrollToThread(threadId);
+                      scrollToThread(thread.id);
                     }
                   }}
                 >
@@ -427,28 +441,34 @@ const ApplicationThread = forwardRef<HTMLDivElement, ApplicationThreadProps>(({ 
           </MenuItem>
         </Menu>
       </div>
-      <AddCommentCharmEditor
-        readOnly={Boolean(editedCommentId)}
-        sx={{
-          display: 'flex',
-          px: 1,
-          pb: 1,
-          flexDirection: 'column',
-          gap: 1,
-          mt: thread && thread.comments && thread.comments.length !== 0 ? 1 : 0
-        }}
-        disabled={!!editedCommentId || isMutating}
-        applicationId={applicationId}
-        thread={thread}
-        onClick={(cb) => {
-          if (editedCommentId) {
-            return;
-          }
-          setIsMutating(true);
-          cb();
-          resetState();
-        }}
-      />
+      {
+        canComment && (
+        <AddCommentCharmEditor
+          readOnly={Boolean(editedCommentId)}
+          sx={{
+            display: 'flex',
+            px: 1,
+            pb: 1,
+            flexDirection: 'column',
+            gap: 1,
+            mt: thread && thread.comments && thread.comments.length !== 0 ? 1 : 0
+          }}
+          disabled={!!editedCommentId || isMutating}
+          applicationId={applicationId}
+          spaceId={spaceId}
+          thread={thread}
+          onClick={async (cb) => {
+            if (editedCommentId) {
+              return;
+            }
+            setIsMutating(true);
+            await cb();
+            await mutate();
+            resetState();
+          }}
+        />
+        )
+    }
     </StyledApplicationThread>
   );
 });

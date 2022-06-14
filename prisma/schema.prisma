@@ -470,7 +470,7 @@ model Thread {
   page            Page?           @relation(fields: [pageId], references: [id], onDelete: Cascade)
   applicationId   String?         @db.Uuid()
   application     Application?    @relation(fields: [applicationId], references: [id], onDelete: Cascade)
-  context         String
+  context         String?
   userId          String          @db.Uuid()
   user            User            @relation(fields: [userId], references: [id])
   comments        Comment[]

@@ -636,7 +636,6 @@ class CharmClient {
 
   getApplicationThread (applicationId: string): Promise<ThreadWithCommentsAndAuthors> {
     return http.GET(`/api/applications/${applicationId}/threads`);
-    999999999;
   }
 
   updateSnapshotConnection (spaceId: string, data: Pick<Space, 'snapshotDomain' | 'defaultVotingDuration'>): Promise<Space> {
