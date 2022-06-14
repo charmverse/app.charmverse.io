@@ -38,7 +38,7 @@ import { SuggestionAction } from 'lib/bounties';
 import { PublicSpaceInfo } from 'lib/spaces/interfaces';
 import { TransactionCreationData } from 'lib/transactions/interface';
 import { PublicUser } from 'pages/api/public/profile/[userPath]';
-import { PublicPageResponse } from 'pages/api/public/pages/[pageId]';
+import { PublicPageResponse } from 'pages/api/public/pages/[...pageId]';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -106,6 +106,10 @@ class CharmClient {
 
   updateSpace (spaceOpts: Prisma.SpaceUpdateInput) {
     return http.PUT<Space>(`/api/spaces/${spaceOpts.id}`, spaceOpts);
+  }
+
+  leaveSpace (spaceId: string) {
+    return http.POST(`/api/spaces/${spaceId}/leave`);
   }
 
   getSpaces () {

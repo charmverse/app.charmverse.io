@@ -13,7 +13,7 @@ export async function recursiveRebuild (pageId: string | IPageWithPermissions, l
 
   for (let i = 0; i < children.length; i += parallelFactor) {
     await Promise.all(children.slice(i, i + parallelFactor).map((child, childIndex) => {
-      console.log(`Processing root ${sourcePageNumber}, level ${level}, child ${i + childIndex + 1}`);
+      // console.log(`Processing root ${sourcePageNumber}, level ${level}, child ${i + childIndex + 1}`);
       return recursiveRebuild(child, level + 1, sourcePageNumber);
     }));
   }
@@ -87,7 +87,7 @@ async function inheritPermissions (processed = 0, total = 0): Promise<true> {
     return true;
   }
 
-  console.log('Processing page tree ', processed + 1, '-', processed + foundPages.length, ' / ', total);
+  // console.log('Processing page tree ', processed + 1, '-', processed + foundPages.length, ' / ', total);
 
   await Promise.all(foundPages.map((page, index) => {
 
@@ -104,17 +104,17 @@ prisma.pagePermission.updateMany({
     inheritedFromPermission: null
   }
 }).then(() => {
-  console.log('Inheritance deleted');
+  // console.log('Inheritance deleted');
 });
 */
 
 /* Run this function
 prisma.$connect()
   .then(() => {
-    console.log('Connected to DB');
+    // console.log('Connected to DB');
     inheritPermissions(0)
       .then(() => {
-        console.log('Success');
+        // console.log('Success');
       });
   });
 

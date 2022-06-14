@@ -14,7 +14,7 @@ interface BountyIntegrationProps {
 export default function BountyIntegration (props: BountyIntegrationProps) {
   const { bounties } = useBounties();
   const { title, linkedTaskId } = props;
-  console.log('Bounties', bounties);
+
   const linkedBounty = bounties.find(bounty => bounty.linkedTaskId === linkedTaskId);
 
   const [isModalOpen, setIsModalOpen] = useState(false);

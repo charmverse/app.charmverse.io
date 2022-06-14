@@ -1,5 +1,5 @@
 
-import { Bounty, Prisma } from '@prisma/client';
+import { Bounty } from '@prisma/client';
 import { prisma } from 'db';
 import { IEventToLog, postToDiscord } from 'lib/log/userEvents';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';

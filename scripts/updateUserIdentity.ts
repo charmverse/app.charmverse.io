@@ -3,6 +3,7 @@ import { IdentityType, IDENTITY_TYPES, LoggedInUser } from 'models';
 import { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { TelegramAccount } from 'pages/api/telegram/connect';
 import { shortenHex } from 'lib/utilities/strings';
+import log from 'lib/log';
 import { prisma } from '../db';
 
 (async () => {
@@ -17,7 +18,7 @@ import { prisma } from '../db';
     }
   });
 
-  console.log('found', users.length, 'users missing identity type');
+  log.info('found', users.length, 'users missing identity type');
 
   let ensFound = 0;
 
@@ -34,7 +35,7 @@ import { prisma } from '../db';
     }
   }));
 
-  console.log('Found', ensFound, 'ens names');
+  log.info('Found', ensFound, 'ens names');
 
   const identityTypes = {
     wallet: 0,
@@ -95,6 +96,6 @@ import { prisma } from '../db';
     })
   );
 
-  console.log('set identity types', identityTypes);
+  log.info('set identity types', identityTypes);
 
 })();

@@ -48,26 +48,20 @@ export const shortenHex = (hex: string, length = 4): string => {
   return `${hex.substring(0, length + 2)}…${hex.substring(hex.length - length)}`;
 };
 
-// copied from react-router to support focalboard
-
-function invariant (cond: any, message: string): asserts cond {
-  if (!cond) throw new Error(message);
-}
-
-/**
- * Returns a path with params interpolated.
- *
- * @see https://reactrouter.com/docs/en/v6/api#generatepath
- */
-export function generatePath (path: string, params: any = {}): string {
-  const remainingParamsKeys = { ...params };
-  return path
-    .replace(/\[(\w+)\]/g, (_, key) => {
-      invariant(params[key] != null, `Missing ":${key}" param`);
-      delete remainingParamsKeys[key];
-      return params[key]!;
-    })
-    .replace(/\/*\*$/, _ => params['*'] == null ? '' : params['*'].replace(/^\/*/, '/'));
+// @source: https://stackoverflow.com/questions/5999118/how-can-i-add-or-update-a-query-string-parameter
+export function getUriWithParam (
+  baseUrl: string,
+  params: Record<string, any>
+): string {
+  const Url = new URL(baseUrl);
+  const urlParams: URLSearchParams = new URLSearchParams(Url.search);
+  for (const key in params) {
+    if (params[key] !== undefined) {
+      urlParams.set(key, params[key]);
+    }
+  }
+  Url.search = urlParams.toString();
+  return Url.toString();
 }
 
 /**

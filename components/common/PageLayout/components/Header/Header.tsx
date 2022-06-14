@@ -8,6 +8,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import SunIcon from '@mui/icons-material/WbSunny';
+import { Divider, FormControlLabel, Switch } from '@mui/material';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
@@ -66,14 +67,13 @@ interface HeaderProps {
 export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }: HeaderProps) {
   const router = useRouter();
   const colorMode = useColorMode();
-  const { pages, currentPageId } = usePages();
+  const { pages, currentPageId, setPages } = usePages();
   const [user, setUser] = useUser();
   const theme = useTheme();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
   const [pageMenuAnchorElement, setPageMenuAnchorElement] = useState<null | Element>(null);
   const pageMenuAnchor = useRef();
   const currentPage = currentPageId ? pages[currentPageId] : undefined;
-
   const isFavorite = currentPage && user?.favorites.some(({ pageId }) => pageId === currentPage.id);
 
   const isPage = router.route.includes('pageId');
@@ -108,6 +108,8 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
       URL.revokeObjectURL(downloadLink);
     }
   }
+
+  const isFullWidth = currentPage?.fullWidth ?? false;
 
   return (
     <StyledToolbar variant='dense'>
@@ -149,7 +151,7 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
             </>
           )}
 
-          {isPage && isExportablePage && (
+          {currentPage && isPage && isExportablePage && (
             <Box sx={{ ml: 1 }} ref={pageMenuAnchor}>
               <IconButton
                 size='small'
@@ -173,7 +175,6 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
                   <ListItemButton onClick={() => {
                     exportMarkdown();
                     setPageMenuOpen(false);
-
                   }}
                   >
                     <GetAppIcon
@@ -188,7 +189,32 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
                   {/* Publishing to snapshot */}
 
                   <PublishToSnapshot page={currentPage as Page} />
-
+                  <Divider />
+                  <ListItemButton>
+                    <FormControlLabel
+                      sx={{
+                        marginLeft: 0.5,
+                        width: '100%',
+                        display: 'flex',
+                        justifyContent: 'space-between'
+                      }}
+                      labelPlacement='start'
+                      control={(
+                        <Switch
+                          size='small'
+                          checked={isFullWidth}
+                          onChange={async () => {
+                            await charmClient.updatePage({
+                              id: currentPage.id,
+                              fullWidth: !isFullWidth
+                            });
+                            setPages((_pages) => ({ ..._pages, [currentPageId]: { ...currentPage, fullWidth: !isFullWidth } }));
+                          }}
+                        />
+                      )}
+                      label='Full Width'
+                    />
+                  </ListItemButton>
                 </List>
               </Popover>
             </Box>

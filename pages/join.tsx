@@ -8,7 +8,6 @@ import getBaseLayout from 'components/common/BaseLayout/BaseLayout';
 import TokenGateForm from 'components/common/TokenGateForm';
 import Button from 'components/common/Button';
 import { useSpaces } from 'hooks/useSpaces';
-import { ErrorModal } from 'components/common/Modal';
 
 export function AlternateRouteButton ({ href, children }: { href: string, children: ReactNode }) {
   const [spaces] = useSpaces();

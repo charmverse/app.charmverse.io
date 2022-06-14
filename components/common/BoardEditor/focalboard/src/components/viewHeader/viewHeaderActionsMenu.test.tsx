@@ -51,7 +51,6 @@ describe('components/viewHeader/viewHeaderActionsMenu', () => {
                         board={board}
                         activeView={activeView}
                         cards={[card]}
-                        showShared={true}
                     />
                 </ReduxProvider>,
             ),
@@ -71,7 +70,6 @@ describe('components/viewHeader/viewHeaderActionsMenu', () => {
                         board={board}
                         activeView={activeView}
                         cards={[card]}
-                        showShared={false}
                     />
                 </ReduxProvider>,
             ),
@@ -90,7 +88,6 @@ describe('components/viewHeader/viewHeaderActionsMenu', () => {
                         board={board}
                         activeView={activeView}
                         cards={[card]}
-                        showShared={true}
                     />
                 </ReduxProvider>,
             ),
@@ -111,7 +108,6 @@ describe('components/viewHeader/viewHeaderActionsMenu', () => {
                         board={board}
                         activeView={activeView}
                         cards={[card]}
-                        showShared={true}
                     />
                 </ReduxProvider>,
             ),

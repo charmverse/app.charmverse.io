@@ -2,7 +2,6 @@ import styled from '@emotion/styled';
 import { Theme } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import MuiDrawer from '@mui/material/Drawer';
-import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import Head from 'next/head';
 import * as React from 'react';
