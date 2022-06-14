@@ -1,13 +1,69 @@
-import { Alert, Box } from '@mui/material';
+import { Alert, Box, Card, Grid, Typography } from '@mui/material';
+import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { MentionedTask } from 'lib/mentions/interfaces';
+import { DateTime } from 'luxon';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import useTasks from './hooks/useTasks';
 
-function MentionedTask ({ mentionIds, pageId }: {pageId: string, mentionIds: string[]}) {
+function MentionedTaskRow ({ createdAt, pagePath, spaceDomain, spaceName, mentionId }: MentionedTask) {
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : null;
   return (
-    <Box>
-      {mentionIds} mentions on page {pageId}
-    </Box>
+    <Card key={mentionId} sx={{ px: 1, my: 2, borderLeft: 0, borderRight: 0 }} variant='outlined'>
+      <Grid justifyContent='space-between' alignItems='center' container>
+        <Grid
+          item
+          xs={4}
+          sx={{
+            fontSize: { xs: 14, sm: 'inherit' }
+          }}
+        >
+          <Typography variant='body2'>
+            <Link
+              sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 0.5
+              }}
+              href={baseUrl ? `${baseUrl}/${spaceDomain}` : ''}
+              external
+              target='_blank'
+            >{spaceDomain} <OpenInNewIcon fontSize='small' />
+            </Link>
+          </Typography>
+        </Grid>
+        <Grid
+          item
+          xs={4}
+          sx={{
+            fontSize: { xs: 14, sm: 'inherit' }
+          }}
+        >
+          <Typography variant='body2'>
+            <Link
+              sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 0.5
+              }}
+              href={baseUrl ? `${baseUrl}/${spaceDomain}/${pagePath}?mentionId=${mentionId}` : ''}
+              external
+              target='_blank'
+            >Link <OpenInNewIcon fontSize='small' />
+            </Link>
+          </Typography>
+        </Grid>
+        <Grid
+          item
+          xs={4}
+          sx={{
+            fontSize: { xs: 14, sm: 'inherit' }
+          }}
+        >
+          {DateTime.fromISO(createdAt).toRelative({ base: DateTime.now() })}
+        </Grid>
+      </Grid>
+    </Card>
   );
 }
 
@@ -29,17 +85,7 @@ export default function MentionedTasksList () {
     }
   }
 
-  const pageIdMentionsRecord: Record<string, string[]> = {};
-  tasks?.mentioned.forEach(({ mentionId, pageId }) => {
-    if (!pageIdMentionsRecord[pageId]) {
-      pageIdMentionsRecord[pageId] = [mentionId];
-    }
-    else {
-      pageIdMentionsRecord[pageId].push(mentionId);
-    }
-  });
-
   return (
-    Object.entries(pageIdMentionsRecord).map(([pageId, mentionIds]) => <MentionedTask mentionIds={mentionIds} key={pageId} pageId={pageId} />)
+    tasks?.mentioned.map((mentionedTask) => <MentionedTaskRow {...mentionedTask} />)
   );
 }

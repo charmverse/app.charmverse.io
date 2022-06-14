@@ -40,10 +40,10 @@ const tabStyles = {
 
 const TASK_TYPES = [
   { icon: <KeyIcon />, type: 'multisig' },
+  { icon: <AlternateEmailIcon />, type: 'mentioned' },
   { icon: <BountyIcon />, type: 'bounty' },
   { icon: <HowToVoteIcon />, type: 'proposal' },
-  { icon: <ForumIcon />, type: 'discussion' },
-  { icon: <AlternateEmailIcon />, type: 'mentioned' }
+  { icon: <ForumIcon />, type: 'discussion' }
 ] as const;
 
 const StyledTypography = styled(Typography)`
@@ -111,7 +111,7 @@ export default function TasksPage () {
           />
         ))}
       </Tabs>
-      {currentTab === 'multisig' ? <GnosisTasksList /> : null}
+      {currentTab === 'multisig' ? <GnosisTasksList /> : currentTab === 'mentioned' ? <MentionedTasksList /> : null}
     </>
   );
 }

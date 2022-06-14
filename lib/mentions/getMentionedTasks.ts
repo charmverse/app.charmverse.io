@@ -25,10 +25,12 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTask[
     select: {
       content: true,
       id: true,
+      path: true,
       space: {
         select: {
           domain: true,
-          id: true
+          id: true,
+          name: true
         }
       }
     }
@@ -38,16 +40,20 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTask[
 
   for (const page of pages) {
     const content = page.content as PageContent;
-    if (content && page.space) {
+    if (content) {
       const mentions = extractMentions(content);
       mentions.forEach(mention => {
-        mentionedTasks.push({
-          mentionId: mention.id,
-          createdAt: mention.createdAt,
-          pageId: page.id,
-          spaceId: page.space?.id as string,
-          spaceDomain: page.space?.domain as string
-        });
+        if (page.space) {
+          mentionedTasks.push({
+            mentionId: mention.id,
+            createdAt: mention.createdAt,
+            pageId: page.id,
+            spaceId: page.space.id,
+            spaceDomain: page.space.domain,
+            pagePath: page.path,
+            spaceName: page.space.name
+          });
+        }
       });
     }
   }

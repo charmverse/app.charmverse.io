@@ -4,4 +4,6 @@ export interface MentionedTask {
   createdAt: string
   spaceId: string
   spaceDomain: string
+  pagePath: string
+  spaceName: string
 }
