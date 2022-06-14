@@ -11,9 +11,10 @@ import { getDisplayName } from 'lib/users';
 import { PageContent } from 'models';
 import Link from 'next/link';
 import { ReactNode } from 'react';
+import { MentionSpecSchemaAttrs } from '../mention.specs';
 
 export default function Mention ({ node }: NodeViewProps) {
-  const attrs = node.attrs as {value: string, type: 'user' | 'page'};
+  const attrs = node.attrs as MentionSpecSchemaAttrs;
   const theme = useTheme();
   const [contributors] = useContributors();
   const { pages } = usePages();
@@ -67,6 +68,7 @@ export default function Mention ({ node }: NodeViewProps) {
         gap: 0.75,
         fontSize: '14px'
       }}
+      id={`${attrs.type}-${attrs.id}`}
     >
       {value}
     </Box>

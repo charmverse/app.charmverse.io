@@ -17,7 +17,7 @@ import debounce from 'lodash/debounce';
 import { NodeView, Plugin, SpecRegistry, BangleEditorState, RawPlugins } from '@bangle.dev/core';
 import { EditorView, Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
-import { useState, CSSProperties, ReactNode, memo, useCallback } from 'react';
+import { useState, CSSProperties, ReactNode, memo, useCallback, useLayoutEffect, useEffect, useRef } from 'react';
 import styled from '@emotion/styled';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
@@ -360,6 +360,8 @@ function CharmEditor (
     }
   }
 
+  const editorRef = useRef<HTMLDivElement>(null);
+
   const state = useEditorState({
     specRegistry,
     plugins: charmEditorPlugins({
@@ -384,6 +386,22 @@ function CharmEditor (
     }
   }, [onContentChangeDebounced]);
 
+  useEffect(() => {
+    if (editorRef.current) {
+      const highlightedMentionId = (new URLSearchParams(window.location.search)).get('mentionId');
+      if (highlightedMentionId && typeof window !== 'undefined') {
+        setTimeout(() => {
+          const highlightedMentionDomElement = window.document.getElementById(`user-${highlightedMentionId}`);
+          if (highlightedMentionDomElement) {
+            highlightedMentionDomElement.scrollIntoView({
+              behavior: 'smooth'
+            });
+          }
+        }, 250);
+      }
+    }
+  }, [editorRef.current]);
+
   return (
     <StyledReactBangleEditor
       style={{
@@ -391,6 +409,7 @@ function CharmEditor (
         width: '100%',
         height: '100%'
       }}
+      editorRef={editorRef}
       className={`czi-editor-frame-body ${isEmpty ? 'empty-editor' : ''}`}
       pmViewOpts={{
         editable: () => !readOnly,
