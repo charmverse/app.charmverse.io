@@ -107,7 +107,7 @@ function AddCommentCharmEditor (
   const [commentContent, setCommentContent] = useState<PageContent | null>(null);
   const theme = useTheme();
   const isEmpty = checkForEmpty(commentContent);
-  const { addComment, setThreads } = useThreads();
+  const { addComment } = useThreads();
 
   return (
     <Box display='flex' px={1} pb={1} sx={sx} flexDirection='column' gap={1} mt={thread && thread.comments && thread.comments.length !== 0 ? 1 : 0}>
@@ -193,7 +193,7 @@ function EditCommentCharmEditor ({ disabled, isEditable, thread, commentId, onCo
             onClick={async () => {
               onSave(async () => {
                 if (commentContent) {
-                  await editComment(thread.id, comment.id, commentContent);
+                  await editComment(thread.id, comment.id, commentContent, thread);
                 }
               });
             }}
@@ -219,7 +219,6 @@ interface ApplicationThreadProps {
   spaceId: string;
   submissionId: string;
   canComment: boolean;
-  thread: ThreadWithCommentsAndAuthors | undefined;
   showFindButton?: boolean;
 }
 
@@ -418,6 +417,7 @@ const ApplicationThread = forwardRef<HTMLDivElement, ApplicationThreadProps>((pr
                 onSave={async (cb) => {
                   setIsMutating(true);
                   await cb();
+                  await mutate();
                   resetState();
                 }}
                 thread={thread}

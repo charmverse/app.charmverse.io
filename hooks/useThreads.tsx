@@ -10,7 +10,7 @@ type IContext = {
   threads: Record<string, ThreadWithCommentsAndAuthors | undefined>,
   setThreads: Dispatch<SetStateAction<Record<string, ThreadWithCommentsAndAuthors | undefined>>>,
   addComment: (threadId: string, commentContent: PageContent, thread?: ThreadWithCommentsAndAuthors | undefined) => Promise<void>,
-  editComment: (threadId: string, commentId: string, commentContent: PageContent) => Promise<void>,
+  editComment: (threadId: string, commentId: string, commentContent: PageContent, thread?: ThreadWithCommentsAndAuthors) => Promise<void>,
   deleteComment: (threadId: string, commentId: string, thread?: ThreadWithCommentsAndAuthors) => Promise<void>,
   resolveThread: (threadId: string) => Promise<void>,
   deleteThread: (threadId: string, thread?: ThreadWithCommentsAndAuthors) => Promise<void>,
@@ -65,7 +65,7 @@ export function ThreadsProvider ({ children }: { children: ReactNode }) {
     threadId: string,
     editedCommentId: string,
     commentContent: PageContent,
-    thread?: ThreadWithCommentsAndAuthors | undefined
+    thread?: ThreadWithCommentsAndAuthors
   ) {
     if (!thread) {
       thread = threads[threadId];
