@@ -30,6 +30,7 @@ import PageThreadsList from 'components/[pageId]/DocumentPage/components/PageThr
 import { Grow } from '@mui/material';
 import { useUser } from 'hooks/useUser';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { createHighlightDomElement } from 'lib/browser';
 import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
 import Callout, * as callout from './components/callout';
 import * as columnLayout from './components/columnLayout';
@@ -393,8 +394,10 @@ function CharmEditor (
         setTimeout(() => {
           const highlightedMentionDomElement = window.document.getElementById(`user-${highlightedMentionId}`);
           if (highlightedMentionDomElement) {
-            highlightedMentionDomElement.scrollIntoView({
-              behavior: 'smooth'
+            requestAnimationFrame(() => {
+              highlightedMentionDomElement.scrollIntoView({
+                behavior: 'smooth'
+              });
             });
           }
         }, 250);

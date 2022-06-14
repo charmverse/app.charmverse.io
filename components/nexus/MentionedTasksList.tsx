@@ -3,7 +3,6 @@ import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { MentionedTask } from 'lib/mentions/interfaces';
 import { DateTime } from 'luxon';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import UserDisplay from 'components/common/UserDisplay';
 import { User } from '@prisma/client';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -70,7 +69,7 @@ function MentionedTaskRow (
                 gap: 0.5
               }}
               >
-                <Typography fontWeight='bold' variant='subtitle1'>{pageTitle}</Typography> in <Typography fontWeight='bold' variant='subtitle1'>{spaceName}</Typography> <OpenInNewIcon fontSize='small' />
+                {pageTitle} in {spaceName}
               </Box>
             </Grid>
             <Grid
@@ -82,7 +81,6 @@ function MentionedTaskRow (
             >
               {DateTime.fromISO(createdAt).toRelative({ base: DateTime.now() })}
             </Grid>
-
           </Grid>
         </Card>
       </Link>
