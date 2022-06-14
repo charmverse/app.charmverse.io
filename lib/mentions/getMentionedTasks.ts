@@ -105,5 +105,8 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
     }
   });
 
-  return mentionedTasks;
+  return {
+    marked: mentionedTasks.marked.sort((mentionTaskA, mentionTaskB) => mentionTaskA.createdAt > mentionTaskB.createdAt ? -1 : 1),
+    unmarked: mentionedTasks.unmarked.sort((mentionTaskA, mentionTaskB) => mentionTaskA.createdAt > mentionTaskB.createdAt ? -1 : 1)
+  };
 }

@@ -6,6 +6,8 @@ import { DateTime } from 'luxon';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import UserDisplay from 'components/common/UserDisplay';
 import { User } from '@prisma/client';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import useTasks from './hooks/useTasks';
 
 function MentionedTaskRow (
@@ -28,9 +30,13 @@ function MentionedTaskRow (
           item
           xs={2}
           sx={{
-            fontSize: { xs: 14, sm: 'inherit' }
+            fontSize: { xs: 14, sm: 'inherit' },
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2
           }}
         >
+          {marked ? <VisibilityOffIcon fontSize='small' /> : <VisibilityIcon fontSize='small' />}
           <Typography variant='body2'>
             <Link
               sx={{
@@ -104,8 +110,8 @@ export default function MentionedTasksList () {
 
   return (
     <>
-      {tasks?.mentioned.unmarked.map((mentionedTask) => <MentionedTaskRow {...mentionedTask} marked />)}
-      {tasks?.mentioned.marked.map((mentionedTask) => <MentionedTaskRow {...mentionedTask} marked={false} />)}
+      {tasks?.mentioned.unmarked.map((mentionedTask) => <MentionedTaskRow key={mentionedTask.mentionId} {...mentionedTask} marked={false} />)}
+      {tasks?.mentioned.marked.map((mentionedTask) => <MentionedTaskRow key={mentionedTask.mentionId} {...mentionedTask} marked />)}
     </>
   );
 }
