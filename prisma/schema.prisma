@@ -92,6 +92,7 @@ model Page {
   threads            Thread[]
   comments           Comment[]
   snapshotProposalId String?
+  fullWidth          Boolean?         @default(false)
 }
 
 // focalboard blocks
@@ -139,8 +140,8 @@ model User {
   applications      Application[]
   username          String?
   avatar            String?
-  isBot             Boolean?               @default(false)
   path              String?                @unique
+  isBot             Boolean?               @default(false)
   discordUser       DiscordUser?
   telegramUser      TelegramUser?
   comments          Comment[]
@@ -420,6 +421,7 @@ enum PagePermissionLevel {
 enum PageOperations {
   read
   delete
+  comment
   edit_position
   edit_content
   edit_isPublic

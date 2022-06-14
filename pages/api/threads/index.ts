@@ -1,106 +1,40 @@
 
+import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { computeUserPagePermissions } from 'lib/permissions/pages';
+import { withSessionRoute } from 'lib/session/withSession';
+import { createThread, ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { withSessionRoute } from 'lib/session/withSession';
-import { prisma } from 'db';
-import { PageContent } from 'models';
-import { computeUserPagePermissions } from 'lib/permissions/pages';
-import { ThreadWithComments } from '../pages/[id]/threads';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
-  .post(requireKeys(['context', 'pageId', 'content'], 'body'), startThread);
+  .post(requireKeys<ThreadCreate>(['context', 'pageId', 'comment'], 'body'), startThread);
 
-export interface StartThreadRequest {
-  content: PageContent,
-  pageId: string,
-  context: string
-}
+async function startThread (req: NextApiRequest, res: NextApiResponse<ThreadWithCommentsAndAuthors>) {
 
-async function startThread (req: NextApiRequest, res: NextApiResponse<ThreadWithComments>) {
-
-  const { content, context, pageId } = req.body as StartThreadRequest;
+  const { comment, context, pageId } = req.body as ThreadCreate;
 
   const userId = req.session.user.id;
 
   const permissionSet = await computeUserPagePermissions({
     pageId,
-    userId
+    userId,
+    allowAdminBypass: false
   });
 
-  if (!permissionSet.edit_content) {
+  if (!permissionSet.comment) {
     throw new ActionNotPermittedError();
   }
 
-  // Get the space from the page, that way we dont need to pass the space id
-  // Furthermore it mitigates the possibility of sending a different space where the page is not located
-  const page = await prisma.page.findUnique({
-    where: {
-      id: pageId
-    },
-    select: {
-      space: {
-        select: {
-          id: true
-        }
-      }
-    }
+  const newThread = await createThread({
+    comment,
+    context,
+    pageId,
+    userId
   });
 
-  const thread = await prisma.thread.create({
-    data: {
-      resolved: false,
-      context,
-      page: {
-        connect: {
-          id: pageId
-        }
-      },
-      user: {
-        connect: {
-          id: userId
-        }
-      },
-      space: {
-        connect: {
-          id: page?.space?.id
-        }
-      }
-    }
-  });
-
-  const comment = await prisma.comment.create({
-    data: {
-      content,
-      thread: {
-        connect: {
-          id: thread.id
-        }
-      },
-      page: {
-        connect: {
-          id: pageId
-        }
-      },
-      user: {
-        connect: {
-          id: userId
-        }
-      },
-      space: {
-        connect: {
-          id: page?.space?.id
-        }
-      }
-    },
-    include: {
-      user: true
-    }
-  });
-
-  return res.status(200).json({ ...thread, comments: [comment] });
+  return res.status(201).json(newThread);
 }
 
 export default withSessionRoute(handler);

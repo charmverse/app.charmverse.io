@@ -1,4 +1,4 @@
-import { Application, Bounty } from '@prisma/client';
+import { Application } from '@prisma/client';
 import { DataNotFoundError, LimitReachedError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { prisma } from 'db';

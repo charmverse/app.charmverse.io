@@ -1,15 +1,18 @@
-import { MoreHoriz as MoreHorizIcon, ContentCopy as DuplicateIcon, DeleteOutlined as DeleteIcon } from '@mui/icons-material';
-import { usePluginState, useEditorViewContext } from '@bangle.dev/react';
-import { ListItemIcon, ListItemText, Menu, MenuItem, MenuProps } from '@mui/material';
 import { PluginKey } from '@bangle.dev/core';
+import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { safeInsert } from '@bangle.dev/utils';
-import reactDOM from 'react-dom';
-import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/hooks';
-import log from 'lib/log';
-import { addPage } from 'lib/pages';
-import { usePages } from 'hooks/usePages';
-import { useUser } from 'hooks/useUser';
+import { ContentCopy as DuplicateIcon, DeleteOutlined as DeleteIcon, MoreHoriz as MoreHorizIcon } from '@mui/icons-material';
+import { ListItemIcon, ListItemText, Menu, MenuItem, MenuProps } from '@mui/material';
+import { Page } from '@prisma/client';
+import charmClient from 'charmClient';
+import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePages } from 'hooks/usePages';
+import log from 'lib/log';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import reactDOM from 'react-dom';
+import { mutate } from 'swr';
 import type { PluginState } from './rowActions';
 
 const menuPosition: Partial<MenuProps> = {
@@ -24,11 +27,12 @@ const menuPosition: Partial<MenuProps> = {
 };
 
 function Component ({ menuState }: { menuState: PluginState }) {
-
   const popupState = usePopupState({ variant: 'popover', popupId: 'user-role' });
   const view = useEditorViewContext();
-  const { currentPageId, pages, setPages } = usePages();
+  const { currentPageId, pages } = usePages();
   const currentPage = pages[currentPageId];
+  const [currentSpace] = useCurrentSpace();
+  const dispatch = useAppDispatch();
 
   function _getNode () {
     if (!menuState.rowPos || !menuState.rowDOM) {
@@ -89,25 +93,19 @@ function Component ({ menuState }: { menuState: PluginState }) {
     const node = _getNode();
     const tr = view.state.tr;
     if (node?.node.type.name === 'page' && currentPage) {
-      const duplicatedPage = pages[node?.node.attrs.id];
-      if (duplicatedPage) {
-        const newPage = await addPage({
-          parentId: currentPage.id,
-          createdBy: duplicatedPage.createdBy,
-          spaceId: duplicatedPage.spaceId as string,
-          title: `${duplicatedPage.title} (copy)`,
-          content: duplicatedPage.content ?? undefined,
-          contentText: duplicatedPage.contentText,
-          headerImage: duplicatedPage.headerImage,
-          icon: duplicatedPage.icon,
-          snapshotProposalId: duplicatedPage.snapshotProposalId
-        });
+      if (currentSpace && node?.node.attrs.id) {
+        const duplicatedPage = await charmClient.duplicatePage(node?.node.attrs.id, currentPage.id);
         const newNode = view.state.schema.nodes.page.create({
-          id: newPage.id
+          id: duplicatedPage.id
         });
         const newTr = safeInsert(newNode, node.nodeEnd)(tr);
         view.dispatch(newTr.scrollIntoView());
-        setPages({ ...pages, [newPage.id]: newPage });
+        dispatch(initialLoad());
+        await mutate(`pages/${currentSpace.id}`, (_pages: Page[]) => {
+          return [..._pages, duplicatedPage];
+        }, {
+          revalidate: true
+        });
       }
     }
     else if (node) {
@@ -142,6 +140,11 @@ function Component ({ menuState }: { menuState: PluginState }) {
 export default function RowActionsMenu ({ pluginKey }: { pluginKey: PluginKey }) {
 
   const menuState: PluginState = usePluginState(pluginKey);
+
+  // Fixes the case where undefined menu state throws an error
+  if (!menuState) {
+    return null;
+  }
 
   return reactDOM.createPortal(<Component menuState={menuState} />, menuState.tooltipDOM);
 }

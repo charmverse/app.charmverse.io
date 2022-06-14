@@ -246,12 +246,14 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
           </ScrollingContainer>
         </Box>
       )}
+      {showingTrash && (
       <TrashModal
         isOpen={showingTrash}
         onClose={() => {
           setShowingTrash(false);
         }}
       />
+      )}
     </SidebarContainer>
   );
 }

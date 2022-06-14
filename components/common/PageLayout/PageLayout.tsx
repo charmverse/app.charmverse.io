@@ -2,15 +2,14 @@ import styled from '@emotion/styled';
 import { Theme } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import MuiDrawer from '@mui/material/Drawer';
-import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import Head from 'next/head';
 import * as React from 'react';
 import { CommentThreadsListDisplayProvider } from 'hooks/useCommentThreadsListDisplay';
 import Header, { headerHeight } from './components/Header';
 import Sidebar from './components/Sidebar';
-import Favicon from './components/Favicon';
 import PageContainer from './components/PageContainer';
+import CurrentPageFavicon from './components/CurrentPageFavicon';
 
 const openedMixin = (theme: Theme, sidebarWidth: number) => ({
   width: '100%',
@@ -35,7 +34,7 @@ const closedMixin = (theme: Theme) => ({
   width: 0
 });
 
-const AppBar = styled(MuiAppBar, { shouldForwardProp: (prop: string) => prop !== 'sidebarWidth' && prop !== 'open' })
+export const AppBar = styled(MuiAppBar, { shouldForwardProp: (prop: string) => prop !== 'sidebarWidth' && prop !== 'open' })
   // eslint-disable-next-line no-unexpected-multiline
   <{ open: boolean, sidebarWidth: number }>(({ sidebarWidth, theme, open }) => ({
     background: 'transparent',
@@ -74,7 +73,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: prop => prop !== 'open' &&
     })
   }));
 
-const HeaderSpacer = styled.div`
+export const HeaderSpacer = styled.div`
   min-height: ${headerHeight}px;
 `;
 
@@ -140,12 +139,6 @@ function PageLayout ({ hideSidebarOnSmallScreen = false, sidebarWidth = 300, chi
       </LayoutContainer>
     </>
   );
-}
-
-function CurrentPageFavicon () {
-  const { currentPageId, pages } = usePages();
-  const currentPage = pages[currentPageId];
-  return <Favicon pageIcon={currentPage?.icon} />;
 }
 
 export default PageLayout;

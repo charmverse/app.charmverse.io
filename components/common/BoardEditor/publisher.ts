@@ -5,7 +5,6 @@ import { updateCards } from './focalboard/src/store/cards';
 import { updateComments } from './focalboard/src/store/comments';
 import { updateViews } from './focalboard/src/store/views';
 import { Block } from './focalboard/src/blocks/block';
-import { ContentBlock } from './focalboard/src/blocks/contentBlock';
 import { CommentBlock } from './focalboard/src/blocks/commentBlock';
 import { Board } from './focalboard/src/blocks/board';
 import { Card } from './focalboard/src/blocks/card';

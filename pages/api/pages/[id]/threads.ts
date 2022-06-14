@@ -1,21 +1,12 @@
 
+import { prisma } from 'db';
+import { onError, onNoMatch } from 'lib/middleware';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { onError, onNoMatch } from 'lib/middleware';
-import { prisma } from 'db';
-import { Thread, Comment, User } from '@prisma/client';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.get(getThreads);
-
-export type CommentWithUser = (Comment & {
-  user: User;
-})
-
-export type ThreadWithComments = Thread & {
-  comments: CommentWithUser[]
-}
 
 async function getThreads (req: NextApiRequest, res: NextApiResponse) {
   const pageId = req.query.id as string;

@@ -1,108 +1,77 @@
 
+import { prisma } from 'db';
+import { deleteComment, updateComment } from 'lib/comments';
+import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { withSessionRoute } from 'lib/session/withSession';
+import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
+import { PageContent } from 'models';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { withSessionRoute } from 'lib/session/withSession';
-import { prisma } from 'db';
-import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
-import { PageContent } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
-  .put(requireKeys(['content'], 'body'), editComment)
-  .delete(deleteComment);
+  .delete(deleteCommentController)
+  .put(requireKeys(['content'], 'body'), updateCommentController);
 
-async function editComment (req: NextApiRequest, res: NextApiResponse) {
+async function updateCommentController (req: NextApiRequest, res: NextApiResponse) {
   const { content } = req.body as {
     content: PageContent,
   };
 
   const commentId = req.query.id as string;
+
   const userId = req.session.user.id;
-  const comment = await prisma.comment.findFirst({
+
+  const comment = await prisma.comment.findUnique({
     where: {
-      id: commentId,
-      userId
+      id: commentId
     },
     select: {
-      thread: {
-        select: {
-          pageId: true
-        }
-      }
+      userId: true
     }
   });
 
   if (!comment) {
-    throw new NotFoundError();
+    throw new DataNotFoundError();
   }
 
-  const permissionSet = await computeUserPagePermissions({
-    pageId: comment.thread.pageId,
-    userId
-  });
-
-  if (!permissionSet.edit_content) {
-    return res.status(401).json({
-      error: 'You are not allowed to perform this action'
-    });
+  if (comment.userId !== userId) {
+    throw new UnauthorisedActionError('You cannot edit another users\' comment');
   }
 
-  await prisma.comment.updateMany({
-    where: {
-      id: commentId,
-      userId: req.session.user.id as string
-    },
-    data: {
-      content,
-      updatedAt: new Date()
-    }
+  const commentAfterUpdate = await updateComment({
+    content,
+    id: commentId
   });
 
-  return res.status(200).json({
-    ...comment,
-    content
-  });
+  return res.status(200).json(commentAfterUpdate);
 }
 
-async function deleteComment (req: NextApiRequest, res: NextApiResponse) {
+async function deleteCommentController (req: NextApiRequest, res: NextApiResponse) {
   const userId = req.session.user.id;
+
+  const { id: commentId } = req.query;
+
   const comment = await prisma.comment.findFirst({
     where: {
-      id: req.query.id as string,
-      userId
+      id: commentId as string
     },
     select: {
-      thread: {
-        select: {
-          pageId: true
-        }
-      }
+      userId: true
     }
   });
 
   if (!comment) {
-    throw new NotFoundError();
+    throw new DataNotFoundError();
   }
 
-  const permissionSet = await computeUserPagePermissions({
-    pageId: comment.thread.pageId,
-    userId
-  });
-
-  if (!permissionSet.edit_content) {
-    return res.status(401).json({
-      error: 'You are not allowed to perform this action'
-    });
+  if (comment.userId !== userId) {
+    throw new UnauthorisedActionError('You cannot delete another users\' comment');
   }
 
-  await prisma.comment.deleteMany({
-    where: {
-      id: req.query.id as string,
-      userId
-    }
-  });
+  await deleteComment(commentId as string);
+
   return res.status(200).json({ ok: true });
 }
 

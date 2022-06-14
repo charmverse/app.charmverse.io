@@ -8,6 +8,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import SunIcon from '@mui/icons-material/WbSunny';
+import { Divider, FormControlLabel, Switch } from '@mui/material';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
@@ -25,14 +26,14 @@ import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
 import { useRouter } from 'next/router';
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import Account from '../Account';
 import ShareButton from '../ShareButton';
 import PageTitleWithBreadcrumbs from './PageTitleWithBreadcrumbs';
 
 export const headerHeight = 56;
 
-const StyledToolbar = styled(Toolbar)`
+export const StyledToolbar = styled(Toolbar)`
   background-color: ${({ theme }) => theme.palette.background.default};
   height: ${headerHeight}px;
   min-height: ${headerHeight}px;
@@ -57,21 +58,22 @@ function CommentThreadsListButton () {
   );
 }
 
-export default function Header (
-  { open, openSidebar, hideSidebarOnSmallScreen }:
-  {
-    open: boolean, openSidebar: () => void, hideSidebarOnSmallScreen?: boolean }
-) {
+interface HeaderProps {
+  open: boolean;
+  openSidebar: () => void;
+  hideSidebarOnSmallScreen?: boolean;
+}
+
+export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }: HeaderProps) {
   const router = useRouter();
   const colorMode = useColorMode();
-  const { pages, currentPageId } = usePages();
+  const { pages, currentPageId, setPages } = usePages();
   const [user, setUser] = useUser();
   const theme = useTheme();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
   const [pageMenuAnchorElement, setPageMenuAnchorElement] = useState<null | Element>(null);
   const pageMenuAnchor = useRef();
   const currentPage = currentPageId ? pages[currentPageId] : undefined;
-
   const isFavorite = currentPage && user?.favorites.some(({ pageId }) => pageId === currentPage.id);
 
   const isPage = router.route.includes('pageId');
@@ -107,6 +109,8 @@ export default function Header (
     }
   }
 
+  const isFullWidth = currentPage?.fullWidth ?? false;
+
   return (
     <StyledToolbar variant='dense'>
       <IconButton
@@ -115,8 +119,8 @@ export default function Header (
         edge='start'
         sx={{
           display: {
-            xs: hideSidebarOnSmallScreen ? 'none' : 'block',
-            md: 'block'
+            xs: hideSidebarOnSmallScreen ? 'none' : 'inline-flex',
+            md: 'inline-flex'
           },
           marginRight: '36px',
           ...(open && { display: 'none' })
@@ -124,6 +128,7 @@ export default function Header (
       >
         <MenuIcon />
       </IconButton>
+
       <Box sx={{
         display: 'flex',
         justifyContent: 'space-between',
@@ -146,7 +151,7 @@ export default function Header (
             </>
           )}
 
-          {isPage && isExportablePage && (
+          {currentPage && isPage && isExportablePage && (
             <Box sx={{ ml: 1 }} ref={pageMenuAnchor}>
               <IconButton
                 size='small'
@@ -170,7 +175,6 @@ export default function Header (
                   <ListItemButton onClick={() => {
                     exportMarkdown();
                     setPageMenuOpen(false);
-
                   }}
                   >
                     <GetAppIcon
@@ -185,7 +189,32 @@ export default function Header (
                   {/* Publishing to snapshot */}
 
                   <PublishToSnapshot page={currentPage as Page} />
-
+                  <Divider />
+                  <ListItemButton>
+                    <FormControlLabel
+                      sx={{
+                        marginLeft: 0.5,
+                        width: '100%',
+                        display: 'flex',
+                        justifyContent: 'space-between'
+                      }}
+                      labelPlacement='start'
+                      control={(
+                        <Switch
+                          size='small'
+                          checked={isFullWidth}
+                          onChange={async () => {
+                            await charmClient.updatePage({
+                              id: currentPage.id,
+                              fullWidth: !isFullWidth
+                            });
+                            setPages((_pages) => ({ ..._pages, [currentPageId]: { ...currentPage, fullWidth: !isFullWidth } }));
+                          }}
+                        />
+                      )}
+                      label='Full Width'
+                    />
+                  </ListItemButton>
                 </List>
               </Popover>
             </Box>

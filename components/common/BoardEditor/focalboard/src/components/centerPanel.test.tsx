@@ -121,7 +121,6 @@ describe('components/centerPanel', () => {
                     activeView={activeView}
                     readonly={false}
                     showCard={jest.fn()}
-                    showShared={true}
                     groupByProperty={groupProperty}
                 />
             </ReduxProvider>,
@@ -140,7 +139,6 @@ describe('components/centerPanel', () => {
                     activeView={activeView}
                     readonly={false}
                     showCard={jest.fn()}
-                    showShared={true}
                     groupByProperty={groupProperty}
                 />
             </ReduxProvider>,
@@ -159,7 +157,6 @@ describe('components/centerPanel', () => {
                     activeView={activeView}
                     readonly={false}
                     showCard={jest.fn()}
-                    showShared={true}
                     groupByProperty={groupProperty}
                 />
             </ReduxProvider>,
@@ -179,7 +176,6 @@ describe('components/centerPanel', () => {
                         activeView={activeView}
                         readonly={false}
                         showCard={jest.fn()}
-                        showShared={true}
                         groupByProperty={groupProperty}
                     />
                 </ReduxProvider>,
@@ -210,7 +206,6 @@ describe('components/centerPanel', () => {
                         activeView={activeView}
                         readonly={true}
                         showCard={jest.fn()}
-                        showShared={true}
                         groupByProperty={groupProperty}
                     />
                 </ReduxProvider>,
@@ -233,7 +228,6 @@ describe('components/centerPanel', () => {
                         activeView={activeView}
                         readonly={false}
                         showCard={jest.fn()}
-                        showShared={true}
                         groupByProperty={groupProperty}
                     />
                 </ReduxProvider>,
@@ -260,7 +254,6 @@ describe('components/centerPanel', () => {
                         activeView={activeView}
                         readonly={false}
                         showCard={jest.fn()}
-                        showShared={true}
                         groupByProperty={groupProperty}
                     />
                 </ReduxProvider>,
@@ -294,7 +287,6 @@ describe('components/centerPanel', () => {
                         activeView={activeView}
                         readonly={false}
                         showCard={jest.fn()}
-                        showShared={true}
                         groupByProperty={groupProperty}
                     />
                 </ReduxProvider>,
@@ -320,7 +312,6 @@ describe('components/centerPanel', () => {
                         activeView={activeView}
                         readonly={false}
                         showCard={jest.fn()}
-                        showShared={true}
                         groupByProperty={groupProperty}
                     />
                 </ReduxProvider>,
@@ -347,7 +338,6 @@ describe('components/centerPanel', () => {
                         activeView={activeView}
                         readonly={false}
                         showCard={mockedShowCard}
-                        showShared={true}
                         groupByProperty={groupProperty}
                     />
                 </ReduxProvider>,
@@ -372,7 +362,6 @@ describe('components/centerPanel', () => {
                         activeView={activeView}
                         readonly={false}
                         showCard={jest.fn()}
-                        showShared={true}
                         groupByProperty={groupProperty}
                     />
                 </ReduxProvider>,
@@ -394,7 +383,6 @@ describe('components/centerPanel', () => {
                         activeView={activeView}
                         readonly={false}
                         showCard={jest.fn()}
-                        showShared={true}
                         groupByProperty={groupProperty}
                     />
                 </ReduxProvider>,
@@ -419,7 +407,6 @@ describe('components/centerPanel', () => {
                         activeView={activeView}
                         readonly={false}
                         showCard={jest.fn()}
-                        showShared={true}
                         groupByProperty={groupProperty}
                     />
                 </ReduxProvider>,
@@ -445,7 +432,6 @@ describe('components/centerPanel', () => {
                         activeView={activeView}
                         readonly={false}
                         showCard={jest.fn()}
-                        showShared={true}
                         groupByProperty={groupProperty}
                     />
                 </ReduxProvider>,

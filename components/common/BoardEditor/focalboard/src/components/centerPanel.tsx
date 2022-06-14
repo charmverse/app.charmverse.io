@@ -46,7 +46,6 @@ type Props = {
   updateView: (view: BoardView) => void
   addTemplate: (template: Card) => void
   showCard: (cardId?: string) => void
-  showShared: boolean
 }
 
 type State = {
@@ -358,7 +357,6 @@ function CenterPanel(props: Props) {
           addCardTemplate={addCardTemplate}
           editCardTemplate={editCardTemplate}
           readonly={props.readonly}
-          showShared={props.showShared}
         />
       </div>
 

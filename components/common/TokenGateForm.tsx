@@ -121,8 +121,8 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
     const result = jwt ? await charmClient.unlockTokenGate({ jwt, id: tokenGate.id }) : null;
     if (result?.space) {
       // create user if we need one
-      if (!user) {
-        await charmClient.createUser({ address: account! });
+      if (!user && account) {
+        await charmClient.createUser({ address: account });
       }
       // refresh user permissions
       const _user = await charmClient.getUser();

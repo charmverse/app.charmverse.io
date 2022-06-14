@@ -1,5 +1,4 @@
-import { Application, ApplicationStatus, Bounty, BountyStatus, Space, User } from '@prisma/client';
-import { prisma } from 'db';
+import { ApplicationStatus, BountyStatus, Space, User } from '@prisma/client';
 import { generateBounty, generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { bountyCanReceiveNewSubmissionsOrApplications, countValidSubmissions, submissionIsEditable, submissionsCapReached } from '../shared';
 

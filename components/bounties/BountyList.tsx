@@ -41,7 +41,7 @@ export default function BountyList () {
 
   const [space] = useCurrentSpace();
 
-  const [savedBountyFilters, setSavedBountyFilters] = useLocalStorage<BountyStatus []>(`${space?.id}-bounty-filters`, ['open', 'inProgress']);
+  const [savedBountyFilters, setSavedBountyFilters] = useLocalStorage<BountyStatus[]>(`${space?.id}-bounty-filters`, ['open', 'inProgress']);
 
   // Filter out the old bounty filters
   useEffect(() => {

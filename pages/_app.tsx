@@ -56,7 +56,6 @@ import 'components/common/BoardEditor/focalboard/src/components/properties/lastM
 import 'components/common/BoardEditor/focalboard/src/components/properties/lastModifiedBy/lastModifiedBy.scss';
 import 'components/common/BoardEditor/focalboard/src/components/properties/link/link.scss';
 import 'components/common/BoardEditor/focalboard/src/components/properties/user/user.scss';
-import 'components/common/BoardEditor/focalboard/src/components/shareBoardComponent.scss';
 // import 'components/common/BoardEditor/focalboard/src/components/sidebar/deleteBoardDialog.scss';
 // import 'components/common/BoardEditor/focalboard/src/components/sidebar/registrationLink.scss';
 // import 'components/common/BoardEditor/focalboard/src/components/sidebar/sidebar.scss';

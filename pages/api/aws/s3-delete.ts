@@ -1,5 +1,5 @@
 // based on example from https://github.com/ryanto/next-s3-upload/issues/13
-import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
+import { NextApiRequest, NextApiResponse } from 'next';
 import { S3Client, DeleteObjectCommand, DeleteObjectCommandInput } from '@aws-sdk/client-s3';
 
 import nc from 'next-connect';

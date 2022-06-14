@@ -1,3 +1,4 @@
+import log from 'lib/log';
 import { prisma } from '../db';
 
 (async () => {
@@ -6,10 +7,10 @@ import { prisma } from '../db';
       user: true
     }
   });
-  console.log('found', spaceRoles.length, 'space roles');
+  log.info('found', spaceRoles.length, 'space roles');
   const toUpdate = spaceRoles
     .filter(spaceRole => spaceRole.user.createdAt < spaceRole.createdAt);
-  console.log('updating', toUpdate.length, 'space roles');
+  log.info('updating', toUpdate.length, 'space roles');
 
   await prisma.$transaction(
     toUpdate

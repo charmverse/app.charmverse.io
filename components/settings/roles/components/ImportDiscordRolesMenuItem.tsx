@@ -27,10 +27,13 @@ export default function ImportDiscordRolesMenuItem () {
   }, [currentSpace, router.query]);
 
   function importFromServer (guildId: string) {
+    if (!currentSpace) {
+      return;
+    }
     setIsLoading(true);
     return charmClient.importRolesFromDiscordServer({
       guildId,
-      spaceId: currentSpace!.id
+      spaceId: currentSpace.id
     })
       .then(result => {
         showMessage(`Successfully imported ${result.importedRoleCount} discord roles`, 'success');

@@ -1,12 +1,13 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { hasAccessToSpace, onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
+import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { prisma } from 'db';
 import { SpaceRole } from '@prisma/client';
 import { IEventToLog, postToDiscord } from 'lib/log/userEvents';
 import { DataNotFoundError } from 'lib/utilities/errors';
+import log from 'lib/log';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -35,7 +36,7 @@ async function acceptInvite (req: NextApiRequest, res: NextApiResponse) {
   const userHasRoleInSpace = roles.some(role => role.spaceId === invite.spaceId);
 
   if (userHasRoleInSpace === false) {
-    console.log('User joined workspace via invite', { spaceId: invite.spaceId, userId });
+    log.info('User joined workspace via invite', { spaceId: invite.spaceId, userId });
     const newRole = await prisma.spaceRole.create({
       data: {
         space: {
@@ -114,7 +115,7 @@ async function logInviteAccepted (role: SpaceRole) {
   const eventLog: IEventToLog = {
     eventType: 'join_workspace_from_link',
     funnelStage: 'acquisition',
-    message: `Someone joined ${space!.domain} workspace via an invite link`
+    message: `Someone joined ${space?.domain} workspace via an invite link`
   };
 
   postToDiscord(eventLog);

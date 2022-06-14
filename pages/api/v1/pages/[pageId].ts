@@ -5,7 +5,6 @@ import { PageFromBlock, Page, PageProperty, mapProperties, validateUpdateData, g
 import { onError, onNoMatch, requireApiKey, SpaceAccessDeniedError } from 'lib/middleware';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { PageContent } from 'models';
 import { generateMarkdown } from 'lib/pages';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

@@ -2,9 +2,7 @@ import React, { forwardRef, ReactNode, SyntheticEvent, useCallback, useMemo, mem
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import { useIntl } from 'react-intl';
-import { mutate } from 'swr';
 import { Page } from '@prisma/client';
-import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
@@ -20,6 +18,7 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemText from '@mui/material/ListItemText';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { IPageWithPermissions } from 'lib/pages';
 import charmClient from 'charmClient';
 import TreeItemContent from 'components/common/TreeItemContent';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
@@ -221,7 +220,7 @@ function EmojiMenu ({ popupState, pageId, pageType }: { popupState: any, pageId:
       setPages(_pages => ({
         ..._pages,
         [pageId]: {
-          ..._pages[pageId] as Page,
+          ..._pages[pageId] as IPageWithPermissions,
           icon: emoji
         }
       }));
@@ -391,7 +390,7 @@ function PageActionsMenu ({ closeMenu, pageId, pagePath }: { closeMenu: () => vo
 
     if (page && user && space) {
       const { pageIds } = await charmClient.archivePage(page.id);
-      let newPage: null | Page = null;
+      let newPage: null | IPageWithPermissions = null;
       if (totalNonArchivedPages - pageIds.length === 0 && pageIds.length !== 0) {
         newPage = await charmClient.createPage(untitledPage({
           userId: user.id,
@@ -419,7 +418,7 @@ function PageActionsMenu ({ closeMenu, pageId, pagePath }: { closeMenu: () => vo
           _pages[_pageId] = {
             ..._pages[_pageId],
             deletedAt: new Date()
-          } as Page;
+          } as IPageWithPermissions;
         });
         // If a new page was created add that to state
         if (newPage) {

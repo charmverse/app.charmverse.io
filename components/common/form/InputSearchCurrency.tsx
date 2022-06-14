@@ -1,6 +1,5 @@
 import { Autocomplete, Box, TextField } from '@mui/material';
-import Image from 'next/image';
-import { FiatCurrencyList, FiatCurrency } from '../../../models/Currency';
+import { FiatCurrencyList, FiatCurrency } from 'connectors';
 
 const currencyOptions = Object.keys(FiatCurrencyList);
 

@@ -45,7 +45,7 @@ export function spec (): RawSpecs {
     type: 'node',
     name,
     markdown: {
-      toMarkdown: (state, node, parent, index) => {
+      toMarkdown: (state, node) => {
 
         // eslint-disable-next-line prefer-const
         let { height, width, src } = node.attrs;
