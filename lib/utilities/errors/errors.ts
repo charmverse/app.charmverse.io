@@ -11,6 +11,7 @@ const ErrorCodes = {
   'Data not found': 404,
   'Maximum size exceeded': 400,
   'Access denied': 401,
+  'Insecure operation': 401,
   'External service': 500,
   'Unexpected result': 500
 };
@@ -108,3 +109,12 @@ export class UnauthorisedActionError extends SystemError {
   }
 }
 
+export class InsecureOperationError extends SystemError {
+  constructor (message = 'Insecure operation cannot be performed.') {
+    super({
+      message,
+      errorType: 'Access denied',
+      severity: 'error'
+    });
+  }
+}
