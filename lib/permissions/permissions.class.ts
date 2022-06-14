@@ -1,6 +1,10 @@
+import { boolean } from 'yup';
 import { UserPermissionFlags } from './interfaces';
 
-export abstract class Permission<O extends string> {
+/**
+ * Defines each operation as a member property queryable as true / false
+ */
+export class Permissions<O extends string> {
 
   private operations: {[key in O]: true};
 

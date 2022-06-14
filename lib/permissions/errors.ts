@@ -10,3 +10,14 @@ export class InvalidPermissionGranteeError extends SystemError {
     });
   }
 }
+
+export class SpaceMembershipRequiredError extends SystemError {
+
+  constructor () {
+    super({
+      errorType: 'Insecure operation',
+      message: 'User must be a member of the space to perform this action.',
+      severity: 'warning'
+    });
+  }
+}

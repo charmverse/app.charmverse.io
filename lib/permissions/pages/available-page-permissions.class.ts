@@ -1,5 +1,5 @@
 import { PageOperations } from '@prisma/client';
-import { Permission } from '../permissions.class';
+import { Permissions } from '../permissions.class';
 import { IPagePermissionFlags, PageOperationType } from './page-permission-interfaces';
 
 /**
@@ -7,7 +7,7 @@ import { IPagePermissionFlags, PageOperationType } from './page-permission-inter
  *
  * Permissions can be added, but not removed.
  */
-export class AllowedPagePermissions extends Permission<PageOperationType> {
+export class AllowedPagePermissions extends Permissions<PageOperationType> {
 
   read: boolean = false;
 

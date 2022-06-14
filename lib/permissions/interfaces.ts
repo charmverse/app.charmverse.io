@@ -25,3 +25,14 @@ export type PermissionAssignee<A extends AssignablePermissionGroups = Assignable
   }
 
 export type UserPermissionFlags<T extends string> = Record<T, boolean>
+
+/**
+ * Required data for calculating operations a user can access relating to a resource
+ * @allowAdminBypass - If true, compute should return full privileges if user is an admin
+ * @resourceId - ID of the entity, such as a page or a space
+ */
+export interface PermissionComputeRequest {
+  resourceId: string
+  allowAdminBypass: boolean
+  userId: string
+}
