@@ -40,7 +40,7 @@ jobs:
       - name: Setup test database
         run: bash ./testing/configure-db.sh
 
-      - name: Run tests
+      - name: Run basic tests
         run: npm run test:ci
 
       - name: Run server integration tests
