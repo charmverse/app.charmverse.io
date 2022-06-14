@@ -48,10 +48,11 @@ export function ThreadsProvider ({ children }: { children: ReactNode }) {
           threadId: thread.id
         });
         if (thread.pageId) {
+          const threadWithCommentsAndAuthors = thread as ThreadWithCommentsAndAuthors;
           setThreads((_threads) => ({ ..._threads,
-            [thread.id]: {
-              ...thread,
-              comments: [...thread.comments, comment]
+            [threadWithCommentsAndAuthors.id]: {
+              ...threadWithCommentsAndAuthors,
+              comments: [...threadWithCommentsAndAuthors.comments, comment]
             } }));
         }
       }
@@ -74,10 +75,11 @@ export function ThreadsProvider ({ children }: { children: ReactNode }) {
       try {
         await charmClient.editComment(editedCommentId, commentContent);
         if (thread.pageId) {
+          const threadWithCommentsAndAuthors = thread as ThreadWithCommentsAndAuthors;
           setThreads((_threads) => ({ ..._threads,
-            [thread.id]: {
-              ...thread,
-              comments: thread.comments
+            [threadWithCommentsAndAuthors.id]: {
+              ...threadWithCommentsAndAuthors,
+              comments: threadWithCommentsAndAuthors.comments
                 .map(comment => comment.id === editedCommentId ? ({ ...comment, content: commentContent, updatedAt: new Date() }) : comment)
             } }));
         }
@@ -102,11 +104,12 @@ export function ThreadsProvider ({ children }: { children: ReactNode }) {
         try {
           await charmClient.deleteComment(comment.id);
           if (thread.pageId) {
+            const threadWithCommentsAndAuthors = thread as ThreadWithCommentsAndAuthors;
             const threadWithoutComment = {
               ...thread,
               comments: thread.comments.filter(_comment => _comment.id !== comment.id)
             };
-            setThreads((_threads) => ({ ..._threads, [thread.id]: threadWithoutComment }));
+            setThreads((_threads) => ({ ..._threads, [threadWithCommentsAndAuthors.id]: threadWithoutComment }));
           }
         }
         catch (_) {
