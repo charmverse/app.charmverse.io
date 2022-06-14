@@ -5,8 +5,9 @@ import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatab
 import { v4 } from 'uuid';
 import { prisma } from 'db';
 import { ExpectedAnError } from 'testing/errors';
+import { InvalidPermissionGranteeError } from 'lib/permissions/errors';
 import { upsertPermission } from '../upsert-permission';
-import { CannotInheritOutsideTreeError, InvalidPermissionGranteeError, SelfInheritancePermissionError } from '../../errors';
+import { CannotInheritOutsideTreeError, SelfInheritancePermissionError } from '../../errors';
 
 let user: User;
 let space: Space;
