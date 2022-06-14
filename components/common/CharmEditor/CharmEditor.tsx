@@ -24,7 +24,7 @@ import { plugins as imagePlugins } from 'components/common/CharmEditor/component
 import * as codeBlock from 'components/common/CharmEditor/components/@bangle.dev/base-components/code-block';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
 import { PageContent } from 'models';
-import { CryptoCurrency, FiatCurrency } from 'models/Currency';
+import { CryptoCurrency, FiatCurrency } from 'connectors';
 import { markdownSerializer } from '@bangle.dev/markdown';
 import PageThreadsList from 'components/[pageId]/DocumentPage/components/PageThreadsList';
 import { Grow } from '@mui/material';
@@ -379,7 +379,7 @@ function CharmEditor (
             // This fixes the placeholder and cursor not being aligned
             top: -34
           }}
-          show={isEmpty}
+          show={isEmpty && !readOnly}
         />
       )}
       state={state}
@@ -458,9 +458,7 @@ function CharmEditor (
           }
           case 'page': {
             return (
-              <NestedPage readOnly={readOnly} {...props}>
-                {_children}
-              </NestedPage>
+              <NestedPage {...props} />
             );
           }
           default: {
@@ -496,7 +494,7 @@ function CharmEditor (
       </Grow>
       )}
       {!disabledPageSpecificFeatures && <InlineCommentThread pluginKey={inlineCommentPluginKey} />}
-      <DevTools />
+      {!readOnly && <DevTools />}
     </StyledReactBangleEditor>
   );
 }

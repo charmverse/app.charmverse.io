@@ -104,7 +104,7 @@ export default function TasksPageHeader () {
                   alignItems='center'
                 >
                   <Tooltip title={metamaskConnected ? 'Metamask connected' : 'Metamask not connected'} arrow placement='top'>
-                    <img className='logo-image' width={20} height={20} src={metamaskConnected ? '/walletLogos/metamask.png' : '/walletLogos/metamask-greyscale.png'} />
+                    <img className='logo-image' width={20} height={20} src={metamaskConnected ? '/images/walletLogos/metamask.png' : '/images/walletLogos/metamask-greyscale.png'} />
                   </Tooltip>
                   <Tooltip title={discordConnected ? 'Discord connected' : 'Discord not connected'} arrow placement='top'>
                     <img className='logo-image' width={25} height={20} src={discordConnected ? '/images/discord-logo-colored.png' : '/images/discord-logo-greyscale.png'} />

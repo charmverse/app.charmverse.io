@@ -1,5 +1,6 @@
 
 import { sendEmail } from 'lib/mailer';
+import log from 'lib/log';
 
 (async () => {
 
@@ -12,6 +13,6 @@ import { sendEmail } from 'lib/mailer';
     }
   });
 
-  console.log('Sent email', r);
+  log.info('Sent email', r);
 
 })();

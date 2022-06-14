@@ -42,19 +42,6 @@ export function BountyApplicantList ({
 
   const bountyApplyModal = usePopupState({ variant: 'popover', popupId: 'apply-for-bounty' });
 
-  function getContributor (userId: string) {
-    return contributors.find(c => c.id === userId);
-  }
-
-  // if (loading.current === true) {
-  //   return (
-  //     <>
-  //       <Typography>Loading proposals</Typography>
-  //       <CircularProgress/>
-  //     </>
-  //   );
-  // }
-
   async function approveApplication (applicationId: string) {
     await charmClient.approveApplication(applicationId);
     refreshBounty(bounty.id);

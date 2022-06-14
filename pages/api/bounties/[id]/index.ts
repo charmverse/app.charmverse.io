@@ -7,6 +7,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import nc, { NextHandler } from 'next-connect';
 import { updateBountySettings, getBounty } from 'lib/bounties';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
+import { rollupBountyStatus } from 'lib/bounties/rollupBountyStatus';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -78,17 +79,14 @@ async function updateBounty (req: NextApiRequest, res: NextApiResponse<BountyWit
     delete body.rewardAmount;
   }
 
-  const updatedBounty = await updateBountySettings({
+  await updateBountySettings({
     bountyId: id as string,
     updateContent: body
   });
 
-  const bountyToSend: BountyWithDetails = {
-    ...bounty,
-    ...updatedBounty
-  };
+  const rolledUpBounty = await rollupBountyStatus(bounty.id);
 
-  res.status(200).json(bountyToSend);
+  res.status(200).json(rolledUpBounty);
 
 }
 

@@ -2,6 +2,7 @@ import Button from '@mui/material/Button';
 import { useWeb3React } from '@web3-react/core';
 import { MetaTransactionData } from '@gnosis.pm/safe-core-sdk-types';
 import SafeServiceClient from '@gnosis.pm/safe-service-client';
+import { Tooltip } from '@mui/material';
 import EthersAdapter from '@gnosis.pm/safe-ethers-lib';
 import { ethers } from 'ethers';
 import { getChainById } from 'connectors';
@@ -59,10 +60,14 @@ export default function MultiPaymentButton ({ isLoading, chainId, safeAddress, t
   }
 
   return (
-    <Button disabled={isLoading || !safe || transactions.length === 0} onClick={makePayment}>
-      Make Payment (
-      {transactions.length}
-      )
-    </Button>
+    <Tooltip arrow placement='top' title={!safe ? `Connect your wallet to the Gnosis safe: ${safeAddress}` : ''}>
+      <span>
+        <Button disabled={isLoading || !safe || transactions.length === 0} onClick={makePayment}>
+          Make Payment (
+          {transactions.length}
+          )
+        </Button>
+      </span>
+    </Tooltip>
   );
 }

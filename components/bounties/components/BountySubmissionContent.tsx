@@ -9,11 +9,10 @@ import Typography from '@mui/material/Typography';
 import ApplicationThread from './ApplicationThread';
 
 interface Props {
-  bounty: Bounty
-  submission: Application
+  submission: Application;
 }
 
-export default function BountySubmissionContent ({ bounty, submission }: Props) {
+export default function BountySubmissionContent ({ submission }: Props) {
 
   const [contributors] = useContributors();
 

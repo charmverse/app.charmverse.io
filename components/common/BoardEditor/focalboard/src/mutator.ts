@@ -17,6 +17,11 @@ import undoManager from './undomanager'
 import { UserSettings } from './userSettings'
 import { IDType, Utils } from './utils'
 
+export interface BlockChange {
+    block: Block
+    newBlock: Block
+}
+
 //
 // The Mutator is used to make all changes to server state
 // It also ensures that the Undo-manager is called for each action
@@ -68,7 +73,7 @@ class Mutator {
         )
     }
 
-    private async updateBlocks(newBlocks: Block[], oldBlocks: Block[], description: string): Promise<void> {
+    async updateBlocks(newBlocks: Block[], oldBlocks: Block[], description: string): Promise<void> {
         if (newBlocks.length !== oldBlocks.length) {
             throw new Error('new and old blocks must have the same length when updating blocks')
         }
@@ -435,7 +440,7 @@ class Mutator {
         await this.updateBlock(newBoard, board, 'change option color')
     }
 
-    async changePropertyValue(card: Card, propertyId: string, value?: string | string[], description = 'change property') {
+    changePropertyValue(card: Card, propertyId: string, value?: string | string[], description = 'change property', mutate = true) {
         const oldValue = card.fields.properties[propertyId]
 
         // dont save anything if property value was not changed.
@@ -449,8 +454,13 @@ class Mutator {
         } else {
             delete newCard.fields.properties[propertyId]
         }
-        await this.updateBlock(newCard, card, description)
-        // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.EditCardProperty, {board: card.rootId, card: card.id})
+        if (mutate) {
+            // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.EditCardProperty, {board: card.rootId, card: card.id})
+            return this.updateBlock(newCard, card, description)
+        }
+        else {
+            return { newBlock: newCard, block: card }
+        }
     }
 
     async changePropertyTypeAndName(board: Board, cards: Card[], propertyTemplate: IPropertyTemplate, newType: PropertyType, newName: string) {
@@ -676,10 +686,15 @@ class Mutator {
         await this.updateBlock(newView, view, 'show column')
     }
 
-    async changeViewCardOrder(view: BoardView, cardOrder: string[], description = 'reorder'): Promise<void> {
+    changeViewCardOrder(view: BoardView, cardOrder: string[], description = 'reorder', mutate = true) {
         const newView = createBoardView(view)
         newView.fields.cardOrder = cardOrder
-        await this.updateBlock(newView, view, description)
+        if (mutate) {
+            return this.updateBlock(newView, view, description)
+        }
+        else {
+            return { newBlock: newView, block: view }
+        }
     }
 
     async followBlock(blockId: string, blockType: string, userId: string) {

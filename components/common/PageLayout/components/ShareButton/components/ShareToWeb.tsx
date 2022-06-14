@@ -11,7 +11,7 @@ import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { IPageWithPermissions } from 'lib/pages';
-import { IPagePermissionWithSource } from 'lib/permissions/pages/page-permission-interfaces';
+import { IPagePermissionWithSource, IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -41,50 +41,35 @@ const CopyButton = styled((props: any) => <Button color='secondary' variant='out
 `;
 
 interface Props {
-  pageId: string
+  pageId: string;
+  pagePermissions: IPagePermissionWithAssignee[];
 }
 
-export default function ShareToWeb ({ pageId }: Props) {
+export default function ShareToWeb ({ pageId, pagePermissions }: Props) {
 
   const router = useRouter();
-  // What user can do
-  const { pages, setPages, getPagePermissions, refreshPage } = usePages();
+  const { pages, getPagePermissions, refreshPage } = usePages();
   const [copied, setCopied] = useState<boolean>(false);
   const [space] = useCurrentSpace();
+  const publicPermission = pagePermissions.find(publicPerm => publicPerm.public === true) ?? null;
 
   const currentPagePermissions = getPagePermissions(pageId);
 
   // Current values of the public permission
-  const [publicPermission, setPublicPermission] = useState<IPagePermissionWithSource | null>(null);
   const [shareLink, setShareLink] = useState<null | string>(null);
-
-  useEffect(() => {
-    if (pageId) {
-      // Access the raw permissions
-      const permissionList = (pages[pageId] as IPageWithPermissions)?.permissions;
-
-      const foundPublic = permissionList.find(publicPerm => publicPerm.public === true) ?? null;
-      // Add ref to new model here
-      setPublicPermission(foundPublic);
-    }
-    else {
-      setPublicPermission(null);
-    }
-
-  }, [pageId, pages]);
 
   async function togglePublic () {
     if (publicPermission) {
       await charmClient.deletePermission(publicPermission.id);
-      setPublicPermission(null);
+      refreshPage(pageId);
     }
     else {
-      const newPermission = await charmClient.createPermission({
+      await charmClient.createPermission({
         pageId,
         permissionLevel: 'view',
         public: true
       });
-      setPublicPermission(newPermission);
+      refreshPage(pageId);
     }
   }
 
@@ -104,13 +89,13 @@ export default function ShareToWeb ({ pageId }: Props) {
     }
     else if (currentPage?.type === 'page' || currentPage?.type === 'card') {
       const shareLinkToSet = (typeof window !== 'undefined')
-        ? `${window.location.origin}/share/${pageId}` : '';
+        ? `${window.location.origin}/share/${space?.domain}/${currentPage.path}` : '';
       setShareLink(shareLinkToSet);
     }
     else if (currentPage?.type === 'board') {
       const viewIdToProvide = router.query.viewId;
       const shareLinkToSet = (typeof window !== 'undefined')
-        ? `${window.location.origin}/share/${pageId}?viewId=${viewIdToProvide}` : '';
+        ? `${window.location.origin}/share/${space?.domain}/${currentPage.path}?viewId=${viewIdToProvide}` : '';
       setShareLink(shareLinkToSet);
     }
   }
@@ -163,18 +148,17 @@ export default function ShareToWeb ({ pageId }: Props) {
         }
       </Collapse>
       {
-
-publicPermission?.sourcePermission && (
-  <Box display='block'>
-    <Typography variant='caption' sx={{ ml: 1 }}>
-      Inherited from
-      <Link sx={{ ml: 0.5 }} href={`/${space?.domain}/${pages[publicPermission?.sourcePermission.pageId]?.path}`}>
-        {pages[publicPermission?.sourcePermission.pageId]?.title || 'Untitled'}
-      </Link>
-    </Typography>
-  </Box>
-)
-}
+        publicPermission?.sourcePermission && (
+          <Box display='block'>
+            <Typography variant='caption' sx={{ ml: 1 }}>
+              Inherited from
+              <Link sx={{ ml: 0.5 }} href={`/${space?.domain}/${pages[publicPermission?.sourcePermission.pageId]?.path}`}>
+                {pages[publicPermission?.sourcePermission.pageId]?.title || 'Untitled'}
+              </Link>
+            </Typography>
+          </Box>
+        )
+      }
     </>
   );
 }

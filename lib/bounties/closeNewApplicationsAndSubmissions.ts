@@ -1,4 +1,4 @@
-import { countValueOccurrences } from 'lib/utilities/numbers';
+
 import { countValidSubmissions } from 'lib/applications/shared';
 import { prisma } from 'db';
 import { BountyWithDetails } from '../../models/Bounty';

@@ -1,6 +1,6 @@
 import { Bounty } from '@prisma/client';
 import Modal from 'components/common/Modal';
-import { PopulatedBounty } from 'charmClient';
+import { BountyWithDetails } from 'models';
 import BountyEditorForm, { FormMode, bountyFormTitles, FormValues } from './BountyEditorForm';
 
 interface Props {
@@ -8,7 +8,7 @@ interface Props {
   mode?: FormMode;
   bounty?: Partial<Bounty>;
   onClose: () => void;
-  onSubmit: (bounty: PopulatedBounty) => void;
+  onSubmit: (bounty: BountyWithDetails) => void;
   focusKey?: keyof FormValues
 }
 

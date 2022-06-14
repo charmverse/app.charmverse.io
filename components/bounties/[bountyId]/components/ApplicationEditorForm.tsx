@@ -2,17 +2,15 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
-import FieldLabel from 'components/common/form/FieldLabel';
 import TextField from '@mui/material/TextField';
 import { Application } from '@prisma/client';
 import charmClient from 'charmClient';
+import { useBounties } from 'hooks/useBounties';
+import { useLocalStorage } from 'hooks/useLocalStorage';
 import { useUser } from 'hooks/useUser';
+import { MINIMUM_APPLICATION_MESSAGE_CHARACTERS } from 'lib/applications/shared';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
-import { isValidChainAddress } from 'lib/tokens/validation';
-import { useBounties } from 'hooks/useBounties';
-import { MINIMUM_APPLICATION_MESSAGE_CHARACTERS } from 'lib/applications/shared';
-import { useLocalStorage } from 'hooks/useLocalStorage';
 import { FormMode } from '../../components/BountyEditorForm';
 
 interface IApplicationFormProps {
@@ -39,9 +37,10 @@ export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'c
   const {
     register,
     handleSubmit,
-    formState: { errors, touchedFields, isValid, isValidating, isSubmitting }
+    formState: { errors, isValid },
+    setValue
   } = useForm<FormValues>({
-    mode: 'onBlur',
+    mode: 'onChange',
     defaultValues: {
       // Default to saved message in local storage
       message: proposal?.message as string ?? applicationMessage
@@ -84,10 +83,14 @@ export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'c
               fullWidth
               onChange={(ev) => {
                 // Only store in local storage if no proposal exists yet
+                const newText = ev.target.value;
                 if (!proposal) {
-                  const newText = ev.target.value;
                   setApplicationMessage(newText);
                 }
+
+                setValue('message', newText, {
+                  shouldValidate: true
+                });
               }}
             />
             {

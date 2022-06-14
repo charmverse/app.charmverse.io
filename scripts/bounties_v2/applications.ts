@@ -1,5 +1,6 @@
 import { Application } from '@prisma/client';
 import { prisma } from 'db';
+import log from 'lib/log';
 
 const CONCURRENT = 3;
 
@@ -88,11 +89,11 @@ export async function setApplicationSpaceIds () {
     }
   });
 
-  console.log('Found', foundApplications.length, 'applications to add a space ID to');
+  log.info('Found', foundApplications.length, 'applications to add a space ID to');
 
   for (let i = 0; i < foundApplications.length; i++) {
     const app = foundApplications[i];
-    console.log('Adding space ID to app ', i + 1, ' / ', foundApplications.length);
+    log.info('Adding space ID to app ', i + 1, ' / ', foundApplications.length);
     await prisma.application.update({
       where: {
         id: app.id
@@ -135,7 +136,7 @@ export async function eliminateDuplicateApplications () {
     return idList;
   }, []);
 
-  console.log('Found duplicates ', toDelete.length);
+  log.info('Found duplicates ', toDelete.length);
 
   if (toDelete.length > 0) {
     await prisma.application.deleteMany({

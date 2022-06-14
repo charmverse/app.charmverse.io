@@ -6,7 +6,7 @@ import { usePages } from 'hooks/usePages'
 import { BountyStatusChip } from 'components/bounties/components/BountyStatusBadge'
 import { useBounties } from 'hooks/useBounties'
 import { BOUNTY_LABELS, PageContent } from 'models'
-import { CryptoCurrency, CryptoLogoPaths } from 'models/Currency'
+import { CryptoCurrency, TokenLogoPaths } from 'connectors'
 import Image from 'next/image'
 import React, { useState } from 'react'
 import styled from '@emotion/styled'
@@ -53,6 +53,15 @@ const BountyFooter = styled.div`
   justify-content: space-between;
   width: 100%;
   padding-top: ${({ theme }) => theme.spacing(1)};
+`;
+
+const CurrencyIcon = styled.span`
+  margin-right: ${({ theme }) => theme.spacing(.5)};
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const KanbanCard = React.memo((props: Props) => {
@@ -204,22 +213,13 @@ const KanbanCard = React.memo((props: Props) => {
             display: "flex",
             gap: 0.25,
           }}>
-            <Box
-              mr={0.25}
-              component='span'
-              sx={{
-                width: 15,
-                display: 'flex',
-                alignItems: 'center'
-              }}
-            >
-              {CryptoLogoPaths[linkedBounty.rewardToken as CryptoCurrency] && (<Image
+            <CurrencyIcon>
+              {TokenLogoPaths[linkedBounty.rewardToken as CryptoCurrency] && (<img
                 loading='lazy'
-                width={15}
-                height={15}
-                src={CryptoLogoPaths[linkedBounty.rewardToken as CryptoCurrency]}
+                height={20}
+                src={TokenLogoPaths[linkedBounty.rewardToken as CryptoCurrency]}
               />)}
-            </Box>
+            </CurrencyIcon>
             <Box sx={{
               display: "flex",
               gap: 0.25
@@ -229,7 +229,7 @@ const KanbanCard = React.memo((props: Props) => {
               </Box>
             </Box>
           </Box>
-          <BountyStatusChip status={linkedBounty.status} />
+          <BountyStatusChip size='small' status={linkedBounty.status} />
         </BountyFooter>}
       </div>
       {showConfirmationDialogBox && <ConfirmationDialogBox dialogBox={confirmDialogProps} />}

@@ -5,7 +5,7 @@ import Integrations from 'components/integrations';
 
 export default function IntegrationsPage () {
 
-  setTitle('My Integrations');
+  setTitle('Integrations');
 
   return (
     <Integrations />

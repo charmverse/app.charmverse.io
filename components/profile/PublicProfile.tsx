@@ -1,5 +1,4 @@
 import { Divider, Grid, Stack } from '@mui/material';
-import { ExtendedPoap } from 'models';
 import UserDetails, { UserDetailsProps } from './components/UserDetails';
 import PoapSection from './components/PoapSection';
 

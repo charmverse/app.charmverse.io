@@ -1,12 +1,12 @@
 import { Bounty } from '@prisma/client';
-import charmClient, { PopulatedBounty } from 'charmClient';
+import charmClient from 'charmClient';
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
 import { BountyWithDetails } from '../models';
 import { useCurrentSpace } from './useCurrentSpace';
 
 type IContext = {
-  bounties: PopulatedBounty[],
-  setBounties: Dispatch<SetStateAction<PopulatedBounty[]>>,
+  bounties: BountyWithDetails[],
+  setBounties: Dispatch<SetStateAction<BountyWithDetails[]>>,
   currentBountyId: string | null,
   updateCurrentBountyId: (bountyId: string | null) => void,
   currentBounty: BountyWithDetails | null
@@ -30,7 +30,7 @@ export const BountiesContext = createContext<Readonly<IContext>>({
 
 export function BountiesProvider ({ children }: { children: ReactNode }) {
   const [space] = useCurrentSpace();
-  const [bounties, setBounties] = useState<PopulatedBounty[]>([]);
+  const [bounties, setBounties] = useState<BountyWithDetails[]>([]);
   useEffect(() => {
     if (space) {
       setBounties([]);
@@ -47,18 +47,19 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
 
   // Updates the value of a bounty in the bounty list
   function refreshBountyList (bounty: BountyWithDetails) {
-    const bountyIndex = bounties.findIndex(bountyInList => bountyInList.id === bounty.id);
+    setBounties(_bounties => {
+      const bountyIndex = _bounties.findIndex(bountyInList => bountyInList.id === bounty.id);
 
-    const updatedList = bounties.slice();
+      const updatedList = _bounties.slice();
 
-    if (bountyIndex > -1) {
-      updatedList[bountyIndex] = bounty;
-    }
-    else {
-      updatedList.push(bounty);
-    }
-
-    setBounties(updatedList);
+      if (bountyIndex > -1) {
+        updatedList[bountyIndex] = bounty;
+      }
+      else {
+        updatedList.push(bounty);
+      }
+      return updatedList;
+    });
   }
 
   async function updateBounty (bountyId: string, bountyUpdate: Partial<Bounty>) {
@@ -89,7 +90,7 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
 
   async function deleteBounty (bountyId: string): Promise<true> {
     await charmClient.deleteBounty(bountyId);
-    setBounties(bounties.filter(bounty => bounty.id !== bountyId));
+    setBounties(_bounties => _bounties.filter(bounty => bounty.id !== bountyId));
     if (currentBounty?.id === bountyId) {
       setCurrentBounty(null);
     }
@@ -110,7 +111,7 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
 
     if (bountyToSet) {
       // Replace current bounty in list of bounties
-      setBounties(bounties.map(b => b.id === bountyToSet.id ? bountyToSet : b));
+      setBounties(_bounties => _bounties.map(b => b.id === bountyToSet.id ? bountyToSet : b));
     }
 
   }

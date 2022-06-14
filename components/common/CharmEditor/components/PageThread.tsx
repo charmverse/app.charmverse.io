@@ -204,7 +204,7 @@ interface PageThreadProps {
   showFindButton?: boolean;
 }
 
-const ThreadCreatedDate = memo<{createdAt: Date}>(({ createdAt }) => {
+function ThreadCreatedDate ({ createdAt }: {createdAt: Date}) {
   return (
     <Tooltip arrow placement='bottom' title={new Date(createdAt).toLocaleString()}>
       <Typography
@@ -221,7 +221,7 @@ const ThreadCreatedDate = memo<{createdAt: Date}>(({ createdAt }) => {
       </Typography>
     </Tooltip>
   );
-});
+}
 
 const CommentDate = memo<{createdAt: Date, updatedAt?: Date | null}>(({ createdAt, updatedAt }) => {
   return (
@@ -359,7 +359,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                           fontSize='small'
                         />
                       )}
-                      disabled={isMutating || !permissions.edit_content || (thread.userId !== user?.id)}
+                      disabled={isMutating || !permissions.comment}
                       onClick={async () => {
                         setIsMutating(true);
                         await resolveThread(threadId);
@@ -367,7 +367,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                         setIsMutating(false);
                       }}
                     />
-                  ) : (comment.userId === user?.id && permissions.edit_content)
+                  ) : (comment.userId === user?.id && permissions.comment)
                   && (
                     <IconButton
                       className='comment-actions'
@@ -445,7 +445,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
           </MenuItem>
         </Menu>
       </div>
-      {permissions.edit_content && (
+      {permissions.comment && (
         <AddCommentCharmEditor
           key={thread.comments[thread.comments.length - 1]?.id}
           readOnly={Boolean(editedCommentId)}
