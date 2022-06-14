@@ -73,7 +73,8 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
             pagePath: page.path,
             spaceName: page.space.name,
             userId: mention.createdBy,
-            pageTitle: page.title
+            pageTitle: page.title,
+            text: mention.text
           };
         }
       });

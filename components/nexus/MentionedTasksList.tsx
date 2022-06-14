@@ -20,7 +20,8 @@ function MentionedTaskRow (
     spaceName,
     pageTitle,
     mentionId,
-    createdBy
+    createdBy,
+    text
   }: MentionedTask & { marked: boolean }
 ) {
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : null;
@@ -38,9 +39,18 @@ function MentionedTaskRow (
           }}
         />
       ) : null}
-      <Link href={baseUrl ? `${baseUrl}/${spaceDomain}/${pagePath}?mentionId=${mentionId}` : ''}>
+      <Link target='_blank' href={baseUrl ? `${baseUrl}/${spaceDomain}/${pagePath}?mentionId=${mentionId}` : ''}>
         <Card key={mentionId} sx={{ width: '100%', opacity: marked ? 0.75 : 1, p: 1.5, my: 2, borderLeft: 0, borderRight: 0 }} variant='outlined'>
           <Grid justifyContent='space-between' alignItems='center' container>
+            <Grid
+              item
+              xs={5}
+              sx={{
+                fontWeight: 'bold'
+              }}
+            >
+              {text.slice(0, 30)}...
+            </Grid>
             <Grid
               item
               xs={2}

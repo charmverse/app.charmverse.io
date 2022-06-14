@@ -10,6 +10,7 @@ export interface MentionedTask {
   spaceName: string
   createdBy: User | null
   pageTitle: string
+  text: string
 }
 
 export type MarkMentionTask = Pick<MentionedTask, 'mentionId' | 'createdAt'>
