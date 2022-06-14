@@ -69,15 +69,16 @@ async function updateThread (req: NextApiRequest, res: NextApiResponse<ThreadWit
   if (!thread) {
     throw new DataNotFoundError(`Could not find thread with id ${threadId}`);
   }
+  if (thread.pageId) {
+    const permissionSet = await computeUserPagePermissions({
+      pageId: thread.pageId,
+      userId,
+      allowAdminBypass: false
+    });
 
-  const permissionSet = await computeUserPagePermissions({
-    pageId: thread.pageId,
-    userId,
-    allowAdminBypass: false
-  });
-
-  if (!permissionSet.comment) {
-    throw new ActionNotPermittedError();
+    if (!permissionSet.comment) {
+      throw new ActionNotPermittedError();
+    }
   }
 
   if (typeof req.body.resolved === 'boolean') {
