@@ -7,7 +7,6 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import UserDisplay from 'components/common/UserDisplay';
 import { User } from '@prisma/client';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { useEffect } from 'react';
 import charmClient from 'charmClient';
 import useTasks from './hooks/useTasks';
@@ -27,93 +26,93 @@ function MentionedTaskRow (
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : null;
 
   return (
-    <Card key={mentionId} sx={{ opacity: marked ? 0.75 : 1, p: 1.5, my: 2, borderLeft: 0, borderRight: 0 }} variant='outlined'>
-      <Grid justifyContent='space-between' alignItems='center' container>
-        <Grid
-          item
-          xs={2}
+    <Box position='relative'>
+      {!marked ? (
+        <VisibilityIcon
+          fontSize='small'
           sx={{
-            fontSize: { xs: 14, sm: 'inherit' },
-            display: 'flex',
-            alignItems: 'center',
-            gap: 2
+            position: 'absolute',
+            left: -35,
+            top: '50%',
+            transform: 'translateY(-50%)'
           }}
-        >
-          {!marked ? <VisibilityOffIcon fontSize='small' /> : <VisibilityIcon fontSize='small' />}
-          <Typography variant='body2'>
-            <Link
-              sx={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 0.5
-              }}
-              href={baseUrl ? `${baseUrl}/${spaceDomain}` : ''}
-              external
-              target='_blank'
-            >{spaceName} <OpenInNewIcon fontSize='small' />
-            </Link>
-          </Typography>
+        />
+      ) : null}
+      <Card key={mentionId} sx={{ width: '100%', opacity: marked ? 0.75 : 1, p: 1.5, my: 2, borderLeft: 0, borderRight: 0 }} variant='outlined'>
+        <Grid justifyContent='space-between' alignItems='center' container>
+          <Grid
+            item
+            xs={2}
+            sx={{
+              fontSize: { xs: 14, sm: 'inherit' },
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2
+            }}
+          >
+            <Typography variant='body2'>
+              <Link
+                sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 0.5
+                }}
+                href={baseUrl ? `${baseUrl}/${spaceDomain}` : ''}
+                external
+                target='_blank'
+              >{spaceName} <OpenInNewIcon fontSize='small' />
+              </Link>
+            </Typography>
+          </Grid>
+          <Grid
+            item
+            xs={2}
+            sx={{
+              fontSize: { xs: 14, sm: 'inherit' }
+            }}
+          >
+            <Typography variant='body2'>
+              <Link
+                sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 0.5
+                }}
+                href={baseUrl ? `${baseUrl}/${spaceDomain}/${pagePath}?mentionId=${mentionId}` : ''}
+                external
+                target='_blank'
+              >{pageTitle} <OpenInNewIcon fontSize='small' />
+              </Link>
+            </Typography>
+          </Grid>
+          <Grid
+            item
+            xs={2}
+            sx={{
+              fontSize: { xs: 14, sm: 'inherit' }
+            }}
+          >
+            {DateTime.fromISO(createdAt).toRelative({ base: DateTime.now() })}
+          </Grid>
+          <Grid
+            item
+            xs={2}
+          >
+            <UserDisplay avatarSize='small' linkToProfile user={createdBy as User} />
+          </Grid>
         </Grid>
-        <Grid
-          item
-          xs={2}
-          sx={{
-            fontSize: { xs: 14, sm: 'inherit' }
-          }}
-        >
-          <Typography variant='body2'>
-            <Link
-              sx={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 0.5
-              }}
-              href={baseUrl ? `${baseUrl}/${spaceDomain}/${pagePath}?mentionId=${mentionId}` : ''}
-              external
-              target='_blank'
-            >{pageTitle} <OpenInNewIcon fontSize='small' />
-            </Link>
-          </Typography>
-        </Grid>
-        <Grid
-          item
-          xs={2}
-          sx={{
-            fontSize: { xs: 14, sm: 'inherit' }
-          }}
-        >
-          {DateTime.fromISO(createdAt).toRelative({ base: DateTime.now() })}
-        </Grid>
-        <Grid
-          item
-          xs={2}
-        >
-          <UserDisplay avatarSize='small' linkToProfile user={createdBy as User} />
-        </Grid>
-      </Grid>
-    </Card>
+      </Card>
+    </Box>
   );
 }
 
 export default function MentionedTasksList () {
-  const { mutate: mutateTasks, tasks, error } = useTasks();
+  const { tasks, error } = useTasks();
 
   useEffect(() => {
     async function main () {
-      if (tasks?.mentioned) {
+      if (tasks?.mentioned && tasks.mentioned.unmarked.length !== 0) {
         await charmClient.markMentions(tasks.mentioned.unmarked);
-        mutateTasks((data) => {
-          if (data?.mentioned) {
-            data.mentioned.marked = [
-              ...data.mentioned.marked,
-              ...data.mentioned.unmarked
-            ].sort((mentionA, mentionB) => mentionA.createdAt > mentionB.createdAt ? -1 : 1);
-            data.mentioned.unmarked = [];
-          }
-          return data;
-        }, {
-          revalidate: false
-        });
       }
     }
 
