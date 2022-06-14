@@ -28,6 +28,8 @@ import { CryptoCurrency, FiatCurrency } from 'connectors';
 import { markdownSerializer } from '@bangle.dev/markdown';
 import PageThreadsList from 'components/[pageId]/DocumentPage/components/PageThreadsList';
 import { Grow } from '@mui/material';
+import { useUser } from 'hooks/useUser';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
 import Callout, * as callout from './components/callout';
 import * as columnLayout from './components/columnLayout';
@@ -51,6 +53,7 @@ import InlineCommentThread, * as inlineComment from './components/inlineComment'
 import Paragraph from './components/Paragraph';
 import Mention, { MentionSuggest, mentionPlugins, mentionSpecs, mentionPluginKeyName } from './components/mention';
 import DevTools from './DevTools';
+import { charmPlugin } from './components/charm/charm.plugins';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -107,10 +110,19 @@ export function charmEditorPlugins (
     onContentChange,
     readOnly,
     disabledPageSpecificFeatures = false,
-    enableComments = true
+    enableComments = true,
+    userId = null,
+    pageId = null,
+    spaceId = null
   }:
     {
-      readOnly?: boolean, onContentChange?: (view: EditorView) => void, disabledPageSpecificFeatures?: boolean, enableComments?: boolean
+      spaceId?: string | null,
+      pageId?: string | null,
+      userId?: string | null,
+      readOnly?: boolean,
+      onContentChange?: (view: EditorView) => void,
+      disabledPageSpecificFeatures?: boolean,
+      enableComments?: boolean
     } = {}
 ): () => RawPlugins[] {
   const basePlugins: RawPlugins[] = [
@@ -122,6 +134,11 @@ export function charmEditorPlugins (
           }
         }
       })
+    }),
+    charmPlugin({
+      userId,
+      pageId,
+      spaceId
     }),
     nestedPagePlugins({
       key: nestedPagePluginKey
@@ -288,6 +305,7 @@ interface CharmEditorProps {
   style?: CSSProperties;
   showingCommentThreadsList?: boolean
   disabledPageSpecificFeatures?: boolean
+  pageId?: string | null
 }
 
 export function convertPageContentToMarkdown (content: PageContent, title?: string): string {
@@ -318,14 +336,16 @@ function CharmEditor (
     onContentChange,
     style,
     readOnly = false,
-    disabledPageSpecificFeatures = false
+    disabledPageSpecificFeatures = false,
+    pageId
   }:
   CharmEditorProps
 ) {
+  const [currentSpace] = useCurrentSpace();
   // check empty state of page on first load
   const _isEmpty = checkForEmpty(content);
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
-
+  const [currentUser] = useUser();
   const onContentChangeDebounced = onContentChange ? debounce((view: EditorView) => {
     const doc = view.state.doc.toJSON() as PageContent;
     const rawText = view.state.doc.textContent as string;
@@ -345,7 +365,10 @@ function CharmEditor (
     plugins: charmEditorPlugins({
       onContentChange: _onContentChange,
       readOnly,
-      disabledPageSpecificFeatures
+      disabledPageSpecificFeatures,
+      pageId,
+      spaceId: currentSpace?.id,
+      userId: currentUser?.id
     }),
     initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
     // hide the black bar when dragging items - we dont even support dragging most components

@@ -22,6 +22,9 @@ export function mentionSpecs (): RawSpecs {
           },
           createdAt: {
             default: null
+          },
+          createdBy: {
+            default: null
           }
         },
         inline: true,
