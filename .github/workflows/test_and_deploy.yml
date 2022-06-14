@@ -97,7 +97,7 @@ jobs:
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: web3-workspace
+          application_name: CharmVerse Worker
           environment_name: charmverse-worker
           version_label: ${{ github.sha }}
           region: us-east-1
