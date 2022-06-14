@@ -24,3 +24,4 @@ export type PermissionAssignee<A extends AssignablePermissionGroups = Assignable
     user?: User
   }
 
+export type UserPermissionFlags<T extends string> = Record<T, boolean>

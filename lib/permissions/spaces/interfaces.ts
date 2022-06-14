@@ -8,3 +8,5 @@ export type SpacePermissionModification<A extends AssignablePermissionGroups = A
 export type SpacePermissionWithAssignee<A extends AssignablePermissionGroups = AssignablePermissionGroups> = SpacePermission
   & PermissionAssignee<A>
   & PermissionAssigneeId<A>
+
+export type SpacePermissionFlags = {[key in SpaceOperation]: boolean}
