@@ -9,4 +9,5 @@ export interface MentionedTask {
   pagePath: string
   spaceName: string
   createdBy: User | null
+  pageTitle: string
 }

@@ -4,16 +4,29 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { MentionedTask } from 'lib/mentions/interfaces';
 import { DateTime } from 'luxon';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import UserDisplay from 'components/common/UserDisplay';
+import { User } from '@prisma/client';
 import useTasks from './hooks/useTasks';
 
-function MentionedTaskRow ({ createdAt, pagePath, spaceDomain, spaceName, mentionId }: MentionedTask) {
+function MentionedTaskRow (
+  {
+    createdAt,
+    marked,
+    pagePath,
+    spaceDomain,
+    spaceName,
+    pageTitle,
+    mentionId,
+    createdBy
+  }: MentionedTask & { marked: boolean }
+) {
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : null;
   return (
-    <Card key={mentionId} sx={{ px: 1, my: 2, borderLeft: 0, borderRight: 0 }} variant='outlined'>
+    <Card key={mentionId} sx={{ opacity: marked ? 0.75 : 1, p: 1.5, my: 2, borderLeft: 0, borderRight: 0 }} variant='outlined'>
       <Grid justifyContent='space-between' alignItems='center' container>
         <Grid
           item
-          xs={4}
+          xs={2}
           sx={{
             fontSize: { xs: 14, sm: 'inherit' }
           }}
@@ -28,13 +41,13 @@ function MentionedTaskRow ({ createdAt, pagePath, spaceDomain, spaceName, mentio
               href={baseUrl ? `${baseUrl}/${spaceDomain}` : ''}
               external
               target='_blank'
-            >{spaceDomain} <OpenInNewIcon fontSize='small' />
+            >{spaceName} <OpenInNewIcon fontSize='small' />
             </Link>
           </Typography>
         </Grid>
         <Grid
           item
-          xs={4}
+          xs={2}
           sx={{
             fontSize: { xs: 14, sm: 'inherit' }
           }}
@@ -49,18 +62,24 @@ function MentionedTaskRow ({ createdAt, pagePath, spaceDomain, spaceName, mentio
               href={baseUrl ? `${baseUrl}/${spaceDomain}/${pagePath}?mentionId=${mentionId}` : ''}
               external
               target='_blank'
-            >Link <OpenInNewIcon fontSize='small' />
+            >{pageTitle} <OpenInNewIcon fontSize='small' />
             </Link>
           </Typography>
         </Grid>
         <Grid
           item
-          xs={4}
+          xs={2}
           sx={{
             fontSize: { xs: 14, sm: 'inherit' }
           }}
         >
           {DateTime.fromISO(createdAt).toRelative({ base: DateTime.now() })}
+        </Grid>
+        <Grid
+          item
+          xs={2}
+        >
+          <UserDisplay avatarSize='small' linkToProfile user={createdBy as User} />
         </Grid>
       </Grid>
     </Card>
@@ -70,22 +89,23 @@ function MentionedTaskRow ({ createdAt, pagePath, spaceDomain, spaceName, mentio
 export default function MentionedTasksList () {
   const { tasks, error } = useTasks();
 
-  if (tasks?.mentioned.length === 0) {
-    if (error) {
-      return (
-        <Box>
-          <Alert severity='error'>
-            There was an error. Please try again later!
-          </Alert>
-        </Box>
-      );
-    }
-    else {
-      return <LoadingComponent height='200px' isLoading={true} />;
-    }
+  if (error) {
+    return (
+      <Box>
+        <Alert severity='error'>
+          There was an error. Please try again later!
+        </Alert>
+      </Box>
+    );
+  }
+  else if (!tasks?.mentioned) {
+    return <LoadingComponent height='200px' isLoading={true} />;
   }
 
   return (
-    tasks?.mentioned.map((mentionedTask) => <MentionedTaskRow {...mentionedTask} />)
+    <>
+      {tasks?.mentioned.unmarked.map((mentionedTask) => <MentionedTaskRow {...mentionedTask} marked />)}
+      {tasks?.mentioned.marked.map((mentionedTask) => <MentionedTaskRow {...mentionedTask} marked={false} />)}
+    </>
   );
 }

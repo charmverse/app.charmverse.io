@@ -3,7 +3,12 @@ import { PageContent, User } from 'models';
 import { extractMentions } from './extractMentions';
 import { MentionedTask } from './interfaces';
 
-export async function getMentionedTasks (userId: string): Promise<MentionedTask[]> {
+export type MentionedTasksGroup = {
+  marked: MentionedTask[],
+  unmarked: MentionedTask[]
+}
+
+export async function getMentionedTasks (userId: string): Promise<MentionedTasksGroup> {
   // Get all the space the user is part of
   const spaceRoles = await prisma.spaceRole.findMany({
     where: {
@@ -16,6 +21,18 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTask[
 
   const spaceIds = spaceRoles.map(spaceRole => spaceRole.spaceId);
 
+  const markedMentionTasks = await prisma.userNotification.findMany({
+    where: {
+      userId,
+      type: 'mention'
+    },
+    select: {
+      taskId: true
+    }
+  });
+
+  const markedMentionTaskIds = new Set(markedMentionTasks.map(markedMentionTask => markedMentionTask.taskId));
+
   const pages = await prisma.page.findMany({
     where: {
       spaceId: {
@@ -26,6 +43,7 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTask[
       content: true,
       id: true,
       path: true,
+      title: true,
       space: {
         select: {
           domain: true,
@@ -54,7 +72,8 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTask[
             spaceDomain: page.space.domain,
             pagePath: page.path,
             spaceName: page.space.name,
-            userId: mention.createdBy
+            userId: mention.createdBy,
+            pageTitle: page.title
           };
         }
       });
@@ -71,7 +90,20 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTask[
 
   const usersRecord: Record<string, User> = users.reduce((acc, cur) => ({ ...acc, [cur.id]: cur }), {});
 
-  return Object.values(
+  const mentionedTasks: MentionedTasksGroup = { marked: [], unmarked: [] };
+
+  Object.values(
     mentionedTasksWithoutUserRecord
-  ).map(mentionedTaskWithoutUser => ({ ...mentionedTaskWithoutUser, createdBy: usersRecord[mentionedTaskWithoutUser.userId] }));
+  ).forEach(mentionedTaskWithoutUser => {
+    // joining the mentioned task with the user
+    const mentionedTask = { ...mentionedTaskWithoutUser, createdBy: usersRecord[mentionedTaskWithoutUser.userId] };
+    if (markedMentionTaskIds.has(mentionedTask.mentionId)) {
+      mentionedTasks.marked.push(mentionedTask);
+    }
+    else {
+      mentionedTasks.unmarked.push(mentionedTask);
+    }
+  });
+
+  return mentionedTasks;
 }
