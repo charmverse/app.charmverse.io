@@ -4,16 +4,16 @@ import { v4 as uuid } from 'uuid';
 import { useRouter } from 'next/router';
 import { ResourceId, checkAndSignAuthMessage, SigningConditions } from 'lit-js-sdk';
 import ShareModal from 'lit-share-modal-v3-react-17';
-import { usePopupState, bindTrigger } from 'material-ui-popup-state/hooks';
+import Modal, { ErrorModal } from 'components/common/Modal';
+import { usePopupState, bindPopover, bindTrigger } from 'material-ui-popup-state/hooks';
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import { TokenGate } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import charmClient from 'charmClient';
-import BackDrop from '@mui/material/Backdrop';
-import Portal from '@mui/material/Portal';
+import styled from '@emotion/styled';
+import { useTheme } from '@emotion/react';
 import { Box } from '@mui/material';
-import { ErrorModal } from 'components/common/Modal';
 import Button from 'components/common/Button';
 import { getLitChainFromChainId } from 'lib/token-gates';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -21,6 +21,18 @@ import useSWR from 'swr';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import Legend from '../Legend';
 import TokenGatesTable from './TokenGatesTable';
+
+const ShareModalContainer = styled.div`
+
+width: 500px;
+height: 700px;
+// position: absolute;
+// left: 50%;
+// top: 50%;
+// transform: translate(-50%, -50%);
+border: 1px solid #333;
+border-radius: 0.25em;
+`;
 
 // Example: https://github.com/LIT-Protocol/lit-js-sdk/blob/9b956c0f399493ae2d98b20503c5a0825e0b923c/build/manual_tests.html
 
@@ -30,6 +42,7 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
   const deletePopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-delete' });
   const [removedTokenGate, setRemovedTokenGate] = useState<TokenGate | null>(null);
 
+  const theme = useTheme();
   const litClient = useLitProtocol();
   const router = useRouter();
   const { chainId } = useWeb3React();
@@ -126,23 +139,18 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
       {data && data.length === 0 && <Typography color='secondary'>No token gates yet</Typography>}
       {data && data?.length > 0
         && <TokenGatesTable isAdmin={isAdmin} tokenGates={data} onDelete={deleteTokenGate} />}
-      <Portal>
-        <BackDrop
-          onClick={popupState.close}
-          open={popupState.isOpen}
-          sx={{ zIndex: 'var(--z-index-modal)' }}
-        >
-          <div role='dialog' onClick={e => e.stopPropagation()}>
-            <ShareModal
-              injectCSS={false}
-              permanentDefault={true}
-              onClose={popupState.close}
-              showModal={popupState.isOpen}
-              onUnifiedAccessControlConditionsSelected={onSubmit}
-            />
-          </div>
-        </BackDrop>
-      </Portal>
+      <Modal {...bindPopover(popupState)} size='large'>
+        <ShareModalContainer>
+          <ShareModal
+            darkMode={theme.palette.mode === 'dark'}
+            injectCSS={false}
+            permanentDefault={true}
+            onClose={popupState.close}
+            isModal={false}
+            onUnifiedAccessControlConditionsSelected={onSubmit}
+          />
+        </ShareModalContainer>
+      </Modal>
       <ErrorModal message={apiError} open={errorPopupState.isOpen} onClose={errorPopupState.close} />
       {removedTokenGate && (
       <ConfirmDeleteModal

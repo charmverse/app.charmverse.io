@@ -1,10 +1,9 @@
 
 import { Page } from '@prisma/client';
-import PageLayout from 'components/common/PageLayout';
+import getPageLayout from 'components/common/PageLayout/getLayout';
 import EditorPage from 'components/[pageId]/EditorPage/EditorPage';
 import { usePages } from 'hooks/usePages';
 import { useRouter } from 'next/router';
-import { ReactElement } from 'react';
 
 export default function BlocksEditorPage () {
 
@@ -23,10 +22,4 @@ export default function BlocksEditorPage () {
 
 }
 
-BlocksEditorPage.getLayout = (page: ReactElement) => {
-  return (
-    <PageLayout>
-      {page}
-    </PageLayout>
-  );
-};
+BlocksEditorPage.getLayout = getPageLayout;

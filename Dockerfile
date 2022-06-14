@@ -6,8 +6,7 @@ WORKDIR /app
 
 COPY . .
 
-ENV NODE_ENV production
-
+ENV PORT 3000
 
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
@@ -15,5 +14,4 @@ ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
 
 EXPOSE 3000
-
-CMD ["npm", "run", "start:prod"]
+CMD ["sh", "-c", "exec npm run $DOCKER_NPM_COMMAND"]

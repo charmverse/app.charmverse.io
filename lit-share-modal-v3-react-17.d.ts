@@ -1,6 +1,7 @@
 import * as React from 'react';
+import { SigningConditions } from 'lit-js-sdk';
 
-declare module 'lit-share-modal' {
+declare module 'lit-share-modal-v3-react-17' {
 
   export type ConditionsModalResult = Pick<SigningConditions, 'unifiedAccessControlConditions' | 'permanant'>;
 
@@ -24,9 +25,7 @@ declare module 'lit-share-modal' {
     onUnifiedAccessControlConditionsSelected (result: ConditionsModalResult): void;
   }
 
-  // eslint-disable-next-line react/prefer-stateless-function
-  class ShareModal extends React.Component<ShareModalProps, any> {}
+  declare const ShareModal: React.FC<ShareModalProps>;
 
   export default ShareModal;
-
 }
