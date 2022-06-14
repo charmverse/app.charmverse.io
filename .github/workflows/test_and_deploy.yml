@@ -44,7 +44,7 @@ jobs:
         run: npm run start:test:ci &
 
       - name: Run tests
-        run: npm run test:server
+        run: npm run test:server:ci
 
   deploy:
     name: Deploy to production

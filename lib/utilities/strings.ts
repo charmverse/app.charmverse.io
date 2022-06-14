@@ -56,8 +56,13 @@ export function getUriWithParam (
   const Url = new URL(baseUrl);
   const urlParams: URLSearchParams = new URLSearchParams(Url.search);
   for (const key in params) {
-    if (params[key] !== undefined) {
-      urlParams.set(key, params[key]);
+    if (params.hasOwnProperty(key)) {
+      if (typeof params[key] === 'string') {
+        urlParams.set(key, params[key]);
+      }
+      else {
+        urlParams.delete(key);
+      }
     }
   }
   Url.search = urlParams.toString();

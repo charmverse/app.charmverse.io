@@ -21,7 +21,7 @@
     "start": "npm run server:dev",
     "start:dev:cron": "concurrently --names \"cron,next\" -c \"yellow,green\" \"npm run cron:dev\" \"npm run server:dev\"",
     "postinstall": "patch-package",
-    "start:test": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local -- npm start",
+    "start:test": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local -- prisma migrate deploy && dotenv -e .env.test.local -- npm start",
     "start:test:ci": "NODE_OPTIONS=\"--max_old_space_size=4096\" npx react-env --path .env.test.local -- npx next start",
     "start:prod": "npm run migrate:prod && concurrently --names \"cron,next\" -c \"yellow,green\" \"npm run cron:prod\" \"npm run server:prod\"",
     "start:staging": "npm run migrate:staging && concurrently --names \"cron,next\" -c \"yellow,green\" \"npm run cron:staging\" \"npm run server:staging\"",
@@ -33,7 +33,8 @@
     "test:setup-db": "./testing/configure-db.sh",
     "test:client": "npm run test-setup && jest --config='./jest.config-client.ts'",
     "test:migrate": "dotenv -e .env.local -- npx prisma migrate dev",
-    "test:server": "dotenv -e .env.test.local --override -- npx jest --config='./jest.config-server.ts' --verbose",
+    "test:server": "dotenv -e .env.test.local --override -- npx jest --config='./jest.config-server.ts' --verbose --watch",
+    "test:server:ci": "dotenv -e .env.test.local --override -- npx jest --config='./jest.config-server.ts'",
     "test:server:debug": "dotenv -e .env.test.local --override -- node --inspect-brk --expose-gc ./node_modules/.bin/jest --runInBand --logHeapUsage --config='./jest.config-server.ts' --verbose",
     "test:server-integration": "dotenv -e .env.test.local --override -- npx jest --config='./jest.config-server-integration.ts' --verbose"
   },
