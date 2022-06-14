@@ -37,7 +37,7 @@
     "test:server:debug": "dotenv -e .env.test.local --override -- node --inspect-brk --expose-gc ./node_modules/.bin/jest --runInBand --logHeapUsage --config='./jest.config-server.ts' --verbose",
     "test:server-integration": "dotenv -e .env.test.local --override -- npx jest --config='./jest.config-server-integration.ts' --verbose"
   },
-  "prepare": "husky install",
+  "type": "module",
   "lint-staged": {
     "*.{ts,tsx}": [
       "eslint --fix"
@@ -120,8 +120,8 @@
     "immutability-helper": "^3.1.1",
     "immutable": "^4.0.0",
     "iron-session": "^6.0.5",
-    "lit-js-sdk": "^1.1.169",
-    "lit-share-modal": "^0.1.82",
+    "lit-js-sdk": "^1.1.182",
+    "lit-share-modal-v3-react-17": "^0.0.67",
     "lodash": "^4.17.21",
     "loglevel": "^1.8.0",
     "luxon": "^2.3.1",

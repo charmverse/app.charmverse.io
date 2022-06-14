@@ -1,9 +1,9 @@
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 import { v4 as uuid } from 'uuid';
-import ShareModal from 'lit-share-modal';
 import { useRouter } from 'next/router';
 import { ResourceId, checkAndSignAuthMessage, SigningConditions } from 'lit-js-sdk';
+import ShareModal from 'lit-share-modal-v3-react-17';
 import { usePopupState, bindTrigger } from 'material-ui-popup-state/hooks';
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import { TokenGate } from '@prisma/client';
@@ -134,9 +134,11 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
         >
           <div role='dialog' onClick={e => e.stopPropagation()}>
             <ShareModal
+              injectCSS={false}
+              permanentDefault={true}
               onClose={popupState.close}
               showModal={popupState.isOpen}
-              onAccessControlConditionsSelected={onSubmit}
+              onUnifiedAccessControlConditionsSelected={onSubmit}
             />
           </div>
         </BackDrop>

@@ -1,6 +1,11 @@
-const path = require('path');
+// const path = require('path');
+import path from 'path';
+import next from 'next/dist/lib/is-serializable-props.js';
 
-const esmModules = [
+import BundleAnalyzer from '@next/bundle-analyzer';
+import transpileModules from 'next-transpile-modules';
+
+export const esmModules = [
   '@bangle.dev/base-components',
   '@bangle.dev/core',
   '@bangle.dev/pm',
@@ -16,12 +21,14 @@ const esmModules = [
   '@fullcalendar/daygrid',
   '@fullcalendar/interaction',
   '@fullcalendar/react',
-  'react-dnd'
+  'react-dnd',
+  'lit-share-modal-v3-react-17'
 ];
 
 const config = {
   generateEtags: false,
   poweredByHeader: false,
+  swcMinify: true,
   webpack5: true,
   experimental: {
     esmExternals: 'loose',
@@ -78,20 +85,19 @@ const removeUndefined = obj => {
   });
   return newObj;
 };
-const next = require('next/dist/lib/is-serializable-props');
+// const next = require('next/dist/lib/is-serializable-props');
 // eslint-disable-next-line prefer-destructuring
-const isSerializableProps = next.isSerializableProps;
-next.isSerializableProps = function _isSerializableProps (page, method, input) {
-  return isSerializableProps(page, method, removeUndefined(input));
-};
+// const isSerializableProps = next.isSerializableProps;
+// next.isSerializableProps = function _isSerializableProps (page, method, input) {
+//   return isSerializableProps(page, method, removeUndefined(input));
+// };
 
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
+const withBundleAnalyzer = BundleAnalyzer({
   enabled: process.env.ANALYZE === 'true'
 });
 
 // fix for esm modules
-const withTM = require('next-transpile-modules')(esmModules);
+const withTM = transpileModules(esmModules);
 
-module.exports = withBundleAnalyzer(withTM(config));
+export default withBundleAnalyzer(withTM(config));
 
-module.exports.esmModules = esmModules;
