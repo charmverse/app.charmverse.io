@@ -1,3 +1,5 @@
+import { User } from '@prisma/client';
+
 export interface MentionedTask {
   pageId: string
   mentionId: string
@@ -6,5 +8,5 @@ export interface MentionedTask {
   spaceDomain: string
   pagePath: string
   spaceName: string
-  createdBy: string
+  createdBy: User | null
 }

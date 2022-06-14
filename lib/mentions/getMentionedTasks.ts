@@ -1,5 +1,5 @@
 import { prisma } from 'db';
-import { PageContent } from 'models';
+import { PageContent, User } from 'models';
 import { extractMentions } from './extractMentions';
 import { MentionedTask } from './interfaces';
 
@@ -36,7 +36,8 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTask[
     }
   });
 
-  const mentionedTasks: MentionedTask[] = [];
+  const mentionedTasksWithoutUserRecord: Record<string, Omit<MentionedTask, 'createdBy'> & {userId: string}> = {};
+  const mentionUserIds: string[] = [];
 
   for (const page of pages) {
     const content = page.content as PageContent;
@@ -44,7 +45,8 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTask[
       const mentions = extractMentions(content);
       mentions.forEach(mention => {
         if (page.space) {
-          mentionedTasks.push({
+          mentionUserIds.push(mention.createdBy);
+          mentionedTasksWithoutUserRecord[mention.id] = {
             mentionId: mention.id,
             createdAt: mention.createdAt,
             pageId: page.id,
@@ -52,12 +54,24 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTask[
             spaceDomain: page.space.domain,
             pagePath: page.path,
             spaceName: page.space.name,
-            createdBy: mention.createdBy
-          });
+            userId: mention.createdBy
+          };
         }
       });
     }
   }
 
-  return mentionedTasks;
+  const users = await prisma.user.findMany({
+    where: {
+      id: {
+        in: mentionUserIds
+      }
+    }
+  });
+
+  const usersRecord: Record<string, User> = users.reduce((acc, cur) => ({ ...acc, [cur.id]: cur }), {});
+
+  return Object.values(
+    mentionedTasksWithoutUserRecord
+  ).map(mentionedTaskWithoutUser => ({ ...mentionedTaskWithoutUser, createdBy: usersRecord[mentionedTaskWithoutUser.userId] }));
 }
