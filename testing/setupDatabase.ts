@@ -1,4 +1,4 @@
-import { ApplicationStatus, Block, Bounty, BountyStatus, Page, Prisma, Space, SpaceApiToken, Thread, Transaction, Comment } from '@prisma/client';
+import { ApplicationStatus, Block, Bounty, BountyStatus, Page, Prisma, Space, SpaceApiToken, Thread, Transaction, Comment, Role } from '@prisma/client';
 import { prisma } from 'db';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import { IPageWithPermissions } from 'lib/pages';
@@ -169,6 +169,25 @@ export async function generateBountyWithSingleApplication ({ applicationStatus, 
   createdBounty.applications = [createdApp];
 
   return createdBounty;
+}
+
+/**
+ * @roleName uses UUID to ensure role names do not conflict
+ */
+export async function generateRole ({ spaceId, createdBy, roleName = `role-${v4()}` }: {spaceId: string, roleName?: string, createdBy: string}): Promise<Role> {
+  const role = await prisma.role.create({
+    data: {
+      name: roleName,
+      createdBy,
+      space: {
+        connect: {
+          id: spaceId
+        }
+      }
+    }
+  });
+
+  return role;
 }
 
 export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'createdBy'>): Promise<IPageWithPermissions> {
