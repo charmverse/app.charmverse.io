@@ -1,7 +1,7 @@
 import { prisma } from 'db';
-import { MentionedTask } from './interfaces';
+import { MarkMentionTask } from './interfaces';
 
-export async function markMentionedTasks (mentions: Pick<MentionedTask, 'createdAt' | 'mentionId'>[], userId: string) {
+export async function markMentionedTasks (mentions: MarkMentionTask[], userId: string) {
   const userNotifications = await prisma.userNotification.findMany({
     select: {
       taskId: true

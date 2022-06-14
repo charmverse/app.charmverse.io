@@ -11,3 +11,5 @@ export interface MentionedTask {
   createdBy: User | null
   pageTitle: string
 }
+
+export type MarkMentionTask = Pick<MentionedTask, 'mentionId' | 'createdAt'>

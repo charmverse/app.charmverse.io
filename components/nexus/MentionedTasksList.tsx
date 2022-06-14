@@ -8,6 +8,8 @@ import UserDisplay from 'components/common/UserDisplay';
 import { User } from '@prisma/client';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { useEffect } from 'react';
+import charmClient from 'charmClient';
 import useTasks from './hooks/useTasks';
 
 function MentionedTaskRow (
@@ -23,6 +25,7 @@ function MentionedTaskRow (
   }: MentionedTask & { marked: boolean }
 ) {
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : null;
+
   return (
     <Card key={mentionId} sx={{ opacity: marked ? 0.75 : 1, p: 1.5, my: 2, borderLeft: 0, borderRight: 0 }} variant='outlined'>
       <Grid justifyContent='space-between' alignItems='center' container>
@@ -36,7 +39,7 @@ function MentionedTaskRow (
             gap: 2
           }}
         >
-          {marked ? <VisibilityOffIcon fontSize='small' /> : <VisibilityIcon fontSize='small' />}
+          {!marked ? <VisibilityOffIcon fontSize='small' /> : <VisibilityIcon fontSize='small' />}
           <Typography variant='body2'>
             <Link
               sx={{
@@ -93,7 +96,31 @@ function MentionedTaskRow (
 }
 
 export default function MentionedTasksList () {
-  const { tasks, error } = useTasks();
+  const { mutate: mutateTasks, tasks, error } = useTasks();
+
+  useEffect(() => {
+    async function main () {
+      if (tasks?.mentioned) {
+        await charmClient.markMentions(tasks.mentioned.unmarked);
+        mutateTasks((data) => {
+          if (data?.mentioned) {
+            data.mentioned.marked = [
+              ...data.mentioned.marked,
+              ...data.mentioned.unmarked
+            ].sort((mentionA, mentionB) => mentionA.createdAt > mentionB.createdAt ? -1 : 1);
+            data.mentioned.unmarked = [];
+          }
+          return data;
+        }, {
+          revalidate: false
+        });
+      }
+    }
+
+    if (tasks?.mentioned) {
+      main();
+    }
+  }, [tasks]);
 
   if (error) {
     return (
