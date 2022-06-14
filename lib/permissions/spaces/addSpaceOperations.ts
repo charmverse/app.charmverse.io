@@ -6,6 +6,7 @@ import { hasAccessToSpace } from 'lib/middleware';
 import { InvalidPermissionGranteeError } from '../errors';
 import { AssignablePermissionGroups } from '../interfaces';
 import { SpacePermissionModification, SpacePermissionWithAssignee } from './interfaces';
+import { generateSpacePermissionQuery } from './utility';
 
 export async function addSpaceOperations<A extends AssignablePermissionGroups = AssignablePermissionGroups> ({
   forSpaceId,
@@ -60,22 +61,12 @@ export async function addSpaceOperations<A extends AssignablePermissionGroups = 
     throw new InsecureOperationError('Space permissions cannot be assigned to a different space than the target space.');
   }
 
-  const query: Prisma.SpacePermissionWhereUniqueInput = spaceId ? {
-    spaceId_forSpaceId: {
-      forSpaceId,
-      spaceId
-    }
-  } : roleId ? {
-    roleId_forSpaceId: {
-      forSpaceId,
-      roleId
-    }
-  } : {
-    userId_forSpaceId: {
-      forSpaceId,
-      userId: userId as string
-    }
-  };
+  const query = generateSpacePermissionQuery({
+    forSpaceId,
+    roleId,
+    spaceId,
+    userId
+  });
 
   const existingPermission = await prisma.spacePermission.findUnique({
     where: query,
