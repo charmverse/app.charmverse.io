@@ -66,7 +66,9 @@ jobs:
           rm -rf .next/cache
 
       - name: Add Datadog API Key
-        run: sed -i 's/{API_KEY}/${{ secrets.DATADOG_API_KEY }}/g' .ebextensions/99_datadog.config
+        run: |
+          sed -i 's/{API_KEY}/${{ secrets.DATADOG_API_KEY }}/g' .ebextensions/99_datadog.config
+          sed -i 's/{API_KEY}/${{ secrets.DATADOG_API_KEY }}/g' .ebextensions_cron/99_datadog.config
 
       - name: Configure Docker npm command
         run: sed -i 's/{DOCKER_NPM_COMMAND}/start:prod/g' .ebextensions/00_env_vars.config
@@ -76,7 +78,7 @@ jobs:
 
       - name: Update and Package background worker
         run: |
-          sed -i 's/start:prod/cron:prod/g' .ebextensions/00_env_vars.config
+          rm -rf .ebextensions && mv .ebextensions_cron .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy_cron.zip
 
       - name: Deploy to Beanstalk
