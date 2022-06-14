@@ -14,6 +14,7 @@ import { SystemError } from 'lib/utilities/errors';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
+import ApplicationThread from '../../components/ApplicationThread';
 
 const schema = yup.object({
   submission: yup.string().required(),
@@ -26,13 +27,14 @@ const schema = yup.object({
 
 type FormValues = yup.InferType<typeof schema>
 
-interface Props {
-  submission?: Application,
-  bounty: Bounty,
-  onSubmit: (submission: Application) => void
+interface BountySubmissionFormProps {
+  submission: Application;
+  bounty: Bounty;
+  onSubmit: (submission: Application) => void;
 }
 
-export default function BountySubmissionForm ({ submission, onSubmit: onSubmitProp, bounty }: Props) {
+export default function BountySubmissionForm (props: BountySubmissionFormProps) {
+  const { submission, onSubmit: onSubmitProp, bounty } = props;
   const [user] = useUser();
 
   const {
@@ -129,6 +131,15 @@ export default function BountySubmissionForm ({ submission, onSubmit: onSubmitPr
 
           <Grid item>
             <Button disabled={!isValid} type='submit'>Save</Button>
+          </Grid>
+
+          <Grid item>
+            <ApplicationThread
+              applicationId={submission.id}
+              spaceId={submission.spaceId}
+              canComment={true}
+              submissionId={submission.id}
+            />
           </Grid>
 
         </Grid>

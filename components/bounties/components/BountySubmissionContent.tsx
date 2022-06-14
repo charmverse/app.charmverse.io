@@ -1,5 +1,5 @@
 import Box from '@mui/material/Box';
-import { Application, Bounty } from '@prisma/client';
+import { Application } from '@prisma/client';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import { getDisplayName } from 'lib/users';
 import { useContributors } from 'hooks/useContributors';
@@ -10,7 +10,7 @@ import ApplicationThread from './ApplicationThread';
 interface BountySubmissionContentProps {
   submission: Application;
   user: LoggedInUser | null;
-  reviewerUser: Contributor;
+  reviewerUser: Contributor | undefined;
 }
 
 export default function BountySubmissionContent (props: BountySubmissionContentProps) {
@@ -19,7 +19,7 @@ export default function BountySubmissionContent (props: BountySubmissionContentP
 
   const submitter = contributors.find(c => c.id === submission.createdBy);
 
-  const canComment: boolean = user?.id === submitter?.id || user?.id === reviewerUser.id;
+  const canComment: boolean = user?.id === submitter?.id || user?.id === reviewerUser?.id;
 
   return (
     <Box flexGrow={1}>

@@ -110,7 +110,7 @@ function AddCommentCharmEditor (
   const { addComment } = useThreads();
 
   return (
-    <Box display='flex' px={1} pb={1} sx={sx} flexDirection='column' gap={1} mt={thread && thread.comments && thread.comments.length !== 0 ? 1 : 0}>
+    <Box display='flex' px={1} py={2} sx={sx} flexDirection='column' gap={1} mt={thread && thread.comments && thread.comments.length !== 0 ? 1 : 0}>
       <InlineCharmEditor
         style={{
           backgroundColor: theme.palette.background.default
