@@ -158,7 +158,7 @@ interface SidebarProps {
 export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const router = useRouter();
   const [user] = useUser();
-  const [space] = useCurrentSpace();
+  const [space,, userSpacePermissions] = useCurrentSpace();
   const [isScrolled, setIsScrolled] = useState(false);
   const [showingTrash, setShowingTrash] = useState(false);
 
@@ -221,9 +221,14 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               <SectionName>
                 WORKSPACE
               </SectionName>
-              <div className='add-a-page'>
-                <NewPageMenu tooltip='Add a page' addPage={addPage} />
-              </div>
+              {
+                userSpacePermissions.createPage && (
+                  <div className='add-a-page'>
+                    <NewPageMenu tooltip='Add a page' addPage={addPage} />
+                  </div>
+                )
+              }
+
             </WorkspaceLabel>
             <Box mb={6}>
               <PageNavigation />

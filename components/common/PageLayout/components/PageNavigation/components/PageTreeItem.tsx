@@ -2,7 +2,7 @@ import React, { forwardRef, ReactNode, SyntheticEvent, useCallback, useMemo, mem
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import { useIntl } from 'react-intl';
-import { Page } from '@prisma/client';
+import { Page, PageType } from '@prisma/client';
 import Link from 'next/link';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
@@ -46,7 +46,7 @@ interface PageTreeItemProps {
   isEmptyContent: boolean;
   labelIcon?: string;
   label: string;
-  pageType?: Page['type'];
+  pageType?: PageType;
   pageId: string;
   hasSelectedChildView: boolean;
   children: React.ReactNode;
@@ -318,6 +318,8 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
   const anchorOrigin = useMemo(() => ({ vertical: 'bottom', horizontal: 'left' } as const), []);
   const transformOrigin = useMemo(() => ({ vertical: 'top', horizontal: 'left' } as const), []);
 
+  const [,, userSpacePermissions] = useCurrentSpace();
+
   const labelComponent = useMemo(() => (
     <PageLink
       href={href}
@@ -330,11 +332,17 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
         <MemoizedIconButton size='small' onClick={showMenu}>
           <MoreHorizIcon color='secondary' fontSize='small' />
         </MemoizedIconButton>
-        {pageType === 'board' ? (
-          <AddNewCard pageId={pageId} />
-        ) : (
-          <NewPageMenu tooltip='Add a page inside' addPage={addSubPage} />
-        )}
+
+        {
+          userSpacePermissions.createPage && (
+            pageType === 'board' ? (
+              <AddNewCard pageId={pageId} />
+            ) : (
+              <NewPageMenu tooltip='Add a page inside' addPage={addSubPage} />
+            )
+          )
+        }
+
       </div>
     </PageLink>
   ), [href, label, pageId, icon, addSubPage, pageType]);
