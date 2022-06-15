@@ -3,13 +3,19 @@ import { prisma } from 'db';
 import { AssignedPermissionsQuery, PermissionAssigneeId } from '../interfaces';
 import { AvailableSpacePermissions } from './availableSpacePermissions';
 import { SpacePermissionFlags } from './interfaces';
+import { groupIsValid } from './utility';
 
 export async function computeGroupSpacePermissions ({ id, group, resourceId }:
   AssignedPermissionsQuery): Promise<SpacePermissionFlags> {
 
+  if (!id || !groupIsValid(group) || !resourceId) {
+    throw new InvalidInputError('Please verify your input for requesting computation of space permissions.');
+  }
+
   const permissionsToReturn = new AvailableSpacePermissions();
 
-  if (group === 'space') {
+  // Prevent space permissions going to other spaces
+  if (group === 'space' && id === resourceId) {
     const spacePermissions = await prisma.spacePermission.findUnique({
       where: {
         spaceId_forSpaceId: {
@@ -29,9 +35,13 @@ export async function computeGroupSpacePermissions ({ id, group, resourceId }:
           roleId: id,
           forSpaceId: resourceId
         }
+      },
+      include: {
+        role: true
       }
     });
-    if (rolePermissions) {
+    // Only take into account roles assigned to the space
+    if (rolePermissions && rolePermissions.role?.spaceId === resourceId) {
       permissionsToReturn.addPermissions(rolePermissions.operations);
     }
 

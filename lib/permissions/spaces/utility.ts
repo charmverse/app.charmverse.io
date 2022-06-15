@@ -1,5 +1,6 @@
 import { Prisma, SpacePermission } from '@prisma/client';
 import { MissingDataError } from 'lib/utilities/errors';
+import { AssignablePermissionGroups } from '../interfaces';
 
 export function generateSpacePermissionQuery ({ roleId, spaceId, userId, forSpaceId }: Pick<SpacePermission, 'forSpaceId'> & Partial<Pick<SpacePermission, 'userId' | 'roleId' | 'spaceId' | 'forSpaceId'>>): Prisma.SpacePermissionWhereUniqueInput {
 
@@ -23,4 +24,12 @@ export function generateSpacePermissionQuery ({ roleId, spaceId, userId, forSpac
       userId: userId as string
     }
   };
+}
+
+export function groupIsValid (group: AssignablePermissionGroups): boolean {
+  if (group !== 'role' && group !== 'space' && group !== 'user') {
+    return false;
+  }
+
+  return true;
 }
