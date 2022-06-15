@@ -40,7 +40,18 @@ describe('setupPermissionsAfterPageCreated', () => {
     }
   });
 
-  it('should assign a space default page permission to a root page if it exists', async () => {
+  it('should assign full access to the user creating the page', async () => {
+    const page = await createPage({
+      createdBy: user1.id,
+      spaceId: spaceWithDefaultPagePermissionGroup.id
+    });
+
+    const pageWithPermissions = await setupPermissionsAfterPageCreated(page.id);
+
+    expect(pageWithPermissions.permissions.some(p => p.userId === user1.id && p.permissionLevel === 'full_access'));
+  });
+
+  it('should assign the space default page permission to a root page', async () => {
 
     const page = await createPage({
       createdBy: user1.id,
@@ -49,8 +60,8 @@ describe('setupPermissionsAfterPageCreated', () => {
 
     const pageWithPermissions = await setupPermissionsAfterPageCreated(page.id);
 
-    expect(pageWithPermissions?.permissions.length).toBe(1);
-    expect(pageWithPermissions?.permissions[0]).toEqual(
+    expect(pageWithPermissions?.permissions.length).toBe(2);
+    expect(pageWithPermissions?.permissions.find(p => p.spaceId === spaceWithDefaultPagePermissionGroup.id)).toEqual(
       expect.objectContaining<Partial<PagePermission>>({
         inheritedFromPermission: null,
         spaceId: expect.stringContaining(spaceWithDefaultPagePermissionGroup.id),
@@ -60,7 +71,7 @@ describe('setupPermissionsAfterPageCreated', () => {
     );
   });
 
-  it('should assign full_access to a root page if it doesn\'t exists', async () => {
+  it('should assign full_access to a root page if the space has no default permission', async () => {
 
     const page = await createPage({
       createdBy: user2.id,
@@ -69,12 +80,12 @@ describe('setupPermissionsAfterPageCreated', () => {
 
     const pageWithPermissions = await setupPermissionsAfterPageCreated(page.id);
 
-    expect(pageWithPermissions?.permissions.length).toBe(1);
-    expect(pageWithPermissions?.permissions[0]).toEqual(
+    expect(pageWithPermissions?.permissions.length).toBe(2);
+    expect(pageWithPermissions?.permissions.find(p => p.spaceId === spaceWithoutDefaultPagePermissionGroup.id)).toEqual(
       expect.objectContaining<Partial<PagePermission>>({
         inheritedFromPermission: null,
-        spaceId: expect.stringContaining(spaceWithoutDefaultPagePermissionGroup.id),
-        pageId: expect.stringContaining(page.id),
+        spaceId: spaceWithoutDefaultPagePermissionGroup.id,
+        pageId: page.id,
         permissionLevel: 'full_access'
       })
     );
