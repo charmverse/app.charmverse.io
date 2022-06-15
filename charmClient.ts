@@ -622,7 +622,7 @@ class CharmClient {
     } as Omit<SpacePermissionModification, 'forSpaceId'>);
   }
 
-  queryGroupPermissions ({ group, id, resourceId }: AssignedPermissionsQuery): Promise<SpacePermissionFlags> {
+  queryGroupSpacePermissions ({ group, id, resourceId }: AssignedPermissionsQuery): Promise<SpacePermissionFlags> {
     return http.GET<SpacePermissionFlags>(`/api/permissions/space/${resourceId}/query`, {
       group,
       id
