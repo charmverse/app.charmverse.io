@@ -32,7 +32,7 @@ const StyledAvatarWithIcons = styled(AvatarWithIcons)`
   }
 `;
 
-function StyledIconButton ({ children, ...props }: { children: ReactNode }) {
+function StyledIconButton ({ children, ...props }: { children: ReactNode, key: string, onClick: () => void }) {
   return (
     <IconButton
       sx={{
