@@ -118,3 +118,13 @@ export class InsecureOperationError extends SystemError {
     });
   }
 }
+
+export class UndesirableOperationError extends SystemError {
+  constructor (message = 'This operation should not be performed.') {
+    super({
+      message,
+      errorType: 'Undesirable operation',
+      severity: 'warning'
+    });
+  }
+}
