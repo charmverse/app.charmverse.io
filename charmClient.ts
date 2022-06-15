@@ -39,6 +39,7 @@ import { PublicSpaceInfo } from 'lib/spaces/interfaces';
 import { TransactionCreationData } from 'lib/transactions/interface';
 import { PublicUser } from 'pages/api/public/profile/[userPath]';
 import { PublicPageResponse } from 'pages/api/public/pages/[pageId]';
+import { SpacePermissionModification, SpacePermissionWithAssignee } from './lib/permissions/spaces';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -600,6 +601,24 @@ class CharmClient {
 
   deletePermission (permissionId: string): Promise<boolean> {
     return http.DELETE('/api/permissions', { permissionId });
+  }
+
+  addSpacePermissions ({ forSpaceId, operations, roleId, spaceId, userId }: SpacePermissionModification): Promise<SpacePermissionWithAssignee> {
+    return http.POST<SpacePermissionWithAssignee>(`/api/permissions/space/${forSpaceId}/add`, {
+      operations,
+      roleId,
+      spaceId,
+      userId
+    } as Omit<SpacePermissionModification, 'forSpaceId'>);
+  }
+
+  removeSpacePermissions ({ forSpaceId, operations, roleId, spaceId, userId }: SpacePermissionModification): Promise<SpacePermissionWithAssignee> {
+    return http.POST<SpacePermissionWithAssignee>(`/api/permissions/space/${forSpaceId}/remove`, {
+      operations,
+      roleId,
+      spaceId,
+      userId
+    } as Omit<SpacePermissionModification, 'forSpaceId'>);
   }
 
   startThread (request: Omit<ThreadCreate, 'userId'>): Promise<ThreadWithCommentsAndAuthors> {
