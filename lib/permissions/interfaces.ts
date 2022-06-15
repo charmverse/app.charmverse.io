@@ -36,3 +36,13 @@ export interface PermissionComputeRequest {
   allowAdminBypass: boolean
   userId: string
 }
+
+/**
+ * @id The userId, roleId or spaceId
+ * @resourceId The resource such as Space or Page we are querying permissions for
+ */
+export interface AssignedPermissionsQuery {
+  group: AssignablePermissionGroups,
+  id: string
+  resourceId: string
+}

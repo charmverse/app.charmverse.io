@@ -39,7 +39,8 @@ import { PublicSpaceInfo } from 'lib/spaces/interfaces';
 import { TransactionCreationData } from 'lib/transactions/interface';
 import { PublicUser } from 'pages/api/public/profile/[userPath]';
 import { PublicPageResponse } from 'pages/api/public/pages/[pageId]';
-import { SpacePermissionModification, SpacePermissionWithAssignee } from './lib/permissions/spaces';
+import { SpacePermissionFlags, SpacePermissionModification, SpacePermissionWithAssignee } from './lib/permissions/spaces';
+import { AssignedPermissionsQuery } from './lib/permissions/interfaces';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -619,6 +620,13 @@ class CharmClient {
       spaceId,
       userId
     } as Omit<SpacePermissionModification, 'forSpaceId'>);
+  }
+
+  queryGroupPermissions ({ group, id, resourceId }: AssignedPermissionsQuery): Promise<SpacePermissionFlags> {
+    return http.GET<SpacePermissionFlags>(`/api/permissions/space/${resourceId}/query`, {
+      group,
+      id
+    });
   }
 
   startThread (request: Omit<ThreadCreate, 'userId'>): Promise<ThreadWithCommentsAndAuthors> {
