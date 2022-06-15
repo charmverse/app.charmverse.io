@@ -24,3 +24,11 @@ export interface PagesRequest {
   archived?: boolean
   pageIds?: string[]
 }
+
+export interface PublicPageResponse {
+  page: Page;
+  boardPage: Page | null;
+  pageBlock: Block | null;
+  boardBlock: Block | null;
+  space: Space;
+}

@@ -6,55 +6,28 @@ import { requireSpaceMembership } from 'lib/middleware/requireSpaceMembership';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import { assignRole, RoleAssignment, unassignRole } from 'lib/roles';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
   .use(requireSpaceMembership({ adminOnly: true }))
   .use(requireKeys<SpaceRoleToRole & SpaceRole>(['spaceId', 'roleId', 'userId'], 'body'))
-  .post(assignRole)
-  .delete(removeRole);
+  .post(assignRoleController)
+  .delete(unassignRoleController);
 
-async function removeRole (req: NextApiRequest, res: NextApiResponse) {
-  const data = req.body as SpaceRole & SpaceRoleToRole;
+async function unassignRoleController (req: NextApiRequest, res: NextApiResponse) {
+  const { roleId, userId } = req.body as RoleAssignment;
 
-  const spaceRole = await prisma.spaceRole.findUnique({
-    where: {
-      spaceUser: {
-        spaceId: data.spaceId,
-        userId: data.userId
-      }
-    }
+  await unassignRole({
+    roleId,
+    userId
   });
 
-  const role = await prisma.role.findFirst({
-    where: {
-      id: data.roleId,
-      // We add the spaceId again to prevent an attempt at assigning a role from a different space
-      spaceId: data.spaceId
-    }
-  });
-
-  if (!role || !spaceRole || role.source === 'guild_xyz') {
-    throw new ApiError({
-      message: 'Cannot remove role',
-      errorType: 'Invalid input'
-    });
-  }
-
-  const deleteResult = await prisma.spaceRoleToRole.delete({
-    where: {
-      spaceRoleId_roleId: {
-        roleId: role.id,
-        spaceRoleId: spaceRole.id as string
-      }
-    }
-  });
-
-  return res.status(200).json({ success: true, deleteResult });
+  return res.status(200).json({ success: true });
 }
 
-async function assignRole (req: NextApiRequest, res: NextApiResponse<{success: boolean}>) {
+async function assignRoleController (req: NextApiRequest, res: NextApiResponse<{success: boolean}>) {
   const data = req.body as SpaceRole & SpaceRoleToRole;
 
   const spaceRole = await prisma.spaceRole.findUnique({
