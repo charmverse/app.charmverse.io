@@ -1,6 +1,6 @@
 import { prisma } from 'db';
+import { extractMentions } from 'lib/prosemirror/extractMentions';
 import { PageContent, User } from 'models';
-import { extractMentions } from './extractMentions';
 import { MentionedTask } from './interfaces';
 
 export type MentionedTasksGroup = {
