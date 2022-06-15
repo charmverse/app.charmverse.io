@@ -104,7 +104,7 @@ export default function WorkspaceSettings () {
               variant='rounded'
               image={watchSpaceImage}
               updateImage={(url: string) => setValue('spaceImage', url, { shouldDirty: true })}
-              displayIcons={isAdmin}
+              editable={isAdmin}
             />
             <TextField
               {...register('spaceImage')}

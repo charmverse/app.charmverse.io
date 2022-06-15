@@ -146,7 +146,7 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
           name={user?.username || ''}
           image={user?.avatar}
           updateImage={(url: string) => handleUserUpdate({ avatar: url })}
-          displayIcons={!readOnly}
+          editable={!readOnly}
           variant='circular'
         />
         <Grid container direction='column' spacing={0.5}>

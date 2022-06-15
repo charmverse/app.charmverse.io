@@ -37,7 +37,7 @@ type LargeAvatarProps = {
   image?: string | null | undefined;
   updateImage?: (url: string) => void;
   variant?: 'circular' | 'rounded' | 'square';
-  displayIcons?: boolean;
+  editable?: boolean;
 };
 
 const getIcons = (editIcon: ReactNode, deleteIcon: ReactNode, avatar: string | null | undefined) => {
@@ -49,7 +49,7 @@ const getIcons = (editIcon: ReactNode, deleteIcon: ReactNode, avatar: string | n
 };
 
 export default function LargeAvatar (props: LargeAvatarProps) {
-  const { name, image, updateImage, variant, displayIcons } = props;
+  const { name, image, updateImage, variant, editable } = props;
   const inputFile = useRef<HTMLInputElement>(null);
   const icons = getIcons(
     <IconButton size='small' key='edit-avatar' onClick={() => inputFile && inputFile.current && inputFile.current.click()}>
@@ -67,7 +67,7 @@ export default function LargeAvatar (props: LargeAvatarProps) {
   );
 
   return (
-    displayIcons
+    editable
       ? (
         <StyledBox>
           <input

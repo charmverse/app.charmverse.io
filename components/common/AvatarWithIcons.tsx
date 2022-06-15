@@ -6,10 +6,9 @@ import Avatar, { InitialAvatarProps } from './Avatar';
 
 const StyledStack = styled(Stack)`
   position: absolute;
-  top: 4px;
-  right: 4px;
-  z-index: 1000;
-  opacity: 80%;
+  top: 0;
+  right: 0;
+  z-index: var(--z-index-tooltip);
   display: none;
 
   & > svg {
@@ -35,7 +34,7 @@ export default function AvatarWithIcons (props: AvatarWithIconsProps) {
 
   return (
     <StyledBox>
-      <StyledStack direction='row' spacing={2} p={0.5} className='icons-stack'>{ icons }</StyledStack>
+      <StyledStack direction='row' padding={1} className='icons-stack'>{ icons }</StyledStack>
       <Avatar {...props} />
     </StyledBox>
   );
