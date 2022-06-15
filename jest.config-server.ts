@@ -8,6 +8,8 @@ import createJestConfig from 'testing/createJestConfig';
  * Configuration copied from
  * https://nextjs.org/docs/testing
  * */
+
+process.env.DATABASE_URL = 'postgres://postgres:postgres@localhost:5432/charmversetest';
 export const jestConfig = {
 
   // Automatically clear mock calls, instances and results before every test
@@ -32,9 +34,10 @@ export const jestConfig = {
   testMatch: [
     // '**/pages/api/**/?(*.)+(spec).[tj]s?(x)',
     // '**/public-api/**/?(*.)+(spec).[tj]s?(x)',
-    '**/lib/**/?(*.)+(spec).[tj]s?(x)',
+    '/mnt/d/Workplace/Projects/Clients/apps/app.charmverse.io/lib/prosemirror/__tests__/extractMentions.spec.ts'
+    // '/lib/prosemirror/__tests__/extractMentions.spec.ts'
     // '**/testing/**/setupDatabase.spec.ts'
-    '**/__integration-tests__/**/**.spec.ts'
+    // '**/__integration-tests__/**/**.spec.ts'
   //   "**/__tests__/**/*.[jt]s?(x)",
   //   "**/?(*.)+(spec|test).[tj]s?(x)"
   ],

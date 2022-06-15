@@ -17,7 +17,7 @@ export function extractMentions (content: PageContent) {
       });
     }
 
-    if (node.type === 'mention' && node.attrs && parentNode) {
+    if (node.type === 'mention' && node.attrs && node.attrs.type === 'user' && parentNode) {
       let text = '';
       if (parentNode.type.match(/(paragraph|heading)/)) {
         parentNode.content?.forEach((childNode: PageContent) => {
