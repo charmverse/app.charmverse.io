@@ -8,32 +8,29 @@ import { PageContent } from 'models';
 export function extractMentions (content: PageContent) {
   const mentions: {id: string, createdAt: string, createdBy: string, text: string}[] = [];
 
-  function recurse (parentNode: PageContent) {
-    if (parentNode.content) {
-      parentNode.content.forEach(contentNode => {
+  function recurse (node: PageContent, parentNode: PageContent | null) {
+    if (node.content) {
+      node.content.forEach(childNode => {
         // A back reference to the parent node
-        (contentNode as any).parent = parentNode;
-        recurse(contentNode);
+        recurse(childNode, node);
       });
     }
 
-    if (parentNode.type === 'mention' && parentNode.attrs) {
-      const parent = parentNode.parent;
+    if (node.type === 'mention' && node.attrs && parentNode) {
       let text = '';
-
-      if (parent.type.match(/(paragraph|heading)/)) {
-        parent.content.forEach((node: PageContent) => {
-          if (node.text) {
-            text += node.text;
+      if (parentNode.type.match(/(paragraph|heading)/)) {
+        parentNode.content?.forEach((childNode: PageContent) => {
+          if (childNode.text) {
+            text += childNode.text;
           }
         });
       }
 
-      mentions.push({ id: parentNode.attrs.id, text, createdAt: parentNode.attrs.createdAt, createdBy: parentNode.attrs.createdBy });
+      mentions.push({ id: node.attrs.id, text, createdAt: node.attrs.createdAt, createdBy: node.attrs.createdBy });
     }
   }
 
-  recurse(content);
+  recurse(content, null);
 
   return mentions;
 }
