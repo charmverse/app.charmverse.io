@@ -629,6 +629,10 @@ class CharmClient {
     });
   }
 
+  computeUserSpacePermissions ({ spaceId }: {spaceId: string}): Promise<SpacePermissionFlags> {
+    return http.GET<SpacePermissionFlags>(`/api/permissions/space/${spaceId}/compute`);
+  }
+
   startThread (request: Omit<ThreadCreate, 'userId'>): Promise<ThreadWithCommentsAndAuthors> {
     return http.POST('/api/threads', request);
   }
