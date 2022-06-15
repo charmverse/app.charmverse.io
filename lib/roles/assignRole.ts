@@ -1,11 +1,24 @@
 import { SpaceRole } from '@prisma/client';
 import { prisma } from 'db';
+import { DataNotFoundError, InsecureOperationError } from 'lib/utilities/errors';
 import { hasAccessToSpace } from '../middleware';
-import { InsecureOperationError } from '../utilities/errors';
 import { RoleAssignment, RoleWithMembers } from './interfaces';
 import { listRoleMembers } from './listRoleMembers';
 
 export async function assignRole ({ roleId, userId }: RoleAssignment): Promise<RoleWithMembers> {
+
+  const userExists = await prisma.user.findUnique({
+    where: {
+      id: userId
+    },
+    select: {
+      id: true
+    }
+  });
+
+  if (!userExists) {
+    throw new DataNotFoundError(`User with id ${userId} not found.`);
+  }
 
   const role = await listRoleMembers({ roleId });
 
