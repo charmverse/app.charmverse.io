@@ -4,6 +4,8 @@ import KeyIcon from '@mui/icons-material/Key';
 import ForumIcon from '@mui/icons-material/Forum';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
+import { silentlyUpdateURL } from 'lib/browser';
 import { useState } from 'react';
 import { useTheme } from '@emotion/react';
 import GnosisTasksList from './GnosisTasksList';
@@ -37,10 +39,10 @@ const tabStyles = {
 };
 
 const TASK_TABS = [
-  { icon: <KeyIcon fontSize='small' />, label: 'Multisig', type: 'multisig' },
+  { icon: <KeyIcon />, label: 'Multisig', type: 'multisig' },
   // { icon: <BountyIcon />, label: 'Bounty', type: 'bounty' },
   // { icon: <HowToVoteIcon />, label: 'Proposal', type: 'proposal' },
-  { icon: <ForumIcon fontSize='small' />, label: 'Discussion', type: 'discussion' }
+  { icon: <ForumIcon />, label: 'Discussion', type: 'discussion' }
 ] as const;
 
 const StyledTypography = styled(Typography)`
@@ -50,10 +52,9 @@ const StyledTypography = styled(Typography)`
 
 export default function TasksPage () {
   const router = useRouter();
+  const [currentTask, setCurrentTask] = useState(router.query?.task ?? 'multisig');
   const { error, mutate: mutateTasks, tasks } = useTasks();
-  const [currentTab, setCurrentTab] = useState(router.query.task as string);
   const theme = useTheme();
-
   return (
     <>
       <NexusPageTitle />
@@ -66,7 +67,7 @@ export default function TasksPage () {
             </StyledTypography>
           </Box>
         </Grid>
-        {currentTab === 'multisig' ? (
+        {currentTask === 'multisig' ? (
           <Grid item xs={12} sm={6}>
             <Box display='flex' alignItems='center' justifyContent={{ xs: 'flex-start', md: 'flex-end' }} gap={{ sm: 2, xs: 1 }}>
               <NotifyMeButton />
@@ -79,7 +80,7 @@ export default function TasksPage () {
       <Tabs
         sx={tabStyles}
         indicatorColor='primary'
-        value={TASK_TABS.findIndex(taskTab => taskTab.type === currentTab)}
+        value={TASK_TABS.findIndex(taskTab => taskTab.type === currentTask)}
       >
         {TASK_TABS.map(task => (
           <Tab
@@ -97,11 +98,14 @@ export default function TasksPage () {
               }
             }}
             label={task.label}
-            onClick={() => setCurrentTab(task.type)}
+            onClick={() => {
+              silentlyUpdateURL(`${window.location.origin}/nexus?task=${task.type}`);
+              setCurrentTask(task.type);
+            }}
           />
         ))}
       </Tabs>
-      {currentTab === 'multisig' ? <GnosisTasksList error={error} mutateTasks={mutateTasks} tasks={tasks} /> : currentTab === 'discussion' ? <MentionedTasksList error={error} tasks={tasks} /> : null}
+      {currentTask === 'multisig' ? <GnosisTasksList error={error} mutateTasks={mutateTasks} tasks={tasks} /> : currentTask === 'discussion' ? <MentionedTasksList error={error} tasks={tasks} /> : null}
     </>
   );
 }
