@@ -12,6 +12,8 @@ export async function computeSpacePermissions ({
   userId
 }: PermissionComputeRequest): Promise<SpacePermissionFlags> {
 
+  const allowedOperations = new AvailableSpacePermissions();
+
   const { error, isAdmin } = await hasAccessToSpace({
     userId,
     spaceId: resourceId,
@@ -19,10 +21,9 @@ export async function computeSpacePermissions ({
   });
 
   if (error) {
-    throw new SpaceMembershipRequiredError();
+    // Returns all permissions as false since user is not space member
+    return allowedOperations;
   }
-
-  const allowedOperations = new AvailableSpacePermissions();
 
   if (isAdmin && allowAdminBypass) {
     allowedOperations.addPermissions(Object.keys(SpaceOperation) as SpaceOperation[]);
