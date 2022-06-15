@@ -26,5 +26,5 @@ async function addPaymentMethods (): Promise<number> {
 
 addPaymentMethods()
   .then((spacesProcessed) => {
-    console.log('Added payment methods for ', spacesProcessed, ' spaces');
+    // console.log('Added payment methods for ', spacesProcessed, ' spaces');
   });

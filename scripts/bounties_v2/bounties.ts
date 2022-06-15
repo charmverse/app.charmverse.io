@@ -1,5 +1,6 @@
 import { prisma } from 'db';
 import { rollupBountyStatus } from 'lib/bounties/rollupBountyStatus';
+import log from 'lib/log';
 
 export async function convertAssignedAndReviewBountiesToInProgress () {
   /*
@@ -37,7 +38,7 @@ export async function rollupExistingBounties () {
 
   for (let i = 0; i < bounties.length; i += CONCURRENT) {
 
-    console.log('Rolling up bounties ', i + 1, '-', i + 1 + CONCURRENT, ' / ', totalBounties);
+    log.info('Rolling up bounties ', i + 1, '-', i + 1 + CONCURRENT, ' / ', totalBounties);
 
     const sliced = bounties.slice(i, i + CONCURRENT);
     await Promise.all(sliced.map(bounty => rollupBountyStatus(bounty.id)));

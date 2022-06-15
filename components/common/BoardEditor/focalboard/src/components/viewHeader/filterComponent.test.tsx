@@ -5,7 +5,6 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import {Provider as ReduxProvider} from 'react-redux'
 
-import {mocked} from 'ts-jest/utils'
 import '@testing-library/jest-dom'
 
 import userEvent from '@testing-library/user-event'
@@ -19,8 +18,7 @@ import {wrapIntl, mockStateStore} from '../../testUtils'
 
 import FilterComponenet from './filterComponent'
 
-jest.mock('../../mutator')
-const mockedMutator = mocked(mutator, true)
+const mockedMutator = jest.mocked(mutator, true)
 const filter: FilterClause = {
     propertyId: '1',
     condition: 'includes',

@@ -8,7 +8,6 @@ import {Provider as ReduxProvider} from 'react-redux'
 import '@testing-library/jest-dom'
 import userEvent from '@testing-library/user-event'
 
-import {mocked} from 'ts-jest/utils'
 
 import {TestBlockFactory} from '../../test/testBlockFactory'
 
@@ -23,8 +22,8 @@ import ViewHeaderActionsMenu from './viewHeaderActionsMenu'
 jest.mock('../../archiver')
 jest.mock('../../csvExporter')
 jest.mock('../../mutator')
-const mockedArchiver = mocked(Archiver, true)
-const mockedCsvExporter = mocked(CsvExporter, true)
+const mockedArchiver = jest.mocked(Archiver, true)
+const mockedCsvExporter = jest.mocked(CsvExporter, true)
 
 const board = TestBlockFactory.createBoard()
 const activeView = TestBlockFactory.createBoardView(board)
@@ -51,7 +50,6 @@ describe('components/viewHeader/viewHeaderActionsMenu', () => {
                         board={board}
                         activeView={activeView}
                         cards={[card]}
-                        showShared={true}
                     />
                 </ReduxProvider>,
             ),
@@ -71,7 +69,6 @@ describe('components/viewHeader/viewHeaderActionsMenu', () => {
                         board={board}
                         activeView={activeView}
                         cards={[card]}
-                        showShared={false}
                     />
                 </ReduxProvider>,
             ),
@@ -90,7 +87,6 @@ describe('components/viewHeader/viewHeaderActionsMenu', () => {
                         board={board}
                         activeView={activeView}
                         cards={[card]}
-                        showShared={true}
                     />
                 </ReduxProvider>,
             ),
@@ -111,7 +107,6 @@ describe('components/viewHeader/viewHeaderActionsMenu', () => {
                         board={board}
                         activeView={activeView}
                         cards={[card]}
-                        showShared={true}
                     />
                 </ReduxProvider>,
             ),

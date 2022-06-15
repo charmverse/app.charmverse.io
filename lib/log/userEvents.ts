@@ -42,7 +42,7 @@ export async function postToDiscord (eventLog: IEventToLog) {
       return discordReponse;
     }
     catch (error) {
-      console.log('Error posting to discord', error);
+      log.warn('Error posting to discord', error);
     }
 
   }

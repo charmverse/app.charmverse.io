@@ -41,7 +41,7 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
   let discordAccount: DiscordAccount;
 
   try {
-    discordAccount = await getDiscordAccount(code, req.headers.host!.startsWith('localhost') ? `http://${req.headers.host}/api/discord/callback` : 'https://app.charmverse.io/api/discord/callback');
+    discordAccount = await getDiscordAccount(code, req.headers.host?.startsWith('localhost') ? `http://${req.headers.host}/api/discord/callback` : 'https://app.charmverse.io/api/discord/callback');
   }
   catch (error) {
     log.warn('Error while connecting to Discord', error);

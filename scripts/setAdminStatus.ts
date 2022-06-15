@@ -50,7 +50,7 @@ async function migrateAdminStatus () {
       isAdmin: true
     }
   }).then(data => {
-    console.log(data.count, ' space roles affected');
+    // console.log(data.count, ' space roles affected');
 
     return true;
   });

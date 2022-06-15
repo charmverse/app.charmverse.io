@@ -1,4 +1,4 @@
-import { Page, PageOperations, Role, Space } from '@prisma/client';
+import { Page, PageOperations, Role } from '@prisma/client';
 import charmClient from 'charmClient';
 import { IPageWithPermissions } from 'lib/pages';
 import { IPagePermissionFlags, PageOperationType } from 'lib/permissions/pages';
@@ -55,7 +55,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
 
   // retrieve space for public pages
   const [spaces] = useSpaces();
-  const publicPageSpace = router.route === '/share/[pageId]' ? spaces[0] : null;
+  const publicPageSpace = router.route === '/share/[...pageId]' ? spaces[0] : null;
   const space = spaceFromUrl || publicPageSpace;
 
   const { data, mutate } = useSWR(() => space ? `pages/${space?.id}` : null, () => {

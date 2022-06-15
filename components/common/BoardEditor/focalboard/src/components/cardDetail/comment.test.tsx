@@ -5,7 +5,6 @@ import userEvent from '@testing-library/user-event'
 import React from 'react'
 import {Provider as ReduxProvider} from 'react-redux'
 
-import {mocked} from 'ts-jest/utils'
 
 import {wrapIntl, mockStateStore} from '../../testUtils'
 
@@ -16,7 +15,7 @@ import mutator from '../../mutator'
 import Comment from './comment'
 
 jest.mock('../../mutator')
-const mockedMutator = mocked(mutator, true)
+const mockedMutator = jest.mocked(mutator, true)
 
 const board = TestBlockFactory.createBoard()
 const card = TestBlockFactory.createCard(board)

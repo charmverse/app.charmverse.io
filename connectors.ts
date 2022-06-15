@@ -3,21 +3,6 @@ import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 import { WalletLinkConnector } from '@web3-react/walletlink-connector';
 import { uniqueValues } from 'lib/utilities/array';
 
-enum Chains {
-  ETHEREUM = 1,
-  BSC = 56,
-  POLYGON = 137,
-  AVALANCHE = 43114,
-  XDAI = 100,
-  FANTOM = 250,
-  ARBITRUM = 42161,
-  CELO = 42220,
-  HARMONY = 1666600000,
-  GOERLI = 5,
-  RINKEBY = 4,
-  MUMBAI = 80001
-}
-
 export interface IChainDetails {
   chainId: number;
   chainName: string;
@@ -179,6 +164,21 @@ const RPC = {
     blockExplorerUrls: ['https://explorer.harmony.one'],
     iconUrl: '/images/cryptoLogos/harmony-one-logo.svg'
   },
+  HARMONY_DEVNET: {
+    chainId: 1666900000,
+    chainName: 'Harmony - Devnet',
+    nativeCurrency: {
+      name: 'Harmony',
+      symbol: 'ONE',
+      decimals: 18,
+      address: '0x0000000000000000000000000000000000000000',
+      logoURI:
+        'https://assets.coingecko.com/coins/images/4344/small/Y88JAze.png?1565065793'
+    },
+    rpcUrls: ['https://api.s0.ps.hmny.io'],
+    blockExplorerUrls: ['https://explorer.ps.hmny.io/'],
+    iconUrl: '/images/cryptoLogos/harmony-one-logo.svg'
+  },
   GOERLI: {
     chainId: 5,
     chainName: 'Ethereum - Goerli',
@@ -286,13 +286,14 @@ const supportedChains: Blockchain[] = [
   'ARBITRUM',
   'CELO',
   'HARMONY',
+  'HARMONY_DEVNET',
   'BSC',
   'GOERLI',
   'RINKEBY',
   'MUMBAI'
 ];
 
-const supportedChainIds = supportedChains.map((_) => Chains[_]);
+const supportedChainIds = supportedChains.map((_) => RPC[_].chainId);
 
 const injected = new InjectedConnector({ supportedChainIds });
 
@@ -302,7 +303,7 @@ const walletConnect = new WalletConnectConnector({
     (obj, chainName: string) => ({
       ...obj,
       // @ts-ignore
-      [Chains[chainName]]: RPC[chainName].rpcUrls[0]
+      [RPC[chainName].chainId]: RPC[chainName].rpcUrls[0]
     }),
     {}
   ),
@@ -382,4 +383,4 @@ export function getChainExplorerLink (chainId: string | number, transactionOrCon
   }
 }
 
-export { Chains, RPC, supportedChains, injected, walletConnect, walletLink };
+export { RPC, supportedChains, injected, walletConnect, walletLink };

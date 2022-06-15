@@ -1,5 +1,6 @@
 import { RawSpecs } from '@bangle.dev/core';
 import { DOMOutputSpec } from '@bangle.dev/pm';
+import log from 'lib/log';
 import { nestedPageNodeName, nestedPageSuggestMarkName } from './nestedPage.constants';
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
 import { encloseNestedPage } from './nestedPage.utils';
@@ -30,7 +31,7 @@ export function nestedPageSpec (): RawSpecs {
           state.ensureNewLine();
         }
         catch (err) {
-          console.log('Conversion err', err);
+          log.warn('Conversion err', err);
         }
       }
     }

@@ -81,7 +81,7 @@ function getTaskDescription (transaction: GnosisTransaction): string {
       }
 
       default:
-        console.warn('Unknown transaction method', data.method);
+        log.warn('Unknown transaction method', data.method);
     }
   }
   else if (transaction.to && transaction.value) {
@@ -203,7 +203,6 @@ function transactionsToTasks ({ transactions, safes, myUserId, users }: Transact
         .map<GnosisTask>(__transactions => ({ nonce: __transactions[0].nonce, transactions: __transactions }))
         .sort((a, b) => a.nonce - b.nonce);
       const taskId = tasks[0].transactions[0].id;
-      console.log('tasks', tasks);
       return {
         taskId,
         safeAddress: _transactions[0].safeAddress,

@@ -5,6 +5,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { importFromWorkspace } from 'lib/notion/importFromWorkspace';
 import { withSessionRoute } from 'lib/session/withSession';
 import { FailedImportsError } from 'lib/notion/types';
+import log from 'lib/log';
 
 const handler = nc({
   onError,
@@ -68,7 +69,7 @@ async function importNotion (req: NextApiRequest, res: NextApiResponse<{
 
   }
   catch (err: any) {
-    console.log('Error', err);
+    log.warn('Error importing from notion', err);
 
     if (err.error === 'invalid_grant' || err.error === 'invalid_request') {
       res.status(400).json({ error: 'Invalid code. Please try importing again' });

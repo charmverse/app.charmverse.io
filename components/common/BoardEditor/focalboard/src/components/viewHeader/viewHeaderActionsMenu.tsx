@@ -15,7 +15,6 @@ import Menu from '../../widgets/menu'
 import MenuWrapper from '../../widgets/menuWrapper'
 import { sendFlashMessage } from '../flashMessages'
 import ModalWrapper from '../modalWrapper'
-import ShareBoardComponent from '../shareBoardComponent'
 
 
 
@@ -23,7 +22,6 @@ type Props = {
     board: Board
     activeView: BoardView
     cards: Card[]
-    showShared: boolean
 }
 
 function onExportCsvTrigger(board: Board, activeView: BoardView, cards: Card[], intl: IntlShape) {
@@ -44,13 +42,10 @@ function onExportCsvTrigger(board: Board, activeView: BoardView, cards: Card[], 
 }
 
 const ViewHeaderActionsMenu = React.memo((props: Props) => {
-    const [showShareDialog, setShowShareDialog] = useState(false)
 
     const {board, activeView, cards} = props
     const user = useAppSelector<IUser|null>(getMe)
     const intl = useIntl()
-
-    const showShareBoard = user && user.id !== 'single-user' && props.showShared
 
     return (
         <ModalWrapper>
@@ -62,22 +57,8 @@ const ViewHeaderActionsMenu = React.memo((props: Props) => {
                         name={intl.formatMessage({id: 'ViewHeader.export-csv', defaultMessage: 'Export to CSV'})}
                         onClick={() => onExportCsvTrigger(board, activeView, cards, intl)}
                     />
-                    {showShareBoard &&
-                        <Menu.Text
-                            id='shareBoard'
-                            name={intl.formatMessage({id: 'ViewHeader.share-board', defaultMessage: 'Share board'})}
-                            onClick={() => setShowShareDialog(true)}
-                        />
-                    }
-
                 </Menu>
             </MenuWrapper>
-            {showShareDialog &&
-                <ShareBoardComponent
-                    boardId={board.id || ''}
-                    onClose={() => setShowShareDialog(false)}
-                />
-            }
         </ModalWrapper>
     )
 })

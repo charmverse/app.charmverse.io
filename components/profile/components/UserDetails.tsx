@@ -144,9 +144,9 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
       <Stack direction={{ xs: 'column', md: 'row' }} mt={5} spacing={3}>
         <Avatar
           name={user?.username || ''}
-          spaceImage={user?.avatar}
+          image={user?.avatar}
           updateImage={(url: string) => handleUserUpdate({ avatar: url })}
-          displayIcons={!readOnly}
+          editable={!readOnly}
           variant='circular'
         />
         <Grid container direction='column' spacing={0.5}>
