@@ -119,7 +119,7 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
           <Avatar
             name={watchName}
             variant='rounded'
-            spaceImage={watchSpaceImage}
+            image={watchSpaceImage}
             updateImage={(url) => setValue('spaceImage', url, { shouldDirty: true })}
             displayIcons={true}
           />

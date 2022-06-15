@@ -5,31 +5,29 @@ import Stack from '@mui/material/Stack';
 import Avatar, { InitialAvatarProps } from './Avatar';
 
 const StyledStack = styled(Stack)`
-    position: absolute;
-    top: 10px;
-    right: 20px;
-    z-index: 1000;
-    background-color: black;
-    opacity: 80%;
-    border-radius: 10%;
-    display: none;
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  z-index: 1000;
+  opacity: 80%;
+  display: none;
 
-    & > svg {
-      color: white;
-      cursor: pointer;
-    }
+  & > svg {
+    color: white;
+    cursor: pointer;
+  }
 `;
 
 const StyledBox = styled(Box)`
-    position: relative;
+  position: relative;
 
-    &:hover .icons-stack {
-      display: flex;
-    }
+  &:hover .icons-stack {
+    display: flex;
+  }
 `;
 
 export type AvatarWithIconsProps = InitialAvatarProps & {
-    icons?: ReactNode;
+  icons: ReactNode;
 };
 
 export default function AvatarWithIcons (props: AvatarWithIconsProps) {
