@@ -7,7 +7,7 @@ import { PageContent } from 'models';
  * @returns An array of mention ids
  */
 export function extractMentions (content: PageContent) {
-  const mentions: {id: string, createdAt: string, createdBy: string, text: string}[] = [];
+  const mentions: {id: string, createdAt: string, createdBy: string, text: string, value: string}[] = [];
 
   function recurse (node: PageContent, parentNode: PageContent | null) {
     if (node.content) {
@@ -30,7 +30,7 @@ export function extractMentions (content: PageContent) {
         });
       }
 
-      mentions.push({ id: node.attrs.id, text, createdAt: node.attrs.createdAt, createdBy: node.attrs.createdBy });
+      mentions.push({ id: node.attrs.id, text, createdAt: node.attrs.createdAt, createdBy: node.attrs.createdBy, value: node.attrs.value });
     }
   }
 
