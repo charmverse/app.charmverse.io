@@ -8,7 +8,6 @@ import {Provider as ReduxProvider} from 'react-redux'
 
 import userEvent from '@testing-library/user-event'
 
-import {mocked} from 'ts-jest/utils'
 
 import {MockStoreEnhanced} from 'redux-mock-store'
 
@@ -29,9 +28,9 @@ jest.mock('../../utils')
 jest.mock('../../octoClient')
 
 describe('src/components/gallery/GalleryCard', () => {
-    const mockedMutator = mocked(mutator, true)
-    const mockedUtils = mocked(Utils, true)
-    const mockedOcto = mocked(octoClient, true)
+    const mockedMutator = jest.mocked(mutator, true)
+    const mockedUtils = jest.mocked(Utils, true)
+    const mockedOcto = jest.mocked(octoClient, true)
     mockedOcto.getFileAsDataUrl.mockResolvedValue('test.jpg')
 
     const board = TestBlockFactory.createBoard()

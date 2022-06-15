@@ -3,7 +3,6 @@
 import {fireEvent, render, screen, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import {mocked} from 'ts-jest/utils'
 import {Provider as ReduxProvider} from 'react-redux'
 
 import {mockDOM, mockStateStore, wrapDNDIntl} from '../testUtils'
@@ -29,8 +28,8 @@ jest.mock('../utils')
 jest.mock('../mutator')
 jest.mock('../telemetry/telemetryClient')
 jest.mock('draft-js/lib/generateRandomKey', () => () => '123')
-const mockedUtils = mocked(Utils, true)
-const mockedMutator = mocked(Mutator, true)
+const mockedUtils = jest.mocked(Utils, true)
+const mockedMutator = jest.mocked(Mutator, true)
 mockedUtils.createGuid.mockReturnValue('test-id')
 describe('components/centerPanel', () => {
     const board = TestBlockFactory.createBoard()

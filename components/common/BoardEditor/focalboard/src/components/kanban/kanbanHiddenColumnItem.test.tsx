@@ -5,7 +5,6 @@ import {render, screen, within} from '@testing-library/react'
 import '@testing-library/jest-dom'
 import userEvent from '@testing-library/user-event'
 import {createIntl} from 'react-intl'
-import {mocked} from 'ts-jest/utils'
 
 import {wrapDNDIntl} from '../../testUtils'
 import Mutator from '../../mutator'
@@ -15,7 +14,7 @@ import {IPropertyOption} from '../../blocks/board'
 import KanbanHiddenColumnItem from './kanbanHiddenColumnItem'
 
 jest.mock('../../mutator')
-const mockedMutator = mocked(Mutator, true)
+const mockedMutator = jest.mocked(Mutator, true)
 
 describe('src/components/kanban/kanbanHiddenColumnItem', () => {
     const intl = createIntl({locale: 'en-us'})

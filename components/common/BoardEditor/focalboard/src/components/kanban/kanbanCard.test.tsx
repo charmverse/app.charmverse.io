@@ -8,7 +8,6 @@ import {Provider as ReduxProvider} from 'react-redux'
 
 import userEvent from '@testing-library/user-event'
 
-import {mocked} from 'ts-jest/utils'
 
 import Mutator from '../../mutator'
 import {Utils} from '../../utils'
@@ -22,8 +21,8 @@ import KanbanCard from './kanbanCard'
 jest.mock('../../mutator')
 jest.mock('../../utils')
 // jest.mock('../../telemetry/telemetryClient')
-const mockedUtils = mocked(Utils, true)
-const mockedMutator = mocked(Mutator, true)
+const mockedUtils = jest.mocked(Utils, true)
+const mockedMutator = jest.mocked(Mutator, true)
 
 describe('src/components/kanban/kanbanCard', () => {
     const board = TestBlockFactory.createBoard()
