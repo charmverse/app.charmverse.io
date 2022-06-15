@@ -34,7 +34,7 @@ export default function AvatarWithIcons (props: AvatarWithIconsProps) {
 
   return (
     <StyledBox>
-      <StyledStack direction='row' padding={1} className='icons-stack'>{ icons }</StyledStack>
+      <StyledStack direction='row' spacing={1} padding={1} className='icons-stack'>{ icons }</StyledStack>
       <Avatar {...props} />
     </StyledBox>
   );

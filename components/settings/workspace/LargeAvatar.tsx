@@ -28,8 +28,8 @@ const StyledAvatarWithIcons = styled(AvatarWithIcons)`
   ${baseAvatarStyles}
   ${({ variant }) => variant === 'rounded' && 'border-radius: 25px'};
   &:hover .edit-avatar-icon, .delete-avatar-icon {
-      display: initial;
-    }
+    display: initial;
+  }
 `;
 
 type LargeAvatarProps = {
@@ -52,12 +52,12 @@ export default function LargeAvatar (props: LargeAvatarProps) {
   const { name, image, updateImage, variant, editable } = props;
   const inputFile = useRef<HTMLInputElement>(null);
   const icons = getIcons(
-    <IconButton size='small' key='edit-avatar' onClick={() => inputFile && inputFile.current && inputFile.current.click()}>
+    <IconButton sx={{ bgcolor: 'background.dark', '&:hover': { bgcolor: 'background.light' } }} size='small' key='edit-avatar' onClick={() => inputFile && inputFile.current && inputFile.current.click()}>
       <EditIcon
         fontSize='small'
       />
     </IconButton>,
-    <IconButton size='small' key='delete-avatar' onClick={() => updateImage && updateImage('')}>
+    <IconButton sx={{ bgcolor: 'background.dark', '&:hover': { bgcolor: 'background.light' } }} size='small' key='delete-avatar' onClick={() => updateImage && updateImage('')}>
       <DeleteIcon
         onClick={() => updateImage && updateImage('')}
         fontSize='small'
