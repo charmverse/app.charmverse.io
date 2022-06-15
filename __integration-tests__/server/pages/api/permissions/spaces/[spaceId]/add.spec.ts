@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { SpacePermissionModification, SpacePermissionWithAssignee } from 'lib/permissions/spaces';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';

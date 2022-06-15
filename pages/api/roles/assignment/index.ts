@@ -1,76 +1,92 @@
 
 import { Prisma, SpaceRole, SpaceRoleToRole } from '@prisma/client';
 import { prisma } from 'db';
-import { ApiError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { ApiError, hasAccessToSpace, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { requireSpaceMembership } from 'lib/middleware/requireSpaceMembership';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { assignRole, RoleAssignment, unassignRole } from 'lib/roles';
+import { assignRole, RoleAssignment, RoleWithMembers, unassignRole } from 'lib/roles';
+import { DataNotFoundError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
-  .use(requireSpaceMembership({ adminOnly: true }))
-  .use(requireKeys<SpaceRoleToRole & SpaceRole>(['spaceId', 'roleId', 'userId'], 'body'))
+  .use(requireKeys<SpaceRoleToRole & SpaceRole>(['roleId', 'userId'], 'body'))
   .post(assignRoleController)
   .delete(unassignRoleController);
 
-async function unassignRoleController (req: NextApiRequest, res: NextApiResponse) {
+async function unassignRoleController (req: NextApiRequest, res: NextApiResponse<RoleWithMembers>) {
   const { roleId, userId } = req.body as RoleAssignment;
 
-  await unassignRole({
+  const { id: requestingUserId } = req.session.user;
+
+  const roleSpaceId = await prisma.role.findUnique({
+    where: {
+      id: roleId
+    },
+    select: {
+      spaceId: true
+    }
+  });
+
+  if (!roleSpaceId) {
+    throw new DataNotFoundError(`Role with id ${roleId} not found`);
+  }
+
+  const { error } = await hasAccessToSpace({
+    spaceId: roleSpaceId.spaceId,
+    userId: requestingUserId,
+    adminOnly: true
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  const roleAfterUpdate = await unassignRole({
     roleId,
     userId
   });
 
-  return res.status(200).json({ success: true });
+  return res.status(200).json(roleAfterUpdate);
 }
 
-async function assignRoleController (req: NextApiRequest, res: NextApiResponse<{success: boolean}>) {
-  const data = req.body as SpaceRole & SpaceRoleToRole;
+async function assignRoleController (req: NextApiRequest, res: NextApiResponse<RoleWithMembers>) {
+  const { roleId, userId } = req.body as RoleAssignment;
 
-  const spaceRole = await prisma.spaceRole.findUnique({
+  const { id: requestingUserId } = req.session.user;
+
+  const roleSpaceId = await prisma.role.findUnique({
     where: {
-      spaceUser: {
-        spaceId: data.spaceId,
-        userId: data.userId
-      }
+      id: roleId
+    },
+    select: {
+      spaceId: true
     }
   });
 
-  const role = await prisma.role.findFirst({
-    where: {
-      id: data.roleId,
-      // We add the spaceId again to prevent an attempt at assigning a role from a different space
-      spaceId: data.spaceId
-    }
-  });
-
-  if (!role || !spaceRole || role.source === 'guild_xyz') {
-    throw new ApiError({
-      message: 'Cannot assign role',
-      errorType: 'Invalid input'
-    });
+  if (!roleSpaceId) {
+    throw new DataNotFoundError(`Role with id ${roleId} not found`);
   }
 
-  const creationData = {
-    role: {
-      connect: {
-        id: role.id
-      }
-    },
-    spaceRole: {
-      connect: {
-        id: spaceRole?.id
-      }
-    }
+  const { error } = await hasAccessToSpace({
+    spaceId: roleSpaceId.spaceId,
+    userId: requestingUserId,
+    adminOnly: true
+  });
 
-  } as Prisma.SpaceRoleToRoleCreateInput;
+  if (error) {
+    throw error;
+  }
 
-  await prisma.spaceRoleToRole.create({ data: creationData });
+  const roleAfterUpdate = await assignRole({
+    roleId,
+    userId
+  });
 
-  return res.status(200).json({ success: true });
+  return res.status(201).json(roleAfterUpdate);
+
 }
 
 export default withSessionRoute(handler);

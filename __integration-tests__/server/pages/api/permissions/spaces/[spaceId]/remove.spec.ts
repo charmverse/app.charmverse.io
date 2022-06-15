@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { addSpaceOperations, SpacePermissionModification, SpacePermissionWithAssignee } from 'lib/permissions/spaces';
+import { addSpaceOperations, SpacePermissionModification } from 'lib/permissions/spaces';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
