@@ -45,12 +45,9 @@ export default function Mention ({ node }: NodeViewProps) {
   }
   else if (attrs.type === 'user') {
     value = (
-      <Typography sx={{
-        fontSize: 12
-      }}
-      >
-        @
-        {ensName || getDisplayName(contributor)}
+      <Typography fontSize='inherit' fontWeight='inherit'>
+        <span style={{ opacity: 0.6 }}>@</span>
+        <span style={{ opacity: 0.75 }}>{ensName || getDisplayName(contributor)}</span>
       </Typography>
     );
   }
@@ -59,14 +56,12 @@ export default function Mention ({ node }: NodeViewProps) {
     <Box
       component='span'
       sx={{
-        padding: theme.spacing(0, 0.5),
         borderRadius: theme.spacing(0.5),
         fontWeight: 600,
         opacity: 0.75,
         display: 'inline-flex',
         alignItems: 'center',
-        gap: 0.75,
-        fontSize: '14px'
+        gap: 0.75
       }}
       id={`${attrs.type}-${attrs.id}`}
     >
