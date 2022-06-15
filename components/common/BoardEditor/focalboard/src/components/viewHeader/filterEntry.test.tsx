@@ -8,7 +8,6 @@ import {Provider as ReduxProvider} from 'react-redux'
 import '@testing-library/jest-dom'
 import userEvent from '@testing-library/user-event'
 
-import {mocked} from 'ts-jest/utils'
 
 import {FilterClause} from '../../blocks/filterClause'
 
@@ -21,7 +20,7 @@ import mutator from '../../mutator'
 import FilterEntry from './filterEntry'
 
 jest.mock('../../mutator')
-const mockedMutator = mocked(mutator, true)
+const mockedMutator = jest.mocked(mutator, true)
 
 const board = TestBlockFactory.createBoard()
 const activeView = TestBlockFactory.createBoardView(board)

@@ -4,7 +4,6 @@ import React from 'react'
 import {fireEvent, render, screen, within} from '@testing-library/react'
 import {createIntl} from 'react-intl'
 import userEvent from '@testing-library/user-event'
-import {mocked} from 'ts-jest/utils'
 
 import Mutator from '../../mutator'
 import {wrapDNDIntl} from '../../testUtils'
@@ -13,7 +12,7 @@ import {IPropertyOption} from '../../blocks/board'
 
 import KanbanColumnHeader from './kanbanColumnHeader'
 jest.mock('../../mutator')
-const mockedMutator = mocked(Mutator, true)
+const mockedMutator = jest.mocked(Mutator, true)
 describe('src/components/kanban/kanbanColumnHeader', () => {
     const intl = createIntl({locale: 'en-us'})
     const board = TestBlockFactory.createBoard()
