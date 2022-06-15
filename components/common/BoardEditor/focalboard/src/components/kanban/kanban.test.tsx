@@ -5,7 +5,6 @@ import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import '@testing-library/jest-dom'
 import React from 'react'
 import {Provider as ReduxProvider} from 'react-redux'
-import {mocked} from 'ts-jest/utils'
 import userEvent from '@testing-library/user-event'
 
 import {IPropertyOption, IPropertyTemplate} from '../../blocks/board'
@@ -18,7 +17,7 @@ import Kanban from './kanban'
 
 global.fetch = jest.fn()
 jest.mock('../../utils')
-const mockedUtils = mocked(Utils, true)
+const mockedUtils = jest.mocked(Utils, true)
 const mockedchangePropertyOptionValue = jest.spyOn(mutator, 'changePropertyOptionValue')
 const mockedChangeViewCardOrder = jest.spyOn(mutator, 'changeViewCardOrder')
 const mockedinsertPropertyOption = jest.spyOn(mutator, 'insertPropertyOption')

@@ -8,7 +8,6 @@ import userEvent from '@testing-library/user-event'
 
 import '@testing-library/jest-dom'
 
-import {mocked} from 'ts-jest/utils'
 
 import mutator from '../mutator'
 
@@ -22,7 +21,7 @@ const board = TestBlockFactory.createBoard()
 const icon = '👍'
 
 jest.mock('../mutator')
-const mockedMutator = mocked(mutator, true)
+const mockedMutator = jest.mocked(mutator, true)
 
 describe('components/blockIconSelector', () => {
     beforeEach(() => {
