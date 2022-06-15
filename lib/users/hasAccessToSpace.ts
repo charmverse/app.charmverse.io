@@ -1,3 +1,4 @@
+import { SpaceRole } from '@prisma/client';
 import { prisma } from 'db';
 import { InvalidInputError, SystemError } from 'lib/utilities/errors';
 import { AdministratorOnlyError, UserIsNotSpaceMemberError } from './errors';
@@ -11,7 +12,8 @@ interface Input {
 interface Result {
   error?: SystemError;
   success?: boolean;
-  isAdmin?: boolean
+  isAdmin?: boolean;
+  spaceRole?: SpaceRole;
 }
 
 export async function hasAccessToSpace ({ userId, spaceId, adminOnly = false }: Input): Promise<Result> {
@@ -31,5 +33,5 @@ export async function hasAccessToSpace ({ userId, spaceId, adminOnly = false }: 
   else if (adminOnly && spaceRole.isAdmin !== true) {
     return { error: new AdministratorOnlyError() };
   }
-  return { success: true, isAdmin: spaceRole.isAdmin };
+  return { success: true, isAdmin: spaceRole.isAdmin, spaceRole };
 }
