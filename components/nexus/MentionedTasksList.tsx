@@ -8,7 +8,7 @@ import { User } from '@prisma/client';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useEffect } from 'react';
 import charmClient from 'charmClient';
-import useTasks from './hooks/useTasks';
+import { GetTasksResponse } from 'pages/api/tasks/list';
 
 function MentionedTaskRow (
   {
@@ -91,9 +91,12 @@ function MentionedTaskRow (
   );
 }
 
-export default function MentionedTasksList () {
-  const { tasks, error } = useTasks();
+interface MentionedTasksListProps {
+  tasks: GetTasksResponse | undefined
+  error: any
+}
 
+export default function MentionedTasksList ({ tasks, error }: MentionedTasksListProps) {
   useEffect(() => {
     async function main () {
       if (tasks?.mentioned && tasks.mentioned.unmarked.length !== 0) {

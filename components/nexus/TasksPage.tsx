@@ -1,9 +1,6 @@
 
-import { useState } from 'react';
 import { Box, Divider, Grid, Tab, Tabs, Typography } from '@mui/material';
 import KeyIcon from '@mui/icons-material/Key';
-import BountyIcon from '@mui/icons-material/RequestPage';
-import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import ForumIcon from '@mui/icons-material/Forum';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
@@ -14,8 +11,7 @@ import TasksPageHeader from './TasksPageHeader';
 import NexusPageTitle from './components/NexusPageTitle';
 import NotifyMeButton from './components/NotifyMeButton';
 import SnoozeButton from './components/SnoozeButton';
-
-type TaskType = 'multisig' | 'bounty' | 'proposal' | 'discussion'
+import useTasks from './hooks/useTasks';
 
 const tabStyles = {
   mb: 2,
@@ -54,6 +50,7 @@ const StyledTypography = styled(Typography)`
 export default function TasksPage () {
   const router = useRouter();
   const { task: taskType = 'multisig' } = router.query;
+  const { error, mutate: mutateTasks, tasks } = useTasks();
 
   return (
     <>
@@ -95,7 +92,7 @@ export default function TasksPage () {
           </Link>
         ))}
       </Tabs>
-      {taskType === 'multisig' ? <GnosisTasksList /> : taskType === 'discussion' ? <MentionedTasksList /> : null}
+      {taskType === 'multisig' ? <GnosisTasksList error={error} mutateTasks={mutateTasks} tasks={tasks} /> : taskType === 'discussion' ? <MentionedTasksList error={error} tasks={tasks} /> : null}
     </>
   );
 }
