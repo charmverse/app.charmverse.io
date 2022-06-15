@@ -1,4 +1,4 @@
-import { Alert, Box, Card, Grid } from '@mui/material';
+import { Alert, Box, Card, Grid, Typography } from '@mui/material';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { MentionedTask } from 'lib/mentions/interfaces';
@@ -120,6 +120,18 @@ export default function MentionedTasksList ({ tasks, error }: MentionedTasksList
   }
   else if (!tasks?.mentioned) {
     return <LoadingComponent height='200px' isLoading={true} />;
+  }
+
+  const totalMentions = (tasks?.mentioned.unmarked.length ?? 0) + (tasks?.mentioned.marked.length ?? 0);
+
+  if (totalMentions === 0) {
+    return (
+      <Card variant='outlined'>
+        <Box p={3} textAlign='center'>
+          <Typography color='secondary'>You don't have any mentions right now</Typography>
+        </Box>
+      </Card>
+    );
   }
 
   return (
