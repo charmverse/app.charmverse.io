@@ -55,6 +55,7 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
   const shareLink = `https://app.charmverse.io/join?domain=${router.query.domain}`;
 
   function onSubmit (conditions: ConditionsModalResult) {
+    // console.log('conditions', conditions);
     setApiError('');
     saveTokenGate(conditions)
       .then(() => {
@@ -145,7 +146,6 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
             darkMode={theme.palette.mode === 'dark'}
             injectCSS={false}
             permanentDefault={true}
-            onClose={popupState.close}
             isModal={false}
             onUnifiedAccessControlConditionsSelected={onSubmit}
           />

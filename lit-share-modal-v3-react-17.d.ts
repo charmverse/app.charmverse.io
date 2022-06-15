@@ -15,7 +15,7 @@ declare module 'lit-share-modal-v3-react-17' {
 
   export interface ShareModalProps {
     isModal?: boolean;
-    onClose: () => void;
+    onClose?: () => void;
     showModal?: boolean;
     darkMode?: boolean;
     cssSubstitution?: any;
