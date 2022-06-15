@@ -1,7 +1,7 @@
 
 import { Space, User } from '@prisma/client';
 import { assignRole } from 'lib/roles';
-import { DataNotFoundError, UndesirableOperationError } from 'lib/utilities/errors';
+import { DataNotFoundError, InvalidInputError, UndesirableOperationError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
@@ -42,7 +42,7 @@ describe('unassignRole', () => {
   it('should fail if the role does not exist', async () => {
 
     try {
-      await assignRole({
+      await unassignRole({
         roleId: v4(),
         userId: user.id
       });
@@ -50,6 +50,25 @@ describe('unassignRole', () => {
     }
     catch (err) {
       expect(err).toBeInstanceOf(DataNotFoundError);
+    }
+  });
+
+  it('should fail if the user is not assigned to the role', async () => {
+
+    const role = await generateRole({
+      spaceId: space.id,
+      createdBy: user.id
+    });
+
+    try {
+      await unassignRole({
+        roleId: role.id,
+        userId: user.id
+      });
+      throw new ExpectedAnError();
+    }
+    catch (err) {
+      expect(err).toBeInstanceOf(InvalidInputError);
     }
   });
 

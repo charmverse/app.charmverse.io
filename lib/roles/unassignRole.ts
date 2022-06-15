@@ -8,7 +8,7 @@ export async function unassignRole ({ roleId, userId }: RoleAssignment): Promise
 
   const role = await listRoleMembers({ roleId });
 
-  if (!role.users.every(u => u.id === userId)) {
+  if (role.users.every(u => u.id !== userId)) {
     throw new InvalidInputError('User is not assigned to this role and cannot be removed from it.');
   }
 
