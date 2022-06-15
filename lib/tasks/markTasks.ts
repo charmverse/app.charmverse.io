@@ -1,0 +1,28 @@
+import { NotificationType } from '@prisma/client';
+import { prisma } from 'db';
+
+export interface MarkTask {
+  id: string,
+  type: NotificationType
+}
+
+export async function markTasks (tasks: MarkTask[], userId: string) {
+  const userNotifications = await prisma.userNotification.findMany({
+    select: {
+      taskId: true
+    }
+  });
+
+  const taskIds = new Set(userNotifications.map(userNotification => userNotification.taskId));
+
+  const tasksNotNotified = tasks.filter(task => !taskIds.has(task.id));
+
+  await prisma.userNotification.createMany({
+    data: tasksNotNotified.map(task => ({
+      taskId: task.id,
+      type: task.type,
+      userId,
+      createdAt: new Date()
+    }))
+  });
+}

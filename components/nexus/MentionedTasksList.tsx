@@ -1,4 +1,4 @@
-import { Alert, Box, Card, Grid, Typography } from '@mui/material';
+import { Alert, Box, Card, Grid } from '@mui/material';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { MentionedTask } from 'lib/mentions/interfaces';
@@ -94,7 +94,7 @@ export default function MentionedTasksList () {
   useEffect(() => {
     async function main () {
       if (tasks?.mentioned && tasks.mentioned.unmarked.length !== 0) {
-        await charmClient.markMentions(tasks.mentioned.unmarked);
+        await charmClient.markTasks(tasks.mentioned.unmarked.map(unmarkedMentions => ({ id: unmarkedMentions.mentionId, type: 'mention' })));
       }
     }
 

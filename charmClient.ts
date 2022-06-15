@@ -39,7 +39,7 @@ import { PublicSpaceInfo } from 'lib/spaces/interfaces';
 import { TransactionCreationData } from 'lib/transactions/interface';
 import { PublicUser } from 'pages/api/public/profile/[userPath]';
 import { PublicPageResponse } from 'pages/api/public/pages/[...pageId]';
-import type { MarkMentionTask } from 'lib/mentions/markMentionedTasks';
+import type { MarkTask } from 'lib/tasks/markTasks';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -649,8 +649,8 @@ class CharmClient {
     return http.PUT(`/api/pages/${pageId}/snapshot`, data);
   }
 
-  markMentions (mentions: MarkMentionTask[]) {
-    return http.POST('/api/tasks/mark-mentions', mentions);
+  markTasks (tasks: MarkTask[]) {
+    return http.POST('/api/tasks/mark', tasks);
   }
 }
 
