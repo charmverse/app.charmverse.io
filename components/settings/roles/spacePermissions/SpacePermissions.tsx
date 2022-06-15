@@ -32,6 +32,8 @@ export default function SpacePermissions ({ targetGroup, id }: Props) {
 
   const [space] = useCurrentSpace();
 
+  const isAdmin = useIsAdmin();
+
   async function togglePermission ({
     operation,
     hasAccess
@@ -100,6 +102,7 @@ export default function SpacePermissions ({ targetGroup, id }: Props) {
                 <FormControlLabel
                   control={(
                     <Switch
+                      disabled={!isAdmin}
                       onChange={(ev) => {
                         const { checked: hasAccess } = ev.target;
                         togglePermission({
