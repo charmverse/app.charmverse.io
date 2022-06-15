@@ -143,7 +143,7 @@ import { useLocalStorage } from 'hooks/useLocalStorage';
 import { PagesProvider } from 'hooks/usePages';
 import { ThreadsProvider } from 'hooks/useThreads';
 import { ContributorsProvider } from 'hooks/useContributors';
-import { PageTitleProvider, TitleContext } from 'hooks/usePageTitle';
+import { PageTitleProvider, usePageTitle } from 'hooks/usePageTitle';
 import { SpacesProvider } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
 import { isMobile } from 'lib/browser';
@@ -254,17 +254,7 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
                   <FocalBoardProviders>
                     <DataProviders>
                       <SnackbarProvider>
-                        <TitleContext.Consumer>
-                          {([title]) => (
-                            <Head>
-                              <title>
-                                {title ? `${title} | CharmVerse` : 'CharmVerse - the all-in-one web3 workspace'}
-                              </title>
-                              {/* viewport meta tag goes in _app.tsx - https://nextjs.org/docs/messages/no-document-viewport-meta */}
-                              <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
-                            </Head>
-                          )}
-                        </TitleContext.Consumer>
+                        <PageMetaTags />
                         <CssBaseline enableColorScheme={true} />
                         <Global styles={cssVariables} />
                         <RouteGuard>
@@ -340,5 +330,18 @@ function DataProviders ({ children }: { children: ReactNode }) {
         </ContributorsProvider>
       </SpacesProvider>
     </UserProvider>
+  );
+}
+
+function PageMetaTags () {
+  const [title] = usePageTitle();
+  return (
+    <Head>
+      <title>
+        {title ? `${title} | CharmVerse` : 'CharmVerse - the all-in-one web3 workspace'}
+      </title>
+      {/* viewport meta tag goes in _app.tsx - https://nextjs.org/docs/messages/no-document-viewport-meta */}
+      <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
+    </Head>
   );
 }
