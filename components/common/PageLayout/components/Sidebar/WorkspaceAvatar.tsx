@@ -13,11 +13,11 @@ const StyledAvatar = styled(Avatar)<{ active: boolean }>`
 type WorkspaceAvatarProps = {
   active?: boolean;
   name: string;
-  spaceImage: string | null;
+  image: string | null;
 };
 
-export default function WorkspaceAvatar ({ active = false, name = '', spaceImage = '' }: WorkspaceAvatarProps) {
+export default function WorkspaceAvatar ({ active = false, name = '', image = '' }: WorkspaceAvatarProps) {
   return (
-    <StyledAvatar active={active} avatar={spaceImage} name={name} variant='rounded' />
+    <StyledAvatar active={active} avatar={image} name={name} variant='rounded' />
   );
 }
