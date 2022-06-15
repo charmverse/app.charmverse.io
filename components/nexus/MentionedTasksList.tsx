@@ -104,9 +104,7 @@ export default function MentionedTasksList ({ tasks, error }: MentionedTasksList
       }
     }
 
-    if (tasks?.mentioned) {
-      main();
-    }
+    main();
   }, [tasks]);
 
   if (error) {
