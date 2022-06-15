@@ -39,7 +39,7 @@ import { PublicSpaceInfo } from 'lib/spaces/interfaces';
 import { TransactionCreationData } from 'lib/transactions/interface';
 import { PublicUser } from 'pages/api/public/profile/[userPath]';
 import { PublicPageResponse } from 'pages/api/public/pages/[...pageId]';
-import { MarkMentionTask } from 'lib/mentions/interfaces';
+import type { MarkMentionTask } from 'lib/mentions/markMentionedTasks';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 

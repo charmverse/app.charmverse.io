@@ -41,8 +41,8 @@ const tabStyles = {
 
 const TASK_TABS = [
   { icon: <KeyIcon />, label: 'Multisig', type: 'multisig' },
-  { icon: <BountyIcon />, label: 'Bounty', type: 'bounty' },
-  { icon: <HowToVoteIcon />, label: 'Proposal', type: 'proposal' },
+  // { icon: <BountyIcon />, label: 'Bounty', type: 'bounty' },
+  // { icon: <HowToVoteIcon />, label: 'Proposal', type: 'proposal' },
   { icon: <ForumIcon />, label: 'Discussion', type: 'discussion' }
 ] as const;
 

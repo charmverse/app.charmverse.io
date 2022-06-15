@@ -19,6 +19,7 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
     }
   });
 
+  // Array of space ids the user is part of
   const spaceIds = spaceRoles.map(spaceRole => spaceRole.spaceId);
 
   const markedMentionTasks = await prisma.userNotification.findMany({
@@ -31,8 +32,10 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
     }
   });
 
+  // Get the marked mention task ids (all the discussion type tasks that exist in the db)
   const markedMentionTaskIds = new Set(markedMentionTasks.map(markedMentionTask => markedMentionTask.taskId));
 
+  // Get all the pages of all the spaces this user is part of
   const pages = await prisma.page.findMany({
     where: {
       spaceId: {
@@ -54,6 +57,7 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
     }
   });
 
+  // A mapping between mention id and the mention data (without user)
   const mentionedTasksWithoutUserRecord: Record<string, Omit<MentionedTask, 'createdBy'> & {userId: string}> = {};
   const mentionUserIds: string[] = [];
 
@@ -81,6 +85,7 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
     }
   }
 
+  // Only fetch the users that created the mentions
   const users = await prisma.user.findMany({
     where: {
       id: {
@@ -89,10 +94,12 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
     }
   });
 
+  // Create a record for the user
   const usersRecord: Record<string, User> = users.reduce((acc, cur) => ({ ...acc, [cur.id]: cur }), {});
 
   const mentionedTasks: MentionedTasksGroup = { marked: [], unmarked: [] };
 
+  // Loop through each mentioned task and attach the user data using usersRecord
   Object.values(
     mentionedTasksWithoutUserRecord
   ).forEach(mentionedTaskWithoutUser => {
