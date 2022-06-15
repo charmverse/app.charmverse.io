@@ -1,3 +1,4 @@
+import { shortenHex } from 'lib/utilities/strings';
 import { PageContent } from 'models';
 
 /**
@@ -22,6 +23,9 @@ export function extractMentions (content: PageContent) {
         parentNode.content?.forEach((childNode: PageContent) => {
           if (childNode.text) {
             text += childNode.text;
+          }
+          else if (childNode.type === 'mention') {
+            text += `@${shortenHex(childNode.attrs?.value)}`;
           }
         });
       }

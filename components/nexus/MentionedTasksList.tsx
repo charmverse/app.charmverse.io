@@ -43,12 +43,15 @@ function MentionedTaskRow (
           <Grid justifyContent='space-between' alignItems='center' container>
             <Grid
               item
-              xs={5}
+              xs={4}
               sx={{
-                fontWeight: 'bold'
+                overflow: 'hidden',
+                whiteSpace: 'nowrap',
+                textOverflow: 'ellipsis',
+                mr: 1
               }}
             >
-              {text.slice(0, 30)}...
+              {text}
             </Grid>
             <Grid
               item
