@@ -33,7 +33,8 @@ const ShareModalContainer = styled.div`
   /* Remove position: absolute so we have a dynamic height */
   .lsm-condition-display,
   .lsm-review-conditions-container,
-  .lsm-single-condition-multiple-button {
+  .lsm-single-condition-multiple-button,
+  .lsm-lit-footer {
     position: relative;
     top: 0;
   }

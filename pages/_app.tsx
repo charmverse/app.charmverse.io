@@ -168,8 +168,6 @@ import {
 } from 'theme/focalboard/theme';
 import { setDarkMode } from 'theme/darkMode';
 import cssVariables from 'theme/cssVariables';
-import 'theme/lit-share-modal/lit-share-modal.scss';
-import { setTheme as setLitProtocolTheme } from 'theme/lit-share-modal/theme';
 import 'theme/styles.scss';
 import Snackbar from 'components/common/Snackbar';
 import { SnackbarProvider } from 'hooks/useSnackbar';
@@ -220,7 +218,6 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
     if (typeof window !== 'undefined') {
       setFocalBoardTheme(mode === 'dark' ? darkTheme : lightTheme);
       setSavedDarkMode(mode);
-      setLitProtocolTheme(mode, muiTheme);
       setDarkMode(mode === 'dark');
     }
     return muiTheme;
