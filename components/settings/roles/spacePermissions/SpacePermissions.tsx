@@ -66,8 +66,6 @@ export default function SpacePermissions ({ targetGroup, id }: Props) {
 
   async function refreshGroupPermissions () {
 
-    console.log('Refreshing', space);
-
     if (!space) {
       setTimeout(() => {
         return refreshGroupPermissions();

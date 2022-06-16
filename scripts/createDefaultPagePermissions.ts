@@ -30,7 +30,7 @@ async function createDefaultPageSpacePermissions (): Promise<any> {
     });
   }));
 
-  console.log('Created permissions for ', pagesToAddPermissionsFor.length, '/', pages.length, ' pages');
+  // console.log('Created permissions for ', pagesToAddPermissionsFor.length, '/', pages.length, ' pages');
 
   return true;
 
