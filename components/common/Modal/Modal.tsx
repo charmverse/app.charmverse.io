@@ -10,7 +10,7 @@ export type ModalSize = 'large' | 'fluid' | 'small' | string;
 
 const defaultSize = '400px';
 
-const ModalContainer = styled.div<{ padding?: number, size: ModalSize }>`
+const ModalContainer = styled.div<{ padding?: string, size: ModalSize }>`
   position: absolute;
   top: 50%;
   left: 50%;
