@@ -647,6 +647,10 @@ class CharmClient {
   updatePageSnapshotData (pageId: string, data: Pick<Page, 'snapshotProposalId'>): Promise<IPageWithPermissions> {
     return http.PUT(`/api/pages/${pageId}/snapshot`, data);
   }
+
+  getBuildId () {
+    return http.GET<{ buildId: string }>('/api/build-id');
+  }
 }
 
 const charmClient = new CharmClient();
