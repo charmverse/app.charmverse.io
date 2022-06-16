@@ -6,7 +6,7 @@ import { Plugin } from '@bangle.dev/pm';
 import { EditorViewContext } from '@bangle.dev/react';
 import { nodeViewUpdateStore, useNodeViews } from '@bangle.dev/react/node-view-helpers';
 import { objectUid } from '@bangle.dev/utils';
-import React, { ReactNode, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import React, { ReactNode, RefObject, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import reactDOM from 'react-dom';
 import { NodeViewWrapper, RenderNodeViewsFunction } from './NodeViewWrapper';
 
@@ -19,6 +19,7 @@ interface BangleEditorProps<PluginMetadata = any>
   style?: React.CSSProperties;
   onReady?: (editor: CoreBangleEditor<PluginMetadata>) => void;
   editorViewRef?: typeof useRef;
+  editorRef?: RefObject<HTMLDivElement>
   // Components that should be placed underneath the editor
   placeholderComponent?: ReactNode
 }
@@ -38,7 +39,8 @@ export const BangleEditor = React.forwardRef<
       className,
       style,
       onReady = () => {},
-      placeholderComponent
+      placeholderComponent,
+      editorRef
     },
     ref,
   ) => {
@@ -83,7 +85,7 @@ export const BangleEditor = React.forwardRef<
     return (
       <React.Fragment>
         <EditorViewContext.Provider value={editor?.view as any}>
-          <div className="bangle-editor-core">
+          <div ref={editorRef} className="bangle-editor-core">
             {editor ? children : null}
             <div ref={renderRef} id={id} className={className} style={style} />
             {editor ? placeholderComponent : null}

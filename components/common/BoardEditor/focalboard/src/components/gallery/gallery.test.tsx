@@ -8,7 +8,6 @@ import {Provider as ReduxProvider} from 'react-redux'
 
 import userEvent from '@testing-library/user-event'
 
-import {mocked} from 'ts-jest/utils'
 
 import {wrapDNDIntl, mockStateStore, blocksById} from '../../testUtils'
 
@@ -21,7 +20,7 @@ import {RootState} from '../../store'
 import Gallery from './gallery'
 
 jest.mock('../../mutator')
-const mockedMutator = mocked(mutator, true)
+const mockedMutator = jest.mocked(mutator, true)
 
 describe('src/components/gallery/Gallery', () => {
     const board = TestBlockFactory.createBoard()

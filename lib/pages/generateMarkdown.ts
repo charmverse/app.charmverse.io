@@ -37,5 +37,4 @@ export async function generateMarkdown (page: Page, withTitle: boolean = false):
     return markdown;
   }
   return '';
-
 }

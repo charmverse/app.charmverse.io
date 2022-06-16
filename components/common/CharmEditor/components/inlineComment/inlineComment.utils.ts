@@ -1,6 +1,6 @@
 import { Command, EditorState, toggleMark } from '@bangle.dev/pm';
 import { filter, isMarkActiveInSelection } from '@bangle.dev/utils';
-import { highlightDomElement } from 'lib/browser';
+import { createHighlightDomElement } from 'lib/browser';
 import { markName } from './inlineComment.constants';
 
 const getMarkFromState = (state: EditorState) => state.schema.marks[markName];
@@ -135,23 +135,6 @@ export function scrollToThread (threadId: string) {
       });
     });
 
-    setTimeout(() => {
-      if (parentElement) {
-        // Need to create a custom element as adding styling to prosemirror-node isn't possible
-        const highlightElement = document.createElement('div');
-        document.body.appendChild(highlightElement);
-        const boundingRect = parentElement.getBoundingClientRect();
-        // Set the location of the custom element
-        highlightElement.style.top = `${boundingRect.top}px`;
-        highlightElement.style.left = `${boundingRect.left}px`;
-        highlightElement.style.width = `${boundingRect.width}px`;
-        highlightElement.style.height = `${boundingRect.height}px`;
-        highlightElement.style.position = 'absolute';
-        highlightDomElement(highlightElement, () => {
-          // Remove the custom element after the highlighting is done
-          document.body.removeChild(highlightElement);
-        });
-      }
-    }, 500);
+    createHighlightDomElement(parentElement);
   }
 }

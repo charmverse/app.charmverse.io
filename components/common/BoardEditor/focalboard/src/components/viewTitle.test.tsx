@@ -7,7 +7,6 @@ import userEvent from '@testing-library/user-event'
 
 import React from 'react'
 import {Provider as ReduxProvider} from 'react-redux'
-import {mocked} from 'ts-jest/utils'
 
 import mutator from '../mutator'
 import {Utils} from '../utils'
@@ -20,8 +19,8 @@ jest.mock('../mutator')
 jest.mock('../utils')
 jest.mock('draft-js/lib/generateRandomKey', () => () => '123')
 
-const mockedMutator = mocked(mutator, true)
-const mockedUtils = mocked(Utils, true)
+const mockedMutator = jest.mocked(mutator, true)
+const mockedUtils = jest.mocked(Utils, true)
 mockedUtils.createGuid.mockReturnValue('test-id')
 
 beforeAll(() => {

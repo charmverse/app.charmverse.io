@@ -7,7 +7,6 @@ import {Provider as ReduxProvider} from 'react-redux'
 import '@testing-library/jest-dom'
 import userEvent from '@testing-library/user-event'
 
-import {mocked} from 'ts-jest/utils'
 
 import {BoardView} from '../../blocks/boardView'
 
@@ -22,7 +21,7 @@ import {Constants} from '../../constants'
 import ViewHeaderPropertiesMenu from './viewHeaderPropertiesMenu'
 
 jest.mock('../../mutator')
-const mockedMutator = mocked(mutator, true)
+const mockedMutator = jest.mocked(mutator, true)
 
 const board = TestBlockFactory.createBoard()
 let activeView:BoardView
