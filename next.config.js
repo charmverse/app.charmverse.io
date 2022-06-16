@@ -1,9 +1,7 @@
 const BundleAnalyzer = require('@next/bundle-analyzer');
-
 const transpileModules = require('next-transpile-modules');
 
 const path = require('path');
-const next = require('next/dist/lib/is-serializable-props.js');
 
 const esmModules = [
   '@bangle.dev/base-components',
@@ -87,12 +85,12 @@ const removeUndefined = obj => {
   });
   return newObj;
 };
-// const next = require('next/dist/lib/is-serializable-props');
+const next = require('next/dist/lib/is-serializable-props');
 // eslint-disable-next-line prefer-destructuring
-// const isSerializableProps = next.isSerializableProps;
-// next.isSerializableProps = function _isSerializableProps (page, method, input) {
-//   return isSerializableProps(page, method, removeUndefined(input));
-// };
+const isSerializableProps = next.isSerializableProps;
+next.isSerializableProps = function _isSerializableProps (page, method, input) {
+  return isSerializableProps(page, method, removeUndefined(input));
+};
 
 const withBundleAnalyzer = BundleAnalyzer({
   enabled: process.env.ANALYZE === 'true'
