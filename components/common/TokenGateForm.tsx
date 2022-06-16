@@ -1,4 +1,4 @@
-import { ALL_LIT_CHAINS, humanizeAccessControlConditions, checkAndSignAuthMessage } from 'lit-js-sdk';
+import { humanizeAccessControlConditions, checkAndSignAuthMessage } from 'lit-js-sdk';
 import { useState, useEffect, ChangeEvent } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import Grid from '@mui/material/Grid';
@@ -28,7 +28,7 @@ interface Props {
 export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
 
   const router = useRouter();
-  const { account, chainId } = useWeb3React();
+  const { account } = useWeb3React();
   const { showMessage } = useSnackbar();
   const [error, setError] = useState('');
   const [user, setUser] = useUser();

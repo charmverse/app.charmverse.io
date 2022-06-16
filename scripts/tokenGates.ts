@@ -1,5 +1,5 @@
 
-import { prisma } from '../db.js';
+import { prisma } from '../db';
 
 (async () => {
 

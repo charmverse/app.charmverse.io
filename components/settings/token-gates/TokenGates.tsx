@@ -8,7 +8,6 @@ import Modal, { ErrorModal } from 'components/common/Modal';
 import { usePopupState, bindPopover, bindTrigger } from 'material-ui-popup-state/hooks';
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import { TokenGate } from '@prisma/client';
-import { useWeb3React } from '@web3-react/core';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import charmClient from 'charmClient';
 import styled from '@emotion/styled';
@@ -18,11 +17,9 @@ import Button from 'components/common/Button';
 import { useSnackbar } from 'hooks/useSnackbar';
 import useSWR from 'swr';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import dynamic from 'next/dynamic';
+import LitShareModal from 'lit-share-modal-v3-react-17';
 import Legend from '../Legend';
 import TokenGatesTable from './TokenGatesTable';
-
-const LitShareModal = dynamic(() => import('lit-share-modal-v3-react-17'));
 
 const ShareModalContainer = styled.div`
 
@@ -47,7 +44,6 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
   const theme = useTheme();
   const litClient = useLitProtocol();
   const router = useRouter();
-  const { chainId } = useWeb3React();
   const popupState = usePopupState({ variant: 'popover', popupId: 'token-gate' });
   const errorPopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-error' });
   const { showMessage } = useSnackbar();

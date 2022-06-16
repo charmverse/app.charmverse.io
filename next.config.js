@@ -1,11 +1,11 @@
-// const path = require('path');
-import path from 'path';
-import next from 'next/dist/lib/is-serializable-props.js';
+const BundleAnalyzer = require('@next/bundle-analyzer');
 
-import BundleAnalyzer from '@next/bundle-analyzer';
-import transpileModules from 'next-transpile-modules';
+const transpileModules = require('next-transpile-modules');
 
-export const esmModules = [
+const path = require('path');
+const next = require('next/dist/lib/is-serializable-props.js');
+
+const esmModules = [
   '@bangle.dev/base-components',
   '@bangle.dev/core',
   '@bangle.dev/pm',
@@ -24,6 +24,8 @@ export const esmModules = [
   'react-dnd',
   'lit-share-modal-v3-react-17'
 ];
+
+exports.esmModules = esmModules;
 
 const config = {
   generateEtags: false,
@@ -99,5 +101,5 @@ const withBundleAnalyzer = BundleAnalyzer({
 // fix for esm modules
 const withTM = transpileModules(esmModules);
 
-export default withBundleAnalyzer(withTM(config));
+module.exports = withBundleAnalyzer(withTM(config));
 

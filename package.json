@@ -38,7 +38,6 @@
     "test:server": "npm run test:server:ci -- --verbose --watch",
     "test:server:ci": "dotenv -e .env.test.local --override -- npx jest --config='./jest.config-server.ts'"
   },
-  "type": "module",
   "lint-staged": {
     "*.{ts,tsx}": [
       "eslint --fix"
