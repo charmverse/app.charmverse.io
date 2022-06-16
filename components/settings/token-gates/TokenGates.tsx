@@ -22,15 +22,21 @@ import Legend from '../Legend';
 import TokenGatesTable from './TokenGatesTable';
 
 const ShareModalContainer = styled.div`
+  width: 100%;
 
-width: 500px;
-height: 700px;
-// position: absolute;
-// left: 50%;
-// top: 50%;
-// transform: translate(-50%, -50%);
-border: 1px solid #333;
-border-radius: 0.25em;
+  .lsm-single-condition-select-container,
+  .lsm-condition-display,
+  .lsm-condition-container,
+  .lsm-review-conditions-group-container {
+    overflow-y: auto !important;
+  }
+  /* Remove position: absolute so we have a dynamic height */
+  .lsm-condition-display,
+  .lsm-review-conditions-container,
+  .lsm-single-condition-multiple-button {
+    position: relative;
+    top: 0;
+  }
 `;
 
 // Example: https://github.com/LIT-Protocol/lit-js-sdk/blob/9b956c0f399493ae2d98b20503c5a0825e0b923c/build/manual_tests.html
@@ -135,7 +141,7 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
       {data && data.length === 0 && <Typography color='secondary'>No token gates yet</Typography>}
       {data && data?.length > 0
         && <TokenGatesTable isAdmin={isAdmin} tokenGates={data} onDelete={deleteTokenGate} />}
-      <Modal {...bindPopover(popupState)} size='large'>
+      <Modal {...bindPopover(popupState)} noPadding size='large'>
         <ShareModalContainer>
           <LitShareModal
             darkMode={theme.palette.mode === 'dark'}
