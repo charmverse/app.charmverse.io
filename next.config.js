@@ -85,6 +85,7 @@ const removeUndefined = obj => {
   });
   return newObj;
 };
+
 const next = require('next/dist/lib/is-serializable-props');
 // eslint-disable-next-line prefer-destructuring
 const isSerializableProps = next.isSerializableProps;
