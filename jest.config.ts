@@ -30,7 +30,7 @@ export const jestConfig = {
 
   // The glob patterns Jest uses to detect test files
   testMatch: [
-    'D:\\Workplace\\Projects\\Clients\\apps\\app.charmverse.io\\lib\\prosemirror\\__tests__\\extractMentions.spec.ts'
+    '**/lib/**/*.spec.ts'
   ],
 
   testTimeout: 30000,
