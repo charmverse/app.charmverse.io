@@ -26,9 +26,6 @@ export async function removeSpaceOperations<A extends AssignablePermissionGroups
     return new AvailableSpacePermissions();
   }
 
-  const group: AssignablePermissionGroups = spaceId ? 'space' : roleId ? 'role' : 'user';
-  const id = (group === 'space' ? spaceId : group === 'role' ? roleId : userId) as string;
-
   const assignedOperations = existingPermission.operations.slice();
 
   const filteredOperations = assignedOperations.filter(op => {
@@ -51,6 +48,9 @@ export async function removeSpaceOperations<A extends AssignablePermissionGroups
       }
     });
   }
+
+  const group: AssignablePermissionGroups = spaceId ? 'space' : roleId ? 'role' : 'user';
+  const id = (group === 'space' ? spaceId : group === 'role' ? roleId : userId) as string;
 
   const updatedGroupSpacePermissions = await computeGroupSpacePermissions({
     resourceId: forSpaceId,

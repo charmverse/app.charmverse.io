@@ -39,10 +39,10 @@ export async function addSpaceOperations<A extends AssignablePermissionGroups = 
 
   // Validate the assignee
   // Make sure user is a space member
-  if (userId) {
+  if (group === 'user') {
     const { error } = await hasAccessToSpace({
       spaceId: forSpaceId,
-      userId,
+      userId: id,
       adminOnly: false
     });
 
@@ -50,18 +50,18 @@ export async function addSpaceOperations<A extends AssignablePermissionGroups = 
       throw new InsecureOperationError('Permissions cannot be assigned to users who are not a member of the space.');
     }
   }
-  else if (roleId) {
+  else if (group === 'role') {
     // Make sure this role is part of the target space
     const roleInSpace = await prisma.role.findUnique({
       where: {
-        id: roleId
+        id
       }
     });
     if (!roleInSpace || roleInSpace.spaceId !== forSpaceId) {
       throw new InsecureOperationError('Permissions cannot be assigned to roles which do not belong to the space.');
     }
   }
-  else if (spaceId && spaceId !== forSpaceId) {
+  else if (group === 'space' && id !== forSpaceId) {
     throw new InsecureOperationError('Space permissions cannot be assigned to a different space than the target space.');
   }
 

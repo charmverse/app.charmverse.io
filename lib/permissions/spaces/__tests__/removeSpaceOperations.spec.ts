@@ -1,17 +1,14 @@
-
-import { Space, SpaceOperation, SpacePermission, User } from '@prisma/client';
+import { Space, SpaceOperation, SpacePermission } from '@prisma/client';
 import { prisma } from 'db';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { addSpaceOperations } from '../addSpaceOperations';
 import { removeSpaceOperations } from '../removeSpaceOperations';
 
-let user: User;
 let space: Space;
 
 beforeAll(async () => {
   const generated = await generateUserAndSpaceWithApiToken(v4());
-  user = generated.user;
   space = generated.space;
 });
 
@@ -24,13 +21,13 @@ describe('removeSpaceOperations', () => {
       isAdmin: false
     });
 
-    const createdOperation = await addSpaceOperations<'user'>({
+    await addSpaceOperations<'user'>({
       forSpaceId: space.id,
       operations: ['createPage', 'createBounty'],
       userId: extraUser.id
     });
 
-    const result = await removeSpaceOperations({
+    await removeSpaceOperations({
       forSpaceId: space.id,
       operations: ['createPage'],
       userId: extraUser.id
@@ -88,7 +85,7 @@ describe('removeSpaceOperations', () => {
       isAdmin: false
     });
 
-    const createdPermission = await addSpaceOperations<'user'>({
+    await addSpaceOperations<'user'>({
       forSpaceId: space.id,
       operations: ['createPage'],
       userId: extraUser.id

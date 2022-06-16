@@ -1,4 +1,3 @@
-
 import { Space, User } from '@prisma/client';
 import { ExpectedAnError } from 'testing/errors';
 import { generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
