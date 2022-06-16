@@ -1,5 +1,5 @@
 
-import { Space, User } from '@prisma/client';
+import { Space, SpaceOperation, User } from '@prisma/client';
 import { prisma } from 'db';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
@@ -100,6 +100,27 @@ describe('computeGroupSpacePermissions', () => {
 
     expect(computedPermissions.createPage).toBe(false);
     expect(computedPermissions.createBounty).toBe(false);
+  });
+
+  it('should contain all Space Operations as keys, with no additional or missing properties', async () => {
+    const { space: otherSpace, user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, false);
+
+    const computedPermissions = await computeGroupSpacePermissions({
+      resourceId: otherSpace.id,
+      group: 'user',
+      id: otherUser.id
+    });
+
+    // Check the object has no extra keys
+    (Object.keys(computedPermissions) as SpaceOperation[]).forEach(key => {
+      expect(SpaceOperation[key]).toBeDefined();
+    });
+
+    // Check the object has no missing keys
+    (Object.keys(SpaceOperation) as SpaceOperation[]).forEach(key => {
+      expect(computedPermissions[key]).toBeDefined();
+    });
+
   });
 
   it('should return false for all permissions if a different space than the target space is provided', async () => {

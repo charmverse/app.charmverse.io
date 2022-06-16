@@ -61,6 +61,6 @@ export async function computeGroupSpacePermissions ({ id, group, resourceId }:
   }
 
   // This last return should never be reached, as one of 3 previous
-  return permissionsToReturn;
+  return permissionsToReturn.operationFlags;
 
 }

@@ -1,12 +1,10 @@
 
-import { Space, SpacePermission, User } from '@prisma/client';
-import { prisma } from 'db';
+import { Space, SpaceOperation, User } from '@prisma/client';
+import { assignRole } from 'lib/roles';
 import { generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
-import { assignRole } from 'lib/roles';
-import { computeSpacePermissions } from '../computeSpacePermissions';
 import { addSpaceOperations } from '../addSpaceOperations';
-import { removeSpaceOperations } from '../removeSpaceOperations';
+import { computeSpacePermissions } from '../computeSpacePermissions';
 
 let user: User;
 let space: Space;
@@ -165,6 +163,27 @@ describe('computeSpacePermissions', () => {
 
     expect(computedPermissions.createPage).toBe(false);
     expect(computedPermissions.createBounty).toBe(true);
+
+  });
+
+  it('should contain all Space Operations as keys, with no additional or missing properties', async () => {
+    const { space: otherSpace, user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, false);
+
+    const computedPermissions = await computeSpacePermissions({
+      allowAdminBypass: false,
+      resourceId: otherSpace.id,
+      userId: otherUser.id
+    });
+
+    // Check the object has no extra keys
+    (Object.keys(computedPermissions) as SpaceOperation[]).forEach(key => {
+      expect(SpaceOperation[key]).toBeDefined();
+    });
+
+    // Check the object has no missing keys
+    (Object.keys(SpaceOperation) as SpaceOperation[]).forEach(key => {
+      expect(computedPermissions[key]).toBeDefined();
+    });
 
   });
 

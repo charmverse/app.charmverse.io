@@ -78,5 +78,5 @@ export async function computeSpacePermissions ({
     allowedOperations.addPermissions(permissionSet.operations);
   }
 
-  return allowedOperations;
+  return allowedOperations.operationFlags;
 }

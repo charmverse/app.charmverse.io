@@ -1,10 +1,16 @@
-import { boolean } from 'yup';
 import { UserPermissionFlags } from './interfaces';
 
 /**
  * Defines each operation as a member property queryable as true / false
  */
 export class Permissions<O extends string> {
+
+  get operationFlags (): UserPermissionFlags<O> {
+    return (Object.keys(this.operations) as O[]).reduce((flags, operation) => {
+      flags[operation] = (this as any)[operation];
+      return flags;
+    }, {} as UserPermissionFlags<O>);
+  }
 
   private operations: {[key in O]: true};
 
