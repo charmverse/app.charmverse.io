@@ -1,28 +1,35 @@
 import { Role, Space, User } from '@prisma/client';
 
-export type AssignablePermissionGroups = 'user' | 'role' | 'space'
+export type AssignablePermissionGroups = 'user' | 'role' | 'space' | 'any'
 
-export type PermissionAssigneeId<A extends AssignablePermissionGroups = AssignablePermissionGroups> =
-  A extends 'user' ? {userId: string, roleId?: undefined | null, spaceId?: undefined | null}
+export type TargetPermissionGroup = {
+  group: Omit<AssignablePermissionGroups, 'any'>
+  id: string
+}
+
+export type PermissionAssigneeId<A extends AssignablePermissionGroups = 'any'> =
+  A extends 'any' ? {
+    spaceId?: string | null | undefined,
+    roleId?: string | null | undefined
+    userId?: string | null| undefined
+  }
+  : A extends 'user' ? {userId: string, roleId?: undefined | null, spaceId?: undefined | null}
   // Default case for when we don't know yet
   : A extends 'role' ? {userId?: undefined | null, roleId: string, spaceId?: undefined | null}
   : A extends 'space' ? {userId?: undefined | null, roleId?: undefined | null, spaceId: string}
-  : {
-    spaceId?: string | null,
-    roleId?: string | null
-    userId?: string | null
-  }
+  : never
 
-export type PermissionAssignee<A extends AssignablePermissionGroups = AssignablePermissionGroups> =
-  // Default case for when we don't know yet
-  A extends 'user' ? {user: User, role?: null | undefined, space?: null | undefined}
-  : A extends 'role' ? {user?: null | undefined, role: Role, space?: null | undefined}
-  : A extends 'space' ? {user?: null | undefined, role?: null | undefined, space: Space}
-  : {
+export type PermissionAssignee<A extends AssignablePermissionGroups = 'any'> =
+  A extends 'any' ? {
     space?: Space,
     role?: Role
     user?: User
   }
+  // Default case for when we don't know yet
+  : A extends 'user' ? {user: User, role?: null | undefined, space?: null | undefined}
+  : A extends 'role' ? {user?: null | undefined, role: Role, space?: null | undefined}
+  : A extends 'space' ? {user?: null | undefined, role?: null | undefined, space: Space}
+  : never
 
 export type UserPermissionFlags<T extends string> = Record<T, boolean>
 

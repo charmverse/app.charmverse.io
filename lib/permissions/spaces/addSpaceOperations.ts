@@ -5,16 +5,17 @@ import { uniqueValues } from 'lib/utilities/array';
 import { hasAccessToSpace } from 'lib/middleware';
 import { InvalidPermissionGranteeError } from '../errors';
 import { AssignablePermissionGroups } from '../interfaces';
-import { SpacePermissionModification, SpacePermissionWithAssignee } from './interfaces';
+import { SpacePermissionFlags, SpacePermissionModification, SpacePermissionWithAssignee } from './interfaces';
 import { generateSpacePermissionQuery } from './utility';
+import { computeGroupSpacePermissions } from './computeGroupSpacePermissions';
 
-export async function addSpaceOperations<A extends AssignablePermissionGroups = AssignablePermissionGroups> ({
+export async function addSpaceOperations<A extends AssignablePermissionGroups = 'any'> ({
   forSpaceId,
   operations,
   roleId,
   spaceId,
   userId
-}: SpacePermissionModification<A>): Promise<SpacePermissionWithAssignee<A>> {
+}: SpacePermissionModification<A>): Promise<SpacePermissionFlags> {
 
   // Make sure one group has been assigned, not more, not 0
   if ((roleId && (spaceId || userId))
@@ -22,6 +23,9 @@ export async function addSpaceOperations<A extends AssignablePermissionGroups = 
   || (!roleId && !spaceId && !userId)) {
     throw new InvalidPermissionGranteeError();
   }
+
+  const group: AssignablePermissionGroups = spaceId ? 'space' : roleId ? 'role' : 'user';
+  const id = (group === 'space' ? spaceId : group === 'role' ? roleId : userId) as string;
 
   if (!operations || !(operations instanceof Array) || operations.length === 0) {
     throw new MissingDataError('You must provide at least 1 operation.');
@@ -84,7 +88,7 @@ export async function addSpaceOperations<A extends AssignablePermissionGroups = 
   // Prevents us from adding the same operation twice
   const deduplicatedOperations = uniqueValues(currentOperations);
 
-  const updatedSpacePermission = await prisma.spacePermission.upsert({
+  await prisma.spacePermission.upsert({
     where: query,
     update: {
       operations: {
@@ -121,6 +125,12 @@ export async function addSpaceOperations<A extends AssignablePermissionGroups = 
     }
   });
 
-  return updatedSpacePermission as SpacePermissionWithAssignee<A>;
+  const updatedGroupSpacePermissions = await computeGroupSpacePermissions({
+    resourceId: forSpaceId,
+    group,
+    id
+  });
+
+  return updatedGroupSpacePermissions;
 
 }

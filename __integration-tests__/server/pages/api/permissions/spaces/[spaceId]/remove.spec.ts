@@ -1,31 +1,36 @@
-import { addSpaceOperations, SpacePermissionModification } from 'lib/permissions/spaces';
+import { addSpaceOperations, SpacePermissionFlags, SpacePermissionModification } from 'lib/permissions/spaces';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 describe('POST /api/permissions/space/{spaceId}/remove - Remove space permissions', () => {
 
-  it('should succeed if the user is a space admin, and respond 201', async () => {
+  it('should succeed if the user is a space admin, sending back available operations for target group and respond 200', async () => {
 
     const { space, user: adminUser } = await generateUserAndSpaceWithApiToken(undefined, true);
 
-    const permissionActionContent: SpacePermissionModification = {
+    await addSpaceOperations({
       forSpaceId: space.id,
-      operations: ['createBounty'],
+      operations: ['createBounty', 'createPage'],
       spaceId: space.id
-    };
-
-    await addSpaceOperations(permissionActionContent);
+    });
 
     const adminCookie = await loginUser(adminUser);
 
-    const { success } = (await request(baseUrl)
+    const toRemove: SpacePermissionModification = {
+      forSpaceId: space.id,
+      operations: ['createPage'],
+      spaceId: space.id
+    };
+
+    const updatedPermissions = (await request(baseUrl)
       .post(`/api/permissions/space/${space.id}/remove`)
       .set('Cookie', adminCookie)
-      .send(permissionActionContent)
-      .expect(200)).body as {success: boolean};
+      .send(toRemove)
+      .expect(200)).body as SpacePermissionFlags;
 
-    expect(success).toBe(true);
+    expect(updatedPermissions.createBounty).toBe(true);
+    expect(updatedPermissions.createPage).toBe(false);
 
   });
 

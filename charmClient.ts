@@ -608,8 +608,8 @@ class CharmClient {
     return http.DELETE('/api/permissions', { permissionId });
   }
 
-  addSpacePermissions ({ forSpaceId, operations, roleId, spaceId, userId }: SpacePermissionModification): Promise<SpacePermissionWithAssignee> {
-    return http.POST<SpacePermissionWithAssignee>(`/api/permissions/space/${forSpaceId}/add`, {
+  addSpacePermissions ({ forSpaceId, operations, roleId, spaceId, userId }: SpacePermissionModification): Promise<SpacePermissionFlags> {
+    return http.POST<SpacePermissionFlags>(`/api/permissions/space/${forSpaceId}/add`, {
       operations,
       roleId,
       spaceId,
@@ -617,8 +617,8 @@ class CharmClient {
     } as Omit<SpacePermissionModification, 'forSpaceId'>);
   }
 
-  removeSpacePermissions ({ forSpaceId, operations, roleId, spaceId, userId }: SpacePermissionModification): Promise<SpacePermissionWithAssignee> {
-    return http.POST<SpacePermissionWithAssignee>(`/api/permissions/space/${forSpaceId}/remove`, {
+  removeSpacePermissions ({ forSpaceId, operations, roleId, spaceId, userId }: SpacePermissionModification): Promise<SpacePermissionFlags> {
+    return http.POST<SpacePermissionFlags>(`/api/permissions/space/${forSpaceId}/remove`, {
       operations,
       roleId,
       spaceId,

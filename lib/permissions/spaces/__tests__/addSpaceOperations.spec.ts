@@ -18,18 +18,18 @@ beforeAll(async () => {
 
 describe('addSpaceOperations', () => {
 
-  it('should create a space permission that grants abilities to a specific user', async () => {
+  it('should grant abilities to a specific user', async () => {
     const createdPermission = await addSpaceOperations<'user'>({
       forSpaceId: space.id,
       operations: ['createPage'],
       userId: user.id
     });
 
-    expect(createdPermission.user.id).toBe(user.id);
-    expect(createdPermission.operations[0]).toBe('createPage');
+    expect(createdPermission.createPage).toBe(true);
+    expect(createdPermission.createBounty).toBe(false);
   });
 
-  it('should create a space permission that grants abilities to assignees of a role', async () => {
+  it('should grant abilities to a specific role', async () => {
     const role = await generateRole({
       createdBy: user.id,
       spaceId: space.id
@@ -41,26 +41,26 @@ describe('addSpaceOperations', () => {
       roleId: role.id
     });
 
-    expect(createdPermission.role!.id).toBe(role.id);
-    expect(createdPermission.operations[0]).toBe('createPage');
+    expect(createdPermission.createPage).toBe(true);
+    expect(createdPermission.createBounty).toBe(false);
   });
 
-  it('should create a space permission that grants abilities to members a space', async () => {
+  it('should grant abilities for a space to its members', async () => {
     const createdPermission = await addSpaceOperations({
       forSpaceId: space.id,
       operations: ['createPage'],
       spaceId: space.id
     });
 
-    expect(createdPermission.space!.id).toBe(space.id);
-    expect(createdPermission.operations[0]).toBe('createPage');
+    expect(createdPermission.createPage).toBe(true);
+    expect(createdPermission.createBounty).toBe(false);
   });
 
   it('should add new operations to an existing permission', async () => {
 
     const extraUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
 
-    const createdPermission = await addSpaceOperations({
+    await addSpaceOperations({
       forSpaceId: space.id,
       operations: ['createPage'],
       userId: extraUser.id
@@ -73,10 +73,8 @@ describe('addSpaceOperations', () => {
     });
 
     // Ensures we modified existing record instead of creating new one
-    expect(updatedPermission.id).toBe(createdPermission.id);
-
-    expect(updatedPermission.operations.length).toBe(2);
-    expect(updatedPermission.operations[1]).toBe('createBounty');
+    expect(updatedPermission.createPage).toBe(true);
+    expect(updatedPermission.createBounty).toBe(true);
   });
 
   it('should succeed if the assignee already has this permission', async () => {
@@ -96,7 +94,8 @@ describe('addSpaceOperations', () => {
     });
 
     // Nothing has changed
-    expect(updatedPermission.operations.length).toBe(1);
+    expect(createdPermission.createPage).toBe(true);
+    expect(createdPermission.createBounty).toBe(false);
   });
 
   it('should fail if 0 assignee groups are provided', async () => {

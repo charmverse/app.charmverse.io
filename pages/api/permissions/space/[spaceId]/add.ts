@@ -3,7 +3,7 @@ import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middlewar
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import { addSpaceOperations, SpacePermissionWithAssignee } from 'lib/permissions/spaces';
+import { addSpaceOperations, SpacePermissionFlags, SpacePermissionWithAssignee } from 'lib/permissions/spaces';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -12,7 +12,7 @@ handler.use(requireUser)
 //  .use(requireSpaceMembership)
   .post(addSpacePermissionsController);
 
-async function addSpacePermissionsController (req: NextApiRequest, res: NextApiResponse<SpacePermissionWithAssignee>) {
+async function addSpacePermissionsController (req: NextApiRequest, res: NextApiResponse<SpacePermissionFlags>) {
 
   const { spaceId } = req.query;
   const { id: userId } = req.session.user;
@@ -27,13 +27,13 @@ async function addSpacePermissionsController (req: NextApiRequest, res: NextApiR
     throw error;
   }
 
-  const updatedPermission = await addSpaceOperations({
+  const updatedPermissions = await addSpaceOperations({
     forSpaceId: spaceId as string,
     // Unwind operations and assigned group
     ...req.body
   });
 
-  return res.status(201).json(updatedPermission);
+  return res.status(201).json(updatedPermissions);
 }
 
 export default withSessionRoute(handler);

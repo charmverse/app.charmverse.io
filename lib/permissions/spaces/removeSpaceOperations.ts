@@ -1,5 +1,8 @@
 import { prisma } from 'db';
-import { SpacePermissionModification } from './interfaces';
+import { AssignablePermissionGroups } from '../interfaces';
+import { AvailableSpacePermissions } from './availableSpacePermissions';
+import { computeGroupSpacePermissions } from './computeGroupSpacePermissions';
+import { SpacePermissionFlags, SpacePermissionModification } from './interfaces';
 import { generateSpacePermissionQuery } from './utility';
 
 /**
@@ -7,7 +10,7 @@ import { generateSpacePermissionQuery } from './utility';
  * @param param0
  * @returns
  */
-export async function removeSpaceOperations ({ forSpaceId, operations, roleId, spaceId, userId }: SpacePermissionModification): Promise<boolean> {
+export async function removeSpaceOperations<A extends AssignablePermissionGroups = 'any'> ({ forSpaceId, operations, roleId, spaceId, userId }: SpacePermissionModification<A>): Promise<SpacePermissionFlags> {
   const query = generateSpacePermissionQuery({
     forSpaceId,
     roleId,
@@ -20,8 +23,11 @@ export async function removeSpaceOperations ({ forSpaceId, operations, roleId, s
   });
 
   if (!existingPermission) {
-    return false;
+    return new AvailableSpacePermissions();
   }
+
+  const group: AssignablePermissionGroups = spaceId ? 'space' : roleId ? 'role' : 'user';
+  const id = (group === 'space' ? spaceId : group === 'role' ? roleId : userId) as string;
 
   const assignedOperations = existingPermission.operations.slice();
 
@@ -34,8 +40,6 @@ export async function removeSpaceOperations ({ forSpaceId, operations, roleId, s
     await prisma.spacePermission.delete({
       where: query
     });
-
-    return true;
   }
   else if (filteredOperations.length < assignedOperations.length) {
     await prisma.spacePermission.update({
@@ -46,10 +50,13 @@ export async function removeSpaceOperations ({ forSpaceId, operations, roleId, s
         }
       }
     });
-
-    return true;
   }
 
-  return false;
+  const updatedGroupSpacePermissions = await computeGroupSpacePermissions({
+    resourceId: forSpaceId,
+    group,
+    id
+  });
 
+  return updatedGroupSpacePermissions;
 }

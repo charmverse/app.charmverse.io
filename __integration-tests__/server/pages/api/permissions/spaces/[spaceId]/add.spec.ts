@@ -1,11 +1,11 @@
-import { SpacePermissionModification, SpacePermissionWithAssignee } from 'lib/permissions/spaces';
+import { SpacePermissionFlags, SpacePermissionModification, SpacePermissionWithAssignee } from 'lib/permissions/spaces';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 describe('POST /api/permissions/space/{spaceId}/add - Add space permissions', () => {
 
-  it('should succeed if the user is a space admin, and respond 201', async () => {
+  it('should succeed if the user is a space admin, sending back available operations for target group and respond 201', async () => {
 
     const { space, user: adminUser } = await generateUserAndSpaceWithApiToken(undefined, true);
 
@@ -16,16 +16,14 @@ describe('POST /api/permissions/space/{spaceId}/add - Add space permissions', ()
 
     const adminCookie = await loginUser(adminUser);
 
-    const createdPermission = (await request(baseUrl)
+    const updatedPermissions = (await request(baseUrl)
       .post(`/api/permissions/space/${space.id}/add`)
       .set('Cookie', adminCookie)
       .send(spacePermissionContent)
-      .expect(201)).body as SpacePermissionWithAssignee<'space'>;
+      .expect(201)).body as SpacePermissionFlags;
 
-    expect(createdPermission.forSpaceId).toBe(space.id);
-    expect(createdPermission.operations.length).toBe(1);
-    expect(createdPermission.operations[0]).toBe('createPage');
-    expect(createdPermission.space.id).toBe(space.id);
+    expect(updatedPermissions.createPage).toBe(true);
+    expect(updatedPermissions.createBounty).toBe(false);
 
   });
 

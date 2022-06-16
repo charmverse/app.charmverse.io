@@ -1,5 +1,5 @@
 
-import { Space, SpacePermission, User } from '@prisma/client';
+import { Space, SpaceOperation, SpacePermission, User } from '@prisma/client';
 import { prisma } from 'db';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
@@ -56,7 +56,7 @@ describe('removeSpaceOperations', () => {
       isAdmin: false
     });
 
-    const createdPermission = await addSpaceOperations<'user'>({
+    await addSpaceOperations<'user'>({
       forSpaceId: space.id,
       operations: ['createPage'],
       userId: extraUser.id
@@ -70,7 +70,10 @@ describe('removeSpaceOperations', () => {
 
     const inexistentPermission = await prisma.spacePermission.findUnique({
       where: {
-        id: createdPermission.id
+        userId_forSpaceId: {
+          forSpaceId: space.id,
+          userId: extraUser.id
+        }
       }
     });
 
@@ -78,7 +81,7 @@ describe('removeSpaceOperations', () => {
 
   });
 
-  it('should return true if a permission was successfully removed', async () => {
+  it('should remove a permission from actions group can perform', async () => {
 
     const extraUser = await generateSpaceUser({
       spaceId: space.id,
@@ -97,10 +100,10 @@ describe('removeSpaceOperations', () => {
       userId: extraUser.id
     });
 
-    expect(result).toBe(true);
+    expect(result.createPage).toBe(false);
   });
 
-  it('should return false if no change happened', async () => {
+  it('should return the current set of operations if no change happened', async () => {
 
     const extraUser = await generateSpaceUser({
       spaceId: space.id,
@@ -113,7 +116,7 @@ describe('removeSpaceOperations', () => {
       userId: extraUser.id
     });
 
-    await removeSpaceOperations({
+    const initialResult = await removeSpaceOperations({
       forSpaceId: space.id,
       operations: ['createPage'],
       userId: extraUser.id
@@ -125,7 +128,10 @@ describe('removeSpaceOperations', () => {
       userId: extraUser.id
     });
 
-    expect(duplicateDeleteResult).toBe(false);
+    (Object.keys(initialResult) as SpaceOperation[]).forEach(op => {
+      expect(duplicateDeleteResult[op]).toEqual(initialResult[op]);
+    });
+
   });
 
 });
