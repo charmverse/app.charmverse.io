@@ -8,6 +8,8 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { createBounty } from 'lib/bounties';
 import nc from 'next-connect';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
+import { computeSpacePermissions } from 'lib/permissions/spaces';
+import { UnauthorisedActionError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -33,15 +35,30 @@ async function getBounties (req: NextApiRequest, res: NextApiResponse<Bounty[]>)
 
 async function createBountyController (req: NextApiRequest, res: NextApiResponse<Bounty>) {
 
-  const { error } = await hasAccessToSpace({
-    userId: req.session.user.id,
-    spaceId: req.body?.spaceId,
-    // Non admins can only create a suggestion
-    adminOnly: req.body.status !== 'suggestion'
-  });
+  const { spaceId, status } = req.body as Bounty;
 
-  if (error) {
-    throw error;
+  const { id: userId } = req.session.user;
+
+  if (status === 'suggestion') {
+    const { error } = await hasAccessToSpace({
+      spaceId,
+      userId,
+      adminOnly: false
+    });
+
+    if (error) {
+      throw error;
+    }
+  }
+  else {
+    const userPermissions = await computeSpacePermissions({
+      allowAdminBypass: true,
+      resourceId: spaceId as string,
+      userId
+    });
+    if (!userPermissions.createBounty) {
+      throw new UnauthorisedActionError('You do not have permissions to create a bounty.');
+    }
   }
 
   const createdBounty = await createBounty({
