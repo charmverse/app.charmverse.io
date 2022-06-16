@@ -1,12 +1,10 @@
-import { AlertColor, SnackbarOrigin, SnackbarProps } from '@mui/material';
+import { AlertColor, SnackbarProps } from '@mui/material';
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useMemo, useState } from 'react';
 
 type IContext = {
   isOpen: boolean,
-  action?: ReactNode,
   setIsOpen: Dispatch<SetStateAction<boolean>>
   message: string | null
-  origin: SnackbarOrigin
   setMessage: Dispatch<SetStateAction<string | null>>
   severity: AlertColor
   setSeverity: Dispatch<SetStateAction<AlertColor>>
@@ -17,9 +15,7 @@ type IContext = {
 export const SnackbarContext = createContext<Readonly<IContext>>({
   handleClose: () => {},
   isOpen: false,
-  action: null,
   message: null,
-  origin: { vertical: 'bottom', horizontal: 'left' },
   setIsOpen: () => {},
   setMessage: () => {},
   setSeverity: () => {},
@@ -28,9 +24,7 @@ export const SnackbarContext = createContext<Readonly<IContext>>({
 });
 
 export function SnackbarProvider ({ children }: {children: ReactNode}) {
-  const [isOpen, setIsOpen] = useState(true);
-  const [action, setAction] = useState<ReactNode>(null);
-  const [origin, setOrigin] = useState<SnackbarOrigin>({ vertical: 'bottom', horizontal: 'left' });
+  const [isOpen, setIsOpen] = useState(false);
   const [severity, setSeverity] = useState<AlertColor>('info');
   const [message, setMessage] = useState<null | string>(null);
 
@@ -49,26 +43,20 @@ export function SnackbarProvider ({ children }: {children: ReactNode}) {
   const value: IContext = useMemo(() => ({
     isOpen,
     handleClose,
-    showMessage: (msg: string, newSeverity?: AlertColor, anchorOrigin?: SnackbarOrigin) => {
+    showMessage: (msg: string, newSeverity?: AlertColor) => {
       newSeverity = newSeverity ?? 'info';
-
       handleClick();
-      if (anchorOrigin) {
-        setOrigin(anchorOrigin);
+      if (newSeverity) {
+        setSeverity(newSeverity);
       }
-      setSeverity(newSeverity);
       setMessage(msg);
     },
     message,
-    action,
-    origin,
     severity,
-    setAction,
-    setOrigin,
     setSeverity,
     setIsOpen,
     setMessage
-  }), [isOpen, message, origin, severity]);
+  }), [isOpen, message, severity]);
 
   return (
     <SnackbarContext.Provider value={value}>

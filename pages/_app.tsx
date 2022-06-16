@@ -22,6 +22,7 @@ import { Web3ReactProvider } from '@web3-react/core';
 import log from 'lib/log';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import RouteGuard from 'components/common/RouteGuard';
+import RefreshPageAlert from 'components/common/RefreshPageAlert';
 import 'theme/focalboard/focalboard.button.scss';
 import 'theme/focalboard/focalboard.main.scss';
 import 'theme/focalboard/focalboard.typography.scss';
@@ -177,8 +178,7 @@ import { SnackbarProvider } from 'hooks/useSnackbar';
 import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
-import IconButton from '@mui/material/IconButton';
-import RefreshIcon from '@mui/icons-material/Refresh';
+
 import charmClient from 'charmClient';
 
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
@@ -240,19 +240,19 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
     }
   }, [prefersDarkMode, savedDarkMode]);
 
-  // wait for router to be ready, as we rely on the URL to know what space to load
-
-  if (!router.isReady) {
-    return null;
-  }
-
   // Check if a new version of the application is available every 5 minutes.
   useInterval(async () => {
     const data = await charmClient.getBuildId();
     if (data.buildId !== process.env.NEXT_PUBLIC_BUILD_ID) {
       setIsOldBuild(true);
     }
-  }, 18000);
+  }, 180000);
+
+  // wait for router to be ready, as we rely on the URL to know what space to load
+
+  if (!router.isReady) {
+    return null;
+  }
 
   // DO NOT REMOVE CacheProvider - it protects MUI from Tailwind CSS in settings
   return (
@@ -272,18 +272,14 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
                         <Global styles={cssVariables} />
                         <RouteGuard>
                           <ErrorBoundary>
-                            <Snackbar
-                              isOpen={isOldBuild}
-                              message='You are viewing an out of date version, please refresh the page.'
-                              action={(
-                                <IconButton onClick={() => window.location.reload()} sx={{ padding: 0, marginLeft: '10px' }}>
-                                  <RefreshIcon sx={{ color: '#FFF' }} fontSize='small' />
-                                </IconButton>
-                              )}
-                              origin={{ vertical: 'top', horizontal: 'center' }}
-                              severity='warning'
-                              handleClose={() => setIsOldBuild(false)}
-                            />
+                            {
+                              isOldBuild && (
+                              <RefreshPageAlert
+                                clear={() => setIsOldBuild(false)}
+                                content='You are viewing an out of date version, please refresh the page.'
+                              />
+                              )
+                            }
                             {getLayout(<Component {...pageProps} />)}
                             <Snackbar />
                           </ErrorBoundary>
