@@ -111,7 +111,7 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
 
       {
         roleSpacePermissions.length > 0 && (
-          <Box sx={{ mt: 1, mb: 1 }}>
+          <Box sx={{ mt: 1, mb: 1, display: 'flex', gap: 1 }}>
             {
               roleSpacePermissions.map(operation => (
 
@@ -122,7 +122,7 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
                   flexDirection: 'row'
                 }}
                 >
-                  <DoneIcon sx={{ fontSize: '16px', mr: 0.5 }} />
+                  <DoneIcon sx={{ fontSize: '18px', mr: 0.5 }} />
                   <Typography variant='caption'>{spaceOperationLabels[operation]}</Typography>
 
                 </div>
