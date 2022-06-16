@@ -23,8 +23,6 @@ const esmModules = [
   'lit-share-modal-v3-react-17'
 ];
 
-exports.esmModules = esmModules;
-
 const config = {
   generateEtags: false,
   poweredByHeader: false,
@@ -102,3 +100,4 @@ const withTM = transpileModules(esmModules);
 
 module.exports = withBundleAnalyzer(withTM(config));
 
+module.exports.esmModules = esmModules;
