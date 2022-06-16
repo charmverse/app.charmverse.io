@@ -345,7 +345,7 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
 
       </div>
     </PageLink>
-  ), [href, label, pageId, icon, addSubPage, pageType]);
+  ), [href, label, pageId, icon, addSubPage, pageType, userSpacePermissions.createPage]);
 
   return (
     <>

@@ -75,6 +75,9 @@ export class PaletteItem implements PaletteItemType {
       keywords,
       disabled,
       hidden,
+      // Prevent required space permission from triggering error
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      requiredSpacePermission,
       editorExecuteCommand,
       group,
       highPriority,
