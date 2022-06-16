@@ -24,6 +24,7 @@ import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MIN_EMBED_WIDTH, VIDEO_ASPECT_RATIO 
 import { PluginKey, TextSelection } from 'prosemirror-state';
 import { useMemo } from 'react';
 import DatabaseIcon from '@mui/icons-material/TableChart';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { insertNode } from '../../utils';
 import { NestedPagePluginState, nestedPageSuggestMarkName } from '../nestedPage';
 import {
@@ -595,13 +596,16 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, 'group'>[]> 
 export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: PluginKey<NestedPagePluginState>}) {
   const { addNestedPage } = useNestedPage();
 
+  const [,, userSpacePermissions] = useCurrentSpace();
+
   const paletteItems = useMemo(() => {
     const itemGroups = Object.entries({ ...paletteGroupItemsRecord,
-      other: [
+      other: ([
         ...paletteGroupItemsRecord.other,
         {
           uid: 'insert-board',
           title: 'Insert board',
+          requiredSpacePermission: 'createPage',
           icon: <DatabaseIcon sx={{
             fontSize: 16
           }}
@@ -621,6 +625,7 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
         {
           uid: 'insert-page',
           title: 'Insert page',
+          requiredSpacePermission: 'createPage',
           icon: <DescriptionOutlinedIcon sx={{
             fontSize: 16
           }}
@@ -662,13 +667,17 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
             }) as PromisedCommand;
           })
         }
-      ]
-    }).map(([group, paletteItemsWithoutGroup]) => {
-      return paletteItemsWithoutGroup.map(paletteItem => PaletteItem.create({
-        ...paletteItem,
-        group
-      }));
-    });
+      ] as PaletteItemType[]).filter(paletteItem => {
+        return !paletteItem.requiredSpacePermission
+        || (paletteItem.requiredSpacePermission && userSpacePermissions[paletteItem.requiredSpacePermission]);
+      })
+    })
+      .map(([group, paletteItemsWithoutGroup]) => {
+        return paletteItemsWithoutGroup.map(paletteItem => PaletteItem.create({
+          ...paletteItem,
+          group
+        }));
+      });
     return itemGroups.flat();
   }, [addNestedPage]);
 

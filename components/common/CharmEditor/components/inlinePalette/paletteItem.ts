@@ -1,4 +1,5 @@
 import { EditorState, EditorView, Transaction } from '@bangle.dev/pm';
+import { SpaceOperation } from '@prisma/client';
 import { InlinePaletteItem } from './hooks';
 
 export const PALETTE_ITEM_REGULAR_TYPE = 'REGULAR_TYPE';
@@ -12,10 +13,14 @@ type EditorExecuteCommand = (arg: {
   itemIndex: number;
 }) => PromisedCommand;
 
+/**
+ * @requiredSpacePermission Optional parameter. If this is provided, the palette item should not be available to a user without this space permission.
+ */
 export interface PaletteItemType {
   uid: string;
   title: string;
   type?: string;
+  requiredSpacePermission?: SpaceOperation,
   description: string;
   keywords?: string[];
   disabled?: ((state: EditorState<any>) => boolean) | boolean;
