@@ -86,7 +86,7 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
     };
 
     const authSig = await checkAndSignAuthMessage({
-      chain: conditions.chain
+      chain: conditions.chain || 'ethereum'
     });
     await litClient!.saveSigningCondition({
       ...conditions,

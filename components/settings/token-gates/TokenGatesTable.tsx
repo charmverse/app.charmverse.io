@@ -68,11 +68,12 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
     setTestResult({ status: 'loading' });
     try {
       const authSig = await checkAndSignAuthMessage({
-        chain: (tokenGate.conditions as any).chain
+        chain: (tokenGate.conditions as any).chain || 'ethereum'
       });
       const jwt = await litClient!.getSignedToken({
         resourceId: tokenGate.resourceId as any,
         authSig,
+        chain: (tokenGate.conditions as any).chain || 'ethereum',
         ...tokenGate.conditions as any
       });
       await charmClient.verifyTokenGate({ jwt, id: tokenGate.id });

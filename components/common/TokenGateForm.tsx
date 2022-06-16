@@ -89,7 +89,7 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
     setError('');
 
     const authSig = await checkAndSignAuthMessage({
-      chain: (tokenGate.conditions as any).chain
+      chain: (tokenGate.conditions as any).chain || 'ethereum'
     })
       .catch(err => {
         if (err.errorCode === 'unsupported_chain') {
@@ -102,6 +102,7 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
 
     const jwt = authSig && await litClient.getSignedToken({
       authSig,
+      chain: (tokenGate.conditions as any).chain || 'ethereum',
       resourceId: tokenGate.resourceId as any,
       ...tokenGate.conditions as any
     })
