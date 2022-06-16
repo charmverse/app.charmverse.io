@@ -1,5 +1,5 @@
 
-import { Prisma, Role, User } from '@prisma/client';
+import { Prisma, Role, SpacePermission, User } from '@prisma/client';
 import { prisma } from 'db';
 import { ApiError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { requireSpaceMembership } from 'lib/middleware/requireSpaceMembership';
@@ -22,6 +22,7 @@ export type ListSpaceRolesResponse = (Pick<Role, 'id' | 'name' | 'source'> & {
           user: User;
       };
   }[];
+  spacePermissions: SpacePermission[]
 })
 
 async function listSpaceRoles (req: NextApiRequest, res: NextApiResponse<ListSpaceRolesResponse[]>) {
@@ -50,6 +51,11 @@ async function listSpaceRoles (req: NextApiRequest, res: NextApiResponse<ListSpa
               user: true
             }
           }
+        }
+      },
+      spacePermissions: {
+        where: {
+          forSpaceId: spaceId as string
         }
       }
     }

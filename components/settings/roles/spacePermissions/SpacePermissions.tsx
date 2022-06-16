@@ -1,32 +1,28 @@
 
 import Box from '@mui/material/Box';
-import Button from 'components/common/Button';
-import Modal from 'components/common/Modal';
-import Legend from 'components/settings/Legend';
 import Grid from '@mui/material/Grid';
-import ImportGuildRolesMenuItem from 'components/settings/roles/components/ImportGuildRolesMenuItem';
-import useRoles from 'components/settings/roles/hooks/useRoles';
-import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import useIsAdmin from 'hooks/useIsAdmin';
-import { useRef, useState, useEffect } from 'react';
-import { Menu } from '@mui/material';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import Loader from 'components/common/Loader';
 import charmClient from 'charmClient';
+import Loader from 'components/common/Loader';
+import useIsAdmin from 'hooks/useIsAdmin';
+import { useEffect, useState } from 'react';
 
-import { spaceOperationLabels, SpacePermissionFlags } from 'lib/permissions/spaces/client';
-import { AssignablePermissionGroups, PermissionAssigneeId } from 'lib/permissions/interfaces';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import Switch from '@mui/material/Switch';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
 import { SpaceOperation } from '@prisma/client';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { AssignablePermissionGroups } from 'lib/permissions/interfaces';
+import { spaceOperationLabels, SpacePermissionFlags } from 'lib/permissions/spaces/client';
 
+/**
+ * @param callback Used to tell the parent the operation is complete. Useful for triggering refreshes
+ */
 interface Props {
   targetGroup: AssignablePermissionGroups;
-  id: string
+  id: string,
+  callback?: () => void
 }
 
-export default function SpacePermissions ({ targetGroup, id }: Props) {
+export default function SpacePermissions ({ targetGroup, id, callback = () => null }: Props) {
 
   const [assignedPermissions, setAssignedPermissions] = useState<SpacePermissionFlags | null>(null);
 
@@ -61,6 +57,7 @@ export default function SpacePermissions ({ targetGroup, id }: Props) {
       // Force a refresh of rendered components
       setAssignedPermissions(null);
       refreshGroupPermissions();
+      callback();
     }
   }
 
