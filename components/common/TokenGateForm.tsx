@@ -19,7 +19,6 @@ import { useUser } from 'hooks/useUser';
 import charmClient from 'charmClient';
 import { useRouter } from 'next/router';
 import log from 'lib/log';
-import { getChainFromGate, getLitChainFromChainId } from 'lib/token-gates';
 import { useSnackbar } from 'hooks/useSnackbar';
 
 interface Props {
@@ -47,7 +46,7 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
     }
     else {
       humanizeAccessControlConditions({
-        accessControlConditions: (tokenGate.conditions as any)?.accessControlConditions || [],
+        ...tokenGate.conditions as any,
         myWalletAddress: account || ''
       }).then(result => {
         setDescription(result);
@@ -87,12 +86,10 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
 
     setIsLoading(true);
 
-    const chain = getLitChainFromChainId(chainId);
-
     setError('');
 
     const authSig = await checkAndSignAuthMessage({
-      chain
+      chain: (tokenGate.conditions as any).chain
     })
       .catch(err => {
         if (err.errorCode === 'unsupported_chain') {
@@ -104,10 +101,9 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
       });
 
     const jwt = authSig && await litClient.getSignedToken({
-      resourceId: tokenGate.resourceId as any,
       authSig,
-      chain,
-      accessControlConditions: (tokenGate.conditions as any).accessControlConditions
+      resourceId: tokenGate.resourceId as any,
+      ...tokenGate.conditions as any
     })
       .catch(err => {
         if (err.errorCode === 'not_authorized') {
@@ -186,11 +182,11 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
                   <Typography gutterBottom>
                     {description}
                   </Typography>
-                  <Typography variant='body2'>
+                  {/* <Typography variant='body2'>
                     Chain:
                     {' '}
                     {tokenGate && getChainName(tokenGate)}
-                  </Typography>
+                  </Typography> */}
                 </CardContent>
               </Card>
             </Grid>
@@ -218,9 +214,4 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
     </>
   );
 
-}
-
-function getChainName (tokenGate: TokenGate): string | undefined {
-  const chain = getChainFromGate(tokenGate);
-  return ALL_LIT_CHAINS[chain]?.name;
 }

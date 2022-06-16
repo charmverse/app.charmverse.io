@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { v4 as uuid } from 'uuid';
 import { useRouter } from 'next/router';
 import { ResourceId, checkAndSignAuthMessage, SigningConditions } from 'lit-js-sdk';
-import ShareModal from 'lit-share-modal-v3-react-17';
+// import ShareModal from 'lit-share-modal-v3-react-17';
 import Modal, { ErrorModal } from 'components/common/Modal';
 import { usePopupState, bindPopover, bindTrigger } from 'material-ui-popup-state/hooks';
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
@@ -15,12 +15,14 @@ import styled from '@emotion/styled';
 import { useTheme } from '@emotion/react';
 import { Box } from '@mui/material';
 import Button from 'components/common/Button';
-import { getLitChainFromChainId } from 'lib/token-gates';
 import { useSnackbar } from 'hooks/useSnackbar';
 import useSWR from 'swr';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import dynamic from 'next/dynamic';
 import Legend from '../Legend';
 import TokenGatesTable from './TokenGatesTable';
+
+const LitShareModal = dynamic(() => import('lit-share-modal-v3-react-17'));
 
 const ShareModalContainer = styled.div`
 
@@ -36,7 +38,7 @@ border-radius: 0.25em;
 
 // Example: https://github.com/LIT-Protocol/lit-js-sdk/blob/9b956c0f399493ae2d98b20503c5a0825e0b923c/build/manual_tests.html
 
-type ConditionsModalResult = Pick<SigningConditions, 'accessControlConditions' | 'permanant'>;
+type ConditionsModalResult = Pick<SigningConditions, 'accessControlConditions' | 'chain' | 'permanant'>;
 
 export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, spaceId: string }) {
   const deletePopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-delete' });
@@ -55,7 +57,6 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
   const shareLink = `https://app.charmverse.io/join?domain=${router.query.domain}`;
 
   function onSubmit (conditions: ConditionsModalResult) {
-    // console.log('conditions', conditions);
     setApiError('');
     saveTokenGate(conditions)
       .then(() => {
@@ -72,7 +73,7 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
     deletePopupState.close();
   }
 
-  async function saveTokenGate (conditions: Partial<SigningConditions>) {
+  async function saveTokenGate (conditions: ConditionsModalResult) {
     const tokenGateId = uuid();
     const resourceId: ResourceId = {
       baseUrl: 'https://app.charmverse.io',
@@ -83,15 +84,13 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
         tokenGateId
       })
     };
-    const chain = getLitChainFromChainId(chainId);
 
     const authSig = await checkAndSignAuthMessage({
-      chain
+      chain: conditions.chain
     });
     await litClient!.saveSigningCondition({
       ...conditions,
       authSig,
-      chain,
       resourceId
     });
     await charmClient.saveTokenGate({
@@ -142,7 +141,7 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
         && <TokenGatesTable isAdmin={isAdmin} tokenGates={data} onDelete={deleteTokenGate} />}
       <Modal {...bindPopover(popupState)} size='large'>
         <ShareModalContainer>
-          <ShareModal
+          <LitShareModal
             darkMode={theme.palette.mode === 'dark'}
             injectCSS={false}
             permanentDefault={true}
