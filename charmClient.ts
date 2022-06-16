@@ -651,6 +651,7 @@ class CharmClient {
 
   getBuildId () {
     return http.GET<{ buildId: string }>('/api/build-id');
+  }
 
   markTasks (tasks: MarkTask[]) {
     return http.POST('/api/tasks/mark', tasks);
