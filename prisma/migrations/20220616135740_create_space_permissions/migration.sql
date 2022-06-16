@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "SpaceOperation" AS ENUM ('createPage');
+CREATE TYPE "SpaceOperation" AS ENUM ('createPage', 'createBounty');
 
 -- CreateTable
 CREATE TABLE "SpacePermission" (
@@ -9,7 +9,7 @@ CREATE TABLE "SpacePermission" (
     "forSpaceId" UUID NOT NULL,
     "roleId" UUID,
     "spaceId" UUID,
-    "userId" UUID NOT NULL,
+    "userId" UUID,
 
     CONSTRAINT "SpacePermission_pkey" PRIMARY KEY ("id")
 );

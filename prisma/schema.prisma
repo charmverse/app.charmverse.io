@@ -156,7 +156,7 @@ model User {
   identityType      IdentityType?
   notificationState UserNotificationState?
   UserNotification  UserNotification[]
-  SpacePermissions  SpacePermission[]
+  spacePermissions  SpacePermission[]
 }
 
 model UserNotificationState {
@@ -387,7 +387,7 @@ model Role {
   permissions      PagePermission[]
   source           RoleSource?
   sourceId         String?
-  SpacePermissions  SpacePermission[]
+  spacePermissions  SpacePermission[]
 
   TokenGateToRole TokenGateToRole[]
   @@unique([spaceId, name])
