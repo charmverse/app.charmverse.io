@@ -6,7 +6,7 @@ import { BountiesContext } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
-import { useContext, useMemo, useState, useEffect } from 'react';
+import { useContext, useMemo, useState, useEffect, useRef } from 'react';
 import { CSVLink } from 'react-csv';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { BountyWithDetails } from 'models';
@@ -39,7 +39,19 @@ export default function BountyList () {
   const [displayBountyDialog, setDisplayBountyDialog] = useState(false);
   const { bounties } = useContext(BountiesContext);
 
-  const [space] = useCurrentSpace();
+  const [space,, currentUserPermissions] = useCurrentSpace();
+
+  // This is a hack so we can have a small time delay before showing the create / suggest bounty button.
+  // The hack gives us 700 milliseconds to provide time for permissions to load and show correct button without it flashing from suggest to create
+  const [mountedOn] = useState(Date.now());
+  const buttonDisplayDelayMilliseconds = 700;
+  const [showCreateOrSuggestBountyButton, setShowCreateOrSuggestBountyButton] = useState(false);
+
+  if (!showCreateOrSuggestBountyButton) {
+    setTimeout(() => {
+      setShowCreateOrSuggestBountyButton(true);
+    }, buttonDisplayDelayMilliseconds);
+  }
 
   const [savedBountyFilters, setSavedBountyFilters] = useLocalStorage<BountyStatus[]>(`${space?.id}-bounty-filters`, ['open', 'inProgress']);
 
@@ -48,10 +60,8 @@ export default function BountyList () {
     setSavedBountyFilters(savedBountyFilters.filter(status => BountyStatus[status] !== undefined));
   }, []);
 
-  const isAdmin = useIsAdmin();
-
   // User can only suggest a bounty instead of creating it
-  const suggestBounties = isAdmin === false;
+  const suggestBounties = currentUserPermissions.createBounty === false;
 
   const filteredBounties = filterBounties(bounties.slice(), savedBountyFilters);
 
@@ -98,14 +108,20 @@ export default function BountyList () {
               </CSVLink>
             )}
             <MultiPaymentModal bounties={bounties} />
-            <Button
-              sx={{ ml: 1 }}
-              onClick={() => {
-                setDisplayBountyDialog(true);
-              }}
-            >
-              {isAdmin ? 'Create' : 'Suggest'} Bounty
-            </Button>
+
+            {
+              showCreateOrSuggestBountyButton && (
+                <Button
+                  sx={{ ml: 1 }}
+                  onClick={() => {
+                    setDisplayBountyDialog(true);
+                  }}
+                >
+                  {suggestBounties ? 'Suggest' : 'Create'} Bounty
+                </Button>
+              )
+            }
+
           </Box>
         </Box>
 
