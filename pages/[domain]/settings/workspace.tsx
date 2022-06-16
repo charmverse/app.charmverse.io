@@ -102,9 +102,9 @@ export default function WorkspaceSettings () {
             <Avatar
               name={watchName}
               variant='rounded'
-              spaceImage={watchSpaceImage}
+              image={watchSpaceImage}
               updateImage={(url: string) => setValue('spaceImage', url, { shouldDirty: true })}
-              displayIcons={isAdmin}
+              editable={isAdmin}
             />
             <TextField
               {...register('spaceImage')}

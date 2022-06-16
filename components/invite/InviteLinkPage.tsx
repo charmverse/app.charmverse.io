@@ -29,7 +29,7 @@ export default function InvitationPage ({ invite }: { invite: InviteLinkPopulate
     <CenteredBox>
       <Card sx={{ p: 3, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
         <Box mb={3}>
-          <WorkspaceAvatar name={invite.space.name} variant='rounded' />
+          <WorkspaceAvatar image={invite.space.spaceImage} name={invite.space.name} variant='rounded' />
         </Box>
         <Box display='flex' flexDirection='column' alignItems='center' mb={3}>
           <Typography gutterBottom>You've been invited to join</Typography>

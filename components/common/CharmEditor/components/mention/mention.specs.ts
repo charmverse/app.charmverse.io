@@ -3,6 +3,14 @@ import { DOMOutputSpec } from '@bangle.dev/pm';
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
 import { mentionNodeName, mentionSuggestMarkName, mentionTrigger } from './mention.constants';
 
+export interface MentionSpecSchemaAttrs {
+  value: string
+  type: 'user' | 'page'
+  id: string
+  createdAt: Date
+  createdBy: string
+}
+
 export function mentionSpecs (): RawSpecs {
   const spec = suggestTooltip.spec({ markName: mentionSuggestMarkName, trigger: mentionTrigger });
   return [
@@ -16,6 +24,15 @@ export function mentionSpecs (): RawSpecs {
           },
           type: {
             default: 'user'
+          },
+          id: {
+            default: null
+          },
+          createdAt: {
+            default: null
+          },
+          createdBy: {
+            default: null
           }
         },
         inline: true,

@@ -9,6 +9,7 @@
     ]
   },
   "compilerOptions": {
+    "importHelpers": true,
     "baseUrl": ".",
     "strict": true,
     "target": "es2019",

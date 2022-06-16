@@ -3,7 +3,7 @@ import Button from 'components/common/Button';
 import Tooltip from '@mui/material/Tooltip';
 import styled from '@emotion/styled';
 import { useWeb3React } from '@web3-react/core';
-import { Chains, RPC, Blockchain } from 'connectors';
+import { RPC, Blockchain } from 'connectors';
 import { greyColor2 } from 'theme/colors';
 
 type Props = {
@@ -19,7 +19,7 @@ const ImageIcon = styled.img`
 function NetworkButton ({ chain, requestNetworkChange }: Props) {
   const { chainId } = useWeb3React();
 
-  const isCurrentChain = Chains[chain] === chainId;
+  const isCurrentChain = RPC[chain].chainId === chainId;
 
   return (
     <Tooltip

@@ -6,6 +6,7 @@ import AvatarWithIcons from 'components/common/AvatarWithIcons';
 import Box from '@mui/material/Box';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import IconButton from '@mui/material/IconButton';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
 
 const StyledBox = styled(Box)`
@@ -20,24 +21,38 @@ const baseAvatarStyles = css`
 
 const StyledAvatar = styled(Avatar)`
   ${baseAvatarStyles}
-  ${({ variant }) => variant === 'rounded' && 'border-radius: 7x'};
+  ${({ variant }) => variant === 'rounded' && 'border-radius: 25px'};
 `;
 
 const StyledAvatarWithIcons = styled(AvatarWithIcons)`
   ${baseAvatarStyles}
   ${({ variant }) => variant === 'rounded' && 'border-radius: 25px'};
-
   &:hover .edit-avatar-icon, .delete-avatar-icon {
-      display: initial;
-    }
+    display: initial;
+  }
 `;
+
+function StyledIconButton ({ children, ...props }: { children: ReactNode, key: string, onClick: () => void }) {
+  return (
+    <IconButton
+      sx={{
+        bgcolor: 'background.dark',
+        '&:hover': { bgcolor: 'background.light' }
+      }}
+      size='small'
+      {...props}
+    >
+      {children}
+    </IconButton>
+  );
+}
 
 type LargeAvatarProps = {
   name: string;
-  spaceImage?: string | null | undefined;
+  image?: string | null | undefined;
   updateImage?: (url: string) => void;
   variant?: 'circular' | 'rounded' | 'square';
-  displayIcons?: boolean;
+  editable?: boolean;
 };
 
 const getIcons = (editIcon: ReactNode, deleteIcon: ReactNode, avatar: string | null | undefined) => {
@@ -49,11 +64,25 @@ const getIcons = (editIcon: ReactNode, deleteIcon: ReactNode, avatar: string | n
 };
 
 export default function LargeAvatar (props: LargeAvatarProps) {
-  const { name = '', spaceImage, updateImage, variant, displayIcons } = props;
+  const { name, image, updateImage, variant, editable } = props;
   const inputFile = useRef<HTMLInputElement>(null);
+  const icons = getIcons(
+    <StyledIconButton key='edit-avatar' onClick={() => inputFile && inputFile.current && inputFile.current.click()}>
+      <EditIcon
+        fontSize='small'
+      />
+    </StyledIconButton>,
+    <StyledIconButton key='delete-avatar' onClick={() => updateImage && updateImage('')}>
+      <DeleteIcon
+        onClick={() => updateImage && updateImage('')}
+        fontSize='small'
+      />
+    </StyledIconButton>,
+    image
+  );
 
   return (
-    displayIcons
+    editable
       ? (
         <StyledBox>
           <input
@@ -79,35 +108,18 @@ export default function LargeAvatar (props: LargeAvatarProps) {
             }}
           />
           <StyledAvatarWithIcons
-            avatar={spaceImage}
-            icons={
-              getIcons(
-                <EditIcon
-                  onClick={() => inputFile && inputFile.current && inputFile.current.click()}
-                  fontSize='small'
-                  key='edit-avatar'
-                />,
-                <DeleteIcon
-                  onClick={() => updateImage && updateImage('')}
-                  fontSize='small'
-                  key='delete-avatar'
-                />,
-                spaceImage
-              )
-          }
-            {...props}
-          >
-            {name.charAt(0).toUpperCase()}
-          </StyledAvatarWithIcons>
+            avatar={image}
+            name={name}
+            variant={variant}
+            icons={icons}
+          />
         </StyledBox>
       ) : (
         <StyledAvatar
-          avatar={spaceImage}
+          avatar={image}
           name={name}
           variant={variant}
-        >
-          {name.charAt(0).toUpperCase()}
-        </StyledAvatar>
+        />
       )
   );
 }

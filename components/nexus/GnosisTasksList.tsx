@@ -16,8 +16,9 @@ import { DateTime } from 'luxon';
 import Tooltip from '@mui/material/Tooltip';
 import { useUser } from 'hooks/useUser';
 import EmailIcon from '@mui/icons-material/Email';
+import { GetTasksResponse } from 'pages/api/tasks/list';
+import { KeyedMutator } from 'swr';
 import { GnosisConnectCard } from '../integrations/components/GnosisSafes';
-import useTasks from './hooks/useTasks';
 import useTasksState from './hooks/useTasksState';
 
 const rowHeight = 48;
@@ -275,9 +276,14 @@ function SafeTasks (
   );
 }
 
-export default function GnosisTasksSection () {
+interface GnosisTasksSectionProps {
+  tasks: GetTasksResponse | undefined
+  error: any
+  mutateTasks: KeyedMutator<GetTasksResponse>
+}
+
+export default function GnosisTasksSection ({ error, mutateTasks, tasks }: GnosisTasksSectionProps) {
   const { data: safeData, mutate } = useMultiWalletSigs();
-  const { error, mutate: mutateTasks, tasks } = useTasks();
   const { snoozedForDate } = useTasksState();
   const [user] = useUser();
   const gnosisSigner = useGnosisSigner();

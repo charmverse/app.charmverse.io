@@ -82,7 +82,7 @@ export default function Workspaces () {
                     <WorkspaceAvatar
                       active={space?.domain === workspace.domain}
                       name={workspace.name}
-                      spaceImage={workspace.spaceImage}
+                      image={workspace.spaceImage}
                     />
                   </span>
                 </Tooltip>
