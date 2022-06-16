@@ -162,6 +162,7 @@ model UserNotificationState {
 
 enum NotificationType {
   multisig
+  mention
 }
 
 model UserNotification {

@@ -10,6 +10,8 @@ import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/sto
 import { getCardComments } from 'components/common/BoardEditor/focalboard/src/store/comments';
 import { usePages } from 'hooks/usePages';
 import { useCommentThreadsListDisplay } from 'hooks/useCommentThreadsListDisplay';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useUser } from 'hooks/useUser';
 import PageHeader from './components/PageHeader';
 import PageBanner from './components/PageBanner';
 import CharmEditor, { ICharmEditorOutput } from '../../common/CharmEditor/CharmEditor';
@@ -34,6 +36,7 @@ export interface IEditorProps {
 
 function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
   const { pages } = usePages();
+
   const board = useAppSelector((state) => {
     if (page.type === 'card' && page.parentId) {
       const parentPage = pages[page.parentId];
@@ -92,6 +95,7 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
             onContentChange={updatePageContent}
             readOnly={readOnly}
             showingCommentThreadsList={showingCommentThreadsList}
+            pageId={page.id}
           >
             <PageHeader
               headerImage={page.headerImage}
