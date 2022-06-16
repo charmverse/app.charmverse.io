@@ -3,6 +3,7 @@ import { Space } from '@prisma/client';
 import { useCallback, useMemo, useEffect, useState } from 'react';
 import { AvailableSpacePermissions, SpacePermissionFlags } from 'lib/permissions/spaces/client';
 import charmClient from 'charmClient';
+import useSWR from 'swr';
 import { useSpaces } from './useSpaces';
 import { useUser } from './useUser';
 
@@ -21,17 +22,17 @@ export function useCurrentSpace () {
     setSpaces(newSpaces);
   }, [spaces, setSpaces]);
 
-  useEffect(() => {
+  const { data } = useSWR(() => space ? `permissions-${space.id}` : null, () => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return charmClient.computeUserSpacePermissions({ spaceId: space!.id });
+  }, { revalidateOnFocus: true, focusThrottleInterval: 0 });
 
-    if (space && user) {
-      charmClient.computeUserSpacePermissions({
-        spaceId: space.id
-      }).then(permissions => {
-        setCurrentUserSpacePermissions(permissions);
-      });
+  useEffect(() => {
+    if (data) {
+      setCurrentUserSpacePermissions(data);
     }
 
-  }, [space, user]);
+  }, [data]);
 
   return [space, setSpace, currentUserSpacePermissions] as const;
 }
