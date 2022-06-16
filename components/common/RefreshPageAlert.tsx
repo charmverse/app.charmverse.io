@@ -9,9 +9,13 @@ const StyledAlert = styled(Alert)`
     margin: auto;
     left: 0;
     right: 0;
-    max-width: 550px;
+    max-width: 590px;
     width: 100%;
     z-index: 2000;
+
+    & > .MuiAlert-icon {
+        padding-top: 8px;
+    }
 `;
 
 type RefreshPageAlertProps = {
