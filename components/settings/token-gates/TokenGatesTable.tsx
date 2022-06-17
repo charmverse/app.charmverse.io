@@ -15,7 +15,6 @@ import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import Chip from '@mui/material/Chip';
 import charmClient from 'charmClient';
 import TableRow from 'components/common/Table/TableRow';
-import { getLitChainFromChainId } from 'lib/token-gates';
 import { TokenGateWithRoles } from 'pages/api/token-gates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { mutate } from 'swr';
@@ -56,7 +55,8 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
       const results = await Promise.all(
         tokenGates.map(tokenGate => humanizeAccessControlConditions({
           myWalletAddress: account || '',
-          accessControlConditions: (tokenGate.conditions as any)?.accessControlConditions || []
+          ...tokenGate.conditions as any
+          // accessControlConditions: (tokenGate.conditions as any)?.accessControlConditions || []
         }))
       );
       setDescriptions(results);
@@ -65,17 +65,16 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
   }, [tokenGates]);
 
   async function testConnect (tokenGate: TokenGate) {
-    const chain = getLitChainFromChainId(chainId);
     setTestResult({ status: 'loading' });
     try {
       const authSig = await checkAndSignAuthMessage({
-        chain
+        chain: (tokenGate.conditions as any).chain || 'ethereum'
       });
       const jwt = await litClient!.getSignedToken({
         resourceId: tokenGate.resourceId as any,
         authSig,
-        chain,
-        accessControlConditions: (tokenGate.conditions as any).accessControlConditions
+        chain: (tokenGate.conditions as any).chain || 'ethereum',
+        ...tokenGate.conditions as any
       });
       await charmClient.verifyTokenGate({ jwt, id: tokenGate.id });
 
@@ -105,7 +104,8 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
           {tokenGates.map((tokenGate, tokenGateIndex) => (
             <TableRow key={tokenGate.id} sx={{ '&:last-child td, &:last-child th': { border: 0 }, marginBottom: 20 }}>
               <TableCell sx={{ px: 0 }}>
-                <Typography variant='body2' sx={{ my: 1 }}>{descriptions[tokenGateIndex]}
+                <Typography variant='body2' sx={{ my: 1 }}>
+                  {descriptions[tokenGateIndex]}
                 </Typography>
               </TableCell>
               <TableCell>
