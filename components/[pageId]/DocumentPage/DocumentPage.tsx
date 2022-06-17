@@ -35,7 +35,6 @@ export interface IEditorProps {
 
 function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
   const { pages } = usePages();
-  const router = useRouter();
   const board = useAppSelector((state) => {
     if (page.type === 'card' && page.parentId) {
       const parentPage = pages[page.parentId];
@@ -74,9 +73,10 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
 
   const comments = useAppSelector(getCardComments(card?.id));
 
-  const cardId = router.query;
+  const cardId = typeof window !== 'undefined' ? (new URLSearchParams(window.location.href)).get('cardId') : null;
 
   const showCommentThreadList = showingCommentThreadsList && !cardId;
+
   return (
     <ScrollableWindow hideScroll={showCommentThreadList}>
       <div style={{
