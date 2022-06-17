@@ -216,8 +216,6 @@ describe('PUT /api/pages/{pageId} - reposition page to different tree', () => {
       }))
       .expect(201)).body as IPageWithPermissions;
 
-    const oldRootSpacePermissionId = oldRootPage.permissions[0].id;
-
     const newRootPage = (await request(baseUrl)
       .post('/api/pages')
       .set('Cookie', cookie)
@@ -257,7 +255,7 @@ describe('PUT /api/pages/{pageId} - reposition page to different tree', () => {
 
     // Should now inherit from parent (Base space permission + createdBy user permission)
     expect(childWithPermissions.permissions.length).toBe(2);
-    expect(childWithPermissions.permissions[0].inheritedFromPermission).toBe(newRootPermissionId);
+    expect(childWithPermissions.permissions.find(p => p.inheritedFromPermission === newRootPermissionId as string)).toBeDefined();
   });
 
   /**
