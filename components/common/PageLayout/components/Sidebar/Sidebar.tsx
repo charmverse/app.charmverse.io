@@ -18,6 +18,7 @@ import Link from 'components/common/Link';
 import { addPageAndRedirect, NewPageInput } from 'lib/pages';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { BoxProps } from '@mui/system';
+import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { headerHeight } from '../Header/Header';
 import NewPageMenu from '../NewPageMenu';
 import Workspaces from './Workspaces';
@@ -158,7 +159,8 @@ interface SidebarProps {
 export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const router = useRouter();
   const [user] = useUser();
-  const [space,, userSpacePermissions] = useCurrentSpace();
+  const [space] = useCurrentSpace();
+  const [userSpacePermissions] = useCurrentSpacePermissions();
   const [isScrolled, setIsScrolled] = useState(false);
   const [showingTrash, setShowingTrash] = useState(false);
 
@@ -222,7 +224,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                 WORKSPACE
               </SectionName>
               {
-                userSpacePermissions.createPage && (
+                userSpacePermissions?.createPage && (
                   <div className='add-a-page'>
                     <NewPageMenu tooltip='Add a page' addPage={addPage} />
                   </div>

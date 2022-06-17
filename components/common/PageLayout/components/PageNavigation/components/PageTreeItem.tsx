@@ -25,7 +25,7 @@ import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePages } from 'hooks/usePages';
 import type { Identifier } from 'dnd-core';
 import { greyColor2 } from 'theme/colors';
@@ -318,7 +318,7 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
   const anchorOrigin = useMemo(() => ({ vertical: 'bottom', horizontal: 'left' } as const), []);
   const transformOrigin = useMemo(() => ({ vertical: 'top', horizontal: 'left' } as const), []);
 
-  const [,, userSpacePermissions] = useCurrentSpace();
+  const [userSpacePermissions] = useCurrentSpacePermissions();
 
   const labelComponent = useMemo(() => (
     <PageLink
@@ -334,7 +334,7 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
         </MemoizedIconButton>
 
         {
-          userSpacePermissions.createPage && (
+          userSpacePermissions?.createPage && (
             pageType === 'board' ? (
               <AddNewCard pageId={pageId} />
             ) : (
@@ -345,7 +345,7 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
 
       </div>
     </PageLink>
-  ), [href, label, pageId, icon, addSubPage, pageType, userSpacePermissions.createPage]);
+  ), [href, label, pageId, icon, addSubPage, pageType, userSpacePermissions?.createPage]);
 
   return (
     <>
