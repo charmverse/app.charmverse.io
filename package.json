@@ -234,7 +234,6 @@
     "sass": "^1.49.0",
     "supertest": "^6.2.2",
     "ts-jest": "^28.0.5",
-    "webpack": "^5.73.0",
-    "webpack-dev-server": "^4.9.2"
+    "webpack": "^5.73.0"
   }
 }
