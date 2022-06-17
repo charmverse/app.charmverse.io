@@ -32,6 +32,7 @@ import { greyColor2 } from 'theme/colors';
 import { untitledPage } from 'seedData';
 import { useUser } from 'hooks/useUser';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import NewPageMenu from '../../NewPageMenu';
 import { StyledPageIcon, StyledDatabaseIcon } from '../../PageIcon';
 import PageTitle from '../../PageTitle';
