@@ -148,7 +148,7 @@ import { SpacesProvider } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
 import { isMobile } from 'lib/browser';
 // Lit Protocol CSS
-import 'lit-share-modal/dist/style.css';
+import 'lit-share-modal-v3-react-17/dist/ShareModal.css';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
@@ -168,8 +168,6 @@ import {
 } from 'theme/focalboard/theme';
 import { setDarkMode } from 'theme/darkMode';
 import cssVariables from 'theme/cssVariables';
-import 'theme/lit-share-modal/lit-share-modal.scss';
-import { setTheme as setLitProtocolTheme } from 'theme/lit-share-modal/theme';
 import 'theme/styles.scss';
 import Snackbar from 'components/common/Snackbar';
 import { SnackbarProvider } from 'hooks/useSnackbar';
@@ -220,7 +218,6 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
     if (typeof window !== 'undefined') {
       setFocalBoardTheme(mode === 'dark' ? darkTheme : lightTheme);
       setSavedDarkMode(mode);
-      setLitProtocolTheme(mode, muiTheme);
       setDarkMode(mode === 'dark');
     }
     return muiTheme;
