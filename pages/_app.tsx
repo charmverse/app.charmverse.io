@@ -22,7 +22,6 @@ import { Web3ReactProvider } from '@web3-react/core';
 import log from 'lib/log';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import RouteGuard from 'components/common/RouteGuard';
-import RefreshPageAlert from 'components/common/RefreshPageAlert';
 import 'theme/focalboard/focalboard.button.scss';
 import 'theme/focalboard/focalboard.main.scss';
 import 'theme/focalboard/focalboard.typography.scss';
@@ -178,6 +177,8 @@ import { SnackbarProvider } from 'hooks/useSnackbar';
 import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
+import IconButton from '@mui/material/IconButton';
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 import charmClient from 'charmClient';
 
@@ -272,14 +273,18 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
                         <Global styles={cssVariables} />
                         <RouteGuard>
                           <ErrorBoundary>
-                            {
-                              isOldBuild && (
-                              <RefreshPageAlert
-                                clear={() => setIsOldBuild(false)}
-                                content='You are viewing an out of date version, please refresh the page.'
-                              />
-                              )
-                            }
+                            <Snackbar
+                              isOpen={isOldBuild}
+                              message='You are viewing an out of date version, please refresh the page.'
+                              action={(
+                                <IconButton onClick={() => window.location.reload()} sx={{ padding: 0, marginLeft: '10px' }}>
+                                  <RefreshIcon sx={{ color: '#FFF' }} fontSize='small' />
+                                </IconButton>
+                              )}
+                              origin={{ vertical: 'top', horizontal: 'center' }}
+                              severity='warning'
+                              handleClose={() => setIsOldBuild(false)}
+                            />
                             {getLayout(<Component {...pageProps} />)}
                             <Snackbar />
                           </ErrorBoundary>
