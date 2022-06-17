@@ -1,21 +1,20 @@
-import { useCallback, memo } from 'react';
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
-import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
-import { Page, PageContent } from 'models';
-import BountyIntegration from 'components/[pageId]/DocumentPage/components/BountyIntegration';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
-import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { getCardComments } from 'components/common/BoardEditor/focalboard/src/store/comments';
-import { usePages } from 'hooks/usePages';
+import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
+import BountyIntegration from 'components/[pageId]/DocumentPage/components/BountyIntegration';
 import { useCommentThreadsListDisplay } from 'hooks/useCommentThreadsListDisplay';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useUser } from 'hooks/useUser';
-import PageHeader from './components/PageHeader';
-import PageBanner from './components/PageBanner';
+import { usePages } from 'hooks/usePages';
+import { Page, PageContent } from 'models';
+import { useRouter } from 'next/router';
+import { memo, useCallback } from 'react';
 import CharmEditor, { ICharmEditorOutput } from '../../common/CharmEditor/CharmEditor';
+import PageBanner from './components/PageBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
+import PageHeader from './components/PageHeader';
 
 export const Container = styled(Box)<{ top: number, fullWidth?: boolean }>`
   width: ${({ fullWidth }) => fullWidth ? '100%' : '860px'};
@@ -36,7 +35,7 @@ export interface IEditorProps {
 
 function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
   const { pages } = usePages();
-
+  const router = useRouter();
   const board = useAppSelector((state) => {
     if (page.type === 'card' && page.parentId) {
       const parentPage = pages[page.parentId];
@@ -75,12 +74,15 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
 
   const comments = useAppSelector(getCardComments(card?.id));
 
+  const cardId = router.query;
+
+  const showCommentThreadList = showingCommentThreadsList && !cardId;
   return (
-    <ScrollableWindow hideScroll={showingCommentThreadsList}>
+    <ScrollableWindow hideScroll={showCommentThreadList}>
       <div style={{
-        width: showingCommentThreadsList ? 'calc(100% - 425px)' : '100%',
-        height: showingCommentThreadsList ? 'calc(100vh - 65px)' : '100%',
-        overflow: showingCommentThreadsList ? 'auto' : 'inherit'
+        width: showCommentThreadList ? 'calc(100% - 425px)' : '100%',
+        height: showCommentThreadList ? 'calc(100vh - 65px)' : '100%',
+        overflow: showCommentThreadList ? 'auto' : 'inherit'
       }}
       >
         {page.deletedAt && <PageDeleteBanner pageId={page.id} />}
@@ -94,7 +96,7 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
             content={page.content as PageContent}
             onContentChange={updatePageContent}
             readOnly={readOnly}
-            showingCommentThreadsList={showingCommentThreadsList}
+            showingCommentThreadsList={showCommentThreadList}
             pageId={page.id}
           >
             <PageHeader
