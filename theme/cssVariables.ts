@@ -37,12 +37,6 @@ const globalCSS = css`
 
     --default-rad: 4px;
     --modal-rad: 8px;
-
-  }
-
-  /* lit protocol */
-  .lsm-light-theme {
-    --lsm-accent-color: ${colors.blueColor};
   }
 
   /* dark theme */
