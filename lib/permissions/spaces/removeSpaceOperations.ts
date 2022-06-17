@@ -23,7 +23,7 @@ export async function removeSpaceOperations<A extends AssignablePermissionGroups
   });
 
   if (!existingPermission) {
-    return new AvailableSpacePermissions();
+    return new AvailableSpacePermissions().empty;
   }
 
   const assignedOperations = existingPermission.operations.slice();

@@ -31,7 +31,7 @@ export type PermissionAssignee<A extends AssignablePermissionGroups = 'any'> =
   : A extends 'space' ? {user?: null | undefined, role?: null | undefined, space: Space}
   : never
 
-export type UserPermissionFlags<T extends string> = Record<T, boolean>
+export type UserPermissionFlags<T extends string, P extends boolean = boolean> = Record<T, P>
 
 /**
  * Required data for calculating operations a user can access relating to a resource

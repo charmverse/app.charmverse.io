@@ -3,10 +3,10 @@ import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middlewar
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import { AvailableSpacePermissions, SpacePermissionFlags } from 'lib/permissions/spaces';
+import { AssignedPermissionsQuery } from 'lib/permissions/interfaces';
+import { SpacePermissionFlags } from 'lib/permissions/spaces';
 import { computeGroupSpacePermissions } from 'lib/permissions/spaces/computeGroupSpacePermissions';
 import nc from 'next-connect';
-import { AssignedPermissionsQuery } from 'lib/permissions/interfaces';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

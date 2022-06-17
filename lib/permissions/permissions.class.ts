@@ -3,7 +3,21 @@ import { UserPermissionFlags } from './interfaces';
 /**
  * Defines each operation as a member property queryable as true / false
  */
-export class Permissions<O extends string> {
+export abstract class Permissions<O extends string> {
+
+  get empty (): UserPermissionFlags<O, false> {
+    return (Object.keys(this.operations) as O[]).reduce((flags, operation) => {
+      flags[operation] = false;
+      return flags;
+    }, {} as UserPermissionFlags<O, false>);
+  }
+
+  get full (): UserPermissionFlags<O, true> {
+    return (Object.keys(this.operations) as O[]).reduce((flags, operation) => {
+      flags[operation] = true;
+      return flags;
+    }, {} as UserPermissionFlags<O, true>);
+  }
 
   get operationFlags (): UserPermissionFlags<O> {
     return (Object.keys(this.operations) as O[]).reduce((flags, operation) => {

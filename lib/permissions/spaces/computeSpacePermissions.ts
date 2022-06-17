@@ -22,12 +22,11 @@ export async function computeSpacePermissions ({
 
   if (error) {
     // Returns all permissions as false since user is not space member
-    return allowedOperations;
+    return allowedOperations.empty;
   }
 
   if (isAdmin && allowAdminBypass) {
-    allowedOperations.addPermissions(Object.keys(SpaceOperation) as SpaceOperation[]);
-    return allowedOperations;
+    return allowedOperations.full;
   }
 
   // Rollup space permissions
