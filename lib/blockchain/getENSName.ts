@@ -8,5 +8,6 @@ export default function getENSName (address: string) {
   return provider.lookupAddress(address)
     .catch(error => {
       log.warn('Error looking up ENS name for address', { error });
+      return null;
     });
 }
