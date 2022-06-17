@@ -59,8 +59,8 @@ describe('PUT /api/pages/{pageId} - reposition page to root', () => {
       })).body as IPageWithPermissions;
     //      .expect(200);
 
-    // Only 1 default permission
-    expect(childWithPermissions.permissions.length).toBe(1);
+    // Base space permission plus createdBy user full access permission
+    expect(childWithPermissions.permissions.length).toBe(2);
     expect(childWithPermissions.permissions.every(perm => perm.inheritedFromPermission === null)).toBe(true);
   });
 
@@ -120,11 +120,15 @@ describe('PUT /api/pages/{pageId} - reposition page to root', () => {
       getPage(superNestedChildPage.id)
     ])) as IPageWithPermissions[];
 
-    expect(childWhichBecameRoot.permissions.length).toBe(1);
+    // Base space permission plus createdBy user full access permission
+    expect(childWhichBecameRoot.permissions.length).toBe(2);
 
-    const newRootPermissionId = childWhichBecameRoot.permissions[0].id;
+    const sourcePermissionIds = childWhichBecameRoot.permissions.map(p => p.id);
 
-    expect(nestedChildWithPermissions.permissions.every(perm => perm.inheritedFromPermission === newRootPermissionId)).toBe(true);
-    expect(superNestedChildWithPermissions.permissions.every(perm => perm.inheritedFromPermission === newRootPermissionId)).toBe(true);
+    expect(nestedChildWithPermissions.permissions.every(perm => sourcePermissionIds.indexOf(perm.inheritedFromPermission as string) >= 0)).toBe(true);
+    expect(superNestedChildWithPermissions
+      .permissions
+      .every(perm => sourcePermissionIds.indexOf(perm.inheritedFromPermission as string) >= 0))
+      .toBe(true);
   });
 });
