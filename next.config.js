@@ -1,4 +1,5 @@
-const path = require('path');
+const path = require('path'); // eslint-disable-line
+const webpack = require('webpack'); // eslint-disable-line
 
 const esmModules = [
   '@bangle.dev/base-components',
@@ -46,7 +47,7 @@ const config = {
       }
     ];
   },
-  webpack (_config, { nextRuntime }) {
+  webpack (_config, { buildId, nextRuntime }) {
     _config.module.rules.push({
       test: /\.svg$/,
       use: ['@svgr/webpack']
@@ -63,6 +64,11 @@ const config = {
         });
       };
     }
+    _config.plugins.push(
+      new webpack.DefinePlugin({
+        'process.env.NEXT_PUBLIC_BUILD_ID': `"${buildId}"`
+      })
+    );
     return _config;
   }
 };
