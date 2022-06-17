@@ -209,9 +209,20 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
         </Grid>
       </Modal>
 
-      <Modal open={rolePermissionsPopupState.isOpen} onClose={rolePermissionsPopupState.close} title={`Manage ${role.name} space permissions`}>
-        <SpacePermissions targetGroup='role' id={role.id} callback={refreshRoles} />
-      </Modal>
+      {
+        rolePermissionsPopupState.isOpen && (
+          <Modal size='large' open onClose={rolePermissionsPopupState.close} title={`${role.name} permissions`}>
+            <SpacePermissions
+              targetGroup='role'
+              id={role.id}
+              callback={() => {
+                refreshRoles();
+                rolePermissionsPopupState.close();
+              }}
+            />
+          </Modal>
+        )
+      }
 
       <Modal {...bindPopover(popupState)} title='Rename role'>
         <RoleForm

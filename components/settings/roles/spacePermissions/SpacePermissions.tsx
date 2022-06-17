@@ -1,17 +1,33 @@
 
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import charmClient from 'charmClient';
 import Loader from 'components/common/Loader';
+import Alert from '@mui/material/Alert';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { useEffect, useState } from 'react';
 
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
-import { SpaceOperation } from '@prisma/client';
+import Typography from '@mui/material/Typography';
+import { SpaceOperation, SpacePermission } from '@prisma/client';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { AssignablePermissionGroups } from 'lib/permissions/interfaces';
-import { spaceOperationLabels, SpacePermissionFlags } from 'lib/permissions/spaces/client';
+import { AvailableSpacePermissions, spaceOperationLabels, spaceOperations, SpacePermissionFlags } from 'lib/permissions/spaces/client';
+import { useForm } from 'react-hook-form';
+import * as yup from 'yup';
+import { BooleanSchema } from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
+
+const fields: Record<SpaceOperation, BooleanSchema> = spaceOperations().reduce((_schema: Record<SpaceOperation, BooleanSchema>, op) => {
+  _schema[op] = yup.boolean();
+  return _schema;
+}, {} as any);
+
+export const schema = yup.object(fields);
+
+type FormValues = yup.InferType<typeof schema>
 
 /**
  * @param callback Used to tell the parent the operation is complete. Useful for triggering refreshes
@@ -30,36 +46,20 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
 
   const isAdmin = useIsAdmin();
 
-  async function togglePermission ({
-    operation,
-    hasAccess
-  }: {operation: SpaceOperation, hasAccess: boolean}) {
-    if (space) {
-      if (hasAccess === false) {
-        await charmClient.removeSpacePermissions({
-          forSpaceId: space.id,
-          operations: [operation],
-          roleId: targetGroup === 'role' ? id : undefined,
-          spaceId: targetGroup === 'space' ? id : undefined,
-          userId: targetGroup === 'user' ? id : undefined
-        } as any);
-      }
-      else if (hasAccess === true) {
-        await charmClient.addSpacePermissions({
-          forSpaceId: space.id,
-          operations: [operation],
-          roleId: targetGroup === 'role' ? id : undefined,
-          spaceId: targetGroup === 'space' ? id : undefined,
-          userId: targetGroup === 'user' ? id : undefined
-        } as any);
-      }
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isValid },
+    setValue,
+    watch
+  } = useForm<FormValues>({
+    mode: 'onChange',
+    defaultValues: assignedPermissions ?? new AvailableSpacePermissions().empty,
+    resolver: yupResolver(schema)
+  });
 
-      // Force a refresh of rendered components
-      setAssignedPermissions(null);
-      refreshGroupPermissions();
-      callback();
-    }
-  }
+  const newValues = watch();
 
   async function refreshGroupPermissions () {
 
@@ -74,7 +74,9 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
         id,
         resourceId: space.id
       });
-
+      spaceOperations().forEach(op => {
+        setValue(op, permissionFlags[op]);
+      });
       setAssignedPermissions(permissionFlags);
     }
   }
@@ -83,40 +85,160 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
     refreshGroupPermissions();
   }, []);
 
+  const settingsChanged = assignedPermissions !== null && (Object.entries(assignedPermissions) as Array<[SpaceOperation, boolean]>)
+    .some(([operation, hasAccess]) => {
+      const newValue = newValues[operation];
+      return newValue !== hasAccess;
+    });
+
+  async function submitted (formValues: FormValues) {
+
+    // Make sure we have existing permission set to compare against
+    if (assignedPermissions && space) {
+      const permissionsToAdd: SpaceOperation[] = [];
+      const permissionsToRemove: SpaceOperation[] = [];
+
+      // Only get new values
+      (Object.entries(formValues) as Array<[SpaceOperation, boolean]>).forEach(([operation, hasAccess]) => {
+        if (assignedPermissions[operation] !== hasAccess) {
+
+          if (hasAccess === true) {
+            permissionsToAdd.push(operation);
+          }
+          else if (hasAccess === false) {
+            permissionsToRemove.push(operation);
+          }
+        }
+      });
+
+      let newPermissionState = assignedPermissions;
+
+      if (permissionsToAdd.length > 0) {
+        newPermissionState = await charmClient.addSpacePermissions({
+          forSpaceId: space.id,
+          operations: permissionsToAdd,
+          spaceId: targetGroup === 'space' ? id : undefined,
+          roleId: targetGroup === 'role' ? id : undefined,
+          userId: targetGroup === 'user' ? id : undefined
+        });
+      }
+
+      if (permissionsToRemove.length > 0) {
+        newPermissionState = await charmClient.removeSpacePermissions({
+          forSpaceId: space.id,
+          operations: permissionsToRemove,
+          spaceId: targetGroup === 'space' ? id : undefined,
+          roleId: targetGroup === 'role' ? id : undefined,
+          userId: targetGroup === 'user' ? id : undefined
+        });
+      }
+      // Force a refresh of rendered components
+      setAssignedPermissions(newPermissionState);
+      callback();
+    }
+  }
+
   if (!assignedPermissions) {
-    return <Box sx={{ height: 100 }}><Loader size={20} sx={{ height: 600 }} /></Box>;
+    return (<Box sx={{ height: 100 }}><Loader size={20} sx={{ height: 600 }} /></Box>);
   }
 
   return (
-    <Grid container direction='column'>
+    <div>
+      <form onSubmit={handleSubmit(formValue => submitted(formValue))} style={{ margin: 'auto' }}>
+        <Grid container direction='column' gap={2}>
 
-      {
+          {
           (Object.keys(spaceOperationLabels) as SpaceOperation[]).map(operation => {
+
+            const userCanPerformAction = assignedPermissions[operation];
+            const actionLabel = spaceOperationLabels[operation];
+
+            const toggleValue = newValues[operation] ?? false;
+            const currentIsDifferentFromStored = toggleValue !== userCanPerformAction;
+
             return (
-              <Grid xs>
-                <FormControlLabel
-                  control={(
-                    <Switch
-                      disabled={!isAdmin}
-                      onChange={(ev) => {
-                        const { checked: hasAccess } = ev.target;
-                        togglePermission({
-                          operation,
-                          hasAccess
-                        });
-                      }}
-                      defaultChecked={assignedPermissions[operation] === true}
-                    />
+              <Grid item container xs>
+                <Grid item xs={6}>
+                  <FormControlLabel
+                    control={(
+                      <Switch
+                        disabled={!isAdmin}
+//                        checked={newValues[operation]}
+                        onChange={(ev) => {
+                          const { checked: nowHasAccess } = ev.target;
+                          const current = userCanPerformAction;
+
+                          if (nowHasAccess !== current) {
+                            setValue(operation, nowHasAccess);
+                          }
+
+                        }}
+                        defaultChecked={userCanPerformAction}
+                      />
                   )}
-                  label={spaceOperationLabels[operation]}
-                />
+                    label={actionLabel}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+
+                  <Typography sx={{ }} variant='body2'>
+                    {
+                      targetGroup === 'space' && toggleValue === true && (`All members of your space can ${actionLabel.toLowerCase()}`)
+                    }
+
+                    {
+                      targetGroup === 'space' && toggleValue === false && (`Space members cannot ${actionLabel.toLowerCase()}`)
+                    }
+
+                    {
+                      targetGroup === 'role' && toggleValue === true && (`Contributors with this role can ${actionLabel.toLowerCase()}`)
+                    }
+
+                    {
+                      targetGroup === 'role' && toggleValue === false && (`Contributors with this role cannot ${actionLabel.toLowerCase()}`)
+                    }
+
+                    {
+                      targetGroup === 'user' && toggleValue === true && (`This user can ${actionLabel.toLowerCase()}`)
+                    }
+
+                    {
+                      targetGroup === 'user' && toggleValue === false && (`This user cannot ${actionLabel.toLowerCase()}`)
+                    }
+
+                  </Typography>
+
+                </Grid>
+
+                {
+                  currentIsDifferentFromStored && (
+                    <Grid item xs>
+                      <Alert severity='warning'>
+                        You are changing this space permission from its current value.
+                      </Alert>
+                    </Grid>
+                  )
+                }
 
               </Grid>
             );
           })
         }
+          {
+        /* Only show save if settings are different from saved */
+      }
+          {
+        settingsChanged && (
+          <Grid item xs sx={{ mt: 3 }}>
+            <Button type='submit' variant='outlined' color='primary' sx={{ mr: 1 }}>Save</Button>
 
-    </Grid>
+          </Grid>
+        )
+      }
 
+        </Grid>
+
+      </form>
+    </div>
   );
 }
