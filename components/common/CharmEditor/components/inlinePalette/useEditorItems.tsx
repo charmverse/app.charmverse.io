@@ -25,6 +25,7 @@ import { PluginKey, TextSelection } from 'prosemirror-state';
 import { useMemo } from 'react';
 import DatabaseIcon from '@mui/icons-material/TableChart';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { insertNode } from '../../utils';
 import { NestedPagePluginState, nestedPageSuggestMarkName } from '../nestedPage';
 import {
@@ -596,7 +597,7 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, 'group'>[]> 
 export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: PluginKey<NestedPagePluginState>}) {
   const { addNestedPage } = useNestedPage();
 
-  const [,, userSpacePermissions] = useCurrentSpace();
+  const [userSpacePermissions] = useCurrentSpacePermissions();
 
   const paletteItems = useMemo(() => {
     const itemGroups = Object.entries({ ...paletteGroupItemsRecord,
@@ -669,7 +670,7 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
         }
       ] as PaletteItemType[]).filter(paletteItem => {
         return !paletteItem.requiredSpacePermission
-        || (paletteItem.requiredSpacePermission && userSpacePermissions[paletteItem.requiredSpacePermission]);
+        || (paletteItem.requiredSpacePermission && userSpacePermissions?.[paletteItem.requiredSpacePermission]);
       })
     })
       .map(([group, paletteItemsWithoutGroup]) => {

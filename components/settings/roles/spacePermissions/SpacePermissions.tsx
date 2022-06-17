@@ -166,12 +166,7 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
 //                        checked={newValues[operation]}
                         onChange={(ev) => {
                           const { checked: nowHasAccess } = ev.target;
-                          const current = userCanPerformAction;
-
-                          if (nowHasAccess !== current) {
-                            setValue(operation, nowHasAccess);
-                          }
-
+                          setValue(operation, nowHasAccess);
                         }}
                         defaultChecked={userCanPerformAction}
                       />
@@ -181,29 +176,29 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
                 </Grid>
                 <Grid item xs={6}>
 
-                  <Typography sx={{ }} variant='body2'>
+                  <Typography sx={{ height: '100%', verticalAlign: 'center' }} variant='body2'>
                     {
-                      targetGroup === 'space' && toggleValue === true && (`All members of your space can ${actionLabel.toLowerCase()}`)
+                      targetGroup === 'space' && newValues[operation] === true && (`All members of your space can ${actionLabel.toLowerCase()}`)
                     }
 
                     {
-                      targetGroup === 'space' && toggleValue === false && (`Space members cannot ${actionLabel.toLowerCase()}`)
+                      targetGroup === 'space' && newValues[operation] === false && (`Space members cannot ${actionLabel.toLowerCase()}`)
                     }
 
                     {
-                      targetGroup === 'role' && toggleValue === true && (`Contributors with this role can ${actionLabel.toLowerCase()}`)
+                      targetGroup === 'role' && newValues[operation] === true && (`Contributors with this role can ${actionLabel.toLowerCase()}`)
                     }
 
                     {
-                      targetGroup === 'role' && toggleValue === false && (`Contributors with this role cannot ${actionLabel.toLowerCase()}`)
+                      targetGroup === 'role' && newValues[operation] === false && (`Contributors with this role cannot ${actionLabel.toLowerCase()}`)
                     }
 
                     {
-                      targetGroup === 'user' && toggleValue === true && (`This user can ${actionLabel.toLowerCase()}`)
+                      targetGroup === 'user' && newValues[operation] === true && (`This user can ${actionLabel.toLowerCase()}`)
                     }
 
                     {
-                      targetGroup === 'user' && toggleValue === false && (`This user cannot ${actionLabel.toLowerCase()}`)
+                      targetGroup === 'user' && newValues[operation] === false && (`This user cannot ${actionLabel.toLowerCase()}`)
                     }
 
                   </Typography>

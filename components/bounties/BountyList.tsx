@@ -4,6 +4,7 @@ import Button from 'components/common/Button';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { BountiesContext } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
 import { useContext, useMemo, useState, useEffect, useRef } from 'react';
@@ -39,19 +40,8 @@ export default function BountyList () {
   const [displayBountyDialog, setDisplayBountyDialog] = useState(false);
   const { bounties } = useContext(BountiesContext);
 
-  const [space,, currentUserPermissions] = useCurrentSpace();
-
-  // This is a hack so we can have a small time delay before showing the create / suggest bounty button.
-  // The hack gives us 700 milliseconds to provide time for permissions to load and show correct button without it flashing from suggest to create
-  const [mountedOn] = useState(Date.now());
-  const buttonDisplayDelayMilliseconds = 700;
-  const [showCreateOrSuggestBountyButton, setShowCreateOrSuggestBountyButton] = useState(false);
-
-  if (!showCreateOrSuggestBountyButton) {
-    setTimeout(() => {
-      setShowCreateOrSuggestBountyButton(true);
-    }, buttonDisplayDelayMilliseconds);
-  }
+  const [space] = useCurrentSpace();
+  const [currentUserPermissions] = useCurrentSpacePermissions();
 
   const [savedBountyFilters, setSavedBountyFilters] = useLocalStorage<BountyStatus[]>(`${space?.id}-bounty-filters`, ['open', 'inProgress']);
 
@@ -61,7 +51,7 @@ export default function BountyList () {
   }, []);
 
   // User can only suggest a bounty instead of creating it
-  const suggestBounties = currentUserPermissions.createBounty === false;
+  const suggestBounties = currentUserPermissions?.createBounty === false;
 
   const filteredBounties = filterBounties(bounties.slice(), savedBountyFilters);
 
@@ -110,7 +100,7 @@ export default function BountyList () {
             <MultiPaymentModal bounties={bounties} />
 
             {
-              showCreateOrSuggestBountyButton && (
+              currentUserPermissions && (
                 <Button
                   sx={{ ml: 1 }}
                   onClick={() => {
