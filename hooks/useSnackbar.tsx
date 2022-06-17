@@ -3,7 +3,7 @@ import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useMemo
 
 type IContext = {
   isOpen: boolean,
-  action?: ReactNode,
+  actions?: ReactNode[],
   setIsOpen: Dispatch<SetStateAction<boolean>>
   message: string | null
   origin: SnackbarOrigin,
@@ -17,7 +17,7 @@ type IContext = {
 export const SnackbarContext = createContext<Readonly<IContext>>({
   handleClose: () => {},
   isOpen: false,
-  action: null,
+  actions: [],
   message: null,
   origin: { vertical: 'bottom', horizontal: 'left' },
   setIsOpen: () => {},
@@ -29,7 +29,7 @@ export const SnackbarContext = createContext<Readonly<IContext>>({
 
 export function SnackbarProvider ({ children }: {children: ReactNode}) {
   const [isOpen, setIsOpen] = useState(true);
-  const [action, setAction] = useState<ReactNode>(null);
+  const [actions, setActions] = useState<ReactNode[]>([]);
   const [origin, setOrigin] = useState<SnackbarOrigin>({ vertical: 'bottom', horizontal: 'left' });
   const [severity, setSeverity] = useState<AlertColor>('info');
   const [message, setMessage] = useState<null | string>(null);
@@ -58,11 +58,11 @@ export function SnackbarProvider ({ children }: {children: ReactNode}) {
       setSeverity(newSeverity);
       setMessage(msg);
     },
-    action,
+    actions,
     message,
     origin,
     severity,
-    setAction,
+    setActions,
     setOrigin,
     setSeverity,
     setIsOpen,

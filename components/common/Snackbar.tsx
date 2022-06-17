@@ -1,6 +1,8 @@
 import MuiAlert, { AlertColor, AlertProps } from '@mui/material/Alert';
 import Snackbar, { SnackbarOrigin, SnackbarProps } from '@mui/material/Snackbar';
 import Stack from '@mui/material/Stack';
+import IconButton from '@mui/material/IconButton';
+import ClearIcon from '@mui/icons-material/Clear';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { forwardRef, useEffect, ReactNode } from 'react';
 
@@ -12,14 +14,14 @@ interface CustomizedSnackbarProps {
   autoHideDuration?: number
   severity?: AlertColor,
   message?: string,
-  action?: ReactNode,
+  actions?: ReactNode[],
   origin?: SnackbarOrigin,
   handleClose?: SnackbarProps['onClose'],
   isOpen?: boolean
 }
 
 export default function CustomizedSnackbar (props: CustomizedSnackbarProps) {
-  const { setIsOpen, severity, message, action, origin, handleClose, isOpen } = useSnackbar();
+  const { setIsOpen, severity, message, actions, origin, handleClose, isOpen } = useSnackbar();
 
   // Close the snackbar if we change url
   useEffect(() => {
@@ -27,7 +29,7 @@ export default function CustomizedSnackbar (props: CustomizedSnackbarProps) {
   }, [window.location.href]);
 
   const {
-    action: actionProp,
+    actions: actionsProp,
     handleClose: handleCloseProp,
     isOpen: isOpenProp,
     message: messageProp,
@@ -35,6 +37,8 @@ export default function CustomizedSnackbar (props: CustomizedSnackbarProps) {
     severity: severityProp,
     autoHideDuration = 5000
   } = props;
+
+  const close = handleCloseProp ?? handleClose as any;
 
   return (
     <Stack spacing={2} sx={{ width: '100%' }}>
@@ -44,9 +48,17 @@ export default function CustomizedSnackbar (props: CustomizedSnackbarProps) {
         anchorOrigin={originProp ?? origin}
         onClose={handleClose}
       >
-        <Alert onClose={handleCloseProp ?? handleClose as any} severity={severityProp ?? severity} sx={{ width: '100%' }}>
+        <Alert
+          action={[
+            ...(actionsProp || actions || []),
+            <IconButton onClick={handleCloseProp ?? handleClose as any}>
+              <ClearIcon fontSize='small' sx={{ color: '#FFF' }} />
+            </IconButton>
+          ]}
+          severity={severityProp ?? severity}
+          sx={{ width: '100%', alignItems: 'center' }}
+        >
           {messageProp ?? message}
-          { actionProp ?? action }
         </Alert>
       </Snackbar>
     </Stack>

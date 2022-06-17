@@ -273,11 +273,11 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
                             <Snackbar
                               isOpen={isOldBuild}
                               message='You are viewing an out of date version, please refresh the page.'
-                              action={(
-                                <IconButton onClick={() => window.location.reload()} sx={{ padding: 0, marginLeft: '10px' }}>
+                              actions={[
+                                <IconButton onClick={() => window.location.reload()}>
                                   <RefreshIcon sx={{ color: '#FFF' }} fontSize='small' />
                                 </IconButton>
-                              )}
+                              ]}
                               origin={{ vertical: 'top', horizontal: 'center' }}
                               severity='warning'
                               handleClose={() => setIsOldBuild(false)}
