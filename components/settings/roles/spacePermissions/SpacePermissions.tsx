@@ -150,15 +150,15 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
           <Grid item xs>
             <Typography variant='caption'>
               {targetGroup === 'space' && (
-                'Permissions that are enabled for the entire space will be accessible to all space members regardless of individually assigned permissions.'
+                'Enabling permissions here will allow every space member to perform the relevant action, whatever their roles and permissions.'
               )}
 
               {targetGroup === 'role' && (
-                'Permissions that are enabled for this role be accessible to all space members with the role, even if this permission is disabled at the space level.'
+                'Space members with this role can perform all enabled actions, even if these actions are disabled at the space level.'
               )}
 
               {targetGroup === 'user' && (
-                'Permissions that are enabled for this user be accessible to all space members with the role, even if this permission is disabled at the space level.'
+                'This user can perform all enabled actions, even if these actions are disabled at the space level.'
               )}
             </Typography>
 
@@ -175,7 +175,7 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
 
             return (
               <Grid item container xs key={operation}>
-                <Grid item xs={6}>
+                <Grid item xs={5}>
                   <FormControlLabel
                     control={(
                       <Switch
@@ -191,7 +191,7 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
                     label={actionLabel}
                   />
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={7}>
 
                   <Typography sx={{ height: '100%', justifyContent: 'center', display: 'flex', flexDirection: 'column' }} variant='body2'>
                     {
