@@ -176,7 +176,7 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
                 </Grid>
                 <Grid item xs={6}>
 
-                  <Typography sx={{ height: '100%', verticalAlign: 'center' }} variant='body2'>
+                  <Typography sx={{ height: '100%', justifyContent: 'center', display: 'flex', flexDirection: 'column' }} variant='body2'>
                     {
                       targetGroup === 'space' && newValues[operation] === true && (`All members of your space can ${actionLabel.toLowerCase()}`)
                     }
@@ -200,6 +200,7 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
                     {
                       targetGroup === 'user' && newValues[operation] === false && (`This user cannot ${actionLabel.toLowerCase()}`)
                     }
+                    .
 
                   </Typography>
 
