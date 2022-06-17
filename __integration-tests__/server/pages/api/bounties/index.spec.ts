@@ -3,10 +3,11 @@ import { Bounty, Prisma, Space, User } from '@prisma/client';
 import { IPageWithPermissions } from 'lib/pages';
 import request from 'supertest';
 import { generatePageToCreateStub } from 'testing/generate-stubs';
-import { baseUrl } from 'testing/mockApiCall';
+import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { createBounty } from 'lib/bounties';
+import { addSpaceOperations } from 'lib/permissions/spaces';
 
 let nonAdminUser: User;
 let nonAdminUserSpace: Space;
@@ -98,7 +99,46 @@ describe('POST /api/bounties - create a bounty', () => {
 
   });
 
-  it('should not allow non-admin users to create an open bounty, and respond 401', async () => {
+  it('should allow non-admin users with createBounty permission to create an open bounty, and respond 201', async () => {
+
+    const { space: differentSpace, user: differentUser } = await generateUserAndSpaceWithApiToken(undefined, false);
+
+    const creationContent: Partial<Bounty> = {
+      title: 'Example',
+      createdBy: differentUser.id,
+      spaceId: differentSpace.id,
+      status: 'open',
+      rewardAmount: 5,
+      chainId: 1,
+      rewardToken: 'ETH'
+    };
+
+    await addSpaceOperations({
+      forSpaceId: differentSpace.id,
+      operations: ['createBounty'],
+      userId: differentUser.id
+    });
+
+    const cookie = await loginUser(differentUser);
+
+    const createdBounty = (await request(baseUrl)
+      .post('/api/bounties')
+      .set('Cookie', cookie)
+      .send(creationContent)
+      .expect(201)).body;
+
+    expect(createdBounty).toEqual(
+      expect.objectContaining<Partial<Bounty>>({
+        title: creationContent.title,
+        createdBy: differentUser.id,
+        spaceId: differentSpace.id,
+        status: creationContent.status
+      })
+    );
+
+  });
+
+  it('should not allow non-admin users without createBounty permission to create an open bounty, and respond 401', async () => {
 
     const creationContent: Partial<Bounty> = {
       title: 'Example',
@@ -112,7 +152,7 @@ describe('POST /api/bounties - create a bounty', () => {
 
     await request(baseUrl)
       .post('/api/bounties')
-      .set('Cookie', adminCookie)
+      .set('Cookie', nonAdminCookie)
       .send(creationContent)
       .expect(401);
   });

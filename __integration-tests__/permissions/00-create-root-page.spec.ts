@@ -28,7 +28,7 @@ beforeAll(async () => {
 
 describe('POST /api/pages - create root page', () => {
 
-  it('should assign to the page a default permission of full access for the space members', async () => {
+  it('should assign to the page a default permission of full access for the space members, and a full acces permission for the creating user', async () => {
 
     const pageToCreate: Prisma.PageCreateInput = generatePageToCreateStub({
       userId: user.id,
@@ -43,10 +43,10 @@ describe('POST /api/pages - create root page', () => {
 
     const createdPage = response.body as IPageWithPermissions;
 
-    // Only 1 default permission
-    expect(createdPage.permissions.length).toBe(1);
+    // Base space permission plus createdBy user full access permission
+    expect(createdPage.permissions.length).toBe(2);
     // Verify shape
-    expect(createdPage.permissions[0].permissionLevel).toBe('full_access');
-    expect(createdPage.permissions[0].spaceId).toBe(space.id);
+    expect(createdPage.permissions.find(p => typeof p.userId === 'string')?.permissionLevel).toBe('full_access');
+    expect(createdPage.permissions.find(p => typeof p.spaceId === 'string')?.permissionLevel).toBe('full_access');
   });
 });

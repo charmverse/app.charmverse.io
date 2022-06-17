@@ -26,6 +26,7 @@ import { isTruthy } from 'lib/utilities/types';
 import { BountyWithDetails, PageContent } from 'models';
 import { useEffect, useState } from 'react';
 import { useForm, UseFormWatch } from 'react-hook-form';
+import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import * as yup from 'yup';
 
 export type FormMode = 'create' | 'update' | 'suggest';
@@ -116,7 +117,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
 
   const defaultChainId = bounty?.chainId ?? 1;
 
-  const isAdmin = useIsAdmin();
+  const [userSpacePermissions] = useCurrentSpacePermissions();
 
   const [user] = useUser();
   const [space] = useCurrentSpace();
@@ -347,7 +348,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
           />
 
           {
-            mode !== 'suggest' && isAdmin && (
+            mode !== 'suggest' && userSpacePermissions?.createBounty && (
               <>
                 <Grid item>
                   <InputLabel>
@@ -501,7 +502,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
           <Grid item>
             <Button
               loading={isSubmitting}
-              disabled={(mode === 'suggest' || !isAdmin) ? (!values.title || !values.description) : !isValid}
+              disabled={(mode === 'suggest' && (!values.title || !values.description)) || !isValid}
               type='submit'
             >
               {bountyFormTitles[mode]}

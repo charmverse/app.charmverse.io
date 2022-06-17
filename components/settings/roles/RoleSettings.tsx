@@ -10,9 +10,11 @@ import useIsAdmin from 'hooks/useIsAdmin';
 import { useRef, useState } from 'react';
 import { Menu } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import RoleRow from './components/RoleRow';
 import RoleForm from './components/RoleForm';
 import ImportDiscordRolesMenuItem from './components/ImportDiscordRolesMenuItem';
+import SpacePermissions from './spacePermissions/SpacePermissions';
 
 export default function RoleSettings () {
   const {
@@ -30,10 +32,19 @@ export default function RoleSettings () {
     setAnchorEl(null);
   };
 
+  const [space] = useCurrentSpace();
+
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   return (
     <>
+      {/* Space permissions */}
+      <Legend sx={{ display: 'flex', justifyContent: 'space-between' }} helperText='Actions that any member of your space can perform.'>
+        Space permissions
+      </Legend>
+      <SpacePermissions targetGroup='space' id={space?.id as string} />
+
+      {/* Roles */}
       <Legend sx={{ display: 'flex', justifyContent: 'space-between' }}>
         Roles
         {isAdmin && (

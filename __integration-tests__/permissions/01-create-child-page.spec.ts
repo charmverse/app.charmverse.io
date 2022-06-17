@@ -5,6 +5,7 @@ import { generatePageToCreateStub } from 'testing/generate-stubs';
 import { baseUrl } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
+import { IPageWithPermissions } from 'lib/pages';
 
 let user: User;
 let space: Space;
@@ -38,7 +39,7 @@ describe('POST /api/pages - create child pages', () => {
         spaceId: space.id,
         title: 'Root'
       }))
-      .expect(201)).body;
+      .expect(201)).body as IPageWithPermissions;
 
     const childPage = (await request(baseUrl)
       .post('/api/pages')
@@ -49,12 +50,14 @@ describe('POST /api/pages - create child pages', () => {
         title: 'Child',
         parentId: rootPage.id
       }))
-      .expect(201)).body;
+      .expect(201)).body as IPageWithPermissions;
 
     // Only 1 default permission
     expect(childPage.parentId).toBe(rootPage.id);
-    expect(childPage.permissions.length).toBe(1);
-    expect(childPage.permissions[0].inheritedFromPermission).toBe(rootPage.permissions[0].id);
+    expect(childPage.permissions.length).toBe(2);
+
+    const sourcePermissionIds = rootPage.permissions.map(p => p.id);
+    expect(sourcePermissionIds.indexOf(childPage.permissions[0].inheritedFromPermission as string) >= 0).toBe(true);
   });
 
   it('should forward inherited permission references to nested children', async () => {
@@ -66,7 +69,7 @@ describe('POST /api/pages - create child pages', () => {
         userId: user.id,
         spaceId: space.id
       }))
-      .expect(201)).body;
+      .expect(201)).body as IPageWithPermissions;
 
     const childPage = (await request(baseUrl)
       .post('/api/pages')
@@ -76,7 +79,7 @@ describe('POST /api/pages - create child pages', () => {
         spaceId: space.id,
         parentId: createdPage.id
       }))
-      .expect(201)).body;
+      .expect(201)).body as IPageWithPermissions;
 
     const nestedChildPage = (await request(baseUrl)
       .post('/api/pages')
@@ -86,10 +89,13 @@ describe('POST /api/pages - create child pages', () => {
         spaceId: space.id,
         parentId: childPage.id
       }))
-      .expect(201)).body;
+      .expect(201)).body as IPageWithPermissions;
 
-    // Only 1 default permission
-    expect(nestedChildPage.permissions.length).toBe(1);
-    expect(nestedChildPage.permissions[0].inheritedFromPermission).toBe(createdPage.permissions[0].id);
+    // Base space permission plus createdBy user full access permission
+    expect(nestedChildPage.permissions.length).toBe(2);
+
+    const sourcePermissionIds = createdPage.permissions.map(p => p.id);
+    expect(sourcePermissionIds.indexOf(childPage.permissions[0].inheritedFromPermission as string) >= 0).toBe(true);
+    expect(sourcePermissionIds.indexOf(nestedChildPage.permissions[0].inheritedFromPermission as string) >= 0).toBe(true);
   });
 });

@@ -1,11 +1,12 @@
 
 import { PagePermission, PagePermissionLevel, SpaceRole, PageOperations as PageOperationEnum, Role, Space, User, Page } from '@prisma/client';
+import { UserPermissionFlags } from '../interfaces';
 
 export type PageOperationType = keyof typeof PageOperationEnum
 
 export type PagePermissionLevelType = keyof typeof PagePermissionLevel
 
-export type IPagePermissionFlags = Record<PageOperationType, boolean>
+export type IPagePermissionFlags = UserPermissionFlags<PageOperationType>
 
 /**
  * Use for requesting all permissions for a page

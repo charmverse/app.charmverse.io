@@ -7,14 +7,7 @@ import { prisma } from 'db';
 import { isUUID } from 'lib/utilities/strings';
 import { NotFoundError } from 'lib/middleware/errors';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
-
-export interface PublicPageResponse {
-  page: Page;
-  boardPage: Page | null;
-  pageBlock: Block | null;
-  boardBlock: Block | null;
-  space: Space;
-}
+import { PublicPageResponse } from 'lib/pages';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

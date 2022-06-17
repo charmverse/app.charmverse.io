@@ -1,17 +1,6 @@
 import { SystemError } from 'lib/utilities/errors';
 import { PagePermissionLevel } from '@prisma/client';
 
-export class InvalidPermissionGranteeError extends SystemError {
-
-  constructor () {
-    super({
-      errorType: 'Invalid input',
-      message: 'Permissions must be linked to one, and only one of a user, role or space',
-      severity: 'warning'
-    });
-  }
-}
-
 export class PermissionNotFoundError extends SystemError {
 
   constructor (permissionId: string) {

@@ -20,7 +20,9 @@ import { InviteLinkPopulated } from 'pages/api/invites/index';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 // TODO: Maybe move these types to another place so that we dont import from backend
 import { ReviewDecision, SubmissionContent, SubmissionCreationData } from 'lib/applications/interfaces';
+import { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
 import { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
+import { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import { ConnectDiscordPayload, ConnectDiscordResponse } from 'pages/api/discord/connect';
 import { ImportDiscordRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
 import { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
@@ -28,18 +30,18 @@ import { ListSpaceRolesResponse } from 'pages/api/roles';
 import { GetTasksResponse } from 'pages/api/tasks/list';
 import { GetTasksStateResponse, UpdateTasksState } from 'pages/api/tasks/state';
 import { TelegramAccount } from 'pages/api/telegram/connect';
-import { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
-import { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import { UpdateThreadRequest } from 'pages/api/threads/[id]';
 import { TokenGateWithRoles } from 'pages/api/token-gates';
 
 import { ApplicationWithTransactions } from 'lib/applications/actions';
 import { SuggestionAction } from 'lib/bounties';
+import { PublicPageResponse } from 'lib/pages/interfaces';
 import { PublicSpaceInfo } from 'lib/spaces/interfaces';
+import type { MarkTask } from 'lib/tasks/markTasks';
 import { TransactionCreationData } from 'lib/transactions/interface';
 import { PublicUser } from 'pages/api/public/profile/[userPath]';
-import { PublicPageResponse } from 'pages/api/public/pages/[...pageId]';
-import type { MarkTask } from 'lib/tasks/markTasks';
+import { AssignedPermissionsQuery } from './lib/permissions/interfaces';
+import { SpacePermissionFlags, SpacePermissionModification } from './lib/permissions/spaces';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -605,6 +607,35 @@ class CharmClient {
 
   deletePermission (permissionId: string): Promise<boolean> {
     return http.DELETE('/api/permissions', { permissionId });
+  }
+
+  addSpacePermissions ({ forSpaceId, operations, roleId, spaceId, userId }: SpacePermissionModification): Promise<SpacePermissionFlags> {
+    return http.POST<SpacePermissionFlags>(`/api/permissions/space/${forSpaceId}/add`, {
+      operations,
+      roleId,
+      spaceId,
+      userId
+    } as Omit<SpacePermissionModification, 'forSpaceId'>);
+  }
+
+  removeSpacePermissions ({ forSpaceId, operations, roleId, spaceId, userId }: SpacePermissionModification): Promise<SpacePermissionFlags> {
+    return http.POST<SpacePermissionFlags>(`/api/permissions/space/${forSpaceId}/remove`, {
+      operations,
+      roleId,
+      spaceId,
+      userId
+    } as Omit<SpacePermissionModification, 'forSpaceId'>);
+  }
+
+  queryGroupSpacePermissions ({ group, id, resourceId }: AssignedPermissionsQuery): Promise<SpacePermissionFlags> {
+    return http.GET<SpacePermissionFlags>(`/api/permissions/space/${resourceId}/query`, {
+      group,
+      id
+    });
+  }
+
+  computeUserSpacePermissions ({ spaceId }: {spaceId: string}): Promise<SpacePermissionFlags> {
+    return http.GET<SpacePermissionFlags>(`/api/permissions/space/${spaceId}/compute`);
   }
 
   startThread (request: Omit<ThreadCreate, 'userId'>): Promise<ThreadWithCommentsAndAuthors> {

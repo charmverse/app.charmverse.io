@@ -2,7 +2,7 @@ import React, { forwardRef, ReactNode, SyntheticEvent, useCallback, useMemo, mem
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import { useIntl } from 'react-intl';
-import { Page } from '@prisma/client';
+import { Page, PageType } from '@prisma/client';
 import Link from 'next/link';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
@@ -25,13 +25,14 @@ import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePages } from 'hooks/usePages';
 import type { Identifier } from 'dnd-core';
 import { greyColor2 } from 'theme/colors';
 import { untitledPage } from 'seedData';
 import { useUser } from 'hooks/useUser';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import NewPageMenu from '../../NewPageMenu';
 import { StyledPageIcon, StyledDatabaseIcon } from '../../PageIcon';
 import PageTitle from '../../PageTitle';
@@ -46,7 +47,7 @@ interface PageTreeItemProps {
   isEmptyContent: boolean;
   labelIcon?: string;
   label: string;
-  pageType?: Page['type'];
+  pageType?: PageType;
   pageId: string;
   hasSelectedChildView: boolean;
   children: React.ReactNode;
@@ -318,6 +319,8 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
   const anchorOrigin = useMemo(() => ({ vertical: 'bottom', horizontal: 'left' } as const), []);
   const transformOrigin = useMemo(() => ({ vertical: 'top', horizontal: 'left' } as const), []);
 
+  const [userSpacePermissions] = useCurrentSpacePermissions();
+
   const labelComponent = useMemo(() => (
     <PageLink
       href={href}
@@ -330,14 +333,20 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
         <MemoizedIconButton size='small' onClick={showMenu}>
           <MoreHorizIcon color='secondary' fontSize='small' />
         </MemoizedIconButton>
-        {pageType === 'board' ? (
-          <AddNewCard pageId={pageId} />
-        ) : (
-          <NewPageMenu tooltip='Add a page inside' addPage={addSubPage} />
-        )}
+
+        {
+          userSpacePermissions?.createPage && (
+            pageType === 'board' ? (
+              <AddNewCard pageId={pageId} />
+            ) : (
+              <NewPageMenu tooltip='Add a page inside' addPage={addSubPage} />
+            )
+          )
+        }
+
       </div>
     </PageLink>
-  ), [href, label, pageId, icon, addSubPage, pageType]);
+  ), [href, label, pageId, icon, addSubPage, pageType, userSpacePermissions?.createPage]);
 
   return (
     <>

@@ -1,4 +1,5 @@
 import { PageOperations } from '@prisma/client';
+import { Permissions } from '../permissions.class';
 import { IPagePermissionFlags, PageOperationType } from './page-permission-interfaces';
 
 /**
@@ -6,7 +7,7 @@ import { IPagePermissionFlags, PageOperationType } from './page-permission-inter
  *
  * Permissions can be added, but not removed.
  */
-export class AllowedPagePermissions implements IPagePermissionFlags {
+export class AllowedPagePermissions extends Permissions<PageOperationType> {
 
   read: boolean = false;
 
@@ -26,41 +27,11 @@ export class AllowedPagePermissions implements IPagePermissionFlags {
 
   constructor (initialPermissions: PageOperationType [] | Partial<IPagePermissionFlags> = []) {
 
+    super({
+      allowedOperations: Object.keys(PageOperations) as PageOperationType[]
+    });
+
     this.addPermissions(initialPermissions);
-  }
-
-  addPermissions (permissions: PageOperationType [] | Partial<IPagePermissionFlags>) {
-
-    if (permissions instanceof Array) {
-      permissions.forEach(permissionName => {
-        if (PageOperations[permissionName]) {
-          this[permissionName] = true;
-        }
-      });
-    }
-    else {
-      const permissionKeys = Object.keys(permissions) as PageOperationType [];
-      permissionKeys.forEach(permissionName => {
-
-        if (PageOperations[permissionName] && permissions[permissionName] === true) {
-          this[permissionName] = true;
-        }
-
-      });
-    }
-  }
-
-  /**
-   * Given a list of operations, indicates if all these are available in current permission set
-   */
-  hasPermissions (operations: PageOperationType []): boolean {
-    for (const op of operations) {
-      if (this[op] !== true) {
-        return false;
-      }
-    }
-
-    return true;
   }
 
 }

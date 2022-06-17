@@ -7,9 +7,11 @@ import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
+import DoneIcon from '@mui/icons-material/Done';
 import Menu from '@mui/material/Menu';
 import Chip from '@mui/material/Chip';
 import MenuItem from '@mui/material/MenuItem';
+import LockOpenIcon from '@mui/icons-material/LockOpen';
 import Button from 'components/common/Button';
 import { InputSearchContributorMultiple } from 'components/common/form/InputSearchContributor';
 import Modal from 'components/common/Modal';
@@ -20,8 +22,12 @@ import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useContributors } from 'hooks/useContributors';
 import GuildXYZIcon from 'public/images/guild_logo.svg';
 import { ListSpaceRolesResponse } from 'pages/api/roles';
+import useIsAdmin from 'hooks/useIsAdmin';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { spaceOperationLabels } from 'lib/permissions/spaces/client';
 import RoleForm from './RoleForm';
 import RoleMemberRow from './RoleMemberRow';
+import SpacePermissions from '../spacePermissions/SpacePermissions';
 
 interface RoleRowProps {
   isEditable: boolean;
@@ -41,9 +47,16 @@ const ScrollableBox = styled.div<{ rows: number }>`
 export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, deleteRole, refreshRoles }: RoleRowProps) {
   const menuState = usePopupState({ variant: 'popover', popupId: `role-${role.id}` });
   const userPopupState = usePopupState({ variant: 'popover', popupId: `role-${role.id}-users` });
+  const rolePermissionsPopupState = usePopupState({ variant: 'popover', popupId: `role-permissions-${role.id}` });
   const confirmDeletePopupState = usePopupState({ variant: 'popover', popupId: 'role-delete' });
   const [newMembers, setNewMembers] = useState<string[]>([]);
   const [contributors] = useContributors();
+
+  const [currentSpace] = useCurrentSpace();
+
+  const isAdmin = useIsAdmin();
+
+  const roleSpacePermissions = role.spacePermissions?.find(p => p.forSpaceId === currentSpace?.id)?.operations ?? [];
 
   function showMembersPopup () {
     setNewMembers([]);
@@ -96,6 +109,29 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
       </Box>
       <Divider />
 
+      {
+        roleSpacePermissions.length > 0 && (
+          <Box sx={{ mt: 1, mb: 1, display: 'flex', gap: 1 }}>
+            {
+              roleSpacePermissions.map(operation => (
+
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  flexDirection: 'row'
+                }}
+                >
+                  <DoneIcon sx={{ fontSize: '18px', mr: 0.5 }} />
+                  <Typography variant='caption'>{spaceOperationLabels[operation]}</Typography>
+
+                </div>
+              ))
+            }
+          </Box>
+        )
+      }
+
       <ScrollableBox rows={assignedContributors.length}>
         {assignedContributors.map(contributor => (
           <RoleMemberRow
@@ -124,6 +160,7 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
           horizontal: 'right'
         }}
       >
+        {/* We can only rename roles if not managed by Guild.xyv */}
         {role.source !== 'guild_xyz' && (
         <MenuItem
           sx={{ padding: '3px 12px' }}
@@ -136,6 +173,19 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
           <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Rename</Typography>
         </MenuItem>
         )}
+        {/* Only admins can update role space permissions */}
+        <MenuItem
+          sx={{ padding: '3px 12px' }}
+          onClick={() => {
+            rolePermissionsPopupState.open();
+            menuState.close();
+          }}
+        >
+          <ListItemIcon><LockOpenIcon fontSize='small' /></ListItemIcon>
+          <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Manage permissions</Typography>
+        </MenuItem>
+
+        {/* Delete this role */}
         <MenuItem
           sx={{ padding: '3px 12px' }}
           onClick={() => {
@@ -158,6 +208,21 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
           </Grid>
         </Grid>
       </Modal>
+
+      {
+        rolePermissionsPopupState.isOpen && (
+          <Modal size='large' open onClose={rolePermissionsPopupState.close} title={`${role.name} permissions`}>
+            <SpacePermissions
+              targetGroup='role'
+              id={role.id}
+              callback={() => {
+                refreshRoles();
+                rolePermissionsPopupState.close();
+              }}
+            />
+          </Modal>
+        )
+      }
 
       <Modal {...bindPopover(popupState)} title='Rename role'>
         <RoleForm

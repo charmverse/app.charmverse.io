@@ -4,9 +4,10 @@ import Button from 'components/common/Button';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { BountiesContext } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
-import { useContext, useMemo, useState, useEffect } from 'react';
+import { useContext, useMemo, useState, useEffect, useRef } from 'react';
 import { CSVLink } from 'react-csv';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { BountyWithDetails } from 'models';
@@ -40,6 +41,7 @@ export default function BountyList () {
   const { bounties } = useContext(BountiesContext);
 
   const [space] = useCurrentSpace();
+  const [currentUserPermissions] = useCurrentSpacePermissions();
 
   const [savedBountyFilters, setSavedBountyFilters] = useLocalStorage<BountyStatus[]>(`${space?.id}-bounty-filters`, ['open', 'inProgress']);
 
@@ -48,10 +50,8 @@ export default function BountyList () {
     setSavedBountyFilters(savedBountyFilters.filter(status => BountyStatus[status] !== undefined));
   }, []);
 
-  const isAdmin = useIsAdmin();
-
   // User can only suggest a bounty instead of creating it
-  const suggestBounties = isAdmin === false;
+  const suggestBounties = currentUserPermissions?.createBounty === false;
 
   const filteredBounties = filterBounties(bounties.slice(), savedBountyFilters);
 
@@ -98,14 +98,20 @@ export default function BountyList () {
               </CSVLink>
             )}
             <MultiPaymentModal bounties={bounties} />
-            <Button
-              sx={{ ml: 1 }}
-              onClick={() => {
-                setDisplayBountyDialog(true);
-              }}
-            >
-              {isAdmin ? 'Create' : 'Suggest'} Bounty
-            </Button>
+
+            {
+              currentUserPermissions && (
+                <Button
+                  sx={{ ml: 1 }}
+                  onClick={() => {
+                    setDisplayBountyDialog(true);
+                  }}
+                >
+                  {suggestBounties ? 'Suggest' : 'Create'} Bounty
+                </Button>
+              )
+            }
+
           </Box>
         </Box>
 

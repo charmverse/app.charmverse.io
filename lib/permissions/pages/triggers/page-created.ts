@@ -55,6 +55,12 @@ export async function setupPermissionsAfterPageCreated (pageId: string): Promise
     }));
   }
 
+  // Add a full access permission for the creating user
+  await upsertPermission(page.id, {
+    permissionLevel: 'full_access',
+    userId: page.createdBy
+  });
+
   const pageWithPermissions = await getPage(page.id) as IPageWithPermissions;
 
   return pageWithPermissions;

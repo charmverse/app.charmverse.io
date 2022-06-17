@@ -3,7 +3,7 @@ import { Space, User } from '@prisma/client';
 import request from 'supertest';
 import { generatePageToCreateStub } from 'testing/generate-stubs';
 import { baseUrl } from 'testing/mockApiCall';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { IPagePermissionToCreate, IPagePermissionWithSource } from 'lib/permissions/pages';
 import { getPage, IPageWithPermissions } from 'lib/pages/server';
@@ -30,7 +30,7 @@ beforeAll(async () => {
 
 describe('PUT /api/pages/{pageId} - reposition page to different tree', () => {
 
-  it('should convert inherited permissions from pages which aren\'t parents anymore to locally defined permissions', async () => {
+  it('should convert inherited permissions from pages which arent parents anymore to locally defined permissions', async () => {
 
     let rootPage = (await request(baseUrl)
       .post('/api/pages')
@@ -41,10 +41,15 @@ describe('PUT /api/pages/{pageId} - reposition page to different tree', () => {
       }))
       .expect(201)).body as IPageWithPermissions;
 
+    const role = await generateRole({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
     const permissionToAdd: IPagePermissionToCreate = {
       pageId: rootPage.id,
       permissionLevel: 'view',
-      userId: user.id
+      roleId: role.id
     };
 
     // Add permission on child page which will inherit downwards
@@ -92,11 +97,11 @@ describe('PUT /api/pages/{pageId} - reposition page to different tree', () => {
 
     const newRootPermissionId = rootPage2.permissions[0].id;
 
-    // Should have kept inherited permissions
-    expect(childWithPermissions.permissions.length).toBe(2);
+    // Should have kept inherited permissions (Default space full access + createdBy user full access + role we just added)
+    expect(childWithPermissions.permissions.length).toBe(3);
 
     const hasLocallyDefinedPermission = childWithPermissions.permissions.some(perm => {
-      return perm.userId === user.id && perm.inheritedFromPermission === null;
+      return perm.roleId === role.id && perm.inheritedFromPermission === null;
     });
 
     expect(hasLocallyDefinedPermission).toBe(true);
@@ -211,8 +216,6 @@ describe('PUT /api/pages/{pageId} - reposition page to different tree', () => {
       }))
       .expect(201)).body as IPageWithPermissions;
 
-    const oldRootSpacePermissionId = oldRootPage.permissions[0].id;
-
     const newRootPage = (await request(baseUrl)
       .post('/api/pages')
       .set('Cookie', cookie)
@@ -247,11 +250,12 @@ describe('PUT /api/pages/{pageId} - reposition page to different tree', () => {
 
     const childWithPermissions = await getPage(childPage.id) as IPageWithPermissions;
 
-    const newRootPermissionId = newRootPage.permissions[0].id;
+    // Return Space ID permission, which should inherit
+    const newRootPermissionId = newRootPage.permissions.find(p => p.spaceId)?.id;
 
-    // Should now inherit from parent
-    expect(childWithPermissions.permissions.length).toBe(1);
-    expect(childWithPermissions.permissions[0].inheritedFromPermission).toBe(newRootPermissionId);
+    // Should now inherit from parent (Base space permission + createdBy user permission)
+    expect(childWithPermissions.permissions.length).toBe(2);
+    expect(childWithPermissions.permissions.find(p => p.inheritedFromPermission === newRootPermissionId as string)).toBeDefined();
   });
 
   /**
