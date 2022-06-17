@@ -275,7 +275,7 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
                           <ErrorBoundary>
                             <Snackbar
                               isOpen={isOldBuild}
-                              message='You are viewing an out of date version, please refresh the page.'
+                              message='New CharmVerse platform update available. Please refresh.'
                               actions={[
                                 <IconButton onClick={() => window.location.reload()} color='inherit'>
                                   <RefreshIcon fontSize='small' />
