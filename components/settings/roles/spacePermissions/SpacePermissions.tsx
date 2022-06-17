@@ -225,7 +225,7 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
       }
           {
         settingsChanged && (
-          <Grid item xs sx={{ mt: 3 }}>
+          <Grid item xs>
             <Button type='submit' variant='outlined' color='primary' sx={{ mr: 1 }}>Save</Button>
 
           </Grid>
