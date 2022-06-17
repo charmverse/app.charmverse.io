@@ -51,8 +51,8 @@ export default function CustomizedSnackbar (props: CustomizedSnackbarProps) {
         <Alert
           action={[
             ...(actionsProp || actions || []),
-            <IconButton onClick={handleCloseProp ?? handleClose as any}>
-              <ClearIcon fontSize='small' sx={{ color: '#FFF' }} />
+            <IconButton onClick={handleCloseProp ?? handleClose as any} color='inherit'>
+              <ClearIcon fontSize='small' />
             </IconButton>
           ]}
           severity={severityProp ?? severity}

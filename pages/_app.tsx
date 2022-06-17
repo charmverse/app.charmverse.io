@@ -274,8 +274,8 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
                               isOpen={isOldBuild}
                               message='You are viewing an out of date version, please refresh the page.'
                               actions={[
-                                <IconButton onClick={() => window.location.reload()}>
-                                  <RefreshIcon sx={{ color: '#FFF' }} fontSize='small' />
+                                <IconButton onClick={() => window.location.reload()} color='inherit'>
+                                  <RefreshIcon fontSize='small' />
                                 </IconButton>
                               ]}
                               origin={{ vertical: 'top', horizontal: 'center' }}
