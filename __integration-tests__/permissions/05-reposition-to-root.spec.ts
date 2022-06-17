@@ -56,8 +56,8 @@ describe('PUT /api/pages/{pageId} - reposition page to root', () => {
       .send({
         id: childPage.id,
         parentId: null
-      })).body as IPageWithPermissions;
-    //      .expect(200);
+      })
+      .expect(200)).body as IPageWithPermissions;
 
     // Base space permission plus createdBy user full access permission
     expect(childWithPermissions.permissions.length).toBe(2);
