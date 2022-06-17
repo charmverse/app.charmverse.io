@@ -147,6 +147,23 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
       <form onSubmit={handleSubmit(formValue => submitted(formValue))} style={{ margin: 'auto' }}>
         <Grid container direction='column' gap={2}>
 
+          <Grid item xs>
+            <Typography variant='caption'>
+              {targetGroup === 'space' && (
+                'Permissions that are enabled for the entire space will be accessible to all space members regardless of individually assigned permissions.'
+              )}
+
+              {targetGroup === 'role' && (
+                'Permissions that are enabled for this role be accessible to all space members with the role, even if this permission is disabled at the space level.'
+              )}
+
+              {targetGroup === 'user' && (
+                'Permissions that are enabled for this user be accessible to all space members with the role, even if this permission is disabled at the space level.'
+              )}
+            </Typography>
+
+          </Grid>
+
           {
           (Object.keys(spaceOperationLabels) as SpaceOperation[]).map(operation => {
 
@@ -157,7 +174,7 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
             const currentIsDifferentFromStored = toggleValue !== userCanPerformAction;
 
             return (
-              <Grid item container xs>
+              <Grid item container xs key={operation}>
                 <Grid item xs={6}>
                   <FormControlLabel
                     control={(
