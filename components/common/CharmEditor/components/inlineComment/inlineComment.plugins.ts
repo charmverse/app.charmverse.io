@@ -66,11 +66,12 @@ export function plugin ({ key } :{
             const pageThreadListNode = document.querySelector('.PageThreadListBox') as HTMLDivElement;
             // Page threads list node might not be present
             const isShowingCommentThreadsList = pageThreadListNode.style.visibility !== 'hidden';
-
+            // Check if we are inside a card page modal
+            const cardId = (new URLSearchParams(window.location.href)).get('cardId');
             const threadId = inlineCommentMark?.attrs.id;
             if (threadId) {
               // If we are showing the thread list on the right, then navigate to the appropriate thread and highlight it
-              if (isShowingCommentThreadsList) {
+              if (isShowingCommentThreadsList && !cardId) {
                 // Use regular dom methods as we have no access to a ref inside a plugin
                 // Plus this is only a cosmetic change which doesn't impact any of the state
                 const threadDocument = document.getElementById(`thread.${threadId}`);
