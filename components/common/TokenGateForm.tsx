@@ -1,4 +1,4 @@
-import { humanizeAccessControlConditions, checkAndSignAuthMessage } from 'lit-js-sdk';
+import { ALL_LIT_CHAINS, humanizeAccessControlConditions, checkAndSignAuthMessage } from 'lit-js-sdk';
 import { useState, useEffect, ChangeEvent } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import Grid from '@mui/material/Grid';
@@ -19,6 +19,7 @@ import { useUser } from 'hooks/useUser';
 import charmClient from 'charmClient';
 import { useRouter } from 'next/router';
 import log from 'lib/log';
+import { getChainFromGate, getLitChainFromChainId } from 'lib/token-gates';
 import { useSnackbar } from 'hooks/useSnackbar';
 
 interface Props {
@@ -28,7 +29,7 @@ interface Props {
 export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
 
   const router = useRouter();
-  const { account } = useWeb3React();
+  const { account, chainId } = useWeb3React();
   const { showMessage } = useSnackbar();
   const [error, setError] = useState('');
   const [user, setUser] = useUser();
@@ -46,7 +47,7 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
     }
     else {
       humanizeAccessControlConditions({
-        ...tokenGate.conditions as any,
+        accessControlConditions: (tokenGate.conditions as any)?.accessControlConditions || [],
         myWalletAddress: account || ''
       }).then(result => {
         setDescription(result);
@@ -86,10 +87,12 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
 
     setIsLoading(true);
 
+    const chain = getLitChainFromChainId(chainId);
+
     setError('');
 
     const authSig = await checkAndSignAuthMessage({
-      chain: (tokenGate.conditions as any).chain || 'ethereum'
+      chain
     })
       .catch(err => {
         if (err.errorCode === 'unsupported_chain') {
@@ -101,10 +104,10 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
       });
 
     const jwt = authSig && await litClient.getSignedToken({
-      authSig,
-      chain: (tokenGate.conditions as any).chain || 'ethereum',
       resourceId: tokenGate.resourceId as any,
-      ...tokenGate.conditions as any
+      authSig,
+      chain,
+      accessControlConditions: (tokenGate.conditions as any).accessControlConditions
     })
       .catch(err => {
         if (err.errorCode === 'not_authorized') {
@@ -183,11 +186,11 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
                   <Typography gutterBottom>
                     {description}
                   </Typography>
-                  {/* <Typography variant='body2'>
+                  <Typography variant='body2'>
                     Chain:
                     {' '}
                     {tokenGate && getChainName(tokenGate)}
-                  </Typography> */}
+                  </Typography>
                 </CardContent>
               </Card>
             </Grid>
@@ -215,4 +218,9 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
     </>
   );
 
+}
+
+function getChainName (tokenGate: TokenGate): string | undefined {
+  const chain = getChainFromGate(tokenGate);
+  return ALL_LIT_CHAINS[chain]?.name;
 }

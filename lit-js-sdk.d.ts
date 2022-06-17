@@ -68,7 +68,6 @@ declare module 'lit-js-sdk' {
 
   export interface SigningConditions {
     accessControlConditions?: (AccessControlCondition | AccessControlCondition[])[];
-    unifiedAccessControlConditions?: (EVMContractCondition | AccessControlCondition)[];
     evmContractConditions?: EVMContractCondition[];
     solRpcConditions?: SolRpcCondition[];
     chain: Chain;
