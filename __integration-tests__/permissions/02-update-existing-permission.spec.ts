@@ -76,7 +76,7 @@ describe('POST /api/permissions - update permissions', () => {
     expect(hasUserPermissionWithLatestUpdate).toBe(true);
   });
 
-  it('should cascade an updated permission down to the children, and make the page the authority for that permission (as long as it is different from the page\'s parent)', async () => {
+  it('should cascade an updated permission down to the children, and make the page the authority for that permission (as long as it is different from the page parent)', async () => {
 
     const rootPage = (await request(baseUrl)
       .post('/api/pages')
@@ -121,10 +121,10 @@ describe('POST /api/permissions - update permissions', () => {
 
     const nestedChildPageWithPermissions = (await getPage(nestedChildPage.id)) as IPageWithPermissions;
 
-    // Only 1 default permission
+    // 2 permissions, base space + default full access for creator
     expect(nestedChildPageWithPermissions.parentId).toBe(childPage.id);
-    expect(nestedChildPageWithPermissions.permissions.length).toBe(1);
-    expect(nestedChildPageWithPermissions.permissions[0].inheritedFromPermission).toBe(childPage.permissions[0].id);
+    expect(nestedChildPageWithPermissions.permissions.length).toBe(2);
+    expect(nestedChildPageWithPermissions.permissions.find(p => p.spaceId)?.inheritedFromPermission).toBe(childPage.permissions[0].id);
   });
 
   it('should re-establish inheritance if a page permission is set to the same value as a parent page, and cascade this down to its children', async () => {
