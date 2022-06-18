@@ -3,7 +3,6 @@ import { Box, BoxProps, Typography } from '@mui/material';
 import useENSName from 'hooks/useENSName';
 import { User } from '@prisma/client';
 import Avatar from 'components/common/Avatar';
-import getDisplayName from 'lib/users/getDisplayName';
 import Link from 'components/common/Link';
 
 interface StyleProps extends BoxProps {
@@ -50,8 +49,6 @@ interface UserDisplayProps extends StyleProps {
 }
 
 function UserDisplay ({ user, linkToProfile = false, ...props }: UserDisplayProps) {
-  const ensName = useENSName(user.addresses[0]);
-
   // Copied from User Details component
   const hostname = typeof window !== 'undefined' ? window.location.origin : '';
   const userPath = user.path || user.id;
@@ -60,13 +57,13 @@ function UserDisplay ({ user, linkToProfile = false, ...props }: UserDisplayProp
   if (linkToProfile) {
     return (
       <Link href={userLink} key={user?.id} external={false}>
-        <BaseComponent username={ensName || getDisplayName(user)} avatar={user.avatar} {...props} />
+        <BaseComponent username={user.username as string} avatar={user.avatar} {...props} />
       </Link>
     );
   }
 
   return (
-    <BaseComponent username={ensName || getDisplayName(user)} avatar={user.avatar} {...props} />
+    <BaseComponent username={user.username as string} avatar={user.avatar} {...props} />
   );
 
 }

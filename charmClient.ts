@@ -13,7 +13,6 @@ import type { FailedImportsError } from 'lib/notion/types';
 import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee, IPagePermissionWithSource } from 'lib/permissions/pages/page-permission-interfaces';
 import { GetPoapsResponse, UpdatePoapsRequest } from 'lib/poap';
 import { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
-import { getDisplayName } from 'lib/users';
 import { BountyWithDetails, Contributor, LoggedInUser, PageContent } from 'models';
 import type { ServerBlockFields } from 'pages/api/blocks';
 import { InviteLinkPopulated } from 'pages/api/invites/index';
@@ -340,7 +339,7 @@ class CharmClient {
   private userToFBUser (user: User): IUser {
     return {
       id: user.id,
-      username: getDisplayName(user),
+      username: user.username!,
       email: '',
       props: {},
       create_at: new Date(user.createdAt).getTime(),
