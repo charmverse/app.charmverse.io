@@ -34,9 +34,9 @@ export default function ContributorRow ({ contributor, isEditable, onRemove }: P
   return (
     <StyledRow py={2}>
       <Box display='flex' alignItems='center'>
-        <Avatar name={contributor.username!} avatar={contributor?.avatar} size='small' />
+        <Avatar name={contributor.username} avatar={contributor?.avatar} size='small' />
         <Box pl={2}>
-          <Typography variant='body1'>{contributor.username!}</Typography>
+          <Typography variant='body1'>{contributor.username}</Typography>
         </Box>
       </Box>
       {isEditable && <ElementDeleteIcon onClick={removeMember} tooltip='Remove member' />}

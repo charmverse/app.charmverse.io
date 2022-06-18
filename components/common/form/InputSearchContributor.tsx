@@ -149,7 +149,7 @@ export function InputSearchContributorMultiple ({ onChange, defaultValue, ...pro
 export function ReviewerOption ({ user, avatarSize, fontSize, fontWeight, ...props }: { fontSize?: string | number, fontWeight?: number | string, user: User, avatarSize?: 'small' | 'medium' } & HTMLAttributes<HTMLLIElement> & {component?: ElementType} & BoxProps) {
   return (
     <Box display='flex' gap={1} {...props} component={props.component ?? 'li'}>
-      <Avatar size={avatarSize} name={user.username!} avatar={user.avatar} />
+      <Avatar size={avatarSize} name={user.username} avatar={user.avatar} />
       <Typography fontSize={fontSize} fontWeight={fontWeight}>{user.username}</Typography>
     </Box>
   );

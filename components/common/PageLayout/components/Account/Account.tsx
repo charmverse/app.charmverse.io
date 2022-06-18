@@ -106,9 +106,9 @@ function Account (): JSX.Element {
             borderTopLeftRadius: '0 !important',
             borderBottomLeftRadius: '0 !important'
           }) : {}}
-          endIcon={<Avatar avatar={user?.avatar} name={user?.username || ''} size='small' />}
+          endIcon={<Avatar avatar={user?.avatar} name={user.username || ''} size='small' />}
         >
-          {user?.username}
+          {user.username}
         </AccountButton>
       </StyledButtonGroup>
       <NetworkModal isOpen={networkModalState.isOpen} onClose={networkModalState.close} />

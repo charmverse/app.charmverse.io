@@ -339,7 +339,7 @@ class CharmClient {
   private userToFBUser (user: User): IUser {
     return {
       id: user.id,
-      username: user.username!,
+      username: user.username,
       email: '',
       props: {},
       create_at: new Date(user.createdAt).getTime(),
