@@ -7,7 +7,7 @@ import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useUser } from 'hooks/useUser';
 import NotifyMeModal from './NotifyMeModal';
 
-export default function SnoozeButton () {
+export default function NotifyMeButton () {
 
   const [user, setUser] = useUser();
 

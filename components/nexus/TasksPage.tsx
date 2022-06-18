@@ -67,14 +67,12 @@ export default function TasksPage () {
             </StyledTypography>
           </Box>
         </Grid>
-        {currentTask === 'multisig' ? (
-          <Grid item xs={12} sm={6}>
-            <Box display='flex' alignItems='center' justifyContent={{ xs: 'flex-start', md: 'flex-end' }} gap={{ sm: 2, xs: 1 }}>
-              <NotifyMeButton />
-              <SnoozeButton />
-            </Box>
-          </Grid>
-        ) : null}
+        <Grid item xs={12} sm={6}>
+          <Box display='flex' alignItems='center' justifyContent={{ xs: 'flex-start', md: 'flex-end' }} gap={{ sm: 2, xs: 1 }}>
+            <NotifyMeButton />
+            {currentTask === 'multisig' ? <SnoozeButton /> : null }
+          </Box>
+        </Grid>
       </Grid>
       <Divider sx={{ mb: 2 }} />
       <Tabs
