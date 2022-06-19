@@ -3,7 +3,7 @@ import { Space, User } from '@prisma/client';
 import request from 'supertest';
 import { generatePageToCreateStub } from 'testing/generate-stubs';
 import { baseUrl } from 'testing/mockApiCall';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { IPagePermissionToCreate, IPagePermissionWithSource } from 'lib/permissions/pages';
 import { getPage, IPageWithPermissions } from 'lib/pages/server';
@@ -138,10 +138,15 @@ describe('PUT /api/pages/{pageId} - reposition page upwards', () => {
       }))
       .expect(201)).body;
 
+    const role = await generateRole({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
     const permissionToAdd: IPagePermissionToCreate = {
       pageId: childPage.id,
       permissionLevel: 'view',
-      userId: user.id
+      roleId: role.id
     };
 
     // Add permission on child page which will inherit downwards
@@ -170,25 +175,28 @@ describe('PUT /api/pages/{pageId} - reposition page upwards', () => {
 
     const rootPagePermissionId = rootPageWithPermissions.permissions[0].id;
 
-    // Should have kept same count of permissions (default space + the child one that was assigned)
-    expect(nestedChildWithPermissions.permissions.length).toBe(2);
+    // Should have same count of permissions as root plus the new one (default space + default creating user + the child one that was assigned)
+    expect(nestedChildWithPermissions.permissions.length).toBe(rootPageWithPermissions.permissions.length + 1);
 
+    // Make sure nested and child inheritance is broken
     const nestedInheritsFromChild = nestedChildWithPermissions.permissions.some(
       perm => perm.inheritedFromPermission === createdChildPermission.id
     );
     expect(nestedInheritsFromChild).toBe(false);
 
+    // Make sure nested still inherits from root
     const nestedInheritsFromRoot = nestedChildWithPermissions.permissions.some(
       perm => perm.inheritedFromPermission === rootPagePermissionId
     );
     expect(nestedInheritsFromRoot).toBe(true);
 
+    // A locally defined permission in child is now defined locally in nested since nested is a sibling of child and shouldn't inherit from child anymore
     const locallyDefinedNestedPermission = nestedChildWithPermissions.permissions.find(perm => perm.inheritedFromPermission === null);
 
     expect(locallyDefinedNestedPermission).toBeDefined();
 
     // Super nested child now inherits one permission from nested
-    expect(superNestedChildWithPermissions.permissions.length).toBe(2);
+    expect(superNestedChildWithPermissions.permissions.length).toBe(rootPageWithPermissions.permissions.length + 1);
 
     const superNestedInheritsFromNested = superNestedChildWithPermissions.permissions.some(
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
