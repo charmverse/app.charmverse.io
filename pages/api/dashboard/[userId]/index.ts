@@ -9,9 +9,9 @@ import { getParticipationScore } from 'lib/deepdao/getParticipationScore';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.get(getAggregatedDashboardData);
+handler.get(getAggregatedData);
 
-async function getAggregatedDashboardData (req: NextApiRequest, res: NextApiResponse<any>) {
+async function getAggregatedData (req: NextApiRequest, res: NextApiResponse<any>) {
   const { userId } = req.query;
   const user = await prisma.user.findUnique({
     where: {

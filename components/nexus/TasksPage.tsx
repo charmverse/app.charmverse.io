@@ -4,7 +4,6 @@ import KeyIcon from '@mui/icons-material/Key';
 import ForumIcon from '@mui/icons-material/Forum';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
 import { silentlyUpdateURL } from 'lib/browser';
 import { useState } from 'react';
 import { useTheme } from '@emotion/react';
