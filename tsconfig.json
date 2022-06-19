@@ -2,7 +2,7 @@
   "ts-node": {
     "compilerOptions": {
       "jsx": "react",
-      "module": "CommonJS"
+      "module": "commonjs"
     },
     "require": [
       "tsconfig-paths/register"
@@ -22,7 +22,7 @@
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
-    "module": "commonjs",
+    "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "jsx": "preserve",

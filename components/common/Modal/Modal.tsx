@@ -10,7 +10,7 @@ export type ModalSize = 'large' | 'fluid' | 'small' | string;
 
 const defaultSize = '400px';
 
-const ModalContainer = styled.div<{ size: ModalSize }>`
+const ModalContainer = styled.div<{ padding?: string, size: ModalSize }>`
   position: absolute;
   top: 50%;
   left: 50%;
@@ -19,7 +19,7 @@ const ModalContainer = styled.div<{ size: ModalSize }>`
   background-color: ${({ theme }) => theme.palette.background.paper};
   border-radius: ${({ theme }) => theme.spacing(1)};
   box-shadow: ${({ theme }) => theme.shadows[15]};
-  padding: ${({ theme }) => theme.spacing(4)};
+  padding: ${({ padding, theme }) => padding || theme.spacing(4)};
   max-height: calc(80vh - ${({ theme }) => theme.spacing(4)});
   max-width: 100%;
   overflow-y: auto;
@@ -54,14 +54,15 @@ export type ModalProps = Omit<ComponentProps<typeof MuiModal>, 'children' | 'onC
   size?: ModalSize,
   children: any,
   title?: string | ReactNode,
+  noPadding?: boolean,
   onClose: () => void
 };
 
-export function Modal ({ children, size = defaultSize, title, ...props }: ModalProps) {
+export function Modal ({ children, noPadding, size = defaultSize, title, ...props }: ModalProps) {
   return (
     <MuiModal {...props}>
       <div>
-        <ModalContainer size={size} className='modal-container'>
+        <ModalContainer padding={noPadding ? '0px' : undefined} size={size}>
           {title && <DialogTitle onClose={props.onClose}>{title}</DialogTitle>}
           {children}
         </ModalContainer>
