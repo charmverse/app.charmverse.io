@@ -690,7 +690,7 @@ class CharmClient {
   }
 
   getAggregatedData (userId: string) {
-    return http.GET<GetParticipationScoreResponse['data']>(`/api/dashboard/${userId}`);
+    return http.GET<GetParticipationScoreResponse['data'] & {bounties: number}>(`/api/dashboard/${userId}`);
   }
 }
 

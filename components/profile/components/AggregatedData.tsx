@@ -1,38 +1,41 @@
-import { Box, CircularProgress, Paper, Typography } from '@mui/material';
+import { Box, CircularProgress, Grid, Paper, Typography } from '@mui/material';
 import charmClient from 'charmClient';
 import useSWRImmutable from 'swr/immutable';
 import { UserDetailsProps } from './UserDetails';
 
 export function AggregatedDataItem ({ value, label }: {value: number, label: string}) {
+
   return (
-    <Paper
-      sx={{
-        gap: 1,
-        px: 2,
-        py: 1,
-        display: 'flex',
-        alignItems: 'center',
-        flexGrow: 1
-      }}
-    >
-      <Typography sx={{
-        fontSize: {
-          xs: '1.25rem',
-          sm: '1.5rem'
-        },
-        fontWeight: 'bold'
-      }}
-      >
-        {value}
-      </Typography>
-      <Typography
-        color='secondary'
+    <Grid item xs={6}>
+      <Paper
         sx={{
-          fontWeight: 500
+          gap: 1,
+          px: 2,
+          py: 1,
+          display: 'flex',
+          alignItems: 'center'
         }}
-      > {label}
-      </Typography>
-    </Paper>
+      >
+        <Typography sx={{
+          fontSize: {
+            xs: '1.25rem',
+            sm: '1.5rem'
+          },
+          fontWeight: 'bold'
+        }}
+        >
+          {value}
+        </Typography>
+        <Typography
+          color='secondary'
+          sx={{
+            fontWeight: 500
+          }}
+        > {label}
+        </Typography>
+      </Paper>
+
+    </Grid>
   );
 }
 
@@ -45,7 +48,7 @@ export function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>) {
     return (
       <Box display='flex' alignItems='center' gap={1}>
         <CircularProgress size={24} />
-        Fetching your data
+        <Typography variant='subtitle1' color='secondary'>Fetching data</Typography>
       </Box>
     );
   }
@@ -55,14 +58,15 @@ export function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>) {
   }
 
   return (
-    <Box display='flex' gap={2} flexDirection='column'>
+    <Grid container display='flex' gap={2} flexDirection='column'>
       <Box display='flex' gap={2} mr={2}>
         <AggregatedDataItem label='communities' value={data.daos} />
         <AggregatedDataItem label='votes' value={data.votes} />
       </Box>
       <Box display='flex' gap={2} mr={2}>
         <AggregatedDataItem label='proposals' value={data.proposals} />
+        <AggregatedDataItem label={data.bounties > 1 ? 'bounties' : 'bounty'} value={data.bounties} />
       </Box>
-    </Box>
+    </Grid>
   );
 }

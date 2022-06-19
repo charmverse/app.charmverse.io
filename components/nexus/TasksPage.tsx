@@ -87,6 +87,7 @@ export default function TasksPage () {
             disableRipple
             iconPosition='start'
             icon={task.icon}
+            key={task}
             sx={{
               px: 1.5,
               fontSize: 14,
