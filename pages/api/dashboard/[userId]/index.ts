@@ -13,7 +13,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.get(getAggregatedData);
 
-async function getAggregatedData (req: NextApiRequest, res: NextApiResponse<GetParticipationScoreResponse['data'] & {bounties: number}>) {
+async function getAggregatedData (req: NextApiRequest, res: NextApiResponse<Pick<GetParticipationScoreResponse['data'], 'daos' | 'proposals' | 'votes'> & {bounties: number}>) {
   const { userId } = req.query;
   const user = await prisma.user.findUnique({
     where: {
@@ -29,11 +29,14 @@ async function getAggregatedData (req: NextApiRequest, res: NextApiResponse<GetP
     throw new DataNotFoundError();
   }
 
-  const participationScore = await getParticipationScore(user.addresses[0]);
+  const participationScores = await Promise.all(user.addresses.map(address => getParticipationScore(address)));
+
   const completedBounties = await getCompletedApplicationsOfUser(user.id);
 
   return res.status(200).json({
-    ...participationScore.data,
+    daos: participationScores.reduce((acc, cur) => acc + cur.data.daos, 0),
+    proposals: participationScores.reduce((acc, cur) => acc + cur.data.proposals, 0),
+    votes: participationScores.reduce((acc, cur) => acc + cur.data.votes, 0),
     bounties: completedBounties
   });
 }
