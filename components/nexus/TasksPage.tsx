@@ -59,7 +59,7 @@ export default function TasksPage () {
     <>
       <NexusPageTitle />
       <TasksPageHeader />
-      <Grid container spacing={3} sx={{ pt: 6, pb: 2 }}>
+      <Grid container spacing={{ xs: 1, sm: 3 }} sx={{ pt: 6, pb: 2 }}>
         <Grid item xs={12} sm={6}>
           <Box>
             <StyledTypography>
@@ -67,14 +67,12 @@ export default function TasksPage () {
             </StyledTypography>
           </Box>
         </Grid>
-        {currentTask === 'multisig' ? (
-          <Grid item xs={12} sm={6}>
-            <Box display='flex' alignItems='center' justifyContent={{ xs: 'flex-start', md: 'flex-end' }} gap={{ sm: 2, xs: 1 }}>
-              <NotifyMeButton />
-              <SnoozeButton />
-            </Box>
-          </Grid>
-        ) : null}
+        <Grid item xs={12} sm={6}>
+          <Box display='flex' alignItems='center' justifyContent={{ sm: 'flex-end', xs: 'flex-start' }} gap={{ sm: 2, xs: 1 }}>
+            <NotifyMeButton />
+            {currentTask === 'multisig' ? <SnoozeButton /> : null }
+          </Box>
+        </Grid>
       </Grid>
       <Divider sx={{ mb: 2 }} />
       <Tabs

@@ -53,9 +53,8 @@ export async function assignDefaultSpacePermissions (skip = 0, totalInDb = 0): P
   return assignDefaultSpacePermissions(skip + CONCURRENT);
 
 }
-/*
+
 assignDefaultSpacePermissions()
   .then(() => {
     console.log('Job complete');
   });
-*/
