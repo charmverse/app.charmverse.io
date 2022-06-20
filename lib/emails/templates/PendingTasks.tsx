@@ -9,13 +9,16 @@ import { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
 import { shortenHex } from 'lib/utilities/strings';
 import { greyColor2 } from 'theme/colors';
 import log from 'lib/log';
+import { MentionedTask } from 'lib/mentions/interfaces';
 import { HR, Feedback, Footer, Header, EmailWrapper } from './components';
 
 type TemplateUser = Pick<User, 'id' | 'username'> & { email: string };
 
 export interface PendingTasksProps {
   user: TemplateUser;
-  tasks: GnosisSafeTasks[];
+  gnosisSafeTasks: GnosisSafeTasks[];
+  mentionedTasks: MentionedTask[]
+  totalTasks: number
 }
 
 export default function PendingTasks (props: PendingTasksProps) {
@@ -28,10 +31,11 @@ export default function PendingTasks (props: PendingTasksProps) {
           <Header />
 
           <MjmlText paddingBottom={0} paddingTop={0}>
-            <h1>Hello {props.user.username},<br />Your signature is required</h1>
+            <h1>Hello {props.user.username},<br />You have {props.totalTasks} tasks.</h1>
           </MjmlText>
 
-          {props.tasks.map(task => <MultisigTask key={task.safeAddress} task={task} />)}
+          {props.gnosisSafeTasks.map(gnosisSafeTask => <MultisigTask key={gnosisSafeTask.safeAddress} task={gnosisSafeTask} />)}
+          {props.mentionedTasks.map(mentionedTask => <MentionTask key={mentionedTask.mentionId} task={mentionedTask} />)}
 
         </MjmlColumn>
       </MjmlSection>
@@ -45,15 +49,33 @@ export default function PendingTasks (props: PendingTasksProps) {
   );
 }
 
-function MultisigTask ({ task }: { task: GnosisSafeTasks }) {
+const charmverseUrl = 'https://app.charmverse.io';
 
-  const charmUrl = 'https://app.charmverse.io/nexus';
+function MentionTask ({ task: { pageTitle, spaceName, text, spaceDomain, pagePath, mentionId } }: {task: MentionedTask}) {
+  return (
+    <>
+      <MjmlText>
+        <a href={`${charmverseUrl}/nexus?task=discussion`}>
+          <h2>{pageTitle || 'Untitled'} in {spaceName}</h2>
+        </a>
+        <strong style={{ color: greyColor2 }}>
+          {text}
+        </strong>
+      </MjmlText>
+      <MjmlButton align='left' padding-bottom='40px' href={`${charmverseUrl}/${spaceDomain}/${pagePath}?mentionedId=${mentionId}`}>
+        View
+      </MjmlButton>
+    </>
+  );
+}
+
+function MultisigTask ({ task }: { task: GnosisSafeTasks }) {
   log.debug('multi sig task', task);
   // console.log('multi sig task...', task.tasks[0].transactions);
   return (
     <>
       <MjmlText>
-        <a href={charmUrl}>
+        <a href={`${charmverseUrl}/nexus?task=multisig`}>
           <h2>Multi sig transaction</h2>
         </a>
         <strong style={{ color: greyColor2 }}>
