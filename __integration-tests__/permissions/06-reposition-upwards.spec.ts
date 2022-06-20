@@ -3,7 +3,7 @@ import { Space, User } from '@prisma/client';
 import request from 'supertest';
 import { generatePageToCreateStub } from 'testing/generate-stubs';
 import { baseUrl } from 'testing/mockApiCall';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { IPagePermissionToCreate, IPagePermissionWithSource } from 'lib/permissions/pages';
 import { getPage, IPageWithPermissions } from 'lib/pages/server';
@@ -138,10 +138,15 @@ describe('PUT /api/pages/{pageId} - reposition page upwards', () => {
       }))
       .expect(201)).body;
 
+    const role = await generateRole({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
     const permissionToAdd: IPagePermissionToCreate = {
       pageId: childPage.id,
       permissionLevel: 'view',
-      userId: user.id
+      roleId: role.id
     };
 
     // Add permission on child page which will inherit downwards
@@ -170,25 +175,28 @@ describe('PUT /api/pages/{pageId} - reposition page upwards', () => {
 
     const rootPagePermissionId = rootPageWithPermissions.permissions[0].id;
 
-    // Should have kept same count of permissions (default space + the child one that was assigned)
-    expect(nestedChildWithPermissions.permissions.length).toBe(2);
+    // Should have same count of permissions as root plus the new one (default space + default creating user + the child one that was assigned)
+    expect(nestedChildWithPermissions.permissions.length).toBe(rootPageWithPermissions.permissions.length + 1);
 
+    // Make sure nested and child inheritance is broken
     const nestedInheritsFromChild = nestedChildWithPermissions.permissions.some(
       perm => perm.inheritedFromPermission === createdChildPermission.id
     );
     expect(nestedInheritsFromChild).toBe(false);
 
+    // Make sure nested still inherits from root
     const nestedInheritsFromRoot = nestedChildWithPermissions.permissions.some(
       perm => perm.inheritedFromPermission === rootPagePermissionId
     );
     expect(nestedInheritsFromRoot).toBe(true);
 
+    // A locally defined permission in child is now defined locally in nested since nested is a sibling of child and shouldn't inherit from child anymore
     const locallyDefinedNestedPermission = nestedChildWithPermissions.permissions.find(perm => perm.inheritedFromPermission === null);
 
     expect(locallyDefinedNestedPermission).toBeDefined();
 
     // Super nested child now inherits one permission from nested
-    expect(superNestedChildWithPermissions.permissions.length).toBe(2);
+    expect(superNestedChildWithPermissions.permissions.length).toBe(rootPageWithPermissions.permissions.length + 1);
 
     const superNestedInheritsFromNested = superNestedChildWithPermissions.permissions.some(
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -203,120 +211,4 @@ describe('PUT /api/pages/{pageId} - reposition page upwards', () => {
 
   });
 
-  /*
-  it('should convert inherited permissions from pages which aren\'t parents anymore to inherited from the new parent, if they have the same value', async () => {
-
-  });
-
-  it('should cascade the new inherited permissions to the children', async () => {
-
-  });
-
-  it('should cascade the new  inherited permissions from pages which aren\'t parents anymore to inherited from the new parent, if they have the same value', async () => {
-
-  });
-
-  it('should convert inherited permissions to locally defined permissions', async () => {
-
-    const rootPage = (await request(baseUrl)
-      .post('/api/pages')
-      .set('Cookie', cookie)
-      .send(generatePageToCreateStub({
-        userId: user.id,
-        spaceId: space.id
-      }))
-      .expect(201)).body as IPageWithPermissions;
-
-    const rootPermissionId = rootPage.permissions[0].id;
-
-    const childPage = (await request(baseUrl)
-      .post('/api/pages')
-      .set('Cookie', cookie)
-      .send(generatePageToCreateStub({
-        userId: user.id,
-        spaceId: space.id,
-        parentId: rootPage.id
-      }))
-      .expect(201)).body;
-
-    await request(baseUrl)
-      .put(`/api/pages/${childPage.id}`)
-      .set('Cookie', cookie)
-      .send({
-        id: childPage.id,
-        parentId: null
-      })
-      .expect(200);
-
-    const childWithPermissions = (await getPage(childPage.id)) as IPageWithPermissions;
-
-    // Only 1 default permission
-    expect(childWithPermissions.permissions.length).toBe(1);
-    expect(childWithPermissions.permissions.every(perm => perm.inheritedFromPermission === null)).toBe(true);
-  });
-
-  it('should update the children to inherit from the new root page instead of the old root page', async () => {
-
-    const rootPage = (await request(baseUrl)
-      .post('/api/pages')
-      .set('Cookie', cookie)
-      .send(generatePageToCreateStub({
-        userId: user.id,
-        spaceId: space.id
-      }))
-      .expect(201)).body;
-
-    const childPage = (await request(baseUrl)
-      .post('/api/pages')
-      .set('Cookie', cookie)
-      .send(generatePageToCreateStub({
-        userId: user.id,
-        spaceId: space.id,
-        parentId: rootPage.id
-      }))
-      .expect(201)).body;
-
-    const nestedChildPage = (await request(baseUrl)
-      .post('/api/pages')
-      .set('Cookie', cookie)
-      .send(generatePageToCreateStub({
-        userId: user.id,
-        spaceId: space.id,
-        parentId: childPage.id
-      }))
-      .expect(201)).body;
-
-    const superNestedChildPage = (await request(baseUrl)
-      .post('/api/pages')
-      .set('Cookie', cookie)
-      .send(generatePageToCreateStub({
-        userId: user.id,
-        spaceId: space.id,
-        parentId: childPage.id
-      }))
-      .expect(201)).body;
-
-    await request(baseUrl)
-      .put(`/api/pages/${childPage.id}`)
-      .set('Cookie', cookie)
-      .send({
-        id: childPage.id,
-        parentId: null
-      })
-      .expect(200);
-
-    const [childWhichBecameRoot, nestedChildWithPermissions, superNestedChildWithPermissions] = (await Promise.all([
-      getPage(childPage.id),
-      getPage(nestedChildPage.id),
-      getPage(superNestedChildPage.id)
-    ])) as IPageWithPermissions[];
-
-    expect(childWhichBecameRoot.permissions.length).toBe(1);
-
-    const newRootPermissionId = childWhichBecameRoot.permissions[0].id;
-
-    expect(nestedChildWithPermissions.permissions.every(perm => perm.inheritedFromPermission === newRootPermissionId)).toBe(true);
-    expect(superNestedChildWithPermissions.permissions.every(perm => perm.inheritedFromPermission === newRootPermissionId)).toBe(true);
-  });
-  */
 });

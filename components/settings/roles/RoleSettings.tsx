@@ -7,10 +7,15 @@ import ImportGuildRolesMenuItem from 'components/settings/roles/components/Impor
 import useRoles from 'components/settings/roles/hooks/useRoles';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import useIsAdmin from 'hooks/useIsAdmin';
-import { useRef, useState } from 'react';
-import { Menu } from '@mui/material';
+import { useEffect, useRef, useState } from 'react';
+import { CircularProgress, Menu, Typography } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useRouter } from 'next/router';
+import { useSnackbar } from 'hooks/useSnackbar';
+import charmClient from 'charmClient';
+import useSWRImmutable from 'swr/immutable';
+import { Space } from '@prisma/client';
 import RoleRow from './components/RoleRow';
 import RoleForm from './components/RoleForm';
 import ImportDiscordRolesMenuItem from './components/ImportDiscordRolesMenuItem';
@@ -31,10 +36,36 @@ export default function RoleSettings () {
   const handleClose = () => {
     setAnchorEl(null);
   };
+  const router = useRouter();
+  const { showMessage } = useSnackbar();
 
   const [space] = useCurrentSpace();
-
   const buttonRef = useRef<HTMLButtonElement>(null);
+
+  const shouldRequestServers = isAdmin && space && typeof router.query.guild_id === 'string' && router.query.discord === '1' && router.query.type === 'server';
+  const serverConnectFailed = router.query.discord === '2' && router.query.type === 'server';
+  const guildId = router.query.guild_id as string;
+  // Using immutable version as otherwise the endpoint is hit twice
+  const { data, isValidating, error } = useSWRImmutable(shouldRequestServers && space ? 'discord-roles-import' : null, async () => {
+    return charmClient.importRolesFromDiscordServer({
+      guildId,
+      spaceId: (space as Space).id
+    });
+  });
+
+  useEffect(() => {
+    if (data && !isValidating) {
+      showMessage(`Successfully imported ${data.importedRoleCount} discord roles`, 'success');
+      router.replace(window.location.href.split('?')[0], undefined, { shallow: true });
+    }
+    else if (error) {
+      // Major failure while trying to import discord server role
+      showMessage(error.message || error.error || 'Something went wrong. Please try again', 'error');
+    }
+    else if (serverConnectFailed) {
+      showMessage('Failed to connect to Discord', 'warning');
+    }
+  }, [data, isValidating, serverConnectFailed]);
 
   return (
     <>
@@ -58,10 +89,11 @@ export default function RoleSettings () {
               endIcon={(
                 <KeyboardArrowDownIcon />
               )}
+              disabled={isValidating}
             >
               Import roles
             </Button>
-            <Button {...bindTrigger(popupState)}>Add a role</Button>
+            <Button {...bindTrigger(popupState)} disabled={isValidating}>Add a role</Button>
           </Box>
         )}
       </Legend>
@@ -79,7 +111,12 @@ export default function RoleSettings () {
         />
       </Modal>
 
-      {roles?.map(role => (
+      {isValidating ? (
+        <Box display='flex' alignItems='center' gap={1}>
+          <CircularProgress size={24} />
+          <Typography variant='subtitle1' color='secondary'>Importing roles from discord server</Typography>
+        </Box>
+      ) : roles?.map(role => (
         <RoleRow
           isEditable={isAdmin}
           assignRoles={assignRoles}
