@@ -689,8 +689,8 @@ class CharmClient {
     return http.POST('/api/tasks/mark', tasks);
   }
 
-  getAggregatedData (userId: string) {
-    return http.GET<GetParticipationScoreResponse['data'] & {bounties: number}>(`/api/dashboard/${userId}`);
+  getAggregatedData (userPath: string) {
+    return http.GET<GetParticipationScoreResponse['data'] & {bounties: number}>(`/api/public/profile/${userPath}/aggregate`);
   }
 }
 

@@ -8,16 +8,19 @@ import { DataNotFoundError } from 'lib/utilities/errors';
 import { getParticipationScore } from 'lib/deepdao/getParticipationScore';
 import { GetParticipationScoreResponse } from 'lib/deepdao/interfaces';
 import { getCompletedApplicationsOfUser } from 'lib/applications/getCompletedApplicationsOfUser';
+import { isUUID } from 'lib/utilities/strings';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.get(getAggregatedData);
 
 async function getAggregatedData (req: NextApiRequest, res: NextApiResponse<Pick<GetParticipationScoreResponse['data'], 'daos' | 'proposals' | 'votes'> & {bounties: number}>) {
-  const { userId } = req.query;
-  const user = await prisma.user.findUnique({
-    where: {
-      id: userId as string
+  const { userPath } = req.query;
+  const user = await prisma.user.findFirst({
+    where: isUUID(userPath as string) ? {
+      id: userPath as string
+    } : {
+      path: userPath as string
     }
   });
 
