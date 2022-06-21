@@ -3,8 +3,9 @@ import { prisma } from 'db';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { getCompletedApplicationsOfUser } from 'lib/applications/getCompletedApplicationsOfUser';
 import { getParticipationScore } from './getParticipationScore';
+import { DeepDaoAggregateData } from './interfaces';
 
-export async function getAggregatedData (userPath: string) {
+export async function getAggregatedData (userPath: string): Promise<DeepDaoAggregateData> {
   const user = await prisma.user.findFirst({
     where: isUUID(userPath as string) ? {
       id: userPath as string

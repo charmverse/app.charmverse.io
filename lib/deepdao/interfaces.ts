@@ -8,3 +8,5 @@ export interface GetParticipationScoreResponse {
     votes: number
   }
 }
+
+export type DeepDaoAggregateData = Pick<GetParticipationScoreResponse['data'], 'daos' | 'proposals' | 'votes'> & {bounties: number}
