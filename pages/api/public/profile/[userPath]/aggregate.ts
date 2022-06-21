@@ -1,47 +1,18 @@
 
+import { getAggregatedData } from 'lib/deepdao/getAggregatedData';
+import { GetParticipationScoreResponse } from 'lib/deepdao/interfaces';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { prisma } from 'db';
-import { DataNotFoundError } from 'lib/utilities/errors';
-import { getParticipationScore } from 'lib/deepdao/getParticipationScore';
-import { GetParticipationScoreResponse } from 'lib/deepdao/interfaces';
-import { getCompletedApplicationsOfUser } from 'lib/applications/getCompletedApplicationsOfUser';
-import { isUUID } from 'lib/utilities/strings';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.get(getAggregatedData);
+handler.get(getAggregatedDataHandler);
 
-async function getAggregatedData (req: NextApiRequest, res: NextApiResponse<Pick<GetParticipationScoreResponse['data'], 'daos' | 'proposals' | 'votes'> & {bounties: number}>) {
-  const { userPath } = req.query;
-  const user = await prisma.user.findFirst({
-    where: isUUID(userPath as string) ? {
-      id: userPath as string
-    } : {
-      path: userPath as string
-    }
-  });
-
-  if (!user) {
-    throw new DataNotFoundError();
-  }
-
-  if (user.addresses.length === 0) {
-    throw new DataNotFoundError();
-  }
-
-  const participationScores = await Promise.all(user.addresses.map(address => getParticipationScore(address)));
-
-  const completedBounties = await getCompletedApplicationsOfUser(user.id);
-
-  return res.status(200).json({
-    daos: participationScores.reduce((acc, cur) => acc + cur.data.daos, 0),
-    proposals: participationScores.reduce((acc, cur) => acc + cur.data.proposals, 0),
-    votes: participationScores.reduce((acc, cur) => acc + cur.data.votes, 0),
-    bounties: completedBounties
-  });
+async function getAggregatedDataHandler (req: NextApiRequest, res: NextApiResponse<Pick<GetParticipationScoreResponse['data'], 'daos' | 'proposals' | 'votes'> & {bounties: number}>) {
+  const aggregatedData = await getAggregatedData(req.query.userPath as string);
+  return res.status(200).json(aggregatedData);
 }
 
 export default withSessionRoute(handler);
