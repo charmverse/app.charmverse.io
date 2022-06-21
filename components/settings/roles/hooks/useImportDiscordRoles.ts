@@ -9,6 +9,14 @@ import { useEffect } from 'react';
 import useSWRImmutable from 'swr/immutable';
 import useRoles from './useRoles';
 
+function routerQueryIsDiscordCallback () {
+  const urlSearchParams = new URLSearchParams(window.location.href);
+  return {
+    shouldImportDiscordRoles: typeof urlSearchParams.get('guild_id') === 'string' && urlSearchParams.get('discord') === '1' && urlSearchParams.get('type') === 'server',
+    serverConnectFailed: urlSearchParams.get('discord') === '2' && urlSearchParams.get('type') === 'server'
+  };
+}
+
 export function useImportDiscordRoles () {
   const { showMessage } = useSnackbar();
   const isAdmin = useIsAdmin();
@@ -18,11 +26,10 @@ export function useImportDiscordRoles () {
     refreshRoles
   } = useRoles();
 
-  const shouldRequestServers = isAdmin && space && typeof router.query.guild_id === 'string' && router.query.discord === '1' && router.query.type === 'server';
-  const serverConnectFailed = router.query.discord === '2' && router.query.type === 'server';
+  const { serverConnectFailed, shouldImportDiscordRoles } = routerQueryIsDiscordCallback();
   const guildId = router.query.guild_id as string;
   // Using immutable version as otherwise its called twice
-  const { data, isValidating, error } = useSWRImmutable(shouldRequestServers && space ? 'discord-roles-import' : null, async () => {
+  const { data, isValidating, error } = useSWRImmutable(isAdmin && shouldImportDiscordRoles && space ? 'discord-roles-import' : null, async () => {
     return charmClient.importRolesFromDiscordServer({
       guildId,
       spaceId: (space as Space).id
@@ -41,7 +48,9 @@ export function useImportDiscordRoles () {
     else if (serverConnectFailed) {
       showMessage('Failed to connect to Discord', 'warning');
     }
-    silentlyUpdateURL(window.location.href.split('?')[0]);
+    // Remove the query string from the url as they are no longer needed after discord import
+    const urlWithoutQueryString = window.location.href.split('?')[0];
+    silentlyUpdateURL(urlWithoutQueryString);
   }, [data, isValidating, serverConnectFailed]);
 
   return {
