@@ -40,7 +40,7 @@ import { PublicSpaceInfo } from 'lib/spaces/interfaces';
 import type { MarkTask } from 'lib/tasks/markTasks';
 import { TransactionCreationData } from 'lib/transactions/interface';
 import { PublicUser } from 'pages/api/public/profile/[userPath]';
-import { DeepDaoAggregateData, GetParticipationScoreResponse } from 'lib/deepdao/interfaces';
+import { DeepDaoAggregateData } from 'lib/deepdao/interfaces';
 import { AssignedPermissionsQuery } from './lib/permissions/interfaces';
 import { SpacePermissionFlags, SpacePermissionModification } from './lib/permissions/spaces';
 

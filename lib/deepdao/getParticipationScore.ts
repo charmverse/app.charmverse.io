@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { GetParticipationScoreResponse } from './interfaces';
+import { DeepDaoGetParticipationScoreResponse } from './interfaces';
 
 const { DEEPDAO_API_KEY } = process.env;
 
@@ -9,7 +9,7 @@ export async function getParticipationScore (address: string) {
     headers: {
       'x-api-key': DEEPDAO_API_KEY as string
     }
-  })).json()) as GetParticipationScoreResponse;
+  })).json()) as DeepDaoGetParticipationScoreResponse;
 
   return participationScore;
 }
