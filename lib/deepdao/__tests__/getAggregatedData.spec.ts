@@ -83,7 +83,7 @@ describe('GET /api/public/profile/[userPath]', () => {
     const aggregatedData = await getAggregatedData(user.id);
 
     expect(aggregatedData).toStrictEqual({
-      daos: 10,
+      daos: 11,
       proposals: 20,
       votes: 15,
       bounties: 1

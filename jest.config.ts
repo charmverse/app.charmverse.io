@@ -31,7 +31,7 @@ export const jestConfig = {
 
   // The glob patterns Jest uses to detect test files
   testMatch: [
-    path.join(__dirname, '/lib/deepdao/__tests__/getAggregatedData.spec.ts')
+    '**/lib/**/*.spec.ts'
   ],
 
   testTimeout: 30000,
