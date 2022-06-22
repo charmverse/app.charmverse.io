@@ -31,7 +31,8 @@ export default function PendingTasks (props: PendingTasksProps) {
           <Header />
 
           <MjmlText paddingBottom={0} paddingTop={0}>
-            <h1>Hello {props.user.username},<br />You have {props.totalTasks} tasks.</h1>
+            <h3>Hello {props.user.username}</h3>
+            <h2>{props.totalTasks} tasks need your attention.</h2>
           </MjmlText>
 
           {props.gnosisSafeTasks.map(gnosisSafeTask => <MultisigTask key={gnosisSafeTask.safeAddress} task={gnosisSafeTask} />)}
@@ -51,12 +52,26 @@ export default function PendingTasks (props: PendingTasksProps) {
 
 const charmverseUrl = 'https://app.charmverse.io';
 
+// https://mjml.io/try-it-live/qD1IvIVyK
 function MentionTask ({ task: { pageTitle, spaceName, text, spaceDomain, pagePath, mentionId } }: {task: MentionedTask}) {
   return (
     <>
       <MjmlText>
         <a href={`${charmverseUrl}/nexus?task=discussion`}>
-          <h2>{pageTitle || 'Untitled'} in {spaceName}</h2>
+          <MjmlSection>
+            <MjmlColumn>
+              <MjmlText>
+                <h2>{pageTitle || 'Untitled'}</h2>
+              </MjmlText>
+            </MjmlColumn>
+            <MjmlColumn>
+              <MjmlText>
+                <h3>
+                  ({spaceName})
+                </h3>
+              </MjmlText>
+            </MjmlColumn>
+          </MjmlSection>
         </a>
         <strong style={{ color: greyColor2 }}>
           {text}
