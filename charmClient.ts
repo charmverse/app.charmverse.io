@@ -43,6 +43,7 @@ import { PublicUser } from 'pages/api/public/profile/[userPath]';
 import { DeepDaoAggregateData } from 'lib/deepdao/interfaces';
 import { AssignedPermissionsQuery } from './lib/permissions/interfaces';
 import { SpacePermissionFlags, SpacePermissionModification } from './lib/permissions/spaces';
+import { SpacePermissionConfigurationUpdate } from './lib/permissions/meta/interfaces';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -675,6 +676,10 @@ class CharmClient {
     return http.POST<Space>(`/api/spaces/${spaceId}/set-default-page-permissions`, {
       pagePermissionLevel
     });
+  }
+
+  setSpacePermissionMode ({ permissionConfigurationMode, spaceId }: SpacePermissionConfigurationUpdate) {
+    return http.POST<SpacePermissionConfigurationUpdate>(`/api/spaces/${spaceId}/set-permissions-mode`, { permissionConfigurationMode });
   }
 
   setDefaultPublicPages ({ spaceId, defaultPublicPages }: SpaceDefaultPublicPageToggle) {
