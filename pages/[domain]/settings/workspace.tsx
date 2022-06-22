@@ -36,7 +36,7 @@ export default function WorkspaceSettings () {
   const [spaces, setSpaces] = useSpaces();
   const [user] = useUser();
   const isAdmin = isSpaceAdmin(user, space?.id);
-  const [isUpdatingPagePermission, setIsUpdatingPagePermission] = useState(false);
+
   const workspaceRemoveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-remove' });
   const workspaceLeaveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-leave' });
 
@@ -75,22 +75,6 @@ export default function WorkspaceSettings () {
 
   async function deleteWorkspace () {
     workspaceRemoveModalState.open();
-  }
-
-  const popupState = usePopupState({ variant: 'popover', popupId: 'workspace-default-page-permission' });
-
-  const menuState = bindMenu(popupState);
-
-  async function handleMenuItemClick (pagePermissionLevel: PagePermissionLevel | null) {
-    if (space) {
-      setIsUpdatingPagePermission(true);
-      menuState.onClose();
-      const updatedSpace = await charmClient.setDefaultPagePermission({
-        spaceId: space.id, pagePermissionLevel
-      });
-      setSpace(updatedSpace);
-      setIsUpdatingPagePermission(false);
-    }
   }
 
   return (
@@ -169,73 +153,6 @@ export default function WorkspaceSettings () {
         <ImportNotionWorkspace />
       </Box>
 
-      {
-        isAdmin ? (
-          <>
-            <Legend helperText='Default permission for new pages and boards across the workspace.'>Default Workspace Permission</Legend>
-            <Box sx={{ ml: 1 }}>
-              <>
-                <Button
-                  color='secondary'
-                  variant='outlined'
-                  disabled={isUpdatingPagePermission}
-                  loading={isUpdatingPagePermission}
-                  endIcon={!isUpdatingPagePermission && <KeyboardArrowDownIcon fontSize='small' />}
-                  {...bindTrigger(popupState)}
-                >
-                  {space?.defaultPagePermissionGroup ? permissionLevels[space.defaultPagePermissionGroup as Exclude<PagePermissionLevel, 'custom'>] : permissionLevels.full_access}
-                </Button>
-                <Menu
-                  {...menuState}
-                  PaperProps={{
-                    sx: { width: 300 }
-                  }}
-                >
-                  <MenuItem
-                    selected={space?.defaultPagePermissionGroup === 'full_access'}
-                    onClick={() => handleMenuItemClick('full_access')}
-                  >
-                    <StyledListItemText
-                      primary={permissionLevels.full_access}
-                      secondary='Can edit and share with others.'
-                    />
-                  </MenuItem>
-
-                  <MenuItem
-                    selected={space?.defaultPagePermissionGroup === 'editor'}
-                    onClick={() => handleMenuItemClick('editor')}
-                  >
-                    <StyledListItemText
-                      primary={permissionLevels.editor}
-                      secondary='Can edit but not share with others.'
-                    />
-                  </MenuItem>
-
-                  <MenuItem
-                    selected={space?.defaultPagePermissionGroup === 'view_comment'}
-                    onClick={() => handleMenuItemClick('view_comment')}
-                  >
-                    <StyledListItemText
-                      primary={permissionLevels.view_comment}
-                      secondary='Can view and comment, but not edit.'
-                    />
-                  </MenuItem>
-
-                  <MenuItem
-                    selected={space?.defaultPagePermissionGroup === 'view'}
-                    onClick={() => handleMenuItemClick('view')}
-                  >
-                    <StyledListItemText
-                      primary={permissionLevels.view}
-                      secondary='Cannot edit or share with others.'
-                    />
-                  </MenuItem>
-                </Menu>
-              </>
-            </Box>
-          </>
-        ) : null
-      }
       <Legend>Snapshot.org Integration</Legend>
       <Box sx={{ ml: 1 }} display='flex' flexDirection='column' gap={1}>
         <ConnectSnapshot />

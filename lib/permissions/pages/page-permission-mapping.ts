@@ -3,7 +3,7 @@ import { PageOperationType } from './page-permission-interfaces';
 
 export const permissionLevels: Record<keyof typeof PagePermissionLevel, string> = {
   full_access: 'Full access',
-  editor: 'Edit page',
+  editor: 'Edit',
   view_comment: 'View and comment',
   view: 'View',
   custom: 'Custom'

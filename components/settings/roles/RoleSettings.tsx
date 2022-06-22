@@ -16,6 +16,7 @@ import RoleForm from './components/RoleForm';
 import RoleRow from './components/RoleRow';
 import { useImportDiscordRoles } from './hooks/useImportDiscordRoles';
 import SpacePermissions from './spacePermissions/SpacePermissions';
+import DefaultPagePermissions from './spacePermissions/DefaultPagePermissions';
 
 export default function RoleSettings () {
   const {
@@ -40,10 +41,14 @@ export default function RoleSettings () {
   return (
     <>
       {/* Space permissions */}
-      <Legend sx={{ display: 'flex', justifyContent: 'space-between' }} helperText='Actions that any member of your space can perform.'>
-        Space permissions
+      <Legend sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        Permissions
       </Legend>
       <SpacePermissions targetGroup='space' id={space?.id as string} />
+
+      <br />
+      {/* Default page permissions */}
+      <DefaultPagePermissions />
 
       {/* Roles */}
       <Legend sx={{ display: 'flex', justifyContent: 'space-between' }}>
