@@ -44,7 +44,7 @@ export default function Mention ({ node }: NodeViewProps) {
     value = (
       <Typography fontSize='inherit' fontWeight='inherit'>
         <span style={{ opacity: 0.6 }}>@</span>
-        <span style={{ opacity: 0.75 }}>{contributor.username}</span>
+        <span style={{ opacity: 0.75 }}>{contributor?.username}</span>
       </Typography>
     );
   }

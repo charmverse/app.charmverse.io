@@ -40,7 +40,7 @@ const Comment: FC<Props> = (props: Props) => {
                     className='comment-avatar'
                     src={userImageUrl}
                 />
-                <div className='comment-username'>{user.username}</div>
+                <div className='comment-username'>{user?.username}</div>
                 <Tooltip title={Utils.displayDateTime(date, intl)}>
                     <div className='comment-date'>
                         {Utils.relativeDisplayDateTime(date, intl)}
