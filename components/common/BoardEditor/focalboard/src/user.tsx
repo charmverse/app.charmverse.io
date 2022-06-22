@@ -10,7 +10,6 @@ export interface IUser {
     create_at: number,
     update_at: number,
     is_bot: boolean,
-    wallet_address: string
 }
 
 export interface UserWorkspace {
