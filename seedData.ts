@@ -22,6 +22,7 @@ function MockSpace (partial: Partial<Space>): Space {
     snapshotDomain: null,
     defaultVotingDuration: null,
     defaultPagePermissionGroup: null,
+    defaultPublicPages: false,
     ...partial
   };
 }
