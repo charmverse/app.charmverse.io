@@ -22,7 +22,7 @@ async function getContributors (req: NextApiRequest, res: NextApiResponse<Contri
   const contributors = spaceRoles.map((spaceRole): Contributor => {
     return {
       ...spaceRole.user,
-      addresses: undefined,
+      addresses: [],
       isAdmin: spaceRole.isAdmin,
       joinDate: spaceRole.createdAt.toISOString()
     } as Contributor;
