@@ -25,6 +25,13 @@ enum PermissionLevel {
   view
 }
 
+enum SpacePermissionConfigurationMode {
+  custom
+  readOnly
+  collaborative
+  open
+}
+
 model Space {
   id                         String               @id @default(uuid()) @db.Uuid
   deletedAt                  DateTime?
@@ -52,7 +59,8 @@ model Space {
   threads                    Thread[]
   comments                   Comment[]
   // Public page settings
-  defaultPagePermissionGroup PagePermissionLevel?
+  permissionConfigurationMode SpacePermissionConfigurationMode? @default(custom)
+  defaultPagePermissionGroup PagePermissionLevel? @default(full_access)
   defaultPublicPages         Boolean ?  @default(false)
   // All role, user, space, space permissions for this space
   permittedGroups            SpacePermission[]    @relation(name: "permittedGroups")
