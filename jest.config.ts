@@ -1,3 +1,4 @@
+import path from 'path';
 import createJestConfig from 'testing/createJestConfig';
 /*
  * For a detailed explanation regarding each configuration property and type check, visit:

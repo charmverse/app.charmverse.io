@@ -1,19 +1,20 @@
 
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { CircularProgress, Menu, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import Legend from 'components/settings/Legend';
 import ImportGuildRolesMenuItem from 'components/settings/roles/components/ImportGuildRolesMenuItem';
 import useRoles from 'components/settings/roles/hooks/useRoles';
-import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import useIsAdmin from 'hooks/useIsAdmin';
-import { useRef, useState } from 'react';
-import { Menu } from '@mui/material';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import RoleRow from './components/RoleRow';
-import RoleForm from './components/RoleForm';
+import useIsAdmin from 'hooks/useIsAdmin';
+import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { useRef, useState } from 'react';
 import ImportDiscordRolesMenuItem from './components/ImportDiscordRolesMenuItem';
+import RoleForm from './components/RoleForm';
+import RoleRow from './components/RoleRow';
+import { useImportDiscordRoles } from './hooks/useImportDiscordRoles';
 import SpacePermissions from './spacePermissions/SpacePermissions';
 
 export default function RoleSettings () {
@@ -31,10 +32,10 @@ export default function RoleSettings () {
   const handleClose = () => {
     setAnchorEl(null);
   };
-
   const [space] = useCurrentSpace();
-
   const buttonRef = useRef<HTMLButtonElement>(null);
+
+  const { isValidating } = useImportDiscordRoles();
 
   return (
     <>
@@ -58,13 +59,31 @@ export default function RoleSettings () {
               endIcon={(
                 <KeyboardArrowDownIcon />
               )}
+              disabled={isValidating}
             >
               Import roles
             </Button>
-            <Button {...bindTrigger(popupState)}>Add a role</Button>
+            <Button {...bindTrigger(popupState)} disabled={isValidating}>Add a role</Button>
           </Box>
         )}
       </Legend>
+      {isValidating ? (
+        <Box display='flex' alignItems='center' gap={1}>
+          <CircularProgress size={24} />
+          <Typography variant='subtitle1' color='secondary'>Importing roles from discord server</Typography>
+        </Box>
+      ) : roles?.map(role => (
+        <RoleRow
+          isEditable={isAdmin}
+          assignRoles={assignRoles}
+          unassignRole={unassignRole}
+          deleteRole={deleteRole}
+          refreshRoles={refreshRoles}
+          role={role}
+          key={role.id}
+        />
+      ))}
+
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
         <ImportDiscordRolesMenuItem />
         <ImportGuildRolesMenuItem onClose={handleClose} />
@@ -78,18 +97,6 @@ export default function RoleSettings () {
           }}
         />
       </Modal>
-
-      {roles?.map(role => (
-        <RoleRow
-          isEditable={isAdmin}
-          assignRoles={assignRoles}
-          unassignRole={unassignRole}
-          deleteRole={deleteRole}
-          refreshRoles={refreshRoles}
-          role={role}
-          key={role.id}
-        />
-      ))}
     </>
   );
 }

@@ -134,13 +134,15 @@ describe('DELETE /api/permissions - delete permission', () => {
 
     const rootPermissionId = rootPage.permissions[0].id;
 
-    (await request(baseUrl)
+    const nestedChildPermissionId = nestedChildPage.permissions.find(p => p.inheritedFromPermission === rootPermissionId)?.id as string;
+
+    await request(baseUrl)
       .delete('/api/permissions')
       .set('Cookie', cookie)
       .send({
-        permissionId: nestedChildPage.permissions[0].id
+        permissionId: nestedChildPermissionId
       })
-      .expect(200));
+      .expect(200);
 
     const remainingPermissions = await prisma.pagePermission.findMany({
       where: {
