@@ -54,3 +54,7 @@ export interface IPagePermissionWithAssignee extends PagePermission, IPagePermis
   public: boolean | null;
 }
 
+export interface SpaceDefaultPublicPageToggle {
+  spaceId: string;
+  defaultPublicPages: boolean;
+}
