@@ -52,9 +52,15 @@ function InputSearchContributorBase ({ filter, options, placeholder, ...props }:
       options={filteredOptions}
       autoHighlight
       // user can also be a string if freeSolo=true
-      getOptionLabel={(user) => cache.get(`@"ENS",102~,"${(user as Contributor).addresses[0]}",${chainId},`) ?? (user as User).username}
+      getOptionLabel={(user) => cache.get(`@"ENS",102~,"${(user as Contributor).username}",${chainId},`) ?? (user as Contributor).username}
       renderOption={(_props, user) => (
-        <ReviewerOption {..._props as any} user={user} />
+        <ReviewerOption
+          {..._props as any}
+          user={{
+            ...user,
+            addresses: []
+          }}
+        />
       )}
       renderInput={(params) => (
         <TextField
