@@ -11,6 +11,7 @@ export async function generateSpaceUser ({ spaceId, isAdmin }: { spaceId: string
     data: {
       addresses: [v4()],
       identityType: IDENTITY_TYPES[1],
+      username: 'Username',
       spaceRoles: {
         create: {
           space: {
