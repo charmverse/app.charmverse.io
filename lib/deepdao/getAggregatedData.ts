@@ -2,6 +2,7 @@ import { isUUID } from 'lib/utilities/strings';
 import { prisma } from 'db';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { getCompletedApplicationsOfUser } from 'lib/applications/getCompletedApplicationsOfUser';
+import { getSpacesCount } from 'lib/spaces/getSpacesCount';
 import { getParticipationScore } from './getParticipationScore';
 import { DeepDaoAggregateData } from './interfaces';
 
@@ -20,12 +21,13 @@ export async function getAggregatedData (userPath: string): Promise<DeepDaoAggre
 
   const participationScores = user.addresses.length !== 0 ? await Promise.all(user.addresses.map(address => getParticipationScore(address))) : [];
 
-  const completedBounties = await getCompletedApplicationsOfUser(user.id);
+  const completedBountiesCount = await getCompletedApplicationsOfUser(user.id);
+  const workspacesCount = await getSpacesCount(user.id);
 
   return {
-    daos: participationScores.reduce((acc, cur) => acc + cur.data.daos, 0),
+    daos: workspacesCount + participationScores.reduce((acc, cur) => acc + cur.data.daos, 0),
     proposals: participationScores.reduce((acc, cur) => acc + cur.data.proposals, 0),
     votes: participationScores.reduce((acc, cur) => acc + cur.data.votes, 0),
-    bounties: completedBounties
+    bounties: completedBountiesCount
   };
 }
