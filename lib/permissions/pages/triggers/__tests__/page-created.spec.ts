@@ -6,6 +6,8 @@ import { v4 } from 'uuid';
 import { ExpectedAnError } from 'testing/errors';
 import { prisma } from 'db';
 import { setupPermissionsAfterPageCreated } from '../page-created';
+import { toggleSpaceDefaultPublicPage } from '../../actions/toggleSpaceDefaultPublicPage';
+import { deletePagePermission } from '../../actions';
 
 let user1: User;
 let spaceWithDefaultPagePermissionGroup: Space;
@@ -124,6 +126,91 @@ describe('setupPermissionsAfterPageCreated', () => {
 
     expect(childInheritedUserPermission).toBe(true);
     expect(childInheritedSpacePermission).toBe(true);
+  });
+
+  it('should insert a public:true page permission to a new root page if spaceDefaultPublic is true for that space', async () => {
+
+    const { space: extraSpace, user: extraUser } = await generateUserAndSpaceWithApiToken(undefined, false);
+
+    await toggleSpaceDefaultPublicPage({
+      spaceId: extraSpace.id,
+      defaultPublicPages: true
+    });
+
+    const page = await createPage({
+      createdBy: extraUser.id,
+      spaceId: extraSpace.id
+    });
+
+    const pageWithPermissions = await setupPermissionsAfterPageCreated(page.id);
+
+    // Default space full access + creating user full access + public page permission
+    expect(pageWithPermissions?.permissions.length).toBe(3);
+
+    const publicPermission = pageWithPermissions.permissions.find(p => p.public === true);
+
+    expect(publicPermission).toBeDefined();
+  });
+
+  it('should not insert a public page permission to a new root page if spaceDefaultPublic is not true for that space', async () => {
+
+    const { space: extraSpace, user: extraUser } = await generateUserAndSpaceWithApiToken(undefined, false);
+
+    await toggleSpaceDefaultPublicPage({
+      spaceId: extraSpace.id,
+      defaultPublicPages: false
+    });
+
+    const page = await createPage({
+      createdBy: extraUser.id,
+      spaceId: extraSpace.id
+    });
+
+    const pageWithPermissions = await setupPermissionsAfterPageCreated(page.id);
+
+    // Default space full access + creating user full access
+    expect(pageWithPermissions?.permissions.length).toBe(2);
+
+    const publicPermission = pageWithPermissions.permissions.find(p => p.public === true);
+
+    expect(publicPermission).not.toBeDefined();
+  });
+
+  // Here permissions inheritance should come into play
+  it('should not insert a public page permission to a new child page if spaceDefaultPublic is true for that space', async () => {
+
+    const { space: extraSpace, user: extraUser } = await generateUserAndSpaceWithApiToken(undefined, false);
+
+    await toggleSpaceDefaultPublicPage({
+      spaceId: extraSpace.id,
+      defaultPublicPages: true
+    });
+
+    let rootPage = await createPage({
+      createdBy: extraUser.id,
+      spaceId: extraSpace.id
+    });
+
+    rootPage = await setupPermissionsAfterPageCreated(rootPage.id);
+
+    const publicPermissionId = rootPage.permissions.find(p => p.public === true)?.id as string;
+
+    await deletePagePermission(publicPermissionId);
+
+    let childPage = await createPage({
+      createdBy: extraUser.id,
+      spaceId: extraSpace.id,
+      parentId: rootPage.id
+    });
+
+    childPage = await setupPermissionsAfterPageCreated(childPage.id);
+
+    // Default space full access + creating user full access
+    expect(childPage.permissions.length).toBe(2);
+
+    const publicPermission = childPage.permissions.find(p => p.public === true);
+
+    expect(publicPermission).not.toBeDefined();
   });
 
 });

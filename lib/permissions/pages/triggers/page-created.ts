@@ -19,7 +19,8 @@ export async function setupPermissionsAfterPageCreated (pageId: string): Promise
           id: page.spaceId
         },
         select: {
-          defaultPagePermissionGroup: true
+          defaultPagePermissionGroup: true,
+          defaultPublicPages: true
         }
       }) as Space;
       if (space?.defaultPagePermissionGroup) {
@@ -36,6 +37,13 @@ export async function setupPermissionsAfterPageCreated (pageId: string): Promise
             spaceId: page.spaceId
           }
         );
+      }
+
+      if (space.defaultPublicPages) {
+        await upsertPermission(pageId, {
+          permissionLevel: 'view',
+          public: true
+        });
       }
     }
     else {
