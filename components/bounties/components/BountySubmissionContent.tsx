@@ -17,7 +17,7 @@ export default function BountySubmissionContent ({ submission }: Props) {
   return (
     <Box flexGrow={1}>
       <Typography variant='h6'>
-        {submitter.username}'s submission
+        {submitter?.username}'s submission
       </Typography>
       <InlineCharmEditor
         content={submission?.submissionNodes ? JSON.parse(submission?.submissionNodes) : ''}
