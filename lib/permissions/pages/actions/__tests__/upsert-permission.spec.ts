@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import { Space, User } from '@prisma/client';
-import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
 import { prisma } from 'db';
-import { ExpectedAnError } from 'testing/errors';
 import { InvalidPermissionGranteeError } from 'lib/permissions/errors';
-import { upsertPermission } from '../upsert-permission';
+import { InsecureOperationError } from 'lib/utilities/errors';
+import { ExpectedAnError } from 'testing/errors';
+import { createPage, generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { v4 } from 'uuid';
 import { CannotInheritOutsideTreeError, SelfInheritancePermissionError } from '../../errors';
+import { upsertPermission } from '../upsert-permission';
 
 let user: User;
 let space: Space;
@@ -295,6 +296,66 @@ describe('upsertPermission', () => {
     expect(subChildPermissionAfterUpdate!.inheritedFromPermission).toBe(childPermissionAfterUpdate!.id);
     expect(siblingPermissionAfterUpdate!.inheritedFromPermission).toBe(parentPermission.id);
 
+  });
+
+  it('should not create a permission for another space than the space the page belongs to', async () => {
+
+    const page = await createPage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    const { space: differentSpace } = await generateUserAndSpaceWithApiToken();
+
+    try {
+      await upsertPermission(page.id, { permissionLevel: 'full_access', spaceId: differentSpace.id });
+      throw new ExpectedAnError();
+    }
+    catch (err) {
+      expect(err).toBeInstanceOf(InsecureOperationError);
+    }
+
+  });
+
+  it('should not create a permission for a role that is outside the space the page belongs to', async () => {
+
+    const page = await createPage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    const { space: differentSpace, user: userFromDifferentSpace } = await generateUserAndSpaceWithApiToken();
+
+    const role = await generateRole({
+      createdBy: userFromDifferentSpace.id,
+      spaceId: differentSpace.id
+    });
+
+    try {
+      await upsertPermission(page.id, { permissionLevel: 'full_access', roleId: role.id });
+      throw new ExpectedAnError();
+    }
+    catch (err) {
+      expect(err).toBeInstanceOf(InsecureOperationError);
+    }
+  });
+
+  it('should not create a permission for a user who is not a member of the space the page belongs to', async () => {
+
+    const page = await createPage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    const { user: userFromDifferentSpace } = await generateUserAndSpaceWithApiToken();
+
+    try {
+      await upsertPermission(page.id, { permissionLevel: 'full_access', userId: userFromDifferentSpace.id });
+      throw new ExpectedAnError();
+    }
+    catch (err) {
+      expect(err).toBeInstanceOf(InsecureOperationError);
+    }
   });
 
 });
