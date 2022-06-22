@@ -286,7 +286,16 @@ class CharmClient {
   async getWorkspaceUsers (): Promise<IUser[]> {
     const currentSpace = await this.getWorkspace();
     const contributors = await this.getContributors(currentSpace.id);
-    return contributors.map(this.userToFBUser);
+
+    return contributors.map((contributor: Contributor) => ({
+      id: contributor.id,
+      username: contributor.username,
+      email: '',
+      props: {},
+      create_at: new Date(contributor.createdAt).getTime(),
+      update_at: new Date(contributor.updatedAt).getTime(),
+      is_bot: false
+    }));
   }
 
   async getPublicSpaceInfo (spaceId: string): Promise<PublicSpaceInfo> {
@@ -334,18 +343,6 @@ class CharmClient {
       deletedAt: fbBlock.deletedAt === 0 ? null : fbBlock.deletedAt ? new Date(fbBlock.deletedAt) : null,
       createdAt: (!fbBlock.createdAt || fbBlock.createdAt === 0) ? new Date() : new Date(fbBlock.createdAt),
       updatedAt: (!fbBlock.updatedAt || fbBlock.updatedAt === 0) ? new Date() : new Date(fbBlock.updatedAt)
-    };
-  }
-
-  private userToFBUser (user: User): IUser {
-    return {
-      id: user.id,
-      username: user.username,
-      email: '',
-      props: {},
-      create_at: new Date(user.createdAt).getTime(),
-      update_at: new Date(user.updatedAt).getTime(),
-      is_bot: false
     };
   }
 
