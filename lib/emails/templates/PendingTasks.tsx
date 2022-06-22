@@ -57,25 +57,22 @@ function MentionTask ({ task: { pageTitle, spaceName, text, spaceDomain, pagePat
   return (
     <>
       <MjmlText>
-        <a href={`${charmverseUrl}/nexus?task=discussion`}>
-          <MjmlSection>
-            <MjmlColumn>
-              <MjmlText>
-                <h2>{pageTitle || 'Untitled'}</h2>
-              </MjmlText>
-            </MjmlColumn>
-            <MjmlColumn>
-              <MjmlText>
-                <h3>
-                  ({spaceName})
-                </h3>
-              </MjmlText>
-            </MjmlColumn>
-          </MjmlSection>
-        </a>
-        <strong style={{ color: greyColor2 }}>
+        <div style={{
+          marginBottom: 20
+        }}
+        >
+          <a
+            href={`${charmverseUrl}/nexus?task=discussion`}
+          >
+            <span style={{ fontSize: 24, fontWeight: 'bold' }}>{pageTitle || 'Untitled'}</span>
+            <span style={{ fontSize: 20, fontWeight: 'bold' }}>
+              ({spaceName})
+            </span>
+          </a>
+        </div>
+        <div style={{ fontWeight: 'bold', color: greyColor2 }}>
           {text}
-        </strong>
+        </div>
       </MjmlText>
       <MjmlButton align='left' padding-bottom='40px' href={`${charmverseUrl}/${spaceDomain}/${pagePath}?mentionedId=${mentionId}`}>
         View
