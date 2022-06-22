@@ -5,10 +5,16 @@ import { withSessionRoute } from 'lib/session/withSession';
 import { setSpaceDefaultPagePermission } from 'lib/spaces/setSpaceDefaultPagePermission';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import { requireCustomPermissionMode } from 'lib/middleware/requireCustomPermissionMode';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).post(setDefaultPagePermission);
+handler.use(requireUser)
+  .use(requireCustomPermissionMode({
+    keyLocation: 'query',
+    spaceIdKey: 'id'
+  }))
+  .post(setDefaultPagePermission);
 
 async function setDefaultPagePermission (req: NextApiRequest, res: NextApiResponse<Space>) {
 

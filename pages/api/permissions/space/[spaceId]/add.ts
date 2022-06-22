@@ -5,11 +5,15 @@ import { NextApiRequest, NextApiResponse } from 'next';
 
 import { addSpaceOperations, SpacePermissionFlags, SpacePermissionWithAssignee } from 'lib/permissions/spaces';
 import nc from 'next-connect';
+import { requireCustomPermissionMode } from 'lib/middleware/requireCustomPermissionMode';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
-//  .use(requireSpaceMembership)
+  .use(requireCustomPermissionMode({
+    keyLocation: 'query',
+    spaceIdKey: 'spaceId'
+  }))
   .post(addSpacePermissionsController);
 
 async function addSpacePermissionsController (req: NextApiRequest, res: NextApiResponse<SpacePermissionFlags>) {

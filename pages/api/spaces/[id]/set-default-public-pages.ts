@@ -1,16 +1,21 @@
 
-import { PagePermissionLevel, Space } from '@prisma/client';
+import { Space } from '@prisma/client';
 import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { withSessionRoute } from 'lib/session/withSession';
-import { setSpaceDefaultPagePermission } from 'lib/spaces/setSpaceDefaultPagePermission';
-import { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
+import { requireCustomPermissionMode } from 'lib/middleware/requireCustomPermissionMode';
 import { SpaceDefaultPublicPageToggle } from 'lib/permissions/pages';
 import { toggleSpaceDefaultPublicPage } from 'lib/permissions/pages/actions/toggleSpaceDefaultPublicPage';
+import { withSessionRoute } from 'lib/session/withSession';
+import { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).post(setSpaceDefaultPublicPage);
+handler.use(requireUser)
+  .use(requireCustomPermissionMode({
+    keyLocation: 'query',
+    spaceIdKey: 'id'
+  }))
+  .post(setSpaceDefaultPublicPage);
 
 async function setSpaceDefaultPublicPage (req: NextApiRequest, res: NextApiResponse<Space>) {
 

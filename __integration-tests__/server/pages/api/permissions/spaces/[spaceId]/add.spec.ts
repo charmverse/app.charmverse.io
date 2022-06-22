@@ -2,6 +2,7 @@ import { SpacePermissionFlags, SpacePermissionModification, SpacePermissionWithA
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 
 describe('POST /api/permissions/space/{spaceId}/add - Add space permissions', () => {
 
@@ -37,6 +38,30 @@ describe('POST /api/permissions/space/{spaceId}/add - Add space permissions', ()
     };
 
     const nonAdminCookie = await loginUser(nonAdminUser);
+
+    await request(baseUrl)
+      .post(`/api/permissions/space/${space.id}/add`)
+      .set('Cookie', nonAdminCookie)
+      .send(spacePermissionContent)
+      .expect(401);
+
+  });
+
+  it('should fail if the user is admin, but the space permission mode is not "custom", and respond 401', async () => {
+
+    const { space, user: adminUser } = await generateUserAndSpaceWithApiToken(undefined, true);
+
+    await updateSpacePermissionConfigurationMode({
+      spaceId: space.id,
+      permissionConfigurationMode: 'collaborative'
+    });
+
+    const spacePermissionContent: Omit<SpacePermissionModification, 'forSpaceId'> = {
+      operations: ['createPage'],
+      spaceId: space.id
+    };
+
+    const nonAdminCookie = await loginUser(adminUser);
 
     await request(baseUrl)
       .post(`/api/permissions/space/${space.id}/add`)

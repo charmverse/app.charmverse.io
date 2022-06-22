@@ -23,6 +23,7 @@ function MockSpace (partial: Partial<Space>): Space {
     defaultVotingDuration: null,
     defaultPagePermissionGroup: null,
     defaultPublicPages: false,
+    permissionConfigurationMode: 'custom',
     ...partial
   };
 }

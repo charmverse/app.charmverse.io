@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Space, User } from '@prisma/client';
 import request from 'supertest';
-import { baseUrl } from 'testing/mockApiCall';
+import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 
 let nonAdminUser: User;
 let nonAdminUserSpace: Space;
@@ -48,6 +49,26 @@ describe('POST /api/spaces/[id]/set-default-page-permissions - Set default page 
     await request(baseUrl)
       .post(`/api/spaces/${nonAdminUserSpace.id}/set-default-page-permissions`)
       .set('Cookie', nonAdminCookie)
+      .send({
+        pagePermissionLevel: 'full_access'
+      })
+      .expect(401);
+  });
+
+  it('should fail if the user is admin, but the space permission mode is not "custom", and respond 401', async () => {
+
+    const { space: extraSpace, user: extraAdminUser } = await generateUserAndSpaceWithApiToken(undefined, true);
+
+    await updateSpacePermissionConfigurationMode({
+      spaceId: extraSpace.id,
+      permissionConfigurationMode: 'collaborative'
+    });
+
+    const userCookie = await loginUser(extraAdminUser);
+
+    await request(baseUrl)
+      .post(`/api/spaces/${extraSpace.id}/set-default-page-permissions`)
+      .set('Cookie', userCookie)
       .send({
         pagePermissionLevel: 'full_access'
       })
