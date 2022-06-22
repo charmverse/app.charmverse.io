@@ -51,10 +51,12 @@ model Space {
   apiToken                   SpaceApiToken?
   threads                    Thread[]
   comments                   Comment[]
+  // Public page settings
   defaultPagePermissionGroup PagePermissionLevel?
+  defaultPublicPages         Boolean ?  @default(false)
   // All role, user, space, space permissions for this space
   permittedGroups            SpacePermission[]    @relation(name: "permittedGroups")
-  // Space permissions this space has (for itself or other spaces)
+  // Space permissions this space has (for itself or other spaces => Currently we only allow space level permissions for same space)
   spacePermissions   SpacePermission[] @relation(name: "spacePermissions")
 
 }
