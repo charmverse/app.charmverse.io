@@ -40,7 +40,7 @@ export interface UserDetailsProps {
 
 export const isPublicUser = (user: PublicUser | LoggedInUser): user is PublicUser => user.hasOwnProperty('profile');
 
-export default function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
+function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
   const { account } = useWeb3React();
   const isPublic = isPublicUser(user);
   const { data: userDetails, mutate } = useSWRImmutable(`/userDetails/${user.id}/${isPublic}`, () => {
@@ -143,7 +143,7 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
     <Box>
       <Stack direction={{ xs: 'column', md: 'row' }} mt={5} spacing={3}>
         <Avatar
-          name={user?.username || ''}
+          name={user.username || ''}
           image={user?.avatar}
           updateImage={(url: string) => handleUserUpdate({ avatar: url })}
           editable={!readOnly}
@@ -153,7 +153,7 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
           <Grid item>
             <Stack direction='row' spacing={1} alignItems='end'>
               { user && !isPublicUser(user) && getIdentityIcon(user.identityType as IdentityType) }
-              <Typography variant='h1'>{user?.username}</Typography>
+              <Typography variant='h1'>{user.username}</Typography>
               {!readOnly && (
                 <IconButton onClick={identityModalState.open}>
                   <EditIcon fontSize='small' />
@@ -267,7 +267,7 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
           }}
           identityTypes={identityTypes}
           identityType={(user?.identityType || IDENTITY_TYPES[0]) as IdentityType}
-          username={user?.username || ''}
+          username={user.username || ''}
         />
         <DescriptionModal
           isOpen={descriptionModalState.isOpen}
@@ -311,3 +311,5 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
     </Box>
   );
 }
+
+export default UserDetails;

@@ -12,7 +12,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { IPagePermissionWithAssignee, PagePermissionLevelType } from 'lib/permissions/pages/page-permission-interfaces';
 import { permissionLevels } from 'lib/permissions/pages/page-permission-mapping';
-import { getDisplayName } from 'lib/users/getDisplayName';
 import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect } from 'react';
 import AddPagePermissionsForm from './AddPagePermissionsForm';
@@ -55,7 +54,7 @@ function sortPagePermissions (pagePermissions: IPagePermissionWithAssignee[]):
 
       const permissionSource = permission.user ? 'user' : 'role';
 
-      const permissionDisplayName = permissionSource === 'user' ? getDisplayName(permission.user!) : permission.role!.name;
+      const permissionDisplayName = permissionSource === 'user' ? permission.user!.username : permission.role!.name;
 
       return {
         ...permission,

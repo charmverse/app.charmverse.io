@@ -2,7 +2,6 @@ import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
 import charmClient from 'charmClient';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useContributors } from 'hooks/useContributors';
-import { getDisplayName } from 'lib/users';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import { Contributor } from 'models';
 import { useState } from 'react';
@@ -89,9 +88,9 @@ export default function ContributorList ({ isAdmin, spaceId, spaceOwner }: Props
         title='Remove contributor'
         onClose={popupState.close}
         open={menuState.open}
-        buttonText={`Remove ${getDisplayName(removedContributor)}`}
+        buttonText={`Remove ${removedContributor.username}`}
         onConfirm={removeContributor}
-        question={`Are you sure you want to remove ${getDisplayName(removedContributor)} from space?`}
+        question={`Are you sure you want to remove ${removedContributor.username} from space?`}
       />
       )}
     </>

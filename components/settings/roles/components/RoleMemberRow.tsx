@@ -4,8 +4,6 @@ import Typography from '@mui/material/Typography';
 import ElementDeleteIcon from 'components/common/form/ElementDeleteIcon';
 import Avatar from 'components/common/Avatar';
 import { User } from 'models';
-import getDisplayName from 'lib/users/getDisplayName';
-import useENSName from 'hooks/useENSName';
 
 export const StyledRow = styled(Box)`
   border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
@@ -29,8 +27,6 @@ interface Props {
 }
 
 export default function ContributorRow ({ contributor, isEditable, onRemove }: Props) {
-  const ensName = useENSName(contributor.addresses[0]);
-
   function removeMember () {
     onRemove(contributor.id);
   }
@@ -38,9 +34,9 @@ export default function ContributorRow ({ contributor, isEditable, onRemove }: P
   return (
     <StyledRow py={2}>
       <Box display='flex' alignItems='center'>
-        <Avatar name={ensName || getDisplayName(contributor)} avatar={contributor?.avatar} size='small' />
+        <Avatar name={contributor.username} avatar={contributor?.avatar} size='small' />
         <Box pl={2}>
-          <Typography variant='body1'>{ensName || getDisplayName(contributor)}</Typography>
+          <Typography variant='body1'>{contributor.username}</Typography>
         </Box>
       </Box>
       {isEditable && <ElementDeleteIcon onClick={removeMember} tooltip='Remove member' />}
