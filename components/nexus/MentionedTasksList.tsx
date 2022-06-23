@@ -62,7 +62,7 @@ function MentionedTaskRow (
               xs={12}
               sm={4}
               md={2}
-              justifyContent={{ sm: 'flex-end', xs: 'initial' }}
+              justifyContent={{ sm: 'flex-end', md: 'initial', xs: 'initial' }}
               sx={{ display: 'flex' }}
             >
               <UserDisplay avatarSize='small' user={createdBy as User} />
@@ -71,7 +71,7 @@ function MentionedTaskRow (
               item
               xs={12}
               sm={6}
-              md={3}
+              md={4}
               sx={{
                 fontSize: { xs: 14, sm: 'inherit' }
               }}
@@ -89,7 +89,7 @@ function MentionedTaskRow (
               item
               xs={12}
               sm={3}
-              md={2}
+              md={1.5}
               justifyContent={{ sm: 'flex-end', xs: 'initial' }}
               sx={{
                 fontSize: { xs: 14, sm: 'inherit', display: 'flex' }
