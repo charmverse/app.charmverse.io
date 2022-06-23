@@ -153,6 +153,13 @@ export function charmEditorPlugins (
                       .replaceRangeWith(draggedNodeStartPos, destinationPos - 1, cutDoc)
                       .replaceRangeWith(destinationPos, destinationPos + 1, draggedNode));
                   }
+                  else {
+                    const cutDoc = view.state.doc.cut(destinationPos, draggedNodeEndPos - 1);
+                    view.dispatch(view.state.tr
+                      .deleteRange(draggedNodeStartPos, draggedNodeEndPos)
+                      .replaceRangeWith(destinationPos - 1, draggedNodeStartPos, cutDoc)
+                      .replaceRangeWith(destinationPos, destinationPos + 1, draggedNode));
+                  }
                 }
               }
             }
