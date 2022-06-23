@@ -11,7 +11,7 @@ const LastModifiedBy = (props: Props): JSX.Element => {
     const workspaceUsersById = useAppSelector<{[key:string]: IUser}>(getWorkspaceUsers)
     return (
         <div className='LastModifiedBy octo-propertyvalue readonly'>
-            {(workspaceUsersById && workspaceUsersById[props.updatedBy]?.username) || props.updatedBy}
+            {(workspaceUsersById && workspaceUsersById[props.updatedBy].username) || props.updatedBy}
         </div>
     )
 }

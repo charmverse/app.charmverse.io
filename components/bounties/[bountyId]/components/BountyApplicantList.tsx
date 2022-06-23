@@ -173,7 +173,10 @@ export function BountyApplicantList ({
                         return (
                           <UserDisplay
                             avatarSize='small'
-                            user={contributor}
+                            user={{
+                              ...contributor,
+                              addresses: []
+                            }}
                             fontSize='small'
                             linkToProfile
                           />
