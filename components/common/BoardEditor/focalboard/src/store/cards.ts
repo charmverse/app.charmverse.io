@@ -208,11 +208,11 @@ function sortCards(cards: Card[], board: Board, activeView: BoardView, usersById
                 let bValue = b.fields.properties[sortPropertyId] || ''
 
                 if (template.type === 'createdBy') {
-                    aValue = usersById[a.createdBy].username || ''
-                    bValue = usersById[b.createdBy].username || ''
+                    aValue = usersById[a.createdBy]?.username || ''
+                    bValue = usersById[b.createdBy]?.username || ''
                 } else if (template.type === 'updatedBy') {
-                    aValue = usersById[a.updatedBy].username || ''
-                    bValue = usersById[b.updatedBy].username || ''
+                    aValue = usersById[a.updatedBy]?.username || ''
+                    bValue = usersById[b.updatedBy]?.username || ''
                 } else if (template.type === 'date') {
                     aValue = (aValue === '') ? '' : JSON.parse(aValue as string).from
                     bValue = (bValue === '') ? '' : JSON.parse(bValue as string).from
