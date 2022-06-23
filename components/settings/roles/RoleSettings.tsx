@@ -2,6 +2,7 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { CircularProgress, Menu, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
+import { SpacePermissionConfigurationMode } from '@prisma/client';
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import Legend from 'components/settings/Legend';
@@ -15,9 +16,9 @@ import ImportDiscordRolesMenuItem from './components/ImportDiscordRolesMenuItem'
 import RoleForm from './components/RoleForm';
 import RoleRow from './components/RoleRow';
 import { useImportDiscordRoles } from './hooks/useImportDiscordRoles';
-import SpacePermissions from './spacePermissions/SpacePermissions';
 import DefaultPagePermissions from './spacePermissions/DefaultPagePermissions';
 import PermissionConfigurationMode from './spacePermissions/PermissionConfigurationMode';
+import SpacePermissions from './spacePermissions/SpacePermissions';
 
 export default function RoleSettings () {
   const {
@@ -39,6 +40,8 @@ export default function RoleSettings () {
 
   const { isValidating } = useImportDiscordRoles();
 
+  const [selectedPermissionMode, setSelectedPermissionMode] = useState<SpacePermissionConfigurationMode>(space?.permissionConfigurationMode ?? 'custom');
+
   return (
     <>
       {/* Space permissions */}
@@ -46,15 +49,20 @@ export default function RoleSettings () {
         Permissions
       </Legend>
 
-      <PermissionConfigurationMode />
+      <PermissionConfigurationMode permissionModeSelected={setSelectedPermissionMode} />
 
-      <br />
+      {
+        space?.permissionConfigurationMode === 'custom' && selectedPermissionMode === 'custom' && (
+          <>
+            <br />
+            <SpacePermissions targetGroup='space' id={space?.id as string} />
 
-      <SpacePermissions targetGroup='space' id={space?.id as string} />
-
-      <br />
-      {/* Default page permissions */}
-      <DefaultPagePermissions />
+            <br />
+            {/* Default page permissions */}
+            <DefaultPagePermissions />
+          </>
+        )
+      }
 
       {/* Roles */}
       <Legend sx={{ display: 'flex', justifyContent: 'space-between' }}>

@@ -19,7 +19,11 @@ import Typography from '@mui/material/Typography';
 import { PagePermissionLevelWithoutCustom } from 'lib/permissions/pages/page-permission-interfaces';
 import { configurationModeDescription, configurationModeName, getTemplateExplanation } from 'lib/permissions/meta/preset-templates';
 
-export default function PermissionConfigurationMode () {
+interface Props {
+  permissionModeSelected?: (mode: SpacePermissionConfigurationMode) => void;
+}
+
+export default function PermissionConfigurationMode ({ permissionModeSelected = () => null }: Props) {
   const [space, setSpace] = useCurrentSpace();
 
   const isAdmin = useIsAdmin();
@@ -96,6 +100,7 @@ export default function PermissionConfigurationMode () {
                   selected={isSelected}
                   onClick={() => {
                     setSelectedConfigurationMode(mode);
+                    permissionModeSelected(mode);
                     popupState.close();
                   }}
                 >
@@ -119,37 +124,25 @@ export default function PermissionConfigurationMode () {
       {
         selectedConfigurationMode !== 'custom' && (
           <Grid container item xs>
-            <Grid item sm={firstGridSmallColumnWidth} xs={12} sx={{ pr: 2 }} display='block'>
+            <Grid item sm={firstGridSmallColumnWidth} xs={12} sx={{ pr: 2 }}>
 
               {
               templateExplanation[0].map(canDo => (
-
-                <div style={{
-                  display: 'block',
-                  alignItems: 'center'
-                }}
-                >
-                  <DoneIcon sx={{ fontSize: '18px', mr: 0.5 }} />
+                <Grid item xs={12} display='flex'>
+                  <DoneIcon color='success' sx={{ fontSize: '18px', mr: 0.5 }} />
                   <Typography variant='caption'>{canDo}</Typography>
-
-                </div>
+                </Grid>
               ))
             }
 
             </Grid>
-            <Grid item sm={secondGridSmallColumnWidth} xs={12} sx={{ pr: 2 }}>
+            <Grid container item sm={secondGridSmallColumnWidth} xs={12} sx={{ pr: 2 }}>
               {
-              templateExplanation[1].map(canDo => (
-
-                <div style={{
-                  display: 'block',
-                  alignItems: 'center'
-                }}
-                >
-
-                  <Typography variant='caption'><CloseIcon sx={{ fontSize: '18px', mr: 0.5 }} />{canDo}</Typography>
-
-                </div>
+              templateExplanation[1].map(cannotDo => (
+                <Grid item xs={12} display='flex'>
+                  <CloseIcon color='error' sx={{ fontSize: '18px', mr: 0.5 }} />
+                  <Typography variant='caption'>{cannotDo}</Typography>
+                </Grid>
               ))
             }
             </Grid>
