@@ -37,7 +37,8 @@
     "test:ci": "dotenv -e .env.test.local --override -- npx jest --config='./jest.config.ts'",
     "test:debug": "dotenv -e .env.test.local --override -- node --inspect-brk --expose-gc ./node_modules/.bin/jest --runInBand --logHeapUsage --config='./jest.config-server.ts' --verbose",
     "test:server": "npm run test:server:ci -- --verbose --watch",
-    "test:server:ci": "dotenv -e .env.test.local --override -- npx jest --config='./jest.config-server.ts'"
+    "test:server:ci": "dotenv -e .env.test.local --override -- npx jest --config='./jest.config-server.ts'",
+    "test:browser:ci": "dotenv -e .env.test.local --override -- npx jest --config='./jest.config-browser.ts'"
   },
   "prepare": "husky install",
   "lint-staged": {

@@ -48,6 +48,11 @@ jobs:
           npm run start:test:ci &
           npm run test:server:ci
 
+      - name: Run browser tests
+        run: |
+          npm run start:test:ci &
+          npm run test:browser:ci
+
   deploy:
     name: Deploy to production
     runs-on: ubuntu-latest
