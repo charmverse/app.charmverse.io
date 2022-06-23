@@ -141,24 +141,24 @@ export function charmEditorPlugins (
               const clientX = event.clientX!;
               const left = (clientX - containerXOffset) < 50 ? clientX + 50 : clientX;
               const ob = view.posAtCoords({ left, top: event.clientY });
-
               if (ob) {
                 const destinationPos = ob.inside > 0 ? ob.inside : ob.pos;
                 const node = view.state.doc.nodeAt(destinationPos);
                 if (node) {
-                  if (draggedNodeEndPos < destinationPos) {
-                    const cutDoc = view.state.doc.cut(draggedNodeEndPos, destinationPos);
+                  if (draggedNodeEndPos <= destinationPos) {
                     view.dispatch(view.state.tr
-                      .deleteRange(draggedNodeStartPos, draggedNodeEndPos)
-                      .replaceRangeWith(draggedNodeStartPos, destinationPos - 1, cutDoc)
-                      .replaceRangeWith(destinationPos, destinationPos + 1, draggedNode));
+                      .deleteRange(draggedNodeStartPos, draggedNodeEndPos));
+                    const cutDoc = view.state.doc.cut(draggedNodeEndPos, destinationPos);
+                    view.dispatch(view.state.tr.replaceRangeWith(draggedNodeStartPos, destinationPos - 1, cutDoc)
+                      .insert(destinationPos, draggedNode));
                   }
                   else {
-                    const cutDoc = view.state.doc.cut(destinationPos, draggedNodeEndPos - 1);
                     view.dispatch(view.state.tr
-                      .deleteRange(draggedNodeStartPos, draggedNodeEndPos)
-                      .replaceRangeWith(destinationPos - 1, draggedNodeStartPos, cutDoc)
-                      .replaceRangeWith(destinationPos, destinationPos + 1, draggedNode));
+                      .deleteRange(draggedNodeStartPos, draggedNodeEndPos));
+
+                    const cutDoc = view.state.doc.cut(destinationPos, draggedNodeEndPos - 1);
+                    view.dispatch(view.state.tr.replaceRangeWith(destinationPos - 1, draggedNodeStartPos, cutDoc)
+                      .insert(destinationPos, draggedNode));
                   }
                 }
               }
