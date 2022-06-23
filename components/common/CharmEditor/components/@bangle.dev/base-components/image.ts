@@ -45,7 +45,7 @@ function specFactory(): RawSpecs {
         }
       },
       group: 'inline',
-      draggable: false,
+      draggable: true,
       parseDOM: [
         {
           tag: 'img[src]',
@@ -103,6 +103,7 @@ function pluginsFactory({
           props: {
             handleDOMEvents: {
               drop(view, event) {
+                console.log(123);
                 if (event.dataTransfer == null) {
                   return false;
                 }

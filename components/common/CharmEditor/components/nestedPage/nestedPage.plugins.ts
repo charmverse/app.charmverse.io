@@ -2,7 +2,7 @@ import { createTooltipDOM, SuggestTooltipRenderOpts } from '@bangle.dev/tooltip'
 import { Plugin, PluginKey } from '@bangle.dev/pm';
 import { insertNestedPage } from 'lib/prosemirror/insertNestedPage';
 import { NodeView } from '@bangle.dev/core';
-import { nestedPageSuggestMarkName } from './nestedPage.constants';
+import { nestedPageNodeName, nestedPageSuggestMarkName } from './nestedPage.constants';
 import { NestedPagePluginState } from './nestedPage.interfaces';
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
 

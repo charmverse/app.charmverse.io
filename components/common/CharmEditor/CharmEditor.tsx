@@ -15,7 +15,7 @@ import {
 } from '@bangle.dev/base-components';
 import debounce from 'lodash/debounce';
 import { NodeView, Plugin, SpecRegistry, BangleEditorState, RawPlugins } from '@bangle.dev/core';
-import { EditorView, Node, PluginKey } from '@bangle.dev/pm';
+import { EditorView, Node, NodeSelection, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
 import { useState, CSSProperties, ReactNode, memo, useCallback, useLayoutEffect, useEffect, useRef } from 'react';
 import styled from '@emotion/styled';
@@ -128,6 +128,40 @@ export function charmEditorPlugins (
 ): () => RawPlugins[] {
   const basePlugins: RawPlugins[] = [
     new Plugin({
+      key: new PluginKey('nestedPage-drop'),
+      props: {
+        handleDOMEvents: {
+          dragend (view, event) {
+            const nodeSelection = (view.state.selection as NodeSelection);
+            const draggedNode = nodeSelection.node;
+            const draggedNodeStartPos = nodeSelection.ranges[0].$from.pos;
+            const draggedNodeEndPos = nodeSelection.ranges[0].$to.pos;
+            if (event) {
+              const containerXOffset = event?.target?.getBoundingClientRect().left;
+              const clientX = event.clientX!;
+              const left = (clientX - containerXOffset) < 50 ? clientX + 50 : clientX;
+              const ob = view.posAtCoords({ left, top: event.clientY });
+
+              if (ob) {
+                const destinationPos = ob.inside > 0 ? ob.inside : ob.pos;
+                const node = view.state.doc.nodeAt(destinationPos);
+                if (node) {
+                  if (draggedNodeEndPos < destinationPos) {
+                    const cutDoc = view.state.doc.cut(draggedNodeEndPos, destinationPos);
+                    view.dispatch(view.state.tr
+                      .deleteRange(draggedNodeStartPos, draggedNodeEndPos)
+                      .replaceRangeWith(draggedNodeStartPos, destinationPos - 1, cutDoc)
+                      .replaceRangeWith(destinationPos, destinationPos + 1, draggedNode));
+                  }
+                }
+              }
+            }
+            return true;
+          }
+        }
+      }
+    }),
+    new Plugin({
       view: () => ({
         update: (view, prevState) => {
           if (onContentChange && !view.state.doc.eq(prevState.doc)) {
@@ -145,7 +179,7 @@ export function charmEditorPlugins (
       key: nestedPagePluginKey
     }),
     imagePlugins({
-      handleDragAndDrop: false
+      handleDragAndDrop: true
     }),
     inlinePalettePlugins(),
     bold.plugins(),
