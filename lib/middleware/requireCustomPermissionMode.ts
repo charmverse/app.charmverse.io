@@ -2,6 +2,7 @@ import { prisma } from 'db';
 import { DataNotFoundError, InvalidInputError, ISystemError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { NextHandler } from 'next-connect';
+import { PermissionAssigneeId } from '../permissions/interfaces';
 
 /**
  * Call to endpoint using this can only proceed if the space permission mode is custom
@@ -27,7 +28,10 @@ export function requireCustomPermissionMode ({ spaceIdKey, keyLocation }: {space
       throw new DataNotFoundError(`Space with id ${spaceId} not found`);
     }
 
-    if (space.permissionConfigurationMode !== 'custom') {
+    const { roleId, userId } = req.body as PermissionAssigneeId<'user'> | PermissionAssigneeId<'role'>;
+
+    // We can still assign permissions to roles and users. We should only block space-level assignment
+    if (space.permissionConfigurationMode !== 'custom' && !roleId && !userId) {
       throw new UnauthorisedActionError('This space must be in custom permissions mode in order to use this endpoint');
     }
 
