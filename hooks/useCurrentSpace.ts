@@ -1,7 +1,11 @@
 import { useRouter } from 'next/router';
 import { Space } from '@prisma/client';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useEffect, useState } from 'react';
+import { AvailableSpacePermissions, SpacePermissionFlags } from 'lib/permissions/spaces/client';
+import charmClient from 'charmClient';
+import useSWR from 'swr';
 import { useSpaces } from './useSpaces';
+import { useUser } from './useUser';
 
 export function useCurrentSpace () {
 

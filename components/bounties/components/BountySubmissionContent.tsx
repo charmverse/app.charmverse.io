@@ -1,6 +1,7 @@
 import Box from '@mui/material/Box';
-import { Application } from '@prisma/client';
+import { Application, Bounty } from '@prisma/client';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
+import { getDisplayName } from 'lib/users';
 import { useContributors } from 'hooks/useContributors';
 import Typography from '@mui/material/Typography';
 
@@ -17,7 +18,7 @@ export default function BountySubmissionContent ({ submission }: Props) {
   return (
     <Box flexGrow={1}>
       <Typography variant='h6'>
-        {submitter?.username}'s submission
+        {getDisplayName(submitter)}'s submission
       </Typography>
       <InlineCharmEditor
         content={submission?.submissionNodes ? JSON.parse(submission?.submissionNodes) : ''}

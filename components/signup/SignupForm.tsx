@@ -8,6 +8,8 @@ import styled from '@emotion/styled';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useWeb3React } from '@web3-react/core';
 import { useRouter } from 'next/router';
+import { getDisplayName } from 'lib/users';
+import useENSName from 'hooks/useENSName';
 
 import gatesImage from 'public/images/artwork/gates.png';
 import rocketImage from 'public/images/artwork/rocket.png';
@@ -42,6 +44,7 @@ const ImageContainer = styled.div`
 export default function SignupPageContent () {
 
   const { account } = useWeb3React();
+  const ensName = useENSName(account);
   const router = useRouter();
   const [user] = useUser();
 
@@ -53,7 +56,7 @@ export default function SignupPageContent () {
     router.push('/join');
   }
 
-  const welcomeMessage = `Welcome, ${user && user.username}!`;
+  const welcomeMessage = `Welcome, ${ensName || (user && getDisplayName(user))}!`;
 
   return (
     <Content px={3}>
