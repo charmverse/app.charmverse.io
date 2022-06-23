@@ -24,6 +24,8 @@ export interface PendingTasksProps {
 
 export default function PendingTasks (props: PendingTasksProps) {
 
+  const totalMentions = props.mentionedTasks.length;
+
   return (
 
     <EmailWrapper title='Your open tasks'>
@@ -37,7 +39,20 @@ export default function PendingTasks (props: PendingTasksProps) {
           </MjmlText>
 
           {props.gnosisSafeTasks.map(gnosisSafeTask => <MultisigTask key={gnosisSafeTask.safeAddress} task={gnosisSafeTask} />)}
-          {props.mentionedTasks.map(mentionedTask => <MentionTask key={mentionedTask.mentionId} task={mentionedTask} />)}
+          <MjmlText>
+            <a
+              href={`${charmverseUrl}/nexus?task=discussion`}
+            >
+              <h2>{totalMentions} Mention{totalMentions > 1 ? 's' : ''}</h2>
+            </a>
+
+          </MjmlText>
+          {props.mentionedTasks.map(mentionedTask => (
+            <MentionTask
+              key={mentionedTask.mentionId}
+              task={mentionedTask}
+            />
+          ))}
 
         </MjmlColumn>
       </MjmlSection>
@@ -51,31 +66,19 @@ export default function PendingTasks (props: PendingTasksProps) {
   );
 }
 
-function MentionTask ({ task: { pageTitle, spaceName, text, spaceDomain, pagePath, mentionId } }: {task: MentionedTask}) {
+function MentionTask ({ task: { text, spaceDomain, pagePath, pageTitle, mentionId } }: {task: MentionedTask}) {
   return (
-    <>
-      <MjmlText>
-        <div style={{
-          marginBottom: 20
-        }}
-        >
-          <a
-            href={`${charmverseUrl}/nexus?task=discussion`}
-          >
-            <span style={{ fontSize: 24, fontWeight: 'bold' }}>{pageTitle || 'Untitled'}</span>
-            <span style={{ fontSize: 20, fontWeight: 'bold' }}>
-              ({spaceName})
-            </span>
-          </a>
+    <MjmlText paddingBottom={10}>
+      <div style={{ fontWeight: 'bold', color: greyColor2, marginBottom: 5 }}>
+        {/* 🙶{text}🙷 */}
+        {text}
+      </div>
+      <a href={`${charmverseUrl}/${spaceDomain}/${pagePath}?mentionId=${mentionId}`}>
+        <div>
+          <h2>{pageTitle} | {spaceDomain}</h2>
         </div>
-        <div style={{ fontWeight: 'bold', color: greyColor2 }}>
-          {text}
-        </div>
-      </MjmlText>
-      <MjmlButton align='left' padding-bottom='40px' href={`${charmverseUrl}/${spaceDomain}/${pagePath}?mentionId=${mentionId}`}>
-        View
-      </MjmlButton>
-    </>
+      </a>
+    </MjmlText>
   );
 }
 
