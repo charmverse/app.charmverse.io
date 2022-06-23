@@ -17,6 +17,7 @@ import RoleRow from './components/RoleRow';
 import { useImportDiscordRoles } from './hooks/useImportDiscordRoles';
 import SpacePermissions from './spacePermissions/SpacePermissions';
 import DefaultPagePermissions from './spacePermissions/DefaultPagePermissions';
+import PermissionConfigurationMode from './spacePermissions/PermissionConfigurationMode';
 
 export default function RoleSettings () {
   const {
@@ -44,6 +45,11 @@ export default function RoleSettings () {
       <Legend sx={{ display: 'flex', justifyContent: 'space-between' }}>
         Permissions
       </Legend>
+
+      <PermissionConfigurationMode />
+
+      <br />
+
       <SpacePermissions targetGroup='space' id={space?.id as string} />
 
       <br />

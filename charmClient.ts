@@ -679,7 +679,7 @@ class CharmClient {
   }
 
   setSpacePermissionMode ({ permissionConfigurationMode, spaceId }: SpacePermissionConfigurationUpdate) {
-    return http.POST<SpacePermissionConfigurationUpdate>(`/api/spaces/${spaceId}/set-permissions-mode`, { permissionConfigurationMode });
+    return http.POST<Space>(`/api/spaces/${spaceId}/set-permissions-mode`, { permissionConfigurationMode });
   }
 
   setDefaultPublicPages ({ spaceId, defaultPublicPages }: SpaceDefaultPublicPageToggle) {

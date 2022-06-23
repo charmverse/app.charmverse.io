@@ -84,7 +84,7 @@ export default function DefaultSpacePagePermissions () {
         </Typography>
       </Grid>
       <Grid item container xs>
-        <Grid item xs={5}>
+        <Grid item xs={6}>
           <Button
             color='secondary'
             variant='outlined'
@@ -127,7 +127,7 @@ export default function DefaultSpacePagePermissions () {
 
           </Menu>
         </Grid>
-        <Grid item xs={7}>
+        <Grid item xs={6}>
           <Typography variant='body2' sx={{ height: '100%', justifyContent: 'center', display: 'flex', flexDirection: 'column' }}>
             {pagePermissionDescriptions[selectedPagePermission]}
           </Typography>
@@ -135,7 +135,7 @@ export default function DefaultSpacePagePermissions () {
       </Grid>
 
       <Grid container item xs>
-        <Grid item xs={5}>
+        <Grid item xs={6}>
           <FormControlLabel
             control={(
               <Switch
@@ -151,7 +151,7 @@ export default function DefaultSpacePagePermissions () {
             label='Accessible to public'
           />
         </Grid>
-        <Grid item xs={7}>
+        <Grid item xs={6}>
           <Typography sx={{ height: '100%', justifyContent: 'center', display: 'flex', flexDirection: 'column' }} variant='body2'>
             {
             defaultPublicPages === true && ('New top-level pages will be viewable by the public.')
@@ -167,7 +167,7 @@ export default function DefaultSpacePagePermissions () {
       {
         isAdmin && (
           <Grid item xs>
-            <Button onClick={() => updateSpaceDefaults()} disabled={!settingsChanged || isUpdatingPagePermission} type='submit' variant='outlined' color='primary' sx={{ mr: 1 }}>Save</Button>
+            <Button onClick={() => updateSpaceDefaults()} disabled={!settingsChanged || isUpdatingPagePermission} type='submit' variant='contained' color='primary' sx={{ mr: 1 }}>Save</Button>
           </Grid>
         )
       }

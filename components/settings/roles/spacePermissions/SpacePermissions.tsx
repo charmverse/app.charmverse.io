@@ -172,11 +172,9 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
             const userCanPerformAction = assignedPermissions[operation];
             const actionLabel = spaceOperationLabels[operation];
 
-            const toggleValue = newValues[operation] ?? false;
-
             return (
               <Grid item container xs key={operation}>
-                <Grid item xs={5}>
+                <Grid item xs={6}>
                   <FormControlLabel
                     control={(
                       <Switch
@@ -192,7 +190,7 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
                     label={actionLabel}
                   />
                 </Grid>
-                <Grid item xs={7}>
+                <Grid item xs={6}>
 
                   <Typography sx={{ height: '100%', justifyContent: 'center', display: 'flex', flexDirection: 'column' }} variant='body2'>
                     {
@@ -228,13 +226,11 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
             );
           })
         }
-          {
-        /* Only show save if settings are different from saved */
-      }
+
           {
         isAdmin && (
           <Grid item xs>
-            <Button disabled={!settingsChanged} type='submit' variant='outlined' color='primary' sx={{ mr: 1 }}>Save</Button>
+            <Button disabled={!settingsChanged} type='submit' variant='contained' color='primary' sx={{ mr: 1 }}>Save</Button>
 
           </Grid>
         )
