@@ -6,7 +6,7 @@ import { PageContent } from 'models';
  * @param content Page content as raw json
  * @returns An array of mention ids
  */
-export function extractMentions (content: PageContent) {
+export function extractMentions (content: PageContent, username?: string) {
   const mentions: {id: string, createdAt: string, createdBy: string, text: string, value: string}[] = [];
 
   function recurse (node: PageContent, parentNode: PageContent | null) {
@@ -26,7 +26,7 @@ export function extractMentions (content: PageContent) {
             text += childNode.text;
           }
           else if (childNode.type === 'mention') {
-            text += `@${shortenHex(childNode.attrs?.value)}`;
+            text += `@${username ?? shortenHex(childNode.attrs?.value)}`;
           }
         });
       }
