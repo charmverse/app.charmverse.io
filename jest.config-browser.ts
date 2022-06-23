@@ -30,7 +30,9 @@ export const jestConfig = {
     '**/components/**/?(*.)+(spec).[tj]s?(x)',
     '**/components/**/**.test.tsx'
   ],
-
+  modulePathIgnorePatterns: [
+    'focalboard'
+  ],
   testTimeout: 30000
 
 };
