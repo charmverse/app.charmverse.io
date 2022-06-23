@@ -9,6 +9,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useEffect } from 'react';
 import charmClient from 'charmClient';
 import { GetTasksResponse } from 'pages/api/tasks/list';
+import { KeyedMutator } from 'swr';
 
 function MentionedTaskRow (
   {
@@ -106,13 +107,26 @@ function MentionedTaskRow (
 interface MentionedTasksListProps {
   tasks: GetTasksResponse | undefined
   error: any
+  mutateTasks: KeyedMutator<GetTasksResponse>
 }
 
-export default function MentionedTasksList ({ tasks, error }: MentionedTasksListProps) {
+export default function MentionedTasksList ({ tasks, error, mutateTasks }: MentionedTasksListProps) {
   useEffect(() => {
     async function main () {
       if (tasks?.mentioned && tasks.mentioned.unmarked.length !== 0) {
         await charmClient.markTasks(tasks.mentioned.unmarked.map(unmarkedMentions => ({ id: unmarkedMentions.mentionId, type: 'mention' })));
+        mutateTasks((_tasks) => {
+          const unmarked = _tasks?.mentioned.unmarked ?? [];
+          return _tasks ? {
+            gnosis: _tasks.gnosis,
+            mentioned: {
+              marked: [..._tasks.mentioned.marked, ...unmarked],
+              unmarked: []
+            }
+          } : undefined;
+        }, {
+          revalidate: false
+        });
       }
     }
 

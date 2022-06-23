@@ -1,9 +1,13 @@
-import useSWR from 'swr';
+import useSWRImmutable from 'swr/immutable';
 import charmClient from 'charmClient';
+import { useUser } from 'hooks/useUser';
 
 export default function useTasks () {
-
-  const { data: tasks, error: serverError, mutate } = useSWR('/tasks/list', () => charmClient.getTasks());
+  const [user] = useUser();
+  const { data: tasks, error: serverError, mutate } = useSWRImmutable(user ? '/tasks/list' : null, () => charmClient.getTasks(), {
+    // 10 minutes
+    refreshInterval: 1000 * 10 * 60
+  });
   const error = serverError?.message || serverError;
   const isLoading = !tasks;
 

@@ -4,7 +4,7 @@ import { IPageWithPermissions } from 'lib/pages';
 import request from 'supertest';
 import { generatePageToCreateStub } from 'testing/generate-stubs';
 import { baseUrl } from 'testing/mockApiCall';
-import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateBountyWithSingleApplication, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { createBounty } from 'lib/bounties';
 import { BountyWithDetails } from '../../../../../../models';
@@ -147,7 +147,7 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
     expect(updated.rewardAmount).toBe(createdBounty.rewardAmount);
   });
 
-  it('should not allow the creator to edit the bounty if it has gone past suggestion status and respond with 401', async () => {
+  it('should allow the creator to edit the whole bounty if it has gone past suggestion status and respond with 200', async () => {
 
     const bountyCreator = await generateSpaceUser({
       isAdmin: false,
@@ -179,7 +179,7 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
       .put(`/api/bounties/${createdBounty.id}`)
       .set('Cookie', bountyCreatorCookie)
       .send(updateContent)
-      .expect(401);
+      .expect(200);
   });
 });
 
@@ -225,7 +225,7 @@ describe('DELETE /api/bounties/{bountyId} - delete a bounty', () => {
 
   });
 
-  it('should not allow the bounty creator to delete a bounty they created if it is past suggestion status and respond with 401', async () => {
+  it('should allow the bounty creator to delete a bounty they created if it is open but has no submissions yet and respond with 200', async () => {
 
     const createdBounty = await createBounty({
       title: 'Example',
@@ -242,6 +242,24 @@ describe('DELETE /api/bounties/{bountyId} - delete a bounty', () => {
       .set('Cookie', nonAdminCookie)
       .send({})
       .expect(200);
+
+  });
+
+  it('should not allow the bounty creator to delete a bounty they created if it has at least 1 in progress or higher submission and respond with 401', async () => {
+
+    const createdBounty = await generateBountyWithSingleApplication({
+      spaceId: nonAdminUserSpace.id,
+      bountyCap: 19,
+      bountyStatus: 'open',
+      applicationStatus: 'inProgress',
+      userId: nonAdminUser.id
+    });
+
+    request(baseUrl)
+      .delete(`/api/bounties/${createdBounty.id}`)
+      .set('Cookie', nonAdminCookie)
+      .send({})
+      .expect(401);
 
   });
 
