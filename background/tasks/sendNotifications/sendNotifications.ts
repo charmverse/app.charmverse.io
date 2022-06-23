@@ -60,19 +60,19 @@ export async function getNotifications (): Promise<PendingTasksProps[]> {
     });
 
     const tasksNotSent = gnosisSafeTasks.filter(gnosisSafeTask => !sentTasks.some(t => t.taskId === getGnosisSafeTaskId(gnosisSafeTask)));
-    const myTasks = tasksNotSent.filter(gnosisSafeTask => Boolean(gnosisSafeTask.tasks[0].transactions[0].myAction));
+    const myGnosisTasks = tasksNotSent.filter(gnosisSafeTask => Boolean(gnosisSafeTask.tasks[0].transactions[0].myAction));
 
     log.debug('Found tasks for notification', {
       notSent: tasksNotSent.length,
-      tasks: gnosisSafeTasks.length,
-      myTask: myTasks.length
+      gnosisSafeTasks: gnosisSafeTasks.length,
+      myGnosisTasks: myGnosisTasks.length
     });
 
-    const totalTasks = myTasks.length + mentionedTasks.unmarked.length;
+    const totalTasks = myGnosisTasks.length + mentionedTasks.unmarked.length;
 
     return {
       user: user as PendingTasksProps['user'],
-      gnosisSafeTasks: myTasks,
+      gnosisSafeTasks: myGnosisTasks,
       totalTasks,
       // Get only the unmarked mentioned tasks
       mentionedTasks: mentionedTasks.unmarked

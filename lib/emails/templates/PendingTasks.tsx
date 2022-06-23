@@ -13,6 +13,7 @@ import { MentionedTask } from 'lib/mentions/interfaces';
 import { HR, Feedback, Footer, Header, EmailWrapper } from './components';
 
 type TemplateUser = Pick<User, 'id' | 'username'> & { email: string };
+const charmverseUrl = process.env.DOMAIN;
 
 export interface PendingTasksProps {
   user: TemplateUser;
@@ -50,9 +51,6 @@ export default function PendingTasks (props: PendingTasksProps) {
   );
 }
 
-const charmverseUrl = 'https://app.charmverse.io';
-
-// https://mjml.io/try-it-live/qD1IvIVyK
 function MentionTask ({ task: { pageTitle, spaceName, text, spaceDomain, pagePath, mentionId } }: {task: MentionedTask}) {
   return (
     <>
@@ -74,7 +72,7 @@ function MentionTask ({ task: { pageTitle, spaceName, text, spaceDomain, pagePat
           {text}
         </div>
       </MjmlText>
-      <MjmlButton align='left' padding-bottom='40px' href={`${charmverseUrl}/${spaceDomain}/${pagePath}?mentionedId=${mentionId}`}>
+      <MjmlButton align='left' padding-bottom='40px' href={`${charmverseUrl}/${spaceDomain}/${pagePath}?mentionId=${mentionId}`}>
         View
       </MjmlButton>
     </>
