@@ -6,7 +6,7 @@ import Button from 'components/common/Button';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { isTruthy } from 'lib/utilities/types';
 import { ListSpaceRolesResponse } from 'pages/api/roles';
-import useRoles from '../roles/hooks/useRoles';
+import useRoles from '../hooks/useRoles';
 
 /**
  * @renderSelected Show selected options in the options menu. Default is true.

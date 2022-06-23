@@ -19,6 +19,7 @@ import { useImportDiscordRoles } from './hooks/useImportDiscordRoles';
 import DefaultPagePermissions from './spacePermissions/DefaultPagePermissions';
 import PermissionConfigurationMode from './spacePermissions/PermissionConfigurationMode';
 import SpacePermissions from './spacePermissions/SpacePermissions';
+import TokenGates from './token-gates/TokenGates';
 
 export default function RoleSettings () {
   const {
@@ -102,6 +103,9 @@ export default function RoleSettings () {
           key={role.id}
         />
       ))}
+
+      {/* Token gates section */}
+      <TokenGates isAdmin={isAdmin} spaceId={space?.id as string} />
 
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
         <ImportDiscordRolesMenuItem />
