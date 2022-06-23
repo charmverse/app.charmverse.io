@@ -1,11 +1,40 @@
 import nc from 'next-connect';
 import { onError, onNoMatch } from 'lib/middleware';
 import * as emails from 'lib/emails/emails';
+import { v4 } from 'uuid';
+import { MentionedTask } from 'lib/mentions/interfaces';
+import randomName from 'lib/utilities/randomName';
 
 const handler = nc({
   onError,
   onNoMatch
 });
+
+const createMentionTask = ({ pageTitle, spaceName, mentionText }: {spaceName: string, mentionText: string, pageTitle: string}): MentionedTask => {
+  return {
+    mentionId: v4(),
+    createdAt: new Date().toISOString(),
+    pageId: v4(),
+    spaceId: v4(),
+    spaceDomain: randomName(),
+    pagePath: `page-${Math.random().toString().replace('0.', '')}`,
+    spaceName,
+    pageTitle,
+    text: mentionText,
+    createdBy: {
+      id: v4(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      addresses: [],
+      email: '',
+      username: '',
+      avatar: '',
+      path: '',
+      isBot: false,
+      identityType: 'Discord'
+    }
+  };
+};
 
 const templates = {
   'Notify the user about tasks': () => {
@@ -15,7 +44,20 @@ const templates = {
         email: '<userEmail>',
         username: 'ghostpepper'
       },
-      tasks: [
+      totalTasks: 4,
+      mentionedTasks: [
+        createMentionTask({
+          mentionText: 'cc @ghostpepper',
+          pageTitle: 'Product Road Map',
+          spaceName: 'CharmVerse'
+        }),
+        createMentionTask({
+          mentionText: 'Let\'s have a meeting @ghostpepper',
+          pageTitle: 'Product Discussion',
+          spaceName: 'CharmVerse'
+        })
+      ],
+      gnosisSafeTasks: [
         {
           tasks: [{
             nonce: 3,

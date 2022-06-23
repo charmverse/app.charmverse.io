@@ -5,13 +5,14 @@ import type { PendingTasksProps } from 'lib/emails/templates/PendingTasks';
 import { getPendingGnosisTasks, GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
 import log from 'lib/log';
 import * as mailer from 'lib/mailer';
+import { getMentionedTasks } from 'lib/mentions/getMentionedTasks';
 
 export async function sendUserNotifications (): Promise<number> {
 
   const notificationsToSend = await getNotifications();
 
   for (const notification of notificationsToSend) {
-    log.info('Debug: send notification to user', { userId: notification.user.id, tasks: notification.tasks.length });
+    log.info('Debug: send notification to user', { userId: notification.user.id, tasks: notification.totalTasks });
     await sendNotification(notification);
   }
 
@@ -19,57 +20,66 @@ export async function sendUserNotifications (): Promise<number> {
 }
 
 // note: the email only notifies the first task of each safe
-const getTaskId = (task: GnosisSafeTasks) => task.tasks[0].transactions[0].id;
+const getGnosisSafeTaskId = (task: GnosisSafeTasks) => task.tasks[0].transactions[0].id;
 
 export async function getNotifications (): Promise<PendingTasksProps[]> {
 
   const usersWithSafes = await prisma.user.findMany({
     where: {
-      gnosisSafes: { some: {} },
       AND: [
         { email: { not: null } },
         { email: { not: '' } }
       ]
     },
-    include: {
+    // select only the fields that are needed
+    select: {
       gnosisSafes: true,
-      notificationState: true
+      notificationState: true,
+      id: true,
+      username: true,
+      email: true
     }
   });
 
   // filter out users that have snoozed notifications
   const activeUsersWithSafes = usersWithSafes.filter(user => {
     const snoozedUntil = user.notificationState?.snoozedUntil;
-    return !snoozedUntil || snoozedUntil > new Date();
-  }) as typeof usersWithSafes;
+    return (!snoozedUntil || snoozedUntil > new Date());
+  });
 
   const notifications = await Promise.all(activeUsersWithSafes.map(async user => {
-    const tasks = await getPendingGnosisTasks(user.id);
+    const gnosisSafeTasks = user.gnosisSafes.length > 0 ? await getPendingGnosisTasks(user.id) : [];
+    const mentionedTasks = await getMentionedTasks(user.id);
 
     const sentTasks = await prisma.userNotification.findMany({
       where: {
         taskId: {
-          in: tasks.map(getTaskId)
+          in: gnosisSafeTasks.map(getGnosisSafeTaskId)
         }
       }
     });
 
-    const tasksNotSent = tasks.filter(task => !sentTasks.some(t => t.taskId === getTaskId(task)));
-    const myTasks = tasksNotSent.filter(task => Boolean(task.tasks[0].transactions[0].myAction));
+    const tasksNotSent = gnosisSafeTasks.filter(gnosisSafeTask => !sentTasks.some(t => t.taskId === getGnosisSafeTaskId(gnosisSafeTask)));
+    const myGnosisTasks = tasksNotSent.filter(gnosisSafeTask => Boolean(gnosisSafeTask.tasks[0].transactions[0].myAction));
 
     log.debug('Found tasks for notification', {
       notSent: tasksNotSent.length,
-      tasks: tasks.length,
-      myTask: myTasks.length
+      gnosisSafeTasks: gnosisSafeTasks.length,
+      myGnosisTasks: myGnosisTasks.length
     });
+
+    const totalTasks = myGnosisTasks.length + mentionedTasks.unmarked.length;
 
     return {
       user: user as PendingTasksProps['user'],
-      tasks: myTasks
+      gnosisSafeTasks: myGnosisTasks,
+      totalTasks,
+      // Get only the unmarked mentioned tasks
+      mentionedTasks: mentionedTasks.unmarked
     };
   }));
 
-  return notifications.filter(notification => notification.tasks.length > 0);
+  return notifications.filter(notification => notification.totalTasks > 0);
 }
 
 async function sendNotification (notification: PendingTasksProps) {
@@ -85,13 +95,21 @@ async function sendNotification (notification: PendingTasksProps) {
   });
 
   // remember that we sent these tasks
-  await prisma.$transaction(notification.tasks.map(task => prisma.userNotification.create({
-    data: {
-      userId: notification.user.id,
-      taskId: getTaskId(task),
-      type: 'multisig'
-    }
-  })));
+  await prisma.$transaction(
+    [...notification.gnosisSafeTasks.map(task => prisma.userNotification.create({
+      data: {
+        userId: notification.user.id,
+        taskId: getGnosisSafeTaskId(task),
+        type: 'multisig'
+      }
+    })), ...notification.mentionedTasks.map(mentionedTask => prisma.userNotification.create({
+      data: {
+        userId: notification.user.id,
+        taskId: mentionedTask.mentionId,
+        type: 'mention'
+      }
+    }))]
+  );
 
   return result;
 }
