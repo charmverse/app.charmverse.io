@@ -105,10 +105,10 @@ export function getTemplateExplanation (template: SpacePermissionConfigurationMo
   const { defaultPublicPages } = templateData.pagePermissionDefaults;
 
   if (defaultPublicPages) {
-    canAndCannot[0].push('Members of the public can see new top-level pages by default.');
+    canAndCannot[0].push('Anyone can see new top-level pages by default.');
   }
   else {
-    canAndCannot[1].push('Members of the public cannot see new top-level pages by default.');
+    canAndCannot[1].push('Anyone outside the space cannot see new top-level pages by default.');
   }
 
   return canAndCannot;
