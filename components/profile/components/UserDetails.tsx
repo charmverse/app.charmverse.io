@@ -155,7 +155,7 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
               { user && !isPublicUser(user) && getIdentityIcon(user.identityType as IdentityType) }
               <Typography variant='h1'>{user?.username}</Typography>
               {!readOnly && (
-                <IconButton onClick={identityModalState.open}>
+                <IconButton onClick={identityModalState.open} data-testid='edit-identity'>
                   <EditIcon fontSize='small' />
                 </IconButton>
               )}
@@ -231,8 +231,8 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
               {!readOnly && (
                 <>
                   <StyledDivider orientation='vertical' flexItem />
-                  <IconButton onClick={socialModalState.open}>
-                    <EditIcon fontSize='small' data-testid='edit-social' />
+                  <IconButton onClick={socialModalState.open} data-testid='edit-social'>
+                    <EditIcon fontSize='small' />
                   </IconButton>
                 </>
               )}
@@ -248,8 +248,8 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
             </Grid>
             <Grid item xs={1} px={1} justifyContent='end' sx={{ display: 'flex' }}>
               {!readOnly && (
-                <IconButton onClick={descriptionModalState.open}>
-                  <EditIcon fontSize='small' data-testid='edit-description' />
+                <IconButton onClick={descriptionModalState.open} data-testid='edit-description'>
+                  <EditIcon fontSize='small' />
                 </IconButton>
               )}
             </Grid>
