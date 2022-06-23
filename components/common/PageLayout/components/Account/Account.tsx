@@ -13,6 +13,9 @@ import { getChainById } from 'connectors';
 import { useContext } from 'react';
 import NetworkModal from 'components/common/PageLayout/components/Account/components/NetworkModal';
 import styled from '@emotion/styled';
+import useTasks from 'components/nexus/hooks/useTasks';
+import { Badge } from '@mui/material';
+import { useRouter } from 'next/router';
 
 const AccountCard = styled.div`
   display: inline-flex;
@@ -54,6 +57,7 @@ function Account (): JSX.Element {
 
   const networkModalState = usePopupState({ variant: 'popover', popupId: 'network-modal' });
   const [user, , isUserLoaded] = useUser();
+  const { tasks } = useTasks();
 
   if (typeof window === 'undefined') {
     return (
@@ -87,7 +91,8 @@ function Account (): JSX.Element {
 
   const isConnectedWithWallet = (account && chainId);
   const chain = chainId ? getChainById(chainId) : null;
-
+  const totalTasks = tasks ? (tasks.mentioned.unmarked.length + tasks.gnosis.length) : 0;
+  const router = useRouter();
   return (
     <AccountCard>
       <StyledButtonGroup variant='contained' disableElevation>
@@ -106,7 +111,26 @@ function Account (): JSX.Element {
             borderTopLeftRadius: '0 !important',
             borderBottomLeftRadius: '0 !important'
           }) : {}}
-          endIcon={<Avatar avatar={user?.avatar} name={user?.username || ''} size='small' />}
+          endIcon={(
+            <Badge
+              color='error'
+              sx={{
+                '&:hover .MuiBadge-badge': {
+                  transform: 'scale(1.25) translate(50%, -50%)',
+                  transition: '250ms ease-in-out transform'
+                }
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                router.push('/nexus');
+              }}
+              badgeContent={totalTasks}
+              max={10}
+            >
+              <Avatar avatar={user?.avatar} name={user?.username || ''} size='small' />
+            </Badge>
+            )}
         >
           {user?.username}
         </AccountButton>
