@@ -10,7 +10,9 @@ import Menu from '@mui/material/Menu';
 import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/hooks';
 import Avatar from 'components/common/Avatar';
 import { Contributor } from 'models';
+import getDisplayName from 'lib/users/getDisplayName';
 import { humanFriendlyDate } from 'lib/utilities/dates';
+import useENSName from 'hooks/useENSName';
 import { StyledListItemText } from 'components/common/StyledListItemText';
 
 export const StyledRow = styled(Box)`
@@ -31,6 +33,7 @@ interface Props {
 }
 
 export default function ContributorRow ({ isAdmin, isSpaceOwner, contributor, onChange }: Props) {
+  const ensName = useENSName(contributor.addresses[0]);
   const popupState = usePopupState({ variant: 'popover', popupId: 'user-role' });
 
   function handleMenuItemClick (action: RoleAction) {
@@ -58,9 +61,9 @@ export default function ContributorRow ({ isAdmin, isSpaceOwner, contributor, on
     <TableRow>
       <TableCell>
         <Box display='flex' alignItems='center'>
-          <Avatar name={contributor.username} avatar={contributor?.avatar} />
+          <Avatar name={ensName || getDisplayName(contributor)} avatar={contributor?.avatar} />
           <Box pl={2}>
-            <Typography variant='body1'><strong>{contributor.username}</strong></Typography>
+            <Typography variant='body1'><strong>{ensName || getDisplayName(contributor)}</strong></Typography>
           </Box>
           <Box pl={2}>
           </Box>

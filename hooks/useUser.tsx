@@ -1,7 +1,8 @@
 import { useWeb3React } from '@web3-react/core';
 import charmClient from 'charmClient';
+import useENSName from 'hooks/useENSName';
 import { LoggedInUser } from 'models';
-import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
 
 type IContext = [
   user: LoggedInUser | null,
@@ -16,6 +17,7 @@ export function UserProvider ({ children }: { children: ReactNode }) {
   const { account } = useWeb3React();
   const [user, setUser] = useState<LoggedInUser | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const ensName = useENSName(account);
 
   useEffect(() => {
     if (!user) {
@@ -30,6 +32,12 @@ export function UserProvider ({ children }: { children: ReactNode }) {
         });
     }
   }, [account]);
+
+  useEffect(() => {
+    if (user && ensName && !user.ensName) {
+      setUser({ ...user, ensName });
+    }
+  }, [user, ensName]);
 
   const value = useMemo(() => [user, setUser, isLoaded, setIsLoaded] as IContext, [user, isLoaded]);
 

@@ -13,6 +13,7 @@ import type { FailedImportsError } from 'lib/notion/types';
 import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee, IPagePermissionWithSource } from 'lib/permissions/pages/page-permission-interfaces';
 import { GetPoapsResponse, UpdatePoapsRequest } from 'lib/poap';
 import { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
+import { getDisplayName } from 'lib/users';
 import { BountyWithDetails, Contributor, LoggedInUser, PageContent } from 'models';
 import type { ServerBlockFields } from 'pages/api/blocks';
 import { InviteLinkPopulated } from 'pages/api/invites/index';
@@ -286,16 +287,7 @@ class CharmClient {
   async getWorkspaceUsers (): Promise<IUser[]> {
     const currentSpace = await this.getWorkspace();
     const contributors = await this.getContributors(currentSpace.id);
-
-    return contributors.map((contributor: Contributor) => ({
-      id: contributor.id,
-      username: contributor.username,
-      email: '',
-      props: {},
-      create_at: new Date(contributor.createdAt).getTime(),
-      update_at: new Date(contributor.updatedAt).getTime(),
-      is_bot: false
-    }));
+    return contributors.map(this.userToFBUser);
   }
 
   async getPublicSpaceInfo (spaceId: string): Promise<PublicSpaceInfo> {
@@ -343,6 +335,19 @@ class CharmClient {
       deletedAt: fbBlock.deletedAt === 0 ? null : fbBlock.deletedAt ? new Date(fbBlock.deletedAt) : null,
       createdAt: (!fbBlock.createdAt || fbBlock.createdAt === 0) ? new Date() : new Date(fbBlock.createdAt),
       updatedAt: (!fbBlock.updatedAt || fbBlock.updatedAt === 0) ? new Date() : new Date(fbBlock.updatedAt)
+    };
+  }
+
+  private userToFBUser (user: User): IUser {
+    return {
+      id: user.id,
+      username: getDisplayName(user),
+      email: '',
+      props: {},
+      create_at: new Date(user.createdAt).getTime(),
+      update_at: new Date(user.updatedAt).getTime(),
+      is_bot: false,
+      wallet_address: user.addresses[0]
     };
   }
 

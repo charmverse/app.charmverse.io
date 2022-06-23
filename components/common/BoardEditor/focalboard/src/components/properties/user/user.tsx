@@ -8,6 +8,7 @@ import {CSSObject} from '@emotion/serialize'
 import {IUser} from '../../../user'
 import {getWorkspaceUsersList, getWorkspaceUsers} from '../../../store/users'
 import {useAppSelector} from '../../../store/hooks'
+import useENSName from 'hooks/useENSName'
 
 import {getSelectBaseStyle} from '../../../theme'
 
@@ -32,6 +33,7 @@ const FormatOptionLabel = ({ user }: { user: IUser }) => {
     if (imageURLForUser) {
         profileImg = imageURLForUser(user.id)
     }
+    const ensName = useENSName(user.wallet_address)
 
     return (
         <div className='UserProperty-item'>
@@ -41,7 +43,7 @@ const FormatOptionLabel = ({ user }: { user: IUser }) => {
                     src={profileImg}
                 />
             )}
-            {user.username}
+            {ensName || user.username}
         </div>
     )
 }
@@ -49,9 +51,10 @@ const FormatOptionLabel = ({ user }: { user: IUser }) => {
 const UserProperty = (props: Props): JSX.Element => {
     const workspaceUsers = useAppSelector<IUser[]>(getWorkspaceUsersList)
     const workspaceUsersById = useAppSelector<{[key:string]: IUser}>(getWorkspaceUsers)
+    const readonlyENSName = useENSName(workspaceUsersById[props.value]?.wallet_address)
 
     if (props.readonly) {
-        return (<div className='UserProperty octo-propertyvalue readonly'>{workspaceUsersById[props.value].username || props.value}</div>)
+        return (<div className='UserProperty octo-propertyvalue readonly'>{readonlyENSName || workspaceUsersById[props.value]?.username || props.value}</div>)
     }
 
     return (
