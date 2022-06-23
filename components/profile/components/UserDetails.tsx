@@ -143,7 +143,7 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
     <Box>
       <Stack direction={{ xs: 'column', md: 'row' }} mt={5} spacing={3}>
         <Avatar
-          name={user.username || ''}
+          name={user?.username || ''}
           image={user?.avatar}
           updateImage={(url: string) => handleUserUpdate({ avatar: url })}
           editable={!readOnly}
@@ -153,7 +153,7 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
           <Grid item>
             <Stack direction='row' spacing={1} alignItems='end'>
               { user && !isPublicUser(user) && getIdentityIcon(user.identityType as IdentityType) }
-              <Typography variant='h1'>{user.username}</Typography>
+              <Typography variant='h1'>{user?.username}</Typography>
               {!readOnly && (
                 <IconButton onClick={identityModalState.open}>
                   <EditIcon fontSize='small' />
@@ -267,7 +267,7 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
           }}
           identityTypes={identityTypes}
           identityType={(user?.identityType || IDENTITY_TYPES[0]) as IdentityType}
-          username={user.username || ''}
+          username={user?.username || ''}
         />
         <DescriptionModal
           isOpen={descriptionModalState.isOpen}
