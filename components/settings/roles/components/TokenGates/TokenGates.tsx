@@ -18,9 +18,8 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import useSWR from 'swr';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import LitShareModal from 'lit-share-modal-v3-react-17';
-import Legend from '../Legend';
-import Legend from '../../Legend';
-import TokenGatesTable from './TokenGatesTable';
+import Legend from '../../../Legend';
+import TokenGatesTable from './components/TokenGatesTable';
 
 const ShareModalContainer = styled.div`
   width: 100%;

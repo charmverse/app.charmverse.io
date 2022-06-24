@@ -16,7 +16,7 @@ import ImportDiscordRolesMenuItem from './components/ImportDiscordRolesMenuItem'
 import RoleForm from './components/RoleForm';
 import RoleRow from './components/RoleRow';
 import { useImportDiscordRoles } from './hooks/useImportDiscordRoles';
-import DefaultPagePermissions from './spacePermissions/DefaultPagePermissions';
+import DefaultPagePermissions from './components/SpacePermissions/components/DefaultPagePermissions';
 import PermissionConfigurationMode from './spacePermissions/PermissionConfigurationMode';
 import SpacePermissions from './spacePermissions/SpacePermissions';
 import TokenGates from './token-gates/TokenGates';
