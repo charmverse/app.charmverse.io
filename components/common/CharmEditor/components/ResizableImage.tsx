@@ -109,7 +109,7 @@ export function imageSpec (): RawSpecs {
         }
       },
       group: 'block',
-      draggable: true,
+      draggable: false,
       parseDOM: [
         {
           tag: 'img[src]',

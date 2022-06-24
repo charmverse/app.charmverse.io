@@ -144,7 +144,7 @@ export function charmEditorPlugins (
       key: nestedPagePluginKey
     }),
     imagePlugins({
-      handleDragAndDrop: true
+      handleDragAndDrop: false
     }),
     inlinePalettePlugins(),
     bold.plugins(),
