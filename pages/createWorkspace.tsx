@@ -3,11 +3,10 @@ import { useRouter } from 'next/router';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import getBaseLayout from 'components/common/BaseLayout/BaseLayout';
-import CreateSpaceForm, { getDomainFromName } from 'components/common/CreateSpaceForm';
+import CreateSpaceForm from 'components/common/CreateSpaceForm';
 import charmClient from 'charmClient';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import getDisplayName from 'lib/users/getDisplayName';
 import { AlternateRouteButton } from './join';
 
 export default function CreateSpace () {
@@ -28,12 +27,6 @@ export default function CreateSpace () {
       router.push(`/${space.domain}`);
     }, 50);
   }
-
-  const defaultName = `${getDisplayName(user!)}'s Workspace`;
-  const defaultValues = {
-    name: defaultName,
-    domain: getDomainFromName(defaultName)
-  };
 
   return (
     <Box sx={{ width: 400, maxWidth: '100%', mx: 'auto' }}>

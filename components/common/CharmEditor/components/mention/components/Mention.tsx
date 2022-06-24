@@ -5,9 +5,7 @@ import { checkForEmpty } from 'components/common/CharmEditor/utils';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import { useContributors } from 'hooks/useContributors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import useENSName from 'hooks/useENSName';
 import { usePages } from 'hooks/usePages';
-import { getDisplayName } from 'lib/users';
 import { PageContent } from 'models';
 import Link from 'next/link';
 import { ReactNode } from 'react';
@@ -19,7 +17,6 @@ export default function Mention ({ node }: NodeViewProps) {
   const [contributors] = useContributors();
   const { pages } = usePages();
   const contributor = contributors.find(_contributor => _contributor.id === attrs.value);
-  const ensName = useENSName(contributor?.addresses[0]);
   const [space] = useCurrentSpace();
   let value: ReactNode = null;
   if (attrs.type === 'page') {
@@ -47,7 +44,7 @@ export default function Mention ({ node }: NodeViewProps) {
     value = (
       <Typography fontSize='inherit' fontWeight='inherit'>
         <span style={{ opacity: 0.6 }}>@</span>
-        <span style={{ opacity: 0.75 }}>{ensName || getDisplayName(contributor)}</span>
+        <span style={{ opacity: 0.75 }}>{contributor?.username}</span>
       </Typography>
     );
   }

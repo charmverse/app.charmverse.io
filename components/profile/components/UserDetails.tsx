@@ -40,7 +40,7 @@ export interface UserDetailsProps {
 
 export const isPublicUser = (user: PublicUser | LoggedInUser): user is PublicUser => user.hasOwnProperty('profile');
 
-export default function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
+function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
   const { account } = useWeb3React();
   const isPublic = isPublicUser(user);
   const { data: userDetails, mutate } = useSWRImmutable(`/userDetails/${user.id}/${isPublic}`, () => {
@@ -311,3 +311,5 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
     </Box>
   );
 }
+
+export default UserDetails;

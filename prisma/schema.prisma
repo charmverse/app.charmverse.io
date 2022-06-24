@@ -153,7 +153,7 @@ model User {
   inviteLinks       InviteLink[]
   bounties          Bounty[]
   applications      Application[]
-  username          String?
+  username          String
   avatar            String?
   path              String?                @unique
   isBot             Boolean?               @default(false)
