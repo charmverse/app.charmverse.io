@@ -29,7 +29,6 @@ const esmModules = [
 const config = {
   generateEtags: false,
   poweredByHeader: false,
-  swcMinify: true,
   webpack5: true,
   experimental: {
     esmExternals: 'loose',
