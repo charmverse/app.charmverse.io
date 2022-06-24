@@ -2,6 +2,7 @@ import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 import { v4 as uuid } from 'uuid';
 import { useRouter } from 'next/router';
+import { useWeb3React } from '@web3-react/core';
 import { ResourceId, checkAndSignAuthMessage, SigningConditions } from 'lit-js-sdk';
 // import ShareModal from 'lit-share-modal-v3-react-17';
 import Modal, { ErrorModal } from 'components/common/Modal';
@@ -18,6 +19,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import useSWR from 'swr';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import LitShareModal from 'lit-share-modal-v3-react-17';
+import getLitChainFromChainId from 'lib/token-gates/getLitChainFromChainId';
 import Legend from '../../../Legend';
 import TokenGatesTable from './components/TokenGatesTable';
 
@@ -50,6 +52,7 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
 
   const theme = useTheme();
   const litClient = useLitProtocol();
+  const { chainId } = useWeb3React();
   const router = useRouter();
   const popupState = usePopupState({ variant: 'popover', popupId: 'token-gate' });
   const errorPopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-error' });
@@ -88,9 +91,9 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
       })
     };
 
-    const authSig = await checkAndSignAuthMessage({
-      chain: conditions.chain || 'ethereum'
-    });
+    const chain = getLitChainFromChainId(chainId);
+
+    const authSig = await checkAndSignAuthMessage({ chain });
     await litClient!.saveSigningCondition({
       ...conditions,
       authSig,

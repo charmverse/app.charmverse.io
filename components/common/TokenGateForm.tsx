@@ -20,6 +20,7 @@ import charmClient from 'charmClient';
 import { useRouter } from 'next/router';
 import log from 'lib/log';
 import { useSnackbar } from 'hooks/useSnackbar';
+import getLitChainFromChainId from 'lib/token-gates/getLitChainFromChainId';
 
 interface Props {
   onSubmit: (values: Space) => void;
@@ -28,7 +29,7 @@ interface Props {
 export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
 
   const router = useRouter();
-  const { account } = useWeb3React();
+  const { account, chainId } = useWeb3React();
   const { showMessage } = useSnackbar();
   const [error, setError] = useState('');
   const [user, setUser] = useUser();
@@ -86,11 +87,11 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
 
     setIsLoading(true);
 
+    const chain = getLitChainFromChainId(chainId);
+
     setError('');
 
-    const authSig = await checkAndSignAuthMessage({
-      chain: (tokenGate.conditions as any).chain || 'ethereum'
-    })
+    const authSig = await checkAndSignAuthMessage({ chain })
       .catch(err => {
         if (err.errorCode === 'unsupported_chain') {
           setError('Unsupported Network. Please make sure you are connected to the correct network');

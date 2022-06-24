@@ -150,6 +150,7 @@ import { UserProvider } from 'hooks/useUser';
 import { isMobile } from 'lib/browser';
 // Lit Protocol CSS
 import 'lit-share-modal-v3-react-17/dist/ShareModal.css';
+import 'theme/lit-protocol/lit-protocol.scss';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
