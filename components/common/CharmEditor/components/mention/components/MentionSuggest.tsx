@@ -92,10 +92,7 @@ function MentionSuggestMenu ({ pluginKey }: {pluginKey: PluginKey}) {
                     style={{
                       alignItems: 'center'
                     }}
-                    user={{
-                      ...contributor,
-                      addresses: []
-                    }}
+                    user={contributor}
                     avatarSize='small'
                   />
                 </MenuItem>
