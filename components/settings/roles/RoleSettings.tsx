@@ -17,9 +17,9 @@ import RoleForm from './components/RoleForm';
 import RoleRow from './components/RoleRow';
 import { useImportDiscordRoles } from './hooks/useImportDiscordRoles';
 import DefaultPagePermissions from './components/SpacePermissions/components/DefaultPagePermissions';
-import PermissionConfigurationMode from './spacePermissions/PermissionConfigurationMode';
-import SpacePermissions from './spacePermissions/SpacePermissions';
-import TokenGates from './token-gates/TokenGates';
+import PermissionConfigurationMode from './components/SpacePermissions/components/PermissionConfigurationMode';
+import SpacePermissions from './components/SpacePermissions';
+import TokenGates from './components/TokenGates';
 
 export default function RoleSettings () {
   const {
