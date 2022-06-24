@@ -27,7 +27,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { spaceOperationLabels } from 'lib/permissions/spaces/client';
 import RoleForm from './RoleForm';
 import RoleMemberRow from './RoleMemberRow';
-import SpacePermissions from '../spacePermissions/SpacePermissions';
+import SpacePermissions from './SpacePermissions';
 
 interface RoleRowProps {
   isEditable: boolean;

@@ -7,7 +7,7 @@ import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import Legend from 'components/settings/Legend';
 import ImportGuildRolesMenuItem from 'components/settings/roles/components/ImportGuildRolesMenuItem';
-import useRoles from 'components/settings/roles/hooks/useRoles';
+import useRoles from 'hooks/useRoles';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';

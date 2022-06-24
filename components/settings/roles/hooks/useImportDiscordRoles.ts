@@ -7,7 +7,7 @@ import { silentlyUpdateURL } from 'lib/browser';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import useSWRImmutable from 'swr/immutable';
-import useRoles from './useRoles';
+import useRoles from 'hooks/useRoles';
 
 function routerQueryIsDiscordCallback () {
   const urlSearchParams = new URLSearchParams(window.location.href);
