@@ -8,6 +8,8 @@ import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import { computeSpacePermissions } from 'lib/permissions/spaces';
+import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -15,6 +17,25 @@ handler.use(requireUser).post(createPage);
 
 async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
   const data = req.body as Prisma.PageCreateInput;
+
+  const spaceId = data.space?.connect?.id;
+
+  if (!spaceId) {
+    throw new InvalidInputError('A space id is required to create a page');
+  }
+
+  const { id: userId } = req.session.user;
+
+  const permissions = await computeSpacePermissions({
+    allowAdminBypass: true,
+    resourceId: spaceId,
+    userId
+  });
+
+  if (!permissions.createPage) {
+    throw new UnauthorisedActionError('You do not have permissions to create a page.');
+  }
+
   const page = await prisma.page.create({ data });
   const pageWithPermissions = await setupPermissionsAfterPageCreated(page.id);
 

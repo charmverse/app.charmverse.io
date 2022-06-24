@@ -1,11 +1,12 @@
 
-import { PagePermissionLevel, Space } from '@prisma/client';
+import { Space } from '@prisma/client';
 import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { requireCustomPermissionMode } from 'lib/middleware/requireCustomPermissionMode';
+import { SpaceDefaultPublicPageToggle } from 'lib/permissions/pages';
+import { toggleSpaceDefaultPublicPage } from 'lib/permissions/pages/actions/toggleSpaceDefaultPublicPage';
 import { withSessionRoute } from 'lib/session/withSession';
-import { setSpaceDefaultPagePermission } from 'lib/spaces/setSpaceDefaultPagePermission';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { requireCustomPermissionMode } from 'lib/middleware/requireCustomPermissionMode';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -14,12 +15,12 @@ handler.use(requireUser)
     keyLocation: 'query',
     spaceIdKey: 'id'
   }))
-  .post(setDefaultPagePermission);
+  .post(setSpaceDefaultPublicPage);
 
-async function setDefaultPagePermission (req: NextApiRequest, res: NextApiResponse<Space>) {
+async function setSpaceDefaultPublicPage (req: NextApiRequest, res: NextApiResponse<Space>) {
 
   const { id: spaceId } = req.query;
-  const { pagePermissionLevel } = req.body as {pagePermissionLevel: PagePermissionLevel};
+  const { defaultPublicPages } = req.body as Pick<SpaceDefaultPublicPageToggle, 'defaultPublicPages'>;
 
   const {
     error
@@ -33,11 +34,12 @@ async function setDefaultPagePermission (req: NextApiRequest, res: NextApiRespon
     throw error;
   }
 
-  const updatedSpaceWithPermissions = await setSpaceDefaultPagePermission({
-    spaceId: spaceId as string, defaultPagePermissionGroup: pagePermissionLevel
+  const updatedSpace = await toggleSpaceDefaultPublicPage({
+    defaultPublicPages,
+    spaceId: spaceId as string
   });
 
-  return res.status(200).json(updatedSpaceWithPermissions);
+  return res.status(200).json(updatedSpace);
 }
 
 export default withSessionRoute(handler);
