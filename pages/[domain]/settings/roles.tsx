@@ -4,7 +4,7 @@ import { setTitle } from 'hooks/usePageTitle';
 import RoleAssignment from 'components/settings/roles/RoleSettings';
 
 export default function RoleSettings () {
-  setTitle('Roles');
+  setTitle('Roles & Permissions');
   return (
     <RoleAssignment />
   );

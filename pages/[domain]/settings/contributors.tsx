@@ -1,8 +1,7 @@
 import SettingsLayout from 'components/settings/Layout';
-import { ReactElement } from 'react';
-import { setTitle } from 'hooks/usePageTitle';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import InviteLinkList from 'components/settings/contributors/InviteLinks/InviteLinks';
+import { setTitle } from 'hooks/usePageTitle';
+import { ReactElement } from 'react';
 import ContributorList from 'components/settings/contributors/ContributorList';
 import useIsAdmin from 'hooks/useIsAdmin';
 
@@ -16,10 +15,7 @@ export default function ContributorSettings () {
     return null;
   }
   return (
-    <>
-      <InviteLinkList isAdmin={isAdmin} spaceId={space.id} />
-      <ContributorList isAdmin={isAdmin} spaceId={space.id} spaceOwner={space.createdBy} />
-    </>
+    <ContributorList isAdmin={isAdmin} spaceId={space.id} spaceOwner={space.createdBy} />
   );
 }
 
