@@ -13,48 +13,47 @@ import {
   strike,
   underline
 } from '@bangle.dev/base-components';
-import debounce from 'lodash/debounce';
-import { NodeView, Plugin, SpecRegistry, BangleEditorState, RawPlugins } from '@bangle.dev/core';
-import { EditorView, Node, NodeSelection, PluginKey } from '@bangle.dev/pm';
-import { useEditorState } from '@bangle.dev/react';
-import { useState, CSSProperties, ReactNode, memo, useCallback, useLayoutEffect, useEffect, useRef } from 'react';
-import styled from '@emotion/styled';
-import ErrorBoundary from 'components/common/errors/ErrorBoundary';
-import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
-import * as codeBlock from 'components/common/CharmEditor/components/@bangle.dev/base-components/code-block';
-import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
-import { PageContent } from 'models';
-import { CryptoCurrency, FiatCurrency } from 'connectors';
+import { BangleEditorState, NodeView, Plugin, RawPlugins, SpecRegistry } from '@bangle.dev/core';
 import { markdownSerializer } from '@bangle.dev/markdown';
-import PageThreadsList from 'components/[pageId]/DocumentPage/components/PageThreadsList';
+import { EditorView, Node, PluginKey } from '@bangle.dev/pm';
+import { useEditorState } from '@bangle.dev/react';
+import styled from '@emotion/styled';
 import { Grow } from '@mui/material';
-import { useUser } from 'hooks/useUser';
+import * as codeBlock from 'components/common/CharmEditor/components/@bangle.dev/base-components/code-block';
+import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
+import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
+import ErrorBoundary from 'components/common/errors/ErrorBoundary';
+import PageThreadsList from 'components/[pageId]/DocumentPage/components/PageThreadsList';
+import { CryptoCurrency, FiatCurrency } from 'connectors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { createHighlightDomElement } from 'lib/browser';
-import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
+import { useUser } from 'hooks/useUser';
+import debounce from 'lodash/debounce';
+import { PageContent } from 'models';
+import { CSSProperties, memo, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import Callout, * as callout from './components/callout';
+import { charmPlugin } from './components/charm/charm.plugins';
 import * as columnLayout from './components/columnLayout';
 import LayoutColumn from './components/columnLayout/Column';
 import LayoutRow from './components/columnLayout/Row';
 import { CryptoPrice, cryptoPriceSpec } from './components/CryptoPrice';
-import InlinePalette, { plugins as inlinePalettePlugins, spec as inlinePaletteSpecs } from './components/inlinePalette';
+import * as disclosure from './components/disclosure';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
+import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
+import * as iframe from './components/iframe';
+import InlineCommentThread, * as inlineComment from './components/inlineComment';
+import InlinePalette, { plugins as inlinePalettePlugins, spec as inlinePaletteSpecs } from './components/inlinePalette';
+import Mention, { mentionPluginKeyName, mentionPlugins, mentionSpecs, MentionSuggest } from './components/mention';
 import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList, nestedPageSpec } from './components/nestedPage';
+import Paragraph from './components/Paragraph';
 import Placeholder from './components/Placeholder';
 import Quote, * as quote from './components/quote';
-import * as iframe from './components/iframe';
 import ResizableImage, { imageSpec } from './components/ResizableImage';
-import * as trailingNode from './components/trailingNode';
+import RowActionsMenu, * as rowActions from './components/rowActions';
 import * as tabIndent from './components/tabIndent';
 import * as table from './components/table';
-import RowActionsMenu, * as rowActions from './components/rowActions';
-import { checkForEmpty } from './utils';
-import * as disclosure from './components/disclosure';
-import InlineCommentThread, * as inlineComment from './components/inlineComment';
-import Paragraph from './components/Paragraph';
-import Mention, { MentionSuggest, mentionPlugins, mentionSpecs, mentionPluginKeyName } from './components/mention';
+import * as trailingNode from './components/trailingNode';
 import DevTools from './DevTools';
-import { charmPlugin } from './components/charm/charm.plugins';
+import { checkForEmpty } from './utils';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -127,47 +126,6 @@ export function charmEditorPlugins (
     } = {}
 ): () => RawPlugins[] {
   const basePlugins: RawPlugins[] = [
-    new Plugin({
-      key: new PluginKey('nestedPage-drop'),
-      props: {
-        handleDOMEvents: {
-          dragend (view, event) {
-            const nodeSelection = (view.state.selection as NodeSelection);
-            const draggedNode = nodeSelection.node;
-            const draggedNodeStartPos = nodeSelection.ranges[0].$from.pos;
-            const draggedNodeEndPos = nodeSelection.ranges[0].$to.pos;
-            if (event) {
-              const containerXOffset = event?.target?.getBoundingClientRect().left;
-              const clientX = event.clientX!;
-              const left = (clientX - containerXOffset) < 50 ? clientX + 50 : clientX;
-              const ob = view.posAtCoords({ left, top: event.clientY });
-              if (ob) {
-                const destinationPos = ob.inside > 0 ? ob.inside : ob.pos;
-                const node = view.state.doc.nodeAt(destinationPos);
-                if (node) {
-                  if (draggedNodeEndPos <= destinationPos) {
-                    view.dispatch(view.state.tr
-                      .deleteRange(draggedNodeStartPos, draggedNodeEndPos));
-                    const cutDoc = view.state.doc.cut(draggedNodeEndPos, destinationPos);
-                    view.dispatch(view.state.tr.replaceRangeWith(draggedNodeStartPos, destinationPos - 1, cutDoc)
-                      .insert(destinationPos, draggedNode));
-                  }
-                  else {
-                    view.dispatch(view.state.tr
-                      .deleteRange(draggedNodeStartPos, draggedNodeEndPos));
-
-                    const cutDoc = view.state.doc.cut(destinationPos, draggedNodeEndPos - 1);
-                    view.dispatch(view.state.tr.replaceRangeWith(destinationPos - 1, draggedNodeStartPos, cutDoc)
-                      .insert(destinationPos, draggedNode));
-                  }
-                }
-              }
-            }
-            return true;
-          }
-        }
-      }
-    }),
     new Plugin({
       view: () => ({
         update: (view, prevState) => {
