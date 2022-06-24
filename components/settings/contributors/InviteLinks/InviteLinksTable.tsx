@@ -9,7 +9,6 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import DeleteIcon from '@mui/icons-material/Close';
 import AllInclusiveIcon from '@mui/icons-material/AllInclusive';
-import { getDisplayName } from 'lib/users';
 import Tooltip from '@mui/material/Tooltip';
 import Chip from '@mui/material/Chip';
 import ButtonChip from 'components/common/ButtonChip';
@@ -46,7 +45,7 @@ export default function InvitesTable (props: Props) {
         {props.invites.map((row) => (
           <TableRow key={row.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
             <TableCell sx={{ px: 0 }}>
-              <Typography><strong>{getDisplayName(row.author)}</strong></Typography>
+              <Typography><strong>{row.author.username}</strong></Typography>
             </TableCell>
             {/* <TableCell><Typography>{row.code}</Typography></TableCell> */}
             <TableCell>

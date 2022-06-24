@@ -1,27 +1,28 @@
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import Box from '@mui/material/Box';
-import IconButton from '@mui/material/IconButton';
-import Tooltip from '@mui/material/Tooltip';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import Button from '@mui/material/Button';
-import MenuItem from '@mui/material/MenuItem';
-import Menu, { MenuProps } from '@mui/material/Menu';
-import ListItemText from '@mui/material/ListItemText';
 import LockIcon from '@mui/icons-material/Lock';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Menu, { MenuProps } from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import charmClient from 'charmClient';
 import BountyDelete from 'components/bounties/components/BountyDelete';
 import BountyModal from 'components/bounties/components/BountyModal';
 import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge';
 import Modal from 'components/common/Modal';
 import { useBounties } from 'hooks/useBounties';
 import useIsAdmin from 'hooks/useIsAdmin';
-import { usePopupState, bindTrigger, bindMenu } from 'material-ui-popup-state/hooks';
-import charmClient from 'charmClient';
 import { useUser } from 'hooks/useUser';
-import { Bounty } from '@prisma/client';
+import { requesterCanDeleteBounty } from 'lib/bounties/shared';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { BountyWithDetails } from 'models';
 
 const menuPosition: Partial<MenuProps> = {
   anchorOrigin: {
@@ -35,7 +36,7 @@ const menuPosition: Partial<MenuProps> = {
 };
 
 interface Props {
-  bounty: Bounty
+  bounty: BountyWithDetails
 }
 
 export default function BountyHeader ({ bounty }: Props) {
@@ -74,6 +75,13 @@ export default function BountyHeader ({ bounty }: Props) {
 
   const isBountyCreator = (user?.id === bounty?.createdBy) || isAdmin;
 
+  // Menu item conditions
+  const canDeleteBounty = requesterCanDeleteBounty({
+    requesterIsAdmin: isAdmin,
+    bounty,
+    requesterCreatedBounty: isBountyCreator
+  });
+
   return (
     <>
       <Box sx={{
@@ -97,7 +105,7 @@ export default function BountyHeader ({ bounty }: Props) {
               {bounty.title}
             </Box>
             {
-          (isAdmin || (isBountyCreator && bounty.status === 'suggestion')) && (
+          (isAdmin || isBountyCreator) && (
             <>
               <IconButton {...bindTrigger(popupState)}>
                 <MoreHorizIcon color='secondary' />
@@ -109,7 +117,7 @@ export default function BountyHeader ({ bounty }: Props) {
               >
 
                 {
-                  (isAdmin || (isBountyCreator && bounty.status === 'suggestion')) && (
+                  (isAdmin || isBountyCreator) && (
                     <Tooltip arrow placement='right' title={`Edit bounty ${bounty.status === 'suggestion' ? 'suggestion' : ''}`}>
                       <MenuItem
                         dense
@@ -157,7 +165,7 @@ export default function BountyHeader ({ bounty }: Props) {
                 }
 
                 {
-                  (isAdmin || (isBountyCreator && bounty.status === 'suggestion')) && (
+                  canDeleteBounty && (
                     <Tooltip arrow placement='right' title={`Delete bounty ${bounty.status === 'suggestion' ? 'suggestion' : ''}`}>
                       <MenuItem
                         dense

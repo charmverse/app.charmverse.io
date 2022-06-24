@@ -21,6 +21,7 @@ const esmModules = [
   '@fullcalendar/interaction',
   '@fullcalendar/react',
   'react-dnd',
+  '@hookform/resolvers',
   'lit-share-modal-v3-react-17'
 ];
 

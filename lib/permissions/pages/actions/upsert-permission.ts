@@ -1,8 +1,10 @@
-import { PagePermission, PagePermissionLevel, Prisma } from '@prisma/client';
+import { Page, PagePermission, PagePermissionLevel, Prisma } from '@prisma/client';
 import { prisma } from 'db';
+import { hasAccessToSpace } from 'lib/middleware';
 import { resolveChildPagesAsFlatList, resolveParentPages } from 'lib/pages/server';
-import { isTruthy } from 'lib/utilities/types';
 import { InvalidPermissionGranteeError } from 'lib/permissions/errors';
+import { InsecureOperationError } from 'lib/utilities/errors';
+import { isTruthy } from 'lib/utilities/types';
 import { CannotInheritOutsideTreeError, InvalidPermissionLevelError, PermissionNotFoundError, SelfInheritancePermissionError } from '../errors';
 import { IPagePermissionToCreate, IPagePermissionWithSource } from '../page-permission-interfaces';
 import { checkParentForSamePermission } from './check-parent-for-same-permission';
@@ -136,7 +138,7 @@ async function validateInheritanceRelationship (permissionIdToInheritFrom: strin
   return true;
 }
 
-function validatePermissionToCreate (permission: IPagePermissionToCreate) {
+async function validatePermissionToCreate (pageId: string, permission: IPagePermissionToCreate) {
   // This in enforced by prisma. For readability, we add this condition here
   if (!permission.permissionLevel || !PagePermissionLevel[permission.permissionLevel]) {
     throw new InvalidPermissionLevelError(permission.permissionLevel);
@@ -150,6 +152,44 @@ function validatePermissionToCreate (permission: IPagePermissionToCreate) {
     || (!permission.userId && !permission.roleId && !permission.spaceId && !permission.public)
   ) {
     throw new InvalidPermissionGranteeError();
+  }
+
+  // Load the page space ID
+  const pageSpaceId = await prisma.page.findUnique({
+    where: {
+      id: pageId
+    },
+    select: {
+      spaceId: true
+    }
+  }) as Pick<Page, 'spaceId'>;
+
+  if (permission.spaceId && permission.spaceId !== pageSpaceId?.spaceId) {
+    throw new InsecureOperationError('You can only create space-level page permissions for the space the page belongs to.');
+
+  }
+  else if (permission.roleId) {
+    const role = await prisma.role.findUnique({
+      where: {
+        id: permission.roleId
+      },
+      select: {
+        spaceId: true
+      }
+    });
+    if (role?.spaceId !== pageSpaceId?.spaceId) {
+      throw new InsecureOperationError('You can only create role-level page permissions for roles belonging to the same space as the page.');
+    }
+  }
+  else if (permission.userId) {
+    const { error } = await hasAccessToSpace({
+      spaceId: pageSpaceId?.spaceId as string,
+      userId: permission.userId
+    });
+
+    if (error) {
+      throw new InsecureOperationError('You can only create user-level page permissions for users who are members of the space the page belongs to.');
+    }
   }
 
   return true;
@@ -173,7 +213,7 @@ export async function upsertPermission (pageId: string, permission: IPagePermiss
     await validateInheritanceRelationship(sourcePermission.id, pageId);
 
     // Prevents propagation of a wrongly added permission in the database
-    validatePermissionToCreate(sourcePermission);
+    await validatePermissionToCreate(pageId, sourcePermission);
 
     permissionData = generatePrismaUpsertArgs(pageId, sourcePermission, sourcePermission.id);
 
@@ -185,7 +225,7 @@ export async function upsertPermission (pageId: string, permission: IPagePermiss
     if (parentPermissionId) {
       return upsertPermission(pageId, parentPermissionId);
     }
-    validatePermissionToCreate(permission);
+    await validatePermissionToCreate(pageId, permission);
 
     permissionData = generatePrismaUpsertArgs(pageId, permission);
     permissionToAssign = permission;

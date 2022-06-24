@@ -8,6 +8,7 @@ import nc, { NextHandler } from 'next-connect';
 import { updateBountySettings, getBounty } from 'lib/bounties';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { rollupBountyStatus } from 'lib/bounties/rollupBountyStatus';
+import { requesterCanDeleteBounty } from 'lib/bounties/shared';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -67,12 +68,15 @@ async function updateBounty (req: NextApiRequest, res: NextApiResponse<BountyWit
     throw error;
   }
 
+  // The suggester or admin can update a suggestion
   if (bounty.status === 'suggestion' && !isAdmin && bounty.createdBy !== userId) {
     throw new UnauthorisedActionError('You need to have created this suggestion or be a workspace admin to edit it.');
-  // Only admins can edit bounty for now
+
+  // The suggester or admin can update a bounty
+  // Keeping these logic branches separate for upcoming more fine grained bounty permissions
   }
-  else if (bounty.status !== 'suggestion' && !isAdmin) {
-    throw new UnauthorisedActionError('Only space administrators can edit active bounties.');
+  else if (bounty.status !== 'suggestion' && !isAdmin && bounty.createdBy !== userId) {
+    throw new UnauthorisedActionError('Only space administrators and the bounty creator can edit active bounties.');
   }
 
   if (bounty.status === 'suggestion' && bounty.createdBy === userId) {
@@ -111,10 +115,13 @@ async function deleteBounty (req: NextApiRequest, res: NextApiResponse) {
     throw error;
   }
 
-  if (bounty.status === 'suggestion' && bounty.createdBy !== userId && !isAdmin) {
-    throw new UnauthorisedActionError('You cannot delete this bounty suggestion.');
-  }
-  else if (bounty.status !== 'suggestion' && !isAdmin) {
+  const canDeleteBounty = requesterCanDeleteBounty({
+    bounty,
+    requesterCreatedBounty: bounty.createdBy === userId,
+    requesterIsAdmin: !!isAdmin
+  });
+
+  if (!canDeleteBounty) {
     throw new UnauthorisedActionError('You cannot delete this bounty suggestion.');
   }
 

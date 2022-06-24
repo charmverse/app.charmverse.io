@@ -6,6 +6,8 @@ export type PageOperationType = keyof typeof PageOperationEnum
 
 export type PagePermissionLevelType = keyof typeof PagePermissionLevel
 
+export type PagePermissionLevelWithoutCustom = Exclude<PagePermissionLevelType, 'custom'>
+
 export type IPagePermissionFlags = UserPermissionFlags<PageOperationType>
 
 /**
@@ -54,3 +56,7 @@ export interface IPagePermissionWithAssignee extends PagePermission, IPagePermis
   public: boolean | null;
 }
 
+export interface SpaceDefaultPublicPageToggle {
+  spaceId: string;
+  defaultPublicPages: boolean;
+}

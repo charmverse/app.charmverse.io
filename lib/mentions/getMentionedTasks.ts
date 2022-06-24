@@ -19,6 +19,17 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
     }
   });
 
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId
+    },
+    select: {
+      username: true
+    }
+  });
+
+  const username = user?.username ?? undefined;
+
   // Array of space ids the user is part of
   const spaceIds = spaceRoles.map(spaceRole => spaceRole.spaceId);
 
@@ -64,7 +75,7 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
   for (const page of pages) {
     const content = page.content as PageContent;
     if (content) {
-      const mentions = extractMentions(content);
+      const mentions = extractMentions(content, username);
       mentions.forEach(mention => {
         if (page.space && mention.value === userId) {
           mentionUserIds.push(mention.createdBy);

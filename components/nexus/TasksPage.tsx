@@ -4,7 +4,6 @@ import KeyIcon from '@mui/icons-material/Key';
 import ForumIcon from '@mui/icons-material/Forum';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
 import { silentlyUpdateURL } from 'lib/browser';
 import { useState } from 'react';
 import { useTheme } from '@emotion/react';
@@ -59,7 +58,7 @@ export default function TasksPage () {
     <>
       <NexusPageTitle />
       <TasksPageHeader />
-      <Grid container spacing={3} sx={{ pt: 6, pb: 2 }}>
+      <Grid container spacing={{ xs: 1, sm: 3 }} sx={{ pt: 6, pb: 2 }}>
         <Grid item xs={12} sm={6}>
           <Box>
             <StyledTypography>
@@ -67,14 +66,12 @@ export default function TasksPage () {
             </StyledTypography>
           </Box>
         </Grid>
-        {currentTask === 'multisig' ? (
-          <Grid item xs={12} sm={6}>
-            <Box display='flex' alignItems='center' justifyContent={{ xs: 'flex-start', md: 'flex-end' }} gap={{ sm: 2, xs: 1 }}>
-              <NotifyMeButton />
-              <SnoozeButton />
-            </Box>
-          </Grid>
-        ) : null}
+        <Grid item xs={12} sm={6}>
+          <Box display='flex' alignItems='center' justifyContent={{ sm: 'flex-end', xs: 'flex-start' }} gap={{ sm: 2, xs: 1 }}>
+            <NotifyMeButton />
+            {currentTask === 'multisig' ? <SnoozeButton /> : null }
+          </Box>
+        </Grid>
       </Grid>
       <Divider sx={{ mb: 2 }} />
       <Tabs
@@ -88,6 +85,7 @@ export default function TasksPage () {
             disableRipple
             iconPosition='start'
             icon={task.icon}
+            key={task.label}
             sx={{
               px: 1.5,
               fontSize: 14,
@@ -105,7 +103,7 @@ export default function TasksPage () {
           />
         ))}
       </Tabs>
-      {currentTask === 'multisig' ? <GnosisTasksList error={error} mutateTasks={mutateTasks} tasks={tasks} /> : currentTask === 'discussion' ? <MentionedTasksList error={error} tasks={tasks} /> : null}
+      {currentTask === 'multisig' ? <GnosisTasksList error={error} mutateTasks={mutateTasks} tasks={tasks} /> : currentTask === 'discussion' ? <MentionedTasksList mutateTasks={mutateTasks} error={error} tasks={tasks} /> : null}
     </>
   );
 }

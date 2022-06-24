@@ -1,7 +1,8 @@
 import { SpacePermissionFlags, SpacePermissionModification, SpacePermissionWithAssignee } from 'lib/permissions/spaces';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 
 describe('POST /api/permissions/space/{spaceId}/add - Add space permissions', () => {
 
@@ -27,6 +28,59 @@ describe('POST /api/permissions/space/{spaceId}/add - Add space permissions', ()
 
   });
 
+  it('should succeed if the user is admin trying to assign role-level permissions, and the space permission mode is not "custom", and respond 201', async () => {
+
+    const { space, user: adminUser } = await generateUserAndSpaceWithApiToken(undefined, true);
+
+    await updateSpacePermissionConfigurationMode({
+      spaceId: space.id,
+      permissionConfigurationMode: 'collaborative'
+    });
+
+    const role = await generateRole({
+      spaceId: space.id,
+      createdBy: adminUser.id
+    });
+
+    const spacePermissionContent: Omit<SpacePermissionModification, 'forSpaceId'> = {
+      operations: ['createPage'],
+      roleId: role.id
+    };
+
+    const nonAdminCookie = await loginUser(adminUser);
+
+    await request(baseUrl)
+      .post(`/api/permissions/space/${space.id}/add`)
+      .set('Cookie', nonAdminCookie)
+      .send(spacePermissionContent)
+      .expect(201);
+
+  });
+
+  it('should succeed if the user is admin trying to assign user-level permissions, and the space permission mode is not "custom", and respond 201', async () => {
+
+    const { space, user: adminUser } = await generateUserAndSpaceWithApiToken(undefined, true);
+
+    await updateSpacePermissionConfigurationMode({
+      spaceId: space.id,
+      permissionConfigurationMode: 'collaborative'
+    });
+
+    const spacePermissionContent: Omit<SpacePermissionModification, 'forSpaceId'> = {
+      operations: ['createPage'],
+      userId: adminUser.id
+    };
+
+    const nonAdminCookie = await loginUser(adminUser);
+
+    await request(baseUrl)
+      .post(`/api/permissions/space/${space.id}/add`)
+      .set('Cookie', nonAdminCookie)
+      .send(spacePermissionContent)
+      .expect(201);
+
+  });
+
   it('should fail if the user is not a space admin, and respond 401', async () => {
 
     const { space, user: nonAdminUser } = await generateUserAndSpaceWithApiToken(undefined, false);
@@ -37,6 +91,30 @@ describe('POST /api/permissions/space/{spaceId}/add - Add space permissions', ()
     };
 
     const nonAdminCookie = await loginUser(nonAdminUser);
+
+    await request(baseUrl)
+      .post(`/api/permissions/space/${space.id}/add`)
+      .set('Cookie', nonAdminCookie)
+      .send(spacePermissionContent)
+      .expect(401);
+
+  });
+
+  it('should fail if the user is admin trying to assign space-level permissions, but the space permission mode is not "custom", and respond 401', async () => {
+
+    const { space, user: adminUser } = await generateUserAndSpaceWithApiToken(undefined, true);
+
+    await updateSpacePermissionConfigurationMode({
+      spaceId: space.id,
+      permissionConfigurationMode: 'collaborative'
+    });
+
+    const spacePermissionContent: Omit<SpacePermissionModification, 'forSpaceId'> = {
+      operations: ['createPage'],
+      spaceId: space.id
+    };
+
+    const nonAdminCookie = await loginUser(adminUser);
 
     await request(baseUrl)
       .post(`/api/permissions/space/${space.id}/add`)

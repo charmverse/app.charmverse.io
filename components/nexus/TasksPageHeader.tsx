@@ -3,8 +3,6 @@ import { useWeb3React } from '@web3-react/core';
 import { useUser } from 'hooks/useUser';
 import Avatar from 'components/common/Avatar';
 import Link from 'next/link';
-import useENSName from 'hooks/useENSName';
-import { getDisplayName } from 'lib/users';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import KeyIcon from '@mui/icons-material/Key';
@@ -33,7 +31,6 @@ export default function TasksPageHeader () {
   const discordConnected = currentUser?.discordUser;
   const telegramConnected = currentUser?.telegramUser;
   const totalIntegrations = (metamaskConnected ? 1 : 0) + (discordConnected ? 1 : 0) + (telegramConnected ? 1 : 0);
-  const userEnsName = useENSName(currentUser?.addresses[0]);
   const { data: safes } = useMultiWalletSigs();
 
   return currentUser && (
@@ -185,7 +182,7 @@ export default function TasksPageHeader () {
                     }
                   }}
                 >
-                  <Avatar size='large' variant='circular' name={userEnsName || getDisplayName(currentUser)} avatar={currentUser.avatar} />
+                  <Avatar size='large' variant='circular' name={currentUser.username} avatar={currentUser.avatar} />
                   <Typography fontWeight={500} color='secondary'>
                     My <Box component='span' display={{ xs: 'none', lg: 'inline' }}>Public</Box> Profile
                   </Typography>

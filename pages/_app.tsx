@@ -274,7 +274,7 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
                               isOpen={isOldBuild}
                               message='New CharmVerse platform update available. Please refresh.'
                               actions={[
-                                <IconButton onClick={() => window.location.reload()} color='inherit'>
+                                <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
                                   <RefreshIcon fontSize='small' />
                                 </IconButton>
                               ]}

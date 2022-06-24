@@ -1,24 +1,24 @@
 
+import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import charmClient from 'charmClient';
 import Loader from 'components/common/Loader';
-import Alert from '@mui/material/Alert';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { useEffect, useState } from 'react';
 
+import { yupResolver } from '@hookform/resolvers/yup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
-import { SpaceOperation, SpacePermission } from '@prisma/client';
+import { SpaceOperation } from '@prisma/client';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { AssignablePermissionGroups } from 'lib/permissions/interfaces';
 import { AvailableSpacePermissions, spaceOperationLabels, spaceOperations, SpacePermissionFlags } from 'lib/permissions/spaces/client';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { BooleanSchema } from 'yup';
-import { yupResolver } from '@hookform/resolvers/yup';
 
 const fields: Record<SpaceOperation, BooleanSchema> = spaceOperations().reduce((_schema: Record<SpaceOperation, BooleanSchema>, op) => {
   _schema[op] = yup.boolean();
@@ -146,8 +146,10 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
     <div>
       <form onSubmit={handleSubmit(formValue => submitted(formValue))} style={{ margin: 'auto' }}>
         <Grid container direction='column' gap={2}>
-
           <Grid item xs>
+            <Typography variant='body2' fontWeight='bold'>
+              Space permissions
+            </Typography>
             <Typography variant='caption'>
               {targetGroup === 'space' && (
                 'Enabling permissions here will allow every space member to perform the relevant action, whatever their roles and permissions.'
@@ -170,12 +172,9 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
             const userCanPerformAction = assignedPermissions[operation];
             const actionLabel = spaceOperationLabels[operation];
 
-            const toggleValue = newValues[operation] ?? false;
-            const currentIsDifferentFromStored = toggleValue !== userCanPerformAction;
-
             return (
               <Grid item container xs key={operation}>
-                <Grid item xs={5}>
+                <Grid item xs={6}>
                   <FormControlLabel
                     control={(
                       <Switch
@@ -191,7 +190,7 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
                     label={actionLabel}
                   />
                 </Grid>
-                <Grid item xs={7}>
+                <Grid item xs={6}>
 
                   <Typography sx={{ height: '100%', justifyContent: 'center', display: 'flex', flexDirection: 'column' }} variant='body2'>
                     {
@@ -223,27 +222,15 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
 
                 </Grid>
 
-                {
-                  currentIsDifferentFromStored && (
-                    <Grid item xs>
-                      <Alert severity='warning'>
-                        You are changing this space permission from its current value.
-                      </Alert>
-                    </Grid>
-                  )
-                }
-
               </Grid>
             );
           })
         }
+
           {
-        /* Only show save if settings are different from saved */
-      }
-          {
-        settingsChanged && (
+        isAdmin && (
           <Grid item xs>
-            <Button type='submit' variant='outlined' color='primary' sx={{ mr: 1 }}>Save</Button>
+            <Button disabled={!settingsChanged} type='submit' variant='contained' color='primary' sx={{ mr: 1 }}>Save</Button>
 
           </Grid>
         )

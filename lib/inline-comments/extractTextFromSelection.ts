@@ -15,7 +15,7 @@ export function extractTextFromSelection (view: EditorView, contributors: Contri
       if (type === 'user') {
         const contributor = contributors.find(_contributor => _contributor.id === value);
         if (contributor) {
-          textContent += `@${(contributor.username ?? contributor.addresses[0])}`;
+          textContent += `@${(contributor.username)}`;
         }
       }
       else {

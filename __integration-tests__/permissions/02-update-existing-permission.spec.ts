@@ -119,12 +119,14 @@ describe('POST /api/permissions - update permissions', () => {
       .send(permissionToUpsert)
       .expect(201));
 
+    const childPageSpacePermission = childPage.permissions.find(p => p.spaceId) as IPagePermissionWithSource;
+
     const nestedChildPageWithPermissions = (await getPage(nestedChildPage.id)) as IPageWithPermissions;
 
     // 2 permissions, base space + default full access for creator
     expect(nestedChildPageWithPermissions.parentId).toBe(childPage.id);
     expect(nestedChildPageWithPermissions.permissions.length).toBe(2);
-    expect(nestedChildPageWithPermissions.permissions.find(p => p.spaceId)?.inheritedFromPermission).toBe(childPage.permissions[0].id);
+    expect(nestedChildPageWithPermissions.permissions.find(p => p.spaceId)?.inheritedFromPermission).toBe(childPageSpacePermission.id);
   });
 
   it('should re-establish inheritance if a page permission is set to the same value as a parent page, and cascade this down to its children', async () => {

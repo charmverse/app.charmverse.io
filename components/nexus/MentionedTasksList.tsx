@@ -9,6 +9,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useEffect } from 'react';
 import charmClient from 'charmClient';
 import { GetTasksResponse } from 'pages/api/tasks/list';
+import { KeyedMutator } from 'swr';
 
 function MentionedTaskRow (
   {
@@ -39,29 +40,38 @@ function MentionedTaskRow (
         />
       ) : null}
       <Link target='_blank' href={baseUrl ? `${baseUrl}/${spaceDomain}/${pagePath}?mentionId=${mentionId}` : ''}>
-        <Card key={mentionId} sx={{ width: '100%', opacity: marked ? 0.75 : 1, p: 1.5, my: 2, borderLeft: 0, borderRight: 0 }} variant='outlined'>
-          <Grid justifyContent='space-between' alignItems='center' container>
+        <Card key={mentionId} sx={{ width: '100%', opacity: marked ? 0.75 : 1, px: 2, py: 1, my: 2, borderLeft: 0, borderRight: 0 }} variant='outlined'>
+          <Grid justifyContent='space-between' alignItems='center' gap={1} container>
             <Grid
               item
-              xs={4}
+              xs={12}
+              sm={7}
+              md={4}
               sx={{
                 overflow: 'hidden',
                 whiteSpace: 'nowrap',
                 textOverflow: 'ellipsis',
                 mr: 1
               }}
+              fontSize={{ sm: 16, xs: 18 }}
             >
               {text}
             </Grid>
             <Grid
               item
-              xs={2}
+              xs={12}
+              sm={4}
+              md={2}
+              justifyContent={{ sm: 'flex-end', md: 'initial', xs: 'initial' }}
+              sx={{ display: 'flex' }}
             >
               <UserDisplay avatarSize='small' user={createdBy as User} />
             </Grid>
             <Grid
               item
-              xs={3}
+              xs={12}
+              sm={6}
+              md={4}
               sx={{
                 fontSize: { xs: 14, sm: 'inherit' }
               }}
@@ -72,14 +82,17 @@ function MentionedTaskRow (
                 gap: 0.5
               }}
               >
-                {pageTitle} in {spaceName}
+                {pageTitle || 'Untitled'} in {spaceName}
               </Box>
             </Grid>
             <Grid
               item
-              xs={2}
+              xs={12}
+              sm={3}
+              md={1.5}
+              justifyContent={{ sm: 'flex-end', xs: 'initial' }}
               sx={{
-                fontSize: { xs: 14, sm: 'inherit' }
+                fontSize: { xs: 14, sm: 'inherit', display: 'flex' }
               }}
             >
               {DateTime.fromISO(createdAt).toRelative({ base: DateTime.now() })}
@@ -94,13 +107,26 @@ function MentionedTaskRow (
 interface MentionedTasksListProps {
   tasks: GetTasksResponse | undefined
   error: any
+  mutateTasks: KeyedMutator<GetTasksResponse>
 }
 
-export default function MentionedTasksList ({ tasks, error }: MentionedTasksListProps) {
+export default function MentionedTasksList ({ tasks, error, mutateTasks }: MentionedTasksListProps) {
   useEffect(() => {
     async function main () {
       if (tasks?.mentioned && tasks.mentioned.unmarked.length !== 0) {
         await charmClient.markTasks(tasks.mentioned.unmarked.map(unmarkedMentions => ({ id: unmarkedMentions.mentionId, type: 'mention' })));
+        mutateTasks((_tasks) => {
+          const unmarked = _tasks?.mentioned.unmarked ?? [];
+          return _tasks ? {
+            gnosis: _tasks.gnosis,
+            mentioned: {
+              marked: [..._tasks.mentioned.marked, ...unmarked],
+              unmarked: []
+            }
+          } : undefined;
+        }, {
+          revalidate: false
+        });
       }
     }
 

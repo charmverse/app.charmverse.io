@@ -38,8 +38,6 @@ export default function CustomizedSnackbar (props: CustomizedSnackbarProps) {
     autoHideDuration = 5000
   } = props;
 
-  const close = handleCloseProp ?? handleClose as any;
-
   return (
     <Stack spacing={2} sx={{ width: '100%' }}>
       <Snackbar
@@ -51,7 +49,7 @@ export default function CustomizedSnackbar (props: CustomizedSnackbarProps) {
         <Alert
           action={[
             ...(actionsProp || actions || []),
-            <IconButton onClick={handleCloseProp ?? handleClose as any} color='inherit'>
+            <IconButton key='clear' onClick={handleCloseProp ?? handleClose as any} color='inherit'>
               <ClearIcon fontSize='small' />
             </IconButton>
           ]}

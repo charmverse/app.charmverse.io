@@ -5,11 +5,16 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { SpacePermissionWithAssignee, removeSpaceOperations, SpacePermissionFlags } from 'lib/permissions/spaces';
 import { computeGroupSpacePermissions } from 'lib/permissions/spaces/computeGroupSpacePermissions';
+import { requireCustomPermissionMode } from 'lib/middleware/requireCustomPermissionMode';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
-//  .use(requireSpaceMembership)
+
+  .use(requireCustomPermissionMode({
+    keyLocation: 'query',
+    spaceIdKey: 'spaceId'
+  }))
   .post(removeSpacePermissionsController);
 
 async function removeSpacePermissionsController (req: NextApiRequest, res: NextApiResponse<SpacePermissionFlags>) {

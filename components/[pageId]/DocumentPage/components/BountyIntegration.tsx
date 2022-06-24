@@ -4,6 +4,7 @@ import { useBounties } from 'hooks/useBounties';
 import { useState } from 'react';
 import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge';
 import BountyModal from 'components/bounties/components/BountyModal';
+import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 
 interface BountyIntegrationProps {
   linkedTaskId: string
@@ -15,6 +16,8 @@ export default function BountyIntegration (props: BountyIntegrationProps) {
   const { bounties } = useBounties();
   const { title, linkedTaskId } = props;
 
+  const [userSpacePermissions] = useCurrentSpacePermissions();
+
   const linkedBounty = bounties.find(bounty => bounty.linkedTaskId === linkedTaskId);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,7 +27,7 @@ export default function BountyIntegration (props: BountyIntegrationProps) {
     }}
     >
       {linkedBounty ? <BountyStatusBadge layout='stacked' bounty={linkedBounty} />
-        : props.readonly ? null : (
+        : props.readonly || !userSpacePermissions?.createBounty ? null : (
           <>
             <Button onClick={() => {
               setIsModalOpen(true);
