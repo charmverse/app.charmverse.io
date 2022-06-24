@@ -108,7 +108,7 @@ export function getTemplateExplanation (template: SpacePermissionConfigurationMo
     canAndCannot[0].push('Anyone can see new top-level pages by default.');
   }
   else {
-    canAndCannot[1].push('Anyone outside the space cannot see new top-level pages by default.');
+    canAndCannot[1].push('Anyone outside the workspace cannot see new top-level pages by default.');
   }
 
   return canAndCannot;

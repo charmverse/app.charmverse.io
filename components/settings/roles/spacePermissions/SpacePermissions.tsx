@@ -152,7 +152,7 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
             </Typography>
             <Typography variant='caption'>
               {targetGroup === 'space' && (
-                'Enabling permissions here will allow every workspacespace member to perform the relevant action, whatever their roles and permissions.'
+                'Enabling permissions here will allow every workspace member to perform the relevant action, whatever their roles and permissions.'
               )}
 
               {targetGroup === 'role' && (
