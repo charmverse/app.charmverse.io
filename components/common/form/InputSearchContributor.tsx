@@ -56,10 +56,7 @@ function InputSearchContributorBase ({ filter, options, placeholder, ...props }:
       renderOption={(_props, user) => (
         <ReviewerOption
           {..._props as any}
-          user={{
-            ...user,
-            addresses: []
-          }}
+          user={user}
         />
       )}
       renderInput={(params) => (
@@ -152,7 +149,7 @@ export function InputSearchContributorMultiple ({ onChange, defaultValue, ...pro
   );
 }
 
-export function ReviewerOption ({ user, avatarSize, fontSize, fontWeight, ...props }: { fontSize?: string | number, fontWeight?: number | string, user: User, avatarSize?: 'small' | 'medium' } & HTMLAttributes<HTMLLIElement> & {component?: ElementType} & BoxProps) {
+export function ReviewerOption ({ user, avatarSize, fontSize, fontWeight, ...props }: { fontSize?: string | number, fontWeight?: number | string, user: Omit<User, 'addresses'>, avatarSize?: 'small' | 'medium' } & HTMLAttributes<HTMLLIElement> & {component?: ElementType} & BoxProps) {
   return (
     <Box display='flex' gap={1} {...props} component={props.component ?? 'li'}>
       <Avatar size={avatarSize} name={user.username} avatar={user.avatar} />

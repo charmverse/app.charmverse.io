@@ -105,10 +105,7 @@ export default function BountySubmissions ({ bounty }: Props) {
             <Grid item xs={12} sx={{ mb: 4, mt: 3 }}>
               <b>Reviewer</b>
               <UserDisplay
-                user={{
-                  ...reviewerUser,
-                  addresses: []
-                }}
+                user={reviewerUser}
               />
             </Grid>
           )
@@ -202,10 +199,7 @@ export default function BountySubmissions ({ bounty }: Props) {
                     return (
                       <UserDisplay
                         avatarSize='small'
-                        user={{
-                          ...contributor,
-                          addresses: []
-                        }}
+                        user={contributor}
                         fontSize='small'
                         linkToProfile
                       />

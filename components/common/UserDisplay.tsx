@@ -44,7 +44,7 @@ export const AnonUserDisplay = memo(AnonUserDisplayComponent);
  * @linkToProfile Whether we show a link to user's public profile. Defaults to false.
  */
 interface UserDisplayProps extends StyleProps {
-  user: User;
+  user: Omit<User, 'addresses'>;
   linkToProfile?: boolean
 }
 
