@@ -16,9 +16,6 @@ export const jestConfig = {
   // Indicates whether the coverage information should be collected while executing the test
   collectCoverage: false,
 
-  // A path to a module which exports an async function that is triggered once before all test suites
-  globalSetup: '<rootDir>/testing/setupDatabase.ts',
-
   // An array of directory names to be searched recursively up from the requiring module's location
   moduleDirectories: [
     'node_modules',
@@ -33,7 +30,9 @@ export const jestConfig = {
     '**/components/**/?(*.)+(spec).[tj]s?(x)',
     '**/components/**/**.test.tsx'
   ],
-
+  modulePathIgnorePatterns: [
+    'focalboard'
+  ],
   testTimeout: 30000
 
 };

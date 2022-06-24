@@ -17,7 +17,9 @@ const esmModules = [
   '@fullcalendar/daygrid',
   '@fullcalendar/interaction',
   '@fullcalendar/react',
-  'react-dnd'
+  '@hookform/resolvers',
+  'react-dnd',
+  'uuid'
 ];
 
 const config = {

@@ -1,50 +1,85 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { IDENTITY_TYPES, LoggedInUser } from 'models';
-import UserDetails from '../UserDetails';
+import { UserDetails } from '@prisma/client';
+import { ThemeProvider } from '@mui/material/styles';
+import { createThemeLightSensitive } from 'theme';
+import IdentityModal from '../IdentityModal';
+import UserDetailsComponent from '../UserDetails';
+
+const theme = createThemeLightSensitive('light');
+
+const userDetails: UserDetails = {
+  id: '1',
+  description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis vitae quam quis ligula tincidunt euismod placerat vel augue. Praesent porta sapien et tincidunt ultrices.',
+  social: {
+    githubURL: 'https://github.com/charmverse',
+    twitterURL: 'https://mobile.twitter.com/charmverse',
+    linkedinURL: 'https://www.linkedin.com/in/alexchibunpoon/'
+  }
+};
 
 function WrappedUserDetails () {
-
   const props = {
     readOnly: false,
     user: {
       id: '1',
-      identityType: IDENTITY_TYPES[0],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      identityType: IDENTITY_TYPES[1],
+      username: 'test.ens',
       addresses: ['0x0000000000000000000000000000000000000000']
     } as LoggedInUser,
     updateUser: () => {}
   };
 
-  return <UserDetails {...props} />;
+  return (
+    <ThemeProvider theme={theme}>
+      <UserDetailsComponent {...props} />
+    </ThemeProvider>
+  );
 }
 
-// TO DO: make these tests work
+jest.mock('../IdentityModal', () => ({
+  __esModule: true,
+  default: () => IdentityModal,
+  getIdentityIcon: jest.fn()
+}));
+
+jest.mock('swr/immutable', () => ({
+  __esModule: true,
+  default: () => ({
+    data: userDetails,
+    mutate: () => {}
+  })
+}));
+
 describe('User details', () => {
-  it.skip('should have back navigation text', () => {
+
+  it('should have correct username displayed', () => {
     render(<WrappedUserDetails />);
-    expect(screen.getByText('My Public Profile')).toBeTruthy();
+    expect(screen.getByText('test.ens')).toBeTruthy();
   });
 
-  it.skip('should have edit icons', () => {
+  it('should have Twitter, GitHub, Linkedin icons', () => {
+    render(<WrappedUserDetails />);
+    expect(screen.getByTestId('TwitterIcon')).toBeTruthy();
+    expect(screen.getByTestId('GitHubIcon')).toBeTruthy();
+    expect(screen.getByTestId('LinkedInIcon')).toBeTruthy();
+  });
+
+  it('should have description', () => {
+    render(<WrappedUserDetails />);
+    expect(screen.getByText(userDetails.description as string)).toBeTruthy();
+  });
+
+  it('should have edit icons', () => {
     render(<WrappedUserDetails />);
     expect(screen.getByTestId('edit-identity')).toBeTruthy();
     expect(screen.getByTestId('edit-social')).toBeTruthy();
     expect(screen.getByTestId('edit-description')).toBeTruthy();
   });
 
-  it.skip('should open identity modal', () => {
-    render(<WrappedUserDetails />);
-    fireEvent.click(screen.getByTestId('edit-identity'));
-    expect(screen.getByText('Public Identity')).toBeTruthy();
-  });
-
-  it.skip('should open social modal', () => {
-    render(<WrappedUserDetails />);
-    fireEvent.click(screen.getByTestId('edit-social'));
-    expect(screen.getByText('Social media links')).toBeTruthy();
-  });
-
-  it.skip('should open description modal', () => {
+  it('should open description modal', () => {
     render(<WrappedUserDetails />);
     fireEvent.click(screen.getByTestId('edit-description'));
     expect(screen.getByText('Describe yourself in a few words')).toBeTruthy();
