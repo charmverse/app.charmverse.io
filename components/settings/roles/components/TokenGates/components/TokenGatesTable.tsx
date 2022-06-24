@@ -18,6 +18,7 @@ import TableRow from 'components/common/Table/TableRow';
 import { TokenGateWithRoles } from 'pages/api/token-gates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { mutate } from 'swr';
+import log from 'lib/log';
 import TestConnectionModal, { TestResult } from './TestConnectionModal';
 import TokenGateRolesSelect from './TokenGateRolesSelect';
 
@@ -28,10 +29,10 @@ interface Props {
 }
 
 export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Props) {
-  const { account, chainId } = useWeb3React();
+  const { account } = useWeb3React();
   const [testResult, setTestResult] = useState<TestResult>({});
   const litClient = useLitProtocol();
-  const [descriptions, setDescriptions] = useState<string[]>([]);
+  const [descriptions, setDescriptions] = useState<(string | null)[]>([]);
   const [space] = useCurrentSpace();
 
   async function updateTokenGateRoles (tokenGateId: string, roleIds: string[]) {
@@ -56,7 +57,9 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
         tokenGates.map(tokenGate => humanizeAccessControlConditions({
           myWalletAddress: account || '',
           ...tokenGate.conditions as any
-          // accessControlConditions: (tokenGate.conditions as any)?.accessControlConditions || []
+        }).catch(err => {
+          log.warn('Could not retrieve humanized format of conditions', err);
+          return null;
         }))
       );
       setDescriptions(results);
@@ -86,6 +89,8 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
     }
   }
 
+  const sortedTokenGates = tokenGates.sort((a, b) => a.createdAt > b.createdAt ? -1 : 1);
+
   return (
     <>
       <Table size='small' aria-label='simple table'>
@@ -101,7 +106,7 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
           </TableRow>
         </TableHead>
         <TableBody>
-          {tokenGates.map((tokenGate, tokenGateIndex) => (
+          {sortedTokenGates.map((tokenGate, tokenGateIndex) => (
             <TableRow key={tokenGate.id} sx={{ '&:last-child td, &:last-child th': { border: 0 }, marginBottom: 20 }}>
               <TableCell sx={{ px: 0 }}>
                 <Typography variant='body2' sx={{ my: 1 }}>

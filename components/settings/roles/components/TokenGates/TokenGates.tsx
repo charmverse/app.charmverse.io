@@ -61,7 +61,7 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
 
   function onSubmit (conditions: ConditionsModalResult) {
     setApiError('');
-    saveTokenGate(conditions)
+    return saveTokenGate(conditions)
       .then(() => {
         popupState.close();
       })

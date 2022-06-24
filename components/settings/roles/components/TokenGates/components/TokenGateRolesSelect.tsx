@@ -62,7 +62,7 @@ export default function TokenGateRolesSelect ({ onDelete, selectedRoleIds, onCha
         disabled={!isAdmin || roles?.length === 0}
         renderValue={(roleIds) => (
           (roleIds.length === 0) ? (
-            <Button size='small' variant='text' color='secondary'>+ Add roles</Button>
+            <Button disabled size='small' variant='text' color='secondary'>+ Add roles</Button>
           ) : (
             <Box display='flex' flexWrap='wrap' gap={0.5} maxWidth={400}>
               {
