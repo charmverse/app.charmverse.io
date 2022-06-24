@@ -22,7 +22,8 @@ const esmModules = [
   '@fullcalendar/react',
   'react-dnd',
   '@hookform/resolvers',
-  'lit-share-modal-v3-react-17'
+  'lit-share-modal-v3-react-17',
+  'uuid'
 ];
 
 const config = {
