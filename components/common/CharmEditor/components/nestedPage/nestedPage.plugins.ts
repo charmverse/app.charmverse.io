@@ -57,10 +57,11 @@ export function nestedPagePlugins ({
                   const destinationPos = ob.inside > 0 ? ob.inside : ob.pos;
                   const node = view.state.doc.nodeAt(destinationPos);
                   if (node) {
-                    view.dispatch(view.state.tr
-                      .deleteRange(draggedNodeStartPos, draggedNodeEndPos));
-                    view.dispatch(view.state.tr.insert(destinationPos, draggedNode));
-                    view.dispatch(view.state.tr.setSelection(TextSelection.near(view.state.tr.doc.resolve(destinationPos))));
+                    view.dispatch(view.state.tr.deleteRange(draggedNodeStartPos, draggedNodeEndPos)
+                      .insert(draggedNodeStartPos < destinationPos ? destinationPos - 1 : destinationPos, draggedNode));
+                    view.dispatch(view.state.tr.setSelection(
+                      TextSelection.near(view.state.tr.doc.resolve(draggedNodeStartPos < destinationPos ? destinationPos - 1 : destinationPos))
+                    ));
                   }
                 }
               }
