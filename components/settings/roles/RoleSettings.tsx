@@ -12,6 +12,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useRef, useState } from 'react';
+import InviteLinkList from 'components/settings/contributors/InviteLinks/InviteLinks';
 import ImportDiscordRolesMenuItem from './components/ImportDiscordRolesMenuItem';
 import RoleForm from './components/RoleForm';
 import RoleRow from './components/RoleRow';
@@ -106,6 +107,8 @@ export default function RoleSettings () {
 
       {/* Token gates section */}
       <TokenGates isAdmin={isAdmin} spaceId={space?.id as string} />
+
+      <InviteLinkList isAdmin={isAdmin} spaceId={space?.id as string} />
 
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
         <ImportDiscordRolesMenuItem />
