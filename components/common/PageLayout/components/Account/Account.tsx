@@ -89,9 +89,16 @@ function Account (): JSX.Element {
     );
   }
 
+  const userNotificationState = user?.notificationState;
   const isConnectedWithWallet = (account && chainId);
   const chain = chainId ? getChainById(chainId) : null;
-  const totalTasks = tasks ? (tasks.mentioned.unmarked.length + tasks.gnosis.length) : 0;
+
+  // If the user has snoozed multisig tasks don't count them
+  const totalTasks = tasks
+    ? (tasks.mentioned.unmarked.length + (userNotificationState
+      ? (userNotificationState.snoozedUntil && new Date(userNotificationState.snoozedUntil) > new Date() ? 0
+        : tasks.gnosis.length) : tasks.gnosis.length))
+    : 0;
   const router = useRouter();
   return (
     <AccountCard>
@@ -115,7 +122,7 @@ function Account (): JSX.Element {
             <Badge
               color='error'
               sx={{
-                '&:hover .MuiBadge-badge': {
+                '& .MuiBadge-badge:hover': {
                   transform: 'scale(1.25) translate(50%, -50%)',
                   transition: '250ms ease-in-out transform'
                 }
