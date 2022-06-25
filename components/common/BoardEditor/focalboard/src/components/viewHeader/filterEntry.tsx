@@ -37,7 +37,7 @@ const FilterEntry = (props: Props): JSX.Element => {
             className='FilterEntry'
             key={key}
         >
-            <MenuWrapper stopPropagationOnToggle={true}>
+            <MenuWrapper>
                 <Button>{propertyName}</Button>
                 <Menu>
                     {board.fields.cardProperties.filter((o: IPropertyTemplate) => o.type === 'select' || o.type === 'multiSelect').map((o: IPropertyTemplate) => (
