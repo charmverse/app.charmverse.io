@@ -46,7 +46,6 @@ const FilterEntry = (props: Props): JSX.Element => {
                             id={o.id}
                             name={o.name}
                             onClick={(optionId: string) => {
-                                console.log('click prop', optionId);
                                 const filterIndex = view.fields.filter.filters.indexOf(filter)
                                 Utils.assert(filterIndex >= 0, "Can't find filter")
                                 const filterGroup = createFilterGroup(view.fields.filter)
