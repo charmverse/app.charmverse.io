@@ -26,6 +26,7 @@ const MenuWrapper = (props: Props) => {
 
     const toggle = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
 
+        console.log('MenuWrapper toggle was called')
         if (props.disabled) {
             return
         }
@@ -46,6 +47,7 @@ const MenuWrapper = (props: Props) => {
     useEffect(() => {
 
         const close = (): void => {
+            console.log('MenuWrapper close was called')
             setOpen(false)
         }
 

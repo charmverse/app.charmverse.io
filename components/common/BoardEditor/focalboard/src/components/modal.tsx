@@ -17,18 +17,8 @@ const Modal = React.memo((props: Props): JSX.Element => {
 
     const {position, onClose, children} = props
 
-    const closeOnBlur = (e: Event) => {
-        console.log('target', e.target)
-        console.log('current node', node.current, node.current?.contains(e.target as Node))
-        if (e.target && node.current?.contains(e.target as Node)) {
-            return
-        }
-
-        onClose()
-    }
-
     return (
-        <ClickAwayListener onClickAway={closeOnBlur}>
+        <ClickAwayListener onClickAway={onClose}>
             <div
                 className={'Modal ' + (position || 'bottom')}
                 ref={node}

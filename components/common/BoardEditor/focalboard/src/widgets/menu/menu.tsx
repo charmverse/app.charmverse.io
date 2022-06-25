@@ -56,8 +56,9 @@ function Menu (props: Props) {
     }, [])
 
     return (
-        <StyledPopper anchorEl={anchorEl} open={true} placement={position || 'bottom-start'}>
+        <StyledPopper onClick={e => e.stopPropagation()} anchorEl={anchorEl} open={true} placement={position || 'bottom-start'}>
             <div
+            onClick={e => e.stopPropagation()}
                 ref={popperRef}
                 style={{ maxHeight: maxHeight || 'none' }}
                 className={'Menu noselect ' + (position || 'bottom-start')}>
