@@ -64,6 +64,13 @@ export default function SnoozeButton () {
       snoozeFor: null,
       snoozeMessage: null
     });
+    setUser((user: LoggedInUser) => ({
+      ...user,
+      notificationState: {
+        snoozedUntil: null,
+        snoozeMessage: null
+      }
+    }));
     await mutateTasks();
     setShowLoading(false);
   }
