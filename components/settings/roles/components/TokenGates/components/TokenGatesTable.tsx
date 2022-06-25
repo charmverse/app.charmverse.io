@@ -19,6 +19,8 @@ import { TokenGateWithRoles } from 'pages/api/token-gates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { mutate } from 'swr';
 import log from 'lib/log';
+import { shortenHex } from 'lib/utilities/strings';
+import getLitChainFromChainId from 'lib/token-gates/getLitChainFromChainId';
 import TestConnectionModal, { TestResult } from './TestConnectionModal';
 import TokenGateRolesSelect from './TokenGateRolesSelect';
 
@@ -29,7 +31,7 @@ interface Props {
 }
 
 export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Props) {
-  const { account } = useWeb3React();
+  const { account, chainId } = useWeb3React();
   const [testResult, setTestResult] = useState<TestResult>({});
   const litClient = useLitProtocol();
   const [descriptions, setDescriptions] = useState<(string | null)[]>([]);
@@ -70,9 +72,9 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
   async function testConnect (tokenGate: TokenGate) {
     setTestResult({ status: 'loading' });
     try {
-      const authSig = await checkAndSignAuthMessage({
-        chain: (tokenGate.conditions as any).chain || 'ethereum'
-      });
+
+      const chain = getLitChainFromChainId(chainId);
+      const authSig = await checkAndSignAuthMessage({ chain });
       const jwt = await litClient!.getSignedToken({
         resourceId: tokenGate.resourceId as any,
         authSig,
@@ -84,12 +86,20 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
       setTestResult({ status: 'success' });
     }
     catch (error) {
-      const message = (error as Error).message || 'Access denied. Please check your access control conditions.';
+      let message = '';
+      switch ((error as any).errorCode) {
+        case 'not_authorized':
+          message = `Address does not meet requirements: ${shortenHex(account || '')}`;
+          break;
+        default:
+          message = (error as Error).message || 'Access denied. Please check your access control conditions.';
+      }
       setTestResult({ message, status: 'error' });
     }
   }
 
-  const sortedTokenGates = tokenGates.sort((a, b) => a.createdAt > b.createdAt ? -1 : 1);
+  // sort oldest to newest
+  const sortedTokenGates = tokenGates.sort((a, b) => b.createdAt > a.createdAt ? -1 : 1);
 
   return (
     <>
