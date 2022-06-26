@@ -71,9 +71,30 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
     }
   });
 
+  const bounties = await prisma.bounty.findMany({
+    where: {
+      spaceId: {
+        in: spaceIds
+      }
+    },
+    select: {
+      id: true,
+      title: true,
+      descriptionNodes: true,
+      createdBy: true,
+      space: {
+        select: {
+          domain: true,
+          id: true,
+          name: true
+        }
+      }
+    }
+  });
+
   // A mapping between mention id and the mention data (without user)
   const mentionedTasksWithoutUserRecord: Record<string, Omit<MentionedTask, 'createdBy'> & {userId: string}> = {};
-  const mentionUserIds: string[] = [];
+  const mentionUserIds: Set<string> = new Set();
 
   for (const page of pages) {
     const content = page.content as PageContent;
@@ -82,7 +103,7 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
       mentions.forEach(mention => {
         // Skip mentions not for the user, self mentions and inside user created pages
         if (page.space && mention.value === userId && mention.createdBy !== userId && page.createdBy !== userId) {
-          mentionUserIds.push(mention.createdBy);
+          mentionUserIds.add(mention.createdBy);
           mentionedTasksWithoutUserRecord[mention.id] = {
             mentionId: mention.id,
             createdAt: mention.createdAt,
@@ -104,11 +125,39 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
     }
   }
 
+  for (const bounty of bounties) {
+    const content = bounty.descriptionNodes as PageContent;
+    if (content) {
+      const mentions = extractMentions(content, username);
+      mentions.forEach(mention => {
+        if (bounty.space && mention.value === userId && mention.createdBy !== userId && bounty.createdBy !== userId) {
+          mentionUserIds.add(mention.createdBy);
+          mentionedTasksWithoutUserRecord[mention.id] = {
+            mentionId: mention.id,
+            createdAt: mention.createdAt,
+            pageId: null,
+            spaceId: bounty.space.id,
+            spaceDomain: bounty.space.domain,
+            pagePath: null,
+            spaceName: bounty.space.name,
+            userId: mention.createdBy,
+            pageTitle: null,
+            text: mention.text,
+            bountyId: bounty.id,
+            bountyTitle: bounty.title,
+            commentId: null,
+            type: 'bounty'
+          };
+        }
+      });
+    }
+  }
+
   // Only fetch the users that created the mentions
   const users = await prisma.user.findMany({
     where: {
       id: {
-        in: mentionUserIds
+        in: Array.from(mentionUserIds)
       }
     }
   });
