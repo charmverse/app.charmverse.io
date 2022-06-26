@@ -100,6 +100,20 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
     }
   });
 
+  const comments = await prisma.comment.findMany({
+    where: {
+      spaceId: {
+        in: spaceIds
+      }
+    },
+    select: {
+      id: true,
+      userId: true,
+      spaceId: true,
+      content: true
+    }
+  });
+
   // A mapping between mention id and the mention data (without user)
   const mentionedTasksWithoutUserRecord: Record<string, Omit<MentionedTask, 'createdBy'> & {userId: string}> = {};
   const mentionUserIds: Set<string> = new Set();
@@ -155,6 +169,34 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
             bountyTitle: bounty.title,
             commentId: null,
             type: 'bounty'
+          };
+        }
+      });
+    }
+  }
+
+  for (const comment of comments) {
+    const content = comment.content as PageContent;
+    if (content) {
+      const mentions = extractMentions(content, username);
+      mentions.forEach(mention => {
+        if (comment.spaceId && mention.value === userId && mention.createdBy !== userId && comment.userId !== userId) {
+          mentionUserIds.add(mention.createdBy);
+          mentionedTasksWithoutUserRecord[mention.id] = {
+            mentionId: mention.id,
+            createdAt: mention.createdAt,
+            pageId: null,
+            spaceId: comment.spaceId,
+            spaceDomain: spaceRecord[comment.spaceId].domain,
+            pagePath: null,
+            spaceName: spaceRecord[comment.spaceId].name,
+            userId: mention.createdBy,
+            pageTitle: null,
+            text: mention.text,
+            bountyId: null,
+            bountyTitle: null,
+            commentId: comment.id,
+            type: 'comment'
           };
         }
       });
