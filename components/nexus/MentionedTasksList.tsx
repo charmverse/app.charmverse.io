@@ -10,6 +10,8 @@ import { useEffect } from 'react';
 import charmClient from 'charmClient';
 import { GetTasksResponse } from 'pages/api/tasks/list';
 import { KeyedMutator } from 'swr';
+import BountyIcon from '@mui/icons-material/RequestPage';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 
 function MentionedTaskRow (
   {
@@ -70,11 +72,14 @@ function MentionedTaskRow (
                 overflow: 'hidden',
                 whiteSpace: 'nowrap',
                 textOverflow: 'ellipsis',
-                mr: 1
+                mr: 1,
+                alignItems: 'center',
+                display: 'flex',
+                gap: 0.5
               }}
               fontSize={{ sm: 16, xs: 18 }}
             >
-              {text}
+              {type === 'bounty' ? <BountyIcon fontSize='small' /> : type === 'page' ? <DescriptionOutlinedIcon fontSize='small' /> : null} {text}
             </Grid>
             <Grid
               item
