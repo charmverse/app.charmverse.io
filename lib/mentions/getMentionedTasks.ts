@@ -77,7 +77,8 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
     if (content) {
       const mentions = extractMentions(content, username);
       mentions.forEach(mention => {
-        if (page.space && mention.value === userId) {
+        // Skip mentions not for the user and self mentions
+        if (page.space && mention.value === userId && mention.createdBy !== userId) {
           mentionUserIds.push(mention.createdBy);
           mentionedTasksWithoutUserRecord[mention.id] = {
             mentionId: mention.id,
