@@ -4,7 +4,7 @@ import { useUser } from 'hooks/useUser';
 
 export default function useTasks () {
   const [user] = useUser();
-  const { data: tasks, error: serverError, mutate } = useSWRImmutable(user ? '/tasks/list' : null, () => charmClient.getTasks(), {
+  const { data: tasks, error: serverError, mutate } = useSWRImmutable(user ? `/tasks/list/${user.id}` : null, () => charmClient.getTasks(), {
     // 10 minutes
     refreshInterval: 1000 * 10 * 60
   });

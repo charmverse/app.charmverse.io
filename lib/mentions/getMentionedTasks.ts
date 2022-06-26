@@ -1,5 +1,6 @@
 import { prisma } from 'db';
 import { extractMentions } from 'lib/prosemirror/extractMentions';
+import { shortenHex } from 'lib/utilities/strings';
 import { PageContent, User } from 'models';
 import { MentionedTask } from './interfaces';
 
@@ -19,6 +20,7 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
     }
   });
 
+  // Get the username of the user, its required when constructing the mention message text
   const user = await prisma.user.findUnique({
     where: {
       id: userId
@@ -28,7 +30,7 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
     }
   });
 
-  const username = user?.username ?? undefined;
+  const username = user?.username ?? shortenHex(userId);
 
   // Array of space ids the user is part of
   const spaceIds = spaceRoles.map(spaceRole => spaceRole.spaceId);
@@ -58,6 +60,7 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
       id: true,
       path: true,
       title: true,
+      createdBy: true,
       space: {
         select: {
           domain: true,
@@ -77,8 +80,8 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
     if (content) {
       const mentions = extractMentions(content, username);
       mentions.forEach(mention => {
-        // Skip mentions not for the user and self mentions
-        if (page.space && mention.value === userId && mention.createdBy !== userId) {
+        // Skip mentions not for the user, self mentions and inside user created pages
+        if (page.space && mention.value === userId && mention.createdBy !== userId && page.createdBy !== userId) {
           mentionUserIds.push(mention.createdBy);
           mentionedTasksWithoutUserRecord[mention.id] = {
             mentionId: mention.id,
@@ -90,7 +93,11 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
             spaceName: page.space.name,
             userId: mention.createdBy,
             pageTitle: page.title,
-            text: mention.text
+            text: mention.text,
+            bountyId: null,
+            bountyTitle: null,
+            commentId: null,
+            type: 'page'
           };
         }
       });
@@ -116,7 +123,7 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
     mentionedTasksWithoutUserRecord
   ).forEach(mentionedTaskWithoutUser => {
     // joining the mentioned task with the user
-    const mentionedTask = { ...mentionedTaskWithoutUser, createdBy: usersRecord[mentionedTaskWithoutUser.userId] };
+    const mentionedTask = { ...mentionedTaskWithoutUser, createdBy: usersRecord[mentionedTaskWithoutUser.userId] } as MentionedTask;
     if (markedMentionTaskIds.has(mentionedTask.mentionId)) {
       mentionedTasks.marked.push(mentionedTask);
     }
