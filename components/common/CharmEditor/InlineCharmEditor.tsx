@@ -15,12 +15,15 @@ import { CSSProperties, ReactNode, useState } from 'react';
 import styled from '@emotion/styled';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
 import { PageContent } from 'models';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useUser } from 'hooks/useUser';
 import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
 import Mention, { mentionPlugins, mentionSpecs, MentionSuggest, mentionPluginKeyName } from './components/mention';
 import * as tabIndent from './components/tabIndent';
 import Placeholder from './components/Placeholder';
 import { checkForEmpty } from './utils';
+import { charmPlugin } from './components/charm/charm.plugins';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -48,10 +51,16 @@ export const specRegistry = new SpecRegistry([
 export function charmEditorPlugins (
   {
     onContentChange,
-    readOnly
+    readOnly,
+    userId = null,
+    pageId = null,
+    spaceId = null
   }:
     {
-      readOnly?: boolean, onContentChange?: (view: EditorView) => void
+      readOnly?: boolean, onContentChange?: (view: EditorView) => void,
+      spaceId?: string | null,
+      pageId?: string | null,
+      userId?: string | null,
     } = {}
 ) {
   return () => [
@@ -63,6 +72,11 @@ export function charmEditorPlugins (
           }
         }
       })
+    }),
+    charmPlugin({
+      userId,
+      pageId,
+      spaceId
     }),
     bold.plugins(),
     code.plugins(),
@@ -79,7 +93,8 @@ export function charmEditorPlugins (
     }),
     floatingMenuPlugin({
       key: floatingMenuPluginKey,
-      readOnly
+      readOnly,
+      enableComments: false
     }),
     tabIndent.plugins()
   ];
@@ -126,6 +141,9 @@ export default function CharmEditor (
   { content, children, onContentChange, style, noPadding, readOnly = false, placeholderText }:
   CharmEditorProps
 ) {
+  const [currentSpace] = useCurrentSpace();
+  const [currentUser] = useUser();
+
   const _isEmpty = !content || checkForEmpty(content);
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
 
@@ -147,7 +165,9 @@ export default function CharmEditor (
     specRegistry,
     plugins: charmEditorPlugins({
       onContentChange: _onContentChange,
-      readOnly
+      readOnly,
+      spaceId: currentSpace?.id,
+      userId: currentUser?.id
     }),
     initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
     // hide the black bar when dragging items - we dont even support dragging most components

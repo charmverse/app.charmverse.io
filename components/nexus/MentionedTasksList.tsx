@@ -24,7 +24,6 @@ function MentionedTaskRow (
     text,
     bountyId,
     bountyTitle,
-    commentId,
     type
   }: MentionedTask & { marked: boolean }
 ) {
@@ -40,6 +39,10 @@ function MentionedTaskRow (
   else if (type === 'page') {
     mentionLink = `${baseUrl}/${spaceDomain}/${pagePath}?mentionId=${mentionId}`;
     mentionTitle = `${pageTitle || 'Untitled'} in ${spaceName}`;
+  }
+  else if (type === 'comment') {
+    mentionLink = `${baseUrl}/${spaceDomain}/${pagePath}`; // No possible way to scroll to the correct mention as its inside a comment
+    mentionTitle = `Comment in ${spaceName}`;
   }
 
   return (
