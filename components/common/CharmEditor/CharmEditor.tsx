@@ -27,6 +27,7 @@ import PageThreadsList from 'components/[pageId]/DocumentPage/components/PageThr
 import { CryptoCurrency, FiatCurrency } from 'connectors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
+import { silentlyUpdateURL } from 'lib/browser';
 import debounce from 'lodash/debounce';
 import { PageContent } from 'models';
 import { CSSProperties, memo, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
@@ -397,6 +398,8 @@ function CharmEditor (
               highlightedMentionDomElement.scrollIntoView({
                 behavior: 'smooth'
               });
+              // Remove the ?mentionId from url
+              silentlyUpdateURL(window.location.href.split('?')[0]);
             });
           }
         }, 250);

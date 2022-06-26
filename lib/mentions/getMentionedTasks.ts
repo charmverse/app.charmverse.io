@@ -1,3 +1,4 @@
+import { Space } from '@prisma/client';
 import { prisma } from 'db';
 import { extractMentions } from 'lib/prosemirror/extractMentions';
 import { shortenHex } from 'lib/utilities/strings';
@@ -45,6 +46,25 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
     }
   });
 
+  const spaces = await prisma.space.findMany({
+    where: {
+      id: {
+        in: spaceIds
+      }
+    },
+    select: {
+      domain: true,
+      id: true,
+      name: true
+    }
+  });
+
+  const spaceRecord: Record<string, Pick<Space, 'name' | 'domain' | 'id'>> = {};
+
+  spaces.forEach(space => {
+    spaceRecord[space.id] = space;
+  });
+
   // Get the marked mention task ids (all the discussion type tasks that exist in the db)
   const markedMentionTaskIds = new Set(markedMentionTasks.map(markedMentionTask => markedMentionTask.taskId));
 
@@ -61,13 +81,7 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
       path: true,
       title: true,
       createdBy: true,
-      space: {
-        select: {
-          domain: true,
-          id: true,
-          name: true
-        }
-      }
+      spaceId: true
     }
   });
 
@@ -82,13 +96,7 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
       title: true,
       descriptionNodes: true,
       createdBy: true,
-      space: {
-        select: {
-          domain: true,
-          id: true,
-          name: true
-        }
-      }
+      spaceId: true
     }
   });
 
@@ -102,16 +110,16 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
       const mentions = extractMentions(content, username);
       mentions.forEach(mention => {
         // Skip mentions not for the user, self mentions and inside user created pages
-        if (page.space && mention.value === userId && mention.createdBy !== userId && page.createdBy !== userId) {
+        if (page.spaceId && mention.value === userId && mention.createdBy !== userId && page.createdBy !== userId) {
           mentionUserIds.add(mention.createdBy);
           mentionedTasksWithoutUserRecord[mention.id] = {
             mentionId: mention.id,
             createdAt: mention.createdAt,
             pageId: page.id,
-            spaceId: page.space.id,
-            spaceDomain: page.space.domain,
+            spaceId: page.spaceId,
+            spaceDomain: spaceRecord[page.spaceId].domain,
             pagePath: page.path,
-            spaceName: page.space.name,
+            spaceName: spaceRecord[page.spaceId].name,
             userId: mention.createdBy,
             pageTitle: page.title,
             text: mention.text,
@@ -130,16 +138,16 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
     if (content) {
       const mentions = extractMentions(content, username);
       mentions.forEach(mention => {
-        if (bounty.space && mention.value === userId && mention.createdBy !== userId && bounty.createdBy !== userId) {
+        if (bounty.spaceId && mention.value === userId && mention.createdBy !== userId && bounty.createdBy !== userId) {
           mentionUserIds.add(mention.createdBy);
           mentionedTasksWithoutUserRecord[mention.id] = {
             mentionId: mention.id,
             createdAt: mention.createdAt,
             pageId: null,
-            spaceId: bounty.space.id,
-            spaceDomain: bounty.space.domain,
+            spaceId: bounty.spaceId,
+            spaceDomain: spaceRecord[bounty.spaceId].domain,
             pagePath: null,
-            spaceName: bounty.space.name,
+            spaceName: spaceRecord[bounty.spaceId].name,
             userId: mention.createdBy,
             pageTitle: null,
             text: mention.text,
