@@ -59,7 +59,7 @@ function sortPagePermissions (pagePermissions: IPagePermissionWithAssignee[]):
       return {
         ...permission,
         permissionSource,
-        displayName: permissionDisplayName
+        displayName: permissionDisplayName as string
       };
     }).sort((a, b) => {
 

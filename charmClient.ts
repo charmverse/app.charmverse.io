@@ -290,7 +290,7 @@ class CharmClient {
 
     return contributors.map((contributor: Contributor) => ({
       id: contributor.id,
-      username: contributor.username,
+      username: contributor.username as string,
       email: '',
       props: {},
       create_at: new Date(contributor.createdAt).getTime(),
