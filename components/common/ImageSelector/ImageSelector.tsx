@@ -49,7 +49,7 @@ export default function ImageSelector ({ autoOpen = false, children, galleryImag
                   width: '100%'
                 }}
                 >
-                  <PimpedButton loading={isUploading} loadingMessage='Uploading image ...' disabled={isUploading} component='label' variant='contained'>
+                  <PimpedButton loading={isUploading} loadingMessage='Uploading image' disabled={isUploading} component='label' variant='contained'>
                     Choose an image
                     <input
                       type='file'
