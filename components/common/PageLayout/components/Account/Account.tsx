@@ -89,9 +89,16 @@ function Account (): JSX.Element {
     );
   }
 
+  const userNotificationState = user?.notificationState;
   const isConnectedWithWallet = (account && chainId);
   const chain = chainId ? getChainById(chainId) : null;
-  const totalTasks = tasks ? (tasks.mentioned.unmarked.length + tasks.gnosis.length) : 0;
+
+  // If the user has snoozed multisig tasks don't count them
+  const totalTasks = tasks
+    ? (tasks.mentioned.unmarked.length + (userNotificationState
+      ? (userNotificationState.snoozedUntil && new Date(userNotificationState.snoozedUntil) > new Date() ? 0
+        : tasks.gnosis.length) : tasks.gnosis.length))
+    : 0;
   const router = useRouter();
   return (
     <AccountCard>
