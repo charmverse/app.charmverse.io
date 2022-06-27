@@ -8,6 +8,7 @@ import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import { computeBountyPermissions } from 'lib/permissions/bounties';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -34,19 +35,13 @@ async function reviewSubmissionController (req: NextApiRequest, res: NextApiResp
     throw new DataNotFoundError(`Submission with id ${submissionId} not found`);
   }
 
-  const { error, isAdmin } = await hasAccessToSpace({
-    spaceId: submission.bounty.spaceId,
-    userId,
-    adminOnly: false
+  const permissions = await computeBountyPermissions({
+    allowAdminBypass: true,
+    resourceId: submission.bounty.id,
+    userId
   });
 
-  if (error) {
-    throw error;
-  }
-
-  const canReview = isAdmin || submission.bounty.reviewer === userId;
-
-  if (!canReview) {
+  if (!permissions.review) {
     throw new UnauthorisedActionError('You cannot review submissions for this bounty');
   }
 

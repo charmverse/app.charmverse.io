@@ -6,6 +6,7 @@ import { generateBounty, generateBountyWithSingleApplication, generateSpaceUser,
 import { ApplicationCreationData, SubmissionCreationData, SubmissionReview } from 'lib/applications/interfaces';
 import { createBounty } from 'lib/bounties';
 import { generateSubmissionContent } from 'testing/generate-stubs';
+import { addBountyPermissionGroup } from 'lib/permissions/bounties';
 
 let nonAdminUser: User;
 let nonAdminUserSpace: Space;
@@ -25,7 +26,7 @@ beforeAll(async () => {
 
 describe('POST /api/submissions/{submissionId}/review - review a submission', () => {
 
-  it('should allow the reviewer to review a submission and respond with 200', async () => {
+  it('should succed if the user has "review" permission, respond with 200', async () => {
 
     const reviewer = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
 
@@ -41,7 +42,17 @@ describe('POST /api/submissions/{submissionId}/review - review a submission', ()
       applicationStatus: 'review',
       bountyCap: null,
       bountyStatus: 'open',
-      reviewer: reviewer.id
+      // Reviewer status is now assigned via permissions
+      reviewer: undefined
+    });
+
+    await addBountyPermissionGroup({
+      level: 'reviewer',
+      resourceId: bounty.id,
+      assignee: {
+        group: 'user',
+        id: reviewer.id
+      }
     });
 
     const decision: Pick<SubmissionReview, 'decision'> = {
@@ -85,7 +96,7 @@ describe('POST /api/submissions/{submissionId}/review - review a submission', ()
       .expect(200);
   });
 
-  it('should fail if the requesting user is neither a space admin, nor the reviewer and respond with 200', async () => {
+  it('should fail if the requesting non-admin user does not have the "review" permission and respond with 401', async () => {
 
     const user = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
 
