@@ -298,7 +298,7 @@ model Bounty {
   approveSubmitters Boolean       @default(false)
   maxSubmissions    Int?          @default(1)
   applications      Application[]
-  bountyPermissions BountyPermission[]
+  permissions       BountyPermission[]
 }
 
 // Not currently used at database level. Defined here so we have a single source of truth
