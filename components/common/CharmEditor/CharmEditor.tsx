@@ -32,7 +32,7 @@ import debounce from 'lodash/debounce';
 import { PageContent } from 'models';
 import { CSSProperties, memo, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import Callout, * as callout from './components/callout';
-import { charmPlugin } from './components/charm/charm.plugins';
+import { userDataPlugin } from './components/charm/charm.plugins';
 import * as columnLayout from './components/columnLayout';
 import LayoutColumn from './components/columnLayout/Column';
 import LayoutRow from './components/columnLayout/Row';
@@ -136,7 +136,7 @@ export function charmEditorPlugins (
         }
       })
     }),
-    charmPlugin({
+    userDataPlugin({
       userId,
       pageId,
       spaceId

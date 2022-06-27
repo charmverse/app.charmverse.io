@@ -23,7 +23,7 @@ import Mention, { mentionPlugins, mentionSpecs, MentionSuggest, mentionPluginKey
 import * as tabIndent from './components/tabIndent';
 import Placeholder from './components/Placeholder';
 import { checkForEmpty } from './utils';
-import { charmPlugin } from './components/charm/charm.plugins';
+import { userDataPlugin } from './components/charm/charm.plugins';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -73,7 +73,7 @@ export function charmEditorPlugins (
         }
       })
     }),
-    charmPlugin({
+    userDataPlugin({
       userId,
       pageId,
       spaceId
