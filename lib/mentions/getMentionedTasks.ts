@@ -203,7 +203,7 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
             bountyId: null,
             bountyTitle: null,
             commentId: comment.id,
-            type: 'comment'
+            type: 'page'
           };
         }
       });
@@ -239,7 +239,7 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
   });
 
   return {
-    marked: mentionedTasks.marked.sort((mentionTaskA, mentionTaskB) => mentionTaskA.createdAt > mentionTaskB.createdAt ? 1 : -1),
-    unmarked: mentionedTasks.unmarked.sort((mentionTaskA, mentionTaskB) => mentionTaskA.createdAt > mentionTaskB.createdAt ? 1 : -1)
+    marked: mentionedTasks.marked.sort((mentionTaskA, mentionTaskB) => mentionTaskA.createdAt > mentionTaskB.createdAt ? -1 : 1),
+    unmarked: mentionedTasks.unmarked.sort((mentionTaskA, mentionTaskB) => mentionTaskA.createdAt > mentionTaskB.createdAt ? -1 : 1)
   };
 }

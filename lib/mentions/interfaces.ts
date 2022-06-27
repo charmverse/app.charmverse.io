@@ -34,21 +34,4 @@ export interface BountyMentionedTask {
   type: 'bounty'
 }
 
-export interface CommentMentionedTask {
-  spaceId: string
-  spaceDomain: string
-  spaceName: string
-  pageId: string
-  pagePath: string
-  pageTitle: string
-  bountyId: string | null
-  bountyTitle: string | null
-  commentId: string
-  mentionId: string
-  createdAt: string
-  createdBy: User | null
-  text: string
-  type: 'comment'
-}
-
-export type MentionedTask = PageMentionedTask | BountyMentionedTask | CommentMentionedTask
+export type MentionedTask = PageMentionedTask | BountyMentionedTask

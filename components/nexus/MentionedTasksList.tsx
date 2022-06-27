@@ -40,11 +40,7 @@ function MentionedTaskRow (
     mentionTitle = `${bountyTitle || 'Untitled'} in ${spaceName}`;
   }
   else if (type === 'page') {
-    mentionLink = `${baseUrl}/${spaceDomain}/${pagePath}?mentionId=${mentionId}`;
-    mentionTitle = `${pageTitle || 'Untitled'} in ${spaceName}`;
-  }
-  else if (type === 'comment') {
-    mentionLink = `${baseUrl}/${spaceDomain}/${pagePath}?commentId=${commentId}`;
+    mentionLink = `${baseUrl}/${spaceDomain}/${pagePath}?${commentId ? `commentId=${commentId}` : `mentionId=${mentionId}`}`;
     mentionTitle = `${pageTitle || 'Untitled'} in ${spaceName}`;
   }
 
