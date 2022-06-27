@@ -263,6 +263,34 @@ describe('addBountyPermissionGroup', () => {
 
   });
 
+  it('should fail if any other level than viewer is assigned to the public', async () => {
+
+    const bounty = await generateBounty({
+      approveSubmitters: false,
+      createdBy: user.id,
+      spaceId: space.id,
+      status: 'open',
+      maxSubmissions: 1
+    });
+
+    try {
+      await addBountyPermissionGroup({
+        assignee: {
+          group: 'public',
+          id: undefined
+        },
+        // Too high permission level for reviewers
+        level: 'reviewer',
+        resourceId: bounty.id
+      });
+      throw new ExpectedAnError();
+    }
+    catch (err) {
+      expect(err).toBeInstanceOf(InsecureOperationError);
+    }
+
+  });
+
   it('should fail if the bounty does not exist', async () => {
     try {
       await addBountyPermissionGroup({

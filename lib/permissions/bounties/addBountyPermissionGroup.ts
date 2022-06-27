@@ -30,6 +30,10 @@ export async function addBountyPermissionGroup ({
     throw new DataNotFoundError(`Bounty with id ${resourceId} not found`);
   }
 
+  if (assignee.group === 'public' && level !== 'viewer') {
+    throw new InsecureOperationError('Only \'viewer\' permissions can be assigned to the \'public\' group');
+  }
+
   // Validate assignees
   if (!assigneeGroupIsValid(assignee.group)) {
     throw new InvalidInputError(`Invalid permission assignee group: '${assignee.group}'`);
