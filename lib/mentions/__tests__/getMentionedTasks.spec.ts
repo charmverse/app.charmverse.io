@@ -145,19 +145,21 @@ describe('getMentionedTasks', () => {
     expect(marked[0].mentionId).toBe(mentionIds[0]);
     expect(marked[0].pageId).toBe(page1.id);
 
-    expect(unmarked[0].mentionId).toBe(mentionIds[3]);
+    expect(unmarked[0].mentionId).toBe(mentionIds[11]);
     expect(unmarked[0].pageId).toBe(page2.id);
+    expect(unmarked[0].commentId).toBe(comment2.id);
 
-    expect(unmarked[1].mentionId).toBe(mentionIds[4]);
-    expect(unmarked[1].bountyId).toBe(bounty1.id);
+    expect(unmarked[1].mentionId).toBe(mentionIds[8]);
+    expect(unmarked[1].commentId).toBe(comment1.id);
+    expect(unmarked[1].pageId).toBe(page1.id);
+
     expect(unmarked[2].mentionId).toBe(mentionIds[7]);
     expect(unmarked[2].bountyId).toBe(bounty2.id);
 
-    expect(unmarked[3].mentionId).toBe(mentionIds[8]);
-    expect(unmarked[3].commentId).toBe(comment1.id);
-    expect(unmarked[3].pageId).toBe(page1.id);
-    expect(unmarked[4].mentionId).toBe(mentionIds[11]);
-    expect(unmarked[4].commentId).toBe(comment2.id);
+    expect(unmarked[3].mentionId).toBe(mentionIds[4]);
+    expect(unmarked[3].bountyId).toBe(bounty1.id);
+
+    expect(unmarked[4].mentionId).toBe(mentionIds[3]);
     expect(unmarked[4].pageId).toBe(page2.id);
   });
 });
