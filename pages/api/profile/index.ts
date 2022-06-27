@@ -56,7 +56,8 @@ async function getUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser |
         }
       },
       discordUser: true,
-      telegramUser: true
+      telegramUser: true,
+      notificationState: true
     }
   });
   if (!profile) {
