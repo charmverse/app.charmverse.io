@@ -48,10 +48,6 @@ export default function PageTitle ({ value, onChange, readOnly }: PageTitleProps
   const view = useContext(EditorViewContext);
   const [title, setTitle] = useState(value);
 
-  useEffect(() => {
-    setTitle(value);
-  }, [value]);
-
   function _onChange (event: ChangeEvent<HTMLInputElement>) {
     setTitle(event.target.value);
     onChange(event);
