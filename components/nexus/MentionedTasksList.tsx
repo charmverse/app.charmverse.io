@@ -10,6 +10,8 @@ import { useEffect } from 'react';
 import charmClient from 'charmClient';
 import { GetTasksResponse } from 'pages/api/tasks/list';
 import { KeyedMutator } from 'swr';
+import BountyIcon from '@mui/icons-material/RequestPage';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 
 function MentionedTaskRow (
   {
@@ -21,10 +23,26 @@ function MentionedTaskRow (
     pageTitle,
     mentionId,
     createdBy,
-    text
+    text,
+    bountyId,
+    bountyTitle,
+    type,
+    commentId
   }: MentionedTask & { marked: boolean }
 ) {
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : null;
+
+  let mentionLink = '';
+  let mentionTitle = '';
+
+  if (type === 'bounty') {
+    mentionLink = `${baseUrl}/${spaceDomain}/bounties/${bountyId}?mentionId=${mentionId}`;
+    mentionTitle = `${bountyTitle || 'Untitled'} in ${spaceName}`;
+  }
+  else if (type === 'page') {
+    mentionLink = `${baseUrl}/${spaceDomain}/${pagePath}?${commentId ? `commentId=${commentId}` : `mentionId=${mentionId}`}`;
+    mentionTitle = `${pageTitle || 'Untitled'} in ${spaceName}`;
+  }
 
   return (
     <Box position='relative'>
@@ -39,7 +57,7 @@ function MentionedTaskRow (
           }}
         />
       ) : null}
-      <Link target='_blank' href={baseUrl ? `${baseUrl}/${spaceDomain}/${pagePath}?mentionId=${mentionId}` : ''}>
+      <Link target='_blank' href={mentionLink}>
         <Card key={mentionId} sx={{ width: '100%', opacity: marked ? 0.75 : 1, px: 2, py: 1, my: 2, borderLeft: 0, borderRight: 0 }} variant='outlined'>
           <Grid justifyContent='space-between' alignItems='center' gap={1} container>
             <Grid
@@ -51,11 +69,14 @@ function MentionedTaskRow (
                 overflow: 'hidden',
                 whiteSpace: 'nowrap',
                 textOverflow: 'ellipsis',
-                mr: 1
+                mr: 1,
+                alignItems: 'center',
+                display: 'flex',
+                gap: 0.5
               }}
               fontSize={{ sm: 16, xs: 18 }}
             >
-              {text}
+              {type === 'bounty' ? <BountyIcon fontSize='small' /> : type === 'page' ? <DescriptionOutlinedIcon fontSize='small' /> : null} {text}
             </Grid>
             <Grid
               item
@@ -82,7 +103,7 @@ function MentionedTaskRow (
                 gap: 0.5
               }}
               >
-                {pageTitle || 'Untitled'} in {spaceName}
+                {mentionTitle}
               </Box>
             </Grid>
             <Grid

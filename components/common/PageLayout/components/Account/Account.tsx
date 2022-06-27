@@ -119,24 +119,26 @@ function Account (): JSX.Element {
             borderBottomLeftRadius: '0 !important'
           }) : {}}
           endIcon={(
-            <Badge
-              color='error'
-              sx={{
-                '& .MuiBadge-badge:hover': {
-                  transform: 'scale(1.25) translate(50%, -50%)',
-                  transition: '250ms ease-in-out transform'
-                }
-              }}
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                router.push('/nexus');
-              }}
-              badgeContent={totalTasks}
-              max={10}
-            >
-              <Avatar avatar={user?.avatar} name={user?.username || ''} size='small' />
-            </Badge>
+            totalTasks !== 0 ? (
+              <Badge
+                color='error'
+                sx={{
+                  '&:hover .MuiBadge-badge': {
+                    transform: 'scale(1.25) translate(50%, -50%)',
+                    transition: '250ms ease-in-out transform'
+                  }
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  router.push('/nexus');
+                }}
+                badgeContent={totalTasks}
+                max={10}
+              >
+                <Avatar avatar={user?.avatar} name={user?.username || ''} size='small' />
+              </Badge>
+            ) : <Avatar avatar={user?.avatar} name={user?.username || ''} size='small' />
             )}
         >
           {user?.username}
