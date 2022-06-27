@@ -1,6 +1,6 @@
 import { BaseRawNodeSpec, NodeViewProps, Plugin, RawSpecs } from '@bangle.dev/core';
 import { DOMOutputSpec, EditorState, EditorView, Node, Slice, Transaction } from '@bangle.dev/pm';
-
+import { Document, Page } from 'react-pdf';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
@@ -8,7 +8,7 @@ import { Box, ListItem, Typography } from '@mui/material';
 import charmClient from 'charmClient';
 import { HTMLAttributes, memo, useCallback } from 'react';
 import PdfSelector from 'components/common/PdfSelector';
-import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/image/constants';
+import { MIN_PDF_WIDTH, MAX_PDF_WIDTH } from 'lib/image/constants';
 import Resizable from './Resizable/Resizable';
 
 const StyledEmptyPDFContainer = styled(Box)`
@@ -83,14 +83,15 @@ export function pdfSpec () {
     type: 'node',
     schema: {
       attrs: {
-        base: {
+        src: {
           default: null
         },
-        quote: {
-          default: null
+        size: {
+          default: (MIN_PDF_WIDTH + MAX_PDF_WIDTH) / 2
         }
       },
       group: 'block',
+      draggable: false,
       parseDOM: [{ tag: 'div.charm-pdf' }],
       toDOM: (): DOMOutputSpec => {
         return ['div.charm-pdf'];
@@ -140,19 +141,23 @@ function ResizablePDF ({ readOnly, onResizeStop, node, updateAttrs, selected }:
 
   if (readOnly) {
     return (
-      <Box></Box>
+      <Document file={node.attrs.src}>
+        <Page pageNumber={1} />
+      </Document>
     );
   }
   else {
     return (
       <Resizable
         initialSize={node.attrs.size}
-        minWidth={MIN_IMAGE_WIDTH}
+        minWidth={MIN_PDF_WIDTH}
         updateAttrs={updateAttrs}
         onDelete={onDelete}
         onResizeStop={onResizeStop}
       >
-        <Box></Box>
+        <Document file={node.attrs.src}>
+          <Page pageNumber={1} />
+        </Document>
       </Resizable>
     );
   }

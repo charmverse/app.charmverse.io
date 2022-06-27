@@ -36,13 +36,14 @@ import * as columnLayout from './components/columnLayout';
 import LayoutColumn from './components/columnLayout/Column';
 import LayoutRow from './components/columnLayout/Row';
 import { CryptoPrice, cryptoPriceSpec } from './components/CryptoPrice';
-import ResizablePDF, { pdfSpec } from './components/PDFSelection';
+import { pdfSpec } from './components/ResizablePDF';
 import InlinePalette, { plugins as inlinePalettePlugins, spec as inlinePaletteSpecs } from './components/inlinePalette';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
 import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList, nestedPageSpec } from './components/nestedPage';
 import Placeholder from './components/Placeholder';
 import Quote, * as quote from './components/quote';
 import * as iframe from './components/iframe';
+import PDFViewer from './components/PDFViewer';
 import ResizableImage, { imageSpec } from './components/ResizableImage';
 import * as trailingNode from './components/trailingNode';
 import * as tabIndent from './components/tabIndent';
@@ -513,7 +514,7 @@ function CharmEditor (
           }
           case 'pdf': {
             return (
-              <ResizablePDF
+              <PDFViewer
                 readOnly={readOnly}
                 onResizeStop={onResizeStop}
                 {...props}
