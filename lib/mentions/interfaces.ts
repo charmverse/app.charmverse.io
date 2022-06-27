@@ -38,9 +38,9 @@ export interface CommentMentionedTask {
   spaceId: string
   spaceDomain: string
   spaceName: string
-  pageId: string | null
-  pagePath: string | null
-  pageTitle: string | null
+  pageId: string
+  pagePath: string
+  pageTitle: string
   bountyId: string | null
   bountyTitle: string | null
   commentId: string

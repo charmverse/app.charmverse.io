@@ -110,7 +110,14 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
       id: true,
       userId: true,
       spaceId: true,
-      content: true
+      content: true,
+      page: {
+        select: {
+          title: true,
+          id: true,
+          path: true
+        }
+      }
     }
   });
 
@@ -185,13 +192,13 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
           mentionedTasksWithoutUserRecord[mention.id] = {
             mentionId: mention.id,
             createdAt: mention.createdAt,
-            pageId: null,
+            pageId: comment.page.id,
             spaceId: comment.spaceId,
             spaceDomain: spaceRecord[comment.spaceId].domain,
-            pagePath: null,
+            pagePath: comment.page.path,
             spaceName: spaceRecord[comment.spaceId].name,
             userId: mention.createdBy,
-            pageTitle: null,
+            pageTitle: comment.page.title,
             text: mention.text,
             bountyId: null,
             bountyTitle: null,

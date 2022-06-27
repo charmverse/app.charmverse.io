@@ -44,7 +44,7 @@ function MentionedTaskRow (
   }
   else if (type === 'comment') {
     mentionLink = `${baseUrl}/${spaceDomain}/${pagePath}`; // No possible way to scroll to the correct mention as its inside a comment
-    mentionTitle = `Comment in ${spaceName}`;
+    mentionTitle = `${pageTitle || 'Untitled'} in ${spaceName}`;
   }
 
   return (
