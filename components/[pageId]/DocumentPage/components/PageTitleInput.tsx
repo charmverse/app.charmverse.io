@@ -2,7 +2,7 @@ import { EditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import { TextField, Typography } from '@mui/material';
 import { TextSelection } from 'prosemirror-state';
-import { ChangeEvent, useContext, useEffect, useState } from 'react';
+import { ChangeEvent, useContext, useEffect, useRef, useState } from 'react';
 
 const StyledPageTitle = styled(TextField)`
   &.MuiFormControl-root {
@@ -47,6 +47,14 @@ interface PageTitleProps {
 export default function PageTitle ({ value, onChange, readOnly }: PageTitleProps) {
   const view = useContext(EditorViewContext);
   const [title, setTitle] = useState(value);
+  const titleInput = useRef(null);
+
+  // sync value with updates if input is not focused
+  useEffect(() => {
+    if (document.activeElement !== titleInput.current) {
+      setTitle(value);
+    }
+  }, [value]);
 
   function _onChange (event: ChangeEvent<HTMLInputElement>) {
     setTitle(event.target.value);
@@ -58,6 +66,7 @@ export default function PageTitle ({ value, onChange, readOnly }: PageTitleProps
   }
   return (
     <StyledPageTitle
+      inputRef={titleInput}
       value={title}
       onChange={_onChange}
       placeholder='Untitled'
