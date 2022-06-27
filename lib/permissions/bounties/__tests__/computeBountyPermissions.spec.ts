@@ -1,0 +1,348 @@
+
+import { BountyOperation } from '@prisma/client';
+import { prisma } from 'db';
+import { assignRole } from 'lib/roles';
+import { typedKeys } from 'lib/utilities/objects';
+import { generateBounty, generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { v4 } from 'uuid';
+import { addBountyPermissionGroup } from '../addBountyPermissionGroup';
+import { computeBountyPermissions } from '../computeBountyPermissions';
+import { bountyPermissionMapping } from '../mapping';
+
+describe('computeBountyPermissions', () => {
+
+  it('should combine permissions from user, role assignments and space membership', async () => {
+
+    const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
+
+    const bounty = await generateBounty({
+      createdBy: user.id,
+      approveSubmitters: true,
+      spaceId: space.id,
+      status: 'open'
+    });
+
+    const role = await generateRole({
+      spaceId: space.id,
+      createdBy: user.id
+    });
+
+    await assignRole({
+      roleId: role.id,
+      userId: user.id
+    });
+
+    await Promise.all([
+      addBountyPermissionGroup({
+        resourceId: bounty.id,
+        level: 'reviewer',
+        assignee: {
+          group: 'user',
+          id: user.id
+        }
+      }),
+      addBountyPermissionGroup({
+        resourceId: bounty.id,
+        level: 'submitter',
+        assignee: {
+          group: 'role',
+          id: role.id
+        }
+      }),
+      addBountyPermissionGroup({
+        resourceId: bounty.id,
+        level: 'viewer',
+        assignee: {
+          group: 'space',
+          id: space.id
+        }
+      })
+    ]);
+
+    const computed = await computeBountyPermissions({
+      allowAdminBypass: false,
+      resourceId: bounty.id,
+      userId: user.id
+    });
+
+    bountyPermissionMapping.viewer.forEach(op => {
+      expect(computed[op]).toBe(true);
+    });
+
+    bountyPermissionMapping.submitter.forEach(op => {
+      expect(computed[op]).toBe(true);
+    });
+
+    bountyPermissionMapping.reviewer.forEach(op => {
+      expect(computed[op]).toBe(true);
+    });
+
+  });
+
+  it('should give user space permissions via their role', async () => {
+    const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
+
+    const bounty = await generateBounty({
+      createdBy: user.id,
+      approveSubmitters: true,
+      spaceId: space.id,
+      status: 'open'
+    });
+
+    const role = await generateRole({
+      spaceId: space.id,
+      createdBy: user.id
+    });
+
+    await assignRole({
+      roleId: role.id,
+      userId: user.id
+    });
+
+    await addBountyPermissionGroup({
+      resourceId: bounty.id,
+      level: 'submitter',
+      assignee: {
+        group: 'role',
+        id: role.id
+      }
+    });
+
+    const availableOperations = bountyPermissionMapping.submitter;
+
+    const computed = await computeBountyPermissions({
+      allowAdminBypass: false,
+      resourceId: bounty.id,
+      userId: user.id
+    });
+
+    typedKeys(BountyOperation).forEach(op => {
+      if (availableOperations.indexOf(op) > -1) {
+        expect(computed[op]).toBe(true);
+      }
+      else {
+        expect(computed[op]).toBe(false);
+      }
+    });
+
+  });
+
+  it('should give user space permissions via their space membership', async () => {
+    const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
+
+    const bounty = await generateBounty({
+      createdBy: user.id,
+      approveSubmitters: true,
+      spaceId: space.id,
+      status: 'open'
+    });
+
+    await addBountyPermissionGroup({
+      resourceId: bounty.id,
+      level: 'reviewer',
+      assignee: {
+        group: 'space',
+        id: space.id
+      }
+    });
+
+    const availableOperations = bountyPermissionMapping.reviewer;
+
+    const computed = await computeBountyPermissions({
+      allowAdminBypass: false,
+      resourceId: bounty.id,
+      userId: user.id
+    });
+
+    typedKeys(BountyOperation).forEach(op => {
+      if (availableOperations.indexOf(op) > -1) {
+        expect(computed[op]).toBe(true);
+      }
+      else {
+        expect(computed[op]).toBe(false);
+      }
+    });
+  });
+
+  it('should give user space permissions as an individual', async () => {
+    const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
+
+    const bounty = await generateBounty({
+      createdBy: user.id,
+      approveSubmitters: true,
+      spaceId: space.id,
+      status: 'open'
+    });
+
+    await addBountyPermissionGroup({
+      resourceId: bounty.id,
+      level: 'reviewer',
+      assignee: {
+        group: 'user',
+        id: user.id
+      }
+    });
+
+    const availableOperations = bountyPermissionMapping.reviewer;
+
+    const computed = await computeBountyPermissions({
+      allowAdminBypass: false,
+      resourceId: bounty.id,
+      userId: user.id
+    });
+
+    typedKeys(BountyOperation).forEach(op => {
+      if (availableOperations.indexOf(op) > -1) {
+        expect(computed[op]).toBe(true);
+      }
+      else {
+        expect(computed[op]).toBe(false);
+      }
+    });
+  });
+
+  it('should return true to all operations if user is a space admin and admin bypass was enabled', async () => {
+
+    const { space, user } = await generateUserAndSpaceWithApiToken(undefined, true);
+
+    const bounty = await generateBounty({
+      createdBy: user.id,
+      approveSubmitters: true,
+      spaceId: space.id,
+      status: 'open'
+    });
+
+    const computed = await computeBountyPermissions({
+      allowAdminBypass: true,
+      resourceId: bounty.id,
+      userId: user.id
+    });
+
+    typedKeys(BountyOperation).forEach(op => {
+      expect(computed[op]).toBe(true);
+    });
+
+  });
+
+  it('should return true only for operations the user has access to if they are a space admin and admin bypass was disabled', async () => {
+    const { space, user } = await generateUserAndSpaceWithApiToken(undefined, true);
+
+    const bounty = await generateBounty({
+      createdBy: user.id,
+      approveSubmitters: true,
+      spaceId: space.id,
+      status: 'open'
+    });
+
+    const computed = await computeBountyPermissions({
+      allowAdminBypass: false,
+      resourceId: bounty.id,
+      userId: user.id
+    });
+
+    typedKeys(BountyOperation).forEach(op => {
+      expect(computed[op]).toBe(false);
+    });
+
+  });
+
+  it('should contain all Bounty Operations as keys, with no additional or missing properties', async () => {
+    const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
+
+    const bounty = await generateBounty({
+      createdBy: user.id,
+      approveSubmitters: true,
+      spaceId: space.id,
+      status: 'open'
+    });
+
+    const computedPermissions = await computeBountyPermissions({
+      allowAdminBypass: false,
+      resourceId: bounty.id,
+      userId: user.id
+    });
+
+    // Check the object has no extra keys
+    typedKeys(computedPermissions).forEach(key => {
+      expect(BountyOperation[key]).toBeDefined();
+    });
+
+    // Check the object has no missing keys
+    typedKeys(BountyOperation).forEach(key => {
+      expect(computedPermissions[key]).toBeDefined();
+    });
+
+  });
+
+  it('should return true only for public operations if the the user is not a member of the space', async () => {
+
+    const { user, space } = await generateUserAndSpaceWithApiToken(undefined, true);
+
+    const { user: externalUser } = await generateUserAndSpaceWithApiToken(undefined, true);
+
+    const bounty = await generateBounty({
+      createdBy: user.id,
+      approveSubmitters: true,
+      spaceId: space.id,
+      status: 'open'
+    });
+
+    await addBountyPermissionGroup({
+      resourceId: bounty.id,
+      assignee: {
+        group: 'public',
+        id: undefined
+      },
+      level: 'viewer'
+    });
+
+    // Add Bounty Permissions should fail adding insecure permissions, so we bypass the business logic and go straight to the database
+    await prisma.bountyPermission.create({
+      data: {
+        // A very high permission level external user shouldn't have
+        permissionLevel: 'creator',
+        bounty: {
+          connect: {
+            id: bounty.id
+          }
+        },
+        user: {
+          connect: {
+            id: externalUser.id
+          }
+        }
+      }
+    });
+
+    const computedPermissions = await computeBountyPermissions({
+      allowAdminBypass: true,
+      resourceId: bounty.id,
+      userId: externalUser.id
+    });
+
+    const availableOperations = bountyPermissionMapping.viewer;
+
+    // We should only have the view permission that was assigned to the public, not the one assigned to this user
+    typedKeys(BountyOperation).forEach(op => {
+      if (availableOperations.indexOf(op) > -1) {
+        expect(computedPermissions[op]).toBe(true);
+      }
+      else {
+        expect(computedPermissions[op]).toBe(false);
+      }
+    });
+
+  });
+
+  it('should return empty permissions if the bounty does not exist', async () => {
+    const computed = await computeBountyPermissions({
+      allowAdminBypass: true,
+      resourceId: v4()
+    });
+
+    typedKeys(BountyOperation).forEach(op => {
+      expect(computed[op]).toBe(false);
+    });
+  });
+
+});
