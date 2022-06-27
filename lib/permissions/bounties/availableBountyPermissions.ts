@@ -3,6 +3,9 @@ import { BountyPermissionFlags } from './interfaces';
 import { Permissions } from '../permissions.class';
 
 export class AvailableBountyPermissions extends Permissions<BountyOperation> implements BountyPermissionFlags {
+
+  grant_permissions: boolean = false;
+
   work: boolean = false;
 
   review: boolean = false;

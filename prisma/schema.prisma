@@ -310,6 +310,7 @@ enum BountyOperation {
   delete
   lock
   approve_applications
+  grant_permissions
 }
 
 
