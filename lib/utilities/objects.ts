@@ -11,3 +11,10 @@ export function filterObjectKeys<T, F extends FilterMode, K extends keyof T> (ob
     return omit(obj as any, keys) as any;
   }
 }
+
+/**
+ * Object.keys with inbuilt typing
+ */
+export function typedKeys<T> (obj: T): (keyof T)[] {
+  return Object.keys(obj) as (keyof T)[];
+}
