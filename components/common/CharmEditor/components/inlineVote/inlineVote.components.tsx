@@ -1,20 +1,26 @@
 import { PluginKey, TextSelection } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { hideSelectionTooltip } from '@bangle.dev/tooltip/selection-tooltip';
-import { ClickAwayListener, Grow, IconButton, TextField } from '@mui/material';
-import { Box, darken, lighten, useTheme } from '@mui/system';
+import CancelIcon from '@mui/icons-material/Cancel';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
+import { ClickAwayListener, FormControlLabel, Grow, IconButton, List, ListItem, ListItemText, Radio, RadioGroup, TextField, Typography } from '@mui/material';
+import { Box, useTheme } from '@mui/system';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import Button from 'components/common/Button';
+import FieldLabel from 'components/common/form/FieldLabel';
 import { usePages } from 'hooks/usePages';
+import { DateTime } from 'luxon';
 import { PageContent } from 'models';
 import { useState } from 'react';
 import { v4 } from 'uuid';
-import { DateTime } from 'luxon';
-import CancelIcon from '@mui/icons-material/Cancel';
-import FieldLabel from 'components/common/form/FieldLabel';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { AddCircle } from '@mui/icons-material';
 import InlineCharmEditor from '../../InlineCharmEditor';
 import { checkForEmpty } from '../../utils';
 import { updateInlineVote } from './inlineVote.utils';
+
+type VoteType = 'boolean' | 'options';
 
 export function InlineVoteSubMenu ({ pluginKey }: {pluginKey: PluginKey}) {
   const view = useEditorViewContext();
@@ -28,7 +34,9 @@ export function InlineVoteSubMenu ({ pluginKey }: {pluginKey: PluginKey}) {
       }
     ]
   });
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [voteType, setVoteType] = useState<VoteType>('boolean');
+  const [options, setOptions] = useState(['', '', '']);
+
   const [deadline, setDeadline] = useState(DateTime.fromMillis(Date.now()));
   const { currentPageId } = usePages();
   const isEmpty = checkForEmpty(voteDescription);
@@ -57,8 +65,17 @@ export function InlineVoteSubMenu ({ pluginKey }: {pluginKey: PluginKey}) {
         }}
         timeout={150}
       >
-
-        <Box flexDirection='column' gap={2} m={1} display='flex' width='400px'>
+        <Box
+          flexDirection='column'
+          gap={1.5}
+          m={1}
+          display='flex'
+          width='400px'
+          sx={{
+            height: 400,
+            overflowY: 'scroll'
+          }}
+        >
           <Box flexDirection='column' display='flex'>
             <FieldLabel>Title</FieldLabel>
             <TextField
@@ -112,7 +129,75 @@ export function InlineVoteSubMenu ({ pluginKey }: {pluginKey: PluginKey}) {
               )}
             />
           </Box>
-
+          <RadioGroup
+            row
+            defaultValue='boolean'
+            value={voteType}
+            onChange={(e) => {
+              setVoteType(e.target.value as VoteType);
+            }}
+          >
+            <FormControlLabel
+              value='boolean'
+              control={<Radio />}
+              label='Yes / No'
+            />
+            <FormControlLabel value='options' control={<Radio />} label='# Options' />
+          </RadioGroup>
+          {voteType === 'boolean' ? (
+            <List>
+              <ListItem sx={{ p: 0 }}>
+                <CheckCircleIcon fontSize='small' sx={{ mr: 1 }} />
+                <ListItemText>Yes</ListItemText>
+              </ListItem>
+              <ListItem sx={{ p: 0 }}>
+                <CancelIcon fontSize='small' sx={{ mr: 1 }} />
+                <ListItemText>No</ListItemText>
+              </ListItem>
+              <ListItem sx={{ p: 0 }}>
+                <RemoveCircleIcon fontSize='small' sx={{ mr: 1 }} />
+                <ListItemText>Abstain</ListItemText>
+              </ListItem>
+            </List>
+          ) : (
+            <List>
+              {options.map((option, index) => (
+                <ListItem sx={{ px: 0, display: 'flex', gap: 1 }}>
+                  <TextField
+                    fullWidth
+                    placeholder={`Option ${index + 1}`}
+                    value={option}
+                    onChange={(e) => {
+                      options[index] = e.target.value;
+                      setOptions([...options]);
+                    }}
+                  />
+                  <IconButton
+                    disabled={options.length === 2}
+                    size='small'
+                    onClick={() => {
+                      setOptions([...options.slice(0, index), ...options.slice(index + 1)]);
+                    }}
+                  >
+                    <DeleteIcon fontSize='small' />
+                  </IconButton>
+                </ListItem>
+              ))}
+              <Box display='flex' gap={0.5} alignItems='center'>
+                <IconButton
+                  size='small'
+                  onClick={() => {
+                    setOptions([...options, '']);
+                  }}
+                >
+                  <AddCircle fontSize='small' />
+                </IconButton>
+                <Typography variant='subtitle1'>
+                  Add Option
+                </Typography>
+              </Box>
+            </List>
+          ) }
           <Button
             size='small'
             onClick={handleSubmit}
