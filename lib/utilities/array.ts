@@ -39,7 +39,7 @@ export function uniqueValues<T = any> (values: T []): T [] {
 // Flattens an object with list of arrays to a single list
 export function flatArrayMap<T> (obj: {[key: string]: T[]}): T[] {
   return Object.keys(obj).reduce((list, key) => {
-    list.push(obj[key] as any);
+    list.push(...obj[key] as any);
     return list;
   }, [] as T[]);
 }
