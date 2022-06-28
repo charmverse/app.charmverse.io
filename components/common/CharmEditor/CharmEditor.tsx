@@ -42,6 +42,7 @@ import EmojiSuggest, * as emoji from './components/emojiSuggest';
 import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
 import * as iframe from './components/iframe';
 import InlineCommentThread, * as inlineComment from './components/inlineComment';
+import * as inlineVote from './components/inlineVote';
 import InlinePalette, { plugins as inlinePalettePlugins, spec as inlinePaletteSpecs } from './components/inlinePalette';
 import Mention, { mentionPluginKeyName, mentionPlugins, mentionSpecs, MentionSuggest } from './components/mention';
 import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList, nestedPageSpec } from './components/nestedPage';
@@ -67,6 +68,7 @@ const mentionPluginKey = new PluginKey(mentionPluginKeyName);
 const floatingMenuPluginKey = new PluginKey('floatingMenu');
 const nestedPagePluginKey = new PluginKey(nestedPagePluginKeyName);
 const inlineCommentPluginKey = new PluginKey(inlineComment.pluginKeyName);
+const inlineVotePluginKey = new PluginKey(inlineVote.pluginKeyName);
 
 export const specRegistry = new SpecRegistry([
   // Comments to the right of each spec show if it supports markdown export
@@ -77,6 +79,7 @@ export const specRegistry = new SpecRegistry([
   // MAKE SURE THIS IS ALWAYS AT THE TOP! Or deleting all contents will leave the wrong component in the editor
   paragraph.spec(), // OK
   inlineComment.spec(),
+  inlineVote.spec(),
   bold.spec(), // OK
   bulletList.spec(), // OK
   hardBreak.spec(), // OK
@@ -226,6 +229,9 @@ export function charmEditorPlugins (
     basePlugins.push(inlineComment.plugin({
       key: inlineCommentPluginKey
     }));
+    basePlugins.push(inlineVote.plugin({
+      key: inlineVotePluginKey
+    }));
   }
 
   return () => basePlugins;
@@ -272,6 +278,16 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
     padding-bottom: 2px;
     &:hover {
       background: rgba(255,212,0,0.56) !important;
+    }
+    cursor: pointer;
+  }
+
+  .charm-inline-vote.active {
+    background: rgba(0,171,255,0.14);
+    border-bottom: 2px solid rgb(0,171,255);
+    padding-bottom: 2px;
+    &:hover {
+      background: rgba(0,171,255,0.56) !important;
     }
     cursor: pointer;
   }

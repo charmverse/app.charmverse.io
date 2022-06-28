@@ -108,7 +108,7 @@ export function queryIsSelectionAroundInlineComment () {
       && $to.pos - $from.pos === node.nodeSize
       // Id will be available after the thread has been created
       && !node.marks.find(mark => mark?.type?.name === markName)?.attrs.id
-      && !!state.doc.type.schema.marks['inline-comment'].isInSet(node.marks)
+      && !!state.doc.type.schema.marks[markName].isInSet(node.marks)
     );
   };
 }

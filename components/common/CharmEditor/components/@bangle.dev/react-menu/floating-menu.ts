@@ -7,7 +7,7 @@ import { PluginKey } from "prosemirror-state";
 import { markName as inlineCommentMarkName } from "../../inlineComment/inlineComment.constants"
 import { markName as inlineVoteMarkName } from "../../inlineVote/inlineVote.constants"
 
-export type SubMenu = 'linkSubMenu' | 'inlineCommentSubMenu' | 'inlineVoteSubMenu';
+export type SubMenu = 'defaultMenu' | 'linkSubMenu' | 'inlineCommentSubMenu' | 'inlineVoteSubMenu';
 
 export function toggleSubMenu(floatingMenuPluginKey: PluginKey, subMenu: SubMenu): Command {
   let nodeName = subMenu === "inlineCommentSubMenu" ? inlineCommentMarkName : subMenu === "inlineVoteSubMenu" ? inlineVoteMarkName : 'link'

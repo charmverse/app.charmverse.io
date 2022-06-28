@@ -3,6 +3,7 @@ import { PluginKey, TextSelection } from '@bangle.dev/pm';
 import { createTooltipDOM, tooltipPlacement } from '@bangle.dev/tooltip';
 import { highlightDomElement } from 'lib/browser';
 import { referenceElement, renderSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
+import { markName } from '../inlineComment/inlineComment.constants';
 
 export interface InlineCommentPluginState {
   tooltipContentDOM: HTMLElement
@@ -62,7 +63,7 @@ export function plugin ({ key } :{
             return true;
           }
           if (fromNodeAfter) {
-            const inlineCommentMark = view.state.doc.type.schema.marks['inline-comment'].isInSet(fromNodeAfter.marks);
+            const inlineCommentMark = view.state.doc.type.schema.marks[markName].isInSet(fromNodeAfter.marks);
             const pageThreadListNode = document.querySelector('.PageThreadListBox') as HTMLDivElement;
             // Page threads list node might not be present
             const isShowingCommentThreadsList = pageThreadListNode.style.visibility !== 'hidden';

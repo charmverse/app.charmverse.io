@@ -1,4 +1,4 @@
-import { EditorState } from '@bangle.dev/pm';
+import { Command, EditorState } from '@bangle.dev/pm';
 import { filter } from '@bangle.dev/utils';
 import { markName } from './inlineVote.constants';
 
@@ -12,6 +12,22 @@ export function queryIsInlineVoteAllowedInRange (from: number, to: number) {
     if ($from.parent === $to.parent && $from.parent.isTextblock) {
       return $from.parent.type.allowsMarkType(inlineVoteMark);
     }
+  };
+}
+
+export function queryIsSelectionAroundInlineVote () {
+  return (state: EditorState) => {
+    const { $from, $to } = state.selection;
+    const node = $from.nodeAfter;
+
+    return (
+      !!node
+      && $from.textOffset === 0
+      && $to.pos - $from.pos === node.nodeSize
+      // Id will be available after the thread has been created
+      && !node.marks.find(mark => mark?.type?.name === markName)?.attrs.id
+      && !!state.doc.type.schema.marks[markName].isInSet(node.marks)
+    );
   };
 }
 
@@ -36,4 +52,52 @@ export function createInlineVote () {
       return true;
     }
   );
+}
+
+function isTextAtPos (pos: number) {
+  return (state: EditorState) => {
+    const node = state.doc.nodeAt(pos);
+    return !!node && (node.isText || node.type.name.match(/(emoji|mention)/));
+  };
+}
+
+function setInlineVote (from: number, to: number, id?: string) {
+  return filter(
+    (state) => isTextAtPos(from)(state),
+    (state, dispatch) => {
+      const inlineVoteMark = getMarkFromState(state);
+      const tr = state.tr.removeMark(from, to, inlineVoteMark);
+      const mark = inlineVoteMark.create({
+        id
+      });
+      tr.addMark(from, to, mark);
+      if (dispatch) {
+        dispatch(tr);
+      }
+      return true;
+    }
+  );
+}
+
+export function updateInlineVote (id: string): Command {
+  return (state, dispatch) => {
+    if (!state.selection.empty) {
+      return setInlineVote(
+        state.selection.$from.pos,
+        state.selection.$to.pos,
+        id
+      )(state, dispatch);
+    }
+
+    const { $from } = state.selection;
+    const pos = $from.pos - $from.textOffset;
+    const node = state.doc.nodeAt(pos);
+    let to = pos;
+
+    if (node) {
+      to += node.nodeSize;
+    }
+
+    return setInlineVote(pos, to, id)(state, dispatch);
+  };
 }
