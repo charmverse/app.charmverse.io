@@ -1,6 +1,6 @@
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import { Box, Button, ClickAwayListener, Grow, Paper } from '@mui/material';
+import { Box, Button, ClickAwayListener, Grow, Paper, TextField } from '@mui/material';
 import { useThreads } from 'hooks/useThreads';
 import { createPortal } from 'react-dom';
 import { hideSelectionTooltip } from '@bangle.dev/tooltip/selection-tooltip';
