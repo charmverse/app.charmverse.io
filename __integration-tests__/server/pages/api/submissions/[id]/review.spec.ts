@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Application, Bounty, Space, User } from '@prisma/client';
 import request from 'supertest';
-import { baseUrl } from 'testing/mockApiCall';
+import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateBounty, generateBountyWithSingleApplication, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { ApplicationCreationData, SubmissionCreationData, SubmissionReview } from 'lib/applications/interfaces';
 import { createBounty } from 'lib/bounties';
@@ -17,11 +17,7 @@ beforeAll(async () => {
 
   nonAdminUser = generated.user;
   nonAdminUserSpace = generated.space;
-  nonAdminCookie = (await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: nonAdminUser.addresses[0]
-    })).headers['set-cookie'][0];
+  nonAdminCookie = await loginUser(nonAdminUser);
 });
 
 describe('POST /api/submissions/{submissionId}/review - review a submission', () => {
@@ -30,11 +26,7 @@ describe('POST /api/submissions/{submissionId}/review - review a submission', ()
 
     const reviewer = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
 
-    const reviewerCookie = (await request(baseUrl)
-      .post('/api/session/login')
-      .send({
-        address: reviewer.addresses[0]
-      })).headers['set-cookie'][0];
+    const reviewerCookie = await loginUser(reviewer);
 
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,
@@ -70,11 +62,7 @@ describe('POST /api/submissions/{submissionId}/review - review a submission', ()
 
     const adminUser = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: true });
 
-    const adminUserCookie = (await request(baseUrl)
-      .post('/api/session/login')
-      .send({
-        address: adminUser.addresses[0]
-      })).headers['set-cookie'][0];
+    const adminUserCookie = await loginUser(adminUser);
 
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,
@@ -100,11 +88,7 @@ describe('POST /api/submissions/{submissionId}/review - review a submission', ()
 
     const user = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
 
-    const userCookie = (await request(baseUrl)
-      .post('/api/session/login')
-      .send({
-        address: user.addresses[0]
-      })).headers['set-cookie'][0];
+    const userCookie = await loginUser(user);
 
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,
