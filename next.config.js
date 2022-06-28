@@ -17,7 +17,8 @@ const esmModules = [
   '@fullcalendar/daygrid',
   '@fullcalendar/interaction',
   '@fullcalendar/react',
-  'react-dnd'
+  'react-dnd',
+  'react-pdf'
 ];
 
 const config = {

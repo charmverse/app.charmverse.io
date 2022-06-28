@@ -1,6 +1,5 @@
-import { BaseRawNodeSpec, NodeViewProps, Plugin, RawSpecs } from '@bangle.dev/core';
-import { DOMOutputSpec, EditorState, EditorView, Node, Slice, Transaction } from '@bangle.dev/pm';
-import { Document, Page } from 'react-pdf';
+import { BaseRawNodeSpec, NodeViewProps, Plugin } from '@bangle.dev/core';
+import { DOMOutputSpec, EditorState, EditorView, Slice, Transaction } from '@bangle.dev/pm';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
@@ -9,7 +8,11 @@ import charmClient from 'charmClient';
 import { HTMLAttributes, memo, useCallback } from 'react';
 import PdfSelector from 'components/common/PdfSelector';
 import { MIN_PDF_WIDTH, MAX_PDF_WIDTH } from 'lib/image/constants';
+import { Document, Page, pdfjs } from 'react-pdf';
 import Resizable from './Resizable/Resizable';
+
+// https://github.com/wojtekmaj/react-pdf/issues/321#issuecomment-451291757
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
 const StyledEmptyPDFContainer = styled(Box)`
   display: flex;
@@ -155,8 +158,8 @@ function ResizablePDF ({ readOnly, onResizeStop, node, updateAttrs, selected }:
         onDelete={onDelete}
         onResizeStop={onResizeStop}
       >
-        <Document file={node.attrs.src}>
-          <Page pageNumber={1} />
+        <Document file={{ url: node.attrs.src }}>
+          <Page pageNumber={1} width={node.attrs.size} />
         </Document>
       </Resizable>
     );
