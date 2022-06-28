@@ -9,6 +9,9 @@ import { updateBountySettings, getBounty } from 'lib/bounties';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { rollupBountyStatus } from 'lib/bounties/rollupBountyStatus';
 import { requesterCanDeleteBounty } from 'lib/bounties/shared';
+import { computeBountyPermissions } from 'lib/permissions/bounties';
+import { typedKeys } from 'lib/utilities/objects';
+import { Bounty } from '@prisma/client';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -47,7 +50,7 @@ async function getBountyController (req: NextApiRequest, res: NextApiResponse<Bo
 async function updateBounty (req: NextApiRequest, res: NextApiResponse<BountyWithDetails>) {
   const { id } = req.query;
 
-  const { body } = req;
+  const body = (req.body ?? {}) as Partial<Bounty>;
 
   const bounty = await getBounty(id as string);
 
@@ -57,30 +60,22 @@ async function updateBounty (req: NextApiRequest, res: NextApiResponse<BountyWit
 
   const userId = req.session.user.id;
 
-  const { error, isAdmin } = await hasAccessToSpace({
-    userId,
-    spaceId: bounty.spaceId,
-    adminOnly: false
+  const permissions = await computeBountyPermissions({
+    allowAdminBypass: true,
+    resourceId: bounty.id,
+    userId
   });
 
-  // User not a space member
-  if (error) {
-    throw error;
+  if (!permissions.edit) {
+    throw new UnauthorisedActionError('You do not have permissions to edit this bounty.');
   }
 
-  // The suggester or admin can update a suggestion
-  if (bounty.status === 'suggestion' && !isAdmin && bounty.createdBy !== userId) {
-    throw new UnauthorisedActionError('You need to have created this suggestion or be a workspace admin to edit it.');
-
-  // The suggester or admin can update a bounty
-  // Keeping these logic branches separate for upcoming more fine grained bounty permissions
-  }
-  else if (bounty.status !== 'suggestion' && !isAdmin && bounty.createdBy !== userId) {
-    throw new UnauthorisedActionError('Only space administrators and the bounty creator can edit active bounties.');
-  }
-
-  if (bounty.status === 'suggestion' && bounty.createdBy === userId) {
-    delete body.rewardAmount;
+  if (bounty.status === 'suggestion') {
+    typedKeys(body).forEach(key => {
+      if (key !== 'title' && key !== 'description' && key !== 'descriptionNodes') {
+        delete body[key];
+      }
+    });
   }
 
   await updateBountySettings({
@@ -105,16 +100,23 @@ async function deleteBounty (req: NextApiRequest, res: NextApiResponse) {
 
   const userId = req.session.user.id;
 
-  const { error, isAdmin } = await hasAccessToSpace({
+  const { isAdmin } = await hasAccessToSpace({
     spaceId: bounty.spaceId,
     userId,
     adminOnly: false
   });
 
-  if (error) {
-    throw error;
+  const permissions = await computeBountyPermissions({
+    allowAdminBypass: true,
+    resourceId: bounty.id,
+    userId
+  });
+
+  if (!permissions.delete) {
+    throw new UnauthorisedActionError('You do not have permissions to delete this bounty.');
   }
 
+  // Permission Filtering Policy: No submissions must exist for a bounty to be deleted by non admin.
   const canDeleteBounty = requesterCanDeleteBounty({
     bounty,
     requesterCreatedBounty: bounty.createdBy === userId,
