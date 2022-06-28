@@ -1,9 +1,9 @@
-import { Button, TextField } from '@mui/material';
+import { Button } from '@mui/material';
 import { Box } from '@mui/system';
 import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
-import { ReactNode, useState } from 'react';
+import { ReactNode } from 'react';
 
 interface PdfSelectorProps {
   autoOpen?: boolean;
@@ -12,7 +12,6 @@ interface PdfSelectorProps {
 }
 
 export default function PdfSelector ({ autoOpen = false, children, onPdfSelect }: PdfSelectorProps) {
-  const [embedLink, setEmbedLink] = useState('');
   const tabs: [string, ReactNode][] = [];
 
   return (
@@ -47,30 +46,6 @@ export default function PdfSelector ({ autoOpen = false, children, onPdfSelect }
                       }
                     }}
                   />
-                </Button>
-              </Box>
-            ],
-            [
-              'Link',
-              <Box sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 2,
-                alignItems: 'center'
-              }}
-              >
-                <TextField autoFocus placeholder='Paste the PDF link...' value={embedLink} onChange={(e) => setEmbedLink(e.target.value)} />
-                <Button
-                  disabled={!embedLink}
-                  sx={{
-                    width: 250
-                  }}
-                  onClick={() => {
-                    onPdfSelect(embedLink);
-                    setEmbedLink('');
-                  }}
-                >
-                  Embed PDF
                 </Button>
               </Box>
             ]
