@@ -10,3 +10,8 @@ export interface RoleAssignment {
 }
 
 export type RoleWithMembers = Role & {users: User[]};
+
+/**
+ * Rollup of number of users in each role
+ */
+export type Roleup = Pick<Role, 'id' | 'name'> & {members: number}
