@@ -15,18 +15,6 @@ export async function approveApplication ({ applicationOrApplicationId, userId }
     throw new DataNotFoundError(`Application with id ${applicationOrApplicationId} was not found`);
   }
 
-  // Check the requester has access to this space
-  const { error, isAdmin } = await hasAccessToSpace({ userId, spaceId: application.bounty.spaceId, adminOnly: false });
-
-  if (error) {
-    throw error;
-  }
-
-  // Admin or reviewer can assign the application
-  if (isAdmin === false && application.bounty.reviewer !== userId) {
-    throw new UnauthorisedActionError('You do not have permissions to approve this application');
-  }
-
   const bounty = await getBounty(application.bountyId) as BountyWithDetails;
 
   const capReached = submissionsCapReached({ bounty, submissions: bounty.applications });
