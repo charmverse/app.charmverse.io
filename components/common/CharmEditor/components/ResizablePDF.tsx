@@ -141,7 +141,6 @@ function PDFViewer (props: PDFViewerProps) {
     <Box>
       <Document
         file={{ url }}
-        onLoadError={(error) => console.log(error)}
         onLoadSuccess={onDocumentLoadSuccess}
       >
         <Page pageNumber={pageNumber} width={width} />
@@ -198,9 +197,7 @@ function ResizablePDF ({ readOnly, onResizeStop, node, updateAttrs, selected }:
 
   if (readOnly) {
     return (
-      <Document file={node.attrs.src}>
-        <PDFViewer url={node.attrs.src} width={node.attrs.size} />
-      </Document>
+      <PDFViewer url={node.attrs.src} width={node.attrs.size} />
     );
   }
   else {
