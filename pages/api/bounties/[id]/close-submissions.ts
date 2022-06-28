@@ -1,8 +1,8 @@
 
 import { closeNewApplicationsAndSubmissions, getBounty } from 'lib/bounties';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { withSessionRoute } from 'lib/session/withSession';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { BountyWithDetails } from 'models';
 import { NextApiRequest, NextApiResponse } from 'next';
@@ -25,17 +25,13 @@ async function closeSubmissionsController (req: NextApiRequest, res: NextApiResp
 
   const userId = req.session.user.id;
 
-  const { error, isAdmin } = await hasAccessToSpace({
-    userId,
-    spaceId: bounty.spaceId,
-    adminOnly: false
+  const permissions = await computeBountyPermissions({
+    allowAdminBypass: true,
+    resourceId: bounty.id,
+    userId
   });
 
-  if (error) {
-    throw error;
-  }
-
-  if (bounty.reviewer !== userId && isAdmin !== true) {
+  if (!permissions.lock) {
     throw new UnauthorisedActionError('You cannot close submissions for this bounty.');
   }
 
