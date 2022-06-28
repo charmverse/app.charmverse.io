@@ -4,9 +4,13 @@ import { hasComponentInSchema } from "@bangle.dev/react-menu/helper";
 import { querySelectionTooltipType, hideSelectionTooltip, updateSelectionTooltipType } from "@bangle.dev/tooltip/selection-tooltip";
 import { rafCommandExec } from "@bangle.dev/utils";
 import { PluginKey } from "prosemirror-state";
+import { markName as inlineCommentMarkName } from "../../inlineComment/inlineComment.constants"
+import { markName as inlineVoteMarkName } from "../../inlineVote/inlineVote.constants"
 
-export function toggleSubMenu(floatingMenuPluginKey: PluginKey, subMenu: 'linkSubMenu' | 'inlineCommentSubMenu'): Command {
-  let nodeName = subMenu === "inlineCommentSubMenu" ? 'inline-comment' : 'link'
+export type SubMenu = 'linkSubMenu' | 'inlineCommentSubMenu' | 'inlineVoteSubMenu';
+
+export function toggleSubMenu(floatingMenuPluginKey: PluginKey, subMenu: SubMenu): Command {
+  let nodeName = subMenu === "inlineCommentSubMenu" ? inlineCommentMarkName : subMenu === "inlineVoteSubMenu" ? inlineVoteMarkName : 'link'
   return (state, _dispatch, view) => {
     const type = querySelectionTooltipType(floatingMenuPluginKey)(state);
 

@@ -9,7 +9,7 @@ import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-per
 import { NodeSelection } from 'prosemirror-state';
 import { LinkSubMenu } from './@bangle.dev/react-menu/LinkSubMenu';
 import { Menu } from './@bangle.dev/react-menu/Menu';
-import { BoldButton, CalloutButton, CodeButton, InlineCommentButton, FloatingLinkButton, HeadingButton, ItalicButton, ParagraphButton, StrikeButton, UnderlineButton } from './@bangle.dev/react-menu/MenuButtons';
+import { BoldButton, CalloutButton, CodeButton, InlineCommentButton, FloatingLinkButton, HeadingButton, ItalicButton, ParagraphButton, StrikeButton, UnderlineButton, InlineVoteButton } from './@bangle.dev/react-menu/MenuButtons';
 import { MenuGroup } from './@bangle.dev/react-menu/MenuGroup';
 import { queryIsSelectionAroundInlineComment } from './inlineComment';
 import { InlineCommentSubMenu } from './inlineComment/InlineComment.components';
@@ -34,7 +34,6 @@ export default function FloatingMenuComponent (
         if (type as FloatingMenuVariant === 'commentOnlyMenu' && permissions.comment) {
           return (
             <Menu>
-
               <InlineCommentButton enableComments menuKey={pluginKey} />
             </Menu>
           );
@@ -51,6 +50,7 @@ export default function FloatingMenuComponent (
                 <UnderlineButton />
                 <FloatingLinkButton menuKey={pluginKey} />
                 {!inline && permissions.comment && enableComments && <InlineCommentButton enableComments menuKey={pluginKey} />}
+                {!inline && permissions.comment && enableComments && <InlineVoteButton enableVotes menuKey={pluginKey} />}
               </MenuGroup>
               {!inline && (
               <MenuGroup isLastGroup>
