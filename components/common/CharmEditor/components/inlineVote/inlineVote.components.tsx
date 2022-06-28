@@ -1,7 +1,7 @@
 import { PluginKey, TextSelection } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { hideSelectionTooltip } from '@bangle.dev/tooltip/selection-tooltip';
-import { IconButton, TextField } from '@mui/material';
+import { ClickAwayListener, Grow, IconButton, TextField } from '@mui/material';
 import { Box, darken, lighten, useTheme } from '@mui/system';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import Button from 'components/common/Button';
@@ -45,73 +45,88 @@ export function InlineVoteSubMenu ({ pluginKey }: {pluginKey: PluginKey}) {
   };
 
   return (
-    <Box flexDirection='column' gap={2} m={1} display='flex' width='400px'>
-      <Box flexDirection='column' display='flex'>
-        <FieldLabel>Title</FieldLabel>
-        <TextField
-          placeholder="What's the vote?"
-          value={voteTitle}
-          onChange={(e) => {
-            setVoteTitle(e.target.value);
-          }}
-        />
-      </Box>
-      <Box flexGrow={1}>
-        <InlineCharmEditor
-          content={voteDescription}
-          style={{
-            fontSize: '14px',
-            borderColor: theme.palette.secondary.main,
-            borderWidth: '2px',
-            borderStyle: 'solid'
-          }}
-          placeholderText='Details (Optional)'
-          onContentChange={({ doc }) => {
-            setVoteDescription(doc);
-          }}
-        />
-      </Box>
-      <Box flexDirection='column' display='flex'>
-        <FieldLabel>Deadline</FieldLabel>
-        <DateTimePicker
-          minDate={DateTime.fromMillis(Date.now())}
-          value={deadline}
-          onAccept={async (value) => {
-            if (value) {
-              setDeadline(value);
-            }
-          }}
-          onChange={(value) => {
-            if (value) {
-              setDeadline(value);
-            }
-          }}
-          renderInput={(props) => (
-            <TextField
-              {...props}
-              inputProps={{
-                ...props.inputProps,
-                readOnly: true
-              }}
-              disabled
-              fullWidth
-            />
-          )}
-        />
-      </Box>
-
-      <Button
-        size='small'
-        onClick={handleSubmit}
-        sx={{
-          alignSelf: 'flex-start',
-          marginBottom: '4px',
-          marginRight: '8px'
+    <ClickAwayListener onClickAway={() => {
+      hideSelectionTooltip(pluginKey)(view.state, view.dispatch, view);
+    }}
+    >
+      <Grow
+        in={true}
+        easing={{
+          enter: 'ease-in',
+          exit: 'ease-out'
         }}
-        disabled={isEmpty}
+        timeout={150}
       >
-        Start
-      </Button>
-    </Box>
+
+        <Box flexDirection='column' gap={2} m={1} display='flex' width='400px'>
+          <Box flexDirection='column' display='flex'>
+            <FieldLabel>Title</FieldLabel>
+            <TextField
+              placeholder="What's the vote?"
+              value={voteTitle}
+              onChange={(e) => {
+                setVoteTitle(e.target.value);
+              }}
+            />
+          </Box>
+          <Box flexGrow={1}>
+            <InlineCharmEditor
+              content={voteDescription}
+              style={{
+                fontSize: '14px',
+                borderColor: theme.palette.secondary.main,
+                borderWidth: '2px',
+                borderStyle: 'solid'
+              }}
+              placeholderText='Details (Optional)'
+              onContentChange={({ doc }) => {
+                setVoteDescription(doc);
+              }}
+            />
+          </Box>
+          <Box flexDirection='column' display='flex'>
+            <FieldLabel>Deadline</FieldLabel>
+            <DateTimePicker
+              minDate={DateTime.fromMillis(Date.now())}
+              value={deadline}
+              onAccept={async (value) => {
+                if (value) {
+                  setDeadline(value);
+                }
+              }}
+              onChange={(value) => {
+                if (value) {
+                  setDeadline(value);
+                }
+              }}
+              renderInput={(props) => (
+                <TextField
+                  {...props}
+                  inputProps={{
+                    ...props.inputProps,
+                    readOnly: true
+                  }}
+                  disabled
+                  fullWidth
+                />
+              )}
+            />
+          </Box>
+
+          <Button
+            size='small'
+            onClick={handleSubmit}
+            sx={{
+              alignSelf: 'flex-start',
+              marginBottom: '4px',
+              marginRight: '8px'
+            }}
+            disabled={isEmpty}
+          >
+            Start
+          </Button>
+        </Box>
+      </Grow>
+    </ClickAwayListener>
   );
 }
