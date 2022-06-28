@@ -13,7 +13,7 @@ import { removeBountyPermissionGroup } from './removeBountyPermissionGroup';
  * Optimised to only do necessary add / substract operations
  * @param set
  */
-export async function setBountyPermissions ({ bountyId, set }: {bountyId: string, set: BulkBountyPermissionAssignment}): Promise<BountyPermissions> {
+export async function setBountyPermissions ({ bountyId, permissionsToAssign }: BulkBountyPermissionAssignment): Promise<BountyPermissions> {
 
   const bounty = await getBounty(bountyId);
 
@@ -32,7 +32,7 @@ export async function setBountyPermissions ({ bountyId, set }: {bountyId: string
     const assigneesToLevel = permissions[permissionLevel];
 
     const missingSetters = assigneesToLevel.filter(assignee => {
-      return set.permissionsToAssign.find(p => {
+      return permissionsToAssign.find(p => {
         return p.level === permissionLevel && p.assignee.group === assignee.group;
       }) === undefined;
     });
@@ -49,7 +49,7 @@ export async function setBountyPermissions ({ bountyId, set }: {bountyId: string
     })));
   });
 
-  set.permissionsToAssign.forEach(perm => {
+  permissionsToAssign.forEach(perm => {
     const existingSamePermissionsGroups = permissions[perm.level];
     if (existingSamePermissionsGroups.find(p => p.group === perm.assignee.group && perm.assignee.id === p.id) === undefined) {
       toAdd.push({
