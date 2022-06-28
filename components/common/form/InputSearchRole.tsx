@@ -2,6 +2,7 @@ import { Autocomplete, TextField } from '@mui/material';
 import { Role } from '@prisma/client';
 import { ComponentProps, useEffect, useState } from 'react';
 import useRoles from 'components/settings/roles/hooks/useRoles';
+import Alert from '@mui/material/Alert';
 import { ListSpaceRolesResponse } from 'pages/api/roles';
 
 interface IRolesFilter {
@@ -44,6 +45,14 @@ function InputSearchRoleBase ({
   }) : undefined;
 
   const filteredRoles = filter ? filterRoles(availableRoles, filter) : availableRoles;
+
+  if (roles?.length === 0) {
+    return (
+      <Alert severity='warning'>
+        There are no roles in this space. Workspace admins can create roles in the workspace settings page.
+      </Alert>
+    );
+  }
 
   return (
     <Autocomplete<ReducedRole>
