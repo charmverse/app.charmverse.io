@@ -89,9 +89,16 @@ function Account (): JSX.Element {
     );
   }
 
+  const userNotificationState = user?.notificationState;
   const isConnectedWithWallet = (account && chainId);
   const chain = chainId ? getChainById(chainId) : null;
-  const totalTasks = tasks ? (tasks.mentioned.unmarked.length + tasks.gnosis.length) : 0;
+
+  // If the user has snoozed multisig tasks don't count them
+  const totalTasks = tasks
+    ? (tasks.mentioned.unmarked.length + (userNotificationState
+      ? (userNotificationState.snoozedUntil && new Date(userNotificationState.snoozedUntil) > new Date() ? 0
+        : tasks.gnosis.length) : tasks.gnosis.length))
+    : 0;
   const router = useRouter();
   return (
     <AccountCard>
@@ -112,24 +119,26 @@ function Account (): JSX.Element {
             borderBottomLeftRadius: '0 !important'
           }) : {}}
           endIcon={(
-            <Badge
-              color='error'
-              sx={{
-                '&:hover .MuiBadge-badge': {
-                  transform: 'scale(1.25) translate(50%, -50%)',
-                  transition: '250ms ease-in-out transform'
-                }
-              }}
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                router.push('/nexus');
-              }}
-              badgeContent={totalTasks}
-              max={10}
-            >
-              <Avatar avatar={user?.avatar} name={user?.username || ''} size='small' />
-            </Badge>
+            totalTasks !== 0 ? (
+              <Badge
+                color='error'
+                sx={{
+                  '&:hover .MuiBadge-badge': {
+                    transform: 'scale(1.25) translate(50%, -50%)',
+                    transition: '250ms ease-in-out transform'
+                  }
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  router.push('/nexus');
+                }}
+                badgeContent={totalTasks}
+                max={10}
+              >
+                <Avatar avatar={user?.avatar} name={user?.username || ''} size='small' />
+              </Badge>
+            ) : <Avatar avatar={user?.avatar} name={user?.username || ''} size='small' />
             )}
         >
           {user?.username}

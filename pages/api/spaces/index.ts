@@ -8,6 +8,7 @@ import { withSessionRoute } from 'lib/session/withSession';
 import { gettingStartedPageContent } from 'seedData';
 import { postToDiscord, IEventToLog } from 'lib/log/userEvents';
 import { setupDefaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMethods';
+import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -45,6 +46,11 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
 
   const space = await prisma.space.create({ data, include: { pages: true } });
 
+  const updatedSpace = await updateSpacePermissionConfigurationMode({
+    permissionConfigurationMode: 'collaborative',
+    spaceId: space.id
+  });
+
   // Add default stablecoin methods
   await setupDefaultPaymentMethods({ spaceIdOrSpace: space });
 
@@ -58,10 +64,7 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
 
   logSpaceCreation(space);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { pages, ...spaceResponse } = space;
-
-  return res.status(200).json(spaceResponse);
+  return res.status(200).json(updatedSpace);
 }
 
 export default withSessionRoute(handler);

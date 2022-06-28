@@ -11,6 +11,7 @@ export async function generateSpaceUser ({ spaceId, isAdmin }: { spaceId: string
     data: {
       addresses: [v4()],
       identityType: IDENTITY_TYPES[1],
+      username: 'Username',
       spaceRoles: {
         create: {
           space: {
@@ -92,7 +93,7 @@ export async function generateUserAndSpaceWithApiToken (walletAddress: string = 
   };
 }
 
-export function generateBounty ({ spaceId, createdBy, status, maxSubmissions, approveSubmitters }: Pick<Bounty, 'createdBy' | 'spaceId' | 'status' | 'approveSubmitters'> & Partial<Pick<Bounty, 'maxSubmissions'>>): Promise<Bounty> {
+export function generateBounty ({ descriptionNodes, spaceId, createdBy, status, maxSubmissions, approveSubmitters }: Pick<Bounty, 'createdBy' | 'spaceId' | 'status' | 'approveSubmitters' | 'descriptionNodes'> & Partial<Pick<Bounty, 'maxSubmissions'>>): Promise<Bounty> {
   return prisma.bounty.create({
     data: {
       createdBy,
@@ -103,11 +104,35 @@ export function generateBounty ({ spaceId, createdBy, status, maxSubmissions, ap
       status,
       spaceId,
       description: '',
-      descriptionNodes: '',
+      descriptionNodes: descriptionNodes ?? '',
       approveSubmitters,
       maxSubmissions
     }
   });
+}
+
+export async function generateComment ({ content, pageId, spaceId, userId, context = '', resolved = false }: Pick<Thread, 'userId' | 'spaceId' | 'pageId'> & Partial<Pick<Thread, 'context' | 'resolved'>> & Pick<Comment, 'content'>): Promise<Comment> {
+  const thread = await prisma.thread.create({
+    data: {
+      context,
+      pageId,
+      spaceId,
+      userId,
+      resolved,
+      comments: {
+        create: {
+          userId,
+          content: content ?? '',
+          pageId,
+          spaceId
+        }
+      }
+    },
+    select: {
+      comments: true
+    }
+  });
+  return thread.comments?.[0];
 }
 
 export function generateTransaction ({ applicationId, chainId = '4', transactionId = '123' }: {applicationId: string} & Partial<Transaction>): Promise<Transaction> {

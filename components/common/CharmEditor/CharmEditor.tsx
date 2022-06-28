@@ -13,49 +13,49 @@ import {
   strike,
   underline
 } from '@bangle.dev/base-components';
-import debounce from 'lodash/debounce';
-import { NodeView, Plugin, SpecRegistry, BangleEditorState, RawPlugins } from '@bangle.dev/core';
+import { BangleEditorState, NodeView, Plugin, RawPlugins, SpecRegistry } from '@bangle.dev/core';
+import { markdownSerializer } from '@bangle.dev/markdown';
 import { EditorView, Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
-import { useState, CSSProperties, ReactNode, memo, useCallback, useLayoutEffect, useEffect, useRef } from 'react';
 import styled from '@emotion/styled';
-import ErrorBoundary from 'components/common/errors/ErrorBoundary';
-import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
-import * as codeBlock from 'components/common/CharmEditor/components/@bangle.dev/base-components/code-block';
-import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
-import { PageContent } from 'models';
-import { CryptoCurrency, FiatCurrency } from 'connectors';
-import { markdownSerializer } from '@bangle.dev/markdown';
-import PageThreadsList from 'components/[pageId]/DocumentPage/components/PageThreadsList';
 import { Grow } from '@mui/material';
-import { useUser } from 'hooks/useUser';
+import * as codeBlock from 'components/common/CharmEditor/components/@bangle.dev/base-components/code-block';
+import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
+import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
+import ErrorBoundary from 'components/common/errors/ErrorBoundary';
+import PageThreadsList from 'components/[pageId]/DocumentPage/components/PageThreadsList';
+import { CryptoCurrency, FiatCurrency } from 'connectors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
+import { useUser } from 'hooks/useUser';
+import { silentlyUpdateURL } from 'lib/browser';
+import debounce from 'lodash/debounce';
+import { PageContent } from 'models';
+import { CSSProperties, memo, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import Callout, * as callout from './components/callout';
+import { userDataPlugin } from './components/charm/charm.plugins';
 import * as columnLayout from './components/columnLayout';
 import LayoutColumn from './components/columnLayout/Column';
 import LayoutRow from './components/columnLayout/Row';
 import { CryptoPrice, cryptoPriceSpec } from './components/CryptoPrice';
 import ResizablePDF, { pdfSpec } from './components/ResizablePDF';
-import InlinePalette, { plugins as inlinePalettePlugins, spec as inlinePaletteSpecs } from './components/inlinePalette';
+import * as disclosure from './components/disclosure';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
+import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
+import * as iframe from './components/iframe';
+import InlineCommentThread, * as inlineComment from './components/inlineComment';
+import InlinePalette, { plugins as inlinePalettePlugins, spec as inlinePaletteSpecs } from './components/inlinePalette';
+import Mention, { mentionPluginKeyName, mentionPlugins, mentionSpecs, MentionSuggest } from './components/mention';
 import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList, nestedPageSpec } from './components/nestedPage';
+import Paragraph from './components/Paragraph';
 import Placeholder from './components/Placeholder';
 import Quote, * as quote from './components/quote';
-import * as iframe from './components/iframe';
-
 import ResizableImage, { imageSpec } from './components/ResizableImage';
-import * as trailingNode from './components/trailingNode';
+import RowActionsMenu, * as rowActions from './components/rowActions';
 import * as tabIndent from './components/tabIndent';
 import * as table from './components/table';
-import RowActionsMenu, * as rowActions from './components/rowActions';
-import { checkForEmpty } from './utils';
-import * as disclosure from './components/disclosure';
-import InlineCommentThread, * as inlineComment from './components/inlineComment';
-import Paragraph from './components/Paragraph';
-import Mention, { MentionSuggest, mentionPlugins, mentionSpecs, mentionPluginKeyName } from './components/mention';
+import * as trailingNode from './components/trailingNode';
 import DevTools from './DevTools';
-import { charmPlugin } from './components/charm/charm.plugins';
+import { checkForEmpty } from './utils';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -138,7 +138,7 @@ export function charmEditorPlugins (
         }
       })
     }),
-    charmPlugin({
+    userDataPlugin({
       userId,
       pageId,
       spaceId
@@ -404,6 +404,8 @@ function CharmEditor (
               highlightedMentionDomElement.scrollIntoView({
                 behavior: 'smooth'
               });
+              // Remove the ?mentionId from url
+              silentlyUpdateURL(window.location.href.split('?')[0]);
             });
           }
         }, 250);

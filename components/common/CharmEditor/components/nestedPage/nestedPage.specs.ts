@@ -18,11 +18,12 @@ export function nestedPageSpec (): RawSpecs {
         }
       },
       group: 'block',
-      draggable: false,
+      draggable: true,
       parseDOM: [{ tag: 'div.charm-nested-page' }],
       toDOM: (): DOMOutputSpec => {
         return ['div', { class: 'charm-nested-page' }];
-      }
+      },
+      atom: true
     },
     markdown: {
       toMarkdown: (state, node) => {

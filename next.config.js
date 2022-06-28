@@ -17,8 +17,10 @@ const esmModules = [
   '@fullcalendar/daygrid',
   '@fullcalendar/interaction',
   '@fullcalendar/react',
+  '@hookform/resolvers',
   'react-dnd',
-  'react-pdf'
+  'react-pdf',
+  'uuid'
 ];
 
 const config = {

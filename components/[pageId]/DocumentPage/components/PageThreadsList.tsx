@@ -1,13 +1,14 @@
 import { Box, BoxProps, List, MenuItem, Select, SelectProps, Typography } from '@mui/material';
 import PageThread from 'components/common/CharmEditor/components/PageThread';
 import { useThreads } from 'hooks/useThreads';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
 import { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import { useUser } from 'hooks/useUser';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { findTotalInlineComments } from 'lib/inline-comments/findTotalInlineComments';
+import { silentlyUpdateURL } from 'lib/browser';
 
 const Center = styled.div`
   position: absolute;
@@ -42,6 +43,24 @@ const EmptyThreadContainerBox = styled(Box)`
   height: 100%;
   background-color: ${({ theme }) => theme.palette.background.light};
 `;
+
+function getCommentFromThreads (threads: (ThreadWithCommentsAndAuthors | undefined)[], commentId: string) {
+  if (!threads) {
+    return null;
+  }
+
+  for (let threadIdx = 0; threadIdx < threads.length; threadIdx += 1) {
+    const thread = threads[threadIdx];
+    if (thread) {
+      for (let commentIdx = 0; commentIdx < thread.comments.length; commentIdx += 1) {
+        if (thread.comments[commentIdx].id === commentId) {
+          return thread.comments[commentIdx];
+        }
+      }
+    }
+  }
+  return null;
+}
 
 export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {inline?: boolean}) {
   const { threads } = useThreads();
@@ -92,6 +111,28 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
     const filteredThreadIds = inlineThreadsIds.filter(inlineThreadsId => threadListSet.has(inlineThreadsId));
     sortedThreadList = filteredThreadIds.map(filteredThreadId => threads[filteredThreadId] as ThreadWithCommentsAndAuthors);
   }
+
+  useEffect(() => {
+    const highlightedCommentId = (new URLSearchParams(window.location.search)).get('commentId');
+    if (highlightedCommentId) {
+      const highlightedComment = getCommentFromThreads(allThreads, highlightedCommentId);
+      if (highlightedComment) {
+        const highlightedCommentDomNode = document.getElementById(`comment.${highlightedComment.id}`);
+        if (highlightedCommentDomNode) {
+          setTimeout(() => {
+            setThreadFilter('all');
+            // Remove query parameters from url
+            silentlyUpdateURL(window.location.href.split('?')[0]);
+            requestAnimationFrame(() => {
+              highlightedCommentDomNode.scrollIntoView({
+                behavior: 'smooth'
+              });
+            });
+          }, 250);
+        }
+      }
+    }
+  }, [allThreads, window.location.search]);
 
   return (
     <StyledPageThreadsBox
