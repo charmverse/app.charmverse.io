@@ -4,8 +4,11 @@ import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import { Box, ListItem, Typography } from '@mui/material';
+import IconButton from '@mui/material/IconButton';
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import charmClient from 'charmClient';
-import { HTMLAttributes, memo, useCallback } from 'react';
+import { HTMLAttributes, memo, useCallback, useState } from 'react';
 import PdfSelector from 'components/common/PdfSelector';
 import { MIN_PDF_WIDTH, MAX_PDF_WIDTH } from 'lib/image/constants';
 import { Document, Page, pdfjs } from 'react-pdf';
@@ -107,6 +110,57 @@ export function pdfSpec () {
   return spec;
 }
 
+type PDFViewerProps = {
+  url: string,
+  width: number
+};
+
+function PDFViewer (props: PDFViewerProps) {
+  const { url, width } = props;
+  const [pageCount, setPageCount] = useState<number | null>(null);
+  const [pageNumber, setPageNumber] = useState(1);
+
+  function onDocumentLoadSuccess ({ numPages }: { numPages : number }) {
+    setPageCount(numPages);
+    setPageNumber(pageNumber || 1);
+  }
+
+  function changePage (offset : number) {
+    setPageNumber((prevPageNumber: number) => prevPageNumber + offset);
+  }
+
+  function previousPage () {
+    changePage(-1);
+  }
+
+  function nextPage () {
+    changePage(1);
+  }
+
+  return (
+    <Box>
+      <Document
+        file={{ url }}
+        onLoadError={(error) => console.log(error)}
+        onLoadSuccess={onDocumentLoadSuccess}
+      >
+        <Page pageNumber={pageNumber} width={width} />
+      </Document>
+      <div>
+        <p>
+          Page {pageNumber || (pageCount ? 1 : '--')} of {pageCount || '--'}
+        </p>
+        <IconButton onClick={previousPage} disabled={pageNumber <= 1}>
+          <NavigateBeforeIcon fontSize='small' />
+        </IconButton>
+        <IconButton onClick={nextPage} disabled={!pageCount || pageNumber >= pageCount}>
+          <NavigateNextIcon fontSize='small' />
+        </IconButton>
+      </div>
+    </Box>
+  );
+}
+
 function ResizablePDF ({ readOnly, onResizeStop, node, updateAttrs, selected }:
   NodeViewProps & {readOnly?: boolean, onResizeStop?: (view: EditorView) => void }) {
   readOnly = readOnly ?? false;
@@ -145,7 +199,7 @@ function ResizablePDF ({ readOnly, onResizeStop, node, updateAttrs, selected }:
   if (readOnly) {
     return (
       <Document file={node.attrs.src}>
-        <Page pageNumber={1} />
+        <PDFViewer url={node.attrs.src} width={node.attrs.size} />
       </Document>
     );
   }
@@ -158,9 +212,7 @@ function ResizablePDF ({ readOnly, onResizeStop, node, updateAttrs, selected }:
         onDelete={onDelete}
         onResizeStop={onResizeStop}
       >
-        <Document file={{ url: node.attrs.src }}>
-          <Page pageNumber={1} width={node.attrs.size} />
-        </Document>
+        <PDFViewer url={node.attrs.src} width={node.attrs.size} />
       </Resizable>
     );
   }
