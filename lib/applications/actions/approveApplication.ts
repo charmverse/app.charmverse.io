@@ -23,10 +23,6 @@ export async function approveApplication ({ applicationOrApplicationId, userId }
     throw new LimitReachedError(`This application cannot be approved as the limit of active submissions of ${bounty.maxSubmissions} has been reached.`);
   }
 
-  if (application.createdBy === userId) {
-    throw new UndesirableOperationError('You cannot approve your own application');
-  }
-
   const updated = await prisma.application.update({
     where: {
       id: application.id

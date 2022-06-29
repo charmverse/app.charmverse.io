@@ -66,13 +66,13 @@ export default function BountyDetails () {
             <>
               <Box sx={{ mb: 3 }}>
                 <BountySubmissions bounty={currentBounty} />
-
               </Box>
               {
           currentBounty.approveSubmitters === true && (
           <BountyApplicantList
             bounty={currentBounty}
             applications={currentBounty.applications}
+            permissions={bountyPermissions}
           />
           )
         }

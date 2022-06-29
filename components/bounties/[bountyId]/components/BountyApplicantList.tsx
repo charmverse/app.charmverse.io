@@ -21,16 +21,19 @@ import { useUser } from 'hooks/useUser';
 import { applicantIsSubmitter, moveUserApplicationToFirstRow, submissionsCapReached } from 'lib/applications/shared';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import { AssignedBountyPermissions, BountyPermissions } from 'lib/bounties/interfaces';
 import { ApplicationEditorForm } from './ApplicationEditorForm';
 
 export interface IBountyApplicantListProps {
   bounty: Bounty,
   applications: Application[]
+  permissions: AssignedBountyPermissions
 }
 
 export function BountyApplicantList ({
   applications,
-  bounty
+  bounty,
+  permissions
 }: IBountyApplicantListProps) {
   const [user] = useUser();
   const [contributors] = useContributors();
@@ -54,7 +57,7 @@ export function BountyApplicantList ({
   function displayAssignmentButton (application: Application) {
     return (
       // Only admins can approve applications for now
-      (isAdmin === true || isReviewer)
+      (permissions.userPermissions.review)
       && application.status === 'applied'
       // If we reached the cap, we can't assign new people
       && (
@@ -102,12 +105,17 @@ export function BountyApplicantList ({
           </Grid>
           <Grid container item xs={4} direction='row' justifyContent='flex-end'>
             {
+              // Currently, we should only be able to see bounties we can work on
                   !userHasApplied && (
-                  <Tooltip placement='top' title={newApplicationsSuspended ? `You cannot apply to this bounty. The cap of ${bounty.maxSubmissions} submission${bounty.maxSubmissions !== 1 ? 's' : ''} has been reached.` : ''}>
-                    <Box component='span'>
-                      <Button disabled={newApplicationsSuspended} onClick={bountyApplyModal.open}>Apply</Button>
-                    </Box>
-                  </Tooltip>
+                    <Tooltip placement='top' title={newApplicationsSuspended ? `You cannot apply to this bounty. The cap of ${bounty.maxSubmissions} submission${bounty.maxSubmissions !== 1 ? 's' : ''} has been reached.` : ''}>
+                      <Box component='span'>
+                        <Button
+                          disabled={newApplicationsSuspended || !permissions?.userPermissions.work}
+                          onClick={bountyApplyModal.open}
+                        >Apply
+                        </Button>
+                      </Box>
+                    </Tooltip>
                   )
                 }
           </Grid>
