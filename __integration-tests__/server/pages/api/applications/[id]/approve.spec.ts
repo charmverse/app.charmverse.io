@@ -1,13 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Application, Bounty, Space, User } from '@prisma/client';
-import request from 'supertest';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateBounty, generateBountyWithSingleApplication, generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { ApplicationCreationData, SubmissionCreationData, SubmissionReview } from 'lib/applications/interfaces';
-import { createBounty } from 'lib/bounties';
-import { generateSubmissionContent } from 'testing/generate-stubs';
+import { Space, User } from '@prisma/client';
 import { addBountyPermissionGroup } from 'lib/permissions/bounties';
 import { assignRole } from 'lib/roles';
+import request from 'supertest';
+import { baseUrl, loginUser } from 'testing/mockApiCall';
+import { generateBountyWithSingleApplication, generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 let nonAdminUser: User;
 let nonAdminUserSpace: Space;
@@ -65,7 +62,7 @@ describe('POST /api/applications/{applicationId}/approve - accept an application
       .expect(200);
   });
 
-  it('should allow a space admin to review a submission and respond with 200', async () => {
+  it('should allow a space admin to accept an applicant to become submitter and respond with 200', async () => {
 
     const admin = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: true });
 
@@ -90,6 +87,13 @@ describe('POST /api/applications/{applicationId}/approve - accept an application
 
   it('should fail if the requesting non-admin user does not have the "review" permission and respond with 401', async () => {
 
+    const extraUser = await generateSpaceUser({
+      isAdmin: false,
+      spaceId: nonAdminUserSpace.id
+    });
+
+    const extraUserCookie = await loginUser(extraUser);
+
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,
       spaceId: nonAdminUserSpace.id,
@@ -102,7 +106,7 @@ describe('POST /api/applications/{applicationId}/approve - accept an application
 
     await request(baseUrl)
       .post(`/api/applications/${bounty.applications[0].id}/approve`)
-      .set('Cookie', nonAdminCookie)
+      .set('Cookie', extraUserCookie)
       .send({})
       .expect(401);
   });
