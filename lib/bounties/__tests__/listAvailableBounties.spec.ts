@@ -125,4 +125,30 @@ describe('listAvailableBounties', () => {
     });
   });
 
+  it('should always display the bounties the user created in the space', async () => {
+    const { space: otherSpace, user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, false);
+    // No permissions provided
+    const bounty = await createBounty({
+      createdBy: otherUser.id,
+      spaceId: otherSpace.id,
+      title: 'Bounty by space'
+    });
+
+    // This one will be ignored
+    await createBounty({
+      createdBy: otherUser.id,
+      spaceId: space.id,
+      title: 'Bounty by space'
+    });
+
+    const bounties = await listAvailableBounties({
+      spaceId: otherSpace.id,
+      userId: otherUser.id
+    });
+
+    expect(bounties.length).toBe(1);
+    expect(bounties[0].id).toBe(bounty.id);
+
+  });
+
 });

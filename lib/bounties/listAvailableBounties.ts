@@ -23,40 +23,47 @@ export async function listAvailableBounties ({ spaceId, userId }: AvailableResou
   return prisma.bounty.findMany({
     where: {
       spaceId,
-      permissions: {
-        some: {
-          OR: [{
-            public: true
-          },
-          {
-            user: {
-              id: userId
-            }
-          },
-          {
-            role: {
-              spaceRolesToRole: {
-                some: {
-                  spaceRole: {
-                    spaceId,
-                    userId
+      OR: [
+        {
+          createdBy: userId
+        },
+        {
+          permissions: {
+            some: {
+              OR: [{
+                public: true
+              },
+              {
+                user: {
+                  id: userId
+                }
+              },
+              {
+                role: {
+                  spaceRolesToRole: {
+                    some: {
+                      spaceRole: {
+                        spaceId,
+                        userId
+                      }
+                    }
                   }
                 }
-              }
-            }
-          },
-          {
-            space: {
-              id: spaceId,
-              spaceRoles: {
-                some: {
-                  userId
+              },
+              {
+                space: {
+                  id: spaceId,
+                  spaceRoles: {
+                    some: {
+                      userId
+                    }
+                  }
                 }
-              }
+              }]
             }
-          }]
-        }
-      }
+          } }
+      ]
+
     },
     include: {
       applications: true

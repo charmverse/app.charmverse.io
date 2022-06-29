@@ -74,9 +74,14 @@ describe('createBounty', () => {
     const bountyPermissions = await queryBountyPermissions({ bountyId: bounty.id });
 
     // Make sure permission was inserted correctly
-    expect(bountyPermissions.submitter[0].id).toBe(space.id);
-    const { creator, reviewer, viewer } = bountyPermissions;
-    expect(creator.length + reviewer.length + viewer.length).toBe(0);
+    expect(bountyPermissions.submitter.some(p => p.group === 'space' && p.id === space.id)).toBe(true);
+
+    // Make sure synthetic permission is applied
+    expect(bountyPermissions.creator.some(p => p.group === 'user' && user.id === bounty.createdBy)).toBe(true);
+    const { reviewer, viewer } = bountyPermissions;
+
+    // Make sure nothing unexpected was added
+    expect(reviewer.length + viewer.length).toBe(0);
 
   });
 

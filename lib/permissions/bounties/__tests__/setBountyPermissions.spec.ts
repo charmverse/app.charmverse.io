@@ -1,6 +1,6 @@
 
 import { DataNotFoundError } from 'lib/utilities/errors';
-import { generateBounty, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateBounty, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { flatArrayMap } from 'lib/utilities/array';
 import { Bounty, BountyPermission, BountyPermissionLevel, Space, User } from '@prisma/client';
@@ -67,10 +67,7 @@ describe('setBountyPermissions', () => {
       bountyId: bounty.id
     });
 
-    expect(queryResult.viewer.length).toBe(1);
-    expect(queryResult.viewer[0].id).toBe(user.id);
-
-    expect(flatArrayMap(queryResult).length).toBe(1);
+    expect(queryResult.viewer.some(p => p.group === 'user' && p.id === user.id)).toBe(true);
 
   });
 
@@ -98,14 +95,16 @@ describe('setBountyPermissions', () => {
       bountyId: bounty.id
     });
 
-    expect(queryResult.viewer.length).toBe(1);
-    expect(queryResult.viewer[0].id).toBe(space.id);
-
-    expect(flatArrayMap(queryResult).length).toBe(1);
+    expect(queryResult.viewer.some(p => p.group === 'space' && p.id === space.id)).toBe(true);
 
   });
 
   it('should not recreate existing permissions, only adding missing ones', async () => {
+
+    const extraUser = await generateSpaceUser({
+      isAdmin: false,
+      spaceId: space.id
+    });
 
     const permissionLevel: BountyPermissionLevel = 'viewer';
 
@@ -121,7 +120,7 @@ describe('setBountyPermissions', () => {
       level: permissionLevel,
       assignee: {
         group: 'user',
-        id: user.id
+        id: extraUser.id
       }
     };
 
@@ -139,7 +138,7 @@ describe('setBountyPermissions', () => {
       where: {
         permissionLevel,
         bountyId: bounty.id,
-        userId: user.id
+        userId: extraUser.id
 
       }
     }) as BountyPermission;
@@ -150,7 +149,7 @@ describe('setBountyPermissions', () => {
       where: {
         permissionLevel,
         bountyId: bounty.id,
-        userId: user.id
+        userId: extraUser.id
 
       }
     }) as BountyPermission;
