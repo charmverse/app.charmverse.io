@@ -47,6 +47,9 @@ export async function createVote (vote: VoteDTO): Promise<Vote> {
           id: createdBy
         }
       }
+    },
+    include: {
+      voteOptions: true
     }
   });
 

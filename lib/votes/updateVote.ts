@@ -21,6 +21,9 @@ export async function updateVote (id: string, status: VoteStatusType): Promise<V
     },
     data: {
       status
+    },
+    include: {
+      voteOptions: true
     }
   });
 

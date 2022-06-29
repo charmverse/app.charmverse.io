@@ -7,7 +7,8 @@ export async function getVote (id: string): Promise<Vote | null> {
       id
     },
     include: {
-      userVotes: true
+      userVotes: true,
+      voteOptions: true
     }
   });
 }

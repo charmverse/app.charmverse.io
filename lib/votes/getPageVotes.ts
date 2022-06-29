@@ -7,7 +7,8 @@ export async function getPageVotes (pageId: string): Promise<Vote[]> {
       pageId
     },
     include: {
-      userVotes: true
+      userVotes: true,
+      voteOptions: true
     }
   });
 }
