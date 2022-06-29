@@ -3,7 +3,6 @@ import { List, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import PageInlineVote from 'components/common/CharmEditor/components/PageInlineVote';
 import { useInlineVotes } from 'hooks/useInlineVotes';
-import PageThreadsList from './PageThreadsList';
 
 export const StyledPageInlineVotesList = styled(List)`
   overflow: auto;
@@ -24,7 +23,7 @@ export default function PageInlineVotesList () {
         Votes
       </Typography>
       <StyledPageInlineVotesList>
-        {Object.values(inlineVotes).map(inlineVote => <PageInlineVote inlineVote={inlineVote} key={inlineVote.id} />)}
+        {Object.values(inlineVotes).map(inlineVote => <PageInlineVote detailed={false} inlineVote={inlineVote} key={inlineVote.id} />)}
       </StyledPageInlineVotesList>
     </Box>
   );

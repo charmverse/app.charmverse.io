@@ -10,5 +10,10 @@ export interface VoteWithUsers {
     userId: string
     choice: string
     voteId: string
+    user: {
+      id: string
+      avatar: string
+      username: string
+    }
   }[]
 }
