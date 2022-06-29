@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Space, User } from '@prisma/client';
-import { BountySubmitterPoolCalculation, BountySubmitterPoolSize } from 'lib/bounties';
+import { BountySubmitterPoolCalculation, BountySubmitterPoolSize, createBounty } from 'lib/bounties';
 import { addBountyPermissionGroup } from 'lib/permissions/bounties';
 import { assignRole } from 'lib/roles';
 import request from 'supertest';
@@ -66,18 +66,21 @@ describe('POST /api/bounties/{bountyId}/pool - Return breakdown of how many peop
     expect(total).toBe(1);
   });
 
-  it('should return the bounty pool size based on a simulation of permissions and respond with 200', async () => {
+  it('should return the bounty pool size based on a simulation of permissions (if user has grant permissions ability) and respond with 200', async () => {
 
     const extraUser = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
     const secondExtraUser = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
 
-    const extraUserCookie = await loginUser(extraUser);
-
-    const bounty = await generateBounty({
+    const bounty = await createBounty({
       spaceId: nonAdminUserSpace.id,
-      status: 'suggestion',
-      approveSubmitters: false,
-      createdBy: nonAdminUser.id
+      createdBy: extraUser.id,
+      title: 'Example',
+      permissions: {
+        creator: [{
+          group: 'user',
+          id: extraUser.id
+        }]
+      }
     });
 
     const role = await generateRole({
@@ -112,6 +115,8 @@ describe('POST /api/bounties/{bountyId}/pool - Return breakdown of how many peop
         submitter: [{ group: 'role', id: role.id }]
       }
     };
+
+    const extraUserCookie = await loginUser(extraUser);
 
     const { mode, roleups, total } = (await request(baseUrl)
       .post(`/api/bounties/${bounty.id}/pool`)

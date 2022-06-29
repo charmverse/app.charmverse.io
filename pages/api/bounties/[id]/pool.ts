@@ -36,8 +36,8 @@ async function getBountySubmitterPoolPermissionsController (req: NextApiRequest,
     adminOnly: false
   });
 
-  // Allow space members who can't view bounty to still run a simulation
-  if (permissionsForSimulation && !error) {
+  // Allow only space members with grant permissions to run an estimate against space data
+  if (permissionsForSimulation && permissions.grant_permissions) {
     const pool = await calculateBountySubmitterPoolSize({
       resourceId: bounty.id,
       permissions: permissionsForSimulation as Partial<BountyPermissions>
