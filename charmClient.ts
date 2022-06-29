@@ -41,6 +41,7 @@ import { TransactionCreationData } from 'lib/transactions/interface';
 import { PublicUser } from 'pages/api/public/profile/[userPath]';
 import { DeepDaoAggregateData } from 'lib/deepdao/interfaces';
 import { VoteWithUsers } from 'lib/inline-votes/interfaces';
+import { v4 } from 'uuid';
 import { AssignedPermissionsQuery } from './lib/permissions/interfaces';
 import { SpacePermissionFlags, SpacePermissionModification } from './lib/permissions/spaces';
 import { SpacePermissionConfigurationUpdate } from './lib/permissions/meta/interfaces';
@@ -701,7 +702,62 @@ class CharmClient {
   }
 
   async getPageInlineVotesWithUsers (currentPageId: string): Promise<VoteWithUsers[]> {
-    return [];
+    const vote1Id = v4();
+    return [{
+      deadline: new Date(new Date().getTime() + (12 * 60 * 60 * 1000)), // 12 hrs
+      description: {
+        type: 'doc',
+        content: [
+          {
+            type: 'paragraph',
+            content: [
+              {
+                type: 'text',
+                text: 'My First '
+              },
+              {
+                type: 'text',
+                marks: [
+                  {
+                    type: 'bold'
+                  }
+                ],
+                text: 'Vote'
+              }
+            ]
+          }
+        ]
+      },
+      id: vote1Id,
+      title: 'Vote 1',
+      options: [{
+        name: 'Yes',
+        passThreshold: 0.5
+      }, {
+        name: 'No',
+        passThreshold: 0.5
+      }, {
+        name: 'Abstain',
+        passThreshold: 0.5
+      }],
+      userVotes: [
+        ...new Array(5).fill(null).map(() => ({
+          userId: v4(),
+          voteId: vote1Id,
+          choice: 'Yes'
+        })),
+        ...new Array(3).fill(null).map(() => ({
+          userId: v4(),
+          voteId: vote1Id,
+          choice: 'No'
+        })),
+        ...new Array(9).fill(null).map(() => ({
+          userId: v4(),
+          voteId: vote1Id,
+          choice: 'Abstain'
+        }))
+      ]
+    }];
   }
 }
 

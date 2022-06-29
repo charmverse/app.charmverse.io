@@ -31,6 +31,7 @@ import { silentlyUpdateURL } from 'lib/browser';
 import debounce from 'lodash/debounce';
 import { PageContent } from 'models';
 import { CSSProperties, memo, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import PageInlineVotesList from 'components/[pageId]/DocumentPage/components/PageInlineVotesList';
 import Callout, * as callout from './components/callout';
 import { userDataPlugin } from './components/charm/charm.plugins';
 import * as columnLayout from './components/columnLayout';
@@ -556,6 +557,7 @@ function CharmEditor (
         </PageThreadListBox>
       </Grow>
       )}
+      <PageInlineVotesList />
       {!disabledPageSpecificFeatures && <InlineCommentThread pluginKey={inlineCommentPluginKey} />}
       {!readOnly && <DevTools />}
     </StyledReactBangleEditor>

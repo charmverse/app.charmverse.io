@@ -4,6 +4,7 @@ import { hideSelectionTooltip } from '@bangle.dev/tooltip/selection-tooltip';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
+import AddCircle from '@mui/icons-material/AddCircle';
 import { ClickAwayListener, FormControlLabel, Grow, IconButton, List, ListItem, ListItemText, Radio, RadioGroup, TextField, Typography } from '@mui/material';
 import { Box, useTheme } from '@mui/system';
 import { DateTimePicker } from '@mui/x-date-pickers';
@@ -15,12 +16,11 @@ import { PageContent } from 'models';
 import { useState } from 'react';
 import { v4 } from 'uuid';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { AddCircle } from '@mui/icons-material';
 import InlineCharmEditor from '../../InlineCharmEditor';
 import { checkForEmpty } from '../../utils';
 import { updateInlineVote } from './inlineVote.utils';
 
-type VoteType = 'boolean' | 'options';
+type VoteType = 'default' | 'custom';
 
 export function InlineVoteSubMenu ({ pluginKey }: {pluginKey: PluginKey}) {
   const view = useEditorViewContext();
@@ -34,7 +34,7 @@ export function InlineVoteSubMenu ({ pluginKey }: {pluginKey: PluginKey}) {
       }
     ]
   });
-  const [voteType, setVoteType] = useState<VoteType>('boolean');
+  const [voteType, setVoteType] = useState<VoteType>('default');
   const [options, setOptions] = useState(['', '', '']);
 
   const [deadline, setDeadline] = useState(DateTime.fromMillis(Date.now()));
@@ -121,20 +121,20 @@ export function InlineVoteSubMenu ({ pluginKey }: {pluginKey: PluginKey}) {
         </Box>
         <RadioGroup
           row
-          defaultValue='boolean'
+          defaultValue='default'
           value={voteType}
           onChange={(e) => {
             setVoteType(e.target.value as VoteType);
           }}
         >
           <FormControlLabel
-            value='boolean'
+            value='default'
             control={<Radio />}
             label='Yes / No'
           />
           <FormControlLabel value='options' control={<Radio />} label='# Options' />
         </RadioGroup>
-        {voteType === 'boolean' ? (
+        {voteType === 'default' ? (
           <List>
             <ListItem sx={{ p: 0 }}>
               <CheckCircleIcon fontSize='small' sx={{ mr: 1 }} />
@@ -203,7 +203,7 @@ export function InlineVoteSubMenu ({ pluginKey }: {pluginKey: PluginKey}) {
             marginBottom: '4px',
             marginRight: '8px'
           }}
-          disabled={isEmpty || (voteType === 'options' && options.findIndex(option => option.length === 0) !== -1)}
+          disabled={isEmpty || (voteType === 'custom' && options.findIndex(option => option.length === 0) !== -1)}
         >
           Start
         </Button>

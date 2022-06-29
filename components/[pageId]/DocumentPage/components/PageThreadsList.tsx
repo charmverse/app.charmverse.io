@@ -113,6 +113,7 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
   }
 
   useEffect(() => {
+    // Highlight the comment id when navigation from nexus mentioned tasks list tab
     const highlightedCommentId = (new URLSearchParams(window.location.search)).get('commentId');
     if (highlightedCommentId) {
       const highlightedComment = getCommentFromThreads(allThreads, highlightedCommentId);
@@ -136,7 +137,7 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
 
   return (
     <StyledPageThreadsBox
-      // The className is used to refer to it using regular dom api
+      // The className is used to access it using regular dom api
       className='PageThreadsList'
       {...props}
       sx={{
