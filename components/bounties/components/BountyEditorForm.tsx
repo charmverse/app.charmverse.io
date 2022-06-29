@@ -458,6 +458,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
                 <Grid item xs>
                   <InputSearchContributorMultiple
                     defaultValue={selectedReviewerUsers}
+                    disableCloseOnSelect={true}
                     onChange={setSelectedReviewerUsers}
                     filter={
                       {
