@@ -193,12 +193,8 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
   const [availableCryptos, setAvailableCryptos] = useState<Array<string | CryptoCurrency>>([]);
   const [formError, setFormError] = useState<SystemError | null>(null);
 
-  const [inferredPermissionsMode, setInferredPermissionsMode] = useState<InferredBountyPermissionMode>(
-    inferBountyPermissionsMode(permissions?.bountyPermissions ?? {})
-  );
-
-  const [submitterMode, setSubmitterMode] = useState<BountySubmitter>(inferredPermissionsMode.mode);
-  const [assignedRoleSubmitters, setAssignedRoleSubmitters] = useState<Array<string>>(permissions ? (inferredPermissionsMode.roles ?? []) : []);
+  const [submitterMode, setSubmitterMode] = useState<BountySubmitter>(inferBountyPermissionsMode(permissions?.bountyPermissions ?? {})?.mode ?? 'space');
+  const [assignedRoleSubmitters, setAssignedRoleSubmitters] = useState<Array<string>>(permissions?.bountyPermissions?.submitter?.filter(p => p.group === 'role').map(p => p.id as string) ?? []);
 
   const [selectedReviewerUsers, setSelectedReviewerUsers] = useState<string[]>(
     permissions?.bountyPermissions?.reviewer?.filter(r => r.group === 'user').map(r => r.id as string) ?? []
@@ -219,7 +215,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
     }
 
     if (calculation.mode === 'role') {
-      setSubmitterMode('space');
+      setSubmitterMode('role');
     }
 
   }
@@ -551,7 +547,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
                   <Typography display='block' justifyContent='center'>
 
                     {
-                      ((submitterMode === 'role' && selectedReviewerRoles.length === 0) || bountyApplicantPool?.total === 0) && (
+                      ((submitterMode === 'role' && bountyApplicantPool?.mode === 'role' && bountyApplicantPool?.total === 0) || (submitterMode === 'space' && bountyApplicantPool?.total === 0)) && (
                         <span style={{ paddingRight: '5px' }}>
                           No workspace members can work on this bounty currently.
                         </span>
