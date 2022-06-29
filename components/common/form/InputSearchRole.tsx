@@ -32,19 +32,11 @@ function InputSearchRoleBase ({
 }: Partial<ComponentProps<typeof Autocomplete>> & {filter?: IRolesFilter}) {
   const { roles } = useRoles();
 
-  const [availableRoles, setAvailableRoles] = useState<ListSpaceRolesResponse []>([]);
-
-  useEffect(() => {
-    if (roles) {
-      setAvailableRoles(roles);
-    }
-  }, [roles]);
-
-  const defaultRole = typeof defaultValue === 'string' ? availableRoles.find(role => {
+  const defaultRole = typeof defaultValue === 'string' ? roles?.find(role => {
     return role.id === defaultValue;
-  }) : undefined;
+  }) : (defaultValue instanceof Array ? (roles?.filter(r => defaultValue.includes(r.id))) : undefined);
 
-  const filteredRoles = filter ? filterRoles(availableRoles, filter) : availableRoles;
+  const filteredRoles = (!!filter && !!roles) ? filterRoles(roles as any, filter as IRolesFilter) : roles ?? [];
 
   if (roles?.length === 0) {
     return (
@@ -57,11 +49,16 @@ function InputSearchRoleBase ({
   return (
     <Autocomplete<ReducedRole>
       defaultValue={defaultRole}
-      loading={availableRoles.length === 0}
+      loading={!roles}
       sx={{ minWidth: 150 }}
       disableCloseOnSelect={disableCloseOnSelect}
+      noOptionsText='No options available'
       // @ts-ignore - not sure why this fails
-      options={filteredRoles}
+      options={
+        // This option is for UX. It avoids a bug where the list would keep state (selected) but remain empty if all options were selected
+        // Now the list pops up in full on first load
+        filteredRoles
+}
       autoHighlight
       getOptionLabel={(role) => role.name}
       renderOption={(_props, role) => (
@@ -72,7 +69,7 @@ function InputSearchRoleBase ({
       renderInput={(params) => (
         <TextField
           {...params}
-          placeholder={placeholder}
+          placeholder={filteredRoles.length > 0 ? placeholder : ''}
           inputProps={{
             ...params.inputProps
           }}
@@ -102,21 +99,31 @@ interface IInputSearchRoleMultipleProps {
   onChange: (id: string[]) => void
   defaultValue?: string[]
   filter?: IRolesFilter
+  disableCloseOnSelect?: boolean
 }
 
-export function InputSearchRoleMultiple ({ onChange, filter, ...props }: IInputSearchRoleMultipleProps) {
+export function InputSearchRoleMultiple ({ onChange, filter, defaultValue, disableCloseOnSelect, ...props }: IInputSearchRoleMultipleProps) {
 
   function emitValue (roles: ReducedRole[]) {
     onChange(roles.map(role => role.id));
   }
 
+  // Let the parent know it's loaded
+  // useEffect(() => {
+  //   if (props.defaultValue) {
+  //     onChange(props.defaultValue);
+  //   }
+  // }, []);
+
   return (
     <InputSearchRoleBase
       {...props}
+      disableCloseOnSelect={disableCloseOnSelect}
       onChange={(e, value) => emitValue(value as ReducedRole[])}
       multiple
       placeholder='Select roles'
       filter={filter}
+      defaultValue={defaultValue}
     />
   );
 }

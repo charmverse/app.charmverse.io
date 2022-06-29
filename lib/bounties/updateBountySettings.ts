@@ -2,6 +2,7 @@ import { Bounty } from '@prisma/client';
 import { prisma } from 'db';
 import { DataNotFoundError, InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
 import { countValidSubmissions } from '../applications/shared';
+import { setBountyPermissions } from '../permissions/bounties';
 import { getBounty } from './getBounty';
 import { BountyUpdate } from './interfaces';
 
@@ -45,6 +46,13 @@ export async function updateBountySettings ({
 
   if (!updatedBounty) {
     throw new DataNotFoundError(`Bounty with ID ${bountyId} not found`);
+  }
+
+  if (updateContent.permissions) {
+    await setBountyPermissions({
+      bountyId,
+      permissionsToAssign: updateContent.permissions
+    });
   }
 
   return updatedBounty;

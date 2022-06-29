@@ -19,9 +19,16 @@ interface Props {
   loading?: boolean,
   valueUpdated: (value: string) => void,
   options: MenuOption[]
+  closeOnSelect?: boolean
 }
 
-export default function SelectMenu ({ selectedValue, valueUpdated, options, loading = false, title }: Props) {
+export default function SelectMenu ({
+  selectedValue,
+  valueUpdated,
+  options,
+  loading = false,
+  title,
+  closeOnSelect = true } : Props) {
 
   const popupState = usePopupState({ variant: 'popover', popupId: `menu-${v4()}` });
 
@@ -63,6 +70,9 @@ export default function SelectMenu ({ selectedValue, valueUpdated, options, load
                   selected={selectedValue === value}
                   onClick={() => {
                     valueUpdated(value);
+                    if (closeOnSelect) {
+                      popupState.close();
+                    }
                   }}
                 >
                   <StyledListItemText
