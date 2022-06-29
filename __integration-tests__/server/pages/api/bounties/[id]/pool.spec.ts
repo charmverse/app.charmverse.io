@@ -1,16 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Application, Bounty, BountyPermissionLevel, Space, User } from '@prisma/client';
+import { Space, User } from '@prisma/client';
+import { BountySubmitterPoolCalculation, BountySubmitterPoolSize } from 'lib/bounties';
+import { addBountyPermissionGroup } from 'lib/permissions/bounties';
+import { assignRole } from 'lib/roles';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateBounty, generateBountyWithSingleApplication, generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { ApplicationCreationData, SubmissionCreationData, SubmissionReview } from 'lib/applications/interfaces';
-import { AssignedBountyPermissions, BountyPermissions, BountySubmitterPoolSize, createBounty } from 'lib/bounties';
-import { generateSubmissionContent } from 'testing/generate-stubs';
-import { countValidSubmissions } from 'lib/applications/shared';
-import { BountyWithDetails } from 'models';
-import { prisma } from 'db';
-import { typedKeys } from 'lib/utilities/objects';
-import { assignRole } from 'lib/roles';
+import { generateBounty, generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 let nonAdminUser: User;
 let nonAdminUserSpace: Space;
@@ -21,14 +16,10 @@ beforeAll(async () => {
 
   nonAdminUser = generated.user;
   nonAdminUserSpace = generated.space;
-  nonAdminCookie = (await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: nonAdminUser.addresses[0]
-    })).headers['set-cookie'][0];
+  nonAdminCookie = await loginUser(nonAdminUser);
 });
 
-describe('GET /api/bounties/{bountyId}/permissions - Return assigned and individual permissions for a bounty', () => {
+describe('POST /api/bounties/{bountyId}/pool - Return breakdown of how many people can apply', () => {
 
   it('should return the bounty pool size based on current bounty permissions and respond with 200', async () => {
 
@@ -43,24 +34,36 @@ describe('GET /api/bounties/{bountyId}/permissions - Return assigned and individ
       createdBy: nonAdminUser.id
     });
 
-    const { bountyPermissions, userPermissions } = (await request(baseUrl)
-      .get(`/api/bounties/${bounty.id}/pool`)
+    const role = await generateRole({
+      createdBy: nonAdminUser.id,
+      spaceId: nonAdminUserSpace.id
+    });
+
+    await assignRole({
+      roleId: role.id,
+      userId: extraUser.id
+    });
+
+    // This should be ignored in following call
+    await addBountyPermissionGroup({
+      assignee: {
+        group: 'role',
+        id: role.id
+      },
+      level: 'submitter',
+      resourceId: bounty.id
+    });
+
+    const { mode, roleups, total } = (await request(baseUrl)
+      .post(`/api/bounties/${bounty.id}/pool`)
       .set('Cookie', extraUserCookie)
-      .expect(200)).body as AssignedBountyPermissions;
+      .send({})
+      .expect(200)).body as BountySubmitterPoolSize;
 
-    expect(bountyPermissions).toBeDefined();
-    expect(userPermissions).toBeDefined();
-
-    // Verify user permissions shape
-    typedKeys(userPermissions).forEach(key => {
-      expect(typeof userPermissions[key] as any).toEqual('boolean');
-    });
-
-    // Verify rollup across levels and assignments
-    typedKeys(BountyPermissionLevel).forEach(key => {
-      expect(bountyPermissions[key]).toBeInstanceOf(Array);
-    });
-
+    expect(mode === 'role').toBe(true);
+    expect(roleups.length).toBe(1);
+    // 1 space member assigned to role
+    expect(total).toBe(1);
   });
 
   it('should return the bounty pool size based on a simulation of permissions and respond with 200', async () => {
@@ -87,6 +90,7 @@ describe('GET /api/bounties/{bountyId}/permissions - Return assigned and individ
       userId: extraUser.id
     });
 
+    // This shouldn't be taken into account for our simulation
     const secondRole = await generateRole({
       createdBy: nonAdminUser.id,
       spaceId: nonAdminUserSpace.id
@@ -102,16 +106,24 @@ describe('GET /api/bounties/{bountyId}/permissions - Return assigned and individ
       userId: secondExtraUser.id
     });
 
+    const simulation: BountySubmitterPoolCalculation = {
+      resourceId: bounty.id,
+      permissions: {
+        submitter: [{ group: 'role', id: role.id }]
+      }
+    };
+
     const { mode, roleups, total } = (await request(baseUrl)
-      .get(`/api/bounties/${bounty.id}/pool`)
+      .post(`/api/bounties/${bounty.id}/pool`)
       .set('Cookie', extraUserCookie)
+      .send(simulation)
       .expect(200)).body as BountySubmitterPoolSize;
 
     expect(mode === 'role').toBe(true);
     expect(roleups.length).toBe(1);
-    expect(roleups[0].id).toBe(role.id);
+    expect(roleups[0].id === role.id).toBe(true);
 
-    // 3 spaceRoleToRoles exist, but only 2 users
+    // 2 users were assigned to 1 role
     expect(total).toBe(2);
   });
 
@@ -130,8 +142,9 @@ describe('GET /api/bounties/{bountyId}/permissions - Return assigned and individ
     });
 
     const { mode, roleups, total } = (await request(baseUrl)
-      .get(`/api/bounties/${bounty.id}/pool`)
+      .post(`/api/bounties/${bounty.id}/pool`)
       .set('Cookie', externalUserCookie)
+      .send({})
       .expect(200)).body as BountySubmitterPoolSize;
 
     expect(mode).toBe('space');
