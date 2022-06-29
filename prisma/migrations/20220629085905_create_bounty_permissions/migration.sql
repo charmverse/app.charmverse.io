@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "BountyOperation" AS ENUM ('work', 'review', 'view', 'edit', 'delete', 'lock', 'approve_applications');
+CREATE TYPE "BountyOperation" AS ENUM ('work', 'review', 'view', 'edit', 'delete', 'lock', 'approve_applications', 'grant_permissions');
 
 -- CreateEnum
 CREATE TYPE "BountyPermissionLevel" AS ENUM ('reviewer', 'creator', 'submitter', 'viewer');
