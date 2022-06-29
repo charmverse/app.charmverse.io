@@ -30,14 +30,14 @@ async function getVote (req: NextApiRequest, res: NextApiResponse<Vote | { error
 async function updateVote (req: NextApiRequest, res: NextApiResponse<Vote | { error: any }>) {
   const voteId = req.query.id as string;
   const { status } = req.body as UpdateVoteDTO;
-  const updatedVote = await updateVoteService(voteId, status);
+  const updatedVote = await updateVoteService(voteId, req.session.user.id, status);
 
   return res.status(200).json(updatedVote);
 }
 
 async function deleteVote (req: NextApiRequest, res: NextApiResponse<Vote | null | { error: any }>) {
   const voteId = req.query.id as string;
-  const deletedVote = await deleteVoteService(voteId);
+  const deletedVote = await deleteVoteService(voteId, req.session.user.id);
 
   return res.status(200).json(deletedVote);
 }
