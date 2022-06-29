@@ -22,13 +22,16 @@ export async function listAvailableBounties ({ spaceId, userId }: AvailableResou
 
   return prisma.bounty.findMany({
     where: {
+      spaceId,
       permissions: {
         some: {
           OR: [{
             public: true
           },
           {
-            userId
+            user: {
+              id: userId
+            }
           },
           {
             role: {

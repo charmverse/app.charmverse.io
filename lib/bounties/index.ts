@@ -5,3 +5,4 @@ export * from './getBounty';
 export * from './closeNewApplicationsAndSubmissions';
 export * from './closeOutBounty';
 export * from './reviewBountySuggestion';
+export * from './listAvailableBounties';

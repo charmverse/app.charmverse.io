@@ -1,17 +1,11 @@
 
 import { Space, User } from '@prisma/client';
-import { generateUserAndSpaceWithApiToken, generateBountyWithSingleApplication, generateBounty, generateSpaceUser, generateRole } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
-import { ExpectedAnError } from 'testing/errors';
-import { countValidSubmissions } from 'lib/applications/shared';
-import { DataNotFoundError, WrongStateError } from 'lib/utilities/errors';
+import { createBounty } from 'lib/bounties';
 import { assignRole } from 'lib/roles';
-import { createApplication, createSubmission } from '../../applications/actions';
-import { closeOutBounty } from '../closeOutBounty';
-import { createBounty } from '../createBounty';
-import { reviewBountySuggestion } from '../reviewBountySuggestion';
-import { listAvailableBounties } from '../listAvailableBounties';
+import { generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { prisma } from 'db';
 import { addBountyPermissionGroup } from '../../permissions/bounties';
+import { listAvailableBounties } from '../listAvailableBounties';
 
 let nonAdminUser: User;
 let space: Space;
@@ -27,20 +21,22 @@ beforeAll(async () => {
 describe('listAvailableBounties', () => {
   it('should only return the bounties the user has access to', async () => {
 
+    const { space: otherSpace, user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, false);
+
     const extraUser = await generateSpaceUser({
       isAdmin: false,
       spaceId: space.id
     });
 
-    const [bountyByUser, bountyByOtherUser, bountyByRole, bountyBySpace, bountyByPublic] = await Promise.all([
+    const bounties = await Promise.all([
       createBounty({
         createdBy: nonAdminUser.id,
         spaceId: space.id,
         title: 'Bounty by user'
       }),
       createBounty({
-        createdBy: nonAdminUser.id,
-        spaceId: space.id,
+        createdBy: otherUser.id,
+        spaceId: otherSpace.id,
         title: 'Bounty by other user'
       }),
       createBounty({
@@ -51,7 +47,7 @@ describe('listAvailableBounties', () => {
       createBounty({
         createdBy: nonAdminUser.id,
         spaceId: space.id,
-        title: 'Bounty by space'
+        title: 'Bounty by space you cant see'
       }),
       createBounty({
         createdBy: nonAdminUser.id,
@@ -60,7 +56,9 @@ describe('listAvailableBounties', () => {
       })
     ]);
 
-    // Permission the user
+    const [bountyByUser, bountyByOtherUser, bountyByRole, bountyBySpace, bountyByPublic] = bounties;
+
+    // 1/4 - Permission the user
     await addBountyPermissionGroup({
       level: 'viewer',
       resourceId: bountyByUser.id,
@@ -70,7 +68,7 @@ describe('listAvailableBounties', () => {
       }
     });
 
-    // Permission the role
+    // 2/4 - Permission the role
     const role = await generateRole({
       spaceId: space.id,
       createdBy: nonAdminUser.id
@@ -90,7 +88,7 @@ describe('listAvailableBounties', () => {
       }
     });
 
-    // Permission the space
+    // 3/4 - Permission the space
     await addBountyPermissionGroup({
       level: 'viewer',
       resourceId: bountyBySpace.id,
@@ -100,7 +98,7 @@ describe('listAvailableBounties', () => {
       }
     });
 
-    // Permission the public
+    // 4/4 - Permission the public
     await addBountyPermissionGroup({
       level: 'viewer',
       resourceId: bountyByPublic.id,
@@ -116,6 +114,15 @@ describe('listAvailableBounties', () => {
     });
 
     expect(available.length).toBe(4);
+
+    // Cleanup bounties
+    await prisma.bounty.deleteMany({
+      where: {
+        OR: bounties.map(b => {
+          return { id: b.id };
+        })
+      }
+    });
   });
 
 });

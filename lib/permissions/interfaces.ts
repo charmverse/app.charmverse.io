@@ -72,5 +72,5 @@ export type OperationGroupMapping<G extends string, O extends string> = {[key in
 
 export interface AvailableResourcesRequest {
   spaceId: string
-  userId: string
+  userId?: string
 }
