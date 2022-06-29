@@ -553,7 +553,7 @@ function CharmEditor (
         <PageInlineActionListBox
           className='PageThreadListBox'
         >
-          <PageThreadsList inline={false} />
+          <PageInlineVotesList />
         </PageInlineActionListBox>
       </Grow>
       )}

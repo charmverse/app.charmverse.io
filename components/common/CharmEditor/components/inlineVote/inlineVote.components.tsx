@@ -8,6 +8,7 @@ import { Box } from '@mui/system';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
+import { useInlineVotes } from 'hooks/useInlineVotes';
 import { usePages } from 'hooks/usePages';
 import { DateTime } from 'luxon';
 import { PageContent } from 'models';
@@ -38,9 +39,9 @@ function InlineVoteOptions (
   InlineVoteOptionsProps
 ) {
   return (
-    <List>
+    <div>
       {options.map((option, index) => (
-        <ListItem sx={{ px: 0, display: 'flex', gap: 1 }}>
+        <ListItem sx={{ px: 0, pt: 0, display: 'flex', gap: 0.5 }}>
           <TextField
             error={option.name.length === 0}
             // Disable changing text for No change option
@@ -103,7 +104,7 @@ function InlineVoteOptions (
         </Typography>
       </Box>
       )}
-    </List>
+    </div>
   );
 }
 
@@ -120,6 +121,7 @@ export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
   });
   const [voteType, setVoteType] = useState<VoteType>('default');
   const [options, setOptions] = useState<{ name: string, passThreshold: number }[]>([]);
+  const { createVote } = useInlineVotes();
 
   useEffect(() => {
     if (voteType === 'custom') {
@@ -151,17 +153,21 @@ export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
 
   const [deadline, setDeadline] = useState(DateTime.fromMillis(Date.now()));
   const { currentPageId } = usePages();
-  const isEmpty = checkForEmpty(voteDescription);
   const handleSubmit = async (e: React.KeyboardEvent<HTMLElement> | React.MouseEvent<HTMLElement, MouseEvent>) => {
-    if (!isEmpty) {
-      const cardId = typeof window !== 'undefined' ? (new URLSearchParams(window.location.href)).get('cardId') : null;
-      e.preventDefault();
-      updateInlineVote(v4())(view.state, view.dispatch);
-      hideSelectionTooltip(pluginKey)(view.state, view.dispatch, view);
-      const tr = view.state.tr.setSelection(new TextSelection(view.state.doc.resolve(view.state.selection.$to.pos)));
-      view.dispatch(tr);
-      view.focus();
-    }
+    const cardId = typeof window !== 'undefined' ? (new URLSearchParams(window.location.href)).get('cardId') : null;
+    e.preventDefault();
+    const vote = await createVote({
+      deadline: deadline.toJSDate(),
+      options,
+      title: voteTitle,
+      description: voteDescription
+    });
+
+    updateInlineVote(vote.id)(view.state, view.dispatch);
+    hideSelectionTooltip(pluginKey)(view.state, view.dispatch, view);
+    const tr = view.state.tr.setSelection(new TextSelection(view.state.doc.resolve(view.state.selection.$to.pos)));
+    view.dispatch(tr);
+    view.focus();
   };
 
   return (
@@ -255,9 +261,9 @@ export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
             marginBottom: '4px',
             marginRight: '8px'
           }}
-          disabled={isEmpty || (voteType === 'custom' && (options.findIndex(option => option.name.length === 0) !== -1)) || (new Set(options.map(option => option.name)).size !== options.length)}
+          disabled={voteTitle.length === 0 || (voteType === 'custom' && (options.findIndex(option => option.name.length === 0) !== -1)) || (new Set(options.map(option => option.name)).size !== options.length)}
         >
-          Start
+          Create
         </Button>
       </Box>
     </ClickAwayListener>

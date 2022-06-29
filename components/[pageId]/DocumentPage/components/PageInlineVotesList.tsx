@@ -8,7 +8,7 @@ export const StyledPageInlineVotesList = styled(List)`
   overflow: auto;
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing(1)};
+  gap: ${({ theme }) => theme.spacing(2)};
   padding-top: 0px;
   padding-bottom: 0px;
   height: calc(100% - 50px);

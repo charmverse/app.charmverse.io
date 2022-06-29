@@ -807,12 +807,15 @@ class CharmClient {
         name: 'Option 2',
         passThreshold: 0.5
       }, {
+        name: 'Option 3',
+        passThreshold: 0.25
+      }, {
         name: 'No Change',
         passThreshold: 0.5
       }],
       userVotes: [
         ...new Array(2).fill(null).map((_, index) => ({
-          userId: v4(),
+          userId: 'b1c1735e-da3c-4856-bd7c-fa9b13978e29',
           voteId: vote1Id,
           choice: 'Option 1',
           user: {
@@ -831,6 +834,16 @@ class CharmClient {
             username: `User 2.${index}`
           }
         })),
+        ...new Array(4).fill(null).map((_, index) => ({
+          userId: v4(),
+          voteId: vote1Id,
+          choice: 'Option 3',
+          user: {
+            avatar: 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50',
+            id: v4(),
+            username: `User 3.${index}`
+          }
+        })),
         ...new Array(3).fill(null).map((_, index) => ({
           userId: v4(),
           voteId: vote1Id,
@@ -838,7 +851,7 @@ class CharmClient {
           user: {
             avatar: 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50',
             id: v4(),
-            username: `User 3.${index}`
+            username: `User 4.${index}`
           }
         }))
       ]

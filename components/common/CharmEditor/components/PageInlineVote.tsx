@@ -1,6 +1,9 @@
-import { Box, Button, Chip, Divider, List, ListItem, ListItemText, Paper, Stack, Typography } from '@mui/material';
+import styled from '@emotion/styled';
+import { Box, Button, Chip, Divider, List, ListItem, ListItemText, Paper, Radio, Stack, Typography } from '@mui/material';
 import Modal from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
+import { useInlineVotes } from 'hooks/useInlineVotes';
+import { useUser } from 'hooks/useUser';
 import { VoteWithUsers } from 'lib/inline-votes/interfaces';
 import { DateTime } from 'luxon';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -12,10 +15,17 @@ interface PageInlineVoteProps {
   detailed?: boolean
 }
 
+const StyledDiv = styled.div<{detailed: boolean}>`
+  background-color: ${({ theme }) => theme.palette.background.light};
+  padding: ${({ theme, detailed }) => detailed ? 0 : theme.spacing(2)};
+`;
+
 export default function PageInlineVote ({ detailed = false, inlineVote }: PageInlineVoteProps) {
   const { deadline, description, title, userVotes, options, id } = inlineVote;
   const [showingDescription, setShowingDescription] = useState(false);
   const totalVotes = userVotes.length;
+  const [user] = useUser();
+  const { castVote } = useInlineVotes();
   const voteFrequencyRecord: Record<string, number> = useMemo(() => {
     return userVotes.reduce<Record<string, number>>((currentRecord, userVote) => {
       if (!currentRecord[userVote.choice]) {
@@ -26,29 +36,31 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
       }
       return currentRecord;
     }, {});
-  }, [userVotes]);
+  }, [inlineVote]);
+
   const inlineVoteDetailModal = usePopupState({ variant: 'popover', popupId: 'inline-votes-detail' });
 
   const voteCountLabel = (
     <Box sx={{
       fontWeight: 'bold',
       fontSize: 20,
-      my: 1
+      mt: 1
     }}
     >
       <span>Votes</span> <Chip size='small' label={totalVotes} />
     </Box>
   );
 
+  const userVote = user && inlineVote.userVotes.find(_userVote => _userVote.userId === user.id);
+
   return (
-    <div>
-      <Typography variant='h5' fontWeight='bold'>
+    <StyledDiv detailed={detailed}>
+      <Typography variant='h6' fontWeight='bold'>
         {title}
       </Typography>
       <Typography
         color='secondary'
         variant='subtitle1'
-        my={1}
       >
         {DateTime.fromJSDate(new Date(deadline)).toRelative({ base: (DateTime.now()) })?.replace('in', '')} left
       </Typography>
@@ -76,14 +88,23 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
         my: 1
       }}
       >
-        {options.map((option, optionIndex) => (
+        {options.map((option) => (
           <>
             <ListItem sx={{ p: 0, justifyContent: 'space-between' }}>
-              <Box sx={{ display: 'flex', gap: 1 }}>
-                <Typography variant='subtitle1'>{optionIndex + 1}.</Typography>
-                <Typography variant='body1'>{option.name}</Typography>
+              <Box display='flex' alignItems='center'>
+                <Radio
+                  disableRipple
+                  size='small'
+                  checked={option.name === userVote?.choice}
+                  onChange={() => {
+                    castVote(inlineVote.id, option.name);
+                  }}
+                />
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  <Typography variant='body1'>{option.name}</Typography>
+                </Box>
               </Box>
-              <Typography variant='subtitle1' color='secondary'>{((voteFrequencyRecord[option.name] / totalVotes) * 100).toFixed(2)}%</Typography>
+              <Typography variant='subtitle1' color='secondary'>{(((voteFrequencyRecord[option.name] ?? 0) / totalVotes) * 100).toFixed(2)}%</Typography>
             </ListItem>
             <Divider />
           </>
@@ -93,7 +114,7 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
       {detailed && voteCountLabel}
       {detailed && (
         <List>
-          {userVotes.map(userVote => (
+          {userVotes.map(_userVote => (
             <>
               <ListItem sx={{
                 px: 0,
@@ -101,8 +122,8 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
                 justifyContent: 'space-between'
               }}
               >
-                <UserDisplay user={userVote.user as any} />
-                {userVote.choice}
+                <UserDisplay user={_userVote.user as any} />
+                <Typography variant='subtitle1' color='secondary'>{_userVote.choice}</Typography>
               </ListItem>
               <Divider />
             </>
@@ -112,6 +133,6 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
       <Modal title='Vote details' size='large' open={inlineVoteDetailModal.isOpen} onClose={inlineVoteDetailModal.close}>
         <PageInlineVote inlineVote={inlineVote} detailed />
       </Modal>
-    </div>
+    </StyledDiv>
   );
 }
