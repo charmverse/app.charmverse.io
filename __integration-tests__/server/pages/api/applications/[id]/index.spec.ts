@@ -6,6 +6,7 @@ import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { ApplicationCreationData, ApplicationUpdateData } from 'lib/applications/interfaces';
 import { createBounty } from 'lib/bounties';
 import { createApplication } from 'lib/applications/actions';
+import { addBountyPermissionGroup } from 'lib/permissions/bounties';
 
 let nonAdminUser: User;
 let nonAdminUserSpace: Space;
@@ -39,6 +40,15 @@ describe('PUT /api/applications/{applicationId} - update an application', () => 
       bountyId: bounty.id,
       message: "I'm volunteering for this as it's in my field of expertise"
     };
+
+    await addBountyPermissionGroup({
+      level: 'submitter',
+      assignee: {
+        group: 'user',
+        id: nonAdminUser.id
+      },
+      resourceId: bounty.id
+    });
 
     const createdApplication = (await request(baseUrl)
       .post('/api/applications')
