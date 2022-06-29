@@ -1,20 +1,63 @@
-import { BountyWithDetails } from 'models';
 import { prisma } from 'db';
-import { getGroupsWithOperations } from '../permissions/bounties';
+import { BountyWithDetails } from 'models';
 import { AvailableResourcesRequest } from '../permissions/interfaces';
 
-export function listAvailableBounties ({ spaceId, userId }: AvailableResourcesRequest): Promise<BountyWithDetails> {
+export async function listAvailableBounties ({ spaceId, userId }: AvailableResourcesRequest): Promise<BountyWithDetails[]> {
 
-  const groups = getGroupsWithOperations(['view']);
+  if (!userId) {
+    return prisma.bounty.findMany({
+      where: {
+        spaceId,
+        permissions: {
+          some: {
+            public: true
+          }
+        }
+      },
+      include: {
+        applications: true
+      }
+    });
+  }
 
-  throw new Error('Not implemented');
-  /*
   return prisma.bounty.findMany({
     where: {
-
-      // TODO
-
+      permissions: {
+        some: {
+          OR: [{
+            public: true
+          },
+          {
+            userId
+          },
+          {
+            role: {
+              spaceRolesToRole: {
+                some: {
+                  spaceRole: {
+                    spaceId,
+                    userId
+                  }
+                }
+              }
+            }
+          },
+          {
+            space: {
+              id: spaceId,
+              spaceRoles: {
+                some: {
+                  userId
+                }
+              }
+            }
+          }]
+        }
+      }
+    },
+    include: {
+      applications: true
     }
   });
-  */
+
 }
