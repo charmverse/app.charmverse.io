@@ -91,7 +91,9 @@ describe('GET /api/bounties/{bountyId}/permissions - Return assigned and individ
 
     // Make sure it's empty everywhere and doesn't leak info about roles
     typedKeys(BountyPermissionLevel).forEach(key => {
-      expect(bountyPermissions[key].length).toBe(0);
+      if (key !== 'creator') {
+        expect(bountyPermissions[key].length).toBe(0);
+      }
     });
   });
 

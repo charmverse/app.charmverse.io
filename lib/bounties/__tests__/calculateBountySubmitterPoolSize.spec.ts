@@ -121,7 +121,7 @@ describe('calculateBountySubmitterPoolSize', () => {
     });
 
     const bountySize = await calculateBountySubmitterPoolSize({
-      bountyId: bounty.id
+      resourceId: bounty.id
     });
 
     expect(bountySize.total).toBe(11);
@@ -153,7 +153,7 @@ describe('calculateBountySubmitterPoolSize', () => {
     });
 
     const bountySize = await calculateBountySubmitterPoolSize({
-      bountyId: bounty.id
+      resourceId: bounty.id
     });
 
     expect(bountySize.total).toBe(5);
@@ -186,7 +186,7 @@ describe('calculateBountySubmitterPoolSize', () => {
     });
 
     const bountySize = await calculateBountySubmitterPoolSize({
-      bountyId: bounty.id,
+      resourceId: bounty.id,
       permissions: {
         submitter: [{
           group: 'space',
@@ -211,7 +211,7 @@ describe('calculateBountySubmitterPoolSize', () => {
     });
 
     const bountySize = await calculateBountySubmitterPoolSize({
-      bountyId: bounty.id,
+      resourceId: bounty.id,
       permissions: {
         viewer: [{
           group: 'space',
@@ -225,7 +225,7 @@ describe('calculateBountySubmitterPoolSize', () => {
 
   it('should fail if the bounty does not exist', async () => {
     await (expect(calculateBountySubmitterPoolSize({
-      bountyId: v4()
+      resourceId: v4()
     })).rejects.toBeInstanceOf(DataNotFoundError));
   });
 });
