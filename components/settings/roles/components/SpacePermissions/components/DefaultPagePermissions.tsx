@@ -1,10 +1,8 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Menu, MenuItem } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
-import { PagePermissionLevel } from '@prisma/client';
 import Button from 'components/common/Button';
 import { StyledListItemText } from 'components/common/StyledListItemText';
 import { permissionLevels } from 'lib/permissions/pages/page-permission-mapping';
