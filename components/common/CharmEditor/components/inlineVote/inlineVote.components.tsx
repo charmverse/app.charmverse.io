@@ -1,30 +1,114 @@
 import { PluginKey, TextSelection } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { hideSelectionTooltip } from '@bangle.dev/tooltip/selection-tooltip';
-import CancelIcon from '@mui/icons-material/Cancel';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import AddCircle from '@mui/icons-material/AddCircle';
-import { ClickAwayListener, FormControlLabel, Grow, IconButton, List, ListItem, ListItemText, Radio, RadioGroup, TextField, Typography } from '@mui/material';
-import { Box, useTheme } from '@mui/system';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { ClickAwayListener, FormControlLabel, IconButton, List, ListItem, Radio, RadioGroup, TextField, Typography } from '@mui/material';
+import { Box } from '@mui/system';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { usePages } from 'hooks/usePages';
 import { DateTime } from 'luxon';
 import { PageContent } from 'models';
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
 import { v4 } from 'uuid';
-import DeleteIcon from '@mui/icons-material/Delete';
 import InlineCharmEditor from '../../InlineCharmEditor';
 import { checkForEmpty } from '../../utils';
 import { updateInlineVote } from './inlineVote.utils';
 
 type VoteType = 'default' | 'custom';
 
-export function InlineVoteSubMenu ({ pluginKey }: {pluginKey: PluginKey}) {
+interface InlineVoteOptionsProps {
+  disableTextFields?: boolean
+  options: { name: string, passThreshold: number }[]
+  setOptions: Dispatch<SetStateAction<{ name: string, passThreshold: number }[]>>
+  disableDelete?: boolean
+  disableAddOption?: boolean
+}
+
+function InlineVoteOptions (
+  {
+    disableAddOption = false,
+    disableDelete = false,
+    options,
+    setOptions,
+    disableTextFields = false
+  }:
+  InlineVoteOptionsProps
+) {
+  return (
+    <List>
+      {options.map((option, index) => (
+        <ListItem sx={{ px: 0, display: 'flex', gap: 1 }}>
+          <TextField
+            error={option.name.length === 0}
+            // Disable changing text for No change option
+            disabled={disableTextFields || index === 2}
+            fullWidth
+            placeholder={`Option ${index + 1}`}
+            value={option.name}
+            onChange={(e) => {
+              options[index] = {
+                name: e.target.value,
+                passThreshold: options[index].passThreshold
+              };
+              setOptions([...options]);
+            }}
+          />
+          <TextField
+            type='number'
+            value={option.passThreshold}
+            onChange={(e) => {
+              options[index] = {
+                name: options[index].name,
+                passThreshold: Number(e.target.value)
+              };
+              setOptions([...options]);
+            }}
+            InputProps={{
+              inputProps: {
+                min: 0,
+                max: 1,
+                step: 0.1
+              }
+            }}
+          />
+          <IconButton
+            disabled={disableDelete || options.length === 2 || (index <= 2)}
+            size='small'
+            onClick={() => {
+              setOptions([...options.slice(0, index), ...options.slice(index + 1)]);
+            }}
+          >
+            <DeleteIcon fontSize='small' />
+          </IconButton>
+        </ListItem>
+      ))}
+      {!disableAddOption && (
+      <Box display='flex' gap={0.5} alignItems='center'>
+        <IconButton
+          size='small'
+          onClick={() => {
+            setOptions([...options, {
+              name: '',
+              passThreshold: 0.5
+            }]);
+          }}
+        >
+          <AddCircle fontSize='small' />
+        </IconButton>
+        <Typography variant='subtitle1'>
+          Add Option
+        </Typography>
+      </Box>
+      )}
+    </List>
+  );
+}
+
+export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
   const view = useEditorViewContext();
-  const theme = useTheme();
   const [voteTitle, setVoteTitle] = useState('');
   const [voteDescription, setVoteDescription] = useState<PageContent>({
     type: 'doc',
@@ -35,7 +119,35 @@ export function InlineVoteSubMenu ({ pluginKey }: {pluginKey: PluginKey}) {
     ]
   });
   const [voteType, setVoteType] = useState<VoteType>('default');
-  const [options, setOptions] = useState(['', '', '']);
+  const [options, setOptions] = useState<{ name: string, passThreshold: number }[]>([]);
+
+  useEffect(() => {
+    if (voteType === 'custom') {
+
+      setOptions([{
+        name: 'Option 1',
+        passThreshold: 0.5
+      }, {
+        name: 'Option 2',
+        passThreshold: 0.5
+      }, {
+        name: 'No change',
+        passThreshold: 0.5
+      }]);
+    }
+    else if (voteType === 'default') {
+      setOptions([{
+        name: 'Yes',
+        passThreshold: 0.5
+      }, {
+        name: 'No',
+        passThreshold: 0.5
+      }, {
+        name: 'Abstain',
+        passThreshold: 0.5
+      }]);
+    }
+  }, [voteType]);
 
   const [deadline, setDeadline] = useState(DateTime.fromMillis(Date.now()));
   const { currentPageId } = usePages();
@@ -132,69 +244,9 @@ export function InlineVoteSubMenu ({ pluginKey }: {pluginKey: PluginKey}) {
             control={<Radio />}
             label='Yes / No'
           />
-          <FormControlLabel value='options' control={<Radio />} label='# Options' />
+          <FormControlLabel value='custom' control={<Radio />} label='# Options' />
         </RadioGroup>
-        {voteType === 'default' ? (
-          <List>
-            <ListItem sx={{ p: 0 }}>
-              <CheckCircleIcon fontSize='small' sx={{ mr: 1 }} />
-              <ListItemText>Yes</ListItemText>
-            </ListItem>
-            <ListItem sx={{ p: 0 }}>
-              <CancelIcon fontSize='small' sx={{ mr: 1 }} />
-              <ListItemText>No</ListItemText>
-            </ListItem>
-            <ListItem sx={{ p: 0 }}>
-              <RemoveCircleIcon fontSize='small' sx={{ mr: 1 }} />
-              <ListItemText>Abstain</ListItemText>
-            </ListItem>
-          </List>
-        ) : (
-          <List>
-            {options.map((option, index) => (
-              <ListItem sx={{ px: 0, display: 'flex', gap: 1 }}>
-                <TextField
-                  fullWidth
-                  placeholder={`Option ${index + 1}`}
-                  value={option}
-                  onChange={(e) => {
-                    options[index] = e.target.value;
-                    setOptions([...options]);
-                  }}
-                />
-                <IconButton
-                  disabled={options.length === 2}
-                  size='small'
-                  onClick={() => {
-                    setOptions([...options.slice(0, index), ...options.slice(index + 1)]);
-                  }}
-                >
-                  <DeleteIcon fontSize='small' />
-                </IconButton>
-              </ListItem>
-            ))}
-            <ListItem sx={{ px: 0, display: 'flex', gap: 1 }}>
-              <TextField
-                fullWidth
-                value='No Change'
-                disabled
-              />
-            </ListItem>
-            <Box display='flex' gap={0.5} alignItems='center'>
-              <IconButton
-                size='small'
-                onClick={() => {
-                  setOptions([...options, '']);
-                }}
-              >
-                <AddCircle fontSize='small' />
-              </IconButton>
-              <Typography variant='subtitle1'>
-                Add Option
-              </Typography>
-            </Box>
-          </List>
-        ) }
+        <InlineVoteOptions disableAddOption={voteType === 'default'} disableDelete={voteType === 'default'} disableTextFields={voteType === 'default'} options={options} setOptions={setOptions} />
         <Button
           size='small'
           onClick={handleSubmit}
@@ -203,7 +255,7 @@ export function InlineVoteSubMenu ({ pluginKey }: {pluginKey: PluginKey}) {
             marginBottom: '4px',
             marginRight: '8px'
           }}
-          disabled={isEmpty || (voteType === 'custom' && options.findIndex(option => option.length === 0) !== -1)}
+          disabled={isEmpty || (voteType === 'custom' && (options.findIndex(option => option.name.length === 0) !== -1)) || (new Set(options.map(option => option.name)).size !== options.length)}
         >
           Start
         </Button>

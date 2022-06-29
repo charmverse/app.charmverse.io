@@ -294,7 +294,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
   }
 `;
 
-const PageThreadListBox = styled.div`
+const PageInlineActionListBox = styled.div`
   position: fixed;
   right: 0px;
   width: 400px;
@@ -550,14 +550,13 @@ function CharmEditor (
         }}
         timeout={250}
       >
-        <PageThreadListBox
+        <PageInlineActionListBox
           className='PageThreadListBox'
         >
           <PageThreadsList inline={false} />
-        </PageThreadListBox>
+        </PageInlineActionListBox>
       </Grow>
       )}
-      <PageInlineVotesList />
       {!disabledPageSpecificFeatures && <InlineCommentThread pluginKey={inlineCommentPluginKey} />}
       {!readOnly && <DevTools />}
     </StyledReactBangleEditor>

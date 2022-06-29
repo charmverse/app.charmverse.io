@@ -4,7 +4,7 @@ import UserDisplay from 'components/common/UserDisplay';
 import { VoteWithUsers } from 'lib/inline-votes/interfaces';
 import { DateTime } from 'luxon';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import InlineCharmEditor from '../InlineCharmEditor';
 
 interface PageInlineVoteProps {
@@ -14,6 +14,7 @@ interface PageInlineVoteProps {
 
 export default function PageInlineVote ({ detailed = false, inlineVote }: PageInlineVoteProps) {
   const { deadline, description, title, userVotes, options, id } = inlineVote;
+  const [showingDescription, setShowingDescription] = useState(false);
   const totalVotes = userVotes.length;
   const voteFrequencyRecord: Record<string, number> = useMemo(() => {
     return userVotes.reduce<Record<string, number>>((currentRecord, userVote) => {
@@ -28,6 +29,17 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
   }, [userVotes]);
   const inlineVoteDetailModal = usePopupState({ variant: 'popover', popupId: 'inline-votes-detail' });
 
+  const voteCountLabel = (
+    <Box sx={{
+      fontWeight: 'bold',
+      fontSize: 20,
+      my: 1
+    }}
+    >
+      <span>Votes</span> <Chip size='small' label={totalVotes} />
+    </Box>
+  );
+
   return (
     <div>
       <Typography variant='h5' fontWeight='bold'>
@@ -40,7 +52,13 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
       >
         {DateTime.fromJSDate(new Date(deadline)).toRelative({ base: (DateTime.now()) })?.replace('in', '')} left
       </Typography>
-      <Box my={1}>
+      <Box mt={1} display='flex' justifyContent='space-between' alignItems='center'>
+        <Typography variant='h6' fontWeight='bold'>
+          Description
+        </Typography>
+        <Button size='small' variant='outlined' onClick={() => setShowingDescription((_showingDescription) => !_showingDescription)}>{!showingDescription ? 'Show' : 'Hide'}</Button>
+      </Box>
+      {showingDescription && (
         <InlineCharmEditor
           key={id}
           content={description}
@@ -49,14 +67,8 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
             padding: 0
           }}
         />
-      </Box>
-      <div style={{
-        fontWeight: 'bold',
-        fontSize: 20
-      }}
-      >
-        <span>Votes</span> <Chip size='small' label={totalVotes} />
-      </div>
+      )}
+      {!detailed && voteCountLabel}
       <List sx={{
         display: 'flex',
         gap: 1,
@@ -78,21 +90,23 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
         ))}
       </List>
       {!detailed && <Button variant='outlined' onClick={inlineVoteDetailModal.open}>View details</Button>}
+      {detailed && voteCountLabel}
       {detailed && (
         <List>
-            {userVotes.map(userVote => (
-              <>
-                <ListItem sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between'
-                }}
-                >
-                  <UserDisplay user={userVote.user as any} />
-                  {userVote.choice}
-                </ListItem>
-                <Divider />
-              </>
-            ))}
+          {userVotes.map(userVote => (
+            <>
+              <ListItem sx={{
+                px: 0,
+                display: 'flex',
+                justifyContent: 'space-between'
+              }}
+              >
+                <UserDisplay user={userVote.user as any} />
+                {userVote.choice}
+              </ListItem>
+              <Divider />
+            </>
+          ))}
         </List>
       )}
       <Modal title='Vote details' size='large' open={inlineVoteDetailModal.isOpen} onClose={inlineVoteDetailModal.close}>
