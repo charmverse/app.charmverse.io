@@ -1,6 +1,7 @@
 import { Bounty, BountyPermission } from '@prisma/client';
 import { BountyPermissions, BountySubmitter } from 'lib/permissions/bounties';
 import { Roleup } from 'lib/roles/interfaces';
+import { Resource } from '../permissions/interfaces';
 
 // Re-export bounty permissions interfaces for convenience
 export * from 'lib/permissions/bounties/interfaces';
@@ -26,6 +27,11 @@ export interface SuggestionRejectAction {
 }
 
 export type SuggestionAction = SuggestionApproveAction | SuggestionRejectAction
+
+/**
+ * Calculate pool for resource permissions as is, or pass simulated permissions to calculate pool
+ */
+export type BountySubmitterPoolCalculation = Resource & {permissions?: Partial<BountyPermissions>}
 
 /**
  * Used to represent how many potential applicants exist.

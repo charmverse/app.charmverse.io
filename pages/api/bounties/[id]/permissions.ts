@@ -43,6 +43,3 @@ async function computeBountyGroupPermissionsController (req: NextApiRequest, res
 }
 
 export default withSessionRoute(handler);
-
-// --------- Add logging events
-// These events as

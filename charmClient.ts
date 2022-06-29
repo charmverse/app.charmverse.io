@@ -33,7 +33,7 @@ import { UpdateThreadRequest } from 'pages/api/threads/[id]';
 import { TokenGateWithRoles } from 'pages/api/token-gates';
 
 import { ApplicationWithTransactions } from 'lib/applications/actions';
-import { AssignedBountyPermissions, BountyUpdate, SuggestionAction } from 'lib/bounties';
+import { AssignedBountyPermissions, BountyUpdate, SuggestionAction, BountySubmitterPoolSize } from 'lib/bounties/interfaces';
 import { PublicPageResponse } from 'lib/pages/interfaces';
 import { PublicSpaceInfo } from 'lib/spaces/interfaces';
 import type { MarkTask } from 'lib/tasks/markTasks';
@@ -403,6 +403,10 @@ class CharmClient {
     const data = await http.POST<Bounty>('/api/bounties', bounty);
 
     return data;
+  }
+
+  async getBountyApplicantPool ({ resourceId }: Resource): Promise<BountySubmitterPoolSize> {
+    return http.GET<BountySubmitterPoolSize>(`/api/bounties/${resourceId}/pool`);
   }
 
   /**

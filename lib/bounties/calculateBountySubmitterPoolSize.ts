@@ -2,19 +2,19 @@ import { prisma } from 'db';
 import { getGroupsWithOperations, queryBountyPermissions } from 'lib/permissions/bounties';
 import { countRoleMembers } from 'lib/roles';
 import { DataNotFoundError } from 'lib/utilities/errors';
-import { BountyPermissions, BountySubmitterPoolSize } from './interfaces';
+import { BountyPermissions, BountySubmitterPoolCalculation, BountySubmitterPoolSize } from './interfaces';
 
 /**
  * Returns the number of potential bounty applicants.
  * You can also permissions to simulate how many people have access to the bounty.
  * @param param0
  */
-export async function calculateBountySubmitterPoolSize ({ bountyId, permissions }:
-  {bountyId: string, permissions?: Partial<BountyPermissions>}): Promise<BountySubmitterPoolSize> {
+export async function calculateBountySubmitterPoolSize ({ resourceId, permissions }:
+  BountySubmitterPoolCalculation): Promise<BountySubmitterPoolSize> {
 
   const bounty = await prisma.bounty.findUnique({
     where: {
-      id: bountyId
+      id: resourceId
     },
     select: {
       id: true,
@@ -23,11 +23,11 @@ export async function calculateBountySubmitterPoolSize ({ bountyId, permissions 
   });
 
   if (!bounty) {
-    throw new DataNotFoundError(`Bounty with id ${bountyId} not found`);
+    throw new DataNotFoundError(`Bounty with id ${resourceId} not found`);
   }
 
   const permissionsToUse = permissions ?? await queryBountyPermissions({
-    bountyId
+    bountyId: resourceId
   });
 
   const groupsWhoCouldSubmit = getGroupsWithOperations(['work']).map(permissionLevel => {
