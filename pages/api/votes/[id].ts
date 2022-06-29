@@ -7,7 +7,7 @@ import {
   getVote as getVoteService,
   updateVote as updateVoteService,
   deleteVote as deleteVoteService,
-  VoteModel
+  UpdateVoteDTO
 } from 'lib/votes';
 import nc from 'next-connect';
 
@@ -30,13 +30,13 @@ async function getVote (req: NextApiRequest, res: NextApiResponse<Vote | { error
 
 async function updateVote (req: NextApiRequest, res: NextApiResponse<Vote | { error: any }>) {
   const voteId = req.query.id as string;
-  const vote = req.body as Partial<Vote>;
-  const updatedVote = await updateVoteService(voteId, vote);
+  const { status } = req.body as UpdateVoteDTO;
+  const updatedVote = await updateVoteService(voteId, status);
 
   return res.status(200).json(updatedVote);
 }
 
-async function deleteVote (req: NextApiRequest, res: NextApiResponse<Vote | { error: any }>) {
+async function deleteVote (req: NextApiRequest, res: NextApiResponse<Vote | null | { error: any }>) {
   const voteId = req.query.id as string;
   const deletedVote = await deleteVoteService(voteId);
 

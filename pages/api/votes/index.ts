@@ -2,7 +2,7 @@
 import { Vote } from '@prisma/client';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { createVote, VoteModel } from 'lib/votes';
+import { createVote, VoteDTO } from 'lib/votes';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -13,13 +13,13 @@ handler
   .post(startVote);
 
 async function startVote (req: NextApiRequest, res: NextApiResponse<Vote | { error: any }>) {
-  const newVote = req.body as Partial<Vote>;
+  const newVote = req.body as VoteDTO;
   const userId = req.session.user.id;
 
   const vote = await createVote({
     ...newVote,
     initiatorId: userId
-  } as VoteModel);
+  } as VoteDTO);
 
   return res.status(200).json(vote);
 }

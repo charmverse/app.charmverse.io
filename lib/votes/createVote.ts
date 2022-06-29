@@ -2,11 +2,11 @@
 import { prisma } from 'db';
 import { Vote } from '@prisma/client';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
-import { VoteModel, VOTE_STATUS } from './interfaces';
+import { DEFAULT_THRESHOLD, VoteDTO, VOTE_STATUS } from './interfaces';
 
-export async function createVote (vote: VoteModel): Promise<Vote> {
+export async function createVote (vote: VoteDTO): Promise<Vote> {
 
-  const { initiatorId, pageId, title, description, deadline, options } = vote;
+  const { createdBy, pageId, title, description, deadline, options } = vote;
 
   if (!pageId) {
     throw new InvalidInputError('Please provide the id of the page where the vote is taking place.');
@@ -31,19 +31,31 @@ export async function createVote (vote: VoteModel): Promise<Vote> {
       description: description as string,
       title,
       deadline,
-      options: options as string,
       status: VOTE_STATUS[0],
       page: {
         connect: {
           id: pageId
         }
       },
-      initiator: {
+      space: {
         connect: {
-          id: initiatorId
+          id: existingPage.spaceId
+        }
+      },
+      author: {
+        connect: {
+          id: createdBy
         }
       }
     }
+  });
+
+  await prisma.voteOptions.createMany({
+    data: options.map(option => ({
+      name: option.name,
+      threshold: option.threshold || DEFAULT_THRESHOLD,
+      voteId: createdVote.id
+    }))
   });
 
   return createdVote;
