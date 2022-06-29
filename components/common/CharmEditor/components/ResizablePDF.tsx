@@ -8,7 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import charmClient from 'charmClient';
-import { HTMLAttributes, memo, useCallback, useState } from 'react';
+import { HTMLAttributes, memo, useCallback, useMemo, useState } from 'react';
 import PdfSelector from 'components/common/PdfSelector';
 import { MIN_PDF_WIDTH, MAX_PDF_WIDTH } from 'lib/image/constants';
 import { Document, Page, pdfjs } from 'react-pdf';
@@ -164,8 +164,12 @@ function ResizablePDF ({ readOnly, onResizeStop, node, updateAttrs, selected }:
   NodeViewProps & {readOnly?: boolean, onResizeStop?: (view: EditorView) => void }) {
   readOnly = readOnly ?? false;
 
+  const url: string = useMemo(() => node.attrs.src, [node.attrs.src]);
+
+  const size: number = useMemo(() => node.attrs.size, [node.attrs.size]);
+
   // If there are no source for the node, return the pdf select component
-  if (!node.attrs.src) {
+  if (!url) {
     if (readOnly) {
       return <EmptyPDFContainer readOnly={readOnly} isSelected={selected} />;
     }
@@ -186,8 +190,8 @@ function ResizablePDF ({ readOnly, onResizeStop, node, updateAttrs, selected }:
   }
 
   const onDelete = useCallback(() => {
-    if (node.attrs.src?.includes('s3.amazonaws.com')) {
-      charmClient.deleteFromS3(node.attrs.src);
+    if (url?.includes('s3.amazonaws.com')) {
+      charmClient.deleteFromS3(url);
     }
     updateAttrs({
       src: null,
@@ -197,19 +201,19 @@ function ResizablePDF ({ readOnly, onResizeStop, node, updateAttrs, selected }:
 
   if (readOnly) {
     return (
-      <PDFViewer url={node.attrs.src} width={node.attrs.size} />
+      <PDFViewer url={url} width={size} />
     );
   }
   else {
     return (
       <Resizable
-        initialSize={node.attrs.size}
+        initialSize={size}
         minWidth={MIN_PDF_WIDTH}
         updateAttrs={updateAttrs}
         onDelete={onDelete}
         onResizeStop={onResizeStop}
       >
-        <PDFViewer url={node.attrs.src} width={node.attrs.size} />
+        <PDFViewer url={url} width={size} />
       </Resizable>
     );
   }
