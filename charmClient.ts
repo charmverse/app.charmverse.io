@@ -40,6 +40,7 @@ import type { MarkTask } from 'lib/tasks/markTasks';
 import { TransactionCreationData } from 'lib/transactions/interface';
 import { PublicUser } from 'pages/api/public/profile/[userPath]';
 import { DeepDaoAggregateData } from 'lib/deepdao/interfaces';
+import { VoteWithUsers } from 'lib/inline-votes/interfaces';
 import { AssignedPermissionsQuery } from './lib/permissions/interfaces';
 import { SpacePermissionFlags, SpacePermissionModification } from './lib/permissions/spaces';
 import { SpacePermissionConfigurationUpdate } from './lib/permissions/meta/interfaces';
@@ -697,6 +698,10 @@ class CharmClient {
 
   getAggregatedData (userPath: string) {
     return http.GET<DeepDaoAggregateData>(`/api/public/profile/${userPath}/aggregate`);
+  }
+
+  async getPageInlineVotesWithUsers (currentPageId: string): Promise<VoteWithUsers[]> {
+    return [];
   }
 }
 
