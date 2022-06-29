@@ -28,7 +28,7 @@ export async function createVote (vote: VoteDTO): Promise<Vote> {
 
   const createdVote = await prisma.vote.create({
     data: {
-      description: description as string,
+      description,
       title,
       deadline,
       status: VOTE_STATUS[0],

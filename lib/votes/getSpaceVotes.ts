@@ -1,10 +1,10 @@
 import { Vote } from '@prisma/client';
 import { prisma } from 'db';
 
-export async function getVote (id: string): Promise<Vote | null> {
-  return prisma.vote.findUnique({
+export async function getSpaceVotes (spaceId: string): Promise<Vote[]> {
+  return prisma.vote.findMany({
     where: {
-      id
+      spaceId
     },
     include: {
       userVotes: true
