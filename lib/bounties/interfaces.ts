@@ -40,3 +40,4 @@ export interface BountySubmitterPoolSize {
   // Rollup that always exists (counts all space members, including roles, who can apply)
   total: number;
 }
+

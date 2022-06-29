@@ -25,6 +25,9 @@ class BountyPermissionLevelOperationMapping implements OperationGroupMapping<Bou
 
 export const bountyPermissionMapping = new BountyPermissionLevelOperationMapping();
 
+/**
+ * Returns only the permission levels as strings which have access to the full set of operations
+ */
 export function getGroupsWithOperations (operations: BountyOperation[]): BountyPermissionLevel[] {
   return bountyPermissionLevels().filter(level => {
 
