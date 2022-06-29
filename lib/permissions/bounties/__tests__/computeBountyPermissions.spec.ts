@@ -3,7 +3,7 @@ import { BountyOperation } from '@prisma/client';
 import { prisma } from 'db';
 import { assignRole } from 'lib/roles';
 import { typedKeys } from 'lib/utilities/objects';
-import { generateBounty, generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateBounty, generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { addBountyPermissionGroup } from '../addBountyPermissionGroup';
 import { computeBountyPermissions } from '../computeBountyPermissions';
@@ -14,6 +14,7 @@ describe('computeBountyPermissions', () => {
   it('should combine permissions from user, role assignments and space membership', async () => {
 
     const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
+    const otherUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
 
     const bounty = await generateBounty({
       createdBy: user.id,
@@ -29,7 +30,7 @@ describe('computeBountyPermissions', () => {
 
     await assignRole({
       roleId: role.id,
-      userId: user.id
+      userId: otherUser.id
     });
 
     await Promise.all([
@@ -38,7 +39,7 @@ describe('computeBountyPermissions', () => {
         level: 'reviewer',
         assignee: {
           group: 'user',
-          id: user.id
+          id: otherUser.id
         }
       }),
       addBountyPermissionGroup({
@@ -62,7 +63,7 @@ describe('computeBountyPermissions', () => {
     const computed = await computeBountyPermissions({
       allowAdminBypass: false,
       resourceId: bounty.id,
-      userId: user.id
+      userId: otherUser.id
     });
 
     bountyPermissionMapping.viewer.forEach(op => {
@@ -81,6 +82,7 @@ describe('computeBountyPermissions', () => {
 
   it('should give user space permissions via their role', async () => {
     const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
+    const otherUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
 
     const bounty = await generateBounty({
       createdBy: user.id,
@@ -96,7 +98,7 @@ describe('computeBountyPermissions', () => {
 
     await assignRole({
       roleId: role.id,
-      userId: user.id
+      userId: otherUser.id
     });
 
     await addBountyPermissionGroup({
@@ -113,7 +115,7 @@ describe('computeBountyPermissions', () => {
     const computed = await computeBountyPermissions({
       allowAdminBypass: false,
       resourceId: bounty.id,
-      userId: user.id
+      userId: otherUser.id
     });
 
     typedKeys(BountyOperation).forEach(op => {
@@ -129,6 +131,7 @@ describe('computeBountyPermissions', () => {
 
   it('should give user space permissions via their space membership', async () => {
     const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
+    const otherUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
 
     const bounty = await generateBounty({
       createdBy: user.id,
@@ -151,6 +154,34 @@ describe('computeBountyPermissions', () => {
     const computed = await computeBountyPermissions({
       allowAdminBypass: false,
       resourceId: bounty.id,
+      userId: otherUser.id
+    });
+
+    typedKeys(BountyOperation).forEach(op => {
+      if (availableOperations.indexOf(op) > -1) {
+        expect(computed[op]).toBe(true);
+      }
+      else {
+        expect(computed[op]).toBe(false);
+      }
+    });
+  });
+
+  it('should always give creator permissions to the bounty creator, even if this is not explicitly assigned', async () => {
+    const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
+
+    const bounty = await generateBounty({
+      createdBy: user.id,
+      approveSubmitters: true,
+      spaceId: space.id,
+      status: 'open'
+    });
+
+    const availableOperations = bountyPermissionMapping.creator;
+
+    const computed = await computeBountyPermissions({
+      allowAdminBypass: false,
+      resourceId: bounty.id,
       userId: user.id
     });
 
@@ -166,6 +197,7 @@ describe('computeBountyPermissions', () => {
 
   it('should give user space permissions as an individual', async () => {
     const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
+    const otherUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
 
     const bounty = await generateBounty({
       createdBy: user.id,
@@ -179,7 +211,7 @@ describe('computeBountyPermissions', () => {
       level: 'reviewer',
       assignee: {
         group: 'user',
-        id: user.id
+        id: otherUser.id
       }
     });
 
@@ -188,7 +220,7 @@ describe('computeBountyPermissions', () => {
     const computed = await computeBountyPermissions({
       allowAdminBypass: false,
       resourceId: bounty.id,
-      userId: user.id
+      userId: otherUser.id
     });
 
     typedKeys(BountyOperation).forEach(op => {
@@ -227,8 +259,10 @@ describe('computeBountyPermissions', () => {
   it('should return true only for operations the user has access to if they are a space admin and admin bypass was disabled', async () => {
     const { space, user } = await generateUserAndSpaceWithApiToken(undefined, true);
 
+    const otherUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
+
     const bounty = await generateBounty({
-      createdBy: user.id,
+      createdBy: otherUser.id,
       approveSubmitters: true,
       spaceId: space.id,
       status: 'open'

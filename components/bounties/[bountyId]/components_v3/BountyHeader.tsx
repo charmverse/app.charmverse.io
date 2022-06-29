@@ -23,6 +23,7 @@ import { useUser } from 'hooks/useUser';
 import { requesterCanDeleteBounty } from 'lib/bounties/shared';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { BountyWithDetails } from 'models';
+import { AssignedBountyPermissions } from 'lib/bounties';
 
 const menuPosition: Partial<MenuProps> = {
   anchorOrigin: {
@@ -37,9 +38,10 @@ const menuPosition: Partial<MenuProps> = {
 
 interface Props {
   bounty: BountyWithDetails
+  permissions: AssignedBountyPermissions
 }
 
-export default function BountyHeader ({ bounty }: Props) {
+export default function BountyHeader ({ bounty, permissions }: Props) {
   const { refreshBounty } = useBounties();
 
   const [user] = useUser();
@@ -205,6 +207,7 @@ export default function BountyHeader ({ bounty }: Props) {
         bounty={bounty}
         open={bountyEditModal.isOpen}
         onClose={bountyEditModal.close}
+        permissions={permissions}
       />
 
       <Modal open={bountyDeleteModal.isOpen} onClose={bountyDeleteModal.close}>

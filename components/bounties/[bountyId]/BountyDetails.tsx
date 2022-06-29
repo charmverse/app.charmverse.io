@@ -53,9 +53,9 @@ export default function BountyDetails () {
   ) : (
     <Box py={3} px={18}>
 
-      <BountyHeader bounty={currentBounty} />
+      <BountyHeader bounty={currentBounty} permissions={bountyPermissions} />
 
-      <BountyDescription />
+      <BountyDescription bounty={currentBounty} permissions={bountyPermissions} />
 
       {
           currentBounty.status === 'suggestion' && <BountySuggestionApproval bounty={currentBounty} />

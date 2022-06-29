@@ -13,7 +13,8 @@ export async function queryBountyPermissions ({ bountyId }: {bountyId: string}):
       id: bountyId
     },
     select: {
-      id: true
+      id: true,
+      createdBy: true
     }
   });
 
@@ -27,5 +28,14 @@ export async function queryBountyPermissions ({ bountyId }: {bountyId: string}):
     }
   });
 
-  return mapBountyPermissions(permissions);
+  const mapped = mapBountyPermissions(permissions);
+
+  if (mapped.creator.every(p => p.id !== bounty.createdBy && p.group !== 'user')) {
+    mapped.creator.push({
+      id: bounty.createdBy,
+      group: 'user'
+    });
+  }
+
+  return mapped;
 }

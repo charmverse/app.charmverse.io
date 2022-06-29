@@ -2,6 +2,7 @@
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { generateBounty, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
+import { TargetPermissionGroup } from '../../interfaces';
 import { addBountyPermissionGroup } from '../addBountyPermissionGroup';
 import { queryBountyPermissions } from '../queryBountyPermissions';
 
@@ -46,7 +47,31 @@ describe('queryBountyPermissions', () => {
     expect(queryResult.reviewer.length).toBe(1);
     expect(queryResult.reviewer[0].id).toBe(user.id);
     expect(queryResult.viewer.length).toBe(0);
-    expect(queryResult.creator.length).toBe(0);
+    // Creator gets a synthetic permission injected
+    expect(queryResult.creator.length).toBe(1);
+
+  });
+
+  it('should assign a creator permission to creator in query results, even if this is not in the database', async () => {
+
+    const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
+
+    const bounty = await generateBounty({
+      createdBy: user.id,
+      approveSubmitters: true,
+      spaceId: space.id,
+      status: 'open'
+    });
+
+    const queryResult = await queryBountyPermissions({
+      bountyId: bounty.id
+    });
+
+    expect(queryResult.creator.length).toBe(1);
+
+    const syntheticPermission = queryResult.creator[0];
+
+    expect(syntheticPermission.group === 'user' && syntheticPermission.id === user.id).toBe(true);
 
   });
 

@@ -105,5 +105,9 @@ export async function computeBountyPermissions ({
     allowedOperations.addPermissions(bountyPermissionMapping[p.permissionLevel].slice());
   });
 
+  if (bounty.createdBy === userId) {
+    allowedOperations.addPermissions(bountyPermissionMapping.creator.slice());
+  }
+
   return allowedOperations.operationFlags;
 }
