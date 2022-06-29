@@ -11,14 +11,14 @@ interface Props {
   onClose: () => void;
   onSubmit: (bounty: BountyWithDetails) => void;
   focusKey?: keyof FormValues;
-  permissions: AssignedBountyPermissions;
+  permissions?: AssignedBountyPermissions;
 }
 
 export default function BountyModal (props: Props) {
   const { open, onClose, onSubmit, mode = 'create', bounty, focusKey, permissions } = props;
   return (
     <Modal size='large' title={bountyFormTitles[mode]} open={open} onClose={onClose} sx={{ margin: 'auto' }}>
-      {open && <BountyEditorForm onSubmit={onSubmit} bounty={bounty} mode={mode} focusKey={focusKey} />}
+      {open && <BountyEditorForm permissions={permissions} onSubmit={onSubmit} bounty={bounty} mode={mode} focusKey={focusKey} />}
     </Modal>
   );
 }
