@@ -4,6 +4,8 @@ import { ComponentProps, useEffect, useState } from 'react';
 import useRoles from 'components/settings/roles/hooks/useRoles';
 import Alert from '@mui/material/Alert';
 import { ListSpaceRolesResponse } from 'pages/api/roles';
+import Link from 'components/common/Link';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
 interface IRolesFilter {
   mode: 'include' | 'exclude',
@@ -31,6 +33,7 @@ function InputSearchRoleBase ({
   defaultValue, disableCloseOnSelect = false, filter, placeholder, ...props
 }: Partial<ComponentProps<typeof Autocomplete>> & {filter?: IRolesFilter}) {
   const { roles } = useRoles();
+  const [space] = useCurrentSpace();
 
   const defaultRole = typeof defaultValue === 'string' ? roles?.find(role => {
     return role.id === defaultValue;
@@ -41,7 +44,7 @@ function InputSearchRoleBase ({
   if (roles?.length === 0) {
     return (
       <Alert severity='warning'>
-        There are no roles in this space. Workspace admins can create roles in the workspace settings page.
+        There are no roles in this space. Workspace admins can create roles in the <Link external={false} sx={{ fontWeight: 'bold' }} href={`/${space?.domain}/settings/roles`}>workspace settings page</Link>.
       </Alert>
     );
   }
