@@ -5,8 +5,8 @@ import { ApplicationCreationData, SubmissionCreationData } from 'lib/application
 import { createBounty } from 'lib/bounties';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import request from 'supertest';
-import { baseUrl } from 'testing/mockApiCall';
-import { generateBounty, generateBountyWithSingleApplication, generateTransaction, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { baseUrl, loginUser } from 'testing/mockApiCall';
+import { generateBounty, generateBountyWithSingleApplication, generateSpaceUser, generateTransaction, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { generateSubmissionContent } from 'testing/generate-stubs';
 import { addBountyPermissionGroup } from 'lib/permissions/bounties';
@@ -116,6 +116,8 @@ describe('POST /api/applications - create an application', () => {
 
   it('should fail if the user does not have the "work" permission for this bounty and respond with 401', async () => {
 
+    const extraUser = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
+
     const bounty = await generateBounty({
       createdBy: nonAdminUser.id,
       spaceId: nonAdminUserSpace.id,
@@ -123,16 +125,16 @@ describe('POST /api/applications - create an application', () => {
       status: 'open'
     });
 
-    const submissionContent = generateSubmissionContent();
-
     const creationContent: Partial<ApplicationCreationData> = {
       bountyId: bounty.id,
       message: 'I\'m volunteering for this as it\'s in my field of expertise'
     };
 
+    const extraUserCookie = await loginUser(extraUser);
+
     await request(baseUrl)
       .post('/api/applications')
-      .set('Cookie', nonAdminCookie)
+      .set('Cookie', extraUserCookie)
       .send(creationContent)
       .expect(401);
 
