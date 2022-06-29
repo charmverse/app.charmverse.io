@@ -370,6 +370,8 @@ model Application {
   message         String?
   submission      String?
   submissionNodes String?
+  acceptedBy      String?           @db.Uuid() // Reviewer who accepted the application
+  reviewedBy      String?           @db.Uuid() // Reviewer who reviewed the final submission
   transactions    Transaction[]
 
   @@unique([bountyId, createdBy])

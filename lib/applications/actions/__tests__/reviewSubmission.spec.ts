@@ -1,23 +1,25 @@
 
 import { Space, User } from '@prisma/client';
-import { DataNotFoundError, InvalidInputError, WrongStateError } from 'lib/utilities/errors';
+import { DataNotFoundError, InvalidInputError, UndesirableOperationError, WrongStateError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
-import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateBountyWithSingleApplication, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { reviewSubmission } from '../reviewSubmission';
 
 let user: User;
+let reviewer: User;
 let space: Space;
 
 beforeAll(async () => {
   const generated = await generateUserAndSpaceWithApiToken(v4(), true);
   user = generated.user;
   space = generated.space;
+  reviewer = await generateSpaceUser({ isAdmin: false, spaceId: space.id });
 });
 
 describe('reviewSubmission', () => {
 
-  it('should return the updated submission with a complete status when approved', async () => {
+  it('should return the updated submission with a complete status when reviewed, and record who approved or rejected it.', async () => {
 
     const bountyWithSubmission = await generateBountyWithSingleApplication({
       userId: user.id,
@@ -29,10 +31,12 @@ describe('reviewSubmission', () => {
 
     const reviewed = await reviewSubmission({
       submissionId: bountyWithSubmission.applications[0].id,
-      decision: 'approve'
+      decision: 'approve',
+      userId: reviewer.id
     });
 
     expect(reviewed.status).toBe('complete');
+    expect(reviewed.reviewedBy).toBe(reviewer.id);
   });
 
   it('should return the updated submission with a rejected status when reject action is initiated', async () => {
@@ -47,10 +51,34 @@ describe('reviewSubmission', () => {
 
     const reviewed = await reviewSubmission({
       submissionId: bountyWithSubmission.applications[0].id,
-      decision: 'reject'
+      decision: 'reject',
+      userId: reviewer.id
     });
 
     expect(reviewed.status).toBe('rejected');
+  });
+
+  it('should fail if the reviewer is the same person as the submitter', async () => {
+
+    const bountyWithSubmission = await generateBountyWithSingleApplication({
+      userId: user.id,
+      spaceId: space.id,
+      bountyStatus: 'open',
+      applicationStatus: 'review',
+      bountyCap: null
+    });
+
+    try {
+      await reviewSubmission({
+        submissionId: bountyWithSubmission.applications[0].id,
+        decision: 'approve',
+        userId: user.id
+      });
+      throw new ExpectedAnError();
+    }
+    catch (err) {
+      expect(err).toBeInstanceOf(UndesirableOperationError);
+    }
   });
 
   it('should fail if the decision is not approve or reject', async () => {
@@ -66,7 +94,8 @@ describe('reviewSubmission', () => {
     try {
       await reviewSubmission({
         submissionId: bountyWithSubmission.applications[0].id,
-        decision: 'invalid decision' as any
+        decision: 'invalid decision' as any,
+        userId: reviewer.id
       });
       throw new ExpectedAnError();
     }
@@ -80,7 +109,8 @@ describe('reviewSubmission', () => {
     try {
       await reviewSubmission({
         submissionId: v4(),
-        decision: 'approve'
+        decision: 'approve',
+        userId: reviewer.id
       });
       throw new ExpectedAnError();
     }
@@ -102,7 +132,8 @@ describe('reviewSubmission', () => {
     try {
       await reviewSubmission({
         submissionId: bountyWithSubmission.applications[0].id,
-        decision: 'approve'
+        decision: 'approve',
+        userId: reviewer.id
       });
       throw new ExpectedAnError();
     }

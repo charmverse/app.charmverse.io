@@ -1,5 +1,5 @@
 import { Application } from '@prisma/client';
-import { DataNotFoundError, LimitReachedError, UnauthorisedActionError } from 'lib/utilities/errors';
+import { DataNotFoundError, LimitReachedError, UnauthorisedActionError, UndesirableOperationError } from 'lib/utilities/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { prisma } from 'db';
 import { getBounty } from 'lib/bounties';
@@ -23,12 +23,17 @@ export async function approveApplication ({ applicationOrApplicationId, userId }
     throw new LimitReachedError(`This application cannot be approved as the limit of active submissions of ${bounty.maxSubmissions} has been reached.`);
   }
 
+  if (application.createdBy === userId) {
+    throw new UndesirableOperationError('You cannot approve your own application');
+  }
+
   const updated = await prisma.application.update({
     where: {
       id: application.id
     },
     data: {
-      status: 'inProgress'
+      status: 'inProgress',
+      acceptedBy: userId
     }
   }) as Application;
 

@@ -3,7 +3,7 @@ import { Space, User } from '@prisma/client';
 import { createBounty, updateBountySettings } from 'lib/bounties';
 import { LimitReachedError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { approveApplication } from '../approveApplication';
 import { createApplication } from '../createApplication';
@@ -19,14 +19,23 @@ beforeAll(async () => {
 
 describe('approveApplication', () => {
 
-  it('should approve an application if the bounty submissions cap has not been reached', async () => {
+  it('should approve an application if the bounty submissions cap has not been reached, and record who approved it', async () => {
+
+    const reviewerUser = await generateSpaceUser({
+      spaceId: space.id,
+      isAdmin: false
+    });
 
     const bounty = await createBounty({
       title: 'My bounty',
       createdBy: user.id,
       spaceId: space.id,
       reviewer: user.id,
-      maxSubmissions: 20
+      maxSubmissions: 20,
+      permissions: {
+        reviewer: [{ group: 'user', id: reviewerUser.id }],
+        submitter: [{ group: 'space', id: space.id }]
+      }
     });
 
     const application = await createApplication({
@@ -36,11 +45,12 @@ describe('approveApplication', () => {
     });
 
     const approved = await approveApplication({
-      userId: user.id,
+      userId: reviewerUser.id,
       applicationOrApplicationId: application
     });
 
     expect(approved.status).toBe('inProgress');
+    expect(approved.acceptedBy).toBe(reviewerUser.id);
 
   });
 
