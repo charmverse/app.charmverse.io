@@ -2,7 +2,7 @@ import { Autocomplete, TextField } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import { Role } from '@prisma/client';
 import Link from 'components/common/Link';
-import useRoles from 'components/settings/roles/hooks/useRoles';
+import useRoles from 'hooks/useRoles';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { ListSpaceRolesResponse } from 'pages/api/roles';
 import { ComponentProps } from 'react';
