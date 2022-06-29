@@ -25,5 +25,5 @@ export interface AssignedBountyPermissions {
 export type BulkBountyPermissionAssignment = {
   bountyId: string;
   // We don't need resource id since the bountyId is global
-  permissionsToAssign: Omit<BountyPermissionAssignment, 'resourceId'>[]
+  permissionsToAssign: (Omit<BountyPermissionAssignment, 'resourceId'>[]) | Partial<BountyPermissions>
 }

@@ -74,6 +74,37 @@ describe('setBountyPermissions', () => {
 
   });
 
+  it('should accept bounty permissions as an input too', async () => {
+
+    const bounty = await generateBounty({
+      createdBy: user.id,
+      approveSubmitters: true,
+      spaceId: space.id,
+      status: 'open'
+    });
+
+    await setBountyPermissions({
+      bountyId: bounty.id,
+      // Only 1 permission should exist
+      permissionsToAssign: {
+        viewer: [{
+          group: 'space',
+          id: space.id
+        }]
+      }
+    });
+
+    const queryResult = await queryBountyPermissions({
+      bountyId: bounty.id
+    });
+
+    expect(queryResult.viewer.length).toBe(1);
+    expect(queryResult.viewer[0].id).toBe(space.id);
+
+    expect(flatArrayMap(queryResult).length).toBe(1);
+
+  });
+
   it('should not recreate existing permissions, only adding missing ones', async () => {
 
     const permissionLevel: BountyPermissionLevel = 'viewer';

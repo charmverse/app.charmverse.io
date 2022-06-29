@@ -21,6 +21,19 @@ export async function setBountyPermissions ({ bountyId, permissionsToAssign }: B
     throw new DataNotFoundError(`Bounty with id ${bountyId} not found`);
   }
 
+  const toAssign: Omit<BountyPermissionAssignment, 'resourceId'>[] = permissionsToAssign instanceof Array ? permissionsToAssign
+  // Convert mapping to list
+    : typedKeys(permissionsToAssign).reduce((generatedAssignments, level) => {
+      generatedAssignments.push(...(permissionsToAssign[level] ?? []).map(assignment => {
+        return {
+          assignee: assignment,
+          level
+        } as Omit<BountyPermissionAssignment, 'resourceId'>;
+      }));
+
+      return generatedAssignments;
+    }, [] as Omit<BountyPermissionAssignment, 'resourceId'>[]);
+
   const permissions = await queryBountyPermissions({ bountyId });
 
   const toDelete: BountyPermissionAssignment[] = [];
@@ -32,7 +45,7 @@ export async function setBountyPermissions ({ bountyId, permissionsToAssign }: B
     const assigneesToLevel = permissions[permissionLevel];
 
     const missingSetters = assigneesToLevel.filter(assignee => {
-      return permissionsToAssign.find(p => {
+      return toAssign.find(p => {
         return p.level === permissionLevel && p.assignee.group === assignee.group;
       }) === undefined;
     });
@@ -49,7 +62,7 @@ export async function setBountyPermissions ({ bountyId, permissionsToAssign }: B
     })));
   });
 
-  permissionsToAssign.forEach(perm => {
+  toAssign.forEach(perm => {
     const existingSamePermissionsGroups = permissions[perm.level];
     if (existingSamePermissionsGroups.find(p => p.group === perm.assignee.group && perm.assignee.id === p.id) === undefined) {
       toAdd.push({
