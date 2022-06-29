@@ -5,8 +5,9 @@ describe('getGroupsWithOperations', () => {
   it('should return only the groups that can perform all requested operations', () => {
     let result = getGroupsWithOperations(['view', 'work']);
 
-    expect(result.length).toBe(1);
-    expect(result[0]).toBe('submitter');
+    expect(result.length).toBe(2);
+    expect(result.includes('submitter')).toBe(true);
+    expect(result.includes('creator')).toBe(true);
 
     result = getGroupsWithOperations(['view']);
 
