@@ -173,6 +173,13 @@ export function InlineVoteSubMenu ({ pluginKey }: {pluginKey: PluginKey}) {
                 </IconButton>
               </ListItem>
             ))}
+            <ListItem sx={{ px: 0, display: 'flex', gap: 1 }}>
+              <TextField
+                fullWidth
+                value='No Change'
+                disabled
+              />
+            </ListItem>
             <Box display='flex' gap={0.5} alignItems='center'>
               <IconButton
                 size='small'
