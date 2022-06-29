@@ -7,7 +7,7 @@ CREATE TABLE "UserVote" (
     "userId" UUID NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "choice" JSONB NOT NULL
+    "choice" TEXT NOT NULL
 );
 
 -- CreateTable
@@ -16,7 +16,7 @@ CREATE TABLE "Vote" (
     "pageId" UUID NOT NULL,
     "initiatorId" UUID NOT NULL,
     "title" TEXT NOT NULL,
-    "description" TEXT,
+    "description" JSONB,
     "deadline" TIMESTAMP(3) NOT NULL,
     "options" JSONB NOT NULL,
     "status" "VoteStatus" NOT NULL,
