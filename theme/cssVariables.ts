@@ -38,6 +38,8 @@ const globalCSS = css`
     --default-rad: 4px;
     --modal-rad: 8px;
 
+    --background-default: ${colors.backgroundColor};
+
   }
 
   /* lit protocol */
@@ -50,6 +52,8 @@ const globalCSS = css`
     ${Object.entries(colors.darkModeColors).map(([key, value]) => `--bg-${key}: ${value};`).join('\n')}
     --input-bg: ${colors.inputBackgroundDarkMode};
     --input-border: ${colors.inputBorderDarkMode};
+
+    --background-default: ${colors.backgroundColorDarkMode};
   }
 
 `;
