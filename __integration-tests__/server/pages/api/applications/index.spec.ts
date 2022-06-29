@@ -1,13 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Application, Space, User } from '@prisma/client';
 import { ApplicationWithTransactions } from 'lib/applications/actions';
-import { ApplicationCreationData } from 'lib/applications/interfaces';
+import { ApplicationCreationData, SubmissionCreationData } from 'lib/applications/interfaces';
 import { createBounty } from 'lib/bounties';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import request from 'supertest';
 import { baseUrl } from 'testing/mockApiCall';
 import { generateBounty, generateBountyWithSingleApplication, generateTransaction, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
+import { generateSubmissionContent } from 'testing/generate-stubs';
+import { addBountyPermissionGroup } from 'lib/permissions/bounties';
 
 let nonAdminUser: User;
 let nonAdminUserSpace: Space;
@@ -25,7 +27,7 @@ beforeAll(async () => {
     })).headers['set-cookie'][0];
 });
 
-describe('GET /api/applications - retrieve all application for a bounty', () => {
+describe('GET /api/applications - retrieve all applications for a bounty', () => {
   it('Should fail if no bounty with passed bountyId was found', async () => {
     try {
       (await request(baseUrl).get(`/api/applications?bountyId=${v4()}`).set('Cookie', nonAdminCookie).expect(404));
@@ -73,7 +75,7 @@ describe('GET /api/applications - retrieve all application for a bounty', () => 
   });
 });
 
-describe('POST /api/applications - update an application', () => {
+describe('POST /api/applications - create an application', () => {
   it('should create the application and respond with 201', async () => {
 
     const bounty = await createBounty({
@@ -89,6 +91,15 @@ describe('POST /api/applications - update an application', () => {
       message: "I'm volunteering for this as it's in my field of expertise"
     };
 
+    await addBountyPermissionGroup({
+      level: 'submitter',
+      assignee: {
+        group: 'user',
+        id: nonAdminUser.id
+      },
+      resourceId: bounty.id
+    });
+
     const createdApplication = (await request(baseUrl)
       .post('/api/applications')
       .set('Cookie', nonAdminCookie)
@@ -100,6 +111,30 @@ describe('POST /api/applications - update an application', () => {
         ...creationContent
       })
     );
+
+  });
+
+  it('should fail if the user does not have the "work" permission for this bounty and respond with 401', async () => {
+
+    const bounty = await generateBounty({
+      createdBy: nonAdminUser.id,
+      spaceId: nonAdminUserSpace.id,
+      approveSubmitters: false,
+      status: 'open'
+    });
+
+    const submissionContent = generateSubmissionContent();
+
+    const creationContent: Partial<ApplicationCreationData> = {
+      bountyId: bounty.id,
+      message: 'I\'m volunteering for this as it\'s in my field of expertise'
+    };
+
+    await request(baseUrl)
+      .post('/api/applications')
+      .set('Cookie', nonAdminCookie)
+      .send(creationContent)
+      .expect(401);
 
   });
 
