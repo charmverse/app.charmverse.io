@@ -2,6 +2,7 @@ import { Bounty } from '@prisma/client';
 import charmClient from 'charmClient';
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
 import useRefState from 'hooks/useRefState';
+import { UpdateableBountyFields } from 'lib/bounties/interfaces';
 import { BountyWithDetails } from '../models';
 import { useCurrentSpace } from './useCurrentSpace';
 
@@ -63,9 +64,9 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
     });
   }
 
-  async function updateBounty (bountyId: string, bountyUpdate: Partial<Bounty>) {
+  async function updateBounty (bountyId: string, bountyUpdate: UpdateableBountyFields) {
 
-    const updatedBounty = await charmClient.updateBounty(bountyId, bountyUpdate);
+    const updatedBounty = await charmClient.updateBounty({ bountyId, updateContent: bountyUpdate });
 
     refreshBountyList(updatedBounty);
 

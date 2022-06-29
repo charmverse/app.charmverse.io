@@ -23,7 +23,7 @@ import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
-import { AssignedBountyPermissions, BountySubmitter, InferredBountyPermissionMode, inferBountyPermissionsMode } from 'lib/permissions/bounties/client';
+import { BountyPermissions, AssignedBountyPermissions, BountySubmitter, InferredBountyPermissionMode, inferBountyPermissionsMode } from 'lib/permissions/bounties/client';
 import { SystemError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 import { isTruthy } from 'lib/utilities/types';
@@ -31,6 +31,8 @@ import { BountyWithDetails, PageContent } from 'models';
 import { useEffect, useState } from 'react';
 import { useForm, UseFormWatch } from 'react-hook-form';
 import * as yup from 'yup';
+import { TargetPermissionGroup } from 'lib/permissions/interfaces';
+import { BountyCreationData } from 'lib/bounties/interfaces';
 
 export type FormMode = 'create' | 'update' | 'suggest';
 
@@ -203,9 +205,48 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
     }
   }, []);
 
+  // Combines current states to generate what we'll send to the API
+  function rollupPermissions (): Pick<BountyPermissions, 'reviewer' | 'submitter'> {
+
+    const reviewers = [
+      ...selectedReviewerUsers.map(uid => {
+        return {
+          id: uid,
+          group: 'user'
+        } as TargetPermissionGroup;
+      }),
+      ...selectedReviewerRoles.map(uid => {
+        return {
+          id: uid,
+          group: 'role'
+        } as TargetPermissionGroup;
+      })
+    ];
+    //    }), ...selectedReviewerRoles];
+
+    const submitters: TargetPermissionGroup[] = submitterMode === 'role' ? assignedRoleSubmitters.map(uid => {
+      return {
+        group: 'role',
+        id: uid
+      };
+    }) : [{
+      id: space?.id,
+      group: 'space'
+    }];
+
+    const permissionsToSend: Pick<BountyPermissions, 'reviewer' | 'submitter'> = {
+      reviewer: reviewers,
+      submitter: submitters
+    };
+
+    return permissionsToSend;
+  }
+
   async function submitted (value: FormValues & Bounty) {
 
     setFormError(null);
+
+    const permissionsToSet = rollupPermissions();
 
     try {
       // if (!value.setExpiryDate) {
@@ -227,6 +268,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
         value.descriptionNodes = value.descriptionNodes ?? '';
         value.status = 'open';
 
+        (value as BountyCreationData).permissions = permissionsToSet;
         const createdBounty = await charmClient.createBounty(value);
         const populatedBounty = { ...createdBounty, applications: [] };
         setBounties([...bounties, populatedBounty]);
@@ -249,6 +291,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
         value.rewardAmount = 0;
         value.chainId = 1;
 
+        (value as BountyCreationData).permissions = permissionsToSet;
         const createdBounty = await charmClient.createBounty(value);
         const populatedBounty = { ...createdBounty, applications: [] };
         setBounties([...bounties, populatedBounty]);

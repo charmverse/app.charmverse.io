@@ -33,7 +33,7 @@ import { UpdateThreadRequest } from 'pages/api/threads/[id]';
 import { TokenGateWithRoles } from 'pages/api/token-gates';
 
 import { ApplicationWithTransactions } from 'lib/applications/actions';
-import { SuggestionAction } from 'lib/bounties';
+import { BountyUpdate, SuggestionAction } from 'lib/bounties';
 import { PublicPageResponse } from 'lib/pages/interfaces';
 import { PublicSpaceInfo } from 'lib/spaces/interfaces';
 import type { MarkTask } from 'lib/tasks/markTasks';
@@ -418,16 +418,12 @@ class CharmClient {
 
   async deleteBounty (bountyId: string): Promise<any> {
 
-    const data = await http.DELETE(`/api/bounties/${bountyId}`);
-
-    return data;
+    return http.DELETE(`/api/bounties/${bountyId}`);
   }
 
-  async updateBounty (bountyId: string, bounty: Partial<Bounty>): Promise<BountyWithDetails> {
+  async updateBounty ({ bountyId, updateContent }: BountyUpdate): Promise<BountyWithDetails> {
 
-    const data = await http.PUT<BountyWithDetails>(`/api/bounties/${bountyId}`, bounty);
-
-    return data;
+    return http.PUT<BountyWithDetails>(`/api/bounties/${bountyId}`, updateContent);
   }
 
   async closeBountySubmissions (bountyId: string): Promise<BountyWithDetails> {
