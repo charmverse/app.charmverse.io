@@ -27,9 +27,9 @@ export default function BountyDetails () {
       setPageTitle(bountyTitle ?? 'Untitled');
     }
 
-  }, [currentBounty?.title]);
+  }, [currentBounty?.title, bountyPermissions]);
 
-  async function refreshPermissions (bountyId: string) {
+  async function refreshBountyPermissions (bountyId: string) {
     setBountyPermissions(null);
     charmClient.computeBountyPermissions({
       resourceId: bountyId
@@ -39,7 +39,7 @@ export default function BountyDetails () {
   useEffect(() => {
 
     if (currentBountyId) {
-      refreshPermissions(currentBountyId);
+      refreshBountyPermissions(currentBountyId);
     }
 
   }, [currentBountyId]);
@@ -53,7 +53,13 @@ export default function BountyDetails () {
   ) : (
     <Box py={3} px={18}>
 
-      <BountyHeader bounty={currentBounty} permissions={bountyPermissions} />
+      <BountyHeader
+        bounty={currentBounty}
+        permissions={bountyPermissions}
+        refreshBountyPermissions={() => {
+          refreshBountyPermissions(currentBountyId);
+        }}
+      />
 
       <BountyDescription bounty={currentBounty} permissions={bountyPermissions} />
 

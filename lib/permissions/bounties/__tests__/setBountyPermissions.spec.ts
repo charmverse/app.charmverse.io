@@ -68,7 +68,9 @@ describe('setBountyPermissions', () => {
     });
 
     expect(queryResult.viewer.some(p => p.group === 'user' && p.id === user.id)).toBe(true);
-
+    expect(queryResult.viewer.length === 1).toBe(true);
+    expect(queryResult.submitter.length === 0).toBe(true);
+    expect(queryResult.reviewer.length === 0).toBe(true);
   });
 
   it('should accept bounty permissions as an input too', async () => {

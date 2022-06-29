@@ -38,10 +38,11 @@ const menuPosition: Partial<MenuProps> = {
 
 interface Props {
   bounty: BountyWithDetails
-  permissions: AssignedBountyPermissions
+  permissions: AssignedBountyPermissions,
+  refreshBountyPermissions: () => any
 }
 
-export default function BountyHeader ({ bounty, permissions }: Props) {
+export default function BountyHeader ({ bounty, permissions, refreshBountyPermissions }: Props) {
   const { refreshBounty } = useBounties();
 
   const [user] = useUser();
@@ -205,7 +206,10 @@ export default function BountyHeader ({ bounty, permissions }: Props) {
       {
         permissions?.userPermissions?.edit && (
           <BountyModal
-            onSubmit={bountyEditModal.close}
+            onSubmit={() => {
+              refreshBountyPermissions();
+              bountyEditModal.close();
+            }}
             mode='update'
             bounty={bounty}
             open={bountyEditModal.isOpen}

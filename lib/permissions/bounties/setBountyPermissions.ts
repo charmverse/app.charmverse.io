@@ -2,6 +2,7 @@ import { prisma } from 'db';
 import { getBounty } from 'lib/bounties/getBounty';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { flatArrayMap } from 'lib/utilities/array';
+import { BountyPermissionLevel } from '@prisma/client';
 import { BountyPermissionAssignment, BountyPermissions, BulkBountyPermissionAssignment } from './interfaces';
 import { queryBountyPermissions } from './queryBountyPermissions';
 import { typedKeys } from '../../utilities/objects';
@@ -40,26 +41,22 @@ export async function setBountyPermissions ({ bountyId, permissionsToAssign }: B
 
   const toAdd: BountyPermissionAssignment[] = [];
 
-  typedKeys(permissions).forEach(permissionLevel => {
+  typedKeys(BountyPermissionLevel).forEach(permissionLevel => {
 
-    const assigneesToLevel = permissions[permissionLevel];
+    const oldAssignees = permissions?.[permissionLevel] ?? [];
+    const currentAssignees = toAssign.filter(assignment => assignment.level === permissionLevel);
 
-    const missingSetters = assigneesToLevel.filter(assignee => {
-      return toAssign.find(p => {
-        return p.level === permissionLevel && p.assignee.group === assignee.group;
-      }) === undefined;
+    const assigneesToRemove = oldAssignees.filter(assignee => {
+      return currentAssignees.find(a => a.assignee.group === assignee.group && a.assignee.id === assignee.id) === undefined;
+    }).map(a => {
+      return {
+        assignee: a,
+        level: permissionLevel,
+        resourceId: bountyId
+      } as BountyPermissionAssignment;
     });
-    toDelete.push(...missingSetters.map((val => {
-      const deleteCommand: BountyPermissionAssignment = {
-        resourceId: bountyId,
-        assignee: {
-          group: val.group,
-          id: val.id
-        },
-        level: permissionLevel
-      };
-      return deleteCommand;
-    })));
+
+    toDelete.push(...assigneesToRemove);
   });
 
   toAssign.forEach(perm => {

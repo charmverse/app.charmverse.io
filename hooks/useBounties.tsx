@@ -3,6 +3,7 @@ import charmClient from 'charmClient';
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
 import useRefState from 'hooks/useRefState';
 import { UpdateableBountyFields } from 'lib/bounties/interfaces';
+import { useUser } from './useUser';
 import { BountyWithDetails } from '../models';
 import { useCurrentSpace } from './useCurrentSpace';
 
@@ -32,16 +33,18 @@ export const BountiesContext = createContext<Readonly<IContext>>({
 
 export function BountiesProvider ({ children }: { children: ReactNode }) {
   const [space] = useCurrentSpace();
+  const [user] = useUser();
   const [bounties, bountiesRef, setBounties] = useRefState<BountyWithDetails[]>([]);
   useEffect(() => {
     if (space) {
       setBounties([]);
       charmClient.listBounties(space.id)
         .then(_bounties => {
+          bountiesRef.current = _bounties;
           setBounties(_bounties);
         });
     }
-  }, [space?.id]);
+  }, [space?.id, user?.id]);
 
   const [currentBountyId, setCurrentBountyId] = useState<string | null>(null);
 

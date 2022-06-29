@@ -23,8 +23,8 @@ import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
-import { BountyCreationData, BountySubmitterPoolSize } from 'lib/bounties/interfaces';
-import { AssignedBountyPermissions, BountyPermissions, BountySubmitter, inferBountyPermissionsMode, InferredBountyPermissionMode } from 'lib/permissions/bounties/client';
+import { BountyCreationData, BountySubmitterPoolSize, UpdateableBountyFields } from 'lib/bounties/interfaces';
+import { AssignedBountyPermissions, BountyPermissions, BountySubmitter, inferBountyPermissionsMode } from 'lib/permissions/bounties/client';
 import { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import { SystemError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
@@ -127,7 +127,7 @@ function FormDescription ({ onContentChange, content, watch }:
   );
 }
 
-export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', focusKey, permissions }: IBountyEditorInput) {
+export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', focusKey, permissions: receivedPermissions }: IBountyEditorInput) {
   const { setBounties, bounties, updateBounty } = useBounties();
 
   const defaultChainId = bounty?.chainId ?? 1;
@@ -138,6 +138,8 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
   const [space] = useCurrentSpace();
 
   const [bountyApplicantPool, setBountyApplicantPool] = useState<BountySubmitterPoolSize | null>(null);
+
+  const [permissions, setPermissions] = useState<Partial<BountyPermissions>>(receivedPermissions?.bountyPermissions ?? {});
 
   useEffect(() => {
     if (bounty) {
@@ -193,14 +195,14 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
   const [availableCryptos, setAvailableCryptos] = useState<Array<string | CryptoCurrency>>([]);
   const [formError, setFormError] = useState<SystemError | null>(null);
 
-  const [submitterMode, setSubmitterMode] = useState<BountySubmitter>(inferBountyPermissionsMode(permissions?.bountyPermissions ?? {})?.mode ?? 'space');
-  const [assignedRoleSubmitters, setAssignedRoleSubmitters] = useState<Array<string>>(permissions?.bountyPermissions?.submitter?.filter(p => p.group === 'role').map(p => p.id as string) ?? []);
+  const [submitterMode, setSubmitterMode] = useState<BountySubmitter>(inferBountyPermissionsMode(permissions ?? {})?.mode ?? 'space');
+  const [assignedRoleSubmitters, setAssignedRoleSubmitters] = useState<Array<string>>(permissions?.submitter?.filter(p => p.group === 'role').map(p => p.id as string) ?? []);
 
   const [selectedReviewerUsers, setSelectedReviewerUsers] = useState<string[]>(
-    permissions?.bountyPermissions?.reviewer?.filter(r => r.group === 'user').map(r => r.id as string) ?? []
+    permissions?.reviewer?.filter(r => r.group === 'user').map(r => r.id as string) ?? []
   );
   const [selectedReviewerRoles, setSelectedReviewerRoles] = useState<string[]>(
-    permissions?.bountyPermissions?.reviewer?.filter(r => r.group === 'role').map(r => r.id as string) ?? []
+    permissions?.reviewer?.filter(r => r.group === 'role').map(r => r.id as string) ?? []
   );
 
   async function refreshBountyApplicantPool (): Promise<void> {
@@ -307,6 +309,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
         (value as BountyCreationData).permissions = permissionsToSet;
         const createdBounty = await charmClient.createBounty(value);
         const populatedBounty = { ...createdBounty, applications: [] };
+
         setBounties([...bounties, populatedBounty]);
         setCachedBountyDescription({
           nodes: {
@@ -343,8 +346,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
 
       }
       else if (bounty?.id && mode === 'update') {
-        const updates: Partial<Bounty> = {
-          updatedAt: new Date(),
+        const updates: UpdateableBountyFields = {
           title: value.title,
           rewardAmount: value.rewardAmount,
           rewardToken: value.rewardToken,
@@ -354,13 +356,13 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
           chainId: value.chainId,
           //
           approveSubmitters: value.approveSubmitters === null ? undefined : value.approveSubmitters,
-          maxSubmissions: value.capSubmissions === false ? null : value.maxSubmissions
-          // expiryDate: value.setExpiryDate ? value.expiryDate : null
-
+          maxSubmissions: value.capSubmissions === false ? null : value.maxSubmissions,
+          permissions: permissionsToSet
         };
 
         const updatedBounty = await updateBounty(bounty.id, updates);
         onSubmit(updatedBounty);
+
       }
     }
     catch (err) {

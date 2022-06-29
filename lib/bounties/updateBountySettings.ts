@@ -49,7 +49,7 @@ export async function updateBountySettings ({
   }
 
   if (updateContent.permissions) {
-    await setBountyPermissions({
+    const afterUpdate = await setBountyPermissions({
       bountyId,
       permissionsToAssign: updateContent.permissions
     });
