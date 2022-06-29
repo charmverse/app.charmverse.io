@@ -33,14 +33,14 @@ import { UpdateThreadRequest } from 'pages/api/threads/[id]';
 import { TokenGateWithRoles } from 'pages/api/token-gates';
 
 import { ApplicationWithTransactions } from 'lib/applications/actions';
-import { BountyUpdate, SuggestionAction } from 'lib/bounties';
+import { AssignedBountyPermissions, BountyUpdate, SuggestionAction } from 'lib/bounties';
 import { PublicPageResponse } from 'lib/pages/interfaces';
 import { PublicSpaceInfo } from 'lib/spaces/interfaces';
 import type { MarkTask } from 'lib/tasks/markTasks';
 import { TransactionCreationData } from 'lib/transactions/interface';
 import { PublicUser } from 'pages/api/public/profile/[userPath]';
 import { DeepDaoAggregateData } from 'lib/deepdao/interfaces';
-import { AssignedPermissionsQuery } from './lib/permissions/interfaces';
+import { AssignedPermissionsQuery, PermissionComputeRequest, Resource } from './lib/permissions/interfaces';
 import { SpacePermissionFlags, SpacePermissionModification } from './lib/permissions/spaces';
 import { SpacePermissionConfigurationUpdate } from './lib/permissions/meta/interfaces';
 
@@ -403,6 +403,13 @@ class CharmClient {
     const data = await http.POST<Bounty>('/api/bounties', bounty);
 
     return data;
+  }
+
+  /**
+   * Get full set of permissions for a specific user on a certain page
+   */
+  async computeBountyPermissions ({ resourceId }: Resource): Promise<AssignedBountyPermissions> {
+    return http.GET(`/api/bounties/${resourceId}/permissions`);
   }
 
   async reviewBountySuggestion ({ bountyId, decision }: SuggestionAction): Promise<BountyWithDetails | {success: true}> {

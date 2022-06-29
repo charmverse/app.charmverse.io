@@ -1,17 +1,16 @@
 
 import { prisma } from 'db';
+import { getBounty, UpdateableBountyFields, updateBountySettings } from 'lib/bounties';
+import { rollupBountyStatus } from 'lib/bounties/rollupBountyStatus';
+import { requesterCanDeleteBounty } from 'lib/bounties/shared';
 import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { withSessionRoute } from 'lib/session/withSession';
+import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
+import { typedKeys } from 'lib/utilities/objects';
 import { BountyWithDetails } from 'models';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc, { NextHandler } from 'next-connect';
-import { updateBountySettings, getBounty } from 'lib/bounties';
-import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
-import { rollupBountyStatus } from 'lib/bounties/rollupBountyStatus';
-import { requesterCanDeleteBounty } from 'lib/bounties/shared';
-import { computeBountyPermissions } from 'lib/permissions/bounties';
-import { typedKeys } from 'lib/utilities/objects';
-import { Bounty } from '@prisma/client';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -50,7 +49,7 @@ async function getBountyController (req: NextApiRequest, res: NextApiResponse<Bo
 async function updateBounty (req: NextApiRequest, res: NextApiResponse<BountyWithDetails>) {
   const { id } = req.query;
 
-  const body = (req.body ?? {}) as Partial<Bounty>;
+  const body = (req.body ?? {}) as UpdateableBountyFields;
 
   const bounty = await getBounty(id as string);
 
@@ -68,6 +67,11 @@ async function updateBounty (req: NextApiRequest, res: NextApiResponse<BountyWit
 
   if (!permissions.edit) {
     throw new UnauthorisedActionError('You do not have permissions to edit this bounty.');
+  }
+
+  if (!permissions.grant_permissions) {
+    // Don't pass permissions assignment to update operation if user can't grant permissions
+    delete body.permissions;
   }
 
   if (bounty.status === 'suggestion') {
