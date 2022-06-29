@@ -6,7 +6,7 @@ import Button from 'components/common/Button';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { isTruthy } from 'lib/utilities/types';
 import { ListSpaceRolesResponse } from 'pages/api/roles';
-import useRoles from '../hooks/useRoles';
+import useRoles from 'hooks/useRoles';
 
 /**
  * @renderSelected Show selected options in the options menu. Default is true.
@@ -62,7 +62,7 @@ export default function TokenGateRolesSelect ({ onDelete, selectedRoleIds, onCha
         disabled={!isAdmin || roles?.length === 0}
         renderValue={(roleIds) => (
           (roleIds.length === 0) ? (
-            <Button size='small' variant='text' color='secondary'>+ Add roles</Button>
+            <Button disabled size='small' variant='text' color='secondary'>+ Add roles</Button>
           ) : (
             <Box display='flex' flexWrap='wrap' gap={0.5} maxWidth={400}>
               {

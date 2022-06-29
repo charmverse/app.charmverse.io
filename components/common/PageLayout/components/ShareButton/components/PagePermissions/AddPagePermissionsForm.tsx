@@ -8,7 +8,7 @@ import InputEnumToOptions from 'components/common/form/InputEnumToOptions';
 import { InputSearchContributorMultiple } from 'components/common/form/InputSearchContributor';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 import Loader from 'components/common/Loader';
-import useRoles from 'components/settings/roles/hooks/useRoles';
+import useRoles from 'hooks/useRoles';
 import { IPagePermissionToCreate, IPagePermissionWithAssignee, PagePermissionLevelType } from 'lib/permissions/pages/page-permission-interfaces';
 import { permissionLevels } from 'lib/permissions/pages/page-permission-mapping';
 import { ListSpaceRolesResponse } from 'pages/api/roles';
