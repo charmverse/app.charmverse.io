@@ -58,6 +58,7 @@ model Space {
   apiToken                   SpaceApiToken?
   threads                    Thread[]
   comments                   Comment[]
+  votes                      Vote[]
   // Public page settings
   permissionConfigurationMode SpacePermissionConfigurationMode? @default(custom)
   defaultPagePermissionGroup PagePermissionLevel? @default(full_access)
@@ -157,19 +158,30 @@ enum VoteStatus {
   Cancelled
 }
 
+model VoteOptions {
+  name        String
+  threshold   Int
+  voteId      String    @unique @db.Uuid
+  vote        Vote      @relation(fields: [voteId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([voteId, name])
+}
+
 model Vote {
-  id            String    @id @default(uuid()) @db.Uuid
-  pageId        String    @db.Uuid
-  page          Page      @relation(fields: [pageId], references: [id], onDelete: Cascade)
-  initiatorId   String    @unique @db.Uuid
-  initiator     User      @relation(fields: [initiatorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  id            String          @id @default(uuid()) @db.Uuid
+  pageId        String          @db.Uuid
+  page          Page            @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  spaceId       String          @db.Uuid
+  space         Space           @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  author        User            @relation(fields: [createdBy], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdBy     String          @db.Uuid
   title         String
-  description   Json?
+  description   String?
   deadline      DateTime
-  options       Json
   status        VoteStatus
-  createdAt     DateTime  @default(now())
+  createdAt     DateTime        @default(now())
   userVotes     UserVote[]
+  voteOptions   VoteOptions[]
 }
 
 model User {
