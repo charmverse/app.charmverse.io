@@ -47,7 +47,8 @@ async function reviewSubmissionController (req: NextApiRequest, res: NextApiResp
 
   const updatedSubmission = await reviewSubmission({
     decision: req.body.decision,
-    submissionId: submissionId as string
+    submissionId: submissionId as string,
+    userId
   });
 
   rollupBountyStatus(updatedSubmission.bountyId);
