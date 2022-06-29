@@ -149,14 +149,24 @@ model UserVote {
   @@unique([voteId, userId])
 }
 
+enum VoteStatus {
+  InProgress
+  Passed
+  Rejected
+  Cancelled
+}
+
 model Vote {
   id            String    @id @default(uuid()) @db.Uuid
   pageId        String    @db.Uuid
   page          Page      @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  initiatorId   String    @unique @db.Uuid
+  initiator     User      @relation(fields: [initiatorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   title         String
   description   String?
   deadline      DateTime
   options       Json
+  status        VoteStatus
   createdAt     DateTime  @default(now())
 }
 
