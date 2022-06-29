@@ -1,4 +1,3 @@
-
 import { Vote } from '@prisma/client';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';

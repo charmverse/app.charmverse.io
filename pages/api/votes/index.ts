@@ -18,7 +18,7 @@ async function startVote (req: NextApiRequest, res: NextApiResponse<Vote | { err
 
   const vote = await createVote({
     ...newVote,
-    initiatorId: userId
+    createdBy: userId
   } as VoteDTO);
 
   return res.status(200).json(vote);
