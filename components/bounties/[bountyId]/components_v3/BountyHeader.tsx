@@ -202,14 +202,18 @@ export default function BountyHeader ({ bounty, permissions }: Props) {
       </Box>
 
       {/** List of modals */}
-      <BountyModal
-        onSubmit={bountyEditModal.close}
-        mode='update'
-        bounty={bounty}
-        open={bountyEditModal.isOpen}
-        onClose={bountyEditModal.close}
-        permissions={permissions}
-      />
+      {
+        permissions?.userPermissions?.edit && (
+          <BountyModal
+            onSubmit={bountyEditModal.close}
+            mode='update'
+            bounty={bounty}
+            open={bountyEditModal.isOpen}
+            onClose={bountyEditModal.close}
+            permissions={permissions}
+          />
+        )
+      }
 
       <Modal open={bountyDeleteModal.isOpen} onClose={bountyDeleteModal.close}>
         <BountyDelete
