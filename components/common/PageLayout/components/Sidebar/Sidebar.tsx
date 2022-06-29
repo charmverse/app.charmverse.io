@@ -2,9 +2,10 @@
 import styled from '@emotion/styled';
 import { css, Theme } from '@emotion/react';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import BountyIcon from '@mui/icons-material/RequestPage';
+import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import SettingsIcon from '@mui/icons-material/Settings';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
+import VoteIcon from '@mui/icons-material/HowToVoteOutlined';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
@@ -206,6 +207,18 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               label='Support & Feedback'
               target='_blank'
             />
+            <SidebarLink
+              href={`/${space.domain}/bounties`}
+              active={router.pathname.startsWith('/[domain]/bounties')}
+              icon={<BountyIcon fontSize='small' />}
+              label='Bounties'
+            />
+            <SidebarLink
+              href={`/${space.domain}/votes`}
+              active={router.pathname.startsWith('/[domain]/votes')}
+              icon={<VoteIcon fontSize='small' />}
+              label='Votes'
+            />
           </Box>
           <ScrollingContainer isScrolled={isScrolled} onScroll={onScroll} className='page-navigation'>
             {favoritePageIds.length > 0 && (
@@ -236,12 +249,6 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               <PageNavigation />
             </Box>
             <Box mb={2}>
-              <SidebarLink
-                href={`/${space.domain}/bounties`}
-                active={router.pathname.startsWith('/[domain]/bounties')}
-                icon={<BountyIcon fontSize='small' />}
-                label='Bounties'
-              />
               <SidebarBox
                 onClick={() => {
                   setShowingTrash(true);
