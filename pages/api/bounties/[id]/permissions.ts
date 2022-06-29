@@ -1,7 +1,7 @@
 
 import { closeOutBounty, getBounty } from 'lib/bounties';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { computeBountyPermissions } from 'lib/permissions/bounties';
+import { AssignedBountyPermissions, computeBountyPermissions, queryBountyPermissions } from 'lib/permissions/bounties';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { BountyWithDetails } from 'models';
@@ -11,9 +11,9 @@ import nc from 'next-connect';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
-  .post(closeBountyController);
+  .get(computeBountyGroupPermissionsController);
 
-async function closeBountyController (req: NextApiRequest, res: NextApiResponse<BountyWithDetails>) {
+async function computeBountyGroupPermissionsController (req: NextApiRequest, res: NextApiResponse<AssignedBountyPermissions>) {
 
   const { id: bountyId } = req.query;
 
@@ -25,19 +25,21 @@ async function closeBountyController (req: NextApiRequest, res: NextApiResponse<
 
   const userId = req.session.user.id;
 
-  const permissions = await computeBountyPermissions({
-    allowAdminBypass: true,
-    resourceId: bounty.id,
-    userId
+  const [permissions, groups] = await Promise.all([
+    computeBountyPermissions({
+      allowAdminBypass: true,
+      resourceId: bounty.id,
+      userId
+    }),
+    queryBountyPermissions({ bountyId: bounty.id })
+  ]);
+
+  return res.status(200).json({
+    // Groups assigned to each level
+    bountyPermissions: groups,
+    // Individual actions user can and cannot perform
+    userPermissions: permissions
   });
-
-  if (!permissions.lock) {
-    throw new UnauthorisedActionError('You do not have the permission to close this bounty');
-  }
-
-  const completeBounty = await closeOutBounty(bountyId as string);
-
-  return res.status(200).json(completeBounty);
 }
 
 export default withSessionRoute(handler);
