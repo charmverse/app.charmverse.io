@@ -65,7 +65,7 @@ export default function BountyDetails () {
           currentBounty.status !== 'suggestion' && (
             <>
               <Box sx={{ mb: 3 }}>
-                <BountySubmissions bounty={currentBounty} />
+                <BountySubmissions bounty={currentBounty} permissions={bountyPermissions} />
               </Box>
               {
           currentBounty.approveSubmitters === true && (

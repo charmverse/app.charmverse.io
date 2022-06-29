@@ -26,12 +26,14 @@ import MultiPaymentModal from 'components/bounties/components/MultiPaymentModal'
 import { BountyWithDetails } from 'models';
 import useIsAdmin from 'hooks/useIsAdmin';
 import UserDisplay from 'components/common/UserDisplay';
+import { AssignedBountyPermissions } from 'lib/bounties/interfaces';
 import BountySubmissionReviewActions from '../../components/BountySubmissionReviewActions';
 import SubmissionEditorForm from './SubmissionEditorForm';
 import BountySubmissionContent from '../../components/BountySubmissionContent';
 
 interface Props {
   bounty: BountyWithDetails
+  permissions: AssignedBountyPermissions
 }
 
 export const SubmissionStatusColors: Record<ApplicationStatus, BrandColor> = {
@@ -52,7 +54,7 @@ export const SubmissionStatusLabels: Record<ApplicationStatus, string> = {
   paid: 'Paid'
 };
 
-export default function BountySubmissions ({ bounty }: Props) {
+export default function BountySubmissions ({ bounty, permissions }: Props) {
 
   const [user] = useUser();
   const [contributors] = useContributors();
@@ -248,6 +250,7 @@ export default function BountySubmissions ({ bounty }: Props) {
                   submission={submission}
                   reviewComplete={refreshSubmissions}
                   onSubmission={editSubmissionModal.open}
+                  permissions={permissions}
                 />
 
               </TableCell>

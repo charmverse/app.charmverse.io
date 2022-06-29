@@ -78,7 +78,7 @@ export default function BountyHeader ({ bounty, permissions }: Props) {
   const isBountyCreator = (user?.id === bounty?.createdBy) || isAdmin;
 
   // Menu item conditions
-  const canDeleteBounty = requesterCanDeleteBounty({
+  const canDeleteBounty = permissions?.userPermissions?.delete && requesterCanDeleteBounty({
     requesterIsAdmin: isAdmin,
     bounty,
     requesterCreatedBounty: isBountyCreator
@@ -106,8 +106,9 @@ export default function BountyHeader ({ bounty, permissions }: Props) {
             <Box component='span'>
               {bounty.title}
             </Box>
+            {/* Provide the bounty menu options */}
             {
-          (isAdmin || isBountyCreator) && (
+          (canDeleteBounty || permissions?.userPermissions?.edit || permissions?.userPermissions?.lock) && (
             <>
               <IconButton {...bindTrigger(popupState)}>
                 <MoreHorizIcon color='secondary' />
@@ -119,7 +120,7 @@ export default function BountyHeader ({ bounty, permissions }: Props) {
               >
 
                 {
-                  (isAdmin || isBountyCreator) && (
+                  permissions.userPermissions.edit && (
                     <Tooltip arrow placement='right' title={`Edit bounty ${bounty.status === 'suggestion' ? 'suggestion' : ''}`}>
                       <MenuItem
                         dense
@@ -136,7 +137,7 @@ export default function BountyHeader ({ bounty, permissions }: Props) {
                 }
 
                 {
-                  (isAdmin && bounty.status !== 'suggestion' && bounty.status !== 'complete' && bounty.status !== 'paid') && (
+                  permissions?.userPermissions?.lock && (
                     [
                       <Tooltip key='stop-new' arrow placement='right' title={`Prevent new ${bounty.approveSubmitters ? 'applications' : 'submissions'} from being made.`}>
                         <MenuItem
