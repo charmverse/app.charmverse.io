@@ -3,11 +3,11 @@ import { suggestTooltip } from '@bangle.dev/tooltip';
 import { SuggestPluginState } from 'lib/prosemirror/interfaces';
 import { PluginKey } from 'prosemirror-state';
 import { v4 } from 'uuid';
-import { CharmPluginKey } from '../charm/charm.plugins';
+import { UserDataPluginKey } from '../charm/charm.plugins';
 
 export function selectMention (key: PluginKey<SuggestPluginState>, mentionValue: string, mentionType: string): Command {
   return (state, dispatch, view) => {
-    const charmPluginState = CharmPluginKey.getState(state);
+    const charmPluginState = UserDataPluginKey.getState(state);
     if (charmPluginState) {
       const mentionNode = state.schema.nodes.mention.create({
         value: mentionValue,

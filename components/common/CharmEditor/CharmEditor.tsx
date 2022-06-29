@@ -27,11 +27,12 @@ import PageThreadsList from 'components/[pageId]/DocumentPage/components/PageThr
 import { CryptoCurrency, FiatCurrency } from 'connectors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
+import { silentlyUpdateURL } from 'lib/browser';
 import debounce from 'lodash/debounce';
 import { PageContent } from 'models';
 import { CSSProperties, memo, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import Callout, * as callout from './components/callout';
-import { charmPlugin } from './components/charm/charm.plugins';
+import { userDataPlugin } from './components/charm/charm.plugins';
 import * as columnLayout from './components/columnLayout';
 import LayoutColumn from './components/columnLayout/Column';
 import LayoutRow from './components/columnLayout/Row';
@@ -135,7 +136,7 @@ export function charmEditorPlugins (
         }
       })
     }),
-    charmPlugin({
+    userDataPlugin({
       userId,
       pageId,
       spaceId
@@ -397,6 +398,8 @@ function CharmEditor (
               highlightedMentionDomElement.scrollIntoView({
                 behavior: 'smooth'
               });
+              // Remove the ?mentionId from url
+              silentlyUpdateURL(window.location.href.split('?')[0]);
             });
           }
         }, 250);

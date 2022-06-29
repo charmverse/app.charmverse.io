@@ -21,6 +21,10 @@ const createMentionTask = ({ pageTitle, spaceName, mentionText }: {spaceName: st
     spaceName,
     pageTitle,
     text: mentionText,
+    bountyId: null,
+    bountyTitle: null,
+    commentId: null,
+    type: 'page',
     createdBy: {
       id: v4(),
       createdAt: new Date(),

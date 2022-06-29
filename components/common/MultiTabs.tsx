@@ -32,11 +32,12 @@ function TabPanel (props: TabPanelProps) {
 
 interface MultiTabsProps {
   tabs: [string, React.ReactNode][]
+  disabled?: boolean
 }
 
 export default function MultiTabs (props: MultiTabsProps) {
   const [value, setValue] = React.useState(0);
-  const { tabs } = props;
+  const { tabs, disabled = false } = props;
   const handleChange = (_: React.SyntheticEvent<Element, Event>, newValue: number) => {
     setValue(newValue);
   };
@@ -44,14 +45,21 @@ export default function MultiTabs (props: MultiTabsProps) {
   return (
     <Box sx={{ width: '100%' }}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={value} onChange={handleChange} aria-label='multi tabs'>
+        <Tabs
+          indicatorColor={disabled ? 'secondary' : 'primary'}
+          value={value}
+          onChange={handleChange}
+          aria-label='multi tabs'
+        >
           {tabs.map(([tabLabel]) => (
             <Tab
+              disabled={disabled}
               sx={{
                 textTransform: 'initial'
               }}
               key={tabLabel}
               label={tabLabel}
+
             />
           ))}
         </Tabs>
