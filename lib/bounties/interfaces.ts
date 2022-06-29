@@ -31,7 +31,7 @@ export type SuggestionAction = SuggestionApproveAction | SuggestionRejectAction
 /**
  * Calculate pool for resource permissions as is, or pass simulated permissions to calculate pool
  */
-export type BountySubmitterPoolCalculation = Resource & {permissions?: Partial<BountyPermissions>}
+export type BountySubmitterPoolCalculation = Partial<Resource & {permissions: Partial<BountyPermissions>}>
 
 /**
  * Used to represent how many potential applicants exist.

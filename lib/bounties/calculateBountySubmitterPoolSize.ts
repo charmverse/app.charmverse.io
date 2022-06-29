@@ -1,7 +1,7 @@
 import { prisma } from 'db';
 import { getGroupsWithOperations, queryBountyPermissions } from 'lib/permissions/bounties';
 import { countRoleMembers } from 'lib/roles';
-import { DataNotFoundError } from 'lib/utilities/errors';
+import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { BountyPermissions, BountySubmitterPoolCalculation, BountySubmitterPoolSize } from './interfaces';
 
 /**
@@ -11,6 +11,69 @@ import { BountyPermissions, BountySubmitterPoolCalculation, BountySubmitterPoolS
  */
 export async function calculateBountySubmitterPoolSize ({ resourceId, permissions }:
   BountySubmitterPoolCalculation): Promise<BountySubmitterPoolSize> {
+
+  if (!resourceId && !permissions) {
+    throw new InvalidInputError('Please provide at least a resource id or a set of permissions to simulate for');
+  }
+
+  if (!resourceId && permissions) {
+    const groupsWhoCouldSubmit = getGroupsWithOperations(['work']).map(permissionLevel => {
+      return permissions[permissionLevel] ?? [];
+    }).flat();
+
+    const spacePermission = groupsWhoCouldSubmit.find(p => p.group === 'space');
+
+    if (spacePermission) {
+      const spaceMembers = await prisma.spaceRole.count({
+        where: {
+          spaceId: spacePermission.id,
+          user: {
+            isBot: {
+              not: true
+            }
+          }
+        }
+      });
+
+      return {
+        mode: 'space',
+        roleups: [],
+        total: spaceMembers
+      };
+    }
+
+    // Get only relevant roles
+    const roleups = await Promise.all(groupsWhoCouldSubmit
+      .filter(g => {
+        return g.group === 'role';
+      })
+      .map(async group => {
+        return countRoleMembers({
+          roleId: group.id as string
+        });
+      }));
+
+    // Get unique user memberships as some may be members of a role multiple times
+    const total = await prisma.spaceRole.count({
+      where: {
+        OR: roleups.map(roleup => {
+          return {
+            spaceRoleToRole: {
+              some: {
+                roleId: roleup.id
+              }
+            }
+          };
+        })
+      }
+    });
+
+    return {
+      mode: 'role',
+      roleups,
+      total
+    };
+  }
 
   const bounty = await prisma.bounty.findUnique({
     where: {
@@ -27,9 +90,10 @@ export async function calculateBountySubmitterPoolSize ({ resourceId, permission
   }
 
   const permissionsToUse = permissions ?? await queryBountyPermissions({
-    bountyId: resourceId
+    bountyId: bounty.id
   });
 
+  // Logic copied above for time saving
   const groupsWhoCouldSubmit = getGroupsWithOperations(['work']).map(permissionLevel => {
     return permissionsToUse[permissionLevel] ?? [];
   }).flat();

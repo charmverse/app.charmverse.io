@@ -201,6 +201,23 @@ describe('calculateBountySubmitterPoolSize', () => {
     expect(bountySize.roleups.length).toBe(0);
   });
 
+  it('should perform the count with simulated permissions and no bounty reference', async () => {
+
+    const bountySize = await calculateBountySubmitterPoolSize({
+      permissions: {
+        submitter: [{
+          group: 'space',
+          id: space.id
+        }]
+      }
+    });
+
+    expect(bountySize.total).toBe(11);
+    expect(bountySize.mode).toBe('space');
+
+    expect(bountySize.roleups.length).toBe(0);
+  });
+
   it('should only include the count permissions that grant access to the "work" operation', async () => {
     const bounty = await generateBounty({
       spaceId: space.id,

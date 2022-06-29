@@ -14,8 +14,17 @@ handler.use(requireUser)
 
 async function getBountySubmitterPoolPermissionsController (req: NextApiRequest, res: NextApiResponse<BountySubmitterPoolSize>) {
 
-  const { id: bountyId } = req.query as any;
-  const { permissions: permissionsForSimulation } = req.body as BountySubmitterPoolCalculation;
+  const { permissions: permissionsForSimulation, resourceId: bountyId } = req.body as BountySubmitterPoolCalculation;
+
+  // This is a simulation for inexistent bounty
+  if (permissionsForSimulation && !bountyId) {
+    const pool = await calculateBountySubmitterPoolSize({
+      permissions: permissionsForSimulation as Partial<BountyPermissions>
+    });
+    return res.status(200).json(pool);
+
+  }
+
   const bounty = await getBounty(bountyId as string);
 
   if (!bounty) {

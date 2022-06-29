@@ -19,7 +19,7 @@ beforeAll(async () => {
   nonAdminCookie = await loginUser(nonAdminUser);
 });
 
-describe('POST /api/bounties/{bountyId}/pool - Return breakdown of how many people can apply', () => {
+describe('POST /api/bounties/pool - Return breakdown of how many people can apply', () => {
 
   it('should return the bounty pool size based on current bounty permissions and respond with 200', async () => {
 
@@ -55,9 +55,11 @@ describe('POST /api/bounties/{bountyId}/pool - Return breakdown of how many peop
     });
 
     const { mode, roleups, total } = (await request(baseUrl)
-      .post(`/api/bounties/${bounty.id}/pool`)
+      .post('/api/bounties/pool')
       .set('Cookie', extraUserCookie)
-      .send({})
+      .send({
+        resourceId: bounty.id
+      })
       .expect(200)).body as BountySubmitterPoolSize;
 
     expect(mode === 'role').toBe(true);
@@ -73,14 +75,8 @@ describe('POST /api/bounties/{bountyId}/pool - Return breakdown of how many peop
 
     const bounty = await createBounty({
       spaceId: nonAdminUserSpace.id,
-      createdBy: extraUser.id,
-      title: 'Example',
-      permissions: {
-        creator: [{
-          group: 'user',
-          id: extraUser.id
-        }]
-      }
+      createdBy: nonAdminUser.id,
+      title: 'Example'
     });
 
     const role = await generateRole({
@@ -116,11 +112,68 @@ describe('POST /api/bounties/{bountyId}/pool - Return breakdown of how many peop
       }
     };
 
-    const extraUserCookie = await loginUser(extraUser);
-
+    // Creator is querying permissions
     const { mode, roleups, total } = (await request(baseUrl)
-      .post(`/api/bounties/${bounty.id}/pool`)
-      .set('Cookie', extraUserCookie)
+      .post('/api/bounties/pool')
+      .set('Cookie', nonAdminCookie)
+      .send(simulation)
+      .expect(200)).body as BountySubmitterPoolSize;
+
+    expect(mode === 'role').toBe(true);
+    expect(roleups.length).toBe(1);
+    expect(roleups[0].id === role.id).toBe(true);
+
+    // 2 users were assigned to 1 role
+    expect(total).toBe(2);
+  });
+
+  it('should return the bounty pool size based on a simulation of permissions for an inexistent bounty and respond with 200', async () => {
+
+    const extraUser = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
+    const secondExtraUser = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
+
+    const bounty = await createBounty({
+      spaceId: nonAdminUserSpace.id,
+      createdBy: extraUser.id,
+      title: 'Example'
+    });
+
+    const role = await generateRole({
+      createdBy: nonAdminUser.id,
+      spaceId: nonAdminUserSpace.id
+    });
+
+    await assignRole({
+      roleId: role.id,
+      userId: extraUser.id
+    });
+
+    // This shouldn't be taken into account for our simulation
+    const secondRole = await generateRole({
+      createdBy: nonAdminUser.id,
+      spaceId: nonAdminUserSpace.id
+    });
+
+    await assignRole({
+      roleId: role.id,
+      userId: secondExtraUser.id
+    });
+
+    await assignRole({
+      roleId: secondRole.id,
+      userId: secondExtraUser.id
+    });
+
+    const simulation: BountySubmitterPoolCalculation = {
+      permissions: {
+        submitter: [{ group: 'role', id: role.id }]
+      }
+    };
+
+    // Creator is querying permissions
+    const { mode, roleups, total } = (await request(baseUrl)
+      .post('/api/bounties/pool')
+      .set('Cookie', nonAdminCookie)
       .send(simulation)
       .expect(200)).body as BountySubmitterPoolSize;
 
@@ -147,9 +200,11 @@ describe('POST /api/bounties/{bountyId}/pool - Return breakdown of how many peop
     });
 
     const { mode, roleups, total } = (await request(baseUrl)
-      .post(`/api/bounties/${bounty.id}/pool`)
+      .post('/api/bounties/pool')
       .set('Cookie', externalUserCookie)
-      .send({})
+      .send({
+        resourceId: bounty.id
+      })
       .expect(200)).body as BountySubmitterPoolSize;
 
     expect(mode).toBe('space');
