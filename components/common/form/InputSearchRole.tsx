@@ -48,15 +48,15 @@ function InputSearchRoleBase ({
 
   return (
     <Autocomplete<ReducedRole>
-      defaultValue={defaultRole}
+      defaultValue={defaultRole as any}
       loading={!roles}
       sx={{ minWidth: 150 }}
       disableCloseOnSelect={disableCloseOnSelect}
+      placeholder={filteredRoles.length > 0 ? placeholder : ''}
       noOptionsText='No options available'
       // @ts-ignore - not sure why this fails
       options={
-        // This option is for UX. It avoids a bug where the list would keep state (selected) but remain empty if all options were selected
-        // Now the list pops up in full on first load
+
         filteredRoles
 }
       autoHighlight

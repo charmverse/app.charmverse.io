@@ -449,9 +449,6 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
                 </Grid>
                 <Grid item xs={12}>
                   <Typography display='block' justifyContent='center'>
-                    {submitterMode}
-                    {assignedRoleSubmitters.length}
-
                     {submitterMode === 'space' && values.approveSubmitters && (
                     // Insert intelligent rollup here
                       'All workspace members can apply to work on this bounty.'
@@ -460,11 +457,15 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
                       'All workspace members can submit work to this bounty.'
                     )}
                     {submitterMode === 'role' && assignedRoleSubmitters.length === 0 && (
-                      'Select a first role you want to allow to apply to this bounty.'
+                      'Select a first role you want to allow to work on this bounty.'
                     )}
                     {submitterMode === 'role' && !values.approveSubmitters && assignedRoleSubmitters.length > 0 && (
                     // Isert intelligent rollup here
                       'Only workspace members with the one of the selected roles can submit work to this bounty.'
+                    )}
+                    {submitterMode === 'role' && values.approveSubmitters && assignedRoleSubmitters.length > 0 && (
+                    // Isert intelligent rollup here
+                      'Only workspace members with the one of the selected roles can apply to work on this bounty.'
                     )}
 
                   </Typography>
