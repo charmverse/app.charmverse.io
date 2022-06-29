@@ -406,7 +406,7 @@ class CharmClient {
   }
 
   async getBountyApplicantPool ({ resourceId, permissions }: BountySubmitterPoolCalculation): Promise<BountySubmitterPoolSize> {
-    return http.POST<BountySubmitterPoolSize>(`/api/bounties/${resourceId}/pool`, { permissions });
+    return http.POST<BountySubmitterPoolSize>('/api/bounties/pool', { permissions, resourceId });
   }
 
   /**

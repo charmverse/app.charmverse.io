@@ -32,7 +32,7 @@ import { useEffect, useState } from 'react';
 import { useForm, UseFormWatch } from 'react-hook-form';
 import * as yup from 'yup';
 import { TargetPermissionGroup } from 'lib/permissions/interfaces';
-import { BountyCreationData } from 'lib/bounties/interfaces';
+import { BountyCreationData, BountySubmitterPoolSize } from 'lib/bounties/interfaces';
 
 export type FormMode = 'create' | 'update' | 'suggest';
 
@@ -138,6 +138,20 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
   const [user] = useUser();
   const [space] = useCurrentSpace();
 
+  const [bountyApplicantPool, setBountyApplicantPool] = useState<BountySubmitterPoolSize | null>(null);
+
+  useEffect(() => {
+    if (bounty) {
+      setBountyApplicantPool(null);
+      charmClient.getBountyApplicantPool({
+        resourceId: bounty.id
+      }).then(calculation => {
+        setBountyApplicantPool(calculation);
+      });
+    }
+
+  }, [bounty]);
+
   // Cached description for when user is creating or suggesting a new bounty
   const [cachedBountyDescription, setCachedBountyDescription] = useLocalStorage<{nodes: PageContent, text: string}>(`newBounty.${space?.id}`, {
     nodes: {
@@ -192,6 +206,16 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
 
   const [selectedReviewerUsers, setSelectedReviewerUsers] = useState<string[]>([]);
   const [selectedReviewerRoles, setSelectedReviewerRoles] = useState<string[]>([]);
+
+  useEffect(() => {
+    const updatedPermissions = rollupPermissions();
+    charmClient.getBountyApplicantPool({
+      permissions: updatedPermissions
+    }).then(calculation => {
+      setBountyApplicantPool(calculation);
+    });
+
+  }, [submitterMode, assignedRoleSubmitters, selectedReviewerUsers, selectedReviewerRoles]);
 
   const chainId = watch('chainId');
   const rewardToken = watch('rewardToken');
@@ -492,24 +516,32 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
                 </Grid>
                 <Grid item xs={12}>
                   <Typography display='block' justifyContent='center'>
+
+                    {
+                      ((submitterMode === 'role' && selectedReviewerRoles.length === 0) || bountyApplicantPool?.total === 0) && (
+                        <span style={{ paddingRight: '5px' }}>
+                          No workspace members can work on this bounty currently.
+                        </span>
+
+                      )
+                    }
+
                     {submitterMode === 'space' && values.approveSubmitters && (
                     // Insert intelligent rollup here
-                      'All workspace members can apply to work on this bounty.'
+                      `${bountyApplicantPool ? (`${bountyApplicantPool.total} `) : ''}workspace member${bountyApplicantPool?.total === 1 ? '' : 's'}  can apply to work on this bounty.`
                     )}
                     {submitterMode === 'space' && !values.approveSubmitters && (
-                      'All workspace members can submit work to this bounty.'
+                      `${bountyApplicantPool ? (`${bountyApplicantPool.total} `) : ''}workspace member${bountyApplicantPool?.total === 1 ? '' : 's'}  can submit work to this bounty.`
                     )}
                     {submitterMode === 'role' && assignedRoleSubmitters.length === 0 && (
                       'Select a first role you want to allow to work on this bounty.'
                     )}
-                    {submitterMode === 'role' && !values.approveSubmitters && assignedRoleSubmitters.length > 0 && (
-                    // Isert intelligent rollup here
-                      'Only workspace members with the one of the selected roles can submit work to this bounty.'
-                    )}
-                    {submitterMode === 'role' && values.approveSubmitters && assignedRoleSubmitters.length > 0 && (
-                    // Isert intelligent rollup here
-                      'Only workspace members with the one of the selected roles can apply to work on this bounty.'
-                    )}
+
+                    {
+                      submitterMode === 'role' && bountyApplicantPool && bountyApplicantPool.roleups.length > 0 && bountyApplicantPool.total > 0 && (
+                        `${bountyApplicantPool.total} workspace member${bountyApplicantPool.total === 1 ? '' : 's'}  across ${bountyApplicantPool.roleups.length} role${bountyApplicantPool.roleups.length === 1 ? '' : 's'} can work on this bounty.`
+                      )
+                    }
 
                   </Typography>
 
