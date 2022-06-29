@@ -45,9 +45,10 @@ function InputSearchContributorBase ({ filter, options, placeholder, ...props }:
   return (
     <Autocomplete
       {...props}
-      disabled={filteredOptions.length === 0}
+      disabled={options.length === 0}
       loading={options.length === 0}
       sx={{ minWidth: 150 }}
+      placeholder={filteredOptions.length > 0 ? placeholder : ''}
       // @ts-ignore - not sure why this fails
       options={filteredOptions}
       autoHighlight
@@ -59,10 +60,11 @@ function InputSearchContributorBase ({ filter, options, placeholder, ...props }:
           user={user}
         />
       )}
+      noOptionsText='No options available'
       renderInput={(params) => (
         <TextField
           {...params}
-          placeholder={placeholder}
+          placeholder={filteredOptions.length > 0 ? placeholder : ''}
           size='small'
           inputProps={{
             ...params.inputProps
