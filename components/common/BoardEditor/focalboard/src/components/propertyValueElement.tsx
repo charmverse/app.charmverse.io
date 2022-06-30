@@ -44,6 +44,7 @@ const PropertyValueElement = (props:Props): JSX.Element => {
     const intl = useIntl()
     const propertyValue = card.fields.properties[propertyTemplate.id]
     const displayValue = OctoUtils.propertyDisplayValue(card, propertyValue, propertyTemplate, intl)
+    console.log('display value', card.fields.properties, displayValue, propertyValue, propertyTemplate)
     const emptyDisplayValue = showEmptyPlaceholder ? intl.formatMessage({id: 'PropertyValueElement.empty', defaultMessage: 'Empty'}) : ''
     const finalDisplayValue = displayValue || emptyDisplayValue
 

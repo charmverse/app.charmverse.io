@@ -5,7 +5,6 @@ import { BoardView } from 'components/common/BoardEditor/focalboard/src/blocks/b
 import { PagesMap } from 'hooks/usePages';
 
 export interface DatabaseContext {
-  activeViewId?: string;
   board: Board;
   cards: Record<string, Card>;
   pages: PagesMap;

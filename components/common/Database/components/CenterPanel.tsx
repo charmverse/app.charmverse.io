@@ -1,12 +1,17 @@
 
 import ViewHeader from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeader';
 import Kanban from 'components/common/BoardEditor/focalboard/src/components/kanban/kanban';
+import { groupCardsByOptions } from 'components/common/BoardEditor/focalboard/src/components/centerPanel';
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
 import type { DatabaseContext } from '../Database.context';
 
 // loosely based off centerPanel.tsx in /focalboard/
 
-export default function DatabaseView (props: DatabaseContext) {
+interface Props extends DatabaseContext {
+  activeViewId?: string;
+}
+
+export default function DatabaseView (props: Props) {
 
   const addCard = () => Promise.resolve();
   const addCardTemplate = () => {};
@@ -16,6 +21,9 @@ export default function DatabaseView (props: DatabaseContext) {
 
   const activeView = props.views.find(view => view.id === props.activeViewId) || props.views[0];
   const cards = Object.values(props.cards);
+  const groupByProperty = props.board.fields.cardProperties.find(prop => prop.id === activeView.fields.groupById);
+  const optionIds = groupByProperty?.options.map(prop => prop.id) || [];
+  const visibleGroups = groupCardsByOptions(cards, optionIds, groupByProperty);
 
   return (
     <>
@@ -36,7 +44,8 @@ export default function DatabaseView (props: DatabaseContext) {
               board={props.board}
               activeView={activeView}
               cards={cards}
-              visibleGroups={[]}
+              groupByProperty={groupByProperty}
+              visibleGroups={visibleGroups}
               hiddenGroups={[]}
               selectedCardIds={[]}
               readonly={true}
