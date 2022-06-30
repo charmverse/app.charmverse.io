@@ -61,7 +61,7 @@ function PageInlineVoteOption ({ isDisabled, option, voteId, checked, percentage
 const MAX_DESCRIPTION_LENGTH = 200;
 
 export default function PageInlineVote ({ detailed = false, inlineVote }: PageInlineVoteProps) {
-  const { deadline, description, title, userVotes, options, id } = inlineVote;
+  const { deadline, description, title, userVotes, options } = inlineVote;
   const totalVotes = userVotes.length;
   const [user] = useUser();
   const { cancelVote, deleteVote } = useInlineVotes();
@@ -102,7 +102,7 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
   const popupState = usePopupState({ variant: 'popover', popupId: 'delete-inline-vote' });
   const menuState = bindMenu(popupState);
   return (
-    <StyledDiv detailed={detailed}>
+    <StyledDiv detailed={detailed} id={`vote.${inlineVote.id}`}>
       <Box display='flex' justifyContent='space-between' alignItems='center'>
         <Typography variant='h6' fontWeight='bold'>
           {title}

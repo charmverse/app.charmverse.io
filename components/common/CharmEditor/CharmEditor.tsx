@@ -571,7 +571,7 @@ function CharmEditor (
           timeout={250}
         >
           <PageActionListBox
-            className='PageVotesListBox'
+            className='PageVoteListBox'
           >
             <PageInlineVotesList />
           </PageActionListBox>

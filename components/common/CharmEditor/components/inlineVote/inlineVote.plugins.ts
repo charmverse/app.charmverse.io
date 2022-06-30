@@ -1,7 +1,9 @@
 import { Plugin, RawPlugins } from '@bangle.dev/core';
 import { PluginKey } from '@bangle.dev/pm';
 import { createTooltipDOM, tooltipPlacement } from '@bangle.dev/tooltip';
+import { highlightMarkedElement } from 'lib/prosemirror/highlightMarkedElement';
 import { referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';
+import { markName } from './inlineVote.constants';
 
 export interface InlineVotePluginState {
   tooltipContentDOM: HTMLElement
@@ -47,6 +49,17 @@ export function plugin ({ key } :{
             };
           }
           throw new Error('Unknown type');
+        }
+      },
+      props: {
+        handleClickOn: (view) => {
+          return highlightMarkedElement({
+            view,
+            className: 'PageVoteListBox',
+            key,
+            markName,
+            prefix: 'vote'
+          });
         }
       }
     }),

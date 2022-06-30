@@ -15,7 +15,7 @@ export function highlightMarkedElement ({
   if (!toNodeAfter) {
     const tr = view.state.tr.setSelection(new TextSelection(view.state.doc.resolve(view.state.selection.$to.pos)));
     view.dispatch(tr);
-    return true;
+    return false;
   }
   if (fromNodeAfter) {
     const inlineActionMark = view.state.doc.type.schema.marks[markName].isInSet(fromNodeAfter.marks);
@@ -33,6 +33,7 @@ export function highlightMarkedElement ({
         const actionDocument = document.getElementById(`${prefix}.${actionId}`);
         if (actionDocument) {
           highlightDomElement(actionDocument);
+          return true;
         }
       }
       else {
@@ -40,8 +41,9 @@ export function highlightMarkedElement ({
         renderSuggestionsTooltip(key, {
           ids: [actionId]
         })(view.state, view.dispatch, view);
+        return true;
       }
     }
   }
-  return true;
+  return false;
 }

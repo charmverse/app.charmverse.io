@@ -727,7 +727,7 @@ class CharmClient {
     }
 
     const vote1Id = v4();
-    const vote2Id = v4();
+    const vote2Id = 'c11f0309-63b1-460a-b4a1-2e086fb9cc0a';
     const vote3Id = v4();
     return [{
       deadline: new Date(new Date().getTime() - (12 * 60 * 60 * 1000)), // 12 hrs ago
