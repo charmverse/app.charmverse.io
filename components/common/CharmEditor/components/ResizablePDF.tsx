@@ -115,7 +115,7 @@ type PDFViewerProps = {
   width: number
 };
 
-function PDFViewer (props: PDFViewerProps) {
+function PDF (props: PDFViewerProps) {
   const { url, width } = props;
   const [pageCount, setPageCount] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState(1);
@@ -189,7 +189,7 @@ function ResizablePDF ({ readOnly, onResizeStop, node, updateAttrs, selected }:
     }
   }
 
-  const onDelete = useCallback(() => {
+  const handleDelete = useCallback(() => {
     if (url?.includes('s3.amazonaws.com')) {
       charmClient.deleteFromS3(url);
     }
@@ -197,11 +197,11 @@ function ResizablePDF ({ readOnly, onResizeStop, node, updateAttrs, selected }:
       src: null,
       aspectRatio: 1
     });
-  }, []);
+  }, [url]);
 
   if (readOnly) {
     return (
-      <PDFViewer url={url} width={size} />
+      <PDF url={url} width={size} />
     );
   }
   else {
@@ -210,10 +210,10 @@ function ResizablePDF ({ readOnly, onResizeStop, node, updateAttrs, selected }:
         initialSize={size}
         minWidth={MIN_PDF_WIDTH}
         updateAttrs={updateAttrs}
-        onDelete={onDelete}
+        onDelete={() => handleDelete()}
         onResizeStop={onResizeStop}
       >
-        <PDFViewer url={url} width={size} />
+        <PDF url={url} width={size} />
       </Resizable>
     );
   }
