@@ -118,6 +118,11 @@ describe('getPageInBoard', () => {
           connect: {
             id: user.id
           }
+        },
+        space: {
+          connect: {
+            id: space.id
+          }
         }
       }
     });
