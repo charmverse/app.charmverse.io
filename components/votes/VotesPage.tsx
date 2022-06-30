@@ -8,25 +8,29 @@ import { createBoard, IPropertyOption } from 'components/common/BoardEditor/foca
 import { createBoardView } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
 import { Card, createCard } from 'components/common/BoardEditor/focalboard/src/blocks/card';
 
-const votes: Vote[] = [{
+const votes: (Vote & { options: any[] })[] = [{
   createdAt: new Date(),
-  initiatorId: 'cc',
+  createdBy: 'cc',
+  spaceId: '',
   id: 'aa',
   title: 'Coffee or Tea?',
   description: '',
   pageId: '',
   deadline: new Date(),
   options: [],
+  threshold: 1,
   status: 'Cancelled'
 }, {
   createdAt: new Date(),
-  initiatorId: 'cc',
+  createdBy: 'cc',
+  spaceId: '',
   id: 'aa',
   title: 'Coke or Pepsi?',
   description: '',
   pageId: '',
   deadline: new Date(),
   options: [],
+  threshold: 1,
   status: 'InProgress'
 }];
 
@@ -102,7 +106,7 @@ export default function VotesPage () {
       icon: null,
       index: -1,
       path: '',
-      spaceId: null,
+      spaceId: '',
       parentId: null,
       type: 'page',
       boardId: null,
@@ -110,9 +114,9 @@ export default function VotesPage () {
       cardId: card.id,
       fullWidth: false,
       createdAt: vote.createdAt,
-      createdBy: vote.initiatorId,
+      createdBy: vote.createdBy,
       updatedAt: vote.createdAt,
-      updatedBy: vote.initiatorId,
+      updatedBy: vote.createdBy,
       permissions: [],
       id: card.id,
       deletedAt: null,
