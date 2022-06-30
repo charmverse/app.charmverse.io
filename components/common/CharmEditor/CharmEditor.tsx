@@ -454,8 +454,9 @@ function CharmEditor (
           case 'paragraph': {
             return (
               <Paragraph
+                inlineVotePluginKey={inlineVotePluginKey}
                 inlineCommentPluginKey={inlineCommentPluginKey}
-                calculateInlineComments={!disabledPageSpecificFeatures}
+                calculateActions={!disabledPageSpecificFeatures}
                 {...props}
               >{_children}
               </Paragraph>
