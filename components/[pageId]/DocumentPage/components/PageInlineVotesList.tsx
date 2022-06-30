@@ -10,7 +10,8 @@ export const StyledPageInlineVotesList = styled(List)`
   overflow: auto;
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing(2)};
+  gap: ${({ theme }) => theme.spacing(1)};
+  margin-right: ${({ theme }) => theme.spacing(1)};
   padding-top: 0px;
   padding-bottom: 0px;
   height: calc(100% - 50px);
@@ -40,7 +41,7 @@ export default function PageInlineVotesList () {
   const filteredVotes = voteFilter === 'completed' ? votesCompleted : votesInProgress;
   return (
     <Box>
-      <Box display='flex' alignItems='center' justifyContent='space-between' mb={1}>
+      <Box display='flex' alignItems='center' justifyContent='space-between' mb={1} ml={2} mr={1}>
         <Typography fontWeight={600} fontSize={20}>
           Votes
         </Typography>

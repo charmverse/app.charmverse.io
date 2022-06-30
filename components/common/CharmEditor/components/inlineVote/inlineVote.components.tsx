@@ -12,6 +12,7 @@ import { useInlineVotes } from 'hooks/useInlineVotes';
 import { usePages } from 'hooks/usePages';
 import { DateTime } from 'luxon';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Modal } from 'components/common/Modal';
 import { updateInlineVote } from './inlineVote.utils';
 
 type VoteType = 'default' | 'custom';
@@ -138,20 +139,12 @@ export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
   };
 
   return (
-    <ClickAwayListener onClickAway={() => {
-      hideSelectionTooltip(pluginKey)(view.state, view.dispatch, view);
-    }}
-    >
+    <Modal title='Create an inline vote' size='large' open onClose={() => hideSelectionTooltip(pluginKey)(view.state, view.dispatch, view)}>
       <Box
         flexDirection='column'
         gap={1.5}
         m={1}
         display='flex'
-        width='400px'
-        sx={{
-          height: 400,
-          overflowY: 'scroll'
-        }}
       >
         <Box flexDirection='column' display='flex'>
           <FieldLabel>Title</FieldLabel>
@@ -166,7 +159,6 @@ export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
         </Box>
 
         <Box flexDirection='column' display='flex'>
-          <FieldLabel>Description</FieldLabel>
           <TextField
             placeholder='Details (Optional)'
             value={voteDescription}
@@ -175,50 +167,53 @@ export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
             }}
           />
         </Box>
-        <Box flexDirection='column' display='flex'>
-          <FieldLabel>Deadline</FieldLabel>
-          <DateTimePicker
-            minDate={DateTime.fromMillis(Date.now())}
-            value={deadline}
-            onAccept={async (value) => {
-              if (value) {
-                setDeadline(value);
-              }
-            }}
-            onChange={(value) => {
-              if (value) {
-                setDeadline(value);
-              }
-            }}
-            renderInput={(props) => (
-              <TextField
-                {...props}
-                inputProps={{
-                  ...props.inputProps,
-                  readOnly: true
-                }}
-                disabled
-                fullWidth
-              />
-            )}
-          />
-        </Box>
-        <Box flexDirection='column' display='flex'>
-          <FieldLabel>Pass Threshold</FieldLabel>
-          <TextField
-            type='number'
-            value={passThreshold}
-            onChange={(e) => {
-              setPassThreshold(e.target.value as any);
-            }}
-            InputProps={{
-              inputProps: {
-                min: 1,
-                max: 100,
-                step: 1
-              }
-            }}
-          />
+        <Box display='flex' gap={1}>
+          <Box flexDirection='column' display='flex' flexGrow={1}>
+            <FieldLabel>Deadline</FieldLabel>
+            <DateTimePicker
+              minDate={DateTime.fromMillis(Date.now())}
+              value={deadline}
+              onAccept={async (value) => {
+                if (value) {
+                  setDeadline(value);
+                }
+              }}
+              onChange={(value) => {
+                if (value) {
+                  setDeadline(value);
+                }
+              }}
+              renderInput={(props) => (
+                <TextField
+                  {...props}
+                  inputProps={{
+                    ...props.inputProps,
+                    readOnly: true
+                  }}
+                  disabled
+                  fullWidth
+                />
+              )}
+            />
+          </Box>
+          <Box flexDirection='column' display='flex' flexGrow={1}>
+            <FieldLabel>Pass Threshold</FieldLabel>
+            <TextField
+              fullWidth
+              type='number'
+              value={passThreshold}
+              onChange={(e) => {
+                setPassThreshold(e.target.value as any);
+              }}
+              InputProps={{
+                inputProps: {
+                  min: 1,
+                  max: 100,
+                  step: 1
+                }
+              }}
+            />
+          </Box>
         </Box>
         <RadioGroup
           row
@@ -237,7 +232,6 @@ export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
         </RadioGroup>
         <InlineVoteOptions disableAddOption={voteType === 'default'} disableDelete={voteType === 'default'} disableTextFields={voteType === 'default'} options={options} setOptions={setOptions} />
         <Button
-          size='small'
           onClick={handleSubmit}
           sx={{
             alignSelf: 'flex-start',
@@ -249,6 +243,6 @@ export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
           Create
         </Button>
       </Box>
-    </ClickAwayListener>
+    </Modal>
   );
 }

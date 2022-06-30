@@ -172,7 +172,8 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
                 sx={{
                   px: 0,
                   display: 'flex',
-                  justifyContent: 'space-between'
+                  justifyContent: 'space-between',
+                  gap: 1
                 }}
               >
                 <Avatar avatar={_userVote.user.avatar} name={_userVote.user.username} />
