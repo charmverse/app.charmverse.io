@@ -109,7 +109,7 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
         </Typography>
         <Chip size='small' label={VoteStatusLabelRecord[inlineVote.status]} />
       </Box>
-      <Box display='flex' justifyContent='space-between' mb={1}>
+      <Box display='flex' justifyContent='space-between'>
         <Typography
           color='secondary'
           variant='subtitle1'
@@ -120,7 +120,7 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
           <MoreHorizIcon fontSize='small' />
         </IconButton>
       </Box>
-      <div>{isDescriptionAbove && !detailed ? (
+      <Box my={1} mb={2}>{isDescriptionAbove && !detailed ? (
         <span>
           {description.slice(0, 200)}...
           <Typography
@@ -139,13 +139,12 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
           </Typography>
         </span>
       ) : description}
-      </div>
+      </Box>
       {!detailed && voteCountLabel}
       <List sx={{
         display: 'flex',
         gap: 0.5,
-        flexDirection: 'column',
-        my: 1
+        flexDirection: 'column'
       }}
       >
         {options.map((option) => {
@@ -156,7 +155,7 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
               checked={option.name === userVote?.choice}
               isDisabled={isDisabled}
               option={option}
-              percentage={(((voteFrequencyRecord[option.name] ?? 0) / totalVotes) * 100)}
+              percentage={((totalVotes === 0 ? 0 : (voteFrequencyRecord[option.name] ?? 0) / totalVotes) * 100)}
               voteId={inlineVote.id}
             />
           );
@@ -200,12 +199,12 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
         onClick={(e) => e.stopPropagation()}
       >
         {inlineVote.status === 'InProgress' && (
-        <MenuItem onClick={() => cancelVote(inlineVote.id)}>
+        <MenuItem dense onClick={() => cancelVote(inlineVote.id)}>
           <DoNotDisturbIcon fontSize='small' sx={{ mr: 1 }} />
           <ListItemText>Cancel</ListItemText>
         </MenuItem>
         )}
-        <MenuItem onClick={() => popupState.open()}>
+        <MenuItem dense onClick={() => popupState.open()}>
           <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
           <ListItemText>Delete</ListItemText>
         </MenuItem>

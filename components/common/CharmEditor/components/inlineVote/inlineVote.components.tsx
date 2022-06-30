@@ -126,7 +126,8 @@ export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
       options,
       title: voteTitle,
       description: voteDescription,
-      pageId: cardId ?? currentPageId
+      pageId: cardId ?? currentPageId,
+      threshold: passThreshold
     });
 
     updateInlineVote(vote.id)(view.state, view.dispatch);

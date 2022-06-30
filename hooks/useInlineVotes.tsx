@@ -11,7 +11,7 @@ type IContext = {
   isValidating: boolean,
   inlineVotes: Record<string, VoteWithUsers>
   castVote: (voteId: string, option: string) => Promise<void>
-  createVote: (votePayload: Pick<VoteWithUsers, 'title' | 'deadline' | 'description' | 'options' | 'pageId'>) => Promise<VoteWithUsers>,
+  createVote: (votePayload: Pick<VoteWithUsers, 'title' | 'deadline' | 'description' | 'options' | 'pageId' | 'threshold'>) => Promise<VoteWithUsers>,
   deleteVote: (voteId: string) => Promise<void>,
   cancelVote: (voteId: string) => Promise<void>,
 };
@@ -60,7 +60,7 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
     });
   }
 
-  async function createVote (votePayload: Pick<VoteWithUsers, 'title' | 'deadline' | 'description' | 'options' | 'pageId'>): Promise<VoteWithUsers> {
+  async function createVote (votePayload: Pick<VoteWithUsers, 'title' | 'deadline' | 'description' | 'options' | 'pageId' | 'threshold'>): Promise<VoteWithUsers> {
     // TODO: Implement & Call charmClient function
     const voteId = v4();
     const vote = {
