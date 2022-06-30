@@ -1,19 +1,16 @@
-import { useEditorViewContext } from '@bangle.dev/react';
-import { User } from '@prisma/client';
 import charmClient from 'charmClient';
-import { VoteWithUsers } from 'lib/inline-votes/interfaces';
-import { removeInlineVoteMark } from 'lib/inline-votes/removeInlineVoteMark';
+import { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
-import { v4 } from 'uuid';
+import { useCurrentSpace } from './useCurrentSpace';
 import { usePages } from './usePages';
 import { useUser } from './useUser';
 
 type IContext = {
   isValidating: boolean,
-  inlineVotes: Record<string, VoteWithUsers>
+  inlineVotes: Record<string, ExtendedVote>
+  createVote: (votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId'>) => Promise<ExtendedVote>,
   castVote: (voteId: string, option: string) => Promise<void>
-  createVote: (votePayload: Pick<VoteWithUsers, 'title' | 'deadline' | 'description' | 'options' | 'pageId' | 'threshold'>) => Promise<VoteWithUsers>,
   deleteVote: (voteId: string) => Promise<void>,
   cancelVote: (voteId: string) => Promise<void>,
 };
@@ -31,8 +28,9 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
   const { currentPageId } = usePages();
   const [inlineVotes, setInlineVotes] = useState<IContext['inlineVotes']>({});
   const [user] = useUser();
-  const { data, isValidating } = useSWR(() => currentPageId ? `pages/${currentPageId}/inline-votes` : null, () => charmClient.getPageInlineVotesWithUsers(currentPageId));
-
+  const cardId = typeof window !== 'undefined' ? (new URLSearchParams(window.location.href)).get('cardId') : null;
+  const { data, isValidating } = useSWR(() => currentPageId ? `pages/${currentPageId}/inline-votes` : null, () => charmClient.getPageVotes(cardId ?? currentPageId));
+  const [currentSpace] = useCurrentSpace();
   async function castVote (voteId: string, choice: string) {
     // TODO: Implement & Call charmClient function
     setInlineVotes((_inlineVotes) => {
@@ -46,7 +44,6 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
           vote.userVotes.push({
             choice,
             // TODO: Remove any
-            user: user as any,
             userId: user.id,
             voteId,
             createdAt: new Date(),
@@ -61,23 +58,19 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
     });
   }
 
-  async function createVote (votePayload: Pick<VoteWithUsers, 'title' | 'deadline' | 'description' | 'options' | 'pageId' | 'threshold'>): Promise<VoteWithUsers> {
+  async function createVote (votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId'>): Promise<ExtendedVote> {
     // TODO: Implement & Call charmClient function
-    const voteId = v4();
-    const vote = {
+    const extendedVote = await charmClient.createVote({
       ...votePayload,
-      id: voteId,
-      userVotes: [],
-      initiatorId: user!.id,
-      createdAt: new Date(),
-      status: 'InProgress'
-    } as VoteWithUsers;
-
+      createdBy: user!.id,
+      pageId: cardId ?? currentPageId,
+      spaceId: currentSpace!.id
+    });
     setInlineVotes({
       ...inlineVotes,
-      [voteId]: vote
+      [extendedVote.id]: extendedVote
     });
-    return vote;
+    return extendedVote;
   }
 
   async function deleteVote (voteId: string) {

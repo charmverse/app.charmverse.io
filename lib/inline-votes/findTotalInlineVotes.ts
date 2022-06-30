@@ -1,11 +1,11 @@
 import { EditorView, MarkType, Node } from '@bangle.dev/pm';
 import { findChildrenByMark } from 'prosemirror-utils';
-import { VoteWithUsers } from './interfaces';
+import { ExtendedVote } from './interfaces';
 
 export function findTotalInlineVotes (
   view:EditorView,
   node: Node,
-  votes: Record<string, VoteWithUsers>
+  votes: Record<string, ExtendedVote>
 ) {
   const inlineVoteMarkSchema = view.state.schema.marks['inline-vote'] as MarkType;
   const inlineVoteNodes = findChildrenByMark(node, inlineVoteMarkSchema);

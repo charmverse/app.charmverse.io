@@ -3,7 +3,7 @@ import { List, MenuItem, Select, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import PageInlineVote from 'components/common/CharmEditor/components/PageInlineVote';
 import { useInlineVotes } from 'hooks/useInlineVotes';
-import { VoteWithUsers } from 'lib/inline-votes/interfaces';
+import { ExtendedVote } from 'lib/inline-votes/interfaces';
 import { useMemo, useState } from 'react';
 
 export const StyledPageInlineVotesList = styled(List)`
@@ -21,8 +21,8 @@ export default function PageInlineVotesList () {
   const { inlineVotes } = useInlineVotes();
   const allVotes = Object.values(inlineVotes);
   const [votesInProgress, votesCompleted] = useMemo(() => {
-    const _votesInProgress: VoteWithUsers[] = [];
-    const _votesCompleted: VoteWithUsers[] = [];
+    const _votesInProgress: ExtendedVote[] = [];
+    const _votesCompleted: ExtendedVote[] = [];
     allVotes.forEach(vote => {
       if (vote.status === 'InProgress') {
         _votesInProgress.push(vote);

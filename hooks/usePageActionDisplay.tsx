@@ -1,4 +1,4 @@
-import { VoteWithUsers } from 'lib/inline-votes/interfaces';
+import { ExtendedVote } from 'lib/inline-votes/interfaces';
 import { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 import { useSWRConfig } from 'swr';
@@ -25,7 +25,7 @@ export function CommentThreadsListDisplayProvider ({ children }: { children: Rea
   const [currentPageActionDisplay, setCurrentPageActionDisplay] = useState<IPageActionDisplayContext['currentPageActionDisplay']>(null);
   useEffect(() => {
     if (currentPageId && !isValidatingInlineComments && !isValidatingInlineVotes) {
-      const cachedInlineVotesData: VoteWithUsers[] = cache.get(`pages/${currentPageId}/inline-votes`);
+      const cachedInlineVotesData: ExtendedVote[] = cache.get(`pages/${currentPageId}/inline-votes`);
       const cachedInlineCommentData: ThreadWithCommentsAndAuthors[] | undefined = cache.get(`pages/${currentPageId}/threads`);
       // Vote takes precedence over comments, so if a page has in progress votes and unresolved comments, show the votes
       if (cachedInlineVotesData && cachedInlineVotesData.find(inlineVote => inlineVote.status === 'InProgress')) {

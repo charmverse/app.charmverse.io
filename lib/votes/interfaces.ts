@@ -1,4 +1,4 @@
-import { Vote, VoteOptions, UserVote } from '@prisma/client';
+import { Vote, VoteOptions, UserVote, User } from '@prisma/client';
 
 export const DEFAULT_THRESHOLD = 50;
 
@@ -23,6 +23,6 @@ export interface UserVoteDTO {
 }
 
 export interface ExtendedVote extends Vote {
-    userVotes: UserVote[],
+    userVotes: (UserVote & {user: User})[],
     voteOptions: VoteOptions[]
 }

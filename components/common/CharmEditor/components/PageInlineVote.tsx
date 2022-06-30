@@ -1,24 +1,23 @@
+import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import { Box, Button, Chip, Divider, FormLabel, IconButton, List, ListItem, ListItemIcon, ListItemText, Menu, MenuItem, Radio, Typography } from '@mui/material';
-import { Vote, VoteStatus } from '@prisma/client';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { Box, Button, Chip, Divider, FormLabel, IconButton, List, ListItem, ListItemText, Menu, MenuItem, Radio, Typography } from '@mui/material';
+import { VoteOptions, VoteStatus } from '@prisma/client';
+import Avatar from 'components/common/Avatar';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import UserDisplay from 'components/common/UserDisplay';
 import { useInlineVotes } from 'hooks/useInlineVotes';
 import { useUser } from 'hooks/useUser';
-import { VoteWithUsers } from 'lib/inline-votes/interfaces';
+import { removeInlineVoteMark } from 'lib/inline-votes/removeInlineVoteMark';
+import { ExtendedVote } from 'lib/votes/interfaces';
 import { DateTime } from 'luxon';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import { useMemo } from 'react';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import Avatar from 'components/common/Avatar';
-import { useEditorViewContext } from '@bangle.dev/react';
-import { removeInlineVoteMark } from 'lib/inline-votes/removeInlineVoteMark';
 
 interface PageInlineVoteProps {
-  inlineVote: VoteWithUsers
+  inlineVote: ExtendedVote
   detailed?: boolean
 }
 
@@ -29,12 +28,15 @@ const VoteStatusLabelRecord: Record<VoteStatus, string> = {
   Rejected: 'rejected'
 };
 
-const StyledDiv = styled.div<{detailed: boolean}>`
+const StyledDiv = styled.div<{ detailed: boolean }>`
   background-color: ${({ theme }) => theme.palette.background.light};
   padding: ${({ theme, detailed }) => detailed ? 0 : theme.spacing(2)};
 `;
 
-function PageInlineVoteOption ({ isDisabled, option, voteId, checked, percentage }: {voteId: string, option: VoteWithUsers['options'][0], percentage: number, checked: boolean, isDisabled: boolean}) {
+function PageInlineVoteOption (
+  { isDisabled, voteOption, voteId, checked, percentage }:
+  { voteId: string, voteOption: VoteOptions, percentage: number, checked: boolean, isDisabled: boolean }
+) {
   const { castVote } = useInlineVotes();
   return (
     <>
@@ -46,11 +48,11 @@ function PageInlineVoteOption ({ isDisabled, option, voteId, checked, percentage
             size='small'
             checked={checked}
             onChange={() => {
-              castVote(voteId, option.name);
+              castVote(voteId, voteOption.name);
             }}
           />
           <Box sx={{ display: 'flex', gap: 1 }}>
-            <FormLabel disabled={isDisabled}>{option.name}</FormLabel>
+            <FormLabel disabled={isDisabled}>{voteOption.name}</FormLabel>
           </Box>
         </Box>
         <Typography variant='subtitle1' color='secondary'>{percentage.toFixed(2)}%</Typography>
@@ -63,7 +65,7 @@ function PageInlineVoteOption ({ isDisabled, option, voteId, checked, percentage
 const MAX_DESCRIPTION_LENGTH = 200;
 
 export default function PageInlineVote ({ detailed = false, inlineVote }: PageInlineVoteProps) {
-  const { deadline, description, title, userVotes, options } = inlineVote;
+  const { deadline, description, title, userVotes, voteOptions } = inlineVote;
   const totalVotes = userVotes.length;
   const [user] = useUser();
   const { cancelVote, deleteVote } = useInlineVotes();
@@ -98,9 +100,10 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
 
   const userVote = user && inlineVote.userVotes.find(_userVote => _userVote.userId === user.id);
 
-  const hasPassedDeadline = deadline.getTime() < Date.now();
+  const hasPassedDeadline = new Date(deadline) < new Date();
+
   const relativeDate = DateTime.fromJSDate(new Date(deadline)).toRelative({ base: (DateTime.now()) });
-  const isDescriptionAbove = description.length > MAX_DESCRIPTION_LENGTH;
+  const isDescriptionAbove = description ? description.length > MAX_DESCRIPTION_LENGTH : false;
   const popupState = usePopupState({ variant: 'popover', popupId: 'delete-inline-vote' });
   const menuState = bindMenu(popupState);
   const view = useEditorViewContext();
@@ -118,14 +121,15 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
           color='secondary'
           variant='subtitle1'
         >
-          {hasPassedDeadline ? relativeDate : `${relativeDate?.replace('in', '')} left`}
+          {hasPassedDeadline ? relativeDate : `${relativeDate?.replace(/^in/g, '')} left`}
         </Typography>
-        {inlineVote.initiatorId === user?.id && (
-        <IconButton size='small' onClick={inlineVoteActionModal.open}>
-          <MoreHorizIcon fontSize='small' />
-        </IconButton>
+        {inlineVote.createdBy === user?.id && (
+          <IconButton size='small' onClick={inlineVoteActionModal.open}>
+            <MoreHorizIcon fontSize='small' />
+          </IconButton>
         )}
       </Box>
+      {description && (
       <Box my={1} mb={2}>{isDescriptionAbove && !detailed ? (
         <span>
           {description.slice(0, 200)}...
@@ -146,6 +150,7 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
         </span>
       ) : description}
       </Box>
+      )}
       {!detailed && voteCountLabel}
       <List sx={{
         display: 'flex',
@@ -153,15 +158,15 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
         flexDirection: 'column'
       }}
       >
-        {options.map((option) => {
-          const isDisabled = inlineVote.status !== 'InProgress' || inlineVote.deadline.getTime() < Date.now();
+        {voteOptions.map((voteOption) => {
+          const isDisabled = inlineVote.status !== 'InProgress' || new Date(inlineVote.deadline) < new Date();
           return (
             <PageInlineVoteOption
-              key={option.name}
-              checked={option.name === userVote?.choice}
+              key={voteOption.name}
+              checked={voteOption.name === userVote?.choice}
               isDisabled={isDisabled}
-              option={option}
-              percentage={((totalVotes === 0 ? 0 : (voteFrequencyRecord[option.name] ?? 0) / totalVotes) * 100)}
+              voteOption={voteOption}
+              percentage={((totalVotes === 0 ? 0 : (voteFrequencyRecord[voteOption.name] ?? 0) / totalVotes) * 100)}
               voteId={inlineVote.id}
             />
           );
@@ -215,16 +220,16 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
         onClick={(e) => e.stopPropagation()}
       >
         {inlineVote.status === 'InProgress' && (
-        <MenuItem
-          dense
-          onClick={() => {
-            removeInlineVoteMark(view, inlineVote.id);
-            cancelVote(inlineVote.id);
-          }}
-        >
-          <DoNotDisturbIcon fontSize='small' sx={{ mr: 1 }} />
-          <ListItemText>Cancel</ListItemText>
-        </MenuItem>
+          <MenuItem
+            dense
+            onClick={() => {
+              removeInlineVoteMark(view, inlineVote.id);
+              cancelVote(inlineVote.id);
+            }}
+          >
+            <DoNotDisturbIcon fontSize='small' sx={{ mr: 1 }} />
+            <ListItemText>Cancel</ListItemText>
+          </MenuItem>
         )}
         <MenuItem dense onClick={() => popupState.open()}>
           <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />

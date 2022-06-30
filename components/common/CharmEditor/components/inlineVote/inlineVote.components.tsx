@@ -3,18 +3,17 @@ import { useEditorViewContext } from '@bangle.dev/react';
 import { hideSelectionTooltip } from '@bangle.dev/tooltip/selection-tooltip';
 import AddCircle from '@mui/icons-material/AddCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { ClickAwayListener, FormControlLabel, IconButton, ListItem, Radio, RadioGroup, TextField, Typography } from '@mui/material';
+import { FormControlLabel, IconButton, ListItem, Radio, RadioGroup, TextField, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
+import { Modal } from 'components/common/Modal';
 import { useInlineVotes } from 'hooks/useInlineVotes';
 import { usePages } from 'hooks/usePages';
 import { DateTime } from 'luxon';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { Modal } from 'components/common/Modal';
 import { updateInlineVote } from './inlineVote.utils';
-import { InlineVotePluginState } from './inlineVote.plugins';
 
 type VoteType = 'default' | 'custom';
 
@@ -125,7 +124,7 @@ export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
     e.preventDefault();
     const vote = await createVote({
       deadline: deadline.toJSDate(),
-      options,
+      voteOptions: options.map(option => option.name),
       title: voteTitle,
       description: voteDescription,
       pageId: cardId ?? currentPageId,

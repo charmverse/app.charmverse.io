@@ -7,7 +7,11 @@ export async function getSpaceVotes (spaceId: string): Promise<ExtendedVote[]> {
       spaceId
     },
     include: {
-      userVotes: true,
+      userVotes: {
+        include: {
+          user: true
+        }
+      },
       voteOptions: true
     }
   });

@@ -3,9 +3,9 @@ import { prisma } from 'db';
 import { Vote } from '@prisma/client';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { DEFAULT_THRESHOLD, VoteDTO, VOTE_STATUS } from './interfaces';
+import { DEFAULT_THRESHOLD, ExtendedVote, VoteDTO, VOTE_STATUS } from './interfaces';
 
-export async function createVote (vote: VoteDTO): Promise<Vote> {
+export async function createVote (vote: VoteDTO): Promise<ExtendedVote> {
 
   const { createdBy, pageId, title, threshold, description, deadline, voteOptions } = vote;
 
@@ -62,6 +62,11 @@ export async function createVote (vote: VoteDTO): Promise<Vote> {
       }
     },
     include: {
+      userVotes: {
+        include: {
+          user: true
+        }
+      },
       voteOptions: true
     }
   });

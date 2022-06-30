@@ -40,7 +40,11 @@ export async function updateVote (id: string, userId: string, status: VoteStatus
     },
     include: {
       voteOptions: true,
-      userVotes: true
+      userVotes: {
+        include: {
+          user: true
+        }
+      }
     }
   });
 

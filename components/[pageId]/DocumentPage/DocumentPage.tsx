@@ -72,8 +72,6 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
 
   const comments = useAppSelector(getCardComments(card?.id));
 
-  const cardId = typeof window !== 'undefined' ? (new URLSearchParams(window.location.href)).get('cardId') : null;
-
   const showingPageActionList = currentPageActionDisplay !== null;
 
   return (
