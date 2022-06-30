@@ -4,6 +4,7 @@ import { Vote } from '@prisma/client';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { DEFAULT_THRESHOLD, VoteDTO, VOTE_STATUS } from './interfaces';
+import { getVote } from './getVote';
 
 export async function createVote (vote: VoteDTO): Promise<Vote> {
 
@@ -11,6 +12,14 @@ export async function createVote (vote: VoteDTO): Promise<Vote> {
 
   if (!pageId) {
     throw new InvalidInputError('Please provide the id of the page where the vote is taking place.');
+  }
+
+  if (!options) {
+    throw new InvalidInputError('Please provide voting options.');
+  }
+
+  if (!deadline) {
+    throw new InvalidInputError('Please provide voting deadline.');
   }
 
   const existingPage = await prisma.page.findUnique({
@@ -41,7 +50,7 @@ export async function createVote (vote: VoteDTO): Promise<Vote> {
     data: {
       description,
       title,
-      deadline,
+      deadline: new Date(deadline),
       status: VOTE_STATUS[0],
       page: {
         connect: {
@@ -64,7 +73,7 @@ export async function createVote (vote: VoteDTO): Promise<Vote> {
     }
   });
 
-  await prisma.voteOptions.createMany({
+  const createdOptions = await prisma.voteOptions.createMany({
     data: options.map(option => ({
       name: option.name,
       threshold: option.threshold || DEFAULT_THRESHOLD,
@@ -72,5 +81,7 @@ export async function createVote (vote: VoteDTO): Promise<Vote> {
     }))
   });
 
-  return createdVote;
+  const dbVote = await getVote(createdVote.id);
+
+  return dbVote;
 }
