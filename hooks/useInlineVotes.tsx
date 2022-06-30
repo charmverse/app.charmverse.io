@@ -74,13 +74,13 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
   }
 
   async function deleteVote (voteId: string) {
-    // TODO: Implement & Call charmClient function
+    await charmClient.deleteVote(voteId);
     delete inlineVotes[voteId];
     setInlineVotes({ ...inlineVotes });
   }
 
   async function cancelVote (voteId: string) {
-    // TODO: Implement & Call charmClient function
+    await charmClient.cancelVote(voteId);
     inlineVotes[voteId] = {
       ...inlineVotes[voteId],
       status: 'Cancelled'

@@ -12,10 +12,9 @@ export const StyledPageInlineVotesList = styled(List)`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing(1)};
-  margin-right: ${({ theme }) => theme.spacing(1)};
   padding-top: 0px;
   padding-bottom: 0px;
-  height: calc(100% - 50px);
+  height: calc(100%);
 `;
 
 const EmptyVoteContainerBox = styled(Box)`
@@ -64,7 +63,7 @@ export default function PageInlineVotesList () {
       height: 'calc(100% - 50px)'
     }}
     >
-      <Box display='flex' alignItems='center' justifyContent='space-between' mb={1} ml={2} mr={1}>
+      <Box display='flex' alignItems='center' justifyContent='space-between' mb={1} ml={2}>
         <Typography fontWeight={600} fontSize={20}>
           Votes
         </Typography>
