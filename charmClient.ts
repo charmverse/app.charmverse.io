@@ -702,13 +702,17 @@ class CharmClient {
   }
 
   async getPageInlineVotesWithUsers (currentPageId: string): Promise<VoteWithUsers[]> {
+    function randomIntFromInterval (min: number, max: number) { // min and max included
+      return Math.floor(Math.random() * (max - min + 1) + min);
+    }
+
     function createUserVote (choice: string, voteId: string, userId?: string) {
       userId = userId ?? v4();
       return {
         choice,
         userId,
         createdAt: new Date(),
-        updatedAt: new Date(),
+        updatedAt: new Date((new Date().getTime() - randomIntFromInterval(1, 24) * 60 * 60 * 1000)),
         voteId,
         user: {
           id: userId,

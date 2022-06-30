@@ -9,11 +9,11 @@ import { useUser } from 'hooks/useUser';
 import { VoteWithUsers } from 'lib/inline-votes/interfaces';
 import { DateTime } from 'luxon';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import InlineCharmEditor from '../InlineCharmEditor';
+import Avatar from 'components/common/Avatar';
 
 interface PageInlineVoteProps {
   inlineVote: VoteWithUsers
@@ -167,14 +167,20 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
         <List>
           {userVotes.map(_userVote => (
             <>
-              <ListItem sx={{
-                px: 0,
-                display: 'flex',
-                justifyContent: 'space-between'
-              }}
+              <ListItem
+                dense
+                sx={{
+                  px: 0,
+                  display: 'flex',
+                  justifyContent: 'space-between'
+                }}
               >
-                <UserDisplay user={_userVote.user as any} />
-                <Typography variant='subtitle1' color='secondary'>{_userVote.choice}</Typography>
+                <Avatar avatar={_userVote.user.avatar} name={_userVote.user.username} />
+                <ListItemText
+                  primary={<Typography>{_userVote.user.username}</Typography>}
+                  secondary={<Typography variant='subtitle1' color='secondary'>{DateTime.fromJSDate(new Date(_userVote.updatedAt)).toRelative({ base: (DateTime.now()) })}</Typography>}
+                />
+                <Typography fontWeight={500} color='secondary'>{_userVote.choice}</Typography>
               </ListItem>
               <Divider />
             </>
