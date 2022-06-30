@@ -1,6 +1,8 @@
+import { useEditorViewContext } from '@bangle.dev/react';
 import { User } from '@prisma/client';
 import charmClient from 'charmClient';
 import { VoteWithUsers } from 'lib/inline-votes/interfaces';
+import { removeInlineVoteMark } from 'lib/inline-votes/removeInlineVoteMark';
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import { v4 } from 'uuid';
@@ -27,7 +29,6 @@ export const InlineVotesContext = createContext<Readonly<IContext>>({
 
 export function InlineVotesProvider ({ children }: { children: ReactNode }) {
   const { currentPageId } = usePages();
-
   const [inlineVotes, setInlineVotes] = useState<IContext['inlineVotes']>({});
   const [user] = useUser();
   const { data, isValidating } = useSWR(() => currentPageId ? `pages/${currentPageId}/inline-votes` : null, () => charmClient.getPageInlineVotesWithUsers(currentPageId));

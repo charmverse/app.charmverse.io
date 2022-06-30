@@ -790,8 +790,8 @@ class CharmClient {
       }],
       createdAt: new Date(),
       pageId: v4(),
-      initiatorId: v4(),
-      status: 'Rejected',
+      initiatorId: 'b1c1735e-da3c-4856-bd7c-fa9b13978e29',
+      status: 'InProgress',
       userVotes: [
         createUserVote('Option 1', vote2Id, 'b1c1735e-da3c-4856-bd7c-fa9b13978e29'),
         ...createUserVotes(2, 'Option 1', vote2Id),

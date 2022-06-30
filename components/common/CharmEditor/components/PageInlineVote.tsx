@@ -14,6 +14,8 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import Avatar from 'components/common/Avatar';
+import { useEditorViewContext } from '@bangle.dev/react';
+import { removeInlineVoteMark } from 'lib/inline-votes/removeInlineVoteMark';
 
 interface PageInlineVoteProps {
   inlineVote: VoteWithUsers
@@ -101,6 +103,8 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
   const isDescriptionAbove = description.length > MAX_DESCRIPTION_LENGTH;
   const popupState = usePopupState({ variant: 'popover', popupId: 'delete-inline-vote' });
   const menuState = bindMenu(popupState);
+  const view = useEditorViewContext();
+
   return (
     <StyledDiv detailed={detailed} id={`vote.${inlineVote.id}`}>
       <Box display='flex' justifyContent='space-between' alignItems='center'>
@@ -198,7 +202,10 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
         onClose={popupState.close}
         open={menuState.open}
         buttonText={`Delete ${inlineVote.title}`}
-        onConfirm={() => deleteVote(inlineVote.id)}
+        onConfirm={() => {
+          removeInlineVoteMark(view, inlineVote.id);
+          deleteVote(inlineVote.id);
+        }}
         question={`Are you sure you want to delete ${inlineVote.title} vote?`}
       />
       <Menu
@@ -208,7 +215,13 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
         onClick={(e) => e.stopPropagation()}
       >
         {inlineVote.status === 'InProgress' && (
-        <MenuItem dense onClick={() => cancelVote(inlineVote.id)}>
+        <MenuItem
+          dense
+          onClick={() => {
+            removeInlineVoteMark(view, inlineVote.id);
+            cancelVote(inlineVote.id);
+          }}
+        >
           <DoNotDisturbIcon fontSize='small' sx={{ mr: 1 }} />
           <ListItemText>Cancel</ListItemText>
         </MenuItem>
