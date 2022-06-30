@@ -14,6 +14,7 @@ import { DateTime } from 'luxon';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { Modal } from 'components/common/Modal';
 import { updateInlineVote } from './inlineVote.utils';
+import { InlineVotePluginState } from './inlineVote.plugins';
 
 type VoteType = 'default' | 'custom';
 
@@ -197,7 +198,7 @@ export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
             />
           </Box>
           <Box flexDirection='column' display='flex' flexGrow={1}>
-            <FieldLabel>Pass Threshold</FieldLabel>
+            <FieldLabel>Pass Threshold (%)</FieldLabel>
             <TextField
               fullWidth
               type='number'

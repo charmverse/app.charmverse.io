@@ -8,7 +8,7 @@ import { markName } from '../inlineComment/inlineComment.constants';
 export interface InlineCommentPluginState {
   tooltipContentDOM: HTMLElement
   show: boolean
-  threadIds: string[]
+  ids: string[]
 }
 
 export function plugin ({ key } :{
@@ -22,7 +22,7 @@ export function plugin ({ key } :{
           return {
             show: false,
             tooltipContentDOM: tooltipDOMSpec.contentDOM,
-            threadIds: []
+            ids: []
           };
         },
         apply (tr, pluginState) {
@@ -44,7 +44,7 @@ export function plugin ({ key } :{
             }
             return {
               ...pluginState,
-              threadIds: [],
+              ids: [],
               show: false
             };
           }
@@ -83,7 +83,7 @@ export function plugin ({ key } :{
               else {
                 // If the page thread list isn't open, then we need to show the inline thread component
                 renderSuggestionsTooltip(key, {
-                  threadIds: [threadId]
+                  ids: [threadId]
                 })(view.state, view.dispatch, view);
               }
             }

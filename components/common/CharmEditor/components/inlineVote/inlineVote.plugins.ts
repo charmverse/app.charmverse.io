@@ -6,6 +6,7 @@ import { referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';
 export interface InlineVotePluginState {
   tooltipContentDOM: HTMLElement
   show: boolean
+  ids: string[]
 }
 
 export function plugin ({ key } :{
@@ -19,7 +20,8 @@ export function plugin ({ key } :{
         init () {
           return {
             show: false,
-            tooltipContentDOM: tooltipDOMSpec.contentDOM
+            tooltipContentDOM: tooltipDOMSpec.contentDOM,
+            ids: []
           };
         },
         apply (tr, pluginState) {
@@ -40,7 +42,8 @@ export function plugin ({ key } :{
             }
             return {
               ...pluginState,
-              show: false
+              show: false,
+              ids: []
             };
           }
           throw new Error('Unknown type');

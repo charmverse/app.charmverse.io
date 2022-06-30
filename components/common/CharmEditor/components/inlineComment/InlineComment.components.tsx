@@ -32,14 +32,14 @@ export default function InlineCommentThread ({ pluginKey }: {pluginKey: PluginKe
   const {
     tooltipContentDOM,
     show: isVisible,
-    threadIds
+    ids
   } = usePluginState(pluginKey) as InlineCommentPluginState;
   const { threads } = useThreads();
   const cardId = (new URLSearchParams(window.location.href)).get('cardId');
 
   const { currentPageActionDisplay } = usePageActionDisplay();
   // Find unresolved threads in the thread ids and sort them based on desc order of createdAt
-  const unResolvedThreads = threadIds
+  const unResolvedThreads = ids
     .map(threadId => threads[threadId])
     .filter(thread => thread && !thread?.resolved)
     .sort((threadA, threadB) => threadA && threadB ? (new Date(threadB.createdAt).getTime() - new Date(threadA.createdAt).getTime()) : 0);
@@ -63,7 +63,7 @@ export default function InlineCommentThread ({ pluginKey }: {pluginKey: PluginKe
         >
           <ThreadContainer elevation={4}>
             {unResolvedThreads.map(resolvedThread => resolvedThread
-              && <PageThread inline={threadIds.length === 1} key={resolvedThread.id} threadId={resolvedThread?.id} />)}
+              && <PageThread inline={ids.length === 1} key={resolvedThread.id} threadId={resolvedThread?.id} />)}
           </ThreadContainer>
         </Grow>
       </ClickAwayListener>,
