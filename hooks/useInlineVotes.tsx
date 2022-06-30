@@ -11,14 +11,18 @@ type IContext = {
   isValidating: boolean,
   inlineVotes: Record<string, VoteWithUsers>
   castVote: (voteId: string, option: string) => Promise<void>
-  createVote: (votePayload: Pick<VoteWithUsers, 'title' | 'deadline' | 'description' | 'options'>) => Promise<VoteWithUsers>
+  createVote: (votePayload: Pick<VoteWithUsers, 'title' | 'deadline' | 'description' | 'options' | 'pageId'>) => Promise<VoteWithUsers>,
+  deleteVote: (voteId: string) => Promise<void>,
+  cancelVote: (voteId: string) => Promise<void>,
 };
 
 export const InlineVotesContext = createContext<Readonly<IContext>>({
   isValidating: true,
   inlineVotes: {},
   castVote: () => undefined as any,
-  createVote: () => undefined as any
+  createVote: () => undefined as any,
+  deleteVote: () => undefined as any,
+  cancelVote: () => undefined as any
 });
 
 export function InlineVotesProvider ({ children }: { children: ReactNode }) {
@@ -43,7 +47,9 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
             // TODO: Remove any
             user: user as any,
             userId: user.id,
-            voteId
+            voteId,
+            createdAt: new Date(),
+            updatedAt: new Date()
           });
         }
         _inlineVotes[voteId] = {
@@ -54,19 +60,38 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
     });
   }
 
-  async function createVote (votePayload: Pick<VoteWithUsers, 'title' | 'deadline' | 'description' | 'options'>): Promise<VoteWithUsers> {
+  async function createVote (votePayload: Pick<VoteWithUsers, 'title' | 'deadline' | 'description' | 'options' | 'pageId'>): Promise<VoteWithUsers> {
     // TODO: Implement & Call charmClient function
     const voteId = v4();
     const vote = {
       ...votePayload,
       id: voteId,
-      userVotes: []
-    };
+      userVotes: [],
+      initiatorId: user!.id,
+      createdAt: new Date(),
+      status: 'InProgress'
+    } as VoteWithUsers;
+
     setInlineVotes({
       ...inlineVotes,
       [voteId]: vote
     });
     return vote;
+  }
+
+  async function deleteVote (voteId: string) {
+    // TODO: Implement & Call charmClient function
+    delete inlineVotes[voteId];
+    setInlineVotes({ ...inlineVotes });
+  }
+
+  async function cancelVote (voteId: string) {
+    // TODO: Implement & Call charmClient function
+    inlineVotes[voteId] = {
+      ...inlineVotes[voteId],
+      status: 'Cancelled'
+    };
+    setInlineVotes({ ...inlineVotes });
   }
 
   useEffect(() => {
@@ -77,7 +102,9 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
     inlineVotes,
     isValidating,
     castVote,
-    createVote
+    createVote,
+    deleteVote,
+    cancelVote
   }), [currentPageId, inlineVotes, isValidating]);
 
   return (

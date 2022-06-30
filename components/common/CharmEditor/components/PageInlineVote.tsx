@@ -33,7 +33,7 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
   const [showingDescription, setShowingDescription] = useState(false);
   const totalVotes = userVotes.length;
   const [user] = useUser();
-  const { castVote } = useInlineVotes();
+  const { cancelVote, deleteVote, castVote } = useInlineVotes();
   const voteFrequencyRecord: Record<string, number> = useMemo(() => {
     return userVotes.reduce<Record<string, number>>((currentRecord, userVote) => {
       if (!currentRecord[userVote.choice]) {
@@ -97,7 +97,7 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
       {!detailed && voteCountLabel}
       <List sx={{
         display: 'flex',
-        gap: 1,
+        gap: 0.5,
         flexDirection: 'column',
         my: 1
       }}
@@ -128,7 +128,15 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
           );
         })}
       </List>
-      {!detailed && <Button variant='outlined' onClick={inlineVoteDetailModal.open}>View details</Button>}
+      <Box display='flex' justifyContent='space-between'>
+        {!detailed && <Button variant='outlined' onClick={inlineVoteDetailModal.open}>View details</Button>}
+        {user?.id === inlineVote.initiatorId && (
+        <Box display='flex' gap={1}>
+          {inlineVote.status === 'InProgress' && <Button onClick={() => cancelVote(inlineVote.id)} variant='outlined' color='secondary'>Cancel</Button>}
+          <Button onClick={() => deleteVote(inlineVote.id)} variant='outlined' color='error'>Delete</Button>
+        </Box>
+        )}
+      </Box>
       {detailed && voteCountLabel}
       {detailed && (
         <List>

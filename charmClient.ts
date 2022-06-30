@@ -764,12 +764,12 @@ class CharmClient {
       }],
       createdAt: new Date(),
       pageId: v4(),
-      initiatorId: v4(),
+      initiatorId: 'b1c1735e-da3c-4856-bd7c-fa9b13978e29',
       status: 'Passed',
       userVotes: [
         ...createUserVotes(10, 'Yes', vote3Id),
         ...createUserVotes(2, 'No', vote3Id),
-        ...createUserVotes(6, 'Abstain', vote3Id)
+        ...createUserVotes(7, 'Abstain', vote3Id)
       ]
     }, {
       deadline: new Date(new Date().getTime() + (12 * 60 * 60 * 1000)), // 12 hrs
@@ -810,11 +810,11 @@ class CharmClient {
       }],
       createdAt: new Date(),
       pageId: v4(),
-      initiatorId: v4(),
+      initiatorId: 'b1c1735e-da3c-4856-bd7c-fa9b13978e29',
       status: 'InProgress',
       userVotes: [
         ...createUserVotes(5, 'Yes', vote1Id),
-        ...createUserVotes(3, 'No', vote1Id),
+        ...createUserVotes(8, 'No', vote1Id),
         ...createUserVotes(9, 'Abstain', vote1Id)
       ]
     }, {
