@@ -1,6 +1,6 @@
 import { NodeViewProps, PluginKey } from '@bangle.dev/core';
 import { ReactNode, useMemo } from 'react';
-import ModeCommentOutlinedIcon from '@mui/icons-material/ModeCommentOutlined';
+import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
 import { Typography } from '@mui/material';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { useThreads } from 'hooks/useThreads';
@@ -40,7 +40,7 @@ export default function Paragraph (
             renderSuggestionsTooltip(inlineCommentPluginKey, { threadIds })(view.state, view.dispatch, view);
           }}
         >
-          <ModeCommentOutlinedIcon
+          <CommentOutlinedIcon
             color='secondary'
             fontSize='small'
           />

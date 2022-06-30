@@ -22,9 +22,8 @@ import {
 import { filter, rafCommandExec } from '@bangle.dev/utils';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import React, { useCallback } from 'react';
-import { createInlineComment, queryIsInlineCommentActive, toggleInlineComment } from '../../inlineComment';
 import { MenuButton } from './Icon';
-import CommentIcon from '@mui/icons-material/Comment';
+import InsertCommentOutlinedIcon from '@mui/icons-material/InsertCommentOutlined';
 import { SubMenu, toggleSubMenu } from './floating-menu';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import { createInlineVote } from '../../inlineVote';
@@ -147,7 +146,7 @@ export function InlineActionButton({
 export function InlineCommentButton({
   hints = ['Comment'],
   hintPos = 'top',
-  children = <CommentIcon sx={{
+  children = <InsertCommentOutlinedIcon sx={{
     fontSize: 12,
     position: "relative"
   }}/>,

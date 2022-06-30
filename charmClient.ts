@@ -744,7 +744,7 @@ class CharmClient {
       }],
       createdAt: new Date(),
       pageId: v4(),
-      initiatorId: 'b1c1735e-da3c-4856-bd7c-fa9b13978e29',
+      initiatorId: 'b1c1735e-da3c-4856-bd7c-fa9b13978e2',
       status: 'Passed',
       userVotes: [
         ...createUserVotes(10, 'Yes', vote3Id),

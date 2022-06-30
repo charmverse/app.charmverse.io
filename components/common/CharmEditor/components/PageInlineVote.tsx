@@ -116,9 +116,11 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
         >
           {hasPassedDeadline ? relativeDate : `${relativeDate?.replace('in', '')} left`}
         </Typography>
+        {inlineVote.initiatorId === user?.id && (
         <IconButton size='small' onClick={inlineVoteActionModal.open}>
           <MoreHorizIcon fontSize='small' />
         </IconButton>
+        )}
       </Box>
       <Box my={1} mb={2}>{isDescriptionAbove && !detailed ? (
         <span>
