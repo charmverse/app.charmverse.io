@@ -2,23 +2,35 @@
 import { prisma } from 'db';
 import { Vote } from '@prisma/client';
 import { DataNotFoundError } from 'lib/utilities/errors';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { DEFAULT_THRESHOLD, VoteDTO, VOTE_STATUS } from './interfaces';
 
 export async function createVote (vote: VoteDTO): Promise<Vote> {
 
-  const { createdBy, pageId, spaceId, title, threshold, description, deadline, voteOptions } = vote;
+  const { createdBy, pageId, title, threshold, description, deadline, voteOptions } = vote;
 
   const existingPage = await prisma.page.findUnique({
     where: {
       id: pageId
     },
     select: {
-      id: true
+      id: true,
+      spaceId: true
     }
   });
 
   if (!existingPage) {
     throw new DataNotFoundError(`Cannot create poll as linked page with id ${pageId} was not found.`);
+  }
+
+  const { error } = await hasAccessToSpace({
+    userId: createdBy,
+    spaceId: existingPage.spaceId,
+    adminOnly: true
+  });
+
+  if (error) {
+    throw error;
   }
 
   const dbVote = await prisma.vote.create({
@@ -35,7 +47,7 @@ export async function createVote (vote: VoteDTO): Promise<Vote> {
       },
       space: {
         connect: {
-          id: spaceId
+          id: existingPage.spaceId
         }
       },
       author: {

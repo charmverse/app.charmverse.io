@@ -11,8 +11,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler
   .use(requireUser)
   .get(getVotes)
-  .use(requireKeys(['deadline', 'pageId', 'spaceId', 'voteOptions'], 'body'))
-  .use(requireSpaceMembership({ adminOnly: true }))
+  .use(requireKeys(['deadline', 'pageId', 'voteOptions'], 'body'))
   .post(createVote);
 
 async function getVotes (req: NextApiRequest, res: NextApiResponse<Vote | { error: any }>) {
