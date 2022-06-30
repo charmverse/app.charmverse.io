@@ -58,6 +58,7 @@ model Space {
   apiToken                   SpaceApiToken?
   threads                    Thread[]
   comments                   Comment[]
+  votes                      Vote[]
   // Public page settings
   permissionConfigurationMode SpacePermissionConfigurationMode? @default(custom)
   defaultPagePermissionGroup PagePermissionLevel? @default(full_access)
@@ -95,7 +96,7 @@ model Page {
   icon               String?
   path               String
   parentId           String?          @db.Uuid
-  spaceId            String?          @db.Uuid
+  spaceId            String           @db.Uuid
   space              Space?           @relation(fields: [spaceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   type               PageType
   boardId            String?          @db.Uuid
@@ -139,9 +140,9 @@ enum IdentityType {
 }
 
 model UserVote {
-  voteId      String    @unique @db.Uuid
+  voteId      String    @db.Uuid
   vote        Vote      @relation(fields: [voteId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId      String    @unique @db.Uuid
+  userId      String    @db.Uuid
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @default(now())
@@ -157,19 +158,30 @@ enum VoteStatus {
   Cancelled
 }
 
+model VoteOptions {
+  name        String
+  voteId      String    @db.Uuid
+  vote        Vote      @relation(fields: [voteId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([voteId, name])
+}
+
 model Vote {
-  id            String    @id @default(uuid()) @db.Uuid
-  pageId        String    @db.Uuid
-  page          Page      @relation(fields: [pageId], references: [id], onDelete: Cascade)
-  initiatorId   String    @unique @db.Uuid
-  initiator     User      @relation(fields: [initiatorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  id            String          @id @default(uuid()) @db.Uuid
+  pageId        String          @db.Uuid
+  page          Page            @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  spaceId       String          @db.Uuid
+  space         Space           @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  author        User            @relation(fields: [createdBy], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdBy     String          @db.Uuid
   title         String
-  description   Json?
+  threshold     Int
+  description   String?
   deadline      DateTime
-  options       Json
   status        VoteStatus
-  createdAt     DateTime  @default(now())
+  createdAt     DateTime        @default(now())
   userVotes     UserVote[]
+  voteOptions   VoteOptions[]
 }
 
 model User {
