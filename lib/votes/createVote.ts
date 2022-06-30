@@ -1,5 +1,6 @@
 
 import { prisma } from 'db';
+import { v4 as uuid } from 'uuid';
 import { Vote } from '@prisma/client';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
@@ -46,42 +47,46 @@ export async function createVote (vote: VoteDTO): Promise<Vote | null> {
     throw error;
   }
 
-  const createdVote = await prisma.vote.create({
-    data: {
-      description,
-      title,
-      deadline: new Date(deadline),
-      status: VOTE_STATUS[0],
-      page: {
-        connect: {
-          id: pageId
+  const voteId = uuid();
+
+  await prisma.$transaction([
+    prisma.vote.create({
+      data: {
+        id: voteId,
+        description,
+        title,
+        deadline: new Date(deadline),
+        status: VOTE_STATUS[0],
+        page: {
+          connect: {
+            id: pageId
+          }
+        },
+        space: {
+          connect: {
+            id: existingPage.spaceId
+          }
+        },
+        author: {
+          connect: {
+            id: createdBy
+          }
         }
       },
-      space: {
-        connect: {
-          id: existingPage.spaceId
-        }
-      },
-      author: {
-        connect: {
-          id: createdBy
-        }
+      select: {
+        id: true
       }
-    },
-    select: {
-      id: true
-    }
-  });
+    }),
+    prisma.voteOptions.createMany({
+      data: voteOptions.map(option => ({
+        name: option.name,
+        threshold: option.threshold ?? DEFAULT_THRESHOLD,
+        voteId
+      }))
+    })
+  ]);
 
-  await prisma.voteOptions.createMany({
-    data: voteOptions.map(option => ({
-      name: option.name,
-      threshold: option.threshold ?? DEFAULT_THRESHOLD,
-      voteId: createdVote.id
-    }))
-  });
-
-  const dbVote = await getVote(createdVote.id);
+  const dbVote = await getVote(voteId);
 
   return dbVote;
 }
