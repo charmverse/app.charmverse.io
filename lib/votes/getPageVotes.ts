@@ -7,11 +7,12 @@ export async function getPageVotes (pageId: string): Promise<Vote[]> {
       pageId
     },
     include: {
-      userVotes: true,
+      userVotes: {
+        orderBy: {
+          updatedAt: 'desc'
+        }
+      },
       voteOptions: true
-    },
-    orderBy: {
-      createdAt: 'desc'
     }
   });
 }
