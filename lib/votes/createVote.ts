@@ -68,7 +68,7 @@ export async function createVote (vote: VoteDTO): Promise<Vote | null> {
         }
       }
     },
-    selected: {
+    select: {
       id: true
     }
   });
