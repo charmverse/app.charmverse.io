@@ -1,7 +1,7 @@
 
 import {
   Application, Block, Bounty, InviteLink, Page, PagePermissionLevel, PaymentMethod, Prisma,
-  Role, Space, TelegramUser, TokenGate, TokenGateToRole, User, UserDetails, UserGnosisSafe
+  Role, Space, TelegramUser, TokenGate, TokenGateToRole, User, UserDetails, UserGnosisSafe, UserVote
 } from '@prisma/client';
 import * as http from 'adapters/http';
 import { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/focalboard/src/blocks/block';
@@ -702,9 +702,76 @@ class CharmClient {
   }
 
   async getPageInlineVotesWithUsers (currentPageId: string): Promise<VoteWithUsers[]> {
+    function createUserVote (choice: string, voteId: string, userId?: string) {
+      userId = userId ?? v4();
+      return {
+        choice,
+        userId,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        voteId,
+        user: {
+          id: userId,
+          avatar: 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50',
+          username: v4().split('-')[0]
+        }
+      } as VoteWithUsers['userVotes'][0];
+    }
+
+    function createUserVotes (count: number, choice: string, voteId: string) {
+      return new Array(count).fill(null).map(() => createUserVote(choice, voteId));
+    }
+
     const vote1Id = v4();
     const vote2Id = v4();
+    const vote3Id = v4();
     return [{
+      deadline: new Date(new Date().getTime() - (12 * 60 * 60 * 1000)), // 12 hrs ago
+      description: {
+        type: 'doc',
+        content: [
+          {
+            type: 'paragraph',
+            content: [
+              {
+                type: 'text',
+                text: 'My First '
+              },
+              {
+                type: 'text',
+                marks: [
+                  {
+                    type: 'bold'
+                  }
+                ],
+                text: 'Vote'
+              }
+            ]
+          }
+        ]
+      },
+      id: vote3Id,
+      title: 'Passed vote',
+      options: [{
+        name: 'Yes',
+        passThreshold: 0.5
+      }, {
+        name: 'No',
+        passThreshold: 0.5
+      }, {
+        name: 'Abstain',
+        passThreshold: 0.5
+      }],
+      createdAt: new Date(),
+      pageId: v4(),
+      initiatorId: v4(),
+      status: 'Passed',
+      userVotes: [
+        ...createUserVotes(10, 'Yes', vote3Id),
+        ...createUserVotes(2, 'No', vote3Id),
+        ...createUserVotes(6, 'Abstain', vote3Id)
+      ]
+    }, {
       deadline: new Date(new Date().getTime() + (12 * 60 * 60 * 1000)), // 12 hrs
       description: {
         type: 'doc',
@@ -741,37 +808,14 @@ class CharmClient {
         name: 'Abstain',
         passThreshold: 0.5
       }],
+      createdAt: new Date(),
+      pageId: v4(),
+      initiatorId: v4(),
+      status: 'InProgress',
       userVotes: [
-        ...new Array(5).fill(null).map((_, index) => ({
-          userId: v4(),
-          voteId: vote1Id,
-          choice: 'Yes',
-          user: {
-            avatar: 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50',
-            id: v4(),
-            username: `User 1.${index}`
-          }
-        })),
-        ...new Array(3).fill(null).map((_, index) => ({
-          userId: v4(),
-          voteId: vote1Id,
-          choice: 'No',
-          user: {
-            avatar: 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50',
-            id: v4(),
-            username: `User 2.${index}`
-          }
-        })),
-        ...new Array(9).fill(null).map((_, index) => ({
-          userId: v4(),
-          voteId: vote1Id,
-          choice: 'Abstain',
-          user: {
-            avatar: 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50',
-            id: v4(),
-            username: `User 3.${index}`
-          }
-        }))
+        ...createUserVotes(5, 'Yes', vote1Id),
+        ...createUserVotes(3, 'No', vote1Id),
+        ...createUserVotes(9, 'Abstain', vote1Id)
       ]
     }, {
       deadline: new Date(new Date().getTime() + (48 * 60 * 60 * 1000)), // 48 hrs
@@ -813,47 +857,16 @@ class CharmClient {
         name: 'No Change',
         passThreshold: 0.5
       }],
+      createdAt: new Date(),
+      pageId: v4(),
+      initiatorId: v4(),
+      status: 'InProgress',
       userVotes: [
-        ...new Array(2).fill(null).map((_, index) => ({
-          userId: 'b1c1735e-da3c-4856-bd7c-fa9b13978e29',
-          voteId: vote1Id,
-          choice: 'Option 1',
-          user: {
-            avatar: 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50',
-            id: v4(),
-            username: `User 1.${index}`
-          }
-        })),
-        ...new Array(7).fill(null).map((_, index) => ({
-          userId: v4(),
-          voteId: vote1Id,
-          choice: 'Option 2',
-          user: {
-            avatar: 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50',
-            id: v4(),
-            username: `User 2.${index}`
-          }
-        })),
-        ...new Array(4).fill(null).map((_, index) => ({
-          userId: v4(),
-          voteId: vote1Id,
-          choice: 'Option 3',
-          user: {
-            avatar: 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50',
-            id: v4(),
-            username: `User 3.${index}`
-          }
-        })),
-        ...new Array(3).fill(null).map((_, index) => ({
-          userId: v4(),
-          voteId: vote1Id,
-          choice: 'No Change',
-          user: {
-            avatar: 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50',
-            id: v4(),
-            username: `User 4.${index}`
-          }
-        }))
+        createUserVote('Option 1', vote2Id, 'b1c1735e-da3c-4856-bd7c-fa9b13978e29'),
+        ...createUserVotes(2, 'Option 1', vote2Id),
+        ...createUserVotes(7, 'Option 2', vote2Id),
+        ...createUserVotes(4, 'Option 3', vote2Id),
+        ...createUserVotes(3, 'No Change', vote2Id)
       ]
     }];
   }

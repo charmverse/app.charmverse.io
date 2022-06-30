@@ -1,19 +1,8 @@
-import { PageContent } from 'models/Page';
+import { User, UserVote, Vote } from '@prisma/client';
+import { PageContent } from 'models';
 
-export interface VoteWithUsers {
-  id: string
-  title: string
-  description?: PageContent
-  deadline: Date
+export type VoteWithUsers = Vote & {
+  description: PageContent
   options: {name: string, passThreshold: number}[]
-  userVotes: {
-    userId: string
-    choice: string
-    voteId: string
-    user: {
-      id: string
-      avatar: string
-      username: string
-    }
-  }[]
+  userVotes: (UserVote & {user: User})[]
 }
