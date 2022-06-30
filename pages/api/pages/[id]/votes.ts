@@ -1,6 +1,5 @@
-import { Vote } from '@prisma/client';
 import { prisma } from 'db';
-import { getPageVotes } from 'lib/votes';
+import { ExtendedVote, getPageVotes } from 'lib/votes';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { PageNotFoundError } from 'lib/pages/server';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -14,7 +13,7 @@ handler
   .use(requireUser)
   .get(getVotes);
 
-async function getVotes (req: NextApiRequest, res: NextApiResponse<Vote[]>) {
+async function getVotes (req: NextApiRequest, res: NextApiResponse<ExtendedVote[]>) {
   const pageId = req.query.id as string;
 
   const page = await prisma.page.findUnique({

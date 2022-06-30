@@ -1,4 +1,4 @@
-import { Vote } from '@prisma/client';
+import { Vote, VoteOptions, UserVote } from '@prisma/client';
 
 export const DEFAULT_THRESHOLD = 50;
 
@@ -16,4 +16,9 @@ export interface VoteDTO extends Omit<Vote, 'id'|'status'|'createdAt'> {
 
 export interface UpdateVoteDTO {
     status: VoteStatusType
+}
+
+export interface ExtendedVote extends Vote {
+    userVotes: UserVote[],
+    voteOptions: VoteOptions[]
 }

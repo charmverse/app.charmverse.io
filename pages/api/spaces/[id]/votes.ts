@@ -1,5 +1,4 @@
-import { Vote } from '@prisma/client';
-import { getSpaceVotes } from 'lib/votes';
+import { ExtendedVote, getSpaceVotes } from 'lib/votes';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
@@ -11,7 +10,7 @@ handler
   .use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'id' }))
   .get(getVotes);
 
-async function getVotes (req: NextApiRequest, res: NextApiResponse<Vote[]>) {
+async function getVotes (req: NextApiRequest, res: NextApiResponse<ExtendedVote[]>) {
   const spaceId = req.query.id as string;
 
   const votes = await getSpaceVotes(spaceId);

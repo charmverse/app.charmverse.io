@@ -1,7 +1,7 @@
-import { Vote } from '@prisma/client';
 import { prisma } from 'db';
+import { ExtendedVote } from './interfaces';
 
-export async function getPageVotes (pageId: string): Promise<Vote[]> {
+export async function getPageVotes (pageId: string): Promise<ExtendedVote[]> {
   return prisma.vote.findMany({
     where: {
       pageId
