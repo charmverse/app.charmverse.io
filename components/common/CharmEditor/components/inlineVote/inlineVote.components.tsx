@@ -11,17 +11,15 @@ import FieldLabel from 'components/common/form/FieldLabel';
 import { useInlineVotes } from 'hooks/useInlineVotes';
 import { usePages } from 'hooks/usePages';
 import { DateTime } from 'luxon';
-import { PageContent } from 'models';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import InlineCharmEditor from '../../InlineCharmEditor';
 import { updateInlineVote } from './inlineVote.utils';
 
 type VoteType = 'default' | 'custom';
 
 interface InlineVoteOptionsProps {
   disableTextFields?: boolean
-  options: { name: string, passThreshold: number }[]
-  setOptions: Dispatch<SetStateAction<{ name: string, passThreshold: number }[]>>
+  options: { name: string }[]
+  setOptions: Dispatch<SetStateAction<{ name: string }[]>>
   disableDelete?: boolean
   disableAddOption?: boolean
 }
@@ -39,21 +37,10 @@ function InlineVoteOptions (
   const optionNames = options.map(option => option.name);
   return (
     <div>
-      <FieldLabel>Options (Pass threshold)</FieldLabel>
-      {/* <Box sx={{ display: 'flex' }}>
-        <FieldLabel sx={{
-          width: 300
-        }}
-        >Options
-        </FieldLabel>
-        <FieldLabel>Threshold</FieldLabel>
-      </Box> */}
+      <FieldLabel>Options</FieldLabel>
       {options.map((option, index) => (
         <ListItem sx={{ px: 0, pt: 0, display: 'flex', gap: 0.5 }}>
           <TextField
-            sx={{
-              width: 300
-            }}
             error={option.name.length === 0 || ([...optionNames.slice(0, index), optionNames.slice(index + 1)].includes(option.name))}
             // Disable changing text for No change option
             disabled={disableTextFields || index === 2}
@@ -62,28 +49,9 @@ function InlineVoteOptions (
             value={option.name}
             onChange={(e) => {
               options[index] = {
-                name: e.target.value,
-                passThreshold: options[index].passThreshold
+                name: e.target.value
               };
               setOptions([...options]);
-            }}
-          />
-          <TextField
-            type='number'
-            value={option.passThreshold}
-            onChange={(e) => {
-              options[index] = {
-                name: options[index].name,
-                passThreshold: Number(e.target.value)
-              };
-              setOptions([...options]);
-            }}
-            InputProps={{
-              inputProps: {
-                min: 0,
-                max: 1,
-                step: 0.1
-              }
             }}
           />
           <IconButton
@@ -103,8 +71,7 @@ function InlineVoteOptions (
           size='small'
           onClick={() => {
             setOptions([...options, {
-              name: '',
-              passThreshold: 50
+              name: ''
             }]);
           }}
         >
@@ -123,33 +90,28 @@ export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
   const view = useEditorViewContext();
   const [voteTitle, setVoteTitle] = useState('');
   const [voteDescription, setVoteDescription] = useState('');
+  const [passThreshold, setPassThreshold] = useState<number>(50);
   const [voteType, setVoteType] = useState<VoteType>('default');
-  const [options, setOptions] = useState<{ name: string, passThreshold: number }[]>([]);
+  const [options, setOptions] = useState<{ name: string }[]>([]);
   const { createVote } = useInlineVotes();
 
   useEffect(() => {
     if (voteType === 'custom') {
       setOptions([{
-        name: 'Option 1',
-        passThreshold: 50
+        name: 'Option 1'
       }, {
-        name: 'Option 2',
-        passThreshold: 50
+        name: 'Option 2'
       }, {
-        name: 'No change',
-        passThreshold: 50
+        name: 'No change'
       }]);
     }
     else if (voteType === 'default') {
       setOptions([{
-        name: 'Yes',
-        passThreshold: 50
+        name: 'Yes'
       }, {
-        name: 'No',
-        passThreshold: 50
+        name: 'No'
       }, {
-        name: 'Abstain',
-        passThreshold: 50
+        name: 'Abstain'
       }]);
     }
   }, [voteType]);
@@ -238,6 +200,23 @@ export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
                 fullWidth
               />
             )}
+          />
+        </Box>
+        <Box flexDirection='column' display='flex'>
+          <FieldLabel>Pass Threshold</FieldLabel>
+          <TextField
+            type='number'
+            value={passThreshold}
+            onChange={(e) => {
+              setPassThreshold(e.target.value as any);
+            }}
+            InputProps={{
+              inputProps: {
+                min: 1,
+                max: 100,
+                step: 1
+              }
+            }}
           />
         </Box>
         <RadioGroup

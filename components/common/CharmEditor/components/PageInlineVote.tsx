@@ -199,10 +199,12 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         onClick={(e) => e.stopPropagation()}
       >
+        {inlineVote.status === 'InProgress' && (
         <MenuItem onClick={() => cancelVote(inlineVote.id)}>
           <DoNotDisturbIcon fontSize='small' sx={{ mr: 1 }} />
           <ListItemText>Cancel</ListItemText>
         </MenuItem>
+        )}
         <MenuItem onClick={() => popupState.open()}>
           <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
           <ListItemText>Delete</ListItemText>

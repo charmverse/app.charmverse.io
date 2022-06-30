@@ -730,15 +730,13 @@ class CharmClient {
       description: 'My first vote',
       id: vote3Id,
       title: 'Passed vote',
+      threshold: 50,
       options: [{
-        name: 'Yes',
-        passThreshold: 0.5
+        name: 'Yes'
       }, {
-        name: 'No',
-        passThreshold: 0.5
+        name: 'No'
       }, {
-        name: 'Abstain',
-        passThreshold: 0.5
+        name: 'Abstain'
       }],
       createdAt: new Date(),
       pageId: v4(),
@@ -752,17 +750,15 @@ class CharmClient {
     }, {
       deadline: new Date(new Date().getTime() + (12 * 60 * 60 * 1000)), // 12 hrs
       description: 'My first vote',
+      threshold: 50,
       id: vote1Id,
       title: 'Vote 1',
       options: [{
-        name: 'Yes',
-        passThreshold: 0.5
+        name: 'Yes'
       }, {
-        name: 'No',
-        passThreshold: 0.5
+        name: 'No'
       }, {
-        name: 'Abstain',
-        passThreshold: 0.5
+        name: 'Abstain'
       }],
       createdAt: new Date(),
       pageId: v4(),
@@ -777,19 +773,16 @@ class CharmClient {
       deadline: new Date(new Date().getTime() + (48 * 60 * 60 * 1000)), // 48 hrs
       description: 'My Second Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam pulvinar, dolor in molestie sagittis, orci eros lacinia eros, vel hendrerit dolor mi vitae quam. Proin convallis tincidunt congue. Suspendisse lorem dui, faucibus suscipit lectus nec, porta placerat nisi. Aenean a orci eu nisi euismod ornare. Suspendisse feugiat nibh mi, ut varius purus dignissim nec. Praesent vitae sapien sapien. Curabitur a tempus orci. Vestibulum at rutrum neque. Mauris sit amet lacus volutpat augue mattis tempor quis vel ante. Quisque sodales eu enim at lobortis. Donec fringilla feugiat faucibus. Nunc vitae massa et est aliquet lobortis. Ut sit amet risus non risus dapibus hendrerit. Etiam tincidunt convallis sagittis. \n Aenean non aliquet turpis. Maecenas eget nibh non lectus bibendum pellentesque. Suspendisse vulputate magna at libero aliquam, vitae consectetur sem maximus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Etiam ornare mollis lacus at suscipit. In scelerisque semper dolor nec aliquam. Nullam nec lorem in sem aliquet dapibus in at ex. Nunc mattis ante et mi porttitor, a pretium sapien laoreet. Maecenas blandit condimentum lorem in sollicitudin. Cras non convallis purus, ultrices elementum dolor. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque eleifend nec dui vitae semper. Nulla gravida mauris non tristique venenatis. Aliquam a nisi cursus, vulputate erat vitae, dignissim mi. Nullam mi tortor, euismod accumsan semper eget, tincidunt volutpat diam.\nIn ut nulla metus. Sed vestibulum tortor vel justo bibendum suscipit. Integer sodales elit dui, et tempus tellus volutpat sed. Nullam tincidunt metus elementum dui iaculis aliquet. Pellentesque hendrerit laoreet posuere. In eleifend leo vel vestibulum bibendum. Curabitur nec sapien vitae erat pellentesque maximus eget et turpis. Quisque eu fringilla sem, dignissim congue augue. Morbi id nisl vel felis vulputate mattis. Ut pellentesque ex id eros rutrum, sollicitudin maximus tortor convallis. Sed fermentum augue nec sem imperdiet ultricies. Suspendisse ac dignissim purus. Nunc facilisis vulputate dolor. Maecenas in volutpat ligula. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.',
       id: vote2Id,
+      threshold: 50,
       title: 'Vote 2',
       options: [{
-        name: 'Option 1',
-        passThreshold: 0.25
+        name: 'Option 1'
       }, {
-        name: 'Option 2',
-        passThreshold: 0.5
+        name: 'Option 2'
       }, {
-        name: 'Option 3',
-        passThreshold: 0.25
+        name: 'Option 3'
       }, {
-        name: 'No Change',
-        passThreshold: 0.5
+        name: 'No Change'
       }],
       createdAt: new Date(),
       pageId: v4(),
