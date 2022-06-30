@@ -3,8 +3,9 @@ import { List, MenuItem, Select, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import PageInlineVote from 'components/common/CharmEditor/components/PageInlineVote';
 import { useInlineVotes } from 'hooks/useInlineVotes';
-import { ExtendedVote } from 'lib/inline-votes/interfaces';
+import { ExtendedVote } from 'lib/votes/interfaces';
 import { useMemo, useState } from 'react';
+import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 
 export const StyledPageInlineVotesList = styled(List)`
   overflow: auto;
@@ -15,6 +16,24 @@ export const StyledPageInlineVotesList = styled(List)`
   padding-top: 0px;
   padding-bottom: 0px;
   height: calc(100% - 50px);
+`;
+
+const EmptyVoteContainerBox = styled(Box)`
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: ${({ theme }) => theme.palette.background.light};
+`;
+
+const Center = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
 `;
 
 export default function PageInlineVotesList () {
@@ -39,8 +58,12 @@ export default function PageInlineVotesList () {
   // const [voteSort, setVoteSort] = useState<'latest_updated' | 'highest_votes'>('latest_updated')
 
   const filteredVotes = voteFilter === 'completed' ? votesCompleted : votesInProgress;
+
   return (
-    <Box>
+    <Box sx={{
+      height: 'calc(100% - 50px)'
+    }}
+    >
       <Box display='flex' alignItems='center' justifyContent='space-between' mb={1} ml={2} mr={1}>
         <Typography fontWeight={600} fontSize={20}>
           Votes
@@ -53,7 +76,21 @@ export default function PageInlineVotesList () {
         </Box>
       </Box>
       <StyledPageInlineVotesList>
-        {filteredVotes.map(inlineVote => <PageInlineVote detailed={false} inlineVote={inlineVote} key={inlineVote.id} />)}
+        {filteredVotes.length === 0 ? (
+          <EmptyVoteContainerBox>
+            <Center>
+              <HowToVoteOutlinedIcon
+                fontSize='large'
+                color='secondary'
+                sx={{
+                  height: '2em',
+                  width: '2em'
+                }}
+              />
+              <Typography variant='subtitle1' color='secondary'>No {voteFilter === 'completed' ? 'completed' : 'in progress'} votes yet</Typography>
+            </Center>
+          </EmptyVoteContainerBox>
+        ) : filteredVotes.map(inlineVote => <PageInlineVote detailed={false} inlineVote={inlineVote} key={inlineVote.id} />)}
       </StyledPageInlineVotesList>
     </Box>
   );

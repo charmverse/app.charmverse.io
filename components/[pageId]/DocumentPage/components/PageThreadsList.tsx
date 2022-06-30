@@ -9,6 +9,7 @@ import { useUser } from 'hooks/useUser';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { findTotalInlineComments } from 'lib/inline-comments/findTotalInlineComments';
 import { silentlyUpdateURL } from 'lib/browser';
+import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
 
 const Center = styled.div`
   position: absolute;
@@ -164,7 +165,7 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
         {sortedThreadList.length === 0 ? (
           <EmptyThreadContainerBox>
             <Center>
-              <ForumOutlinedIcon
+              <CommentOutlinedIcon
                 fontSize='large'
                 color='secondary'
                 sx={{
