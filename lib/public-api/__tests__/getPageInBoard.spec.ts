@@ -114,10 +114,14 @@ describe('getPageInBoard', () => {
         path: v4(),
         type: 'page',
         updatedBy: user.id,
-        spaceId: space.id,
         author: {
           connect: {
             id: user.id
+          }
+        },
+        space: {
+          connect: {
+            id: space.id
           }
         }
       }
