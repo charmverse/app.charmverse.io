@@ -11,7 +11,7 @@ export interface VoteOptionsDTO {
 }
 
 export interface VoteDTO extends Omit<Vote, 'id'|'status'|'createdAt'> {
-    options: VoteOptionsDTO[]
+    voteOptions: VoteOptionsDTO[]
 }
 
 export interface UpdateVoteDTO {

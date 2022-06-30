@@ -8,13 +8,13 @@ import { getVote } from './getVote';
 
 export async function createVote (vote: VoteDTO): Promise<Vote | null> {
 
-  const { createdBy, pageId, title, description, deadline, options } = vote;
+  const { createdBy, pageId, title, description, deadline, voteOptions } = vote;
 
   if (!pageId) {
     throw new InvalidInputError('Please provide the id of the page where the vote is taking place.');
   }
 
-  if (!options) {
+  if (!voteOptions) {
     throw new InvalidInputError('Please provide voting options.');
   }
 
@@ -74,7 +74,7 @@ export async function createVote (vote: VoteDTO): Promise<Vote | null> {
   });
 
   await prisma.voteOptions.createMany({
-    data: options.map(option => ({
+    data: voteOptions.map(option => ({
       name: option.name,
       threshold: option.threshold || DEFAULT_THRESHOLD,
       voteId: createdVote.id
