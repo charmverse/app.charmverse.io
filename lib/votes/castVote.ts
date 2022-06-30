@@ -2,7 +2,6 @@
 import { prisma } from 'db';
 import { UserVote, VoteOptions } from '@prisma/client';
 import { DataNotFoundError, InvalidInputError, UndesirableOperationError } from 'lib/utilities/errors';
-import { CompressOutlined } from '@mui/icons-material';
 import { VOTE_STATUS } from './interfaces';
 
 export async function castVote (choice: string, voteId: string, userId: string): Promise<UserVote> {
@@ -20,6 +19,7 @@ export async function castVote (choice: string, voteId: string, userId: string):
     throw new DataNotFoundError(`A vote with id ${voteId} was not found.`);
   }
 
+  // If vote doesn't have an InProgress status, it can't take on new votes.
   if (vote.status !== VOTE_STATUS[0]) {
     throw new UndesirableOperationError(`Vote with id: ${voteId} is not in progress.`);
   }

@@ -1,8 +1,8 @@
 import { prisma } from 'db';
 import { Vote } from '@prisma/client';
-import { DataNotFoundError } from 'lib/utilities/errors';
+import { DataNotFoundError, UndesirableOperationError } from 'lib/utilities/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { VoteStatusType } from './interfaces';
+import { VoteStatusType, VOTE_STATUS } from './interfaces';
 
 export async function updateVote (id: string, userId: string, status: VoteStatusType): Promise<Vote> {
 
@@ -14,6 +14,11 @@ export async function updateVote (id: string, userId: string, status: VoteStatus
 
   if (!existingVote) {
     throw new DataNotFoundError(`Incorrect vote id: ${id}.`);
+  }
+
+  // If vote has a Cancelled status, it can't be updated.
+  if (existingVote.status === VOTE_STATUS[3]) {
+    throw new UndesirableOperationError(`Vote with id: ${id} has been cancelled and cannot be updated.`);
   }
 
   const { error } = await hasAccessToSpace({
