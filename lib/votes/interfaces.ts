@@ -18,6 +18,12 @@ export interface UpdateVoteDTO {
     status: VoteStatusType
 }
 
+export interface UserVoteDTO {
+    choice: string,
+    userId: string,
+    voteId: string
+}
+
 export interface ExtendedVote extends Vote {
     userVotes: UserVote[],
     voteOptions: VoteOptions[]

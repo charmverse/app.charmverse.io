@@ -1,6 +1,6 @@
 
 import { Vote } from '@prisma/client';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireKeys, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { createVote as createVoteService, getVote as getVoteService, VoteDTO } from 'lib/votes';
 import { NextApiRequest, NextApiResponse } from 'next';
@@ -11,6 +11,8 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler
   .use(requireUser)
   .get(getVotes)
+  .use(requireKeys(['deadline', 'pageId', 'spaceId', 'voteOptions'], 'body'))
+  .use(requireSpaceMembership({ adminOnly: true }))
   .post(createVote);
 
 async function getVotes (req: NextApiRequest, res: NextApiResponse<Vote | { error: any }>) {

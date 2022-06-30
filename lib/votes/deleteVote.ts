@@ -1,4 +1,5 @@
 import { Vote } from '@prisma/client';
+import log from 'lib/log';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { prisma } from 'db';
@@ -8,7 +9,8 @@ export async function deleteVote (id: string, userId: string): Promise<Vote | nu
   const vote: Vote | null = await getVote(id);
 
   if (!vote) {
-    throw new DataNotFoundError(`There is no vote with id: ${id}`);
+    log.warn(`Attempt to delete a non-existing vote with id: ${id}`);
+    return null;
   }
 
   const { error } = await hasAccessToSpace({

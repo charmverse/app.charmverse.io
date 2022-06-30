@@ -160,7 +160,6 @@ enum VoteStatus {
 
 model VoteOptions {
   name        String
-  threshold   Int
   voteId      String    @db.Uuid
   vote        Vote      @relation(fields: [voteId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
@@ -176,6 +175,7 @@ model Vote {
   author        User            @relation(fields: [createdBy], references: [id], onDelete: Cascade, onUpdate: Cascade)
   createdBy     String          @db.Uuid
   title         String
+  threshold     Int
   description   String?
   deadline      DateTime
   status        VoteStatus
