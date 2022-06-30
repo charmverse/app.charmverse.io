@@ -6,7 +6,7 @@ import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { DEFAULT_THRESHOLD, VoteDTO, VOTE_STATUS } from './interfaces';
 import { getVote } from './getVote';
 
-export async function createVote (vote: VoteDTO): Promise<Vote> {
+export async function createVote (vote: VoteDTO): Promise<Vote | null> {
 
   const { createdBy, pageId, title, description, deadline, options } = vote;
 
@@ -73,7 +73,7 @@ export async function createVote (vote: VoteDTO): Promise<Vote> {
     }
   });
 
-  const createdOptions = await prisma.voteOptions.createMany({
+  await prisma.voteOptions.createMany({
     data: options.map(option => ({
       name: option.name,
       threshold: option.threshold || DEFAULT_THRESHOLD,

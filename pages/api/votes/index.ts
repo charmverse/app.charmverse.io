@@ -22,7 +22,7 @@ async function getVotes (req: NextApiRequest, res: NextApiResponse<Vote | { erro
   return res.status(200).json(vote);
 }
 
-async function createVote (req: NextApiRequest, res: NextApiResponse<Vote | { error: any }>) {
+async function createVote (req: NextApiRequest, res: NextApiResponse<Vote | null | { error: any }>) {
   const newVote = req.body as VoteDTO;
   const userId = req.session.user.id;
 
