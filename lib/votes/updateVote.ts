@@ -34,7 +34,8 @@ export async function updateVote (id: string, userId: string, status: VoteStatus
       status
     },
     include: {
-      voteOptions: true
+      voteOptions: true,
+      userVotes: true
     }
   });
 

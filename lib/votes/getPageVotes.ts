@@ -9,6 +9,9 @@ export async function getPageVotes (pageId: string): Promise<Vote[]> {
     include: {
       userVotes: true,
       voteOptions: true
+    },
+    orderBy: {
+      updatedAt: 'desc'
     }
   });
 }

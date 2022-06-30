@@ -68,15 +68,15 @@ export async function createVote (vote: VoteDTO): Promise<Vote | null> {
         }
       }
     },
-    include: {
-      voteOptions: true
+    selected: {
+      id: true
     }
   });
 
   await prisma.voteOptions.createMany({
     data: voteOptions.map(option => ({
       name: option.name,
-      threshold: option.threshold || DEFAULT_THRESHOLD,
+      threshold: option.threshold ?? DEFAULT_THRESHOLD,
       voteId: createdVote.id
     }))
   });
