@@ -57,6 +57,7 @@ export default function BountyDetails () {
         bounty={currentBounty}
         permissions={bountyPermissions}
         refreshBountyPermissions={() => {
+          // refreshBounty(currentBountyId);
           refreshBountyPermissions(currentBountyId);
         }}
       />

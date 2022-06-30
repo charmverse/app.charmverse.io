@@ -17,11 +17,14 @@ import UserDisplay from 'components/common/UserDisplay';
 import { useBounties } from 'hooks/useBounties';
 import { useContributors } from 'hooks/useContributors';
 import useIsAdmin from 'hooks/useIsAdmin';
+import useRoles from 'hooks/useRoles';
 import { useUser } from 'hooks/useUser';
 import { applicantIsSubmitter, moveUserApplicationToFirstRow, submissionsCapReached } from 'lib/applications/shared';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { AssignedBountyPermissions, BountyPermissions } from 'lib/bounties/interfaces';
+import { AssignedBountyPermissions, BountyPermissions, humaniseBountyAccessConditions } from 'lib/bounties/client';
+import { useMemo } from 'react';
+import { Roleup } from 'lib/roles/interfaces';
 import { ApplicationEditorForm } from './ApplicationEditorForm';
 
 export interface IBountyApplicantListProps {
@@ -40,6 +43,8 @@ export function BountyApplicantList ({
   const { refreshBounty } = useBounties();
 
   const isAdmin = useIsAdmin();
+
+  const { roles } = useRoles();
 
   const theme = useTheme();
 
@@ -94,6 +99,38 @@ export function BountyApplicantList ({
     submissions: applications
   });
 
+  // If the bounty is space-wide, we won't need this.
+  const submitterRoles = permissions?.bountyPermissions.submitter
+    .map(submitter => {
+      return roles?.find(role => role.id === submitter.id)?.name ?? '';
+    });
+
+  const roleups: Roleup[] = useMemo(() => {
+    return (
+      (roles ?? []).map(r => {
+        const rollup: Roleup = {
+          id: r.id,
+          name: r.name,
+          members: r.spaceRolesToRole.length
+        };
+        return rollup;
+      })
+    );
+  }, [roles]);
+
+  const humanisedSubmitterAccessCondition = humaniseBountyAccessConditions({
+    assignees: permissions?.bountyPermissions.submitter ?? [],
+    bounty,
+    permissionLevel: 'submitter',
+    roles: roleups
+  });
+
+  const submissionsCapSentence = `The cap of ${bounty.maxSubmissions} submission${bounty.maxSubmissions !== 1 ? 's'
+    : ''} has been reached.`;
+
+  const applyButtonTooltipTitle = !permissions?.userPermissions.work ? `You do not have the correct role to work on this bounty. ${humanisedSubmitterAccessCondition.phrase}`
+    : newApplicationsSuspended ? submissionsCapSentence : '';
+
   return (
     <>
       <Box component='div' sx={{ minHeight, maxHeight, overflowY: 'auto' }}>
@@ -107,7 +144,10 @@ export function BountyApplicantList ({
             {
               // Currently, we should only be able to see bounties we can work on
                   !userHasApplied && (
-                    <Tooltip placement='top' title={newApplicationsSuspended ? `You cannot apply to this bounty. The cap of ${bounty.maxSubmissions} submission${bounty.maxSubmissions !== 1 ? 's' : ''} has been reached.` : ''}>
+                    <Tooltip
+                      placement='top'
+                      title={applyButtonTooltipTitle}
+                    >
                       <Box component='span'>
                         <Button
                           disabled={newApplicationsSuspended || !permissions?.userPermissions.work}

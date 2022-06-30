@@ -29,3 +29,13 @@ export type BulkBountyPermissionAssignment = {
 }
 
 export interface InferredBountyPermissionMode {mode: BountySubmitter, roles?: string[]}
+
+// For now, we only want to write about who can submit, and who can review
+export type SupportedHumanisedAccessConditions = Extract<BountyPermissionLevel, 'submitter' | 'reviewer'>
+
+export interface HumanisedBountyAccessSummary {
+  permissionLevel: SupportedHumanisedAccessConditions
+  phrase: string
+  // Should be empty if the target permission level is accessible to the whole space
+  roleNames: string[]
+}
