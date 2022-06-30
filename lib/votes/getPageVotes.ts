@@ -11,7 +11,7 @@ export async function getPageVotes (pageId: string): Promise<Vote[]> {
       voteOptions: true
     },
     orderBy: {
-      updatedAt: 'desc'
+      createdAt: 'desc'
     }
   });
 }
