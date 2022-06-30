@@ -4,10 +4,9 @@ import { Vote } from '@prisma/client';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { PagesMap } from 'hooks/usePages';
 import Database from 'components/common/Database';
-import { Column, Row, View } from 'components/common/Database/interfaces';
 import { createBoard } from 'components/common/BoardEditor/focalboard/src/blocks/board';
 import { createBoardView } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
-import { createCard } from 'components/common/BoardEditor/focalboard/src/blocks/card';
+import { Card, createCard } from 'components/common/BoardEditor/focalboard/src/blocks/card';
 
 const votes: Vote[] = [{
   createdAt: new Date(),
@@ -24,15 +23,28 @@ const votes: Vote[] = [{
 export default function VotesPage () {
 
   const board = createBoard({ addDefaultProperty: true });
+  const statusOptions = [
+    { id: 'InProgress', value: 'In Progress', color: 'propColorYellow' },
+    { id: 'Passed', value: 'Passed', color: 'propColorTeal' },
+    { id: 'Rejected', value: 'Rejected', color: 'propColorRed' },
+    { id: 'Cancelled', value: 'Cancelled', color: 'propColorGray' }
+  ];
 
-  const columns: Column[] = [
-    { id: 'title', label: 'Title' },
-    { id: 'created', label: 'Created' },
-    { id: 'deadline', label: 'Deadline' },
-    { id: 'status', label: 'Status' }
+  board.fields.cardProperties = [
+    { id: 'title', name: 'Title', type: 'text', options: [] },
+    { id: 'created', name: 'Created', type: 'date', options: [] },
+    { id: 'deadline', name: 'Deadline', type: 'date', options: [] },
+    { id: 'status', name: 'Status', type: 'select', options: statusOptions }
   ];
 
   const view = createBoardView();
+  view.fields.columnWidths = {
+    created: 150,
+    deadline: 150,
+    status: 150,
+    __title: 500
+  };
+  view.fields.visiblePropertyIds = ['created', 'deadline', 'status'];
   view.fields.viewType = 'table';
   view.title = 'Table View';
   view.parentId = board.id;
@@ -42,7 +54,7 @@ export default function VotesPage () {
 
   const pages: PagesMap = {};
 
-  const cards = votes.reduce<Record<string, Row>>((voteMap, vote) => {
+  const cards = votes.reduce<Record<string, Card>>((voteMap, vote) => {
     const card = createCard();
     card.parentId = board.id;
     card.rootId = board.rootId;

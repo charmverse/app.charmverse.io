@@ -4,7 +4,7 @@ import Kanban from 'components/common/BoardEditor/focalboard/src/components/kanb
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
 import type { DatabaseContext } from '../Database.context';
 
-// loosely based off centerPanel.tsx in focalboard
+// loosely based off centerPanel.tsx in /focalboard/
 
 export default function DatabaseView (props: DatabaseContext) {
 

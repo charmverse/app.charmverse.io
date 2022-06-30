@@ -4,7 +4,7 @@ import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-per
 import CenterPanel from './components/CenterPanel';
 import { DatabaseContext } from './Database.context';
 
-// loosely based off BoardPage.tsx in focalboard
+// loosely based off BoardPage.tsx in /focalboard/
 
 export default function Database (props: DatabaseContext) {
 

@@ -33,8 +33,7 @@ type Props = {
 const TableRows = (props: Props): JSX.Element => {
     const {board, cards, activeView} = props
     const { pages, setPages } = usePages();
-    console.log('cards', cards)
-    console.log('pages', pages)
+
     const saveTitle = React.useCallback(async (saveType: string, cardId: string, title: string) => {
         const updatedPage = await charmClient.updatePage({
             id: cardId,
