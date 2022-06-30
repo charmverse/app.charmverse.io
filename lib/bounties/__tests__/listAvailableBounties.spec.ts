@@ -53,10 +53,16 @@ describe('listAvailableBounties', () => {
         createdBy: nonAdminUser.id,
         spaceId: space.id,
         title: 'Bounty by space'
+      }),
+      // User did not create this, so they should not see it
+      createBounty({
+        createdBy: nonAdminUser.id,
+        spaceId: space.id,
+        title: 'Bounty by space'
       })
     ]);
 
-    const [bountyByUser, bountyByOtherUser, bountyByRole, bountyBySpace, bountyByPublic] = bounties;
+    const [bountyByUser, bountyByOtherUser, bountyByRole, bountyBySpace, bountyByPublic, invisibleBounty] = bounties;
 
     // 1/4 - Permission the user
     await addBountyPermissionGroup({
@@ -148,6 +154,36 @@ describe('listAvailableBounties', () => {
 
     expect(bounties.length).toBe(1);
     expect(bounties[0].id).toBe(bounty.id);
+
+  });
+
+  it('should always display all space bounties to the admin, even if they have no permissions for this bounty', async () => {
+    const { space: otherSpace, user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, false);
+    const adminUser = await generateSpaceUser({
+      isAdmin: true,
+      spaceId: otherSpace.id
+    });
+
+    // No permissions provided
+    await createBounty({
+      createdBy: otherUser.id,
+      spaceId: otherSpace.id,
+      title: 'Bounty by space'
+    });
+
+    // This one will be ignored
+    await createBounty({
+      createdBy: otherUser.id,
+      spaceId: space.id,
+      title: 'Bounty by space'
+    });
+
+    const bounties = await listAvailableBounties({
+      spaceId: otherSpace.id,
+      userId: adminUser.id
+    });
+
+    expect(bounties.length).toBe(1);
 
   });
 

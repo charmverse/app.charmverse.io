@@ -24,6 +24,17 @@ export async function listAvailableBounties ({ spaceId, userId }: AvailableResou
     where: {
       spaceId,
       OR: [
+        // Admin override
+        {
+          space: {
+            spaceRoles: {
+              some: {
+                userId,
+                isAdmin: true
+              }
+            }
+          }
+        },
         {
           createdBy: userId
         },
