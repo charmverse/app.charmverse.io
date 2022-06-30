@@ -1,6 +1,8 @@
 // import { prisma } from 'db';
 // import { addBountyPermissionGroup } from 'lib/permissions/bounties/addBountyPermissionGroup';
 
+export const placeholder = 2;
+
 // const concurrent = 5;
 
 // async function migrateBountyReviewers (skip: number, total?: number): Promise<true> {
