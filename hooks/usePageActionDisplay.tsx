@@ -5,13 +5,13 @@ import { usePages } from './usePages';
 import { useThreads } from './useThreads';
 
 interface IContext {
-  showingCommentThreadsList: boolean,
-  setShowingCommentThreadsList: React.Dispatch<React.SetStateAction<boolean>>
+  currentPageActionDisplay: null | 'votes' | 'comments',
+  setCurrentPageActionDisplay: React.Dispatch<React.SetStateAction<IContext['currentPageActionDisplay']>>
 }
 
-export const CommentThreadsListDisplayContext = createContext<IContext>({
-  setShowingCommentThreadsList: () => undefined,
-  showingCommentThreadsList: false
+export const PageActionDisplay = createContext<IContext>({
+  currentPageActionDisplay: 'votes',
+  setCurrentPageActionDisplay: () => undefined
 });
 
 export function CommentThreadsListDisplayProvider ({ children }: { children: ReactNode }) {
@@ -19,32 +19,29 @@ export function CommentThreadsListDisplayProvider ({ children }: { children: Rea
   const { isValidating } = useThreads();
   const { cache } = useSWRConfig();
 
-  const [showingCommentThreadsList, setShowingCommentThreadsList] = useState(false);
+  const [currentPageActionDisplay, setCurrentPageActionDisplay] = useState<IContext['currentPageActionDisplay']>(null);
   useEffect(() => {
     if (currentPageId) {
       // For some reason we cant get the threads map using useThreads, its empty even after isValidating is true (data has loaded)
       const cachedData: ThreadWithCommentsAndAuthors[] | undefined = cache.get(`pages/${currentPageId}/threads`);
-      if (cachedData) {
-        setShowingCommentThreadsList(cachedData.filter(thread => thread && !thread.resolved).length > 0);
-      }
-      else {
-        setShowingCommentThreadsList(false);
+      if (cachedData && cachedData.filter(thread => thread && !thread.resolved).length > 0) {
+        setCurrentPageActionDisplay('comments');
       }
     }
   }, [isValidating, currentPageId]);
 
   const value = useMemo<IContext>(() => ({
-    showingCommentThreadsList,
-    setShowingCommentThreadsList
-  }), [showingCommentThreadsList]);
+    currentPageActionDisplay,
+    setCurrentPageActionDisplay
+  }), [currentPageActionDisplay]);
 
   return (
-    <CommentThreadsListDisplayContext.Provider value={value}>
+    <PageActionDisplay.Provider value={value}>
       {children}
-    </CommentThreadsListDisplayContext.Provider>
+    </PageActionDisplay.Provider>
   );
 }
 
-export function useCommentThreadsListDisplay () {
-  return useContext(CommentThreadsListDisplayContext);
+export function usePageActionDisplay () {
+  return useContext(PageActionDisplay);
 }

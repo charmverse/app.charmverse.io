@@ -21,12 +21,14 @@ import { Page } from '@prisma/client';
 import charmClient from 'charmClient';
 import PublishToSnapshot from 'components/common/PageLayout/components/Header/snapshot/PublishToSnapshot';
 import { useColorMode } from 'context/darkMode';
-import { useCommentThreadsListDisplay } from 'hooks/useCommentThreadsListDisplay';
+import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
 import { useRouter } from 'next/router';
 import { useRef, useState } from 'react';
+import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
+import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import Account from '../Account';
 import ShareButton from '../ShareButton';
 import PageTitleWithBreadcrumbs from './PageTitleWithBreadcrumbs';
@@ -38,25 +40,6 @@ export const StyledToolbar = styled(Toolbar)`
   height: ${headerHeight}px;
   min-height: ${headerHeight}px;
 `;
-
-function CommentThreadsListButton () {
-  const { showingCommentThreadsList, setShowingCommentThreadsList } = useCommentThreadsListDisplay();
-  return (
-    <Tooltip title={`${showingCommentThreadsList ? 'Hide' : 'Show'} comment threads`} arrow placement='bottom'>
-      <IconButton
-        color={!showingCommentThreadsList ? 'secondary' : 'inherit'}
-        onClick={() => {
-          setShowingCommentThreadsList(!showingCommentThreadsList);
-        }}
-        sx={showingCommentThreadsList ? { backgroundColor: 'emoji.hoverBackground' } : {}}
-      >
-        <CommentIcon
-          fontSize='small'
-        />
-      </IconButton>
-    </Tooltip>
-  );
-}
 
 interface HeaderProps {
   open: boolean;
@@ -79,6 +62,7 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
   const isPage = router.route.includes('pageId');
   const pageType = (currentPage as Page)?.type;
   const isExportablePage = pageType === 'card' || pageType === 'page';
+  const { currentPageActionDisplay, setCurrentPageActionDisplay } = usePageActionDisplay();
 
   async function toggleFavorite () {
     if (!currentPage || !user) return;
@@ -142,7 +126,6 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
           {isPage && (
             <>
               {currentPage?.deletedAt === null && <ShareButton headerHeight={headerHeight} />}
-              {currentPage?.type !== 'board' && <CommentThreadsListButton />}
               <Tooltip title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} arrow placement='bottom'>
                 <IconButton size='small' sx={{ ml: 1 }} onClick={toggleFavorite} color='inherit'>
                   {isFavorite ? <FavoritedIcon color='secondary' /> : <NotFavoritedIcon color='secondary' />}
@@ -213,6 +196,66 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
                         />
                       )}
                       label='Full Width'
+                    />
+                  </ListItemButton>
+                  <ListItemButton>
+                    <FormControlLabel
+                      sx={{
+                        marginLeft: 0.5,
+                        width: '100%',
+                        display: 'flex',
+                        justifyContent: 'space-between'
+                      }}
+                      labelPlacement='start'
+                      control={(
+                        <Switch
+                          size='small'
+                          checked={currentPageActionDisplay === 'comments'}
+                          onChange={async () => {
+                            setCurrentPageActionDisplay((_currentPageActionDisplay) => _currentPageActionDisplay === 'comments' ? null : 'comments');
+                          }}
+                        />
+                      )}
+                      label={(
+                        <Box display='flex' gap={1}><CommentOutlinedIcon
+                          fontSize='small'
+                          sx={{
+                            top: 2.5,
+                            position: 'relative'
+                          }}
+                        />Comments
+                        </Box>
+                      )}
+                    />
+                  </ListItemButton>
+                  <ListItemButton>
+                    <FormControlLabel
+                      sx={{
+                        marginLeft: 0.5,
+                        width: '100%',
+                        display: 'flex',
+                        justifyContent: 'space-between'
+                      }}
+                      labelPlacement='start'
+                      control={(
+                        <Switch
+                          size='small'
+                          checked={currentPageActionDisplay === 'votes'}
+                          onChange={async () => {
+                            setCurrentPageActionDisplay((_currentPageActionDisplay) => _currentPageActionDisplay === 'votes' ? null : 'votes');
+                          }}
+                        />
+                      )}
+                      label={(
+                        <Box display='flex' gap={1}><HowToVoteOutlinedIcon
+                          fontSize='small'
+                          sx={{
+                            top: 2.5,
+                            position: 'relative'
+                          }}
+                        />Votes
+                        </Box>
+                      )}
                     />
                   </ListItemButton>
                 </List>

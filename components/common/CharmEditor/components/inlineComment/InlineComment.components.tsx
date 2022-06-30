@@ -12,7 +12,7 @@ import { usePages } from 'hooks/usePages';
 import { PageContent } from 'models';
 import { PluginKey, TextSelection } from 'prosemirror-state';
 import React, { useState } from 'react';
-import { useCommentThreadsListDisplay } from 'hooks/useCommentThreadsListDisplay';
+import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import PageThread from '../PageThread';
 import { hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
 import { updateInlineComment } from './inlineComment.utils';
@@ -37,14 +37,14 @@ export default function InlineCommentThread ({ pluginKey }: {pluginKey: PluginKe
   const { threads } = useThreads();
   const cardId = (new URLSearchParams(window.location.href)).get('cardId');
 
-  const { showingCommentThreadsList } = useCommentThreadsListDisplay();
+  const { currentPageActionDisplay } = usePageActionDisplay();
   // Find unresolved threads in the thread ids and sort them based on desc order of createdAt
   const unResolvedThreads = threadIds
     .map(threadId => threads[threadId])
     .filter(thread => thread && !thread?.resolved)
     .sort((threadA, threadB) => threadA && threadB ? (new Date(threadB.createdAt).getTime() - new Date(threadA.createdAt).getTime()) : 0);
 
-  if ((!showingCommentThreadsList || cardId) && isVisible && unResolvedThreads.length !== 0) {
+  if ((currentPageActionDisplay !== 'comments' || cardId) && isVisible && unResolvedThreads.length !== 0) {
     // Only show comment thread on inline comment if the page threads list is not active
     return createPortal(
       <ClickAwayListener onClickAway={() => {

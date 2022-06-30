@@ -5,7 +5,7 @@ import MuiDrawer from '@mui/material/Drawer';
 import { useUser } from 'hooks/useUser';
 import Head from 'next/head';
 import * as React from 'react';
-import { CommentThreadsListDisplayProvider } from 'hooks/useCommentThreadsListDisplay';
+import { CommentThreadsListDisplayProvider } from 'hooks/usePageActionDisplay';
 import Header, { headerHeight } from './components/Header';
 import Sidebar from './components/Sidebar';
 import PageContainer from './components/PageContainer';

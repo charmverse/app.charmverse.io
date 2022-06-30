@@ -6,10 +6,9 @@ import { getCardComments } from 'components/common/BoardEditor/focalboard/src/st
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import BountyIntegration from 'components/[pageId]/DocumentPage/components/BountyIntegration';
-import { useCommentThreadsListDisplay } from 'hooks/useCommentThreadsListDisplay';
+import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
 import { Page, PageContent } from 'models';
-import { useRouter } from 'next/router';
 import { memo, useCallback } from 'react';
 import CharmEditor, { ICharmEditorOutput } from '../../common/CharmEditor/CharmEditor';
 import PageBanner from './components/PageBanner';
@@ -63,7 +62,7 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
     pageTop = 200;
   }
 
-  const { showingCommentThreadsList } = useCommentThreadsListDisplay();
+  const { currentPageActionDisplay } = usePageActionDisplay();
 
   const updatePageContent = useCallback((content: ICharmEditorOutput) => {
     setPage({ content: content.doc, contentText: content.rawText });
@@ -75,7 +74,7 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
 
   const cardId = typeof window !== 'undefined' ? (new URLSearchParams(window.location.href)).get('cardId') : null;
 
-  const showCommentThreadList = showingCommentThreadsList && !cardId;
+  const showCommentThreadList = currentPageActionDisplay === 'comments' && !cardId;
 
   return (
     <ScrollableWindow hideScroll={showCommentThreadList}>
