@@ -1,7 +1,7 @@
 import { Autocomplete, TextField } from '@mui/material';
 import { Role } from '@prisma/client';
 import { ComponentProps, useEffect, useState } from 'react';
-import useRoles from 'components/settings/roles/hooks/useRoles';
+import useRoles from 'hooks/useRoles';
 import { ListSpaceRolesResponse } from 'pages/api/roles';
 
 interface IRolesFilter {

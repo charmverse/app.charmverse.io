@@ -1,5 +1,8 @@
-const path = require('path'); // eslint-disable-line
-const webpack = require('webpack'); // eslint-disable-line
+/* eslint-disable @typescript-eslint/no-var-requires */
+
+const webpack = require('webpack');
+const BundleAnalyzer = require('@next/bundle-analyzer');
+const transpileModules = require('next-transpile-modules');
 
 const esmModules = [
   '@bangle.dev/base-components',
@@ -17,8 +20,9 @@ const esmModules = [
   '@fullcalendar/daygrid',
   '@fullcalendar/interaction',
   '@fullcalendar/react',
-  '@hookform/resolvers',
   'react-dnd',
+  '@hookform/resolvers',
+  'lit-share-modal-v3-react-17',
   'uuid'
 ];
 
@@ -86,6 +90,7 @@ const removeUndefined = obj => {
   });
   return newObj;
 };
+
 const next = require('next/dist/lib/is-serializable-props');
 // eslint-disable-next-line prefer-destructuring
 const isSerializableProps = next.isSerializableProps;
@@ -93,12 +98,12 @@ next.isSerializableProps = function _isSerializableProps (page, method, input) {
   return isSerializableProps(page, method, removeUndefined(input));
 };
 
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
+const withBundleAnalyzer = BundleAnalyzer({
   enabled: process.env.ANALYZE === 'true'
 });
 
 // fix for esm modules
-const withTM = require('next-transpile-modules')(esmModules);
+const withTM = transpileModules(esmModules);
 
 module.exports = withBundleAnalyzer(withTM(config));
 
