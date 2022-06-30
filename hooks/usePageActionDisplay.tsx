@@ -4,12 +4,12 @@ import { useSWRConfig } from 'swr';
 import { usePages } from './usePages';
 import { useThreads } from './useThreads';
 
-interface IContext {
+export interface IPageActionDisplayContext {
   currentPageActionDisplay: null | 'votes' | 'comments',
-  setCurrentPageActionDisplay: React.Dispatch<React.SetStateAction<IContext['currentPageActionDisplay']>>
+  setCurrentPageActionDisplay: React.Dispatch<React.SetStateAction<IPageActionDisplayContext['currentPageActionDisplay']>>
 }
 
-export const PageActionDisplay = createContext<IContext>({
+export const PageActionDisplay = createContext<IPageActionDisplayContext>({
   currentPageActionDisplay: 'votes',
   setCurrentPageActionDisplay: () => undefined
 });
@@ -19,7 +19,7 @@ export function CommentThreadsListDisplayProvider ({ children }: { children: Rea
   const { isValidating } = useThreads();
   const { cache } = useSWRConfig();
 
-  const [currentPageActionDisplay, setCurrentPageActionDisplay] = useState<IContext['currentPageActionDisplay']>(null);
+  const [currentPageActionDisplay, setCurrentPageActionDisplay] = useState<IPageActionDisplayContext['currentPageActionDisplay']>(null);
   useEffect(() => {
     if (currentPageId) {
       // For some reason we cant get the threads map using useThreads, its empty even after isValidating is true (data has loaded)
@@ -30,7 +30,7 @@ export function CommentThreadsListDisplayProvider ({ children }: { children: Rea
     }
   }, [isValidating, currentPageId]);
 
-  const value = useMemo<IContext>(() => ({
+  const value = useMemo<IPageActionDisplayContext>(() => ({
     currentPageActionDisplay,
     setCurrentPageActionDisplay
   }), [currentPageActionDisplay]);

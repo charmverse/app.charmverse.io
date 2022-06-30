@@ -32,6 +32,7 @@ import debounce from 'lodash/debounce';
 import { PageContent } from 'models';
 import { CSSProperties, memo, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import PageInlineVotesList from 'components/[pageId]/DocumentPage/components/PageInlineVotesList';
+import { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
 import Callout, * as callout from './components/callout';
 import { userDataPlugin } from './components/charm/charm.plugins';
 import * as columnLayout from './components/columnLayout';
@@ -294,7 +295,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
   }
 `;
 
-const PageInlineActionListBox = styled.div`
+const PageActionListBox = styled.div`
   position: fixed;
   right: 0px;
   width: 400px;
@@ -302,6 +303,7 @@ const PageInlineActionListBox = styled.div`
   z-index: var(--z-index-drawer);
   height: calc(100% - 80px);
   overflow: auto;
+  margin-right: ${({ theme }) => theme.spacing(1)};
 `;
 
 const defaultContent: PageContent = {
@@ -321,7 +323,7 @@ interface CharmEditorProps {
   onContentChange?: UpdatePageContent;
   readOnly?: boolean;
   style?: CSSProperties;
-  showingCommentThreadsList?: boolean
+  pageActionDisplay?: IPageActionDisplayContext['currentPageActionDisplay']
   disabledPageSpecificFeatures?: boolean
   pageId?: string | null
 }
@@ -348,7 +350,7 @@ export function convertPageContentToMarkdown (content: PageContent, title?: stri
 
 function CharmEditor (
   {
-    showingCommentThreadsList = false,
+    pageActionDisplay = null,
     content = defaultContent,
     children,
     onContentChange,
@@ -453,7 +455,7 @@ function CharmEditor (
             return (
               <Paragraph
                 inlineCommentPluginKey={inlineCommentPluginKey}
-                calculateInlineComments={!showingCommentThreadsList && !disabledPageSpecificFeatures}
+                calculateInlineComments={!disabledPageSpecificFeatures}
                 {...props}
               >{_children}
               </Paragraph>
@@ -539,25 +541,44 @@ function CharmEditor (
       <InlinePalette nestedPagePluginKey={nestedPagePluginKey} disableNestedPage={disabledPageSpecificFeatures} />
       {children}
       {!disabledPageSpecificFeatures && (
-      <Grow
-        in={showingCommentThreadsList}
-        style={{
-          transformOrigin: 'left top'
-        }}
-        easing={{
-          enter: 'ease-in',
-          exit: 'ease-out'
-        }}
-        timeout={250}
-      >
-        <PageInlineActionListBox
-          className='PageThreadListBox'
+      <>
+        <Grow
+          in={pageActionDisplay === 'comments'}
+          style={{
+            transformOrigin: 'left top'
+          }}
+          easing={{
+            enter: 'ease-in',
+            exit: 'ease-out'
+          }}
+          timeout={250}
         >
-          <PageInlineVotesList />
-        </PageInlineActionListBox>
-      </Grow>
+          <PageActionListBox
+            className='PageThreadListBox'
+          >
+            <PageThreadsList />
+          </PageActionListBox>
+        </Grow>
+        <Grow
+          in={pageActionDisplay === 'votes'}
+          style={{
+            transformOrigin: 'left top'
+          }}
+          easing={{
+            enter: 'ease-in',
+            exit: 'ease-out'
+          }}
+          timeout={250}
+        >
+          <PageActionListBox
+            className='PageVotesListBox'
+          >
+            <PageInlineVotesList />
+          </PageActionListBox>
+        </Grow>
+        <InlineCommentThread pluginKey={inlineCommentPluginKey} />
+      </>
       )}
-      {!disabledPageSpecificFeatures && <InlineCommentThread pluginKey={inlineCommentPluginKey} />}
       {!readOnly && <DevTools />}
     </StyledReactBangleEditor>
   );

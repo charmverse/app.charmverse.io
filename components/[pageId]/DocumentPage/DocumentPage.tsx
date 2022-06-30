@@ -74,14 +74,14 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
 
   const cardId = typeof window !== 'undefined' ? (new URLSearchParams(window.location.href)).get('cardId') : null;
 
-  const showCommentThreadList = currentPageActionDisplay === 'comments' && !cardId;
+  const showingPageActionList = currentPageActionDisplay !== null;
 
   return (
-    <ScrollableWindow hideScroll={showCommentThreadList}>
+    <ScrollableWindow hideScroll={showingPageActionList}>
       <div style={{
-        width: showCommentThreadList ? 'calc(100% - 425px)' : '100%',
-        height: showCommentThreadList ? 'calc(100vh - 65px)' : '100%',
-        overflow: showCommentThreadList ? 'auto' : 'inherit'
+        width: showingPageActionList ? 'calc(100% - 425px)' : '100%',
+        height: showingPageActionList ? 'calc(100vh - 65px)' : '100%',
+        overflow: showingPageActionList ? 'auto' : 'inherit'
       }}
       >
         {page.deletedAt && <PageDeleteBanner pageId={page.id} />}
@@ -95,7 +95,7 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
             content={page.content as PageContent}
             onContentChange={updatePageContent}
             readOnly={readOnly}
-            showingCommentThreadsList={showCommentThreadList}
+            pageActionDisplay={currentPageActionDisplay}
             pageId={page.id}
           >
             <PageHeader
