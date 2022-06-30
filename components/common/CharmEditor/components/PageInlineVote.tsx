@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { Box, Button, Chip, Divider, FormLabel, List, ListItem, Radio, Typography } from '@mui/material';
-import { VoteStatus } from '@prisma/client';
+import { Vote, VoteStatus } from '@prisma/client';
 import Modal from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
 import { useInlineVotes } from 'hooks/useInlineVotes';
@@ -27,6 +27,32 @@ const StyledDiv = styled.div<{detailed: boolean}>`
   background-color: ${({ theme }) => theme.palette.background.light};
   padding: ${({ theme, detailed }) => detailed ? 0 : theme.spacing(2)};
 `;
+
+function PageInlineVoteOption ({ isDisabled, option, voteId, checked, percentage }: {voteId: string, option: VoteWithUsers['options'][0], percentage: number, checked: boolean, isDisabled: boolean}) {
+  const { castVote } = useInlineVotes();
+  return (
+    <>
+      <ListItem sx={{ p: 0, justifyContent: 'space-between' }}>
+        <Box display='flex' alignItems='center'>
+          <Radio
+            disabled={isDisabled}
+            disableRipple
+            size='small'
+            checked={checked}
+            onChange={() => {
+              castVote(voteId, option.name);
+            }}
+          />
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <FormLabel disabled={isDisabled}>{option.name}</FormLabel>
+          </Box>
+        </Box>
+        <Typography variant='subtitle1' color='secondary'>{percentage.toFixed(2)}%</Typography>
+      </ListItem>
+      <Divider />
+    </>
+  );
+}
 
 export default function PageInlineVote ({ detailed = false, inlineVote }: PageInlineVoteProps) {
   const { deadline, description, title, userVotes, options, id } = inlineVote;
@@ -105,26 +131,14 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
         {options.map((option) => {
           const isDisabled = inlineVote.status !== 'InProgress' || inlineVote.deadline.getTime() < Date.now();
           return (
-            <>
-              <ListItem sx={{ p: 0, justifyContent: 'space-between' }}>
-                <Box display='flex' alignItems='center'>
-                  <Radio
-                    disabled={isDisabled}
-                    disableRipple
-                    size='small'
-                    checked={option.name === userVote?.choice}
-                    onChange={() => {
-                      castVote(inlineVote.id, option.name);
-                    }}
-                  />
-                  <Box sx={{ display: 'flex', gap: 1 }}>
-                    <FormLabel disabled={isDisabled}>{option.name}</FormLabel>
-                  </Box>
-                </Box>
-                <Typography variant='subtitle1' color='secondary'>{(((voteFrequencyRecord[option.name] ?? 0) / totalVotes) * 100).toFixed(2)}%</Typography>
-              </ListItem>
-              <Divider />
-            </>
+            <PageInlineVoteOption
+              key={option.name}
+              checked={option.name === userVote?.choice}
+              isDisabled={isDisabled}
+              option={option}
+              percentage={(((voteFrequencyRecord[option.name] ?? 0) / totalVotes) * 100)}
+              voteId={inlineVote.id}
+            />
           );
         })}
       </List>
