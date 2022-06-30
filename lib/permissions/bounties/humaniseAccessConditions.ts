@@ -48,14 +48,14 @@ export function humaniseBountyAccessConditions ({
     return count + (group === 'user' ? 1 : 0);
   }, 0);
 
-  const totalSubmitters = hasSpacePermission ? 'all' : totalRoleMembers;
+  const totalSubmitters = hasSpacePermission ? 0 : totalRoleMembers;
 
   // Don't count users if person gets to review via their role and as an individual user
   const duplicateReviewersMembers = permissionLevel !== 'reviewer' ? 0 : assignees.reduce((count, assignee) => {
     const shouldCheckForDuplicates = assignee.group === 'user';
 
     const isDuplicateReviewer = shouldCheckForDuplicates && assignedRoles.some(reviewerRole => roles.some(roleInSpace => {
-      return roleInSpace.users.some(u => u.id === assignee.id);
+      return roleInSpace.users.some(u => u.id === reviewerRole.id);
     }));
 
     return count + (isDuplicateReviewer ? 1 : 0);
@@ -66,7 +66,11 @@ export function humaniseBountyAccessConditions ({
   const result: HumanisedBountyAccessSummary = {
     permissionLevel,
     phrase: '',
-    roleNames: assignedRoleNames
+    roleNames: assignedRoleNames,
+    // Only calculate if this is not all space members
+    totalPeople: hasSpacePermission ? undefined : (
+      permissionLevel === 'submitter' ? totalSubmitters : totalReviewers
+    )
   };
 
   // console.log('Assignees', assignees);
@@ -85,17 +89,17 @@ export function humaniseBountyAccessConditions ({
       }
       // Bounty requires applications
       else if (!hasSpacePermission && bounty.approveSubmitters && assignedRoleNames.length === 1) {
-        result.phrase = `Only ${totalSubmitters} workspace members with the ${upperCaseFirstCharacter(assignedRoleNames[0])} role can apply to work on this bounty.`;
+        result.phrase = `Applications to this bounty are reserved to the ${totalSubmitters} workspace members with the ${upperCaseFirstCharacter(assignedRoleNames[0])} role.`;
       }
       else if (!hasSpacePermission && bounty.approveSubmitters && assignedRoleNames.length > 1) {
-        result.phrase = `Only ${totalSubmitters} workspace members with the ${humanisedRoleNames} roles can apply to work on this bounty.`;
+        result.phrase = `Applications to this bounty are reserved to the ${totalSubmitters} workspace members with ${humanisedRoleNames} roles.`;
       }
       // Bounty is open to submitters
       else if (!hasSpacePermission && !bounty.approveSubmitters && assignedRoleNames.length === 1) {
-        result.phrase = `Only ${totalSubmitters} workspace members with the ${upperCaseFirstCharacter(assignedRoleNames[0])} role can directly work on this bounty.`;
+        result.phrase = `Submissions to this bounty are reserved to the ${totalSubmitters} workspace members with the ${upperCaseFirstCharacter(assignedRoleNames[0])} role.`;
       }
       else if (!hasSpacePermission && !bounty.approveSubmitters && assignedRoleNames.length > 1) {
-        result.phrase = `Only ${totalSubmitters} workspace members with one of the ${humanisedRoleNames} roles can directly work on this bounty.`;
+        result.phrase = `Submissions to this bounty are reserved to the ${totalSubmitters} workspace members with ${humanisedRoleNames} roles.`;
       }
       break;
 

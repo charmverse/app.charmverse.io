@@ -44,7 +44,7 @@ export function BountyApplicantList ({
 
   const isAdmin = useIsAdmin();
 
-  const { roles } = useRoles();
+  const { roles, roleups } = useRoles();
 
   const theme = useTheme();
 
@@ -90,6 +90,13 @@ export function BountyApplicantList ({
 
   const sortedApplications = moveUserApplicationToFirstRow(applications, user?.id as string);
 
+  const humanisedSubmitterSentence = humaniseBountyAccessConditions({
+    assignees: permissions.bountyPermissions.submitter,
+    bounty,
+    permissionLevel: 'submitter',
+    roles: roleups
+  });
+
   const userApplication = sortedApplications.find(app => app.createdBy === user?.id);
 
   const userHasApplied = userApplication !== undefined;
@@ -99,36 +106,10 @@ export function BountyApplicantList ({
     submissions: applications
   });
 
-  // If the bounty is space-wide, we won't need this.
-  const submitterRoles = permissions?.bountyPermissions.submitter
-    .map(submitter => {
-      return roles?.find(role => role.id === submitter.id)?.name ?? '';
-    });
-
-  const roleups: Roleup[] = useMemo(() => {
-    return (
-      (roles ?? []).map(r => {
-        const rollup: Roleup = {
-          id: r.id,
-          name: r.name,
-          members: r.spaceRolesToRole.length
-        };
-        return rollup;
-      })
-    );
-  }, [roles]);
-
-  const humanisedSubmitterAccessCondition = humaniseBountyAccessConditions({
-    assignees: permissions?.bountyPermissions.submitter ?? [],
-    bounty,
-    permissionLevel: 'submitter',
-    roles: roleups
-  });
-
   const submissionsCapSentence = `The cap of ${bounty.maxSubmissions} submission${bounty.maxSubmissions !== 1 ? 's'
     : ''} has been reached.`;
 
-  const applyButtonTooltipTitle = !permissions?.userPermissions.work ? `You do not have the correct role to work on this bounty. ${humanisedSubmitterAccessCondition.phrase}`
+  const applyButtonTooltipTitle = !permissions?.userPermissions.work ? 'You cannot apply to this bounty.'
     : newApplicationsSuspended ? submissionsCapSentence : '';
 
   return (
@@ -158,6 +139,9 @@ export function BountyApplicantList ({
                     </Tooltip>
                   )
                 }
+          </Grid>
+          <Grid item xs={12}>
+            {humanisedSubmitterSentence.phrase}
           </Grid>
         </Grid>
 

@@ -1,4 +1,6 @@
 import { useTheme } from '@emotion/react';
+import AvatarGroup from '@mui/material/AvatarGroup';
+import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
@@ -19,14 +21,18 @@ import { useUser } from 'hooks/useUser';
 import { applicantIsSubmitter, countValidSubmissions, moveUserApplicationToFirstRow, submissionsCapReached } from 'lib/applications/shared';
 import { fancyTrim } from 'lib/utilities/strings';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { BrandColor } from 'theme/colors';
 import { ApplicationWithTransactions } from 'lib/applications/actions';
 import MultiPaymentModal from 'components/bounties/components/MultiPaymentModal';
-import { BountyWithDetails } from 'models';
+import { BountyWithDetails, Contributor } from 'models';
 import useIsAdmin from 'hooks/useIsAdmin';
 import UserDisplay from 'components/common/UserDisplay';
-import { AssignedBountyPermissions } from 'lib/bounties/interfaces';
+import { AssignedBountyPermissions, BountyReviewer } from 'lib/bounties/interfaces';
+import { humaniseBountyAccessConditions } from 'lib/bounties/client';
+import useRoles from 'hooks/useRoles';
+import { TargetPermissionGroup } from 'lib/permissions/interfaces';
+import WorkspaceAvatar from 'components/common/PageLayout/components/Sidebar/WorkspaceAvatar';
 import BountySubmissionReviewActions from '../../components/BountySubmissionReviewActions';
 import SubmissionEditorForm from './SubmissionEditorForm';
 import BountySubmissionContent from '../../components/BountySubmissionContent';
@@ -54,10 +60,14 @@ export const SubmissionStatusLabels: Record<ApplicationStatus, string> = {
   paid: 'Paid'
 };
 
+// Initial number of avatars we show, and the number to add each time the user clicks
+const defaultAvatarGroupIncrement = 5;
+
 export default function BountySubmissions ({ bounty, permissions }: Props) {
 
   const [user] = useUser();
   const [contributors] = useContributors();
+  const { roleups } = useRoles();
   const theme = useTheme();
   const isAdmin = useIsAdmin();
 
@@ -65,6 +75,8 @@ export default function BountySubmissions ({ bounty, permissions }: Props) {
   const { refreshBounty } = useBounties();
 
   const [currentViewedSubmission, setCurrentViewedSubmission] = useState<Application | null>(null);
+
+  const [maxVisibleUsers, setMaxVisibleUsers] = useState<number>(defaultAvatarGroupIncrement);
 
   const editSubmissionModal = usePopupState({ variant: 'popover', popupId: 'edit-submission' });
 
@@ -97,21 +109,123 @@ export default function BountySubmissions ({ bounty, permissions }: Props) {
   // Only applies if there is a submissions cap
   const capReached = submissionsCapReached({ bounty, submissions: submissions ?? [] });
 
-  const reviewerUser = bounty.reviewer ? contributors.find(c => c.id === bounty.reviewer) : undefined;
+  const reviewerNames: {
+    roles: (TargetPermissionGroup & {name: string})[]
+    users: (TargetPermissionGroup & {name: string, profilePic?: string})[]
+  } = useMemo(() => {
+    return (permissions?.bountyPermissions.reviewer ?? []).map(reviewer => {
+
+      if (reviewer.group === 'role') {
+        const name: string = roleups?.find(r => r.id === reviewer.id)?.name ?? '';
+        return {
+          ...reviewer,
+          name
+        };
+      }
+      else {
+        const reviewerUser: Contributor | undefined = contributors?.find(c => c.id === reviewer.id);
+        return {
+          ...reviewer,
+          name: reviewerUser?.username ?? '',
+          profilePic: reviewerUser?.avatar
+        } as (TargetPermissionGroup & {name: string, profilePic?: string});
+
+      }
+
+    }).reduce((reviewersByGroup, reviewer) => {
+
+      if (reviewer.group === 'role') {
+        reviewersByGroup.roles.push(reviewer);
+      }
+      else if (reviewer.group === 'user') {
+        reviewersByGroup.users.push(reviewer);
+      }
+
+      return reviewersByGroup;
+    }, {
+      roles: [],
+      users: []
+    } as {
+      roles: (TargetPermissionGroup & {name: string})[]
+      users: (TargetPermissionGroup & {name: string, profilePic?: string})[]
+    });
+  }, [bounty, permissions, roleups]);
+
+  const humanisedSubmitterSentence = humaniseBountyAccessConditions({
+    assignees: permissions.bountyPermissions.submitter,
+    bounty,
+    permissionLevel: 'submitter',
+    roles: roleups
+  });
 
   return (
     <Box>
       <Grid container sx={{ mb: 2 }}>
-        {
-          reviewerUser && (
-            <Grid item xs={12} sx={{ mb: 4, mt: 3 }}>
-              <b>Reviewer</b>
-              <UserDisplay
-                user={reviewerUser}
-              />
+        <Grid container item xs={12} sx={{ mt: 3, mb: 4 }}>
+          <Grid item xs={12}>
+            <Typography variant='h5'>
+              Reviewers
+            </Typography>
+
+            {
+          reviewerNames.roles.length === 0 && reviewerNames.users.length === 0 && (
+            <Typography variant='body2'>
+              There are no reviewers assigned to this bounty yet.
+            </Typography>
+          )
+        }
+
+          </Grid>
+
+          {
+          reviewerNames.users.length > 0 && (
+            <Grid item xs={12} sx={{ mt: 1 }} display='flex'>
+              <Typography sx={{ alignItems: 'center', fontWeight: 'bold', mr: 1 }} display='flex'>
+                Users
+              </Typography>
+              <AvatarGroup max={maxVisibleUsers} onClick={() => setMaxVisibleUsers(maxVisibleUsers + defaultAvatarGroupIncrement)}>
+
+                {
+            reviewerNames.users.map(reviewer => {
+
+              return (
+                <Tooltip key={reviewer.id} title={reviewer.name}>
+                  <Box>
+                    <WorkspaceAvatar name={reviewer.name.slice(0, 2).match('0x') ? reviewer.name.slice(2, 3).toUpperCase() : reviewer.name.slice(0, 1).toUpperCase()} image={reviewer.profilePic as string} />
+                  </Box>
+
+                </Tooltip>
+              );
+            })
+            }
+              </AvatarGroup>
             </Grid>
           )
         }
+
+          {
+          reviewerNames.roles.length > 0 && (
+          <Grid item xs={12} sx={{ mb: 4, mt: 3 }}>
+            <Box display='flex'>
+              <Typography sx={{ alignItems: 'center', fontWeight: 'bold', mr: 1 }} display='flex'>
+                Roles
+              </Typography>
+              {
+              reviewerNames.roles.map(reviewer => {
+                return (
+                  <Chip key={reviewer.id} label={reviewer.name} color='purple' sx={{ mr: 1 }} />
+                );
+              })
+            }
+            </Box>
+
+            <AvatarGroup max={3}>
+
+            </AvatarGroup>
+          </Grid>
+          )
+        }
+        </Grid>
 
         <Grid item xs={8}>
           <Typography variant='h5'>
@@ -139,6 +253,14 @@ export default function BountySubmissions ({ bounty, permissions }: Props) {
             )
           }
         </Grid>
+        {
+          !bounty.approveSubmitters && (
+            <Grid item xs={12}>
+              {humanisedSubmitterSentence.phrase}
+            </Grid>
+          )
+        }
+
       </Grid>
 
       <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>

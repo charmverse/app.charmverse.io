@@ -38,4 +38,6 @@ export interface HumanisedBountyAccessSummary {
   phrase: string
   // Should be empty if the target permission level is accessible to the whole space
   roleNames: string[]
+  // If all workspace members can perform this action, then the number is not provided, only if roles and people are selected
+  totalPeople?: number
 }
