@@ -9,8 +9,10 @@ export async function castVote (vote: UserVoteDTO): Promise<UserVote> {
 
   const userVote = await prisma.userVote.upsert({
     where: {
-      voteId,
-      userId
+      voteId_userId: {
+        voteId,
+        userId
+      }
     },
     create: {
       userId,
