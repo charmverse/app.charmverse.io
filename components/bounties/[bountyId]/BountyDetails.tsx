@@ -19,12 +19,8 @@ export default function BountyDetails () {
   const [bountyPermissions, setBountyPermissions] = useState<AssignedBountyPermissions | null>(null);
 
   useEffect(() => {
-    if (!currentBounty || !bountyPermissions || !bountyPermissions.userPermissions.view) {
-      setPageTitle('Loading');
-    }
-    else {
-      const bountyTitle = currentBounty?.title;
-      setPageTitle(bountyTitle ?? 'Untitled');
+    if (currentBounty) {
+      setPageTitle(currentBounty.title ?? 'Untitled bounty');
     }
 
   }, [currentBounty?.title, bountyPermissions]);
