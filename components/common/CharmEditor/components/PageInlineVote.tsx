@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { Box, Button, Chip, Divider, FormLabel, List, ListItem, Radio, Typography } from '@mui/material';
+import { Box, Button, Chip, Divider, FormLabel, IconButton, List, ListItem, ListItemIcon, ListItemText, Menu, MenuItem, Radio, Typography } from '@mui/material';
 import { Vote, VoteStatus } from '@prisma/client';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
@@ -10,6 +10,9 @@ import { VoteWithUsers } from 'lib/inline-votes/interfaces';
 import { DateTime } from 'luxon';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import { useMemo, useState } from 'react';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import InlineCharmEditor from '../InlineCharmEditor';
 
 interface PageInlineVoteProps {
@@ -75,12 +78,16 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
   }, [inlineVote]);
 
   const inlineVoteDetailModal = usePopupState({ variant: 'popover', popupId: 'inline-votes-detail' });
+  const inlineVoteActionModal = usePopupState({ variant: 'popover', popupId: 'inline-votes-action' });
 
   const voteCountLabel = (
     <Box sx={{
       fontWeight: 'bold',
-      fontSize: 20,
-      mt: 1
+      fontSize: 18,
+      mt: 1,
+      display: 'flex',
+      alignItems: 'center',
+      gap: 0.5
     }}
     >
       <span>Votes</span> <Chip size='small' label={totalVotes} />
@@ -96,9 +103,12 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
   const menuState = bindMenu(popupState);
   return (
     <StyledDiv detailed={detailed}>
-      <Typography variant='h6' fontWeight='bold'>
-        {title}
-      </Typography>
+      <Box display='flex' justifyContent='space-between' alignItems='center'>
+        <Typography variant='h6' fontWeight='bold'>
+          {title}
+        </Typography>
+        <Chip size='small' label={VoteStatusLabelRecord[inlineVote.status]} />
+      </Box>
       <Box display='flex' justifyContent='space-between' mb={1}>
         <Typography
           color='secondary'
@@ -106,14 +116,18 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
         >
           {hasPassedDeadline ? relativeDate : `${relativeDate?.replace('in', '')} left`}
         </Typography>
-        <Chip size='small' label={VoteStatusLabelRecord[inlineVote.status]} />
+        <IconButton size='small' onClick={inlineVoteActionModal.open}>
+          <MoreHorizIcon fontSize='small' />
+        </IconButton>
       </Box>
       <div>{isDescriptionAbove && !detailed ? (
         <span>
           {description.slice(0, 200)}...
           <Typography
+            component='span'
             onClick={inlineVoteDetailModal.open}
             sx={{
+              ml: 0.5,
               cursor: 'pointer',
               '&:hover': {
                 textDecoration: 'underline'
@@ -148,15 +162,7 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
           );
         })}
       </List>
-      <Box display='flex' justifyContent='space-between'>
-        {!detailed && <Button variant='outlined' onClick={inlineVoteDetailModal.open}>View details</Button>}
-        {user?.id === inlineVote.initiatorId && (
-        <Box display='flex' gap={1}>
-          {inlineVote.status === 'InProgress' && <Button onClick={() => cancelVote(inlineVote.id)} variant='outlined' color='secondary'>Cancel</Button>}
-          <Button onClick={() => popupState.open()} variant='outlined' color='error'>Delete</Button>
-        </Box>
-        )}
-      </Box>
+      {!detailed && <Button variant='outlined' onClick={inlineVoteDetailModal.open}>View details</Button>}
       {detailed && voteCountLabel}
       {detailed && (
         <List>
@@ -187,6 +193,21 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
         onConfirm={() => deleteVote(inlineVote.id)}
         question={`Are you sure you want to delete ${inlineVote.title} vote?`}
       />
+      <Menu
+        {...bindMenu(inlineVoteActionModal)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <MenuItem onClick={() => cancelVote(inlineVote.id)}>
+          <DoNotDisturbIcon fontSize='small' sx={{ mr: 1 }} />
+          <ListItemText>Cancel</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={() => popupState.open()}>
+          <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
+          <ListItemText>Delete</ListItemText>
+        </MenuItem>
+      </Menu>
     </StyledDiv>
   );
 }
