@@ -3,7 +3,7 @@ import { useEditorViewContext } from '@bangle.dev/react';
 import { hideSelectionTooltip } from '@bangle.dev/tooltip/selection-tooltip';
 import AddCircle from '@mui/icons-material/AddCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { ClickAwayListener, FormControlLabel, IconButton, List, ListItem, Radio, RadioGroup, TextField, Typography } from '@mui/material';
+import { ClickAwayListener, FormControlLabel, IconButton, ListItem, Radio, RadioGroup, TextField, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import Button from 'components/common/Button';
@@ -12,10 +12,8 @@ import { useInlineVotes } from 'hooks/useInlineVotes';
 import { usePages } from 'hooks/usePages';
 import { DateTime } from 'luxon';
 import { PageContent } from 'models';
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
-import { v4 } from 'uuid';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import InlineCharmEditor from '../../InlineCharmEditor';
-import { checkForEmpty } from '../../utils';
 import { updateInlineVote } from './inlineVote.utils';
 
 type VoteType = 'default' | 'custom';
@@ -38,12 +36,25 @@ function InlineVoteOptions (
   }:
   InlineVoteOptionsProps
 ) {
+  const optionNames = options.map(option => option.name);
   return (
     <div>
+      <FieldLabel>Options (Pass threshold)</FieldLabel>
+      {/* <Box sx={{ display: 'flex' }}>
+        <FieldLabel sx={{
+          width: 300
+        }}
+        >Options
+        </FieldLabel>
+        <FieldLabel>Threshold</FieldLabel>
+      </Box> */}
       {options.map((option, index) => (
         <ListItem sx={{ px: 0, pt: 0, display: 'flex', gap: 0.5 }}>
           <TextField
-            error={option.name.length === 0}
+            sx={{
+              width: 300
+            }}
+            error={option.name.length === 0 || ([...optionNames.slice(0, index), optionNames.slice(index + 1)].includes(option.name))}
             // Disable changing text for No change option
             disabled={disableTextFields || index === 2}
             fullWidth
@@ -93,7 +104,7 @@ function InlineVoteOptions (
           onClick={() => {
             setOptions([...options, {
               name: '',
-              passThreshold: 0.5
+              passThreshold: 50
             }]);
           }}
         >
@@ -111,42 +122,34 @@ function InlineVoteOptions (
 export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
   const view = useEditorViewContext();
   const [voteTitle, setVoteTitle] = useState('');
-  const [voteDescription, setVoteDescription] = useState<PageContent>({
-    type: 'doc',
-    content: [
-      {
-        type: 'paragraph'
-      }
-    ]
-  });
+  const [voteDescription, setVoteDescription] = useState('');
   const [voteType, setVoteType] = useState<VoteType>('default');
   const [options, setOptions] = useState<{ name: string, passThreshold: number }[]>([]);
   const { createVote } = useInlineVotes();
 
   useEffect(() => {
     if (voteType === 'custom') {
-
       setOptions([{
         name: 'Option 1',
-        passThreshold: 0.5
+        passThreshold: 50
       }, {
         name: 'Option 2',
-        passThreshold: 0.5
+        passThreshold: 50
       }, {
         name: 'No change',
-        passThreshold: 0.5
+        passThreshold: 50
       }]);
     }
     else if (voteType === 'default') {
       setOptions([{
         name: 'Yes',
-        passThreshold: 0.5
+        passThreshold: 50
       }, {
         name: 'No',
-        passThreshold: 0.5
+        passThreshold: 50
       }, {
         name: 'Abstain',
-        passThreshold: 0.5
+        passThreshold: 50
       }]);
     }
   }, [voteType]);
@@ -160,7 +163,8 @@ export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
       deadline: deadline.toJSDate(),
       options,
       title: voteTitle,
-      description: voteDescription
+      description: voteDescription,
+      pageId: cardId ?? currentPageId
     });
 
     updateInlineVote(vote.id)(view.state, view.dispatch);
@@ -189,6 +193,7 @@ export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
         <Box flexDirection='column' display='flex'>
           <FieldLabel>Title</FieldLabel>
           <TextField
+            error={voteTitle.length === 0}
             placeholder="What's the vote?"
             value={voteTitle}
             onChange={(e) => {
@@ -196,16 +201,14 @@ export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
             }}
           />
         </Box>
-        <Box flexGrow={1}>
-          <InlineCharmEditor
-            content={voteDescription}
-            style={{
-              fontSize: '14px',
-              backgroundColor: 'var(--input-bg)'
-            }}
-            placeholderText='Details (Optional)'
-            onContentChange={({ doc }) => {
-              setVoteDescription(doc);
+
+        <Box flexDirection='column' display='flex'>
+          <FieldLabel>Description</FieldLabel>
+          <TextField
+            placeholder='Details (Optional)'
+            value={voteDescription}
+            onChange={(e) => {
+              setVoteDescription(e.target.value);
             }}
           />
         </Box>

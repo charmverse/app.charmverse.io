@@ -55,9 +55,10 @@ function PageInlineVoteOption ({ isDisabled, option, voteId, checked, percentage
   );
 }
 
+const MAX_DESCRIPTION_LENGTH = 200;
+
 export default function PageInlineVote ({ detailed = false, inlineVote }: PageInlineVoteProps) {
   const { deadline, description, title, userVotes, options, id } = inlineVote;
-  const [showingDescription, setShowingDescription] = useState(false);
   const totalVotes = userVotes.length;
   const [user] = useUser();
   const { cancelVote, deleteVote } = useInlineVotes();
@@ -90,16 +91,15 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
 
   const hasPassedDeadline = deadline.getTime() < Date.now();
   const relativeDate = DateTime.fromJSDate(new Date(deadline)).toRelative({ base: (DateTime.now()) });
-
+  const isDescriptionAbove = description.length > MAX_DESCRIPTION_LENGTH;
   const popupState = usePopupState({ variant: 'popover', popupId: 'delete-inline-vote' });
   const menuState = bindMenu(popupState);
-
   return (
     <StyledDiv detailed={detailed}>
       <Typography variant='h6' fontWeight='bold'>
         {title}
       </Typography>
-      <Box display='flex' justifyContent='space-between'>
+      <Box display='flex' justifyContent='space-between' mb={1}>
         <Typography
           color='secondary'
           variant='subtitle1'
@@ -108,22 +108,24 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
         </Typography>
         <Chip size='small' label={VoteStatusLabelRecord[inlineVote.status]} />
       </Box>
-      <Box mt={1} display='flex' justifyContent='space-between' alignItems='center'>
-        <Typography variant='h6' fontWeight='bold'>
-          Description
-        </Typography>
-        <Button size='small' variant='outlined' onClick={() => setShowingDescription((_showingDescription) => !_showingDescription)}>{!showingDescription ? 'Show' : 'Hide'}</Button>
-      </Box>
-      {showingDescription && (
-        <InlineCharmEditor
-          key={id}
-          content={description}
-          readOnly={true}
-          style={{
-            padding: 0
-          }}
-        />
-      )}
+      <div>{isDescriptionAbove && !detailed ? (
+        <span>
+          {description.slice(0, 200)}...
+          <Typography
+            onClick={inlineVoteDetailModal.open}
+            sx={{
+              cursor: 'pointer',
+              '&:hover': {
+                textDecoration: 'underline'
+              }
+            }}
+            variant='subtitle1'
+            fontWeight='bold'
+          >(More)
+          </Typography>
+        </span>
+      ) : description}
+      </div>
       {!detailed && voteCountLabel}
       <List sx={{
         display: 'flex',
