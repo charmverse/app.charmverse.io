@@ -2,12 +2,13 @@ import styled from '@emotion/styled';
 import { Box, Button, Chip, Divider, FormLabel, List, ListItem, Radio, Typography } from '@mui/material';
 import { Vote, VoteStatus } from '@prisma/client';
 import Modal from 'components/common/Modal';
+import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import UserDisplay from 'components/common/UserDisplay';
 import { useInlineVotes } from 'hooks/useInlineVotes';
 import { useUser } from 'hooks/useUser';
 import { VoteWithUsers } from 'lib/inline-votes/interfaces';
 import { DateTime } from 'luxon';
-import { usePopupState } from 'material-ui-popup-state/hooks';
+import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import { useMemo, useState } from 'react';
 import InlineCharmEditor from '../InlineCharmEditor';
 
@@ -59,7 +60,7 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
   const [showingDescription, setShowingDescription] = useState(false);
   const totalVotes = userVotes.length;
   const [user] = useUser();
-  const { cancelVote, deleteVote, castVote } = useInlineVotes();
+  const { cancelVote, deleteVote } = useInlineVotes();
   const voteFrequencyRecord: Record<string, number> = useMemo(() => {
     return userVotes.reduce<Record<string, number>>((currentRecord, userVote) => {
       if (!currentRecord[userVote.choice]) {
@@ -89,6 +90,9 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
 
   const hasPassedDeadline = deadline.getTime() < Date.now();
   const relativeDate = DateTime.fromJSDate(new Date(deadline)).toRelative({ base: (DateTime.now()) });
+
+  const popupState = usePopupState({ variant: 'popover', popupId: 'delete-inline-vote' });
+  const menuState = bindMenu(popupState);
 
   return (
     <StyledDiv detailed={detailed}>
@@ -147,7 +151,7 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
         {user?.id === inlineVote.initiatorId && (
         <Box display='flex' gap={1}>
           {inlineVote.status === 'InProgress' && <Button onClick={() => cancelVote(inlineVote.id)} variant='outlined' color='secondary'>Cancel</Button>}
-          <Button onClick={() => deleteVote(inlineVote.id)} variant='outlined' color='error'>Delete</Button>
+          <Button onClick={() => popupState.open()} variant='outlined' color='error'>Delete</Button>
         </Box>
         )}
       </Box>
@@ -173,6 +177,14 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
       <Modal title='Vote details' size='large' open={inlineVoteDetailModal.isOpen} onClose={inlineVoteDetailModal.close}>
         <PageInlineVote inlineVote={inlineVote} detailed />
       </Modal>
+      <ConfirmDeleteModal
+        title='Delete vote'
+        onClose={popupState.close}
+        open={menuState.open}
+        buttonText={`Delete ${inlineVote.title}`}
+        onConfirm={() => deleteVote(inlineVote.id)}
+        question={`Are you sure you want to delete ${inlineVote.title} vote?`}
+      />
     </StyledDiv>
   );
 }
