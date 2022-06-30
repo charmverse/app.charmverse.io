@@ -15,13 +15,6 @@ import nc, { NextHandler } from 'next-connect';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
-  .use((req: NextApiRequest, res: NextApiResponse, next: NextHandler) => {
-    const bountyId = req.query.id;
-    if (!bountyId) {
-      return res.status(400).send({ error: 'Please provide a valid bountyId' });
-    }
-    next();
-  })
   .get(getBountyController)
   .put(updateBounty)
   .delete(deleteBounty);
@@ -29,20 +22,25 @@ handler.use(requireUser)
 async function getBountyController (req: NextApiRequest, res: NextApiResponse<BountyWithDetails>) {
   const { id } = req.query;
 
-  const bounty = await prisma.bounty.findUnique({
-    where: {
-      id: id as string
-    },
-    include: {
-      applications: true
-    }
-  });
+  const bounty = await getBounty(id as string);
+
+  const bountyNotFoundError = new DataNotFoundError(`Bounty with id ${id} not found.`);
 
   if (!bounty) {
-    return res.status(421).send({ error: 'Bounty not found' } as any);
+    throw bountyNotFoundError;
   }
 
-  res.status(200).json(bounty as any as BountyWithDetails);
+  const permissions = await computeBountyPermissions({
+    allowAdminBypass: true,
+    resourceId: bounty.id,
+    userId: req.session.user.id
+  });
+
+  if (!permissions.view) {
+    throw bountyNotFoundError;
+  }
+
+  res.status(200).json(bounty);
 
 }
 

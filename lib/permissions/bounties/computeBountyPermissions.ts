@@ -18,6 +18,11 @@ export async function computeBountyPermissions ({
   const bounty = await prisma.bounty.findUnique({
     where: {
       id: resourceId
+    },
+    select: {
+      id: true,
+      spaceId: true,
+      createdBy: true
     }
   });
 
