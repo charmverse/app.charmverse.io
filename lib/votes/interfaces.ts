@@ -20,8 +20,6 @@ export interface UpdateVoteDTO {
 
 export interface UserVoteDTO {
     choice: string,
-    userId: string,
-    voteId: string
 }
 
 export interface ExtendedVote extends Vote {

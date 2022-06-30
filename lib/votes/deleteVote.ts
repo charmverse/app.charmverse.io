@@ -1,7 +1,6 @@
 import { Vote } from '@prisma/client';
 import log from 'lib/log';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { DataNotFoundError } from 'lib/utilities/errors';
 import { prisma } from 'db';
 import { getVote } from './getVote';
 

@@ -57,7 +57,7 @@ export async function createVote (vote: VoteDTO): Promise<Vote> {
       },
       voteOptions: {
         create: voteOptions.map(option => ({
-          name: option.name
+          name: option
         }))
       }
     },

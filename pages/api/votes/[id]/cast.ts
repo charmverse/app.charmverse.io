@@ -14,14 +14,11 @@ handler
   .post(castVote);
 
 async function castVote (req: NextApiRequest, res: NextApiResponse<UserVote | { error: any }>) {
-  const userVote = req.body as UserVoteDTO;
+  const { choice } = req.body as UserVoteDTO;
   const voteId = req.query.id as string;
+  const userId = req.session.user.id;
 
-  const newUserVote: UserVote = await castVoteService({
-    ...userVote,
-    voteId,
-    userId: req.session.user.id
-  });
+  const newUserVote: UserVote = await castVoteService(choice, voteId, userId);
 
   return res.status(200).json(newUserVote);
 }
