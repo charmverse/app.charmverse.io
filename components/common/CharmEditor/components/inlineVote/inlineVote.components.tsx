@@ -75,53 +75,54 @@ function InlineVoteOptions (
   }:
   InlineVoteOptionsProps
 ) {
-  const optionNames = options.map(option => option.name);
   return (
     <div>
       <FieldLabel>Options</FieldLabel>
-      {options.map((option, index) => (
-        <ListItem sx={{ px: 0, pt: 0, display: 'flex', gap: 0.5 }}>
-          <TextField
-            error={option.name.length === 0 || ([...optionNames.slice(0, index), optionNames.slice(index + 1)].includes(option.name))}
-            // Disable changing text for No change option
-            disabled={disableTextFields || index === 2}
-            fullWidth
-            placeholder={`Option ${index + 1}`}
-            value={option.name}
-            onChange={(e) => {
-              options[index] = {
-                name: e.target.value
-              };
-              setOptions([...options]);
-            }}
-          />
-          <IconButton
-            disabled={disableDelete || options.length === 2 || (index <= 2)}
-            size='small'
-            onClick={() => {
-              setOptions([...options.slice(0, index), ...options.slice(index + 1)]);
-            }}
-          >
-            <DeleteIcon fontSize='small' />
-          </IconButton>
-        </ListItem>
-      ))}
+      {options.map((option, index) => {
+        return (
+          <ListItem sx={{ px: 0, pt: 0, display: 'flex', gap: 0.5 }}>
+            <TextField
+              error={option.name.length === 0 || Boolean(options.find((_option, _index) => _index !== index && _option.name === option.name))}
+              // Disable changing text for No change option
+              disabled={disableTextFields || index === 2}
+              fullWidth
+              placeholder={`Option ${index + 1}`}
+              value={option.name}
+              onChange={(e) => {
+                options[index] = {
+                  name: e.target.value
+                };
+                setOptions([...options]);
+              }}
+            />
+            <IconButton
+              disabled={disableDelete || options.length === 2 || (index <= 2)}
+              size='small'
+              onClick={() => {
+                setOptions([...options.slice(0, index), ...options.slice(index + 1)]);
+              }}
+            >
+              <DeleteIcon fontSize='small' />
+            </IconButton>
+          </ListItem>
+        );
+      })}
       {!disableAddOption && (
-      <Box display='flex' gap={0.5} alignItems='center'>
-        <IconButton
-          size='small'
-          onClick={() => {
-            setOptions([...options, {
-              name: ''
-            }]);
-          }}
-        >
-          <AddCircle fontSize='small' />
-        </IconButton>
+      <Button
+        variant='outlined'
+        color='secondary'
+        size='small'
+        onClick={() => {
+          setOptions([...options, {
+            name: ''
+          }]);
+        }}
+      >
+        <AddCircle fontSize='small' sx={{ mr: 1 }} />
         <Typography variant='subtitle1'>
           Add Option
         </Typography>
-      </Box>
+      </Button>
       )}
     </div>
   );
