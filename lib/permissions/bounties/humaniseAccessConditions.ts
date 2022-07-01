@@ -89,17 +89,17 @@ export function humaniseBountyAccessConditions ({
       }
       // Bounty requires applications
       else if (!hasSpacePermission && bounty.approveSubmitters && assignedRoleNames.length === 1) {
-        result.phrase = `Applications to this bounty are reserved to the ${totalSubmitters} workspace members with the ${upperCaseFirstCharacter(assignedRoleNames[0])} role.`;
+        result.phrase = `Applications to this bounty are reserved to the ${totalSubmitters} workspace member${totalSubmitters > 1 ? 's' : ''} with the ${upperCaseFirstCharacter(assignedRoleNames[0])} role.`;
       }
       else if (!hasSpacePermission && bounty.approveSubmitters && assignedRoleNames.length > 1) {
-        result.phrase = `Applications to this bounty are reserved to the ${totalSubmitters} workspace members with ${humanisedRoleNames} roles.`;
+        result.phrase = `Applications to this bounty are reserved to the ${totalSubmitters} workspace member${totalSubmitters > 1 ? 's' : ''} with ${humanisedRoleNames} roles.`;
       }
       // Bounty is open to submitters
       else if (!hasSpacePermission && !bounty.approveSubmitters && assignedRoleNames.length === 1) {
-        result.phrase = `Submissions to this bounty are reserved to the ${totalSubmitters} workspace members with the ${upperCaseFirstCharacter(assignedRoleNames[0])} role.`;
+        result.phrase = `Submissions to this bounty are reserved to the ${totalSubmitters} workspace member${totalSubmitters > 1 ? 's' : ''} with the ${upperCaseFirstCharacter(assignedRoleNames[0])} role.`;
       }
       else if (!hasSpacePermission && !bounty.approveSubmitters && assignedRoleNames.length > 1) {
-        result.phrase = `Submissions to this bounty are reserved to the ${totalSubmitters} workspace members with ${humanisedRoleNames} roles.`;
+        result.phrase = `Submissions to this bounty are reserved to the ${totalSubmitters} workspace member${totalSubmitters > 1 ? 's' : ''} with ${humanisedRoleNames} roles.`;
       }
       break;
 

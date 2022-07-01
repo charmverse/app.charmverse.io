@@ -140,7 +140,7 @@ export function BountyApplicantList ({
                   )
                 }
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={12} sx={{ mt: 2 }}>
             {humanisedSubmitterSentence.phrase}
           </Grid>
         </Grid>

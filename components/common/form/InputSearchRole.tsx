@@ -30,8 +30,8 @@ function filterRoles (roles: ReducedRole [], filter: IRolesFilter): ReducedRole 
 }
 
 function InputSearchRoleBase ({
-  defaultValue, disableCloseOnSelect = false, filter, placeholder, ...props
-}: Partial<ComponentProps<typeof Autocomplete>> & {filter?: IRolesFilter}) {
+  defaultValue, disableCloseOnSelect = false, filter, showWarningOnNoRoles = false, placeholder, ...props
+}: Partial<ComponentProps<typeof Autocomplete>> & {filter?: IRolesFilter} & {showWarningOnNoRoles?: boolean}) {
   const { roles } = useRoles();
   const [space] = useCurrentSpace();
 
@@ -41,7 +41,7 @@ function InputSearchRoleBase ({
 
   const filteredRoles = (!!filter && !!roles) ? filterRoles(roles as any, filter as IRolesFilter) : roles ?? [];
 
-  if (roles?.length === 0) {
+  if (roles?.length === 0 && showWarningOnNoRoles) {
     return (
       <Alert severity='warning'>
         There are no roles in this space. Workspace admins can create roles in the <Link external={false} sx={{ fontWeight: 'bold' }} href={`/${space?.domain}/settings/roles`}>workspace settings page</Link>.
@@ -55,7 +55,7 @@ function InputSearchRoleBase ({
       loading={!roles}
       sx={{ minWidth: 150 }}
       disableCloseOnSelect={disableCloseOnSelect}
-      placeholder={filteredRoles.length > 0 ? placeholder : ''}
+      placeholder={(filteredRoles.length > 0 || roles?.length === 0) ? placeholder : ''}
       noOptionsText='No options available'
       // @ts-ignore - not sure why this fails
       options={
@@ -72,7 +72,7 @@ function InputSearchRoleBase ({
       renderInput={(params) => (
         <TextField
           {...params}
-          placeholder={filteredRoles.length > 0 ? placeholder : ''}
+          placeholder={(filteredRoles.length > 0 || roles?.length === 0) ? placeholder : ''}
           inputProps={{
             ...params.inputProps
           }}
@@ -86,6 +86,7 @@ function InputSearchRoleBase ({
 interface IInputSearchRoleProps {
   onChange: (id: string) => void
   defaultValue?: string
+  showWarningOnNoRoles?: boolean
 }
 
 export function InputSearchRole (props: IInputSearchRoleProps) {
@@ -103,9 +104,12 @@ interface IInputSearchRoleMultipleProps {
   defaultValue?: string[]
   filter?: IRolesFilter
   disableCloseOnSelect?: boolean
+  showWarningOnNoRoles?: boolean
 }
 
-export function InputSearchRoleMultiple ({ onChange, filter, defaultValue, disableCloseOnSelect, ...props }: IInputSearchRoleMultipleProps) {
+export function InputSearchRoleMultiple ({
+  onChange, filter, defaultValue, showWarningOnNoRoles, disableCloseOnSelect, ...props
+}: IInputSearchRoleMultipleProps) {
 
   function emitValue (roles: ReducedRole[]) {
     onChange(roles.map(role => role.id));
@@ -121,6 +125,7 @@ export function InputSearchRoleMultiple ({ onChange, filter, defaultValue, disab
   return (
     <InputSearchRoleBase
       {...props}
+      showWarningOnNoRoles={showWarningOnNoRoles}
       disableCloseOnSelect={disableCloseOnSelect}
       onChange={(e, value) => emitValue(value as ReducedRole[])}
       multiple

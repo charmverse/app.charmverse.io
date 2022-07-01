@@ -186,6 +186,10 @@ export default function BountySubmissions ({ bounty, permissions }: Props) {
     roles: roleups
   });
 
+  const canCreateSubmission = !userSubmission && !capReached && permissions?.userPermissions.work;
+
+  const newSubmissionTooltip = !permissions?.userPermissions.work ? 'You do not have the correct role to submit work to this bounty' : (capReached ? 'The submissions cap has been reached. This bounty is closed to new submissions.' : 'Create a new submission to this bounty.');
+
   return (
     <Box>
       <Grid container sx={{ mb: 2 }}>
@@ -266,10 +270,10 @@ export default function BountySubmissions ({ bounty, permissions }: Props) {
         <Grid container item xs={4} direction='row' justifyContent='flex-end'>
           {
             !bounty.approveSubmitters && !userSubmission && (
-            <Tooltip placement='top' title={capReached ? `You cannot make a new submission to this bounty. The cap of ${bounty.maxSubmissions} submission${bounty.maxSubmissions !== 1 ? 's' : ''} has been reached.` : 'Submit your work to this bounty'}>
+            <Tooltip placement='top' title={newSubmissionTooltip}>
               <Box component='span'>
                 <Button
-                  disabled={!!userSubmission}
+                  disabled={!canCreateSubmission}
                   onClick={editSubmissionModal.open}
                 >
                   New
@@ -281,7 +285,7 @@ export default function BountySubmissions ({ bounty, permissions }: Props) {
         </Grid>
         {
           !bounty.approveSubmitters && (
-            <Grid item xs={12}>
+            <Grid item xs={12} sx={{ mt: 2 }}>
               {humanisedSubmitterSentence.phrase}
             </Grid>
           )
