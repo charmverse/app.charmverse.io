@@ -22,7 +22,6 @@ export class NodeViewWrapper extends React.Component<PropsType, StateType> {
 
   constructor(props: PropsType) {
     super(props);
-
     this.update = () => {
       this.setState((_state, props) => ({
         nodeViewProps: props.nodeView.getNodeViewProps(),
