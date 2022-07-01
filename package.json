@@ -31,7 +31,7 @@
     "db-tool": "dotenv -e .env.production -- npx prisma studio",
     "db-tool:dev": "dotenv -e .env.local -- npx prisma studio",
     "db-tool:test": "dotenv -e .env.test.local -- npx prisma studio",
-    "test:setup-db": "./testing/configure-db.sh",
+    "test:setup-db": "./scripts/configure-db.sh",
     "test:browser": "npm run test-setup && jest --config='./jest.config-client.ts'",
     "test": "npm run test:ci -- --verbose --watch",
     "test:ci": "dotenv -e .env.test.local --override -- npx jest --config='./jest.config.ts'",
