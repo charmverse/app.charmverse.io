@@ -32,9 +32,10 @@ type BooleanField = boolean | undefined;
 interface Props extends Omit<AutocompleteProps<Contributor, BooleanField, BooleanField, BooleanField>, 'options' | 'renderInput'> {
   filter?: IContributorsFilter;
   options: Contributor[];
+  disableCloseOnSelect?: boolean
 }
 
-function InputSearchContributorBase ({ filter, options, placeholder, ...props }: Props) {
+function InputSearchContributorBase ({ filter, options, disableCloseOnSelect, placeholder, ...props }: Props) {
 
   const { chainId } = useWeb3React<Web3Provider>();
 
@@ -45,9 +46,11 @@ function InputSearchContributorBase ({ filter, options, placeholder, ...props }:
   return (
     <Autocomplete
       {...props}
-      disabled={filteredOptions.length === 0}
+      disabled={options.length === 0}
+      disableCloseOnSelect={disableCloseOnSelect}
       loading={options.length === 0}
       sx={{ minWidth: 150 }}
+      placeholder={filteredOptions.length > 0 ? placeholder : ''}
       // @ts-ignore - not sure why this fails
       options={filteredOptions}
       autoHighlight
@@ -59,10 +62,11 @@ function InputSearchContributorBase ({ filter, options, placeholder, ...props }:
           user={user}
         />
       )}
+      noOptionsText='No options available'
       renderInput={(params) => (
         <TextField
           {...params}
-          placeholder={placeholder}
+          placeholder={filteredOptions.length > 0 ? placeholder : ''}
           size='small'
           inputProps={{
             ...params.inputProps
@@ -115,9 +119,10 @@ interface IInputSearchContributorMultipleProps {
   onChange: (id: string[]) => void
   defaultValue?: string[]
   filter?: IContributorsFilter
+  disableCloseOnSelect?: boolean
 }
 
-export function InputSearchContributorMultiple ({ onChange, defaultValue, ...props }: IInputSearchContributorMultipleProps) {
+export function InputSearchContributorMultiple ({ onChange, disableCloseOnSelect, defaultValue, ...props }: IInputSearchContributorMultipleProps) {
 
   const [contributors] = useContributors();
   const [value, setValue] = useState<Contributor[]>([]);
@@ -143,6 +148,7 @@ export function InputSearchContributorMultiple ({ onChange, defaultValue, ...pro
       options={contributors}
       placeholder='Select users'
       value={value}
+      disableCloseOnSelect={disableCloseOnSelect}
       onChange={(e, _value) => emitValue(_value as Contributor[])}
       {...props}
     />
@@ -152,7 +158,7 @@ export function InputSearchContributorMultiple ({ onChange, defaultValue, ...pro
 export function ReviewerOption ({ user, avatarSize, fontSize, fontWeight, ...props }: { fontSize?: string | number, fontWeight?: number | string, user: Omit<User, 'addresses'>, avatarSize?: 'small' | 'medium' } & HTMLAttributes<HTMLLIElement> & {component?: ElementType} & BoxProps) {
   return (
     <Box display='flex' gap={1} {...props} component={props.component ?? 'li'}>
-      <Avatar size={avatarSize} name={user.username} avatar={user.avatar} />
+      <Avatar size={avatarSize} name={user.username as string} avatar={user.avatar} />
       <Typography fontSize={fontSize} fontWeight={fontWeight}>{user.username}</Typography>
     </Box>
   );

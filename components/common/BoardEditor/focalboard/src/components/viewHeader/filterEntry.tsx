@@ -1,7 +1,8 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import React from 'react'
-import {FormattedMessage, useIntl} from 'react-intl'
+import { useIntl} from 'react-intl'
+import DeleteIcon from '@mui/icons-material/DeleteOutlined'
 
 import {FilterClause, areEqual as areFilterClausesEqual} from '../../blocks/filterClause'
 import {createFilterGroup, isAFilterGroupInstance} from '../../blocks/filterGroup'
@@ -24,7 +25,7 @@ type Props = {
     filter: FilterClause
 }
 
-const FilterEntry = React.memo((props: Props): JSX.Element => {
+const FilterEntry = (props: Props): JSX.Element => {
     const {board, view, filter} = props
     const intl = useIntl()
 
@@ -56,7 +57,8 @@ const FilterEntry = React.memo((props: Props): JSX.Element => {
                                     mutator.changeViewFilter(view.id, view.fields.filter, filterGroup)
                                 }
                             }}
-                        />))}
+                        />
+                    ))}
                 </Menu>
             </MenuWrapper>
             <MenuWrapper>
@@ -98,13 +100,10 @@ const FilterEntry = React.memo((props: Props): JSX.Element => {
                     mutator.changeViewFilter(view.id, view.fields.filter, filterGroup)
                 }}
             >
-                <FormattedMessage
-                    id='FilterComponent.delete'
-                    defaultMessage='Delete'
-                />
+                <DeleteIcon fontSize='small' />
             </Button>
         </div>
     )
-})
+}
 
-export default FilterEntry
+export default React.memo(FilterEntry)

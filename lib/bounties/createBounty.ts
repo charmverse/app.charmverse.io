@@ -1,5 +1,6 @@
 import { Bounty, BountyStatus, Prisma } from '@prisma/client';
 import { prisma } from 'db';
+import { setBountyPermissions } from 'lib/permissions/bounties';
 import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
 import { BountyCreationData } from './interfaces';
 
@@ -16,7 +17,8 @@ export async function createBounty ({
   maxSubmissions,
   rewardAmount = 0,
   rewardToken = 'ETH',
-  reviewer
+  reviewer,
+  permissions
 }: BountyCreationData): Promise<Bounty> {
 
   const validCreationStatuses: BountyStatus[] = ['suggestion', 'open'];
@@ -63,8 +65,17 @@ export async function createBounty ({
     bountyCreateInput.suggestedBy = createdBy;
   }
 
-  return prisma.bounty.create({
+  const bounty = await prisma.bounty.create({
     data: bountyCreateInput
   });
+
+  if (permissions) {
+    await setBountyPermissions({
+      bountyId: bounty.id,
+      permissionsToAssign: permissions
+    });
+  }
+
+  return bounty;
 
 }

@@ -58,6 +58,7 @@ model Space {
   apiToken                   SpaceApiToken?
   threads                    Thread[]
   comments                   Comment[]
+  votes                      Vote[]
   // Public page settings
   permissionConfigurationMode SpacePermissionConfigurationMode? @default(custom)
   defaultPagePermissionGroup PagePermissionLevel? @default(full_access)
@@ -66,6 +67,7 @@ model Space {
   permittedGroups            SpacePermission[]    @relation(name: "permittedGroups")
   // Space permissions this space has (for itself or other spaces => Currently we only allow space level permissions for same space)
   spacePermissions   SpacePermission[] @relation(name: "spacePermissions")
+  bountyPermissions BountyPermission[]
 
 }
 
@@ -95,7 +97,7 @@ model Page {
   icon               String?
   path               String
   parentId           String?          @db.Uuid
-  spaceId            String?          @db.Uuid
+  spaceId            String           @db.Uuid
   space              Space?           @relation(fields: [spaceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   type               PageType
   boardId            String?          @db.Uuid
@@ -106,6 +108,7 @@ model Page {
   card               Block?           @relation(fields: [cardId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   threads            Thread[]
   comments           Comment[]
+  votes              Vote[]
   snapshotProposalId String?
   fullWidth          Boolean?         @default(false)
 }
@@ -135,6 +138,51 @@ enum IdentityType {
   Discord
   Telegram
   RandomName
+}
+
+model UserVote {
+  voteId      String    @db.Uuid
+  vote        Vote      @relation(fields: [voteId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId      String    @db.Uuid
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now())
+  choice      String
+
+  @@unique([voteId, userId])
+}
+
+enum VoteStatus {
+  InProgress
+  Passed
+  Rejected
+  Cancelled
+}
+
+model VoteOptions {
+  name        String
+  voteId      String    @db.Uuid
+  vote        Vote      @relation(fields: [voteId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([voteId, name])
+}
+
+model Vote {
+  id            String          @id @default(uuid()) @db.Uuid
+  pageId        String          @db.Uuid
+  page          Page            @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  spaceId       String          @db.Uuid
+  space         Space           @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  author        User            @relation(fields: [createdBy], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdBy     String          @db.Uuid
+  title         String
+  threshold     Int
+  description   String?
+  deadline      DateTime
+  status        VoteStatus
+  createdAt     DateTime        @default(now())
+  userVotes     UserVote[]
+  voteOptions   VoteOptions[]
 }
 
 model User {
@@ -167,6 +215,9 @@ model User {
   notificationState UserNotificationState?
   UserNotification  UserNotification[]
   spacePermissions  SpacePermission[]
+  bountyPermissions BountyPermission[]
+  userVotes         UserVote[]
+  initiatedVotes    Vote[]
 }
 
 model UserNotificationState {
@@ -263,6 +314,10 @@ model InviteLink {
   useCount      Int      @default(0)
 }
 
+
+
+
+
 enum BountyStatus {
   suggestion
   open
@@ -292,7 +347,54 @@ model Bounty {
   approveSubmitters Boolean       @default(false)
   maxSubmissions    Int?          @default(1)
   applications      Application[]
+  permissions       BountyPermission[]
 }
+
+// Not currently used at database level. Defined here so we have a single source of truth
+enum BountyOperation {
+  work
+  review
+  view
+  edit
+  delete
+  lock
+  approve_applications
+  grant_permissions
+}
+
+
+enum BountyPermissionLevel {
+  reviewer
+  creator
+  submitter
+  viewer
+}
+
+
+model BountyPermission {
+  id                      String              @id @default(uuid()) @db.Uuid
+  // Ways a permission can be accessed (pick one)
+  userId                  String?             @db.Uuid
+  user                    User?               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  spaceId                 String?             @db.Uuid
+  space                   Space?              @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  roleId                  String?             @db.Uuid
+  role                    Role?               @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  // Should be only null or true
+  public                  Boolean?
+  bountyId                String              @db.Uuid
+  bounty                  Bounty              @relation(fields: [bountyId], references: [id], onDelete: Cascade)
+  permissionLevel         BountyPermissionLevel
+  // For now, our implementation only needs permissionLevel. Adding this reference so the enum is not dropped by Prisma client
+  operations              BountyOperation[]   
+
+  @@unique([userId, bountyId, permissionLevel], name: "userId_bountyId_permissionLevel")
+  @@unique([roleId, bountyId, permissionLevel], name: "roleId_bountyId_permissionLevel")
+  @@unique([spaceId, bountyId, permissionLevel], name: "spaceId_bountyId_permissionLevel")
+  @@unique([public, bountyId, permissionLevel], name: "public_bountyId_permissionLevel")
+}
+
+
 
 enum ApplicationStatus {
   applied
@@ -317,6 +419,8 @@ model Application {
   message         String?
   submission      String?
   submissionNodes String?
+  acceptedBy      String?           @db.Uuid() // Reviewer who accepted the application
+  reviewedBy      String?           @db.Uuid() // Reviewer who reviewed the final submission
   transactions    Transaction[]
 
   @@unique([bountyId, createdBy])
@@ -399,6 +503,7 @@ model Role {
   source           RoleSource?
   sourceId         String?
   spacePermissions  SpacePermission[]
+  bountyPermissions BountyPermission[]
 
   TokenGateToRole TokenGateToRole[]
   @@unique([spaceId, name])

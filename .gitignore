@@ -16,6 +16,8 @@
 .env.production
 tsconfig.tsbuildinfo
 
+./pages/api/script/*
+
 # cdk
 cdk.out
 cdk.context.json

@@ -12,10 +12,12 @@ import Modal from 'components/common/Modal';
 import CancelIcon from '@mui/icons-material/Cancel';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { humanFriendlyDate } from 'lib/utilities/dates';
+import { useUser } from 'hooks/useUser';
+import { LoggedInUser } from 'models';
 import useTasksState from '../hooks/useTasksState';
 
 export default function SnoozeButton () {
-
+  const [, setUser] = useUser();
   const { isLoading, snoozedForDate, snoozedMessage, mutate: mutateTasks } = useTasksState();
 
   const isSnoozed = snoozedForDate !== null;
@@ -62,6 +64,13 @@ export default function SnoozeButton () {
       snoozeFor: null,
       snoozeMessage: null
     });
+    setUser((user: LoggedInUser) => ({
+      ...user,
+      notificationState: {
+        snoozedUntil: null,
+        snoozeMessage: null
+      }
+    }));
     await mutateTasks();
     setShowLoading(false);
   }
@@ -95,6 +104,11 @@ export default function SnoozeButton () {
       snoozeFor: newSnoozedForDate.toJSDate(),
       snoozeMessage: _snoozeMessage
     });
+    setUser((user: LoggedInUser) => ({ ...user,
+      notificationState: {
+        snoozedUntil: newSnoozedForDate.toString(),
+        snoozeMessage: _snoozeMessage
+      } }));
     await mutateTasks();
     setShowLoading(false);
   }

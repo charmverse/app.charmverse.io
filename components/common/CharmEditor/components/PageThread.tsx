@@ -319,6 +319,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
             <ThreadCommentListItem
               key={comment.id}
               highlighted={(editedCommentId === comment.id).toString()}
+              id={`comment.${comment.id}`}
             >
               <Box display='flex' width='100%' alignItems='center' justifyContent='space-between'>
                 <Box

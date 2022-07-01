@@ -17,6 +17,7 @@ import InsertChartIcon from '@mui/icons-material/InsertChart';
 import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
 import PreviewIcon from '@mui/icons-material/Preview';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import useNestedPage from 'components/common/CharmEditor/components/nestedPage/hooks/useNestedPage';
@@ -185,9 +186,38 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, 'group'>[]> 
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (_state, _dispatch) => {
-
             const node = _state.schema.nodes.image.create({
               src: null
+            });
+
+            if (_dispatch && isAtBeginningOfLine(_state)) {
+              _dispatch(_state.tr.replaceSelectionWith(node));
+              return true;
+            }
+
+            return insertNode(_state, _dispatch, node);
+          });
+          return replaceSuggestionMarkWith(palettePluginKey, '')(
+            state,
+            dispatch,
+            view
+          );
+        };
+      }
+    },
+    {
+      uid: 'pdf',
+      title: 'PDF',
+      icon: <PictureAsPdfIcon
+        sx={{ fontSize: 16 }}
+      />,
+      description: 'Insert a PDF block in the line below',
+      editorExecuteCommand: () => {
+        return (state, dispatch, view) => {
+          rafCommandExec(view!, (_state, _dispatch) => {
+            const node = _state.schema.nodes.pdf.create({
+              src: null
+
             });
 
             if (_dispatch && isAtBeginningOfLine(_state)) {

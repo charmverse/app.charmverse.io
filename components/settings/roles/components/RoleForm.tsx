@@ -5,7 +5,7 @@ import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
 import { Role } from '@prisma/client';
 import Button from 'components/common/Button';
-import useRoles from 'components/settings/roles/hooks/useRoles';
+import useRoles from 'hooks/useRoles';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { ISystemError } from 'lib/utilities/errors';
