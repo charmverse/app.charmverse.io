@@ -117,7 +117,7 @@ We've provided a script you can use to configure a test database that won't inte
 
 ```bash
 # Make database setup script executable
-$ chmod +x ./testing/configure-db.sh
+$ chmod +x ./scripts/configure-db.sh
 
 # Run this script to create the test database in your local postgres instance
 # Re-run this script at any time to drop and recreate the database with the latest prisma migrations applied
