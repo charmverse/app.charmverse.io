@@ -25,7 +25,7 @@ const VoteStatusLabelRecord: Record<VoteStatus, string> = {
   Cancelled: 'Cancelled',
   InProgress: 'In progress',
   Passed: 'Passed',
-  Rejected: 'rejected'
+  Rejected: 'Rejected'
 };
 
 const StyledDiv = styled.div<{ detailed: boolean }>`
