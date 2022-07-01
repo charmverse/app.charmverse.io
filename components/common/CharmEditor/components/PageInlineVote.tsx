@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { Box, Button, Chip, Divider, FormLabel, IconButton, List, ListItem, ListItemText, Menu, MenuItem, Radio, Typography } from '@mui/material';
+import { Box, Button, Card, Chip, Divider, FormLabel, IconButton, List, ListItem, ListItemText, Menu, MenuItem, Radio, Typography } from '@mui/material';
 import { VoteOptions, VoteStatus } from '@prisma/client';
 import Avatar from 'components/common/Avatar';
 import Modal from 'components/common/Modal';
@@ -15,6 +15,7 @@ import { ExtendedVote } from 'lib/votes/interfaces';
 import { DateTime } from 'luxon';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import { useMemo } from 'react';
+import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 
 interface PageInlineVoteProps {
   inlineVote: ExtendedVote
@@ -29,8 +30,8 @@ const VoteStatusLabelRecord: Record<VoteStatus, string> = {
 };
 
 const StyledDiv = styled.div<{ detailed: boolean }>`
-  background-color: ${({ theme }) => theme.palette.background.light};
-  padding: ${({ theme, detailed }) => detailed ? 0 : theme.spacing(2)};
+  background-color: ${({ theme, detailed }) => detailed && theme.palette.mode !== 'light' ? theme.palette.background.default : theme.palette.background.light};
+  padding: ${({ theme }) => theme.spacing(2)};
 `;
 
 function PageInlineVoteOption (
@@ -173,7 +174,14 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
         })}
       </List>
       {!detailed && <Button variant='outlined' onClick={inlineVoteDetailModal.open}>View details</Button>}
-      {detailed && voteCountLabel}
+      {detailed && (totalVotes !== 0 ? voteCountLabel : (
+        <Card variant='outlined'>
+          <Box p={3} textAlign='center'>
+            <HowToVoteOutlinedIcon fontSize='large' color='secondary' />
+            <Typography color='secondary'>No votes casted yet. Be the first to vote !!!</Typography>
+          </Box>
+        </Card>
+      ))}
       {detailed && (
         <List>
           {userVotes.map(_userVote => (

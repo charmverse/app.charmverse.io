@@ -55,9 +55,8 @@ export function InlineVoteList ({ pluginKey }: {pluginKey: PluginKey<InlineVoteP
         }}
       >
         {inProgressVoteIds.map(inProgressVoteId => (
-          <Box mb={3}>
+          <Box mb={2}>
             <PageInlineVote inlineVote={inlineVotes[inProgressVoteId]} detailed />
-            <Divider />
           </Box>
         ))}
       </Modal>

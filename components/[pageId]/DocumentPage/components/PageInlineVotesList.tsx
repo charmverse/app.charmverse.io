@@ -1,11 +1,11 @@
 import styled from '@emotion/styled';
-import { FormControl, FormHelperText, List, MenuItem, Select, Typography } from '@mui/material';
+import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
+import { List, MenuItem, Select, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import PageInlineVote from 'components/common/CharmEditor/components/PageInlineVote';
 import { useInlineVotes } from 'hooks/useInlineVotes';
 import { ExtendedVote } from 'lib/votes/interfaces';
 import { useMemo, useState } from 'react';
-import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 
 export const StyledPageInlineVotesList = styled(List)`
   overflow: auto;
