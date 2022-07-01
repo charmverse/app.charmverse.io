@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
+import { mapTree, filterVisiblePages } from 'components/common/PageLayout/components/PageNavigation/PageNavigation';
 
 // Redirect users to an initial page
 export default function RedirectToMainPage () {
@@ -12,13 +13,12 @@ export default function RedirectToMainPage () {
   useEffect(() => {
 
     // Find the first top-level page that is not card and hasn't been deleted yet
-    const firstPage = Object.values(pages)
-      .find((page) => (page?.type === 'board' || page?.type === 'page')
-            && page?.deletedAt === null
-            && page?.parentId === null);
+    const pageArray = Object.values(pages);
+    const pageTree = mapTree(filterVisiblePages(pageArray));
+    const firstPage = pageTree[0];
 
     // make sure this page is part of this space in case user is navigating to a new space
-    if (space && firstPage?.spaceId === space.id) {
+    if (firstPage && space && pageArray[0]?.spaceId === space.id) {
       router.push(`/${space.domain}/${firstPage.path}`);
     }
 
