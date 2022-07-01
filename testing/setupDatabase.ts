@@ -93,7 +93,7 @@ export async function generateUserAndSpaceWithApiToken (walletAddress: string = 
   };
 }
 
-export function generateBounty ({ descriptionNodes, spaceId, createdBy, status, maxSubmissions, approveSubmitters }: Pick<Bounty, 'createdBy' | 'spaceId' | 'status' | 'approveSubmitters' | 'descriptionNodes'> & Partial<Pick<Bounty, 'maxSubmissions'>>): Promise<Bounty> {
+export function generateBounty ({ descriptionNodes, spaceId, createdBy, status, maxSubmissions, approveSubmitters }: Pick<Bounty, 'createdBy' | 'spaceId' | 'status' | 'approveSubmitters'> & Partial<Pick<Bounty, 'maxSubmissions' | 'descriptionNodes'>>): Promise<Bounty> {
   return prisma.bounty.create({
     data: {
       createdBy,

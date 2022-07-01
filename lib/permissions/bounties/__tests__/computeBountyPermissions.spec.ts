@@ -89,6 +89,7 @@ describe('computeBountyPermissions', () => {
       approveSubmitters: true,
       spaceId: space.id,
       status: 'open'
+
     });
 
     const role = await generateRole({

@@ -20,7 +20,7 @@ import Modal from 'components/common/Modal';
 import { useBounties } from 'hooks/useBounties';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
-import { requesterCanDeleteBounty } from 'lib/bounties/shared';
+import { isBountyLockable, requesterCanDeleteBounty } from 'lib/bounties/shared';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { BountyWithDetails } from 'models';
 import { AssignedBountyPermissions } from 'lib/bounties';
@@ -138,7 +138,7 @@ export default function BountyHeader ({ bounty, permissions, refreshBountyPermis
                 }
 
                 {
-                  permissions?.userPermissions?.lock && (
+                  permissions?.userPermissions?.lock && isBountyLockable(bounty) && (
                     [
                       <Tooltip key='stop-new' arrow placement='right' title={`Prevent new ${bounty.approveSubmitters ? 'applications' : 'submissions'} from being made.`}>
                         <MenuItem
