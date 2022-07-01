@@ -1,5 +1,5 @@
 import { Role, User } from '@prisma/client';
-import { LoggedInUser } from 'models';
+import { Contributor, LoggedInUser } from 'models';
 
 export interface RoleMembersQuery {
   roleId: string
@@ -17,4 +17,4 @@ export type RoleWithMembers = Role & {users: User[]};
  */
 export type Roleup = Pick<Role, 'id' | 'name'> & {members: number}
 
-export type RoleupWithMembers = Roleup & {users: (User | LoggedInUser)[]};
+export type RoleupWithMembers = Roleup & {users: (User | LoggedInUser | Contributor)[]};

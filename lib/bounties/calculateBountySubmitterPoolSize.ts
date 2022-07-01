@@ -2,7 +2,7 @@ import { prisma } from 'db';
 import { getGroupsWithOperations, queryBountyPermissions } from 'lib/permissions/bounties';
 import { countRoleMembers } from 'lib/roles';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
-import { BountyPermissions, BountySubmitterPoolCalculation, BountySubmitterPoolSize } from './interfaces';
+import { BountySubmitterPoolCalculation, BountySubmitterPoolSize } from './interfaces';
 
 /**
  * Returns the number of potential bounty applicants.

@@ -1,4 +1,4 @@
-import { Bounty, BountyPermission } from '@prisma/client';
+import { Bounty } from '@prisma/client';
 import { BountyPermissions, BountySubmitter } from 'lib/permissions/bounties';
 import { Roleup } from 'lib/roles/interfaces';
 import { Resource } from '../permissions/interfaces';

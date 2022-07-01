@@ -1,6 +1,6 @@
 import { useTheme } from '@emotion/react';
 import AvatarGroup from '@mui/material/AvatarGroup';
-import Avatar from '@mui/material/Avatar';
+import Avatar from 'components/common/Avatar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
@@ -61,7 +61,7 @@ export const SubmissionStatusLabels: Record<ApplicationStatus, string> = {
 };
 
 // Initial number of avatars we show, and the number to add each time the user clicks
-const defaultAvatarGroupIncrement = 5;
+const defaultAvatarGroupIncrement = 2;
 
 export default function BountySubmissions ({ bounty, permissions }: Props) {
 
@@ -110,32 +110,51 @@ export default function BountySubmissions ({ bounty, permissions }: Props) {
   const capReached = submissionsCapReached({ bounty, submissions: submissions ?? [] });
 
   const reviewerNames: {
-    roles: (TargetPermissionGroup & {name: string})[]
-    users: (TargetPermissionGroup & {name: string, profilePic?: string})[]
+    roles: ({id: string, name: string, users: Contributor[]})[]
+    users: ({id: string, name: string, profilePic?: string | null})[]
   } = useMemo(() => {
-    return (permissions?.bountyPermissions.reviewer ?? []).map(reviewer => {
+    const mapped = (permissions?.bountyPermissions.reviewer ?? []).map(reviewer => {
 
       if (reviewer.group === 'role') {
         const name: string = roleups?.find(r => r.id === reviewer.id)?.name ?? '';
         return {
-          ...reviewer,
-          name
+          ...(reviewer as TargetPermissionGroup<'role'>),
+          name,
+          users: roleups?.find(r => r.id === reviewer.id)?.users ?? []
         };
       }
       else {
         const reviewerUser: Contributor | undefined = contributors?.find(c => c.id === reviewer.id);
         return {
-          ...reviewer,
+          ...(reviewer as TargetPermissionGroup<'user'>),
           name: reviewerUser?.username ?? '',
           profilePic: reviewerUser?.avatar
-        } as (TargetPermissionGroup & {name: string, profilePic?: string});
+        };
 
       }
 
-    }).reduce((reviewersByGroup, reviewer) => {
+    });
+
+    const reduced = mapped.reduce((reviewersByGroup, reviewer) => {
 
       if (reviewer.group === 'role') {
-        reviewersByGroup.roles.push(reviewer);
+
+        const roleAsReviewer = reviewer as {id: string, name: string, users: Contributor[]};
+
+        reviewersByGroup.roles.push(roleAsReviewer);
+
+        // We want to show users that can review
+        const usersToAdd = (roleups.find(r => r.id === roleAsReviewer.id)?.users ?? [])
+          .map(u => {
+            return {
+              id: u.id,
+              name: u.username,
+              profilePic: u.avatar
+            };
+          });
+
+        reviewersByGroup.users.push(...usersToAdd);
+
       }
       else if (reviewer.group === 'user') {
         reviewersByGroup.users.push(reviewer);
@@ -146,9 +165,18 @@ export default function BountySubmissions ({ bounty, permissions }: Props) {
       roles: [],
       users: []
     } as {
-      roles: (TargetPermissionGroup & {name: string})[]
-      users: (TargetPermissionGroup & {name: string, profilePic?: string})[]
+      roles: {id: string, name: string, users: Contributor[]}[]
+      users: {id: string, name: string, profilePic?: string | null}[]
     });
+
+    reduced.users = reduced.users.filter((listedUser, index) => {
+      // Only look ahead in the array to see if the user is already in the list
+      const copiedUser = reduced.users.slice(index + 1);
+      // make sure the user isn't already in list because of their roles
+      return copiedUser.every(u => u.id !== listedUser.id);
+    });
+
+    return reduced;
   }, [bounty, permissions, roleups]);
 
   const humanisedSubmitterSentence = humaniseBountyAccessConditions({
@@ -178,37 +206,11 @@ export default function BountySubmissions ({ bounty, permissions }: Props) {
           </Grid>
 
           {
-          reviewerNames.users.length > 0 && (
-            <Grid item xs={12} sx={{ mt: 1 }} display='flex'>
-              <Typography sx={{ alignItems: 'center', fontWeight: 'bold', mr: 1 }} display='flex'>
-                Users
-              </Typography>
-              <AvatarGroup max={maxVisibleUsers} onClick={() => setMaxVisibleUsers(maxVisibleUsers + defaultAvatarGroupIncrement)}>
-
-                {
-            reviewerNames.users.map(reviewer => {
-
-              return (
-                <Tooltip key={reviewer.id} title={reviewer.name}>
-                  <Box>
-                    <WorkspaceAvatar name={reviewer.name.slice(0, 2).match('0x') ? reviewer.name.slice(2, 3).toUpperCase() : reviewer.name.slice(0, 1).toUpperCase()} image={reviewer.profilePic as string} />
-                  </Box>
-
-                </Tooltip>
-              );
-            })
-            }
-              </AvatarGroup>
-            </Grid>
-          )
-        }
-
-          {
           reviewerNames.roles.length > 0 && (
-          <Grid item xs={12} sx={{ mb: 4, mt: 3 }}>
+          <Grid item xs={12} sx={{ mt: 2, mb: 2 }}>
             <Box display='flex'>
               <Typography sx={{ alignItems: 'center', fontWeight: 'bold', mr: 1 }} display='flex'>
-                Roles
+                Eligible roles
               </Typography>
               {
               reviewerNames.roles.map(reviewer => {
@@ -225,6 +227,30 @@ export default function BountySubmissions ({ bounty, permissions }: Props) {
           </Grid>
           )
         }
+
+          {
+          reviewerNames.users.length > 0 && (
+            <Grid item xs={12} sx={{ mt: 1 }} display='flex'>
+              <AvatarGroup max={maxVisibleUsers} onClick={() => setMaxVisibleUsers(maxVisibleUsers + defaultAvatarGroupIncrement)}>
+
+                {
+            reviewerNames.users.map(reviewer => {
+
+              return (
+                <Tooltip placement='top' key={reviewer.id} title={reviewer.name}>
+                  <Box>
+                    <Avatar name={reviewer.name.slice(0, 2).match('0x') ? reviewer.name.slice(2, 3).toUpperCase() : reviewer.name.slice(0, 1).toUpperCase()} avatar={reviewer.profilePic as string} />
+                  </Box>
+
+                </Tooltip>
+              );
+            })
+            }
+              </AvatarGroup>
+            </Grid>
+          )
+        }
+
         </Grid>
 
         <Grid item xs={8}>
