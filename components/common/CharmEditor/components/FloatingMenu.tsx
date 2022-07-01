@@ -3,6 +3,7 @@ import { PluginKey } from '@bangle.dev/core';
 import { Node, ResolvedPos } from '@bangle.dev/pm';
 import { FloatingMenu, floatingMenu } from '@bangle.dev/react-menu';
 import { hasComponentInSchema } from '@bangle.dev/react-menu/helper';
+import isAdmin from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
@@ -29,7 +30,7 @@ export default function FloatingMenuComponent (
   const { showMessage } = useSnackbar();
   const { getPagePermissions, currentPageId } = usePages();
   const permissions = currentPageId ? getPagePermissions(currentPageId) : new AllowedPagePermissions();
-
+  const isUserAdmin = isAdmin();
   return (
     <FloatingMenu
       menuKey={pluginKey}
@@ -54,7 +55,7 @@ export default function FloatingMenuComponent (
                 <UnderlineButton />
                 <FloatingLinkButton menuKey={pluginKey} />
                 {!inline && permissions.comment && enableComments && <InlineCommentButton enableComments menuKey={pluginKey} />}
-                {!inline && permissions.comment && enableComments && <InlineVoteButton enableVotes menuKey={pluginKey} />}
+                {!inline && permissions.comment && isUserAdmin && enableComments && <InlineVoteButton enableVotes menuKey={pluginKey} />}
               </MenuGroup>
               {!inline && (
               <MenuGroup isLastGroup>
