@@ -7,7 +7,8 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { PaymentMethod } from '@prisma/client';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import AddIcon from '@mui/icons-material/Add';
-import { getTokenInfo } from 'lib/tokens/tokenData';
+import TokenLogo from 'components/common/TokenLogo';
+import { getTokenInfo, getTokenAndChainInfoFromPayments } from 'lib/tokens/tokenData';
 import CustomERCTokenForm from 'components/settings/payment-methods/components/CustomERCTokenForm';
 
 export interface IInputSearchCryptoProps {
@@ -106,19 +107,13 @@ export function InputSearchCrypto ({
               </Box>
             );
           }
-          const tokenInfo = getTokenInfo(paymentMethods, option);
+          const tokenInfo = getTokenAndChainInfoFromPayments({ methods: paymentMethods, chainId: 1, symbolOrAddress: option });
 
           return (
             <Box component='li' sx={{ '& > img': { flexShrink: 0 }, display: 'flex', gap: 1, alignItems: 'center' }} {...props}>
-              {
-                tokenInfo.tokenLogo && (
-                  <img
-                    width='20px'
-                    height='20px'
-                    src={tokenInfo.tokenLogo}
-                  />
-                )
-              }
+              <Box display='inline-block' width={20}>
+                <TokenLogo height={20} src={tokenInfo.canonicalLogo} />
+              </Box>
               <Box component='span'>
                 {tokenInfo.tokenSymbol}
               </Box>

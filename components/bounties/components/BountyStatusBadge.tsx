@@ -11,7 +11,7 @@ import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
 import { Bounty, BountyStatus } from '@prisma/client';
-import { getChainById } from 'connectors';
+import TokenLogo from 'components/common/TokenLogo';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenAndChainInfoFromPayments } from 'lib/tokens/tokenData';
@@ -129,7 +129,7 @@ export function BountyAmount ({ bounty, truncate = false }: { bounty: Pick<Bount
     symbolOrAddress: bounty.rewardToken
   });
 
-  const tooltip = `${tokenInfo.chain.chainName} (${tokenInfo.tokenSymbol})`;
+  const tooltip = `${tokenInfo.tokenName} (${tokenInfo.tokenSymbol})`;
 
   return (
     <Tooltip arrow placement='top' title={bounty.rewardAmount === 0 ? '' : tooltip}>
@@ -161,12 +161,7 @@ export function BountyAmount ({ bounty, truncate = false }: { bounty: Pick<Bount
                     alignItems: 'center'
                   }}
                 >
-                  <Box component='span' sx={{ width: '25px', height: '25px' }}>
-                    <img
-                      height='100%'
-                      src={tokenInfo.canonicalLogo}
-                    />
-                  </Box>
+                  <TokenLogo src={tokenInfo.canonicalLogo} />
                 </Box>
                 <Typography
                   component='span'

@@ -92,29 +92,6 @@ export function getTokenInfo (paymentMethods: PaymentMethod[], symbolOrAddress: 
   return tokenInfo;
 }
 
-// /**
-//  * Returns a standardised shape for either a contract address, or a native currency
-//  * @param paymentMethods Call this function from a component that can access the usePaymentMethods hook which provides available methods to search through
-//  */
-//  export function getTokenInfoFromPayments (paymentMethods: PaymentMethod[], symbolOrAddress: string): TokenInfo {
-
-//   const paymentMethod = paymentMethods.find(method => (
-//     method.contractAddress === symbolOrAddress || method.tokenSymbol === symbolOrAddress
-//   ));
-
-//   if (paymentMethod) {
-//     return getTokenInfo(paymentMethod);
-//   }
-//   else {
-//     return {
-//       tokenName: TokenLogoPaths[symbolOrAddress as CryptoCurrency],
-//       tokenSymbol: symbolOrAddress,
-//       tokenLogo: CryptoCurrencyList[symbolOrAddress as CryptoCurrency],
-//       isContract: false
-//     };
-//   }
-// }
-
 type TokenAndChain = TokenInfo & { chain: IChainDetails, canonicalLogo: string };
 type getTokenAndChainInfoFromPaymentsProps = { chainId: number, methods: PaymentMethod[], symbolOrAddress: string }
 
@@ -133,9 +110,9 @@ export function getTokenAndChainInfoFromPayments ({ chainId, methods, symbolOrAd
     return {
       chain,
       canonicalLogo: TokenLogoPaths[symbolOrAddress as CryptoCurrency],
-      tokenName: TokenLogoPaths[symbolOrAddress as CryptoCurrency],
+      tokenName: CryptoCurrencyList[symbolOrAddress as CryptoCurrency],
       tokenSymbol: symbolOrAddress,
-      tokenLogo: CryptoCurrencyList[symbolOrAddress as CryptoCurrency],
+      tokenLogo: TokenLogoPaths[symbolOrAddress as CryptoCurrency],
       isContract: false
     };
   }
@@ -149,7 +126,7 @@ export function getTokenAndChainInfo (paymentMethod: PaymentMethod): TokenAndCha
   const tokenLogo = paymentMethod.tokenLogo || TokenLogoPaths[paymentMethod.tokenSymbol as CryptoCurrency];
   return {
     // prefer our standard iconUrl for native tokens that may have been saved to tokenInfo
-    canonicalLogo: paymentMethod.contractAddress ? tokenLogo : (chain.iconUrl || tokenLogo),
+    canonicalLogo: paymentMethod.contractAddress ? (tokenLogo || chain.iconUrl) : chain.iconUrl,
     chain,
     tokenName: paymentMethod.tokenName,
     tokenSymbol: paymentMethod.tokenSymbol,

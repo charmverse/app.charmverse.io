@@ -7,10 +7,12 @@ import { PaymentMethod } from '@prisma/client';
 import ElementDeleteIcon from 'components/common/form/ElementDeleteIcon';
 import Link from 'components/common/Link';
 import TableRow from 'components/common/Table/TableRow';
-import { getChainById, getChainExplorerLink } from 'connectors';
+import { getChainExplorerLink } from 'connectors';
+import TokenLogo from 'components/common/TokenLogo';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { shortenHex } from 'lib/utilities/strings';
 import { useState } from 'react';
+import { getTokenAndChainInfo } from 'lib/tokens/tokenData';
 import CompositeDeletePaymentMethod from './DeletePaymentMethodModal';
 
 interface IProps {
@@ -25,18 +27,9 @@ export default function CompositePaymentMethodList ({ paymentMethods }: IProps) 
 
   const isAdmin = useIsAdmin();
 
-  const sortedMethods = [...paymentMethods]
-    .sort((methodA, methodB) => {
-      if (methodA.chainId < methodB.chainId) {
-        return -1;
-      }
-      else if (methodA.chainId > methodB.chainId) {
-        return 1;
-      }
-      else {
-        return 0;
-      }
-    });
+  const tableRows = paymentMethods
+    .map(method => ({ method, tokenInfo: getTokenAndChainInfo(method) }))
+    .sort((methodA, methodB) => methodA.method.createdAt < methodB.method.createdAt ? -1 : 1);
 
   return (
 
@@ -60,40 +53,33 @@ export default function CompositePaymentMethodList ({ paymentMethods }: IProps) 
           </TableRow>
         </TableHead>
         <TableBody>
-          {sortedMethods.map((row) => (
-            <TableRow key={row.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+          {tableRows.map(({ method, tokenInfo }) => (
+            <TableRow key={method.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
               <TableCell sx={{ px: 0 }}>
-                {row.contractAddress ? (
-                  <Tooltip arrow placement='top' title={`Contract address: ${shortenHex(row.contractAddress)}`}>
+                {method.contractAddress ? (
+                  <Tooltip arrow placement='top' title={`Contract address: ${shortenHex(method.contractAddress)}`}>
                     <span>
-                      <Link href={getChainExplorerLink(row.chainId, row.contractAddress, 'token')} external target='_blank'>
-                        {row.tokenName} ({row.tokenSymbol})
+                      <Link href={getChainExplorerLink(method.chainId, method.contractAddress, 'address')} external target='_blank'>
+                        {method.tokenName} ({method.tokenSymbol})
                       </Link>
                     </span>
                   </Tooltip>
                 ) : (
-                  `${row.tokenName} (${row.tokenSymbol})`
+                  `${method.tokenName} (${method.tokenSymbol})`
                 )}
               </TableCell>
               <TableCell width={54}>
-                {
-                  row.tokenLogo && (
-                    <img
-                      style={{ maxWidth: '100%' }}
-                      src={row.tokenLogo as string}
-                    />
-                  )
-                }
+                <TokenLogo src={tokenInfo.canonicalLogo} />
               </TableCell>
               <TableCell>
-                {getChainById(row.chainId)?.chainName}
+                {tokenInfo.chain.chainName}
               </TableCell>
               <TableCell>
                 {
-                  row.gnosisSafeAddress ? (
-                    <Tooltip arrow placement='top' title={`Safe address: ${shortenHex(row.gnosisSafeAddress)}`}>
+                  method.gnosisSafeAddress ? (
+                    <Tooltip arrow placement='top' title={`Safe address: ${shortenHex(method.gnosisSafeAddress)}`}>
                       <span>
-                        <Link href={getGnosisSafeUrl(row.gnosisSafeAddress)} external target='_blank'>
+                        <Link href={getGnosisSafeUrl(method.gnosisSafeAddress)} external target='_blank'>
                           Gnosis Safe
                         </Link>
                       </span>
@@ -107,7 +93,7 @@ export default function CompositePaymentMethodList ({ paymentMethods }: IProps) 
 
                 {
                 isAdmin && (
-                  <ElementDeleteIcon onClick={() => setPaymentMethodIdToDelete(row.id)} />
+                  <ElementDeleteIcon onClick={() => setPaymentMethodIdToDelete(method.id)} />
                 )
               }
               </TableCell>
