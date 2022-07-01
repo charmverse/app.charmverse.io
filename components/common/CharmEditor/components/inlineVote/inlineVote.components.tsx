@@ -117,7 +117,7 @@ export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
     }
   }, [voteType]);
 
-  const [deadline, setDeadline] = useState(DateTime.fromMillis(Date.now()));
+  const [deadline, setDeadline] = useState(DateTime.fromMillis(Date.now()).plus({ hour: 12 }));
   const { currentPageId } = usePages();
   const handleSubmit = async (e: React.KeyboardEvent<HTMLElement> | React.MouseEvent<HTMLElement, MouseEvent>) => {
     const cardId = typeof window !== 'undefined' ? (new URLSearchParams(window.location.href)).get('cardId') : null;
@@ -149,6 +149,7 @@ export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
         <Box flexDirection='column' display='flex'>
           <FieldLabel>Title</FieldLabel>
           <TextField
+            autoFocus
             error={voteTitle.length === 0}
             placeholder="What's the vote?"
             value={voteTitle}

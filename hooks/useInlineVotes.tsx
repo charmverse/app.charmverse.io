@@ -42,7 +42,7 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
           existingUserVote.updatedAt = new Date();
         }
         else {
-          vote.userVotes.push(userVote);
+          vote.userVotes.unshift(userVote);
         }
         _inlineVotes[voteId] = {
           ...vote

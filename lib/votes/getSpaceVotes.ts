@@ -1,8 +1,9 @@
 import { prisma } from 'db';
 import { ExtendedVote } from './interfaces';
+import { updateVotesStatus } from './updateVotesStatus';
 
 export async function getSpaceVotes (spaceId: string): Promise<ExtendedVote[]> {
-  return prisma.vote.findMany({
+  const pageVotes = await prisma.vote.findMany({
     where: {
       spaceId
     },
@@ -15,4 +16,6 @@ export async function getSpaceVotes (spaceId: string): Promise<ExtendedVote[]> {
       voteOptions: true
     }
   });
+
+  return updateVotesStatus(pageVotes);
 }

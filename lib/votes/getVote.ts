@@ -1,8 +1,9 @@
-import { Vote } from '@prisma/client';
 import { prisma } from 'db';
+import { ExtendedVote } from './interfaces';
+import { updateVotesStatus } from './updateVotesStatus';
 
-export async function getVote (id: string): Promise<Vote | null> {
-  return prisma.vote.findUnique({
+export async function getVote (id: string): Promise<ExtendedVote | null> {
+  const pageVote = await prisma.vote.findUnique({
     where: {
       id
     },
@@ -15,4 +16,6 @@ export async function getVote (id: string): Promise<Vote | null> {
       voteOptions: true
     }
   });
+
+  return pageVote ? (await updateVotesStatus([pageVote]))[0] : null;
 }
