@@ -24,7 +24,7 @@ const StyledTreeRoot = styled(TreeRoot)<{ isFavorites?: boolean }>`
   overflow-y: auto;
 `;
 
-const sortNodes = (nodes: Array<Page | ParentMenuNode>) => {
+export const sortNodes = (nodes: Array<Page | ParentMenuNode>) => {
   return [
     ...sortBy(nodes.filter(node => node.index >= 0), ['index', 'createdAt']),
     ...sortBy(nodes.filter(node => node.index < 0), ['createdAt'])
@@ -38,7 +38,7 @@ export function filterVisiblePages (pages: (Page | undefined)[], rootPageIds: st
     ));
 }
 
-export function mapTree (items: MenuNode[], rootPageIds?: string[]): ParentMenuNode[] {
+function mapTree (items: MenuNode[], rootPageIds?: string[]): ParentMenuNode[] {
   const tempItems = items.map((item): ParentMenuNode => {
     return {
       ...item,
