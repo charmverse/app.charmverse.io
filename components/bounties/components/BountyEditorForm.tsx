@@ -552,7 +552,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
                       <Typography display='block' justifyContent='center'>
 
                         {submitterMode === 'space' && (
-                          bounty?.approveSubmitters
+                          values?.approveSubmitters
                             ? 'All workspace members can apply to work on this bounty.' : 'All workspace members can submit work to this bounty.'
                         )}
 
@@ -560,10 +560,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
                       && bountyApplicantPool && (
                           `There ${
                             bountyApplicantPool.total === 1 ? 'is' : 'are'
-                          }
-                        ${bountyApplicantPool.total} potential ${
-                            bounty?.approveSubmitters ? `candidate${bountyApplicantPool.total !== 1 ? 's' : ''} who can apply to` : `candidate${
-                              bountyApplicantPool.total !== 1 ? 's' : ''}`} who can submit work to this bounty.`
+                          } ${bountyApplicantPool.total} workspace member${bountyApplicantPool.total !== 1 ? 's' : ''} who can ${values?.approveSubmitters ? 'apply' : 'submit work'} to this bounty.`
                         )}
 
                       </Typography>
