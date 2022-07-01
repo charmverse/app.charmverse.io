@@ -1,6 +1,6 @@
 import { Application, ApplicationStatus } from '@prisma/client';
 import { prisma } from 'db';
-import { DataNotFoundError, InvalidInputError, WrongStateError } from 'lib/utilities/errors';
+import { DataNotFoundError, InvalidInputError, UndesirableOperationError, WrongStateError } from 'lib/utilities/errors';
 import { getApplication } from '../getApplication';
 import { ReviewDecision, SubmissionReview } from '../interfaces';
 
@@ -13,11 +13,15 @@ const submissionStatusAfterDecision: Record<ReviewDecision, ApplicationStatus> =
  * Accept, reject or request changes for the work
  * @returns
  */
-export async function reviewSubmission ({ submissionId, decision }: SubmissionReview): Promise<Application> {
+export async function reviewSubmission ({ submissionId, decision, userId }: SubmissionReview): Promise<Application> {
   const submission = await getApplication(submissionId);
 
   if (!submission) {
     throw new DataNotFoundError(`Application with id ${submissionId} was not found`);
+  }
+
+  if (submission.createdBy === userId) {
+    throw new UndesirableOperationError('You cannot review your own submission');
   }
 
   if (submission.status !== 'review' && decision === 'approve') {
@@ -35,7 +39,8 @@ export async function reviewSubmission ({ submissionId, decision }: SubmissionRe
       id: submission.id
     },
     data: {
-      status: correspondingSubmissionStatus
+      status: correspondingSubmissionStatus,
+      reviewedBy: userId
     }
   }) as Application;
 

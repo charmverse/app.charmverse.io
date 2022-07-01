@@ -3,11 +3,12 @@ import { Bounty, Prisma, Space, User } from '@prisma/client';
 import { IPageWithPermissions } from 'lib/pages';
 import request from 'supertest';
 import { generatePageToCreateStub } from 'testing/generate-stubs';
-import { baseUrl } from 'testing/mockApiCall';
+import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateBountyWithSingleApplication, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { createBounty } from 'lib/bounties';
-import { BountyWithDetails } from '../../../../../../models';
+import { addBountyPermissionGroup } from 'lib/permissions/bounties';
+import { BountyWithDetails } from 'models';
 
 let nonAdminUser: User;
 let nonAdminUserSpace: Space;
@@ -22,24 +23,56 @@ beforeAll(async () => {
 
   nonAdminUser = first.user;
   nonAdminUserSpace = first.space;
-  nonAdminCookie = (await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: nonAdminUser.addresses[0]
-    })).headers['set-cookie'][0];
+  nonAdminCookie = await loginUser(nonAdminUser);
 
   const second = await generateUserAndSpaceWithApiToken();
 
   adminUser = second.user;
   adminUserSpace = second.space;
-  adminCookie = (await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: adminUser.addresses[0]
-    })).headers['set-cookie'][0];
+  adminCookie = await loginUser(adminUser);
 });
 
 describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
+
+  it('should allow a user with the edit permission to update the bounty and respond with 200', async () => {
+
+    const createdBounty = await createBounty({
+      title: 'Example',
+      createdBy: nonAdminUser.id,
+      spaceId: nonAdminUserSpace.id,
+      status: 'open',
+      rewardAmount: 5,
+      chainId: 1,
+      rewardToken: 'ETH'
+    });
+
+    await addBountyPermissionGroup({
+      assignee: {
+        group: 'user',
+        id: nonAdminUser.id
+      },
+      // Creators can edit their bounties
+      level: 'creator',
+      resourceId: createdBounty.id
+    });
+
+    const updateContent: Partial<Bounty> = {
+      rewardAmount: 10,
+      rewardToken: 'BNB'
+    };
+
+    const response = await request(baseUrl)
+      .put(`/api/bounties/${createdBounty.id}`)
+      .set('Cookie', nonAdminCookie)
+      .send(updateContent)
+      .expect(200);
+
+    const updatedBounty = response.body as Bounty;
+
+    expect(updatedBounty.rewardAmount).toBe(updateContent.rewardAmount);
+    expect(updatedBounty.rewardToken).toBe(updateContent.rewardToken);
+
+  });
 
   it('should ignore irrelevant bounty fields and succeed with the update and respond with 200', async () => {
 
@@ -82,11 +115,7 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
       spaceId: nonAdminUserSpace.id
     });
 
-    const randomSpaceUserCookie = (await request(baseUrl)
-      .post('/api/session/login')
-      .send({
-        address: randomSpaceUser.addresses[0]
-      })).headers['set-cookie'][0];
+    const randomSpaceUserCookie = await loginUser(randomSpaceUser);
 
     const createdBounty = await createBounty({
       title: 'Example',
@@ -115,17 +144,22 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
       spaceId: nonAdminUserSpace.id
     });
 
-    const bountyCreatorCookie = (await request(baseUrl)
-      .post('/api/session/login')
-      .send({
-        address: bountyCreator.addresses[0]
-      })).headers['set-cookie'][0];
+    const bountyCreatorCookie = await loginUser(bountyCreator);
 
     const createdBounty = await createBounty({
       title: 'Example',
       createdBy: bountyCreator.id,
       spaceId: nonAdminUserSpace.id,
       status: 'suggestion'
+    });
+
+    await addBountyPermissionGroup({
+      assignee: {
+        group: 'user',
+        id: bountyCreator.id
+      },
+      level: 'creator',
+      resourceId: createdBounty.id
     });
 
     const updateContent: Partial<Bounty> = {
@@ -154,11 +188,7 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
       spaceId: nonAdminUserSpace.id
     });
 
-    const bountyCreatorCookie = (await request(baseUrl)
-      .post('/api/session/login')
-      .send({
-        address: bountyCreator.addresses[0]
-      })).headers['set-cookie'][0];
+    const bountyCreatorCookie = await loginUser(bountyCreator);
 
     const createdBounty = await createBounty({
       title: 'Example',
@@ -166,6 +196,15 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
       spaceId: nonAdminUserSpace.id,
       status: 'open',
       rewardAmount: 3
+    });
+
+    await addBountyPermissionGroup({
+      assignee: {
+        group: 'user',
+        id: bountyCreator.id
+      },
+      level: 'creator',
+      resourceId: createdBounty.id
     });
 
     const updateContent: Partial<Bounty> = {
@@ -217,6 +256,15 @@ describe('DELETE /api/bounties/{bountyId} - delete a bounty', () => {
       rewardToken: 'ETH'
     });
 
+    await addBountyPermissionGroup({
+      assignee: {
+        group: 'user',
+        id: nonAdminUser.id
+      },
+      level: 'creator',
+      resourceId: createdBounty.id
+    });
+
     request(baseUrl)
       .delete(`/api/bounties/${createdBounty.id}`)
       .set('Cookie', nonAdminCookie)
@@ -237,6 +285,15 @@ describe('DELETE /api/bounties/{bountyId} - delete a bounty', () => {
       rewardToken: 'ETH'
     });
 
+    await addBountyPermissionGroup({
+      assignee: {
+        group: 'user',
+        id: nonAdminUser.id
+      },
+      level: 'creator',
+      resourceId: createdBounty.id
+    });
+
     request(baseUrl)
       .delete(`/api/bounties/${createdBounty.id}`)
       .set('Cookie', nonAdminCookie)
@@ -255,6 +312,15 @@ describe('DELETE /api/bounties/{bountyId} - delete a bounty', () => {
       userId: nonAdminUser.id
     });
 
+    await addBountyPermissionGroup({
+      assignee: {
+        group: 'user',
+        id: nonAdminUser.id
+      },
+      level: 'creator',
+      resourceId: createdBounty.id
+    });
+
     request(baseUrl)
       .delete(`/api/bounties/${createdBounty.id}`)
       .set('Cookie', nonAdminCookie)
@@ -270,11 +336,7 @@ describe('DELETE /api/bounties/{bountyId} - delete a bounty', () => {
       spaceId: nonAdminUserSpace.id
     });
 
-    const randomSpaceUserCookie = (await request(baseUrl)
-      .post('/api/session/login')
-      .send({
-        address: randomSpaceUser.addresses[0]
-      })).headers['set-cookie'][0];
+    const randomSpaceUserCookie = await loginUser(randomSpaceUser);
 
     const createdBounty = await createBounty({
       title: 'Example',

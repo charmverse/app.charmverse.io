@@ -104,7 +104,7 @@ export function floatingMenuPlugin ({ key, readOnly, enableComments = true }:{ke
 
       if (state.selection.empty
         || (state.selection as NodeSelection)?.node?.type?.name.match(
-          /(image)|(cryptoPrice)|(iframe)|(page)|(mention)|(tabIndent)|(codeBlock)/
+          /(image)|(cryptoPrice)|(iframe)|(page)|(pdf)|(mention)|(tabIndent)|(codeBlock)/
         )) {
         return null;
       }

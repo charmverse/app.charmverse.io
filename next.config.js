@@ -21,6 +21,7 @@ const esmModules = [
   '@fullcalendar/interaction',
   '@fullcalendar/react',
   'react-dnd',
+  'react-pdf',
   '@hookform/resolvers',
   'lit-share-modal-v3-react-17',
   'uuid'
@@ -54,6 +55,8 @@ const config = {
     ];
   },
   webpack (_config, { buildId, nextRuntime }) {
+    // Fix for: "Module not found: Can't resolve 'canvas'"
+    _config.resolve.alias.canvas = false;
     _config.module.rules.push({
       test: /\.svg$/,
       use: ['@svgr/webpack']

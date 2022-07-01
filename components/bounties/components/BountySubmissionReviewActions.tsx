@@ -20,16 +20,18 @@ import { ReviewDecision, SubmissionReview } from 'lib/applications/interfaces';
 import { SystemError } from 'lib/utilities/errors';
 import { eToNumber } from 'lib/utilities/numbers';
 import { SyntheticEvent, useState } from 'react';
+import { AssignedBountyPermissions } from 'lib/bounties/interfaces';
 import BountyPaymentButton from '../[bountyId]/components/BountyPaymentButton';
 
 interface Props {
   bounty: Bounty,
   submission: ApplicationWithTransactions,
+  permissions: AssignedBountyPermissions,
   reviewComplete: (updatedApplication: Application) => void
   onSubmission: (eventOrAnchorEl?: HTMLElement | SyntheticEvent<any, Event> | null | undefined) => void
 }
 
-export default function BountySubmissionReviewActions ({ onSubmission, bounty, submission, reviewComplete }: Props) {
+export default function BountySubmissionReviewActions ({ onSubmission, bounty, submission, reviewComplete, permissions }: Props) {
 
   const [user] = useUser();
   const isAdmin = useIsAdmin();
@@ -73,7 +75,8 @@ export default function BountySubmissionReviewActions ({ onSubmission, bounty, s
     setApiError(null);
   }
 
-  const canReview = (user?.id === bounty.reviewer || isAdmin) && (submission.status === 'inProgress' || submission.status === 'review');
+  const canReview = permissions?.userPermissions?.review && (submission.status === 'inProgress' || submission.status === 'review');
+
   return (
     <Box display='flex' gap={1} alignItems='center' justifyContent='end'>
 
@@ -81,10 +84,10 @@ export default function BountySubmissionReviewActions ({ onSubmission, bounty, s
         canReview && (
           <>
             <Tooltip placement='top' title='Approve this submission.'>
-              <AssignmentTurnedInIcon sx={{ cursor: 'pointer' }} onClick={() => setReviewDecision({ decision: 'approve', submissionId: submission.id })} />
+              <AssignmentTurnedInIcon sx={{ cursor: 'pointer' }} onClick={() => setReviewDecision({ decision: 'approve', submissionId: submission.id, userId: user?.id as string })} />
             </Tooltip>
             <Tooltip placement='top' title='Reject this submission. The submitter will be disqualified from making further changes'>
-              <CancelIcon sx={{ cursor: 'pointer' }} onClick={() => setReviewDecision({ submissionId: submission.id, decision: 'reject' })} />
+              <CancelIcon sx={{ cursor: 'pointer' }} onClick={() => setReviewDecision({ submissionId: submission.id, decision: 'reject', userId: user?.id as string })} />
             </Tooltip>
           </>
         )

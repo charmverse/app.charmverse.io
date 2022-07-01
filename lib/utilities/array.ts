@@ -1,3 +1,4 @@
+import { typedKeys } from './objects';
 
 /**
  * Sort an array of objects by a property. Include an optional valuesOrder for looking up the order of a certain value
@@ -35,3 +36,10 @@ export function uniqueValues<T = any> (values: T []): T [] {
   return Array.from(new Set(values));
 }
 
+// Flattens an object with list of arrays to a single list
+export function flatArrayMap<T> (obj: {[key: string]: T[]}): T[] {
+  return Object.keys(obj).reduce((list, key) => {
+    list.push(...obj[key] as any);
+    return list;
+  }, [] as T[]);
+}

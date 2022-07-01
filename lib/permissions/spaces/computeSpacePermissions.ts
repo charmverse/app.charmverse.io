@@ -14,6 +14,10 @@ export async function computeSpacePermissions ({
 
   const allowedOperations = new AvailableSpacePermissions();
 
+  if (!userId) {
+    return allowedOperations.empty;
+  }
+
   const { error, isAdmin } = await hasAccessToSpace({
     userId,
     spaceId: resourceId,

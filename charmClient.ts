@@ -33,17 +33,15 @@ import { UpdateThreadRequest } from 'pages/api/threads/[id]';
 import { TokenGateWithRoles } from 'pages/api/token-gates';
 
 import { ApplicationWithTransactions } from 'lib/applications/actions';
-import { SuggestionAction } from 'lib/bounties';
+import { AssignedBountyPermissions, BountyUpdate, SuggestionAction, BountySubmitterPoolSize, BountySubmitterPoolCalculation } from 'lib/bounties/interfaces';
 import { PublicPageResponse } from 'lib/pages/interfaces';
 import { PublicSpaceInfo } from 'lib/spaces/interfaces';
 import type { MarkTask } from 'lib/tasks/markTasks';
 import { TransactionCreationData } from 'lib/transactions/interface';
 import { PublicUser } from 'pages/api/public/profile/[userPath]';
 import { DeepDaoAggregateData } from 'lib/deepdao/interfaces';
-import { v4 } from 'uuid';
 import { ExtendedUserVote, ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
-import { deleteVote } from 'lib/votes';
-import { AssignedPermissionsQuery } from './lib/permissions/interfaces';
+import { AssignedPermissionsQuery, Resource } from './lib/permissions/interfaces';
 import { SpacePermissionFlags, SpacePermissionModification } from './lib/permissions/spaces';
 import { SpacePermissionConfigurationUpdate } from './lib/permissions/meta/interfaces';
 
@@ -408,6 +406,17 @@ class CharmClient {
     return data;
   }
 
+  async getBountyApplicantPool ({ resourceId, permissions }: BountySubmitterPoolCalculation): Promise<BountySubmitterPoolSize> {
+    return http.POST<BountySubmitterPoolSize>('/api/bounties/pool', { permissions, resourceId });
+  }
+
+  /**
+   * Get full set of permissions for a specific user on a certain page
+   */
+  async computeBountyPermissions ({ resourceId }: Resource): Promise<AssignedBountyPermissions> {
+    return http.GET(`/api/bounties/${resourceId}/permissions`);
+  }
+
   async reviewBountySuggestion ({ bountyId, decision }: SuggestionAction): Promise<BountyWithDetails | {success: true}> {
     return http.POST<BountyWithDetails>(`/api/bounties/${bountyId}/review-suggestion`, { decision });
   }
@@ -421,16 +430,12 @@ class CharmClient {
 
   async deleteBounty (bountyId: string): Promise<any> {
 
-    const data = await http.DELETE(`/api/bounties/${bountyId}`);
-
-    return data;
+    return http.DELETE(`/api/bounties/${bountyId}`);
   }
 
-  async updateBounty (bountyId: string, bounty: Partial<Bounty>): Promise<BountyWithDetails> {
+  async updateBounty ({ bountyId, updateContent }: BountyUpdate): Promise<BountyWithDetails> {
 
-    const data = await http.PUT<BountyWithDetails>(`/api/bounties/${bountyId}`, bounty);
-
-    return data;
+    return http.PUT<BountyWithDetails>(`/api/bounties/${bountyId}`, updateContent);
   }
 
   async closeBountySubmissions (bountyId: string): Promise<BountyWithDetails> {

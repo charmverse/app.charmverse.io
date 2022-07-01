@@ -1,5 +1,5 @@
 import { Application } from '@prisma/client';
-import { DataNotFoundError, LimitReachedError, UnauthorisedActionError } from 'lib/utilities/errors';
+import { DataNotFoundError, LimitReachedError, UnauthorisedActionError, UndesirableOperationError } from 'lib/utilities/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { prisma } from 'db';
 import { getBounty } from 'lib/bounties';
@@ -15,18 +15,6 @@ export async function approveApplication ({ applicationOrApplicationId, userId }
     throw new DataNotFoundError(`Application with id ${applicationOrApplicationId} was not found`);
   }
 
-  // Check the requester has access to this space
-  const { error, isAdmin } = await hasAccessToSpace({ userId, spaceId: application.bounty.spaceId, adminOnly: false });
-
-  if (error) {
-    throw error;
-  }
-
-  // Admin or reviewer can assign the application
-  if (isAdmin === false && application.bounty.reviewer !== userId) {
-    throw new UnauthorisedActionError('You do not have permissions to approve this application');
-  }
-
   const bounty = await getBounty(application.bountyId) as BountyWithDetails;
 
   const capReached = submissionsCapReached({ bounty, submissions: bounty.applications });
@@ -40,7 +28,8 @@ export async function approveApplication ({ applicationOrApplicationId, userId }
       id: application.id
     },
     data: {
-      status: 'inProgress'
+      status: 'inProgress',
+      acceptedBy: userId
     }
   }) as Application;
 

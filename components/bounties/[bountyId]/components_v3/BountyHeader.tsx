@@ -20,9 +20,10 @@ import Modal from 'components/common/Modal';
 import { useBounties } from 'hooks/useBounties';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
-import { requesterCanDeleteBounty } from 'lib/bounties/shared';
+import { isBountyLockable, requesterCanDeleteBounty } from 'lib/bounties/shared';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { BountyWithDetails } from 'models';
+import { AssignedBountyPermissions } from 'lib/bounties';
 
 const menuPosition: Partial<MenuProps> = {
   anchorOrigin: {
@@ -37,9 +38,11 @@ const menuPosition: Partial<MenuProps> = {
 
 interface Props {
   bounty: BountyWithDetails
+  permissions: AssignedBountyPermissions,
+  refreshBountyPermissions: () => any
 }
 
-export default function BountyHeader ({ bounty }: Props) {
+export default function BountyHeader ({ bounty, permissions, refreshBountyPermissions }: Props) {
   const { refreshBounty } = useBounties();
 
   const [user] = useUser();
@@ -76,7 +79,7 @@ export default function BountyHeader ({ bounty }: Props) {
   const isBountyCreator = (user?.id === bounty?.createdBy) || isAdmin;
 
   // Menu item conditions
-  const canDeleteBounty = requesterCanDeleteBounty({
+  const canDeleteBounty = permissions?.userPermissions?.delete && requesterCanDeleteBounty({
     requesterIsAdmin: isAdmin,
     bounty,
     requesterCreatedBounty: isBountyCreator
@@ -104,8 +107,9 @@ export default function BountyHeader ({ bounty }: Props) {
             <Box component='span'>
               {bounty.title}
             </Box>
+            {/* Provide the bounty menu options */}
             {
-          (isAdmin || isBountyCreator) && (
+          (canDeleteBounty || permissions?.userPermissions?.edit || permissions?.userPermissions?.lock) && (
             <>
               <IconButton {...bindTrigger(popupState)}>
                 <MoreHorizIcon color='secondary' />
@@ -117,7 +121,7 @@ export default function BountyHeader ({ bounty }: Props) {
               >
 
                 {
-                  (isAdmin || isBountyCreator) && (
+                  permissions.userPermissions.edit && (
                     <Tooltip arrow placement='right' title={`Edit bounty ${bounty.status === 'suggestion' ? 'suggestion' : ''}`}>
                       <MenuItem
                         dense
@@ -134,7 +138,7 @@ export default function BountyHeader ({ bounty }: Props) {
                 }
 
                 {
-                  (isAdmin && bounty.status !== 'suggestion' && bounty.status !== 'complete' && bounty.status !== 'paid') && (
+                  permissions?.userPermissions?.lock && isBountyLockable(bounty) && (
                     [
                       <Tooltip key='stop-new' arrow placement='right' title={`Prevent new ${bounty.approveSubmitters ? 'applications' : 'submissions'} from being made.`}>
                         <MenuItem
@@ -199,13 +203,21 @@ export default function BountyHeader ({ bounty }: Props) {
       </Box>
 
       {/** List of modals */}
-      <BountyModal
-        onSubmit={bountyEditModal.close}
-        mode='update'
-        bounty={bounty}
-        open={bountyEditModal.isOpen}
-        onClose={bountyEditModal.close}
-      />
+      {
+        permissions?.userPermissions?.edit && (
+          <BountyModal
+            onSubmit={() => {
+              refreshBountyPermissions();
+              bountyEditModal.close();
+            }}
+            mode='update'
+            bounty={bounty}
+            open={bountyEditModal.isOpen}
+            onClose={bountyEditModal.close}
+            permissions={permissions}
+          />
+        )
+      }
 
       <Modal open={bountyDeleteModal.isOpen} onClose={bountyDeleteModal.close}>
         <BountyDelete

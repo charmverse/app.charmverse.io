@@ -39,6 +39,7 @@ import * as columnLayout from './components/columnLayout';
 import LayoutColumn from './components/columnLayout/Column';
 import LayoutRow from './components/columnLayout/Row';
 import { CryptoPrice, cryptoPriceSpec } from './components/CryptoPrice';
+import ResizablePDF, { pdfSpec } from './components/ResizablePDF';
 import * as disclosure from './components/disclosure';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
 import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
@@ -102,6 +103,7 @@ export const specRegistry = new SpecRegistry([
   inlinePaletteSpecs(), // Not required
   callout.spec(), // OK
   cryptoPriceSpec(), // NO
+  pdfSpec(), // NO
   imageSpec(), // OK
   columnLayout.rowSpec(), // NO
   columnLayout.columnSpec(), // NO
@@ -183,6 +185,10 @@ export function charmEditorPlugins (
     callout.plugins(),
     NodeView.createPlugin({
       name: 'image',
+      containerDOM: ['div', { draggable: 'false' }]
+    }),
+    NodeView.createPlugin({
+      name: 'pdf',
       containerDOM: ['div', { draggable: 'false' }]
     }),
     NodeView.createPlugin({
@@ -527,6 +533,15 @@ function CharmEditor (
           case 'page': {
             return (
               <NestedPage {...props} />
+            );
+          }
+          case 'pdf': {
+            return (
+              <ResizablePDF
+                readOnly={readOnly}
+                onResizeStop={onResizeStop}
+                {...props}
+              />
             );
           }
           default: {

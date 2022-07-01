@@ -4,6 +4,7 @@ import { InvalidInputError } from 'lib/utilities/errors/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
+import { queryBountyPermissions } from '../../permissions/bounties';
 import { PositiveNumbersOnlyError } from '../../utilities/errors/numbers';
 import { createBounty } from '../createBounty';
 import { BountyCreationData } from '../interfaces';
@@ -39,7 +40,7 @@ describe('createBounty', () => {
 
   });
 
-  it('should accept as creation input: title, spaceId, createdBy, status, chainId, description, descriptionNodes, approveSubmitters, maxSubmissions, rewardAmount, rewardToken, reviewer, linkedTaskId', async () => {
+  it('should accept as creation input: title, spaceId, createdBy, status, chainId, description, descriptionNodes, approveSubmitters, maxSubmissions, rewardAmount, rewardToken, reviewer, linkedTaskId, permissions', async () => {
 
     const fullBountyCreationData: BountyCreationData = {
       createdBy: user.id,
@@ -54,14 +55,33 @@ describe('createBounty', () => {
       reviewer: user.id,
       rewardAmount: 1000,
       rewardToken: 'ETH',
-      status: 'suggestion'
+      status: 'suggestion',
+      permissions: {
+        submitter: [{ group: 'space', id: space.id }]
+      }
     };
 
     const bounty = await createBounty(fullBountyCreationData);
 
     Object.entries(fullBountyCreationData).forEach(([key, value]) => {
-      expect(bounty[key as keyof BountyCreationData]).toBe(value);
+
+      if (key !== 'permissions') {
+        expect(bounty[key as Exclude<keyof BountyCreationData, 'permissions'>]).toBe(value);
+      }
+
     });
+
+    const bountyPermissions = await queryBountyPermissions({ bountyId: bounty.id });
+
+    // Make sure permission was inserted correctly
+    expect(bountyPermissions.submitter.some(p => p.group === 'space' && p.id === space.id)).toBe(true);
+
+    // Make sure synthetic permission is applied
+    expect(bountyPermissions.creator.some(p => p.group === 'user' && user.id === bounty.createdBy)).toBe(true);
+    const { reviewer, viewer } = bountyPermissions;
+
+    // Make sure nothing unexpected was added
+    expect(reviewer.length + viewer.length).toBe(0);
 
   });
 

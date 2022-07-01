@@ -1,17 +1,14 @@
 
-import { Space, SpaceOperation, User } from '@prisma/client';
+import { Space, SpaceOperation } from '@prisma/client';
 import { assignRole } from 'lib/roles';
 import { generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
 import { addSpaceOperations } from '../addSpaceOperations';
 import { computeSpacePermissions } from '../computeSpacePermissions';
 
-let user: User;
 let space: Space;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpaceWithApiToken(v4());
-  user = generated.user;
+  const generated = await generateUserAndSpaceWithApiToken();
   space = generated.space;
 });
 
