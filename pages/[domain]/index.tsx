@@ -14,7 +14,7 @@ export default function RedirectToMainPage () {
 
     // Find the first top-level page that is not card and hasn't been deleted yet.
     const pageArray = filterVisiblePages(Object.values(pages))
-      // Optimize a bit by removing any non-parent pages
+      // Optimize a bit by removing any child pages (eg. that have a parentId)
       .filter(page => !page?.parentId);
     const pageTree = mapTree(pageArray);
     const firstPage = pageTree[0];
