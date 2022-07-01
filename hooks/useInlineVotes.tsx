@@ -32,26 +32,20 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
   const { data, isValidating } = useSWR(() => currentPageId ? `pages/${currentPageId}/inline-votes` : null, () => charmClient.getPageVotes(cardId ?? currentPageId));
   const [currentSpace] = useCurrentSpace();
   async function castVote (voteId: string, choice: string) {
-    // TODO: Implement & Call charmClient function
+    const userVote = await charmClient.castVote(voteId, choice);
     setInlineVotes((_inlineVotes) => {
       const vote = _inlineVotes[voteId];
       if (vote && user) {
-        const userVote = vote.userVotes.find(_userVote => _userVote.userId === user.id);
-        if (userVote) {
-          userVote.choice = choice;
+        const existingUserVote = vote.userVotes.find(_userVote => _userVote.userId === user.id);
+        if (existingUserVote) {
+          existingUserVote.choice = choice;
         }
         else {
-          vote.userVotes.push({
-            choice,
-            // TODO: Remove any
-            userId: user.id,
-            voteId,
-            createdAt: new Date(),
-            updatedAt: new Date()
-          });
+          vote.userVotes.push(userVote);
         }
         _inlineVotes[voteId] = {
           ...vote
+
         };
       }
       return { ..._inlineVotes };

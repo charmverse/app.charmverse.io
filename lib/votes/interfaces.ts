@@ -22,7 +22,11 @@ export interface UserVoteDTO {
     choice: string,
 }
 
+export interface ExtendedUserVote extends UserVote {
+  user: User
+}
+
 export interface ExtendedVote extends Vote {
-    userVotes: (UserVote & {user: User})[],
+    userVotes: ExtendedUserVote[],
     voteOptions: VoteOptions[]
 }

@@ -41,7 +41,7 @@ import { TransactionCreationData } from 'lib/transactions/interface';
 import { PublicUser } from 'pages/api/public/profile/[userPath]';
 import { DeepDaoAggregateData } from 'lib/deepdao/interfaces';
 import { v4 } from 'uuid';
-import { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
+import { ExtendedUserVote, ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
 import { deleteVote } from 'lib/votes';
 import { AssignedPermissionsQuery } from './lib/permissions/interfaces';
 import { SpacePermissionFlags, SpacePermissionModification } from './lib/permissions/spaces';
@@ -703,112 +703,6 @@ class CharmClient {
   }
 
   async getPageVotes (pageId: string): Promise<ExtendedVote[]> {
-    // function randomIntFromInterval (min: number, max: number) { // min and max included
-    //   return Math.floor(Math.random() * (max - min + 1) + min);
-    // }
-
-    // function createUserVote (choice: string, voteId: string, userId?: string) {
-    //   userId = userId ?? v4();
-    //   return {
-    //     choice,
-    //     userId,
-    //     createdAt: new Date(),
-    //     updatedAt: new Date((new Date().getTime() - randomIntFromInterval(1, 24) * 60 * 60 * 1000)),
-    //     voteId,
-    //     user: {
-    //       id: userId,
-    //       avatar: 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50',
-    //       username: v4().split('-')[0]
-    //     }
-    //   } as ExtendedVote['userVotes'][0];
-    // }
-
-    // function createUserVotes (count: number, choice: string, voteId: string) {
-    //   return new Array(count).fill(null).map(() => createUserVote(choice, voteId));
-    // }
-
-    // const vote1Id = v4();
-    // const vote2Id = 'c11f0309-63b1-460a-b4a1-2e086fb9cc0a';
-    // const vote3Id = v4();
-    // return [{
-    //   deadline: new Date(new Date().getTime() - (12 * 60 * 60 * 1000)), // 12 hrs ago
-    //   description: 'My first vote',
-    //   id: vote3Id,
-    //   title: 'Passed vote',
-    //   threshold: 50,
-    //   voteOptions: [{
-    //     name: 'Yes',
-    //     voteId: vote3Id
-    //   }, {
-    //     name: 'No',
-    //     voteId: vote3Id
-    //   }, {
-    //     name: 'Abstain',
-    //     voteId: vote3Id
-    //   }],
-    //   createdAt: new Date(),
-    //   pageId: v4(),
-    //   createdBy: 'b1c1735e-da3c-4856-bd7c-fa9b13978e2',
-    //   spaceId: '',
-    //   status: 'Passed',
-    //   userVotes: [
-    //     ...createUserVotes(10, 'Yes', vote3Id),
-    //     ...createUserVotes(2, 'No', vote3Id),
-    //     ...createUserVotes(7, 'Abstain', vote3Id)
-    //   ]
-    // }, {
-    //   deadline: new Date(new Date().getTime() + (12 * 60 * 60 * 1000)), // 12 hrs
-    //   description: 'My first vote',
-    //   threshold: 50,
-    //   id: vote1Id,
-    //   title: 'Vote 1',
-    //   options: [{
-    //     name: 'Yes',
-    //     voteId: vote1Id
-    //   }, {
-    //     name: 'No',
-    //     voteId: vote1Id
-    //   }, {
-    //     name: 'Abstain',
-    //     voteId: vote1Id
-    //   }],
-    //   createdAt: new Date(),
-    //   pageId: v4(),
-    //   initiatorId: 'b1c1735e-da3c-4856-bd7c-fa9b13978e29',
-    //   status: 'Cancelled',
-    //   userVotes: [
-    //     ...createUserVotes(5, 'Yes', vote1Id),
-    //     ...createUserVotes(8, 'No', vote1Id),
-    //     ...createUserVotes(9, 'Abstain', vote1Id)
-    //   ]
-    // }, {
-    //   deadline: new Date(new Date().getTime() + (48 * 60 * 60 * 1000)), // 48 hrs
-    //   description: 'My Second Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam pulvinar, dolor in molestie sagittis, orci eros lacinia eros, vel hendrerit dolor mi vitae quam. Proin convallis tincidunt congue. Suspendisse lorem dui, faucibus suscipit lectus nec, porta placerat nisi. Aenean a orci eu nisi euismod ornare. Suspendisse feugiat nibh mi, ut varius purus dignissim nec. Praesent vitae sapien sapien. Curabitur a tempus orci. Vestibulum at rutrum neque. Mauris sit amet lacus volutpat augue mattis tempor quis vel ante. Quisque sodales eu enim at lobortis. Donec fringilla feugiat faucibus. Nunc vitae massa et est aliquet lobortis. Ut sit amet risus non risus dapibus hendrerit. Etiam tincidunt convallis sagittis. \n Aenean non aliquet turpis. Maecenas eget nibh non lectus bibendum pellentesque. Suspendisse vulputate magna at libero aliquam, vitae consectetur sem maximus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Etiam ornare mollis lacus at suscipit. In scelerisque semper dolor nec aliquam. Nullam nec lorem in sem aliquet dapibus in at ex. Nunc mattis ante et mi porttitor, a pretium sapien laoreet. Maecenas blandit condimentum lorem in sollicitudin. Cras non convallis purus, ultrices elementum dolor. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque eleifend nec dui vitae semper. Nulla gravida mauris non tristique venenatis. Aliquam a nisi cursus, vulputate erat vitae, dignissim mi. Nullam mi tortor, euismod accumsan semper eget, tincidunt volutpat diam.\nIn ut nulla metus. Sed vestibulum tortor vel justo bibendum suscipit. Integer sodales elit dui, et tempus tellus volutpat sed. Nullam tincidunt metus elementum dui iaculis aliquet. Pellentesque hendrerit laoreet posuere. In eleifend leo vel vestibulum bibendum. Curabitur nec sapien vitae erat pellentesque maximus eget et turpis. Quisque eu fringilla sem, dignissim congue augue. Morbi id nisl vel felis vulputate mattis. Ut pellentesque ex id eros rutrum, sollicitudin maximus tortor convallis. Sed fermentum augue nec sem imperdiet ultricies. Suspendisse ac dignissim purus. Nunc facilisis vulputate dolor. Maecenas in volutpat ligula. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.',
-    //   id: vote2Id,
-    //   threshold: 50,
-    //   title: 'Vote 2',
-    //   options: [{
-    //     name: 'Option 1'
-    //   }, {
-    //     name: 'Option 2'
-    //   }, {
-    //     name: 'Option 3'
-    //   }, {
-    //     name: 'No Change'
-    //   }],
-    //   createdAt: new Date(),
-    //   pageId: v4(),
-    //   initiatorId: 'b1c1735e-da3c-4856-bd7c-fa9b13978e29',
-    //   status: 'InProgress',
-    //   userVotes: [
-    //     createUserVote('Option 1', vote2Id, 'b1c1735e-da3c-4856-bd7c-fa9b13978e29'),
-    //     ...createUserVotes(2, 'Option 1', vote2Id),
-    //     ...createUserVotes(7, 'Option 2', vote2Id),
-    //     ...createUserVotes(4, 'Option 3', vote2Id),
-    //     ...createUserVotes(3, 'No Change', vote2Id)
-    //   ]
-    // }];
-
     return http.GET(`/api/pages/${pageId}/votes`);
   }
 
@@ -824,6 +718,12 @@ class CharmClient {
 
   deleteVote (voteId: string) {
     return http.DELETE(`/api/votes/${voteId}`);
+  }
+
+  castVote (voteId: string, choice: string) {
+    return http.POST<ExtendedUserVote>(`/api/votes/${voteId}/cast`, {
+      choice
+    });
   }
 }
 
