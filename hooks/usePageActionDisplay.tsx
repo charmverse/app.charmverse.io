@@ -1,5 +1,5 @@
-import { ExtendedVote } from 'lib/inline-votes/interfaces';
 import { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
+import { ExtendedVote } from 'lib/votes/interfaces';
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 import { useSWRConfig } from 'swr';
 import { useInlineVotes } from './useInlineVotes';

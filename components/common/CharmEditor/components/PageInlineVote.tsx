@@ -87,7 +87,7 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
   const voteCountLabel = (
     <Box sx={{
       fontWeight: 'bold',
-      fontSize: 18,
+      fontSize: 16,
       mt: 1,
       display: 'flex',
       alignItems: 'center',

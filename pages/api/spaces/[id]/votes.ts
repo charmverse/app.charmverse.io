@@ -1,8 +1,9 @@
-import { ExtendedVote, getSpaceVotes } from 'lib/votes';
+import { getSpaceVotes } from 'lib/votes';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import { ExtendedVote } from 'lib/votes/interfaces';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
