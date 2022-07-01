@@ -14,25 +14,6 @@ handler
 
 async function runCommand (req: NextApiRequest, res: NextApiResponse) {
 
-  // const bounties = await prisma.bounty.findMany({
-  //   take: 57
-  // });
-
-  // await prisma.bounty.updateMany({
-  //   where: {
-  //     OR: bounties.map(b => {
-  //       return {
-  //         id: b.id
-  //       };
-  //     })
-  //   },
-  //   data: {
-  //     reviewer: '89ad2fd4-1f9d-4ac3-a3ec-d3a395c88de6'
-  //   }
-  // });
-
-  await migrateBountyReviewers(0);
-
   res.status(200).json({
     msg: 'hello'
   });

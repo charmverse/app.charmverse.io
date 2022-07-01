@@ -1,12 +1,13 @@
 /* eslint-disable no-console */
 import { prisma } from 'db';
 import { addBountyPermissionGroup } from 'lib/permissions/bounties/addBountyPermissionGroup';
+import { hasAccessToSpace } from '../lib/middleware';
 
 export const placeholder = 2;
 
 const concurrent = 5;
 
-export async function migrateBountyReviewers (skip: number, total?: number): Promise<true> {
+export async function migrateBountyReviewers (skip: number, total?: number, errorsFound: number = 0): Promise<true> {
 
   if (total === undefined) {
     total = await prisma.bounty.count({
@@ -24,6 +25,7 @@ export async function migrateBountyReviewers (skip: number, total?: number): Pro
 
   const bounties = await prisma.bounty.findMany({
     skip,
+    take: concurrent,
     where: {
       reviewer: {
         not: null
@@ -36,9 +38,6 @@ export async function migrateBountyReviewers (skip: number, total?: number): Pro
   const errors: any[] = [];
 
   await Promise.all(bounties.map(async b => {
-    console.log(b);
-
-    console.log(await prisma.user.findUnique({ where: { id: b.reviewer as string } }));
 
     return addBountyPermissionGroup({
       assignee: {
@@ -49,14 +48,17 @@ export async function migrateBountyReviewers (skip: number, total?: number): Pro
       resourceId: b.id
     })
       .catch(err => {
-        console.log(err);
+        console.log(err.errorType, err.errorConstructor);
         errors.push(err);
       }).then((val) => val);
   }));
 
-  console.log(errors);
+  console.log(errors.length);
 
-  return migrateBountyReviewers(skip + concurrent, total);
+  const newErrorTotal = errorsFound + errors.length;
+  console.log('Total errors', newErrorTotal, ' / ', total);
+
+  return migrateBountyReviewers(skip + concurrent, total, errorsFound + errors.length);
 
 }
 
