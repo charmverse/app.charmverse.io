@@ -115,7 +115,7 @@ type PDFViewerProps = {
   width: number
 };
 
-function PDF (props: PDFViewerProps) {
+const PDF = memo((props: PDFViewerProps) => {
   const { url, width } = props;
   const [pageCount, setPageCount] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState(1);
@@ -158,7 +158,7 @@ function PDF (props: PDFViewerProps) {
       </div>
     </Box>
   );
-}
+});
 
 function ResizablePDF ({ readOnly, onResizeStop, node, updateAttrs, selected }:
   NodeViewProps & {readOnly?: boolean, onResizeStop?: (view: EditorView) => void }) {
