@@ -14,7 +14,7 @@ import { Bounty, BountyStatus } from '@prisma/client';
 import { getChainById } from 'connectors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import { getTokenInfo } from 'lib/tokens/tokenData';
+import { getTokenAndChainInfoFromPayments } from 'lib/tokens/tokenData';
 import millify from 'millify';
 import { BOUNTY_LABELS } from 'models/Bounty';
 import Link from 'next/link';
@@ -122,15 +122,14 @@ export default function BountyStatusBadgeWrapper ({ truncate = false, bounty, la
 
 export function BountyAmount ({ bounty, truncate = false }: { bounty: Pick<Bounty, 'rewardAmount' | 'rewardToken' | 'chainId'>, truncate?: boolean }) {
 
-  const chainInfo = getChainById(bounty.chainId);
-  const chainName = chainInfo?.chainName || '';
   const [paymentMethods] = usePaymentMethods();
-  const tokenInfo = getTokenInfo(paymentMethods, bounty.rewardToken);
+  const tokenInfo = getTokenAndChainInfoFromPayments({
+    chainId: bounty.chainId,
+    methods: paymentMethods,
+    symbolOrAddress: bounty.rewardToken
+  });
 
-  const tooltip = `${chainName} (${tokenInfo.tokenSymbol})`;
-
-  // prefer our standard iconUrl for native tokens
-  const tokenLogo = tokenInfo.isContract ? tokenInfo.tokenLogo : (chainInfo?.iconUrl || tokenInfo.tokenLogo);
+  const tooltip = `${tokenInfo.chain.chainName} (${tokenInfo.tokenSymbol})`;
 
   return (
     <Tooltip arrow placement='top' title={bounty.rewardAmount === 0 ? '' : tooltip}>
@@ -162,16 +161,12 @@ export function BountyAmount ({ bounty, truncate = false }: { bounty: Pick<Bount
                     alignItems: 'center'
                   }}
                 >
-                  {
-              tokenLogo && (
-                <Box component='span' sx={{ width: '25px', height: '25px' }}>
-                  <img
-                    height='100%'
-                    src={tokenLogo}
-                  />
-                </Box>
-              )
-            }
+                  <Box component='span' sx={{ width: '25px', height: '25px' }}>
+                    <img
+                      height='100%'
+                      src={tokenInfo.canonicalLogo}
+                    />
+                  </Box>
                 </Box>
                 <Typography
                   component='span'
