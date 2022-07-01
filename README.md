@@ -94,6 +94,29 @@ npx prisma migrate dev --name blocks_title_required
 
 For more information about how migrations work: https://www.prisma.io/docs/concepts/components/prisma-migrate.
 
+#### Postgres CLI Cheatsheat
+
+```
+# Connect to Postgres
+psql -h <host> -p 5432 -U <user> -d <database>
+
+# View databases
+\l
+
+# Enter a database
+\c <databasename>
+
+# View tables
+\dt
+
+# View columns in a table
+\d+ <table>
+
+# View prisma migrations
+SELECT started_at,migration_name FROM "_prisma_migrations" ORDER BY "started_at" DESC LIMIT 20;
+
+```
+
 ### Testing
 Testing for client-side and server-side code happens separately.
 
