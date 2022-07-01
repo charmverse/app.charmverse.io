@@ -12,9 +12,11 @@ export default function RedirectToMainPage () {
 
   useEffect(() => {
 
-    // Find the first top-level page that is not card and hasn't been deleted yet
-    const pageArray = Object.values(pages);
-    const pageTree = mapTree(filterVisiblePages(pageArray));
+    // Find the first top-level page that is not card and hasn't been deleted yet.
+    const pageArray = filterVisiblePages(Object.values(pages))
+      // Optimize a bit by removing any non-parent pages
+      .filter(page => !page?.parentId);
+    const pageTree = mapTree(pageArray);
     const firstPage = pageTree[0];
 
     // make sure this page is part of this space in case user is navigating to a new space
