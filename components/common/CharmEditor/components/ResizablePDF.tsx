@@ -8,7 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import charmClient from 'charmClient';
-import { HTMLAttributes, memo, useCallback, useMemo, useState } from 'react';
+import { HTMLAttributes, memo, useMemo, useState } from 'react';
 import PdfSelector from 'components/common/PdfSelector';
 import { MIN_PDF_WIDTH, MAX_PDF_WIDTH } from 'lib/image/constants';
 import { Document, Page, pdfjs } from 'react-pdf';
@@ -93,7 +93,7 @@ export function pdfSpec () {
           default: null
         },
         size: {
-          default: (MIN_PDF_WIDTH + MAX_PDF_WIDTH) / 2
+          default: MAX_PDF_WIDTH
         }
       },
       group: 'block',
