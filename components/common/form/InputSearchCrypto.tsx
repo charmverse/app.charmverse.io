@@ -42,19 +42,17 @@ export function InputSearchCrypto ({
   const ERC20PopupState = usePopupState({ variant: 'popover', popupId: 'ERC20-popup' });
 
   useEffect(() => {
-    setInputValue(defaultValue);
     setValue(defaultValue);
   }, [cryptoList]);
 
   useEffect(() => {
     if (parentValue) {
-      setInputValue(parentValue);
       setValue(parentValue);
     }
   }, [cryptoList, parentValue]);
 
   function emitValue (received: string) {
-    if (received !== null && cryptoList.indexOf(received as CryptoCurrency) >= 0) {
+    if (received && cryptoList.includes(received as CryptoCurrency)) {
       setValue(received);
       onChange(received as CryptoCurrency);
     }
@@ -95,8 +93,7 @@ export function InputSearchCrypto ({
         autoHighlight
         size='small'
         getOptionLabel={(option) => {
-          const tokenInfo = getTokenInfo(paymentMethods, option);
-          return tokenInfo.tokenSymbol;
+          return getTokenInfo(paymentMethods, option).tokenSymbol;
         }}
         renderOption={(props, option) => {
           if (option === ADD_NEW_CUSTOM) {

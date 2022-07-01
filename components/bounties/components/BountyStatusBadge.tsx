@@ -153,7 +153,7 @@ export function BountyAmount ({ bounty, truncate = false }: { bounty: Pick<Bount
             ) : (
               <>
                 <Box
-                  mr={0.75}
+                  mr={0.5}
                   component='span'
                   sx={{
                     width: 25,
