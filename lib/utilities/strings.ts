@@ -75,10 +75,55 @@ export function getUriWithParam (
  * @param input
  */
 export function upperCaseFirstCharacter (input: string): string {
+  if (!input) {
+    return '';
+  }
   const trimmed = input.trim();
   return `${trimmed[0].toUpperCase()}${trimmed.slice(1)}`;
 }
 
 export function isUUID (uuid: string) {
   return validate(uuid);
+}
+
+/**
+ * Converts a list of string to human friendly gramatically correct comma list, with an and / or at the end
+ * Won't add the conjunction if there is less than 2 items in the list
+ */
+export function humaniseList ({
+  content,
+  conjunction,
+  capitaliseFirstCharacter
+}: {
+  content: string[],
+  conjunction: 'and' | 'or',
+  capitaliseFirstCharacter: boolean
+}): string {
+
+  if (content.length === 1) {
+    return capitaliseFirstCharacter ? upperCaseFirstCharacter(content[0]) : content[0];
+  }
+  else if (content.length === 0) {
+    return '';
+  }
+  else if (content.length === 2) {
+    return capitaliseFirstCharacter ? `${upperCaseFirstCharacter(content[0])} ${conjunction} ${upperCaseFirstCharacter(content[1])}`
+      : `${content[0]} ${conjunction} ${content[1]}`;
+  }
+
+  const last = content.pop();
+  const formatted = content.map(item => {
+    if (capitaliseFirstCharacter) {
+      return upperCaseFirstCharacter(item);
+    }
+    return item.trim();
+  });
+  if (formatted.length > 1) {
+    formatted.push(`${conjunction} ${last}`);
+  }
+  else if (last) {
+    formatted.push(last);
+  }
+
+  return formatted.join(', ');
 }

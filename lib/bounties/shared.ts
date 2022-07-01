@@ -1,5 +1,6 @@
 /* Any method here can be used across client and server */
 
+import { BountyStatus } from '@prisma/client';
 import { BountyWithDetails } from 'models';
 
 export function requesterCanDeleteBounty ({ bounty, requesterIsAdmin, requesterCreatedBounty }: {
@@ -21,4 +22,11 @@ export function requesterCanDeleteBounty ({ bounty, requesterIsAdmin, requesterC
   }
 
   return false;
+}
+
+// Allow ability to lock submissions only if the bounty is in status to receive new submissions.
+export function isBountyLockable (bounty: BountyWithDetails): boolean {
+  const lockableStatuses: BountyStatus[] = ['open', 'inProgress'];
+
+  return lockableStatuses.includes(bounty.status);
 }

@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Application, Bounty, Space, User } from '@prisma/client';
 import request from 'supertest';
-import { baseUrl } from 'testing/mockApiCall';
+import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateBounty, generateBountyWithSingleApplication, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { ApplicationCreationData, SubmissionCreationData, SubmissionReview } from 'lib/applications/interfaces';
 import { createBounty } from 'lib/bounties';
 import { generateSubmissionContent } from 'testing/generate-stubs';
+import { addBountyPermissionGroup } from 'lib/permissions/bounties';
 
 let nonAdminUser: User;
 let nonAdminUserSpace: Space;
@@ -16,24 +17,16 @@ beforeAll(async () => {
 
   nonAdminUser = generated.user;
   nonAdminUserSpace = generated.space;
-  nonAdminCookie = (await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: nonAdminUser.addresses[0]
-    })).headers['set-cookie'][0];
+  nonAdminCookie = await loginUser(nonAdminUser);
 });
 
 describe('POST /api/submissions/{submissionId}/review - review a submission', () => {
 
-  it('should allow the reviewer to review a submission and respond with 200', async () => {
+  it('should succed if the user has "review" permission, respond with 200', async () => {
 
     const reviewer = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
 
-    const reviewerCookie = (await request(baseUrl)
-      .post('/api/session/login')
-      .send({
-        address: reviewer.addresses[0]
-      })).headers['set-cookie'][0];
+    const reviewerCookie = await loginUser(reviewer);
 
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,
@@ -41,7 +34,17 @@ describe('POST /api/submissions/{submissionId}/review - review a submission', ()
       applicationStatus: 'review',
       bountyCap: null,
       bountyStatus: 'open',
-      reviewer: reviewer.id
+      // Reviewer status is now assigned via permissions
+      reviewer: undefined
+    });
+
+    await addBountyPermissionGroup({
+      level: 'reviewer',
+      resourceId: bounty.id,
+      assignee: {
+        group: 'user',
+        id: reviewer.id
+      }
     });
 
     const decision: Pick<SubmissionReview, 'decision'> = {
@@ -59,11 +62,7 @@ describe('POST /api/submissions/{submissionId}/review - review a submission', ()
 
     const adminUser = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: true });
 
-    const adminUserCookie = (await request(baseUrl)
-      .post('/api/session/login')
-      .send({
-        address: adminUser.addresses[0]
-      })).headers['set-cookie'][0];
+    const adminUserCookie = await loginUser(adminUser);
 
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,
@@ -85,15 +84,11 @@ describe('POST /api/submissions/{submissionId}/review - review a submission', ()
       .expect(200);
   });
 
-  it('should fail if the requesting user is neither a space admin, nor the reviewer and respond with 200', async () => {
+  it('should fail if the requesting non-admin user does not have the "review" permission and respond with 401', async () => {
 
     const user = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
 
-    const userCookie = (await request(baseUrl)
-      .post('/api/session/login')
-      .send({
-        address: user.addresses[0]
-      })).headers['set-cookie'][0];
+    const userCookie = await loginUser(user);
 
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,

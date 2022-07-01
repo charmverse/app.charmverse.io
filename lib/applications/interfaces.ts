@@ -21,6 +21,7 @@ export type ReviewDecision = 'approve' | 'reject'
 
 export interface SubmissionReview {
   submissionId: string
+  userId: string
   decision: ReviewDecision
 }
 
