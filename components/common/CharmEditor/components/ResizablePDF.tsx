@@ -165,7 +165,6 @@ function ResizablePDF ({ readOnly, onResizeStop, node, updateAttrs, selected }:
   readOnly = readOnly ?? false;
 
   const url: string = useMemo(() => node.attrs.src, [node.attrs.src]);
-
   const size: number = useMemo(() => node.attrs.size, [node.attrs.size]);
 
   // If there are no source for the node, return the pdf select component
@@ -189,7 +188,7 @@ function ResizablePDF ({ readOnly, onResizeStop, node, updateAttrs, selected }:
     }
   }
 
-  const handleDelete = useCallback(() => {
+  const handleDelete = () => {
     if (url?.includes('s3.amazonaws.com')) {
       charmClient.deleteFromS3(url);
     }
@@ -197,7 +196,7 @@ function ResizablePDF ({ readOnly, onResizeStop, node, updateAttrs, selected }:
       src: null,
       aspectRatio: 1
     });
-  }, [url]);
+  };
 
   if (readOnly) {
     return (
