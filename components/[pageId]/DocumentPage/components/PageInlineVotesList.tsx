@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { List, MenuItem, Select, Typography } from '@mui/material';
+import { FormControl, FormHelperText, List, MenuItem, Select, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import PageInlineVote from 'components/common/CharmEditor/components/PageInlineVote';
 import { useInlineVotes } from 'hooks/useInlineVotes';
@@ -35,6 +35,9 @@ const Center = styled.div`
   flex-direction: column;
 `;
 
+type TVoteSort = 'latest_deadline' | 'highest_votes' | 'earliest_created';
+type TVoteFilter = 'in_progress' | 'completed';
+
 export default function PageInlineVotesList () {
   const { inlineVotes } = useInlineVotes();
   const allVotes = Object.values(inlineVotes);
@@ -53,11 +56,28 @@ export default function PageInlineVotesList () {
     return [_votesInProgress, _votesCompleted];
   }, [inlineVotes]);
 
-  const [voteFilter, setVoteFilter] = useState<'in_progress' | 'completed'>('in_progress');
-  // const [voteSort, setVoteSort] = useState<'latest_updated' | 'highest_votes'>('latest_updated')
+  const [voteFilter, setVoteFilter] = useState<TVoteFilter>('in_progress');
+  const [voteSort, setVoteSort] = useState<TVoteSort>('latest_deadline');
 
   const filteredVotes = voteFilter === 'completed' ? votesCompleted : votesInProgress;
 
+  const sortedVotes = useMemo(() => {
+    let _sortedVotes: ExtendedVote[] = filteredVotes;
+    if (voteSort === 'highest_votes') {
+      _sortedVotes = filteredVotes.sort((filteredVoteA, filteredVoteB) => filteredVoteA.userVotes.length > filteredVoteB.userVotes.length ? -1 : 1);
+    }
+    else if (voteSort === 'earliest_created') {
+      _sortedVotes = filteredVotes.sort(
+        (filteredVoteA, filteredVoteB) => new Date(filteredVoteA.createdAt) < new Date(filteredVoteB.createdAt) ? -1 : 1
+      );
+    }
+    else if (voteSort === 'latest_deadline') {
+      _sortedVotes = filteredVotes.sort(
+        (filteredVoteA, filteredVoteB) => new Date(filteredVoteA.deadline) < new Date(filteredVoteB.deadline) ? -1 : 1
+      );
+    }
+    return _sortedVotes;
+  }, [filteredVotes, voteSort]);
   return (
     <Box sx={{
       height: 'calc(100% - 50px)'
@@ -68,14 +88,19 @@ export default function PageInlineVotesList () {
           Votes
         </Typography>
         <Box display='flex' gap={1}>
-          <Select variant='outlined' value={voteFilter} onChange={(e) => setVoteFilter(e.target.value as 'in_progress' | 'completed')}>
+          <Select variant='outlined' value={voteSort} onChange={(e) => setVoteSort(e.target.value as TVoteSort)}>
+            <MenuItem value='latest_deadline'>Latest deadline</MenuItem>
+            <MenuItem value='highest_votes'>Highest votes</MenuItem>
+            <MenuItem value='earliest_created'>Earliest created</MenuItem>
+          </Select>
+          <Select variant='outlined' value={voteFilter} onChange={(e) => setVoteFilter(e.target.value as TVoteFilter)}>
             <MenuItem value='in_progress'>In progress</MenuItem>
             <MenuItem value='completed'>Completed</MenuItem>
           </Select>
         </Box>
       </Box>
       <StyledPageInlineVotesList>
-        {filteredVotes.length === 0 ? (
+        {sortedVotes.length === 0 ? (
           <EmptyVoteContainerBox>
             <Center>
               <HowToVoteOutlinedIcon
@@ -89,7 +114,7 @@ export default function PageInlineVotesList () {
               <Typography variant='subtitle1' color='secondary'>No {voteFilter === 'completed' ? 'completed' : 'in progress'} votes yet</Typography>
             </Center>
           </EmptyVoteContainerBox>
-        ) : filteredVotes.map(inlineVote => <PageInlineVote detailed={false} inlineVote={inlineVote} key={inlineVote.id} />)}
+        ) : sortedVotes.map(inlineVote => <PageInlineVote detailed={false} inlineVote={inlineVote} key={inlineVote.id} />)}
       </StyledPageInlineVotesList>
     </Box>
   );
