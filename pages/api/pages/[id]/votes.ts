@@ -1,11 +1,12 @@
 import { prisma } from 'db';
-import { ExtendedVote, getPageVotes } from 'lib/votes';
+import { getPageVotes } from 'lib/votes';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { PageNotFoundError } from 'lib/pages/server';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import { ExtendedVote } from 'lib/votes/interfaces';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

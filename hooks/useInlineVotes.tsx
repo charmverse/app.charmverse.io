@@ -39,6 +39,7 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
         const existingUserVote = vote.userVotes.find(_userVote => _userVote.userId === user.id);
         if (existingUserVote) {
           existingUserVote.choice = choice;
+          existingUserVote.updatedAt = new Date();
         }
         else {
           vote.userVotes.push(userVote);
@@ -53,7 +54,6 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
   }
 
   async function createVote (votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId'>): Promise<ExtendedVote> {
-    // TODO: Implement & Call charmClient function
     const extendedVote = await charmClient.createVote({
       ...votePayload,
       createdBy: user!.id,

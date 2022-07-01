@@ -702,8 +702,8 @@ class CharmClient {
     return http.GET<DeepDaoAggregateData>(`/api/public/profile/${userPath}/aggregate`);
   }
 
-  async getPageVotes (pageId: string): Promise<ExtendedVote[]> {
-    return http.GET(`/api/pages/${pageId}/votes`);
+  getPageVotes (pageId: string) {
+    return http.GET<ExtendedVote[]>(`/api/pages/${pageId}/votes`);
   }
 
   createVote (votePayload: VoteDTO) {
