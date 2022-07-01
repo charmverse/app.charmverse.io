@@ -240,10 +240,14 @@ export default function BountySubmissions ({ bounty, permissions }: Props) {
                 {
             reviewerNames.users.map(reviewer => {
 
+              const userName = !reviewer.name ? 'Unknown user. This person has most likely left this workspace.' : (
+                reviewer.name.slice(0, 2).match('0x') ? reviewer.name.slice(2, 3).toUpperCase() : reviewer.name.slice(0, 1).toUpperCase()
+              );
+
               return (
-                <Tooltip placement='top' key={reviewer.id} title={reviewer.name}>
+                <Tooltip placement='top' key={reviewer.id} title={!reviewer.name ? userName : reviewer.name}>
                   <Box>
-                    <Avatar name={reviewer.name.slice(0, 2).match('0x') ? reviewer.name.slice(2, 3).toUpperCase() : reviewer.name.slice(0, 1).toUpperCase()} avatar={reviewer.profilePic as string} />
+                    <Avatar name={userName.slice(0, 1)} avatar={reviewer.profilePic as string} />
                   </Box>
 
                 </Tooltip>
