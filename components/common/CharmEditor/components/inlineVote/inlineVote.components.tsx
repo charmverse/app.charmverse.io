@@ -1,18 +1,23 @@
 import { PluginKey, TextSelection } from '@bangle.dev/pm';
-import { useEditorViewContext } from '@bangle.dev/react';
+import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { hideSelectionTooltip } from '@bangle.dev/tooltip/selection-tooltip';
 import AddCircle from '@mui/icons-material/AddCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { FormControlLabel, IconButton, ListItem, Radio, RadioGroup, TextField, Typography } from '@mui/material';
+import { Divider, FormControlLabel, IconButton, ListItem, Radio, RadioGroup, TextField, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { Modal } from 'components/common/Modal';
 import { useInlineVotes } from 'hooks/useInlineVotes';
+import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
 import { DateTime } from 'luxon';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
+import PageInlineVote from '../PageInlineVote';
+import { InlineVotePluginState } from './inlineVote.plugins';
 import { updateInlineVote } from './inlineVote.utils';
 
 type VoteType = 'default' | 'custom';
@@ -23,6 +28,42 @@ interface InlineVoteOptionsProps {
   setOptions: Dispatch<SetStateAction<{ name: string }[]>>
   disableDelete?: boolean
   disableAddOption?: boolean
+}
+
+export function InlineVoteList ({ pluginKey }: {pluginKey: PluginKey<InlineVotePluginState>}) {
+  const view = useEditorViewContext();
+  const {
+    ids,
+    show
+  } = usePluginState(pluginKey) as InlineVotePluginState;
+
+  const cardId = (new URLSearchParams(window.location.href)).get('cardId');
+  const { currentPageActionDisplay } = usePageActionDisplay();
+  const inlineVoteDetailModal = usePopupState({ variant: 'popover', popupId: 'inline-votes-detail' });
+  const { inlineVotes } = useInlineVotes();
+  const inProgressVoteIds = ids.filter(voteId => inlineVotes[voteId].status === 'InProgress');
+
+  if ((currentPageActionDisplay !== 'votes' || cardId) && show && inProgressVoteIds.length !== 0) {
+    return (
+      <Modal
+        title='Votes details'
+        size='large'
+        open={true}
+        onClose={() => {
+          hideSuggestionsTooltip(pluginKey)(view.state, view.dispatch, view);
+          inlineVoteDetailModal.close();
+        }}
+      >
+        {inProgressVoteIds.map(inProgressVoteId => (
+          <Box mb={3}>
+            <PageInlineVote inlineVote={inlineVotes[inProgressVoteId]} detailed />
+            <Divider />
+          </Box>
+        ))}
+      </Modal>
+    );
+  }
+  return null;
 }
 
 function InlineVoteOptions (

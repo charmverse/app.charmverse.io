@@ -58,6 +58,7 @@ import * as table from './components/table';
 import * as trailingNode from './components/trailingNode';
 import DevTools from './DevTools';
 import { checkForEmpty } from './utils';
+import { InlineVoteList } from './components/inlineVote';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -578,6 +579,7 @@ function CharmEditor (
           </PageActionListBox>
         </Grow>
         <InlineCommentThread pluginKey={inlineCommentPluginKey} />
+        <InlineVoteList pluginKey={inlineVotePluginKey} />
       </>
       )}
       {!readOnly && <DevTools />}
