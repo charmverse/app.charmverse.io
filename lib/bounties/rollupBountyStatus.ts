@@ -12,6 +12,11 @@ export async function rollupBountyStatus (bountyId: string): Promise<BountyWithD
     throw new DataNotFoundError(`Bounty with id ${bountyId} not found`);
   }
 
+  // No-op on bounty suggestions. They need to be approved first
+  if (bounty.status === 'suggestion') {
+    return bounty;
+  }
+
   function statusUpdate (newStatus: BountyStatus): Promise<BountyWithDetails> {
     return prisma.bounty.update({
       where: {

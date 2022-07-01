@@ -1,14 +1,10 @@
 
-import { Bounty, PageOperations, PagePermissionLevel, Space, User } from '@prisma/client';
-import { computeUserPagePermissions, permissionTemplates, upsertPermission } from 'lib/permissions/pages';
-import { createPage, generateUserAndSpaceWithApiToken, generateBountyWithSingleApplication } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
+import { Space, User } from '@prisma/client';
+import { DataNotFoundError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
-import { UserIsNotSpaceMemberError } from 'lib/users/errors';
-import { DataNotFoundError, InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
-import { createBounty } from '../createBounty';
+import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { v4 } from 'uuid';
 import { rollupBountyStatus } from '../rollupBountyStatus';
-import { PositiveNumbersOnlyError } from '../../utilities/errors/numbers';
 
 let user: User;
 let space: Space;
@@ -102,6 +98,20 @@ describe('rollupBountyStatus', () => {
     const bountyAfterRollup = await rollupBountyStatus(bounty.id);
 
     expect(bountyAfterRollup.status).toBe('open');
+  });
+
+  it('should leave a bounty with suggestion status unchanged', async () => {
+    const bounty = await generateBountyWithSingleApplication({
+      userId: user.id,
+      spaceId: space.id,
+      bountyCap: 10,
+      applicationStatus: 'applied',
+      bountyStatus: 'suggestion'
+    });
+
+    const bountyAfterRollup = await rollupBountyStatus(bounty.id);
+
+    expect(bountyAfterRollup.status).toBe('suggestion');
   });
 
 });
