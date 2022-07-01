@@ -7,7 +7,7 @@ import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import Legend from 'components/settings/Legend';
 import ImportGuildRolesMenuItem from 'components/settings/roles/components/ImportGuildRolesMenuItem';
-import useRoles from 'components/settings/roles/hooks/useRoles';
+import useRoles from 'hooks/useRoles';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
@@ -17,10 +17,10 @@ import ImportDiscordRolesMenuItem from './components/ImportDiscordRolesMenuItem'
 import RoleForm from './components/RoleForm';
 import RoleRow from './components/RoleRow';
 import { useImportDiscordRoles } from './hooks/useImportDiscordRoles';
-import DefaultPagePermissions from './spacePermissions/DefaultPagePermissions';
-import PermissionConfigurationMode from './spacePermissions/PermissionConfigurationMode';
-import SpacePermissions from './spacePermissions/SpacePermissions';
-import TokenGates from './token-gates/TokenGates';
+import DefaultPagePermissions from './components/SpacePermissions/components/DefaultPagePermissions';
+import PermissionConfigurationMode from './components/SpacePermissions/components/PermissionConfigurationMode';
+import SpacePermissions from './components/SpacePermissions';
+import TokenGates from './components/TokenGates';
 
 export default function RoleSettings () {
   const {

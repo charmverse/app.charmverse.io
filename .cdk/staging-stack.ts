@@ -122,7 +122,7 @@ export class CdkDeployStack extends Stack {
     *  Note: something at the end of the path is required or the Load balancer url never resolves
      */
      new CfnOutput(this, "DeploymentUrl", {
-      value: 'https://' + deploymentDomain + '/login',
+      value: 'https://' + deploymentDomain + '/',
     });
   }
 }

@@ -40,7 +40,6 @@
     "test:server:ci": "dotenv -e .env.test.local --override -- npx jest --config='./jest.config-server.ts'",
     "test:browser:ci": "dotenv -e .env.test.local --override -- npx jest --config='./jest.config-browser.ts'"
   },
-  "prepare": "husky install",
   "lint-staged": {
     "*.{ts,tsx}": [
       "eslint --fix"
@@ -126,8 +125,8 @@
     "immutable": "^4.0.0",
     "iron-session": "^6.0.5",
     "koa": "^2.13.4",
-    "lit-js-sdk": "^1.1.169",
-    "lit-share-modal": "^0.1.82",
+    "lit-js-sdk": "^1.1.192",
+    "lit-share-modal-v3-react-17": "^0.0.76",
     "lodash": "^4.17.21",
     "loglevel": "^1.8.0",
     "luxon": "^2.3.1",

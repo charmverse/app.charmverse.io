@@ -15,10 +15,12 @@ import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import Chip from '@mui/material/Chip';
 import charmClient from 'charmClient';
 import TableRow from 'components/common/Table/TableRow';
-import { getLitChainFromChainId } from 'lib/token-gates';
 import { TokenGateWithRoles } from 'pages/api/token-gates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { mutate } from 'swr';
+import log from 'lib/log';
+import { shortenHex } from 'lib/utilities/strings';
+import getLitChainFromChainId from 'lib/token-gates/getLitChainFromChainId';
 import TestConnectionModal, { TestResult } from './TestConnectionModal';
 import TokenGateRolesSelect from './TokenGateRolesSelect';
 
@@ -32,7 +34,7 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
   const { account, chainId } = useWeb3React();
   const [testResult, setTestResult] = useState<TestResult>({});
   const litClient = useLitProtocol();
-  const [descriptions, setDescriptions] = useState<string[]>([]);
+  const [descriptions, setDescriptions] = useState<(string | null)[]>([]);
   const [space] = useCurrentSpace();
 
   async function updateTokenGateRoles (tokenGateId: string, roleIds: string[]) {
@@ -56,7 +58,10 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
       const results = await Promise.all(
         tokenGates.map(tokenGate => humanizeAccessControlConditions({
           myWalletAddress: account || '',
-          accessControlConditions: (tokenGate.conditions as any)?.accessControlConditions || []
+          ...tokenGate.conditions as any
+        }).catch(err => {
+          log.warn('Could not retrieve humanized format of conditions', err);
+          return null;
         }))
       );
       setDescriptions(results);
@@ -65,27 +70,36 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
   }, [tokenGates]);
 
   async function testConnect (tokenGate: TokenGate) {
-    const chain = getLitChainFromChainId(chainId);
     setTestResult({ status: 'loading' });
     try {
-      const authSig = await checkAndSignAuthMessage({
-        chain
-      });
+
+      const chain = getLitChainFromChainId(chainId);
+      const authSig = await checkAndSignAuthMessage({ chain });
       const jwt = await litClient!.getSignedToken({
         resourceId: tokenGate.resourceId as any,
         authSig,
-        chain,
-        accessControlConditions: (tokenGate.conditions as any).accessControlConditions
+        chain: (tokenGate.conditions as any).chain || 'ethereum',
+        ...tokenGate.conditions as any
       });
       await charmClient.verifyTokenGate({ jwt, id: tokenGate.id });
 
       setTestResult({ status: 'success' });
     }
     catch (error) {
-      const message = (error as Error).message || 'Access denied. Please check your access control conditions.';
+      let message = '';
+      switch ((error as any).errorCode) {
+        case 'not_authorized':
+          message = `Address does not meet requirements: ${shortenHex(account || '')}`;
+          break;
+        default:
+          message = (error as Error).message || 'Access denied. Please check your access control conditions.';
+      }
       setTestResult({ message, status: 'error' });
     }
   }
+
+  // sort oldest to newest
+  const sortedTokenGates = tokenGates.sort((a, b) => b.createdAt > a.createdAt ? -1 : 1);
 
   return (
     <>
@@ -102,10 +116,11 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
           </TableRow>
         </TableHead>
         <TableBody>
-          {tokenGates.map((tokenGate, tokenGateIndex) => (
+          {sortedTokenGates.map((tokenGate, tokenGateIndex) => (
             <TableRow key={tokenGate.id} sx={{ '&:last-child td, &:last-child th': { border: 0 }, marginBottom: 20 }}>
               <TableCell sx={{ px: 0 }}>
-                <Typography variant='body2' sx={{ my: 1 }}>{descriptions[tokenGateIndex]}
+                <Typography variant='body2' sx={{ my: 1 }}>
+                  {descriptions[tokenGateIndex]}
                 </Typography>
               </TableCell>
               <TableCell>
