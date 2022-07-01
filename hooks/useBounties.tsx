@@ -40,7 +40,6 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
       setBounties([]);
       charmClient.listBounties(space.id)
         .then(_bounties => {
-          bountiesRef.current = _bounties;
           setBounties(_bounties);
         });
     }
