@@ -1,13 +1,14 @@
 /* eslint-disable no-console */
 import { prisma } from 'db';
-import { addBountyPermissionGroup } from 'lib/permissions/bounties/addBountyPermissionGroup';
+import { setBountyPermissions } from 'lib/permissions/bounties/setBountyPermissions';
 import { hasAccessToSpace } from '../lib/middleware';
+import { addBountyPermissionGroup } from '../lib/permissions/bounties';
 
 export const placeholder = 2;
 
 const concurrent = 5;
 
-export async function migrateBountyReviewers (skip: number, total?: number, errorsFound: number = 0): Promise<true> {
+export async function migrateBountyReviewers (skip: number, total?: number, errorsFound: any[] = []): Promise<true> {
 
   if (total === undefined) {
     total = await prisma.bounty.count({
@@ -20,6 +21,8 @@ export async function migrateBountyReviewers (skip: number, total?: number, erro
   }
 
   if (skip >= total) {
+    console.log(errorsFound);
+    console.log('All errors: ', errorsFound.length);
     return true;
   }
 
@@ -39,26 +42,43 @@ export async function migrateBountyReviewers (skip: number, total?: number, erro
 
   await Promise.all(bounties.map(async b => {
 
-    return addBountyPermissionGroup({
-      assignee: {
-        group: 'user',
-        id: b.reviewer as string
-      },
-      level: 'reviewer',
-      resourceId: b.id
-    })
-      .catch(err => {
-        console.log(err.errorType, err.errorConstructor);
-        errors.push(err);
-      }).then((val) => val);
+    try {
+      await addBountyPermissionGroup({
+        assignee: {
+          group: 'space',
+          id: b.spaceId
+        },
+        level: 'submitter',
+        resourceId: b.id
+      });
+      await addBountyPermissionGroup({
+        assignee: {
+          group: 'user',
+          id: b.reviewer as string
+        },
+        level: 'reviewer',
+        resourceId: b.id
+      });
+      return true;
+    }
+    catch (err: any) {
+      console.log(err.errorType, err.errorConstructor);
+      errors.push({
+        bountyId: b.id,
+        reviewer: b.reviewer,
+        reason: err.message
+      });
+      return true;
+
+    }
   }));
 
-  console.log(errors.length);
+  const newErrorTotal = errorsFound.length + errors.length;
+  errorsFound.push(...errors);
 
-  const newErrorTotal = errorsFound + errors.length;
   console.log('Total errors', newErrorTotal, ' / ', total);
 
-  return migrateBountyReviewers(skip + concurrent, total, errorsFound + errors.length);
+  return migrateBountyReviewers(skip + concurrent, total, errorsFound);
 
 }
 
