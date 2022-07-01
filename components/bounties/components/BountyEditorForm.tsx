@@ -546,27 +546,31 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
                   </Grid>
 
                 </Grid>
-                <Grid item xs={12}>
-                  <Typography display='block' justifyContent='center'>
+                {
+                  (submitterMode === 'space' || (submitterMode === 'role' && assignedRoleSubmitters.length > 0)) && (
+                    <Grid item xs={12}>
+                      <Typography display='block' justifyContent='center'>
 
-                    {submitterMode === 'space' && (
-                      bounty?.approveSubmitters
-                        ? 'All workspace members can apply to work on this bounty.' : 'All workspace members can submit work to this bounty.'
-                    )}
+                        {submitterMode === 'space' && (
+                          bounty?.approveSubmitters
+                            ? 'All workspace members can apply to work on this bounty.' : 'All workspace members can submit work to this bounty.'
+                        )}
 
-                    {submitterMode === 'role' && assignedRoleSubmitters.length > 0
-                    && bountyApplicantPool && (
-                      `There ${
-                        bountyApplicantPool.total === 1 ? 'is' : 'are'
-                      }
-                      ${bountyApplicantPool.total} potential ${
-                        bounty?.approveSubmitters ? `candidate${bountyApplicantPool.total !== 1 ? 's' : ''} who can apply to` : `candidate${
-                          bountyApplicantPool.total !== 1 ? 's' : ''}`} who can submit work to this bounty.`
-                    )}
+                        {submitterMode === 'role' && assignedRoleSubmitters.length > 0
+                      && bountyApplicantPool && (
+                          `There ${
+                            bountyApplicantPool.total === 1 ? 'is' : 'are'
+                          }
+                        ${bountyApplicantPool.total} potential ${
+                            bounty?.approveSubmitters ? `candidate${bountyApplicantPool.total !== 1 ? 's' : ''} who can apply to` : `candidate${
+                              bountyApplicantPool.total !== 1 ? 's' : ''}`} who can submit work to this bounty.`
+                        )}
 
-                  </Typography>
+                      </Typography>
 
-                </Grid>
+                    </Grid>
+                  )
+                }
 
                 {
                   submitterMode === 'role' && (
