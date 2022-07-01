@@ -5,7 +5,8 @@ import { ApplicationWithTransactions, createApplication, listSubmissions } from 
 import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireKeys } from 'lib/middleware/requireKeys';
 import { withSessionRoute } from 'lib/session/withSession';
-import { DataNotFoundError } from 'lib/utilities/errors';
+import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
+import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -66,6 +67,7 @@ async function createApplicationController (req: NextApiRequest, res: NextApiRes
       id: bountyId
     },
     select: {
+      approveSubmitters: true,
       spaceId: true
     }
   });
@@ -76,14 +78,14 @@ async function createApplicationController (req: NextApiRequest, res: NextApiRes
 
   const userId = req.session.user.id;
 
-  const { error } = await hasAccessToSpace({
-    spaceId: bountySpaceId.spaceId,
-    userId,
-    adminOnly: false
+  const permissions = await computeBountyPermissions({
+    allowAdminBypass: true,
+    resourceId: bountyId,
+    userId
   });
 
-  if (error) {
-    throw (error);
+  if (!permissions.work) {
+    throw new UnauthorisedActionError(`You do not have the permission to ${bountySpaceId.approveSubmitters === true ? 'apply' : 'submit work'} to this bounty`);
   }
 
   const createdApplication = await createApplication({

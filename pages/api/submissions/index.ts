@@ -3,10 +3,11 @@ import { Application } from '@prisma/client';
 import { prisma } from 'db';
 import { createSubmission, SubmissionCreationData } from 'lib/applications/actions';
 import { rollupBountyStatus } from 'lib/bounties/rollupBountyStatus';
-import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireKeys } from 'lib/middleware/requireKeys';
+import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { withSessionRoute } from 'lib/session/withSession';
-import { DataNotFoundError } from 'lib/utilities/errors';
+import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -25,7 +26,8 @@ async function createSubmissionController (req: NextApiRequest, res: NextApiResp
       id: bountyId
     },
     select: {
-      spaceId: true
+      spaceId: true,
+      approveSubmitters: true
     }
   });
 
@@ -35,14 +37,14 @@ async function createSubmissionController (req: NextApiRequest, res: NextApiResp
 
   const userId = req.session.user.id;
 
-  const { error } = await hasAccessToSpace({
-    userId,
-    spaceId: bountySpaceId.spaceId,
-    adminOnly: false
+  const permissions = await computeBountyPermissions({
+    allowAdminBypass: true,
+    resourceId: bountyId,
+    userId
   });
 
-  if (error) {
-    throw error;
+  if (!permissions.work) {
+    throw new UnauthorisedActionError(`You do not have the permission to ${bountySpaceId.approveSubmitters === true ? 'apply' : 'submit work'} to this bounty`);
   }
 
   const createdSubmission = await createSubmission({
@@ -54,6 +56,7 @@ async function createSubmissionController (req: NextApiRequest, res: NextApiResp
   rollupBountyStatus(createdSubmission.bountyId);
 
   return res.status(201).json(createdSubmission);
+
 }
 
 export default withSessionRoute(handler);

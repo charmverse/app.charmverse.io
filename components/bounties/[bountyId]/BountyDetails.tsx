@@ -5,33 +5,60 @@ import BountyDescription from 'components/bounties/[bountyId]/components_v3/Boun
 import BountyHeader from 'components/bounties/[bountyId]/components_v3/BountyHeader';
 import BountySubmissions from 'components/bounties/[bountyId]/components_v3/BountySubmissions';
 import { useBounties } from 'hooks/useBounties';
+import LoadingComponent from 'components/common/LoadingComponent';
 import { usePageTitle } from 'hooks/usePageTitle';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import charmClient from 'charmClient';
+import { AssignedBountyPermissions } from 'lib/bounties/interfaces';
 
 export default function BountyDetails () {
 
   const [, setPageTitle] = usePageTitle();
   const { currentBounty, currentBountyId } = useBounties();
 
-  useEffect(() => {
-    const bountyTitle = currentBounty?.title;
+  const [bountyPermissions, setBountyPermissions] = useState<AssignedBountyPermissions | null>(null);
 
-    if (bountyTitle) {
-      setPageTitle(bountyTitle);
+  useEffect(() => {
+    if (currentBounty) {
+      setPageTitle(currentBounty.title ?? 'Untitled bounty');
     }
 
-  }, [currentBounty?.title]);
+  }, [currentBounty?.title, bountyPermissions]);
+
+  async function refreshBountyPermissions (bountyId: string) {
+    setBountyPermissions(null);
+    charmClient.computeBountyPermissions({
+      resourceId: bountyId
+    }).then(data => setBountyPermissions(data));
+  }
+
+  useEffect(() => {
+
+    if (currentBountyId) {
+      refreshBountyPermissions(currentBountyId);
+    }
+
+  }, [currentBountyId]);
 
   if (!currentBounty || currentBounty?.id !== currentBountyId) {
     return null;
   }
 
-  return (
+  return !bountyPermissions ? (
+    <LoadingComponent height='200px' isLoading={true} />
+  ) : (
     <Box py={3} px={18}>
 
-      <BountyHeader bounty={currentBounty} />
+      <BountyHeader
+        bounty={currentBounty}
+        permissions={bountyPermissions}
+        refreshBountyPermissions={() => {
+          // refreshBounty(currentBountyId);
+          refreshBountyPermissions(currentBountyId);
+        }}
+      />
 
-      <BountyDescription />
+      <BountyDescription bounty={currentBounty} permissions={bountyPermissions} />
 
       {
           currentBounty.status === 'suggestion' && <BountySuggestionApproval bounty={currentBounty} />
@@ -41,14 +68,14 @@ export default function BountyDetails () {
           currentBounty.status !== 'suggestion' && (
             <>
               <Box sx={{ mb: 3 }}>
-                <BountySubmissions bounty={currentBounty} />
-
+                <BountySubmissions bounty={currentBounty} permissions={bountyPermissions} />
               </Box>
               {
           currentBounty.approveSubmitters === true && (
           <BountyApplicantList
             bounty={currentBounty}
             applications={currentBounty.applications}
+            permissions={bountyPermissions}
           />
           )
         }

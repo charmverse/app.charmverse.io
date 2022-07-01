@@ -17,26 +17,34 @@ import UserDisplay from 'components/common/UserDisplay';
 import { useBounties } from 'hooks/useBounties';
 import { useContributors } from 'hooks/useContributors';
 import useIsAdmin from 'hooks/useIsAdmin';
+import useRoles from 'hooks/useRoles';
 import { useUser } from 'hooks/useUser';
 import { applicantIsSubmitter, moveUserApplicationToFirstRow, submissionsCapReached } from 'lib/applications/shared';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import { AssignedBountyPermissions, BountyPermissions, humaniseBountyAccessConditions } from 'lib/bounties/client';
+import { useMemo } from 'react';
+import { Roleup } from 'lib/roles/interfaces';
 import { ApplicationEditorForm } from './ApplicationEditorForm';
 
 export interface IBountyApplicantListProps {
   bounty: Bounty,
   applications: Application[]
+  permissions: AssignedBountyPermissions
 }
 
 export function BountyApplicantList ({
   applications,
-  bounty
+  bounty,
+  permissions
 }: IBountyApplicantListProps) {
   const [user] = useUser();
   const [contributors] = useContributors();
   const { refreshBounty } = useBounties();
 
   const isAdmin = useIsAdmin();
+
+  const { roles, roleups } = useRoles();
 
   const theme = useTheme();
 
@@ -54,7 +62,7 @@ export function BountyApplicantList ({
   function displayAssignmentButton (application: Application) {
     return (
       // Only admins can approve applications for now
-      (isAdmin === true || isReviewer)
+      (permissions.userPermissions.review)
       && application.status === 'applied'
       // If we reached the cap, we can't assign new people
       && (
@@ -82,6 +90,13 @@ export function BountyApplicantList ({
 
   const sortedApplications = moveUserApplicationToFirstRow(applications, user?.id as string);
 
+  const humanisedSubmitterSentence = humaniseBountyAccessConditions({
+    assignees: permissions.bountyPermissions.submitter,
+    bounty,
+    permissionLevel: 'submitter',
+    roles: roleups
+  });
+
   const userApplication = sortedApplications.find(app => app.createdBy === user?.id);
 
   const userHasApplied = userApplication !== undefined;
@@ -90,6 +105,12 @@ export function BountyApplicantList ({
     bounty,
     submissions: applications
   });
+
+  const submissionsCapSentence = `The cap of ${bounty.maxSubmissions} submission${bounty.maxSubmissions !== 1 ? 's'
+    : ''} has been reached.`;
+
+  const applyButtonTooltipTitle = !permissions?.userPermissions.work ? 'You cannot apply to this bounty.'
+    : newApplicationsSuspended ? submissionsCapSentence : '';
 
   return (
     <>
@@ -102,14 +123,25 @@ export function BountyApplicantList ({
           </Grid>
           <Grid container item xs={4} direction='row' justifyContent='flex-end'>
             {
+              // Currently, we should only be able to see bounties we can work on
                   !userHasApplied && (
-                  <Tooltip placement='top' title={newApplicationsSuspended ? `You cannot apply to this bounty. The cap of ${bounty.maxSubmissions} submission${bounty.maxSubmissions !== 1 ? 's' : ''} has been reached.` : ''}>
-                    <Box component='span'>
-                      <Button disabled={newApplicationsSuspended} onClick={bountyApplyModal.open}>Apply</Button>
-                    </Box>
-                  </Tooltip>
+                    <Tooltip
+                      placement='top'
+                      title={applyButtonTooltipTitle}
+                    >
+                      <Box component='span'>
+                        <Button
+                          disabled={newApplicationsSuspended || !permissions?.userPermissions.work}
+                          onClick={bountyApplyModal.open}
+                        >Apply
+                        </Button>
+                      </Box>
+                    </Tooltip>
                   )
                 }
+          </Grid>
+          <Grid item xs={12} sx={{ mt: 2 }}>
+            {humanisedSubmitterSentence.phrase}
           </Grid>
         </Grid>
 

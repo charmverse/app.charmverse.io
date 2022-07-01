@@ -1,4 +1,4 @@
-import { uniqueValues, sortArrayByObjectProperty } from '../array';
+import { uniqueValues, sortArrayByObjectProperty, flatArrayMap } from '../array';
 
 describe('uniqueValues', () => {
   it('should only return unique values', () => {
@@ -69,4 +69,24 @@ describe('sortArrayByObjectProperty', () => {
     expect(sorted.slice(3).some(item => item.prop === 'fourth')).toBe(true);
     expect(sorted.slice(3).some(item => item.prop === undefined)).toBe(true);
   });
+});
+
+describe('flatArrayMap', () => {
+  it('should convert a list of arrays grouped by key on a record to a flat array', () => {
+    const test = {
+      one: [1],
+      two: [1, 2],
+      three: [1, 2, 3]
+    };
+
+    const flat = flatArrayMap(test);
+
+    // Make sure arrays were unwound
+    expect(flat.length).toBe(test.one.length + test.two.length + test.three.length);
+
+    // Make sure values preserved (3 ones in our series)
+    expect(flat.filter(val => val !== 1).length).toBe(3);
+
+  });
+
 });

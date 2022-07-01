@@ -2,6 +2,8 @@ import { Role } from '@prisma/client';
 import charmClient from 'charmClient';
 import useSWR, { mutate } from 'swr';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useMemo } from 'react';
+import { RoleupWithMembers } from '../lib/roles';
 
 export default function useRoles () {
   const [space] = useCurrentSpace();
@@ -55,6 +57,22 @@ export default function useRoles () {
     }
   }
 
+  const roleups: RoleupWithMembers[] = useMemo(() => {
+    return (
+      (roles ?? []).map(r => {
+        const rollup: RoleupWithMembers = {
+          id: r.id,
+          name: r.name,
+          members: r.spaceRolesToRole.length,
+          users: r.spaceRolesToRole.map(sr => {
+            return sr.spaceRole.user;
+          })
+        };
+        return rollup;
+      })
+    );
+  }, [roles]);
+
   return {
     createRole,
     updateRole,
@@ -62,6 +80,7 @@ export default function useRoles () {
     assignRoles,
     unassignRole,
     refreshRoles,
-    roles
+    roles,
+    roleups
   };
 }

@@ -12,21 +12,25 @@ import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import CharmEditor, { ICharmEditorOutput, UpdatePageContent } from 'components/common/CharmEditor/CharmEditor';
 import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
-import { InputSearchContributor } from 'components/common/form/InputSearchContributor';
+import { InputSearchContributorMultiple } from 'components/common/form/InputSearchContributor';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
-import { getChainById, CryptoCurrency } from 'connectors';
+import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
+import SelectMenu, { MenuOption } from 'components/common/Menu';
+import { CryptoCurrency, getChainById } from 'connectors';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import useIsAdmin from 'hooks/useIsAdmin';
+import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
+import { BountyCreationData, BountySubmitterPoolSize, UpdateableBountyFields } from 'lib/bounties/interfaces';
+import { AssignedBountyPermissions, BountyPermissions, BountySubmitter, inferBountyPermissionsMode } from 'lib/permissions/bounties/client';
+import { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import { SystemError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
 import { BountyWithDetails, PageContent } from 'models';
 import { useEffect, useState } from 'react';
 import { useForm, UseFormWatch } from 'react-hook-form';
-import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import * as yup from 'yup';
 
 export type FormMode = 'create' | 'update' | 'suggest';
@@ -75,6 +79,16 @@ export const schema = yup.object({
 
 export type FormValues = yup.InferType<typeof schema>
 
+const submitterMenuOptions: MenuOption<BountySubmitter>[] = [{
+  value: 'space',
+  primary: 'Workspace',
+  secondary: 'All workspace members can work on this bounty'
+}, {
+  value: 'role',
+  primary: 'Specific roles',
+  secondary: 'Only members with specific roles can work on this bounty'
+}];
+
 /**
  * @focusKey The field that should be focused on popup. The underlying field should be using a native MUI field for this to work
  */
@@ -82,6 +96,7 @@ interface IBountyEditorInput {
   onSubmit: (bounty: BountyWithDetails) => any,
   mode?: FormMode
   bounty?: Partial<Bounty>
+  permissions?: AssignedBountyPermissions
   focusKey?: keyof FormValues
 }
 
@@ -112,7 +127,7 @@ function FormDescription ({ onContentChange, content, watch }:
   );
 }
 
-export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', focusKey }: IBountyEditorInput) {
+export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', focusKey, permissions: receivedPermissions }: IBountyEditorInput) {
   const { setBounties, bounties, updateBounty } = useBounties();
 
   const defaultChainId = bounty?.chainId ?? 1;
@@ -121,6 +136,19 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
 
   const [user] = useUser();
   const [space] = useCurrentSpace();
+
+  const [bountyApplicantPool, setBountyApplicantPool] = useState<BountySubmitterPoolSize | null>(null);
+
+  const [permissions, setPermissions] = useState<Partial<BountyPermissions>>(receivedPermissions?.bountyPermissions ?? {});
+
+  useEffect(() => {
+    if (bounty) {
+      setBountyApplicantPool(null);
+      refreshBountyApplicantPool();
+
+    }
+
+  }, [bounty, permissions]);
 
   // Cached description for when user is creating or suggesting a new bounty
   const [cachedBountyDescription, setCachedBountyDescription] = useLocalStorage<{nodes: PageContent, text: string}>(`newBounty.${space?.id}`, {
@@ -167,6 +195,37 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
   const [availableCryptos, setAvailableCryptos] = useState<Array<string | CryptoCurrency>>([]);
   const [formError, setFormError] = useState<SystemError | null>(null);
 
+  const [submitterMode, setSubmitterMode] = useState<BountySubmitter>(inferBountyPermissionsMode(permissions ?? {})?.mode ?? 'space');
+  const [assignedRoleSubmitters, setAssignedRoleSubmitters] = useState<Array<string>>(permissions?.submitter?.filter(p => p.group === 'role').map(p => p.id as string) ?? []);
+
+  const [selectedReviewerUsers, setSelectedReviewerUsers] = useState<string[]>(
+    permissions?.reviewer?.filter(r => r.group === 'user').map(r => r.id as string) ?? []
+  );
+  const [selectedReviewerRoles, setSelectedReviewerRoles] = useState<string[]>(
+    permissions?.reviewer?.filter(r => r.group === 'role').map(r => r.id as string) ?? []
+  );
+
+  async function refreshBountyApplicantPool (): Promise<void> {
+    const updatedPermissions = rollupPermissions();
+    const calculation = await charmClient.getBountyApplicantPool({
+      permissions: updatedPermissions
+    });
+    setBountyApplicantPool(calculation);
+
+    if (calculation.mode === 'space') {
+      setSubmitterMode('space');
+    }
+
+    if (calculation.mode === 'role') {
+      setSubmitterMode('role');
+    }
+
+  }
+
+  useEffect(() => {
+    refreshBountyApplicantPool();
+  }, [submitterMode, assignedRoleSubmitters, selectedReviewerUsers, selectedReviewerRoles]);
+
   const chainId = watch('chainId');
   const rewardToken = watch('rewardToken');
 
@@ -179,9 +238,53 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
     }
   }, []);
 
+  // Combines current states to generate what we'll send to the API
+  function rollupPermissions (): Pick<BountyPermissions, 'reviewer' | 'submitter'> {
+
+    const reviewers = [
+      ...selectedReviewerUsers.map(uid => {
+        return {
+          id: uid,
+          group: 'user'
+        } as TargetPermissionGroup;
+      }),
+      ...selectedReviewerRoles.map(uid => {
+        return {
+          id: uid,
+          group: 'role'
+        } as TargetPermissionGroup;
+      })
+    ];
+    //    }), ...selectedReviewerRoles];
+
+    const submitters: TargetPermissionGroup[] = submitterMode === 'role' ? assignedRoleSubmitters.map(uid => {
+      return {
+        group: 'role',
+        id: uid
+      };
+    }) : [{
+      id: space?.id,
+      group: 'space'
+    }];
+
+    const permissionsToSend: Pick<BountyPermissions, 'reviewer' | 'submitter'> = {
+      reviewer: reviewers,
+      submitter: submitters
+    };
+
+    return permissionsToSend;
+  }
+
   async function submitted (value: FormValues & Bounty) {
 
+    // Not using this field anymore
+    if (value.reviewer) {
+      value.reviewer = null;
+    }
+
     setFormError(null);
+
+    const permissionsToSet = rollupPermissions();
 
     try {
       // if (!value.setExpiryDate) {
@@ -203,8 +306,10 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
         value.descriptionNodes = value.descriptionNodes ?? '';
         value.status = 'open';
 
+        (value as BountyCreationData).permissions = permissionsToSet;
         const createdBounty = await charmClient.createBounty(value);
         const populatedBounty = { ...createdBounty, applications: [] };
+
         setBounties([...bounties, populatedBounty]);
         setCachedBountyDescription({
           nodes: {
@@ -225,6 +330,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
         value.rewardAmount = 0;
         value.chainId = 1;
 
+        (value as BountyCreationData).permissions = permissionsToSet;
         const createdBounty = await charmClient.createBounty(value);
         const populatedBounty = { ...createdBounty, applications: [] };
         setBounties([...bounties, populatedBounty]);
@@ -240,8 +346,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
 
       }
       else if (bounty?.id && mode === 'update') {
-        const updates: Partial<Bounty> = {
-          updatedAt: new Date(),
+        const updates: UpdateableBountyFields = {
           title: value.title,
           rewardAmount: value.rewardAmount,
           rewardToken: value.rewardToken,
@@ -251,13 +356,13 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
           chainId: value.chainId,
           //
           approveSubmitters: value.approveSubmitters === null ? undefined : value.approveSubmitters,
-          maxSubmissions: value.capSubmissions === false ? null : value.maxSubmissions
-          // expiryDate: value.setExpiryDate ? value.expiryDate : null
-
+          maxSubmissions: value.capSubmissions === false ? null : value.maxSubmissions,
+          permissions: permissionsToSet
         };
 
         const updatedBounty = await updateBounty(bounty.id, updates);
         onSubmit(updatedBounty);
+
       }
     }
     catch (err) {
@@ -276,10 +381,6 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
         text: content.rawText
       });
     }
-  }
-
-  function setReviewer (userId: string) {
-    setValue('reviewer', userId);
   }
 
   function setChainId (_chainId: number) {
@@ -350,12 +451,34 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
           {
             mode !== 'suggest' && userSpacePermissions?.createBounty && (
               <>
-                <Grid item>
+
+                <Grid item xs>
                   <InputLabel>
-                    Reviewer
+                    Reviewers
                   </InputLabel>
-                  <InputSearchContributor defaultValue={bounty?.reviewer as string} onChange={setReviewer} />
                 </Grid>
+                <Grid item xs>
+                  <InputSearchContributorMultiple
+                    defaultValue={selectedReviewerUsers}
+                    disableCloseOnSelect={true}
+                    onChange={setSelectedReviewerUsers}
+                    filter={
+                      {
+                        mode: 'exclude',
+                        userIds: selectedReviewerUsers
+                      }
+                    }
+                  />
+                </Grid>
+                <Grid item xs>
+                  <InputSearchRoleMultiple
+                    disableCloseOnSelect={true}
+                    defaultValue={selectedReviewerRoles}
+                    onChange={setSelectedReviewerRoles}
+                    filter={{ mode: 'exclude', userIds: selectedReviewerRoles }}
+                  />
+                </Grid>
+
                 <Grid container item>
                   <Grid item xs>
                     <InputLabel>
@@ -404,7 +527,61 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
                   </Grid>
                 </Grid>
 
+                <hr />
+
                 {/* New options */}
+
+                <Grid container item xs={12}>
+                  <Grid item xs={8}>
+                    <Typography variant='h6'>
+                      Who can work on this bounty
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <SelectMenu
+                      selectedValue={submitterMode}
+                      valueUpdated={(value) => setSubmitterMode(value as BountySubmitter)}
+                      options={submitterMenuOptions}
+                    />
+                  </Grid>
+
+                </Grid>
+                {
+                  (submitterMode === 'space' || (submitterMode === 'role' && assignedRoleSubmitters.length > 0)) && (
+                    <Grid item xs={12}>
+                      <Typography display='block' justifyContent='center'>
+
+                        {submitterMode === 'space' && (
+                          values?.approveSubmitters
+                            ? 'All workspace members can apply to work on this bounty.' : 'All workspace members can submit work to this bounty.'
+                        )}
+
+                        {submitterMode === 'role' && assignedRoleSubmitters.length > 0
+                      && bountyApplicantPool && (
+                          `There ${
+                            bountyApplicantPool.total === 1 ? 'is' : 'are'
+                          } ${bountyApplicantPool.total} workspace member${bountyApplicantPool.total !== 1 ? 's' : ''} who can ${values?.approveSubmitters ? 'apply' : 'submit work'} to this bounty.`
+                        )}
+
+                      </Typography>
+
+                    </Grid>
+                  )
+                }
+
+                {
+                  submitterMode === 'role' && (
+                    <Grid item xs={12}>
+                      <InputSearchRoleMultiple
+                        disableCloseOnSelect={true}
+                        defaultValue={assignedRoleSubmitters}
+                        onChange={setAssignedRoleSubmitters}
+                        filter={{ mode: 'exclude', userIds: assignedRoleSubmitters }}
+                        showWarningOnNoRoles={true}
+                      />
+                    </Grid>
+                  )
+                }
 
                 <Grid item xs={12}>
                   <FormControlLabel
@@ -422,12 +599,14 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
                   />
 
                 </Grid>
+
                 <Grid item xs={12} sx={{ pt: '2px !important' }}>
                   <Typography variant='body2' sx={{ ml: '8%' }}>
                     When enabled, a workspace Admin or the Bounty Reviewer must explicitly approve each user's application to this bounty.
                   </Typography>
 
                 </Grid>
+
                 <Grid container item xs={12}>
                   <Grid item xs={6}>
                     <FormControlLabel
@@ -489,6 +668,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
               </>
             )
           }
+
           {
             formError && (
               <Grid item xs={12} sx={{ pt: '2px !important' }}>

@@ -38,7 +38,7 @@ jobs:
         uses: ./.github/actions/build
 
       - name: Setup test database
-        run: bash ./testing/configure-db.sh
+        run: bash ./scripts/configure-db.sh
 
       - name: Run basic tests
         run: npm run test:ci

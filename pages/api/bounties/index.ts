@@ -1,15 +1,15 @@
 
 import { Bounty } from '@prisma/client';
 import { prisma } from 'db';
+import { createBounty, listAvailableBounties } from 'lib/bounties';
 import { IEventToLog, postToDiscord } from 'lib/log/userEvents';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { withSessionRoute } from 'lib/session/withSession';
-import { NextApiRequest, NextApiResponse } from 'next';
-import { createBounty } from 'lib/bounties';
-import nc from 'next-connect';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
+import { withSessionRoute } from 'lib/session/withSession';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
+import { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -22,14 +22,13 @@ async function getBounties (req: NextApiRequest, res: NextApiResponse<Bounty[]>)
     return res.status(400).send({ error: 'Please provide a valid spaceId' } as any);
   }
 
-  const bounties = await prisma.bounty.findMany({
-    where: {
-      spaceId
-    },
-    include: {
-      applications: true
-    }
+  const userId = req.session.user.id;
+
+  const bounties = await listAvailableBounties({
+    spaceId,
+    userId
   });
+
   return res.status(200).json(bounties);
 }
 
