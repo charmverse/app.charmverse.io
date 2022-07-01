@@ -203,6 +203,8 @@ export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
         <Box flexDirection='column' display='flex'>
           <TextField
             placeholder='Details (Optional)'
+            multiline
+            rows={3}
             value={voteDescription}
             onChange={(e) => {
               setVoteDescription(e.target.value);
