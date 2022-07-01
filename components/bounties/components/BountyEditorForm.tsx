@@ -682,7 +682,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
           <Grid item>
             <Button
               loading={isSubmitting}
-              disabled={(mode === 'suggest' && (!values.title || !values.description)) || !isValid || (submitterMode === 'role' && bountyApplicantPool && bountyApplicantPool.roleups.length > 0 && bountyApplicantPool.total === 0)}
+              disabled={(mode === 'suggest' && (!values.title || !values.description)) || !isValid}
               type='submit'
             >
               {bountyFormTitles[mode]}
