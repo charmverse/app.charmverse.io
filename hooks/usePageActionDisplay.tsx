@@ -24,15 +24,17 @@ export function CommentThreadsListDisplayProvider ({ children }: { children: Rea
 
   const [currentPageActionDisplay, setCurrentPageActionDisplay] = useState<IPageActionDisplayContext['currentPageActionDisplay']>(null);
   useEffect(() => {
+    const highlightedCommentId = (new URLSearchParams(window.location.search)).get('commentId');
+
     if (currentPageId && !isValidatingInlineComments && !isValidatingInlineVotes) {
       const cachedInlineVotesData: ExtendedVote[] = cache.get(`pages/${currentPageId}/inline-votes`);
       const cachedInlineCommentData: ThreadWithCommentsAndAuthors[] | undefined = cache.get(`pages/${currentPageId}/threads`);
       // Vote takes precedence over comments, so if a page has in progress votes and unresolved comments, show the votes
-      if (cachedInlineVotesData && cachedInlineVotesData.find(inlineVote => inlineVote.status === 'InProgress')) {
+      if (!highlightedCommentId && cachedInlineVotesData && cachedInlineVotesData.find(inlineVote => inlineVote.status === 'InProgress')) {
         setCurrentPageActionDisplay('votes');
       }
       // For some reason we cant get the threads map using useThreads, its empty even after isValidating is true (data has loaded)
-      else if (cachedInlineCommentData && cachedInlineCommentData.find(thread => thread && !thread.resolved)) {
+      else if (highlightedCommentId || (cachedInlineCommentData && cachedInlineCommentData.find(thread => thread && !thread.resolved))) {
         setCurrentPageActionDisplay('comments');
       }
     }

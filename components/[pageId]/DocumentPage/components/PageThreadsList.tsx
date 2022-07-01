@@ -10,6 +10,7 @@ import { useEditorViewContext } from '@bangle.dev/react';
 import { findTotalInlineComments } from 'lib/inline-comments/findTotalInlineComments';
 import { silentlyUpdateURL } from 'lib/browser';
 import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
+import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 
 const Center = styled.div`
   position: absolute;
@@ -78,6 +79,8 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
     setThreadSort(event.target.value as any);
   };
 
+  const { setCurrentPageActionDisplay } = usePageActionDisplay();
+
   let threadList: ThreadWithCommentsAndAuthors[] = [];
   if (threadFilter === 'resolved') {
     threadList = resolvedThreads;
@@ -122,6 +125,7 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
         const highlightedCommentDomNode = document.getElementById(`comment.${highlightedComment.id}`);
         if (highlightedCommentDomNode) {
           setTimeout(() => {
+            setCurrentPageActionDisplay('comments');
             setThreadFilter('all');
             // Remove query parameters from url
             silentlyUpdateURL(window.location.href.split('?')[0]);
