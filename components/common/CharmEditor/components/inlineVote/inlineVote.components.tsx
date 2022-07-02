@@ -3,7 +3,7 @@ import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { hideSelectionTooltip } from '@bangle.dev/tooltip/selection-tooltip';
 import AddCircle from '@mui/icons-material/AddCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { FormControlLabel, IconButton, ListItem, Radio, RadioGroup, TextField, Typography } from '@mui/material';
+import { FormControlLabel, IconButton, ListItem, Radio, RadioGroup, TextField, Tooltip, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import Button from 'components/common/Button';
@@ -86,15 +86,19 @@ function InlineVoteOptions (
                 setOptions([...options]);
               }}
             />
-            <IconButton
-              disabled={options.length === 2 || (index <= 2)}
-              size='small'
-              onClick={() => {
-                setOptions([...options.slice(0, index), ...options.slice(index + 1)]);
-              }}
-            >
-              <DeleteIcon fontSize='small' />
-            </IconButton>
+            <Tooltip arrow placement='top' title={index < 2 ? 'At least two options are required' : ''}>
+              <div>
+                <IconButton
+                  disabled={(index <= 1)}
+                  size='small'
+                  onClick={() => {
+                    setOptions([...options.slice(0, index), ...options.slice(index + 1)]);
+                  }}
+                >
+                  <DeleteIcon fontSize='small' />
+                </IconButton>
+              </div>
+            </Tooltip>
           </ListItem>
         );
       })}
