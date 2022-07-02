@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
-import { List, MenuItem, Select, Typography } from '@mui/material';
+import { InputLabel, List, MenuItem, Select, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import PageInlineVote from 'components/common/CharmEditor/components/PageInlineVote';
 import { useInlineVotes } from 'hooks/useInlineVotes';
@@ -80,24 +80,27 @@ export default function PageInlineVotesList () {
   }, [filteredVotes, voteSort]);
   return (
     <Box sx={{
-      height: 'calc(100% - 50px)'
+      height: 'calc(100%)',
+      gap: 1,
+      display: 'flex',
+      flexDirection: 'column'
     }}
     >
-      <Box display='flex' alignItems='center' justifyContent='space-between' mb={1} ml={2}>
-        <Typography fontWeight={600} fontSize={20}>
-          Votes
-        </Typography>
-        <Box display='flex' gap={1}>
-          <Select variant='outlined' value={voteSort} onChange={(e) => setVoteSort(e.target.value as TVoteSort)}>
-            <MenuItem value='highest_votes'>Votes</MenuItem>
-            <MenuItem value='latest_deadline'>Deadline</MenuItem>
-            <MenuItem value='latest_created'>Created</MenuItem>
-          </Select>
-          <Select variant='outlined' value={voteFilter} onChange={(e) => setVoteFilter(e.target.value as TVoteFilter)}>
-            <MenuItem value='in_progress'>In progress</MenuItem>
-            <MenuItem value='completed'>Completed</MenuItem>
-          </Select>
-        </Box>
+      <Typography fontWeight={600} fontSize={20}>
+        Votes
+      </Typography>
+      <Box display='flex' gap={1} alignItems='center'>
+        <InputLabel>Sort</InputLabel>
+        <Select label='Filter' variant='outlined' value={voteSort} onChange={(e) => setVoteSort(e.target.value as TVoteSort)}>
+          <MenuItem value='highest_votes'>Votes</MenuItem>
+          <MenuItem value='latest_deadline'>Deadline</MenuItem>
+          <MenuItem value='latest_created'>Created</MenuItem>
+        </Select>
+        <InputLabel>Filter</InputLabel>
+        <Select variant='outlined' value={voteFilter} onChange={(e) => setVoteFilter(e.target.value as TVoteFilter)}>
+          <MenuItem value='in_progress'>In progress</MenuItem>
+          <MenuItem value='completed'>Completed</MenuItem>
+        </Select>
       </Box>
       <StyledPageInlineVotesList>
         {sortedVotes.length === 0 ? (

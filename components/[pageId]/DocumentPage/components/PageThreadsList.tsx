@@ -1,16 +1,15 @@
-import { Box, BoxProps, List, MenuItem, Select, SelectProps, Typography } from '@mui/material';
-import PageThread from 'components/common/CharmEditor/components/PageThread';
-import { useThreads } from 'hooks/useThreads';
-import { useEffect, useState } from 'react';
-import styled from '@emotion/styled';
-import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
-import { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
-import { useUser } from 'hooks/useUser';
 import { useEditorViewContext } from '@bangle.dev/react';
-import { findTotalInlineComments } from 'lib/inline-comments/findTotalInlineComments';
-import { silentlyUpdateURL } from 'lib/browser';
+import styled from '@emotion/styled';
 import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
+import { Box, BoxProps, InputLabel, List, MenuItem, Select, SelectProps, Typography } from '@mui/material';
+import PageThread from 'components/common/CharmEditor/components/PageThread';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
+import { useThreads } from 'hooks/useThreads';
+import { useUser } from 'hooks/useUser';
+import { silentlyUpdateURL } from 'lib/browser';
+import { findTotalInlineComments } from 'lib/inline-comments/findTotalInlineComments';
+import { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
+import { useEffect, useState } from 'react';
 
 const Center = styled.div`
   position: absolute;
@@ -146,24 +145,26 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
       className='PageThreadsList'
       {...props}
       sx={{
-        ...(sx ?? {})
+        ...(sx ?? {}),
+        display: 'flex',
+        gap: 1
       }}
     >
-      <Box display='flex' alignItems='center' justifyContent='space-between' mb={1}>
-        <Typography fontWeight={600} fontSize={20}>Comments</Typography>
-        <Box display='flex' gap={1}>
-          <Select variant='outlined' value={threadFilter} onChange={handleThreadClassChange}>
-            <MenuItem value='open'>Open</MenuItem>
-            <MenuItem value='resolved'>Resolved</MenuItem>
-            <MenuItem value='you'>For you</MenuItem>
-            <MenuItem value='all'>All</MenuItem>
-          </Select>
-          <Select variant='outlined' value={threadSort} onChange={handleThreadListSortChange}>
-            <MenuItem value='position'>Position</MenuItem>
-            <MenuItem value='latest'>Latest</MenuItem>
-            <MenuItem value='earliest'>Earliest</MenuItem>
-          </Select>
-        </Box>
+      <Typography fontWeight={600} fontSize={20}>Comments</Typography>
+      <Box display='flex' alignItems='center' mb={1}>
+        <InputLabel>Filter</InputLabel>
+        <Select variant='outlined' value={threadFilter} onChange={handleThreadClassChange}>
+          <MenuItem value='open'>Open</MenuItem>
+          <MenuItem value='resolved'>Resolved</MenuItem>
+          <MenuItem value='you'>For you</MenuItem>
+          <MenuItem value='all'>All</MenuItem>
+        </Select>
+        <InputLabel>Sort</InputLabel>
+        <Select variant='outlined' value={threadSort} onChange={handleThreadListSortChange}>
+          <MenuItem value='position'>Position</MenuItem>
+          <MenuItem value='latest'>Latest</MenuItem>
+          <MenuItem value='earliest'>Earliest</MenuItem>
+        </Select>
       </Box>
       <StyledPageThreadsList>
         {sortedThreadList.length === 0 ? (
