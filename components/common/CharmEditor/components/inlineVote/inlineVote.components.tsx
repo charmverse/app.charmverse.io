@@ -23,11 +23,8 @@ import { updateInlineVote } from './inlineVote.utils';
 type VoteType = 'default' | 'custom';
 
 interface InlineVoteOptionsProps {
-  disableTextFields?: boolean
   options: { name: string }[]
   setOptions: Dispatch<SetStateAction<{ name: string }[]>>
-  disableDelete?: boolean
-  disableAddOption?: boolean
 }
 
 export function InlineVoteList ({ pluginKey }: {pluginKey: PluginKey<InlineVotePluginState>}) {
@@ -67,24 +64,19 @@ export function InlineVoteList ({ pluginKey }: {pluginKey: PluginKey<InlineVoteP
 
 function InlineVoteOptions (
   {
-    disableAddOption = false,
-    disableDelete = false,
     options,
-    setOptions,
-    disableTextFields = false
+    setOptions
   }:
   InlineVoteOptionsProps
 ) {
   return (
     <div>
-      <FieldLabel>Options</FieldLabel>
       {options.map((option, index) => {
         return (
           <ListItem sx={{ px: 0, pt: 0, display: 'flex', gap: 0.5 }}>
             <TextField
               error={option.name.length === 0 || Boolean(options.find((_option, _index) => _index !== index && _option.name === option.name))}
               // Disable changing text for No change option
-              disabled={disableTextFields || index === 2}
               fullWidth
               placeholder={`Option ${index + 1}`}
               value={option.name}
@@ -96,7 +88,7 @@ function InlineVoteOptions (
               }}
             />
             <IconButton
-              disabled={disableDelete || options.length === 2 || (index <= 2)}
+              disabled={options.length === 2 || (index <= 2)}
               size='small'
               onClick={() => {
                 setOptions([...options.slice(0, index), ...options.slice(index + 1)]);
@@ -107,7 +99,6 @@ function InlineVoteOptions (
           </ListItem>
         );
       })}
-      {!disableAddOption && (
       <Button
         variant='outlined'
         color='secondary'
@@ -123,7 +114,6 @@ function InlineVoteOptions (
           Add Option
         </Typography>
       </Button>
-      )}
     </div>
   );
 }
@@ -145,7 +135,7 @@ export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
       }, {
         name: 'Option 2'
       }, {
-        name: 'No change'
+        name: 'Abstain'
       }]);
     }
     else if (voteType === 'default') {
@@ -264,22 +254,25 @@ export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
             />
           </Box>
         </Box>
-        <RadioGroup
-          row
-          defaultValue='default'
-          value={voteType}
-          onChange={(e) => {
-            setVoteType(e.target.value as VoteType);
-          }}
-        >
-          <FormControlLabel
-            value='default'
-            control={<Radio />}
-            label='Yes / No'
-          />
-          <FormControlLabel value='custom' control={<Radio />} label='# Options' />
-        </RadioGroup>
-        <InlineVoteOptions disableAddOption={voteType === 'default'} disableDelete={voteType === 'default'} disableTextFields={voteType === 'default'} options={options} setOptions={setOptions} />
+        <Box display='flex' gap={2} alignItems='center'>
+          <Typography fontWeight='bold'>Options: </Typography>
+          <RadioGroup
+            row
+            defaultValue='default'
+            value={voteType}
+            onChange={(e) => {
+              setVoteType(e.target.value as VoteType);
+            }}
+          >
+            <FormControlLabel
+              value='default'
+              control={<Radio />}
+              label='Yes / No / Abstain'
+            />
+            <FormControlLabel value='custom' control={<Radio />} label='# Custom' />
+          </RadioGroup>
+        </Box>
+        {voteType !== 'default' && <InlineVoteOptions options={options} setOptions={setOptions} />}
         <Button
           onClick={handleSubmit}
           sx={{

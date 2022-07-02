@@ -11,7 +11,7 @@ export async function updateVotesStatus (pageVotes: ExtendedVote[]) {
     let status = pageVote.status;
     const { deadline, userVotes, threshold } = pageVote;
     const totalVotes = userVotes.length;
-    const userVoteFrequencyRecord: Record<string, number> = pageVote.userVotes.reduce<Record<string, number>>((currentRecord, userVote) => {
+    const userVoteFrequencyRecord = pageVote.userVotes.reduce<Record<string, number>>((currentRecord, userVote) => {
       if (!currentRecord[userVote.choice]) {
         currentRecord[userVote.choice] = 1;
       }

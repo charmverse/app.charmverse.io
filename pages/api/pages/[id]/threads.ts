@@ -1,6 +1,8 @@
 
 import { prisma } from 'db';
-import { onError, onNoMatch } from 'lib/middleware';
+import { NotFoundError, onError, onNoMatch } from 'lib/middleware';
+import { computeUserPagePermissions } from 'lib/permissions/pages';
+import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -10,6 +12,14 @@ handler.get(getThreads);
 
 async function getThreads (req: NextApiRequest, res: NextApiResponse) {
   const pageId = req.query.id as string;
+  const computed = await computeUserPagePermissions({
+    pageId,
+    userId: req.session?.user?.id
+  });
+
+  if (computed.read !== true) {
+    throw new NotFoundError('Page not found');
+  }
 
   const threads = await prisma.thread.findMany({
     where: {
@@ -30,4 +40,4 @@ async function getThreads (req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json(threads);
 }
 
-export default handler;
+export default withSessionRoute(handler);
