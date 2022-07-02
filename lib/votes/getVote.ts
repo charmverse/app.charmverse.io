@@ -9,7 +9,12 @@ export async function getVote (id: string): Promise<ExtendedVote | null> {
     include: {
       userVotes: {
         include: {
-          user: true
+          user: {
+            select: {
+              avatar: true,
+              username: true
+            }
+          }
         }
       },
       voteOptions: true

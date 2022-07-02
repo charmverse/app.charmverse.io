@@ -64,7 +64,10 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
     });
     setInlineVotes({
       ...inlineVotes,
-      [extendedVote.id]: extendedVote
+      [extendedVote.id]: {
+        ...extendedVote,
+        userVotes: []
+      }
     });
     return extendedVote;
   }

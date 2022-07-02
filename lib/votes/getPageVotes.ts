@@ -12,7 +12,12 @@ export async function getPageVotes (pageId: string): Promise<ExtendedVote[]> {
           updatedAt: 'desc'
         },
         include: {
-          user: true
+          user: {
+            select: {
+              avatar: true,
+              username: true
+            }
+          }
         }
       },
       voteOptions: true

@@ -61,14 +61,9 @@ export async function createVote (vote: VoteDTO): Promise<ExtendedVote> {
       }
     },
     include: {
-      userVotes: {
-        include: {
-          user: true
-        }
-      },
       voteOptions: true
     }
-  });
+  }) as ExtendedVote;
 
   return dbVote;
 }
