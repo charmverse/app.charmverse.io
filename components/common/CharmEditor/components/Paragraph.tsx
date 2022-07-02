@@ -24,14 +24,15 @@ const InlineActionCountContainer = styled.div`
   user-select: none;
 `;
 
+interface ParagraphProps extends NodeViewProps{
+  children: ReactNode,
+  calculateActions?: boolean,
+  inlineCommentPluginKey: PluginKey<InlineCommentPluginState>,
+  inlineVotePluginKey: PluginKey<InlineVotePluginState>
+}
+
 export default function Paragraph (
-  { node, children, calculateActions = true, inlineCommentPluginKey, inlineVotePluginKey }:
-  NodeViewProps & {
-    children: ReactNode,
-    calculateActions?: boolean,
-    inlineCommentPluginKey: PluginKey<InlineCommentPluginState>,
-    inlineVotePluginKey: PluginKey<InlineVotePluginState>
-  }
+  { node, children, calculateActions = true, inlineCommentPluginKey, inlineVotePluginKey }: ParagraphProps
 ) {
   const cardId = (new URLSearchParams(window.location.href)).get('cardId');
   const view = useEditorViewContext();

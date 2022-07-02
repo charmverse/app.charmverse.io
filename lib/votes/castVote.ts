@@ -1,10 +1,10 @@
 
+import { UserVote, VoteOptions } from '@prisma/client';
 import { prisma } from 'db';
-import { User, UserVote, VoteOptions } from '@prisma/client';
 import { DataNotFoundError, InvalidInputError, UndesirableOperationError } from 'lib/utilities/errors';
-import { ExtendedUserVote, VOTE_STATUS } from './interfaces';
+import { VOTE_STATUS } from './interfaces';
 
-export async function castVote (choice: string, voteId: string, userId: string): Promise<ExtendedUserVote> {
+export async function castVote (choice: string, voteId: string, userId: string): Promise<UserVote> {
 
   const vote = await prisma.vote.findUnique({
     where: {
@@ -43,9 +43,6 @@ export async function castVote (choice: string, voteId: string, userId: string):
     update: {
       choice,
       updatedAt: new Date()
-    },
-    include: {
-      user: true
     }
   });
 

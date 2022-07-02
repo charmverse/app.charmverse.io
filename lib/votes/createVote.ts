@@ -1,6 +1,5 @@
 
 import { prisma } from 'db';
-import { Vote } from '@prisma/client';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { DEFAULT_THRESHOLD, ExtendedVote, VoteDTO, VOTE_STATUS } from './interfaces';
