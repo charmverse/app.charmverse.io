@@ -6,6 +6,7 @@ import PageInlineVote from 'components/common/CharmEditor/components/PageInlineV
 import { useInlineVotes } from 'hooks/useInlineVotes';
 import { ExtendedVote } from 'lib/votes/interfaces';
 import { useMemo, useState } from 'react';
+import PageActionToggle from './PageActionToggle';
 
 export const StyledPageInlineVotesList = styled(List)`
   overflow: auto;
@@ -86,9 +87,10 @@ export default function PageInlineVotesList () {
       flexDirection: 'column'
     }}
     >
-      <Typography fontWeight={600} fontSize={20}>
-        Votes
-      </Typography>
+      <Box display='flex' gap={1}>
+        <PageActionToggle />
+        <Typography fontWeight={600} fontSize={20}>Votes</Typography>
+      </Box>
       <Box display='flex' gap={1} alignItems='center'>
         <InputLabel>Sort</InputLabel>
         <Select label='Filter' variant='outlined' value={voteSort} onChange={(e) => setVoteSort(e.target.value as TVoteSort)}>

@@ -10,6 +10,7 @@ import { silentlyUpdateURL } from 'lib/browser';
 import { findTotalInlineComments } from 'lib/inline-comments/findTotalInlineComments';
 import { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import { useEffect, useState } from 'react';
+import PageActionToggle from './PageActionToggle';
 
 const Center = styled.div`
   position: absolute;
@@ -151,7 +152,10 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
         flexDirection: 'column'
       }}
     >
-      <Typography fontWeight={600} fontSize={20}>Comments</Typography>
+      <Box display='flex' gap={1}>
+        <PageActionToggle />
+        <Typography fontWeight={600} fontSize={20}>Comments</Typography>
+      </Box>
       <Box display='flex' alignItems='center' gap={1}>
         <InputLabel>Sort</InputLabel>
         <Select variant='outlined' value={threadSort} onChange={handleThreadListSortChange}>
