@@ -11,7 +11,7 @@ export interface IPageActionDisplayContext {
   setCurrentPageActionDisplay: React.Dispatch<React.SetStateAction<IPageActionDisplayContext['currentPageActionDisplay']>>
 }
 
-export const PageActionDisplay = createContext<IPageActionDisplayContext>({
+export const PageActionDisplayContext = createContext<IPageActionDisplayContext>({
   currentPageActionDisplay: 'votes',
   setCurrentPageActionDisplay: () => undefined
 });
@@ -46,12 +46,12 @@ export function PageActionDisplayProvider ({ children }: { children: ReactNode }
   }), [currentPageActionDisplay]);
 
   return (
-    <PageActionDisplay.Provider value={value}>
+    <PageActionDisplayContext.Provider value={value}>
       {children}
-    </PageActionDisplay.Provider>
+    </PageActionDisplayContext.Provider>
   );
 }
 
 export function usePageActionDisplay () {
-  return useContext(PageActionDisplay);
+  return useContext(PageActionDisplayContext);
 }
