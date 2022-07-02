@@ -35,7 +35,7 @@ const Center = styled.div`
   flex-direction: column;
 `;
 
-type TVoteSort = 'latest_deadline' | 'highest_votes' | 'earliest_created';
+type TVoteSort = 'latest_deadline' | 'highest_votes' | 'latest_created';
 type TVoteFilter = 'in_progress' | 'completed';
 
 export default function PageInlineVotesList () {
@@ -66,9 +66,9 @@ export default function PageInlineVotesList () {
     if (voteSort === 'highest_votes') {
       _sortedVotes = filteredVotes.sort((filteredVoteA, filteredVoteB) => filteredVoteA.userVotes.length > filteredVoteB.userVotes.length ? -1 : 1);
     }
-    else if (voteSort === 'earliest_created') {
+    else if (voteSort === 'latest_created') {
       _sortedVotes = filteredVotes.sort(
-        (filteredVoteA, filteredVoteB) => new Date(filteredVoteA.createdAt) < new Date(filteredVoteB.createdAt) ? -1 : 1
+        (filteredVoteA, filteredVoteB) => new Date(filteredVoteA.createdAt) > new Date(filteredVoteB.createdAt) ? -1 : 1
       );
     }
     else if (voteSort === 'latest_deadline') {
@@ -89,9 +89,9 @@ export default function PageInlineVotesList () {
         </Typography>
         <Box display='flex' gap={1}>
           <Select variant='outlined' value={voteSort} onChange={(e) => setVoteSort(e.target.value as TVoteSort)}>
-            <MenuItem value='latest_deadline'>Latest deadline</MenuItem>
-            <MenuItem value='highest_votes'>Highest votes</MenuItem>
-            <MenuItem value='earliest_created'>Earliest created</MenuItem>
+            <MenuItem value='highest_votes'>Votes</MenuItem>
+            <MenuItem value='latest_deadline'>Deadline</MenuItem>
+            <MenuItem value='latest_created'>Created</MenuItem>
           </Select>
           <Select variant='outlined' value={voteFilter} onChange={(e) => setVoteFilter(e.target.value as TVoteFilter)}>
             <MenuItem value='in_progress'>In progress</MenuItem>

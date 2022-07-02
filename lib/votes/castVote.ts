@@ -24,6 +24,10 @@ export async function castVote (choice: string, voteId: string, userId: string):
     throw new UndesirableOperationError(`Vote with id: ${voteId} is not in progress.`);
   }
 
+  if (new Date(vote.deadline) < new Date()) {
+    throw new UndesirableOperationError(`Vote with id: ${voteId} is past deadline.`);
+  }
+
   if (!vote.voteOptions.find((option: VoteOptions) => option.name === choice)) {
     throw new InvalidInputError('Voting choice is not a valid option.');
   }
