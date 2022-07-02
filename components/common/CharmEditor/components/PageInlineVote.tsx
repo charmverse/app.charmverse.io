@@ -39,12 +39,13 @@ function PageInlineVoteOption (
   { voteId: string, voteOption: VoteOptions, percentage: number, checked: boolean, isDisabled: boolean }
 ) {
   const { castVote } = useInlineVotes();
+  const [user] = useUser();
   return (
     <>
       <ListItem sx={{ p: 0, justifyContent: 'space-between' }}>
         <Box display='flex' alignItems='center'>
           <Radio
-            disabled={isDisabled}
+            disabled={isDisabled || !user}
             disableRipple
             size='small'
             checked={checked}
@@ -173,7 +174,7 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
           );
         })}
       </List>
-      {!detailed && <Button variant='outlined' onClick={inlineVoteDetailModal.open}>View details</Button>}
+      {!detailed && <Button disabled={!user} variant='outlined' onClick={inlineVoteDetailModal.open}>View details</Button>}
       {detailed && (totalVotes !== 0 ? voteCountLabel : (
         <Card variant='outlined'>
           <Box p={3} textAlign='center'>
