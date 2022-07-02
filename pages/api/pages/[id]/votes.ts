@@ -1,4 +1,4 @@
-import { NotFoundError, onError, onNoMatch } from 'lib/middleware';
+import { NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { getPageVotes } from 'lib/votes';
@@ -8,7 +8,7 @@ import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.get(getVotes);
+handler.use(requireUser).get(getVotes);
 
 async function getVotes (req: NextApiRequest, res: NextApiResponse<ExtendedVote[]>) {
   const pageId = req.query.id as string;

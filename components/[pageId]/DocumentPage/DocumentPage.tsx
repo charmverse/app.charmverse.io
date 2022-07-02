@@ -9,6 +9,7 @@ import BountyIntegration from 'components/[pageId]/DocumentPage/components/Bount
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
 import { Page, PageContent } from 'models';
+import { useRouter } from 'next/router';
 import { memo, useCallback } from 'react';
 import CharmEditor, { ICharmEditorOutput } from '../../common/CharmEditor/CharmEditor';
 import PageBanner from './components/PageBanner';
@@ -73,6 +74,8 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
   const comments = useAppSelector(getCardComments(card?.id));
 
   const showingPageActionList = currentPageActionDisplay !== null;
+  const router = useRouter();
+  const isSharedPage = router.pathname.startsWith('/share');
 
   return (
     <ScrollableWindow hideScroll={showingPageActionList}>
@@ -95,6 +98,7 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
             readOnly={readOnly}
             pageActionDisplay={currentPageActionDisplay}
             pageId={page.id}
+            disablePageSpecificFeatures={isSharedPage}
           >
             <PageHeader
               headerImage={page.headerImage}

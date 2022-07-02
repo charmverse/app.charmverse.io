@@ -33,6 +33,7 @@ import { PageContent } from 'models';
 import { CSSProperties, memo, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import PageInlineVotesList from 'components/[pageId]/DocumentPage/components/PageInlineVotesList';
 import { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
+import { useRouter } from 'next/router';
 import Callout, * as callout from './components/callout';
 import { userDataPlugin } from './components/charm/charm.plugins';
 import * as columnLayout from './components/columnLayout';
@@ -118,7 +119,7 @@ export function charmEditorPlugins (
   {
     onContentChange,
     readOnly,
-    disabledPageSpecificFeatures = false,
+    disablePageSpecificFeatures = false,
     enableComments = true,
     userId = null,
     pageId = null,
@@ -130,7 +131,7 @@ export function charmEditorPlugins (
       userId?: string | null,
       readOnly?: boolean,
       onContentChange?: (view: EditorView) => void,
-      disabledPageSpecificFeatures?: boolean,
+      disablePageSpecificFeatures?: boolean,
       enableComments?: boolean
     } = {}
 ): () => RawPlugins[] {
@@ -234,7 +235,7 @@ export function charmEditorPlugins (
     }));
   }
 
-  if (!disabledPageSpecificFeatures) {
+  if (!disablePageSpecificFeatures) {
     basePlugins.push(inlineComment.plugin({
       key: inlineCommentPluginKey
     }));
@@ -246,7 +247,7 @@ export function charmEditorPlugins (
   return () => basePlugins;
 }
 
-const StyledReactBangleEditor = styled(ReactBangleEditor)`
+const StyledReactBangleEditor = styled(ReactBangleEditor)<{disablePageSpecificFeatures?: boolean}>`
   position: relative;
 
   /** DONT REMOVE THIS STYLING */
@@ -281,25 +282,27 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
     background-color: ${({ theme }) => theme.palette.background.light};
   }
 
-  .charm-inline-comment.active {
-    background: rgba(255,212,0,0.14);
-    border-bottom: 2px solid rgb(255, 212, 0);
-    padding-bottom: 2px;
-    &:hover {
-      background: rgba(255,212,0,0.56) !important;
+  ${({ disablePageSpecificFeatures }) => !disablePageSpecificFeatures && `
+    .charm-inline-comment.active {
+      background: rgba(255,212,0,0.14);
+      border-bottom: 2px solid rgb(255, 212, 0);
+      padding-bottom: 2px;
+      &:hover {
+        background: rgba(255,212,0,0.56) !important;
+      }
+      cursor: pointer;
     }
-    cursor: pointer;
-  }
 
-  .charm-inline-vote.active {
-    background: rgba(0,171,255,0.14);
-    border-bottom: 2px solid rgb(0,171,255);
-    padding-bottom: 2px;
-    &:hover {
-      background: rgba(0,171,255,0.56) !important;
+    .charm-inline-vote.active {
+      background: rgba(0,171,255,0.14);
+      border-bottom: 2px solid rgb(0,171,255);
+      padding-bottom: 2px;
+      &:hover {
+        background: rgba(0,171,255,0.56) !important;
+      }
+      cursor: pointer;
     }
-    cursor: pointer;
-  }
+  `}
 `;
 
 const PageActionListBox = styled.div`
@@ -331,7 +334,7 @@ interface CharmEditorProps {
   readOnly?: boolean;
   style?: CSSProperties;
   pageActionDisplay?: IPageActionDisplayContext['currentPageActionDisplay']
-  disabledPageSpecificFeatures?: boolean
+  disablePageSpecificFeatures?: boolean
   pageId?: string | null
 }
 
@@ -363,7 +366,7 @@ function CharmEditor (
     onContentChange,
     style,
     readOnly = false,
-    disabledPageSpecificFeatures = false,
+    disablePageSpecificFeatures = false,
     pageId
   }:
   CharmEditorProps
@@ -394,7 +397,7 @@ function CharmEditor (
     plugins: charmEditorPlugins({
       onContentChange: _onContentChange,
       readOnly,
-      disabledPageSpecificFeatures,
+      disablePageSpecificFeatures,
       pageId,
       spaceId: currentSpace?.id,
       userId: currentUser?.id
@@ -435,6 +438,7 @@ function CharmEditor (
 
   return (
     <StyledReactBangleEditor
+      disablePageSpecificFeatures={disablePageSpecificFeatures}
       style={{
         ...(style ?? {}),
         width: '100%',
@@ -463,7 +467,7 @@ function CharmEditor (
               <Paragraph
                 inlineVotePluginKey={inlineVotePluginKey}
                 inlineCommentPluginKey={inlineCommentPluginKey}
-                calculateActions={!disabledPageSpecificFeatures}
+                calculateActions={!disablePageSpecificFeatures}
                 {...props}
               >{_children}
               </Paragraph>
@@ -550,14 +554,14 @@ function CharmEditor (
         }
       }}
     >
-      <FloatingMenu enableComments={!disabledPageSpecificFeatures} pluginKey={floatingMenuPluginKey} />
+      <FloatingMenu enableComments={!disablePageSpecificFeatures} pluginKey={floatingMenuPluginKey} />
       <MentionSuggest pluginKey={mentionPluginKey} />
       <NestedPagesList pluginKey={nestedPagePluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
       {!readOnly && <RowActionsMenu pluginKey={actionsPluginKey} />}
-      <InlinePalette nestedPagePluginKey={nestedPagePluginKey} disableNestedPage={disabledPageSpecificFeatures} />
+      <InlinePalette nestedPagePluginKey={nestedPagePluginKey} disableNestedPage={disablePageSpecificFeatures} />
       {children}
-      {!disabledPageSpecificFeatures && (
+      {!disablePageSpecificFeatures && (
       <>
         <Grow
           in={pageActionDisplay === 'comments'}

@@ -1,5 +1,6 @@
 import { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import { ExtendedVote } from 'lib/votes/interfaces';
+import { useRouter } from 'next/router';
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 import { useSWRConfig } from 'swr';
 import { useInlineVotes } from './useInlineVotes';
@@ -12,7 +13,7 @@ export interface IPageActionDisplayContext {
 }
 
 export const PageActionDisplayContext = createContext<IPageActionDisplayContext>({
-  currentPageActionDisplay: 'votes',
+  currentPageActionDisplay: null,
   setCurrentPageActionDisplay: () => undefined
 });
 
@@ -21,7 +22,6 @@ export function PageActionDisplayProvider ({ children }: { children: ReactNode }
   const { isValidating: isValidatingInlineComments } = useThreads();
   const { isValidating: isValidatingInlineVotes } = useInlineVotes();
   const { cache } = useSWRConfig();
-
   const [currentPageActionDisplay, setCurrentPageActionDisplay] = useState<IPageActionDisplayContext['currentPageActionDisplay']>(null);
   useEffect(() => {
     const highlightedCommentId = (new URLSearchParams(window.location.search)).get('commentId');
