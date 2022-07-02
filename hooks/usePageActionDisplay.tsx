@@ -16,7 +16,7 @@ export const PageActionDisplay = createContext<IPageActionDisplayContext>({
   setCurrentPageActionDisplay: () => undefined
 });
 
-export function CommentThreadsListDisplayProvider ({ children }: { children: ReactNode }) {
+export function PageActionDisplayProvider ({ children }: { children: ReactNode }) {
   const { currentPageId } = usePages();
   const { isValidating: isValidatingInlineComments } = useThreads();
   const { isValidating: isValidatingInlineVotes } = useInlineVotes();
