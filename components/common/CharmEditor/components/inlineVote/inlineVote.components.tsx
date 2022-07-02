@@ -3,7 +3,7 @@ import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { hideSelectionTooltip } from '@bangle.dev/tooltip/selection-tooltip';
 import AddCircle from '@mui/icons-material/AddCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Divider, FormControlLabel, IconButton, ListItem, Radio, RadioGroup, TextField, Typography } from '@mui/material';
+import { FormControlLabel, IconButton, ListItem, Radio, RadioGroup, TextField, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import Button from 'components/common/Button';
@@ -136,6 +136,7 @@ export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
   const [voteType, setVoteType] = useState<VoteType>('default');
   const [options, setOptions] = useState<{ name: string }[]>([]);
   const { createVote } = useInlineVotes();
+  const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
 
   useEffect(() => {
     if (voteType === 'custom') {
@@ -234,10 +235,14 @@ export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
                     ...props.inputProps,
                     readOnly: true
                   }}
-                  disabled
                   fullWidth
+                  onClick={() => {
+                    setIsDateTimePickerOpen((_isDateTimePickerOpen) => !_isDateTimePickerOpen);
+                  }}
                 />
               )}
+              onClose={() => setIsDateTimePickerOpen(false)}
+              open={isDateTimePickerOpen}
             />
           </Box>
           <Box flexDirection='column' display='flex' flexGrow={1}>

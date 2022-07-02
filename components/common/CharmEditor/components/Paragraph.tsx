@@ -34,17 +34,17 @@ interface ParagraphProps extends NodeViewProps{
 export default function Paragraph (
   { node, children, calculateActions = true, inlineCommentPluginKey, inlineVotePluginKey }: ParagraphProps
 ) {
-  const cardId = (new URLSearchParams(window.location.href)).get('cardId');
+  const isShowingCardModal = (new URLSearchParams(window.location.href)).get('cardId');
   const view = useEditorViewContext();
   const { threads } = useThreads();
   const { inlineVotes } = useInlineVotes();
-  const { threadIds, totalInlineComments } = useMemo(() => (calculateActions || cardId)
+  const { threadIds, totalInlineComments } = useMemo(() => (calculateActions || isShowingCardModal)
     ? findTotalInlineComments(view, node, threads)
-    : { threadIds: [], totalInlineComments: 0 }, [node, calculateActions, cardId, threads]);
+    : { threadIds: [], totalInlineComments: 0 }, [node, calculateActions, isShowingCardModal, threads]);
 
-  const { voteIds, totalInlineVotes } = useMemo(() => (calculateActions || cardId)
+  const { voteIds, totalInlineVotes } = useMemo(() => (calculateActions || isShowingCardModal)
     ? findTotalInlineVotes(view, node, inlineVotes)
-    : { voteIds: [], totalInlineVotes: 0 }, [node, calculateActions, cardId, inlineVotes]);
+    : { voteIds: [], totalInlineVotes: 0 }, [node, calculateActions, isShowingCardModal, inlineVotes]);
 
   return (
     <>
