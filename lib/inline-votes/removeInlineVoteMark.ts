@@ -10,7 +10,7 @@ export function removeInlineVoteMark (view: EditorView, voteId: string) {
   for (const inlineVoteNode of inlineVoteNodes) {
     // Find the inline vote mark for the node
     const inlineVoteMark = inlineVoteNode.node.marks.find(mark => mark.type.name === inlineVoteMarkSchema.name);
-    // Make sure the mark has the same threadId as the given one
+    // Make sure the mark has the same voteId as the given one
     if (inlineVoteMark?.attrs.id === voteId) {
       inlineVoteNodeWithMarks.push({
         ...inlineVoteNode,

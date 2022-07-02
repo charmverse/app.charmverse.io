@@ -55,7 +55,7 @@ export function plugin ({ key } :{
         handleClickOn: (view) => {
           return highlightMarkedElement({
             view,
-            className: 'PageVoteListBox',
+            elementId: 'page-vote-list-box',
             key,
             markName,
             prefix: 'vote'

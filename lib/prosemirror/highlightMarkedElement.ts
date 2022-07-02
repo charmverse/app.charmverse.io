@@ -4,11 +4,11 @@ import { highlightDomElement } from 'lib/browser';
 
 export function highlightMarkedElement ({
   view,
-  className,
+  elementId,
   markName,
   key,
   prefix
-}: {view: EditorView, markName: string, key: PluginKey, className: string, prefix: string}) {
+}: {view: EditorView, markName: string, key: PluginKey, elementId: string, prefix: string}) {
   const { $from, $to } = view.state.selection;
   const fromNodeAfter = $from.nodeAfter;
   const toNodeAfter = $to.nodeAfter;
@@ -19,7 +19,7 @@ export function highlightMarkedElement ({
   }
   if (fromNodeAfter) {
     const inlineActionMark = view.state.doc.type.schema.marks[markName].isInSet(fromNodeAfter.marks);
-    const pageActionListNode = document.querySelector(`.${className}`) as HTMLDivElement;
+    const pageActionListNode = document.getElementById(elementId) as HTMLDivElement;
     // Page action list node might not be present
     const isShowingActionList = pageActionListNode.style.visibility !== 'hidden';
     // Check if we are inside a card page modal

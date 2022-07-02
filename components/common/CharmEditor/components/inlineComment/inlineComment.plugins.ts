@@ -56,7 +56,7 @@ export function plugin ({ key } :{
         handleClickOn: (view) => {
           return highlightMarkedElement({
             view,
-            className: 'PageThreadListBox',
+            elementId: 'page-thread-list-box',
             key,
             markName,
             prefix: 'thread'
