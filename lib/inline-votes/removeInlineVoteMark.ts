@@ -1,4 +1,4 @@
-import { EditorView, MarkType, Mark } from '@bangle.dev/pm';
+import { EditorView, MarkType, Mark, Transaction } from '@bangle.dev/pm';
 import { findChildrenByMark, NodeWithPos } from 'prosemirror-utils';
 
 export function removeInlineVoteMark (view: EditorView, voteId: string) {
@@ -19,12 +19,13 @@ export function removeInlineVoteMark (view: EditorView, voteId: string) {
     }
   }
 
+  let tr: Transaction | null = null;
   inlineVoteNodeWithMarks.forEach(inlineVoteNodeWithMark => {
     const from = inlineVoteNodeWithMark.pos;
     const to = from + inlineVoteNodeWithMark.node.nodeSize;
-    const tr = view.state.tr.removeMark(from, to, inlineVoteMarkSchema);
-    if (view.dispatch) {
-      view.dispatch(tr);
-    }
+    tr = view.state.tr.removeMark(from, to, inlineVoteMarkSchema);
   });
+  if (tr && view.dispatch) {
+    view.dispatch(tr);
+  }
 }

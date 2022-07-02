@@ -219,7 +219,7 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
           removeInlineVoteMark(view, inlineVote.id);
           deleteVote(inlineVote.id);
         }}
-        question={`Are you sure you want to delete ${inlineVote.title} vote?`}
+        question={`Are you sure you want to delete this vote: ${inlineVote.title}?`}
       />
       <Menu
         {...bindMenu(inlineVoteActionModal)}
