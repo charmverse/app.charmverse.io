@@ -40,7 +40,7 @@ import type { MarkTask } from 'lib/tasks/markTasks';
 import { TransactionCreationData } from 'lib/transactions/interface';
 import { PublicUser } from 'pages/api/public/profile/[userPath]';
 import { DeepDaoAggregateData } from 'lib/deepdao/interfaces';
-import { ExtendedUserVote, ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
+import { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
 import { AssignedPermissionsQuery, Resource } from './lib/permissions/interfaces';
 import { SpacePermissionFlags, SpacePermissionModification } from './lib/permissions/spaces';
 import { SpacePermissionConfigurationUpdate } from './lib/permissions/meta/interfaces';
@@ -726,7 +726,7 @@ class CharmClient {
   }
 
   castVote (voteId: string, choice: string) {
-    return http.POST<ExtendedUserVote>(`/api/votes/${voteId}/cast`, {
+    return http.POST<UserVote>(`/api/votes/${voteId}/cast`, {
       choice
     });
   }

@@ -75,7 +75,6 @@ function InlineVoteOptions (
         return (
           <ListItem sx={{ px: 0, pt: 0, display: 'flex', gap: 0.5 }}>
             <TextField
-              error={option.name.length === 0 || Boolean(options.find((_option, _index) => _index !== index && _option.name === option.name))}
               // Disable changing text for No change option
               fullWidth
               placeholder={`Option ${index + 1}`}
@@ -182,7 +181,6 @@ export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
           <FieldLabel>Title</FieldLabel>
           <TextField
             autoFocus
-            error={voteTitle.length === 0}
             placeholder="What's the vote?"
             value={voteTitle}
             onChange={(e) => {
