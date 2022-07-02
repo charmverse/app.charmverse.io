@@ -61,7 +61,7 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
   const isPage = router.route.includes('pageId');
   const pageType = (currentPage as Page)?.type;
   const isExportablePage = pageType === 'card' || pageType === 'page';
-  const { currentPageActionDisplay, setCurrentPageActionDisplay } = usePageActionDisplay();
+  const { setCurrentPageActionDisplay } = usePageActionDisplay();
 
   async function toggleFavorite () {
     if (!currentPage || !user) return;
@@ -154,6 +154,32 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
                 }}
               >
                 <List dense>
+                  {isPage && (
+                  <>
+                    <ListItemButton onClick={async () => {
+                      setCurrentPageActionDisplay('comments');
+                    }}
+                    >
+                      <CommentOutlinedIcon
+                        fontSize='small'
+                        sx={{
+                          mr: 1
+                        }}
+                      />
+                      <ListItemText primary='View comments' />
+                    </ListItemButton>
+                    <ListItemButton onClick={() => setCurrentPageActionDisplay('votes')}>
+                      <HowToVoteOutlinedIcon
+                        fontSize='small'
+                        sx={{
+                          mr: 1
+                        }}
+                      />
+                      <ListItemText primary='View votes' />
+                    </ListItemButton>
+                  </>
+                  )}
+                  <Divider />
                   <ListItemButton onClick={() => {
                     exportMarkdown();
                     setPageMenuOpen(false);
@@ -195,66 +221,6 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
                         />
                       )}
                       label='Full Width'
-                    />
-                  </ListItemButton>
-                  <ListItemButton>
-                    <FormControlLabel
-                      sx={{
-                        marginLeft: 0.5,
-                        width: '100%',
-                        display: 'flex',
-                        justifyContent: 'space-between'
-                      }}
-                      labelPlacement='start'
-                      control={(
-                        <Switch
-                          size='small'
-                          checked={currentPageActionDisplay === 'comments'}
-                          onChange={async () => {
-                            setCurrentPageActionDisplay((_currentPageActionDisplay) => _currentPageActionDisplay === 'comments' ? null : 'comments');
-                          }}
-                        />
-                      )}
-                      label={(
-                        <Box display='flex' gap={1}><CommentOutlinedIcon
-                          fontSize='small'
-                          sx={{
-                            top: 2.5,
-                            position: 'relative'
-                          }}
-                        />Comments
-                        </Box>
-                      )}
-                    />
-                  </ListItemButton>
-                  <ListItemButton>
-                    <FormControlLabel
-                      sx={{
-                        marginLeft: 0.5,
-                        width: '100%',
-                        display: 'flex',
-                        justifyContent: 'space-between'
-                      }}
-                      labelPlacement='start'
-                      control={(
-                        <Switch
-                          size='small'
-                          checked={currentPageActionDisplay === 'votes'}
-                          onChange={async () => {
-                            setCurrentPageActionDisplay((_currentPageActionDisplay) => _currentPageActionDisplay === 'votes' ? null : 'votes');
-                          }}
-                        />
-                      )}
-                      label={(
-                        <Box display='flex' gap={1}><HowToVoteOutlinedIcon
-                          fontSize='small'
-                          sx={{
-                            top: 2.5,
-                            position: 'relative'
-                          }}
-                        />Votes
-                        </Box>
-                      )}
                     />
                   </ListItemButton>
                 </List>
