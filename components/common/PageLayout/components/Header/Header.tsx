@@ -156,8 +156,9 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
                 <List dense>
                   {isPage && (
                   <>
-                    <ListItemButton onClick={async () => {
+                    <ListItemButton onClick={() => {
                       setCurrentPageActionDisplay('comments');
+                      setPageMenuOpen(false);
                     }}
                     >
                       <CommentOutlinedIcon
@@ -168,7 +169,11 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
                       />
                       <ListItemText primary='View comments' />
                     </ListItemButton>
-                    <ListItemButton onClick={() => setCurrentPageActionDisplay('votes')}>
+                    <ListItemButton onClick={() => {
+                      setCurrentPageActionDisplay('votes');
+                      setPageMenuOpen(false);
+                    }}
+                    >
                       <HowToVoteOutlinedIcon
                         fontSize='small'
                         sx={{
