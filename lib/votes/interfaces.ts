@@ -25,3 +25,18 @@ export interface ExtendedVote extends Vote {
     userVotes: (UserVote & {user: Pick<User, 'username' | 'avatar'>})[],
     voteOptions: VoteOptions[]
 }
+
+export type VoteTask = {
+  space: {
+    name: string;
+    domain: string;
+  };
+  page: {
+      title: string;
+      path: string;
+  };
+  title: string;
+  pageId: string;
+  spaceId: string;
+  deadline: Date;
+}

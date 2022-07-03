@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import { silentlyUpdateURL } from 'lib/browser';
 import { useState } from 'react';
 import { useTheme } from '@emotion/react';
+import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import GnosisTasksList from './GnosisTasksList';
 import MentionedTasksList from './MentionedTasksList';
 import TasksPageHeader from './TasksPageHeader';
@@ -40,7 +41,7 @@ const tabStyles = {
 const TASK_TABS = [
   { icon: <KeyIcon />, label: 'Multisig', type: 'multisig' },
   // { icon: <BountyIcon />, label: 'Bounty', type: 'bounty' },
-  // { icon: <HowToVoteIcon />, label: 'Proposal', type: 'proposal' },
+  { icon: <HowToVoteIcon />, label: 'Votes', type: 'vote' },
   { icon: <ForumIcon />, label: 'Discussion', type: 'discussion' }
 ] as const;
 
