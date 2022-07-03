@@ -235,7 +235,7 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         onClick={(e) => e.stopPropagation()}
       >
-        {inlineVote.status === 'InProgress' && (
+        {inlineVote.status === 'InProgress' && !hasPassedDeadline && (
           <MenuItem
             dense
             onClick={() => {
