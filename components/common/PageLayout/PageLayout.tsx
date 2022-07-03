@@ -2,7 +2,9 @@ import styled from '@emotion/styled';
 import { Theme } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import MuiDrawer from '@mui/material/Drawer';
+import { InlineVotesProvider } from 'hooks/useInlineVotes';
 import { PageActionDisplayProvider } from 'hooks/usePageActionDisplay';
+import { ThreadsProvider } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import Head from 'next/head';
 import * as React from 'react';
@@ -108,34 +110,38 @@ function PageLayout ({ hideSidebarOnSmallScreen = false, sidebarWidth = 300, chi
         <CurrentPageFavicon />
       </Head>
       <LayoutContainer>
-        <PageActionDisplayProvider>
-          <AppBar sidebarWidth={sidebarWidth} position='fixed' open={open}>
-            <Header
-              open={open}
-              hideSidebarOnSmallScreen={hideSidebarOnSmallScreen}
-              openSidebar={handleDrawerOpen}
-            />
-          </AppBar>
-          <Drawer
-            sidebarWidth={sidebarWidth}
-            variant='permanent'
-            open={open}
-            sx={{
-              display: {
-                xs: hideSidebarOnSmallScreen ? 'none' : 'block',
-                md: 'block'
-              }
-            }}
-          >
-            {SidebarOverride
-              ? <SidebarOverride closeSidebar={handleDrawerClose} />
-              : <Sidebar closeSidebar={handleDrawerClose} favorites={user?.favorites || []} />}
-          </Drawer>
-          <PageContainer>
-            <HeaderSpacer />
-            {children}
-          </PageContainer>
-        </PageActionDisplayProvider>
+        <ThreadsProvider>
+          <InlineVotesProvider>
+            <PageActionDisplayProvider>
+              <AppBar sidebarWidth={sidebarWidth} position='fixed' open={open}>
+                <Header
+                  open={open}
+                  hideSidebarOnSmallScreen={hideSidebarOnSmallScreen}
+                  openSidebar={handleDrawerOpen}
+                />
+              </AppBar>
+              <Drawer
+                sidebarWidth={sidebarWidth}
+                variant='permanent'
+                open={open}
+                sx={{
+                  display: {
+                    xs: hideSidebarOnSmallScreen ? 'none' : 'block',
+                    md: 'block'
+                  }
+                }}
+              >
+                {SidebarOverride
+                  ? <SidebarOverride closeSidebar={handleDrawerClose} />
+                  : <Sidebar closeSidebar={handleDrawerClose} favorites={user?.favorites || []} />}
+              </Drawer>
+              <PageContainer>
+                <HeaderSpacer />
+                {children}
+              </PageContainer>
+            </PageActionDisplayProvider>
+          </InlineVotesProvider>
+        </ThreadsProvider>
       </LayoutContainer>
     </>
   );

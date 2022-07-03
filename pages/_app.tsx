@@ -343,13 +343,9 @@ function DataProviders ({ children }: { children: ReactNode }) {
             <PaymentMethodsProvider>
               <PagesProvider>
                 <PageTitleProvider>
-                  <ThreadsProvider>
-                    <InlineVotesProvider>
-                      <FocalboardViewsProvider>
-                        {children}
-                      </FocalboardViewsProvider>
-                    </InlineVotesProvider>
-                  </ThreadsProvider>
+                  <FocalboardViewsProvider>
+                    {children}
+                  </FocalboardViewsProvider>
                 </PageTitleProvider>
               </PagesProvider>
             </PaymentMethodsProvider>
