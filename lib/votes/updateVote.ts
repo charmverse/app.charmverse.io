@@ -5,7 +5,6 @@ import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { VoteStatusType, VOTE_STATUS } from './interfaces';
 
 export async function updateVote (id: string, userId: string, status: VoteStatusType): Promise<Vote> {
-
   const existingVote = await prisma.vote.findUnique({
     where: {
       id
@@ -17,8 +16,13 @@ export async function updateVote (id: string, userId: string, status: VoteStatus
   }
 
   // If vote has a Cancelled status, it can't be updated.
-  if (existingVote.status === VOTE_STATUS[3]) {
-    throw new UndesirableOperationError(`Vote with id: ${id} has been cancelled and cannot be updated.`);
+  if (existingVote.status !== VOTE_STATUS[0]) {
+    throw new UndesirableOperationError('Only in progress votes can be updated.');
+  }
+
+  // If vote has a Cancelled status, it can't be updated.
+  if (status !== VOTE_STATUS[3]) {
+    throw new UndesirableOperationError('Votes can only be cancelled.');
   }
 
   const { error } = await hasAccessToSpace({

@@ -6,6 +6,7 @@ import { Box } from '@mui/system';
 import PageInlineVote from 'components/common/CharmEditor/components/PageInlineVote';
 import { useInlineVotes } from 'hooks/useInlineVotes';
 import { findTotalInlineVotes } from 'lib/inline-votes/findTotalInlineVotes';
+import { isTruthy } from 'lib/utilities/types';
 import { ExtendedVote } from 'lib/votes/interfaces';
 import { useMemo, useState } from 'react';
 import PageActionToggle from './PageActionToggle';
@@ -65,12 +66,12 @@ export default function PageInlineVotesList () {
       );
     }
     else if (voteSort === 'position') {
-      _sortedVotes = inlineVoteIds.map(inlineVoteId => inlineVotes[inlineVoteId]);
+      _sortedVotes = inlineVoteIds.map(inlineVoteId => inlineVotes[inlineVoteId]).filter(isTruthy);
     }
     return _sortedVotes;
   }, [inlineVotes, allVotes, voteSort]);
 
-  const filteredVotes = voteFilter === 'completed' ? sortedVotes.filter(sortedVote => sortedVote.status !== 'InProgress') : sortedVotes.filter(sortedVote => sortedVote.status === 'InProgress');
+  const filteredVotes = voteFilter === 'completed' ? allVotes.filter(sortedVote => sortedVote.status !== 'InProgress') : sortedVotes.filter(sortedVote => sortedVote.status === 'InProgress');
 
   return (
     <Box sx={{

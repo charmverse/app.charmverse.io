@@ -123,7 +123,11 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
         <Typography variant='h6' fontWeight='bold'>
           {title}
         </Typography>
-        <Chip size='small' label={VoteStatusLabelRecord[inlineVote.status]} />
+        {inlineVote.createdBy === user?.id && (
+          <IconButton size='small' onClick={inlineVoteActionModal.open}>
+            <MoreHorizIcon fontSize='small' />
+          </IconButton>
+        )}
       </Box>
       <Box display='flex' justifyContent='space-between'>
         <Typography
@@ -132,11 +136,7 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
         >
           {hasPassedDeadline ? relativeDate : `${relativeDate?.replace(/^in/g, '')} left`}
         </Typography>
-        {inlineVote.createdBy === user?.id && (
-          <IconButton size='small' onClick={inlineVoteActionModal.open}>
-            <MoreHorizIcon fontSize='small' />
-          </IconButton>
-        )}
+        <Chip size='small' label={VoteStatusLabelRecord[inlineVote.status]} />
       </Box>
       {description && (
       <Box my={1} mb={2}>{isDescriptionAbove && !detailed ? (
