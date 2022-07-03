@@ -24,7 +24,12 @@ import Legend from '../../../Legend';
 import TokenGatesTable from './components/TokenGatesTable';
 
 const ShareModalContainer = styled.div`
+
   width: 100%;
+
+  .lsm-share-modal-container {
+    min-height: 500px;
+  }
 
   .lsm-single-condition-select-container,
   .lsm-condition-display,
@@ -36,7 +41,9 @@ const ShareModalContainer = styled.div`
   .lsm-condition-display,
   .lsm-review-conditions-container,
   .lsm-single-condition-multiple-button,
-  .lsm-lit-footer {
+  .lsm-lit-footer,
+  // container when selecting multiple conditions
+  .lsm-multiple-conditions-container {
     position: relative;
     top: 0;
   }
