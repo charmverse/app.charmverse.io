@@ -10,9 +10,14 @@ export async function getVoteTasks (userId: string): Promise<VoteTask[]> {
             userId
           }
         }
-      }
+      },
+      status: 'InProgress'
+    },
+    orderBy: {
+      deadline: 'desc'
     },
     select: {
+      id: true,
       title: true,
       pageId: true,
       spaceId: true,

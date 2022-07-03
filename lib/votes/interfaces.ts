@@ -35,6 +35,7 @@ export type VoteTask = {
       title: string;
       path: string;
   };
+  id: string
   title: string;
   pageId: string;
   spaceId: string;
