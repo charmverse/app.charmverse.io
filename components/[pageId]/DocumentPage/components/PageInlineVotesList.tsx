@@ -5,10 +5,12 @@ import { InputLabel, List, MenuItem, Select, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import PageInlineVote from 'components/common/CharmEditor/components/PageInlineVote';
 import { useInlineVotes } from 'hooks/useInlineVotes';
+import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
+import { silentlyUpdateURL } from 'lib/browser';
 import { findTotalInlineVotes } from 'lib/inline-votes/findTotalInlineVotes';
 import { isTruthy } from 'lib/utilities/types';
 import { ExtendedVote } from 'lib/votes/interfaces';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import PageActionToggle from './PageActionToggle';
 
 export const StyledPageInlineVotesList = styled(List)`
@@ -40,7 +42,7 @@ const Center = styled.div`
 `;
 
 type TVoteSort = 'position' | 'latest_deadline' | 'highest_votes' | 'latest_created';
-type TVoteFilter = 'in_progress' | 'completed';
+type TVoteFilter = 'in_progress' | 'completed' | 'all';
 
 export default function PageInlineVotesList () {
   const { inlineVotes } = useInlineVotes();
@@ -49,7 +51,7 @@ export default function PageInlineVotesList () {
   const [voteFilter, setVoteFilter] = useState<TVoteFilter>('in_progress');
   const [voteSort, setVoteSort] = useState<TVoteSort>('position');
   const inlineVoteIds = voteSort === 'position' ? findTotalInlineVotes(view, view.state.doc, inlineVotes).voteIds : [];
-
+  const { setCurrentPageActionDisplay } = usePageActionDisplay();
   const sortedVotes = useMemo(() => {
     let _sortedVotes: ExtendedVote[] = [];
     if (voteSort === 'highest_votes') {
@@ -71,7 +73,31 @@ export default function PageInlineVotesList () {
     return _sortedVotes;
   }, [inlineVotes, allVotes, voteSort]);
 
-  const filteredVotes = voteFilter === 'completed' ? allVotes.filter(sortedVote => sortedVote.status !== 'InProgress') : sortedVotes.filter(sortedVote => sortedVote.status === 'InProgress');
+  const filteredVotes = voteFilter === 'all' ? allVotes : voteFilter === 'completed' ? allVotes.filter(sortedVote => sortedVote.status !== 'InProgress') : sortedVotes.filter(sortedVote => sortedVote.status === 'InProgress');
+
+  useEffect(() => {
+    // Highlight the vote id when navigation from nexus votes tasks list tab
+    const highlightedVoteId = (new URLSearchParams(window.location.search)).get('voteId');
+    if (highlightedVoteId) {
+      const highlightedVote = allVotes.find(vote => vote.id === highlightedVoteId);
+      if (highlightedVote) {
+        const highlightedVoteDomNode = document.getElementById(`vote.${highlightedVoteId}`);
+        if (highlightedVoteDomNode) {
+          setTimeout(() => {
+            setCurrentPageActionDisplay('votes');
+            setVoteFilter('all');
+            // Remove query parameters from url
+            silentlyUpdateURL(window.location.href.split('?')[0]);
+            requestAnimationFrame(() => {
+              highlightedVoteDomNode.scrollIntoView({
+                behavior: 'smooth'
+              });
+            });
+          }, 250);
+        }
+      }
+    }
+  }, [allVotes, window.location.search]);
 
   return (
     <Box sx={{
@@ -97,6 +123,7 @@ export default function PageInlineVotesList () {
         <Select variant='outlined' value={voteFilter} onChange={(e) => setVoteFilter(e.target.value as TVoteFilter)}>
           <MenuItem value='in_progress'>In progress</MenuItem>
           <MenuItem value='completed'>Completed</MenuItem>
+          <MenuItem value='all'>All</MenuItem>
         </Select>
       </Box>
       <StyledPageInlineVotesList>
