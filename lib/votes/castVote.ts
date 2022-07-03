@@ -1,6 +1,7 @@
 
 import { UserVote, VoteOptions } from '@prisma/client';
 import { prisma } from 'db';
+import { hasAccessToSpace } from 'lib/middleware';
 import { DataNotFoundError, InvalidInputError, UndesirableOperationError } from 'lib/utilities/errors';
 import { VOTE_STATUS } from './interfaces';
 
@@ -30,6 +31,15 @@ export async function castVote (choice: string, voteId: string, userId: string):
 
   if (!vote.voteOptions.find((option: VoteOptions) => option.name === choice)) {
     throw new InvalidInputError('Voting choice is not a valid option.');
+  }
+
+  const { error } = await hasAccessToSpace({
+    userId,
+    spaceId: vote.spaceId
+  });
+
+  if (error) {
+    throw error;
   }
 
   const userVote = await prisma.userVote.upsert({
