@@ -1,7 +1,9 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
+import { Page } from '@prisma/client';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
+import { sortNodes, filterVisiblePages } from 'components/common/PageLayout/components/PageNavigation/PageNavigation';
 
 // Redirect users to an initial page
 export default function RedirectToMainPage () {
@@ -11,14 +13,17 @@ export default function RedirectToMainPage () {
 
   useEffect(() => {
 
-    // Find the first top-level page that is not card and hasn't been deleted yet
-    const firstPage = Object.values(pages)
-      .find((page) => (page?.type === 'board' || page?.type === 'page')
-            && page?.deletedAt === null
-            && page?.parentId === null);
+    // Find the first top-level page that is not card and hasn't been deleted yet.
+    const topLevelPages = filterVisiblePages(Object.values(pages))
+      // Remove any child pages (eg. that have a parentId)
+      .filter(page => !page?.parentId);
+
+    const sortedPages = sortNodes(topLevelPages);
+
+    const firstPage = sortedPages[0] as Page;
 
     // make sure this page is part of this space in case user is navigating to a new space
-    if (space && firstPage?.spaceId === space.id) {
+    if (firstPage && space && firstPage?.spaceId === space.id) {
       router.push(`/${space.domain}/${firstPage.path}`);
     }
 

@@ -44,7 +44,7 @@ interface PageTreeItemProps {
   href: string;
   isActive: boolean;
   isAdjacent: boolean;
-  isEmptyContent: boolean;
+  isEmptyContent?: boolean;
   labelIcon?: string;
   label: string;
   pageType?: PageType;
