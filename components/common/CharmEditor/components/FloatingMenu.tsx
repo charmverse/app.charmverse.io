@@ -31,6 +31,8 @@ export default function FloatingMenuComponent (
   const { getPagePermissions, currentPageId } = usePages();
   const permissions = currentPageId ? getPagePermissions(currentPageId) : new AllowedPagePermissions();
   const isUserAdmin = isAdmin();
+  const displayInlineCommentButton = !inline && permissions.comment && enableComments;
+  const displayInlineVoteButton = !inline && permissions.comment && isUserAdmin && enableComments;
   return (
     <FloatingMenu
       menuKey={pluginKey}
@@ -54,8 +56,8 @@ export default function FloatingMenuComponent (
                 <StrikeButton />
                 <UnderlineButton />
                 <FloatingLinkButton menuKey={pluginKey} />
-                {!inline && permissions.comment && enableComments && <InlineCommentButton enableComments menuKey={pluginKey} />}
-                {!inline && permissions.comment && isUserAdmin && enableComments && <InlineVoteButton enableVotes menuKey={pluginKey} />}
+                {displayInlineCommentButton && <InlineCommentButton enableComments menuKey={pluginKey} />}
+                {displayInlineVoteButton && <InlineVoteButton enableVotes menuKey={pluginKey} />}
               </MenuGroup>
               {!inline && (
               <MenuGroup isLastGroup>

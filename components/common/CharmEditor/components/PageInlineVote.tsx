@@ -34,9 +34,16 @@ const StyledDiv = styled.div<{ detailed: boolean }>`
   padding: ${({ theme }) => theme.spacing(2)};
 `;
 
+interface PageInlineVoteOptionProps {
+  voteId: string
+  voteOption: VoteOptions
+  percentage: number
+  checked: boolean
+  isDisabled: boolean
+}
+
 function PageInlineVoteOption (
-  { isDisabled, voteOption, voteId, checked, percentage }:
-  { voteId: string, voteOption: VoteOptions, percentage: number, checked: boolean, isDisabled: boolean }
+  { isDisabled, voteOption, voteId, checked, percentage }: PageInlineVoteOptionProps
 ) {
   const { castVote } = useInlineVotes();
   const [user] = useUser();
