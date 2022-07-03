@@ -1,8 +1,9 @@
 
 import { Vote } from '@prisma/client';
-import { onError, onNoMatch, requireKeys, requireSpaceMembership, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { createVote as createVoteService, getVote as getVoteService, VoteDTO } from 'lib/votes';
+import { createVote as createVoteService, getVote as getVoteService } from 'lib/votes';
+import { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -23,7 +24,7 @@ async function getVotes (req: NextApiRequest, res: NextApiResponse<Vote | { erro
   return res.status(200).json(vote);
 }
 
-async function createVote (req: NextApiRequest, res: NextApiResponse<Vote | null | { error: any }>) {
+async function createVote (req: NextApiRequest, res: NextApiResponse<ExtendedVote | null | { error: any }>) {
   const newVote = req.body as VoteDTO;
   const userId = req.session.user.id;
 

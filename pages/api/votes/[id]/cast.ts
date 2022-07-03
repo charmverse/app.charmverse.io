@@ -2,7 +2,8 @@
 import { UserVote } from '@prisma/client';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { castVote as castVoteService, UserVoteDTO } from 'lib/votes';
+import { castVote as castVoteService } from 'lib/votes';
+import { UserVoteDTO } from 'lib/votes/interfaces';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 

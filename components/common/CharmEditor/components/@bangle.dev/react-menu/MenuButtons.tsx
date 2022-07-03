@@ -22,10 +22,11 @@ import {
 import { filter, rafCommandExec } from '@bangle.dev/utils';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import React, { useCallback } from 'react';
-import { createInlineComment, queryIsInlineCommentActive, toggleInlineComment } from '../../inlineComment';
 import { MenuButton } from './Icon';
-import CommentIcon from '@mui/icons-material/Comment';
-import { toggleSubMenu } from './floating-menu';
+import InsertCommentOutlinedIcon from '@mui/icons-material/InsertCommentOutlined';
+import { SubMenu, toggleSubMenu } from './floating-menu';
+import HowToVoteIcon from '@mui/icons-material/HowToVote';
+import { createInlineVote } from '../../inlineVote';
 
 const {
   defaultKeys: orderedListKeys,
@@ -95,27 +96,25 @@ export function BoldButton({
   );
 }
 
-export function InlineCommentButton({
-  hints = ['Comment'],
+export function InlineActionButton({
+  hints = [],
   hintPos = 'top',
-  children = <CommentIcon sx={{
-    fontSize: 12,
-    position: "relative"
-  }}/>,
+  children,
   menuKey,
-  enableComments,
+  enable,
+  subMenu,
   ...props
-}: ButtonProps & {menuKey: PluginKey, enableComments: boolean}) {
+}: ButtonProps & {subMenu: SubMenu, menuKey: PluginKey, enable: boolean}) {
   const view = useEditorViewContext();
   
   const onMouseDown = useCallback(
     (e) => {
       e.preventDefault();
       const command = filter(
-        (state: EditorState) => createInlineComment()(state),
+        (state: EditorState) => createInlineVote()(state),
         (_state, dispatch, view) => {
           if (dispatch) {
-            toggleSubMenu(menuKey, "inlineCommentSubMenu")(view!.state, view!.dispatch, view);
+            toggleSubMenu(menuKey, subMenu)(view!.state, view!.dispatch, view);
             rafCommandExec(view!, focusFloatingMenuInput(menuKey));
           }
           return true;
@@ -137,11 +136,56 @@ export function InlineCommentButton({
       onMouseDown={onMouseDown}
       hints={hints}
       // Figure out when the button will be disabled
-      isDisabled={!enableComments}
+      isDisabled={!enable}
     >
       {children}
     </MenuButton>
   );
+}
+
+export function InlineCommentButton({
+  hints = ['Comment'],
+  hintPos = 'top',
+  children = <InsertCommentOutlinedIcon sx={{
+    fontSize: 12,
+    position: "relative"
+  }}/>,
+  menuKey,
+  enableComments,
+  ...props
+}: ButtonProps & {menuKey: PluginKey, enableComments: boolean}) {
+
+  return <InlineActionButton 
+    {...props}
+    enable={enableComments}
+    menuKey={menuKey}
+    hints={['Comment']}
+    subMenu='inlineCommentSubMenu'
+  >
+    {children}
+  </InlineActionButton>
+}
+
+export function InlineVoteButton({
+  hints = ['Vote'],
+  hintPos = 'top',
+  children = <HowToVoteIcon sx={{
+    fontSize: 12,
+    position: "relative"
+  }}/>,
+  menuKey,
+  enableVotes,
+  ...props
+}: ButtonProps & {menuKey: PluginKey, enableVotes: boolean}) {
+  return <InlineActionButton 
+    {...props}
+    enable={enableVotes}
+    menuKey={menuKey}
+    hints={['Vote']}
+    subMenu='inlineVoteSubMenu'
+  >
+    {children}
+  </InlineActionButton>
 }
 
 export function StrikeButton({

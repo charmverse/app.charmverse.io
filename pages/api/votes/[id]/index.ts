@@ -5,10 +5,10 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import {
   getVote as getVoteService,
   updateVote as updateVoteService,
-  deleteVote as deleteVoteService,
-  UpdateVoteDTO
+  deleteVote as deleteVoteService
 } from 'lib/votes';
 import nc from 'next-connect';
+import { UpdateVoteDTO } from 'lib/votes/interfaces';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

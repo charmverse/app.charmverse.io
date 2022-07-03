@@ -1,14 +1,12 @@
+import { Vote } from '@prisma/client';
 import { prisma } from 'db';
-import { ExtendedVote } from './interfaces';
 
-export async function getSpaceVotes (spaceId: string): Promise<ExtendedVote[]> {
-  return prisma.vote.findMany({
+export async function getSpaceVotes (spaceId: string): Promise<Vote[]> {
+  const pageVotes = await prisma.vote.findMany({
     where: {
       spaceId
-    },
-    include: {
-      userVotes: true,
-      voteOptions: true
     }
   });
+
+  return pageVotes;
 }

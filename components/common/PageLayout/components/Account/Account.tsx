@@ -123,7 +123,7 @@ function Account (): JSX.Element {
               <Badge
                 color='error'
                 sx={{
-                  '&:hover .MuiBadge-badge': {
+                  '& .MuiBadge-badge:hover': {
                     transform: 'scale(1.25) translate(50%, -50%)',
                     transition: '250ms ease-in-out transform'
                   }
