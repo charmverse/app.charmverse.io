@@ -586,10 +586,10 @@ model PagePermission {
   @@unique([public, pageId], name: "public_pageId")
 }
 
-
 enum SpaceOperation {
   createPage
   createBounty
+  createVote
 }
 
 model SpacePermission {
