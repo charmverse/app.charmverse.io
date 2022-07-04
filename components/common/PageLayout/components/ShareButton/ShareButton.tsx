@@ -1,8 +1,6 @@
 
 import Button from 'components/common/Button';
-import Popover from '@mui/material/Popover';
-import Box from '@mui/material/Box';
-import Divider from '@mui/material/Divider';
+import { Box, Divider, Popover, Tooltip } from '@mui/material';
 import Loader from 'components/common/Loader';
 import charmClient from 'charmClient';
 import { usePages } from 'hooks/usePages';
@@ -34,17 +32,19 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
 
   return (
     <>
-      <Button
-        color='secondary'
-        variant='text'
-        size='small'
-        onClick={() => {
-          refreshPermissions();
-          popupState.open();
-        }}
-      >
-        Share
-      </Button>
+      <Tooltip arrow title='Share or publish to the web'>
+        <Button
+          color='secondary'
+          variant='text'
+          size='small'
+          onClick={() => {
+            refreshPermissions();
+            popupState.open();
+          }}
+        >
+          Share
+        </Button>
+      </Tooltip>
       <Popover
         {...bindPopover(popupState)}
         anchorOrigin={{

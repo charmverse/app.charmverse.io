@@ -18,7 +18,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import { Page } from '@prisma/client';
 import charmClient from 'charmClient';
-import PublishToSnapshot from 'components/common/PageLayout/components/Header/snapshot/PublishToSnapshot';
+import PublishToSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/PublishToSnapshot';
 import { useColorMode } from 'context/darkMode';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
@@ -30,7 +30,8 @@ import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import Account from '../Account';
 import ShareButton from '../ShareButton';
-import PageTitleWithBreadcrumbs from './PageTitleWithBreadcrumbs';
+import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
+import NotificationsBadge from './components/NotificationsBadge';
 
 export const headerHeight = 56;
 
@@ -125,11 +126,11 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
           {isPage && (
             <>
               {currentPage?.deletedAt === null && <ShareButton headerHeight={headerHeight} />}
-              <Tooltip title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} arrow placement='bottom'>
-                <IconButton size='small' sx={{ ml: 1 }} onClick={toggleFavorite} color='inherit'>
+              <IconButton size='small' onClick={toggleFavorite} color='inherit'>
+                <Tooltip title={isFavorite ? 'Remove from sidebar' : 'Pin this page to your sidebar'} arrow placement='bottom'>
                   {isFavorite ? <FavoritedIcon color='secondary' /> : <NotFavoritedIcon color='secondary' />}
-                </IconButton>
-              </Tooltip>
+                </Tooltip>
+              </IconButton>
             </>
           )}
 
@@ -142,7 +143,9 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
                   setPageMenuAnchorElement(pageMenuAnchor.current || null);
                 }}
               >
-                <MoreHorizIcon />
+                <Tooltip title='View comments, votes, export content and more' arrow>
+                  <MoreHorizIcon />
+                </Tooltip>
               </IconButton>
               <Popover
                 anchorEl={pageMenuAnchorElement}
@@ -235,12 +238,13 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
 
           {/** dark mode toggle */}
           {user && (
-            <Tooltip title={theme.palette.mode === 'dark' ? 'Light mode' : 'Dark mode'} arrow placement='bottom'>
-              <IconButton sx={{ mx: 1 }} onClick={colorMode.toggleColorMode} color='inherit'>
+            <IconButton size='small' sx={{ mx: 1 }} onClick={colorMode.toggleColorMode} color='inherit'>
+              <Tooltip title={`Enable ${theme.palette.mode === 'dark' ? 'light mode' : 'dark mode'}`} arrow placement='bottom'>
                 {theme.palette.mode === 'dark' ? <SunIcon color='secondary' /> : <MoonIcon color='secondary' />}
-              </IconButton>
-            </Tooltip>
+              </Tooltip>
+            </IconButton>
           )}
+          <NotificationsBadge />
           {/** user account */}
           <Account />
         </Box>
