@@ -6,7 +6,7 @@ import { Box } from '@mui/system';
 import PageInlineVote from 'components/common/CharmEditor/components/PageInlineVote';
 import { useInlineVotes } from 'hooks/useInlineVotes';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
-import { silentlyUpdateURL } from 'lib/browser';
+import { highlightDomElement, silentlyUpdateURL } from 'lib/browser';
 import { findTotalInlineVotes } from 'lib/inline-votes/findTotalInlineVotes';
 import { isTruthy } from 'lib/utilities/types';
 import { ExtendedVote } from 'lib/votes/interfaces';
@@ -64,7 +64,7 @@ export default function PageInlineVotesList () {
     }
     else if (voteSort === 'latest_deadline') {
       _sortedVotes = allVotes.sort(
-        (voteA, voteB) => new Date(voteA.deadline) < new Date(voteB.deadline) ? -1 : 1
+        (voteA, voteB) => new Date(voteA.deadline) > new Date(voteB.deadline) ? -1 : 1
       );
     }
     else if (voteSort === 'position') {
@@ -92,6 +92,11 @@ export default function PageInlineVotesList () {
               highlightedVoteDomNode.scrollIntoView({
                 behavior: 'smooth'
               });
+              setTimeout(() => {
+                requestAnimationFrame(() => {
+                  highlightDomElement(highlightedVoteDomNode);
+                });
+              }, 250);
             });
           }, 250);
         }
