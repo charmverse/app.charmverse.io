@@ -119,7 +119,7 @@ function FormDescription ({ onContentChange, content, watch }:
         Description
       </InputLabel>
       <CharmEditor
-        disabledPageSpecificFeatures
+        disablePageSpecificFeatures
         content={content}
         onContentChange={onContentChange}
       />

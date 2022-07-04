@@ -24,14 +24,21 @@ const StyledTreeRoot = styled(TreeRoot)<{ isFavorites?: boolean }>`
   overflow-y: auto;
 `;
 
-const sortNodes = (nodes: Array<Page | ParentMenuNode>) => {
+export const sortNodes = (nodes: Array<Page | ParentMenuNode>) => {
   return [
     ...sortBy(nodes.filter(node => node.index >= 0), ['index', 'createdAt']),
     ...sortBy(nodes.filter(node => node.index < 0), ['createdAt'])
   ];
 };
 
-function mapTree (items: MenuNode[], key: 'parentId', rootPageIds?: string[]): ParentMenuNode[] {
+export function filterVisiblePages (pages: (Page | undefined)[], rootPageIds: string[] = []) {
+  return pages
+    .filter((page): page is IPageWithPermissions => isTruthy(
+      page && (page.type === 'board' || page.type === 'page' || rootPageIds?.includes(page.id))
+    ));
+}
+
+function mapTree (items: MenuNode[], rootPageIds?: string[]): ParentMenuNode[] {
   const tempItems = items.map((item): ParentMenuNode => {
     return {
       ...item,
@@ -48,10 +55,10 @@ function mapTree (items: MenuNode[], key: 'parentId', rootPageIds?: string[]): P
 
   for (i = 0; i < tempItems.length; i += 1) {
     node = tempItems[i];
-    const nodeIndex = node[key];
-    const index = nodeIndex ? map[nodeIndex] : -1;
+    const parentIndex = node.parentId;
+    const index = parentIndex ? map[parentIndex] : -1;
 
-    if (node[key] && tempItems[index] && node.deletedAt === null) {
+    if (node.parentId && tempItems[index] && node.deletedAt === null) {
       // Make sure its not a database page or a focalboard card
       if (tempItems[index].type === 'page') {
         tempItems[index].children.push(node);
@@ -130,8 +137,7 @@ function PageNavigation ({
   const [user] = useUser();
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${space!.id}.expanded-pages`, []);
 
-  const pagesArray: MenuNode[] = Object.values(pages)
-    .filter((page): page is IPageWithPermissions => isTruthy(page && (page.type === 'board' || page.type === 'page' || rootPageIds?.includes(page.id))))
+  const pagesArray: MenuNode[] = filterVisiblePages(Object.values(pages))
     .map((page): MenuNode => ({
       id: page.id,
       title: page.title,
@@ -148,7 +154,7 @@ function PageNavigation ({
   const pageHash = JSON.stringify(pagesArray);
 
   const mappedItems = useMemo(() => {
-    return mapTree(pagesArray, 'parentId', rootPageIds);
+    return mapTree(pagesArray, rootPageIds);
   }, [pageHash, rootPageIds]);
 
   const onDropAdjacent = useCallback((droppedItem: ParentMenuNode, containerItem: MenuNode) => {

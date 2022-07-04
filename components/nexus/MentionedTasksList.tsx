@@ -141,7 +141,7 @@ export default function MentionedTasksList ({ tasks, error, mutateTasks }: Menti
           return _tasks ? {
             gnosis: _tasks.gnosis,
             mentioned: {
-              marked: [..._tasks.mentioned.marked, ...unmarked],
+              marked: [...unmarked, ..._tasks.mentioned.marked],
               unmarked: []
             }
           } : undefined;

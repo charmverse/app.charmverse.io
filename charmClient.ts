@@ -1,7 +1,7 @@
 
 import {
   Application, Block, Bounty, InviteLink, Page, PagePermissionLevel, PaymentMethod, Prisma,
-  Role, Space, TelegramUser, TokenGate, TokenGateToRole, User, UserDetails, UserGnosisSafe
+  Role, Space, TelegramUser, TokenGate, TokenGateToRole, User, UserDetails, UserGnosisSafe, UserVote, Vote, VoteStatus
 } from '@prisma/client';
 import * as http from 'adapters/http';
 import { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/focalboard/src/blocks/block';
@@ -40,7 +40,8 @@ import type { MarkTask } from 'lib/tasks/markTasks';
 import { TransactionCreationData } from 'lib/transactions/interface';
 import { PublicUser } from 'pages/api/public/profile/[userPath]';
 import { DeepDaoAggregateData } from 'lib/deepdao/interfaces';
-import { AssignedPermissionsQuery, PermissionComputeRequest, Resource } from './lib/permissions/interfaces';
+import { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
+import { AssignedPermissionsQuery, Resource } from './lib/permissions/interfaces';
 import { SpacePermissionFlags, SpacePermissionModification } from './lib/permissions/spaces';
 import { SpacePermissionConfigurationUpdate } from './lib/permissions/meta/interfaces';
 
@@ -704,6 +705,30 @@ class CharmClient {
 
   getAggregatedData (userPath: string) {
     return http.GET<DeepDaoAggregateData>(`/api/public/profile/${userPath}/aggregate`);
+  }
+
+  getPageVotes (pageId: string) {
+    return http.GET<ExtendedVote[]>(`/api/pages/${pageId}/votes`);
+  }
+
+  createVote (votePayload: VoteDTO) {
+    return http.POST<ExtendedVote>('/api/votes', votePayload);
+  }
+
+  cancelVote (voteId: string) {
+    return http.PUT(`/api/votes/${voteId}`, {
+      status: 'Cancelled'
+    });
+  }
+
+  deleteVote (voteId: string) {
+    return http.DELETE(`/api/votes/${voteId}`);
+  }
+
+  castVote (voteId: string, choice: string) {
+    return http.POST<UserVote>(`/api/votes/${voteId}/cast`, {
+      choice
+    });
   }
 }
 

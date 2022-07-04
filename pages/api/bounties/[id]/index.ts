@@ -72,7 +72,16 @@ async function updateBounty (req: NextApiRequest, res: NextApiResponse<BountyWit
     delete body.permissions;
   }
 
-  if (bounty.status === 'suggestion') {
+  const { error, isAdmin } = await hasAccessToSpace({
+    spaceId: bounty.spaceId,
+    userId,
+    adminOnly: true
+  });
+
+  // Only drop keys if user is not an admin
+  // Bounty suggestions only exist if creating bounties is disabled at workspace level.
+  // In this case, we wouldn't want non admin to configure any other fields than the title and description of the bounty until it is approved.
+  if (bounty.status === 'suggestion' && (error || !isAdmin)) {
     typedKeys(body).forEach(key => {
       if (key !== 'title' && key !== 'description' && key !== 'descriptionNodes') {
         delete body[key];

@@ -23,9 +23,11 @@ import * as codeBlock from 'components/common/CharmEditor/components/@bangle.dev
 import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
+import PageInlineVotesList from 'components/[pageId]/DocumentPage/components/PageInlineVotesList';
 import PageThreadsList from 'components/[pageId]/DocumentPage/components/PageThreadsList';
 import { CryptoCurrency, FiatCurrency } from 'connectors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
 import { useUser } from 'hooks/useUser';
 import { silentlyUpdateURL } from 'lib/browser';
 import debounce from 'lodash/debounce';
@@ -37,19 +39,21 @@ import * as columnLayout from './components/columnLayout';
 import LayoutColumn from './components/columnLayout/Column';
 import LayoutRow from './components/columnLayout/Row';
 import { CryptoPrice, cryptoPriceSpec } from './components/CryptoPrice';
-import ResizablePDF, { pdfSpec } from './components/ResizablePDF';
 import * as disclosure from './components/disclosure';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
 import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
 import * as iframe from './components/iframe';
 import InlineCommentThread, * as inlineComment from './components/inlineComment';
 import InlinePalette, { plugins as inlinePalettePlugins, spec as inlinePaletteSpecs } from './components/inlinePalette';
+import * as inlineVote from './components/inlineVote';
+import { InlineVoteList } from './components/inlineVote';
 import Mention, { mentionPluginKeyName, mentionPlugins, mentionSpecs, MentionSuggest } from './components/mention';
 import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList, nestedPageSpec } from './components/nestedPage';
 import Paragraph from './components/Paragraph';
 import Placeholder from './components/Placeholder';
 import Quote, * as quote from './components/quote';
 import ResizableImage, { imageSpec } from './components/ResizableImage';
+import ResizablePDF, { pdfSpec } from './components/ResizablePDF';
 import RowActionsMenu, * as rowActions from './components/rowActions';
 import * as tabIndent from './components/tabIndent';
 import * as table from './components/table';
@@ -68,6 +72,7 @@ const mentionPluginKey = new PluginKey(mentionPluginKeyName);
 const floatingMenuPluginKey = new PluginKey('floatingMenu');
 const nestedPagePluginKey = new PluginKey(nestedPagePluginKeyName);
 const inlineCommentPluginKey = new PluginKey(inlineComment.pluginKeyName);
+const inlineVotePluginKey = new PluginKey(inlineVote.pluginKeyName);
 
 export const specRegistry = new SpecRegistry([
   // Comments to the right of each spec show if it supports markdown export
@@ -78,6 +83,7 @@ export const specRegistry = new SpecRegistry([
   // MAKE SURE THIS IS ALWAYS AT THE TOP! Or deleting all contents will leave the wrong component in the editor
   paragraph.spec(), // OK
   inlineComment.spec(),
+  inlineVote.spec(),
   bold.spec(), // OK
   bulletList.spec(), // OK
   hardBreak.spec(), // OK
@@ -112,7 +118,7 @@ export function charmEditorPlugins (
   {
     onContentChange,
     readOnly,
-    disabledPageSpecificFeatures = false,
+    disablePageSpecificFeatures = false,
     enableComments = true,
     userId = null,
     pageId = null,
@@ -124,7 +130,7 @@ export function charmEditorPlugins (
       userId?: string | null,
       readOnly?: boolean,
       onContentChange?: (view: EditorView) => void,
-      disabledPageSpecificFeatures?: boolean,
+      disablePageSpecificFeatures?: boolean,
       enableComments?: boolean
     } = {}
 ): () => RawPlugins[] {
@@ -228,16 +234,19 @@ export function charmEditorPlugins (
     }));
   }
 
-  if (!disabledPageSpecificFeatures) {
+  if (!disablePageSpecificFeatures) {
     basePlugins.push(inlineComment.plugin({
       key: inlineCommentPluginKey
+    }));
+    basePlugins.push(inlineVote.plugin({
+      key: inlineVotePluginKey
     }));
   }
 
   return () => basePlugins;
 }
 
-const StyledReactBangleEditor = styled(ReactBangleEditor)`
+const StyledReactBangleEditor = styled(ReactBangleEditor)<{disablePageSpecificFeatures?: boolean}>`
   position: relative;
 
   /** DONT REMOVE THIS STYLING */
@@ -272,18 +281,30 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
     background-color: ${({ theme }) => theme.palette.background.light};
   }
 
-  .charm-inline-comment.active {
-    background: rgba(255,212,0,0.14);
-    border-bottom: 2px solid rgb(255, 212, 0);
-    padding-bottom: 2px;
-    &:hover {
-      background: rgba(255,212,0,0.56) !important;
+  ${({ disablePageSpecificFeatures }) => !disablePageSpecificFeatures && `
+    .charm-inline-comment.active {
+      background: rgba(255,212,0,0.14);
+      border-bottom: 2px solid rgb(255, 212, 0);
+      padding-bottom: 2px;
+      &:hover {
+        background: rgba(255,212,0,0.56) !important;
+      }
+      cursor: pointer;
     }
-    cursor: pointer;
-  }
+
+    .charm-inline-vote.active {
+      background: rgba(0,171,255,0.14);
+      border-bottom: 2px solid rgb(0,171,255);
+      padding-bottom: 2px;
+      &:hover {
+        background: rgba(0,171,255,0.56) !important;
+      }
+      cursor: pointer;
+    }
+  `}
 `;
 
-const PageThreadListBox = styled.div`
+const PageActionListBox = styled.div`
   position: fixed;
   right: 0px;
   width: 400px;
@@ -291,6 +312,7 @@ const PageThreadListBox = styled.div`
   z-index: var(--z-index-drawer);
   height: calc(100% - 80px);
   overflow: auto;
+  margin-right: ${({ theme }) => theme.spacing(1)};
 `;
 
 const defaultContent: PageContent = {
@@ -310,8 +332,8 @@ interface CharmEditorProps {
   onContentChange?: UpdatePageContent;
   readOnly?: boolean;
   style?: CSSProperties;
-  showingCommentThreadsList?: boolean
-  disabledPageSpecificFeatures?: boolean
+  pageActionDisplay?: IPageActionDisplayContext['currentPageActionDisplay']
+  disablePageSpecificFeatures?: boolean
   pageId?: string | null
 }
 
@@ -337,13 +359,13 @@ export function convertPageContentToMarkdown (content: PageContent, title?: stri
 
 function CharmEditor (
   {
-    showingCommentThreadsList = false,
+    pageActionDisplay = null,
     content = defaultContent,
     children,
     onContentChange,
     style,
     readOnly = false,
-    disabledPageSpecificFeatures = false,
+    disablePageSpecificFeatures = false,
     pageId
   }:
   CharmEditorProps
@@ -374,7 +396,7 @@ function CharmEditor (
     plugins: charmEditorPlugins({
       onContentChange: _onContentChange,
       readOnly,
-      disabledPageSpecificFeatures,
+      disablePageSpecificFeatures,
       pageId,
       spaceId: currentSpace?.id,
       userId: currentUser?.id
@@ -415,6 +437,7 @@ function CharmEditor (
 
   return (
     <StyledReactBangleEditor
+      disablePageSpecificFeatures={disablePageSpecificFeatures}
       style={{
         ...(style ?? {}),
         width: '100%',
@@ -441,8 +464,9 @@ function CharmEditor (
           case 'paragraph': {
             return (
               <Paragraph
+                inlineVotePluginKey={inlineVotePluginKey}
                 inlineCommentPluginKey={inlineCommentPluginKey}
-                calculateInlineComments={!showingCommentThreadsList && !disabledPageSpecificFeatures}
+                calculateActions={!disablePageSpecificFeatures}
                 {...props}
               >{_children}
               </Paragraph>
@@ -529,33 +553,53 @@ function CharmEditor (
         }
       }}
     >
-      <FloatingMenu enableComments={!disabledPageSpecificFeatures} pluginKey={floatingMenuPluginKey} />
+      <FloatingMenu enableComments={!disablePageSpecificFeatures} pluginKey={floatingMenuPluginKey} />
       <MentionSuggest pluginKey={mentionPluginKey} />
       <NestedPagesList pluginKey={nestedPagePluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
       {!readOnly && <RowActionsMenu pluginKey={actionsPluginKey} />}
-      <InlinePalette nestedPagePluginKey={nestedPagePluginKey} disableNestedPage={disabledPageSpecificFeatures} />
+      <InlinePalette nestedPagePluginKey={nestedPagePluginKey} disableNestedPage={disablePageSpecificFeatures} />
       {children}
-      {!disabledPageSpecificFeatures && (
-      <Grow
-        in={showingCommentThreadsList}
-        style={{
-          transformOrigin: 'left top'
-        }}
-        easing={{
-          enter: 'ease-in',
-          exit: 'ease-out'
-        }}
-        timeout={250}
-      >
-        <PageThreadListBox
-          className='PageThreadListBox'
+      {!disablePageSpecificFeatures && (
+      <>
+        <Grow
+          in={pageActionDisplay === 'comments'}
+          style={{
+            transformOrigin: 'left top'
+          }}
+          easing={{
+            enter: 'ease-in',
+            exit: 'ease-out'
+          }}
+          timeout={250}
         >
-          <PageThreadsList inline={false} />
-        </PageThreadListBox>
-      </Grow>
+          <PageActionListBox
+            id='page-thread-list-box'
+          >
+            <PageThreadsList />
+          </PageActionListBox>
+        </Grow>
+        <Grow
+          in={pageActionDisplay === 'votes'}
+          style={{
+            transformOrigin: 'left top'
+          }}
+          easing={{
+            enter: 'ease-in',
+            exit: 'ease-out'
+          }}
+          timeout={250}
+        >
+          <PageActionListBox
+            id='page-vote-list-box'
+          >
+            <PageInlineVotesList />
+          </PageActionListBox>
+        </Grow>
+        <InlineCommentThread pluginKey={inlineCommentPluginKey} />
+        <InlineVoteList pluginKey={inlineVotePluginKey} />
+      </>
       )}
-      {!disabledPageSpecificFeatures && <InlineCommentThread pluginKey={inlineCommentPluginKey} />}
       {!readOnly && <DevTools />}
     </StyledReactBangleEditor>
   );

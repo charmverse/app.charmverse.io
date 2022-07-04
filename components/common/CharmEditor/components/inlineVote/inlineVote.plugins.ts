@@ -3,9 +3,9 @@ import { PluginKey } from '@bangle.dev/pm';
 import { createTooltipDOM, tooltipPlacement } from '@bangle.dev/tooltip';
 import { highlightMarkedElement } from 'lib/prosemirror/highlightMarkedElement';
 import { referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';
-import { markName } from '../inlineComment/inlineComment.constants';
+import { markName } from './inlineVote.constants';
 
-export interface InlineCommentPluginState {
+export interface InlineVotePluginState {
   tooltipContentDOM: HTMLElement
   show: boolean
   ids: string[]
@@ -16,7 +16,8 @@ export function plugin ({ key } :{
 }): RawPlugins {
   const tooltipDOMSpec = createTooltipDOM();
   return [
-    new Plugin<InlineCommentPluginState>({
+    new Plugin<InlineVotePluginState>({
+      key,
       state: {
         init () {
           return {
@@ -38,28 +39,26 @@ export function plugin ({ key } :{
             };
           }
           if (meta.type === 'HIDE_TOOLTIP') {
-            // Do not change object reference if show was and is false
             if (pluginState.show === false) {
               return pluginState;
             }
             return {
               ...pluginState,
-              ids: [],
-              show: false
+              show: false,
+              ids: []
             };
           }
           throw new Error('Unknown type');
         }
       },
-      key,
       props: {
         handleClickOn: (view) => {
           return highlightMarkedElement({
             view,
-            elementId: 'page-thread-list-box',
+            elementId: 'page-vote-list-box',
             key,
             markName,
-            prefix: 'thread'
+            prefix: 'vote'
           });
         }
       }

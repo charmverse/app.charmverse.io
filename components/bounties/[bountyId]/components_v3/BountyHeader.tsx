@@ -119,7 +119,6 @@ export default function BountyHeader ({ bounty, permissions, refreshBountyPermis
                 {...bindMenu(popupState)}
                 {...menuPosition}
               >
-
                 {
                   permissions.userPermissions.edit && (
                     <Tooltip arrow placement='right' title={`Edit bounty ${bounty.status === 'suggestion' ? 'suggestion' : ''}`}>

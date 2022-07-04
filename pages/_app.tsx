@@ -180,6 +180,7 @@ import IconButton from '@mui/material/IconButton';
 import RefreshIcon from '@mui/icons-material/Refresh';
 
 import charmClient from 'charmClient';
+import { InlineVotesProvider } from 'hooks/useInlineVotes';
 
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
 
@@ -342,11 +343,9 @@ function DataProviders ({ children }: { children: ReactNode }) {
             <PaymentMethodsProvider>
               <PagesProvider>
                 <PageTitleProvider>
-                  <ThreadsProvider>
-                    <FocalboardViewsProvider>
-                      {children}
-                    </FocalboardViewsProvider>
-                  </ThreadsProvider>
+                  <FocalboardViewsProvider>
+                    {children}
+                  </FocalboardViewsProvider>
                 </PageTitleProvider>
               </PagesProvider>
             </PaymentMethodsProvider>

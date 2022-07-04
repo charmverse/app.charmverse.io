@@ -10,6 +10,14 @@ export async function getPageVotes (pageId: string): Promise<ExtendedVote[]> {
       userVotes: {
         orderBy: {
           updatedAt: 'desc'
+        },
+        include: {
+          user: {
+            select: {
+              avatar: true,
+              username: true
+            }
+          }
         }
       },
       voteOptions: true
