@@ -10,6 +10,7 @@ import { shortenHex } from 'lib/utilities/strings';
 import { greyColor2 } from 'theme/colors';
 import log from 'lib/log';
 import { MentionedTask } from 'lib/mentions/interfaces';
+import { VoteTask } from 'lib/votes/interfaces';
 import { HR, Feedback, Footer, Header, EmailWrapper } from './components';
 
 type TemplateUser = Pick<User, 'id' | 'username'> & { email: string };
@@ -20,11 +21,13 @@ export interface PendingTasksProps {
   gnosisSafeTasks: GnosisSafeTasks[];
   mentionedTasks: MentionedTask[]
   totalTasks: number
+  voteTasks: VoteTask[]
 }
 
 export default function PendingTasks (props: PendingTasksProps) {
 
   const totalMentions = props.mentionedTasks.length;
+  const totalVotes = props.voteTasks.length;
 
   return (
 
@@ -39,6 +42,7 @@ export default function PendingTasks (props: PendingTasksProps) {
           </MjmlText>
 
           {props.gnosisSafeTasks.map(gnosisSafeTask => <MultisigTask key={gnosisSafeTask.safeAddress} task={gnosisSafeTask} />)}
+
           <MjmlText>
             <a
               href={`${charmverseUrl}/nexus?task=discussion`}
@@ -54,6 +58,21 @@ export default function PendingTasks (props: PendingTasksProps) {
             />
           ))}
 
+          <MjmlText>
+            <a
+              href={`${charmverseUrl}/nexus?task=discussion`}
+            >
+              <h2>{totalVotes} Vote{totalVotes > 1 ? 's' : ''}</h2>
+            </a>
+
+          </MjmlText>
+          {props.voteTasks.map(voteTask => (
+            <VoteTaskMjml
+              key={voteTask.id}
+              task={voteTask}
+            />
+          ))}
+
         </MjmlColumn>
       </MjmlSection>
 
@@ -66,16 +85,30 @@ export default function PendingTasks (props: PendingTasksProps) {
   );
 }
 
+function VoteTaskMjml ({ task }: {task: VoteTask}) {
+  return (
+    <MjmlText paddingBottom={10}>
+      <div style={{ fontWeight: 'bold', color: greyColor2, marginBottom: 5 }}>
+        {task.title}
+      </div>
+      <a href={`${charmverseUrl}/${task.space.domain}/${task.page.path}?voteId=${task.id}`}>
+        <div>
+          <h2>{task.page.title || 'Untitled'} | {task.space.name}</h2>
+        </div>
+      </a>
+    </MjmlText>
+  );
+}
+
 function MentionTask ({ task: { text, spaceDomain, pagePath, pageTitle, mentionId } }: {task: MentionedTask}) {
   return (
     <MjmlText paddingBottom={10}>
       <div style={{ fontWeight: 'bold', color: greyColor2, marginBottom: 5 }}>
-        {/* 🙶{text}🙷 */}
         {text}
       </div>
       <a href={`${charmverseUrl}/${spaceDomain}/${pagePath}?mentionId=${mentionId}`}>
         <div>
-          <h2>{pageTitle} | {spaceDomain}</h2>
+          <h2>{pageTitle || 'Untitled'} | {spaceDomain}</h2>
         </div>
       </a>
     </MjmlText>
