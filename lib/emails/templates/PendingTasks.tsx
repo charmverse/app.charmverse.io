@@ -2,7 +2,8 @@ import {
   MjmlSection,
   MjmlColumn,
   MjmlText,
-  MjmlButton
+  MjmlButton,
+  MjmlDivider
 } from 'mjml-react';
 import { User } from '@prisma/client';
 import { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
@@ -27,16 +28,17 @@ export interface PendingTasksProps {
 
 export default function PendingTasks (props: PendingTasksProps) {
 
-  const totalMentions = props.mentionedTasks.length;
-  const totalVotes = props.voteTasks.length;
+  const totalMentionTasks = props.mentionedTasks.length;
+  const totalVoteTasks = props.voteTasks.length;
+  const totalGnosisSafeTasks = props.gnosisSafeTasks.length;
 
-  const mentionSection = totalMentions > 0 ? (
+  const mentionSection = totalMentionTasks > 0 ? (
     <>
       <MjmlText>
         <a
           href={`${charmverseUrl}/nexus?task=discussion`}
         >
-          <h2>{totalMentions} Mention{totalMentions > 1 ? 's' : ''}</h2>
+          <h2>{totalMentionTasks} Mention{totalMentionTasks > 1 ? 's' : ''}</h2>
         </a>
 
       </MjmlText>
@@ -46,15 +48,17 @@ export default function PendingTasks (props: PendingTasksProps) {
           task={mentionedTask}
         />
       ))}
+      <MjmlDivider />
     </>
   ) : null;
-  const voteSection = totalVotes > 0 ? (
+
+  const voteSection = totalVoteTasks > 0 ? (
     <>
       <MjmlText>
         <a
           href={`${charmverseUrl}/nexus?task=vote`}
         >
-          <h2>{totalVotes} Vote{totalVotes > 1 ? 's' : ''}</h2>
+          <h2>{totalVoteTasks} Vote{totalVoteTasks > 1 ? 's' : ''}</h2>
         </a>
 
       </MjmlText>
@@ -64,6 +68,13 @@ export default function PendingTasks (props: PendingTasksProps) {
           task={voteTask}
         />
       ))}
+    </>
+  ) : null;
+
+  const multisigSection = totalGnosisSafeTasks > 0 ? (
+    <>
+      {props.gnosisSafeTasks.map(gnosisSafeTask => <MultisigTask key={gnosisSafeTask.safeAddress} task={gnosisSafeTask} />)}
+      <MjmlDivider />
     </>
   ) : null;
 
@@ -79,10 +90,8 @@ export default function PendingTasks (props: PendingTasksProps) {
             <h2>{props.totalTasks} tasks need your attention.</h2>
           </MjmlText>
 
-          {props.gnosisSafeTasks.map(gnosisSafeTask => <MultisigTask key={gnosisSafeTask.safeAddress} task={gnosisSafeTask} />)}
-
+          {multisigSection}
           {mentionSection}
-
           {voteSection}
 
         </MjmlColumn>
@@ -103,7 +112,7 @@ function VoteTaskMjml ({ task }: {task: VoteTask}) {
     <>
       <MjmlText paddingBottom={10}>
         <div style={{ fontWeight: 'bold', color: greyColor2, marginBottom: 5 }}>
-          {task.title} <br />Ends {DateTime.fromJSDate(new Date(task.deadline)).toRelative({ base: (DateTime.now()) })}
+          {task.title} <br /><span>Ends {DateTime.fromJSDate(new Date(task.deadline)).toRelative({ base: (DateTime.now()) })}</span>
         </div>
         <a href={voteTaskLink}>
           <div>
