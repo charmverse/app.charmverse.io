@@ -22,7 +22,7 @@ export default function NotificationsBadge () {
       <IconButton size='small' sx={{ mr: 1 }}>
         <Tooltip arrow title='Your Notifications'>
           <Badge
-            badgeContent={totalTasks}
+            badgeContent={2}
             color='error'
             sx={{
               '& .MuiBadge-badge:hover': {

@@ -100,7 +100,7 @@ function Account (): JSX.Element {
           </Tooltip>
         )}
         <AccountButton
-          href='/nexus/profile'
+          href='/profile'
           sx={isConnectedWithWallet ? ({
             borderTopLeftRadius: '0 !important',
             borderBottomLeftRadius: '0 !important'
