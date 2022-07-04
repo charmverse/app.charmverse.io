@@ -78,6 +78,16 @@ const templates = {
           mentionText: 'Let\'s have a meeting @ghostpepper',
           pageTitle: 'Product Discussion',
           spaceName: 'CharmVerse'
+        }),
+        createMentionTask({
+          mentionText: 'Take a look at this @ghostpepper',
+          pageTitle: 'Task Board',
+          spaceName: 'CharmVerse'
+        }),
+        createMentionTask({
+          mentionText: 'We should discuss about this @ghostpepper',
+          pageTitle: 'Product Road Map',
+          spaceName: 'CharmVerse'
         })
       ],
       voteTasks: [
@@ -92,6 +102,18 @@ const templates = {
           pageTitle: 'Product Discussion',
           spaceName: 'Charmverse',
           voteTitle: 'Should we format the text?'
+        }),
+        createVoteTasks({
+          deadline: new Date(Date.now() + (32 * 60 * 60 * 1000)),
+          pageTitle: 'Task Board',
+          spaceName: 'Charmverse',
+          voteTitle: 'Let\'s vote'
+        }),
+        createVoteTasks({
+          deadline: new Date(Date.now() + (52 * 60 * 60 * 1000)),
+          pageTitle: 'Product Road Map',
+          spaceName: 'Charmverse Demo',
+          voteTitle: 'We should all vote on this'
         })
       ],
       gnosisSafeTasks: [

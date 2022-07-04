@@ -18,6 +18,8 @@ import { HR, Feedback, Footer, Header, EmailWrapper } from './components';
 type TemplateUser = Pick<User, 'id' | 'username'> & { email: string };
 const charmverseUrl = process.env.DOMAIN;
 
+const MAX_ITEMS_PER_TASK = 3;
+
 export interface PendingTasksProps {
   user: TemplateUser;
   gnosisSafeTasks: GnosisSafeTasks[];
@@ -26,28 +28,45 @@ export interface PendingTasksProps {
   voteTasks: VoteTask[]
 }
 
+function ViewAllText ({ href }: {href: string}) {
+  return (
+    <MjmlText>
+      <a
+        href={href}
+      >
+        <h4 style={{ marginBottom: 0 }}>View all</h4>
+      </a>
+    </MjmlText>
+  );
+}
+
 export default function PendingTasks (props: PendingTasksProps) {
 
   const totalMentionTasks = props.mentionedTasks.length;
   const totalVoteTasks = props.voteTasks.length;
   const totalGnosisSafeTasks = props.gnosisSafeTasks.length;
 
+  const nexusDiscussionLink = `${charmverseUrl}/nexus?task=discussion`;
+  const nexusVoteLink = `${charmverseUrl}/nexus?task=vote`;
+  const nexusMultisigLink = `${charmverseUrl}/nexus?task=multisig`;
+
   const mentionSection = totalMentionTasks > 0 ? (
     <>
       <MjmlText>
         <a
-          href={`${charmverseUrl}/nexus?task=discussion`}
+          href={nexusDiscussionLink}
         >
           <h2 style={{ marginBottom: 0 }}>{totalMentionTasks} Mention{totalMentionTasks > 1 ? 's' : ''}</h2>
         </a>
 
       </MjmlText>
-      {props.mentionedTasks.map(mentionedTask => (
+      {props.mentionedTasks.slice(0, MAX_ITEMS_PER_TASK).map(mentionedTask => (
         <MentionTask
           key={mentionedTask.mentionId}
           task={mentionedTask}
         />
       ))}
+      {totalMentionTasks > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusDiscussionLink} /> : null}
     </>
   ) : null;
 
@@ -55,18 +74,18 @@ export default function PendingTasks (props: PendingTasksProps) {
     <>
       <MjmlText>
         <a
-          href={`${charmverseUrl}/nexus?task=vote`}
+          href={nexusVoteLink}
         >
           <h2 style={{ marginBottom: 0 }}>{totalVoteTasks} Vote{totalVoteTasks > 1 ? 's' : ''}</h2>
         </a>
-
       </MjmlText>
-      {props.voteTasks.map(voteTask => (
+      {props.voteTasks.slice(0, MAX_ITEMS_PER_TASK).map(voteTask => (
         <VoteTaskMjml
           key={voteTask.id}
           task={voteTask}
         />
       ))}
+      {totalVoteTasks > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusVoteLink} /> : null}
       <MjmlDivider />
     </>
   ) : null;
@@ -74,11 +93,14 @@ export default function PendingTasks (props: PendingTasksProps) {
   const multisigSection = totalGnosisSafeTasks > 0 ? (
     <>
       <MjmlText>
-        <a href={`${charmverseUrl}/nexus?task=multisig`}>
+        <a href={nexusMultisigLink}>
           <h2 style={{ marginBottom: 0 }}>{totalGnosisSafeTasks} Multisig transaction{totalGnosisSafeTasks > 1 ? 's' : ''}</h2>
         </a>
       </MjmlText>
-      {props.gnosisSafeTasks.map(gnosisSafeTask => <MultisigTask key={gnosisSafeTask.safeAddress} task={gnosisSafeTask} />)}
+      {props.gnosisSafeTasks.slice(0, MAX_ITEMS_PER_TASK).map(
+        gnosisSafeTask => <MultisigTask key={gnosisSafeTask.safeAddress} task={gnosisSafeTask} />
+      )}
+      {totalGnosisSafeTasks > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusMultisigLink} /> : null}
       <MjmlDivider />
     </>
   ) : null;
