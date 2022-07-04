@@ -8,7 +8,7 @@ import {
 import { User } from '@prisma/client';
 import { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
 import { shortenHex } from 'lib/utilities/strings';
-import { greyColor2 } from 'theme/colors';
+import { darkModeColors, greyColor2 } from 'theme/colors';
 import log from 'lib/log';
 import { MentionedTask } from 'lib/mentions/interfaces';
 import { VoteTask } from 'lib/votes/interfaces';
@@ -38,7 +38,7 @@ export default function PendingTasks (props: PendingTasksProps) {
         <a
           href={`${charmverseUrl}/nexus?task=discussion`}
         >
-          <h2>{totalMentionTasks} Mention{totalMentionTasks > 1 ? 's' : ''}</h2>
+          <h2 style={{ marginBottom: 0 }}>{totalMentionTasks} Mention{totalMentionTasks > 1 ? 's' : ''}</h2>
         </a>
 
       </MjmlText>
@@ -48,7 +48,6 @@ export default function PendingTasks (props: PendingTasksProps) {
           task={mentionedTask}
         />
       ))}
-      <MjmlDivider />
     </>
   ) : null;
 
@@ -58,7 +57,7 @@ export default function PendingTasks (props: PendingTasksProps) {
         <a
           href={`${charmverseUrl}/nexus?task=vote`}
         >
-          <h2>{totalVoteTasks} Vote{totalVoteTasks > 1 ? 's' : ''}</h2>
+          <h2 style={{ marginBottom: 0 }}>{totalVoteTasks} Vote{totalVoteTasks > 1 ? 's' : ''}</h2>
         </a>
 
       </MjmlText>
@@ -68,11 +67,17 @@ export default function PendingTasks (props: PendingTasksProps) {
           task={voteTask}
         />
       ))}
+      <MjmlDivider />
     </>
   ) : null;
 
   const multisigSection = totalGnosisSafeTasks > 0 ? (
     <>
+      <MjmlText>
+        <a href={`${charmverseUrl}/nexus?task=multisig`}>
+          <h2 style={{ marginBottom: 0 }}>{totalGnosisSafeTasks} Multisig transaction{totalGnosisSafeTasks > 1 ? 's' : ''}</h2>
+        </a>
+      </MjmlText>
       {props.gnosisSafeTasks.map(gnosisSafeTask => <MultisigTask key={gnosisSafeTask.safeAddress} task={gnosisSafeTask} />)}
       <MjmlDivider />
     </>
@@ -91,8 +96,8 @@ export default function PendingTasks (props: PendingTasksProps) {
           </MjmlText>
 
           {multisigSection}
-          {mentionSection}
           {voteSection}
+          {mentionSection}
 
         </MjmlColumn>
       </MjmlSection>
@@ -110,17 +115,28 @@ function VoteTaskMjml ({ task }: {task: VoteTask}) {
 
   return (
     <>
-      <MjmlText paddingBottom={10}>
+      <MjmlText>
         <div style={{ fontWeight: 'bold', color: greyColor2, marginBottom: 5 }}>
-          {task.title} <br /><span>Ends {DateTime.fromJSDate(new Date(task.deadline)).toRelative({ base: (DateTime.now()) })}</span>
+          {task.title}
         </div>
         <a href={voteTaskLink}>
-          <div>
-            <h2>{task.page.title || 'Untitled'} | {task.space.name}</h2>
-          </div>
+          <h2 style={{
+            fontSize: 16,
+            marginBottom: 5
+          }}
+          >{task.page.title || 'Untitled'} | {task.space.name}
+          </h2>
         </a>
+        <div style={{
+          color: darkModeColors.red,
+          fontSize: 14,
+          fontWeight: 'bold'
+        }}
+        >
+          Ends {DateTime.fromJSDate(new Date(task.deadline)).toRelative({ base: (DateTime.now()) })}
+        </div>
       </MjmlText>
-      <MjmlButton align='left' padding-bottom='40px' href={voteTaskLink}>
+      <MjmlButton align='left' padding-bottom='20px' href={voteTaskLink}>
         Vote
       </MjmlButton>
     </>
@@ -129,14 +145,17 @@ function VoteTaskMjml ({ task }: {task: VoteTask}) {
 
 function MentionTask ({ task: { text, spaceDomain, spaceName, pagePath, pageTitle, mentionId } }: {task: MentionedTask}) {
   return (
-    <MjmlText paddingBottom={10}>
+    <MjmlText>
       <div style={{ fontWeight: 'bold', color: greyColor2, marginBottom: 5 }}>
         {text}
       </div>
       <a href={`${charmverseUrl}/${spaceDomain}/${pagePath}?mentionId=${mentionId}`}>
-        <div>
-          <h2>{pageTitle || 'Untitled'} | {spaceName}</h2>
-        </div>
+        <h2 style={{
+          fontSize: 16,
+          marginBottom: 5
+        }}
+        >{pageTitle || 'Untitled'} | {spaceName}
+        </h2>
       </a>
     </MjmlText>
   );
@@ -148,15 +167,12 @@ function MultisigTask ({ task }: { task: GnosisSafeTasks }) {
   return (
     <>
       <MjmlText>
-        <a href={`${charmverseUrl}/nexus?task=multisig`}>
-          <h2>Multi sig transaction</h2>
-        </a>
         <strong style={{ color: greyColor2 }}>
           Safe address: {shortenHex(task.safeAddress)}<br />
           {task.tasks[0].transactions[0].description}
         </strong>
       </MjmlText>
-      <MjmlButton align='left' padding-bottom='40px' href={task.tasks[0].transactions[0].myActionUrl}>
+      <MjmlButton align='left' padding-bottom='20px' href={task.tasks[0].transactions[0].myActionUrl}>
         {task.tasks[0].transactions[0].myAction}
       </MjmlButton>
     </>
