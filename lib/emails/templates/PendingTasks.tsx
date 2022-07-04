@@ -19,6 +19,7 @@ type TemplateUser = Pick<User, 'id' | 'username'> & { email: string };
 const charmverseUrl = process.env.DOMAIN;
 
 const MAX_ITEMS_PER_TASK = 3;
+const MAX_CHAR = 60;
 
 export interface PendingTasksProps {
   user: TemplateUser;
@@ -134,19 +135,19 @@ export default function PendingTasks (props: PendingTasksProps) {
 
 function VoteTaskMjml ({ task }: {task: VoteTask}) {
   const voteTaskLink = `${charmverseUrl}/${task.space.domain}/${task.page.path}?voteId=${task.id}`;
-
+  const pageWorkspaceTitle = `${task.page.title || 'Untitled'} | ${task.space.name}`;
   return (
     <>
       <MjmlText>
         <div style={{ fontWeight: 'bold', color: greyColor2, marginBottom: 5 }}>
-          {task.title}
+          {task.title.length > MAX_CHAR ? `${task.title.slice(0, MAX_CHAR)}...` : task.title}
         </div>
         <a href={voteTaskLink}>
           <h2 style={{
             fontSize: 16,
             marginBottom: 5
           }}
-          >{task.page.title || 'Untitled'} | {task.space.name}
+          >{pageWorkspaceTitle.length > MAX_CHAR ? `${pageWorkspaceTitle.slice(0, MAX_CHAR)}...` : pageWorkspaceTitle}
           </h2>
         </a>
         <div style={{
@@ -166,17 +167,18 @@ function VoteTaskMjml ({ task }: {task: VoteTask}) {
 }
 
 function MentionTask ({ task: { text, spaceDomain, spaceName, pagePath, pageTitle, mentionId } }: {task: MentionedTask}) {
+  const pageWorkspaceTitle = `${pageTitle || 'Untitled'} | ${spaceName}`;
   return (
     <MjmlText>
       <div style={{ fontWeight: 'bold', color: greyColor2, marginBottom: 5 }}>
-        {text}
+        {text.length > MAX_CHAR ? `${text.slice(0, MAX_CHAR)}...` : text}
       </div>
       <a href={`${charmverseUrl}/${spaceDomain}/${pagePath}?mentionId=${mentionId}`}>
         <h2 style={{
           fontSize: 16,
           marginBottom: 5
         }}
-        >{pageTitle || 'Untitled'} | {spaceName}
+        >{pageWorkspaceTitle.length > MAX_CHAR ? `${pageWorkspaceTitle.slice(0, MAX_CHAR)}...` : pageWorkspaceTitle}
         </h2>
       </a>
     </MjmlText>
