@@ -95,7 +95,6 @@ export function VoteTasksListRow (
       </Link>
     </Box>
   );
-
 }
 
 export function VoteTasksList ({ error, tasks }: VoteTasksListProps) {

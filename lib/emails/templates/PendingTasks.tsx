@@ -30,6 +30,43 @@ export default function PendingTasks (props: PendingTasksProps) {
   const totalMentions = props.mentionedTasks.length;
   const totalVotes = props.voteTasks.length;
 
+  const mentionSection = totalMentions > 0 ? (
+    <>
+      <MjmlText>
+        <a
+          href={`${charmverseUrl}/nexus?task=discussion`}
+        >
+          <h2>{totalMentions} Mention{totalMentions > 1 ? 's' : ''}</h2>
+        </a>
+
+      </MjmlText>
+      {props.mentionedTasks.map(mentionedTask => (
+        <MentionTask
+          key={mentionedTask.mentionId}
+          task={mentionedTask}
+        />
+      ))}
+    </>
+  ) : null;
+  const voteSection = totalVotes > 0 ? (
+    <>
+      <MjmlText>
+        <a
+          href={`${charmverseUrl}/nexus?task=vote`}
+        >
+          <h2>{totalVotes} Vote{totalVotes > 1 ? 's' : ''}</h2>
+        </a>
+
+      </MjmlText>
+      {props.voteTasks.map(voteTask => (
+        <VoteTaskMjml
+          key={voteTask.id}
+          task={voteTask}
+        />
+      ))}
+    </>
+  ) : null;
+
   return (
 
     <EmailWrapper title='Your open tasks'>
@@ -44,35 +81,9 @@ export default function PendingTasks (props: PendingTasksProps) {
 
           {props.gnosisSafeTasks.map(gnosisSafeTask => <MultisigTask key={gnosisSafeTask.safeAddress} task={gnosisSafeTask} />)}
 
-          <MjmlText>
-            <a
-              href={`${charmverseUrl}/nexus?task=discussion`}
-            >
-              <h2>{totalMentions} Mention{totalMentions > 1 ? 's' : ''}</h2>
-            </a>
+          {mentionSection}
 
-          </MjmlText>
-          {props.mentionedTasks.map(mentionedTask => (
-            <MentionTask
-              key={mentionedTask.mentionId}
-              task={mentionedTask}
-            />
-          ))}
-
-          <MjmlText>
-            <a
-              href={`${charmverseUrl}/nexus?task=discussion`}
-            >
-              <h2>{totalVotes} Vote{totalVotes > 1 ? 's' : ''}</h2>
-            </a>
-
-          </MjmlText>
-          {props.voteTasks.map(voteTask => (
-            <VoteTaskMjml
-              key={voteTask.id}
-              task={voteTask}
-            />
-          ))}
+          {voteSection}
 
         </MjmlColumn>
       </MjmlSection>
@@ -80,7 +91,6 @@ export default function PendingTasks (props: PendingTasksProps) {
       <HR />
 
       <Feedback />
-
       <Footer />
     </EmailWrapper>
   );
