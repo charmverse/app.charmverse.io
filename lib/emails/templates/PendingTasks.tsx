@@ -11,6 +11,7 @@ import { greyColor2 } from 'theme/colors';
 import log from 'lib/log';
 import { MentionedTask } from 'lib/mentions/interfaces';
 import { VoteTask } from 'lib/votes/interfaces';
+import { DateTime } from 'luxon';
 import { HR, Feedback, Footer, Header, EmailWrapper } from './components';
 
 type TemplateUser = Pick<User, 'id' | 'username'> & { email: string };
@@ -86,21 +87,28 @@ export default function PendingTasks (props: PendingTasksProps) {
 }
 
 function VoteTaskMjml ({ task }: {task: VoteTask}) {
+  const voteTaskLink = `${charmverseUrl}/${task.space.domain}/${task.page.path}?voteId=${task.id}`;
+
   return (
-    <MjmlText paddingBottom={10}>
-      <div style={{ fontWeight: 'bold', color: greyColor2, marginBottom: 5 }}>
-        {task.title}
-      </div>
-      <a href={`${charmverseUrl}/${task.space.domain}/${task.page.path}?voteId=${task.id}`}>
-        <div>
-          <h2>{task.page.title || 'Untitled'} | {task.space.name}</h2>
+    <>
+      <MjmlText paddingBottom={10}>
+        <div style={{ fontWeight: 'bold', color: greyColor2, marginBottom: 5 }}>
+          {task.title} <br />Ends {DateTime.fromJSDate(new Date(task.deadline)).toRelative({ base: (DateTime.now()) })}
         </div>
-      </a>
-    </MjmlText>
+        <a href={voteTaskLink}>
+          <div>
+            <h2>{task.page.title || 'Untitled'} | {task.space.name}</h2>
+          </div>
+        </a>
+      </MjmlText>
+      <MjmlButton align='left' padding-bottom='40px' href={voteTaskLink}>
+        Vote
+      </MjmlButton>
+    </>
   );
 }
 
-function MentionTask ({ task: { text, spaceDomain, pagePath, pageTitle, mentionId } }: {task: MentionedTask}) {
+function MentionTask ({ task: { text, spaceDomain, spaceName, pagePath, pageTitle, mentionId } }: {task: MentionedTask}) {
   return (
     <MjmlText paddingBottom={10}>
       <div style={{ fontWeight: 'bold', color: greyColor2, marginBottom: 5 }}>
@@ -108,7 +116,7 @@ function MentionTask ({ task: { text, spaceDomain, pagePath, pageTitle, mentionI
       </div>
       <a href={`${charmverseUrl}/${spaceDomain}/${pagePath}?mentionId=${mentionId}`}>
         <div>
-          <h2>{pageTitle || 'Untitled'} | {spaceDomain}</h2>
+          <h2>{pageTitle || 'Untitled'} | {spaceName}</h2>
         </div>
       </a>
     </MjmlText>
