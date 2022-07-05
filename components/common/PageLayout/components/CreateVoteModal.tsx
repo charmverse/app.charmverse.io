@@ -81,9 +81,10 @@ function InlineVoteOptions (
 interface CreateVoteModalProps {
   onClose?: () => void
   postCreateVote?: (vote: ExtendedVote) => void
+  open?: boolean
 }
 
-export default function CreateVoteModal ({ onClose, postCreateVote }: CreateVoteModalProps) {
+export default function CreateVoteModal ({ open = true, onClose, postCreateVote }: CreateVoteModalProps) {
   const [voteTitle, setVoteTitle] = useState('');
   const [voteDescription, setVoteDescription] = useState('');
   const [passThreshold, setPassThreshold] = useState<number>(50);
@@ -133,7 +134,7 @@ export default function CreateVoteModal ({ onClose, postCreateVote }: CreateVote
   };
 
   return (
-    <Modal title='Create an inline vote' size='large' open onClose={onClose ?? (() => {})}>
+    <Modal title='Create an inline vote' size='large' open={open} onClose={onClose ?? (() => {})}>
       <Box
         flexDirection='column'
         gap={1.5}
