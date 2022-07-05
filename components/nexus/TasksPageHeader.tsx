@@ -184,7 +184,7 @@ export default function TasksPageHeader () {
                 >
                   <Avatar size='large' variant='circular' name={currentUser.username} avatar={currentUser.avatar} />
                   <Typography fontWeight={500} color='secondary'>
-                    My <Box component='span' display={{ xs: 'none', lg: 'inline' }}>Public</Box> Profile
+                    My Profile
                   </Typography>
                 </Box>
                 <IconButton>
