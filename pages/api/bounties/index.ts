@@ -13,23 +13,22 @@ import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).get(getBounties).post(createBountyController);
+handler.get(getBounties)
+  .use(requireUser)
+  .post(createBountyController);
 
 async function getBounties (req: NextApiRequest, res: NextApiResponse<Bounty[]>) {
   const { spaceId } = req.query;
 
-  if (typeof spaceId !== 'string') {
-    return res.status(400).send({ error: 'Please provide a valid spaceId' } as any);
-  }
-
-  const userId = req.session.user.id;
+  // Session may be undefined as non-logged in users can access this endpoint
+  const userId = req.session?.user?.id;
 
   const bounties = await listAvailableBounties({
-    spaceId,
+    spaceId: spaceId as string,
     userId
   });
-
   return res.status(200).json(bounties);
+
 }
 
 async function createBountyController (req: NextApiRequest, res: NextApiResponse<Bounty>) {
