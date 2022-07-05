@@ -582,6 +582,7 @@ model PagePermission {
 enum SpaceOperation {
   createPage
   createBounty
+  createVote
 }
 
 model SpacePermission {
