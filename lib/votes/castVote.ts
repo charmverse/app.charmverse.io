@@ -4,6 +4,7 @@ import { prisma } from 'db';
 import { hasAccessToSpace } from 'lib/middleware';
 import { DataNotFoundError, InvalidInputError, UndesirableOperationError } from 'lib/utilities/errors';
 import { VOTE_STATUS } from './interfaces';
+import { isVotingClosed } from './utils';
 
 export async function castVote (choice: string, voteId: string, userId: string): Promise<UserVote> {
 
@@ -20,12 +21,7 @@ export async function castVote (choice: string, voteId: string, userId: string):
     throw new DataNotFoundError(`A vote with id ${voteId} was not found.`);
   }
 
-  // If vote doesn't have an InProgress status, it can't take on new votes.
-  if (vote.status !== VOTE_STATUS[0]) {
-    throw new UndesirableOperationError(`Vote with id: ${voteId} is not in progress.`);
-  }
-
-  if (new Date(vote.deadline) < new Date()) {
+  if (isVotingClosed(vote)) {
     throw new UndesirableOperationError(`Vote with id: ${voteId} is past deadline.`);
   }
 
