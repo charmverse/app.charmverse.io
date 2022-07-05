@@ -3,6 +3,7 @@ import { Application } from '@prisma/client';
 import { prisma } from 'db';
 import { paySubmission } from 'lib/applications/actions/paySubmission';
 import { rollupBountyStatus } from 'lib/bounties/rollupBountyStatus';
+import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
@@ -33,19 +34,13 @@ async function paySubmissionController (req: NextApiRequest, res: NextApiRespons
     throw new DataNotFoundError(`Submission with id ${submissionId} not found`);
   }
 
-  const { error, isAdmin } = await hasAccessToSpace({
-    spaceId: submission.bounty.spaceId,
-    userId,
-    adminOnly: false
+  const permissions = await computeBountyPermissions({
+    allowAdminBypass: true,
+    resourceId: submission.bounty.id,
+    userId
   });
 
-  if (error) {
-    throw error;
-  }
-
-  const canReview = isAdmin || submission.bounty.reviewer === userId;
-
-  if (!canReview) {
+  if (!permissions.review) {
     throw new UnauthorisedActionError('You cannot review submissions for this bounty');
   }
 
