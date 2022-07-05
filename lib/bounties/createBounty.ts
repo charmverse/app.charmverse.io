@@ -17,7 +17,6 @@ export async function createBounty ({
   maxSubmissions,
   rewardAmount = 0,
   rewardToken = 'ETH',
-  reviewer,
   permissions
 }: BountyCreationData): Promise<Bounty> {
 
@@ -57,7 +56,6 @@ export async function createBounty ({
     maxSubmissions,
     rewardAmount,
     rewardToken,
-    reviewer,
     linkedTaskId
   };
 

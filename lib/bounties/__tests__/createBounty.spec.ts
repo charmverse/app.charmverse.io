@@ -52,7 +52,6 @@ describe('createBounty', () => {
       descriptionNodes: '{type:"doc"}',
       linkedTaskId: v4(),
       maxSubmissions: 100,
-      reviewer: user.id,
       rewardAmount: 1000,
       rewardToken: 'ETH',
       status: 'suggestion',
