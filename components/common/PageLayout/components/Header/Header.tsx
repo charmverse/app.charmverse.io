@@ -28,9 +28,11 @@ import { useRouter } from 'next/router';
 import { useRef, useState } from 'react';
 import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
+import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import Account from '../Account';
 import ShareButton from '../ShareButton';
 import PageTitleWithBreadcrumbs from './PageTitleWithBreadcrumbs';
+import { CreateVoteButton } from './CreateVoteButton';
 
 export const headerHeight = 56;
 
@@ -57,6 +59,7 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
   const pageMenuAnchor = useRef();
   const currentPage = currentPageId ? pages[currentPageId] : undefined;
   const isFavorite = currentPage && user?.favorites.some(({ pageId }) => pageId === currentPage.id);
+  const [currentSpacePermissions] = useCurrentSpacePermissions();
 
   const isPage = router.route.includes('pageId');
   const pageType = (currentPage as Page)?.type;
@@ -124,6 +127,7 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
         <Box display='flex' alignItems='center'>
           {isPage && (
             <>
+              {currentSpacePermissions?.createVote && <CreateVoteButton />}
               {currentPage?.deletedAt === null && <ShareButton headerHeight={headerHeight} />}
               <Tooltip title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} arrow placement='bottom'>
                 <IconButton size='small' sx={{ ml: 1 }} onClick={toggleFavorite} color='inherit'>
