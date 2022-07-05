@@ -36,7 +36,6 @@
   ],
   "include": [
     "**/*.ts",
-    "**/*.tsx",
-    "components/common/PageLayout/components/Header/components/NotificationsBadge"
+    "**/*.tsx"
   ]
 }

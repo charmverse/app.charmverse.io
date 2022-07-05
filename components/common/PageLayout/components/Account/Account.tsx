@@ -2,6 +2,7 @@
 import ButtonGroup from '@mui/material/ButtonGroup';
 import { alpha } from '@mui/system';
 import Tooltip from '@mui/material/Tooltip';
+import Avatar from 'components/common/Avatar';
 import Button from 'components/common/Button';
 import SvgIcon from '@mui/material/SvgIcon';
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
@@ -105,6 +106,7 @@ function Account (): JSX.Element {
             borderTopLeftRadius: '0 !important',
             borderBottomLeftRadius: '0 !important'
           }) : {}}
+          endIcon={<Avatar avatar={user?.avatar} name={user?.username || ''} size='small' />}
         >
           {user?.username}
         </AccountButton>
