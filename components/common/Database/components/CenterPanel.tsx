@@ -1,8 +1,8 @@
 
-import ViewHeader from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeader';
 import Kanban from 'components/common/BoardEditor/focalboard/src/components/kanban/kanban';
 import { groupCardsByOptions } from 'components/common/BoardEditor/focalboard/src/components/centerPanel';
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
+import ViewHeader from './ViewHeader';
 import type { DatabaseContext } from '../Database.context';
 
 // loosely based off centerPanel.tsx in /focalboard/

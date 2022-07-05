@@ -84,7 +84,7 @@ function getPageModels () {
   tableView.id = 'table';
   tableView.fields.visiblePropertyIds = ['created', 'deadline', 'status'];
   tableView.fields.viewType = 'table';
-  tableView.title = 'Table View';
+  tableView.title = 'Table';
   tableView.parentId = board.id;
   tableView.rootId = board.rootId;
 
@@ -99,7 +99,7 @@ function getPageModels () {
   boardView.fields.visiblePropertyIds = ['created', 'deadline'];
   boardView.fields.viewType = 'board';
   boardView.fields.groupById = 'status';
-  boardView.title = 'Column View';
+  boardView.title = 'Columns';
   boardView.parentId = board.id;
   boardView.rootId = board.rootId;
 
