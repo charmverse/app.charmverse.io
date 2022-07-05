@@ -25,7 +25,6 @@ export function PageActionDisplayProvider ({ children }: { children: ReactNode }
   const [currentPageActionDisplay, setCurrentPageActionDisplay] = useState<IPageActionDisplayContext['currentPageActionDisplay']>(null);
   useEffect(() => {
     const highlightedCommentId = (new URLSearchParams(window.location.search)).get('commentId');
-
     if (currentPageId && !isValidatingInlineComments && !isValidatingInlineVotes) {
       const cachedInlineVotesData: ExtendedVote[] = cache.get(`pages/${currentPageId}/inline-votes`);
       const cachedInlineCommentData: ThreadWithCommentsAndAuthors[] | undefined = cache.get(`pages/${currentPageId}/threads`);
@@ -37,6 +36,12 @@ export function PageActionDisplayProvider ({ children }: { children: ReactNode }
       else if (highlightedCommentId || (cachedInlineCommentData && cachedInlineCommentData.find(thread => thread && !thread.resolved))) {
         setCurrentPageActionDisplay('comments');
       }
+      else {
+        setCurrentPageActionDisplay(null);
+      }
+    }
+    else {
+      setCurrentPageActionDisplay(null);
     }
   }, [isValidatingInlineComments, isValidatingInlineVotes, currentPageId]);
 
