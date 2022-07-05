@@ -36,7 +36,7 @@ export async function createVote (vote: VoteDTO): Promise<ExtendedVote> {
     data: {
       description,
       title,
-      threshold: threshold ?? DEFAULT_THRESHOLD,
+      threshold: +threshold ?? DEFAULT_THRESHOLD,
       deadline: new Date(deadline),
       status: VOTE_STATUS[0],
       page: {
