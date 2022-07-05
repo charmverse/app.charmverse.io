@@ -332,7 +332,7 @@ export function getCryptos (chainId: number): Array<string | CryptoCurrency> {
 
 }
 
-export function getChainExplorerLink (chainId: string | number, transactionOrContractId: string, endpoint: 'transaction' | 'token' = 'transaction'): string {
+export function getChainExplorerLink (chainId: string | number, transactionOrContractId: string, endpoint: 'transaction' | 'address' = 'transaction'): string {
 
   chainId = chainId.toString();
 
