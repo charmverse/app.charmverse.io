@@ -1,10 +1,10 @@
 
 import { Application } from '@prisma/client';
 import { prisma } from 'db';
-import { paySubmission } from 'lib/applications/actions/paySubmission';
+import { markSubmissionAsPaid } from 'lib/applications/actions/markSubmissionAsPaid';
 import { rollupBountyStatus } from 'lib/bounties/rollupBountyStatus';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
-import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { NextApiRequest, NextApiResponse } from 'next';
@@ -14,9 +14,9 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  .post(paySubmissionController);
+  .post(markSubmissionAsPaidController);
 
-async function paySubmissionController (req: NextApiRequest, res: NextApiResponse<Application>) {
+async function markSubmissionAsPaidController (req: NextApiRequest, res: NextApiResponse<Application>) {
   const { id: submissionId } = req.query;
 
   const userId = req.session.user.id;
@@ -44,7 +44,7 @@ async function paySubmissionController (req: NextApiRequest, res: NextApiRespons
     throw new UnauthorisedActionError('You cannot review submissions for this bounty');
   }
 
-  const updatedSubmission = await paySubmission(submissionId as string);
+  const updatedSubmission = await markSubmissionAsPaid(submissionId as string);
 
   rollupBountyStatus(updatedSubmission.bountyId);
 
