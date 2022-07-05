@@ -20,7 +20,7 @@ beforeAll(async () => {
   nonAdminCookie = await loginUser(nonAdminUser);
 });
 
-describe('POST /api/submissions/{submissionId}/review - review a submission', () => {
+describe('POST /api/submissions/{submissionId}/mark-as-paid - Update submission status to "paid"', () => {
 
   it('should succed if the user has "review" permission, respond with 200', async () => {
 
@@ -31,11 +31,9 @@ describe('POST /api/submissions/{submissionId}/review - review a submission', ()
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,
       spaceId: nonAdminUserSpace.id,
-      applicationStatus: 'review',
+      applicationStatus: 'complete',
       bountyCap: null,
-      bountyStatus: 'open',
-      // Reviewer status is now assigned via permissions
-      reviewer: undefined
+      bountyStatus: 'open'
     });
 
     await addBountyPermissionGroup({
@@ -47,15 +45,14 @@ describe('POST /api/submissions/{submissionId}/review - review a submission', ()
       }
     });
 
-    const decision: Pick<SubmissionReview, 'decision'> = {
-      decision: 'approve'
-    };
-
-    await request(baseUrl)
-      .post(`/api/submissions/${bounty.applications[0].id}/review`)
+    const afterUpdate = (await request(baseUrl)
+      .post(`/api/submissions/${bounty.applications[0].id}/mark-as-paid`)
       .set('Cookie', reviewerCookie)
-      .send(decision)
-      .expect(200);
+      .send({})
+      .expect(200)).body as Application;
+
+    expect(afterUpdate.status).toBe('paid');
+
   });
 
   it('should allow a space admin to review a submission and respond with 200', async () => {
@@ -67,21 +64,19 @@ describe('POST /api/submissions/{submissionId}/review - review a submission', ()
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,
       spaceId: nonAdminUserSpace.id,
-      applicationStatus: 'review',
+      applicationStatus: 'complete',
       bountyCap: null,
       bountyStatus: 'open',
       reviewer: nonAdminUser.id
     });
 
-    const decision: Pick<SubmissionReview, 'decision'> = {
-      decision: 'approve'
-    };
-
-    await request(baseUrl)
-      .post(`/api/submissions/${bounty.applications[0].id}/review`)
+    const afterUpdate = (await request(baseUrl)
+      .post(`/api/submissions/${bounty.applications[0].id}/mark-as-paid`)
       .set('Cookie', adminUserCookie)
-      .send(decision)
-      .expect(200);
+      .send({})
+      .expect(200)).body as Application;
+
+    expect(afterUpdate.status).toBe('paid');
   });
 
   it('should fail if the requesting non-admin user does not have the "review" permission and respond with 401', async () => {
@@ -93,7 +88,7 @@ describe('POST /api/submissions/{submissionId}/review - review a submission', ()
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,
       spaceId: nonAdminUserSpace.id,
-      applicationStatus: 'review',
+      applicationStatus: 'complete',
       bountyCap: null,
       bountyStatus: 'open',
       reviewer: nonAdminUser.id
@@ -104,7 +99,7 @@ describe('POST /api/submissions/{submissionId}/review - review a submission', ()
     };
 
     await request(baseUrl)
-      .post(`/api/submissions/${bounty.applications[0].id}/review`)
+      .post(`/api/submissions/${bounty.applications[0].id}/mark-as-paid`)
       .set('Cookie', userCookie)
       .send(decision)
       .expect(401);
