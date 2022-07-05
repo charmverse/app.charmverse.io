@@ -38,7 +38,7 @@ export function InlineVoteList ({ pluginKey }: {pluginKey: PluginKey<InlineVoteP
   const { currentPageActionDisplay } = usePageActionDisplay();
   const inlineVoteDetailModal = usePopupState({ variant: 'popover', popupId: 'inline-votes-detail' });
   const { inlineVotes } = useInlineVotes();
-  const inProgressVoteIds = ids.filter(voteId => inlineVotes[voteId].status === 'InProgress');
+  const inProgressVoteIds = ids.filter(voteId => inlineVotes[voteId]?.status === 'InProgress');
 
   if ((currentPageActionDisplay !== 'votes' || cardId) && show && inProgressVoteIds.length !== 0) {
     return (

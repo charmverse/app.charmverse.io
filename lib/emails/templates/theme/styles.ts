@@ -63,7 +63,7 @@ export const css = `
     font-family: ${fontFamily} !important;
     font-size: 18px !important;
     font-weight: 600 !important;
-    padding: 15px 40px !important;
+    padding: 10px 30px !important;
     background: ${blueColor} !important;
     text-decoration: underline;
   }

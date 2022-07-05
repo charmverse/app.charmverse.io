@@ -93,9 +93,9 @@ const templates = {
       voteTasks: [
         createVoteTasks({
           deadline: new Date(Date.now() + (12 * 60 * 60 * 1000)),
-          pageTitle: 'Vote Page',
-          spaceName: 'Charmverse',
-          voteTitle: 'Should we add this section?'
+          pageTitle: 'This is a really really long vote title',
+          spaceName: 'This is a really really long space name',
+          voteTitle: 'Should we add this section? I think it can be a great addition but need all of your votes to decide'
         }),
         createVoteTasks({
           deadline: new Date(Date.now() + (26 * 60 * 60 * 1000)),
