@@ -57,7 +57,7 @@ function MentionedTaskRow (
           }}
         />
       ) : null}
-      <Link target='_blank' href={mentionLink}>
+      <Link href={mentionLink}>
         <Card key={mentionId} sx={{ width: '100%', opacity: marked ? 0.75 : 1, px: 2, py: 1, my: 2, borderLeft: 0, borderRight: 0 }} variant='outlined'>
           <Grid justifyContent='space-between' alignItems='center' gap={1} container>
             <Grid

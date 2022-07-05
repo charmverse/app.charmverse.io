@@ -5,8 +5,8 @@ import { VoteTask } from 'lib/votes/interfaces';
 import { GetTasksResponse } from 'pages/api/tasks/list';
 import { KeyedMutator } from 'swr';
 import Link from 'components/common/Link';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import { DateTime } from 'luxon';
+import Button from 'components/common/Button';
 
 interface VoteTasksListProps {
   tasks: GetTasksResponse | undefined
@@ -18,8 +18,8 @@ export function VoteTasksListRow (
   {
     page: { path: pagePath, title: pageTitle },
     space: { domain: spaceDomain, name: spaceName },
-    deadline, title: voteTitle, id: voteId, marked
-  }: VoteTask & {marked: boolean}
+    deadline, title: voteTitle, id: voteId
+  }: VoteTask
 ) {
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : null;
 
@@ -28,25 +28,14 @@ export function VoteTasksListRow (
 
   return (
     <Box>
-      {!marked ? (
-        <VisibilityIcon
-          fontSize='small'
-          sx={{
-            position: 'absolute',
-            left: -35,
-            top: '50%',
-            transform: 'translateY(-50%)'
-          }}
-        />
-      ) : null}
-      <Link target='_blank' href={voteLink}>
-        <Card sx={{ width: '100%', opacity: marked ? 0.75 : 1, px: 2, py: 1, my: 2, borderLeft: 0, borderRight: 0 }} variant='outlined'>
+      <Link href={voteLink}>
+        <Card sx={{ width: '100%', px: 2, py: 1, my: 2, borderLeft: 0, borderRight: 0 }} variant='outlined'>
           <Grid justifyContent='space-between' alignItems='center' gap={1} container>
             <Grid
               item
               xs={12}
-              sm={7}
-              md={4}
+              sm={12}
+              md={5}
               sx={{
                 overflow: 'hidden',
                 whiteSpace: 'nowrap',
@@ -63,32 +52,32 @@ export function VoteTasksListRow (
             <Grid
               item
               xs={12}
-              sm={6}
-              md={4}
+              sm={12}
+              md={3}
               sx={{
                 fontSize: { xs: 14, sm: 'inherit' }
               }}
             >
-              <Box sx={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 0.5
-              }}
-              >
-                {voteLocation}
-              </Box>
+              {voteLocation}
             </Grid>
             <Grid
               item
               xs={12}
-              sm={3}
-              md={1.5}
-              justifyContent={{ sm: 'flex-end', xs: 'initial' }}
+              sm={6}
+              md={1}
               sx={{
-                fontSize: { xs: 14, sm: 'inherit', display: 'flex' }
+                fontSize: { xs: 14, sm: 'inherit' }
               }}
             >
               {DateTime.fromJSDate(new Date(deadline)).toRelative({ base: DateTime.now() })}
+            </Grid>
+            <Grid
+              item
+              xs={12}
+              sm={2}
+              md={1}
+            >
+              <Button href={voteLink}>Vote now</Button>
             </Grid>
           </Grid>
         </Card>
@@ -127,7 +116,7 @@ export function VoteTasksList ({ error, tasks }: VoteTasksListProps) {
 
   return (
     <>
-      {tasks.votes.map(vote => <VoteTasksListRow key={vote.id} marked={false} {...vote} />)}
+      {tasks.votes.map(vote => <VoteTasksListRow key={vote.id} {...vote} />)}
     </>
   );
 }
