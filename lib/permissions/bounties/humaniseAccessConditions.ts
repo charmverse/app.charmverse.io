@@ -85,7 +85,11 @@ export function humaniseBountyAccessConditions ({
       }
       else if (hasSpacePermission && !bounty.approveSubmitters) {
         result.phrase = 'Any workspace member can directly submit their to work to this bounty.';
-      // Roles mode
+      // Roles mode ------------------
+      // Edge case where the total members of the role is 0
+      }
+      else if (!hasSpacePermission && bounty.approveSubmitters && assignedRoleNames.length === 1 && totalSubmitters === 0) {
+        result.phrase = `Applications to this bounty are reserved to workspace members with the ${upperCaseFirstCharacter(assignedRoleNames[0])} role.`;
       }
       // Bounty requires applications
       else if (!hasSpacePermission && bounty.approveSubmitters && assignedRoleNames.length === 1) {
@@ -95,6 +99,9 @@ export function humaniseBountyAccessConditions ({
         result.phrase = `Applications to this bounty are reserved to the ${totalSubmitters} workspace member${totalSubmitters > 1 ? 's' : ''} with ${humanisedRoleNames} roles.`;
       }
       // Bounty is open to submitters
+      else if (!hasSpacePermission && !bounty.approveSubmitters && assignedRoleNames.length === 1 && totalSubmitters === 0) {
+        result.phrase = `Submissions to this bounty are reserved to workspace members with the ${upperCaseFirstCharacter(assignedRoleNames[0])} role.`;
+      }
       else if (!hasSpacePermission && !bounty.approveSubmitters && assignedRoleNames.length === 1) {
         result.phrase = `Submissions to this bounty are reserved to the ${totalSubmitters} workspace member${totalSubmitters > 1 ? 's' : ''} with the ${upperCaseFirstCharacter(assignedRoleNames[0])} role.`;
       }
