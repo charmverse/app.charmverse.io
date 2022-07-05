@@ -68,7 +68,12 @@ export default function PageInlineVotesList () {
       );
     }
     else if (voteSort === 'position') {
-      _sortedVotes = inlineVoteIds.map(inlineVoteId => inlineVotes[inlineVoteId]).filter(isTruthy);
+      const inlineVoteIdsSet = new Set(inlineVoteIds);
+      const votesNotInEditor = allVotes.filter(vote => !inlineVoteIdsSet.has(vote.id)).map(vote => vote.id);
+      _sortedVotes = [
+        ...inlineVoteIds.map(inlineVoteId => inlineVotes[inlineVoteId]).filter(isTruthy),
+        ...votesNotInEditor.map(inlineVoteId => inlineVotes[inlineVoteId]).filter(isTruthy)
+      ];
     }
     return _sortedVotes;
   }, [inlineVotes, allVotes, voteSort]);
