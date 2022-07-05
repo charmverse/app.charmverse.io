@@ -48,15 +48,15 @@ const createVoteTasks = ({ voteTitle, deadline, pageTitle, spaceName }: {voteTit
     page: {
       path: `page-${Math.random().toString().replace('0.', '')}`,
       title: pageTitle
-    },
+    } as any,
     space: {
       domain: randomName(),
       name: spaceName
-    },
+    } as any,
     pageId: v4(),
     spaceId: v4(),
     title: voteTitle
-  };
+  } as any;
 };
 
 const templates = {
