@@ -149,14 +149,15 @@ export function generateTransaction ({ applicationId, chainId = '4', transaction
   });
 }
 
-export async function generateBountyWithSingleApplication ({ applicationStatus, bountyCap, userId, spaceId, bountyStatus, reviewer }:
-  {applicationStatus: ApplicationStatus, bountyCap: number | null, userId: string, spaceId: string, bountyStatus?: BountyStatus, reviewer?: string}):
+export async function generateBountyWithSingleApplication ({ applicationStatus, bountyCap, userId, spaceId, bountyStatus }:
+  {applicationStatus: ApplicationStatus, bountyCap: number | null, userId: string, spaceId: string, bountyStatus?: BountyStatus,
+    // This should be deleted on future PR. Left for backwards compatibility for now
+    reviewer?: string}):
   Promise<BountyWithDetails> {
   const createdBounty = await prisma.bounty.create({
     data: {
       createdBy: userId,
       chainId: 1,
-      reviewer,
       rewardAmount: 1,
       rewardToken: 'ETH',
       title: 'Example',

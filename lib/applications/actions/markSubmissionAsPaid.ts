@@ -3,7 +3,7 @@ import { prisma } from 'db';
 import { Application } from '@prisma/client';
 import { getApplication } from '../getApplication';
 
-export async function paySubmission (submissionId: string) {
+export async function markSubmissionAsPaid (submissionId: string) {
   const submission = await getApplication(submissionId);
 
   if (!submission) {
