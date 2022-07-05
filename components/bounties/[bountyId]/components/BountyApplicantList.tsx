@@ -42,9 +42,7 @@ export function BountyApplicantList ({
   const [contributors] = useContributors();
   const { refreshBounty } = useBounties();
 
-  const isAdmin = useIsAdmin();
-
-  const { roles, roleups } = useRoles();
+  const { roleups } = useRoles();
 
   const theme = useTheme();
 
@@ -56,8 +54,6 @@ export function BountyApplicantList ({
   }
 
   const acceptedApplications = applications.filter(applicantIsSubmitter);
-
-  const isReviewer = bounty.reviewer === user?.id;
 
   function displayAssignmentButton (application: Application) {
     return (
