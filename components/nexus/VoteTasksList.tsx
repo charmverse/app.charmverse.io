@@ -28,60 +28,58 @@ export function VoteTasksListRow (
 
   return (
     <Box>
-      <Link href={voteLink}>
-        <Card sx={{ width: '100%', px: 2, py: 1, my: 2, borderLeft: 0, borderRight: 0 }} variant='outlined'>
-          <Grid justifyContent='space-between' alignItems='center' gap={1} container>
-            <Grid
-              item
-              xs={12}
-              sm={12}
-              md={5}
-              sx={{
-                overflow: 'hidden',
-                whiteSpace: 'nowrap',
-                textOverflow: 'ellipsis',
-                mr: 1,
-                alignItems: 'center',
-                display: 'flex',
-                gap: 0.5
-              }}
-              fontSize={{ sm: 16, xs: 18 }}
-            >
-              {voteTitle}
-            </Grid>
-            <Grid
-              item
-              xs={12}
-              sm={12}
-              md={3}
-              sx={{
-                fontSize: { xs: 14, sm: 'inherit' }
-              }}
-            >
-              {voteLocation}
-            </Grid>
-            <Grid
-              item
-              xs={12}
-              sm={6}
-              md={2}
-              sx={{
-                fontSize: { xs: 14, sm: 'inherit' }
-              }}
-            >
-              due {DateTime.fromJSDate(new Date(deadline)).toRelative({ base: DateTime.now() })}
-            </Grid>
-            <Grid
-              item
-              xs={12}
-              sm={2}
-              md={1}
-            >
-              <Button href={voteLink}>Vote now</Button>
-            </Grid>
+      <Card sx={{ width: '100%', px: 2, py: 1, my: 2, borderLeft: 0, borderRight: 0 }} variant='outlined'>
+        <Grid justifyContent='space-between' alignItems='center' gap={1} container>
+          <Grid
+            item
+            xs={12}
+            sm={12}
+            md={4}
+            sx={{
+              overflow: 'hidden',
+              whiteSpace: 'nowrap',
+              textOverflow: 'ellipsis',
+              mr: 1,
+              alignItems: 'center',
+              display: 'flex',
+              gap: 0.5
+            }}
+            fontSize={{ sm: 16, xs: 18 }}
+          >
+            {voteTitle}
           </Grid>
-        </Card>
-      </Link>
+          <Grid
+            item
+            xs={12}
+            sm={12}
+            md={4}
+            sx={{
+              fontSize: { xs: 14, sm: 'inherit' }
+            }}
+          >
+            {voteLocation}
+          </Grid>
+          <Grid
+            item
+            xs={12}
+            sm={6}
+            md={2}
+            sx={{
+              fontSize: { xs: 14, sm: 'inherit' }
+            }}
+          >
+            due {DateTime.fromJSDate(new Date(deadline)).toRelative({ base: DateTime.now() })}
+          </Grid>
+          <Grid
+            item
+            xs={12}
+            sm={2}
+            md={1}
+          >
+            <Button href={voteLink}>Vote now</Button>
+          </Grid>
+        </Grid>
+      </Card>
     </Box>
   );
 }
