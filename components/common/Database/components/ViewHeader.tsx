@@ -70,26 +70,24 @@ const ViewHeader = React.memo((props: Props) => {
             defaultMessage='Filter'
           />
         </Button>
-        {showFilter
-                    && (
-                    <FilterComponent
-                      board={board}
-                      activeView={activeView}
-                      onClose={() => setShowFilter(false)}
-                    />
-                    )}
+        {showFilter && (
+          <FilterComponent
+            board={board}
+            activeView={activeView}
+            onClose={() => setShowFilter(false)}
+          />
+        )}
       </ModalWrapper>
 
       {/* Sort */}
 
-      {withSortBy
-                    && (
-                    <ViewHeaderSortMenu
-                      properties={board.fields.cardProperties}
-                      activeView={activeView}
-                      orderedCards={cards}
-                    />
-                    )}
+      {withSortBy && (
+        <ViewHeaderSortMenu
+          properties={board.fields.cardProperties}
+          activeView={activeView}
+          orderedCards={cards}
+        />
+      )}
 
       {/* Search */}
 

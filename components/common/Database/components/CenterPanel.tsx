@@ -25,6 +25,10 @@ export default function DatabaseView (props: Props) {
   const optionIds = groupByProperty?.options.map(prop => prop.id) || [];
   const visibleGroups = groupCardsByOptions(cards, optionIds, groupByProperty);
 
+  function changeViewSortOptions () {
+
+  }
+
   return (
     <>
       <ViewHeader
