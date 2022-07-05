@@ -1,4 +1,5 @@
 import { Bounty } from '@prisma/client';
+import { useRouter } from 'next/router';
 import charmClient from 'charmClient';
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
 import useRefState from 'hooks/useRefState';
@@ -33,17 +34,28 @@ export const BountiesContext = createContext<Readonly<IContext>>({
 
 export function BountiesProvider ({ children }: { children: ReactNode }) {
   const [space] = useCurrentSpace();
+
+  // Hardcoded for now - remove after dev is complete
+  const spaceId = '5376c50b-50f2-4227-a09d-2eb32dfd7e78';
+
   const [user] = useUser();
   const [bounties, bountiesRef, setBounties] = useRefState<BountyWithDetails[]>([]);
   useEffect(() => {
     if (space) {
       setBounties([]);
-      charmClient.listBounties(space.id)
+      charmClient.listBounties(spaceId)
+        .then(_bounties => {
+          setBounties(_bounties);
+        });
+    // Remove this after dev
+    }
+    else {
+      charmClient.listBounties(spaceId)
         .then(_bounties => {
           setBounties(_bounties);
         });
     }
-  }, [space?.id, user?.id]);
+  }, [user?.id, spaceId]);
 
   const [currentBountyId, setCurrentBountyId] = useState<string | null>(null);
 
