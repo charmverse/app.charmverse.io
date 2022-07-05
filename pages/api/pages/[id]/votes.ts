@@ -1,7 +1,7 @@
 import { NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
-import { getPageVotes } from 'lib/votes';
+import { getVotesByPage } from 'lib/votes';
 import { ExtendedVote } from 'lib/votes/interfaces';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -22,7 +22,7 @@ async function getVotes (req: NextApiRequest, res: NextApiResponse<ExtendedVote[
     throw new NotFoundError('Page not found');
   }
 
-  const votes = await getPageVotes(pageId);
+  const votes = await getVotesByPage(pageId);
 
   return res.status(200).json(votes);
 }

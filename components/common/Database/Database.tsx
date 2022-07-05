@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { PagesContext } from 'hooks/usePages';
 import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
+import { createBoard, IPropertyTemplate } from 'components/common/BoardEditor/focalboard/src/blocks/board';
 import CenterPanel from './components/CenterPanel';
 import { DatabaseContext } from './Database.context';
 

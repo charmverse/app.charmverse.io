@@ -707,8 +707,12 @@ class CharmClient {
     return http.GET<DeepDaoAggregateData>(`/api/public/profile/${userPath}/aggregate`);
   }
 
-  getPageVotes (pageId: string) {
+  getVotesByPage (pageId: string) {
     return http.GET<ExtendedVote[]>(`/api/pages/${pageId}/votes`);
+  }
+
+  getVotesBySpace (spaceId: string) {
+    return http.GET<ExtendedVote[]>(`/api/spaces/${spaceId}/votes`);
   }
 
   createVote (votePayload: VoteDTO) {

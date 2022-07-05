@@ -421,7 +421,7 @@ function CenterPanel(props: Props) {
 
 export function groupCardsByOptions (cards: Card[], optionIds: string[], groupByProperty?: IPropertyTemplate): BoardGroup[] {
   const groups = [];
-  console.log(optionIds)
+
   for (const optionId of optionIds) {
     if (optionId) {
       const option = groupByProperty?.options.find((o) => o.id === optionId);
