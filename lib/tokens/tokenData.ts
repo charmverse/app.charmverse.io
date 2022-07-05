@@ -1,6 +1,6 @@
 import * as http from 'adapters/http';
 import { PaymentMethod } from '@prisma/client';
-import { TokenLogoPaths, CryptoCurrency, CryptoCurrencyList } from 'connectors';
+import { TokenLogoPaths, CryptoCurrency, CryptoCurrencyList, getChainById, IChainDetails } from 'connectors';
 
 export interface ITokenMetadataRequest {
   chainId: number,
@@ -90,4 +90,47 @@ export function getTokenInfo (paymentMethods: PaymentMethod[], symbolOrAddress: 
   };
 
   return tokenInfo;
+}
+
+type TokenAndChain = TokenInfo & { chain: IChainDetails, canonicalLogo: string };
+type getTokenAndChainInfoFromPaymentsProps = { chainId: number, methods: PaymentMethod[], symbolOrAddress: string }
+
+export function getTokenAndChainInfoFromPayments ({ chainId, methods, symbolOrAddress }: getTokenAndChainInfoFromPaymentsProps): TokenAndChain {
+  const paymentMethod = methods.find(method => (
+    method.contractAddress === symbolOrAddress || method.tokenSymbol === symbolOrAddress
+  ));
+  if (paymentMethod) {
+    return getTokenAndChainInfo(paymentMethod);
+  }
+  else {
+    const chain = getChainById(chainId);
+    if (!chain) {
+      throw new Error(`No chain found for chainId: ${chainId}`);
+    }
+    return {
+      chain,
+      canonicalLogo: TokenLogoPaths[symbolOrAddress as CryptoCurrency],
+      tokenName: CryptoCurrencyList[symbolOrAddress as CryptoCurrency],
+      tokenSymbol: symbolOrAddress,
+      tokenLogo: TokenLogoPaths[symbolOrAddress as CryptoCurrency],
+      isContract: false
+    };
+  }
+}
+
+export function getTokenAndChainInfo (paymentMethod: PaymentMethod): TokenAndChain {
+  const chain = getChainById(paymentMethod.chainId);
+  if (!chain) {
+    throw new Error(`No chain found for chainId: ${paymentMethod.chainId}`);
+  }
+  const tokenLogo = paymentMethod.tokenLogo || TokenLogoPaths[paymentMethod.tokenSymbol as CryptoCurrency];
+  return {
+    // prefer our standard iconUrl for native tokens that may have been saved to tokenInfo
+    canonicalLogo: paymentMethod.contractAddress ? (tokenLogo || chain.iconUrl) : chain.iconUrl,
+    chain,
+    tokenName: paymentMethod.tokenName,
+    tokenSymbol: paymentMethod.tokenSymbol,
+    tokenLogo,
+    isContract: !!paymentMethod.contractAddress
+  };
 }
