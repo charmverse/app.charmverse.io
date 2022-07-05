@@ -7,7 +7,8 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { PaymentMethod } from '@prisma/client';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import AddIcon from '@mui/icons-material/Add';
-import { getTokenInfo } from 'lib/tokens/tokenData';
+import TokenLogo from 'components/common/TokenLogo';
+import { getTokenInfo, getTokenAndChainInfoFromPayments } from 'lib/tokens/tokenData';
 import CustomERCTokenForm from 'components/settings/payment-methods/components/CustomERCTokenForm';
 
 export interface IInputSearchCryptoProps {
@@ -41,19 +42,17 @@ export function InputSearchCrypto ({
   const ERC20PopupState = usePopupState({ variant: 'popover', popupId: 'ERC20-popup' });
 
   useEffect(() => {
-    setInputValue(defaultValue);
     setValue(defaultValue);
   }, [cryptoList]);
 
   useEffect(() => {
     if (parentValue) {
-      setInputValue(parentValue);
       setValue(parentValue);
     }
   }, [cryptoList, parentValue]);
 
   function emitValue (received: string) {
-    if (received !== null && cryptoList.indexOf(received as CryptoCurrency) >= 0) {
+    if (received && cryptoList.includes(received as CryptoCurrency)) {
       setValue(received);
       onChange(received as CryptoCurrency);
     }
@@ -94,8 +93,7 @@ export function InputSearchCrypto ({
         autoHighlight
         size='small'
         getOptionLabel={(option) => {
-          const tokenInfo = getTokenInfo(paymentMethods, option);
-          return tokenInfo.tokenSymbol;
+          return getTokenInfo(paymentMethods, option).tokenSymbol;
         }}
         renderOption={(props, option) => {
           if (option === ADD_NEW_CUSTOM) {
@@ -106,19 +104,13 @@ export function InputSearchCrypto ({
               </Box>
             );
           }
-          const tokenInfo = getTokenInfo(paymentMethods, option);
+          const tokenInfo = getTokenAndChainInfoFromPayments({ methods: paymentMethods, chainId: 1, symbolOrAddress: option });
 
           return (
             <Box component='li' sx={{ '& > img': { flexShrink: 0 }, display: 'flex', gap: 1, alignItems: 'center' }} {...props}>
-              {
-                tokenInfo.tokenLogo && (
-                  <img
-                    width='20px'
-                    height='20px'
-                    src={tokenInfo.tokenLogo}
-                  />
-                )
-              }
+              <Box display='inline-block' width={20}>
+                <TokenLogo height={20} src={tokenInfo.canonicalLogo} />
+              </Box>
               <Box component='span'>
                 {tokenInfo.tokenSymbol}
               </Box>

@@ -2,20 +2,17 @@
 import ButtonGroup from '@mui/material/ButtonGroup';
 import { alpha } from '@mui/system';
 import Tooltip from '@mui/material/Tooltip';
+import Avatar from 'components/common/Avatar';
 import Button from 'components/common/Button';
 import SvgIcon from '@mui/material/SvgIcon';
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import Avatar from 'components/common/Avatar';
 import { useUser } from 'hooks/useUser';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { getChainById } from 'connectors';
 import { useContext } from 'react';
 import NetworkModal from 'components/common/PageLayout/components/Account/components/NetworkModal';
 import styled from '@emotion/styled';
-import useTasks from 'components/nexus/hooks/useTasks';
-import { Badge } from '@mui/material';
-import { useRouter } from 'next/router';
 
 const AccountCard = styled.div`
   display: inline-flex;
@@ -57,7 +54,6 @@ function Account (): JSX.Element {
 
   const networkModalState = usePopupState({ variant: 'popover', popupId: 'network-modal' });
   const [user, , isUserLoaded] = useUser();
-  const { tasks } = useTasks();
 
   if (typeof window === 'undefined') {
     return (
@@ -89,17 +85,9 @@ function Account (): JSX.Element {
     );
   }
 
-  const userNotificationState = user?.notificationState;
   const isConnectedWithWallet = (account && chainId);
   const chain = chainId ? getChainById(chainId) : null;
 
-  // If the user has snoozed multisig tasks don't count them
-  const totalTasks = tasks
-    ? (tasks.votes.length + tasks.mentioned.unmarked.length + (userNotificationState
-      ? (userNotificationState.snoozedUntil && new Date(userNotificationState.snoozedUntil) > new Date() ? 0
-        : tasks.gnosis.length) : tasks.gnosis.length))
-    : 0;
-  const router = useRouter();
   return (
     <AccountCard>
       <StyledButtonGroup variant='contained' disableElevation>
@@ -113,33 +101,12 @@ function Account (): JSX.Element {
           </Tooltip>
         )}
         <AccountButton
-          href='/nexus'
+          href='/profile'
           sx={isConnectedWithWallet ? ({
             borderTopLeftRadius: '0 !important',
             borderBottomLeftRadius: '0 !important'
           }) : {}}
-          endIcon={(
-            totalTasks !== 0 ? (
-              <Badge
-                color='error'
-                sx={{
-                  '& .MuiBadge-badge:hover': {
-                    transform: 'scale(1.25) translate(50%, -50%)',
-                    transition: '250ms ease-in-out transform'
-                  }
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  e.preventDefault();
-                  router.push('/nexus');
-                }}
-                badgeContent={totalTasks}
-                max={10}
-              >
-                <Avatar avatar={user?.avatar} name={user?.username || ''} size='small' />
-              </Badge>
-            ) : <Avatar avatar={user?.avatar} name={user?.username || ''} size='small' />
-            )}
+          endIcon={<Avatar avatar={user?.avatar} name={user?.username || ''} size='small' />}
         >
           {user?.username}
         </AccountButton>

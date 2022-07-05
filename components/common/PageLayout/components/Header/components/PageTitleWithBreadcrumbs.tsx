@@ -5,7 +5,7 @@ import { usePageTitle } from 'hooks/usePageTitle';
 import { usePages } from 'hooks/usePages';
 import { useRouter } from 'next/router';
 import { ReactNode } from 'react';
-import { StyledPageIcon } from '../PageIcon';
+import { StyledPageIcon } from '../../PageIcon';
 
 const NEXUS_ROUTES = ['/nexus', '/profile', '/integrations'];
 

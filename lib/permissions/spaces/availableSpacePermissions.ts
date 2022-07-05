@@ -1,6 +1,5 @@
 import { SpaceOperation } from '@prisma/client';
 import { UserPermissionFlags } from '../interfaces';
-import { SpacePermissionFlags } from './interfaces';
 import { Permissions } from '../permissions.class';
 
 export class AvailableSpacePermissions extends Permissions<SpaceOperation> implements UserPermissionFlags<SpaceOperation> {
@@ -8,6 +7,8 @@ export class AvailableSpacePermissions extends Permissions<SpaceOperation> imple
   createPage: boolean = false;
 
   createBounty: boolean = false;
+
+  createVote: boolean = false;
 
   constructor (operations: SpaceOperation[] = []) {
     super({ allowedOperations: Object.keys(SpaceOperation) as SpaceOperation[] });

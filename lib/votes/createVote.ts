@@ -1,7 +1,7 @@
 
 import { prisma } from 'db';
-import { DataNotFoundError } from 'lib/utilities/errors';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
+import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
+import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { DEFAULT_THRESHOLD, ExtendedVote, VoteDTO, VOTE_STATUS } from './interfaces';
 
 export async function createVote (vote: VoteDTO): Promise<ExtendedVote> {
@@ -22,21 +22,20 @@ export async function createVote (vote: VoteDTO): Promise<ExtendedVote> {
     throw new DataNotFoundError(`Cannot create poll as linked page with id ${pageId} was not found.`);
   }
 
-  const { error } = await hasAccessToSpace({
-    userId: createdBy,
-    spaceId: existingPage.spaceId,
-    adminOnly: true
+  const userPermissions = await computeSpacePermissions({
+    allowAdminBypass: true,
+    resourceId: existingPage.spaceId,
+    userId: createdBy
   });
-
-  if (error) {
-    throw error;
+  if (!userPermissions.createVote) {
+    throw new UnauthorisedActionError('You do not have permissions to create a vote.');
   }
 
   const dbVote = await prisma.vote.create({
     data: {
       description,
       title,
-      threshold: threshold ?? DEFAULT_THRESHOLD,
+      threshold: +threshold ?? DEFAULT_THRESHOLD,
       deadline: new Date(deadline),
       status: VOTE_STATUS[0],
       page: {

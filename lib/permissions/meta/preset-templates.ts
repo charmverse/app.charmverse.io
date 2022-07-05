@@ -5,7 +5,8 @@ import { spaceOperationLabels } from '../spaces/mapping';
 const readOnly: SpacePermissionTemplate = {
   spaceOperations: {
     createBounty: false,
-    createPage: false
+    createPage: false,
+    createVote: false
   },
   pagePermissionDefaults: {
     defaultPagePermissionGroup: 'view',
@@ -16,7 +17,8 @@ const readOnly: SpacePermissionTemplate = {
 const collaborative: SpacePermissionTemplate = {
   spaceOperations: {
     createPage: true,
-    createBounty: true
+    createBounty: true,
+    createVote: true
   },
   pagePermissionDefaults: {
     defaultPagePermissionGroup: 'full_access',
@@ -27,7 +29,8 @@ const collaborative: SpacePermissionTemplate = {
 const open: SpacePermissionTemplate = {
   spaceOperations: {
     createPage: true,
-    createBounty: true
+    createBounty: true,
+    createVote: true
   },
   pagePermissionDefaults: {
     defaultPagePermissionGroup: 'full_access',
