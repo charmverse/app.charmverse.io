@@ -352,9 +352,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
           rewardToken: value.rewardToken,
           descriptionNodes: value.descriptionNodes,
           description: value.description,
-          reviewer: value.reviewer,
           chainId: value.chainId,
-          //
           approveSubmitters: value.approveSubmitters === null ? undefined : value.approveSubmitters,
           maxSubmissions: value.capSubmissions === false ? null : value.maxSubmissions,
           permissions: permissionsToSet
