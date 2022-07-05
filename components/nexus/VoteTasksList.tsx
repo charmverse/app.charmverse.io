@@ -64,12 +64,12 @@ export function VoteTasksListRow (
               item
               xs={12}
               sm={6}
-              md={1}
+              md={2}
               sx={{
                 fontSize: { xs: 14, sm: 'inherit' }
               }}
             >
-              {DateTime.fromJSDate(new Date(deadline)).toRelative({ base: DateTime.now() })}
+              due {DateTime.fromJSDate(new Date(deadline)).toRelative({ base: DateTime.now() })}
             </Grid>
             <Grid
               item
