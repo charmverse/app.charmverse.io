@@ -244,7 +244,7 @@ export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
               type='number'
               value={passThreshold}
               onChange={(e) => {
-                setPassThreshold(e.target.value as any);
+                setPassThreshold(Number(e.target.value as any));
               }}
               InputProps={{
                 inputProps: {
@@ -282,7 +282,7 @@ export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
             marginBottom: '4px',
             marginRight: '8px'
           }}
-          disabled={voteTitle.length === 0 || (voteType === 'custom' && (options.findIndex(option => option.name.length === 0) !== -1)) || (new Set(options.map(option => option.name)).size !== options.length)}
+          disabled={passThreshold > 100 || voteTitle.length === 0 || (voteType === 'custom' && (options.findIndex(option => option.name.length === 0) !== -1)) || (new Set(options.map(option => option.name)).size !== options.length)}
         >
           Create
         </Button>

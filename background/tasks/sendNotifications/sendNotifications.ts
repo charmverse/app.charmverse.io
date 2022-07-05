@@ -70,13 +70,13 @@ export async function getNotifications (): Promise<PendingTasksProps[]> {
     const gnosisSafeTasksNotSent = gnosisSafeTasks.filter(gnosisSafeTask => !sentTaskIds.has(getGnosisSafeTaskId(gnosisSafeTask)));
     const myGnosisTasks = gnosisSafeTasksNotSent.filter(gnosisSafeTask => Boolean(gnosisSafeTask.tasks[0].transactions[0].myAction));
 
+    const totalTasks = myGnosisTasks.length + mentionedTasks.unmarked.length + voteTasksNotSent.length;
+
     log.debug('Found tasks for notification', {
-      notSent: gnosisSafeTasksNotSent.length,
+      notSent: gnosisSafeTasksNotSent.length + voteTasksNotSent.length + mentionedTasks.unmarked.length,
       gnosisSafeTasks: gnosisSafeTasks.length,
       myGnosisTasks: myGnosisTasks.length
     });
-
-    const totalTasks = myGnosisTasks.length + mentionedTasks.unmarked.length + voteTasksNotSent.length;
 
     return {
       user: user as PendingTasksProps['user'],
