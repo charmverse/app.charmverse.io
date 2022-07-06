@@ -9,6 +9,8 @@ export const placeholder = 2;
 const concurrent = 5;
 
 export async function migrateBountyReviewers (skip: number, total?: number, errorsFound: any[] = []): Promise<true> {
+  // Added as script body references old schema and would cause build errors if not commented out
+  return Promise.resolve(true);
 
   // if (total === undefined) {
   //   total = await prisma.bounty.count({
