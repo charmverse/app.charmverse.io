@@ -67,7 +67,25 @@ export async function createBounty ({
     data: bountyCreateInput
   });
 
-  if (permissions) {
+  // Initialise suggestions with a view permission
+  if (status === 'suggestion') {
+    await setBountyPermissions({
+      bountyId: bounty.id,
+      permissionsToAssign: {
+        creator: [{
+          group: 'user',
+          id: createdBy
+        }],
+        // This permission is created so that all space members can see the suggestion. When the admin is configuring a not yet approved suggestion, this will remain the same, or be overriden if the admin has restricted submitters to a list of roles.
+        submitter: [{
+          group: 'space',
+          id: spaceId
+        }]
+      }
+    });
+  }
+  // Pass custom permissions
+  else if (permissions) {
     await setBountyPermissions({
       bountyId: bounty.id,
       permissionsToAssign: permissions

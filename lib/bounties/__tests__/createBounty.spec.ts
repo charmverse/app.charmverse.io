@@ -40,6 +40,23 @@ describe('createBounty', () => {
 
   });
 
+  it('should assign a default submitter / space permission to a bounty suggestion so that space members can see a suggestion', async () => {
+
+    const bounty = await createBounty({
+      title: 'My bounty',
+      createdBy: user.id,
+      spaceId: space.id,
+      status: 'suggestion'
+    });
+
+    const permissions = await queryBountyPermissions({ bountyId: bounty.id });
+
+    expect(permissions.submitter.length).toBe(1);
+    expect(permissions.submitter[0].group).toBe('space');
+    expect(permissions.submitter[0].id).toBe(bounty.spaceId);
+
+  });
+
   it('should accept as creation input: title, spaceId, createdBy, status, chainId, description, descriptionNodes, approveSubmitters, maxSubmissions, rewardAmount, rewardToken, reviewer, linkedTaskId, permissions', async () => {
 
     const fullBountyCreationData: BountyCreationData = {
