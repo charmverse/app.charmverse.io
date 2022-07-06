@@ -35,7 +35,7 @@ import { TokenGateWithRoles } from 'pages/api/token-gates';
 import { ApplicationWithTransactions } from 'lib/applications/actions';
 import { AssignedBountyPermissions, BountyUpdate, SuggestionAction, BountySubmitterPoolSize, BountySubmitterPoolCalculation } from 'lib/bounties/interfaces';
 import { PublicPageResponse } from 'lib/pages/interfaces';
-import { PublicSpaceInfo } from 'lib/spaces/interfaces';
+import { PublicBountyToggle, PublicSpaceInfo } from 'lib/spaces/interfaces';
 import type { MarkTask } from 'lib/tasks/markTasks';
 import { TransactionCreationData } from 'lib/transactions/interface';
 import { PublicUser } from 'pages/api/public/profile/[userPath]';
@@ -688,6 +688,12 @@ class CharmClient {
   setDefaultPublicPages ({ spaceId, defaultPublicPages }: SpaceDefaultPublicPageToggle) {
     return http.POST<Space>(`/api/spaces/${spaceId}/set-default-public-pages`, {
       defaultPublicPages
+    });
+  }
+
+  setPublicBountyBoard ({ publicBountyBoard, spaceId }: PublicBountyToggle): Promise<PublicBountyToggle> {
+    return http.POST<PublicBountyToggle>(`/api/spaces/${spaceId}/set-public-bounty-board`, {
+      publicBountyBoard
     });
   }
 
