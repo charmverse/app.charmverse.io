@@ -1,8 +1,9 @@
 
 import { Space } from '@prisma/client';
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
-import { SpacePermissionConfigurationUpdate, updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import { withSessionRoute } from 'lib/session/withSession';
+import { PublicBountyToggle } from 'lib/spaces/interfaces';
+import { togglePublicBounties } from 'lib/spaces/togglePublicBounties';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -13,15 +14,15 @@ handler.use(requireUser)
     adminOnly: true,
     spaceIdKey: 'id'
   }))
-  .post(setPermissionsMode);
+  .post(setPublicBountyBoardController);
 
-async function setPermissionsMode (req: NextApiRequest, res: NextApiResponse<Space>) {
+async function setPublicBountyBoardController (req: NextApiRequest, res: NextApiResponse<Space>) {
 
   const { id: spaceId } = req.query;
-  const { permissionConfigurationMode } = req.body as Pick<SpacePermissionConfigurationUpdate, 'permissionConfigurationMode'>;
+  const { publicBountyBoard } = req.body as Pick<PublicBountyToggle, 'publicBountyBoard'>;
 
-  const updatedSpace = await updateSpacePermissionConfigurationMode({
-    permissionConfigurationMode,
+  const updatedSpace = await togglePublicBounties({
+    publicBountyBoard,
     spaceId: spaceId as string
   });
 

@@ -47,7 +47,3 @@ export interface BountySubmitterPoolSize {
   total: number;
 }
 
-export interface PublicBountyToggle {
-  spaceId: string;
-  publicBountyBoard: boolean;
-}
