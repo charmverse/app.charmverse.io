@@ -62,7 +62,7 @@ export default function BountySubmissionReviewActions ({ onSubmission, bounty, s
         chainId: chainId.toString(),
         transactionId
       });
-      await charmClient.paySubmission(submission.id);
+      await charmClient.markSubmissionAsPaid(submission.id);
       await refreshBounty(bounty.id);
     }
     catch (err: any) {
