@@ -1,15 +1,15 @@
-import BountyList from 'components/bounties/BountyList';
+import VotesPageComponent from 'components/votes/VotesPage';
 import getPageLayout from 'components/common/PageLayout/getLayout';
 import { setTitle } from 'hooks/usePageTitle';
 
-export default function BountyPage () {
+export default function VotesPage () {
 
   setTitle('Votes');
 
   return (
-    <BountyList />
+    <VotesPageComponent />
   );
 
 }
 
-BountyPage.getLayout = getPageLayout;
+VotesPage.getLayout = getPageLayout;

@@ -73,7 +73,7 @@ export default function VotesPage () {
           <strong>Votes</strong>
         </Typography>
       </Stack>
-      <VotesTable votes={sortedVotes} />
+      <VotesTable votes={data ? sortedVotes : undefined} />
     </CenteredPageContent>
   );
 }

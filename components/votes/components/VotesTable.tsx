@@ -2,6 +2,7 @@ import { DateTime } from 'luxon';
 import { Alert, Box, Card, Chip, Collapse, Divider, Grid, Typography } from '@mui/material';
 import GridHeader from 'components/common/Grid/GridHeader';
 import GridContainer from 'components/common/Grid/GridContainer';
+import LoadingComponent from 'components/common/LoadingComponent';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 import type { UIVote, ViewState } from '../VotesPage';
 import NoVotesMessage from './NoVotesMessage';
@@ -26,6 +27,9 @@ export default function VotesTable ({ votes }: { votes?: UIVote[] }) {
           Deadline
         </Grid>
       </GridHeader>
+      {!votes && (
+        <LoadingComponent height='250px' isLoading={true} />
+      )}
       {votes?.length === 0 && (
         <NoVotesMessage message='There are no votes yet. Create a vote from an individual document to get started!' />
       )}
