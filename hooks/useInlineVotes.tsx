@@ -30,7 +30,35 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
   const [user] = useUser();
   const cardId = typeof window !== 'undefined' ? (new URLSearchParams(window.location.href)).get('cardId') : null;
 
-  const { data, isValidating } = useSWR(() => currentPageId && !cardId ? `pages/${currentPageId}/inline-votes` : null, () => charmClient.getPageVotes(currentPageId));
+  const { data, isValidating } = useSWR(() => currentPageId && !cardId ? `pages/${currentPageId}/inline-votes` : null, async () => {
+    const fetchedInlineVotes = await charmClient.getPageVotes(currentPageId);
+    return fetchedInlineVotes.map(fetchedInlineVote => {
+      const userVoteFrequencyRecord = fetchedInlineVote.userVotes.reduce<Record<string, number>>((currentRecord, userVote) => {
+        if (!currentRecord[userVote.choice]) {
+          currentRecord[userVote.choice] = 1;
+        }
+        else {
+          currentRecord[userVote.choice] += 1;
+        }
+        return currentRecord;
+      }, {});
+
+      const totalVotes = fetchedInlineVote.userVotes.length;
+      const threshold = fetchedInlineVote.threshold;
+      const status = fetchedInlineVote.status;
+
+      if (status !== 'Cancelled' && new Date(fetchedInlineVote.deadline) < new Date()) {
+        // If any of the option passed the threshold amount
+        if (Object.values(userVoteFrequencyRecord).some(voteCount => ((voteCount / totalVotes) * 100) >= threshold)) {
+          fetchedInlineVote.status = 'Passed';
+        }
+        else {
+          fetchedInlineVote.status = 'Rejected';
+        }
+      }
+      return fetchedInlineVote;
+    });
+  });
   const [currentSpace] = useCurrentSpace();
   async function castVote (voteId: string, choice: string) {
     const userVote = await charmClient.castVote(voteId, choice);

@@ -6,7 +6,7 @@ import PageThread from 'components/common/CharmEditor/components/PageThread';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
-import { silentlyUpdateURL } from 'lib/browser';
+import { highlightDomElement, silentlyUpdateURL } from 'lib/browser';
 import { findTotalInlineComments } from 'lib/inline-comments/findTotalInlineComments';
 import { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import { useEffect, useState } from 'react';
@@ -133,6 +133,11 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
               highlightedCommentDomNode.scrollIntoView({
                 behavior: 'smooth'
               });
+              setTimeout(() => {
+                requestAnimationFrame(() => {
+                  highlightDomElement(highlightedCommentDomNode);
+                });
+              }, 250);
             });
           }, 250);
         }

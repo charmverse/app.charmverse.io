@@ -2,29 +2,143 @@ import {
   MjmlSection,
   MjmlColumn,
   MjmlText,
-  MjmlButton
+  MjmlButton,
+  MjmlDivider
 } from 'mjml-react';
-import { User } from '@prisma/client';
 import { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
 import { shortenHex } from 'lib/utilities/strings';
-import { greyColor2 } from 'theme/colors';
+import { darkModeColors, greyColor2 } from 'theme/colors';
 import log from 'lib/log';
 import { MentionedTask } from 'lib/mentions/interfaces';
+import { VoteTask } from 'lib/votes/interfaces';
+import { DateTime } from 'luxon';
+import { User } from '@prisma/client';
 import { HR, Feedback, Footer, Header, EmailWrapper } from './components';
 
-type TemplateUser = Pick<User, 'id' | 'username'> & { email: string };
 const charmverseUrl = process.env.DOMAIN;
 
+const MAX_ITEMS_PER_TASK = 3;
+const MAX_CHAR = 60;
+type TemplateUser = Pick<User, 'id' | 'username'> & { email: string };
+const buttonStyle = { color: '#ffffff', lineHeight: '120%', textDecoration: 'none', borderRadius: '3px', fontWeight: '600', padding: '10px 30px', background: '#009Fb7' };
+const h2Style = { lineHeight: '1.2em', fontSize: '24px', fontWeight: 'bold', marginTop: '10px' };
+
 export interface PendingTasksProps {
-  user: TemplateUser;
   gnosisSafeTasks: GnosisSafeTasks[];
   mentionedTasks: MentionedTask[]
   totalTasks: number
+  voteTasks: VoteTask[]
+  // eslint-disable-next-line
+  user: TemplateUser
+}
+
+function ViewAllText ({ href }: {href: string}) {
+  return (
+    <MjmlText>
+      <a
+        href={href}
+      >
+        <h4 style={{ marginBottom: 0 }}>View all</h4>
+      </a>
+    </MjmlText>
+  );
 }
 
 export default function PendingTasks (props: PendingTasksProps) {
 
-  const totalMentions = props.mentionedTasks.length;
+  const totalMentionTasks = props.mentionedTasks.length;
+  const totalVoteTasks = props.voteTasks.length;
+  const totalGnosisSafeTasks = props.gnosisSafeTasks.length;
+
+  const nexusDiscussionLink = `${charmverseUrl}/nexus?task=discussion`;
+  const nexusVoteLink = `${charmverseUrl}/nexus?task=vote`;
+  const nexusMultisigLink = `${charmverseUrl}/nexus?task=multisig`;
+
+  const mentionSection = totalMentionTasks > 0 ? (
+    <>
+      <MjmlText>
+        <div style={{
+          marginBottom: 15
+        }}
+        >
+          <a
+            href={nexusDiscussionLink}
+            style={{
+              marginRight: 15
+            }}
+          >
+            <span style={h2Style}>{totalMentionTasks} Mention{totalMentionTasks > 1 ? 's' : ''}</span>
+          </a>
+          <a href={nexusVoteLink} style={buttonStyle}>
+            View
+          </a>
+        </div>
+      </MjmlText>
+      {props.mentionedTasks.slice(0, MAX_ITEMS_PER_TASK).map(mentionedTask => (
+        <MentionTask
+          key={mentionedTask.mentionId}
+          task={mentionedTask}
+        />
+      ))}
+      {totalMentionTasks > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusDiscussionLink} /> : null}
+    </>
+  ) : null;
+
+  const voteSection = totalVoteTasks > 0 ? (
+    <>
+      <MjmlText>
+        <div style={{
+          marginBottom: 15
+        }}
+        >
+          <a
+            href={nexusVoteLink}
+            style={{
+              marginRight: 15
+            }}
+          >
+            <span style={h2Style}>{totalVoteTasks} Vote{totalVoteTasks > 1 ? 's' : ''}</span>
+          </a>
+          <a href={nexusVoteLink} style={buttonStyle}>
+            Vote
+          </a>
+        </div>
+      </MjmlText>
+      {props.voteTasks.slice(0, MAX_ITEMS_PER_TASK).map(voteTask => (
+        <VoteTaskMjml
+          key={voteTask.id}
+          task={voteTask}
+        />
+      ))}
+      {totalVoteTasks > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusVoteLink} /> : null}
+      <MjmlDivider />
+    </>
+  ) : null;
+
+  const multisigSection = totalGnosisSafeTasks > 0 ? (
+    <>
+      <MjmlText>
+        <div>
+          <a
+            href={nexusMultisigLink}
+            style={{
+              marginRight: 15
+            }}
+          >
+            <span style={h2Style}>{totalGnosisSafeTasks} Multisig{totalGnosisSafeTasks > 1 ? 's' : ''}</span>
+          </a>
+          <a href={nexusMultisigLink} style={buttonStyle}>
+            Sign
+          </a>
+        </div>
+      </MjmlText>
+      {props.gnosisSafeTasks.slice(0, MAX_ITEMS_PER_TASK).map(
+        gnosisSafeTask => <MultisigTask key={gnosisSafeTask.safeAddress} task={gnosisSafeTask} />
+      )}
+      {totalGnosisSafeTasks > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusMultisigLink} /> : null}
+      <MjmlDivider />
+    </>
+  ) : null;
 
   return (
 
@@ -34,25 +148,14 @@ export default function PendingTasks (props: PendingTasksProps) {
           <Header />
 
           <MjmlText paddingBottom={0} paddingTop={0}>
-            <h3>Hello {props.user.username}</h3>
-            <h2>{props.totalTasks} tasks need your attention.</h2>
+            <h3>{props.totalTasks} tasks need your attention.</h3>
           </MjmlText>
-
-          {props.gnosisSafeTasks.map(gnosisSafeTask => <MultisigTask key={gnosisSafeTask.safeAddress} task={gnosisSafeTask} />)}
-          <MjmlText>
-            <a
-              href={`${charmverseUrl}/nexus?task=discussion`}
-            >
-              <h2>{totalMentions} Mention{totalMentions > 1 ? 's' : ''}</h2>
-            </a>
-
-          </MjmlText>
-          {props.mentionedTasks.map(mentionedTask => (
-            <MentionTask
-              key={mentionedTask.mentionId}
-              task={mentionedTask}
-            />
-          ))}
+          <MjmlButton align='left' padding-bottom='20px' href={`${charmverseUrl}/nexus`}>
+            View
+          </MjmlButton>
+          {multisigSection}
+          {voteSection}
+          {mentionSection}
 
         </MjmlColumn>
       </MjmlSection>
@@ -60,24 +163,53 @@ export default function PendingTasks (props: PendingTasksProps) {
       <HR />
 
       <Feedback />
-
       <Footer />
     </EmailWrapper>
   );
 }
 
-function MentionTask ({ task: { text, spaceDomain, pagePath, pageTitle, mentionId } }: {task: MentionedTask}) {
+function VoteTaskMjml ({ task }: {task: VoteTask}) {
+  const pageWorkspaceTitle = `${task.page.title || 'Untitled'} | ${task.space.name}`;
   return (
-    <MjmlText paddingBottom={10}>
-      <div style={{ fontWeight: 'bold', color: greyColor2, marginBottom: 5 }}>
-        {/* 🙶{text}🙷 */}
-        {text}
+    <MjmlText>
+      <div style={{ fontWeight: 'bold', color: '#000', marginBottom: 5 }}>
+        {task.title.length > MAX_CHAR ? `${task.title.slice(0, MAX_CHAR)}...` : task.title}
       </div>
-      <a href={`${charmverseUrl}/${spaceDomain}/${pagePath}?mentionId=${mentionId}`}>
-        <div>
-          <h2>{pageTitle} | {spaceDomain}</h2>
-        </div>
-      </a>
+      <div style={{
+        fontSize: 16,
+        marginBottom: 5,
+        color: greyColor2,
+        fontWeight: 500
+      }}
+      >{pageWorkspaceTitle.length > MAX_CHAR ? `${pageWorkspaceTitle.slice(0, MAX_CHAR)}...` : pageWorkspaceTitle}
+      </div>
+      <div style={{
+        color: darkModeColors.red,
+        fontSize: 14,
+        fontWeight: 'bold'
+      }}
+      >
+        Ends {DateTime.fromJSDate(new Date(task.deadline)).toRelative({ base: (DateTime.now()) })}
+      </div>
+    </MjmlText>
+  );
+}
+
+function MentionTask ({ task: { text, spaceName, pageTitle } }: {task: MentionedTask}) {
+  const pageWorkspaceTitle = `${pageTitle || 'Untitled'} | ${spaceName}`;
+  return (
+    <MjmlText>
+      <div style={{ fontWeight: 'bold', color: '#000', marginBottom: 5 }}>
+        {text.length > MAX_CHAR ? `${text.slice(0, MAX_CHAR)}...` : text}
+      </div>
+      <div style={{
+        fontSize: 16,
+        marginBottom: 5,
+        color: greyColor2,
+        fontWeight: 500
+      }}
+      >{pageWorkspaceTitle.length > MAX_CHAR ? `${pageWorkspaceTitle.slice(0, MAX_CHAR)}...` : pageWorkspaceTitle}
+      </div>
     </MjmlText>
   );
 }
@@ -86,19 +218,11 @@ function MultisigTask ({ task }: { task: GnosisSafeTasks }) {
   log.debug('multi sig task', task);
   // console.log('multi sig task...', task.tasks[0].transactions);
   return (
-    <>
-      <MjmlText>
-        <a href={`${charmverseUrl}/nexus?task=multisig`}>
-          <h2>Multi sig transaction</h2>
-        </a>
-        <strong style={{ color: greyColor2 }}>
-          Safe address: {shortenHex(task.safeAddress)}<br />
-          {task.tasks[0].transactions[0].description}
-        </strong>
-      </MjmlText>
-      <MjmlButton align='left' padding-bottom='40px' href={task.tasks[0].transactions[0].myActionUrl}>
-        {task.tasks[0].transactions[0].myAction}
-      </MjmlButton>
-    </>
+    <MjmlText>
+      <strong style={{ color: '#000' }}>
+        Safe address: {shortenHex(task.safeAddress)}<br />
+        {task.tasks[0].transactions[0].description}
+      </strong>
+    </MjmlText>
   );
 }

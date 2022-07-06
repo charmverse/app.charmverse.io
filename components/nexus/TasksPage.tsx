@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import { silentlyUpdateURL } from 'lib/browser';
 import { useState } from 'react';
 import { useTheme } from '@emotion/react';
+import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import GnosisTasksList from './GnosisTasksList';
 import MentionedTasksList from './MentionedTasksList';
 import TasksPageHeader from './TasksPageHeader';
@@ -14,6 +15,7 @@ import NexusPageTitle from './components/NexusPageTitle';
 import NotifyMeButton from './components/NotifyMeButton';
 import SnoozeButton from './components/SnoozeButton';
 import useTasks from './hooks/useTasks';
+import { VoteTasksList } from './VoteTasksList';
 
 const tabStyles = {
   mb: 2,
@@ -40,7 +42,7 @@ const tabStyles = {
 const TASK_TABS = [
   { icon: <KeyIcon />, label: 'Multisig', type: 'multisig' },
   // { icon: <BountyIcon />, label: 'Bounty', type: 'bounty' },
-  // { icon: <HowToVoteIcon />, label: 'Proposal', type: 'proposal' },
+  { icon: <HowToVoteIcon />, label: 'Votes', type: 'vote' },
   { icon: <ForumIcon />, label: 'Discussion', type: 'discussion' }
 ] as const;
 
@@ -103,7 +105,7 @@ export default function TasksPage () {
           />
         ))}
       </Tabs>
-      {currentTask === 'multisig' ? <GnosisTasksList error={error} mutateTasks={mutateTasks} tasks={tasks} /> : currentTask === 'discussion' ? <MentionedTasksList mutateTasks={mutateTasks} error={error} tasks={tasks} /> : null}
+      {currentTask === 'multisig' ? <GnosisTasksList error={error} mutateTasks={mutateTasks} tasks={tasks} /> : currentTask === 'discussion' ? <MentionedTasksList mutateTasks={mutateTasks} error={error} tasks={tasks} /> : currentTask === 'vote' ? <VoteTasksList mutateTasks={mutateTasks} error={error} tasks={tasks} /> : null}
     </>
   );
 }

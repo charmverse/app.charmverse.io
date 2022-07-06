@@ -4,6 +4,7 @@ import * as emails from 'lib/emails/emails';
 import { v4 } from 'uuid';
 import { MentionedTask } from 'lib/mentions/interfaces';
 import randomName from 'lib/utilities/randomName';
+import { VoteTask } from 'lib/votes/interfaces';
 
 const handler = nc({
   onError,
@@ -40,6 +41,24 @@ const createMentionTask = ({ pageTitle, spaceName, mentionText }: {spaceName: st
   };
 };
 
+const createVoteTasks = ({ voteTitle, deadline, pageTitle, spaceName }: {voteTitle: string, deadline: VoteTask['deadline'], spaceName: string, pageTitle: string}): VoteTask => {
+  return {
+    deadline,
+    id: v4(),
+    page: {
+      path: `page-${Math.random().toString().replace('0.', '')}`,
+      title: pageTitle
+    } as any,
+    space: {
+      domain: randomName(),
+      name: spaceName
+    } as any,
+    pageId: v4(),
+    spaceId: v4(),
+    title: voteTitle
+  } as any;
+};
+
 const templates = {
   'Notify the user about tasks': () => {
     return emails.getPendingTasksEmail({
@@ -48,7 +67,7 @@ const templates = {
         email: '<userEmail>',
         username: 'ghostpepper'
       },
-      totalTasks: 4,
+      totalTasks: 6,
       mentionedTasks: [
         createMentionTask({
           mentionText: 'cc @ghostpepper',
@@ -59,6 +78,42 @@ const templates = {
           mentionText: 'Let\'s have a meeting @ghostpepper',
           pageTitle: 'Product Discussion',
           spaceName: 'CharmVerse'
+        }),
+        createMentionTask({
+          mentionText: 'Take a look at this @ghostpepper',
+          pageTitle: 'Task Board',
+          spaceName: 'CharmVerse'
+        }),
+        createMentionTask({
+          mentionText: 'We should discuss about this @ghostpepper',
+          pageTitle: 'Product Road Map',
+          spaceName: 'CharmVerse'
+        })
+      ],
+      voteTasks: [
+        createVoteTasks({
+          deadline: new Date(Date.now() + (12 * 60 * 60 * 1000)),
+          pageTitle: 'This is a really really long vote title',
+          spaceName: 'This is a really really long space name',
+          voteTitle: 'Should we add this section? I think it can be a great addition but need all of your votes to decide'
+        }),
+        createVoteTasks({
+          deadline: new Date(Date.now() + (26 * 60 * 60 * 1000)),
+          pageTitle: 'Product Discussion',
+          spaceName: 'Charmverse',
+          voteTitle: 'Should we format the text?'
+        }),
+        createVoteTasks({
+          deadline: new Date(Date.now() + (32 * 60 * 60 * 1000)),
+          pageTitle: 'Task Board',
+          spaceName: 'Charmverse',
+          voteTitle: 'Let\'s vote'
+        }),
+        createVoteTasks({
+          deadline: new Date(Date.now() + (52 * 60 * 60 * 1000)),
+          pageTitle: 'Product Road Map',
+          spaceName: 'Charmverse Demo',
+          voteTitle: 'We should all vote on this'
         })
       ],
       gnosisSafeTasks: [
