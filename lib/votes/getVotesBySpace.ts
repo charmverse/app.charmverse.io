@@ -8,6 +8,18 @@ export async function getVotesBySpace (spaceId: string): Promise<Vote[]> {
       page: {
         deletedAt: null
       }
+    },
+    include: {
+      userVotes: {
+        select: {
+          userId: true
+        }
+      },
+      page: {
+        select: {
+          path: true
+        }
+      }
     }
   });
 

@@ -1,5 +1,7 @@
 import { DateTime } from 'luxon';
+import { useRouter } from 'next/router';
 import { Alert, Box, Card, Chip, Collapse, Divider, Grid, Typography } from '@mui/material';
+import Link from 'components/common/Link';
 import GridHeader from 'components/common/Grid/GridHeader';
 import GridContainer from 'components/common/Grid/GridContainer';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -8,7 +10,10 @@ import { ExtendedVote } from 'lib/votes/interfaces';
 import NoVotesMessage from './NoVotesMessage';
 import VoteStatusChip from './VoteStatusChip';
 
-export default function VotesTable ({ votes }: { votes?: ExtendedVote[] }) {
+export default function VotesTable ({ votes }: { votes?: (ExtendedVote & { page: { path: string }})[] }) {
+
+  const router = useRouter();
+
   return (
     <>
       <GridHeader>
@@ -35,7 +40,9 @@ export default function VotesTable ({ votes }: { votes?: ExtendedVote[] }) {
       {votes?.map(vote => (
         <GridContainer key={vote.id}>
           <Grid item xs={6}>
-            {vote.title}
+            <Link href={getVoteUrl({ domain: router.query.domain as string, path: vote.page.path, voteId: vote.id })}>
+              {vote.title}
+            </Link>
           </Grid>
           <Grid item xs={2}>
             <VoteStatusChip status={vote.status} />
@@ -50,4 +57,8 @@ export default function VotesTable ({ votes }: { votes?: ExtendedVote[] }) {
       ))}
     </>
   );
+}
+
+function getVoteUrl ({ domain, path, voteId }: { domain: string, path: string, voteId: string }) {
+  return `/${domain}/${path}?voteId=${voteId}`;
 }
