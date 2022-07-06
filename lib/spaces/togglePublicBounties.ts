@@ -2,7 +2,7 @@ import { Space } from '@prisma/client';
 import { prisma } from 'db';
 import { validate } from 'uuid';
 import { DataNotFoundError, InvalidInputError } from '../utilities/errors';
-import { PublicBountyToggle } from '../bounties/interfaces';
+import { PublicBountyToggle } from './interfaces';
 
 export async function togglePublicBounties ({ spaceId, publicBountyBoard }: PublicBountyToggle): Promise<Space> {
 
