@@ -36,21 +36,26 @@ export function useImportDiscordRoles () {
     });
   });
 
+  // Remove the query string from the url as they are no longer needed after discord import
+  const urlWithoutQueryString = window.location.href.split('?')[0];
+
   useEffect(() => {
     if (data && !isValidating) {
       showMessage(`Successfully imported ${data.importedRoleCount} discord roles`, 'success');
       refreshRoles();
+      setTimeout(() => {
+        silentlyUpdateURL(urlWithoutQueryString);
+      }, 250);
     }
     else if (error) {
       // Major failure while trying to import discord server role
       showMessage(error.message || error.error || 'Something went wrong. Please try again', 'error');
+      silentlyUpdateURL(urlWithoutQueryString);
     }
     else if (serverConnectFailed) {
       showMessage('Failed to connect to Discord', 'warning');
     }
-    // Remove the query string from the url as they are no longer needed after discord import
-    const urlWithoutQueryString = window.location.href.split('?')[0];
-    silentlyUpdateURL(urlWithoutQueryString);
+
   }, [data, isValidating, serverConnectFailed]);
 
   return {
