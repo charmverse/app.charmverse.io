@@ -60,7 +60,6 @@ export function getTimeDifference (
 
   const timeDifference = timeToAssess.diff(baseTime, timeUnit);
 
-  // foo
   return timeDifference[`${timeUnit}s`];
 }
 
