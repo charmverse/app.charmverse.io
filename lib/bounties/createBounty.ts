@@ -4,6 +4,9 @@ import { setBountyPermissions } from 'lib/permissions/bounties';
 import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
 import { BountyCreationData } from './interfaces';
 
+/**
+ * You can create a bounty suggestion using only title, spaceId and createdBy. You will see many unit tests using this limited dataset, which will then default the bounty to suggestion status. Your logic should account for this.
+ */
 export async function createBounty ({
   title,
   spaceId,

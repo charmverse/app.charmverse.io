@@ -22,7 +22,7 @@ beforeAll(async () => {
 
 describe('listAvailableBounties', () => {
 
-  it('should only return the bounties the user has an explicit permission for', async () => {
+  it('should return the bounties has permissions for as well as bounty suggestions', async () => {
 
     // This will be used to create a bounty in a different space, and ensure we don't get bounties from that space
     const { space: otherSpace, user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, false);
@@ -32,53 +32,6 @@ describe('listAvailableBounties', () => {
       spaceId: space.id
     });
 
-    const bounties = await Promise.all([
-      createBounty({
-        createdBy: nonAdminUser.id,
-        spaceId: space.id,
-        title: 'Bounty by user'
-      }),
-      createBounty({
-        createdBy: otherUser.id,
-        spaceId: otherSpace.id,
-        title: 'Bounty by other user'
-      }),
-      createBounty({
-        createdBy: nonAdminUser.id,
-        spaceId: space.id,
-        title: 'Bounty by role'
-      }),
-      createBounty({
-        createdBy: nonAdminUser.id,
-        spaceId: space.id,
-        title: 'Bounty by space you cant see'
-      }),
-      createBounty({
-        createdBy: nonAdminUser.id,
-        spaceId: space.id,
-        title: 'Bounty by space'
-      }),
-      // User did not create this, so they should not see it
-      createBounty({
-        createdBy: nonAdminUser.id,
-        spaceId: space.id,
-        title: 'Bounty by space'
-      })
-    ]);
-
-    const [bountyByUser, bountyByOtherUser, bountyByRole, bountyBySpace, bountyByPublic, invisibleBounty] = bounties;
-
-    // 1/4 - Permission the user
-    await addBountyPermissionGroup({
-      level: 'viewer',
-      resourceId: bountyByUser.id,
-      assignee: {
-        group: 'user',
-        id: extraUser.id
-      }
-    });
-
-    // 2/4 - Permission the role
     const role = await generateRole({
       spaceId: space.id,
       createdBy: nonAdminUser.id
@@ -89,41 +42,118 @@ describe('listAvailableBounties', () => {
       userId: extraUser.id
     });
 
-    await addBountyPermissionGroup({
-      level: 'viewer',
-      resourceId: bountyByRole.id,
-      assignee: {
-        group: 'role',
-        id: role.id
-      }
-    });
+    const bounties = await Promise.all([
+      createBounty({
+        createdBy: nonAdminUser.id,
+        spaceId: space.id,
+        title: 'Bounty with user permission',
+        status: 'open',
+        rewardAmount: 1,
+        rewardToken: 'ETH',
+        permissions: {
+          viewer: [{
+            group: 'user',
+            id: extraUser.id
+          }]
+        }
+      }),
+      createBounty({
+        createdBy: nonAdminUser.id,
+        spaceId: space.id,
+        title: 'Bounty with role permission',
+        status: 'open',
+        rewardAmount: 1,
+        rewardToken: 'ETH',
+        permissions: {
+          viewer: [{
+            group: 'role',
+            id: role.id
+          }]
+        }
+      }),
+      createBounty({
+        createdBy: nonAdminUser.id,
+        spaceId: space.id,
+        title: 'Bounty with space permission',
+        status: 'open',
+        rewardAmount: 1,
+        rewardToken: 'ETH',
+        permissions: {
+          viewer: [{
+            group: 'space',
+            id: space.id
+          }]
+        }
+      }),
+      createBounty({
+        createdBy: nonAdminUser.id,
+        spaceId: space.id,
+        title: 'Bounty with public permission',
+        status: 'open',
+        rewardAmount: 1,
+        rewardToken: 'ETH',
+        permissions: {
+          viewer: [{
+            group: 'space',
+            id: space.id
+          }]
+        }
+      }),
+      // Create bounty will create a permission for the space when bounty suggestion is created. There is no extra logic in listAvailableBounties. It simply queries existing permissions
+      createBounty({
+        createdBy: nonAdminUser.id,
+        spaceId: space.id,
+        title: 'Bounty suggestion',
+        status: 'suggestion'
+      }),
+      // -------- Invisible bounties -------
+      // Bounty in current space but different user
+      createBounty({
+        createdBy: nonAdminUser.id,
+        spaceId: space.id,
+        title: 'Bounty by other space user',
+        status: 'open',
+        rewardAmount: 1,
+        rewardToken: 'ETH'
+      }),
+      // Bounty in different space we shouldn't see
+      createBounty({
+        createdBy: otherUser.id,
+        spaceId: otherSpace.id,
+        title: 'Bounty in other space',
+        status: 'open',
+        rewardAmount: 1,
+        rewardToken: 'ETH'
+      })
+    ]);
 
-    // 3/4 - Permission the space
-    await addBountyPermissionGroup({
-      level: 'viewer',
-      resourceId: bountyBySpace.id,
-      assignee: {
-        group: 'space',
-        id: space.id
-      }
-    });
-
-    // 4/4 - Permission the public
-    await addBountyPermissionGroup({
-      level: 'viewer',
-      resourceId: bountyByPublic.id,
-      assignee: {
-        group: 'public',
-        id: undefined
-      }
-    });
+    const [
+      bountyWithUserPermission,
+      bountyWithRolePermission,
+      bountyWithSpacePermission,
+      bountyWithPublicPermission,
+      bountySuggestion,
+      bountyByOtherUser,
+      bountyInOtherSpace
+    ] = bounties;
 
     const available = await listAvailableBounties({
       spaceId: space.id,
       userId: extraUser.id
     });
 
-    expect(available.length).toBe(4);
+    expect(available.length).toBe(5);
+
+    // Check for created bounties
+    expect(available.some(b => b.id === bountyWithUserPermission.id)).toBe(true);
+    expect(available.some(b => b.id === bountyWithRolePermission.id)).toBe(true);
+    expect(available.some(b => b.id === bountyWithSpacePermission.id)).toBe(true);
+    expect(available.some(b => b.id === bountyWithPublicPermission.id)).toBe(true);
+    expect(available.some(b => b.id === bountySuggestion.id)).toBe(true);
+
+    // Make sure these are missing
+    expect(available.every(b => b.id !== bountyInOtherSpace.id)).toBe(true);
+    expect(available.every(b => b.id !== bountyByOtherUser.id)).toBe(true);
 
     // Cleanup bounties
     await prisma.bounty.deleteMany({
@@ -234,6 +264,9 @@ describe('listAvailableBounties', () => {
         createdBy: otherUser.id,
         spaceId: otherSpace.id,
         title: 'Invisible bounty',
+        status: 'open',
+        rewardAmount: 1,
+        rewardToken: 'ETH',
         permissions: {
           creator: [{
             group: 'user',
@@ -299,6 +332,9 @@ describe('listAvailableBounties', () => {
         createdBy: otherUser.id,
         spaceId: otherSpace.id,
         title: 'Invisible bounty',
+        status: 'open',
+        rewardAmount: 1,
+        rewardToken: 'ETH',
         permissions: {
           creator: [{
             group: 'user',
