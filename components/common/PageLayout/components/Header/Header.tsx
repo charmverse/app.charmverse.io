@@ -32,7 +32,7 @@ import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import Account from '../Account';
 import ShareButton from '../ShareButton';
 import PageTitleWithBreadcrumbs from './PageTitleWithBreadcrumbs';
-import { CreateVoteButton } from './CreateVoteButton';
+import CreateVoteModal from '../CreateVoteModal';
 
 export const headerHeight = 56;
 
@@ -65,6 +65,7 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
   const pageType = (currentPage as Page)?.type;
   const isExportablePage = pageType === 'card' || pageType === 'page';
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   async function toggleFavorite () {
     if (!currentPage || !user) return;
@@ -127,7 +128,6 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
         <Box display='flex' alignItems='center'>
           {isPage && (
             <>
-              {currentSpacePermissions?.createVote && <CreateVoteButton />}
               {currentPage?.deletedAt === null && <ShareButton headerHeight={headerHeight} />}
               <Tooltip title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} arrow placement='bottom'>
                 <IconButton size='small' sx={{ ml: 1 }} onClick={toggleFavorite} color='inherit'>
@@ -159,36 +159,53 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
               >
                 <List dense>
                   {isPage && (
-                  <>
-                    <ListItemButton onClick={() => {
-                      setCurrentPageActionDisplay('comments');
-                      setPageMenuOpen(false);
-                    }}
-                    >
-                      <CommentOutlinedIcon
-                        fontSize='small'
-                        sx={{
-                          mr: 1
-                        }}
-                      />
-                      <ListItemText primary='View comments' />
-                    </ListItemButton>
-                    <ListItemButton onClick={() => {
-                      setCurrentPageActionDisplay('votes');
-                      setPageMenuOpen(false);
-                    }}
-                    >
-                      <HowToVoteOutlinedIcon
-                        fontSize='small'
-                        sx={{
-                          mr: 1
-                        }}
-                      />
-                      <ListItemText primary='View votes' />
-                    </ListItemButton>
-                  </>
+                    <>
+                      {currentSpacePermissions?.createVote && (
+                      <ListItemButton onClick={() => {
+                        setIsModalOpen(true);
+                      }}
+                      >
+                        <HowToVoteOutlinedIcon
+                          fontSize='small'
+                          sx={{
+                            mr: 1
+                          }}
+                        />
+                        <ListItemText primary='Create a vote' />
+                      </ListItemButton>
+                      )}
+                      <ListItemButton onClick={() => {
+                        setCurrentPageActionDisplay('votes');
+                        setPageMenuOpen(false);
+                      }}
+                      >
+                        <HowToVoteOutlinedIcon
+                          fontSize='small'
+                          sx={{
+                            mr: 1
+                          }}
+                        />
+                        <ListItemText primary='View votes' />
+                      </ListItemButton>
+                      <PublishToSnapshot page={currentPage as Page} />
+                    </>
                   )}
                   <Divider />
+                  {isPage && (
+                  <ListItemButton onClick={() => {
+                    setCurrentPageActionDisplay('comments');
+                    setPageMenuOpen(false);
+                  }}
+                  >
+                    <CommentOutlinedIcon
+                      fontSize='small'
+                      sx={{
+                        mr: 1
+                      }}
+                    />
+                    <ListItemText primary='View comments' />
+                  </ListItemButton>
+                  )}
                   <ListItemButton onClick={() => {
                     exportMarkdown();
                     setPageMenuOpen(false);
@@ -204,8 +221,6 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
                   </ListItemButton>
 
                   {/* Publishing to snapshot */}
-
-                  <PublishToSnapshot page={currentPage as Page} />
                   <Divider />
                   <ListItemButton>
                     <FormControlLabel
@@ -249,6 +264,15 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
           <Account />
         </Box>
       </Box>
+      <CreateVoteModal
+        open={isModalOpen}
+        postCreateVote={() => {
+          setIsModalOpen(false);
+        }}
+        onClose={() => {
+          setIsModalOpen(false);
+        }}
+      />
     </StyledToolbar>
   );
 }
