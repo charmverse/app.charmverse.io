@@ -28,7 +28,7 @@ beforeAll(async () => {
 });
 
 describe('POST /api/spaces/[id]/set-public-bounty-board - Make the space bounty board public or private', () => {
-  it('should update the public bounty board status and return the space, responding with 200', async () => {
+  it('should update a space`s public bounty board status, set its mode to "custom" and return the space, responding with 200', async () => {
 
     const update: Pick<PublicBountyToggle, 'publicBountyBoard'> = {
       publicBountyBoard: true
@@ -41,6 +41,10 @@ describe('POST /api/spaces/[id]/set-public-bounty-board - Make the space bounty 
       .expect(200)).body as Space;
 
     expect(updatedSpace.publicBountyBoard).toBe(true);
+
+    // Public bounty board toggle may be set from bounties page or space permissions page when in custom mode.
+    // This breaks any link with a permission preset (read-only, collaborative, public workspace), to ensure the preset description does not become misleading (as bounties public status may be different from permission preset)
+    expect(updatedSpace.permissionConfigurationMode).toBe('custom');
 
     // Make a second request to ensure the value is actually being changed
     update.publicBountyBoard = false;
