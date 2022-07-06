@@ -25,24 +25,9 @@ export async function getVoteTasks (userId: string): Promise<VoteTask[]> {
     orderBy: {
       deadline: 'asc'
     },
-    select: {
-      id: true,
-      title: true,
-      pageId: true,
-      spaceId: true,
-      deadline: true,
-      page: {
-        select: {
-          title: true,
-          path: true
-        }
-      },
-      space: {
-        select: {
-          name: true,
-          domain: true
-        }
-      }
+    include: {
+      page: true,
+      space: true
     }
   });
 

@@ -20,7 +20,7 @@ const charmverseUrl = process.env.DOMAIN;
 const MAX_ITEMS_PER_TASK = 3;
 const MAX_CHAR = 60;
 type TemplateUser = Pick<User, 'id' | 'username'> & { email: string };
-const buttonStyle = { color: '#ffffff', lineHeight: '120%', textDecoration: 'none', borderRadius: '3px', fontWeight: '600', padding: '15px 40px', background: '#009Fb7' };
+const buttonStyle = { color: '#ffffff', lineHeight: '120%', textDecoration: 'none', borderRadius: '3px', fontWeight: '600', padding: '10px 30px', background: '#009Fb7' };
 const h2Style = { lineHeight: '1.2em', fontSize: '24px', fontWeight: 'bold', marginTop: '10px' };
 
 export interface PendingTasksProps {
@@ -57,11 +57,22 @@ export default function PendingTasks (props: PendingTasksProps) {
   const mentionSection = totalMentionTasks > 0 ? (
     <>
       <MjmlText>
-        <a
-          href={nexusDiscussionLink}
+        <div style={{
+          marginBottom: 15
+        }}
         >
-          <h2 style={{ marginBottom: 0 }}>{totalMentionTasks} Mention{totalMentionTasks > 1 ? 's' : ''}</h2>
-        </a>
+          <a
+            href={nexusDiscussionLink}
+            style={{
+              marginRight: 15
+            }}
+          >
+            <span style={h2Style}>{totalMentionTasks} Mention{totalMentionTasks > 1 ? 's' : ''}</span>
+          </a>
+          <a href={nexusVoteLink} style={buttonStyle}>
+            View
+          </a>
+        </div>
       </MjmlText>
       {props.mentionedTasks.slice(0, MAX_ITEMS_PER_TASK).map(mentionedTask => (
         <MentionTask
@@ -76,7 +87,10 @@ export default function PendingTasks (props: PendingTasksProps) {
   const voteSection = totalVoteTasks > 0 ? (
     <>
       <MjmlText>
-        <div>
+        <div style={{
+          marginBottom: 15
+        }}
+        >
           <a
             href={nexusVoteLink}
             style={{
@@ -111,7 +125,7 @@ export default function PendingTasks (props: PendingTasksProps) {
               marginRight: 15
             }}
           >
-            <span style={h2Style}>{totalGnosisSafeTasks} Multisig transaction{totalGnosisSafeTasks > 1 ? 's' : ''}</span>
+            <span style={h2Style}>{totalGnosisSafeTasks} Multisig{totalGnosisSafeTasks > 1 ? 's' : ''}</span>
           </a>
           <a href={nexusMultisigLink} style={buttonStyle}>
             Sign
@@ -134,7 +148,7 @@ export default function PendingTasks (props: PendingTasksProps) {
           <Header />
 
           <MjmlText paddingBottom={0} paddingTop={0}>
-            <h2>{props.totalTasks} tasks need your attention.</h2>
+            <h3>{props.totalTasks} tasks need your attention.</h3>
           </MjmlText>
           <MjmlButton align='left' padding-bottom='20px' href={`${charmverseUrl}/nexus`}>
             View
@@ -161,13 +175,14 @@ function VoteTaskMjml ({ task }: {task: VoteTask}) {
       <div style={{ fontWeight: 'bold', color: '#000', marginBottom: 5 }}>
         {task.title.length > MAX_CHAR ? `${task.title.slice(0, MAX_CHAR)}...` : task.title}
       </div>
-      <h2 style={{
+      <div style={{
         fontSize: 16,
         marginBottom: 5,
-        color: greyColor2
+        color: greyColor2,
+        fontWeight: 500
       }}
       >{pageWorkspaceTitle.length > MAX_CHAR ? `${pageWorkspaceTitle.slice(0, MAX_CHAR)}...` : pageWorkspaceTitle}
-      </h2>
+      </div>
       <div style={{
         color: darkModeColors.red,
         fontSize: 14,
@@ -187,13 +202,14 @@ function MentionTask ({ task: { text, spaceName, pageTitle } }: {task: Mentioned
       <div style={{ fontWeight: 'bold', color: '#000', marginBottom: 5 }}>
         {text.length > MAX_CHAR ? `${text.slice(0, MAX_CHAR)}...` : text}
       </div>
-      <h2 style={{
+      <div style={{
         fontSize: 16,
         marginBottom: 5,
-        color: greyColor2
+        color: greyColor2,
+        fontWeight: 500
       }}
       >{pageWorkspaceTitle.length > MAX_CHAR ? `${pageWorkspaceTitle.slice(0, MAX_CHAR)}...` : pageWorkspaceTitle}
-      </h2>
+      </div>
     </MjmlText>
   );
 }

@@ -102,7 +102,7 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
             transactionId: result.txHash,
             chainId: gnosisSafeChainId.toString()
           });
-          await charmClient.paySubmission(transaction.applicationId);
+          await charmClient.markSubmissionAsPaid(transaction.applicationId);
         })
       );
 

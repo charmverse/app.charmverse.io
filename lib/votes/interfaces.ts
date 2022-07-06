@@ -1,4 +1,4 @@
-import { User, UserVote, Vote, VoteOptions } from '@prisma/client';
+import { Page, Space, User, UserVote, Vote, VoteOptions } from '@prisma/client';
 
 export const DEFAULT_THRESHOLD = 50;
 
@@ -26,18 +26,7 @@ export interface ExtendedVote extends Vote {
     voteOptions: VoteOptions[]
 }
 
-export type VoteTask = {
-  space: {
-    name: string;
-    domain: string;
-  };
-  page: {
-      title: string;
-      path: string;
-  };
-  id: string
-  title: string;
-  pageId: string;
-  spaceId: string;
-  deadline: Date;
+export type VoteTask = Vote & {
+  page: Page
+  space: Space
 }
