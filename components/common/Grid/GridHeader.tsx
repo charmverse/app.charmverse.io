@@ -1,0 +1,23 @@
+import { ComponentProps } from 'react';
+import { Grid } from '@mui/material';
+import styled from '@emotion/styled';
+
+const StyledGrid = styled(Grid)`
+
+  // typography taken from focalboard styles
+  color: rgba(var(--center-channel-color-rgb), 0.6);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding-bottom: ${({ theme }) => theme.spacing(1)};
+
+  border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
+  width: 100%;
+`;
+
+export default function GridContainer ({ children, ...props }: ComponentProps<typeof Grid>) {
+  return (
+    <StyledGrid container alignItems='flex-end' {...props}>
+      {children}
+    </StyledGrid>
+  );
+}
