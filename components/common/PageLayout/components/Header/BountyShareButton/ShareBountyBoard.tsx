@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
+import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Collapse from '@mui/material/Collapse';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -13,6 +14,8 @@ import { useSpaces } from 'hooks/useSpaces';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { configurationModeName } from 'lib/permissions/meta/preset-templates';
+import { SpacePermissionConfigurationMode } from '@prisma/client';
 
 const StyledInput = styled(Input)`
   font-size: .8em;
@@ -38,7 +41,11 @@ const CopyButton = styled((props: any) => <Button color='secondary' variant='out
   border-bottom-color: transparent;
 `;
 
-export default function ShareBountyBoard () {
+interface Props {
+  padding?: number
+}
+
+export default function ShareBountyBoard ({ padding = 1 }: Props) {
 
   const router = useRouter();
   const [copied, setCopied] = useState<boolean>(false);
@@ -88,12 +95,12 @@ export default function ShareBountyBoard () {
         display='flex'
         justifyContent='space-between'
         alignItems='center'
-        padding={1}
+        padding={padding}
       >
 
         <Box>
 
-          <Typography>Share to web</Typography>
+          <Typography>Make bounties public</Typography>
 
           <Typography variant='body2' color='secondary'>
             {bountiesArePublic
@@ -107,10 +114,21 @@ export default function ShareBountyBoard () {
           onChange={togglePublic}
         />
       </Box>
+      {
+        space?.permissionConfigurationMode !== 'custom' && (
+          <Alert severity='info'>
+            Your bounty board is {bountiesArePublic ? 'public' : 'reserved to workspace members'} because you are using the <b>{configurationModeName[space?.permissionConfigurationMode as SpacePermissionConfigurationMode].toLowerCase()}</b> preset.
+
+            <br />
+
+            If you update the public bounty board setting manually, your space permissions configuration will be updated to custom.
+          </Alert>
+        )
+      }
       <Collapse in={bountiesArePublic}>
         {
           shareLink && (
-          <Box p={1}>
+          <Box p={padding} sx={{ mt: padding === 0 ? 1 : undefined }}>
             <StyledInput
               fullWidth
               disabled

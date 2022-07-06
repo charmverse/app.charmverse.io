@@ -13,6 +13,7 @@ import useIsAdmin from 'hooks/useIsAdmin';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useRef, useState } from 'react';
 import InviteLinkList from 'components/settings/contributors/InviteLinks/InviteLinks';
+import ShareBountyBoard from 'components/common/PageLayout/components/Header/BountyShareButton/ShareBountyBoard';
 import ImportDiscordRolesMenuItem from './components/ImportDiscordRolesMenuItem';
 import RoleForm from './components/RoleForm';
 import RoleRow from './components/RoleRow';
@@ -58,6 +59,10 @@ export default function RoleSettings () {
           <>
             <br />
             <SpacePermissions targetGroup='space' id={space?.id as string} />
+
+            <br />
+
+            <ShareBountyBoard padding={0} />
 
             <br />
             {/* Default page permissions */}
