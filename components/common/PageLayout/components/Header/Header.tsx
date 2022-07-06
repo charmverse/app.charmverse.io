@@ -7,7 +7,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import SunIcon from '@mui/icons-material/WbSunny';
-import { Divider, FormControlLabel, Switch } from '@mui/material';
+import { Divider, FormControlLabel, Switch, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
@@ -247,7 +247,7 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
                           }}
                         />
                       )}
-                      label='Full Width'
+                      label={<Typography variant='body2'>Full Width</Typography>}
                     />
                   </ListItemButton>
                 </List>
