@@ -8,5 +8,5 @@ export type SpaceConfigurationPreset = Exclude<SpacePermissionConfigurationMode,
 
 export interface SpacePermissionTemplate {
   spaceOperations: Record<SpaceOperation, boolean>
-  pagePermissionDefaults: Pick<Space, 'defaultPagePermissionGroup' | 'defaultPublicPages'>
+  pagePermissionDefaults: Pick<Space, 'defaultPagePermissionGroup' | 'defaultPublicPages' | 'publicBountyBoard'>
 }
