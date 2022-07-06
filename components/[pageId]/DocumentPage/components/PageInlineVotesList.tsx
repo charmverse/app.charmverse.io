@@ -78,7 +78,7 @@ export default function PageInlineVotesList () {
         <PageActionToggle />
         <Typography fontWeight={600} fontSize={20}>Votes</Typography>
       </Box>
-      <ViewOptions voteSort={voteSort} voteFilter={voteFilter} setVoteFilter={setVoteFilter} setVoteSort={setVoteSort} />
+      <ViewOptions showPosition={true} voteSort={voteSort} voteFilter={voteFilter} setVoteFilter={setVoteFilter} setVoteSort={setVoteSort} />
       <StyledPageInlineVotesList>
         {sortedVotes.length === 0
           ? <NoVotesMessage message={`No ${voteFilter === 'completed' ? 'completed' : 'in progress'} votes yet`} />
@@ -89,18 +89,19 @@ export default function PageInlineVotesList () {
 }
 
 interface ViewOptionsProps {
+  showPosition?: boolean;
   voteSort: VoteSort;
   voteFilter: VoteFilter;
   setVoteFilter: (value: VoteFilter) => void;
   setVoteSort: (value: VoteSort) => void;
 }
 
-export function ViewOptions ({ voteSort, voteFilter, setVoteFilter, setVoteSort }: ViewOptionsProps) {
+export function ViewOptions ({ voteSort, voteFilter, setVoteFilter, setVoteSort, showPosition }: ViewOptionsProps) {
   return (
     <Box display='flex' gap={1} alignItems='center'>
       <InputLabel>Sort</InputLabel>
-      <Select label='Filter' size='small' variant='outlined' value={voteSort} onChange={(e) => setVoteSort(e.target.value as VoteSort)} sx={{ mr: 2 }}>
-        <MenuItem value='position'>Position</MenuItem>
+      <Select variant='outlined' value={voteSort} onChange={(e) => setVoteSort(e.target.value as VoteSort)} sx={{ mr: 2 }}>
+        {showPosition && <MenuItem value='position'>Position</MenuItem>}
         <MenuItem value='highest_votes'>Votes</MenuItem>
         <MenuItem value='latest_deadline'>Deadline</MenuItem>
         <MenuItem value='latest_created'>Created</MenuItem>

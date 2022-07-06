@@ -18,10 +18,10 @@ export default function VotesTable ({ votes }: { votes?: ExtendedVote[] }) {
           Status
         </Grid>
         <Grid item xs={2}>
-          Started
+          Deadline
         </Grid>
         <Grid item xs={2}>
-          Deadline
+          Created
         </Grid>
       </GridHeader>
       {!votes && (
@@ -41,10 +41,10 @@ export default function VotesTable ({ votes }: { votes?: ExtendedVote[] }) {
             <VoteStatusChip status={vote.status} />
           </Grid>
           <Grid item xs={2}>
-            {humanFriendlyDate(vote.createdAt)}
+            {DateTime.fromISO(vote.deadline as any).toRelative({ base: DateTime.now() })}
           </Grid>
           <Grid item xs={2}>
-            {DateTime.fromISO(vote.deadline as any).toRelative({ base: DateTime.now() })}
+            {humanFriendlyDate(vote.createdAt)}
           </Grid>
         </GridContainer>
       ))}
