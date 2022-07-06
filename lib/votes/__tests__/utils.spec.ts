@@ -40,9 +40,6 @@ describe('voting status', () => {
     expect(isVotingClosed({
       ...vote,
       status: VOTE_STATUS[0] // InProgress
-    })).toBe(false);
-    expect(isVotingClosed({
-      ...vote,
       deadline: new Date('2777-07-07') // future deadline
     })).toBe(false);
   });
