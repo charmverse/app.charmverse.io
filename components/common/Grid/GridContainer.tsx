@@ -11,6 +11,13 @@ const StyledGrid = styled(Grid)`
   &:hover {
     background-color: rgba(var(--center-channel-color-rgb),.05);
   }
+
+  .show-on-hover {
+    visibility: hidden;
+  }
+  &:hover .show-on-hover {
+    visibility: visible;
+  }
 `;
 
 export default function GridContainer ({ children, ...props }: ComponentProps<typeof Grid>) {

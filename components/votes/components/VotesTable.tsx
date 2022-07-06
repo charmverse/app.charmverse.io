@@ -5,6 +5,7 @@ import Link from 'components/common/Link';
 import GridHeader from 'components/common/Grid/GridHeader';
 import GridContainer from 'components/common/Grid/GridContainer';
 import LoadingComponent from 'components/common/LoadingComponent';
+import Button from 'components/common/Button';
 import { humanFriendlyDate, toMonthDate } from 'lib/utilities/dates';
 import { ExtendedVote } from 'lib/votes/interfaces';
 import NoVotesMessage from './NoVotesMessage';
@@ -42,7 +43,10 @@ export default function VotesTable ({ votes }: { votes?: (ExtendedVote & { page:
         <GridContainer key={vote.id}>
           <Grid item xs={8} sm={8} md={6}>
             <Link href={getVoteUrl({ domain: router.query.domain as string, path: vote.page.path, voteId: vote.id })}>
-              {vote.title}
+              <Box display='flex' alignItems='center' justifyContent='space-between'>
+                {vote.title}
+                <Button className='show-on-hover' color='secondary' variant='outlined' size='small'>Open</Button>
+              </Box>
             </Link>
           </Grid>
           <Grid item xs={4} md={2} display='flex' justifyContent='center'>
