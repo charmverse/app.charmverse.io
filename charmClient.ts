@@ -691,8 +691,8 @@ class CharmClient {
     });
   }
 
-  setPublicBountyBoard ({ publicBountyBoard, spaceId }: PublicBountyToggle): Promise<PublicBountyToggle> {
-    return http.POST<PublicBountyToggle>(`/api/spaces/${spaceId}/set-public-bounty-board`, {
+  setPublicBountyBoard ({ publicBountyBoard, spaceId }: PublicBountyToggle): Promise<Space> {
+    return http.POST<Space>(`/api/spaces/${spaceId}/set-public-bounty-board`, {
       publicBountyBoard
     });
   }

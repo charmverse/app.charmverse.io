@@ -5,6 +5,7 @@ import { usePageTitle } from 'hooks/usePageTitle';
 import { usePages } from 'hooks/usePages';
 import { useRouter } from 'next/router';
 import { ReactNode } from 'react';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { StyledPageIcon } from '../PageIcon';
 
 const NEXUS_ROUTES = ['/nexus', '/profile', '/integrations'];
@@ -127,6 +128,26 @@ function BountyPageTitle ({ basePath }: { basePath: string }) {
   );
 }
 
+function PublicBountyPageTitle ({ basePath }: { basePath: string }) {
+  const [pageTitle] = usePageTitle();
+  const [space] = useCurrentSpace();
+  return (
+    <PageTitleWrapper>
+      <BreadCrumb>
+        {
+        space && (
+          <Link href={`${basePath}`}>
+            {space.name}
+          </Link>
+        )
+      }
+
+      </BreadCrumb>
+      Bounties
+    </PageTitleWrapper>
+  );
+}
+
 function NexusPageTitle ({ route }: { route: string }) {
   const [pageTitle] = usePageTitle();
 
@@ -162,7 +183,11 @@ function EmptyPageTitle () {
 
 export default function PageTitleWithBreadcrumbs () {
   const router = useRouter();
-  if (router.route === '/[domain]/bounties/[bountyId]') {
+
+  if (router.route === '/share/[...pageId]' && router.query?.pageId?.[1] === 'bounties') {
+    return <PublicBountyPageTitle basePath={`${router.asPath}`} />;
+  }
+  else if (router.route === '/[domain]/bounties/[bountyId]') {
     return <BountyPageTitle basePath={`/${router.query.domain}`} />;
   }
   else if (router.route === '/[domain]/[pageId]') {

@@ -7,7 +7,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import SunIcon from '@mui/icons-material/WbSunny';
-import { Divider, FormControlLabel, Switch } from '@mui/material';
+import { Divider, FormControlLabel, Switch, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
@@ -31,6 +31,7 @@ import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import Account from '../Account';
 import ShareButton from '../ShareButton';
 import PageTitleWithBreadcrumbs from './PageTitleWithBreadcrumbs';
+import BountyShareButton from './BountyShareButton/BountyShareButton';
 
 export const headerHeight = 56;
 
@@ -62,6 +63,8 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
   const pageType = (currentPage as Page)?.type;
   const isExportablePage = pageType === 'card' || pageType === 'page';
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
+
+  const isBountyBoard = router.route === '/[domain]/bounties';
 
   async function toggleFavorite () {
     if (!currentPage || !user) return;
@@ -122,6 +125,12 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
       >
         <PageTitleWithBreadcrumbs />
         <Box display='flex' alignItems='center'>
+          {
+            isBountyBoard && (
+              <BountyShareButton headerHeight={headerHeight} />
+            )
+          }
+
           {isPage && (
             <>
               {currentPage?.deletedAt === null && <ShareButton headerHeight={headerHeight} />}
@@ -232,6 +241,7 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
               </Popover>
             </Box>
           )}
+          {/** End of CharmEditor page specific header content */}
 
           {/** dark mode toggle */}
           {user && (
