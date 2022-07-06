@@ -36,11 +36,7 @@ function sortSelected (bountyStatuses: BountyStatus[]): BountyStatus[] {
   });
 }
 
-interface Props {
-  title?: string
-}
-
-export default function BountyList ({ title = 'Bounties' }: Props) {
+export default function BountyList () {
   const [displayBountyDialog, setDisplayBountyDialog] = useState(false);
   const { bounties } = useContext(BountiesContext);
 
@@ -91,8 +87,34 @@ export default function BountyList ({ title = 'Bounties' }: Props) {
     <ScrollableWindow>
       <Box py={3} sx={{ px: { xs: '40px', sm: '80px' }, minHeight: '80vh' }}>
         <Box display='flex' justifyContent='space-between' mb={3}>
-          <Typography variant='h1'>{title}</Typography>
-          <Box display='flex' justifyContent='flex-end'>
+
+        </Box>
+
+        <Box display='flex' justifyContent='space-between' alignContent='center' mb={3}>
+          {
+            bounties.length === 0 && (
+              <Typography variant='h6'>Getting started with bounties</Typography>
+            )
+          }
+
+          {
+          bounties.length > 0 && (
+            <Box>
+              {/* Filters for the bounties */}
+              <InputBountyStatus
+                onChange={(statuses) => {
+                  setSavedBountyFilters(sortSelected(statuses));
+                }}
+                renderSelectedInValue={true}
+                renderSelectedInOption={true}
+                defaultValues={savedBountyFilters}
+              />
+            </Box>
+          )
+
+            }
+
+          <Box justifyContent='flex-end' alignSelf='center'>
             { !!csvData.length
             && (
               <CSVLink data={csvData} filename='Gnosis Safe Airdrop.csv' style={{ textDecoration: 'none' }}>
@@ -106,7 +128,7 @@ export default function BountyList ({ title = 'Bounties' }: Props) {
             {
               currentUserPermissions && (
                 <Button
-                  sx={{ ml: 1 }}
+                  sx={{ ml: 1, height: '35px' }}
                   onClick={() => {
                     setDisplayBountyDialog(true);
                   }}
@@ -119,48 +141,34 @@ export default function BountyList ({ title = 'Bounties' }: Props) {
           </Box>
         </Box>
 
-        {/* Filters for the bounties */}
-
-        {
-          bounties.length > 0 && (
-            <Box display='flex' alignContent='center' justifyContent='flex-start' mb={3}>
-              <InputBountyStatus
-                onChange={(statuses) => {
-                  setSavedBountyFilters(sortSelected(statuses));
-                }}
-                renderSelectedInValue={true}
-                renderSelectedInOption={true}
-                defaultValues={savedBountyFilters}
-              />
-            </Box>
-          )
-        }
-
         {/* Onboarding video when no bounties exist */}
         {
             bounties.length === 0 && (
-              <>
-                <Typography variant='h6' sx={{ mb: 2 }}>Getting started with bounties</Typography>
-                <div>
+              <div>
 
-                  <iframe
-                    src='https://tiny.charmverse.io/bounties'
-                    style={{ maxWidth: '100%', border: '0 none' }}
-                    height='395px'
-                    width='700px'
-                    title='Bounties | Getting started with Charmverse'
-                  >
-                  </iframe>
+                <iframe
+                  src='https://tiny.charmverse.io/bounties'
+                  style={{ maxWidth: '100%', border: '0 none' }}
+                  height='395px'
+                  width='700px'
+                  title='Bounties | Getting started with Charmverse'
+                >
+                </iframe>
 
-                </div>
-              </>
+              </div>
             )
           }
 
         {/* Current filter status doesn't have any matching bounties */}
         {
-            bounties.length > 0 && sortedBounties.length === 0 && <Typography paragraph={true}>No bounties were found</Typography>
-          }
+            bounties.length > 0 && sortedBounties.length === 0 && (
+            <Typography paragraph={true}>
+              {
+                savedBountyFilters.length === 0 ? 'Select one or multiple bounty statuses.' : 'No bounties matching the current filter status.'
+              }
+            </Typography>
+            )
+        }
 
         {/* List of bounties based on current filter */}
         {
