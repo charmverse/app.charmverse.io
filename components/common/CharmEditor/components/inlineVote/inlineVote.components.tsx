@@ -1,4 +1,4 @@
-import { PluginKey, TextSelection } from '@bangle.dev/pm';
+import { Mark, MarkType, PluginKey, TextSelection } from '@bangle.dev/pm';
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { hideSelectionTooltip } from '@bangle.dev/tooltip/selection-tooltip';
 import AddCircle from '@mui/icons-material/AddCircle';
@@ -14,9 +14,11 @@ import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
 import { DateTime } from 'luxon';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { findChildrenByMark, NodeWithPos } from 'prosemirror-utils';
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
 import PageInlineVote from '../PageInlineVote';
+import { markName } from './inlineVote.constants';
 import { InlineVotePluginState } from './inlineVote.plugins';
 import { updateInlineVote } from './inlineVote.utils';
 
@@ -37,8 +39,47 @@ export function InlineVoteList ({ pluginKey }: {pluginKey: PluginKey<InlineVoteP
   const cardId = (new URLSearchParams(window.location.href)).get('cardId');
   const { currentPageActionDisplay } = usePageActionDisplay();
   const inlineVoteDetailModal = usePopupState({ variant: 'popover', popupId: 'inline-votes-detail' });
-  const { inlineVotes } = useInlineVotes();
+  const { inlineVotes, isValidating } = useInlineVotes();
   const inProgressVoteIds = ids.filter(voteId => inlineVotes[voteId]?.status === 'InProgress');
+
+  // Using a ref so that its done only once
+  const hasRemovedCompletedVoteMarks = useRef(false);
+
+  useEffect(() => {
+    if (!hasRemovedCompletedVoteMarks.current) {
+      const inlineVotesList = Object.keys(inlineVotes);
+      const inProgressVoteIdsSet = new Set(inlineVotesList.filter(voteId => inlineVotes[voteId].status === 'InProgress'));
+      const completedVoteNodeWithMarks: (NodeWithPos & {mark: Mark})[] = [];
+      if (!isValidating && inlineVotesList.length !== 0) {
+        const inlineVoteMarkSchema = view.state.schema.marks[markName] as MarkType;
+        const inlineVoteNodes = findChildrenByMark(view.state.doc, inlineVoteMarkSchema);
+        for (const inlineVoteNode of inlineVoteNodes) {
+          // Find the inline vote mark for the node
+          const inlineVoteMark = inlineVoteNode.node.marks.find(mark => mark.type.name === inlineVoteMarkSchema.name);
+          // If the mark point to a vote that is not in progress, remove it from document
+          if (inlineVoteMark && !inProgressVoteIdsSet.has(inlineVoteMark.attrs.id)) {
+            completedVoteNodeWithMarks.push({
+              ...inlineVoteNode,
+              mark: inlineVoteMark
+            });
+          }
+        }
+        if (completedVoteNodeWithMarks.length !== 0) {
+          let tr = view.state.tr;
+          // Automatically remove marks for votes that are not in progress anymore
+          completedVoteNodeWithMarks.forEach(inlineVoteNodeWithMark => {
+            const from = inlineVoteNodeWithMark.pos;
+            const to = from + inlineVoteNodeWithMark.node.nodeSize;
+            tr = tr.removeMark(from, to, inlineVoteMarkSchema);
+          });
+          if (view.dispatch) {
+            view.dispatch(tr);
+          }
+        }
+        hasRemovedCompletedVoteMarks.current = true;
+      }
+    }
+  }, [inlineVotes, isValidating, view, hasRemovedCompletedVoteMarks]);
 
   if ((currentPageActionDisplay !== 'votes' || cardId) && show && inProgressVoteIds.length !== 0) {
     return (

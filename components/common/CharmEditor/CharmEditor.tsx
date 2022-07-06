@@ -292,7 +292,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{disablePageSpecificFe
       cursor: pointer;
     }
 
-    .charm-inline-vote.active {
+    .charm-inline-vote {
       background: rgba(0,171,255,0.14);
       border-bottom: 2px solid rgb(0,171,255);
       padding-bottom: 2px;

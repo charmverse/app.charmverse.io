@@ -18,7 +18,7 @@ export function findTotalInlineVotes (
     // Only count the non-resolved votes
     if (inlineVoteMark) {
       const vote = votes[inlineVoteMark.attrs.id];
-      if (vote && !voteIds.has(vote.id)) {
+      if (vote && !voteIds.has(vote.id) && vote.status === 'InProgress') {
         totalInlineVotes += 1;
       }
       voteIds.add(inlineVoteMark.attrs.id);

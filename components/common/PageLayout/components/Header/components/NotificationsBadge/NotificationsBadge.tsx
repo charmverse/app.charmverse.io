@@ -12,7 +12,7 @@ export default function NotificationsBadge () {
   const userNotificationState = user?.notificationState;
   // If the user has snoozed multisig tasks don't count them
   const totalTasks = tasks
-    ? (tasks.mentioned.unmarked.length + (userNotificationState
+    ? (tasks.votes.length + tasks.mentioned.unmarked.length + (userNotificationState
       ? (userNotificationState.snoozedUntil && new Date(userNotificationState.snoozedUntil) > new Date() ? 0
         : tasks.gnosis.length) : tasks.gnosis.length))
     : 0;
