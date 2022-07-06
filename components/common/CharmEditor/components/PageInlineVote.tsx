@@ -4,7 +4,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Box, Button, Card, Chip, Divider, FormLabel, IconButton, List, ListItem, ListItemText, Menu, MenuItem, Radio, Typography } from '@mui/material';
-import { VoteOptions, VoteStatus } from '@prisma/client';
+import { VoteOptions } from '@prisma/client';
 import Avatar from 'components/common/Avatar';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
@@ -16,18 +16,12 @@ import { DateTime } from 'luxon';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import { useMemo } from 'react';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
+import VoteStatusChip from 'components/votes/components/VoteStatusChip';
 
 interface PageInlineVoteProps {
   inlineVote: ExtendedVote
   detailed?: boolean
 }
-
-const VoteStatusLabelRecord: Record<VoteStatus, string> = {
-  Cancelled: 'Cancelled',
-  InProgress: 'In progress',
-  Passed: 'Passed',
-  Rejected: 'Rejected'
-};
 
 const StyledDiv = styled.div<{ detailed: boolean }>`
   background-color: ${({ theme, detailed }) => detailed && theme.palette.mode !== 'light' ? theme.palette.background.default : theme.palette.background.light};
@@ -136,7 +130,7 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
         >
           {hasPassedDeadline ? relativeDate : `${relativeDate?.replace(/^in/g, '')} left`}
         </Typography>
-        <Chip size='small' label={VoteStatusLabelRecord[inlineVote.status]} />
+        <VoteStatusChip size='small' status={inlineVote.status} />
       </Box>
       {description && (
       <Box my={1} mb={2}>{isDescriptionAbove && !detailed ? (
