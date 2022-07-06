@@ -40,11 +40,6 @@
     "test:server:ci": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local --override -- npx jest --config='./jest.config-server.ts'",
     "test:browser:ci": "dotenv -e .env.test.local --override -- npx jest --config='./jest.config-browser.ts'"
   },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "eslint --fix"
-    ]
-  },
   "dependencies": {
     "@apollo/client": "^3.6.2",
     "@aws-sdk/client-s3": "^3.67.0",
