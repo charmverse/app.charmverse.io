@@ -2,43 +2,24 @@ import { Box, Stack, Typography } from '@mui/material';
 import { useReducer, Reducer } from 'react';
 import useSWR from 'swr';
 import VoteIcon from '@mui/icons-material/HowToVoteOutlined';
-import { Vote, VoteStatus } from '@prisma/client';
+import { VoteStatus } from '@prisma/client';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import sortBy from 'lodash/sortBy';
+import { ExtendedVote } from 'lib/votes/interfaces';
 import charmClient from 'charmClient';
+import { ViewOptions, VoteSort, VoteFilter, sortVotes, filterVotes } from 'components/[pageId]/DocumentPage/components/PageInlineVotesList';
 import VotesTable from './components/VotesTable';
 
-// TODO: figure out how to determine the variant
-type VoteVariant = 'page' | 'page-inline';
-
-export interface UIVote extends Vote {
-  type: VoteVariant;
-}
-
 export interface ViewState {
-  variant: 'table' | 'columns';
-  sortBy: 'createdAt' | 'deadline' | 'title' | 'type';
+  sortBy: VoteSort;
+  filterBy: VoteFilter;
   visibleStatuses: VoteStatus[];
 }
 
-interface StatusOption {
-  id: VoteStatus;
-  label: string;
-  color: string;
-}
-
-const statusOptions: StatusOption[] = [
-  { id: 'InProgress', label: 'In Progress', color: 'propColorYellow' },
-  { id: 'Passed', label: 'Passed', color: 'propColorTeal' },
-  { id: 'Rejected', label: 'Rejected', color: 'propColorRed' },
-  { id: 'Cancelled', label: 'Cancelled', color: 'propColorGray' }
-];
-
 const defaultViewState: ViewState = {
-  variant: 'table',
-  sortBy: 'createdAt',
-  visibleStatuses: statusOptions.map(option => option.id)
+  sortBy: 'latest_deadline',
+  filterBy: 'in_progress',
+  visibleStatuses: ['InProgress', 'Passed', 'Rejected']
 };
 
 type ViewStateReducer = Reducer<ViewState, Partial<ViewState>>;
@@ -50,28 +31,25 @@ export default function VotesPage () {
   const [currentSpace] = useCurrentSpace();
   const { data } = useSWR(() => `votesBySpace/${currentSpace?.id}`, () => currentSpace ? charmClient.getVotesBySpace(currentSpace.id) : []);
 
-  const votes: UIVote[] | undefined = data?.map(vote => ({
-    ...vote,
-    type: 'page'
-  }));
+  const filteredVotes = data ? filterVotes(data, viewState.filterBy) : undefined;
+  const sortedVotes = filteredVotes ? sortVotes(filteredVotes, viewState.sortBy) : undefined;
 
-  const sortedVotes = sortBy(votes, viewState.sortBy);
-
-  function toggleVariant (variant: ViewState['variant']) {
-    setViewState({ variant });
+  function setVoteSort (sortBy: VoteSort) {
+    setViewState({ sortBy });
   }
 
-  function filterByStatus (visibleStatuses: ViewState['visibleStatuses']) {
-    setViewState({ visibleStatuses });
+  function setVoteFilter (filterBy: VoteFilter) {
+    setViewState({ filterBy });
   }
 
   return (
     <CenteredPageContent>
-      <Stack direction='row' alignItems='center' gap={1} mb={1}>
+      <Stack direction='row' alignItems='center' justifyContent='space-between' gap={1} mb={3}>
         {/* <VoteIcon fontSize='large' /> */}
         <Typography variant='h1'>
           <strong>Votes</strong>
         </Typography>
+        <ViewOptions voteSort={viewState.sortBy} voteFilter={viewState.filterBy} setVoteSort={setVoteSort} setVoteFilter={setVoteFilter} />
       </Stack>
       <VotesTable votes={data ? sortedVotes : undefined} />
     </CenteredPageContent>

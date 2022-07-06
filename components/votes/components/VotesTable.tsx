@@ -4,11 +4,11 @@ import GridHeader from 'components/common/Grid/GridHeader';
 import GridContainer from 'components/common/Grid/GridContainer';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { humanFriendlyDate } from 'lib/utilities/dates';
-import type { UIVote, ViewState } from '../VotesPage';
+import { ExtendedVote } from 'lib/votes/interfaces';
 import NoVotesMessage from './NoVotesMessage';
 import VoteStatusChip from './VoteStatusChip';
 
-export default function VotesTable ({ votes }: { votes?: UIVote[] }) {
+export default function VotesTable ({ votes }: { votes?: ExtendedVote[] }) {
   if (votes?.[0]) {
     votes[0].title = ' wdfgdsfg fsdgfdsg fdsg fdsgfdsg fsgfg sfdgfdsgfd gfg';
   }
@@ -31,7 +31,9 @@ export default function VotesTable ({ votes }: { votes?: UIVote[] }) {
         <LoadingComponent height='250px' isLoading={true} />
       )}
       {votes?.length === 0 && (
-        <NoVotesMessage message='There are no votes yet. Create a vote from an individual document to get started!' />
+        <Box height='250px' mt={2}>
+          <NoVotesMessage message='There are no votes yet. Create a vote from a page to get started!' />
+        </Box>
       )}
       {votes?.map(vote => (
         <GridContainer key={vote.id}>
