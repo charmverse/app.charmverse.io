@@ -38,7 +38,7 @@ export function InlineVoteList ({ pluginKey }: {pluginKey: PluginKey<InlineVoteP
   const { currentPageActionDisplay } = usePageActionDisplay();
   const inlineVoteDetailModal = usePopupState({ variant: 'popover', popupId: 'inline-votes-detail' });
   const { inlineVotes } = useInlineVotes();
-  const inProgressVoteIds = ids.filter(voteId => inlineVotes[voteId].status === 'InProgress');
+  const inProgressVoteIds = ids.filter(voteId => inlineVotes[voteId]?.status === 'InProgress');
 
   if ((currentPageActionDisplay !== 'votes' || cardId) && show && inProgressVoteIds.length !== 0) {
     return (
@@ -244,7 +244,7 @@ export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
               type='number'
               value={passThreshold}
               onChange={(e) => {
-                setPassThreshold(e.target.value as any);
+                setPassThreshold(Number(e.target.value as any));
               }}
               InputProps={{
                 inputProps: {
@@ -282,7 +282,7 @@ export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
             marginBottom: '4px',
             marginRight: '8px'
           }}
-          disabled={voteTitle.length === 0 || (voteType === 'custom' && (options.findIndex(option => option.name.length === 0) !== -1)) || (new Set(options.map(option => option.name)).size !== options.length)}
+          disabled={passThreshold > 100 || voteTitle.length === 0 || (voteType === 'custom' && (options.findIndex(option => option.name.length === 0) !== -1)) || (new Set(options.map(option => option.name)).size !== options.length)}
         >
           Create
         </Button>
