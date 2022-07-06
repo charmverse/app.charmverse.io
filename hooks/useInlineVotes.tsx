@@ -26,9 +26,10 @@ export const InlineVotesContext = createContext<Readonly<IContext>>({
 });
 
 export function InlineVotesProvider ({ children }: { children: ReactNode }) {
-  const { currentPageId } = usePages();
+  const { currentPageId, pages } = usePages();
   const [inlineVotes, setInlineVotes] = useState<IContext['inlineVotes']>({});
   const [user] = useUser();
+
   const cardId = typeof window !== 'undefined' ? (new URLSearchParams(window.location.href)).get('cardId') : null;
 
   const { data, isValidating } = useSWR(() => currentPageId && !cardId ? `pages/${currentPageId}/inline-votes` : null, async () => {
@@ -103,6 +104,20 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
       createdBy: user!.id,
       pageId: cardId ?? currentPageId,
       spaceId: currentSpace!.id
+    });
+
+    mutateTasks((tasks) => {
+      // Add the vote to the task
+      if (tasks) {
+        tasks.votes.push({
+          ...extendedVote,
+          space: currentSpace!,
+          page: pages[currentPageId]!
+        });
+      }
+      return tasks;
+    }, {
+      revalidate: false
     });
     setInlineVotes({
       ...inlineVotes,
