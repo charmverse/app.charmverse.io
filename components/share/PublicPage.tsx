@@ -132,14 +132,17 @@ export default function PublicPage () {
           <HeaderSpacer />
 
           {
-            isBountiesPage ? <BountyList title={`${currentSpace?.name} bounties`} /> : (
-              currentPage?.type === 'board'
-                ? (
-                  <BoardPage page={currentPage} setPage={() => {}} readonly={true} />
-                ) : (
-                  currentPage && <DocumentPage page={currentPage} setPage={() => {}} readOnly={true} />
-                )
+            isBountiesPage && currentSpace && (
+              currentSpace.publicBountyBoard ? <BountyList /> : <ErrorPage message={"Sorry, this workspace's bounties are reserved to its members."} />
             )
+          }
+          {
+            !isBountiesPage && (currentPage?.type === 'board'
+              ? (
+                <BoardPage page={currentPage} setPage={() => {}} readonly={true} />
+              ) : (
+                currentPage && <DocumentPage page={currentPage} setPage={() => {}} readOnly={true} />
+              ))
           }
 
         </PageContainer>

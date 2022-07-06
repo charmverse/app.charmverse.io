@@ -117,16 +117,16 @@ export default function ShareBountyBoard ({ padding = 1 }: Props) {
       {
         space?.permissionConfigurationMode !== 'custom' && (
           <Alert severity='info'>
-            Currently using
+            Your workspace is using the
             <b>
               {
               ` ${configurationModeName[space?.permissionConfigurationMode as SpacePermissionConfigurationMode]} `
              }
             </b>
-            space permissions preset.
+            preset.
             <br />
             <br />
-            Manual updates here will change space permissions  to <b>custom mode.</b>
+            Manual updates here will change workspace permissions  to <b>custom mode.</b>
 
           </Alert>
         )
