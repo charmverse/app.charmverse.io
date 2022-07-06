@@ -9,9 +9,6 @@ import NoVotesMessage from './NoVotesMessage';
 import VoteStatusChip from './VoteStatusChip';
 
 export default function VotesTable ({ votes }: { votes?: ExtendedVote[] }) {
-  if (votes?.[0]) {
-    votes[0].title = ' wdfgdsfg fsdgfdsg fdsg fdsgfdsg fsgfg sfdgfdsgfd gfg';
-  }
   return (
     <>
       <GridHeader>
