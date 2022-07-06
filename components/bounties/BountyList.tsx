@@ -36,7 +36,11 @@ function sortSelected (bountyStatuses: BountyStatus[]): BountyStatus[] {
   });
 }
 
-export default function BountyList () {
+interface Props {
+  title?: string
+}
+
+export default function BountyList ({ title = 'Bounties' }: Props) {
   const [displayBountyDialog, setDisplayBountyDialog] = useState(false);
   const { bounties } = useContext(BountiesContext);
 
@@ -87,7 +91,7 @@ export default function BountyList () {
     <ScrollableWindow>
       <Box py={3} sx={{ px: { xs: '40px', sm: '80px' }, minHeight: '80vh' }}>
         <Box display='flex' justifyContent='space-between' mb={3}>
-          <Typography variant='h1'>Bounty list</Typography>
+          <Typography variant='h1'>{title}</Typography>
           <Box display='flex' justifyContent='flex-end'>
             { !!csvData.length
             && (
