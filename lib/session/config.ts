@@ -1,4 +1,3 @@
-import { Prisma } from '@prisma/client';
 
 declare module 'iron-session' {
   interface IronSessionData {
