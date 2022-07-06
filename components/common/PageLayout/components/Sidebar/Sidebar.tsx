@@ -195,6 +195,18 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
           </SidebarHeader>
           <Box mb={2}>
             <SidebarLink
+              href={`/${space.domain}/bounties`}
+              active={router.pathname.startsWith('/[domain]/bounties')}
+              icon={<BountyIcon fontSize='small' />}
+              label='Bounties'
+            />
+            <SidebarLink
+              href={`/${space.domain}/votes`}
+              active={router.pathname.startsWith('/[domain]/votes')}
+              icon={<VoteIcon fontSize='small' />}
+              label='Votes'
+            />
+            <SidebarLink
               active={router.pathname.startsWith('/[domain]/settings')}
               href={`/${space.domain}/settings/workspace`}
               icon={<SettingsIcon color='secondary' fontSize='small' />}
@@ -206,18 +218,6 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               icon={<QuestionMarkIcon color='secondary' fontSize='small' />}
               label='Support & Feedback'
               target='_blank'
-            />
-            <SidebarLink
-              href={`/${space.domain}/bounties`}
-              active={router.pathname.startsWith('/[domain]/bounties')}
-              icon={<BountyIcon fontSize='small' />}
-              label='Bounties'
-            />
-            <SidebarLink
-              href={`/${space.domain}/votes`}
-              active={router.pathname.startsWith('/[domain]/votes')}
-              icon={<VoteIcon fontSize='small' />}
-              label='Votes'
             />
           </Box>
           <ScrollingContainer isScrolled={isScrolled} onScroll={onScroll} className='page-navigation'>
@@ -261,12 +261,12 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
         </Box>
       )}
       {showingTrash && (
-      <TrashModal
-        isOpen={showingTrash}
-        onClose={() => {
-          setShowingTrash(false);
-        }}
-      />
+        <TrashModal
+          isOpen={showingTrash}
+          onClose={() => {
+            setShowingTrash(false);
+          }}
+        />
       )}
     </SidebarContainer>
   );
