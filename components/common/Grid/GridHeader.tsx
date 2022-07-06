@@ -8,7 +8,7 @@ const StyledGrid = styled(Grid)`
   color: rgba(var(--center-channel-color-rgb), 0.6);
   font-size: 0.85rem;
   font-weight: 600;
-  padding-bottom: ${({ theme }) => theme.spacing(1)};
+  padding: ${({ theme }) => theme.spacing(1, 2)};
 
   border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
   width: 100%;
