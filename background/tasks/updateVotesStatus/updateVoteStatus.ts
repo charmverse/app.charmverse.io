@@ -69,31 +69,27 @@ const updateVoteStatus = async () => {
 
   const { passedVotes, rejectedVotes } = await getVotesByState(votesPassedDeadline as ExtendedVote[]);
 
-  const updateDB = true;
-
-  if (updateDB) {
-    await prisma.vote.updateMany({
-      where: {
-        id: {
-          in: passedVotes
-        }
-      },
-      data: {
-        status: VOTE_STATUS[1]
+  await prisma.vote.updateMany({
+    where: {
+      id: {
+        in: passedVotes
       }
-    });
+    },
+    data: {
+      status: 'Passed'
+    }
+  });
 
-    await prisma.vote.updateMany({
-      where: {
-        id: {
-          in: rejectedVotes
-        }
-      },
-      data: {
-        status: VOTE_STATUS[2]
+  await prisma.vote.updateMany({
+    where: {
+      id: {
+        in: rejectedVotes
       }
-    });
-  }
+    },
+    data: {
+      status: 'Rejected'
+    }
+  });
 
   return passedVotes.length + rejectedVotes.length;
 };

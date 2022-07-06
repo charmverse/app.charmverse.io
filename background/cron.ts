@@ -14,7 +14,7 @@ cron.schedule('0 * * * *', archiveTask);
 cron.schedule('0 * * * *', notificationTask);
 
 // Update votes status
-cron.schedule('0 * * * *', voteTask);
+cron.schedule('0 */30 * * * *', voteTask);
 
 const port = process.env.PORT || 4000;
 
