@@ -117,11 +117,17 @@ export default function ShareBountyBoard ({ padding = 1 }: Props) {
       {
         space?.permissionConfigurationMode !== 'custom' && (
           <Alert severity='info'>
-            Your bounty board is {bountiesArePublic ? 'public' : 'reserved to workspace members'} because you are using the <b>{configurationModeName[space?.permissionConfigurationMode as SpacePermissionConfigurationMode].toLowerCase()}</b> preset.
-
+            Currently using
+            <b>
+              {
+              ` ${configurationModeName[space?.permissionConfigurationMode as SpacePermissionConfigurationMode]} `
+             }
+            </b>
+            space permissions preset.
             <br />
+            <br />
+            Manual updates here will change space permissions  to <b>custom mode.</b>
 
-            If you update the public bounty board setting manually, your space permissions configuration will be updated to custom.
           </Alert>
         )
       }
