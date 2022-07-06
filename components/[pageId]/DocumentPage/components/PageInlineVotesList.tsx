@@ -116,7 +116,7 @@ export function ViewOptions ({ voteSort, voteFilter, setVoteFilter, setVoteSort,
   );
 }
 
-export function filterVotes (votes: ExtendedVote[], voteFilter: VoteFilter) {
+export function filterVotes <T extends ExtendedVote> (votes: T[], voteFilter: VoteFilter) {
   if (voteFilter === 'completed') {
     return votes.filter(sortedVote => sortedVote.status !== 'InProgress');
   }
@@ -126,7 +126,12 @@ export function filterVotes (votes: ExtendedVote[], voteFilter: VoteFilter) {
   return votes;
 }
 
-export function sortVotes (votes: ExtendedVote[], voteSort: VoteSort, inlineVoteIds: string[] = [], inlineVotes: Record<string, ExtendedVote> = {}) {
+export function sortVotes <T extends ExtendedVote> (
+  votes: T[],
+  voteSort: VoteSort,
+  inlineVoteIds: string[] = [],
+  inlineVotes: Record<string, T> = {}
+) {
   if (voteSort === 'highest_votes') {
     votes.sort((voteA, voteB) => voteA.userVotes.length > voteB.userVotes.length ? -1 : 1);
   }
