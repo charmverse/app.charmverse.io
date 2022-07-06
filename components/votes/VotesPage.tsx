@@ -2,7 +2,7 @@ import { Box, Stack, Typography } from '@mui/material';
 import useSWR from 'swr';
 import VoteIcon from '@mui/icons-material/HowToVoteOutlined';
 import { Vote } from '@prisma/client';
-import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
+import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { PagesMap } from 'hooks/usePages';
 import Database from 'components/common/Database';
 import { createBoard, IPropertyOption } from 'components/common/BoardEditor/focalboard/src/blocks/board';
@@ -39,20 +39,20 @@ export default function VotesPage () {
   }, {});
 
   return (
-    <ScrollableWindow>
-      <Box py={3} sx={{ px: { xs: '40px', sm: '80px' }, minHeight: '80vh' }}>
-        <Stack direction='row' alignItems='center' gap={1} mb={1}>
-          <VoteIcon fontSize='large' />
-          <Typography variant='h1'> Votes</Typography>
-        </Stack>
-        <Database
-          board={board}
-          cards={cards}
-          pages={pages}
-          views={views}
-        />
-      </Box>
-    </ScrollableWindow>
+    <CenteredPageContent>
+      <Stack direction='row' alignItems='center' gap={1} mb={1}>
+        <VoteIcon fontSize='large' />
+        <Typography variant='h1'>
+          <strong>Votes</strong>
+        </Typography>
+      </Stack>
+      <Database
+        board={board}
+        cards={cards}
+        pages={pages}
+        views={views}
+      />
+    </CenteredPageContent>
   );
 }
 
