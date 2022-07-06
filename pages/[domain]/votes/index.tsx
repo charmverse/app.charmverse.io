@@ -4,7 +4,7 @@ import { setTitle } from 'hooks/usePageTitle';
 
 export default function BountyPage () {
 
-  setTitle('Bounties');
+  setTitle('Votes');
 
   return (
     <BountyList />
