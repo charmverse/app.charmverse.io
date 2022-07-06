@@ -21,29 +21,29 @@ describe('voting status', () => {
     expect(isVotingClosed({
       ...vote,
       status: VOTE_STATUS[1] // Passed
-    })).toBeTrue();
+    })).toBe(true);
     expect(isVotingClosed({
       ...vote,
       status: VOTE_STATUS[2] // Rejected
-    })).toBeTrue();
+    })).toBe(true);
     expect(isVotingClosed({
       ...vote,
       status: VOTE_STATUS[3] // Cancelled
-    })).toBeTrue();
+    })).toBe(true);
     expect(isVotingClosed({
       ...vote,
       deadline: new Date('2021-07-07') // passed deadline
-    })).toBeTrue();
+    })).toBe(true);
   });
 
   it('should not be closed', () => {
     expect(isVotingClosed({
       ...vote,
       status: VOTE_STATUS[0] // InProgress
-    })).not.toBeTrue();
+    })).toBe(false);
     expect(isVotingClosed({
       ...vote,
       deadline: new Date('2777-07-07') // future deadline
-    })).not.toBeTrue();
+    })).toBe(false);
   });
 });
