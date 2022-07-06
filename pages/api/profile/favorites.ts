@@ -4,6 +4,7 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { sessionUserRelations } from 'lib/session/config';
 import { LoggedInUser } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -41,9 +42,7 @@ async function addFavoritePage (req: NextApiRequest, res: NextApiResponse<Partia
         }
       }
     },
-    include: {
-      favorites: true
-    }
+    include: sessionUserRelations
   });
   return res.status(200).json(user);
 }
@@ -65,9 +64,7 @@ async function unFavoritePage (req: NextApiRequest, res: NextApiResponse<Partial
         }
       }
     },
-    include: {
-      favorites: true
-    }
+    include: sessionUserRelations
   });
   return res.status(200).json(user);
 }

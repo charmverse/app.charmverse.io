@@ -12,7 +12,7 @@ interface NestedMemberships {
 }
 
 export interface LoggedInUser extends User {
-  favorites: FavoritePage[];
+  favorites: { pageId: string }[];
   spaceRoles: (SpaceRole & NestedMemberships)[]
   ensName?: string;
   discordUser?: DiscordUser | null
