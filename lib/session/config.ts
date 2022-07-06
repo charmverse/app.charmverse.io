@@ -15,3 +15,29 @@ export const ironOptions = {
     secure: typeof process.env.DOMAIN === 'string' && process.env.DOMAIN.includes('https')
   }
 };
+
+// a map of relationships we pull in for the logged-in user (try to keep this small)
+export const sessionUserRelations = {
+  favorites: {
+    where: {
+      page: {
+        deletedAt: null
+      }
+    },
+    select: {
+      pageId: true
+    }
+  },
+  spaceRoles: {
+    include: {
+      spaceRoleToRole: {
+        include: {
+          role: true
+        }
+      }
+    }
+  },
+  discordUser: true,
+  telegramUser: true,
+  notificationState: true
+} as const;
