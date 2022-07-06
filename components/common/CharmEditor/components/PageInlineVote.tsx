@@ -11,6 +11,7 @@ import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useInlineVotes } from 'hooks/useInlineVotes';
 import { useUser } from 'hooks/useUser';
 import { removeInlineVoteMark } from 'lib/inline-votes/removeInlineVoteMark';
+import { isVotingClosed } from 'lib/votes/utils';
 import { ExtendedVote } from 'lib/votes/interfaces';
 import { DateTime } from 'luxon';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
@@ -168,7 +169,8 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
       }}
       >
         {voteOptions.map((voteOption) => {
-          const isDisabled = inlineVote.status !== 'InProgress' || new Date(inlineVote.deadline) < new Date();
+          const isDisabled = isVotingClosed(inlineVote);
+
           return (
             <PageInlineVoteOption
               key={voteOption.name}
