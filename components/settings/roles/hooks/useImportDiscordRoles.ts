@@ -45,14 +45,14 @@ export function useImportDiscordRoles () {
       refreshRoles();
       setTimeout(() => {
         silentlyUpdateURL(urlWithoutQueryString);
-      }, 250);
+      }, 0);
     }
     else if (error) {
       // Major failure while trying to import discord server role
       showMessage(error.message || error.error || 'Something went wrong. Please try again', 'error');
       setTimeout(() => {
         silentlyUpdateURL(urlWithoutQueryString);
-      }, 250);
+      }, 0);
     }
     else if (serverConnectFailed) {
       showMessage('Failed to connect to Discord', 'warning');
