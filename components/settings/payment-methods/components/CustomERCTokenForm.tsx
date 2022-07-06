@@ -219,7 +219,9 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
                       Token decimals
                     </InputLabel>
                     <TextField
-                      {...register('tokenDecimals')}
+                      {...register('tokenDecimals', {
+                        valueAsNumber: true
+                      })}
                       type='number'
                       size='small'
                       inputMode='numeric'

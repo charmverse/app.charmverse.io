@@ -11,7 +11,7 @@ import { FormValues, schema } from 'components/common/CreateSpaceForm';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Link from 'components/common/Link';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import ConnectSnapshot from 'components/common/PageLayout/components/Header/snapshot/ConnectSnapshot';
+import ConnectSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/ConnectSnapshot';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { StyledListItemText } from 'components/common/StyledListItemText';
 import SettingsLayout from 'components/settings/Layout';

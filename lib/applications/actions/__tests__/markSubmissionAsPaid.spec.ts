@@ -4,7 +4,7 @@ import { WrongStateError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
-import { paySubmission } from '../paySubmission';
+import { markSubmissionAsPaid } from '../markSubmissionAsPaid';
 
 let user: User;
 let space: Space;
@@ -15,7 +15,7 @@ beforeAll(async () => {
   space = generated.space;
 });
 
-describe('paySubmission', () => {
+describe('markSubmissionAsPaid', () => {
   it('should return the updated submission with a paid status when paid', async () => {
 
     const bountyWithSubmission = await generateBountyWithSingleApplication({
@@ -26,7 +26,7 @@ describe('paySubmission', () => {
       bountyCap: null
     });
 
-    const reviewed = await paySubmission(bountyWithSubmission.applications[0].id);
+    const reviewed = await markSubmissionAsPaid(bountyWithSubmission.applications[0].id);
 
     expect(reviewed.status).toBe('paid');
   });
@@ -42,7 +42,7 @@ describe('paySubmission', () => {
     });
 
     try {
-      await paySubmission(bountyWithSubmission.applications[0].id);
+      await markSubmissionAsPaid(bountyWithSubmission.applications[0].id);
       throw new ExpectedAnError();
     }
     catch (error: any) {

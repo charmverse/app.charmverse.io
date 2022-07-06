@@ -15,6 +15,7 @@ describe('getTemplateExplanation', () => {
     const cannot = [
       'Workspace members cannot create new bounties.',
       'Workspace members cannot create new pages.',
+      'Workspace members cannot create new votes.',
       'Workspace members cannot comment on, edit, share or delete new top-level pages by default.',
       'Anyone outside the workspace cannot see new top-level pages by default.',
       'Anyone outside the workspace cannot see bounties and bounty suggestions.'
@@ -37,6 +38,7 @@ describe('getTemplateExplanation', () => {
     const can = [
       'Workspace members can create new pages.',
       'Workspace members can create new bounties.',
+      'Workspace members can create new votes.',
       'Workspace members can view, edit, comment on, share and delete new top-level pages by default.'
     ];
     const cannot = [
@@ -61,6 +63,7 @@ describe('getTemplateExplanation', () => {
     const can = [
       'Workspace members can create new pages.',
       'Workspace members can create new bounties.',
+      'Workspace members can create new votes.',
       'Workspace members can view, edit, comment on, share and delete new top-level pages by default.',
       'Anyone can see new top-level pages by default.',
       'Anyone can see bounties and bounty suggestions visible to workspace members.'

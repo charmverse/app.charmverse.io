@@ -6,7 +6,7 @@ import { usePages } from 'hooks/usePages';
 import { useRouter } from 'next/router';
 import { ReactNode } from 'react';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { StyledPageIcon } from '../PageIcon';
+import { StyledPageIcon } from '../../PageIcon';
 
 const NEXUS_ROUTES = ['/nexus', '/profile', '/integrations'];
 
@@ -129,7 +129,6 @@ function BountyPageTitle ({ basePath }: { basePath: string }) {
 }
 
 function PublicBountyPageTitle ({ basePath }: { basePath: string }) {
-  const [pageTitle] = usePageTitle();
   const [space] = useCurrentSpace();
   return (
     <PageTitleWrapper>

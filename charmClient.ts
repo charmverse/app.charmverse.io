@@ -485,8 +485,8 @@ class CharmClient {
     });
   }
 
-  async paySubmission (submissionId: string) {
-    return http.POST<Application>(`/api/submissions/${submissionId}/pay`);
+  async markSubmissionAsPaid (submissionId: string) {
+    return http.POST<Application>(`/api/submissions/${submissionId}/mark-as-paid`);
   }
 
   recordTransaction (data: TransactionCreationData) {

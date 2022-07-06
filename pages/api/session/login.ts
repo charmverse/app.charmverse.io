@@ -5,6 +5,7 @@ import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { LoggedInUser } from 'models';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
+import { sessionUserRelations } from 'lib/session/config';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -18,20 +19,7 @@ async function login (req: NextApiRequest, res: NextApiResponse<LoggedInUser | {
         has: address
       }
     },
-    include: {
-      favorites: true,
-      telegramUser: true,
-      discordUser: true,
-      spaceRoles: {
-        include: {
-          spaceRoleToRole: {
-            include: {
-              role: true
-            }
-          }
-        }
-      }
-    }
+    include: sessionUserRelations
   });
 
   if (!user) {

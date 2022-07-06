@@ -1,13 +1,15 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
+import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
 import MoonIcon from '@mui/icons-material/DarkMode';
 import GetAppIcon from '@mui/icons-material/GetApp';
+import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import SunIcon from '@mui/icons-material/WbSunny';
-import { Divider, FormControlLabel, Switch, Typography } from '@mui/material';
+import { Divider, FormControlLabel, Switch } from '@mui/material';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
@@ -18,7 +20,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import { Page } from '@prisma/client';
 import charmClient from 'charmClient';
-import PublishToSnapshot from 'components/common/PageLayout/components/Header/snapshot/PublishToSnapshot';
+import PublishToSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/PublishToSnapshot';
 import { useColorMode } from 'context/darkMode';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
@@ -26,12 +28,11 @@ import { useUser } from 'hooks/useUser';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
 import { useRouter } from 'next/router';
 import { useRef, useState } from 'react';
-import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
-import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import Account from '../Account';
 import ShareButton from '../ShareButton';
-import PageTitleWithBreadcrumbs from './PageTitleWithBreadcrumbs';
 import BountyShareButton from './BountyShareButton/BountyShareButton';
+import NotificationsBadge from './components/NotificationsBadge';
+import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
 
 export const headerHeight = 56;
 
@@ -134,11 +135,11 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
           {isPage && (
             <>
               {currentPage?.deletedAt === null && <ShareButton headerHeight={headerHeight} />}
-              <Tooltip title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} arrow placement='bottom'>
-                <IconButton size='small' sx={{ ml: 1 }} onClick={toggleFavorite} color='inherit'>
+              <IconButton size='small' onClick={toggleFavorite} color='inherit'>
+                <Tooltip title={isFavorite ? 'Remove from sidebar' : 'Pin this page to your sidebar'} arrow placement='bottom'>
                   {isFavorite ? <FavoritedIcon color='secondary' /> : <NotFavoritedIcon color='secondary' />}
-                </IconButton>
-              </Tooltip>
+                </Tooltip>
+              </IconButton>
             </>
           )}
 
@@ -151,7 +152,9 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
                   setPageMenuAnchorElement(pageMenuAnchor.current || null);
                 }}
               >
-                <MoreHorizIcon />
+                <Tooltip title='View comments, votes, export content and more' arrow>
+                  <MoreHorizIcon />
+                </Tooltip>
               </IconButton>
               <Popover
                 anchorEl={pageMenuAnchorElement}
@@ -245,12 +248,13 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
 
           {/** dark mode toggle */}
           {user && (
-            <Tooltip title={theme.palette.mode === 'dark' ? 'Light mode' : 'Dark mode'} arrow placement='bottom'>
-              <IconButton sx={{ mx: 1 }} onClick={colorMode.toggleColorMode} color='inherit'>
+            <IconButton size='small' sx={{ mx: 1 }} onClick={colorMode.toggleColorMode} color='inherit'>
+              <Tooltip title={`Enable ${theme.palette.mode === 'dark' ? 'light mode' : 'dark mode'}`} arrow placement='bottom'>
                 {theme.palette.mode === 'dark' ? <SunIcon color='secondary' /> : <MoonIcon color='secondary' />}
-              </IconButton>
-            </Tooltip>
+              </Tooltip>
+            </IconButton>
           )}
+          <NotificationsBadge />
           {/** user account */}
           <Account />
         </Box>

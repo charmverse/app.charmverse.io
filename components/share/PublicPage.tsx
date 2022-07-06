@@ -10,7 +10,7 @@ import MoonIcon from '@mui/icons-material/DarkMode';
 import CurrentPageFavicon from 'components/common/PageLayout/components/CurrentPageFavicon';
 import { StyledToolbar } from 'components/common/PageLayout/components/Header';
 import Account from 'components/common/PageLayout/components/Account';
-import PageTitleWithBreadcrumbs from 'components/common/PageLayout/components/Header/PageTitleWithBreadcrumbs';
+import PageTitleWithBreadcrumbs from 'components/common/PageLayout/components/Header/components/PageTitleWithBreadcrumbs';
 import charmClient from 'charmClient';
 import { Card } from 'components/common/BoardEditor/focalboard/src/blocks/card';
 import { addBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';

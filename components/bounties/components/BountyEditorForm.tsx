@@ -1,4 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import { Divider } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Grid from '@mui/material/Grid';
@@ -524,8 +525,11 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
                     />
                   </Grid>
                 </Grid>
-
-                <hr />
+                <Grid container item>
+                  <Grid item xs={12}>
+                    <Divider />
+                  </Grid>
+                </Grid>
 
                 {/* New options */}
 

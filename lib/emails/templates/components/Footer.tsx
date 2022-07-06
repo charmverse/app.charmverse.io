@@ -1,15 +1,10 @@
-import { ReactNode } from 'react';
-import TwitterIcon from '@mui/icons-material/Twitter';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import TwitterIcon from '@mui/icons-material/Twitter';
 import {
-  MjmlText,
-  MjmlSection,
-  MjmlColumn,
-  MjmlImage,
-  MjmlSocial,
-  MjmlSocialElement
+  MjmlColumn, MjmlSection, MjmlText
 } from 'mjml-react';
+import { ReactNode } from 'react';
 import { greyColor2 } from 'theme/colors';
 
 export default function Footer () {
