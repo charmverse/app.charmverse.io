@@ -11,7 +11,7 @@ import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useInlineVotes } from 'hooks/useInlineVotes';
 import { useUser } from 'hooks/useUser';
 import { removeInlineVoteMark } from 'lib/inline-votes/removeInlineVoteMark';
-import { isVotingClosed } from 'libs/votes';
+import { isVotingClosed } from 'lib/votes/utils';
 import { ExtendedVote } from 'lib/votes/interfaces';
 import { DateTime } from 'luxon';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
