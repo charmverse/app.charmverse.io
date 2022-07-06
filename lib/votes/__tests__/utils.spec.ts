@@ -39,7 +39,7 @@ describe('voting status', () => {
   it('should not be closed', () => {
     expect(isVotingClosed({
       ...vote,
-      status: VOTE_STATUS[0] // InProgress
+      status: VOTE_STATUS[0], // InProgress
       deadline: new Date('2777-07-07') // future deadline
     })).toBe(false);
   });
