@@ -31,6 +31,10 @@ const config = {
   generateEtags: false,
   poweredByHeader: false,
   webpack5: true,
+  eslint: {
+    // add background to the default list of pages for eslint
+    dirs: ['pages', 'components', 'lib', 'background']
+  },
   experimental: {
     esmExternals: 'loose',
     modularizeImports: {

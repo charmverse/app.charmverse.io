@@ -83,6 +83,11 @@ export default function PublicPage () {
   useEffect(() => {
 
     onLoad();
+
+    return () => {
+      setCurrentPageId('');
+    };
+
   }, []);
 
   const currentPage = pages[currentPageId];

@@ -1,5 +1,4 @@
 import BountyDetails from 'components/bounties/[bountyId]/BountyDetails';
-import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { useBounties } from 'hooks/useBounties';
 import getPageLayout from 'components/common/PageLayout/getLayout';
 import { useRouter } from 'next/router';
@@ -15,9 +14,7 @@ export default function BountyPage () {
   }, [router.query.bountyId, router.query.pageId]);
 
   return (
-    <ScrollableWindow>
-      <BountyDetails />
-    </ScrollableWindow>
+    <BountyDetails />
   );
 
 }

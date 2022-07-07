@@ -1,16 +1,15 @@
 import { Box, Grid, Typography } from '@mui/material';
 import { BountyStatus } from '@prisma/client';
 import Button from 'components/common/Button';
-import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { BountiesContext } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
-import { useContext, useMemo, useState, useEffect, useRef } from 'react';
+import { useContext, useMemo, useState, useEffect } from 'react';
 import { CSVLink } from 'react-csv';
-import useIsAdmin from 'hooks/useIsAdmin';
 import { BountyWithDetails } from 'models';
+import { FullWidthPageContent } from 'components/common/PageLayout/components/PageContent';
 import { BountyCard } from './components/BountyCard';
 import BountyModal from './components/BountyModal';
 import InputBountyStatus from './components/InputBountyStatus';
@@ -92,20 +91,16 @@ export default function BountyList ({ publicMode, bountyCardClicked = () => null
   }
 
   return (
-    <ScrollableWindow>
-      <Box py={3} sx={{ px: { xs: '40px', sm: '80px' }, minHeight: '80vh' }}>
-        <Box display='flex' justifyContent='space-between' mb={3}>
+    <FullWidthPageContent>
 
-        </Box>
-
-        <Box display='flex' justifyContent='space-between' alignContent='center' mb={3}>
-          {
+      <Box display='flex' justifyContent='space-between' alignContent='center' mb={3}>
+        {
             bounties.length === 0 && (
               <Typography variant='h6'>Getting started with bounties</Typography>
             )
           }
 
-          {
+        {
           bounties.length > 0 && (
             <Box>
               {/* Filters for the bounties */}
@@ -122,8 +117,8 @@ export default function BountyList ({ publicMode, bountyCardClicked = () => null
 
             }
 
-          <Box justifyContent='flex-end' alignSelf='center'>
-            { !!csvData.length && !publicMode
+        <Box justifyContent='flex-end' alignSelf='center'>
+          { !!csvData.length && !publicMode
             && (
               <CSVLink data={csvData} filename='Gnosis Safe Airdrop.csv' style={{ textDecoration: 'none' }}>
                 <Button color='secondary' variant='outlined'>
@@ -131,9 +126,9 @@ export default function BountyList ({ publicMode, bountyCardClicked = () => null
                 </Button>
               </CSVLink>
             )}
-            <MultiPaymentModal bounties={bounties} />
+          <MultiPaymentModal bounties={bounties} />
 
-            {
+          {
               currentUserPermissions && !publicMode && (
                 <Button
                   sx={{ ml: 1, height: '35px' }}
@@ -146,11 +141,11 @@ export default function BountyList ({ publicMode, bountyCardClicked = () => null
               )
             }
 
-          </Box>
         </Box>
+      </Box>
 
-        {/* Onboarding video when no bounties exist */}
-        {
+      {/* Onboarding video when no bounties exist */}
+      {
             bounties.length === 0 && (
               <div style={{ marginTop: '25px' }}>
 
@@ -167,8 +162,8 @@ export default function BountyList ({ publicMode, bountyCardClicked = () => null
             )
           }
 
-        {/* Current filter status doesn't have any matching bounties */}
-        {
+      {/* Current filter status doesn't have any matching bounties */}
+      {
             bounties.length > 0 && sortedBounties.length === 0 && (
             <Typography paragraph={true}>
               {
@@ -178,8 +173,8 @@ export default function BountyList ({ publicMode, bountyCardClicked = () => null
             )
         }
 
-        {/* List of bounties based on current filter */}
-        {
+      {/* List of bounties based on current filter */}
+      {
             sortedBounties.length > 0 && (
               <Grid container spacing={1}>
                 {sortedBounties.map(bounty => {
@@ -199,7 +194,7 @@ export default function BountyList ({ publicMode, bountyCardClicked = () => null
             )
           }
 
-        {
+      {
           /**
            * Remove later to its own popup modal
            */
@@ -214,7 +209,6 @@ export default function BountyList ({ publicMode, bountyCardClicked = () => null
             />
           )
         }
-      </Box>
-    </ScrollableWindow>
+    </FullWidthPageContent>
   );
 }
