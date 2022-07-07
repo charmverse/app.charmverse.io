@@ -18,6 +18,7 @@ type IContext = {
   updateBounty: (bountyId: string, update: Partial<Bounty>) => Promise<BountyWithDetails>
   deleteBounty: (bountyId: string) => Promise<true>
   refreshBounty: (bountyId: string) => Promise<void>
+  loadingBounties: boolean
 };
 
 export const BountiesContext = createContext<Readonly<IContext>>({
@@ -29,7 +30,8 @@ export const BountiesContext = createContext<Readonly<IContext>>({
   setCurrentBounty: () => undefined,
   updateBounty: () => Promise.resolve({} as any),
   deleteBounty: () => Promise.resolve(true),
-  refreshBounty: () => Promise.resolve(undefined)
+  refreshBounty: () => Promise.resolve(undefined),
+  loadingBounties: false
 });
 
 export function BountiesProvider ({ children }: { children: ReactNode }) {
@@ -37,12 +39,17 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
 
   const [user] = useUser();
   const [bounties, bountiesRef, setBounties] = useRefState<BountyWithDetails[]>([]);
+
+  const [isLoading, setIsLoading] = useState(false);
+
   useEffect(() => {
     if (space) {
+      setIsLoading(true);
       setBounties([]);
       charmClient.listBounties(space?.id)
         .then(_bounties => {
           setBounties(_bounties);
+          setIsLoading(false);
         });
     }
   }, [user?.id, space]);
@@ -136,8 +143,9 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
     setCurrentBounty: _setCurrentBounty,
     updateBounty,
     deleteBounty,
-    refreshBounty
-  }), [bounties, currentBountyId, currentBounty]);
+    refreshBounty,
+    loadingBounties: isLoading
+  }), [bounties, currentBountyId, currentBounty, isLoading]);
 
   return (
     <BountiesContext.Provider value={value}>

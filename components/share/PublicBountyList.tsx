@@ -1,4 +1,5 @@
 import Alert from '@mui/material/Alert';
+import { useContext, useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import { Bounty } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
@@ -15,7 +16,9 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { Web3Connection } from 'components/_app/Web3ConnectionManager';
+
+import Login from 'components/login/LoginPageContent';
 
 export default function PublicBountyList () {
   const router = useRouter();
@@ -29,9 +32,19 @@ export default function PublicBountyList () {
   const [selectedBounty, setSelectedBounty] = useState<Bounty | null>(null);
   const [loggingIn, setLoggingIn] = useState(false);
 
+  const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
+
   const loginViaTokenGateModal = usePopupState({ variant: 'popover', popupId: 'login-via-token-gate' });
 
   const isSpaceMember = user && contributors.some(c => c.id === user.id);
+
+  useEffect(() => {
+
+    if (account && !user) {
+      loginUser();
+    }
+
+  }, [account]);
 
   function bountySelected (bounty: Bounty) {
 
@@ -81,16 +94,9 @@ export default function PublicBountyList () {
       <Modal size='large' open={loginViaTokenGateModal.isOpen} onClose={loginViaTokenGateModal.close}>
         {
           !account && (
-            <Alert severity='info' sx={{ py: 2, m: -2 }}>
-              No wallet detected. Please unlock your wallet to connect to Charmverse.
-            </Alert>
-          )
-        }
-        {
-          account && !user && (
             <Box display='flex' justifyContent='center'>
-              <PrimaryButton onClick={loginUser} loading={loggingIn}>
-                Login with your wallet
+              <PrimaryButton onClick={openWalletSelectorModal} loading={loggingIn}>
+                Connect your wallet
               </PrimaryButton>
             </Box>
           )
