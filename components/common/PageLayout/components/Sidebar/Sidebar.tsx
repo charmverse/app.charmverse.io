@@ -1,6 +1,7 @@
 
 import styled from '@emotion/styled';
 import { css, Theme } from '@emotion/react';
+import { Divider } from '@mui/material';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -206,6 +207,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               icon={<VoteIcon fontSize='small' />}
               label='Votes'
             />
+            <Divider sx={{ mx: 2, my: 1 }} />
             <SidebarLink
               active={router.pathname.startsWith('/[domain]/settings')}
               href={`/${space.domain}/settings/workspace`}

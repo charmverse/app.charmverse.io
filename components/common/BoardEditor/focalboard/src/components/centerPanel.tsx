@@ -425,7 +425,6 @@ export function groupCardsByOptions (cards: Card[], optionIds: string[], groupBy
   for (const optionId of optionIds) {
     if (optionId) {
       const option = groupByProperty?.options.find((o) => o.id === optionId);
-
       if (option) {
         const c = cards.filter((o) => optionId === o.fields.properties[groupByProperty!.id]);
         const group: BoardGroup = {

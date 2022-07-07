@@ -5,3 +5,4 @@ export * from './getVote';
 export * from './getVotesByPage';
 export * from './getVotesBySpace';
 export * from './updateVote';
+export * from './utils';

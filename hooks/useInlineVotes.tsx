@@ -1,4 +1,5 @@
 import charmClient from 'charmClient';
+import useTasks from 'components/nexus/hooks/useTasks';
 import { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
@@ -59,7 +60,10 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
       return fetchedInlineVote;
     });
   });
+
   const [currentSpace] = useCurrentSpace();
+  const { mutate: mutateTasks } = useTasks();
+
   async function castVote (voteId: string, choice: string) {
     const userVote = await charmClient.castVote(voteId, choice);
     setInlineVotes((_inlineVotes) => {
@@ -70,10 +74,19 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
           existingUserVote.choice = choice;
           existingUserVote.updatedAt = new Date();
         }
+        // Vote casted for the first time
         else {
           vote.userVotes.unshift({
             ...userVote,
             user
+          });
+          mutateTasks((tasks) => {
+            return tasks ? {
+              ...tasks,
+              votes: tasks.votes.filter(_vote => _vote.id !== voteId)
+            } : undefined;
+          }, {
+            revalidate: false
           });
         }
         _inlineVotes[voteId] = {
