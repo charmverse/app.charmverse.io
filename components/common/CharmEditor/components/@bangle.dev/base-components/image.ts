@@ -191,11 +191,9 @@ function addImagesToView(
     const { tr } = view.state;
     let newTr = safeInsert(node, pos)(tr);
 
-    if (newTr === tr) {
-      continue;
+    if (newTr !== tr) {
+      view.dispatch(newTr);
     }
-
-    view.dispatch(newTr);
   }
 }
 
