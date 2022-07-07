@@ -6,7 +6,7 @@ import { DEFAULT_THRESHOLD, ExtendedVote, VoteDTO, VOTE_STATUS } from './interfa
 
 export async function createVote (vote: VoteDTO): Promise<ExtendedVote> {
 
-  const { createdBy, pageId, title, threshold, description, deadline, voteOptions } = vote;
+  const { createdBy, pageId, title, threshold, description, deadline, type, voteOptions } = vote;
 
   const existingPage = await prisma.page.findUnique({
     where: {
@@ -38,6 +38,7 @@ export async function createVote (vote: VoteDTO): Promise<ExtendedVote> {
       threshold: +threshold ?? DEFAULT_THRESHOLD,
       deadline: new Date(deadline),
       status: VOTE_STATUS[0],
+      type,
       page: {
         connect: {
           id: pageId

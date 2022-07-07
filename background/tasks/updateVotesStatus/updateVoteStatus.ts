@@ -1,6 +1,8 @@
 import { prisma } from 'db';
-import { UserVote } from '@prisma/client';
+import { UserVote, VoteStatus, VoteType } from '@prisma/client';
 import { ExtendedVote, VOTE_STATUS } from 'lib/votes/interfaces';
+
+const YES_OPTION = 'Yes';
 
 const getVotesByState = async (votes: ExtendedVote[]) => {
 
@@ -10,6 +12,17 @@ const getVotesByState = async (votes: ExtendedVote[]) => {
   for (const vote of votes) {
     if (vote.userVotes.length === 0) {
       rejectedVotes.push(vote.id);
+    }
+    else if (vote.type === VoteType.Approval) {
+      const yesVoteCount = vote.userVotes.filter((uv: UserVote) => uv.choice === YES_OPTION).length;
+      const isPassed = ((yesVoteCount * 100) / vote.userVotes.length) >= vote.threshold;
+
+      if (isPassed) {
+        passedVotes.push(vote.id);
+      }
+      else {
+        rejectedVotes.push(vote.id);
+      }
     }
     else {
       const choices: string[] = vote.userVotes.map((uv: UserVote) => uv.choice).sort();
