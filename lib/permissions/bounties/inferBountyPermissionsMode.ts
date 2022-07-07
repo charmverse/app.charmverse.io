@@ -11,14 +11,12 @@ export function inferBountyPermissionsMode (permissions: Partial<BountyPermissio
 
   // Find space permission
   for (const permissionLevel of keys) {
-    if (!permissions[permissionLevel]) {
-      // eslint-disable-next-line no-continue
-      continue;
-    }
-    const spacePermission = permissions[permissionLevel]?.find(p => p.group === 'space');
+    if (permissions[permissionLevel]) {
+      const spacePermission = permissions[permissionLevel]?.find(p => p.group === 'space');
 
-    if (spacePermission) {
-      return { mode: 'space' };
+      if (spacePermission) {
+        return { mode: 'space' };
+      }
     }
   }
 

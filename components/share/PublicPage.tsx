@@ -69,6 +69,11 @@ export default function PublicPage () {
     }
 
     onLoad();
+
+    return () => {
+      setCurrentPageId('');
+    };
+
   }, []);
 
   const currentPage = pages[currentPageId];

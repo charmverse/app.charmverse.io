@@ -419,4 +419,36 @@ function CenterPanel(props: Props) {
 
 }
 
+export function groupCardsByOptions (cards: Card[], optionIds: string[], groupByProperty?: IPropertyTemplate): BoardGroup[] {
+  const groups = [];
+
+  for (const optionId of optionIds) {
+    if (optionId) {
+      const option = groupByProperty?.options.find((o) => o.id === optionId);
+      console.log('OPTION', optionId, option)
+      if (option) {
+        const c = cards.filter((o) => optionId === o.fields.properties[groupByProperty!.id]);
+        const group: BoardGroup = {
+          option,
+          cards: c
+        };
+        groups.push(group);
+      }
+    }
+    else {
+      // Empty group
+      const emptyGroupCards = cards.filter((card) => {
+        const groupByOptionId = card.fields.properties[groupByProperty?.id || ''];
+        return !groupByOptionId || !groupByProperty?.options.find((option) => option.id === groupByOptionId);
+      });
+      const group: BoardGroup = {
+        option: { id: '', value: `No ${groupByProperty?.name}`, color: '' },
+        cards: emptyGroupCards
+      };
+      groups.push(group);
+    }
+  }
+  return groups;
+}
+
 export default connect(undefined, { addCard, addTemplate, updateView })(injectIntl(CenterPanel))

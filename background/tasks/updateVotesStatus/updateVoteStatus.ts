@@ -10,39 +10,40 @@ const getVotesByState = async (votes: ExtendedVote[]) => {
   for (const vote of votes) {
     if (vote.userVotes.length === 0) {
       rejectedVotes.push(vote.id);
-      continue;
-    }
-    const choices: string[] = vote.userVotes.map((uv: UserVote) => uv.choice).sort();
-
-    let index = 0;
-    let maxCount = 0;
-    let maxChoices = [];
-    let currentIndex = 0;
-
-    while (index < choices.length) {
-      currentIndex = index;
-      while (choices[currentIndex] === choices[index]) {
-        currentIndex += 1;
-      }
-
-      if (currentIndex - index > maxCount) {
-        maxCount = currentIndex - index;
-        maxChoices = [choices[index]];
-      }
-      else if (currentIndex - index === maxCount) {
-        maxChoices.push(choices[index]);
-      }
-
-      index = currentIndex;
-    }
-
-    const maxChoicePercentage = maxCount * 100 / choices.length;
-
-    if (maxChoicePercentage < vote.threshold) {
-      rejectedVotes.push(vote.id);
     }
     else {
-      passedVotes.push(vote.id);
+      const choices: string[] = vote.userVotes.map((uv: UserVote) => uv.choice).sort();
+
+      let index = 0;
+      let maxCount = 0;
+      let maxChoices = [];
+      let currentIndex = 0;
+
+      while (index < choices.length) {
+        currentIndex = index;
+        while (choices[currentIndex] === choices[index]) {
+          currentIndex += 1;
+        }
+
+        if (currentIndex - index > maxCount) {
+          maxCount = currentIndex - index;
+          maxChoices = [choices[index]];
+        }
+        else if (currentIndex - index === maxCount) {
+          maxChoices.push(choices[index]);
+        }
+
+        index = currentIndex;
+      }
+
+      const maxChoicePercentage = (maxCount * 100) / choices.length;
+
+      if (maxChoicePercentage < vote.threshold) {
+        rejectedVotes.push(vote.id);
+      }
+      else {
+        passedVotes.push(vote.id);
+      }
     }
   }
 

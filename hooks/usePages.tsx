@@ -19,7 +19,7 @@ export type LinkedPage = (Page & {children: LinkedPage[], parent: null | LinkedP
 
 export type PagesMap = Record<string, IPageWithPermissions | undefined>;
 
-type IContext = {
+export type PagesContext = {
   currentPageId: string,
   pages: PagesMap,
   setPages: Dispatch<SetStateAction<PagesMap>>,
@@ -32,7 +32,7 @@ type IContext = {
 
 const refreshInterval = 1000 * 5 * 60; // 5 minutes
 
-export const PagesContext = createContext<Readonly<IContext>>({
+export const PagesContext = createContext<Readonly<PagesContext>>({
   currentPageId: '',
   pages: {},
   setCurrentPageId: () => '',
@@ -48,7 +48,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   const isAdmin = useIsAdmin();
   const [isEditing, setIsEditing] = useState(false);
   const [spaceFromUrl] = useCurrentSpace();
-  const [pages, pagesRef, setPages] = useRefState<IContext['pages']>({});
+  const [pages, pagesRef, setPages] = useRefState<PagesContext['pages']>({});
   const [currentPageId, setCurrentPageId] = useState<string>('');
   const router = useRouter();
   const [user] = useUser();
@@ -122,7 +122,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     return freshPageVersion;
   }
 
-  const value: IContext = useMemo(() => ({
+  const value: PagesContext = useMemo(() => ({
     currentPageId,
     isEditing,
     setIsEditing,

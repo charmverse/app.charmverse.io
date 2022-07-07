@@ -6,6 +6,7 @@ import BountyHeader from 'components/bounties/[bountyId]/components_v3/BountyHea
 import BountySubmissions from 'components/bounties/[bountyId]/components_v3/BountySubmissions';
 import { useBounties } from 'hooks/useBounties';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useEffect, useState } from 'react';
 import charmClient from 'charmClient';
@@ -47,7 +48,7 @@ export default function BountyDetails () {
   return !bountyPermissions ? (
     <LoadingComponent height='200px' isLoading={true} />
   ) : (
-    <Box py={3} px={18}>
+    <CenteredPageContent>
 
       <BountyHeader
         bounty={currentBounty}
@@ -82,7 +83,7 @@ export default function BountyDetails () {
             </>
           )
         }
-    </Box>
+    </CenteredPageContent>
   );
 
 }
