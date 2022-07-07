@@ -1,5 +1,6 @@
 import { FormControlLabel, IconButton, ListItem, Radio, RadioGroup, TextField, Tooltip, Typography } from '@mui/material';
 import { Box } from '@mui/system';
+import { VoteType } from '@prisma/client';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
@@ -94,7 +95,7 @@ export default function CreateVoteModal ({ open = true, onClose, postCreateVote 
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
 
   useEffect(() => {
-    if (voteType === 'custom') {
+    if (voteType === VoteType.SingleChoice) {
       setOptions([{
         name: 'Option 1'
       }, {
@@ -103,7 +104,7 @@ export default function CreateVoteModal ({ open = true, onClose, postCreateVote 
         name: 'Abstain'
       }]);
     }
-    else if (voteType === 'default') {
+    else if (voteType === VoteType.Approval) {
       setOptions([{
         name: 'Yes'
       }, {
@@ -125,7 +126,8 @@ export default function CreateVoteModal ({ open = true, onClose, postCreateVote 
       title: voteTitle,
       description: voteDescription,
       pageId: cardId ?? currentPageId,
-      threshold: +passThreshold
+      threshold: +passThreshold,
+      type: voteType
     });
 
     if (postCreateVote) {
@@ -220,21 +222,21 @@ export default function CreateVoteModal ({ open = true, onClose, postCreateVote 
           <Typography fontWeight='bold'>Options: </Typography>
           <RadioGroup
             row
-            defaultValue='default'
+            defaultValue={VoteType.Approval}
             value={voteType}
             onChange={(e) => {
               setVoteType(e.target.value as VoteType);
             }}
           >
             <FormControlLabel
-              value='default'
+              value={VoteType.Approval}
               control={<Radio />}
               label='Yes / No / Abstain'
             />
-            <FormControlLabel value='custom' control={<Radio />} label='# Custom' />
+            <FormControlLabel value={VoteType.SingleChoice} control={<Radio />} label='Custom Options' />
           </RadioGroup>
         </Box>
-        {voteType !== 'default' && <InlineVoteOptions options={options} setOptions={setOptions} />}
+        {voteType === VoteType.SingleChoice && <InlineVoteOptions options={options} setOptions={setOptions} />}
         <Button
           onClick={handleSubmit}
           sx={{
