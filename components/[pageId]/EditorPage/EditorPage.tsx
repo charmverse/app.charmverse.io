@@ -51,6 +51,10 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
     }
     main();
 
+    return () => {
+      setCurrentPageId('');
+    };
+
   }, [pageId, pagesLoaded, space, user]);
 
   const debouncedPageUpdate = debouncePromise(async (updates: Prisma.PageUpdateInput) => {

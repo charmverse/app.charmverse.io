@@ -51,7 +51,7 @@ function ViewTabs({ board, activeView, intl, readonly, showView, views }: ViewTa
   const { setFocalboardViewsRecord } = useFocalboardViews();
 
   // Find the index of the current view
-  const currentViewId = router.query.viewId;
+  const currentViewId = router.query.viewId || activeView.id;
   const currentViewIndex = views.findIndex(view => view.id === currentViewId)
   const shownViews = views.slice(0, SHOWN_VIEWS)
   let restViews = views.slice(SHOWN_VIEWS);

@@ -1,16 +1,15 @@
 import { Box, Grid, Typography } from '@mui/material';
 import { BountyStatus } from '@prisma/client';
 import Button from 'components/common/Button';
-import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { BountiesContext } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
-import { useContext, useMemo, useState, useEffect, useRef } from 'react';
+import { useContext, useMemo, useState, useEffect } from 'react';
 import { CSVLink } from 'react-csv';
-import useIsAdmin from 'hooks/useIsAdmin';
 import { BountyWithDetails } from 'models';
+import { FullWidthPageContent } from 'components/common/PageLayout/components/PageContent';
 import { BountyCard } from './components/BountyCard';
 import BountyModal from './components/BountyModal';
 import InputBountyStatus from './components/InputBountyStatus';
@@ -84,12 +83,11 @@ export default function BountyList () {
   }
 
   return (
-    <ScrollableWindow>
-      <Box py={3} sx={{ px: { xs: '40px', sm: '80px' }, minHeight: '80vh' }}>
-        <Box display='flex' justifyContent='space-between' mb={3}>
-          <Typography variant='h1'>Bounty list</Typography>
-          <Box display='flex' justifyContent='flex-end'>
-            { !!csvData.length
+    <FullWidthPageContent>
+      <Box display='flex' justifyContent='space-between' mb={3}>
+        <Typography variant='h1'><strong>Bounties</strong></Typography>
+        <Box display='flex' justifyContent='flex-end'>
+          { !!csvData.length
             && (
               <CSVLink data={csvData} filename='Gnosis Safe Airdrop.csv' style={{ textDecoration: 'none' }}>
                 <Button color='secondary' variant='outlined'>
@@ -97,9 +95,9 @@ export default function BountyList () {
                 </Button>
               </CSVLink>
             )}
-            <MultiPaymentModal bounties={bounties} />
+          <MultiPaymentModal bounties={bounties} />
 
-            {
+          {
               currentUserPermissions && (
                 <Button
                   sx={{ ml: 1 }}
@@ -112,12 +110,12 @@ export default function BountyList () {
               )
             }
 
-          </Box>
         </Box>
+      </Box>
 
-        {/* Filters for the bounties */}
+      {/* Filters for the bounties */}
 
-        {
+      {
           bounties.length > 0 && (
             <Box display='flex' alignContent='center' justifyContent='flex-start' mb={3}>
               <InputBountyStatus
@@ -132,8 +130,8 @@ export default function BountyList () {
           )
         }
 
-        {/* Onboarding video when no bounties exist */}
-        {
+      {/* Onboarding video when no bounties exist */}
+      {
             bounties.length === 0 && (
               <>
                 <Typography variant='h6' sx={{ mb: 2 }}>Getting started with bounties</Typography>
@@ -153,13 +151,13 @@ export default function BountyList () {
             )
           }
 
-        {/* Current filter status doesn't have any matching bounties */}
-        {
+      {/* Current filter status doesn't have any matching bounties */}
+      {
             bounties.length > 0 && sortedBounties.length === 0 && <Typography paragraph={true}>No bounties were found</Typography>
           }
 
-        {/* List of bounties based on current filter */}
-        {
+      {/* List of bounties based on current filter */}
+      {
             sortedBounties.length > 0 && (
               <Grid container spacing={1}>
                 {sortedBounties.map(bounty => {
@@ -173,7 +171,7 @@ export default function BountyList () {
             )
           }
 
-        {
+      {
           /**
            * Remove later to its own popup modal
            */
@@ -188,7 +186,6 @@ export default function BountyList () {
             />
           )
         }
-      </Box>
-    </ScrollableWindow>
+    </FullWidthPageContent>
   );
 }
