@@ -11,6 +11,7 @@ import PrimaryButton from 'components/common/PrimaryButton';
 import TokenGateForm from 'components/common/TokenGateForm';
 import { useContributors } from 'hooks/useContributors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
@@ -21,9 +22,11 @@ export default function PublicBountyList () {
 
   const [contributors] = useContributors();
   const [space] = useCurrentSpace();
-  const [selectedBounty, setSelectedBounty] = useState<Bounty | null>(null);
   const { account } = useWeb3React();
   const [user, setUser] = useUser();
+  const { showMessage } = useSnackbar();
+
+  const [selectedBounty, setSelectedBounty] = useState<Bounty | null>(null);
   const [loggingIn, setLoggingIn] = useState(false);
 
   const loginViaTokenGateModal = usePopupState({ variant: 'popover', popupId: 'login-via-token-gate' });
@@ -97,7 +100,14 @@ export default function PublicBountyList () {
           account && user && (
             <TokenGateForm
               onSubmit={() => {
-                redirectToSpace();
+                loginViaTokenGateModal.close();
+                showMessage(`You've joined the ${space.name} workspace.`, 'success');
+
+                // Wait for 2 seconds before redirecting
+                setTimeout(() => {
+                  redirectToSpace();
+                }, 2000);
+
               }}
               spaceDomainToAccess={space.domain}
             />
