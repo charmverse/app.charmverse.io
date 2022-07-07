@@ -16,7 +16,6 @@ type Props = {
     toolbar?: React.ReactNode
     hideCloseButton?: boolean
     className?: string
-    open?: boolean
     onClose: () => void,
 }
 
@@ -33,7 +32,7 @@ const Dialog = React.memo((props: Props) => {
     useHotkeys('esc', () => props.onClose())
 
     return (
-        <Modal open={open}>
+        <Modal open={true}>
         <div className={`Dialog dialog-back ${props.className}`}>
             <div
                 className='wrapper'
