@@ -20,9 +20,8 @@ export function VoteTasksListRow (
     deadline, title: voteTitle, id: voteId
   }: VoteTask
 ) {
-  const baseUrl = typeof window !== 'undefined' ? window.location.origin : null;
 
-  const voteLink = `${baseUrl}/${spaceDomain}/${pagePath}?voteId=${voteId}`;
+  const voteLink = `/${spaceDomain}/${pagePath}?voteId=${voteId}`;
   const voteLocation = `${pageTitle || 'Untitled'} in ${spaceName}`;
 
   return (

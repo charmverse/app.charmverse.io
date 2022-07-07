@@ -33,7 +33,7 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
   const cardId = typeof window !== 'undefined' ? (new URLSearchParams(window.location.href)).get('cardId') : null;
 
   const { data, isValidating } = useSWR(() => currentPageId && !cardId ? `pages/${currentPageId}/inline-votes` : null, async () => {
-    const fetchedInlineVotes = await charmClient.getPageVotes(currentPageId);
+    const fetchedInlineVotes = await charmClient.getVotesByPage(currentPageId);
     return fetchedInlineVotes.map(fetchedInlineVote => {
       const userVoteFrequencyRecord = fetchedInlineVote.userVotes.reduce<Record<string, number>>((currentRecord, userVote) => {
         if (!currentRecord[userVote.choice]) {
