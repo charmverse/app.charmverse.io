@@ -102,20 +102,26 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
   }
 
   async function createVote (votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId'>): Promise<ExtendedVote> {
+
+    if (!user || !currentSpace) {
+      throw new Error('Missing user or space');
+    }
+
     const extendedVote = await charmClient.createVote({
       ...votePayload,
-      createdBy: user!.id,
+      createdBy: user.id,
       pageId: cardId ?? currentPageId,
-      spaceId: currentSpace!.id
+      spaceId: currentSpace.id
     });
 
     mutateTasks((tasks) => {
       // Add the vote to the task
-      if (tasks) {
+      const currentPage = pages[currentPageId];
+      if (tasks && currentSpace && currentPage) {
         tasks.votes.push({
           ...extendedVote,
-          space: currentSpace!,
-          page: pages[currentPageId]!
+          space: currentSpace,
+          page: currentPage
         });
       }
       return tasks;
