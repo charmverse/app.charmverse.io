@@ -16,13 +16,12 @@ import { DateTime } from 'luxon';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { findChildrenByMark, NodeWithPos } from 'prosemirror-utils';
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
+import { VoteType } from '@prisma/client';
 import { hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
 import PageInlineVote from '../PageInlineVote';
 import { markName } from './inlineVote.constants';
 import { InlineVotePluginState } from './inlineVote.plugins';
 import { updateInlineVote } from './inlineVote.utils';
-
-type VoteType = 'default' | 'custom';
 
 interface InlineVoteOptionsProps {
   options: { name: string }[]
@@ -167,13 +166,13 @@ export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
   const [voteTitle, setVoteTitle] = useState('');
   const [voteDescription, setVoteDescription] = useState('');
   const [passThreshold, setPassThreshold] = useState<number>(50);
-  const [voteType, setVoteType] = useState<VoteType>('default');
+  const [voteType, setVoteType] = useState<VoteType>(VoteType.Approval);
   const [options, setOptions] = useState<{ name: string }[]>([]);
   const { createVote } = useInlineVotes();
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
 
   useEffect(() => {
-    if (voteType === 'custom') {
+    if (voteType === VoteType.SingleChoice) {
       setOptions([{
         name: 'Option 1'
       }, {
@@ -182,7 +181,7 @@ export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
         name: 'Abstain'
       }]);
     }
-    else if (voteType === 'default') {
+    else if (voteType === VoteType.Approval) {
       setOptions([{
         name: 'Yes'
       }, {
@@ -198,13 +197,15 @@ export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
   const handleSubmit = async (e: React.KeyboardEvent<HTMLElement> | React.MouseEvent<HTMLElement, MouseEvent>) => {
     const cardId = typeof window !== 'undefined' ? (new URLSearchParams(window.location.href)).get('cardId') : null;
     e.preventDefault();
+
     const vote = await createVote({
       deadline: deadline.toJSDate(),
       voteOptions: options.map(option => option.name),
       title: voteTitle,
       description: voteDescription,
       pageId: cardId ?? currentPageId,
-      threshold: +passThreshold
+      threshold: +passThreshold,
+      type: voteType
     });
 
     updateInlineVote(vote.id)(view.state, view.dispatch);
@@ -308,14 +309,14 @@ export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
             }}
           >
             <FormControlLabel
-              value='default'
+              value={VoteType.Approval}
               control={<Radio />}
               label='Yes / No / Abstain'
             />
-            <FormControlLabel value='custom' control={<Radio />} label='# Custom' />
+            <FormControlLabel value={VoteType.SingleChoice} control={<Radio />} label='# Custom' />
           </RadioGroup>
         </Box>
-        {voteType !== 'default' && <InlineVoteOptions options={options} setOptions={setOptions} />}
+        {voteType !== VoteType.Approval && <InlineVoteOptions options={options} setOptions={setOptions} />}
         <Button
           onClick={handleSubmit}
           sx={{
@@ -323,7 +324,10 @@ export function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
             marginBottom: '4px',
             marginRight: '8px'
           }}
-          disabled={passThreshold > 100 || voteTitle.length === 0 || (voteType === 'custom' && (options.findIndex(option => option.name.length === 0) !== -1)) || (new Set(options.map(option => option.name)).size !== options.length)}
+          disabled={passThreshold > 100
+            || voteTitle.length === 0
+            || (voteType === VoteType.SingleChoice && (options.findIndex(option => option.name.length === 0) !== -1))
+            || (new Set(options.map(option => option.name)).size !== options.length)}
         >
           Create
         </Button>
