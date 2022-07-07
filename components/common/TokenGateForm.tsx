@@ -24,19 +24,20 @@ import getLitChainFromChainId from 'lib/token-gates/getLitChainFromChainId';
 
 interface Props {
   onSubmit: (values: Space) => void;
+  spaceDomainToAccess?: string
 }
 
-export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
+export default function JoinSpacePage ({ onSubmit: _onSubmit, spaceDomainToAccess = '' }: Props) {
 
   const router = useRouter();
   const { account, chainId } = useWeb3React();
   const { showMessage } = useSnackbar();
   const [error, setError] = useState('');
   const [user, setUser] = useUser();
-  const [, setSpaces] = useSpaces();
+  const [spaces, setSpaces] = useSpaces();
   const [tokenGate, setTokenGate] = useState<TokenGate & { space: Space } | null>(null);
   const [description, setDescription] = useState('');
-  const [spaceDomain, setSpaceDomain] = useState('');
+  const [spaceDomain, setSpaceDomain] = useState(spaceDomainToAccess);
   const litClient = useLitProtocol();
   const [userInputStatus, setStatus] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -72,6 +73,9 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
           setTokenGate(gates[0]);
           if (gates[0]) {
             setStatus('Workspace found');
+          }
+          else if (spaces.some(s => s.domain === spaceDomain)) {
+            setStatus('This workspace is invite-only. Please contact the admin');
           }
           else {
             setStatus('Workspace not found');
@@ -159,6 +163,7 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
         <Grid item>
           <FieldLabel>Enter a CharmVerse Domain or URL</FieldLabel>
           <TextField
+            defaultValue={spaceDomain}
             onChange={onChangeDomainName}
             autoFocus
             placeholder='https://app.charmverse.io/my-space'

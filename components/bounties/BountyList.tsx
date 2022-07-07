@@ -36,7 +36,15 @@ function sortSelected (bountyStatuses: BountyStatus[]): BountyStatus[] {
   });
 }
 
-export default function BountyList () {
+/**
+ *
+ */
+interface Props {
+  publicMode?: boolean
+  bountyCardClicked?: (bounty: BountyWithDetails) => void
+}
+
+export default function BountyList ({ publicMode, bountyCardClicked = () => null }: Props) {
   const [displayBountyDialog, setDisplayBountyDialog] = useState(false);
   const { bounties } = useContext(BountiesContext);
 
@@ -115,7 +123,7 @@ export default function BountyList () {
             }
 
           <Box justifyContent='flex-end' alignSelf='center'>
-            { !!csvData.length
+            { !!csvData.length && !publicMode
             && (
               <CSVLink data={csvData} filename='Gnosis Safe Airdrop.csv' style={{ textDecoration: 'none' }}>
                 <Button color='secondary' variant='outlined'>
@@ -126,7 +134,7 @@ export default function BountyList () {
             <MultiPaymentModal bounties={bounties} />
 
             {
-              currentUserPermissions && (
+              currentUserPermissions && !publicMode && (
                 <Button
                   sx={{ ml: 1, height: '35px' }}
                   onClick={() => {
@@ -176,8 +184,14 @@ export default function BountyList () {
               <Grid container spacing={1}>
                 {sortedBounties.map(bounty => {
                   return (
-                    <Grid key={bounty.id} item>
-                      <BountyCard truncate={false} key={bounty.id} bounty={bounty} />
+                    <Grid
+                      key={bounty.id}
+                      item
+                      onClick={() => {
+                        bountyCardClicked(bounty);
+                      }}
+                    >
+                      <BountyCard truncate={false} key={bounty.id} bounty={bounty} publicMode={publicMode} />
                     </Grid>
                   );
                 })}

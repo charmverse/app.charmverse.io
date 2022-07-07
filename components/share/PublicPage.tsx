@@ -27,8 +27,8 @@ import BoardPage from 'components/[pageId]/BoardPage';
 import DocumentPage from 'components/[pageId]/DocumentPage';
 import { useColorMode } from 'context/darkMode';
 import LoadingComponent from 'components/common/LoadingComponent';
-import BountyList from 'components/bounties/BountyList';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import PublicBountyList from './PublicBountyList';
 
 const LayoutContainer = styled.div`
   display: flex;
@@ -132,9 +132,7 @@ export default function PublicPage () {
           <HeaderSpacer />
 
           {
-            isBountiesPage && currentSpace && (
-              currentSpace.publicBountyBoard ? <BountyList /> : <ErrorPage message={"Sorry, this workspace's bounties are reserved to its members."} />
-            )
+            isBountiesPage && <PublicBountyList />
           }
           {
             !isBountiesPage && (currentPage?.type === 'board'
