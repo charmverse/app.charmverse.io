@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Page } from '@prisma/client';
-import Button from 'components/common/Button';
+import Button from 'components/common/PrimaryButton';
 import { addPage } from 'lib/pages/addPage';
 import { useUser } from 'hooks/useUser';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';

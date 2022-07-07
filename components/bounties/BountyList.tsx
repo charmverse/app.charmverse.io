@@ -1,6 +1,6 @@
 import { Box, Grid, Typography } from '@mui/material';
 import { BountyStatus } from '@prisma/client';
-import Button from 'components/common/Button';
+import Button from 'components/common/PrimaryButton';
 import { BountiesContext } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
