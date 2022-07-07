@@ -13,8 +13,6 @@ import AddCircle from '@mui/icons-material/AddCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { ExtendedVote } from 'lib/votes/interfaces';
 
-type VoteType = 'default' | 'custom';
-
 interface InlineVoteOptionsProps {
   options: { name: string }[]
   setOptions: Dispatch<SetStateAction<{ name: string }[]>>
@@ -135,6 +133,11 @@ export default function CreateVoteModal ({ open = true, onClose, postCreateVote 
     }
   };
 
+  const disabledSave = passThreshold > 100
+    || voteTitle.length === 0
+    || (voteType === VoteType.SingleChoice && (options.findIndex(option => option.name.length === 0) !== -1))
+    || (new Set(options.map(option => option.name)).size !== options.length);
+
   return (
     <Modal title='Create an inline vote' size='large' open={open} onClose={onClose ?? (() => {})}>
       <Box
@@ -244,7 +247,7 @@ export default function CreateVoteModal ({ open = true, onClose, postCreateVote 
             marginBottom: '4px',
             marginRight: '8px'
           }}
-          disabled={passThreshold > 100 || voteTitle.length === 0 || (voteType === 'custom' && (options.findIndex(option => option.name.length === 0) !== -1)) || (new Set(options.map(option => option.name)).size !== options.length)}
+          disabled={disabledSave}
         >
           Create
         </Button>
