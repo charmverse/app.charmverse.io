@@ -165,6 +165,7 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
                     <>
                       {currentSpacePermissions?.createVote && (
                       <ListItemButton onClick={() => {
+                        setPageMenuOpen(false);
                         setIsModalOpen(true);
                       }}
                       >
