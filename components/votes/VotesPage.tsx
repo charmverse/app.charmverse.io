@@ -1,4 +1,4 @@
-import { Stack, Typography } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import { useReducer, Reducer } from 'react';
 import useSWR from 'swr';
 import VoteIcon from '@mui/icons-material/HowToVoteOutlined';
@@ -8,6 +8,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import charmClient from 'charmClient';
 import { ViewOptions, VoteSort, VoteFilter, sortVotes, filterVotes } from 'components/[pageId]/DocumentPage/components/PageInlineVotesList';
 import VotesTable from './components/VotesTable';
+import CreateProposal from './components/Proposal/CreateProposal';
 
 export interface ViewState {
   sortBy: VoteSort;
@@ -48,7 +49,10 @@ export default function VotesPage () {
         <Typography variant='h1'>
           <strong>Votes</strong>
         </Typography>
-        <ViewOptions voteSort={viewState.sortBy} voteFilter={viewState.filterBy} setVoteSort={setVoteSort} setVoteFilter={setVoteFilter} />
+        <Box display='flex' gap={3}>
+          <ViewOptions voteSort={viewState.sortBy} voteFilter={viewState.filterBy} setVoteSort={setVoteSort} setVoteFilter={setVoteFilter} />
+          <CreateProposal />
+        </Box>
       </Stack>
       <VotesTable votes={data ? sortedVotes : undefined} />
     </CenteredPageContent>
