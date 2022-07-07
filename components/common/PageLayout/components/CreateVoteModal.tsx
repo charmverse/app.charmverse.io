@@ -87,7 +87,7 @@ export default function CreateVoteModal ({ open = true, onClose, postCreateVote 
   const [voteTitle, setVoteTitle] = useState('');
   const [voteDescription, setVoteDescription] = useState('');
   const [passThreshold, setPassThreshold] = useState<number>(50);
-  const [voteType, setVoteType] = useState<VoteType>('default');
+  const [voteType, setVoteType] = useState<VoteType>(VoteType.Approval);
   const [options, setOptions] = useState<{ name: string }[]>([]);
   const { createVote } = useInlineVotes();
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
@@ -139,7 +139,7 @@ export default function CreateVoteModal ({ open = true, onClose, postCreateVote 
     || (new Set(options.map(option => option.name)).size !== options.length);
 
   return (
-    <Modal title='Create an inline vote' size='large' open={open} onClose={onClose ?? (() => {})}>
+    <Modal title='Create a vote' size='large' open={open} onClose={onClose ?? (() => {})}>
       <Box
         flexDirection='column'
         gap={1.5}

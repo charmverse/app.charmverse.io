@@ -146,7 +146,12 @@ export function sortVotes <T extends ExtendedVote> (
     );
   }
   else if (voteSort === 'position') {
-    return inlineVoteIds.map(inlineVoteId => inlineVotes[inlineVoteId]).filter(isTruthy);
+    const votesWithoutPosition = votes.filter(vote => !inlineVoteIds.includes(vote.id))
+    // sort by created Date
+      .sort(
+        (voteA, voteB) => new Date(voteA.createdAt) > new Date(voteB.createdAt) ? -1 : 1
+      );
+    return [...votesWithoutPosition, ...inlineVoteIds.map(inlineVoteId => inlineVotes[inlineVoteId]).filter(isTruthy)];
   }
   return votes;
 }

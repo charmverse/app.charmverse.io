@@ -8,6 +8,7 @@ import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import SunIcon from '@mui/icons-material/WbSunny';
 import { Divider, FormControlLabel, Switch, Typography } from '@mui/material';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
@@ -183,7 +184,7 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
                         setPageMenuOpen(false);
                       }}
                       >
-                        <HowToVoteOutlinedIcon
+                        <FormatListBulletedIcon
                           fontSize='small'
                           sx={{
                             mr: 1
@@ -269,15 +270,18 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
           <Account />
         </Box>
       </Box>
-      <CreateVoteModal
-        open={isModalOpen}
-        postCreateVote={() => {
-          setIsModalOpen(false);
-        }}
-        onClose={() => {
-          setIsModalOpen(false);
-        }}
-      />
+      {/** inject the modal based on open status so it resets the form each time */}
+      {isModalOpen && (
+        <CreateVoteModal
+          open={isModalOpen}
+          postCreateVote={() => {
+            setIsModalOpen(false);
+          }}
+          onClose={() => {
+            setIsModalOpen(false);
+          }}
+        />
+      )}
     </StyledToolbar>
   );
 }
