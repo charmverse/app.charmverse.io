@@ -23,7 +23,7 @@ import * as codeBlock from 'components/common/CharmEditor/components/@bangle.dev
 import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
-import PageInlineVotesList from 'components/[pageId]/DocumentPage/components/PageInlineVotesList';
+import PageInlineVotesList from 'components/[pageId]/DocumentPage/components/VotesSidebar';
 import PageThreadsList from 'components/[pageId]/DocumentPage/components/PageThreadsList';
 import { CryptoCurrency, FiatCurrency } from 'connectors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -46,7 +46,7 @@ import * as iframe from './components/iframe';
 import InlineCommentThread, * as inlineComment from './components/inlineComment';
 import InlinePalette, { plugins as inlinePalettePlugins, spec as inlinePaletteSpecs } from './components/inlinePalette';
 import * as inlineVote from './components/inlineVote';
-import { InlineVoteList } from './components/inlineVote';
+import InlineVoteList from './components/inlineVote/components/InlineVoteList';
 import Mention, { mentionPluginKeyName, mentionPlugins, mentionSpecs, MentionSuggest } from './components/mention';
 import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList, nestedPageSpec } from './components/nestedPage';
 import Paragraph from './components/Paragraph';

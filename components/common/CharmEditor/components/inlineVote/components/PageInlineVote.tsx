@@ -4,7 +4,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { Box, Button, Card, Chip, Divider, FormLabel, IconButton, List, ListItem, ListItemText, Menu, MenuItem, Radio, Typography } from '@mui/material';
+import { Box, Button, Card, Chip, Divider, FormControl, FormControlLabel, IconButton, List, ListItem, ListItemText, Menu, MenuItem, Radio, RadioGroup, Typography } from '@mui/material';
 import { VoteOptions } from '@prisma/client';
 import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
@@ -31,6 +31,14 @@ const StyledDiv = styled.div<{ detailed: boolean }>`
   padding: ${({ theme }) => theme.spacing(2)};
 `;
 
+const StyledFormControl = styled(FormControl)`
+  border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
+  border-top: 1px solid ${({ theme }) => theme.palette.divider};
+  width: 100%;
+  margin-bottom: ${({ theme }) => theme.spacing(2)};
+  margin-top: ${({ theme }) => theme.spacing(2)};
+`;
+
 const MAX_DESCRIPTION_LENGTH = 200;
 
 export default function PageInlineVote ({ detailed = false, inlineVote }: PageInlineVoteProps) {
@@ -47,11 +55,10 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
   const voteCountLabel = (
     <Box sx={{
       fontWeight: 'bold',
-      fontSize: 16,
       mt: 1,
       display: 'flex',
       alignItems: 'center',
-      gap: 0.5
+      gap: 1
     }}
     >
       <span>Votes</span> <Chip size='small' label={totalVotes} />
@@ -88,80 +95,68 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
         <VoteStatusChip size='small' status={inlineVote.status} />
       </Box>
       {description && (
-      <Box my={1} mb={2}>{isDescriptionAbove && !detailed ? (
-        <span>
-          {description.slice(0, 200)}...
-          <Typography
-            component='span'
-            onClick={inlineVoteDetailModal.open}
-            sx={{
-              ml: 0.5,
-              cursor: 'pointer',
-              '&:hover': {
-                textDecoration: 'underline'
-              }
-            }}
-            variant='subtitle1'
-            fontWeight='bold'
-          >(More)
-          </Typography>
-        </span>
-      ) : description}
-      </Box>
+        <Box my={1} mb={2}>{isDescriptionAbove && !detailed ? (
+          <span>
+            {description.slice(0, 200)}...
+            <Typography
+              component='span'
+              onClick={inlineVoteDetailModal.open}
+              sx={{
+                ml: 0.5,
+                cursor: 'pointer',
+                '&:hover': {
+                  textDecoration: 'underline'
+                }
+              }}
+              variant='subtitle1'
+              fontWeight='bold'
+            >(More)
+            </Typography>
+          </span>
+        ) : description}
+        </Box>
       )}
       {!detailed && voteCountLabel}
-      <List sx={{
-        display: 'flex',
-        gap: 0.5,
-        flexDirection: 'column'
-      }}
-      >
-        {voteOptions.map((voteOption) => {
-          const isDisabled = isVotingClosed(inlineVote);
-
-          return (
-            <Fragment key={voteOption.name}>
-              <ListItem sx={{ p: 0, justifyContent: 'space-between' }}>
-                <Box display='flex' alignItems='center'>
-                  <Radio
-                    disabled={isDisabled || !user}
-                    disableRipple
-                    size='small'
-                    checked={voteOption.name === userChoice}
-                    onChange={async () => {
-                      if (user) {
-                        const userVote = await castVote(id, voteOption.name);
-                        mutate((_userVotes) => {
-                          if (_userVotes) {
-                            const existingUserVoteIndex = _userVotes.findIndex(_userVote => _userVote.userId === user.id);
-                            // User already voted
-                            if (existingUserVoteIndex !== -1) {
-                              _userVotes.splice(existingUserVoteIndex, 1);
-                            }
-
-                            return [{
-                              ...userVote,
-                              user
-                            }, ..._userVotes];
-                          }
-                          return undefined;
-                        }, {
-                          revalidate: false
-                        });
-                      }
-                    }}
-                  />
-                  <Box sx={{ display: 'flex', gap: 1 }}>
-                    <FormLabel disabled={isDisabled}>{voteOption.name}</FormLabel>
-                  </Box>
+      <StyledFormControl>
+        <RadioGroup name={inlineVote.id} value={userChoice}>
+          {voteOptions.map(voteOption => (
+            <FormControlLabel
+              control={<Radio size='small' />}
+              disabled={isVotingClosed(inlineVote) || !user}
+              value={voteOption.name}
+              label={(
+                <Box display='flex' justifyContent='space-between' flexGrow={1}>
+                  <span>{voteOption.name}</span>
+                  <Typography variant='subtitle1' color='secondary'>{((totalVotes === 0 ? 0 : (voteAggregateResult?.[voteOption.name] ?? 0) / totalVotes) * 100).toFixed(2)}%</Typography>
                 </Box>
-                <Typography variant='subtitle1' color='secondary'>{((totalVotes === 0 ? 0 : (voteAggregateResult?.[voteOption.name] ?? 0) / totalVotes) * 100).toFixed(2)}%</Typography>
-              </ListItem>
-              <Divider />
-            </Fragment>
-          );
-        })}
-      </List>
+              )}
+              disableTypography
+              onChange={async () => {
+                if (user) {
+                  const userVote = await castVote(id, voteOption.name);
+                  mutate((_userVotes) => {
+                    if (_userVotes) {
+                      const existingUserVoteIndex = _userVotes.findIndex(_userVote => _userVote.userId === user.id);
+                      // User already voted
+                      if (existingUserVoteIndex !== -1) {
+                        _userVotes.splice(existingUserVoteIndex, 1);
+                      }
+
+                      return [{
+                        ...userVote,
+                        user
+                      }, ..._userVotes];
+                    }
+                    return undefined;
+                  }, {
+                    revalidate: false
+                  });
+                }
+              }}
+            />
+          ))}
+        </RadioGroup>
+      </StyledFormControl>
       {!detailed && <Button disabled={!user} variant='outlined' onClick={inlineVoteDetailModal.open}>View details</Button>}
       {detailed && (totalVotes !== 0 ? voteCountLabel : (
         <Card variant='outlined'>

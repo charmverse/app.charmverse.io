@@ -1,7 +1,7 @@
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import { Box, InputLabel, List, MenuItem, Select, Typography } from '@mui/material';
-import PageInlineVote from 'components/common/CharmEditor/components/PageInlineVote';
+import PageInlineVote from 'components/common/CharmEditor/components/inlineVote/components/PageInlineVote';
 import { useInlineVotes } from 'hooks/useInlineVotes';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { highlightDomElement, silentlyUpdateURL } from 'lib/browser';
@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react';
 import NoVotesMessage from 'components/votes/components/NoVotesMessage';
 import PageActionToggle from './PageActionToggle';
 
-export const StyledPageInlineVotesList = styled(List)`
+const VotesContainer = styled(List)`
   overflow: auto;
   display: flex;
   flex-direction: column;
@@ -25,7 +25,7 @@ export const StyledPageInlineVotesList = styled(List)`
 export type VoteSort = 'position' | 'latest_deadline' | 'highest_votes' | 'latest_created';
 export type VoteFilter = 'in_progress' | 'completed' | 'all';
 
-export default function PageInlineVotesList () {
+export default function VotesSidebar () {
   const { inlineVotes } = useInlineVotes();
   const allVotes = Object.values(inlineVotes);
   const view = useEditorViewContext();
@@ -80,11 +80,11 @@ export default function PageInlineVotesList () {
         <Typography fontWeight={600} fontSize={20}>Votes</Typography>
       </Box>
       <ViewOptions showPosition={true} voteSort={voteSort} voteFilter={voteFilter} setVoteFilter={setVoteFilter} setVoteSort={setVoteSort} />
-      <StyledPageInlineVotesList>
+      <VotesContainer>
         {sortedVotes.length === 0
           ? <NoVotesMessage message={`No ${voteFilter === 'completed' ? 'completed' : 'in progress'} votes yet`} />
           : sortedVotes.map(inlineVote => <PageInlineVote detailed={false} inlineVote={inlineVote} key={inlineVote.id} />)}
-      </StyledPageInlineVotesList>
+      </VotesContainer>
     </Box>
   );
 }

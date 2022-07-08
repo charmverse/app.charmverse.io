@@ -1,12 +1,11 @@
 import { Box, Grid, Typography } from '@mui/material';
 import { useReducer, Reducer } from 'react';
 import useSWR from 'swr';
-import VoteIcon from '@mui/icons-material/HowToVoteOutlined';
 import { VoteStatus } from '@prisma/client';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import charmClient from 'charmClient';
-import { ViewOptions, VoteSort, VoteFilter, sortVotes, filterVotes } from 'components/[pageId]/DocumentPage/components/PageInlineVotesList';
+import { ViewOptions, VoteSort, VoteFilter, sortVotes, filterVotes } from 'components/[pageId]/DocumentPage/components/VotesSidebar';
 import VotesTable from './components/VotesTable';
 import CreateProposal from './components/Proposal/CreateProposal';
 
@@ -45,7 +44,6 @@ export default function VotesPage () {
   return (
     <CenteredPageContent>
       <Grid container mb={6}>
-        {/* <VoteIcon fontSize='large' /> */}
         <Grid item xs>
           <Typography variant='h1' gutterBottom>
             <strong>Votes</strong>

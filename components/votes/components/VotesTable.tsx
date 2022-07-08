@@ -2,6 +2,7 @@ import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 import { Tooltip, Typography, Box, Grid } from '@mui/material';
 import Link from 'components/common/Link';
+import VoteIcon from '@mui/icons-material/HowToVoteOutlined';
 import GridHeader from 'components/common/Grid/GridHeader';
 import GridContainer from 'components/common/Grid/GridContainer';
 import LoadingComponent from 'components/common/LoadingComponent';
