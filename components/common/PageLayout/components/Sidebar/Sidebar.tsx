@@ -25,6 +25,7 @@ import { addPageAndRedirect, NewPageInput } from 'lib/pages';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { BoxProps } from '@mui/system';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
+import { useBounties } from 'hooks/useBounties';
 import { usePages } from 'hooks/usePages';
 import { headerHeight } from '../Header/Header';
 import NewPageMenu from '../NewPageMenu';
@@ -171,6 +172,8 @@ type SearchResultItem = {
 
 export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const router = useRouter();
+  const { pages } = usePages();
+  const { bounties } = useBounties();
   const [user] = useUser();
   const [space] = useCurrentSpace();
   const [userSpacePermissions] = useCurrentSpacePermissions();
@@ -194,19 +197,23 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
     }
   }, []);
 
-  // Search pages and bountues
+  const pageSearchResultItems: SearchResultItem[] = Object.values(pages)
+    .map(page => ({
+      name: page!.title,
+      link: `/${router.query.domain}/${page!.path}`,
+      group: 'Pages'
+    })).sort((page1, page2) => page1.name > page2.name ? 1 : -1);
 
-  const { pages } = usePages();
+  const bountySearchResultItems: SearchResultItem[] = bounties.map(bounty => ({
+    name: bounty.title,
+    link: `/${router.query.domain}/bounties/${bounty.id}`,
+    group: 'Bounties'
+  }));
 
-  const searchResultItems: SearchResultItem[] = Object.values(pages)
-    .map(page => {
-      return {
-        name: page!.title,
-        link: `/${router.query.domain}/${page!.path}`,
-        group: 'Pages'
-      };
-    }).sort((page1, page2) => page1.name > page2.name ? 1 : -1);
-
+  const searchResultItems: SearchResultItem[] = [
+    ...pageSearchResultItems,
+    ...bountySearchResultItems
+  ];
   return (
     <SidebarContainer>
       <Workspaces />
@@ -237,7 +244,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               direction='row'
               px={2}
               sx={{ paddingTop: '4px', paddingBottom: '4px', marginTop: '0px' }}
-              alignItems='self-end'
+              alignItems='center'
             >
               <SearchIcon color='secondary' fontSize='small' />
               {
@@ -249,7 +256,15 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                   options={searchResultItems}
                   groupBy={(option) => option.group}
                   getOptionLabel={option => typeof option === 'object' ? option.name : option}
-                  sx={{ width: '100%', marginTop: '0px' }}
+                  fullWidth
+                  sx={{
+                    '& .MuiInput-root': {
+                      marginTop: '0px'
+                    },
+                    '& label': {
+                      transform: 'inherit'
+                    }
+                  }}
                   renderOption={(props, option: SearchResultItem) => (
                     <Box p={1}>
                       <StyledSidebarLink
@@ -262,7 +277,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label='Quick Find'
+                      placeholder='Quick Find'
                       variant='standard'
                       size='small'
                       InputProps={{
