@@ -1,12 +1,11 @@
 import HowToVote from '@mui/icons-material/HowToVote';
 import { Alert, Box, Card, Grid, Typography } from '@mui/material';
+import Button from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { VoteTask } from 'lib/votes/interfaces';
+import { DateTime } from 'luxon';
 import { GetTasksResponse } from 'pages/api/tasks/list';
 import { KeyedMutator } from 'swr';
-import Link from 'components/common/Link';
-import { DateTime } from 'luxon';
-import Button from 'components/common/Button';
 
 interface VoteTasksListProps {
   tasks: GetTasksResponse | undefined
