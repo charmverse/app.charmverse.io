@@ -1,4 +1,4 @@
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Grid, Typography } from '@mui/material';
 import { useReducer, Reducer } from 'react';
 import useSWR from 'swr';
 import VoteIcon from '@mui/icons-material/HowToVoteOutlined';
@@ -44,16 +44,20 @@ export default function VotesPage () {
 
   return (
     <CenteredPageContent>
-      <Stack direction='row' alignItems='center' justifyContent='space-between' gap={1} mb={6}>
+      <Grid container mb={6}>
         {/* <VoteIcon fontSize='large' /> */}
-        <Typography variant='h1'>
-          <strong>Votes</strong>
-        </Typography>
-        <Box display='flex' gap={3}>
-          <ViewOptions voteSort={viewState.sortBy} voteFilter={viewState.filterBy} setVoteSort={setVoteSort} setVoteFilter={setVoteFilter} />
-          <CreateProposal />
-        </Box>
-      </Stack>
+        <Grid item xs>
+          <Typography variant='h1' gutterBottom>
+            <strong>Votes</strong>
+          </Typography>
+        </Grid>
+        <Grid xs={12} lg={8} display='flex'>
+          <Box display='flex' gap={3} sx={{ width: '100%', justifyContent: { xs: 'flex-start', lg: 'flex-end' }, flexDirection: { xs: 'column-reverse', lg: 'row' } }}>
+            <ViewOptions voteSort={viewState.sortBy} voteFilter={viewState.filterBy} setVoteSort={setVoteSort} setVoteFilter={setVoteFilter} />
+            <CreateProposal />
+          </Box>
+        </Grid>
+      </Grid>
       <VotesTable votes={data ? sortedVotes : undefined} />
     </CenteredPageContent>
   );
