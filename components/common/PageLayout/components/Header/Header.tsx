@@ -7,7 +7,8 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import SunIcon from '@mui/icons-material/WbSunny';
-import { Divider, FormControlLabel, Switch } from '@mui/material';
+import { Divider, FormControlLabel, Switch, Typography } from '@mui/material';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
@@ -28,8 +29,10 @@ import { useRouter } from 'next/router';
 import { useRef, useState } from 'react';
 import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
+import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import Account from '../Account';
 import ShareButton from '../ShareButton';
+import CreateVoteModal from '../CreateVoteModal';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
 import NotificationsBadge from './components/NotificationsBadge';
 
@@ -58,11 +61,13 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
   const pageMenuAnchor = useRef();
   const currentPage = currentPageId ? pages[currentPageId] : undefined;
   const isFavorite = currentPage && user?.favorites.some(({ pageId }) => pageId === currentPage.id);
+  const [currentSpacePermissions] = useCurrentSpacePermissions();
 
   const isPage = router.route.includes('pageId');
   const pageType = (currentPage as Page)?.type;
   const isExportablePage = pageType === 'card' || pageType === 'page';
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   async function toggleFavorite () {
     if (!currentPage || !user) return;
@@ -158,36 +163,54 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
               >
                 <List dense>
                   {isPage && (
-                  <>
-                    <ListItemButton onClick={() => {
-                      setCurrentPageActionDisplay('comments');
-                      setPageMenuOpen(false);
-                    }}
-                    >
-                      <CommentOutlinedIcon
-                        fontSize='small'
-                        sx={{
-                          mr: 1
-                        }}
-                      />
-                      <ListItemText primary='View comments' />
-                    </ListItemButton>
-                    <ListItemButton onClick={() => {
-                      setCurrentPageActionDisplay('votes');
-                      setPageMenuOpen(false);
-                    }}
-                    >
-                      <HowToVoteOutlinedIcon
-                        fontSize='small'
-                        sx={{
-                          mr: 1
-                        }}
-                      />
-                      <ListItemText primary='View votes' />
-                    </ListItemButton>
-                  </>
+                    <>
+                      {currentSpacePermissions?.createVote && (
+                      <ListItemButton onClick={() => {
+                        setPageMenuOpen(false);
+                        setIsModalOpen(true);
+                      }}
+                      >
+                        <HowToVoteOutlinedIcon
+                          fontSize='small'
+                          sx={{
+                            mr: 1
+                          }}
+                        />
+                        <ListItemText primary='Create a vote' />
+                      </ListItemButton>
+                      )}
+                      <ListItemButton onClick={() => {
+                        setCurrentPageActionDisplay('votes');
+                        setPageMenuOpen(false);
+                      }}
+                      >
+                        <FormatListBulletedIcon
+                          fontSize='small'
+                          sx={{
+                            mr: 1
+                          }}
+                        />
+                        <ListItemText primary='View votes' />
+                      </ListItemButton>
+                      <PublishToSnapshot page={currentPage as Page} />
+                    </>
                   )}
                   <Divider />
+                  {isPage && (
+                  <ListItemButton onClick={() => {
+                    setCurrentPageActionDisplay('comments');
+                    setPageMenuOpen(false);
+                  }}
+                  >
+                    <CommentOutlinedIcon
+                      fontSize='small'
+                      sx={{
+                        mr: 1
+                      }}
+                    />
+                    <ListItemText primary='View comments' />
+                  </ListItemButton>
+                  )}
                   <ListItemButton onClick={() => {
                     exportMarkdown();
                     setPageMenuOpen(false);
@@ -203,8 +226,6 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
                   </ListItemButton>
 
                   {/* Publishing to snapshot */}
-
-                  <PublishToSnapshot page={currentPage as Page} />
                   <Divider />
                   <ListItemButton>
                     <FormControlLabel
@@ -228,7 +249,7 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
                           }}
                         />
                       )}
-                      label='Full Width'
+                      label={<Typography variant='body2'>Full Width</Typography>}
                     />
                   </ListItemButton>
                 </List>
@@ -249,6 +270,18 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
           <Account />
         </Box>
       </Box>
+      {/** inject the modal based on open status so it resets the form each time */}
+      {isModalOpen && (
+        <CreateVoteModal
+          open={isModalOpen}
+          postCreateVote={() => {
+            setIsModalOpen(false);
+          }}
+          onClose={() => {
+            setIsModalOpen(false);
+          }}
+        />
+      )}
     </StyledToolbar>
   );
 }

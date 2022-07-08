@@ -1,7 +1,7 @@
 
 import {
   Application, Block, Bounty, InviteLink, Page, PagePermissionLevel, PaymentMethod, Prisma,
-  Role, Space, TelegramUser, TokenGate, TokenGateToRole, User, UserDetails, UserGnosisSafe, UserVote, Vote, VoteStatus
+  Role, Space, TelegramUser, TokenGate, TokenGateToRole, User, UserDetails, UserGnosisSafe, UserVote
 } from '@prisma/client';
 import * as http from 'adapters/http';
 import { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/focalboard/src/blocks/block';
@@ -33,17 +33,17 @@ import { UpdateThreadRequest } from 'pages/api/threads/[id]';
 import { TokenGateWithRoles } from 'pages/api/token-gates';
 
 import { ApplicationWithTransactions } from 'lib/applications/actions';
-import { AssignedBountyPermissions, BountyUpdate, SuggestionAction, BountySubmitterPoolSize, BountySubmitterPoolCalculation } from 'lib/bounties/interfaces';
+import { AssignedBountyPermissions, BountySubmitterPoolCalculation, BountySubmitterPoolSize, BountyUpdate, SuggestionAction } from 'lib/bounties/interfaces';
+import { DeepDaoAggregateData } from 'lib/deepdao/interfaces';
 import { PublicPageResponse } from 'lib/pages/interfaces';
 import { PublicSpaceInfo } from 'lib/spaces/interfaces';
 import type { MarkTask } from 'lib/tasks/markTasks';
 import { TransactionCreationData } from 'lib/transactions/interface';
+import { ExtendedVote, UserVoteExtendedDTO, VoteDTO } from 'lib/votes/interfaces';
 import { PublicUser } from 'pages/api/public/profile/[userPath]';
-import { DeepDaoAggregateData } from 'lib/deepdao/interfaces';
-import { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
 import { AssignedPermissionsQuery, Resource } from './lib/permissions/interfaces';
-import { SpacePermissionFlags, SpacePermissionModification } from './lib/permissions/spaces';
 import { SpacePermissionConfigurationUpdate } from './lib/permissions/meta/interfaces';
+import { SpacePermissionFlags, SpacePermissionModification } from './lib/permissions/spaces';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -733,6 +733,10 @@ class CharmClient {
     return http.POST<UserVote>(`/api/votes/${voteId}/cast`, {
       choice
     });
+  }
+
+  getUserVotes (voteId: string) {
+    return http.GET<UserVoteExtendedDTO[]>(`/api/votes/${voteId}/user-votes`);
   }
 }
 

@@ -22,11 +22,17 @@ export interface UserVoteDTO {
     choice: string,
 }
 export interface ExtendedVote extends Vote {
-    userVotes: (UserVote & {user: Pick<User, 'username' | 'avatar'>})[],
+    aggregatedResult: Record<string, number>
     voteOptions: VoteOptions[]
+    userChoice: null | string
+    totalVotes: number
 }
 
 export type VoteTask = Vote & {
   page: Page
   space: Space
+}
+
+export type UserVoteExtendedDTO = UserVote & {
+  user: Pick<User, 'avatar' | 'username'>
 }

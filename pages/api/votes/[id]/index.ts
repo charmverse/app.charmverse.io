@@ -20,7 +20,7 @@ handler
 
 async function getVote (req: NextApiRequest, res: NextApiResponse<Vote | { error: any }>) {
   const voteId = req.query.id as string;
-  const vote = await getVoteService(voteId);
+  const vote = await getVoteService(voteId, req.session.user.id);
   if (!vote) {
     return res.status(404).json({ error: 'No vote found' });
   }

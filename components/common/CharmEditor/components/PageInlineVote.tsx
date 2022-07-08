@@ -2,22 +2,24 @@ import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';
+import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Box, Button, Card, Chip, Divider, FormLabel, IconButton, List, ListItem, ListItemText, Menu, MenuItem, Radio, Typography } from '@mui/material';
 import { VoteOptions } from '@prisma/client';
+import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import VoteStatusChip from 'components/votes/components/VoteStatusChip';
 import { useInlineVotes } from 'hooks/useInlineVotes';
 import { useUser } from 'hooks/useUser';
 import { removeInlineVoteMark } from 'lib/inline-votes/removeInlineVoteMark';
-import { isVotingClosed } from 'lib/votes/utils';
 import { ExtendedVote } from 'lib/votes/interfaces';
+import { isVotingClosed } from 'lib/votes/utils';
 import { DateTime } from 'luxon';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
-import { useMemo } from 'react';
-import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
-import VoteStatusChip from 'components/votes/components/VoteStatusChip';
+import { Fragment } from 'react';
+import useSWR from 'swr';
 
 interface PageInlineVoteProps {
   inlineVote: ExtendedVote
@@ -29,61 +31,15 @@ const StyledDiv = styled.div<{ detailed: boolean }>`
   padding: ${({ theme }) => theme.spacing(2)};
 `;
 
-interface PageInlineVoteOptionProps {
-  voteId: string
-  voteOption: VoteOptions
-  percentage: number
-  checked: boolean
-  isDisabled: boolean
-}
-
-function PageInlineVoteOption (
-  { isDisabled, voteOption, voteId, checked, percentage }: PageInlineVoteOptionProps
-) {
-  const { castVote } = useInlineVotes();
-  const [user] = useUser();
-  return (
-    <>
-      <ListItem sx={{ p: 0, justifyContent: 'space-between' }}>
-        <Box display='flex' alignItems='center'>
-          <Radio
-            disabled={isDisabled || !user}
-            disableRipple
-            size='small'
-            checked={checked}
-            onChange={() => {
-              castVote(voteId, voteOption.name);
-            }}
-          />
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <FormLabel disabled={isDisabled}>{voteOption.name}</FormLabel>
-          </Box>
-        </Box>
-        <Typography variant='subtitle1' color='secondary'>{percentage.toFixed(2)}%</Typography>
-      </ListItem>
-      <Divider />
-    </>
-  );
-}
-
 const MAX_DESCRIPTION_LENGTH = 200;
 
 export default function PageInlineVote ({ detailed = false, inlineVote }: PageInlineVoteProps) {
-  const { deadline, description, title, userVotes, voteOptions } = inlineVote;
-  const totalVotes = userVotes.length;
+  const { deadline, totalVotes, description, id, title, userChoice, voteOptions } = inlineVote;
   const [user] = useUser();
-  const { cancelVote, deleteVote } = useInlineVotes();
-  const voteFrequencyRecord: Record<string, number> = useMemo(() => {
-    return userVotes.reduce<Record<string, number>>((currentRecord, userVote) => {
-      if (!currentRecord[userVote.choice]) {
-        currentRecord[userVote.choice] = 1;
-      }
-      else {
-        currentRecord[userVote.choice] += 1;
-      }
-      return currentRecord;
-    }, {});
-  }, [inlineVote]);
+  const { castVote, cancelVote, deleteVote } = useInlineVotes();
+  const { data: userVotes, mutate } = useSWR(detailed ? `/votes/${id}/user-votes` : null, () => charmClient.getUserVotes(id));
+
+  const voteAggregateResult = inlineVote.aggregatedResult;
 
   const inlineVoteDetailModal = usePopupState({ variant: 'popover', popupId: 'inline-votes-detail' });
   const inlineVoteActionModal = usePopupState({ variant: 'popover', popupId: 'inline-votes-action' });
@@ -101,8 +57,6 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
       <span>Votes</span> <Chip size='small' label={totalVotes} />
     </Box>
   );
-
-  const userVote = user && inlineVote.userVotes.find(_userVote => _userVote.userId === user.id);
 
   const hasPassedDeadline = new Date(deadline) < new Date();
 
@@ -166,14 +120,45 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
           const isDisabled = isVotingClosed(inlineVote);
 
           return (
-            <PageInlineVoteOption
-              key={voteOption.name}
-              checked={voteOption.name === userVote?.choice}
-              isDisabled={isDisabled}
-              voteOption={voteOption}
-              percentage={((totalVotes === 0 ? 0 : (voteFrequencyRecord[voteOption.name] ?? 0) / totalVotes) * 100)}
-              voteId={inlineVote.id}
-            />
+            <Fragment key={voteOption.name}>
+              <ListItem sx={{ p: 0, justifyContent: 'space-between' }}>
+                <Box display='flex' alignItems='center'>
+                  <Radio
+                    disabled={isDisabled || !user}
+                    disableRipple
+                    size='small'
+                    checked={voteOption.name === userChoice}
+                    onChange={async () => {
+                      if (user) {
+                        const userVote = await castVote(id, voteOption.name);
+                        mutate((_userVotes) => {
+                          if (_userVotes) {
+                            const existingUserVoteIndex = _userVotes.findIndex(_userVote => _userVote.userId === user.id);
+                            // User already voted
+                            if (existingUserVoteIndex !== -1) {
+                              _userVotes.splice(existingUserVoteIndex, 1);
+                            }
+
+                            return [{
+                              ...userVote,
+                              user
+                            }, ..._userVotes];
+                          }
+                          return undefined;
+                        }, {
+                          revalidate: false
+                        });
+                      }
+                    }}
+                  />
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    <FormLabel disabled={isDisabled}>{voteOption.name}</FormLabel>
+                  </Box>
+                </Box>
+                <Typography variant='subtitle1' color='secondary'>{((totalVotes === 0 ? 0 : (voteAggregateResult?.[voteOption.name] ?? 0) / totalVotes) * 100).toFixed(2)}%</Typography>
+              </ListItem>
+              <Divider />
+            </Fragment>
           );
         })}
       </List>
@@ -186,9 +171,9 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
           </Box>
         </Card>
       ))}
-      {detailed && (
+      {detailed && userVotes && (
         <List>
-          {userVotes.map(_userVote => (
+          {userVotes.map(userVote => (
             <>
               <ListItem
                 dense
@@ -199,12 +184,12 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
                   gap: 1
                 }}
               >
-                <Avatar avatar={_userVote.user.avatar} name={_userVote.user.username} />
+                <Avatar avatar={userVote.user.avatar} name={userVote.user.username} />
                 <ListItemText
-                  primary={<Typography>{_userVote.user.username}</Typography>}
-                  secondary={<Typography variant='subtitle1' color='secondary'>{DateTime.fromJSDate(new Date(_userVote.updatedAt)).toRelative({ base: (DateTime.now()) })}</Typography>}
+                  primary={<Typography>{userVote.user.username}</Typography>}
+                  secondary={<Typography variant='subtitle1' color='secondary'>{DateTime.fromJSDate(new Date(userVote.updatedAt)).toRelative({ base: (DateTime.now()) })}</Typography>}
                 />
-                <Typography fontWeight={500} color='secondary'>{_userVote.choice}</Typography>
+                <Typography fontWeight={500} color='secondary'>{userVote.choice}</Typography>
               </ListItem>
               <Divider />
             </>

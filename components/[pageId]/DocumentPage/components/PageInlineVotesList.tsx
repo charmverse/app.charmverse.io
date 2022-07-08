@@ -35,6 +35,7 @@ export default function PageInlineVotesList () {
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
 
   const filteredVotes = filterVotes(allVotes, voteFilter);
+
   const sortedVotes = sortVotes(filteredVotes, voteSort, inlineVoteIds, inlineVotes);
 
   useEffect(() => {
@@ -133,7 +134,7 @@ export function sortVotes <T extends ExtendedVote> (
   inlineVotes: Record<string, T> = {}
 ) {
   if (voteSort === 'highest_votes') {
-    votes.sort((voteA, voteB) => voteA.userVotes.length > voteB.userVotes.length ? -1 : 1);
+    votes.sort((voteA, voteB) => voteA.totalVotes > voteB.totalVotes ? -1 : 1);
   }
   else if (voteSort === 'latest_created') {
     votes.sort(
@@ -146,7 +147,16 @@ export function sortVotes <T extends ExtendedVote> (
     );
   }
   else if (voteSort === 'position') {
-    return inlineVoteIds.map(inlineVoteId => inlineVotes[inlineVoteId]).filter(isTruthy);
+    const voteIds = new Set(votes.map(vote => vote.id));
+    const votesWithoutPosition = votes.filter(vote => !inlineVoteIds.includes(vote.id))
+    // sort by created Date
+      .sort(
+        (voteA, voteB) => new Date(voteA.createdAt) > new Date(voteB.createdAt) ? -1 : 1
+      );
+    return [
+      ...votesWithoutPosition,
+      ...inlineVoteIds.map(inlineVoteId => inlineVotes[inlineVoteId]).filter((vote) => isTruthy(vote) && voteIds.has(vote.id))
+    ];
   }
   return votes;
 }
