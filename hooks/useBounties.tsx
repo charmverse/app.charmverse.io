@@ -43,7 +43,7 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (space) {
+    if (space?.id) {
       setIsLoading(true);
       setBounties([]);
       charmClient.listBounties(space?.id)
@@ -52,7 +52,7 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
           setIsLoading(false);
         });
     }
-  }, [user?.id, space]);
+  }, [user?.id, space?.id]);
 
   const [currentBountyId, setCurrentBountyId] = useState<string | null>(null);
 
