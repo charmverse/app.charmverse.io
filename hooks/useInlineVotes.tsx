@@ -26,9 +26,10 @@ export const InlineVotesContext = createContext<Readonly<IContext>>({
 });
 
 export function InlineVotesProvider ({ children }: { children: ReactNode }) {
-  const { currentPageId } = usePages();
+  const { currentPageId, pages } = usePages();
   const [inlineVotes, setInlineVotes] = useState<IContext['inlineVotes']>({});
   const [user] = useUser();
+
   const cardId = typeof window !== 'undefined' ? (new URLSearchParams(window.location.href)).get('cardId') : null;
 
   const { data, isValidating } = useSWR(() => currentPageId && !cardId ? `pages/${currentPageId}/inline-votes` : null, async () => charmClient.getVotesByPage(currentPageId));
@@ -68,11 +69,31 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
   }
 
   async function createVote (votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId'>): Promise<ExtendedVote> {
+
+    if (!user || !currentSpace) {
+      throw new Error('Missing user or space');
+    }
+
     const extendedVote = await charmClient.createVote({
       ...votePayload,
-      createdBy: user!.id,
+      createdBy: user.id,
       pageId: cardId ?? currentPageId,
-      spaceId: currentSpace!.id
+      spaceId: currentSpace.id
+    });
+
+    mutateTasks((tasks) => {
+      // Add the vote to the task
+      const currentPage = pages[currentPageId];
+      if (tasks && currentSpace && currentPage) {
+        tasks.votes.push({
+          ...extendedVote,
+          space: currentSpace,
+          page: currentPage
+        });
+      }
+      return tasks;
+    }, {
+      revalidate: false
     });
     setInlineVotes({
       ...inlineVotes,
