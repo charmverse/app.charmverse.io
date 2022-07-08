@@ -24,7 +24,7 @@ const StyledPopper = styled(Popper)`
 `;
 
 const StyledLink = styled(Link)`
-    padding-left: ${({ theme }) => theme.spacing(2)};
+    padding-left: ${({ theme }) => theme.spacing(3)};
     padding-right: ${({ theme }) => theme.spacing(2)};
     align-items: center;
     color: ${({ theme }) => theme.palette.secondary.main};
