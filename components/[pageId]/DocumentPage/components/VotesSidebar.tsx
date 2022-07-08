@@ -79,7 +79,14 @@ export default function VotesSidebar () {
         <PageActionToggle />
         <Typography fontWeight={600} fontSize={20}>Votes</Typography>
       </Box>
-      <ViewOptions showPosition={true} voteSort={voteSort} voteFilter={voteFilter} setVoteFilter={setVoteFilter} setVoteSort={setVoteSort} />
+      <ViewOptions
+        showPosition={true}
+        showVotes={true}
+        voteSort={voteSort}
+        voteFilter={voteFilter}
+        setVoteFilter={setVoteFilter}
+        setVoteSort={setVoteSort}
+      />
       <VotesContainer>
         {sortedVotes.length === 0
           ? <NoVotesMessage message={`No ${voteFilter === 'completed' ? 'completed' : 'in progress'} votes yet`} />
@@ -91,19 +98,20 @@ export default function VotesSidebar () {
 
 interface ViewOptionsProps {
   showPosition?: boolean;
+  showVotes?: boolean;
   voteSort: VoteSort;
   voteFilter: VoteFilter;
   setVoteFilter: (value: VoteFilter) => void;
   setVoteSort: (value: VoteSort) => void;
 }
 
-export function ViewOptions ({ voteSort, voteFilter, setVoteFilter, setVoteSort, showPosition }: ViewOptionsProps) {
+export function ViewOptions ({ voteSort, voteFilter, setVoteFilter, setVoteSort, showPosition, showVotes }: ViewOptionsProps) {
   return (
     <Box display='flex' gap={1} alignItems='center'>
       <InputLabel>Sort</InputLabel>
       <Select variant='outlined' value={voteSort} onChange={(e) => setVoteSort(e.target.value as VoteSort)} sx={{ mr: 2 }}>
         {showPosition && <MenuItem value='position'>Position</MenuItem>}
-        <MenuItem value='highest_votes'>Votes</MenuItem>
+        {showVotes && <MenuItem value='highest_votes'>Votes</MenuItem>}
         <MenuItem value='latest_deadline'>Deadline</MenuItem>
         <MenuItem value='latest_created'>Created</MenuItem>
       </Select>
@@ -117,24 +125,24 @@ export function ViewOptions ({ voteSort, voteFilter, setVoteFilter, setVoteSort,
   );
 }
 
-export function filterVotes <T extends ExtendedVote> (votes: T[], voteFilter: VoteFilter) {
+export function filterVotes <T extends { status: string }> (votes: T[], voteFilter: VoteFilter) {
   if (voteFilter === 'completed') {
     return votes.filter(sortedVote => sortedVote.status !== 'InProgress');
   }
   else if (voteFilter === 'in_progress') {
-    return votes.filter(sortedVote => sortedVote.status === 'InProgress');
+    return votes.filter(sortedVote => sortedVote.status === 'InProgress' || sortedVote.status === 'Draft');
   }
   return votes;
 }
 
-export function sortVotes <T extends ExtendedVote> (
+export function sortVotes <T extends Pick<ExtendedVote, 'createdAt' | 'deadline' | 'id'> & { totalVotes?: number }> (
   votes: T[],
   voteSort: VoteSort,
   inlineVoteIds: string[] = [],
   inlineVotes: Record<string, T> = {}
 ) {
   if (voteSort === 'highest_votes') {
-    votes.sort((voteA, voteB) => voteA.totalVotes > voteB.totalVotes ? -1 : 1);
+    votes.sort((voteA, voteB) => (typeof voteA.totalVotes === 'number' && typeof voteB.totalVotes === 'number' && voteA.totalVotes > voteB.totalVotes) ? -1 : 1);
   }
   else if (voteSort === 'latest_created') {
     votes.sort(

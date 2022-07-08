@@ -12,14 +12,7 @@ export async function getVotesBySpace (spaceId: string): Promise<Vote[]> {
     },
     include: {
       userVotes: true,
-      voteOptions: true,
-      page: {
-        select: {
-          path: true,
-          type: true,
-          title: true
-        }
-      }
+      voteOptions: true
     }
   });
 

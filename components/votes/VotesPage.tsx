@@ -4,9 +4,10 @@ import useSWR from 'swr';
 import { VoteStatus } from '@prisma/client';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePages } from 'hooks/usePages';
 import charmClient from 'charmClient';
 import { ViewOptions, VoteSort, VoteFilter, sortVotes, filterVotes } from 'components/[pageId]/DocumentPage/components/VotesSidebar';
-import VotesTable from './components/VotesTable';
+import VotesTable, { VoteRow } from './components/VotesTable';
 import CreateProposal from './components/Proposal/CreateProposal';
 
 export interface ViewState {
@@ -30,7 +31,19 @@ export default function VotesPage () {
   const [currentSpace] = useCurrentSpace();
   const { data } = useSWR(() => `votesBySpace/${currentSpace?.id}`, () => currentSpace ? charmClient.getVotesBySpace(currentSpace.id) : []);
 
-  const filteredVotes = data ? filterVotes(data, viewState.filterBy) : undefined;
+  // votes dont exist right away for proposals, so treat them like draft votes
+  const { pages } = usePages();
+  const draftProposals = Object.values(pages).filter(page => page?.type === 'proposal' && !data?.some(vote => vote.pageId === page.id));
+  const draftVotes: VoteRow[] = draftProposals.map(page => ({
+    id: page!.id,
+    createdAt: page!.createdAt,
+    deadline: null,
+    pageId: page!.id,
+    status: 'Draft',
+    title: ''
+  }));
+
+  const filteredVotes = data ? filterVotes<VoteRow>(draftVotes.concat(data), viewState.filterBy) : undefined;
   const sortedVotes = filteredVotes ? sortVotes(filteredVotes, viewState.sortBy) : undefined;
 
   function setVoteSort (sortBy: VoteSort) {
