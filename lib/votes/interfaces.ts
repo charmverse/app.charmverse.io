@@ -25,6 +25,7 @@ export interface ExtendedVote extends Vote {
     aggregatedResult: Record<string, number>
     voteOptions: VoteOptions[]
     userChoice: null | string
+    totalVotes: number
 }
 
 export type VoteTask = Vote & {

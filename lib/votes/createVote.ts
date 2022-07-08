@@ -75,6 +75,7 @@ export async function createVote (vote: VoteDTO): Promise<ExtendedVote> {
   return {
     ...dbVote,
     aggregatedResult,
-    userChoice
+    userChoice,
+    totalVotes: 0
   };
 }

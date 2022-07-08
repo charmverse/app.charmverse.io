@@ -2,22 +2,20 @@ import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';
+import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Box, Button, Card, Chip, Divider, FormLabel, IconButton, List, ListItem, ListItemText, Menu, MenuItem, Radio, Typography } from '@mui/material';
 import { VoteOptions } from '@prisma/client';
-import Avatar from 'components/common/Avatar';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import VoteStatusChip from 'components/votes/components/VoteStatusChip';
 import { useInlineVotes } from 'hooks/useInlineVotes';
 import { useUser } from 'hooks/useUser';
 import { removeInlineVoteMark } from 'lib/inline-votes/removeInlineVoteMark';
-import { isVotingClosed } from 'lib/votes/utils';
 import { ExtendedVote } from 'lib/votes/interfaces';
+import { isVotingClosed } from 'lib/votes/utils';
 import { DateTime } from 'luxon';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
-import { useMemo } from 'react';
-import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
-import VoteStatusChip from 'components/votes/components/VoteStatusChip';
 
 interface PageInlineVoteProps {
   inlineVote: ExtendedVote
@@ -69,21 +67,11 @@ function PageInlineVoteOption (
 const MAX_DESCRIPTION_LENGTH = 200;
 
 export default function PageInlineVote ({ detailed = false, inlineVote }: PageInlineVoteProps) {
-  const { deadline, description, title, userVotes, voteOptions } = inlineVote;
-  const totalVotes = userVotes.length;
+  const { deadline, totalVotes, description, title, userChoice, voteOptions } = inlineVote;
   const [user] = useUser();
   const { cancelVote, deleteVote } = useInlineVotes();
-  const voteFrequencyRecord: Record<string, number> = useMemo(() => {
-    return userVotes.reduce<Record<string, number>>((currentRecord, userVote) => {
-      if (!currentRecord[userVote.choice]) {
-        currentRecord[userVote.choice] = 1;
-      }
-      else {
-        currentRecord[userVote.choice] += 1;
-      }
-      return currentRecord;
-    }, {});
-  }, [inlineVote]);
+
+  const voteAggregateResult = inlineVote.aggregatedResult;
 
   const inlineVoteDetailModal = usePopupState({ variant: 'popover', popupId: 'inline-votes-detail' });
   const inlineVoteActionModal = usePopupState({ variant: 'popover', popupId: 'inline-votes-action' });
@@ -101,8 +89,6 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
       <span>Votes</span> <Chip size='small' label={totalVotes} />
     </Box>
   );
-
-  const userVote = user && inlineVote.userVotes.find(_userVote => _userVote.userId === user.id);
 
   const hasPassedDeadline = new Date(deadline) < new Date();
 
@@ -168,10 +154,10 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
           return (
             <PageInlineVoteOption
               key={voteOption.name}
-              checked={voteOption.name === userVote?.choice}
+              checked={voteOption.name === userChoice}
               isDisabled={isDisabled}
               voteOption={voteOption}
-              percentage={((totalVotes === 0 ? 0 : (voteFrequencyRecord[voteOption.name] ?? 0) / totalVotes) * 100)}
+              percentage={((totalVotes === 0 ? 0 : (voteAggregateResult?.[voteOption.name] ?? 0) / totalVotes) * 100)}
               voteId={inlineVote.id}
             />
           );
@@ -186,7 +172,7 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
           </Box>
         </Card>
       ))}
-      {detailed && (
+      {/* {detailed && (
         <List>
           {userVotes.map(_userVote => (
             <>
@@ -210,7 +196,7 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
             </>
           ))}
         </List>
-      )}
+      )} */}
       <Modal title='Vote details' size='large' open={inlineVoteDetailModal.isOpen} onClose={inlineVoteDetailModal.close}>
         <PageInlineVote inlineVote={inlineVote} detailed />
       </Modal>

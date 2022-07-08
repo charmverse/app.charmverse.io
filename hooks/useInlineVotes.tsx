@@ -46,6 +46,9 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
         if (currentChoice) {
           vote.aggregatedResult[currentChoice] -= 1;
         }
+        else {
+          vote.totalVotes += 1;
+        }
         vote.aggregatedResult[choice] += 1;
         _inlineVotes[voteId] = {
           ...vote

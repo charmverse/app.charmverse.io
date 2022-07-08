@@ -6,7 +6,7 @@ import { prisma } from 'db';
 import { getVote } from './getVote';
 
 export async function deleteVote (id: string, userId: string): Promise<Vote | null> {
-  const vote: Vote | null = await getVote(id);
+  const vote: Vote | null = await getVote(id, userId);
 
   if (!vote) {
     log.warn(`Attempt to delete a non-existing vote with id: ${id}`);

@@ -17,7 +17,8 @@ handler
 
 async function getVotes (req: NextApiRequest, res: NextApiResponse<Vote | { error: any }>) {
   const voteId = req.query.id as string;
-  const vote = await getVoteService(voteId);
+  const userId = req.session.user.id;
+  const vote = await getVoteService(voteId, userId);
   if (!vote) {
     return res.status(404).json({ error: 'No vote found' });
   }
