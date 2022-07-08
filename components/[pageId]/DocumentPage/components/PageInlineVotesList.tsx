@@ -133,7 +133,7 @@ export function sortVotes <T extends ExtendedVote> (
   inlineVotes: Record<string, T> = {}
 ) {
   if (voteSort === 'highest_votes') {
-    votes.sort((voteA, voteB) => voteA.userVotes.length > voteB.userVotes.length ? -1 : 1);
+    votes.sort((voteA, voteB) => voteA.totalVotes > voteB.totalVotes ? -1 : 1);
   }
   else if (voteSort === 'latest_created') {
     votes.sort(
