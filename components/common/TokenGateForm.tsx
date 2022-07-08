@@ -126,12 +126,22 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit, spaceDomainToAcces
         }
         return null;
       });
+
+    // create user if we need one
+    if (!user && account) {
+      try {
+        const userProfile = await charmClient.login(account);
+        setUser(userProfile);
+      }
+      catch (err) {
+        const userProfile = await charmClient.createUser({ address: account });
+        setUser(userProfile);
+      }
+    }
+
     const result = jwt ? await charmClient.unlockTokenGate({ jwt, id: tokenGate.id }) : null;
     if (result?.space) {
-      // create user if we need one
-      if (!user && account) {
-        await charmClient.createUser({ address: account });
-      }
+
       // refresh user permissions
       const _user = await charmClient.getUser();
       setUser(_user);
@@ -162,9 +172,16 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit, spaceDomainToAcces
 
   return (
     <>
-      <DialogTitle>Join a workspace</DialogTitle>
-      <Divider />
-      <br />
+      {// We are controlling the title from Public Bounty list, so don't need this
+       !spaceDomainToAccess && (
+       <>
+         <DialogTitle>Join a workspace</DialogTitle>
+         <Divider />
+         <br />
+       </>
+       )
+      }
+
       <Grid container direction='column' spacing={2}>
         {
           // We should only show this input if we are not already providing a space domain

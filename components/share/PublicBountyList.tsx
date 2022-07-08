@@ -29,7 +29,6 @@ export default function PublicBountyList () {
   const [user, setUser] = useUser();
   const { showMessage } = useSnackbar();
 
-  const blockLogin = useRef(false);
   const renders = useRef(0);
   renders.current += 1;
 
@@ -71,25 +70,12 @@ export default function PublicBountyList () {
   }
 
   function loginUser () {
-    //    console.log('Login user fired, block login state', blockLogin.current, 'Timestamp', Date.now(), 'Renders', renders);
-    // Prevents accidentally creating a user twice
-    if (!loggingIn && !blockLogin.current) {
-      blockLogin.current = true;
+    if (!loggingIn) {
       setLoggingIn(true);
       charmClient.login(account as string)
         .then(loggedInProfile => {
           setUser(loggedInProfile);
           setLoggingIn(false);
-          blockLogin.current = false;
-        })
-        .catch(() => {
-          charmClient.createUser({
-            address: account as string
-          }).then(loggedInProfile => {
-            setUser(loggedInProfile);
-            setLoggingIn(false);
-            blockLogin.current = false;
-          });
         });
     }
   }
@@ -101,33 +87,23 @@ export default function PublicBountyList () {
   return (space.publicBountyBoard ? (
     <>
       <BountyList publicMode bountyCardClicked={bountySelected} />
-      <Modal size='large' open={loginViaTokenGateModal.isOpen} onClose={loginViaTokenGateModal.close}>
+      <Modal size='large' open={loginViaTokenGateModal.isOpen && !isSpaceMember} onClose={loginViaTokenGateModal.close} title={`Join the ${space?.name} workspace to apply`}>
         {
           !account && (
-            <>
-              <Typography variant='h2' display='block' textAlign='center'>Join the {space?.name} workspace to apply</Typography>
+            <Box display='flex' justifyContent='center' sx={{ mt: 3 }}>
 
-              <Box display='flex' justifyContent='center' sx={{ mt: 3 }}>
-
-                <PrimaryButton
-                  onClick={openWalletSelectorModal}
-                  loading={loggingIn}
-                >
-                  Connect wallet
-                </PrimaryButton>
-              </Box>
-            </>
+              <PrimaryButton
+                onClick={openWalletSelectorModal}
+                loading={loggingIn}
+              >
+                Connect wallet
+              </PrimaryButton>
+            </Box>
           )
         }
 
         {
-          account && !user && (
-            <LoadingComponent height='200px' isLoading={true} />
-          )
-        }
-
-        {
-          account && user && (
+          account && (
             <TokenGateForm
               onSubmit={() => {
                 loginViaTokenGateModal.close();
