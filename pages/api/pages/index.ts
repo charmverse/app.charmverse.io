@@ -50,7 +50,7 @@ async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
   }
   catch (error) {
 
-    log.warn('Deleting page because page permissions failed. TODO: create permissions with page in one transaction');
+    log.warn('Deleting page because page permissions failed. TODO: create permissions with page in one transaction', { error });
     await prisma.page.delete({ where: { id: page.id } });
 
     throw error;
