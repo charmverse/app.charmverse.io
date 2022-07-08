@@ -1,8 +1,9 @@
 import { Vote } from '@prisma/client';
 import { prisma } from 'db';
+import { calculateVoteStatus } from './calculateVoteStatus';
 
 export async function getVotesBySpace (spaceId: string): Promise<Vote[]> {
-  const pageVotes = await prisma.vote.findMany({
+  const spaceVotes = await prisma.vote.findMany({
     where: {
       spaceId,
       page: {
@@ -10,11 +11,8 @@ export async function getVotesBySpace (spaceId: string): Promise<Vote[]> {
       }
     },
     include: {
-      userVotes: {
-        select: {
-          userId: true
-        }
-      },
+      userVotes: true,
+      voteOptions: true,
       page: {
         select: {
           path: true
@@ -23,5 +21,16 @@ export async function getVotesBySpace (spaceId: string): Promise<Vote[]> {
     }
   });
 
-  return pageVotes;
+  return spaceVotes.map(spaceVote => {
+    const voteStatus = calculateVoteStatus(spaceVote);
+    const userVotes = spaceVote.userVotes;
+
+    delete (spaceVote as any).userVotes;
+
+    return {
+      ...spaceVote,
+      status: voteStatus,
+      totalVotes: userVotes.length
+    };
+  });
 }

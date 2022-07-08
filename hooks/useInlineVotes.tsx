@@ -1,9 +1,9 @@
+import { UserVote } from '@prisma/client';
 import charmClient from 'charmClient';
 import useTasks from 'components/nexus/hooks/useTasks';
 import { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
-import { VoteStatus, VoteType } from '@prisma/client';
 import { useCurrentSpace } from './useCurrentSpace';
 import { usePages } from './usePages';
 import { useUser } from './useUser';
@@ -12,7 +12,7 @@ type IContext = {
   isValidating: boolean,
   inlineVotes: Record<string, ExtendedVote>
   createVote: (votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId'>) => Promise<ExtendedVote>,
-  castVote: (voteId: string, option: string) => Promise<void>
+  castVote: (voteId: string, option: string) => Promise<UserVote>
   deleteVote: (voteId: string) => Promise<void>,
   cancelVote: (voteId: string) => Promise<void>,
 };
@@ -33,72 +33,45 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
 
   const cardId = typeof window !== 'undefined' ? (new URLSearchParams(window.location.href)).get('cardId') : null;
 
-  const { data, isValidating } = useSWR(() => currentPageId && !cardId ? `pages/${currentPageId}/inline-votes` : null, async () => {
-    const fetchedInlineVotes = await charmClient.getVotesByPage(currentPageId);
-    return fetchedInlineVotes.map(fetchedInlineVote => {
-      const userVoteFrequencyRecord = fetchedInlineVote.userVotes.reduce<Record<string, number>>((currentRecord, userVote) => {
-        if (!currentRecord[userVote.choice]) {
-          currentRecord[userVote.choice] = 1;
-        }
-        else {
-          currentRecord[userVote.choice] += 1;
-        }
-        return currentRecord;
-      }, {});
-
-      const totalVotes = fetchedInlineVote.userVotes.length;
-      const threshold = fetchedInlineVote.threshold;
-      const status = fetchedInlineVote.status;
-
-      if (status !== 'Cancelled' && new Date(fetchedInlineVote.deadline) < new Date()) {
-        if (fetchedInlineVote.type === VoteType.Approval) {
-          fetchedInlineVote.status = ((userVoteFrequencyRecord.Yes * 100) / totalVotes) >= threshold ? VoteStatus.Passed : VoteStatus.Rejected;
-        } // If any of the option passed the threshold amount
-        else if (Object.values(userVoteFrequencyRecord).some(voteCount => ((voteCount / totalVotes) * 100) >= threshold)) {
-          fetchedInlineVote.status = VoteStatus.Passed;
-        }
-        else {
-          fetchedInlineVote.status = VoteStatus.Rejected;
-        }
-      }
-      return fetchedInlineVote;
-    });
-  });
+  const { data, isValidating } = useSWR(() => currentPageId && !cardId ? `pages/${currentPageId}/inline-votes` : null, async () => charmClient.getVotesByPage(currentPageId));
 
   const [currentSpace] = useCurrentSpace();
   const { mutate: mutateTasks } = useTasks();
+
+  function removeVoteFromTask (voteId: string) {
+    mutateTasks((tasks) => {
+      return tasks ? {
+        ...tasks,
+        votes: tasks.votes.filter(_vote => _vote.id !== voteId)
+      } : undefined;
+    }, {
+      revalidate: false
+    });
+  }
 
   async function castVote (voteId: string, choice: string) {
     const userVote = await charmClient.castVote(voteId, choice);
     setInlineVotes((_inlineVotes) => {
       const vote = _inlineVotes[voteId];
       if (vote && user) {
-        const existingUserVote = vote.userVotes.find(_userVote => _userVote.userId === user.id);
-        if (existingUserVote) {
-          existingUserVote.choice = choice;
-          existingUserVote.updatedAt = new Date();
+        const currentChoice = vote.userChoice;
+        vote.userChoice = choice;
+        if (currentChoice) {
+          vote.aggregatedResult[currentChoice] -= 1;
         }
-        // Vote casted for the first time
         else {
-          vote.userVotes.unshift({
-            ...userVote,
-            user
-          });
-          mutateTasks((tasks) => {
-            return tasks ? {
-              ...tasks,
-              votes: tasks.votes.filter(_vote => _vote.id !== voteId)
-            } : undefined;
-          }, {
-            revalidate: false
-          });
+          vote.totalVotes += 1;
         }
+        vote.aggregatedResult[choice] += 1;
         _inlineVotes[voteId] = {
           ...vote
         };
+
+        removeVoteFromTask(voteId);
       }
       return { ..._inlineVotes };
     });
+    return userVote;
   }
 
   async function createVote (votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId'>): Promise<ExtendedVote> {
@@ -130,10 +103,7 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
     });
     setInlineVotes({
       ...inlineVotes,
-      [extendedVote.id]: {
-        ...extendedVote,
-        userVotes: []
-      }
+      [extendedVote.id]: extendedVote
     });
     return extendedVote;
   }
@@ -142,6 +112,7 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
     await charmClient.deleteVote(voteId);
     delete inlineVotes[voteId];
     setInlineVotes({ ...inlineVotes });
+    removeVoteFromTask(voteId);
   }
 
   async function cancelVote (voteId: string) {
@@ -151,6 +122,7 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
       status: 'Cancelled'
     };
     setInlineVotes({ ...inlineVotes });
+    removeVoteFromTask(voteId);
   }
 
   useEffect(() => {
