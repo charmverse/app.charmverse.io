@@ -98,16 +98,15 @@ export default function BountyList ({ publicMode, bountyCardClicked = () => null
   return (
     <FullWidthPageContent>
 
-      <Box display='flex' justifyContent='space-between' alignContent='center' mb={3}>
-        {
-            bounties.length === 0 && (
-              <Typography variant='h6'>Getting started with bounties</Typography>
-            )
-          }
+      <Grid container display='flex' justifyContent='space-between' alignContent='center' mb={3}>
+
+        <Grid item xs={12} mb={2} justifyContent='center'>
+          <Typography variant='h1' display='flex' alignItems='center' sx={{ height: '100%' }}>Bounties</Typography>
+        </Grid>
 
         {
           bounties.length > 0 && (
-            <Box>
+            <Grid item>
               {/* Filters for the bounties */}
               <InputBountyStatus
                 onChange={(statuses) => {
@@ -117,42 +116,51 @@ export default function BountyList ({ publicMode, bountyCardClicked = () => null
                 renderSelectedInOption={true}
                 defaultValues={savedBountyFilters}
               />
-            </Box>
+            </Grid>
           )
 
             }
 
-        <Box justifyContent='flex-end' alignSelf='center'>
-          { !!csvData.length && !publicMode
-            && (
-              <CSVLink data={csvData} filename='Gnosis Safe Airdrop.csv' style={{ textDecoration: 'none' }}>
-                <Button color='secondary' variant='outlined'>
-                  Export to CSV
-                </Button>
-              </CSVLink>
-            )}
-          <MultiPaymentModal bounties={bounties} />
+        {
+          !publicMode && (
+            <Box justifyContent='flex-end' alignSelf='center'>
+              { !!csvData.length
+              && (
+                <CSVLink data={csvData} filename='Gnosis Safe Airdrop.csv' style={{ textDecoration: 'none' }}>
+                  <Button color='secondary' variant='outlined'>
+                    Export to CSV
+                  </Button>
+                </CSVLink>
+              )}
+              <MultiPaymentModal bounties={bounties} />
 
-          {
-              currentUserPermissions && !publicMode && (
-                <Button
-                  sx={{ ml: 1, height: '35px' }}
-                  onClick={() => {
-                    setDisplayBountyDialog(true);
-                  }}
-                >
-                  {suggestBounties ? 'Suggest' : 'Create'} Bounty
-                </Button>
-              )
-            }
+              {
+                currentUserPermissions && (
+                  <Button
+                    sx={{ ml: 1, height: '35px' }}
+                    onClick={() => {
+                      setDisplayBountyDialog(true);
+                    }}
+                  >
+                    {suggestBounties ? 'Suggest' : 'Create'} Bounty
+                  </Button>
+                )
+              }
 
-        </Box>
-      </Box>
+            </Box>
+          )
+        }
+
+      </Grid>
 
       {/* Onboarding video when no bounties exist */}
       {
             bounties.length === 0 && (
               <div style={{ marginTop: '25px' }}>
+
+                <Typography variant='h6'>
+                  Getting started with bounties
+                </Typography>
 
                 <iframe
                   src='https://tiny.charmverse.io/bounties'

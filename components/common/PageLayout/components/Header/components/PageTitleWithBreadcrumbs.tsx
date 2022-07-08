@@ -131,14 +131,17 @@ function BountyPageTitle ({ basePath }: { basePath: string }) {
 function PublicBountyPageTitle () {
   const [space] = useCurrentSpace();
   return (
-    <Typography variant='h6' fontWeight='bold'>
-      {
-        space && (
-          `${space.name} bounties`
-        )
-      }
+    <PageTitleWrapper>
+      {space && (
+        <>
+          <BreadCrumb>
+            {`${space.name}`}
+          </BreadCrumb>
+          Bounties
+        </>
+      )}
 
-    </Typography>
+    </PageTitleWrapper>
   );
 }
 
