@@ -14,12 +14,14 @@ import { usePages } from 'hooks/usePages';
 import NoVotesMessage from './NoVotesMessage';
 import VoteStatusChip from './VoteStatusChip';
 import ProposalDialog from './Proposal/ProposalDialog';
+import VoteActionsMenu from './VoteActionsMenu';
 
 export interface VoteRow {
   id: string;
   pageId: string;
   title: string;
   createdAt: Date;
+  createdBy: string;
   deadline: any | null;
   status: VoteStatus | 'Draft';
 }
@@ -28,6 +30,7 @@ export default function VotesTable ({ votes }: { votes?: VoteRow[] }) {
 
   const router = useRouter();
   const { pages } = usePages();
+
   const [activePage, setActivePage] = useState<Page | null>();
 
   function openPage (pageId: string) {
@@ -67,13 +70,13 @@ export default function VotesTable ({ votes }: { votes?: VoteRow[] }) {
       )}
       {votes?.map(vote => (
         <GridContainer key={vote.id}>
-          <Grid item xs={8} sm={8} md={6}>
+          <Grid item xs={8} sm={8} md={5}>
             {pages[vote.pageId]?.type === 'proposal' && (
               <Box display='flex' alignItems='center' justifyContent='space-between' onClick={() => openPage(vote.pageId)}>
                 <Box display='flex' alignItems='flex-start' gap={1}>
                   <VoteIcon color='secondary' />
                   <div>
-                    <Typography><strong>{pages[vote.pageId]?.title}</strong></Typography>
+                    <Typography><strong>{vote.title}</strong></Typography>
                   </div>
                 </Box>
                 <Button className='show-on-hover' color='secondary' variant='outlined' size='small'>Open</Button>
@@ -86,7 +89,7 @@ export default function VotesTable ({ votes }: { votes?: VoteRow[] }) {
                     <VoteIcon color='secondary' />
                     <div>
                       <Typography><strong>{vote.title}</strong></Typography>
-                      <Typography variant='caption'>{pages[vote.pageId]?.title}</Typography>
+                      <Typography variant='caption'>{pages[vote.pageId]?.title || 'Untitled'}</Typography>
                     </div>
                   </Box>
                   <Button className='show-on-hover' color='secondary' variant='outlined' size='small'>Open</Button>
@@ -94,7 +97,7 @@ export default function VotesTable ({ votes }: { votes?: VoteRow[] }) {
               </Link>
             )}
           </Grid>
-          <Grid item xs={4} md={2} display='flex' justifyContent='center'>
+          <Grid item xs={3} md={2} display='flex' justifyContent='center'>
             <VoteStatusChip status={vote.status} />
           </Grid>
           <Grid item xs={2} sx={{ display: { xs: 'none', md: 'flex' } }} justifyContent='center'>
@@ -104,6 +107,9 @@ export default function VotesTable ({ votes }: { votes?: VoteRow[] }) {
           </Grid>
           <Grid item xs={2} sx={{ display: { xs: 'none', md: 'flex' } }} display='flex' justifyContent='center'>
             {toMonthDate(vote.createdAt)}
+          </Grid>
+          <Grid item xs={1}>
+            <VoteActionsMenu vote={vote} />
           </Grid>
         </GridContainer>
       ))}

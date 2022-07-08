@@ -1,15 +1,10 @@
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { Box, Button, Card, Chip, Divider, FormControl, FormControlLabel, IconButton, List, ListItem, ListItemText, Menu, MenuItem, Radio, RadioGroup, Typography } from '@mui/material';
-import { VoteOptions } from '@prisma/client';
+import { Box, Button, Card, Chip, Divider, FormControl, FormControlLabel, List, ListItem, ListItemText, Radio, RadioGroup, Typography } from '@mui/material';
 import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
 import Modal from 'components/common/Modal';
-import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import VoteStatusChip from 'components/votes/components/VoteStatusChip';
 import { useVotes } from 'hooks/useVotes';
 import { useUser } from 'hooks/useUser';
@@ -17,9 +12,9 @@ import { removeInlineVoteMark } from 'lib/inline-votes/removeInlineVoteMark';
 import { ExtendedVote } from 'lib/votes/interfaces';
 import { isVotingClosed } from 'lib/votes/utils';
 import { DateTime } from 'luxon';
-import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
-import { Fragment } from 'react';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import useSWR from 'swr';
+import VoteActionsMenu from 'components/votes/components/VoteActionsMenu';
 
 interface PageInlineVoteProps {
   inlineVote: ExtendedVote
@@ -41,16 +36,15 @@ const StyledFormControl = styled(FormControl)`
 
 const MAX_DESCRIPTION_LENGTH = 200;
 
-export default function PageInlineVote ({ detailed = false, inlineVote }: PageInlineVoteProps) {
-  const { deadline, totalVotes, description, id, title, userChoice, voteOptions } = inlineVote;
+export default function PageInlineVote ({ detailed = false, inlineVote: vote }: PageInlineVoteProps) {
+  const { deadline, totalVotes, description, id, title, userChoice, voteOptions } = vote;
   const [user] = useUser();
-  const { castVote, cancelVote, deleteVote } = useVotes();
+  const { castVote } = useVotes();
   const { data: userVotes, mutate } = useSWR(detailed ? `/votes/${id}/user-votes` : null, () => charmClient.getUserVotes(id));
 
-  const voteAggregateResult = inlineVote.aggregatedResult;
+  const voteAggregateResult = vote.aggregatedResult;
 
-  const inlineVoteDetailModal = usePopupState({ variant: 'popover', popupId: 'inline-votes-detail' });
-  const inlineVoteActionModal = usePopupState({ variant: 'popover', popupId: 'inline-votes-action' });
+  const voteDetailsPopup = usePopupState({ variant: 'popover', popupId: 'inline-votes-detail' });
 
   const voteCountLabel = (
     <Box sx={{
@@ -69,21 +63,19 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
 
   const relativeDate = DateTime.fromJSDate(new Date(deadline)).toRelative({ base: (DateTime.now()) });
   const isDescriptionAbove = description ? description.length > MAX_DESCRIPTION_LENGTH : false;
-  const popupState = usePopupState({ variant: 'popover', popupId: 'delete-inline-vote' });
-  const menuState = bindMenu(popupState);
-  const view = useEditorViewContext();
+
+  function removeFromPage (voteId: string) {
+    const view = useEditorViewContext();
+    removeInlineVoteMark(view, voteId);
+  }
 
   return (
-    <StyledDiv detailed={detailed} id={`vote.${inlineVote.id}`}>
+    <StyledDiv detailed={detailed} id={`vote.${vote.id}`}>
       <Box display='flex' justifyContent='space-between' alignItems='center'>
         <Typography variant='h6' fontWeight='bold'>
           {title}
         </Typography>
-        {inlineVote.createdBy === user?.id && (
-          <IconButton size='small' onClick={inlineVoteActionModal.open}>
-            <MoreHorizIcon fontSize='small' />
-          </IconButton>
-        )}
+        <VoteActionsMenu vote={vote} removeFromPage={removeFromPage} />
       </Box>
       <Box display='flex' justifyContent='space-between'>
         <Typography
@@ -92,7 +84,7 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
         >
           {hasPassedDeadline ? relativeDate : `${relativeDate?.replace(/^in/g, '')} left`}
         </Typography>
-        <VoteStatusChip size='small' status={inlineVote.status} />
+        <VoteStatusChip size='small' status={vote.status} />
       </Box>
       {description && (
         <Box my={1} mb={2}>{isDescriptionAbove && !detailed ? (
@@ -100,7 +92,7 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
             {description.slice(0, 200)}...
             <Typography
               component='span'
-              onClick={inlineVoteDetailModal.open}
+              onClick={voteDetailsPopup.open}
               sx={{
                 ml: 0.5,
                 cursor: 'pointer',
@@ -118,11 +110,11 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
       )}
       {!detailed && voteCountLabel}
       <StyledFormControl>
-        <RadioGroup name={inlineVote.id} value={userChoice}>
+        <RadioGroup name={vote.id} value={userChoice}>
           {voteOptions.map(voteOption => (
             <FormControlLabel
               control={<Radio size='small' />}
-              disabled={isVotingClosed(inlineVote) || !user}
+              disabled={isVotingClosed(vote) || !user}
               value={voteOption.name}
               label={(
                 <Box display='flex' justifyContent='space-between' flexGrow={1}>
@@ -157,7 +149,7 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
           ))}
         </RadioGroup>
       </StyledFormControl>
-      {!detailed && <Button disabled={!user} variant='outlined' onClick={inlineVoteDetailModal.open}>View details</Button>}
+      {!detailed && <Button disabled={!user} variant='outlined' onClick={voteDetailsPopup.open}>View details</Button>}
       {detailed && (totalVotes !== 0 ? voteCountLabel : (
         <Card variant='outlined'>
           <Box p={3} textAlign='center'>
@@ -191,43 +183,9 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
           ))}
         </List>
       )}
-      <Modal title='Vote details' size='large' open={inlineVoteDetailModal.isOpen} onClose={inlineVoteDetailModal.close}>
-        <PageInlineVote inlineVote={inlineVote} detailed />
+      <Modal title='Vote details' size='large' open={voteDetailsPopup.isOpen} onClose={voteDetailsPopup.close}>
+        <PageInlineVote inlineVote={vote} detailed />
       </Modal>
-      <ConfirmDeleteModal
-        title='Delete vote'
-        onClose={popupState.close}
-        open={menuState.open}
-        buttonText={`Delete ${inlineVote.title}`}
-        onConfirm={() => {
-          removeInlineVoteMark(view, inlineVote.id);
-          deleteVote(inlineVote.id);
-        }}
-        question={`Are you sure you want to delete this vote: ${inlineVote.title}?`}
-      />
-      <Menu
-        {...bindMenu(inlineVoteActionModal)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {inlineVote.status === 'InProgress' && !hasPassedDeadline && (
-          <MenuItem
-            dense
-            onClick={() => {
-              removeInlineVoteMark(view, inlineVote.id);
-              cancelVote(inlineVote.id);
-            }}
-          >
-            <DoNotDisturbIcon fontSize='small' sx={{ mr: 1 }} />
-            <ListItemText>Cancel</ListItemText>
-          </MenuItem>
-        )}
-        <MenuItem dense onClick={() => popupState.open()}>
-          <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
-          <ListItemText>Delete</ListItemText>
-        </MenuItem>
-      </Menu>
     </StyledDiv>
   );
 }

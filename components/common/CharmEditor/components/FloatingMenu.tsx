@@ -16,7 +16,8 @@ import { MenuGroup } from './@bangle.dev/react-menu/MenuGroup';
 import { queryIsSelectionAroundInlineComment } from './inlineComment';
 import { InlineCommentSubMenu } from './inlineComment/InlineComment.components';
 import { markName as inlineCommentMarkName } from './inlineComment/inlineComment.constants';
-import { InlineVoteSubMenu, queryIsSelectionAroundInlineVote } from './inlineVote';
+import { queryIsSelectionAroundInlineVote } from './inlineVote';
+import InlineVoteSubMenu from './inlineVote/components/InlineVoteSubMenu';
 import { markName as inlineVoteMarkName } from './inlineVote/inlineVote.constants';
 
 export type FloatingMenuVariant = 'defaultMenu' | 'linkSubMenu' | 'inlineCommentSubMenu' | 'commentOnlyMenu';

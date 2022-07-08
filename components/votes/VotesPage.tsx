@@ -37,10 +37,11 @@ export default function VotesPage () {
   const draftVotes: VoteRow[] = draftProposals.map(page => ({
     id: page!.id,
     createdAt: page!.createdAt,
+    createdBy: page!.createdBy,
     deadline: null,
     pageId: page!.id,
     status: 'Draft',
-    title: ''
+    title: page!.title
   }));
 
   const filteredVotes = data ? filterVotes<VoteRow>(draftVotes.concat(data), viewState.filterBy) : undefined;
