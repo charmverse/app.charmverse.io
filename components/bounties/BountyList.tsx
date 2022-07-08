@@ -100,30 +100,16 @@ export default function BountyList ({ publicMode, bountyCardClicked = () => null
 
       <Grid container display='flex' justifyContent='space-between' alignContent='center' mb={3}>
 
-        <Grid item xs={12} mb={2} justifyContent='center'>
-          <Typography variant='h1' display='flex' alignItems='center' sx={{ height: '100%' }}>Bounties</Typography>
-        </Grid>
+        <Grid display='flex' justifyContent='space-between' item xs={12} mb={2}>
+          <Box width='fit-content'>
+            <Typography variant='h1' display='flex' alignItems='center' sx={{ height: '100%' }}>
+              Bounties
+            </Typography>
+          </Box>
 
-        {
-          bounties.length > 0 && (
-            <Grid item>
-              {/* Filters for the bounties */}
-              <InputBountyStatus
-                onChange={(statuses) => {
-                  setSavedBountyFilters(sortSelected(statuses));
-                }}
-                renderSelectedInValue={true}
-                renderSelectedInOption={true}
-                defaultValues={savedBountyFilters}
-              />
-            </Grid>
-          )
-
-            }
-
-        {
+          {
           !publicMode && (
-            <Box justifyContent='flex-end' alignSelf='center'>
+            <Box width='fit-content'>
               { !!csvData.length
               && (
                 <CSVLink data={csvData} filename='Gnosis Safe Airdrop.csv' style={{ textDecoration: 'none' }}>
@@ -150,6 +136,25 @@ export default function BountyList ({ publicMode, bountyCardClicked = () => null
             </Box>
           )
         }
+
+        </Grid>
+
+        {
+          bounties.length > 0 && (
+            <Grid item xs={12}>
+              {/* Filters for the bounties */}
+              <InputBountyStatus
+                onChange={(statuses) => {
+                  setSavedBountyFilters(sortSelected(statuses));
+                }}
+                renderSelectedInValue={true}
+                renderSelectedInOption={true}
+                defaultValues={savedBountyFilters}
+              />
+            </Grid>
+          )
+
+            }
 
       </Grid>
 
