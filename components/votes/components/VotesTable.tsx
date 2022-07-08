@@ -48,7 +48,7 @@ export default function VotesTable ({ votes }: { votes?: (ExtendedVote & { page:
                 <Box display='flex' alignItems='flex-start' gap={1}>
                   <VoteIcon color='secondary' />
                   <div>
-                    <Typography><strong>{vote.title}</strong></Typography>
+                    <Typography><strong>{vote.page.type === 'proposal' ? vote.page.title : vote.title}</strong></Typography>
                     {vote.page.type !== 'proposal' && <Typography variant='caption'>{vote.page?.title}</Typography>}
                   </div>
                 </Box>
