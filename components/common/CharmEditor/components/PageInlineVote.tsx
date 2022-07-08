@@ -6,6 +6,8 @@ import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Box, Button, Card, Chip, Divider, FormLabel, IconButton, List, ListItem, ListItemText, Menu, MenuItem, Radio, Typography } from '@mui/material';
 import { VoteOptions } from '@prisma/client';
+import charmClient from 'charmClient';
+import Avatar from 'components/common/Avatar';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import VoteStatusChip from 'components/votes/components/VoteStatusChip';
@@ -16,6 +18,7 @@ import { ExtendedVote } from 'lib/votes/interfaces';
 import { isVotingClosed } from 'lib/votes/utils';
 import { DateTime } from 'luxon';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
+import useSWR from 'swr';
 
 interface PageInlineVoteProps {
   inlineVote: ExtendedVote
@@ -67,9 +70,10 @@ function PageInlineVoteOption (
 const MAX_DESCRIPTION_LENGTH = 200;
 
 export default function PageInlineVote ({ detailed = false, inlineVote }: PageInlineVoteProps) {
-  const { deadline, totalVotes, description, title, userChoice, voteOptions } = inlineVote;
+  const { deadline, totalVotes, description, id, title, userChoice, voteOptions } = inlineVote;
   const [user] = useUser();
   const { cancelVote, deleteVote } = useInlineVotes();
+  const { data: userVotes } = useSWR(detailed ? `/votes/${id}/user-votes` : null, () => charmClient.getUserVotes(id));
 
   const voteAggregateResult = inlineVote.aggregatedResult;
 
@@ -172,9 +176,9 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
           </Box>
         </Card>
       ))}
-      {/* {detailed && (
+      {detailed && userVotes && (
         <List>
-          {userVotes.map(_userVote => (
+          {userVotes.map(userVote => (
             <>
               <ListItem
                 dense
@@ -185,18 +189,18 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
                   gap: 1
                 }}
               >
-                <Avatar avatar={_userVote.user.avatar} name={_userVote.user.username} />
+                <Avatar avatar={userVote.user.avatar} name={userVote.user.username} />
                 <ListItemText
-                  primary={<Typography>{_userVote.user.username}</Typography>}
-                  secondary={<Typography variant='subtitle1' color='secondary'>{DateTime.fromJSDate(new Date(_userVote.updatedAt)).toRelative({ base: (DateTime.now()) })}</Typography>}
+                  primary={<Typography>{userVote.user.username}</Typography>}
+                  secondary={<Typography variant='subtitle1' color='secondary'>{DateTime.fromJSDate(new Date(userVote.updatedAt)).toRelative({ base: (DateTime.now()) })}</Typography>}
                 />
-                <Typography fontWeight={500} color='secondary'>{_userVote.choice}</Typography>
+                <Typography fontWeight={500} color='secondary'>{userVote.choice}</Typography>
               </ListItem>
               <Divider />
             </>
           ))}
         </List>
-      )} */}
+      )}
       <Modal title='Vote details' size='large' open={inlineVoteDetailModal.isOpen} onClose={inlineVoteDetailModal.close}>
         <PageInlineVote inlineVote={inlineVote} detailed />
       </Modal>
