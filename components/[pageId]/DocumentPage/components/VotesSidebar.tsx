@@ -2,7 +2,7 @@ import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import { Box, InputLabel, List, MenuItem, Select, Typography } from '@mui/material';
 import PageInlineVote from 'components/common/CharmEditor/components/inlineVote/components/PageInlineVote';
-import { useInlineVotes } from 'hooks/useInlineVotes';
+import { useVotes } from 'hooks/useVotes';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { highlightDomElement, silentlyUpdateURL } from 'lib/browser';
 import { findTotalInlineVotes } from 'lib/inline-votes/findTotalInlineVotes';
@@ -26,23 +26,23 @@ export type VoteSort = 'position' | 'latest_deadline' | 'highest_votes' | 'lates
 export type VoteFilter = 'in_progress' | 'completed' | 'all';
 
 export default function VotesSidebar () {
-  const { inlineVotes } = useInlineVotes();
-  const allVotes = Object.values(inlineVotes);
+  const { votes } = useVotes();
+  const votesArray = Object.values(votes);
   const view = useEditorViewContext();
   const [voteFilter, setVoteFilter] = useState<VoteFilter>('in_progress');
   const [voteSort, setVoteSort] = useState<VoteSort>('position');
-  const inlineVoteIds = voteSort === 'position' ? findTotalInlineVotes(view, view.state.doc, inlineVotes).voteIds : [];
+  const inlineVoteIds = voteSort === 'position' ? findTotalInlineVotes(view, view.state.doc, votes).voteIds : [];
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
 
-  const filteredVotes = filterVotes(allVotes, voteFilter);
+  const filteredVotes = filterVotes(votesArray, voteFilter);
 
-  const sortedVotes = sortVotes(filteredVotes, voteSort, inlineVoteIds, inlineVotes);
+  const sortedVotes = sortVotes(filteredVotes, voteSort, inlineVoteIds, votes);
 
   useEffect(() => {
     // Highlight the vote id when navigation from nexus votes tasks list tab
     const highlightedVoteId = (new URLSearchParams(window.location.search)).get('voteId');
     if (highlightedVoteId) {
-      const highlightedVote = allVotes.find(vote => vote.id === highlightedVoteId);
+      const highlightedVote = votes[highlightedVoteId];
       if (highlightedVote) {
         const highlightedVoteDomNode = document.getElementById(`vote.${highlightedVoteId}`);
         if (highlightedVoteDomNode) {
@@ -65,7 +65,7 @@ export default function VotesSidebar () {
         }
       }
     }
-  }, [allVotes, window.location.search]);
+  }, [votes, window.location.search]);
 
   return (
     <Box sx={{

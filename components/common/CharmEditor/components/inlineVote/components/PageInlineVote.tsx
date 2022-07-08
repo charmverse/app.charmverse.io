@@ -11,7 +11,7 @@ import Avatar from 'components/common/Avatar';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import VoteStatusChip from 'components/votes/components/VoteStatusChip';
-import { useInlineVotes } from 'hooks/useInlineVotes';
+import { useVotes } from 'hooks/useVotes';
 import { useUser } from 'hooks/useUser';
 import { removeInlineVoteMark } from 'lib/inline-votes/removeInlineVoteMark';
 import { ExtendedVote } from 'lib/votes/interfaces';
@@ -44,7 +44,7 @@ const MAX_DESCRIPTION_LENGTH = 200;
 export default function PageInlineVote ({ detailed = false, inlineVote }: PageInlineVoteProps) {
   const { deadline, totalVotes, description, id, title, userChoice, voteOptions } = inlineVote;
   const [user] = useUser();
-  const { castVote, cancelVote, deleteVote } = useInlineVotes();
+  const { castVote, cancelVote, deleteVote } = useVotes();
   const { data: userVotes, mutate } = useSWR(detailed ? `/votes/${id}/user-votes` : null, () => charmClient.getUserVotes(id));
 
   const voteAggregateResult = inlineVote.aggregatedResult;

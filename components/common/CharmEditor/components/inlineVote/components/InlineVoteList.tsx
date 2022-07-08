@@ -3,7 +3,7 @@ import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 
 import { Box } from '@mui/system';
 import { Modal } from 'components/common/Modal';
-import { useInlineVotes } from 'hooks/useInlineVotes';
+import { useVotes } from 'hooks/useVotes';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { findChildrenByMark, NodeWithPos } from 'prosemirror-utils';
@@ -23,18 +23,18 @@ export default function InlineVoteList ({ pluginKey }: {pluginKey: PluginKey<Inl
   const cardId = (new URLSearchParams(window.location.href)).get('cardId');
   const { currentPageActionDisplay } = usePageActionDisplay();
   const inlineVoteDetailModal = usePopupState({ variant: 'popover', popupId: 'inline-votes-detail' });
-  const { inlineVotes, isValidating } = useInlineVotes();
-  const inProgressVoteIds = ids.filter(voteId => inlineVotes[voteId]?.status === 'InProgress');
+  const { votes, isValidating } = useVotes();
+  const inProgressVoteIds = ids.filter(voteId => votes[voteId]?.status === 'InProgress');
 
   // Using a ref so that its done only once
   const hasRemovedCompletedVoteMarks = useRef(false);
 
   useEffect(() => {
     if (!hasRemovedCompletedVoteMarks.current) {
-      const inlineVotesList = Object.keys(inlineVotes);
-      const inProgressVoteIdsSet = new Set(inlineVotesList.filter(voteId => inlineVotes[voteId].status === 'InProgress'));
+      const votesList = Object.keys(votes);
+      const inProgressVoteIdsSet = new Set(votesList.filter(voteId => votes[voteId].status === 'InProgress'));
       const completedVoteNodeWithMarks: (NodeWithPos & {mark: Mark})[] = [];
-      if (!isValidating && inlineVotesList.length !== 0) {
+      if (!isValidating && votesList.length !== 0) {
         const inlineVoteMarkSchema = view.state.schema.marks[markName] as MarkType;
         const inlineVoteNodes = findChildrenByMark(view.state.doc, inlineVoteMarkSchema);
         for (const inlineVoteNode of inlineVoteNodes) {
@@ -63,7 +63,7 @@ export default function InlineVoteList ({ pluginKey }: {pluginKey: PluginKey<Inl
         hasRemovedCompletedVoteMarks.current = true;
       }
     }
-  }, [inlineVotes, isValidating, view, hasRemovedCompletedVoteMarks]);
+  }, [votes, isValidating, view, hasRemovedCompletedVoteMarks]);
 
   if ((currentPageActionDisplay !== 'votes' || cardId) && show && inProgressVoteIds.length !== 0) {
     return (
@@ -78,7 +78,7 @@ export default function InlineVoteList ({ pluginKey }: {pluginKey: PluginKey<Inl
       >
         {inProgressVoteIds.map(inProgressVoteId => (
           <Box mb={2}>
-            <PageInlineVote inlineVote={inlineVotes[inProgressVoteId]} detailed />
+            <PageInlineVote inlineVote={votes[inProgressVoteId]} detailed />
           </Box>
         ))}
       </Modal>

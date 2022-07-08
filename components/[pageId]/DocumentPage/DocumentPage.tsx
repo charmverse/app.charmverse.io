@@ -15,6 +15,7 @@ import CharmEditor, { ICharmEditorOutput } from '../../common/CharmEditor/CharmE
 import PageBanner from './components/PageBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
 import PageHeader from './components/PageHeader';
+import ProposalVote from './components/ProposalVote';
 
 export const Container = styled(Box)<{ top: number, fullWidth?: boolean }>`
   width: ${({ fullWidth }) => fullWidth ? '100%' : '860px'};
@@ -108,36 +109,39 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
               setPage={setPage}
             />
             {card && board && (
-            <div className='CardDetail content'>
-              {/* Property list */}
-              <Box sx={{
-                display: 'flex',
-                gap: 1,
-                justifyContent: 'space-between',
-                width: '100%'
-              }}
-              >
-                <CardDetailProperties
-                  board={board}
-                  card={card}
-                  cards={cards}
-                  activeView={activeView}
-                  views={boardViews}
-                  readonly={readOnly}
-                  pageUpdatedAt={page.updatedAt.toString()}
-                  pageUpdatedBy={page.updatedBy}
-                />
-                <BountyIntegration linkedTaskId={card.id} title={page.title} readonly={readOnly} />
-              </Box>
+              <div className='CardDetail content'>
+                {/* Property list */}
+                <Box sx={{
+                  display: 'flex',
+                  gap: 1,
+                  justifyContent: 'space-between',
+                  width: '100%'
+                }}
+                >
+                  <CardDetailProperties
+                    board={board}
+                    card={card}
+                    cards={cards}
+                    activeView={activeView}
+                    views={boardViews}
+                    readonly={readOnly}
+                    pageUpdatedAt={page.updatedAt.toString()}
+                    pageUpdatedBy={page.updatedBy}
+                  />
+                  <BountyIntegration linkedTaskId={card.id} title={page.title} readonly={readOnly} />
+                </Box>
 
-              <hr />
-              <CommentsList
-                comments={comments}
-                rootId={card.rootId}
-                cardId={card.id}
-                readonly={readOnly}
-              />
-            </div>
+                <hr />
+                <CommentsList
+                  comments={comments}
+                  rootId={card.rootId}
+                  cardId={card.id}
+                  readonly={readOnly}
+                />
+              </div>
+            )}
+            {page.type === 'proposal' && (
+              <ProposalVote page={page} />
             )}
           </CharmEditor>
         </Container>

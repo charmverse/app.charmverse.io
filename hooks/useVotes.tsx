@@ -10,30 +10,30 @@ import { useUser } from './useUser';
 
 type IContext = {
   isValidating: boolean,
-  inlineVotes: Record<string, ExtendedVote>
+  votes: Record<string, ExtendedVote>
   createVote: (votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId'>) => Promise<ExtendedVote>,
   castVote: (voteId: string, option: string) => Promise<UserVote>
   deleteVote: (voteId: string) => Promise<void>,
   cancelVote: (voteId: string) => Promise<void>,
 };
 
-export const InlineVotesContext = createContext<Readonly<IContext>>({
+const VotesContext = createContext<Readonly<IContext>>({
   isValidating: true,
-  inlineVotes: {},
+  votes: {},
   castVote: () => undefined as any,
   createVote: () => undefined as any,
   deleteVote: () => undefined as any,
   cancelVote: () => undefined as any
 });
 
-export function InlineVotesProvider ({ children }: { children: ReactNode }) {
+export function VotesProvider ({ children }: { children: ReactNode }) {
   const { currentPageId, pages } = usePages();
-  const [inlineVotes, setInlineVotes] = useState<IContext['inlineVotes']>({});
+  const [votes, setVotes] = useState<IContext['votes']>({});
   const [user] = useUser();
 
   const cardId = typeof window !== 'undefined' ? (new URLSearchParams(window.location.href)).get('cardId') : null;
 
-  const { data, isValidating } = useSWR(() => currentPageId && !cardId ? `pages/${currentPageId}/inline-votes` : null, async () => charmClient.getVotesByPage(currentPageId));
+  const { data, isValidating } = useSWR(() => currentPageId && !cardId ? `pages/${currentPageId}/votes` : null, async () => charmClient.getVotesByPage(currentPageId));
 
   const [currentSpace] = useCurrentSpace();
   const { mutate: mutateTasks } = useTasks();
@@ -51,8 +51,8 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
 
   async function castVote (voteId: string, choice: string) {
     const userVote = await charmClient.castVote(voteId, choice);
-    setInlineVotes((_inlineVotes) => {
-      const vote = _inlineVotes[voteId];
+    setVotes((_votes) => {
+      const vote = _votes[voteId];
       if (vote && user) {
         const currentChoice = vote.userChoice;
         vote.userChoice = choice;
@@ -63,13 +63,13 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
           vote.totalVotes += 1;
         }
         vote.aggregatedResult[choice] += 1;
-        _inlineVotes[voteId] = {
+        _votes[voteId] = {
           ...vote
         };
 
         removeVoteFromTask(voteId);
       }
-      return { ..._inlineVotes };
+      return { ..._votes };
     });
     return userVote;
   }
@@ -101,8 +101,8 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
     }, {
       revalidate: false
     });
-    setInlineVotes({
-      ...inlineVotes,
+    setVotes({
+      ...votes,
       [extendedVote.id]: extendedVote
     });
     return extendedVote;
@@ -110,39 +110,39 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
 
   async function deleteVote (voteId: string) {
     await charmClient.deleteVote(voteId);
-    delete inlineVotes[voteId];
-    setInlineVotes({ ...inlineVotes });
+    delete votes[voteId];
+    setVotes({ ...votes });
     removeVoteFromTask(voteId);
   }
 
   async function cancelVote (voteId: string) {
     await charmClient.cancelVote(voteId);
-    inlineVotes[voteId] = {
-      ...inlineVotes[voteId],
+    votes[voteId] = {
+      ...votes[voteId],
       status: 'Cancelled'
     };
-    setInlineVotes({ ...inlineVotes });
+    setVotes({ ...votes });
     removeVoteFromTask(voteId);
   }
 
   useEffect(() => {
-    setInlineVotes(data?.reduce((acc, voteWithUser) => ({ ...acc, [voteWithUser.id]: voteWithUser }), {}) || {});
+    setVotes(data?.reduce((acc, voteWithUser) => ({ ...acc, [voteWithUser.id]: voteWithUser }), {}) || {});
   }, [data]);
 
   const value: IContext = useMemo(() => ({
-    inlineVotes,
+    votes,
     isValidating,
     castVote,
     createVote,
     deleteVote,
     cancelVote
-  }), [currentPageId, inlineVotes, isValidating]);
+  }), [currentPageId, votes, isValidating]);
 
   return (
-    <InlineVotesContext.Provider value={value}>
+    <VotesContext.Provider value={value}>
       {children}
-    </InlineVotesContext.Provider>
+    </VotesContext.Provider>
   );
 }
 
-export const useInlineVotes = () => useContext(InlineVotesContext);
+export const useVotes = () => useContext(VotesContext);

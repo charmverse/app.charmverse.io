@@ -5,7 +5,7 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Modal from 'components/common/Modal';
-import { useInlineVotes } from 'hooks/useInlineVotes';
+import { useVotes } from 'hooks/useVotes';
 import { usePages } from 'hooks/usePages';
 import { DateTime } from 'luxon';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
@@ -89,7 +89,7 @@ export default function CreateVoteModal ({ open = true, onClose, postCreateVote 
   const [passThreshold, setPassThreshold] = useState<number>(50);
   const [voteType, setVoteType] = useState<VoteType>(VoteType.Approval);
   const [options, setOptions] = useState<{ name: string }[]>([]);
-  const { createVote } = useInlineVotes();
+  const { createVote } = useVotes();
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
 
   useEffect(() => {
