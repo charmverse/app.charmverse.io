@@ -160,6 +160,11 @@ enum VoteStatus {
   Cancelled
 }
 
+enum VoteType {
+  Approval
+  SingleChoice
+}
+
 model VoteOptions {
   name   String
   voteId String @db.Uuid
@@ -181,6 +186,7 @@ model Vote {
   description String?
   deadline    DateTime
   status      VoteStatus
+  type        VoteType      @default(SingleChoice)
   createdAt   DateTime      @default(now())
   userVotes   UserVote[]
   voteOptions VoteOptions[]

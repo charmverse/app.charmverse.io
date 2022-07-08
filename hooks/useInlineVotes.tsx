@@ -3,6 +3,7 @@ import useTasks from 'components/nexus/hooks/useTasks';
 import { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
+import { VoteStatus, VoteType } from '@prisma/client';
 import { useCurrentSpace } from './useCurrentSpace';
 import { usePages } from './usePages';
 import { useUser } from './useUser';
@@ -26,9 +27,10 @@ export const InlineVotesContext = createContext<Readonly<IContext>>({
 });
 
 export function InlineVotesProvider ({ children }: { children: ReactNode }) {
-  const { currentPageId } = usePages();
+  const { currentPageId, pages } = usePages();
   const [inlineVotes, setInlineVotes] = useState<IContext['inlineVotes']>({});
   const [user] = useUser();
+
   const cardId = typeof window !== 'undefined' ? (new URLSearchParams(window.location.href)).get('cardId') : null;
 
   const { data, isValidating } = useSWR(() => currentPageId && !cardId ? `pages/${currentPageId}/inline-votes` : null, async () => {
@@ -49,12 +51,14 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
       const status = fetchedInlineVote.status;
 
       if (status !== 'Cancelled' && new Date(fetchedInlineVote.deadline) < new Date()) {
-        // If any of the option passed the threshold amount
-        if (Object.values(userVoteFrequencyRecord).some(voteCount => ((voteCount / totalVotes) * 100) >= threshold)) {
-          fetchedInlineVote.status = 'Passed';
+        if (fetchedInlineVote.type === VoteType.Approval) {
+          fetchedInlineVote.status = ((userVoteFrequencyRecord.Yes * 100) / totalVotes) >= threshold ? VoteStatus.Passed : VoteStatus.Rejected;
+        } // If any of the option passed the threshold amount
+        else if (Object.values(userVoteFrequencyRecord).some(voteCount => ((voteCount / totalVotes) * 100) >= threshold)) {
+          fetchedInlineVote.status = VoteStatus.Passed;
         }
         else {
-          fetchedInlineVote.status = 'Rejected';
+          fetchedInlineVote.status = VoteStatus.Rejected;
         }
       }
       return fetchedInlineVote;
@@ -98,11 +102,31 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
   }
 
   async function createVote (votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId'>): Promise<ExtendedVote> {
+
+    if (!user || !currentSpace) {
+      throw new Error('Missing user or space');
+    }
+
     const extendedVote = await charmClient.createVote({
       ...votePayload,
-      createdBy: user!.id,
+      createdBy: user.id,
       pageId: cardId ?? currentPageId,
-      spaceId: currentSpace!.id
+      spaceId: currentSpace.id
+    });
+
+    mutateTasks((tasks) => {
+      // Add the vote to the task
+      const currentPage = pages[currentPageId];
+      if (tasks && currentSpace && currentPage) {
+        tasks.votes.push({
+          ...extendedVote,
+          space: currentSpace,
+          page: currentPage
+        });
+      }
+      return tasks;
+    }, {
+      revalidate: false
     });
     setInlineVotes({
       ...inlineVotes,
