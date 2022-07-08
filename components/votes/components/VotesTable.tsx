@@ -47,10 +47,10 @@ export default function VotesTable ({ votes }: { votes?: VoteRow[] }) {
   return (
     <>
       <GridHeader>
-        <Grid item xs={8} md={6}>
+        <Grid item xs={8} md={5}>
           Title
         </Grid>
-        <Grid item xs={4} md={2} display='flex' justifyContent='center'>
+        <Grid item xs={3} md={2} display='flex' justifyContent='center'>
           Status
         </Grid>
         <Grid item xs={2} sx={{ display: { xs: 'none', md: 'flex' } }} justifyContent='center'>
@@ -59,6 +59,7 @@ export default function VotesTable ({ votes }: { votes?: VoteRow[] }) {
         <Grid item xs={2} sx={{ display: { xs: 'none', md: 'flex' } }} justifyContent='center'>
           Created
         </Grid>
+        <Grid item xs={1} />
       </GridHeader>
       {!votes && (
         <LoadingComponent height='250px' isLoading={true} />
@@ -74,7 +75,7 @@ export default function VotesTable ({ votes }: { votes?: VoteRow[] }) {
             {pages[vote.pageId]?.type === 'proposal' && (
               <Box display='flex' alignItems='center' justifyContent='space-between' onClick={() => openPage(vote.pageId)}>
                 <Box display='flex' alignItems='flex-start' gap={1}>
-                  <VoteIcon color='secondary' />
+                  <Box component='span' sx={{ display: { xs: 'none', md: 'inline' } }}><VoteIcon color='secondary' /></Box>
                   <div>
                     <Typography><strong>{vote.title}</strong></Typography>
                   </div>
@@ -86,7 +87,7 @@ export default function VotesTable ({ votes }: { votes?: VoteRow[] }) {
               <Link color='textPrimary' href={getVoteUrl({ domain: router.query.domain as string, path: pages[vote.pageId]?.path || '', voteId: vote.id })}>
                 <Box display='flex' alignItems='center' justifyContent='space-between'>
                   <Box display='flex' alignItems='flex-start' gap={1}>
-                    <VoteIcon color='secondary' />
+                    <Box component='span' sx={{ display: { xs: 'none', md: 'inline' } }}><VoteIcon color='secondary' /></Box>
                     <div>
                       <Typography><strong>{vote.title}</strong></Typography>
                       <Typography variant='caption'>{pages[vote.pageId]?.title || 'Untitled'}</Typography>
