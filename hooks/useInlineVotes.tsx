@@ -37,6 +37,17 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
   const [currentSpace] = useCurrentSpace();
   const { mutate: mutateTasks } = useTasks();
 
+  function removeVoteFromTask (voteId: string) {
+    mutateTasks((tasks) => {
+      return tasks ? {
+        ...tasks,
+        votes: tasks.votes.filter(_vote => _vote.id !== voteId)
+      } : undefined;
+    }, {
+      revalidate: false
+    });
+  }
+
   async function castVote (voteId: string, choice: string) {
     await charmClient.castVote(voteId, choice);
     setInlineVotes((_inlineVotes) => {
@@ -55,14 +66,7 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
           ...vote
         };
 
-        mutateTasks((tasks) => {
-          return tasks ? {
-            ...tasks,
-            votes: tasks.votes.filter(_vote => _vote.id !== voteId)
-          } : undefined;
-        }, {
-          revalidate: false
-        });
+        removeVoteFromTask(voteId);
       }
       return { ..._inlineVotes };
     });
@@ -106,6 +110,7 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
     await charmClient.deleteVote(voteId);
     delete inlineVotes[voteId];
     setInlineVotes({ ...inlineVotes });
+    removeVoteFromTask(voteId);
   }
 
   async function cancelVote (voteId: string) {
@@ -115,6 +120,7 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
       status: 'Cancelled'
     };
     setInlineVotes({ ...inlineVotes });
+    removeVoteFromTask(voteId);
   }
 
   useEffect(() => {
