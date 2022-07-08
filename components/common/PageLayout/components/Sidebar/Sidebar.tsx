@@ -1,4 +1,3 @@
-
 import styled from '@emotion/styled';
 import { css, Theme } from '@emotion/react';
 import { Divider } from '@mui/material';
@@ -7,12 +6,9 @@ import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import SettingsIcon from '@mui/icons-material/Settings';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import VoteIcon from '@mui/icons-material/HowToVoteOutlined';
-import Autocomplete from '@mui/material/Autocomplete';
 import Box from '@mui/material/Box';
-import Stack from '@mui/material/Stack';
 import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search';
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { Page } from '@prisma/client';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -25,13 +21,13 @@ import { addPageAndRedirect, NewPageInput } from 'lib/pages';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { BoxProps } from '@mui/system';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
-import { useBounties } from 'hooks/useBounties';
-import { usePages } from 'hooks/usePages';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { headerHeight } from '../Header/Header';
 import NewPageMenu from '../NewPageMenu';
 import Workspaces from './Workspaces';
 import PageNavigation from '../PageNavigation';
 import TrashModal from '../TrashModal';
+import SearchInWorkspaceModal from '../SearchInWorkspaceModal';
 
 const WorkspaceLabel = styled.div`
   display: flex;
@@ -164,21 +160,15 @@ interface SidebarProps {
   favorites: LoggedInUser['favorites'];
 }
 
-type SearchResultItem = {
-  name: string;
-  link: string;
-  group: string;
-};
-
 export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const router = useRouter();
-  const { pages } = usePages();
-  const { bounties } = useBounties();
   const [user] = useUser();
   const [space] = useCurrentSpace();
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const [isScrolled, setIsScrolled] = useState(false);
   const [showingTrash, setShowingTrash] = useState(false);
+
+  const searchInWorkspaceModalState = usePopupState({ variant: 'popover', popupId: 'search-in-workspace-modal' });
 
   const favoritePageIds = favorites.map(f => f.pageId);
 
@@ -197,23 +187,6 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
     }
   }, []);
 
-  const pageSearchResultItems: SearchResultItem[] = Object.values(pages)
-    .map(page => ({
-      name: page!.title,
-      link: `/${router.query.domain}/${page!.path}`,
-      group: 'Pages'
-    })).sort((page1, page2) => page1.name > page2.name ? 1 : -1);
-
-  const bountySearchResultItems: SearchResultItem[] = bounties.map(bounty => ({
-    name: bounty.title,
-    link: `/${router.query.domain}/bounties/${bounty.id}`,
-    group: 'Bounties'
-  }));
-
-  const searchResultItems: SearchResultItem[] = [
-    ...pageSearchResultItems,
-    ...bountySearchResultItems
-  ];
   return (
     <SidebarContainer>
       <Workspaces />
@@ -239,58 +212,15 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               label='Votes'
             />
             <Divider sx={{ mx: 2, my: 1 }} />
-            <Stack
-              spacing={1}
-              direction='row'
-              px={2}
-              sx={{ paddingTop: '4px', paddingBottom: '4px', marginTop: '0px' }}
-              alignItems='center'
-            >
-              <SearchIcon color='secondary' fontSize='small' />
-              {
-                searchResultItems
-                && (
-                <Autocomplete
-                  freeSolo
-                  disableClearable
-                  options={searchResultItems}
-                  groupBy={(option) => option.group}
-                  getOptionLabel={option => typeof option === 'object' ? option.name : option}
-                  fullWidth
-                  sx={{
-                    '& .MuiInput-root': {
-                      marginTop: '0px'
-                    },
-                    '& label': {
-                      transform: 'inherit'
-                    }
-                  }}
-                  renderOption={(props, option: SearchResultItem) => (
-                    <Box p={0.5}>
-                      <StyledSidebarLink
-                        href={option.link}
-                        active={false}
-                      >
-                        {option.name}
-                      </StyledSidebarLink>
-                    </Box>
-                  )}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      placeholder='Quick Find'
-                      variant='standard'
-                      size='small'
-                      InputProps={{
-                        ...params.InputProps,
-                        type: 'search'
-                      }}
-                    />
-                  )}
-                />
-                )
-              }
-            </Stack>
+            <SidebarBox
+              onClick={searchInWorkspaceModalState.open}
+              icon={<SearchIcon color='secondary' fontSize='small' />}
+              label='Quick Find'
+            />
+            <SearchInWorkspaceModal
+              isOpen={searchInWorkspaceModalState.isOpen}
+              close={searchInWorkspaceModalState.close}
+            />
             <SidebarLink
               active={router.pathname.startsWith('/[domain]/settings')}
               href={`/${space.domain}/settings/workspace`}
