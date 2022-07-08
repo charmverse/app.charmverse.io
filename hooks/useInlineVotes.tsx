@@ -1,3 +1,4 @@
+import { UserVote } from '@prisma/client';
 import charmClient from 'charmClient';
 import useTasks from 'components/nexus/hooks/useTasks';
 import { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
@@ -11,7 +12,7 @@ type IContext = {
   isValidating: boolean,
   inlineVotes: Record<string, ExtendedVote>
   createVote: (votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId'>) => Promise<ExtendedVote>,
-  castVote: (voteId: string, option: string) => Promise<void>
+  castVote: (voteId: string, option: string) => Promise<UserVote>
   deleteVote: (voteId: string) => Promise<void>,
   cancelVote: (voteId: string) => Promise<void>,
 };
@@ -49,7 +50,7 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
   }
 
   async function castVote (voteId: string, choice: string) {
-    await charmClient.castVote(voteId, choice);
+    const userVote = await charmClient.castVote(voteId, choice);
     setInlineVotes((_inlineVotes) => {
       const vote = _inlineVotes[voteId];
       if (vote && user) {
@@ -70,6 +71,7 @@ export function InlineVotesProvider ({ children }: { children: ReactNode }) {
       }
       return { ..._inlineVotes };
     });
+    return userVote;
   }
 
   async function createVote (votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId'>): Promise<ExtendedVote> {

@@ -18,6 +18,7 @@ import { ExtendedVote } from 'lib/votes/interfaces';
 import { isVotingClosed } from 'lib/votes/utils';
 import { DateTime } from 'luxon';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
+import { Fragment } from 'react';
 import useSWR from 'swr';
 
 interface PageInlineVoteProps {
@@ -30,50 +31,13 @@ const StyledDiv = styled.div<{ detailed: boolean }>`
   padding: ${({ theme }) => theme.spacing(2)};
 `;
 
-interface PageInlineVoteOptionProps {
-  voteId: string
-  voteOption: VoteOptions
-  percentage: number
-  checked: boolean
-  isDisabled: boolean
-}
-
-function PageInlineVoteOption (
-  { isDisabled, voteOption, voteId, checked, percentage }: PageInlineVoteOptionProps
-) {
-  const { castVote } = useInlineVotes();
-  const [user] = useUser();
-  return (
-    <>
-      <ListItem sx={{ p: 0, justifyContent: 'space-between' }}>
-        <Box display='flex' alignItems='center'>
-          <Radio
-            disabled={isDisabled || !user}
-            disableRipple
-            size='small'
-            checked={checked}
-            onChange={() => {
-              castVote(voteId, voteOption.name);
-            }}
-          />
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <FormLabel disabled={isDisabled}>{voteOption.name}</FormLabel>
-          </Box>
-        </Box>
-        <Typography variant='subtitle1' color='secondary'>{percentage.toFixed(2)}%</Typography>
-      </ListItem>
-      <Divider />
-    </>
-  );
-}
-
 const MAX_DESCRIPTION_LENGTH = 200;
 
 export default function PageInlineVote ({ detailed = false, inlineVote }: PageInlineVoteProps) {
   const { deadline, totalVotes, description, id, title, userChoice, voteOptions } = inlineVote;
   const [user] = useUser();
-  const { cancelVote, deleteVote } = useInlineVotes();
-  const { data: userVotes } = useSWR(detailed ? `/votes/${id}/user-votes` : null, () => charmClient.getUserVotes(id));
+  const { castVote, cancelVote, deleteVote } = useInlineVotes();
+  const { data: userVotes, mutate } = useSWR(detailed ? `/votes/${id}/user-votes` : null, () => charmClient.getUserVotes(id));
 
   const voteAggregateResult = inlineVote.aggregatedResult;
 
@@ -156,14 +120,45 @@ export default function PageInlineVote ({ detailed = false, inlineVote }: PageIn
           const isDisabled = isVotingClosed(inlineVote);
 
           return (
-            <PageInlineVoteOption
-              key={voteOption.name}
-              checked={voteOption.name === userChoice}
-              isDisabled={isDisabled}
-              voteOption={voteOption}
-              percentage={((totalVotes === 0 ? 0 : (voteAggregateResult?.[voteOption.name] ?? 0) / totalVotes) * 100)}
-              voteId={inlineVote.id}
-            />
+            <Fragment key={voteOption.name}>
+              <ListItem sx={{ p: 0, justifyContent: 'space-between' }}>
+                <Box display='flex' alignItems='center'>
+                  <Radio
+                    disabled={isDisabled || !user}
+                    disableRipple
+                    size='small'
+                    checked={voteOption.name === userChoice}
+                    onChange={async () => {
+                      if (user) {
+                        const userVote = await castVote(id, voteOption.name);
+                        mutate((_userVotes) => {
+                          if (_userVotes) {
+                            const existingUserVoteIndex = _userVotes.findIndex(_userVote => _userVote.userId === user.id);
+                            // User already voted
+                            if (existingUserVoteIndex !== -1) {
+                              _userVotes.splice(existingUserVoteIndex, 1);
+                            }
+
+                            return [{
+                              ...userVote,
+                              user
+                            }, ..._userVotes];
+                          }
+                          return undefined;
+                        }, {
+                          revalidate: false
+                        });
+                      }
+                    }}
+                  />
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    <FormLabel disabled={isDisabled}>{voteOption.name}</FormLabel>
+                  </Box>
+                </Box>
+                <Typography variant='subtitle1' color='secondary'>{((totalVotes === 0 ? 0 : (voteAggregateResult?.[voteOption.name] ?? 0) / totalVotes) * 100).toFixed(2)}%</Typography>
+              </ListItem>
+              <Divider />
+            </Fragment>
           );
         })}
       </List>
