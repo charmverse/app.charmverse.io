@@ -225,7 +225,6 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
                     <ListItemText primary='Export to markdown' />
                   </ListItemButton>
 
-                  {/* Publishing to snapshot */}
                   <Divider />
                   <ListItemButton>
                     <FormControlLabel
