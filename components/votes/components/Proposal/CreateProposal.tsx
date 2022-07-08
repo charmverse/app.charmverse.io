@@ -26,7 +26,7 @@ export default function CreateProposal () {
 
   return (
     <>
-      <Button size='small' color='primary' onClick={onClickCreate}>
+      <Button onClick={onClickCreate}>
         Create Proposal
       </Button>
       <ProposalDialog page={page} onClose={() => setPage(null)} />
