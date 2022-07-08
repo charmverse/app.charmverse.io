@@ -15,7 +15,9 @@ export async function getVotesBySpace (spaceId: string): Promise<Vote[]> {
       voteOptions: true,
       page: {
         select: {
-          path: true
+          path: true,
+          type: true,
+          title: true
         }
       }
     }

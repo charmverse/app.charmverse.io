@@ -12,7 +12,7 @@ import { ExtendedVote } from 'lib/votes/interfaces';
 import NoVotesMessage from './NoVotesMessage';
 import VoteStatusChip from './VoteStatusChip';
 
-export default function VotesTable ({ votes }: { votes?: (ExtendedVote & { page: { path: string }})[] }) {
+export default function VotesTable ({ votes }: { votes?: (ExtendedVote & { page: { path: string, title: string, type: string }})[] }) {
 
   const router = useRouter();
 
@@ -43,9 +43,15 @@ export default function VotesTable ({ votes }: { votes?: (ExtendedVote & { page:
       {votes?.map(vote => (
         <GridContainer key={vote.id}>
           <Grid item xs={8} sm={8} md={6}>
-            <Link href={getVoteUrl({ domain: router.query.domain as string, path: vote.page.path, voteId: vote.id })}>
+            <Link color='textPrimary' href={getVoteUrl({ domain: router.query.domain as string, path: vote.page.path, voteId: vote.id })}>
               <Box display='flex' alignItems='center' justifyContent='space-between'>
-                {vote.title}
+                <Box display='flex' alignItems='flex-start' gap={1}>
+                  <VoteIcon color='secondary' />
+                  <div>
+                    <Typography><strong>{vote.title}</strong></Typography>
+                    {vote.page.type !== 'proposal' && <Typography variant='caption'>{vote.page?.title}</Typography>}
+                  </div>
+                </Box>
                 <Button className='show-on-hover' color='secondary' variant='outlined' size='small'>Open</Button>
               </Box>
             </Link>
