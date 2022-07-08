@@ -7,8 +7,12 @@ import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import SettingsIcon from '@mui/icons-material/Settings';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import VoteIcon from '@mui/icons-material/HowToVoteOutlined';
+import Autocomplete from '@mui/material/Autocomplete';
 import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
 import IconButton from '@mui/material/IconButton';
+import SearchIcon from '@mui/icons-material/Search';
+import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { Page } from '@prisma/client';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -21,6 +25,7 @@ import { addPageAndRedirect, NewPageInput } from 'lib/pages';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { BoxProps } from '@mui/system';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
+import { usePages } from 'hooks/usePages';
 import { headerHeight } from '../Header/Header';
 import NewPageMenu from '../NewPageMenu';
 import Workspaces from './Workspaces';
@@ -158,6 +163,12 @@ interface SidebarProps {
   favorites: LoggedInUser['favorites'];
 }
 
+type SearchResultItem = {
+  name: string;
+  link: string;
+  group: string;
+};
+
 export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const router = useRouter();
   const [user] = useUser();
@@ -182,6 +193,19 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
       addPageAndRedirect(newPage, router);
     }
   }, []);
+
+  // Search pages and bountues
+
+  const { pages } = usePages();
+
+  const searchResultItems: SearchResultItem[] = Object.values(pages)
+    .map(page => {
+      return {
+        name: page!.title,
+        link: `/${router.query.domain}/${page!.path}`,
+        group: 'Pages'
+      };
+    }).sort((page1, page2) => page1.name > page2.name ? 1 : -1);
 
   return (
     <SidebarContainer>
@@ -208,6 +232,49 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               label='Votes'
             />
             <Divider sx={{ mx: 2, my: 1 }} />
+            <Stack
+              spacing={1}
+              direction='row'
+              px={2}
+              sx={{ paddingTop: '4px', paddingBottom: '4px', marginTop: '0px' }}
+              alignItems='self-end'
+            >
+              <SearchIcon color='secondary' fontSize='small' />
+              {
+                searchResultItems
+                && (
+                <Autocomplete
+                  freeSolo
+                  disableClearable
+                  options={searchResultItems}
+                  groupBy={(option) => option.group}
+                  getOptionLabel={option => typeof option === 'object' ? option.name : option}
+                  sx={{ width: '100%', marginTop: '0px' }}
+                  renderOption={(props, option: SearchResultItem) => (
+                    <Box p={1}>
+                      <StyledSidebarLink
+                        href={option.link}
+                      >
+                        {option.name}
+                      </StyledSidebarLink>
+                    </Box>
+                  )}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label='Quick Find'
+                      variant='standard'
+                      size='small'
+                      InputProps={{
+                        ...params.InputProps,
+                        type: 'search'
+                      }}
+                    />
+                  )}
+                />
+                )
+              }
+            </Stack>
             <SidebarLink
               active={router.pathname.startsWith('/[domain]/settings')}
               href={`/${space.domain}/settings/workspace`}
