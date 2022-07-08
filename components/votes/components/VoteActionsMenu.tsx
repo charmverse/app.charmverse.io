@@ -31,12 +31,12 @@ export default function VoteActionsMenu ({ removeFromPage, vote }: VoteActionsPr
         title='Delete vote'
         onClose={popupState.close}
         open={popupState.isOpen}
-        buttonText={`Delete ${vote.title}`}
+        buttonText='Delete'
         onConfirm={() => {
           removeFromPage?.(vote.id);
           deleteVote(vote.id);
         }}
-        question={`Are you sure you want to delete this vote: ${vote.title}?`}
+        question={<><p>Are you sure you want to delete this vote:</p><strong>{vote.title}</strong>?</>}
       />
       <Menu
         {...bindMenu(actionsPopup)}

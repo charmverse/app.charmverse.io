@@ -43,7 +43,6 @@ export default function ConfirmDeleteModal ({
       <Box sx={{ columnSpacing: 2, mt: 3, display: 'flex' }}>
         <Button
           color='error'
-          elevation={0}
           sx={{ mr: 2, fontWeight: 'bold' }}
           onClick={_onConfirm}
         >
@@ -52,7 +51,7 @@ export default function ConfirmDeleteModal ({
 
         <Button
           color='secondary'
-          elevation={0}
+          variant='outlined'
           onClick={onClose}
         >
           Cancel

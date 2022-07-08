@@ -39,6 +39,7 @@ const MAX_DESCRIPTION_LENGTH = 200;
 export default function PageInlineVote ({ detailed = false, inlineVote: vote }: PageInlineVoteProps) {
   const { deadline, totalVotes, description, id, title, userChoice, voteOptions } = vote;
   const [user] = useUser();
+  const view = useEditorViewContext();
   const { castVote } = useVotes();
   const { data: userVotes, mutate } = useSWR(detailed ? `/votes/${id}/user-votes` : null, () => charmClient.getUserVotes(id));
 
@@ -65,7 +66,6 @@ export default function PageInlineVote ({ detailed = false, inlineVote: vote }: 
   const isDescriptionAbove = description ? description.length > MAX_DESCRIPTION_LENGTH : false;
 
   function removeFromPage (voteId: string) {
-    const view = useEditorViewContext();
     removeInlineVoteMark(view, voteId);
   }
 
