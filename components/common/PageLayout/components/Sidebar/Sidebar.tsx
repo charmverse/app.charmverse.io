@@ -266,7 +266,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                     }
                   }}
                   renderOption={(props, option: SearchResultItem) => (
-                    <Box p={1}>
+                    <Box p={0.5}>
                       <StyledSidebarLink
                         href={option.link}
                       >
