@@ -1,4 +1,5 @@
 import Alert from '@mui/material/Alert';
+import Typography from '@mui/material/Typography';
 import { useContext, useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import { Bounty } from '@prisma/client';
@@ -94,11 +95,16 @@ export default function PublicBountyList () {
       <Modal size='large' open={loginViaTokenGateModal.isOpen} onClose={loginViaTokenGateModal.close}>
         {
           !account && (
-            <Box display='flex' justifyContent='center'>
-              <PrimaryButton onClick={openWalletSelectorModal} loading={loggingIn}>
-                Connect your wallet
-              </PrimaryButton>
-            </Box>
+            <>
+              <Typography variant='h2' display='block' textAlign='center'>Join the {space?.name} workspace to apply</Typography>
+
+              <Box display='flex' justifyContent='center' sx={{ mt: 3 }}>
+
+                <PrimaryButton onClick={openWalletSelectorModal} loading={loggingIn}>
+                  Connect wallet
+                </PrimaryButton>
+              </Box>
+            </>
           )
         }
 

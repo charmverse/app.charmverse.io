@@ -128,22 +128,17 @@ function BountyPageTitle ({ basePath }: { basePath: string }) {
   );
 }
 
-function PublicBountyPageTitle ({ basePath }: { basePath: string }) {
+function PublicBountyPageTitle () {
   const [space] = useCurrentSpace();
   return (
-    <PageTitleWrapper>
-      <BreadCrumb>
-        {
+    <Typography variant='h6' fontWeight='bold'>
+      {
         space && (
-          <Link href={`${basePath}`}>
-            {space.name}
-          </Link>
+          `${space.name} bounties`
         )
       }
 
-      </BreadCrumb>
-      Bounties
-    </PageTitleWrapper>
+    </Typography>
   );
 }
 
@@ -184,7 +179,7 @@ export default function PageTitleWithBreadcrumbs () {
   const router = useRouter();
 
   if (router.route === '/share/[...pageId]' && router.query?.pageId?.[1] === 'bounties') {
-    return <PublicBountyPageTitle basePath={`${router.asPath}`} />;
+    return <PublicBountyPageTitle />;
   }
   else if (router.route === '/[domain]/bounties/[bountyId]') {
     return <BountyPageTitle basePath={`/${router.query.domain}`} />;

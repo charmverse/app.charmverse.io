@@ -5,6 +5,7 @@ import Tooltip from '@mui/material/Tooltip';
 import Avatar from 'components/common/Avatar';
 import Button from 'components/common/Button';
 import SvgIcon from '@mui/material/SvgIcon';
+import { useRouter } from 'next/router';
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useUser } from 'hooks/useUser';
@@ -51,6 +52,7 @@ function Account (): JSX.Element {
   const { error, account, chainId } = useWeb3React();
   // console.log(account);
   const { openNetworkModal } = useContext(Web3Connection);
+  const router = useRouter();
 
   const networkModalState = usePopupState({ variant: 'popover', popupId: 'network-modal' });
   const [user, , isUserLoaded] = useUser();
@@ -66,7 +68,13 @@ function Account (): JSX.Element {
   if (isUserLoaded && !user) {
     return (
       <AccountCard>
-        <AccountButton href='/'>Join CharmVerse</AccountButton>
+        <AccountButton href='/'>
+          {
+            // This is a quick fix for making the public pages and bounties an acquisition channel.
+            // We would still show the "Join" in the classic Charmverse signup page.
+            router.asPath.split('/')[1] === 'share' ? 'Try CharmVerse' : 'Join CharmVerse'
+          }
+        </AccountButton>
       </AccountCard>
     );
   }
