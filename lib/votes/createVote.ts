@@ -3,6 +3,7 @@ import { prisma } from 'db';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { DEFAULT_THRESHOLD, ExtendedVote, VoteDTO, VOTE_STATUS } from './interfaces';
+import { aggregateVoteResult } from './aggregateVoteResult';
 
 export async function createVote (vote: VoteDTO): Promise<ExtendedVote> {
 
@@ -63,7 +64,17 @@ export async function createVote (vote: VoteDTO): Promise<ExtendedVote> {
     include: {
       voteOptions: true
     }
-  }) as ExtendedVote;
+  });
 
-  return dbVote;
+  const { aggregatedResult, userChoice } = aggregateVoteResult({
+    userId: vote.createdBy,
+    userVotes: [],
+    voteOptions: dbVote.voteOptions
+  });
+
+  return {
+    ...dbVote,
+    aggregatedResult,
+    userChoice
+  };
 }

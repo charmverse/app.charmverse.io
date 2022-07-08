@@ -24,7 +24,12 @@ export async function getVote (id: string, userId: string): Promise<ExtendedVote
     }
   });
 
-  const { aggregatedResult, userChoice } = aggregateVoteResult(vote?.userVotes ?? [], userId);
+  const { aggregatedResult, userChoice } = aggregateVoteResult({
+    userId,
+    userVotes: vote?.userVotes ?? [],
+    voteOptions: vote?.voteOptions ?? []
+  });
+
   const voteStatus = vote ? calculateVoteStatus(vote) : VoteStatus.InProgress;
 
   if (vote) {
