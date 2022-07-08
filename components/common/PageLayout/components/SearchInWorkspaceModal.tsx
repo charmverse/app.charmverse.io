@@ -67,7 +67,7 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
     name: bounty.title,
     link: `/${router.query.domain}/bounties/${bounty.id}`,
     group: 'Bounties'
-  }));
+  })).sort((bounty1, bounty2) => bounty1.name > bounty2.name ? 1 : -1);
 
   const searchResultItems: SearchResultItem[] = [
     ...pageSearchResultItems,
