@@ -1,6 +1,6 @@
 import Alert from '@mui/material/Alert';
+import { useRef, useContext, useState, useEffect } from 'react';
 import Typography from '@mui/material/Typography';
-import { useContext, useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import { Bounty } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
@@ -18,8 +18,7 @@ import { useUser } from 'hooks/useUser';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
-
-import Login from 'components/login/LoginPageContent';
+import debouncePromise from 'lib/utilities/debouncePromise';
 
 export default function PublicBountyList () {
   const router = useRouter();
@@ -30,6 +29,10 @@ export default function PublicBountyList () {
   const [user, setUser] = useUser();
   const { showMessage } = useSnackbar();
 
+  const blockLogin = useRef(false);
+  const renders = useRef(0);
+  renders.current += 1;
+
   const [selectedBounty, setSelectedBounty] = useState<Bounty | null>(null);
   const [loggingIn, setLoggingIn] = useState(false);
 
@@ -38,14 +41,6 @@ export default function PublicBountyList () {
   const loginViaTokenGateModal = usePopupState({ variant: 'popover', popupId: 'login-via-token-gate' });
 
   const isSpaceMember = user && contributors.some(c => c.id === user.id);
-
-  useEffect(() => {
-
-    if (account && !user) {
-      loginUser();
-    }
-
-  }, [account]);
 
   function bountySelected (bounty: Bounty) {
 
@@ -60,6 +55,13 @@ export default function PublicBountyList () {
 
   }
 
+  useEffect(() => {
+    if (account && !user) {
+
+      loginUser();
+    }
+  }, [account]);
+
   function redirectToSpace (bounty: Bounty | null = selectedBounty) {
 
     const redirectUrl = bounty ? `/${space?.domain}/bounties/${bounty.id}` : `/${space?.domain}/bounties`;
@@ -69,20 +71,27 @@ export default function PublicBountyList () {
   }
 
   function loginUser () {
-    setLoggingIn(true);
-    charmClient.login(account as string)
-      .then(loggedInProfile => {
-        setUser(loggedInProfile);
-        setLoggingIn(false);
-      })
-      .catch(() => {
-        charmClient.createUser({
-          address: account as string
-        }).then(loggedInProfile => {
+    //    console.log('Login user fired, block login state', blockLogin.current, 'Timestamp', Date.now(), 'Renders', renders);
+    // Prevents accidentally creating a user twice
+    if (!loggingIn && !blockLogin.current) {
+      blockLogin.current = true;
+      setLoggingIn(true);
+      charmClient.login(account as string)
+        .then(loggedInProfile => {
           setUser(loggedInProfile);
           setLoggingIn(false);
+          blockLogin.current = false;
+        })
+        .catch(() => {
+          charmClient.createUser({
+            address: account as string
+          }).then(loggedInProfile => {
+            setUser(loggedInProfile);
+            setLoggingIn(false);
+            blockLogin.current = false;
+          });
         });
-      });
+    }
   }
 
   if (!space) {
@@ -100,11 +109,20 @@ export default function PublicBountyList () {
 
               <Box display='flex' justifyContent='center' sx={{ mt: 3 }}>
 
-                <PrimaryButton onClick={openWalletSelectorModal} loading={loggingIn}>
+                <PrimaryButton
+                  onClick={openWalletSelectorModal}
+                  loading={loggingIn}
+                >
                   Connect wallet
                 </PrimaryButton>
               </Box>
             </>
+          )
+        }
+
+        {
+          account && !user && (
+            <LoadingComponent height='200px' isLoading={true} />
           )
         }
 
