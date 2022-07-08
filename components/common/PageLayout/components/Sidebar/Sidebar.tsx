@@ -269,6 +269,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                     <Box p={0.5}>
                       <StyledSidebarLink
                         href={option.link}
+                        active={false}
                       >
                         {option.name}
                       </StyledSidebarLink>
