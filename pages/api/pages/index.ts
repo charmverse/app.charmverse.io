@@ -10,6 +10,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
+import log from 'lib/log';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -37,11 +38,23 @@ async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
   }
 
   const page = await prisma.page.create({ data });
-  const pageWithPermissions = await setupPermissionsAfterPageCreated(page.id);
 
-  logFirstWorkspacePageCreation(page);
-  logFirstUserPageCreation(page);
-  return res.status(201).json(pageWithPermissions);
+  try {
+
+    const pageWithPermissions = await setupPermissionsAfterPageCreated(page.id);
+
+    logFirstWorkspacePageCreation(page);
+    logFirstUserPageCreation(page);
+
+    res.status(201).json(pageWithPermissions);
+  }
+  catch (error) {
+
+    log.warn('Deleting page because page permissions failed. TODO: create permissions with page in one transaction');
+    await prisma.page.delete({ where: { id: page.id } });
+
+    throw error;
+  }
 }
 
 export default withSessionRoute(handler);
