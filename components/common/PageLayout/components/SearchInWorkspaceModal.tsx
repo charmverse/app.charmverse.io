@@ -84,7 +84,6 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
           <Box p={0.5}>
             <StyledLink
               href={option.link}
-              active={false}
             >
               {option.name}
             </StyledLink>
