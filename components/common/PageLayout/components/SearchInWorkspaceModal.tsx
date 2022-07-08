@@ -3,10 +3,25 @@ import { Box } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import { Modal, DialogTitle } from 'components/common/Modal';
+import Popper from '@mui/material/Popper';
 import Link from 'components/common/Link';
 import { useBounties } from 'hooks/useBounties';
 import { usePages } from 'hooks/usePages';
 import { useRouter } from 'next/router';
+
+const StyledPopper = styled(Popper)`
+  position: initial !important;
+  transform: initial !important;
+  width: 100%;
+
+  & > .MuiPaper-root {
+    box-shadow: none;
+
+    & > .MuiAutocomplete-listbox {
+      max-height: initial;
+    }
+  }
+`;
 
 const StyledLink = styled(Link)`
     padding-left: ${({ theme }) => theme.spacing(2)};
@@ -63,6 +78,8 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
     <Modal
       open={isOpen}
       onClose={close}
+      style={{ height: '100%' }}
+      size='large'
     >
       <DialogTitle onClose={close}>Quick Find</DialogTitle>
       <Autocomplete
@@ -71,6 +88,8 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
         options={searchResultItems}
         groupBy={(option) => option.group}
         getOptionLabel={option => typeof option === 'object' ? option.name : option}
+        open={true}
+        disablePortal={true}
         fullWidth
         sx={{
           '& .MuiInput-root': {
@@ -80,6 +99,7 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
             transform: 'inherit'
           }
         }}
+        PopperComponent={StyledPopper}
         renderOption={(_, option: SearchResultItem) => (
           <Box p={0.5}>
             <StyledLink
