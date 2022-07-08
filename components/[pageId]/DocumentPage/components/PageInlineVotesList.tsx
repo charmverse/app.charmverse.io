@@ -35,6 +35,7 @@ export default function PageInlineVotesList () {
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
 
   const filteredVotes = filterVotes(allVotes, voteFilter);
+
   const sortedVotes = sortVotes(filteredVotes, voteSort, inlineVoteIds, inlineVotes);
 
   useEffect(() => {
@@ -146,12 +147,16 @@ export function sortVotes <T extends ExtendedVote> (
     );
   }
   else if (voteSort === 'position') {
+    const voteIds = new Set(votes.map(vote => vote.id));
     const votesWithoutPosition = votes.filter(vote => !inlineVoteIds.includes(vote.id))
     // sort by created Date
       .sort(
         (voteA, voteB) => new Date(voteA.createdAt) > new Date(voteB.createdAt) ? -1 : 1
       );
-    return [...votesWithoutPosition, ...inlineVoteIds.map(inlineVoteId => inlineVotes[inlineVoteId]).filter(isTruthy)];
+    return [
+      ...votesWithoutPosition,
+      ...inlineVoteIds.map(inlineVoteId => inlineVotes[inlineVoteId]).filter((vote) => isTruthy(vote) && voteIds.has(vote.id))
+    ];
   }
   return votes;
 }
