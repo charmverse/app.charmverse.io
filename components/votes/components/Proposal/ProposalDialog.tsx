@@ -7,6 +7,7 @@ import RootPortal from 'components/common/BoardEditor/focalboard/src/components/
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import DocumentPage from 'components/[pageId]/DocumentPage';
 import Button from 'components/common/Button';
+import { usePages } from 'hooks/usePages';
 
 interface Props {
   page?: Page | null;
@@ -18,6 +19,7 @@ export default function ProposalDialog (props: Props) {
 
   const popupState = usePopupState({ variant: 'popover', popupId: 'proposal-dialog' });
   const router = useRouter();
+  const { setCurrentPageId } = usePages();
 
   // open modal when page is set
   useEffect(() => {
@@ -30,6 +32,15 @@ export default function ProposalDialog (props: Props) {
     props.onClose();
     popupState.close();
   }
+
+  useEffect(() => {
+    if (props.page?.id) {
+      setCurrentPageId(props.page?.id);
+    }
+    return () => {
+      setCurrentPageId('');
+    };
+  }, [props.page?.id]);
 
   function updatePage (input: Partial<Page>) {
     // console.log('update page', input);

@@ -9,8 +9,10 @@ import GridHeader from 'components/common/Grid/GridHeader';
 import GridContainer from 'components/common/Grid/GridContainer';
 import LoadingComponent from 'components/common/LoadingComponent';
 import Button from 'components/common/Button';
+import useTasks from 'components/nexus/hooks/useTasks';
 import { humanFriendlyDate, toMonthDate } from 'lib/utilities/dates';
 import { usePages } from 'hooks/usePages';
+import charmClient from 'charmClient';
 import NoVotesMessage from './NoVotesMessage';
 import VoteStatusChip from './VoteStatusChip';
 import ProposalDialog from './Proposal/ProposalDialog';
@@ -26,10 +28,11 @@ export interface VoteRow {
   status: VoteStatus | 'Draft';
 }
 
-export default function VotesTable ({ votes }: { votes?: VoteRow[] }) {
+export default function VotesTable ({ votes, mutateVotes }: { votes?: VoteRow[], mutateVotes: () => void }) {
 
   const router = useRouter();
   const { pages } = usePages();
+  const { mutate: mutateTasks } = useTasks();
 
   const [activePage, setActivePage] = useState<Page | null>();
 
@@ -42,6 +45,18 @@ export default function VotesTable ({ votes }: { votes?: VoteRow[] }) {
 
   function closePage () {
     setActivePage(null);
+  }
+
+  async function deleteVote (voteId: string) {
+    await charmClient.deleteVote(voteId);
+    mutateTasks();
+    mutateVotes();
+  }
+
+  async function cancelVote (voteId: string) {
+    await charmClient.cancelVote(voteId);
+    mutateTasks();
+    mutateVotes();
   }
 
   return (
@@ -71,7 +86,7 @@ export default function VotesTable ({ votes }: { votes?: VoteRow[] }) {
       )}
       {votes?.map(vote => (
         <GridContainer key={vote.id}>
-          <Grid item xs={8} sm={8} md={5}>
+          <Grid item xs={8} sm={8} md={5} sx={{ cursor: 'pointer' }}>
             {pages[vote.pageId]?.type === 'proposal' && (
               <Box display='flex' alignItems='center' justifyContent='space-between' onClick={() => openPage(vote.pageId)}>
                 <Box display='flex' alignItems='flex-start' gap={1}>
@@ -102,15 +117,17 @@ export default function VotesTable ({ votes }: { votes?: VoteRow[] }) {
             <VoteStatusChip status={vote.status} />
           </Grid>
           <Grid item xs={2} sx={{ display: { xs: 'none', md: 'flex' } }} justifyContent='center'>
-            <Tooltip arrow placement='top' title={humanFriendlyDate(vote.deadline, { withTime: true })}>
-              <Typography>{vote.deadline ? DateTime.fromISO(vote.deadline).toRelative({ base: DateTime.now() }) : 'N/A'}</Typography>
+            <Tooltip arrow placement='top' title={vote.deadline ? humanFriendlyDate(vote.deadline, { withTime: true }) : ''}>
+              <Typography color={vote.deadline ? 'inherit' : 'secondary'}>{vote.deadline ? DateTime.fromISO(vote.deadline).toRelative({ base: DateTime.now() }) : 'N/A'}</Typography>
             </Tooltip>
           </Grid>
           <Grid item xs={2} sx={{ display: { xs: 'none', md: 'flex' } }} display='flex' justifyContent='center'>
-            {toMonthDate(vote.createdAt)}
+            <Tooltip arrow placement='top' title={`Created on ${humanFriendlyDate(vote.createdAt, { withTime: true })}`}>
+              <span>{toMonthDate(vote.createdAt)}</span>
+            </Tooltip>
           </Grid>
           <Grid item xs={1}>
-            <VoteActionsMenu vote={vote} />
+            <VoteActionsMenu deleteVote={deleteVote} cancelVote={cancelVote} vote={vote} />
           </Grid>
         </GridContainer>
       ))}

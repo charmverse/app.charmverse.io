@@ -8,14 +8,15 @@ import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import { useUser } from 'hooks/useUser';
 
 interface VoteActionsProps {
+  deleteVote: (voteId: string) => Promise<void>;
+  cancelVote: (voteId: string) => Promise<void>;
   removeFromPage?: (voteId: string) => void;
   vote: { createdBy: string, id: string, deadline?: Date, status: string, title: string };
 }
 
-export default function VoteActionsMenu ({ removeFromPage, vote }: VoteActionsProps) {
+export default function VoteActionsMenu ({ cancelVote, deleteVote, removeFromPage, vote }: VoteActionsProps) {
 
   const [user] = useUser();
-  const { cancelVote, deleteVote } = useVotes();
   const actionsPopup = usePopupState({ variant: 'popover', popupId: 'inline-votes-action' });
   const popupState = usePopupState({ variant: 'popover', popupId: 'delete-inline-vote' });
   const hasPassedDeadline = Boolean(vote.deadline && new Date(vote.deadline) <= new Date());

@@ -29,7 +29,7 @@ export default function VotesPage () {
   const [viewState, setViewState] = useReducer<ViewStateReducer>((state, updates) => ({ ...state, ...updates }), defaultViewState);
 
   const [currentSpace] = useCurrentSpace();
-  const { data } = useSWR(() => `votesBySpace/${currentSpace?.id}`, () => currentSpace ? charmClient.getVotesBySpace(currentSpace.id) : []);
+  const { data, mutate } = useSWR(() => `votesBySpace/${currentSpace?.id}`, () => currentSpace ? charmClient.getVotesBySpace(currentSpace.id) : []);
 
   // votes dont exist right away for proposals, so treat them like draft votes
   const { pages } = usePages();
@@ -70,7 +70,7 @@ export default function VotesPage () {
           </Box>
         </Grid>
       </Grid>
-      <VotesTable votes={data ? sortedVotes : undefined} />
+      <VotesTable votes={data ? sortedVotes : undefined} mutateVotes={mutate} />
     </CenteredPageContent>
   );
 }

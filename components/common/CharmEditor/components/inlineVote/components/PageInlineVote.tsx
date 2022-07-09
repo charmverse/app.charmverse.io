@@ -40,7 +40,7 @@ export default function PageInlineVote ({ detailed = false, inlineVote: vote }: 
   const { deadline, totalVotes, description, id, title, userChoice, voteOptions } = vote;
   const [user] = useUser();
   const view = useEditorViewContext();
-  const { castVote } = useVotes();
+  const { castVote, cancelVote, deleteVote } = useVotes();
   const { data: userVotes, mutate } = useSWR(detailed ? `/votes/${id}/user-votes` : null, () => charmClient.getUserVotes(id));
 
   const voteAggregateResult = vote.aggregatedResult;
@@ -75,7 +75,7 @@ export default function PageInlineVote ({ detailed = false, inlineVote: vote }: 
         <Typography variant='h6' fontWeight='bold'>
           {title}
         </Typography>
-        <VoteActionsMenu vote={vote} removeFromPage={removeFromPage} />
+        <VoteActionsMenu deleteVote={deleteVote} cancelVote={cancelVote} vote={vote} removeFromPage={removeFromPage} />
       </Box>
       <Box display='flex' justifyContent='space-between'>
         <Typography
