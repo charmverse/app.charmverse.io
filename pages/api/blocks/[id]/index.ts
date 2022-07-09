@@ -60,6 +60,13 @@ async function deleteBlock (req: NextApiRequest, res: NextApiResponse<{deletedCo
         errorType: 'Undesirable operation'
       });
     }
+
+    await prisma.block.delete({
+      where: {
+        id: blockId
+      }
+    });
+    deletedCount = 1;
   }
   else {
     await prisma.block.delete({
