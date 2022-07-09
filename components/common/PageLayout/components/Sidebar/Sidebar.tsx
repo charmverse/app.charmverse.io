@@ -1,4 +1,3 @@
-
 import styled from '@emotion/styled';
 import { css, Theme } from '@emotion/react';
 import { Divider } from '@mui/material';
@@ -9,6 +8,7 @@ import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import VoteIcon from '@mui/icons-material/HowToVoteOutlined';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
+import SearchIcon from '@mui/icons-material/Search';
 import Typography from '@mui/material/Typography';
 import { Page } from '@prisma/client';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -21,11 +21,13 @@ import { addPageAndRedirect, NewPageInput } from 'lib/pages';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { BoxProps } from '@mui/system';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { headerHeight } from '../Header/Header';
 import NewPageMenu from '../NewPageMenu';
 import Workspaces from './Workspaces';
 import PageNavigation from '../PageNavigation';
 import TrashModal from '../TrashModal';
+import SearchInWorkspaceModal from '../SearchInWorkspaceModal';
 
 const WorkspaceLabel = styled.div`
   display: flex;
@@ -166,6 +168,8 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [showingTrash, setShowingTrash] = useState(false);
 
+  const searchInWorkspaceModalState = usePopupState({ variant: 'popover', popupId: 'search-in-workspace-modal' });
+
   const favoritePageIds = favorites.map(f => f.pageId);
 
   function onScroll (e: React.UIEvent<HTMLDivElement>) {
@@ -208,6 +212,15 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               label='Votes'
             />
             <Divider sx={{ mx: 2, my: 1 }} />
+            <SidebarBox
+              onClick={searchInWorkspaceModalState.open}
+              icon={<SearchIcon color='secondary' fontSize='small' />}
+              label='Quick Find'
+            />
+            <SearchInWorkspaceModal
+              isOpen={searchInWorkspaceModalState.isOpen}
+              close={searchInWorkspaceModalState.close}
+            />
             <SidebarLink
               active={router.pathname.startsWith('/[domain]/settings')}
               href={`/${space.domain}/settings/workspace`}
