@@ -2,19 +2,20 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';
 import { IconButton, ListItemText, Menu, MenuItem } from '@mui/material';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import EditIcon from '@mui/icons-material/Edit';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import { useVotes } from 'hooks/useVotes';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import { useUser } from 'hooks/useUser';
 
 interface VoteActionsProps {
   deleteVote: (voteId: string) => Promise<void>;
   cancelVote: (voteId: string) => Promise<void>;
+  editProposal?: (voteId: string) => void;
   removeFromPage?: (voteId: string) => void;
   vote: { createdBy: string, id: string, deadline?: Date, status: string, title: string };
 }
 
-export default function VoteActionsMenu ({ cancelVote, deleteVote, removeFromPage, vote }: VoteActionsProps) {
+export default function VoteActionsMenu ({ cancelVote, deleteVote, editProposal, removeFromPage, vote }: VoteActionsProps) {
 
   const [user] = useUser();
   const actionsPopup = usePopupState({ variant: 'popover', popupId: 'inline-votes-action' });
@@ -48,17 +49,28 @@ export default function VoteActionsMenu ({ cancelVote, deleteVote, removeFromPag
           actionsPopup.close();
         }}
       >
+        {editProposal && (
+          <MenuItem
+            dense
+            onClick={() => {
+              editProposal(vote.id);
+            }}
+          >
+            <EditIcon fontSize='small' sx={{ mr: 1 }} />
+            <ListItemText>Edit proposal</ListItemText>
+          </MenuItem>
+        )}
         {vote.status === 'InProgress' && !hasPassedDeadline && (
-        <MenuItem
-          dense
-          onClick={() => {
-            removeFromPage?.(vote.id);
-            cancelVote(vote.id);
-          }}
-        >
-          <DoNotDisturbIcon fontSize='small' sx={{ mr: 1 }} />
-          <ListItemText>Cancel</ListItemText>
-        </MenuItem>
+          <MenuItem
+            dense
+            onClick={() => {
+              removeFromPage?.(vote.id);
+              cancelVote(vote.id);
+            }}
+          >
+            <DoNotDisturbIcon fontSize='small' sx={{ mr: 1 }} />
+            <ListItemText>Cancel</ListItemText>
+          </MenuItem>
         )}
         <MenuItem dense onClick={popupState.open}>
           <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />

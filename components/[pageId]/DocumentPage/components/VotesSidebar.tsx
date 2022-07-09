@@ -151,7 +151,19 @@ export function sortVotes <T extends Pick<ExtendedVote, 'createdAt' | 'deadline'
   }
   else if (voteSort === 'latest_deadline') {
     votes.sort(
-      (voteA, voteB) => new Date(voteA.deadline) > new Date(voteB.deadline) ? -1 : 1
+      (voteA, voteB) => {
+        // if neither vote has a deadline, sort by created date
+        if (!voteA.deadline && !voteB.deadline) {
+          return new Date(voteA.createdAt) > new Date(voteB.createdAt) ? -1 : 1;
+        }
+        else if (!voteA.deadline) {
+          return -1;
+        }
+        else if (!voteB.deadline) {
+          return 1;
+        }
+        return new Date(voteA.deadline) > new Date(voteB.deadline) ? -1 : 1;
+      }
     );
   }
   else if (voteSort === 'position') {

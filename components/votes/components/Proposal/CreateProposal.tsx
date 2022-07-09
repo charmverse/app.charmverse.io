@@ -17,7 +17,6 @@ export default function CreateProposal () {
       const newPage = await addPage({
         spaceId: currentSpace.id,
         createdBy: user.id,
-        title: 'New Proposal',
         type: 'proposal'
       });
       setPage(newPage);

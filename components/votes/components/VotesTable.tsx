@@ -1,5 +1,5 @@
 import { Page, VoteStatus } from '@prisma/client';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 import { Tooltip, Typography, Box, Grid } from '@mui/material';
@@ -31,24 +31,38 @@ export interface VoteRow {
 export default function VotesTable ({ votes, mutateVotes }: { votes?: VoteRow[], mutateVotes: () => void }) {
 
   const router = useRouter();
-  const { pages } = usePages();
+  const { pages, setPages } = usePages();
   const { mutate: mutateTasks } = useTasks();
 
   const [activePage, setActivePage] = useState<Page | null>();
 
-  function openPage (pageId: string) {
+  const openPage = useCallback((pageId: string) => {
     const page = pages[pageId];
     if (page) {
       setActivePage(page);
     }
-  }
+  }, [pages]);
 
   function closePage () {
     setActivePage(null);
   }
 
   async function deleteVote (voteId: string) {
-    await charmClient.deleteVote(voteId);
+    // delete the related page instead of deleting the vote
+    const vote = votes?.find(v => v.id === voteId);
+    if (vote?.pageId) {
+      const page = pages[vote.pageId];
+      if (page) {
+        await charmClient.archivePage(page.id);
+        setPages((_pages) => {
+          _pages[page.id] = { ...page, deletedAt: new Date() };
+          return { ..._pages };
+        });
+      }
+    }
+    else {
+      await charmClient.deleteVote(voteId);
+    }
     mutateTasks();
     mutateVotes();
   }
@@ -57,6 +71,13 @@ export default function VotesTable ({ votes, mutateVotes }: { votes?: VoteRow[],
     await charmClient.cancelVote(voteId);
     mutateTasks();
     mutateVotes();
+  }
+
+  function editProposal (voteId: string) {
+    const vote = votes?.find(v => v.id === voteId);
+    if (vote) {
+      openPage(vote.pageId);
+    }
   }
 
   return (
@@ -126,8 +147,13 @@ export default function VotesTable ({ votes, mutateVotes }: { votes?: VoteRow[],
               <span>{toMonthDate(vote.createdAt)}</span>
             </Tooltip>
           </Grid>
-          <Grid item xs={1}>
-            <VoteActionsMenu deleteVote={deleteVote} cancelVote={cancelVote} vote={vote} />
+          <Grid item xs={1} display='flex' justifyContent='flex-end'>
+            <VoteActionsMenu
+              deleteVote={deleteVote}
+              cancelVote={cancelVote}
+              editProposal={pages[vote.pageId]?.type === 'proposal' ? editProposal : undefined}
+              vote={vote}
+            />
           </Grid>
         </GridContainer>
       ))}

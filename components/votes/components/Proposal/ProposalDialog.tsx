@@ -1,13 +1,16 @@
-import { useEffect } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/router';
-import { Page } from '@prisma/client';
+import { Page, Prisma } from '@prisma/client';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import DocumentPage from 'components/[pageId]/DocumentPage';
 import Button from 'components/common/Button';
+import debouncePromise from 'lib/utilities/debouncePromise';
 import { usePages } from 'hooks/usePages';
+import charmClient from 'charmClient';
+import log from 'lib/log';
 
 interface Props {
   page?: Page | null;
@@ -17,9 +20,18 @@ interface Props {
 
 export default function ProposalDialog (props: Props) {
 
+  const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'proposal-dialog' });
   const router = useRouter();
-  const { setCurrentPageId } = usePages();
+  const { setCurrentPageId, setPages } = usePages();
+
+  // keep track if charmeditor is mounted. There is a bug that it calls the update method on closing the modal, but content is empty
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
 
   // open modal when page is set
   useEffect(() => {
@@ -42,19 +54,34 @@ export default function ProposalDialog (props: Props) {
     };
   }, [props.page?.id]);
 
-  function updatePage (input: Partial<Page>) {
-    // console.log('update page', input);
-  }
+  const debouncedPageUpdate = debouncePromise(async (updates: Prisma.PageUpdateInput) => {
+    const updatedPage = await charmClient.updatePage(updates);
+    setPages((_pages) => ({
+      ..._pages,
+      [updatedPage.id]: updatedPage
+    }));
+  }, 500);
+
+  const setPage = useCallback(async (updates: Partial<Page>) => {
+    if (!props.page || !mounted.current) {
+      return;
+    }
+    debouncedPageUpdate({ id: props.page.id, ...updates } as Prisma.PageUpdateInput)
+      .catch((err: any) => {
+        log.error('Error saving page', err);
+      });
+  }, [props.page]);
 
   return (
     <RootPortal>
       {popupState.isOpen && (
         <Dialog
+          hideCloseButton={true}
           toolbar={(
             <Button
               size='small'
               color='secondary'
-              href={`/${router.query.domain}/${props.page!.path}`}
+              href={`/${router.query.domain}/${props.page?.path}`}
               variant='text'
               startIcon={<OpenInFullIcon fontSize='small' />}
             >
@@ -63,7 +90,7 @@ export default function ProposalDialog (props: Props) {
           )}
           onClose={onClose}
         >
-          <DocumentPage page={props.page!} setPage={updatePage} readOnly={props.readOnly} />
+          {props.page && <DocumentPage page={props.page} setPage={setPage} readOnly={props.readOnly} />}
         </Dialog>
       )}
     </RootPortal>

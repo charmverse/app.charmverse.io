@@ -140,10 +140,10 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
                 />
               </div>
             )}
-            {page.type === 'proposal' && (
-              <ProposalVote page={page} />
-            )}
           </CharmEditor>
+          {page.type === 'proposal' && (
+            <ProposalVote page={page} />
+          )}
         </Container>
       </div>
     </ScrollableWindow>
