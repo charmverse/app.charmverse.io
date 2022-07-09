@@ -2,6 +2,8 @@ import styled from '@emotion/styled';
 import { Box } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
+import BountyIcon from '@mui/icons-material/RequestPageOutlined';
+import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import { Modal, DialogTitle } from 'components/common/Modal';
 import Popper from '@mui/material/Popper';
 import Link from 'components/common/Link';
@@ -24,11 +26,12 @@ const StyledPopper = styled(Popper)`
 `;
 
 const StyledLink = styled(Link)`
-    padding-left: ${({ theme }) => theme.spacing(3)};
+    padding-left: 0px;
     padding-right: ${({ theme }) => theme.spacing(2)};
     align-items: center;
     color: ${({ theme }) => theme.palette.secondary.main};
     display: flex;
+    gap: 5px;
     font-size: 14px;
     font-weight: 500;
     padding-top: 4px;
@@ -39,10 +42,15 @@ const StyledLink = styled(Link)`
     }
 `;
 
+enum ResultType {
+  page = 'page',
+  bounty = 'bounty'
+}
+
 type SearchResultItem = {
     name: string;
     link: string;
-    group: string;
+    type: ResultType;
   };
 
 type SearchInWorkspaceModalProps = {
@@ -58,21 +66,21 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
 
   const pageSearchResultItems: SearchResultItem[] = Object.values(pages)
     .map(page => ({
-      name: page!.title,
+      name: page?.title || 'Untitled',
       link: `/${router.query.domain}/${page!.path}`,
-      group: 'Pages'
-    })).sort((page1, page2) => page1.name > page2.name ? 1 : -1);
+      type: ResultType.page
+    }));
 
   const bountySearchResultItems: SearchResultItem[] = bounties.map(bounty => ({
     name: bounty.title,
     link: `/${router.query.domain}/bounties/${bounty.id}`,
-    group: 'Bounties'
-  })).sort((bounty1, bounty2) => bounty1.name > bounty2.name ? 1 : -1);
+    type: ResultType.bounty
+  }));
 
   const searchResultItems: SearchResultItem[] = [
     ...pageSearchResultItems,
     ...bountySearchResultItems
-  ];
+  ].sort((item1, item2) => item1.name > item2.name ? 1 : -1);
 
   return (
     <Modal
@@ -86,7 +94,6 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
         freeSolo
         disableClearable
         options={searchResultItems}
-        groupBy={(option) => option.group}
         getOptionLabel={option => typeof option === 'object' ? option.name : option}
         open={true}
         disablePortal={true}
@@ -105,6 +112,11 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
             <StyledLink
               href={option.link}
             >
+              {
+                option.type === ResultType.page
+                  ? <InsertDriveFileOutlinedIcon fontSize='small' />
+                  : <BountyIcon fontSize='small' />
+              }
               {option.name}
             </StyledLink>
           </Box>
@@ -115,6 +127,7 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
             placeholder='Search inside the workspace'
             variant='standard'
             size='small'
+            autoFocus={true}
             InputProps={{
               ...params.InputProps,
               type: 'search'
