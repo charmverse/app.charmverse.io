@@ -11,11 +11,11 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  .get(getVotes)
-  .use(requireKeys(['deadline', 'pageId', 'voteOptions'], 'body'))
+  .get(getVoteById)
+  .use(requireKeys(['deadline', 'pageId', 'voteOptions', 'title', 'type', 'threshold'], 'body'))
   .post(createVote);
 
-async function getVotes (req: NextApiRequest, res: NextApiResponse<Vote | { error: any }>) {
+async function getVoteById (req: NextApiRequest, res: NextApiResponse<Vote | { error: any }>) {
   const voteId = req.query.id as string;
   const userId = req.session.user.id;
   const vote = await getVoteService(voteId, userId);

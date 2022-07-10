@@ -1,4 +1,4 @@
-import { ApplicationStatus, Block, Bounty, BountyStatus, Page, Prisma, Space, SpaceApiToken, Thread, Transaction, Comment, Role, RoleSource } from '@prisma/client';
+import { ApplicationStatus, Block, Bounty, BountyStatus, Page, Prisma, Space, SpaceApiToken, Thread, Transaction, Comment, Role, RoleSource, Vote } from '@prisma/client';
 import { prisma } from 'db';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import { IPageWithPermissions } from 'lib/pages';
@@ -248,6 +248,34 @@ export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'cre
           sourcePermission: true
         }
       }
+    }
+  });
+}
+
+export async function createVote ({ spaceId, createdBy, pageId }: Partial<Vote>) {
+  return prisma.vote.create({
+    data: {
+      deadline: new Date(),
+      status: 'InProgress',
+      threshold: 50,
+      title: 'Vote title',
+      author: {
+        connect: {
+          id: createdBy
+        }
+      },
+      page: {
+        connect: {
+          id: pageId
+        }
+      },
+      space: {
+        connect: {
+          id: spaceId
+        }
+      },
+      type: 'Approval',
+      description: null
     }
   });
 }
