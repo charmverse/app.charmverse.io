@@ -1,4 +1,4 @@
-import { ApplicationStatus, Block, Bounty, BountyStatus, Page, Prisma, Space, SpaceApiToken, Thread, Transaction, Comment, Role, RoleSource, Vote, VoteOptions } from '@prisma/client';
+import { ApplicationStatus, Block, Bounty, BountyStatus, Page, Prisma, Space, SpaceApiToken, Thread, Transaction, Comment, Role, RoleSource, Vote, VoteOptions, UserVote } from '@prisma/client';
 import { prisma } from 'db';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import { IPageWithPermissions } from 'lib/pages';
@@ -252,7 +252,7 @@ export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'cre
   });
 }
 
-export async function createVote ({ voteOptions, spaceId, createdBy, pageId, deadline = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), title = 'Vote Title', description = null }: Partial<Vote> & {voteOptions?: string[]}) {
+export async function createVote ({ userVotes = [], voteOptions = [], spaceId, createdBy, pageId, deadline = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), title = 'Vote Title', description = null }: Partial<Vote> & {voteOptions?: string[], userVotes?: string[]}) {
   return prisma.vote.create({
     data: {
       deadline,
@@ -276,9 +276,17 @@ export async function createVote ({ voteOptions, spaceId, createdBy, pageId, dea
       },
       voteOptions: {
         createMany: {
-          data: voteOptions?.map(voteOption => ({
+          data: voteOptions.map(voteOption => ({
             name: voteOption
-          })) ?? []
+          }))
+        }
+      },
+      userVotes: {
+        createMany: {
+          data: userVotes.map(userVote => ({
+            choice: userVote,
+            userId: createdBy!
+          }))
         }
       },
       type: 'Approval',

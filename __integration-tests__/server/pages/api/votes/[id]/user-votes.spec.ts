@@ -24,22 +24,15 @@ beforeAll(async () => {
     createdBy: user.id,
     pageId: page.id,
     spaceId: space.id,
-    voteOptions: ['3', '4']
+    voteOptions: ['3', '4'],
+    userVotes: ['3']
   });
 
   userCookie = await loginUser(user);
 });
 
-describe('POST /api/votes/[id]/cast', () => {
-  it('Should cast vote and respond 200', async () => {
-    await request(baseUrl).post(`/api/votes/${vote.id}/cast`).set('Cookie', userCookie).send({
-      choice: '3'
-    })
-      .expect(200);
-  });
-
-  it('Should fail if the body doesn\'t have correct fields and respond 400', async () => {
-    await request(baseUrl).post(`/api/votes/${vote.id}/cast`).set('Cookie', userCookie).send({})
-      .expect(400);
+describe('GET /api/votes/[id]/user-votes', () => {
+  it('Should get user votes and respond 200', async () => {
+    await request(baseUrl).get(`/api/votes/${vote.id}/user-votes`).set('Cookie', userCookie).expect(200);
   });
 });
