@@ -90,6 +90,7 @@ export default function ProposalVote ({ page }: { page: Page }) {
         </Card>
         <CreateVoteModal
           createVote={createVote}
+          isProposal={true}
           open={isModalOpen}
           postCreateVote={() => {
             setIsModalOpen(false);

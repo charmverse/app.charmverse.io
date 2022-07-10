@@ -78,7 +78,7 @@ export default function PageInlineVote ({ detailed = false, inlineVote: vote, is
     <StyledDiv detailed={detailed} id={`vote.${vote.id}`}>
       <Box display='flex' justifyContent='space-between' alignItems='center'>
         <Typography variant='h6' fontWeight='bold'>
-          {!isProposal ? title : 'Vote on proposal'}
+          {!isProposal ? title : 'Vote on this proposal'}
         </Typography>
         <VoteActionsMenu deleteVote={deleteVote} cancelVote={cancelVote} vote={vote} removeFromPage={removeFromPage} />
       </Box>
