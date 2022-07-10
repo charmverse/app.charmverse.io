@@ -18,6 +18,7 @@ export async function deleteVote (id: string, userId: string): Promise<Vote | nu
     resourceId: vote.spaceId,
     userId
   });
+
   if (!userPermissions.createVote) {
     throw new UnauthorisedActionError('You do not have permissions to delete the vote.');
   }
