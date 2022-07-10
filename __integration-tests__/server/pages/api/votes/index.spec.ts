@@ -4,58 +4,47 @@ import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { Page, Space, User, Vote } from '@prisma/client';
 import { v4 } from 'uuid';
 
-let page1: Page;
-let page2: Page;
-let space1: Space;
-let space2: Space;
-let user1: User;
-let user2: User;
-let vote1: Vote;
+let page: Page;
+let space: Space;
+let user: User;
+let vote: Vote;
 
-let user1Cookie: string;
+let userCookie: string;
 
 beforeAll(async () => {
-  const { space: generatedSpace1, user: generatedUser1 } = await generateUserAndSpaceWithApiToken(undefined, true);
-  const { space: generatedSpace2, user: generatedUser2 } = await generateUserAndSpaceWithApiToken(undefined, true);
-  user1 = generatedUser1;
-  user2 = generatedUser2;
-  space1 = generatedSpace1;
-  space2 = generatedSpace2;
+  const { space: generatedSpace, user: generatedUser } = await generateUserAndSpaceWithApiToken(undefined, true);
+  user = generatedUser;
+  space = generatedSpace;
 
-  page1 = await createPage({
-    createdBy: user1.id,
-    spaceId: space1.id
+  page = await createPage({
+    createdBy: user.id,
+    spaceId: space.id
   });
 
-  page2 = await createPage({
-    createdBy: user2.id,
-    spaceId: space2.id
+  vote = await createVote({
+    createdBy: user.id,
+    pageId: page.id,
+    spaceId: space.id
   });
 
-  vote1 = await createVote({
-    createdBy: user1.id,
-    pageId: page1.id,
-    spaceId: space1.id
-  });
-
-  user1Cookie = await loginUser(user1);
+  userCookie = await loginUser(user);
 });
 
 describe('GET /api/votes?id={id}', () => {
   it('Should return the vote if the vote exist and respond 200', async () => {
-    await request(baseUrl).get(`/api/votes?id=${vote1.id}`).set('Cookie', user1Cookie).expect(200);
+    await request(baseUrl).get(`/api/votes?id=${vote.id}`).set('Cookie', userCookie).expect(200);
   });
 
   it('Should fail if the vote doesn\'t exist and respond 404', async () => {
-    await request(baseUrl).get(`/api/votes?id=${v4()}`).set('Cookie', user1Cookie).expect(404);
+    await request(baseUrl).get(`/api/votes?id=${v4()}`).set('Cookie', userCookie).expect(404);
   });
 });
 
 describe('POST /api/votes', () => {
   it('Should create the vote respond 200', async () => {
-    await request(baseUrl).post('/api/votes').set('Cookie', user1Cookie).send({
+    await request(baseUrl).post('/api/votes').set('Cookie', userCookie).send({
       deadline: new Date(),
-      pageId: page1.id,
+      pageId: page.id,
       title: 'new vote',
       type: 'Approval',
       threshold: 50,
@@ -65,7 +54,7 @@ describe('POST /api/votes', () => {
   });
 
   it('Should fail if the vote body doesn\'t have correct fields and respond 400', async () => {
-    await request(baseUrl).post(`/api/votes?id=${v4()}`).set('Cookie', user1Cookie).send({})
+    await request(baseUrl).post(`/api/votes?id=${v4()}`).set('Cookie', userCookie).send({})
       .expect(400);
   });
 });
