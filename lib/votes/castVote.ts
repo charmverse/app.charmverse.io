@@ -3,7 +3,6 @@ import { UserVote, VoteOptions } from '@prisma/client';
 import { prisma } from 'db';
 import { hasAccessToSpace } from 'lib/middleware';
 import { DataNotFoundError, InvalidInputError, UndesirableOperationError } from 'lib/utilities/errors';
-import { VOTE_STATUS } from './interfaces';
 import { isVotingClosed } from './utils';
 
 export async function castVote (choice: string, voteId: string, userId: string): Promise<UserVote> {
