@@ -6,7 +6,6 @@ import { DataNotFoundError, InvalidInputError, UndesirableOperationError } from 
 import { isVotingClosed } from './utils';
 
 export async function castVote (choice: string, voteId: string, userId: string): Promise<UserVote> {
-
   const vote = await prisma.vote.findUnique({
     where: {
       id: voteId
