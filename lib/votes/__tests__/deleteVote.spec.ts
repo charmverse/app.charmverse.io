@@ -1,11 +1,8 @@
-import { VoteStatus } from '@prisma/client';
-import { addSpaceOperations, removeSpaceOperations } from 'lib/permissions/spaces';
-import { UserIsNotSpaceMemberError } from 'lib/users/errors';
-import { DataNotFoundError, InvalidInputError, UnauthorisedActionError, UndesirableOperationError } from 'lib/utilities/errors';
+import { addSpaceOperations } from 'lib/permissions/spaces';
+import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
-import { castVote } from '../castVote';
 import { deleteVote } from '../deleteVote';
 
 describe('deleteVote', () => {
