@@ -1,62 +1,61 @@
 import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { getVotesByPage } from '../getVotesByPage';
+import { getVotesBySpace } from '../getVotesBySpace';
 
-describe('getVotesByPage', () => {
-  it('should get votes for a page along with user choice and aggregated result', async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
+describe('getVotesBySpace', () => {
+  it('should get all votes for a space', async () => {
+    const { space: space1, user } = await generateUserAndSpaceWithApiToken(undefined, false);
+    const { space: space2 } = await generateUserAndSpaceWithApiToken(undefined, false);
+
     const page1 = await createPage({
       createdBy: user.id,
-      spaceId: space.id
+      spaceId: space1.id
     });
 
     const page2 = await createPage({
       createdBy: user.id,
-      spaceId: space.id
+      spaceId: space1.id
+    });
+
+    const page3 = await createPage({
+      createdBy: user.id,
+      spaceId: space2.id
     });
 
     const createdVote1 = await createVote({
       pageId: page1.id,
       createdBy: user.id,
-      spaceId: space.id,
+      spaceId: space1.id,
       voteOptions: ['1', '2'],
       userVotes: ['1']
     });
 
     const createdVote2 = await createVote({
-      pageId: page1.id,
+      pageId: page2.id,
       createdBy: user.id,
-      spaceId: space.id,
+      spaceId: space1.id,
       voteOptions: ['a', 'b'],
       userVotes: ['a']
     });
 
     await createVote({
-      pageId: page2.id,
+      pageId: page3.id,
       createdBy: user.id,
-      spaceId: space.id,
-      voteOptions: ['a', 'b'],
-      userVotes: ['a']
+      spaceId: space2.id,
+      voteOptions: ['i', 'ii'],
+      userVotes: ['iii']
     });
 
-    const votes = await getVotesByPage(page1.id, user.id);
+    const votes = await getVotesBySpace(space1.id);
     expect(votes[0]).toMatchObject(expect.objectContaining({
       id: createdVote1.id,
-      userChoice: '1',
       totalVotes: 1,
-      aggregatedResult: {
-        1: 1,
-        2: 0
-      }
+      status: 'InProgress'
     }));
 
     expect(votes[1]).toMatchObject(expect.objectContaining({
       id: createdVote2.id,
-      userChoice: 'a',
       totalVotes: 1,
-      aggregatedResult: {
-        a: 1,
-        b: 0
-      }
+      status: 'InProgress'
     }));
   });
 });

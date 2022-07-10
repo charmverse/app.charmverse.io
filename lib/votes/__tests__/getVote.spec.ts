@@ -2,7 +2,7 @@ import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testin
 import { getVote } from '../getVote';
 
 describe('getVote', () => {
-  it('should throw error if createVote space permission doesn\'t', async () => {
+  it('should get vote along with user choice and aggregated result', async () => {
     const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
     const page = await createPage({
       createdBy: user.id,
