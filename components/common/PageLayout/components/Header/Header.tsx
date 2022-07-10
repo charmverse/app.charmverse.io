@@ -30,9 +30,10 @@ import { useRef, useState } from 'react';
 import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
+import { useVotes } from 'hooks/useVotes';
 import Account from '../Account';
 import ShareButton from '../ShareButton';
-import CreateVoteModal from '../CreateVoteModal';
+import CreateVoteModal from '../../../../votes/components/CreateVoteModal';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
 import NotificationsBadge from './components/NotificationsBadge';
 
@@ -56,6 +57,7 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
   const { pages, currentPageId, setPages } = usePages();
   const [user, setUser] = useUser();
   const theme = useTheme();
+  const { createVote } = useVotes();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
   const [pageMenuAnchorElement, setPageMenuAnchorElement] = useState<null | Element>(null);
   const pageMenuAnchor = useRef();
@@ -272,6 +274,7 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
       {/** inject the modal based on open status so it resets the form each time */}
       {isModalOpen && (
         <CreateVoteModal
+          createVote={createVote}
           open={isModalOpen}
           postCreateVote={() => {
             setIsModalOpen(false);

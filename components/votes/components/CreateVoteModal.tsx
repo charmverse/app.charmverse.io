@@ -5,13 +5,12 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Modal from 'components/common/Modal';
-import { useVotes } from 'hooks/useVotes';
-import { usePages } from 'hooks/usePages';
+import { VoteDTO, ExtendedVote } from 'lib/votes/interfaces';
 import { DateTime } from 'luxon';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { usePages } from 'hooks/usePages';
 import AddCircle from '@mui/icons-material/AddCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { ExtendedVote } from 'lib/votes/interfaces';
 
 interface InlineVoteOptionsProps {
   options: { name: string }[]
@@ -79,17 +78,17 @@ function InlineVoteOptions (
 
 interface CreateVoteModalProps {
   onClose?: () => void
+  createVote: (votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId'>) => Promise<ExtendedVote>;
   postCreateVote?: (vote: ExtendedVote) => void
   open?: boolean
 }
 
-export default function CreateVoteModal ({ open = true, onClose, postCreateVote }: CreateVoteModalProps) {
+export default function CreateVoteModal ({ open = true, onClose, createVote, postCreateVote }: CreateVoteModalProps) {
   const [voteTitle, setVoteTitle] = useState('');
   const [voteDescription, setVoteDescription] = useState('');
   const [passThreshold, setPassThreshold] = useState<number>(50);
   const [voteType, setVoteType] = useState<VoteType>(VoteType.Approval);
   const [options, setOptions] = useState<{ name: string }[]>([]);
-  const { createVote } = useVotes();
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
 
   useEffect(() => {
