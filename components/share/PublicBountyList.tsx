@@ -10,7 +10,6 @@ import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';
 import PrimaryButton from 'components/common/PrimaryButton';
-import TokenGateForm from 'components/common/TokenGateForm';
 import { useContributors } from 'hooks/useContributors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -19,6 +18,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import debouncePromise from 'lib/utilities/debouncePromise';
+import TokenGateForm from './PublicBountyTokenGateForm';
 
 export default function PublicBountyList () {
   const router = useRouter();
@@ -58,6 +58,10 @@ export default function PublicBountyList () {
     if (account && !user) {
 
       loginUser();
+    }
+    else if (account && user && selectedBounty && isSpaceMember) {
+      // Will send the user to the bounty they clicked
+      redirectToSpace();
     }
   }, [account]);
 
