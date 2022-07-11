@@ -242,7 +242,7 @@ function ViewTabs({ board, activeView, intl, readonly, showView, views }: ViewTa
     {/* Form to rename views */}
     <Modal open={renameViewPopupState.isOpen} onClose={renameViewPopupState.close} title='Rename the view'>
       <form onSubmit={handleSubmit(saveViewTitle)}>
-        <TextField {...register('title')} defaultValue={currentView?.title} />
+        <TextField {...register('title')} defaultValue={currentView?.title} autoFocus />
         <Button type='submit'>Save</Button>
       </form>
     </Modal>
