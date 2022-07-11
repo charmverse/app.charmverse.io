@@ -1,11 +1,7 @@
-
-import { Page } from '@prisma/client';
 import { useState } from 'react';
-import { Box, Card, Stack, Typography } from '@mui/material';
-import { ExtendedVote } from 'lib/votes/interfaces';
+import { Card, Stack, Typography } from '@mui/material';
 import Button from 'components/common/PrimaryButton';
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
-import PageInlineVote from 'components/common/CharmEditor/components/inlineVote/components/PageInlineVote';
 import { useVotes } from 'hooks/useVotes';
 
 export default function CreateVoteBox () {

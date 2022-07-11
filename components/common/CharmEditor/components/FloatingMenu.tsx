@@ -24,8 +24,8 @@ export type FloatingMenuVariant = 'defaultMenu' | 'linkSubMenu' | 'inlineComment
 
 export default function FloatingMenuComponent (
   {
-    pluginKey, enableComments = true, inline = false }:
-    {enableComments?: boolean, pluginKey: PluginKey, inline?: boolean
+    pluginKey, enableComments = true, enableVoting = false, inline = false }:
+    {enableComments?: boolean, enableVoting?: boolean, pluginKey: PluginKey, inline?: boolean
   }
 ) {
   const { showMessage } = useSnackbar();
@@ -34,7 +34,7 @@ export default function FloatingMenuComponent (
   const [currentUserPermissions] = useCurrentSpacePermissions();
   const displayInlineCommentButton = !inline && permissions.comment && enableComments;
 
-  const displayInlineVoteButton = !inline && permissions.comment && currentUserPermissions?.createVote && enableComments;
+  const displayInlineVoteButton = !inline && permissions.comment && currentUserPermissions?.createVote && enableVoting;
   return (
     <FloatingMenu
       menuKey={pluginKey}
