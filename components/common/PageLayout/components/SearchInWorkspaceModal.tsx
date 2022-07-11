@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import styled from '@emotion/styled';
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
@@ -10,6 +11,7 @@ import Link from 'components/common/Link';
 import { useBounties } from 'hooks/useBounties';
 import { usePages } from 'hooks/usePages';
 import { useRouter } from 'next/router';
+import { IPageWithPermissions } from 'lib/pages';
 
 const StyledPopper = styled(Popper)`
   position: initial !important;
@@ -18,10 +20,6 @@ const StyledPopper = styled(Popper)`
 
   & > .MuiPaper-root {
     box-shadow: none;
-
-    & > .MuiAutocomplete-listbox {
-      max-height: initial;
-    }
   }
 `;
 
@@ -32,14 +30,18 @@ const StyledLink = styled(Link)`
     color: ${({ theme }) => theme.palette.secondary.main};
     display: flex;
     gap: 5px;
-    font-size: 14px;
+    font-size: 17px;
     font-weight: 500;
     padding-top: 4px;
     padding-bottom: 4px;
     :hover {
-    background-color: ${({ theme }) => theme.palette.action.hover};
-    color: inherit;
+      background-color: ${({ theme }) => theme.palette.action.hover};
+      color: inherit;
     }
+`;
+
+const StyledTypography = styled(Typography)`
+    font-style: italic;
 `;
 
 enum ResultType {
@@ -51,6 +53,7 @@ type SearchResultItem = {
     name: string;
     link: string;
     type: ResultType;
+    path? :string;
   };
 
 type SearchInWorkspaceModalProps = {
@@ -63,10 +66,31 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
   const router = useRouter();
   const { pages } = usePages();
   const { bounties } = useBounties();
+  const [isSearching, setIsSearching] = useState(false);
 
-  const pageSearchResultItems: SearchResultItem[] = Object.values(pages)
+  const pageList = Object.values(pages);
+
+  const getPagePath = (page: IPageWithPermissions) => {
+    if (!pages) return '';
+
+    const pathElements: string[] = [];
+    let currentPage: IPageWithPermissions | undefined = { ...page };
+
+    while (currentPage && currentPage.parentId) {
+      const pageId: string = currentPage.parentId;
+      currentPage = pageList.find(p => p.id === pageId);
+      if (currentPage) {
+        pathElements.unshift(currentPage.title);
+      }
+    }
+
+    return pathElements.join(' / ');
+  };
+
+  const pageSearchResultItems: SearchResultItem[] = pageList
     .map(page => ({
       name: page?.title || 'Untitled',
+      path: getPagePath(page!),
       link: `/${router.query.domain}/${page!.path}`,
       type: ResultType.page
     }));
@@ -91,11 +115,14 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
     >
       <DialogTitle onClose={close}>Quick Find</DialogTitle>
       <Autocomplete
-        freeSolo
         disableClearable
         options={searchResultItems}
+        noOptionsText='No search results'
+        onInputChange={(_event, newInputValue) => {
+          setIsSearching(!!newInputValue);
+        }}
         getOptionLabel={option => typeof option === 'object' ? option.name : option}
-        open={true}
+        open={isSearching}
         disablePortal={true}
         fullWidth
         sx={{
@@ -117,7 +144,7 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
                   ? <InsertDriveFileOutlinedIcon fontSize='small' />
                   : <BountyIcon fontSize='small' />
               }
-              {option.name}
+              {option.name}{option.path && <StyledTypography>- {option.path}</StyledTypography>}
             </StyledLink>
           </Box>
         )}
