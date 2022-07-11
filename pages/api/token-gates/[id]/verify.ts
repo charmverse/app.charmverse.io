@@ -6,6 +6,8 @@ import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import log from 'lib/log';
+import { postToDiscord } from 'lib/log/userEvents';
+import { Space } from '@prisma/client';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -55,6 +57,15 @@ async function verifyWallet (req: NextApiRequest, res: NextApiResponse) {
             tokenGateConnectedDate: new Date()
           }
         });
+
+        const { name: workspaceName } = await prisma.space.findUnique({
+          where: {
+            id: tokenGate.spaceId
+          }
+        }) as Space;
+
+        logWorkspaceJoinedViaTokenGate(workspaceName);
+
         await prisma.spaceRoleToRole.createMany({
           data: tokenGateToRoles.map(tokenGateToRole => ({
             roleId: tokenGateToRole.roleId,
@@ -62,6 +73,7 @@ async function verifyWallet (req: NextApiRequest, res: NextApiResponse) {
           }))
         });
         log.debug('Gave user access to workspace', { tokenGateId: tokenGate.id, userId: user.id });
+
       }
     }
     const space = await prisma.space.findFirst({
@@ -76,3 +88,11 @@ async function verifyWallet (req: NextApiRequest, res: NextApiResponse) {
 }
 
 export default withSessionRoute(handler);
+
+export async function logWorkspaceJoinedViaTokenGate (workspaceName: string) {
+  postToDiscord({
+    funnelStage: 'acquisition',
+    eventType: 'create_user',
+    message: `A user has joined the ${workspaceName} workspace via token gate.`
+  });
+}

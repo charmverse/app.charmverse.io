@@ -30,7 +30,7 @@ async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
   }
   catch {
     user = await createUserFromWallet(address);
-    logSignup();
+    logSignupViaWallet();
   }
 
   const { discordUser, spaceRoles, telegramUser, ...userData } = user;
@@ -70,10 +70,10 @@ async function updateUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
 
 export default withSessionRoute(handler);
 
-export async function logSignup () {
+export async function logSignupViaWallet () {
   postToDiscord({
     funnelStage: 'acquisition',
     eventType: 'create_user',
-    message: 'A new user has joined Charmverse'
+    message: 'A new user has joined Charmverse using their Web3 wallet'
   });
 }
