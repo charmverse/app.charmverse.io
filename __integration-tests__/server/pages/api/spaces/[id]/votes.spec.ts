@@ -16,12 +16,12 @@ beforeAll(async () => {
   userCookie = await loginUser(user);
 });
 
-describe('GET /api/spaces/[id]/votes', () => {
+describe('GET /api/spaces/[id]/votes - Get all the votes for a specific space', () => {
   it('Should get all votes for space and respond 200', async () => {
     await request(baseUrl).get(`/api/spaces/${space.id}/votes`).set('Cookie', userCookie).expect(200);
   });
 
-  it('Should fail if user is not a part of a space and respond 404', async () => {
+  it('Should fail if user is not a part of the space and respond with 401', async () => {
     await request(baseUrl).get(`/api/spaces/${v4()}/votes`).set('Cookie', userCookie).expect(401);
   });
 });

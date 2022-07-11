@@ -30,8 +30,8 @@ beforeAll(async () => {
   userCookie = await loginUser(user);
 });
 
-describe('GET /api/votes?id={id}', () => {
-  it('Should return the vote if the vote exist and respond 200', async () => {
+describe('GET /api/votes?id={id} - Get an individual vote', () => {
+  it('Should return the vote if it exist and respond 200', async () => {
     await request(baseUrl).get(`/api/votes?id=${vote.id}`).set('Cookie', userCookie).expect(200);
   });
 
@@ -40,7 +40,7 @@ describe('GET /api/votes?id={id}', () => {
   });
 });
 
-describe('POST /api/votes', () => {
+describe('POST /api/votes - Create a new vote', () => {
   it('Should create the vote respond 200', async () => {
     await request(baseUrl).post('/api/votes').set('Cookie', userCookie).send({
       deadline: new Date(),

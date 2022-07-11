@@ -32,7 +32,7 @@ beforeAll(async () => {
   userCookie = await loginUser(user);
 });
 
-describe('GET /api/votes/[id]', () => {
+describe('GET /api/votes/[id] - Get a single vote', () => {
   it('Should get vote and respond 200', async () => {
     await request(baseUrl).get(`/api/votes/${vote.id}`).set('Cookie', userCookie).expect(200);
   });
@@ -42,7 +42,7 @@ describe('GET /api/votes/[id]', () => {
   });
 });
 
-describe('PUT /api/votes/[id]', () => {
+describe('PUT /api/votes/[id] - Update a single vote', () => {
   it('Should update vote and respond 200', async () => {
     await request(baseUrl).put(`/api/votes/${vote.id}`).set('Cookie', userCookie).send({
       status: 'Cancelled'
@@ -51,7 +51,7 @@ describe('PUT /api/votes/[id]', () => {
   });
 });
 
-describe('DELETE /api/votes/[id]', () => {
+describe('DELETE /api/votes/[id] - Delete a single vote', () => {
   it('Should delete update vote and respond 200', async () => {
     await request(baseUrl).delete(`/api/votes/${vote.id}`).set('Cookie', userCookie).send()
       .expect(200);

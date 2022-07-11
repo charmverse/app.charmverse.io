@@ -33,8 +33,8 @@ beforeAll(async () => {
   user1Cookie = await loginUser(user1);
 });
 
-describe('POST /api/pages/{id}/votes', () => {
-  it('Should succeed if the user have read access to the page, respond 200', async () => {
+describe('POST /api/pages/{id}/votes - Get all the votes for a specific page', () => {
+  it('Should return the votes if the user have read access to the page and respond 200', async () => {
     await request(baseUrl).get(`/api/pages/${page1.id}/votes`).set('Cookie', user1Cookie).expect(200);
   });
 

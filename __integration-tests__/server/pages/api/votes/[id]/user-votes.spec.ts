@@ -31,7 +31,7 @@ beforeAll(async () => {
   userCookie = await loginUser(user);
 });
 
-describe('GET /api/votes/[id]/user-votes', () => {
+describe('GET /api/votes/[id]/user-votes - Get all the user votes casted for an individual vote', () => {
   it('Should get user votes and respond 200', async () => {
     await request(baseUrl).get(`/api/votes/${vote.id}/user-votes`).set('Cookie', userCookie).expect(200);
   });

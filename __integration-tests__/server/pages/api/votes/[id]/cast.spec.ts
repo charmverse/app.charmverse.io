@@ -30,7 +30,7 @@ beforeAll(async () => {
   userCookie = await loginUser(user);
 });
 
-describe('POST /api/votes/[id]/cast', () => {
+describe('POST /api/votes/[id]/cast - Cast a vote using one of the provided options', () => {
   it('Should cast vote and respond 200', async () => {
     await request(baseUrl).post(`/api/votes/${vote.id}/cast`).set('Cookie', userCookie).send({
       choice: '3'
