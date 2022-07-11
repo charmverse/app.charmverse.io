@@ -22,6 +22,11 @@ export default function VoteActionsMenu ({ cancelVote, deleteVote, editProposal,
   const popupState = usePopupState({ variant: 'popover', popupId: 'delete-inline-vote' });
   const hasPassedDeadline = Boolean(vote.deadline && new Date(vote.deadline) <= new Date());
 
+  const deleteQuestion = vote.title
+    ? <><p>Are you sure you want to delete this vote:</p><strong>{vote.title}</strong>?</>
+    // most likely a proposal vote
+    : <p>Are you sure you want to remove the vote from this proposal?</p>;
+
   return (
     <>
       {vote.createdBy === user?.id && (
@@ -38,7 +43,7 @@ export default function VoteActionsMenu ({ cancelVote, deleteVote, editProposal,
           removeFromPage?.(vote.id);
           deleteVote(vote.id);
         }}
-        question={<><p>Are you sure you want to delete this vote:</p><strong>{vote.title}</strong>?</>}
+        question={deleteQuestion}
       />
       <Menu
         {...bindMenu(actionsPopup)}

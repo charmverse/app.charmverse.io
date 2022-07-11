@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Page } from '@prisma/client';
-import Button from 'components/common/PrimaryButton';
+import Button from 'components/common/Button';
 import { addPage } from 'lib/pages/addPage';
 import { useUser } from 'hooks/useUser';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -28,7 +28,7 @@ export default function CreateProposal () {
       <Button onClick={onClickCreate}>
         Create Proposal
       </Button>
-      <ProposalDialog page={page} onClose={() => setPage(null)} />
+      {page && <ProposalDialog page={page} onClose={() => setPage(null)} />}
     </>
   );
 }

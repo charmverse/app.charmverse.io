@@ -8,6 +8,7 @@ import ScrollableWindow from 'components/common/PageLayout/components/Scrollable
 import BountyIntegration from 'components/[pageId]/DocumentPage/components/BountyIntegration';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
+import { useVotes } from 'hooks/useVotes';
 import { Page, PageContent } from 'models';
 import { useRouter } from 'next/router';
 import { memo, useCallback } from 'react';
@@ -36,6 +37,10 @@ export interface IEditorProps {
 
 function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
   const { pages } = usePages();
+  const { votes } = useVotes();
+
+  const pageVote = Object.values(votes)[0];
+
   const board = useAppSelector((state) => {
     if (page.type === 'card' && page.parentId) {
       const parentPage = pages[page.parentId];
@@ -108,6 +113,11 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
               readOnly={readOnly}
               setPage={setPage}
             />
+            {page.type === 'proposal' && pageVote && (
+              <Box mb={2}>
+                <ProposalVote page={page} vote={pageVote} />
+              </Box>
+            )}
             {card && board && (
               <div className='CardDetail content'>
                 {/* Property list */}
@@ -141,7 +151,7 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
               </div>
             )}
           </CharmEditor>
-          {page.type === 'proposal' && (
+          {page.type === 'proposal' && !pageVote && (
             <ProposalVote page={page} />
           )}
         </Container>

@@ -1,24 +1,14 @@
 import { Page } from '@prisma/client';
 import { useState } from 'react';
 import { Box, Card, Stack, Typography } from '@mui/material';
+import { ExtendedVote } from 'lib/votes/interfaces';
 import Button from 'components/common/PrimaryButton';
-import { VoteDTO } from 'lib/votes/interfaces';
-import LoadingComponent from 'components/common/LoadingComponent';
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
 import PageInlineVote from 'components/common/CharmEditor/components/inlineVote/components/PageInlineVote';
-import charmClient from 'charmClient';
-import { useUser } from 'hooks/useUser';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import useTasks from 'components/nexus/hooks/useTasks';
-import useSWR from 'swr';
+import { useVotes } from 'hooks/useVotes';
 
-export default function ProposalVote ({ page }: { page: Page }) {
-  const [user] = useUser();
-  const [currentSpace] = useCurrentSpace();
-  const { mutate: mutateTasks } = useTasks();
-  const { data: votes, mutate: refreshVotes } = useSWR(() => `pages/${page.id}/votes`, () => charmClient.getVotesByPage(page.id));
-
-  const vote = votes?.[0];
+export default function ProposalVote ({ page, vote }: { page: Page, vote?: ExtendedVote }) {
+  const { createVote } = useVotes();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -26,56 +16,52 @@ export default function ProposalVote ({ page }: { page: Page }) {
     setIsModalOpen(true);
   }
 
-  async function castVote (voteId: string, choice: string) {
-    const userVote = await charmClient.castVote(voteId, choice);
-    refreshVotes();
-    return userVote;
-  }
+  // async function castVote (voteId: string, choice: string) {
+  //   const userVote = await charmClient.castVote(voteId, choice);
+  //   refreshVotes();
+  //   return userVote;
+  // }
 
-  async function cancelVote (voteId: string) {
-    await charmClient.cancelVote(voteId);
-    refreshVotes();
-  }
+  // async function cancelVote (voteId: string) {
+  //   await charmClient.cancelVote(voteId);
+  //   refreshVotes();
+  // }
 
-  async function deleteVote (voteId: string) {
-    await charmClient.deleteVote(voteId);
-    refreshVotes();
-  }
+  // async function deleteVote (voteId: string) {
+  //   await charmClient.deleteVote(voteId);
+  //   refreshVotes();
+  // }
 
-  async function createVote (votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId' | 'pageId'>) {
+  // async function createVote (votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId' | 'pageId'>) {
 
-    if (!user || !currentSpace) {
-      throw new Error('Missing user or space');
-    }
+  //   if (!user || !currentSpace) {
+  //     throw new Error('Missing user or space');
+  //   }
 
-    const extendedVote = await charmClient.createVote({
-      ...votePayload,
-      createdBy: user.id,
-      pageId: page.id,
-      spaceId: currentSpace.id
-    });
+  //   const extendedVote = await charmClient.createVote({
+  //     ...votePayload,
+  //     createdBy: user.id,
+  //     pageId: page.id,
+  //     spaceId: currentSpace.id
+  //   });
 
-    refreshVotes((_votes) => [...(_votes || []), extendedVote], { revalidate: true });
+  //   refreshVotes((_votes) => [...(_votes || []), extendedVote], { revalidate: true });
 
-    mutateTasks((tasks) => {
-      // Add the vote to the task
-      if (tasks && currentSpace) {
-        tasks.votes.push({
-          ...extendedVote,
-          space: currentSpace,
-          page
-        });
-      }
-      return tasks;
-    }, {
-      revalidate: false
-    });
-    return extendedVote;
-  }
-
-  if (!votes) {
-    return <LoadingComponent height='300px' isLoading={true} />;
-  }
+  //   mutateTasks((tasks) => {
+  //     // Add the vote to the task
+  //     if (tasks && currentSpace) {
+  //       tasks.votes.push({
+  //         ...extendedVote,
+  //         space: currentSpace,
+  //         page
+  //       });
+  //     }
+  //     return tasks;
+  //   }, {
+  //     revalidate: false
+  //   });
+  //   return extendedVote;
+  // }
 
   if (!vote) {
     return (
@@ -104,7 +90,7 @@ export default function ProposalVote ({ page }: { page: Page }) {
   }
   return (
     <Box mt={2}>
-      <PageInlineVote inlineVote={vote} detailed={false} isProposal={true} cancelVote={cancelVote} deleteVote={deleteVote} castVote={castVote} />
+      <PageInlineVote inlineVote={vote} detailed={false} isProposal={true} />
     </Box>
   );
 }

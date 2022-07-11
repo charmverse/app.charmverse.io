@@ -95,9 +95,6 @@ export default function VotesSidebar () {
               key={inlineVote.id}
               detailed={false}
               inlineVote={inlineVote}
-              castVote={castVote}
-              deleteVote={deleteVote}
-              cancelVote={cancelVote}
             />
           ))}
       </VotesContainer>
@@ -114,9 +111,18 @@ interface ViewOptionsProps {
   setVoteSort: (value: VoteSort) => void;
 }
 
+const StyledViewOptions = styled.div`
+  align-items: center;
+  display: flex;
+  gap: ${({ theme }) => theme.spacing(1)};
+  .MuiInputLabel-root, .MuiSelect-select {
+    font-size: .85em;
+  }
+`;
+
 export function ViewOptions ({ voteSort, voteFilter, setVoteFilter, setVoteSort, showPosition, showVotes }: ViewOptionsProps) {
   return (
-    <Box display='flex' gap={1} alignItems='center'>
+    <StyledViewOptions>
       <InputLabel>Sort</InputLabel>
       <Select variant='outlined' value={voteSort} onChange={(e) => setVoteSort(e.target.value as VoteSort)} sx={{ mr: 2 }}>
         {showPosition && <MenuItem value='position'>Position</MenuItem>}
@@ -130,7 +136,7 @@ export function ViewOptions ({ voteSort, voteFilter, setVoteFilter, setVoteSort,
         <MenuItem value='completed'>Completed</MenuItem>
         <MenuItem value='all'>All</MenuItem>
       </Select>
-    </Box>
+    </StyledViewOptions>
   );
 }
 

@@ -157,7 +157,7 @@ export default function VotesTable ({ votes, mutateVotes }: { votes?: VoteRow[],
           </Grid>
         </GridContainer>
       ))}
-      <ProposalDialog page={activePage} onClose={closePage} />
+      {activePage && <ProposalDialog page={activePage} onClose={closePage} />}
     </>
   );
 }

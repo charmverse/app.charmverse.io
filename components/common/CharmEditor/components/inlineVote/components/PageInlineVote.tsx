@@ -7,10 +7,10 @@ import Avatar from 'components/common/Avatar';
 import Modal from 'components/common/Modal';
 import VoteStatusChip from 'components/votes/components/VoteStatusChip';
 import { useUser } from 'hooks/useUser';
+import { useVotes } from 'hooks/useVotes';
 import { removeInlineVoteMark } from 'lib/inline-votes/removeInlineVoteMark';
 import { ExtendedVote } from 'lib/votes/interfaces';
 import { isVotingClosed } from 'lib/votes/utils';
-import { UserVote } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import useSWR from 'swr';
@@ -20,9 +20,6 @@ interface PageInlineVoteProps {
   inlineVote: ExtendedVote;
   detailed?: boolean;
   isProposal?: boolean;
-  castVote: (voteId: string, option: string) => Promise<UserVote>;
-  deleteVote: (voteId: string) => Promise<void>;
-  cancelVote: (voteId: string) => Promise<void>;
 }
 
 const StyledDiv = styled.div<{ detailed: boolean }>`
@@ -40,8 +37,9 @@ const StyledFormControl = styled(FormControl)`
 
 const MAX_DESCRIPTION_LENGTH = 200;
 
-export default function PageInlineVote ({ detailed = false, inlineVote: vote, isProposal, castVote, cancelVote, deleteVote }: PageInlineVoteProps) {
+export default function PageInlineVote ({ detailed = false, inlineVote: vote, isProposal }: PageInlineVoteProps) {
   const { deadline, totalVotes, description, id, title, userChoice, voteOptions } = vote;
+  const { castVote, cancelVote, deleteVote } = useVotes();
   const [user] = useUser();
   const view = useEditorViewContext();
   const { data: userVotes, mutate } = useSWR(detailed ? `/votes/${id}/user-votes` : null, () => charmClient.getUserVotes(id));
@@ -192,9 +190,6 @@ export default function PageInlineVote ({ detailed = false, inlineVote: vote, is
         <PageInlineVote
           inlineVote={vote}
           detailed={true}
-          castVote={castVote}
-          deleteVote={deleteVote}
-          cancelVote={cancelVote}
         />
       </Modal>
     </StyledDiv>
