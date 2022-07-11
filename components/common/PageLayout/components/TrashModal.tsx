@@ -136,7 +136,7 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
   }
 
   const searchTextMatchedPages = useMemo(() => {
-    return Object.values(archivedPages).filter(archivedPage => archivedPage.title.toLowerCase().startsWith(searchText.toLowerCase()));
+    return Object.values(archivedPages).filter(archivedPage => archivedPage.title.toLowerCase().includes(searchText.toLowerCase()));
   }, [archivedPages, searchText]);
 
   const onRestorePage = useCallback(async (e: MouseEvent<HTMLButtonElement, MouseEvent>, pageId: string) => {

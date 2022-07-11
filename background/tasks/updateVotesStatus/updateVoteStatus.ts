@@ -1,10 +1,12 @@
+import { UserVote, Vote, VoteOptions, VoteType } from '@prisma/client';
 import { prisma } from 'db';
-import { UserVote, VoteStatus, VoteType } from '@prisma/client';
-import { ExtendedVote, VOTE_STATUS } from 'lib/votes/interfaces';
+import { VOTE_STATUS } from 'lib/votes/interfaces';
 
 const YES_OPTION = 'Yes';
 
-const getVotesByState = async (votes: ExtendedVote[]) => {
+type VoteWithUserVotes = (Vote & {userVotes: UserVote[], voteOptions: VoteOptions[]})
+
+const getVotesByState = async (votes: VoteWithUserVotes[]) => {
 
   const passedVotes: string[] = [];
   const rejectedVotes: string[] = [];
@@ -81,7 +83,7 @@ const updateVoteStatus = async () => {
     }
   });
 
-  const { passedVotes, rejectedVotes } = await getVotesByState(votesPassedDeadline as ExtendedVote[]);
+  const { passedVotes, rejectedVotes } = await getVotesByState(votesPassedDeadline as VoteWithUserVotes[]);
 
   await prisma.vote.updateMany({
     where: {

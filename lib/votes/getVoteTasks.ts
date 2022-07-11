@@ -12,6 +12,7 @@ export async function getVoteTasks (userId: string): Promise<VoteTask[]> {
         }
       },
       status: 'InProgress',
+      // No need to fetch votes that have been casted by the user
       userVotes: {
         none: {
           userId
