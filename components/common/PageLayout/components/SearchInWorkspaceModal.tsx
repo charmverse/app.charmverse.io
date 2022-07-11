@@ -78,7 +78,7 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
 
     while (currentPage && currentPage.parentId) {
       const pageId: string = currentPage.parentId;
-      currentPage = pageList.find(p => p.id === pageId);
+      currentPage = pageList.find(p => p && p.id === pageId);
       if (currentPage) {
         pathElements.unshift(currentPage.title);
       }
