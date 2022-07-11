@@ -21,29 +21,25 @@ import { useRouter } from 'next/router';
 import log from 'lib/log';
 import { useSnackbar } from 'hooks/useSnackbar';
 import getLitChainFromChainId from 'lib/token-gates/getLitChainFromChainId';
-import LoadingComponent from 'components/common/LoadingComponent';
 
 interface Props {
   onSubmit: (values: Space) => void;
-  spaceDomainToAccess?: string
 }
 
-export default function JoinSpacePage ({ onSubmit: _onSubmit, spaceDomainToAccess = '' }: Props) {
+export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
 
   const router = useRouter();
   const { account, chainId } = useWeb3React();
   const { showMessage } = useSnackbar();
   const [error, setError] = useState('');
   const [user, setUser] = useUser();
-  const [spaces, setSpaces] = useSpaces();
+  const [, setSpaces] = useSpaces();
   const [tokenGate, setTokenGate] = useState<TokenGate & { space: Space } | null>(null);
   const [description, setDescription] = useState('');
-  const [spaceDomain, setSpaceDomain] = useState(spaceDomainToAccess);
+  const [spaceDomain, setSpaceDomain] = useState('');
   const litClient = useLitProtocol();
   const [userInputStatus, setStatus] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  // We will use this only when providing the space domain externally, so as not to show an empty form
-  const [loadingTokenGates, setLoadingTokenGates] = useState(!!spaceDomainToAccess);
 
   useEffect(() => {
     if (!tokenGate) {
@@ -71,21 +67,15 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit, spaceDomainToAcces
       setTokenGate(null);
     }
     else {
-      setLoadingTokenGates(true);
       charmClient.getTokenGatesForSpace({ spaceDomain })
         .then(gates => {
           setTokenGate(gates[0]);
           if (gates[0]) {
             setStatus('Workspace found');
           }
-          // Token gate is undefined, so we let the user know this space cannot be accessed via token-gate
-          else if (spaces.some(s => s.domain === spaceDomain)) {
-            setStatus('This workspace is invite-only. Please contact the admin.');
-          }
           else {
             setStatus('Workspace not found');
           }
-          setLoadingTokenGates(false);
         });
     }
   }, [spaceDomain]);
@@ -126,22 +116,12 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit, spaceDomainToAcces
         }
         return null;
       });
-
-    // create user if we need one
-    if (!user && account) {
-      try {
-        const userProfile = await charmClient.login(account);
-        setUser(userProfile);
-      }
-      catch (err) {
-        const userProfile = await charmClient.createUser({ address: account });
-        setUser(userProfile);
-      }
-    }
-
     const result = jwt ? await charmClient.unlockTokenGate({ jwt, id: tokenGate.id }) : null;
     if (result?.space) {
-
+      // create user if we need one
+      if (!user && account) {
+        await charmClient.createUser({ address: account });
+      }
       // refresh user permissions
       const _user = await charmClient.getUser();
       setUser(_user);
@@ -172,53 +152,25 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit, spaceDomainToAcces
 
   return (
     <>
-      {// We are controlling the title from Public Bounty list, so don't need this
-       !spaceDomainToAccess && (
-       <>
-         <DialogTitle>Join a workspace</DialogTitle>
-         <Divider />
-         <br />
-       </>
-       )
-      }
-
+      <DialogTitle>Join a workspace</DialogTitle>
+      <Divider />
+      <br />
       <Grid container direction='column' spacing={2}>
-        {
-          // We should only show this input if we are not already providing a space domain
-          !spaceDomainToAccess && (
-            <Grid item>
-              <FieldLabel>Enter a CharmVerse Domain or URL</FieldLabel>
-              <TextField
-                defaultValue={spaceDomain}
-                onChange={onChangeDomainName}
-                autoFocus
-                placeholder='https://app.charmverse.io/my-space'
-                fullWidth
-                value={spaceDomain}
-                helperText={userInputStatus}
-                InputProps={{
-                  endAdornment: tokenGate && <CheckIcon color='success' />
-                }}
-              />
-            </Grid>
-          )
-        }
-
-        {
-          loadingTokenGates && (
-            <LoadingComponent height='200px' isLoading={true} />
-          )
-        }
-
-        { // Added to show the error state when we provide the domain externally, and no token gates exist
-         userInputStatus && !tokenGate && !loadingTokenGates && (
-         <Typography sx={{ ml: 2, mt: 1 }}>
-           {userInputStatus}
-         </Typography>
-         )
-        }
-
-        {description && tokenGate && !loadingTokenGates && (
+        <Grid item>
+          <FieldLabel>Enter a CharmVerse Domain or URL</FieldLabel>
+          <TextField
+            onChange={onChangeDomainName}
+            autoFocus
+            placeholder='https://app.charmverse.io/my-space'
+            fullWidth
+            value={spaceDomain}
+            helperText={userInputStatus}
+            InputProps={{
+              endAdornment: tokenGate && <CheckIcon color='success' />
+            }}
+          />
+        </Grid>
+        {description && (
           <>
             <Grid item>
               <Typography variant='h6' gutterBottom>
