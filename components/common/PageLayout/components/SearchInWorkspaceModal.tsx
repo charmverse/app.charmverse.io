@@ -118,22 +118,28 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
     >
       <DialogTitle onClose={close}>Quick Find</DialogTitle>
       <Autocomplete
-        disableClearable
         options={searchResultItems}
         noOptionsText='No search results'
+        autoComplete
+        clearOnBlur={false}
+        fullWidth
         onInputChange={(_event, newInputValue) => {
           setIsSearching(!!newInputValue);
         }}
         getOptionLabel={option => typeof option === 'object' ? option.name : option}
         open={isSearching}
-        disablePortal={true}
-        fullWidth
+        disablePortal
+        disableClearable
         sx={{
           '& .MuiInput-root': {
-            marginTop: '0px'
+            marginTop: '0px',
+            paddingRight: '0px !important'
           },
           '& label': {
             transform: 'inherit'
+          },
+          '& .MuiAutocomplete-endAdornment': {
+            display: 'none'
           }
         }}
         PopperComponent={StyledPopper}
@@ -177,6 +183,11 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
             InputProps={{
               ...params.InputProps,
               type: 'search'
+            }}
+            sx={{
+              '& .MuiAutocomplete-clearIndicator': {
+                color: '#000 !important'
+              }
             }}
           />
         )}
