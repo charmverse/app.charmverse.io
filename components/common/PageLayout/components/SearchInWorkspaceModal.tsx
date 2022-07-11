@@ -12,6 +12,8 @@ import { useBounties } from 'hooks/useBounties';
 import { usePages } from 'hooks/usePages';
 import { useRouter } from 'next/router';
 import { IPageWithPermissions } from 'lib/pages';
+import parse from 'autosuggest-highlight/parse';
+import match from 'autosuggest-highlight/match';
 
 const StyledPopper = styled(Popper)`
   position: initial !important;
@@ -31,7 +33,7 @@ const StyledLink = styled(Link)`
     display: flex;
     gap: 5px;
     font-size: 17px;
-    font-weight: 500;
+    font-weight: 400;
     padding-top: 4px;
     padding-bottom: 4px;
     :hover {
@@ -134,20 +136,36 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
           }
         }}
         PopperComponent={StyledPopper}
-        renderOption={(_, option: SearchResultItem) => (
-          <Box p={0.5}>
-            <StyledLink
-              href={option.link}
-            >
-              {
-                option.type === ResultType.page
-                  ? <InsertDriveFileOutlinedIcon fontSize='small' />
-                  : <BountyIcon fontSize='small' />
-              }
-              {option.name}{option.path && <StyledTypography>- {option.path}</StyledTypography>}
-            </StyledLink>
-          </Box>
-        )}
+        renderOption={(_, option: SearchResultItem, { inputValue }) => {
+          const matches = match(option.name, inputValue, { insideWords: true, findAllOccurrences: true });
+          const parts = parse(option.name, matches);
+
+          return (
+            <Box p={0.5}>
+              <StyledLink
+                href={option.link}
+              >
+                {
+                  option.type === ResultType.page
+                    ? <InsertDriveFileOutlinedIcon fontSize='small' />
+                    : <BountyIcon fontSize='small' />
+                }
+                <span>
+                  {parts.map((part: { text: string; highlight: boolean; }, _index: number) => {
+                    return (
+                      <span
+                        style={{
+                          fontWeight: part.highlight ? 700 : 400
+                        }}
+                      >{part.text}
+                      </span>
+                    );
+                  })}
+                </span>{option.path && <StyledTypography>- {option.path}</StyledTypography>}
+              </StyledLink>
+            </Box>
+          );
+        }}
         renderInput={(params) => (
           <TextField
             {...params}
