@@ -23,6 +23,11 @@ const ModalContainer = styled.div<{ padding?: string, size: ModalSize }>`
   max-height: calc(80vh - ${({ theme }) => theme.spacing(4)});
   max-width: 100%;
   overflow-y: auto;
+
+  &.top-position {
+    top: 10%;
+    transform: translate(-50%, 0);
+  }
 `;
 
 const ScrollableModalContainer = styled(ModalContainer)`
@@ -50,19 +55,29 @@ const ScrollableContainer = styled.div`
   overflow: auto;
 `;
 
+export enum ModalPosition {
+  center,
+  top,
+}
+
 export type ModalProps = Omit<ComponentProps<typeof MuiModal>, 'children' | 'onClose' | 'title'> & {
   size?: ModalSize,
   children: any,
   title?: string | ReactNode,
+  position?: ModalPosition,
   noPadding?: boolean,
   onClose: () => void
 };
 
-export function Modal ({ children, noPadding, size = defaultSize, title, ...props }: ModalProps) {
+export function Modal ({ children, noPadding, position = ModalPosition.center, size = defaultSize, title, ...props }: ModalProps) {
   return (
     <MuiModal {...props}>
       <div>
-        <ModalContainer padding={noPadding ? '0px' : undefined} size={size}>
+        <ModalContainer
+          padding={noPadding ? '0px' : undefined}
+          size={size}
+          className={position === ModalPosition.center ? 'center-position' : 'top-position'}
+        >
           {title && <DialogTitle onClose={props.onClose}>{title}</DialogTitle>}
           {children}
         </ModalContainer>

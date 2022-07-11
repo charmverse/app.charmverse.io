@@ -5,7 +5,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
-import { Modal, DialogTitle } from 'components/common/Modal';
+import { Modal, DialogTitle, ModalPosition } from 'components/common/Modal';
 import Popper from '@mui/material/Popper';
 import Link from 'components/common/Link';
 import { useBounties } from 'hooks/useBounties';
@@ -112,6 +112,7 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
     <Modal
       open={isOpen}
       onClose={close}
+      position={ModalPosition.top}
       style={{ height: '100%' }}
       size='large'
     >
