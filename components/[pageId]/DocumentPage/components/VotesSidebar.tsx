@@ -26,7 +26,7 @@ export type VoteSort = 'position' | 'latest_deadline' | 'highest_votes' | 'lates
 export type VoteFilter = 'in_progress' | 'completed' | 'all';
 
 export default function VotesSidebar () {
-  const { votes, castVote, deleteVote, cancelVote } = useVotes();
+  const { votes } = useVotes();
   const votesArray = Object.values(votes);
   const view = useEditorViewContext();
   const [voteFilter, setVoteFilter] = useState<VoteFilter>('in_progress');

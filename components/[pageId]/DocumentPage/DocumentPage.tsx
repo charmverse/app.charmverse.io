@@ -12,11 +12,12 @@ import { useVotes } from 'hooks/useVotes';
 import { Page, PageContent } from 'models';
 import { useRouter } from 'next/router';
 import { memo, useCallback } from 'react';
+import PageInlineVote from 'components/common/CharmEditor/components/inlineVote/components/PageInlineVote';
 import CharmEditor, { ICharmEditorOutput } from '../../common/CharmEditor/CharmEditor';
 import PageBanner from './components/PageBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
 import PageHeader from './components/PageHeader';
-import ProposalVote from './components/ProposalVote';
+import CreateVoteBox from './components/CreateVoteBox';
 
 export const Container = styled(Box)<{ top: number, fullWidth?: boolean }>`
   width: ${({ fullWidth }) => fullWidth ? '100%' : '860px'};
@@ -37,7 +38,7 @@ export interface IEditorProps {
 
 function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
   const { pages } = usePages();
-  const { votes } = useVotes();
+  const { votes, isLoading } = useVotes();
 
   const pageVote = Object.values(votes)[0];
 
@@ -105,6 +106,7 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
             pageActionDisplay={currentPageActionDisplay}
             pageId={page.id}
             disablePageSpecificFeatures={isSharedPage}
+            enableVoting={page.type !== 'proposal'}
           >
             <PageHeader
               headerImage={page.headerImage}
@@ -113,9 +115,9 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
               readOnly={readOnly}
               setPage={setPage}
             />
-            {page.type === 'proposal' && pageVote && (
-              <Box mb={2}>
-                <ProposalVote page={page} vote={pageVote} />
+            {page.type === 'proposal' && !isLoading && pageVote && (
+              <Box my={2}>
+                <PageInlineVote inlineVote={pageVote} detailed={false} isProposal={true} />
               </Box>
             )}
             {card && board && (
@@ -151,8 +153,8 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
               </div>
             )}
           </CharmEditor>
-          {page.type === 'proposal' && !pageVote && (
-            <ProposalVote page={page} />
+          {page.type === 'proposal' && !isLoading && !pageVote && (
+            <CreateVoteBox />
           )}
         </Container>
       </div>

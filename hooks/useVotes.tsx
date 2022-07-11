@@ -9,16 +9,18 @@ import { usePages } from './usePages';
 import { useUser } from './useUser';
 
 type IContext = {
-  isValidating: boolean,
-  votes: Record<string, ExtendedVote>
-  createVote: (votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId'>) => Promise<ExtendedVote>,
-  castVote: (voteId: string, option: string) => Promise<UserVote>
-  deleteVote: (voteId: string) => Promise<void>,
-  cancelVote: (voteId: string) => Promise<void>,
+  isValidating: boolean;
+  isLoading: boolean;
+  votes: Record<string, ExtendedVote>;
+  createVote: (votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId'>) => Promise<ExtendedVote>;
+  castVote: (voteId: string, option: string) => Promise<UserVote>;
+  deleteVote: (voteId: string) => Promise<void>;
+  cancelVote: (voteId: string) => Promise<void>;
 };
 
 const VotesContext = createContext<Readonly<IContext>>({
   isValidating: true,
+  isLoading: true,
   votes: {},
   castVote: () => undefined as any,
   createVote: () => undefined as any,
@@ -132,6 +134,7 @@ export function VotesProvider ({ children }: { children: ReactNode }) {
   const value: IContext = useMemo(() => ({
     votes,
     isValidating,
+    isLoading: !data,
     castVote,
     createVote,
     deleteVote,

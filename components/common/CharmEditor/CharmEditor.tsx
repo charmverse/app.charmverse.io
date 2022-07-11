@@ -119,6 +119,7 @@ export function charmEditorPlugins (
     onContentChange,
     readOnly,
     disablePageSpecificFeatures = false,
+    enableVoting,
     enableComments = true,
     userId = null,
     pageId = null,
@@ -131,6 +132,7 @@ export function charmEditorPlugins (
       readOnly?: boolean,
       onContentChange?: (view: EditorView) => void,
       disablePageSpecificFeatures?: boolean,
+      enableVoting?: boolean,
       enableComments?: boolean
     } = {}
 ): () => RawPlugins[] {
@@ -238,9 +240,11 @@ export function charmEditorPlugins (
     basePlugins.push(inlineComment.plugin({
       key: inlineCommentPluginKey
     }));
-    basePlugins.push(inlineVote.plugin({
-      key: inlineVotePluginKey
-    }));
+    if (enableVoting) {
+      basePlugins.push(inlineVote.plugin({
+        key: inlineVotePluginKey
+      }));
+    }
   }
 
   return () => basePlugins;
@@ -333,8 +337,9 @@ interface CharmEditorProps {
   readOnly?: boolean;
   style?: CSSProperties;
   pageActionDisplay?: IPageActionDisplayContext['currentPageActionDisplay']
-  disablePageSpecificFeatures?: boolean
-  pageId?: string | null
+  disablePageSpecificFeatures?: boolean;
+  enableVoting?: boolean;
+  pageId?: string | null;
 }
 
 export function convertPageContentToMarkdown (content: PageContent, title?: string): string {
@@ -366,6 +371,7 @@ function CharmEditor (
     style,
     readOnly = false,
     disablePageSpecificFeatures = false,
+    enableVoting,
     pageId
   }:
   CharmEditorProps
@@ -397,6 +403,7 @@ function CharmEditor (
       onContentChange: _onContentChange,
       readOnly,
       disablePageSpecificFeatures,
+      enableVoting,
       pageId,
       spaceId: currentSpace?.id,
       userId: currentUser?.id
@@ -597,7 +604,7 @@ function CharmEditor (
           </PageActionListBox>
         </Grow>
         <InlineCommentThread pluginKey={inlineCommentPluginKey} />
-        <InlineVoteList pluginKey={inlineVotePluginKey} />
+        {enableVoting && <InlineVoteList pluginKey={inlineVotePluginKey} />}
       </>
       )}
       {!readOnly && <DevTools />}

@@ -152,7 +152,11 @@ export default function PageInlineVote ({ detailed = false, inlineVote: vote, is
           ))}
         </RadioGroup>
       </StyledFormControl>
-      {!detailed && <Button disabled={!user} variant='outlined' onClick={voteDetailsPopup.open}>View details</Button>}
+      {!detailed && (
+        <Box display='flex' justifyContent='flex-end'>
+          <Button disabled={!user} color='secondary' variant='outlined' size='small' onClick={voteDetailsPopup.open}>View details</Button>
+        </Box>
+      )}
       {detailed && (totalVotes !== 0 ? voteCountLabel : (
         <Card variant='outlined'>
           <Box p={3} textAlign='center'>

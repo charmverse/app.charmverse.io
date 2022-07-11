@@ -67,7 +67,7 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
 
   const isPage = router.route.includes('pageId');
   const pageType = (currentPage as Page)?.type;
-  const isExportablePage = pageType === 'card' || pageType === 'page';
+  const isExportablePage = pageType === 'card' || pageType === 'page' || pageType === 'proposal';
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -166,52 +166,54 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
                 <List dense>
                   {isPage && (
                     <>
-                      {currentSpacePermissions?.createVote && (
-                      <ListItemButton onClick={() => {
-                        setPageMenuOpen(false);
-                        setIsModalOpen(true);
-                      }}
-                      >
-                        <HowToVoteOutlinedIcon
-                          fontSize='small'
-                          sx={{
-                            mr: 1
-                          }}
-                        />
-                        <ListItemText primary='Create a vote' />
-                      </ListItemButton>
+                      {(currentPage?.type === 'page' || currentPage?.type === 'card') && currentSpacePermissions?.createVote && (
+                        <ListItemButton onClick={() => {
+                          setPageMenuOpen(false);
+                          setIsModalOpen(true);
+                        }}
+                        >
+                          <HowToVoteOutlinedIcon
+                            fontSize='small'
+                            sx={{
+                              mr: 1
+                            }}
+                          />
+                          <ListItemText primary='Create a vote' />
+                        </ListItemButton>
                       )}
-                      <ListItemButton onClick={() => {
-                        setCurrentPageActionDisplay('votes');
-                        setPageMenuOpen(false);
-                      }}
-                      >
-                        <FormatListBulletedIcon
-                          fontSize='small'
-                          sx={{
-                            mr: 1
-                          }}
-                        />
-                        <ListItemText primary='View votes' />
-                      </ListItemButton>
+                      {(currentPage?.type === 'page' || currentPage?.type === 'card') && (
+                        <ListItemButton onClick={() => {
+                          setCurrentPageActionDisplay('votes');
+                          setPageMenuOpen(false);
+                        }}
+                        >
+                          <FormatListBulletedIcon
+                            fontSize='small'
+                            sx={{
+                              mr: 1
+                            }}
+                          />
+                          <ListItemText primary='View votes' />
+                        </ListItemButton>
+                      )}
                       <PublishToSnapshot page={currentPage as Page} />
                     </>
                   )}
                   <Divider />
                   {isPage && (
-                  <ListItemButton onClick={() => {
-                    setCurrentPageActionDisplay('comments');
-                    setPageMenuOpen(false);
-                  }}
-                  >
-                    <CommentOutlinedIcon
-                      fontSize='small'
-                      sx={{
-                        mr: 1
-                      }}
-                    />
-                    <ListItemText primary='View comments' />
-                  </ListItemButton>
+                    <ListItemButton onClick={() => {
+                      setCurrentPageActionDisplay('comments');
+                      setPageMenuOpen(false);
+                    }}
+                    >
+                      <CommentOutlinedIcon
+                        fontSize='small'
+                        sx={{
+                          mr: 1
+                        }}
+                      />
+                      <ListItemText primary='View comments' />
+                    </ListItemButton>
                   )}
                   <ListItemButton onClick={() => {
                     exportMarkdown();

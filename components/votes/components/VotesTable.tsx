@@ -47,7 +47,7 @@ export default function VotesTable ({ votes, mutateVotes }: { votes?: VoteRow[],
     setActivePage(null);
   }
 
-  async function deleteVote (voteId: string) {
+  async function deleteProposal (voteId: string) {
     // delete the related page instead of deleting the vote
     const vote = votes?.find(v => v.id === voteId);
     if (vote?.pageId) {
@@ -63,6 +63,12 @@ export default function VotesTable ({ votes, mutateVotes }: { votes?: VoteRow[],
     else {
       await charmClient.deleteVote(voteId);
     }
+    mutateTasks();
+    mutateVotes();
+  }
+
+  async function deleteVote (voteId: string) {
+    await charmClient.deleteVote(voteId);
     mutateTasks();
     mutateVotes();
   }
@@ -113,7 +119,7 @@ export default function VotesTable ({ votes, mutateVotes }: { votes?: VoteRow[],
                 <Box display='flex' alignItems='flex-start' gap={1}>
                   <Box component='span' sx={{ display: { xs: 'none', md: 'inline' } }}><VoteIcon color='secondary' /></Box>
                   <div>
-                    <Typography><strong>{vote.title}</strong></Typography>
+                    <Typography><strong>{pages[vote.pageId]?.title}</strong></Typography>
                   </div>
                 </Box>
                 <Button className='show-on-hover' color='secondary' variant='outlined' size='small'>Open</Button>
@@ -149,8 +155,9 @@ export default function VotesTable ({ votes, mutateVotes }: { votes?: VoteRow[],
           </Grid>
           <Grid item xs={1} display='flex' justifyContent='flex-end'>
             <VoteActionsMenu
-              deleteVote={deleteVote}
+              deleteVote={vote.status === 'Draft' ? undefined : deleteVote}
               cancelVote={cancelVote}
+              deleteProposal={pages[vote.pageId]?.type === 'proposal' ? deleteProposal : undefined}
               editProposal={pages[vote.pageId]?.type === 'proposal' ? editProposal : undefined}
               vote={vote}
             />

@@ -8,14 +8,15 @@ import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import { useUser } from 'hooks/useUser';
 
 interface VoteActionsProps {
-  deleteVote: (voteId: string) => Promise<void>;
+  deleteVote?: (voteId: string) => Promise<void>;
+  deleteProposal?: (voteId: string) => Promise<void>;
   cancelVote: (voteId: string) => Promise<void>;
   editProposal?: (voteId: string) => void;
   removeFromPage?: (voteId: string) => void;
   vote: { createdBy: string, id: string, deadline?: Date, status: string, title: string };
 }
 
-export default function VoteActionsMenu ({ cancelVote, deleteVote, editProposal, removeFromPage, vote }: VoteActionsProps) {
+export default function VoteActionsMenu ({ cancelVote, deleteVote, deleteProposal, editProposal, removeFromPage, vote }: VoteActionsProps) {
 
   const [user] = useUser();
   const actionsPopup = usePopupState({ variant: 'popover', popupId: 'inline-votes-action' });
@@ -41,7 +42,7 @@ export default function VoteActionsMenu ({ cancelVote, deleteVote, editProposal,
         buttonText='Delete'
         onConfirm={() => {
           removeFromPage?.(vote.id);
-          deleteVote(vote.id);
+          deleteVote?.(vote.id);
         }}
         question={deleteQuestion}
       />
@@ -65,6 +66,17 @@ export default function VoteActionsMenu ({ cancelVote, deleteVote, editProposal,
             <ListItemText>Edit proposal</ListItemText>
           </MenuItem>
         )}
+        {deleteProposal && (
+          <MenuItem
+            dense
+            onClick={() => {
+              deleteProposal(vote.id);
+            }}
+          >
+            <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
+            <ListItemText>Delete proposal</ListItemText>
+          </MenuItem>
+        )}
         {vote.status === 'InProgress' && !hasPassedDeadline && (
           <MenuItem
             dense
@@ -74,13 +86,15 @@ export default function VoteActionsMenu ({ cancelVote, deleteVote, editProposal,
             }}
           >
             <DoNotDisturbIcon fontSize='small' sx={{ mr: 1 }} />
-            <ListItemText>Cancel</ListItemText>
+            <ListItemText>Cancel vote</ListItemText>
           </MenuItem>
         )}
-        <MenuItem dense onClick={popupState.open}>
-          <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
-          <ListItemText>Delete</ListItemText>
-        </MenuItem>
+        {deleteVote && (
+          <MenuItem dense onClick={popupState.open}>
+            <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
+            <ListItemText>Delete vote</ListItemText>
+          </MenuItem>
+        )}
       </Menu>
     </>
   );
