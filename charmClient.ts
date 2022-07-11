@@ -712,7 +712,7 @@ class CharmClient {
   }
 
   getVotesBySpace (spaceId: string) {
-    return http.GET<(ExtendedVote & { page: { path: string } })[]>(`/api/spaces/${spaceId}/votes`);
+    return http.GET<ExtendedVote[]>(`/api/spaces/${spaceId}/votes`);
   }
 
   createVote (votePayload: VoteDTO) {

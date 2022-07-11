@@ -30,9 +30,10 @@ import { useRef, useState } from 'react';
 import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
+import { useVotes } from 'hooks/useVotes';
 import Account from '../Account';
 import ShareButton from '../ShareButton';
-import CreateVoteModal from '../CreateVoteModal';
+import CreateVoteModal from '../../../../votes/components/CreateVoteModal';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
 import NotificationsBadge from './components/NotificationsBadge';
 
@@ -56,6 +57,7 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
   const { pages, currentPageId, setPages } = usePages();
   const [user, setUser] = useUser();
   const theme = useTheme();
+  const { createVote } = useVotes();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
   const [pageMenuAnchorElement, setPageMenuAnchorElement] = useState<null | Element>(null);
   const pageMenuAnchor = useRef();
@@ -65,7 +67,7 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
 
   const isPage = router.route.includes('pageId');
   const pageType = (currentPage as Page)?.type;
-  const isExportablePage = pageType === 'card' || pageType === 'page';
+  const isExportablePage = pageType === 'card' || pageType === 'page' || pageType === 'proposal';
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -164,52 +166,54 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
                 <List dense>
                   {isPage && (
                     <>
-                      {currentSpacePermissions?.createVote && (
-                      <ListItemButton onClick={() => {
-                        setPageMenuOpen(false);
-                        setIsModalOpen(true);
-                      }}
-                      >
-                        <HowToVoteOutlinedIcon
-                          fontSize='small'
-                          sx={{
-                            mr: 1
-                          }}
-                        />
-                        <ListItemText primary='Create a vote' />
-                      </ListItemButton>
+                      {(currentPage?.type === 'page' || currentPage?.type === 'card') && currentSpacePermissions?.createVote && (
+                        <ListItemButton onClick={() => {
+                          setPageMenuOpen(false);
+                          setIsModalOpen(true);
+                        }}
+                        >
+                          <HowToVoteOutlinedIcon
+                            fontSize='small'
+                            sx={{
+                              mr: 1
+                            }}
+                          />
+                          <ListItemText primary='Create a vote' />
+                        </ListItemButton>
                       )}
-                      <ListItemButton onClick={() => {
-                        setCurrentPageActionDisplay('votes');
-                        setPageMenuOpen(false);
-                      }}
-                      >
-                        <FormatListBulletedIcon
-                          fontSize='small'
-                          sx={{
-                            mr: 1
-                          }}
-                        />
-                        <ListItemText primary='View votes' />
-                      </ListItemButton>
+                      {(currentPage?.type === 'page' || currentPage?.type === 'card') && (
+                        <ListItemButton onClick={() => {
+                          setCurrentPageActionDisplay('votes');
+                          setPageMenuOpen(false);
+                        }}
+                        >
+                          <FormatListBulletedIcon
+                            fontSize='small'
+                            sx={{
+                              mr: 1
+                            }}
+                          />
+                          <ListItemText primary='View votes' />
+                        </ListItemButton>
+                      )}
                       <PublishToSnapshot page={currentPage as Page} />
                     </>
                   )}
                   <Divider />
                   {isPage && (
-                  <ListItemButton onClick={() => {
-                    setCurrentPageActionDisplay('comments');
-                    setPageMenuOpen(false);
-                  }}
-                  >
-                    <CommentOutlinedIcon
-                      fontSize='small'
-                      sx={{
-                        mr: 1
-                      }}
-                    />
-                    <ListItemText primary='View comments' />
-                  </ListItemButton>
+                    <ListItemButton onClick={() => {
+                      setCurrentPageActionDisplay('comments');
+                      setPageMenuOpen(false);
+                    }}
+                    >
+                      <CommentOutlinedIcon
+                        fontSize='small'
+                        sx={{
+                          mr: 1
+                        }}
+                      />
+                      <ListItemText primary='View comments' />
+                    </ListItemButton>
                   )}
                   <ListItemButton onClick={() => {
                     exportMarkdown();
@@ -225,7 +229,6 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
                     <ListItemText primary='Export to markdown' />
                   </ListItemButton>
 
-                  {/* Publishing to snapshot */}
                   <Divider />
                   <ListItemButton>
                     <FormControlLabel
@@ -273,6 +276,7 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
       {/** inject the modal based on open status so it resets the form each time */}
       {isModalOpen && (
         <CreateVoteModal
+          createVote={createVote}
           open={isModalOpen}
           postCreateVote={() => {
             setIsModalOpen(false);

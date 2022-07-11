@@ -1,12 +1,7 @@
 
 import { DateTime, DateTimeUnit as LuxonTimeUnit } from 'luxon';
 
-/**
- * Datestamps are created as YYYY-MM-DD
- */
-export type DateStamp = `${number}-${number}-${number}`;
-
-export type DateInput = DateTime | Date | DateStamp | number;
+export type DateInput = DateTime | Date | string | number;
 
 export type DateTimeFormat = 'relative' | 'absolute'
 

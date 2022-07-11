@@ -8,13 +8,16 @@ import ScrollableWindow from 'components/common/PageLayout/components/Scrollable
 import BountyIntegration from 'components/[pageId]/DocumentPage/components/BountyIntegration';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
+import { useVotes } from 'hooks/useVotes';
 import { Page, PageContent } from 'models';
 import { useRouter } from 'next/router';
 import { memo, useCallback } from 'react';
+import PageInlineVote from 'components/common/CharmEditor/components/inlineVote/components/PageInlineVote';
 import CharmEditor, { ICharmEditorOutput } from '../../common/CharmEditor/CharmEditor';
 import PageBanner from './components/PageBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
 import PageHeader from './components/PageHeader';
+import CreateVoteBox from './components/CreateVoteBox';
 
 export const Container = styled(Box)<{ top: number, fullWidth?: boolean }>`
   width: ${({ fullWidth }) => fullWidth ? '100%' : '860px'};
@@ -35,6 +38,10 @@ export interface IEditorProps {
 
 function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
   const { pages } = usePages();
+  const { votes, isLoading } = useVotes();
+
+  const pageVote = Object.values(votes)[0];
+
   const board = useAppSelector((state) => {
     if (page.type === 'card' && page.parentId) {
       const parentPage = pages[page.parentId];
@@ -99,6 +106,7 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
             pageActionDisplay={currentPageActionDisplay}
             pageId={page.id}
             disablePageSpecificFeatures={isSharedPage}
+            enableVoting={page.type !== 'proposal'}
           >
             <PageHeader
               headerImage={page.headerImage}
@@ -107,39 +115,47 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
               readOnly={readOnly}
               setPage={setPage}
             />
-            {card && board && (
-            <div className='CardDetail content'>
-              {/* Property list */}
-              <Box sx={{
-                display: 'flex',
-                gap: 1,
-                justifyContent: 'space-between',
-                width: '100%'
-              }}
-              >
-                <CardDetailProperties
-                  board={board}
-                  card={card}
-                  cards={cards}
-                  activeView={activeView}
-                  views={boardViews}
-                  readonly={readOnly}
-                  pageUpdatedAt={page.updatedAt.toString()}
-                  pageUpdatedBy={page.updatedBy}
-                />
-                <BountyIntegration linkedTaskId={card.id} title={page.title} readonly={readOnly} />
+            {page.type === 'proposal' && !isLoading && pageVote && (
+              <Box my={2}>
+                <PageInlineVote inlineVote={pageVote} detailed={false} isProposal={true} />
               </Box>
+            )}
+            {card && board && (
+              <div className='CardDetail content'>
+                {/* Property list */}
+                <Box sx={{
+                  display: 'flex',
+                  gap: 1,
+                  justifyContent: 'space-between',
+                  width: '100%'
+                }}
+                >
+                  <CardDetailProperties
+                    board={board}
+                    card={card}
+                    cards={cards}
+                    activeView={activeView}
+                    views={boardViews}
+                    readonly={readOnly}
+                    pageUpdatedAt={page.updatedAt.toString()}
+                    pageUpdatedBy={page.updatedBy}
+                  />
+                  <BountyIntegration linkedTaskId={card.id} title={page.title} readonly={readOnly} />
+                </Box>
 
-              <hr />
-              <CommentsList
-                comments={comments}
-                rootId={card.rootId}
-                cardId={card.id}
-                readonly={readOnly}
-              />
-            </div>
+                <hr />
+                <CommentsList
+                  comments={comments}
+                  rootId={card.rootId}
+                  cardId={card.id}
+                  readonly={readOnly}
+                />
+              </div>
             )}
           </CharmEditor>
+          {page.type === 'proposal' && !isLoading && !pageVote && (
+            <CreateVoteBox />
+          )}
         </Container>
       </div>
     </ScrollableWindow>
