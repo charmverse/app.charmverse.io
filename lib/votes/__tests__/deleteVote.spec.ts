@@ -33,7 +33,7 @@ describe('deleteVote', () => {
     expect(deletedVote?.id).toBe(vote.id);
   });
 
-  it('should throw error if createVote space permission doesn\'t', async () => {
+  it('should throw error if createVote space permission doesn\'t exist', async () => {
     const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
     const page = await createPage({
       createdBy: user.id,

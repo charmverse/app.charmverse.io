@@ -10,7 +10,7 @@ describe('getVoteTasks', () => {
       spaceId: space.id
     });
 
-    // Not fetched due to being cancelled
+    // Not included as the vote has been cancelled
     await createVote({
       pageId: page.id,
       createdBy: user.id,
@@ -20,7 +20,7 @@ describe('getVoteTasks', () => {
       deadline: new Date(Date.now() + 24 * 60 * 60 * 1000)
     });
 
-    // Not fetched due to finished deadline
+    // Not included as the vote is past deadline
     await createVote({
       pageId: page.id,
       createdBy: user.id,
@@ -30,7 +30,7 @@ describe('getVoteTasks', () => {
       deadline: new Date(Date.now() - 24 * 60 * 60 * 1000)
     });
 
-    // Not fetched as user voted on it
+    // Not included as the user casted vote
     await createVote({
       pageId: page.id,
       createdBy: user.id,
@@ -50,8 +50,7 @@ describe('getVoteTasks', () => {
     });
 
     const votes = await getVoteTasks(user.id);
-    expect(votes[0]).toMatchObject(expect.objectContaining({
-      id: createdVote4.id
-    }));
+    expect(votes[0].id).toBe(createdVote4.id);
+    expect(votes.length).toBe(1);
   });
 });

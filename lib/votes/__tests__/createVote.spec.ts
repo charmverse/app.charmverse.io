@@ -1,8 +1,7 @@
 import { VoteStatus } from '@prisma/client';
 import { addSpaceOperations } from 'lib/permissions/spaces';
-import { DataNotFoundError, UnauthorisedActionError, UndesirableOperationError } from 'lib/utilities/errors';
-import { ExpectedAnError } from 'testing/errors';
-import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
+import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { createVote as createVoteService } from '../createVote';
 

@@ -56,7 +56,7 @@ describe('updateVote', () => {
     await expect(updateVote(vote.id, v4(), 'Cancelled')).rejects.toBeInstanceOf(UndesirableOperationError);
   });
 
-  it('should throw error if status to be updated is not cancelled', async () => {
+  it('should fail if the user tries to update the vote status to any other status than cancelled', async () => {
     const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     const page = await createPage({
