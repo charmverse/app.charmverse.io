@@ -3,7 +3,7 @@ import Typography from '@mui/material/Typography';
 import { useFocalboardViews } from 'hooks/useFocalboardViews';
 import useRefState from 'hooks/useRefState';
 import { Page } from 'models';
-import { useCallback, useRef, memo } from 'react';
+import { useCallback, useRef, memo, useEffect } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { greyColor2 } from 'theme/colors';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
@@ -112,7 +112,7 @@ function DraggableTreeNode ({ item, onDropAdjacent, onDropChild, pathPrefix, add
     }
   }, [addPage]);
 
-  const { focalboardViewsRecord } = useFocalboardViews();
+  const { focalboardViewsRecord, setFocalboardViewsRecord } = useFocalboardViews();
 
   const viewsRecord = useAppSelector((state) => state.views.views);
   const views = Object.values(viewsRecord).filter(view => view.parentId === item.id);
@@ -120,6 +120,14 @@ function DraggableTreeNode ({ item, onDropAdjacent, onDropChild, pathPrefix, add
   const hasSelectedChildView = views.some(view => view.id === selectedNodeId);
   const { expanded } = useTreeItem(item.id);
   const hideChildren = !expanded;
+
+  useEffect(() => {
+    const focalboardViewId = focalboardViewsRecord[item.id];
+    if (focalboardViewId && item.type === 'board' && !views.find(view => view.id === focalboardViewId)) {
+      const firstView = views[0];
+      setFocalboardViewsRecord((_focalboardViewsRecord) => ({ ..._focalboardViewsRecord, [firstView.parentId]: firstView.id }));
+    }
+  }, [focalboardViewsRecord, views, item]);
 
   return (
     <PageTreeItem

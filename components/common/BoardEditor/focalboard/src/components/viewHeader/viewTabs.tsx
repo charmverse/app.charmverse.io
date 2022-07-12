@@ -113,6 +113,7 @@ function ViewTabs({ board, activeView, intl, readonly, showView, views }: ViewTa
       'duplicate view',
       async (block) => {
         showView(block.id)
+        setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [board.id]: newView.id }))
       },
       async () => {
         showView(currentView.id)
