@@ -2,7 +2,7 @@ import { v4 } from 'uuid';
 import { aggregateVoteResult } from '../aggregateVoteResult';
 
 describe('aggregateVoteResult', () => {
-  it('should aggregate vote result and user choice', async () => {
+  it('should count the number of times each option was voted and what the user\'s choice was', async () => {
     const userId = v4();
     const aggregatedVoteResult = aggregateVoteResult({
       userId,

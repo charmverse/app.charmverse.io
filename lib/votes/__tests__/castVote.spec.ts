@@ -1,4 +1,3 @@
-import { VoteStatus } from '@prisma/client';
 import { UserIsNotSpaceMemberError } from 'lib/users/errors';
 import { DataNotFoundError, InvalidInputError, UndesirableOperationError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
@@ -7,6 +6,56 @@ import { v4 } from 'uuid';
 import { castVote } from '../castVote';
 
 describe('castVote', () => {
+
+  it('should create new user vote if it doesn\'t exist', async () => {
+    const { space, user } = await generateUserAndSpaceWithApiToken(undefined, true);
+    const page = await createPage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    const vote = await createVote({
+      pageId: page.id,
+      createdBy: user.id,
+      spaceId: space.id,
+      voteOptions: [
+        '1', '2', '3'
+      ]
+    });
+    const choice = '1';
+    const userVote = await castVote(choice, vote.id, user.id);
+    expect(userVote).toMatchObject(expect.objectContaining({
+      userId: user.id,
+      voteId: vote.id,
+      choice
+    }));
+  });
+
+  it('should update existing user vote', async () => {
+    const { space, user } = await generateUserAndSpaceWithApiToken(undefined, true);
+    const page = await createPage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    const vote = await createVote({
+      pageId: page.id,
+      createdBy: user.id,
+      spaceId: space.id,
+      voteOptions: [
+        '1', '2', '3'
+      ],
+      userVotes: ['1']
+    });
+    const choice = '3';
+    const userVote = await castVote(choice, vote.id, user.id);
+    expect(userVote).toMatchObject(expect.objectContaining({
+      userId: user.id,
+      voteId: vote.id,
+      choice
+    }));
+  });
+
   it('should throw error if vote doesn\'t exist', async () => {
     try {
       await castVote('1', v4(), v4());
@@ -88,54 +137,5 @@ describe('castVote', () => {
     catch (err) {
       expect(err).toBeInstanceOf(UserIsNotSpaceMemberError);
     }
-  });
-
-  it('should create new user vote if it doesn\'t exist', async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken(undefined, true);
-    const page = await createPage({
-      createdBy: user.id,
-      spaceId: space.id
-    });
-
-    const vote = await createVote({
-      pageId: page.id,
-      createdBy: user.id,
-      spaceId: space.id,
-      voteOptions: [
-        '1', '2', '3'
-      ]
-    });
-    const choice = '1';
-    const userVote = await castVote(choice, vote.id, user.id);
-    expect(userVote).toMatchObject(expect.objectContaining({
-      userId: user.id,
-      voteId: vote.id,
-      choice
-    }));
-  });
-
-  it('should update existing user vote', async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken(undefined, true);
-    const page = await createPage({
-      createdBy: user.id,
-      spaceId: space.id
-    });
-
-    const vote = await createVote({
-      pageId: page.id,
-      createdBy: user.id,
-      spaceId: space.id,
-      voteOptions: [
-        '1', '2', '3'
-      ],
-      userVotes: ['1']
-    });
-    const choice = '3';
-    const userVote = await castVote(choice, vote.id, user.id);
-    expect(userVote).toMatchObject(expect.objectContaining({
-      userId: user.id,
-      voteId: vote.id,
-      choice
-    }));
   });
 });
