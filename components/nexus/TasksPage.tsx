@@ -1,5 +1,6 @@
 
-import { Box, Divider, Grid, Tab, Tabs, Typography } from '@mui/material';
+import { Box, Divider, Grid, Tab, Tabs, Typography,
+  Badge, IconButton, Tooltip } from '@mui/material';
 import KeyIcon from '@mui/icons-material/Key';
 import ForumIcon from '@mui/icons-material/Forum';
 import styled from '@emotion/styled';
@@ -8,6 +9,7 @@ import { silentlyUpdateURL } from 'lib/browser';
 import { useState } from 'react';
 import { useTheme } from '@emotion/react';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
+import { useUser } from 'hooks/useUser';
 import GnosisTasksList from './GnosisTasksList';
 import MentionedTasksList from './MentionedTasksList';
 import TasksPageHeader from './TasksPageHeader';
@@ -39,13 +41,6 @@ const tabStyles = {
   }
 };
 
-const TASK_TABS = [
-  { icon: <KeyIcon />, label: 'Multisig', type: 'multisig' },
-  // { icon: <BountyIcon />, label: 'Bounty', type: 'bounty' },
-  { icon: <HowToVoteIcon />, label: 'Votes', type: 'vote' },
-  { icon: <ForumIcon />, label: 'Discussion', type: 'discussion' }
-] as const;
-
 const StyledTypography = styled(Typography)`
   font-size: 24px;
   font-weight: bold;
@@ -53,9 +48,26 @@ const StyledTypography = styled(Typography)`
 
 export default function TasksPage () {
   const router = useRouter();
+  const [user] = useUser();
   const [currentTask, setCurrentTask] = useState(router.query?.task ?? 'multisig');
   const { error, mutate: mutateTasks, tasks } = useTasks();
   const theme = useTheme();
+
+  const userNotificationState = user?.notificationState;
+  const votesTaskCount: number = tasks ? tasks.votes.length : 0;
+  const mentionsTaskCount: number = tasks ? tasks.mentioned.unmarked.length : 0;
+  const hasSnoozedNotifications = userNotificationState
+    && userNotificationState.snoozedUntil
+    && new Date(userNotificationState.snoozedUntil) > new Date();
+  const multisigTaskCount: number = tasks && !hasSnoozedNotifications ? tasks.gnosis.length : 0;
+
+  const TASK_TABS = [
+    { icon: <KeyIcon />, label: 'Multisig', type: 'multisig', notificationCount: multisigTaskCount },
+    // { icon: <BountyIcon />, label: 'Bounty', type: 'bounty' },
+    { icon: <HowToVoteIcon />, label: 'Votes', type: 'vote', notificationCount: votesTaskCount },
+    { icon: <ForumIcon />, label: 'Discussion', type: 'discussion', notificationCount: mentionsTaskCount }
+  ] as const;
+
   return (
     <>
       <NexusPageTitle />
@@ -97,7 +109,26 @@ export default function TasksPage () {
                 color: theme.palette.textPrimary.main
               }
             }}
-            label={task.label}
+            label={(task.notificationCount
+              ? (
+
+                <Tooltip arrow title={`Your ${task.label.toLowerCase()} notifications`}>
+                  <Badge
+                    badgeContent={task.notificationCount}
+                    color='error'
+                    sx={{
+                      '& .MuiBadge-badge:hover': {
+                        transform: 'scale(1.25) translate(50%, -50%)',
+                        transition: '250ms ease-in-out transform'
+                      }
+                    }}
+                    max={99}
+                  >
+                    {task.label}
+                  </Badge>
+                </Tooltip>
+              ) : task.label
+            )}
             onClick={() => {
               silentlyUpdateURL(`${window.location.origin}/nexus?task=${task.type}`);
               setCurrentTask(task.type);
