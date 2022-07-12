@@ -291,6 +291,9 @@ export async function createVote ({ userVotes = [], voteOptions = [], spaceId, c
       },
       type: 'Approval',
       description
+    },
+    include: {
+      voteOptions: true
     }
   });
 }

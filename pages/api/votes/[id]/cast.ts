@@ -1,7 +1,9 @@
 
 import { UserVote } from '@prisma/client';
-import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { prisma } from 'db';
+import { hasAccessToSpace, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { DataNotFoundError } from 'lib/utilities/errors';
 import { castVote as castVoteService } from 'lib/votes';
 import { UserVoteDTO } from 'lib/votes/interfaces';
 import { NextApiRequest, NextApiResponse } from 'next';
@@ -19,7 +21,29 @@ async function castVote (req: NextApiRequest, res: NextApiResponse<UserVote | { 
   const voteId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const newUserVote: UserVote = await castVoteService(choice, voteId, userId);
+  const vote = await prisma.vote.findUnique({
+    where: {
+      id: voteId
+    },
+    include: {
+      voteOptions: true
+    }
+  });
+
+  if (!vote) {
+    throw new DataNotFoundError(`A vote with id ${voteId} was not found.`);
+  }
+
+  const { error } = await hasAccessToSpace({
+    userId,
+    spaceId: vote.spaceId
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  const newUserVote: UserVote = await castVoteService(choice, vote, userId);
 
   return res.status(200).json(newUserVote);
 }

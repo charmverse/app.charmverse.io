@@ -1,5 +1,4 @@
-import { UserIsNotSpaceMemberError } from 'lib/users/errors';
-import { DataNotFoundError, InvalidInputError, UndesirableOperationError } from 'lib/utilities/errors';
+import { InvalidInputError, UndesirableOperationError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
@@ -23,7 +22,7 @@ describe('castVote', () => {
       ]
     });
     const choice = '1';
-    const userVote = await castVote(choice, vote.id, user.id);
+    const userVote = await castVote(choice, vote, user.id);
     expect(userVote).toMatchObject(expect.objectContaining({
       userId: user.id,
       voteId: vote.id,
@@ -48,22 +47,12 @@ describe('castVote', () => {
       userVotes: ['1']
     });
     const choice = '3';
-    const userVote = await castVote(choice, vote.id, user.id);
+    const userVote = await castVote(choice, vote, user.id);
     expect(userVote).toMatchObject(expect.objectContaining({
       userId: user.id,
       voteId: vote.id,
       choice
     }));
-  });
-
-  it('should throw error if vote doesn\'t exist', async () => {
-    try {
-      await castVote('1', v4(), v4());
-      throw new ExpectedAnError();
-    }
-    catch (err) {
-      expect(err).toBeInstanceOf(DataNotFoundError);
-    }
   });
 
   it('should throw error if vote status is cancelled', async () => {
@@ -81,7 +70,7 @@ describe('castVote', () => {
     });
 
     try {
-      await castVote('1', vote.id, v4());
+      await castVote('1', vote, v4());
       throw new ExpectedAnError();
     }
     catch (err) {
@@ -106,36 +95,11 @@ describe('castVote', () => {
     });
 
     try {
-      await castVote('4', vote.id, v4());
+      await castVote('4', vote, v4());
       throw new ExpectedAnError();
     }
     catch (err) {
       expect(err).toBeInstanceOf(InvalidInputError);
-    }
-  });
-
-  it('should throw error if the user don\'t have access to the space', async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken(undefined, true);
-    const page = await createPage({
-      createdBy: user.id,
-      spaceId: space.id
-    });
-
-    const vote = await createVote({
-      pageId: page.id,
-      createdBy: user.id,
-      spaceId: space.id,
-      voteOptions: [
-        '1', '2', '3'
-      ]
-    });
-
-    try {
-      await castVote('1', vote.id, v4());
-      throw new ExpectedAnError();
-    }
-    catch (err) {
-      expect(err).toBeInstanceOf(UserIsNotSpaceMemberError);
     }
   });
 });
