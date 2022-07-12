@@ -38,7 +38,7 @@ export default function PageTitle ({ subPage }: { subPage?: string }) {
             <Tooltip arrow placement='top' title={account ? 'User cant be logged out so long as their wallet is connected' : ''}>
               <Box display='flex' justifyContent='flex-end' mt={2}>
                 <Button
-                  disabled={account}
+                  disabled={Boolean(account)}
                   variant='outlined'
                   color='secondary'
                   loading={isLoggingOut}

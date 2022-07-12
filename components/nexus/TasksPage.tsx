@@ -1,6 +1,5 @@
 
-import { Box, Divider, Grid, Tab, Tabs, Typography,
-  Badge, IconButton, Tooltip } from '@mui/material';
+import { Box, Divider, Grid, Tab, Tabs, Typography, Badge } from '@mui/material';
 import KeyIcon from '@mui/icons-material/Key';
 import ForumIcon from '@mui/icons-material/Forum';
 import styled from '@emotion/styled';
@@ -46,6 +45,13 @@ const StyledTypography = styled(Typography)`
   font-weight: bold;
 `;
 
+const TASK_TABS = [
+  { icon: <KeyIcon />, label: 'Multisig', type: 'multisig' },
+  // { icon: <BountyIcon />, label: 'Bounty', type: 'bounty' },
+  { icon: <HowToVoteIcon />, label: 'Votes', type: 'vote' },
+  { icon: <ForumIcon />, label: 'Discussion', type: 'discussion' }
+] as const;
+
 export default function TasksPage () {
   const router = useRouter();
   const [user] = useUser();
@@ -54,19 +60,15 @@ export default function TasksPage () {
   const theme = useTheme();
 
   const userNotificationState = user?.notificationState;
-  const votesTaskCount: number = tasks ? tasks.votes.length : 0;
-  const mentionsTaskCount: number = tasks ? tasks.mentioned.unmarked.length : 0;
   const hasSnoozedNotifications = userNotificationState
     && userNotificationState.snoozedUntil
     && new Date(userNotificationState.snoozedUntil) > new Date();
-  const multisigTaskCount: number = tasks && !hasSnoozedNotifications ? tasks.gnosis.length : 0;
 
-  const TASK_TABS = [
-    { icon: <KeyIcon />, label: 'Multisig', type: 'multisig', notificationCount: multisigTaskCount },
-    // { icon: <BountyIcon />, label: 'Bounty', type: 'bounty' },
-    { icon: <HowToVoteIcon />, label: 'Votes', type: 'vote', notificationCount: votesTaskCount },
-    { icon: <ForumIcon />, label: 'Discussion', type: 'discussion', notificationCount: mentionsTaskCount }
-  ] as const;
+  const notificationCount: Record<(typeof TASK_TABS)[number]['type'], number> = {
+    multisig: (tasks && !hasSnoozedNotifications) ? tasks.gnosis.length : 0,
+    vote: tasks ? tasks.votes.length : 0,
+    discussion: tasks ? tasks.mentioned.unmarked.length : 0
+  };
 
   return (
     <>
@@ -105,29 +107,22 @@ export default function TasksPage () {
               fontSize: 14,
               minHeight: 0,
               '&.MuiTab-root': {
-                opacity: 0.75,
-                color: theme.palette.textPrimary.main
+                color: theme.palette.secondary.main
               }
             }}
-            label={(task.notificationCount
-              ? (
-
-                <Tooltip arrow title={`Your ${task.label.toLowerCase()} notifications`}>
-                  <Badge
-                    badgeContent={task.notificationCount}
-                    color='error'
-                    sx={{
-                      '& .MuiBadge-badge:hover': {
-                        transform: 'scale(1.25) translate(50%, -50%)',
-                        transition: '250ms ease-in-out transform'
-                      }
-                    }}
-                    max={99}
-                  >
-                    {task.label}
-                  </Badge>
-                </Tooltip>
-              ) : task.label
+            label={(
+              <Badge
+                sx={{
+                  '& .MuiBadge-badge': {
+                    right: '-3px'
+                  }
+                }}
+                invisible={notificationCount[task.type] === 0}
+                color='error'
+                variant='dot'
+              >
+                {task.label}
+              </Badge>
             )}
             onClick={() => {
               silentlyUpdateURL(`${window.location.origin}/nexus?task=${task.type}`);
