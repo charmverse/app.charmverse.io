@@ -10,7 +10,7 @@ import { useContext, useMemo, useState, useEffect } from 'react';
 import { CSVLink } from 'react-csv';
 import { BountyWithDetails } from 'models';
 import { FullWidthPageContent } from 'components/common/PageLayout/components/PageContent';
-import LoadingComponent from 'components/common/LoadingComponent';
+
 import { BountyCard } from './components/BountyCard';
 import BountyModal from './components/BountyModal';
 import InputBountyStatus from './components/InputBountyStatus';
@@ -41,12 +41,12 @@ function sortSelected (bountyStatuses: BountyStatus[]): BountyStatus[] {
  */
 interface Props {
   publicMode?: boolean
-  bountyCardClicked?: (bounty: BountyWithDetails) => void
+  bountyCardClicked?: (bounty: BountyWithDetails) => void,
+  bounties: BountyWithDetails[]
 }
 
-export default function BountyList ({ publicMode, bountyCardClicked = () => null }: Props) {
+export default function BountyList ({ publicMode, bountyCardClicked = () => null, bounties }: Props) {
   const [displayBountyDialog, setDisplayBountyDialog] = useState(false);
-  const { bounties, loadingBounties } = useContext(BountiesContext);
 
   const [space] = useCurrentSpace();
   const [currentUserPermissions] = useCurrentSpacePermissions();
@@ -89,10 +89,6 @@ export default function BountyList ({ publicMode, bountyCardClicked = () => null
 
   function bountyCreated () {
     setDisplayBountyDialog(false);
-  }
-
-  if (loadingBounties) {
-    return <LoadingComponent height='200px' isLoading={true} />;
   }
 
   return (

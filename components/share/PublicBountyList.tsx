@@ -1,6 +1,3 @@
-import Alert from '@mui/material/Alert';
-import { useRef, useContext, useState, useEffect } from 'react';
-import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import { Bounty } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
@@ -10,14 +7,15 @@ import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';
 import PrimaryButton from 'components/common/PrimaryButton';
+import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { useContributors } from 'hooks/useContributors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import { BountyWithDetails } from 'models';
 import { useRouter } from 'next/router';
-import { Web3Connection } from 'components/_app/Web3ConnectionManager';
-import debouncePromise from 'lib/utilities/debouncePromise';
+import { useContext, useEffect, useState } from 'react';
 import TokenGateForm from './PublicBountyTokenGateForm';
 
 export default function PublicBountyList () {
@@ -29,8 +27,7 @@ export default function PublicBountyList () {
   const [user, setUser] = useUser();
   const { showMessage } = useSnackbar();
 
-  const renders = useRef(0);
-  renders.current += 1;
+  const [bounties, setBounties] = useState<BountyWithDetails[] | null>(null);
 
   const [selectedBounty, setSelectedBounty] = useState<Bounty | null>(null);
   const [loggingIn, setLoggingIn] = useState(false);
@@ -65,6 +62,16 @@ export default function PublicBountyList () {
     }
   }, [account]);
 
+  useEffect(() => {
+    if (space) {
+      charmClient.listBounties(space.id, true)
+        .then(_bounties => {
+          setBounties(_bounties);
+        });
+    }
+
+  }, [space]);
+
   function redirectToSpace (bounty: Bounty | null = selectedBounty) {
 
     const redirectUrl = bounty ? `/${space?.domain}/bounties/${bounty.id}` : `/${space?.domain}/bounties`;
@@ -84,13 +91,13 @@ export default function PublicBountyList () {
     }
   }
 
-  if (!space) {
+  if (!space || !bounties) {
     return <LoadingComponent height='200px' isLoading={true} />;
   }
 
   return (space.publicBountyBoard ? (
     <>
-      <BountyList publicMode bountyCardClicked={bountySelected} />
+      <BountyList publicMode bountyCardClicked={bountySelected} bounties={bounties} />
       <Modal size='large' open={loginViaTokenGateModal.isOpen && !isSpaceMember} onClose={loginViaTokenGateModal.close} title={`Join the ${space?.name} workspace to apply`}>
         {
           !account && (

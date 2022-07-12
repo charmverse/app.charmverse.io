@@ -5,7 +5,6 @@ import { UpdateableBountyFields } from 'lib/bounties/interfaces';
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
 import { BountyWithDetails } from '../models';
 import { useCurrentSpace } from './useCurrentSpace';
-import { useIsPublicPage } from './useIsPublicPage';
 import { useUser } from './useUser';
 
 type IContext = {
@@ -42,19 +41,17 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const isPublicPage = useIsPublicPage();
-
   useEffect(() => {
     if (space?.id) {
       setIsLoading(true);
       setBounties([]);
-      charmClient.listBounties(space?.id, isPublicPage)
+      charmClient.listBounties(space?.id)
         .then(_bounties => {
           setBounties(_bounties);
           setIsLoading(false);
         });
     }
-  }, [user?.id, space?.id, isPublicPage]);
+  }, [user?.id, space?.id]);
 
   const [currentBountyId, setCurrentBountyId] = useState<string | null>(null);
 
