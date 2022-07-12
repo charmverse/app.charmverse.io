@@ -53,6 +53,7 @@ async function createVote (req: NextApiRequest, res: NextApiResponse<ExtendedVot
     resourceId: existingPage.spaceId,
     userId: createdBy
   });
+
   if (!userPermissions.createVote) {
     throw new UnauthorisedActionError('You do not have permissions to create a vote.');
   }
