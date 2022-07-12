@@ -113,7 +113,6 @@ function ViewTabs({ board, activeView, intl, readonly, showView, views }: ViewTa
       'duplicate view',
       async (block) => {
         showView(block.id)
-        setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [board.id]: newView.id }))
       },
       async () => {
         showView(currentView.id)
@@ -129,7 +128,6 @@ function ViewTabs({ board, activeView, intl, readonly, showView, views }: ViewTa
     mutator.deleteBlock(currentView, 'delete view')
     if (nextView) {
       showView(nextView.id)
-      setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [board.id]: nextView.id }))
     }
   }, [views, currentView, showView])
 
