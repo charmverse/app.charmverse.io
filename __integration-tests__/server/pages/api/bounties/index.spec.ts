@@ -136,6 +136,65 @@ describe('GET /api/bounties?spaceId={spaceId} - list space bounties', () => {
 
   });
 
+  it('should return only the bounties available to the public if this is requested by the user, ignoring the bounties they have access to, and respond 200', async () => {
+
+    const { space: otherSpace, user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, false);
+
+    const otherUserCookie = await loginUser(otherUser);
+
+    await prisma.space.update({
+      where: {
+        id: otherSpace.id
+      },
+      data: {
+        publicBountyBoard: true
+      }
+    });
+
+    const creationContent: Partial<Bounty> = {
+      title: 'Example',
+      createdBy: otherUser.id,
+      spaceId: otherSpace.id,
+      status: 'open',
+      rewardAmount: 5,
+      chainId: 1,
+      rewardToken: 'ETH'
+    };
+
+    // Create a bounty viewable by the space
+    const visibleBounty = await createBounty({ ...(creationContent as Bounty),
+      permissions: {
+        viewer: [{
+          group: 'space',
+          id: otherSpace.id
+        }]
+      } });
+
+    // Create a bounty viewable only by this user
+    await createBounty({ ...(creationContent as Bounty),
+      permissions: {
+        viewer: [{
+          group: 'user',
+          id: otherUser.id
+        }]
+      } });
+
+    // Authenticated request, where we specify that we only want to see public data
+    const bounties = (await request(baseUrl)
+      .get(`/api/bounties?spaceId=${otherSpace.id}&publicOnly=${true}`)
+      .set('Cookie', otherUserCookie)
+      .send(creationContent)
+      .expect(200)).body as Bounty[];
+
+    // We shoukd only have received one result
+    expect(bounties.length).toBe(1);
+
+    const bounty = bounties[0];
+
+    expect(bounty.id).toBe(visibleBounty.id);
+
+  });
+
   it('should return an empty list if public bounties are disabled, and respond 200', async () => {
 
     const { space: otherSpace, user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, false);

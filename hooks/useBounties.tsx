@@ -1,12 +1,12 @@
 import { Bounty } from '@prisma/client';
-import { useRouter } from 'next/router';
 import charmClient from 'charmClient';
-import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
 import useRefState from 'hooks/useRefState';
 import { UpdateableBountyFields } from 'lib/bounties/interfaces';
-import { useUser } from './useUser';
+import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
 import { BountyWithDetails } from '../models';
 import { useCurrentSpace } from './useCurrentSpace';
+import { useIsPublicPage } from './useIsPublicPage';
+import { useUser } from './useUser';
 
 type IContext = {
   bounties: BountyWithDetails[],
@@ -42,17 +42,19 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
 
   const [isLoading, setIsLoading] = useState(false);
 
+  const isPublicPage = useIsPublicPage();
+
   useEffect(() => {
     if (space?.id) {
       setIsLoading(true);
       setBounties([]);
-      charmClient.listBounties(space?.id)
+      charmClient.listBounties(space?.id, isPublicPage)
         .then(_bounties => {
           setBounties(_bounties);
           setIsLoading(false);
         });
     }
-  }, [user?.id, space?.id]);
+  }, [user?.id, space?.id, isPublicPage]);
 
   const [currentBountyId, setCurrentBountyId] = useState<string | null>(null);
 

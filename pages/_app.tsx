@@ -146,6 +146,7 @@ import { ThreadsProvider } from 'hooks/useThreads';
 import { ContributorsProvider } from 'hooks/useContributors';
 import { PageTitleProvider, usePageTitle } from 'hooks/usePageTitle';
 import { SpacesProvider } from 'hooks/useSpaces';
+import { IsPublicPageProvider } from 'hooks/useIsPublicPage';
 import { UserProvider } from 'hooks/useUser';
 import { isMobile } from 'lib/browser';
 // Lit Protocol CSS
@@ -336,23 +337,25 @@ function DataProviders ({ children }: { children: ReactNode }) {
   }, [router.query.domain]);
 
   return (
-    <UserProvider>
-      <SpacesProvider>
-        <ContributorsProvider>
-          <BountiesProvider>
-            <PaymentMethodsProvider>
-              <PagesProvider>
-                <PageTitleProvider>
-                  <FocalboardViewsProvider>
-                    {children}
-                  </FocalboardViewsProvider>
-                </PageTitleProvider>
-              </PagesProvider>
-            </PaymentMethodsProvider>
-          </BountiesProvider>
-        </ContributorsProvider>
-      </SpacesProvider>
-    </UserProvider>
+    <IsPublicPageProvider>
+      <UserProvider>
+        <SpacesProvider>
+          <ContributorsProvider>
+            <BountiesProvider>
+              <PaymentMethodsProvider>
+                <PagesProvider>
+                  <PageTitleProvider>
+                    <FocalboardViewsProvider>
+                      {children}
+                    </FocalboardViewsProvider>
+                  </PageTitleProvider>
+                </PagesProvider>
+              </PaymentMethodsProvider>
+            </BountiesProvider>
+          </ContributorsProvider>
+        </SpacesProvider>
+      </UserProvider>
+    </IsPublicPageProvider>
   );
 }
 

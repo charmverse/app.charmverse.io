@@ -4,6 +4,7 @@ import { prisma } from 'db';
 import { createBounty, listAvailableBounties } from 'lib/bounties';
 import { IEventToLog, postToDiscord } from 'lib/log/userEvents';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { AvailableResourcesRequest } from 'lib/permissions/interfaces';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
@@ -18,14 +19,16 @@ handler.get(getBounties)
   .post(createBountyController);
 
 async function getBounties (req: NextApiRequest, res: NextApiResponse<Bounty[]>) {
-  const { spaceId } = req.query;
+  const { spaceId, publicOnly } = req.query as any as AvailableResourcesRequest;
+
+  const publicResourcesOnly = ((publicOnly as any) === 'true' || publicOnly === true);
 
   // Session may be undefined as non-logged in users can access this endpoint
   const userId = req.session?.user?.id;
 
   const bounties = await listAvailableBounties({
     spaceId: spaceId as string,
-    userId
+    userId: publicResourcesOnly ? undefined : userId
   });
   return res.status(200).json(bounties);
 

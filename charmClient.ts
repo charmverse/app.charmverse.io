@@ -395,8 +395,8 @@ class CharmClient {
     updater(fbBlocks);
   }
 
-  listBounties (spaceId: string): Promise<BountyWithDetails[]> {
-    return http.GET('/api/bounties', { spaceId });
+  listBounties (spaceId: string, publicOnly?: boolean): Promise<BountyWithDetails[]> {
+    return http.GET('/api/bounties', { spaceId, publicOnly });
   }
 
   async createBounty (bounty: Partial<Bounty>): Promise<Bounty> {
