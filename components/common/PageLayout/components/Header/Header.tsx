@@ -31,10 +31,10 @@ import { useRouter } from 'next/router';
 import { useRef, useState } from 'react';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useVotes } from 'hooks/useVotes';
+import CreateVoteModal from 'components/votes/components/CreateVoteModal';
 import Account from '../Account';
 import ShareButton from '../ShareButton';
 import BountyShareButton from './BountyShareButton/BountyShareButton';
-import CreateVoteModal from '../CreateVoteModal';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
 import NotificationsBadge from './components/NotificationsBadge';
 
