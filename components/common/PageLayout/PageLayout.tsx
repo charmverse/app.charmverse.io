@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import { Theme } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import MuiDrawer from '@mui/material/Drawer';
-import { InlineVotesProvider } from 'hooks/useInlineVotes';
+import { VotesProvider } from 'hooks/useVotes';
 import { PageActionDisplayProvider } from 'hooks/usePageActionDisplay';
 import { ThreadsProvider } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
@@ -111,7 +111,7 @@ function PageLayout ({ hideSidebarOnSmallScreen = false, sidebarWidth = 300, chi
       </Head>
       <LayoutContainer>
         <ThreadsProvider>
-          <InlineVotesProvider>
+          <VotesProvider>
             <PageActionDisplayProvider>
               <AppBar sidebarWidth={sidebarWidth} position='fixed' open={open}>
                 <Header
@@ -140,7 +140,7 @@ function PageLayout ({ hideSidebarOnSmallScreen = false, sidebarWidth = 300, chi
                 {children}
               </PageContainer>
             </PageActionDisplayProvider>
-          </InlineVotesProvider>
+          </VotesProvider>
         </ThreadsProvider>
       </LayoutContainer>
     </>

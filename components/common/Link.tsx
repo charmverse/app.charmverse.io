@@ -2,10 +2,7 @@ import { ReactNode } from 'react';
 import NextLink from 'next/link';
 import MuiLink from '@mui/material/Link';
 import { Theme } from '@mui/material';
-import { SxProps,
-  // @ts-ignore
-  getPath
-} from '@mui/system';
+import { SxProps } from '@mui/system';
 
 import styled from '@emotion/styled';
 
@@ -17,9 +14,12 @@ const hoverStyle: { [key: string]: string } = {
 
 const StyledMuiLink = styled(MuiLink)`
   ${props => props.color
-    ? `color: ${getPath(props.theme, `palette.${props.color}.main`)};` : ''}
+    // @ts-ignore
+    ? `color: ${props.theme.palette[props.color]?.main};` : ''}
   &:hover {
-    ${props => typeof props.color === 'string' ? hoverStyle[props.color] : `${getPath(props.theme, `palette.${props.color}.main`)};`}
+    color: ${props => typeof props.color === 'string'
+    // @ts-ignore
+    ? (hoverStyle[props.color] || props.theme.palette[props.color]?.main) : props.theme.palette[props.color]?.main};
   }
 `;
 

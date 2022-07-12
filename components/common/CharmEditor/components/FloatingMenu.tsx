@@ -16,15 +16,16 @@ import { MenuGroup } from './@bangle.dev/react-menu/MenuGroup';
 import { queryIsSelectionAroundInlineComment } from './inlineComment';
 import { InlineCommentSubMenu } from './inlineComment/InlineComment.components';
 import { markName as inlineCommentMarkName } from './inlineComment/inlineComment.constants';
-import { InlineVoteSubMenu, queryIsSelectionAroundInlineVote } from './inlineVote';
+import { queryIsSelectionAroundInlineVote } from './inlineVote';
+import InlineVoteSubMenu from './inlineVote/components/InlineVoteSubmenu';
 import { markName as inlineVoteMarkName } from './inlineVote/inlineVote.constants';
 
 export type FloatingMenuVariant = 'defaultMenu' | 'linkSubMenu' | 'inlineCommentSubMenu' | 'commentOnlyMenu';
 
 export default function FloatingMenuComponent (
   {
-    pluginKey, enableComments = true, inline = false }:
-    {enableComments?: boolean, pluginKey: PluginKey, inline?: boolean
+    pluginKey, enableComments = true, enableVoting = false, inline = false }:
+    {enableComments?: boolean, enableVoting?: boolean, pluginKey: PluginKey, inline?: boolean
   }
 ) {
   const { showMessage } = useSnackbar();
@@ -33,7 +34,7 @@ export default function FloatingMenuComponent (
   const [currentUserPermissions] = useCurrentSpacePermissions();
   const displayInlineCommentButton = !inline && permissions.comment && enableComments;
 
-  const displayInlineVoteButton = !inline && permissions.comment && currentUserPermissions?.createVote && enableComments;
+  const displayInlineVoteButton = !inline && permissions.comment && currentUserPermissions?.createVote && enableVoting;
   return (
     <FloatingMenu
       menuKey={pluginKey}

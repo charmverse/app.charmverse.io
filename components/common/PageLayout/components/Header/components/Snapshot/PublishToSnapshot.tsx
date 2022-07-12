@@ -1,5 +1,5 @@
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-import IosShareIcon from '@mui/icons-material/IosShare';
+import PublishIcon from '@mui/icons-material/ElectricBolt';
 import Box from '@mui/material/Box';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
@@ -55,51 +55,47 @@ export default function PublishToSnapshot ({ page }: {page: Page}) {
 
   return (
     <ListItemButton>
-
       {
-
-      checkingProposal && (
-        <>
-          <LoadingIcon size={18} sx={{ mr: 1 }} />
-          <ListItemText primary='Checking proposal' />
-        </>
-      )
+        checkingProposal && (
+          <>
+            <LoadingIcon size={18} sx={{ mr: 1 }} />
+            <ListItemText primary='Checking proposal' />
+          </>
+        )
       }
-
       {
         !checkingProposal && !proposal && (
           <>
-            <IosShareIcon
+            <PublishIcon
               fontSize='small'
               sx={{
                 mr: 1
               }}
               onClick={open}
             />
-            <ListItemText onClick={open} primary='Publish to snapshot' />
+            <ListItemText onClick={open} primary='Publish to Snapshot' />
 
-            <Modal size='large' open={isOpen} onClose={close} title={`Publish to snapshot ${currentSpace ? `(${currentSpace.snapshotDomain})` : ''}`}>
+            <Modal size='large' open={isOpen} onClose={close} title={`Publish to Snapshot ${currentSpace?.snapshotDomain ? `(${currentSpace.snapshotDomain})` : ''}`}>
               <PublishingForm onSubmit={close} page={page} />
             </Modal>
           </>
         )
       }
-
       {
-      !checkingProposal && proposal && (
-      <Link sx={{ display: 'flex', verticalAlign: 'center' }} color='textPrimary' external target='_blank' href={`https://snapshot.org/#/${proposal.space.id}/proposal/${proposal.id}`}>
-        <ExitToAppIcon
-          fontSize='small'
-          sx={{
-            m: 'auto',
-            mr: 1
-          }}
+        !checkingProposal && proposal && (
+          <Link sx={{ display: 'flex', verticalAlign: 'center' }} color='textPrimary' external target='_blank' href={`https://snapshot.org/#/${proposal.space.id}/proposal/${proposal.id}`}>
+            <ExitToAppIcon
+              fontSize='small'
+              sx={{
+                m: 'auto',
+                mr: 1
+              }}
 
-        />
-        <ListItemText primary='View on Snapshot' />
+            />
+            <ListItemText primary='View on Snapshot' />
 
-      </Link>
-      )
+          </Link>
+        )
       }
 
     </ListItemButton>

@@ -3,7 +3,7 @@ import { ExtendedVote } from 'lib/votes/interfaces';
 import { useRouter } from 'next/router';
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 import { useSWRConfig } from 'swr';
-import { useInlineVotes } from './useInlineVotes';
+import { useVotes } from './useVotes';
 import { usePages } from './usePages';
 import { useThreads } from './useThreads';
 
@@ -20,7 +20,7 @@ export const PageActionDisplayContext = createContext<IPageActionDisplayContext>
 export function PageActionDisplayProvider ({ children }: { children: ReactNode }) {
   const { currentPageId } = usePages();
   const { isValidating: isValidatingInlineComments } = useThreads();
-  const { isValidating: isValidatingInlineVotes } = useInlineVotes();
+  const { isValidating: isValidatingInlineVotes } = useVotes();
   const { cache } = useSWRConfig();
   const [currentPageActionDisplay, setCurrentPageActionDisplay] = useState<IPageActionDisplayContext['currentPageActionDisplay']>(null);
   useEffect(() => {

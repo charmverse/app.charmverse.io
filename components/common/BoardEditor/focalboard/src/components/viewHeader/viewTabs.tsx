@@ -113,6 +113,7 @@ function ViewTabs({ board, activeView, intl, readonly, showView, views }: ViewTa
       'duplicate view',
       async (block) => {
         showView(block.id)
+        setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [board.id]: newView.id }))
       },
       async () => {
         showView(currentView.id)
@@ -128,6 +129,7 @@ function ViewTabs({ board, activeView, intl, readonly, showView, views }: ViewTa
     mutator.deleteBlock(currentView, 'delete view')
     if (nextView) {
       showView(nextView.id)
+      setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [board.id]: nextView.id }))
     }
   }, [views, currentView, showView])
 
@@ -242,7 +244,7 @@ function ViewTabs({ board, activeView, intl, readonly, showView, views }: ViewTa
     {/* Form to rename views */}
     <Modal open={renameViewPopupState.isOpen} onClose={renameViewPopupState.close} title='Rename the view'>
       <form onSubmit={handleSubmit(saveViewTitle)}>
-        <TextField {...register('title')} defaultValue={currentView?.title} />
+        <TextField {...register('title')} defaultValue={currentView?.title} autoFocus />
         <Button type='submit'>Save</Button>
       </form>
     </Modal>
