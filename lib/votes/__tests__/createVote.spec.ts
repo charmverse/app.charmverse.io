@@ -8,15 +8,9 @@ import { createVote as createVoteService } from '../createVote';
 
 describe('createVote', () => {
   it('should throw error if page doesn\'t exist', async () => {
-    try {
-      await createVoteService({
-        pageId: v4()
-      } as any);
-      throw new ExpectedAnError();
-    }
-    catch (err) {
-      expect(err).toBeInstanceOf(DataNotFoundError);
-    }
+    await expect(createVoteService({
+      pageId: v4()
+    } as any)).rejects.toBeInstanceOf(DataNotFoundError);
   });
 
   it('should throw error if user don\'t have permission to update vote', async () => {
@@ -27,15 +21,9 @@ describe('createVote', () => {
       spaceId: space.id
     });
 
-    try {
-      await createVoteService({
-        pageId: page.id
-      } as any);
-      throw new ExpectedAnError();
-    }
-    catch (err) {
-      expect(err).toBeInstanceOf(UnauthorisedActionError);
-    }
+    await expect(createVoteService({
+      pageId: page.id
+    } as any)).rejects.toBeInstanceOf(UnauthorisedActionError);
   });
 
   it('should create and return vote', async () => {

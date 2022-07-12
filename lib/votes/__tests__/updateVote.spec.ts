@@ -7,13 +7,7 @@ import { updateVote } from '../updateVote';
 
 describe('updateVote', () => {
   it('should throw error if vote doesn\'t exist', async () => {
-    try {
-      await updateVote(v4(), v4(), 'Cancelled');
-      throw new ExpectedAnError();
-    }
-    catch (err) {
-      expect(err).toBeInstanceOf(DataNotFoundError);
-    }
+    await expect(updateVote(v4(), v4(), 'Cancelled')).rejects.toBeInstanceOf(DataNotFoundError);
   });
 
   it('should throw error if vote is not in progress', async () => {
@@ -33,13 +27,7 @@ describe('updateVote', () => {
       deadline: new Date(Date.now() - 24 * 60 * 60 * 1000)
     });
 
-    try {
-      await updateVote(vote.id, v4(), 'Cancelled');
-      throw new ExpectedAnError();
-    }
-    catch (err) {
-      expect(err).toBeInstanceOf(UndesirableOperationError);
-    }
+    await expect(updateVote(vote.id, v4(), 'Cancelled')).rejects.toBeInstanceOf(UndesirableOperationError);
   });
 
   it('should throw error if status to be updated is not cancelled', async () => {
@@ -59,13 +47,7 @@ describe('updateVote', () => {
       deadline: new Date(Date.now() - 24 * 60 * 60 * 1000)
     });
 
-    try {
-      await updateVote(vote.id, v4(), 'InProgress');
-      throw new ExpectedAnError();
-    }
-    catch (err) {
-      expect(err).toBeInstanceOf(UndesirableOperationError);
-    }
+    await expect(updateVote(vote.id, v4(), 'InProgress')).rejects.toBeInstanceOf(UndesirableOperationError);
   });
 
   it('should throw error if user don\'t have permission to update vote', async () => {
@@ -85,13 +67,7 @@ describe('updateVote', () => {
       deadline: new Date(Date.now() - 24 * 60 * 60 * 1000)
     });
 
-    try {
-      await updateVote(vote.id, user.id, 'Cancelled');
-      throw new ExpectedAnError();
-    }
-    catch (err) {
-      expect(err).toBeInstanceOf(UnauthorisedActionError);
-    }
+    await expect(updateVote(vote.id, user.id, 'Cancelled')).rejects.toBeInstanceOf(UnauthorisedActionError);
   });
 
   it('should update and return vote', async () => {

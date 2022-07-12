@@ -24,13 +24,7 @@ describe('deleteVote', () => {
       spaceId: space.id
     });
 
-    try {
-      await deleteVote(vote.id, user.id);
-      throw new ExpectedAnError();
-    }
-    catch (err) {
-      expect(err).toBeInstanceOf(UnauthorisedActionError);
-    }
+    await expect(deleteVote(vote.id, user.id)).rejects.toBeInstanceOf(UnauthorisedActionError);
   });
 
   it('should return deleted vote', async () => {

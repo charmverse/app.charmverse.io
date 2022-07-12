@@ -69,13 +69,7 @@ describe('castVote', () => {
       spaceId: space.id
     });
 
-    try {
-      await castVote('1', vote, v4());
-      throw new ExpectedAnError();
-    }
-    catch (err) {
-      expect(err).toBeInstanceOf(UndesirableOperationError);
-    }
+    await expect(castVote('1', vote, v4())).rejects.toBeInstanceOf(UndesirableOperationError);
   });
 
   it('should throw error if vote choice isn\'t one of vote option', async () => {
@@ -94,12 +88,6 @@ describe('castVote', () => {
       ]
     });
 
-    try {
-      await castVote('4', vote, v4());
-      throw new ExpectedAnError();
-    }
-    catch (err) {
-      expect(err).toBeInstanceOf(InvalidInputError);
-    }
+    await expect(castVote('4', vote, v4())).rejects.toBeInstanceOf(InvalidInputError);
   });
 });
