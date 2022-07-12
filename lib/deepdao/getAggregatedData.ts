@@ -23,11 +23,15 @@ export async function getAggregatedData (userPath: string): Promise<DeepDaoAggre
 
   const completedBountiesCount = await getCompletedApplicationsOfUser(user.id);
   const workspacesCount = await getSpacesCount(user.id);
-
+  const totalCharmverseVotes = await prisma.userVote.count({
+    where: {
+      userId: user.id
+    }
+  });
   return {
     daos: workspacesCount + participationScores.reduce((acc, cur) => acc + cur.data.daos, 0),
     proposals: participationScores.reduce((acc, cur) => acc + cur.data.proposals, 0),
-    votes: participationScores.reduce((acc, cur) => acc + cur.data.votes, 0),
+    votes: participationScores.reduce((acc, cur) => acc + cur.data.votes, 0) + totalCharmverseVotes,
     bounties: completedBountiesCount
   };
 }

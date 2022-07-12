@@ -354,7 +354,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
                       <LoadingIcon size={18} sx={{ mr: 1 }} />
                       Publishing
                     </>
-                  ) : ('Publish to snapshot')
+                  ) : ('Publish to Snapshot')
                 }
 
               </PrimaryButton>

@@ -23,7 +23,7 @@ import * as codeBlock from 'components/common/CharmEditor/components/@bangle.dev
 import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
-import PageInlineVotesList from 'components/[pageId]/DocumentPage/components/PageInlineVotesList';
+import PageInlineVotesList from 'components/[pageId]/DocumentPage/components/VotesSidebar';
 import PageThreadsList from 'components/[pageId]/DocumentPage/components/PageThreadsList';
 import { CryptoCurrency, FiatCurrency } from 'connectors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -46,7 +46,7 @@ import * as iframe from './components/iframe';
 import InlineCommentThread, * as inlineComment from './components/inlineComment';
 import InlinePalette, { plugins as inlinePalettePlugins, spec as inlinePaletteSpecs } from './components/inlinePalette';
 import * as inlineVote from './components/inlineVote';
-import { InlineVoteList } from './components/inlineVote';
+import InlineVoteList from './components/inlineVote/components/InlineVoteList';
 import Mention, { mentionPluginKeyName, mentionPlugins, mentionSpecs, MentionSuggest } from './components/mention';
 import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList, nestedPageSpec } from './components/nestedPage';
 import Paragraph from './components/Paragraph';
@@ -119,6 +119,7 @@ export function charmEditorPlugins (
     onContentChange,
     readOnly,
     disablePageSpecificFeatures = false,
+    enableVoting,
     enableComments = true,
     userId = null,
     pageId = null,
@@ -131,6 +132,7 @@ export function charmEditorPlugins (
       readOnly?: boolean,
       onContentChange?: (view: EditorView) => void,
       disablePageSpecificFeatures?: boolean,
+      enableVoting?: boolean,
       enableComments?: boolean
     } = {}
 ): () => RawPlugins[] {
@@ -238,9 +240,11 @@ export function charmEditorPlugins (
     basePlugins.push(inlineComment.plugin({
       key: inlineCommentPluginKey
     }));
-    basePlugins.push(inlineVote.plugin({
-      key: inlineVotePluginKey
-    }));
+    if (enableVoting) {
+      basePlugins.push(inlineVote.plugin({
+        key: inlineVotePluginKey
+      }));
+    }
   }
 
   return () => basePlugins;
@@ -333,8 +337,9 @@ interface CharmEditorProps {
   readOnly?: boolean;
   style?: CSSProperties;
   pageActionDisplay?: IPageActionDisplayContext['currentPageActionDisplay']
-  disablePageSpecificFeatures?: boolean
-  pageId?: string | null
+  disablePageSpecificFeatures?: boolean;
+  enableVoting?: boolean;
+  pageId?: string | null;
 }
 
 export function convertPageContentToMarkdown (content: PageContent, title?: string): string {
@@ -366,6 +371,7 @@ function CharmEditor (
     style,
     readOnly = false,
     disablePageSpecificFeatures = false,
+    enableVoting,
     pageId
   }:
   CharmEditorProps
@@ -397,6 +403,7 @@ function CharmEditor (
       onContentChange: _onContentChange,
       readOnly,
       disablePageSpecificFeatures,
+      enableVoting,
       pageId,
       spaceId: currentSpace?.id,
       userId: currentUser?.id
@@ -553,7 +560,7 @@ function CharmEditor (
         }
       }}
     >
-      <FloatingMenu enableComments={!disablePageSpecificFeatures} pluginKey={floatingMenuPluginKey} />
+      <FloatingMenu enableComments={!disablePageSpecificFeatures} enableVoting={enableVoting} pluginKey={floatingMenuPluginKey} />
       <MentionSuggest pluginKey={mentionPluginKey} />
       <NestedPagesList pluginKey={nestedPagePluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
@@ -597,7 +604,7 @@ function CharmEditor (
           </PageActionListBox>
         </Grow>
         <InlineCommentThread pluginKey={inlineCommentPluginKey} />
-        <InlineVoteList pluginKey={inlineVotePluginKey} />
+        {enableVoting && <InlineVoteList pluginKey={inlineVotePluginKey} />}
       </>
       )}
       {!readOnly && <DevTools />}
