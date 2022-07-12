@@ -115,7 +115,7 @@ function DraggableTreeNode ({ item, onDropAdjacent, onDropChild, pathPrefix, add
   const { focalboardViewsRecord, setFocalboardViewsRecord } = useFocalboardViews();
 
   const viewsRecord = useAppSelector((state) => state.views.views);
-  const views = Object.values(viewsRecord).filter(view => view.parentId === item.id);
+  const views = Object.values(viewsRecord).filter(view => view?.parentId === item.id);
 
   const hasSelectedChildView = views.some(view => view.id === selectedNodeId);
   const { expanded } = useTreeItem(item.id);
@@ -123,9 +123,11 @@ function DraggableTreeNode ({ item, onDropAdjacent, onDropChild, pathPrefix, add
 
   useEffect(() => {
     const focalboardViewId = focalboardViewsRecord[item.id];
-    if (focalboardViewId && item.type === 'board' && !views.some(view => view.id === focalboardViewId)) {
+    if (views && focalboardViewId && item.type === 'board' && !views.some(view => view.id === focalboardViewId)) {
       const firstView = views[0];
-      setFocalboardViewsRecord((_focalboardViewsRecord) => ({ ..._focalboardViewsRecord, [firstView.parentId]: firstView.id }));
+      if (firstView) {
+        setFocalboardViewsRecord((_focalboardViewsRecord) => ({ ..._focalboardViewsRecord, [firstView.parentId]: firstView.id }));
+      }
     }
   }, [focalboardViewsRecord, views, item]);
 
