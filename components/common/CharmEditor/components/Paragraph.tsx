@@ -40,11 +40,11 @@ export default function Paragraph (
   const { votes } = useVotes();
   const { threadIds, totalInlineComments } = useMemo(() => (calculateActions || isShowingCardModal)
     ? findTotalInlineComments(view, node, threads)
-    : { threadIds: [], totalInlineComments: 0 }, [node, calculateActions, isShowingCardModal, threads]);
+    : { threadIds: [], totalInlineComments: 0 }, [node, calculateActions, isShowingCardModal]);
 
   const { voteIds, totalInlineVotes } = useMemo(() => (calculateActions || isShowingCardModal)
     ? findTotalInlineVotes(view, node, votes)
-    : { voteIds: [], totalInlineVotes: 0 }, [node, calculateActions, isShowingCardModal, votes]);
+    : { voteIds: [], totalInlineVotes: 0 }, [node, calculateActions, isShowingCardModal]);
 
   return (
     <>
