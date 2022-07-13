@@ -2,6 +2,7 @@ import { addSpaceOperations } from 'lib/permissions/spaces';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
+import { prisma } from 'db';
 import { deleteVote } from '../deleteVote';
 
 describe('deleteVote', () => {
@@ -29,8 +30,12 @@ describe('deleteVote', () => {
       spaceId: space.id
     });
 
-    const deletedVote = await deleteVote(vote.id, user.id);
-    expect(deletedVote?.id).toBe(vote.id);
+    await deleteVote(vote.id, user.id);
+    expect(await prisma.vote.findUnique({
+      where: {
+        id: vote.id
+      }
+    })).toBeFalsy();
   });
 
   it('should throw error if createVote space permission doesn\'t exist', async () => {
