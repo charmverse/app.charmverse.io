@@ -1,44 +1,102 @@
-import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { Page, Space, User } from '@prisma/client';
-
-let page1: Page;
-let page2: Page;
-let space1: Space;
-let space2: Space;
-let user1: User;
-let user2: User;
-
-let user1Cookie: string;
-
-beforeAll(async () => {
-  const { space: generatedSpace1, user: generatedUser1 } = await generateUserAndSpaceWithApiToken(undefined, true);
-  const { space: generatedSpace2, user: generatedUser2 } = await generateUserAndSpaceWithApiToken(undefined, true);
-  user1 = generatedUser1;
-  user2 = generatedUser2;
-  space1 = generatedSpace1;
-  space2 = generatedSpace2;
-
-  page1 = await createPage({
-    createdBy: user1.id,
-    spaceId: space1.id
-  });
-
-  page2 = await createPage({
-    createdBy: user2.id,
-    spaceId: space2.id
-  });
-
-  user1Cookie = await loginUser(user1);
-});
+import { v4 } from 'uuid';
+import { upsertPermission } from 'lib/permissions/pages';
 
 describe('GET /api/pages/{id}/votes - Get all the votes for a specific page', () => {
-  it('Should return the votes if the user have read access to the page and respond 200', async () => {
-    await request(baseUrl).get(`/api/pages/${page1.id}/votes`).set('Cookie', user1Cookie).expect(200);
+  it('should get votes of a page for the admin user and return it, responding with 200', async () => {
+    const { user, space } = await generateUserAndSpaceWithApiToken(v4(), true);
+    const userCookie = await loginUser(user);
+    const page = await createPage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    await createVote({
+      createdBy: user.id,
+      pageId: page.id,
+      spaceId: space.id
+    });
+
+    await request(baseUrl)
+      .get(`/api/pages/${page.id}/votes`)
+      .set('Cookie', userCookie)
+      .expect(200);
   });
 
-  it('Should fail if the user don\'t have read access to the page', async () => {
-    await request(baseUrl).get(`/api/pages/${page2.id}/votes`).set('Cookie', user1Cookie).expect(404);
+  it('should get votes of a page for a contributor who has read access, responding with 200', async () => {
+    const { user, space } = await generateUserAndSpaceWithApiToken(v4(), false);
+
+    const page = await createPage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    await createVote({
+      createdBy: user.id,
+      pageId: page.id,
+      spaceId: space.id
+    });
+
+    await upsertPermission(page.id, {
+      permissionLevel: 'full_access',
+      userId: user.id
+    });
+
+    await request(baseUrl)
+      .get(`/api/pages/${page.id}/votes`)
+      .set('Cookie', await loginUser(user))
+      .expect(200);
   });
+
+  it('should fail to get votes of a page for a contributor who doesn\'t have read access, responding with 200', async () => {
+    const { user, space } = await generateUserAndSpaceWithApiToken(v4(), false);
+
+    const page = await createPage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    await createVote({
+      createdBy: user.id,
+      pageId: page.id,
+      spaceId: space.id
+    });
+
+    await request(baseUrl)
+      .get(`/api/pages/${page.id}/votes`)
+      .set('Cookie', await loginUser(user))
+      .expect(404);
+  });
+
+  it('should fail to get votes of a page for a user not part of the space, responding with 200', async () => {
+    const { user: userInSpace, space } = await generateUserAndSpaceWithApiToken(v4(), true);
+    const { user: userNotInSpace } = await generateUserAndSpaceWithApiToken(v4(), false);
+
+    const page = await createPage({
+      createdBy: userInSpace.id,
+      spaceId: space.id
+    });
+
+    await createVote({
+      createdBy: userInSpace.id,
+      pageId: page.id,
+      spaceId: space.id
+    });
+
+    await request(baseUrl)
+      .get(`/api/pages/${page.id}/votes`)
+      .set('Cookie', await loginUser(userNotInSpace))
+      .expect(404);
+  });
+
+  // it('Should return the votes if the user have read access to the page and respond 200', async () => {
+  //   await request(baseUrl).get(`/api/pages/${page1.id}/votes`).set('Cookie', user1Cookie).expect(200);
+  // });
+
+  // it('Should fail if the user don\'t have read access to the page', async () => {
+  //   await request(baseUrl).get(`/api/pages/${page2.id}/votes`).set('Cookie', user1Cookie).expect(404);
+  // });
 });
