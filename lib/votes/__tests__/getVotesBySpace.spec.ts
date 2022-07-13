@@ -45,7 +45,7 @@ describe('getVotesBySpace', () => {
       userVotes: ['iii']
     });
 
-    const votes = await getVotesBySpace(space1.id);
+    const votes = await getVotesBySpace({ spaceId: space1.id, userId: user.id });
     expect(votes[0]).toMatchObject(expect.objectContaining({
       id: createdVote1.id,
       totalVotes: 1,
