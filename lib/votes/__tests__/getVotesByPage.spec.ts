@@ -38,7 +38,10 @@ describe('getVotesByPage', () => {
       userVotes: ['a']
     });
 
-    const votes = await getVotesByPage(page1.id, user.id);
+    const votes = await getVotesByPage({
+      pageId: page1.id,
+      userId: user.id
+    });
     expect(votes[0]).toMatchObject(expect.objectContaining({
       id: createdVote1.id,
       userChoice: '1',

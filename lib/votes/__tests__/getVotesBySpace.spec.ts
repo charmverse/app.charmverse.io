@@ -1,61 +1,88 @@
-import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { upsertPermission } from 'lib/permissions/pages';
+import { createPage, createVote, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { getVotesBySpace } from '../getVotesBySpace';
 
 describe('getVotesBySpace', () => {
-  it('should get all votes for a space', async () => {
-    const { space: space1, user } = await generateUserAndSpaceWithApiToken(undefined, false);
-    const { space: space2 } = await generateUserAndSpaceWithApiToken(undefined, false);
+  it('should get all votes of a space for an admin user', async () => {
+    const { space, user: accessibleSpaceUser } = await generateUserAndSpaceWithApiToken(undefined, true);
+    const { space: inaccessibleSpace, user: inaccessibleSpaceUser } = await generateUserAndSpaceWithApiToken(undefined, true);
 
-    const page1 = await createPage({
-      createdBy: user.id,
-      spaceId: space1.id
+    const [accessibleSpacePage, inaccessibleSpacePage] = await Promise.all([
+      createPage({
+        createdBy: accessibleSpaceUser.id,
+        spaceId: space.id
+      }),
+      createPage({
+        createdBy: inaccessibleSpaceUser.id,
+        spaceId: inaccessibleSpace.id
+      })
+    ]);
+
+    const [accessibleSpacePageVote] = await Promise.all([
+      createVote({
+        pageId: accessibleSpacePage.id,
+        createdBy: accessibleSpaceUser.id,
+        spaceId: space.id,
+        voteOptions: ['1', '2'],
+        userVotes: ['1']
+      }),
+      createVote({
+        pageId: inaccessibleSpacePage.id,
+        createdBy: inaccessibleSpaceUser.id,
+        spaceId: inaccessibleSpace.id,
+        voteOptions: ['1', '2'],
+        userVotes: ['1']
+      })
+    ]);
+
+    const votes = await getVotesBySpace({ spaceId: space.id, userId: accessibleSpaceUser.id });
+    expect(votes.length).toBe(1);
+    expect(votes[0].id).toBe(accessibleSpacePageVote.id);
+  });
+
+  it('should get votes of a space for a non admin user', async () => {
+    const { space, user: nonAdminUser } = await generateUserAndSpaceWithApiToken(undefined, false);
+
+    const adminUser = await generateSpaceUser({
+      isAdmin: true,
+      spaceId: space.id
     });
 
-    const page2 = await createPage({
-      createdBy: user.id,
-      spaceId: space1.id
+    const [accessiblePage, inaccessiblePage] = await Promise.all([
+      createPage({
+        createdBy: adminUser.id,
+        spaceId: space.id
+      }),
+      createPage({
+        createdBy: adminUser.id,
+        spaceId: space.id
+      })
+    ]);
+
+    await upsertPermission(accessiblePage.id, {
+      permissionLevel: 'full_access',
+      userId: nonAdminUser.id
     });
 
-    const page3 = await createPage({
-      createdBy: user.id,
-      spaceId: space2.id
-    });
+    const [accessibleVote1] = await Promise.all([
+      createVote({
+        pageId: accessiblePage.id,
+        createdBy: nonAdminUser.id,
+        spaceId: space.id,
+        voteOptions: ['1', '2'],
+        userVotes: ['1']
+      }),
+      createVote({
+        pageId: inaccessiblePage.id,
+        createdBy: adminUser.id,
+        spaceId: space.id,
+        voteOptions: ['1', '2'],
+        userVotes: ['1']
+      })
+    ]);
 
-    const createdVote1 = await createVote({
-      pageId: page1.id,
-      createdBy: user.id,
-      spaceId: space1.id,
-      voteOptions: ['1', '2'],
-      userVotes: ['1']
-    });
-
-    const createdVote2 = await createVote({
-      pageId: page2.id,
-      createdBy: user.id,
-      spaceId: space1.id,
-      voteOptions: ['a', 'b'],
-      userVotes: ['a']
-    });
-
-    await createVote({
-      pageId: page3.id,
-      createdBy: user.id,
-      spaceId: space2.id,
-      voteOptions: ['i', 'ii'],
-      userVotes: ['iii']
-    });
-
-    const votes = await getVotesBySpace({ spaceId: space1.id, userId: user.id });
-    expect(votes[0]).toMatchObject(expect.objectContaining({
-      id: createdVote1.id,
-      totalVotes: 1,
-      status: 'InProgress'
-    }));
-
-    expect(votes[1]).toMatchObject(expect.objectContaining({
-      id: createdVote2.id,
-      totalVotes: 1,
-      status: 'InProgress'
-    }));
+    const votes = await getVotesBySpace({ spaceId: space.id, userId: nonAdminUser.id });
+    expect(votes.length).toBe(1);
+    expect(votes[0].id).toBe(accessibleVote1.id);
   });
 });
