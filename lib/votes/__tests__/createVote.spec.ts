@@ -18,7 +18,7 @@ describe('createVote', () => {
       spaceId: space.id
     });
 
-    const updatedVote = await createVoteService({
+    const createdVote = await createVoteService({
       createdBy: user.id,
       deadline: new Date(),
       description: null,
@@ -29,7 +29,7 @@ describe('createVote', () => {
       type: 'Approval',
       voteOptions: ['1', '2', '3']
     });
-    expect(updatedVote).toMatchObject(expect.objectContaining({
+    expect(createdVote).toMatchObject(expect.objectContaining({
       totalVotes: 0,
       status: VoteStatus.InProgress,
       aggregatedResult: {
