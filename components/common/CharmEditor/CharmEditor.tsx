@@ -82,6 +82,7 @@ export const specRegistry = new SpecRegistry([
   //
   // MAKE SURE THIS IS ALWAYS AT THE TOP! Or deleting all contents will leave the wrong component in the editor
   paragraph.spec(), // OK
+  mentionSpecs(), // NO
   inlineComment.spec(),
   inlineVote.spec(),
   bold.spec(), // OK
@@ -95,7 +96,6 @@ export const specRegistry = new SpecRegistry([
   strike.spec(), // OK
   underline.spec(), // OK
   emoji.specs(), // OK
-  mentionSpecs(), // NO
   code.spec(), // OK
   codeBlock.spec(), // OK
   iframe.spec(), // OK
@@ -157,6 +157,9 @@ export function charmEditorPlugins (
     imagePlugins({
       handleDragAndDrop: false
     }),
+    mentionPlugins({
+      key: mentionPluginKey
+    }),
     inlinePalettePlugins(),
     bold.plugins(),
     bulletList.plugins(),
@@ -175,9 +178,6 @@ export function charmEditorPlugins (
     underline.plugins(),
     emoji.plugins({
       key: emojiPluginKey
-    }),
-    mentionPlugins({
-      key: mentionPluginKey
     }),
     floatingMenuPlugin({
       key: floatingMenuPluginKey,
