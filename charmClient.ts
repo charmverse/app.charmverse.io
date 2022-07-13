@@ -36,7 +36,7 @@ import { ApplicationWithTransactions } from 'lib/applications/actions';
 import { AssignedBountyPermissions, BountySubmitterPoolCalculation, BountySubmitterPoolSize, BountyUpdate, SuggestionAction } from 'lib/bounties/interfaces';
 import { DeepDaoAggregateData } from 'lib/deepdao/interfaces';
 import { PublicPageResponse } from 'lib/pages/interfaces';
-import { PublicSpaceInfo } from 'lib/spaces/interfaces';
+import { PublicBountyToggle, PublicSpaceInfo } from 'lib/spaces/interfaces';
 import type { MarkTask } from 'lib/tasks/markTasks';
 import { TransactionCreationData } from 'lib/transactions/interface';
 import { ExtendedVote, UserVoteExtendedDTO, VoteDTO } from 'lib/votes/interfaces';
@@ -300,8 +300,8 @@ class CharmClient {
     }));
   }
 
-  async getPublicSpaceInfo (spaceId: string): Promise<PublicSpaceInfo> {
-    return http.GET<PublicSpaceInfo>(`/api/spaces/${spaceId}/public`);
+  async getPublicSpaceInfo (spaceId: string): Promise<Space> {
+    return http.GET<Space>(`/api/spaces/${spaceId}/public`);
   }
 
   async getAllBlocks (): Promise<FBBlock[]> {
@@ -395,8 +395,8 @@ class CharmClient {
     updater(fbBlocks);
   }
 
-  listBounties (spaceId: string): Promise<BountyWithDetails[]> {
-    return http.GET('/api/bounties', { spaceId });
+  listBounties (spaceId: string, publicOnly?: boolean): Promise<BountyWithDetails[]> {
+    return http.GET('/api/bounties', { spaceId, publicOnly });
   }
 
   async createBounty (bounty: Partial<Bounty>): Promise<Bounty> {
@@ -688,6 +688,12 @@ class CharmClient {
   setDefaultPublicPages ({ spaceId, defaultPublicPages }: SpaceDefaultPublicPageToggle) {
     return http.POST<Space>(`/api/spaces/${spaceId}/set-default-public-pages`, {
       defaultPublicPages
+    });
+  }
+
+  setPublicBountyBoard ({ publicBountyBoard, spaceId }: PublicBountyToggle): Promise<Space> {
+    return http.POST<Space>(`/api/spaces/${spaceId}/set-public-bounty-board`, {
+      publicBountyBoard
     });
   }
 

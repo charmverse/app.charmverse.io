@@ -33,8 +33,6 @@ describe('updateBountySettings', () => {
       description: 'Old description',
       descriptionNodes: '{"type":"doc","content":[{"type":"paragraph","content":[{"text":"Old description","type":"text"}]}]}',
       maxSubmissions: 3,
-      // No reviewer initially
-      reviewer: null,
       rewardAmount: 4,
       rewardToken: 'ETH',
       linkedTaskId
@@ -49,7 +47,6 @@ describe('updateBountySettings', () => {
       description: 'New description',
       descriptionNodes: '{"type":"doc","content":[{"type":"paragraph","content":[{"text":"New description","type":"text"}]}]}',
       maxSubmissions: 30,
-      reviewer: user.id,
       rewardAmount: 40,
       rewardToken: 'BNB',
       linkedTaskId: newTaskId
@@ -61,7 +58,9 @@ describe('updateBountySettings', () => {
     });
 
     (Object.keys(newContent) as (keyof UpdateableBountyFields)[]).forEach(key => {
-      expect(updatedBounty[key]).toBe(newContent[key]);
+      if (key !== 'permissions') {
+        expect(updatedBounty[key]).toBe(newContent[key]);
+      }
     });
 
   });

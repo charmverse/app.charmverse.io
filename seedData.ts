@@ -24,6 +24,7 @@ function MockSpace (partial: Partial<Space>): Space {
     defaultPagePermissionGroup: null,
     defaultPublicPages: false,
     permissionConfigurationMode: 'custom',
+    publicBountyBoard: false,
     ...partial
   };
 }

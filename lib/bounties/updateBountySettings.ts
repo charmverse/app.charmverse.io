@@ -34,7 +34,6 @@ export async function updateBountySettings ({
       title: updateContent.title,
       descriptionNodes: updateContent.descriptionNodes as string,
       description: updateContent.description,
-      reviewer: updateContent.reviewer,
       chainId: updateContent.chainId,
       rewardAmount: updateContent.rewardAmount,
       rewardToken: updateContent.rewardToken,

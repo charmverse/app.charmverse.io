@@ -4,6 +4,7 @@ import { prisma } from 'db';
 import { createBounty, listAvailableBounties } from 'lib/bounties';
 import { IEventToLog, postToDiscord } from 'lib/log/userEvents';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { AvailableResourcesRequest } from 'lib/permissions/interfaces';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
@@ -13,23 +14,24 @@ import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).get(getBounties).post(createBountyController);
+handler.get(getBounties)
+  .use(requireUser)
+  .post(createBountyController);
 
 async function getBounties (req: NextApiRequest, res: NextApiResponse<Bounty[]>) {
-  const { spaceId } = req.query;
+  const { spaceId, publicOnly } = req.query as any as AvailableResourcesRequest;
 
-  if (typeof spaceId !== 'string') {
-    return res.status(400).send({ error: 'Please provide a valid spaceId' } as any);
-  }
+  const publicResourcesOnly = ((publicOnly as any) === 'true' || publicOnly === true);
 
-  const userId = req.session.user.id;
+  // Session may be undefined as non-logged in users can access this endpoint
+  const userId = req.session?.user?.id;
 
   const bounties = await listAvailableBounties({
-    spaceId,
-    userId
+    spaceId: spaceId as string,
+    userId: publicResourcesOnly ? undefined : userId
   });
-
   return res.status(200).json(bounties);
+
 }
 
 async function createBountyController (req: NextApiRequest, res: NextApiResponse<Bounty>) {

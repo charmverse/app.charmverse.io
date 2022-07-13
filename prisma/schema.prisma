@@ -62,8 +62,9 @@ model Space {
   votes                       Vote[]
   // Public page settings
   permissionConfigurationMode SpacePermissionConfigurationMode? @default(custom)
-  defaultPagePermissionGroup  PagePermissionLevel?              @default(full_access)
-  defaultPublicPages          Boolean?                          @default(false)
+  defaultPagePermissionGroup PagePermissionLevel? @default(full_access)
+  defaultPublicPages         Boolean ?  @default(false)
+  publicBountyBoard          Boolean?   @default(false)
   // All role, user, space, space permissions for this space
   permittedGroups             SpacePermission[]                 @relation(name: "permittedGroups")
   // Space permissions this space has (for itself or other spaces => Currently we only allow space level permissions for same space)
@@ -341,7 +342,6 @@ model Bounty {
   updatedAt         DateTime           @default(now())
   description       String
   descriptionNodes  Json
-  reviewer          String?            @db.Uuid
   chainId           Int
   rewardAmount      Float
   rewardToken       String

@@ -1,7 +1,9 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
+import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
 import MoonIcon from '@mui/icons-material/DarkMode';
 import GetAppIcon from '@mui/icons-material/GetApp';
+import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import FavoritedIcon from '@mui/icons-material/Star';
@@ -27,13 +29,12 @@ import { useUser } from 'hooks/useUser';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
 import { useRouter } from 'next/router';
 import { useRef, useState } from 'react';
-import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
-import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useVotes } from 'hooks/useVotes';
+import CreateVoteModal from 'components/votes/components/CreateVoteModal';
 import Account from '../Account';
 import ShareButton from '../ShareButton';
-import CreateVoteModal from '../../../../votes/components/CreateVoteModal';
+import BountyShareButton from './BountyShareButton/BountyShareButton';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
 import NotificationsBadge from './components/NotificationsBadge';
 
@@ -70,6 +71,8 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
   const isExportablePage = pageType === 'card' || pageType === 'page' || pageType === 'proposal';
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const isBountyBoard = router.route === '/[domain]/bounties';
 
   async function toggleFavorite () {
     if (!currentPage || !user) return;
@@ -130,6 +133,12 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
       >
         <PageTitleWithBreadcrumbs />
         <Box display='flex' alignItems='center'>
+          {
+            isBountyBoard && (
+              <BountyShareButton headerHeight={headerHeight} />
+            )
+          }
+
           {isPage && (
             <>
               {currentPage?.deletedAt === null && <ShareButton headerHeight={headerHeight} />}
@@ -259,6 +268,7 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
               </Popover>
             </Box>
           )}
+          {/** End of CharmEditor page specific header content */}
 
           {/** dark mode toggle */}
           {user && (

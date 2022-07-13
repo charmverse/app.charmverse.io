@@ -26,6 +26,9 @@ import { useSpaces } from 'hooks/useSpaces';
 import BoardPage from 'components/[pageId]/BoardPage';
 import DocumentPage from 'components/[pageId]/DocumentPage';
 import { useColorMode } from 'context/darkMode';
+import LoadingComponent from 'components/common/LoadingComponent';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import PublicBountyList from './PublicBountyList';
 
 const LayoutContainer = styled.div`
   display: flex;
@@ -40,14 +43,22 @@ export default function PublicPage () {
   const pageIdOrPath = router.query.pageId instanceof Array ? router.query.pageId.join('/') : router.query.pageId as string;
   const dispatch = useAppDispatch();
   const { pages, currentPageId, setCurrentPageId } = usePages();
+  const [currentSpace] = useCurrentSpace();
   const [, setSpaces] = useSpaces();
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
+  const isBountiesPage = router.query.pageId?.[1] === 'bounties';
 
-  useEffect(() => {
+  async function onLoad () {
 
-    async function onLoad () {
-
+    if (isBountiesPage) {
+      // The other part of this logic for setting current space is in hooks/useCurrentSpace
+      const spaceDomain = (router.query.pageId as string[])[0];
+      charmClient.getPublicSpaceInfo(spaceDomain).then(space => {
+        setSpaces([space]);
+      });
+    }
+    else {
       try {
         const { page: rootPage, pageBlock, boardBlock, space } = await charmClient.getPublicPage(pageIdOrPath);
 
@@ -67,6 +78,9 @@ export default function PublicPage () {
         setPageNotFound(true);
       }
     }
+  }
+
+  useEffect(() => {
 
     onLoad();
 
@@ -77,6 +91,10 @@ export default function PublicPage () {
   }, []);
 
   const currentPage = pages[currentPageId];
+
+  if (!router.query) {
+    return <LoadingComponent height='200px' isLoading={true} />;
+  }
 
   if (pageNotFound) {
     return <ErrorPage message={'Sorry, that page doesn\'t exist'} />;
@@ -117,12 +135,19 @@ export default function PublicPage () {
 
         <PageContainer>
           <HeaderSpacer />
-          {currentPage?.type === 'board'
-            ? (
-              <BoardPage page={currentPage} setPage={() => {}} readonly={true} />
-            ) : (
-              currentPage && <DocumentPage page={currentPage} setPage={() => {}} readOnly={true} />
-            )}
+
+          {
+            isBountiesPage && <PublicBountyList />
+          }
+          {
+            !isBountiesPage && (currentPage?.type === 'board'
+              ? (
+                <BoardPage page={currentPage} setPage={() => {}} readonly={true} />
+              ) : (
+                currentPage && <DocumentPage page={currentPage} setPage={() => {}} readOnly={true} />
+              ))
+          }
+
         </PageContainer>
 
       </LayoutContainer>

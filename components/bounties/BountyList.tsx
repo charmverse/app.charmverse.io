@@ -10,6 +10,7 @@ import { useContext, useMemo, useState, useEffect } from 'react';
 import { CSVLink } from 'react-csv';
 import { BountyWithDetails } from 'models';
 import { FullWidthPageContent } from 'components/common/PageLayout/components/PageContent';
+
 import { BountyCard } from './components/BountyCard';
 import BountyModal from './components/BountyModal';
 import InputBountyStatus from './components/InputBountyStatus';
@@ -35,9 +36,17 @@ function sortSelected (bountyStatuses: BountyStatus[]): BountyStatus[] {
   });
 }
 
-export default function BountyList () {
+/**
+ *
+ */
+interface Props {
+  publicMode?: boolean
+  bountyCardClicked?: (bounty: BountyWithDetails) => void,
+  bounties: BountyWithDetails[]
+}
+
+export default function BountyList ({ publicMode, bountyCardClicked = () => null, bounties }: Props) {
   const [displayBountyDialog, setDisplayBountyDialog] = useState(false);
-  const { bounties } = useContext(BountiesContext);
 
   const [space] = useCurrentSpace();
   const [currentUserPermissions] = useCurrentSpacePermissions();
@@ -84,40 +93,52 @@ export default function BountyList () {
 
   return (
     <FullWidthPageContent>
-      <Box display='flex' justifyContent='space-between' mb={3}>
-        <Typography variant='h1'><strong>Bounties</strong></Typography>
-        <Box display='flex' justifyContent='flex-end'>
-          { !!csvData.length
-            && (
-              <CSVLink data={csvData} filename='Gnosis Safe Airdrop.csv' style={{ textDecoration: 'none' }}>
-                <Button color='secondary' variant='outlined'>
-                  Export to CSV
-                </Button>
-              </CSVLink>
-            )}
-          <MultiPaymentModal bounties={bounties} />
+
+      <Grid container display='flex' justifyContent='space-between' alignContent='center' mb={3}>
+
+        <Grid display='flex' justifyContent='space-between' item xs={12} mb={2}>
+          <Box width='fit-content'>
+            <Typography variant='h1' display='flex' alignItems='center' sx={{ height: '100%' }}>
+              Bounties
+            </Typography>
+          </Box>
 
           {
-              currentUserPermissions && (
-                <Button
-                  sx={{ ml: 1 }}
-                  onClick={() => {
-                    setDisplayBountyDialog(true);
-                  }}
-                >
-                  {suggestBounties ? 'Suggest' : 'Create'} Bounty
-                </Button>
-              )
-            }
+          !publicMode && (
+            <Box width='fit-content'>
+              { !!csvData.length
+              && (
+                <CSVLink data={csvData} filename='Gnosis Safe Airdrop.csv' style={{ textDecoration: 'none' }}>
+                  <Button color='secondary' variant='outlined'>
+                    Export to CSV
+                  </Button>
+                </CSVLink>
+              )}
+              <MultiPaymentModal bounties={bounties} />
 
-        </Box>
-      </Box>
+              {
+                currentUserPermissions && (
+                  <Button
+                    sx={{ ml: 1, height: '35px' }}
+                    onClick={() => {
+                      setDisplayBountyDialog(true);
+                    }}
+                  >
+                    {suggestBounties ? 'Suggest' : 'Create'} Bounty
+                  </Button>
+                )
+              }
 
-      {/* Filters for the bounties */}
+            </Box>
+          )
+        }
 
-      {
+        </Grid>
+
+        {
           bounties.length > 0 && (
-            <Box display='flex' alignContent='center' justifyContent='flex-start' mb={3}>
+            <Grid item xs={12}>
+              {/* Filters for the bounties */}
               <InputBountyStatus
                 onChange={(statuses) => {
                   setSavedBountyFilters(sortSelected(statuses));
@@ -126,35 +147,45 @@ export default function BountyList () {
                 renderSelectedInOption={true}
                 defaultValues={savedBountyFilters}
               />
-            </Box>
+            </Grid>
           )
-        }
+
+            }
+
+      </Grid>
 
       {/* Onboarding video when no bounties exist */}
       {
             bounties.length === 0 && (
-              <>
-                <Typography variant='h6' sx={{ mb: 2 }}>Getting started with bounties</Typography>
-                <div>
+              <div style={{ marginTop: '25px' }}>
 
-                  <iframe
-                    src='https://tiny.charmverse.io/bounties'
-                    style={{ maxWidth: '100%', border: '0 none' }}
-                    height='395px'
-                    width='700px'
-                    title='Bounties | Getting started with Charmverse'
-                  >
-                  </iframe>
+                <Typography variant='h6'>
+                  Getting started with bounties
+                </Typography>
 
-                </div>
-              </>
+                <iframe
+                  src='https://tiny.charmverse.io/bounties'
+                  style={{ maxWidth: '100%', border: '0 none' }}
+                  height='367px'
+                  width='650px'
+                  title='Bounties | Getting started with Charmverse'
+                >
+                </iframe>
+
+              </div>
             )
           }
 
       {/* Current filter status doesn't have any matching bounties */}
       {
-            bounties.length > 0 && sortedBounties.length === 0 && <Typography paragraph={true}>No bounties were found</Typography>
-          }
+            bounties.length > 0 && sortedBounties.length === 0 && (
+            <Typography paragraph={true}>
+              {
+                savedBountyFilters.length === 0 ? 'Select one or multiple bounty statuses.' : 'No bounties matching the current filter status.'
+              }
+            </Typography>
+            )
+        }
 
       {/* List of bounties based on current filter */}
       {
@@ -162,8 +193,14 @@ export default function BountyList () {
               <Grid container spacing={1}>
                 {sortedBounties.map(bounty => {
                   return (
-                    <Grid key={bounty.id} item>
-                      <BountyCard truncate={false} key={bounty.id} bounty={bounty} />
+                    <Grid
+                      key={bounty.id}
+                      item
+                      onClick={() => {
+                        bountyCardClicked(bounty);
+                      }}
+                    >
+                      <BountyCard truncate={false} key={bounty.id} bounty={bounty} publicMode={publicMode} />
                     </Grid>
                   );
                 })}

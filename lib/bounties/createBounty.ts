@@ -4,6 +4,9 @@ import { setBountyPermissions } from 'lib/permissions/bounties';
 import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
 import { BountyCreationData } from './interfaces';
 
+/**
+ * You can create a bounty suggestion using only title, spaceId and createdBy. You will see many unit tests using this limited dataset, which will then default the bounty to suggestion status. Your logic should account for this.
+ */
 export async function createBounty ({
   title,
   spaceId,
@@ -17,7 +20,6 @@ export async function createBounty ({
   maxSubmissions,
   rewardAmount = 0,
   rewardToken = 'ETH',
-  reviewer,
   permissions
 }: BountyCreationData): Promise<Bounty> {
 
@@ -57,7 +59,6 @@ export async function createBounty ({
     maxSubmissions,
     rewardAmount,
     rewardToken,
-    reviewer,
     linkedTaskId
   };
 
@@ -69,7 +70,25 @@ export async function createBounty ({
     data: bountyCreateInput
   });
 
-  if (permissions) {
+  // Initialise suggestions with a view permission
+  if (status === 'suggestion') {
+    await setBountyPermissions({
+      bountyId: bounty.id,
+      permissionsToAssign: {
+        creator: [{
+          group: 'user',
+          id: createdBy
+        }],
+        // This permission is created so that all space members can see the suggestion. When the admin is configuring a not yet approved suggestion, this will remain the same, or be overriden if the admin has restricted submitters to a list of roles.
+        submitter: [{
+          group: 'space',
+          id: spaceId
+        }]
+      }
+    });
+  }
+  // Pass custom permissions
+  else if (permissions) {
     await setBountyPermissions({
       bountyId: bounty.id,
       permissionsToAssign: permissions
