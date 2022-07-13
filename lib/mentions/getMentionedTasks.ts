@@ -159,7 +159,7 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
     if (content) {
       const mentions = extractMentions(content, username);
       mentions.forEach(mention => {
-        if (bounty.spaceId && mention.value === userId && mention.createdBy !== userId && bounty.createdBy !== userId) {
+        if (bounty.spaceId && mention.value === userId && mention.createdBy !== userId) {
           mentionUserIds.add(mention.createdBy);
           mentionedTasksWithoutUserRecord[mention.id] = {
             mentionId: mention.id,
