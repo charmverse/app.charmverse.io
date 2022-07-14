@@ -181,7 +181,7 @@ class CharmClient {
     return http.DELETE<ModifyChildPagesResponse>(`/api/pages/${pageId}`);
   }
 
-  updatePage (pageOpts: Prisma.PageUpdateInput) {
+  updatePage (pageOpts: Partial<Page>) {
     return http.PUT<IPageWithPermissions>(`/api/pages/${pageOpts.id}`, pageOpts);
   }
 
