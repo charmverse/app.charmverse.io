@@ -111,7 +111,11 @@ async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
           type: 'card',
           headerImage: cardBlock.fields.headerImage,
           contentText: cardBlock.fields.contentText || '',
-          parentId: cardBlock.parentId,
+          parentPage: {
+            connect: {
+              id: cardBlock.parentId
+            }
+          },
           updatedAt: cardBlock.updatedAt,
           content: cardBlock.fields.content ?? undefined,
           permissions: {

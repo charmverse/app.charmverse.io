@@ -7,12 +7,16 @@ import { createBoard } from 'components/common/BoardEditor/focalboard/src/blocks
 import { createCard, Card } from 'components/common/BoardEditor/focalboard/src/blocks/card';
 import { createBoardView } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
+import { v4 } from 'uuid';
 
 export type NewPageInput = Partial<Page> & { spaceId: string, createdBy: string };
 
 export async function addPage ({ createdBy, spaceId, ...page }: NewPageInput): Promise<Page> {
-  const id = Math.random().toString().replace('0.', '');
+  const id = v4();
+
   const pageProperties: Prisma.PageCreateInput = {
+    id,
+    boardId: id,
     content: undefined as any,
     contentText: '',
     createdAt: new Date(),
@@ -33,13 +37,13 @@ export async function addPage ({ createdBy, spaceId, ...page }: NewPageInput): P
     type: page.type ?? 'page',
     ...(page ?? {})
   };
-  if (pageProperties.type === 'board') {
-    await createDefaultBoardData(boardId => {
-      pageProperties.boardId = boardId;
-      pageProperties.id = boardId; // use the same uuid value
-    }, pageProperties.id);
-  }
+
   const newPage = await charmClient.createPage(pageProperties);
+
+  if (pageProperties.type === 'board') {
+    await createDefaultBoardData(() => null, id);
+  }
+
   await mutate(`pages/${spaceId}`, (pages: Page[]) => {
     return [...pages, newPage];
   }, {
