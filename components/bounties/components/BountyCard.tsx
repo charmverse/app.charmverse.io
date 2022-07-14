@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from 'components/common/Link';
 import { Box, Card, CardActionArea, CardHeader, Typography } from '@mui/material';
 import { Bounty as IBounty } from '@prisma/client';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -18,32 +18,6 @@ export interface IBountyInput {
 
 function BountyCardDetails ({ bounty, truncate }: Pick<IBountyInput, 'bounty' | 'truncate'>) {
   return (
-    <CardActionArea
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        alignItems: 'flex-start',
-        justifyContent: 'space-between'
-      }}
-    >
-      <CardHeader title={bounty.title} titleTypographyProps={{ sx: { fontSize: '1rem', fontWeight: 'bold' } }} />
-      <Box p={2} width='100%' display='flex' flex={1} flexDirection='column' justifyContent='space-between'>
-        <Typography paragraph={true}>
-          {fancyTrim(bounty.description, 120)}
-        </Typography>
-        <BountyStatusBadge truncate={truncate} bounty={bounty} />
-      </Box>
-    </CardActionArea>
-  );
-}
-
-export function BountyCard ({ truncate = true, bounty, publicMode = false }: IBountyInput) {
-  const [space] = useCurrentSpace();
-  const bountyUrl = `/${space?.domain}/bounties/${bounty.id}`;
-  const router = useRouter();
-
-  return (
     <Card
       sx={{
         width: 290,
@@ -53,15 +27,37 @@ export function BountyCard ({ truncate = true, bounty, publicMode = false }: IBo
       }}
       variant='outlined'
     >
-      {/* Temporary solution to prevent navigating to different path */}
-      {publicMode ? (
-        <BountyCardDetails truncate={truncate} bounty={bounty} />
-      ) : (
-        <Link href={publicMode ? router.asPath : bountyUrl} passHref={!publicMode}>
-          <BountyCardDetails truncate={truncate} bounty={bounty} />
-        </Link>
-      )}
-
+      <CardActionArea
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between'
+        }}
+      >
+        <CardHeader title={bounty.title} titleTypographyProps={{ sx: { fontSize: '1rem', fontWeight: 'bold' } }} />
+        <Box p={2} width='100%' display='flex' flex={1} flexDirection='column' justifyContent='space-between'>
+          <Typography paragraph={true}>
+            {fancyTrim(bounty.description, 120)}
+          </Typography>
+          <BountyStatusBadge truncate={truncate} bounty={bounty} />
+        </Box>
+      </CardActionArea>
     </Card>
+  );
+}
+
+export function BountyCard ({ truncate = true, bounty, publicMode = false }: IBountyInput) {
+  const [space] = useCurrentSpace();
+  const bountyUrl = `/${space?.domain}/bounties/${bounty.id}`;
+
+  return (publicMode ? (
+    <BountyCardDetails truncate={truncate} bounty={bounty} />
+  ) : (
+    <Link href={bountyUrl}>
+      <BountyCardDetails truncate={truncate} bounty={bounty} />
+    </Link>
+  )
   );
 }
