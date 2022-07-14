@@ -1,22 +1,24 @@
-import { Page } from '@prisma/client';
+import { Page, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { PageWithChildren, resolveChildPages } from 'lib/pages/server';
 
+function recursiveInclude ({ level = 0, depth = 10 }: {level?: number, depth?: number}): Prisma.PageInclude {
+  return {
+    children: level === depth ? true : {
+      include: recursiveInclude({ depth, level: level + 1 })
+    },
+    card: true
+  };
+}
+
 export async function exportSpacePages ({ spaceId }: {spaceId: string}): Promise<Omit<PageWithChildren, 'permissions'>[]> {
-  const rootPages = await prisma.page.findMany({
+  const rootPages = (await prisma.page.findMany({
     where: {
       parentId: null,
       spaceId
-    }
-  });
+    },
+    include: recursiveInclude({})
+  })) as Omit<PageWithChildren, 'permissions'>[];
 
-  const rootsWithChildren = await Promise.all(rootPages.map(async p => {
-    const children = await resolveChildPages(p.id, false);
-    return {
-      ...p,
-      children
-    };
-  }));
-
-  return rootsWithChildren;
+  return rootPages;
 }
