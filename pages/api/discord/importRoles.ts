@@ -24,7 +24,7 @@ export type ImportRolesResponse = { importedRoleCount: number };
 // requests per second = 10, timeUnit = 1sec
 const rateLimiter = RateLimit(10);
 
-const MEMBERS_PER_REQUEST = 1;
+const MEMBERS_PER_REQUEST = 100;
 
 async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRolesResponse | { error: string }>) {
   const { spaceId, guildId } = req.body as ImportDiscordRolesPayload;
