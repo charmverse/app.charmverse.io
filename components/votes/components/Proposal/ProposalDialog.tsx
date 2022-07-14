@@ -54,7 +54,7 @@ export default function ProposalDialog (props: Props) {
     };
   }, [props.page?.id]);
 
-  const debouncedPageUpdate = debouncePromise(async (updates: Prisma.PageUpdateInput) => {
+  const debouncedPageUpdate = debouncePromise(async (updates: Partial<Page>) => {
     const updatedPage = await charmClient.updatePage(updates);
     setPages((_pages) => ({
       ..._pages,
@@ -66,7 +66,7 @@ export default function ProposalDialog (props: Props) {
     if (!props.page || !mounted.current) {
       return;
     }
-    debouncedPageUpdate({ id: props.page.id, ...updates } as Prisma.PageUpdateInput)
+    debouncedPageUpdate({ id: props.page.id, ...updates } as Partial<Page>)
       .catch((err: any) => {
         log.error('Error saving page', err);
       });
