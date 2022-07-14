@@ -16,7 +16,7 @@ export async function addPage ({ createdBy, spaceId, ...page }: NewPageInput): P
 
   const pageProperties: Prisma.PageCreateInput = {
     id,
-    boardId: id,
+    boardId: page.type === 'board' ? id : undefined,
     content: undefined as any,
     contentText: '',
     createdAt: new Date(),
