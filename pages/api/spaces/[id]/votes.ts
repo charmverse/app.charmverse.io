@@ -13,8 +13,9 @@ handler
 
 async function getVotes (req: NextApiRequest, res: NextApiResponse<Vote[]>) {
   const spaceId = req.query.id as string;
+  const { id: userId } = req.session.user;
 
-  const votes = await getVotesBySpace(spaceId);
+  const votes = await getVotesBySpace({ spaceId, userId });
 
   return res.status(200).json(votes);
 }

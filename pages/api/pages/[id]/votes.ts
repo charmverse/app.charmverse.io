@@ -22,7 +22,7 @@ async function getVotes (req: NextApiRequest, res: NextApiResponse<ExtendedVote[
     throw new NotFoundError('Page not found');
   }
 
-  const votes = await getVotesByPage(pageId, req.session.user.id);
+  const votes = await getVotesByPage({ pageId, userId: req.session.user.id });
 
   return res.status(200).json(votes);
 }

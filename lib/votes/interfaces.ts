@@ -36,3 +36,8 @@ export type VoteTask = Vote & {
 export type UserVoteExtendedDTO = UserVote & {
   user: Pick<User, 'avatar' | 'username'>
 }
+
+export interface SpaceVotesRequest {
+  userId: string
+  spaceId: string
+}
