@@ -50,7 +50,7 @@ describe('GET /api/pages/{id}/votes - Get all the votes for a specific page', ()
       .expect(200);
   });
 
-  it('should fail to get votes of a page for a contributor who doesn\'t have read access, responding with 200', async () => {
+  it('should fail to get votes of a page for a contributor who doesn\'t have read access, responding with 404', async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken(v4(), false);
 
     const page = await createPage({
@@ -70,7 +70,7 @@ describe('GET /api/pages/{id}/votes - Get all the votes for a specific page', ()
       .expect(404);
   });
 
-  it('should fail to get votes of a page for a user not part of the space, responding with 200', async () => {
+  it('should fail to get votes of a page for a user not part of the space, responding with 404', async () => {
     const { user: userInSpace, space } = await generateUserAndSpaceWithApiToken(v4(), true);
     const { user: userNotInSpace } = await generateUserAndSpaceWithApiToken(v4(), false);
 
@@ -90,12 +90,4 @@ describe('GET /api/pages/{id}/votes - Get all the votes for a specific page', ()
       .set('Cookie', await loginUser(userNotInSpace))
       .expect(404);
   });
-
-  // it('Should return the votes if the user have read access to the page and respond 200', async () => {
-  //   await request(baseUrl).get(`/api/pages/${page1.id}/votes`).set('Cookie', user1Cookie).expect(200);
-  // });
-
-  // it('Should fail if the user don\'t have read access to the page', async () => {
-  //   await request(baseUrl).get(`/api/pages/${page2.id}/votes`).set('Cookie', user1Cookie).expect(404);
-  // });
 });

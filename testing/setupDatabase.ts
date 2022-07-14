@@ -252,7 +252,7 @@ export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'cre
   });
 }
 
-export async function createVote ({ userVotes = [], voteOptions = [], spaceId, createdBy, pageId, deadline = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), status = 'InProgress', title = 'Vote Title', description = null }: Partial<Omit<Vote, 'spaceId' | 'createdBy' | 'pageId'>> & Pick<Vote, 'spaceId' | 'createdBy' | 'pageId'> & {voteOptions?: string[], userVotes?: string[]}) {
+export async function createVote ({ userVotes = [], voteOptions = [], spaceId, createdBy, pageId, deadline = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), status = 'InProgress', title = 'Vote Title', description = null }: Partial<Vote> & Pick<Vote, 'spaceId' | 'createdBy' | 'pageId'> & {voteOptions?: string[], userVotes?: string[]}) {
   return prisma.vote.create({
     data: {
       deadline,
