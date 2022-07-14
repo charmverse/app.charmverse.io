@@ -40,7 +40,7 @@ describe('getVotesBySpace', () => {
     expect(votes[0].id).toBe(accessibleSpacePageVote.id);
   });
 
-  it('should get votes of a space for a non admin user', async () => {
+  it('should get votes of a space linked to pages a non admin user can access', async () => {
     const { space, user: nonAdminUser } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     const adminUser = await generateSpaceUser({
