@@ -40,8 +40,8 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   // Has selected workspace page different than the stored one.
   if (isDomain && pathSegments.length > 1 && router.asPath !== lastPage) {
     setLastPage(router.asPath);
-  } // If there is no workspace page in URL, get stored one.
-  else if (isDomain && pathSegments.length === 1 && lastPage) {
+  } // If there is no workspace page in URL, get stored one as long as it was from the current workspace.
+  else if (isDomain && pathSegments.length === 1 && lastPage && lastPage.startsWith(`/${firstPathSegment}`)) {
     router.push(lastPage);
   }
 
