@@ -33,7 +33,7 @@ export default function WorkspaceSettings () {
   const [spaces, setSpaces] = useSpaces();
   const [user] = useUser();
   const isAdmin = isSpaceAdmin(user, space?.id);
-  const storageKey = `${space?.domain}-last-page`;
+  const storageKey = `${user?.id}-${space?.domain}-last-page`;
   const [, , removeStorageValue] = useLocalStorage<string>(storageKey, '');
 
   const workspaceRemoveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-remove' });

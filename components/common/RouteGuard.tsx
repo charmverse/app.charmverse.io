@@ -35,22 +35,28 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   const isDomain: boolean = !!isSpaceDomain(firstPathSegment);
   const storagePrefix: string = isDomain ? firstPathSegment : 'user';
 
-  const [lastPage, setLastPage] = useLocalStorage<string>(`${storagePrefix}-last-page`, '');
+  const [lastPage, setLastPage] = useLocalStorage<string>(`${user?.id}-${storagePrefix}-last-page`, '');
 
-  // Has selected workspace page different than the stored one.
-  if (isDomain && pathSegments.length > 1 && router.asPath !== lastPage) {
-    setLastPage(router.asPath);
-  } // If there is no workspace page in URL, get stored one as long as it was from the current workspace.
-  else if (isDomain && pathSegments.length === 1 && lastPage && lastPage.startsWith(`/${firstPathSegment}`)) {
-    router.push(lastPage);
-  }
+  const manageLastVisitedPage = () => {
+    // Has selected workspace page different than the stored one.
+    if (isDomain && pathSegments.length > 1 && router.asPath !== lastPage) {
+      setLastPage(router.asPath);
+    } // If there is no workspace page in URL, get stored one as long as it was from the current workspace.
+    else if (isDomain && pathSegments.length === 1 && lastPage && lastPage.startsWith(`/${firstPathSegment}`)) {
+      router.push(lastPage);
+    }
 
-  // Has selected a non-workspace page different than the stored one.
-  if (!isDomain && pathSegments.length > 0 && router.asPath !== lastPage) {
-    setLastPage(router.asPath);
-  } // If there is no page in URL, get stored one.
-  else if (!isDomain && pathSegments.length === 0 && lastPage) {
-    router.push(lastPage);
+    // Has selected a non-workspace page different than the stored one.
+    if (!isDomain && pathSegments.length > 0 && router.asPath !== lastPage) {
+      setLastPage(router.asPath);
+    } // If there is no page in URL, get stored one.
+    else if (!isDomain && pathSegments.length === 0 && lastPage) {
+      router.push(lastPage);
+    }
+  };
+
+  if (user) {
+    manageLastVisitedPage();
   }
 
   useEffect(() => {
