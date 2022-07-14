@@ -9,8 +9,8 @@ export function queryIsInlineVoteAllowedInRange (from: number, to: number) {
     const $from = state.doc.resolve(from);
     const $to = state.doc.resolve(to);
     const inlineVoteMark = getMarkFromState(state);
-    if ($from.parent === $to.parent && $from.parent.isTextblock) {
-      return $from.parent.type.allowsMarkType(inlineVoteMark);
+    if ($from.parent.isTextblock && $to.parent.isTextblock) {
+      return $from.parent.type.allowsMarkType(inlineVoteMark) && $to.parent.type.allowsMarkType(inlineVoteMark);
     }
   };
 }

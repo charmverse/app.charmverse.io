@@ -91,8 +91,8 @@ export function queryIsInlineCommentAllowedInRange (from: number, to: number) {
     const $from = state.doc.resolve(from);
     const $to = state.doc.resolve(to);
     const inlineCommentMark = getMarkFromState(state);
-    if ($from.parent === $to.parent && $from.parent.isTextblock) {
-      return $from.parent.type.allowsMarkType(inlineCommentMark);
+    if ($to.parent.isTextblock && $from.parent.isTextblock) {
+      return $from.parent.type.allowsMarkType(inlineCommentMark) && $to.parent.type.allowsMarkType(inlineCommentMark);
     }
   };
 }

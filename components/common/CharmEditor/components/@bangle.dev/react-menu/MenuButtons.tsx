@@ -12,7 +12,7 @@ import {
   strike,
   underline
 } from '@bangle.dev/base-components';
-import { EditorState, PluginKey } from '@bangle.dev/pm';
+import { Command, EditorState, PluginKey } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { BoldIcon, BulletListIcon, CodeIcon, ItalicIcon, LinkIcon, OrderedListIcon, ParagraphIcon, RedoIcon, TodoListIcon, UndoIcon } from '@bangle.dev/react-menu';
 import { HintPos } from '@bangle.dev/react-menu/dist/types';
@@ -27,6 +27,8 @@ import InsertCommentOutlinedIcon from '@mui/icons-material/InsertCommentOutlined
 import { SubMenu, toggleSubMenu } from './floating-menu';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import { createInlineVote } from '../../inlineVote';
+import { createCommentBlock } from 'components/common/BoardEditor/focalboard/src/blocks/commentBlock';
+import { createInlineComment } from '../../inlineComment';
 
 const {
   defaultKeys: orderedListKeys,
@@ -103,15 +105,16 @@ export function InlineActionButton({
   menuKey,
   enable,
   subMenu,
+  commandFn,
   ...props
-}: ButtonProps & {subMenu: SubMenu, menuKey: PluginKey, enable: boolean}) {
+}: ButtonProps & {commandFn: () => Command, subMenu: SubMenu, menuKey: PluginKey, enable: boolean}) {
   const view = useEditorViewContext();
   
   const onMouseDown = useCallback(
     (e) => {
       e.preventDefault();
       const command = filter(
-        (state: EditorState) => createInlineVote()(state),
+        (state: EditorState) => commandFn()(state),
         (_state, dispatch, view) => {
           if (dispatch) {
             toggleSubMenu(menuKey, subMenu)(view!.state, view!.dispatch, view);
@@ -157,6 +160,7 @@ export function InlineCommentButton({
 
   return <InlineActionButton 
     {...props}
+    commandFn={createInlineComment}
     enable={enableComments}
     menuKey={menuKey}
     hints={['Comment']}
@@ -179,6 +183,7 @@ export function InlineVoteButton({
 }: ButtonProps & {menuKey: PluginKey, enableVotes: boolean}) {
   return <InlineActionButton 
     {...props}
+    commandFn={createInlineVote}
     enable={enableVotes}
     menuKey={menuKey}
     hints={['Vote']}
