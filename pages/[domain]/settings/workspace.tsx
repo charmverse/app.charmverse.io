@@ -60,6 +60,9 @@ export default function WorkspaceSettings () {
     const newDomain = space.domain !== values.domain;
     const updatedSpace = await charmClient.updateSpace({ ...space, ...values });
     if (newDomain) {
+      // Remove the local storage item storing the workspace's last visited page.
+      // An item for the new domain will be created.
+      removeStorageValue(storageKey);
       window.location.href = router.asPath.replace(space.domain, values.domain);
     }
     else {
@@ -168,6 +171,7 @@ export default function WorkspaceSettings () {
             await charmClient.deleteSpace(space.id);
             const filteredSpaces = spaces.filter(s => s.id !== space.id);
             setSpaces(filteredSpaces);
+            // Remove the local storage item storing the workspace's last visited page.
             removeStorageValue(storageKey);
             window.location.href = filteredSpaces.length !== 0 ? `/${filteredSpaces[0].domain}` : '/signup';
           }
