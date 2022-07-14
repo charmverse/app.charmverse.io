@@ -55,7 +55,7 @@ export default function InlineActionCounter (
   return (
     <>
       {children}
-      <CursorBoundary contentEditable='false'>
+      <CursorBoundary contentEditable='false' suppressContentEditableWarning>
         <InlineActionCountContainer>
           {totalInlineComments > 0 && (
           <Box
