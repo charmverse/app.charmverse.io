@@ -60,7 +60,7 @@ import * as table from './components/table';
 import * as trailingNode from './components/trailingNode';
 import DevTools from './DevTools';
 import { checkForEmpty } from './utils';
-import Heading from './components/Heading';
+import Heading from './components/heading/Heading';
 
 export interface ICharmEditorOutput {
   doc: PageContent,

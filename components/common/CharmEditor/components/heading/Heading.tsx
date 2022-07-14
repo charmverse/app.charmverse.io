@@ -1,8 +1,8 @@
 import { NodeViewProps, PluginKey } from '@bangle.dev/core';
 import { ReactNode } from 'react';
-import InlineActionCounter from './InlineActionCounter';
-import { InlineCommentPluginState } from './inlineComment';
-import { InlineVotePluginState } from './inlineVote';
+import InlineActionCounter from '../InlineActionCounter';
+import { InlineCommentPluginState } from '../inlineComment';
+import { InlineVotePluginState } from '../inlineVote';
 
 interface HeadingProps extends NodeViewProps{
   children: ReactNode,
