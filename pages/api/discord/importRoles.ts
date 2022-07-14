@@ -22,7 +22,7 @@ export interface ImportDiscordRolesPayload {
 export type ImportRolesResponse = { importedRoleCount: number };
 
 // requests per second = 10, timeUnit = 1sec
-const rateLimiter = RateLimit(10);
+const rateLimiter = RateLimit(35);
 
 const MEMBERS_PER_REQUEST = 100;
 
@@ -68,8 +68,8 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
       throw new Error('Guild member does not have a user property');
     }
     lastUserId = guildMember.user.id;
-    discordGuildMembersResponse = await handleDiscordResponse<DiscordGuildMember[]>(`https://discord.com/api/v8/guilds/${guildId}/members?limit=${MEMBERS_PER_REQUEST}&after=${lastUserId}`);
     await rateLimiter();
+    discordGuildMembersResponse = await handleDiscordResponse<DiscordGuildMember[]>(`https://discord.com/api/v8/guilds/${guildId}/members?limit=${MEMBERS_PER_REQUEST}&after=${lastUserId}`);
   }
 
   if (discordGuildMembersResponse.status !== 'success') {
