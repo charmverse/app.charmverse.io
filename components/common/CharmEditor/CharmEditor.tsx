@@ -60,6 +60,7 @@ import * as table from './components/table';
 import * as trailingNode from './components/trailingNode';
 import DevTools from './DevTools';
 import { checkForEmpty } from './utils';
+import Heading from './components/Heading';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -209,6 +210,11 @@ export function charmEditorPlugins (
     NodeView.createPlugin({
       name: 'paragraph',
       containerDOM: ['p', { class: 'charm-paragraph' }],
+      contentDOM: ['span']
+    }),
+    NodeView.createPlugin({
+      name: 'heading',
+      containerDOM: ['div', { class: 'charm-heading' }],
       contentDOM: ['span']
     }),
     tabIndent.plugins(),
@@ -477,6 +483,17 @@ function CharmEditor (
                 {...props}
               >{_children}
               </Paragraph>
+            );
+          }
+          case 'heading': {
+            return (
+              <Heading
+                inlineVotePluginKey={inlineVotePluginKey}
+                inlineCommentPluginKey={inlineCommentPluginKey}
+                calculateActions={!disablePageSpecificFeatures}
+                {...props}
+              >{_children}
+              </Heading>
             );
           }
           case 'quote':
