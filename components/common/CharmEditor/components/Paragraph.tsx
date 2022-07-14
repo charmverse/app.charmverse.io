@@ -13,7 +13,12 @@ import { renderSuggestionsTooltip } from './@bangle.dev/tooltip/suggest-tooltip'
 import { InlineCommentPluginState } from './inlineComment';
 import { InlineVotePluginState } from './inlineVote';
 
-const InlineActionCountContainer = styled.div`
+// this span is necessary to prevent the cursor from becoming trapped by the action container with `position: absolute`
+const CursorBoundary = styled.span`
+  display: block;
+`;
+
+const InlineActionCountContainer = styled.span`
   position: absolute;
   top: 5px;
   display: flex;
@@ -49,8 +54,9 @@ export default function Paragraph (
   return (
     <>
       {children}
-      <InlineActionCountContainer>
-        {totalInlineComments > 0 && (
+      <CursorBoundary contentEditable='false'>
+        <InlineActionCountContainer>
+          {totalInlineComments > 0 && (
           <Box
             display='flex'
             gap={0.5}
@@ -69,8 +75,8 @@ export default function Paragraph (
             >{totalInlineComments}
             </Typography>
           </Box>
-        )}
-        {totalInlineVotes > 0 && (
+          )}
+          {totalInlineVotes > 0 && (
           <Box
             display='flex'
             gap={0.5}
@@ -89,8 +95,9 @@ export default function Paragraph (
             >{totalInlineVotes}
             </Typography>
           </Box>
-        )}
-      </InlineActionCountContainer>
+          )}
+        </InlineActionCountContainer>
+      </CursorBoundary>
     </>
   );
 }
