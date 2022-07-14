@@ -32,6 +32,7 @@ export async function computeBountyPermissions ({
 
   // Handle public request case and only enforce view permission
   if (!userId) {
+    // Make sure there is an explicit public permission assigned to the public
     const publicViewPermission = await prisma.bountyPermission.findFirst({
       where: {
         bountyId: bounty.id,

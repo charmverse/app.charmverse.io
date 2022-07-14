@@ -34,7 +34,6 @@ export async function updateBountySettings ({
       title: updateContent.title,
       descriptionNodes: updateContent.descriptionNodes as string,
       description: updateContent.description,
-      reviewer: updateContent.reviewer,
       chainId: updateContent.chainId,
       rewardAmount: updateContent.rewardAmount,
       rewardToken: updateContent.rewardToken,
@@ -49,7 +48,7 @@ export async function updateBountySettings ({
   }
 
   if (updateContent.permissions) {
-    const afterUpdate = await setBountyPermissions({
+    await setBountyPermissions({
       bountyId,
       permissionsToAssign: updateContent.permissions
     });

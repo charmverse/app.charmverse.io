@@ -35,13 +35,6 @@ export default function PaymentMethods () {
 
         <Stack component='span' spacing={1} direction='row'>
           <Button
-            onClick={gnosisPopupState.open}
-            variant='outlined'
-            sx={{ float: 'right' }}
-          >
-            Add Gnosis Safe wallet
-          </Button>
-          <Button
             onClick={ERC20PopupState.open}
             variant='outlined'
             sx={{ float: 'right' }}

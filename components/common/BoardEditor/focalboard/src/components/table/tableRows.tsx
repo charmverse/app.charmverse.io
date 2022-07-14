@@ -8,7 +8,6 @@ import {Card} from '../../blocks/card'
 import {Board} from '../../blocks/board'
 import {BoardView} from '../../blocks/boardView'
 import charmClient from 'charmClient'
-import { Page } from '@prisma/client'
 import { usePages } from 'hooks/usePages'
 
 
@@ -34,6 +33,7 @@ type Props = {
 const TableRows = (props: Props): JSX.Element => {
     const {board, cards, activeView} = props
     const { pages, setPages } = usePages();
+
     const saveTitle = React.useCallback(async (saveType: string, cardId: string, title: string) => {
         const updatedPage = await charmClient.updatePage({
             id: cardId,

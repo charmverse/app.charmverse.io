@@ -1,7 +1,7 @@
 
 import {
   Application, Block, Bounty, InviteLink, Page, PagePermissionLevel, PaymentMethod, Prisma,
-  Role, Space, TelegramUser, TokenGate, TokenGateToRole, User, UserDetails, UserGnosisSafe
+  Role, Space, TelegramUser, TokenGate, TokenGateToRole, User, UserDetails, UserGnosisSafe, UserVote
 } from '@prisma/client';
 import * as http from 'adapters/http';
 import { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/focalboard/src/blocks/block';
@@ -33,16 +33,17 @@ import { UpdateThreadRequest } from 'pages/api/threads/[id]';
 import { TokenGateWithRoles } from 'pages/api/token-gates';
 
 import { ApplicationWithTransactions } from 'lib/applications/actions';
-import { AssignedBountyPermissions, BountyUpdate, SuggestionAction, BountySubmitterPoolSize, BountySubmitterPoolCalculation } from 'lib/bounties/interfaces';
+import { AssignedBountyPermissions, BountySubmitterPoolCalculation, BountySubmitterPoolSize, BountyUpdate, SuggestionAction } from 'lib/bounties/interfaces';
+import { DeepDaoAggregateData } from 'lib/deepdao/interfaces';
 import { PublicPageResponse } from 'lib/pages/interfaces';
-import { PublicSpaceInfo } from 'lib/spaces/interfaces';
+import { PublicBountyToggle, PublicSpaceInfo } from 'lib/spaces/interfaces';
 import type { MarkTask } from 'lib/tasks/markTasks';
 import { TransactionCreationData } from 'lib/transactions/interface';
+import { ExtendedVote, UserVoteExtendedDTO, VoteDTO } from 'lib/votes/interfaces';
 import { PublicUser } from 'pages/api/public/profile/[userPath]';
-import { DeepDaoAggregateData } from 'lib/deepdao/interfaces';
-import { AssignedPermissionsQuery, PermissionComputeRequest, Resource } from './lib/permissions/interfaces';
-import { SpacePermissionFlags, SpacePermissionModification } from './lib/permissions/spaces';
+import { AssignedPermissionsQuery, Resource } from './lib/permissions/interfaces';
 import { SpacePermissionConfigurationUpdate } from './lib/permissions/meta/interfaces';
+import { SpacePermissionFlags, SpacePermissionModification } from './lib/permissions/spaces';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -299,8 +300,8 @@ class CharmClient {
     }));
   }
 
-  async getPublicSpaceInfo (spaceId: string): Promise<PublicSpaceInfo> {
-    return http.GET<PublicSpaceInfo>(`/api/spaces/${spaceId}/public`);
+  async getPublicSpaceInfo (spaceId: string): Promise<Space> {
+    return http.GET<Space>(`/api/spaces/${spaceId}/public`);
   }
 
   async getAllBlocks (): Promise<FBBlock[]> {
@@ -394,8 +395,8 @@ class CharmClient {
     updater(fbBlocks);
   }
 
-  listBounties (spaceId: string): Promise<BountyWithDetails[]> {
-    return http.GET('/api/bounties', { spaceId });
+  listBounties (spaceId: string, publicOnly?: boolean): Promise<BountyWithDetails[]> {
+    return http.GET('/api/bounties', { spaceId, publicOnly });
   }
 
   async createBounty (bounty: Partial<Bounty>): Promise<Bounty> {
@@ -484,8 +485,8 @@ class CharmClient {
     });
   }
 
-  async paySubmission (submissionId: string) {
-    return http.POST<Application>(`/api/submissions/${submissionId}/pay`);
+  async markSubmissionAsPaid (submissionId: string) {
+    return http.POST<Application>(`/api/submissions/${submissionId}/mark-as-paid`);
   }
 
   recordTransaction (data: TransactionCreationData) {
@@ -690,6 +691,12 @@ class CharmClient {
     });
   }
 
+  setPublicBountyBoard ({ publicBountyBoard, spaceId }: PublicBountyToggle): Promise<Space> {
+    return http.POST<Space>(`/api/spaces/${spaceId}/set-public-bounty-board`, {
+      publicBountyBoard
+    });
+  }
+
   updatePageSnapshotData (pageId: string, data: Pick<Page, 'snapshotProposalId'>): Promise<IPageWithPermissions> {
     return http.PUT(`/api/pages/${pageId}/snapshot`, data);
   }
@@ -704,6 +711,38 @@ class CharmClient {
 
   getAggregatedData (userPath: string) {
     return http.GET<DeepDaoAggregateData>(`/api/public/profile/${userPath}/aggregate`);
+  }
+
+  getVotesByPage (pageId: string) {
+    return http.GET<ExtendedVote[]>(`/api/pages/${pageId}/votes`);
+  }
+
+  getVotesBySpace (spaceId: string) {
+    return http.GET<ExtendedVote[]>(`/api/spaces/${spaceId}/votes`);
+  }
+
+  createVote (votePayload: VoteDTO) {
+    return http.POST<ExtendedVote>('/api/votes', votePayload);
+  }
+
+  cancelVote (voteId: string) {
+    return http.PUT(`/api/votes/${voteId}`, {
+      status: 'Cancelled'
+    });
+  }
+
+  deleteVote (voteId: string) {
+    return http.DELETE(`/api/votes/${voteId}`);
+  }
+
+  castVote (voteId: string, choice: string) {
+    return http.POST<UserVote>(`/api/votes/${voteId}/cast`, {
+      choice
+    });
+  }
+
+  getUserVotes (voteId: string) {
+    return http.GET<UserVoteExtendedDTO[]>(`/api/votes/${voteId}/user-votes`);
   }
 }
 

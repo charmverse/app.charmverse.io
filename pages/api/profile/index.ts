@@ -2,10 +2,11 @@
 import { prisma } from 'db';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
 import { postToDiscord } from 'lib/log/userEvents';
-import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { getUserProfile } from 'lib/users/getUser';
+import { sessionUserRelations } from 'lib/session/config';
 import { LoggedInUser } from 'models';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -29,7 +30,7 @@ async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
   }
   catch {
     user = await createUserFromWallet(address);
-    logSignup();
+    logSignupViaWallet();
   }
 
   const { discordUser, spaceRoles, telegramUser, ...userData } = user;
@@ -44,21 +45,7 @@ async function getUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser |
     where: {
       id: req.session.user.id
     },
-    include: {
-      favorites: true,
-      spaceRoles: {
-        include: {
-          spaceRoleToRole: {
-            include: {
-              role: true
-            }
-          }
-        }
-      },
-      discordUser: true,
-      telegramUser: true,
-      notificationState: true
-    }
+    include: sessionUserRelations
   });
   if (!profile) {
     return res.status(404).json({ error: 'No user found' });
@@ -72,20 +59,7 @@ async function updateUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
     where: {
       id: req.session.user.id
     },
-    include: {
-      favorites: true,
-      spaceRoles: {
-        include: {
-          spaceRoleToRole: {
-            include: {
-              role: true
-            }
-          }
-        }
-      },
-      discordUser: true,
-      telegramUser: true
-    },
+    include: sessionUserRelations,
     data: {
       ...req.body
     }
@@ -96,10 +70,10 @@ async function updateUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
 
 export default withSessionRoute(handler);
 
-export async function logSignup () {
+export async function logSignupViaWallet () {
   postToDiscord({
     funnelStage: 'acquisition',
     eventType: 'create_user',
-    message: 'A new user has joined Charmverse'
+    message: 'A new user has joined Charmverse using their Web3 wallet'
   });
 }

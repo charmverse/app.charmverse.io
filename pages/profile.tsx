@@ -7,7 +7,7 @@ import { useUser } from 'hooks/useUser';
 
 export default function PublicProfilePage () {
 
-  setTitle('Public Profile');
+  setTitle('My Profile');
 
   const [user, setUser] = useUser();
 
@@ -17,7 +17,7 @@ export default function PublicProfilePage () {
 
   return (
     <>
-      <NexusPageTitle subPage='Public Profile' />
+      <NexusPageTitle subPage='My Profile' />
       <PublicProfile user={user} updateUser={setUser} />
     </>
   );

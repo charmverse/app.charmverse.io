@@ -16,6 +16,7 @@ enum PageType {
   board
   page
   card
+  proposal
 }
 
 enum PermissionLevel {
@@ -33,41 +34,42 @@ enum SpacePermissionConfigurationMode {
 }
 
 model Space {
-  id                         String               @id @default(uuid()) @db.Uuid
-  deletedAt                  DateTime?
-  createdAt                  DateTime             @default(now())
-  author                     User                 @relation(fields: [createdBy], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  createdBy                  String               @db.Uuid
-  updatedAt                  DateTime
-  updatedBy                  String               @db.Uuid
-  name                       String
-  spaceImage                 String?
-  domain                     String               @unique
-  discordServerId            String?
-  snapshotDomain             String?
-  defaultVotingDuration      Int?
-  spaceRoles                 SpaceRole[]
-  permissions                PagePermission[]
-  pages                      Page[]
-  blocks                     Block[]
-  inviteLinks                InviteLink[]
-  bounties                   Bounty[]
-  TokenGate                  TokenGate[]
-  paymentMethods             PaymentMethod[]
-  roles                      Role[]
-  apiToken                   SpaceApiToken?
-  threads                    Thread[]
-  comments                   Comment[]
-  votes                      Vote[]
+  id                          String                            @id @default(uuid()) @db.Uuid
+  deletedAt                   DateTime?
+  createdAt                   DateTime                          @default(now())
+  author                      User                              @relation(fields: [createdBy], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdBy                   String                            @db.Uuid
+  updatedAt                   DateTime
+  updatedBy                   String                            @db.Uuid
+  name                        String
+  spaceImage                  String?
+  domain                      String                            @unique
+  discordServerId             String?
+  snapshotDomain              String?
+  defaultVotingDuration       Int?
+  spaceRoles                  SpaceRole[]
+  permissions                 PagePermission[]
+  pages                       Page[]
+  blocks                      Block[]
+  inviteLinks                 InviteLink[]
+  bounties                    Bounty[]
+  TokenGate                   TokenGate[]
+  paymentMethods              PaymentMethod[]
+  roles                       Role[]
+  apiToken                    SpaceApiToken?
+  threads                     Thread[]
+  comments                    Comment[]
+  votes                       Vote[]
   // Public page settings
   permissionConfigurationMode SpacePermissionConfigurationMode? @default(custom)
   defaultPagePermissionGroup PagePermissionLevel? @default(full_access)
   defaultPublicPages         Boolean ?  @default(false)
+  publicBountyBoard          Boolean?   @default(false)
   // All role, user, space, space permissions for this space
-  permittedGroups            SpacePermission[]    @relation(name: "permittedGroups")
+  permittedGroups             SpacePermission[]                 @relation(name: "permittedGroups")
   // Space permissions this space has (for itself or other spaces => Currently we only allow space level permissions for same space)
-  spacePermissions   SpacePermission[] @relation(name: "spacePermissions")
-  bountyPermissions BountyPermission[]
+  spacePermissions            SpacePermission[]                 @relation(name: "spacePermissions")
+  bountyPermissions           BountyPermission[]
 
 }
 
@@ -141,13 +143,13 @@ enum IdentityType {
 }
 
 model UserVote {
-  voteId      String    @db.Uuid
-  vote        Vote      @relation(fields: [voteId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId      String    @db.Uuid
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @default(now())
-  choice      String
+  voteId    String   @db.Uuid
+  vote      Vote     @relation(fields: [voteId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  choice    String
 
   @@unique([voteId, userId])
 }
@@ -159,30 +161,36 @@ enum VoteStatus {
   Cancelled
 }
 
+enum VoteType {
+  Approval
+  SingleChoice
+}
+
 model VoteOptions {
-  name        String
-  voteId      String    @db.Uuid
-  vote        Vote      @relation(fields: [voteId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  name   String
+  voteId String @db.Uuid
+  vote   Vote   @relation(fields: [voteId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@unique([voteId, name])
 }
 
 model Vote {
-  id            String          @id @default(uuid()) @db.Uuid
-  pageId        String          @db.Uuid
-  page          Page            @relation(fields: [pageId], references: [id], onDelete: Cascade)
-  spaceId       String          @db.Uuid
-  space         Space           @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  author        User            @relation(fields: [createdBy], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  createdBy     String          @db.Uuid
-  title         String
-  threshold     Int
-  description   String?
-  deadline      DateTime
-  status        VoteStatus
-  createdAt     DateTime        @default(now())
-  userVotes     UserVote[]
-  voteOptions   VoteOptions[]
+  id          String        @id @default(uuid()) @db.Uuid
+  pageId      String        @db.Uuid
+  page        Page          @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  spaceId     String        @db.Uuid
+  space       Space         @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  author      User          @relation(fields: [createdBy], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdBy   String        @db.Uuid
+  title       String
+  threshold   Int
+  description String?
+  deadline    DateTime
+  status      VoteStatus
+  type        VoteType      @default(SingleChoice)
+  createdAt   DateTime      @default(now())
+  userVotes   UserVote[]
+  voteOptions VoteOptions[]
 }
 
 model User {
@@ -230,6 +238,7 @@ model UserNotificationState {
 enum NotificationType {
   multisig
   mention
+  vote
 }
 
 model UserNotification {
@@ -314,10 +323,6 @@ model InviteLink {
   useCount      Int      @default(0)
 }
 
-
-
-
-
 enum BountyStatus {
   suggestion
   open
@@ -327,25 +332,24 @@ enum BountyStatus {
 }
 
 model Bounty {
-  id                String        @id @default(uuid()) @db.Uuid
-  author            User          @relation(fields: [createdBy], references: [id])
-  createdBy         String        @db.Uuid()
-  suggestedBy       String?       @db.Uuid()
-  space             Space         @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  spaceId           String        @db.Uuid
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @default(now())
+  id                String             @id @default(uuid()) @db.Uuid
+  author            User               @relation(fields: [createdBy], references: [id])
+  createdBy         String             @db.Uuid()
+  suggestedBy       String?            @db.Uuid()
+  space             Space              @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  spaceId           String             @db.Uuid
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @default(now())
   description       String
   descriptionNodes  Json
-  reviewer          String?       @db.Uuid
   chainId           Int
   rewardAmount      Float
   rewardToken       String
-  status            BountyStatus  @default(open)
+  status            BountyStatus       @default(open)
   title             String
-  linkedTaskId      String?       @db.Uuid
-  approveSubmitters Boolean       @default(false)
-  maxSubmissions    Int?          @default(1)
+  linkedTaskId      String?            @db.Uuid
+  approveSubmitters Boolean            @default(false)
+  maxSubmissions    Int?               @default(1)
   applications      Application[]
   permissions       BountyPermission[]
 }
@@ -362,7 +366,6 @@ enum BountyOperation {
   grant_permissions
 }
 
-
 enum BountyPermissionLevel {
   reviewer
   creator
@@ -370,31 +373,28 @@ enum BountyPermissionLevel {
   viewer
 }
 
-
 model BountyPermission {
-  id                      String              @id @default(uuid()) @db.Uuid
+  id              String                @id @default(uuid()) @db.Uuid
   // Ways a permission can be accessed (pick one)
-  userId                  String?             @db.Uuid
-  user                    User?               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  spaceId                 String?             @db.Uuid
-  space                   Space?              @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  roleId                  String?             @db.Uuid
-  role                    Role?               @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  userId          String?               @db.Uuid
+  user            User?                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  spaceId         String?               @db.Uuid
+  space           Space?                @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  roleId          String?               @db.Uuid
+  role            Role?                 @relation(fields: [roleId], references: [id], onDelete: Cascade)
   // Should be only null or true
-  public                  Boolean?
-  bountyId                String              @db.Uuid
-  bounty                  Bounty              @relation(fields: [bountyId], references: [id], onDelete: Cascade)
-  permissionLevel         BountyPermissionLevel
+  public          Boolean?
+  bountyId        String                @db.Uuid
+  bounty          Bounty                @relation(fields: [bountyId], references: [id], onDelete: Cascade)
+  permissionLevel BountyPermissionLevel
   // For now, our implementation only needs permissionLevel. Adding this reference so the enum is not dropped by Prisma client
-  operations              BountyOperation[]   
+  operations      BountyOperation[]
 
   @@unique([userId, bountyId, permissionLevel], name: "userId_bountyId_permissionLevel")
   @@unique([roleId, bountyId, permissionLevel], name: "roleId_bountyId_permissionLevel")
   @@unique([spaceId, bountyId, permissionLevel], name: "spaceId_bountyId_permissionLevel")
   @@unique([public, bountyId, permissionLevel], name: "public_bountyId_permissionLevel")
 }
-
-
 
 enum ApplicationStatus {
   applied
@@ -492,16 +492,16 @@ enum RoleSource {
 }
 
 model Role {
-  id               String            @id @default(uuid()) @db.Uuid
-  createdAt        DateTime          @default(now())
-  createdBy        String            @db.Uuid()
-  name             String
-  spaceId          String            @db.Uuid
-  space            Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  spaceRolesToRole SpaceRoleToRole[]
-  permissions      PagePermission[]
-  source           RoleSource?
-  sourceId         String?
+  id                String             @id @default(uuid()) @db.Uuid
+  createdAt         DateTime           @default(now())
+  createdBy         String             @db.Uuid()
+  name              String
+  spaceId           String             @db.Uuid
+  space             Space              @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  spaceRolesToRole  SpaceRoleToRole[]
+  permissions       PagePermission[]
+  source            RoleSource?
+  sourceId          String?
   spacePermissions  SpacePermission[]
   bountyPermissions BountyPermission[]
 
@@ -586,31 +586,30 @@ model PagePermission {
   @@unique([public, pageId], name: "public_pageId")
 }
 
-
 enum SpaceOperation {
   createPage
   createBounty
+  createVote
 }
 
 model SpacePermission {
-  id            String    @id @default(uuid()) @db.Uuid
-  createdAt DateTime  @default(now())
-  operations    SpaceOperation[]
-  forSpaceId    String    @db.Uuid
-  forSpace      Space     @relation(fields: [forSpaceId], references: [id], onDelete: Cascade, name: "permittedGroups")
+  id         String           @id @default(uuid()) @db.Uuid
+  createdAt  DateTime         @default(now())
+  operations SpaceOperation[]
+  forSpaceId String           @db.Uuid
+  forSpace   Space            @relation(fields: [forSpaceId], references: [id], onDelete: Cascade, name: "permittedGroups")
   // Linkable groups
-  roleId        String?   @db.Uuid
-  role          Role?     @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  spaceId       String?   @db.Uuid
-  space         Space?    @relation(fields: [spaceId], references: [id], onDelete: Cascade, name: "spacePermissions")
-  userId        String?    @db.Uuid
-  user          User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roleId     String?          @db.Uuid
+  role       Role?            @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  spaceId    String?          @db.Uuid
+  space      Space?           @relation(fields: [spaceId], references: [id], onDelete: Cascade, name: "spacePermissions")
+  userId     String?          @db.Uuid
+  user       User?            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, forSpaceId], name: "userId_forSpaceId")
   @@unique([roleId, forSpaceId], name: "roleId_forSpaceId")
   @@unique([spaceId, forSpaceId], name: "spaceId_forSpaceId")
 }
-
 
 model Thread {
   id        String    @id @default(uuid()) @db.Uuid
@@ -641,4 +640,3 @@ model Comment {
   space     Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   updatedAt DateTime?
 }
-

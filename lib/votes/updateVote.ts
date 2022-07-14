@@ -1,11 +1,10 @@
 import { prisma } from 'db';
 import { Vote } from '@prisma/client';
-import { DataNotFoundError, UndesirableOperationError } from 'lib/utilities/errors';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
+import { DataNotFoundError, UndesirableOperationError, UnauthorisedActionError } from 'lib/utilities/errors';
+import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { VoteStatusType, VOTE_STATUS } from './interfaces';
 
 export async function updateVote (id: string, userId: string, status: VoteStatusType): Promise<Vote> {
-
   const existingVote = await prisma.vote.findUnique({
     where: {
       id
@@ -17,18 +16,22 @@ export async function updateVote (id: string, userId: string, status: VoteStatus
   }
 
   // If vote has a Cancelled status, it can't be updated.
-  if (existingVote.status === VOTE_STATUS[3]) {
-    throw new UndesirableOperationError(`Vote with id: ${id} has been cancelled and cannot be updated.`);
+  if (existingVote.status !== VOTE_STATUS[0]) {
+    throw new UndesirableOperationError('Only in progress votes can be updated.');
   }
 
-  const { error } = await hasAccessToSpace({
-    userId,
-    spaceId: existingVote.spaceId,
-    adminOnly: true
-  });
+  // If vote has a Cancelled status, it can't be updated.
+  if (status !== VOTE_STATUS[3]) {
+    throw new UndesirableOperationError('Votes can only be cancelled.');
+  }
 
-  if (error) {
-    throw error;
+  const userPermissions = await computeSpacePermissions({
+    allowAdminBypass: true,
+    resourceId: existingVote.spaceId,
+    userId
+  });
+  if (!userPermissions.createVote) {
+    throw new UnauthorisedActionError('You do not have permissions to update the vote.');
   }
 
   const updatedVote = await prisma.vote.update({
@@ -40,7 +43,11 @@ export async function updateVote (id: string, userId: string, status: VoteStatus
     },
     include: {
       voteOptions: true,
-      userVotes: true
+      userVotes: {
+        include: {
+          user: true
+        }
+      }
     }
   });
 

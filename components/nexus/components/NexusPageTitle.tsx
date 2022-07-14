@@ -28,17 +28,17 @@ export default function PageTitle ({ subPage }: { subPage?: string }) {
       }}
     >
       {subPage ? (
-        <Box component='span' alignItems='center' sx={{ fontWeight: 'bold' }}>
-          {subPage}
+        <Box component='span' alignItems='center'>
+          <strong>{subPage}</strong>
         </Box>
       )
         : (
           <Box display='flex' justifyContent='space-between' width='100%' alignItems='center'>
-            <Box component='span' sx={{ fontWeight: 'bold' }}>{MyNexus}</Box>
+            <strong>{MyNexus}</strong>
             <Tooltip arrow placement='top' title={account ? 'User cant be logged out so long as their wallet is connected' : ''}>
               <Box display='flex' justifyContent='flex-end' mt={2}>
                 <Button
-                  disabled={account}
+                  disabled={Boolean(account)}
                   variant='outlined'
                   color='secondary'
                   loading={isLoggingOut}

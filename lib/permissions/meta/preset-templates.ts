@@ -5,33 +5,39 @@ import { spaceOperationLabels } from '../spaces/mapping';
 const readOnly: SpacePermissionTemplate = {
   spaceOperations: {
     createBounty: false,
-    createPage: false
+    createPage: false,
+    createVote: false
   },
   pagePermissionDefaults: {
     defaultPagePermissionGroup: 'view',
-    defaultPublicPages: false
+    defaultPublicPages: false,
+    publicBountyBoard: false
   }
 };
 
 const collaborative: SpacePermissionTemplate = {
   spaceOperations: {
     createPage: true,
-    createBounty: true
+    createBounty: true,
+    createVote: true
   },
   pagePermissionDefaults: {
     defaultPagePermissionGroup: 'full_access',
-    defaultPublicPages: false
+    defaultPublicPages: false,
+    publicBountyBoard: false
   }
 };
 
 const open: SpacePermissionTemplate = {
   spaceOperations: {
     createPage: true,
-    createBounty: true
+    createBounty: true,
+    createVote: true
   },
   pagePermissionDefaults: {
     defaultPagePermissionGroup: 'full_access',
-    defaultPublicPages: true
+    defaultPublicPages: true,
+    publicBountyBoard: true
   }
 };
 
@@ -82,9 +88,9 @@ export function getTemplateExplanation (template: SpacePermissionConfigurationMo
     }
   }
 
+  // Explain the default page permission
   const { defaultPagePermissionGroup } = templateData.pagePermissionDefaults;
 
-  // Handle page permission defaults
   if (defaultPagePermissionGroup === 'full_access') {
     canAndCannot[0].push('Workspace members can view, edit, comment on, share and delete new top-level pages by default.');
   }
@@ -102,6 +108,7 @@ export function getTemplateExplanation (template: SpacePermissionConfigurationMo
     canAndCannot[1].push('Workspace members cannot comment on, edit, share or delete new top-level pages by default.');
   }
 
+  // Explain if new top level pages will be public
   const { defaultPublicPages } = templateData.pagePermissionDefaults;
 
   if (defaultPublicPages) {
@@ -109,6 +116,16 @@ export function getTemplateExplanation (template: SpacePermissionConfigurationMo
   }
   else {
     canAndCannot[1].push('Anyone outside the workspace cannot see new top-level pages by default.');
+  }
+
+  // Explain the status of the bounty board
+  const { publicBountyBoard } = templateData.pagePermissionDefaults;
+
+  if (publicBountyBoard) {
+    canAndCannot[0].push('Anyone can see bounties and bounty suggestions visible to workspace members.');
+  }
+  else {
+    canAndCannot[1].push('Anyone outside the workspace cannot see bounties and bounty suggestions.');
   }
 
   return canAndCannot;

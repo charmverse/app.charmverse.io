@@ -1,5 +1,5 @@
 
-import { Box, Divider, Grid, Tab, Tabs, Typography } from '@mui/material';
+import { Box, Divider, Grid, Tab, Tabs, Typography, Badge } from '@mui/material';
 import KeyIcon from '@mui/icons-material/Key';
 import ForumIcon from '@mui/icons-material/Forum';
 import styled from '@emotion/styled';
@@ -7,6 +7,8 @@ import { useRouter } from 'next/router';
 import { silentlyUpdateURL } from 'lib/browser';
 import { useState } from 'react';
 import { useTheme } from '@emotion/react';
+import HowToVoteIcon from '@mui/icons-material/HowToVote';
+import { useUser } from 'hooks/useUser';
 import GnosisTasksList from './GnosisTasksList';
 import MentionedTasksList from './MentionedTasksList';
 import TasksPageHeader from './TasksPageHeader';
@@ -14,6 +16,7 @@ import NexusPageTitle from './components/NexusPageTitle';
 import NotifyMeButton from './components/NotifyMeButton';
 import SnoozeButton from './components/SnoozeButton';
 import useTasks from './hooks/useTasks';
+import { VoteTasksList } from './VoteTasksList';
 
 const tabStyles = {
   mb: 2,
@@ -37,23 +40,36 @@ const tabStyles = {
   }
 };
 
-const TASK_TABS = [
-  { icon: <KeyIcon />, label: 'Multisig', type: 'multisig' },
-  // { icon: <BountyIcon />, label: 'Bounty', type: 'bounty' },
-  // { icon: <HowToVoteIcon />, label: 'Proposal', type: 'proposal' },
-  { icon: <ForumIcon />, label: 'Discussion', type: 'discussion' }
-] as const;
-
 const StyledTypography = styled(Typography)`
   font-size: 24px;
   font-weight: bold;
 `;
 
+const TASK_TABS = [
+  { icon: <KeyIcon />, label: 'Multisig', type: 'multisig' },
+  // { icon: <BountyIcon />, label: 'Bounty', type: 'bounty' },
+  { icon: <HowToVoteIcon />, label: 'Votes', type: 'vote' },
+  { icon: <ForumIcon />, label: 'Discussion', type: 'discussion' }
+] as const;
+
 export default function TasksPage () {
   const router = useRouter();
+  const [user] = useUser();
   const [currentTask, setCurrentTask] = useState(router.query?.task ?? 'multisig');
   const { error, mutate: mutateTasks, tasks } = useTasks();
   const theme = useTheme();
+
+  const userNotificationState = user?.notificationState;
+  const hasSnoozedNotifications = userNotificationState
+    && userNotificationState.snoozedUntil
+    && new Date(userNotificationState.snoozedUntil) > new Date();
+
+  const notificationCount: Record<(typeof TASK_TABS)[number]['type'], number> = {
+    multisig: (tasks && !hasSnoozedNotifications) ? tasks.gnosis.length : 0,
+    vote: tasks ? tasks.votes.length : 0,
+    discussion: tasks ? tasks.mentioned.unmarked.length : 0
+  };
+
   return (
     <>
       <NexusPageTitle />
@@ -91,11 +107,23 @@ export default function TasksPage () {
               fontSize: 14,
               minHeight: 0,
               '&.MuiTab-root': {
-                opacity: 0.75,
-                color: theme.palette.textPrimary.main
+                color: theme.palette.secondary.main
               }
             }}
-            label={task.label}
+            label={(
+              <Badge
+                sx={{
+                  '& .MuiBadge-badge': {
+                    right: '-3px'
+                  }
+                }}
+                invisible={notificationCount[task.type] === 0}
+                color='error'
+                variant='dot'
+              >
+                {task.label}
+              </Badge>
+            )}
             onClick={() => {
               silentlyUpdateURL(`${window.location.origin}/nexus?task=${task.type}`);
               setCurrentTask(task.type);
@@ -103,7 +131,7 @@ export default function TasksPage () {
           />
         ))}
       </Tabs>
-      {currentTask === 'multisig' ? <GnosisTasksList error={error} mutateTasks={mutateTasks} tasks={tasks} /> : currentTask === 'discussion' ? <MentionedTasksList mutateTasks={mutateTasks} error={error} tasks={tasks} /> : null}
+      {currentTask === 'multisig' ? <GnosisTasksList error={error} mutateTasks={mutateTasks} tasks={tasks} /> : currentTask === 'discussion' ? <MentionedTasksList mutateTasks={mutateTasks} error={error} tasks={tasks} /> : currentTask === 'vote' ? <VoteTasksList mutateTasks={mutateTasks} error={error} tasks={tasks} /> : null}
     </>
   );
 }

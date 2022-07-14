@@ -1,4 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import { Divider } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Grid from '@mui/material/Grid';
@@ -119,7 +120,7 @@ function FormDescription ({ onContentChange, content, watch }:
         Description
       </InputLabel>
       <CharmEditor
-        disabledPageSpecificFeatures
+        disablePageSpecificFeatures
         content={content}
         onContentChange={onContentChange}
       />
@@ -352,9 +353,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
           rewardToken: value.rewardToken,
           descriptionNodes: value.descriptionNodes,
           description: value.description,
-          reviewer: value.reviewer,
           chainId: value.chainId,
-          //
           approveSubmitters: value.approveSubmitters === null ? undefined : value.approveSubmitters,
           maxSubmissions: value.capSubmissions === false ? null : value.maxSubmissions,
           permissions: permissionsToSet
@@ -526,8 +525,11 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
                     />
                   </Grid>
                 </Grid>
-
-                <hr />
+                <Grid container item>
+                  <Grid item xs={12}>
+                    <Divider />
+                  </Grid>
+                </Grid>
 
                 {/* New options */}
 

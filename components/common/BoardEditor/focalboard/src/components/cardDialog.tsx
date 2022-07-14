@@ -154,7 +154,6 @@ const CardDialog = (props: Props): JSX.Element | null => {
                     </Button>
                   )
                 }
-                // toolbar={toolbar}
             >
                 {card && card.fields.isTemplate &&
                     <div className='banner'>

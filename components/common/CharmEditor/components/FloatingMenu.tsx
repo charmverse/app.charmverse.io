@@ -6,35 +6,43 @@ import { hasComponentInSchema } from '@bangle.dev/react-menu/helper';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
+import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { NodeSelection } from 'prosemirror-state';
+import { SubMenu } from './@bangle.dev/react-menu/floating-menu';
 import { LinkSubMenu } from './@bangle.dev/react-menu/LinkSubMenu';
 import { Menu } from './@bangle.dev/react-menu/Menu';
-import { BoldButton, CalloutButton, CodeButton, InlineCommentButton, FloatingLinkButton, HeadingButton, ItalicButton, ParagraphButton, StrikeButton, UnderlineButton } from './@bangle.dev/react-menu/MenuButtons';
+import { BoldButton, CalloutButton, CodeButton, InlineCommentButton, FloatingLinkButton, HeadingButton, ItalicButton, ParagraphButton, StrikeButton, UnderlineButton, InlineVoteButton } from './@bangle.dev/react-menu/MenuButtons';
 import { MenuGroup } from './@bangle.dev/react-menu/MenuGroup';
 import { queryIsSelectionAroundInlineComment } from './inlineComment';
 import { InlineCommentSubMenu } from './inlineComment/InlineComment.components';
+import { markName as inlineCommentMarkName } from './inlineComment/inlineComment.constants';
+import { queryIsSelectionAroundInlineVote } from './inlineVote';
+import InlineVoteSubMenu from './inlineVote/components/InlineVoteSubmenu';
+import { markName as inlineVoteMarkName } from './inlineVote/inlineVote.constants';
 
 export type FloatingMenuVariant = 'defaultMenu' | 'linkSubMenu' | 'inlineCommentSubMenu' | 'commentOnlyMenu';
 
 export default function FloatingMenuComponent (
   {
-    pluginKey, enableComments = true, inline = false }:
-    {enableComments?: boolean, pluginKey: PluginKey, inline?: boolean
+    pluginKey, enableComments = true, enableVoting = false, inline = false }:
+    {enableComments?: boolean, enableVoting?: boolean, pluginKey: PluginKey, inline?: boolean
   }
 ) {
   const { showMessage } = useSnackbar();
   const { getPagePermissions, currentPageId } = usePages();
   const permissions = currentPageId ? getPagePermissions(currentPageId) : new AllowedPagePermissions();
+  const [currentUserPermissions] = useCurrentSpacePermissions();
+  const displayInlineCommentButton = !inline && permissions.comment && enableComments;
 
+  const displayInlineVoteButton = !inline && permissions.comment && currentUserPermissions?.createVote && enableVoting;
   return (
     <FloatingMenu
       menuKey={pluginKey}
-      renderMenuType={({ type }) => {
-
+      renderMenuType={(menuType) => {
+        const { type } = menuType as {type: SubMenu};
         if (type as FloatingMenuVariant === 'commentOnlyMenu' && permissions.comment) {
           return (
             <Menu>
-
               <InlineCommentButton enableComments menuKey={pluginKey} />
             </Menu>
           );
@@ -50,7 +58,8 @@ export default function FloatingMenuComponent (
                 <StrikeButton />
                 <UnderlineButton />
                 <FloatingLinkButton menuKey={pluginKey} />
-                {!inline && permissions.comment && enableComments && <InlineCommentButton enableComments menuKey={pluginKey} />}
+                {displayInlineCommentButton && <InlineCommentButton enableComments menuKey={pluginKey} />}
+                {displayInlineVoteButton && <InlineVoteButton enableVotes menuKey={pluginKey} />}
               </MenuGroup>
               {!inline && (
               <MenuGroup isLastGroup>
@@ -75,6 +84,14 @@ export default function FloatingMenuComponent (
           return (
             <Menu>
               <InlineCommentSubMenu pluginKey={pluginKey} />
+            </Menu>
+          );
+        }
+
+        if (type === 'inlineVoteSubMenu' && !inline) {
+          return (
+            <Menu>
+              <InlineVoteSubMenu pluginKey={pluginKey} />
             </Menu>
           );
         }
@@ -105,9 +122,16 @@ export function floatingMenuPlugin ({ key, readOnly, enableComments = true }:{ke
       }
 
       // If we are inside an inline comment
-      if (hasComponentInSchema(state, 'inline-comment')) {
+      if (hasComponentInSchema(state, inlineCommentMarkName)) {
         if (queryIsSelectionAroundInlineComment()(state)) {
           return 'inlineCommentSubMenu';
+        }
+      }
+
+      // If we are inside an inline vote
+      if (hasComponentInSchema(state, inlineVoteMarkName)) {
+        if (queryIsSelectionAroundInlineVote()(state)) {
+          return 'inlineVoteSubMenu';
         }
       }
 

@@ -11,7 +11,7 @@ import nc from 'next-connect';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
-  .use(requireKeys<Page>(['snapshotProposalId'], 'body', ['snapshotProposalId']))
+  .use(requireKeys<Page>(['snapshotProposalId'], 'body'))
   .put(recordSnapshotInfo);
 
 async function recordSnapshotInfo (req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {

@@ -27,7 +27,7 @@ import { AssignedBountyPermissions } from 'lib/bounties';
 
 const menuPosition: Partial<MenuProps> = {
   anchorOrigin: {
-    horizontal: 'right',
+    horizontal: 'left',
     vertical: 'bottom'
   },
   transformOrigin: {
@@ -99,19 +99,17 @@ export default function BountyHeader ({ bounty, permissions, refreshBountyPermis
             sx={{
               display: 'flex',
               alignItems: 'center',
-              fontSize: '40px',
-              fontWeight: 700,
               gap: 1
             }}
           >
-            <Box component='span'>
+            <strong>
               {bounty.title}
-            </Box>
+            </strong>
             {/* Provide the bounty menu options */}
             {
           (canDeleteBounty || permissions?.userPermissions?.edit || permissions?.userPermissions?.lock) && (
             <>
-              <IconButton {...bindTrigger(popupState)}>
+              <IconButton size='small' {...bindTrigger(popupState)}>
                 <MoreHorizIcon color='secondary' />
               </IconButton>
 
@@ -119,7 +117,6 @@ export default function BountyHeader ({ bounty, permissions, refreshBountyPermis
                 {...bindMenu(popupState)}
                 {...menuPosition}
               >
-
                 {
                   permissions.userPermissions.edit && (
                     <Tooltip arrow placement='right' title={`Edit bounty ${bounty.status === 'suggestion' ? 'suggestion' : ''}`}>

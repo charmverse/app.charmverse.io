@@ -1,25 +1,25 @@
 import { Vote } from '@prisma/client';
 import log from 'lib/log';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
+import { UnauthorisedActionError } from 'lib/utilities/errors';
+import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { prisma } from 'db';
 import { getVote } from './getVote';
 
 export async function deleteVote (id: string, userId: string): Promise<Vote | null> {
-  const vote: Vote | null = await getVote(id);
+  const vote: Vote | null = await getVote(id, userId);
 
   if (!vote) {
     log.warn(`Attempt to delete a non-existing vote with id: ${id}`);
     return null;
   }
 
-  const { error } = await hasAccessToSpace({
-    userId,
-    spaceId: vote.spaceId,
-    adminOnly: true
+  const userPermissions = await computeSpacePermissions({
+    allowAdminBypass: true,
+    resourceId: vote.spaceId,
+    userId
   });
-
-  if (error) {
-    throw error;
+  if (!userPermissions.createVote) {
+    throw new UnauthorisedActionError('You do not have permissions to delete the vote.');
   }
 
   return prisma.vote.delete({

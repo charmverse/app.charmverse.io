@@ -2,6 +2,8 @@ import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
+import { prisma } from 'db';
+import { Space } from '@prisma/client';
 import { computeGroupSpacePermissions } from '../../spaces/computeGroupSpacePermissions';
 import { updateSpacePermissionConfigurationMode } from '../updateSpacePermissionConfigurationMode';
 
@@ -40,6 +42,17 @@ describe('updateSpacePermissionConfigurationMode', () => {
     expect(spacePermissions.createBounty).toBe(false);
     expect(spacePermissions.createPage).toBe(false);
 
+    const { publicBountyBoard } = (await prisma.space.findUnique({
+      where: {
+        id: space.id
+      },
+      select: {
+        publicBountyBoard: true
+      }
+    }) as Space);
+
+    expect(publicBountyBoard).toBe(false);
+
   });
 
   it('should update individual settings to match the collaborative template', async () => {
@@ -62,6 +75,17 @@ describe('updateSpacePermissionConfigurationMode', () => {
 
     expect(spacePermissions.createBounty).toBe(true);
     expect(spacePermissions.createPage).toBe(true);
+
+    const { publicBountyBoard } = (await prisma.space.findUnique({
+      where: {
+        id: space.id
+      },
+      select: {
+        publicBountyBoard: true
+      }
+    }) as Space);
+
+    expect(publicBountyBoard).toBe(false);
   });
 
   it('should update individual settings to match the public template', async () => {
@@ -84,6 +108,17 @@ describe('updateSpacePermissionConfigurationMode', () => {
 
     expect(spacePermissions.createBounty).toBe(true);
     expect(spacePermissions.createPage).toBe(true);
+
+    const { publicBountyBoard } = (await prisma.space.findUnique({
+      where: {
+        id: space.id
+      },
+      select: {
+        publicBountyBoard: true
+      }
+    }) as Space);
+
+    expect(publicBountyBoard).toBe(true);
   });
 
   it('should fail if the new mode is invalid', async () => {

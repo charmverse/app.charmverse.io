@@ -112,7 +112,7 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
                 <span>Included Roles</span>
               </Tooltip>
             </TableCell>
-            <TableCell></TableCell>
+            <TableCell />
           </TableRow>
         </TableHead>
         <TableBody>

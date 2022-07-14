@@ -5,10 +5,10 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import {
   getVote as getVoteService,
   updateVote as updateVoteService,
-  deleteVote as deleteVoteService,
-  UpdateVoteDTO
+  deleteVote as deleteVoteService
 } from 'lib/votes';
 import nc from 'next-connect';
+import { UpdateVoteDTO } from 'lib/votes/interfaces';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -20,7 +20,7 @@ handler
 
 async function getVote (req: NextApiRequest, res: NextApiResponse<Vote | { error: any }>) {
   const voteId = req.query.id as string;
-  const vote = await getVoteService(voteId);
+  const vote = await getVoteService(voteId, req.session.user.id);
   if (!vote) {
     return res.status(404).json({ error: 'No vote found' });
   }

@@ -1,14 +1,16 @@
-import { Box, BoxProps, List, MenuItem, Select, SelectProps, Typography } from '@mui/material';
-import PageThread from 'components/common/CharmEditor/components/PageThread';
-import { useThreads } from 'hooks/useThreads';
-import { useEffect, useState } from 'react';
-import styled from '@emotion/styled';
-import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
-import { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
-import { useUser } from 'hooks/useUser';
 import { useEditorViewContext } from '@bangle.dev/react';
+import styled from '@emotion/styled';
+import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
+import { Box, BoxProps, InputLabel, List, MenuItem, Select, SelectProps, Typography } from '@mui/material';
+import PageThread from 'components/common/CharmEditor/components/PageThread';
+import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
+import { useThreads } from 'hooks/useThreads';
+import { useUser } from 'hooks/useUser';
+import { highlightDomElement, silentlyUpdateURL } from 'lib/browser';
 import { findTotalInlineComments } from 'lib/inline-comments/findTotalInlineComments';
-import { silentlyUpdateURL } from 'lib/browser';
+import { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
+import { useEffect, useState } from 'react';
+import PageActionToggle from './PageActionToggle';
 
 const Center = styled.div`
   position: absolute;
@@ -77,6 +79,8 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
     setThreadSort(event.target.value as any);
   };
 
+  const { setCurrentPageActionDisplay } = usePageActionDisplay();
+
   let threadList: ThreadWithCommentsAndAuthors[] = [];
   if (threadFilter === 'resolved') {
     threadList = resolvedThreads;
@@ -113,6 +117,7 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
   }
 
   useEffect(() => {
+    // Highlight the comment id when navigation from nexus mentioned tasks list tab
     const highlightedCommentId = (new URLSearchParams(window.location.search)).get('commentId');
     if (highlightedCommentId) {
       const highlightedComment = getCommentFromThreads(allThreads, highlightedCommentId);
@@ -120,6 +125,7 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
         const highlightedCommentDomNode = document.getElementById(`comment.${highlightedComment.id}`);
         if (highlightedCommentDomNode) {
           setTimeout(() => {
+            setCurrentPageActionDisplay('comments');
             setThreadFilter('all');
             // Remove query parameters from url
             silentlyUpdateURL(window.location.href.split('?')[0]);
@@ -127,6 +133,11 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
               highlightedCommentDomNode.scrollIntoView({
                 behavior: 'smooth'
               });
+              setTimeout(() => {
+                requestAnimationFrame(() => {
+                  highlightDomElement(highlightedCommentDomNode);
+                });
+              }, 250);
             });
           }, 250);
         }
@@ -136,34 +147,40 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
 
   return (
     <StyledPageThreadsBox
-      // The className is used to refer to it using regular dom api
+      // The className is used to access it using regular dom api
       className='PageThreadsList'
       {...props}
       sx={{
-        ...(sx ?? {})
+        ...(sx ?? {}),
+        display: 'flex',
+        gap: 1,
+        flexDirection: 'column'
       }}
     >
-      <Box display='flex' alignItems='center' justifyContent='space-between' mb={1}>
+      <Box display='flex' gap={1}>
+        <PageActionToggle />
         <Typography fontWeight={600} fontSize={20}>Comments</Typography>
-        <Box display='flex' gap={1}>
-          <Select variant='outlined' value={threadFilter} onChange={handleThreadClassChange}>
-            <MenuItem value='open'>Open</MenuItem>
-            <MenuItem value='resolved'>Resolved</MenuItem>
-            <MenuItem value='you'>For you</MenuItem>
-            <MenuItem value='all'>All</MenuItem>
-          </Select>
-          <Select variant='outlined' value={threadSort} onChange={handleThreadListSortChange}>
-            <MenuItem value='position'>Position</MenuItem>
-            <MenuItem value='latest'>Latest</MenuItem>
-            <MenuItem value='earliest'>Earliest</MenuItem>
-          </Select>
-        </Box>
+      </Box>
+      <Box display='flex' alignItems='center' gap={1}>
+        <InputLabel>Sort</InputLabel>
+        <Select variant='outlined' value={threadSort} onChange={handleThreadListSortChange}>
+          <MenuItem value='position'>Position</MenuItem>
+          <MenuItem value='latest'>Latest</MenuItem>
+          <MenuItem value='earliest'>Earliest</MenuItem>
+        </Select>
+        <InputLabel>Filter</InputLabel>
+        <Select variant='outlined' value={threadFilter} onChange={handleThreadClassChange}>
+          <MenuItem value='open'>Open</MenuItem>
+          <MenuItem value='resolved'>Resolved</MenuItem>
+          <MenuItem value='you'>For you</MenuItem>
+          <MenuItem value='all'>All</MenuItem>
+        </Select>
       </Box>
       <StyledPageThreadsList>
         {sortedThreadList.length === 0 ? (
           <EmptyThreadContainerBox>
             <Center>
-              <ForumOutlinedIcon
+              <CommentOutlinedIcon
                 fontSize='large'
                 color='secondary'
                 sx={{

@@ -1,13 +1,10 @@
 
-import { PagePermissionLevel, Space } from '@prisma/client';
-import { hasAccessToSpace, onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
+import { Space } from '@prisma/client';
+import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
+import { SpacePermissionConfigurationUpdate, updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import { withSessionRoute } from 'lib/session/withSession';
-import { setSpaceDefaultPagePermission } from 'lib/spaces/setSpaceDefaultPagePermission';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { SpaceDefaultPublicPageToggle } from 'lib/permissions/pages';
-import { toggleSpaceDefaultPublicPage } from 'lib/permissions/pages/actions/toggleSpaceDefaultPublicPage';
-import { SpacePermissionConfigurationUpdate, updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

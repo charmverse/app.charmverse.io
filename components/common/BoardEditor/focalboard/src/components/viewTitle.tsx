@@ -124,7 +124,7 @@ const ViewTitle = React.memo((props: Props) => {
 
             {board.fields.showDescription &&
                 <div className='description'>
-                    <CharmEditor disabledPageSpecificFeatures content={board.fields.description} onContentChange={(content: ICharmEditorOutput) => {
+                    <CharmEditor disablePageSpecificFeatures content={board.fields.description} onContentChange={(content: ICharmEditorOutput) => {
                       onDescriptionChange(content.doc)
                     }} />
                 </div>

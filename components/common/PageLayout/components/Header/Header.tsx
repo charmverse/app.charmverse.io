@@ -1,14 +1,16 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import CommentIcon from '@mui/icons-material/Comment';
+import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
 import MoonIcon from '@mui/icons-material/DarkMode';
 import GetAppIcon from '@mui/icons-material/GetApp';
+import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import SunIcon from '@mui/icons-material/WbSunny';
-import { Divider, FormControlLabel, Switch } from '@mui/material';
+import { Divider, FormControlLabel, Switch, Typography } from '@mui/material';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
@@ -19,17 +21,22 @@ import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import { Page } from '@prisma/client';
 import charmClient from 'charmClient';
-import PublishToSnapshot from 'components/common/PageLayout/components/Header/snapshot/PublishToSnapshot';
+import PublishToSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/PublishToSnapshot';
 import { useColorMode } from 'context/darkMode';
-import { useCommentThreadsListDisplay } from 'hooks/useCommentThreadsListDisplay';
+import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
 import { useRouter } from 'next/router';
 import { useRef, useState } from 'react';
+import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
+import { useVotes } from 'hooks/useVotes';
+import CreateVoteModal from 'components/votes/components/CreateVoteModal';
 import Account from '../Account';
 import ShareButton from '../ShareButton';
-import PageTitleWithBreadcrumbs from './PageTitleWithBreadcrumbs';
+import BountyShareButton from './BountyShareButton/BountyShareButton';
+import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
+import NotificationsBadge from './components/NotificationsBadge';
 
 export const headerHeight = 56;
 
@@ -38,25 +45,6 @@ export const StyledToolbar = styled(Toolbar)`
   height: ${headerHeight}px;
   min-height: ${headerHeight}px;
 `;
-
-function CommentThreadsListButton () {
-  const { showingCommentThreadsList, setShowingCommentThreadsList } = useCommentThreadsListDisplay();
-  return (
-    <Tooltip title={`${showingCommentThreadsList ? 'Hide' : 'Show'} comment threads`} arrow placement='bottom'>
-      <IconButton
-        color={!showingCommentThreadsList ? 'secondary' : 'inherit'}
-        onClick={() => {
-          setShowingCommentThreadsList(!showingCommentThreadsList);
-        }}
-        sx={showingCommentThreadsList ? { backgroundColor: 'emoji.hoverBackground' } : {}}
-      >
-        <CommentIcon
-          fontSize='small'
-        />
-      </IconButton>
-    </Tooltip>
-  );
-}
 
 interface HeaderProps {
   open: boolean;
@@ -70,15 +58,21 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
   const { pages, currentPageId, setPages } = usePages();
   const [user, setUser] = useUser();
   const theme = useTheme();
+  const { createVote } = useVotes();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
   const [pageMenuAnchorElement, setPageMenuAnchorElement] = useState<null | Element>(null);
   const pageMenuAnchor = useRef();
   const currentPage = currentPageId ? pages[currentPageId] : undefined;
   const isFavorite = currentPage && user?.favorites.some(({ pageId }) => pageId === currentPage.id);
+  const [currentSpacePermissions] = useCurrentSpacePermissions();
 
   const isPage = router.route.includes('pageId');
   const pageType = (currentPage as Page)?.type;
-  const isExportablePage = pageType === 'card' || pageType === 'page';
+  const isExportablePage = pageType === 'card' || pageType === 'page' || pageType === 'proposal';
+  const { setCurrentPageActionDisplay } = usePageActionDisplay();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const isBountyBoard = router.route === '/[domain]/bounties';
 
   async function toggleFavorite () {
     if (!currentPage || !user) return;
@@ -139,15 +133,20 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
       >
         <PageTitleWithBreadcrumbs />
         <Box display='flex' alignItems='center'>
+          {
+            isBountyBoard && (
+              <BountyShareButton headerHeight={headerHeight} />
+            )
+          }
+
           {isPage && (
             <>
               {currentPage?.deletedAt === null && <ShareButton headerHeight={headerHeight} />}
-              {currentPage?.type !== 'board' && <CommentThreadsListButton />}
-              <Tooltip title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} arrow placement='bottom'>
-                <IconButton size='small' sx={{ ml: 1 }} onClick={toggleFavorite} color='inherit'>
+              <IconButton size='small' onClick={toggleFavorite} color='inherit'>
+                <Tooltip title={isFavorite ? 'Remove from sidebar' : 'Pin this page to your sidebar'} arrow placement='bottom'>
                   {isFavorite ? <FavoritedIcon color='secondary' /> : <NotFavoritedIcon color='secondary' />}
-                </IconButton>
-              </Tooltip>
+                </Tooltip>
+              </IconButton>
             </>
           )}
 
@@ -160,7 +159,9 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
                   setPageMenuAnchorElement(pageMenuAnchor.current || null);
                 }}
               >
-                <MoreHorizIcon />
+                <Tooltip title='View comments, votes, export content and more' arrow>
+                  <MoreHorizIcon />
+                </Tooltip>
               </IconButton>
               <Popover
                 anchorEl={pageMenuAnchorElement}
@@ -172,6 +173,57 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
                 }}
               >
                 <List dense>
+                  {isPage && (
+                    <>
+                      {(currentPage?.type === 'page' || currentPage?.type === 'card') && currentSpacePermissions?.createVote && (
+                        <ListItemButton onClick={() => {
+                          setPageMenuOpen(false);
+                          setIsModalOpen(true);
+                        }}
+                        >
+                          <HowToVoteOutlinedIcon
+                            fontSize='small'
+                            sx={{
+                              mr: 1
+                            }}
+                          />
+                          <ListItemText primary='Create a vote' />
+                        </ListItemButton>
+                      )}
+                      {(currentPage?.type === 'page' || currentPage?.type === 'card') && (
+                        <ListItemButton onClick={() => {
+                          setCurrentPageActionDisplay('votes');
+                          setPageMenuOpen(false);
+                        }}
+                        >
+                          <FormatListBulletedIcon
+                            fontSize='small'
+                            sx={{
+                              mr: 1
+                            }}
+                          />
+                          <ListItemText primary='View votes' />
+                        </ListItemButton>
+                      )}
+                      <PublishToSnapshot page={currentPage as Page} />
+                    </>
+                  )}
+                  <Divider />
+                  {isPage && (
+                    <ListItemButton onClick={() => {
+                      setCurrentPageActionDisplay('comments');
+                      setPageMenuOpen(false);
+                    }}
+                    >
+                      <CommentOutlinedIcon
+                        fontSize='small'
+                        sx={{
+                          mr: 1
+                        }}
+                      />
+                      <ListItemText primary='View comments' />
+                    </ListItemButton>
+                  )}
                   <ListItemButton onClick={() => {
                     exportMarkdown();
                     setPageMenuOpen(false);
@@ -186,9 +238,6 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
                     <ListItemText primary='Export to markdown' />
                   </ListItemButton>
 
-                  {/* Publishing to snapshot */}
-
-                  <PublishToSnapshot page={currentPage as Page} />
                   <Divider />
                   <ListItemButton>
                     <FormControlLabel
@@ -212,26 +261,41 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
                           }}
                         />
                       )}
-                      label='Full Width'
+                      label={<Typography variant='body2'>Full Width</Typography>}
                     />
                   </ListItemButton>
                 </List>
               </Popover>
             </Box>
           )}
+          {/** End of CharmEditor page specific header content */}
 
           {/** dark mode toggle */}
           {user && (
-            <Tooltip title={theme.palette.mode === 'dark' ? 'Light mode' : 'Dark mode'} arrow placement='bottom'>
-              <IconButton sx={{ mx: 1 }} onClick={colorMode.toggleColorMode} color='inherit'>
+            <IconButton size='small' sx={{ mx: 1 }} onClick={colorMode.toggleColorMode} color='inherit'>
+              <Tooltip title={`Enable ${theme.palette.mode === 'dark' ? 'light mode' : 'dark mode'}`} arrow placement='bottom'>
                 {theme.palette.mode === 'dark' ? <SunIcon color='secondary' /> : <MoonIcon color='secondary' />}
-              </IconButton>
-            </Tooltip>
+              </Tooltip>
+            </IconButton>
           )}
+          <NotificationsBadge />
           {/** user account */}
           <Account />
         </Box>
       </Box>
+      {/** inject the modal based on open status so it resets the form each time */}
+      {isModalOpen && (
+        <CreateVoteModal
+          createVote={createVote}
+          open={isModalOpen}
+          postCreateVote={() => {
+            setIsModalOpen(false);
+          }}
+          onClose={() => {
+            setIsModalOpen(false);
+          }}
+        />
+      )}
     </StyledToolbar>
   );
 }
