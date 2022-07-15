@@ -26,21 +26,23 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   const isRouterLoading = !router.isReady;
   const isLoading = !isUserRequestComplete || isWalletLoading || isRouterLoading || !isSpacesLoaded;
 
-  const pathSegments: string[] = router.asPath.split('?')[0].split('/').filter(segment => !!segment);
-  const firstSegment: string = pathSegments[0];
-  const isDomain: boolean = !!isSpaceDomain(firstSegment) || firstSegment === 'nexus';
-  const workspaceDomain = isDomain ? firstSegment : null;
-  const defaultPageKey: string = workspaceDomain ? getKey(`last-page-${workspaceDomain}`) : '';
-  const defaultWorkspaceKey: string = getKey('last-workspace');
-  const defaultPage = defaultPageKey ? localStorage.getItem(defaultPageKey) : null;
-  const defaultWorkspace = localStorage.getItem(defaultWorkspaceKey);
+  if (typeof window !== 'undefined') {
+    const pathSegments: string[] = router.asPath.split('?')[0].split('/').filter(segment => !!segment);
+    const firstSegment: string = pathSegments[0];
+    const isDomain: boolean = !!isSpaceDomain(firstSegment) || firstSegment === 'nexus';
+    const workspaceDomain = isDomain ? firstSegment : null;
+    const defaultPageKey: string = workspaceDomain ? getKey(`last-page-${workspaceDomain}`) : '';
+    const defaultWorkspaceKey: string = getKey('last-workspace');
+    const defaultPage = defaultPageKey ? localStorage.getItem(defaultPageKey) : null;
+    const defaultWorkspace = localStorage.getItem(defaultWorkspaceKey);
 
-  if (workspaceDomain && workspaceDomain !== defaultWorkspace) {
-    localStorage.setItem(defaultWorkspaceKey, workspaceDomain);
-  }
+    if (workspaceDomain && workspaceDomain !== defaultWorkspace) {
+      localStorage.setItem(defaultWorkspaceKey, workspaceDomain);
+    }
 
-  if (workspaceDomain && pathSegments.length > 1 && router.asPath !== defaultPage) {
-    localStorage.setItem(defaultPageKey, router.asPath);
+    if (workspaceDomain && pathSegments.length > 1 && router.asPath !== defaultPage) {
+      localStorage.setItem(defaultPageKey, router.asPath);
+    }
   }
 
   useEffect(() => {

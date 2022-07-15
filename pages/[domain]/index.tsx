@@ -12,7 +12,7 @@ export default function RedirectToMainPage () {
   const [space] = useCurrentSpace();
   const { pages } = usePages();
   const defaultPageKey: string = space?.domain ? getKey(`last-page-${space.domain}`) : '';
-  const defaultPage = defaultPageKey ? localStorage.getItem(defaultPageKey) : null;
+  const defaultPage = defaultPageKey ? (typeof window !== 'undefined' && localStorage.getItem(defaultPageKey)) : null;
 
   useEffect(() => {
     if (defaultPage && space && defaultPage.startsWith(`/${space.domain}/`)) {

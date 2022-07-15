@@ -14,7 +14,7 @@ export default function LoginPage () {
   const { account } = useWeb3React();
   const { triedEager } = useContext(Web3Connection);
   const router = useRouter();
-  const defaultWorkspace = localStorage.getItem(getKey('last-workspace'));
+  const defaultWorkspace = typeof window !== 'undefined' && localStorage.getItem(getKey('last-workspace'));
   const [, setTitleState] = usePageTitle();
   const [user, setUser, isUserLoaded] = useUser();
   const [spaces, setSpaces, isSpacesLoaded] = useSpaces();
