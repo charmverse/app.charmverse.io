@@ -18,7 +18,7 @@ import { markdownSerializer } from '@bangle.dev/markdown';
 import { EditorView, Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import { Grow } from '@mui/material';
+import { Grow, Slide } from '@mui/material';
 import * as codeBlock from 'components/common/CharmEditor/components/@bangle.dev/base-components/code-block';
 import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
@@ -586,7 +586,8 @@ function CharmEditor (
       {children}
       {!disablePageSpecificFeatures && (
       <>
-        <Grow
+        <Slide
+          direction='left'
           in={pageActionDisplay === 'comments'}
           style={{
             transformOrigin: 'left top'
@@ -602,8 +603,9 @@ function CharmEditor (
           >
             <PageThreadsList />
           </PageActionListBox>
-        </Grow>
-        <Grow
+        </Slide>
+        <Slide
+          direction='left'
           in={pageActionDisplay === 'votes'}
           style={{
             transformOrigin: 'left top'
@@ -619,7 +621,7 @@ function CharmEditor (
           >
             <PageInlineVotesList />
           </PageActionListBox>
-        </Grow>
+        </Slide>
         <InlineCommentThread pluginKey={inlineCommentPluginKey} />
         {enableVoting && <InlineVoteList pluginKey={inlineVotePluginKey} />}
       </>

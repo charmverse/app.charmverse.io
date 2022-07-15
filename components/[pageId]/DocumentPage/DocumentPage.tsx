@@ -12,7 +12,7 @@ import { useVotes } from 'hooks/useVotes';
 import { Page, PageContent } from 'models';
 import { useRouter } from 'next/router';
 import { memo, useCallback } from 'react';
-import PageInlineVote from 'components/common/CharmEditor/components/inlineVote/components/PageInlineVote';
+import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import CharmEditor, { ICharmEditorOutput } from '../../common/CharmEditor/CharmEditor';
 import PageBanner from './components/PageBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
@@ -34,11 +34,11 @@ export const Container = styled(Box)<{ top: number, fullWidth?: boolean }>`
 `;
 
 export interface IEditorProps {
-  page: Page, setPage: (p: Partial<Page>) => void, readOnly?: boolean }
+  page: Page, setPage: (p: Partial<Page>) => void, readOnly?: boolean, insideModal?: boolean }
 
-function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
+function DocumentPage ({ page, setPage, insideModal, readOnly = false }: IEditorProps) {
   const { pages } = usePages();
-  const { votes, isLoading } = useVotes();
+  const { cancelVote, castVote, deleteVote, votes, isLoading } = useVotes();
 
   const pageVote = Object.values(votes)[0];
 
@@ -80,16 +80,16 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
 
   const comments = useAppSelector(getCardComments(card?.id));
 
-  const showingPageActionList = currentPageActionDisplay !== null;
+  const showPageActionSidebar = (currentPageActionDisplay !== null) && !insideModal;
   const router = useRouter();
   const isSharedPage = router.pathname.startsWith('/share');
 
   return (
-    <ScrollableWindow hideScroll={showingPageActionList}>
+    <ScrollableWindow hideScroll={showPageActionSidebar}>
       <div style={{
-        width: showingPageActionList ? 'calc(100% - 425px)' : '100%',
-        height: showingPageActionList ? 'calc(100vh - 65px)' : '100%',
-        overflow: showingPageActionList ? 'auto' : 'inherit'
+        width: showPageActionSidebar ? 'calc(100% - 425px)' : '100%',
+        height: showPageActionSidebar ? 'calc(100vh - 65px)' : '100%',
+        overflow: showPageActionSidebar ? 'auto' : 'inherit'
       }}
       >
         {page.deletedAt && <PageDeleteBanner pageId={page.id} />}
@@ -103,7 +103,7 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
             content={page.content as PageContent}
             onContentChange={updatePageContent}
             readOnly={readOnly}
-            pageActionDisplay={currentPageActionDisplay}
+            pageActionDisplay={!insideModal ? currentPageActionDisplay : null}
             pageId={page.id}
             disablePageSpecificFeatures={isSharedPage}
             enableVoting={page.type !== 'proposal'}
@@ -117,7 +117,14 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
             />
             {page.type === 'proposal' && !isLoading && pageVote && (
               <Box my={2}>
-                <PageInlineVote inlineVote={pageVote} detailed={false} isProposal={true} />
+                <VoteDetail
+                  cancelVote={cancelVote}
+                  deleteVote={deleteVote}
+                  castVote={castVote}
+                  vote={pageVote}
+                  detailed={false}
+                  isProposal={true}
+                />
               </Box>
             )}
             {card && board && (
@@ -162,4 +169,4 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
   );
 }
 
-export default memo(Editor);
+export default memo(DocumentPage);

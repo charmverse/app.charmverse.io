@@ -28,7 +28,7 @@ export interface ExtendedVote extends Vote {
     totalVotes: number
 }
 
-export type VoteTask = Vote & {
+export type VoteTask = ExtendedVote & {
   page: Page
   space: Space
 }

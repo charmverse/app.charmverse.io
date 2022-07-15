@@ -29,13 +29,15 @@ const VotesContext = createContext<Readonly<IContext>>({
 });
 
 export function VotesProvider ({ children }: { children: ReactNode }) {
-  const { currentPageId, pages } = usePages();
+  const { currentPageId } = usePages();
   const [votes, setVotes] = useState<IContext['votes']>({});
   const [user] = useUser();
 
   const cardId = typeof window !== 'undefined' ? (new URLSearchParams(window.location.href)).get('cardId') : null;
 
-  const { data, isValidating } = useSWR(() => currentPageId && !cardId ? `pages/${currentPageId}/votes` : null, async () => charmClient.getVotesByPage(currentPageId));
+  const { data, isValidating } = useSWR(() => currentPageId && !cardId ? `pages/${currentPageId}/votes` : null, async () => charmClient.getVotesByPage(currentPageId), {
+    revalidateOnFocus: false
+  });
 
   const [currentSpace] = useCurrentSpace();
   const { mutate: mutateTasks } = useTasks();
@@ -53,31 +55,31 @@ export function VotesProvider ({ children }: { children: ReactNode }) {
 
   async function castVote (voteId: string, choice: string) {
     const userVote = await charmClient.castVote(voteId, choice);
-    setVotes((_votes) => {
-      const vote = _votes[voteId];
-      if (vote && user) {
-        const currentChoice = vote.userChoice;
-        vote.userChoice = choice;
-        if (currentChoice) {
-          vote.aggregatedResult[currentChoice] -= 1;
+    if (currentPageId) {
+      setVotes((_votes) => {
+        const vote = _votes[voteId];
+        if (vote && user) {
+          const currentChoice = vote.userChoice;
+          vote.userChoice = choice;
+          if (currentChoice) {
+            vote.aggregatedResult[currentChoice] -= 1;
+          }
+          else {
+            vote.totalVotes += 1;
+          }
+          vote.aggregatedResult[choice] += 1;
+          _votes[voteId] = {
+            ...vote
+          };
         }
-        else {
-          vote.totalVotes += 1;
-        }
-        vote.aggregatedResult[choice] += 1;
-        _votes[voteId] = {
-          ...vote
-        };
-
-        removeVoteFromTask(voteId);
-      }
-      return { ..._votes };
-    });
+        return { ..._votes };
+      });
+    }
+    removeVoteFromTask(voteId);
     return userVote;
   }
 
   async function createVote (votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId'>): Promise<ExtendedVote> {
-
     if (!user || !currentSpace) {
       throw new Error('Missing user or space');
     }
@@ -89,20 +91,6 @@ export function VotesProvider ({ children }: { children: ReactNode }) {
       spaceId: currentSpace.id
     });
 
-    mutateTasks((tasks) => {
-      // Add the vote to the task
-      const currentPage = pages[currentPageId];
-      if (tasks && currentSpace && currentPage) {
-        tasks.votes.push({
-          ...extendedVote,
-          space: currentSpace,
-          page: currentPage
-        });
-      }
-      return tasks;
-    }, {
-      revalidate: false
-    });
     setVotes({
       ...votes,
       [extendedVote.id]: extendedVote
@@ -112,18 +100,22 @@ export function VotesProvider ({ children }: { children: ReactNode }) {
 
   async function deleteVote (voteId: string) {
     await charmClient.deleteVote(voteId);
-    delete votes[voteId];
-    setVotes({ ...votes });
+    if (currentPageId) {
+      delete votes[voteId];
+      setVotes({ ...votes });
+    }
     removeVoteFromTask(voteId);
   }
 
   async function cancelVote (voteId: string) {
     await charmClient.cancelVote(voteId);
-    votes[voteId] = {
-      ...votes[voteId],
-      status: 'Cancelled'
-    };
-    setVotes({ ...votes });
+    if (currentPageId) {
+      votes[voteId] = {
+        ...votes[voteId],
+        status: 'Cancelled'
+      };
+      setVotes({ ...votes });
+    }
     removeVoteFromTask(voteId);
   }
 

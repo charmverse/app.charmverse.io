@@ -7,7 +7,6 @@ import Avatar from 'components/common/Avatar';
 import Modal from 'components/common/Modal';
 import VoteStatusChip from 'components/votes/components/VoteStatusChip';
 import { useUser } from 'hooks/useUser';
-import { useVotes } from 'hooks/useVotes';
 import { removeInlineVoteMark } from 'lib/inline-votes/removeInlineVoteMark';
 import { ExtendedVote } from 'lib/votes/interfaces';
 import { isVotingClosed } from 'lib/votes/utils';
@@ -15,11 +14,15 @@ import { DateTime } from 'luxon';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import useSWR from 'swr';
 import VoteActionsMenu from 'components/votes/components/VoteActionsMenu';
+import { UserVote } from '@prisma/client';
 
-interface PageInlineVoteProps {
-  inlineVote: ExtendedVote;
+export interface VoteDetailProps {
+  vote: ExtendedVote;
   detailed?: boolean;
   isProposal?: boolean;
+  castVote: (voteId: string, choice: string) => Promise<UserVote>
+  deleteVote: (voteId: string) => Promise<void>
+  cancelVote: (voteId: string) => Promise<void>
 }
 
 const StyledDiv = styled.div<{ detailed: boolean }>`
@@ -37,14 +40,11 @@ const StyledFormControl = styled(FormControl)`
 
 const MAX_DESCRIPTION_LENGTH = 200;
 
-export default function PageInlineVote ({ detailed = false, inlineVote: vote, isProposal }: PageInlineVoteProps) {
-  const { deadline, totalVotes, description, id, title, userChoice, voteOptions } = vote;
-  const { castVote, cancelVote, deleteVote } = useVotes();
+export default function VoteDetail ({ cancelVote, castVote, deleteVote, detailed = false, vote, isProposal }: VoteDetailProps) {
+  const { deadline, totalVotes, description, id, title, userChoice, voteOptions, aggregatedResult } = vote;
   const [user] = useUser();
   const view = useEditorViewContext();
   const { data: userVotes, mutate } = useSWR(detailed ? `/votes/${id}/user-votes` : null, () => charmClient.getUserVotes(id));
-
-  const voteAggregateResult = vote.aggregatedResult;
 
   const voteDetailsPopup = usePopupState({ variant: 'popover', popupId: 'inline-votes-detail' });
 
@@ -62,6 +62,7 @@ export default function PageInlineVote ({ detailed = false, inlineVote: vote, is
   );
 
   const hasPassedDeadline = new Date(deadline) < new Date();
+  const userVoteChoice = userVotes && user ? userVotes.find(userVote => userVote.userId === user.id)?.choice ?? userChoice : userChoice;
 
   const relativeDate = DateTime.fromJSDate(new Date(deadline)).toRelative({ base: (DateTime.now()) });
   const isDescriptionAbove = description ? description.length > MAX_DESCRIPTION_LENGTH : false;
@@ -113,7 +114,7 @@ export default function PageInlineVote ({ detailed = false, inlineVote: vote, is
       )}
       {!detailed && voteCountLabel}
       <StyledFormControl>
-        <RadioGroup name={vote.id} value={userChoice}>
+        <RadioGroup name={vote.id} value={userVoteChoice}>
           {voteOptions.map(voteOption => (
             <FormControlLabel
               control={<Radio size='small' />}
@@ -122,7 +123,7 @@ export default function PageInlineVote ({ detailed = false, inlineVote: vote, is
               label={(
                 <Box display='flex' justifyContent='space-between' flexGrow={1}>
                   <span>{voteOption.name}</span>
-                  <Typography variant='subtitle1' color='secondary'>{((totalVotes === 0 ? 0 : (voteAggregateResult?.[voteOption.name] ?? 0) / totalVotes) * 100).toFixed(2)}%</Typography>
+                  <Typography variant='subtitle1' color='secondary'>{((totalVotes === 0 ? 0 : (aggregatedResult?.[voteOption.name] ?? 0) / totalVotes) * 100).toFixed(2)}%</Typography>
                 </Box>
               )}
               disableTypography
@@ -191,9 +192,12 @@ export default function PageInlineVote ({ detailed = false, inlineVote: vote, is
         </List>
       )}
       <Modal title='Vote details' size='large' open={voteDetailsPopup.isOpen} onClose={voteDetailsPopup.close}>
-        <PageInlineVote
-          inlineVote={vote}
+        <VoteDetail
+          vote={vote}
           detailed={true}
+          cancelVote={cancelVote}
+          castVote={castVote}
+          deleteVote={deleteVote}
         />
       </Modal>
     </StyledDiv>

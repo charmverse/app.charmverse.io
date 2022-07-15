@@ -1,7 +1,7 @@
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import { Box, InputLabel, List, MenuItem, Select, Typography } from '@mui/material';
-import PageInlineVote from 'components/common/CharmEditor/components/inlineVote/components/PageInlineVote';
+import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import { useVotes } from 'hooks/useVotes';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { highlightDomElement, silentlyUpdateURL } from 'lib/browser';
@@ -26,7 +26,7 @@ export type VoteSort = 'position' | 'latest_deadline' | 'highest_votes' | 'lates
 export type VoteFilter = 'in_progress' | 'completed' | 'all';
 
 export default function VotesSidebar () {
-  const { votes } = useVotes();
+  const { votes, cancelVote, castVote, deleteVote } = useVotes();
   const votesArray = Object.values(votes);
   const view = useEditorViewContext();
   const [voteFilter, setVoteFilter] = useState<VoteFilter>('in_progress');
@@ -91,10 +91,13 @@ export default function VotesSidebar () {
         {sortedVotes.length === 0
           ? <NoVotesMessage message={`No ${voteFilter === 'completed' ? 'completed' : 'in progress'} votes yet`} />
           : sortedVotes.map(inlineVote => (
-            <PageInlineVote
+            <VoteDetail
+              cancelVote={cancelVote}
+              castVote={castVote}
+              deleteVote={deleteVote}
               key={inlineVote.id}
               detailed={false}
-              inlineVote={inlineVote}
+              vote={inlineVote}
             />
           ))}
       </VotesContainer>

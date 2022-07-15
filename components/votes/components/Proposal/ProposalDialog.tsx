@@ -90,7 +90,7 @@ export default function ProposalDialog (props: Props) {
           )}
           onClose={onClose}
         >
-          {props.page && <DocumentPage page={props.page} setPage={setPage} readOnly={props.readOnly} />}
+          {props.page && <DocumentPage insideModal page={props.page} setPage={setPage} readOnly={props.readOnly} />}
         </Dialog>
       )}
     </RootPortal>
