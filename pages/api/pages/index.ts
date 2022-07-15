@@ -37,9 +37,6 @@ async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
     throw new UnauthorisedActionError('You do not have permissions to create a page.');
   }
 
-  // eslint-disable-next-line no-console
-  console.log('Creation data', data);
-
   // Remove parent ID and pass it to the creation input
   // This became necessary after adding a formal parentPage relation related to page.parentId
   // We now need to specify this as a ParentPage.connect prisma argument instead of a raw string
