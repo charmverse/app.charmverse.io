@@ -81,6 +81,7 @@ export default function PendingTasks (props: PendingTasksProps) {
         />
       ))}
       {totalMentionTasks > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusDiscussionLink} /> : null}
+      <MjmlDivider />
     </>
   ) : null;
 
@@ -100,7 +101,7 @@ export default function PendingTasks (props: PendingTasksProps) {
             <span style={h2Style}>{totalVoteTasks} Vote{totalVoteTasks > 1 ? 's' : ''}</span>
           </a>
           <a href={nexusVoteLink} style={buttonStyle}>
-            Vote
+            Vote now
           </a>
         </div>
       </MjmlText>
@@ -150,18 +151,12 @@ export default function PendingTasks (props: PendingTasksProps) {
           <MjmlText paddingBottom={0} paddingTop={0}>
             <h3>{props.totalTasks} tasks need your attention.</h3>
           </MjmlText>
-          <MjmlButton align='left' padding-bottom='20px' href={`${charmverseUrl}/nexus`}>
-            View
-          </MjmlButton>
           {multisigSection}
           {voteSection}
           {mentionSection}
 
         </MjmlColumn>
       </MjmlSection>
-
-      <HR />
-
       <Feedback />
       <Footer />
     </EmailWrapper>
