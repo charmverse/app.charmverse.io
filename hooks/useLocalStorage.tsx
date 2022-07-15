@@ -27,10 +27,6 @@ export function setStorageValue<T = any> (key: string, value: T): T {
   return value;
 }
 
-export function removeStorageValue (key: string): void {
-  localStorage.removeItem(getKey(key));
-}
-
 export function useLocalStorage<T = any> (key: string, defaultValue: T) {
   const [value, setValue] = useState<T>(() => {
     return getStorageValue(key, defaultValue);
@@ -44,7 +40,7 @@ export function useLocalStorage<T = any> (key: string, defaultValue: T) {
   useEffect(() => {
     setStorageValue(key, value);
   }, [key, value]);
-  return [value, setValue, removeStorageValue] as const;
+  return [value, setValue] as const;
 }
 
 export function getKey (key: string) {
