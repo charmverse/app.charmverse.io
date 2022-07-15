@@ -16,5 +16,5 @@ export const DOMAIN_BLACKLIST = [
 ];
 
 export function isSpaceDomain (domain: string) {
-  return domain && !DOMAIN_BLACKLIST.includes(domain);
+  return domain && !DOMAIN_BLACKLIST.includes(domain) && !domain.includes('?');
 }

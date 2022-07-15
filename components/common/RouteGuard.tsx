@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { useWeb3React } from '@web3-react/core';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { User } from '@prisma/client';
-import { useLocalStorage } from 'hooks/useLocalStorage';
+import { getKey } from 'hooks/useLocalStorage';
 import { useUser } from 'hooks/useUser';
 import { useSpaces } from 'hooks/useSpaces';
 import { isSpaceDomain } from 'lib/spaces';
@@ -26,37 +26,21 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   const isRouterLoading = !router.isReady;
   const isLoading = !isUserRequestComplete || isWalletLoading || isRouterLoading || !isSpacesLoaded;
 
-  const pathSegments: string[] = router.asPath.split('/').filter(segment => {
-    // Only get segments that evaluate to some value
-    return segment;
-  });
+  const pathSegments: string[] = router.asPath.split('?')[0].split('/').filter(segment => !!segment);
+  const firstSegment: string = pathSegments[0];
+  const isDomain: boolean = !!isSpaceDomain(firstSegment) || firstSegment === 'nexus';
+  const workspaceDomain = isDomain ? firstSegment : null;
+  const defaultPageKey: string = workspaceDomain ? getKey(`last-page-${workspaceDomain}`) : '';
+  const defaultWorkspaceKey: string = getKey('last-workspace');
+  const defaultPage = defaultPageKey ? localStorage.getItem(defaultPageKey) : null;
+  const defaultWorkspace = localStorage.getItem(defaultWorkspaceKey);
 
-  const firstPathSegment: string = pathSegments[0];
-  const isDomain: boolean = !!isSpaceDomain(firstPathSegment);
-  const storagePrefix: string = isDomain ? firstPathSegment : 'user';
+  if (workspaceDomain && workspaceDomain !== defaultWorkspace) {
+    localStorage.setItem(defaultWorkspaceKey, workspaceDomain);
+  }
 
-  const [lastPage, setLastPage] = useLocalStorage<string>(`${user?.id}-${storagePrefix}-last-page`, '');
-
-  const manageLastVisitedPage = () => {
-    // Has selected workspace page different than the stored one.
-    if (isDomain && pathSegments.length > 1 && router.asPath !== lastPage) {
-      setLastPage(router.asPath);
-    } // If there is no workspace page in URL, get stored one as long as it was from the current workspace.
-    else if (isDomain && pathSegments.length === 1 && lastPage && lastPage.startsWith(`/${firstPathSegment}`)) {
-      router.push(lastPage);
-    }
-
-    // Has selected a non-workspace page different than the stored one.
-    if (!isDomain && pathSegments.length > 0 && router.asPath !== lastPage) {
-      setLastPage(router.asPath);
-    } // If there is no page in URL, get stored one.
-    else if (!isDomain && pathSegments.length === 0 && lastPage) {
-      router.push(lastPage);
-    }
-  };
-
-  if (user) {
-    manageLastVisitedPage();
+  if (workspaceDomain && pathSegments.length > 1 && router.asPath !== defaultPage) {
+    localStorage.setItem(defaultPageKey, router.asPath);
   }
 
   useEffect(() => {
@@ -66,8 +50,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     }
 
     async function authCheckAndRedirect (path: string) {
-
-      const result = await authCheck();
+      const result = await authCheck(path);
 
       setAuthorized(result.authorized);
 
@@ -100,7 +83,16 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   }, [isLoading, account, user, spaces]);
 
   // authCheck runs before each page load and redirects to login if user is not logged in
-  async function authCheck (): Promise<{ authorized: boolean, redirect?: UrlObject, user?: User }> {
+  async function authCheck (url: string): Promise<{ authorized: boolean, redirect?: UrlObject, user?: User }> {
+    const path = url.split('?')[0];
+
+    const firstPathSegment = path.split('/').filter(pathElem => {
+      // Only get segments that evaluate to some value
+      return pathElem;
+    })[0] ?? '/';
+
+    const spaceDomain = path.split('/')[1];
+
     // condition: public page
     if (publicPages.some(basePath => firstPathSegment === basePath)) {
       return { authorized: true };
@@ -152,13 +144,13 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       return { authorized: true };
     }
     // condition: trying to access a space without access
-    else if (isSpaceDomain(firstPathSegment) && !spaces.some(s => s.domain === firstPathSegment)) {
+    else if (isSpaceDomain(spaceDomain) && !spaces.some(s => s.domain === spaceDomain)) {
       log.info('[RouteGuard]: send to join workspace page');
       return {
         authorized: false,
         redirect: {
           pathname: '/join',
-          query: { domain: firstPathSegment, returnUrl: router.asPath }
+          query: { domain: spaceDomain, returnUrl: router.asPath }
         }
       };
     }

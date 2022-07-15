@@ -24,7 +24,6 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { ReactElement } from 'react';
 import { useForm } from 'react-hook-form';
-import { useLocalStorage } from 'hooks/useLocalStorage';
 
 export default function WorkspaceSettings () {
   setTitle('Workspace Options');
@@ -33,8 +32,6 @@ export default function WorkspaceSettings () {
   const [spaces, setSpaces] = useSpaces();
   const [user] = useUser();
   const isAdmin = isSpaceAdmin(user, space?.id);
-  const storageKey = `${user?.id}-${space?.domain}-last-page`;
-  const [, , removeStorageValue] = useLocalStorage<string>(storageKey, '');
 
   const workspaceRemoveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-remove' });
   const workspaceLeaveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-leave' });
@@ -60,9 +57,6 @@ export default function WorkspaceSettings () {
     const newDomain = space.domain !== values.domain;
     const updatedSpace = await charmClient.updateSpace({ ...space, ...values });
     if (newDomain) {
-      // Remove the local storage item storing the workspace's last visited page.
-      // An item for the new domain will be created.
-      removeStorageValue(storageKey);
       window.location.href = router.asPath.replace(space.domain, values.domain);
     }
     else {
@@ -171,8 +165,6 @@ export default function WorkspaceSettings () {
             await charmClient.deleteSpace(space.id);
             const filteredSpaces = spaces.filter(s => s.id !== space.id);
             setSpaces(filteredSpaces);
-            // Remove the local storage item storing the workspace's last visited page.
-            removeStorageValue(storageKey);
             window.location.href = filteredSpaces.length !== 0 ? `/${filteredSpaces[0].domain}` : '/signup';
           }
         }}
