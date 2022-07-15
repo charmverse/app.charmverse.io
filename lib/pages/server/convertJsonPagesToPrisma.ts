@@ -74,11 +74,14 @@ async function convertFolderContent ({
     }
   };
 
-  typedPrismaCreateInput.parentPage = parentPageId ? {
-    connect: {
-      id: parentPageId
-    }
-  } : undefined;
+  typedPrismaCreateInput.parentId = parentPageId;
+
+  // Re-add this once we re-create a formal relationship for a page and its children
+  // typedPrismaCreateInput.parentPage = parentPageId ? {
+  //   connect: {
+  //     id: parentPageId
+  //   }
+  // } : undefined;
 
   // Leave this empty for now, we'll reassign later
   typedPrismaCreateInput.card = undefined;

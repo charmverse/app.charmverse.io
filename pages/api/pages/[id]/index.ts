@@ -68,13 +68,6 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
     },
     data: {
       ...req.body,
-      parentPage: req.body.parentId ? {
-        connect: {
-          id: req.body.parentId
-        }
-      } : req.body.parentId === null ? {
-        disconnect: true
-      } : undefined,
       parentId: undefined,
       updatedAt: new Date(),
       updatedBy: userId
