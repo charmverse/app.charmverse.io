@@ -15,7 +15,10 @@ export async function exportSpacePages ({ spaceId }: {spaceId: string}): Promise
   const rootPages = (await prisma.page.findMany({
     where: {
       parentId: null,
-      spaceId
+      spaceId,
+      type: {
+        in: ['board', 'page']
+      }
     },
     include: recursiveInclude({})
   })) as Omit<PageWithChildren, 'permissions'>[];
