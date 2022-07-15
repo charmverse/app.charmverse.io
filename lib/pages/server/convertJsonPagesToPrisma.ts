@@ -201,10 +201,11 @@ async function convertFolderContent ({
 /**
  * Use this to convert a static page tree to prisma input you can provide to a transaction
  * @folderPath The folder containing the exported pages for the target space
+ * @findS3Assets If enabled, will return all AWS S3 assets found in the page content, or the page header image
  */
-export async function convertJsonPagesToPrisma ({ folderPath, spaceId }:
+export async function convertJsonPagesToPrisma ({ folderPath, spaceId, findS3Assets }:
   {
-    folderPath: string, spaceId: string
+    folderPath: string, spaceId: string, findS3Assets: boolean
   }): Promise<Omit<ConverterOutput, 'oldNewHashmap'>> {
   const space = await prisma.space.findUnique({
     where: {
@@ -250,31 +251,32 @@ export async function convertJsonPagesToPrisma ({ folderPath, spaceId }:
       (p.content as PageContent).content = JSON.parse(prosemirrorNodesAsText);
 
       // Step - 2 Extract any S3 URLs
-      const awsUrlRegex = /https:\/\/s3\.amazonaws(\w|\d|-|\/|\.){1,}/g;
+      if (findS3Assets) {
+        const awsUrlRegex = /https:\/\/s3\.amazonaws(\w|\d|-|\/|\.){1,}/g;
 
-      const awsAssetLinksFound = prosemirrorNodesAsText.match(awsUrlRegex);
+        const awsAssetLinksFound = prosemirrorNodesAsText.match(awsUrlRegex);
 
-      const pageId = p.id as string;
+        const pageId = p.id as string;
 
-      if (awsAssetLinksFound) {
-        awsAssetUrls.push(...awsAssetLinksFound.map(link => {
-          const assetUrl: AWSAssetUrl = {
-            awsUrl: link,
+        if (awsAssetLinksFound) {
+          awsAssetUrls.push(...awsAssetLinksFound.map(link => {
+            const assetUrl: AWSAssetUrl = {
+              awsUrl: link,
+              newPageId: pageId,
+              oldPageId: oldNewHashmap[pageId]
+            };
+            return assetUrl;
+          }));
+        }
+
+        if (p.headerImage && p.headerImage.match(awsUrlRegex) !== null) {
+          awsAssetUrls.push({
+            awsUrl: p.headerImage,
             newPageId: pageId,
             oldPageId: oldNewHashmap[pageId]
-          };
-          return assetUrl;
-        }));
+          });
+        }
       }
-
-      if (p.headerImage && p.headerImage.match(awsUrlRegex) !== null) {
-        awsAssetUrls.push({
-          awsUrl: p.headerImage,
-          newPageId: pageId,
-          oldPageId: oldNewHashmap[pageId]
-        });
-      }
-
     }
   });
 

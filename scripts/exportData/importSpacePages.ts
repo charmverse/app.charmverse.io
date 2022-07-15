@@ -5,7 +5,7 @@ const folderPath = '/home/mo/Development/app.charmverse.io/seedData/space/space-
 
 const targetSpaceId = 'f9db60bc-ec9a-43a0-ac02-6c08a20cbd71';
 
-convertJsonPagesToPrisma({ spaceId: targetSpaceId, folderPath })
+convertJsonPagesToPrisma({ spaceId: targetSpaceId, folderPath, findS3Assets: true })
   .then((toCreate) => {
 
     console.log('Import success!');
