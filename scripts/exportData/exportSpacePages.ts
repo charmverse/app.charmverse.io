@@ -104,10 +104,10 @@ async function exportSpacePagesData (spaceId: string): Promise<string> {
 
 }
 
-exportSpacePagesData('3c5b2550-0bde-494f-86b4-d2bc257536ae')
-  .then(basePath => {
-    //    console.log('Export complete for ', basePath);
-  });
+// exportSpacePagesData('da74cab3-c2b6-40bb-8734-0de5375b0fce')
+//   .then(basePath => {
+//     // console.log('Export complete for ', basePath);
+//   });
 
 // fs.readdir(__dirname + '/exports').then(data => {
 //   console.log(data)

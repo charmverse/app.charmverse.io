@@ -1,0 +1,263 @@
+{
+  "id": "24de9338-f07c-42d8-9c2c-f1cfd3df1480",
+  "deletedAt": "2022-07-03T12:27:39.728Z",
+  "createdAt": "2022-05-23T16:35:48.240Z",
+  "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+  "index": 0,
+  "updatedAt": "2022-07-03T12:27:39.728Z",
+  "updatedBy": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
+  "title": "Getting Started",
+  "content": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "text": "👋 Welcome to your workspace!",
+            "type": "text"
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "level": 3,
+          "collapseContent": null
+        },
+        "content": [
+          {
+            "text": "Some basics to get you started",
+            "type": "text"
+          }
+        ]
+      },
+      {
+        "type": "bulletList",
+        "attrs": {
+          "tight": false
+        },
+        "content": [
+          {
+            "type": "listItem",
+            "attrs": {
+              "todoChecked": false
+            },
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "text": "Click anywhere and just start typing",
+                    "type": "text"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "attrs": {
+              "todoChecked": false
+            },
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "text": "Use ",
+                    "type": "text"
+                  },
+                  {
+                    "text": "/",
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "code"
+                      }
+                    ]
+                  },
+                  {
+                    "text": " to see the different styles and content you can create - bold, italics, tables, task lists, images, videos, etc",
+                    "type": "text"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "attrs": {
+              "todoChecked": false
+            },
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "text": "Use ",
+                    "type": "text"
+                  },
+                  {
+                    "text": ":",
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "code"
+                      }
+                    ]
+                  },
+                  {
+                    "text": " for inserting emojis.",
+                    "type": "text"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "attrs": {
+              "todoChecked": false
+            },
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "text": "Use ",
+                    "type": "text"
+                  },
+                  {
+                    "text": "+",
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "code"
+                      }
+                    ]
+                  },
+                  {
+                    "text": " button in the sidebar to add new pages",
+                    "type": "text"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "level": 3,
+          "collapseContent": null
+        },
+        "content": [
+          {
+            "text": "Getting started with CharmVerse",
+            "type": "text"
+          }
+        ]
+      },
+      {
+        "type": "iframe",
+        "attrs": {
+          "src": "https://www.youtube.com/embed/LGgi6bFRRTw",
+          "type": "video",
+          "width": 700,
+          "height": 451.9774011299435
+        }
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "level": 3,
+          "collapseContent": null
+        },
+        "content": [
+          {
+            "text": "Inviting others",
+            "type": "text"
+          }
+        ]
+      },
+      {
+        "type": "iframe",
+        "attrs": {
+          "src": "https://www.youtube.com/embed/sZjggbVYGMo",
+          "type": "video",
+          "width": 700,
+          "height": 451.9774011299435
+        }
+      },
+      {
+        "type": "blockquote",
+        "attrs": {
+          "emoji": "👉🏼"
+        },
+        "content": [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "text": "Questions?",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "bold"
+                  }
+                ]
+              },
+              {
+                "text": " Email us at ",
+                "type": "text"
+              },
+              {
+                "text": "hello@charmverse.io",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "code"
+                  }
+                ]
+              },
+              {
+                "text": "or join our community in ",
+                "type": "text"
+              },
+              {
+                "text": "Discord",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "link",
+                    "attrs": {
+                      "href": "https://discord.gg/ACYCzBGC2M"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "paragraph"
+      }
+    ]
+  },
+  "contentText": "👋 Welcome to your workspace!Some basics to get you startedClick anywhere and just start typingUse / to see the different styles and content you can create - bold, italics, tables, task lists, images, videos, etcUse : for inserting emojis.Use + button in the sidebar to add new pagesGetting started with CharmVerseInviting othersQuestions? Email us at hello@charmverse.ioor join our community in Discord",
+  "headerImage": null,
+  "icon": null,
+  "path": "getting-started",
+  "parentId": null,
+  "spaceId": "da74cab3-c2b6-40bb-8734-0de5375b0fce",
+  "type": "page",
+  "boardId": null,
+  "autoGenerated": true,
+  "cardId": null,
+  "snapshotProposalId": null,
+  "fullWidth": false,
+  "card": null
+}

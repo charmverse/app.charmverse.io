@@ -1,0 +1,19 @@
+{
+  "id": "81544004-472a-48a6-a0b3-5263274ccb81",
+  "deletedAt": "2022-07-08T16:38:43.518Z",
+  "createdAt": "2022-06-30T12:51:29.723Z",
+  "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+  "updatedAt": "2022-07-08T16:38:43.518Z",
+  "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+  "spaceId": "da74cab3-c2b6-40bb-8734-0de5375b0fce",
+  "parentId": "f918bdc2-8439-4675-89ae-00805b9e15c7",
+  "rootId": "f918bdc2-8439-4675-89ae-00805b9e15c7",
+  "schema": 1,
+  "type": "card",
+  "title": "Card 1",
+  "fields": {
+    "isTemplate": false,
+    "properties": {},
+    "contentOrder": []
+  }
+}

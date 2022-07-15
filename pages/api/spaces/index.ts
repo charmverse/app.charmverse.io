@@ -49,7 +49,7 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
   const space = await prisma.space.create({ data, include: { pages: true } });
 
   // Create all page content in a single transaction
-  const sourceDataPath = path.resolve('scripts/exportData/exports/space-3c5b2550-0bde-494f-86b4-d2bc257536ae-pages-1657841593654');
+  const sourceDataPath = path.resolve('seedData/space/space-da74cab3-c2b6-40bb-8734-0de5375b0fce-pages-1657887621286');
 
   const seedPagesTransactionInput = await convertJsonPagesToPrisma({
     folderPath: sourceDataPath,
