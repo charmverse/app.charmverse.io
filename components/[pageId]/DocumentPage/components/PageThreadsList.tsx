@@ -9,6 +9,7 @@ import { useUser } from 'hooks/useUser';
 import { highlightDomElement, silentlyUpdateURL } from 'lib/browser';
 import { findTotalInlineComments } from 'lib/inline-comments/findTotalInlineComments';
 import { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
+import { isTruthy } from 'lib/utilities/types';
 import { useEffect, useState } from 'react';
 import PageActionToggle from './PageActionToggle';
 
@@ -97,7 +98,8 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
   }
 
   const view = useEditorViewContext();
-  const inlineThreadsIds = threadSort === 'position' ? findTotalInlineComments(view, view.state.doc, threads, true).threadIds : [];
+  // Making sure the position sort doesn't filter out comments that are not in the view
+  const inlineThreadsIds = threadSort === 'position' ? Array.from(new Set([...findTotalInlineComments(view, view.state.doc, threads, true).threadIds, ...allThreads.map(thread => thread?.id).filter(isTruthy)])) : [];
 
   let sortedThreadList: ThreadWithCommentsAndAuthors[] = [];
   if (threadSort === 'earliest') {
