@@ -1,19 +1,27 @@
 import { Block, Page, Prisma, Space } from '@prisma/client';
 import { prisma } from 'db';
+import { PageContent } from 'models';
 import fs from 'node:fs/promises';
 import { v4 } from 'uuid';
 
-// Converts a folder to a page
-async function convertFolderContent ({ entryPath, spaceId, authorId, blocksToCreate, pagesToCreate, parentPageId, parentPermissionId }:
+interface ConverterOutput {
+  blocksToCreate: Prisma.BlockCreateInput[],
+  pagesToCreate: Prisma.PageCreateInput[],
+  oldNewHashmap: Record<string, string>
+}
+
+/**
+ * Processes the recursive folder structure created by export page data script and returns the data necessary for a prisma page transaction
+ * @oldNewHashmap - A Handy tree structure that keeps a reference to the old and new page IDs
+ */
+async function convertFolderContent ({ entryPath, spaceId, authorId, blocksToCreate, pagesToCreate, parentPageId, parentPermissionId, oldNewHashmap }:
   {
     parentPageId?: string | null,
     entryPath: string,
     spaceId: string,
     authorId: string,
-    blocksToCreate: Prisma.BlockCreateInput[],
-    pagesToCreate: Prisma.PageCreateInput[],
     parentPermissionId?: string
-  }): Promise<Prisma.PageCreateInput> {
+  } & ConverterOutput): Promise<ConverterOutput> {
   // Find the JSON content for the page
   const folderContent = await fs.readdir(entryPath);
 
@@ -22,6 +30,9 @@ async function convertFolderContent ({ entryPath, spaceId, authorId, blocksToCre
   const pageContentPath = `${entryPath}/${folderContent.find(p => p.match('json')) as string}`;
 
   const pageContent = JSON.parse(await fs.readFile(pageContentPath, 'utf8')) as Page;
+
+  // Map the old page ID to the new one
+  oldNewHashmap[pageContent.id] = newPageId;
 
   pageContent.id = newPageId;
 
@@ -153,13 +164,18 @@ async function convertFolderContent ({ entryPath, spaceId, authorId, blocksToCre
         spaceId,
         pagesToCreate,
         parentPageId: newPageId,
-        parentPermissionId: permissionId
+        parentPermissionId: permissionId,
+        oldNewHashmap
       });
     }));
 
   }
 
-  return typedPrismaCreateInput;
+  return {
+    blocksToCreate,
+    pagesToCreate,
+    oldNewHashmap
+  };
 
 }
 
@@ -181,14 +197,39 @@ export async function convertJsonPagesToPrisma ({ folderPath, spaceId }:
 
   const pagesToCreate: Prisma.PageCreateInput[] = [];
   const blocksToCreate: Prisma.BlockCreateInput[] = [];
+  const oldNewHashmap: Record<string, string> = {};
 
   await Promise.all(entryFolder.map(pageFolder => convertFolderContent({
     authorId: space.createdBy,
     blocksToCreate,
     pagesToCreate,
+    oldNewHashmap,
     entryPath: `${folderPath}/${pageFolder}`,
     spaceId
   })));
+
+  // Iterate through page links and update the reference
+  pagesToCreate.forEach(p => {
+    const prosemirrorNodes = (p.content as PageContent)?.content;
+    if (prosemirrorNodes) {
+      let prosemirrorNodesAsText = JSON.stringify(prosemirrorNodes);
+
+      const nestedPageRefs = prosemirrorNodesAsText.match(/{"type":"page","attrs":{"id":"((\d|[a-f]){1,}-){1,}(\d|[a-f]){1,}"}}/g);
+
+      nestedPageRefs?.forEach(pageLinkNode => {
+        const oldPageId = pageLinkNode.match(/((\d|[a-f]){1,}-){1,}(\d|[a-f]){1,}/)?.[0];
+        const newPageId = oldPageId ? oldNewHashmap[oldPageId] : undefined;
+
+        if (oldPageId && newPageId) {
+          prosemirrorNodesAsText = prosemirrorNodesAsText.replace(oldPageId, newPageId);
+        }
+      });
+
+      (p.content as PageContent).content = JSON.parse(prosemirrorNodesAsText);
+    }
+  });
+
+  // Run post processing to update page references
 
   return {
     blocksToCreate,
