@@ -548,11 +548,7 @@ async function createPrismaPage ({
     title: title || '',
     type,
     boardId,
-    parentPage: parentId ? {
-      connect: {
-        id: parentId
-      }
-    } : undefined
+    parentId
   };
 
   if (type === 'card' && cardId) {
