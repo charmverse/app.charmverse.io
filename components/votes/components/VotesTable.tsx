@@ -14,7 +14,7 @@ import { humanFriendlyDate, toMonthDate } from 'lib/utilities/dates';
 import { usePages } from 'hooks/usePages';
 import charmClient from 'charmClient';
 import { ExtendedVote } from 'lib/votes/interfaces';
-import PageInlineVote from 'components/common/CharmEditor/components/inlineVote/components/PageInlineVote';
+import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import Modal from 'components/common/Modal';
 import NoVotesMessage from './NoVotesMessage';
 import VoteStatusChip from './VoteStatusChip';
@@ -189,7 +189,7 @@ export default function VotesTable ({ votes, mutateVotes }: { votes?: (ExtendedV
       ))}
       {activePage && <ProposalDialog page={activePage} onClose={closePage} />}
       <Modal title='Vote details' size='large' open={!!activeVote} onClose={() => setActiveVote(null)}>
-        <PageInlineVote
+        <VoteDetail
           detailed
           inlineVote={activeVote!}
           cancelVote={cancelVote}

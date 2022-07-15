@@ -9,7 +9,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { findChildrenByMark, NodeWithPos } from 'prosemirror-utils';
 import { useEffect, useRef } from 'react';
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
-import PageInlineVote from './PageInlineVote';
+import VoteDetail from './VoteDetail';
 import { markName } from '../inlineVote.constants';
 import { InlineVotePluginState } from '../inlineVote.plugins';
 
@@ -77,7 +77,7 @@ export default function InlineVoteList ({ pluginKey }: {pluginKey: PluginKey<Inl
       >
         {inProgressVoteIds.map(inProgressVoteId => (
           <Box mb={2} key={inProgressVoteId}>
-            <PageInlineVote
+            <VoteDetail
               {...rest}
               inlineVote={votes[inProgressVoteId]}
               detailed={true}

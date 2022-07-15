@@ -40,7 +40,7 @@ const StyledFormControl = styled(FormControl)`
 
 const MAX_DESCRIPTION_LENGTH = 200;
 
-export default function PageInlineVote ({ cancelVote, castVote, deleteVote, detailed = false, inlineVote: vote, isProposal }: PageInlineVoteProps) {
+export default function VoteDetail ({ cancelVote, castVote, deleteVote, detailed = false, inlineVote: vote, isProposal }: PageInlineVoteProps) {
   const { deadline, totalVotes, description, id, title, userChoice, voteOptions, aggregatedResult } = vote;
   const [user] = useUser();
   const view = useEditorViewContext();
@@ -192,7 +192,7 @@ export default function PageInlineVote ({ cancelVote, castVote, deleteVote, deta
         </List>
       )}
       <Modal title='Vote details' size='large' open={voteDetailsPopup.isOpen} onClose={voteDetailsPopup.close}>
-        <PageInlineVote
+        <VoteDetail
           inlineVote={vote}
           detailed={true}
           cancelVote={cancelVote}

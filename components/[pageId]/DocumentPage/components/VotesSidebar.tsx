@@ -1,7 +1,7 @@
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import { Box, InputLabel, List, MenuItem, Select, Typography } from '@mui/material';
-import PageInlineVote from 'components/common/CharmEditor/components/inlineVote/components/PageInlineVote';
+import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import { useVotes } from 'hooks/useVotes';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { highlightDomElement, silentlyUpdateURL } from 'lib/browser';
@@ -91,7 +91,7 @@ export default function VotesSidebar () {
         {sortedVotes.length === 0
           ? <NoVotesMessage message={`No ${voteFilter === 'completed' ? 'completed' : 'in progress'} votes yet`} />
           : sortedVotes.map(inlineVote => (
-            <PageInlineVote
+            <VoteDetail
               {...rest}
               key={inlineVote.id}
               detailed={false}

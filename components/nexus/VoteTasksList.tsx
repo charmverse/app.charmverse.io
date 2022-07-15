@@ -2,7 +2,7 @@ import HowToVote from '@mui/icons-material/HowToVote';
 import { Alert, Box, Card, Grid, Typography } from '@mui/material';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import PageInlineVote, { PageInlineVoteProps } from 'components/common/CharmEditor/components/inlineVote/components/PageInlineVote';
+import VoteDetail, { PageInlineVoteProps } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';
@@ -132,7 +132,7 @@ export function VoteTasksListRow (
           setIsVoteModalOpen(false);
         }}
       >
-        <PageInlineVote
+        <VoteDetail
           inlineVote={voteTask}
           detailed
           castVote={castVote}

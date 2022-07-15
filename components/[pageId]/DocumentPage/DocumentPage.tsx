@@ -12,7 +12,7 @@ import { useVotes } from 'hooks/useVotes';
 import { Page, PageContent } from 'models';
 import { useRouter } from 'next/router';
 import { memo, useCallback } from 'react';
-import PageInlineVote from 'components/common/CharmEditor/components/inlineVote/components/PageInlineVote';
+import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import CharmEditor, { ICharmEditorOutput } from '../../common/CharmEditor/CharmEditor';
 import PageBanner from './components/PageBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
@@ -117,7 +117,7 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
             />
             {page.type === 'proposal' && !isLoading && pageVote && (
               <Box my={2}>
-                <PageInlineVote
+                <VoteDetail
                   cancelVote={cancelVote}
                   deleteVote={deleteVote}
                   castVote={castVote}
