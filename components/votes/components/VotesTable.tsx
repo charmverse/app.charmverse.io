@@ -1,5 +1,5 @@
 import { Page, VoteStatus } from '@prisma/client';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 import { Tooltip, Typography, Box, Grid } from '@mui/material';
@@ -13,6 +13,9 @@ import useTasks from 'components/nexus/hooks/useTasks';
 import { humanFriendlyDate, toMonthDate } from 'lib/utilities/dates';
 import { usePages } from 'hooks/usePages';
 import charmClient from 'charmClient';
+import { ExtendedVote } from 'lib/votes/interfaces';
+import PageInlineVote from 'components/common/CharmEditor/components/inlineVote/components/PageInlineVote';
+import Modal from 'components/common/Modal';
 import NoVotesMessage from './NoVotesMessage';
 import VoteStatusChip from './VoteStatusChip';
 import ProposalDialog from './Proposal/ProposalDialog';
@@ -28,13 +31,12 @@ export interface VoteRow {
   status: VoteStatus | 'Draft';
 }
 
-export default function VotesTable ({ votes, mutateVotes }: { votes?: VoteRow[], mutateVotes: () => void }) {
-
+export default function VotesTable ({ votes, mutateVotes }: { votes?: (ExtendedVote | VoteRow)[], mutateVotes: () => void }) {
   const router = useRouter();
   const { pages, setPages } = usePages();
   const { mutate: mutateTasks } = useTasks();
-
-  const [activePage, setActivePage] = useState<Page | null>();
+  const [activeVote, setActiveVote] = useState<ExtendedVote | null>(null);
+  const [activePage, setActivePage] = useState<Page | null>(null);
 
   const openPage = useCallback((pageId: string) => {
     const page = pages[pageId];
@@ -46,6 +48,12 @@ export default function VotesTable ({ votes, mutateVotes }: { votes?: VoteRow[],
   function closePage () {
     setActivePage(null);
   }
+
+  useEffect(() => {
+    if (activeVote && votes) {
+      setActiveVote(votes.find(vote => vote.id === activeVote.id) as ExtendedVote);
+    }
+  }, [votes, activeVote]);
 
   async function deleteProposal (voteId: string) {
     // delete the related page instead of deleting the vote
@@ -77,6 +85,12 @@ export default function VotesTable ({ votes, mutateVotes }: { votes?: VoteRow[],
     await charmClient.cancelVote(voteId);
     mutateTasks();
     mutateVotes();
+  }
+
+  async function castVote (voteId: string, choice: string) {
+    const userVote = await charmClient.castVote(voteId, choice);
+    mutateVotes();
+    return userVote;
   }
 
   function editProposal (voteId: string) {
@@ -119,25 +133,34 @@ export default function VotesTable ({ votes, mutateVotes }: { votes?: VoteRow[],
                 <Box display='flex' alignItems='flex-start' gap={1}>
                   <Box component='span' sx={{ display: { xs: 'none', md: 'inline' } }}><VoteIcon color='secondary' /></Box>
                   <div>
-                    <Typography><strong>{pages[vote.pageId]?.title}</strong></Typography>
+                    <Typography><strong>{pages[vote.pageId]?.title || 'Untitled'}</strong></Typography>
                   </div>
                 </Box>
                 <Button className='show-on-hover' color='secondary' variant='outlined' size='small'>Open</Button>
               </Box>
             )}
             {pages[vote.pageId]?.type !== 'proposal' && (
-              <Link color='textPrimary' href={getVoteUrl({ domain: router.query.domain as string, path: pages[vote.pageId]?.path || '', voteId: vote.id })}>
-                <Box display='flex' alignItems='center' justifyContent='space-between'>
-                  <Box display='flex' alignItems='flex-start' gap={1}>
-                    <Box component='span' sx={{ display: { xs: 'none', md: 'inline' } }}><VoteIcon color='secondary' /></Box>
-                    <div>
+              <Box display='flex' alignItems='center' justifyContent='space-between'>
+                <Box display='flex' alignItems='flex-start' gap={1}>
+                  <Box component='span' sx={{ display: { xs: 'none', md: 'inline' } }}><VoteIcon color='secondary' /></Box>
+                  <div>
+                    <Link color='textPrimary' href={getVoteUrl({ domain: router.query.domain as string, path: pages[vote.pageId]?.path || '', voteId: vote.id })}>
                       <Typography><strong>{vote.title}</strong></Typography>
                       <Typography variant='caption'>{pages[vote.pageId]?.title || 'Untitled'}</Typography>
-                    </div>
-                  </Box>
-                  <Button className='show-on-hover' color='secondary' variant='outlined' size='small'>Open</Button>
+                    </Link>
+                  </div>
                 </Box>
-              </Link>
+                <Button
+                  className='show-on-hover'
+                  onClick={() => {
+                    setActiveVote(vote as ExtendedVote);
+                  }}
+                  color='secondary'
+                  variant='outlined'
+                  size='small'
+                >Open
+                </Button>
+              </Box>
             )}
           </Grid>
           <Grid item xs={3} md={2} display='flex' justifyContent='center'>
@@ -165,6 +188,15 @@ export default function VotesTable ({ votes, mutateVotes }: { votes?: VoteRow[],
         </GridContainer>
       ))}
       {activePage && <ProposalDialog page={activePage} onClose={closePage} />}
+      <Modal title='Vote details' size='large' open={!!activeVote} onClose={() => setActiveVote(null)}>
+        <PageInlineVote
+          detailed
+          inlineVote={activeVote!}
+          cancelVote={cancelVote}
+          deleteVote={deleteVote}
+          castVote={castVote}
+        />
+      </Modal>
     </>
   );
 }

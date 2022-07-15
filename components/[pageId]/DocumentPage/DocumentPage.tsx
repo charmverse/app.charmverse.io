@@ -38,7 +38,7 @@ export interface IEditorProps {
 
 function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
   const { pages } = usePages();
-  const { votes, isLoading } = useVotes();
+  const { cancelVote, castVote, deleteVote, votes, isLoading } = useVotes();
 
   const pageVote = Object.values(votes)[0];
 
@@ -117,7 +117,14 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
             />
             {page.type === 'proposal' && !isLoading && pageVote && (
               <Box my={2}>
-                <PageInlineVote inlineVote={pageVote} detailed={false} isProposal={true} />
+                <PageInlineVote
+                  cancelVote={cancelVote}
+                  deleteVote={deleteVote}
+                  castVote={castVote}
+                  inlineVote={pageVote}
+                  detailed={false}
+                  isProposal={true}
+                />
               </Box>
             )}
             {card && board && (

@@ -51,67 +51,33 @@ export function VotesProvider ({ children }: { children: ReactNode }) {
     });
   }
 
-  function updateVoteInCache<Vote extends ExtendedVote> (vote: Vote, choice: string) {
-    if (vote && user) {
-      const currentChoice = vote.userChoice;
-      vote.userChoice = choice;
-      if (currentChoice) {
-        vote.aggregatedResult[currentChoice] -= 1;
-      }
-      else {
-        vote.totalVotes += 1;
-      }
-      vote.aggregatedResult[choice] += 1;
-    }
-    return {
-      ...vote
-    };
-  }
-
   async function castVote (voteId: string, choice: string) {
     const userVote = await charmClient.castVote(voteId, choice);
-
-    setVotes((_votes) => {
-      const vote = _votes[voteId];
-      if (vote && user) {
-        const currentChoice = vote.userChoice;
-        vote.userChoice = choice;
-        if (currentChoice) {
-          vote.aggregatedResult[currentChoice] -= 1;
+    if (currentPageId) {
+      setVotes((_votes) => {
+        const vote = _votes[voteId];
+        if (vote && user) {
+          const currentChoice = vote.userChoice;
+          vote.userChoice = choice;
+          if (currentChoice) {
+            vote.aggregatedResult[currentChoice] -= 1;
+          }
+          else {
+            vote.totalVotes += 1;
+          }
+          vote.aggregatedResult[choice] += 1;
+          _votes[voteId] = {
+            ...vote
+          };
         }
-        else {
-          vote.totalVotes += 1;
-        }
-        vote.aggregatedResult[choice] += 1;
-        _votes[voteId] = {
-          ...vote
-        };
-
-        removeVoteFromTask(voteId);
-      }
-      return { ..._votes };
-    });
-
-    // Update the tasks cache
-    mutateTasks((tasks) => {
-      if (tasks) {
-        const voteInTaskIndex = tasks.votes.findIndex(vote => vote.id === voteId);
-
-        if (voteInTaskIndex !== -1) {
-          tasks.votes[voteInTaskIndex] = updateVoteInCache(tasks.votes[voteInTaskIndex], choice);
-        }
-
-        return { ...tasks };
-      }
-      return tasks;
-    }, {
-      revalidate: false
-    });
+        return { ..._votes };
+      });
+    }
+    removeVoteFromTask(voteId);
     return userVote;
   }
 
   async function createVote (votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId'>): Promise<ExtendedVote> {
-
     if (!user || !currentSpace) {
       throw new Error('Missing user or space');
     }

@@ -26,7 +26,7 @@ export type VoteSort = 'position' | 'latest_deadline' | 'highest_votes' | 'lates
 export type VoteFilter = 'in_progress' | 'completed' | 'all';
 
 export default function VotesSidebar () {
-  const { votes } = useVotes();
+  const { votes, ...rest } = useVotes();
   const votesArray = Object.values(votes);
   const view = useEditorViewContext();
   const [voteFilter, setVoteFilter] = useState<VoteFilter>('in_progress');
@@ -92,6 +92,7 @@ export default function VotesSidebar () {
           ? <NoVotesMessage message={`No ${voteFilter === 'completed' ? 'completed' : 'in progress'} votes yet`} />
           : sortedVotes.map(inlineVote => (
             <PageInlineVote
+              {...rest}
               key={inlineVote.id}
               detailed={false}
               inlineVote={inlineVote}

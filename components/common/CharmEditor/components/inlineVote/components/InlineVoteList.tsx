@@ -19,11 +19,10 @@ export default function InlineVoteList ({ pluginKey }: {pluginKey: PluginKey<Inl
     ids,
     show
   } = usePluginState(pluginKey) as InlineVotePluginState;
-
   const cardId = (new URLSearchParams(window.location.href)).get('cardId');
   const { currentPageActionDisplay } = usePageActionDisplay();
   const inlineVoteDetailModal = usePopupState({ variant: 'popover', popupId: 'inline-votes-detail' });
-  const { votes, isValidating } = useVotes();
+  const { votes, isValidating, ...rest } = useVotes();
   const inProgressVoteIds = ids.filter(voteId => votes[voteId]?.status === 'InProgress');
 
   // Using a ref so that its done only once
@@ -79,6 +78,7 @@ export default function InlineVoteList ({ pluginKey }: {pluginKey: PluginKey<Inl
         {inProgressVoteIds.map(inProgressVoteId => (
           <Box mb={2} key={inProgressVoteId}>
             <PageInlineVote
+              {...rest}
               inlineVote={votes[inProgressVoteId]}
               detailed={true}
             />
