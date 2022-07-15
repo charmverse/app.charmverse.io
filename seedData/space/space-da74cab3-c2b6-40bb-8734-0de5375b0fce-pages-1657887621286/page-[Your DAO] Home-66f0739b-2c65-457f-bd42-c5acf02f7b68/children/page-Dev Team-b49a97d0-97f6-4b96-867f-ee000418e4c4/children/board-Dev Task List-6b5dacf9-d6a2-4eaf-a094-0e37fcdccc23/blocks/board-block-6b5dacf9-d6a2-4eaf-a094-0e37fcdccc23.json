@@ -1,0 +1,84 @@
+{
+  "id": "6b5dacf9-d6a2-4eaf-a094-0e37fcdccc23",
+  "deletedAt": null,
+  "createdAt": "2022-06-30T12:48:31.867Z",
+  "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+  "updatedAt": "2022-07-08T16:30:41.152Z",
+  "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+  "spaceId": "da74cab3-c2b6-40bb-8734-0de5375b0fce",
+  "parentId": "",
+  "rootId": "6b5dacf9-d6a2-4eaf-a094-0e37fcdccc23",
+  "schema": 1,
+  "type": "board",
+  "title": "Dev Task List",
+  "fields": {
+    "icon": "🛠️",
+    "isTemplate": false,
+    "description": "",
+    "headerImage": null,
+    "cardProperties": [
+      {
+        "id": "c8bb446a-21eb-4849-aff7-096cd75edafe",
+        "name": "Status",
+        "type": "select",
+        "options": [
+          {
+            "id": "2efe3884-7b4e-49fd-b340-c9cce44d50c0",
+            "color": "propColorTeal",
+            "value": "Completed"
+          },
+          {
+            "id": "9c047d40-c4e2-416e-bb0b-d54e79983564",
+            "color": "propColorYellow",
+            "value": "In progress"
+          },
+          {
+            "id": "1e4f3635-40ec-4838-bd5a-b3c9e4107381",
+            "color": "propColorRed",
+            "value": "Not started"
+          },
+          {
+            "id": "57f75b39-2aab-4df6-bbd1-ec887c8e340d",
+            "color": "propColorPurple",
+            "value": "In Review"
+          }
+        ]
+      },
+      {
+        "id": "57039289-9873-4ce9-a637-05c4697f899a",
+        "name": "System",
+        "type": "select",
+        "options": [
+          {
+            "id": "4701b2f2-011e-4777-9680-d8b52dc197e0",
+            "color": "propColorTurquoise",
+            "value": "Mobile"
+          },
+          {
+            "id": "bfc06251-f8a6-4448-aa49-ca3f6e05f66a",
+            "color": "propColorTeal",
+            "value": "Front-end"
+          },
+          {
+            "id": "90970a2c-8e0e-4e9e-a6bb-b53f3ffb3671",
+            "color": "propColorOrange",
+            "value": "Website"
+          },
+          {
+            "id": "16579d05-a1a0-45ad-a97c-0e65cf6e266c",
+            "color": "propColorYellow",
+            "value": "Smart contract"
+          }
+        ]
+      },
+      {
+        "id": "21dab88f-8bb0-4841-8716-3c0073c2192b",
+        "name": "Assigned to",
+        "type": "person",
+        "options": []
+      }
+    ],
+    "showDescription": false,
+    "columnCalculations": []
+  }
+}

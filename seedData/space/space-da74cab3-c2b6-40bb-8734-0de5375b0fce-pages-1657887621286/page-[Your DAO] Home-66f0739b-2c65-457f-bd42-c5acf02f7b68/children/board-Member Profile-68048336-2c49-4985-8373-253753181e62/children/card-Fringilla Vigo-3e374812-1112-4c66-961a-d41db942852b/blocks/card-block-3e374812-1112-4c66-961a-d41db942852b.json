@@ -1,0 +1,25 @@
+{
+  "id": "3e374812-1112-4c66-961a-d41db942852b",
+  "deletedAt": null,
+  "createdAt": "2022-06-18T12:31:31.330Z",
+  "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+  "updatedAt": "2022-06-18T12:33:31.560Z",
+  "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+  "spaceId": "da74cab3-c2b6-40bb-8734-0de5375b0fce",
+  "parentId": "68048336-2c49-4985-8373-253753181e62",
+  "rootId": "68048336-2c49-4985-8373-253753181e62",
+  "schema": 1,
+  "type": "card",
+  "title": "",
+  "fields": {
+    "icon": "",
+    "isTemplate": false,
+    "properties": {
+      "81b997de-e26d-4694-a062-78df2368d199": "@immabadguy",
+      "a81231c7-6de2-42f0-8667-9dfc6479cc14": "7603f9a3-e287-4e68-945a-29e13fd41bde",
+      "a9bcc8ef-9d60-4320-9f2a-5639ff686d9d": "Fullstack Software Engineer"
+    },
+    "headerImage": null,
+    "contentOrder": []
+  }
+}

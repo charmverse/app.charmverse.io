@@ -1,45 +1,41 @@
-import { Page, Prisma } from '@prisma/client';
-import { mutate } from 'swr';
+import { Page } from '@prisma/client';
 import charmClient from 'charmClient';
-import { NextRouter } from 'next/router';
 import { Block } from 'components/common/BoardEditor/focalboard/src/blocks/block';
 import { createBoard } from 'components/common/BoardEditor/focalboard/src/blocks/board';
-import { createCard, Card } from 'components/common/BoardEditor/focalboard/src/blocks/card';
 import { createBoardView } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
+import { Card, createCard } from 'components/common/BoardEditor/focalboard/src/blocks/card';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
+import { NextRouter } from 'next/router';
+import { mutate } from 'swr';
+import { v4 } from 'uuid';
 
 export type NewPageInput = Partial<Page> & { spaceId: string, createdBy: string };
 
 export async function addPage ({ createdBy, spaceId, ...page }: NewPageInput): Promise<Page> {
-  const id = Math.random().toString().replace('0.', '');
-  const pageProperties: Prisma.PageCreateInput = {
+  const id = v4();
+
+  const pageProperties: Partial<Page> = {
+    id,
+    boardId: page.type === 'board' ? id : undefined,
     content: undefined as any,
     contentText: '',
     createdAt: new Date(),
-    author: {
-      connect: {
-        id: createdBy
-      }
-    },
+    createdBy,
     updatedAt: new Date(),
     updatedBy: createdBy,
     path: `page-${id}`,
-    space: {
-      connect: {
-        id: spaceId
-      }
-    },
+    spaceId,
     title: '',
     type: page.type ?? 'page',
     ...(page ?? {})
   };
-  if (pageProperties.type === 'board') {
-    await createDefaultBoardData(boardId => {
-      pageProperties.boardId = boardId;
-      pageProperties.id = boardId; // use the same uuid value
-    }, pageProperties.id);
-  }
+
   const newPage = await charmClient.createPage(pageProperties);
+
+  if (pageProperties.type === 'board') {
+    await createDefaultBoardData(() => null, id);
+  }
+
   await mutate(`pages/${spaceId}`, (pages: Page[]) => {
     return [...pages, newPage];
   }, {

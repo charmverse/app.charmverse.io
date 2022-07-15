@@ -1,0 +1,58 @@
+{
+  "id": "74f5829b-6cf0-4810-8c9b-d9415157b991",
+  "deletedAt": null,
+  "createdAt": "2022-07-08T13:48:59.126Z",
+  "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+  "updatedAt": "2022-07-08T16:27:12.970Z",
+  "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+  "spaceId": "da74cab3-c2b6-40bb-8734-0de5375b0fce",
+  "parentId": "",
+  "rootId": "74f5829b-6cf0-4810-8c9b-d9415157b991",
+  "schema": 1,
+  "type": "board",
+  "title": "Calendar",
+  "fields": {
+    "icon": "🗓️",
+    "isTemplate": false,
+    "description": "",
+    "headerImage": null,
+    "cardProperties": [
+      {
+        "id": "b449cb5a-c6b6-4eab-a1bc-081fd5ffe1dd",
+        "name": "Status",
+        "type": "select",
+        "options": [
+          {
+            "id": "daa12498-a52a-438d-a825-2096d5376ab4",
+            "color": "propColorTeal",
+            "value": "Completed"
+          },
+          {
+            "id": "5b1a3a19-a458-4a62-8c77-68f7d4b79573",
+            "color": "propColorYellow",
+            "value": "In progress"
+          },
+          {
+            "id": "22bcfa56-fc30-4146-8598-3264bd1fd576",
+            "color": "propColorRed",
+            "value": "Not started"
+          }
+        ]
+      },
+      {
+        "id": "ebf1aa9b-886c-41cc-81d1-1454e0780234",
+        "name": "Date",
+        "type": "date",
+        "options": []
+      },
+      {
+        "id": "e32ee08c-f8ba-4bae-b824-fc17deaf7c44",
+        "name": "Time",
+        "type": "number",
+        "options": []
+      }
+    ],
+    "showDescription": false,
+    "columnCalculations": []
+  }
+}

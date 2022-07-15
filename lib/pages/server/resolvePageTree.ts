@@ -36,8 +36,8 @@ export async function resolveChildPagesAsFlatList (pageId: string): Promise<IPag
 }
 
 /**
- * Returned a flattened list of all a page's children
- * @param pageId
+ * Returned the children of a specific page along with their own descendants
+ * @param directOnly stops at the direct descendants of the target page
  */
 export async function resolveChildPages (pageId: string, directOnly: boolean): Promise<PageWithChildren []> {
 

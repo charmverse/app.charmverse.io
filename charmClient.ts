@@ -161,7 +161,7 @@ class CharmClient {
     return http.GET<PageLink>(`/api/pages/${pageId}/link`);
   }
 
-  createPage (pageOpts: Prisma.PageCreateInput) {
+  createPage (pageOpts: Partial<Page>) {
     return http.POST<IPageWithPermissions>('/api/pages', pageOpts);
   }
 
@@ -181,7 +181,7 @@ class CharmClient {
     return http.DELETE<ModifyChildPagesResponse>(`/api/pages/${pageId}`);
   }
 
-  updatePage (pageOpts: Prisma.PageUpdateInput) {
+  updatePage (pageOpts: Partial<Page>) {
     return http.PUT<IPageWithPermissions>(`/api/pages/${pageOpts.id}`, pageOpts);
   }
 

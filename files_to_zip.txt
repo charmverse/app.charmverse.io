@@ -9,3 +9,4 @@ node_modules
 package.json
 public
 prisma
+seedData/space/space-da74cab3-c2b6-40bb-8734-0de5375b0fce-pages-1657887621286

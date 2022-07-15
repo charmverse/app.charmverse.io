@@ -1,0 +1,39 @@
+{
+  "id": "2a9746f1-6eac-4084-a082-39e549b8035f",
+  "deletedAt": null,
+  "createdAt": "2022-07-08T13:49:07.140Z",
+  "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+  "updatedAt": "2022-07-08T13:56:59.980Z",
+  "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+  "spaceId": "da74cab3-c2b6-40bb-8734-0de5375b0fce",
+  "parentId": "74f5829b-6cf0-4810-8c9b-d9415157b991",
+  "rootId": "74f5829b-6cf0-4810-8c9b-d9415157b991",
+  "schema": 1,
+  "type": "view",
+  "title": "Calendar View",
+  "fields": {
+    "filter": {
+      "filters": [],
+      "operation": "and"
+    },
+    "viewType": "calendar",
+    "cardOrder": [
+      "cdc37c2a-c19e-4407-99b6-3e37f6b30541",
+      "98d6b944-d007-4fd3-8df6-5f7a0445c28d",
+      "c0efaa87-465e-4c04-beef-2e2063970f12",
+      "007b3eb5-6b27-4828-bb7b-b6a3557b0501"
+    ],
+    "sortOptions": [],
+    "columnWidths": {},
+    "hiddenOptionIds": [],
+    "visibleOptionIds": [],
+    "defaultTemplateId": "",
+    "collapsedOptionIds": [],
+    "columnCalculations": {},
+    "kanbanCalculations": {},
+    "visiblePropertyIds": [
+      "__title",
+      "e32ee08c-f8ba-4bae-b824-fc17deaf7c44"
+    ]
+  }
+}
