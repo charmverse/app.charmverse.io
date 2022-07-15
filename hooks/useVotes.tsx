@@ -35,7 +35,9 @@ export function VotesProvider ({ children }: { children: ReactNode }) {
 
   const cardId = typeof window !== 'undefined' ? (new URLSearchParams(window.location.href)).get('cardId') : null;
 
-  const { data, isValidating } = useSWR(() => currentPageId && !cardId ? `pages/${currentPageId}/votes` : null, async () => charmClient.getVotesByPage(currentPageId));
+  const { data, isValidating } = useSWR(() => currentPageId && !cardId ? `pages/${currentPageId}/votes` : null, async () => charmClient.getVotesByPage(currentPageId), {
+    revalidateOnFocus: false
+  });
 
   const [currentSpace] = useCurrentSpace();
   const { mutate: mutateTasks } = useTasks();
