@@ -14,7 +14,7 @@
         "type": "image",
         "attrs": {
           "alt": "Epic Guards - Clash Royale Wiki",
-          "src": "https://clashroyale.wiki/wp-content/uploads/2016/05/guards.png",
+          "src": "https://s3.amazonaws.com/charm.public/assets/guards.png",
           "size": 425,
           "caption": null
         }

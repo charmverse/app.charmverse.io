@@ -14,7 +14,7 @@
         "type": "image",
         "attrs": {
           "alt": "Clash Royale Cards",
-          "src": "https://cdn.statsroyale.com/images/cards/full/wizard.png",
+          "src": "https://s3.amazonaws.com/charm.public/assets/wizard.png",
           "size": 425,
           "caption": null
         }

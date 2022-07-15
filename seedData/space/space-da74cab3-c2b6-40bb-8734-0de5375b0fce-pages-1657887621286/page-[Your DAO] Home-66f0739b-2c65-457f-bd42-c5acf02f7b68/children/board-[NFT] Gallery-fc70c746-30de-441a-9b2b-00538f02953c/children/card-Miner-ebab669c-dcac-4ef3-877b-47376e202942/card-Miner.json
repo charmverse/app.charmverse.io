@@ -14,7 +14,7 @@
         "type": "image",
         "attrs": {
           "alt": "Miner - Legendary Clash Royale Card",
-          "src": "https://cdn.statsroyale.com/images/cards/full/miner.png",
+          "src": "https://s3.amazonaws.com/charm.public/assets/miner.png",
           "size": 425,
           "caption": null
         }
