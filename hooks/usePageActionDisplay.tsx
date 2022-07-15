@@ -1,6 +1,5 @@
 import { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import { ExtendedVote } from 'lib/votes/interfaces';
-import { useRouter } from 'next/router';
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 import { useSWRConfig } from 'swr';
 import { useVotes } from './useVotes';
@@ -39,9 +38,6 @@ export function PageActionDisplayProvider ({ children }: { children: ReactNode }
       else {
         setCurrentPageActionDisplay(null);
       }
-    }
-    else {
-      setCurrentPageActionDisplay(null);
     }
   }, [isValidatingInlineComments, isValidatingInlineVotes, currentPageId]);
 
