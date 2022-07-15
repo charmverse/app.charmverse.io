@@ -35,7 +35,7 @@ export function VotesProvider ({ children }: { children: ReactNode }) {
 
   const cardId = typeof window !== 'undefined' ? (new URLSearchParams(window.location.href)).get('cardId') : null;
 
-  const { data, isValidating, mutate: mutateVotes } = useSWR(() => currentPageId && !cardId ? `pages/${currentPageId}/votes` : null, async () => charmClient.getVotesByPage(currentPageId));
+  const { data, isValidating } = useSWR(() => currentPageId && !cardId ? `pages/${currentPageId}/votes` : null, async () => charmClient.getVotesByPage(currentPageId));
 
   const [currentSpace] = useCurrentSpace();
   const { mutate: mutateTasks } = useTasks();
@@ -53,7 +53,26 @@ export function VotesProvider ({ children }: { children: ReactNode }) {
 
   async function castVote (voteId: string, choice: string) {
     const userVote = await charmClient.castVote(voteId, choice);
-    mutateVotes();
+    if (currentPageId) {
+      setVotes((_votes) => {
+        const vote = _votes[voteId];
+        if (vote && user) {
+          const currentChoice = vote.userChoice;
+          vote.userChoice = choice;
+          if (currentChoice) {
+            vote.aggregatedResult[currentChoice] -= 1;
+          }
+          else {
+            vote.totalVotes += 1;
+          }
+          vote.aggregatedResult[choice] += 1;
+          _votes[voteId] = {
+            ...vote
+          };
+        }
+        return { ..._votes };
+      });
+    }
     removeVoteFromTask(voteId);
     return userVote;
   }
@@ -79,13 +98,22 @@ export function VotesProvider ({ children }: { children: ReactNode }) {
 
   async function deleteVote (voteId: string) {
     await charmClient.deleteVote(voteId);
-    mutateVotes();
+    if (currentPageId) {
+      delete votes[voteId];
+      setVotes({ ...votes });
+    }
     removeVoteFromTask(voteId);
   }
 
   async function cancelVote (voteId: string) {
     await charmClient.cancelVote(voteId);
-    mutateVotes();
+    if (currentPageId) {
+      votes[voteId] = {
+        ...votes[voteId],
+        status: 'Cancelled'
+      };
+      setVotes({ ...votes });
+    }
     removeVoteFromTask(voteId);
   }
 
