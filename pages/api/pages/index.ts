@@ -17,9 +17,9 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser).post(createPage);
 
 async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
-  const data = req.body as Prisma.PageCreateInput;
+  const data = req.body as Page;
 
-  const spaceId = data.space?.connect?.id;
+  const spaceId = data.spaceId;
 
   if (!spaceId) {
     throw new InvalidInputError('A space id is required to create a page');
@@ -37,17 +37,30 @@ async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
     throw new UnauthorisedActionError('You do not have permissions to create a page.');
   }
 
+  // eslint-disable-next-line no-console
+  console.log('Creation data', data);
+
   // Remove parent ID and pass it to the creation input
   // This became necessary after adding a formal parentPage relation related to page.parentId
   // We now need to specify this as a ParentPage.connect prisma argument instead of a raw string
-  const { parentId, ...pageCreationData } = data as any;
-  const typedPageCreationData = pageCreationData as Prisma.PageCreateInput;
+  const { parentId, createdBy, spaceId: droppedSpaceId, ...pageCreationData } = data;
+  const typedPageCreationData = pageCreationData as any as Prisma.PageCreateInput;
 
-  const inputDataAsPage = data as any as Page;
-
-  typedPageCreationData.parentPage = inputDataAsPage.parentId ? {
+  typedPageCreationData.author = {
     connect: {
-      id: inputDataAsPage.parentId
+      id: userId
+    }
+  };
+
+  typedPageCreationData.space = {
+    connect: {
+      id: spaceId
+    }
+  };
+
+  typedPageCreationData.parentPage = parentId ? {
+    connect: {
+      id: parentId
     }
   } : undefined;
 

@@ -161,7 +161,7 @@ class CharmClient {
     return http.GET<PageLink>(`/api/pages/${pageId}/link`);
   }
 
-  createPage (pageOpts: Prisma.PageCreateInput) {
+  createPage (pageOpts: Partial<Page>) {
     return http.POST<IPageWithPermissions>('/api/pages', pageOpts);
   }
 

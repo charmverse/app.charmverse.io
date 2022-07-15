@@ -1,33 +1,21 @@
-import { Prisma } from '@prisma/client';
-import { v4 } from 'uuid';
+import { Page } from '@prisma/client';
 import { SubmissionContent } from 'lib/applications/interfaces';
+import { v4 } from 'uuid';
 
 export function generatePageToCreateStub (options: {
   userId:string,
   spaceId: string,
   title?: string,
-  parentId?: string | null}): Prisma.PageCreateInput {
+  parentId?: string | null}): Partial<Page> {
   return {
-    author: {
-      connect: {
-        id: options.userId
-      }
-    },
+    createdBy: options.userId,
     contentText: '',
     path: v4(),
     title: options.title || 'Root',
     type: 'page',
     updatedBy: options.userId,
-    space: {
-      connect: {
-        id: options.spaceId
-      }
-    },
-    parentPage: options.parentId ? {
-      connect: {
-        id: options.parentId
-      }
-    } : undefined
+    spaceId: options.spaceId,
+    parentId: options.parentId
   };
 }
 
