@@ -4,17 +4,33 @@ import { PageContent } from 'models';
 import fs from 'node:fs/promises';
 import { v4 } from 'uuid';
 
+interface AWSAssetUrl {
+  oldPageId: string;
+  newPageId: string;
+  awsUrl: string;
+}
+
 interface ConverterOutput {
   blocksToCreate: Prisma.BlockCreateInput[],
   pagesToCreate: Prisma.PageCreateInput[],
   oldNewHashmap: Record<string, string>
+  awsAssetUrls: AWSAssetUrl[]
 }
 
 /**
  * Processes the recursive folder structure created by export page data script and returns the data necessary for a prisma page transaction
- * @oldNewHashmap - A Handy tree structure that keeps a reference to the old and new page IDs
+ * @oldNewHashmap - A Handy tree structure that keeps a reference to the old and new page IDs. It can be accessed in both directions
  */
-async function convertFolderContent ({ entryPath, spaceId, authorId, blocksToCreate, pagesToCreate, parentPageId, parentPermissionId, oldNewHashmap }:
+async function convertFolderContent ({
+  entryPath,
+  spaceId,
+  authorId,
+  blocksToCreate,
+  pagesToCreate,
+  parentPageId,
+  parentPermissionId,
+  oldNewHashmap,
+  awsAssetUrls }:
   {
     parentPageId?: string | null,
     entryPath: string,
@@ -33,6 +49,7 @@ async function convertFolderContent ({ entryPath, spaceId, authorId, blocksToCre
 
   // Map the old page ID to the new one
   oldNewHashmap[pageContent.id] = newPageId;
+  oldNewHashmap[newPageId] = pageContent.id;
 
   pageContent.id = newPageId;
 
@@ -165,7 +182,8 @@ async function convertFolderContent ({ entryPath, spaceId, authorId, blocksToCre
         pagesToCreate,
         parentPageId: newPageId,
         parentPermissionId: permissionId,
-        oldNewHashmap
+        oldNewHashmap,
+        awsAssetUrls
       });
     }));
 
@@ -174,7 +192,8 @@ async function convertFolderContent ({ entryPath, spaceId, authorId, blocksToCre
   return {
     blocksToCreate,
     pagesToCreate,
-    oldNewHashmap
+    oldNewHashmap,
+    awsAssetUrls
   };
 
 }
@@ -186,7 +205,7 @@ async function convertFolderContent ({ entryPath, spaceId, authorId, blocksToCre
 export async function convertJsonPagesToPrisma ({ folderPath, spaceId }:
   {
     folderPath: string, spaceId: string
-  }): Promise<{pagesToCreate: Prisma.PageCreateInput[], blocksToCreate: Prisma.BlockCreateInput[]}> {
+  }): Promise<Omit<ConverterOutput, 'oldNewHashmap'>> {
   const space = await prisma.space.findUnique({
     where: {
       id: spaceId
@@ -198,6 +217,7 @@ export async function convertJsonPagesToPrisma ({ folderPath, spaceId }:
   const pagesToCreate: Prisma.PageCreateInput[] = [];
   const blocksToCreate: Prisma.BlockCreateInput[] = [];
   const oldNewHashmap: Record<string, string> = {};
+  const awsAssetUrls: AWSAssetUrl[] = [];
 
   await Promise.all(entryFolder.map(pageFolder => convertFolderContent({
     authorId: space.createdBy,
@@ -205,15 +225,17 @@ export async function convertJsonPagesToPrisma ({ folderPath, spaceId }:
     pagesToCreate,
     oldNewHashmap,
     entryPath: `${folderPath}/${pageFolder}`,
-    spaceId
+    spaceId,
+    awsAssetUrls
   })));
 
-  // Iterate through page links and update the reference
+  // Assess the page content for any data we want to update
   pagesToCreate.forEach(p => {
     const prosemirrorNodes = (p.content as PageContent)?.content;
     if (prosemirrorNodes) {
       let prosemirrorNodesAsText = JSON.stringify(prosemirrorNodes);
 
+      // Step 1 - Update all nested page links
       const nestedPageRefs = prosemirrorNodesAsText.match(/{"type":"page","attrs":{"id":"((\d|[a-f]){1,}-){1,}(\d|[a-f]){1,}"}}/g);
 
       nestedPageRefs?.forEach(pageLinkNode => {
@@ -226,6 +248,33 @@ export async function convertJsonPagesToPrisma ({ folderPath, spaceId }:
       });
 
       (p.content as PageContent).content = JSON.parse(prosemirrorNodesAsText);
+
+      // Step - 2 Extract any S3 URLs
+      const awsUrlRegex = /https:\/\/s3\.amazonaws(\w|\d|-|\/|\.){1,}/g;
+
+      const awsAssetLinksFound = prosemirrorNodesAsText.match(awsUrlRegex);
+
+      const pageId = p.id as string;
+
+      if (awsAssetLinksFound) {
+        awsAssetUrls.push(...awsAssetLinksFound.map(link => {
+          const assetUrl: AWSAssetUrl = {
+            awsUrl: link,
+            newPageId: pageId,
+            oldPageId: oldNewHashmap[pageId]
+          };
+          return assetUrl;
+        }));
+      }
+
+      if (p.headerImage && p.headerImage.match(awsUrlRegex) !== null) {
+        awsAssetUrls.push({
+          awsUrl: p.headerImage,
+          newPageId: pageId,
+          oldPageId: oldNewHashmap[pageId]
+        });
+      }
+
     }
   });
 
@@ -233,6 +282,7 @@ export async function convertJsonPagesToPrisma ({ folderPath, spaceId }:
 
   return {
     blocksToCreate,
-    pagesToCreate
+    pagesToCreate,
+    awsAssetUrls
   };
 }
