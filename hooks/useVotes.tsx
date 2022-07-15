@@ -35,7 +35,7 @@ export function VotesProvider ({ children }: { children: ReactNode }) {
 
   const cardId = typeof window !== 'undefined' ? (new URLSearchParams(window.location.href)).get('cardId') : null;
 
-  const { data, isValidating } = useSWR(() => currentPageId && !cardId ? `pages/${currentPageId}/votes` : null, async () => charmClient.getVotesByPage(currentPageId));
+  const { data, isValidating, mutate: mutateVotes } = useSWR(() => currentPageId && !cardId ? `pages/${currentPageId}/votes` : null, async () => charmClient.getVotesByPage(currentPageId));
 
   const [currentSpace] = useCurrentSpace();
   const { mutate: mutateTasks } = useTasks();
@@ -53,26 +53,7 @@ export function VotesProvider ({ children }: { children: ReactNode }) {
 
   async function castVote (voteId: string, choice: string) {
     const userVote = await charmClient.castVote(voteId, choice);
-    if (currentPageId) {
-      setVotes((_votes) => {
-        const vote = _votes[voteId];
-        if (vote && user) {
-          const currentChoice = vote.userChoice;
-          vote.userChoice = choice;
-          if (currentChoice) {
-            vote.aggregatedResult[currentChoice] -= 1;
-          }
-          else {
-            vote.totalVotes += 1;
-          }
-          vote.aggregatedResult[choice] += 1;
-          _votes[voteId] = {
-            ...vote
-          };
-        }
-        return { ..._votes };
-      });
-    }
+    mutateVotes();
     removeVoteFromTask(voteId);
     return userVote;
   }
@@ -98,18 +79,13 @@ export function VotesProvider ({ children }: { children: ReactNode }) {
 
   async function deleteVote (voteId: string) {
     await charmClient.deleteVote(voteId);
-    delete votes[voteId];
-    setVotes({ ...votes });
+    mutateVotes();
     removeVoteFromTask(voteId);
   }
 
   async function cancelVote (voteId: string) {
     await charmClient.cancelVote(voteId);
-    votes[voteId] = {
-      ...votes[voteId],
-      status: 'Cancelled'
-    };
-    setVotes({ ...votes });
+    mutateVotes();
     removeVoteFromTask(voteId);
   }
 
