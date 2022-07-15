@@ -238,7 +238,11 @@ export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'cre
           id: options.spaceId as string
         }
       },
-      parentId: options.parentId,
+      parentPage: options.parentId ? {
+        connect: {
+          id: options.parentId
+        }
+      } : undefined,
       deletedAt: options.deletedAt ?? null,
       boardId: options.boardId ?? null
     },
