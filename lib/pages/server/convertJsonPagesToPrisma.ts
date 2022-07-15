@@ -204,11 +204,11 @@ async function convertFolderContent ({
 /**
  * Use this to convert a static page tree to prisma input you can provide to a transaction
  * @folderPath The folder containing the exported pages for the target space
- * @findS3Assets If enabled, will return all AWS S3 assets found in the page content, or the page header image
+ * @findS3Assets Defaults to false - If enabled, will return all AWS S3 assets found in the page content, or the page header image
  */
-export async function convertJsonPagesToPrisma ({ folderPath, spaceId, findS3Assets }:
+export async function convertJsonPagesToPrisma ({ folderPath, spaceId, findS3Assets = false }:
   {
-    folderPath: string, spaceId: string, findS3Assets: boolean
+    folderPath: string, spaceId: string, findS3Assets?: boolean
   }): Promise<Omit<ConverterOutput, 'oldNewHashmap'>> {
   const space = await prisma.space.findUnique({
     where: {
