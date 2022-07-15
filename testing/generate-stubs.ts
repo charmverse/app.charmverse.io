@@ -23,7 +23,11 @@ export function generatePageToCreateStub (options: {
         id: options.spaceId
       }
     },
-    parentId: options.parentId
+    parentPage: options.parentId ? {
+      connect: {
+        id: options.parentId
+      }
+    } : undefined
   };
 }
 
