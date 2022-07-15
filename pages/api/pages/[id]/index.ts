@@ -68,7 +68,6 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
     },
     data: {
       ...req.body,
-      parentId: undefined,
       updatedAt: new Date(),
       updatedBy: userId
     },
