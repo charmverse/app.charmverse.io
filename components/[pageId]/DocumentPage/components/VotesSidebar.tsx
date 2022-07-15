@@ -95,7 +95,7 @@ export default function VotesSidebar () {
               {...rest}
               key={inlineVote.id}
               detailed={false}
-              inlineVote={inlineVote}
+              vote={inlineVote}
             />
           ))}
       </VotesContainer>

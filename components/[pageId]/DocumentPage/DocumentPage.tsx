@@ -121,7 +121,7 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
                   cancelVote={cancelVote}
                   deleteVote={deleteVote}
                   castVote={castVote}
-                  inlineVote={pageVote}
+                  vote={pageVote}
                   detailed={false}
                   isProposal={true}
                 />

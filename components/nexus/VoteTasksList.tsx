@@ -2,7 +2,7 @@ import HowToVote from '@mui/icons-material/HowToVote';
 import { Alert, Box, Card, Grid, Typography } from '@mui/material';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import VoteDetail, { PageInlineVoteProps } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
+import VoteDetail, { VoteDetailProps } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';
@@ -48,18 +48,18 @@ export function VoteTasksListRow (
     });
   }
 
-  const castVote: PageInlineVoteProps['castVote'] = async (voteId, choice) => {
+  const castVote: VoteDetailProps['castVote'] = async (voteId, choice) => {
     const userVote = await charmClient.castVote(voteId, choice);
     removeVoteFromTask(voteId);
     return userVote;
   };
 
-  const deleteVote: PageInlineVoteProps['deleteVote'] = async (voteId) => {
+  const deleteVote: VoteDetailProps['deleteVote'] = async (voteId) => {
     await charmClient.deleteVote(voteId);
     removeVoteFromTask(voteId);
   };
 
-  const cancelVote: PageInlineVoteProps['cancelVote'] = async (voteId) => {
+  const cancelVote: VoteDetailProps['cancelVote'] = async (voteId) => {
     await charmClient.cancelVote(voteId);
     removeVoteFromTask(voteId);
   };
@@ -133,7 +133,7 @@ export function VoteTasksListRow (
         }}
       >
         <VoteDetail
-          inlineVote={voteTask}
+          vote={voteTask}
           detailed
           castVote={castVote}
           deleteVote={deleteVote}

@@ -191,7 +191,7 @@ export default function VotesTable ({ votes, mutateVotes }: { votes?: (ExtendedV
       <Modal title='Vote details' size='large' open={!!activeVote} onClose={() => setActiveVote(null)}>
         <VoteDetail
           detailed
-          inlineVote={activeVote!}
+          vote={activeVote!}
           cancelVote={cancelVote}
           deleteVote={deleteVote}
           castVote={castVote}

@@ -16,8 +16,8 @@ import useSWR from 'swr';
 import VoteActionsMenu from 'components/votes/components/VoteActionsMenu';
 import { UserVote } from '@prisma/client';
 
-export interface PageInlineVoteProps {
-  inlineVote: ExtendedVote;
+export interface VoteDetailProps {
+  vote: ExtendedVote;
   detailed?: boolean;
   isProposal?: boolean;
   castVote: (voteId: string, choice: string) => Promise<UserVote>
@@ -40,7 +40,7 @@ const StyledFormControl = styled(FormControl)`
 
 const MAX_DESCRIPTION_LENGTH = 200;
 
-export default function VoteDetail ({ cancelVote, castVote, deleteVote, detailed = false, inlineVote: vote, isProposal }: PageInlineVoteProps) {
+export default function VoteDetail ({ cancelVote, castVote, deleteVote, detailed = false, vote, isProposal }: VoteDetailProps) {
   const { deadline, totalVotes, description, id, title, userChoice, voteOptions, aggregatedResult } = vote;
   const [user] = useUser();
   const view = useEditorViewContext();
@@ -193,7 +193,7 @@ export default function VoteDetail ({ cancelVote, castVote, deleteVote, detailed
       )}
       <Modal title='Vote details' size='large' open={voteDetailsPopup.isOpen} onClose={voteDetailsPopup.close}>
         <VoteDetail
-          inlineVote={vote}
+          vote={vote}
           detailed={true}
           cancelVote={cancelVote}
           castVote={castVote}

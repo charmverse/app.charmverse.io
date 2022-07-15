@@ -79,7 +79,7 @@ export default function InlineVoteList ({ pluginKey }: {pluginKey: PluginKey<Inl
           <Box mb={2} key={inProgressVoteId}>
             <VoteDetail
               {...rest}
-              inlineVote={votes[inProgressVoteId]}
+              vote={votes[inProgressVoteId]}
               detailed={true}
             />
           </Box>
