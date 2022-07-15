@@ -26,7 +26,7 @@ export function PageActionDisplayProvider ({ children }: { children: ReactNode }
   useEffect(() => {
     const highlightedCommentId = (new URLSearchParams(window.location.search)).get('commentId');
     if (currentPageId && !isValidatingInlineComments && !isValidatingInlineVotes) {
-      const cachedInlineVotesData: ExtendedVote[] = cache.get(`pages/${currentPageId}/inline-votes`);
+      const cachedInlineVotesData: ExtendedVote[] = cache.get(`pages/${currentPageId}/votes`);
       const cachedInlineCommentData: ThreadWithCommentsAndAuthors[] | undefined = cache.get(`pages/${currentPageId}/threads`);
       // Vote takes precedence over comments, so if a page has in progress votes and unresolved comments, show the votes
       if (!highlightedCommentId && cachedInlineVotesData && cachedInlineVotesData.find(inlineVote => inlineVote.status === 'InProgress')) {
