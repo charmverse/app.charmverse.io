@@ -22,9 +22,9 @@ const InlineActionCountContainer = styled.span`
   position: absolute;
   top: 5px;
   display: flex;
-  right: -40px;
+  right: -70px;
   align-items: center;
-  gap: ${({ theme }) => theme.spacing(1.5)};
+  gap: ${({ theme }) => theme.spacing(1)};
   cursor: pointer;
   user-select: none;
 `;

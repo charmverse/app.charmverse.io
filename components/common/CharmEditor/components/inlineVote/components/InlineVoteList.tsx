@@ -77,7 +77,7 @@ export default function InlineVoteList ({ pluginKey }: {pluginKey: PluginKey<Inl
         }}
       >
         {inProgressVoteIds.map(inProgressVoteId => (
-          <Box mb={2}>
+          <Box mb={2} key={inProgressVoteId}>
             <PageInlineVote
               inlineVote={votes[inProgressVoteId]}
               detailed={true}

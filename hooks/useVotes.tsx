@@ -29,7 +29,7 @@ const VotesContext = createContext<Readonly<IContext>>({
 });
 
 export function VotesProvider ({ children }: { children: ReactNode }) {
-  const { currentPageId, pages } = usePages();
+  const { currentPageId } = usePages();
   const [votes, setVotes] = useState<IContext['votes']>({});
   const [user] = useUser();
 
@@ -51,8 +51,26 @@ export function VotesProvider ({ children }: { children: ReactNode }) {
     });
   }
 
+  function updateVoteInCache<Vote extends ExtendedVote> (vote: Vote, choice: string) {
+    if (vote && user) {
+      const currentChoice = vote.userChoice;
+      vote.userChoice = choice;
+      if (currentChoice) {
+        vote.aggregatedResult[currentChoice] -= 1;
+      }
+      else {
+        vote.totalVotes += 1;
+      }
+      vote.aggregatedResult[choice] += 1;
+    }
+    return {
+      ...vote
+    };
+  }
+
   async function castVote (voteId: string, choice: string) {
     const userVote = await charmClient.castVote(voteId, choice);
+
     setVotes((_votes) => {
       const vote = _votes[voteId];
       if (vote && user) {
@@ -73,6 +91,22 @@ export function VotesProvider ({ children }: { children: ReactNode }) {
       }
       return { ..._votes };
     });
+
+    // Update the tasks cache
+    mutateTasks((tasks) => {
+      if (tasks) {
+        const voteInTaskIndex = tasks.votes.findIndex(vote => vote.id === voteId);
+
+        if (voteInTaskIndex !== -1) {
+          tasks.votes[voteInTaskIndex] = updateVoteInCache(tasks.votes[voteInTaskIndex], choice);
+        }
+
+        return { ...tasks };
+      }
+      return tasks;
+    }, {
+      revalidate: false
+    });
     return userVote;
   }
 
@@ -89,20 +123,6 @@ export function VotesProvider ({ children }: { children: ReactNode }) {
       spaceId: currentSpace.id
     });
 
-    mutateTasks((tasks) => {
-      // Add the vote to the task
-      const currentPage = pages[currentPageId];
-      if (tasks && currentSpace && currentPage) {
-        tasks.votes.push({
-          ...extendedVote,
-          space: currentSpace,
-          page: currentPage
-        });
-      }
-      return tasks;
-    }, {
-      revalidate: false
-    });
     setVotes({
       ...votes,
       [extendedVote.id]: extendedVote

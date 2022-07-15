@@ -1,10 +1,14 @@
 import HowToVote from '@mui/icons-material/HowToVote';
 import { Alert, Box, Card, Grid, Typography } from '@mui/material';
 import Button from 'components/common/Button';
+import PageInlineVote from 'components/common/CharmEditor/components/inlineVote/components/PageInlineVote';
+import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
+import Modal from 'components/common/Modal';
 import { VoteTask } from 'lib/votes/interfaces';
 import { DateTime } from 'luxon';
 import { GetTasksResponse } from 'pages/api/tasks/list';
+import { useState } from 'react';
 import { KeyedMutator } from 'swr';
 
 interface VoteTasksListProps {
@@ -14,12 +18,14 @@ interface VoteTasksListProps {
 }
 
 export function VoteTasksListRow (
-  {
+  voteTask: VoteTask
+) {
+  const {
     page: { path: pagePath, title: pageTitle },
     space: { domain: spaceDomain, name: spaceName },
     deadline, title: voteTitle, id: voteId
-  }: VoteTask
-) {
+  } = voteTask;
+  const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
 
   const voteLink = `/${spaceDomain}/${pagePath}?voteId=${voteId}`;
   const voteLocation = `${pageTitle || 'Untitled'} in ${spaceName}`;
@@ -55,7 +61,9 @@ export function VoteTasksListRow (
               fontSize: { xs: 14, sm: 'inherit' }
             }}
           >
-            {voteLocation}
+            <Link href={voteLink}>
+              {voteLocation}
+            </Link>
           </Grid>
           <Grid
             item
@@ -74,10 +82,27 @@ export function VoteTasksListRow (
             sm={2}
             md={1}
           >
-            <Button href={voteLink}>Vote now</Button>
+            <Button onClick={() => {
+              setIsVoteModalOpen(true);
+            }}
+            >Vote now
+            </Button>
           </Grid>
         </Grid>
       </Card>
+      <Modal
+        title='Vote details'
+        size='large'
+        open={isVoteModalOpen}
+        onClose={() => {
+          setIsVoteModalOpen(false);
+        }}
+      >
+        <PageInlineVote
+          inlineVote={voteTask}
+          detailed={true}
+        />
+      </Modal>
     </Box>
   );
 }
