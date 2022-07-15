@@ -131,11 +131,7 @@ export async function createDatabaseCardPage (pageInfo: Record<keyof Pick<Page, 
       path: `page-${Math.random().toString().replace('0.', '')}`,
       type: 'card',
       title: pageInfo.title || '',
-      parentPage: {
-        connect: {
-          id: pageInfo.boardId
-        }
-      },
+      parentId: pageInfo.boardId,
       id: cardBlock.id,
       space: {
         connect: {
