@@ -1,6 +1,6 @@
 import { EditorView, MarkType, Node } from '@bangle.dev/pm';
+import { findChildrenByMark } from 'lib/focalboard/findChildrenByMark';
 import { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
-import { findChildrenByMark } from 'prosemirror-utils';
 
 export function findTotalInlineComments (
   view:EditorView,

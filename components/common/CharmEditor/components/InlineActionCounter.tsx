@@ -46,11 +46,11 @@ export default function InlineActionCounter (
   const { votes } = useVotes();
   const { threadIds, totalInlineComments } = useMemo(() => (calculateActions || isShowingCardModal)
     ? findTotalInlineComments(view, node, threads)
-    : { threadIds: [], totalInlineComments: 0 }, [node, calculateActions, isShowingCardModal]);
+    : { threadIds: [], totalInlineComments: 0 }, [node, calculateActions, isShowingCardModal, view, threads]);
 
   const { voteIds, totalInlineVotes } = useMemo(() => (calculateActions || isShowingCardModal)
     ? findTotalInlineVotes(view, node, votes)
-    : { voteIds: [], totalInlineVotes: 0 }, [node, calculateActions, isShowingCardModal]);
+    : { voteIds: [], totalInlineVotes: 0 }, [node, calculateActions, isShowingCardModal, view, votes]);
 
   return (
     <>
