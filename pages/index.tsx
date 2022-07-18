@@ -30,12 +30,12 @@ export default function LoginPage () {
     if (typeof router.query.returnUrl === 'string') {
       router.push(router.query.returnUrl);
     }
-    else if (defaultWorkspace === 'nexus') {
+    else if (defaultWorkspace === '/nexus') {
       router.push('/nexus');
     }
     else if (spaces.length > 0) {
-      const isValidDefaultWorkspace = !!defaultWorkspace && spaces.some(space => space.domain === defaultWorkspace);
-      router.push(`/${isValidDefaultWorkspace ? defaultWorkspace : spaces[0].domain}`);
+      const isValidDefaultWorkspace = !!defaultWorkspace && spaces.some(space => defaultWorkspace.startsWith(`/${space.domain}`));
+      router.push(isValidDefaultWorkspace ? defaultWorkspace : `/${spaces[0].domain}`);
     }
     else {
       router.push('/signup');
