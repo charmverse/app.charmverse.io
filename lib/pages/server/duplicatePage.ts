@@ -21,11 +21,7 @@ export async function duplicatePage (pageId: string, userId: string, parentId?: 
   const transactions: PrismaPromise<any>[] = [prisma.page.create({
     data: {
       id: createdPageId,
-      parentPage: parentIdToAssign ? {
-        connect: {
-          id: parentIdToAssign
-        }
-      } : undefined,
+      parentId: parentIdToAssign,
       updatedBy: userId,
       title: `${page.title} (copy)`,
       content: page.content ?? undefined,
