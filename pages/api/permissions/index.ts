@@ -1,5 +1,5 @@
 
-import { PagePermission } from '@prisma/client';
+import { Page, PagePermission, PrismaPromise, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { deletePagePermission, IPagePermissionRequest, IPagePermissionToDelete, IPagePermissionWithAssignee, listPagePermissions, setupPermissionsAfterPagePermissionAdded, upsertPermission, computeUserPagePermissions, getPagePermission, IPagePermissionWithSource } from 'lib/permissions/pages';
@@ -7,7 +7,8 @@ import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 import nc from 'next-connect';
-import { PermissionNotFoundError } from '../../../lib/permissions/pages/errors';
+import { PermissionNotFoundError } from 'lib/permissions/pages/errors';
+import { boardPagePermissionUpdated } from 'lib/permissions/pages/triggers';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -44,6 +45,12 @@ async function addPagePermission (req: NextApiRequest, res: NextApiResponse<IPag
     throw new ActionNotPermittedError('You cannot make page public.');
   }
 
+  const { type: pageType } = await prisma.page.findUnique({
+    where: {
+      id: pageId
+    }
+  }) as Page;
+
   // Count before and after permissions so we don't trigger the event unless necessary
   const permissionsBefore = await prisma.pagePermission.count({
     where: {
@@ -53,15 +60,27 @@ async function addPagePermission (req: NextApiRequest, res: NextApiResponse<IPag
 
   const createdPermission = await upsertPermission(pageId, req.body);
 
-  const permissionsAfter = await prisma.pagePermission.count({
-    where: {
-      pageId
-    }
-  });
+  if (pageType === 'board') {
+    const args = await boardPagePermissionUpdated({ boardId: pageId, permissionId: createdPermission.id });
 
-  // TODO - This could be an async job, but there is a risk of the UI being out of sync
-  if (permissionsAfter > permissionsBefore) {
-    await setupPermissionsAfterPagePermissionAdded(createdPermission.id);
+    await prisma.$transaction([
+      args.updateManyArgs ? prisma.pagePermission.updateMany(args.updateManyArgs) : null,
+      args.createManyArgs ? prisma.pagePermission.createMany(args.createManyArgs) : null
+    ].filter(a => a !== null) as PrismaPromise<any>[]);
+
+  }
+  // Old behaviour where we setup permissions after a page permission is added
+  else {
+    const permissionsAfter = await prisma.pagePermission.count({
+      where: {
+        pageId
+      }
+    });
+
+    // TODO - This could be an async job, but there is a risk of the UI being out of sync
+    if (permissionsAfter > permissionsBefore) {
+      await setupPermissionsAfterPagePermissionAdded(createdPermission.id);
+    }
   }
 
   return res.status(201).json(createdPermission);
