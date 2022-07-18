@@ -51,7 +51,7 @@ const UserProperty = (props: Props): JSX.Element => {
     const workspaceUsersById = useAppSelector<{[key:string]: IUser}>(getWorkspaceUsers)
 
     if (props.readonly) {
-        return (<div className='UserProperty octo-propertyvalue readonly'>{workspaceUsersById[props.value]?.username || ''}</div>)
+        return (<div className='UserProperty octo-propertyvalue readonly'>{workspaceUsersById[props.value]?.username || '(missing name)'}</div>)
     }
 
     return (
