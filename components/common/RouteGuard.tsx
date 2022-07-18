@@ -33,14 +33,12 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     const workspaceDomain = isDomain ? firstSegment : null;
     const defaultPageKey: string = workspaceDomain ? getKey(`last-page-${workspaceDomain}`) : '';
     const defaultWorkspaceKey: string = getKey('last-workspace');
-    const defaultPage = defaultPageKey ? localStorage.getItem(defaultPageKey) : null;
-    const defaultWorkspace = localStorage.getItem(defaultWorkspaceKey);
 
-    if (workspaceDomain && workspaceDomain !== defaultWorkspace) {
-      localStorage.setItem(defaultWorkspaceKey, workspaceDomain);
+    if (workspaceDomain) {
+      localStorage.setItem(defaultWorkspaceKey, router.asPath);
     }
 
-    if (workspaceDomain && pathSegments.length > 1 && router.asPath !== defaultPage) {
+    if (workspaceDomain && pathSegments.length > 1) {
       localStorage.setItem(defaultPageKey, router.asPath);
     }
   }

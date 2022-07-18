@@ -13,9 +13,13 @@ export default function RedirectToMainPage () {
   const { pages } = usePages();
   const defaultPageKey: string = space?.domain ? getKey(`last-page-${space.domain}`) : '';
   const defaultPage = defaultPageKey ? (typeof window !== 'undefined' && localStorage.getItem(defaultPageKey)) : null;
+  const staticCommonPages = ['bounties', 'votes', 'settings/workspace', 'settings/contributors', 'settings/roles', 'settings/payment-methods'];
 
   useEffect(() => {
-    if (defaultPage && space && defaultPage.startsWith(`/${space.domain}/`)) {
+    const isCommonDefaultPage = defaultPage && staticCommonPages.some(page => defaultPage.includes(`/${page}`));
+    const isDynamicDefaultPage = !isCommonDefaultPage && defaultPage && Object.values(pages).some(page => page && defaultPage.includes(`/${page.path}`));
+
+    if (isCommonDefaultPage || isDynamicDefaultPage) {
       router.push(defaultPage);
     }
     else {
