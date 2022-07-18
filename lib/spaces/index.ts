@@ -16,6 +16,9 @@ export const DOMAIN_BLACKLIST = [
 ];
 
 export function isSpaceDomain (path: string) {
+  if (!path) {
+    return false;
+  }
   const pathSegments = path.split('?');
   const domain = pathSegments[0];
 
