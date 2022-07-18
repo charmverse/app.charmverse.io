@@ -23,6 +23,7 @@ import { useRouter } from 'next/router'
 import { usePages } from 'hooks/usePages'
 import { mutate } from 'swr'
 import { useCurrentSpace } from 'hooks/useCurrentSpace'
+import { useSnackbar } from 'hooks/useSnackbar'
 
 type Props = {
     board: Board
@@ -38,6 +39,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
     const intl = useIntl()
     const [space] = useCurrentSpace()
     const [showConfirmationDialogBox, setShowConfirmationDialogBox] = useState<boolean>(false)
+    const { showMessage } = useSnackbar()
     const makeTemplateClicked = async () => {
         if (!card) {
             Utils.assertFailure('card')
@@ -117,7 +119,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
                     }
 
                     Utils.copyTextToClipboard(cardLink)
-                    sendFlashMessage({content: intl.formatMessage({id: 'CardDialog.copiedLink', defaultMessage: 'Copied!'}), severity: 'high'})
+                    showMessage('Copied card link to clipboard', 'success')
                 }}
             />
             {/* {(card && !card.fields.isTemplate) &&

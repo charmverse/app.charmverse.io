@@ -26,6 +26,7 @@ import { mutate } from 'swr'
 import { useCurrentSpace } from 'hooks/useCurrentSpace'
 import PageIcon from 'components/common/PageLayout/components/PageIcon'
 import { checkForEmpty } from 'components/common/CharmEditor/utils'
+import { useSnackbar } from 'hooks/useSnackbar'
 
 
 type Props = {
@@ -84,6 +85,8 @@ const GalleryCard = React.memo((props: Props) => {
     }
   }
 
+  const { showMessage } = useSnackbar();
+
   const pagePermissions = getPagePermissions(card.id)
 
   return (
@@ -136,7 +139,7 @@ const GalleryCard = React.memo((props: Props) => {
                 }
 
                 Utils.copyTextToClipboard(cardLink)
-                sendFlashMessage({ content: intl.formatMessage({ id: 'GalleryCard.copiedLink', defaultMessage: 'Copied!' }), severity: 'high' })
+                showMessage('Copied card link to clipboard', 'success')
               }}
             />
           </Menu>
