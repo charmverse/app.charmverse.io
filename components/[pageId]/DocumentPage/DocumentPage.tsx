@@ -5,13 +5,12 @@ import CommentsList from 'components/common/BoardEditor/focalboard/src/component
 import { getCardComments } from 'components/common/BoardEditor/focalboard/src/store/comments';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
-import BountyIntegration from 'components/[pageId]/DocumentPage/components/BountyIntegration';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
 import { useVotes } from 'hooks/useVotes';
 import { Page, PageContent } from 'models';
 import { useRouter } from 'next/router';
-import { memo, useCallback } from 'react';
+import { memo, ReactNode, useCallback } from 'react';
 import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import CharmEditor, { ICharmEditorOutput } from '../../common/CharmEditor/CharmEditor';
 import PageBanner from './components/PageBanner';
@@ -33,10 +32,12 @@ export const Container = styled(Box)<{ top: number, fullWidth?: boolean }>`
   }
 `;
 
-export interface IEditorProps {
-  page: Page, setPage: (p: Partial<Page>) => void, readOnly?: boolean, insideModal?: boolean }
+export interface DocumentPageProps {
+  page: Page, setPage: (p: Partial<Page>) => void, readOnly?: boolean, insideModal?: boolean
+  bountyEditor?: ReactNode
+}
 
-function DocumentPage ({ page, setPage, insideModal, readOnly = false }: IEditorProps) {
+function DocumentPage ({ bountyEditor = null, page, setPage, insideModal, readOnly = false }: DocumentPageProps) {
   const { pages } = usePages();
   const { cancelVote, castVote, deleteVote, votes, isLoading } = useVotes();
 
@@ -148,6 +149,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: IEditor
                   cardId={card.id}
                   readonly={readOnly}
                 />
+                {bountyEditor}
               </div>
             )}
           </CharmEditor>

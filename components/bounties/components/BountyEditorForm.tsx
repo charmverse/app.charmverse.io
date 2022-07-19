@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Divider } from '@mui/material';
+import { ButtonProps, Divider } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Grid from '@mui/material/Grid';
@@ -99,36 +99,10 @@ interface IBountyEditorInput {
   bounty?: Partial<Bounty>
   permissions?: AssignedBountyPermissions
   focusKey?: keyof FormValues
+  onCancel: ButtonProps['onClick']
 }
 
-// This component was created to localize the state change of CharmEditor
-// Otherwise watching inside its parent would've caused the whole component tree to rerender
-function FormDescription ({ onContentChange, content, watch }:
-  {content?: PageContent, onContentChange: UpdatePageContent, watch: UseFormWatch<FormValues>}) {
-  watch(['description', 'descriptionNodes']);
-
-  return (
-    <Grid
-      item
-      sx={{
-        '&.MuiGrid-item': {
-          maxWidth: '100%'
-        }
-      }}
-    >
-      <InputLabel>
-        Description
-      </InputLabel>
-      <CharmEditor
-        disablePageSpecificFeatures
-        content={content}
-        onContentChange={onContentChange}
-      />
-    </Grid>
-  );
-}
-
-export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', focusKey, permissions: receivedPermissions }: IBountyEditorInput) {
+export default function BountyEditorForm ({ onCancel, onSubmit, bounty, mode = 'create', focusKey, permissions: receivedPermissions }: IBountyEditorInput) {
   const { setBounties, bounties, updateBounty } = useBounties();
 
   const defaultChainId = bounty?.chainId ?? 1;
@@ -422,31 +396,6 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
     <div>
       <form onSubmit={handleSubmit(val => submitted(val as any))} style={{ margin: 'auto' }}>
         <Grid container direction='column' spacing={3}>
-          <Grid item>
-            <InputLabel>
-              Bounty title
-            </InputLabel>
-            <Input
-              {...register('title')}
-              type='text'
-              fullWidth
-            />
-            {
-              errors?.title && (
-              <Alert severity='error'>
-                {errors.title.message}
-              </Alert>
-              )
-            }
-          </Grid>
-
-          <FormDescription
-            watch={watch}
-//            content={bounty?.descriptionNodes as PageContent ?? cachedBountyDescription.nodes as PageContent}
-            content={values.descriptionNodes}
-            onContentChange={setRichContent}
-          />
-
           {
             mode !== 'suggest' && userSpacePermissions?.createBounty && (
               <>
@@ -688,6 +637,16 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
               type='submit'
             >
               {bountyFormTitles[mode]}
+            </Button>
+            <Button
+              loading={isSubmitting}
+              color='error'
+              sx={{
+                ml: 2
+              }}
+              onClick={onCancel}
+            >
+              Cancel
             </Button>
           </Grid>
         </Grid>

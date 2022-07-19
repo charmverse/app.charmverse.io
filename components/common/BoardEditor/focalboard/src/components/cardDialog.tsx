@@ -25,6 +25,7 @@ import { mutate } from 'swr'
 import { useCurrentSpace } from 'hooks/useCurrentSpace'
 import BountyIntegration from 'components/[pageId]/DocumentPage/components/BountyIntegration'
 import { Box } from '@mui/system'
+import BountyEditorForm from 'components/bounties/components/BountyEditorForm'
 
 type Props = {
     board: Board
@@ -35,7 +36,6 @@ type Props = {
 }
 
 const CardDialog = (props: Props): JSX.Element | null => {
-    const {board} = props
     const card = useAppSelector(getCard(props.cardId))
     const intl = useIntl()
     const [showConfirmationDialogBox, setShowConfirmationDialogBox] = useState<boolean>(false)
@@ -43,6 +43,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
     const router = useRouter();
     const isSharedPage = router.route.startsWith('/share')
     const cardPage = pages[props.cardId]
+    const [isEditingBounty, setIsEditingBounty] = useState(false);
 
     const handleDeleteCard = async () => {
         if (!card) {
@@ -127,7 +128,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
                         startIcon={<OpenInFullIcon fontSize='small'/>}>
                         Open as Page
                       </Button>
-                      {cardPage && <BountyIntegration linkedTaskId={props.cardId} title={cardPage.title} readonly={props.readonly} />}
+                      {cardPage && !isEditingBounty && <BountyIntegration linkedTaskId={props.cardId} onClick={() => setIsEditingBounty(true)} readonly={props.readonly} />}
                     </Box>
                   )
                 }
@@ -139,11 +140,18 @@ const CardDialog = (props: Props): JSX.Element | null => {
                             defaultMessage="You're editing a template."
                         />
                     </div>}
-
                 {card &&
                     <CardDetail
                         card={card}
                         readonly={props.readonly || isSharedPage}
+                        bountyEditor={
+                          isEditingBounty && 
+                          <BountyEditorForm 
+                            onSubmit={() => {}}
+                            mode={"create"}
+                            onCancel={() => setIsEditingBounty(false)}
+                          />
+                        }
                     />}
 
                 {!card &&
@@ -154,10 +162,9 @@ const CardDialog = (props: Props): JSX.Element | null => {
                         />
                     </div>}
             </Dialog>
-
+            
             {showConfirmationDialogBox && <ConfirmationDialogBox dialogBox={confirmDialogProps}/>}
         </>
     ) : null
 }
-
 export default CardDialog
