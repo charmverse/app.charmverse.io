@@ -1,9 +1,9 @@
 import { Plugin, RawPlugins } from '@bangle.dev/core';
-import { PluginKey, EditorView, Node, Schema } from '@bangle.dev/pm';
+import { PluginKey, EditorState, EditorView, Node, Schema } from '@bangle.dev/pm';
 import { createTooltipDOM, tooltipPlacement } from '@bangle.dev/tooltip';
 import { highlightMarkedElement, highlightElement } from 'lib/prosemirror/highlightMarkedElement';
 import { Decoration, DecorationSet } from 'prosemirror-view';
-import { extractInlineComments } from 'lib/inline-comments/findTotalInlineComments';
+import { extractInlineCommentRows } from 'lib/inline-comments/findTotalInlineComments';
 import reactDOM from 'react-dom';
 import { referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';
 import { markName } from './inlineComment.constants';
@@ -57,7 +57,7 @@ export function plugin ({ key } :{
       },
       key,
       props: {
-        handleClickOn: (view, pos, node, nodePos, event) => {
+        handleClick: (view: EditorView, pos: number, event: MouseEvent) => {
           if (/charm-inline-comment/.test((event.target as HTMLElement).className)) {
             return highlightMarkedElement({
               view,
@@ -95,10 +95,10 @@ export function plugin ({ key } :{
         }
       },
       props: {
-        decorations (state) {
+        decorations (state: EditorState) {
           return this.getState(state);
         },
-        handleClickOn: (view, pos, node, nodePos, event) => {
+        handleClick: (view: EditorView, pos: number, event: MouseEvent) => {
           const inlineCommentParent = (event.target as HTMLElement)?.closest('.charm-comment-count');
           const ids = inlineCommentParent?.getAttribute('data-ids')?.split(',') || [];
           if (ids.length > 0) {
@@ -121,22 +121,27 @@ export function plugin ({ key } :{
 // TODO: group comments on the same line somehow
 function commentDecorations ({ schema, doc }: { doc: Node, schema: Schema }) {
   const decos: Decoration[] = [];
-  const inlineComments = extractInlineComments(schema, doc);
-  inlineComments.forEach(comment => {
-    decos.push(
-      Decoration.widget(comment.pos, () => icon(comment.node), { key: comment.pos })
-    );
+  const inlineComments = extractInlineCommentRows(schema, doc);
+  // console.log('inlineComments', inlineComments);
+  inlineComments.forEach(comments => {
+    if (comments.length > 0) {
+      const firstPos = comments[0].pos;
+      // console.log('firstPos', firstPos);
+      decos.push(
+        Decoration.widget(firstPos, () => renderComponent(comments.map(_ => _.node)), { key: firstPos.toString() })
+      );
+    }
   });
   return DecorationSet.create(doc, decos);
 }
 
-function icon (node: Node) {
+function renderComponent (nodes: Node[]) {
   const container = document.createElement('div');
   container.className = 'charm-comment-count';
-  const threadId = node.marks[0]?.attrs.id;
-  const threadIds = threadId ? [threadId] : [];
+  const threadIds = nodes.map(node => node.marks[0]?.attrs.id).filter(Boolean);
+  // console.log('threadIds', threadIds);
   container.setAttribute('data-ids', threadIds.join(','));
 
-  reactDOM.render(<RowIcon threadIds={threadId ? [threadId] : []} />, container);
+  reactDOM.render(<RowIcon threadIds={threadIds} />, container);
   return container;
 }

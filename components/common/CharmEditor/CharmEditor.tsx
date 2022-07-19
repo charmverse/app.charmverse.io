@@ -18,7 +18,7 @@ import { markdownSerializer } from '@bangle.dev/markdown';
 import { EditorView, Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import { Grow, Slide } from '@mui/material';
+import { Slide } from '@mui/material';
 import * as codeBlock from 'components/common/CharmEditor/components/@bangle.dev/base-components/code-block';
 import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
@@ -422,7 +422,7 @@ function CharmEditor (
     }
   });
 
-  const onResizeStop = useCallback((view: EditorView<any>) => {
+  const onResizeStop = useCallback((view: EditorView) => {
     if (onContentChangeDebounced) {
       // Save the current embed size on the backend after we are done resizing
       onContentChangeDebounced(view);
