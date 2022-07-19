@@ -20,13 +20,13 @@ export function highlightMarkedElement ({
   if (fromNodeAfter) {
     const inlineActionMark = view.state.doc.type.schema.marks[markName].isInSet(fromNodeAfter.marks);
     const actionId = inlineActionMark?.attrs.id;
-    return highlightElement({ id: actionId, view, elementId, markName, key, prefix });
+    return highlightElement({ ids: [actionId], view, elementId, markName, key, prefix });
   }
   return false;
 }
 
-export function highlightElement ({ id, key, prefix, elementId, view }:
-  { id: string, key: PluginKey, prefix: string, elementId: string, markName: string, view: EditorView }) {
+export function highlightElement ({ ids, key, prefix, elementId, view }:
+  { ids: string[], key: PluginKey, prefix: string, elementId: string, markName: string, view: EditorView }) {
 
   const pageActionListNode = document.getElementById(elementId) as HTMLDivElement;
   // Page action list node might not be present
@@ -34,12 +34,12 @@ export function highlightElement ({ id, key, prefix, elementId, view }:
   // Check if we are inside a card page modal
   const cardId = (new URLSearchParams(window.location.href)).get('cardId');
 
-  if (id) {
+  if (ids.length > 0) {
     // If we are showing the thread list on the right, then navigate to the appropriate thread and highlight it
     if (isShowingActionList && !cardId) {
       // Use regular dom methods as we have no access to a ref inside a plugin
       // Plus this is only a cosmetic change which doesn't impact any of the state
-      const actionDocument = document.getElementById(`${prefix}.${id}`);
+      const actionDocument = document.getElementById(`${prefix}.${ids[0]}`);
       if (actionDocument) {
         highlightDomElement(actionDocument);
         return true;
@@ -48,7 +48,7 @@ export function highlightElement ({ id, key, prefix, elementId, view }:
     else {
       // If the page thread list isn't open, then we need to show the inline thread component
       renderSuggestionsTooltip(key, {
-        ids: [id]
+        ids
       })(view.state, view.dispatch, view);
       return true;
     }

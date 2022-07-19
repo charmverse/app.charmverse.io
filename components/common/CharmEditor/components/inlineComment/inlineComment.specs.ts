@@ -21,7 +21,10 @@ export function spec (): RawSpecs {
           tag: 'span.charm-inline-comment'
         }
       ],
-      toDOM: (mark): DOMOutputSpec => ['span', { class: `charm-inline-comment ${mark.attrs.resolved ? 'resolved' : 'active'}`, id: `inline-comment.${mark.attrs.id}` }]
+      toDOM: (mark): DOMOutputSpec => ['span', {
+        class: mark.attrs.id ? `charm-inline-comment ${mark.attrs.resolved ? 'resolved' : 'active'}` : '',
+        id: mark.attrs.id ? `inline-comment.${mark.attrs.id}` : ''
+      }]
     },
     markdown: {
       // TODO: Fix convert to markdown

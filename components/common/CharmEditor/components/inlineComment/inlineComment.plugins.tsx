@@ -57,7 +57,7 @@ export function plugin ({ key } :{
       },
       key,
       props: {
-        handleClick: (view: EditorView, pos: number, event: MouseEvent) => {
+        handleClickOn: (view: EditorView, pos: number, node, nodePos, event: MouseEvent) => {
           if (/charm-inline-comment/.test((event.target as HTMLElement).className)) {
             return highlightMarkedElement({
               view,
@@ -98,12 +98,12 @@ export function plugin ({ key } :{
         decorations (state: EditorState) {
           return this.getState(state);
         },
-        handleClick: (view: EditorView, pos: number, event: MouseEvent) => {
-          const inlineCommentParent = (event.target as HTMLElement)?.closest('.charm-comment-count');
-          const ids = inlineCommentParent?.getAttribute('data-ids')?.split(',') || [];
+        handleClickOn: (view: EditorView, pos: number, node, nodePos, event: MouseEvent) => {
+          const inlineCommentContainer = (event.target as HTMLElement)?.closest('.charm-comment-count');
+          const ids = inlineCommentContainer?.getAttribute('data-ids')?.split(',') || [];
           if (ids.length > 0) {
             return highlightElement({
-              id: ids[0],
+              ids,
               view,
               elementId: 'page-thread-list-box',
               key,
@@ -126,7 +126,7 @@ function commentDecorations ({ schema, doc }: { doc: Node, schema: Schema }) {
       const firstPos = comments.pos + 1;
       // console.log('firstPos', firstPos);
       decos.push(
-        Decoration.widget(firstPos, () => renderComponent(comments.nodes), { key: firstPos.toString() })
+        Decoration.widget(firstPos, () => renderComponent(comments.nodes), { key: firstPos.toString() + comments.nodes.length })
       );
     }
   });
