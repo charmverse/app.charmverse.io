@@ -463,28 +463,6 @@ function CharmEditor (
       state={state}
       renderNodeViews={({ children: _children, ...props }) => {
         switch (props.node.type.name) {
-          // case 'paragraph': {
-          //   return (
-          //     <Paragraph
-          //       inlineVotePluginKey={inlineVotePluginKey}
-          //       inlineCommentPluginKey={inlineCommentPluginKey}
-          //       calculateActions={!disablePageSpecificFeatures}
-          //       {...props}
-          //     >{_children}
-          //     </Paragraph>
-          //   );
-          // }
-          // case 'heading': {
-          //   return (
-          //     <Heading
-          //       inlineVotePluginKey={inlineVotePluginKey}
-          //       inlineCommentPluginKey={inlineCommentPluginKey}
-          //       calculateActions={!disablePageSpecificFeatures}
-          //       {...props}
-          //     >{_children}
-          //     </Heading>
-          //   );
-          // }
           case 'quote':
             return <Quote {...props}>{_children}</Quote>;
           case 'columnLayout': {
