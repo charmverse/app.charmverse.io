@@ -1,12 +1,19 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import OpenInFullIcon from '@mui/icons-material/OpenInFull'
+import { ButtonProps } from '@mui/material'
 import { Box } from '@mui/system'
+import { Bounty } from '@prisma/client'
+import charmClient from 'charmClient'
 import BountyEditorForm from 'components/bounties/components/BountyEditorForm'
 import BountyDetails from 'components/bounties/[bountyId]/BountyDetails'
 import Button from "components/common/Button"
 import BountyIntegration from 'components/[pageId]/DocumentPage/components/BountyIntegration'
+import { useBounties } from 'hooks/useBounties'
+import { useCurrentSpace } from 'hooks/useCurrentSpace'
+import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions'
 import { usePages } from 'hooks/usePages'
+import { useUser } from 'hooks/useUser'
 import { BountyWithDetails } from 'models'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -33,6 +40,40 @@ type Props = {
     bounty?: BountyWithDetails
 }
 
+function CreateBountyButton (props: Pick<Bounty, "linkedTaskId" | "title">) {
+  const { linkedTaskId, title } = props;
+  const { setBounties } = useBounties();
+  const [user] = useUser();
+  const [space] = useCurrentSpace();
+
+  const [userSpacePermissions] = useCurrentSpacePermissions();
+
+  return (
+    <Box sx={{
+      whiteSpace: 'nowrap'
+    }}
+    >
+      {!userSpacePermissions?.createBounty || !space || !user ? null : (
+        <Button onClick={async () => {
+          const createdBounty = await charmClient.createBounty({
+            chainId: 1,
+            status: "open",
+            spaceId: space.id,
+            createdBy: user.id,
+            rewardAmount: 1,
+            rewardToken: "ETH",
+            linkedTaskId,
+            title
+          })
+          setBounties((bounties) => [...bounties, {...createdBounty, applications: []}])
+        }}>
+          Create bounty
+        </Button>
+      )}
+    </Box>
+  );
+}
+
 const CardDialog = (props: Props): JSX.Element | null => {
   const { cardId, readonly, onClose, bounty } = props;
     const card = useAppSelector(getCard(cardId))
@@ -42,7 +83,6 @@ const CardDialog = (props: Props): JSX.Element | null => {
     const router = useRouter();
     const isSharedPage = router.route.startsWith('/share')
     const cardPage = pages[cardId]
-    const [isEditingBounty, setIsEditingBounty] = useState(false);
     
     const handleDeleteCard = async () => {
         if (!card) {
@@ -104,8 +144,6 @@ const CardDialog = (props: Props): JSX.Element | null => {
           </Menu>
     </>
 
-    console.log({bounty});
-
     return card && pages[card.id] ? (
         <>
             <Dialog
@@ -122,7 +160,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
                         startIcon={<OpenInFullIcon fontSize='small'/>}>
                         Open as Page
                       </Button>
-                      {cardPage && !isEditingBounty && <BountyIntegration linkedTaskId={cardId} onClick={() => setIsEditingBounty(true)} readonly={readonly} />}
+                      {cardPage && !bounty && !readonly && <CreateBountyButton linkedTaskId={cardId} title={cardPage.title} />}
                     </Box>
                   )
                 }
@@ -138,23 +176,31 @@ const CardDialog = (props: Props): JSX.Element | null => {
                     <CardDetail
                         card={card}
                         readonly={readonly || isSharedPage}
-                        bountyEditor={
-                          isEditingBounty ? 
-                          <BountyEditorForm 
-                            onSubmit={() => {
-                              setIsEditingBounty(false)
-                            }}
-                            mode={"create"}
-                            onCancel={() => setIsEditingBounty(false)}
-                            bounty={{
-                              title: cardPage?.title,
-                              description: cardPage?.contentText,
-                              descriptionNodes: cardPage?.content,
-                              linkedTaskId: cardPage?.id
-                            }}
-                          /> :
-                          bounty ? <BountyDetails /> : null
-                        }
+                        // bountyEditor={
+                        //   isEditingBounty ? 
+                        //   <BountyEditorForm 
+                        //     onSubmit={() => {
+                        //       setIsEditingBounty(false)
+                        //     }}
+                        //     mode={"create"}
+                        //     onCancel={() => setIsEditingBounty(false)}
+                        //     bounty={{
+                        //       title: cardPage?.title,
+                        //       description: undefined,
+                        //       descriptionNodes: undefined,
+                        //       linkedTaskId: cardPage?.id,
+                        //       rewardAmount: 1,
+                        //       rewardToken: "ETH",
+                        //       chainId: 1,
+                        //     }}
+                        //   /> :
+                        //   bounty ? <BountyDetails 
+                        //     centeredContent={false}
+                        //     bounty={bounty}
+                        //     showDescription={false}
+                        //     showHeader={false}
+                        //   /> : null
+                        // }
                     />}
 
                 {!card &&
