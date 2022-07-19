@@ -8,7 +8,7 @@ export default function RowIcon ({ threadIds }: { threadIds: string[] }) {
       display='flex'
       gap={0.5}
       alignItems='center'
-
+      sx={{ cursor: 'pointer' }}
     >
       <CommentOutlined
         color='secondary'

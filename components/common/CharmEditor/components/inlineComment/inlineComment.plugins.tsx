@@ -118,17 +118,15 @@ export function plugin ({ key } :{
   ];
 }
 
-// TODO: group comments on the same line somehow
 function commentDecorations ({ schema, doc }: { doc: Node, schema: Schema }) {
   const decos: Decoration[] = [];
   const inlineComments = extractInlineCommentRows(schema, doc);
-  // console.log('inlineComments', inlineComments);
   inlineComments.forEach(comments => {
-    if (comments.length > 0) {
-      const firstPos = comments[0].pos;
+    if (comments.nodes.length > 0) {
+      const firstPos = comments.pos + 1;
       // console.log('firstPos', firstPos);
       decos.push(
-        Decoration.widget(firstPos, () => renderComponent(comments.map(_ => _.node)), { key: firstPos.toString() })
+        Decoration.widget(firstPos, () => renderComponent(comments.nodes), { key: firstPos.toString() })
       );
     }
   });

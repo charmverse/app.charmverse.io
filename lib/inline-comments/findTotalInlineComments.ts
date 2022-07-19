@@ -32,11 +32,15 @@ export function findTotalInlineComments (
 export function extractInlineCommentRows (
   schema: Schema,
   node: Node
-): NodeWithPos[][] {
+): { pos: number, nodes: Node[] }[] {
   const inlineCommentMarkSchema = schema.marks['inline-comment'] as MarkType;
   const paragraphs = findChildrenByType(node, schema.nodes.paragraph);
-  return paragraphs.map(_node => (
-    findChildrenByMark(_node.node, inlineCommentMarkSchema)
-  ));
+  const headings = findChildrenByType(node, schema.nodes.heading);
+  return headings.concat(paragraphs).map(_node => ({
+    pos: _node.pos,
+    nodes: findChildrenByMark(_node.node, inlineCommentMarkSchema)
+      .map(nodeWithPos => nodeWithPos.node)
+      .filter(__node => __node.marks[0].attrs.id && !__node.marks[0].attrs.resolved)
+  })).filter(({ nodes }) => nodes.length > 0);
 
 }
