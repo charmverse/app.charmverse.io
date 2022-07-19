@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { PageType, Prisma } from '@prisma/client';
 import { v4 } from 'uuid';
 import { SubmissionContent } from 'lib/applications/interfaces';
 
@@ -6,7 +6,8 @@ export function generatePageToCreateStub (options: {
   userId:string,
   spaceId: string,
   title?: string,
-  parentId?: string | null}): Prisma.PageCreateInput {
+  parentId?: string | null,
+  type?: PageType}): Prisma.PageCreateInput {
   return {
     author: {
       connect: {
@@ -16,7 +17,7 @@ export function generatePageToCreateStub (options: {
     contentText: '',
     path: v4(),
     title: options.title || 'Root',
-    type: 'page',
+    type: options.type ?? 'page',
     updatedBy: options.userId,
     space: {
       connect: {

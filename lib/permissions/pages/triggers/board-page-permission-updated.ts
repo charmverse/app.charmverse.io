@@ -1,4 +1,4 @@
-import { PagePermission, Prisma } from '@prisma/client';
+import { PagePermission, Prisma, PrismaPromise } from '@prisma/client';
 import { resolveChildPagesAsFlatList, resolveParentPages } from 'lib/pages/server/resolvePageTree';
 import { prisma } from 'db';
 import { IPageWithPermissions } from 'lib/pages/server';
@@ -10,7 +10,7 @@ import { BoardPagePermissionUpdated } from '../interfaces';
  * @param param0
  * @returns
  */
-export async function boardPagePermissionUpdated ({ boardId, permissionId }: BoardPagePermissionUpdated):
+export async function generateboardPagePermissionUpdated ({ boardId, permissionId }: BoardPagePermissionUpdated):
  Promise<{updateManyArgs?: Prisma.PagePermissionUpdateManyArgs, createManyArgs?: Prisma.PagePermissionCreateManyArgs}> {
 
   const permissionUpdates: Prisma.PagePermissionUpdateArgs [] = [];
@@ -121,4 +121,16 @@ export async function boardPagePermissionUpdated ({ boardId, permissionId }: Boa
     updateManyArgs: permissionUpdateManyIds.length > 0 ? updateOperation : undefined,
     createManyArgs: permissionCreateMany.length > 0 ? createOperation : undefined
   };
+}
+
+export async function boardPagePermissionUpdated ({ boardId, permissionId }: BoardPagePermissionUpdated):
+ Promise<true> {
+  const args = await generateboardPagePermissionUpdated({ boardId, permissionId });
+
+  await prisma.$transaction([
+    args.updateManyArgs ? prisma.pagePermission.updateMany(args.updateManyArgs) : null,
+    args.createManyArgs ? prisma.pagePermission.createMany(args.createManyArgs) : null
+  ].filter(a => a !== null) as PrismaPromise<any>[]);
+
+  return true;
 }

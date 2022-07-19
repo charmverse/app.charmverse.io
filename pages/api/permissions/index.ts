@@ -61,12 +61,7 @@ async function addPagePermission (req: NextApiRequest, res: NextApiResponse<IPag
   const createdPermission = await upsertPermission(pageId, req.body);
 
   if (pageType === 'board') {
-    const args = await boardPagePermissionUpdated({ boardId: pageId, permissionId: createdPermission.id });
-
-    await prisma.$transaction([
-      args.updateManyArgs ? prisma.pagePermission.updateMany(args.updateManyArgs) : null,
-      args.createManyArgs ? prisma.pagePermission.createMany(args.createManyArgs) : null
-    ].filter(a => a !== null) as PrismaPromise<any>[]);
+    await boardPagePermissionUpdated({ boardId: pageId, permissionId: createdPermission.id });
 
   }
   // Old behaviour where we setup permissions after a page permission is added
