@@ -149,7 +149,13 @@ function DocumentPage ({ bountyEditor = null, page, setPage, insideModal, readOn
                   cardId={card.id}
                   readonly={readOnly}
                 />
-                {bountyEditor}
+
+                {bountyEditor && (
+                <>
+                  {bountyEditor}
+                  <hr />
+                </>
+                )}
               </div>
             )}
           </CharmEditor>

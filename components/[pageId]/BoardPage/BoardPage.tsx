@@ -1,5 +1,5 @@
 import { getUriWithParam } from 'lib/utilities/strings';
-import { Page } from 'models';
+import { BountyWithDetails, Page } from 'models';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState, useMemo } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -27,9 +27,10 @@ interface Props {
   page: Page;
   readonly?: boolean;
   setPage: (p: Partial<Page>) => void;
+  bounty?: BountyWithDetails
 }
 
-export default function BoardPage ({ page, setPage, readonly }: Props) {
+export default function BoardPage ({ bounty, page, setPage, readonly }: Props) {
   const router = useRouter();
   const board = useAppSelector(getCurrentBoard);
   const cards = useAppSelector(getCurrentViewCardsSortedFilteredAndGrouped);
@@ -146,6 +147,7 @@ export default function BoardPage ({ page, setPage, readonly }: Props) {
         {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
           <RootPortal>
             <CardDialog
+              bounty={bounty}
               board={board}
               key={shownCardId}
               cardId={shownCardId}

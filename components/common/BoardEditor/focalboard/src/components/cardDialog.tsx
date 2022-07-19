@@ -1,31 +1,28 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+import OpenInFullIcon from '@mui/icons-material/OpenInFull'
+import { Box } from '@mui/system'
+import BountyEditorForm from 'components/bounties/components/BountyEditorForm'
+import BountyDetails from 'components/bounties/[bountyId]/BountyDetails'
+import Button from "components/common/Button"
+import BountyIntegration from 'components/[pageId]/DocumentPage/components/BountyIntegration'
+import { usePages } from 'hooks/usePages'
+import { BountyWithDetails } from 'models'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { FormattedMessage, useIntl } from 'react-intl'
 import { Board } from '../blocks/board'
-import { BoardView } from '../blocks/boardView'
-import { Card } from '../blocks/card'
-import ConfirmationDialogBox, { ConfirmationDialogBoxProps } from './confirmationDialogBox'
 import mutator from '../mutator'
 import { getCard } from '../store/cards'
 import { useAppSelector } from '../store/hooks'
-import { getUserBlockSubscriptionList } from '../store/initialLoad'
 import { Utils } from '../utils'
 import DeleteIcon from '../widgets/icons/delete'
 import LinkIcon from '../widgets/icons/Link'
 import Menu from '../widgets/menu'
 import CardDetail from './cardDetail/cardDetail'
+import ConfirmationDialogBox, { ConfirmationDialogBoxProps } from './confirmationDialogBox'
 import Dialog from './dialog'
 import { sendFlashMessage } from './flashMessages'
-import OpenInFullIcon from '@mui/icons-material/OpenInFull';
-import Button from "components/common/Button"
-import { useRouter } from 'next/router'
-import { usePages } from 'hooks/usePages'
-import { mutate } from 'swr'
-import { useCurrentSpace } from 'hooks/useCurrentSpace'
-import BountyIntegration from 'components/[pageId]/DocumentPage/components/BountyIntegration'
-import { Box } from '@mui/system'
-import BountyEditorForm from 'components/bounties/components/BountyEditorForm'
 
 type Props = {
     board: Board
@@ -33,18 +30,20 @@ type Props = {
     onClose: () => void
     showCard: (cardId?: string) => void
     readonly: boolean
+    bounty?: BountyWithDetails
 }
 
 const CardDialog = (props: Props): JSX.Element | null => {
-    const card = useAppSelector(getCard(props.cardId))
+  const { cardId, readonly, onClose, bounty } = props;
+    const card = useAppSelector(getCard(cardId))
     const intl = useIntl()
     const [showConfirmationDialogBox, setShowConfirmationDialogBox] = useState<boolean>(false)
     const { pages } = usePages()
     const router = useRouter();
     const isSharedPage = router.route.startsWith('/share')
-    const cardPage = pages[props.cardId]
+    const cardPage = pages[cardId]
     const [isEditingBounty, setIsEditingBounty] = useState(false);
-
+    
     const handleDeleteCard = async () => {
         if (!card) {
             Utils.assertFailure()
@@ -52,7 +51,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
         }
         // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.DeleteCard, {board: props.board.id, view: props.activeView.id, card: card.id})
         await mutator.deleteBlock(card, 'delete card')
-        props.onClose()
+        onClose()
     }
 
     const confirmDialogProps: ConfirmationDialogBoxProps = {
@@ -102,21 +101,16 @@ const CardDialog = (props: Props): JSX.Element | null => {
                       sendFlashMessage({content: intl.formatMessage({id: 'CardDialog.copiedLink', defaultMessage: 'Copied!'}), severity: 'high'})
                   }}
               />
-              {/* {(card && !card.fields.isTemplate) &&
-                  <Menu.Text
-                      id='makeTemplate'
-                      name='New template from card'
-                      onClick={makeTemplateClicked}
-                  />
-              } */}
           </Menu>
     </>
+
+    console.log({bounty});
 
     return card && pages[card.id] ? (
         <>
             <Dialog
-                onClose={props.onClose}
-                toolsMenu={!props.readonly && menu}
+                onClose={onClose}
+                toolsMenu={!readonly && menu}
                 hideCloseButton
                 toolbar={!isSharedPage && (
                     <Box display="flex" justifyContent={"space-between"}>
@@ -128,7 +122,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
                         startIcon={<OpenInFullIcon fontSize='small'/>}>
                         Open as Page
                       </Button>
-                      {cardPage && !isEditingBounty && <BountyIntegration linkedTaskId={props.cardId} onClick={() => setIsEditingBounty(true)} readonly={props.readonly} />}
+                      {cardPage && !isEditingBounty && <BountyIntegration linkedTaskId={cardId} onClick={() => setIsEditingBounty(true)} readonly={readonly} />}
                     </Box>
                   )
                 }
@@ -143,14 +137,23 @@ const CardDialog = (props: Props): JSX.Element | null => {
                 {card &&
                     <CardDetail
                         card={card}
-                        readonly={props.readonly || isSharedPage}
+                        readonly={readonly || isSharedPage}
                         bountyEditor={
-                          isEditingBounty && 
+                          isEditingBounty ? 
                           <BountyEditorForm 
-                            onSubmit={() => {}}
+                            onSubmit={() => {
+                              setIsEditingBounty(false)
+                            }}
                             mode={"create"}
                             onCancel={() => setIsEditingBounty(false)}
-                          />
+                            bounty={{
+                              title: cardPage?.title,
+                              description: cardPage?.contentText,
+                              descriptionNodes: cardPage?.content,
+                              linkedTaskId: cardPage?.id
+                            }}
+                          /> :
+                          bounty ? <BountyDetails /> : null
                         }
                     />}
 

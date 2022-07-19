@@ -62,27 +62,27 @@ export default function BountyDetails () {
       <BountyDescription bounty={currentBounty} permissions={bountyPermissions} />
 
       {
-          currentBounty.status === 'suggestion' && <BountySuggestionApproval bounty={currentBounty} />
-        }
+        currentBounty.status === 'suggestion' && <BountySuggestionApproval bounty={currentBounty} />
+      }
 
       {
-          currentBounty.status !== 'suggestion' && (
-            <>
-              <Box sx={{ mb: 3 }}>
-                <BountySubmissions bounty={currentBounty} permissions={bountyPermissions} />
-              </Box>
-              {
-          currentBounty.approveSubmitters === true && (
-          <BountyApplicantList
-            bounty={currentBounty}
-            applications={currentBounty.applications}
-            permissions={bountyPermissions}
-          />
-          )
-        }
-            </>
-          )
-        }
+        currentBounty.status !== 'suggestion' && (
+          <>
+            <Box sx={{ mb: 3 }}>
+              <BountySubmissions bounty={currentBounty} permissions={bountyPermissions} />
+            </Box>
+            {
+              currentBounty.approveSubmitters === true && (
+                <BountyApplicantList
+                  bounty={currentBounty}
+                  applications={currentBounty.applications}
+                  permissions={bountyPermissions}
+                />
+              )
+            }
+          </>
+        )
+      }
     </CenteredPageContent>
   );
 
