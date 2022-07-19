@@ -70,7 +70,7 @@ export const BangleEditor = React.forwardRef<
       (editor.view as any)._updatePluginWatcher = updatePluginWatcher(editor);
       onReadyRef.current(editor);
       setEditor(editor);
-
+        console.log('called setEditor')
       return () => {
         editor.destroy();
       };

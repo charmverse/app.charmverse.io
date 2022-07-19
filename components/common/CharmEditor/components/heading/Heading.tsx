@@ -41,13 +41,14 @@ export default function Heading (
   }
 
   return (
-    <InlineActionCounter
-      node={node}
-      inlineCommentPluginKey={inlineCommentPluginKey}
-      inlineVotePluginKey={inlineVotePluginKey}
-      calculateActions={calculateActions}
-    >
+    <>
       {content}
-    </InlineActionCounter>
+      <InlineActionCounter
+        node={node}
+        inlineCommentPluginKey={inlineCommentPluginKey}
+        inlineVotePluginKey={inlineVotePluginKey}
+        calculateActions={calculateActions}
+      />
+    </>
   );
 }

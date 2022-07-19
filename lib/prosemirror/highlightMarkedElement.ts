@@ -1,4 +1,4 @@
-import { EditorView, PluginKey, TextSelection } from '@bangle.dev/pm';
+import { EditorView, Node, PluginKey, TextSelection } from '@bangle.dev/pm';
 import { renderSuggestionsTooltip } from 'components/common/CharmEditor/components/@bangle.dev/tooltip/suggest-tooltip';
 import { highlightDomElement } from 'lib/browser';
 
@@ -19,30 +19,38 @@ export function highlightMarkedElement ({
   }
   if (fromNodeAfter) {
     const inlineActionMark = view.state.doc.type.schema.marks[markName].isInSet(fromNodeAfter.marks);
-    const pageActionListNode = document.getElementById(elementId) as HTMLDivElement;
-    // Page action list node might not be present
-    const isShowingActionList = pageActionListNode.style.visibility !== 'hidden';
-    // Check if we are inside a card page modal
-    const cardId = (new URLSearchParams(window.location.href)).get('cardId');
     const actionId = inlineActionMark?.attrs.id;
-    if (actionId) {
-      // If we are showing the thread list on the right, then navigate to the appropriate thread and highlight it
-      if (isShowingActionList && !cardId) {
-        // Use regular dom methods as we have no access to a ref inside a plugin
-        // Plus this is only a cosmetic change which doesn't impact any of the state
-        const actionDocument = document.getElementById(`${prefix}.${actionId}`);
-        if (actionDocument) {
-          highlightDomElement(actionDocument);
-          return true;
-        }
-      }
-      else {
-        // If the page thread list isn't open, then we need to show the inline thread component
-        renderSuggestionsTooltip(key, {
-          ids: [actionId]
-        })(view.state, view.dispatch, view);
+    return highlightElement({ id: actionId, view, elementId, markName, key, prefix });
+  }
+  return false;
+}
+
+export function highlightElement ({ id, key, prefix, elementId, view }:
+  { id: string, key: PluginKey, prefix: string, elementId: string, markName: string, view: EditorView }) {
+
+  const pageActionListNode = document.getElementById(elementId) as HTMLDivElement;
+  // Page action list node might not be present
+  const isShowingActionList = pageActionListNode.style.visibility !== 'hidden';
+  // Check if we are inside a card page modal
+  const cardId = (new URLSearchParams(window.location.href)).get('cardId');
+
+  if (id) {
+    // If we are showing the thread list on the right, then navigate to the appropriate thread and highlight it
+    if (isShowingActionList && !cardId) {
+      // Use regular dom methods as we have no access to a ref inside a plugin
+      // Plus this is only a cosmetic change which doesn't impact any of the state
+      const actionDocument = document.getElementById(`${prefix}.${id}`);
+      if (actionDocument) {
+        highlightDomElement(actionDocument);
         return true;
       }
+    }
+    else {
+      // If the page thread list isn't open, then we need to show the inline thread component
+      renderSuggestionsTooltip(key, {
+        ids: [id]
+      })(view.state, view.dispatch, view);
+      return true;
     }
   }
   return false;

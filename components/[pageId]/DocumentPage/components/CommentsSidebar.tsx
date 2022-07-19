@@ -30,7 +30,7 @@ const StyledPageThreadsBox = styled(Box)`
   width: 100%;
 `;
 
-const StyledPageThreadsList = styled(List)`
+export const StyledSidebar = styled(List)`
   overflow: auto;
   display: flex;
   flex-direction: column;
@@ -65,7 +65,7 @@ function getCommentFromThreads (threads: (ThreadWithCommentsAndAuthors | undefin
   return null;
 }
 
-export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {inline?: boolean}) {
+export default function CommentsSidebar ({ sx, inline, ...props }: BoxProps & {inline?: boolean}) {
   const { threads } = useThreads();
   const [user] = useUser();
   const allThreads = Object.values(threads);
@@ -99,7 +99,7 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
 
   const view = useEditorViewContext();
   // Making sure the position sort doesn't filter out comments that are not in the view
-  const inlineThreadsIds = threadSort === 'position' ? Array.from(new Set([...findTotalInlineComments(view, view.state.doc, threads, true).threadIds, ...allThreads.map(thread => thread?.id).filter(isTruthy)])) : [];
+  const inlineThreadsIds = threadSort === 'position' ? Array.from(new Set([...findTotalInlineComments(view.state.schema, view.state.doc, threads, true).threadIds, ...allThreads.map(thread => thread?.id).filter(isTruthy)])) : [];
 
   let sortedThreadList: ThreadWithCommentsAndAuthors[] = [];
   if (threadSort === 'earliest') {
@@ -149,8 +149,6 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
 
   return (
     <StyledPageThreadsBox
-      // The className is used to access it using regular dom api
-      className='PageThreadsList'
       {...props}
       sx={{
         ...(sx ?? {}),
@@ -178,24 +176,30 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
           <MenuItem value='all'>All</MenuItem>
         </Select>
       </Box>
-      <StyledPageThreadsList>
+      <StyledSidebar>
         {sortedThreadList.length === 0 ? (
-          <EmptyThreadContainerBox>
-            <Center>
-              <CommentOutlinedIcon
-                fontSize='large'
-                color='secondary'
-                sx={{
-                  height: '2em',
-                  width: '2em'
-                }}
-              />
-              <Typography variant='subtitle1' color='secondary'>No {threadFilter} threads yet</Typography>
-            </Center>
-          </EmptyThreadContainerBox>
+          <NoCommentsMessage threadType={threadFilter} />
         ) : sortedThreadList.map(resolvedThread => resolvedThread
           && <PageThread showFindButton inline={inline} key={resolvedThread.id} threadId={resolvedThread?.id} />)}
-      </StyledPageThreadsList>
+      </StyledSidebar>
     </StyledPageThreadsBox>
+  );
+}
+
+function NoCommentsMessage ({ threadType }: { threadType: string }) {
+  return (
+    <EmptyThreadContainerBox>
+      <Center>
+        <CommentOutlinedIcon
+          fontSize='large'
+          color='secondary'
+          sx={{
+            height: '2em',
+            width: '2em'
+          }}
+        />
+        <Typography variant='subtitle1' color='secondary'>No {threadType} comments yet</Typography>
+      </Center>
+    </EmptyThreadContainerBox>
   );
 }

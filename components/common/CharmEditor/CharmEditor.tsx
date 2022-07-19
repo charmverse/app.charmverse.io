@@ -24,7 +24,7 @@ import { plugins as imagePlugins } from 'components/common/CharmEditor/component
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import PageInlineVotesList from 'components/[pageId]/DocumentPage/components/VotesSidebar';
-import PageThreadsList from 'components/[pageId]/DocumentPage/components/PageThreadsList';
+import CommentsSidebar from 'components/[pageId]/DocumentPage/components/CommentsSidebar';
 import { CryptoCurrency, FiatCurrency } from 'connectors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
@@ -137,6 +137,7 @@ export function charmEditorPlugins (
       enableComments?: boolean
     } = {}
 ): () => RawPlugins[] {
+
   const basePlugins: RawPlugins[] = [
     new Plugin({
       view: () => ({
@@ -601,7 +602,7 @@ function CharmEditor (
           <PageActionListBox
             id='page-thread-list-box'
           >
-            <PageThreadsList />
+            <CommentsSidebar />
           </PageActionListBox>
         </Slide>
         <Slide

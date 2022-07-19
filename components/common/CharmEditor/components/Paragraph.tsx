@@ -15,13 +15,14 @@ export default function Paragraph (
   { node, children, calculateActions = true, inlineCommentPluginKey, inlineVotePluginKey }: ParagraphProps
 ) {
   return (
-    <InlineActionCounter
-      inlineCommentPluginKey={inlineCommentPluginKey}
-      inlineVotePluginKey={inlineVotePluginKey}
-      calculateActions={calculateActions}
-      node={node}
-    >
+    <>
       {children}
-    </InlineActionCounter>
+      {/* <InlineActionCounter
+        inlineCommentPluginKey={inlineCommentPluginKey}
+        inlineVotePluginKey={inlineVotePluginKey}
+        calculateActions={calculateActions}
+        node={node}
+      /> */}
+    </>
   );
 }

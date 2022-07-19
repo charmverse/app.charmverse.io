@@ -45,11 +45,15 @@ export function ThreadsProvider ({ children }: { children: ReactNode }) {
           threadId: thread.id
         });
 
-        setThreads((_threads) => ({ ..._threads,
-          [thread.id]: {
-            ...thread,
-            comments: [...thread.comments, comment]
-          } }));
+        setThreads((_threads) => {
+          return {
+            ..._threads,
+            [thread.id]: {
+              ...thread,
+              comments: [...thread.comments, comment]
+            }
+          };
+        });
       }
       catch (_) {
         //

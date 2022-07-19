@@ -513,3 +513,16 @@ details {
     }
   }
 }
+
+// for inline comments
+.charm-comment-count {
+  svg {
+    color: rgba(var(--center-channel-color-rgb), .5);
+  }
+
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 20px;
+  height: 20px;
+}
