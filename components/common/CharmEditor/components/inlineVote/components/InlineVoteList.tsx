@@ -11,7 +11,7 @@ import { useEffect, useRef } from 'react';
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import VoteDetail from './VoteDetail';
 import { markName } from '../inlineVote.constants';
-import { InlineVotePluginState } from '../inlineVote.plugins';
+import type { InlineVotePluginState } from '../inlineVote.plugins';
 
 export default function InlineVoteList ({ pluginKey }: {pluginKey: PluginKey<InlineVotePluginState>}) {
   const view = useEditorViewContext();

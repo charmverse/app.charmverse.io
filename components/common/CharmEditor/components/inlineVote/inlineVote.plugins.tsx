@@ -1,14 +1,14 @@
 import { Plugin, RawPlugins } from '@bangle.dev/core';
-import { Decoration, DecorationSet, PluginKey, EditorState, EditorView, Node, Schema } from '@bangle.dev/pm';
+import { Decoration, DecorationSet, EditorState, EditorView, Node, PluginKey, Schema } from '@bangle.dev/pm';
 import { createTooltipDOM, tooltipPlacement } from '@bangle.dev/tooltip';
 import { highlightMarkedElement, highlightElement } from 'lib/prosemirror/highlightMarkedElement';
-import { extractInlineCommentRows } from 'lib/inline-comments/findTotalInlineComments';
+import { extractInlineVoteRows } from 'lib/inline-votes/findTotalInlineVotes';
 import reactDOM from 'react-dom';
 import { referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';
-import { markName } from './inlineComment.constants';
-import RowDecoration from './components/InlineCommentRowDecoration';
+import { markName } from './inlineVote.constants';
+import RowDecoration from './components/InlineVoteRowDecoration';
 
-export interface InlineCommentPluginState {
+export interface InlineVotePluginState {
   tooltipContentDOM: HTMLElement
   show: boolean
   ids: string[]
@@ -19,7 +19,8 @@ export function plugin ({ key } :{
 }): RawPlugins {
   const tooltipDOMSpec = createTooltipDOM();
   return [
-    new Plugin<InlineCommentPluginState>({
+    new Plugin<InlineVotePluginState>({
+      key,
       state: {
         init () {
           return {
@@ -41,32 +42,27 @@ export function plugin ({ key } :{
             };
           }
           if (meta.type === 'HIDE_TOOLTIP') {
-            // Do not change object reference if show was and is false
             if (pluginState.show === false) {
               return pluginState;
             }
             return {
               ...pluginState,
-              ids: [],
-              show: false
+              show: false,
+              ids: []
             };
           }
           throw new Error('Unknown type');
         }
       },
-      key,
       props: {
-        handleClickOn: (view: EditorView, pos: number, node, nodePos, event: MouseEvent) => {
-          if (/charm-inline-comment/.test((event.target as HTMLElement).className)) {
-            return highlightMarkedElement({
-              view,
-              elementId: 'page-thread-list-box',
-              key,
-              markName,
-              prefix: 'thread'
-            });
-          }
-          return false;
+        handleClickOn: (view) => {
+          return highlightMarkedElement({
+            view,
+            elementId: 'page-vote-list-box',
+            key,
+            markName,
+            prefix: 'vote'
+          });
         }
       }
     }),
@@ -99,16 +95,16 @@ export function plugin ({ key } :{
           return this.getState(state);
         },
         handleClickOn: (view: EditorView, pos: number, node, nodePos, event: MouseEvent) => {
-          const inlineCommentContainer = (event.target as HTMLElement)?.closest('.charm-row-decoration-comments');
+          const inlineCommentContainer = (event.target as HTMLElement)?.closest('.charm-row-decoration-votes');
           const ids = inlineCommentContainer?.getAttribute('data-ids')?.split(',') || [];
           if (ids.length > 0) {
             return highlightElement({
               ids,
               view,
-              elementId: 'page-thread-list-box',
+              elementId: 'page-vote-list-box',
               key,
               markName,
-              prefix: 'thread'
+              prefix: 'vote'
             });
           }
           return false;
@@ -119,12 +115,14 @@ export function plugin ({ key } :{
 }
 
 function getDecorations ({ schema, doc }: { doc: Node, schema: Schema }) {
-  const rows = extractInlineCommentRows(schema, doc);
+
+  const rows = extractInlineVoteRows(schema, doc);
   const decorations: Decoration[] = rows.map(row => {
     // inject decoration at the start of the paragraph/header
     const firstPos = row.pos + 1;
     return Decoration.widget(firstPos, () => renderComponent(row.nodes), { key: firstPos.toString() + row.nodes.length });
   });
+
   return DecorationSet.create(doc, decorations);
 }
 
@@ -133,7 +131,7 @@ function renderComponent (nodesWithMark: Node[]) {
   const ids = nodesWithMark.map(node => node.marks[0]?.attrs.id).filter(Boolean);
 
   const container = document.createElement('div');
-  container.className = 'charm-row-decoration-comments charm-row-decoration';
+  container.className = 'charm-row-decoration-votes charm-row-decoration';
   container.setAttribute('data-ids', ids.join(','));
   reactDOM.render(<RowDecoration count={ids.length} />, container);
 

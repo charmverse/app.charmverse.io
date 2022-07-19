@@ -1,8 +1,8 @@
-
+import { ReactNode } from 'react';
 import { Box, Typography } from '@mui/material';
 import { CommentOutlined } from '@mui/icons-material';
 
-export default function RowIcon ({ threadIds }: { threadIds: string[] }) {
+export function RowDecoration ({ children }: { children: ReactNode }) {
   return (
     <Box
       display='flex'
@@ -10,6 +10,14 @@ export default function RowIcon ({ threadIds }: { threadIds: string[] }) {
       alignItems='center'
       sx={{ cursor: 'pointer' }}
     >
+      {children}
+    </Box>
+  );
+}
+
+export default function RowIcon ({ count }: { count: number }) {
+  return (
+    <RowDecoration>
       <CommentOutlined
         color='secondary'
         fontSize='small'
@@ -18,8 +26,8 @@ export default function RowIcon ({ threadIds }: { threadIds: string[] }) {
         component='span'
         variant='subtitle1'
       >
-        {threadIds.length}
+        {count}
       </Typography>
-    </Box>
+    </RowDecoration>
   );
 }

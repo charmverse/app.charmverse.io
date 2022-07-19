@@ -31,21 +31,16 @@ const InlineActionCountContainer = styled.span`
 
 interface InlineActionCounterProps {
   calculateActions?: boolean,
-  inlineCommentPluginKey: PluginKey<InlineCommentPluginState>,
   inlineVotePluginKey: PluginKey<InlineVotePluginState>
   node: NodeViewProps['node']
 }
 
 function InlineActionCounter (
-  { node, calculateActions = true, inlineCommentPluginKey, inlineVotePluginKey }: InlineActionCounterProps
+  { node, calculateActions = true, inlineVotePluginKey }: InlineActionCounterProps
 ) {
   const isShowingCardModal = (new URLSearchParams(window.location.href)).get('cardId');
   const view = useEditorViewContext();
-  const { threads } = useThreads();
   const { votes } = useVotes();
-  const { threadIds, totalInlineComments } = useMemo(() => (calculateActions || isShowingCardModal)
-    ? findTotalInlineComments(view.state.schema, node, threads)
-    : { threadIds: [], totalInlineComments: 0 }, [node, calculateActions, isShowingCardModal, view, threads]);
 
   const { voteIds, totalInlineVotes } = useMemo(() => (calculateActions || isShowingCardModal)
     ? findTotalInlineVotes(view, node, votes)
@@ -54,26 +49,6 @@ function InlineActionCounter (
   return (
     <CursorBoundary contentEditable='false' suppressContentEditableWarning>
       <InlineActionCountContainer>
-        {totalInlineComments > 0 && (
-        <Box
-          display='flex'
-          gap={0.5}
-          alignItems='center'
-          onClick={() => {
-            renderSuggestionsTooltip(inlineCommentPluginKey, { ids: threadIds })(view.state, view.dispatch, view);
-          }}
-        >
-          <CommentOutlinedIcon
-            color='secondary'
-            fontSize='small'
-          />
-          <Typography
-            component='span'
-            variant='subtitle1'
-          >{totalInlineComments}
-          </Typography>
-        </Box>
-        )}
         {totalInlineVotes > 0 && (
         <Box
           display='flex'

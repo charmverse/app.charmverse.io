@@ -1,5 +1,5 @@
-import { EditorView, MarkType, Node } from '@bangle.dev/pm';
-import { findChildrenByMark } from 'prosemirror-utils';
+import { EditorView, MarkType, Node, Schema } from '@bangle.dev/pm';
+import { findChildrenByMark, findChildrenByType } from 'prosemirror-utils';
 import { ExtendedVote } from 'lib/votes/interfaces';
 
 export function findTotalInlineVotes (
@@ -25,4 +25,20 @@ export function findTotalInlineVotes (
     }
   }
   return { totalInlineVotes, voteIds: Array.from(voteIds) };
+}
+
+// find and group votes by paragraph and heading
+export function extractInlineVoteRows (
+  schema: Schema,
+  node: Node
+): { pos: number, nodes: Node[] }[] {
+  const inlineCommentMarkSchema = schema.marks['inline-vote'] as MarkType;
+  const paragraphs = findChildrenByType(node, schema.nodes.paragraph);
+  const headings = findChildrenByType(node, schema.nodes.heading);
+  return headings.concat(paragraphs).map(_node => ({
+    pos: _node.pos,
+    nodes: findChildrenByMark(_node.node, inlineCommentMarkSchema)
+      .map(nodeWithPos => nodeWithPos.node)
+      .filter(__node => __node.marks[0].attrs.id && !__node.marks[0].attrs.resolved)
+  })).filter(({ nodes }) => nodes.length > 0);
 }

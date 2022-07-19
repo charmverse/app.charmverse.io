@@ -1,5 +1,5 @@
 import { Schema, MarkType, Node } from '@bangle.dev/pm';
-import { findChildrenByMark, findChildrenByType, NodeWithPos } from 'prosemirror-utils';
+import { findChildrenByMark, findChildrenByType } from 'prosemirror-utils';
 import { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 
 export function findTotalInlineComments (
@@ -29,6 +29,7 @@ export function findTotalInlineComments (
   return { totalInlineComments, threadIds: Array.from(threadIds) };
 }
 
+// find and group comments by paragraph and heading
 export function extractInlineCommentRows (
   schema: Schema,
   node: Node
@@ -42,5 +43,4 @@ export function extractInlineCommentRows (
       .map(nodeWithPos => nodeWithPos.node)
       .filter(__node => __node.marks[0].attrs.id && !__node.marks[0].attrs.resolved)
   })).filter(({ nodes }) => nodes.length > 0);
-
 }

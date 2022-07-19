@@ -49,7 +49,6 @@ import * as inlineVote from './components/inlineVote';
 import InlineVoteList from './components/inlineVote/components/InlineVoteList';
 import Mention, { mentionPluginKeyName, mentionPlugins, mentionSpecs, MentionSuggest } from './components/mention';
 import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList, nestedPageSpec } from './components/nestedPage';
-import Paragraph from './components/Paragraph';
 import Placeholder from './components/Placeholder';
 import Quote, * as quote from './components/quote';
 import ResizableImage, { imageSpec } from './components/ResizableImage';
@@ -60,7 +59,6 @@ import * as table from './components/table';
 import * as trailingNode from './components/trailingNode';
 import DevTools from './DevTools';
 import { checkForEmpty } from './utils';
-import Heading from './components/heading/Heading';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -207,16 +205,6 @@ export function charmEditorPlugins (
       name: 'quote',
       containerDOM: ['blockquote', { class: 'charm-quote' }],
       contentDOM: ['div']
-    }),
-    NodeView.createPlugin({
-      name: 'paragraph',
-      containerDOM: ['p', { class: 'charm-paragraph' }],
-      contentDOM: ['span']
-    }),
-    NodeView.createPlugin({
-      name: 'heading',
-      containerDOM: ['div', { class: 'charm-heading' }],
-      contentDOM: ['span']
     }),
     tabIndent.plugins(),
     table.tableEditing({ allowTableNodeSelection: true }),
@@ -475,28 +463,28 @@ function CharmEditor (
       state={state}
       renderNodeViews={({ children: _children, ...props }) => {
         switch (props.node.type.name) {
-          case 'paragraph': {
-            return (
-              <Paragraph
-                inlineVotePluginKey={inlineVotePluginKey}
-                inlineCommentPluginKey={inlineCommentPluginKey}
-                calculateActions={!disablePageSpecificFeatures}
-                {...props}
-              >{_children}
-              </Paragraph>
-            );
-          }
-          case 'heading': {
-            return (
-              <Heading
-                inlineVotePluginKey={inlineVotePluginKey}
-                inlineCommentPluginKey={inlineCommentPluginKey}
-                calculateActions={!disablePageSpecificFeatures}
-                {...props}
-              >{_children}
-              </Heading>
-            );
-          }
+          // case 'paragraph': {
+          //   return (
+          //     <Paragraph
+          //       inlineVotePluginKey={inlineVotePluginKey}
+          //       inlineCommentPluginKey={inlineCommentPluginKey}
+          //       calculateActions={!disablePageSpecificFeatures}
+          //       {...props}
+          //     >{_children}
+          //     </Paragraph>
+          //   );
+          // }
+          // case 'heading': {
+          //   return (
+          //     <Heading
+          //       inlineVotePluginKey={inlineVotePluginKey}
+          //       inlineCommentPluginKey={inlineCommentPluginKey}
+          //       calculateActions={!disablePageSpecificFeatures}
+          //       {...props}
+          //     >{_children}
+          //     </Heading>
+          //   );
+          // }
           case 'quote':
             return <Quote {...props}>{_children}</Quote>;
           case 'columnLayout': {

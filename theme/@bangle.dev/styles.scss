@@ -515,14 +515,21 @@ details {
 }
 
 // for inline comments
-.charm-comment-count {
+.charm-row-decoration {
+
+  background-color: var(--background-default);
+  cursor: pointer;
+  position: absolute;
+  right: -70px;
+  // add a width so that icons are left-aligned even if counts get large
+  width: 40px;
+
   svg {
     color: rgba(var(--center-channel-color-rgb), .5);
   }
 
-  position: absolute;
-  right: -50px;
-  top: 0;
-  width: 20px;
-  height: 20px;
+  .MuiTypography-root {
+    color: rgba(var(--center-channel-color-rgb), .8);
+    font-size: .8rem;
+  }
 }
