@@ -8,15 +8,16 @@ import ScrollableWindow from 'components/common/PageLayout/components/Scrollable
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
 import { useVotes } from 'hooks/useVotes';
-import { Page, PageContent } from 'models';
+import { BountyWithDetails, Page, PageContent } from 'models';
 import { useRouter } from 'next/router';
-import { memo, ReactNode, useCallback } from 'react';
+import { memo, useCallback } from 'react';
 import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import CharmEditor, { ICharmEditorOutput } from '../../common/CharmEditor/CharmEditor';
 import PageBanner from './components/PageBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
 import PageHeader from './components/PageHeader';
 import CreateVoteBox from './components/CreateVoteBox';
+import BountyProperties from './components/BountyProperties';
 
 export const Container = styled(Box)<{ top: number, fullWidth?: boolean }>`
   width: ${({ fullWidth }) => fullWidth ? '100%' : '860px'};
@@ -34,10 +35,10 @@ export const Container = styled(Box)<{ top: number, fullWidth?: boolean }>`
 
 export interface DocumentPageProps {
   page: Page, setPage: (p: Partial<Page>) => void, readOnly?: boolean, insideModal?: boolean
-  bountyEditor?: ReactNode
+  bounty?: BountyWithDetails
 }
 
-function DocumentPage ({ bountyEditor = null, page, setPage, insideModal, readOnly = false }: DocumentPageProps) {
+function DocumentPage ({ bounty, page, setPage, insideModal, readOnly = false }: DocumentPageProps) {
   const { pages } = usePages();
   const { cancelVote, castVote, deleteVote, votes, isLoading } = useVotes();
 
@@ -141,7 +142,12 @@ function DocumentPage ({ bountyEditor = null, page, setPage, insideModal, readOn
                   pageUpdatedAt={page.updatedAt.toString()}
                   pageUpdatedBy={page.updatedBy}
                 />
-
+                {bounty && (
+                <>
+                  <hr />
+                  <BountyProperties bounty={bounty} readOnly={readOnly} />
+                </>
+                )}
                 <hr />
                 <CommentsList
                   comments={comments}
@@ -150,12 +156,6 @@ function DocumentPage ({ bountyEditor = null, page, setPage, insideModal, readOn
                   readonly={readOnly}
                 />
 
-                {bountyEditor && (
-                <>
-                  {bountyEditor}
-                  <hr />
-                </>
-                )}
               </div>
             )}
           </CharmEditor>

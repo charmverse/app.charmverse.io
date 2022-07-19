@@ -14,6 +14,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace'
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions'
 import { usePages } from 'hooks/usePages'
 import { useUser } from 'hooks/useUser'
+import { log } from 'loglevel'
 import { BountyWithDetails } from 'models'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -176,31 +177,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
                     <CardDetail
                         card={card}
                         readonly={readonly || isSharedPage}
-                        // bountyEditor={
-                        //   isEditingBounty ? 
-                        //   <BountyEditorForm 
-                        //     onSubmit={() => {
-                        //       setIsEditingBounty(false)
-                        //     }}
-                        //     mode={"create"}
-                        //     onCancel={() => setIsEditingBounty(false)}
-                        //     bounty={{
-                        //       title: cardPage?.title,
-                        //       description: undefined,
-                        //       descriptionNodes: undefined,
-                        //       linkedTaskId: cardPage?.id,
-                        //       rewardAmount: 1,
-                        //       rewardToken: "ETH",
-                        //       chainId: 1,
-                        //     }}
-                        //   /> :
-                        //   bounty ? <BountyDetails 
-                        //     centeredContent={false}
-                        //     bounty={bounty}
-                        //     showDescription={false}
-                        //     showHeader={false}
-                        //   /> : null
-                        // }
+                        bounty={bounty}
                     />}
 
                 {!card &&

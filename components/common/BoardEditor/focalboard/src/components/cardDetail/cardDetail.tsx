@@ -9,15 +9,16 @@ import log from 'lib/log'
 import { Prisma, Page } from '@prisma/client';
 import charmClient from 'charmClient';
 import debouncePromise from 'lib/utilities/debouncePromise';
+import { BountyWithDetails } from 'models'
 
 type Props = {
     card: Card
     readonly: boolean
-    bountyEditor?: ReactNode
+    bounty?: BountyWithDetails
 }
 
 const CardDetail = (props: Props): JSX.Element|null => {
-    const {bountyEditor, card, readonly} = props
+    const {bounty, card, readonly} = props
 
     const mounted = useRef(false);
 
@@ -57,7 +58,7 @@ const CardDetail = (props: Props): JSX.Element|null => {
         page={page} 
         setPage={setPage} 
         readOnly={readonly} 
-        bountyEditor={bountyEditor}
+        bounty={bounty}
       />
     )
 }
