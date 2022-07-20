@@ -72,7 +72,7 @@ handler
  *          example: https://app.charmverse.io/my-workspace/bounties/5985679461310778
  *
  */
-interface Bounty {
+export interface PublicApiBounty {
   id: string;
   createdAt: string;
   description: string;
@@ -134,6 +134,9 @@ async function getBounties (req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
+  /**
+   * Returns the wallet addresses that have received a payment for this bounty
+   */
   function getRecipients (bounty: (typeof bounties)[number]) {
     return bounty.applications
       .filter(application => application.status === 'paid' && application.walletAddress)
@@ -143,10 +146,10 @@ async function getBounties (req: NextApiRequest, res: NextApiResponse) {
   }
 
   function getUrl (bounty: (typeof bounties)[number]) {
-    return `${process.env.DOMAIN}/${bounty.space.domain}/bounties/${bounty.id}}`;
+    return `${process.env.DOMAIN}/${bounty.space.domain}/bounties/${bounty.id}`;
   }
 
-  const bountiesResponse = bounties.map((bounty): Bounty => ({
+  const bountiesResponse = bounties.map((bounty): PublicApiBounty => ({
     createdAt: bounty.createdAt.toISOString(),
     description: bounty.description,
     id: bounty.id,
@@ -164,7 +167,7 @@ async function getBounties (req: NextApiRequest, res: NextApiResponse) {
     url: getUrl(bounty)
   }));
 
-  return res.status(201).json(bountiesResponse);
+  return res.status(200).json(bountiesResponse);
 }
 
 export default handler;
