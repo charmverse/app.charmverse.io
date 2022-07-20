@@ -12,8 +12,6 @@ export const sortNodes = (nodes: Array<PageNode>) => {
 
 /**
  * @targetPageId If provided, the only root node returned will be the one whose child tree contains the target page ID
- *
- * @abstract If target page id is provided, the meaning of the returned values changes. The first value will be the root node and the second value will be the target page node. The tree between root node and target node will be pruned so that the children array only contains a single child node. The target node and below retain their children
  */
 function reducePagesToPageTree<
     T extends PageNode = PageNode, R extends PageNodeWithChildren = PageNodeWithChildren
@@ -51,7 +49,7 @@ function reducePagesToPageTree<
         tempItems[index].children = sortNodes(tempItems[index].children) as R[];
       }
     }
-    // If its a root page always show it
+    // If it's a root page always show it
     else if ((node.parentId === null) && !rootPageIds && node.deletedAt === null) {
       roots.push(node);
     }
