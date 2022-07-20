@@ -1,7 +1,7 @@
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { RequiredNotNull } from 'lib/utilities/types';
 import sortBy from 'lodash/sortBy';
-import { PageNode, PageNodeWithChildren, PageTreeMappingInput } from './interfaces';
+import { PageNode, PageNodeWithChildren, PageTreeMappingInput, TargetPageTree } from './interfaces';
 
 export const sortNodes = (nodes: Array<PageNode>) => {
   return [
@@ -78,10 +78,7 @@ T extends PageNode = PageNode, R extends PageNodeWithChildren = PageNodeWithChil
  * Given a list of pages, resolve only the tree specific to the target page
  * @return parents is the array of parent pages from nearest parent to the root. target page is the target page along with all child pages as a tree
  */
-export function mapTargetPageTree<T extends PageNode = PageNode, R extends PageNodeWithChildren = PageNodeWithChildren> ({ items, targetPageId }: Omit<PageTreeMappingInput<T>, 'rootPageIds'> & {targetPageId: string}): {
-  parents: R[],
-  targetPage: R
-} {
+export function mapTargetPageTree<T extends PageNode = PageNode, R extends PageNodeWithChildren = PageNodeWithChildren> ({ items, targetPageId }: Omit<PageTreeMappingInput<T>, 'rootPageIds'> & {targetPageId: string}): TargetPageTree<R> {
 
   const { itemMap, itemsWithChildren } = reducePagesToPageTree({ items });
 

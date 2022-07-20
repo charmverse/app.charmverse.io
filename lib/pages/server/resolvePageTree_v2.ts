@@ -1,8 +1,7 @@
 import { prisma } from 'db';
-import { MissingDataError } from 'lib/utilities/errors';
-import { PageNode, PageNodeWithChildren, PageNodeWithPermissions } from '../interfaces';
+import { PageNodeWithChildren, PageNodeWithPermissions, TargetPageTree } from '../interfaces';
+import { mapTargetPageTree } from '../mapPageTree';
 import { PageNotFoundError } from './errors';
-import { mapPageTree } from '../mapPageTree';
 
 /**
  * Returns resolved page tree along with the permissions state
@@ -11,7 +10,7 @@ import { mapPageTree } from '../mapPageTree';
  * Children is a recursive array of children in tree format
  */
 export async function resolvePageTreeV2 ({ pageId }: {pageId: string}):
-  Promise<{parents: PageNode [], pageWithChildren: PageNode}> {
+  Promise<TargetPageTree> {
 
   const pageWithSpaceIdOnly = await prisma.page.findUnique({
     where: {
@@ -45,35 +44,29 @@ export async function resolvePageTreeV2 ({ pageId }: {pageId: string}):
     }
   });
 
-  const [prunedRoot, targetNode] = mapPageTree<PageNodeWithPermissions, PageNodeWithChildren<PageNodeWithPermissions>>({
+  const { parents, targetPage } = mapTargetPageTree<PageNodeWithPermissions, PageNodeWithChildren<PageNodeWithPermissions>>({
     items: pagesInSpace,
     targetPageId: pageId
   });
 
-  const parents: PageNode[] = [];
+  // Prune the parent references so we have a direct chain
+  for (let i = 0; i < parents.length; i++) {
+    const parent = parents[i];
 
-  function populateParents (currentNode: PageNodeWithChildren<PageNodeWithPermissions>): void {
-    if (currentNode.id === pageId) {
-      return;
-    }
+    parent.children = parent.children.filter(child => {
 
-    parents.push(currentNode);
+      if (i === 0) {
+        return child.id === targetPage.id;
+      }
 
-    // Depends on map page tree to prune all non related parents
-    const child = currentNode.children?.[0];
-
-    if (!child) {
-      throw new MissingDataError('Tree traversal failed. Page could not be found');
-    }
-
-    return populateParents(child);
+      // The previous item in the parents array is the child of the current parent node
+      return child.id === parents[i - 1].id;
+    });
   }
 
-  populateParents(prunedRoot);
-
   return {
-    parents: parents.reverse(),
-    pageWithChildren: targetNode
+    parents,
+    targetPage
   };
 
 }

@@ -52,3 +52,8 @@ export interface PageTreeMappingInput<T extends PageNode> {
   items: T[], rootPageIds?: string[],
   targetPageId?: string
 }
+
+export type TargetPageTree<R extends PageNodeWithChildren = PageNodeWithChildren> = {
+  parents: R[],
+  targetPage: R
+}
