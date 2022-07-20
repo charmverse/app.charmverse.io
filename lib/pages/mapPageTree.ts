@@ -1,3 +1,5 @@
+import { DataNotFoundError } from 'lib/utilities/errors';
+import { RequiredNotNull } from 'lib/utilities/types';
 import sortBy from 'lodash/sortBy';
 import { PageNode, PageNodeWithChildren, PageTreeMappingInput } from './interfaces';
 
@@ -13,9 +15,9 @@ export const sortNodes = (nodes: Array<PageNode>) => {
  *
  * @abstract If target page id is provided, the meaning of the returned values changes. The first value will be the root node and the second value will be the target page node. The tree between root node and target node will be pruned so that the children array only contains a single child node. The target node and below retain their children
  */
-export function mapPageTree<
+function reducePagesToPageTree<
     T extends PageNode = PageNode, R extends PageNodeWithChildren = PageNodeWithChildren
-    > ({ items, rootPageIds, targetPageId }: PageTreeMappingInput<T>): R[] {
+    > ({ items, rootPageIds }: Omit<PageTreeMappingInput<T>, 'targetPageId'>): {itemMap: { [key: string]: number}, itemsWithChildren: R[], rootNodes: R[]} {
 
   // Assign empty children to each node
   const tempItems: R[] = items.map((item: T) => {
@@ -53,23 +55,53 @@ export function mapPageTree<
     else if ((node.parentId === null) && !rootPageIds && node.deletedAt === null) {
       roots.push(node);
     }
-    if (rootPageIds?.includes(node.id)) {
+    else if (rootPageIds?.includes(node.id)) {
       roots.push(node);
     }
   }
 
-  // Only used when we pass a target page id
+  return {
+    itemMap: map,
+    rootNodes: roots,
+    itemsWithChildren: tempItems
+  };
+
+}
+
+export function mapPageTree<
+T extends PageNode = PageNode, R extends PageNodeWithChildren = PageNodeWithChildren
+> ({ items, rootPageIds }: Omit<PageTreeMappingInput<T>, 'targetPageId'>): R[] {
+  const { rootNodes } = reducePagesToPageTree({ items, rootPageIds });
+
+  return sortNodes(rootNodes) as R[];
+}
+
+/**
+ * Given a list of pages, resolve only the tree specific to the target page
+ * @return parents is the array of parent pages from nearest parent to the root. target page is the target page along with all child pages as a tree
+ */
+export function mapTargetPageTree<T extends PageNode = PageNode, R extends PageNodeWithChildren = PageNodeWithChildren> ({ items, targetPageId }: Omit<PageTreeMappingInput<T>, 'rootPageIds'> & {targetPageId: string}): {
+  parents: R[],
+  targetPage: R
+} {
+
+  const { itemMap, itemsWithChildren } = reducePagesToPageTree({ items });
+
+  /**
+   * Goes from the page to its root, and generates a list of references corresponding to the path
+   * @childIdChain A list of page IDs going from the target page to the first child of the root
+   */
   function resolveRootId (currentNodeId: string, childIdChain: string[] = []): {rootId: string, childIdChain: string[]} {
-    const currentNode = tempItems[map[currentNodeId]];
+
+    const currentNode = itemsWithChildren[itemMap[currentNodeId]];
 
     const parentId = currentNode.parentId;
 
     // If the parent does not exist, consider current node as the root
-    if (!parentId || !tempItems[map[currentNodeId]]) {
+    if (!parentId || !itemsWithChildren[itemMap[parentId]]) {
       return {
         rootId: currentNodeId,
-        // Reverse so we start with the top most child
-        childIdChain: childIdChain.reverse()
+        childIdChain
       };
     }
 
@@ -78,24 +110,38 @@ export function mapPageTree<
     return resolveRootId(parentId, childIdChain);
   }
 
-  if (targetPageId) {
+  const { childIdChain, rootId } = resolveRootId(targetPageId);
 
-    const targetPageNode = tempItems[map[targetPageId]];
+  const rootNode = itemsWithChildren[itemMap[rootId]];
 
-    const { childIdChain, rootId } = resolveRootId(targetPageId);
+  const parents: R[] = [];
 
-    const rootNode = tempItems[map[rootId]];
+  if (rootNode.id !== targetPageId) {
 
-    childIdChain.reduce((currentNode, childId) => {
-      currentNode.children = currentNode.children.filter(childNode => childNode.id === childId);
-      return currentNode.children[0] as R;
-    }, rootNode);
+    const childIdChainFromRootChild = childIdChain.reverse();
 
-    return [rootNode, targetPageNode];
+    let currentNode = rootNode as R;
 
+    for (const childId of childIdChainFromRootChild) {
+
+      parents.push(currentNode);
+
+      const childNode = currentNode.children.find(child => child.id === childId);
+
+      if (!childNode) {
+        throw new DataNotFoundError('Could not find the target child page');
+      }
+
+      currentNode = childNode as R;
+    }
   }
-  else {
-    return sortNodes(roots) as R[];
-  }
+
+  const targetPageNode = itemsWithChildren[itemMap[targetPageId]];
+
+  return {
+    // Parents were resolved from the root, but we need to return them from the closest to the page
+    parents: parents.reverse(),
+    targetPage: targetPageNode as R
+  };
 
 }
