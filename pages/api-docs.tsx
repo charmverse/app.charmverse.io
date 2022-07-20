@@ -46,7 +46,6 @@ export default function ApiDoc ({ spec }: InferGetStaticPropsType<typeof getStat
 
   return (
     <SwaggerUI spec={spec}>
-      <h1>test child</h1>
     </SwaggerUI>
   );
 //  ;
