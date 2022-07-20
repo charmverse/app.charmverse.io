@@ -9,6 +9,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { PermissionNotFoundError } from 'lib/permissions/pages/errors';
 import { boardPagePermissionUpdated } from 'lib/permissions/pages/triggers';
+import { PageNotFoundError } from 'lib/pages/server';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -45,11 +46,15 @@ async function addPagePermission (req: NextApiRequest, res: NextApiResponse<IPag
     throw new ActionNotPermittedError('You cannot make page public.');
   }
 
-  const { type: pageType } = await prisma.page.findUnique({
+  const page = await prisma.page.findUnique({
     where: {
       id: pageId
     }
-  }) as Page;
+  });
+
+  if (!page) {
+    throw new PageNotFoundError(pageId);
+  }
 
   // Count before and after permissions so we don't trigger the event unless necessary
   const permissionsBefore = await prisma.pagePermission.count({
@@ -61,7 +66,7 @@ async function addPagePermission (req: NextApiRequest, res: NextApiResponse<IPag
   const createdPermission = await upsertPermission(pageId, req.body);
 
   // Override behaviour, we always cascade board permissions downwards
-  if (pageType === 'board') {
+  if (page.type === 'board') {
     await boardPagePermissionUpdated({ boardId: pageId, permissionId: createdPermission.id });
 
   }
