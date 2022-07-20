@@ -89,11 +89,6 @@ export async function generateboardPagePermissionUpdated ({ boardId, permissionI
 
   });
 
-  // // Find inheritance references to drop
-  // const inheritedPermissions = board.permissions.filter(permission => {
-
-  // });
-
   /**
    * 1. Detect if board inheritance for target permissions should be dropped as page is outside the tree
    * 2. Resolve the children of the board => Make sure the child permissions don't inherit above the board
