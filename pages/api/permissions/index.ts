@@ -60,11 +60,12 @@ async function addPagePermission (req: NextApiRequest, res: NextApiResponse<IPag
 
   const createdPermission = await upsertPermission(pageId, req.body);
 
+  // Override behaviour, we always cascade board permissions downwards
   if (pageType === 'board') {
     await boardPagePermissionUpdated({ boardId: pageId, permissionId: createdPermission.id });
 
   }
-  // Old behaviour where we setup permissions after a page permission is added
+  // Existing behaviour where we setup permissions after a page permission is added, and account for inheritance conditions
   else {
     const permissionsAfter = await prisma.pagePermission.count({
       where: {
