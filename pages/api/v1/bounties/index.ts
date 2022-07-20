@@ -15,12 +15,16 @@ handler
   .use(getBounties);
 
 /**
- * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
- *
  * @swagger
  * components:
  *  schemas:
- *    DatabasePage:
+ *    UserWallet:
+ *      type: object
+ *      properties:
+ *        address:
+ *          type: string
+ *          example: 0x7684F0170a3B37640423b1CD9d8Cb817Edf301aE
+ *    Bounty:
  *      type: object
  *      properties:
  *        id:
@@ -31,31 +35,53 @@ handler
  *          type: string
  *          format: date-time
  *          example: 2022-04-04T21:32:38.317Z
- *        updatedAt:
+ *        description:
  *          type: string
- *          format: date-time
- *          example: 2022-04-04T21:32:38.317Z
- *        type:
- *          type: string
- *          example: board
- *        title:
- *          type: string
- *          example: Todo tracker
- *        url:
- *          type: string
- *          example: https://app.charmverse.io/my-workspace/page-5985679461310778
- *        schema:
+ *          example: Create a story on Instagram
+ *        issuer:
+ *          type: object
+ *          $ref: '#/components/schemas/UserWallet'
+ *        recipients:
  *          type: array
  *          items:
  *            type: object
- *            $ref: '#/components/schemas/Bounty'
+ *            $ref: '#/components/schemas/UserWallet'
+ *        reward:
+ *          type: object
+ *          properties:
+ *            amount:
+ *              type: number
+ *              example: .001
+ *            chain:
+ *              type: number
+ *              example: 1
+ *            token:
+ *              type: string
+ *              example: ETH
+ *        status:
+ *          type: string
+ *          example: paid
+ *          enum:
+ *            - suggestion
+ *            - open
+ *            - inProgress
+ *            - complete
+ *            - paid
+ *        title:
+ *          type: string
+ *          example: Social media boost
+ *        url:
+ *          type: string
+ *          example: https://app.charmverse.io/my-workspace/bounties/5985679461310778
  *
  */
 interface Bounty {
   id: string;
-  url: string;
   createdAt: string;
   description: string;
+  issuer: {
+    address: string
+  };
   reward: {
     amount: number;
     chain: number;
@@ -63,9 +89,7 @@ interface Bounty {
   };
   status: BountyStatus;
   title: string;
-  issuer: {
-    address: string
-  };
+  url: string;
   recipients: {
     address: string
   }[];
@@ -80,9 +104,7 @@ interface Bounty {
  *     parameters:
  *      - in: query
  *        name: status
- *        schema:
- *          type: string
- *        description: Filter bounties by one or more status: suggestion | open | inProgress | complete | paid
+ *        type: string
  *     responses:
  *       200:
  *         description: List of bounties
@@ -91,7 +113,7 @@ interface Bounty {
  *              schema:
  *                $ref: '#/components/schemas/Bounty'
  */
-export async function getBounties (req: NextApiRequest, res: NextApiResponse) {
+async function getBounties (req: NextApiRequest, res: NextApiResponse) {
 
   const { status } = req.query;
   const statuses = (Array.isArray(status) ? status : (status ? [status] : null)) as BountyStatus[];
