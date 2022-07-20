@@ -153,7 +153,7 @@ function validateRootOne (node: PageNodeWithChildren) {
 
 describe('mapPageTree', () => {
 
-  it('should map a list of pages to a tree', async () => {
+  it('should map a list of pages to an ordered array containing root nodes with their respective tree', async () => {
     const rootList = mapPageTree({
       items: pages
     });
