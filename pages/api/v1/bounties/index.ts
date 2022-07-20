@@ -1,17 +1,14 @@
 
+import { BountyStatus } from '@prisma/client';
 import { prisma } from 'db';
-import { BountyStatus, Prisma } from '@prisma/client';
-import { onError, onNoMatch, requireApiKey, requireKeys } from 'lib/middleware';
+import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { Page, validateCreationData, DatabasePageNotFoundError, createDatabaseCardPage } from 'lib/public-api';
-import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireApiKey)
-  .use(requireKeys<Page>(['title'], 'body'))
   .use(getBounties);
 
 /**
