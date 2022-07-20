@@ -3,6 +3,7 @@ import { resolveChildPagesAsFlatList, resolveParentPages } from 'lib/pages/serve
 import { prisma } from 'db';
 import { IPageWithPermissions } from 'lib/pages/server';
 import { DataNotFoundError } from 'lib/utilities/errors';
+import { isTruthy } from 'lib/utilities/types';
 import { BoardPagePermissionUpdated } from '../interfaces';
 
 /**
@@ -125,7 +126,7 @@ export async function boardPagePermissionUpdated ({ boardId, permissionId }: Boa
   await prisma.$transaction([
     args.updateManyArgs ? prisma.pagePermission.updateMany(args.updateManyArgs) : null,
     args.createManyArgs ? prisma.pagePermission.createMany(args.createManyArgs) : null
-  ].filter(a => a !== null) as PrismaPromise<any>[]);
+  ].filter(a => isTruthy(a)) as PrismaPromise<any>[]);
 
   return true;
 }
