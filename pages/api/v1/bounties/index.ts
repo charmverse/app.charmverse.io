@@ -108,7 +108,10 @@ interface Bounty {
  *         content:
  *            application/json:
  *              schema:
- *                $ref: '#/components/schemas/Bounty'
+ *                type: array
+ *                items:
+ *                  type: object
+ *                  $ref: '#/components/schemas/Bounty'
  */
 async function getBounties (req: NextApiRequest, res: NextApiResponse) {
 
