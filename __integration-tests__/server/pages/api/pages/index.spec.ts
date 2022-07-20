@@ -22,7 +22,7 @@ describe('POST /api/pages - create page', () => {
 
     const userCookie = await loginUser(user);
 
-    const pageToCreate: Prisma.PageCreateInput = generatePageToCreateStub({
+    const pageToCreate = generatePageToCreateStub({
       userId: user.id,
       spaceId: space.id
     });
@@ -33,9 +33,9 @@ describe('POST /api/pages - create page', () => {
       .send(pageToCreate)
       .expect(201) as {body: IPageWithPermissions};
 
-    expect(createdPage.spaceId).toBe(pageToCreate.space?.connect?.id as string);
+    expect(createdPage.spaceId).toBe(pageToCreate.spaceId as string);
     expect(createdPage.path).toBe(pageToCreate.path);
-    expect(createdPage.createdBy).toBe(pageToCreate.author.connect?.id);
+    expect(createdPage.createdBy).toBe(pageToCreate.createdBy as string);
 
   });
 
@@ -45,7 +45,7 @@ describe('POST /api/pages - create page', () => {
 
     const userCookie = await loginUser(user);
 
-    const pageToCreate: Prisma.PageCreateInput = generatePageToCreateStub({
+    const pageToCreate = generatePageToCreateStub({
       userId: user.id,
       spaceId: space.id
     });
@@ -56,9 +56,9 @@ describe('POST /api/pages - create page', () => {
       .send(pageToCreate)
       .expect(201) as {body: IPageWithPermissions};
 
-    expect(createdPage.spaceId).toBe(pageToCreate.space?.connect?.id as string);
+    expect(createdPage.spaceId).toBe(pageToCreate.spaceId as string);
     expect(createdPage.path).toBe(pageToCreate.path);
-    expect(createdPage.createdBy).toBe(pageToCreate.author.connect?.id);
+    expect(createdPage.createdBy).toBe(pageToCreate.createdBy);
 
   });
 
@@ -68,7 +68,7 @@ describe('POST /api/pages - create page', () => {
 
     const userCookie = await loginUser(user);
 
-    const pageToCreate: Prisma.PageCreateInput = generatePageToCreateStub({
+    const pageToCreate = generatePageToCreateStub({
       userId: user.id,
       spaceId: space.id
     });

@@ -29,7 +29,7 @@ const CardDetail = (props: Props): JSX.Element|null => {
 
     const { pages, setPages } = usePages();
 
-    const debouncedPageUpdate = debouncePromise(async (updates: Prisma.PageUpdateInput) => {
+    const debouncedPageUpdate = debouncePromise(async (updates: Partial<Page>) => {
         const updatedPage = await charmClient.updatePage(updates);
         setPages((_pages) => ({
           ..._pages,
@@ -40,7 +40,7 @@ const CardDetail = (props: Props): JSX.Element|null => {
 
     const setPage = useCallback(async (updates: Partial<Page>) => {
       if (mounted.current) {
-        debouncedPageUpdate({ id: card.id, ...updates } as Prisma.PageUpdateInput)
+        debouncedPageUpdate({ id: card.id, ...updates } as Partial<Page>)
           .catch((err: any) => {
             log.error('Error saving page', err);
           });

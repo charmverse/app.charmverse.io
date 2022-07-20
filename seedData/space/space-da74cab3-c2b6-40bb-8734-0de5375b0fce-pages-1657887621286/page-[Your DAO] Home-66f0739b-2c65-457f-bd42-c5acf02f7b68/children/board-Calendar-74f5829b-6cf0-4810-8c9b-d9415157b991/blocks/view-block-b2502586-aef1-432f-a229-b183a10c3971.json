@@ -1,0 +1,35 @@
+{
+  "id": "b2502586-aef1-432f-a229-b183a10c3971",
+  "deletedAt": null,
+  "createdAt": "2022-07-08T13:48:59.126Z",
+  "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+  "updatedAt": "2022-07-08T13:48:59.126Z",
+  "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+  "spaceId": "da74cab3-c2b6-40bb-8734-0de5375b0fce",
+  "parentId": "74f5829b-6cf0-4810-8c9b-d9415157b991",
+  "rootId": "74f5829b-6cf0-4810-8c9b-d9415157b991",
+  "schema": 1,
+  "type": "view",
+  "title": "Board view",
+  "fields": {
+    "filter": {
+      "filters": [],
+      "operation": "and"
+    },
+    "viewType": "board",
+    "cardOrder": [
+      "cdc37c2a-c19e-4407-99b6-3e37f6b30541",
+      "98d6b944-d007-4fd3-8df6-5f7a0445c28d",
+      "c0efaa87-465e-4c04-beef-2e2063970f12"
+    ],
+    "sortOptions": [],
+    "columnWidths": {},
+    "hiddenOptionIds": [],
+    "visibleOptionIds": [],
+    "defaultTemplateId": "",
+    "collapsedOptionIds": [],
+    "columnCalculations": {},
+    "kanbanCalculations": {},
+    "visiblePropertyIds": []
+  }
+}

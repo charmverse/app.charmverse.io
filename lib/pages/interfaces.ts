@@ -5,7 +5,7 @@ export interface IPageWithPermissions extends Page {
 }
 
 export interface PageWithChildren extends IPageWithPermissions {
-  children: IPageWithPermissions []
+  children: PageWithChildren []
 }
 
 export interface ModifyChildPagesResponse {

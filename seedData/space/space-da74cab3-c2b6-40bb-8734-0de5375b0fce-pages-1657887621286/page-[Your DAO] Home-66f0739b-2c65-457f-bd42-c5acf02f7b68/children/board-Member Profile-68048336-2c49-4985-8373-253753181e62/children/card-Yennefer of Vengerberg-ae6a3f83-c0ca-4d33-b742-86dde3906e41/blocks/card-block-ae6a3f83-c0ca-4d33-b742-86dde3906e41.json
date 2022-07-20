@@ -1,0 +1,25 @@
+{
+  "id": "ae6a3f83-c0ca-4d33-b742-86dde3906e41",
+  "deletedAt": null,
+  "createdAt": "2022-06-17T19:39:36.586Z",
+  "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+  "updatedAt": "2022-06-18T12:29:04.730Z",
+  "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+  "spaceId": "da74cab3-c2b6-40bb-8734-0de5375b0fce",
+  "parentId": "68048336-2c49-4985-8373-253753181e62",
+  "rootId": "68048336-2c49-4985-8373-253753181e62",
+  "schema": 1,
+  "type": "card",
+  "title": "Card 2",
+  "fields": {
+    "icon": "",
+    "isTemplate": false,
+    "properties": {
+      "81b997de-e26d-4694-a062-78df2368d199": "@yenna",
+      "a81231c7-6de2-42f0-8667-9dfc6479cc14": "edba4459-615c-407a-97fc-f081428f5ba1",
+      "a9bcc8ef-9d60-4320-9f2a-5639ff686d9d": "Senior Visual Designer"
+    },
+    "headerImage": null,
+    "contentOrder": []
+  }
+}

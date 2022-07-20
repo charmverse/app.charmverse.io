@@ -32,6 +32,7 @@ import { sendFlashMessage } from '../flashMessages'
 import PropertyValueElement from '../propertyValueElement'
 import PageIcon from 'components/common/PageLayout/components/PageIcon'
 import { checkForEmpty } from 'components/common/CharmEditor/utils'
+import { useSnackbar } from 'hooks/useSnackbar'
 
 
 type Props = {
@@ -114,6 +115,8 @@ const KanbanCard = React.memo((props: Props) => {
     setShowConfirmationDialogBox(true)
   }
 
+  const { showMessage } = useSnackbar()
+
   return (
     <>
       <div
@@ -174,7 +177,7 @@ const KanbanCard = React.memo((props: Props) => {
                   }
 
                   Utils.copyTextToClipboard(cardLink)
-                  sendFlashMessage({ content: intl.formatMessage({ id: 'KanbanCard.copiedLink', defaultMessage: 'Copied!' }), severity: 'high' })
+                  showMessage('Copied card link to clipboard', 'success')
                 }}
               />
             </Menu>

@@ -16,10 +16,12 @@ export async function duplicatePage (pageId: string, userId: string, parentId?: 
 
   const createdPageId = v4();
 
+  const parentIdToAssign = parentId ?? page.parentId;
+
   const transactions: PrismaPromise<any>[] = [prisma.page.create({
     data: {
       id: createdPageId,
-      parentId: parentId ?? page.parentId,
+      parentId: parentIdToAssign,
       updatedBy: userId,
       title: `${page.title} (copy)`,
       content: page.content ?? undefined,
