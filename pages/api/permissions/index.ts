@@ -72,7 +72,6 @@ async function addPagePermission (req: NextApiRequest, res: NextApiResponse<IPag
       }
     });
 
-    // TODO - This could be an async job, but there is a risk of the UI being out of sync
     if (permissionsAfter > permissionsBefore) {
       await setupPermissionsAfterPagePermissionAdded(createdPermission.id);
     }
