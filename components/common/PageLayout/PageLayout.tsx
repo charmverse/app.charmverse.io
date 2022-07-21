@@ -15,8 +15,7 @@ import Sidebar from './components/Sidebar';
 
 const openedMixin = (theme: Theme, sidebarWidth: number) => ({
   width: '100%',
-  marginRight: 0,
-  transition: theme.transitions.create(['marginRight', 'width'], {
+  transition: theme.transitions.create(['width'], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.enteringScreen
   }),
@@ -27,40 +26,39 @@ const openedMixin = (theme: Theme, sidebarWidth: number) => ({
 });
 
 const closedMixin = (theme: Theme) => ({
-  transition: theme.transitions.create(['marginRight', 'width'], {
+  transition: theme.transitions.create(['width'], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen
   }),
   overflowX: 'hidden',
-  marginRight: 60,
   width: 0
-});
+}) as const;
 
-export const AppBar = styled(MuiAppBar, { shouldForwardProp: (prop: string) => prop !== 'sidebarWidth' && prop !== 'open' })
-  // eslint-disable-next-line no-unexpected-multiline
-  <{ open: boolean, sidebarWidth: number }>(({ sidebarWidth, theme, open }) => ({
-    background: 'transparent',
-    boxShadow: 'none',
-    color: 'inherit',
-    zIndex: 'var(--z-index-appBar)',
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
-    }),
-    ...(open && {
-      marginLeft: sidebarWidth,
-      width: `calc(100% - ${sidebarWidth}px)`,
-      transition: theme.transitions.create(['width', 'margin'], {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.enteringScreen
-      })
-    })
-  }));
+export const AppBar = styled(MuiAppBar, { shouldForwardProp: (prop: string) => prop !== 'sidebarWidth' && prop !== 'open' })<{ open: boolean, sidebarWidth: number }>`
+
+  background: transparent;
+  box-shadow: none;
+  color: inherit;
+  z-index: var(--z-index-appBar);
+  transition: ${({ theme }) => theme.transitions.create(['width', 'margin'], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen
+  })};
+
+  ${({ open, sidebarWidth, theme }) => open ? `
+    margin-left: ${sidebarWidth}px;
+    width: calc(100% - ${sidebarWidth}px);
+    transition: ${theme.transitions.create(['width', 'margin'], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.enteringScreen
+  })};
+  ` : ''}
+`;
 
 const Drawer = styled(MuiDrawer, { shouldForwardProp: prop => prop !== 'open' && prop !== 'sidebarWidth' && prop !== 'hideSidebarOnSmallScreen' })
-  // @ts-ignore mixins dont work with Typescript
+  // @ts-ignore mixin isnt typesafe
   // eslint-disable-next-line no-unexpected-multiline
-  <{ open: BooleanSchema, sidebarWidth: number }>(({ sidebarWidth, theme, open }) => ({
+  <{ open: boolean, sidebarWidth: number }>(({ sidebarWidth, theme, open }) => ({
     width: sidebarWidth,
     flexShrink: 0,
     whiteSpace: 'nowrap',
@@ -113,7 +111,7 @@ function PageLayout ({ hideSidebarOnSmallScreen = false, sidebarWidth = 300, chi
         <ThreadsProvider>
           <VotesProvider>
             <PageActionDisplayProvider>
-              <AppBar sidebarWidth={sidebarWidth} position='fixed' open={open}>
+              <AppBar open={open} sidebarWidth={sidebarWidth} position='fixed'>
                 <Header
                   open={open}
                   hideSidebarOnSmallScreen={hideSidebarOnSmallScreen}
@@ -144,6 +142,12 @@ function PageLayout ({ hideSidebarOnSmallScreen = false, sidebarWidth = 300, chi
         </ThreadsProvider>
       </LayoutContainer>
     </>
+  );
+}
+
+function MobileLayout () {
+  return (
+    <>layout</>
   );
 }
 

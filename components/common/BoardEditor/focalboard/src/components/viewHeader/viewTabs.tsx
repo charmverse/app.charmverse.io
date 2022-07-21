@@ -220,25 +220,21 @@ function ViewTabs({ board, activeView, intl, readonly, showView, views }: ViewTa
         mb: 1
       }}>
         {restViews.map(view => (
-          <MenuItem key={view.id} dense>
-            <Link
-              color={'textPrimary'}
-              href={getViewUrl(view.id)}
-            >
-              <Box sx={{ display: "flex", gap: 1 }}>
-                {iconForViewType(view.fields.viewType)}
-                <Typography>
-                  {view.title}
-                </Typography>
-              </Box>
-            </Link>
-          </MenuItem>
+          <Link
+            href={getViewUrl(view.id)}
+            passHref
+          >
+            <MenuItem component='a' key={view.id} dense>
+              <ListItemIcon>{iconForViewType(view.fields.viewType)}</ListItemIcon>
+              <ListItemText>{view.title}</ListItemText>
+            </MenuItem>
+          </Link>
         ))}
       </Box>
       <Divider />
       <AddViewMenu sx={{
         width: "100%"
-      }} board={board} activeView={activeView} showView={showView} views={views}/>
+      }} showLabel={true} board={board} activeView={activeView} showView={showView} views={views}/>
     </Menu>
 
     {/* Form to rename views */}
