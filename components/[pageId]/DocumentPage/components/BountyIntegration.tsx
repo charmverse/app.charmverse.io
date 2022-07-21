@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { Button } from '@mui/material';
 import { Box } from '@mui/system';
 import BountyModal from 'components/bounties/components/BountyModal';
@@ -9,12 +10,14 @@ import { useState } from 'react';
 interface BountyIntegrationProps {
   linkedTaskId: string
   title?: string
+  description: string;
+  descriptionNodes: Prisma.JsonValue;
   readonly?: boolean
 }
 
 export default function BountyIntegration (props: BountyIntegrationProps) {
   const { bounties } = useBounties();
-  const { title, linkedTaskId } = props;
+  const { description, descriptionNodes, title, linkedTaskId } = props;
 
   const [userSpacePermissions] = useCurrentSpacePermissions();
 
@@ -42,6 +45,8 @@ export default function BountyIntegration (props: BountyIntegrationProps) {
               open={isModalOpen}
               bounty={{
                 title,
+                description,
+                descriptionNodes,
                 linkedTaskId
               }}
               onClose={() => {
