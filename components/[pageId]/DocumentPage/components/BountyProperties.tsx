@@ -1,5 +1,6 @@
 import { Divider, TextField } from '@mui/material';
 import { PaymentMethod } from '@prisma/client';
+import { BountyStatusChip } from 'components/bounties/components/BountyStatusBadge';
 import SelectProperty from 'components/common/BoardEditor/focalboard/src/components/properties/select/select';
 import Editable from 'components/common/BoardEditor/focalboard/src/widgets/editable';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
@@ -75,35 +76,9 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
     <div className='octo-propertylist CardDetailProperties'>
       <div className='octo-propertyrow'>
         <div className='octo-propertyname'>Status</div>
-        <SelectProperty
-          isEditable={false}
-          propertyValue={currentBounty.status}
-          propertyTemplate={{
-            id: '',
-            name: 'Status',
-            type: 'select',
-            options: [{
-              color: 'propColorTeal',
-              id: 'open',
-              value: 'Open'
-            }, {
-              color: 'propColorPurple',
-              id: 'suggestion',
-              value: 'Suggestion'
-            }, {
-              color: 'propColorYellow',
-              id: 'inProgress',
-              value: 'In Progress'
-            }, {
-              color: 'propColorPink',
-              id: 'complete',
-              value: 'Complete'
-            }, {
-              color: 'propColorGray',
-              id: 'paid',
-              value: 'Paid'
-            }]
-          }}
+        <BountyStatusChip
+          size='small'
+          status={currentBounty.status}
         />
       </div>
 
@@ -111,6 +86,9 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
         <div className='octo-propertyname'>Chain</div>
         <InputSearchBlockchain
           chainId={currentBounty.chainId}
+          sx={{
+            width: 250
+          }}
         />
       </div>
 
@@ -126,6 +104,9 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
             setCurrentBounty((_currentBounty) => ({ ..._currentBounty, rewardToken: newToken }));
           }}
           onNewPaymentMethod={onNewPaymentMethod}
+          sx={{
+            width: 250
+          }}
         />
       </div>
 
@@ -133,6 +114,9 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
         <div className='octo-propertyname'>Amount</div>
         <TextField
           required
+          sx={{
+            width: 250
+          }}
           value={currentBounty.rewardAmount}
           type='number'
           size='small'
@@ -162,6 +146,9 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
           type='number'
           size='small'
           inputProps={{ step: 1, min: 1 }}
+          sx={{
+            width: 250
+          }}
         />
       </div>
 

@@ -1,4 +1,4 @@
-import { Autocomplete, Box, TextField, Typography } from '@mui/material';
+import { Autocomplete, Box, SxProps, TextField, Typography } from '@mui/material';
 import { CryptoCurrencies, CryptoCurrency } from 'connectors';
 import Modal from 'components/common/Modal';
 import { useEffect, useState } from 'react';
@@ -19,6 +19,7 @@ export interface IInputSearchCryptoProps {
   hideBackdrop?: boolean; // hide backdrop when modal is open
   cryptoList?: Array<string | CryptoCurrency>;
   chainId?: number; // allow passing this down to the 'new custom token' form
+  sx?: SxProps
 }
 
 const ADD_NEW_CUSTOM = 'ADD_NEW_CUSTOM';
@@ -30,7 +31,8 @@ export function InputSearchCrypto ({
   defaultValue = '',
   value: parentValue,
   cryptoList = CryptoCurrencies,
-  chainId
+  chainId,
+  sx = {}
 }: IInputSearchCryptoProps) {
 
   const [inputValue, setInputValue] = useState('');
@@ -70,7 +72,7 @@ export function InputSearchCrypto ({
   return (
     <>
       <Autocomplete
-        sx={{ minWidth: 150 }}
+        sx={{ minWidth: 150, ...sx }}
         onChange={(_, _value, reason) => {
           if (_value === ADD_NEW_CUSTOM) {
             if (reason === 'selectOption') {
