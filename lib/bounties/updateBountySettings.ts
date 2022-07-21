@@ -44,7 +44,8 @@ export async function updateBountySettings ({
         update: {
           title: updateContent.title,
           contentText: updateContent.description,
-          content: updateContent.descriptionNodes as string
+          content: updateContent.descriptionNodes as string,
+          parentId: null
         }
       }
     }
