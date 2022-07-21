@@ -1,13 +1,29 @@
 import { ReactNode } from 'react';
-import { Box } from '@mui/material';
+import styled from '@emotion/styled';
 import ScrollableWindow from './ScrollableWindow';
+
+const StyledBox = styled.div(({ theme }) => `
+  width: 1200px;
+  max-width: 100%;
+  margin: ${theme.spacing(10, 'auto')};
+  min-height: 80vh;
+  padding: ${theme.spacing(3, '24px')};
+  ${theme.breakpoints.up('sm')} {
+    padding: ${theme.spacing(3, '80px')};
+  }
+`);
+
+const FixedWidthStyledBox = styled(StyledBox)`
+  width: 1200px;
+  max-width: 100%;
+`;
 
 export function CenteredPageContent (props: { children: ReactNode }) {
   return (
     <ScrollableWindow>
-      <Box py={3} sx={{ width: 1200, maxWidth: '100%', px: { xs: '20px', sm: '80px' } }} mx='auto' mb={10}>
+      <FixedWidthStyledBox>
         {props.children}
-      </Box>
+      </FixedWidthStyledBox>
     </ScrollableWindow>
   );
 }
@@ -16,9 +32,9 @@ export function FullWidthPageContent (props: { children: ReactNode }) {
 
   return (
     <ScrollableWindow>
-      <Box py={3} sx={{ px: { xs: '20px', sm: '80px' }, minHeight: '80vh' }}>
+      <StyledBox>
         {props.children}
-      </Box>
+      </StyledBox>
     </ScrollableWindow>
   );
 }

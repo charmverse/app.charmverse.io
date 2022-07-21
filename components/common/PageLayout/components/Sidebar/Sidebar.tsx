@@ -52,6 +52,12 @@ const SidebarContainer = styled.div`
     transition: opacity 0.2s ease-in-out;
   }
 
+  ${({ theme }) => theme.breakpoints.up('sm')} {
+    .sidebar-header .MuiIconButton-root {
+      opacity: 0;
+    }
+  }
+
   &:hover {
     .sidebar-header {
       .MuiTypography-root {
@@ -79,7 +85,7 @@ const sidebarItemStyles = ({ theme }: { theme: Theme }) => css`
   font-weight: 500;
   padding-top: 4px;
   padding-bottom: 4px;
-  :hover {
+  &:hover {
     background-color: ${theme.palette.action.hover};
     color: inherit;
   }
@@ -112,22 +118,21 @@ const StyledSidebarBox = styled(Box)`
   ${sidebarItemStyles}
 `;
 
-const SidebarHeader = styled.div(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  padding: theme.spacing(0, 1.5, 0, 2),
-  '& .MuiIconButton-root': {
-    opacity: 0,
-    borderRadius: '4px',
-    transition: theme.transitions.create('opacity', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen
-    })
-  },
+const SidebarHeader = styled.div(({ theme }) => `
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: ${theme.spacing(0, 1.5, 0, 2)};
+  & .MuiIconButton-root {
+    border-radius: 4px;
+    transition: ${theme.transitions.create('opacity', {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.enteringScreen
+  })};
+  }
   // necessary for content to be below app bar
-  minHeight: headerHeight
-}));
+  min-height: ${headerHeight}px;
+`);
 
 const ScrollingContainer = styled.div<{ isScrolled: boolean }>`
   flex-grow: 1;
