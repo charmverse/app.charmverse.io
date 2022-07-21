@@ -362,8 +362,6 @@ model Bounty {
 enum BountyOperation {
   work
   review
-  view
-  edit
   delete
   lock
   approve_applications
