@@ -79,6 +79,7 @@ export async function createBounty ({
       create: {
         path: `page-${Math.random().toString().replace('0.', '')}`,
         title,
+        bountyId,
         contentText: description,
         content: descriptionNodes as string,
         space: {
