@@ -8,6 +8,123 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
+enum PageType {
+  board
+  page
+  card
+  proposal
+}
+
+enum PermissionLevel {
+  full_access
+  editor
+  view_comment
+  view
+}
+
+enum SpacePermissionConfigurationMode {
+  custom
+  readOnly
+  collaborative
+  open
+}
+
+enum IdentityType {
+  Wallet
+  Discord
+  Telegram
+  RandomName
+}
+
+enum VoteStatus {
+  InProgress
+  Passed
+  Rejected
+  Cancelled
+}
+
+enum VoteType {
+  Approval
+  SingleChoice
+}
+
+enum NotificationType {
+  multisig
+  mention
+  vote
+}
+
+enum BountyStatus {
+  suggestion
+  open
+  inProgress
+  complete
+  paid
+}
+
+enum BountyOperation {
+  work
+  review
+  view
+  edit
+  delete
+  lock
+  approve_applications
+  grant_permissions
+}
+
+enum BountyPermissionLevel {
+  reviewer
+  creator
+  submitter
+  viewer
+}
+
+enum ApplicationStatus {
+  applied
+  inProgress
+  review
+  rejected
+  complete
+  paid
+}
+
+enum WalletType {
+  metamask
+  gnosis
+}
+
+enum RoleSource {
+  guild_xyz
+}
+
+enum PagePermissionLevel {
+  full_access
+  editor
+  view_comment
+  view
+  custom
+}
+
+enum PageOperations {
+  read
+  delete
+  edit_position
+  edit_content
+  edit_isPublic
+  edit_path
+  grant_permissions
+  comment
+}
+
+enum SpaceOperation {
+  createPage
+  createBounty
+  createVote
+}
+
+
 model Space {
   id                          String                            @id @default(uuid()) @db.Uuid
   deletedAt                   DateTime?
@@ -494,119 +611,4 @@ model Comment {
   space     Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   thread    Thread    @relation(fields: [threadId], references: [id], onDelete: Cascade)
   user      User      @relation(fields: [userId], references: [id])
-}
-
-enum PageType {
-  board
-  page
-  card
-  proposal
-}
-
-enum PermissionLevel {
-  full_access
-  editor
-  view_comment
-  view
-}
-
-enum SpacePermissionConfigurationMode {
-  custom
-  readOnly
-  collaborative
-  open
-}
-
-enum IdentityType {
-  Wallet
-  Discord
-  Telegram
-  RandomName
-}
-
-enum VoteStatus {
-  InProgress
-  Passed
-  Rejected
-  Cancelled
-}
-
-enum VoteType {
-  Approval
-  SingleChoice
-}
-
-enum NotificationType {
-  multisig
-  mention
-  vote
-}
-
-enum BountyStatus {
-  suggestion
-  open
-  inProgress
-  complete
-  paid
-}
-
-enum BountyOperation {
-  work
-  review
-  view
-  edit
-  delete
-  lock
-  approve_applications
-  grant_permissions
-}
-
-enum BountyPermissionLevel {
-  reviewer
-  creator
-  submitter
-  viewer
-}
-
-enum ApplicationStatus {
-  applied
-  inProgress
-  review
-  rejected
-  complete
-  paid
-}
-
-enum WalletType {
-  metamask
-  gnosis
-}
-
-enum RoleSource {
-  guild_xyz
-}
-
-enum PagePermissionLevel {
-  full_access
-  editor
-  view_comment
-  view
-  custom
-}
-
-enum PageOperations {
-  read
-  delete
-  edit_position
-  edit_content
-  edit_isPublic
-  edit_path
-  grant_permissions
-  comment
-}
-
-enum SpaceOperation {
-  createPage
-  createBounty
-  createVote
 }
