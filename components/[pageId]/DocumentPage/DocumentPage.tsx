@@ -27,8 +27,8 @@ export const Container = styled(Box)<{ top: number, fullWidth?: boolean }>`
   top: ${({ top }) => top}px;
   padding-bottom: ${({ theme }) => theme.spacing(5)};
 
-  padding: 0 40px;
-  @media (min-width: 975px) {
+  padding: 0 24px;
+  ${({ theme }) => theme.breakpoints.up('md')} {
     padding: 0 80px;
   }
 `;
@@ -128,41 +128,43 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: IEditor
               </Box>
             )}
             {card && board && (
-              <div className='CardDetail content'>
-                {/* Property list */}
-                <Box sx={{
-                  display: 'flex',
-                  gap: 1,
-                  justifyContent: 'space-between',
-                  width: '100%'
-                }}
-                >
-                  <CardDetailProperties
-                    board={board}
-                    card={card}
-                    cards={cards}
-                    activeView={activeView}
-                    views={boardViews}
-                    readonly={readOnly}
-                    pageUpdatedAt={page.updatedAt.toString()}
-                    pageUpdatedBy={page.updatedBy}
-                  />
-                  <BountyIntegration
-                    linkedTaskId={card.id}
-                    title={page.title}
-                    description={page.contentText}
-                    descriptionNodes={page.content}
-                    readonly={readOnly}
-                  />
-                </Box>
+              <div className='focalboard-body'>
+                <div className='CardDetail content'>
+                  {/* Property list */}
+                  <Box sx={{
+                    display: 'flex',
+                    gap: 1,
+                    justifyContent: 'space-between',
+                    width: '100%'
+                  }}
+                  >
+                    <CardDetailProperties
+                      board={board}
+                      card={card}
+                      cards={cards}
+                      activeView={activeView}
+                      views={boardViews}
+                      readonly={readOnly}
+                      pageUpdatedAt={page.updatedAt.toString()}
+                      pageUpdatedBy={page.updatedBy}
+                    />
+                    <BountyIntegration
+                      linkedTaskId={card.id}
+                      title={page.title}
+                      description={page.contentText}
+                      descriptionNodes={page.content}
+                      readonly={readOnly}
+                    />
+                  </Box>
 
-                <hr />
-                <CommentsList
-                  comments={comments}
-                  rootId={card.rootId}
-                  cardId={card.id}
-                  readonly={readOnly}
-                />
+                  <hr />
+                  <CommentsList
+                    comments={comments}
+                    rootId={card.rootId}
+                    cardId={card.id}
+                    readonly={readOnly}
+                  />
+                </div>
               </div>
             )}
           </CharmEditor>
