@@ -110,12 +110,10 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
   };
 
   if (searchQuery.query?.title) {
-    prismaQueryContent.Page = {
-      every: {
-        title: {
-          contains: searchQuery.query.title,
-          mode: 'insensitive'
-        }
+    prismaQueryContent.page = {
+      title: {
+        contains: searchQuery.query.title,
+        mode: 'insensitive'
       }
     };
   }
