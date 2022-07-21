@@ -120,7 +120,7 @@ describe('upsertPermission', () => {
     }
   });
 
-  it('should throw an error if an attempt to inherit outside the parent tree happens', async () => {
+  it('should drop the inheritance reference if trying to inherit a permission from outside the parent tree', async () => {
     const parentPage = await createPage({
       createdBy: user.id,
       spaceId: space.id
@@ -136,13 +136,9 @@ describe('upsertPermission', () => {
       spaceId: space.id
     });
 
-    try {
-      await upsertPermission(otherParent.id, parentPagePermission.id);
-      throw new ExpectedAnError();
-    }
-    catch (error) {
-      expect(error).toBeInstanceOf(CannotInheritOutsideTreeError);
-    }
+    const newPermission = await upsertPermission(otherParent.id, parentPagePermission.id);
+
+    expect(newPermission.inheritedFromPermission).toBeNull();
 
   });
 
