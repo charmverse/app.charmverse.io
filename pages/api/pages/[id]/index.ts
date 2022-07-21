@@ -69,30 +69,36 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
     throw new NotFoundError();
   }
 
-  const bountyData = page.type === PageType.bounty ? {
-    title: req.body.title,
-    description: req.body.contentText,
-    descriptionNodes: req.body.content as string
-  } : undefined;
+  const isBountyPage = page.type === PageType.bounty;
 
-  const pageWithPermission = await prisma.page.update({
-    where: {
-      id: pageId
-    },
-    data: {
-      ...req.body,
-      updatedAt: new Date(),
-      updatedBy: userId,
-      bounty: bountyData
-    },
-    include: {
-      permissions: {
-        include: {
-          sourcePermission: true
+  const [pageWithPermission] = await prisma.$transaction([
+    prisma.page.update({
+      where: {
+        id: pageId
+      },
+      data: {
+        ...req.body,
+        updatedAt: new Date(),
+        updatedBy: userId
+      },
+      include: {
+        permissions: {
+          include: {
+            sourcePermission: true
+          }
         }
       }
+    })
+  ].concat(!isBountyPage ? [] : [prisma.bounty.update({
+    where: {
+      id: page.bountyId
+    },
+    data: {
+      title: req.body.title,
+      description: req.body.contentText,
+      descriptionNodes: req.body.content as string
     }
-  });
+  })]));
 
   if (updateContent.parentId === null || typeof updateContent.parentId === 'string') {
     const updatedPage = await setupPermissionsAfterPageRepositioned(pageId);

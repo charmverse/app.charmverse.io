@@ -24,36 +24,35 @@ export async function updateBountySettings ({
   if (typeof updateContent.maxSubmissions === 'number' && bounty.maxSubmissions !== null && updateContent.maxSubmissions < countValidSubmissions(bounty.applications)) {
     throw new InvalidInputError('New bounty cap cannot be lower than total of active and valid submissions.');
   }
-
-  const updatedBounty = await prisma.bounty.update({
-    where: {
-      id: bountyId
-    },
-    data: {
-      updatedAt: new Date(),
-      title: updateContent.title,
-      descriptionNodes: updateContent.descriptionNodes as string,
-      description: updateContent.description,
-      chainId: updateContent.chainId,
-      rewardAmount: updateContent.rewardAmount,
-      rewardToken: updateContent.rewardToken,
-      approveSubmitters: updateContent.approveSubmitters,
-      maxSubmissions: updateContent.maxSubmissions,
-      linkedTaskId: updateContent.linkedTaskId,
-      page: {
-        update: {
-          data: {
-            title: updateContent.title,
-            contentText: updateContent.description,
-            content: updateContent.descriptionNodes as string
-          },
-          where: {
-            bountyId
-          }
-        }
+  const [updatedBounty] = await prisma.$transaction([
+    prisma.bounty.update({
+      where: {
+        id: bountyId
+      },
+      data: {
+        updatedAt: new Date(),
+        title: updateContent.title,
+        descriptionNodes: updateContent.descriptionNodes as string,
+        description: updateContent.description,
+        chainId: updateContent.chainId,
+        rewardAmount: updateContent.rewardAmount,
+        rewardToken: updateContent.rewardToken,
+        approveSubmitters: updateContent.approveSubmitters,
+        maxSubmissions: updateContent.maxSubmissions,
+        linkedTaskId: updateContent.linkedTaskId
       }
-    }
-  });
+    }),
+    prisma.page.update({
+      where: {
+        bountyId
+      },
+      data: {
+        title: updateContent.title,
+        contentText: updateContent.description,
+        content: updateContent.descriptionNodes as string
+      }
+    })
+  ]);
 
   if (!updatedBounty) {
     throw new DataNotFoundError(`Bounty with ID ${bountyId} not found`);
