@@ -20,10 +20,10 @@
 
     > * {
 
-        padding: 0 80px;
+        padding: 0 24px;
 
-        @media screen and (max-width: 768px) {
-            padding: 0 40px;
+        @media screen and (min-width: 768px) {
+            padding: 0 80px;
         }
 
         &.PageBanner {
@@ -49,9 +49,8 @@
     }
 
     > .container-container {
-        padding: 0 0 180px 1px;
-        margin-left: 80px;
-        padding-right: 80px;
+        padding-bottom: 180px;
+        // margin-left: 80px;
         min-width: fit-content;
 
         // @media (max-width: 768px) {

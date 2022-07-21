@@ -1,10 +1,8 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
-import { Box, Menu, MenuItem, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
-import { PagePermissionLevel } from '@prisma/client';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { FormValues, schema } from 'components/common/CreateSpaceForm';
@@ -13,7 +11,6 @@ import Link from 'components/common/Link';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ConnectSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/ConnectSnapshot';
 import PrimaryButton from 'components/common/PrimaryButton';
-import { StyledListItemText } from 'components/common/StyledListItemText';
 import SettingsLayout from 'components/settings/Layout';
 import Legend from 'components/settings/Legend';
 import ImportNotionWorkspace from 'components/settings/workspace/ImportNotionWorkspace';
@@ -22,11 +19,10 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { setTitle } from 'hooks/usePageTitle';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import { permissionLevels } from 'lib/permissions/pages/page-permission-mapping';
 import isSpaceAdmin from 'lib/users/isSpaceAdmin';
-import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
-import { ReactElement, useState } from 'react';
+import { ReactElement } from 'react';
 import { useForm } from 'react-hook-form';
 
 export default function WorkspaceSettings () {

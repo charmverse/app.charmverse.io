@@ -47,12 +47,12 @@ export default function CreateSpace () {
   }, [spaces]);
 
   return (
-    <Box sx={{ width: 600, maxWidth: '100%', mx: 'auto', mb: 6 }}>
+    <Box sx={{ width: 600, maxWidth: '100%', mx: 'auto', mb: 6, px: 2 }}>
       <Card sx={{ p: 4, mb: 3 }} variant='outlined'>
         <TokenGateForm onSubmit={onJoinSpace} />
       </Card>
       <AlternateRouteButton href='/createWorkspace'>
-        Create a new workspace
+        Create a workspace
       </AlternateRouteButton>
     </Box>
   );

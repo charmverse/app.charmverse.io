@@ -1,6 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import React, { useState } from 'react'
+import { Box } from '@mui/material'
 import { IntlShape, useIntl } from 'react-intl'
 import { Board } from '../../blocks/board'
 import { BoardView } from '../../blocks/boardView'
@@ -48,6 +49,7 @@ const ViewHeaderActionsMenu = React.memo((props: Props) => {
     const intl = useIntl()
 
     return (
+      <Box ml={0} mr={2}>
         <ModalWrapper>
             <MenuWrapper label={intl.formatMessage({id: 'ViewHeader.view-menu', defaultMessage: 'View menu'})}>
                 <IconButton icon={<OptionsIcon/>}/>
@@ -60,6 +62,7 @@ const ViewHeaderActionsMenu = React.memo((props: Props) => {
                 </Menu>
             </MenuWrapper>
         </ModalWrapper>
+      </Box>
     )
 })
 
