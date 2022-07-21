@@ -1,26 +1,26 @@
-import { Page, PageType } from '@prisma/client';
+import { Page } from '@prisma/client';
 import { SubmissionContent } from 'lib/applications/interfaces';
-import { v4 } from 'uuid';
 import { PageNode } from 'lib/pages/interfaces';
+import { v4 } from 'uuid';
 
-export function generatePageToCreateStub (options: {
-  userId:string,
-  spaceId: string,
-  title?: string,
-  parentId?: string | null
-  id?: string,
-  type?: PageType,
-}): Partial<Page> {
+export function generatePageToCreateStub ({
+  userId,
+  spaceId,
+  title,
+  parentId,
+  id = v4(),
+  type
+}: {userId: string} & Pick<Page, 'spaceId'> & Partial<Pick<Page, 'title' | 'parentId' | 'id' | 'type'>>): Partial<Page> {
   return {
-    id: options.id,
-    createdBy: options.userId,
+    id,
+    createdBy: userId,
     contentText: '',
-    path: `page-${options.id}`,
-    title: options.title || 'Root',
-    type: options.type ?? 'page',
-    updatedBy: options.userId,
-    spaceId: options.spaceId,
-    parentId: options.parentId
+    path: `page-${id}`,
+    title: title || 'Root',
+    type: type ?? 'page',
+    updatedBy: userId,
+    spaceId,
+    parentId
   };
 }
 
