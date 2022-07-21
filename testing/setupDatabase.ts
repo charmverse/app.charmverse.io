@@ -174,6 +174,8 @@ export async function generateBountyWithSingleApplication ({ applicationStatus, 
     }
   }) as BountyWithDetails;
 
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+
   const createdApp = await prisma.application.create({
     data: {
       spaceId,
@@ -187,6 +189,7 @@ export async function generateBountyWithSingleApplication ({ applicationStatus, 
           id: createdBounty.id
         }
       },
+      walletAddress: user?.addresses?.[0],
       message: 'I can do this!',
       // Other important variable
       status: applicationStatus

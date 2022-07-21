@@ -41,7 +41,6 @@ const ImageContainer = styled.div`
 
 export default function SignupPageContent () {
 
-  const { account } = useWeb3React();
   const router = useRouter();
   const [user] = useUser();
 
@@ -66,7 +65,7 @@ export default function SignupPageContent () {
         </Typography> */}
       </Box>
       <Grid container spacing={6} alignItems='stretch' sx={{ mb: 6 }}>
-        <Grid item xs sm={6} sx={{ height: '100%', margin: 'auto' }}>
+        <Grid item xs sx={{ height: '100%', margin: 'auto' }}>
           <AdventureCard onClick={createWorkspace}>
             <ImageContainer>
               <Image src={rocketImage} />
