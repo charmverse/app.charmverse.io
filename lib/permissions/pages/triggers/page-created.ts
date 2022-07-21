@@ -1,4 +1,4 @@
-import { getPage, IPageWithPermissions, PageNotFoundError } from 'lib/pages/server';
+import { getPage, IPageWithPermissions, PageNodeWithPermissions, PageNotFoundError } from 'lib/pages/server';
 import { prisma } from 'db';
 import { Space } from '@prisma/client';
 import { resolvePageTreeV2 } from 'lib/pages/server/resolvePageTree_v2';
@@ -81,16 +81,20 @@ export async function setupPermissionsAfterPageCreated (pageId: string): Promise
 
     const { updateManyOperations: illegalPermissionReplaceOperations } = generateReplaceIllegalPermissions(tree);
 
-    await prisma.$transaction([
-      ...illegalPermissionReplaceOperations.map(op => prisma.pagePermission.updateMany(op)),
-      prisma.pagePermission.createMany(
+    await prisma.$transaction(async () => {
+      for (const op of illegalPermissionReplaceOperations) {
+        await prisma.pagePermission.updateMany(op);
+      }
+      const refreshedParent = await getPage(parent.id) as IPageWithPermissions;
+      await prisma.pagePermission.createMany(
         copyAllPagePermissions({
           inheritFrom: true,
           newPageId: pageId,
-          permissions: parent.permissions
+          permissions: refreshedParent.permissions
         })
-      )
-    ]);
+      );
+
+    });
   }
 
   // Add a full access permission for the creating user
