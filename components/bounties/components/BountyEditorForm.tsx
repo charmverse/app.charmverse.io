@@ -1,18 +1,14 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { ButtonProps, Divider } from '@mui/material';
-import Alert from '@mui/material/Alert';
+import { ButtonProps } from '@mui/material';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { Bounty, PaymentMethod } from '@prisma/client';
+import { Bounty } from '@prisma/client';
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
-import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
 import { InputSearchContributorMultiple } from 'components/common/form/InputSearchContributor';
-import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 import SelectMenu, { MenuOption } from 'components/common/Menu';
 import { CryptoCurrency, getChainById } from 'connectors';
@@ -64,16 +60,6 @@ export const schema = yup.object({
       return true;
     }
   })
-  // setExpiryDate: yup.boolean(),
-  // expiryDate: yup.mixed().test({
-  //   message: 'Expiry date is required',
-  //   test: (value, context) => {
-  //     if (context.parent.setExpiryDate === true && !value) {
-  //       return false;
-  //     }
-  //     return true;
-  //   }
-  // })
 });
 
 export type FormValues = yup.InferType<typeof schema>
@@ -117,25 +103,17 @@ export default function BountyEditorForm ({ onCancel, onSubmit, bounty, mode = '
     if (bounty) {
       setBountyApplicantPool(null);
       refreshBountyApplicantPool();
-
     }
 
   }, [bounty, permissions]);
 
-  // Cached description for when user is creating or suggesting a new bounty
-  const [cachedBountyDescription, setCachedBountyDescription] = useLocalStorage<{nodes: PageContent, text: string}>(`newBounty.${space?.id}`, {
-    nodes: {
-      type: 'doc'
-    },
-    text: ''
-  });
   const {
     register,
     handleSubmit,
     setValue,
     watch,
     trigger,
-    formState: { errors, isValid, isSubmitting }
+    formState: { errors }
   } = useForm<FormValues>({
     mode: 'onChange',
     defaultValues: {
@@ -147,8 +125,8 @@ export default function BountyEditorForm ({ onCancel, onSubmit, bounty, mode = '
       capSubmissions: !((bounty && bounty?.maxSubmissions === null)),
       // expiryDate: null,
       ...(bounty || {}),
-      description: bounty?.description ?? cachedBountyDescription.text,
-      descriptionNodes: bounty?.descriptionNodes ?? cachedBountyDescription.nodes
+      description: bounty?.description,
+      descriptionNodes: bounty?.descriptionNodes
       //      setExpiryDate: !!bounty?.expiryDate
     },
     resolver: yupResolver(schema)
@@ -161,11 +139,6 @@ export default function BountyEditorForm ({ onCancel, onSubmit, bounty, mode = '
   }, [focusKey]);
 
   const values = watch();
-
-  const [paymentMethods] = usePaymentMethods();
-
-  const [availableCryptos, setAvailableCryptos] = useState<Array<string | CryptoCurrency>>([]);
-  const [formError, setFormError] = useState<SystemError | null>(null);
 
   const [submitterMode, setSubmitterMode] = useState<BountySubmitter>(inferBountyPermissionsMode(permissions ?? {})?.mode ?? 'space');
   const [assignedRoleSubmitters, setAssignedRoleSubmitters] = useState<Array<string>>(permissions?.submitter?.filter(p => p.group === 'role').map(p => p.id as string) ?? []);
@@ -191,24 +164,11 @@ export default function BountyEditorForm ({ onCancel, onSubmit, bounty, mode = '
     if (calculation.mode === 'role') {
       setSubmitterMode('role');
     }
-
   }
 
   useEffect(() => {
     refreshBountyApplicantPool();
   }, [submitterMode, assignedRoleSubmitters, selectedReviewerUsers, selectedReviewerRoles]);
-
-  const chainId = watch('chainId');
-  const rewardToken = watch('rewardToken');
-
-  useEffect(() => {
-    refreshCryptoList(defaultChainId, bounty?.rewardToken);
-
-    // Revalidate form on load
-    if (mode === 'update') {
-      trigger();
-    }
-  }, []);
 
   // Combines current states to generate what we'll send to the API
   function rollupPermissions (): Pick<BountyPermissions, 'reviewer' | 'submitter'> {
@@ -254,127 +214,53 @@ export default function BountyEditorForm ({ onCancel, onSubmit, bounty, mode = '
       value.reviewer = null;
     }
 
-    setFormError(null);
-
     const permissionsToSet = rollupPermissions();
 
-    try {
-      // if (!value.setExpiryDate) {
-      //   value.expiryDate = null;
-      // }
+    // if (!value.setExpiryDate) {
+    //   value.expiryDate = null;
+    // }
 
-      if (!value.capSubmissions) {
-        // Ensures any existing limit will be nulled
-        value.maxSubmissions = null;
-      }
-      delete value.capSubmissions;
-
-      if (mode === 'create') {
-        // delete value.setExpiryDate;
-
-        value.spaceId = space!.id;
-        value.createdBy = user!.id;
-        value.description = value.description ?? '';
-        value.descriptionNodes = value.descriptionNodes ?? '';
-        value.status = 'open';
-        value.linkedTaskId = bounty?.linkedTaskId ?? null;
-        (value as BountyCreationData).permissions = permissionsToSet;
-        const createdBounty = await charmClient.createBounty(value);
-        const populatedBounty = { ...createdBounty, applications: [] };
-
-        setBounties([...bounties, populatedBounty]);
-        setCachedBountyDescription({
-          nodes: {
-            type: 'doc'
-          },
-          text: ''
-        });
-        onSubmit(populatedBounty);
-      }
-      else if (mode === 'suggest') {
-        value.spaceId = space!.id;
-        value.createdBy = user!.id;
-        value.description = value.description ?? '';
-        value.descriptionNodes = value.descriptionNodes ?? '';
-        value.status = 'suggestion';
-
-        value.rewardToken = 'ETH';
-        value.rewardAmount = 0;
-        value.chainId = 1;
-
-        (value as BountyCreationData).permissions = permissionsToSet;
-        const createdBounty = await charmClient.createBounty(value);
-        const populatedBounty = { ...createdBounty, applications: [] };
-        setBounties([...bounties, populatedBounty]);
-
-        setCachedBountyDescription({
-          nodes: {
-            type: 'doc'
-          },
-          text: ''
-        });
-
-        onSubmit(populatedBounty);
-
-      }
-      else if (bounty?.id && mode === 'update') {
-        const updates: UpdateableBountyFields = {
-          title: value.title,
-          rewardAmount: value.rewardAmount,
-          rewardToken: value.rewardToken,
-          descriptionNodes: value.descriptionNodes,
-          description: value.description,
-          chainId: value.chainId,
-          approveSubmitters: value.approveSubmitters === null ? undefined : value.approveSubmitters,
-          maxSubmissions: value.capSubmissions === false ? null : value.maxSubmissions,
-          permissions: permissionsToSet
-        };
-
-        const updatedBounty = await updateBounty(bounty.id, updates);
-        onSubmit(updatedBounty);
-
-      }
+    if (!value.capSubmissions) {
+      // Ensures any existing limit will be nulled
+      value.maxSubmissions = null;
     }
-    catch (err) {
-      setFormError(err as SystemError);
+    delete value.capSubmissions;
+
+    if (mode === 'create') {
+      // delete value.setExpiryDate;
+
+      value.spaceId = space!.id;
+      value.createdBy = user!.id;
+      value.description = value.description ?? '';
+      value.descriptionNodes = value.descriptionNodes ?? '';
+      value.status = 'open';
+      value.linkedTaskId = bounty?.linkedTaskId ?? null;
+      (value as BountyCreationData).permissions = permissionsToSet;
+      const createdBounty = await charmClient.createBounty(value);
+      const populatedBounty = { ...createdBounty, applications: [] };
+
+      setBounties([...bounties, populatedBounty]);
+      onSubmit(populatedBounty);
+    }
+    else if (mode === 'suggest') {
+      value.spaceId = space!.id;
+      value.createdBy = user!.id;
+      value.description = value.description ?? '';
+      value.descriptionNodes = value.descriptionNodes ?? '';
+      value.status = 'suggestion';
+
+      value.rewardToken = 'ETH';
+      value.rewardAmount = 0;
+      value.chainId = 1;
+
+      (value as BountyCreationData).permissions = permissionsToSet;
+      const createdBounty = await charmClient.createBounty(value);
+      const populatedBounty = { ...createdBounty, applications: [] };
+      setBounties([...bounties, populatedBounty]);
+
+      onSubmit(populatedBounty);
     }
 
-  }
-
-  function setChainId (_chainId: number) {
-    setValue('chainId', _chainId);
-    refreshCryptoList(_chainId);
-  }
-
-  function refreshCryptoList (_chainId: number, _rewardToken?: string) {
-
-    // Set the default chain currency
-    const selectedChain = getChainById(_chainId);
-
-    if (selectedChain) {
-
-      const nativeCurrency = selectedChain.nativeCurrency.symbol;
-
-      const cryptosToDisplay = [nativeCurrency];
-
-      const contractAddresses = paymentMethods
-        .filter(method => method.chainId === _chainId)
-        .map(method => {
-          return method.contractAddress;
-        })
-        .filter(isTruthy);
-      cryptosToDisplay.push(...contractAddresses);
-
-      setAvailableCryptos(cryptosToDisplay);
-      setValue('rewardToken', _rewardToken || nativeCurrency);
-    }
-  }
-
-  function onNewPaymentMethod (paymentMethod: PaymentMethod) {
-    if (paymentMethod.contractAddress) {
-      setValue('chainId', paymentMethod.chainId);
-      refreshCryptoList(paymentMethod.chainId, paymentMethod.contractAddress);
-    }
   }
 
   return (
@@ -411,62 +297,6 @@ export default function BountyEditorForm ({ onCancel, onSubmit, bounty, mode = '
                     filter={{ mode: 'exclude', userIds: selectedReviewerRoles }}
                   />
                 </Grid>
-
-                <Grid container item>
-                  <Grid item xs>
-                    <InputLabel>
-                      Select a chain for this transaction
-                    </InputLabel>
-                    <InputSearchBlockchain
-                      chainId={chainId}
-                      onChange={setChainId}
-                    />
-                  </Grid>
-                </Grid>
-
-                <Grid container item>
-                  <Grid item xs={6}>
-                    <InputLabel>
-                      Reward amount
-                    </InputLabel>
-                    <TextField
-                      {...register('rewardAmount', {
-                        valueAsNumber: true,
-                        required: true
-                      })}
-                      focused={focusKey === 'rewardAmount'}
-                      type='number'
-                      size='small'
-                      error={!!errors?.rewardAmount}
-                      helperText={errors?.rewardAmount?.message}
-                      inputProps={{ step: 0.000000001 }}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <InputLabel>
-                      Reward token
-                    </InputLabel>
-                    <InputSearchCrypto
-                      cryptoList={availableCryptos}
-                      chainId={chainId}
-                      defaultValue={bounty?.rewardToken}
-                      value={rewardToken}
-                      hideBackdrop={true}
-                      onChange={newToken => {
-                        setValue('rewardToken', newToken);
-                      }}
-                      onNewPaymentMethod={onNewPaymentMethod}
-                    />
-                  </Grid>
-                </Grid>
-                <Grid container item>
-                  <Grid item xs={12}>
-                    <Divider />
-                  </Grid>
-                </Grid>
-
-                {/* New options */}
-
                 <Grid container item xs={12}>
                   <Grid item xs={8}>
                     <Typography variant='h6'>
@@ -536,13 +366,6 @@ export default function BountyEditorForm ({ onCancel, onSubmit, bounty, mode = '
 
                 </Grid>
 
-                <Grid item xs={12} sx={{ pt: '2px !important' }}>
-                  <Typography variant='body2' sx={{ ml: '8%' }}>
-                    When enabled, a workspace Admin or the Bounty Reviewer must explicitly approve each user's application to this bounty.
-                  </Typography>
-
-                </Grid>
-
                 <Grid container item xs={12}>
                   <Grid item xs={6}>
                     <FormControlLabel
@@ -595,47 +418,9 @@ export default function BountyEditorForm ({ onCancel, onSubmit, bounty, mode = '
 
                   </Grid>
                 </Grid>
-                <Grid item xs={12} sx={{ pt: '2px !important' }}>
-                  <Typography variant='body2' sx={{ ml: '8%' }}>
-                    When enabled, limits the amount of active submissions for this bounty.
-                  </Typography>
-
-                </Grid>
               </>
             )
           }
-
-          {
-            formError && (
-              <Grid item xs={12} sx={{ pt: '2px !important' }}>
-                <Alert severity={formError.severity}>
-                  {formError.message}
-                </Alert>
-              </Grid>
-            )
-          }
-
-          <Grid item>
-            <Button
-              loading={isSubmitting}
-              disabled={(mode === 'suggest' && (!values.title || !values.description)) || !isValid}
-              type='submit'
-            >
-              {bountyFormTitles[mode]}
-            </Button>
-            {onCancel && (
-            <Button
-              loading={isSubmitting}
-              color='error'
-              sx={{
-                ml: 2
-              }}
-              onClick={onCancel}
-            >
-              Cancel
-            </Button>
-            )}
-          </Grid>
         </Grid>
       </form>
     </div>
