@@ -117,9 +117,7 @@ export default function BountyEditorForm ({ onCancel, onSubmit, bounty, mode = '
     if (bounty) {
       setBountyApplicantPool(null);
       refreshBountyApplicantPool();
-
     }
-
   }, [bounty, permissions]);
 
   // Cached description for when user is creating or suggesting a new bounty

@@ -1,4 +1,4 @@
-import { Autocomplete, TextField } from '@mui/material';
+import { Autocomplete, AutocompleteProps, TextField } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import { Role } from '@prisma/client';
 import Link from 'components/common/Link';
@@ -9,12 +9,12 @@ import { ComponentProps } from 'react';
 
 interface IRolesFilter {
   mode: 'include' | 'exclude',
-  userIds: string []
+  userIds: string[]
 }
 
 type ReducedRole = Role | ListSpaceRolesResponse
 
-function filterRoles (roles: ReducedRole [], filter: IRolesFilter): ReducedRole [] {
+function filterRoles (roles: ReducedRole[], filter: IRolesFilter): ReducedRole[] {
   if (filter.mode === 'exclude') {
     return roles.filter(role => {
       const shouldInclude = filter.userIds.indexOf(role.id) === -1;
@@ -31,7 +31,7 @@ function filterRoles (roles: ReducedRole [], filter: IRolesFilter): ReducedRole 
 
 function InputSearchRoleBase ({
   defaultValue, disableCloseOnSelect = false, filter, showWarningOnNoRoles = false, placeholder, ...props
-}: Partial<ComponentProps<typeof Autocomplete>> & {filter?: IRolesFilter} & {showWarningOnNoRoles?: boolean}) {
+}: Partial<ComponentProps<typeof Autocomplete>> & { filter?: IRolesFilter } & { showWarningOnNoRoles?: boolean }) {
   const { roles } = useRoles();
   const [space] = useCurrentSpace();
 
@@ -59,9 +59,8 @@ function InputSearchRoleBase ({
       noOptionsText='No options available'
       // @ts-ignore - not sure why this fails
       options={
-
         filteredRoles
-}
+      }
       autoHighlight
       getOptionLabel={(role) => role.name}
       renderOption={(_props, role) => (
@@ -129,6 +128,9 @@ export function InputSearchRoleMultiple ({
       disableCloseOnSelect={disableCloseOnSelect}
       onChange={(e, value) => emitValue(value as ReducedRole[])}
       multiple
+      sx={{
+        minWidth: 250
+      }}
       placeholder='Select roles'
       filter={filter}
       defaultValue={defaultValue}
