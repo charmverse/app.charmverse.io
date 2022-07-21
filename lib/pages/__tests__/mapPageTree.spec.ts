@@ -176,20 +176,21 @@ describe('mapPageTree', () => {
 
   });
 
-  it('should consider a page as root-level if it has a parentId, but this parent does not exist', async () => {
+  it('should return only pages (including non root pages) that are in rootPageIds if this is provided', async () => {
 
     // Page 1.1.1 will not be linkable to Root 1, so it should be considered a root-level page
-    const pagesWithMissingLink = pages.filter(p => p.id !== page_1_1.id);
-
     const rootList = mapPageTree({
-      items: pagesWithMissingLink
+      items: pages,
+      rootPageIds: [root_1.id, page_1_1_1.id]
     });
 
-    expect(rootList.length).toBe(3);
+    expect(rootList.length).toBe(2);
 
     expect(rootList.some(r => r.id === root_1.id));
     expect(rootList.some(r => r.id === page_1_1_1.id));
-    expect(rootList.some(r => r.id === root_2.id));
+
+    // Root 2 should have been dropped
+    expect(rootList.every(r => r.id !== root_2.id));
 
     const rootNode = rootList.find(r => r.id === root_1.id) as PageNodeWithChildren;
 

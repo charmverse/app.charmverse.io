@@ -53,7 +53,8 @@ function reducePagesToPageTree<
     else if ((node.parentId === null) && !rootPageIds && node.deletedAt === null) {
       roots.push(node);
     }
-    else if (rootPageIds?.includes(node.id)) {
+
+    if (rootPageIds?.includes(node.id)) {
       roots.push(node);
     }
   }
