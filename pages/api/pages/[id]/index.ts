@@ -96,7 +96,7 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
       prisma.page.update(pageUpdateData),
       prisma.bounty.update({
         where: {
-          id: page.bountyId
+          id: page.bountyId || undefined
         },
         data: {
           title: req.body.title,
