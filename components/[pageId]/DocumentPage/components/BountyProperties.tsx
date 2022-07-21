@@ -1,8 +1,6 @@
 import { Divider, TextField } from '@mui/material';
 import { PaymentMethod } from '@prisma/client';
 import { BountyStatusChip } from 'components/bounties/components/BountyStatusBadge';
-import SelectProperty from 'components/common/BoardEditor/focalboard/src/components/properties/select/select';
-import Editable from 'components/common/BoardEditor/focalboard/src/widgets/editable';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
 import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
@@ -10,6 +8,7 @@ import { CryptoCurrency, getChainById } from 'connectors';
 import { useBounties } from 'hooks/useBounties';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { UpdateableBountyFields } from 'lib/bounties';
+import debouncePromise from 'lib/utilities/debouncePromise';
 import { isTruthy } from 'lib/utilities/types';
 import { BountyWithDetails } from 'models';
 import { useEffect, useState } from 'react';
@@ -21,6 +20,7 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
   const [availableCryptos, setAvailableCryptos] = useState<Array<string | CryptoCurrency>>([]);
 
   const [currentBounty, setCurrentBounty] = useState<BountyWithDetails>(bounty);
+  const [capSubmissions, setCapSubmissions] = useState(false);
 
   function refreshCryptoList (chainId: number, rewardToken?: string) {
 
@@ -53,6 +53,10 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
     }
   }
 
+  const debouncedBountyUpdate = debouncePromise(async (bountyId, updates: Partial<UpdateableBountyFields>) => {
+    updateBounty(bountyId, updates);
+  }, 2500);
+
   useEffect(() => {
     refreshCryptoList(bounty.chainId, bounty.rewardToken);
   }, []);
@@ -70,7 +74,7 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
     }
 
     update();
-  }, [currentBounty]);
+  }, [currentBounty.chainId, currentBounty.rewardToken, currentBounty.approveSubmitters]);
 
   return (
     <div className='octo-propertylist CardDetailProperties'>
@@ -121,6 +125,14 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
           type='number'
           size='small'
           inputProps={{ step: 0.000000001 }}
+          onChange={(e) => {
+            setCurrentBounty((_currentBounty) => ({ ..._currentBounty,
+              rewardAmount: Number(e.target.value)
+            }));
+            debouncedBountyUpdate(currentBounty.id, {
+              rewardAmount: Number(e.target.value)
+            });
+          }}
         />
       </div>
       <Divider sx={{
@@ -139,6 +151,19 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
       </div>
 
       <div className='octo-propertyrow'>
+        <div className='octo-propertyname'>Submissions limit</div>
+        <Switch
+          isOn={capSubmissions}
+          onChanged={(isOn) => {
+            setCapSubmissions(isOn);
+            setCurrentBounty((_currentBounty) => ({ ..._currentBounty, maxSubmissions: isOn ? 1 : _currentBounty.maxSubmissions }));
+          }}
+          readOnly={readOnly}
+        />
+      </div>
+
+      {capSubmissions && (
+      <div className='octo-propertyrow'>
         <div className='octo-propertyname'>Max submissions</div>
         <TextField
           required
@@ -149,8 +174,17 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
           sx={{
             width: 250
           }}
+          onChange={(e) => {
+            setCurrentBounty((_currentBounty) => ({ ..._currentBounty,
+              maxSubmissions: Number(e.target.value)
+            }));
+            debouncedBountyUpdate(currentBounty.id, {
+              maxSubmissions: Number(e.target.value)
+            });
+          }}
         />
       </div>
+      )}
 
     </div>
   );
