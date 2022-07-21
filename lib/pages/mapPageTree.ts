@@ -78,7 +78,7 @@ T extends PageNode = PageNode, R extends PageNodeWithChildren = PageNodeWithChil
  * Given a list of pages, resolve only the tree specific to the target page
  * @return parents is the array of parent pages from nearest parent to the root. target page is the target page along with all child pages as a tree
  */
-export function mapTargetPageTree<T extends PageNode = PageNode, R extends PageNodeWithChildren = PageNodeWithChildren> ({ items, targetPageId }: Omit<PageTreeMappingInput<T>, 'rootPageIds'> & {targetPageId: string}): TargetPageTree<R> {
+export function mapTargetPageTree<T extends PageNode = PageNode> ({ items, targetPageId }: Omit<PageTreeMappingInput<T>, 'rootPageIds'> & {targetPageId: string}): TargetPageTree<T> {
 
   const { itemMap, itemsWithChildren } = reducePagesToPageTree({ items });
 
@@ -109,13 +109,13 @@ export function mapTargetPageTree<T extends PageNode = PageNode, R extends PageN
 
   const rootNode = itemsWithChildren[itemMap[rootId]];
 
-  const parents: R[] = [];
+  const parents: PageNodeWithChildren<T>[] = [];
 
   if (rootNode.id !== targetPageId) {
 
     const childIdChainFromRootChild = childIdChain.reverse();
 
-    let currentNode = rootNode as R;
+    let currentNode = rootNode as PageNodeWithChildren<T>;
 
     for (const childId of childIdChainFromRootChild) {
 
@@ -127,16 +127,29 @@ export function mapTargetPageTree<T extends PageNode = PageNode, R extends PageN
         throw new DataNotFoundError('Could not find the target child page');
       }
 
-      currentNode = childNode as R;
+      currentNode = childNode as PageNodeWithChildren<T>;
     }
   }
 
-  const targetPageNode = itemsWithChildren[itemMap[targetPageId]];
+  const targetPageNode = itemsWithChildren[itemMap[targetPageId]] as PageNodeWithChildren<T>;
 
   return {
     // Parents were resolved from the root, but we need to return them from the closest to the page
     parents: parents.reverse(),
-    targetPage: targetPageNode as R
-  };
+    targetPage: targetPageNode
+  } as TargetPageTree<T>;
 
+}
+
+/**
+* Given a page node, returns a flattened list of its children
+*/
+export function flattenTree (node: PageNodeWithChildren, flatNodes: PageNodeWithChildren[] = []): PageNodeWithChildren[] {
+
+  node.children.forEach(childNode => {
+    flatNodes.push(childNode);
+    flattenTree(childNode, flatNodes);
+  });
+
+  return flatNodes;
 }

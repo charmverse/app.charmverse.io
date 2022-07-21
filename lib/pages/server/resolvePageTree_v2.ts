@@ -1,5 +1,5 @@
 import { prisma } from 'db';
-import { PageNodeWithChildren, PageNodeWithPermissions, TargetPageTree } from '../interfaces';
+import { PageNodeWithPermissions, TargetPageTree } from '../interfaces';
 import { mapTargetPageTree } from '../mapPageTree';
 import { PageNotFoundError } from './errors';
 
@@ -10,7 +10,7 @@ import { PageNotFoundError } from './errors';
  * Children is a recursive array of children in tree format
  */
 export async function resolvePageTreeV2 ({ pageId }: {pageId: string}):
-  Promise<TargetPageTree> {
+  Promise<TargetPageTree<PageNodeWithPermissions>> {
 
   const pageWithSpaceIdOnly = await prisma.page.findUnique({
     where: {
@@ -44,7 +44,7 @@ export async function resolvePageTreeV2 ({ pageId }: {pageId: string}):
     }
   });
 
-  const { parents, targetPage } = mapTargetPageTree<PageNodeWithPermissions, PageNodeWithChildren<PageNodeWithPermissions>>({
+  const { parents, targetPage } = mapTargetPageTree<PageNodeWithPermissions>({
     items: pagesInSpace,
     targetPageId: pageId
   });
