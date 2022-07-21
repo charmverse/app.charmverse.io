@@ -73,7 +73,7 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
     title: req.body.title,
     description: req.body.contentText,
     descriptionNodes: req.body.content as string
-  } : null;
+  } : undefined;
 
   const pageWithPermission = await prisma.page.update({
     where: {
