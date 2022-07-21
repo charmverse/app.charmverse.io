@@ -1,4 +1,7 @@
 import SelectProperty from 'components/common/BoardEditor/focalboard/src/components/properties/select/select';
+import Editable from 'components/common/BoardEditor/focalboard/src/widgets/editable';
+import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
+import { RPCList } from 'connectors';
 import { BountyWithDetails } from 'models';
 
 export default function BountyProperties (props: {readOnly?: boolean, bounty: BountyWithDetails}) {
@@ -39,6 +42,86 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
           }}
         />
       </div>
+
+      <div className='octo-propertyrow'>
+        <div className='octo-propertyname'>Chain</div>
+        <SelectProperty
+          isEditable={false}
+          propertyValue={bounty.chainId.toString()}
+          propertyTemplate={{
+            id: '',
+            name: 'Chain',
+            type: 'select',
+            options: RPCList.map(rpc => ({
+              color: 'propColorGray',
+              id: rpc.chainId.toString(),
+              value: rpc.chainName
+            }))
+          }}
+        />
+      </div>
+
+      <div className='octo-propertyrow'>
+        <div className='octo-propertyname'>Token</div>
+        <SelectProperty
+          isEditable={false}
+          propertyValue={bounty.rewardToken.toString()}
+          propertyTemplate={{
+            id: '',
+            name: 'Chain',
+            type: 'select',
+            options: [{
+              color: 'propColorGray',
+              id: 'ETH',
+              value: 'ETH'
+            }]
+          }}
+        />
+      </div>
+
+      <div className='octo-propertyrow'>
+        <div className='octo-propertyname'>Amount</div>
+        <Editable
+          className='octo-propertyvalue'
+          placeholderText=''
+          value={bounty.rewardAmount.toString()}
+          autoExpand={false}
+          onChange={() => {}}
+          onSave={() => {
+          }}
+          onCancel={() => {}}
+          validator={(newValue) => true}
+          spellCheck={false}
+          readonly={readOnly}
+        />
+      </div>
+
+      <div className='octo-propertyrow'>
+        <div className='octo-propertyname'>Applications</div>
+        <Switch
+          isOn={Boolean(bounty.approveSubmitters)}
+          onChanged={() => {}}
+          readOnly={readOnly}
+        />
+      </div>
+
+      <div className='octo-propertyrow'>
+        <div className='octo-propertyname'>Submission Limit</div>
+        <Editable
+          className='octo-propertyvalue'
+          placeholderText=''
+          value={bounty.maxSubmissions?.toString() ?? '0'}
+          autoExpand={false}
+          onChange={() => {}}
+          onSave={() => {
+          }}
+          onCancel={() => {}}
+          validator={(newValue) => true}
+          spellCheck={false}
+          readonly={readOnly}
+        />
+      </div>
+
     </div>
   );
 }
