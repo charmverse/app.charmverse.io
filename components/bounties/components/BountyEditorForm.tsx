@@ -554,7 +554,6 @@ export default function BountyEditorForm ({ onCancel, onSubmit, bounty, mode = '
                             setValue('capSubmissions', newValue, {
                               shouldValidate: true
                             });
-
                             // eslint-disable-next-line no-restricted-globals
                             if (newValue === false && isNaN(values.maxSubmissions as any)) {
                               setValue('maxSubmissions', null, {

@@ -11,7 +11,7 @@ import { UpdateableBountyFields } from 'lib/bounties';
 import debouncePromise from 'lib/utilities/debouncePromise';
 import { isTruthy } from 'lib/utilities/types';
 import { BountyWithDetails } from 'models';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
@@ -78,6 +78,24 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
     update();
   }, [currentBounty.chainId, currentBounty.rewardToken, currentBounty.approveSubmitters]);
 
+  const updateBountyAmount = useCallback((e) => {
+    setCurrentBounty((_currentBounty) => ({ ..._currentBounty,
+      rewardAmount: Number(e.target.value)
+    }));
+    debouncedBountyUpdate(currentBounty.id, {
+      rewardAmount: Number(e.target.value)
+    });
+  }, []);
+
+  const updateBountyMaxSubmissions = useCallback((e) => {
+    setCurrentBounty((_currentBounty) => ({ ..._currentBounty,
+      maxSubmissions: Number(e.target.value)
+    }));
+    debouncedBountyUpdate(currentBounty.id, {
+      maxSubmissions: Number(e.target.value)
+    });
+  }, []);
+
   return (
     <div className='octo-propertylist CardDetailProperties'>
       <div className='octo-propertyrow'>
@@ -126,14 +144,9 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
           value={currentBounty.rewardAmount}
           type='number'
           size='small'
-          inputProps={{ step: 0.000000001 }}
-          onChange={(e) => {
-            setCurrentBounty((_currentBounty) => ({ ..._currentBounty,
-              rewardAmount: Number(e.target.value)
-            }));
-            debouncedBountyUpdate(currentBounty.id, {
-              rewardAmount: Number(e.target.value)
-            });
+          onChange={updateBountyAmount}
+          inputProps={{
+            step: 0.000000001
           }}
         />
       </div>
@@ -188,14 +201,7 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
             sx={{
               width: 250
             }}
-            onChange={(e) => {
-              setCurrentBounty((_currentBounty) => ({ ..._currentBounty,
-                maxSubmissions: Number(e.target.value)
-              }));
-              debouncedBountyUpdate(currentBounty.id, {
-                maxSubmissions: Number(e.target.value)
-              });
-            }}
+            onChange={updateBountyMaxSubmissions}
           />
         </div>
         )}
