@@ -564,7 +564,7 @@ export default function BountyEditorForm ({ onCancel, onSubmit, bounty, mode = '
                           }}
                           defaultChecked={values.capSubmissions}
                         />
-              )}
+                      )}
                     />
                   </Grid>
                   <Grid item xs={6}>

@@ -1,4 +1,4 @@
-import { Divider, TextField } from '@mui/material';
+import { FormLabel, IconButton, Stack, TextField } from '@mui/material';
 import { PaymentMethod } from '@prisma/client';
 import { BountyStatusChip } from 'components/bounties/components/BountyStatusBadge';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
@@ -12,13 +12,15 @@ import debouncePromise from 'lib/utilities/debouncePromise';
 import { isTruthy } from 'lib/utilities/types';
 import { BountyWithDetails } from 'models';
 import { useEffect, useState } from 'react';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
 export default function BountyProperties (props: {readOnly?: boolean, bounty: BountyWithDetails}) {
   const { bounty, readOnly = false } = props;
   const [paymentMethods] = usePaymentMethods();
   const { updateBounty } = useBounties();
   const [availableCryptos, setAvailableCryptos] = useState<Array<string | CryptoCurrency>>([]);
-
+  const [isShowingAdvancedSettings, setIsShowingAdvancedSettings] = useState(false);
   const [currentBounty, setCurrentBounty] = useState<BountyWithDetails>(bounty);
   const [capSubmissions, setCapSubmissions] = useState(false);
 
@@ -135,55 +137,69 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
           }}
         />
       </div>
-      <Divider sx={{
-        my: 1
-      }}
-      />
-      <div className='octo-propertyrow'>
-        <div className='octo-propertyname'>Require applications</div>
-        <Switch
-          isOn={Boolean(currentBounty.approveSubmitters)}
-          onChanged={(isOn) => {
-            setCurrentBounty((_currentBounty) => ({ ..._currentBounty, approveSubmitters: isOn }));
-          }}
-          readOnly={readOnly}
-        />
-      </div>
-
-      <div className='octo-propertyrow'>
-        <div className='octo-propertyname'>Submissions limit</div>
-        <Switch
-          isOn={capSubmissions}
-          onChanged={(isOn) => {
-            setCapSubmissions(isOn);
-            setCurrentBounty((_currentBounty) => ({ ..._currentBounty, maxSubmissions: isOn ? 1 : _currentBounty.maxSubmissions }));
-          }}
-          readOnly={readOnly}
-        />
-      </div>
-
-      {capSubmissions && (
-      <div className='octo-propertyrow'>
-        <div className='octo-propertyname'>Max submissions</div>
-        <TextField
-          required
-          value={currentBounty.maxSubmissions}
-          type='number'
+      <Stack gap={1} flexDirection='row' mt={2}>
+        <FormLabel sx={{
+          fontWeight: 500
+        }}
+        >Advanced Settings
+        </FormLabel>
+        <IconButton
           size='small'
-          inputProps={{ step: 1, min: 1 }}
-          sx={{
-            width: 250
+          onClick={() => {
+            setIsShowingAdvancedSettings(!isShowingAdvancedSettings);
           }}
-          onChange={(e) => {
-            setCurrentBounty((_currentBounty) => ({ ..._currentBounty,
-              maxSubmissions: Number(e.target.value)
-            }));
-            debouncedBountyUpdate(currentBounty.id, {
-              maxSubmissions: Number(e.target.value)
-            });
-          }}
-        />
-      </div>
+        >
+          {isShowingAdvancedSettings ? <KeyboardArrowUpIcon fontSize='small' /> : <KeyboardArrowDownIcon fontSize='small' />}
+        </IconButton>
+      </Stack>
+      {isShowingAdvancedSettings && (
+      <>
+        <div className='octo-propertyrow'>
+          <div className='octo-propertyname'>Require applications</div>
+          <Switch
+            isOn={Boolean(currentBounty.approveSubmitters)}
+            onChanged={(isOn) => {
+              setCurrentBounty((_currentBounty) => ({ ..._currentBounty, approveSubmitters: isOn }));
+            }}
+            readOnly={readOnly}
+          />
+        </div>
+
+        <div className='octo-propertyrow'>
+          <div className='octo-propertyname'>Submissions limit</div>
+          <Switch
+            isOn={capSubmissions}
+            onChanged={(isOn) => {
+              setCapSubmissions(isOn);
+              setCurrentBounty((_currentBounty) => ({ ..._currentBounty, maxSubmissions: isOn ? 1 : _currentBounty.maxSubmissions }));
+            }}
+            readOnly={readOnly}
+          />
+        </div>
+        {capSubmissions && (
+        <div className='octo-propertyrow'>
+          <div className='octo-propertyname'>Max submissions</div>
+          <TextField
+            required
+            value={currentBounty.maxSubmissions}
+            type='number'
+            size='small'
+            inputProps={{ step: 1, min: 1 }}
+            sx={{
+              width: 250
+            }}
+            onChange={(e) => {
+              setCurrentBounty((_currentBounty) => ({ ..._currentBounty,
+                maxSubmissions: Number(e.target.value)
+              }));
+              debouncedBountyUpdate(currentBounty.id, {
+                maxSubmissions: Number(e.target.value)
+              });
+            }}
+          />
+        </div>
+        )}
+      </>
       )}
 
     </div>
