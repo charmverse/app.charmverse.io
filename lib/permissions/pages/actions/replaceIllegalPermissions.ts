@@ -1,6 +1,6 @@
 import { PagePermission, Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { IPageWithPermissions, PageNodeWithPermissions, TargetPageTree } from 'lib/pages/interfaces';
+import { IPageWithPermissions, PageNodeWithChildren, PageNodeWithPermissions, TargetPageTree } from 'lib/pages/interfaces';
 import { flattenTree } from 'lib/pages/mapPageTree';
 import { getPage } from 'lib/pages/server';
 import { resolvePageTreeV2 } from 'lib/pages/server/resolvePageTree_v2';
@@ -203,13 +203,23 @@ export function generateReplaceIllegalPermissions ({ parents, targetPage }: Targ
 }
 
 export async function replaceIllegalPermissions ({ pageId }: {pageId: string}):
- Promise<IPageWithPermissions> {
+ Promise<IPageWithPermissions & PageNodeWithChildren<PageNodeWithPermissions>> {
 
   const { parents, targetPage } = await resolvePageTreeV2({ pageId });
 
   const args = generateReplaceIllegalPermissions({ parents, targetPage });
 
   return prisma.$transaction(args.updateManyOperations.map(op => prisma.pagePermission.updateMany(op)))
-    .then(() => getPage(pageId) as Promise<IPageWithPermissions>);
+    .then(async () => {
+      const pageAfterPermissionsUpdate = await getPage(pageId) as IPageWithPermissions;
+
+      const pageWithChildren: IPageWithPermissions & PageNodeWithChildren<PageNodeWithPermissions> = {
+        ...pageAfterPermissionsUpdate,
+        children: targetPage.children
+      };
+
+      return pageWithChildren;
+
+    });
 
 }
