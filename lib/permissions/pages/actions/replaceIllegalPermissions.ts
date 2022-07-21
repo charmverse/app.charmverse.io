@@ -1,11 +1,12 @@
-import { PagePermission, Prisma, PrismaPromise } from '@prisma/client';
-import { PageNodeWithChildren, PageNodeWithPermissions, TargetPageTree } from 'lib/pages/interfaces';
-import { flattenTree } from 'lib/pages/mapPageTree';
-import { isTruthy } from 'lib/utilities/types';
+import { PagePermission, Prisma } from '@prisma/client';
 import { prisma } from 'db';
+import { IPageWithPermissions, PageNodeWithPermissions, TargetPageTree } from 'lib/pages/interfaces';
+import { flattenTree } from 'lib/pages/mapPageTree';
+import { getPage } from 'lib/pages/server';
 import { resolvePageTreeV2 } from 'lib/pages/server/resolvePageTree_v2';
-import { hasSameOrMorePermissions } from './has-same-or-more-permissions';
+import { isTruthy } from 'lib/utilities/types';
 import { findExistingPermissionForGroup } from './find-existing-permission-for-group';
+import { hasSameOrMorePermissions } from './has-same-or-more-permissions';
 
 /**
  * Detects permissions to replace and emits the updateMany arguments for a Prisma transaction
@@ -202,12 +203,13 @@ export function generateReplaceIllegalPermissions ({ parents, targetPage }: Targ
 }
 
 export async function replaceIllegalPermissions ({ pageId }: {pageId: string}):
- Promise<any> {
+ Promise<IPageWithPermissions> {
 
   const { parents, targetPage } = await resolvePageTreeV2({ pageId });
 
   const args = generateReplaceIllegalPermissions({ parents, targetPage });
 
-  return prisma.$transaction(args.updateManyOperations.map(op => prisma.pagePermission.updateMany(op)));
+  return prisma.$transaction(args.updateManyOperations.map(op => prisma.pagePermission.updateMany(op)))
+    .then(() => getPage(pageId) as Promise<IPageWithPermissions>);
 
 }
