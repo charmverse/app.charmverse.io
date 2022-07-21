@@ -554,30 +554,6 @@ enum BountyStatus {
   paid
 }
 
-model Bounty {
-  id                String             @id @default(uuid()) @db.Uuid
-  author            User               @relation(fields: [createdBy], references: [id])
-  createdBy         String             @db.Uuid()
-  suggestedBy       String?            @db.Uuid()
-  space             Space              @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  spaceId           String             @db.Uuid
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @default(now())
-  description       String
-  descriptionNodes  Json
-  chainId           Int
-  rewardAmount      Float
-  rewardToken       String
-  status            BountyStatus       @default(open)
-  title             String
-  linkedTaskId      String?            @db.Uuid
-  approveSubmitters Boolean            @default(false)
-  maxSubmissions    Int?               @default(1)
-  applications      Application[]
-  permissions       BountyPermission[]
-  page              Page?
-}
-
 // Not currently used at database level. Defined here so we have a single source of truth
 enum BountyOperation {
   work
