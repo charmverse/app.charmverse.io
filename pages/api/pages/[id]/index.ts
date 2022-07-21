@@ -4,7 +4,7 @@ import { computeUserPagePermissions, setupPermissionsAfterPageRepositioned } fro
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { withSessionRoute } from 'lib/session/withSession';
-import { Page } from '@prisma/client';
+import { Page, PageType } from '@prisma/client';
 import { prisma } from 'db';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
 import { IPageWithPermissions, ModifyChildPagesResponse } from 'lib/pages';
@@ -62,28 +62,43 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
   else if (permissions.edit_content !== true && permissions.comment !== true) {
     throw new ActionNotPermittedError('You do not have permission to update this page');
   }
-  const pageWithPermission = await prisma.page.update({
-    where: {
-      id: pageId
-    },
-    data: {
-      ...req.body,
-      updatedAt: new Date(),
-      updatedBy: userId,
-      bounty: {
-        title: req.body.title,
-        description: req.body.contentText,
-        descriptionNodes: req.body.content as string
-      }
-    },
-    include: {
-      permissions: {
-        include: {
-          sourcePermission: true
+
+  const page = await getPage(pageId);
+
+  if (!page) {
+    throw new NotFoundError();
+  }
+
+  const isBountyPage = page.type === PageType.bounty;
+
+  const [pageWithPermission] = await prisma.$transaction([
+    prisma.page.update({
+      where: {
+        id: pageId
+      },
+      data: {
+        ...req.body,
+        updatedAt: new Date(),
+        updatedBy: userId
+      },
+      include: {
+        permissions: {
+          include: {
+            sourcePermission: true
+          }
         }
       }
+    })
+  ].concat(!isBountyPage ? [] : [prisma.bounty.update({
+    where: {
+      id: page.bountyId
+    },
+    data: {
+      title: req.body.title,
+      description: req.body.contentText,
+      descriptionNodes: req.body.content as string
     }
-  });
+  })]));
 
   if (updateContent.parentId === null || typeof updateContent.parentId === 'string') {
     const updatedPage = await setupPermissionsAfterPageRepositioned(pageId);
