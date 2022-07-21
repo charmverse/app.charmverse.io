@@ -1,21 +1,21 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import { useRouter } from 'next/router';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
 import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
 import TreeView from '@mui/lab/TreeView';
 import charmClient from 'charmClient';
+import { checkForEmpty } from 'components/common/CharmEditor/utils';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
+import { addPageAndRedirect, IPageWithPermissions, NewPageInput } from 'lib/pages';
+import { mapPageTree, sortNodes } from 'lib/pages/mapPageTree';
 import { isTruthy } from 'lib/utilities/types';
 import { Page, PageContent } from 'models';
-import { ComponentProps, Dispatch, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo, memo } from 'react';
+import { useRouter } from 'next/router';
+import { ComponentProps, Dispatch, memo, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo } from 'react';
 import { useDrop } from 'react-dnd';
-import { checkForEmpty } from 'components/common/CharmEditor/utils';
-import { addPageAndRedirect, NewPageInput, IPageWithPermissions } from 'lib/pages';
-import { sortNodes, mapPageTree } from 'lib/pages/mapPageTree';
 import TreeNode, { MenuNode, ParentMenuNode } from './components/TreeNode';
 
 const StyledTreeRoot = styled(TreeRoot)<{ isFavorites?: boolean }>`
