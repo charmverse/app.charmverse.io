@@ -69,7 +69,12 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
     data: {
       ...req.body,
       updatedAt: new Date(),
-      updatedBy: userId
+      updatedBy: userId,
+      bounty: {
+        title: req.body.title,
+        description: req.body.contentText,
+        descriptionNodes: req.body.content as string
+      }
     },
     include: {
       permissions: {

@@ -39,7 +39,14 @@ export async function updateBountySettings ({
       rewardToken: updateContent.rewardToken,
       approveSubmitters: updateContent.approveSubmitters,
       maxSubmissions: updateContent.maxSubmissions,
-      linkedTaskId: updateContent.linkedTaskId
+      linkedTaskId: updateContent.linkedTaskId,
+      page: {
+        update: {
+          title: updateContent.title,
+          contentText: updateContent.description,
+          content: updateContent.descriptionNodes as string
+        }
+      }
     }
   });
 
