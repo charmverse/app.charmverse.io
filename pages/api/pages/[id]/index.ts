@@ -107,7 +107,7 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
     ]);
   }
   else {
-    pageWithPermission = prisma.page.update(pageUpdateData);
+    pageWithPermission = await prisma.page.update(pageUpdateData);
   }
 
   if (updateContent.parentId === null || typeof updateContent.parentId === 'string') {
