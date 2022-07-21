@@ -42,9 +42,14 @@ export async function updateBountySettings ({
       linkedTaskId: updateContent.linkedTaskId,
       page: {
         update: {
-          title: updateContent.title,
-          contentText: updateContent.description,
-          content: updateContent.descriptionNodes as string
+          data: {
+            title: updateContent.title,
+            contentText: updateContent.description,
+            content: updateContent.descriptionNodes as string
+          },
+          where: {
+            bountyId
+          }
         }
       }
     }
