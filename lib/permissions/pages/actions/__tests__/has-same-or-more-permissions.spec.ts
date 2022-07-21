@@ -95,6 +95,20 @@ describe('hasSameOrMorePermissions', () => {
 
   });
 
+  it('should return true if the base permissions array is empty', async () => {
+
+    const [page] = await setupPagesWithPermissions([
+      [{
+        userId: user.id,
+        permissionLevel: 'full_access'
+      }]
+    ]);
+
+    const hasEqualOrMorePermissions = hasSameOrMorePermissions([], page.permissions);
+
+    expect(hasEqualOrMorePermissions).toBe(true);
+  });
+
   it('should return false when the compared list of permissions has less operations permitted than the base', async () => {
 
     const [root, child] = await setupPagesWithPermissions([
@@ -120,102 +134,3 @@ describe('hasSameOrMorePermissions', () => {
     expect(hasEqualOrMorePermissions).toBe(false);
   });
 });
-
-/*
-describe('canInheritFromParent', () => {
-
-  it('should return false when the page does not have a parent', async () => {
-    const rootPage = await createPage({
-      createdBy: user.id,
-      spaceId: space.id
-    });
-
-    const canInherit = await canInheritPermissionsFromParent(rootPage.id);
-
-    expect(canInherit).toBe(false);
-
-  });
-  it('should return true when the child page has the same amount of permissions as the parent', async () => {
-
-    const [root, child] = await setupPagesWithPermissions([
-      // Root page
-      [{
-        userId: user.id,
-        permissionLevel: 'full_access'
-      },
-      {
-        spaceId: space.id,
-        permissionLevel: 'view'
-      }],
-      // Child page
-      [{
-        userId: user.id,
-        permissionLevel: 'full_access'
-      },
-      {
-        spaceId: space.id,
-        permissionLevel: 'view'
-      }]
-    ]);
-
-    const canInherit = await canInheritPermissionsFromParent(child.id);
-
-    expect(canInherit).toBe(true);
-
-  });
-
-  it('should return false when the child page has less permissions than the parent', async () => {
-
-    const [root, child] = await setupPagesWithPermissions([
-      // Root page
-      [{
-        userId: user.id,
-        permissionLevel: 'full_access'
-      },
-      {
-        spaceId: space.id,
-        permissionLevel: 'view'
-      }],
-      // Child page
-      [
-        {
-          spaceId: space.id,
-          permissionLevel: 'view'
-        }]
-    ]);
-
-    const canInherit = await canInheritPermissionsFromParent(child.id);
-
-    expect(canInherit).toBe(false);
-
-  });
-
-  it('should return true when the child page has the same permissions as the parent if a specific permission is ignored', async () => {
-
-    const [root, child] = await setupPagesWithPermissions([
-      // Root page
-      [{
-        userId: user.id,
-        permissionLevel: 'full_access'
-      },
-      {
-        spaceId: space.id,
-        permissionLevel: 'view'
-      }],
-      // Child page
-      [
-        {
-          spaceId: space.id,
-          permissionLevel: 'view'
-        }]
-    ]);
-
-    const canInherit = await canInheritPermissionsFromParent(child.id, root.permissions[0].id);
-
-    expect(canInherit).toBe(true);
-
-  });
-
-});
-
-*/
