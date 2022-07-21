@@ -102,7 +102,7 @@ model Block {
   fields    Json
   user      User      @relation(fields: [createdBy], references: [id])
   space     Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  Page      Page?
+  page      Page?
 }
 
 model UserVote {
