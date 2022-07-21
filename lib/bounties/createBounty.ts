@@ -77,7 +77,7 @@ export async function createBounty ({
   if (!isSuggestion) {
     pageData = {
       create: {
-        path: `page-${v4()}`,
+        path: `page-${Math.random().toString().replace('0.', '')}`,
         title,
         contentText: description,
         content: descriptionNodes as string,
