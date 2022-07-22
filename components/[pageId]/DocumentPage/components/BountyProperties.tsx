@@ -1,23 +1,28 @@
+import { useTheme } from '@emotion/react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Box, Divider, FormLabel, IconButton, Stack, TextField } from '@mui/material';
-import { PaymentMethod } from '@prisma/client';
+import { Box, Chip, Divider, FormLabel, IconButton, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField } from '@mui/material';
+import { Application, PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
 import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge';
 import { BountyApplicantList } from 'components/bounties/[bountyId]/components/BountyApplicantList';
+import { SubmissionStatusColors, SubmissionStatusLabels } from 'components/bounties/[bountyId]/components_v3/BountySubmissions';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
 import Button from 'components/common/Button';
 import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
+import UserDisplay from 'components/common/UserDisplay';
 import { CryptoCurrency, getChainById } from 'connectors';
 import { useBounties } from 'hooks/useBounties';
+import { useContributors } from 'hooks/useContributors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
 import { AssignedBountyPermissions, BountyPermissions, UpdateableBountyFields } from 'lib/bounties';
 import { TargetPermissionGroup } from 'lib/permissions/interfaces';
+import { humanFriendlyDate } from 'lib/utilities/dates';
 import debouncePromise from 'lib/utilities/debouncePromise';
 import { isTruthy } from 'lib/utilities/types';
 import { BountyWithDetails } from 'models';
@@ -66,6 +71,176 @@ function rollupPermissions ({
   return permissionsToSend;
 }
 
+interface UserBountyApplicationFormProps {
+  bountyId: string
+  mode: 'create' | 'update'
+  onClick?: () => void
+  application?: Application
+}
+
+function UserBountyApplicationForm ({ onClick, mode, bountyId, application }: UserBountyApplicationFormProps) {
+  const [applicationMessage, setApplicationMessage] = useState(application?.message ?? '');
+
+  return (
+    <Stack gap={1}>
+      <FormLabel sx={{
+        fontWeight: 'bold'
+      }}
+      >Application
+      </FormLabel>
+      <Stack alignItems='center' gap={2}>
+        <TextField
+          autoFocus
+          placeholder='Explain why you are the right person or team to work on this bounty.'
+          minRows={5}
+          multiline
+          variant='outlined'
+          type='text'
+          fullWidth
+          value={applicationMessage}
+          onChange={(ev) => {
+            const newText = ev.target.value;
+            setApplicationMessage(newText);
+          }}
+        />
+        <Stack justifyContent='center' gap={1} flexDirection='row'>
+          <Button
+            onClick={async () => {
+              if (mode === 'create') {
+                await charmClient.createApplication({
+                  bountyId,
+                  status: 'applied',
+                  message: applicationMessage
+                });
+              }
+              else if (application) {
+                await charmClient.updateApplication(application.id, {
+                  bountyId,
+                  message: applicationMessage
+                });
+              }
+
+              onClick?.();
+            }}
+          >{mode === 'create' ? 'Apply' : 'Update'}
+          </Button>
+          {mode === 'create' && (
+          <Button
+            color='error'
+            onClick={() => {
+              onClick?.();
+            }}
+          >Cancel
+          </Button>
+          )}
+        </Stack>
+      </Stack>
+    </Stack>
+  );
+}
+
+interface UserBountySubmissionTableProps {
+  submission: Application
+  bountyId: string
+}
+
+function UserBountySubmissionTable ({ bountyId, submission }: UserBountySubmissionTableProps) {
+  const theme = useTheme();
+  const [user] = useUser();
+  const [contributors] = useContributors();
+  const [isShowingSubmissionDetails, setIsShowingSubmissionDetails] = useState(false);
+
+  return (
+    <>
+      <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
+        <TableHead sx={{
+          background: theme.palette.background.dark,
+          '.MuiTableCell-root': {
+            background: theme.palette.settingsHeader.background
+          }
+        }}
+        >
+          <TableRow>
+            {/* Width should always be same as Bounty Applicant list status column, so submitter and applicant columns align */}
+            <TableCell>
+              <Box sx={{
+                display: 'flex',
+                alignItems: 'center'
+              }}
+              >
+                Submitter
+              </Box>
+            </TableCell>
+            <TableCell sx={{ width: 120 }} align='left'>
+              Status
+            </TableCell>
+            <TableCell>
+              Last updated
+            </TableCell>
+            <TableCell align='center'>
+              Action
+            </TableCell>
+            <TableCell align='center'>
+            </TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          <TableCell size='small'>
+            {(() => {
+              const contributor = contributors.find(c => c.id === submission.createdBy);
+
+              if (contributor) {
+                return (
+                  <UserDisplay
+                    avatarSize='small'
+                    user={contributor}
+                    fontSize='small'
+                    linkToProfile
+                  />
+                );
+              }
+              return 'Anonymous';
+            })()}
+          </TableCell>
+          <TableCell size='small' align='left'>
+            <Box display='flex' gap={1}>
+              <Chip
+                label={SubmissionStatusLabels[submission.status]}
+                color={SubmissionStatusColors[submission.status]}
+              />
+            </Box>
+          </TableCell>
+          <TableCell>{ humanFriendlyDate(submission.updatedAt, { withTime: true })}</TableCell>
+          <TableCell align='center' sx={{ gap: 2, justifyContent: 'flex-end' }}>
+            <Button disabled={submission.status !== 'inProgress'}>
+              {submission.status === 'inProgress' ? 'Submit' : 'Not assigned'}
+            </Button>
+          </TableCell>
+          <TableCell align='center' sx={{ gap: 2, justifyContent: 'flex-end' }}>
+            <IconButton
+              size='small'
+              onClick={() => {
+                setIsShowingSubmissionDetails(!isShowingSubmissionDetails);
+              }}
+            >
+              {!isShowingSubmissionDetails ? <KeyboardArrowDownIcon fontSize='small' /> : <KeyboardArrowUpIcon fontSize='small' />}
+            </IconButton>
+          </TableCell>
+        </TableBody>
+      </Table>
+      {isShowingSubmissionDetails && (
+      <Box my={2}>
+        <UserBountyApplicationForm
+          mode='update'
+          bountyId={bountyId}
+          application={submission}
+        />
+      </Box>
+      )}
+    </>
+  );
+}
+
 export default function BountyProperties (props: {readOnly?: boolean, bounty: BountyWithDetails}) {
   const { bounty, readOnly = false } = props;
   const [paymentMethods] = usePaymentMethods();
@@ -81,7 +256,6 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
   const selectedReviewerUsers = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'user').map(p => p.id as string) ?? [];
   const selectedReviewerRoles = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
   const [isApplyingBounty, setIsApplyingBounty] = useState(false);
-  const [applicationMessage, setApplicationMessage] = useState('');
   const canEdit = !readOnly && permissions?.userPermissions.edit;
   const userApplication = currentBounty.applications.find(application => application.createdBy === user?.id);
 
@@ -334,13 +508,6 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
         }
       }}
     >
-      {/* <div className='octo-propertyrow'>
-        <div className='octo-propertyname'>Status</div>
-        <BountyStatusChip
-          size='small'
-          status={currentBounty.status}
-        />
-      </div> */}
       <Stack flexDirection='row' justifyContent='space-between' gap={2} alignItems='center'>
         <div
           className='octo-propertyrow'
@@ -418,53 +585,21 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
         </>
       )}
 
+      {userApplication && permissions?.userPermissions?.work && (
+      <UserBountySubmissionTable
+        bountyId={currentBounty.id}
+        submission={userApplication}
+      />
+      )}
+
       {isApplyingBounty && !userApplication && (
-      <>
-        <FormLabel sx={{
-          fontWeight: 'bold',
-          mb: 1,
-          mt: 2
-        }}
-        >Application
-        </FormLabel>
-        <Stack alignItems='center' gap={2}>
-          <TextField
-            autoFocus
-            placeholder='Explain why you are the right person or team to work on this bounty.'
-            minRows={5}
-            multiline
-            variant='outlined'
-            type='text'
-            fullWidth
-            value={applicationMessage}
-            onChange={(ev) => {
-              const newText = ev.target.value;
-              setApplicationMessage(newText);
-            }}
-          />
-          <Stack justifyContent='center' gap={1} flexDirection='row'>
-            <Button
-              color='error'
-              onClick={async () => {
-                await charmClient.createApplication({
-                  bountyId: currentBounty.id,
-                  status: 'applied',
-                  message: applicationMessage
-                });
-                setApplicationMessage('');
-                setIsApplyingBounty(false);
-              }}
-            >Cancel
-            </Button>
-            <Button onClick={() => {
-              setApplicationMessage('');
-              setIsApplyingBounty(false);
-            }}
-            >Apply
-            </Button>
-          </Stack>
-        </Stack>
-      </>
+        <UserBountyApplicationForm
+          bountyId={currentBounty.id}
+          mode='create'
+          onClick={() => {
+            setIsApplyingBounty(false);
+          }}
+        />
       )}
     </Box>
   );
