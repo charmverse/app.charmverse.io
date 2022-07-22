@@ -4,6 +4,7 @@ import { Box, Divider, FormLabel, IconButton, Stack, TextField } from '@mui/mate
 import { PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
 import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge';
+import { BountyApplicantList } from 'components/bounties/[bountyId]/components/BountyApplicantList';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
 import Button from 'components/common/Button';
 import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
@@ -146,7 +147,12 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
 
   const bountyProperties = (
     <>
-      <div className='octo-propertyrow'>
+      <div
+        className='octo-propertyrow'
+        style={{
+          height: 'fit-content'
+        }}
+      >
         <div className='octo-propertyname'>Chain</div>
         <InputSearchBlockchain
           disabled={!canEdit}
@@ -166,7 +172,12 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
         />
       </div>
 
-      <div className='octo-propertyrow'>
+      <div
+        className='octo-propertyrow'
+        style={{
+          height: 'fit-content'
+        }}
+      >
         <div className='octo-propertyname'>Token</div>
         <InputSearchCrypto
           disabled={!canEdit}
@@ -189,7 +200,12 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
         />
       </div>
 
-      <div className='octo-propertyrow'>
+      <div
+        className='octo-propertyrow'
+        style={{
+          height: 'fit-content'
+        }}
+      >
         <div className='octo-propertyname'>Amount</div>
         <TextField
           required
@@ -338,7 +354,6 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
             onChange={async (e, options) => {
               const roles = options.filter(option => option.group === 'role');
               const contributors = options.filter(option => option.group === 'user');
-
               await updateBounty(currentBounty.id, {
                 permissions: rollupPermissions({
                   assignedRoleSubmitters,
@@ -363,7 +378,23 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
         </Box>
       </Stack>
 
-      {canEdit && bountyProperties}
+      {canEdit && (
+      <>
+        {bountyProperties}
+        {
+          currentBounty.approveSubmitters === true && (
+            <Box my={2}>
+              <BountyApplicantList
+                showHeader={false}
+                bounty={currentBounty}
+                applications={currentBounty.applications}
+                permissions={permissions}
+              />
+            </Box>
+          )
+        }
+      </>
+      )}
 
       {!canEdit && permissions?.userPermissions?.work && (
         <>
