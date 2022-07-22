@@ -1,21 +1,21 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import { useRouter } from 'next/router';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
 import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
 import TreeView from '@mui/lab/TreeView';
 import charmClient from 'charmClient';
+import { checkForEmpty } from 'components/common/CharmEditor/utils';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
+import { addPageAndRedirect, IPageWithPermissions, NewPageInput } from 'lib/pages';
+import { mapPageTree, sortNodes } from 'lib/pages/mapPageTree';
 import { isTruthy } from 'lib/utilities/types';
 import { Page, PageContent } from 'models';
-import { ComponentProps, Dispatch, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo, memo } from 'react';
+import { useRouter } from 'next/router';
+import { ComponentProps, Dispatch, memo, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo } from 'react';
 import { useDrop } from 'react-dnd';
-import { checkForEmpty } from 'components/common/CharmEditor/utils';
-import { addPageAndRedirect, NewPageInput, IPageWithPermissions } from 'lib/pages';
-import sortBy from 'lodash/sortBy';
 import TreeNode, { MenuNode, ParentMenuNode } from './components/TreeNode';
 
 const StyledTreeRoot = styled(TreeRoot)<{ isFavorites?: boolean }>`
@@ -24,57 +24,11 @@ const StyledTreeRoot = styled(TreeRoot)<{ isFavorites?: boolean }>`
   overflow-y: auto;
 `;
 
-export const sortNodes = (nodes: Array<Page | ParentMenuNode>) => {
-  return [
-    ...sortBy(nodes.filter(node => node.index >= 0), ['index', 'createdAt']),
-    ...sortBy(nodes.filter(node => node.index < 0), ['createdAt'])
-  ];
-};
-
 export function filterVisiblePages (pages: (Page | undefined)[], rootPageIds: string[] = []) {
   return pages
     .filter((page): page is IPageWithPermissions => isTruthy(
       page && (page.type === 'board' || page.type === 'page' || rootPageIds?.includes(page.id))
     ));
-}
-
-function mapTree (items: MenuNode[], rootPageIds?: string[]): ParentMenuNode[] {
-  const tempItems = items.map((item): ParentMenuNode => {
-    return {
-      ...item,
-      children: []
-    };
-  });
-  const map: { [key: string]: number } = {};
-  let node: ParentMenuNode;
-  const roots = [];
-  let i: number;
-  for (i = 0; i < tempItems.length; i += 1) {
-    map[tempItems[i].id] = i; // initialize the map
-  }
-
-  for (i = 0; i < tempItems.length; i += 1) {
-    node = tempItems[i];
-    const parentIndex = node.parentId;
-    const index = parentIndex ? map[parentIndex] : -1;
-
-    if (node.parentId && tempItems[index] && node.deletedAt === null) {
-      // Make sure its not a database page or a focalboard card
-      if (tempItems[index].type === 'page') {
-        tempItems[index].children.push(node);
-        tempItems[index].children = sortNodes(tempItems[index].children) as ParentMenuNode[];
-      }
-    }
-    // If its a root page always show it
-    else if ((node.parentId === null) && !rootPageIds && node.deletedAt === null) {
-      roots.push(node);
-    }
-    if (rootPageIds?.includes(node.id)) {
-      roots.push(node);
-    }
-  }
-
-  return sortNodes(roots) as ParentMenuNode[];
 }
 
 type TreeRootProps = {
@@ -154,7 +108,7 @@ function PageNavigation ({
   const pageHash = JSON.stringify(pagesArray);
 
   const mappedItems = useMemo(() => {
-    return mapTree(pagesArray, rootPageIds);
+    return mapPageTree<MenuNode>({ items: pagesArray, rootPageIds });
   }, [pageHash, rootPageIds]);
 
   const onDropAdjacent = useCallback((droppedItem: ParentMenuNode, containerItem: MenuNode) => {

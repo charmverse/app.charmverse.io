@@ -1,5 +1,6 @@
 import { prisma } from 'db';
-import { resolveChildPagesAsFlatList } from 'lib/pages/server';
+import { flattenTree } from 'lib/pages/mapPageTree';
+import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
 import { isTruthy } from 'lib/utilities/types';
 import { PermissionNotFoundError } from '../errors';
 
@@ -23,7 +24,8 @@ export async function deletePagePermission (permissionId: string) {
 
   // We are deleting an intermediate permission, so we need to also delete all children
   if (foundPermission.inheritedFromPermission) {
-    const childPages = await resolveChildPagesAsFlatList(foundPermission.pageId);
+    const { targetPage } = await resolvePageTree({ pageId: foundPermission.pageId });
+    const childPages = flattenTree(targetPage);
     // Delete all child permissions that inherited from the same permission as this
     await prisma.pagePermission.deleteMany({ where: {
       AND: [
