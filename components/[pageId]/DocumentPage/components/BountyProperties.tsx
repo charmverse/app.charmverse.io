@@ -70,7 +70,7 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
   const [availableCryptos, setAvailableCryptos] = useState<Array<string | CryptoCurrency>>([]);
   const [isShowingAdvancedSettings, setIsShowingAdvancedSettings] = useState(false);
   const [currentBounty, setCurrentBounty] = useState<BountyWithDetails>(bounty);
-  const [capSubmissions, setCapSubmissions] = useState(false);
+  const [capSubmissions, setCapSubmissions] = useState(currentBounty.maxSubmissions !== null);
   const [space] = useCurrentSpace();
   const [bountyPermissions, setBountyPermissions] = useState<BountyPermissions | null>(null);
   const assignedRoleSubmitters = bountyPermissions?.submitter?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
@@ -303,9 +303,9 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
             isOn={capSubmissions}
             onChanged={(isOn) => {
               setCapSubmissions(isOn);
-              setCurrentBounty((_currentBounty) => ({ ..._currentBounty, maxSubmissions: isOn ? 1 : _currentBounty.maxSubmissions }));
+              setCurrentBounty((_currentBounty) => ({ ..._currentBounty, maxSubmissions: isOn ? (_currentBounty.maxSubmissions ?? 1) : null }));
               updateBounty(currentBounty.id, {
-                maxSubmissions: isOn ? 1 : currentBounty.maxSubmissions
+                maxSubmissions: isOn ? (currentBounty.maxSubmissions ?? 1) : null
               });
             }}
             readOnly={readOnly}
