@@ -27,7 +27,8 @@ export async function resolvePageTreeV2 ({ pageId }: {pageId: string}):
 
   const pagesInSpace = await prisma.page.findMany({
     where: {
-      spaceId: pageWithSpaceIdOnly.spaceId
+      spaceId: pageWithSpaceIdOnly.spaceId,
+      deletedAt: null
     },
     select: {
       id: true,

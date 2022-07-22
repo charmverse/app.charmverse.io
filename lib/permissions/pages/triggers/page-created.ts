@@ -62,7 +62,6 @@ export async function setupPermissionsAfterPageCreated (pageId: string): Promise
   else {
     const parent = (await getPage(page.parentId) as IPageWithPermissions);
 
-    // Parent was deleted, so we should drop the reference, and reinvoke this function with the page as a root page
     if (!parent) {
       await prisma.page.update({
         where: {
@@ -72,6 +71,7 @@ export async function setupPermissionsAfterPageCreated (pageId: string): Promise
           parentId: null
         }
       });
+      // Parent was deleted, so we should drop the reference, and reinvoke this function with the page as a root page
       return setupPermissionsAfterPageCreated(pageId);
     }
 
