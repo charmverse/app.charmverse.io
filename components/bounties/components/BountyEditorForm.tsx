@@ -189,7 +189,6 @@ export default function BountyEditorForm ({ onCancel, onSubmit, bounty, mode = '
     if (calculation.mode === 'role') {
       setSubmitterMode('role');
     }
-
   }
 
   useEffect(() => {

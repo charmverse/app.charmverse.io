@@ -6,6 +6,8 @@ import charmClient from 'charmClient';
 import { BountyStatusChip } from 'components/bounties/components/BountyStatusBadge';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
 import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
+import { InputSearchContributorMultiple } from 'components/common/form/InputSearchContributor';
+import InputSearchContributorsRoles from 'components/common/form/InputSearchContributorsRoles';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 import SelectMenu, { MenuOption } from 'components/common/Menu';
@@ -31,6 +33,51 @@ const submitterMenuOptions: MenuOption<BountySubmitter>[] = [{
   secondary: 'Only members with specific roles can work on this bounty'
 }];
 
+function rollupPermissions ({
+  selectedReviewerUsers,
+  selectedReviewerRoles,
+  submitterMode,
+  assignedRoleSubmitters,
+  spaceId
+}: {
+  selectedReviewerUsers: string[],
+  selectedReviewerRoles: string[],
+  assignedRoleSubmitters: string[],
+  submitterMode: 'role' | 'space',
+  spaceId: string
+}): Pick<BountyPermissions, 'reviewer' | 'submitter'> {
+  const reviewers = [
+    ...selectedReviewerUsers.map(uid => {
+      return {
+        id: uid,
+        group: 'user'
+      } as TargetPermissionGroup;
+    }),
+    ...selectedReviewerRoles.map(uid => {
+      return {
+        id: uid,
+        group: 'role'
+      } as TargetPermissionGroup;
+    })
+  ];
+  const submitters: TargetPermissionGroup[] = submitterMode === 'role' ? assignedRoleSubmitters.map(uid => {
+    return {
+      group: 'role',
+      id: uid
+    };
+  }) : [{
+    id: spaceId,
+    group: 'space'
+  }];
+
+  const permissionsToSend: Pick<BountyPermissions, 'reviewer' | 'submitter'> = {
+    reviewer: reviewers,
+    submitter: submitters
+  };
+
+  return permissionsToSend;
+}
+
 export default function BountyProperties (props: {readOnly?: boolean, bounty: BountyWithDetails}) {
   const { bounty, readOnly = false } = props;
   const [paymentMethods] = usePaymentMethods();
@@ -40,15 +87,18 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
   const [currentBounty, setCurrentBounty] = useState<BountyWithDetails>(bounty);
   const [capSubmissions, setCapSubmissions] = useState(false);
   const [space] = useCurrentSpace();
-  const [permissions] = useState<Partial<BountyPermissions>>({});
-  const [submitterMode, setSubmitterMode] = useState<BountySubmitter>(inferBountyPermissionsMode(permissions)?.mode ?? 'space');
-  const [assignedRoleSubmitters, setAssignedRoleSubmitters] = useState<Array<string>>(permissions?.submitter?.filter(p => p.group === 'role').map(p => p.id as string) ?? []);
-  const [selectedReviewerUsers, setSelectedReviewerUsers] = useState<string[]>(
-    permissions?.reviewer?.filter(r => r.group === 'user').map(r => r.id as string) ?? []
-  );
-  const [selectedReviewerRoles, setSelectedReviewerRoles] = useState<string[]>(
-    permissions?.reviewer?.filter(r => r.group === 'role').map(r => r.id as string) ?? []
-  );
+  const [bountyPermissions, setBountyPermissions] = useState<BountyPermissions | null>(null);
+  const [submitterMode, setSubmitterMode] = useState<BountySubmitter>(bountyPermissions ? inferBountyPermissionsMode(bountyPermissions).mode : 'space');
+  const assignedRoleSubmitters = bountyPermissions?.submitter?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
+  const selectedReviewerUsers = bountyPermissions?.reviewer?.filter(p => p.group === 'user').map(p => p.id as string) ?? [];
+  const selectedReviewerRoles = bountyPermissions?.reviewer?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
+
+  async function refreshBountyPermissions (bountyId: string) {
+    setBountyPermissions(null);
+    charmClient.computeBountyPermissions({
+      resourceId: bountyId
+    }).then(data => setBountyPermissions(data.bountyPermissions));
+  }
 
   function refreshCryptoList (chainId: number, rewardToken?: string) {
 
@@ -81,52 +131,25 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
     }
   }
 
-  function rollupPermissions (): Pick<BountyPermissions, 'reviewer' | 'submitter'> {
-
-    const reviewers = [
-      ...selectedReviewerUsers.map(uid => {
-        return {
-          id: uid,
-          group: 'user'
-        } as TargetPermissionGroup;
-      }),
-      ...selectedReviewerRoles.map(uid => {
-        return {
-          id: uid,
-          group: 'role'
-        } as TargetPermissionGroup;
-      })
-    ];
-    const submitters: TargetPermissionGroup[] = submitterMode === 'role' ? assignedRoleSubmitters.map(uid => {
-      return {
-        group: 'role',
-        id: uid
-      };
-    }) : [{
-      id: space?.id,
-      group: 'space'
-    }];
-
-    const permissionsToSend: Pick<BountyPermissions, 'reviewer' | 'submitter'> = {
-      reviewer: reviewers,
-      submitter: submitters
-    };
-
-    return permissionsToSend;
-  }
-
   async function refreshBountyApplicantPool (): Promise<void> {
-    const updatedPermissions = rollupPermissions();
-    const calculation = await charmClient.getBountyApplicantPool({
-      permissions: updatedPermissions
-    });
+    if (bountyPermissions) {
+      const calculation = await charmClient.getBountyApplicantPool({
+        permissions: rollupPermissions({
+          assignedRoleSubmitters,
+          selectedReviewerRoles,
+          selectedReviewerUsers,
+          spaceId: space!.id,
+          submitterMode
+        })
+      });
 
-    if (calculation.mode === 'space') {
-      setSubmitterMode('space');
-    }
+      if (calculation.mode === 'space') {
+        setSubmitterMode('space');
+      }
 
-    if (calculation.mode === 'role') {
-      setSubmitterMode('role');
+      if (calculation.mode === 'role') {
+        setSubmitterMode('role');
+      }
     }
   }
 
@@ -153,35 +176,13 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
   }, []);
 
   useEffect(() => {
-    if (bounty) {
-      refreshBountyApplicantPool();
-    }
-  }, [bounty, permissions]);
-
-  useEffect(() => {
     refreshBountyApplicantPool();
-  }, [submitterMode, assignedRoleSubmitters, selectedReviewerUsers, selectedReviewerRoles]);
+  }, [submitterMode, bountyPermissions]);
 
   useEffect(() => {
     refreshCryptoList(bounty.chainId, bounty.rewardToken);
+    refreshBountyPermissions(currentBounty.id);
   }, []);
-
-  useEffect(() => {
-    async function update () {
-      const permissionsToSet = rollupPermissions();
-      const updates: UpdateableBountyFields = {
-        rewardAmount: currentBounty.rewardAmount,
-        rewardToken: currentBounty.rewardToken,
-        chainId: currentBounty.chainId,
-        approveSubmitters: currentBounty.approveSubmitters === null ? undefined : currentBounty.approveSubmitters,
-        maxSubmissions: currentBounty.maxSubmissions,
-        permissions: permissionsToSet
-      };
-      await updateBounty(currentBounty.id, updates);
-    }
-
-    update();
-  }, [currentBounty.chainId, assignedRoleSubmitters, currentBounty.rewardToken, currentBounty.approveSubmitters]);
 
   return (
     <div className='octo-propertylist CardDetailProperties'>
@@ -192,6 +193,29 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
           status={currentBounty.status}
         />
       </div>
+      <div className='octo-propertyrow'>
+        <div className='octo-propertyname'>Reviewer</div>
+        <InputSearchContributorsRoles
+          defaultValue={selectedReviewerRoles}
+          disableCloseOnSelect={true}
+          onChange={async (e, roles) => {
+            await updateBounty(currentBounty.id, {
+              permissions: rollupPermissions({
+                assignedRoleSubmitters,
+                selectedReviewerRoles: (roles as any[]).map(role => role.id),
+                selectedReviewerUsers,
+                spaceId: space!.id,
+                submitterMode
+              })
+            });
+            refreshBountyPermissions(currentBounty.id);
+          }}
+          excludedIds={selectedReviewerRoles}
+          sx={{
+            width: 250
+          }}
+        />
+      </div>
 
       <div className='octo-propertyrow'>
         <div className='octo-propertyname'>Chain</div>
@@ -199,6 +223,12 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
           chainId={currentBounty.chainId}
           sx={{
             width: 250
+          }}
+          onChange={(chainId) => {
+            setCurrentBounty((_currentBounty) => ({ ..._currentBounty, chainId }));
+            updateBounty(currentBounty.id, {
+              chainId
+            });
           }}
         />
       </div>
@@ -213,6 +243,9 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
           hideBackdrop={true}
           onChange={newToken => {
             setCurrentBounty((_currentBounty) => ({ ..._currentBounty, rewardToken: newToken }));
+            updateBounty(currentBounty.id, {
+              rewardToken: newToken
+            });
           }}
           onNewPaymentMethod={onNewPaymentMethod}
           sx={{
@@ -264,6 +297,9 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
             isOn={Boolean(currentBounty.approveSubmitters)}
             onChanged={(isOn) => {
               setCurrentBounty((_currentBounty) => ({ ..._currentBounty, approveSubmitters: isOn }));
+              updateBounty(currentBounty.id, {
+                approveSubmitters: isOn
+              });
             }}
             readOnly={readOnly}
           />
@@ -282,7 +318,18 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
           <InputSearchRoleMultiple
             disableCloseOnSelect={true}
             defaultValue={assignedRoleSubmitters}
-            onChange={setAssignedRoleSubmitters}
+            onChange={async (roleIds) => {
+              await updateBounty(currentBounty.id, {
+                permissions: rollupPermissions({
+                  assignedRoleSubmitters: roleIds,
+                  selectedReviewerRoles,
+                  selectedReviewerUsers,
+                  spaceId: space!.id,
+                  submitterMode
+                })
+              });
+              refreshBountyPermissions(currentBounty.id);
+            }}
             filter={{ mode: 'exclude', userIds: assignedRoleSubmitters }}
             showWarningOnNoRoles={true}
           />
@@ -295,6 +342,9 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
             onChanged={(isOn) => {
               setCapSubmissions(isOn);
               setCurrentBounty((_currentBounty) => ({ ..._currentBounty, maxSubmissions: isOn ? 1 : _currentBounty.maxSubmissions }));
+              updateBounty(currentBounty.id, {
+                maxSubmissions: isOn ? 1 : currentBounty.maxSubmissions
+              });
             }}
             readOnly={readOnly}
           />

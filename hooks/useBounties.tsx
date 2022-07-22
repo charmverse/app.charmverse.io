@@ -14,7 +14,7 @@ type IContext = {
   updateCurrentBountyId: (bountyId: string | null) => void,
   currentBounty: BountyWithDetails | null
   setCurrentBounty: (bounty: BountyWithDetails) => void,
-  updateBounty: (bountyId: string, update: Partial<Bounty>) => Promise<BountyWithDetails>
+  updateBounty: (bountyId: string, update: Partial<UpdateableBountyFields>) => Promise<BountyWithDetails>
   deleteBounty: (bountyId: string) => Promise<true>
   refreshBounty: (bountyId: string) => Promise<void>
   loadingBounties: boolean
