@@ -1,4 +1,4 @@
-import { Application, Bounty, BountyStatus } from '@prisma/client';
+import { Application, Bounty, BountyStatus, Page } from '@prisma/client';
 
 export const BOUNTY_LABELS: Record<BountyStatus, string> = {
   suggestion: 'Suggestion',
@@ -8,4 +8,4 @@ export const BOUNTY_LABELS: Record<BountyStatus, string> = {
   paid: 'Paid'
 };
 
-export type BountyWithDetails = Bounty & {applications: Application []}
+export type BountyWithDetails = Bounty & {applications: Application [], page: Page | null};

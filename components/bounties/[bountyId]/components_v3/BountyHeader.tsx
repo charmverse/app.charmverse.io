@@ -107,7 +107,7 @@ export default function BountyHeader ({ bounty, permissions, refreshBountyPermis
             </strong>
             {/* Provide the bounty menu options */}
             {
-          (canDeleteBounty || permissions?.userPermissions?.edit || permissions?.userPermissions?.lock) && (
+          (canDeleteBounty || permissions?.bountyPagePermissions?.edit_content || permissions?.userPermissions?.lock) && (
             <>
               <IconButton size='small' {...bindTrigger(popupState)}>
                 <MoreHorizIcon color='secondary' />
@@ -118,7 +118,7 @@ export default function BountyHeader ({ bounty, permissions, refreshBountyPermis
                 {...menuPosition}
               >
                 {
-                  permissions.userPermissions.edit && (
+                  permissions.bountyPagePermissions?.edit_content && (
                     <Tooltip arrow placement='right' title={`Edit bounty ${bounty.status === 'suggestion' ? 'suggestion' : ''}`}>
                       <MenuItem
                         dense
@@ -201,7 +201,7 @@ export default function BountyHeader ({ bounty, permissions, refreshBountyPermis
 
       {/** List of modals */}
       {
-        permissions?.userPermissions?.edit && (
+        permissions?.bountyPagePermissions?.edit_content && (
           <BountyModal
             onSubmit={() => {
               refreshBountyPermissions();

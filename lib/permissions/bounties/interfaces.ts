@@ -1,5 +1,6 @@
 import { BountyOperation, BountyPermissionLevel } from '@prisma/client';
 import { UserPermissionFlags, TargetPermissionGroup, Resource, AssignablePermissionGroupsWithPublic } from '../interfaces';
+import { IPagePermissionFlags } from '../pages/page-permission-interfaces';
 
 export type BountyPermissionFlags = UserPermissionFlags<BountyOperation>
 
@@ -19,7 +20,8 @@ export type BountySubmitter = Extract<AssignablePermissionGroupsWithPublic, 'spa
 
 export interface AssignedBountyPermissions {
   bountyPermissions: BountyPermissions;
-  userPermissions: BountyPermissionFlags
+  userPermissions: BountyPermissionFlags;
+  bountyPagePermissions: IPagePermissionFlags | null;
 }
 
 export type BulkBountyPermissionAssignment = {

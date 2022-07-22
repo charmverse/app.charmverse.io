@@ -1,10 +1,10 @@
 
-import { closeOutBounty, getBounty } from 'lib/bounties';
+import { getBounty } from 'lib/bounties';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { AssignedBountyPermissions, computeBountyPermissions, queryBountyPermissions } from 'lib/permissions/bounties';
 import { withSessionRoute } from 'lib/session/withSession';
-import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
-import { BountyWithDetails } from 'models';
+import { DataNotFoundError } from 'lib/utilities/errors';
+import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -17,7 +17,7 @@ async function computeBountyGroupPermissionsController (req: NextApiRequest, res
 
   const { id: bountyId } = req.query;
 
-  const bounty = await getBounty(bountyId as string);
+  const bounty = await getBounty(bountyId as string, true);
 
   if (!bounty) {
     throw new DataNotFoundError(`Bounty with id ${bountyId} not found`);
@@ -34,11 +34,21 @@ async function computeBountyGroupPermissionsController (req: NextApiRequest, res
     queryBountyPermissions({ bountyId: bounty.id })
   ]);
 
+  let bountyPagePermissions = null;
+
+  if (bounty.page) {
+    bountyPagePermissions = await computeUserPagePermissions({
+      pageId: bounty.page.id,
+      userId
+    });
+  }
+
   return res.status(200).json({
     // Groups assigned to each level
     bountyPermissions: groups,
     // Individual actions user can and cannot perform
-    userPermissions: permissions
+    userPermissions: permissions,
+    bountyPagePermissions
   });
 }
 
