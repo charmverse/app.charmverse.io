@@ -1,6 +1,7 @@
 import { prisma } from 'db';
-import { IPageWithPermissions, PageNotFoundError } from 'lib/pages/server';
-import { replaceIllegalPermissions } from '../actions';
+import { flattenTree } from 'lib/pages/mapPageTree';
+import { getPage, IPageWithPermissions, PageNodeWithPermissions, PageNotFoundError, TargetPageTreeWithFlatChildren } from 'lib/pages/server';
+import { findExistingPermissionForGroup, hasSameOrMorePermissions, replaceIllegalPermissions, upsertPermission } from '../actions';
 
 /**
  * When updating the position of a page within the space page tree, call this function immediately afterwards
@@ -13,7 +14,9 @@ export async function setupPermissionsAfterPageRepositioned (pageId: string | IP
       id: pageId
     },
     select: {
-      id: true
+      id: true,
+      parentId: true,
+      permissions: true
     }
   }) : pageId;
 
@@ -21,6 +24,43 @@ export async function setupPermissionsAfterPageRepositioned (pageId: string | IP
     throw new PageNotFoundError(pageId as string);
   }
 
-  return replaceIllegalPermissions({ pageId: page.id });
+  const updatedPage = await replaceIllegalPermissions({ pageId: page.id });
+
+  if (updatedPage.parentId) {
+    const parent = await prisma.page.findUnique({
+      where: {
+        id: updatedPage.parentId
+      },
+      select: {
+        id: true,
+        permissions: {
+          include: {
+            sourcePermission: true
+          }
+        }
+      }
+    });
+
+    if (parent && hasSameOrMorePermissions(parent.permissions, updatedPage.permissions)) {
+      const permissionsToCopy = parent.permissions.filter(p => {
+        const matchingGroupPermission = findExistingPermissionForGroup(p, updatedPage.permissions);
+
+        return matchingGroupPermission?.permissionLevel === p.permissionLevel;
+      });
+      if (permissionsToCopy.length > 0) {
+
+        const treeWithChildren: TargetPageTreeWithFlatChildren<PageNodeWithPermissions> = {
+          parents: updatedPage.tree.parents,
+          targetPage: updatedPage.tree.targetPage,
+          flatChildren: flattenTree(updatedPage.tree.targetPage)
+        };
+
+        await Promise.all(permissionsToCopy.map(p => upsertPermission(updatedPage.id, p, treeWithChildren)));
+      }
+    }
+
+  }
+
+  return getPage(updatedPage.id) as Promise<IPageWithPermissions>;
 
 }

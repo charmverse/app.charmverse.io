@@ -1,6 +1,6 @@
 import { PagePermission, Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { IPageWithPermissions, PageNodeWithChildren, PageNodeWithPermissions, TargetPageTree } from 'lib/pages/interfaces';
+import { IPageWithPermissions, PageNodeWithChildren, PageNodeWithPermissions, TargetPageTree, TargetPageTreeWithFlatChildren } from 'lib/pages/interfaces';
 import { flattenTree } from 'lib/pages/mapPageTree';
 import { getPage } from 'lib/pages/server';
 import { resolvePageTreeV2 } from 'lib/pages/server/resolvePageTree_v2';
@@ -205,7 +205,7 @@ export function generateReplaceIllegalPermissions ({ parents, targetPage }: Targ
 }
 
 export async function replaceIllegalPermissions ({ pageId }: {pageId: string}):
- Promise<IPageWithPermissions & PageNodeWithChildren<PageNodeWithPermissions>> {
+ Promise<IPageWithPermissions & PageNodeWithChildren<PageNodeWithPermissions> & {tree: TargetPageTree<PageNodeWithPermissions>}> {
 
   const { parents, targetPage } = await resolvePageTreeV2({ pageId });
 
@@ -215,9 +215,17 @@ export async function replaceIllegalPermissions ({ pageId }: {pageId: string}):
     .then(async () => {
       const pageAfterPermissionsUpdate = await getPage(pageId) as IPageWithPermissions;
 
-      const pageWithChildren: IPageWithPermissions & PageNodeWithChildren<PageNodeWithPermissions> = {
+      const { parents: newParents, targetPage: newTargetPage } = await resolvePageTreeV2({ pageId });
+
+      const pageWithChildren: IPageWithPermissions
+      & PageNodeWithChildren<PageNodeWithPermissions>
+      & {tree: TargetPageTree<PageNodeWithPermissions>} = {
         ...pageAfterPermissionsUpdate,
-        children: targetPage.children
+        children: targetPage.children,
+        tree: {
+          parents: newParents,
+          targetPage: newTargetPage
+        }
       };
 
       return pageWithChildren;
