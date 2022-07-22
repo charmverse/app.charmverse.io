@@ -1,5 +1,4 @@
 import { DataNotFoundError } from 'lib/utilities/errors';
-import { RequiredNotNull } from 'lib/utilities/types';
 import sortBy from 'lodash/sortBy';
 import { PageNode, PageNodeWithChildren, PageTreeMappingInput, TargetPageTree } from './interfaces';
 
@@ -14,20 +13,19 @@ export const sortNodes = (nodes: Array<PageNode>) => {
  * @targetPageId If provided, the only root node returned will be the one whose child tree contains the target page ID
  */
 export function reducePagesToPageTree<
-    T extends PageNode = PageNode, R extends PageNodeWithChildren = PageNodeWithChildren
-    > ({ items, rootPageIds, includeCards }: Omit<PageTreeMappingInput<T>, 'targetPageId'>): {itemMap: { [key: string]: number}, itemsWithChildren: R[], rootNodes: R[]} {
+    T extends PageNode = PageNode> ({ items, rootPageIds, includeCards }: Omit<PageTreeMappingInput<T>, 'targetPageId'>): {itemMap: { [key: string]: number}, itemsWithChildren: PageNodeWithChildren<T>[], rootNodes: PageNodeWithChildren<T>[]} {
 
   // Assign empty children to each node
-  const tempItems: R[] = items.map((item: T) => {
+  const tempItems: PageNodeWithChildren<T>[] = items.map((item: T) => {
     return {
       ...item,
       children: []
-    } as any as R;
+    };
   });
 
   // A map that contains the temp items array position for each page
   const map: { [key: string]: number } = {};
-  let node: R;
+  let node: PageNodeWithChildren<T>;
 
   // Root pages will only be pushed here if rootPageIds is undefined, or if it is provided and the root page ID matches
   const roots = [];
@@ -49,7 +47,7 @@ export function reducePagesToPageTree<
         includeCards && parentNode.type === 'board' && node.type === 'card'
       )) {
         parentNode.children.push(node);
-        parentNode.children = sortNodes(parentNode.children) as R[];
+        parentNode.children = sortNodes(parentNode.children) as PageNodeWithChildren<T>[];
       }
     }
     // If it's a root page always show it
@@ -64,18 +62,17 @@ export function reducePagesToPageTree<
 
   return {
     itemMap: map,
-    rootNodes: roots,
+    rootNodes: sortNodes(roots) as PageNodeWithChildren<T>[],
     itemsWithChildren: tempItems
   };
 
 }
 
 export function mapPageTree<
-T extends PageNode = PageNode, R extends PageNodeWithChildren = PageNodeWithChildren
-> ({ items, rootPageIds }: Omit<PageTreeMappingInput<T>, 'targetPageId' | 'includeCards'>): R[] {
+T extends PageNode = PageNode> ({ items, rootPageIds }: Omit<PageTreeMappingInput<T>, 'targetPageId' | 'includeCards'>): PageNodeWithChildren<T>[] {
   const { rootNodes } = reducePagesToPageTree({ items, rootPageIds, includeCards: false });
 
-  return sortNodes(rootNodes) as R[];
+  return sortNodes(rootNodes) as PageNodeWithChildren<T>[];
 }
 
 /**

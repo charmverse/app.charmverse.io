@@ -108,7 +108,7 @@ function PageNavigation ({
   const pageHash = JSON.stringify(pagesArray);
 
   const mappedItems = useMemo(() => {
-    return mapPageTree<MenuNode, ParentMenuNode>({ items: pagesArray, rootPageIds });
+    return mapPageTree<MenuNode>({ items: pagesArray, rootPageIds });
   }, [pageHash, rootPageIds]);
 
   const onDropAdjacent = useCallback((droppedItem: ParentMenuNode, containerItem: MenuNode) => {
