@@ -1,11 +1,12 @@
 import { useTheme } from '@emotion/react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Box, FormLabel, IconButton, Stack, TextField } from '@mui/material';
-import { PaymentMethod } from '@prisma/client';
+import { Box, Divider, FormLabel, IconButton, Stack, TextField } from '@mui/material';
+import { BountyStatus, PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
-import { BountyStatusChip } from 'components/bounties/components/BountyStatusBadge';
+import BountyStatusBadge, { BountyStatusChip } from 'components/bounties/components/BountyStatusBadge';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
+import Button from 'components/common/Button';
 import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
@@ -144,55 +145,8 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
     refreshBountyPermissions(currentBounty.id);
   }, []);
 
-  return (
-    <Box
-      className='octo-propertylist CardDetailProperties'
-      sx={{
-        '& .MuiInputBase-input': {
-          background: 'none'
-        }
-      }}
-    >
-      {/* <div className='octo-propertyrow'>
-        <div className='octo-propertyname'>Status</div>
-        <BountyStatusChip
-          size='small'
-          status={currentBounty.status}
-        />
-      </div> */}
-      <div
-        className='octo-propertyrow'
-        style={{
-          height: 'fit-content'
-        }}
-      >
-        <div className='octo-propertyname'>Reviewer</div>
-        <InputSearchReviewers
-          disabled={!canEdit}
-          readOnly={!canEdit}
-          value={permissions?.bountyPermissions?.reviewer ?? []}
-          disableCloseOnSelect={true}
-          onChange={async (e, options) => {
-            const roles = options.filter(option => option.group === 'role');
-            const contributors = options.filter(option => option.group === 'user');
-
-            await updateBounty(currentBounty.id, {
-              permissions: rollupPermissions({
-                assignedRoleSubmitters,
-                selectedReviewerRoles: roles.map(role => role.id),
-                selectedReviewerUsers: contributors.map(contributor => contributor.id),
-                spaceId: space!.id
-              })
-            });
-            await refreshBountyPermissions(currentBounty.id);
-          }}
-          excludedIds={[...selectedReviewerUsers, ...selectedReviewerRoles]}
-          sx={{
-            width: 500
-          }}
-        />
-      </div>
-
+  const bountyProperties = (
+    <>
       <div className='octo-propertyrow'>
         <div className='octo-propertyname'>Chain</div>
         <InputSearchBlockchain
@@ -349,7 +303,79 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
         )}
       </>
       )}
+    </>
+  );
 
+  return (
+    <Box
+      className='octo-propertylist CardDetailProperties'
+      sx={{
+        '& .MuiInputBase-input': {
+          background: 'none'
+        }
+      }}
+    >
+      {/* <div className='octo-propertyrow'>
+        <div className='octo-propertyname'>Status</div>
+        <BountyStatusChip
+          size='small'
+          status={currentBounty.status}
+        />
+      </div> */}
+      <Stack flexDirection='row' justifyContent='space-between' gap={2} alignItems='center'>
+        <div
+          className='octo-propertyrow'
+          style={{
+            height: 'fit-content',
+            flexGrow: 1
+          }}
+        >
+          <div className='octo-propertyname'>Reviewer</div>
+          <InputSearchReviewers
+            disabled={!canEdit}
+            readOnly={!canEdit}
+            value={permissions?.bountyPermissions?.reviewer ?? []}
+            disableCloseOnSelect={true}
+            onChange={async (e, options) => {
+              const roles = options.filter(option => option.group === 'role');
+              const contributors = options.filter(option => option.group === 'user');
+
+              await updateBounty(currentBounty.id, {
+                permissions: rollupPermissions({
+                  assignedRoleSubmitters,
+                  selectedReviewerRoles: roles.map(role => role.id),
+                  selectedReviewerUsers: contributors.map(contributor => contributor.id),
+                  spaceId: space!.id
+                })
+              });
+              await refreshBountyPermissions(currentBounty.id);
+            }}
+            excludedIds={[...selectedReviewerUsers, ...selectedReviewerRoles]}
+            sx={{
+              width: '100%'
+            }}
+          />
+        </div>
+        <Box my={1} display='flex' justifyContent='flex-start' width='fit-content'>
+          <BountyStatusBadge
+            bounty={currentBounty}
+            truncate
+          />
+        </Box>
+      </Stack>
+
+      {canEdit && bountyProperties}
+      <Divider sx={{
+        my: 2
+      }}
+      />
+      <Stack justifyContent='center' width='100%' flexDirection='row' my={2}>
+        <Button sx={{
+          width: 'fit-content'
+        }}
+        >Apply
+        </Button>
+      </Stack>
     </Box>
   );
 }
