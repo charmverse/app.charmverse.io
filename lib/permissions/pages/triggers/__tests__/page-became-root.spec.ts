@@ -1,4 +1,5 @@
 
+import { PagePermission } from '@prisma/client';
 import { prisma } from 'db';
 import { flattenTree } from 'lib/pages/mapPageTree';
 import { getPage, IPageWithPermissions } from 'lib/pages/server';
@@ -175,4 +176,77 @@ describe('setupPermissionsAfterPageRepositioned / page became root', () => {
     expect(stillHasLocalPermission).toBe(true);
 
   });
+});
+
+describe('setupPermissionsAfterPageRepositioned / page repositioned below other page', () => {
+  it('should establish an inheritance link with the parent if it has at least the same amount of permissions', async () => {
+
+    const { user, space } = await generateUserAndSpaceWithApiToken();
+
+    const root = await createPage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    const rootPermission = await upsertPermission(root.id, {
+      permissionLevel: 'full_access',
+      spaceId: space.id
+    });
+
+    const root2 = await createPage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    const root2Permission = await upsertPermission(root2.id, {
+      permissionLevel: 'full_access',
+      spaceId: space.id
+    });
+
+    const root2UserPermission = await upsertPermission(root2.id, {
+      permissionLevel: 'editor',
+      userId: user.id
+    });
+
+    const child = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      parentId: root.id
+    });
+
+    const childPermission = await upsertPermission(child.id, rootPermission.id);
+
+    const secondChildPermission = await upsertPermission(child.id, {
+      permissionLevel: 'full_access',
+      userId: user.id
+    });
+
+    // Set the child to have no parent
+    await prisma.page.update({
+      where: {
+        id: child.id
+      },
+      data: {
+        parentId: root2.id
+      }
+    });
+
+    const updatedPage = await setupPermissionsAfterPageRepositioned(child.id);
+
+    expect(updatedPage.permissions.length).toBe(2);
+
+    const childSpacePermission = updatedPage.permissions.find(permission => permission.spaceId === space.id) as PagePermission;
+
+    const childUserPermission = updatedPage.permissions.find(permission => permission.userId === user.id) as PagePermission;
+
+    // Permission is same as parent, so we can update it to inherit from there
+    expect(childSpacePermission.permissionLevel).toBe('full_access');
+    expect(childSpacePermission.inheritedFromPermission).toBe(root2Permission.id);
+
+    // The permission should have been maintained without modification or inheritance
+    expect(childUserPermission.permissionLevel).toBe('full_access');
+    expect(childUserPermission.inheritedFromPermission).toBeNull();
+
+  });
+
 });

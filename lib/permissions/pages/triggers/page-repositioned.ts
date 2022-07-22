@@ -43,7 +43,7 @@ export async function setupPermissionsAfterPageRepositioned (pageId: string | IP
 
     if (parent && hasSameOrMorePermissions(parent.permissions, updatedPage.permissions)) {
       const permissionsToCopy = parent.permissions.filter(p => {
-        const matchingGroupPermission = findExistingPermissionForGroup(p, updatedPage.permissions);
+        const matchingGroupPermission = findExistingPermissionForGroup(p, updatedPage.permissions, true);
 
         return matchingGroupPermission?.permissionLevel === p.permissionLevel;
       });
