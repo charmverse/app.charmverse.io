@@ -6,8 +6,7 @@ import charmClient from 'charmClient';
 import { BountyStatusChip } from 'components/bounties/components/BountyStatusBadge';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
 import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
-import { InputSearchContributorMultiple } from 'components/common/form/InputSearchContributor';
-import InputSearchContributorsRoles from 'components/common/form/InputSearchContributorsRoles';
+import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 import SelectMenu, { MenuOption } from 'components/common/Menu';
@@ -94,10 +93,10 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
   const selectedReviewerRoles = bountyPermissions?.reviewer?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
 
   async function refreshBountyPermissions (bountyId: string) {
-    setBountyPermissions(null);
-    charmClient.computeBountyPermissions({
+    const permissions = await charmClient.computeBountyPermissions({
       resourceId: bountyId
-    }).then(data => setBountyPermissions(data.bountyPermissions));
+    });
+    setBountyPermissions(permissions.bountyPermissions);
   }
 
   function refreshCryptoList (chainId: number, rewardToken?: string) {
@@ -193,26 +192,34 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
           status={currentBounty.status}
         />
       </div>
-      <div className='octo-propertyrow'>
+      <div
+        className='octo-propertyrow'
+        style={{
+          height: 'fit-content'
+        }}
+      >
         <div className='octo-propertyname'>Reviewer</div>
-        <InputSearchContributorsRoles
-          defaultValue={selectedReviewerRoles}
+        <InputSearchReviewers
+          value={bountyPermissions?.reviewer ?? []}
           disableCloseOnSelect={true}
-          onChange={async (e, roles) => {
+          onChange={async (e, options) => {
+            const roles = options.filter(option => option.group === 'role');
+            const contributors = options.filter(option => option.group === 'user');
+
             await updateBounty(currentBounty.id, {
               permissions: rollupPermissions({
                 assignedRoleSubmitters,
-                selectedReviewerRoles: (roles as any[]).map(role => role.id),
-                selectedReviewerUsers,
+                selectedReviewerRoles: roles.map(role => role.id),
+                selectedReviewerUsers: contributors.map(contributor => contributor.id),
                 spaceId: space!.id,
                 submitterMode
               })
             });
-            refreshBountyPermissions(currentBounty.id);
+            await refreshBountyPermissions(currentBounty.id);
           }}
-          excludedIds={selectedReviewerRoles}
+          excludedIds={[...selectedReviewerUsers, ...selectedReviewerRoles]}
           sx={{
-            width: 250
+            width: 500
           }}
         />
       </div>
@@ -328,7 +335,7 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
                   submitterMode
                 })
               });
-              refreshBountyPermissions(currentBounty.id);
+              await refreshBountyPermissions(currentBounty.id);
             }}
             filter={{ mode: 'exclude', userIds: assignedRoleSubmitters }}
             showWarningOnNoRoles={true}
