@@ -81,15 +81,17 @@ export function generateReplaceIllegalPermissions ({ parents, targetPage }: Targ
 
         const canInherit = hasSameOrMorePermissions(parent.permissions, targetPage.permissions);
 
-        if (canInherit) {
+        // Make sure the parent will have a permission to inherit from
+        // This logic was added to deal with an edge case where a page had an extra permission from an old parent which became a sibling, and the parent did not have this permission
+        const newParentPermissionRef = findExistingPermissionForGroup(illegalSourcePagePermission, parent.permissions) as PagePermission;
 
-          // Find the new source permission
-          const newPermissionRef = findExistingPermissionForGroup(illegalSourcePagePermission, parent.permissions) as PagePermission;
+        if (canInherit && newParentPermissionRef) {
 
           oldNewMap.push({
             oldSourcePermissionId: illegalPermissionRef,
-            newSourcePermissionId: newPermissionRef.id
+            newSourcePermissionId: newParentPermissionRef.id
           });
+
         }
         else {
           pagePermissionsToDisconnect.push({

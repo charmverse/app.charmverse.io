@@ -12,8 +12,6 @@ let user: User;
 let space: Space;
 let cookie: string;
 
-jest.setTimeout(1000000);
-
 beforeAll(async () => {
   const generated = await generateUserAndSpaceWithApiToken(v4());
 
