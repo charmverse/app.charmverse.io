@@ -16,15 +16,12 @@ import { Modal } from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
 import { useBounties } from 'hooks/useBounties';
 import { useContributors } from 'hooks/useContributors';
-import useIsAdmin from 'hooks/useIsAdmin';
 import useRoles from 'hooks/useRoles';
 import { useUser } from 'hooks/useUser';
 import { applicantIsSubmitter, moveUserApplicationToFirstRow, submissionsCapReached } from 'lib/applications/shared';
+import { AssignedBountyPermissions, humaniseBountyAccessConditions } from 'lib/bounties/client';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { AssignedBountyPermissions, BountyPermissions, humaniseBountyAccessConditions } from 'lib/bounties/client';
-import { useMemo } from 'react';
-import { Roleup } from 'lib/roles/interfaces';
 import { ApplicationEditorForm } from './ApplicationEditorForm';
 
 export interface IBountyApplicantListProps {

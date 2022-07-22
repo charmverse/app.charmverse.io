@@ -15,6 +15,7 @@ import { CryptoCurrency, getChainById } from 'connectors';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
+import { useUser } from 'hooks/useUser';
 import { AssignedBountyPermissions, BountyPermissions, UpdateableBountyFields } from 'lib/bounties';
 import { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import debouncePromise from 'lib/utilities/debouncePromise';
@@ -74,12 +75,15 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
   const [currentBounty, setCurrentBounty] = useState<BountyWithDetails>(bounty);
   const [capSubmissions, setCapSubmissions] = useState(currentBounty.maxSubmissions !== null);
   const [space] = useCurrentSpace();
+  const [user] = useUser();
   const [permissions, setPermissions] = useState<AssignedBountyPermissions | null>(null);
   const assignedRoleSubmitters = permissions?.bountyPermissions?.submitter?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
   const selectedReviewerUsers = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'user').map(p => p.id as string) ?? [];
   const selectedReviewerRoles = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
-
+  const [isApplyingBounty, setIsApplyingBounty] = useState(false);
+  const [applicationMessage, setApplicationMessage] = useState('');
   const canEdit = !readOnly && permissions?.userPermissions.edit;
+  const userApplication = currentBounty.applications.find(application => application.createdBy === user?.id);
 
   async function refreshBountyPermissions (bountyId: string) {
     setPermissions(await charmClient.computeBountyPermissions({
@@ -396,20 +400,71 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
       </>
       )}
 
-      {!canEdit && permissions?.userPermissions?.work && (
+      {!canEdit && permissions?.userPermissions?.work && !isApplyingBounty && !userApplication && (
         <>
           <Divider sx={{
             my: 2
           }}
           />
           <Stack justifyContent='center' width='100%' flexDirection='row' my={2}>
-            <Button sx={{
-              width: 'fit-content'
-            }}
+            <Button
+              sx={{
+                width: 'fit-content'
+              }}
+              onClick={() => setIsApplyingBounty(true)}
             >Apply
             </Button>
           </Stack>
         </>
+      )}
+
+      {isApplyingBounty && !userApplication && (
+      <>
+        <FormLabel sx={{
+          fontWeight: 'bold',
+          mb: 1,
+          mt: 2
+        }}
+        >Application
+        </FormLabel>
+        <Stack alignItems='center' gap={2}>
+          <TextField
+            autoFocus
+            placeholder='Explain why you are the right person or team to work on this bounty.'
+            minRows={5}
+            multiline
+            variant='outlined'
+            type='text'
+            fullWidth
+            value={applicationMessage}
+            onChange={(ev) => {
+              const newText = ev.target.value;
+              setApplicationMessage(newText);
+            }}
+          />
+          <Stack justifyContent='center' gap={1} flexDirection='row'>
+            <Button
+              color='error'
+              onClick={async () => {
+                await charmClient.createApplication({
+                  bountyId: currentBounty.id,
+                  status: 'applied',
+                  message: applicationMessage
+                });
+                setApplicationMessage('');
+                setIsApplyingBounty(false);
+              }}
+            >Cancel
+            </Button>
+            <Button onClick={() => {
+              setApplicationMessage('');
+              setIsApplyingBounty(false);
+            }}
+            >Apply
+            </Button>
+          </Stack>
+        </Stack>
+      </>
       )}
     </Box>
   );

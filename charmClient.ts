@@ -457,7 +457,7 @@ class CharmClient {
     return data;
   }
 
-  async createApplication (application: Application): Promise<Application> {
+  async createApplication (application: Pick<Application, 'bountyId' | 'message' | 'status'>): Promise<Application> {
 
     const data = await http.POST<Application>('/api/applications', application);
 

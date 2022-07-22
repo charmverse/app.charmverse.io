@@ -1,8 +1,9 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { ButtonProps, Divider } from '@mui/material';
+import { Divider } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Grid from '@mui/material/Grid';
+import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
 import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
@@ -10,6 +11,7 @@ import Typography from '@mui/material/Typography';
 import { Bounty, PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
+import CharmEditor, { ICharmEditorOutput, UpdatePageContent } from 'components/common/CharmEditor/CharmEditor';
 import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
 import { InputSearchContributorMultiple } from 'components/common/form/InputSearchContributor';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
@@ -29,7 +31,7 @@ import { SystemError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
 import { BountyWithDetails, PageContent } from 'models';
 import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, UseFormWatch } from 'react-hook-form';
 import * as yup from 'yup';
 
 export type FormMode = 'create' | 'update' | 'suggest';
@@ -97,11 +99,38 @@ interface IBountyEditorInput {
   bounty?: Partial<Bounty>
   permissions?: AssignedBountyPermissions
   focusKey?: keyof FormValues
-  onCancel?: ButtonProps['onClick']
 }
 
-export default function BountyEditorForm ({ onCancel, onSubmit, bounty, mode = 'create', focusKey, permissions: receivedPermissions }: IBountyEditorInput) {
+// This component was created to localize the state change of CharmEditor
+// Otherwise watching inside its parent would've caused the whole component tree to rerender
+function FormDescription ({ onContentChange, content, watch }:
+  {content?: PageContent, onContentChange: UpdatePageContent, watch: UseFormWatch<FormValues>}) {
+  watch(['description', 'descriptionNodes']);
+
+  return (
+    <Grid
+      item
+      sx={{
+        '&.MuiGrid-item': {
+          maxWidth: '100%'
+        }
+      }}
+    >
+      <InputLabel>
+        Description
+      </InputLabel>
+      <CharmEditor
+        disablePageSpecificFeatures
+        content={content}
+        onContentChange={onContentChange}
+      />
+    </Grid>
+  );
+}
+
+export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', focusKey, permissions: receivedPermissions }: IBountyEditorInput) {
   const { setBounties, bounties, updateBounty } = useBounties();
+
   const defaultChainId = bounty?.chainId ?? 1;
 
   const [userSpacePermissions] = useCurrentSpacePermissions();
@@ -111,13 +140,15 @@ export default function BountyEditorForm ({ onCancel, onSubmit, bounty, mode = '
 
   const [bountyApplicantPool, setBountyApplicantPool] = useState<BountySubmitterPoolSize | null>(null);
 
-  const [permissions] = useState<Partial<BountyPermissions>>(receivedPermissions?.bountyPermissions ?? {});
+  const [permissions, setPermissions] = useState<Partial<BountyPermissions>>(receivedPermissions?.bountyPermissions ?? {});
 
   useEffect(() => {
     if (bounty) {
       setBountyApplicantPool(null);
       refreshBountyApplicantPool();
+
     }
+
   }, [bounty, permissions]);
 
   // Cached description for when user is creating or suggesting a new bounty
@@ -137,10 +168,10 @@ export default function BountyEditorForm ({ onCancel, onSubmit, bounty, mode = '
   } = useForm<FormValues>({
     mode: 'onChange',
     defaultValues: {
-      rewardToken: 'ETH',
+      rewardToken: 'ETH' as CryptoCurrency,
       // TBC till we agree on Prisma migration
-      chainId: defaultChainId,
-      maxSubmissions: 1,
+      chainId: defaultChainId as any,
+      maxSubmissions: 1 as any,
       approveSubmitters: true,
       capSubmissions: !((bounty && bounty?.maxSubmissions === null)),
       // expiryDate: null,
@@ -189,6 +220,7 @@ export default function BountyEditorForm ({ onCancel, onSubmit, bounty, mode = '
     if (calculation.mode === 'role') {
       setSubmitterMode('role');
     }
+
   }
 
   useEffect(() => {
@@ -274,7 +306,7 @@ export default function BountyEditorForm ({ onCancel, onSubmit, bounty, mode = '
         value.description = value.description ?? '';
         value.descriptionNodes = value.descriptionNodes ?? '';
         value.status = 'open';
-        value.linkedTaskId = bounty?.linkedTaskId ?? null;
+
         (value as BountyCreationData).permissions = permissionsToSet;
         const createdBounty = await charmClient.createBounty(value);
         const populatedBounty = { ...createdBounty, applications: [] };
@@ -338,6 +370,18 @@ export default function BountyEditorForm ({ onCancel, onSubmit, bounty, mode = '
 
   }
 
+  function setRichContent (content: ICharmEditorOutput) {
+    setValue('descriptionNodes', content.doc);
+    setValue('description', content.rawText);
+
+    if (!bounty) {
+      setCachedBountyDescription({
+        nodes: content.doc,
+        text: content.rawText
+      });
+    }
+  }
+
   function setChainId (_chainId: number) {
     setValue('chainId', _chainId);
     refreshCryptoList(_chainId);
@@ -378,6 +422,31 @@ export default function BountyEditorForm ({ onCancel, onSubmit, bounty, mode = '
     <div>
       <form onSubmit={handleSubmit(val => submitted(val as any))} style={{ margin: 'auto' }}>
         <Grid container direction='column' spacing={3}>
+          <Grid item>
+            <InputLabel>
+              Bounty title
+            </InputLabel>
+            <Input
+              {...register('title')}
+              type='text'
+              fullWidth
+            />
+            {
+              errors?.title && (
+              <Alert severity='error'>
+                {errors.title.message}
+              </Alert>
+              )
+            }
+          </Grid>
+
+          <FormDescription
+            watch={watch}
+//            content={bounty?.descriptionNodes as PageContent ?? cachedBountyDescription.nodes as PageContent}
+            content={values.descriptionNodes}
+            onContentChange={setRichContent}
+          />
+
           {
             mode !== 'suggest' && userSpacePermissions?.createBounty && (
               <>
@@ -551,6 +620,7 @@ export default function BountyEditorForm ({ onCancel, onSubmit, bounty, mode = '
                             setValue('capSubmissions', newValue, {
                               shouldValidate: true
                             });
+
                             // eslint-disable-next-line no-restricted-globals
                             if (newValue === false && isNaN(values.maxSubmissions as any)) {
                               setValue('maxSubmissions', null, {
@@ -560,7 +630,7 @@ export default function BountyEditorForm ({ onCancel, onSubmit, bounty, mode = '
                           }}
                           defaultChecked={values.capSubmissions}
                         />
-                      )}
+              )}
                     />
                   </Grid>
                   <Grid item xs={6}>
@@ -619,18 +689,6 @@ export default function BountyEditorForm ({ onCancel, onSubmit, bounty, mode = '
             >
               {bountyFormTitles[mode]}
             </Button>
-            {onCancel && (
-            <Button
-              loading={isSubmitting}
-              color='error'
-              sx={{
-                ml: 2
-              }}
-              onClick={onCancel}
-            >
-              Cancel
-            </Button>
-            )}
           </Grid>
         </Grid>
       </form>
