@@ -95,9 +95,7 @@ export async function computeUserPagePermissions ({ pageId, allowAdminBypass = t
   // TODO DELETE LATER when we remove admin access to workspace
   if (foundSpaceRole && foundSpaceRole.isAdmin === true && allowAdminBypass) {
 
-    const fullPermissions = Object.keys(PageOperations) as PageOperationType [];
-
-    return new AllowedPagePermissions(fullPermissions);
+    return new AllowedPagePermissions().full;
   }
 
   const computedPermissions = new AllowedPagePermissions();
@@ -110,7 +108,7 @@ export async function computeUserPagePermissions ({ pageId, allowAdminBypass = t
     computedPermissions.addPermissions(permissionsToAdd);
   });
 
-  return computedPermissions;
+  return computedPermissions.operationFlags;
 
 }
 
