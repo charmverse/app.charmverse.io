@@ -250,7 +250,7 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
           <div className='octo-propertyname'>Applicant Role(s)</div>
           <InputSearchRoleMultiple
             disableCloseOnSelect={true}
-            value={assignedRoleSubmitters}
+            defaultValue={assignedRoleSubmitters}
             onChange={async (roleIds) => {
               await updateBounty(currentBounty.id, {
                 permissions: rollupPermissions({
@@ -365,7 +365,7 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
 
       {canEdit && bountyProperties}
 
-      {!canEdit && (
+      {!canEdit && permissions?.userPermissions?.work && (
         <>
           <Divider sx={{
             my: 2
