@@ -77,8 +77,8 @@ const KanbanCard = React.memo((props: Props) => {
 
   const { bounties } = useBounties()
   const linkedBounty = bounties.find(bounty => bounty.linkedTaskId === card.id);
-
-  const comments = useAppSelector(getCardComments(card.id))
+  console.log({linkedBounty});
+  
   const { pages, getPagePermissions } = usePages()
   const cardPage = pages[card.id]
 
@@ -182,7 +182,7 @@ const KanbanCard = React.memo((props: Props) => {
         }
 
         <div className='octo-icontitle'>
-            <div>
+          <div>
             {cardPage?.icon ? <PageIcon isEditorEmpty={checkForEmpty(cardPage?.content as PageContent)} pageType="page" icon={cardPage.icon} /> : undefined}
             </div>
             <div
@@ -190,7 +190,7 @@ const KanbanCard = React.memo((props: Props) => {
               className='octo-titletext'
             >
               {cardPage?.title || intl.formatMessage({ id: 'KanbanCard.untitled', defaultMessage: 'Untitled' })}
-            </div>
+          </div>
         </div>
         {visiblePropertyTemplates.map((template) => (
           <Tooltip

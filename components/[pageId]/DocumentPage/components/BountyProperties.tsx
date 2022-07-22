@@ -106,6 +106,7 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
       setAvailableCryptos(cryptosToDisplay);
       setCurrentBounty((_currentBounty) => ({ ..._currentBounty, rewardToken: rewardToken || nativeCurrency }));
     }
+    return selectedChain?.nativeCurrency.symbol;
   }
 
   function onNewPaymentMethod (paymentMethod: PaymentMethod) {
@@ -142,7 +143,11 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
   }, []);
 
   useEffect(() => {
-    refreshCryptoList(currentBounty.chainId);
+    const newNativeCurrency = refreshCryptoList(currentBounty.chainId);
+    updateBounty(currentBounty.id, {
+      chainId: currentBounty.chainId,
+      rewardToken: newNativeCurrency
+    });
   }, [currentBounty.chainId]);
 
   return (
@@ -194,9 +199,6 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
           }}
           onChange={(chainId) => {
             setCurrentBounty((_currentBounty) => ({ ..._currentBounty, chainId }));
-            updateBounty(currentBounty.id, {
-              chainId
-            });
           }}
         />
       </div>
