@@ -1,21 +1,16 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import OpenInFullIcon from '@mui/icons-material/OpenInFull'
-import { ButtonProps } from '@mui/material'
 import { Box } from '@mui/system'
 import { Bounty } from '@prisma/client'
 import charmClient from 'charmClient'
-import BountyEditorForm from 'components/bounties/components/BountyEditorForm'
-import BountyDetails from 'components/bounties/[bountyId]/BountyDetails'
 import Button from "components/common/Button"
-import BountyIntegration from 'components/[pageId]/DocumentPage/components/BountyIntegration'
 import { useBounties } from 'hooks/useBounties'
 import { useCurrentSpace } from 'hooks/useCurrentSpace'
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions'
 import { usePages } from 'hooks/usePages'
+import { useSnackbar } from 'hooks/useSnackbar'
 import { useUser } from 'hooks/useUser'
-import { log } from 'loglevel'
-import { BountyWithDetails } from 'models'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { FormattedMessage, useIntl } from 'react-intl'
@@ -30,7 +25,6 @@ import Menu from '../widgets/menu'
 import CardDetail from './cardDetail/cardDetail'
 import ConfirmationDialogBox, { ConfirmationDialogBoxProps } from './confirmationDialogBox'
 import Dialog from './dialog'
-import { sendFlashMessage } from './flashMessages'
 
 type Props = {
     board: Board
@@ -45,7 +39,6 @@ function CreateBountyButton (props: Pick<Bounty, "linkedTaskId" | "title">) {
   const { setBounties } = useBounties();
   const [user] = useUser();
   const [space] = useCurrentSpace();
-
   const [userSpacePermissions] = useCurrentSpacePermissions();
 
   return (
@@ -85,6 +78,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
     const cardPage = pages[cardId]
     const { bounties } = useBounties();
     const bounty = bounties.find(bounty => bounty.linkedTaskId === cardId);
+    const { showMessage } = useSnackbar()
     
     const handleDeleteCard = async () => {
         if (!card) {
@@ -117,7 +111,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
         setShowConfirmationDialogBox(true)
     }
 
-    const menu = <>
+    const menu = 
           <Menu position='bottom-end'>
               <Menu.Text
                   id='delete'
@@ -139,12 +133,18 @@ const CardDialog = (props: Props): JSX.Element | null => {
                           cardLink = newUrl.toString()
                       }
 
-                      Utils.copyTextToClipboard(cardLink)
-                      sendFlashMessage({content: intl.formatMessage({id: 'CardDialog.copiedLink', defaultMessage: 'Copied!'}), severity: 'high'})
-                  }}
-              />
-          </Menu>
-    </>
+                    Utils.copyTextToClipboard(cardLink)
+                    showMessage('Copied card link to clipboard', 'success')
+                }}
+            />
+            {/* {(card && !card.fields.isTemplate) &&
+                <Menu.Text
+                    id='makeTemplate'
+                    name='New template from card'
+                    onClick={makeTemplateClicked}
+                />
+            } */}
+        </Menu>
 
     return card && pages[card.id] ? (
         <>

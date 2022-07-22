@@ -29,12 +29,12 @@ export default function CreateSpace () {
   }
 
   return (
-    <Box sx={{ width: 400, maxWidth: '100%', mx: 'auto' }}>
+    <Box sx={{ width: 400, maxWidth: '100%', mx: 'auto', px: 2 }}>
       <Card sx={{ p: 4, mb: 3 }} variant='outlined'>
         <CreateSpaceForm onSubmit={addSpace} submitText='Get Started' />
       </Card>
       <AlternateRouteButton href='/join'>
-        Join an existing workspace
+        Join a workspace
       </AlternateRouteButton>
     </Box>
   );

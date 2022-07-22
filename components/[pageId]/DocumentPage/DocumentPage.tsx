@@ -4,21 +4,21 @@ import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/c
 import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
 import { getCardComments } from 'components/common/BoardEditor/focalboard/src/store/comments';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
+import { useBounties } from 'hooks/useBounties';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
 import { useVotes } from 'hooks/useVotes';
-import { BountyWithDetails, Page, PageContent } from 'models';
+import { Page, PageContent } from 'models';
 import { useRouter } from 'next/router';
 import { memo, useCallback } from 'react';
-import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
-import { useBounties } from 'hooks/useBounties';
 import CharmEditor, { ICharmEditorOutput } from '../../common/CharmEditor/CharmEditor';
+import BountyProperties from './components/BountyProperties';
+import CreateVoteBox from './components/CreateVoteBox';
 import PageBanner from './components/PageBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
 import PageHeader from './components/PageHeader';
-import CreateVoteBox from './components/CreateVoteBox';
-import BountyProperties from './components/BountyProperties';
 
 export const Container = styled(Box)<{ top: number, fullWidth?: boolean }>`
   width: ${({ fullWidth }) => fullWidth ? '100%' : '860px'};
@@ -28,8 +28,8 @@ export const Container = styled(Box)<{ top: number, fullWidth?: boolean }>`
   top: ${({ top }) => top}px;
   padding-bottom: ${({ theme }) => theme.spacing(5)};
 
-  padding: 0 40px;
-  @media (min-width: 975px) {
+  padding: 0 24px;
+  ${({ theme }) => theme.breakpoints.up('md')} {
     padding: 0 80px;
   }
 `;
@@ -132,32 +132,34 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
               </Box>
             )}
             {card && board && (
-              <div className='CardDetail content'>
-                {/* Property list */}
-                <CardDetailProperties
-                  board={board}
-                  card={card}
-                  cards={cards}
-                  activeView={activeView}
-                  views={boardViews}
-                  readonly={readOnly}
-                  pageUpdatedAt={page.updatedAt.toString()}
-                  pageUpdatedBy={page.updatedBy}
-                />
-                {bounty && (
-                <>
-                  <hr />
-                  <BountyProperties bounty={bounty} readOnly={readOnly} />
-                </>
-                )}
-                <hr />
-                <CommentsList
-                  comments={comments}
-                  rootId={card.rootId}
-                  cardId={card.id}
-                  readonly={readOnly}
-                />
 
+              <div className='focalboard-body'>
+                <div className='CardDetail content'>
+                  {/* Property list */}
+                  <CardDetailProperties
+                    board={board}
+                    card={card}
+                    cards={cards}
+                    activeView={activeView}
+                    views={boardViews}
+                    readonly={readOnly}
+                    pageUpdatedAt={page.updatedAt.toString()}
+                    pageUpdatedBy={page.updatedBy}
+                  />
+                  {bounty && (
+                  <>
+                    <hr />
+                    <BountyProperties bounty={bounty} readOnly={readOnly} />
+                  </>
+                  )}
+                  <hr />
+                  <CommentsList
+                    comments={comments}
+                    rootId={card.rootId}
+                    cardId={card.id}
+                    readonly={readOnly}
+                  />
+                </div>
               </div>
             )}
           </CharmEditor>

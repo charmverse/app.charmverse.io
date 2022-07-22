@@ -7,7 +7,8 @@ import { Constants } from '../constants';
 import mutator from '../mutator';
 import Button from 'components/common/Button';
 import { Utils } from '../utils';
-import AddIcon from '../widgets/icons/add';
+import { Add } from '@mui/icons-material';
+import { IconButton } from '@mui/material';
 import BoardIcon from '../widgets/icons/board';
 import CalendarIcon from '../widgets/icons/calendar';
 import ListItemText from '@mui/material/ListItemText';
@@ -25,12 +26,12 @@ type AddViewProps = {
   activeView: BoardView,
   views: BoardView[],
   intl: IntlShape,
+  showLabel?: boolean,
   showView: (viewId: string) => void,
   sx?: SxProps
 }
 
-const AddButton = styled(Button)`
-  font-size: 13.5px !important;
+const StyledIconButton = styled(IconButton)`
   position: relative;
   top: -3px;
 `;
@@ -42,10 +43,6 @@ function AddViewMenu (props: AddViewProps) {
 
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-view-menu' });
 
-  const addViewText = intl.formatMessage({
-      id: 'View.AddView',
-      defaultMessage: 'Add view',
-  })
   const boardText = intl.formatMessage({
       id: 'View.Board',
       defaultMessage: 'Board',
@@ -183,16 +180,22 @@ function AddViewMenu (props: AddViewProps) {
 
   return (
     <>
-      <AddButton
-        {...bindTrigger(popupState)}
-        startIcon={<AddIcon />}
-        color='secondary'
-        size='small'
-        sx={{ px: 1.5, ...(props.sx ?? {}) }}
-        variant='text'
-      >
-        {addViewText}
-      </AddButton>
+      {props.showLabel ? (
+        <Button
+          {...bindTrigger(popupState)}
+          color='secondary'
+          size='small'
+          startIcon={<Add />}
+          variant='text'
+          sx={{ ...(props.sx ?? {}) }}
+        >
+          Add view
+        </Button>
+      ) : (
+        <StyledIconButton {...bindTrigger(popupState)} color='secondary' size='small'>
+          <Add fontSize='small' />
+        </StyledIconButton>
+      )}
       <Menu {...bindMenu(popupState)}>
         <MenuItem onClick={handleAddViewBoard}>
           <ListItemIcon><BoardIcon/></ListItemIcon>
