@@ -32,7 +32,9 @@ export function InputSearchCrypto ({
   value: parentValue,
   cryptoList = CryptoCurrencies,
   chainId,
-  sx = {}
+  sx = {},
+  disabled,
+  readOnly
 }: IInputSearchCryptoProps) {
 
   const [inputValue, setInputValue] = useState('');
@@ -127,6 +129,8 @@ export function InputSearchCrypto ({
             {...params}
           />
         )}
+        disabled={disabled}
+        readOnly={readOnly}
       />
 
       <Modal title='Add a custom ERC20 token' hideBackdrop={hideBackdrop} open={ERC20PopupState.isOpen} onClose={ERC20PopupState.close} size='500px'>

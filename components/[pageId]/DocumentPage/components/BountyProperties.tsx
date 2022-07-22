@@ -14,7 +14,7 @@ import { CryptoCurrency, getChainById } from 'connectors';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import { BountyPermissions, UpdateableBountyFields } from 'lib/bounties';
+import { AssignedBountyPermissions, BountyPermissions, UpdateableBountyFields } from 'lib/bounties';
 import { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import debouncePromise from 'lib/utilities/debouncePromise';
 import { isTruthy } from 'lib/utilities/types';
@@ -73,16 +73,17 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
   const [currentBounty, setCurrentBounty] = useState<BountyWithDetails>(bounty);
   const [capSubmissions, setCapSubmissions] = useState(currentBounty.maxSubmissions !== null);
   const [space] = useCurrentSpace();
-  const [bountyPermissions, setBountyPermissions] = useState<BountyPermissions | null>(null);
-  const assignedRoleSubmitters = bountyPermissions?.submitter?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
-  const selectedReviewerUsers = bountyPermissions?.reviewer?.filter(p => p.group === 'user').map(p => p.id as string) ?? [];
-  const selectedReviewerRoles = bountyPermissions?.reviewer?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
+  const [permissions, setPermissions] = useState<AssignedBountyPermissions | null>(null);
+  const assignedRoleSubmitters = permissions?.bountyPermissions?.submitter?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
+  const selectedReviewerUsers = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'user').map(p => p.id as string) ?? [];
+  const selectedReviewerRoles = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
+
+  const canEdit = !readOnly && permissions?.userPermissions.edit;
 
   async function refreshBountyPermissions (bountyId: string) {
-    const permissions = await charmClient.computeBountyPermissions({
+    setPermissions(await charmClient.computeBountyPermissions({
       resourceId: bountyId
-    });
-    setBountyPermissions(permissions.bountyPermissions);
+    }));
   }
 
   function refreshCryptoList (chainId: number, rewardToken?: string) {
@@ -143,14 +144,6 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
     refreshBountyPermissions(currentBounty.id);
   }, []);
 
-  useEffect(() => {
-    const newNativeCurrency = refreshCryptoList(currentBounty.chainId);
-    updateBounty(currentBounty.id, {
-      chainId: currentBounty.chainId,
-      rewardToken: newNativeCurrency
-    });
-  }, [currentBounty.chainId]);
-
   return (
     <Box
       className='octo-propertylist CardDetailProperties'
@@ -175,9 +168,9 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
       >
         <div className='octo-propertyname'>Reviewer</div>
         <InputSearchReviewers
-          disabled={readOnly}
-          readOnly={readOnly}
-          value={bountyPermissions?.reviewer ?? []}
+          disabled={!canEdit}
+          readOnly={!canEdit}
+          value={permissions?.bountyPermissions?.reviewer ?? []}
           disableCloseOnSelect={true}
           onChange={async (e, options) => {
             const roles = options.filter(option => option.group === 'role');
@@ -203,13 +196,18 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
       <div className='octo-propertyrow'>
         <div className='octo-propertyname'>Chain</div>
         <InputSearchBlockchain
-          disabled={readOnly}
-          readOnly={readOnly}
+          disabled={!canEdit}
+          readOnly={!canEdit}
           chainId={currentBounty.chainId}
           sx={{
             width: 250
           }}
-          onChange={(chainId) => {
+          onChange={async (chainId) => {
+            const newNativeCurrency = refreshCryptoList(currentBounty.chainId);
+            await updateBounty(currentBounty.id, {
+              chainId: currentBounty.chainId,
+              rewardToken: newNativeCurrency
+            });
             setCurrentBounty((_currentBounty) => ({ ..._currentBounty, chainId }));
           }}
         />
@@ -218,8 +216,8 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
       <div className='octo-propertyrow'>
         <div className='octo-propertyname'>Token</div>
         <InputSearchCrypto
-          disabled={readOnly}
-          readOnly={readOnly}
+          disabled={!canEdit}
+          readOnly={!canEdit}
           cryptoList={availableCryptos}
           chainId={currentBounty?.chainId}
           defaultValue={currentBounty?.rewardToken}
@@ -245,7 +243,7 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
           sx={{
             width: 250
           }}
-          disabled={readOnly}
+          disabled={!canEdit}
           value={currentBounty.rewardAmount}
           type='number'
           size='small'
@@ -286,7 +284,8 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
                 approveSubmitters: isOn
               });
             }}
-            readOnly={readOnly}
+            disabled={!canEdit}
+            readOnly={!canEdit}
           />
         </div>
         <div
@@ -312,8 +311,8 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
             }}
             filter={{ mode: 'exclude', userIds: assignedRoleSubmitters }}
             showWarningOnNoRoles={true}
-            disabled={readOnly}
-            readOnly={readOnly}
+            disabled={!canEdit}
+            readOnly={!canEdit}
           />
         </div>
         <div className='octo-propertyrow'>
@@ -327,7 +326,8 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
                 maxSubmissions: isOn ? (currentBounty.maxSubmissions ?? 1) : null
               });
             }}
-            readOnly={readOnly}
+            readOnly={!canEdit}
+            disabled={!canEdit}
           />
         </div>
         {capSubmissions && (
@@ -342,7 +342,7 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
             sx={{
               width: 250
             }}
-            disabled={readOnly}
+            disabled={!canEdit}
             onChange={updateBountyMaxSubmissions}
           />
         </div>

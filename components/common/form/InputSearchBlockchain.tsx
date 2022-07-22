@@ -16,7 +16,9 @@ export default function InputSearchBlockchain ({
   defaultChainId,
   chainId,
   onChange = () => {},
-  sx = {}
+  sx = {},
+  disabled,
+  readOnly
 }: Props) {
 
   const [value, setValue] = useState<IChainDetails | null>(null);
@@ -74,6 +76,8 @@ export default function InputSearchBlockchain ({
           }}
         />
       )}
+      disabled={disabled}
+      readOnly={readOnly}
     />
   );
 }
