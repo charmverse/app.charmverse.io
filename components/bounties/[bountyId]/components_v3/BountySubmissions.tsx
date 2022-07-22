@@ -1,6 +1,5 @@
 import { useTheme } from '@emotion/react';
 import AvatarGroup from '@mui/material/AvatarGroup';
-import Avatar from 'components/common/Avatar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
@@ -14,32 +13,33 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { Application, ApplicationStatus } from '@prisma/client';
 import charmClient from 'charmClient';
+import MultiPaymentModal from 'components/bounties/components/MultiPaymentModal';
+import Avatar from 'components/common/Avatar';
 import { Modal } from 'components/common/Modal';
+import UserDisplay from 'components/common/UserDisplay';
 import { useBounties } from 'hooks/useBounties';
 import { useContributors } from 'hooks/useContributors';
+import useIsAdmin from 'hooks/useIsAdmin';
+import useRoles from 'hooks/useRoles';
 import { useUser } from 'hooks/useUser';
+import { ApplicationWithTransactions } from 'lib/applications/actions';
 import { applicantIsSubmitter, countValidSubmissions, moveUserApplicationToFirstRow, submissionsCapReached } from 'lib/applications/shared';
+import { humaniseBountyAccessConditions } from 'lib/bounties/client';
+import { AssignedBountyPermissions } from 'lib/bounties/interfaces';
+import { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import { fancyTrim } from 'lib/utilities/strings';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useEffect, useState, useMemo } from 'react';
-import { BrandColor } from 'theme/colors';
-import { ApplicationWithTransactions } from 'lib/applications/actions';
-import MultiPaymentModal from 'components/bounties/components/MultiPaymentModal';
 import { BountyWithDetails, Contributor } from 'models';
-import useIsAdmin from 'hooks/useIsAdmin';
-import UserDisplay from 'components/common/UserDisplay';
-import { AssignedBountyPermissions, BountyReviewer } from 'lib/bounties/interfaces';
-import { humaniseBountyAccessConditions } from 'lib/bounties/client';
-import useRoles from 'hooks/useRoles';
-import { TargetPermissionGroup } from 'lib/permissions/interfaces';
-import WorkspaceAvatar from 'components/common/PageLayout/components/Sidebar/WorkspaceAvatar';
+import { useEffect, useMemo, useState } from 'react';
+import { BrandColor } from 'theme/colors';
+import BountySubmissionContent from '../../components/BountySubmissionContent';
 import BountySubmissionReviewActions from '../../components/BountySubmissionReviewActions';
 import SubmissionEditorForm from './SubmissionEditorForm';
-import BountySubmissionContent from '../../components/BountySubmissionContent';
 
 interface Props {
   bounty: BountyWithDetails
   permissions: AssignedBountyPermissions
+  showMetadata?: boolean
 }
 
 export const SubmissionStatusColors: Record<ApplicationStatus, BrandColor> = {
@@ -63,7 +63,7 @@ export const SubmissionStatusLabels: Record<ApplicationStatus, string> = {
 // Initial number of avatars we show, and the number to add each time the user clicks
 const defaultAvatarGroupIncrement = 2;
 
-export default function BountySubmissions ({ bounty, permissions }: Props) {
+export default function BountySubmissions ({ showMetadata = true, bounty, permissions }: Props) {
 
   const [user] = useUser();
   const [contributors] = useContributors();
@@ -192,6 +192,7 @@ export default function BountySubmissions ({ bounty, permissions }: Props) {
 
   return (
     <Box>
+      {showMetadata && (
       <Grid container sx={{ mb: 2 }}>
         <Grid container item xs={12} sx={{ mt: 3, mb: 4 }}>
           <Grid item xs={12}>
@@ -296,6 +297,7 @@ export default function BountySubmissions ({ bounty, permissions }: Props) {
         }
 
       </Grid>
+      )}
 
       <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
         <TableHead sx={{

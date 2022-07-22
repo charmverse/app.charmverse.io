@@ -1,30 +1,25 @@
-import { useTheme } from '@emotion/react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Box, Chip, Divider, FormLabel, IconButton, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField } from '@mui/material';
-import { Application, Bounty, PaymentMethod } from '@prisma/client';
+import { Box, FormLabel, IconButton, Stack, TextField } from '@mui/material';
+import { PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
 import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge';
 import { ApplicationEditorForm } from 'components/bounties/[bountyId]/components/ApplicationEditorForm';
 import { BountyApplicantList } from 'components/bounties/[bountyId]/components/BountyApplicantList';
-import { SubmissionStatusColors, SubmissionStatusLabels } from 'components/bounties/[bountyId]/components_v3/BountySubmissions';
-import BountySubmissionForm from 'components/bounties/[bountyId]/components_v3/SubmissionEditorForm';
+import BountyApplyButton from 'components/bounties/[bountyId]/components/BountyApplyButton';
+import BountySubmissions from 'components/bounties/[bountyId]/components_v3/BountySubmissions';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
-import Button from 'components/common/Button';
 import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
-import UserDisplay from 'components/common/UserDisplay';
 import { CryptoCurrency, getChainById } from 'connectors';
 import { useBounties } from 'hooks/useBounties';
-import { useContributors } from 'hooks/useContributors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
 import { AssignedBountyPermissions, BountyPermissions, UpdateableBountyFields } from 'lib/bounties';
 import { TargetPermissionGroup } from 'lib/permissions/interfaces';
-import { humanFriendlyDate } from 'lib/utilities/dates';
 import debouncePromise from 'lib/utilities/debouncePromise';
 import { isTruthy } from 'lib/utilities/types';
 import { BountyWithDetails } from 'models';
@@ -71,120 +66,6 @@ function rollupPermissions ({
   };
 
   return permissionsToSend;
-}
-
-interface UserBountySubmissionTableProps {
-  submission: Application
-  bounty: Bounty
-}
-
-function UserBountySubmissionTable ({ bounty, submission }: UserBountySubmissionTableProps) {
-  const theme = useTheme();
-  const [contributors] = useContributors();
-  const [isShowingSubmissionDetails, setIsShowingSubmissionDetails] = useState(false);
-  const [isShowingSubmissionForm, setIsShowingSubmissionForm] = useState(false);
-
-  return (
-    <>
-      <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
-        <TableHead sx={{
-          background: theme.palette.background.dark,
-          '.MuiTableCell-root': {
-            background: theme.palette.settingsHeader.background
-          }
-        }}
-        >
-          <TableRow>
-            {/* Width should always be same as Bounty Applicant list status column, so submitter and applicant columns align */}
-            <TableCell>
-              <Box sx={{
-                display: 'flex',
-                alignItems: 'center'
-              }}
-              >
-                Submitter
-              </Box>
-            </TableCell>
-            <TableCell sx={{ width: 120 }} align='left'>
-              Status
-            </TableCell>
-            <TableCell>
-              Last updated
-            </TableCell>
-            <TableCell align='center'>
-              Action
-            </TableCell>
-            <TableCell align='center'>
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          <TableCell size='small'>
-            {(() => {
-              const contributor = contributors.find(c => c.id === submission.createdBy);
-
-              if (contributor) {
-                return (
-                  <UserDisplay
-                    avatarSize='small'
-                    user={contributor}
-                    fontSize='small'
-                    linkToProfile
-                  />
-                );
-              }
-              return 'Anonymous';
-            })()}
-          </TableCell>
-          <TableCell size='small' align='left'>
-            <Box display='flex' gap={1}>
-              <Chip
-                label={SubmissionStatusLabels[submission.status]}
-                color={SubmissionStatusColors[submission.status]}
-              />
-            </Box>
-          </TableCell>
-          <TableCell>{ humanFriendlyDate(submission.updatedAt, { withTime: true })}</TableCell>
-          <TableCell align='center' sx={{ gap: 2, justifyContent: 'flex-end' }}>
-            <Button
-              disabled={submission.status !== 'inProgress'}
-              onClick={() => {
-                setIsShowingSubmissionForm(true);
-              }}
-            >
-              {submission.status === 'inProgress' ? 'Submit' : 'Awaiting approval'}
-            </Button>
-          </TableCell>
-          <TableCell align='center' sx={{ gap: 2, justifyContent: 'flex-end' }}>
-            <IconButton
-              size='small'
-              onClick={() => {
-                setIsShowingSubmissionDetails(!isShowingSubmissionDetails);
-              }}
-            >
-              {!isShowingSubmissionDetails ? <KeyboardArrowDownIcon fontSize='small' /> : <KeyboardArrowUpIcon fontSize='small' />}
-            </IconButton>
-          </TableCell>
-        </TableBody>
-      </Table>
-      {isShowingSubmissionForm && (
-      <Stack gap={1} my={2}>
-        <FormLabel sx={{
-          fontWeight: 'bold'
-        }}
-        >Submission
-        </FormLabel>
-        <BountySubmissionForm
-          bounty={bounty}
-          onSubmit={() => {}}
-          onCancel={() => {
-            setIsShowingSubmissionForm(false);
-          }}
-        />
-      </Stack>
-      )}
-    </>
-  );
 }
 
 export default function BountyProperties (props: {readOnly?: boolean, bounty: BountyWithDetails}) {
@@ -517,29 +398,25 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
       </>
       )}
 
-      {!canEdit && permissions?.userPermissions?.work && !isApplyingBounty && !userApplication && (
-        <>
-          <Divider sx={{
-            my: 2
-          }}
+      {!canEdit && !isApplyingBounty && (
+        <Stack justifyContent='center' width='100%' flexDirection='row' my={2}>
+          <BountyApplyButton
+            applications={currentBounty.applications}
+            bounty={currentBounty}
+            onClick={() => {
+              setIsApplyingBounty(true);
+            }}
+            permissions={permissions}
           />
-          <Stack justifyContent='center' width='100%' flexDirection='row' my={2}>
-            <Button
-              sx={{
-                width: 'fit-content'
-              }}
-              onClick={() => setIsApplyingBounty(true)}
-            >Apply
-            </Button>
-          </Stack>
-        </>
+        </Stack>
       )}
 
       {userApplication && permissions?.userPermissions?.work && (
-      <UserBountySubmissionTable
-        bounty={currentBounty}
-        submission={userApplication}
-      />
+        <BountySubmissions
+          bounty={currentBounty}
+          permissions={permissions}
+          showMetadata={false}
+        />
       )}
 
       {isApplyingBounty && !userApplication && (
