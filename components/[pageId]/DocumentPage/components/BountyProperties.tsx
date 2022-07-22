@@ -420,16 +420,23 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
       )}
 
       {isApplyingBounty && !userApplication && (
-        <ApplicationEditorForm
-          bountyId={currentBounty.id}
-          mode='create'
-          onSubmit={() => {
-            setIsApplyingBounty(false);
+        <Stack my={1} gap={1}>
+          <FormLabel sx={{
+            fontWeight: 'bold'
           }}
-          onCancel={() => {
-            setIsApplyingBounty(false);
-          }}
-        />
+          >Application
+          </FormLabel>
+          <ApplicationEditorForm
+            bountyId={currentBounty.id}
+            mode='create'
+            onSubmit={() => {
+              setIsApplyingBounty(false);
+            }}
+            onCancel={() => {
+              setIsApplyingBounty(false);
+            }}
+          />
+        </Stack>
       )}
     </Box>
   );

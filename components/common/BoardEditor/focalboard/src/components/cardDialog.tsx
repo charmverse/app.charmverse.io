@@ -56,7 +56,13 @@ function CreateBountyButton (props: Pick<Bounty, "linkedTaskId" | "title">) {
             rewardAmount: 1,
             rewardToken: "ETH",
             linkedTaskId,
-            title
+            title,
+            permissions: {
+              submitter: [{
+                group: "space",
+                id: space.id
+              }]
+            }
           })
           setBounties((bounties) => [...bounties, {...createdBounty, applications: []}])
         }}>
@@ -145,7 +151,8 @@ const CardDialog = (props: Props): JSX.Element | null => {
                 />
             } */}
         </Menu>
-
+    console.log({bounty, bounties});
+    
     return card && pages[card.id] ? (
         <>
             <Dialog
