@@ -60,3 +60,12 @@ export type TargetPageTree<T extends PageNode = PageNode> = {
   parents: PageNodeWithChildren<T>[],
   targetPage: PageNodeWithChildren<T>
 }
+
+/**
+ * A target page tree that also contains a pre-computed flat list of children
+ */
+export type TargetPageTreeWithFlatChildren<T extends PageNode = PageNode> = {
+  parents: PageNodeWithChildren<T>[],
+  targetPage: PageNodeWithChildren<T>,
+  flatChildren: PageNodeWithChildren<T>[]
+}

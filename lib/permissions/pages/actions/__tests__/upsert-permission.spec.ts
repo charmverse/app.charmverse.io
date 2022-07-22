@@ -7,7 +7,7 @@ import { InsecureOperationError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { createPage, generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
-import { CannotInheritOutsideTreeError, SelfInheritancePermissionError } from '../../errors';
+import { SelfInheritancePermissionError } from '../../errors';
 import { upsertPermission } from '../upsert-permission';
 
 let user: User;

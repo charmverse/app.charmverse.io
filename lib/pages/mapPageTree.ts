@@ -148,7 +148,8 @@ export function mapTargetPageTree<T extends PageNode = PageNode> ({ items, targe
 /**
 * Given a page node, returns a flattened list of its children
 */
-export function flattenTree (node: PageNodeWithChildren, flatNodes: PageNodeWithChildren[] = []): PageNodeWithChildren[] {
+export function flattenTree<T extends PageNode = PageNode> (node: PageNodeWithChildren<T>, flatNodes: PageNodeWithChildren<T>[] = []):
+ PageNodeWithChildren<T>[] {
 
   node.children.forEach(childNode => {
     flatNodes.push(childNode);
