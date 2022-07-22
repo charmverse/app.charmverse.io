@@ -1,10 +1,9 @@
-import { useTheme } from '@emotion/react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Box, Divider, FormLabel, IconButton, Stack, TextField } from '@mui/material';
-import { BountyStatus, PaymentMethod } from '@prisma/client';
+import { PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
-import BountyStatusBadge, { BountyStatusChip } from 'components/bounties/components/BountyStatusBadge';
+import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
 import Button from 'components/common/Button';
 import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
@@ -365,17 +364,22 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
       </Stack>
 
       {canEdit && bountyProperties}
-      <Divider sx={{
-        my: 2
-      }}
-      />
-      <Stack justifyContent='center' width='100%' flexDirection='row' my={2}>
-        <Button sx={{
-          width: 'fit-content'
-        }}
-        >Apply
-        </Button>
-      </Stack>
+
+      {!canEdit && (
+        <>
+          <Divider sx={{
+            my: 2
+          }}
+          />
+          <Stack justifyContent='center' width='100%' flexDirection='row' my={2}>
+            <Button sx={{
+              width: 'fit-content'
+            }}
+            >Apply
+            </Button>
+          </Stack>
+        </>
+      )}
     </Box>
   );
 }
