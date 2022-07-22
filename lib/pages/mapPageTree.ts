@@ -11,9 +11,10 @@ export const sortNodes = (nodes: Array<PageNode>) => {
 
 /**
  * @targetPageId If provided, the only root node returned will be the one whose child tree contains the target page ID
+ * @includeCards - Defaults to false
  */
 export function reducePagesToPageTree<
-    T extends PageNode = PageNode> ({ items, rootPageIds, includeCards }: Omit<PageTreeMappingInput<T>, 'targetPageId'>): {itemMap: { [key: string]: number}, itemsWithChildren: PageNodeWithChildren<T>[], rootNodes: PageNodeWithChildren<T>[]} {
+    T extends PageNode = PageNode> ({ items, rootPageIds, includeCards = false }: Omit<PageTreeMappingInput<T>, 'targetPageId'>): {itemMap: { [key: string]: number}, itemsWithChildren: PageNodeWithChildren<T>[], rootNodes: PageNodeWithChildren<T>[]} {
 
   // Assign empty children to each node
   const tempItems: PageNodeWithChildren<T>[] = items.map((item: T) => {
@@ -44,8 +45,10 @@ export function reducePagesToPageTree<
     if (parentNode && node.deletedAt === null) {
       // Make sure its not a database page or a focalboard card
       if (parentNode.type === 'page' || (
-        includeCards && parentNode.type === 'board' && node.type === 'card'
-      )) {
+        includeCards && (
+          (parentNode.type === 'board' && node.type === 'card')
+           || (parentNode.type === 'card' && node.type === 'page')
+        ))) {
         parentNode.children.push(node);
         parentNode.children = sortNodes(parentNode.children) as PageNodeWithChildren<T>[];
       }

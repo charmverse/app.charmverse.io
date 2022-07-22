@@ -151,35 +151,35 @@ function validateRootOne (node: PageNodeWithChildren) {
   expect(node.children[2].id).toBe(page_1_3.id);
 }
 
+function generateBoardWithCardsStub (): {board: PageNode, card_1: PageNode, card_2: PageNode, boardAndCards: PageNode[]} {
+  const board = generatePageNode({
+    parentId: null,
+    title: 'Board',
+    index: 1,
+    type: 'board'
+  });
+
+  const card_1 = generatePageNode({
+    parentId: board.id,
+    title: 'Card 1',
+    index: 1,
+    type: 'card'
+  });
+
+  const card_2 = generatePageNode({
+    parentId: board.id,
+    title: 'Card 2',
+    index: 2,
+    type: 'card'
+  });
+
+  return { board, card_1, card_2, boardAndCards: [board, card_1, card_2] };
+}
+
 describe('reducePagesToPageTree', () => {
   it('should filter out card type pages by default', async () => {
 
-    const board = generatePageNode({
-      parentId: null,
-      index: 0,
-      title: 'Board',
-      type: 'board'
-    });
-
-    const card_1 = generatePageNode({
-      parentId: board.id,
-      index: 0,
-      title: 'Card 1',
-      type: 'card'
-    });
-
-    const card_2 = generatePageNode({
-      parentId: board.id,
-      index: 1,
-      title: 'Card 2',
-      type: 'card'
-    });
-
-    const boardAndCards = [
-      board,
-      card_1,
-      card_2
-    ];
+    const { board, boardAndCards } = generateBoardWithCardsStub();
 
     const { rootNodes } = reducePagesToPageTree({
       items: boardAndCards
@@ -195,32 +195,7 @@ describe('reducePagesToPageTree', () => {
 
   it('should include card type pages if this setting is provided', async () => {
 
-    const board = generatePageNode({
-      parentId: null,
-      index: 0,
-      title: 'Board',
-      type: 'board'
-    });
-
-    const card_1 = generatePageNode({
-      parentId: board.id,
-      index: 0,
-      title: 'Card 1',
-      type: 'card'
-    });
-
-    const card_2 = generatePageNode({
-      parentId: board.id,
-      index: 1,
-      title: 'Card 2',
-      type: 'card'
-    });
-
-    const boardAndCards = [
-      board,
-      card_1,
-      card_2
-    ];
+    const { board, card_1, card_2, boardAndCards } = generateBoardWithCardsStub();
 
     const { rootNodes } = reducePagesToPageTree({
       items: boardAndCards,
@@ -235,6 +210,52 @@ describe('reducePagesToPageTree', () => {
     expect(rootNodes[0].children.length).toBe(2);
     expect(rootNodes[0].children[0].id).toBe(card_1.id);
     expect(rootNodes[0].children[1].id).toBe(card_2.id);
+  });
+
+  it('should include cards and their child pages if includeCard is true', async () => {
+
+    const board = generatePageNode({
+      parentId: null,
+      title: 'Board',
+      index: 1
+    });
+
+    const card_1 = generatePageNode({
+      parentId: board.id,
+      title: 'Card 1',
+      index: 1
+    });
+
+    const card_page_1 = generatePageNode({
+      parentId: card_1.id,
+      title: 'Card page 1',
+      index: 1
+    });
+
+    const card_page_2 = generatePageNode({
+      parentId: card_1.id,
+      title: 'Card page 2',
+      index: 2
+    });
+
+    const boardAndCards = [board, card_1, card_page_1, card_page_2];
+
+    const { rootNodes } = reducePagesToPageTree({
+      items: boardAndCards,
+      includeCards: true
+    });
+
+    expect(rootNodes.length).toBe(1);
+
+    expect(rootNodes[0].id).toBe(board.id);
+
+    // Should be the card
+    expect(rootNodes[0].children.length).toBe(1);
+    expect(rootNodes[0].children[0].id).toBe(card_1.id);
+
+    // Should be the card's children pages
+    expect(rootNodes[0].children[0].children[0].id).toBe(card_page_1.id);
+    expect(rootNodes[0].children[0].children[1].id).toBe(card_page_2.id);
   });
 });
 
@@ -253,32 +274,7 @@ describe('mapPageTree', () => {
 
   it('should always ignore card type pages', async () => {
 
-    const board = generatePageNode({
-      parentId: null,
-      index: 0,
-      title: 'Board',
-      type: 'board'
-    });
-
-    const card_1 = generatePageNode({
-      parentId: board.id,
-      index: 0,
-      title: 'Card 1',
-      type: 'card'
-    });
-
-    const card_2 = generatePageNode({
-      parentId: board.id,
-      index: 1,
-      title: 'Card 2',
-      type: 'card'
-    });
-
-    const boardAndCards = [
-      board,
-      card_1,
-      card_2
-    ];
+    const { boardAndCards, board } = generateBoardWithCardsStub();
 
     const rootList = mapPageTree({
       items: boardAndCards,
@@ -359,32 +355,7 @@ describe('mapTargetPageTree', () => {
 
   it('should always include cards', () => {
 
-    const board = generatePageNode({
-      parentId: null,
-      index: 0,
-      title: 'Board',
-      type: 'board'
-    });
-
-    const card_1 = generatePageNode({
-      parentId: board.id,
-      index: 0,
-      title: 'Card 1',
-      type: 'card'
-    });
-
-    const card_2 = generatePageNode({
-      parentId: board.id,
-      index: 1,
-      title: 'Card 2',
-      type: 'card'
-    });
-
-    const boardAndCards = [
-      board,
-      card_1,
-      card_2
-    ];
+    const { board, card_1, card_2, boardAndCards } = generateBoardWithCardsStub();
 
     const { parents, targetPage } = mapTargetPageTree({ targetPageId: board.id, items: boardAndCards });
 
