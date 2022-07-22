@@ -1,6 +1,7 @@
+import { useTheme } from '@emotion/react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { FormLabel, IconButton, Stack, TextField } from '@mui/material';
+import { Box, FormLabel, IconButton, Stack, TextField } from '@mui/material';
 import { PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
 import { BountyStatusChip } from 'components/bounties/components/BountyStatusBadge';
@@ -151,7 +152,14 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
   }, [currentBounty.chainId]);
 
   return (
-    <div className='octo-propertylist CardDetailProperties'>
+    <Box
+      className='octo-propertylist CardDetailProperties'
+      sx={{
+        '& .MuiInputBase-input': {
+          background: 'none'
+        }
+      }}
+    >
       {/* <div className='octo-propertyrow'>
         <div className='octo-propertyname'>Status</div>
         <BountyStatusChip
@@ -342,6 +350,6 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
       </>
       )}
 
-    </div>
+    </Box>
   );
 }
