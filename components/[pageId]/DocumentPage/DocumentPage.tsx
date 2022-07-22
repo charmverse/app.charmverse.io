@@ -149,7 +149,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: IEditor
                       pageUpdatedBy={page.updatedBy}
                     />
                     <BountyIntegration
-                      linkedTaskId={card.id}
+                      pageId={card.id}
                       title={page.title}
                       description={page.contentText}
                       descriptionNodes={page.content}

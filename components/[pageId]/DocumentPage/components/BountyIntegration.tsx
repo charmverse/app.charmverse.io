@@ -8,7 +8,7 @@ import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useState } from 'react';
 
 interface BountyIntegrationProps {
-  linkedTaskId: string
+  pageId: string
   title?: string
   description: string;
   descriptionNodes: Prisma.JsonValue;
@@ -17,11 +17,11 @@ interface BountyIntegrationProps {
 
 export default function BountyIntegration (props: BountyIntegrationProps) {
   const { bounties } = useBounties();
-  const { description, descriptionNodes, title, linkedTaskId } = props;
+  const { description, descriptionNodes, title, pageId } = props;
 
   const [userSpacePermissions] = useCurrentSpacePermissions();
 
-  const linkedBounty = bounties.find(bounty => bounty.linkedTaskId === linkedTaskId);
+  const linkedBounty = bounties.find(bounty => bounty.pageId === pageId);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -47,7 +47,7 @@ export default function BountyIntegration (props: BountyIntegrationProps) {
                 title,
                 description,
                 descriptionNodes,
-                linkedTaskId
+                pageId
               }}
               onClose={() => {
                 setIsModalOpen(false);

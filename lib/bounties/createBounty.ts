@@ -16,7 +16,6 @@ export async function createBounty ({
   chainId = 1,
   description = '',
   descriptionNodes = '',
-  linkedTaskId,
   approveSubmitters = true,
   maxSubmissions,
   rewardAmount = 0,
@@ -62,8 +61,7 @@ export async function createBounty ({
     approveSubmitters,
     maxSubmissions,
     rewardAmount,
-    rewardToken,
-    linkedTaskId
+    rewardToken
   };
 
   const isSuggestion = status === 'suggestion';
