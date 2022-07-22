@@ -1,11 +1,11 @@
-import Autocomplete from '@mui/material/Autocomplete';
+import Autocomplete, { AutocompleteProps } from '@mui/material/Autocomplete';
 import Box from '@mui/material/Box';
 import { useEffect, useState } from 'react';
 import { RPCList, IChainDetails } from 'connectors';
 import TextField from '@mui/material/TextField';
 import { SxProps } from '@mui/system';
 
-interface Props {
+interface Props extends Omit<Partial<AutocompleteProps<IChainDetails, false, true, true>>, 'onChange'>{
   onChange?: (chainId: number) => void;
   defaultChainId?: number; // allow setting a default
   chainId?: number; // allow overriding from the parent

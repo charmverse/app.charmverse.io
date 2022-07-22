@@ -1,4 +1,4 @@
-import { Autocomplete, Box, SxProps, TextField, Typography } from '@mui/material';
+import { Autocomplete, AutocompleteProps, Box, SxProps, TextField, Typography } from '@mui/material';
 import { CryptoCurrencies, CryptoCurrency } from 'connectors';
 import Modal from 'components/common/Modal';
 import { useEffect, useState } from 'react';
@@ -11,7 +11,7 @@ import TokenLogo from 'components/common/TokenLogo';
 import { getTokenInfo, getTokenAndChainInfoFromPayments } from 'lib/tokens/tokenData';
 import CustomERCTokenForm from 'components/settings/payment-methods/components/CustomERCTokenForm';
 
-export interface IInputSearchCryptoProps {
+export interface IInputSearchCryptoProps extends Omit<Partial<AutocompleteProps<string, true, true, true>>, 'onChange' | 'defaultValue' | 'value'> {
   onChange?: (value: CryptoCurrency) => void;
   onNewPaymentMethod?: (method: PaymentMethod) => void;
   defaultValue?: CryptoCurrency | string;

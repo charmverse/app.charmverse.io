@@ -167,6 +167,8 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
       >
         <div className='octo-propertyname'>Reviewer</div>
         <InputSearchReviewers
+          disabled={readOnly}
+          readOnly={readOnly}
           value={bountyPermissions?.reviewer ?? []}
           disableCloseOnSelect={true}
           onChange={async (e, options) => {
@@ -193,6 +195,8 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
       <div className='octo-propertyrow'>
         <div className='octo-propertyname'>Chain</div>
         <InputSearchBlockchain
+          disabled={readOnly}
+          readOnly={readOnly}
           chainId={currentBounty.chainId}
           sx={{
             width: 250
@@ -206,6 +210,8 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
       <div className='octo-propertyrow'>
         <div className='octo-propertyname'>Token</div>
         <InputSearchCrypto
+          disabled={readOnly}
+          readOnly={readOnly}
           cryptoList={availableCryptos}
           chainId={currentBounty?.chainId}
           defaultValue={currentBounty?.rewardToken}
@@ -231,6 +237,7 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
           sx={{
             width: 250
           }}
+          disabled={readOnly}
           value={currentBounty.rewardAmount}
           type='number'
           size='small'
@@ -283,7 +290,7 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
           <div className='octo-propertyname'>Applicant Role(s)</div>
           <InputSearchRoleMultiple
             disableCloseOnSelect={true}
-            defaultValue={assignedRoleSubmitters}
+            value={assignedRoleSubmitters}
             onChange={async (roleIds) => {
               await updateBounty(currentBounty.id, {
                 permissions: rollupPermissions({
@@ -297,6 +304,8 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
             }}
             filter={{ mode: 'exclude', userIds: assignedRoleSubmitters }}
             showWarningOnNoRoles={true}
+            disabled={readOnly}
+            readOnly={readOnly}
           />
         </div>
         <div className='octo-propertyrow'>
@@ -325,6 +334,7 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
             sx={{
               width: 250
             }}
+            disabled={readOnly}
             onChange={updateBountyMaxSubmissions}
           />
         </div>

@@ -98,7 +98,7 @@ export function InputSearchRole (props: IInputSearchRoleProps) {
   return <InputSearchRoleBase {...props} onChange={(e, value) => emitValue(value as Role)} multiple />;
 }
 
-interface IInputSearchRoleMultipleProps {
+interface IInputSearchRoleMultipleProps extends Partial<Omit<ComponentProps<typeof Autocomplete>, 'onChange' | 'defaultValue'>> {
   onChange: (id: string[]) => void
   defaultValue?: string[]
   filter?: IRolesFilter
@@ -116,7 +116,6 @@ export function InputSearchRoleMultiple ({
 
   return (
     <InputSearchRoleBase
-      {...props}
       showWarningOnNoRoles={showWarningOnNoRoles}
       disableCloseOnSelect={disableCloseOnSelect}
       onChange={(e, value) => emitValue(value as ReducedRole[])}
@@ -127,6 +126,7 @@ export function InputSearchRoleMultiple ({
       placeholder='Select roles'
       filter={filter}
       defaultValue={defaultValue}
+      {...props}
     />
   );
 }
