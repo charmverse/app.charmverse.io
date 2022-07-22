@@ -114,13 +114,6 @@ export function InputSearchRoleMultiple ({
     onChange(roles.map(role => role.id));
   }
 
-  // Let the parent know it's loaded
-  // useEffect(() => {
-  //   if (props.defaultValue) {
-  //     onChange(props.defaultValue);
-  //   }
-  // }, []);
-
   return (
     <InputSearchRoleBase
       {...props}

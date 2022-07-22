@@ -14,7 +14,6 @@ import DocumentPage from '../DocumentPage';
 
 export default function EditorPage ({ pageId }: { pageId: string }) {
   const { setIsEditing, pages, setCurrentPageId, setPages, getPagePermissions } = usePages();
-  const { bounties } = useBounties();
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
   const [space] = useCurrentSpace();
@@ -23,11 +22,6 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
   const currentPagePermissions = getPagePermissions(pageId);
 
   const pagesLoaded = Object.keys(pages).length > 0;
-  const cardId = (new URLSearchParams(window.location.search)).get('cardId');
-
-  const pageBounty = useMemo(() => {
-    return bounties.find(bounty => bounty.linkedTaskId === cardId);
-  }, [pages, bounties, cardId]);
 
   useEffect(() => {
     async function main () {
@@ -114,7 +108,6 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
     if (currentPage?.type === 'board') {
       return (
         <BoardPage
-          bounty={pageBounty}
           page={memoizedCurrentPage}
           setPage={setPage}
           readonly={currentPagePermissions.edit_content !== true}

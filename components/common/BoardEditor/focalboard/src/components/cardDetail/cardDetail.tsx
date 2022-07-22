@@ -14,11 +14,10 @@ import { BountyWithDetails } from 'models'
 type Props = {
     card: Card
     readonly: boolean
-    bounty?: BountyWithDetails
 }
 
 const CardDetail = (props: Props): JSX.Element|null => {
-    const {bounty, card, readonly} = props
+    const {card, readonly} = props
 
     const mounted = useRef(false);
 
@@ -58,7 +57,6 @@ const CardDetail = (props: Props): JSX.Element|null => {
         page={page} 
         setPage={setPage} 
         readOnly={readonly} 
-        bounty={bounty}
       />
     )
 }

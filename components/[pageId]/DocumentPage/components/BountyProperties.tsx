@@ -147,13 +147,13 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
 
   return (
     <div className='octo-propertylist CardDetailProperties'>
-      <div className='octo-propertyrow'>
+      {/* <div className='octo-propertyrow'>
         <div className='octo-propertyname'>Status</div>
         <BountyStatusChip
           size='small'
           status={currentBounty.status}
         />
-      </div>
+      </div> */}
       <div
         className='octo-propertyrow'
         style={{

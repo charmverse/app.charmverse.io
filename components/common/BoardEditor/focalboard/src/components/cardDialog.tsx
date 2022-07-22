@@ -38,7 +38,6 @@ type Props = {
     onClose: () => void
     showCard: (cardId?: string) => void
     readonly: boolean
-    bounty?: BountyWithDetails
 }
 
 function CreateBountyButton (props: Pick<Bounty, "linkedTaskId" | "title">) {
@@ -76,7 +75,7 @@ function CreateBountyButton (props: Pick<Bounty, "linkedTaskId" | "title">) {
 }
 
 const CardDialog = (props: Props): JSX.Element | null => {
-  const { cardId, readonly, onClose, bounty } = props;
+    const { cardId, readonly, onClose } = props;
     const card = useAppSelector(getCard(cardId))
     const intl = useIntl()
     const [showConfirmationDialogBox, setShowConfirmationDialogBox] = useState<boolean>(false)
@@ -84,6 +83,8 @@ const CardDialog = (props: Props): JSX.Element | null => {
     const router = useRouter();
     const isSharedPage = router.route.startsWith('/share')
     const cardPage = pages[cardId]
+    const { bounties } = useBounties();
+    const bounty = bounties.find(bounty => bounty.linkedTaskId === cardId);
     
     const handleDeleteCard = async () => {
         if (!card) {
@@ -177,7 +178,6 @@ const CardDialog = (props: Props): JSX.Element | null => {
                     <CardDetail
                         card={card}
                         readonly={readonly || isSharedPage}
-                        bounty={bounty}
                     />}
 
                 {!card &&

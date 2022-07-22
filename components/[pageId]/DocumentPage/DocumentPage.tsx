@@ -12,6 +12,7 @@ import { BountyWithDetails, Page, PageContent } from 'models';
 import { useRouter } from 'next/router';
 import { memo, useCallback } from 'react';
 import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
+import { useBounties } from 'hooks/useBounties';
 import CharmEditor, { ICharmEditorOutput } from '../../common/CharmEditor/CharmEditor';
 import PageBanner from './components/PageBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
@@ -35,13 +36,14 @@ export const Container = styled(Box)<{ top: number, fullWidth?: boolean }>`
 
 export interface DocumentPageProps {
   page: Page, setPage: (p: Partial<Page>) => void, readOnly?: boolean, insideModal?: boolean
-  bounty?: BountyWithDetails
 }
 
-function DocumentPage ({ bounty, page, setPage, insideModal, readOnly = false }: DocumentPageProps) {
+function DocumentPage ({ page, setPage, insideModal, readOnly = false }: DocumentPageProps) {
   const { pages } = usePages();
   const { cancelVote, castVote, deleteVote, votes, isLoading } = useVotes();
-
+  const { bounties } = useBounties();
+  const cardId = (new URLSearchParams(window.location.search)).get('cardId');
+  const bounty = bounties.find(_bounty => _bounty.linkedTaskId === cardId);
   const pageVote = Object.values(votes)[0];
 
   const board = useAppSelector((state) => {
