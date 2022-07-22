@@ -3,7 +3,7 @@ import { Page, Space, User } from '@prisma/client';
 import { generatePageNode, generatePageToCreateStub } from 'testing/generate-stubs';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { PageNode, PageNodeWithChildren } from '../interfaces';
-import { mapTargetPageTree, mapPageTree } from '../mapPageTree';
+import { mapTargetPageTree, mapPageTree, reducePagesToPageTree } from '../mapPageTree';
 
 const root_1 = generatePageNode({
   parentId: null,
@@ -151,6 +151,93 @@ function validateRootOne (node: PageNodeWithChildren) {
   expect(node.children[2].id).toBe(page_1_3.id);
 }
 
+describe('reducePagesToPageTree', () => {
+  it('should filter out card type pages by default', async () => {
+
+    const board = generatePageNode({
+      parentId: null,
+      index: 0,
+      title: 'Board',
+      type: 'board'
+    });
+
+    const card_1 = generatePageNode({
+      parentId: board.id,
+      index: 0,
+      title: 'Card 1',
+      type: 'card'
+    });
+
+    const card_2 = generatePageNode({
+      parentId: board.id,
+      index: 1,
+      title: 'Card 2',
+      type: 'card'
+    });
+
+    const boardAndCards = [
+      board,
+      card_1,
+      card_2
+    ];
+
+    const { rootNodes } = reducePagesToPageTree({
+      items: boardAndCards
+    });
+
+    expect(rootNodes.length).toBe(1);
+
+    expect(rootNodes[0].id).toBe(board.id);
+
+    // No children should have been passed
+    expect(rootNodes[0].children.length).toBe(0);
+  });
+
+  it('should include card type pages if this setting is provided', async () => {
+
+    const board = generatePageNode({
+      parentId: null,
+      index: 0,
+      title: 'Board',
+      type: 'board'
+    });
+
+    const card_1 = generatePageNode({
+      parentId: board.id,
+      index: 0,
+      title: 'Card 1',
+      type: 'card'
+    });
+
+    const card_2 = generatePageNode({
+      parentId: board.id,
+      index: 1,
+      title: 'Card 2',
+      type: 'card'
+    });
+
+    const boardAndCards = [
+      board,
+      card_1,
+      card_2
+    ];
+
+    const { rootNodes } = reducePagesToPageTree({
+      items: boardAndCards,
+      includeCards: true
+    });
+
+    expect(rootNodes.length).toBe(1);
+
+    expect(rootNodes[0].id).toBe(board.id);
+
+    // No children should have been passed
+    expect(rootNodes[0].children.length).toBe(2);
+    expect(rootNodes[0].children[0].id).toBe(card_1.id);
+    expect(rootNodes[0].children[1].id).toBe(card_2.id);
+  });
+});
+
 describe('mapPageTree', () => {
 
   it('should map a list of pages to an ordered array containing root nodes with their respective tree', async () => {
@@ -162,6 +249,49 @@ describe('mapPageTree', () => {
 
     validateRootOne(rootList[0]);
 
+  });
+
+  it('should always ignore card type pages', async () => {
+
+    const board = generatePageNode({
+      parentId: null,
+      index: 0,
+      title: 'Board',
+      type: 'board'
+    });
+
+    const card_1 = generatePageNode({
+      parentId: board.id,
+      index: 0,
+      title: 'Card 1',
+      type: 'card'
+    });
+
+    const card_2 = generatePageNode({
+      parentId: board.id,
+      index: 1,
+      title: 'Card 2',
+      type: 'card'
+    });
+
+    const boardAndCards = [
+      board,
+      card_1,
+      card_2
+    ];
+
+    const rootList = mapPageTree({
+      items: boardAndCards,
+      // Added this prop manually, Typescript will prevent us from calling it
+      includeCards: true
+    } as any);
+
+    expect(rootList.length).toBe(1);
+
+    expect(rootList[0].id).toBe(board.id);
+
+    // No children should have been passed
+    expect(rootList[0].children.length).toBe(0);
   });
 
   it('should only return the selected root nodes if this is provided as a parameter', async () => {
@@ -225,5 +355,44 @@ describe('mapTargetPageTree', () => {
 
     validateRootOne(targetPage);
 
+  });
+
+  it('should always include cards', () => {
+
+    const board = generatePageNode({
+      parentId: null,
+      index: 0,
+      title: 'Board',
+      type: 'board'
+    });
+
+    const card_1 = generatePageNode({
+      parentId: board.id,
+      index: 0,
+      title: 'Card 1',
+      type: 'card'
+    });
+
+    const card_2 = generatePageNode({
+      parentId: board.id,
+      index: 1,
+      title: 'Card 2',
+      type: 'card'
+    });
+
+    const boardAndCards = [
+      board,
+      card_1,
+      card_2
+    ];
+
+    const { parents, targetPage } = mapTargetPageTree({ targetPageId: board.id, items: boardAndCards });
+
+    expect(parents.length).toBe(0);
+
+    expect(targetPage.id).toBe(board.id);
+    expect(targetPage.children.length).toBe(2);
+    expect(targetPage.children[0].id).toBe(card_1.id);
+    expect(targetPage.children[1].id).toBe(card_2.id);
   });
 });

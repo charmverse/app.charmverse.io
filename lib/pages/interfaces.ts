@@ -47,10 +47,13 @@ export type PageNodeWithPermissions = PageNode<{permissions: (PagePermission & {
 /**
  * @rootPageIds The list of roots we want to track
  * @targetPageId Overrides root pageIds. Ensures only the root containing the target page ID will be returned
+ * @includeCards Whether to include focalboard cards in the children. Should default to false. These were originally cards left out as mapPageTree was only used for showing page tree in the User Interface, and we did not want to show the actual cards
  */
 export interface PageTreeMappingInput<T extends PageNode> {
-  items: T[], rootPageIds?: string[],
-  targetPageId?: string
+  items: T[],
+  rootPageIds?: string[],
+  targetPageId?: string,
+  includeCards?: boolean
 }
 
 export type TargetPageTree<T extends PageNode = PageNode> = {
