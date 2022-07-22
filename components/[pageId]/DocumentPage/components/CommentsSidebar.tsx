@@ -176,7 +176,7 @@ export default function CommentsSidebar ({ sx, inline, ...props }: BoxProps & {i
           <MenuItem value='all'>All</MenuItem>
         </Select>
       </Box>
-      <StyledSidebar>
+      <StyledSidebar className='charm-inline-comment-sidebar'>
         {sortedThreadList.length === 0 ? (
           <NoCommentsMessage threadType={threadFilter} />
         ) : sortedThreadList.map(resolvedThread => resolvedThread
