@@ -14,10 +14,11 @@ import * as yup from 'yup';
 import { FormMode } from '../../components/BountyEditorForm';
 
 interface IApplicationFormProps {
-  onSubmit: (application: Application) => any,
+  onSubmit?: (application: Application) => any,
   bountyId: string
   mode?: FormMode
   proposal?: Application
+  onCancel?: () => void
 }
 
 export const schema = yup.object({
@@ -26,7 +27,7 @@ export const schema = yup.object({
 
 type FormValues = yup.InferType<typeof schema>
 
-export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'create' }: IApplicationFormProps) {
+export function ApplicationEditorForm ({ onCancel, onSubmit, bountyId, proposal, mode = 'create' }: IApplicationFormProps) {
 
   const { refreshBounty } = useBounties();
 
@@ -55,13 +56,17 @@ export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'c
       proposalToSave.bountyId = bountyId;
       proposalToSave.status = 'applied';
       const createdApplication = await charmClient.createApplication(proposalToSave);
-      onSubmit(createdApplication);
+      if (onSubmit) {
+        onSubmit(createdApplication);
+      }
       refreshBounty(bountyId);
       setApplicationMessage('');
     }
     else if (mode === 'update') {
       await charmClient.updateApplication(proposal?.id as string, proposalToSave);
-      onSubmit(proposalToSave);
+      if (onSubmit) {
+        onSubmit(proposalToSave);
+      }
       refreshBounty(bountyId);
     }
 
@@ -103,8 +108,9 @@ export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'c
 
           </Grid>
 
-          <Grid item>
+          <Grid item display='flex' gap={1}>
             <Button disabled={!isValid} type='submit'>{mode === 'create' ? ' Submit application' : 'Update application'}</Button>
+            {onCancel && <Button onClick={onCancel} color='error'>Cancel</Button>}
           </Grid>
 
         </Grid>

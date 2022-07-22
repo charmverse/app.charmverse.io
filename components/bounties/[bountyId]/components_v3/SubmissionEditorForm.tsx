@@ -30,9 +30,10 @@ interface Props {
   submission?: Application,
   bounty: Bounty,
   onSubmit: (submission: Application) => void
+  onCancel?: () => void
 }
 
-export default function BountySubmissionForm ({ submission, onSubmit: onSubmitProp, bounty }: Props) {
+export default function BountySubmissionForm ({ onCancel, submission, onSubmit: onSubmitProp, bounty }: Props) {
   const [user] = useUser();
 
   const {
@@ -98,7 +99,6 @@ export default function BountySubmissionForm ({ submission, onSubmit: onSubmitPr
                 });
               }}
               placeholderText='Enter the content of your submission here.'
-
             />
 
           </Grid>
@@ -127,8 +127,9 @@ export default function BountySubmissionForm ({ submission, onSubmit: onSubmitPr
             )
           }
 
-          <Grid item>
+          <Grid item display='flex' gap={1}>
             <Button disabled={!isValid} type='submit'>Save</Button>
+            {onCancel && <Button onClick={onCancel} color='error'>Cancel</Button>}
           </Grid>
 
         </Grid>

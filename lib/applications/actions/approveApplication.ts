@@ -1,12 +1,11 @@
 import { Application } from '@prisma/client';
-import { DataNotFoundError, LimitReachedError, UnauthorisedActionError, UndesirableOperationError } from 'lib/utilities/errors';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { prisma } from 'db';
 import { getBounty } from 'lib/bounties';
-import { ApplicationActionRequest } from '../interfaces';
-import { getApplication } from '../getApplication';
-import { submissionsCapReached } from '../shared';
+import { DataNotFoundError, LimitReachedError } from 'lib/utilities/errors';
 import { BountyWithDetails } from '../../../models';
+import { getApplication } from '../getApplication';
+import { ApplicationActionRequest } from '../interfaces';
+import { submissionsCapReached } from '../shared';
 
 export async function approveApplication ({ applicationOrApplicationId, userId }: ApplicationActionRequest): Promise<Application> {
   const application = await getApplication(typeof applicationOrApplicationId === 'string' ? applicationOrApplicationId : applicationOrApplicationId.id);
