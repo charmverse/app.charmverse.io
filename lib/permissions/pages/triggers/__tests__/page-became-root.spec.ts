@@ -1,6 +1,8 @@
 
 import { prisma } from 'db';
-import { getPage, IPageWithPermissions, resolveChildPagesAsFlatList } from 'lib/pages/server';
+import { flattenTree } from 'lib/pages/mapPageTree';
+import { getPage, IPageWithPermissions } from 'lib/pages/server';
+import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { upsertPermission } from '../../actions/upsert-permission';
 import { setupPermissionsAfterPageRepositioned } from '../page-repositioned';
@@ -106,9 +108,10 @@ describe('setupPermissionsAfterPageRepositioned / page became root', () => {
 
     await setupPermissionsAfterPageRepositioned(child.id);
 
-    const children = await resolveChildPagesAsFlatList(child.id);
+    const { targetPage } = await resolvePageTree({ pageId: child.id });
+    const childPages = flattenTree(targetPage);
 
-    children.forEach(nestedPage => {
+    childPages.forEach(nestedPage => {
       nestedPage.permissions.forEach(nestedPagePermission => {
         expect(nestedPagePermission.inheritedFromPermission).toBe(childPermission.id);
 

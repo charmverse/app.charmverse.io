@@ -1,7 +1,7 @@
 import { PagePermission, Prisma, PrismaPromise } from '@prisma/client';
-import { resolveChildPagesAsFlatList, resolveParentPages } from 'lib/pages/server/resolvePageTree';
 import { prisma } from 'db';
-import { IPageWithPermissions } from 'lib/pages/server';
+import { flattenTree } from 'lib/pages/mapPageTree';
+import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
 import { BoardPagePermissionUpdated } from '../interfaces';
@@ -21,23 +21,8 @@ export async function generateboardPagePermissionUpdated ({ boardId, permissionI
 
   const permissionCreateMany: Prisma.PagePermissionCreateManyInput[] = [];
 
-  const [board, boardParents, boardChildren] = await Promise.all([
-    prisma.page.findFirst({
-      where: {
-        id: boardId,
-        type: 'board'
-      },
-      select: {
-        permissions: {
-          include: {
-            sourcePermission: true
-          }
-        }
-      }
-    }) as Promise<Pick<IPageWithPermissions, 'permissions'>>,
-    resolveParentPages(boardId),
-    resolveChildPagesAsFlatList(boardId)
-  ]);
+  const { parents: boardParents, targetPage: board } = await resolvePageTree({ pageId: boardId });
+  const boardChildren = flattenTree(board);
 
   const targetPermission = board.permissions.find(permission => permission.id === permissionId);
 

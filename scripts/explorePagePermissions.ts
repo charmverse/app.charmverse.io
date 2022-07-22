@@ -1,6 +1,6 @@
 import { prisma } from 'db';
 import { setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages/triggers';
-import { IPageWithPermissions, resolveChildPages } from 'lib/pages/server';
+import { IPageWithPermissions } from 'lib/pages/server';
 
 export async function queryBoard (pageId: string): Promise<true> {
   const root = await prisma.page.findUnique({

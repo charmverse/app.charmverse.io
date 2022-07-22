@@ -2,7 +2,7 @@
 import { Page, Space, User } from '@prisma/client';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { PageNodeWithChildren } from '../../interfaces';
-import { resolvePageTreeV2 } from '../resolvePageTree_v2';
+import { resolvePageTree } from '../resolvePageTree';
 
 let user: User;
 let space: Space;
@@ -114,10 +114,10 @@ function validateRootNode (node: PageNodeWithChildren) {
   expect(node.children[1].children[0].children[0].id).toBe(page_1_2_1_1.id);
 }
 
-describe('resolvePageTree_v2', () => {
+describe('resolvePageTree', () => {
 
   it('should return the list of parents from closest to root, along with the page and its children', async () => {
-    const { parents, targetPage } = await resolvePageTreeV2({ pageId: page_1_1.id });
+    const { parents, targetPage } = await resolvePageTree({ pageId: page_1_1.id });
 
     // Manually list out the parent chain
     const parentList = [root_1];
@@ -135,7 +135,7 @@ describe('resolvePageTree_v2', () => {
   });
 
   it('should prune the parents so they each only contain one child, establishing a direct link to the page', async () => {
-    const { parents, targetPage } = await resolvePageTreeV2({ pageId: page_1_1_1.id });
+    const { parents, targetPage } = await resolvePageTree({ pageId: page_1_1_1.id });
 
     // Make sure we got correct page
     expect(targetPage.id).toEqual(page_1_1_1.id);
@@ -160,7 +160,7 @@ describe('resolvePageTree_v2', () => {
   });
 
   it('should return an empty list of parents for a root page, along with the page and its children', async () => {
-    const { parents, targetPage } = await resolvePageTreeV2({ pageId: root_1.id });
+    const { parents, targetPage } = await resolvePageTree({ pageId: root_1.id });
 
     expect(parents.length).toBe(0);
 

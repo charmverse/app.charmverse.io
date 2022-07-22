@@ -1,7 +1,7 @@
 import { getPage, IPageWithPermissions, PageNodeWithPermissions, PageNotFoundError } from 'lib/pages/server';
 import { prisma } from 'db';
 import { Space } from '@prisma/client';
-import { resolvePageTreeV2 } from 'lib/pages/server/resolvePageTree_v2';
+import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
 import { upsertPermission } from '../actions/upsert-permission';
 import { generateReplaceIllegalPermissions, replaceIllegalPermissions } from '../actions/replaceIllegalPermissions';
 import { copyAllPagePermissions } from '../actions/copyPermission';
@@ -77,7 +77,7 @@ export async function setupPermissionsAfterPageCreated (pageId: string): Promise
 
     // Generate a prisma transaction for the inheritance
 
-    const tree = await resolvePageTreeV2({ pageId: parent.id });
+    const tree = await resolvePageTree({ pageId: parent.id });
 
     const { updateManyOperations: illegalPermissionReplaceOperations } = generateReplaceIllegalPermissions(tree);
 

@@ -3,7 +3,7 @@ import { prisma } from 'db';
 import { hasAccessToSpace } from 'lib/middleware';
 import { flattenTree } from 'lib/pages/mapPageTree';
 import { PageNodeWithPermissions, TargetPageTreeWithFlatChildren } from 'lib/pages/server';
-import { resolvePageTreeV2 } from 'lib/pages/server/resolvePageTree_v2';
+import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
 import { InvalidPermissionGranteeError } from 'lib/permissions/errors';
 import { InsecureOperationError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
@@ -197,7 +197,7 @@ export async function upsertPermission (
 ): Promise<IPagePermissionWithSource> {
 
   // Pre-compute this only once
-  resolvedPageTree = (resolvedPageTree ?? await resolvePageTreeV2({
+  resolvedPageTree = (resolvedPageTree ?? await resolvePageTree({
     pageId
   }).then(tree => {
     return {
