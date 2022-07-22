@@ -2,7 +2,7 @@ import { ApplicationStatus, Space, User } from '@prisma/client';
 import { generateBountyWithSingleApplication, generateSpaceUser, generateTransaction, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { prisma } from 'db';
-import { listSubmissions } from '../listSubmissions';
+import { listSubmissions } from '../listAccessibleApplications';
 
 let user: User;
 let space: Space;

@@ -464,8 +464,8 @@ class CharmClient {
     return data;
   }
 
-  listApplications (bountyId: string, submissionsOnly: boolean): Promise<ApplicationWithTransactions []> {
-    return http.GET('/api/applications', { bountyId, submissionsOnly });
+  listApplications (bountyId: string): Promise<ApplicationWithTransactions []> {
+    return http.GET('/api/applications', { bountyId });
   }
 
   async createSubmission (content: Omit<SubmissionCreationData, 'userId'>): Promise<Application> {

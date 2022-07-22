@@ -1,5 +1,4 @@
 import { useTheme } from '@emotion/react';
-import AvatarGroup from '@mui/material/AvatarGroup';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
@@ -14,7 +13,6 @@ import Typography from '@mui/material/Typography';
 import { Application, ApplicationStatus } from '@prisma/client';
 import charmClient from 'charmClient';
 import MultiPaymentModal from 'components/bounties/components/MultiPaymentModal';
-import Avatar from 'components/common/Avatar';
 import { Modal } from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
 import { useBounties } from 'hooks/useBounties';
@@ -26,11 +24,10 @@ import { ApplicationWithTransactions } from 'lib/applications/actions';
 import { applicantIsSubmitter, countValidSubmissions, moveUserApplicationToFirstRow, submissionsCapReached } from 'lib/applications/shared';
 import { humaniseBountyAccessConditions } from 'lib/bounties/client';
 import { AssignedBountyPermissions } from 'lib/bounties/interfaces';
-import { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import { fancyTrim } from 'lib/utilities/strings';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { BountyWithDetails, Contributor } from 'models';
-import { useEffect, useMemo, useState } from 'react';
+import { BountyWithDetails } from 'models';
+import { useEffect, useState } from 'react';
 import { BrandColor } from 'theme/colors';
 import BountySubmissionContent from '../../components/BountySubmissionContent';
 import BountySubmissionReviewActions from '../../components/BountySubmissionReviewActions';
@@ -82,7 +79,7 @@ export default function BountySubmissions ({ showMetadata = true, bounty, permis
 
   function refreshSubmissions () {
     if (bounty) {
-      charmClient.listApplications(bounty.id, true)
+      charmClient.listApplications(bounty.id)
         .then(foundSubmissions => {
           setSubmissions(foundSubmissions);
         });
