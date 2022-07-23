@@ -23,22 +23,24 @@ export default function BountyApplicationForm (props: BountyApplicationFormProps
   // Only applies if there is a submissions cap
   const capReached = submissionsCapReached({ bounty, submissions });
   const canCreateSubmission = !userSubmission && !capReached && permissions?.userPermissions.work && bounty.createdBy !== user?.id;
-  const newSubmissionTooltip = !permissions?.userPermissions.work ? 'You do not have the correct role to submit work to this bounty' : (capReached ? 'The submissions cap has been reached. This bounty is closed to new submissions.' : 'Create a new submission to this bounty.');
+  const newSubmissionTooltip = !permissions?.userPermissions.work ? 'You do not have the correct role to submit work to this bounty' : (capReached ? 'The submissions cap has been reached. This bounty is closed to new submissions.' : 'Apply to this bounty.');
 
   if (!userSubmission) {
     if (!isApplyingBounty && bounty.createdBy !== user?.id) {
       return (
         <Tooltip placement='top' title={newSubmissionTooltip}>
-          <Box component='span'>
-            <Button
-              disabled={!canCreateSubmission}
-              onClick={() => {
-                setIsApplyingBounty(true);
-              }}
-            >
-              Apply
-            </Button>
-          </Box>
+          <Stack justifyContent='center' width='100%' flexDirection='row' my={2}>
+            <Box component='span'>
+              <Button
+                disabled={!canCreateSubmission}
+                onClick={() => {
+                  setIsApplyingBounty(true);
+                }}
+              >
+                Apply
+              </Button>
+            </Box>
+          </Stack>
         </Tooltip>
       );
     }

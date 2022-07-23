@@ -101,6 +101,7 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
         label={`Submissions: ${bounty?.maxSubmissions ? `${validSubmissions} / ${bounty.maxSubmissions}` : validSubmissions}`}
       />
 
+      {(userApplication || permissions.userPermissions.review) && (
       <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
         <TableHead sx={{
           background: theme.palette.background.dark,
@@ -190,7 +191,8 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
           ))}
         </TableBody>
       </Table>
-      {submissions.length === 0 && (
+      )}
+      {submissions.length === 0 && permissions.userPermissions.review && (
         <Box
           my={3}
           sx={{

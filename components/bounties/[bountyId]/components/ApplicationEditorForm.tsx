@@ -109,10 +109,9 @@ export function ApplicationEditorForm ({ onCancel, onSubmit, bountyId, proposal,
           </Grid>
 
           <Grid item display='flex' gap={1}>
-            <Button disabled={!isValid} type='submit'>{mode === 'create' ? ' Submit application' : 'Update application'}</Button>
+            <Button disabled={!isValid} type='submit'>{mode === 'create' ? ' Submit' : 'Update'}</Button>
             {onCancel && <Button onClick={onCancel} color='error'>Cancel</Button>}
           </Grid>
-
         </Grid>
 
       </form>

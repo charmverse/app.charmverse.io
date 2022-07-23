@@ -4,8 +4,6 @@ import { Box, FormLabel, IconButton, Stack, TextField } from '@mui/material';
 import { PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
 import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge';
-import { ApplicationEditorForm } from 'components/bounties/[bountyId]/components/ApplicationEditorForm';
-import BountyApplyButton from 'components/bounties/[bountyId]/components/BountyApplyButton';
 import BountySubmissionsTable from 'components/bounties/[bountyId]/components_v3/BountySubmissionsTable';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
 import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
