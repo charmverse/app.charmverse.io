@@ -143,15 +143,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
                     showMessage('Copied card link to clipboard', 'success')
                 }}
             />
-            {/* {(card && !card.fields.isTemplate) &&
-                <Menu.Text
-                    id='makeTemplate'
-                    name='New template from card'
-                    onClick={makeTemplateClicked}
-                />
-            } */}
         </Menu>
-    console.log({bounty, bounties});
     
     return card && pages[card.id] ? (
         <>

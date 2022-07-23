@@ -5,9 +5,8 @@ import { PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
 import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge';
 import { ApplicationEditorForm } from 'components/bounties/[bountyId]/components/ApplicationEditorForm';
-import { BountyApplicantList } from 'components/bounties/[bountyId]/components/BountyApplicantList';
 import BountyApplyButton from 'components/bounties/[bountyId]/components/BountyApplyButton';
-import BountySubmissions from 'components/bounties/[bountyId]/components_v3/BountySubmissions';
+import BountySubmissionsTable from 'components/bounties/[bountyId]/components_v3/BountySubmissionsTable';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
 import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
@@ -380,23 +379,7 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
         </Box>
       </Stack>
 
-      {canEdit && (
-      <>
-        {bountyProperties}
-        {
-          currentBounty.approveSubmitters === true && (
-            <Box my={2}>
-              <BountyApplicantList
-                showHeader={false}
-                bounty={currentBounty}
-                applications={currentBounty.applications}
-                permissions={permissions}
-              />
-            </Box>
-          )
-        }
-      </>
-      )}
+      {canEdit && bountyProperties}
 
       {!canEdit && !isApplyingBounty && (
         <Stack justifyContent='center' width='100%' flexDirection='row' my={2}>
@@ -411,12 +394,11 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
         </Stack>
       )}
 
-      {userApplication && permissions?.userPermissions?.work && (
-        <BountySubmissions
-          bounty={currentBounty}
-          permissions={permissions}
-          showMetadata={false}
-        />
+      {permissions && (
+      <BountySubmissionsTable
+        bounty={currentBounty}
+        permissions={permissions}
+      />
       )}
 
       {isApplyingBounty && !userApplication && (
