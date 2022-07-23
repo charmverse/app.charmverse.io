@@ -7,7 +7,6 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { Application, ApplicationStatus, Bounty } from '@prisma/client';
 import charmClient from 'charmClient';
@@ -17,7 +16,7 @@ import { useBounties } from 'hooks/useBounties';
 import { useContributors } from 'hooks/useContributors';
 import { useUser } from 'hooks/useUser';
 import { ApplicationWithTransactions } from 'lib/applications/actions';
-import { applicantIsSubmitter, countValidSubmissions, moveUserApplicationToFirstRow, submissionsCapReached } from 'lib/applications/shared';
+import { applicantIsSubmitter, countValidSubmissions } from 'lib/applications/shared';
 import { AssignedBountyPermissions } from 'lib/bounties/interfaces';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -26,7 +25,7 @@ import { BrandColor } from 'theme/colors';
 import BountySubmissionContent from '../../components/BountySubmissionContent';
 import BountySubmissionReviewActions from '../../components/BountySubmissionReviewActions';
 import { ApplicationEditorForm } from '../components/ApplicationEditorForm';
-import SubmissionEditorForm from './SubmissionEditorForm';
+import BountyApplicationForm from './BountyApplicationForm';
 
 interface Props {
   bounty: Bounty
@@ -61,37 +60,9 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
 
   const [submissions, setSubmissions] = useState<ApplicationWithTransactions[]>([]);
   const [currentViewedSubmission, setCurrentViewedSubmission] = useState<Application | null>(null);
-
-  const sortedSubmissions = submissions ? moveUserApplicationToFirstRow(submissions.filter(applicantIsSubmitter), user?.id as string) : [];
-  const userSubmission = sortedSubmissions.find(sub => sub.createdBy === user?.id);
-  // Calculate valid submissions for the UI
-  const validSubmissions = countValidSubmissions(submissions);
-  // Only applies if there is a submissions cap
-  const capReached = submissionsCapReached({ bounty, submissions });
-  const canCreateSubmission = !userSubmission && !capReached && permissions?.userPermissions.work;
-  const newSubmissionTooltip = !permissions?.userPermissions.work ? 'You do not have the correct role to submit work to this bounty' : (capReached ? 'The submissions cap has been reached. This bounty is closed to new submissions.' : 'Create a new submission to this bounty.');
-
   const acceptedApplications = submissions.filter(applicantIsSubmitter);
-
-  const applicationsMade = submissions.length;
-
-  let maxHeight: null | number | string = 400;
-
-  let minHeight: null | number | string = applicationsMade === 0 ? 100 : 100 * applicationsMade;
-
-  // Ensure table only starts scrolling once we've received more than a few applications
-  if (minHeight > maxHeight) {
-    minHeight = null;
-    maxHeight = `${maxHeight}px`;
-  }
-  else {
-    // We don't need to change maxHeight to null as minHeight always overrides maxHeight
-    minHeight = `${minHeight}px`;
-  }
-
-  const sortedApplications = moveUserApplicationToFirstRow(submissions, user?.id as string);
-
-  const userApplication = sortedApplications.find(app => app.createdBy === user?.id);
+  const userApplication = submissions.find(app => app.createdBy === user?.id);
+  const validSubmissions = countValidSubmissions(submissions);
 
   function refreshSubmissions () {
     if (bounty) {
@@ -120,12 +91,6 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
     refreshBounty(bounty.id);
   }
 
-  function submitterUpdatedSubmission () {
-    editSubmissionModal.close();
-    refreshSubmissions();
-    refreshBounty(bounty.id);
-  }
-
   useEffect(() => {
     refreshSubmissions();
   }, [bounty]);
@@ -133,23 +98,8 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
   return (
     <Box>
       <Chip
-        label={`${bounty?.maxSubmissions ? `${validSubmissions} / ${bounty.maxSubmissions}` : validSubmissions}`}
+        label={`Submissions: ${bounty?.maxSubmissions ? `${validSubmissions} / ${bounty.maxSubmissions}` : validSubmissions}`}
       />
-
-      {
-        !bounty.approveSubmitters && !userSubmission && (
-          <Tooltip placement='top' title={newSubmissionTooltip}>
-            <Box component='span'>
-              <Button
-                disabled={!canCreateSubmission}
-                onClick={editSubmissionModal.open}
-              >
-                New
-              </Button>
-            </Box>
-          </Tooltip>
-        )
-      }
 
       <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
         <TableHead sx={{
@@ -182,7 +132,7 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
           </TableRow>
         </TableHead>
         <TableBody>
-          {sortedSubmissions.map((submission, submissionIndex) => (
+          {submissions.map((submission, submissionIndex) => (
             <TableRow
               key={submission.id}
               sx={{ backgroundColor: submissionIndex % 2 !== 0 ? theme.palette.background.default : theme.palette.background.light, '&:last-child td, &:last-child th': { border: 0 } }}
@@ -254,6 +204,13 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
           </Typography>
         </Box>
       )}
+
+      <BountyApplicationForm
+        bounty={bounty}
+        permissions={permissions}
+        submissions={submissions}
+      />
+
       <Modal title='Bounty Application' size='large' open={bountyApplyModal.isOpen} onClose={bountyApplyModal.close}>
         <ApplicationEditorForm
           bountyId={bounty.id}
@@ -261,9 +218,6 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
           proposal={userApplication}
           mode={userApplication ? 'update' : 'create'}
         />
-      </Modal>
-      <Modal title='Your submission' open={editSubmissionModal.isOpen} onClose={editSubmissionModal.close} size='large'>
-        <SubmissionEditorForm submission={userSubmission} bounty={bounty} onSubmit={submitterUpdatedSubmission} />
       </Modal>
 
       <Modal open={currentViewedSubmission !== null} onClose={() => setCurrentViewedSubmission(null)} size='large'>

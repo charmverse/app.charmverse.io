@@ -81,7 +81,6 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
   const assignedRoleSubmitters = permissions?.bountyPermissions?.submitter?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
   const selectedReviewerUsers = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'user').map(p => p.id as string) ?? [];
   const selectedReviewerRoles = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
-  const [isApplyingBounty, setIsApplyingBounty] = useState(false);
   const canEdit = !readOnly && permissions?.userPermissions.edit;
   const userApplication = currentBounty.applications.find(application => application.createdBy === user?.id);
 
@@ -381,44 +380,11 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
 
       {canEdit && bountyProperties}
 
-      {!canEdit && !isApplyingBounty && (
-        <Stack justifyContent='center' width='100%' flexDirection='row' my={2}>
-          <BountyApplyButton
-            applications={currentBounty.applications}
-            bounty={currentBounty}
-            onClick={() => {
-              setIsApplyingBounty(true);
-            }}
-            permissions={permissions}
-          />
-        </Stack>
-      )}
-
       {permissions && (
       <BountySubmissionsTable
         bounty={currentBounty}
         permissions={permissions}
       />
-      )}
-
-      {isApplyingBounty && !userApplication && (
-        <Stack my={1} gap={1}>
-          <FormLabel sx={{
-            fontWeight: 'bold'
-          }}
-          >Application
-          </FormLabel>
-          <ApplicationEditorForm
-            bountyId={currentBounty.id}
-            mode='create'
-            onSubmit={() => {
-              setIsApplyingBounty(false);
-            }}
-            onCancel={() => {
-              setIsApplyingBounty(false);
-            }}
-          />
-        </Stack>
       )}
     </Box>
   );
