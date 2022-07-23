@@ -1,4 +1,7 @@
 import { useTheme } from '@emotion/react';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import { Collapse, IconButton } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
@@ -10,7 +13,6 @@ import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import { Application, ApplicationStatus, Bounty } from '@prisma/client';
 import charmClient from 'charmClient';
-import { Modal } from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
 import { useBounties } from 'hooks/useBounties';
 import { useContributors } from 'hooks/useContributors';
@@ -21,10 +23,6 @@ import { AssignedBountyPermissions } from 'lib/bounties/interfaces';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 import { useEffect, useState } from 'react';
 import { BrandColor } from 'theme/colors';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Collapse, IconButton } from '@mui/material';
-import BountySubmissionContent from '../../components/BountySubmissionContent';
 import BountySubmissionReviewActions, { BountySubmissionReviewActionsProps } from '../../components/BountySubmissionReviewActions';
 import { ApplicationEditorForm } from '../components/ApplicationEditorForm';
 import BountyApplicationForm from './BountyApplicationForm';
@@ -175,19 +173,17 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
   const theme = useTheme();
 
   const [submissions, setSubmissions] = useState<ApplicationWithTransactions[]>([]);
-  const [currentViewedSubmission, setCurrentViewedSubmission] = useState<Application | null>(null);
   const [isSubmittingApplication, setIsSubmittingApplication] = useState(false);
+  const { refreshBounty } = useBounties();
 
   const acceptedApplications = submissions.filter(applicantIsSubmitter);
   const userApplication = submissions.find(app => app.createdBy === user?.id);
   const validSubmissions = countValidSubmissions(submissions);
 
-  function refreshSubmissions () {
+  async function refreshSubmissions () {
     if (bounty) {
-      charmClient.listApplications(bounty.id)
-        .then(foundSubmissions => {
-          setSubmissions(foundSubmissions);
-        });
+      const foundSubmissions = await charmClient.listApplications(bounty.id);
+      setSubmissions(foundSubmissions);
     }
   }
 
@@ -232,7 +228,7 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
             </TableCell>
             <TableCell>
             </TableCell>
-            <TableCell align='right'>
+            <TableCell align='center'>
               Action
             </TableCell>
           </TableRow>
@@ -245,7 +241,7 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
               permissions={permissions}
               submission={submission}
               key={submission.id}
-              onSubmission={() => {
+              onSubmission={async () => {
                 setIsSubmittingApplication(true);
               }}
             />
@@ -281,16 +277,14 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
           submission={userApplication}
           showHeader
           onCancel={() => setIsSubmittingApplication(false)}
-          onSubmit={() => {
+          onSubmit={async () => {
+            await refreshSubmissions();
+            await refreshBounty(bounty.id);
             setIsSubmittingApplication(false);
           }}
         />
         )
       }
-
-      <Modal open={currentViewedSubmission !== null} onClose={() => setCurrentViewedSubmission(null)} size='large'>
-        <BountySubmissionContent submission={currentViewedSubmission as Application} />
-      </Modal>
     </Box>
   );
 }

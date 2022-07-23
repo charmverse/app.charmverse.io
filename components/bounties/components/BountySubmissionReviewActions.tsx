@@ -99,6 +99,11 @@ export default function BountySubmissionReviewActions (
           <Button type='submit' onClick={onSubmission}>Submit</Button>
         )
       }
+      {
+        submission.status === 'applied' && submission.createdBy === user?.id && (
+          <Button disabled>Waiting assignment</Button>
+        )
+      }
       {isAdmin && submission.status === 'complete' && submission.walletAddress && <BountyPaymentButton onSuccess={recordTransaction} receiver={submission.walletAddress} amount={eToNumber(bounty.rewardAmount)} tokenSymbolOrAddress={bounty.rewardToken} chainIdToUse={bounty.chainId} />}
       {
         (submission.status === 'paid' && submission.transactions.length !== 0) && (
