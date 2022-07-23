@@ -38,8 +38,7 @@ export async function updateBountySettings ({
         rewardAmount: updateContent.rewardAmount,
         rewardToken: updateContent.rewardToken,
         approveSubmitters: updateContent.approveSubmitters,
-        maxSubmissions: updateContent.maxSubmissions,
-        linkedTaskId: updateContent.linkedTaskId
+        maxSubmissions: updateContent.maxSubmissions
       }
     }),
     prisma.page.update({

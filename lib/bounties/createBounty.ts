@@ -16,7 +16,6 @@ export async function createBounty ({
   chainId = 1,
   description = '',
   descriptionNodes = '',
-  linkedTaskId,
   approveSubmitters = true,
   maxSubmissions,
   rewardAmount = 0,
@@ -62,8 +61,7 @@ export async function createBounty ({
     approveSubmitters,
     maxSubmissions,
     rewardAmount,
-    rewardToken,
-    linkedTaskId
+    rewardToken
   };
 
   const isSuggestion = status === 'suggestion';
@@ -74,28 +72,26 @@ export async function createBounty ({
 
   let pageData = {};
 
-  if (!isSuggestion) {
-    pageData = {
-      create: {
-        path: `page-${Math.random().toString().replace('0.', '')}`,
-        title,
-        contentText: description,
-        content: descriptionNodes as string,
-        space: {
-          connect: {
-            id: spaceId
-          }
-        },
-        updatedBy: createdBy,
-        author: {
-          connect: {
-            id: createdBy
-          }
-        },
-        type: PageType.bounty
-      }
-    };
-  }
+  pageData = {
+    create: {
+      path: `page-${Math.random().toString().replace('0.', '')}`,
+      title,
+      contentText: description,
+      content: descriptionNodes as string,
+      space: {
+        connect: {
+          id: spaceId
+        }
+      },
+      updatedBy: createdBy,
+      author: {
+        connect: {
+          id: createdBy
+        }
+      },
+      type: PageType.bounty
+    }
+  };
 
   const bounty = await prisma.bounty.create({
     data: {

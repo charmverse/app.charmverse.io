@@ -3,7 +3,7 @@ import log from 'lib/log';
 import { prisma } from '../db';
 
 (async () => {
-  const bounties: Array<Partial<Bounty>> = await prisma.bounty.findMany();
+  const bounties: Partial<Bounty>[] = await prisma.bounty.findMany();
 
   log.info('Number of bounties: ', bounties.length);
 
