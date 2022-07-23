@@ -148,12 +148,14 @@ function BountySubmissionsTableRow ({ onSubmission, submission, permissions, bou
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={5}>
           <Collapse in={isViewingDetails} timeout='auto' unmountOnExit>
-            <SubmissionEditorForm
-              bountyId={bounty.id}
-              readOnly={user?.id !== submission.createdBy || submission.status !== 'inProgress'}
-              submission={submission}
-              showHeader
-            />
+            {submission.status !== 'applied' && submission.walletAddress && submission.submission && (
+              <SubmissionEditorForm
+                bountyId={bounty.id}
+                readOnly={user?.id !== submission.createdBy || (submission.status !== 'inProgress' && submission.status !== 'review')}
+                submission={submission}
+                showHeader
+              />
+            )}
             <ApplicationEditorForm
               bountyId={bounty.id}
               proposal={submission}
@@ -196,6 +198,9 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
   return (
     <Box>
       <Chip
+        sx={{
+          my: 1
+        }}
         label={`Submissions: ${bounty?.maxSubmissions ? `${validSubmissions} / ${bounty.maxSubmissions}` : validSubmissions}`}
       />
 

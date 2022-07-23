@@ -1,6 +1,6 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Box, FormLabel, IconButton, Stack, TextField } from '@mui/material';
+import { Box, Collapse, Divider, FormLabel, IconButton, Stack, TextField } from '@mui/material';
 import { PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
 import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge';
@@ -245,8 +245,7 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
           {isShowingAdvancedSettings ? <KeyboardArrowUpIcon fontSize='small' /> : <KeyboardArrowDownIcon fontSize='small' />}
         </IconButton>
       </Stack>
-      {isShowingAdvancedSettings && (
-      <>
+      <Collapse in={isShowingAdvancedSettings} timeout='auto' unmountOnExit>
         <div className='octo-propertyrow'>
           <div className='octo-propertyname'>Require applications</div>
           <Switch
@@ -288,7 +287,12 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
             readOnly={!canEdit}
           />
         </div>
-        <div className='octo-propertyrow'>
+        <div
+          className='octo-propertyrow'
+          style={{
+            height: 'fit-content'
+          }}
+        >
           <div className='octo-propertyname'>Submissions limit</div>
           <Switch
             isOn={capSubmissions}
@@ -304,7 +308,12 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
           />
         </div>
         {capSubmissions && (
-        <div className='octo-propertyrow'>
+        <div
+          className='octo-propertyrow'
+          style={{
+            height: 'fit-content'
+          }}
+        >
           <div className='octo-propertyname'>Max submissions</div>
           <TextField
             required
@@ -320,8 +329,7 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
           />
         </div>
         )}
-      </>
-      )}
+      </Collapse>
     </>
   );
 
@@ -377,6 +385,11 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
 
       {canEdit && bountyProperties}
 
+      <Divider
+        sx={{
+          my: 1
+        }}
+      />
       {permissions && (
       <BountySubmissionsTable
         bounty={currentBounty}
