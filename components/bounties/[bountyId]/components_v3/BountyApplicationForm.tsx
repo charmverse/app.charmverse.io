@@ -30,7 +30,7 @@ export default function BountyApplicationForm (props: BountyApplicationFormProps
   const newSubmissionTooltip = !permissions?.userPermissions.work ? 'You do not have the correct role to submit work to this bounty' : (capReached ? 'The submissions cap has been reached. This bounty is closed to new submissions.' : 'Apply to this bounty.');
 
   if (!userSubmission) {
-    if (!isApplyingBounty && bounty.createdBy !== user?.id) {
+    if (!isApplyingBounty && bounty.createdBy !== user?.id && !permissions.userPermissions.review) {
       return (
         <Tooltip placement='top' title={newSubmissionTooltip}>
           <Stack justifyContent='center' width='100%' flexDirection='row' my={2}>
