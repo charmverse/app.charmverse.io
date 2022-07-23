@@ -1,4 +1,5 @@
 import { prisma } from 'db';
+import { generateAccessibleBountiesQuery } from 'lib/bounties';
 import { ApplicationWithTransactions } from '../interfaces';
 
 /**
@@ -17,57 +18,10 @@ export async function listAccessibleApplications (
       OR: [
         {
           bounty: {
-            OR: [
-              {
-                createdBy: userId
-              },
-              {
-                space: {
-                  spaceRoles: {
-                    some: {
-                      userId,
-                      isAdmin: true
-                    }
-                  }
-                }
-              },
-              {
-                permissions: {
-                  some: {
-                    OR: [{
-                      public: true
-                    },
-                    {
-                      user: {
-                        id: userId
-                      }
-                    },
-                    {
-                      role: {
-                        spaceRolesToRole: {
-                          some: {
-                            spaceRole: {
-                              spaceId,
-                              userId
-                            }
-                          }
-                        }
-                      }
-                    },
-                    {
-                      space: {
-                        id: spaceId,
-                        spaceRoles: {
-                          some: {
-                            userId
-                          }
-                        }
-                      }
-                    }]
-                  }
-                }
-              }
-            ]
+            OR: generateAccessibleBountiesQuery({
+              userId,
+              spaceId
+            })
           }
         },
         {
