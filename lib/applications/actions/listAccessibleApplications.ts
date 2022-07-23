@@ -17,34 +17,57 @@ export async function listAccessibleApplications (
       OR: [
         {
           bounty: {
-            createdBy: userId
-          }
-        },
-        {
-          bounty: {
-            permissions: {
-              some: {
-                userId
-              }
-            }
-          }
-        },
-        {
-          bounty: {
-            permissions: {
-              some: {
-                role: {
-                  spaceRolesToRole: {
+            OR: [
+              {
+                createdBy: userId
+              },
+              {
+                space: {
+                  spaceRoles: {
                     some: {
-                      spaceRole: {
-                        userId,
-                        spaceId
-                      }
+                      userId,
+                      isAdmin: true
                     }
                   }
                 }
+              },
+              {
+                permissions: {
+                  some: {
+                    OR: [{
+                      public: true
+                    },
+                    {
+                      user: {
+                        id: userId
+                      }
+                    },
+                    {
+                      role: {
+                        spaceRolesToRole: {
+                          some: {
+                            spaceRole: {
+                              spaceId,
+                              userId
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      space: {
+                        id: spaceId,
+                        spaceRoles: {
+                          some: {
+                            userId
+                          }
+                        }
+                      }
+                    }]
+                  }
+                }
               }
-            }
+            ]
           }
         },
         {
