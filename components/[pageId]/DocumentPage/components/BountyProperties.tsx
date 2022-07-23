@@ -166,9 +166,9 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
             width: 250
           }}
           onChange={async (chainId) => {
-            const newNativeCurrency = refreshCryptoList(currentBounty.chainId);
+            const newNativeCurrency = refreshCryptoList(chainId);
             await updateBounty(currentBounty.id, {
-              chainId: currentBounty.chainId,
+              chainId,
               rewardToken: newNativeCurrency
             });
             setCurrentBounty((_currentBounty) => ({ ..._currentBounty, chainId }));

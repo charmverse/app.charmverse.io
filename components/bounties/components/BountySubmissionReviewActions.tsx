@@ -77,7 +77,7 @@ export default function BountySubmissionReviewActions (
     setApiError(null);
   }
 
-  const canReview = permissions?.userPermissions?.review && (submission.status === 'inProgress' || submission.status === 'review');
+  const canReview = permissions?.userPermissions?.review && submission.status === 'review';
 
   return (
     <Box display='flex' gap={1} alignItems='center' justifyContent='end'>
@@ -100,8 +100,18 @@ export default function BountySubmissionReviewActions (
         )
       }
       {
+        submission.status === 'review' && submission.createdBy === user?.id && (
+          <Button disabled>Waiting review</Button>
+        )
+      }
+      {
         submission.status === 'applied' && submission.createdBy === user?.id && (
           <Button disabled>Waiting assignment</Button>
+        )
+      }
+      {
+        submission.status === 'complete' && submission.createdBy === user?.id && (
+          <Button disabled>Waiting payment</Button>
         )
       }
       {isAdmin && submission.status === 'complete' && submission.walletAddress && <BountyPaymentButton onSuccess={recordTransaction} receiver={submission.walletAddress} amount={eToNumber(bounty.rewardAmount)} tokenSymbolOrAddress={bounty.rewardToken} chainIdToUse={bounty.chainId} />}
