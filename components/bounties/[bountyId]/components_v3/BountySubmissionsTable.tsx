@@ -19,16 +19,16 @@ import { ApplicationWithTransactions } from 'lib/applications/actions';
 import { applicantIsSubmitter, countValidSubmissions } from 'lib/applications/shared';
 import { AssignedBountyPermissions } from 'lib/bounties/interfaces';
 import { humanFriendlyDate } from 'lib/utilities/dates';
-import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 import { BrandColor } from 'theme/colors';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Collapse, IconButton } from '@mui/material';
 import BountySubmissionContent from '../../components/BountySubmissionContent';
-import BountySubmissionReviewActions from '../../components/BountySubmissionReviewActions';
+import BountySubmissionReviewActions, { BountySubmissionReviewActionsProps } from '../../components/BountySubmissionReviewActions';
 import { ApplicationEditorForm } from '../components/ApplicationEditorForm';
 import BountyApplicationForm from './BountyApplicationForm';
+import SubmissionEditorForm from './SubmissionEditorForm';
 
 interface Props {
   bounty: Bounty
@@ -58,9 +58,10 @@ interface BountySubmissionsTableRowProps {
   submission: ApplicationWithTransactions
   permissions: AssignedBountyPermissions
   bounty: Bounty
+  onSubmission: BountySubmissionReviewActionsProps['onSubmission']
 }
 
-function BountySubmissionsTableRow ({ submission, permissions, bounty, totalAcceptedApplications }: BountySubmissionsTableRowProps) {
+function BountySubmissionsTableRow ({ onSubmission, submission, permissions, bounty, totalAcceptedApplications }: BountySubmissionsTableRowProps) {
   const [contributors] = useContributors();
   const { refreshBounty } = useBounties();
   const [user] = useUser();
@@ -137,7 +138,7 @@ function BountySubmissionsTableRow ({ submission, permissions, bounty, totalAcce
               bounty={bounty}
               submission={submission}
               reviewComplete={() => {}}
-              onSubmission={() => {}}
+              onSubmission={onSubmission}
               permissions={permissions}
             />
           )
@@ -151,7 +152,7 @@ function BountySubmissionsTableRow ({ submission, permissions, bounty, totalAcce
               <ApplicationEditorForm
                 bountyId={bounty.id}
                 proposal={submission}
-                readOnly={user?.id !== submission.createdBy}
+                readOnly={user?.id !== submission.createdBy || submission.status !== 'applied'}
                 mode='update'
                 showHeader
               />
@@ -167,10 +168,10 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
   const [user] = useUser();
   const theme = useTheme();
 
-  const bountyApplyModal = usePopupState({ variant: 'popover', popupId: 'apply-for-bounty' });
-
   const [submissions, setSubmissions] = useState<ApplicationWithTransactions[]>([]);
   const [currentViewedSubmission, setCurrentViewedSubmission] = useState<Application | null>(null);
+  const [isSubmittingApplication, setIsSubmittingApplication] = useState(false);
+
   const acceptedApplications = submissions.filter(applicantIsSubmitter);
   const userApplication = submissions.find(app => app.createdBy === user?.id);
   const validSubmissions = countValidSubmissions(submissions);
@@ -235,6 +236,9 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
               permissions={permissions}
               submission={submission}
               key={submission.id}
+              onSubmission={() => {
+                setIsSubmittingApplication(true);
+              }}
             />
           ))}
         </TableBody>
@@ -261,14 +265,19 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
         submissions={submissions}
       />
 
-      <Modal title='Bounty Application' size='large' open={bountyApplyModal.isOpen} onClose={bountyApplyModal.close}>
-        <ApplicationEditorForm
-          bountyId={bounty.id}
-          onSubmit={bountyApplyModal.close}
-          proposal={userApplication}
-          mode={userApplication ? 'update' : 'create'}
+      {
+        isSubmittingApplication && (
+        <SubmissionEditorForm
+          bounty={bounty}
+          submission={userApplication}
+          showHeader
+          onCancel={() => setIsSubmittingApplication(false)}
+          onSubmit={() => {
+            setIsSubmittingApplication(false);
+          }}
         />
-      </Modal>
+        )
+      }
 
       <Modal open={currentViewedSubmission !== null} onClose={() => setCurrentViewedSubmission(null)} size='large'>
         <BountySubmissionContent submission={currentViewedSubmission as Application} />

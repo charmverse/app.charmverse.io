@@ -23,7 +23,7 @@ import { SyntheticEvent, useState } from 'react';
 import { AssignedBountyPermissions } from 'lib/bounties/interfaces';
 import BountyPaymentButton from '../[bountyId]/components/BountyPaymentButton';
 
-interface Props {
+export interface BountySubmissionReviewActionsProps {
   bounty: Bounty,
   submission: ApplicationWithTransactions,
   permissions: AssignedBountyPermissions,
@@ -31,8 +31,10 @@ interface Props {
   onSubmission: (eventOrAnchorEl?: HTMLElement | SyntheticEvent<any, Event> | null | undefined) => void
 }
 
-export default function BountySubmissionReviewActions ({ onSubmission, bounty, submission, reviewComplete, permissions }: Props) {
-
+export default function BountySubmissionReviewActions (
+  { onSubmission, bounty, submission, reviewComplete, permissions }:
+  BountySubmissionReviewActionsProps
+) {
   const [user] = useUser();
   const isAdmin = useIsAdmin();
   const { refreshBounty } = useBounties();

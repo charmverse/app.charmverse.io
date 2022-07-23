@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import { FormLabel, Stack } from '@mui/material';
 import Alert from '@mui/material/Alert';
-import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
@@ -29,19 +29,19 @@ type FormValues = yup.InferType<typeof schema>
 interface Props {
   submission?: Application,
   bounty: Bounty,
-  onSubmit: (submission: Application) => void
+  onSubmit?: (submission: Application) => void
   onCancel?: () => void
+  showHeader?: boolean
 }
 
-export default function BountySubmissionForm ({ onCancel, submission, onSubmit: onSubmitProp, bounty }: Props) {
+export default function BountySubmissionForm ({ showHeader = false, onCancel, submission, onSubmit: onSubmitProp, bounty }: Props) {
   const [user] = useUser();
 
   const {
     register,
     handleSubmit,
     setValue,
-    watch,
-    formState: { errors, touchedFields, isValid, isValidating, isSubmitting }
+    formState: { errors, isValid }
   } = useForm<FormValues>({
     mode: 'onChange',
     defaultValues: {
@@ -74,7 +74,9 @@ export default function BountySubmissionForm ({ onCancel, submission, onSubmit: 
           submissionContent: values
         });
       }
-      onSubmitProp(application);
+      if (onSubmitProp) {
+        onSubmitProp(application);
+      }
     }
     catch (err: any) {
       setFormError(err);
@@ -84,8 +86,17 @@ export default function BountySubmissionForm ({ onCancel, submission, onSubmit: 
   //  console.log('Submission', submission.submissionNodes, typeof submission.submissionNodes);
 
   return (
-    <Box>
-      <form onSubmit={handleSubmit(onSubmit)} style={{ margin: 'auto' }}>
+    <Stack my={1} gap={1}>
+      {
+        showHeader && (
+        <FormLabel sx={{
+          fontWeight: 'bold'
+        }}
+        >Submission
+        </FormLabel>
+        )
+      }
+      <form onSubmit={handleSubmit(onSubmit)} style={{ margin: 'auto', width: '100%' }}>
         <Grid container direction='column' spacing={3}>
           <Grid item>
             <InlineCharmEditor
@@ -135,6 +146,6 @@ export default function BountySubmissionForm ({ onCancel, submission, onSubmit: 
         </Grid>
 
       </form>
-    </Box>
+    </Stack>
   );
 }

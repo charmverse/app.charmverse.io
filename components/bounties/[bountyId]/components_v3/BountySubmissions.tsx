@@ -107,47 +107,47 @@ export default function BountySubmissions ({ showMetadata = true, bounty, permis
   return (
     <Box>
       {showMetadata && (
-      <Grid container sx={{ mb: 2 }}>
+        <Grid container sx={{ mb: 2 }}>
 
-        <BountyReviewers
-          bounty={bounty}
-          permissions={permissions}
-        />
-        <Grid item xs={8}>
-          <Typography variant='h5'>
-            Submissions
-            <Chip
-              sx={{ ml: 1 }}
-              label={`${bounty?.maxSubmissions ? `${validSubmissions} / ${bounty.maxSubmissions}` : validSubmissions}`}
-            />
+          <BountyReviewers
+            bounty={bounty}
+            permissions={permissions}
+          />
+          <Grid item xs={8}>
+            <Typography variant='h5'>
+              Submissions
+              <Chip
+                sx={{ ml: 1 }}
+                label={`${bounty?.maxSubmissions ? `${validSubmissions} / ${bounty.maxSubmissions}` : validSubmissions}`}
+              />
 
-          </Typography>
-        </Grid>
-        <Grid container item xs={4} direction='row' justifyContent='flex-end'>
+            </Typography>
+          </Grid>
+          <Grid container item xs={4} direction='row' justifyContent='flex-end'>
+            {
+              !bounty.approveSubmitters && !userSubmission && (
+                <Tooltip placement='top' title={newSubmissionTooltip}>
+                  <Box component='span'>
+                    <Button
+                      disabled={!canCreateSubmission}
+                      onClick={editSubmissionModal.open}
+                    >
+                      New
+                    </Button>
+                  </Box>
+                </Tooltip>
+              )
+            }
+          </Grid>
           {
-            !bounty.approveSubmitters && !userSubmission && (
-            <Tooltip placement='top' title={newSubmissionTooltip}>
-              <Box component='span'>
-                <Button
-                  disabled={!canCreateSubmission}
-                  onClick={editSubmissionModal.open}
-                >
-                  New
-                </Button>
-              </Box>
-            </Tooltip>
+            !bounty.approveSubmitters && (
+              <Grid item xs={12} sx={{ mt: 2 }}>
+                {humanisedSubmitterSentence.phrase}
+              </Grid>
             )
           }
-        </Grid>
-        {
-          !bounty.approveSubmitters && (
-            <Grid item xs={12} sx={{ mt: 2 }}>
-              {humanisedSubmitterSentence.phrase}
-            </Grid>
-          )
-        }
 
-      </Grid>
+        </Grid>
       )}
 
       <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
@@ -222,36 +222,36 @@ export default function BountySubmissions ({ showMetadata = true, bounty, permis
               <TableCell sx={{ maxWidth: '61vw', cursor: 'pointer' }} onClick={!(submission.status === 'review' && submission.createdBy === user?.id) ? () => setCurrentViewedSubmission(submission) : editSubmissionModal.open}>
 
                 {
-                    submission.status === 'review' && submission.createdBy === user?.id && (
-                      <Typography
-                        variant='body2'
-                        color={theme.palette.primary?.main}
-                      >
-                        {fancyTrim(submission.submission ?? '', 50)}
-                      </Typography>
-                    )
-                  }
+                  submission.status === 'review' && submission.createdBy === user?.id && (
+                    <Typography
+                      variant='body2'
+                      color={theme.palette.primary?.main}
+                    >
+                      {fancyTrim(submission.submission ?? '', 50)}
+                    </Typography>
+                  )
+                }
 
                 {
                   // Either another user is seeing this, or the user who made the submission, and they can't edit it further
-                    ((submission.status !== 'review' && submission.createdBy === user?.id) || (submission.createdBy !== user?.id)) && (
-                      <Typography
-                        variant='body2'
-                      >
-                        {fancyTrim(submission.submission ?? '', 50)}
-                      </Typography>
-                    )
-                  }
+                  ((submission.status !== 'review' && submission.createdBy === user?.id) || (submission.createdBy !== user?.id)) && (
+                    <Typography
+                      variant='body2'
+                    >
+                      {fancyTrim(submission.submission ?? '', 50)}
+                    </Typography>
+                  )
+                }
 
               </TableCell>
 
               {
-                  /*
-                  Hidden until we implement comments
-                <TableCell align='right' sx={{ gap: 2 }}>
-                </TableCell>
-                  */
-                }
+                /*
+                Hidden until we implement comments
+              <TableCell align='right' sx={{ gap: 2 }}>
+              </TableCell>
+                */
+              }
 
               <TableCell align='right' sx={{ gap: 2, justifyContent: 'flex-end' }}>
                 <BountySubmissionReviewActions
@@ -288,11 +288,11 @@ export default function BountySubmissions ({ showMetadata = true, bounty, permis
       </Modal>
 
       {
-      /* Modal for viewing the content */
+        /* Modal for viewing the content */
         <Modal open={currentViewedSubmission !== null} onClose={() => setCurrentViewedSubmission(null)} size='large'>
           <BountySubmissionContent submission={currentViewedSubmission as Application} />
         </Modal>
-    }
+      }
 
     </Box>
   );
