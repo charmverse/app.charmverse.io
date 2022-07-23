@@ -1,11 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Space, User } from '@prisma/client';
+import { PagePermission, Space, User } from '@prisma/client';
+import { prisma } from 'db';
+import { IPageWithPermissions } from 'lib/pages';
+import { getPage } from 'lib/pages/server';
+import { isTruthy } from 'lib/utilities/types';
 import request from 'supertest';
 import { generatePageToCreateStub } from 'testing/generate-stubs';
 import { baseUrl } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
-import { IPageWithPermissions } from 'lib/pages';
 
 let user: User;
 let space: Space;
@@ -97,5 +100,83 @@ describe('POST /api/pages - create child pages', () => {
     const sourcePermissionIds = createdPage.permissions.map(p => p.id);
     expect(sourcePermissionIds.indexOf(childPage.permissions[0].inheritedFromPermission as string) >= 0).toBe(true);
     expect(sourcePermissionIds.indexOf(nestedChildPage.permissions[0].inheritedFromPermission as string) >= 0).toBe(true);
+  });
+
+  it('should clean up any illegal permission inheritance references', async () => {
+    const createdPage = (await request(baseUrl)
+      .post('/api/pages')
+      .set('Cookie', cookie)
+      .send(generatePageToCreateStub({
+        userId: user.id,
+        spaceId: space.id
+      }))
+      .expect(201)).body as IPageWithPermissions;
+
+    let childPage = (await request(baseUrl)
+      .post('/api/pages')
+      .set('Cookie', cookie)
+      .send(generatePageToCreateStub({
+        userId: user.id,
+        spaceId: space.id,
+        parentId: createdPage.id
+      }))
+      .expect(201)).body as IPageWithPermissions;
+
+    const separateRoot = (await request(baseUrl)
+      .post('/api/pages')
+      .set('Cookie', cookie)
+      .send(generatePageToCreateStub({
+        userId: user.id,
+        spaceId: space.id
+      }))
+      .expect(201)).body as IPageWithPermissions;
+
+    // Inject bad permissions by updating space level and created by permissions to inherit from the separate root
+    for (const permission of childPage.permissions) {
+
+      const matchingPermission = separateRoot.permissions.find(p => {
+        if (permission.spaceId) {
+          // Same space ID
+          return p.spaceId === permission.spaceId;
+        }
+        else {
+          // User ID defined
+          return isTruthy(p.userId) && isTruthy(permission.userId);
+        }
+      }) as PagePermission;
+
+      await prisma.pagePermission.update({
+        where: {
+          id: permission.id
+        },
+        data: {
+          sourcePermission: {
+            connect: {
+              id: matchingPermission.id
+            }
+          }
+        }
+      });
+    }
+
+    const nestedChildPage = (await request(baseUrl)
+      .post('/api/pages')
+      .set('Cookie', cookie)
+      .send(generatePageToCreateStub({
+        userId: user.id,
+        spaceId: space.id,
+        parentId: childPage.id
+      }))
+      .expect(201)).body as IPageWithPermissions;
+
+    // Refresh the child page
+    childPage = await getPage(childPage.id) as IPageWithPermissions;
+
+    const sourcePermissionIds = createdPage.permissions.map(p => p.id);
+
+    // Adding the new permission should have updated the old one
+    expect(childPage.permissions.every(p => sourcePermissionIds.indexOf(p.inheritedFromPermission as string) >= 0)).toBe(true);
+    expect(nestedChildPage.permissions.every(p => sourcePermissionIds.indexOf(p.inheritedFromPermission as string) >= 0)).toBe(true);
+
   });
 });

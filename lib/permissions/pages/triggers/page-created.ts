@@ -1,7 +1,10 @@
-import { getPage, IPageWithPermissions, PageNotFoundError } from 'lib/pages/server';
+import { getPage, IPageWithPermissions, PageNodeWithPermissions, PageNotFoundError } from 'lib/pages/server';
 import { prisma } from 'db';
 import { Space } from '@prisma/client';
+import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
 import { upsertPermission } from '../actions/upsert-permission';
+import { generateReplaceIllegalPermissions, replaceIllegalPermissions } from '../actions/replaceIllegalPermissions';
+import { copyAllPagePermissions } from '../actions/copyPermission';
 
 export async function setupPermissionsAfterPageCreated (pageId: string): Promise<IPageWithPermissions> {
   const page = await getPage(pageId);
@@ -58,9 +61,40 @@ export async function setupPermissionsAfterPageCreated (pageId: string): Promise
   }
   else {
     const parent = (await getPage(page.parentId) as IPageWithPermissions);
-    await Promise.all(parent.permissions.map(permission => {
-      return upsertPermission(page.id, permission.id);
-    }));
+
+    if (!parent) {
+      await prisma.page.update({
+        where: {
+          id: pageId
+        },
+        data: {
+          parentId: null
+        }
+      });
+      // Parent was deleted, so we should drop the reference, and reinvoke this function with the page as a root page
+      return setupPermissionsAfterPageCreated(pageId);
+    }
+
+    // Generate a prisma transaction for the inheritance
+
+    const tree = await resolvePageTree({ pageId: parent.id });
+
+    const { updateManyOperations: illegalPermissionReplaceOperations } = generateReplaceIllegalPermissions(tree);
+
+    await prisma.$transaction(async () => {
+      for (const op of illegalPermissionReplaceOperations) {
+        await prisma.pagePermission.updateMany(op);
+      }
+      const refreshedParent = await getPage(parent.id) as IPageWithPermissions;
+      await prisma.pagePermission.createMany(
+        copyAllPagePermissions({
+          inheritFrom: true,
+          newPageId: pageId,
+          permissions: refreshedParent.permissions
+        })
+      );
+
+    });
   }
 
   // Add a full access permission for the creating user

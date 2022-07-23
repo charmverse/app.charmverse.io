@@ -63,26 +63,27 @@ describe('deletePagePermission', () => {
       parentId: root.id
     });
 
-    const rootPermissions = await Promise.all([
-      upsertPermission(
-        root.id,
-        {
-          permissionLevel: 'full_access',
-          userId: user.id
-        }
-      ),
-      upsertPermission(root.id, {
+    const rootFullAccessPermission = await upsertPermission(
+      root.id,
+      {
+        permissionLevel: 'full_access',
+        userId: user.id
+      }
+    );
+
+    const childFullAccessPermission = await upsertPermission(child.id, rootFullAccessPermission.id);
+
+    const rootViewPermission = await upsertPermission(
+      root.id,
+      {
         permissionLevel: 'view',
         spaceId: space.id
-      })
-    ]);
+      }
+    );
 
-    const childPermissions = await Promise.all([
-      upsertPermission(child.id, rootPermissions[0].id),
-      upsertPermission(child.id, rootPermissions[1].id)
-    ]);
+    const childViewPermission = await upsertPermission(child.id, rootViewPermission);
 
-    await deletePagePermission(rootPermissions[0].id);
+    await deletePagePermission(rootFullAccessPermission.id);
 
     const remainingChildPermissions = await prisma.pagePermission.findMany({
       where: {

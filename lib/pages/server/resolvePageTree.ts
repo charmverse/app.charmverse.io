@@ -1,18 +1,42 @@
 import { prisma } from 'db';
+import { PageNodeWithPermissions, TargetPageTree } from '../interfaces';
+import { mapTargetPageTree } from '../mapPageTree';
 import { PageNotFoundError } from './errors';
-import { getPage } from './getPage';
-import { IPageWithPermissions, PageWithChildren } from '../interfaces';
 
 /**
- * Returned a flattened list of all a page's children
- * @param pageId
+ * Returns resolved page tree along with the permissions state
+ *
+ * Parents is an ordered array from closest ancestor up to the root
+ * Children is a recursive array of children in tree format
  */
-export async function resolveChildPagesAsFlatList (pageId: string): Promise<IPageWithPermissions []> {
-  const children = await prisma.page.findMany({
+export async function resolvePageTree ({ pageId }: {pageId: string}):
+  Promise<TargetPageTree<PageNodeWithPermissions>> {
+
+  const pageWithSpaceIdOnly = await prisma.page.findUnique({
     where: {
-      parentId: pageId
+      id: pageId
     },
-    include: {
+    select: {
+      spaceId: true
+    }
+  });
+
+  if (!pageWithSpaceIdOnly) {
+    throw new PageNotFoundError(pageId);
+  }
+
+  const pagesInSpace = await prisma.page.findMany({
+    where: {
+      spaceId: pageWithSpaceIdOnly.spaceId,
+      deletedAt: null
+    },
+    select: {
+      id: true,
+      parentId: true,
+      index: true,
+      type: true,
+      createdAt: true,
+      deletedAt: true,
       permissions: {
         include: {
           sourcePermission: true
@@ -21,102 +45,29 @@ export async function resolveChildPagesAsFlatList (pageId: string): Promise<IPag
     }
   });
 
-  const nestedChildren = await Promise.all(children.map(childPage => {
-    return resolveChildPagesAsFlatList(childPage.id);
-  }));
-
-  // Merge the results
-  const flattenedChildren: IPageWithPermissions [] = [...children];
-
-  nestedChildren.forEach(nestedSet => {
-    flattenedChildren.push(...nestedSet);
+  const { parents, targetPage } = mapTargetPageTree<PageNodeWithPermissions>({
+    items: pagesInSpace,
+    targetPageId: pageId
   });
 
-  return flattenedChildren;
-}
+  // Prune the parent references so we have a direct chain
+  for (let i = 0; i < parents.length; i++) {
+    const parent = parents[i];
 
-/**
- * Returned the children of a specific page along with their own descendants
- * @param directOnly stops at the direct descendants of the target page
- */
-export async function resolveChildPages (pageId: string, directOnly: boolean): Promise<PageWithChildren []> {
+    parent.children = parent.children.filter(child => {
 
-  const children = await prisma.page.findMany({
-    where: {
-      parentId: pageId
-    },
-    include: {
-      permissions: {
-        include: {
-          sourcePermission: true
-        }
+      if (i === 0) {
+        return child.id === targetPage.id;
       }
-    }
-  });
 
-  if (directOnly || children.length === 0) {
-    return children.map(child => {
-      return {
-        ...child,
-        children: []
-      };
+      // The previous item in the parents array is the child of the current parent node
+      return child.id === parents[i - 1].id;
     });
   }
 
-  const childrenWithNestedChildren: PageWithChildren [] = await Promise.all(children.map(childPage => {
-    return new Promise<PageWithChildren>((resolve, reject) => {
-      resolveChildPages(childPage.id, false)
-        .then(nestedChildren => {
-          resolve({
-            ...childPage,
-            children: nestedChildren
-          });
-        });
-    });
-  }));
-
-  return childrenWithNestedChildren;
-
-}
-
-/**
- * Returns a list of parents up to the root
- * @param pageId
- */
-export async function resolveParentPages (pageId: string | IPageWithPermissions): Promise<IPageWithPermissions []> {
-  const page = typeof pageId === 'string' ? await getPage(pageId) : pageId;
-
-  if (!page) {
-    throw new PageNotFoundError(pageId as string);
-  }
-
-  if (!page.parentId) {
-    return [];
-  }
-
-  // List of parents from closest to furthest
-  const parentPages: IPageWithPermissions [] = [];
-
-  let parentPageIdToSearch = page.parentId;
-
-  for (let i = 0; i <= parentPages.length; i++) {
-    const parent = await getPage(parentPageIdToSearch) as IPageWithPermissions;
-
-    // Gracefully handle case where a parent is referenced, but was deleted
-    if (parent) {
-      parentPages.push(parent);
-    }
-
-    if (parent?.parentId) {
-      parentPageIdToSearch = parent.parentId;
-    }
-
-    if (!parent || !parent.parentId) {
-      break;
-    }
-
-  }
-
-  return parentPages;
+  return {
+    parents,
+    targetPage
+  };
 
 }

@@ -1,22 +1,27 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
-import { Space, User } from '@prisma/client';
+import { Role, Space, User } from '@prisma/client';
 import { prisma } from 'db';
 import { InvalidPermissionGranteeError } from 'lib/permissions/errors';
 import { InsecureOperationError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { createPage, generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
-import { CannotInheritOutsideTreeError, SelfInheritancePermissionError } from '../../errors';
+import { SelfInheritancePermissionError } from '../../errors';
 import { upsertPermission } from '../upsert-permission';
 
 let user: User;
 let space: Space;
+let role: Role;
 
 beforeAll(async () => {
   const generated = await generateUserAndSpaceWithApiToken(v4());
   user = generated.user;
   space = generated.space;
+  role = await generateRole({
+    spaceId: space.id,
+    createdBy: user.id
+  });
 });
 
 describe('upsertPermission', () => {
@@ -120,7 +125,7 @@ describe('upsertPermission', () => {
     }
   });
 
-  it('should throw an error if an attempt to inherit outside the parent tree happens', async () => {
+  it('should drop the inheritance reference if trying to inherit a permission from outside the parent tree', async () => {
     const parentPage = await createPage({
       createdBy: user.id,
       spaceId: space.id
@@ -136,13 +141,108 @@ describe('upsertPermission', () => {
       spaceId: space.id
     });
 
-    try {
-      await upsertPermission(otherParent.id, parentPagePermission.id);
-      throw new ExpectedAnError();
-    }
-    catch (error) {
-      expect(error).toBeInstanceOf(CannotInheritOutsideTreeError);
-    }
+    const newPermission = await upsertPermission(otherParent.id, parentPagePermission.id);
+
+    expect(newPermission.inheritedFromPermission).toBeNull();
+
+  });
+
+  it('should drop the inheritance reference if trying to inherit from a parent page that has more permissions', async () => {
+
+    const parentPage = await createPage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    const parentPagePermission = await upsertPermission(parentPage.id, {
+      permissionLevel: 'full_access',
+      userId: user.id
+    });
+
+    const secondParentPagePermission = await upsertPermission(parentPage.id, {
+      permissionLevel: 'full_access',
+      roleId: role.id
+    });
+
+    const child = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      parentId: parentPage.id
+    });
+
+    const newPermission = await upsertPermission(child.id, parentPagePermission.id);
+
+    expect(newPermission.inheritedFromPermission).toBeNull();
+    expect(newPermission.userId).toBe(parentPagePermission.userId);
+
+  });
+
+  it('should auto-add an inheritance reference if the value of the permission is the same as the parent and the child page can inherit from the parent page', async () => {
+
+    const parentPage = await createPage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    const parentPagePermission = await upsertPermission(parentPage.id, {
+      permissionLevel: 'full_access',
+      userId: user.id
+    });
+
+    const child = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      parentId: parentPage.id
+    });
+
+    const parentPageUserPermission = await upsertPermission(parentPage.id, {
+      permissionLevel: 'full_access',
+      userId: user.id
+    });
+
+    const newPermission = await upsertPermission(child.id, parentPageUserPermission.id);
+
+    expect(newPermission.inheritedFromPermission).toBe(parentPagePermission.id);
+    expect(newPermission.userId).toBe(parentPagePermission.userId);
+
+  });
+
+  it('should not auto-add an inheritance reference if the page could inherit from its parent, but the value of the new permission is different', async () => {
+
+    const parentPage = await createPage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    const childPage = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      parentId: parentPage.id
+    });
+
+    const parentPagePermission = await upsertPermission(parentPage.id, {
+      permissionLevel: 'full_access',
+      userId: user.id
+    });
+
+    const childPagePermission = await upsertPermission(childPage.id, {
+      permissionLevel: 'full_access',
+      userId: user.id
+    });
+
+    const rootRolePermission = await upsertPermission(parentPage.id, {
+      permissionLevel: 'view',
+      roleId: role.id
+    });
+
+    // Higher access level, which means we could potentially inherit
+    const childRolePermission = await upsertPermission(childPage.id, {
+      permissionLevel: 'full_access',
+      roleId: role.id
+    });
+
+    expect(childPagePermission.inheritedFromPermission).toBe(parentPagePermission.id);
+    expect(childRolePermission.inheritedFromPermission).toBe(null);
 
   });
 
@@ -326,13 +426,13 @@ describe('upsertPermission', () => {
 
     const { space: differentSpace, user: userFromDifferentSpace } = await generateUserAndSpaceWithApiToken();
 
-    const role = await generateRole({
+    const differentSpaceRole = await generateRole({
       createdBy: userFromDifferentSpace.id,
       spaceId: differentSpace.id
     });
 
     try {
-      await upsertPermission(page.id, { permissionLevel: 'full_access', roleId: role.id });
+      await upsertPermission(page.id, { permissionLevel: 'full_access', roleId: differentSpaceRole.id });
       throw new ExpectedAnError();
     }
     catch (err) {

@@ -36,6 +36,7 @@ describe('POST /api/permissions - create or update board permissions', () => {
       .post('/api/pages')
       .set('Cookie', cookie)
       .send(generatePageToCreateStub({
+        title: 'Board',
         userId: user.id,
         spaceId: space.id,
         type: 'board'
@@ -62,6 +63,7 @@ describe('POST /api/permissions - create or update board permissions', () => {
       .post('/api/pages')
       .set('Cookie', cookie)
       .send(generatePageToCreateStub({
+        title: 'Nested page of child card 1',
         userId: user.id,
         spaceId: space.id,
         type: 'page',
@@ -107,7 +109,8 @@ describe('POST /api/permissions - create or update board permissions', () => {
       .send(generatePageToCreateStub({
         userId: user.id,
         spaceId: space.id,
-        type: 'board'
+        type: 'board',
+        title: 'Board'
       }))
       .expect(201)).body as IPageWithPermissions;
 
@@ -134,7 +137,8 @@ describe('POST /api/permissions - create or update board permissions', () => {
         userId: user.id,
         spaceId: space.id,
         type: 'page',
-        parentId: childCard1.id
+        parentId: childCard1.id,
+        title: 'Nested page of child card 1'
       }))
       .expect(201)).body as IPageWithPermissions;
 
