@@ -17,8 +17,8 @@ import UserDisplay from 'components/common/UserDisplay';
 import { useBounties } from 'hooks/useBounties';
 import { useContributors } from 'hooks/useContributors';
 import { useUser } from 'hooks/useUser';
-import { ApplicationWithTransactions } from 'lib/applications/actions';
-import { applicantIsSubmitter, countValidSubmissions } from 'lib/applications/shared';
+import { ApplicationWithTransactions, ListApplicationsResponse } from 'lib/applications/actions';
+import { applicantIsSubmitter } from 'lib/applications/shared';
 import { AssignedBountyPermissions } from 'lib/bounties/interfaces';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 import { useEffect, useState } from 'react';
@@ -175,17 +175,19 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
   const theme = useTheme();
   const { refreshBounty } = useBounties();
 
-  const [submissions, setSubmissions] = useState<ApplicationWithTransactions[]>([]);
+  const [listApplications, setListApplications] = useState<ListApplicationsResponse>({
+    applications: [],
+    validSubmissions: 0
+  });
   const [isSubmittingApplication, setIsSubmittingApplication] = useState(false);
-
-  const acceptedApplications = submissions.filter(applicantIsSubmitter);
-  const userApplication = submissions.find(app => app.createdBy === user?.id);
-  const validSubmissions = countValidSubmissions(submissions);
+  const { applications, validSubmissions } = listApplications;
+  const acceptedApplications = applications.filter(applicantIsSubmitter);
+  const userApplication = applications.find(app => app.createdBy === user?.id);
 
   async function refreshSubmissions () {
     if (bounty) {
-      const foundSubmissions = await charmClient.listApplications(bounty.id);
-      setSubmissions(foundSubmissions);
+      const listApplicationsResponse = await charmClient.listApplications(bounty.id);
+      setListApplications(listApplicationsResponse);
     }
   }
 
@@ -236,7 +238,7 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
           </TableRow>
         </TableHead>
         <TableBody>
-          {submissions.map((submission) => (
+          {applications.map((submission) => (
             <BountySubmissionsTableRow
               bounty={bounty}
               totalAcceptedApplications={acceptedApplications.length}
@@ -251,7 +253,7 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
         </TableBody>
       </Table>
       )}
-      {submissions.length === 0 && permissions.userPermissions.review && (
+      {applications.length === 0 && permissions.userPermissions.review && (
         <Box
           my={3}
           sx={{
@@ -269,8 +271,9 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
       <BountyApplicationForm
         bounty={bounty}
         permissions={permissions}
-        submissions={submissions}
+        submissions={applications}
         refreshSubmissions={refreshSubmissions}
+        validSubmissionsCount={validSubmissions}
       />
 
       {

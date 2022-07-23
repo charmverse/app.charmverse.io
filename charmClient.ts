@@ -18,7 +18,7 @@ import type { ServerBlockFields } from 'pages/api/blocks';
 import { InviteLinkPopulated } from 'pages/api/invites/index';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 // TODO: Maybe move these types to another place so that we dont import from backend
-import { ReviewDecision, SubmissionContent, SubmissionCreationData } from 'lib/applications/interfaces';
+import { ListApplicationsResponse, ReviewDecision, SubmissionContent, SubmissionCreationData } from 'lib/applications/interfaces';
 import { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
 import { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
@@ -464,7 +464,7 @@ class CharmClient {
     return data;
   }
 
-  listApplications (bountyId: string): Promise<ApplicationWithTransactions []> {
+  listApplications (bountyId: string): Promise<ListApplicationsResponse> {
     return http.GET('/api/applications', { bountyId });
   }
 

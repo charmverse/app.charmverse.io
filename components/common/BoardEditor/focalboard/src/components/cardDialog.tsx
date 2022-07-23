@@ -31,11 +31,13 @@ type Props = {
     cardId: string
     onClose: () => void
     showCard: (cardId?: string) => void
-    readonly: boolean
+    readonly: BooleanConstructor
 }
 
-function CreateBountyButton (props: Pick<Bounty, "linkedTaskId" | "title">) {
-  const { linkedTaskId, title } = props;
+function CreateBountyButton (props: Pick<Bounty, "linkedTaskId" | "title"> & {
+  onClick: (createdBounty: Bounty) => void
+}) {
+  const { onClick, linkedTaskId, title } = props;
   const { setBounties } = useBounties();
   const [user] = useUser();
   const [space] = useCurrentSpace();
@@ -65,6 +67,7 @@ function CreateBountyButton (props: Pick<Bounty, "linkedTaskId" | "title">) {
             }
           })
           setBounties((bounties) => [...bounties, {...createdBounty, applications: []}])
+          onClick(createdBounty)
         }}>
           Create bounty
         </Button>
@@ -170,7 +173,9 @@ const CardDialog = (props: Props): JSX.Element | null => {
                         startIcon={<OpenInFullIcon fontSize='small'/>}>
                         Open as Page
                       </Button>
-                      {spacePermissions?.createBounty && isBountyAttached !== null && cardPage && !isBountyAttached && !readonly && <CreateBountyButton linkedTaskId={cardId} title={cardPage.title} />}
+                      {spacePermissions?.createBounty && isBountyAttached !== null && !isSharedPage && cardPage && !isBountyAttached && !readonly && <CreateBountyButton onClick={() => {
+                        setIsBountyAttached(true)
+                      }} linkedTaskId={cardId} title={cardPage.title} />}
                     </Box>
                   )
                 }
@@ -185,7 +190,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
                 {card &&
                     <CardDetail
                         card={card}
-                        readonly={readonly || isSharedPage}
+                        readonly={Boolean(readonly || isSharedPage)}
                     />}
 
                 {!card &&

@@ -2,7 +2,6 @@ import { Box, Button, Stack, Tooltip } from '@mui/material';
 import { Application, Bounty } from '@prisma/client';
 import { useBounties } from 'hooks/useBounties';
 import { useUser } from 'hooks/useUser';
-import { submissionsCapReached } from 'lib/applications/shared';
 import { AssignedBountyPermissions } from 'lib/bounties';
 import { useState } from 'react';
 import { ApplicationEditorForm } from '../components/ApplicationEditorForm';
@@ -13,10 +12,11 @@ interface BountyApplicationFormProps {
   bounty: Bounty
   submissions: Application[]
   refreshSubmissions: () => Promise<void>
+  validSubmissionsCount: number
 }
 
 export default function BountyApplicationForm (props: BountyApplicationFormProps) {
-  const { refreshSubmissions, bounty, permissions, submissions } = props;
+  const { validSubmissionsCount, refreshSubmissions, bounty, permissions, submissions } = props;
 
   const [user] = useUser();
   const { refreshBounty } = useBounties();
@@ -25,7 +25,7 @@ export default function BountyApplicationForm (props: BountyApplicationFormProps
 
   const userSubmission = submissions.find(sub => sub.createdBy === user?.id);
   // Only applies if there is a submissions cap
-  const capReached = submissionsCapReached({ bounty, submissions });
+  const capReached = bounty.maxSubmissions !== null && (validSubmissionsCount >= bounty.maxSubmissions);
   const canCreateSubmission = !userSubmission && !capReached && permissions?.userPermissions.work && bounty.createdBy !== user?.id;
   const newSubmissionTooltip = !permissions?.userPermissions.work ? 'You do not have the correct role to submit work to this bounty' : (capReached ? 'The submissions cap has been reached. This bounty is closed to new submissions.' : 'Apply to this bounty.');
 
