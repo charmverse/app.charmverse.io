@@ -12,7 +12,7 @@ import { usePages } from 'hooks/usePages'
 import { useSnackbar } from 'hooks/useSnackbar'
 import { useUser } from 'hooks/useUser'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FormattedMessage, useIntl } from 'react-intl'
 import { Board } from '../blocks/board'
 import mutator from '../mutator'
@@ -82,10 +82,19 @@ const CardDialog = (props: Props): JSX.Element | null => {
     const router = useRouter();
     const isSharedPage = router.route.startsWith('/share')
     const cardPage = pages[cardId]
-    const { bounties } = useBounties();
-    const bounty = bounties.find(bounty => bounty.linkedTaskId === cardId);
+    const [spacePermissions] = useCurrentSpacePermissions()
+    const [ isBountyAttached, setIsBountyAttached ] = useState<boolean | null>(null)
+
     const { showMessage } = useSnackbar()
-    
+
+    useEffect(() => {
+      async function checkPageBounty() {
+        const hasBounty = await charmClient.checkPageBounty(cardId)
+        setIsBountyAttached(hasBounty)
+      }
+      checkPageBounty()
+    }, [])
+
     const handleDeleteCard = async () => {
         if (!card) {
             Utils.assertFailure()
@@ -161,7 +170,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
                         startIcon={<OpenInFullIcon fontSize='small'/>}>
                         Open as Page
                       </Button>
-                      {cardPage && !bounty && !readonly && <CreateBountyButton linkedTaskId={cardId} title={cardPage.title} />}
+                      {spacePermissions?.createBounty && isBountyAttached !== null && cardPage && !isBountyAttached && !readonly && <CreateBountyButton linkedTaskId={cardId} title={cardPage.title} />}
                     </Box>
                   )
                 }

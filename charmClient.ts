@@ -744,6 +744,10 @@ class CharmClient {
   getUserVotes (voteId: string) {
     return http.GET<UserVoteExtendedDTO[]>(`/api/votes/${voteId}/user-votes`);
   }
+
+  checkPageBounty (pageId: string) {
+    return http.GET<boolean>(`/api/pages/${pageId}/bounty`);
+  }
 }
 
 const charmClient = new CharmClient();
