@@ -284,7 +284,7 @@ export default function BountySubmissions ({ showMetadata = true, bounty, permis
       )}
 
       <Modal title='Your submission' open={editSubmissionModal.isOpen} onClose={editSubmissionModal.close} size='large'>
-        <SubmissionEditorForm submission={userSubmission} bounty={bounty} onSubmit={submitterUpdatedSubmission} />
+        <SubmissionEditorForm submission={userSubmission} bountyId={bounty.id} onSubmit={submitterUpdatedSubmission} />
       </Modal>
 
       {

@@ -148,15 +148,19 @@ function BountySubmissionsTableRow ({ onSubmission, submission, permissions, bou
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={5}>
           <Collapse in={isViewingDetails} timeout='auto' unmountOnExit>
-            <Box my={1}>
-              <ApplicationEditorForm
-                bountyId={bounty.id}
-                proposal={submission}
-                readOnly={user?.id !== submission.createdBy || submission.status !== 'applied'}
-                mode='update'
-                showHeader
-              />
-            </Box>
+            <SubmissionEditorForm
+              bountyId={bounty.id}
+              readOnly={user?.id !== submission.createdBy || submission.status !== 'inProgress'}
+              submission={submission}
+              showHeader
+            />
+            <ApplicationEditorForm
+              bountyId={bounty.id}
+              proposal={submission}
+              readOnly={user?.id !== submission.createdBy || submission.status !== 'applied'}
+              mode='update'
+              showHeader
+            />
           </Collapse>
         </TableCell>
       </TableRow>
@@ -268,7 +272,7 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
       {
         isSubmittingApplication && (
         <SubmissionEditorForm
-          bounty={bounty}
+          bountyId={bounty.id}
           submission={userApplication}
           showHeader
           onCancel={() => setIsSubmittingApplication(false)}

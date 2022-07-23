@@ -1,4 +1,4 @@
-import { Box, Button, FormLabel, Stack, Tooltip } from '@mui/material';
+import { Box, Button, Stack, Tooltip } from '@mui/material';
 import { Application, Bounty } from '@prisma/client';
 import { useUser } from 'hooks/useUser';
 import { submissionsCapReached } from 'lib/applications/shared';
