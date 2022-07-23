@@ -74,7 +74,6 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
   const [currentBounty, setCurrentBounty] = useState<BountyWithDetails>(bounty);
   const [capSubmissions, setCapSubmissions] = useState(currentBounty.maxSubmissions !== null);
   const [space] = useCurrentSpace();
-  const [user] = useUser();
   const [permissions, setPermissions] = useState<AssignedBountyPermissions | null>(null);
   const assignedRoleSubmitters = permissions?.bountyPermissions?.submitter?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
   const selectedReviewerUsers = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'user').map(p => p.id as string) ?? [];

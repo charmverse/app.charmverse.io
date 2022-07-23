@@ -1,21 +1,25 @@
 import { Box, Button, Stack, Tooltip } from '@mui/material';
 import { Application, Bounty } from '@prisma/client';
+import { useBounties } from 'hooks/useBounties';
 import { useUser } from 'hooks/useUser';
 import { submissionsCapReached } from 'lib/applications/shared';
 import { AssignedBountyPermissions } from 'lib/bounties';
 import { useState } from 'react';
 import { ApplicationEditorForm } from '../components/ApplicationEditorForm';
+import SubmissionEditorForm from './SubmissionEditorForm';
 
 interface BountyApplicationFormProps {
   permissions: AssignedBountyPermissions
   bounty: Bounty
   submissions: Application[]
+  refreshSubmissions: () => Promise<void>
 }
 
 export default function BountyApplicationForm (props: BountyApplicationFormProps) {
-  const { bounty, permissions, submissions } = props;
+  const { refreshSubmissions, bounty, permissions, submissions } = props;
 
   const [user] = useUser();
+  const { refreshBounty } = useBounties();
 
   const [isApplyingBounty, setIsApplyingBounty] = useState(false);
 
@@ -45,17 +49,31 @@ export default function BountyApplicationForm (props: BountyApplicationFormProps
       );
     }
     else if (isApplyingBounty) {
+      if (bounty.approveSubmitters) {
+        return (
+          <ApplicationEditorForm
+            bountyId={bounty.id}
+            mode='create'
+            onSubmit={() => {
+              setIsApplyingBounty(false);
+            }}
+            onCancel={() => {
+              setIsApplyingBounty(false);
+            }}
+            showHeader
+          />
+        );
+      }
       return (
-        <ApplicationEditorForm
+        <SubmissionEditorForm
           bountyId={bounty.id}
-          mode='create'
-          onSubmit={() => {
-            setIsApplyingBounty(false);
-          }}
-          onCancel={() => {
-            setIsApplyingBounty(false);
-          }}
           showHeader
+          onCancel={() => setIsApplyingBounty(false)}
+          onSubmit={async () => {
+            await refreshSubmissions();
+            await refreshBounty(bounty.id);
+            setIsApplyingBounty(false);
+          }}
         />
       );
     }

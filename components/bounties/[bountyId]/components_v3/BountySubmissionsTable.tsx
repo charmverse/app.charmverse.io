@@ -154,6 +154,7 @@ function BountySubmissionsTableRow ({ onSubmission, submission, permissions, bou
                 showHeader
               />
             )}
+            {bounty.approveSubmitters && (
             <ApplicationEditorForm
               bountyId={bounty.id}
               proposal={submission}
@@ -161,6 +162,7 @@ function BountySubmissionsTableRow ({ onSubmission, submission, permissions, bou
               mode='update'
               showHeader
             />
+            )}
           </Collapse>
         </TableCell>
       </TableRow>
@@ -171,10 +173,10 @@ function BountySubmissionsTableRow ({ onSubmission, submission, permissions, bou
 export default function BountySubmissionsTable ({ bounty, permissions }: Props) {
   const [user] = useUser();
   const theme = useTheme();
+  const { refreshBounty } = useBounties();
 
   const [submissions, setSubmissions] = useState<ApplicationWithTransactions[]>([]);
   const [isSubmittingApplication, setIsSubmittingApplication] = useState(false);
-  const { refreshBounty } = useBounties();
 
   const acceptedApplications = submissions.filter(applicantIsSubmitter);
   const userApplication = submissions.find(app => app.createdBy === user?.id);
@@ -268,6 +270,7 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
         bounty={bounty}
         permissions={permissions}
         submissions={submissions}
+        refreshSubmissions={refreshSubmissions}
       />
 
       {
