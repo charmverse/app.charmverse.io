@@ -11,6 +11,7 @@ datasource db {
 
 enum PageType {
   board
+  bounty
   page
   card
   proposal

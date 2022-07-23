@@ -21,7 +21,7 @@ export default function BountyIntegration (props: BountyIntegrationProps) {
 
   const [userSpacePermissions] = useCurrentSpacePermissions();
 
-  const linkedBounty = bounties.find(bounty => bounty.pageId === pageId);
+  const linkedBounty = bounties.find(bounty => bounty.page?.id === pageId);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -46,8 +46,7 @@ export default function BountyIntegration (props: BountyIntegrationProps) {
               bounty={{
                 title,
                 description,
-                descriptionNodes,
-                pageId
+                descriptionNodes
               }}
               onClose={() => {
                 setIsModalOpen(false);
