@@ -80,7 +80,6 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
   const selectedReviewerUsers = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'user').map(p => p.id as string) ?? [];
   const selectedReviewerRoles = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
   const canEdit = !readOnly && permissions?.userPermissions.edit;
-  const userApplication = currentBounty.applications.find(application => application.createdBy === user?.id);
 
   async function refreshBountyPermissions (bountyId: string) {
     setPermissions(await charmClient.computeBountyPermissions({

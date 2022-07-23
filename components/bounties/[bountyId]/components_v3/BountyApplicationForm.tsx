@@ -46,23 +46,17 @@ export default function BountyApplicationForm (props: BountyApplicationFormProps
     }
     else if (isApplyingBounty) {
       return (
-        <Stack my={1} gap={1}>
-          <FormLabel sx={{
-            fontWeight: 'bold'
+        <ApplicationEditorForm
+          bountyId={bounty.id}
+          mode='create'
+          onSubmit={() => {
+            setIsApplyingBounty(false);
           }}
-          >Application
-          </FormLabel>
-          <ApplicationEditorForm
-            bountyId={bounty.id}
-            mode='create'
-            onSubmit={() => {
-              setIsApplyingBounty(false);
-            }}
-            onCancel={() => {
-              setIsApplyingBounty(false);
-            }}
-          />
-        </Stack>
+          onCancel={() => {
+            setIsApplyingBounty(false);
+          }}
+          showHeader
+        />
       );
     }
   }

@@ -22,6 +22,9 @@ import { humanFriendlyDate } from 'lib/utilities/dates';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 import { BrandColor } from 'theme/colors';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import { Collapse, IconButton } from '@mui/material';
 import BountySubmissionContent from '../../components/BountySubmissionContent';
 import BountySubmissionReviewActions from '../../components/BountySubmissionReviewActions';
 import { ApplicationEditorForm } from '../components/ApplicationEditorForm';
@@ -50,12 +53,120 @@ export const SubmissionStatusLabels: Record<ApplicationStatus, string> = {
   paid: 'Paid'
 };
 
+interface BountySubmissionsTableRowProps {
+  totalAcceptedApplications: number
+  submission: ApplicationWithTransactions
+  permissions: AssignedBountyPermissions
+  bounty: Bounty
+}
+
+function BountySubmissionsTableRow ({ submission, permissions, bounty, totalAcceptedApplications }: BountySubmissionsTableRowProps) {
+  const [contributors] = useContributors();
+  const { refreshBounty } = useBounties();
+  const [user] = useUser();
+  const [isViewingDetails, setIsViewingDetails] = useState(false);
+
+  const contributor = contributors.find(c => c.id === submission.createdBy);
+
+  function displayAssignmentButton (application: Application) {
+    return (
+      // Only admins can approve applications for now
+      (permissions.userPermissions.review)
+      && application.status === 'applied'
+      // If we reached the cap, we can't assign new people
+      && (
+        bounty.maxSubmissions === null || (
+          totalAcceptedApplications < (bounty.maxSubmissions ?? 0)
+        )
+      ));
+  }
+
+  async function approveApplication (applicationId: string) {
+    await charmClient.approveApplication(applicationId);
+    refreshBounty(bounty.id);
+  }
+
+  return (
+    <>
+      <TableRow
+        key={submission.id}
+        hover
+      >
+        <TableCell size='small'>
+          { contributor ? (
+            <UserDisplay
+              avatarSize='small'
+              user={contributor}
+              fontSize='small'
+              linkToProfile
+            />
+          ) : 'Anonymous'}
+        </TableCell>
+        <TableCell size='small' align='left'>
+          <Box display='flex' gap={1}>
+            <Chip
+              label={SubmissionStatusLabels[submission.status]}
+              color={SubmissionStatusColors[submission.status]}
+            />
+          </Box>
+        </TableCell>
+        <TableCell>{humanFriendlyDate(submission.updatedAt, { withTime: true })}</TableCell>
+        <TableCell>
+          <IconButton
+            size='small'
+            onClick={() => {
+              setIsViewingDetails(!isViewingDetails);
+            }}
+          >
+            {!isViewingDetails ? <KeyboardArrowDownIcon fontSize='small' /> : <KeyboardArrowUpIcon fontSize='small' />}
+          </IconButton>
+        </TableCell>
+        <TableCell align='right' sx={{ gap: 2, justifyContent: 'flex-end' }}>
+          {
+          displayAssignmentButton(submission) === true ? (
+            <Button
+              sx={{ ml: 2 }}
+              onClick={() => {
+                approveApplication(submission.id);
+              }}
+            >
+              Assign
+            </Button>
+          ) : (
+            <BountySubmissionReviewActions
+              bounty={bounty}
+              submission={submission}
+              reviewComplete={() => {}}
+              onSubmission={() => {}}
+              permissions={permissions}
+            />
+          )
+        }
+        </TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={5}>
+          <Collapse in={isViewingDetails} timeout='auto' unmountOnExit>
+            <Box my={1}>
+              <ApplicationEditorForm
+                bountyId={bounty.id}
+                proposal={submission}
+                readOnly={user?.id !== submission.createdBy}
+                mode='update'
+                showHeader
+              />
+            </Box>
+          </Collapse>
+        </TableCell>
+      </TableRow>
+    </>
+  );
+}
+
 export default function BountySubmissionsTable ({ bounty, permissions }: Props) {
   const [user] = useUser();
-  const [contributors] = useContributors();
   const theme = useTheme();
-  const { refreshBounty } = useBounties();
-  const editSubmissionModal = usePopupState({ variant: 'popover', popupId: 'edit-submission' });
+
   const bountyApplyModal = usePopupState({ variant: 'popover', popupId: 'apply-for-bounty' });
 
   const [submissions, setSubmissions] = useState<ApplicationWithTransactions[]>([]);
@@ -71,24 +182,6 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
           setSubmissions(foundSubmissions);
         });
     }
-  }
-
-  function displayAssignmentButton (application: Application) {
-    return (
-      // Only admins can approve applications for now
-      (permissions.userPermissions.review)
-      && application.status === 'applied'
-      // If we reached the cap, we can't assign new people
-      && (
-        bounty.maxSubmissions === null || (
-          acceptedApplications.length < (bounty.maxSubmissions ?? 0)
-        )
-      ));
-  }
-
-  async function approveApplication (applicationId: string) {
-    await charmClient.approveApplication(applicationId);
-    refreshBounty(bounty.id);
   }
 
   useEffect(() => {
@@ -127,67 +220,22 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
             <TableCell>
               Last updated
             </TableCell>
+            <TableCell>
+            </TableCell>
             <TableCell align='right'>
               Action
             </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {submissions.map((submission, submissionIndex) => (
-            <TableRow
+          {submissions.map((submission) => (
+            <BountySubmissionsTableRow
+              bounty={bounty}
+              totalAcceptedApplications={acceptedApplications.length}
+              permissions={permissions}
+              submission={submission}
               key={submission.id}
-              sx={{ backgroundColor: submissionIndex % 2 !== 0 ? theme.palette.background.default : theme.palette.background.light, '&:last-child td, &:last-child th': { border: 0 } }}
-              hover
-            >
-              <TableCell size='small'>
-                {(() => {
-                  const contributor = contributors.find(c => c.id === submission.createdBy);
-
-                  if (contributor) {
-                    return (
-                      <UserDisplay
-                        avatarSize='small'
-                        user={contributor}
-                        fontSize='small'
-                        linkToProfile
-                      />
-                    );
-                  }
-                  return 'Anonymous';
-                })()}
-              </TableCell>
-              <TableCell size='small' align='left'>
-                <Box display='flex' gap={1}>
-                  <Chip
-                    label={SubmissionStatusLabels[submission.status]}
-                    color={SubmissionStatusColors[submission.status]}
-                  />
-                </Box>
-              </TableCell>
-              <TableCell>{humanFriendlyDate(submission.updatedAt, { withTime: true })}</TableCell>
-              <TableCell align='right' sx={{ gap: 2, justifyContent: 'flex-end' }}>
-                {
-                  displayAssignmentButton(submission) === true ? (
-                    <Button
-                      sx={{ ml: 2 }}
-                      onClick={() => {
-                        approveApplication(submission.id);
-                      }}
-                    >
-                      Assign
-                    </Button>
-                  ) : (
-                    <BountySubmissionReviewActions
-                      bounty={bounty}
-                      submission={submission}
-                      reviewComplete={refreshSubmissions}
-                      onSubmission={editSubmissionModal.open}
-                      permissions={permissions}
-                    />
-                  )
-                }
-              </TableCell>
-            </TableRow>
+            />
           ))}
         </TableBody>
       </Table>
