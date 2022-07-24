@@ -23,14 +23,12 @@ describe('createBounty', () => {
   it('should be able to create a bounty suggestion with only a title, createdBy, spaceId and status, and record who suggested the bounty', async () => {
 
     const bounty = await createBounty({
-      title: 'My bounty',
       createdBy: user.id,
       spaceId: space.id
     });
 
     expect(bounty).toEqual(
       expect.objectContaining<Partial<Bounty>>({
-        title: expect.stringContaining('My bounty'),
         description: expect.any(String),
         createdBy: expect.stringContaining(user.id),
         spaceId: expect.stringContaining(space.id),
@@ -43,7 +41,6 @@ describe('createBounty', () => {
   it('should assign a default submitter / space permission to a bounty suggestion so that space members can see a suggestion', async () => {
 
     const bounty = await createBounty({
-      title: 'My bounty',
       createdBy: user.id,
       spaceId: space.id,
       status: 'suggestion'
@@ -62,11 +59,8 @@ describe('createBounty', () => {
     const fullBountyCreationData: BountyCreationData = {
       createdBy: user.id,
       spaceId: space.id,
-      title: 'Testing this works',
       approveSubmitters: true,
       chainId: 1,
-      description: 'Example description',
-      descriptionNodes: '{type:"doc"}',
       maxSubmissions: 100,
       rewardAmount: 1000,
       rewardToken: 'ETH',
@@ -81,7 +75,7 @@ describe('createBounty', () => {
     Object.entries(fullBountyCreationData).forEach(([key, value]) => {
 
       if (key !== 'permissions') {
-        expect(bounty[key as Exclude<keyof BountyCreationData, 'permissions'>]).toBe(value);
+        expect(bounty[key as Exclude<keyof BountyCreationData, 'permissions' | 'pageId'>]).toBe(value);
       }
 
     });
@@ -105,7 +99,6 @@ describe('createBounty', () => {
     const { user: adminUser, space: localSpace } = await generateUserAndSpaceWithApiToken(undefined, true);
 
     const bounty = await createBounty({
-      title: 'My bounty',
       createdBy: adminUser.id,
       spaceId: localSpace.id,
       status: 'open',
@@ -114,7 +107,6 @@ describe('createBounty', () => {
 
     expect(bounty).toEqual(
       expect.objectContaining<Partial<Bounty>>({
-        title: expect.stringContaining('My bounty'),
         description: expect.any(String),
         createdBy: expect.stringContaining(adminUser.id),
         spaceId: expect.stringContaining(localSpace.id)
@@ -130,7 +122,6 @@ describe('createBounty', () => {
     try {
 
       await createBounty({
-        title: 'My bounty',
         createdBy: localUser.id,
         spaceId: localSpace.id,
         rewardAmount: 0,
@@ -153,7 +144,6 @@ describe('createBounty', () => {
     try {
 
       await createBounty({
-        title: 'My bounty',
         createdBy: localUser.id,
         spaceId: localSpace.id,
         rewardAmount: -10,
