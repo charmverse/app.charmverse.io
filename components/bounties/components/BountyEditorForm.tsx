@@ -349,11 +349,8 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
       }
       else if (bounty?.id && mode === 'update') {
         const updates: UpdateableBountyFields = {
-          title: value.title,
           rewardAmount: value.rewardAmount,
           rewardToken: value.rewardToken,
-          descriptionNodes: value.descriptionNodes,
-          description: value.description,
           chainId: value.chainId,
           approveSubmitters: value.approveSubmitters === null ? undefined : value.approveSubmitters,
           maxSubmissions: value.capSubmissions === false ? null : value.maxSubmissions,
