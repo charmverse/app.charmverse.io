@@ -31,7 +31,7 @@ type Props = {
     cardId: string
     onClose: () => void
     showCard: (cardId?: string) => void
-    readonly: BooleanConstructor
+    readonly: boolean
 }
 
 function CreateBountyButton (props: Pick<Bounty, "linkedTaskId" | "title"> & {
