@@ -12,7 +12,6 @@ import { BountyCreationData } from './interfaces';
  * You can create a bounty suggestion using only title, spaceId and createdBy. You will see many unit tests using this limited dataset, which will then default the bounty to suggestion status. Your logic should account for this.
  */
 export async function createBounty ({
-  title,
   spaceId,
   createdBy,
   status = 'suggestion',
@@ -47,7 +46,7 @@ export async function createBounty ({
 
   const bountyCreateInput: Prisma.BountyCreateInput = {
     id: bountyId,
-    title,
+    title: '',
     space: {
       connect: {
         id: spaceId
@@ -60,8 +59,8 @@ export async function createBounty ({
     },
     status,
     chainId,
-    description,
-    descriptionNodes: descriptionNodes as string,
+    description: '',
+    descriptionNodes: '',
     approveSubmitters,
     maxSubmissions,
     rewardAmount,
@@ -74,26 +73,6 @@ export async function createBounty ({
     bountyCreateInput.suggestedBy = createdBy;
   }
 
-  const pageData: Prisma.PageCreateInput = {
-    id: bountyId,
-    path: `page-${Math.random().toString().replace('0.', '')}`,
-    title,
-    contentText: description,
-    content: descriptionNodes as string,
-    space: {
-      connect: {
-        id: spaceId
-      }
-    },
-    updatedBy: createdBy,
-    author: {
-      connect: {
-        id: createdBy
-      }
-    },
-    type: 'bounty'
-  };
-
   const bountyPagePermissionSet: Omit<Prisma.PagePermissionCreateManyInput, 'pageId'>[] = getBountyPagePermissionSet({ createdBy, status, spaceId, permissions, linkedPageId });
 
   if (!linkedPageId) {
@@ -102,7 +81,25 @@ export async function createBounty ({
         data: {
           ...bountyCreateInput,
           page: {
-            create: pageData
+            create: {
+              id: bountyId,
+              path: `page-${Math.random().toString().replace('0.', '')}`,
+              title: '',
+              contentText: description,
+              content: descriptionNodes as string,
+              space: {
+                connect: {
+                  id: spaceId
+                }
+              },
+              updatedBy: createdBy,
+              author: {
+                connect: {
+                  id: createdBy
+                }
+              },
+              type: 'bounty'
+            }
           }
         }
       }),

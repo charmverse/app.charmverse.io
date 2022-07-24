@@ -34,10 +34,11 @@ type Props = {
     readonly: boolean
 }
 
-function CreateBountyButton (props: Pick<Bounty, "linkedTaskId" | "title"> & {
+function CreateBountyButton (props: {
   onClick: (createdBounty: Bounty) => void
+  pageId: string
 }) {
-  const { onClick, linkedTaskId, title } = props;
+  const { onClick, pageId } = props;
   const { setBounties } = useBounties();
   const [user] = useUser();
   const [space] = useCurrentSpace();
@@ -57,8 +58,7 @@ function CreateBountyButton (props: Pick<Bounty, "linkedTaskId" | "title"> & {
             createdBy: user.id,
             rewardAmount: 1,
             rewardToken: "ETH",
-            linkedTaskId,
-            title,
+            pageId,
             permissions: {
               submitter: [{
                 group: "space",
@@ -66,7 +66,7 @@ function CreateBountyButton (props: Pick<Bounty, "linkedTaskId" | "title"> & {
               }]
             }
           })
-          setBounties((bounties) => [...bounties, {...createdBounty, applications: []}])
+          setBounties((bounties) => [...bounties, createdBounty])
           onClick(createdBounty)
         }}>
           Create bounty
@@ -175,7 +175,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
                       </Button>
                       {spacePermissions?.createBounty && isBountyAttached !== null && !isSharedPage && cardPage && !isBountyAttached && !readonly && <CreateBountyButton onClick={() => {
                         setIsBountyAttached(true)
-                      }} linkedTaskId={cardId} title={cardPage.title} />}
+                      }} pageId={cardId} />}
                     </Box>
                   )
                 }
