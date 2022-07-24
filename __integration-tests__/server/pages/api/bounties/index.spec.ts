@@ -9,6 +9,7 @@ import { v4 } from 'uuid';
 import { createBounty } from 'lib/bounties';
 import { addSpaceOperations } from 'lib/permissions/spaces';
 import { prisma } from 'db';
+import { BountyWithDetails } from 'models';
 
 let nonAdminUser: User;
 let nonAdminUserSpace: Space;
@@ -67,8 +68,10 @@ describe('GET /api/bounties?spaceId={spaceId} - list space bounties', () => {
     const bounty = bounties[0];
 
     expect(bounty).toEqual(
-      expect.objectContaining<Partial<Bounty>>({
-        title: creationContent.title,
+      expect.objectContaining<Partial<BountyWithDetails>>({
+        page: expect.objectContaining({
+          title: creationContent.title
+        }),
         createdBy: nonAdminUser.id,
         spaceId: nonAdminUserSpace.id,
         status: creationContent.status,
@@ -123,8 +126,10 @@ describe('GET /api/bounties?spaceId={spaceId} - list space bounties', () => {
     const bounty = bounties[0];
 
     expect(bounty).toEqual(
-      expect.objectContaining<Partial<Bounty>>({
-        title: creationContent.title,
+      expect.objectContaining<Partial<BountyWithDetails>>({
+        page: expect.objectContaining({
+          title: creationContent.title
+        }),
         createdBy: otherUser.id,
         spaceId: otherSpace.id,
         status: creationContent.status,
@@ -259,8 +264,10 @@ describe('POST /api/bounties - create a bounty', () => {
       .expect(201)).body;
 
     expect(createdBounty).toEqual(
-      expect.objectContaining<Partial<Bounty>>({
-        title: creationContent.title,
+      expect.objectContaining<Partial<BountyWithDetails>>({
+        page: expect.objectContaining({
+          title: creationContent.title
+        }),
         createdBy: adminUser.id,
         spaceId: adminUserSpace.id,
         status: creationContent.status,
@@ -288,8 +295,10 @@ describe('POST /api/bounties - create a bounty', () => {
       .expect(201)).body;
 
     expect(createdBounty).toEqual(
-      expect.objectContaining<Partial<Bounty>>({
-        title: creationContent.title,
+      expect.objectContaining<Partial<BountyWithDetails>>({
+        page: expect.objectContaining({
+          title: creationContent.title
+        }),
         createdBy: nonAdminUser.id,
         spaceId: nonAdminUserSpace.id,
         status: creationContent.status
@@ -327,8 +336,10 @@ describe('POST /api/bounties - create a bounty', () => {
       .expect(201)).body;
 
     expect(createdBounty).toEqual(
-      expect.objectContaining<Partial<Bounty>>({
-        title: creationContent.title,
+      expect.objectContaining<Partial<BountyWithDetails>>({
+        page: expect.objectContaining({
+          title: creationContent.title
+        }),
         createdBy: differentUser.id,
         spaceId: differentSpace.id,
         status: creationContent.status

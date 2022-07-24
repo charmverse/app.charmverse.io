@@ -137,49 +137,49 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
 
   });
 
-  it('should allow the creator to edit only the bounty title and description if it is in suggestion status and respond with 200', async () => {
+  // it('should allow the creator to edit only the bounty title and description if it is in suggestion status and respond with 200', async () => {
 
-    const bountyCreator = await generateSpaceUser({
-      isAdmin: false,
-      spaceId: nonAdminUserSpace.id
-    });
+  //   const bountyCreator = await generateSpaceUser({
+  //     isAdmin: false,
+  //     spaceId: nonAdminUserSpace.id
+  //   });
 
-    const bountyCreatorCookie = await loginUser(bountyCreator);
+  //   const bountyCreatorCookie = await loginUser(bountyCreator);
 
-    const createdBounty = await createBounty({
-      title: 'Example',
-      createdBy: bountyCreator.id,
-      spaceId: nonAdminUserSpace.id,
-      status: 'suggestion'
-    });
+  //   const createdBounty = await createBounty({
+  //     title: 'Example',
+  //     createdBy: bountyCreator.id,
+  //     spaceId: nonAdminUserSpace.id,
+  //     status: 'suggestion'
+  //   });
 
-    await addBountyPermissionGroup({
-      assignee: {
-        group: 'user',
-        id: bountyCreator.id
-      },
-      level: 'creator',
-      resourceId: createdBounty.id
-    });
+  //   await addBountyPermissionGroup({
+  //     assignee: {
+  //       group: 'user',
+  //       id: bountyCreator.id
+  //     },
+  //     level: 'creator',
+  //     resourceId: createdBounty.id
+  //   });
 
-    const updateContent: Partial<Bounty> = {
-      title: 'New title to set',
-      descriptionNodes: '{}',
-      rewardAmount: 10,
-      rewardToken: 'BNB'
-    };
+  //   const updateContent: Partial<Bounty> = {
+  //     title: 'New title to set',
+  //     descriptionNodes: '{}',
+  //     rewardAmount: 10,
+  //     rewardToken: 'BNB'
+  //   };
 
-    const updated = (await request(baseUrl)
-      .put(`/api/bounties/${createdBounty.id}`)
-      .set('Cookie', bountyCreatorCookie)
-      .send(updateContent)
-      .expect(200)).body as BountyWithDetails;
+  //   const updated = (await request(baseUrl)
+  //     .put(`/api/bounties/${createdBounty.id}`)
+  //     .set('Cookie', bountyCreatorCookie)
+  //     .send(updateContent)
+  //     .expect(200)).body as BountyWithDetails;
 
-    expect(updated.title).toBe(updateContent.title);
-    expect(updated.descriptionNodes).toBe(updateContent.descriptionNodes);
-    // Reward amount was dropped
-    expect(updated.rewardAmount).toBe(createdBounty.rewardAmount);
-  });
+  //   expect(updated.title).toBe(updateContent.title);
+  //   expect(updated.descriptionNodes).toBe(updateContent.descriptionNodes);
+  //   // Reward amount was dropped
+  //   expect(updated.rewardAmount).toBe(createdBounty.rewardAmount);
+  // });
 
   it('should allow the creator to edit the whole bounty if it has gone past suggestion status and respond with 200', async () => {
 

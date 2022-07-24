@@ -19,7 +19,9 @@ export async function createBounty ({
   rewardAmount = 0,
   rewardToken = 'ETH',
   permissions,
-  pageId
+  pageId,
+  title = '',
+  content
 }: BountyCreationData): Promise<Bounty> {
 
   const validCreationStatuses: BountyStatus[] = ['suggestion', 'open'];
@@ -95,9 +97,9 @@ export async function createBounty ({
         page: {
           create: {
             path: `page-${Math.random().toString().replace('0.', '')}`,
-            title: '',
+            title,
             contentText: '',
-            content: undefined,
+            content: content ?? undefined,
             space: {
               connect: {
                 id: spaceId

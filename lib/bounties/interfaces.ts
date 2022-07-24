@@ -1,4 +1,4 @@
-import { Bounty } from '@prisma/client';
+import { Bounty, Page } from '@prisma/client';
 import { BountyPermissions, BountySubmitter } from 'lib/permissions/bounties';
 import { Roleup } from 'lib/roles/interfaces';
 import { Resource } from '../permissions/interfaces';
@@ -6,7 +6,7 @@ import { Resource } from '../permissions/interfaces';
 // Re-export bounty permissions interfaces for convenience
 export * from 'lib/permissions/bounties/interfaces';
 
-export type BountyCreationData = Pick<Bounty, 'spaceId' | 'createdBy'> & Partial<Pick<Bounty, 'status'| 'chainId'| 'approveSubmitters'| 'maxSubmissions'| 'rewardAmount'| 'rewardToken'>> & {permissions?: Partial<BountyPermissions>, pageId?: null | string}
+export type BountyCreationData = Pick<Bounty, 'spaceId' | 'createdBy'> & Partial<Pick<Bounty, 'status'| 'chainId'| 'approveSubmitters'| 'maxSubmissions'| 'rewardAmount'| 'rewardToken'>> & {permissions?: Partial<BountyPermissions>, pageId?: null | string} & Partial<Pick<Page, 'title' | 'content'>>
 
 export type UpdateableBountyFields = Partial<Pick<Bounty, 'chainId' | 'rewardAmount' | 'rewardToken' | 'approveSubmitters' | 'maxSubmissions'>> & {permissions?: Partial<BountyPermissions>}
 

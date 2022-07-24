@@ -174,6 +174,28 @@ export async function generateBountyWithSingleApplication ({ applicationStatus, 
     // This should be deleted on future PR. Left for backwards compatibility for now
     reviewer?: string}):
   Promise<BountyWithDetails> {
+
+  const createdPage = await prisma.page.create({
+    data: {
+      contentText: '',
+      content: undefined,
+      title: 'Example',
+      path: `page-${Math.random().toString().replace('0.', '')}`,
+      space: {
+        connect: {
+          id: spaceId
+        }
+      },
+      updatedBy: userId,
+      author: {
+        connect: {
+          id: userId
+        }
+      },
+      type: PageType.bounty
+    }
+  });
+
   const createdBounty = await prisma.bounty.create({
     data: {
       createdBy: userId,
@@ -187,7 +209,12 @@ export async function generateBountyWithSingleApplication ({ applicationStatus, 
       descriptionNodes: '',
       approveSubmitters: false,
       // Important variable
-      maxSubmissions: bountyCap
+      maxSubmissions: bountyCap,
+      page: {
+        connect: {
+          id: createdPage.id
+        }
+      }
     },
     include: {
       applications: true
