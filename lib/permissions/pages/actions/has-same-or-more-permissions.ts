@@ -10,7 +10,7 @@ import { findExistingPermissionForGroup } from './find-existing-permission-for-g
 export function hasSameOrMorePermissions (basePermissions: PagePermission [], comparisonPermissions: PagePermission []): boolean {
 
   for (const basePerm of basePermissions) {
-    const comparePerm = findExistingPermissionForGroup(basePerm, comparisonPermissions);
+    const comparePerm = findExistingPermissionForGroup(basePerm, comparisonPermissions, true);
 
     if (!comparePerm) {
       return false;

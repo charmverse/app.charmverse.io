@@ -57,7 +57,7 @@ describe('createBounty', () => {
 
   });
 
-  it('should accept as creation input: title, spaceId, createdBy, status, chainId, description, descriptionNodes, approveSubmitters, maxSubmissions, rewardAmount, rewardToken, reviewer, linkedTaskId, permissions', async () => {
+  it('should accept as creation input: title, spaceId, createdBy, status, chainId, description, descriptionNodes, approveSubmitters, maxSubmissions, rewardAmount, rewardToken, reviewer, permissions', async () => {
 
     const fullBountyCreationData: BountyCreationData = {
       createdBy: user.id,
@@ -67,7 +67,6 @@ describe('createBounty', () => {
       chainId: 1,
       description: 'Example description',
       descriptionNodes: '{type:"doc"}',
-      linkedTaskId: v4(),
       maxSubmissions: 100,
       rewardAmount: 1000,
       rewardToken: 'ETH',

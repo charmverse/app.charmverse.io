@@ -308,8 +308,9 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
         value.status = 'open';
 
         (value as BountyCreationData).permissions = permissionsToSet;
+        // TODO: Create page when calling charmClient.createBounty
         const createdBounty = await charmClient.createBounty(value);
-        const populatedBounty = { ...createdBounty, applications: [] };
+        const populatedBounty = { ...createdBounty, applications: [], page: null };
 
         setBounties([...bounties, populatedBounty]);
         setCachedBountyDescription({
@@ -333,7 +334,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
 
         (value as BountyCreationData).permissions = permissionsToSet;
         const createdBounty = await charmClient.createBounty(value);
-        const populatedBounty = { ...createdBounty, applications: [] };
+        const populatedBounty = { ...createdBounty, applications: [], page: null };
         setBounties([...bounties, populatedBounty]);
 
         setCachedBountyDescription({

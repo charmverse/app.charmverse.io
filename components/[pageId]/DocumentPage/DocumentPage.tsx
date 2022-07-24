@@ -43,7 +43,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
   const { cancelVote, castVote, deleteVote, votes, isLoading } = useVotes();
   const { bounties } = useBounties();
   const cardId = (new URLSearchParams(window.location.search)).get('cardId');
-  const bounty = bounties.find(_bounty => _bounty.linkedTaskId === cardId);
+  const bounty = bounties.find(_bounty => _bounty.page?.id === cardId);
   const pageVote = Object.values(votes)[0];
 
   const board = useAppSelector((state) => {

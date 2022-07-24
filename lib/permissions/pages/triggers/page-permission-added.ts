@@ -1,10 +1,13 @@
-import { PagePermission } from '@prisma/client';
-import { getPage, IPageWithPermissions, resolveChildPages } from 'lib/pages/server';
-import { PermissionNotFoundError } from '../errors';
+import { PagePermission, Prisma, PrismaPromise } from '@prisma/client';
+import { prisma } from 'db';
+import { IPageWithPermissions, PageNodeWithChildren, PageNodeWithPermissions } from 'lib/pages/server';
+import { isTruthy } from 'lib/utilities/types';
+import { replaceIllegalPermissions } from '../actions';
+import { copyAllPagePermissions } from '../actions/copyPermission';
 import { findExistingPermissionForGroup } from '../actions/find-existing-permission-for-group';
 import { getPagePermission } from '../actions/get-permission';
 import { hasSameOrMorePermissions } from '../actions/has-same-or-more-permissions';
-import { upsertPermission } from '../actions/upsert-permission';
+import { PermissionNotFoundError } from '../errors';
 
 /**
  * If the page doesn't have this permission locally defined, then they can inherit it
@@ -36,30 +39,52 @@ export async function setupPermissionsAfterPagePermissionAdded (permissionId: st
     throw new PermissionNotFoundError(permissionId);
   }
 
-  return applyRecursively(foundPermission.pageId, foundPermission);
+  const updatedPage = await replaceIllegalPermissions({ pageId: foundPermission.pageId });
 
-  // Recursion happens here
-  async function applyRecursively (parentPageId: string, permission: PagePermission): Promise<true> {
-    const parent = await getPage(parentPageId) as IPageWithPermissions;
-    const children = await resolveChildPages(parentPageId, false);
+  const { permissions: permissionsToCopy } = updatedPage;
 
-    const childrenToCreatePermissionFor = children.filter(child => {
-      return canInheritNewPermission(child, parent, permission);
+  // We want to compare the existing permissions of the parent page without the newly added permission
+  const permissionsToCompare = updatedPage.permissions.filter(permission => permission.id !== permissionId);
+
+  // We cannot do upsert many currently on Prisma. To keep the number of operations down, we will delete all relevant permissions and recreate them in 2 bulk operations. See https://stackoverflow.com/a/70824192
+  const permissionsToDelete: Prisma.PagePermissionWhereInput[] = [];
+  const permissionsToCreate: Prisma.PagePermissionCreateManyInput[] = [];
+
+  function findChildPagesToCreatePermissionsFor (node: PageNodeWithChildren<PageNodeWithPermissions>): void {
+    node.children.forEach(child => {
+
+      const { permissions: childPermissions } = child;
+
+      const canInherit = hasSameOrMorePermissions(permissionsToCompare, childPermissions);
+
+      if (canInherit) {
+        permissionsToDelete.push(...childPermissions.map(p => {
+          return {
+            id: p.id
+          };
+        }));
+
+        const copied = copyAllPagePermissions({
+          permissions: permissionsToCopy,
+          newPageId: child.id,
+          inheritFrom: true
+        });
+
+        permissionsToCreate.push(...(copied.data as Prisma.PagePermissionCreateManyInput[]));
+
+        // This child can inherit, lets check its children
+        findChildPagesToCreatePermissionsFor(child);
+      }
+
     });
-
-    await Promise.all(childrenToCreatePermissionFor.map(child => {
-      // eslint-disable-next-line no-async-promise-executor
-      return new Promise(async (resolve) => {
-        await upsertPermission(child.id, permission.id);
-
-        if (child.children?.length > 0) {
-          await applyRecursively(child.id, permission);
-        }
-        resolve(true);
-      });
-    }));
-
-    return true;
   }
 
+  findChildPagesToCreatePermissionsFor(updatedPage);
+
+  await prisma.$transaction([
+    permissionsToDelete.length > 0 ? prisma.pagePermission.deleteMany({ where: { OR: permissionsToDelete } }) : null,
+    prisma.pagePermission.createMany({ data: permissionsToCreate })
+  ].filter(a => isTruthy(a)) as PrismaPromise<any>[]);
+
+  return true;
 }
