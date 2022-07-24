@@ -1,9 +1,9 @@
-import { ApplicationStatus, Block, Bounty, BountyStatus, Page, Prisma, Space, SpaceApiToken, Thread, Transaction, Comment, Role, RoleSource, Vote, VoteOptions, UserVote } from '@prisma/client';
+import { ApplicationStatus, Block, Bounty, BountyStatus, Comment, Page, PageType, Prisma, Role, RoleSource, Space, SpaceApiToken, Thread, Transaction, Vote } from '@prisma/client';
 import { prisma } from 'db';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import { IPageWithPermissions } from 'lib/pages';
 import { createUserFromWallet } from 'lib/users/createUser';
-import { BountyWithDetails, IDENTITY_TYPES, LoggedInUser } from 'models';
+import { BountyWithDetails, IDENTITY_TYPES, LoggedInUser, PageContent } from 'models';
 import { v4 } from 'uuid';
 
 export async function generateSpaceUser ({ spaceId, isAdmin }: { spaceId: string, isAdmin: boolean }): Promise<LoggedInUser> {
@@ -106,7 +106,27 @@ export function generateBounty ({ descriptionNodes, spaceId, createdBy, status, 
       description: '',
       descriptionNodes: descriptionNodes ?? '',
       approveSubmitters,
-      maxSubmissions
+      maxSubmissions,
+      page: {
+        create: {
+          path: `page-${Math.random().toString().replace('0.', '')}`,
+          title: '',
+          contentText: '',
+          content: descriptionNodes as PageContent,
+          space: {
+            connect: {
+              id: spaceId
+            }
+          },
+          updatedBy: createdBy,
+          author: {
+            connect: {
+              id: createdBy
+            }
+          },
+          type: PageType.bounty
+        }
+      }
     }
   });
 }
@@ -154,6 +174,28 @@ export async function generateBountyWithSingleApplication ({ applicationStatus, 
     // This should be deleted on future PR. Left for backwards compatibility for now
     reviewer?: string}):
   Promise<BountyWithDetails> {
+
+  const createdPage = await prisma.page.create({
+    data: {
+      contentText: '',
+      content: undefined,
+      title: 'Example',
+      path: `page-${Math.random().toString().replace('0.', '')}`,
+      space: {
+        connect: {
+          id: spaceId
+        }
+      },
+      updatedBy: userId,
+      author: {
+        connect: {
+          id: userId
+        }
+      },
+      type: PageType.bounty
+    }
+  });
+
   const createdBounty = await prisma.bounty.create({
     data: {
       createdBy: userId,
@@ -167,7 +209,12 @@ export async function generateBountyWithSingleApplication ({ applicationStatus, 
       descriptionNodes: '',
       approveSubmitters: false,
       // Important variable
-      maxSubmissions: bountyCap
+      maxSubmissions: bountyCap,
+      page: {
+        connect: {
+          id: createdPage.id
+        }
+      }
     },
     include: {
       applications: true

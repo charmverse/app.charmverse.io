@@ -40,7 +40,8 @@ export async function reviewBountySuggestion ({ bountyId, decision }: Suggestion
       status: 'open'
     },
     include: {
-      applications: true
+      applications: true,
+      page: true
     }
   });
 

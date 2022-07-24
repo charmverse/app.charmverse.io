@@ -9,14 +9,14 @@ import Label from '../../../widgets/label'
 import ValueSelector from '../../../widgets/valueSelector'
 
 type Props = {
-    emptyValue: string
+    emptyValue?: string
     propertyValue: string
     propertyTemplate: IPropertyTemplate
-    onCreate: (value: string) => void
-    onChange: (value: string) => void
-    onChangeColor: (option: IPropertyOption, color: string) => void
-    onDeleteOption: (option: IPropertyOption) => void
-    onDeleteValue: () => void;
+    onCreate?: (value: string) => void
+    onChange?: (value: string) => void
+    onChangeColor?: (option: IPropertyOption, color: string) => void
+    onDeleteOption?: (option: IPropertyOption) => void
+    onDeleteValue?: () => void;
     isEditable: boolean
 }
 
@@ -45,14 +45,14 @@ const SelectProperty = React.memo((props: Props) => {
     }
     return (
         <ValueSelector
-            emptyValue={emptyValue}
+            emptyValue={emptyValue || ''}
             options={propertyTemplate.options}
             value={propertyTemplate.options.find((p) => p.id === propertyValue)}
-            onCreate={props.onCreate}
-            onChange={(value) => props.onChange(value as string)}
-            onChangeColor={props.onChangeColor}
-            onDeleteOption={props.onDeleteOption}
-            onDeleteValue={props.onDeleteValue}
+            onCreate={props.onCreate ?? (() => {})}
+            onChange={(value) => (props.onChange ? props.onChange(value as string) : (() => {}))}
+            onChangeColor={props.onChangeColor ?? (() => {})}
+            onDeleteOption={props.onDeleteOption ?? (() => {})}
+            onDeleteValue={props.onDeleteValue ?? (() => {})}
             onBlur={() => setOpen(false)}
         />
     )

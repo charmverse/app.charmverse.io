@@ -1,26 +1,27 @@
-import { Bounty, BountyStatus, Prisma } from '@prisma/client';
+import { Bounty, BountyStatus, PageType, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { setBountyPermissions } from 'lib/permissions/bounties';
 import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
+import { BountyWithDetails } from 'models';
+import { v4 } from 'uuid';
 import { BountyCreationData } from './interfaces';
 
 /**
  * You can create a bounty suggestion using only title, spaceId and createdBy. You will see many unit tests using this limited dataset, which will then default the bounty to suggestion status. Your logic should account for this.
  */
 export async function createBounty ({
-  title,
   spaceId,
   createdBy,
   status = 'suggestion',
   chainId = 1,
-  description = '',
-  descriptionNodes = '',
-  linkedTaskId,
   approveSubmitters = true,
   maxSubmissions,
   rewardAmount = 0,
   rewardToken = 'ETH',
-  permissions
+  permissions,
+  pageId,
+  title = '',
+  content
 }: BountyCreationData): Promise<Bounty> {
 
   const validCreationStatuses: BountyStatus[] = ['suggestion', 'open'];
@@ -39,8 +40,10 @@ export async function createBounty ({
     throw new PositiveNumbersOnlyError();
   }
 
+  const bountyId = v4();
+
   const bountyCreateInput: Prisma.BountyCreateInput = {
-    title,
+    id: bountyId,
     space: {
       connect: {
         id: spaceId
@@ -53,25 +56,74 @@ export async function createBounty ({
     },
     status,
     chainId,
-    description,
-    descriptionNodes: descriptionNodes as string,
+    title: '',
+    description: '',
+    descriptionNodes: '',
     approveSubmitters,
     maxSubmissions,
     rewardAmount,
-    rewardToken,
-    linkedTaskId
+    rewardToken
   };
 
-  if (status === 'suggestion') {
+  const isSuggestion = status === 'suggestion';
+
+  if (isSuggestion) {
     bountyCreateInput.suggestedBy = createdBy;
   }
 
-  const bounty = await prisma.bounty.create({
-    data: bountyCreateInput
-  });
+  let bounty: BountyWithDetails;
+
+  // Link to a focalboard card page
+  if (pageId) {
+    bounty = await prisma.bounty.create({
+      data: {
+        ...bountyCreateInput,
+        page: {
+          connect: {
+            id: pageId
+          }
+        }
+      },
+      include: {
+        applications: true,
+        page: true
+      }
+    });
+  }
+  else {
+    bounty = await prisma.bounty.create({
+      data: {
+        ...bountyCreateInput,
+        page: {
+          create: {
+            path: `page-${Math.random().toString().replace('0.', '')}`,
+            title,
+            contentText: '',
+            content: content ?? undefined,
+            space: {
+              connect: {
+                id: spaceId
+              }
+            },
+            updatedBy: createdBy,
+            author: {
+              connect: {
+                id: createdBy
+              }
+            },
+            type: PageType.bounty
+          }
+        }
+      },
+      include: {
+        applications: true,
+        page: true
+      }
+    });
+  }
 
   // Initialise suggestions with a view permission
-  if (status === 'suggestion') {
+  if (isSuggestion) {
     await setBountyPermissions({
       bountyId: bounty.id,
       permissionsToAssign: {

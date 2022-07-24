@@ -1,5 +1,4 @@
 import { useTheme } from '@emotion/react';
-import { Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
@@ -16,27 +15,27 @@ import { Modal } from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
 import { useBounties } from 'hooks/useBounties';
 import { useContributors } from 'hooks/useContributors';
-import useIsAdmin from 'hooks/useIsAdmin';
 import useRoles from 'hooks/useRoles';
 import { useUser } from 'hooks/useUser';
-import { applicantIsSubmitter, moveUserApplicationToFirstRow, submissionsCapReached } from 'lib/applications/shared';
+import { applicantIsSubmitter, moveUserApplicationToFirstRow } from 'lib/applications/shared';
+import { AssignedBountyPermissions, humaniseBountyAccessConditions } from 'lib/bounties/client';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { AssignedBountyPermissions, BountyPermissions, humaniseBountyAccessConditions } from 'lib/bounties/client';
-import { useMemo } from 'react';
-import { Roleup } from 'lib/roles/interfaces';
 import { ApplicationEditorForm } from './ApplicationEditorForm';
+import BountyApplyButton from './BountyApplyButton';
 
 export interface IBountyApplicantListProps {
   bounty: Bounty,
   applications: Application[]
   permissions: AssignedBountyPermissions
+  showHeader?: boolean
 }
 
 export function BountyApplicantList ({
   applications,
   bounty,
-  permissions
+  permissions,
+  showHeader = true
 }: IBountyApplicantListProps) {
   const [user] = useUser();
   const [contributors] = useContributors();
@@ -95,22 +94,10 @@ export function BountyApplicantList ({
 
   const userApplication = sortedApplications.find(app => app.createdBy === user?.id);
 
-  const userHasApplied = userApplication !== undefined;
-
-  const newApplicationsSuspended = submissionsCapReached({
-    bounty,
-    submissions: applications
-  });
-
-  const submissionsCapSentence = `The cap of ${bounty.maxSubmissions} submission${bounty.maxSubmissions !== 1 ? 's'
-    : ''} has been reached.`;
-
-  const applyButtonTooltipTitle = !permissions?.userPermissions.work ? 'You cannot apply to this bounty.'
-    : newApplicationsSuspended ? submissionsCapSentence : '';
-
   return (
     <>
       <Box component='div' sx={{ minHeight, maxHeight, overflowY: 'auto' }}>
+        {showHeader && (
         <Grid container sx={{ mb: 2 }}>
           <Grid item xs={8}>
             <Typography variant='h5'>
@@ -118,28 +105,18 @@ export function BountyApplicantList ({
             </Typography>
           </Grid>
           <Grid container item xs={4} direction='row' justifyContent='flex-end'>
-            {
-              // Currently, we should only be able to see bounties we can work on
-                  !userHasApplied && (
-                    <Tooltip
-                      placement='top'
-                      title={applyButtonTooltipTitle}
-                    >
-                      <Box component='span'>
-                        <Button
-                          disabled={newApplicationsSuspended || !permissions?.userPermissions.work}
-                          onClick={bountyApplyModal.open}
-                        >Apply
-                        </Button>
-                      </Box>
-                    </Tooltip>
-                  )
-                }
+            <BountyApplyButton
+              applications={sortedApplications}
+              bounty={bounty}
+              onClick={bountyApplyModal.open}
+              permissions={permissions}
+            />
           </Grid>
           <Grid item xs={12} sx={{ mt: 2 }}>
             {humanisedSubmitterSentence.phrase}
           </Grid>
         </Grid>
+        )}
 
         <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
           <TableHead sx={{

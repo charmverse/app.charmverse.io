@@ -14,10 +14,10 @@ type Props = {
     propertyTemplate: IPropertyTemplate;
     propertyValue: string | string[];
     onChange: (value: string | string[]) => void;
-    onChangeColor: (option: IPropertyOption, color: string) => void;
-    onDeleteOption: (option: IPropertyOption) => void;
-    onCreate: (newValue: string, currentValues: IPropertyOption[]) => void;
-    onDeleteValue: (valueToDelete: IPropertyOption, currentValues: IPropertyOption[]) => void;
+    onChangeColor?: (option: IPropertyOption, color: string) => void;
+    onDeleteOption?: (option: IPropertyOption) => void;
+    onCreate?: (newValue: string, currentValues: IPropertyOption[]) => void;
+    onDeleteValue?: (valueToDelete: IPropertyOption, currentValues: IPropertyOption[]) => void;
     isEditable: boolean;
 }
 
@@ -59,10 +59,10 @@ const MultiSelectProperty = (props: Props): JSX.Element => {
             options={propertyTemplate.options}
             value={values}
             onChange={onChange}
-            onChangeColor={onChangeColor}
-            onDeleteOption={onDeleteOption}
-            onDeleteValue={(valueToRemove) => onDeleteValue(valueToRemove, values)}
-            onCreate={(newValue) => onCreate(newValue, values)}
+            onChangeColor={onChangeColor ?? (() => {})}
+            onDeleteOption={onDeleteOption ?? (() => {})}
+            onDeleteValue={(valueToRemove) => onDeleteValue && onDeleteValue(valueToRemove, values)}
+            onCreate={(newValue) => onCreate && onCreate(newValue, values)}
             onBlur={() => setOpen(false)}
         />
     )

@@ -151,13 +151,6 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
 
   }, [bounty, permissions]);
 
-  // Cached description for when user is creating or suggesting a new bounty
-  const [cachedBountyDescription, setCachedBountyDescription] = useLocalStorage<{nodes: PageContent, text: string}>(`newBounty.${space?.id}`, {
-    nodes: {
-      type: 'doc'
-    },
-    text: ''
-  });
   const {
     register,
     handleSubmit,
@@ -174,11 +167,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
       maxSubmissions: 1 as any,
       approveSubmitters: true,
       capSubmissions: !((bounty && bounty?.maxSubmissions === null)),
-      // expiryDate: null,
-      ...(bounty || {}),
-      description: bounty?.description ?? cachedBountyDescription.text,
-      descriptionNodes: bounty?.descriptionNodes ?? cachedBountyDescription.nodes
-      //      setExpiryDate: !!bounty?.expiryDate
+      ...(bounty || {})
     },
     resolver: yupResolver(schema)
   });
@@ -303,56 +292,36 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
 
         value.spaceId = space!.id;
         value.createdBy = user!.id;
-        value.description = value.description ?? '';
-        value.descriptionNodes = value.descriptionNodes ?? '';
         value.status = 'open';
 
         (value as BountyCreationData).permissions = permissionsToSet;
+        // TODO: Create page when calling charmClient.createBounty
         const createdBounty = await charmClient.createBounty(value);
-        const populatedBounty = { ...createdBounty, applications: [] };
+        const populatedBounty = { ...createdBounty, applications: [], page: null };
 
         setBounties([...bounties, populatedBounty]);
-        setCachedBountyDescription({
-          nodes: {
-            type: 'doc'
-          },
-          text: ''
-        });
         onSubmit(populatedBounty);
       }
       else if (mode === 'suggest') {
         value.spaceId = space!.id;
         value.createdBy = user!.id;
-        value.description = value.description ?? '';
-        value.descriptionNodes = value.descriptionNodes ?? '';
         value.status = 'suggestion';
-
         value.rewardToken = 'ETH';
         value.rewardAmount = 0;
         value.chainId = 1;
 
         (value as BountyCreationData).permissions = permissionsToSet;
         const createdBounty = await charmClient.createBounty(value);
-        const populatedBounty = { ...createdBounty, applications: [] };
+        const populatedBounty = { ...createdBounty, applications: [], page: null };
         setBounties([...bounties, populatedBounty]);
-
-        setCachedBountyDescription({
-          nodes: {
-            type: 'doc'
-          },
-          text: ''
-        });
 
         onSubmit(populatedBounty);
 
       }
       else if (bounty?.id && mode === 'update') {
         const updates: UpdateableBountyFields = {
-          title: value.title,
           rewardAmount: value.rewardAmount,
           rewardToken: value.rewardToken,
-          descriptionNodes: value.descriptionNodes,
-          description: value.description,
           chainId: value.chainId,
           approveSubmitters: value.approveSubmitters === null ? undefined : value.approveSubmitters,
           maxSubmissions: value.capSubmissions === false ? null : value.maxSubmissions,
@@ -373,13 +342,6 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
   function setRichContent (content: ICharmEditorOutput) {
     setValue('descriptionNodes', content.doc);
     setValue('description', content.rawText);
-
-    if (!bounty) {
-      setCachedBountyDescription({
-        nodes: content.doc,
-        text: content.rawText
-      });
-    }
   }
 
   function setChainId (_chainId: number) {

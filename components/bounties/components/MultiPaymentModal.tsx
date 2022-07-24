@@ -25,9 +25,10 @@ import { isTruthy } from 'lib/utilities/types';
 import MultiPaymentButton, { MultiPaymentResult } from './MultiPaymentButton';
 import { BountyAmount } from './BountyStatusBadge';
 
-interface TransactionWithMetadata extends MetaTransactionData, Pick<Bounty, 'rewardToken' | 'rewardAmount' | 'chainId' | 'title'>{
+interface TransactionWithMetadata extends MetaTransactionData, Pick<Bounty, 'rewardToken' | 'rewardAmount' | 'chainId'>{
   applicationId: string
   userId: string
+  title: string
 }
 
 export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDetails[]}) {
@@ -71,7 +72,7 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
               chainId: bounty.chainId,
               rewardAmount: bounty.rewardAmount,
               rewardToken: bounty.rewardToken,
-              title: bounty.title
+              title: bounty.page?.title || 'Untitled'
             };
           }
           return false;
