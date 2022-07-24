@@ -19,9 +19,7 @@ beforeAll(async () => {
 
 describe('updateBountySettings', () => {
 
-  it("should be able to update 'title' | 'descriptionNodes' | 'description' | 'reviewer' | 'chainId' | 'rewardAmount' | 'rewardToken' | 'approveSubmitters' | 'maxSubmissions' | 'linkedTaskId'", async () => {
-
-    const linkedTaskId = v4();
+  it("should be able to update 'title' | 'descriptionNodes' | 'description' | 'reviewer' | 'chainId' | 'rewardAmount' | 'rewardToken' | 'approveSubmitters' | 'maxSubmissions'", async () => {
 
     const bounty = await createBounty({
       createdBy: user.id,
@@ -34,11 +32,8 @@ describe('updateBountySettings', () => {
       descriptionNodes: '{"type":"doc","content":[{"type":"paragraph","content":[{"text":"Old description","type":"text"}]}]}',
       maxSubmissions: 3,
       rewardAmount: 4,
-      rewardToken: 'ETH',
-      linkedTaskId
+      rewardToken: 'ETH'
     });
-
-    const newTaskId = v4();
 
     const newContent: UpdateableBountyFields = {
       title: 'New title',
@@ -48,8 +43,7 @@ describe('updateBountySettings', () => {
       descriptionNodes: '{"type":"doc","content":[{"type":"paragraph","content":[{"text":"New description","type":"text"}]}]}',
       maxSubmissions: 30,
       rewardAmount: 40,
-      rewardToken: 'BNB',
-      linkedTaskId: newTaskId
+      rewardToken: 'BNB'
     };
 
     const updatedBounty = await updateBountySettings({

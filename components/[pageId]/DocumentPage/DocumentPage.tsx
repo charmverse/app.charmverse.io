@@ -148,7 +148,13 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: IEditor
                       pageUpdatedAt={page.updatedAt.toString()}
                       pageUpdatedBy={page.updatedBy}
                     />
-                    <BountyIntegration linkedTaskId={card.id} title={page.title} readonly={readOnly} />
+                    <BountyIntegration
+                      pageId={card.id}
+                      title={page.title}
+                      description={page.contentText}
+                      descriptionNodes={page.content}
+                      readonly={readOnly}
+                    />
                   </Box>
 
                   <hr />

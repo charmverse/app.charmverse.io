@@ -38,7 +38,8 @@ export async function listAvailableBounties ({ spaceId, userId }: AvailableResou
         }
       },
       include: {
-        applications: true
+        applications: true,
+        page: true
       }
     });
   }
@@ -100,7 +101,8 @@ export async function listAvailableBounties ({ spaceId, userId }: AvailableResou
 
     },
     include: {
-      applications: true
+      applications: true,
+      page: true
     }
   });
 

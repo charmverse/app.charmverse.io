@@ -1,7 +1,8 @@
-import { Bounty, BountyStatus, Prisma } from '@prisma/client';
+import { Bounty, BountyStatus, PageType, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { setBountyPermissions } from 'lib/permissions/bounties';
 import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
+import { v4 } from 'uuid';
 import { BountyCreationData } from './interfaces';
 
 /**
@@ -15,7 +16,6 @@ export async function createBounty ({
   chainId = 1,
   description = '',
   descriptionNodes = '',
-  linkedTaskId,
   approveSubmitters = true,
   maxSubmissions,
   rewardAmount = 0,
@@ -39,7 +39,10 @@ export async function createBounty ({
     throw new PositiveNumbersOnlyError();
   }
 
+  const bountyId = v4();
+
   const bountyCreateInput: Prisma.BountyCreateInput = {
+    id: bountyId,
     title,
     space: {
       connect: {
@@ -58,20 +61,47 @@ export async function createBounty ({
     approveSubmitters,
     maxSubmissions,
     rewardAmount,
-    rewardToken,
-    linkedTaskId
+    rewardToken
   };
 
-  if (status === 'suggestion') {
+  const isSuggestion = status === 'suggestion';
+
+  if (isSuggestion) {
     bountyCreateInput.suggestedBy = createdBy;
   }
 
+  let pageData = {};
+
+  pageData = {
+    create: {
+      path: `page-${Math.random().toString().replace('0.', '')}`,
+      title,
+      contentText: description,
+      content: descriptionNodes as string,
+      space: {
+        connect: {
+          id: spaceId
+        }
+      },
+      updatedBy: createdBy,
+      author: {
+        connect: {
+          id: createdBy
+        }
+      },
+      type: PageType.bounty
+    }
+  };
+
   const bounty = await prisma.bounty.create({
-    data: bountyCreateInput
+    data: {
+      ...bountyCreateInput,
+      page: pageData
+    }
   });
 
   // Initialise suggestions with a view permission
-  if (status === 'suggestion') {
+  if (isSuggestion) {
     await setBountyPermissions({
       bountyId: bounty.id,
       permissionsToAssign: {
