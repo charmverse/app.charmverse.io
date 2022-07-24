@@ -1,5 +1,5 @@
 import { getUriWithParam } from 'lib/utilities/strings';
-import { BountyWithDetails, Page } from 'models';
+import { Page } from 'models';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState, useMemo } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -151,7 +151,7 @@ export default function BoardPage ({ page, setPage, readonly }: Props) {
               cardId={shownCardId}
               onClose={() => showCard(undefined)}
               showCard={(cardId) => showCard(cardId)}
-              readonly={!!readonly}
+              readonly={Boolean(readonly)}
             />
           </RootPortal>
         )}

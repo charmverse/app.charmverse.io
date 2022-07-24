@@ -399,9 +399,9 @@ class CharmClient {
     return http.GET('/api/bounties', { spaceId, publicOnly });
   }
 
-  async createBounty (bounty: Partial<BountyCreationData>): Promise<Bounty> {
+  async createBounty (bounty: Partial<BountyCreationData>) {
 
-    const data = await http.POST<Bounty>('/api/bounties', bounty);
+    const data = await http.POST<BountyWithDetails>('/api/bounties', bounty);
 
     return data;
   }

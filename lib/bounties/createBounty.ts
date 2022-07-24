@@ -2,6 +2,7 @@ import { Bounty, BountyStatus, PageType, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { setBountyPermissions } from 'lib/permissions/bounties';
 import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
+import { BountyWithDetails } from 'models';
 import { v4 } from 'uuid';
 import { BountyCreationData } from './interfaces';
 
@@ -9,18 +10,16 @@ import { BountyCreationData } from './interfaces';
  * You can create a bounty suggestion using only title, spaceId and createdBy. You will see many unit tests using this limited dataset, which will then default the bounty to suggestion status. Your logic should account for this.
  */
 export async function createBounty ({
-  title,
   spaceId,
   createdBy,
   status = 'suggestion',
   chainId = 1,
-  description = '',
-  descriptionNodes = '',
   approveSubmitters = true,
   maxSubmissions,
   rewardAmount = 0,
   rewardToken = 'ETH',
-  permissions
+  permissions,
+  pageId
 }: BountyCreationData): Promise<Bounty> {
 
   const validCreationStatuses: BountyStatus[] = ['suggestion', 'open'];
@@ -43,7 +42,7 @@ export async function createBounty ({
 
   const bountyCreateInput: Prisma.BountyCreateInput = {
     id: bountyId,
-    title,
+    title: '',
     space: {
       connect: {
         id: spaceId
@@ -56,8 +55,8 @@ export async function createBounty ({
     },
     status,
     chainId,
-    description,
-    descriptionNodes: descriptionNodes as string,
+    description: '',
+    descriptionNodes: '',
     approveSubmitters,
     maxSubmissions,
     rewardAmount,
@@ -70,35 +69,56 @@ export async function createBounty ({
     bountyCreateInput.suggestedBy = createdBy;
   }
 
-  let pageData = {};
+  let bounty: BountyWithDetails;
 
-  pageData = {
-    create: {
-      path: `page-${Math.random().toString().replace('0.', '')}`,
-      title,
-      contentText: description,
-      content: descriptionNodes as string,
-      space: {
-        connect: {
-          id: spaceId
+  // Link to a focalboard card page
+  if (pageId) {
+    bounty = await prisma.bounty.create({
+      data: {
+        ...bountyCreateInput,
+        page: {
+          connect: {
+            id: pageId
+          }
         }
       },
-      updatedBy: createdBy,
-      author: {
-        connect: {
-          id: createdBy
+      include: {
+        applications: true,
+        page: true
+      }
+    });
+  }
+  else {
+    bounty = await prisma.bounty.create({
+      data: {
+        ...bountyCreateInput,
+        page: {
+          create: {
+            path: `page-${Math.random().toString().replace('0.', '')}`,
+            title: '',
+            contentText: '',
+            content: undefined,
+            space: {
+              connect: {
+                id: spaceId
+              }
+            },
+            updatedBy: createdBy,
+            author: {
+              connect: {
+                id: createdBy
+              }
+            },
+            type: PageType.bounty
+          }
         }
       },
-      type: PageType.bounty
-    }
-  };
-
-  const bounty = await prisma.bounty.create({
-    data: {
-      ...bountyCreateInput,
-      page: pageData
-    }
-  });
+      include: {
+        applications: true,
+        page: true
+      }
+    });
+  }
 
   // Initialise suggestions with a view permission
   if (isSuggestion) {
