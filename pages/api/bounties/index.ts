@@ -8,7 +8,7 @@ import { AvailableResourcesRequest } from 'lib/permissions/interfaces';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { UnauthorisedActionError } from 'lib/utilities/errors';
+import { UnauthorisedActionError, UndesirableOperationError } from 'lib/utilities/errors';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -36,7 +36,7 @@ async function getBounties (req: NextApiRequest, res: NextApiResponse<Bounty[]>)
 
 async function createBountyController (req: NextApiRequest, res: NextApiResponse<Bounty>) {
 
-  const { spaceId, status } = req.body as Bounty;
+  const { spaceId, status, linkedTaskId } = req.body as Bounty;
 
   const { id: userId } = req.session.user;
 
@@ -59,6 +59,18 @@ async function createBountyController (req: NextApiRequest, res: NextApiResponse
     });
     if (!userPermissions.createBounty) {
       throw new UnauthorisedActionError('You do not have permissions to create a bounty.');
+    }
+  }
+
+  if (linkedTaskId) {
+    const existingBounty = await prisma.bounty.findFirst({
+      where: {
+        linkedTaskId
+      }
+    });
+
+    if (existingBounty) {
+      throw new UndesirableOperationError('A card page can have at most a single bounty');
     }
   }
 

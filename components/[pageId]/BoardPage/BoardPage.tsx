@@ -1,5 +1,5 @@
 import { getUriWithParam } from 'lib/utilities/strings';
-import { Page } from 'models';
+import { BountyWithDetails, Page } from 'models';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState, useMemo } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';

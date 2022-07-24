@@ -4,6 +4,59 @@ import { hasAccessToSpace } from 'lib/middleware';
 import { AvailableResourcesRequest } from '../permissions/interfaces';
 import { DataNotFoundError } from '../utilities/errors';
 
+export function generateAccessibleBountiesQuery ({ userId, spaceId }: {userId: string, spaceId: string}) {
+  return [
+    {
+      space: {
+        spaceRoles: {
+          some: {
+            userId,
+            isAdmin: true
+          }
+        }
+      }
+    },
+    {
+      createdBy: userId
+    },
+    {
+      permissions: {
+        some: {
+          OR: [{
+            public: true
+          },
+          {
+            user: {
+              id: userId
+            }
+          },
+          {
+            role: {
+              spaceRolesToRole: {
+                some: {
+                  spaceRole: {
+                    spaceId,
+                    userId
+                  }
+                }
+              }
+            }
+          },
+          {
+            space: {
+              id: spaceId,
+              spaceRoles: {
+                some: {
+                  userId
+                }
+              }
+            }
+          }]
+        }
+      } }
+  ];
+}
+
 export async function listAvailableBounties ({ spaceId, userId }: AvailableResourcesRequest): Promise<BountyWithDetails[]> {
 
   const space = await prisma.space.findUnique({
@@ -46,58 +99,10 @@ export async function listAvailableBounties ({ spaceId, userId }: AvailableResou
   return prisma.bounty.findMany({
     where: {
       spaceId,
-      OR: [
-        // Admin override
-        {
-          space: {
-            spaceRoles: {
-              some: {
-                userId,
-                isAdmin: true
-              }
-            }
-          }
-        },
-        {
-          createdBy: userId
-        },
-        {
-          permissions: {
-            some: {
-              OR: [{
-                public: true
-              },
-              {
-                user: {
-                  id: userId
-                }
-              },
-              {
-                role: {
-                  spaceRolesToRole: {
-                    some: {
-                      spaceRole: {
-                        spaceId,
-                        userId
-                      }
-                    }
-                  }
-                }
-              },
-              {
-                space: {
-                  id: spaceId,
-                  spaceRoles: {
-                    some: {
-                      userId
-                    }
-                  }
-                }
-              }]
-            }
-          } }
-      ]
-
+      OR: generateAccessibleBountiesQuery({
+        spaceId,
+        userId
+      })
     },
     include: {
       applications: true

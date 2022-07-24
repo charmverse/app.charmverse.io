@@ -18,7 +18,7 @@ import type { ServerBlockFields } from 'pages/api/blocks';
 import { InviteLinkPopulated } from 'pages/api/invites/index';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 // TODO: Maybe move these types to another place so that we dont import from backend
-import { ReviewDecision, SubmissionContent, SubmissionCreationData } from 'lib/applications/interfaces';
+import { ListApplicationsResponse, ReviewDecision, SubmissionContent, SubmissionCreationData } from 'lib/applications/interfaces';
 import { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
 import { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
@@ -33,7 +33,7 @@ import { UpdateThreadRequest } from 'pages/api/threads/[id]';
 import { TokenGateWithRoles } from 'pages/api/token-gates';
 
 import { ApplicationWithTransactions } from 'lib/applications/actions';
-import { AssignedBountyPermissions, BountySubmitterPoolCalculation, BountySubmitterPoolSize, BountyUpdate, SuggestionAction } from 'lib/bounties/interfaces';
+import { AssignedBountyPermissions, BountyCreationData, BountySubmitterPoolCalculation, BountySubmitterPoolSize, BountyUpdate, SuggestionAction } from 'lib/bounties/interfaces';
 import { DeepDaoAggregateData } from 'lib/deepdao/interfaces';
 import { PublicPageResponse } from 'lib/pages/interfaces';
 import { PublicBountyToggle, PublicSpaceInfo } from 'lib/spaces/interfaces';
@@ -399,7 +399,7 @@ class CharmClient {
     return http.GET('/api/bounties', { spaceId, publicOnly });
   }
 
-  async createBounty (bounty: Partial<Bounty>): Promise<Bounty> {
+  async createBounty (bounty: Partial<BountyCreationData>): Promise<Bounty> {
 
     const data = await http.POST<Bounty>('/api/bounties', bounty);
 
@@ -457,15 +457,15 @@ class CharmClient {
     return data;
   }
 
-  async createApplication (application: Application): Promise<Application> {
+  async createApplication (application: Pick<Application, 'bountyId' | 'message' | 'status'>): Promise<Application> {
 
     const data = await http.POST<Application>('/api/applications', application);
 
     return data;
   }
 
-  listApplications (bountyId: string, submissionsOnly: boolean): Promise<ApplicationWithTransactions []> {
-    return http.GET('/api/applications', { bountyId, submissionsOnly });
+  listApplications (bountyId: string): Promise<ListApplicationsResponse> {
+    return http.GET('/api/applications', { bountyId });
   }
 
   async createSubmission (content: Omit<SubmissionCreationData, 'userId'>): Promise<Application> {
@@ -743,6 +743,10 @@ class CharmClient {
 
   getUserVotes (voteId: string) {
     return http.GET<UserVoteExtendedDTO[]>(`/api/votes/${voteId}/user-votes`);
+  }
+
+  checkPageBounty (pageId: string) {
+    return http.GET<boolean>(`/api/pages/${pageId}/bounty`);
   }
 }
 

@@ -1,6 +1,7 @@
 import { Page } from '@prisma/client';
 import charmClient from 'charmClient';
 import ErrorPage from 'components/common/errors/ErrorPage';
+import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
@@ -12,7 +13,6 @@ import BoardPage from '../BoardPage';
 import DocumentPage from '../DocumentPage';
 
 export default function EditorPage ({ pageId }: { pageId: string }) {
-
   const { setIsEditing, pages, setCurrentPageId, setPages, getPagePermissions } = usePages();
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
@@ -106,7 +106,13 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
   }
   else if (currentPagePermissions.read === true) {
     if (currentPage?.type === 'board') {
-      return <BoardPage page={memoizedCurrentPage} setPage={setPage} readonly={currentPagePermissions.edit_content !== true} />;
+      return (
+        <BoardPage
+          page={memoizedCurrentPage}
+          setPage={setPage}
+          readonly={currentPagePermissions.edit_content !== true}
+        />
+      );
     }
     else {
       return (

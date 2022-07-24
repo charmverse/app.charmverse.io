@@ -1,12 +1,13 @@
 
 import { Application } from '@prisma/client';
 import { prisma } from 'db';
-import { ApplicationWithTransactions, createApplication, listSubmissions } from 'lib/applications/actions';
+import { createApplication, listAccessibleApplications, ListApplicationsResponse } from 'lib/applications/actions';
+import { countValidSubmissions } from 'lib/applications/shared';
 import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireKeys } from 'lib/middleware/requireKeys';
+import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
-import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -17,13 +18,13 @@ handler.use(requireUser)
   .use(requireKeys<Application>(['bountyId', 'message'], 'body'))
   .post(createApplicationController);
 
-async function getApplications (req: NextApiRequest, res: NextApiResponse<ApplicationWithTransactions[]>) {
-  const { bountyId, submissionsOnly } = req.query;
+async function getApplications (req: NextApiRequest, res: NextApiResponse<ListApplicationsResponse>) {
+  const bountyId = req.query.bountyId as string;
   const { id: userId } = req.session.user;
 
   const bounty = await prisma.bounty.findUnique({
     where: {
-      id: bountyId as string
+      id: bountyId
     },
     select: {
       spaceId: true
@@ -44,17 +45,16 @@ async function getApplications (req: NextApiRequest, res: NextApiResponse<Applic
     throw error;
   }
 
-  const applicationsOrSubmissions = await (submissionsOnly === 'true'
-    ? listSubmissions(bountyId as string)
-    : prisma.application.findMany({
-      where: {
-        bountyId: bountyId as string
-      },
-      include: {
-        transactions: true
-      }
-    }));
-  return res.status(200).json(applicationsOrSubmissions);
+  const applicationsOrSubmissions = await listAccessibleApplications({
+    bountyId,
+    spaceId: bounty.spaceId,
+    userId
+  });
+
+  return res.status(200).json({
+    applications: applicationsOrSubmissions,
+    validSubmissions: countValidSubmissions(applicationsOrSubmissions)
+  });
 }
 
 async function createApplicationController (req: NextApiRequest, res: NextApiResponse<Application>) {

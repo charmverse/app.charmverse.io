@@ -1,11 +1,8 @@
-import { countValueOccurrences } from 'lib/utilities/numbers';
-import { countValidSubmissions } from 'lib/applications/shared';
 import { prisma } from 'db';
+import { countValidSubmissions } from 'lib/applications/shared';
 import { BountyWithDetails } from '../../models/Bounty';
 import { DataNotFoundError } from '../utilities/errors';
 import { getBounty } from './getBounty';
-import { rollupBountyStatus } from './rollupBountyStatus';
-import { closeNewApplicationsAndSubmissions } from './closeNewApplicationsAndSubmissions';
 
 export async function closeOutBounty (bountyId: string): Promise<BountyWithDetails> {
   const bounty = await getBounty(bountyId);

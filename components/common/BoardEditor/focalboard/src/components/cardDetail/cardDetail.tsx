@@ -2,13 +2,14 @@
 // See LICENSE.txt for license information.
 
 import DocumentPage from 'components/[pageId]/DocumentPage'
-import { useCallback, useEffect, useRef } from 'react'
+import { ReactNode, useCallback, useEffect, useRef } from 'react'
 import { Card } from '../../blocks/card'
 import { usePages } from 'hooks/usePages'
 import log from 'lib/log'
 import { Prisma, Page } from '@prisma/client';
 import charmClient from 'charmClient';
 import debouncePromise from 'lib/utilities/debouncePromise';
+import { BountyWithDetails } from 'models'
 
 type Props = {
     card: Card
@@ -52,7 +53,11 @@ const CardDetail = (props: Props): JSX.Element|null => {
       return null
     }
     return (
-      <DocumentPage page={page} setPage={setPage} readOnly={readonly} />
+      <DocumentPage 
+        page={page} 
+        setPage={setPage} 
+        readOnly={readonly} 
+      />
     )
 }
 

@@ -34,7 +34,6 @@
     .octo-propertylist {
         display: flex;
         flex-direction: column;
-        width: 75%;
     }
 
     .octo-propertyrow {
@@ -122,6 +121,7 @@
     }
 
     .octo-propertyname {
+        font-weight: 600;
         span {
           text-overflow: ellipsis;
           overflow: hidden;

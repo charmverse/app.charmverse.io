@@ -45,7 +45,6 @@ function InputSearchContributorBase ({ filter, options, disableCloseOnSelect, pl
 
   return (
     <Autocomplete
-      {...props}
       disabled={options.length === 0}
       disableCloseOnSelect={disableCloseOnSelect}
       loading={options.length === 0}
@@ -73,6 +72,7 @@ function InputSearchContributorBase ({ filter, options, disableCloseOnSelect, pl
           }}
         />
       )}
+      {...props}
     />
   );
 }
@@ -115,7 +115,7 @@ export function InputSearchContributor ({ defaultValue, onChange, ...props }: II
   );
 }
 
-interface IInputSearchContributorMultipleProps {
+interface IInputSearchContributorMultipleProps extends Partial<Omit<AutocompleteProps<Contributor, true, true, true>, 'onChange'>> {
   onChange: (id: string[]) => void
   defaultValue?: string[]
   filter?: IContributorsFilter
@@ -145,12 +145,12 @@ export function InputSearchContributorMultiple ({ onChange, disableCloseOnSelect
     <InputSearchContributorBase
       filterSelectedOptions
       multiple
-      options={contributors}
       placeholder='Select users'
       value={value}
       disableCloseOnSelect={disableCloseOnSelect}
       onChange={(e, _value) => emitValue(_value as Contributor[])}
       {...props}
+      options={contributors}
     />
   );
 }
