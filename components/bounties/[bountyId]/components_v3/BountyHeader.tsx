@@ -103,7 +103,7 @@ export default function BountyHeader ({ bounty, permissions, refreshBountyPermis
             }}
           >
             <strong>
-              {bounty.title}
+              {bounty.page?.title || 'Untitled'}
             </strong>
             {/* Provide the bounty menu options */}
             {

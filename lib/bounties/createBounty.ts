@@ -42,7 +42,6 @@ export async function createBounty ({
 
   const bountyCreateInput: Prisma.BountyCreateInput = {
     id: bountyId,
-    title: '',
     space: {
       connect: {
         id: spaceId
@@ -55,6 +54,7 @@ export async function createBounty ({
     },
     status,
     chainId,
+    title: '',
     description: '',
     descriptionNodes: '',
     approveSubmitters,
