@@ -1,14 +1,14 @@
 
+import { Page } from '@prisma/client';
+import { prisma } from 'db';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { IPageWithPermissions, ModifyChildPagesResponse } from 'lib/pages';
+import { modifyChildPages } from 'lib/pages/modifyChildPages';
+import { getPage } from 'lib/pages/server/getPage';
 import { computeUserPagePermissions, setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages';
+import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { withSessionRoute } from 'lib/session/withSession';
-import { Page, PageType } from '@prisma/client';
-import { prisma } from 'db';
-import { modifyChildPages } from 'lib/pages/modifyChildPages';
-import { IPageWithPermissions, ModifyChildPagesResponse } from 'lib/pages';
-import { getPage } from 'lib/pages/server/getPage';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -69,9 +69,7 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
     throw new NotFoundError();
   }
 
-  const isBountyPage = page.type === PageType.bounty;
-
-  const pageUpdateData = {
+  const pageWithPermission = await prisma.page.update({
     where: {
       id: pageId
     },
@@ -87,28 +85,7 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
         }
       }
     }
-  };
-
-  let pageWithPermission;
-
-  if (isBountyPage) {
-    [pageWithPermission] = await prisma.$transaction([
-      prisma.page.update(pageUpdateData),
-      prisma.bounty.update({
-        where: {
-          id: page.bountyId || undefined
-        },
-        data: {
-          title: req.body.title,
-          description: req.body.contentText,
-          descriptionNodes: req.body.content as string
-        }
-      })
-    ]);
-  }
-  else {
-    pageWithPermission = await prisma.page.update(pageUpdateData);
-  }
+  });
 
   if (updateContent.parentId === null || typeof updateContent.parentId === 'string') {
     const updatedPage = await setupPermissionsAfterPageRepositioned(pageId);
