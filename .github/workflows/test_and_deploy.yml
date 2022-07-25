@@ -7,7 +7,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main, bounty-page]
+    branches: [main]
 
 jobs:
   test:
