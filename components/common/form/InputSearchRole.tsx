@@ -1,9 +1,9 @@
-import { Autocomplete, AutocompleteProps, TextField } from '@mui/material';
+import { Autocomplete, TextField } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import { Role } from '@prisma/client';
 import Link from 'components/common/Link';
-import useRoles from 'hooks/useRoles';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import useRoles from 'hooks/useRoles';
 import { ListSpaceRolesResponse } from 'pages/api/roles';
 import { ComponentProps } from 'react';
 
@@ -120,9 +120,6 @@ export function InputSearchRoleMultiple ({
       disableCloseOnSelect={disableCloseOnSelect}
       onChange={(e, value) => emitValue(value as ReducedRole[])}
       multiple
-      sx={{
-        minWidth: 250
-      }}
       placeholder='Select roles'
       filter={filter}
       defaultValue={defaultValue}

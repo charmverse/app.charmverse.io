@@ -12,8 +12,8 @@ import { ReviewerOption } from './InputSearchContributor';
 
 type ReducedRole = Role | ListSpaceRolesResponse
 
-type GroupedRole = ReducedRole & {group: 'Role'}
-type GroupedContributor = Contributor & {group: 'User'}
+type GroupedRole = ReducedRole & {group: 'role'}
+type GroupedContributor = Contributor & {group: 'user'}
 type GroupedOption = GroupedRole | GroupedContributor
 
 export default function InputSearchReviewers ({
@@ -26,8 +26,8 @@ export default function InputSearchReviewers ({
 
   const excludedIdsSet = new Set(excludedIds);
 
-  const mappedContributors: GroupedContributor[] = contributors.map(contributor => ({ ...contributor, group: 'User' }));
-  const mappedRoles: GroupedRole[] = roles?.map(includedRole => ({ ...includedRole, group: 'Role' } as const)) ?? [];
+  const mappedContributors: GroupedContributor[] = contributors.map(contributor => ({ ...contributor, group: 'user' }));
+  const mappedRoles: GroupedRole[] = roles?.map(includedRole => ({ ...includedRole, group: 'role' } as const)) ?? [];
 
   const options: GroupedOption[] = [
     ...mappedContributors.filter(contributor => !excludedIdsSet.has(contributor.id)),
@@ -51,16 +51,16 @@ export default function InputSearchReviewers ({
         options
       }
       autoHighlight
-      groupBy={(option) => option.group}
+      groupBy={(option) => option.group[0].toUpperCase() + option.group.slice(1)}
       getOptionLabel={(groupWithId) => {
         const option = optionsRecord[groupWithId.id];
-        if (option.group === 'User') {
+        if (option.group === 'user') {
           return cache.get(`@"ENS",102~,"${option.username}",${chainId},`) ?? option.username;
         }
         return option.name;
       }}
       renderOption={(_props, option) => {
-        if (option.group === 'Role') {
+        if (option.group === 'role') {
           return (
             <li {..._props}>
               {option.name}
