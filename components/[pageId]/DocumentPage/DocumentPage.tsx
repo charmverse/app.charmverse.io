@@ -93,7 +93,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: IEditor
       }}
       >
         {page.deletedAt && <PageDeleteBanner pageId={page.id} />}
-        {page.headerImage && <PageBanner headerImage={page.headerImage} setPage={setPage} />}
+        {page.headerImage && <PageBanner headerImage={page.headerImage} readOnly={readOnly} setPage={setPage} />}
         <Container
           top={pageTop}
           fullWidth={page.fullWidth ?? false}
