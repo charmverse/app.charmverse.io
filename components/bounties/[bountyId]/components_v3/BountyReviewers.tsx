@@ -22,8 +22,8 @@ export default function BountyReviewers ({ bounty, permissions }: BountyReviewer
   const { roleups } = useRoles();
 
   const reviewerNames: {
-    roles: ({id: string, name: string, users: Contributor[]})[]
-    users: ({id: string, name: string, profilePic?: string | null})[]
+    roles: ({ id: string, name: string, users: Contributor[] })[]
+    users: ({ id: string, name: string, profilePic?: string | null })[]
   } = useMemo(() => {
     const mapped = (permissions?.bountyPermissions.reviewer ?? []).map(reviewer => {
 
@@ -51,7 +51,7 @@ export default function BountyReviewers ({ bounty, permissions }: BountyReviewer
 
       if (reviewer.group === 'role') {
 
-        const roleAsReviewer = reviewer as {id: string, name: string, users: Contributor[]};
+        const roleAsReviewer = reviewer as { id: string, name: string, users: Contributor[] };
 
         reviewersByGroup.roles.push(roleAsReviewer);
 
@@ -77,8 +77,8 @@ export default function BountyReviewers ({ bounty, permissions }: BountyReviewer
       roles: [],
       users: []
     } as {
-      roles: {id: string, name: string, users: Contributor[]}[]
-      users: {id: string, name: string, profilePic?: string | null}[]
+      roles: { id: string, name: string, users: Contributor[] }[]
+      users: { id: string, name: string, profilePic?: string | null }[]
     });
 
     reduced.users = reduced.users.filter((listedUser, index) => {
@@ -99,64 +99,64 @@ export default function BountyReviewers ({ bounty, permissions }: BountyReviewer
         </Typography>
 
         {
-    reviewerNames.roles.length === 0 && reviewerNames.users.length === 0 && (
-      <Typography variant='body2'>
-        There are no reviewers assigned to this bounty yet.
-      </Typography>
-    )
-  }
+          reviewerNames.roles.length === 0 && reviewerNames.users.length === 0 && (
+            <Typography variant='body2'>
+              There are no reviewers assigned to this bounty yet.
+            </Typography>
+          )
+        }
 
       </Grid>
 
       {
-    reviewerNames.roles.length > 0 && (
-    <Grid item xs={12} sx={{ mt: 2, mb: 2 }}>
-      <Box display='flex'>
-        <Typography sx={{ alignItems: 'center', fontWeight: 'bold', mr: 1 }} display='flex'>
-          Eligible roles
-        </Typography>
-        {
-        reviewerNames.roles.map(reviewer => {
-          return (
-            <Chip key={reviewer.id} label={reviewer.name} color='purple' sx={{ mr: 1 }} />
-          );
-        })
-      }
-      </Box>
-
-      <AvatarGroup max={3}>
-
-      </AvatarGroup>
-    </Grid>
-    )
-  }
-
-      {
-    reviewerNames.users.length > 0 && (
-      <Grid item xs={12} sx={{ mt: 1 }} display='flex'>
-        <AvatarGroup max={maxVisibleUsers} onClick={() => setMaxVisibleUsers(maxVisibleUsers + defaultAvatarGroupIncrement)}>
-
-          {
-      reviewerNames.users.map(reviewer => {
-
-        const userName = !reviewer.name ? 'Unknown user. This person has most likely left this workspace.' : (
-          reviewer.name.slice(0, 2).match('0x') ? reviewer.name.slice(2, 3).toUpperCase() : reviewer.name.slice(0, 1).toUpperCase()
-        );
-
-        return (
-          <Tooltip placement='top' key={reviewer.id} title={!reviewer.name ? userName : reviewer.name}>
-            <Box>
-              <Avatar name={userName.slice(0, 1)} avatar={reviewer.profilePic as string} />
+        reviewerNames.roles.length > 0 && (
+          <Grid item xs={12} sx={{ mt: 2, mb: 2 }}>
+            <Box display='flex'>
+              <Typography sx={{ alignItems: 'center', fontWeight: 'bold', mr: 1 }} display='flex'>
+                Eligible roles
+              </Typography>
+              {
+                reviewerNames.roles.map(reviewer => {
+                  return (
+                    <Chip key={reviewer.id} label={reviewer.name} color='purple' sx={{ mr: 1 }} />
+                  );
+                })
+              }
             </Box>
 
-          </Tooltip>
-        );
-      })
+            <AvatarGroup max={3}>
+
+            </AvatarGroup>
+          </Grid>
+        )
       }
-        </AvatarGroup>
-      </Grid>
-    )
-  }
+
+      {
+        reviewerNames.users.length > 0 && (
+          <Grid item xs={12} sx={{ mt: 1 }} display='flex'>
+            <AvatarGroup max={maxVisibleUsers} onClick={() => setMaxVisibleUsers(maxVisibleUsers + defaultAvatarGroupIncrement)}>
+
+              {
+                reviewerNames.users.map(reviewer => {
+
+                  const userName = !reviewer.name ? 'Unknown user. This person has most likely left this workspace.' : (
+                    reviewer.name.slice(0, 2).match('0x') ? reviewer.name.slice(2, 3).toUpperCase() : reviewer.name.slice(0, 1).toUpperCase()
+                  );
+
+                  return (
+                    <Tooltip placement='top' key={reviewer.id} title={!reviewer.name ? userName : reviewer.name}>
+                      <Box>
+                        <Avatar name={userName.slice(0, 1)} avatar={reviewer.profilePic as string} />
+                      </Box>
+
+                    </Tooltip>
+                  );
+                })
+              }
+            </AvatarGroup>
+          </Grid>
+        )
+      }
 
     </Grid>
   );

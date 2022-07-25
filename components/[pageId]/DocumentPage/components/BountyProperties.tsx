@@ -4,6 +4,7 @@ import { Box, Collapse, Divider, FormLabel, IconButton, Stack, TextField } from 
 import { PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
 import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge';
+import BountyReviewers from 'components/bounties/[bountyId]/components_v3/BountyReviewers';
 import BountySubmissionsTable from 'components/bounties/[bountyId]/components_v3/BountySubmissionsTable';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
 import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
@@ -344,38 +345,48 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
       }}
     >
       <Stack flexDirection='row' justifyContent='space-between' gap={2} alignItems='center'>
-        <div
-          className='octo-propertyrow'
-          style={{
-            height: 'fit-content',
-            flexGrow: 1
-          }}
-        >
-          <div className='octo-propertyname'>Reviewer</div>
-          <InputSearchReviewers
-            disabled={!canEdit}
-            readOnly={!canEdit}
-            value={permissions?.bountyPermissions?.reviewer ?? []}
-            disableCloseOnSelect={true}
-            onChange={async (e, options) => {
-              const roles = options.filter(option => option.group === 'role');
-              const contributors = options.filter(option => option.group === 'user');
-              await updateBounty(currentBounty.id, {
-                permissions: rollupPermissions({
-                  assignedRoleSubmitters,
-                  selectedReviewerRoles: roles.map(role => role.id),
-                  selectedReviewerUsers: contributors.map(contributor => contributor.id),
-                  spaceId: space!.id
-                })
-              });
-              await refreshBountyPermissions(currentBounty.id);
-            }}
-            excludedIds={[...selectedReviewerUsers, ...selectedReviewerRoles]}
-            sx={{
-              width: 250
-            }}
-          />
-        </div>
+        {
+          (permissions && !permissions.bountyPermissions?.reviewer) ? (
+            <BountyReviewers
+              bounty={bounty}
+              permissions={permissions}
+            />
+          ) : (
+            <div
+              className='octo-propertyrow'
+              style={{
+                height: 'fit-content',
+                flexGrow: 1
+              }}
+            >
+              <div className='octo-propertyname'>Reviewer</div>
+              <InputSearchReviewers
+                disabled={!canEdit}
+                readOnly={!canEdit}
+                value={permissions?.bountyPermissions?.reviewer ?? []}
+                disableCloseOnSelect={true}
+                onChange={async (e, options) => {
+                  const roles = options.filter(option => option.group === 'role');
+                  const contributors = options.filter(option => option.group === 'user');
+                  await updateBounty(currentBounty.id, {
+                    permissions: rollupPermissions({
+                      assignedRoleSubmitters,
+                      selectedReviewerRoles: roles.map(role => role.id),
+                      selectedReviewerUsers: contributors.map(contributor => contributor.id),
+                      spaceId: space!.id
+                    })
+                  });
+                  await refreshBountyPermissions(currentBounty.id);
+                }}
+                excludedIds={[...selectedReviewerUsers, ...selectedReviewerRoles]}
+                sx={{
+                  width: 250
+                }}
+              />
+            </div>
+          )
+        }
+
         <Box my={1} display='flex' justifyContent='flex-start' width='fit-content'>
           <BountyStatusBadge
             bounty={currentBounty}
