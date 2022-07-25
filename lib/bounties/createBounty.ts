@@ -16,6 +16,7 @@ export async function createBounty ({
   chainId = 1,
   description = '',
   descriptionNodes = '',
+  linkedTaskId,
   approveSubmitters = true,
   maxSubmissions,
   rewardAmount = 0,
@@ -70,35 +71,65 @@ export async function createBounty ({
     bountyCreateInput.suggestedBy = createdBy;
   }
 
-  let pageData = {};
+  let bounty: any;
 
-  pageData = {
-    create: {
-      path: `page-${Math.random().toString().replace('0.', '')}`,
-      title,
-      contentText: description,
-      content: descriptionNodes as string,
-      space: {
-        connect: {
-          id: spaceId
+  if (!linkedTaskId) {
+    bounty = await prisma.bounty.create({
+      data: {
+        ...bountyCreateInput,
+        page: {
+          create: {
+            path: `page-${Math.random().toString().replace('0.', '')}`,
+            title,
+            contentText: description,
+            content: descriptionNodes as string,
+            space: {
+              connect: {
+                id: spaceId
+              }
+            },
+            updatedBy: createdBy,
+            author: {
+              connect: {
+                id: createdBy
+              }
+            },
+            type: PageType.bounty
+          }
         }
       },
-      updatedBy: createdBy,
-      author: {
-        connect: {
-          id: createdBy
+      include: {
+        page: {
+          select: {
+            id: true
+          }
         }
-      },
-      type: PageType.bounty
-    }
-  };
+      }
+    });
+  }
+  else {
+    let page;
+    [bounty, page] = await prisma.$transaction([
+      prisma.bounty.create({
+        data: {
+          ...bountyCreateInput
+        }
+      }),
+      prisma.page.update({
+        where: {
+          cardId: linkedTaskId
+        },
+        data: {
+          type: PageType.card,
+          bountyId
+        }
+      })
+    ]);
 
-  const bounty = await prisma.bounty.create({
-    data: {
-      ...bountyCreateInput,
-      page: pageData
-    }
-  });
+    bounty.page = {
+      id: page.id
+    };
+  }
 
   // Initialise suggestions with a view permission
   if (isSuggestion) {

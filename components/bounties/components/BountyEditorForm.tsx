@@ -96,6 +96,7 @@ const submitterMenuOptions: MenuOption<BountySubmitter>[] = [{
 interface IBountyEditorInput {
   onSubmit: (bounty: BountyWithDetails) => any,
   mode?: FormMode
+  linkedTaskId?: string;
   bounty?: Partial<Bounty>
   permissions?: AssignedBountyPermissions
   focusKey?: keyof FormValues
@@ -128,7 +129,7 @@ function FormDescription ({ onContentChange, content, watch }:
   );
 }
 
-export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', focusKey, permissions: receivedPermissions }: IBountyEditorInput) {
+export default function BountyEditorForm ({ onSubmit, bounty, linkedTaskId, mode = 'create', focusKey, permissions: receivedPermissions }: IBountyEditorInput) {
   const { setBounties, bounties, updateBounty } = useBounties();
 
   const defaultChainId = bounty?.chainId ?? 1;
@@ -277,7 +278,6 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
   }
 
   async function submitted (value: FormValues & Bounty) {
-
     // Not using this field anymore
     if (value.reviewer) {
       value.reviewer = null;
@@ -300,18 +300,15 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
 
       if (mode === 'create') {
         // delete value.setExpiryDate;
-
         value.spaceId = space!.id;
         value.createdBy = user!.id;
         value.description = value.description ?? '';
         value.descriptionNodes = value.descriptionNodes ?? '';
         value.status = 'open';
-
         (value as BountyCreationData).permissions = permissionsToSet;
-        // TODO: Create page when calling charmClient.createBounty
+        value.linkedTaskId = linkedTaskId;
         const createdBounty = await charmClient.createBounty(value);
-        const populatedBounty = { ...createdBounty, applications: [], page: null };
-
+        const populatedBounty = { ...createdBounty, applications: [], page: { id: createdBounty.page.id } };
         setBounties([...bounties, populatedBounty]);
         setCachedBountyDescription({
           nodes: {
@@ -334,7 +331,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
 
         (value as BountyCreationData).permissions = permissionsToSet;
         const createdBounty = await charmClient.createBounty(value);
-        const populatedBounty = { ...createdBounty, applications: [], page: null };
+        const populatedBounty = { ...createdBounty, applications: [], page: { id: createdBounty.page.id } };
         setBounties([...bounties, populatedBounty]);
 
         setCachedBountyDescription({

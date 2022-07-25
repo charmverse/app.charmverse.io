@@ -8,7 +8,11 @@ export async function getBounty (bountyId: string): Promise<BountyWithDetails | 
     },
     include: {
       applications: true,
-      page: true
+      page: {
+        select: {
+          id: true
+        }
+      }
     }
   });
 }

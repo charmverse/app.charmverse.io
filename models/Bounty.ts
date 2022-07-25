@@ -8,4 +8,4 @@ export const BOUNTY_LABELS: Record<BountyStatus, string> = {
   paid: 'Paid'
 };
 
-export type BountyWithDetails = Bounty & {applications: Application [], page: Page | null}
+export type BountyWithDetails = Bounty & {applications: Application [], page: Pick<Page, 'id' | 'cardId'> | null}

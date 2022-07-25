@@ -130,7 +130,12 @@ async function getBounties (req: NextApiRequest, res: NextApiResponse) {
     include: {
       author: true,
       applications: true,
-      space: true
+      space: true,
+      page: {
+        select: {
+          id: true
+        }
+      }
     }
   });
 

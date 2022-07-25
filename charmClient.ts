@@ -22,6 +22,8 @@ import { ReviewDecision, SubmissionContent, SubmissionCreationData } from 'lib/a
 import { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
 import { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
+import { BountyCreationData, AssignedBountyPermissions,
+  BountySubmitterPoolCalculation, BountySubmitterPoolSize, BountyUpdate, SuggestionAction } from 'lib/bounties/interfaces';
 import { ConnectDiscordPayload, ConnectDiscordResponse } from 'pages/api/discord/connect';
 import { ImportDiscordRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
 import { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
@@ -33,7 +35,7 @@ import { UpdateThreadRequest } from 'pages/api/threads/[id]';
 import { TokenGateWithRoles } from 'pages/api/token-gates';
 
 import { ApplicationWithTransactions } from 'lib/applications/actions';
-import { AssignedBountyPermissions, BountySubmitterPoolCalculation, BountySubmitterPoolSize, BountyUpdate, SuggestionAction } from 'lib/bounties/interfaces';
+
 import { DeepDaoAggregateData } from 'lib/deepdao/interfaces';
 import { PublicPageResponse } from 'lib/pages/interfaces';
 import { PublicBountyToggle, PublicSpaceInfo } from 'lib/spaces/interfaces';
@@ -399,8 +401,7 @@ class CharmClient {
     return http.GET('/api/bounties', { spaceId, publicOnly });
   }
 
-  async createBounty (bounty: Partial<Bounty>): Promise<Bounty> {
-
+  async createBounty (bounty: BountyCreationData): Promise<Bounty> {
     const data = await http.POST<Bounty>('/api/bounties', bounty);
 
     return data;

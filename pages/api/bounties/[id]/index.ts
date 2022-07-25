@@ -10,7 +10,7 @@ import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors
 import { typedKeys } from 'lib/utilities/objects';
 import { BountyWithDetails } from 'models';
 import { NextApiRequest, NextApiResponse } from 'next';
-import nc, { NextHandler } from 'next-connect';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
