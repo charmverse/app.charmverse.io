@@ -1,6 +1,7 @@
 import { Box, Grid, Typography } from '@mui/material';
 import { BountyStatus } from '@prisma/client';
 import Button from 'components/common/Button';
+import { FullWidthPageContent } from 'components/common/PageLayout/components/PageContent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useLocalStorage } from 'hooks/useLocalStorage';
@@ -8,7 +9,6 @@ import { sortArrayByObjectProperty } from 'lib/utilities/array';
 import { useMemo, useState, useEffect } from 'react';
 import { CSVLink } from 'react-csv';
 import { BountyWithDetails } from 'models';
-import { FullWidthPageContent } from 'components/common/PageLayout/components/PageContent';
 
 import { BountyCard } from './components/BountyCard';
 import BountyModal from './components/BountyModal';

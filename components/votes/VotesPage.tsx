@@ -1,14 +1,14 @@
 import { Box, Grid, Typography } from '@mui/material';
-import { useReducer, Reducer } from 'react';
-import useSWR from 'swr';
 import { VoteStatus } from '@prisma/client';
+import charmClient from 'charmClient';
+import CreatePageButton from 'components/common/Page/CreatePageButton';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
+import { filterVotes, sortVotes, ViewOptions, VoteFilter, VoteSort } from 'components/[pageId]/DocumentPage/components/VotesSidebar';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
-import charmClient from 'charmClient';
-import { ViewOptions, VoteSort, VoteFilter, sortVotes, filterVotes } from 'components/[pageId]/DocumentPage/components/VotesSidebar';
+import { Reducer, useReducer } from 'react';
+import useSWR from 'swr';
 import VotesTable, { VoteRow } from './components/VotesTable';
-import CreateProposal from './components/Proposal/CreateProposal';
 
 export interface ViewState {
   sortBy: VoteSort;
@@ -66,7 +66,7 @@ export default function VotesPage () {
         <Grid item xs={12} lg={8} display='flex'>
           <Box gap={3} sx={{ display: 'flex', alignItems: { xs: 'flex-start', lg: 'center' }, width: '100%', justifyContent: { xs: 'flex-start', lg: 'flex-end' }, flexDirection: { xs: 'column-reverse', lg: 'row' } }}>
             <ViewOptions voteSort={viewState.sortBy} voteFilter={viewState.filterBy} setVoteSort={setVoteSort} setVoteFilter={setVoteFilter} />
-            <CreateProposal />
+            <CreatePageButton type='proposal' />
           </Box>
         </Grid>
       </Grid>
