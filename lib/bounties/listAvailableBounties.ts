@@ -1,7 +1,7 @@
 import { prisma } from 'db';
 import { BountyWithDetails } from 'models';
 import { hasAccessToSpace } from 'lib/middleware';
-import { accessiblePagesByPermissionsQuery } from 'lib/pages/server';
+import { accessiblePagesByPermissionsQuery, includePagePermissions } from 'lib/pages/server';
 import { AvailableResourcesRequest } from '../permissions/interfaces';
 import { DataNotFoundError } from '../utilities/errors';
 
@@ -44,13 +44,7 @@ export async function listAvailableBounties ({ spaceId, userId }: AvailableResou
       include: {
         applications: true,
         page: {
-          include: {
-            permissions: {
-              include: {
-                sourcePermission: true
-              }
-            }
-          }
+          include: includePagePermissions()
         }
       }
     }) as Promise<BountyWithDetails[]>;

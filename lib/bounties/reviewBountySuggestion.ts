@@ -1,4 +1,5 @@
 import { prisma } from 'db';
+import { includePagePermissions } from 'lib/pages/server';
 import { DataNotFoundError, WrongStateError } from 'lib/utilities/errors';
 import { BountyWithDetails } from 'models';
 import { getBounty } from './getBounty';
@@ -32,7 +33,7 @@ export async function reviewBountySuggestion ({ bountyId, decision }: Suggestion
   }
 
   // All other checks passed, Let's change this bounty's status from "suggestion" to "open"
-  const bountyAfterApproval = await prisma.bounty.update({
+  return prisma.bounty.update({
     where: {
       id: bountyId
     },
@@ -41,10 +42,9 @@ export async function reviewBountySuggestion ({ bountyId, decision }: Suggestion
     },
     include: {
       applications: true,
-      page: true
+      page: {
+        include: includePagePermissions()
+      }
     }
-  });
-
-  return bountyAfterApproval;
-
+  }) as Promise<BountyWithDetails>;
 }

@@ -2,6 +2,26 @@ import { Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { IPageWithPermissions, PagesRequest } from '../interfaces';
 
+/**
+ * Utility for getting permissions of a page
+ * @returns
+ */
+export function includePagePermissions (): Prisma.PageInclude & {
+  permissions: {
+    include: {
+      sourcePermission: true
+    }
+  }
+  } {
+  return {
+    permissions: {
+      include: {
+        sourcePermission: true
+      }
+    }
+  };
+}
+
 export function accessiblePagesByPermissionsQuery ({ spaceId, userId }: {spaceId: string, userId: string}): Prisma.PagePermissionListRelationFilter {
   return {
     some: {

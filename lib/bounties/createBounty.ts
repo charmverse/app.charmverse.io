@@ -1,4 +1,4 @@
-import { Bounty, BountyStatus, PageType, Prisma } from '@prisma/client';
+import { BountyStatus, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { setBountyPermissions } from 'lib/permissions/bounties';
 import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
