@@ -283,6 +283,9 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
             showWarningOnNoRoles={true}
             disabled={!canEdit}
             readOnly={!canEdit}
+            sx={{
+              width: 250
+            }}
           />
         </div>
         <div
@@ -355,8 +358,8 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
             value={permissions?.bountyPermissions?.reviewer ?? []}
             disableCloseOnSelect={true}
             onChange={async (e, options) => {
-              const roles = options.filter(option => option.group === 'Role');
-              const contributors = options.filter(option => option.group === 'User');
+              const roles = options.filter(option => option.group === 'role');
+              const contributors = options.filter(option => option.group === 'user');
               await updateBounty(currentBounty.id, {
                 permissions: rollupPermissions({
                   assignedRoleSubmitters,
