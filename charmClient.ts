@@ -401,8 +401,8 @@ class CharmClient {
     return http.GET('/api/bounties', { spaceId, publicOnly });
   }
 
-  async createBounty (bounty: BountyCreationData): Promise<Bounty> {
-    const data = await http.POST<Bounty>('/api/bounties', bounty);
+  async createBounty (bounty: BountyCreationData): Promise<BountyWithDetails> {
+    const data = await http.POST<BountyWithDetails>('/api/bounties', bounty);
 
     return data;
   }

@@ -101,7 +101,8 @@ export async function createBounty ({
       include: {
         page: {
           select: {
-            id: true
+            id: true,
+            cardId: true
           }
         }
       }
@@ -127,7 +128,8 @@ export async function createBounty ({
     ]);
 
     bounty.page = {
-      id: page.id
+      id: page.id,
+      cardId: page.cardId
     };
   }
 

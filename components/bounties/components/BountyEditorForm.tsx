@@ -277,7 +277,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, linkedTaskId, mode
     return permissionsToSend;
   }
 
-  async function submitted (value: FormValues & Bounty) {
+  async function submitted (value: FormValues & Bounty & {linkedTaskId?: string}) {
     // Not using this field anymore
     if (value.reviewer) {
       value.reviewer = null;
@@ -308,7 +308,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, linkedTaskId, mode
         (value as BountyCreationData).permissions = permissionsToSet;
         value.linkedTaskId = linkedTaskId;
         const createdBounty = await charmClient.createBounty(value);
-        const populatedBounty = { ...createdBounty, applications: [], page: { id: createdBounty.page.id } };
+        const populatedBounty = { ...createdBounty, applications: [], page: { id: createdBounty.page!.id, cardId: createdBounty.page!.cardId } };
         setBounties([...bounties, populatedBounty]);
         setCachedBountyDescription({
           nodes: {
@@ -331,7 +331,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, linkedTaskId, mode
 
         (value as BountyCreationData).permissions = permissionsToSet;
         const createdBounty = await charmClient.createBounty(value);
-        const populatedBounty = { ...createdBounty, applications: [], page: { id: createdBounty.page.id } };
+        const populatedBounty = { ...createdBounty, applications: [], page: { id: createdBounty.page!.id, cardId: createdBounty.page!.cardId } };
         setBounties([...bounties, populatedBounty]);
 
         setCachedBountyDescription({
