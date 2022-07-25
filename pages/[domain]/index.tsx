@@ -1,10 +1,11 @@
-import { useEffect } from 'react';
-import { useRouter } from 'next/router';
 import { Page } from '@prisma/client';
+import { filterVisiblePages } from 'components/common/PageLayout/components/PageNavigation/PageNavigation';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { getKey } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
-import { sortNodes, filterVisiblePages } from 'components/common/PageLayout/components/PageNavigation/PageNavigation';
+import { sortNodes } from 'lib/pages/mapPageTree';
+import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 
 // Redirect users to an initial page
 export default function RedirectToMainPage () {

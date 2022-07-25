@@ -3,11 +3,17 @@ import { IPagePermissionToCreate } from '../page-permission-interfaces';
 
 /**
  * Given a list of permissions and a permission, find a permission in the list that targets that group
+ * @ignorePermissionLevel - Return permission for target group even if it has different permission level
  */
-export function findExistingPermissionForGroup (basePermission: IPagePermissionToCreate, permissionList: PagePermission []): PagePermission | null {
+export function findExistingPermissionForGroup (
+  basePermission: IPagePermissionToCreate,
+  permissionList: PagePermission [],
+  ignorePermissionLevel = false
+):
+PagePermission | null {
   const foundPermission = permissionList.find(permission => {
 
-    if (basePermission.permissionLevel !== permission.permissionLevel) {
+    if (basePermission.permissionLevel !== permission.permissionLevel && !ignorePermissionLevel) {
       return false;
     }
 

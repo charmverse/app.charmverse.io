@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { Box, Typography } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
+import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
@@ -28,21 +30,35 @@ const StyledPopper = styled(Popper)`
 const StyledLink = styled(Link)`
     padding-left: 0px;
     padding-right: ${({ theme }) => theme.spacing(2)};
-    align-items: center;
+    flex-direction: column;
+    align-items: start;
     color: ${({ theme }) => theme.palette.secondary.main};
     display: flex;
     gap: 5px;
     font-size: 17px;
     font-weight: 400;
-    padding-top: 4px;
-    padding-bottom: 4px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid ${({ theme }) => theme.palette.gray.main};
     :hover {
       background-color: ${({ theme }) => theme.palette.action.hover};
       color: inherit;
     }
 `;
 
-const StyledTypography = styled(Typography)`
+const baseLine = css`
+  max-width: 450px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+`;
+
+const StyledTypographyPage = styled(Typography)`
+  ${baseLine}
+`;
+
+const StyledTypographyPath = styled(Typography)`
+    ${baseLine}
     font-style: italic;
 `;
 
@@ -148,27 +164,34 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
           const parts = parse(option.name, matches);
 
           return (
-            <Box p={0.5}>
+            <Box>
               <StyledLink
                 href={option.link}
               >
-                {
-                  option.type === ResultType.page
-                    ? <InsertDriveFileOutlinedIcon fontSize='small' />
-                    : <BountyIcon fontSize='small' />
-                }
-                <span>
-                  {parts.map((part: { text: string; highlight: boolean; }, _index: number) => {
-                    return (
-                      <span
-                        style={{
-                          fontWeight: part.highlight ? 700 : 400
-                        }}
-                      >{part.text}
-                      </span>
-                    );
-                  })}
-                </span>{option.path && <StyledTypography>- {option.path}</StyledTypography>}
+                <Stack direction='row' spacing={1}>
+                  {
+                    option.type === ResultType.page
+                      ? <InsertDriveFileOutlinedIcon fontSize='small' style={{ marginTop: '2px' }} />
+                      : <BountyIcon fontSize='small' style={{ marginTop: '2px' }} />
+                  }
+                  <Stack>
+                    <StyledTypographyPage>
+                      {
+                        parts.map((part: { text: string; highlight: boolean; }, _index: number) => {
+                          return (
+                            <span
+                              style={{
+                                fontWeight: part.highlight ? 700 : 400
+                              }}
+                            >{part.text}
+                            </span>
+                          );
+                        })
+                      }
+                    </StyledTypographyPage>
+                    {option.path && <StyledTypographyPath>{option.path}</StyledTypographyPath>}
+                  </Stack>
+                </Stack>
               </StyledLink>
             </Box>
           );
