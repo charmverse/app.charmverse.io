@@ -92,7 +92,8 @@ interface PageLayoutProps {
 
 function PageLayout ({ hideSidebarOnSmallScreen = false, sidebarWidth = 300, children, sidebar: SidebarOverride }: PageLayoutProps) {
 
-  const [open, setOpen] = React.useState(!isSmallScreen());
+  const smallScreen = React.useMemo(() => isSmallScreen(), []);
+  const [open, setOpen] = React.useState(!smallScreen);
   const [user] = useUser();
 
   const handleDrawerOpen = React.useCallback(() => {

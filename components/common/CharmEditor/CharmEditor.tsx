@@ -321,6 +321,11 @@ const PageActionListBox = styled.div`
   height: calc(100% - 80px);
   overflow: auto;
   margin-right: ${({ theme }) => theme.spacing(1)};
+  background: ${({ theme }) => theme.palette.background.paper};
+  display: none;
+  ${({ theme }) => theme.breakpoints.up('md')} {
+    display: block;
+  }
 `;
 
 const defaultContent: PageContent = {

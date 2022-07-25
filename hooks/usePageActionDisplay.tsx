@@ -19,7 +19,8 @@ export const PageActionDisplayContext = createContext<IPageActionDisplayContext>
 
 export function PageActionDisplayProvider ({ children }: { children: ReactNode }) {
 
-  const smallScreen = isSmallScreen();
+  // only calculate once
+  const smallScreen = useMemo(() => isSmallScreen(), []);
   const { currentPageId } = usePages();
   const { isValidating: isValidatingInlineComments } = useThreads();
   const { isValidating: isValidatingInlineVotes } = useVotes();
