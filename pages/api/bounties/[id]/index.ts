@@ -53,7 +53,7 @@ async function updateBounty (req: NextApiRequest, res: NextApiResponse<BountyWit
   const { error, isAdmin } = await hasAccessToSpace({
     spaceId: bounty.spaceId,
     userId,
-    adminOnly: true
+    adminOnly: false
   });
 
   if (error) {
