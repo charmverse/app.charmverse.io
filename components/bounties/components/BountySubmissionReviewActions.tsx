@@ -101,17 +101,29 @@ export default function BountySubmissionReviewActions (
       }
       {
         submission.status === 'review' && submission.createdBy === user?.id && (
-          <Button disabled>Waiting review</Button>
+          <Typography sx={{
+            opacity: 0.5
+          }}
+          >Waiting review
+          </Typography>
         )
       }
       {
         submission.status === 'applied' && submission.createdBy === user?.id && (
-          <Button disabled>Waiting assignment</Button>
+          <Typography sx={{
+            opacity: 0.5
+          }}
+          >Waiting assignment
+          </Typography>
         )
       }
       {
         submission.status === 'complete' && submission.createdBy === user?.id && (
-          <Button disabled>Waiting payment</Button>
+          <Typography sx={{
+            opacity: 0.5
+          }}
+          >Waiting payment
+          </Typography>
         )
       }
       {isAdmin && submission.status === 'complete' && submission.walletAddress && <BountyPaymentButton onSuccess={recordTransaction} receiver={submission.walletAddress} amount={eToNumber(bounty.rewardAmount)} tokenSymbolOrAddress={bounty.rewardToken} chainIdToUse={bounty.chainId} />}
