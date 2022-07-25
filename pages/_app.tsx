@@ -142,7 +142,6 @@ import { FocalboardViewsProvider } from 'hooks/useFocalboardViews';
 import { useInterval } from 'hooks/useInterval';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { PagesProvider } from 'hooks/usePages';
-import { ThreadsProvider } from 'hooks/useThreads';
 import { ContributorsProvider } from 'hooks/useContributors';
 import { PageTitleProvider, usePageTitle } from 'hooks/usePageTitle';
 import { SpacesProvider } from 'hooks/useSpaces';

@@ -334,9 +334,12 @@ function CenterPanel(props: Props) {
       />
       {!!board.deletedAt && <PageDeleteBanner pageId={board.id}/>}
       {board.fields.headerImage && <Box className='PageBanner' width={"100%"} mb={2}>
-        <PageBanner focalBoard headerImage={board.fields.headerImage} setPage={({ headerImage }) => {
-          setRandomHeaderImage(board, headerImage!)
-        }} />
+        <PageBanner
+          focalBoard
+          headerImage={board.fields.headerImage}
+          readOnly={props.readonly}
+          setPage={({ headerImage }) => setRandomHeaderImage(board, headerImage!)}
+        />
       </Box>}
       <div className='top-head'>
         <ViewTitle
