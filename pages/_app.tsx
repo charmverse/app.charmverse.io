@@ -155,7 +155,7 @@ import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { ReactElement, ReactNode, useEffect, useMemo, useState } from 'react';
-import { DndProvider } from 'reacAt-dnd';
+import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { TouchBackend } from 'react-dnd-touch-backend';
 import { IntlProvider } from 'react-intl';
