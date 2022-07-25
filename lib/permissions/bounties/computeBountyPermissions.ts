@@ -1,8 +1,6 @@
-import { SpaceOperation, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { isTruthy } from 'lib/utilities/types';
 import { hasAccessToSpace } from '../../middleware';
-import { SpaceMembershipRequiredError } from '../errors';
 import { PermissionComputeRequest } from '../interfaces';
 import { AvailableBountyPermissions } from './availableBountyPermissions';
 import { BountyPermissionFlags } from './interfaces';
