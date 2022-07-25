@@ -55,10 +55,11 @@ export function randomBannerImage () {
 interface PageBannerProps {
   focalBoard?: boolean;
   headerImage: string;
+  readOnly: boolean;
   setPage: (page: { headerImage: string | null }) => void;
 }
 
-function PageBanner ({ focalBoard, headerImage, setPage }: PageBannerProps) {
+function PageBanner ({ focalBoard, headerImage, readOnly, setPage }: PageBannerProps) {
 
   const theme = useTheme();
 
@@ -70,53 +71,55 @@ function PageBanner ({ focalBoard, headerImage, setPage }: PageBannerProps) {
     <StyledPageBanner focalBoard={focalBoard}>
       {/* eslint-disable-next-line */}
       <img src={headerImage} />
-      <Box
-        sx={{
-          background: theme.palette.background.light,
-          borderRadius: theme.spacing(0.5),
-          display: 'flex',
-          gap: theme.spacing(0.25),
-          boxShadow: theme.shadows[2]
-        }}
-        className='page-cover-controls'
-      >
-        <ImageSelector
-          galleryImages={bannerImageGroups}
-          onImageSelect={setImage}
+      {!readOnly && (
+        <Box
+          sx={{
+            background: theme.palette.background.light,
+            borderRadius: theme.spacing(0.5),
+            display: 'flex',
+            gap: theme.spacing(0.25),
+            boxShadow: theme.shadows[2]
+          }}
+          className='page-cover-controls'
         >
+          <ImageSelector
+            galleryImages={bannerImageGroups}
+            onImageSelect={setImage}
+          >
+            <ListItem
+              button
+              disableRipple
+              sx={{
+                background: theme.palette.background.dark,
+                borderTopLeftRadius: theme.spacing(0.5),
+                borderBottomLeftRadius: theme.spacing(0.5),
+                padding: theme.spacing(0.5, 1.5)
+              }}
+            >
+              <Typography variant='subtitle1' whiteSpace='nowrap'>
+                Change Cover
+              </Typography>
+            </ListItem>
+          </ImageSelector>
           <ListItem
             button
             disableRipple
             sx={{
               background: theme.palette.background.dark,
-              borderTopLeftRadius: theme.spacing(0.5),
-              borderBottomLeftRadius: theme.spacing(0.5),
+              borderTopRightRadius: theme.spacing(0.5),
+              borderBottomRightRadius: theme.spacing(0.5),
               padding: theme.spacing(0.5, 1.5)
             }}
           >
-            <Typography variant='subtitle1' whiteSpace='nowrap'>
-              Change Cover
+            <Typography
+              variant='subtitle1'
+              onClick={() => setImage(null)}
+            >
+              Remove
             </Typography>
           </ListItem>
-        </ImageSelector>
-        <ListItem
-          button
-          disableRipple
-          sx={{
-            background: theme.palette.background.dark,
-            borderTopRightRadius: theme.spacing(0.5),
-            borderBottomRightRadius: theme.spacing(0.5),
-            padding: theme.spacing(0.5, 1.5)
-          }}
-        >
-          <Typography
-            variant='subtitle1'
-            onClick={() => setImage(null)}
-          >
-            Remove
-          </Typography>
-        </ListItem>
-      </Box>
+        </Box>
+      )}
     </StyledPageBanner>
   );
 }
