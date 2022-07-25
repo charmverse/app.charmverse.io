@@ -1,8 +1,11 @@
-import { Bounty, BountyStatus, PageType, Prisma } from '@prisma/client';
+import { BountyStatus, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { setBountyPermissions } from 'lib/permissions/bounties';
 import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
+import { isTruthy } from 'lib/utilities/types';
+import { BountyWithDetails } from 'models';
 import { v4 } from 'uuid';
+import { getBounty } from './getBounty';
 import { BountyCreationData } from './interfaces';
 
 /**
@@ -22,7 +25,7 @@ export async function createBounty ({
   rewardAmount = 0,
   rewardToken = 'ETH',
   permissions
-}: BountyCreationData): Promise<Bounty> {
+}: BountyCreationData): Promise<BountyWithDetails> {
 
   const validCreationStatuses: BountyStatus[] = ['suggestion', 'open'];
 
@@ -71,81 +74,104 @@ export async function createBounty ({
     bountyCreateInput.suggestedBy = createdBy;
   }
 
-  let bounty: any;
-
-  if (!linkedTaskId) {
-    bounty = await prisma.bounty.create({
-      data: {
-        ...bountyCreateInput,
-        page: {
-          create: {
-            path: `page-${Math.random().toString().replace('0.', '')}`,
-            title,
-            contentText: description,
-            content: descriptionNodes as string,
-            space: {
-              connect: {
-                id: spaceId
-              }
-            },
-            updatedBy: createdBy,
-            author: {
-              connect: {
-                id: createdBy
-              }
-            },
-            type: PageType.bounty
-          }
-        }
-      },
-      include: {
-        page: {
-          select: {
-            id: true,
-            cardId: true
-          }
-        }
+  const pageData: Prisma.PageCreateInput = {
+    id: bountyId,
+    path: `page-${Math.random().toString().replace('0.', '')}`,
+    title,
+    contentText: description,
+    content: descriptionNodes as string,
+    space: {
+      connect: {
+        id: spaceId
       }
+    },
+    updatedBy: createdBy,
+    author: {
+      connect: {
+        id: createdBy
+      }
+    },
+    type: 'bounty'
+  };
+
+  const bountyPagePermissionSet: Omit<Prisma.PagePermissionCreateManyInput, 'pageId'>[] = [];
+
+  bountyPagePermissionSet.push({
+    permissionLevel: 'full_access',
+    userId: createdBy
+  });
+
+  // Initialise page permissions
+  if (status === 'suggestion') {
+    bountyPagePermissionSet.push({
+      permissionLevel: 'view',
+      spaceId
     });
   }
   else {
-    let page;
-    [bounty, page] = await prisma.$transaction([
-      prisma.bounty.create({
-        data: {
-          ...bountyCreateInput
-        }
-      }),
-      prisma.page.update({
-        where: {
-          cardId: linkedTaskId
-        },
-        data: {
-          type: PageType.card,
-          bountyId
-        }
-      })
-    ]);
+    // Reviewer permissions
+    permissions?.reviewer?.forEach(reviewer => {
+      if (reviewer.group === 'role') {
+        bountyPagePermissionSet.push({
+          permissionLevel: 'view_comment',
+          roleId: reviewer.id
+        });
+      }
+      // Prevent adding a duplicate user permission for the creator
+      else if (reviewer.group === 'user' && bountyPagePermissionSet.every(p => p.userId !== reviewer.id)) {
+        bountyPagePermissionSet.push({
+          permissionLevel: 'view_comment',
+          userId: reviewer.id
+        });
+      }
+    });
 
-    bounty.page = {
-      id: page.id,
-      cardId: page.cardId
-    };
+    // Submitter permissions
+    permissions?.submitter?.forEach(submitter => {
+      // Prevent adding a duplicate role permission
+      if (submitter.group === 'role' && bountyPagePermissionSet.every(p => p.roleId !== submitter.id)) {
+        bountyPagePermissionSet.push({
+          permissionLevel: 'view',
+          roleId: submitter.id
+        });
+      }
+      // Prevent adding a duplicate space permission
+      else if (submitter.group === 'space' && bountyPagePermissionSet.every(p => !isTruthy(p.spaceId))) {
+        bountyPagePermissionSet.push({
+          permissionLevel: 'view',
+          spaceId
+        });
+      }
+    });
   }
+
+  await prisma.$transaction([
+    prisma.bounty.create({
+      data: {
+        ...bountyCreateInput,
+        page: {
+          create: pageData
+        }
+      }
+    }),
+    prisma.pagePermission.createMany({
+      data: bountyPagePermissionSet.map(p => {
+        return {
+          ...p,
+          pageId: bountyId
+        };
+      })
+    })
+  ]);
 
   // Initialise suggestions with a view permission
   if (isSuggestion) {
     await setBountyPermissions({
-      bountyId: bounty.id,
+      bountyId,
       permissionsToAssign: {
         creator: [{
           group: 'user',
           id: createdBy
-        }],
-        // This permission is created so that all space members can see the suggestion. When the admin is configuring a not yet approved suggestion, this will remain the same, or be overriden if the admin has restricted submitters to a list of roles.
-        submitter: [{
-          group: 'space',
-          id: spaceId
         }]
       }
     });
@@ -153,11 +179,11 @@ export async function createBounty ({
   // Pass custom permissions
   else if (permissions) {
     await setBountyPermissions({
-      bountyId: bounty.id,
+      bountyId,
       permissionsToAssign: permissions
     });
   }
 
-  return bounty;
+  return getBounty(bountyId) as Promise<BountyWithDetails>;
 
 }

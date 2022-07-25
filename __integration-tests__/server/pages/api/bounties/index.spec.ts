@@ -103,10 +103,9 @@ describe('GET /api/bounties?spaceId={spaceId} - list space bounties', () => {
       rewardToken: 'ETH'
     };
 
-    // Create a bounty viewable by the space
     await createBounty({ ...(creationContent as Bounty),
       permissions: {
-        viewer: [{
+        submitter: [{
           group: 'space',
           id: otherSpace.id
         }]
@@ -164,7 +163,7 @@ describe('GET /api/bounties?spaceId={spaceId} - list space bounties', () => {
     // Create a bounty viewable by the space
     const visibleBounty = await createBounty({ ...(creationContent as Bounty),
       permissions: {
-        viewer: [{
+        submitter: [{
           group: 'space',
           id: otherSpace.id
         }]
@@ -173,7 +172,7 @@ describe('GET /api/bounties?spaceId={spaceId} - list space bounties', () => {
     // Create a bounty viewable only by this user
     await createBounty({ ...(creationContent as Bounty),
       permissions: {
-        viewer: [{
+        creator: [{
           group: 'user',
           id: otherUser.id
         }]
@@ -221,7 +220,7 @@ describe('GET /api/bounties?spaceId={spaceId} - list space bounties', () => {
     // Create a bounty viewable by the space
     await createBounty({ ...(creationContent as Bounty),
       permissions: {
-        viewer: [{
+        submitter: [{
           group: 'space',
           id: otherSpace.id
         }]

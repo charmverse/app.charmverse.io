@@ -1,6 +1,6 @@
-import { Bounty } from '@prisma/client';
 import { prisma } from 'db';
 import { DataNotFoundError, InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
+import { BountyWithDetails } from 'models';
 import { countValidSubmissions } from '../applications/shared';
 import { setBountyPermissions } from '../permissions/bounties';
 import { getBounty } from './getBounty';
@@ -9,7 +9,7 @@ import { BountyUpdate } from './interfaces';
 export async function updateBountySettings ({
   bountyId,
   updateContent
-}: BountyUpdate): Promise<Bounty> {
+}: BountyUpdate): Promise<BountyWithDetails> {
 
   if (updateContent.rewardAmount === null || (typeof updateContent.rewardAmount === 'number' && updateContent.rewardAmount <= 0)) {
     throw new PositiveNumbersOnlyError();
@@ -64,5 +64,5 @@ export async function updateBountySettings ({
     });
   }
 
-  return updatedBounty;
+  return getBounty(bountyId) as Promise<BountyWithDetails>;
 }

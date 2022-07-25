@@ -22,6 +22,7 @@ import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useLocalStorage } from 'hooks/useLocalStorage';
+import { usePages } from 'hooks/usePages';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
 import { BountyCreationData, BountySubmitterPoolSize, UpdateableBountyFields } from 'lib/bounties/interfaces';
@@ -138,6 +139,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, linkedTaskId, mode
 
   const [user] = useUser();
   const [space] = useCurrentSpace();
+  const { pages, setPages } = usePages();
 
   const [bountyApplicantPool, setBountyApplicantPool] = useState<BountySubmitterPoolSize | null>(null);
 
@@ -308,15 +310,21 @@ export default function BountyEditorForm ({ onSubmit, bounty, linkedTaskId, mode
         (value as BountyCreationData).permissions = permissionsToSet;
         value.linkedTaskId = linkedTaskId;
         const createdBounty = await charmClient.createBounty(value);
-        const populatedBounty = { ...createdBounty, applications: [], page: { id: createdBounty.page!.id, cardId: createdBounty.page!.cardId } };
-        setBounties([...bounties, populatedBounty]);
+
+        setBounties([...bounties, createdBounty]);
+
+        setPages({
+          ...pages,
+          [createdBounty.page.id]: createdBounty.page
+        });
+
         setCachedBountyDescription({
           nodes: {
             type: 'doc'
           },
           text: ''
         });
-        onSubmit(populatedBounty);
+        onSubmit(createdBounty);
       }
       else if (mode === 'suggest') {
         value.spaceId = space!.id;
@@ -331,8 +339,11 @@ export default function BountyEditorForm ({ onSubmit, bounty, linkedTaskId, mode
 
         (value as BountyCreationData).permissions = permissionsToSet;
         const createdBounty = await charmClient.createBounty(value);
-        const populatedBounty = { ...createdBounty, applications: [], page: { id: createdBounty.page!.id, cardId: createdBounty.page!.cardId } };
-        setBounties([...bounties, populatedBounty]);
+        setBounties([...bounties, createdBounty]);
+        setPages({
+          ...pages,
+          [createdBounty.page.id]: createdBounty.page
+        });
 
         setCachedBountyDescription({
           nodes: {
@@ -341,7 +352,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, linkedTaskId, mode
           text: ''
         });
 
-        onSubmit(populatedBounty);
+        onSubmit(createdBounty);
 
       }
       else if (bounty?.id && mode === 'update') {
