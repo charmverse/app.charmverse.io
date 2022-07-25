@@ -1,10 +1,9 @@
 
-import { closeOutBounty, getBounty } from 'lib/bounties';
+import { getBounty } from 'lib/bounties';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { AssignedBountyPermissions, computeBountyPermissions, queryBountyPermissions } from 'lib/permissions/bounties';
 import { withSessionRoute } from 'lib/session/withSession';
-import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
-import { BountyWithDetails } from 'models';
+import { DataNotFoundError } from 'lib/utilities/errors';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
