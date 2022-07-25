@@ -1,7 +1,8 @@
 
 import nextJest from 'next/jest';
 import * as path from 'path';
-import { esmModules } from '../next.config';
+
+import { esmModules } from '../next.base';
 
 const createJestConfig = nextJest({ dir: path.join(__dirname, '../') });
 
