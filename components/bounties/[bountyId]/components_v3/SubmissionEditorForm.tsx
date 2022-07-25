@@ -140,7 +140,8 @@ export default function BountySubmissionForm (
                 });
               }}
               style={{
-                backgroundColor: theme.palette.background.light
+                backgroundColor: theme.palette.background.light,
+                minHeight: 130
               }}
               readOnly={readOnly}
               placeholderText='Enter the content of your submission here.'
