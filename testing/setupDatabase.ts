@@ -1,10 +1,15 @@
 import { ApplicationStatus, Block, Bounty, BountyStatus, Page, Prisma, Space, SpaceApiToken, Thread, Transaction, Comment, Role, RoleSource, Vote, VoteOptions, UserVote } from '@prisma/client';
 import { prisma } from 'db';
+import { getBounty } from 'lib/bounties';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import { IPageWithPermissions } from 'lib/pages';
+import { BountyPermissionAssignment, BountyPermissions } from 'lib/permissions/bounties';
+import { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import { createUserFromWallet } from 'lib/users/createUser';
+import { typedKeys } from 'lib/utilities/objects';
 import { BountyWithDetails, IDENTITY_TYPES, LoggedInUser } from 'models';
 import { v4 } from 'uuid';
+import { generatePageToCreateStub } from './generate-stubs';
 
 export async function generateSpaceUser ({ spaceId, isAdmin }: { spaceId: string, isAdmin: boolean }): Promise<LoggedInUser> {
   return prisma.user.create({
@@ -93,22 +98,80 @@ export async function generateUserAndSpaceWithApiToken (walletAddress: string = 
   };
 }
 
-export function generateBounty ({ descriptionNodes, spaceId, createdBy, status, maxSubmissions, approveSubmitters }: Pick<Bounty, 'createdBy' | 'spaceId' | 'status' | 'approveSubmitters'> & Partial<Pick<Bounty, 'maxSubmissions' | 'descriptionNodes'>>): Promise<Bounty> {
-  return prisma.bounty.create({
-    data: {
-      createdBy,
-      chainId: 1,
-      rewardAmount: 1,
-      rewardToken: 'ETH',
-      title: 'Example',
-      status,
-      spaceId,
-      description: '',
-      descriptionNodes: descriptionNodes ?? '',
-      approveSubmitters,
-      maxSubmissions
-    }
-  });
+export async function generateBounty ({ descriptionNodes, spaceId, createdBy, status, maxSubmissions, approveSubmitters, title = 'Example', rewardToken = 'ETH', rewardAmount = 1, chainId = 1, bountyPermissions = {}, pagePermissions = [] }: Pick<Bounty, 'createdBy' | 'spaceId' | 'status' | 'approveSubmitters'> & Partial<Pick<Bounty, 'title' | 'maxSubmissions' | 'descriptionNodes' | 'chainId' | 'rewardAmount' | 'rewardToken'>> & {bountyPermissions?: Partial<BountyPermissions>, pagePermissions?: Omit<Prisma.PagePermissionCreateManyInput, 'pageId'>[]}): Promise<BountyWithDetails> {
+
+  const pageId = v4();
+  const bountyId = v4();
+
+  const bountyPermissionsToAssign: Omit<Prisma.BountyPermissionCreateManyInput, 'bountyId'>[] = typedKeys(bountyPermissions).reduce((createManyInputs, permissionLevel) => {
+
+    const permissions = bountyPermissions[permissionLevel] as TargetPermissionGroup[];
+
+    permissions.forEach(p => {
+      createManyInputs.push({
+        permissionLevel,
+        userId: p.group === 'user' ? p.id : undefined,
+        roleId: p.group === 'role' ? p.id : undefined,
+        spaceId: p.group === 'space' ? p.id : undefined,
+        public: p.group === 'public' ? true : undefined
+      });
+    });
+
+    createManyInputs.push({
+      permissionLevel
+
+    });
+
+    return createManyInputs;
+  }, [] as Omit<Prisma.BountyPermissionCreateManyInput, 'bountyId'>[]);
+
+  await prisma.$transaction([
+    // Step 1 - Initialise bounty with page and bounty permissions
+    prisma.bounty.create({
+      data: {
+        id: bountyId,
+        createdBy,
+        chainId,
+        rewardAmount,
+        rewardToken,
+        title,
+        status,
+        spaceId,
+        description: '',
+        descriptionNodes: descriptionNodes ?? '',
+        approveSubmitters,
+        maxSubmissions,
+        page: {
+          create: {
+            id: pageId,
+            createdBy,
+            contentText: '',
+            path: `page-${pageId}`,
+            title: title || 'Root',
+            type: 'bounty',
+            updatedBy: createdBy,
+            spaceId
+          }
+        },
+        permissions: {
+          createMany: {
+            data: bountyPermissionsToAssign
+          }
+        }
+      }
+    }),
+    // Step 2 populate the page permissions
+    prisma.pagePermission.createMany({
+      data: pagePermissions.map(p => {
+        return {
+          ...p,
+          pageId
+        };
+      })
+    })
+  ]);
+
+  return getBounty(bountyId) as Promise<BountyWithDetails>;
 }
 
 export async function generateComment ({ content, pageId, spaceId, userId, context = '', resolved = false }: Pick<Thread, 'userId' | 'spaceId' | 'pageId'> & Partial<Pick<Thread, 'context' | 'resolved'>> & Pick<Comment, 'content'>): Promise<Comment> {
