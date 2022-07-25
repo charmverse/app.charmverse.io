@@ -29,7 +29,7 @@ import { CryptoCurrency, FiatCurrency } from 'connectors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
 import { useUser } from 'hooks/useUser';
-import { silentlyUpdateURL, isSmallScreen } from 'lib/browser';
+import { silentlyUpdateURL } from 'lib/browser';
 import debounce from 'lodash/debounce';
 import { PageContent } from 'models';
 import { CSSProperties, memo, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
@@ -380,7 +380,7 @@ function CharmEditor (
   }:
   CharmEditorProps
 ) {
-  const smallScreen = isSmallScreen();
+
   const [currentSpace] = useCurrentSpace();
   // check empty state of page on first load
   const _isEmpty = checkForEmpty(content);
@@ -583,7 +583,7 @@ function CharmEditor (
       {!readOnly && <RowActionsMenu pluginKey={actionsPluginKey} />}
       <InlinePalette nestedPagePluginKey={nestedPagePluginKey} disableNestedPage={disablePageSpecificFeatures} />
       {children}
-      {!disablePageSpecificFeatures && !smallScreen && (
+      {!disablePageSpecificFeatures && (
       <>
         <Slide
           direction='left'
