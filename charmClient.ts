@@ -29,14 +29,14 @@ import { ListSpaceRolesResponse } from 'pages/api/roles';
 import { GetTasksResponse } from 'pages/api/tasks/list';
 import { GetTasksStateResponse, UpdateTasksState } from 'pages/api/tasks/state';
 import { TelegramAccount } from 'pages/api/telegram/connect';
-import { UpdateThreadRequest } from 'pages/api/threads/[id]/resolve';
+import { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
 import { TokenGateWithRoles } from 'pages/api/token-gates';
 
 import { ApplicationWithTransactions } from 'lib/applications/actions';
 import { AssignedBountyPermissions, BountySubmitterPoolCalculation, BountySubmitterPoolSize, BountyUpdate, SuggestionAction } from 'lib/bounties/interfaces';
 import { DeepDaoAggregateData } from 'lib/deepdao/interfaces';
 import { PublicPageResponse } from 'lib/pages/interfaces';
-import { PublicBountyToggle, PublicSpaceInfo } from 'lib/spaces/interfaces';
+import { PublicBountyToggle } from 'lib/spaces/interfaces';
 import type { MarkTask } from 'lib/tasks/markTasks';
 import { TransactionCreationData } from 'lib/transactions/interface';
 import { ExtendedVote, UserVoteExtendedDTO, VoteDTO } from 'lib/votes/interfaces';
@@ -651,7 +651,7 @@ class CharmClient {
     return http.DELETE(`/api/threads/${threadId}`);
   }
 
-  resolveThread (threadId: string, request: { resolved: boolean }) {
+  resolveThread (threadId: string, request: ResolveThreadRequest) {
     return http.PUT(`/api/threads/${threadId}/resolve`, request);
   }
 
