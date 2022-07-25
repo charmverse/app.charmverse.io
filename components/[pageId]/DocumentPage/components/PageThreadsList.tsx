@@ -66,8 +66,10 @@ function getCommentFromThreads (threads: (ThreadWithCommentsAndAuthors | undefin
 }
 
 export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {inline?: boolean}) {
+
   const { threads } = useThreads();
   const [user] = useUser();
+
   const allThreads = Object.values(threads);
   const unResolvedThreads = allThreads.filter(thread => thread && !thread.resolved) as ThreadWithCommentsAndAuthors[];
   const resolvedThreads = allThreads.filter(thread => thread && thread.resolved) as ThreadWithCommentsAndAuthors[];
