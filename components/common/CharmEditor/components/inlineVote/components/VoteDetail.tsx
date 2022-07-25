@@ -117,6 +117,7 @@ export default function VoteDetail ({ cancelVote, castVote, deleteVote, detailed
         <RadioGroup name={vote.id} value={userVoteChoice}>
           {voteOptions.map(voteOption => (
             <FormControlLabel
+              key={voteOption.name}
               control={<Radio size='small' />}
               disabled={isVotingClosed(vote) || !user}
               value={voteOption.name}

@@ -88,6 +88,7 @@ export function InlineCommentSubMenu ({ pluginKey }: {pluginKey: PluginKey}) {
   const { currentPageId } = usePages();
   const isEmpty = checkForEmpty(commentContent);
   const handleSubmit = async (e: React.KeyboardEvent<HTMLElement> | React.MouseEvent<HTMLElement, MouseEvent>) => {
+
     if (!isEmpty) {
       const cardId = typeof window !== 'undefined' ? (new URLSearchParams(window.location.href)).get('cardId') : null;
       e.preventDefault();

@@ -283,6 +283,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
   }
 
   async function onClickDeleteComment () {
+
     if (actionComment && thread) {
       // If we delete the last comment, delete the whole thread
       if (thread.comments.length === 1) {

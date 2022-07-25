@@ -1,6 +1,7 @@
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import { Box, InputLabel, List, MenuItem, Select, Typography } from '@mui/material';
+import { uniq } from 'lodash';
 import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import { useVotes } from 'hooks/useVotes';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
@@ -11,14 +12,9 @@ import { ExtendedVote } from 'lib/votes/interfaces';
 import { useEffect, useState } from 'react';
 import NoVotesMessage from 'components/votes/components/NoVotesMessage';
 import PageActionToggle from './PageActionToggle';
+import { StyledSidebar as CommentsSidebar } from './CommentsSidebar';
 
-const VotesContainer = styled(List)`
-  overflow: auto;
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing(1)};
-  padding-top: 0px;
-  padding-bottom: 0px;
+const StyledSidebar = styled(CommentsSidebar)`
   height: calc(100%);
 `;
 
@@ -87,7 +83,7 @@ export default function VotesSidebar () {
         setVoteFilter={setVoteFilter}
         setVoteSort={setVoteSort}
       />
-      <VotesContainer>
+      <StyledSidebar>
         {sortedVotes.length === 0
           ? <NoVotesMessage message={`No ${voteFilter === 'completed' ? 'completed' : 'in progress'} votes yet`} />
           : sortedVotes.map(inlineVote => (
@@ -100,7 +96,7 @@ export default function VotesSidebar () {
               vote={inlineVote}
             />
           ))}
-      </VotesContainer>
+      </StyledSidebar>
     </Box>
   );
 }

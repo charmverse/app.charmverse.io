@@ -123,17 +123,11 @@ export function scrollToThread (threadId: string) {
     for (let i = 0; i < 10; i++) {
       element = element?.parentElement ?? null;
       // Get the first paragraph parent element
-      if (element?.classList.contains('charm-paragraph')) {
+      if (element?.tagName === 'p' || element?.tagName.startsWith('h')) {
         parentElement = element;
         break;
       }
     }
-
-    requestAnimationFrame(() => {
-      threadDocument.scrollIntoView({
-        behavior: 'smooth'
-      });
-    });
 
     createHighlightDomElement(parentElement);
   }

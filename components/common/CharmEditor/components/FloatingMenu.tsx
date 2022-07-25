@@ -13,9 +13,7 @@ import { LinkSubMenu } from './@bangle.dev/react-menu/LinkSubMenu';
 import { Menu } from './@bangle.dev/react-menu/Menu';
 import { BoldButton, CalloutButton, CodeButton, InlineCommentButton, FloatingLinkButton, HeadingButton, ItalicButton, ParagraphButton, StrikeButton, UnderlineButton, InlineVoteButton } from './@bangle.dev/react-menu/MenuButtons';
 import { MenuGroup } from './@bangle.dev/react-menu/MenuGroup';
-import { queryIsSelectionAroundInlineComment } from './inlineComment';
 import { InlineCommentSubMenu } from './inlineComment/InlineComment.components';
-import { markName as inlineCommentMarkName } from './inlineComment/inlineComment.constants';
 import { queryIsSelectionAroundInlineVote } from './inlineVote';
 import InlineVoteSubMenu from './inlineVote/components/InlineVoteSubmenu';
 import { markName as inlineVoteMarkName } from './inlineVote/inlineVote.constants';
@@ -119,13 +117,6 @@ export function floatingMenuPlugin ({ key, readOnly, enableComments = true }:{ke
 
       if (readOnly) {
         return null;
-      }
-
-      // If we are inside an inline comment
-      if (hasComponentInSchema(state, inlineCommentMarkName)) {
-        if (queryIsSelectionAroundInlineComment()(state)) {
-          return 'inlineCommentSubMenu';
-        }
       }
 
       // If we are inside an inline vote
