@@ -8,7 +8,15 @@ export async function getBounty (bountyId: string): Promise<BountyWithDetails | 
     },
     include: {
       applications: true,
-      page: true
+      page: {
+        include: {
+          permissions: {
+            include: {
+              sourcePermission: true
+            }
+          }
+        }
+      }
     }
-  });
+  }) as Promise<BountyWithDetails | null>;
 }

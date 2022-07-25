@@ -1,4 +1,5 @@
-import { Application, Bounty, BountyStatus, Page } from '@prisma/client';
+import { Application, Bounty, BountyStatus } from '@prisma/client';
+import { IPageWithPermissions } from 'lib/pages/interfaces';
 
 export const BOUNTY_LABELS: Record<BountyStatus, string> = {
   suggestion: 'Suggestion',
@@ -8,4 +9,4 @@ export const BOUNTY_LABELS: Record<BountyStatus, string> = {
   paid: 'Paid'
 };
 
-export type BountyWithDetails = Bounty & {applications: Application [], page: Page | null}
+export type BountyWithDetails = Bounty & {applications: Application [], page: IPageWithPermissions};
