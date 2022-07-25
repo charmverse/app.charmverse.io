@@ -42,8 +42,8 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
   const { pages } = usePages();
   const { cancelVote, castVote, deleteVote, votes, isLoading } = useVotes();
   const { bounties } = useBounties();
-  const cardId = (new URLSearchParams(window.location.search)).get('cardId');
-  const bounty = bounties.find(_bounty => _bounty.linkedTaskId === cardId);
+  const bounty = bounties.find(_bounty => _bounty.page?.id === page.id);
+
   const pageVote = Object.values(votes)[0];
 
   const board = useAppSelector((state) => {
@@ -143,6 +143,14 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
                 />
               </Box>
             )}
+            {!card && !board && page.type === 'bounty' && bounty
+              && (
+              <div className='focalboard-body'>
+                <div className='CardDetail content'>
+                  <BountyProperties bounty={bounty} readOnly={readOnly} />
+                </div>
+              </div>
+              ) }
             {card && board && (
 
               <div className='focalboard-body'>
@@ -175,7 +183,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
               </div>
             )}
           </CharmEditor>
-          {page.type === 'bounty' && bounty && <BountyProperties bounty={bounty} readOnly={readOnly} />}
+
           {page.type === 'proposal' && !isLoading && !pageVote && (
             <CreateVoteBox />
           )}

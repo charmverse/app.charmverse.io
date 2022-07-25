@@ -1,17 +1,15 @@
 import { Box, Grid, Typography } from '@mui/material';
 import { BountyStatus } from '@prisma/client';
 import Button from 'components/common/Button';
+import CreatePageButton from 'components/common/Page/CreatePageButton';
 import { FullWidthPageContent } from 'components/common/PageLayout/components/PageContent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
-import { useMemo, useState, useEffect } from 'react';
-import { CSVLink } from 'react-csv';
 import { BountyWithDetails } from 'models';
-
+import { useEffect, useMemo } from 'react';
+import { CSVLink } from 'react-csv';
 import { BountyCard } from './components/BountyCard';
-import BountyModal from './components/BountyModal';
 import InputBountyStatus from './components/InputBountyStatus';
 import MultiPaymentModal from './components/MultiPaymentModal';
 
@@ -45,10 +43,7 @@ interface Props {
 }
 
 export default function BountyList ({ publicMode, bountyCardClicked = () => null, bounties }: Props) {
-  const [displayBountyDialog, setDisplayBountyDialog] = useState(false);
-
   const [space] = useCurrentSpace();
-  const [currentUserPermissions] = useCurrentSpacePermissions();
 
   const [savedBountyFilters, setSavedBountyFilters] = useLocalStorage<BountyStatus[]>(`${space?.id}-bounty-filters`, ['open', 'inProgress']);
 
@@ -58,7 +53,6 @@ export default function BountyList ({ publicMode, bountyCardClicked = () => null
   }, []);
 
   // User can only suggest a bounty instead of creating it
-  const suggestBounties = currentUserPermissions?.createBounty === false;
 
   const filteredBounties = filterBounties(bounties.slice(), savedBountyFilters);
 
@@ -86,10 +80,6 @@ export default function BountyList ({ publicMode, bountyCardClicked = () => null
     ];
   }, [sortedBounties]);
 
-  function bountyCreated () {
-    setDisplayBountyDialog(false);
-  }
-
   return (
     <FullWidthPageContent>
 
@@ -114,19 +104,7 @@ export default function BountyList ({ publicMode, bountyCardClicked = () => null
                 </CSVLink>
               )}
               <MultiPaymentModal bounties={bounties} />
-
-              {
-                currentUserPermissions && (
-                  <Button
-                    sx={{ ml: 1, height: '35px' }}
-                    onClick={() => {
-                      setDisplayBountyDialog(true);
-                    }}
-                  >
-                    {suggestBounties ? 'Suggest' : 'Create'} Bounty
-                  </Button>
-                )
-              }
+              <CreatePageButton type='bounty' />
 
             </Box>
           )
@@ -206,22 +184,6 @@ export default function BountyList ({ publicMode, bountyCardClicked = () => null
               </Grid>
             )
           }
-
-      {
-          /**
-           * Remove later to its own popup modal
-           */
-          displayBountyDialog === true && (
-            <BountyModal
-              onSubmit={bountyCreated}
-              open={displayBountyDialog}
-              onClose={() => {
-                setDisplayBountyDialog(false);
-              }}
-              mode={suggestBounties ? 'suggest' : 'create'}
-            />
-          )
-        }
     </FullWidthPageContent>
   );
 }
