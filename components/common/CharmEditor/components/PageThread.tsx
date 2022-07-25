@@ -304,6 +304,13 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
     menuState.close();
   }
 
+  async function toggleResolved () {
+    setIsMutating(true);
+    await resolveThread(threadId);
+    removeInlineCommentMark(view, threadId);
+    setIsMutating(false);
+  }
+
   if (!thread) {
     return null;
   }
@@ -362,12 +369,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                         />
                       )}
                       disabled={isMutating || !permissions.comment}
-                      onClick={async () => {
-                        setIsMutating(true);
-                        await resolveThread(threadId);
-                        removeInlineCommentMark(view, thread.id);
-                        setIsMutating(false);
-                      }}
+                      onClick={toggleResolved}
                     />
                   ) : (comment.userId === user?.id && permissions.comment)
                   && (

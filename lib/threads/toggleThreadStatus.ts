@@ -1,5 +1,4 @@
-import { Thread } from '@prisma/client';
-import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utilities/errors';
 import { prisma } from 'db';
 import { ThreadStatusUpdate, ThreadStatus, ThreadWithCommentsAndAuthors } from './interfaces';
 
@@ -10,7 +9,8 @@ export async function toggleThreadStatus ({ id, status }: ThreadStatusUpdate): P
 
   const resolvedStatus = status === 'closed';
 
-  const existingThread = await prisma.thread.findUnique({
+  // check that thread exists
+  await prisma.thread.findUniqueOrThrow({
     where: {
       id
     },
@@ -18,10 +18,6 @@ export async function toggleThreadStatus ({ id, status }: ThreadStatusUpdate): P
       id: true
     }
   });
-
-  if (!existingThread) {
-    throw new DataNotFoundError(`Thread with id ${id} not found.`);
-  }
 
   const updatedThread = await prisma.thread.update({
     where: {
