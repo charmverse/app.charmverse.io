@@ -50,36 +50,43 @@ async function updateBounty (req: NextApiRequest, res: NextApiResponse<BountyWit
 
   const userId = req.session.user.id;
 
-  const bountyPagePermissions = await computeUserPagePermissions({
-    allowAdminBypass: true,
-    resourceId: bounty.page.id,
-    userId
-  });
-
-  if (bountyPagePermissions.read !== true) {
-    throw new UnauthorisedActionError('You do not have permissions to edit this bounty.');
-  }
-
-  if (!permissions.grant_permissions) {
-    // Don't pass permissions assignment to update operation if user can't grant permissions
-    delete body.permissions;
-  }
-
   const { error, isAdmin } = await hasAccessToSpace({
     spaceId: bounty.spaceId,
     userId,
     adminOnly: true
   });
 
+  if (error) {
+    throw new UnauthorisedActionError('You do not have permissions to edit this bounty.');
+  }
+
+  const bountyPagePermissions = await computeUserPagePermissions({
+    allowAdminBypass: true,
+    pageId: bounty.page.id,
+    userId
+  });
+
+  if (bountyPagePermissions.edit_content !== true) {
+    throw new UnauthorisedActionError('You do not have permissions to edit this bounty.');
+  }
+
   // Only drop keys if user is not an admin
   // Bounty suggestions only exist if creating bounties is disabled at workspace level.
   // In this case, we wouldn't want non admin to configure any other fields than the title and description of the bounty until it is approved.
-  if (bounty.status === 'suggestion' && (error || !isAdmin)) {
-    typedKeys(body).forEach(key => {
-      if (key !== 'title' && key !== 'description' && key !== 'descriptionNodes') {
-        delete body[key];
-      }
-    });
+  if (bounty.status === 'suggestion') {
+
+    // Non admins can only update their own suggestions
+    if (bounty.createdBy !== userId && !isAdmin) {
+      throw new UnauthorisedActionError('You do not have permissions to edit this bounty.');
+    }
+    // These are the only editable fields
+    else {
+      typedKeys(body).forEach(key => {
+        if (key !== 'title' && key !== 'description' && key !== 'descriptionNodes') {
+          delete body[key];
+        }
+      });
+    }
   }
 
   await updateBountySettings({
