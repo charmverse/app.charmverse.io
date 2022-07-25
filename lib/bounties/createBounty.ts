@@ -1,4 +1,4 @@
-import { Bounty, BountyStatus, PageType, Prisma } from '@prisma/client';
+import { BountyStatus, PageType, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { setBountyPermissions } from 'lib/permissions/bounties';
 import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
@@ -22,7 +22,7 @@ export async function createBounty ({
   pageId,
   title = '',
   content
-}: BountyCreationData): Promise<Bounty> {
+}: BountyCreationData) {
 
   const validCreationStatuses: BountyStatus[] = ['suggestion', 'open'];
 

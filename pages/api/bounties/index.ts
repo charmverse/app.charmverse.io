@@ -8,7 +8,7 @@ import { AvailableResourcesRequest } from 'lib/permissions/interfaces';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { UnauthorisedActionError, UndesirableOperationError } from 'lib/utilities/errors';
+import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
