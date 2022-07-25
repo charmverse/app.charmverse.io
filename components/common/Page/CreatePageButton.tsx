@@ -4,16 +4,20 @@ import Button from 'components/common/Button';
 import { addPage } from 'lib/pages/addPage';
 import { useUser } from 'hooks/useUser';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import ProposalDialog from './ProposalDialog';
+import PageDialog from './PageDialog';
 
-export default function CreateProposal () {
+interface CreatePageButtonProps {
+  type: 'proposal' | 'bounty'
+}
+
+export default function CreatePageButton ({ type }: CreatePageButtonProps) {
 
   const [user] = useUser();
   const [currentSpace] = useCurrentSpace();
   const [page, setPage] = useState<Page | null>();
 
   async function onClickCreate () {
-    if (currentSpace && user) {
+    if (currentSpace && user && type === 'proposal') {
       const newPage = await addPage({
         spaceId: currentSpace.id,
         createdBy: user.id,
@@ -26,9 +30,9 @@ export default function CreateProposal () {
   return (
     <>
       <Button onClick={onClickCreate}>
-        Create Proposal
+        {type === 'proposal' ? 'Create Proposal' : 'Create Bounty'}
       </Button>
-      {page && <ProposalDialog page={page} onClose={() => setPage(null)} />}
+      {page && <PageDialog page={page} onClose={() => setPage(null)} />}
     </>
   );
 }

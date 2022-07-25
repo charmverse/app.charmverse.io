@@ -163,6 +163,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
               </div>
             )}
           </CharmEditor>
+          {page.type === 'bounty' && bounty && <BountyProperties bounty={bounty} readOnly={readOnly} />}
           {page.type === 'proposal' && !isLoading && !pageVote && (
             <CreateVoteBox />
           )}
