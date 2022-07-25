@@ -73,10 +73,8 @@ export async function createBounty ({
     bountyCreateInput.suggestedBy = createdBy;
   }
 
-  const pageId = v4();
-
   const pageData: Prisma.PageCreateInput = {
-    id: pageId,
+    id: bountyId,
     path: `page-${Math.random().toString().replace('0.', '')}`,
     title,
     contentText: description,
@@ -159,7 +157,7 @@ export async function createBounty ({
       data: bountyPagePermissionSet.map(p => {
         return {
           ...p,
-          pageId
+          pageId: bountyId
         };
       })
     })

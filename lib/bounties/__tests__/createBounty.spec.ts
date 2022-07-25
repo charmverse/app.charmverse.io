@@ -111,6 +111,18 @@ describe('createBounty', () => {
 
   });
 
+  it('should create a linked page with the same ID as the bounty', async () => {
+    const bounty = await createBounty({
+      title: 'My bounty',
+      createdBy: user.id,
+      spaceId: space.id,
+      status: 'open',
+      rewardAmount: 1
+    });
+
+    expect(bounty.page.id).toBe(bounty.id);
+  });
+
   it('should fail to create an open bounty if the reward amount is 0 and status is open', async () => {
 
     const { user: localUser, space: localSpace } = await generateUserAndSpaceWithApiToken(undefined, true);
