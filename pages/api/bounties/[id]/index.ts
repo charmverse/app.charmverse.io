@@ -5,12 +5,13 @@ import { rollupBountyStatus } from 'lib/bounties/rollupBountyStatus';
 import { requesterCanDeleteBounty } from 'lib/bounties/shared';
 import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
+import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 import { BountyWithDetails } from 'models';
 import { NextApiRequest, NextApiResponse } from 'next';
-import nc, { NextHandler } from 'next-connect';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -24,20 +25,12 @@ async function getBountyController (req: NextApiRequest, res: NextApiResponse<Bo
 
   const bounty = await getBounty(id as string);
 
-  const bountyNotFoundError = new DataNotFoundError(`Bounty with id ${id} not found.`);
-
-  if (!bounty) {
-    throw bountyNotFoundError;
-  }
-
-  const permissions = await computeBountyPermissions({
+  if (!bounty || !bounty.page || (await computeUserPagePermissions({
     allowAdminBypass: true,
-    resourceId: bounty.id,
+    pageId: bounty.page.id,
     userId: req.session.user.id
-  });
-
-  if (!permissions.view) {
-    throw bountyNotFoundError;
+  })).read !== true) {
+    throw new DataNotFoundError(`Bounty with id ${id} not found.`);
   }
 
   res.status(200).json(bounty);
@@ -51,19 +44,19 @@ async function updateBounty (req: NextApiRequest, res: NextApiResponse<BountyWit
 
   const bounty = await getBounty(id as string);
 
-  if (!bounty) {
+  if (!bounty || !bounty.page) {
     throw new DataNotFoundError(`Bounty with id ${id} was not found`);
   }
 
   const userId = req.session.user.id;
 
-  const permissions = await computeBountyPermissions({
+  const bountyPagePermissions = await computeUserPagePermissions({
     allowAdminBypass: true,
-    resourceId: bounty.id,
+    resourceId: bounty.page.id,
     userId
   });
 
-  if (!permissions.edit) {
+  if (bountyPagePermissions.read !== true) {
     throw new UnauthorisedActionError('You do not have permissions to edit this bounty.');
   }
 

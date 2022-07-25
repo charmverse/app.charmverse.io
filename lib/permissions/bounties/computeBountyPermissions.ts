@@ -1,5 +1,6 @@
 import { SpaceOperation, Prisma } from '@prisma/client';
 import { prisma } from 'db';
+import { isTruthy } from 'lib/utilities/types';
 import { hasAccessToSpace } from '../../middleware';
 import { SpaceMembershipRequiredError } from '../errors';
 import { PermissionComputeRequest } from '../interfaces';
@@ -22,33 +23,23 @@ export async function computeBountyPermissions ({
     select: {
       id: true,
       spaceId: true,
-      createdBy: true
+      createdBy: true,
+      page: {
+        select: {
+          permissions: {
+            include: {
+              sourcePermission: true
+            }
+          }
+        }
+      }
     }
   });
 
-  if (!bounty) {
+  // Bounty permissions allow interaction with a bounty. Users need to be a member of the bounty space to be eligible for any permissions
+  // Page permissions apply for whether a user can view a bounty
+  if (!bounty || !userId) {
     return allowedOperations.empty;
-  }
-
-  // Handle public request case and only enforce view permission
-  if (!userId) {
-    // Make sure there is an explicit public permission assigned to the public
-    const publicViewPermission = await prisma.bountyPermission.findFirst({
-      where: {
-        bountyId: bounty.id,
-        public: true,
-        permissionLevel: 'viewer'
-      }
-    });
-
-    if (!publicViewPermission) {
-      return allowedOperations.empty;
-    }
-    else {
-      allowedOperations.addPermissions(bountyPermissionMapping.viewer.slice());
-      return allowedOperations.operationFlags;
-    }
-
   }
 
   const { error, isAdmin } = await hasAccessToSpace({
@@ -58,12 +49,7 @@ export async function computeBountyPermissions ({
   });
 
   if (error) {
-    // User is not a space member, treat them as a member of the public
-    return computeBountyPermissions({
-      allowAdminBypass: false,
-      resourceId
-      // No user id since this person is not a space member
-    });
+    return allowedOperations.empty;
   }
 
   if (isAdmin && allowAdminBypass) {

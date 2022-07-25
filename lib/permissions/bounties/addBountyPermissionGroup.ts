@@ -30,8 +30,8 @@ export async function addBountyPermissionGroup ({
     throw new DataNotFoundError(`Bounty with id ${resourceId} not found`);
   }
 
-  if (assignee.group === 'public' && level !== 'viewer') {
-    throw new InsecureOperationError('Only \'viewer\' permissions can be assigned to the \'public\' group');
+  if (assignee.group === 'public') {
+    throw new InsecureOperationError('No Bounty permissions can be assigned to the public.');
   }
 
   // Validate assignees
@@ -39,7 +39,7 @@ export async function addBountyPermissionGroup ({
     throw new InvalidInputError(`Invalid permission assignee group: '${assignee.group}'`);
   }
 
-  if (assignee.group !== 'public' && !assignee.id) {
+  if (!assignee.id) {
     throw new InvalidInputError(`Please provide a valid ${assignee.group} id`);
   }
 
@@ -60,7 +60,7 @@ export async function addBountyPermissionGroup ({
       throw new DataNotFoundError(`Role with id ${assignee.id} not found`);
     }
     else if (role.spaceId !== bounty.spaceId) {
-      throw new InsecureOperationError('You cannot assign permissions to a role from outside the space the bounty belongs to.');
+      throw new InsecureOperationError('You cannot assign permissions to a different space from the one this bounty belongs to.');
     }
   }
   else if (assignee.group === 'user') {
@@ -104,8 +104,6 @@ export async function addBountyPermissionGroup ({
         id: resourceId
       }
     },
-    // Permission assignable to one of these 4 groups
-    public: assignee.group === 'public' ? true : undefined,
     user: assignee.group === 'user' ? {
       connect: {
         id: assignee.id
