@@ -12,7 +12,7 @@ export default function NexusLayout (props: { children: ReactNode }) {
   const [user] = useUser();
 
   return (
-    <PageLayout hideSidebarOnSmallScreen sidebarWidth={user ? 55 : 0} sidebar={user ? NexusSidebar : emptySidebar}>
+    <PageLayout sidebarWidth={user ? 55 : 0} sidebar={user ? NexusSidebar : emptySidebar}>
       <CenteredPageContent>
         {props.children}
       </CenteredPageContent>

@@ -1,7 +1,8 @@
+import { Response as NodeFetchResponse } from 'node-fetch';
 
 type RequestInit = Parameters<typeof fetch>[1];
 
-function transformResponse (response: Response) {
+export function transformResponse (response: Response | NodeFetchResponse) {
   if (response.status >= 400) {
     const contentType = response.headers.get('content-type') as string;
     // necessary to capture the regular response for embedded blcoks

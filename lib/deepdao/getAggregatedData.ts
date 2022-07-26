@@ -3,6 +3,8 @@ import { prisma } from 'db';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { getCompletedApplicationsOfUser } from 'lib/applications/getCompletedApplicationsOfUser';
 import { getSpacesCount } from 'lib/spaces/getSpacesCount';
+import { isTruthy } from 'lib/utilities/types';
+import log from 'lib/log';
 import { getParticipationScore } from './getParticipationScore';
 import { DeepDaoAggregateData } from './interfaces';
 
@@ -19,15 +21,24 @@ export async function getAggregatedData (userPath: string): Promise<DeepDaoAggre
     throw new DataNotFoundError();
   }
 
-  const participationScores = user.addresses.length !== 0 ? await Promise.all(user.addresses.map(address => getParticipationScore(address))) : [];
+  const participationScores = (await Promise.all(
+    user.addresses.map(address => getParticipationScore(address)
+      .catch(error => {
+        log.error('Error calling DEEP DAO API', error);
+        return null;
+      }))
+  )).filter(isTruthy);
 
-  const completedBountiesCount = await getCompletedApplicationsOfUser(user.id);
-  const workspacesCount = await getSpacesCount(user.id);
-  const totalCharmverseVotes = await prisma.userVote.count({
-    where: {
-      userId: user.id
-    }
-  });
+  const [completedBountiesCount, workspacesCount, totalCharmverseVotes] = await Promise.all([
+    getCompletedApplicationsOfUser(user.id),
+    getSpacesCount(user.id),
+    prisma.userVote.count({
+      where: {
+        userId: user.id
+      }
+    })
+  ]);
+
   return {
     daos: workspacesCount + participationScores.reduce((acc, cur) => acc + cur.data.daos, 0),
     proposals: participationScores.reduce((acc, cur) => acc + cur.data.proposals, 0),

@@ -85,11 +85,10 @@ const LayoutContainer = styled.div`
 interface PageLayoutProps {
   children: React.ReactNode;
   sidebar?: ((p: { closeSidebar: () => void }) => JSX.Element)
-  sidebarWidth?: number
-  hideSidebarOnSmallScreen?: boolean
+  sidebarWidth?: number;
 }
 
-function PageLayout ({ hideSidebarOnSmallScreen = false, sidebarWidth = 300, children, sidebar: SidebarOverride }: PageLayoutProps) {
+function PageLayout ({ sidebarWidth = 300, children, sidebar: SidebarOverride }: PageLayoutProps) {
   const isSmallScreen = window.innerWidth < 600;
   const [open, setOpen] = React.useState(!isSmallScreen);
   const [user] = useUser();
@@ -114,7 +113,6 @@ function PageLayout ({ hideSidebarOnSmallScreen = false, sidebarWidth = 300, chi
               <AppBar open={open} sidebarWidth={sidebarWidth} position='fixed'>
                 <Header
                   open={open}
-                  hideSidebarOnSmallScreen={hideSidebarOnSmallScreen}
                   openSidebar={handleDrawerOpen}
                 />
               </AppBar>
@@ -122,12 +120,6 @@ function PageLayout ({ hideSidebarOnSmallScreen = false, sidebarWidth = 300, chi
                 sidebarWidth={sidebarWidth}
                 variant='permanent'
                 open={open}
-                sx={{
-                  display: {
-                    xs: hideSidebarOnSmallScreen ? 'none' : 'block',
-                    md: 'block'
-                  }
-                }}
               >
                 {SidebarOverride
                   ? <SidebarOverride closeSidebar={handleDrawerClose} />
@@ -142,12 +134,6 @@ function PageLayout ({ hideSidebarOnSmallScreen = false, sidebarWidth = 300, chi
         </ThreadsProvider>
       </LayoutContainer>
     </>
-  );
-}
-
-function MobileLayout () {
-  return (
-    <>layout</>
   );
 }
 
