@@ -1,13 +1,13 @@
-import { useEffect, ReactNode } from 'react';
-import { Space } from '@prisma/client';
-import { useRouter } from 'next/router';
+import NavigateNextIcon from '@mui/icons-material/ArrowRightAlt';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
-import NavigateNextIcon from '@mui/icons-material/ArrowRightAlt';
+import { Space } from '@prisma/client';
 import getBaseLayout from 'components/common/BaseLayout/BaseLayout';
-import TokenGateForm from 'components/common/TokenGateForm';
 import Button from 'components/common/Button';
+import TokenGateForm from 'components/common/TokenGate/TokenGateForm';
 import { useSpaces } from 'hooks/useSpaces';
+import { useRouter } from 'next/router';
+import { ReactNode, useEffect } from 'react';
 
 export function AlternateRouteButton ({ href, children }: { href: string, children: ReactNode }) {
   const [spaces] = useSpaces();
