@@ -6,7 +6,8 @@ import { prisma } from 'db';
 import { User, UserGnosisSafe, UserNotificationState } from '@prisma/client';
 import { getTransactionsforSafes, GnosisTransaction } from './gnosis';
 
-const providerUrl = `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`;
+const providerKey = process.env.ALCHEMY_API_KEY;
+const providerUrl = `https://eth-mainnet.alchemyapi.io/v2/${providerKey}`;
 
 type UserWithGnosisSafeState = User & {notificationState: UserNotificationState | null}
 interface ActionUser {
@@ -49,10 +50,6 @@ export interface GnosisSafeTasks {
   safeUrl: string;
   tasks: GnosisTask[];
   taskId: string;
-}
-
-function etherToBN (ether: string): ethers.BigNumber {
-  return ethers.BigNumber.from(ethers.utils.parseEther(ether));
 }
 
 function getFriendlyEthValue (value: string) {
@@ -215,6 +212,11 @@ function transactionsToTasks ({ transactions, safes, myUserId, users }: Transact
 }
 
 export async function getPendingGnosisTasks (myUserId: string) {
+
+  if (!providerKey) {
+    log.warn('Skip gnosis request: Alchemy API Key is missing');
+    return [];
+  }
 
   const provider = new ethers.providers.JsonRpcProvider(providerUrl);
   const safeOwner = provider.getSigner(0);
