@@ -7,6 +7,7 @@ import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';
 import PrimaryButton from 'components/common/PrimaryButton';
+import TokenGateForm from 'components/common/TokenGate/TokenGateForm';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { useContributors } from 'hooks/useContributors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -16,7 +17,6 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { BountyWithDetails } from 'models';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
-import TokenGateForm from './PublicBountyTokenGateForm';
 
 export default function PublicBountyList () {
   const router = useRouter();
@@ -114,7 +114,7 @@ export default function PublicBountyList () {
         }
 
         {
-          account && (
+          account && space && (
             <TokenGateForm
               onSubmit={() => {
                 loginViaTokenGateModal.close();
@@ -126,7 +126,7 @@ export default function PublicBountyList () {
                 }, 2000);
 
               }}
-              spaceDomainToAccess={space.domain}
+              spaceDomain={space.domain}
             />
           )
         }

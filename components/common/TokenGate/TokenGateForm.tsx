@@ -1,35 +1,31 @@
-import CheckIcon from '@mui/icons-material/Check';
-import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
+import Alert from '@mui/material/Alert';
 import Typography from '@mui/material/Typography';
 import { Space } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import charmClient from 'charmClient';
-import FieldLabel from 'components/common/form/FieldLabel';
 import Link from 'components/common/Link';
-import { DialogTitle, ErrorModal } from 'components/common/Modal';
+import { ErrorModal } from 'components/common/Modal';
 import PrimaryButton from 'components/common/PrimaryButton';
+import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import log from 'lib/log';
 import getLitChainFromChainId from 'lib/token-gates/getLitChainFromChainId';
 import { TokenGateWithRoles } from 'lib/token-gates/interfaces';
-import { isTruthy } from 'lib/utilities/types';
 import { checkAndSignAuthMessage } from 'lit-js-sdk';
-import { useRouter } from 'next/router';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import TokenGateOption from './TokenGateOption';
 
 interface Props {
   onSubmit: (values: Space) => void;
+  spaceDomain: string
 }
 
-export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
+export default function JoinSpacePage ({ onSubmit: _onSubmit, spaceDomain }: Props) {
 
-  const router = useRouter();
   const { account, chainId } = useWeb3React();
   const { showMessage } = useSnackbar();
   const [error, setError] = useState('');
@@ -39,34 +35,31 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
 
   const [selectedTokenGate, setSelectedTokenGate] = useState<TokenGateWithRoles | null>(null);
 
-  const [spaceDomain, setSpaceDomain] = useState('');
   const litClient = useLitProtocol();
-  const [userInputStatus, setStatus] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (router.query.domain) {
-      setSpaceDomain(stripUrlParts(router.query.domain as string));
-    }
-  }, []);
-
-  useEffect(() => {
-    if (spaceDomain.length < 3) {
-      setStatus('');
+    if (!spaceDomain || spaceDomain.length < 3) {
       setTokenGates(null);
+      setIsLoading(false);
     }
     else {
+      setIsLoading(true);
       charmClient.getTokenGatesForSpace({ spaceDomain })
         .then(gates => {
           setTokenGates(gates);
           if (gates[0]) {
-            setStatus('Workspace found');
             setSelectedTokenGate(gates[0]);
           }
           else {
-            setStatus('Workspace not found');
             setSelectedTokenGate(null);
           }
+          setIsLoading(false);
+        })
+        .catch(err => {
+          setTokenGates(null);
+          setIsLoading(false);
         });
     }
   }, [spaceDomain]);
@@ -132,73 +125,64 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
     setIsLoading(false);
   }
 
-  function onChangeDomainName (event: ChangeEvent<HTMLInputElement>) {
-    const domain = stripUrlParts(event.target.value);
-    setSpaceDomain(domain);
+  if (isLoading) {
+    return <LoadingComponent height='200px' isLoading={true} />;
   }
 
-  function stripUrlParts (maybeUrl: string) {
-    return maybeUrl.replace('https://app.charmverse.io/', '').replace('http://localhost:3000/', '').split('/')[0];
+  if (!isLoading && (!tokenGates || tokenGates?.length === 0)) {
+    return (
+      <Alert severity='info' sx={{ my: 1 }}>
+        No token gates found for this workspace.
+      </Alert>
+    );
   }
 
   return (
-    <>
-      <DialogTitle>Join a workspace</DialogTitle>
-      <Divider />
-      <br />
-      <Grid container direction='column' spacing={2}>
-        <Grid item>
-          <FieldLabel>Enter a CharmVerse Domain or URL</FieldLabel>
-          <TextField
-            onChange={onChangeDomainName}
-            autoFocus
-            placeholder='https://app.charmverse.io/my-space'
-            fullWidth
-            value={spaceDomain}
-            helperText={userInputStatus}
-            InputProps={{
-              endAdornment: isTruthy(tokenGates?.[0]) && <CheckIcon color='success' />
-            }}
-          />
-        </Grid>
-        <Grid item>
-          <Typography variant='h6' gutterBottom>
-            {tokenGates?.[0]?.space?.name}
-          </Typography>
-          <Typography variant='body2'>
-            Please verify that you meet the requirements to join
-          </Typography>
-        </Grid>
-        {
-          tokenGates?.map(gate => {
+    <Grid container direction='column' spacing={2} sx={{ my: 2 }}>
+      <Grid item>
+        <Typography variant='body2'>
+          Please verify that you meet the requirements to join
+        </Typography>
+      </Grid>
+      {
+          tokenGates?.map((gate, index, list) => {
             return (
               <Grid item>
                 <TokenGateOption tokenGate={gate} key={gate.id} select={setSelectedTokenGate} isSelected={selectedTokenGate?.id === gate.id} />
+
+                {
+                  // Don't show or after the last list item
+                  index < list.length - 1 && (
+                    <Typography color='secondary' sx={{ mb: -1, mt: 2, textAlign: 'center' }}>
+                      OR
+                    </Typography>
+                  )
+                }
+
               </Grid>
             );
           })
         }
 
-        <Grid item>
-          <PrimaryButton loading={isLoading} size='large' fullWidth type='submit' onClick={onSubmit}>
-            Verify Wallet
-          </PrimaryButton>
-        </Grid>
-        <Grid item>
-          <Typography component='p' variant='caption' align='center'>
-            Powered by
-            {' '}
-            <Link href='https://litprotocol.com/' external target='_blank'>Lit Protocol</Link>
-          </Typography>
-        </Grid>
-        <ErrorModal
-          title='Access denied'
-          message={error}
-          open={!!error}
-          onClose={() => setError('')}
-        />
+      <Grid item>
+        <PrimaryButton loading={isLoading} size='large' fullWidth type='submit' onClick={onSubmit}>
+          Verify Wallet
+        </PrimaryButton>
       </Grid>
-    </>
+      <Grid item>
+        <Typography component='p' variant='caption' align='center'>
+          Powered by
+          {' '}
+          <Link href='https://litprotocol.com/' external target='_blank'>Lit Protocol</Link>
+        </Typography>
+      </Grid>
+      <ErrorModal
+        title='Access denied'
+        message={error}
+        open={!!error}
+        onClose={() => setError('')}
+      />
+    </Grid>
   );
 
 }
