@@ -22,6 +22,7 @@ import { ReviewDecision, SubmissionContent, SubmissionCreationData } from 'lib/a
 import { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
 import { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
+import { TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import { ConnectDiscordPayload, ConnectDiscordResponse } from 'pages/api/discord/connect';
 import { ImportDiscordRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
 import { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
@@ -30,13 +31,12 @@ import { GetTasksResponse } from 'pages/api/tasks/list';
 import { GetTasksStateResponse, UpdateTasksState } from 'pages/api/tasks/state';
 import { TelegramAccount } from 'pages/api/telegram/connect';
 import { UpdateThreadRequest } from 'pages/api/threads/[id]';
-import { TokenGateWithRoles } from 'pages/api/token-gates';
 
 import { ApplicationWithTransactions } from 'lib/applications/actions';
 import { AssignedBountyPermissions, BountySubmitterPoolCalculation, BountySubmitterPoolSize, BountyUpdate, SuggestionAction } from 'lib/bounties/interfaces';
 import { DeepDaoAggregateData } from 'lib/deepdao/interfaces';
 import { PublicPageResponse } from 'lib/pages/interfaces';
-import { PublicBountyToggle, PublicSpaceInfo } from 'lib/spaces/interfaces';
+import { PublicBountyToggle } from 'lib/spaces/interfaces';
 import type { MarkTask } from 'lib/tasks/markTasks';
 import { TransactionCreationData } from 'lib/transactions/interface';
 import { ExtendedVote, UserVoteExtendedDTO, VoteDTO } from 'lib/votes/interfaces';
@@ -517,7 +517,7 @@ class CharmClient {
   }
 
   getTokenGatesForSpace (query: { spaceDomain: string }) {
-    return http.GET<(TokenGate & { space: Space })[]>('/api/token-gates', query);
+    return http.GET<TokenGateWithRoles[]>('/api/token-gates', query);
   }
 
   saveTokenGate (tokenGate: Partial<TokenGate>): Promise<TokenGate> {
