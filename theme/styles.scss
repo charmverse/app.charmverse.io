@@ -30,6 +30,8 @@ div[role="presentation"] {
 
 blockquote .bangle-nv-child-container {
   width: 100%;
+  display: flex;
+  align-items: center;
 }
 
 // make sure tooltips always appear, on Account page it falls behind our custom modal

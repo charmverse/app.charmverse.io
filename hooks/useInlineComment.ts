@@ -18,7 +18,7 @@ export function useInlineComment () {
       return extractTextFromSelection(view, contributors, pages);
     },
     findTotalInlineComments (node: Node, keepResolved?: boolean) {
-      return findTotalInlineComments(view, node, threads, keepResolved);
+      return findTotalInlineComments(view.state.schema, node, threads, keepResolved);
     },
     removeInlineCommentMark (threadId: string, deleteThread?: boolean) {
       removeInlineCommentMark(view, threadId, deleteThread);
