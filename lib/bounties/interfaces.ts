@@ -8,7 +8,7 @@ export * from 'lib/permissions/bounties/interfaces';
 
 export type BountyCreationData = Pick<Bounty, 'title' | 'spaceId' | 'createdBy'>
   & Partial<Pick<Bounty, 'status'| 'chainId'| 'description'| 'descriptionNodes'| 'approveSubmitters'| 'maxSubmissions'| 'rewardAmount'| 'rewardToken'>>
-  & {permissions?: Partial<BountyPermissions>; pageType?: PageType; linkedTaskId?: string;};
+  & {permissions?: Partial<BountyPermissions>; pageType?: PageType; linkedPageId?: string;};
 
 export type UpdateableBountyFields = Partial<Pick<Bounty, 'title' | 'descriptionNodes' | 'description' | 'chainId' | 'rewardAmount' | 'rewardToken' | 'approveSubmitters' | 'maxSubmissions'>> & {permissions?: Partial<BountyPermissions>}
 

@@ -97,7 +97,7 @@ const submitterMenuOptions: MenuOption<BountySubmitter>[] = [{
 interface IBountyEditorInput {
   onSubmit: (bounty: BountyWithDetails) => any,
   mode?: FormMode
-  linkedTaskId?: string;
+  linkedPageId?: string;
   bounty?: Partial<Bounty>
   permissions?: AssignedBountyPermissions
   focusKey?: keyof FormValues
@@ -130,7 +130,7 @@ function FormDescription ({ onContentChange, content, watch }:
   );
 }
 
-export default function BountyEditorForm ({ onSubmit, bounty, linkedTaskId, mode = 'create', focusKey, permissions: receivedPermissions }: IBountyEditorInput) {
+export default function BountyEditorForm ({ onSubmit, bounty, linkedPageId, mode = 'create', focusKey, permissions: receivedPermissions }: IBountyEditorInput) {
   const { setBounties, bounties, updateBounty } = useBounties();
 
   const defaultChainId = bounty?.chainId ?? 1;
@@ -279,7 +279,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, linkedTaskId, mode
     return permissionsToSend;
   }
 
-  async function submitted (value: FormValues & Bounty & {linkedTaskId?: string}) {
+  async function submitted (value: FormValues & Bounty & {linkedPageId?: string}) {
     // Not using this field anymore
     if (value.reviewer) {
       value.reviewer = null;
@@ -308,7 +308,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, linkedTaskId, mode
         value.descriptionNodes = value.descriptionNodes ?? '';
         value.status = 'open';
         (value as BountyCreationData).permissions = permissionsToSet;
-        value.linkedTaskId = linkedTaskId;
+        value.linkedPageId = linkedPageId;
         const createdBounty = await charmClient.createBounty(value);
 
         setBounties([...bounties, createdBounty]);

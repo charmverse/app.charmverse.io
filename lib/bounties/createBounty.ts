@@ -19,7 +19,7 @@ export async function createBounty ({
   chainId = 1,
   description = '',
   descriptionNodes = '',
-  linkedTaskId,
+  linkedPageId,
   approveSubmitters = true,
   maxSubmissions,
   rewardAmount = 0,
@@ -136,7 +136,10 @@ export async function createBounty ({
         });
       }
       // Prevent adding a duplicate space permission
-      else if (submitter.group === 'space' && bountyPagePermissionSet.every(p => !isTruthy(p.spaceId))) {
+      else if (submitter.group === 'space'
+        && bountyPagePermissionSet.every(p => !isTruthy(p.spaceId))
+        && !linkedPageId // if there already is a page, there is already a permission for <spaceId, pageId>
+      ) {
         bountyPagePermissionSet.push({
           permissionLevel: 'view',
           spaceId
@@ -145,24 +148,52 @@ export async function createBounty ({
     });
   }
 
-  await prisma.$transaction([
-    prisma.bounty.create({
-      data: {
-        ...bountyCreateInput,
-        page: {
-          create: pageData
+  if (!linkedPageId) {
+    await prisma.$transaction([
+      prisma.bounty.create({
+        data: {
+          ...bountyCreateInput,
+          page: {
+            create: pageData
+          }
         }
-      }
-    }),
-    prisma.pagePermission.createMany({
-      data: bountyPagePermissionSet.map(p => {
-        return {
-          ...p,
-          pageId: bountyId
-        };
+      }),
+      prisma.pagePermission.createMany({
+        data: bountyPagePermissionSet.map(p => {
+          return {
+            ...p,
+            pageId: bountyId
+          };
+        })
       })
-    })
-  ]);
+    ]);
+  }
+  else {
+    await prisma.$transaction([
+      prisma.bounty.create({
+        data: {
+          ...bountyCreateInput
+        }
+      }),
+      prisma.page.update({
+        where: {
+          id: linkedPageId
+        },
+        data: {
+          type: 'card',
+          bountyId
+        }
+      }),
+      prisma.pagePermission.createMany({
+        data: bountyPagePermissionSet.map(p => {
+          return {
+            ...p,
+            pageId: linkedPageId
+          };
+        })
+      })
+    ]);
+  }
 
   // Initialise suggestions with a view permission
   if (isSuggestion) {
@@ -185,5 +216,4 @@ export async function createBounty ({
   }
 
   return getBounty(bountyId) as Promise<BountyWithDetails>;
-
 }
