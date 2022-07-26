@@ -131,11 +131,7 @@ async function getBounties (req: NextApiRequest, res: NextApiResponse) {
       author: true,
       applications: true,
       space: true,
-      page: {
-        select: {
-          id: true
-        }
-      }
+      page: true
     }
   });
 
@@ -156,7 +152,7 @@ async function getBounties (req: NextApiRequest, res: NextApiResponse) {
 
   const bountiesResponse = bounties.map((bounty): PublicApiBounty => ({
     createdAt: bounty.createdAt.toISOString(),
-    description: bounty.description,
+    description: bounty.page.contentText,
     id: bounty.id,
     issuer: {
       address: bounty.author.addresses[0]

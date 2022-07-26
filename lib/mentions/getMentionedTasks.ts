@@ -94,9 +94,13 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
     select: {
       id: true,
       title: true,
-      descriptionNodes: true,
       createdBy: true,
-      spaceId: true
+      spaceId: true,
+      page: {
+        select: {
+          content: true
+        }
+      }
     }
   });
 
@@ -155,7 +159,7 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
   }
 
   for (const bounty of bounties) {
-    const content = bounty.descriptionNodes as PageContent;
+    const content = bounty.page.content as PageContent;
     if (content) {
       const mentions = extractMentions(content, username);
       mentions.forEach(mention => {

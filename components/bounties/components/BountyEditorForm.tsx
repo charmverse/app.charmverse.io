@@ -179,8 +179,8 @@ export default function BountyEditorForm ({ onSubmit, bounty, linkedPageId, mode
       capSubmissions: !((bounty && bounty?.maxSubmissions === null)),
       // expiryDate: null,
       ...(bounty || {}),
-      description: bounty?.description ?? cachedBountyDescription.text,
-      descriptionNodes: bounty?.descriptionNodes ?? cachedBountyDescription.nodes
+      description: bounty?.page.contentText ?? cachedBountyDescription.text,
+      descriptionNodes: bounty?.page.content ?? cachedBountyDescription.nodes
       //      setExpiryDate: !!bounty?.expiryDate
     },
     resolver: yupResolver(schema)

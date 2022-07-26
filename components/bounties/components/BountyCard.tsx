@@ -3,8 +3,6 @@ import { Box, Card, CardActionArea, CardHeader, Typography } from '@mui/material
 import { Bounty as IBounty } from '@prisma/client';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { fancyTrim } from 'lib/utilities/strings';
-import { useRouter } from 'next/router';
-import { useMemo } from 'react';
 import BountyStatusBadge from './BountyStatusBadge';
 
 /**
@@ -39,7 +37,7 @@ function BountyCardDetails ({ bounty, truncate }: Pick<IBountyInput, 'bounty' | 
         <CardHeader title={bounty.title} titleTypographyProps={{ sx: { fontSize: '1rem', fontWeight: 'bold' } }} />
         <Box p={2} width='100%' display='flex' flex={1} flexDirection='column' justifyContent='space-between'>
           <Typography paragraph={true}>
-            {fancyTrim(bounty.description, 120)}
+            {fancyTrim(bounty.page.contentText, 120)}
           </Typography>
           <BountyStatusBadge truncate={truncate} bounty={bounty} />
         </Box>
