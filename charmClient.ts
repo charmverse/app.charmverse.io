@@ -29,7 +29,7 @@ import { ListSpaceRolesResponse } from 'pages/api/roles';
 import { GetTasksResponse } from 'pages/api/tasks/list';
 import { GetTasksStateResponse, UpdateTasksState } from 'pages/api/tasks/state';
 import { TelegramAccount } from 'pages/api/telegram/connect';
-import { UpdateThreadRequest } from 'pages/api/threads/[id]';
+import { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
 import { TokenGateWithRoles } from 'pages/api/token-gates';
 
 import { ApplicationWithTransactions } from 'lib/applications/actions';
@@ -651,8 +651,8 @@ class CharmClient {
     return http.DELETE(`/api/threads/${threadId}`);
   }
 
-  updateThread (threadId: string, request: UpdateThreadRequest) {
-    return http.PUT(`/api/threads/${threadId}`, request);
+  resolveThread (threadId: string, request: ResolveThreadRequest) {
+    return http.PUT(`/api/threads/${threadId}/resolve`, request);
   }
 
   addComment (request: Omit<CommentCreate, 'userId'>): Promise<CommentWithUser> {
