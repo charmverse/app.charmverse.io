@@ -163,7 +163,7 @@ async function getBounties (req: NextApiRequest, res: NextApiResponse) {
       chain: bounty.chainId,
       token: bounty.rewardToken
     },
-    title: bounty.title,
+    title: bounty.page.title,
     status: bounty.status,
     url: getUrl(bounty)
   }));

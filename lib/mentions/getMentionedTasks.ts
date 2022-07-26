@@ -98,7 +98,8 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
       spaceId: true,
       page: {
         select: {
-          content: true
+          content: true,
+          title: true
         }
       }
     }
@@ -177,7 +178,7 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
             pageTitle: null,
             text: mention.text,
             bountyId: bounty.id,
-            bountyTitle: bounty.title,
+            bountyTitle: bounty.page.title,
             commentId: null,
             type: 'bounty'
           };
