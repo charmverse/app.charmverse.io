@@ -15,7 +15,7 @@ import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import Chip from '@mui/material/Chip';
 import charmClient from 'charmClient';
 import TableRow from 'components/common/Table/TableRow';
-import { TokenGateWithRoles } from 'pages/api/token-gates';
+import { TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { mutate } from 'swr';
 import log from 'lib/log';
