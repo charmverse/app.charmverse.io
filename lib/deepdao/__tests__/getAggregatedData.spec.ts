@@ -31,11 +31,11 @@ beforeAll(async () => {
   });
 });
 
-afterEach(() => {
-  // nock.restore();
+afterAll(() => {
+  nock.restore();
 });
 
-describe.only('GET /api/public/profile/[userPath]', () => {
+describe('GET /api/public/profile/[userPath]', () => {
 
   it('should throw a not found error if userPath doesn\'t return any user', async () => {
     try {
@@ -56,7 +56,7 @@ describe.only('GET /api/public/profile/[userPath]', () => {
       userId: user.id
     });
 
-    const scope = nock(DEEP_DAO_BASE_URL as string, { encodedQueryParams: true })
+    const scope = nock(DEEP_DAO_BASE_URL as string)
       .get(`/v0.1/people/participation_score/${walletAddresses[0]}`)
       .reply(200, {
         data: {
@@ -65,7 +65,6 @@ describe.only('GET /api/public/profile/[userPath]', () => {
           votes: 9
         }
       })
-      .persist()
       .get(`/v0.1/people/participation_score/${walletAddresses[1]}`)
       .reply(200, {
         data: {
@@ -73,8 +72,7 @@ describe.only('GET /api/public/profile/[userPath]', () => {
           proposals: 8,
           votes: 6
         }
-      })
-      .persist();
+      });
 
     // scope.on('request', (req, interceptor) => {
     //   console.log('interceptor matched request', interceptor.uri);
@@ -82,7 +80,10 @@ describe.only('GET /api/public/profile/[userPath]', () => {
     // scope.on('replied', (req, interceptor) => {
     //   console.log('response replied with nocked payload', interceptor.uri);
     // });
+
     const aggregatedData = await getAggregatedData(user.id, 'dummy_key');
+
+    expect(scope.isDone());
 
     expect(aggregatedData).toStrictEqual({
       daos: 11,
