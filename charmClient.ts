@@ -34,9 +34,9 @@ import { TokenGateWithRoles } from 'pages/api/token-gates';
 
 import { ApplicationWithTransactions } from 'lib/applications/actions';
 import { AssignedBountyPermissions, BountySubmitterPoolCalculation, BountySubmitterPoolSize, BountyUpdate, SuggestionAction } from 'lib/bounties/interfaces';
-import { DeepDaoAggregateData } from 'lib/deepdao/interfaces';
+import { DeepDaoAggregateData } from 'lib/deepdao/client';
 import { PublicPageResponse } from 'lib/pages/interfaces';
-import { PublicBountyToggle, PublicSpaceInfo } from 'lib/spaces/interfaces';
+import { PublicBountyToggle } from 'lib/spaces/interfaces';
 import type { MarkTask } from 'lib/tasks/markTasks';
 import { TransactionCreationData } from 'lib/transactions/interface';
 import { ExtendedVote, UserVoteExtendedDTO, VoteDTO } from 'lib/votes/interfaces';
