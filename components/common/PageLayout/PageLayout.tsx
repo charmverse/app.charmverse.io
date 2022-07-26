@@ -15,15 +15,13 @@ import PageContainer from './components/PageContainer';
 import Sidebar from './components/Sidebar';
 
 const openedMixin = (theme: Theme, sidebarWidth: number) => ({
-  width: '100%',
+  maxWidth: '100%',
+  width: sidebarWidth,
   transition: theme.transitions.create(['width'], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.enteringScreen
   }),
-  overflowX: 'hidden',
-  [theme.breakpoints.up('sm')]: {
-    width: sidebarWidth
-  }
+  overflowX: 'hidden'
 });
 
 const closedMixin = (theme: Theme) => ({
@@ -86,11 +84,10 @@ const LayoutContainer = styled.div`
 interface PageLayoutProps {
   children: React.ReactNode;
   sidebar?: ((p: { closeSidebar: () => void }) => JSX.Element)
-  sidebarWidth?: number
-  hideSidebarOnSmallScreen?: boolean
+  sidebarWidth?: number;
 }
 
-function PageLayout ({ hideSidebarOnSmallScreen = false, sidebarWidth = 300, children, sidebar: SidebarOverride }: PageLayoutProps) {
+function PageLayout ({ sidebarWidth = 300, children, sidebar: SidebarOverride }: PageLayoutProps) {
 
   const smallScreen = React.useMemo(() => isSmallScreen(), []);
   const [open, setOpen] = React.useState(!smallScreen);
@@ -116,7 +113,6 @@ function PageLayout ({ hideSidebarOnSmallScreen = false, sidebarWidth = 300, chi
               <AppBar open={open} sidebarWidth={sidebarWidth} position='fixed'>
                 <Header
                   open={open}
-                  hideSidebarOnSmallScreen={hideSidebarOnSmallScreen}
                   openSidebar={handleDrawerOpen}
                 />
               </AppBar>
@@ -124,12 +120,6 @@ function PageLayout ({ hideSidebarOnSmallScreen = false, sidebarWidth = 300, chi
                 sidebarWidth={sidebarWidth}
                 variant='permanent'
                 open={open}
-                sx={{
-                  display: {
-                    xs: hideSidebarOnSmallScreen ? 'none' : 'block',
-                    md: 'block'
-                  }
-                }}
               >
                 {SidebarOverride
                   ? <SidebarOverride closeSidebar={handleDrawerClose} />
@@ -144,12 +134,6 @@ function PageLayout ({ hideSidebarOnSmallScreen = false, sidebarWidth = 300, chi
         </ThreadsProvider>
       </LayoutContainer>
     </>
-  );
-}
-
-function MobileLayout () {
-  return (
-    <>layout</>
   );
 }
 
