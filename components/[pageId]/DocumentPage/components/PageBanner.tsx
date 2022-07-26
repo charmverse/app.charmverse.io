@@ -24,7 +24,13 @@ const StyledPageBanner = styled(Box)<{focalBoard?: boolean}>`
     visibility: hidden;
     position: absolute;
     bottom: 10px;
-    right: ${({ focalBoard }) => focalBoard ? '10px' : '200px'};
+    right: 10px;
+    z-index: var(--z-index-tooltip);
+  }
+  ${({ theme }) => theme.breakpoints.up('sm')} {
+    .page-cover-controls {
+      right: ${({ focalBoard }) => focalBoard ? '10px' : '200px'};
+    }
   }
 
   &:hover .page-cover-controls {

@@ -60,7 +60,7 @@ describe('toggleThreadStatus', () => {
       throw new ExpectedAnError();
     }
     catch (err) {
-      expect(err).toBeInstanceOf(DataNotFoundError);
+      expect((err as Error).name).toStrictEqual('NotFoundError');
     }
 
   });

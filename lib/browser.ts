@@ -139,16 +139,18 @@ export function deleteCookie (name: string) {
 export function createHighlightDomElement (parentElement: HTMLElement | null) {
   if (parentElement) {
     setTimeout(() => {
-      // Need to create a custom element as adding styling to prosemirror-node isn't possible
-      const highlightElement = document.createElement('div');
-      document.body.appendChild(highlightElement);
       const boundingRect = parentElement.getBoundingClientRect();
+      // Need to create a custom element as adding styling to prosemirror-node isn't possible
+      const highlightElement = document.createElement('span');
+      document.body.appendChild(highlightElement);
+      // console.log('boundingRect', boundingRect, parentElement);
+      highlightElement.style.display = 'block';
+      highlightElement.style.position = 'absolute';
       // Set the location of the custom element
       highlightElement.style.top = `${boundingRect.top}px`;
       highlightElement.style.left = `${boundingRect.left}px`;
       highlightElement.style.width = `${boundingRect.width}px`;
       highlightElement.style.height = `${boundingRect.height}px`;
-      highlightElement.style.position = 'absolute';
       highlightDomElement(highlightElement, () => {
         // Remove the custom element after the highlighting is done
         document.body.removeChild(highlightElement);
