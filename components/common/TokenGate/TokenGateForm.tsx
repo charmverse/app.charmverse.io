@@ -1,28 +1,26 @@
-import { humanizeAccessControlConditions, checkAndSignAuthMessage } from 'lit-js-sdk';
-import { useState, useEffect, ChangeEvent } from 'react';
-import { useWeb3React } from '@web3-react/core';
+import CheckIcon from '@mui/icons-material/Check';
+import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import PrimaryButton from 'components/common/PrimaryButton';
+import { Space } from '@prisma/client';
+import { useWeb3React } from '@web3-react/core';
+import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
+import charmClient from 'charmClient';
 import FieldLabel from 'components/common/form/FieldLabel';
-import Divider from '@mui/material/Divider';
-import CheckIcon from '@mui/icons-material/Check';
-import { TokenGate, Space } from '@prisma/client';
 import Link from 'components/common/Link';
 import { DialogTitle, ErrorModal } from 'components/common/Modal';
-import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
+import PrimaryButton from 'components/common/PrimaryButton';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import charmClient from 'charmClient';
-import { useRouter } from 'next/router';
 import log from 'lib/log';
-import { useSnackbar } from 'hooks/useSnackbar';
 import getLitChainFromChainId from 'lib/token-gates/getLitChainFromChainId';
 import { TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import { isTruthy } from 'lib/utilities/types';
+import { checkAndSignAuthMessage } from 'lit-js-sdk';
+import { useRouter } from 'next/router';
+import { ChangeEvent, useEffect, useState } from 'react';
 import TokenGateOption from './TokenGateOption';
 
 interface Props {
@@ -41,7 +39,6 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
 
   const [selectedTokenGate, setSelectedTokenGate] = useState<TokenGateWithRoles | null>(null);
 
-  const [description, setDescription] = useState('');
   const [spaceDomain, setSpaceDomain] = useState('');
   const litClient = useLitProtocol();
   const [userInputStatus, setStatus] = useState('');
@@ -64,15 +61,12 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
           setTokenGates(gates);
           if (gates[0]) {
             setStatus('Workspace found');
+            setSelectedTokenGate(gates[0]);
           }
           else {
             setStatus('Workspace not found');
+            setSelectedTokenGate(null);
           }
-
-          if (selectedTokenGate && gates.every(g => g.id !== selectedTokenGate.id)) {
-            setSelectedTokenGate(gates[0] ?? null);
-          }
-
         });
     }
   }, [spaceDomain]);
