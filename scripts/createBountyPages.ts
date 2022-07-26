@@ -13,10 +13,10 @@ import { prisma } from '../db';
 
   const result = await Promise.all(
     bounties.map(async bounty => {
-      if (bounty.linkedPageId) {
+      if (bounty.linkedTaskId) {
         const page = await prisma.page.update({
           where: {
-            cardId: bounty.linkedPageId
+            cardId: bounty.linkedTaskId
           },
           data: {
             type: PageType.card,
