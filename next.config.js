@@ -3,34 +3,11 @@
 const webpack = require('webpack');
 const BundleAnalyzer = require('@next/bundle-analyzer');
 const transpileModules = require('next-transpile-modules');
-
-const esmModules = [
-  '@bangle.dev/base-components',
-  '@bangle.dev/core',
-  '@bangle.dev/pm',
-  '@bangle.dev/react',
-  '@bangle.dev/utils',
-  '@bangle.dev/markdown',
-  '@bangle.dev/tooltip',
-  '@bangle.dev/react-menu',
-  '@bangle.dev/table',
-  '@popperjs/core',
-  '@fullcalendar/common',
-  '@fullcalendar/core',
-  '@fullcalendar/daygrid',
-  '@fullcalendar/interaction',
-  '@fullcalendar/react',
-  'react-dnd',
-  'react-pdf',
-  '@hookform/resolvers',
-  'lit-share-modal-v3-react-17',
-  'uuid'
-];
+const next = require('next/dist/lib/is-serializable-props');
+const esmModules = require('./next.base').esmModules;
 
 const config = {
-  generateEtags: false,
   poweredByHeader: false,
-  webpack5: true,
   eslint: {
     // add background to the default list of pages for eslint
     dirs: ['pages', 'components', 'lib', 'background']
@@ -98,7 +75,6 @@ const removeUndefined = obj => {
   return newObj;
 };
 
-const next = require('next/dist/lib/is-serializable-props');
 // eslint-disable-next-line prefer-destructuring
 const isSerializableProps = next.isSerializableProps;
 next.isSerializableProps = function _isSerializableProps (page, method, input) {
@@ -113,5 +89,3 @@ const withBundleAnalyzer = BundleAnalyzer({
 const withTM = transpileModules(esmModules);
 
 module.exports = withBundleAnalyzer(withTM(config));
-
-module.exports.esmModules = esmModules;

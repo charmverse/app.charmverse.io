@@ -1,19 +1,21 @@
 import { Space, User } from '@prisma/client';
 import { prisma } from 'db';
+import nock from 'nock';
 import { DataNotFoundError } from 'lib/utilities/errors';
-import fetch from 'node-fetch';
 import { ExpectedAnError } from 'testing/errors';
 import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
+import { DEEP_DAO_BASE_URL } from 'lib/deepdao/client';
+import { getAggregatedData } from 'lib/deepdao/getAggregatedData';
 
-jest.mock('node-fetch');
-
+nock.disableNetConnect();
 let user: User;
 let space: Space;
 
 const walletAddresses = [v4(), v4()];
 
 beforeAll(async () => {
+
   const generated = await generateUserAndSpaceWithApiToken(walletAddresses[0], false);
   user = generated.user;
   space = generated.space;
@@ -29,17 +31,15 @@ beforeAll(async () => {
   });
 });
 
-afterEach(() => {
-  jest.restoreAllMocks();
+afterAll(() => {
+  nock.restore();
 });
 
 describe('GET /api/public/profile/[userPath]', () => {
-  const mockFetch = fetch as jest.MockedFunction<typeof fetch>;
 
   it('should throw a not found error if userPath doesn\'t return any user', async () => {
-    const { getAggregatedData } = await import('../getAggregatedData');
     try {
-      await getAggregatedData(v4());
+      await getAggregatedData(v4(), 'dummy_key');
       throw new ExpectedAnError();
     }
     catch (err) {
@@ -47,8 +47,7 @@ describe('GET /api/public/profile/[userPath]', () => {
     }
   });
 
-  it('Should return aggregate data', async () => {
-    const { getAggregatedData } = await import('../getAggregatedData');
+  it('Should combine several responses', async () => {
 
     await generateBountyWithSingleApplication({
       bountyCap: 1,
@@ -57,30 +56,34 @@ describe('GET /api/public/profile/[userPath]', () => {
       userId: user.id
     });
 
-    const json = jest.fn();
+    const scope = nock(DEEP_DAO_BASE_URL as string)
+      .get(`/v0.1/people/participation_score/${walletAddresses[0]}`)
+      .reply(200, {
+        data: {
+          daos: 4,
+          proposals: 12,
+          votes: 9
+        }
+      })
+      .get(`/v0.1/people/participation_score/${walletAddresses[1]}`)
+      .reply(200, {
+        data: {
+          daos: 6,
+          proposals: 8,
+          votes: 6
+        }
+      });
 
-    mockFetch.mockResolvedValue({
-      json
-      // Its not possible to complete mock node-fetch so using any
-    } as any);
+    // scope.on('request', (req, interceptor) => {
+    //   console.log('interceptor matched request', interceptor.uri);
+    // });
+    // scope.on('replied', (req, interceptor) => {
+    //   console.log('response replied with nocked payload', interceptor.uri);
+    // });
 
-    json.mockResolvedValueOnce({
-      data: {
-        daos: 4,
-        proposals: 12,
-        votes: 9
-      }
-    });
+    const aggregatedData = await getAggregatedData(user.id, 'dummy_key');
 
-    json.mockResolvedValueOnce({
-      data: {
-        daos: 6,
-        proposals: 8,
-        votes: 6
-      }
-    });
-
-    const aggregatedData = await getAggregatedData(user.id);
+    expect(scope.isDone());
 
     expect(aggregatedData).toStrictEqual({
       daos: 11,

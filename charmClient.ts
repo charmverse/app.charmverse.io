@@ -19,7 +19,7 @@ import { InviteLinkPopulated } from 'pages/api/invites/index';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 // TODO: Maybe move these types to another place so that we dont import from backend
 import { ReviewDecision, SubmissionContent, SubmissionCreationData } from 'lib/applications/interfaces';
-import { AssignedBountyPermissions, BountyCreationData, BountySubmitterPoolCalculation, BountySubmitterPoolSize, BountyUpdate, SuggestionAction } from 'lib/bounties/interfaces';
+import { AssignedBountyPermissions, BountyCreationData, BountySubmitterPoolCalculation, BountySubmitterPoolSize, BountyUpdate, SuggestionAction, AssignedBountyPermissions, BountySubmitterPoolCalculation, BountySubmitterPoolSize, BountyUpdate, SuggestionAction } from 'lib/bounties/interfaces';
 import { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
 import { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
@@ -30,12 +30,12 @@ import { ListSpaceRolesResponse } from 'pages/api/roles';
 import { GetTasksResponse } from 'pages/api/tasks/list';
 import { GetTasksStateResponse, UpdateTasksState } from 'pages/api/tasks/state';
 import { TelegramAccount } from 'pages/api/telegram/connect';
-import { UpdateThreadRequest } from 'pages/api/threads/[id]';
+import { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
 import { TokenGateWithRoles } from 'pages/api/token-gates';
 
 import { ApplicationWithTransactions } from 'lib/applications/actions';
 
-import { DeepDaoAggregateData } from 'lib/deepdao/interfaces';
+import { DeepDaoAggregateData } from 'lib/deepdao/client';
 import { PublicPageResponse } from 'lib/pages/interfaces';
 import { PublicBountyToggle } from 'lib/spaces/interfaces';
 import type { MarkTask } from 'lib/tasks/markTasks';
@@ -650,8 +650,8 @@ class CharmClient {
     return http.DELETE(`/api/threads/${threadId}`);
   }
 
-  updateThread (threadId: string, request: UpdateThreadRequest) {
-    return http.PUT(`/api/threads/${threadId}`, request);
+  resolveThread (threadId: string, request: ResolveThreadRequest) {
+    return http.PUT(`/api/threads/${threadId}/resolve`, request);
   }
 
   addComment (request: Omit<CommentCreate, 'userId'>): Promise<CommentWithUser> {

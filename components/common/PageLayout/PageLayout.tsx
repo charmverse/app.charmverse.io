@@ -8,21 +8,20 @@ import { ThreadsProvider } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import Head from 'next/head';
 import * as React from 'react';
+import { isSmallScreen } from 'lib/browser';
 import CurrentPageFavicon from './components/CurrentPageFavicon';
 import Header, { headerHeight } from './components/Header';
 import PageContainer from './components/PageContainer';
 import Sidebar from './components/Sidebar';
 
 const openedMixin = (theme: Theme, sidebarWidth: number) => ({
-  width: '100%',
+  maxWidth: '100%',
+  width: sidebarWidth,
   transition: theme.transitions.create(['width'], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.enteringScreen
   }),
-  overflowX: 'hidden',
-  [theme.breakpoints.up('sm')]: {
-    width: sidebarWidth
-  }
+  overflowX: 'hidden'
 });
 
 const closedMixin = (theme: Theme) => ({
@@ -85,13 +84,13 @@ const LayoutContainer = styled.div`
 interface PageLayoutProps {
   children: React.ReactNode;
   sidebar?: ((p: { closeSidebar: () => void }) => JSX.Element)
-  sidebarWidth?: number
-  hideSidebarOnSmallScreen?: boolean
+  sidebarWidth?: number;
 }
 
-function PageLayout ({ hideSidebarOnSmallScreen = false, sidebarWidth = 300, children, sidebar: SidebarOverride }: PageLayoutProps) {
-  const isSmallScreen = window.innerWidth < 600;
-  const [open, setOpen] = React.useState(!isSmallScreen);
+function PageLayout ({ sidebarWidth = 300, children, sidebar: SidebarOverride }: PageLayoutProps) {
+
+  const smallScreen = React.useMemo(() => isSmallScreen(), []);
+  const [open, setOpen] = React.useState(!smallScreen);
   const [user] = useUser();
 
   const handleDrawerOpen = React.useCallback(() => {
@@ -114,7 +113,6 @@ function PageLayout ({ hideSidebarOnSmallScreen = false, sidebarWidth = 300, chi
               <AppBar open={open} sidebarWidth={sidebarWidth} position='fixed'>
                 <Header
                   open={open}
-                  hideSidebarOnSmallScreen={hideSidebarOnSmallScreen}
                   openSidebar={handleDrawerOpen}
                 />
               </AppBar>
@@ -122,12 +120,6 @@ function PageLayout ({ hideSidebarOnSmallScreen = false, sidebarWidth = 300, chi
                 sidebarWidth={sidebarWidth}
                 variant='permanent'
                 open={open}
-                sx={{
-                  display: {
-                    xs: hideSidebarOnSmallScreen ? 'none' : 'block',
-                    md: 'block'
-                  }
-                }}
               >
                 {SidebarOverride
                   ? <SidebarOverride closeSidebar={handleDrawerClose} />
@@ -142,12 +134,6 @@ function PageLayout ({ hideSidebarOnSmallScreen = false, sidebarWidth = 300, chi
         </ThreadsProvider>
       </LayoutContainer>
     </>
-  );
-}
-
-function MobileLayout () {
-  return (
-    <>layout</>
   );
 }
 

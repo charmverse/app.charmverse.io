@@ -1,5 +1,6 @@
 import { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import { ExtendedVote } from 'lib/votes/interfaces';
+import { isSmallScreen } from 'lib/browser';
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 import { useSWRConfig } from 'swr';
 import { useVotes } from './useVotes';
@@ -17,11 +18,22 @@ export const PageActionDisplayContext = createContext<IPageActionDisplayContext>
 });
 
 export function PageActionDisplayProvider ({ children }: { children: ReactNode }) {
+
+  // only calculate once
+  const smallScreen = useMemo(() => isSmallScreen(), []);
   const { currentPageId } = usePages();
   const { isValidating: isValidatingInlineComments } = useThreads();
   const { isValidating: isValidatingInlineVotes } = useVotes();
   const { cache } = useSWRConfig();
-  const [currentPageActionDisplay, setCurrentPageActionDisplay] = useState<IPageActionDisplayContext['currentPageActionDisplay']>(null);
+  const [currentPageActionDisplay, _setCurrentPageActionDisplay] = useState<IPageActionDisplayContext['currentPageActionDisplay']>(null);
+
+  const setCurrentPageActionDisplay: typeof _setCurrentPageActionDisplay = (value) => {
+    // dont show action for mobile screens
+    if (!smallScreen) {
+      _setCurrentPageActionDisplay(value);
+    }
+  };
+
   useEffect(() => {
     const highlightedCommentId = (new URLSearchParams(window.location.search)).get('commentId');
     if (currentPageId && !isValidatingInlineComments && !isValidatingInlineVotes) {
