@@ -8,6 +8,7 @@ import { ThreadsProvider } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import Head from 'next/head';
 import * as React from 'react';
+import { isSmallScreen } from 'lib/browser';
 import CurrentPageFavicon from './components/CurrentPageFavicon';
 import Header, { headerHeight } from './components/Header';
 import PageContainer from './components/PageContainer';
@@ -87,8 +88,9 @@ interface PageLayoutProps {
 }
 
 function PageLayout ({ sidebarWidth = 300, children, sidebar: SidebarOverride }: PageLayoutProps) {
-  const isSmallScreen = window.innerWidth < 600;
-  const [open, setOpen] = React.useState(!isSmallScreen);
+
+  const smallScreen = React.useMemo(() => isSmallScreen(), []);
+  const [open, setOpen] = React.useState(!smallScreen);
   const [user] = useUser();
 
   const handleDrawerOpen = React.useCallback(() => {
