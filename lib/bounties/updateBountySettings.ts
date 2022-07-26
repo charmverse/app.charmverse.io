@@ -31,9 +31,6 @@ export async function updateBountySettings ({
       },
       data: {
         updatedAt: new Date(),
-        title: updateContent.title,
-        descriptionNodes: updateContent.descriptionNodes as string,
-        description: updateContent.description,
         chainId: updateContent.chainId,
         rewardAmount: updateContent.rewardAmount,
         rewardToken: updateContent.rewardToken,

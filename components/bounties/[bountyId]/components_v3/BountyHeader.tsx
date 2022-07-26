@@ -48,8 +48,7 @@ export default function BountyHeader ({ bounty, permissions, refreshBountyPermis
   const { refreshBounty } = useBounties();
 
   const { getPagePermissions } = usePages();
-
-  const bountyPagePermissions = useMemo(() => getPagePermissions('bounties'), [bounty?.page]);
+  const bountyPagePermissions = useMemo(() => getPagePermissions(bounty?.page.id), [bounty?.page]);
 
   const [user] = useUser();
 
