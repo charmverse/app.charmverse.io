@@ -2,18 +2,20 @@ import { Space, User } from '@prisma/client';
 import { prisma } from 'db';
 import nock from 'nock';
 import { DataNotFoundError } from 'lib/utilities/errors';
-import fetch from 'node-fetch';
 import { ExpectedAnError } from 'testing/errors';
 import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { DEEP_DAO_BASE_URL } from 'lib/deepdao/client';
+import { getAggregatedData } from 'lib/deepdao/getAggregatedData';
 
+nock.disableNetConnect();
 let user: User;
 let space: Space;
 
 const walletAddresses = [v4(), v4()];
 
 beforeAll(async () => {
+
   const generated = await generateUserAndSpaceWithApiToken(walletAddresses[0], false);
   user = generated.user;
   space = generated.space;
@@ -29,14 +31,13 @@ beforeAll(async () => {
   });
 });
 
-afterEach(() => {
+afterAll(() => {
   nock.restore();
 });
 
 describe('GET /api/public/profile/[userPath]', () => {
 
   it('should throw a not found error if userPath doesn\'t return any user', async () => {
-    const { getAggregatedData } = await import('../getAggregatedData');
     try {
       await getAggregatedData(v4(), 'dummy_key');
       throw new ExpectedAnError();
@@ -47,7 +48,6 @@ describe('GET /api/public/profile/[userPath]', () => {
   });
 
   it('Should combine several responses', async () => {
-    const { getAggregatedData } = await import('../getAggregatedData');
 
     await generateBountyWithSingleApplication({
       bountyCap: 1,
@@ -56,21 +56,34 @@ describe('GET /api/public/profile/[userPath]', () => {
       userId: user.id
     });
 
-    nock(DEEP_DAO_BASE_URL)
-      .get(`/people/participation_score/${walletAddresses[0]}`)
+    const scope = nock(DEEP_DAO_BASE_URL as string)
+      .get(`/v0.1/people/participation_score/${walletAddresses[0]}`)
       .reply(200, {
-        daos: 4,
-        proposals: 12,
-        votes: 9
+        data: {
+          daos: 4,
+          proposals: 12,
+          votes: 9
+        }
       })
-      .get(`/people/participation_score/${walletAddresses[1]}`)
+      .get(`/v0.1/people/participation_score/${walletAddresses[1]}`)
       .reply(200, {
-        daos: 6,
-        proposals: 8,
-        votes: 6
+        data: {
+          daos: 6,
+          proposals: 8,
+          votes: 6
+        }
       });
 
+    // scope.on('request', (req, interceptor) => {
+    //   console.log('interceptor matched request', interceptor.uri);
+    // });
+    // scope.on('replied', (req, interceptor) => {
+    //   console.log('response replied with nocked payload', interceptor.uri);
+    // });
+
     const aggregatedData = await getAggregatedData(user.id, 'dummy_key');
+
+    expect(scope.isDone());
 
     expect(aggregatedData).toStrictEqual({
       daos: 11,

@@ -20,7 +20,11 @@ const esmModules = [
   'react-pdf',
   '@hookform/resolvers',
   'lit-share-modal-v3-react-17',
-  'uuid'
+  'uuid',
+  'node-fetch',
+  'data-uri-to-buffer',
+  'fetch-blob',
+  'formdata-polyfill'
 ];
 
 exports.esmModules = esmModules;
