@@ -14,15 +14,13 @@ import PageContainer from './components/PageContainer';
 import Sidebar from './components/Sidebar';
 
 const openedMixin = (theme: Theme, sidebarWidth: number) => ({
-  width: '100%',
+  maxWidth: '100%',
+  width: sidebarWidth,
   transition: theme.transitions.create(['width'], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.enteringScreen
   }),
-  overflowX: 'hidden',
-  [theme.breakpoints.up('sm')]: {
-    width: sidebarWidth
-  }
+  overflowX: 'hidden'
 });
 
 const closedMixin = (theme: Theme) => ({
