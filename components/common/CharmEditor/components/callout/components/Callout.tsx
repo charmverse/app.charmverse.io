@@ -10,7 +10,6 @@ import { alpha } from '@mui/system';
 
 const StyledCallout = styled.div`
   background-color: ${({ theme }) => theme.palette.background.light};
-  font-size: 20px;
   padding: ${({ theme }) => theme.spacing(1)};
   margin-top: ${({ theme }) => theme.spacing(1)};
   border-radius: ${({ theme }) => theme.spacing(0.5)};

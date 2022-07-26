@@ -30,7 +30,6 @@ import { ListSpaceRolesResponse } from 'pages/api/roles';
 import { GetTasksResponse } from 'pages/api/tasks/list';
 import { GetTasksStateResponse, UpdateTasksState } from 'pages/api/tasks/state';
 import { TelegramAccount } from 'pages/api/telegram/connect';
-import { UpdateThreadRequest } from 'pages/api/threads/[id]';
 
 import { ApplicationWithTransactions } from 'lib/applications/actions';
 import { AssignedBountyPermissions, BountySubmitterPoolCalculation, BountySubmitterPoolSize, BountyUpdate, SuggestionAction } from 'lib/bounties/interfaces';
@@ -41,6 +40,7 @@ import type { MarkTask } from 'lib/tasks/markTasks';
 import { TransactionCreationData } from 'lib/transactions/interface';
 import { ExtendedVote, UserVoteExtendedDTO, VoteDTO } from 'lib/votes/interfaces';
 import { PublicUser } from 'pages/api/public/profile/[userPath]';
+import { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
 import { AssignedPermissionsQuery, Resource } from './lib/permissions/interfaces';
 import { SpacePermissionConfigurationUpdate } from './lib/permissions/meta/interfaces';
 import { SpacePermissionFlags, SpacePermissionModification } from './lib/permissions/spaces';
@@ -651,8 +651,8 @@ class CharmClient {
     return http.DELETE(`/api/threads/${threadId}`);
   }
 
-  updateThread (threadId: string, request: UpdateThreadRequest) {
-    return http.PUT(`/api/threads/${threadId}`, request);
+  resolveThread (threadId: string, request: ResolveThreadRequest) {
+    return http.PUT(`/api/threads/${threadId}/resolve`, request);
   }
 
   addComment (request: Omit<CommentCreate, 'userId'>): Promise<CommentWithUser> {
