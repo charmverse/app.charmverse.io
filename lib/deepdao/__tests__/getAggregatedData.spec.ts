@@ -1,12 +1,12 @@
 import { Space, User } from '@prisma/client';
 import { prisma } from 'db';
+import nock from 'nock';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import fetch from 'node-fetch';
 import { ExpectedAnError } from 'testing/errors';
 import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
-
-jest.mock('node-fetch');
+import { DEEP_DAO_BASE_URL } from 'lib/deepdao/client';
 
 let user: User;
 let space: Space;
@@ -30,16 +30,15 @@ beforeAll(async () => {
 });
 
 afterEach(() => {
-  jest.restoreAllMocks();
+  nock.restore();
 });
 
 describe('GET /api/public/profile/[userPath]', () => {
-  const mockFetch = fetch as jest.MockedFunction<typeof fetch>;
 
   it('should throw a not found error if userPath doesn\'t return any user', async () => {
     const { getAggregatedData } = await import('../getAggregatedData');
     try {
-      await getAggregatedData(v4());
+      await getAggregatedData(v4(), 'dummy_key');
       throw new ExpectedAnError();
     }
     catch (err) {
@@ -47,7 +46,7 @@ describe('GET /api/public/profile/[userPath]', () => {
     }
   });
 
-  it('Should return aggregate data', async () => {
+  it('Should combine several responses', async () => {
     const { getAggregatedData } = await import('../getAggregatedData');
 
     await generateBountyWithSingleApplication({
@@ -57,30 +56,21 @@ describe('GET /api/public/profile/[userPath]', () => {
       userId: user.id
     });
 
-    const json = jest.fn();
-
-    mockFetch.mockResolvedValue({
-      json
-      // Its not possible to complete mock node-fetch so using any
-    } as any);
-
-    json.mockResolvedValueOnce({
-      data: {
+    nock(DEEP_DAO_BASE_URL)
+      .get(`/people/participation_score/${walletAddresses[0]}`)
+      .reply(200, {
         daos: 4,
         proposals: 12,
         votes: 9
-      }
-    });
-
-    json.mockResolvedValueOnce({
-      data: {
+      })
+      .get(`/people/participation_score/${walletAddresses[1]}`)
+      .reply(200, {
         daos: 6,
         proposals: 8,
         votes: 6
-      }
-    });
+      });
 
-    const aggregatedData = await getAggregatedData(user.id);
+    const aggregatedData = await getAggregatedData(user.id, 'dummy_key');
 
     expect(aggregatedData).toStrictEqual({
       daos: 11,

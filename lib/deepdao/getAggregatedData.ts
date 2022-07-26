@@ -5,10 +5,9 @@ import { getCompletedApplicationsOfUser } from 'lib/applications/getCompletedApp
 import { getSpacesCount } from 'lib/spaces/getSpacesCount';
 import { isTruthy } from 'lib/utilities/types';
 import log from 'lib/log';
-import { getParticipationScore } from './getParticipationScore';
-import { DeepDaoAggregateData } from './interfaces';
+import { getParticipationScore, DeepDaoAggregateData } from './client';
 
-export async function getAggregatedData (userPath: string): Promise<DeepDaoAggregateData> {
+export async function getAggregatedData (userPath: string, apiToken?: string): Promise<DeepDaoAggregateData> {
   const user = await prisma.user.findFirst({
     where: isUUID(userPath as string) ? {
       id: userPath as string
@@ -22,7 +21,7 @@ export async function getAggregatedData (userPath: string): Promise<DeepDaoAggre
   }
 
   const participationScores = (await Promise.all(
-    user.addresses.map(address => getParticipationScore(address)
+    user.addresses.map(address => getParticipationScore(address, apiToken)
       .catch(error => {
         log.error('Error calling DEEP DAO API', error);
         return null;

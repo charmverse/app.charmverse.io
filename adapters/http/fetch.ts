@@ -13,6 +13,7 @@ export function transformResponse (response: Response | NodeFetchResponse) {
     return response.text().then(text => Promise.reject({ status: response.status, message: text }));
   }
   const contentType = response.headers.get('content-type');
+
   if (contentType?.includes('application/json')) {
     return response.json();
   }
