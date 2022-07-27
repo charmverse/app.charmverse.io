@@ -87,9 +87,10 @@ export function plugins ({ key }: { key: PluginKey }) {
 
     // nodeType === 1 is an element like <p> or <div>
     if (node && node.nodeType === 1) {
-      // console.log('nodeType is 1', view.docView);
-      const desc = view.docView.nearestDesc(node, true);
-      if (!(!desc || desc === view.docView)) {
+      // @ts-ignore
+      const docView = view.docView;
+      const desc = docView.nearestDesc(node, true);
+      if (!(!desc || desc === docView)) {
         return desc.posBefore;
       }
     }
@@ -148,7 +149,7 @@ export function plugins ({ key }: { key: PluginKey }) {
       },
       view: (view) => {
 
-        function onDragStart (e) {
+        function onDragStart (e: DragEvent) {
           return dragStart(view, e);
         }
 
