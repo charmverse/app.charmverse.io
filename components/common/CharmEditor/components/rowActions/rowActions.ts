@@ -77,8 +77,15 @@ export function plugins ({ key }: { key: PluginKey }) {
     if (!pos) {
       return;
     }
-    let { node } = view.domAtPos(pos.pos);
-
+    // Note '.inside' refers to the position of the parent node, it is -1 if the position is at the root
+    const startPos = pos.inside > 0 ? pos.inside : pos.pos;
+    const dom = view.domAtPos(startPos);
+    let node = dom.node;
+    // Note: for leaf nodes, domAtPos() only returns the parent with an offset. text nodes have an offset but don't have childNodes
+    // ref: https://github.com/atlassian/prosemirror-utils/issues/8
+    if (dom.offset && dom.node.childNodes[dom.offset]) {
+      node = dom.node.childNodes[dom.offset];
+    }
     while (node && node.parentNode) {
       if ((node.parentNode as Element).classList?.contains('ProseMirror')) { // todo
         break;
@@ -102,7 +109,7 @@ export function plugins ({ key }: { key: PluginKey }) {
 
     if (!e.dataTransfer || !/charm-drag-handle/.test((e.target as HTMLElement)?.className)) return;
 
-    const coords = { left: e.clientX + 50, top: e.clientY };
+    const coords = { left: e.clientX + 100, top: e.clientY };
     const pos = blockPosAtCoords(view, coords);
     if (pos != null) {
       view.dispatch(view.state.tr.setSelection(NodeSelection.create(view.state.doc, pos)));
