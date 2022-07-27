@@ -161,6 +161,12 @@ export default function BountyEditorForm ({ onSubmit, bounty, linkedPageId, mode
     },
     text: ''
   });
+
+  // Hack until the updated UI is merged. This code will be removed.
+  const description = (bounty?.page?.contentText || bounty?.description) ?? cachedBountyDescription.text;
+  const descriptionNodes = (bounty?.page?.content || bounty?.descriptionNodes) ?? cachedBountyDescription.nodes;
+  const title = bounty?.page?.title || bounty?.title;
+
   const {
     register,
     handleSubmit,
@@ -179,8 +185,9 @@ export default function BountyEditorForm ({ onSubmit, bounty, linkedPageId, mode
       capSubmissions: !((bounty && bounty?.maxSubmissions === null)),
       // expiryDate: null,
       ...(bounty || {}),
-      description: bounty?.description ?? cachedBountyDescription.text,
-      descriptionNodes: bounty?.descriptionNodes ?? cachedBountyDescription.nodes
+      title,
+      description,
+      descriptionNodes
       //      setExpiryDate: !!bounty?.expiryDate
     },
     resolver: yupResolver(schema)
