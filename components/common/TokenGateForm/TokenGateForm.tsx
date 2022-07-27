@@ -15,7 +15,7 @@ import { useUser } from 'hooks/useUser';
 import log from 'lib/log';
 import getLitChainFromChainId from 'lib/token-gates/getLitChainFromChainId';
 import { TokenGateWithRoles } from 'lib/token-gates/interfaces';
-import { checkAndSignAuthMessage } from 'lit-js-sdk';
+import { AuthSig, checkAndSignAuthMessage } from 'lit-js-sdk';
 import { useEffect, useState } from 'react';
 import TokenGateOption from './TokenGateOption';
 
@@ -38,6 +38,10 @@ export default function TokenGateForm ({ onSubmit: _onSubmit, spaceDomain }: Pro
   const litClient = useLitProtocol();
 
   const [isLoading, setIsLoading] = useState(true);
+
+  const [storedAuthSig, setStoredAuthSig] = useState<AuthSig | null>(null);
+
+  const [verified, setVerified] = useState(false);
 
   useEffect(() => {
     if (!spaceDomain || spaceDomain.length < 3) {
@@ -63,6 +67,41 @@ export default function TokenGateForm ({ onSubmit: _onSubmit, spaceDomain }: Pro
         });
     }
   }, [spaceDomain]);
+
+  async function generateAuthSignature () {
+    setStoredAuthSig(null);
+    setIsLoading(true);
+
+    const chain = getLitChainFromChainId(chainId);
+
+    setError('');
+
+    try {
+      const authSig = await checkAndSignAuthMessage({ chain });
+      setStoredAuthSig(authSig);
+      setIsLoading(false);
+    }
+    catch (err) {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (storedAuthSig && account) {
+      charmClient.evalueTokenGateEligibility({
+        authSig: storedAuthSig,
+        chainId: chainId as number,
+        spaceIdOrDomain: spaceDomain
+      }).then(success => {
+        // eslint-disable-next-line no-console
+        console.log('SUCCESS', success);
+      }).catch(err => {
+        // eslint-disable-next-line no-console
+        console.log('ERROR', err);
+      });
+    }
+
+  }, [storedAuthSig, account]);
 
   async function onSubmit () {
     if (!tokenGates || !litClient || !selectedTokenGate) {
@@ -137,45 +176,20 @@ export default function TokenGateForm ({ onSubmit: _onSubmit, spaceDomain }: Pro
     );
   }
 
+  if (!verified) {
+    return (
+      <PrimaryButton size='large' fullWidth type='submit' onClick={generateAuthSignature}>
+        Check if you have access
+      </PrimaryButton>
+    );
+  }
+
   return (
     <Grid container direction='column' spacing={2} sx={{ my: 2 }}>
-      <Grid item>
-        <Typography variant='body2'>
-          {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          tokenGates!.length > 1 ? 'To join, please select the condition you want to verify.' : 'Please verify that you meet the requirements to join.'
-        }
-        </Typography>
-      </Grid>
-      {
-          tokenGates?.map((gate, index, list) => {
-            return (
-              <Grid item>
-                <TokenGateOption
-                  totalGates={list.length}
-                  tokenGate={gate}
-                  key={gate.id}
-                  onSelect={setSelectedTokenGate}
-                  isSelected={selectedTokenGate?.id === gate.id}
-                />
-
-                {
-                  // Don't show or after the last list item
-                  index < list.length - 1 && (
-                    <Typography color='secondary' sx={{ mb: -1, mt: 2, textAlign: 'center' }}>
-                      OR
-                    </Typography>
-                  )
-                }
-
-              </Grid>
-            );
-          })
-        }
 
       <Grid item>
-        <PrimaryButton loading={isLoading} size='large' fullWidth type='submit' onClick={onSubmit}>
-          Verify Wallet
+        <PrimaryButton disabled={!verified} loading={isLoading} size='large' fullWidth type='submit' onClick={onSubmit}>
+          Join workspace
         </PrimaryButton>
       </Grid>
       <Grid item>
