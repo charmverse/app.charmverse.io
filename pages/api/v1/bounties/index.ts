@@ -152,7 +152,7 @@ async function getBounties (req: NextApiRequest, res: NextApiResponse) {
 
   const bountiesResponse = bounties.map((bounty): PublicApiBounty => ({
     createdAt: bounty.createdAt.toISOString(),
-    description: bounty.page.contentText,
+    description: bounty.page?.contentText || '',
     id: bounty.id,
     issuer: {
       address: bounty.author.addresses[0]
@@ -163,7 +163,7 @@ async function getBounties (req: NextApiRequest, res: NextApiResponse) {
       chain: bounty.chainId,
       token: bounty.rewardToken
     },
-    title: bounty.page.title,
+    title: bounty.page?.title || 'Untitled',
     status: bounty.status,
     url: getUrl(bounty)
   }));

@@ -52,11 +52,13 @@ describe('updateBountySettings', () => {
     });
 
     (Object.keys(newContent) as (keyof UpdateableBountyFields)[]).forEach(key => {
-      if (key !== 'permissions') {
+      if (key !== 'permissions' && key !== 'title' && key !== 'description' && key !== 'descriptionNodes') {
         expect(updatedBounty[key]).toBe(newContent[key]);
       }
     });
 
+    expect(updatedBounty.page?.title).toBe(newContent.title);
+    expect(updatedBounty.page?.content).toBe(newContent.descriptionNodes);
   });
 
   it('should not be able to update the status', async () => {

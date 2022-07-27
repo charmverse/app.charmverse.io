@@ -1,15 +1,15 @@
-import Link from 'components/common/Link';
 import { Box, Card, CardActionArea, CardHeader, Typography } from '@mui/material';
-import { Bounty as IBounty } from '@prisma/client';
+import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { fancyTrim } from 'lib/utilities/strings';
+import { BountyWithDetails } from 'models';
 import BountyStatusBadge from './BountyStatusBadge';
 
 /**
  * @publicMode When a bounty card is clicked in public mode, we do not want the user to be directed to the bounty (for now)
  */
 export interface IBountyInput {
-  bounty: IBounty
+  bounty: BountyWithDetails
   truncate?: boolean
   publicMode?: boolean
 }

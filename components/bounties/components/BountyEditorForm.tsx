@@ -98,7 +98,7 @@ interface IBountyEditorInput {
   onSubmit: (bounty: BountyWithDetails) => any,
   mode?: FormMode
   linkedPageId?: string;
-  bounty?: Partial<Bounty>
+  bounty?: Partial<BountyWithDetails>
   permissions?: AssignedBountyPermissions
   focusKey?: keyof FormValues
 }
@@ -143,7 +143,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, linkedPageId, mode
 
   const [bountyApplicantPool, setBountyApplicantPool] = useState<BountySubmitterPoolSize | null>(null);
 
-  const [permissions, setPermissions] = useState<Partial<BountyPermissions>>(receivedPermissions?.bountyPermissions ?? {});
+  const [permissions] = useState<Partial<BountyPermissions>>(receivedPermissions?.bountyPermissions ?? {});
 
   useEffect(() => {
     if (bounty) {
@@ -179,8 +179,8 @@ export default function BountyEditorForm ({ onSubmit, bounty, linkedPageId, mode
       capSubmissions: !((bounty && bounty?.maxSubmissions === null)),
       // expiryDate: null,
       ...(bounty || {}),
-      description: bounty?.page.contentText ?? cachedBountyDescription.text,
-      descriptionNodes: bounty?.page.content ?? cachedBountyDescription.nodes
+      description: bounty?.page?.contentText ?? cachedBountyDescription.text,
+      descriptionNodes: bounty?.page?.content ?? cachedBountyDescription.nodes
       //      setExpiryDate: !!bounty?.expiryDate
     },
     resolver: yupResolver(schema)

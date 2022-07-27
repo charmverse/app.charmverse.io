@@ -1,15 +1,14 @@
-import { ApplicationStatus, Block, Bounty, BountyStatus, Page, Prisma, Space, SpaceApiToken, Thread, Transaction, Comment, Role, RoleSource, Vote, VoteOptions, UserVote } from '@prisma/client';
+import { ApplicationStatus, Block, Bounty, BountyStatus, Comment, Page, Prisma, Role, RoleSource, Space, SpaceApiToken, Thread, Transaction, Vote } from '@prisma/client';
 import { prisma } from 'db';
 import { getBounty } from 'lib/bounties';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import { IPageWithPermissions } from 'lib/pages';
-import { BountyPermissionAssignment, BountyPermissions } from 'lib/permissions/bounties';
+import { BountyPermissions } from 'lib/permissions/bounties';
 import { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { typedKeys } from 'lib/utilities/objects';
 import { BountyWithDetails, IDENTITY_TYPES, LoggedInUser } from 'models';
 import { v4 } from 'uuid';
-import { generatePageToCreateStub } from './generate-stubs';
 
 export async function generateSpaceUser ({ spaceId, isAdmin }: { spaceId: string, isAdmin: boolean }): Promise<LoggedInUser> {
   return prisma.user.create({
@@ -146,6 +145,7 @@ export async function generateBounty ({ descriptionNodes, spaceId, createdBy, st
             id: pageId,
             createdBy,
             contentText: '',
+            content: descriptionNodes ?? undefined,
             path: `page-${pageId}`,
             title: title || 'Root',
             type: 'bounty',

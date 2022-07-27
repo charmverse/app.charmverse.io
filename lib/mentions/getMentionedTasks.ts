@@ -160,7 +160,7 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
   }
 
   for (const bounty of bounties) {
-    const content = bounty.page.content as PageContent;
+    const content = bounty.page?.content as PageContent;
     if (content) {
       const mentions = extractMentions(content, username);
       mentions.forEach(mention => {
@@ -178,7 +178,7 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
             pageTitle: null,
             text: mention.text,
             bountyId: bounty.id,
-            bountyTitle: bounty.page.title,
+            bountyTitle: bounty.page?.title || 'Untitled',
             commentId: null,
             type: 'bounty'
           };

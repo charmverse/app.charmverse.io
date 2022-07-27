@@ -19,7 +19,7 @@ import { InviteLinkPopulated } from 'pages/api/invites/index';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 // TODO: Maybe move these types to another place so that we dont import from backend
 import { ReviewDecision, SubmissionContent, SubmissionCreationData } from 'lib/applications/interfaces';
-import { AssignedBountyPermissions, BountyCreationData, BountySubmitterPoolCalculation, BountySubmitterPoolSize, BountyUpdate, SuggestionAction, AssignedBountyPermissions, BountySubmitterPoolCalculation, BountySubmitterPoolSize, BountyUpdate, SuggestionAction } from 'lib/bounties/interfaces';
+import { BountySubmitterPoolCalculation, BountySubmitterPoolSize, BountyUpdate, SuggestionAction, AssignedBountyPermissions, BountyCreationData } from 'lib/bounties/interfaces';
 import { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
 import { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
@@ -32,9 +32,7 @@ import { GetTasksStateResponse, UpdateTasksState } from 'pages/api/tasks/state';
 import { TelegramAccount } from 'pages/api/telegram/connect';
 import { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
 import { TokenGateWithRoles } from 'pages/api/token-gates';
-
 import { ApplicationWithTransactions } from 'lib/applications/actions';
-
 import { DeepDaoAggregateData } from 'lib/deepdao/client';
 import { PublicPageResponse } from 'lib/pages/interfaces';
 import { PublicBountyToggle } from 'lib/spaces/interfaces';
