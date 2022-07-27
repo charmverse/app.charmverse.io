@@ -66,7 +66,8 @@ export function plugins ({ key, readOnly, enableComments = true }:{key: PluginKe
     }
   });
 
-  // add event listener to dragging so that we dont trigger a tooltip
+  // We need to override the selection tooltip plugin to not show up when the rowAction plugin is handling drag and drop.
+  // They both work through pm's active selection, but since this plugin responds to mousedown events, we can safely remove the listener to view updates
   const selectionTooltipPluginFn = menuPlugins[0] as (() => Plugin<any, any>[]);
   menuPlugins[0] = () => {
     const selectionTooltipPlugins = selectionTooltipPluginFn();

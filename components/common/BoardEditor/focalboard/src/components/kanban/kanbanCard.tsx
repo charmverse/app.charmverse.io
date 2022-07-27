@@ -132,7 +132,7 @@ const KanbanCard = React.memo((props: Props) => {
             stopPropagationOnToggle={true}
           >
             <IconButton icon={<OptionsIcon />} />
-            <Menu position='bottom-end'>
+            <Menu position='bottom-start'>
               {pagePermissions.delete && pages[card.id]?.deletedAt === null && <Menu.Text
                 icon={<DeleteIcon />}
                 id='delete'
