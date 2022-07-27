@@ -1,7 +1,7 @@
 import { PluginKey } from '@bangle.dev/core';
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { safeInsert } from '@bangle.dev/utils';
-import { ContentCopy as DuplicateIcon, DeleteOutlined as DeleteIcon, MoreHoriz as MoreHorizIcon } from '@mui/icons-material';
+import { ContentCopy as DuplicateIcon, DeleteOutlined as DeleteIcon, DragIndicator as DragIndicatorIcon } from '@mui/icons-material';
 import { ListItemIcon, ListItemText, Menu, MenuItem, MenuProps } from '@mui/material';
 import { Page } from '@prisma/client';
 import charmClient from 'charmClient';
@@ -118,18 +118,20 @@ function Component ({ menuState }: { menuState: PluginState }) {
 
   return (
     <>
-      <MoreHorizIcon color='secondary' {...bindTrigger(popupState)} />
+      <span className='charm-drag-handle' draggable='true'>
+        <DragIndicatorIcon color='secondary' {...bindTrigger(popupState)} />
+      </span>
 
       <Menu
         {...bindMenu(popupState)}
         {...menuPosition}
       >
-        <MenuItem onClick={deleteRow}>
+        <MenuItem onClick={deleteRow} dense>
           <ListItemIcon><DeleteIcon color='secondary' /></ListItemIcon>
           <ListItemText>Delete</ListItemText>
         </MenuItem>
-        <MenuItem onClick={duplicateRow}>
-          <ListItemIcon><DuplicateIcon color='secondary' fontSize='small' /></ListItemIcon>
+        <MenuItem onClick={duplicateRow} dense>
+          <ListItemIcon><DuplicateIcon color='secondary' /></ListItemIcon>
           <ListItemText>Duplicate</ListItemText>
         </MenuItem>
       </Menu>

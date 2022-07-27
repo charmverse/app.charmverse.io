@@ -99,7 +99,6 @@ import 'components/common/BoardEditor/focalboard/src/widgets/icons/disclosureTri
 import 'components/common/BoardEditor/focalboard/src/widgets/icons/divider.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/icons/dot.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/icons/dropdown.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/duplicate.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/icons/edit.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/icons/emoji.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/icons/focalboard_logo.scss';

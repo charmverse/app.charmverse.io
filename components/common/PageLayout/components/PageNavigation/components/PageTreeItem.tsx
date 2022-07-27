@@ -255,9 +255,6 @@ const PageMenuItem = styled(MenuItem)`
   .MuiTypography-root {
     font-weight: 600;
   }
-  .MuiListItemIcon-root {
-    min-width: 30px;
-  }
 `;
 
 // eslint-disable-next-line react/function-component-definition

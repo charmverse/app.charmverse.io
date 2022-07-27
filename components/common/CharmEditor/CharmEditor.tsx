@@ -40,7 +40,7 @@ import LayoutRow from './components/columnLayout/Row';
 import { CryptoPrice, cryptoPriceSpec } from './components/CryptoPrice';
 import * as disclosure from './components/disclosure';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
-import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
+import * as floatingMenu from './components/floatingMenu';
 import * as iframe from './components/iframe';
 import InlineCommentThread, * as inlineComment from './components/inlineComment';
 import InlinePalette, { plugins as inlinePalettePlugins, spec as inlinePaletteSpecs } from './components/inlinePalette';
@@ -179,7 +179,7 @@ export function charmEditorPlugins (
     emoji.plugins({
       key: emojiPluginKey
     }),
-    floatingMenuPlugin({
+    floatingMenu.plugins({
       key: floatingMenuPluginKey,
       readOnly,
       enableComments
@@ -547,7 +547,7 @@ function CharmEditor (
         }
       }}
     >
-      <FloatingMenu enableComments={!disablePageSpecificFeatures} enableVoting={enableVoting} pluginKey={floatingMenuPluginKey} />
+      <floatingMenu.FloatingMenu enableComments={!disablePageSpecificFeatures} enableVoting={enableVoting} pluginKey={floatingMenuPluginKey} />
       <MentionSuggest pluginKey={mentionPluginKey} />
       <NestedPagesList pluginKey={nestedPagePluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />

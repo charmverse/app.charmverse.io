@@ -274,6 +274,14 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
           }
         }
       },
+      MuiListItemIcon: {
+        styleOverrides: {
+          root: {
+            fontSize: 'inherit',
+            minWidth: '30px'
+          }
+        }
+      },
       MuiInput: {
         defaultProps: {
           size: 'small'

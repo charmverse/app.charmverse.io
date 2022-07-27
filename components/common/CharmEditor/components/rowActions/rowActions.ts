@@ -18,7 +18,7 @@ export interface PluginState {
 
 export function plugins ({ key }: { key: PluginKey }) {
 
-  const tooltipDOM = createElement(['div', { class: 'row-handle', draggable: 'true' }]);
+  const tooltipDOM = createElement(['div', { class: 'row-handle' }]);
 
   function onMouseOver (view: EditorView, e: MouseEventInit) {
     // @ts-ignore
@@ -99,8 +99,8 @@ export function plugins ({ key }: { key: PluginKey }) {
   }
 
   function dragStart (view: EditorView, e: DragEvent) {
-    // console.log('e', e);
-    if (!e.dataTransfer) return;
+
+    if (!e.dataTransfer || !/charm-drag-handle/.test((e.target as HTMLElement)?.className)) return;
 
     const coords = { left: e.clientX + 50, top: e.clientY };
     const pos = blockPosAtCoords(view, coords);
