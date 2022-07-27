@@ -49,17 +49,6 @@ import { prisma } from '../db';
             })
           })
         ]);
-
-        return prisma.bounty.update({
-          where: {
-            id: bounty.id
-          },
-          data: {
-            title: page?.title || '',
-            description: page?.contentText,
-            descriptionNodes: page?.content as string
-          }
-        });
       }
       else {
         const pageData: Prisma.PageCreateInput = {
