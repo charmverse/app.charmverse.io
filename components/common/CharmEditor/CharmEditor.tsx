@@ -18,13 +18,13 @@ import { markdownSerializer } from '@bangle.dev/markdown';
 import { EditorView, Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import { Grow } from '@mui/material';
+import { Slide } from '@mui/material';
 import * as codeBlock from 'components/common/CharmEditor/components/@bangle.dev/base-components/code-block';
 import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import PageInlineVotesList from 'components/[pageId]/DocumentPage/components/VotesSidebar';
-import PageThreadsList from 'components/[pageId]/DocumentPage/components/PageThreadsList';
+import CommentsSidebar from 'components/[pageId]/DocumentPage/components/CommentsSidebar';
 import { CryptoCurrency, FiatCurrency } from 'connectors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
@@ -49,7 +49,6 @@ import * as inlineVote from './components/inlineVote';
 import InlineVoteList from './components/inlineVote/components/InlineVoteList';
 import Mention, { mentionPluginKeyName, mentionPlugins, mentionSpecs, MentionSuggest } from './components/mention';
 import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList, nestedPageSpec } from './components/nestedPage';
-import Paragraph from './components/Paragraph';
 import Placeholder from './components/Placeholder';
 import Quote, * as quote from './components/quote';
 import ResizableImage, { imageSpec } from './components/ResizableImage';
@@ -136,6 +135,7 @@ export function charmEditorPlugins (
       enableComments?: boolean
     } = {}
 ): () => RawPlugins[] {
+
   const basePlugins: RawPlugins[] = [
     new Plugin({
       view: () => ({
@@ -206,11 +206,6 @@ export function charmEditorPlugins (
       containerDOM: ['blockquote', { class: 'charm-quote' }],
       contentDOM: ['div']
     }),
-    NodeView.createPlugin({
-      name: 'paragraph',
-      containerDOM: ['p', { class: 'charm-paragraph' }],
-      contentDOM: ['span']
-    }),
     tabIndent.plugins(),
     table.tableEditing({ allowTableNodeSelection: true }),
     table.columnHandles(),
@@ -256,8 +251,6 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{disablePageSpecificFe
   /** DONT REMOVE THIS STYLING */
   /** ITS TO MAKE SURE THE USER CAN DRAG PAST THE ACTUAL CONTENT FROM RIGHT TO LEFT AND STILL SHOW THE FLOATING MENU */
   left: -50px;
-
-  min-width: 500px;
 
   /** DONT REMOVE THIS STYLING */
   div.ProseMirror.bangle-editor {
@@ -317,6 +310,11 @@ const PageActionListBox = styled.div`
   height: calc(100% - 80px);
   overflow: auto;
   margin-right: ${({ theme }) => theme.spacing(1)};
+  background: ${({ theme }) => theme.palette.background.default};
+  display: none;
+  ${({ theme }) => theme.breakpoints.up('md')} {
+    display: block;
+  }
 `;
 
 const defaultContent: PageContent = {
@@ -376,6 +374,7 @@ function CharmEditor (
   }:
   CharmEditorProps
 ) {
+
   const [currentSpace] = useCurrentSpace();
   // check empty state of page on first load
   const _isEmpty = checkForEmpty(content);
@@ -415,7 +414,7 @@ function CharmEditor (
     }
   });
 
-  const onResizeStop = useCallback((view: EditorView<any>) => {
+  const onResizeStop = useCallback((view: EditorView) => {
     if (onContentChangeDebounced) {
       // Save the current embed size on the backend after we are done resizing
       onContentChangeDebounced(view);
@@ -468,17 +467,6 @@ function CharmEditor (
       state={state}
       renderNodeViews={({ children: _children, ...props }) => {
         switch (props.node.type.name) {
-          case 'paragraph': {
-            return (
-              <Paragraph
-                inlineVotePluginKey={inlineVotePluginKey}
-                inlineCommentPluginKey={inlineCommentPluginKey}
-                calculateActions={!disablePageSpecificFeatures}
-                {...props}
-              >{_children}
-              </Paragraph>
-            );
-          }
           case 'quote':
             return <Quote {...props}>{_children}</Quote>;
           case 'columnLayout': {
@@ -569,7 +557,8 @@ function CharmEditor (
       {children}
       {!disablePageSpecificFeatures && (
       <>
-        <Grow
+        <Slide
+          direction='left'
           in={pageActionDisplay === 'comments'}
           style={{
             transformOrigin: 'left top'
@@ -583,10 +572,11 @@ function CharmEditor (
           <PageActionListBox
             id='page-thread-list-box'
           >
-            <PageThreadsList />
+            <CommentsSidebar />
           </PageActionListBox>
-        </Grow>
-        <Grow
+        </Slide>
+        <Slide
+          direction='left'
           in={pageActionDisplay === 'votes'}
           style={{
             transformOrigin: 'left top'
@@ -602,7 +592,7 @@ function CharmEditor (
           >
             <PageInlineVotesList />
           </PageActionListBox>
-        </Grow>
+        </Slide>
         <InlineCommentThread pluginKey={inlineCommentPluginKey} />
         {enableVoting && <InlineVoteList pluginKey={inlineVotePluginKey} />}
       </>

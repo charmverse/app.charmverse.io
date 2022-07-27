@@ -28,11 +28,16 @@ export interface ExtendedVote extends Vote {
     totalVotes: number
 }
 
-export type VoteTask = Vote & {
+export type VoteTask = ExtendedVote & {
   page: Page
   space: Space
 }
 
 export type UserVoteExtendedDTO = UserVote & {
   user: Pick<User, 'avatar' | 'username'>
+}
+
+export interface SpaceVotesRequest {
+  userId: string
+  spaceId: string
 }

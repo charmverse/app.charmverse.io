@@ -1,0 +1,117 @@
+{
+  "id": "f918bdc2-8439-4675-89ae-00805b9e15c7",
+  "deletedAt": null,
+  "createdAt": "2022-06-30T12:51:29.723Z",
+  "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+  "updatedAt": "2022-07-08T16:38:17.670Z",
+  "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+  "spaceId": "da74cab3-c2b6-40bb-8734-0de5375b0fce",
+  "parentId": "",
+  "rootId": "f918bdc2-8439-4675-89ae-00805b9e15c7",
+  "schema": 1,
+  "type": "board",
+  "title": "Bugs",
+  "fields": {
+    "icon": "🐜",
+    "isTemplate": false,
+    "description": "",
+    "headerImage": null,
+    "cardProperties": [
+      {
+        "id": "4baf4732-513b-4177-89bb-f5d8c88cb238",
+        "name": "Status",
+        "type": "select",
+        "options": [
+          {
+            "id": "6f06009e-3724-44c4-b9b0-d6541d33cfbf",
+            "color": "propColorTeal",
+            "value": "Completed"
+          },
+          {
+            "id": "3649740e-5ed6-4894-85d7-7088db491869",
+            "color": "propColorYellow",
+            "value": "In progress"
+          },
+          {
+            "id": "c01f4e69-68c2-45aa-9adb-51b7b2bc275d",
+            "color": "propColorRed",
+            "value": "Submitted"
+          },
+          {
+            "id": "911e290e-8966-4e43-bfee-6a14245066db",
+            "color": "propColorOrange",
+            "value": "Accepted"
+          },
+          {
+            "id": "143036b9-59db-4249-95d6-948bf46f1b9d",
+            "color": "propColorBlue",
+            "value": "Notified user"
+          }
+        ]
+      },
+      {
+        "id": "af0adc7a-4f3b-4f99-b529-8f9381cb464a",
+        "name": "System",
+        "type": "select",
+        "options": [
+          {
+            "id": "ce54a8e5-1797-43bc-a8f2-2b03f4a239d9",
+            "color": "propColorTeal",
+            "value": "Mobile"
+          },
+          {
+            "id": "10997e00-4042-4cd0-a169-2c8a3c77d828",
+            "color": "propColorYellow",
+            "value": "Front-end"
+          },
+          {
+            "id": "c60b78cf-a75c-4153-929f-f864e18951b9",
+            "color": "propColorTurquoise",
+            "value": "Website"
+          },
+          {
+            "id": "5c2836de-6630-482b-81a4-3d6ee0a2fe50",
+            "color": "propColorOrange",
+            "value": "Smart contract"
+          }
+        ]
+      },
+      {
+        "id": "263415dc-5b6a-452f-9f10-73ec396148a8",
+        "name": "Urgency",
+        "type": "select",
+        "options": [
+          {
+            "id": "cf9b12fb-3262-4c6a-a745-9f653a420077",
+            "color": "propColorRed",
+            "value": "ASAP"
+          },
+          {
+            "id": "079eeb89-6eec-4044-a4cb-db8aed527eaa",
+            "color": "propColorYellow",
+            "value": "Moderate"
+          },
+          {
+            "id": "7a12507b-9fb2-4426-ab82-1650ffd5418c",
+            "color": "propColorTeal",
+            "value": "Nice-to-have"
+          }
+        ]
+      },
+      {
+        "id": "3970626b-bf84-48b3-871e-c6250203e21f",
+        "name": "Reported by",
+        "type": "person",
+        "options": []
+      },
+      {
+        "id": "4c0b4233-4723-4c90-b314-f90fceb1220d",
+        "name": "Assigned to",
+        "type": "person",
+        "options": []
+      }
+    ],
+    "showDescription": false,
+    "columnCalculations": []
+  }
+}

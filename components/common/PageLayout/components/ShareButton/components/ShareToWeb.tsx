@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Collapse from '@mui/material/Collapse';
@@ -10,8 +11,7 @@ import charmClient from 'charmClient';
 import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
-import { IPageWithPermissions } from 'lib/pages';
-import { IPagePermissionWithSource, IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
+import { IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -55,6 +55,8 @@ export default function ShareToWeb ({ pageId, pagePermissions }: Props) {
 
   const currentPagePermissions = getPagePermissions(pageId);
 
+  const currentPage = pages[pageId];
+
   // Current values of the public permission
   const [shareLink, setShareLink] = useState<null | string>(null);
 
@@ -83,7 +85,6 @@ export default function ShareToWeb ({ pageId, pagePermissions }: Props) {
   }
 
   async function updateShareLink () {
-    const currentPage = pages[pageId];
     if (!publicPermission) {
       setShareLink(null);
     }
@@ -125,6 +126,14 @@ export default function ShareToWeb ({ pageId, pagePermissions }: Props) {
           onChange={togglePublic}
         />
       </Box>
+      {
+        currentPage?.type === 'board' && (
+          <Alert severity='info'>
+            Updates to this board's permissions, including whether it is public, will also apply to its cards.
+          </Alert>
+        )
+      }
+
       <Collapse in={!!publicPermission}>
         {
           shareLink && (

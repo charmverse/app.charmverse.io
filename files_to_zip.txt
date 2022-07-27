@@ -4,8 +4,10 @@ Dockerrun.aws.json
 .env
 .env.staging
 .next
+next.base.js
 next.config.js
 node_modules
 package.json
 public
 prisma
+seedData

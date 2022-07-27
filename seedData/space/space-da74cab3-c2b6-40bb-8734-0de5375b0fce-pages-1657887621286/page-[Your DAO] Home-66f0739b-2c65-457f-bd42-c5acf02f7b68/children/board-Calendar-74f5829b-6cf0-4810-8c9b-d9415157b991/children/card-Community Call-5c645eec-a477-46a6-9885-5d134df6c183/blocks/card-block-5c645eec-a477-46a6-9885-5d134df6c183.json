@@ -1,0 +1,24 @@
+{
+  "id": "5c645eec-a477-46a6-9885-5d134df6c183",
+  "deletedAt": null,
+  "createdAt": "2022-07-08T16:39:38.185Z",
+  "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+  "updatedAt": "2022-07-08T16:39:52.684Z",
+  "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+  "spaceId": "da74cab3-c2b6-40bb-8734-0de5375b0fce",
+  "parentId": "74f5829b-6cf0-4810-8c9b-d9415157b991",
+  "rootId": "74f5829b-6cf0-4810-8c9b-d9415157b991",
+  "schema": 1,
+  "type": "card",
+  "title": "Community Call copy",
+  "fields": {
+    "icon": "",
+    "isTemplate": false,
+    "properties": {
+      "e32ee08c-f8ba-4bae-b824-fc17deaf7c44": "2:00 PM EST",
+      "ebf1aa9b-886c-41cc-81d1-1454e0780234": "{\"from\":1657886400000}"
+    },
+    "headerImage": null,
+    "contentOrder": []
+  }
+}

@@ -1,4 +1,4 @@
-import { ApplicationStatus, Block, Bounty, BountyStatus, Page, Prisma, Space, SpaceApiToken, Thread, Transaction, Comment, Role, RoleSource } from '@prisma/client';
+import { ApplicationStatus, Block, Bounty, BountyStatus, Page, Prisma, Space, SpaceApiToken, Thread, Transaction, Comment, Role, RoleSource, Vote, VoteOptions, UserVote } from '@prisma/client';
 import { prisma } from 'db';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import { IPageWithPermissions } from 'lib/pages';
@@ -174,6 +174,8 @@ export async function generateBountyWithSingleApplication ({ applicationStatus, 
     }
   }) as BountyWithDetails;
 
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+
   const createdApp = await prisma.application.create({
     data: {
       spaceId,
@@ -187,6 +189,7 @@ export async function generateBountyWithSingleApplication ({ applicationStatus, 
           id: createdBounty.id
         }
       },
+      walletAddress: user?.addresses?.[0],
       message: 'I can do this!',
       // Other important variable
       status: applicationStatus
@@ -248,6 +251,52 @@ export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'cre
           sourcePermission: true
         }
       }
+    }
+  });
+}
+
+export async function createVote ({ userVotes = [], voteOptions = [], spaceId, createdBy, pageId, deadline = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), status = 'InProgress', title = 'Vote Title', description = null }: Partial<Vote> & Pick<Vote, 'spaceId' | 'createdBy' | 'pageId'> & {voteOptions?: string[], userVotes?: string[]}) {
+  return prisma.vote.create({
+    data: {
+      deadline,
+      status,
+      threshold: 50,
+      title,
+      author: {
+        connect: {
+          id: createdBy
+        }
+      },
+      page: {
+        connect: {
+          id: pageId
+        }
+      },
+      space: {
+        connect: {
+          id: spaceId
+        }
+      },
+      voteOptions: {
+        createMany: {
+          data: voteOptions.map(voteOption => ({
+            name: voteOption
+          }))
+        }
+      },
+      userVotes: {
+        createMany: {
+          data: userVotes.map(userVote => ({
+            choice: userVote,
+            userId: createdBy
+          }))
+        }
+      },
+      type: 'Approval',
+      description
+    },
+    include: {
+      voteOptions: true
     }
   });
 }

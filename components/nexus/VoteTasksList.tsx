@@ -1,10 +1,15 @@
 import HowToVote from '@mui/icons-material/HowToVote';
 import { Alert, Box, Card, Grid, Typography } from '@mui/material';
+import charmClient from 'charmClient';
 import Button from 'components/common/Button';
+import VoteDetail, { VoteDetailProps } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
+import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
+import Modal from 'components/common/Modal';
 import { VoteTask } from 'lib/votes/interfaces';
 import { DateTime } from 'luxon';
 import { GetTasksResponse } from 'pages/api/tasks/list';
+import { useState } from 'react';
 import { KeyedMutator } from 'swr';
 
 interface VoteTasksListProps {
@@ -14,15 +19,50 @@ interface VoteTasksListProps {
 }
 
 export function VoteTasksListRow (
-  {
+  props: {voteTask: VoteTask, mutateTasks: KeyedMutator<GetTasksResponse>}
+) {
+  const {
+    voteTask,
+    mutateTasks
+  } = props;
+
+  const {
     page: { path: pagePath, title: pageTitle },
     space: { domain: spaceDomain, name: spaceName },
-    deadline, title: voteTitle, id: voteId
-  }: VoteTask
-) {
+    deadline, title: voteTitle, id
+  } = voteTask;
 
-  const voteLink = `/${spaceDomain}/${pagePath}?voteId=${voteId}`;
+  const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
+
+  const voteLink = `/${spaceDomain}/${pagePath}?voteId=${id}`;
   const voteLocation = `${pageTitle || 'Untitled'} in ${spaceName}`;
+
+  function removeVoteFromTask (voteId: string) {
+    mutateTasks((tasks) => {
+      return tasks ? {
+        ...tasks,
+        votes: tasks.votes.filter(vote => vote.id !== voteId)
+      } : undefined;
+    }, {
+      revalidate: false
+    });
+  }
+
+  const castVote: VoteDetailProps['castVote'] = async (voteId, choice) => {
+    const userVote = await charmClient.castVote(voteId, choice);
+    removeVoteFromTask(voteId);
+    return userVote;
+  };
+
+  const deleteVote: VoteDetailProps['deleteVote'] = async (voteId) => {
+    await charmClient.deleteVote(voteId);
+    removeVoteFromTask(voteId);
+  };
+
+  const cancelVote: VoteDetailProps['cancelVote'] = async (voteId) => {
+    await charmClient.cancelVote(voteId);
+    removeVoteFromTask(voteId);
+  };
 
   return (
     <Box>
@@ -55,7 +95,9 @@ export function VoteTasksListRow (
               fontSize: { xs: 14, sm: 'inherit' }
             }}
           >
-            {voteLocation}
+            <Link href={voteLink}>
+              {voteLocation}
+            </Link>
           </Grid>
           <Grid
             item
@@ -74,15 +116,35 @@ export function VoteTasksListRow (
             sm={2}
             md={1}
           >
-            <Button href={voteLink}>Vote now</Button>
+            <Button onClick={() => {
+              setIsVoteModalOpen(true);
+            }}
+            >Vote now
+            </Button>
           </Grid>
         </Grid>
       </Card>
+      <Modal
+        title='Vote details'
+        size='large'
+        open={isVoteModalOpen}
+        onClose={() => {
+          setIsVoteModalOpen(false);
+        }}
+      >
+        <VoteDetail
+          vote={voteTask}
+          detailed
+          castVote={castVote}
+          deleteVote={deleteVote}
+          cancelVote={cancelVote}
+        />
+      </Modal>
     </Box>
   );
 }
 
-export function VoteTasksList ({ error, tasks }: VoteTasksListProps) {
+export function VoteTasksList ({ error, tasks, mutateTasks }: VoteTasksListProps) {
 
   if (error) {
     return (
@@ -112,7 +174,7 @@ export function VoteTasksList ({ error, tasks }: VoteTasksListProps) {
 
   return (
     <>
-      {tasks.votes.map(vote => <VoteTasksListRow key={vote.id} {...vote} />)}
+      {tasks.votes.map(vote => <VoteTasksListRow mutateTasks={mutateTasks} key={vote.id} voteTask={vote} />)}
     </>
   );
 }

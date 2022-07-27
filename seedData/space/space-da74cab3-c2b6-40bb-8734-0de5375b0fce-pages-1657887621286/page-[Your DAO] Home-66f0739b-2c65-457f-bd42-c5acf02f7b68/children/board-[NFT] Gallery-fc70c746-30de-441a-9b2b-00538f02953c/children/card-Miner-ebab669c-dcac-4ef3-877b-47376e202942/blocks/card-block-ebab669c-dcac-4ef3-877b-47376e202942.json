@@ -1,0 +1,26 @@
+{
+  "id": "ebab669c-dcac-4ef3-877b-47376e202942",
+  "deletedAt": null,
+  "createdAt": "2022-05-23T16:38:19.596Z",
+  "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+  "updatedAt": "2022-05-23T17:00:40.531Z",
+  "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+  "spaceId": "da74cab3-c2b6-40bb-8734-0de5375b0fce",
+  "parentId": "fc70c746-30de-441a-9b2b-00538f02953c",
+  "rootId": "fc70c746-30de-441a-9b2b-00538f02953c",
+  "schema": 1,
+  "type": "card",
+  "title": "Card 1",
+  "fields": {
+    "icon": "",
+    "isTemplate": false,
+    "properties": {
+      "29c17abf-5d6a-4cfc-a626-f3dc7d8e932c": "24a45402-c2dc-422e-943f-59c65f59e0f8",
+      "30b13c59-9040-4b26-8b01-a11781ae67d3": "https://opensea.io/assets/...",
+      "5668d579-d491-4ed9-95c9-86a2f8068914": "Polygon",
+      "f09f5e1e-5376-4efc-b888-4043e9d2ac50": "[0x555blahblah...]"
+    },
+    "headerImage": null,
+    "contentOrder": []
+  }
+}

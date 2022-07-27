@@ -14,6 +14,9 @@ type Card = Block & {
     fields: CardFields
 }
 
+/**
+ * Returns a focalboard-ready card data stub
+ */
 function createCard(block?: Partial<Block>): Card {
     const contentOrder: Array<string|string[]> = []
     const contentIds = block?.fields?.contentOrder?.filter((id: any) => id !== null)

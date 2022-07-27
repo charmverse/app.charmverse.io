@@ -1,4 +1,4 @@
-import { Page, Prisma } from '@prisma/client';
+import { Page } from '@prisma/client';
 import charmClient from 'charmClient';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -57,7 +57,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
 
   }, [pageId, pagesLoaded, space, user]);
 
-  const debouncedPageUpdate = debouncePromise(async (updates: Prisma.PageUpdateInput) => {
+  const debouncedPageUpdate = debouncePromise(async (updates: Partial<Page>) => {
     setIsEditing(true);
     const updatedPage = await charmClient.updatePage(updates);
     setPages((_pages) => ({
@@ -74,7 +74,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
     if (updates.hasOwnProperty('title')) {
       setTitleState(updates.title || 'Untitled');
     }
-    debouncedPageUpdate({ id: pageId, ...updates } as Prisma.PageUpdateInput)
+    debouncedPageUpdate({ id: pageId, ...updates } as Partial<Page>)
       .catch((err: any) => {
         log.error('Error saving page', err);
       })

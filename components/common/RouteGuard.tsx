@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { useWeb3React } from '@web3-react/core';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { User } from '@prisma/client';
+import { getKey } from 'hooks/useLocalStorage';
 import { useUser } from 'hooks/useUser';
 import { useSpaces } from 'hooks/useSpaces';
 import { isSpaceDomain } from 'lib/spaces';
@@ -25,6 +26,23 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   const isRouterLoading = !router.isReady;
   const isLoading = !isUserRequestComplete || isWalletLoading || isRouterLoading || !isSpacesLoaded;
 
+  if (typeof window !== 'undefined') {
+    const pathSegments: string[] = router.asPath.split('?')[0].split('/').filter(segment => !!segment);
+    const firstSegment: string = pathSegments[0];
+    const isDomain: boolean = !!isSpaceDomain(firstSegment) || firstSegment === 'nexus';
+    const workspaceDomain = isDomain ? firstSegment : null;
+    const defaultPageKey: string = workspaceDomain ? getKey(`last-page-${workspaceDomain}`) : '';
+    const defaultWorkspaceKey: string = getKey('last-workspace');
+
+    if (workspaceDomain) {
+      localStorage.setItem(defaultWorkspaceKey, router.asPath);
+    }
+
+    if (workspaceDomain && pathSegments.length > 1) {
+      localStorage.setItem(defaultPageKey, router.asPath);
+    }
+  }
+
   useEffect(() => {
     // wait to listen to events until data is loaded
     if (isLoading) {
@@ -32,7 +50,6 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     }
 
     async function authCheckAndRedirect (path: string) {
-
       const result = await authCheck(path);
 
       setAuthorized(result.authorized);
@@ -67,7 +84,6 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
 
   // authCheck runs before each page load and redirects to login if user is not logged in
   async function authCheck (url: string): Promise<{ authorized: boolean, redirect?: UrlObject, user?: User }> {
-
     const path = url.split('?')[0];
 
     const firstPathSegment = path.split('/').filter(pathElem => {

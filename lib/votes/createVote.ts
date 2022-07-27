@@ -1,37 +1,10 @@
 
 import { prisma } from 'db';
-import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
-import { computeSpacePermissions } from 'lib/permissions/spaces';
-import { DEFAULT_THRESHOLD, ExtendedVote, VoteDTO, VOTE_STATUS } from './interfaces';
 import { aggregateVoteResult } from './aggregateVoteResult';
+import { DEFAULT_THRESHOLD, ExtendedVote, VoteDTO, VOTE_STATUS } from './interfaces';
 
-export async function createVote (vote: VoteDTO): Promise<ExtendedVote> {
-
-  const { createdBy, pageId, title, threshold, description, deadline, type, voteOptions } = vote;
-
-  const existingPage = await prisma.page.findUnique({
-    where: {
-      id: pageId
-    },
-    select: {
-      id: true,
-      spaceId: true
-    }
-  });
-
-  if (!existingPage) {
-    throw new DataNotFoundError(`Cannot create poll as linked page with id ${pageId} was not found.`);
-  }
-
-  const userPermissions = await computeSpacePermissions({
-    allowAdminBypass: true,
-    resourceId: existingPage.spaceId,
-    userId: createdBy
-  });
-  if (!userPermissions.createVote) {
-    throw new UnauthorisedActionError('You do not have permissions to create a vote.');
-  }
-
+export async function createVote (vote: VoteDTO & {spaceId: string}): Promise<ExtendedVote> {
+  const { spaceId, createdBy, pageId, title, threshold, description, deadline, type, voteOptions } = vote;
   const dbVote = await prisma.vote.create({
     data: {
       description,
@@ -47,7 +20,7 @@ export async function createVote (vote: VoteDTO): Promise<ExtendedVote> {
       },
       space: {
         connect: {
-          id: existingPage.spaceId
+          id: spaceId
         }
       },
       author: {

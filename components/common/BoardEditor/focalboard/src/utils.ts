@@ -450,22 +450,14 @@ class Utils {
     // Clipboard
 
     static copyTextToClipboard(text: string): boolean {
-        const textField = document.createElement('textarea')
-        textField.innerText = text
-        textField.style.position = 'fixed'
-        textField.style.opacity = '0'
-
-        document.body.appendChild(textField)
-        textField.select()
-
         let result = false
         try {
-            result = document.execCommand('copy')
+            navigator.clipboard.writeText(text);
+            result = true;
         } catch (err) {
             Utils.logError(`copyTextToClipboard ERROR: ${err}`)
             result = false
         }
-        textField.remove()
 
         return result
     }

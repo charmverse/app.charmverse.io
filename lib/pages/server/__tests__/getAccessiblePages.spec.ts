@@ -1,10 +1,9 @@
 import { IPagePermissionWithSource, setupPermissionsAfterPagePermissionAdded, upsertPermission } from 'lib/permissions/pages';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { } from '..';
 import { IPageWithPermissions } from '../../interfaces';
 import { getAccessiblePages } from '../getAccessiblePages';
 
-describe('getAccessiblePage', () => {
+describe('getAccessiblePages', () => {
 
   it('Should return all pages if user is admin', async () => {
 

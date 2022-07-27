@@ -12,7 +12,7 @@ import { useVotes } from 'hooks/useVotes';
 import { Page, PageContent } from 'models';
 import { useRouter } from 'next/router';
 import { memo, useCallback } from 'react';
-import PageInlineVote from 'components/common/CharmEditor/components/inlineVote/components/PageInlineVote';
+import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import CharmEditor, { ICharmEditorOutput } from '../../common/CharmEditor/CharmEditor';
 import PageBanner from './components/PageBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
@@ -27,18 +27,18 @@ export const Container = styled(Box)<{ top: number, fullWidth?: boolean }>`
   top: ${({ top }) => top}px;
   padding-bottom: ${({ theme }) => theme.spacing(5)};
 
-  padding: 0 40px;
-  @media (min-width: 975px) {
+  padding: 0 24px;
+  ${({ theme }) => theme.breakpoints.up('md')} {
     padding: 0 80px;
   }
 `;
 
 export interface IEditorProps {
-  page: Page, setPage: (p: Partial<Page>) => void, readOnly?: boolean }
+  page: Page, setPage: (p: Partial<Page>) => void, readOnly?: boolean, insideModal?: boolean }
 
-function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
+function DocumentPage ({ page, setPage, insideModal, readOnly = false }: IEditorProps) {
   const { pages } = usePages();
-  const { votes, isLoading } = useVotes();
+  const { cancelVote, castVote, deleteVote, votes, isLoading } = useVotes();
 
   const pageVote = Object.values(votes)[0];
 
@@ -80,20 +80,32 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
 
   const comments = useAppSelector(getCardComments(card?.id));
 
-  const showingPageActionList = currentPageActionDisplay !== null;
+  const showPageActionSidebar = (currentPageActionDisplay !== null) && !insideModal;
   const router = useRouter();
   const isSharedPage = router.pathname.startsWith('/share');
 
   return (
-    <ScrollableWindow hideScroll={showingPageActionList}>
-      <div style={{
-        width: showingPageActionList ? 'calc(100% - 425px)' : '100%',
-        height: showingPageActionList ? 'calc(100vh - 65px)' : '100%',
-        overflow: showingPageActionList ? 'auto' : 'inherit'
+    <ScrollableWindow
+      sx={{
+        overflow: {
+          md: showPageActionSidebar ? 'hidden' : 'auto'
+        }
+      }}
+    >
+      <Box sx={{
+        width: {
+          md: showPageActionSidebar ? 'calc(100% - 425px)' : '100%'
+        },
+        height: {
+          md: showPageActionSidebar ? 'calc(100vh - 65px)' : '100%'
+        },
+        overflow: {
+          md: showPageActionSidebar ? 'auto' : 'inherit'
+        }
       }}
       >
         {page.deletedAt && <PageDeleteBanner pageId={page.id} />}
-        {page.headerImage && <PageBanner headerImage={page.headerImage} setPage={setPage} />}
+        {page.headerImage && <PageBanner headerImage={page.headerImage} readOnly={readOnly} setPage={setPage} />}
         <Container
           top={pageTop}
           fullWidth={page.fullWidth ?? false}
@@ -103,7 +115,7 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
             content={page.content as PageContent}
             onContentChange={updatePageContent}
             readOnly={readOnly}
-            pageActionDisplay={currentPageActionDisplay}
+            pageActionDisplay={!insideModal ? currentPageActionDisplay : null}
             pageId={page.id}
             disablePageSpecificFeatures={isSharedPage}
             enableVoting={page.type !== 'proposal'}
@@ -117,39 +129,48 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
             />
             {page.type === 'proposal' && !isLoading && pageVote && (
               <Box my={2}>
-                <PageInlineVote inlineVote={pageVote} detailed={false} isProposal={true} />
+                <VoteDetail
+                  cancelVote={cancelVote}
+                  deleteVote={deleteVote}
+                  castVote={castVote}
+                  vote={pageVote}
+                  detailed={false}
+                  isProposal={true}
+                />
               </Box>
             )}
             {card && board && (
-              <div className='CardDetail content'>
-                {/* Property list */}
-                <Box sx={{
-                  display: 'flex',
-                  gap: 1,
-                  justifyContent: 'space-between',
-                  width: '100%'
-                }}
-                >
-                  <CardDetailProperties
-                    board={board}
-                    card={card}
-                    cards={cards}
-                    activeView={activeView}
-                    views={boardViews}
-                    readonly={readOnly}
-                    pageUpdatedAt={page.updatedAt.toString()}
-                    pageUpdatedBy={page.updatedBy}
-                  />
-                  <BountyIntegration linkedTaskId={card.id} title={page.title} readonly={readOnly} />
-                </Box>
+              <div className='focalboard-body'>
+                <div className='CardDetail content'>
+                  {/* Property list */}
+                  <Box sx={{
+                    display: 'flex',
+                    gap: 1,
+                    justifyContent: 'space-between',
+                    width: '100%'
+                  }}
+                  >
+                    <CardDetailProperties
+                      board={board}
+                      card={card}
+                      cards={cards}
+                      activeView={activeView}
+                      views={boardViews}
+                      readonly={readOnly}
+                      pageUpdatedAt={page.updatedAt.toString()}
+                      pageUpdatedBy={page.updatedBy}
+                    />
+                    <BountyIntegration linkedTaskId={card.id} title={page.title} readonly={readOnly} />
+                  </Box>
 
-                <hr />
-                <CommentsList
-                  comments={comments}
-                  rootId={card.rootId}
-                  cardId={card.id}
-                  readonly={readOnly}
-                />
+                  <hr />
+                  <CommentsList
+                    comments={comments}
+                    rootId={card.rootId}
+                    cardId={card.id}
+                    readonly={readOnly}
+                  />
+                </div>
               </div>
             )}
           </CharmEditor>
@@ -157,9 +178,9 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
             <CreateVoteBox />
           )}
         </Container>
-      </div>
+      </Box>
     </ScrollableWindow>
   );
 }
 
-export default memo(Editor);
+export default memo(DocumentPage);
