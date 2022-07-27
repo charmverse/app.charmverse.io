@@ -26,41 +26,26 @@ export function plugins ({ key }: { key: PluginKey }) {
     const clientX = e.clientX!;
     const left = (clientX - containerXOffset) < 50 ? clientX + 50 : clientX;
 
-    const ob = view.posAtCoords({ left, top: e.clientY! });
+    const startPos = posAtCoords(view, { left, top: e.clientY! });
 
-    if (ob) {
-      // Note '.inside' refers to the position of the parent node, it is -1 if the position is at the root
-      const startPos = ob.inside > 0 ? ob.inside : ob.pos;
+    if (startPos) {
 
       // Step 1. grab the top-most ancestor of the related DOM element
-      const dom = view.domAtPos(startPos);
-      let hoveredElement = dom.node;
-      // Note: for leaf nodes, domAtPos() only returns the parent with an offset. text nodes have an offset but don't have childNodes
-      // ref: https://github.com/atlassian/prosemirror-utils/issues/8
-      if (dom.offset && dom.node.childNodes[dom.offset]) {
-        hoveredElement = dom.node.childNodes[dom.offset];
-      }
-      let levels = 10; // pre-caution to prevent infinite loop
-      while (hoveredElement && hoveredElement.parentNode !== view.dom && levels > 0) {
-        levels -= 1;
-        if (hoveredElement.parentNode && view.dom.contains(hoveredElement.parentNode)) {
-          hoveredElement = hoveredElement.parentNode;
-        }
-      }
-
-      // console.log('hoveredElement', hoveredElement, 'from dom', dom);
+      const dom = rowNodeAtPos(view, startPos);
+      const rowNode = dom.rowNode;
 
       // @ts-ignore pm types are wrong
-      if (hoveredElement && view.dom.contains(hoveredElement.parentNode) && hoveredElement.getBoundingClientRect) {
+      if (rowNode && view.dom.contains(rowNode.parentNode) && rowNode.getBoundingClientRect) {
         // @ts-ignore pm types are wrong
-        const box = hoveredElement.getBoundingClientRect();
+        const box = rowNode.getBoundingClientRect();
         const viewBox = view.dom.getBoundingClientRect();
+        // align to the top of the row
         const top = box.top - viewBox.top;
         tooltipDOM.style.top = `${top}px`;
 
         const newState = {
           rowPos: startPos,
-          rowDOM: hoveredElement,
+          rowDOM: dom.rowNode,
           rowNodeOffset: dom.offset && dom.node.childNodes[dom.offset] ? dom.offset : 0
         };
         view.dispatch(view.state.tr.setMeta(key, newState));
@@ -71,39 +56,6 @@ export function plugins ({ key }: { key: PluginKey }) {
   const throttled = throttle(onMouseOver, 100);
 
   const brokenClipboardAPI = false;
-
-  function blockPosAtCoords (view: EditorView, coords: { left: number, top: number }) {
-    const pos = view.posAtCoords(coords);
-    if (!pos) {
-      return;
-    }
-    // Note '.inside' refers to the position of the parent node, it is -1 if the position is at the root
-    const startPos = pos.inside > 0 ? pos.inside : pos.pos;
-    const dom = view.domAtPos(startPos);
-    let node = dom.node;
-    // Note: for leaf nodes, domAtPos() only returns the parent with an offset. text nodes have an offset but don't have childNodes
-    // ref: https://github.com/atlassian/prosemirror-utils/issues/8
-    if (dom.offset && dom.node.childNodes[dom.offset]) {
-      node = dom.node.childNodes[dom.offset];
-    }
-    while (node && node.parentNode) {
-      if ((node.parentNode as Element).classList?.contains('ProseMirror')) { // todo
-        break;
-      }
-      node = node.parentNode;
-    }
-
-    // nodeType === 1 is an element like <p> or <div>
-    if (node && node.nodeType === 1) {
-      // @ts-ignore
-      const docView = view.docView;
-      const desc = docView.nearestDesc(node, true);
-      if (!(!desc || desc === docView)) {
-        return desc.posBefore;
-      }
-    }
-    return null;
-  }
 
   function dragStart (view: EditorView, e: DragEvent) {
 
@@ -174,4 +126,65 @@ export function plugins ({ key }: { key: PluginKey }) {
       }
     })
   ];
+}
+
+function posAtCoords (view: EditorView, coords: { left: number, top: number }) {
+  const pos = view.posAtCoords(coords);
+  if (!pos) {
+    return null;
+  }
+  // Note '.inside' refers to the position of the parent node, it is -1 if the position is at the root
+  const startPos = pos.inside > 0 ? pos.inside : pos.pos;
+  return startPos;
+}
+
+function rowNodeAtPos (view: EditorView, startPos: number) {
+
+  const dom = view.domAtPos(startPos);
+  let rowNode = dom.node;
+  // Note: for leaf nodes, domAtPos() only returns the parent with an offset. text nodes have an offset but don't have childNodes
+  // ref: https://github.com/atlassian/prosemirror-utils/issues/8
+  if (dom.offset && dom.node.childNodes[dom.offset]) {
+    rowNode = dom.node.childNodes[dom.offset];
+  }
+  let levels = 10; // pre-caution to prevent infinite loop
+  while (rowNode && rowNode.parentNode !== view.dom && levels > 0) {
+    levels -= 1;
+    if (rowNode.parentNode && view.dom.contains(rowNode.parentNode)) {
+      rowNode = rowNode.parentNode;
+    }
+  }
+  // another approach, which may require checking the nodeType:
+  // while (node && node.parentNode) {
+  //   if ((node.parentNode as Element).classList?.contains('ProseMirror')) { // todo
+  //     break;
+  //   }
+  //   node = node.parentNode;
+  // }
+  return {
+    ...dom,
+    rowNode
+  };
+}
+
+function blockPosAtCoords (view: EditorView, coords: { left: number, top: number }) {
+
+  const startPos = posAtCoords(view, coords);
+  if (!startPos) {
+    return;
+  }
+  const dom = rowNodeAtPos(view, startPos);
+
+  const node = dom.rowNode;
+
+  // nodeType === 1 is an element like <p> or <div>
+  if (node && node.nodeType === 1) {
+    // @ts-ignore
+    const docView = view.docView;
+    const desc = docView.nearestDesc(node, true);
+    if (!(!desc || desc === docView)) {
+      return desc.posBefore;
+    }
+  }
+  return null;
 }
