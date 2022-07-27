@@ -1,6 +1,7 @@
 import { ApplicationStatus, BountyStatus } from '@prisma/client';
 import { prisma } from 'db';
 import { submissionsCapReached } from 'lib/applications/shared';
+import { includePagePermissions } from 'lib/pages/server';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { BountyWithDetails } from 'models';
 import { countValueOccurrences } from '../utilities/numbers';
@@ -27,9 +28,12 @@ export async function rollupBountyStatus (bountyId: string): Promise<BountyWithD
         status: newStatus
       },
       include: {
-        applications: true
+        applications: true,
+        page: {
+          include: includePagePermissions()
+        }
       }
-    });
+    }) as Promise<BountyWithDetails>;
   }
 
   const capReached = submissionsCapReached({

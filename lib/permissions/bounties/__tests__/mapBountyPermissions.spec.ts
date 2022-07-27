@@ -7,7 +7,7 @@ describe('mapBountyPermissions', () => {
   it('should map assigned permissions to the correct key', () => {
     const permissionSet: Partial<BountyPermission>[] = [
       {
-        permissionLevel: 'viewer',
+        permissionLevel: 'reviewer',
         public: true
       },
       {
@@ -22,17 +22,15 @@ describe('mapBountyPermissions', () => {
 
     const mapped = mapBountyPermissions(permissionSet as any);
 
-    expect(mapped.viewer.length).toBe(1);
+    expect(mapped.reviewer.length).toBe(1);
     expect(mapped.submitter.length).toBe(2);
     expect(mapped.creator.length).toBe(0);
-    expect(mapped.reviewer.length).toBe(0);
-
   });
 
   it('should ingore badly shaped permissions', () => {
     const permissionSet: Partial<BountyPermission>[] = [
       {
-        permissionLevel: 'viewer',
+        permissionLevel: 'reviewer',
         public: true
       },
       {
@@ -46,18 +44,13 @@ describe('mapBountyPermissions', () => {
       // Wrong level
       {
         permissionLevel: 'random' as any
-      },
-      // No assignee
-      {
-        permissionLevel: 'viewer'
       }
     ];
 
     const mapped = mapBountyPermissions(permissionSet as any);
 
-    expect(mapped.viewer.length).toBe(1);
     expect(mapped.submitter.length).toBe(2);
     expect(mapped.creator.length).toBe(0);
-    expect(mapped.reviewer.length).toBe(0);
+    expect(mapped.reviewer.length).toBe(1);
   });
 });

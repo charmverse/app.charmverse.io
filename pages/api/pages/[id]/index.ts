@@ -1,14 +1,14 @@
 
-import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { computeUserPagePermissions, setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages';
-import { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-import { withSessionRoute } from 'lib/session/withSession';
 import { Page } from '@prisma/client';
 import { prisma } from 'db';
-import { modifyChildPages } from 'lib/pages/modifyChildPages';
+import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { IPageWithPermissions, ModifyChildPagesResponse } from 'lib/pages';
+import { modifyChildPages } from 'lib/pages/modifyChildPages';
 import { getPage } from 'lib/pages/server/getPage';
+import { computeUserPagePermissions, setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages';
+import { withSessionRoute } from 'lib/session/withSession';
+import { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -62,6 +62,13 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
   else if (permissions.edit_content !== true && permissions.comment !== true) {
     throw new ActionNotPermittedError('You do not have permission to update this page');
   }
+
+  const page = await getPage(pageId);
+
+  if (!page) {
+    throw new NotFoundError();
+  }
+
   const pageWithPermission = await prisma.page.update({
     where: {
       id: pageId

@@ -10,15 +10,14 @@ interface Props {
 }
 
 export default function BountyDescription ({ bounty, permissions }: Props) {
-
   const CharmEditorMemoized = useMemo(() => {
     // Only show the editor if the description exist
     // Otherwise it shows the `Type / for commands` placeholder
-    return bounty && bounty.description ? (
+    return bounty && bounty.page?.contentText ? (
       <CharmEditor
         readOnly
-        key={bounty.description}
-        content={bounty.descriptionNodes as PageContent}
+        key={bounty.page?.contentText}
+        content={bounty.page?.content as PageContent}
       />
     ) : null;
   }, [bounty]);
