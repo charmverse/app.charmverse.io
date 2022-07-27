@@ -10,7 +10,7 @@ import getBaseLayout from 'components/common/BaseLayout/BaseLayout';
 import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { DialogTitle } from 'components/common/Modal';
-import TokenGateForm from 'components/common/TokenGate/TokenGateForm';
+import TokenGateForm from 'components/common/TokenGateForm';
 import { useSpaces } from 'hooks/useSpaces';
 import { PublicSpaceInfo } from 'lib/spaces/interfaces';
 import { isTruthy } from 'lib/utilities/types';

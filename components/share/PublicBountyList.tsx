@@ -7,7 +7,7 @@ import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';
 import PrimaryButton from 'components/common/PrimaryButton';
-import TokenGateForm from 'components/common/TokenGate/TokenGateForm';
+import TokenGateForm from 'components/common/TokenGateForm';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { useContributors } from 'hooks/useContributors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';

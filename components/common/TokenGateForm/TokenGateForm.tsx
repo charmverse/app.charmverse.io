@@ -24,7 +24,7 @@ interface Props {
   spaceDomain: string
 }
 
-export default function JoinSpacePage ({ onSubmit: _onSubmit, spaceDomain }: Props) {
+export default function TokenGateForm ({ onSubmit: _onSubmit, spaceDomain }: Props) {
 
   const { account, chainId } = useWeb3React();
   const { showMessage } = useSnackbar();
