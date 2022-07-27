@@ -9,7 +9,6 @@ import {
   link,
   listItem,
   orderedList,
-  paragraph,
   strike,
   underline
 } from '@bangle.dev/base-components';
@@ -57,6 +56,7 @@ import RowActionsMenu, * as rowActions from './components/rowActions';
 import * as tabIndent from './components/tabIndent';
 import * as table from './components/table';
 import * as trailingNode from './components/trailingNode';
+import paragraph from './components/paragraph';
 import DevTools from './DevTools';
 import { checkForEmpty } from './utils';
 
@@ -187,11 +187,11 @@ export function charmEditorPlugins (
     callout.plugins(),
     NodeView.createPlugin({
       name: 'image',
-      containerDOM: ['div', { draggable: 'false' }]
+      containerDOM: ['div', { draggable: 'true' }]
     }),
     NodeView.createPlugin({
       name: 'pdf',
-      containerDOM: ['div', { draggable: 'false' }]
+      containerDOM: ['div', { draggable: 'true' }]
     }),
     NodeView.createPlugin({
       name: 'cryptoPrice',
@@ -199,7 +199,7 @@ export function charmEditorPlugins (
     }),
     NodeView.createPlugin({
       name: 'iframe',
-      containerDOM: ['div', { class: 'iframe-container', draggable: 'false' }]
+      containerDOM: ['div', { class: 'iframe-container', draggable: 'true' }]
     }),
     NodeView.createPlugin({
       name: 'quote',
@@ -408,9 +408,8 @@ function CharmEditor (
       userId: currentUser?.id
     }),
     initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
-    // hide the black bar when dragging items - we dont even support dragging most components
     dropCursorOpts: {
-      color: 'transparent'
+      // color: 'transparent'
     }
   });
 

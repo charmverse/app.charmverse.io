@@ -170,7 +170,6 @@ export default function CharmEditor (
       userId: currentUser?.id
     }),
     initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
-    // hide the black bar when dragging items - we dont even support dragging most components
     dropCursorOpts: {
       color: 'transparent'
     }
