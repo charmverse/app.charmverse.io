@@ -1,6 +1,7 @@
 import { Bounty, Prisma } from 'prisma/prisma-client';
 import log from 'lib/log';
 import { getBountyPagePermissionSet } from 'lib/bounties/shared';
+import { queryBountyPermissions } from 'lib/permissions/bounties';
 import { prisma } from '../db';
 
 (async () => {
@@ -14,11 +15,13 @@ import { prisma } from '../db';
 
   const result = await Promise.all(
     bounties.map(async bounty => {
+      const permissions = await queryBountyPermissions({ bountyId: bounty.id! });
+
       const bountyPagePermissionSet: Omit<Prisma.PagePermissionCreateManyInput, 'pageId'>[] = getBountyPagePermissionSet({
         createdBy: bounty.createdBy!,
         status: bounty.status!,
         spaceId: bounty.spaceId!,
-        permissions: undefined,
+        permissions,
         linkedPageId: bounty.linkedTaskId || ''
       });
 
