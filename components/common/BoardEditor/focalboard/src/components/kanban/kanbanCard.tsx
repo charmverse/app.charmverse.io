@@ -232,7 +232,7 @@ const KanbanCard = React.memo((props: Props) => {
               </Box>
             </Box>
           </Box>
-          <BountyStatusChip size='small' status={linkedBounty.status} />
+          <BountyStatusChip status={linkedBounty.status} />
         </BountyFooter>}
       </div>
       {showConfirmationDialogBox && <ConfirmationDialogBox dialogBox={confirmDialogProps} />}

@@ -146,13 +146,17 @@ export default function BountyList ({ publicMode, bountyCardClicked = () => null
       {/* List of bounties based on current filter */}
 
       <Grid container>
+        {bountyStatuses.map(bountyStatus => (
+          <Grid container className='octo-board-header' gap={1} item md={12 / 5} alignContent='flex-start' key={bountyStatus}>
+            <Grid item height='fit-content'>
+              <BountyStatusChip status={bountyStatus} />
+            </Grid>
+          </Grid>
+        ))}
         {
             bountyStatuses.map(bountyStatus => {
               return (
                 <Grid container gap={1} item md={12 / 5} alignContent='flex-start' key={bountyStatus}>
-                  <Grid item height='fit-content'>
-                    <BountyStatusChip size='small' status={bountyStatus} />
-                  </Grid>
                   {bountiesStatusRecord[bountyStatus].map(bounty => (
                     <Grid
                       key={bounty.id}
