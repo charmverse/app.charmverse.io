@@ -1,14 +1,14 @@
-import Grid from '@mui/material/Grid';
 import Alert from '@mui/material/Alert';
+import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { Space } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import charmClient from 'charmClient';
 import Link from 'components/common/Link';
+import LoadingComponent from 'components/common/LoadingComponent';
 import { ErrorModal } from 'components/common/Modal';
 import PrimaryButton from 'components/common/PrimaryButton';
-import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
@@ -57,7 +57,7 @@ export default function TokenGateForm ({ onSubmit: _onSubmit, spaceDomain }: Pro
           }
           setIsLoading(false);
         })
-        .catch(err => {
+        .catch(() => {
           setTokenGates(null);
           setIsLoading(false);
         });
@@ -141,14 +141,17 @@ export default function TokenGateForm ({ onSubmit: _onSubmit, spaceDomain }: Pro
     <Grid container direction='column' spacing={2} sx={{ my: 2 }}>
       <Grid item>
         <Typography variant='body2'>
-          Please verify that you meet the requirements to join
+          {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          tokenGates!.length > 1 ? 'To join, please select the condition you want to verify.' : 'Please verify that you meet the requirements to join.'
+        }
         </Typography>
       </Grid>
       {
           tokenGates?.map((gate, index, list) => {
             return (
               <Grid item>
-                <TokenGateOption tokenGate={gate} key={gate.id} select={setSelectedTokenGate} isSelected={selectedTokenGate?.id === gate.id} />
+                <TokenGateOption tokenGate={gate} key={gate.id} onSelect={setSelectedTokenGate} isSelected={selectedTokenGate?.id === gate.id} />
 
                 {
                   // Don't show or after the last list item

@@ -10,11 +10,11 @@ import { useEffect, useState } from 'react';
 
 interface Props {
   tokenGate: TokenGateWithRoles,
-  select: (tokenGate: TokenGateWithRoles) => void,
+  onSelect: (tokenGate: TokenGateWithRoles) => void,
   isSelected: boolean
 }
 
-export default function TokenGateOption ({ tokenGate, isSelected, select }: Props) {
+export default function TokenGateOption ({ tokenGate, isSelected, onSelect }: Props) {
 
   const { account } = useWeb3React();
   const [description, setDescription] = useState<string>('');
@@ -34,7 +34,7 @@ export default function TokenGateOption ({ tokenGate, isSelected, select }: Prop
       raised={isSelected}
       sx={{ my: 1 }}
       onClick={() => {
-        select(tokenGate);
+        onSelect(tokenGate);
       }}
     >
       <CardContent>
