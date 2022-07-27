@@ -1,10 +1,8 @@
-import Link from 'components/common/Link';
 import { Box, Card, CardActionArea, CardHeader, Typography } from '@mui/material';
 import { Bounty as IBounty } from '@prisma/client';
+import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { fancyTrim } from 'lib/utilities/strings';
-import { useRouter } from 'next/router';
-import { useMemo } from 'react';
 import BountyStatusBadge from './BountyStatusBadge';
 
 /**
@@ -20,10 +18,9 @@ function BountyCardDetails ({ bounty, truncate }: Pick<IBountyInput, 'bounty' | 
   return (
     <Card
       sx={{
-        width: 290,
         minHeight: 200,
         height: '100%',
-        display: 'grid' // make child full height
+        display: 'grid' // make child full height,
       }}
       variant='outlined'
     >
@@ -36,10 +33,10 @@ function BountyCardDetails ({ bounty, truncate }: Pick<IBountyInput, 'bounty' | 
           justifyContent: 'space-between'
         }}
       >
-        <CardHeader title={bounty.title} titleTypographyProps={{ sx: { fontSize: '1rem', fontWeight: 'bold' } }} />
+        <CardHeader title={bounty.title} sx={{ paddingBottom: 0 }} titleTypographyProps={{ sx: { fontSize: '1rem', fontWeight: 'bold' } }} />
         <Box p={2} width='100%' display='flex' flex={1} flexDirection='column' justifyContent='space-between'>
           <Typography paragraph={true}>
-            {fancyTrim(bounty.description, 120)}
+            {fancyTrim(bounty.description, 50)}
           </Typography>
           <BountyStatusBadge truncate={truncate} bounty={bounty} />
         </Box>
