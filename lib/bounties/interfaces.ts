@@ -49,3 +49,10 @@ export interface BountySubmitterPoolSize {
   total: number;
 }
 
+export interface BountyPagePermissionSetRequest {
+  createdBy: string;
+  status: string;
+  spaceId: string;
+  permissions: Partial<BountyPermissions> | undefined;
+  linkedPageId: string | undefined;
+}
