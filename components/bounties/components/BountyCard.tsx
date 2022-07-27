@@ -20,10 +20,9 @@ function BountyCardDetails ({ bounty, truncate }: Pick<IBountyInput, 'bounty' | 
   return (
     <Card
       sx={{
-        width: 290,
         minHeight: 200,
         height: '100%',
-        display: 'grid' // make child full height
+        display: 'grid' // make child full height,
       }}
       variant='outlined'
     >
@@ -36,10 +35,10 @@ function BountyCardDetails ({ bounty, truncate }: Pick<IBountyInput, 'bounty' | 
           justifyContent: 'space-between'
         }}
       >
-        <CardHeader title={bountyPage?.title} titleTypographyProps={{ sx: { fontSize: '1rem', fontWeight: 'bold' } }} />
+        <CardHeader title={bountyPage?.title} sx={{ paddingBottom: 0 }} titleTypographyProps={{ sx: { fontSize: '1rem', fontWeight: 'bold' } }} />
         <Box p={2} width='100%' display='flex' flex={1} flexDirection='column' justifyContent='space-between'>
           <Typography paragraph={true}>
-            {fancyTrim(bountyPage?.contentText, 120)}
+            {fancyTrim(bountyPage?.contentText, 50)}
           </Typography>
           <BountyStatusBadge truncate={truncate} bounty={bounty} />
         </Box>
