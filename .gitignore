@@ -18,6 +18,8 @@ tsconfig.tsbuildinfo
 
 ./pages/api/script/*
 
+scripts/exportData/exports
+
 # cdk
 cdk.out
 cdk.context.json

@@ -1,0 +1,69 @@
+{
+  "id": "fc70c746-30de-441a-9b2b-00538f02953c",
+  "deletedAt": null,
+  "createdAt": "2022-05-23T16:38:19.596Z",
+  "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+  "updatedAt": "2022-07-08T13:32:22.552Z",
+  "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+  "spaceId": "da74cab3-c2b6-40bb-8734-0de5375b0fce",
+  "parentId": "",
+  "rootId": "fc70c746-30de-441a-9b2b-00538f02953c",
+  "schema": 1,
+  "type": "board",
+  "title": "[NFT] Gallery",
+  "fields": {
+    "icon": "🖼️",
+    "isTemplate": false,
+    "description": "",
+    "headerImage": null,
+    "cardProperties": [
+      {
+        "id": "29c17abf-5d6a-4cfc-a626-f3dc7d8e932c",
+        "name": "Tier",
+        "type": "select",
+        "options": [
+          {
+            "id": "7ae76295-4546-41d5-9be3-5bafbd75dbda",
+            "color": "propColorTeal",
+            "value": "Common"
+          },
+          {
+            "id": "8ee679f6-c90b-4ac5-874f-d36e65d6fdc5",
+            "color": "propColorYellow",
+            "value": "Rare"
+          },
+          {
+            "id": "f7cd2eea-cdda-4c3a-8268-9ec8748fc70c",
+            "color": "propColorRed",
+            "value": "Epic"
+          },
+          {
+            "id": "24a45402-c2dc-422e-943f-59c65f59e0f8",
+            "color": "propColorPurple",
+            "value": "Legendary"
+          }
+        ]
+      },
+      {
+        "id": "5668d579-d491-4ed9-95c9-86a2f8068914",
+        "name": "Blockchain",
+        "type": "text",
+        "options": []
+      },
+      {
+        "id": "f09f5e1e-5376-4efc-b888-4043e9d2ac50",
+        "name": "Smart contract address",
+        "type": "text",
+        "options": []
+      },
+      {
+        "id": "30b13c59-9040-4b26-8b01-a11781ae67d3",
+        "name": "Opensea Link",
+        "type": "text",
+        "options": []
+      }
+    ],
+    "showDescription": false,
+    "columnCalculations": []
+  }
+}

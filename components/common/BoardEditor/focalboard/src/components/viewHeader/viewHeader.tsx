@@ -141,9 +141,9 @@ const ViewHeader = React.memo((props: Props) => {
             </>
             }
 
-            {/* Search */}
+            {/* Search - disabled until we can access page data inside the redux selector */}
 
-            <ViewHeaderSearch/>
+            {/* <ViewHeaderSearch/> */}
 
             {/* Options menu */}
 

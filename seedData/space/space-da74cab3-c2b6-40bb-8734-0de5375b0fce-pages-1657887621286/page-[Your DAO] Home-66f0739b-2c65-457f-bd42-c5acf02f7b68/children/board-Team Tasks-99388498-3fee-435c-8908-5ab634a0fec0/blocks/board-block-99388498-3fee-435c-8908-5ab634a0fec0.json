@@ -1,0 +1,101 @@
+{
+  "id": "99388498-3fee-435c-8908-5ab634a0fec0",
+  "deletedAt": null,
+  "createdAt": "2022-05-23T22:16:15.589Z",
+  "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+  "updatedAt": "2022-07-08T12:41:45.974Z",
+  "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+  "spaceId": "da74cab3-c2b6-40bb-8734-0de5375b0fce",
+  "parentId": "",
+  "rootId": "99388498-3fee-435c-8908-5ab634a0fec0",
+  "schema": 1,
+  "type": "board",
+  "title": "Team Tasks",
+  "fields": {
+    "icon": "☑️",
+    "isTemplate": false,
+    "description": "",
+    "headerImage": "https://s3.amazonaws.com/charm.public/user-content/e5dba747-be62-49be-a7ba-71cf27b17174/9df87077-76ea-406c-96d8-d3f2d7f41271/lets_dao_it_banner.jpg",
+    "cardProperties": [
+      {
+        "id": "03289657-299f-453b-a1d8-54d8b3b85851",
+        "name": "Status",
+        "type": "select",
+        "options": [
+          {
+            "id": "fe17f0fd-4112-4eb7-81ef-dce1236f3001",
+            "color": "propColorTeal",
+            "value": "Completed"
+          },
+          {
+            "id": "53d8edb4-f34e-4cc5-87b3-ed5faed5c1f2",
+            "color": "propColorYellow",
+            "value": "In progress"
+          },
+          {
+            "id": "ddae6548-e379-47be-9a54-46982072f66a",
+            "color": "propColorRed",
+            "value": "Not started"
+          }
+        ]
+      },
+      {
+        "id": "ab46872a-c754-4813-9114-372e923cc66a",
+        "name": "Priority",
+        "type": "select",
+        "options": [
+          {
+            "id": "80e80e97-2934-4863-be2c-5b69fe0e3678",
+            "color": "propColorBlue",
+            "value": "Low"
+          },
+          {
+            "id": "0650a329-de16-42f8-bf0d-d20ab54a5305",
+            "color": "propColorYellow",
+            "value": "Medium"
+          },
+          {
+            "id": "79ef1f7f-56da-48dd-a4d7-4a2a4dae5166",
+            "color": "propColorRed",
+            "value": "High"
+          }
+        ]
+      },
+      {
+        "id": "2b3cc0fd-3174-4b60-bb28-a4f4fa03350e",
+        "name": "Category",
+        "type": "multiSelect",
+        "options": [
+          {
+            "id": "34ced5d7-3f92-4b8d-8044-063b38b6e013",
+            "color": "propColorBlue",
+            "value": "Operations"
+          },
+          {
+            "id": "7a8f0181-b28b-43cb-9bf1-d330141da055",
+            "color": "propColorPurple",
+            "value": "Marketing"
+          },
+          {
+            "id": "66e2c64e-c9a0-416e-9762-52f55f5c1941",
+            "color": "propColorRed",
+            "value": "Development"
+          },
+          {
+            "id": "9db45552-dd20-45cc-b577-e5a34205042c",
+            "color": "propColorYellow",
+            "value": "Partnerships"
+          }
+        ]
+      },
+      {
+        "id": "ae50984b-38af-48a8-9494-2cb1b4f71694",
+        "name": "Assignee",
+        "type": "person",
+        "options": []
+      }
+    ],
+    "showDescription": false,
+    "columnCalculations": []
+  }
+}

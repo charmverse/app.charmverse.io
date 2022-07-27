@@ -112,11 +112,8 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
         onClick={openSidebar}
         edge='start'
         sx={{
-          display: {
-            xs: hideSidebarOnSmallScreen ? 'none' : 'inline-flex',
-            md: 'inline-flex'
-          },
-          marginRight: '36px',
+          display: 'inline-flex',
+          mr: 2,
           ...(open && { display: 'none' })
         }}
       >
@@ -142,9 +139,9 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
           {isPage && (
             <>
               {currentPage?.deletedAt === null && <ShareButton headerHeight={headerHeight} />}
-              <IconButton size='small' onClick={toggleFavorite} color='inherit'>
+              <IconButton sx={{ display: { xs: 'none', md: 'inline-flex' } }} size='small' onClick={toggleFavorite} color='inherit'>
                 <Tooltip title={isFavorite ? 'Remove from sidebar' : 'Pin this page to your sidebar'} arrow placement='bottom'>
-                  {isFavorite ? <FavoritedIcon color='secondary' /> : <NotFavoritedIcon color='secondary' />}
+                  {isFavorite ? <FavoritedIcon fontSize='small' color='secondary' /> : <NotFavoritedIcon fontSize='small' color='secondary' />}
                 </Tooltip>
               </IconButton>
             </>
@@ -160,7 +157,7 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
                 }}
               >
                 <Tooltip title='View comments, votes, export content and more' arrow>
-                  <MoreHorizIcon />
+                  <MoreHorizIcon color='secondary' />
                 </Tooltip>
               </IconButton>
               <Popover
@@ -272,9 +269,9 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
 
           {/** dark mode toggle */}
           {user && (
-            <IconButton size='small' sx={{ mx: 1 }} onClick={colorMode.toggleColorMode} color='inherit'>
+            <IconButton size='small' sx={{ display: { xs: 'none', md: 'inline-flex' }, mx: 1 }} onClick={colorMode.toggleColorMode} color='inherit'>
               <Tooltip title={`Enable ${theme.palette.mode === 'dark' ? 'light mode' : 'dark mode'}`} arrow placement='bottom'>
-                {theme.palette.mode === 'dark' ? <SunIcon color='secondary' /> : <MoonIcon color='secondary' />}
+                {theme.palette.mode === 'dark' ? <SunIcon fontSize='small' color='secondary' /> : <MoonIcon fontSize='small' color='secondary' />}
               </Tooltip>
             </IconButton>
           )}

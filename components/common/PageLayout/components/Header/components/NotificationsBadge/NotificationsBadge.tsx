@@ -30,10 +30,9 @@ export default function NotificationsBadge () {
                 transition: '250ms ease-in-out transform'
               }
             }}
-          // variant='dot'
             max={99}
           >
-            <NotificationsNoneIcon />
+            <NotificationsNoneIcon color='secondary' fontSize='small' />
           </Badge>
         </Tooltip>
       </IconButton>

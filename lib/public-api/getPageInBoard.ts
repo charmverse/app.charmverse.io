@@ -1,10 +1,9 @@
 import { Block } from '@prisma/client';
 import { prisma } from 'db';
+import { generateMarkdown } from 'lib/pages/generateMarkdown';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { filterObjectKeys } from 'lib/utilities/objects';
-import { PageContent } from 'models';
 import { validate } from 'uuid';
-import { generateMarkdown } from 'lib/pages/generateMarkdown';
 import { DatabasePageNotFoundError, PageNotFoundError, SpaceNotFoundError } from './errors';
 import { DatabasePage, Page, PageProperty } from './interfaces';
 import { PageFromBlock } from './pageFromBlock.class';

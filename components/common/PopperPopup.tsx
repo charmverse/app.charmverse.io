@@ -46,6 +46,7 @@ export default function PopperPopup (props: PopperPopupProps) {
       </div>
       )}
       <Popover
+        disableRestoreFocus
         {...popoverProps}
       >
         <Paper>
