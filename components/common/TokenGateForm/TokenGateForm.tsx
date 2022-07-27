@@ -151,7 +151,13 @@ export default function TokenGateForm ({ onSubmit: _onSubmit, spaceDomain }: Pro
           tokenGates?.map((gate, index, list) => {
             return (
               <Grid item>
-                <TokenGateOption tokenGate={gate} key={gate.id} onSelect={setSelectedTokenGate} isSelected={selectedTokenGate?.id === gate.id} />
+                <TokenGateOption
+                  totalGates={list.length}
+                  tokenGate={gate}
+                  key={gate.id}
+                  onSelect={setSelectedTokenGate}
+                  isSelected={selectedTokenGate?.id === gate.id}
+                />
 
                 {
                   // Don't show or after the last list item

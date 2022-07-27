@@ -13,7 +13,6 @@ import { DialogTitle } from 'components/common/Modal';
 import TokenGateForm from 'components/common/TokenGateForm';
 import { useSpaces } from 'hooks/useSpaces';
 import { PublicSpaceInfo } from 'lib/spaces/interfaces';
-import { isTruthy } from 'lib/utilities/types';
 import { useRouter } from 'next/router';
 import { ChangeEvent, ReactNode, useEffect, useState } from 'react';
 
@@ -102,12 +101,12 @@ export default function CreateSpace () {
           value={spaceDomain}
           helperText={userInputStatus}
           InputProps={{
-            endAdornment: isTruthy(spaceInfo) && <CheckIcon color='success' />
+            endAdornment: spaceInfo && <CheckIcon color='success' />
           }}
         />
 
         {
-          isTruthy(spaceInfo) && (
+          spaceInfo && (
             <TokenGateForm onSubmit={onJoinSpace} spaceDomain={spaceDomain} />
           )
         }
