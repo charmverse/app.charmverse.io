@@ -24,6 +24,8 @@ import { isBountyLockable, requesterCanDeleteBounty } from 'lib/bounties/shared'
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { BountyWithDetails } from 'models';
 import { AssignedBountyPermissions } from 'lib/bounties';
+import { usePages } from 'hooks/usePages';
+import { useMemo } from 'react';
 
 const menuPosition: Partial<MenuProps> = {
   anchorOrigin: {
@@ -44,6 +46,9 @@ interface Props {
 
 export default function BountyHeader ({ bounty, permissions, refreshBountyPermissions }: Props) {
   const { refreshBounty } = useBounties();
+
+  const { getPagePermissions } = usePages();
+  const bountyPagePermissions = useMemo(() => getPagePermissions(bounty?.page.id), [bounty?.page]);
 
   const [user] = useUser();
 
@@ -103,11 +108,11 @@ export default function BountyHeader ({ bounty, permissions, refreshBountyPermis
             }}
           >
             <strong>
-              {bounty.title}
+              {bounty.page.title}
             </strong>
             {/* Provide the bounty menu options */}
             {
-          (canDeleteBounty || permissions?.userPermissions?.edit || permissions?.userPermissions?.lock) && (
+          (canDeleteBounty || bountyPagePermissions.edit_content || permissions?.userPermissions?.lock) && (
             <>
               <IconButton size='small' {...bindTrigger(popupState)}>
                 <MoreHorizIcon color='secondary' />
@@ -118,7 +123,7 @@ export default function BountyHeader ({ bounty, permissions, refreshBountyPermis
                 {...menuPosition}
               >
                 {
-                  permissions.userPermissions.edit && (
+                  bountyPagePermissions.edit_content && (
                     <Tooltip arrow placement='right' title={`Edit bounty ${bounty.status === 'suggestion' ? 'suggestion' : ''}`}>
                       <MenuItem
                         dense
@@ -201,7 +206,7 @@ export default function BountyHeader ({ bounty, permissions, refreshBountyPermis
 
       {/** List of modals */}
       {
-        permissions?.userPermissions?.edit && (
+        bountyPagePermissions.edit_content && (
           <BountyModal
             onSubmit={() => {
               refreshBountyPermissions();

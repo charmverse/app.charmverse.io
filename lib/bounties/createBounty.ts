@@ -1,7 +1,11 @@
-import { Bounty, BountyStatus, Prisma } from '@prisma/client';
+import { BountyStatus, Prisma } from '@prisma/client';
 import { prisma } from 'db';
+import { getBountyPagePermissionSet } from 'lib/bounties/shared';
 import { setBountyPermissions } from 'lib/permissions/bounties';
 import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
+import { BountyWithDetails } from 'models';
+import { v4 } from 'uuid';
+import { getBounty } from './getBounty';
 import { BountyCreationData } from './interfaces';
 
 /**
@@ -15,13 +19,13 @@ export async function createBounty ({
   chainId = 1,
   description = '',
   descriptionNodes = '',
-  linkedTaskId,
+  linkedPageId,
   approveSubmitters = true,
   maxSubmissions,
   rewardAmount = 0,
   rewardToken = 'ETH',
   permissions
-}: BountyCreationData): Promise<Bounty> {
+}: BountyCreationData): Promise<BountyWithDetails> {
 
   const validCreationStatuses: BountyStatus[] = ['suggestion', 'open'];
 
@@ -39,7 +43,10 @@ export async function createBounty ({
     throw new PositiveNumbersOnlyError();
   }
 
+  const bountyId = v4();
+
   const bountyCreateInput: Prisma.BountyCreateInput = {
+    id: bountyId,
     title,
     space: {
       connect: {
@@ -58,31 +65,92 @@ export async function createBounty ({
     approveSubmitters,
     maxSubmissions,
     rewardAmount,
-    rewardToken,
-    linkedTaskId
+    rewardToken
   };
 
-  if (status === 'suggestion') {
+  const isSuggestion = status === 'suggestion';
+
+  if (isSuggestion) {
     bountyCreateInput.suggestedBy = createdBy;
   }
 
-  const bounty = await prisma.bounty.create({
-    data: bountyCreateInput
-  });
+  const pageData: Prisma.PageCreateInput = {
+    id: bountyId,
+    path: `page-${Math.random().toString().replace('0.', '')}`,
+    title,
+    contentText: description,
+    content: descriptionNodes as string,
+    space: {
+      connect: {
+        id: spaceId
+      }
+    },
+    updatedBy: createdBy,
+    author: {
+      connect: {
+        id: createdBy
+      }
+    },
+    type: 'bounty'
+  };
+
+  const bountyPagePermissionSet: Omit<Prisma.PagePermissionCreateManyInput, 'pageId'>[] = getBountyPagePermissionSet({ createdBy, status, spaceId, permissions, linkedPageId });
+
+  if (!linkedPageId) {
+    await prisma.$transaction([
+      prisma.bounty.create({
+        data: {
+          ...bountyCreateInput,
+          page: {
+            create: pageData
+          }
+        }
+      }),
+      prisma.pagePermission.createMany({
+        data: bountyPagePermissionSet.map(p => {
+          return {
+            ...p,
+            pageId: bountyId
+          };
+        })
+      })
+    ]);
+  }
+  else {
+    await prisma.$transaction([
+      prisma.bounty.create({
+        data: {
+          ...bountyCreateInput
+        }
+      }),
+      prisma.page.update({
+        where: {
+          id: linkedPageId
+        },
+        data: {
+          type: 'card',
+          bountyId
+        }
+      }),
+      prisma.pagePermission.createMany({
+        data: bountyPagePermissionSet.map(p => {
+          return {
+            ...p,
+            pageId: linkedPageId
+          };
+        })
+      })
+    ]);
+  }
 
   // Initialise suggestions with a view permission
-  if (status === 'suggestion') {
+  if (isSuggestion) {
     await setBountyPermissions({
-      bountyId: bounty.id,
+      bountyId,
       permissionsToAssign: {
         creator: [{
           group: 'user',
           id: createdBy
-        }],
-        // This permission is created so that all space members can see the suggestion. When the admin is configuring a not yet approved suggestion, this will remain the same, or be overriden if the admin has restricted submitters to a list of roles.
-        submitter: [{
-          group: 'space',
-          id: spaceId
         }]
       }
     });
@@ -90,11 +158,10 @@ export async function createBounty ({
   // Pass custom permissions
   else if (permissions) {
     await setBountyPermissions({
-      bountyId: bounty.id,
+      bountyId,
       permissionsToAssign: permissions
     });
   }
 
-  return bounty;
-
+  return getBounty(bountyId) as Promise<BountyWithDetails>;
 }

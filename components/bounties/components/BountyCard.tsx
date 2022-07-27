@@ -1,17 +1,15 @@
-import Link from 'components/common/Link';
 import { Box, Card, CardActionArea, CardHeader, Typography } from '@mui/material';
-import { Bounty as IBounty } from '@prisma/client';
+import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { fancyTrim } from 'lib/utilities/strings';
-import { useRouter } from 'next/router';
-import { useMemo } from 'react';
+import { BountyWithDetails } from 'models';
 import BountyStatusBadge from './BountyStatusBadge';
 
 /**
  * @publicMode When a bounty card is clicked in public mode, we do not want the user to be directed to the bounty (for now)
  */
 export interface IBountyInput {
-  bounty: IBounty
+  bounty: BountyWithDetails
   truncate?: boolean
   publicMode?: boolean
 }
@@ -36,10 +34,10 @@ function BountyCardDetails ({ bounty, truncate }: Pick<IBountyInput, 'bounty' | 
           justifyContent: 'space-between'
         }}
       >
-        <CardHeader title={bounty.title} titleTypographyProps={{ sx: { fontSize: '1rem', fontWeight: 'bold' } }} />
+        <CardHeader title={bounty.page?.title} titleTypographyProps={{ sx: { fontSize: '1rem', fontWeight: 'bold' } }} />
         <Box p={2} width='100%' display='flex' flex={1} flexDirection='column' justifyContent='space-between'>
           <Typography paragraph={true}>
-            {fancyTrim(bounty.description, 120)}
+            {fancyTrim(bounty.page.contentText, 120)}
           </Typography>
           <BountyStatusBadge truncate={truncate} bounty={bounty} />
         </Box>

@@ -110,7 +110,7 @@ describe('addBountyPermissionGroup', () => {
           group: 'space',
           id: extraSpace.id
         },
-        level: 'viewer',
+        level: 'reviewer',
         resourceId: bounty.id
       });
       throw new ExpectedAnError();
@@ -144,7 +144,7 @@ describe('addBountyPermissionGroup', () => {
           group: 'role',
           id: externalRole.id
         },
-        level: 'viewer',
+        level: 'reviewer',
         resourceId: bounty.id
       });
       throw new ExpectedAnError();
@@ -172,7 +172,7 @@ describe('addBountyPermissionGroup', () => {
           group: 'user',
           id: extraUser.id
         },
-        level: 'viewer',
+        level: 'reviewer',
         resourceId: bounty.id
       });
       throw new ExpectedAnError();

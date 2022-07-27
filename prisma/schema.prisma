@@ -1,6 +1,6 @@
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["linux-musl", "darwin", "native"]
+  provider        = "prisma-client-js"
+  binaryTargets   = ["linux-musl", "darwin", "native"]
   previewFeatures = ["interactiveTransactions"]
 }
 
@@ -9,9 +9,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 enum PageType {
   board
+  bounty
   page
   card
   proposal
@@ -67,8 +67,6 @@ enum BountyStatus {
 enum BountyOperation {
   work
   review
-  view
-  edit
   delete
   lock
   approve_applications
@@ -79,7 +77,6 @@ enum BountyPermissionLevel {
   reviewer
   creator
   submitter
-  viewer
 }
 
 enum ApplicationStatus {
@@ -124,7 +121,6 @@ enum SpaceOperation {
   createBounty
   createVote
 }
-
 
 model Space {
   id                          String                            @id @default(uuid()) @db.Uuid
@@ -200,6 +196,8 @@ model Page {
   comments           Comment[]
   favorites          FavoritePage[]
   permissions        PagePermission[]
+  bountyId           String?          @unique @db.Uuid
+  bounty             Bounty?          @relation(fields: [bountyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   threads            Thread[]
   votes              Vote[]
 }
@@ -407,6 +405,7 @@ model Bounty {
   space             Space              @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   applications      Application[]
   permissions       BountyPermission[]
+  page              Page?
 }
 
 model BountyPermission {

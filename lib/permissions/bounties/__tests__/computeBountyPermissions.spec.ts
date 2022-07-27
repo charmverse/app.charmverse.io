@@ -1,6 +1,5 @@
 
 import { BountyOperation } from '@prisma/client';
-import { prisma } from 'db';
 import { assignRole } from 'lib/roles';
 import { typedKeys } from 'lib/utilities/objects';
 import { generateBounty, generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
@@ -36,7 +35,7 @@ describe('computeBountyPermissions', () => {
     await Promise.all([
       addBountyPermissionGroup({
         resourceId: bounty.id,
-        level: 'reviewer',
+        level: 'creator',
         assignee: {
           group: 'user',
           id: otherUser.id
@@ -44,7 +43,7 @@ describe('computeBountyPermissions', () => {
       }),
       addBountyPermissionGroup({
         resourceId: bounty.id,
-        level: 'submitter',
+        level: 'reviewer',
         assignee: {
           group: 'role',
           id: role.id
@@ -52,7 +51,7 @@ describe('computeBountyPermissions', () => {
       }),
       addBountyPermissionGroup({
         resourceId: bounty.id,
-        level: 'viewer',
+        level: 'submitter',
         assignee: {
           group: 'space',
           id: space.id
@@ -66,7 +65,7 @@ describe('computeBountyPermissions', () => {
       userId: otherUser.id
     });
 
-    bountyPermissionMapping.viewer.forEach(op => {
+    bountyPermissionMapping.creator.forEach(op => {
       expect(computed[op]).toBe(true);
     });
 
@@ -309,43 +308,23 @@ describe('computeBountyPermissions', () => {
 
   });
 
-  it('should return true only for public operations if the the user is not a member of the space', async () => {
+  it('should return false for all bounty operations if the the user is not a member of the space', async () => {
 
     const { user, space } = await generateUserAndSpaceWithApiToken(undefined, true);
 
     const { user: externalUser } = await generateUserAndSpaceWithApiToken(undefined, true);
 
+    // Create a permission for the non space member which computeBountyPermissions should ignore
     const bounty = await generateBounty({
       createdBy: user.id,
       approveSubmitters: true,
       spaceId: space.id,
-      status: 'open'
-    });
-
-    await addBountyPermissionGroup({
-      resourceId: bounty.id,
-      assignee: {
-        group: 'public',
-        id: undefined
-      },
-      level: 'viewer'
-    });
-
-    // Add Bounty Permissions should fail adding insecure permissions, so we bypass the business logic and go straight to the database
-    await prisma.bountyPermission.create({
-      data: {
-        // A very high permission level external user shouldn't have
-        permissionLevel: 'creator',
-        bounty: {
-          connect: {
-            id: bounty.id
-          }
-        },
-        user: {
-          connect: {
-            id: externalUser.id
-          }
-        }
+      status: 'open',
+      bountyPermissions: {
+        reviewer: [{
+          group: 'user',
+          id: externalUser.id
+        }]
       }
     });
 
@@ -355,16 +334,9 @@ describe('computeBountyPermissions', () => {
       userId: externalUser.id
     });
 
-    const availableOperations = bountyPermissionMapping.viewer;
-
     // We should only have the view permission that was assigned to the public, not the one assigned to this user
     typedKeys(BountyOperation).forEach(op => {
-      if (availableOperations.indexOf(op) > -1) {
-        expect(computedPermissions[op]).toBe(true);
-      }
-      else {
-        expect(computedPermissions[op]).toBe(false);
-      }
+      expect(computedPermissions[op]).toBe(false);
     });
 
   });
