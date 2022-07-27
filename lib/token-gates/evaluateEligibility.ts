@@ -1,18 +1,20 @@
-import { validate } from 'uuid';
+import { Role } from '@prisma/client';
 import { prisma } from 'db';
-import { DataNotFoundError, MissingDataError } from 'lib/utilities/errors';
-import LitJsSdk, { LitNodeClient } from 'lit-js-sdk';
 import { InvalidStateError } from 'lib/middleware';
-import { Role, TokenGate } from '@prisma/client';
-import { TokenGateVerificationAttempt, TokenGateVerificationResult, TokenGateWithRoleData } from './interfaces';
-import getLitChainFromChainId from './getLitChainFromChainId';
+import { DataNotFoundError, MissingDataError } from 'lib/utilities/errors';
+import { LitNodeClient } from 'lit-js-sdk';
+import { validate } from 'uuid';
+import { TokenGateJwt, TokenGateVerificationAttempt, TokenGateVerificationResult, TokenGateWithRoleData } from './interfaces';
 
-const litClient = new LitNodeClient();
+const litClient = new LitNodeClient({
+  debug: false
+} as any);
 
-litClient.connect();
-
-export async function evalueTokenGateEligibility ({ authSig, chainId, spaceIdOrDomain, userId }:TokenGateVerificationAttempt):
+export async function evalueTokenGateEligibility ({ authSig, spaceIdOrDomain, userId }:TokenGateVerificationAttempt):
  Promise<TokenGateVerificationResult> {
+  if (!litClient.ready) {
+    await litClient.connect();
+  }
 
   const validUuid = validate(spaceIdOrDomain);
 
@@ -46,53 +48,44 @@ export async function evalueTokenGateEligibility ({ authSig, chainId, spaceIdOrD
     throw new InvalidStateError('Lit client is not available');
   }
 
-  const litChain = getLitChainFromChainId(chainId);
-
-  const matchingTokenGates = space.TokenGate.filter(gate => {
-    return (gate.conditions as any).chain === litChain;
-  }) as TokenGateWithRoleData[];
-
-  if (!matchingTokenGates) {
-    throw new MissingDataError('No token gates are available on the selected chain');
-  }
-
-  const tokenGateResults: {verified: boolean, tokenGate: TokenGateWithRoleData}[] = await Promise.all(
-    matchingTokenGates.map(tokenGate => {
+  const tokenGateResults: {signedToken?: TokenGateJwt, tokenGate: TokenGateWithRoleData}[] = await Promise.all(
+    space.TokenGate.map(tokenGate => {
       return litClient.getSignedToken({
         authSig,
-        chain: litChain,
         resourceId: tokenGate.resourceId,
         ...tokenGate.conditions as any
       })
-        .then(() => {
+        .then((signedToken: string) => {
           return {
-            verified: true,
+            signedToken: {
+              signedToken,
+              tokenGateId: tokenGate.id
+            },
             tokenGate
           };
         })
         .catch(() => {
           return {
-            verified: true,
             tokenGate
           };
         });
     })
   );
 
-  const success = tokenGateResults.some(r => r.verified === true);
+  const successGates = tokenGateResults.filter(result => result.signedToken);
 
-  if (!success) {
+  if (successGates.length === 0) {
     return {
       canJoinSpace: false,
       userId,
-      spaceId: space.id,
-      chainId,
+      space,
+      gateTokens: [],
       walletAddress: authSig.address,
       roles: []
     };
   }
 
-  const eligibleRoles = tokenGateResults.filter(g => g.verified).reduce((roleList, result) => {
+  const eligibleRoles = successGates.reduce((roleList, result) => {
 
     result.tokenGate.tokenGateToRoles.forEach(tokenGateRoleMapping => {
       if (roleList.every(role => role.id !== tokenGateRoleMapping.roleId)) {
@@ -105,11 +98,11 @@ export async function evalueTokenGateEligibility ({ authSig, chainId, spaceIdOrD
   }, [] as Role[]);
 
   return {
-    canJoinSpace: false,
+    canJoinSpace: true,
     userId,
-    spaceId: space.id,
-    chainId,
+    space,
     walletAddress: authSig.address,
+    gateTokens: successGates.map(g => g.signedToken as TokenGateJwt),
     roles: eligibleRoles
   };
 

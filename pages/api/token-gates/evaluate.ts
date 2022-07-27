@@ -19,12 +19,7 @@ async function verifyWallet (req: NextApiRequest, res: NextApiResponse) {
     userId: user.id
   });
 
-  if (result.canJoinSpace) {
-    res.status(200).send(result);
-  }
-  else {
-    res.status(401).send(result);
-  }
+  res.status(200).send(result);
 
 }
 

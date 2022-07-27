@@ -12,16 +12,23 @@ export interface TokenGateWithRoles extends TokenGate {
 
 export interface TokenGateVerificationAttempt {
   userId: string;
-  chainId: number;
   authSig: AuthSig;
   spaceIdOrDomain: string;
 }
 
+export interface TokenGateJwt {
+  signedToken: string;
+  tokenGateId: string;
+}
+
+/**
+ * @gateTokens List of Lit-generated tokens we can verify when joining a space
+ */
 export interface TokenGateVerificationResult {
   userId: string;
-  spaceId: string;
+  space: Space;
   walletAddress: string;
-  chainId: number;
   canJoinSpace: boolean;
+  gateTokens: TokenGateJwt[]
   roles: Role[]
 }
