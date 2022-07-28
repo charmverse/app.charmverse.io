@@ -79,14 +79,6 @@ async function updateBounty (req: NextApiRequest, res: NextApiResponse<BountyWit
     if (bounty.createdBy !== userId && !isAdmin) {
       throw new UnauthorisedActionError('You do not have permissions to edit this bounty.');
     }
-    // These are the only editable fields
-    else {
-      typedKeys(body).forEach(key => {
-        if (key !== 'title' && key !== 'description' && key !== 'descriptionNodes') {
-          delete body[key];
-        }
-      });
-    }
   }
 
   await updateBountySettings({

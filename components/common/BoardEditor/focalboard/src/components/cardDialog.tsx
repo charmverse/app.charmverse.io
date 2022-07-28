@@ -58,7 +58,7 @@ function CreateBountyButton (props: {
             createdBy: user.id,
             rewardAmount: 1,
             rewardToken: "ETH",
-            pageId,
+            linkedPageId: pageId,
             permissions: {
               submitter: [{
                 group: "space",

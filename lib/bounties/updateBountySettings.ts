@@ -37,16 +37,6 @@ export async function updateBountySettings ({
         approveSubmitters: updateContent.approveSubmitters,
         maxSubmissions: updateContent.maxSubmissions
       }
-    }),
-    prisma.page.update({
-      where: {
-        bountyId
-      },
-      data: {
-        title: updateContent.title,
-        contentText: updateContent.description,
-        content: updateContent.descriptionNodes as string
-      }
     })
   ]);
 

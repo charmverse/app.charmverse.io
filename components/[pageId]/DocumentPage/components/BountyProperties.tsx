@@ -15,6 +15,7 @@ import { CryptoCurrency, getChainById } from 'connectors';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
+import { useUser } from 'hooks/useUser';
 import { AssignedBountyPermissions, BountyPermissions, UpdateableBountyFields } from 'lib/bounties';
 import { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import debouncePromise from 'lib/utilities/debouncePromise';
@@ -74,11 +75,12 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
   const [currentBounty, setCurrentBounty] = useState<BountyWithDetails>(bounty);
   const [capSubmissions, setCapSubmissions] = useState(currentBounty.maxSubmissions !== null);
   const [space] = useCurrentSpace();
+  const [user] = useUser();
   const [permissions, setPermissions] = useState<AssignedBountyPermissions | null>(null);
   const assignedRoleSubmitters = permissions?.bountyPermissions?.submitter?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
   const selectedReviewerUsers = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'user').map(p => p.id as string) ?? [];
   const selectedReviewerRoles = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
-  const canEdit = !readOnly && permissions?.userPermissions.edit;
+  const canEdit = user && !readOnly && bounty.createdBy === user.id;
 
   async function refreshBountyPermissions (bountyId: string) {
     setPermissions(await charmClient.computeBountyPermissions({
