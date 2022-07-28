@@ -1,5 +1,6 @@
 import { prisma } from 'db';
 import { countValidSubmissions } from 'lib/applications/shared';
+import { includePagePermissions } from 'lib/pages/server';
 import { BountyWithDetails } from '../../models/Bounty';
 import { DataNotFoundError } from '../utilities/errors';
 import { getBounty } from './getBounty';
@@ -29,7 +30,7 @@ export async function closeOutBounty (bountyId: string): Promise<BountyWithDetai
 
   const validSubmissionsAfterUpdate = validSubmissions - applicationsToReject.length;
 
-  const updatedBounty = await prisma.bounty.update({
+  return prisma.bounty.update({
     where: {
       id: bounty.id
     },
@@ -38,10 +39,10 @@ export async function closeOutBounty (bountyId: string): Promise<BountyWithDetai
       maxSubmissions: validSubmissionsAfterUpdate
     },
     include: {
-      applications: true
+      applications: true,
+      page: {
+        include: includePagePermissions()
+      }
     }
-  });
-
-  return updatedBounty;
-
+  }) as Promise<BountyWithDetails>;
 }

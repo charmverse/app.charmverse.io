@@ -46,6 +46,11 @@ export function getTokenMetaData ({ chainId, contractAddress }: ITokenMetadataRe
 
     const baseUrl = `https://${apiSubdomain}.g.alchemy.com/v2/${apiKey}`;
 
+    if (!apiKey) {
+      reject('Alchemy API key is missing when requesting token data');
+      return;
+    }
+
     http.POST(baseUrl, {
       jsonrpc: '2.0',
       method: 'alchemy_getTokenMetadata',

@@ -22,6 +22,7 @@ import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useLocalStorage } from 'hooks/useLocalStorage';
+import { usePages } from 'hooks/usePages';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
 import { BountyCreationData, BountySubmitterPoolSize, UpdateableBountyFields } from 'lib/bounties/interfaces';
@@ -96,7 +97,8 @@ const submitterMenuOptions: MenuOption<BountySubmitter>[] = [{
 interface IBountyEditorInput {
   onSubmit: (bounty: BountyWithDetails) => any,
   mode?: FormMode
-  bounty?: Partial<Bounty>
+  linkedPageId?: string;
+  bounty?: Partial<BountyWithDetails>
   permissions?: AssignedBountyPermissions
   focusKey?: keyof FormValues
 }
@@ -128,7 +130,7 @@ function FormDescription ({ onContentChange, content, watch }:
   );
 }
 
-export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', focusKey, permissions: receivedPermissions }: IBountyEditorInput) {
+export default function BountyEditorForm ({ onSubmit, bounty, linkedPageId, mode = 'create', focusKey, permissions: receivedPermissions }: IBountyEditorInput) {
   const { setBounties, bounties, updateBounty } = useBounties();
 
   const defaultChainId = bounty?.chainId ?? 1;
@@ -137,10 +139,11 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
 
   const [user] = useUser();
   const [space] = useCurrentSpace();
+  const { pages, setPages } = usePages();
 
   const [bountyApplicantPool, setBountyApplicantPool] = useState<BountySubmitterPoolSize | null>(null);
 
-  const [permissions, setPermissions] = useState<Partial<BountyPermissions>>(receivedPermissions?.bountyPermissions ?? {});
+  const [permissions] = useState<Partial<BountyPermissions>>(receivedPermissions?.bountyPermissions ?? {});
 
   useEffect(() => {
     if (bounty) {
@@ -158,6 +161,12 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
     },
     text: ''
   });
+
+  // Hack until the updated UI is merged. This code will be removed.
+  const description = (bounty?.page?.contentText || bounty?.description) ?? cachedBountyDescription.text;
+  const descriptionNodes = (bounty?.page?.content || bounty?.descriptionNodes) ?? cachedBountyDescription.nodes;
+  const title = bounty?.page?.title || bounty?.title;
+
   const {
     register,
     handleSubmit,
@@ -176,8 +185,9 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
       capSubmissions: !((bounty && bounty?.maxSubmissions === null)),
       // expiryDate: null,
       ...(bounty || {}),
-      description: bounty?.description ?? cachedBountyDescription.text,
-      descriptionNodes: bounty?.descriptionNodes ?? cachedBountyDescription.nodes
+      title,
+      description,
+      descriptionNodes
       //      setExpiryDate: !!bounty?.expiryDate
     },
     resolver: yupResolver(schema)
@@ -276,8 +286,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
     return permissionsToSend;
   }
 
-  async function submitted (value: FormValues & Bounty) {
-
+  async function submitted (value: FormValues & Bounty & {linkedPageId?: string}) {
     // Not using this field anymore
     if (value.reviewer) {
       value.reviewer = null;
@@ -300,25 +309,29 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
 
       if (mode === 'create') {
         // delete value.setExpiryDate;
-
         value.spaceId = space!.id;
         value.createdBy = user!.id;
         value.description = value.description ?? '';
         value.descriptionNodes = value.descriptionNodes ?? '';
         value.status = 'open';
-
         (value as BountyCreationData).permissions = permissionsToSet;
+        value.linkedPageId = linkedPageId;
         const createdBounty = await charmClient.createBounty(value);
-        const populatedBounty = { ...createdBounty, applications: [] };
 
-        setBounties([...bounties, populatedBounty]);
+        setBounties([...bounties, createdBounty]);
+
+        setPages({
+          ...pages,
+          [createdBounty.page.id]: createdBounty.page
+        });
+
         setCachedBountyDescription({
           nodes: {
             type: 'doc'
           },
           text: ''
         });
-        onSubmit(populatedBounty);
+        onSubmit(createdBounty);
       }
       else if (mode === 'suggest') {
         value.spaceId = space!.id;
@@ -333,8 +346,11 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
 
         (value as BountyCreationData).permissions = permissionsToSet;
         const createdBounty = await charmClient.createBounty(value);
-        const populatedBounty = { ...createdBounty, applications: [] };
-        setBounties([...bounties, populatedBounty]);
+        setBounties([...bounties, createdBounty]);
+        setPages({
+          ...pages,
+          [createdBounty.page.id]: createdBounty.page
+        });
 
         setCachedBountyDescription({
           nodes: {
@@ -343,7 +359,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
           text: ''
         });
 
-        onSubmit(populatedBounty);
+        onSubmit(createdBounty);
 
       }
       else if (bounty?.id && mode === 'update') {

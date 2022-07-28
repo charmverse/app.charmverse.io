@@ -9,6 +9,7 @@ import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { UnauthorisedActionError, UndesirableOperationError } from 'lib/utilities/errors';
+import { BountyWithDetails } from 'models';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -34,7 +35,7 @@ async function getBounties (req: NextApiRequest, res: NextApiResponse<Bounty[]>)
 
 }
 
-async function createBountyController (req: NextApiRequest, res: NextApiResponse<Bounty>) {
+async function createBountyController (req: NextApiRequest, res: NextApiResponse<BountyWithDetails>) {
 
   const { spaceId, status, linkedTaskId } = req.body as Bounty;
 

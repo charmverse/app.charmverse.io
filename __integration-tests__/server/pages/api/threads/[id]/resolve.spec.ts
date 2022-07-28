@@ -58,7 +58,7 @@ describe('PUT /api/threads/{id} - update a comment', () => {
     });
 
     await request(baseUrl)
-      .put(`/api/threads/${thread.id}`)
+      .put(`/api/threads/${thread.id}/resolve`)
       .set('Cookie', nonAdminCookie)
       .send({ resolved: true })
       .expect(200);
@@ -84,7 +84,7 @@ describe('PUT /api/threads/{id} - update a comment', () => {
     });
 
     await request(baseUrl)
-      .put(`/api/threads/${thread.id}`)
+      .put(`/api/threads/${thread.id}/resolve`)
       .set('Cookie', otherAdminCookie)
       .send({ resolved: true })
       .expect(401);

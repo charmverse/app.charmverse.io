@@ -1,6 +1,7 @@
 import { prisma } from 'db';
 import { BountyWithDetails } from 'models';
 import { hasAccessToSpace } from 'lib/middleware';
+import { accessiblePagesByPermissionsQuery, includePagePermissions } from 'lib/pages/server';
 import { AvailableResourcesRequest } from '../permissions/interfaces';
 import { DataNotFoundError } from '../utilities/errors';
 
@@ -78,35 +79,67 @@ export async function listAvailableBounties ({ spaceId, userId }: AvailableResou
     return !space.publicBountyBoard ? [] : prisma.bounty.findMany({
       where: {
         spaceId,
-        permissions: {
-          some: {
-            // Provides all bounties open to the public, or to the space
-            OR: [{
-              public: true
-            }, {
-              spaceId
-            }]
-
+        page: {
+          // Prevents returning bounties from other spaces
+          spaceId,
+          permissions: {
+            some: {
+              // Returns bounties accessible to the whole spaces
+              OR: [{
+                spaceId
+              }, {
+                public: true
+              }]
+            }
           }
         }
       },
       include: {
-        applications: true
+        applications: true,
+        page: {
+          include: includePagePermissions()
+        }
       }
-    });
+    }) as Promise<BountyWithDetails[]>;
   }
 
   return prisma.bounty.findMany({
     where: {
       spaceId,
-      OR: generateAccessibleBountiesQuery({
-        spaceId,
-        userId
-      })
+      OR: [
+        // Admin override
+        {
+          space: {
+            spaceRoles: {
+              some: {
+                userId,
+                isAdmin: true
+              }
+            }
+          }
+        },
+        {
+          page: {
+            permissions: accessiblePagesByPermissionsQuery({
+              spaceId,
+              userId
+            })
+          }
+        }
+      ]
     },
     include: {
-      applications: true
+      applications: true,
+      page: {
+        include: {
+          permissions: {
+            include: {
+              sourcePermission: true
+            }
+          }
+        }
+      }
     }
-  });
+  }) as Promise<BountyWithDetails[]>;
 
 }

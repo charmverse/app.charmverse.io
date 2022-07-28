@@ -89,15 +89,27 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
   const isSharedPage = router.pathname.startsWith('/share');
 
   return (
-    <ScrollableWindow hideScroll={showPageActionSidebar}>
-      <div style={{
-        width: showPageActionSidebar ? 'calc(100% - 425px)' : '100%',
-        height: showPageActionSidebar ? 'calc(100vh - 65px)' : '100%',
-        overflow: showPageActionSidebar ? 'auto' : 'inherit'
+    <ScrollableWindow
+      sx={{
+        overflow: {
+          md: showPageActionSidebar ? 'hidden' : 'auto'
+        }
+      }}
+    >
+      <Box sx={{
+        width: {
+          md: showPageActionSidebar ? 'calc(100% - 425px)' : '100%'
+        },
+        height: {
+          md: showPageActionSidebar ? 'calc(100vh - 65px)' : '100%'
+        },
+        overflow: {
+          md: showPageActionSidebar ? 'auto' : 'inherit'
+        }
       }}
       >
         {page.deletedAt && <PageDeleteBanner pageId={page.id} />}
-        {page.headerImage && <PageBanner headerImage={page.headerImage} setPage={setPage} />}
+        {page.headerImage && <PageBanner headerImage={page.headerImage} readOnly={readOnly} setPage={setPage} />}
         <Container
           top={pageTop}
           fullWidth={page.fullWidth ?? false}
@@ -167,7 +179,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
             <CreateVoteBox />
           )}
         </Container>
-      </div>
+      </Box>
     </ScrollableWindow>
   );
 }

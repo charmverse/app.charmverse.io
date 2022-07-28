@@ -16,7 +16,7 @@ export default function BountyIntegration (props: BountyIntegrationProps) {
 
   const [userSpacePermissions] = useCurrentSpacePermissions();
 
-  const linkedBounty = bounties.find(bounty => bounty.linkedTaskId === linkedTaskId);
+  const linkedBounty = bounties.find(bounty => bounty.page?.cardId === linkedTaskId);
 
   return (
     <Box sx={{

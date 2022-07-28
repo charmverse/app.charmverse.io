@@ -1,6 +1,6 @@
 
 import {
-  Application, Block, Bounty, InviteLink, Page, PagePermissionLevel, PaymentMethod, Prisma,
+  Application, Block, InviteLink, Page, PagePermissionLevel, PaymentMethod, Prisma,
   Role, Space, TelegramUser, TokenGate, TokenGateToRole, User, UserDetails, UserGnosisSafe, UserVote
 } from '@prisma/client';
 import * as http from 'adapters/http';
@@ -29,14 +29,12 @@ import { ListSpaceRolesResponse } from 'pages/api/roles';
 import { GetTasksResponse } from 'pages/api/tasks/list';
 import { GetTasksStateResponse, UpdateTasksState } from 'pages/api/tasks/state';
 import { TelegramAccount } from 'pages/api/telegram/connect';
-import { UpdateThreadRequest } from 'pages/api/threads/[id]';
+import { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
 import { TokenGateWithRoles } from 'pages/api/token-gates';
-
-import { ApplicationWithTransactions } from 'lib/applications/actions';
 import { AssignedBountyPermissions, BountyCreationData, BountySubmitterPoolCalculation, BountySubmitterPoolSize, BountyUpdate, SuggestionAction } from 'lib/bounties/interfaces';
-import { DeepDaoAggregateData } from 'lib/deepdao/interfaces';
+import { DeepDaoAggregateData } from 'lib/deepdao/client';
 import { PublicPageResponse } from 'lib/pages/interfaces';
-import { PublicBountyToggle, PublicSpaceInfo } from 'lib/spaces/interfaces';
+import { PublicBountyToggle } from 'lib/spaces/interfaces';
 import type { MarkTask } from 'lib/tasks/markTasks';
 import { TransactionCreationData } from 'lib/transactions/interface';
 import { ExtendedVote, UserVoteExtendedDTO, VoteDTO } from 'lib/votes/interfaces';
@@ -399,11 +397,8 @@ class CharmClient {
     return http.GET('/api/bounties', { spaceId, publicOnly });
   }
 
-  async createBounty (bounty: Partial<BountyCreationData>): Promise<Bounty> {
-
-    const data = await http.POST<Bounty>('/api/bounties', bounty);
-
-    return data;
+  async createBounty (bounty: BountyCreationData): Promise<BountyWithDetails> {
+    return http.POST<BountyWithDetails>('/api/bounties', bounty);
   }
 
   async getBountyApplicantPool ({ resourceId, permissions }: BountySubmitterPoolCalculation): Promise<BountySubmitterPoolSize> {
@@ -651,8 +646,8 @@ class CharmClient {
     return http.DELETE(`/api/threads/${threadId}`);
   }
 
-  updateThread (threadId: string, request: UpdateThreadRequest) {
-    return http.PUT(`/api/threads/${threadId}`, request);
+  resolveThread (threadId: string, request: ResolveThreadRequest) {
+    return http.PUT(`/api/threads/${threadId}/resolve`, request);
   }
 
   addComment (request: Omit<CommentCreate, 'userId'>): Promise<CommentWithUser> {

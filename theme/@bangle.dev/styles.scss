@@ -2,10 +2,6 @@
   border-radius: 8px;
 }
 
-.bangle-editor li[data-bangle-is-todo] > span:first-child > input {
-  margin-top: 0.45rem;
-}
-
 .bangle-editor .selected-node {
   animation-duration: 0.75s;
   animation-name: editorSelectedNode;
@@ -341,7 +337,10 @@ ol li {
   display: flex;
   flex-direction: row;
   position: relative;
-  left: -1.5rem;
+}
+
+.bangle-editor li[data-bangle-is-todo] > span:first-child {
+  margin-left: -1.5rem;
 }
 
 .bangle-editor li[data-bangle-is-todo] > span:first-child > input {
@@ -511,5 +510,25 @@ details {
     .row-handle {
       opacity: 1;
     }
+  }
+}
+
+// for inline comments
+.charm-row-decoration {
+
+  background-color: var(--background-default);
+  cursor: pointer;
+  position: absolute;
+  right: -70px;
+  // add a width so that icons are left-aligned even if counts get large
+  width: 40px;
+
+  svg {
+    color: rgba(var(--center-channel-color-rgb), .5);
+  }
+
+  .MuiTypography-root {
+    color: rgba(var(--center-channel-color-rgb), .8);
+    font-size: .8rem;
   }
 }
