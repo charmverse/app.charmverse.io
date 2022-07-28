@@ -4,6 +4,7 @@ import { Box, Collapse, Divider, FormLabel, IconButton, Stack, TextField } from 
 import { PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
 import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge';
+import BountySuggestionApproval from 'components/bounties/components/BountySuggestionApproval';
 import BountyReviewers from 'components/bounties/[bountyId]/components_v3/BountyReviewers';
 import BountySubmissionsTable from 'components/bounties/[bountyId]/components_v3/BountySubmissionsTable';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
@@ -15,6 +16,7 @@ import { CryptoCurrency, getChainById } from 'connectors';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
+import useIsAdmin from 'hooks/useIsAdmin';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
 import { AssignedBountyPermissions, BountyPermissions, UpdateableBountyFields } from 'lib/bounties';
@@ -77,13 +79,13 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
   const [capSubmissions, setCapSubmissions] = useState(currentBounty.maxSubmissions !== null);
   const [space] = useCurrentSpace();
   const [user] = useUser();
+  const isAdmin = useIsAdmin();
   const [permissions, setPermissions] = useState<AssignedBountyPermissions | null>(null);
   const assignedRoleSubmitters = permissions?.bountyPermissions?.submitter?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
   const selectedReviewerUsers = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'user').map(p => p.id as string) ?? [];
   const selectedReviewerRoles = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
-  const [currentUserPermissions] = useCurrentSpacePermissions();
 
-  const canEdit = user && !readOnly && bounty.createdBy === user.id && currentUserPermissions?.createBounty !== false;
+  const canEdit = user && !readOnly && ((bounty.createdBy === user.id && bounty.status !== 'suggestion') || (bounty.status === 'suggestion' && isAdmin) || isAdmin);
 
   async function refreshBountyPermissions (bountyId: string) {
     setPermissions(await charmClient.computeBountyPermissions({
@@ -409,10 +411,30 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
         }}
       />
       {permissions && bounty.status !== 'suggestion' && (
-      <BountySubmissionsTable
-        bounty={currentBounty}
-        permissions={permissions}
-      />
+      <>
+        <BountySubmissionsTable
+          bounty={currentBounty}
+          permissions={permissions}
+        />
+        <Divider
+          sx={{
+            my: 1
+          }}
+        />
+      </>
+      )}
+
+      {permissions?.userPermissions?.review && bounty.status === 'suggestion' && bounty.createdBy !== user?.id && (
+        <>
+          <BountySuggestionApproval
+            bounty={currentBounty}
+          />
+          <Divider
+            sx={{
+              my: 1
+            }}
+          />
+        </>
       )}
     </Box>
   );
