@@ -2,16 +2,12 @@ import { ApplicationStatus, BountyStatus } from '@prisma/client';
 import { prisma } from 'db';
 import { submissionsCapReached } from 'lib/applications/shared';
 import { includePagePermissions } from 'lib/pages/server';
-import { DataNotFoundError } from 'lib/utilities/errors';
 import { BountyWithDetails } from 'models';
 import { countValueOccurrences } from '../utilities/numbers';
-import { getBounty } from './getBounty';
+import { getBountyOrThrow } from './getBounty';
 
 export async function rollupBountyStatus (bountyId: string): Promise<BountyWithDetails> {
-  const bounty = await getBounty(bountyId);
-  if (!bounty) {
-    throw new DataNotFoundError(`Bounty with id ${bountyId} not found`);
-  }
+  const bounty = await getBountyOrThrow(bountyId);
 
   // No-op on bounty suggestions. They need to be approved first
   if (bounty.status === 'suggestion') {

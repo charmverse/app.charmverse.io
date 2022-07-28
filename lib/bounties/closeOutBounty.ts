@@ -2,14 +2,11 @@ import { prisma } from 'db';
 import { countValidSubmissions } from 'lib/applications/shared';
 import { includePagePermissions } from 'lib/pages/server';
 import { BountyWithDetails } from '../../models/Bounty';
-import { DataNotFoundError } from '../utilities/errors';
-import { getBounty } from './getBounty';
+import { getBountyOrThrow } from './getBounty';
 
 export async function closeOutBounty (bountyId: string): Promise<BountyWithDetails> {
-  const bounty = await getBounty(bountyId);
-  if (!bounty) {
-    throw new DataNotFoundError(`Bounty with ID ${bountyId} not found`);
-  }
+
+  const bounty = await getBountyOrThrow(bountyId);
 
   const validSubmissions = countValidSubmissions(bounty.applications);
 

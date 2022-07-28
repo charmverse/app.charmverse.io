@@ -3,9 +3,8 @@ import { Space, User } from '@prisma/client';
 import { generateUserAndSpaceWithApiToken, generateBountyWithSingleApplication } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { ExpectedAnError } from 'testing/errors';
-import { DataNotFoundError, InvalidInputError, UnauthorisedActionError, MissingDataError } from 'lib/utilities/errors';
-import { createBounty } from 'lib/bounties/createBounty';
-import { prisma } from 'db';
+import { DataNotFoundError, UnauthorisedActionError, MissingDataError } from 'lib/utilities/errors';
+
 import { generateSubmissionContent } from 'testing/generate-stubs';
 import { SubmissionContent } from '../../interfaces';
 import { updateSubmission } from '../updateSubmission';
@@ -96,7 +95,7 @@ describe('updateSubmission', () => {
 
     const submissionUpdate: SubmissionContent = {
       submission: '',
-      submissionNodes: null,
+      submissionNodes: '',
       walletAddress: '0x0'
     };
 

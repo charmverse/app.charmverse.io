@@ -17,7 +17,7 @@ beforeAll(async () => {
 });
 
 describe('closeNewApplicationsAndSubmissions', () => {
-  it('should update the cap of the bounty to the current amount of active / accepted submissions', async () => {
+  it('should lock submissions', async () => {
     const bounty = await generateBountyWithSingleApplication({
       bountyStatus: 'open',
       applicationStatus: 'inProgress',
@@ -28,22 +28,7 @@ describe('closeNewApplicationsAndSubmissions', () => {
 
     const updatedBounty = await closeNewApplicationsAndSubmissions(bounty.id);
 
-    expect(updatedBounty.maxSubmissions).toBe(1);
-  });
-
-  // See rollupBountyStatus for how this works
-  it('should rollup the bounty status after the new submission cap', async () => {
-    const bounty = await generateBountyWithSingleApplication({
-      bountyStatus: 'open',
-      applicationStatus: 'inProgress',
-      bountyCap: 2,
-      spaceId: space.id,
-      userId: nonAdminUser.id
-    });
-
-    const updatedBounty = await closeNewApplicationsAndSubmissions(bounty.id);
-
-    expect(updatedBounty.status).toBe('inProgress');
+    expect(updatedBounty.submissionsLocked).toBe(true);
   });
 
   it('should fail if the bounty does not exist', async () => {
