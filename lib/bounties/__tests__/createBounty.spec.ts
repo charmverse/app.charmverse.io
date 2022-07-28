@@ -35,8 +35,6 @@ describe('createBounty', () => {
 
     expect(bounty).toEqual(
       expect.objectContaining<Partial<Bounty>>({
-        title: expect.stringContaining('My bounty'),
-        description: expect.any(String),
         createdBy: expect.stringContaining(user.id),
         spaceId: expect.stringContaining(space.id),
         suggestedBy: expect.stringContaining(user.id)
@@ -66,12 +64,18 @@ describe('createBounty', () => {
 
     const bounty = await createBounty(fullBountyCreationData);
 
-    Object.entries(fullBountyCreationData).forEach(([key, value]) => {
-
-      if (key !== 'permissions') {
-        expect(bounty[key as Exclude<keyof BountyCreationData, 'permissions'>]).toBe(value);
-      }
-
+    expect({
+      chainId: fullBountyCreationData.chainId,
+      maxSubmissions: fullBountyCreationData.maxSubmissions,
+      rewardAmount: fullBountyCreationData.rewardAmount,
+      rewardToken: fullBountyCreationData.rewardToken,
+      status: fullBountyCreationData.status
+    }).toStrictEqual({
+      chainId: bounty.chainId,
+      maxSubmissions: bounty.maxSubmissions,
+      rewardAmount: bounty.rewardAmount,
+      rewardToken: bounty.rewardToken,
+      status: bounty.status
     });
 
     const bountyPermissions = await queryBountyPermissions({ bountyId: bounty.id });
@@ -88,7 +92,7 @@ describe('createBounty', () => {
 
   });
 
-  it('should be able to create a bounty in open status if the data provided has at least title, createdBy, spaceId, status and rewardAmount', async () => {
+  it('should be able to create a bounty with a page in open status if the data provided has at least title, createdBy, spaceId, status and rewardAmount', async () => {
 
     const { user: adminUser, space: localSpace } = await generateUserAndSpaceWithApiToken(undefined, true);
 
@@ -102,12 +106,14 @@ describe('createBounty', () => {
 
     expect(bounty).toEqual(
       expect.objectContaining<Partial<Bounty>>({
-        title: expect.stringContaining('My bounty'),
-        description: expect.any(String),
         createdBy: expect.stringContaining(adminUser.id),
         spaceId: expect.stringContaining(localSpace.id)
       })
     );
+
+    expect(bounty.page).toMatchObject(expect.objectContaining({
+      title: 'My bounty'
+    }));
 
   });
 
