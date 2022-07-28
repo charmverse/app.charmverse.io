@@ -1,7 +1,7 @@
 import { useTheme } from '@emotion/react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Collapse, IconButton } from '@mui/material';
+import { Collapse, IconButton, Stack, TextField } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
@@ -13,6 +13,9 @@ import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import { Application, ApplicationStatus, Bounty } from '@prisma/client';
 import charmClient from 'charmClient';
+import { createCommentBlock } from 'components/common/BoardEditor/focalboard/src/blocks/commentBlock';
+import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
+import FieldLabel from 'components/common/form/FieldLabel';
 import UserDisplay from 'components/common/UserDisplay';
 import { useBounties } from 'hooks/useBounties';
 import { useContributors } from 'hooks/useContributors';
@@ -21,6 +24,7 @@ import { ApplicationWithTransactions } from 'lib/applications/actions';
 import { applicantIsSubmitter, countValidSubmissions } from 'lib/applications/shared';
 import { AssignedBountyPermissions } from 'lib/bounties/interfaces';
 import { humanFriendlyDate } from 'lib/utilities/dates';
+import { BountyWithDetails } from 'models';
 import { useEffect, useState } from 'react';
 import { BrandColor } from 'theme/colors';
 import BountySubmissionReviewActions, { BountySubmissionReviewActionsProps } from '../../components/BountySubmissionReviewActions';
@@ -29,7 +33,7 @@ import BountyApplicationForm from './BountyApplicationForm';
 import SubmissionEditorForm from './SubmissionEditorForm';
 
 interface Props {
-  bounty: Bounty
+  bounty: BountyWithDetails
   permissions: AssignedBountyPermissions
 }
 
@@ -55,7 +59,7 @@ interface BountySubmissionsTableRowProps {
   totalAcceptedApplications: number
   submission: ApplicationWithTransactions
   permissions: AssignedBountyPermissions
-  bounty: Bounty
+  bounty: BountyWithDetails
   onSubmission: BountySubmissionReviewActionsProps['onSubmission']
 }
 
@@ -64,8 +68,16 @@ function BountySubmissionsTableRow ({ onSubmission, submission, permissions, bou
   const { refreshBounty } = useBounties();
   const [user] = useUser();
   const [isViewingDetails, setIsViewingDetails] = useState(false);
-
+  const [applicationComment, setApplicationComment] = useState('');
   const contributor = contributors.find(c => c.id === submission.createdBy);
+
+  const onSendClicked = () => {
+    const comment = createCommentBlock();
+    comment.parentId = bounty.page?.id;
+    comment.rootId = bounty.page?.id;
+    comment.title = `@${contributor?.username} ${applicationComment}`;
+    mutator.insertBlock(comment, 'add comment');
+  };
 
   function displayAssignmentButton (application: Application) {
     return (
@@ -162,6 +174,29 @@ function BountySubmissionsTableRow ({ onSubmission, submission, permissions, bou
               mode='update'
               showHeader
             />
+            )}
+            {permissions.userPermissions.review && (
+            <Stack mt={1}>
+              <FieldLabel>Message for Applicant (optional)</FieldLabel>
+              <Stack mb={1} flexDirection='row' gap={1}><TextField
+                value={applicationComment}
+                onChange={(e) => {
+                  setApplicationComment(e.target.value);
+                }}
+                sx={{
+                  flexGrow: 1
+                }}
+              />
+                <Button
+                  disabled={applicationComment.length === 0}
+                  onClick={() => {
+                    setApplicationComment('');
+                    onSendClicked();
+                  }}
+                >Send
+                </Button>
+              </Stack>
+            </Stack>
             )}
           </Collapse>
         </TableCell>
