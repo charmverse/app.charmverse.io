@@ -6,14 +6,14 @@ import { rollupBountyStatus } from './rollupBountyStatus';
 
 export async function closeNewApplicationsAndSubmissions (bountyId: string): Promise<BountyWithDetails> {
 
-  await getBountyOrThrow(bountyId);
+  await getBountyOrThrow(bountyId); // herer
 
   await prisma.bounty.update({
     where: {
       id: bountyId
     },
     data: {
-      lockSubmissions: true
+      submissionsLocked: true
     }
   });
 

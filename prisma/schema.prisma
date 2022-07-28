@@ -400,7 +400,7 @@ model Bounty {
   chainId           Int
   suggestedBy       String?            @db.Uuid
   approveSubmitters Boolean            @default(false)
-  lockSubmissions   Boolean            @default(false)
+  submissionsLocked Boolean            @default(false)
   maxSubmissions    Int?               @default(1)
   author            User               @relation(fields: [createdBy], references: [id])
   space             Space              @relation(fields: [spaceId], references: [id], onDelete: Cascade)
