@@ -1,5 +1,6 @@
 import { Box, Card, CardActionArea, CardHeader, Typography } from '@mui/material';
 import PageDialog from 'components/common/Page/PageDialog';
+import { usePages } from 'hooks/usePages';
 import { fancyTrim } from 'lib/utilities/strings';
 import { BountyWithDetails, Page } from 'models';
 import { useState } from 'react';
@@ -14,6 +15,8 @@ export interface IBountyInput {
 }
 
 function BountyCardDetails ({ bounty, truncate }: Pick<IBountyInput, 'bounty' | 'truncate'>) {
+  const { pages } = usePages();
+  const bountyPage = pages[bounty.page?.id];
   return (
     <Card
       sx={{
@@ -33,10 +36,10 @@ function BountyCardDetails ({ bounty, truncate }: Pick<IBountyInput, 'bounty' | 
           justifyContent: 'space-between'
         }}
       >
-        <CardHeader title={bounty.page?.title} titleTypographyProps={{ sx: { fontSize: '1rem', fontWeight: 'bold' } }} />
+        <CardHeader title={bountyPage?.title} titleTypographyProps={{ sx: { fontSize: '1rem', fontWeight: 'bold' } }} />
         <Box p={2} width='100%' display='flex' flex={1} flexDirection='column' justifyContent='space-between'>
           <Typography paragraph={true}>
-            {fancyTrim(bounty.page.contentText, 120)}
+            {fancyTrim(bountyPage?.contentText, 120)}
           </Typography>
           <BountyStatusBadge truncate={truncate} bounty={bounty} />
         </Box>
@@ -47,11 +50,15 @@ function BountyCardDetails ({ bounty, truncate }: Pick<IBountyInput, 'bounty' | 
 
 export function BountyCard ({ truncate = true, bounty }: IBountyInput) {
   const [page, setPage] = useState<Page | null>(null);
+  const { pages } = usePages();
 
   return (
     <>
       <Box onClick={() => {
-        setPage(bounty.page);
+        const bountyPage = pages[bounty.page?.id];
+        if (bountyPage) {
+          setPage(bountyPage);
+        }
       }}
       >
         <BountyCardDetails truncate={truncate} bounty={bounty} />
