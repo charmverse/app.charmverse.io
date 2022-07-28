@@ -11,7 +11,7 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
-import { Application, ApplicationStatus, Bounty } from '@prisma/client';
+import { Application, ApplicationStatus } from '@prisma/client';
 import charmClient from 'charmClient';
 import { createCommentBlock } from 'components/common/BoardEditor/focalboard/src/blocks/commentBlock';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
@@ -65,7 +65,6 @@ interface BountySubmissionsTableRowProps {
 
 function BountySubmissionsTableRow ({ onSubmission, submission, permissions, bounty, totalAcceptedApplications }: BountySubmissionsTableRowProps) {
   const [contributors] = useContributors();
-  const { refreshBounty } = useBounties();
   const [user] = useUser();
   const [isViewingDetails, setIsViewingDetails] = useState(false);
   const [applicationComment, setApplicationComment] = useState('');
@@ -79,24 +78,6 @@ function BountySubmissionsTableRow ({ onSubmission, submission, permissions, bou
     mutator.insertBlock(comment, 'add comment');
   };
 
-  function displayAssignmentButton (application: Application) {
-    return (
-      // Only admins can approve applications for now
-      (permissions.userPermissions.review)
-      && application.status === 'applied'
-      // If we reached the cap, we can't assign new people
-      && (
-        bounty.maxSubmissions === null || (
-          totalAcceptedApplications < (bounty.maxSubmissions ?? 0)
-        )
-      ));
-  }
-
-  async function approveApplication (applicationId: string) {
-    await charmClient.approveApplication(applicationId);
-    refreshBounty(bounty.id);
-  }
-
   return (
     <>
       <TableRow
@@ -104,7 +85,7 @@ function BountySubmissionsTableRow ({ onSubmission, submission, permissions, bou
         hover
       >
         <TableCell size='small'>
-          { contributor ? (
+          {contributor ? (
             <UserDisplay
               avatarSize='small'
               user={contributor}
@@ -133,26 +114,15 @@ function BountySubmissionsTableRow ({ onSubmission, submission, permissions, bou
           </IconButton>
         </TableCell>
         <TableCell align='right' sx={{ gap: 2, justifyContent: 'flex-end' }}>
-          {
-          displayAssignmentButton(submission) === true ? (
-            <Button
-              sx={{ ml: 2 }}
-              onClick={() => {
-                approveApplication(submission.id);
-              }}
-            >
-              Assign
-            </Button>
-          ) : (
-            <BountySubmissionReviewActions
-              bounty={bounty}
-              submission={submission}
-              reviewComplete={() => {}}
-              onSubmission={onSubmission}
-              permissions={permissions}
-            />
-          )
-        }
+          <BountySubmissionReviewActions
+            totalAcceptedApplications={totalAcceptedApplications}
+            bounty={bounty}
+            submission={submission}
+            reviewComplete={() => { }}
+            onSubmission={onSubmission}
+            permissions={permissions}
+            disableRejectButton
+          />
         </TableCell>
       </TableRow>
       <TableRow>
@@ -167,36 +137,48 @@ function BountySubmissionsTableRow ({ onSubmission, submission, permissions, bou
               />
             )}
             {bounty.approveSubmitters && (
-            <ApplicationEditorForm
-              bountyId={bounty.id}
-              proposal={submission}
-              readOnly={user?.id !== submission.createdBy || submission.status !== 'applied'}
-              mode='update'
-              showHeader
-            />
-            )}
-            {permissions.userPermissions.review && (
-            <Stack mt={1}>
-              <FieldLabel>Message for Applicant (optional)</FieldLabel>
-              <Stack mb={1} flexDirection='row' gap={1}><TextField
-                value={applicationComment}
-                onChange={(e) => {
-                  setApplicationComment(e.target.value);
-                }}
-                sx={{
-                  flexGrow: 1
-                }}
+              <ApplicationEditorForm
+                bountyId={bounty.id}
+                proposal={submission}
+                readOnly={user?.id !== submission.createdBy || submission.status !== 'applied'}
+                mode='update'
+                showHeader
               />
-                <Button
-                  disabled={applicationComment.length === 0}
-                  onClick={() => {
-                    setApplicationComment('');
-                    onSendClicked();
-                  }}
-                >Send
-                </Button>
-              </Stack>
-            </Stack>
+            )}
+            {permissions.userPermissions.review && submission.status !== 'rejected' && (
+              <>
+                <Stack mt={1}>
+                  <FieldLabel>Message for Applicant (optional)</FieldLabel>
+                  <Stack mb={1} flexDirection='row' gap={1}><TextField
+                    value={applicationComment}
+                    onChange={(e) => {
+                      setApplicationComment(e.target.value);
+                    }}
+                    sx={{
+                      flexGrow: 1
+                    }}
+                  />
+                    <Button
+                      disabled={applicationComment.length === 0}
+                      onClick={() => {
+                        setApplicationComment('');
+                        onSendClicked();
+                      }}
+                    >Send
+                    </Button>
+                  </Stack>
+                </Stack>
+                <Box width='100%' display='flex' gap={1} my={2} justifyContent='center'>
+                  <BountySubmissionReviewActions
+                    totalAcceptedApplications={totalAcceptedApplications}
+                    bounty={bounty}
+                    submission={submission}
+                    reviewComplete={() => { }}
+                    onSubmission={onSubmission}
+                    permissions={permissions}
+                  />
+                </Box>
+              </>
             )}
           </Collapse>
         </TableCell>
@@ -238,53 +220,53 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
       />
 
       {(userApplication || permissions.userPermissions.review) && (
-      <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
-        <TableHead sx={{
-          background: theme.palette.background.dark,
-          '.MuiTableCell-root': {
-            background: theme.palette.settingsHeader.background
-          }
-        }}
-        >
-          <TableRow>
-            {/* Width should always be same as Bounty Applicant list status column, so submitter and applicant columns align */}
-            <TableCell>
-              <Box sx={{
-                display: 'flex',
-                alignItems: 'center'
-              }}
-              >
-                Applicant
-              </Box>
-            </TableCell>
-            <TableCell sx={{ width: 120 }} align='left'>
-              Status
-            </TableCell>
-            <TableCell>
-              Last updated
-            </TableCell>
-            <TableCell>
-            </TableCell>
-            <TableCell align='center'>
-              Action
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {(isReviewer ? applications : applications.filter(application => application.createdBy === user?.id)).map((submission) => (
-            <BountySubmissionsTableRow
-              bounty={bounty}
-              totalAcceptedApplications={acceptedApplications.length}
-              permissions={permissions}
-              submission={submission}
-              key={submission.id}
-              onSubmission={async () => {
-                setIsSubmittingApplication(true);
-              }}
-            />
-          ))}
-        </TableBody>
-      </Table>
+        <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
+          <TableHead sx={{
+            background: theme.palette.background.dark,
+            '.MuiTableCell-root': {
+              background: theme.palette.settingsHeader.background
+            }
+          }}
+          >
+            <TableRow>
+              {/* Width should always be same as Bounty Applicant list status column, so submitter and applicant columns align */}
+              <TableCell>
+                <Box sx={{
+                  display: 'flex',
+                  alignItems: 'center'
+                }}
+                >
+                  Applicant
+                </Box>
+              </TableCell>
+              <TableCell sx={{ width: 120 }} align='left'>
+                Status
+              </TableCell>
+              <TableCell>
+                Last updated
+              </TableCell>
+              <TableCell>
+              </TableCell>
+              <TableCell align='center'>
+                Action
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {(isReviewer ? applications : applications.filter(application => application.createdBy === user?.id)).map((submission) => (
+              <BountySubmissionsTableRow
+                bounty={bounty}
+                totalAcceptedApplications={acceptedApplications.length}
+                permissions={permissions}
+                submission={submission}
+                key={submission.id}
+                onSubmission={async () => {
+                  setIsSubmittingApplication(true);
+                }}
+              />
+            ))}
+          </TableBody>
+        </Table>
       )}
       {applications.length === 0 && permissions.userPermissions.review && (
         <Box
@@ -311,17 +293,17 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
 
       {
         isSubmittingApplication && (
-        <SubmissionEditorForm
-          bountyId={bounty.id}
-          submission={userApplication}
-          showHeader
-          onCancel={() => setIsSubmittingApplication(false)}
-          onSubmit={async () => {
-            await refreshSubmissions();
-            await refreshBounty(bounty.id);
-            setIsSubmittingApplication(false);
-          }}
-        />
+          <SubmissionEditorForm
+            bountyId={bounty.id}
+            submission={userApplication}
+            showHeader
+            onCancel={() => setIsSubmittingApplication(false)}
+            onSubmit={async () => {
+              await refreshSubmissions();
+              await refreshBounty(bounty.id);
+              setIsSubmittingApplication(false);
+            }}
+          />
         )
       }
     </Box>
