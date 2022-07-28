@@ -8,6 +8,8 @@ import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useSpaces } from 'hooks/useSpaces';
+import { useUser } from 'hooks/useUser';
 import getLitChainFromChainId from 'lib/token-gates/getLitChainFromChainId';
 import { TokenGateEvaluationResult, TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import { checkAndSignAuthMessage } from 'lit-js-sdk';
@@ -24,11 +26,14 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
 
   const { account, chainId } = useWeb3React();
   const { showMessage } = useSnackbar();
+  const [spaces, setSpaces] = useSpaces();
+  const [user, setUser] = useUser();
 
   const [tokenGates, setTokenGates] = useState<TokenGateWithRoles[] | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
   const [verifyingGates, setIsVerifyingGates] = useState(false);
+  const [joiningSpace, setJoiningSpace] = useState(false);
 
   const [tokenGateResult, setTokenGateResult] = useState<TokenGateEvaluationResult | null>(null);
   // Token gates with those that succeedeed first
@@ -58,7 +63,7 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
     setTokenGateResult(null);
     window.localStorage.removeItem('lit-auth-signature');
 
-    setIsLoading(true);
+    setIsVerifyingGates(true);
 
     const chain = getLitChainFromChainId(chainId);
 
@@ -72,15 +77,16 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
       if (verifyResult.canJoinSpace) {
         showMessage('Verification succeeded.', 'success');
       }
-      setIsLoading(false);
+
+      setIsVerifyingGates(false);
     }
     catch (err) {
-      setIsLoading(false);
+      setIsVerifyingGates(false);
     }
   }
 
   async function onSubmit () {
-    setIsLoading(true);
+    setJoiningSpace(true);
     try {
       const verified = await charmClient.verifyTokenGate({
         spaceId: tokenGateResult?.space.id as string,
@@ -88,13 +94,25 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
       });
 
       showMessage(`You have joined the ${tokenGateResult?.space.name} workspace.`, 'success');
+      const spaceExists = spaces.some(s => s.id === tokenGateResult?.space.id);
 
+      // Refresh the user account. This was required as otherwise the user would not be able to see the first page upon joining the space
+      const refreshedProfile = await charmClient.login(account as string);
+
+      setUser(refreshedProfile);
+
+      // Refresh spaces as otherwise the redirect will not work
+      if (!spaceExists) {
+        setSpaces([...spaces, tokenGateResult?.space as Space]);
+      }
       onSuccess(tokenGateResult?.space as Space);
+      // onSuccess(tokenGateResult?.space as Space);
     }
     catch (err: any) {
       showMessage(err?.message ?? (err ?? 'An unknown error occurred'), 'error');
-      setIsLoading(false);
     }
+
+    setJoiningSpace(false);
 
   }
 
@@ -123,8 +141,8 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
             <Grid item xs key={gate.id}>
               <TokenGateOption
                 tokenGate={gate}
-                isVerifying={false}
-                validGate={Math.random() > 0.5}
+                isVerifying={verifyingGates}
+                validGate={tokenGateResult ? (tokenGateResult.gateTokens.some(g => g.tokenGate.id === gate.id)) : null}
               />
               {
                 index < list.length - 1 && (
@@ -156,7 +174,7 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
       <Grid item>
         {
           !tokenGateResult?.canJoinSpace ? (
-            <PrimaryButton size='large' fullWidth type='submit' onClick={generateAuthSignature}>
+            <PrimaryButton disabled={verifyingGates} size='large' fullWidth type='submit' onClick={generateAuthSignature}>
               Verify wallet
             </PrimaryButton>
           ) : (
@@ -164,7 +182,8 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
               size='large'
               fullWidth
               type='submit'
-              disabled={!tokenGateResult?.canJoinSpace}
+              loading={joiningSpace}
+              disabled={joiningSpace}
               onClick={onSubmit}
             >
               {joinButtonLabel || 'Join workspace'}

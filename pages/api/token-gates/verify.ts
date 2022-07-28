@@ -1,6 +1,6 @@
 
 import { postToDiscord } from 'lib/log/userEvents';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { InvalidStateError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { applyTokenGates } from 'lib/token-gates/applyTokenGates';
 import { TokenGateVerification } from 'lib/token-gates/interfaces';

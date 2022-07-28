@@ -107,7 +107,7 @@ export default function CreateSpace () {
 
         {
           spaceInfo && (
-            <TokenGateForm onSubmit={onJoinSpace} spaceDomain={spaceDomain} />
+            <TokenGateForm onSuccess={onJoinSpace} spaceDomain={spaceDomain} />
           )
         }
 
