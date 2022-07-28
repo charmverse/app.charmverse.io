@@ -159,14 +159,23 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
                 />
                 )}
                 <hr />
+                {!bounty && (
                 <CommentsList
                   comments={comments}
                   rootId={card?.rootId ?? page.spaceId}
                   cardId={card?.id ?? page.id}
                   readonly={readOnly}
                 />
+                )}
                 {bounty && (
-                  <BountyProperties bounty={bounty} readOnly={readOnly} />
+                  <BountyProperties bounty={bounty} readOnly={readOnly}>
+                    <CommentsList
+                      comments={comments}
+                      rootId={card?.rootId ?? page.spaceId}
+                      cardId={card?.id ?? page.id}
+                      readonly={readOnly}
+                    />
+                  </BountyProperties>
                 )}
               </div>
             </div>

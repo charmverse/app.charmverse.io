@@ -24,7 +24,7 @@ import { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import debouncePromise from 'lib/utilities/debouncePromise';
 import { isTruthy } from 'lib/utilities/types';
 import { BountyWithDetails } from 'models';
-import { useCallback, useEffect, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useState } from 'react';
 
 function rollupPermissions ({
   selectedReviewerUsers,
@@ -69,8 +69,8 @@ function rollupPermissions ({
   return permissionsToSend;
 }
 
-export default function BountyProperties (props: {readOnly?: boolean, bounty: BountyWithDetails}) {
-  const { bounty, readOnly = false } = props;
+export default function BountyProperties (props: {children: ReactNode, readOnly?: boolean, bounty: BountyWithDetails}) {
+  const { bounty, readOnly = false, children } = props;
   const [paymentMethods] = usePaymentMethods();
   const { updateBounty } = useBounties();
   const [availableCryptos, setAvailableCryptos] = useState<Array<string | CryptoCurrency>>([]);
@@ -416,6 +416,7 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
           my: 1
         }}
       />
+      {children}
       {permissions && bounty.status !== 'suggestion' && (
       <>
         <BountySubmissionsTable
