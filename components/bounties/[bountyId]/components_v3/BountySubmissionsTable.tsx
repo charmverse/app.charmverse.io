@@ -11,7 +11,7 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
-import { Application, ApplicationStatus } from '@prisma/client';
+import { ApplicationStatus } from '@prisma/client';
 import charmClient from 'charmClient';
 import { createCommentBlock } from 'components/common/BoardEditor/focalboard/src/blocks/commentBlock';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';

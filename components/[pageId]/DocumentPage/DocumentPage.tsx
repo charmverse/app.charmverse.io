@@ -82,7 +82,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
 
   const card = cards.find(_card => _card.id === page.id);
 
-  const comments = useAppSelector(getCardComments(card?.id));
+  const comments = useAppSelector(getCardComments(card?.id ?? page.id));
 
   const showPageActionSidebar = (currentPageActionDisplay !== null) && !insideModal;
   const router = useRouter();
@@ -143,42 +143,33 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
                 />
               </Box>
             )}
-            {!card && !board && page.type === 'bounty' && bounty
-              && (
-              <div className='focalboard-body'>
-                <div className='CardDetail content'>
+            <div className='focalboard-body'>
+              <div className='CardDetail content'>
+                {/* Property list */}
+                {card && board && (
+                <CardDetailProperties
+                  board={board}
+                  card={card}
+                  cards={cards}
+                  activeView={activeView}
+                  views={boardViews}
+                  readonly={readOnly}
+                  pageUpdatedAt={page.updatedAt.toString()}
+                  pageUpdatedBy={page.updatedBy}
+                />
+                )}
+                <hr />
+                <CommentsList
+                  comments={comments}
+                  rootId={card?.rootId ?? page.spaceId}
+                  cardId={card?.id ?? page.id}
+                  readonly={readOnly}
+                />
+                {bounty && (
                   <BountyProperties bounty={bounty} readOnly={readOnly} />
-                </div>
+                )}
               </div>
-              ) }
-            {card && board && (
-
-              <div className='focalboard-body'>
-                <div className='CardDetail content'>
-                  {/* Property list */}
-                  <CardDetailProperties
-                    board={board}
-                    card={card}
-                    cards={cards}
-                    activeView={activeView}
-                    views={boardViews}
-                    readonly={readOnly}
-                    pageUpdatedAt={page.updatedAt.toString()}
-                    pageUpdatedBy={page.updatedBy}
-                  />
-                  <hr />
-                  <CommentsList
-                    comments={comments}
-                    rootId={card.rootId}
-                    cardId={card.id}
-                    readonly={readOnly}
-                  />
-                  {bounty && (
-                  <BountyProperties bounty={bounty} readOnly={readOnly} />
-                  )}
-                </div>
-              </div>
-            )}
+            </div>
           </CharmEditor>
 
           {page.type === 'proposal' && !isLoading && !pageVote && (

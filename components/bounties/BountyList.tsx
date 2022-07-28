@@ -94,7 +94,7 @@ export default function BountyList ({ publicMode, bountyCardClicked = () => null
 
           {
           !publicMode && (
-            <Box width='fit-content'>
+            <Box width='fit-content' display='flex' gap={1}>
               { !!csvData.length
               && (
                 <CSVLink data={csvData} filename='Gnosis Safe Airdrop.csv' style={{ textDecoration: 'none' }}>
