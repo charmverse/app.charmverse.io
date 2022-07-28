@@ -47,11 +47,13 @@ export interface TokenGateEvaluationResult {
 
 /**
  * Used for passing lit JWTs and gaining membership to a space
+ * @commit Whether the token gates for selected tokens should be applied
  */
 export interface TokenGateVerification {
   userId: string;
   spaceId: string;
-  tokens: TokenGateJwt[];
+  tokens: (Pick<TokenGateJwt, 'signedToken'> & {tokenGateId: string})[];
+  commit: boolean
 }
 
 export interface TokenGateVerificationResult {

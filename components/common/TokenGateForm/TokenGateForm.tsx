@@ -88,9 +88,15 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
   async function onSubmit () {
     setJoiningSpace(true);
     try {
-      const verified = await charmClient.verifyTokenGate({
+      await charmClient.verifyTokenGate({
+        commit: true,
         spaceId: tokenGateResult?.space.id as string,
-        tokens: tokenGateResult?.gateTokens ?? []
+        tokens: tokenGateResult?.gateTokens.map(tk => {
+          return {
+            signedToken: tk.signedToken,
+            tokenGateId: tk.tokenGate.id
+          };
+        }) ?? []
       });
 
       showMessage(`You have joined the ${tokenGateResult?.space.name} workspace.`, 'success');

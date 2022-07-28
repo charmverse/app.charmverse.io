@@ -1,11 +1,11 @@
-import { DataNotFoundError, InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
-import { verifyJwt, LitNodeClient } from 'lit-js-sdk';
-import { prisma } from 'db';
 import { Role } from '@prisma/client';
+import { prisma } from 'db';
+import { DataNotFoundError, InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
+import { verifyJwt } from 'lit-js-sdk';
 import { v4 } from 'uuid';
-import { TokenGateVerification, TokenGateVerificationResult, TokenGateJwt, LitJwtPayload } from './interfaces';
+import { LitJwtPayload, TokenGateVerification, TokenGateVerificationResult, TokenGateWithRoles } from './interfaces';
 
-export async function applyTokenGates ({ spaceId, userId, tokens }: TokenGateVerification): Promise<TokenGateVerificationResult> {
+export async function applyTokenGates ({ spaceId, userId, tokens, commit }: TokenGateVerification): Promise<TokenGateVerificationResult> {
 
   if (!spaceId || !userId) {
     throw new InvalidInputError(`Please provide a valid ${!spaceId ? 'space' : 'user'} id.`);
@@ -16,53 +16,56 @@ export async function applyTokenGates ({ spaceId, userId, tokens }: TokenGateVer
       id: spaceId
     },
     include: {
-      roles: true
+      roles: true,
+      TokenGate: {
+        include: {
+          tokenGateToRoles: {
+            include: {
+              role: true
+            }
+          }
+        }
+      }
     }
   });
 
   if (!space) {
-    throw new DataNotFoundError(`Could not find space with id ${spaceId}`);
+    throw new DataNotFoundError(`Could not find space with id ${spaceId}.`);
   }
 
-  const tokenGateVerifications: TokenGateJwt[] = (await Promise.all(tokens.map(async tk => {
+  const { TokenGate: tokenGates } = space;
+
+  // We need to have at least one token gate that succeeded in order to proceed
+  if (tokenGates.length === 0) {
+    throw new DataNotFoundError('No token gates were found for this space.');
+  }
+
+  const verifiedTokenGates: TokenGateWithRoles[] = (await Promise.all(tokens.map(async tk => {
     const result = await verifyJwt({ jwt: tk.signedToken }) as {payload: LitJwtPayload, verified: boolean};
+
+    const matchingTokenGate = tokenGates.find(g => g.id === tk.tokenGateId);
+
+    // Only check against existing token gates for this space
+    if (matchingTokenGate
     // Perform additional checks here as per https://github.com/LIT-Protocol/lit-minimal-jwt-example/blob/main/server.js
-    if (result?.verified && result.payload?.orgId === space.id) {
+    && result?.verified && result.payload?.orgId === space.id) {
+
       const embeddedTokenGateId = JSON.parse(result.payload.extraData).tokenGateId;
 
-      if (embeddedTokenGateId === tk.tokenGate.id) {
-        return tk;
+      if (embeddedTokenGateId === tk.tokenGateId) {
+        return matchingTokenGate;
       }
     }
 
     return null;
-  }))).filter(tk => tk !== null) as TokenGateJwt[];
 
-  if (tokenGateVerifications.length === 0) {
+  }))).filter(tk => tk !== null) as TokenGateWithRoles[];
+
+  if (verifiedTokenGates.length === 0) {
     throw new InsecureOperationError('At least one token gate verification must succeed to grant a space membership.');
   }
 
-  const tokenGates = await prisma.tokenGate.findMany({
-    where: {
-      spaceId,
-      OR: tokenGateVerifications.map(tk => {
-        return {
-          id: tk.tokenGate.id
-        };
-      })
-    },
-    select: {
-      id: true,
-      tokenGateToRoles: true
-    }
-  });
-
-  // We need to have at least one token gate that succeeded in order to proceed
-  if (tokenGates.length === 0) {
-    throw new DataNotFoundError('No token gates were found.');
-  }
-
-  const roleIdsToAssign: string[] = tokenGates.reduce((roleList, tokenGate) => {
+  const roleIdsToAssign: string[] = verifiedTokenGates.reduce((roleList, tokenGate) => {
 
     tokenGate.tokenGateToRoles.forEach(roleMapping => {
       if (!roleList.includes(roleMapping.roleId) && space.roles.some(role => role.id === roleMapping.roleId)) {
@@ -88,7 +91,10 @@ export async function applyTokenGates ({ spaceId, userId, tokens }: TokenGateVer
     roles: assignedRoles
   };
 
-  if (spaceMembership && roleIdsToAssign.length === 0) {
+  if (!commit) {
+    return returnValue;
+  }
+  else if (spaceMembership && roleIdsToAssign.length === 0) {
     return returnValue;
   }
   else if (spaceMembership) {
