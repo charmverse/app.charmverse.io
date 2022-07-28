@@ -26,7 +26,7 @@
     "start:test:ci": "NODE_OPTIONS=\"--max_old_space_size=4096\" npx react-env --path .env.test.local -- npx next start",
     "start:prod": "npm run migrate:prod && npm run server:prod",
     "start:staging": "npm run migrate:staging && npm run server:staging",
-    "start:remote": "npx react-env --path .env.production -- next dev",
+    "start:remote": "cross-env NODE_ENV=development npx react-env --path .env.production -- next dev",
     "prepare": "husky install",
     "db-tool": "dotenv -e .env.production -- npx prisma studio",
     "db-tool:dev": "dotenv -e .env.local -- npx prisma studio",
