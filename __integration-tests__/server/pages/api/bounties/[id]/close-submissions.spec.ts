@@ -28,7 +28,7 @@ beforeAll(async () => {
 
 describe('POST /api/bounties/{submissionId}/close-submissions - close a bounty to new submissions and applications', () => {
 
-  it('should allow a user with the lock permission to close the bounty to new submissions, returning bounty with a submissions cap equal to current amount of valid submissions and respond with 200', async () => {
+  it('should allow a user with the lock permission to close the bounty to new submissions and respond with 200', async () => {
 
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,
@@ -54,17 +54,11 @@ describe('POST /api/bounties/{submissionId}/close-submissions - close a bounty t
       .send({})
       .expect(200)).body as BountyWithDetails;
 
-    // Count valid subs before any change took place
-    const validSubmissions = countValidSubmissions(bounty.applications);
-    const validSubmissionsAfterUpdate = countValidSubmissions(result.applications);
-
-    expect(validSubmissionsAfterUpdate).toEqual(validSubmissions);
-
-    expect(validSubmissionsAfterUpdate).toBe(result.maxSubmissions);
+    expect(result.submissionsLocked).toBe(true);
 
   });
 
-  it('should allow a space admin to close the bounty to new submissions, returning bounty with a submissions cap equal to current amount of valid submissions and respond with 200', async () => {
+  it('should allow a space admin to close the bounty to new submissions', async () => {
 
     const adminUser = await generateSpaceUser({
       spaceId: nonAdminUserSpace.id,
@@ -81,13 +75,11 @@ describe('POST /api/bounties/{submissionId}/close-submissions - close a bounty t
       bountyStatus: 'open'
     });
 
-    const result = (await request(baseUrl)
+    await request(baseUrl)
       .post(`/api/bounties/${bounty.id}/close-submissions`)
       .set('Cookie', adminCookie)
       .send({})
-      .expect(200)).body as BountyWithDetails;
-
-    expect(result.status).toBe('inProgress');
+      .expect(200);
   });
 
   it('should fail if the non-admin user does not have the lock permission and respond with 401', async () => {

@@ -1,8 +1,8 @@
 import { prisma } from 'db';
 import { includePagePermissions } from 'lib/pages/server';
-import { DataNotFoundError, WrongStateError } from 'lib/utilities/errors';
+import { WrongStateError } from 'lib/utilities/errors';
 import { BountyWithDetails } from 'models';
-import { getBounty } from './getBounty';
+import { getBountyOrThrow } from './getBounty';
 import { SuggestionAction, SuggestionApproveAction, SuggestionRejectAction } from './interfaces';
 
 /**
@@ -13,11 +13,7 @@ import { SuggestionAction, SuggestionApproveAction, SuggestionRejectAction } fro
 export async function reviewBountySuggestion ({ bountyId, decision }: SuggestionApproveAction): Promise<BountyWithDetails>
 export async function reviewBountySuggestion ({ bountyId, decision }: SuggestionRejectAction): Promise<true>
 export async function reviewBountySuggestion ({ bountyId, decision }: SuggestionAction): Promise<BountyWithDetails | true> {
-  const bounty = await getBounty(bountyId);
-
-  if (!bounty) {
-    throw new DataNotFoundError(`Bounty with id ${bountyId} not found`);
-  }
+  const bounty = await getBountyOrThrow(bountyId);
 
   if (bounty.status !== 'suggestion') {
     throw new WrongStateError(`This is bounty has the "${bounty.status}" status. It is not a deleteable suggestion.`);

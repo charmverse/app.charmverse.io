@@ -3,7 +3,7 @@ import { DataNotFoundError, InvalidInputError, PositiveNumbersOnlyError } from '
 import { BountyWithDetails } from 'models';
 import { countValidSubmissions } from '../applications/shared';
 import { setBountyPermissions } from '../permissions/bounties';
-import { getBounty } from './getBounty';
+import { getBountyOrThrow } from './getBounty';
 import { BountyUpdate } from './interfaces';
 
 export async function updateBountySettings ({
@@ -15,11 +15,7 @@ export async function updateBountySettings ({
     throw new PositiveNumbersOnlyError();
   }
 
-  const bounty = await getBounty(bountyId);
-
-  if (!bounty) {
-    throw new DataNotFoundError(`Bounty with id ${bountyId} not found`);
-  }
+  const bounty = await getBountyOrThrow(bountyId);
 
   if (typeof updateContent.maxSubmissions === 'number' && bounty.maxSubmissions !== null && updateContent.maxSubmissions < countValidSubmissions(bounty.applications)) {
     throw new InvalidInputError('New bounty cap cannot be lower than total of active and valid submissions.');
@@ -51,5 +47,5 @@ export async function updateBountySettings ({
     });
   }
 
-  return getBounty(bountyId) as Promise<BountyWithDetails>;
+  return getBountyOrThrow(bountyId);
 }

@@ -1,10 +1,9 @@
 
-import { BountySubmitterPoolCalculation, BountySubmitterPoolSize, calculateBountySubmitterPoolSize, getBounty } from 'lib/bounties';
+import { BountySubmitterPoolCalculation, BountySubmitterPoolSize, calculateBountySubmitterPoolSize, getBountyOrThrow } from 'lib/bounties';
 import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { BountyPermissions } from 'lib/permissions/bounties';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
-import { DataNotFoundError } from 'lib/utilities/errors';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -26,11 +25,7 @@ async function getBountySubmitterPoolPermissionsController (req: NextApiRequest,
 
   }
 
-  const bounty = await getBounty(bountyId as string);
-
-  if (!bounty || !bounty.page) {
-    throw new DataNotFoundError(`Bounty with id ${bountyId} not found`);
-  }
+  const bounty = await getBountyOrThrow(bountyId as string);
 
   const userId = req.session.user.id;
 
