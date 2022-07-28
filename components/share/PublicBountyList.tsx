@@ -116,10 +116,8 @@ export default function PublicBountyList () {
         {
           account && space && (
             <TokenGateForm
-              onSubmit={() => {
+              onSuccess={() => {
                 loginViaTokenGateModal.close();
-                showMessage(`You've joined the ${space.name} workspace.`, 'success');
-
                 // Wait for 2 seconds before redirecting
                 setTimeout(() => {
                   redirectToSpace();
