@@ -3,9 +3,9 @@ import { verifyJwt } from 'lit-js-sdk';
 import { prisma } from 'db';
 import { Role } from '@prisma/client';
 import { v4 } from 'uuid';
-import { TokenGateApplication, TokenGateApplicationResult, TokenGateJwt } from './interfaces';
+import { TokenGateVerification, TokenGateVerificationResult, TokenGateJwt } from './interfaces';
 
-export async function applyTokenGates ({ spaceId, userId, tokens }: TokenGateApplication): Promise<TokenGateApplicationResult> {
+export async function applyTokenGates ({ spaceId, userId, tokens }: TokenGateVerification): Promise<TokenGateVerificationResult> {
 
   if (!spaceId || !userId) {
     throw new InvalidInputError(`Please provide a valid ${!spaceId ? 'space' : 'user'} id.`);

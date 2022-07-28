@@ -3,7 +3,7 @@ import { postToDiscord } from 'lib/log/userEvents';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { applyTokenGates } from 'lib/token-gates/applyTokenGates';
-import { TokenGateApplication } from 'lib/token-gates/interfaces';
+import { TokenGateVerification } from 'lib/token-gates/interfaces';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -13,12 +13,12 @@ handler.use(requireUser).post(verifyWallet);
 
 async function verifyWallet (req: NextApiRequest, res: NextApiResponse) {
 
-  const tokenGateApplication: TokenGateApplication = {
+  const tokenGateVerification: TokenGateVerification = {
     ...req.body,
     userId: req.session.user.id
   };
 
-  const result = await applyTokenGates(tokenGateApplication);
+  const result = await applyTokenGates(tokenGateVerification);
 
   res.status(200).send(result);
 

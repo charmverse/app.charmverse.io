@@ -5,21 +5,21 @@ export interface TokenGateWithRoles extends TokenGate {
   tokenGateToRoles: (TokenGateToRole & {role: Role})[];
 }
 
-export interface TokenGateVerificationAttempt {
-  userId: string;
-  authSig: AuthSig;
-  spaceIdOrDomain: string;
-}
-
 export interface TokenGateJwt {
   signedToken: string;
   tokenGate: TokenGateWithRoles;
 }
 
+export interface TokenGateEvaluationAttempt {
+  userId: string;
+  authSig: AuthSig;
+  spaceIdOrDomain: string;
+}
+
 /**
  * @gateTokens List of Lit-generated tokens we can verify when joining a space
  */
-export interface TokenGateVerificationResult {
+export interface TokenGateEvaluationResult {
   userId: string;
   space: Space;
   walletAddress: string;
@@ -31,13 +31,13 @@ export interface TokenGateVerificationResult {
 /**
  * Used for passing lit JWTs and gaining membership to a space
  */
-export interface TokenGateApplication {
+export interface TokenGateVerification {
   userId: string;
   spaceId: string;
   tokens: TokenGateJwt[];
 }
 
-export interface TokenGateApplicationResult {
+export interface TokenGateVerificationResult {
   userId: string;
   space: Space;
   roles: Role[];

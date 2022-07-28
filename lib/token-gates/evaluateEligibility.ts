@@ -4,14 +4,14 @@ import { InvalidStateError } from 'lib/middleware';
 import { DataNotFoundError, MissingDataError } from 'lib/utilities/errors';
 import { LitNodeClient } from 'lit-js-sdk';
 import { validate } from 'uuid';
-import { TokenGateJwt, TokenGateVerificationAttempt, TokenGateVerificationResult, TokenGateWithRoles } from './interfaces';
+import { TokenGateEvaluationAttempt, TokenGateEvaluationResult, TokenGateJwt } from './interfaces';
 
 const litClient = new LitNodeClient({
   debug: false
 } as any);
 
-export async function evalueTokenGateEligibility ({ authSig, spaceIdOrDomain, userId }:TokenGateVerificationAttempt):
- Promise<TokenGateVerificationResult> {
+export async function evalueTokenGateEligibility ({ authSig, spaceIdOrDomain, userId }:TokenGateEvaluationAttempt):
+ Promise<TokenGateEvaluationResult> {
   if (!litClient.ready) {
     await litClient.connect();
   }

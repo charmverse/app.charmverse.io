@@ -22,7 +22,7 @@ import { ReviewDecision, SubmissionContent, SubmissionCreationData } from 'lib/a
 import { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
 import { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
-import { TokenGateVerificationAttempt, TokenGateVerificationResult, TokenGateWithRoles } from 'lib/token-gates/interfaces';
+import { TokenGateVerification, TokenGateEvaluationAttempt, TokenGateEvaluationResult, TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import { ConnectDiscordPayload, ConnectDiscordResponse } from 'pages/api/discord/connect';
 import { ImportDiscordRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
 import { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
@@ -529,12 +529,13 @@ class CharmClient {
     return http.DELETE<TokenGate>(`/api/token-gates/${id}`);
   }
 
-  verifyTokenGate ({ id, jwt }: { id: string, jwt: string }): Promise<{ error?: string, success?: boolean }> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  verifyTokenGate (verification: Omit<TokenGateVerification, 'userId'>): Promise<{ error?: string, success?: boolean }> {
 
-    return http.POST(`/api/token-gates/${id}/verify`, { jwt });
+    return http.POST('/api/token-gates/verify', verification);
   }
 
-  evalueTokenGateEligibility (verification: Omit<TokenGateVerificationAttempt, 'userId'>): Promise<TokenGateVerificationResult> {
+  evalueTokenGateEligibility (verification: Omit<TokenGateEvaluationAttempt, 'userId'>): Promise<TokenGateEvaluationResult> {
     return http.POST('/api/token-gates/evaluate', verification);
   }
 

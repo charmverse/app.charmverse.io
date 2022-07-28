@@ -11,7 +11,7 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useSnackbar } from 'hooks/useSnackbar';
 import getLitChainFromChainId from 'lib/token-gates/getLitChainFromChainId';
-import { TokenGateVerificationResult, TokenGateWithRoles } from 'lib/token-gates/interfaces';
+import { TokenGateEvaluationResult, TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import { checkAndSignAuthMessage } from 'lit-js-sdk';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -33,7 +33,7 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
 
   const [isLoading, setIsLoading] = useState(true);
 
-  const [tokenGateResult, setTokenGateResult] = useState<TokenGateVerificationResult | null>(null);
+  const [tokenGateResult, setTokenGateResult] = useState<TokenGateEvaluationResult | null>(null);
   // Token gates with those that succeedeed first
   const sortedTokenGates = tokenGates?.sort((a, b) => {
 
