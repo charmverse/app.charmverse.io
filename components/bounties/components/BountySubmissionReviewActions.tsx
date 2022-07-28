@@ -93,10 +93,10 @@ export default function BountySubmissionReviewActions (
               color='primary'
               onClick={() => {
                 if (submission.status === 'applied') {
-                  setReviewDecision({ decision: 'approve', submissionId: submission.id, userId: user?.id as string });
+                  approveApplication(submission.id);
                 }
                 else if (submission.status === 'review') {
-                  approveApplication(submission.id);
+                  setReviewDecision({ decision: 'approve', submissionId: submission.id, userId: user?.id as string });
                 }
               }}
             >{submission.status === 'applied' ? 'Assign' : submission.status === 'review' ? 'Approve' : ''}

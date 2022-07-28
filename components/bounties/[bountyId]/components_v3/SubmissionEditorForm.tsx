@@ -179,7 +179,7 @@ export default function BountySubmissionForm (
           {!readOnly && (
           <Grid item display='flex' gap={1}>
             <Button disabled={!isValid} type='submit'>Save</Button>
-            {onCancel && <Button onClick={onCancel} color='error'>Cancel</Button>}
+            {onCancel && <Button onClick={onCancel} variant='outlined' color='secondary'>Cancel</Button>}
           </Grid>
           )}
 

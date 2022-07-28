@@ -364,7 +364,7 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
       )}
       <Stack flexDirection='row' justifyContent='space-between' gap={2} alignItems='center'>
         {
-          (permissions && !permissions.bountyPermissions?.reviewer) ? (
+          (permissions && !permissions.userPermissions?.review) ? (
             <BountyReviewers
               bounty={bounty}
               permissions={permissions}

@@ -61,9 +61,18 @@ interface BountySubmissionsTableRowProps {
   permissions: AssignedBountyPermissions
   bounty: BountyWithDetails
   onSubmission: BountySubmissionReviewActionsProps['onSubmission']
+  onDetailsView: (isViewingDetails: boolean) => void
 }
 
-function BountySubmissionsTableRow ({ onSubmission, submission, permissions, bounty, totalAcceptedApplications }: BountySubmissionsTableRowProps) {
+function BountySubmissionsTableRow ({
+  onDetailsView,
+  onSubmission,
+  submission,
+  permissions,
+  bounty,
+  totalAcceptedApplications
+}:
+  BountySubmissionsTableRowProps) {
   const [contributors] = useContributors();
   const [user] = useUser();
   const [isViewingDetails, setIsViewingDetails] = useState(false);
@@ -107,6 +116,7 @@ function BountySubmissionsTableRow ({ onSubmission, submission, permissions, bou
           <IconButton
             size='small'
             onClick={() => {
+              onDetailsView(isViewingDetails);
               setIsViewingDetails(!isViewingDetails);
             }}
           >
@@ -126,7 +136,7 @@ function BountySubmissionsTableRow ({ onSubmission, submission, permissions, bou
         </TableCell>
       </TableRow>
       <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0, borderBottom: 0 }} colSpan={5}>
+        <TableCell style={{ borderBottom: 0, padding: 0 }} colSpan={5}>
           <Collapse in={isViewingDetails} timeout='auto' unmountOnExit>
             {submission.status !== 'applied' && submission.walletAddress && submission.submission && (
               <SubmissionEditorForm
@@ -255,6 +265,11 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
           <TableBody>
             {(isReviewer ? applications : applications.filter(application => application.createdBy === user?.id)).map((submission) => (
               <BountySubmissionsTableRow
+                onDetailsView={(isViewingDetails) => {
+                  if (isViewingDetails) {
+                    setIsSubmittingApplication(false);
+                  }
+                }}
                 bounty={bounty}
                 totalAcceptedApplications={acceptedApplications.length}
                 permissions={permissions}
