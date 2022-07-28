@@ -2,7 +2,6 @@ import {
   MjmlSection,
   MjmlColumn,
   MjmlText,
-  MjmlButton,
   MjmlDivider
 } from 'mjml-react';
 import { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
@@ -13,7 +12,7 @@ import { MentionedTask } from 'lib/mentions/interfaces';
 import { VoteTask } from 'lib/votes/interfaces';
 import { DateTime } from 'luxon';
 import { User } from '@prisma/client';
-import { HR, Feedback, Footer, Header, EmailWrapper } from './components';
+import { Feedback, Footer, Header, EmailWrapper } from './components';
 
 const charmverseUrl = process.env.DOMAIN;
 
@@ -149,7 +148,7 @@ export default function PendingTasks (props: PendingTasksProps) {
           <Header />
 
           <MjmlText paddingBottom={0} paddingTop={0}>
-            <h3>{props.totalTasks} tasks need your attention.</h3>
+            <h3>{tasksRequiresYourAttention({ count: props.totalTasks })}.</h3>
           </MjmlText>
           {multisigSection}
           {voteSection}
@@ -220,4 +219,8 @@ function MultisigTask ({ task }: { task: GnosisSafeTasks }) {
       </strong>
     </MjmlText>
   );
+}
+
+export function tasksRequiresYourAttention ({ count, includeName }: { count: number, includeName?: boolean }) {
+  return `${count} ${includeName ? 'CharmVerse ' : ''}tasks need${count > 0 ? '' : 's'} your attention`;
 }
