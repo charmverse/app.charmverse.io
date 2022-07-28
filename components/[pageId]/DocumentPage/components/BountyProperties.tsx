@@ -5,6 +5,7 @@ import { PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
 import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge';
 import BountySuggestionApproval from 'components/bounties/components/BountySuggestionApproval';
+import BountyHeader from 'components/bounties/[bountyId]/components_v3/BountyHeader';
 import BountyReviewers from 'components/bounties/[bountyId]/components_v3/BountyReviewers';
 import BountySubmissionsTable from 'components/bounties/[bountyId]/components_v3/BountySubmissionsTable';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
@@ -15,7 +16,6 @@ import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole'
 import { CryptoCurrency, getChainById } from 'connectors';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
@@ -352,6 +352,12 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
         }
       }}
     >
+      {permissions && (user?.id === bounty.createdBy || isAdmin) && (
+      <BountyHeader
+        bounty={bounty}
+        permissions={permissions}
+      />
+      )}
       <Stack flexDirection='row' justifyContent='space-between' gap={2} alignItems='center'>
         {
           (permissions && !permissions.bountyPermissions?.reviewer) ? (
