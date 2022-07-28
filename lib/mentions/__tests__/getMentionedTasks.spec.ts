@@ -65,7 +65,7 @@ beforeAll(async () => {
     createdBy: user2.id,
     status: 'complete',
     approveSubmitters: false,
-    descriptionNodes: { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'mention', attrs: { id: mentionIds[4], type: 'user', value: user1.id, createdAt: new Date().toISOString(), createdBy: user2.id } }] }] }
+    content: { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'mention', attrs: { id: mentionIds[4], type: 'user', value: user1.id, createdAt: new Date().toISOString(), createdBy: user2.id } }] }] }
   });
 
   // This will be skipped as the mention was created by the same user
@@ -74,7 +74,7 @@ beforeAll(async () => {
     createdBy: user2.id,
     status: 'complete',
     approveSubmitters: false,
-    descriptionNodes: { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'mention', attrs: { id: mentionIds[5], type: 'user', value: user1.id, createdAt: new Date().toISOString(), createdBy: user1.id } }] }] }
+    content: { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'mention', attrs: { id: mentionIds[5], type: 'user', value: user1.id, createdAt: new Date().toISOString(), createdBy: user1.id } }] }] }
   });
 
   // This will be skipped as the mention was not for the user
@@ -83,7 +83,7 @@ beforeAll(async () => {
     createdBy: user2.id,
     status: 'complete',
     approveSubmitters: false,
-    descriptionNodes: { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'mention', attrs: { id: mentionIds[6], type: 'user', value: user2.id, createdAt: new Date().toISOString(), createdBy: user1.id } }] }] }
+    content: { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'mention', attrs: { id: mentionIds[6], type: 'user', value: user2.id, createdAt: new Date().toISOString(), createdBy: user1.id } }] }] }
   });
 
   bounty2 = await generateBounty({
@@ -91,7 +91,7 @@ beforeAll(async () => {
     createdBy: user2.id,
     status: 'complete',
     approveSubmitters: false,
-    descriptionNodes: { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'mention', attrs: { id: mentionIds[7], type: 'user', value: user1.id, createdAt: new Date().toISOString(), createdBy: user2.id } }] }] }
+    content: { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'mention', attrs: { id: mentionIds[7], type: 'user', value: user1.id, createdAt: new Date().toISOString(), createdBy: user2.id } }] }] }
   });
 
   comment1 = await generateComment({
