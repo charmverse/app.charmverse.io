@@ -260,6 +260,7 @@ export default function BountySubmissions ({ showMetadata = true, bounty, permis
                   reviewComplete={refreshSubmissions}
                   onSubmission={editSubmissionModal.open}
                   permissions={permissions}
+                  totalAcceptedApplications={0}
                 />
 
               </TableCell>

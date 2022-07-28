@@ -126,7 +126,7 @@ function BountySubmissionsTableRow ({ onSubmission, submission, permissions, bou
         </TableCell>
       </TableRow>
       <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={5}>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0, borderBottom: 0 }} colSpan={5}>
           <Collapse in={isViewingDetails} timeout='auto' unmountOnExit>
             {submission.status !== 'applied' && submission.walletAddress && submission.submission && (
               <SubmissionEditorForm
