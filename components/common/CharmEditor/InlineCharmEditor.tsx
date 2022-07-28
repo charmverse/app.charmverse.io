@@ -160,6 +160,17 @@ export default function CharmEditor (
       onContentChangeDebounced(view);
     }
   }
+  let contentJSON = content;
+  // for some reason content is saved as a string sometimes.
+  if (typeof contentJSON === 'string') {
+    try {
+      contentJSON = JSON.parse(contentJSON);
+    }
+    catch (e) {
+      // well, we tried
+    }
+  }
+  const initialValue = contentJSON ? Node.fromJSON(specRegistry.schema, contentJSON) : '';
 
   const state = useEditorState({
     specRegistry,
@@ -169,7 +180,7 @@ export default function CharmEditor (
       spaceId: currentSpace?.id,
       userId: currentUser?.id
     }),
-    initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
+    initialValue,
     dropCursorOpts: {
       color: 'transparent'
     }
