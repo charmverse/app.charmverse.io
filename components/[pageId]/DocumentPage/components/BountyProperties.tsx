@@ -25,6 +25,7 @@ import debouncePromise from 'lib/utilities/debouncePromise';
 import { isTruthy } from 'lib/utilities/types';
 import { BountyWithDetails } from 'models';
 import { ReactNode, useCallback, useEffect, useState } from 'react';
+import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 
 function rollupPermissions ({
   selectedReviewerUsers,
@@ -164,7 +165,9 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
           height: 'fit-content'
         }}
       >
-        <div className='octo-propertyname'>Chain</div>
+        <div className='octo-propertyname'>
+          <Button>Chain</Button>
+        </div>
         <InputSearchBlockchain
           disabled={!canEdit}
           readOnly={!canEdit}
@@ -189,7 +192,9 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
           height: 'fit-content'
         }}
       >
-        <div className='octo-propertyname'>Token</div>
+        <div className='octo-propertyname'>
+          <Button>Token</Button>
+        </div>
         <InputSearchCrypto
           disabled={!canEdit}
           readOnly={!canEdit}
@@ -217,7 +222,9 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
           height: 'fit-content'
         }}
       >
-        <div className='octo-propertyname'>Amount</div>
+        <div className='octo-propertyname'>
+          <Button>Amount</Button>
+        </div>
         <TextField
           required
           sx={{
@@ -258,7 +265,9 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
       </Stack>
       <Collapse in={isShowingAdvancedSettings} timeout='auto' unmountOnExit>
         <div className='octo-propertyrow'>
-          <div className='octo-propertyname'>Require applications</div>
+          <div className='octo-propertyname'>
+            <Button>Require applications</Button>
+          </div>
           <Switch
             isOn={Boolean(currentBounty.approveSubmitters)}
             onChanged={(isOn) => {
@@ -277,7 +286,9 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
             height: 'fit-content'
           }}
         >
-          <div className='octo-propertyname'>Applicant Role(s)</div>
+          <div className='octo-propertyname'>
+            <Button>Applicant Role(s)</Button>
+          </div>
           <InputSearchRoleMultiple
             disableCloseOnSelect={true}
             defaultValue={assignedRoleSubmitters}
@@ -307,7 +318,9 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
             height: 'fit-content'
           }}
         >
-          <div className='octo-propertyname'>Submissions limit</div>
+          <div className='octo-propertyname'>
+            <Button>Submissions limit</Button>
+          </div>
           <Switch
             isOn={capSubmissions}
             onChanged={(isOn) => {
@@ -328,7 +341,9 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
             height: 'fit-content'
           }}
         >
-          <div className='octo-propertyname'>Max submissions</div>
+          <div className='octo-propertyname'>
+            <Button>Max submissions</Button>
+          </div>
           <TextField
             required
             value={currentBounty.maxSubmissions}
@@ -377,7 +392,9 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
                 flexGrow: 1
               }}
             >
-              <div className='octo-propertyname'>Reviewer</div>
+              <div className='octo-propertyname'>
+                <Button>Reviewer</Button>
+              </div>
               <InputSearchReviewers
                 disabled={!canEdit}
                 readOnly={!canEdit}
