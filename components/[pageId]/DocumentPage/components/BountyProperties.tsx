@@ -14,6 +14,7 @@ import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole'
 import { CryptoCurrency, getChainById } from 'connectors';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
 import { AssignedBountyPermissions, BountyPermissions, UpdateableBountyFields } from 'lib/bounties';
@@ -80,7 +81,9 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
   const assignedRoleSubmitters = permissions?.bountyPermissions?.submitter?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
   const selectedReviewerUsers = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'user').map(p => p.id as string) ?? [];
   const selectedReviewerRoles = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
-  const canEdit = user && !readOnly && bounty.createdBy === user.id;
+  const [currentUserPermissions] = useCurrentSpacePermissions();
+
+  const canEdit = user && !readOnly && bounty.createdBy === user.id && currentUserPermissions?.createBounty !== false;
 
   async function refreshBountyPermissions (bountyId: string) {
     setPermissions(await charmClient.computeBountyPermissions({
@@ -405,7 +408,7 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
           my: 1
         }}
       />
-      {permissions && (
+      {permissions && bounty.status !== 'suggestion' && (
       <BountySubmissionsTable
         bounty={currentBounty}
         permissions={permissions}
