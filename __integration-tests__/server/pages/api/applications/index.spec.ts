@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Application, Space, User } from '@prisma/client';
 import { ApplicationWithTransactions } from 'lib/applications/actions';
-import { ApplicationCreationData, ListApplicationsResponse, SubmissionCreationData } from 'lib/applications/interfaces';
+import { ApplicationCreationData, SubmissionCreationData } from 'lib/applications/interfaces';
 import { createBounty } from 'lib/bounties';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import request from 'supertest';
@@ -69,9 +69,9 @@ describe('GET /api/applications - retrieve all applications for a bounty', () =>
     const applicationsWithTransactions = (await request(baseUrl)
       .get(`/api/applications?bountyId=${bounty.id}`)
       .set('Cookie', nonAdminCookie)
-      .expect(200)).body as ListApplicationsResponse;
-    expect(applicationsWithTransactions.applications.length).toBe(1);
-    expect(applicationsWithTransactions.applications[0].transactions.length).toBe(1);
+      .expect(200)).body;
+    expect(applicationsWithTransactions.length).toBe(1);
+    expect(applicationsWithTransactions[0].transactions.length).toBe(1);
   });
 });
 
@@ -81,7 +81,6 @@ describe('POST /api/applications - create an application', () => {
     const bounty = await createBounty({
       createdBy: nonAdminUser.id,
       spaceId: nonAdminUserSpace.id,
-      title: 'Example title',
       status: 'open',
       rewardAmount: 1
     });
@@ -147,7 +146,6 @@ describe('POST /api/applications - create an application', () => {
     const bounty = await createBounty({
       createdBy: userFromOtherSpace.id,
       spaceId: otherSpace.id,
-      title: 'Example title',
       status: 'open',
       rewardAmount: 1
     });
