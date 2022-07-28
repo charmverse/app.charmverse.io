@@ -7,7 +7,7 @@ import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge'
 import BountySuggestionApproval from 'components/bounties/components/BountySuggestionApproval';
 import BountyHeader from 'components/bounties/[bountyId]/components_v3/BountyHeader';
 import BountyReviewers from 'components/bounties/[bountyId]/components_v3/BountyReviewers';
-import BountySubmissionsTable from 'components/bounties/[bountyId]/components_v3/BountySubmissionsTable';
+import BountySubmissionsTable from 'components/bounties/components/BountySubmissionsTable';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
 import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
@@ -233,7 +233,14 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
           }}
         />
       </div>
-      <Stack gap={0.5} flexDirection='row' mt={2}>
+      <Stack
+        gap={0.5}
+        flexDirection='row'
+        mt={2}
+        onClick={() => {
+          setIsShowingAdvancedSettings(!isShowingAdvancedSettings);
+        }}
+      >
         <FormLabel sx={{
           fontWeight: 500
         }}
@@ -241,9 +248,6 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
         </FormLabel>
         <IconButton
           size='small'
-          onClick={() => {
-            setIsShowingAdvancedSettings(!isShowingAdvancedSettings);
-          }}
           sx={{
             top: -2.5,
             position: 'relative'

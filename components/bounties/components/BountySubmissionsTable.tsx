@@ -27,10 +27,10 @@ import { humanFriendlyDate } from 'lib/utilities/dates';
 import { BountyWithDetails } from 'models';
 import { useEffect, useState } from 'react';
 import { BrandColor } from 'theme/colors';
-import BountySubmissionReviewActions, { BountySubmissionReviewActionsProps } from '../../components/BountySubmissionReviewActions';
-import { ApplicationEditorForm } from '../components/ApplicationEditorForm';
+import BountySubmissionReviewActions, { BountySubmissionReviewActionsProps } from './BountySubmissionReviewActions';
+import { ApplicationEditorForm } from '../[bountyId]/components/ApplicationEditorForm';
 import BountyApplicationForm from './BountyApplicationForm';
-import SubmissionEditorForm from './SubmissionEditorForm';
+import SubmissionEditorForm from '../[bountyId]/components_v3/SubmissionEditorForm';
 
 interface Props {
   bounty: BountyWithDetails

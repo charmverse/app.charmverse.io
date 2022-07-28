@@ -31,14 +31,13 @@ export default function BountyApplyButton ({ onClick, permissions, bounty, appli
 
   return !userHasApplied ? (
     <Tooltip
-      placement='top'
       title={applyButtonTooltipTitle}
     >
       <Box component='span'>
         <Button
           disabled={newApplicationsSuspended || !permissions?.userPermissions.work}
           onClick={onClick}
-        >Apply
+        >Apply to this bounty
         </Button>
       </Box>
     </Tooltip>

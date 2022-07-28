@@ -23,13 +23,12 @@ interface BountyDetailsProps {
 export default function BountyDetails ({ showHeader = true, showDescription = true, centeredContent = true, bounty }: BountyDetailsProps) {
 
   const [, setPageTitle] = usePageTitle();
-  const { currentBounty, setCurrentBounty, currentBountyId, updateCurrentBountyId } = useBounties();
+  const { currentBounty, setCurrentBounty, currentBountyId } = useBounties();
 
   const [bountyPermissions, setBountyPermissions] = useState<AssignedBountyPermissions | null>(null);
 
   useEffect(() => {
     if (bounty) {
-      updateCurrentBountyId(bounty.id);
       setCurrentBounty(bounty);
     }
   }, [bounty]);

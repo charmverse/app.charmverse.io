@@ -243,6 +243,12 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
           }
         }
       },
+      MuiTooltip: {
+        defaultProps: {
+          arrow: true,
+          placement: 'top'
+        }
+      },
       MuiCard: {
         styleOverrides: {
           root: {
