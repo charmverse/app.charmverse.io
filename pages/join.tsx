@@ -66,7 +66,7 @@ export default function CreateSpace () {
       charmClient.getPublicSpaceInfo(spaceDomain)
         .then((_space) => {
           setSpaceInfo(_space);
-          setStatus('Workspace found');
+          setStatus('');
         })
         .catch(() => {
           setSpaceInfo(null);
@@ -107,7 +107,7 @@ export default function CreateSpace () {
 
         {
           spaceInfo && (
-            <TokenGateForm onSubmit={onJoinSpace} spaceDomain={spaceDomain} />
+            <TokenGateForm onSuccess={onJoinSpace} spaceDomain={spaceDomain} />
           )
         }
 

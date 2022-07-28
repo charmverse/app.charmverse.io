@@ -1,23 +1,24 @@
-import CheckIcon from '@mui/icons-material/Check';
+import CancelIcon from '@mui/icons-material/Cancel';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
+import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
-import ToggleButton from '@mui/material/ToggleButton';
 import Typography from '@mui/material/Typography';
+import { SxProps, Theme } from '@mui/system';
 import { useWeb3React } from '@web3-react/core';
+import LoadingComponent from 'components/common/LoadingComponent';
 import { TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import { humanizeAccessControlConditions } from 'lit-js-sdk';
 import { useEffect, useState } from 'react';
 
 interface Props {
   tokenGate: TokenGateWithRoles,
-  onSelect: (tokenGate: TokenGateWithRoles) => void,
-  isSelected: boolean,
-  // Provide this so we don't show the toggle UI if there is only 1 token gate for the space
-  totalGates: number
+  validGate?: boolean | null,
+  isVerifying: boolean,
 }
 
-export default function TokenGateOption ({ tokenGate, isSelected, onSelect, totalGates }: Props) {
+export default function TokenGateOption ({ tokenGate, validGate, isVerifying }: Props) {
 
   const { account } = useWeb3React();
   const [description, setDescription] = useState<string>('');
@@ -31,52 +32,51 @@ export default function TokenGateOption ({ tokenGate, isSelected, onSelect, tota
     });
   }, [tokenGate]);
 
+  // Extra styling if the user was able to verify with the gate
+  const validGateBorderProps: SxProps<Theme> = validGate ? {
+    borderColor: 'success.main',
+    borderWidth: 1,
+    borderStyle: 'solid'
+  } : {};
+
   return (
     <Card
       variant='outlined'
-      raised={isSelected}
-      sx={{ my: 1 }}
-      onClick={() => {
-        onSelect(tokenGate);
-      }}
+      raised={validGate === true}
+      color={validGate === true ? 'success' : 'default'}
+      sx={{ my: 1, ...validGateBorderProps }}
     >
       <CardContent>
-        <Grid container>
+        <Grid container spacing={2}>
           <Grid item xs={10}>
             <Typography>
               {description}
             </Typography>
           </Grid>
+          <Grid item xs={2} display='flex' justifyContent='center' alignItems='center'>
+            {isVerifying && (
+              <LoadingComponent isLoading height='20px' size={25} />
+            )}
+            {
+              !isVerifying && validGate && <CheckCircleIcon color='success' />
+            }
+            {
+              !isVerifying && validGate === false && <CancelIcon color='error' />
+            }
+          </Grid>
           {
-            totalGates > 1 && (
-              <Grid item xs={2} display='flex' justifyContent='center' alignItems='center'>
-                <ToggleButton
-                  value='check'
-                  color={isSelected ? 'primary' : 'secondary'}
-                  selected={isSelected}
-                  onChange={() => {
-                    onSelect(tokenGate);
-                  }}
-                  size='small'
-
-                >
-                  <CheckIcon fontSize='small' sx={{ m: 0, p: 0 }} />
-                </ToggleButton>
-              </Grid>
-            )
-          }
+              tokenGate.tokenGateToRoles.length > 0 && (
+                <Grid item xs spacing={1}>
+                  <Typography sx={{ mr: 1 }} variant='caption'>
+                    Roles
+                  </Typography>
+                  {
+                tokenGate.tokenGateToRoles.map(role => <Chip variant='outlined' sx={{ mr: 2, fontWeight: validGate ? 'bold' : undefined }} color={validGate ? 'success' : 'secondary'} key={role.id} label={role.role.name} />)
+              }
+                </Grid>
+              )
+            }
         </Grid>
-        <Grid item xs>
-          {
-            tokenGate.tokenGateToRoles.length > 0 && (
-              <Typography color='secondary' sx={{ mt: 1 }}>
-                Grants {tokenGate.tokenGateToRoles.length} role{tokenGate.tokenGateToRoles.length > 1 ? 's' : ''}
-              </Typography>
-            )
-          }
-
-        </Grid>
-
       </CardContent>
     </Card>
   );

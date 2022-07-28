@@ -22,7 +22,7 @@ import { ReviewDecision, SubmissionContent, SubmissionCreationData } from 'lib/a
 import { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
 import { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
-import { TokenGateWithRoles } from 'lib/token-gates/interfaces';
+import { TokenGateVerification, TokenGateEvaluationAttempt, TokenGateEvaluationResult, TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import { ConnectDiscordPayload, ConnectDiscordResponse } from 'pages/api/discord/connect';
 import { ImportDiscordRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
 import { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
@@ -41,6 +41,7 @@ import { TransactionCreationData } from 'lib/transactions/interface';
 import { ExtendedVote, UserVoteExtendedDTO, VoteDTO } from 'lib/votes/interfaces';
 import { PublicUser } from 'pages/api/public/profile/[userPath]';
 import { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
+import { AuthSig } from 'lit-js-sdk';
 import { AssignedPermissionsQuery, Resource } from './lib/permissions/interfaces';
 import { SpacePermissionConfigurationUpdate } from './lib/permissions/meta/interfaces';
 import { SpacePermissionFlags, SpacePermissionModification } from './lib/permissions/spaces';
@@ -528,10 +529,20 @@ class CharmClient {
     return http.DELETE<TokenGate>(`/api/token-gates/${id}`);
   }
 
-  verifyTokenGate ({ id, jwt }: { id: string, jwt: string }): Promise<{ error?: string, success?: boolean }> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  verifyTokenGate (verification: Omit<TokenGateVerification, 'userId'>): Promise<{ error?: string, success?: boolean }> {
 
-    return http.POST(`/api/token-gates/${id}/verify`, { jwt });
+    return http.POST('/api/token-gates/verify', verification);
   }
+
+  evalueTokenGateEligibility (verification: Omit<TokenGateEvaluationAttempt, 'userId'>): Promise<TokenGateEvaluationResult> {
+    return http.POST('/api/token-gates/evaluate', verification);
+  }
+
+  // evaluate ({ , jwt }: { id: string, jwt: string }): Promise<{ error?: string, success?: boolean }> {
+
+  //   return http.POST(`/api/token-gates/${id}/verify`, { jwt });
+  // }
 
   unlockTokenGate ({ id, jwt }: { id: string, jwt: string }):
     Promise<{ error?: string, success?: boolean, space: Space }> {
