@@ -144,6 +144,7 @@ export default function BountyProperties (props: {readOnly?: boolean, bounty: Bo
 
   useEffect(() => {
     refreshBountyPermissions(currentBounty.id);
+    refreshCryptoList(currentBounty.chainId, currentBounty.rewardToken);
   }, []);
 
   useEffect(() => {
