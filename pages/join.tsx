@@ -66,7 +66,7 @@ export default function CreateSpace () {
       charmClient.getPublicSpaceInfo(spaceDomain)
         .then((_space) => {
           setSpaceInfo(_space);
-          setStatus('Workspace found');
+          setStatus('');
         })
         .catch(() => {
           setSpaceInfo(null);

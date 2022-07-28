@@ -4,7 +4,7 @@ import { InvalidStateError } from 'lib/middleware';
 import { DataNotFoundError, MissingDataError } from 'lib/utilities/errors';
 import { LitNodeClient } from 'lit-js-sdk';
 import { validate } from 'uuid';
-import { TokenGateJwt, TokenGateVerificationAttempt, TokenGateVerificationResult, TokenGateWithRoleData } from './interfaces';
+import { TokenGateJwt, TokenGateVerificationAttempt, TokenGateVerificationResult, TokenGateWithRoles } from './interfaces';
 
 const litClient = new LitNodeClient({
   debug: false
@@ -48,7 +48,7 @@ export async function evalueTokenGateEligibility ({ authSig, spaceIdOrDomain, us
     throw new InvalidStateError('Lit client is not available');
   }
 
-  const tokenGateResults: {signedToken?: TokenGateJwt, tokenGate: TokenGateWithRoleData}[] = await Promise.all(
+  const tokenGateResults: (TokenGateJwt | null)[] = await Promise.all(
     space.TokenGate.map(tokenGate => {
       return litClient.getSignedToken({
         authSig,
@@ -57,22 +57,17 @@ export async function evalueTokenGateEligibility ({ authSig, spaceIdOrDomain, us
       })
         .then((signedToken: string) => {
           return {
-            signedToken: {
-              signedToken,
-              tokenGateId: tokenGate.id
-            },
+            signedToken,
             tokenGate
           };
         })
         .catch(() => {
-          return {
-            tokenGate
-          };
+          return null;
         });
     })
   );
 
-  const successGates = tokenGateResults.filter(result => result.signedToken);
+  const successGates = tokenGateResults.filter(result => result !== null) as TokenGateJwt[];
 
   if (successGates.length === 0) {
     return {
@@ -102,7 +97,7 @@ export async function evalueTokenGateEligibility ({ authSig, spaceIdOrDomain, us
     userId,
     space,
     walletAddress: authSig.address,
-    gateTokens: successGates.map(g => g.signedToken as TokenGateJwt),
+    gateTokens: successGates,
     roles: eligibleRoles
   };
 

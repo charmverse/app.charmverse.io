@@ -1,8 +1,8 @@
-import CheckIcon from '@mui/icons-material/Check';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
+import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
-import ToggleButton from '@mui/material/ToggleButton';
 import Typography from '@mui/material/Typography';
 import { useWeb3React } from '@web3-react/core';
 import { TokenGateWithRoles } from 'lib/token-gates/interfaces';
@@ -11,13 +11,10 @@ import { useEffect, useState } from 'react';
 
 interface Props {
   tokenGate: TokenGateWithRoles,
-  onSelect: (tokenGate: TokenGateWithRoles) => void,
-  isSelected: boolean,
-  // Provide this so we don't show the toggle UI if there is only 1 token gate for the space
-  totalGates: number
+  isSelected?: boolean
 }
 
-export default function TokenGateOption ({ tokenGate, isSelected, onSelect, totalGates }: Props) {
+export default function TokenGateOption ({ tokenGate, isSelected }: Props) {
 
   const { account } = useWeb3React();
   const [description, setDescription] = useState<string>('');
@@ -36,47 +33,23 @@ export default function TokenGateOption ({ tokenGate, isSelected, onSelect, tota
       variant='outlined'
       raised={isSelected}
       sx={{ my: 1 }}
-      onClick={() => {
-        onSelect(tokenGate);
-      }}
     >
       <CardContent>
-        <Grid container>
+        <Grid container spacing={1}>
           <Grid item xs={10}>
             <Typography>
               {description}
             </Typography>
           </Grid>
-          {
-            totalGates > 1 && (
-              <Grid item xs={2} display='flex' justifyContent='center' alignItems='center'>
-                <ToggleButton
-                  value='check'
-                  color={isSelected ? 'primary' : 'secondary'}
-                  selected={isSelected}
-                  onChange={() => {
-                    onSelect(tokenGate);
-                  }}
-                  size='small'
-
-                >
-                  <CheckIcon fontSize='small' sx={{ m: 0, p: 0 }} />
-                </ToggleButton>
-              </Grid>
-            )
+          <Grid item xs={2} display='flex' justifyContent='center' alignItems='center'>
+            {isSelected && <CheckCircleIcon color='success' />}
+          </Grid>
+          <Grid item xs>
+            {
+            tokenGate.tokenGateToRoles.map(role => <Chip sx={{ mr: 2 }} color={isSelected ? 'success' : 'secondary'} key={role.id} label={role.role.name} />)
           }
+          </Grid>
         </Grid>
-        <Grid item xs>
-          {
-            tokenGate.tokenGateToRoles.length > 0 && (
-              <Typography color='secondary' sx={{ mt: 1 }}>
-                Grants {tokenGate.tokenGateToRoles.length} role{tokenGate.tokenGateToRoles.length > 1 ? 's' : ''}
-              </Typography>
-            )
-          }
-
-        </Grid>
-
       </CardContent>
     </Card>
   );

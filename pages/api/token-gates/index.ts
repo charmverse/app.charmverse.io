@@ -69,7 +69,11 @@ async function getTokenGates (req: NextApiRequest, res: NextApiResponse<TokenGat
     },
     include: {
       space: true,
-      tokenGateToRoles: true
+      tokenGateToRoles: {
+        include: {
+          role: true
+        }
+      }
     }
   });
 

@@ -15,6 +15,7 @@ import { TokenGateVerificationResult, TokenGateWithRoles } from 'lib/token-gates
 import { checkAndSignAuthMessage } from 'lit-js-sdk';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import TokenGateOption from './TokenGateOption';
 
 interface Props {
   onSuccess: (values: Space) => void;
@@ -33,6 +34,22 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
   const [isLoading, setIsLoading] = useState(true);
 
   const [tokenGateResult, setTokenGateResult] = useState<TokenGateVerificationResult | null>(null);
+  // Token gates with those that succeedeed first
+  const sortedTokenGates = tokenGates?.sort((a, b) => {
+
+    const aVerified = tokenGateResult?.gateTokens.some(g => g.tokenGate.id === a.id);
+    const bVerified = tokenGateResult?.gateTokens.some(g => g.tokenGate.id === b.id);
+
+    if (aVerified && !bVerified) {
+      return -1;
+    }
+    else if (!aVerified && bVerified) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }) ?? [];
 
   useEffect(() => {
     if (!spaceDomain || spaceDomain.length < 3) {
@@ -71,6 +88,9 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
         spaceIdOrDomain: spaceDomain
       });
       setTokenGateResult(verifyResult);
+      if (verifyResult.canJoinSpace) {
+        showMessage('Verification succeeded.', 'success');
+      }
       setIsLoading(false);
     }
     catch (err) {
@@ -96,18 +116,48 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
 
   if (!tokenGateResult || !tokenGateResult.canJoinSpace) {
     return (
-      <>
-        <PrimaryButton size='large' fullWidth type='submit' onClick={generateAuthSignature}>
-          Verify wallet
-        </PrimaryButton>
+      <Grid container direction='column' spacing={2} sx={{ mt: 2 }}>
+
+        <Grid item>
+          <Typography variant='body2'>
+            Verify your wallet to check if you can join this workspace and which roles you can receive.
+          </Typography>
+        </Grid>
+
+        <Grid item xs>
+          <PrimaryButton size='large' fullWidth type='submit' onClick={generateAuthSignature}>
+            Verify wallet
+          </PrimaryButton>
+        </Grid>
+        <Grid item>
+          <Typography component='p' variant='caption' align='center'>
+            Powered by
+            {' '}
+            <Link href='https://litprotocol.com/' external target='_blank'>Lit Protocol</Link>
+          </Typography>
+        </Grid>
+
         {
         tokenGateResult && !tokenGateResult.canJoinSpace && (
+        <Grid item xs>
           <Alert sx={{ mt: 2 }} severity='warning'>
             Your wallet does not meet any of the conditions to access this space. You can try with another wallet.
           </Alert>
+        </Grid>
         )
-      }
-      </>
+}
+
+        {
+          tokenGates?.map(gate => (
+            <Grid item xs key={gate.id}>
+              <TokenGateOption
+                tokenGate={gate}
+              />
+            </Grid>
+          ))
+        }
+
+      </Grid>
 
     );
   }
@@ -117,29 +167,17 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
       <Grid container direction='column' spacing={2} sx={{ mt: 2 }}>
         <Grid item>
           <Alert severity='success'>
-            {
-            tokenGateResult.roles.length > 0 ? (
-              <>
-
-                You can join this space and receive these roles:
-                <Box sx={{ mt: 1 }}>
-                  {tokenGateResult.roles.map(role => <Chip sx={{ mr: 2 }} key={role.id} label={role.name} />)}
-                </Box>
-              </>
-            ) : (
-              'You can join this space.'
-            )
-          }
+            You can join this workspace. {tokenGateResult.roles.length > 0 ? 'You will also receive the roles attached to each condition you passed' : ''}
           </Alert>
         </Grid>
+
         <Grid item>
           <PrimaryButton
             size='large'
             fullWidth
             type='submit'
-            onClick={() => {
-              router.push(`/${tokenGateResult.space.domain}`);
-            }}
+            disabled={!tokenGateResult?.canJoinSpace}
+            onClick={onSubmit}
           >
             {joinButtonLabel || 'Join workspace'}
           </PrimaryButton>
@@ -151,6 +189,18 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
             <Link href='https://litprotocol.com/' external target='_blank'>Lit Protocol</Link>
           </Typography>
         </Grid>
+
+        {
+          sortedTokenGates.map(gate => (
+            <Grid item xs key={gate.id}>
+              <TokenGateOption
+                tokenGate={gate}
+                isSelected={tokenGateResult?.gateTokens.some(g => g.tokenGate.id === gate.id)}
+              />
+            </Grid>
+          ))
+        }
+
       </Grid>
     );
   }

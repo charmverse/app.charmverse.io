@@ -1,13 +1,8 @@
 import { Role, Space, TokenGate, TokenGateToRole } from '@prisma/client';
 import { AuthSig } from 'lit-js-sdk';
 
-export interface TokenGateWithRoleData extends TokenGate {
-  tokenGateToRoles: (TokenGateToRole & {role: Role})[];
-}
-
 export interface TokenGateWithRoles extends TokenGate {
-  space: Space;
-  tokenGateToRoles: TokenGateToRole[];
+  tokenGateToRoles: (TokenGateToRole & {role: Role})[];
 }
 
 export interface TokenGateVerificationAttempt {
@@ -18,7 +13,7 @@ export interface TokenGateVerificationAttempt {
 
 export interface TokenGateJwt {
   signedToken: string;
-  tokenGateId: string;
+  tokenGate: TokenGateWithRoles;
 }
 
 /**
@@ -31,4 +26,19 @@ export interface TokenGateVerificationResult {
   canJoinSpace: boolean;
   gateTokens: TokenGateJwt[]
   roles: Role[]
+}
+
+/**
+ * Used for passing lit JWTs and gaining membership to a space
+ */
+export interface TokenGateApplication {
+  userId: string;
+  spaceId: string;
+  tokens: TokenGateJwt[];
+}
+
+export interface TokenGateApplicationResult {
+  userId: string;
+  space: Space;
+  roles: Role[];
 }
