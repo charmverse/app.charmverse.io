@@ -1,6 +1,6 @@
 
 import {
-  Application, Block, Bounty, InviteLink, Page, PagePermissionLevel, PaymentMethod, Prisma,
+  Application, Block, InviteLink, Page, PagePermissionLevel, PaymentMethod, Prisma,
   Role, Space, TelegramUser, TokenGate, TokenGateToRole, User, UserDetails, UserGnosisSafe, UserVote
 } from '@prisma/client';
 import * as http from 'adapters/http';
@@ -19,6 +19,7 @@ import { InviteLinkPopulated } from 'pages/api/invites/index';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 // TODO: Maybe move these types to another place so that we dont import from backend
 import { ReviewDecision, SubmissionContent, SubmissionCreationData } from 'lib/applications/interfaces';
+import { BountySubmitterPoolCalculation, BountySubmitterPoolSize, BountyUpdate, SuggestionAction, AssignedBountyPermissions, BountyCreationData } from 'lib/bounties/interfaces';
 import { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
 import { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
@@ -30,10 +31,8 @@ import { ListSpaceRolesResponse } from 'pages/api/roles';
 import { GetTasksResponse } from 'pages/api/tasks/list';
 import { GetTasksStateResponse, UpdateTasksState } from 'pages/api/tasks/state';
 import { TelegramAccount } from 'pages/api/telegram/connect';
-
 import { ApplicationWithTransactions } from 'lib/applications/actions';
-import { AssignedBountyPermissions, BountySubmitterPoolCalculation, BountySubmitterPoolSize, BountyUpdate, SuggestionAction } from 'lib/bounties/interfaces';
-import { DeepDaoAggregateData } from 'lib/deepdao/interfaces';
+import { DeepDaoAggregateData } from 'lib/deepdao/client';
 import { PublicPageResponse } from 'lib/pages/interfaces';
 import { PublicBountyToggle } from 'lib/spaces/interfaces';
 import type { MarkTask } from 'lib/tasks/markTasks';
@@ -400,11 +399,9 @@ class CharmClient {
     return http.GET('/api/bounties', { spaceId, publicOnly });
   }
 
-  async createBounty (bounty: Partial<Bounty>): Promise<Bounty> {
+  async createBounty (bounty: BountyCreationData): Promise<BountyWithDetails> {
 
-    const data = await http.POST<Bounty>('/api/bounties', bounty);
-
-    return data;
+    return http.POST<BountyWithDetails>('/api/bounties', bounty);
   }
 
   async getBountyApplicantPool ({ resourceId, permissions }: BountySubmitterPoolCalculation): Promise<BountySubmitterPoolSize> {

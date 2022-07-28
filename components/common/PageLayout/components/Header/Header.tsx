@@ -112,10 +112,7 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
         onClick={openSidebar}
         edge='start'
         sx={{
-          display: {
-            xs: hideSidebarOnSmallScreen ? 'none' : 'inline-flex',
-            md: 'inline-flex'
-          },
+          display: 'inline-flex',
           mr: 2,
           ...(open && { display: 'none' })
         }}

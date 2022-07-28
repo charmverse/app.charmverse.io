@@ -18,7 +18,7 @@ import MenuItem from '@mui/material/MenuItem';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import DeleteIcon from '../../widgets/icons/delete';
-import DuplicateIcon from '../../widgets/icons/duplicate';
+import DuplicateIcon from '@mui/icons-material/ContentCopy';
 import EditIcon from '@mui/icons-material/Edit';
 import { usePopupState, bindTrigger, bindMenu } from 'material-ui-popup-state/hooks';
 import { useForm } from 'react-hook-form';

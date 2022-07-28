@@ -18,6 +18,13 @@ export function isMobile (): boolean {
   });
 }
 
+export function isSmallScreen () {
+  if (typeof window !== 'undefined') {
+    return window.innerWidth < 600;
+  }
+  return false;
+}
+
 /** Based on https://developer.mozilla.org/docs/Web/HTTP/Browser_detection_using_the_user_agent */
 export function isTouchDevice () {
   let hasTouchScreen = false;

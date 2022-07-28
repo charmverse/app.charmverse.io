@@ -85,11 +85,23 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: IEditor
   const isSharedPage = router.pathname.startsWith('/share');
 
   return (
-    <ScrollableWindow hideScroll={showPageActionSidebar}>
-      <div style={{
-        width: showPageActionSidebar ? 'calc(100% - 425px)' : '100%',
-        height: showPageActionSidebar ? 'calc(100vh - 65px)' : '100%',
-        overflow: showPageActionSidebar ? 'auto' : 'inherit'
+    <ScrollableWindow
+      sx={{
+        overflow: {
+          md: showPageActionSidebar ? 'hidden' : 'auto'
+        }
+      }}
+    >
+      <Box sx={{
+        width: {
+          md: showPageActionSidebar ? 'calc(100% - 425px)' : '100%'
+        },
+        height: {
+          md: showPageActionSidebar ? 'calc(100vh - 65px)' : '100%'
+        },
+        overflow: {
+          md: showPageActionSidebar ? 'auto' : 'inherit'
+        }
       }}
       >
         {page.deletedAt && <PageDeleteBanner pageId={page.id} />}
@@ -148,7 +160,13 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: IEditor
                       pageUpdatedAt={page.updatedAt.toString()}
                       pageUpdatedBy={page.updatedBy}
                     />
-                    <BountyIntegration linkedTaskId={card.id} title={page.title} readonly={readOnly} />
+                    <BountyIntegration
+                      linkedPageId={card.id}
+                      title={page.title}
+                      description={page.contentText}
+                      descriptionNodes={page.content}
+                      readonly={readOnly}
+                    />
                   </Box>
 
                   <hr />
@@ -166,7 +184,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: IEditor
             <CreateVoteBox />
           )}
         </Container>
-      </div>
+      </Box>
     </ScrollableWindow>
   );
 }

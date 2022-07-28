@@ -25,6 +25,7 @@ import RouteGuard from 'components/common/RouteGuard';
 import 'theme/focalboard/focalboard.button.scss';
 import 'theme/focalboard/focalboard.main.scss';
 import 'theme/focalboard/focalboard.typography.scss';
+import ReactDndProvider from 'components/common/ReactDndProvider';
 import 'components/common/BoardEditor/focalboard/src/components/blockIconSelector.scss';
 import 'components/common/BoardEditor/focalboard/src/components/calculations/calculation.scss';
 import 'components/common/BoardEditor/focalboard/src/components/calendar/fullcalendar.scss';
@@ -98,7 +99,6 @@ import 'components/common/BoardEditor/focalboard/src/widgets/icons/disclosureTri
 import 'components/common/BoardEditor/focalboard/src/widgets/icons/divider.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/icons/dot.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/icons/dropdown.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/duplicate.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/icons/edit.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/icons/emoji.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/icons/focalboard_logo.scss';
@@ -146,7 +146,6 @@ import { ContributorsProvider } from 'hooks/useContributors';
 import { PageTitleProvider, usePageTitle } from 'hooks/usePageTitle';
 import { SpacesProvider } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
-import { isMobile } from 'lib/browser';
 // Lit Protocol CSS
 import 'lit-share-modal-v3-react-17/dist/ShareModal.css';
 import 'theme/lit-protocol/lit-protocol.scss';
@@ -155,9 +154,6 @@ import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { ReactElement, ReactNode, useEffect, useMemo, useState } from 'react';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
-import { TouchBackend } from 'react-dnd-touch-backend';
 import { IntlProvider } from 'react-intl';
 import { Provider as ReduxProvider } from 'react-redux';
 import 'react-resizable/css/styles.css';
@@ -315,10 +311,10 @@ function FocalBoardProviders ({ children }: { children: ReactNode }) {
       locale={language.split(/[_]/)[0]}
       messages={getMessages(language)}
     >
-      <DndProvider backend={isMobile() ? TouchBackend : HTML5Backend}>
+      <ReactDndProvider>
         <FlashMessages milliseconds={2000} />
         {children}
-      </DndProvider>
+      </ReactDndProvider>
     </IntlProvider>
   );
 }

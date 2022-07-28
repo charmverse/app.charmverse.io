@@ -1,5 +1,5 @@
-import { BountyOperation, Role, Bounty } from '@prisma/client';
-import { Roleup, RoleupWithMembers } from 'lib/roles/interfaces';
+import { Bounty } from '@prisma/client';
+import { RoleupWithMembers } from 'lib/roles/interfaces';
 import { humaniseList, upperCaseFirstCharacter } from '../../utilities/strings';
 import { TargetPermissionGroup } from '../interfaces';
 import { HumanisedBountyAccessSummary, SupportedHumanisedAccessConditions } from './interfaces';

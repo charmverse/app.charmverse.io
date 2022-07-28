@@ -5,12 +5,13 @@ import { rollupBountyStatus } from 'lib/bounties/rollupBountyStatus';
 import { requesterCanDeleteBounty } from 'lib/bounties/shared';
 import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
+import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 import { BountyWithDetails } from 'models';
 import { NextApiRequest, NextApiResponse } from 'next';
-import nc, { NextHandler } from 'next-connect';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -24,20 +25,12 @@ async function getBountyController (req: NextApiRequest, res: NextApiResponse<Bo
 
   const bounty = await getBounty(id as string);
 
-  const bountyNotFoundError = new DataNotFoundError(`Bounty with id ${id} not found.`);
-
-  if (!bounty) {
-    throw bountyNotFoundError;
-  }
-
-  const permissions = await computeBountyPermissions({
+  if (!bounty || !bounty.page || (await computeUserPagePermissions({
     allowAdminBypass: true,
-    resourceId: bounty.id,
+    pageId: bounty.page.id,
     userId: req.session.user.id
-  });
-
-  if (!permissions.view) {
-    throw bountyNotFoundError;
+  })).read !== true) {
+    throw new DataNotFoundError(`Bounty with id ${id} not found.`);
   }
 
   res.status(200).json(bounty);
@@ -51,42 +44,49 @@ async function updateBounty (req: NextApiRequest, res: NextApiResponse<BountyWit
 
   const bounty = await getBounty(id as string);
 
-  if (!bounty) {
+  if (!bounty || !bounty.page) {
     throw new DataNotFoundError(`Bounty with id ${id} was not found`);
   }
 
   const userId = req.session.user.id;
 
-  const permissions = await computeBountyPermissions({
-    allowAdminBypass: true,
-    resourceId: bounty.id,
-    userId
-  });
-
-  if (!permissions.edit) {
-    throw new UnauthorisedActionError('You do not have permissions to edit this bounty.');
-  }
-
-  if (!permissions.grant_permissions) {
-    // Don't pass permissions assignment to update operation if user can't grant permissions
-    delete body.permissions;
-  }
-
   const { error, isAdmin } = await hasAccessToSpace({
     spaceId: bounty.spaceId,
     userId,
-    adminOnly: true
+    adminOnly: false
   });
+
+  if (error) {
+    throw new UnauthorisedActionError('You do not have permissions to edit this bounty.');
+  }
+
+  const bountyPagePermissions = await computeUserPagePermissions({
+    allowAdminBypass: true,
+    pageId: bounty.page.id,
+    userId
+  });
+
+  if (bountyPagePermissions.edit_content !== true) {
+    throw new UnauthorisedActionError('You do not have permissions to edit this bounty.');
+  }
 
   // Only drop keys if user is not an admin
   // Bounty suggestions only exist if creating bounties is disabled at workspace level.
   // In this case, we wouldn't want non admin to configure any other fields than the title and description of the bounty until it is approved.
-  if (bounty.status === 'suggestion' && (error || !isAdmin)) {
-    typedKeys(body).forEach(key => {
-      if (key !== 'title' && key !== 'description' && key !== 'descriptionNodes') {
-        delete body[key];
-      }
-    });
+  if (bounty.status === 'suggestion') {
+
+    // Non admins can only update their own suggestions
+    if (bounty.createdBy !== userId && !isAdmin) {
+      throw new UnauthorisedActionError('You do not have permissions to edit this bounty.');
+    }
+    // These are the only editable fields
+    else {
+      typedKeys(body).forEach(key => {
+        if (key !== 'title' && key !== 'description' && key !== 'descriptionNodes') {
+          delete body[key];
+        }
+      });
+    }
   }
 
   await updateBountySettings({

@@ -94,7 +94,7 @@ export function iframeSpec (): RawSpecs {
       },
       group: 'block',
       inline: false,
-      draggable: false,
+      draggable: true,
       isolating: true, // dont allow backspace to delete
       parseDOM: [
         {

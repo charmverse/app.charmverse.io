@@ -21,10 +21,10 @@ export default function BountyDetails () {
 
   useEffect(() => {
     if (currentBounty) {
-      setPageTitle(currentBounty.title ?? 'Untitled bounty');
+      setPageTitle(currentBounty.page.title ?? 'Untitled bounty');
     }
 
-  }, [currentBounty?.title, bountyPermissions]);
+  }, [currentBounty?.page.title, bountyPermissions]);
 
   async function refreshBountyPermissions (bountyId: string) {
     setBountyPermissions(null);

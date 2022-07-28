@@ -13,7 +13,7 @@ export function rowSpec (): RawSpecs {
       content: 'columnBlock+',
       isolating: true,
       group: 'block',
-      draggable: false,
+      draggable: true,
       parseDOM: [{ tag: 'div.charm-column-row' }],
       toDOM: (): DOMOutputSpec => {
         return ['div', { class: 'charm-column-row' }];

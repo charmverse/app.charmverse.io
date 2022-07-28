@@ -1,16 +1,15 @@
 
 import styled from '@emotion/styled';
+import { Box, IconButton } from '@mui/material';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import { headerHeight } from 'components/common/PageLayout/components/Header';
 import Workspaces from 'components/common/PageLayout/components/Sidebar/Workspaces';
 
 const SidebarContainer = styled.div`
   display: flex;
+  flex-direction: column;
   background-color: ${({ theme }) => theme.palette.sidebar.background};
   height: 100%;
-
-  .add-a-page {
-    opacity: 0;
-    transition: opacity 0.2s ease-in-out;
-  }
 
   &:hover {
     .sidebar-header {
@@ -23,10 +22,6 @@ const SidebarContainer = styled.div`
       }
     }
   }
-
-  &:hover .add-a-page {
-    opacity: 1;
-  }
 `;
 
 interface SidebarProps {
@@ -37,7 +32,14 @@ export default function Sidebar ({ closeSidebar }: SidebarProps) {
 
   return (
     <SidebarContainer>
-      <Workspaces />
+      <Box sx={{ height: headerHeight, display: { xs: 'flex', sm: 'none' } }} justifyContent='center' alignItems='center'>
+        <IconButton onClick={closeSidebar} size='small'>
+          <ChevronLeftIcon />
+        </IconButton>
+      </Box>
+      <Box flexGrow={1}>
+        <Workspaces />
+      </Box>
     </SidebarContainer>
   );
 }
