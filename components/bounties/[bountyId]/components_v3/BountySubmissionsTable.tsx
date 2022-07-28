@@ -17,8 +17,8 @@ import UserDisplay from 'components/common/UserDisplay';
 import { useBounties } from 'hooks/useBounties';
 import { useContributors } from 'hooks/useContributors';
 import { useUser } from 'hooks/useUser';
-import { ApplicationWithTransactions, ListApplicationsResponse } from 'lib/applications/actions';
-import { applicantIsSubmitter } from 'lib/applications/shared';
+import { ApplicationWithTransactions } from 'lib/applications/actions';
+import { applicantIsSubmitter, countValidSubmissions } from 'lib/applications/shared';
 import { AssignedBountyPermissions } from 'lib/bounties/interfaces';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 import { useEffect, useState } from 'react';
@@ -175,13 +175,10 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
   const theme = useTheme();
   const { refreshBounty } = useBounties();
 
-  const [listApplications, setListApplications] = useState<ListApplicationsResponse>({
-    applications: [],
-    validSubmissions: 0
-  });
+  const [applications, setListApplications] = useState<ApplicationWithTransactions[]>([]);
   const [isSubmittingApplication, setIsSubmittingApplication] = useState(false);
-  const { applications, validSubmissions } = listApplications;
   const acceptedApplications = applications.filter(applicantIsSubmitter);
+  const validSubmissions = countValidSubmissions(applications);
   const userApplication = applications.find(app => app.createdBy === user?.id);
 
   async function refreshSubmissions () {

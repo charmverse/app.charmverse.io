@@ -1,8 +1,7 @@
 
 import { Application } from '@prisma/client';
 import { prisma } from 'db';
-import { createApplication, listAccessibleApplications, ListApplicationsResponse } from 'lib/applications/actions';
-import { countValidSubmissions } from 'lib/applications/shared';
+import { ApplicationWithTransactions, createApplication } from 'lib/applications/actions';
 import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireKeys } from 'lib/middleware/requireKeys';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
@@ -18,7 +17,7 @@ handler.use(requireUser)
   .use(requireKeys<Application>(['bountyId', 'message'], 'body'))
   .post(createApplicationController);
 
-async function getApplications (req: NextApiRequest, res: NextApiResponse<ListApplicationsResponse>) {
+async function getApplications (req: NextApiRequest, res: NextApiResponse<ApplicationWithTransactions[]>) {
   const bountyId = req.query.bountyId as string;
   const { id: userId } = req.session.user;
 
@@ -45,16 +44,16 @@ async function getApplications (req: NextApiRequest, res: NextApiResponse<ListAp
     throw error;
   }
 
-  const applicationsOrSubmissions = await listAccessibleApplications({
-    bountyId,
-    spaceId: bounty.spaceId,
-    userId
+  const applicationsOrSubmissions = await prisma.application.findMany({
+    where: {
+      bountyId
+    },
+    include: {
+      transactions: true
+    }
   });
 
-  return res.status(200).json({
-    applications: applicationsOrSubmissions,
-    validSubmissions: countValidSubmissions(applicationsOrSubmissions)
-  });
+  return res.status(200).json(applicationsOrSubmissions);
 }
 
 async function createApplicationController (req: NextApiRequest, res: NextApiResponse<Application>) {

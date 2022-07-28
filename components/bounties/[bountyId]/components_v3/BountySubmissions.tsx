@@ -89,7 +89,7 @@ export default function BountySubmissions ({ showMetadata = true, bounty, permis
     if (bounty) {
       charmClient.listApplications(bounty.id)
         .then(foundSubmissions => {
-          setSubmissions(foundSubmissions.applications);
+          setSubmissions(foundSubmissions);
         });
     }
   }
