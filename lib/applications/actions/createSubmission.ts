@@ -1,16 +1,12 @@
 import { Application } from '@prisma/client';
 import { prisma } from 'db';
-import { getBounty } from 'lib/bounties/getBounty';
-import { DataNotFoundError, DuplicateDataError, MissingDataError, UnauthorisedActionError } from 'lib/utilities/errors';
+import { getBountyOrThrow } from 'lib/bounties/getBounty';
+import { DuplicateDataError, MissingDataError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { SubmissionCreationData } from '../interfaces';
 import { bountyCanReceiveNewSubmissionsOrApplications } from '../shared';
 
 export async function createSubmission ({ bountyId, submissionContent, userId }: SubmissionCreationData): Promise<Application> {
-  const bounty = await getBounty(bountyId);
-
-  if (!bounty) {
-    throw new DataNotFoundError(`Bounty with id ${bountyId} not found`);
-  }
+  const bounty = await getBountyOrThrow(bountyId);
 
   if (bounty.approveSubmitters === true) {
     throw new UnauthorisedActionError('This bounty requires submitters to apply first.');

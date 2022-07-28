@@ -230,7 +230,7 @@ describe('calculateBountySubmitterPoolSize', () => {
     const bountySize = await calculateBountySubmitterPoolSize({
       resourceId: bounty.id,
       permissions: {
-        viewer: [{
+        reviewer: [{
           group: 'space',
           id: space.id
         }]

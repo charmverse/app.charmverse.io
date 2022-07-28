@@ -1,6 +1,6 @@
 import { ApplicationStatus, Block, Bounty, BountyStatus, Comment, Page, Prisma, Role, RoleSource, Space, SpaceApiToken, Thread, Transaction, Vote } from '@prisma/client';
 import { prisma } from 'db';
-import { getBounty } from 'lib/bounties';
+import { getBountyOrThrow } from 'lib/bounties';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import { IPageWithPermissions } from 'lib/pages';
 import { BountyPermissions } from 'lib/permissions/bounties';
@@ -171,7 +171,7 @@ export async function generateBounty ({ descriptionNodes, spaceId, createdBy, st
     })
   ]);
 
-  return getBounty(bountyId) as Promise<BountyWithDetails>;
+  return getBountyOrThrow(bountyId);
 }
 
 export async function generateComment ({ content, pageId, spaceId, userId, context = '', resolved = false }: Pick<Thread, 'userId' | 'spaceId' | 'pageId'> & Partial<Pick<Thread, 'context' | 'resolved'>> & Pick<Comment, 'content'>): Promise<Comment> {

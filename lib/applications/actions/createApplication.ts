@@ -1,16 +1,12 @@
 import { Application } from '@prisma/client';
-import { getBounty } from 'lib/bounties';
-import { DataNotFoundError, DuplicateDataError, LimitReachedError, StringTooShortError } from 'lib/utilities/errors';
+import { getBountyOrThrow } from 'lib/bounties';
+import { DuplicateDataError, LimitReachedError, StringTooShortError } from 'lib/utilities/errors';
 import { prisma } from 'db';
 import { ApplicationCreationData } from '../interfaces';
 import { submissionsCapReached, MINIMUM_APPLICATION_MESSAGE_CHARACTERS } from '../shared';
 
 export async function createApplication ({ bountyId, message, userId }: ApplicationCreationData): Promise<Application> {
-  const bounty = await getBounty(bountyId);
-
-  if (!bounty) {
-    throw new DataNotFoundError(`Bounty with id ${bountyId}`);
-  }
+  const bounty = await getBountyOrThrow(bountyId);
 
   const existingApplication = bounty.applications.find(app => app.createdBy === userId);
 

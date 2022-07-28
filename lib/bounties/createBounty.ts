@@ -5,7 +5,7 @@ import { setBountyPermissions } from 'lib/permissions/bounties';
 import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
 import { BountyWithDetails } from 'models';
 import { v4 } from 'uuid';
-import { getBounty } from './getBounty';
+import { getBountyOrThrow } from './getBounty';
 import { BountyCreationData } from './interfaces';
 
 /**
@@ -163,5 +163,5 @@ export async function createBounty ({
     });
   }
 
-  return getBounty(bountyId) as Promise<BountyWithDetails>;
+  return getBountyOrThrow(bountyId);
 }

@@ -1,9 +1,9 @@
 
-import { closeNewApplicationsAndSubmissions, getBounty } from 'lib/bounties';
+import { closeNewApplicationsAndSubmissions, getBountyOrThrow } from 'lib/bounties';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { withSessionRoute } from 'lib/session/withSession';
-import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
+import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { BountyWithDetails } from 'models';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -17,11 +17,7 @@ async function closeSubmissionsController (req: NextApiRequest, res: NextApiResp
 
   const { id: bountyId } = req.query;
 
-  const bounty = await getBounty(bountyId as string);
-
-  if (!bounty) {
-    throw new DataNotFoundError(`Bounty with id ${bountyId} not found`);
-  }
+  const bounty = await getBountyOrThrow(bountyId as string);
 
   const userId = req.session.user.id;
 

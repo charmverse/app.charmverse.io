@@ -1,6 +1,5 @@
 import { BountyPermissionLevel } from '@prisma/client';
-import { getBounty } from 'lib/bounties/getBounty';
-import { DataNotFoundError } from 'lib/utilities/errors';
+import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import { typedKeys } from '../../utilities/objects';
 import { addBountyPermissionGroup } from './addBountyPermissionGroup';
 import { BountyPermissionAssignment, BountyPermissions, BulkBountyPermissionAssignment } from './interfaces';
@@ -14,11 +13,7 @@ import { removeBountyPermissionGroup } from './removeBountyPermissionGroup';
  */
 export async function setBountyPermissions ({ bountyId, permissionsToAssign }: BulkBountyPermissionAssignment): Promise<BountyPermissions> {
 
-  const bounty = await getBounty(bountyId);
-
-  if (!bounty) {
-    throw new DataNotFoundError(`Bounty with id ${bountyId} not found`);
-  }
+  await getBountyOrThrow(bountyId);
 
   const toAssign: Omit<BountyPermissionAssignment, 'resourceId'>[] = permissionsToAssign instanceof Array ? permissionsToAssign
   // Convert mapping to list

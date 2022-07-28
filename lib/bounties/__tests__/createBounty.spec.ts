@@ -69,7 +69,8 @@ describe('createBounty', () => {
     Object.entries(fullBountyCreationData).forEach(([key, value]) => {
 
       if (key !== 'permissions') {
-        expect(bounty[key as Exclude<keyof BountyCreationData, 'permissions'>]).toBe(value);
+        // @ts-ignore
+        expect(bounty[key]).toBe(value);
       }
 
     });
