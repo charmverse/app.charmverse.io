@@ -36,11 +36,8 @@ describe('updateBountySettings', () => {
     });
 
     const newContent: UpdateableBountyFields = {
-      title: 'New title',
       approveSubmitters: false,
       chainId: 1,
-      description: 'New description',
-      descriptionNodes: '{"type":"doc","content":[{"type":"paragraph","content":[{"text":"New description","type":"text"}]}]}',
       maxSubmissions: 30,
       rewardAmount: 40,
       rewardToken: 'BNB'
@@ -52,13 +49,11 @@ describe('updateBountySettings', () => {
     });
 
     (Object.keys(newContent) as (keyof UpdateableBountyFields)[]).forEach(key => {
-      if (key !== 'permissions' && key !== 'title' && key !== 'description' && key !== 'descriptionNodes') {
+      if (key !== 'permissions') {
         expect(updatedBounty[key]).toBe(newContent[key]);
       }
     });
 
-    expect(updatedBounty.page?.title).toBe(newContent.title);
-    expect(updatedBounty.page?.content).toBe(newContent.descriptionNodes);
   });
 
   it('should not be able to update the status', async () => {

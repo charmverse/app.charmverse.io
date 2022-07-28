@@ -56,7 +56,6 @@ async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
   };
 
   const page = await prisma.page.create({ data: typedPageCreationData });
-
   try {
 
     const pageWithPermissions = await setupPermissionsAfterPageCreated(page.id);

@@ -1,8 +1,9 @@
 import { Box, Card, CardActionArea, CardHeader, Typography } from '@mui/material';
-import Link from 'components/common/Link';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import PageDialog from 'components/common/Page/PageDialog';
+import { usePages } from 'hooks/usePages';
 import { fancyTrim } from 'lib/utilities/strings';
-import { BountyWithDetails } from 'models';
+import { BountyWithDetails, Page } from 'models';
+import { useState } from 'react';
 import BountyStatusBadge from './BountyStatusBadge';
 
 /**
@@ -11,10 +12,11 @@ import BountyStatusBadge from './BountyStatusBadge';
 export interface IBountyInput {
   bounty: BountyWithDetails
   truncate?: boolean
-  publicMode?: boolean
 }
 
 function BountyCardDetails ({ bounty, truncate }: Pick<IBountyInput, 'bounty' | 'truncate'>) {
+  const { pages } = usePages();
+  const bountyPage = pages[bounty.page?.id];
   return (
     <Card
       sx={{
@@ -34,10 +36,10 @@ function BountyCardDetails ({ bounty, truncate }: Pick<IBountyInput, 'bounty' | 
           justifyContent: 'space-between'
         }}
       >
-        <CardHeader title={bounty.page?.title} titleTypographyProps={{ sx: { fontSize: '1rem', fontWeight: 'bold' } }} />
+        <CardHeader title={bountyPage?.title} titleTypographyProps={{ sx: { fontSize: '1rem', fontWeight: 'bold' } }} />
         <Box p={2} width='100%' display='flex' flex={1} flexDirection='column' justifyContent='space-between'>
           <Typography paragraph={true}>
-            {fancyTrim(bounty.page.contentText, 120)}
+            {fancyTrim(bountyPage?.contentText, 120)}
           </Typography>
           <BountyStatusBadge truncate={truncate} bounty={bounty} />
         </Box>
@@ -46,16 +48,22 @@ function BountyCardDetails ({ bounty, truncate }: Pick<IBountyInput, 'bounty' | 
   );
 }
 
-export function BountyCard ({ truncate = true, bounty, publicMode = false }: IBountyInput) {
-  const [space] = useCurrentSpace();
-  const bountyUrl = `/${space?.domain}/bounties/${bounty.id}`;
+export function BountyCard ({ truncate = true, bounty }: IBountyInput) {
+  const [page, setPage] = useState<Page | null>(null);
+  const { pages } = usePages();
 
-  return (publicMode ? (
-    <BountyCardDetails truncate={truncate} bounty={bounty} />
-  ) : (
-    <Link href={bountyUrl}>
-      <BountyCardDetails truncate={truncate} bounty={bounty} />
-    </Link>
-  )
+  return (
+    <>
+      <Box onClick={() => {
+        const bountyPage = pages[bounty.page?.id];
+        if (bountyPage) {
+          setPage(bountyPage);
+        }
+      }}
+      >
+        <BountyCardDetails truncate={truncate} bounty={bounty} />
+      </Box>
+      {page && <PageDialog page={page} onClose={() => setPage(null)} />}
+    </>
   );
 }

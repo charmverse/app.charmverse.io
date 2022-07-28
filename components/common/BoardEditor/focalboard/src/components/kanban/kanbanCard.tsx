@@ -1,23 +1,23 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+import styled from '@emotion/styled'
 import { Box } from '@mui/material'
+import { BountyStatusChip } from 'components/bounties/components/BountyStatusBadge'
+import { checkForEmpty } from 'components/common/CharmEditor/utils'
+import PageIcon from 'components/common/PageLayout/components/PageIcon'
+import { CryptoCurrency, TokenLogoPaths } from 'connectors'
+import { useBounties } from 'hooks/useBounties'
 import { useCurrentSpace } from 'hooks/useCurrentSpace'
 import { usePages } from 'hooks/usePages'
-import { BountyStatusChip } from 'components/bounties/components/BountyStatusBadge'
-import { useBounties } from 'hooks/useBounties'
-import { BOUNTY_LABELS, PageContent } from 'models'
-import { CryptoCurrency, TokenLogoPaths } from 'connectors'
-import Image from 'next/image'
+import { useSnackbar } from 'hooks/useSnackbar'
+import { PageContent } from 'models'
 import React, { useState } from 'react'
-import styled from '@emotion/styled'
 import { useIntl } from 'react-intl'
 import { mutate } from 'swr'
 import { Board, IPropertyTemplate } from '../../blocks/board'
 import { Card } from '../../blocks/card'
 import { useSortable } from '../../hooks/sortable'
 import mutator from '../../mutator'
-import { getCardComments } from '../../store/comments'
-import { useAppSelector } from '../../store/hooks'
 import { Utils } from '../../utils'
 import IconButton from '../../widgets/buttons/iconButton'
 import DeleteIcon from '../../widgets/icons/delete'
@@ -28,12 +28,7 @@ import Menu from '../../widgets/menu'
 import MenuWrapper from '../../widgets/menuWrapper'
 import Tooltip from '../../widgets/tooltip'
 import ConfirmationDialogBox, { ConfirmationDialogBoxProps } from '../confirmationDialogBox'
-import { sendFlashMessage } from '../flashMessages'
 import PropertyValueElement from '../propertyValueElement'
-import PageIcon from 'components/common/PageLayout/components/PageIcon'
-import { checkForEmpty } from 'components/common/CharmEditor/utils'
-import { useSnackbar } from 'hooks/useSnackbar'
-
 
 type Props = {
   card: Card
@@ -79,7 +74,6 @@ const KanbanCard = React.memo((props: Props) => {
   const { bounties } = useBounties()
   const linkedBounty = bounties.find(bounty => bounty.page?.id === card.id);
 
-  const comments = useAppSelector(getCardComments(card.id))
   const { pages, getPagePermissions } = usePages()
   const cardPage = pages[card.id]
 
@@ -185,7 +179,7 @@ const KanbanCard = React.memo((props: Props) => {
         }
 
         <div className='octo-icontitle'>
-            <div>
+          <div>
             {cardPage?.icon ? <PageIcon isEditorEmpty={checkForEmpty(cardPage?.content as PageContent)} pageType="page" icon={cardPage.icon} /> : undefined}
             </div>
             <div
@@ -193,7 +187,7 @@ const KanbanCard = React.memo((props: Props) => {
               className='octo-titletext'
             >
               {cardPage?.title || intl.formatMessage({ id: 'KanbanCard.untitled', defaultMessage: 'Untitled' })}
-            </div>
+          </div>
         </div>
         {visiblePropertyTemplates.map((template) => (
           <Tooltip

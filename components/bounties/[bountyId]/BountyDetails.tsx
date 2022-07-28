@@ -11,13 +11,28 @@ import { usePageTitle } from 'hooks/usePageTitle';
 import { useEffect, useState } from 'react';
 import charmClient from 'charmClient';
 import { AssignedBountyPermissions } from 'lib/bounties/interfaces';
+import { BountyWithDetails } from 'models';
 
-export default function BountyDetails () {
+interface BountyDetailsProps {
+  bounty?: BountyWithDetails
+  centeredContent?: boolean
+  showDescription?: boolean
+  showHeader?: boolean
+}
+
+export default function BountyDetails ({ showHeader = true, showDescription = true, centeredContent = true, bounty }: BountyDetailsProps) {
 
   const [, setPageTitle] = usePageTitle();
-  const { currentBounty, currentBountyId } = useBounties();
+  const { currentBounty, setCurrentBounty, currentBountyId, updateCurrentBountyId } = useBounties();
 
   const [bountyPermissions, setBountyPermissions] = useState<AssignedBountyPermissions | null>(null);
+
+  useEffect(() => {
+    if (bounty) {
+      updateCurrentBountyId(bounty.id);
+      setCurrentBounty(bounty);
+    }
+  }, [bounty]);
 
   useEffect(() => {
     if (currentBounty) {
@@ -45,46 +60,49 @@ export default function BountyDetails () {
     return null;
   }
 
-  return !bountyPermissions ? (
+  const content = !bountyPermissions ? (
     <LoadingComponent height='200px' isLoading={true} />
   ) : (
-    <CenteredPageContent>
-
+    <>
+      {showHeader && (
       <BountyHeader
         bounty={currentBounty}
         permissions={bountyPermissions}
-        refreshBountyPermissions={() => {
-          // refreshBounty(currentBountyId);
-          refreshBountyPermissions(currentBountyId);
-        }}
       />
+      )}
 
-      <BountyDescription bounty={currentBounty} permissions={bountyPermissions} />
-
-      {
-          currentBounty.status === 'suggestion' && <BountySuggestionApproval bounty={currentBounty} />
-        }
+      {showDescription && <BountyDescription bounty={currentBounty} permissions={bountyPermissions} />}
 
       {
-          currentBounty.status !== 'suggestion' && (
-            <>
-              <Box sx={{ mb: 3 }}>
-                <BountySubmissions bounty={currentBounty} permissions={bountyPermissions} />
-              </Box>
-              {
-          currentBounty.approveSubmitters === true && (
-          <BountyApplicantList
-            bounty={currentBounty}
-            applications={currentBounty.applications}
-            permissions={bountyPermissions}
-          />
-          )
-        }
-            </>
-          )
-        }
-    </CenteredPageContent>
+      currentBounty.status === 'suggestion' && <BountySuggestionApproval bounty={currentBounty} />
+    }
+
+      {
+      currentBounty.status !== 'suggestion' && (
+        <>
+          <Box sx={{ mb: 3 }}>
+            <BountySubmissions bounty={currentBounty} permissions={bountyPermissions} />
+          </Box>
+          {
+            currentBounty.approveSubmitters === true && (
+              <BountyApplicantList
+                bounty={currentBounty}
+                applications={currentBounty.applications}
+                permissions={bountyPermissions}
+              />
+            )
+          }
+        </>
+      )
+    }
+    </>
   );
 
+  return centeredContent
+    ? (
+      <CenteredPageContent>
+        {content}
+      </CenteredPageContent>
+    ) : content;
 }
 

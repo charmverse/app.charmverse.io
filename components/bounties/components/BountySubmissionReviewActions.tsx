@@ -23,7 +23,7 @@ import { SyntheticEvent, useState } from 'react';
 import { AssignedBountyPermissions } from 'lib/bounties/interfaces';
 import BountyPaymentButton from '../[bountyId]/components/BountyPaymentButton';
 
-interface Props {
+export interface BountySubmissionReviewActionsProps {
   bounty: Bounty,
   submission: ApplicationWithTransactions,
   permissions: AssignedBountyPermissions,
@@ -31,8 +31,10 @@ interface Props {
   onSubmission: (eventOrAnchorEl?: HTMLElement | SyntheticEvent<any, Event> | null | undefined) => void
 }
 
-export default function BountySubmissionReviewActions ({ onSubmission, bounty, submission, reviewComplete, permissions }: Props) {
-
+export default function BountySubmissionReviewActions (
+  { onSubmission, bounty, submission, reviewComplete, permissions }:
+  BountySubmissionReviewActionsProps
+) {
   const [user] = useUser();
   const isAdmin = useIsAdmin();
   const { refreshBounty } = useBounties();
@@ -75,7 +77,7 @@ export default function BountySubmissionReviewActions ({ onSubmission, bounty, s
     setApiError(null);
   }
 
-  const canReview = permissions?.userPermissions?.review && (submission.status === 'inProgress' || submission.status === 'review');
+  const canReview = permissions?.userPermissions?.review && submission.status === 'review';
 
   return (
     <Box display='flex' gap={1} alignItems='center' justifyContent='end'>
@@ -95,6 +97,33 @@ export default function BountySubmissionReviewActions ({ onSubmission, bounty, s
       {
         submission.status === 'inProgress' && submission.createdBy === user?.id && (
           <Button type='submit' onClick={onSubmission}>Submit</Button>
+        )
+      }
+      {
+        submission.status === 'review' && submission.createdBy === user?.id && (
+          <Typography sx={{
+            opacity: 0.5
+          }}
+          >Waiting review
+          </Typography>
+        )
+      }
+      {
+        submission.status === 'applied' && submission.createdBy === user?.id && (
+          <Typography sx={{
+            opacity: 0.5
+          }}
+          >Waiting assignment
+          </Typography>
+        )
+      }
+      {
+        submission.status === 'complete' && submission.createdBy === user?.id && (
+          <Typography sx={{
+            opacity: 0.5
+          }}
+          >Waiting payment
+          </Typography>
         )
       }
       {isAdmin && submission.status === 'complete' && submission.walletAddress && <BountyPaymentButton onSuccess={recordTransaction} receiver={submission.walletAddress} amount={eToNumber(bounty.rewardAmount)} tokenSymbolOrAddress={bounty.rewardToken} chainIdToUse={bounty.chainId} />}

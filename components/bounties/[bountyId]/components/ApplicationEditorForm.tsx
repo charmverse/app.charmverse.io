@@ -1,4 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import { FormLabel, Stack } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
@@ -14,10 +15,13 @@ import * as yup from 'yup';
 import { FormMode } from '../../components/BountyEditorForm';
 
 interface IApplicationFormProps {
-  onSubmit: (application: Application) => any,
+  onSubmit?: (application: Application) => any,
   bountyId: string
   mode?: FormMode
   proposal?: Application
+  onCancel?: () => void
+  readOnly?: boolean
+  showHeader?: boolean
 }
 
 export const schema = yup.object({
@@ -26,7 +30,7 @@ export const schema = yup.object({
 
 type FormValues = yup.InferType<typeof schema>
 
-export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'create' }: IApplicationFormProps) {
+export function ApplicationEditorForm ({ showHeader = false, readOnly = false, onCancel, onSubmit, bountyId, proposal, mode = 'create' }: IApplicationFormProps) {
 
   const { refreshBounty } = useBounties();
 
@@ -55,21 +59,34 @@ export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'c
       proposalToSave.bountyId = bountyId;
       proposalToSave.status = 'applied';
       const createdApplication = await charmClient.createApplication(proposalToSave);
-      onSubmit(createdApplication);
+      if (onSubmit) {
+        onSubmit(createdApplication);
+      }
       refreshBounty(bountyId);
       setApplicationMessage('');
     }
     else if (mode === 'update') {
       await charmClient.updateApplication(proposal?.id as string, proposalToSave);
-      onSubmit(proposalToSave);
+      if (onSubmit) {
+        onSubmit(proposalToSave);
+      }
       refreshBounty(bountyId);
     }
 
   }
 
   return (
-    <div>
-      <form onSubmit={handleSubmit(formValue => submitted(formValue as Application))} style={{ margin: 'auto' }}>
+    <Stack my={1} gap={1}>
+      {
+        showHeader && (
+        <FormLabel sx={{
+          fontWeight: 'bold'
+        }}
+        >Application
+        </FormLabel>
+        )
+      }
+      <form onSubmit={handleSubmit(formValue => submitted(formValue as Application))} style={{ margin: 'auto', width: '100%' }}>
         <Grid container direction='column' spacing={3}>
           <Grid item>
             <TextField
@@ -81,6 +98,7 @@ export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'c
               variant='outlined'
               type='text'
               fullWidth
+              disabled={readOnly}
               onChange={(ev) => {
                 // Only store in local storage if no proposal exists yet
                 const newText = ev.target.value;
@@ -103,14 +121,16 @@ export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'c
 
           </Grid>
 
-          <Grid item>
-            <Button disabled={!isValid} type='submit'>{mode === 'create' ? ' Submit application' : 'Update application'}</Button>
+          {!readOnly && (
+          <Grid item display='flex' gap={1}>
+            <Button disabled={!isValid} type='submit'>{mode === 'create' ? ' Submit' : 'Update'}</Button>
+            {onCancel && <Button onClick={onCancel} color='error'>Cancel</Button>}
           </Grid>
-
+          )}
         </Grid>
 
       </form>
-    </div>
+    </Stack>
   );
 }
 
