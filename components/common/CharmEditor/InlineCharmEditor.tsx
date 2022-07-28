@@ -17,7 +17,7 @@ import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor
 import { PageContent } from 'models';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
-import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
+import * as floatingMenu from './components/floatingMenu';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
 import Mention, { mentionPlugins, mentionSpecs, MentionSuggest, mentionPluginKeyName } from './components/mention';
 import * as tabIndent from './components/tabIndent';
@@ -91,7 +91,7 @@ export function charmEditorPlugins (
     mentionPlugins({
       key: mentionPluginKey
     }),
-    floatingMenuPlugin({
+    floatingMenu.plugins({
       key: floatingMenuPluginKey,
       readOnly,
       enableComments: false
@@ -170,7 +170,6 @@ export default function CharmEditor (
       userId: currentUser?.id
     }),
     initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
-    // hide the black bar when dragging items - we dont even support dragging most components
     dropCursorOpts: {
       color: 'transparent'
     }
@@ -217,7 +216,7 @@ export default function CharmEditor (
         }
       }}
     >
-      <FloatingMenu inline pluginKey={floatingMenuPluginKey} />
+      <floatingMenu.FloatingMenu inline pluginKey={floatingMenuPluginKey} />
       <MentionSuggest pluginKey={mentionPluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
       {children}

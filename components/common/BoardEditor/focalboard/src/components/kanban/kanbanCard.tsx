@@ -21,7 +21,7 @@ import mutator from '../../mutator'
 import { Utils } from '../../utils'
 import IconButton from '../../widgets/buttons/iconButton'
 import DeleteIcon from '../../widgets/icons/delete'
-import DuplicateIcon from '../../widgets/icons/duplicate'
+import DuplicateIcon from '@mui/icons-material/ContentCopy'
 import LinkIcon from '../../widgets/icons/Link'
 import OptionsIcon from '../../widgets/icons/options'
 import Menu from '../../widgets/menu'
@@ -126,7 +126,7 @@ const KanbanCard = React.memo((props: Props) => {
             stopPropagationOnToggle={true}
           >
             <IconButton icon={<OptionsIcon />} />
-            <Menu position='left'>
+            <Menu position='bottom-start'>
               {pagePermissions.delete && pages[card.id]?.deletedAt === null && <Menu.Text
                 icon={<DeleteIcon />}
                 id='delete'
@@ -134,7 +134,7 @@ const KanbanCard = React.memo((props: Props) => {
                 onClick={handleDeleteButtonOnClick}
               />}
               <Menu.Text
-                icon={<DuplicateIcon />}
+                icon={<DuplicateIcon color='secondary' fontSize='small' />}
                 id='duplicate'
                 name={intl.formatMessage({ id: 'KanbanCard.duplicate', defaultMessage: 'Duplicate' })}
                 onClick={() => {

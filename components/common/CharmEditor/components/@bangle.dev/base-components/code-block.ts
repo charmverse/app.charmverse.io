@@ -49,7 +49,7 @@ function specFactory(): RawSpecs {
       group: 'block',
       code: true,
       defining: true,
-      draggable: false,
+      draggable: true,
       parseDOM: [{ tag: 'pre', preserveWhitespace: 'full' }],
       toDOM: (): DOMOutputSpecArray => ['pre', ['code', 0]],
     },

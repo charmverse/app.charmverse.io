@@ -15,7 +15,7 @@ export function spec (): BaseRawNodeSpec {
       content: 'block*',
       group: 'block',
       defining: true,
-      draggable: false,
+      draggable: true,
       parseDOM: [{ tag: 'blockquote' }],
       toDOM: (): DOMOutputSpec => {
         return ['blockquote', 0];
