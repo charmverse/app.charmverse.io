@@ -180,6 +180,7 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
   const acceptedApplications = applications.filter(applicantIsSubmitter);
   const validSubmissions = countValidSubmissions(applications);
   const userApplication = applications.find(app => app.createdBy === user?.id);
+  const isReviewer = permissions.userPermissions?.review;
 
   async function refreshSubmissions () {
     if (bounty) {
@@ -235,7 +236,7 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
           </TableRow>
         </TableHead>
         <TableBody>
-          {applications.map((submission) => (
+          {(isReviewer ? applications : applications.filter(application => application.createdBy === user?.id)).map((submission) => (
             <BountySubmissionsTableRow
               bounty={bounty}
               totalAcceptedApplications={acceptedApplications.length}
