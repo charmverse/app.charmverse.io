@@ -82,21 +82,18 @@ const CardDialog = (props: Props): JSX.Element | null => {
     const intl = useIntl()
     const [showConfirmationDialogBox, setShowConfirmationDialogBox] = useState<boolean>(false)
     const { pages } = usePages()
+    const { bounties } = useBounties()
     const router = useRouter();
     const isSharedPage = router.route.startsWith('/share')
     const cardPage = pages[cardId]
     const [spacePermissions] = useCurrentSpacePermissions()
-    const [ isBountyAttached, setIsBountyAttached ] = useState<boolean | null>(null)
+    const [ isBountyAttached, setIsBountyAttached ] = useState<boolean | null>(false)
 
     const { showMessage } = useSnackbar()
 
     useEffect(() => {
-      async function checkPageBounty() {
-        const hasBounty = await charmClient.checkPageBounty(cardId)
-        setIsBountyAttached(hasBounty)
-      }
-      checkPageBounty()
-    }, [])
+      setIsBountyAttached(Boolean(bounties.find(bounty => bounty.page?.id === cardId)))
+    }, [bounties, cardId])
 
     const handleDeleteCard = async () => {
         if (!card) {
@@ -173,7 +170,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
                         startIcon={<OpenInFullIcon fontSize='small'/>}>
                         Open as Page
                       </Button>
-                      {spacePermissions?.createBounty && isBountyAttached !== null && !isSharedPage && cardPage && !isBountyAttached && !readonly && <CreateBountyButton onClick={() => {
+                      {spacePermissions?.createBounty && !isSharedPage && cardPage && !isBountyAttached && !readonly && <CreateBountyButton onClick={() => {
                         setIsBountyAttached(true)
                       }} pageId={cardId} />}
                     </Box>
