@@ -177,7 +177,7 @@ export default function BountyList ({ publicMode, bountyCardClicked = () => null
                         bountyCardClicked(bounty);
                       }}
                     >
-                      <BountyCard truncate={false} key={bounty.id} bounty={bounty} publicMode={publicMode} />
+                      <BountyCard truncate={false} key={bounty.id} bounty={bounty} />
                     </Grid>
                   );
                 })}
