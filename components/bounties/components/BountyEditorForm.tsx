@@ -154,18 +154,10 @@ export default function BountyEditorForm ({ onSubmit, bounty, linkedPageId, mode
 
   }, [bounty, permissions]);
 
-  // Cached description for when user is creating or suggesting a new bounty
-  const [cachedBountyDescription, setCachedBountyDescription] = useLocalStorage<{nodes: PageContent, text: string}>(`newBounty.${space?.id}`, {
-    nodes: {
-      type: 'doc'
-    },
-    text: ''
-  });
-
   // Hack until the updated UI is merged. This code will be removed.
-  const description = (bounty?.page?.contentText || bounty?.description) ?? cachedBountyDescription.text;
-  const descriptionNodes = (bounty?.page?.content || bounty?.descriptionNodes) ?? cachedBountyDescription.nodes;
-  const title = bounty?.page?.title || bounty?.title;
+  const description = (bounty?.page?.contentText);
+  const descriptionNodes = (bounty?.page?.content);
+  const title = bounty?.page?.title;
 
   const {
     register,
@@ -251,7 +243,6 @@ export default function BountyEditorForm ({ onSubmit, bounty, linkedPageId, mode
 
   // Combines current states to generate what we'll send to the API
   function rollupPermissions (): Pick<BountyPermissions, 'reviewer' | 'submitter'> {
-
     const reviewers = [
       ...selectedReviewerUsers.map(uid => {
         return {
@@ -325,12 +316,6 @@ export default function BountyEditorForm ({ onSubmit, bounty, linkedPageId, mode
           [createdBounty.page.id]: createdBounty.page
         });
 
-        setCachedBountyDescription({
-          nodes: {
-            type: 'doc'
-          },
-          text: ''
-        });
         onSubmit(createdBounty);
       }
       else if (mode === 'suggest') {
@@ -350,13 +335,6 @@ export default function BountyEditorForm ({ onSubmit, bounty, linkedPageId, mode
         setPages({
           ...pages,
           [createdBounty.page.id]: createdBounty.page
-        });
-
-        setCachedBountyDescription({
-          nodes: {
-            type: 'doc'
-          },
-          text: ''
         });
 
         onSubmit(createdBounty);
@@ -386,13 +364,6 @@ export default function BountyEditorForm ({ onSubmit, bounty, linkedPageId, mode
   function setRichContent (content: ICharmEditorOutput) {
     setValue('descriptionNodes', content.doc);
     setValue('description', content.rawText);
-
-    if (!bounty) {
-      setCachedBountyDescription({
-        nodes: content.doc,
-        text: content.rawText
-      });
-    }
   }
 
   function setChainId (_chainId: number) {

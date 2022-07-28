@@ -13,7 +13,9 @@ async function checkPageBounty (req: NextApiRequest, res: NextApiResponse<boolea
   const pageId = req.query.id as string;
   const pageBounty = await prisma.bounty.findFirst({
     where: {
-      linkedTaskId: pageId
+      page: {
+        id: pageId
+      }
     }
   });
 

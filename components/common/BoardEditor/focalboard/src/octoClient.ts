@@ -39,7 +39,7 @@ class OctoClient {
         this.serverUrl = serverUrl
     }
 
-    private async getJson(response: Response, defaultValue: unknown): Promise<unknown> {
+    private async getJson(response: Response, defaultValue: unknown): Promise<any> {
         // The server may return null or malformed json
         try {
             const value = await response.json()

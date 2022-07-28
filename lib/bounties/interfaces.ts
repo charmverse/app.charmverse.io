@@ -6,8 +6,8 @@ import { Resource } from '../permissions/interfaces';
 // Re-export bounty permissions interfaces for convenience
 export * from 'lib/permissions/bounties/interfaces';
 
-export type BountyCreationData = Pick<Bounty, 'title' | 'spaceId' | 'createdBy'>
-  & Partial<Pick<Bounty, 'status'| 'chainId'| 'description'| 'descriptionNodes'| 'approveSubmitters'| 'maxSubmissions'| 'rewardAmount'| 'rewardToken'>>
+export type BountyCreationData = Pick<Bounty, 'spaceId' | 'createdBy'>
+  & Partial<Pick<Bounty, 'status'| 'chainId'| 'approveSubmitters'| 'maxSubmissions'| 'rewardAmount'| 'rewardToken'>>
   & {permissions?: Partial<BountyPermissions>; pageType?: PageType; linkedPageId?: string;};
 
 export type UpdateableBountyFields = Partial<Pick<Bounty, 'chainId' | 'rewardAmount' | 'rewardToken' | 'approveSubmitters' | 'maxSubmissions'>> & {permissions?: Partial<BountyPermissions>}

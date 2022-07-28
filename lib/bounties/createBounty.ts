@@ -1,4 +1,4 @@
-import { BountyStatus, PageType, Prisma } from '@prisma/client';
+import { BountyStatus, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { getBountyPagePermissionSet } from 'lib/bounties/shared';
 import { setBountyPermissions } from 'lib/permissions/bounties';
@@ -16,15 +16,12 @@ export async function createBounty ({
   createdBy,
   status = 'suggestion',
   chainId = 1,
-  description = '',
-  descriptionNodes = '',
   linkedPageId,
   approveSubmitters = true,
   maxSubmissions,
   rewardAmount = 0,
   rewardToken = 'ETH',
-  permissions,
-  title = ''
+  permissions
 }: BountyCreationData) {
 
   const validCreationStatuses: BountyStatus[] = ['suggestion', 'open'];
@@ -47,7 +44,6 @@ export async function createBounty ({
 
   const bountyCreateInput: Prisma.BountyCreateInput = {
     id: bountyId,
-    title: '',
     space: {
       connect: {
         id: spaceId
@@ -60,8 +56,6 @@ export async function createBounty ({
     },
     status,
     chainId,
-    description: '',
-    descriptionNodes: '',
     approveSubmitters,
     maxSubmissions,
     rewardAmount,
@@ -85,9 +79,9 @@ export async function createBounty ({
             create: {
               id: bountyId,
               path: `page-${Math.random().toString().replace('0.', '')}`,
-              title,
-              contentText: description,
-              content: descriptionNodes as string,
+              title: '',
+              contentText: '',
+              content: undefined,
               space: {
                 connect: {
                   id: spaceId
