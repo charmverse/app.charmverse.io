@@ -21,14 +21,12 @@ export async function updateComment ({ content, id }: CommentUpdate): Promise<Co
     throw new DataNotFoundError(`Comment with id ${id} not found`);
   }
 
-  const updateContent = typeof content === 'string' ? JSON.parse(content) : content;
-
   const updated = await prisma.comment.update({
     where: {
       id
     },
     data: {
-      content: updateContent,
+      content,
       updatedAt: new Date()
     },
     include: {
