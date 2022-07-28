@@ -68,10 +68,6 @@ export default function BountyDetails ({ showHeader = true, showDescription = tr
       <BountyHeader
         bounty={currentBounty}
         permissions={bountyPermissions}
-        refreshBountyPermissions={() => {
-          // refreshBounty(currentBountyId);
-          refreshBountyPermissions(currentBountyId);
-        }}
       />
       )}
 
