@@ -29,7 +29,7 @@ const config = {
   async redirects () {
     return [
       {
-        // (^(?!.*\bapi\b).*$) includes all paths except for /api/
+        // (^(?!.*\bapi\b).*$) includes all paths except for /api/ source: https://stackoverflow.com/questions/70701544/next-js-redirect-all-paths-except-one
         source: '/:domain(^(?!.*\bapi\b).*$)/settings',
         destination: '/:domain/settings/workspace',
         permanent: false
