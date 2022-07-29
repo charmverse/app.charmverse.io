@@ -30,10 +30,11 @@ const config = {
     return [
       {
         // (^(?!.*\bapi\b).*$) includes all paths except for /api/ source: https://stackoverflow.com/questions/70701544/next-js-redirect-all-paths-except-one
-        source: '/:domain(^(?!.*\bapi\b).*$)/settings',
+        source: '/:domain(^(?!api$).*)/settings',
         destination: '/:domain/settings/workspace',
         permanent: false
       },
+      // redirect old links for bounties - July 29th
       {
         source: '/:domain(^(?!api$).*)/bounties/:id',
         destination: '/:domain/:id',
