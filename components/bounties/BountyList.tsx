@@ -1,7 +1,6 @@
 import { Box, Grid, Typography } from '@mui/material';
 import { BountyStatus } from '@prisma/client';
 import Button from 'components/common/Button';
-import CreatePageButton from 'components/common/Page/CreatePageButton';
 import { FullWidthPageContent } from 'components/common/PageLayout/components/PageContent';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
 import { BountyWithDetails } from 'models';
@@ -10,6 +9,7 @@ import { CSVLink } from 'react-csv';
 import { BountyCard } from './components/BountyCard';
 import { BountyStatusChip } from './components/BountyStatusBadge';
 import MultiPaymentModal from './components/MultiPaymentModal';
+import NewBountyButton from './components/NewBountyButton';
 
 const bountyStatuses: BountyStatus[] = ['open', 'inProgress', 'complete', 'paid', 'suggestion'];
 
@@ -88,8 +88,7 @@ export default function BountyList ({ publicMode, bountyCardClicked = () => null
                 </CSVLink>
               )}
               <MultiPaymentModal bounties={bounties} />
-              <CreatePageButton type='bounty' />
-
+              <NewBountyButton />
             </Box>
           )
         }
