@@ -60,7 +60,7 @@ export default function VotesPage () {
       <Grid container mb={6}>
         <Grid item xs>
           <Typography variant='h1' gutterBottom>
-            <strong>Votes</strong>
+            Votes
           </Typography>
         </Grid>
         <Grid item xs={12} lg={8} display='flex'>

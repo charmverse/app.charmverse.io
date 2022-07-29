@@ -104,7 +104,7 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       htmlFontSize: 14,
       h1: {
         fontSize: '2rem',
-        fontWeight: 500
+        fontWeight: 700
       },
       h2: {
         fontSize: '1.05rem',

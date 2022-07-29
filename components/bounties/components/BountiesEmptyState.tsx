@@ -2,7 +2,7 @@ import { Typography } from '@mui/material';
 
 export default function BountiesEmptyState () {
   return (
-    <div style={{ marginTop: '25px' }}>
+    <div>
       <Typography variant='h6'>
         Getting started with bounties
       </Typography>
