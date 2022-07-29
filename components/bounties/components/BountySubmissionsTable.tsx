@@ -19,6 +19,7 @@ import FieldLabel from 'components/common/form/FieldLabel';
 import UserDisplay from 'components/common/UserDisplay';
 import { useBounties } from 'hooks/useBounties';
 import { useContributors } from 'hooks/useContributors';
+import useIsAdmin from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 import { ApplicationWithTransactions } from 'lib/applications/actions';
 import { applicantIsSubmitter, countValidSubmissions } from 'lib/applications/shared';
@@ -31,6 +32,7 @@ import { ApplicationEditorForm } from '../[bountyId]/components/ApplicationEdito
 import SubmissionEditorForm from '../[bountyId]/components_v3/SubmissionEditorForm';
 import BountyApplicationForm from './BountyApplicationForm';
 import BountySubmissionReviewActions from './BountySubmissionReviewActions';
+import MultiPaymentModal from './MultiPaymentModal';
 
 interface Props {
   bounty: BountyWithDetails
@@ -212,6 +214,7 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
   const validSubmissions = countValidSubmissions(applications);
   const userApplication = applications.find(app => app.createdBy === user?.id);
   const isReviewer = permissions.userPermissions?.review;
+  const isAdmin = useIsAdmin();
 
   async function refreshSubmissions () {
     if (bounty) {
@@ -226,12 +229,15 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
 
   return (
     <Box>
-      <Chip
-        sx={{
-          my: 1
-        }}
-        label={`Submissions: ${bounty?.maxSubmissions ? `${validSubmissions} / ${bounty.maxSubmissions}` : validSubmissions}`}
-      />
+      <Box width='100%' display='flex' mb={1} justifyContent='space-between'>
+        <Chip
+          sx={{
+            my: 1
+          }}
+          label={`Submissions: ${bounty?.maxSubmissions ? `${validSubmissions} / ${bounty.maxSubmissions}` : validSubmissions}`}
+        />
+        {isAdmin && <MultiPaymentModal bounties={[bounty]} />}
+      </Box>
 
       {(userApplication || permissions.userPermissions.review) && (
         <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
