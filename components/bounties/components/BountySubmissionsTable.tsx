@@ -29,6 +29,7 @@ import { useEffect, useState } from 'react';
 import { BrandColor } from 'theme/colors';
 import { ApplicationEditorForm } from '../[bountyId]/components/ApplicationEditorForm';
 import SubmissionEditorForm from '../[bountyId]/components_v3/SubmissionEditorForm';
+import BountyApplicationForm from './BountyApplicationForm';
 import BountySubmissionReviewActions from './BountySubmissionReviewActions';
 
 interface Props {
@@ -121,6 +122,7 @@ function BountySubmissionsTableRow ({
           </IconButton>
         </TableCell>
         <TableCell align='right' sx={{ gap: 2, justifyContent: 'flex-end' }}>
+          {submission.status !== 'inProgress' && (
           <BountySubmissionReviewActions
             totalAcceptedApplications={totalAcceptedApplications}
             bounty={bounty}
@@ -129,6 +131,7 @@ function BountySubmissionsTableRow ({
             permissions={permissions}
             disableRejectButton
           />
+          )}
         </TableCell>
       </TableRow>
       <TableRow>
@@ -144,6 +147,7 @@ function BountySubmissionsTableRow ({
                   onSubmit={async () => {
                     await refreshSubmissions();
                     await refreshBounty(bounty.id);
+                    setIsViewingDetails(false);
                   }}
                 />
               </Box>
@@ -290,6 +294,12 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
           </Typography>
         </Box>
       )}
+      <BountyApplicationForm
+        bounty={bounty}
+        submissions={applications}
+        permissions={permissions}
+        refreshSubmissions={refreshSubmissions}
+      />
     </Box>
   );
 }

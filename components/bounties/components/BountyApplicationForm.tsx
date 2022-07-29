@@ -2,6 +2,7 @@ import { Box, Button, Stack, Tooltip } from '@mui/material';
 import { Application, Bounty } from '@prisma/client';
 import { useBounties } from 'hooks/useBounties';
 import { useUser } from 'hooks/useUser';
+import { countValidSubmissions } from 'lib/applications/shared';
 import { AssignedBountyPermissions } from 'lib/bounties';
 import { useState } from 'react';
 import { ApplicationEditorForm } from '../[bountyId]/components/ApplicationEditorForm';
@@ -12,12 +13,11 @@ interface BountyApplicationFormProps {
   bounty: Bounty
   submissions: Application[]
   refreshSubmissions: () => Promise<void>
-  validSubmissionsCount: number
 }
 
 export default function BountyApplicationForm (props: BountyApplicationFormProps) {
-  const { validSubmissionsCount, refreshSubmissions, bounty, permissions, submissions } = props;
-
+  const { refreshSubmissions, bounty, permissions, submissions } = props;
+  const validSubmissionsCount = countValidSubmissions(submissions);
   const [user] = useUser();
   const { refreshBounty } = useBounties();
 

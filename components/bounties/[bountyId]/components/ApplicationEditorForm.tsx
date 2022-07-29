@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { FormLabel, Stack } from '@mui/material';
+import { Box, Collapse, FormLabel, IconButton, Stack, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
@@ -10,8 +10,11 @@ import { useBounties } from 'hooks/useBounties';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { useUser } from 'hooks/useUser';
 import { MINIMUM_APPLICATION_MESSAGE_CHARACTERS } from 'lib/applications/shared';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { FormMode } from '../../components/BountyEditorForm';
 
 interface IApplicationFormProps {
@@ -31,9 +34,8 @@ export const schema = yup.object({
 type FormValues = yup.InferType<typeof schema>
 
 export function ApplicationEditorForm ({ showHeader = false, readOnly = false, onCancel, onSubmit, bountyId, proposal, mode = 'create' }: IApplicationFormProps) {
-
   const { refreshBounty } = useBounties();
-
+  const [isVisible, setIsVisible] = useState(proposal?.status === 'applied' || mode === 'create');
   const [user] = useUser();
 
   const [applicationMessage, setApplicationMessage] = useLocalStorage(`${bountyId}.${user?.id}.application`, '');
@@ -79,57 +81,78 @@ export function ApplicationEditorForm ({ showHeader = false, readOnly = false, o
     <Stack my={1} gap={1}>
       {
         showHeader && (
-        <FormLabel sx={{
-          fontWeight: 'bold'
-        }}
-        >Application
-        </FormLabel>
+        <Stack
+          flexDirection='row'
+          gap={0.5}
+          onClick={() => {
+            setIsVisible(!isVisible);
+          }}
+        >
+          <FormLabel
+            sx={{
+              fontWeight: 'bold'
+            }}
+          >
+            Applications
+          </FormLabel>
+          <IconButton
+            sx={{
+              top: -2.5,
+              position: 'relative'
+            }}
+            size='small'
+          >
+            {isVisible ? <KeyboardArrowUpIcon fontSize='small' /> : <KeyboardArrowDownIcon fontSize='small' />}
+          </IconButton>
+        </Stack>
         )
       }
-      <form onSubmit={handleSubmit(formValue => submitted(formValue as Application))} style={{ margin: 'auto', width: '100%' }}>
-        <Grid container direction='column' spacing={3}>
-          <Grid item>
-            <TextField
-              {...register('message')}
-              autoFocus
-              placeholder={applicationExample}
-              minRows={5}
-              multiline
-              variant='outlined'
-              type='text'
-              fullWidth
-              disabled={readOnly}
-              onChange={(ev) => {
-                // Only store in local storage if no proposal exists yet
-                const newText = ev.target.value;
-                if (!proposal) {
-                  setApplicationMessage(newText);
-                }
+      <Collapse in={isVisible} timeout='auto' unmountOnExit>
+        <form onSubmit={handleSubmit(formValue => submitted(formValue as Application))} style={{ margin: 'auto', width: '100%' }}>
+          <Grid container direction='column' spacing={3}>
+            <Grid item>
+              <TextField
+                {...register('message')}
+                autoFocus
+                placeholder={applicationExample}
+                minRows={5}
+                multiline
+                variant='outlined'
+                type='text'
+                fullWidth
+                disabled={readOnly}
+                onChange={(ev) => {
+                  // Only store in local storage if no proposal exists yet
+                  const newText = ev.target.value;
+                  if (!proposal) {
+                    setApplicationMessage(newText);
+                  }
 
-                setValue('message', newText, {
-                  shouldValidate: true
-                });
-              }}
-            />
-            {
-              errors?.message && (
-              <Alert severity='error'>
-                {errors.message.message}
-              </Alert>
-              )
-            }
+                  setValue('message', newText, {
+                    shouldValidate: true
+                  });
+                }}
+              />
+              {
+                errors?.message && (
+                <Alert severity='error'>
+                  {errors.message.message}
+                </Alert>
+                )
+              }
 
+            </Grid>
+
+            {!readOnly && (
+            <Grid item display='flex' gap={1}>
+              <Button disabled={!isValid} type='submit'>{mode === 'create' ? ' Submit' : 'Update'}</Button>
+              {onCancel && <Button onClick={onCancel} variant='outlined' color='secondary'>Cancel</Button>}
+            </Grid>
+            )}
           </Grid>
 
-          {!readOnly && (
-          <Grid item display='flex' gap={1}>
-            <Button disabled={!isValid} type='submit'>{mode === 'create' ? ' Submit' : 'Update'}</Button>
-            {onCancel && <Button onClick={onCancel} variant='outlined' color='secondary'>Cancel</Button>}
-          </Grid>
-          )}
-        </Grid>
-
-      </form>
+        </form>
+      </Collapse>
     </Stack>
   );
 }

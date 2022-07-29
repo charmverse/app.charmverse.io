@@ -82,7 +82,7 @@ export default function BountySubmissionReviewActions (
     setApiError(null);
   }
 
-  const canReview = (bounty.maxSubmissions === null || (submission.status === 'applied' && (totalAcceptedApplications < bounty.maxSubmissions)) || submission.status === 'review') && permissions?.userPermissions?.review && submission.status !== 'rejected' && submission.status !== 'inProgress';
+  const canReview = (bounty.maxSubmissions === null || (submission.status === 'applied' && (totalAcceptedApplications < bounty.maxSubmissions)) || submission.status === 'review') && permissions?.userPermissions?.review && submission.status !== 'rejected';
 
   return (
     <>
