@@ -73,6 +73,8 @@ export default function BountyList ({ publicMode = false, onSelectBounty, bounti
             </Grid>
 
           </Grid>
+          {/* include ViewHEader to include the horizontal line */}
+          <div className='ViewHeader' />
         </div>
         <div className='container-container'>
           {bounties.length === 0
