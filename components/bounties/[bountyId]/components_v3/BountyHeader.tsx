@@ -78,7 +78,7 @@ export default function BountyHeader ({ bounty, permissions }: Props) {
                   {
                     permissions?.userPermissions?.lock && isBountyLockable(bounty) && (
                       [
-                        <Tooltip key='stop-new' arrow placement='right' title={`Prevent new ${bounty.approveSubmitters ? 'applications' : 'submissions'} from being made.`}>
+                        <Tooltip key='stop-new' arrow placement='top' title={`Prevent new ${bounty.approveSubmitters ? 'applications' : 'submissions'} from being made.`}>
                           <IconButton
                             onClick={() => {
                               closeSubmissionsModal.open();
@@ -87,7 +87,7 @@ export default function BountyHeader ({ bounty, permissions }: Props) {
                             <LockIcon color='secondary' fontSize='small' />
                           </IconButton>
                         </Tooltip>,
-                        <Tooltip key='mark-complete' arrow placement='right' title='Mark this bounty complete and auto-reject all non-reviewed submissions'>
+                        <Tooltip key='mark-complete' arrow placement='top' title='Mark this bounty complete and auto-reject all non-reviewed submissions'>
                           <IconButton
                             onClick={() => {
                               closeBountyModal.open();
@@ -102,7 +102,7 @@ export default function BountyHeader ({ bounty, permissions }: Props) {
 
                   {
                     canDeleteBounty && (
-                      <Tooltip arrow placement='right' title={`Delete bounty ${bounty.status === 'suggestion' ? 'suggestion' : ''}`}>
+                      <Tooltip arrow placement='top' title={`Delete bounty ${bounty.status === 'suggestion' ? 'suggestion' : ''}`}>
                         <IconButton
                           onClick={() => {
                             bountyDeleteModal.open();
