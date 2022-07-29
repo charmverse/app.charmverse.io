@@ -78,7 +78,7 @@ export default function BountyHeader ({ bounty, permissions }: Props) {
                   {
                     permissions?.userPermissions?.lock && isBountyLockable(bounty) && (
                       [
-                        <Tooltip key='stop-new' arrow placement='top' title={`Prevent new ${bounty.approveSubmitters ? 'applications' : 'submissions'} from being made.`}>
+                        <Tooltip key='stop-new' arrow placement='top' title='Prevent new applications from being made.'>
                           <IconButton
                             onClick={() => {
                               closeSubmissionsModal.open();
