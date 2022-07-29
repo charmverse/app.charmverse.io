@@ -40,7 +40,7 @@ const LayoutContainer = styled.div`
 export default function PublicPage () {
 
   const { account } = useWeb3React();
-  const [user, setUser] = useUser();
+  const [, setUser] = useUser();
 
   const theme = useTheme();
   const colorMode = useColorMode();
@@ -48,6 +48,7 @@ export default function PublicPage () {
   const pageIdOrPath = router.query.pageId instanceof Array ? router.query.pageId.join('/') : router.query.pageId as string;
   const dispatch = useAppDispatch();
   const { pages, currentPageId, setCurrentPageId } = usePages();
+  const [loadingSpace, setLoadingSpace] = useState(true);
   const [currentSpace] = useCurrentSpace();
   const [, setSpaces] = useSpaces();
   const [, setTitleState] = usePageTitle();
@@ -59,9 +60,13 @@ export default function PublicPage () {
     if (isBountiesPage) {
       // The other part of this logic for setting current space is in hooks/useCurrentSpace
       const spaceDomain = (router.query.pageId as string[])[0];
-      charmClient.getPublicSpaceInfo(spaceDomain).then(space => {
+      try {
+        const space = await charmClient.getPublicSpaceInfo(spaceDomain);
         setSpaces([space]);
-      });
+      }
+      catch (err) {
+        setPageNotFound(true);
+      }
     }
     else {
       try {
@@ -83,6 +88,7 @@ export default function PublicPage () {
         setPageNotFound(true);
       }
     }
+    setLoadingSpace(false);
   }
 
   useEffect(() => {
@@ -114,15 +120,19 @@ export default function PublicPage () {
     }
   }, [account]);
 
-  const currentPage = pages[currentPageId];
-
-  if (!router.query) {
+  if (!router.query || loadingSpace) {
     return <LoadingComponent height='200px' isLoading={true} />;
+  }
+
+  if (!currentSpace) {
+    return <ErrorPage message={'Sorry, that space doesn\'t exist'} />;
   }
 
   if (pageNotFound) {
     return <ErrorPage message={'Sorry, that page doesn\'t exist'} />;
   }
+
+  const currentPage = pages[currentPageId];
 
   return (
     <>
@@ -161,15 +171,15 @@ export default function PublicPage () {
           <HeaderSpacer />
 
           {
-            isBountiesPage && <PublicBountyList />
-          }
-          {
-            !isBountiesPage && (currentPage?.type === 'board'
-              ? (
-                <BoardPage page={currentPage} setPage={() => {}} readonly={true} />
-              ) : (
-                currentPage && <DocumentPage page={currentPage} setPage={() => {}} readOnly={true} />
-              ))
+            isBountiesPage
+              ? <PublicBountyList />
+              : (currentPage?.type === 'board'
+                ? (
+                  <BoardPage page={currentPage} setPage={() => {}} readonly={true} />
+                ) : (
+                  currentPage && <DocumentPage page={currentPage} setPage={() => {}} readOnly={true} />
+                )
+              )
           }
 
         </PageContainer>

@@ -11,7 +11,6 @@ import TokenGateForm from 'components/common/TokenGateForm';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { useContributors } from 'hooks/useContributors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { BountyWithDetails } from 'models';
