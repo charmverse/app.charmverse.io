@@ -6,9 +6,9 @@ const StyledBox = styled.div(({ theme }) => `
   max-width: 100%;
   margin: ${theme.spacing(10, 'auto')};
   min-height: 80vh;
-  padding: ${theme.spacing(3, '24px')};
+  padding: ${theme.spacing(0, '24px')};
   ${theme.breakpoints.up('sm')} {
-    padding: ${theme.spacing(3, '80px')};
+    padding: ${theme.spacing(0, '80px')};
   }
 `);
 

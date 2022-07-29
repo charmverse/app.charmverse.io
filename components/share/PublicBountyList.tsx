@@ -25,20 +25,19 @@ export default function PublicBountyList () {
   const [space] = useCurrentSpace();
   const { account } = useWeb3React();
   const [user, setUser] = useUser();
-  const { showMessage } = useSnackbar();
 
   const [bounties, setBounties] = useState<BountyWithDetails[] | null>(null);
 
   const [selectedBounty, setSelectedBounty] = useState<Bounty | null>(null);
   const [loggingIn, setLoggingIn] = useState(false);
 
-  const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
+  const { openWalletSelectorModal } = useContext(Web3Connection);
 
   const loginViaTokenGateModal = usePopupState({ variant: 'popover', popupId: 'login-via-token-gate' });
 
   const isSpaceMember = user && contributors.some(c => c.id === user.id);
 
-  function bountySelected (bounty: Bounty) {
+  function onSelectBounty (bounty: Bounty) {
 
     if (isSpaceMember) {
       // We pass the bounty as the useState setter will not have set the new bounty state before calling redirect to space
@@ -97,7 +96,7 @@ export default function PublicBountyList () {
 
   return (space.publicBountyBoard ? (
     <>
-      <BountyList publicMode bountyCardClicked={bountySelected} bounties={bounties} />
+      <BountyList publicMode onSelectBounty={onSelectBounty} bounties={bounties} />
       <Modal size='large' open={loginViaTokenGateModal.isOpen && !isSpaceMember} onClose={loginViaTokenGateModal.close} title={`Join the ${space?.name} workspace to apply`}>
         {
           !account && (
