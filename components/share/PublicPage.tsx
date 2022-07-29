@@ -40,7 +40,7 @@ const LayoutContainer = styled.div`
 export default function PublicPage () {
 
   const { account } = useWeb3React();
-  const [user, setUser] = useUser();
+  const [, setUser] = useUser();
 
   const theme = useTheme();
   const colorMode = useColorMode();
@@ -50,7 +50,7 @@ export default function PublicPage () {
   const { pages, currentPageId, setCurrentPageId } = usePages();
   const [loadingSpace, setLoadingSpace] = useState(true);
   const [currentSpace] = useCurrentSpace();
-  const [_, setSpaces] = useSpaces();
+  const [, setSpaces] = useSpaces();
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
   const isBountiesPage = router.query.pageId?.[1] === 'bounties';
