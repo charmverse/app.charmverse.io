@@ -1,16 +1,14 @@
 import { Box, Grid, Typography } from '@mui/material';
-import { BountyStatus, Page } from '@prisma/client';
+import { BountyStatus } from '@prisma/client';
 import Button from 'components/common/Button';
-import PageDialog from 'components/common/Page/PageDialog';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
 import { BountyWithDetails } from 'models';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { CSVLink } from 'react-csv';
-import { usePages } from 'hooks/usePages';
-import BountyCard from './components/BountyCard';
-import { BountyStatusChip } from './components/BountyStatusBadge';
 import MultiPaymentModal from './components/MultiPaymentModal';
 import NewBountyButton from './components/NewBountyButton';
+import BountiesEmptyState from './components/BountiesEmptyState';
+import BountiesKanBanView from './components/BountiesKanbanView';
 
 const bountyStatuses: BountyStatus[] = ['open', 'inProgress', 'complete', 'paid', 'suggestion'];
 
@@ -79,81 +77,12 @@ export default function BountyList ({ publicMode = false, onSelectBounty, bounti
         <div className='container-container'>
           {bounties.length === 0
             ? (
-              <EmptyBounties />
+              <BountiesEmptyState />
             ) : (
-              <BountiesKanban bounties={bounties} onSelectBounty={onSelectBounty} />
+              <BountiesKanBanView bounties={bounties} onSelectBounty={onSelectBounty} />
             )}
         </div>
       </div>
-    </div>
-  );
-}
-
-function EmptyBounties () {
-  return (
-    <div style={{ marginTop: '25px' }}>
-      <Typography variant='h6'>
-        Getting started with bounties
-      </Typography>
-
-      {/* Onboarding video when no bounties exist */}
-      <iframe
-        src='https://tiny.charmverse.io/bounties'
-        style={{ maxWidth: '100%', border: '0 none' }}
-        height='367px'
-        width='650px'
-        title='Bounties | Getting started with Charmverse'
-      >
-      </iframe>
-    </div>
-  );
-}
-
-function BountiesKanban ({ bounties, onSelectBounty }: Omit<Props, 'publicMode'>) {
-
-  const [activeBountyPage, setBountyPage] = useState<Page | null>(null);
-  const { pages } = usePages();
-
-  const bountiesGroupedByStatus = bounties.reduce<Record<BountyStatus, BountyWithDetails[]>>((record, bounty) => {
-    record[bounty.status].push(bounty);
-    return record;
-  }, {
-    complete: [],
-    inProgress: [],
-    open: [],
-    paid: [],
-    suggestion: []
-  });
-
-  return (
-    <div className='Kanban'>
-      <div className='octo-board-header'>
-        {bountyStatuses.map(bountyStatus => (
-          <div className='octo-board-header-cell' key={bountyStatus}>
-            <BountyStatusChip status={bountyStatus} />
-          </div>
-        ))}
-      </div>
-      <div className='octo-board-body'>
-        {bountyStatuses.map(bountyStatus => (
-          <div className='octo-board-column' key={bountyStatus}>
-            {bountiesGroupedByStatus[bountyStatus].filter(bounty => Boolean(pages[bounty.page?.id])).map(bounty => (
-              <BountyCard
-                key={bounty.id}
-                bounty={bounty}
-                page={pages[bounty.page.id] as Page}
-                onClick={() => {
-                  onSelectBounty?.(bounty);
-                  const bountyPage = pages[bounty.page?.id] as Page;
-                  setBountyPage(bountyPage);
-                }}
-              />
-            ))}
-          </div>
-        ))}
-      </div>
-
-      {activeBountyPage && <PageDialog page={activeBountyPage} onClose={() => setBountyPage(null)} />}
     </div>
   );
 }
