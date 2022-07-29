@@ -27,10 +27,9 @@ import { humanFriendlyDate } from 'lib/utilities/dates';
 import { BountyWithDetails } from 'models';
 import { useEffect, useState } from 'react';
 import { BrandColor } from 'theme/colors';
-import BountySubmissionReviewActions, { BountySubmissionReviewActionsProps } from './BountySubmissionReviewActions';
 import { ApplicationEditorForm } from '../[bountyId]/components/ApplicationEditorForm';
-import BountyApplicationForm from './BountyApplicationForm';
 import SubmissionEditorForm from '../[bountyId]/components_v3/SubmissionEditorForm';
+import BountySubmissionReviewActions from './BountySubmissionReviewActions';
 
 interface Props {
   bounty: BountyWithDetails
@@ -60,17 +59,15 @@ interface BountySubmissionsTableRowProps {
   submission: ApplicationWithTransactions
   permissions: AssignedBountyPermissions
   bounty: BountyWithDetails
-  onSubmission: BountySubmissionReviewActionsProps['onSubmission']
-  onDetailsView: (isViewingDetails: boolean) => void
+  refreshSubmissions: () => Promise<void>
 }
 
 function BountySubmissionsTableRow ({
-  onDetailsView,
-  onSubmission,
   submission,
   permissions,
   bounty,
-  totalAcceptedApplications
+  totalAcceptedApplications,
+  refreshSubmissions
 }:
   BountySubmissionsTableRowProps) {
   const [contributors] = useContributors();
@@ -78,6 +75,7 @@ function BountySubmissionsTableRow ({
   const [isViewingDetails, setIsViewingDetails] = useState(false);
   const [applicationComment, setApplicationComment] = useState('');
   const contributor = contributors.find(c => c.id === submission.createdBy);
+  const { refreshBounty } = useBounties();
 
   const onSendClicked = () => {
     const comment = createCommentBlock();
@@ -116,7 +114,6 @@ function BountySubmissionsTableRow ({
           <IconButton
             size='small'
             onClick={() => {
-              onDetailsView(isViewingDetails);
               setIsViewingDetails(!isViewingDetails);
             }}
           >
@@ -129,7 +126,6 @@ function BountySubmissionsTableRow ({
             bounty={bounty}
             submission={submission}
             reviewComplete={() => { }}
-            onSubmission={onSubmission}
             permissions={permissions}
             disableRejectButton
           />
@@ -138,13 +134,19 @@ function BountySubmissionsTableRow ({
       <TableRow>
         <TableCell style={{ borderBottom: 0, padding: 0 }} colSpan={5}>
           <Collapse in={isViewingDetails} timeout='auto' unmountOnExit>
-            {submission.status !== 'applied' && submission.walletAddress && submission.submission && (
-              <SubmissionEditorForm
-                bountyId={bounty.id}
-                readOnly={user?.id !== submission.createdBy || (submission.status !== 'inProgress' && submission.status !== 'review')}
-                submission={submission}
-                showHeader
-              />
+            {submission.status !== 'applied' && (
+              <Box mb={3}>
+                <SubmissionEditorForm
+                  bountyId={bounty.id}
+                  readOnly={user?.id !== submission.createdBy || (submission.status !== 'inProgress' && submission.status !== 'review')}
+                  submission={submission}
+                  showHeader
+                  onSubmit={async () => {
+                    await refreshSubmissions();
+                    await refreshBounty(bounty.id);
+                  }}
+                />
+              </Box>
             )}
             {bounty.approveSubmitters && (
               <ApplicationEditorForm
@@ -155,6 +157,7 @@ function BountySubmissionsTableRow ({
                 showHeader
               />
             )}
+
             {permissions.userPermissions.review && submission.status !== 'rejected' && (
               <>
                 <Stack mt={1}>
@@ -184,7 +187,6 @@ function BountySubmissionsTableRow ({
                     bounty={bounty}
                     submission={submission}
                     reviewComplete={() => { }}
-                    onSubmission={onSubmission}
                     permissions={permissions}
                   />
                 </Box>
@@ -200,10 +202,8 @@ function BountySubmissionsTableRow ({
 export default function BountySubmissionsTable ({ bounty, permissions }: Props) {
   const [user] = useUser();
   const theme = useTheme();
-  const { refreshBounty } = useBounties();
 
   const [applications, setListApplications] = useState<ApplicationWithTransactions[]>([]);
-  const [isSubmittingApplication, setIsSubmittingApplication] = useState(false);
   const acceptedApplications = applications.filter(applicantIsSubmitter);
   const validSubmissions = countValidSubmissions(applications);
   const userApplication = applications.find(app => app.createdBy === user?.id);
@@ -265,19 +265,12 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
           <TableBody>
             {(isReviewer ? applications : applications.filter(application => application.createdBy === user?.id)).map((submission) => (
               <BountySubmissionsTableRow
-                onDetailsView={(isViewingDetails) => {
-                  if (isViewingDetails) {
-                    setIsSubmittingApplication(false);
-                  }
-                }}
                 bounty={bounty}
                 totalAcceptedApplications={acceptedApplications.length}
                 permissions={permissions}
                 submission={submission}
                 key={submission.id}
-                onSubmission={async () => {
-                  setIsSubmittingApplication(true);
-                }}
+                refreshSubmissions={refreshSubmissions}
               />
             ))}
           </TableBody>
@@ -297,30 +290,6 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
           </Typography>
         </Box>
       )}
-
-      <BountyApplicationForm
-        bounty={bounty}
-        permissions={permissions}
-        submissions={applications}
-        refreshSubmissions={refreshSubmissions}
-        validSubmissionsCount={validSubmissions}
-      />
-
-      {
-        isSubmittingApplication && (
-          <SubmissionEditorForm
-            bountyId={bounty.id}
-            submission={userApplication}
-            showHeader
-            onCancel={() => setIsSubmittingApplication(false)}
-            onSubmit={async () => {
-              await refreshSubmissions();
-              await refreshBounty(bounty.id);
-              setIsSubmittingApplication(false);
-            }}
-          />
-        )
-      }
     </Box>
   );
 }

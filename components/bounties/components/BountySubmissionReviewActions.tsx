@@ -26,7 +26,7 @@ export interface BountySubmissionReviewActionsProps {
   submission: ApplicationWithTransactions,
   permissions: AssignedBountyPermissions,
   reviewComplete: (updatedApplication: Application) => void
-  onSubmission: (eventOrAnchorEl?: HTMLElement | SyntheticEvent<any, Event> | null | undefined) => void
+  onSubmission?: (eventOrAnchorEl?: HTMLElement | SyntheticEvent<any, Event> | null | undefined) => void
   totalAcceptedApplications: number
   disableRejectButton?: boolean
 }
@@ -82,7 +82,7 @@ export default function BountySubmissionReviewActions (
     setApiError(null);
   }
 
-  const canReview = permissions?.userPermissions?.review && (bounty.maxSubmissions === null || totalAcceptedApplications < bounty.maxSubmissions) && submission.status !== 'rejected';
+  const canReview = (bounty.maxSubmissions === null || (submission.status === 'applied' && (totalAcceptedApplications < bounty.maxSubmissions)) || submission.status === 'review') && permissions?.userPermissions?.review && submission.status !== 'rejected' && submission.status !== 'inProgress';
 
   return (
     <>
@@ -107,7 +107,7 @@ export default function BountySubmissionReviewActions (
         )
       }
       {
-        submission.status === 'inProgress' && submission.createdBy === user?.id && (
+        onSubmission && submission.status === 'inProgress' && submission.createdBy === user?.id && (
           <Button type='submit' onClick={onSubmission}>Submit</Button>
         )
       }

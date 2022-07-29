@@ -17,7 +17,6 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import { useTheme } from '@emotion/react';
 
 const schema = yup.object({
   submission: yup.string().required(),
@@ -34,16 +33,14 @@ interface Props {
   submission?: Application,
   bountyId: string,
   onSubmit?: (submission: Application) => void
-  onCancel?: () => void
   showHeader?: boolean
   readOnly?: boolean
 }
 
 export default function BountySubmissionForm (
-  { readOnly = false, showHeader = false, onCancel, submission, onSubmit: onSubmitProp, bountyId }: Props
+  { readOnly = false, showHeader = false, submission, onSubmit: onSubmitProp, bountyId }: Props
 ) {
   const [user] = useUser();
-  const theme = useTheme();
 
   const {
     register,
@@ -124,7 +121,7 @@ export default function BountySubmissionForm (
         )
       }
       <form onSubmit={handleSubmit(onSubmit)} style={{ margin: 'auto', width: '100%' }}>
-        <Grid container direction='column' spacing={3}>
+        <Grid container direction='column' spacing={2}>
 
           <Grid
             item
@@ -180,8 +177,7 @@ export default function BountySubmissionForm (
 
           {!readOnly && (
           <Grid item display='flex' gap={1}>
-            <Button disabled={!isValid} type='submit'>Save</Button>
-            {onCancel && <Button onClick={onCancel} variant='outlined' color='secondary'>Cancel</Button>}
+            <Button disabled={!isValid} type='submit'>Submit</Button>
           </Grid>
           )}
 
