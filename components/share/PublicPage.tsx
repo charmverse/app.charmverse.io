@@ -87,8 +87,8 @@ export default function PublicPage () {
       catch (err) {
         setPageNotFound(true);
       }
-      setLoadingSpace(false);
     }
+    setLoadingSpace(false);
   }
 
   useEffect(() => {
