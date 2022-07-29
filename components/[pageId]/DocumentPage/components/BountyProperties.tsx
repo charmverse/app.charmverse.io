@@ -192,7 +192,7 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
         }}
       >
         <div className='octo-propertyname'>
-          <Button>Token</Button>
+          <Button>Reward token</Button>
         </div>
         <InputSearchCrypto
           disabled={!canEdit}
@@ -222,7 +222,7 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
         }}
       >
         <div className='octo-propertyname'>
-          <Button>Amount</Button>
+          <Button>Reward amount</Button>
         </div>
         <TextField
           required
@@ -286,7 +286,7 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
           }}
         >
           <div className='octo-propertyname'>
-            <Button>Applicant Role(s)</Button>
+            <Button>Applicant role(s)</Button>
           </div>
           <InputSearchRoleMultiple
             disableCloseOnSelect={true}

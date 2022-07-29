@@ -1,16 +1,9 @@
-import PageContainer from 'components/common/PageLayout/components/PageContainer';
 import { useTheme } from '@emotion/react';
-import { AppBar, HeaderSpacer } from 'components/common/PageLayout/PageLayout';
 import styled from '@emotion/styled';
-import { useRouter } from 'next/router';
-import Head from 'next/head';
-import { Box, Tooltip, IconButton } from '@mui/material';
-import SunIcon from '@mui/icons-material/WbSunny';
 import MoonIcon from '@mui/icons-material/DarkMode';
-import CurrentPageFavicon from 'components/common/PageLayout/components/CurrentPageFavicon';
-import { StyledToolbar } from 'components/common/PageLayout/components/Header';
-import Account from 'components/common/PageLayout/components/Account';
-import PageTitleWithBreadcrumbs from 'components/common/PageLayout/components/Header/components/PageTitleWithBreadcrumbs';
+import SunIcon from '@mui/icons-material/WbSunny';
+import { Box, IconButton, Tooltip } from '@mui/material';
+import { useWeb3React } from '@web3-react/core';
 import charmClient from 'charmClient';
 import { Card } from 'components/common/BoardEditor/focalboard/src/blocks/card';
 import { addBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
@@ -18,16 +11,25 @@ import { addCard } from 'components/common/BoardEditor/focalboard/src/store/card
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { setCurrent } from 'components/common/BoardEditor/focalboard/src/store/views';
 import ErrorPage from 'components/common/errors/ErrorPage';
-import { usePages } from 'hooks/usePages';
-import { usePageTitle } from 'hooks/usePageTitle';
-import { Board } from 'lib/focalboard/board';
-import { useEffect, useState } from 'react';
-import { useSpaces } from 'hooks/useSpaces';
+import LoadingComponent from 'components/common/LoadingComponent';
+import Account from 'components/common/PageLayout/components/Account';
+import CurrentPageFavicon from 'components/common/PageLayout/components/CurrentPageFavicon';
+import { StyledToolbar } from 'components/common/PageLayout/components/Header';
+import PageTitleWithBreadcrumbs from 'components/common/PageLayout/components/Header/components/PageTitleWithBreadcrumbs';
+import PageContainer from 'components/common/PageLayout/components/PageContainer';
+import { AppBar, HeaderSpacer } from 'components/common/PageLayout/PageLayout';
 import BoardPage from 'components/[pageId]/BoardPage';
 import DocumentPage from 'components/[pageId]/DocumentPage';
 import { useColorMode } from 'context/darkMode';
-import LoadingComponent from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePages } from 'hooks/usePages';
+import { usePageTitle } from 'hooks/usePageTitle';
+import { useSpaces } from 'hooks/useSpaces';
+import { useUser } from 'hooks/useUser';
+import { Board } from 'lib/focalboard/board';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import PublicBountyList from './PublicBountyList';
 
 const LayoutContainer = styled.div`
@@ -36,6 +38,9 @@ const LayoutContainer = styled.div`
 `;
 
 export default function PublicPage () {
+
+  const { account } = useWeb3React();
+  const [user, setUser] = useUser();
 
   const theme = useTheme();
   const colorMode = useColorMode();
@@ -89,6 +94,25 @@ export default function PublicPage () {
     };
 
   }, []);
+
+  useEffect(() => {
+    if (account) {
+      charmClient.login(account)
+        .then(loggedInUser => {
+          setUser(loggedInUser);
+        })
+        .catch(() => {
+          charmClient.createUser({ address: account })
+            .then(loggedInUser => {
+              setUser(loggedInUser);
+            }).catch(() => {
+              charmClient.logout();
+              setUser(null);
+            });
+        });
+
+    }
+  }, [account]);
 
   const currentPage = pages[currentPageId];
 
