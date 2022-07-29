@@ -124,7 +124,7 @@ export default function PublicPage () {
     return <LoadingComponent height='200px' isLoading={true} />;
   }
 
-  if (!currentSpace) {
+  if (isBountiesPage && !currentSpace) {
     return <ErrorPage message={'Sorry, that space doesn\'t exist'} />;
   }
 
