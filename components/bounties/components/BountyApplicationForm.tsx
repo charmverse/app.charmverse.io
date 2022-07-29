@@ -4,7 +4,16 @@ import { useBounties } from 'hooks/useBounties';
 import { useUser } from 'hooks/useUser';
 import { countValidSubmissions } from 'lib/applications/shared';
 import { AssignedBountyPermissions } from 'lib/bounties';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
+import { useWeb3React } from '@web3-react/core';
+import Modal from 'components/common/Modal';
+import PrimaryButton from 'components/common/PrimaryButton';
+import TokenGateForm from 'components/common/TokenGateForm';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+
+import { usePopupState } from 'material-ui-popup-state/hooks';
+import { Web3Connection } from 'components/_app/Web3ConnectionManager';
+import { useContributors } from 'hooks/useContributors';
 import { ApplicationEditorForm } from '../[bountyId]/components/ApplicationEditorForm';
 import SubmissionEditorForm from '../[bountyId]/components_v3/SubmissionEditorForm';
 
@@ -18,9 +27,13 @@ interface BountyApplicationFormProps {
 export default function BountyApplicationForm (props: BountyApplicationFormProps) {
   const { refreshSubmissions, bounty, permissions, submissions } = props;
   const validSubmissionsCount = countValidSubmissions(submissions);
-  const [user] = useUser();
+  const [contributors] = useContributors();
+  const [space] = useCurrentSpace();
   const { refreshBounty } = useBounties();
-
+  const loginViaTokenGateModal = usePopupState({ variant: 'popover', popupId: 'login-via-token-gate' });
+  const { account } = useWeb3React();
+  const [user, setUser] = useUser();
+  const { openWalletSelectorModal } = useContext(Web3Connection);
   const [isApplyingBounty, setIsApplyingBounty] = useState(false);
 
   const userSubmission = submissions.find(sub => sub.createdBy === user?.id);
@@ -33,7 +46,46 @@ export default function BountyApplicationForm (props: BountyApplicationFormProps
     && bounty.createdBy !== user?.id;
   const newSubmissionTooltip = bounty.submissionsLocked ? 'Submissions locked' : !permissions?.userPermissions.work ? 'You do not have the correct role to submit work to this bounty' : (capReached ? 'The submissions cap has been reached. This bounty is closed to new submissions.' : '');
 
+  const showSignup = true;
+
   if (!userSubmission) {
+    if (showSignup) {
+
+      return (
+        <Modal size='large' open={loginViaTokenGateModal.isOpen && !isSpaceMember} onClose={loginViaTokenGateModal.close} title={`Join the ${space?.name} workspace to apply`}>
+          {
+            !account && (
+              <Box display='flex' justifyContent='center' sx={{ mt: 3 }}>
+
+                <PrimaryButton
+                  onClick={openWalletSelectorModal}
+                  loading={loggingIn}
+                >
+                  Connect wallet
+                </PrimaryButton>
+              </Box>
+            )
+          }
+
+          {
+            account && space && (
+              <TokenGateForm
+                onSuccess={() => {
+                  loginViaTokenGateModal.close();
+                  // Wait for 2 seconds before redirecting
+                  setTimeout(() => {
+                    redirectToSpace();
+                  }, 2000);
+
+                }}
+                spaceDomain={space.domain}
+              />
+            )
+          }
+
+        </Modal>
+      );
+    }
     if (!isApplyingBounty && bounty.createdBy !== user?.id && !permissions.userPermissions.review) {
       return (
         <Tooltip placement='top' title={newSubmissionTooltip} arrow>

@@ -84,6 +84,7 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
   const assignedRoleSubmitters = permissions?.bountyPermissions?.submitter?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
   const selectedReviewerUsers = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'user').map(p => p.id as string) ?? [];
   const selectedReviewerRoles = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
+  const [loggingIn, setLoggingIn] = useState(false);
 
   const canEdit = user && !readOnly && ((bounty.createdBy === user.id && bounty.status !== 'suggestion') || (bounty.status === 'suggestion' && isAdmin) || isAdmin);
 
