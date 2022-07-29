@@ -1,4 +1,4 @@
-import BountyList from 'components/bounties/BountyList';
+import BountiesPage from 'components/bounties/BountiesPage';
 import getPageLayout from 'components/common/PageLayout/getLayout';
 import { setTitle } from 'hooks/usePageTitle';
 import { useBounties } from 'hooks/useBounties';
@@ -15,7 +15,7 @@ export default function BountyPage () {
   }
 
   return (
-    <BountyList bounties={bounties} />
+    <BountiesPage bounties={bounties} />
   );
 
 }

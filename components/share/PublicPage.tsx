@@ -30,7 +30,7 @@ import { Board } from 'lib/focalboard/board';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import PublicBountyList from './PublicBountyList';
+import PublicBountiesPage from './PublicBountiesPage';
 
 const LayoutContainer = styled.div`
   display: flex;
@@ -172,7 +172,7 @@ export default function PublicPage () {
 
           {
             isBountiesPage
-              ? <PublicBountyList />
+              ? <PublicBountiesPage />
               : (currentPage?.type === 'board'
                 ? (
                   <BoardPage page={currentPage} setPage={() => {}} readonly={true} />
