@@ -60,13 +60,13 @@ export default function PublicPage () {
     if (isBountiesPage) {
       // The other part of this logic for setting current space is in hooks/useCurrentSpace
       const spaceDomain = (router.query.pageId as string[])[0];
-      charmClient.getPublicSpaceInfo(spaceDomain).then(space => {
+      try {
+        const space = await charmClient.getPublicSpaceInfo(spaceDomain);
         setSpaces([space]);
-        setLoadingSpace(false);
-      })
-        .catch(() => {
-          setLoadingSpace(false);
-        });
+      }
+      catch (err) {
+        setPageNotFound(true);
+      }
     }
     else {
       try {
@@ -87,6 +87,7 @@ export default function PublicPage () {
       catch (err) {
         setPageNotFound(true);
       }
+      setLoadingSpace(false);
     }
   }
 
