@@ -1,7 +1,7 @@
 
 import { Space, User } from '@prisma/client';
 import { createBounty, updateBountySettings } from 'lib/bounties';
-import { LimitReachedError, UnauthorisedActionError } from 'lib/utilities/errors';
+import { LimitReachedError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
@@ -30,7 +30,6 @@ describe('approveApplication', () => {
       title: 'My bounty',
       createdBy: user.id,
       spaceId: space.id,
-      reviewer: user.id,
       maxSubmissions: 20,
       permissions: {
         reviewer: [{ group: 'user', id: reviewerUser.id }],
@@ -61,9 +60,7 @@ describe('approveApplication', () => {
     const bounty = await createBounty({
       title: 'My bounty',
       createdBy: adminUser.id,
-      spaceId: adminSpace.id,
-      // Random person
-      reviewer: null
+      spaceId: adminSpace.id
     });
 
     const application = await createApplication({

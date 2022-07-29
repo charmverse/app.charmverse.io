@@ -1,43 +1,19 @@
 import { Box, Grid, Typography } from '@mui/material';
-import { BountyStatus } from '@prisma/client';
+import { BountyStatus, Page } from '@prisma/client';
 import Button from 'components/common/Button';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
-import { useLocalStorage } from 'hooks/useLocalStorage';
+import PageDialog from 'components/common/Page/PageDialog';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
-import { useMemo, useState, useEffect } from 'react';
-import { CSVLink } from 'react-csv';
 import { BountyWithDetails } from 'models';
-import { FullWidthPageContent } from 'components/common/PageLayout/components/PageContent';
-
-import { BountyCard } from './components/BountyCard';
-import BountyModal from './components/BountyModal';
-import InputBountyStatus from './components/InputBountyStatus';
+import { useMemo, useState } from 'react';
+import { CSVLink } from 'react-csv';
+import { usePages } from 'hooks/usePages';
+import BountyCard from './components/BountyCard';
+import { BountyStatusChip } from './components/BountyStatusBadge';
 import MultiPaymentModal from './components/MultiPaymentModal';
+import NewBountyButton from './components/NewBountyButton';
 
-const bountyOrder: BountyStatus[] = ['open', 'inProgress', 'complete', 'paid', 'suggestion'];
+const bountyStatuses: BountyStatus[] = ['open', 'inProgress', 'complete', 'paid', 'suggestion'];
 
-function filterBounties (bounties: BountyWithDetails[], statuses: BountyStatus[]): BountyWithDetails[] {
-  return bounties?.filter(bounty => statuses.indexOf(bounty.status) > -1) ?? [];
-}
-
-function sortSelected (bountyStatuses: BountyStatus[]): BountyStatus[] {
-  return bountyStatuses.sort((first, second) => {
-    if (first === second) {
-      return 0;
-    }
-    else if (bountyOrder.indexOf(first) < bountyOrder.indexOf(second)) {
-      return -1;
-    }
-    else {
-      return 1;
-    }
-  });
-}
-
-/**
- *
- */
 interface Props {
   publicMode?: boolean
   bountyCardClicked?: (bounty: BountyWithDetails) => void,
@@ -45,27 +21,25 @@ interface Props {
 }
 
 export default function BountyList ({ publicMode, bountyCardClicked = () => null, bounties }: Props) {
-  const [displayBountyDialog, setDisplayBountyDialog] = useState(false);
 
-  const [space] = useCurrentSpace();
-  const [currentUserPermissions] = useCurrentSpacePermissions();
+  const [activeBountyPage, setBountyPage] = useState<Page | null>(null);
+  const { pages } = usePages();
 
-  const [savedBountyFilters, setSavedBountyFilters] = useLocalStorage<BountyStatus[]>(`${space?.id}-bounty-filters`, ['open', 'inProgress']);
+  const bountiesSorted = bounties ? sortArrayByObjectProperty(bounties, 'status', bountyStatuses) : [];
 
-  // Filter out the old bounty filters
-  useEffect(() => {
-    setSavedBountyFilters(savedBountyFilters.filter(status => BountyStatus[status] !== undefined));
-  }, []);
-
-  // User can only suggest a bounty instead of creating it
-  const suggestBounties = currentUserPermissions?.createBounty === false;
-
-  const filteredBounties = filterBounties(bounties.slice(), savedBountyFilters);
-
-  const sortedBounties = bounties ? sortArrayByObjectProperty(filteredBounties, 'status', bountyOrder) : [];
+  const bountiesGroupedByStatus = bountiesSorted.reduce<Record<BountyStatus, BountyWithDetails[]>>((record, sortedBounty) => {
+    record[sortedBounty.status].push(sortedBounty);
+    return record;
+  }, {
+    complete: [],
+    inProgress: [],
+    open: [],
+    paid: [],
+    suggestion: []
+  });
 
   const csvData = useMemo(() => {
-    const completedBounties = sortedBounties.filter(bounty => bounty.status === BountyStatus.complete);
+    const completedBounties = bountiesSorted.filter(bounty => bounty.status === BountyStatus.complete);
     if (!completedBounties.length) {
       return [];
     }
@@ -77,151 +51,103 @@ export default function BountyList ({ publicMode, bountyCardClicked = () => null
     // More information: https://github.com/bh2smith/safe-airdrop
     return [
       ['token_address', 'receiver', 'amount', 'chainId'],
-      ...completedBounties.map((bounty, _index) => [
+      ...completedBounties.map((bounty) => [
         bounty.rewardToken.startsWith('0x') ? bounty.rewardToken : '', // for native token it should be empty
         bounty.applications.find(application => application.status === 'complete')?.walletAddress,
         bounty.rewardAmount,
         bounty.chainId
       ])
     ];
-  }, [sortedBounties]);
-
-  function bountyCreated () {
-    setDisplayBountyDialog(false);
-  }
+  }, [bountiesSorted]);
 
   return (
-    <FullWidthPageContent>
+    <div className='focalboard-body'>
+      <div className='BoardComponent'>
 
-      <Grid container display='flex' justifyContent='space-between' alignContent='center' mb={3}>
+        <div className='top-head'>
+          <Grid container display='flex' justifyContent='space-between' alignContent='center' mb={3} mt={10}>
 
-        <Grid display='flex' justifyContent='space-between' item xs={12} mb={2}>
-          <Box width='fit-content'>
-            <Typography variant='h1' display='flex' alignItems='center' sx={{ height: '100%' }}>
-              Bounties
-            </Typography>
-          </Box>
+            <Grid display='flex' justifyContent='space-between' item xs={12} mb={2}>
+              <Typography variant='h1' display='flex' alignItems='center' sx={{ height: '100%' }}>
+                Bounties
+              </Typography>
 
-          {
-          !publicMode && (
-            <Box width='fit-content'>
-              { !!csvData.length
-              && (
-                <CSVLink data={csvData} filename='Gnosis Safe Airdrop.csv' style={{ textDecoration: 'none' }}>
-                  <Button color='secondary' variant='outlined'>
-                    Export to CSV
-                  </Button>
-                </CSVLink>
+              {!publicMode && (
+                <Box width='fit-content' display='flex' gap={1}>
+                  { !!csvData.length
+                      && (
+                        <CSVLink data={csvData} filename='Gnosis Safe Airdrop.csv' style={{ textDecoration: 'none' }}>
+                          <Button color='secondary' variant='outlined'>
+                            Export to CSV
+                          </Button>
+                        </CSVLink>
+                      )}
+                  <MultiPaymentModal bounties={bounties} />
+                  <NewBountyButton />
+                </Box>
               )}
-              <MultiPaymentModal bounties={bounties} />
 
-              {
-                currentUserPermissions && (
-                  <Button
-                    sx={{ ml: 1, height: '35px' }}
-                    onClick={() => {
-                      setDisplayBountyDialog(true);
-                    }}
-                  >
-                    {suggestBounties ? 'Suggest' : 'Create'} Bounty
-                  </Button>
-                )
-              }
-
-            </Box>
-          )
-        }
-
-        </Grid>
-
-        {
-          bounties.length > 0 && (
-            <Grid item xs={12}>
-              {/* Filters for the bounties */}
-              <InputBountyStatus
-                onChange={(statuses) => {
-                  setSavedBountyFilters(sortSelected(statuses));
-                }}
-                renderSelectedInValue={true}
-                renderSelectedInOption={true}
-                defaultValues={savedBountyFilters}
-              />
             </Grid>
+
+          </Grid>
+        </div>
+
+        <div className='container-container'>
+
+          {/* Onboarding video when no bounties exist */}
+          {
+          bounties.length === 0 && (
+            <div style={{ marginTop: '25px' }}>
+
+              <Typography variant='h6'>
+                Getting started with bounties
+              </Typography>
+
+              <iframe
+                src='https://tiny.charmverse.io/bounties'
+                style={{ maxWidth: '100%', border: '0 none' }}
+                height='367px'
+                width='650px'
+                title='Bounties | Getting started with Charmverse'
+              >
+              </iframe>
+
+            </div>
           )
-
-            }
-
-      </Grid>
-
-      {/* Onboarding video when no bounties exist */}
-      {
-            bounties.length === 0 && (
-              <div style={{ marginTop: '25px' }}>
-
-                <Typography variant='h6'>
-                  Getting started with bounties
-                </Typography>
-
-                <iframe
-                  src='https://tiny.charmverse.io/bounties'
-                  style={{ maxWidth: '100%', border: '0 none' }}
-                  height='367px'
-                  width='650px'
-                  title='Bounties | Getting started with Charmverse'
-                >
-                </iframe>
-
-              </div>
-            )
-          }
-
-      {/* Current filter status doesn't have any matching bounties */}
-      {
-            bounties.length > 0 && sortedBounties.length === 0 && (
-            <Typography paragraph={true}>
-              {
-                savedBountyFilters.length === 0 ? 'Select one or multiple bounty statuses.' : 'No bounties matching the current filter status.'
-              }
-            </Typography>
-            )
         }
 
-      {/* List of bounties based on current filter */}
-      {
-            sortedBounties.length > 0 && (
-              <Grid container spacing={1}>
-                {sortedBounties.map(bounty => {
-                  return (
-                    <Grid
+          {/* List of bounties based on current filter */}
+          <div className='Kanban'>
+            <div className='octo-board-header'>
+              {bountyStatuses.map(bountyStatus => (
+                <div className='octo-board-header-cell' key={bountyStatus}>
+                  <BountyStatusChip status={bountyStatus} />
+                </div>
+              ))}
+            </div>
+            <div className='octo-board-body'>
+              {bountyStatuses.map(bountyStatus => (
+                <div className='octo-board-column' key={bountyStatus}>
+                  {bountiesGroupedByStatus[bountyStatus].filter(bounty => Boolean(pages[bounty.page?.id])).map(bounty => (
+                    <BountyCard
                       key={bounty.id}
-                      item
+                      bounty={bounty}
+                      page={pages[bounty.page.id] as Page}
                       onClick={() => {
                         bountyCardClicked(bounty);
+                        const bountyPage = pages[bounty.page?.id] as Page;
+                        setBountyPage(bountyPage);
                       }}
-                    >
-                      <BountyCard truncate={false} key={bounty.id} bounty={bounty} publicMode={publicMode} />
-                    </Grid>
-                  );
-                })}
-              </Grid>
-            )
-          }
+                    />
+                  ))}
+                </div>
+              ))}
+            </div>
 
-      {
-          /**
-           * Remove later to its own popup modal
-           */
-          displayBountyDialog === true && (
-            <BountyModal
-              onSubmit={bountyCreated}
-              open={displayBountyDialog}
-              onClose={() => {
-                setDisplayBountyDialog(false);
-              }}
-              mode={suggestBounties ? 'suggest' : 'create'}
-            />
-          )
-        }
-    </FullWidthPageContent>
+            {activeBountyPage && <PageDialog page={activeBountyPage} onClose={() => setBountyPage(null)} />}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

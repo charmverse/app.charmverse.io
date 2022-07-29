@@ -48,7 +48,7 @@ describe('GET /api/applications - retrieve all applications for a bounty', () =>
     });
 
     await request(baseUrl)
-      .get(`/api/applications?bountyId=${bounty.id}&submissionsOnly=false`)
+      .get(`/api/applications?bountyId=${bounty.id}`)
       .set('Cookie', nonAdminCookie)
       .expect(401);
   });
@@ -67,9 +67,9 @@ describe('GET /api/applications - retrieve all applications for a bounty', () =>
     });
 
     const applicationsWithTransactions = (await request(baseUrl)
-      .get(`/api/applications?bountyId=${bounty.id}&submissionsOnly=false`)
+      .get(`/api/applications?bountyId=${bounty.id}`)
       .set('Cookie', nonAdminCookie)
-      .expect(200)).body as ApplicationWithTransactions[];
+      .expect(200)).body;
     expect(applicationsWithTransactions.length).toBe(1);
     expect(applicationsWithTransactions[0].transactions.length).toBe(1);
   });
@@ -81,7 +81,6 @@ describe('POST /api/applications - create an application', () => {
     const bounty = await createBounty({
       createdBy: nonAdminUser.id,
       spaceId: nonAdminUserSpace.id,
-      title: 'Example title',
       status: 'open',
       rewardAmount: 1
     });
@@ -147,7 +146,6 @@ describe('POST /api/applications - create an application', () => {
     const bounty = await createBounty({
       createdBy: userFromOtherSpace.id,
       spaceId: otherSpace.id,
-      title: 'Example title',
       status: 'open',
       rewardAmount: 1
     });

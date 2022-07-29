@@ -18,8 +18,7 @@ import type { ServerBlockFields } from 'pages/api/blocks';
 import { InviteLinkPopulated } from 'pages/api/invites/index';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 // TODO: Maybe move these types to another place so that we dont import from backend
-import { ReviewDecision, SubmissionContent, SubmissionCreationData } from 'lib/applications/interfaces';
-import { BountySubmitterPoolCalculation, BountySubmitterPoolSize, BountyUpdate, SuggestionAction, AssignedBountyPermissions, BountyCreationData } from 'lib/bounties/interfaces';
+import { ApplicationWithTransactions, ReviewDecision, SubmissionContent, SubmissionCreationData } from 'lib/applications/interfaces';
 import { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
 import { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
@@ -31,7 +30,7 @@ import { ListSpaceRolesResponse } from 'pages/api/roles';
 import { GetTasksResponse } from 'pages/api/tasks/list';
 import { GetTasksStateResponse, UpdateTasksState } from 'pages/api/tasks/state';
 import { TelegramAccount } from 'pages/api/telegram/connect';
-import { ApplicationWithTransactions } from 'lib/applications/actions';
+import { AssignedBountyPermissions, BountyCreationData, BountySubmitterPoolCalculation, BountySubmitterPoolSize, BountyUpdate, SuggestionAction } from 'lib/bounties/interfaces';
 import { DeepDaoAggregateData } from 'lib/deepdao/client';
 import { PublicPageResponse } from 'lib/pages/interfaces';
 import { PublicBountyToggle } from 'lib/spaces/interfaces';
@@ -40,7 +39,6 @@ import { TransactionCreationData } from 'lib/transactions/interface';
 import { ExtendedVote, UserVoteExtendedDTO, VoteDTO } from 'lib/votes/interfaces';
 import { PublicUser } from 'pages/api/public/profile/[userPath]';
 import { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
-import { AuthSig } from 'lit-js-sdk';
 import { AssignedPermissionsQuery, Resource } from './lib/permissions/interfaces';
 import { SpacePermissionConfigurationUpdate } from './lib/permissions/meta/interfaces';
 import { SpacePermissionFlags, SpacePermissionModification } from './lib/permissions/spaces';
@@ -399,9 +397,11 @@ class CharmClient {
     return http.GET('/api/bounties', { spaceId, publicOnly });
   }
 
-  async createBounty (bounty: BountyCreationData): Promise<BountyWithDetails> {
+  async createBounty (bounty: Partial<BountyCreationData>) {
 
-    return http.POST<BountyWithDetails>('/api/bounties', bounty);
+    const data = await http.POST<BountyWithDetails>('/api/bounties', bounty);
+
+    return data;
   }
 
   async getBountyApplicantPool ({ resourceId, permissions }: BountySubmitterPoolCalculation): Promise<BountySubmitterPoolSize> {
@@ -436,8 +436,8 @@ class CharmClient {
     return http.PUT<BountyWithDetails>(`/api/bounties/${bountyId}`, updateContent);
   }
 
-  async closeBountySubmissions (bountyId: string): Promise<BountyWithDetails> {
-    return http.POST<BountyWithDetails>(`/api/bounties/${bountyId}/close-submissions`);
+  async lockBountySubmissions (bountyId: string, lock?: boolean): Promise<BountyWithDetails> {
+    return http.POST<BountyWithDetails>(`/api/bounties/${bountyId}/lock?lock=${lock ?? true}`);
   }
 
   async closeBounty (bountyId: string): Promise<BountyWithDetails> {
@@ -455,15 +455,15 @@ class CharmClient {
     return data;
   }
 
-  async createApplication (application: Application): Promise<Application> {
+  async createApplication (application: Pick<Application, 'bountyId' | 'message' | 'status'>): Promise<Application> {
 
     const data = await http.POST<Application>('/api/applications', application);
 
     return data;
   }
 
-  listApplications (bountyId: string, submissionsOnly: boolean): Promise<ApplicationWithTransactions []> {
-    return http.GET('/api/applications', { bountyId, submissionsOnly });
+  listApplications (bountyId: string): Promise<ApplicationWithTransactions[]> {
+    return http.GET('/api/applications', { bountyId });
   }
 
   async createSubmission (content: Omit<SubmissionCreationData, 'userId'>): Promise<Application> {

@@ -145,7 +145,7 @@ export default function PublicPage () {
               <PageTitleWithBreadcrumbs />
               <Box display='flex' alignItems='center'>
                 {/** dark mode toggle */}
-                <Tooltip title={theme.palette.mode === 'dark' ? 'Light mode' : 'Dark mode'} arrow placement='bottom'>
+                <Tooltip title={theme.palette.mode === 'dark' ? 'Light mode' : 'Dark mode'} arrow placement='top'>
                   <IconButton sx={{ mx: 1 }} onClick={colorMode.toggleColorMode} color='inherit'>
                     {theme.palette.mode === 'dark' ? <SunIcon color='secondary' /> : <MoonIcon color='secondary' />}
                   </IconButton>

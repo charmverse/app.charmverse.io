@@ -115,7 +115,7 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
 
   const bountySearchResultItems: SearchResultItem[] = bounties.map(bounty => ({
     name: bounty.page?.title || '',
-    link: `/${router.query.domain}/bounties/${bounty.id}`,
+    link: `/${router.query.domain}/${bounty.page?.id}`,
     type: ResultType.bounty
   }));
 

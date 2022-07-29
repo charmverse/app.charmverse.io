@@ -7,7 +7,7 @@ import ModeStandbyIcon from '@mui/icons-material/ModeStandby';
 import PaidIcon from '@mui/icons-material/Paid';
 import { IconButton, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
-import Chip from '@mui/material/Chip';
+import Chip, { ChipProps } from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
 import { Bounty, BountyStatus } from '@prisma/client';
@@ -58,15 +58,16 @@ const StyledBountyStatusChip = styled(Chip)<{ status: BountyStatus }>`
 `;
 
 export interface IBountyBadgeProps {
-  bounty: Bounty
-  layout?: 'row' | 'stacked'
-  truncate?: boolean
+  bounty: Bounty;
+  layout?: 'row' | 'stacked';
+  truncate?: boolean;
+  hideStatus?: boolean;
 }
 
 export function BountyStatusChip ({
-  size,
-  status
-}: { size?: 'small', status: BountyStatus }) {
+  status,
+  size = 'small'
+}: { size?: ChipProps['size'], status: BountyStatus }) {
   return (
     <StyledBountyStatusChip
       size={size}
@@ -78,7 +79,7 @@ export function BountyStatusChip ({
   );
 }
 
-export default function BountyStatusBadgeWrapper ({ truncate = false, bounty, layout = 'row' } : IBountyBadgeProps) {
+export default function BountyStatusBadgeWrapper ({ truncate = false, hideStatus, bounty, layout = 'row' } : IBountyBadgeProps) {
   const [space] = useCurrentSpace();
 
   const bountyLink = `/${space?.domain}/bounties/${bounty.id}`;
@@ -93,11 +94,12 @@ export default function BountyStatusBadgeWrapper ({ truncate = false, bounty, la
             flexWrap: 'wrap',
             width: '100%',
             justifyContent: 'space-between',
-            gap: 1
+            gap: 1,
+            alignItems: 'center'
           }}
           >
             <BountyAmount bounty={bounty} truncate={truncate} />
-            <BountyStatusChip status={bounty.status} />
+            {!hideStatus && <BountyStatusChip status={bounty.status} />}
           </Box>
         </Grid>
       </Grid>
@@ -153,7 +155,6 @@ export function BountyAmount ({ bounty, truncate = false }: { bounty: Pick<Bount
             ) : (
               <>
                 <Box
-                  mr={0.5}
                   component='span'
                   sx={{
                     width: 25,
@@ -161,15 +162,15 @@ export function BountyAmount ({ bounty, truncate = false }: { bounty: Pick<Bount
                     alignItems: 'center'
                   }}
                 >
-                  <TokenLogo src={tokenInfo.canonicalLogo} />
+                  <TokenLogo height={20} src={tokenInfo.canonicalLogo} />
                 </Box>
                 <Typography
                   component='span'
                   sx={{
                     fontWeight: 600
                   }}
-                  mr={0.5}
                   variant='h6'
+                  fontSize={18}
                 >
                   {truncate ? millify(bounty.rewardAmount) : bounty.rewardAmount}
                 </Typography>

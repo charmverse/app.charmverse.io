@@ -5,27 +5,24 @@ import { setBountyPermissions } from 'lib/permissions/bounties';
 import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
 import { BountyWithDetails } from 'models';
 import { v4 } from 'uuid';
-import { getBounty } from './getBounty';
+import { getBountyOrThrow } from './getBounty';
 import { BountyCreationData } from './interfaces';
 
 /**
  * You can create a bounty suggestion using only title, spaceId and createdBy. You will see many unit tests using this limited dataset, which will then default the bounty to suggestion status. Your logic should account for this.
  */
 export async function createBounty ({
-  title,
   spaceId,
   createdBy,
   status = 'suggestion',
   chainId = 1,
-  description = '',
-  descriptionNodes = '',
   linkedPageId,
   approveSubmitters = true,
   maxSubmissions,
   rewardAmount = 0,
   rewardToken = 'ETH',
   permissions
-}: BountyCreationData): Promise<BountyWithDetails> {
+}: BountyCreationData) {
 
   const validCreationStatuses: BountyStatus[] = ['suggestion', 'open'];
 
@@ -47,7 +44,6 @@ export async function createBounty ({
 
   const bountyCreateInput: Prisma.BountyCreateInput = {
     id: bountyId,
-    title,
     space: {
       connect: {
         id: spaceId
@@ -60,8 +56,6 @@ export async function createBounty ({
     },
     status,
     chainId,
-    description,
-    descriptionNodes: descriptionNodes as string,
     approveSubmitters,
     maxSubmissions,
     rewardAmount,
@@ -74,26 +68,6 @@ export async function createBounty ({
     bountyCreateInput.suggestedBy = createdBy;
   }
 
-  const pageData: Prisma.PageCreateInput = {
-    id: bountyId,
-    path: `page-${Math.random().toString().replace('0.', '')}`,
-    title,
-    contentText: description,
-    content: descriptionNodes as string,
-    space: {
-      connect: {
-        id: spaceId
-      }
-    },
-    updatedBy: createdBy,
-    author: {
-      connect: {
-        id: createdBy
-      }
-    },
-    type: 'bounty'
-  };
-
   const bountyPagePermissionSet: Omit<Prisma.PagePermissionCreateManyInput, 'pageId'>[] = getBountyPagePermissionSet({ createdBy, status, spaceId, permissions, linkedPageId });
 
   if (!linkedPageId) {
@@ -102,7 +76,25 @@ export async function createBounty ({
         data: {
           ...bountyCreateInput,
           page: {
-            create: pageData
+            create: {
+              id: bountyId,
+              path: `page-${Math.random().toString().replace('0.', '')}`,
+              title: '',
+              contentText: '',
+              content: undefined,
+              space: {
+                connect: {
+                  id: spaceId
+                }
+              },
+              updatedBy: createdBy,
+              author: {
+                connect: {
+                  id: createdBy
+                }
+              },
+              type: 'bounty'
+            }
           }
         }
       }),
@@ -163,5 +155,5 @@ export async function createBounty ({
     });
   }
 
-  return getBounty(bountyId) as Promise<BountyWithDetails>;
+  return getBountyOrThrow(bountyId);
 }

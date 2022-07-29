@@ -53,7 +53,7 @@ export const MenuButton = ({
           color: hintIndex === 0 ? "inherit" : "#aaa"
         }} key={hint}>{hint}</div>)
       }
-    </div>} arrow placement='bottom'>
+    </div>} arrow placement='top'>
       <ListItem disabled={isDisabled} button={!disableButton as any} component="div" sx={{ py: 0, px: 0, mx: 0.25, my: 0, borderRadius: 0.5 }}>
         <StyledMenuButton
           aria-label={hints.join("\n")}
