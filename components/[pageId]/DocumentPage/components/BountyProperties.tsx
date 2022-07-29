@@ -5,9 +5,9 @@ import { PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
 import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge';
 import BountySuggestionApproval from 'components/bounties/components/BountySuggestionApproval';
-import BountyHeader from 'components/bounties/[bountyId]/components_v3/BountyHeader';
+import BountyHeader from 'components/bounties/components/BountyHeader';
 import BountyReviewers from 'components/bounties/[bountyId]/components_v3/BountyReviewers';
-import BountySubmissionsTable from 'components/bounties/[bountyId]/components_v3/BountySubmissionsTable';
+import BountySubmissionsTable from 'components/bounties/components/BountySubmissionsTable';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
 import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
@@ -25,6 +25,7 @@ import debouncePromise from 'lib/utilities/debouncePromise';
 import { isTruthy } from 'lib/utilities/types';
 import { BountyWithDetails } from 'models';
 import { ReactNode, useCallback, useEffect, useState } from 'react';
+import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 
 function rollupPermissions ({
   selectedReviewerUsers,
@@ -164,7 +165,9 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
           height: 'fit-content'
         }}
       >
-        <div className='octo-propertyname'>Chain</div>
+        <div className='octo-propertyname'>
+          <Button>Chain</Button>
+        </div>
         <InputSearchBlockchain
           disabled={!canEdit}
           readOnly={!canEdit}
@@ -189,7 +192,9 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
           height: 'fit-content'
         }}
       >
-        <div className='octo-propertyname'>Token</div>
+        <div className='octo-propertyname'>
+          <Button>Token</Button>
+        </div>
         <InputSearchCrypto
           disabled={!canEdit}
           readOnly={!canEdit}
@@ -217,7 +222,9 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
           height: 'fit-content'
         }}
       >
-        <div className='octo-propertyname'>Amount</div>
+        <div className='octo-propertyname'>
+          <Button>Amount</Button>
+        </div>
         <TextField
           required
           sx={{
@@ -233,7 +240,14 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
           }}
         />
       </div>
-      <Stack gap={0.5} flexDirection='row' mt={2}>
+      <Stack
+        gap={0.5}
+        flexDirection='row'
+        mt={2}
+        onClick={() => {
+          setIsShowingAdvancedSettings(!isShowingAdvancedSettings);
+        }}
+      >
         <FormLabel sx={{
           fontWeight: 500
         }}
@@ -241,9 +255,6 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
         </FormLabel>
         <IconButton
           size='small'
-          onClick={() => {
-            setIsShowingAdvancedSettings(!isShowingAdvancedSettings);
-          }}
           sx={{
             top: -2.5,
             position: 'relative'
@@ -254,7 +265,9 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
       </Stack>
       <Collapse in={isShowingAdvancedSettings} timeout='auto' unmountOnExit>
         <div className='octo-propertyrow'>
-          <div className='octo-propertyname'>Require applications</div>
+          <div className='octo-propertyname'>
+            <Button>Require applications</Button>
+          </div>
           <Switch
             isOn={Boolean(currentBounty.approveSubmitters)}
             onChanged={(isOn) => {
@@ -273,7 +286,9 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
             height: 'fit-content'
           }}
         >
-          <div className='octo-propertyname'>Applicant Role(s)</div>
+          <div className='octo-propertyname'>
+            <Button>Applicant Role(s)</Button>
+          </div>
           <InputSearchRoleMultiple
             disableCloseOnSelect={true}
             defaultValue={assignedRoleSubmitters}
@@ -303,7 +318,9 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
             height: 'fit-content'
           }}
         >
-          <div className='octo-propertyname'>Submissions limit</div>
+          <div className='octo-propertyname'>
+            <Button>Submissions limit</Button>
+          </div>
           <Switch
             isOn={capSubmissions}
             onChanged={(isOn) => {
@@ -324,7 +341,9 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
             height: 'fit-content'
           }}
         >
-          <div className='octo-propertyname'>Max submissions</div>
+          <div className='octo-propertyname'>
+            <Button>Max submissions</Button>
+          </div>
           <TextField
             required
             value={currentBounty.maxSubmissions}
@@ -360,7 +379,7 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
       )}
       <Stack flexDirection='row' justifyContent='space-between' gap={2} alignItems='center'>
         {
-          (permissions && !permissions.bountyPermissions?.reviewer) ? (
+          (permissions && !permissions.userPermissions?.review) ? (
             <BountyReviewers
               bounty={bounty}
               permissions={permissions}
@@ -373,7 +392,9 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
                 flexGrow: 1
               }}
             >
-              <div className='octo-propertyname'>Reviewer</div>
+              <div className='octo-propertyname'>
+                <Button>Reviewer</Button>
+              </div>
               <InputSearchReviewers
                 disabled={!canEdit}
                 readOnly={!canEdit}

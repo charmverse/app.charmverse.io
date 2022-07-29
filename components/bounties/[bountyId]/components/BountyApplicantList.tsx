@@ -28,14 +28,12 @@ export interface IBountyApplicantListProps {
   bounty: Bounty,
   applications: Application[]
   permissions: AssignedBountyPermissions
-  showHeader?: boolean
 }
 
 export function BountyApplicantList ({
   applications,
   bounty,
-  permissions,
-  showHeader = true
+  permissions
 }: IBountyApplicantListProps) {
   const [user] = useUser();
   const [contributors] = useContributors();
@@ -97,7 +95,6 @@ export function BountyApplicantList ({
   return (
     <>
       <Box component='div' sx={{ minHeight, maxHeight, overflowY: 'auto' }}>
-        {showHeader && (
         <Grid container sx={{ mb: 2 }}>
           <Grid item xs={8}>
             <Typography variant='h5'>
@@ -116,7 +113,6 @@ export function BountyApplicantList ({
             {humanisedSubmitterSentence.phrase}
           </Grid>
         </Grid>
-        )}
 
         <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
           <TableHead sx={{

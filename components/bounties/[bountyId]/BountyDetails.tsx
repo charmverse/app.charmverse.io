@@ -2,7 +2,7 @@ import Box from '@mui/material/Box';
 import BountySuggestionApproval from 'components/bounties/components/BountySuggestionApproval';
 import { BountyApplicantList } from 'components/bounties/[bountyId]/components/BountyApplicantList';
 import BountyDescription from 'components/bounties/[bountyId]/components_v3/BountyDescription';
-import BountyHeader from 'components/bounties/[bountyId]/components_v3/BountyHeader';
+import BountyHeader from 'components/bounties/components/BountyHeader';
 import BountySubmissions from 'components/bounties/[bountyId]/components_v3/BountySubmissions';
 import { useBounties } from 'hooks/useBounties';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -23,13 +23,12 @@ interface BountyDetailsProps {
 export default function BountyDetails ({ showHeader = true, showDescription = true, centeredContent = true, bounty }: BountyDetailsProps) {
 
   const [, setPageTitle] = usePageTitle();
-  const { currentBounty, setCurrentBounty, currentBountyId, updateCurrentBountyId } = useBounties();
+  const { currentBounty, setCurrentBounty, currentBountyId } = useBounties();
 
   const [bountyPermissions, setBountyPermissions] = useState<AssignedBountyPermissions | null>(null);
 
   useEffect(() => {
     if (bounty) {
-      updateCurrentBountyId(bounty.id);
       setCurrentBounty(bounty);
     }
   }, [bounty]);

@@ -146,7 +146,7 @@ export default function BountyReviewers ({ bounty, permissions }: BountyReviewer
                   return (
                     <Tooltip placement='top' key={reviewer.id} title={!reviewer.name ? userName : reviewer.name}>
                       <Box>
-                        <Avatar name={userName.slice(0, 1)} avatar={reviewer.profilePic as string} />
+                        <Avatar size='small' name={userName.slice(0, 1)} avatar={reviewer.profilePic as string} />
                       </Box>
 
                     </Tooltip>

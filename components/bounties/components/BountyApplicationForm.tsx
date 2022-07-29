@@ -4,8 +4,8 @@ import { useBounties } from 'hooks/useBounties';
 import { useUser } from 'hooks/useUser';
 import { AssignedBountyPermissions } from 'lib/bounties';
 import { useState } from 'react';
-import { ApplicationEditorForm } from '../components/ApplicationEditorForm';
-import SubmissionEditorForm from './SubmissionEditorForm';
+import { ApplicationEditorForm } from '../[bountyId]/components/ApplicationEditorForm';
+import SubmissionEditorForm from '../[bountyId]/components_v3/SubmissionEditorForm';
 
 interface BountyApplicationFormProps {
   permissions: AssignedBountyPermissions
@@ -27,12 +27,12 @@ export default function BountyApplicationForm (props: BountyApplicationFormProps
   // Only applies if there is a submissions cap
   const capReached = bounty.maxSubmissions !== null && (validSubmissionsCount >= bounty.maxSubmissions);
   const canCreateSubmission = !userSubmission && !capReached && permissions?.userPermissions.work && bounty.createdBy !== user?.id;
-  const newSubmissionTooltip = !permissions?.userPermissions.work ? 'You do not have the correct role to submit work to this bounty' : (capReached ? 'The submissions cap has been reached. This bounty is closed to new submissions.' : 'Apply to this bounty.');
+  const newSubmissionTooltip = !permissions?.userPermissions.work ? 'You do not have the correct role to submit work to this bounty' : (capReached ? 'The submissions cap has been reached. This bounty is closed to new submissions.' : '');
 
   if (!userSubmission) {
     if (!isApplyingBounty && bounty.createdBy !== user?.id && !permissions.userPermissions.review) {
       return (
-        <Tooltip placement='top' title={newSubmissionTooltip}>
+        <Tooltip placement='top' title={newSubmissionTooltip} arrow>
           <Stack justifyContent='center' width='100%' flexDirection='row' my={2}>
             <Box component='span'>
               <Button
@@ -41,7 +41,7 @@ export default function BountyApplicationForm (props: BountyApplicationFormProps
                   setIsApplyingBounty(true);
                 }}
               >
-                Apply
+                Apply to this bounty
               </Button>
             </Box>
           </Stack>

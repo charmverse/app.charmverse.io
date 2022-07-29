@@ -27,10 +27,10 @@ import { humanFriendlyDate } from 'lib/utilities/dates';
 import { BountyWithDetails } from 'models';
 import { useEffect, useState } from 'react';
 import { BrandColor } from 'theme/colors';
-import BountySubmissionReviewActions, { BountySubmissionReviewActionsProps } from '../../components/BountySubmissionReviewActions';
-import { ApplicationEditorForm } from '../components/ApplicationEditorForm';
+import BountySubmissionReviewActions, { BountySubmissionReviewActionsProps } from './BountySubmissionReviewActions';
+import { ApplicationEditorForm } from '../[bountyId]/components/ApplicationEditorForm';
 import BountyApplicationForm from './BountyApplicationForm';
-import SubmissionEditorForm from './SubmissionEditorForm';
+import SubmissionEditorForm from '../[bountyId]/components_v3/SubmissionEditorForm';
 
 interface Props {
   bounty: BountyWithDetails
@@ -61,9 +61,18 @@ interface BountySubmissionsTableRowProps {
   permissions: AssignedBountyPermissions
   bounty: BountyWithDetails
   onSubmission: BountySubmissionReviewActionsProps['onSubmission']
+  onDetailsView: (isViewingDetails: boolean) => void
 }
 
-function BountySubmissionsTableRow ({ onSubmission, submission, permissions, bounty, totalAcceptedApplications }: BountySubmissionsTableRowProps) {
+function BountySubmissionsTableRow ({
+  onDetailsView,
+  onSubmission,
+  submission,
+  permissions,
+  bounty,
+  totalAcceptedApplications
+}:
+  BountySubmissionsTableRowProps) {
   const [contributors] = useContributors();
   const [user] = useUser();
   const [isViewingDetails, setIsViewingDetails] = useState(false);
@@ -107,6 +116,7 @@ function BountySubmissionsTableRow ({ onSubmission, submission, permissions, bou
           <IconButton
             size='small'
             onClick={() => {
+              onDetailsView(isViewingDetails);
               setIsViewingDetails(!isViewingDetails);
             }}
           >
@@ -126,7 +136,7 @@ function BountySubmissionsTableRow ({ onSubmission, submission, permissions, bou
         </TableCell>
       </TableRow>
       <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0, borderBottom: 0 }} colSpan={5}>
+        <TableCell style={{ borderBottom: 0, padding: 0 }} colSpan={5}>
           <Collapse in={isViewingDetails} timeout='auto' unmountOnExit>
             {submission.status !== 'applied' && submission.walletAddress && submission.submission && (
               <SubmissionEditorForm
@@ -255,6 +265,11 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
           <TableBody>
             {(isReviewer ? applications : applications.filter(application => application.createdBy === user?.id)).map((submission) => (
               <BountySubmissionsTableRow
+                onDetailsView={(isViewingDetails) => {
+                  if (isViewingDetails) {
+                    setIsSubmittingApplication(false);
+                  }
+                }}
                 bounty={bounty}
                 totalAcceptedApplications={acceptedApplications.length}
                 permissions={permissions}
