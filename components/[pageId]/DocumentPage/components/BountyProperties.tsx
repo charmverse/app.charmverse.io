@@ -250,7 +250,7 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
         <FormLabel sx={{
           fontWeight: 500
         }}
-        >Advanced Settings
+        >Advanced settings
         </FormLabel>
         <IconButton
           size='small'

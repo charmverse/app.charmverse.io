@@ -158,14 +158,16 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
                   pageUpdatedBy={page.updatedBy}
                 />
                 )}
-                <hr />
-                {!bounty && (
-                <CommentsList
-                  comments={comments}
-                  rootId={card?.rootId ?? page.spaceId}
-                  cardId={card?.id ?? page.id}
-                  readonly={readOnly}
-                />
+                {!bounty && page.type === 'card' && (
+                  <>
+                    <hr />
+                    <CommentsList
+                      comments={comments}
+                      rootId={card?.rootId ?? page.spaceId}
+                      cardId={card?.id ?? page.id}
+                      readonly={readOnly}
+                    />
+                  </>
                 )}
                 {bounty && (
                   <BountyProperties bounty={bounty} readOnly={readOnly}>

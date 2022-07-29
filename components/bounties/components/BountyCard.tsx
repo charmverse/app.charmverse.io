@@ -30,7 +30,7 @@ function BountyCard ({ bounty, page, onClick }: Props) {
           justifyContent: 'space-between'
         }}
       >
-        <CardHeader title={page?.title} sx={{ p: 0 }} titleTypographyProps={{ sx: { fontSize: '1rem', fontWeight: 'bold' } }} />
+        <CardHeader title={page?.title || 'Untitled'} sx={{ p: 0 }} titleTypographyProps={{ sx: { fontSize: '1rem', fontWeight: 'bold' } }} />
         <Box width='100%' display='flex' flex={1} flexDirection='column' justifyContent='space-between'>
           <Typography paragraph={true}>
             {fancyTrim(page?.contentText, 50)}
