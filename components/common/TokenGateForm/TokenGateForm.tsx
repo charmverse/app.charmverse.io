@@ -61,8 +61,6 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
   async function generateAuthSignature () {
     // Reset the current state
     setTokenGateResult(null);
-    window.localStorage.removeItem('lit-auth-signature');
-
     setIsVerifyingGates(true);
 
     const chain = getLitChainFromChainId(chainId);
