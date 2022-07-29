@@ -29,13 +29,13 @@ const config = {
   async redirects () {
     return [
       {
-        source: '/:domain/settings',
+        // (^(?!.*\bapi\b).*$) includes all paths except for /api/ source: https://stackoverflow.com/questions/70701544/next-js-redirect-all-paths-except-one
+        source: '/:domain(^(?!.*\bapi\b).*$)/settings',
         destination: '/:domain/settings/workspace',
         permanent: false
       },
-      // redirect old bounty pages to standard page urls
       {
-        source: '/:domain/bounties/:id',
+        source: '/:domain(^(?!.*\bapi\b).*$)/bounties/:id',
         destination: '/:domain/:id',
         permanent: true
       }
