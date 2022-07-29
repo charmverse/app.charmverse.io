@@ -58,7 +58,7 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
       rewardAmount: 10,
       rewardToken: 'BNB'
     };
-    // f
+
     const response = await request(baseUrl)
       .put(`/api/bounties/${createdBounty.id}`)
       .set('Cookie', nonAdminCookie)
