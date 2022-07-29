@@ -14,6 +14,8 @@ import MenuWrapper from '../../widgets/menuWrapper'
 import {getUser} from '../../store/users'
 import {useAppSelector} from '../../store/hooks'
 import Tooltip from '../../widgets/tooltip'
+import Avatar from 'components/common/Avatar'
+import { useContributors } from 'hooks/useContributors'
 
 
 type Props = {
@@ -29,6 +31,8 @@ const Comment: FC<Props> = (props: Props) => {
     const html = Utils.htmlFromMarkdown(comment.title)
     const user = useAppSelector(getUser(userId))
     const date = new Date(comment.createdAt)
+    const [contributors] = useContributors()
+    const contributor = contributors.find(_contributor => _contributor.id === userId);
 
     return (
         <div
@@ -36,10 +40,10 @@ const Comment: FC<Props> = (props: Props) => {
             className='Comment comment'
         >
             <div className='comment-header'>
-                <img
+                {contributor ? <Avatar size={"small"} name={contributor.username as string} avatar={contributor.avatar} /> : <img
                     className='comment-avatar'
                     src={userImageUrl}
-                />
+                />}
                 <div className='comment-username'>{user?.username}</div>
                 <Tooltip title={Utils.displayDateTime(date, intl)}>
                     <div className='comment-date'>
