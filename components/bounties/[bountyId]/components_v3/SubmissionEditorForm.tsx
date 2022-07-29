@@ -17,6 +17,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import { AssignedBountyPermissions } from 'lib/bounties';
 
 const schema = yup.object({
   submission: yup.string().required(),
@@ -35,10 +36,11 @@ interface Props {
   onSubmit?: (submission: Application) => void
   showHeader?: boolean
   readOnly?: boolean
+  permissions: AssignedBountyPermissions
 }
 
 export default function BountySubmissionForm (
-  { readOnly = false, showHeader = false, submission, onSubmit: onSubmitProp, bountyId }: Props
+  { permissions, readOnly = false, showHeader = false, submission, onSubmit: onSubmitProp, bountyId }: Props
 ) {
   const [user] = useUser();
 
@@ -143,7 +145,7 @@ export default function BountySubmissionForm (
                 minHeight: 130
               }}
               readOnly={readOnly}
-              placeholderText='Enter the content of your submission here.'
+              placeholderText={permissions.userPermissions.review ? 'No submission yet' : 'Enter the content of your submission here.'}
             />
 
           </Grid>

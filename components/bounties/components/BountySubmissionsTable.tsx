@@ -123,7 +123,7 @@ function BountySubmissionsTableRow ({
             {!isViewingDetails ? <KeyboardArrowDownIcon fontSize='small' /> : <KeyboardArrowUpIcon fontSize='small' />}
           </IconButton>
         </TableCell>
-        <TableCell align='right' sx={{ gap: 2, justifyContent: 'flex-end' }}>
+        <TableCell align='right' sx={{ gap: 2, justifyContent: 'center', display: 'flex' }}>
           {submission.status !== 'inProgress' && (
           <BountySubmissionReviewActions
             totalAcceptedApplications={totalAcceptedApplications}
@@ -151,6 +151,7 @@ function BountySubmissionsTableRow ({
                     await refreshBounty(bounty.id);
                     setIsViewingDetails(false);
                   }}
+                  permissions={permissions}
                 />
               </Box>
             )}

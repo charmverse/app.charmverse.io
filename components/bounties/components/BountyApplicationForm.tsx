@@ -77,6 +77,7 @@ export default function BountyApplicationForm (props: BountyApplicationFormProps
             await refreshBounty(bounty.id);
             setIsApplyingBounty(false);
           }}
+          permissions={permissions}
         />
       );
     }
