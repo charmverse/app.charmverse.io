@@ -120,9 +120,7 @@ export default function PublicPage () {
     }
   }, [account]);
 
-  const currentPage = pages[currentPageId];
-
-  if (!router.query || loadingSpace || !currentPage) {
+  if (!router.query || loadingSpace) {
     return <LoadingComponent height='200px' isLoading={true} />;
   }
 
@@ -133,6 +131,8 @@ export default function PublicPage () {
   if (pageNotFound) {
     return <ErrorPage message={'Sorry, that page doesn\'t exist'} />;
   }
+
+  const currentPage = pages[currentPageId];
 
   return (
     <>
@@ -173,11 +173,11 @@ export default function PublicPage () {
           {
             isBountiesPage
               ? <PublicBountyList />
-              : (currentPage.type === 'board'
+              : (currentPage?.type === 'board'
                 ? (
                   <BoardPage page={currentPage} setPage={() => {}} readonly={true} />
                 ) : (
-                  <DocumentPage page={currentPage} setPage={() => {}} readOnly={true} />
+                  currentPage && <DocumentPage page={currentPage} setPage={() => {}} readOnly={true} />
                 )
               )
           }
