@@ -8,17 +8,16 @@ import { CSVLink } from 'react-csv';
 import MultiPaymentModal from './components/MultiPaymentModal';
 import NewBountyButton from './components/NewBountyButton';
 import BountiesEmptyState from './components/BountiesEmptyState';
-import BountiesKanBanView from './components/BountiesKanbanView';
+import BountiesKanbanView from './components/BountiesKanbanView';
 
 const bountyStatuses: BountyStatus[] = ['open', 'inProgress', 'complete', 'paid', 'suggestion'];
 
 interface Props {
-  publicMode?: boolean
-  onSelectBounty?: (bounty: BountyWithDetails) => void,
-  bounties: BountyWithDetails[]
+  publicMode?: boolean;
+  bounties: BountyWithDetails[];
 }
 
-export default function BountyList ({ publicMode = false, onSelectBounty, bounties }: Props) {
+export default function BountiesPage ({ publicMode = false, bounties }: Props) {
 
   const bountiesSorted = bounties ? sortArrayByObjectProperty(bounties, 'status', bountyStatuses) : [];
 
@@ -81,7 +80,7 @@ export default function BountyList ({ publicMode = false, onSelectBounty, bounti
             ? (
               <BountiesEmptyState />
             ) : (
-              <BountiesKanBanView bounties={bounties} onSelectBounty={onSelectBounty} />
+              <BountiesKanbanView bounties={bounties} />
             )}
         </div>
       </div>

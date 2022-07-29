@@ -2,7 +2,7 @@ import Box from '@mui/material/Box';
 import { Bounty } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
 import charmClient from 'charmClient';
-import BountyList from 'components/bounties/BountyList';
+import BountiesPage from 'components/bounties/BountiesPage';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';
@@ -17,7 +17,7 @@ import { BountyWithDetails } from 'models';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
 
-export default function PublicBountyList () {
+export default function PublicBountiesPage () {
   const router = useRouter();
 
   const [contributors] = useContributors();
@@ -40,7 +40,7 @@ export default function PublicBountyList () {
 
     if (isSpaceMember) {
       // We pass the bounty as the useState setter will not have set the new bounty state before calling redirect to space
-      redirectToSpace(bounty);
+      // redirectToSpace(bounty);
     }
     else {
       setSelectedBounty(bounty);
@@ -95,7 +95,7 @@ export default function PublicBountyList () {
 
   return (space.publicBountyBoard ? (
     <>
-      <BountyList publicMode onSelectBounty={onSelectBounty} bounties={bounties} />
+      <BountiesPage publicMode bounties={bounties} />
       <Modal size='large' open={loginViaTokenGateModal.isOpen && !isSpaceMember} onClose={loginViaTokenGateModal.close} title={`Join the ${space?.name} workspace to apply`}>
         {
           !account && (
