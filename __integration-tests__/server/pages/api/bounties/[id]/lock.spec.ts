@@ -1,14 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Application, Bounty, Space, User } from '@prisma/client';
+import { Space, User } from '@prisma/client';
+import { addBountyPermissionGroup } from 'lib/permissions/bounties';
+import { BountyWithDetails } from 'models';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateBounty, generateBountyWithSingleApplication, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { ApplicationCreationData, SubmissionCreationData, SubmissionReview } from 'lib/applications/interfaces';
-import { createBounty } from 'lib/bounties';
-import { generateSubmissionContent } from 'testing/generate-stubs';
-import { countValidSubmissions } from 'lib/applications/shared';
-import { BountyWithDetails } from 'models';
-import { addBountyPermissionGroup } from 'lib/permissions/bounties';
+import { generateBountyWithSingleApplication, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 let nonAdminUser: User;
 let nonAdminUserSpace: Space;
@@ -26,7 +22,7 @@ beforeAll(async () => {
     })).headers['set-cookie'][0];
 });
 
-describe('POST /api/bounties/{submissionId}/close-submissions - close a bounty to new submissions and applications', () => {
+describe('POST /api/bounties/{submissionId}/lock - close a bounty to new submissions and applications', () => {
 
   it('should allow a user with the lock permission to close the bounty to new submissions and respond with 200', async () => {
 
@@ -49,7 +45,7 @@ describe('POST /api/bounties/{submissionId}/close-submissions - close a bounty t
     });
 
     const result = (await request(baseUrl)
-      .post(`/api/bounties/${bounty.id}/close-submissions`)
+      .post(`/api/bounties/${bounty.id}/lock`)
       .set('Cookie', nonAdminCookie)
       .send({})
       .expect(200)).body as BountyWithDetails;
@@ -76,7 +72,7 @@ describe('POST /api/bounties/{submissionId}/close-submissions - close a bounty t
     });
 
     await request(baseUrl)
-      .post(`/api/bounties/${bounty.id}/close-submissions`)
+      .post(`/api/bounties/${bounty.id}/lock`)
       .set('Cookie', adminCookie)
       .send({})
       .expect(200);
@@ -100,7 +96,7 @@ describe('POST /api/bounties/{submissionId}/close-submissions - close a bounty t
     });
 
     await request(baseUrl)
-      .post(`/api/bounties/${bounty.id}/close-submissions`)
+      .post(`/api/bounties/${bounty.id}/lock`)
       .set('Cookie', extraNonAdminUserCookie)
       .send({})
       .expect(401);

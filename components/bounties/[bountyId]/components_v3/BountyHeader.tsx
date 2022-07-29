@@ -42,9 +42,9 @@ export default function BountyHeader ({ bounty, permissions }: Props) {
     closeBountyModal.close();
   }
 
-  async function closeBountySubmissions () {
+  async function lockBountySubmissions () {
 
-    const updatedBounty = await charmClient.closeBountySubmissions(bounty!.id);
+    const updatedBounty = await charmClient.lockBountySubmissions(bounty!.id);
     refreshBounty(updatedBounty.id);
     closeSubmissionsModal.close();
   }
@@ -144,7 +144,7 @@ export default function BountyHeader ({ bounty, permissions }: Props) {
             <Button
               color='primary'
               sx={{ mr: 2, fontWeight: 'bold' }}
-              onClick={closeBountySubmissions}
+              onClick={lockBountySubmissions}
             >Close {bounty.approveSubmitters ? 'applications' : 'submissions'}
             </Button>
 

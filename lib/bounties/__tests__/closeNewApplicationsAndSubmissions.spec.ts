@@ -3,7 +3,7 @@ import { generateUserAndSpaceWithApiToken, generateBountyWithSingleApplication }
 import { v4 } from 'uuid';
 import { ExpectedAnError } from 'testing/errors';
 import { DataNotFoundError } from 'lib/utilities/errors';
-import { closeNewApplicationsAndSubmissions } from '../closeNewApplicationsAndSubmissions';
+import { lockApplicationAndSubmissions } from '../lockApplicationAndSubmissions';
 
 let nonAdminUser: User;
 let space: Space;
@@ -16,7 +16,7 @@ beforeAll(async () => {
 
 });
 
-describe('closeNewApplicationsAndSubmissions', () => {
+describe('lockApplicationAndSubmissions', () => {
   it('should lock submissions', async () => {
     const bounty = await generateBountyWithSingleApplication({
       bountyStatus: 'open',
@@ -26,7 +26,7 @@ describe('closeNewApplicationsAndSubmissions', () => {
       userId: nonAdminUser.id
     });
 
-    const updatedBounty = await closeNewApplicationsAndSubmissions(bounty.id);
+    const updatedBounty = await lockApplicationAndSubmissions(bounty.id);
 
     expect(updatedBounty.submissionsLocked).toBe(true);
   });
@@ -34,7 +34,7 @@ describe('closeNewApplicationsAndSubmissions', () => {
   it('should fail if the bounty does not exist', async () => {
 
     try {
-      await closeNewApplicationsAndSubmissions(v4());
+      await lockApplicationAndSubmissions(v4());
       throw new ExpectedAnError();
     }
     catch (err) {

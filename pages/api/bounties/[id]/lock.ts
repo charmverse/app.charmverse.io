@@ -1,5 +1,5 @@
 
-import { closeNewApplicationsAndSubmissions, getBountyOrThrow } from 'lib/bounties';
+import { lockApplicationAndSubmissions, getBountyOrThrow } from 'lib/bounties';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -31,7 +31,7 @@ async function closeSubmissionsController (req: NextApiRequest, res: NextApiResp
     throw new UnauthorisedActionError('You cannot close submissions for this bounty.');
   }
 
-  const bountyWithClosedSubmissions = await closeNewApplicationsAndSubmissions(bountyId as string);
+  const bountyWithClosedSubmissions = await lockApplicationAndSubmissions(bountyId as string, req.query.lock === 'true');
 
   return res.status(200).json(bountyWithClosedSubmissions);
 }

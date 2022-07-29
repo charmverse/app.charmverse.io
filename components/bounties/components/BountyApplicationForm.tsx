@@ -26,8 +26,12 @@ export default function BountyApplicationForm (props: BountyApplicationFormProps
   const userSubmission = submissions.find(sub => sub.createdBy === user?.id);
   // Only applies if there is a submissions cap
   const capReached = bounty.maxSubmissions !== null && (validSubmissionsCount >= bounty.maxSubmissions);
-  const canCreateSubmission = !userSubmission && !capReached && permissions?.userPermissions.work && bounty.createdBy !== user?.id;
-  const newSubmissionTooltip = !permissions?.userPermissions.work ? 'You do not have the correct role to submit work to this bounty' : (capReached ? 'The submissions cap has been reached. This bounty is closed to new submissions.' : '');
+  const canCreateSubmission = !bounty.submissionsLocked
+    && !userSubmission
+    && !capReached
+    && permissions?.userPermissions.work
+    && bounty.createdBy !== user?.id;
+  const newSubmissionTooltip = bounty.submissionsLocked ? 'Submissions locked' : !permissions?.userPermissions.work ? 'You do not have the correct role to submit work to this bounty' : (capReached ? 'The submissions cap has been reached. This bounty is closed to new submissions.' : '');
 
   if (!userSubmission) {
     if (!isApplyingBounty && bounty.createdBy !== user?.id && !permissions.userPermissions.review) {

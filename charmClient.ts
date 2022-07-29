@@ -436,8 +436,8 @@ class CharmClient {
     return http.PUT<BountyWithDetails>(`/api/bounties/${bountyId}`, updateContent);
   }
 
-  async closeBountySubmissions (bountyId: string): Promise<BountyWithDetails> {
-    return http.POST<BountyWithDetails>(`/api/bounties/${bountyId}/close-submissions`);
+  async lockBountySubmissions (bountyId: string, lock?: boolean): Promise<BountyWithDetails> {
+    return http.POST<BountyWithDetails>(`/api/bounties/${bountyId}/lock?lock=${lock ?? true}`);
   }
 
   async closeBounty (bountyId: string): Promise<BountyWithDetails> {
