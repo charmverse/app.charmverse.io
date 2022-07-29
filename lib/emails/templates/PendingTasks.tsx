@@ -68,7 +68,7 @@ export default function PendingTasks (props: PendingTasksProps) {
           >
             <span style={h2Style}>{totalMentionTasks} Mention{totalMentionTasks > 1 ? 's' : ''}</span>
           </a>
-          <a href={nexusVoteLink} style={buttonStyle}>
+          <a href={nexusDiscussionLink} style={buttonStyle}>
             View
           </a>
         </div>
