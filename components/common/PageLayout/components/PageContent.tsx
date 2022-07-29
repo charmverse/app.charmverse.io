@@ -3,7 +3,6 @@ import styled from '@emotion/styled';
 import ScrollableWindow from './ScrollableWindow';
 
 const StyledBox = styled.div(({ theme }) => `
-  width: 1200px;
   max-width: 100%;
   margin: ${theme.spacing(10, 'auto')};
   min-height: 80vh;

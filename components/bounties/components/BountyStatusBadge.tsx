@@ -58,9 +58,10 @@ const StyledBountyStatusChip = styled(Chip)<{ status: BountyStatus }>`
 `;
 
 export interface IBountyBadgeProps {
-  bounty: Bounty
-  layout?: 'row' | 'stacked'
-  truncate?: boolean
+  bounty: Bounty;
+  layout?: 'row' | 'stacked';
+  truncate?: boolean;
+  hideStatus?: boolean;
 }
 
 export function BountyStatusChip ({
@@ -78,7 +79,7 @@ export function BountyStatusChip ({
   );
 }
 
-export default function BountyStatusBadgeWrapper ({ truncate = false, bounty, layout = 'row' } : IBountyBadgeProps) {
+export default function BountyStatusBadgeWrapper ({ truncate = false, hideStatus, bounty, layout = 'row' } : IBountyBadgeProps) {
   const [space] = useCurrentSpace();
 
   const bountyLink = `/${space?.domain}/bounties/${bounty.id}`;
@@ -98,7 +99,7 @@ export default function BountyStatusBadgeWrapper ({ truncate = false, bounty, la
           }}
           >
             <BountyAmount bounty={bounty} truncate={truncate} />
-            <BountyStatusChip status={bounty.status} />
+            {!hideStatus && <BountyStatusChip status={bounty.status} />}
           </Box>
         </Grid>
       </Grid>
