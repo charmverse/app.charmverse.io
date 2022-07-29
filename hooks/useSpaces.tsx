@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import charmClient from 'charmClient';
 import { useUser } from './useUser';
 
-type IContext = [spaces: Space[], setSpaces: (user: Space[]) => void, isLoaded: boolean];
+type IContext = [spaces: Space[], setSpaces: (spaces: Space[]) => void, isLoaded: boolean];
 
 export const SpacesContext = createContext<Readonly<IContext>>([[], () => undefined, false]);
 

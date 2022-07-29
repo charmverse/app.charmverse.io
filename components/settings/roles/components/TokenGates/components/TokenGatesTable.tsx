@@ -1,26 +1,26 @@
-import { useEffect, useState } from 'react';
-import { checkAndSignAuthMessage, humanizeAccessControlConditions } from 'lit-js-sdk';
+import DeleteIcon from '@mui/icons-material/Close';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import { TokenGate } from '@prisma/client';
-import { useWeb3React } from '@web3-react/core';
+import Chip from '@mui/material/Chip';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
-import DeleteIcon from '@mui/icons-material/Close';
-import ButtonChip from 'components/common/ButtonChip';
 import Tooltip from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
+import { TokenGate } from '@prisma/client';
+import { useWeb3React } from '@web3-react/core';
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
-import Chip from '@mui/material/Chip';
 import charmClient from 'charmClient';
+import ButtonChip from 'components/common/ButtonChip';
 import TableRow from 'components/common/Table/TableRow';
-import { TokenGateWithRoles } from 'pages/api/token-gates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { mutate } from 'swr';
 import log from 'lib/log';
-import { shortenHex } from 'lib/utilities/strings';
 import getLitChainFromChainId from 'lib/token-gates/getLitChainFromChainId';
+import { TokenGateWithRoles } from 'lib/token-gates/interfaces';
+import { shortenHex } from 'lib/utilities/strings';
+import { checkAndSignAuthMessage, humanizeAccessControlConditions } from 'lit-js-sdk';
+import { useEffect, useState } from 'react';
+import { mutate } from 'swr';
 import TestConnectionModal, { TestResult } from './TestConnectionModal';
 import TokenGateRolesSelect from './TokenGateRolesSelect';
 
@@ -81,7 +81,7 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
         chain: (tokenGate.conditions as any).chain || 'ethereum',
         ...tokenGate.conditions as any
       });
-      await charmClient.verifyTokenGate({ jwt, id: tokenGate.id });
+      await charmClient.verifyTokenGate({ commit: false, spaceId: space?.id as string, tokens: [{ signedToken: jwt, tokenGateId: tokenGate.id }] });
 
       setTestResult({ status: 'success' });
     }

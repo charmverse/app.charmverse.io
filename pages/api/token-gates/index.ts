@@ -1,8 +1,10 @@
 
-import { Space, TokenGate, TokenGateToRole } from '@prisma/client';
+import { Space } from '@prisma/client';
 import { prisma } from 'db';
 import { hasAccessToSpace, onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { TokenGateWithRoles } from 'lib/token-gates/interfaces';
+import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -34,28 +36,31 @@ async function saveTokenGate (req: NextApiRequest, res: NextApiResponse) {
   res.status(200).json(result);
 }
 
-export interface TokenGateWithRoles extends TokenGate {
-  space: Space;
-  tokenGateToRoles: TokenGateToRole[];
-}
+async function getTokenGates (req: NextApiRequest, res: NextApiResponse<TokenGateWithRoles[]>) {
 
-async function getTokenGates (req: NextApiRequest, res: NextApiResponse<TokenGateWithRoles[] | { error: string }>) {
+  let space: Pick<Space, 'id'> | null = null;
 
-  let space: Space | null = null;
-  if (req.query.spaceDomain) {
+  const { spaceDomain } = req.query;
+
+  // Get space id using the domain
+  if (spaceDomain) {
     space = await prisma.space.findFirst({
       where: {
         domain: req.query.spaceDomain as string
+      },
+      select: {
+        id: true
       }
     });
     if (!space) {
-      return res.status(201).end();
+      throw new DataNotFoundError(`Space with domain ${spaceDomain}`);
     }
   }
+
   const spaceId = space?.id || req.query.spaceId as string;
 
   if (!spaceId) {
-    return res.status(400).json({ error: 'spaceId is required' });
+    throw new InvalidInputError('spaceId is required');
   }
 
   const result = await prisma.tokenGate.findMany({
@@ -64,7 +69,11 @@ async function getTokenGates (req: NextApiRequest, res: NextApiResponse<TokenGat
     },
     include: {
       space: true,
-      tokenGateToRoles: true
+      tokenGateToRoles: {
+        include: {
+          role: true
+        }
+      }
     }
   });
 
