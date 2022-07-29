@@ -1,12 +1,12 @@
-import { AvatarGroup, Box, Chip, Grid, Tooltip, Typography } from '@mui/material';
+import { AvatarGroup, Box, Chip, Tooltip, Typography } from '@mui/material';
 import { Bounty } from '@prisma/client';
+import Avatar from 'components/common/Avatar';
 import { useContributors } from 'hooks/useContributors';
 import useRoles from 'hooks/useRoles';
 import { AssignedBountyPermissions } from 'lib/bounties';
 import { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import { Contributor } from 'models';
 import { useMemo, useState } from 'react';
-import Avatar from 'components/common/Avatar';
 
 interface BountyReviewersProps {
   permissions: AssignedBountyPermissions
@@ -92,53 +92,41 @@ export default function BountyReviewers ({ bounty, permissions }: BountyReviewer
   }, [bounty, permissions, roleups]);
 
   return (
-    <Grid container item xs={12} sx={{ mt: 3, mb: 4 }}>
-      <Grid item xs={12}>
-        <Typography variant='h5'>
-          Reviewers
-        </Typography>
-
-        {
-          reviewerNames.roles.length === 0 && reviewerNames.users.length === 0 && (
-            <Typography variant='body2'>
-              There are no reviewers assigned to this bounty yet.
-            </Typography>
-          )
-        }
-
-      </Grid>
+    <Box display='flex' alignItems='center' gap={2}>
+      <Typography sx={{
+        fontWeight: 'bold'
+      }}
+      >
+        Reviewers:
+      </Typography>
 
       {
-        reviewerNames.roles.length > 0 && (
-          <Grid item xs={12} sx={{ mt: 2, mb: 2 }}>
-            <Box display='flex'>
-              <Typography sx={{ alignItems: 'center', fontWeight: 'bold', mr: 1 }} display='flex'>
-                Eligible roles
-              </Typography>
-              {
-                reviewerNames.roles.map(reviewer => {
-                  return (
-                    <Chip key={reviewer.id} label={reviewer.name} color='purple' sx={{ mr: 1 }} />
-                  );
-                })
-              }
-            </Box>
-
-            <AvatarGroup max={3}>
-
-            </AvatarGroup>
-          </Grid>
+        reviewerNames.roles.length === 0 && reviewerNames.users.length === 0 && (
+          <Typography variant='body2'>
+            There are no reviewers assigned to this bounty yet.
+          </Typography>
         )
       }
 
+      <Box display='flex' alignItems='center'>
+        {
+          reviewerNames.roles.length > 0 && (
+            reviewerNames.roles.map(reviewer => {
+              return (
+                <Chip size='small' key={reviewer.id} label={reviewer.name} color='purple' sx={{ mr: 1 }} />
+              );
+            })
+          )
+        }
+        <Typography variant='subtitle2'>(Roles)</Typography>
+      </Box>
+
       {
         reviewerNames.users.length > 0 && (
-          <Grid item xs={12} sx={{ mt: 1 }} display='flex'>
-            <AvatarGroup max={maxVisibleUsers} onClick={() => setMaxVisibleUsers(maxVisibleUsers + defaultAvatarGroupIncrement)}>
-
+          <Box display='flex' alignItems='center'>
+            <AvatarGroup max={maxVisibleUsers} sx={{ mr: 1 }} onClick={() => setMaxVisibleUsers(maxVisibleUsers + defaultAvatarGroupIncrement)}>
               {
                 reviewerNames.users.map(reviewer => {
-
                   const userName = !reviewer.name ? 'Unknown user. This person has most likely left this workspace.' : (
                     reviewer.name.slice(0, 2).match('0x') ? reviewer.name.slice(2, 3).toUpperCase() : reviewer.name.slice(0, 1).toUpperCase()
                   );
@@ -148,16 +136,16 @@ export default function BountyReviewers ({ bounty, permissions }: BountyReviewer
                       <Box>
                         <Avatar size='small' name={userName.slice(0, 1)} avatar={reviewer.profilePic as string} />
                       </Box>
-
                     </Tooltip>
                   );
                 })
               }
             </AvatarGroup>
-          </Grid>
+            <Typography variant='subtitle2'>(Users)</Typography>
+          </Box>
         )
       }
 
-    </Grid>
+    </Box>
   );
 }
