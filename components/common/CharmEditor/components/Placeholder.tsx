@@ -8,6 +8,7 @@ function PlaceHolder ({ show, text = "Type '/' for commands", sx }: { sx?: SxPro
   return show ? (
     <Box sx={{
       top: '-2em',
+      pointerEvents: 'none',
       position: 'relative',
       color: alpha(theme.palette.text.secondary, 0.5),
       zIndex: -20,

@@ -32,6 +32,12 @@ const config = {
         source: '/:domain/settings',
         destination: '/:domain/settings/workspace',
         permanent: false
+      },
+      // redirect old bounty pages to standard page urls
+      {
+        source: '/:domain/bounties/:id',
+        destination: '/:domain/:id',
+        permanent: true
       }
     ];
   },

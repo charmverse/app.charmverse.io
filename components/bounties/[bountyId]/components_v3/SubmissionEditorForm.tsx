@@ -140,7 +140,9 @@ export default function BountySubmissionForm (
                 });
               }}
               style={{
-                backgroundColor: theme.palette.background.light,
+                backgroundColor: 'var(--input-bg)',
+                border: '1px solid var(--input-border)',
+                borderRadius: 3,
                 minHeight: 130
               }}
               readOnly={readOnly}
@@ -179,7 +181,7 @@ export default function BountySubmissionForm (
           {!readOnly && (
           <Grid item display='flex' gap={1}>
             <Button disabled={!isValid} type='submit'>Save</Button>
-            {onCancel && <Button onClick={onCancel} color='error'>Cancel</Button>}
+            {onCancel && <Button onClick={onCancel} variant='outlined' color='secondary'>Cancel</Button>}
           </Grid>
           )}
 
