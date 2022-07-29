@@ -1,4 +1,4 @@
-
+import { Box, Typography } from '@mui/material';
 import { BountyStatus, Page } from '@prisma/client';
 import PageDialog from 'components/common/Page/PageDialog';
 import { BountyWithDetails } from 'models';
@@ -35,9 +35,12 @@ function BountiesKanban ({ bounties, onSelectBounty }: Omit<Props, 'publicMode'>
     <div className='Kanban'>
       <div className='octo-board-header'>
         {bountyStatuses.map(bountyStatus => (
-          <div className='octo-board-header-cell' key={bountyStatus}>
+          <Box className='octo-board-header-cell' key={bountyStatus}>
             <BountyStatusChip status={bountyStatus} />
-          </div>
+            <Typography variant='body2' color='secondary' px={2}>
+              {bountiesGroupedByStatus[bountyStatus].length}
+            </Typography>
+          </Box>
         ))}
       </div>
       <div className='octo-board-body'>

@@ -40,6 +40,7 @@ const globalCSS = css`
     --modal-rad: 8px;
 
     --background-default: ${colors.backgroundColor};
+    --background-paper: ${colors.backgroundColor};
 
   }
 
@@ -56,6 +57,7 @@ const globalCSS = css`
     --input-border-hover: #ededed;
 
     --background-default: ${colors.backgroundColorDarkMode};
+    --background-paper: ${colors.backgroundLightColorDarkMode};
   }
 
 `;
