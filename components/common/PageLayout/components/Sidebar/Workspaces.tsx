@@ -63,7 +63,7 @@ export default function Workspaces () {
           <Grid item key={workspace.domain}>
             <AvatarLink href={`/${workspace.domain}`} passHref>
               <MuiLink>
-                <Tooltip title={workspace.name} placement='right' arrow>
+                <Tooltip title={workspace.name} placement='top' arrow>
                   <span>
                     <WorkspaceAvatar
                       active={space?.domain === workspace.domain}
@@ -77,7 +77,7 @@ export default function Workspaces () {
           </Grid>
         ))}
         <Grid item>
-          <Tooltip title='Create or join a workspace' placement='right' arrow>
+          <Tooltip title='Create or join a workspace' placement='top' arrow>
             <IconButton sx={{ borderRadius: '8px' }} onClick={showSpaceForm}><AddIcon /></IconButton>
           </Tooltip>
         </Grid>

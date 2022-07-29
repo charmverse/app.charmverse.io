@@ -128,7 +128,7 @@ export default function IdentityProviders () {
             <Typography color='secondary' variant='button'>
               {isConnected ? 'Connected with Discord' : 'Connect with Discord'}
             </Typography>
-            <Tooltip arrow placement='bottom' title={user?.addresses.length === 0 ? 'You must have at least one wallet address to disconnect from discord' : ''}>
+            <Tooltip arrow placement='top' title={user?.addresses.length === 0 ? 'You must have at least one wallet address to disconnect from discord' : ''}>
               {/** div is used to make sure the tooltip is rendered as disabled button doesn't allow tooltip */}
               <div>
                 <StyledButton

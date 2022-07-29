@@ -140,7 +140,7 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
             <>
               {currentPage?.deletedAt === null && <ShareButton headerHeight={headerHeight} />}
               <IconButton sx={{ display: { xs: 'none', md: 'inline-flex' } }} size='small' onClick={toggleFavorite} color='inherit'>
-                <Tooltip title={isFavorite ? 'Remove from sidebar' : 'Pin this page to your sidebar'} arrow placement='bottom'>
+                <Tooltip title={isFavorite ? 'Remove from sidebar' : 'Pin this page to your sidebar'} arrow placement='top'>
                   {isFavorite ? <FavoritedIcon fontSize='small' color='secondary' /> : <NotFavoritedIcon fontSize='small' color='secondary' />}
                 </Tooltip>
               </IconButton>
@@ -270,7 +270,7 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
           {/** dark mode toggle */}
           {user && (
             <IconButton size='small' sx={{ display: { xs: 'none', md: 'inline-flex' }, mx: 1 }} onClick={colorMode.toggleColorMode} color='inherit'>
-              <Tooltip title={`Enable ${theme.palette.mode === 'dark' ? 'light mode' : 'dark mode'}`} arrow placement='bottom'>
+              <Tooltip title={`Enable ${theme.palette.mode === 'dark' ? 'light mode' : 'dark mode'}`} arrow placement='top'>
                 {theme.palette.mode === 'dark' ? <SunIcon fontSize='small' color='secondary' /> : <MoonIcon fontSize='small' color='secondary' />}
               </Tooltip>
             </IconButton>

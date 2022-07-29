@@ -50,7 +50,7 @@ function NewPageMenu ({ addPage, tooltip, ...props }: Props) {
 
   return (
     <>
-      <Tooltip disableInteractive title={tooltip} leaveDelay={0} placement='right' arrow>
+      <Tooltip disableInteractive title={tooltip} leaveDelay={0} placement='top' arrow>
         <StyledIconButton onClick={handleClick} {...props}>
           <AddIcon color='secondary' />
         </StyledIconButton>

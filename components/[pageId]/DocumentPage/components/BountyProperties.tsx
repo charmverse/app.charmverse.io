@@ -3,11 +3,11 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Box, Collapse, Divider, FormLabel, IconButton, Stack, TextField } from '@mui/material';
 import { PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
-import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge';
-import BountySuggestionApproval from 'components/bounties/components/BountySuggestionApproval';
 import BountyHeader from 'components/bounties/components/BountyHeader';
-import BountyReviewers from 'components/bounties/[bountyId]/components_v3/BountyReviewers';
 import BountySubmissionsTable from 'components/bounties/components/BountySubmissionsTable';
+import BountySuggestionApproval from 'components/bounties/components/BountySuggestionApproval';
+import BountyReviewers from 'components/bounties/[bountyId]/components_v3/BountyReviewers';
+import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
 import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
@@ -25,7 +25,6 @@ import debouncePromise from 'lib/utilities/debouncePromise';
 import { isTruthy } from 'lib/utilities/types';
 import { BountyWithDetails } from 'models';
 import { ReactNode, useCallback, useEffect, useState } from 'react';
-import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 
 function rollupPermissions ({
   selectedReviewerUsers,
