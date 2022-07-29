@@ -35,7 +35,7 @@ const config = {
         permanent: false
       },
       {
-        source: '/:domain(^(?!.*\bapi\b).*$)/bounties/:id',
+        source: '/:domain(^(?!api$).*)/bounties/:id',
         destination: '/:domain/:id',
         permanent: true
       }
