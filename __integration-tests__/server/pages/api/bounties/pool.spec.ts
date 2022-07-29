@@ -73,6 +73,7 @@ describe('POST /api/bounties/pool - Return breakdown of how many people can appl
         resourceId: bounty.id
       })
       .expect(200)).body as BountySubmitterPoolSize;
+      // sf
 
     expect(mode === 'role').toBe(true);
     expect(roleups.length).toBe(1);
