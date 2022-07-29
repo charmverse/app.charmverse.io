@@ -72,7 +72,6 @@ export default function BountyApplicationForm (props: BountyApplicationFormProps
         <SubmissionEditorForm
           bountyId={bounty.id}
           showHeader
-          onCancel={() => setIsApplyingBounty(false)}
           onSubmit={async () => {
             await refreshSubmissions();
             await refreshBounty(bounty.id);
