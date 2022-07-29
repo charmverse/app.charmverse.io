@@ -11,8 +11,10 @@ import TokenGateForm from 'components/common/TokenGateForm';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { useContributors } from 'hooks/useContributors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
+import { IPageWithPermissions } from 'lib/pages';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { BountyWithDetails } from 'models';
 import { useRouter } from 'next/router';
@@ -25,14 +27,14 @@ export default function PublicBountyList () {
   const [space] = useCurrentSpace();
   const { account } = useWeb3React();
   const [user, setUser] = useUser();
-  const { showMessage } = useSnackbar();
+  const { pages, setPages } = usePages();
 
   const [bounties, setBounties] = useState<BountyWithDetails[] | null>(null);
 
   const [selectedBounty, setSelectedBounty] = useState<Bounty | null>(null);
   const [loggingIn, setLoggingIn] = useState(false);
 
-  const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
+  const { openWalletSelectorModal } = useContext(Web3Connection);
 
   const loginViaTokenGateModal = usePopupState({ variant: 'popover', popupId: 'login-via-token-gate' });
 
@@ -66,6 +68,21 @@ export default function PublicBountyList () {
     if (space) {
       charmClient.listBounties(space.id, true)
         .then(_bounties => {
+
+          const pagesToSet: Record<string, IPageWithPermissions> = _bounties.reduce((pageMap, bounty) => {
+
+            if (bounty.page) {
+              pageMap[bounty.page.id] = bounty.page;
+            }
+
+            return pageMap;
+          }, {} as Record<string, IPageWithPermissions>);
+
+          setPages({
+            ...pages,
+            ...pagesToSet
+          });
+
           setBounties(_bounties);
         });
     }

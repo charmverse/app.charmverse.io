@@ -48,8 +48,9 @@ export default function PublicPage () {
   const pageIdOrPath = router.query.pageId instanceof Array ? router.query.pageId.join('/') : router.query.pageId as string;
   const dispatch = useAppDispatch();
   const { pages, currentPageId, setCurrentPageId } = usePages();
+  const [loadingSpace, setLoadingSpace] = useState(true);
   const [currentSpace] = useCurrentSpace();
-  const [, setSpaces] = useSpaces();
+  const [_, setSpaces] = useSpaces();
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
   const isBountiesPage = router.query.pageId?.[1] === 'bounties';
@@ -61,7 +62,11 @@ export default function PublicPage () {
       const spaceDomain = (router.query.pageId as string[])[0];
       charmClient.getPublicSpaceInfo(spaceDomain).then(space => {
         setSpaces([space]);
-      });
+        setLoadingSpace(false);
+      })
+        .catch(() => {
+          setLoadingSpace(false);
+        });
     }
     else {
       try {
@@ -116,8 +121,12 @@ export default function PublicPage () {
 
   const currentPage = pages[currentPageId];
 
-  if (!router.query) {
+  if (!router.query || loadingSpace) {
     return <LoadingComponent height='200px' isLoading={true} />;
+  }
+
+  if (!currentSpace) {
+    return <ErrorPage message={'Sorry, that space doesn\'t exist'} />;
   }
 
   if (pageNotFound) {
