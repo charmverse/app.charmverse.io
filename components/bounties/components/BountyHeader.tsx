@@ -17,6 +17,7 @@ import { AssignedBountyPermissions } from 'lib/bounties';
 import { isBountyLockable, requesterCanDeleteBounty } from 'lib/bounties/shared';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { BountyWithDetails } from 'models';
+import BountyStatusBadge from './BountyStatusBadge';
 
 interface Props {
   bounty: BountyWithDetails
@@ -68,60 +69,65 @@ export default function BountyHeader ({ bounty, permissions }: Props) {
       <Box sx={{
         justifyContent: 'space-between',
         gap: 1,
-        display: 'flex'
+        display: 'flex',
+        alignItems: 'center'
       }}
       >
-        <Box flexGrow={1}>
-          <FieldLabel sx={{
+        <Typography fontWeight={500}>Bounty Properties</Typography>
+        {/* Provide the bounty menu options */}
+        <Box display='flex' gap={2} alignItems='center'>
 
-          }}
-          >Bounty Properties
-          </FieldLabel>
-          {/* Provide the bounty menu options */}
           {
-              (canDeleteBounty || permissions?.userPermissions?.lock) && (
-                <>
-                  {
-                    permissions?.userPermissions?.lock && isBountyLockable(bounty) && (
-                      [
-                        <Tooltip key='stop-new' arrow placement='right' title={`Prevent new ${bounty.approveSubmitters ? 'applications' : 'submissions'} from being made.`}>
-                          <IconButton
-                            onClick={() => {
-                              closeSubmissionsModal.open();
-                            }}
-                          >
-                            <LockIcon color='secondary' fontSize='small' />
-                          </IconButton>
-                        </Tooltip>,
-                        <Tooltip key='mark-complete' arrow placement='right' title='Mark this bounty complete and auto-reject all non-reviewed submissions'>
-                          <IconButton
-                            onClick={() => {
-                              closeBountyModal.open();
-                            }}
-                          >
-                            <CheckCircleIcon color='secondary' fontSize='small' />
-                          </IconButton>
-                        </Tooltip>
-                      ]
-                    )
-                  }
-
-                  {
-                    canDeleteBounty && (
-                      <Tooltip arrow placement='right' title={`Delete bounty ${bounty.status === 'suggestion' ? 'suggestion' : ''}`}>
+            (canDeleteBounty || permissions?.userPermissions?.lock) && (
+              <Box display='flex'>
+                {
+                  permissions?.userPermissions?.lock && isBountyLockable(bounty) && (
+                    [
+                      <Tooltip key='stop-new' arrow placement='right' title={`Prevent new ${bounty.approveSubmitters ? 'applications' : 'submissions'} from being made.`}>
                         <IconButton
+                          size='small'
                           onClick={() => {
-                            bountyDeleteModal.open();
+                            closeSubmissionsModal.open();
                           }}
                         >
-                          <DeleteIcon color='secondary' />
+                          <LockIcon color='secondary' fontSize='small' />
+                        </IconButton>
+                      </Tooltip>,
+                      <Tooltip key='mark-complete' arrow placement='right' title='Mark this bounty complete and auto-reject all non-reviewed submissions'>
+                        <IconButton
+                          size='small'
+                          onClick={() => {
+                            closeBountyModal.open();
+                          }}
+                        >
+                          <CheckCircleIcon color='secondary' fontSize='small' />
                         </IconButton>
                       </Tooltip>
-                    )
-                  }
-                </>
-              )
-            }
+                    ]
+                  )
+                }
+
+                {
+                  canDeleteBounty && (
+                    <Tooltip arrow placement='right' title={`Delete bounty ${bounty.status === 'suggestion' ? 'suggestion' : ''}`}>
+                      <IconButton
+                        size='small'
+                        onClick={() => {
+                          bountyDeleteModal.open();
+                        }}
+                      >
+                        <DeleteIcon color='secondary' />
+                      </IconButton>
+                    </Tooltip>
+                  )
+                }
+              </Box>
+            )
+          }
+          <BountyStatusBadge
+            bounty={bounty}
+            truncate
+          />
         </Box>
       </Box>
 

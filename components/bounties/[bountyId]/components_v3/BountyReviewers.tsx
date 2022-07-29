@@ -108,18 +108,19 @@ export default function BountyReviewers ({ bounty, permissions }: BountyReviewer
         )
       }
 
-      <Box display='flex' alignItems='center'>
-        {
-          reviewerNames.roles.length > 0 && (
-            reviewerNames.roles.map(reviewer => {
+      {
+        reviewerNames.roles.length > 0 && (
+          <Box display='flex' alignItems='center'>
+
+            {reviewerNames.roles.map(reviewer => {
               return (
                 <Chip size='small' key={reviewer.id} label={reviewer.name} color='purple' sx={{ mr: 1 }} />
               );
-            })
-          )
-        }
-        <Typography variant='subtitle2'>(Roles)</Typography>
-      </Box>
+            })}
+            <Typography variant='subtitle2'>(Roles)</Typography>
+          </Box>
+        )
+      }
 
       {
         reviewerNames.users.length > 0 && (

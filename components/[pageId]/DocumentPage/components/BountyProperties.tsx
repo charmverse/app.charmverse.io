@@ -173,7 +173,7 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
           readOnly={!canEdit}
           chainId={currentBounty.chainId}
           sx={{
-            width: 250
+            width: '100%'
           }}
           onChange={async (chainId) => {
             const newNativeCurrency = refreshCryptoList(chainId);
@@ -211,7 +211,7 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
           }}
           onNewPaymentMethod={onNewPaymentMethod}
           sx={{
-            width: 250
+            width: '100%'
           }}
         />
       </div>
@@ -228,7 +228,7 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
         <TextField
           required
           sx={{
-            width: 250
+            width: '100%'
           }}
           disabled={!canEdit}
           value={currentBounty.rewardAmount}
@@ -308,7 +308,7 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
             disabled={!canEdit}
             readOnly={!canEdit}
             sx={{
-              width: 250
+              width: '100%'
             }}
           />
         </div>
@@ -351,7 +351,7 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
             size='small'
             inputProps={{ step: 1, min: 1 }}
             sx={{
-              width: 250
+              width: '100%'
             }}
             disabled={!canEdit}
             onChange={updateBountyMaxSubmissions}
@@ -415,19 +415,12 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
                 }}
                 excludedIds={[...selectedReviewerUsers, ...selectedReviewerRoles]}
                 sx={{
-                  width: 250
+                  width: '100%'
                 }}
               />
             </div>
           )
         }
-
-        <Box my={1} display='flex' justifyContent='flex-start' width='fit-content'>
-          <BountyStatusBadge
-            bounty={currentBounty}
-            truncate
-          />
-        </Box>
       </Stack>
 
       {canEdit && bountyProperties}
