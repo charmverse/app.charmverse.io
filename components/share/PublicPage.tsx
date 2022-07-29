@@ -122,7 +122,7 @@ export default function PublicPage () {
 
   const currentPage = pages[currentPageId];
 
-  if (!router.query || loadingSpace) {
+  if (!router.query || loadingSpace || !currentPage) {
     return <LoadingComponent height='200px' isLoading={true} />;
   }
 
@@ -171,15 +171,15 @@ export default function PublicPage () {
           <HeaderSpacer />
 
           {
-            isBountiesPage && <PublicBountyList />
-          }
-          {
-            !isBountiesPage && (currentPage?.type === 'board'
-              ? (
-                <BoardPage page={currentPage} setPage={() => {}} readonly={true} />
-              ) : (
-                currentPage && <DocumentPage page={currentPage} setPage={() => {}} readOnly={true} />
-              ))
+            isBountiesPage
+              ? <PublicBountyList />
+              : (currentPage.type === 'board'
+                ? (
+                  <BoardPage page={currentPage} setPage={() => {}} readonly={true} />
+                ) : (
+                  <DocumentPage page={currentPage} setPage={() => {}} readOnly={true} />
+                )
+              )
           }
 
         </PageContainer>
