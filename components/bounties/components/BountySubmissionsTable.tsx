@@ -1,7 +1,7 @@
 import { useTheme } from '@emotion/react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Collapse, IconButton, Stack, TextField } from '@mui/material';
+import { Collapse, IconButton, Stack, TextField, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
@@ -28,6 +28,8 @@ import { humanFriendlyDate } from 'lib/utilities/dates';
 import { BountyWithDetails } from 'models';
 import { useEffect, useState } from 'react';
 import { BrandColor } from 'theme/colors';
+import LockIcon from '@mui/icons-material/Lock';
+import { LockOpen } from '@mui/icons-material';
 import { ApplicationEditorForm } from '../[bountyId]/components/ApplicationEditorForm';
 import SubmissionEditorForm from '../[bountyId]/components_v3/SubmissionEditorForm';
 import BountyApplicationForm from './BountyApplicationForm';
@@ -216,6 +218,7 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
   const userApplication = applications.find(app => app.createdBy === user?.id);
   const isReviewer = permissions.userPermissions?.review;
   const isAdmin = useIsAdmin();
+  const { refreshBounty } = useBounties();
 
   async function refreshSubmissions () {
     if (bounty) {
@@ -228,15 +231,32 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
     refreshSubmissions();
   }, [bounty]);
 
+  async function lockBountySubmissions () {
+    const updatedBounty = await charmClient.lockBountySubmissions(bounty!.id, !bounty.submissionsLocked);
+    refreshBounty(updatedBounty.id);
+  }
+
   return (
     <Box>
       <Box width='100%' display='flex' mb={1} justifyContent='space-between'>
-        <Chip
-          sx={{
-            my: 1
-          }}
-          label={`Submissions: ${bounty?.maxSubmissions ? `${validSubmissions} / ${bounty.maxSubmissions}` : validSubmissions}`}
-        />
+        <Box display='flex' gap={1} alignItems='center'>
+          <Chip
+            sx={{
+              my: 1
+            }}
+            label={`Submissions: ${bounty?.maxSubmissions ? `${validSubmissions} / ${bounty.maxSubmissions}` : validSubmissions}`}
+          />
+          <Tooltip key='stop-new' arrow placement='top' title={`${bounty.submissionsLocked ? 'Enable' : 'Prevent'} new ${bounty.approveSubmitters ? 'applications' : 'submissions'} from being made.`}>
+            <IconButton
+              size='small'
+              onClick={() => {
+                lockBountySubmissions();
+              }}
+            >
+              { !bounty.submissionsLocked ? <LockOpen color='secondary' fontSize='small' /> : <LockIcon color='secondary' fontSize='small' />}
+            </IconButton>
+          </Tooltip>
+        </Box>
         {isAdmin && <MultiPaymentModal bounties={[bounty]} />}
       </Box>
 

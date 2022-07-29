@@ -99,7 +99,7 @@ export default function BountySubmissionForm (
           gap: 1
         }}
         >
-          Payment Details:
+          Payment address:
           <Link
             sx={{
               display: 'flex',

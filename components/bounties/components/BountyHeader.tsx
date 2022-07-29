@@ -1,6 +1,5 @@
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
-import LockIcon from '@mui/icons-material/Lock';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
@@ -16,7 +15,6 @@ import { AssignedBountyPermissions } from 'lib/bounties';
 import { isBountyLockable, requesterCanDeleteBounty } from 'lib/bounties/shared';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { BountyWithDetails } from 'models';
-import { LockOpen } from '@mui/icons-material';
 import BountyStatusBadge from './BountyStatusBadge';
 
 interface Props {
@@ -42,11 +40,6 @@ export default function BountyHeader ({ bounty, permissions }: Props) {
     closeBountyModal.close();
   }
 
-  async function lockBountySubmissions () {
-    const updatedBounty = await charmClient.lockBountySubmissions(bounty!.id, !bounty.submissionsLocked);
-    refreshBounty(updatedBounty.id);
-  }
-
   if (!bounty) {
     return null;
   }
@@ -69,7 +62,7 @@ export default function BountyHeader ({ bounty, permissions }: Props) {
         alignItems: 'center'
       }}
       >
-        <Typography fontWeight={500}>Bounty Properties</Typography>
+        <Typography fontWeight={500}>Bounty properties</Typography>
         {/* Provide the bounty menu options */}
         <Box display='flex' gap={2} alignItems='center'>
 
@@ -79,16 +72,6 @@ export default function BountyHeader ({ bounty, permissions }: Props) {
                 {
                   permissions?.userPermissions?.lock && isBountyLockable(bounty) && (
                     [
-                      <Tooltip key='stop-new' arrow placement='top' title={`${bounty.submissionsLocked ? 'Enable' : 'Prevent'} new ${bounty.approveSubmitters ? 'applications' : 'submissions'} from being made.`}>
-                        <IconButton
-                          size='small'
-                          onClick={() => {
-                            lockBountySubmissions();
-                          }}
-                        >
-                          { bounty.submissionsLocked ? <LockOpen color='secondary' fontSize='small' /> : <LockIcon color='secondary' fontSize='small' />}
-                        </IconButton>
-                      </Tooltip>,
                       <Tooltip key='mark-complete' arrow placement='top' title='Mark this bounty complete and auto-reject all non-reviewed submissions'>
                         <IconButton
                           size='small'
