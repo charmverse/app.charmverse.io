@@ -5,7 +5,7 @@ import { PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
 import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge';
 import BountySuggestionApproval from 'components/bounties/components/BountySuggestionApproval';
-import BountyHeader from 'components/bounties/[bountyId]/components_v3/BountyHeader';
+import BountyHeader from 'components/bounties/components/BountyHeader';
 import BountyReviewers from 'components/bounties/[bountyId]/components_v3/BountyReviewers';
 import BountySubmissionsTable from 'components/bounties/components/BountySubmissionsTable';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';

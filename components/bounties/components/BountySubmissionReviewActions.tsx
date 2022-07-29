@@ -91,6 +91,7 @@ export default function BountySubmissionReviewActions (
           <>
             <Button
               color='primary'
+              size='small'
               onClick={() => {
                 if (submission.status === 'applied') {
                   approveApplication(submission.id);
@@ -99,7 +100,7 @@ export default function BountySubmissionReviewActions (
                   setReviewDecision({ decision: 'approve', submissionId: submission.id, userId: user?.id as string });
                 }
               }}
-            >{submission.status === 'applied' ? 'Assign' : submission.status === 'review' ? 'Approve' : ''}
+            >{submission.status === 'applied' ? 'Approve application' : submission.status === 'review' ? 'Approve' : ''}
             </Button>
             {!disableRejectButton && <Button color='error' onClick={() => setReviewDecision({ submissionId: submission.id, decision: 'reject', userId: user?.id as string })}>Reject</Button>}
           </>
@@ -112,29 +113,17 @@ export default function BountySubmissionReviewActions (
       }
       {
         submission.status === 'review' && submission.createdBy === user?.id && (
-          <Typography sx={{
-            opacity: 0.5
-          }}
-          >Waiting review
-          </Typography>
+          <Typography variant='body2' color='secondary'>Waiting review</Typography>
         )
       }
       {
         submission.status === 'applied' && submission.createdBy === user?.id && (
-          <Typography sx={{
-            opacity: 0.5
-          }}
-          >Waiting assignment
-          </Typography>
+          <Typography variant='body2' color='secondary'>Waiting assignment</Typography>
         )
       }
       {
         submission.status === 'complete' && submission.createdBy === user?.id && (
-          <Typography sx={{
-            opacity: 0.5
-          }}
-          >Waiting payment
-          </Typography>
+          <Typography variant='body2' color='secondary'>Waiting payment</Typography>
         )
       }
       {isAdmin && submission.status === 'complete' && submission.walletAddress && <BountyPaymentButton onSuccess={recordTransaction} receiver={submission.walletAddress} amount={eToNumber(bounty.rewardAmount)} tokenSymbolOrAddress={bounty.rewardToken} chainIdToUse={bounty.chainId} />}
@@ -189,7 +178,7 @@ export default function BountySubmissionReviewActions (
           {
             reviewDecision?.decision === 'approve' && (
               <Button
-                color='success'
+                color='primary'
                 sx={{ mr: 2, fontWeight: 'bold' }}
                 onClick={() => makeSubmissionDecision(reviewDecision.submissionId, 'approve')}
               >
@@ -210,7 +199,7 @@ export default function BountySubmissionReviewActions (
             )
           }
 
-          <Button color='secondary' onClick={cancel}>Cancel</Button>
+          <Button variant='outlined' color='secondary' onClick={cancel}>Cancel</Button>
         </Box>
       </Modal>
     </>
