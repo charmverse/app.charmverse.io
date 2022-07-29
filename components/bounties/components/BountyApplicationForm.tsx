@@ -4,7 +4,7 @@ import { useBounties } from 'hooks/useBounties';
 import { useUser } from 'hooks/useUser';
 import { countValidSubmissions } from 'lib/applications/shared';
 import { AssignedBountyPermissions } from 'lib/bounties';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import Modal from 'components/common/Modal';
 import PrimaryButton from 'components/common/PrimaryButton';
@@ -14,6 +14,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { useContributors } from 'hooks/useContributors';
+import charmClient from 'charmClient';
 import { ApplicationEditorForm } from '../[bountyId]/components/ApplicationEditorForm';
 import SubmissionEditorForm from '../[bountyId]/components_v3/SubmissionEditorForm';
 
@@ -35,6 +36,9 @@ export default function BountyApplicationForm (props: BountyApplicationFormProps
   const [user, setUser] = useUser();
   const { openWalletSelectorModal } = useContext(Web3Connection);
   const [isApplyingBounty, setIsApplyingBounty] = useState(false);
+  const [loggingIn, setLoggingIn] = useState(false);
+
+  const isSpaceMember = user && contributors.some(c => c.id === user.id);
 
   const userSubmission = submissions.find(sub => sub.createdBy === user?.id);
   // Only applies if there is a submissions cap
@@ -47,6 +51,23 @@ export default function BountyApplicationForm (props: BountyApplicationFormProps
   const newSubmissionTooltip = bounty.submissionsLocked ? 'Submissions locked' : !permissions?.userPermissions.work ? 'You do not have the correct role to submit work to this bounty' : (capReached ? 'The submissions cap has been reached. This bounty is closed to new submissions.' : '');
 
   const showSignup = true;
+
+  function loginUser () {
+    if (!loggingIn) {
+      setLoggingIn(true);
+      charmClient.login(account as string)
+        .then(loggedInProfile => {
+          setUser(loggedInProfile);
+          setLoggingIn(false);
+        });
+    }
+  }
+
+  useEffect(() => {
+    if (account && !user) {
+      loginUser();
+    }
+  }, [account]);
 
   if (!userSubmission) {
     if (showSignup) {
@@ -71,12 +92,7 @@ export default function BountyApplicationForm (props: BountyApplicationFormProps
             account && space && (
               <TokenGateForm
                 onSuccess={() => {
-                  loginViaTokenGateModal.close();
-                  // Wait for 2 seconds before redirecting
-                  setTimeout(() => {
-                    redirectToSpace();
-                  }, 2000);
-
+                  window.location.reload();
                 }}
                 spaceDomain={space.domain}
               />
