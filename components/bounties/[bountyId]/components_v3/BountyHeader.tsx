@@ -77,7 +77,7 @@ export default function BountyHeader ({ bounty, permissions }: Props) {
                 <>
                   {
                     permissions?.userPermissions?.lock && isBountyLockable(bounty) && (
-                      [
+                      <>
                         <Tooltip key='stop-new' arrow placement='top' title='Prevent new applications from being made.'>
                           <IconButton
                             onClick={() => {
@@ -96,7 +96,7 @@ export default function BountyHeader ({ bounty, permissions }: Props) {
                             <CheckCircleIcon color='secondary' fontSize='small' />
                           </IconButton>
                         </Tooltip>
-                      ]
+                      </>
                     )
                   }
 

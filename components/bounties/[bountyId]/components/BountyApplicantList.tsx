@@ -21,7 +21,7 @@ import { applicantIsSubmitter, moveUserApplicationToFirstRow } from 'lib/applica
 import { AssignedBountyPermissions, humaniseBountyAccessConditions } from 'lib/bounties/client';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { ApplicationEditorForm } from './ApplicationEditorForm';
+import { ApplicationEditorForm } from '../../components/BountyApplicantForm/components/ApplicationEditorForm';
 import BountyApplyButton from './BountyApplyButton';
 
 export interface IBountyApplicantListProps {

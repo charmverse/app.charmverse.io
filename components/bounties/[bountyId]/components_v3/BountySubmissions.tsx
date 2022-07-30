@@ -32,7 +32,7 @@ import { BrandColor } from 'theme/colors';
 import BountySubmissionContent from '../../components/BountySubmissionContent';
 import BountySubmissionReviewActions from '../../components/BountySubmissionReviewActions';
 import BountyReviewers from './BountyReviewers';
-import SubmissionEditorForm from './SubmissionEditorForm';
+import SubmissionEditorForm from '../../components/BountyApplicantForm/components/SubmissionEditorForm';
 
 interface Props {
   bounty: BountyWithDetails

@@ -30,9 +30,9 @@ import { useEffect, useState } from 'react';
 import { BrandColor } from 'theme/colors';
 import LockIcon from '@mui/icons-material/Lock';
 import { LockOpen } from '@mui/icons-material';
-import { ApplicationEditorForm } from '../[bountyId]/components/ApplicationEditorForm';
-import SubmissionEditorForm from '../[bountyId]/components_v3/SubmissionEditorForm';
-import BountyApplicationForm from './BountyApplicationForm';
+import { ApplicationEditorForm } from './BountyApplicantForm/components/ApplicationEditorForm';
+import SubmissionEditorForm from './BountyApplicantForm/components/SubmissionEditorForm';
+import BountyApplicantForm from './BountyApplicantForm/BountyApplicantForm';
 import BountySubmissionReviewActions from './BountySubmissionReviewActions';
 import MultiPaymentModal from './MultiPaymentModal';
 
@@ -237,28 +237,30 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
   }
 
   return (
-    <Box>
-      <Box width='100%' display='flex' mb={1} justifyContent='space-between'>
-        <Box display='flex' gap={1} alignItems='center'>
-          <Chip
-            sx={{
-              my: 1
-            }}
-            label={`Submissions: ${bounty?.maxSubmissions ? `${validSubmissions} / ${bounty.maxSubmissions}` : validSubmissions}`}
-          />
-          <Tooltip key='stop-new' arrow placement='top' title={`${bounty.submissionsLocked ? 'Enable' : 'Prevent'} new ${bounty.approveSubmitters ? 'applications' : 'submissions'} from being made.`}>
-            <IconButton
-              size='small'
-              onClick={() => {
-                lockBountySubmissions();
+    <>
+      {permissions.userPermissions.review && (
+        <Box width='100%' display='flex' mb={1} justifyContent='space-between'>
+          <Box display='flex' gap={1} alignItems='center'>
+            <Chip
+              sx={{
+                my: 1
               }}
-            >
-              { !bounty.submissionsLocked ? <LockOpen color='secondary' fontSize='small' /> : <LockIcon color='secondary' fontSize='small' />}
-            </IconButton>
-          </Tooltip>
+              label={`Submissions: ${bounty?.maxSubmissions ? `${validSubmissions} / ${bounty.maxSubmissions}` : validSubmissions}`}
+            />
+            <Tooltip key='stop-new' arrow placement='top' title={`${bounty.submissionsLocked ? 'Enable' : 'Prevent'} new ${bounty.approveSubmitters ? 'applications' : 'submissions'} from being made.`}>
+              <IconButton
+                size='small'
+                onClick={() => {
+                  lockBountySubmissions();
+                }}
+              >
+                { !bounty.submissionsLocked ? <LockOpen color='secondary' fontSize='small' /> : <LockIcon color='secondary' fontSize='small' />}
+              </IconButton>
+            </Tooltip>
+          </Box>
+          {isAdmin && <MultiPaymentModal bounties={[bounty]} />}
         </Box>
-        {isAdmin && <MultiPaymentModal bounties={[bounty]} />}
-      </Box>
+      )}
 
       {(userApplication || permissions.userPermissions.review) && (
         <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
@@ -321,12 +323,14 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
           </Typography>
         </Box>
       )}
-      <BountyApplicationForm
-        bounty={bounty}
-        submissions={applications}
-        permissions={permissions}
-        refreshSubmissions={refreshSubmissions}
-      />
-    </Box>
+      {!userApplication && (
+        <BountyApplicantForm
+          bounty={bounty}
+          submissions={applications}
+          permissions={permissions}
+          refreshSubmissions={refreshSubmissions}
+        />
+      )}
+    </>
   );
 }
