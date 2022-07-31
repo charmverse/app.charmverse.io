@@ -1,14 +1,15 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import React from 'react'
-import {useIntl} from 'react-intl'
-import {useHotkeys} from 'react-hotkeys-hook'
+import { useHotkeys } from 'react-hotkeys-hook'
+import { useIntl } from 'react-intl'
 
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
+import Modal from '@mui/material/Modal'
+import PopperPopup from 'components/common/PopperPopup'
 import IconButton from '../widgets/buttons/iconButton'
 import CloseIcon from '../widgets/icons/close'
-import OptionsIcon from '../widgets/icons/options'
-import MenuWrapper from '../widgets/menuWrapper'
-import Modal from '@mui/material/Modal';
+import MuiIconButton from "@mui/material/IconButton"
 
 type Props = {
     children: React.ReactNode
@@ -57,14 +58,11 @@ const Dialog = React.memo((props: Props) => {
                             />
                         }
                         {toolbar && <div className='cardToolbar'>{toolbar}</div>}
-                        {toolsMenu && <MenuWrapper>
-                            <IconButton
-                                className='IconButton--large'
-                                icon={<OptionsIcon/>}
-                            />
-                            {toolsMenu}
-                        </MenuWrapper>
-                        }
+                        {toolsMenu && <PopperPopup closeOnClick popupContent={toolsMenu}>
+                          <MuiIconButton size="small">
+                            <MoreHorizIcon fontSize="small" />
+                          </MuiIconButton>
+                        </PopperPopup>}
                     </div>
                     {props.children}
                 </div>
