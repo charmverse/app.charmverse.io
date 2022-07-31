@@ -7,7 +7,6 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import charmClient from 'charmClient';
-import BountyDelete from 'components/bounties/components/BountyDelete';
 import Modal from 'components/common/Modal';
 import { useBounties } from 'hooks/useBounties';
 import useIsAdmin from 'hooks/useIsAdmin';
@@ -118,14 +117,6 @@ export default function BountyHeader ({ bounty, permissions }: Props) {
             }
         </Box>
       </Box>
-
-      <Modal open={bountyDeleteModal.isOpen} onClose={bountyDeleteModal.close}>
-        <BountyDelete
-          bounty={bounty}
-          onCancel={bountyDeleteModal.close}
-          onDelete={bountyDeleteModal.close}
-        />
-      </Modal>
 
       <Modal title='Confirm' open={closeSubmissionsModal.isOpen} onClose={closeSubmissionsModal.close} size='large'>
         <Box>

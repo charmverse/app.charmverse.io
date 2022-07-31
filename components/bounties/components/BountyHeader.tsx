@@ -1,12 +1,10 @@
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import DeleteIcon from '@mui/icons-material/Delete';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import charmClient from 'charmClient';
-import BountyDelete from 'components/bounties/components/BountyDelete';
 import Modal from 'components/common/Modal';
 import { useBounties } from 'hooks/useBounties';
 import useIsAdmin from 'hooks/useIsAdmin';
@@ -28,8 +26,6 @@ export default function BountyHeader ({ bounty, permissions }: Props) {
   const [user] = useUser();
 
   const isAdmin = useIsAdmin();
-
-  const bountyDeleteModal = usePopupState({ variant: 'popover', popupId: 'delete-bounty' });
 
   const closeBountyModal = usePopupState({ variant: 'popover', popupId: 'close-bounty' });
 
@@ -85,21 +81,6 @@ export default function BountyHeader ({ bounty, permissions }: Props) {
                     ]
                   )
                 }
-
-                {
-                  canDeleteBounty && (
-                    <Tooltip arrow placement='top' title={`Delete bounty ${bounty.status === 'suggestion' ? 'suggestion' : ''}`}>
-                      <IconButton
-                        size='small'
-                        onClick={() => {
-                          bountyDeleteModal.open();
-                        }}
-                      >
-                        <DeleteIcon color='secondary' />
-                      </IconButton>
-                    </Tooltip>
-                  )
-                }
               </Box>
             )
           }
@@ -110,13 +91,6 @@ export default function BountyHeader ({ bounty, permissions }: Props) {
         </Box>
       </Box>
 
-      <Modal open={bountyDeleteModal.isOpen} onClose={bountyDeleteModal.close}>
-        <BountyDelete
-          bounty={bounty}
-          onCancel={bountyDeleteModal.close}
-          onDelete={bountyDeleteModal.close}
-        />
-      </Modal>
       <Modal title='Confirm' size='large' open={closeBountyModal.isOpen} onClose={closeBountyModal.close}>
         <Box>
 
