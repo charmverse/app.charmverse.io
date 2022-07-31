@@ -35,7 +35,6 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
   it('should allow a user with the edit permission to update the bounty and respond with 200', async () => {
 
     const createdBounty = await createBounty({
-      title: 'Example',
       createdBy: nonAdminUser.id,
       spaceId: nonAdminUserSpace.id,
       status: 'open',
@@ -75,7 +74,6 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
   it('should ignore irrelevant bounty fields and succeed with the update and respond with 200', async () => {
 
     const createdBounty = await createBounty({
-      title: 'Example',
       createdBy: adminUser.id,
       spaceId: adminUserSpace.id,
       status: 'open',
@@ -116,7 +114,6 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
     const randomSpaceUserCookie = await loginUser(randomSpaceUser);
 
     const createdBounty = await createBounty({
-      title: 'Example',
       createdBy: adminUser.id,
       spaceId: nonAdminUserSpace.id,
       status: 'suggestion'
@@ -146,7 +143,6 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
     const bountyCreatorCookie = await loginUser(bountyCreator);
 
     const createdBounty = await createBounty({
-      title: 'Example',
       createdBy: bountyCreator.id,
       spaceId: nonAdminUserSpace.id,
       status: 'suggestion'
@@ -162,8 +158,6 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
     });
 
     const updateContent: Partial<Bounty> = {
-      title: 'New title to set',
-      descriptionNodes: '{}',
       rewardAmount: 10,
       rewardToken: 'BNB'
     };
@@ -174,8 +168,6 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
       .send(updateContent)
       .expect(200)).body as BountyWithDetails;
 
-    expect(updated.title).toBe(updateContent.title);
-    expect(updated.descriptionNodes).toBe(updateContent.descriptionNodes);
     // Reward amount was dropped
     expect(updated.rewardAmount).toBe(createdBounty.rewardAmount);
   });
@@ -190,7 +182,6 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
     const bountyCreatorCookie = await loginUser(bountyCreator);
 
     const createdBounty = await createBounty({
-      title: 'Example',
       createdBy: bountyCreator.id,
       spaceId: nonAdminUserSpace.id,
       status: 'open',
@@ -207,8 +198,6 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
     });
 
     const updateContent: Partial<Bounty> = {
-      title: 'New title to set',
-      descriptionNodes: '{}',
       rewardAmount: 10,
       rewardToken: 'BNB'
     };
@@ -219,152 +208,4 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
       .send(updateContent)
       .expect(200);
   });
-});
-
-describe('DELETE /api/bounties/{bountyId} - delete a bounty', () => {
-
-  it('should allow admins to delete a bounty and respond with 200', async () => {
-
-    const createdBounty = await createBounty({
-      title: 'Example',
-      createdBy: adminUser.id,
-      spaceId: adminUserSpace.id,
-      status: 'open',
-      rewardAmount: 5,
-      chainId: 1,
-      rewardToken: 'ETH'
-    });
-
-    request(baseUrl)
-      .delete(`/api/bounties/${createdBounty.id}`)
-      .set('Cookie', adminCookie)
-      .send({})
-      .expect(200);
-
-  });
-
-  it('should allow the bounty creator to delete a bounty suggestion they created and respond with 200', async () => {
-
-    const createdBounty = await createBounty({
-      title: 'Example',
-      createdBy: nonAdminUser.id,
-      spaceId: nonAdminUserSpace.id,
-      status: 'suggestion',
-      rewardAmount: 5,
-      chainId: 1,
-      rewardToken: 'ETH'
-    });
-
-    await addBountyPermissionGroup({
-      assignee: {
-        group: 'user',
-        id: nonAdminUser.id
-      },
-      level: 'creator',
-      resourceId: createdBounty.id
-    });
-
-    request(baseUrl)
-      .delete(`/api/bounties/${createdBounty.id}`)
-      .set('Cookie', nonAdminCookie)
-      .send({})
-      .expect(200);
-
-  });
-
-  it('should allow the bounty creator to delete a bounty they created if it is open but has no submissions yet and respond with 200', async () => {
-
-    const createdBounty = await createBounty({
-      title: 'Example',
-      createdBy: nonAdminUser.id,
-      spaceId: nonAdminUserSpace.id,
-      status: 'open',
-      rewardAmount: 5,
-      chainId: 1,
-      rewardToken: 'ETH'
-    });
-
-    await addBountyPermissionGroup({
-      assignee: {
-        group: 'user',
-        id: nonAdminUser.id
-      },
-      level: 'creator',
-      resourceId: createdBounty.id
-    });
-
-    request(baseUrl)
-      .delete(`/api/bounties/${createdBounty.id}`)
-      .set('Cookie', nonAdminCookie)
-      .send({})
-      .expect(200);
-
-  });
-
-  it('should not allow the bounty creator to delete a bounty they created if it has at least 1 in progress or higher submission and respond with 401', async () => {
-
-    const createdBounty = await generateBountyWithSingleApplication({
-      spaceId: nonAdminUserSpace.id,
-      bountyCap: 19,
-      bountyStatus: 'open',
-      applicationStatus: 'inProgress',
-      userId: nonAdminUser.id
-    });
-
-    await addBountyPermissionGroup({
-      assignee: {
-        group: 'user',
-        id: nonAdminUser.id
-      },
-      level: 'creator',
-      resourceId: createdBounty.id
-    });
-
-    request(baseUrl)
-      .delete(`/api/bounties/${createdBounty.id}`)
-      .set('Cookie', nonAdminCookie)
-      .send({})
-      .expect(401);
-
-  });
-
-  it('should reject an update attempt from a non admin user who did not create the bounty and respond with 401', async () => {
-
-    const randomSpaceUser = await generateSpaceUser({
-      isAdmin: false,
-      spaceId: nonAdminUserSpace.id
-    });
-
-    const randomSpaceUserCookie = await loginUser(randomSpaceUser);
-
-    const createdBounty = await createBounty({
-      title: 'Example',
-      createdBy: adminUser.id,
-      spaceId: nonAdminUserSpace.id,
-      status: 'suggestion'
-    });
-
-    const updateContent: Partial<Bounty> = {
-      rewardAmount: 10,
-      rewardToken: 'BNB'
-    };
-
-    await request(baseUrl)
-      .delete(`/api/bounties/${createdBounty.id}`)
-      .set('Cookie', randomSpaceUserCookie)
-      .send({})
-      .expect(401);
-
-  });
-
-  it('should fail if the bounty does not exist and respond with 404', async () => {
-
-    request(baseUrl)
-      .delete(`/api/bounties/${v4()}`)
-      .set('Cookie', adminCookie)
-      .send({})
-      .expect(404);
-
-  });
-
 });
