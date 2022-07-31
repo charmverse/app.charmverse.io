@@ -5,8 +5,8 @@ import { useUser } from 'hooks/useUser';
 import { countValidSubmissions } from 'lib/applications/shared';
 import { AssignedBountyPermissions } from 'lib/bounties';
 import { useState } from 'react';
-import { ApplicationEditorForm } from '../[bountyId]/components/ApplicationEditorForm';
-import SubmissionEditorForm from '../[bountyId]/components_v3/SubmissionEditorForm';
+import { ApplicationEditorForm } from './ApplicationEditorForm';
+import SubmissionEditorForm from './SubmissionEditorForm';
 
 interface BountyApplicationFormProps {
   permissions: AssignedBountyPermissions

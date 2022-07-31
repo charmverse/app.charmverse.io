@@ -6,7 +6,7 @@ import charmClient from 'charmClient';
 import BountyHeader from 'components/bounties/components/BountyHeader';
 import BountySubmissionsTable from 'components/bounties/components/BountySubmissionsTable';
 import BountySuggestionApproval from 'components/bounties/components/BountySuggestionApproval';
-import BountyReviewers from 'components/bounties/[bountyId]/components_v3/BountyReviewers';
+import BountyReviewers from 'components/bounties/components/BountyReviewers';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
 import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';

@@ -15,7 +15,7 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { FormMode } from '../../components/BountyEditorForm';
+import { FormMode } from './BountyEditorForm';
 
 interface IApplicationFormProps {
   onSubmit?: (application: Application) => any,
