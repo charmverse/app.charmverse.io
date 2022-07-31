@@ -371,10 +371,10 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
       }}
     >
       {permissions && (user?.id === bounty.createdBy || isAdmin) && (
-      <BountyHeader
-        bounty={bounty}
-        permissions={permissions}
-      />
+        <BountyHeader
+          bounty={bounty}
+          permissions={permissions}
+        />
       )}
       <Stack flexDirection='row' justifyContent='space-between' gap={2} alignItems='center'>
         {
@@ -431,17 +431,17 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
       />
       {children}
       {permissions && bounty.status !== 'suggestion' && (
-      <>
-        <BountySubmissionsTable
-          bounty={currentBounty}
-          permissions={permissions}
-        />
-        <Divider
-          sx={{
-            my: 1
-          }}
-        />
-      </>
+        <>
+          <BountySubmissionsTable
+            bounty={currentBounty}
+            permissions={permissions}
+          />
+          <Divider
+            sx={{
+              my: 1
+            }}
+          />
+        </>
       )}
 
       {permissions?.userPermissions?.review && bounty.status === 'suggestion' && bounty.createdBy !== user?.id && (
