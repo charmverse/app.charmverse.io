@@ -1,20 +1,20 @@
 import styled from '@emotion/styled';
-import { ListItemButton } from '@mui/material';
-import Box from '@mui/material/Box';
+import DeleteOutlineIcon from '@mui/icons-material/Delete';
 import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
 import ImageIcon from '@mui/icons-material/Image';
+import { ListItemButton } from '@mui/material';
+import Box from '@mui/material/Box';
 import { BlockIcons } from 'components/common/BoardEditor/focalboard/src/blockIcons';
+import { randomEmojiList } from 'components/common/BoardEditor/focalboard/src/emojiList';
 import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
-import DeleteIcon from 'components/common/BoardEditor/focalboard/src/widgets/icons/delete';
 import FBEmojiIcon from 'components/common/BoardEditor/focalboard/src/widgets/icons/emoji';
 import Menu from 'components/common/BoardEditor/focalboard/src/widgets/menu';
 import MenuWrapper from 'components/common/BoardEditor/focalboard/src/widgets/menuWrapper';
-import { randomEmojiList } from 'components/common/BoardEditor/focalboard/src/emojiList';
+import EmojiIcon from 'components/common/Emoji';
 import { randomIntFromInterval } from 'lib/utilities/random';
 import { Page } from 'models';
 import { ChangeEvent, memo } from 'react';
 import { useIntl } from 'react-intl';
-import EmojiIcon from 'components/common/Emoji';
 import { randomBannerImage } from './PageBanner';
 import PageTitleInput from './PageTitleInput';
 
@@ -109,7 +109,7 @@ function PageHeader ({ headerImage, icon, readOnly, setPage, title }: PageHeader
             </Menu.SubMenu>
             <Menu.Text
               id='remove'
-              icon={<DeleteIcon />}
+              icon={<DeleteOutlineIcon fontSize='small' />}
               name={intl.formatMessage({ id: 'ViewTitle.remove-icon', defaultMessage: 'Remove icon' })}
               onClick={() => {
                 updatePageIcon(null);
