@@ -176,12 +176,12 @@ const CardDialog = (props: Props): JSX.Element | null => {
             }} fontSize='small' />
             <ListItemText primary='Copy link' />
           </ListItemButton>
-          <ListItemButton onClick={closeBounty}>
+          {bounty && <ListItemButton disabled={bounty.status === "complete"} onClick={closeBounty}>
             <CheckCircleIcon sx={{
               mr: 1
             }} fontSize="small"/>
             <ListItemText primary="Mark complete"/>
-          </ListItemButton>
+          </ListItemButton>}
         </List>}
         toolbar={!isSharedPage && (
           <Box display="flex" justifyContent={"space-between"}>
