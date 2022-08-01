@@ -1,17 +1,21 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import DeleteIcon from '@mui/icons-material/Delete'
+import LinkIcon from '@mui/icons-material/Link'
 import OpenInFullIcon from '@mui/icons-material/OpenInFull'
+import { List, ListItemButton, ListItemText } from '@mui/material'
 import { Box } from '@mui/system'
-import { Bounty } from '@prisma/client'
 import charmClient from 'charmClient'
 import Button from "components/common/Button"
-import PopperPopup from 'components/common/PopperPopup'
 import { useBounties } from 'hooks/useBounties'
 import { useCurrentSpace } from 'hooks/useCurrentSpace'
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions'
 import { usePages } from 'hooks/usePages'
 import { useSnackbar } from 'hooks/useSnackbar'
 import { useUser } from 'hooks/useUser'
+import { AssignedBountyPermissions } from 'lib/bounties'
+import { BountyWithDetails } from 'models'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { FormattedMessage, useIntl } from 'react-intl'
@@ -23,9 +27,6 @@ import { Utils } from '../utils'
 import CardDetail from './cardDetail/cardDetail'
 import ConfirmationDialogBox, { ConfirmationDialogBoxProps } from './confirmationDialogBox'
 import Dialog from './dialog'
-import { List, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material'
-import DeleteIcon from '@mui/icons-material/Delete';
-import LinkIcon from '@mui/icons-material/Link';
 
 type Props = {
   board: Board
@@ -36,7 +37,7 @@ type Props = {
 }
 
 function CreateBountyButton(props: {
-  onClick: (createdBounty: Bounty) => void
+  onClick: (createdBounty: BountyWithDetails) => void
   pageId: string
 }) {
   const { onClick, pageId } = props;
@@ -83,18 +84,31 @@ const CardDialog = (props: Props): JSX.Element | null => {
   const intl = useIntl()
   const [showConfirmationDialogBox, setShowConfirmationDialogBox] = useState<boolean>(false)
   const { pages } = usePages()
-  const { bounties } = useBounties()
+  const { refreshBounty, bounties } = useBounties()
   const router = useRouter();
   const isSharedPage = router.route.startsWith('/share')
   const cardPage = pages[cardId]
   const [spacePermissions] = useCurrentSpacePermissions()
-  const [isBountyAttached, setIsBountyAttached] = useState<boolean | null>(false)
+  const [bounty, setBounty] = useState<BountyWithDetails | null>(null)
+  const [permissions, setPermissions] = useState<AssignedBountyPermissions | null>(null);
 
   const { showMessage } = useSnackbar()
 
   useEffect(() => {
-    setIsBountyAttached(Boolean(bounties.find(bounty => bounty.page?.id === cardId)))
+    setBounty(bounties.find(bounty => bounty.page?.id === cardId) ?? null)
   }, [bounties, cardId])
+
+  async function refreshBountyPermission(bountyId: string) {
+    setPermissions(await charmClient.computeBountyPermissions({
+      resourceId: bountyId
+    }));
+  }
+
+  useEffect(() => {
+    if (bounty) {
+      refreshBountyPermission(bounty.id)
+    }
+  }, [bounty])
 
   const handleDeleteCard = async () => {
     if (!card) {
@@ -127,6 +141,11 @@ const CardDialog = (props: Props): JSX.Element | null => {
     setShowConfirmationDialogBox(true)
   }
 
+  async function closeBounty () {
+    const updatedBounty = await charmClient.closeBounty(bounty!.id);
+    refreshBounty(updatedBounty.id);
+  }
+
   return card && pages[card.id] ? (
     <>
       <Dialog
@@ -157,6 +176,12 @@ const CardDialog = (props: Props): JSX.Element | null => {
             }} fontSize='small' />
             <ListItemText primary='Copy link' />
           </ListItemButton>
+          <ListItemButton onClick={closeBounty}>
+            <CheckCircleIcon sx={{
+              mr: 1
+            }} fontSize="small"/>
+            <ListItemText primary="Mark complete"/>
+          </ListItemButton>
         </List>}
         toolbar={!isSharedPage && (
           <Box display="flex" justifyContent={"space-between"}>
@@ -168,8 +193,8 @@ const CardDialog = (props: Props): JSX.Element | null => {
               startIcon={<OpenInFullIcon fontSize='small' />}>
               Open as Page
             </Button>
-            {spacePermissions?.createBounty && !isSharedPage && cardPage && !isBountyAttached && !readonly && <CreateBountyButton onClick={() => {
-              setIsBountyAttached(true)
+            {spacePermissions?.createBounty && !isSharedPage && cardPage && !bounty && !readonly && <CreateBountyButton onClick={(createdBounty) => {
+              setBounty(createdBounty)
             }} pageId={cardId} />}
           </Box>
         )

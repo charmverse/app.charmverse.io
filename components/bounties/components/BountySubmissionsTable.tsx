@@ -30,6 +30,7 @@ import { useEffect, useState } from 'react';
 import { BrandColor } from 'theme/colors';
 import LockIcon from '@mui/icons-material/Lock';
 import { LockOpen } from '@mui/icons-material';
+import { isBountyLockable } from 'lib/bounties/shared';
 import { ApplicationEditorForm } from './ApplicationEditorForm';
 import SubmissionEditorForm from './SubmissionEditorForm';
 import BountyApplicationForm from './BountyApplicationForm';
@@ -246,6 +247,7 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
             }}
             label={`Submissions: ${bounty?.maxSubmissions ? `${validSubmissions} / ${bounty.maxSubmissions}` : validSubmissions}`}
           />
+          { permissions?.userPermissions?.lock && isBountyLockable(bounty) && (
           <Tooltip key='stop-new' arrow placement='top' title={`${bounty.submissionsLocked ? 'Enable' : 'Prevent'} new ${bounty.approveSubmitters ? 'applications' : 'submissions'} from being made.`}>
             <IconButton
               size='small'
@@ -256,6 +258,7 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
               { !bounty.submissionsLocked ? <LockOpen color='secondary' fontSize='small' /> : <LockIcon color='secondary' fontSize='small' />}
             </IconButton>
           </Tooltip>
+          )}
         </Box>
         {isAdmin && <MultiPaymentModal bounties={[bounty]} />}
       </Box>
