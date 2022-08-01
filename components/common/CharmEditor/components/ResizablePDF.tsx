@@ -97,7 +97,7 @@ export function pdfSpec () {
         }
       },
       group: 'block',
-      draggable: true,
+      draggable: false,
       parseDOM: [{ tag: 'div.charm-pdf' }],
       toDOM: (): DOMOutputSpec => {
         return ['div.charm-pdf'];

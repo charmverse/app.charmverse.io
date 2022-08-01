@@ -409,7 +409,7 @@ function CharmEditor (
     }),
     initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
     dropCursorOpts: {
-      // color: 'transparent'
+      color: 'blue'
     }
   });
 

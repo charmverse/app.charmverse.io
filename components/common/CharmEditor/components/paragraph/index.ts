@@ -4,7 +4,7 @@ const updated = {
   ...paragraph,
   spec: () => {
     const spec = paragraph.spec();
-    spec.schema.draggable = true;
+    // spec.schema.draggable = true;
     return spec;
   }
 };
