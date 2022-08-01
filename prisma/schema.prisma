@@ -200,6 +200,8 @@ model Page {
   bounty             Bounty?          @relation(fields: [bountyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   threads            Thread[]
   votes              Vote[]
+  proposal           Proposal?
+
 }
 
 model Block {
@@ -258,6 +260,7 @@ model Vote {
   space       Space         @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   userVotes   UserVote[]
   voteOptions VoteOptions[]
+  proposal    Proposal?
 }
 
 model User {
@@ -293,6 +296,7 @@ model User {
   notificationState UserNotificationState?
   userVotes         UserVote[]
   initiatedVotes    Vote[]
+  proposals         Proposal[]
 }
 
 model UserNotificationState {
@@ -608,4 +612,24 @@ model Comment {
   space     Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   thread    Thread    @relation(fields: [threadId], references: [id], onDelete: Cascade)
   user      User      @relation(fields: [userId], references: [id])
+}
+
+enum ProposalStatus {
+  draft
+  in_progress
+  cancelled
+  complete
+}
+
+model Proposal {
+  id        String    @id @default(uuid()) @db.Uuid
+  createdAt DateTime  @default(now())
+  createdBy String    @db.Uuid
+  author    User      @relation(fields: [createdBy], references: [id])
+  spaceId   String
+  status    ProposalStatus
+  pageId    String    @db.Uuid @unique
+  page      Page      @relation(fields: [pageId], references: [id])
+  voteId    String    @db.Uuid @unique
+  vote      Vote      @relation(fields: [voteId], references: [id])
 }
