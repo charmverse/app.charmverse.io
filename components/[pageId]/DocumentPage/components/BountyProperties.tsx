@@ -4,9 +4,9 @@ import { Box, Collapse, Divider, FormLabel, IconButton, Stack, TextField } from 
 import { PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
 import BountyHeader from 'components/bounties/components/BountyHeader';
+import BountyReviewers from 'components/bounties/components/BountyReviewers';
 import BountySubmissionsTable from 'components/bounties/components/BountySubmissionsTable';
 import BountySuggestionApproval from 'components/bounties/components/BountySuggestionApproval';
-import BountyReviewers from 'components/bounties/components/BountyReviewers';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
 import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';

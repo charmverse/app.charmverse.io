@@ -24,10 +24,10 @@ interface Props {
 }
 
 export default function BountiesKanbanView ({ bounties, refreshBounty }: Omit<Props, 'publicMode'>) {
-
   const [bountyPage, setBountyPage] = useState<Page | null>(null);
   const [selectedBounty, setSelectedBounty] = useState<BountyWithDetails | null>(null);
-  const { pages } = usePages();
+  const { pages, deletePage } = usePages();
+
   const router = useRouter();
 
   const bountiesGroupedByStatus = bounties.reduce<Record<BountyStatus, BountyWithDetails[]>>((record, bounty) => {
@@ -88,15 +88,16 @@ export default function BountiesKanbanView ({ bounties, refreshBounty }: Omit<Pr
       <div className='octo-board-body'>
         {bountyStatuses.map(bountyStatus => (
           <div className='octo-board-column' key={bountyStatus}>
-            {bountiesGroupedByStatus[bountyStatus].filter(bounty => Boolean(pages[bounty.page?.id])).map(bounty => (
-              <BountyCard
-                key={bounty.id}
-                bounty={bounty}
-                page={pages[bounty.page.id] as Page}
-                onClick={() => {
-                  showBounty(bounty.id);
-                }}
-              />
+            {bountiesGroupedByStatus[bountyStatus].filter(bounty => Boolean(pages[bounty.page?.id])
+              && pages[bounty.page.id]?.deletedAt === null).map(bounty => (
+                <BountyCard
+                  key={bounty.id}
+                  bounty={bounty}
+                  page={pages[bounty.page.id] as Page}
+                  onClick={() => {
+                    showBounty(bounty.id);
+                  }}
+                />
             ))}
           </div>
         ))}
@@ -106,7 +107,13 @@ export default function BountiesKanbanView ({ bounties, refreshBounty }: Omit<Pr
       <PageDialog
         toolsMenu={(
           <List dense>
-            <ListItemButton onClick={() => {}}>
+            <ListItemButton onClick={async () => {
+              await deletePage({
+                pageId: bountyPage.id
+              });
+              closePopup();
+            }}
+            >
               <DeleteIcon
                 sx={{
                   mr: 1

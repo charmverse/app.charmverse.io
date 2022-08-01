@@ -138,7 +138,7 @@ class Mutator {
         )
     }
 
-    async deleteBlock(block: Block, description?: string, beforeRedo?: () => Promise<void>, afterUndo?: () => Promise<void>) {
+    async deleteBlock(block: Pick<Block, "type" | "id">, description?: string, beforeRedo?: () => Promise<void>, afterUndo?: () => Promise<void>) {
         const actualDescription = description || `delete ${block.type}`
 
         await undoManager.perform(
