@@ -83,32 +83,19 @@ const CardDialog = (props: Props): JSX.Element | null => {
   const card = useAppSelector(getCard(cardId))
   const intl = useIntl()
   const [showConfirmationDialogBox, setShowConfirmationDialogBox] = useState<boolean>(false)
-  const { pages } = usePages()
+  const { pages, getPagePermissions } = usePages()
   const { refreshBounty, bounties } = useBounties()
   const router = useRouter();
   const isSharedPage = router.route.startsWith('/share')
   const cardPage = pages[cardId]
   const [spacePermissions] = useCurrentSpacePermissions()
   const [bounty, setBounty] = useState<BountyWithDetails | null>(null)
-  const [permissions, setPermissions] = useState<AssignedBountyPermissions | null>(null);
-
+  const pagePermission = cardPage ? getPagePermissions(cardPage.id) : null
   const { showMessage } = useSnackbar()
 
   useEffect(() => {
     setBounty(bounties.find(bounty => bounty.page?.id === cardId) ?? null)
   }, [bounties, cardId])
-
-  async function refreshBountyPermission(bountyId: string) {
-    setPermissions(await charmClient.computeBountyPermissions({
-      resourceId: bountyId
-    }));
-  }
-
-  useEffect(() => {
-    if (bounty) {
-      refreshBountyPermission(bounty.id)
-    }
-  }, [bounty])
 
   const handleDeleteCard = async () => {
     if (!card) {
@@ -152,7 +139,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
         onClose={onClose}
         hideCloseButton
         toolsMenu={!readonly && <List dense>
-          <ListItemButton onClick={handleDeleteButtonOnClick}>
+          <ListItemButton disabled={!pagePermission?.delete} onClick={handleDeleteButtonOnClick}>
             <DeleteIcon sx={{
               mr: 1
             }} fontSize='small' />

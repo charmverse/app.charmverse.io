@@ -130,7 +130,6 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
       // Replace current bounty in list of bounties
       setBounties(_bounties => _bounties.map(b => b.id === bountyToSet.id ? bountyToSet : b));
     }
-
   }
 
   const value = useMemo(() => ({

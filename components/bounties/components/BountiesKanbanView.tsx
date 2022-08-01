@@ -26,8 +26,8 @@ interface Props {
 export default function BountiesKanbanView ({ bounties, refreshBounty }: Omit<Props, 'publicMode'>) {
   const [bountyPage, setBountyPage] = useState<Page | null>(null);
   const [selectedBounty, setSelectedBounty] = useState<BountyWithDetails | null>(null);
-  const { pages, deletePage } = usePages();
-
+  const { pages, deletePage, getPagePermissions } = usePages();
+  const pagePermission = bountyPage ? getPagePermissions(bountyPage.id) : null;
   const router = useRouter();
 
   const bountiesGroupedByStatus = bounties.reduce<Record<BountyStatus, BountyWithDetails[]>>((record, bounty) => {
@@ -107,12 +107,14 @@ export default function BountiesKanbanView ({ bounties, refreshBounty }: Omit<Pr
       <PageDialog
         toolsMenu={(
           <List dense>
-            <ListItemButton onClick={async () => {
-              await deletePage({
-                pageId: bountyPage.id
-              });
-              closePopup();
-            }}
+            <ListItemButton
+              disabled={!pagePermission?.delete}
+              onClick={async () => {
+                await deletePage({
+                  pageId: bountyPage.id
+                });
+                closePopup();
+              }}
             >
               <DeleteIcon
                 sx={{
