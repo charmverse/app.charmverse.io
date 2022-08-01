@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Collapse, FormLabel, IconButton, Stack } from '@mui/material';
+import { Box, Collapse, FormLabel, IconButton, Stack, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
@@ -15,7 +15,7 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { FormMode } from './BountyEditorForm';
+import { FormMode } from '../../BountyEditorForm';
 
 interface IApplicationFormProps {
   onSubmit?: (application: Application) => any,

@@ -24,6 +24,7 @@ import { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import debouncePromise from 'lib/utilities/debouncePromise';
 import { isTruthy } from 'lib/utilities/types';
 import { BountyWithDetails } from 'models';
+import { useRouter } from 'next/router';
 import { ReactNode, useCallback, useEffect, useState } from 'react';
 
 function rollupPermissions ({
@@ -84,6 +85,8 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
   const assignedRoleSubmitters = permissions?.bountyPermissions?.submitter?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
   const selectedReviewerUsers = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'user').map(p => p.id as string) ?? [];
   const selectedReviewerRoles = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
+  const router = useRouter();
+  const isSharedPage = router.pathname.startsWith('/share');
 
   const canEdit = user && !readOnly && ((bounty.createdBy === user.id && bounty.status !== 'suggestion') || (bounty.status === 'suggestion' && isAdmin) || isAdmin);
 
@@ -424,7 +427,7 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
         }
       </Stack>
 
-      {canEdit && bountyProperties}
+      {(canEdit || isSharedPage) && bountyProperties}
 
       <Divider
         sx={{
@@ -433,17 +436,17 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
       />
       {children}
       {permissions && bounty.status !== 'suggestion' && (
-      <>
-        <BountySubmissionsTable
-          bounty={currentBounty}
-          permissions={permissions}
-        />
-        <Divider
-          sx={{
-            my: 1
-          }}
-        />
-      </>
+        <>
+          <BountySubmissionsTable
+            bounty={currentBounty}
+            permissions={permissions}
+          />
+          <Divider
+            sx={{
+              my: 1
+            }}
+          />
+        </>
       )}
 
       {permissions?.userPermissions?.review && bounty.status === 'suggestion' && bounty.createdBy !== user?.id && (

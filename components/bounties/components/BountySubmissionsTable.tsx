@@ -1,6 +1,8 @@
 import { useTheme } from '@emotion/react';
+import { LockOpen } from '@mui/icons-material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import LockIcon from '@mui/icons-material/Lock';
 import { Collapse, IconButton, Stack, TextField, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -19,23 +21,19 @@ import FieldLabel from 'components/common/form/FieldLabel';
 import UserDisplay from 'components/common/UserDisplay';
 import { useBounties } from 'hooks/useBounties';
 import { useContributors } from 'hooks/useContributors';
-import useIsAdmin from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 import { ApplicationWithTransactions } from 'lib/applications/actions';
 import { applicantIsSubmitter, countValidSubmissions } from 'lib/applications/shared';
 import { AssignedBountyPermissions } from 'lib/bounties/interfaces';
+import { isBountyLockable } from 'lib/bounties/shared';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 import { BountyWithDetails } from 'models';
 import { useEffect, useState } from 'react';
 import { BrandColor } from 'theme/colors';
-import LockIcon from '@mui/icons-material/Lock';
-import { LockOpen } from '@mui/icons-material';
-import { isBountyLockable } from 'lib/bounties/shared';
-import { ApplicationEditorForm } from './ApplicationEditorForm';
-import SubmissionEditorForm from './SubmissionEditorForm';
-import BountyApplicationForm from './BountyApplicationForm';
+import BountyApplicantForm from './BountyApplicantForm/BountyApplicantForm';
+import { ApplicationEditorForm } from './BountyApplicantForm/components/ApplicationEditorForm';
+import SubmissionEditorForm from './BountyApplicantForm/components/SubmissionEditorForm';
 import BountySubmissionReviewActions from './BountySubmissionReviewActions';
-import MultiPaymentModal from './MultiPaymentModal';
 
 interface Props {
   bounty: BountyWithDetails
@@ -126,7 +124,7 @@ function BountySubmissionsTableRow ({
             {!isViewingDetails ? <KeyboardArrowDownIcon fontSize='small' /> : <KeyboardArrowUpIcon fontSize='small' />}
           </IconButton>
         </TableCell>
-        <TableCell align='right' sx={{ gap: 2, justifyContent: 'center', display: 'flex' }}>
+        <TableCell align='right' sx={{ gap: 2, justifyContent: 'center', minHeight: 65, display: 'flex' }}>
           {submission.status !== 'inProgress' && (
           <BountySubmissionReviewActions
             totalAcceptedApplications={totalAcceptedApplications}
@@ -218,7 +216,6 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
   const validSubmissions = countValidSubmissions(applications);
   const userApplication = applications.find(app => app.createdBy === user?.id);
   const isReviewer = permissions.userPermissions?.review;
-  const isAdmin = useIsAdmin();
   const { refreshBounty } = useBounties();
 
   async function refreshSubmissions () {
@@ -238,7 +235,8 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
   }
 
   return (
-    <Box>
+    <>
+      {permissions.userPermissions.review && (
       <Box width='100%' display='flex' mb={1} justifyContent='space-between'>
         <Box display='flex' gap={1} alignItems='center'>
           <Chip
@@ -260,9 +258,8 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
           </Tooltip>
           )}
         </Box>
-        {isAdmin && <MultiPaymentModal bounties={[bounty]} />}
       </Box>
-
+      )}
       {(userApplication || permissions.userPermissions.review) && (
         <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
           <TableHead sx={{
@@ -324,12 +321,14 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
           </Typography>
         </Box>
       )}
-      <BountyApplicationForm
-        bounty={bounty}
-        submissions={applications}
-        permissions={permissions}
-        refreshSubmissions={refreshSubmissions}
-      />
-    </Box>
+      {!userApplication && (
+        <BountyApplicantForm
+          bounty={bounty}
+          submissions={applications}
+          permissions={permissions}
+          refreshSubmissions={refreshSubmissions}
+        />
+      )}
+    </>
   );
 }
