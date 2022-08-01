@@ -17,7 +17,7 @@ import { markdownSerializer } from '@bangle.dev/markdown';
 import { EditorView, Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import { Slide } from '@mui/material';
+import { Box, Divider, Slide } from '@mui/material';
 import * as codeBlock from 'components/common/CharmEditor/components/@bangle.dev/base-components/code-block';
 import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
@@ -187,6 +187,10 @@ export function charmEditorPlugins (
     callout.plugins(),
     NodeView.createPlugin({
       name: 'image',
+      containerDOM: ['div', { draggable: 'false' }]
+    }),
+    NodeView.createPlugin({
+      name: 'horizontalRule',
       containerDOM: ['div', { draggable: 'false' }]
     }),
     NodeView.createPlugin({
@@ -500,6 +504,13 @@ function CharmEditor (
               <Callout {...props}>
                 {_children}
               </Callout>
+            );
+          }
+          case 'horizontalRule': {
+            return (
+              <Box display='flex' alignItems='center' height={30} sx={{ overflow: 'auto' }}>
+                <Divider sx={{ width: '100%' }} />
+              </Box>
             );
           }
           case 'image': {
