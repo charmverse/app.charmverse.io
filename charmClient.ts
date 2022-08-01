@@ -18,11 +18,11 @@ import type { ServerBlockFields } from 'pages/api/blocks';
 import { InviteLinkPopulated } from 'pages/api/invites/index';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 // TODO: Maybe move these types to another place so that we dont import from backend
-import { ReviewDecision, SubmissionContent, SubmissionCreationData } from 'lib/applications/interfaces';
-import { BountySubmitterPoolCalculation, BountySubmitterPoolSize, BountyUpdate, SuggestionAction, AssignedBountyPermissions, BountyCreationData } from 'lib/bounties/interfaces';
+import { ApplicationWithTransactions, ReviewDecision, SubmissionContent, SubmissionCreationData } from 'lib/applications/interfaces';
 import { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
 import { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
+import { TokenGateVerification, TokenGateEvaluationAttempt, TokenGateEvaluationResult, TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import { ConnectDiscordPayload, ConnectDiscordResponse } from 'pages/api/discord/connect';
 import { ImportDiscordRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
 import { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
@@ -30,9 +30,7 @@ import { ListSpaceRolesResponse } from 'pages/api/roles';
 import { GetTasksResponse } from 'pages/api/tasks/list';
 import { GetTasksStateResponse, UpdateTasksState } from 'pages/api/tasks/state';
 import { TelegramAccount } from 'pages/api/telegram/connect';
-import { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
-import { TokenGateWithRoles } from 'pages/api/token-gates';
-import { ApplicationWithTransactions } from 'lib/applications/actions';
+import { AssignedBountyPermissions, BountyCreationData, BountySubmitterPoolCalculation, BountySubmitterPoolSize, BountyUpdate, SuggestionAction } from 'lib/bounties/interfaces';
 import { DeepDaoAggregateData } from 'lib/deepdao/client';
 import { PublicPageResponse } from 'lib/pages/interfaces';
 import { PublicBountyToggle } from 'lib/spaces/interfaces';
@@ -40,6 +38,7 @@ import type { MarkTask } from 'lib/tasks/markTasks';
 import { TransactionCreationData } from 'lib/transactions/interface';
 import { ExtendedVote, UserVoteExtendedDTO, VoteDTO } from 'lib/votes/interfaces';
 import { PublicUser } from 'pages/api/public/profile/[userPath]';
+import { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
 import { AssignedPermissionsQuery, Resource } from './lib/permissions/interfaces';
 import { SpacePermissionConfigurationUpdate } from './lib/permissions/meta/interfaces';
 import { SpacePermissionFlags, SpacePermissionModification } from './lib/permissions/spaces';
@@ -398,9 +397,11 @@ class CharmClient {
     return http.GET('/api/bounties', { spaceId, publicOnly });
   }
 
-  async createBounty (bounty: BountyCreationData): Promise<BountyWithDetails> {
+  async createBounty (bounty: Partial<BountyCreationData>) {
 
-    return http.POST<BountyWithDetails>('/api/bounties', bounty);
+    const data = await http.POST<BountyWithDetails>('/api/bounties', bounty);
+
+    return data;
   }
 
   async getBountyApplicantPool ({ resourceId, permissions }: BountySubmitterPoolCalculation): Promise<BountySubmitterPoolSize> {
@@ -435,8 +436,8 @@ class CharmClient {
     return http.PUT<BountyWithDetails>(`/api/bounties/${bountyId}`, updateContent);
   }
 
-  async closeBountySubmissions (bountyId: string): Promise<BountyWithDetails> {
-    return http.POST<BountyWithDetails>(`/api/bounties/${bountyId}/close-submissions`);
+  async lockBountySubmissions (bountyId: string, lock?: boolean): Promise<BountyWithDetails> {
+    return http.POST<BountyWithDetails>(`/api/bounties/${bountyId}/lock?lock=${lock ?? true}`);
   }
 
   async closeBounty (bountyId: string): Promise<BountyWithDetails> {
@@ -454,15 +455,15 @@ class CharmClient {
     return data;
   }
 
-  async createApplication (application: Application): Promise<Application> {
+  async createApplication (application: Pick<Application, 'bountyId' | 'message' | 'status'>): Promise<Application> {
 
     const data = await http.POST<Application>('/api/applications', application);
 
     return data;
   }
 
-  listApplications (bountyId: string, submissionsOnly: boolean): Promise<ApplicationWithTransactions []> {
-    return http.GET('/api/applications', { bountyId, submissionsOnly });
+  listApplications (bountyId: string): Promise<ApplicationWithTransactions[]> {
+    return http.GET('/api/applications', { bountyId });
   }
 
   async createSubmission (content: Omit<SubmissionCreationData, 'userId'>): Promise<Application> {
@@ -514,7 +515,7 @@ class CharmClient {
   }
 
   getTokenGatesForSpace (query: { spaceDomain: string }) {
-    return http.GET<(TokenGate & { space: Space })[]>('/api/token-gates', query);
+    return http.GET<TokenGateWithRoles[]>('/api/token-gates', query);
   }
 
   saveTokenGate (tokenGate: Partial<TokenGate>): Promise<TokenGate> {
@@ -525,10 +526,20 @@ class CharmClient {
     return http.DELETE<TokenGate>(`/api/token-gates/${id}`);
   }
 
-  verifyTokenGate ({ id, jwt }: { id: string, jwt: string }): Promise<{ error?: string, success?: boolean }> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  verifyTokenGate (verification: Omit<TokenGateVerification, 'userId'>): Promise<{ error?: string, success?: boolean }> {
 
-    return http.POST(`/api/token-gates/${id}/verify`, { jwt });
+    return http.POST('/api/token-gates/verify', verification);
   }
+
+  evalueTokenGateEligibility (verification: Omit<TokenGateEvaluationAttempt, 'userId'>): Promise<TokenGateEvaluationResult> {
+    return http.POST('/api/token-gates/evaluate', verification);
+  }
+
+  // evaluate ({ , jwt }: { id: string, jwt: string }): Promise<{ error?: string, success?: boolean }> {
+
+  //   return http.POST(`/api/token-gates/${id}/verify`, { jwt });
+  // }
 
   unlockTokenGate ({ id, jwt }: { id: string, jwt: string }):
     Promise<{ error?: string, success?: boolean, space: Space }> {

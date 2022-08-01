@@ -1,16 +1,15 @@
-import { useState } from 'react';
 import { Page } from '@prisma/client';
 import Button from 'components/common/Button';
-import { addPage } from 'lib/pages/addPage';
-import { useUser } from 'hooks/useUser';
+import PageDialog from 'components/common/Page/PageDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import ProposalDialog from './ProposalDialog';
+import { useUser } from 'hooks/useUser';
+import { addPage } from 'lib/pages/addPage';
+import { useState } from 'react';
 
-export default function CreateProposal () {
-
+export default function NewProposalButton () {
   const [user] = useUser();
   const [currentSpace] = useCurrentSpace();
-  const [page, setPage] = useState<Page | null>();
+  const [page, setPage] = useState<Page | null>(null);
 
   async function onClickCreate () {
     if (currentSpace && user) {
@@ -28,7 +27,7 @@ export default function CreateProposal () {
       <Button onClick={onClickCreate}>
         Create Proposal
       </Button>
-      {page && <ProposalDialog page={page} onClose={() => setPage(null)} />}
+      {page && <PageDialog page={page} onClose={() => setPage(null)} />}
     </>
   );
 }

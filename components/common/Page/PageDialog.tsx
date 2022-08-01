@@ -1,16 +1,16 @@
-import { useEffect, useCallback, useRef } from 'react';
-import { useRouter } from 'next/router';
-import { Page, Prisma } from '@prisma/client';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
-import { usePopupState } from 'material-ui-popup-state/hooks';
-import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
-import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
-import DocumentPage from 'components/[pageId]/DocumentPage';
-import Button from 'components/common/Button';
-import debouncePromise from 'lib/utilities/debouncePromise';
-import { usePages } from 'hooks/usePages';
+import { Page } from '@prisma/client';
 import charmClient from 'charmClient';
+import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
+import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
+import Button from 'components/common/Button';
+import DocumentPage from 'components/[pageId]/DocumentPage';
+import { usePages } from 'hooks/usePages';
 import log from 'lib/log';
+import debouncePromise from 'lib/utilities/debouncePromise';
+import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useRouter } from 'next/router';
+import { useCallback, useEffect, useRef } from 'react';
 
 interface Props {
   page?: Page | null;
@@ -18,10 +18,10 @@ interface Props {
   readOnly?: boolean;
 }
 
-export default function ProposalDialog (props: Props) {
+export default function PageDialog (props: Props) {
 
   const mounted = useRef(false);
-  const popupState = usePopupState({ variant: 'popover', popupId: 'proposal-dialog' });
+  const popupState = usePopupState({ variant: 'popover', popupId: 'page-dialog' });
   const router = useRouter();
   const { setCurrentPageId, setPages } = usePages();
 

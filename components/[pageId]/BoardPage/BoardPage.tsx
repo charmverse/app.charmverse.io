@@ -151,7 +151,7 @@ export default function BoardPage ({ page, setPage, readonly }: Props) {
               cardId={shownCardId}
               onClose={() => showCard(undefined)}
               showCard={(cardId) => showCard(cardId)}
-              readonly={!!readonly}
+              readonly={Boolean(readonly)}
             />
           </RootPortal>
         )}

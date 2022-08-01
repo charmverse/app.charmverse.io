@@ -9,7 +9,6 @@ import {
   link,
   listItem,
   orderedList,
-  paragraph,
   strike,
   underline
 } from '@bangle.dev/base-components';
@@ -41,7 +40,7 @@ import LayoutRow from './components/columnLayout/Row';
 import { CryptoPrice, cryptoPriceSpec } from './components/CryptoPrice';
 import * as disclosure from './components/disclosure';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
-import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
+import * as floatingMenu from './components/floatingMenu';
 import * as iframe from './components/iframe';
 import InlineCommentThread, * as inlineComment from './components/inlineComment';
 import InlinePalette, { plugins as inlinePalettePlugins, spec as inlinePaletteSpecs } from './components/inlinePalette';
@@ -57,6 +56,7 @@ import RowActionsMenu, * as rowActions from './components/rowActions';
 import * as tabIndent from './components/tabIndent';
 import * as table from './components/table';
 import * as trailingNode from './components/trailingNode';
+import paragraph from './components/paragraph';
 import DevTools from './DevTools';
 import { checkForEmpty } from './utils';
 
@@ -179,7 +179,7 @@ export function charmEditorPlugins (
     emoji.plugins({
       key: emojiPluginKey
     }),
-    floatingMenuPlugin({
+    floatingMenu.plugins({
       key: floatingMenuPluginKey,
       readOnly,
       enableComments
@@ -187,11 +187,11 @@ export function charmEditorPlugins (
     callout.plugins(),
     NodeView.createPlugin({
       name: 'image',
-      containerDOM: ['div', { draggable: 'false' }]
+      containerDOM: ['div', { draggable: 'true' }]
     }),
     NodeView.createPlugin({
       name: 'pdf',
-      containerDOM: ['div', { draggable: 'false' }]
+      containerDOM: ['div', { draggable: 'true' }]
     }),
     NodeView.createPlugin({
       name: 'cryptoPrice',
@@ -199,7 +199,7 @@ export function charmEditorPlugins (
     }),
     NodeView.createPlugin({
       name: 'iframe',
-      containerDOM: ['div', { class: 'iframe-container', draggable: 'false' }]
+      containerDOM: ['div', { class: 'iframe-container', draggable: 'true' }]
     }),
     NodeView.createPlugin({
       name: 'quote',
@@ -408,9 +408,8 @@ function CharmEditor (
       userId: currentUser?.id
     }),
     initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
-    // hide the black bar when dragging items - we dont even support dragging most components
     dropCursorOpts: {
-      color: 'transparent'
+      // color: 'transparent'
     }
   });
 
@@ -548,7 +547,7 @@ function CharmEditor (
         }
       }}
     >
-      <FloatingMenu enableComments={!disablePageSpecificFeatures} enableVoting={enableVoting} pluginKey={floatingMenuPluginKey} />
+      <floatingMenu.FloatingMenu enableComments={!disablePageSpecificFeatures} enableVoting={enableVoting} pluginKey={floatingMenuPluginKey} />
       <MentionSuggest pluginKey={mentionPluginKey} />
       <NestedPagesList pluginKey={nestedPagePluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />

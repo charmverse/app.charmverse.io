@@ -1,7 +1,7 @@
 
 import { Bounty } from '@prisma/client';
 import { prisma } from 'db';
-import { createBounty, listAvailableBounties } from 'lib/bounties';
+import { BountyCreationData, createBounty, listAvailableBounties } from 'lib/bounties';
 import { IEventToLog, postToDiscord } from 'lib/log/userEvents';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { AvailableResourcesRequest } from 'lib/permissions/interfaces';
@@ -37,7 +37,7 @@ async function getBounties (req: NextApiRequest, res: NextApiResponse<Bounty[]>)
 
 async function createBountyController (req: NextApiRequest, res: NextApiResponse<BountyWithDetails>) {
 
-  const { spaceId, status } = req.body as Bounty;
+  const { spaceId, status } = req.body as BountyCreationData;
 
   const { id: userId } = req.session.user;
 

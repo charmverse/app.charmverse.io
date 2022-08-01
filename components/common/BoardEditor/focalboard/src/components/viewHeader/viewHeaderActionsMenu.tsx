@@ -12,7 +12,6 @@ import { useAppSelector } from '../../store/hooks';
 import { getMe } from '../../store/users';
 import { IUser } from '../../user';
 import IconButton from '../../widgets/buttons/iconButton';
-
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
 import { sendFlashMessage } from '../flashMessages';

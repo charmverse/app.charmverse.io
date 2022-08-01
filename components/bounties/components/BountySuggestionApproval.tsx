@@ -3,12 +3,11 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { Bounty } from '@prisma/client';
+import charmClient from 'charmClient';
 import { Modal } from 'components/common/Modal';
 import { useBounties } from 'hooks/useBounties';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import charmClient from 'charmClient';
-import BountyModal from '../components/BountyModal';
 import BountyDelete from './BountyDelete';
 
 interface Props {
@@ -68,16 +67,6 @@ export default function BountySuggestionApproval ({ bounty }: Props) {
 
       {/* Modals */}
 
-      {/* Form for setting valid reward amount amount */}
-      <BountyModal
-        onSubmit={bountyEditModal.close}
-        mode='update'
-        bounty={bounty}
-        open={bountyEditModal.isOpen}
-        onClose={bountyEditModal.close}
-        focusKey='rewardAmount'
-      />
-
       {/* Reject bounty suggestion */}
       <Modal title='Reject bounty suggestion' open={bountyDeleteModal.isOpen} onClose={bountyDeleteModal.close}>
         <BountyDelete bounty={bounty} onCancel={bountyDeleteModal.close} onDelete={bountyDeleteModal.close} />
@@ -88,8 +77,8 @@ export default function BountySuggestionApproval ({ bounty }: Props) {
 
         <Typography sx={{ whiteSpace: 'pre-wrap' }}>
           {
-                'Confirm you want to approve this bounty.\r\n\r\nIts status will be changed to \'open\' and workspace members will be able to apply.'
-                }
+            'Confirm you want to approve this bounty.\r\n\r\nIts status will be changed to \'open\' and workspace members will be able to apply.'
+          }
 
         </Typography>
 

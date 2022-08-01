@@ -28,15 +28,12 @@ describe('createBounty', () => {
   it('should be able to create a bounty suggestion with only a title, createdBy, spaceId and status, and record who suggested the bounty', async () => {
 
     const bounty = await createBounty({
-      title: 'My bounty',
       createdBy: user.id,
       spaceId: space.id
     });
 
     expect(bounty).toEqual(
       expect.objectContaining<Partial<Bounty>>({
-        title: expect.stringContaining('My bounty'),
-        description: expect.any(String),
         createdBy: expect.stringContaining(user.id),
         spaceId: expect.stringContaining(space.id),
         suggestedBy: expect.stringContaining(user.id)
@@ -50,11 +47,8 @@ describe('createBounty', () => {
     const fullBountyCreationData: BountyCreationData = {
       createdBy: user.id,
       spaceId: space.id,
-      title: 'Testing this works',
       approveSubmitters: true,
       chainId: 1,
-      description: 'Example description',
-      descriptionNodes: '{type:"doc"}',
       maxSubmissions: 100,
       rewardAmount: 1000,
       rewardToken: 'ETH',
@@ -66,12 +60,18 @@ describe('createBounty', () => {
 
     const bounty = await createBounty(fullBountyCreationData);
 
-    Object.entries(fullBountyCreationData).forEach(([key, value]) => {
-
-      if (key !== 'permissions') {
-        expect(bounty[key as Exclude<keyof BountyCreationData, 'permissions'>]).toBe(value);
-      }
-
+    expect({
+      chainId: fullBountyCreationData.chainId,
+      maxSubmissions: fullBountyCreationData.maxSubmissions,
+      rewardAmount: fullBountyCreationData.rewardAmount,
+      rewardToken: fullBountyCreationData.rewardToken,
+      status: fullBountyCreationData.status
+    }).toStrictEqual({
+      chainId: bounty.chainId,
+      maxSubmissions: bounty.maxSubmissions,
+      rewardAmount: bounty.rewardAmount,
+      rewardToken: bounty.rewardToken,
+      status: bounty.status
     });
 
     const bountyPermissions = await queryBountyPermissions({ bountyId: bounty.id });
@@ -88,12 +88,11 @@ describe('createBounty', () => {
 
   });
 
-  it('should be able to create a bounty in open status if the data provided has at least title, createdBy, spaceId, status and rewardAmount', async () => {
+  it('should be able to create a bounty with a page in open status if the data provided has at least title, createdBy, spaceId, status and rewardAmount', async () => {
 
     const { user: adminUser, space: localSpace } = await generateUserAndSpaceWithApiToken(undefined, true);
 
     const bounty = await createBounty({
-      title: 'My bounty',
       createdBy: adminUser.id,
       spaceId: localSpace.id,
       status: 'open',
@@ -102,18 +101,19 @@ describe('createBounty', () => {
 
     expect(bounty).toEqual(
       expect.objectContaining<Partial<Bounty>>({
-        title: expect.stringContaining('My bounty'),
-        description: expect.any(String),
         createdBy: expect.stringContaining(adminUser.id),
         spaceId: expect.stringContaining(localSpace.id)
       })
     );
 
+    expect(bounty.page).toMatchObject(expect.objectContaining({
+      title: ''
+    }));
+
   });
 
   it('should create a linked page with the same ID as the bounty', async () => {
     const bounty = await createBounty({
-      title: 'My bounty',
       createdBy: user.id,
       spaceId: space.id,
       status: 'open',
@@ -130,7 +130,6 @@ describe('createBounty', () => {
     try {
 
       await createBounty({
-        title: 'My bounty',
         createdBy: localUser.id,
         spaceId: localSpace.id,
         rewardAmount: 0,
@@ -153,7 +152,6 @@ describe('createBounty', () => {
     try {
 
       await createBounty({
-        title: 'My bounty',
         createdBy: localUser.id,
         spaceId: localSpace.id,
         rewardAmount: -10,
@@ -176,8 +174,7 @@ describe('createBounty / permissions setup', () => {
   it('should always create a page/full_access permissions for the creator', async () => {
     const bounty = await createBounty({
       createdBy: user.id,
-      spaceId: space.id,
-      title: 'Example bounty'
+      spaceId: space.id
     });
 
     const creatorFullAccessPermission = bounty.page.permissions.some(p => p.userId === user.id && p.permissionLevel === 'full_access');
@@ -191,7 +188,6 @@ describe('createBounty / permissions setup', () => {
     const bounty = await createBounty({
       createdBy: user.id,
       spaceId: space.id,
-      title: 'Example bounty',
       status: 'suggestion'
     });
 
@@ -205,7 +201,6 @@ describe('createBounty / permissions setup', () => {
     const bounty = await createBounty({
       createdBy: user.id,
       spaceId: space.id,
-      title: 'Example bounty',
       status: 'open',
       rewardAmount: 1,
       chainId: 1,
@@ -233,7 +228,6 @@ describe('createBounty / permissions setup', () => {
     const bounty = await createBounty({
       createdBy: user.id,
       spaceId: space.id,
-      title: 'Example bounty',
       status: 'open',
       rewardAmount: 1,
       chainId: 1,
@@ -255,7 +249,6 @@ describe('createBounty / permissions setup', () => {
     const bounty = await createBounty({
       createdBy: user.id,
       spaceId: space.id,
-      title: 'Example bounty',
       status: 'open',
       rewardAmount: 1,
       chainId: 1,
@@ -277,7 +270,6 @@ describe('createBounty / permissions setup', () => {
     const bounty = await createBounty({
       createdBy: user.id,
       spaceId: space.id,
-      title: 'Example bounty',
       status: 'open',
       rewardAmount: 1,
       chainId: 1,

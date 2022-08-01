@@ -29,8 +29,13 @@ const config = {
   async redirects () {
     return [
       {
-        source: '/:domain/settings',
+        source: '/:domain(^(?!.*\bapi\b).*$)/settings',
         destination: '/:domain/settings/workspace',
+        permanent: false
+      },
+      {
+        source: '/:domain(^(?!.*\bapi\b).*$)/bounties/:id',
+        destination: '/:domain/bounties?bountyId=:id',
         permanent: false
       }
     ];

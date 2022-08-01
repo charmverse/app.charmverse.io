@@ -16,9 +16,9 @@ import charmClient from 'charmClient';
 import { ExtendedVote } from 'lib/votes/interfaces';
 import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import Modal from 'components/common/Modal';
+import PageDialog from 'components/common/Page/PageDialog';
 import NoVotesMessage from './NoVotesMessage';
 import VoteStatusChip from './VoteStatusChip';
-import ProposalDialog from './Proposal/ProposalDialog';
 import VoteActionsMenu from './VoteActionsMenu';
 
 export interface VoteRow {
@@ -187,7 +187,7 @@ export default function VotesTable ({ votes, mutateVotes }: { votes?: (ExtendedV
           </Grid>
         </GridContainer>
       ))}
-      {activePage && <ProposalDialog page={activePage} onClose={closePage} />}
+      {activePage && <PageDialog page={activePage} onClose={closePage} />}
       <Modal title='Vote details' size='large' open={!!activeVote} onClose={() => setActiveVote(null)}>
         <VoteDetail
           detailed

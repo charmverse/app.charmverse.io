@@ -1,9 +1,9 @@
 
-import { closeNewApplicationsAndSubmissions, getBounty } from 'lib/bounties';
+import { lockApplicationAndSubmissions, getBountyOrThrow } from 'lib/bounties';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { withSessionRoute } from 'lib/session/withSession';
-import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
+import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { BountyWithDetails } from 'models';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -17,11 +17,7 @@ async function closeSubmissionsController (req: NextApiRequest, res: NextApiResp
 
   const { id: bountyId } = req.query;
 
-  const bounty = await getBounty(bountyId as string);
-
-  if (!bounty) {
-    throw new DataNotFoundError(`Bounty with id ${bountyId} not found`);
-  }
+  const bounty = await getBountyOrThrow(bountyId as string);
 
   const userId = req.session.user.id;
 
@@ -35,7 +31,7 @@ async function closeSubmissionsController (req: NextApiRequest, res: NextApiResp
     throw new UnauthorisedActionError('You cannot close submissions for this bounty.');
   }
 
-  const bountyWithClosedSubmissions = await closeNewApplicationsAndSubmissions(bountyId as string);
+  const bountyWithClosedSubmissions = await lockApplicationAndSubmissions(bountyId as string, (!req.query.lock || req.query.lock === 'true'));
 
   return res.status(200).json(bountyWithClosedSubmissions);
 }

@@ -6,6 +6,7 @@ const globalCSS = css`
     ${Object.entries(colors.lightModeColors).map(([key, value]) => `--bg-${key}: ${value};`).join('\n')}
     --input-bg: ${colors.inputBackground};
     --input-border: ${colors.inputBorder};
+    --input-border-hover: #37352f;
 
     /* copied from https://mui.com/material-ui/customization/z-index/#main-content */
     --z-index-mobileStepper: 1000;
@@ -39,6 +40,7 @@ const globalCSS = css`
     --modal-rad: 8px;
 
     --background-default: ${colors.backgroundColor};
+    --background-paper: ${colors.backgroundColor};
 
   }
 
@@ -52,8 +54,10 @@ const globalCSS = css`
     ${Object.entries(colors.darkModeColors).map(([key, value]) => `--bg-${key}: ${value};`).join('\n')}
     --input-bg: ${colors.inputBackgroundDarkMode};
     --input-border: ${colors.inputBorderDarkMode};
+    --input-border-hover: #ededed;
 
     --background-default: ${colors.backgroundColorDarkMode};
+    --background-paper: ${colors.backgroundLightColorDarkMode};
   }
 
 `;

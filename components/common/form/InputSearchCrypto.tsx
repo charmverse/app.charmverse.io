@@ -1,4 +1,4 @@
-import { Autocomplete, Box, TextField, Typography } from '@mui/material';
+import { Autocomplete, AutocompleteProps, Box, SxProps, TextField, Typography } from '@mui/material';
 import { CryptoCurrencies, CryptoCurrency } from 'connectors';
 import Modal from 'components/common/Modal';
 import { useEffect, useState } from 'react';
@@ -11,7 +11,7 @@ import TokenLogo from 'components/common/TokenLogo';
 import { getTokenInfo, getTokenAndChainInfoFromPayments } from 'lib/tokens/tokenData';
 import CustomERCTokenForm from 'components/settings/payment-methods/components/CustomERCTokenForm';
 
-export interface IInputSearchCryptoProps {
+export interface IInputSearchCryptoProps extends Omit<Partial<AutocompleteProps<string, true, true, true>>, 'onChange' | 'defaultValue' | 'value'> {
   onChange?: (value: CryptoCurrency) => void;
   onNewPaymentMethod?: (method: PaymentMethod) => void;
   defaultValue?: CryptoCurrency | string;
@@ -19,6 +19,7 @@ export interface IInputSearchCryptoProps {
   hideBackdrop?: boolean; // hide backdrop when modal is open
   cryptoList?: Array<string | CryptoCurrency>;
   chainId?: number; // allow passing this down to the 'new custom token' form
+  sx?: SxProps
 }
 
 const ADD_NEW_CUSTOM = 'ADD_NEW_CUSTOM';
@@ -30,7 +31,10 @@ export function InputSearchCrypto ({
   defaultValue = '',
   value: parentValue,
   cryptoList = CryptoCurrencies,
-  chainId
+  chainId,
+  sx = {},
+  disabled,
+  readOnly
 }: IInputSearchCryptoProps) {
 
   const [inputValue, setInputValue] = useState('');
@@ -70,7 +74,7 @@ export function InputSearchCrypto ({
   return (
     <>
       <Autocomplete
-        sx={{ minWidth: 150 }}
+        sx={{ minWidth: 150, ...sx }}
         onChange={(_, _value, reason) => {
           if (_value === ADD_NEW_CUSTOM) {
             if (reason === 'selectOption') {
@@ -125,6 +129,8 @@ export function InputSearchCrypto ({
             {...params}
           />
         )}
+        disabled={disabled}
+        readOnly={readOnly}
       />
 
       <Modal title='Add a custom ERC20 token' hideBackdrop={hideBackdrop} open={ERC20PopupState.isOpen} onClose={ERC20PopupState.close} size='500px'>

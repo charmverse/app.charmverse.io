@@ -1,31 +1,27 @@
-import { Box, Card, CardActionArea, CardHeader, Typography } from '@mui/material';
-import Link from 'components/common/Link';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { Box, CardHeader, Typography } from '@mui/material';
+import { Page } from '@prisma/client';
 import { fancyTrim } from 'lib/utilities/strings';
 import { BountyWithDetails } from 'models';
+import { memo } from 'react';
 import BountyStatusBadge from './BountyStatusBadge';
 
-/**
- * @publicMode When a bounty card is clicked in public mode, we do not want the user to be directed to the bounty (for now)
- */
-export interface IBountyInput {
-  bounty: BountyWithDetails
-  truncate?: boolean
-  publicMode?: boolean
+interface Props {
+  bounty: BountyWithDetails;
+  page: Page;
+  onClick?: () => void;
 }
 
-function BountyCardDetails ({ bounty, truncate }: Pick<IBountyInput, 'bounty' | 'truncate'>) {
+function BountyCard ({ bounty, page, onClick }: Props) {
   return (
-    <Card
+    <Box
+      onClick={onClick}
+      className='KanbanCard'
       sx={{
-        width: 290,
-        minHeight: 200,
-        height: '100%',
-        display: 'grid' // make child full height
+        height: 150,
+        display: 'grid' // make child full height,
       }}
-      variant='outlined'
     >
-      <CardActionArea
+      <Box
         sx={{
           display: 'flex',
           flexDirection: 'column',
@@ -34,28 +30,16 @@ function BountyCardDetails ({ bounty, truncate }: Pick<IBountyInput, 'bounty' | 
           justifyContent: 'space-between'
         }}
       >
-        <CardHeader title={bounty.page?.title} titleTypographyProps={{ sx: { fontSize: '1rem', fontWeight: 'bold' } }} />
-        <Box p={2} width='100%' display='flex' flex={1} flexDirection='column' justifyContent='space-between'>
+        <CardHeader title={page?.title || 'Untitled'} sx={{ p: 0 }} titleTypographyProps={{ sx: { fontSize: '1rem', fontWeight: 'bold' } }} />
+        <Box width='100%' display='flex' flex={1} flexDirection='column' justifyContent='space-between'>
           <Typography paragraph={true}>
-            {fancyTrim(bounty.page.contentText, 120)}
+            {fancyTrim(page?.contentText, 50)}
           </Typography>
-          <BountyStatusBadge truncate={truncate} bounty={bounty} />
+          <BountyStatusBadge bounty={bounty} hideStatus={true} />
         </Box>
-      </CardActionArea>
-    </Card>
+      </Box>
+    </Box>
   );
 }
 
-export function BountyCard ({ truncate = true, bounty, publicMode = false }: IBountyInput) {
-  const [space] = useCurrentSpace();
-  const bountyUrl = `/${space?.domain}/bounties/${bounty.id}`;
-
-  return (publicMode ? (
-    <BountyCardDetails truncate={truncate} bounty={bounty} />
-  ) : (
-    <Link href={bountyUrl}>
-      <BountyCardDetails truncate={truncate} bounty={bounty} />
-    </Link>
-  )
-  );
-}
+export default memo(BountyCard);

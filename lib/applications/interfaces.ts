@@ -45,3 +45,4 @@ export interface SubmissionUpdateData {
 export interface ApplicationWithTransactions extends Application {
   transactions: Transaction[]
 }
+

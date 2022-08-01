@@ -4,20 +4,21 @@ import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/c
 import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
 import { getCardComments } from 'components/common/BoardEditor/focalboard/src/store/comments';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
-import BountyIntegration from 'components/[pageId]/DocumentPage/components/BountyIntegration';
+import { useBounties } from 'hooks/useBounties';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
 import { useVotes } from 'hooks/useVotes';
 import { Page, PageContent } from 'models';
 import { useRouter } from 'next/router';
 import { memo, useCallback } from 'react';
-import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import CharmEditor, { ICharmEditorOutput } from '../../common/CharmEditor/CharmEditor';
+import BountyProperties from './components/BountyProperties';
+import CreateVoteBox from './components/CreateVoteBox';
 import PageBanner from './components/PageBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
 import PageHeader from './components/PageHeader';
-import CreateVoteBox from './components/CreateVoteBox';
 
 export const Container = styled(Box)<{ top: number, fullWidth?: boolean }>`
   width: ${({ fullWidth }) => fullWidth ? '100%' : '860px'};
@@ -33,12 +34,15 @@ export const Container = styled(Box)<{ top: number, fullWidth?: boolean }>`
   }
 `;
 
-export interface IEditorProps {
-  page: Page, setPage: (p: Partial<Page>) => void, readOnly?: boolean, insideModal?: boolean }
+export interface DocumentPageProps {
+  page: Page, setPage: (p: Partial<Page>) => void, readOnly?: boolean, insideModal?: boolean
+}
 
-function DocumentPage ({ page, setPage, insideModal, readOnly = false }: IEditorProps) {
+function DocumentPage ({ page, setPage, insideModal, readOnly = false }: DocumentPageProps) {
   const { pages } = usePages();
   const { cancelVote, castVote, deleteVote, votes, isLoading } = useVotes();
+  const { bounties } = useBounties();
+  const bounty = bounties.find(_bounty => _bounty.page?.id === page.id);
 
   const pageVote = Object.values(votes)[0];
 
@@ -78,7 +82,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: IEditor
 
   const card = cards.find(_card => _card.id === page.id);
 
-  const comments = useAppSelector(getCardComments(card?.id));
+  const comments = useAppSelector(getCardComments(card?.id ?? page.id));
 
   const showPageActionSidebar = (currentPageActionDisplay !== null) && !insideModal;
   const router = useRouter();
@@ -139,47 +143,46 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: IEditor
                 />
               </Box>
             )}
-            {card && board && (
-              <div className='focalboard-body'>
-                <div className='CardDetail content'>
-                  {/* Property list */}
-                  <Box sx={{
-                    display: 'flex',
-                    gap: 1,
-                    justifyContent: 'space-between',
-                    width: '100%'
-                  }}
-                  >
-                    <CardDetailProperties
-                      board={board}
-                      card={card}
-                      cards={cards}
-                      activeView={activeView}
-                      views={boardViews}
-                      readonly={readOnly}
-                      pageUpdatedAt={page.updatedAt.toString()}
-                      pageUpdatedBy={page.updatedBy}
-                    />
-                    <BountyIntegration
-                      linkedPageId={card.id}
-                      title={page.title}
-                      description={page.contentText}
-                      descriptionNodes={page.content}
+            <div className='focalboard-body'>
+              <div className='CardDetail content'>
+                {/* Property list */}
+                {card && board && (
+                <CardDetailProperties
+                  board={board}
+                  card={card}
+                  cards={cards}
+                  activeView={activeView}
+                  views={boardViews}
+                  readonly={readOnly}
+                  pageUpdatedAt={page.updatedAt.toString()}
+                  pageUpdatedBy={page.updatedBy}
+                />
+                )}
+                {!bounty && page.type === 'card' && (
+                  <>
+                    <hr />
+                    <CommentsList
+                      comments={comments}
+                      rootId={card?.rootId ?? page.spaceId}
+                      cardId={card?.id ?? page.id}
                       readonly={readOnly}
                     />
-                  </Box>
-
-                  <hr />
-                  <CommentsList
-                    comments={comments}
-                    rootId={card.rootId}
-                    cardId={card.id}
-                    readonly={readOnly}
-                  />
-                </div>
+                  </>
+                )}
+                {bounty && (
+                  <BountyProperties bounty={bounty} readOnly={readOnly}>
+                    <CommentsList
+                      comments={comments}
+                      rootId={card?.rootId ?? page.spaceId}
+                      cardId={card?.id ?? page.id}
+                      readonly={readOnly}
+                    />
+                  </BountyProperties>
+                )}
               </div>
-            )}
+            </div>
           </CharmEditor>
+
           {page.type === 'proposal' && !isLoading && !pageVote && (
             <CreateVoteBox />
           )}

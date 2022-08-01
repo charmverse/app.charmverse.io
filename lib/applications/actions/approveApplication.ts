@@ -1,12 +1,10 @@
 import { Application } from '@prisma/client';
-import { DataNotFoundError, LimitReachedError, UnauthorisedActionError, UndesirableOperationError } from 'lib/utilities/errors';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { prisma } from 'db';
-import { getBounty } from 'lib/bounties';
-import { ApplicationActionRequest } from '../interfaces';
+import { getBountyOrThrow } from 'lib/bounties/getBounty';
+import { DataNotFoundError, LimitReachedError } from 'lib/utilities/errors';
 import { getApplication } from '../getApplication';
+import { ApplicationActionRequest } from '../interfaces';
 import { submissionsCapReached } from '../shared';
-import { BountyWithDetails } from '../../../models';
 
 export async function approveApplication ({ applicationOrApplicationId, userId }: ApplicationActionRequest): Promise<Application> {
   const application = await getApplication(typeof applicationOrApplicationId === 'string' ? applicationOrApplicationId : applicationOrApplicationId.id);
@@ -15,7 +13,7 @@ export async function approveApplication ({ applicationOrApplicationId, userId }
     throw new DataNotFoundError(`Application with id ${applicationOrApplicationId} was not found`);
   }
 
-  const bounty = await getBounty(application.bountyId) as BountyWithDetails;
+  const bounty = await getBountyOrThrow(application.bountyId);
 
   const capReached = submissionsCapReached({ bounty, submissions: bounty.applications });
 

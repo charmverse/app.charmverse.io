@@ -93,7 +93,6 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
     },
     select: {
       id: true,
-      title: true,
       createdBy: true,
       spaceId: true,
       page: {

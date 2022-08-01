@@ -104,7 +104,7 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       htmlFontSize: 14,
       h1: {
         fontSize: '2rem',
-        fontWeight: 500
+        fontWeight: 700
       },
       h2: {
         fontSize: '1.05rem',
@@ -243,6 +243,12 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
           }
         }
       },
+      MuiTooltip: {
+        defaultProps: {
+          arrow: true,
+          placement: 'top'
+        }
+      },
       MuiCard: {
         styleOverrides: {
           root: {
@@ -271,6 +277,14 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
         styleOverrides: {
           root: {
             padding: '8px'
+          }
+        }
+      },
+      MuiListItemIcon: {
+        styleOverrides: {
+          root: {
+            fontSize: 'inherit',
+            minWidth: '30px'
           }
         }
       },

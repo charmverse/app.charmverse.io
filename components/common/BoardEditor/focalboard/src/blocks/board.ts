@@ -1,10 +1,9 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import { PageContent } from 'models'
-import { IDType, Utils } from '../utils'
-import { Block, createBlock } from './block'
-import { Card } from './card'
-
+import { PageContent } from 'models';
+import { IDType, Utils } from '../utils';
+import { Block, createBlock } from './block';
+import { Card } from './card';
 
 type PropertyType = 'text' | 'number' | 'select' | 'multiSelect' | 'date' | 'person' | 'file' | 'checkbox' | 'url' | 'email' | 'phone' | 'createdTime' | 'createdBy' | 'updatedTime' | 'updatedBy'
 
@@ -35,54 +34,54 @@ type Board = Block & {
     fields: BoardFields
 }
 
-function createBoard({block, addDefaultProperty}: {block?: Block, addDefaultProperty?: boolean} | undefined = {}): Board {
-    addDefaultProperty = addDefaultProperty ?? false
-    const cardProperties: IPropertyTemplate[] = block?.fields.cardProperties.map((o: IPropertyTemplate) => {
-        return {
-            id: o.id,
-            name: o.name,
-            type: o.type,
-            options: o.options ? o.options.map((option) => ({...option})) : [],
-        }
-    }) ?? []
-
-    const selectProperties = cardProperties.find((o) => o.type === 'select')
-
-    if (!selectProperties && addDefaultProperty) {
-        const property: IPropertyTemplate = {
-            id: Utils.createGuid(IDType.BlockID),
-            name: 'Status',
-            type: 'select',
-            options: [{
-              color: 'propColorTeal',
-              id: Utils.createGuid(IDType.BlockID),
-              value: 'Completed'
-            }, {
-              color: 'propColorYellow',
-              id: Utils.createGuid(IDType.BlockID),
-              value: 'In progress'
-            }, {
-              color: 'propColorRed',
-              id: Utils.createGuid(IDType.BlockID),
-              value: 'Not started'
-            }],
-        }
-        cardProperties.push(property)
-    }
-
+function createBoard ({ block, addDefaultProperty }: {block?: Block, addDefaultProperty?: boolean} | undefined = {}): Board {
+  addDefaultProperty = addDefaultProperty ?? false;
+  const cardProperties: IPropertyTemplate[] = block?.fields.cardProperties.map((o: IPropertyTemplate) => {
     return {
-        ...createBlock(block),
-        type: 'board',
-        fields: {
-            showDescription: block?.fields.showDescription || false,
-            description: block?.fields.description || '',
-            icon: block?.fields.icon || '',
-            isTemplate: block?.fields.isTemplate || false,
-            columnCalculations: block?.fields.columnCalculations || [],
-            headerImage: block?.fields.headerImage || null,
-            cardProperties,
-        },
+      id: o.id,
+      name: o.name,
+      type: o.type,
+      options: o.options ? o.options.map((option) => ({ ...option })) : []
+    };
+  }) ?? [];
+
+  const selectProperties = cardProperties.find((o) => o.type === 'select');
+
+  if (!selectProperties && addDefaultProperty) {
+    const property: IPropertyTemplate = {
+      id: Utils.createGuid(IDType.BlockID),
+      name: 'Status',
+      type: 'select',
+      options: [{
+        color: 'propColorTeal',
+        id: Utils.createGuid(IDType.BlockID),
+        value: 'Completed'
+      }, {
+        color: 'propColorYellow',
+        id: Utils.createGuid(IDType.BlockID),
+        value: 'In progress'
+      }, {
+        color: 'propColorRed',
+        id: Utils.createGuid(IDType.BlockID),
+        value: 'Not started'
+      }]
+    };
+    cardProperties.push(property);
+  }
+
+  return {
+    ...createBlock(block),
+    type: 'board',
+    fields: {
+      showDescription: block?.fields.showDescription || false,
+      description: block?.fields.description || '',
+      icon: block?.fields.icon || '',
+      isTemplate: block?.fields.isTemplate || false,
+      columnCalculations: block?.fields.columnCalculations || [],
+      headerImage: block?.fields.headerImage || null,
+      cardProperties
     }
+  };
 }
 
 type BoardGroup = {
@@ -90,6 +89,6 @@ type BoardGroup = {
     cards: Card[]
 }
 
-export { createBoard }
-export type { Board, PropertyType, IPropertyOption, IPropertyTemplate, BoardGroup }
+export { createBoard };
+export type { Board, PropertyType, IPropertyOption, IPropertyTemplate, BoardGroup };
 

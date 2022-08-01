@@ -162,7 +162,6 @@ function CardDialog (props: Props): JSX.Element | null {
                       />
                     </div>
                     )}
-
         {card
                     && (
                     <CardDetail
@@ -186,5 +185,4 @@ function CardDialog (props: Props): JSX.Element | null {
     </>
   ) : null;
 }
-
 export default CardDialog;

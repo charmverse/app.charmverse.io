@@ -8,10 +8,10 @@ import { Constants } from '../../../constants';
 import { Option as SelectOption, typesByOptions } from '../../calculations/options';
 
 type OptionProps = SelectOption & {
-    cardProperties: IPropertyTemplate[]
-    onChange: (data: {calculation: string, propertyId: string}) => void
-    activeValue: string
-    activeProperty: IPropertyTemplate
+  cardProperties: IPropertyTemplate[]
+  onChange: (data: {calculation: string, propertyId: string}) => void
+  activeValue: string
+  activeProperty: IPropertyTemplate
 }
 
 function Option (props: {data: OptionProps}): JSX.Element {
@@ -99,4 +99,3 @@ function Option (props: {data: OptionProps}): JSX.Element {
 
 export { Option };
 export type { OptionProps };
-

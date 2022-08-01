@@ -59,8 +59,20 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   const space = spaceFromUrl || publicPageSpace;
 
   const { data, mutate } = useSWR(() => space ? `pages/${space?.id}` : null, () => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return charmClient.getPages(space!.id);
+
+    if (!space) {
+      return [];
+    }
+
+    const isPublicBountiesPage = (router.route === '/share/[...pageId]') && (router.query.pageId?.[1] === 'bounties');
+    if (isPublicBountiesPage) {
+      // retrieve the pages we need for public bounties
+      return charmClient.listBounties(space.id, true)
+        .then(bounties => bounties.map(bounty => bounty.page).filter(isTruthy));
+    }
+    else {
+      return charmClient.getPages(space.id);
+    }
   }, { refreshInterval });
 
   const _setPages: Dispatch<SetStateAction<PagesMap>> = (_pages) => {

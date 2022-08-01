@@ -485,7 +485,6 @@ details {
 // handles on the side of each row
 .row-handle {
   display: initial;
-  cursor: pointer;
   left: 20px;
   top: -1000px;
   position: absolute;
@@ -495,7 +494,8 @@ details {
   opacity: 0;
   transition: opacity 0.2s ease-in-out;
 
-  svg {
+  .charm-drag-handle {
+    cursor: grab;
     opacity: .5;
     transition: opacity 0.2s ease-in-out;
 

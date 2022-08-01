@@ -27,7 +27,7 @@ export interface ImageNodeSchemaAttrs {
   alt: null | string
 }
 
-function specFactory(): RawSpecs {
+function specFactory (): RawSpecs {
   return {
     type: 'node',
     name,
@@ -41,31 +41,31 @@ function specFactory(): RawSpecs {
           default: null
         },
         alt: {
-          default: null,
+          default: null
         }
       },
       group: 'inline',
-      draggable: false,
+      draggable: true,
       parseDOM: [
         {
           tag: 'img[src]',
           getAttrs: (dom: any) => ({
             src: dom.getAttribute('src'),
-            alt: dom.getAttribute('alt'),
-          }),
-        },
+            alt: dom.getAttribute('alt')
+          })
+        }
       ],
       toDOM: (node: Node) => {
         return ['img', node.attrs];
-      },
+      }
     }
   };
 }
 
-function pluginsFactory({
+function pluginsFactory ({
   handleDragAndDrop = true,
   acceptFileType = 'image/*',
-  createImageNodes = defaultCreateImageNodes,
+  createImageNodes = defaultCreateImageNodes
 }: {
   handleDragAndDrop?: boolean;
   acceptFileType?: string;
@@ -82,7 +82,7 @@ function pluginsFactory({
       new InputRule(
         /!\[(.+|:?)]\((\S+)(?:(?:\s+)["'](\S+)["'])?\)/,
         (state, match, start, end) => {
-          let [, alt, src] = match;
+          const [, alt, src] = match;
           if (!src) {
             return null;
           }
@@ -91,25 +91,25 @@ function pluginsFactory({
             end,
             type.create({
               src,
-              alt,
-            }),
+              alt
+            })
           );
-        },
+        }
       ),
 
-      handleDragAndDrop &&
-        new Plugin({
-          key: new PluginKey(name + '-drop-paste'),
+      handleDragAndDrop
+        && new Plugin({
+          key: new PluginKey(`${name}-drop-paste`),
           props: {
             handleDOMEvents: {
-              drop(view, event) {
+              drop (view, event) {
                 if (event.dataTransfer == null) {
                   return false;
                 }
                 const files = getFileData(
                   event.dataTransfer,
                   acceptFileType,
-                  true,
+                  true
                 );
 
                 // TODO should we handle all drops but just show error?
@@ -121,23 +121,23 @@ function pluginsFactory({
                 event.preventDefault();
                 const coordinates = view.posAtCoords({
                   left: event.clientX,
-                  top: event.clientY,
+                  top: event.clientY
                 });
 
                 createImageNodes(
                   files,
                   getTypeFromSchema(view.state.schema),
-                  view,
+                  view
                 ).then((imageNodes) => {
                   addImagesToView(
                     view,
                     coordinates == null ? undefined : coordinates.pos,
-                    imageNodes,
+                    imageNodes
                   );
                 });
 
                 return true;
-              },
+              }
             },
 
             handlePaste: (view, rawEvent) => {
@@ -148,7 +148,7 @@ function pluginsFactory({
               const files = getFileData(
                 event.clipboardData,
                 acceptFileType,
-                true,
+                true
               );
               if (!files || files.length === 0) {
                 return false;
@@ -156,40 +156,40 @@ function pluginsFactory({
               createImageNodes(
                 files,
                 getTypeFromSchema(view.state.schema),
-                view,
+                view
               ).then((imageNodes) => {
                 addImagesToView(view, view.state.selection.from, imageNodes);
               });
 
               return true;
-            },
-          },
-        }),
+            }
+          }
+        })
     ];
   };
 }
 
-async function defaultCreateImageNodes(
+async function defaultCreateImageNodes (
   files: File[],
   imageType: NodeType,
-  _view: EditorView,
+  _view: EditorView
 ) {
   const { url } = await uploadToS3(files[0]);
   return [
     imageType.create({
-      src: url,
+      src: url
     })
   ];
 }
 
-function addImagesToView(
+function addImagesToView (
   view: EditorView,
   pos: number | undefined,
-  imageNodes: Node[],
+  imageNodes: Node[]
 ) {
   for (const node of imageNodes) {
     const { tr } = view.state;
-    let newTr = safeInsert(node, pos)(tr);
+    const newTr = safeInsert(node, pos)(tr);
 
     if (newTr !== tr) {
       view.dispatch(newTr);
@@ -197,7 +197,7 @@ function addImagesToView(
   }
 }
 
-function getFileData(data: DataTransfer, accept: string, multiple: boolean) {
+function getFileData (data: DataTransfer, accept: string, multiple: boolean) {
   const dragDataItems = getMatchingItems(data.items, accept, multiple);
   const files: File[] = [];
 
@@ -212,10 +212,10 @@ function getFileData(data: DataTransfer, accept: string, multiple: boolean) {
   return files;
 }
 
-function getMatchingItems(
+function getMatchingItems (
   list: DataTransferItemList,
   accept: string,
-  multiple: boolean,
+  multiple: boolean
 ) {
   const dataItems = Array.from(list);
   let results;
@@ -247,8 +247,8 @@ function getMatchingItems(
     for (const [acceptMain, acceptSub] of accepts) {
       // Look for an exact match, or a partial match if * is accepted, eg image/*.
       if (
-        typeMain === acceptMain &&
-        (acceptSub === '*' || typeSub === acceptSub)
+        typeMain === acceptMain
+        && (acceptSub === '*' || typeSub === acceptSub)
       ) {
         return true;
       }
@@ -264,24 +264,22 @@ function getMatchingItems(
   return results;
 }
 
-export const updateImageNodeAttribute =
-  (attr: Node['attrs'] = {}): Command =>
-  (state, dispatch) => {
-    if (!(state.selection instanceof NodeSelection) || !state.selection.node) {
-      return false;
-    }
-    const { node } = state.selection;
-    if (node.type !== getTypeFromSchema(state.schema)) {
-      return false;
-    }
+export const updateImageNodeAttribute = (attr: Node['attrs'] = {}): Command => (state, dispatch) => {
+  if (!(state.selection instanceof NodeSelection) || !state.selection.node) {
+    return false;
+  }
+  const { node } = state.selection;
+  if (node.type !== getTypeFromSchema(state.schema)) {
+    return false;
+  }
 
-    if (dispatch) {
-      dispatch(
-        state.tr.setNodeMarkup(state.selection.$from.pos, undefined, {
-          ...node.attrs,
-          ...attr,
-        }),
-      );
-    }
-    return true;
-  };
+  if (dispatch) {
+    dispatch(
+      state.tr.setNodeMarkup(state.selection.$from.pos, undefined, {
+        ...node.attrs,
+        ...attr
+      })
+    );
+  }
+  return true;
+};

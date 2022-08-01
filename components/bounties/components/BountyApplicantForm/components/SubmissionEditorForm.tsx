@@ -1,19 +1,23 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import { FormLabel, lighten, Stack, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
-import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
-import { Application, Bounty } from '@prisma/client';
+import { Application } from '@prisma/client';
 import charmClient from 'charmClient';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
+import Link from 'components/common/Link';
 import { useUser } from 'hooks/useUser';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import { SystemError } from 'lib/utilities/errors';
+import { shortenHex } from 'lib/utilities/strings';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import { AssignedBountyPermissions } from 'lib/bounties';
 
 const schema = yup.object({
   submission: yup.string().required(),
@@ -28,19 +32,23 @@ type FormValues = yup.InferType<typeof schema>
 
 interface Props {
   submission?: Application,
-  bounty: Bounty,
-  onSubmit: (submission: Application) => void
+  bountyId: string,
+  onSubmit?: (submission: Application) => void
+  showHeader?: boolean
+  readOnly?: boolean
+  permissions: AssignedBountyPermissions
 }
 
-export default function BountySubmissionForm ({ submission, onSubmit: onSubmitProp, bounty }: Props) {
+export default function BountySubmissionForm (
+  { permissions, readOnly = false, showHeader = false, submission, onSubmit: onSubmitProp, bountyId }: Props
+) {
   const [user] = useUser();
 
   const {
     register,
     handleSubmit,
     setValue,
-    watch,
-    formState: { errors, touchedFields, isValid, isValidating, isSubmitting }
+    formState: { errors, isValid }
   } = useForm<FormValues>({
     mode: 'onChange',
     defaultValues: {
@@ -69,24 +77,57 @@ export default function BountySubmissionForm ({ submission, onSubmit: onSubmitPr
       else {
         // create
         application = await charmClient.createSubmission({
-          bountyId: bounty.id,
+          bountyId,
           submissionContent: values
         });
       }
-      onSubmitProp(application);
+      if (onSubmitProp) {
+        onSubmitProp(application);
+      }
     }
     catch (err: any) {
       setFormError(err);
     }
   }
 
-  //  console.log('Submission', submission.submissionNodes, typeof submission.submissionNodes);
-
   return (
-    <Box>
-      <form onSubmit={handleSubmit(onSubmit)} style={{ margin: 'auto' }}>
-        <Grid container direction='column' spacing={3}>
-          <Grid item>
+    <Stack my={2} gap={1}>
+      {readOnly && submission?.walletAddress && (
+        <Typography sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1
+        }}
+        >
+          Payment address:
+          <Link
+            sx={{
+              display: 'flex',
+              alignItems: 'center'
+            }}
+            external
+            target='_blank'
+            href={`https://etherscan.io/address/${submission.walletAddress}`}
+          >{shortenHex(submission.walletAddress)}
+            <OpenInNewIcon fontSize='small' />
+          </Link>
+        </Typography>
+      )}
+      {
+        showHeader && (
+        <FormLabel sx={{
+          fontWeight: 'bold'
+        }}
+        >Submission
+        </FormLabel>
+        )
+      }
+      <form onSubmit={handleSubmit(onSubmit)} style={{ margin: 'auto', width: '100%' }}>
+        <Grid container direction='column' spacing={2}>
+
+          <Grid
+            item
+          >
             <InlineCharmEditor
               content={submission?.submissionNodes ? JSON.parse(submission?.submissionNodes) : null}
               onContentChange={content => {
@@ -97,12 +138,19 @@ export default function BountySubmissionForm ({ submission, onSubmit: onSubmitPr
                   shouldValidate: true
                 });
               }}
-              placeholderText='Enter the content of your submission here.'
-
+              style={{
+                backgroundColor: 'var(--input-bg)',
+                border: '1px solid var(--input-border)',
+                borderRadius: 3,
+                minHeight: 130
+              }}
+              readOnly={readOnly}
+              placeholderText={permissions.userPermissions.review ? 'No submission yet' : 'Enter the content of your submission here.'}
             />
 
           </Grid>
 
+          {!readOnly && (
           <Grid item>
             <InputLabel>
               Address to get paid for this bounty
@@ -113,9 +161,11 @@ export default function BountySubmissionForm ({ submission, onSubmit: onSubmitPr
               fullWidth
               error={!!errors.walletAddress}
               helperText={errors.walletAddress?.message}
+              disabled={readOnly}
             />
 
           </Grid>
+          )}
 
           {
             formError && (
@@ -127,13 +177,15 @@ export default function BountySubmissionForm ({ submission, onSubmit: onSubmitPr
             )
           }
 
-          <Grid item>
-            <Button disabled={!isValid} type='submit'>Save</Button>
+          {!readOnly && (
+          <Grid item display='flex' gap={1}>
+            <Button disabled={!isValid} type='submit'>Submit</Button>
           </Grid>
+          )}
 
         </Grid>
 
       </form>
-    </Box>
+    </Stack>
   );
 }

@@ -1,19 +1,24 @@
-import Autocomplete from '@mui/material/Autocomplete';
+import Autocomplete, { AutocompleteProps } from '@mui/material/Autocomplete';
 import Box from '@mui/material/Box';
 import { useEffect, useState } from 'react';
 import { RPCList, IChainDetails } from 'connectors';
 import TextField from '@mui/material/TextField';
+import { SxProps } from '@mui/system';
 
-interface Props {
+interface Props extends Omit<Partial<AutocompleteProps<IChainDetails, false, true, true>>, 'onChange'>{
   onChange?: (chainId: number) => void;
   defaultChainId?: number; // allow setting a default
   chainId?: number; // allow overriding from the parent
+  sx?: SxProps
 }
 
 export default function InputSearchBlockchain ({
   defaultChainId,
   chainId,
-  onChange = () => {}
+  onChange = () => {},
+  sx = {},
+  disabled,
+  readOnly
 }: Props) {
 
   const [value, setValue] = useState<IChainDetails | null>(null);
@@ -50,7 +55,7 @@ export default function InputSearchBlockchain ({
           onChange(_value.chainId);
         }
       }}
-      sx={{ minWidth: 150 }}
+      sx={{ minWidth: 150, ...sx }}
       options={RPCList}
       disableClearable
       autoHighlight
@@ -71,6 +76,8 @@ export default function InputSearchBlockchain ({
           }}
         />
       )}
+      disabled={disabled}
+      readOnly={readOnly}
     />
   );
 }
