@@ -67,7 +67,7 @@ function EmptyPDFContainer ({ readOnly, isSelected, ...props }: HTMLAttributes<H
       disableRipple
       disabled={readOnly}
       sx={{
-        backgroundColor: (isSelected && !readOnly) ? 'rgba(46, 170, 220, 0.2)' : theme.palette.background.light,
+        backgroundColor: (isSelected && !readOnly) ? 'var(--charmeditor-active)' : theme.palette.background.light,
         p: 2,
         display: 'flex'
       }}
@@ -97,7 +97,7 @@ export function pdfSpec () {
         }
       },
       group: 'block',
-      draggable: true,
+      draggable: false,
       parseDOM: [{ tag: 'div.charm-pdf' }],
       toDOM: (): DOMOutputSpec => {
         return ['div.charm-pdf'];

@@ -187,11 +187,11 @@ export function charmEditorPlugins (
     callout.plugins(),
     NodeView.createPlugin({
       name: 'image',
-      containerDOM: ['div', { draggable: 'true' }]
+      containerDOM: ['div', { draggable: 'false' }]
     }),
     NodeView.createPlugin({
       name: 'pdf',
-      containerDOM: ['div', { draggable: 'true' }]
+      containerDOM: ['div', { draggable: 'false' }]
     }),
     NodeView.createPlugin({
       name: 'cryptoPrice',
@@ -199,7 +199,7 @@ export function charmEditorPlugins (
     }),
     NodeView.createPlugin({
       name: 'iframe',
-      containerDOM: ['div', { class: 'iframe-container', draggable: 'true' }]
+      containerDOM: ['div', { class: 'iframe-container', draggable: 'false' }]
     }),
     NodeView.createPlugin({
       name: 'quote',
@@ -409,7 +409,7 @@ function CharmEditor (
     }),
     initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
     dropCursorOpts: {
-      // color: 'transparent'
+      color: 'var(--charmeditor-active)'
     }
   });
 

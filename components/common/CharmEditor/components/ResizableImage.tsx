@@ -60,7 +60,7 @@ function EmptyImageContainer ({ readOnly, isSelected, ...props }: HTMLAttributes
       disableRipple
       disabled={readOnly}
       sx={{
-        backgroundColor: (isSelected && !readOnly) ? 'rgba(46, 170, 220, 0.2)' : theme.palette.background.light,
+        backgroundColor: (isSelected && !readOnly) ? 'var(--charmeditor-active)' : theme.palette.background.light,
         p: 2,
         display: 'flex'
       }}
@@ -109,7 +109,7 @@ export function imageSpec (): RawSpecs {
         }
       },
       group: 'block',
-      draggable: true,
+      draggable: false,
       parseDOM: [
         {
           tag: 'img[src]',

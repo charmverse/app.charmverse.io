@@ -45,7 +45,7 @@ function specFactory (): RawSpecs {
         }
       },
       group: 'inline',
-      draggable: true,
+      draggable: false,
       parseDOM: [
         {
           tag: 'img[src]',

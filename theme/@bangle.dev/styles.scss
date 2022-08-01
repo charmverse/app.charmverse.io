@@ -325,7 +325,7 @@ ol li {
 }
 
 .ProseMirror-selectednode {
-  background-color: rgba(46, 170, 220, 0.2);
+  background-color: var(--charmeditor-active);
   transition: background-color 150ms ease-in-out;
 }
 

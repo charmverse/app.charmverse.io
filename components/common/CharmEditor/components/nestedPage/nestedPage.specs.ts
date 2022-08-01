@@ -18,7 +18,7 @@ export function nestedPageSpec (): RawSpecs {
         }
       },
       group: 'block',
-      draggable: true,
+      draggable: false,
       parseDOM: [{ tag: 'div.charm-nested-page' }],
       toDOM: (): DOMOutputSpec => {
         return ['div', { class: 'charm-nested-page' }];
