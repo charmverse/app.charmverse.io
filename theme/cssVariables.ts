@@ -41,6 +41,9 @@ const globalCSS = css`
 
     --background-default: ${colors.backgroundColor};
     --background-paper: ${colors.backgroundColor};
+    --background-dark: ${colors.backgroundDarkColor};
+
+    --charmeditor-active: rgba(46, 170, 220, 0.2);
 
   }
 
@@ -58,6 +61,7 @@ const globalCSS = css`
 
     --background-default: ${colors.backgroundColorDarkMode};
     --background-paper: ${colors.backgroundLightColorDarkMode};
+    --background-dark: ${colors.backgroundDarkColorDarkMode};
   }
 
 `;
