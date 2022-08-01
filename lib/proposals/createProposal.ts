@@ -33,7 +33,7 @@ export async function createProposal ({ spaceId, userId }: ProposalCreationData)
             permissionLevel: 'full_access',
             userId
           }, {
-            permissionLevel: 'view',
+            permissionLevel: space.defaultPagePermissionGroup ?? 'full_access',
             spaceId
           }]
         }

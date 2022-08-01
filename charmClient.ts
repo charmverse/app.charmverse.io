@@ -39,6 +39,7 @@ import { TransactionCreationData } from 'lib/transactions/interface';
 import { ExtendedVote, UserVoteExtendedDTO, VoteDTO } from 'lib/votes/interfaces';
 import { PublicUser } from 'pages/api/public/profile/[userPath]';
 import { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
+import { PageWithProposal, ProposalCreationData } from 'lib/proposals/interfaces';
 import { AssignedPermissionsQuery, Resource } from './lib/permissions/interfaces';
 import { SpacePermissionConfigurationUpdate } from './lib/permissions/meta/interfaces';
 import { SpacePermissionFlags, SpacePermissionModification } from './lib/permissions/spaces';
@@ -751,6 +752,10 @@ class CharmClient {
 
   getUserVotes (voteId: string) {
     return http.GET<UserVoteExtendedDTO[]>(`/api/votes/${voteId}/user-votes`);
+  }
+
+  createProposal (proposal: ProposalCreationData): Promise<PageWithProposal> {
+    return http.POST('/api/proposals', proposal);
   }
 }
 
