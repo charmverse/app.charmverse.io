@@ -156,6 +156,7 @@ model Space {
   threads                     Thread[]
   TokenGate                   TokenGate[]
   votes                       Vote[]
+  proposals                   Proposal[]
 }
 
 model SpaceApiToken {
@@ -256,7 +257,7 @@ model Vote {
   threshold   Int
   type        VoteType      @default(SingleChoice)
   author      User          @relation(fields: [createdBy], references: [id], onDelete: Cascade)
-  page        Page          @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  page        Page?          @relation(fields: [pageId], references: [id], onDelete: Cascade)
   space       Space         @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   userVotes   UserVote[]
   voteOptions VoteOptions[]
@@ -622,14 +623,15 @@ enum ProposalStatus {
 }
 
 model Proposal {
-  id        String    @id @default(uuid()) @db.Uuid
-  createdAt DateTime  @default(now())
-  createdBy String    @db.Uuid
-  author    User      @relation(fields: [createdBy], references: [id])
-  spaceId   String
+  id        String     @id @default(uuid()) @db.Uuid
+  createdAt DateTime   @default(now())
   status    ProposalStatus
-  pageId    String    @db.Uuid @unique
-  page      Page      @relation(fields: [pageId], references: [id])
-  voteId    String    @db.Uuid @unique
-  vote      Vote      @relation(fields: [voteId], references: [id])
+  createdBy String     @db.Uuid
+  author    User       @relation(fields: [createdBy], references: [id])
+  spaceId   String     @db.Uuid
+  space     Space      @relation(fields: [spaceId], references: [id]) 
+  pageId    String     @db.Uuid @unique
+  page      Page       @relation(fields: [pageId], references: [id])
+  voteId    String?    @db.Uuid @unique
+  vote      Vote?      @relation(fields: [voteId], references: [id])
 }

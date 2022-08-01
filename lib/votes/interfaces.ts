@@ -41,3 +41,4 @@ export interface SpaceVotesRequest {
   userId: string
   spaceId: string
 }
+
