@@ -189,11 +189,6 @@ function ResizablePDF ({ readOnly, onResizeStop, node, updateAttrs, selected }:
   }
 
   const handleDelete = () => {
-    // dont do this since it may be used in some other place
-    // TODO: find a better way to know when we can delete files!
-    // if (url?.includes('s3.amazonaws.com')) {
-    //   charmClient.deleteFromS3(url);
-    // }
     updateAttrs({
       src: null,
       aspectRatio: 1
