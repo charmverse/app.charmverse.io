@@ -370,7 +370,7 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
         }
       }}
     >
-      {permissions && (user?.id === bounty.createdBy || isAdmin) && (
+      {permissions && (user?.id === bounty.createdBy) && (
         <BountyHeader
           bounty={bounty}
           permissions={permissions}

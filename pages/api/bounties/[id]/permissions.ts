@@ -21,7 +21,7 @@ async function computeBountyGroupPermissionsController (req: NextApiRequest, res
 
   const [permissions, groups] = await Promise.all([
     computeBountyPermissions({
-      allowAdminBypass: true,
+      allowAdminBypass: false,
       resourceId: bounty.id,
       userId
     }),
