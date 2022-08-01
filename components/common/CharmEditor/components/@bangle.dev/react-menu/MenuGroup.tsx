@@ -10,7 +10,7 @@ const StyledMenuGroup = styled.div<{ keepBorder: boolean }>`
   `}
 `;
 
-export function MenuGroup({
+export function MenuGroup ({
   className = '',
   children,
   isLastGroup = false

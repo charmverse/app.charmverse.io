@@ -1,42 +1,41 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import React from 'react'
+import React from 'react';
 
-
-export default function LogoWithNameWhiteIcon(): JSX.Element {
-    return (
-        <svg
-            className='LogoWithNameWhiteIcon Icon'
-            version='1.1'
-            x='0px'
-            y='0px'
-            viewBox='0 0 300 64'
-            enableBackground='new 0 0 300 64'
-        >
-            <g
-                id='Layer_2'
-                display='none'
-            >
-                <rect
-                    x='0'
-                    y='0.16'
-                    display='inline'
-                    fillRule='evenodd'
-                    clipRule='evenodd'
-                    fill='#FFFFFF'
-                    width='300'
-                    height='63.84'
-                />
-            </g>
-            <g id='Layer_1'>
-                <g>
-                    <g>
-                        <path
-                            fillRule='evenodd'
-                            clipRule='evenodd'
-                            fill='#FFFFFF'
-                            d='M33.071,12.289C20.408,8.822,6.018,15.578,1.395,29.232
+export default function LogoWithNameWhiteIcon (): JSX.Element {
+  return (
+    <svg
+      className='LogoWithNameWhiteIcon Icon'
+      version='1.1'
+      x='0px'
+      y='0px'
+      viewBox='0 0 300 64'
+      enableBackground='new 0 0 300 64'
+    >
+      <g
+        id='Layer_2'
+        display='none'
+      >
+        <rect
+          x='0'
+          y='0.16'
+          display='inline'
+          fillRule='evenodd'
+          clipRule='evenodd'
+          fill='#FFFFFF'
+          width='300'
+          height='63.84'
+        />
+      </g>
+      <g id='Layer_1'>
+        <g>
+          <g>
+            <path
+              fillRule='evenodd'
+              clipRule='evenodd'
+              fill='#FFFFFF'
+              d='M33.071,12.289C20.408,8.822,6.018,15.578,1.395,29.232
                         c-4.655,13.75,2.719,28.67,16.469,33.325c13.75,4.655,28.67-2.719,33.326-16.469c3.804-11.235-0.462-22.701-8.976-29.249
                         l-0.46,4.871l-0.001,0c4.631,4.896,6.709,11.941,4.325,18.985c-3.362,9.931-14.447,15.151-24.76,11.66
                         C11.005,48.865,5.37,37.985,8.731,28.054c2.975-8.788,11.998-13.715,20.743-12.625v-0.001L33.071,12.289L33.071,12.289z
@@ -49,20 +48,20 @@ export default function LogoWithNameWhiteIcon(): JSX.Element {
                         c-3.754-1.271-6.661-3.895-8.326-7.108c-1.674-3.233-2.09-7.065-0.851-10.728c0.819-2.419,2.26-4.46,4.097-6.016
                         c1.88-1.593,4.181-2.673,6.656-3.125l-0.001-0.004c1.759-0.339,3.522-0.313,5.213,0.016l-3.583,3.761
                         c-0.294,0.028-0.588,0.071-0.883,0.127H25.611z'
-                        />
-                        <polygon
-                            fillRule='evenodd'
-                            clipRule='evenodd'
-                            fill='#FFFFFF'
-                            points='37.495,11.658 36.79,8.44 41.066,0.207 43.683,4.611
+            />
+            <polygon
+              fillRule='evenodd'
+              clipRule='evenodd'
+              fill='#FFFFFF'
+              points='37.495,11.658 36.79,8.44 41.066,0.207 43.683,4.611
                         48.803,4.434 44.185,12.48 40.902,13.697 29.542,34.491 26.057,32.594 			'
-                        />
-                    </g>
-                    <path
-                        fillRule='evenodd'
-                        clipRule='evenodd'
-                        fill='#FFFFFF'
-                        d='M68.736,52.902V21.449h19.827v5.982H75.828v7.284H86.73v5.983
+            />
+          </g>
+          <path
+            fillRule='evenodd'
+            clipRule='evenodd'
+            fill='#FFFFFF'
+            d='M68.736,52.902V21.449h19.827v5.982H75.828v7.284H86.73v5.983
                     H75.828v12.204H68.736L68.736,52.902z M102.842,53.481c-1.513,0-2.976-0.282-4.391-0.845c-1.415-0.563-2.661-1.374-3.739-2.437
                     c-1.077-1.061-1.937-2.371-2.58-3.932c-0.644-1.56-0.965-3.336-0.965-5.33c0-1.993,0.321-3.771,0.965-5.33
                     c0.643-1.561,1.503-2.87,2.58-3.933c1.078-1.061,2.325-1.872,3.739-2.435c1.415-0.563,2.878-0.844,4.391-0.844
@@ -124,9 +123,9 @@ export default function LogoWithNameWhiteIcon(): JSX.Element {
                      M289.001,47.692c0.772,0,1.471-0.161,2.1-0.482c0.626-0.322,1.229-0.884,1.808-1.688v-9.793c-0.643-0.579-1.302-0.98-1.977-1.206
                     c-0.676-0.225-1.336-0.337-1.979-0.337c-1.126,0-2.123,0.538-2.991,1.615s-1.303,2.758-1.303,5.042
                     c0,2.379,0.379,4.116,1.134,5.21C286.549,47.146,287.619,47.692,289.001,47.692z'
-                    />
-                </g>
-            </g>
-        </svg>
-    )
+          />
+        </g>
+      </g>
+    </svg>
+  );
 }

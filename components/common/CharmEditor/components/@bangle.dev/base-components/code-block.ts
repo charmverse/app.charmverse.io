@@ -7,14 +7,14 @@ import {
   Node,
   Schema,
   setBlockType,
-  textblockTypeInputRule,
+  textblockTypeInputRule
 } from '@bangle.dev/pm';
 import { moveNode } from '@bangle.dev/pm-commands';
 import {
   createObject,
   filter,
   findParentNodeOfType,
-  insertEmpty,
+  insertEmpty
 } from '@bangle.dev/utils';
 import type Token from 'markdown-it/lib/token';
 import type { MarkdownSerializerState } from 'prosemirror-markdown';
@@ -22,7 +22,7 @@ import type { MarkdownSerializerState } from 'prosemirror-markdown';
 export const spec = specFactory;
 export const plugins = pluginsFactory;
 export const commands = {
-  queryIsCodeActiveBlock,
+  queryIsCodeActiveBlock
 };
 export const defaultKeys = {
   toCodeBlock: 'Shift-Ctrl-\\',
@@ -30,19 +30,19 @@ export const defaultKeys = {
   moveUp: 'Alt-ArrowUp',
   insertEmptyParaAbove: 'Mod-Shift-Enter',
   insertEmptyParaBelow: 'Mod-Enter',
-  tab: 'Tab',
+  tab: 'Tab'
 };
 
 const name = 'codeBlock';
 const getTypeFromSchema = (schema: Schema) => schema.nodes[name];
 
-function specFactory(): RawSpecs {
+function specFactory (): RawSpecs {
   return {
     type: 'node',
     name,
     schema: {
       attrs: {
-        language: { default: '' },
+        language: { default: '' }
       },
       content: 'text*',
       marks: '',
@@ -51,11 +51,11 @@ function specFactory(): RawSpecs {
       defining: true,
       draggable: true,
       parseDOM: [{ tag: 'pre', preserveWhitespace: 'full' }],
-      toDOM: (): DOMOutputSpecArray => ['pre', ['code', 0]],
+      toDOM: (): DOMOutputSpecArray => ['pre', ['code', 0]]
     },
     markdown: {
-      toMarkdown(state: MarkdownSerializerState, node: Node) {
-        state.write('```' + (node.attrs.language || '') + '\n');
+      toMarkdown (state: MarkdownSerializerState, node: Node) {
+        state.write(`\`\`\`${node.attrs.language || ''}\n`);
         state.text(node.textContent, false);
         state.ensureNewLine();
         state.write('```');
@@ -66,23 +66,23 @@ function specFactory(): RawSpecs {
         fence: {
           block: name,
           getAttrs: (tok: Token) => ({ language: tok.info || '' }),
-          noCloseToken: true,
-        },
-      },
-    },
+          noCloseToken: true
+        }
+      }
+    }
   };
 }
 
-function pluginsFactory({
+function pluginsFactory ({
   markdownShortcut = true,
-  keybindings = defaultKeys,
+  keybindings = defaultKeys
 } = {}): RawPlugins {
   return ({ schema }) => {
     const type = getTypeFromSchema(schema);
     return [
       markdownShortcut && textblockTypeInputRule(/^```$/, type),
-      keybindings &&
-        keymap(
+      keybindings
+        && keymap(
           createObject([
             [keybindings.toCodeBlock, setBlockType(type)],
 
@@ -93,15 +93,15 @@ function pluginsFactory({
               keybindings.insertEmptyParaAbove,
               filter(
                 queryIsCodeActiveBlock(),
-                insertEmpty(schema.nodes.paragraph, 'above', false),
-              ),
+                insertEmpty(schema.nodes.paragraph, 'above', false)
+              )
             ],
             [
               keybindings.insertEmptyParaBelow,
               filter(
                 queryIsCodeActiveBlock(),
-                insertEmpty(schema.nodes.paragraph, 'below', false),
-              ),
+                insertEmpty(schema.nodes.paragraph, 'below', false)
+              )
             ],
             [
               keybindings.tab,
@@ -114,15 +114,15 @@ function pluginsFactory({
                   }
                   return true;
                 }
-              ),
-            ],
-          ]),
-        ),
+              )
+            ]
+          ])
+        )
     ];
   };
 }
 
-export function queryIsCodeActiveBlock() {
+export function queryIsCodeActiveBlock () {
   return (state: EditorState) => {
     const type = getTypeFromSchema(state.schema);
     return Boolean(findParentNodeOfType(type)(state.selection));
