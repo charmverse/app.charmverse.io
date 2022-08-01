@@ -165,9 +165,11 @@ function ResizableImage ({ readOnly, onResizeStop, node, updateAttrs, selected }
   }
 
   const onDelete = useCallback(() => {
-    if (node.attrs.src?.includes('s3.amazonaws.com')) {
-      charmClient.deleteFromS3(node.attrs.src);
-    }
+    // dont do this since it may be used in some other place
+    // TODO: find a better way to know when we can delete files!
+    // if (node.attrs.src?.includes('s3.amazonaws.com')) {
+    //   charmClient.deleteFromS3(node.attrs.src);
+    // }
     updateAttrs({
       src: null,
       aspectRatio: 1
