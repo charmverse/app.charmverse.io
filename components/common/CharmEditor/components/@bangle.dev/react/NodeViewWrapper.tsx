@@ -1,5 +1,5 @@
 import { NodeView, NodeViewProps } from '@bangle.dev/core';
-import React from "react";
+import React from 'react';
 
 export type RenderNodeViewsFunction = (
   props: NodeViewProps & { children: React.ReactNode },
@@ -18,13 +18,14 @@ interface StateType {
 
 export class NodeViewWrapper extends React.Component<PropsType, StateType> {
   update: () => void;
+
   attachToContentDOM: (reactElement: HTMLDivElement) => void;
 
-  constructor(props: PropsType) {
+  constructor (props: PropsType) {
     super(props);
     this.update = () => {
       this.setState((_state, props) => ({
-        nodeViewProps: props.nodeView.getNodeViewProps(),
+        nodeViewProps: props.nodeView.getNodeViewProps()
       }));
     };
 
@@ -54,7 +55,7 @@ export class NodeViewWrapper extends React.Component<PropsType, StateType> {
     this.state = { nodeViewProps: this.props.nodeView.getNodeViewProps() };
   }
 
-  getChildren() {
+  getChildren () {
     if (!this.props.nodeView.contentDOM) {
       return null;
     }
@@ -72,20 +73,20 @@ export class NodeViewWrapper extends React.Component<PropsType, StateType> {
 
     return (
       <div
-        className="bangle-nv-child-container"
+        className='bangle-nv-child-container'
         ref={this.attachToContentDOM}
       />
     );
   }
 
-  render() {
+  render () {
     const element = this.props.renderNodeViews({
       ...this.state.nodeViewProps,
-      children: this.getChildren(),
+      children: this.getChildren()
     });
     if (!element) {
       throw new Error(
-        `renderNodeView must handle rendering for node of type "${this.state.nodeViewProps.node.type.name}"`,
+        `renderNodeView must handle rendering for node of type "${this.state.nodeViewProps.node.type.name}"`
       );
     }
     return element;
