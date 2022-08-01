@@ -37,19 +37,19 @@ function URLProperty (props: Props): JSX.Element {
   return (
     <div className='URLProperty property-link url'>
       {(hasValue || props.placeholder)
-            && (
-            <Editable
-              className='octo-propertyvalue'
-              placeholderText={props.placeholder}
-              value={props.value}
-              autoExpand={false}
-              readonly={props.readonly}
-              onChange={props.onChange}
-              onSave={props.onSave}
-              onCancel={props.onCancel}
-              validator={props.validator}
-            />
-            )}
+        && (
+        <Editable
+          className='octo-propertyvalue'
+          placeholderText={props.placeholder}
+          value={props.value}
+          autoExpand={false}
+          readonly={props.readonly}
+          onChange={props.onChange}
+          onSave={props.onSave}
+          onCancel={props.onCancel}
+          validator={props.validator}
+        />
+        )}
       {link}
     </div>
   );
