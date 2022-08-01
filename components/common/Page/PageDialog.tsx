@@ -10,16 +10,16 @@ import log from 'lib/log';
 import debouncePromise from 'lib/utilities/debouncePromise';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useRef } from 'react';
+import { ReactNode, useCallback, useEffect, useRef } from 'react';
 
 interface Props {
   page?: Page | null;
   onClose: () => void;
   readOnly?: boolean;
+  toolsMenu?: ReactNode
 }
 
 export default function PageDialog (props: Props) {
-
   const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'page-dialog' });
   const router = useRouter();
@@ -77,6 +77,7 @@ export default function PageDialog (props: Props) {
       {popupState.isOpen && (
         <Dialog
           hideCloseButton={true}
+          toolsMenu={props.toolsMenu}
           toolbar={(
             <Button
               size='small'

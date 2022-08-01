@@ -371,9 +371,12 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
       }}
     >
       {permissions && (user?.id === bounty.createdBy || isAdmin) && (
-      <BountyHeader
-        bounty={bounty}
-      />
+        <>
+          <hr />
+          <BountyHeader
+            bounty={bounty}
+          />
+        </>
       )}
       <Stack flexDirection='row' justifyContent='space-between' gap={2} alignItems='center'>
         {

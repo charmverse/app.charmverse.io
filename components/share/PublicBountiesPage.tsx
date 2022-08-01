@@ -36,19 +36,6 @@ export default function PublicBountiesPage () {
 
   const isSpaceMember = user && contributors.some(c => c.id === user.id);
 
-  function onSelectBounty (bounty: Bounty) {
-
-    if (isSpaceMember) {
-      // We pass the bounty as the useState setter will not have set the new bounty state before calling redirect to space
-      // redirectToSpace(bounty);
-    }
-    else {
-      setSelectedBounty(bounty);
-      loginViaTokenGateModal.open();
-    }
-
-  }
-
   useEffect(() => {
     if (account && !user) {
 
