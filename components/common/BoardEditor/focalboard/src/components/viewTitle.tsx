@@ -18,7 +18,6 @@ import ShowIcon from '../widgets/icons/show';
 import BlockIconSelector from './blockIconSelector';
 import dynamic from 'next/dynamic';
 const CharmEditor = dynamic(() => import('components/common/CharmEditor'), {
-  loading: () => <header />,
   ssr: false
 })
 

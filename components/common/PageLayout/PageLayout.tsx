@@ -2,6 +2,7 @@ import styled from '@emotion/styled';
 import { Theme } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import MuiDrawer from '@mui/material/Drawer';
+import { FocalboardViewsProvider } from 'hooks/useFocalboardViews';
 import { VotesProvider } from 'hooks/useVotes';
 import { PageActionDisplayProvider } from 'hooks/usePageActionDisplay';
 import { ThreadsProvider } from 'hooks/useThreads';
@@ -107,31 +108,34 @@ function PageLayout ({ sidebarWidth = 300, children, sidebar: SidebarOverride }:
         <CurrentPageFavicon />
       </Head>
       <LayoutContainer>
-        <ThreadsProvider>
-          <VotesProvider>
-            <PageActionDisplayProvider>
-              <AppBar open={open} sidebarWidth={sidebarWidth} position='fixed'>
-                <Header
+        <FocalboardViewsProvider>
+          <ThreadsProvider>
+            <VotesProvider>
+              <PageActionDisplayProvider>
+                <AppBar open={open} sidebarWidth={sidebarWidth} position='fixed'>
+                  <Header
+                    open={open}
+                    openSidebar={handleDrawerOpen}
+                  />
+                </AppBar>
+                <Drawer
+                  sidebarWidth={sidebarWidth}
+                  variant='permanent'
                   open={open}
-                  openSidebar={handleDrawerOpen}
-                />
-              </AppBar>
-              <Drawer
-                sidebarWidth={sidebarWidth}
-                variant='permanent'
-                open={open}
-              >
-                {SidebarOverride
-                  ? <SidebarOverride closeSidebar={handleDrawerClose} />
-                  : <Sidebar closeSidebar={handleDrawerClose} favorites={user?.favorites || []} />}
-              </Drawer>
-              <PageContainer>
-                <HeaderSpacer />
-                {children}
-              </PageContainer>
-            </PageActionDisplayProvider>
-          </VotesProvider>
-        </ThreadsProvider>
+                >
+                  {SidebarOverride
+                    ? <SidebarOverride closeSidebar={handleDrawerClose} />
+                    : <Sidebar closeSidebar={handleDrawerClose} favorites={user?.favorites || []} />}
+                </Drawer>
+                <PageContainer>
+                  <HeaderSpacer />
+                  {children}
+                </PageContainer>
+              </PageActionDisplayProvider>
+            </VotesProvider>
+          </ThreadsProvider>
+
+        </FocalboardViewsProvider>
       </LayoutContainer>
     </>
   );

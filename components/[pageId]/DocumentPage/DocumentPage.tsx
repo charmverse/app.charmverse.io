@@ -22,7 +22,6 @@ import PageDeleteBanner from './components/PageDeleteBanner';
 import PageHeader from './components/PageHeader';
 
 const CharmEditor = dynamic(() => import('components/common/CharmEditor'), {
-  loading: () => <header />,
   ssr: false
 });
 

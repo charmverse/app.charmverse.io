@@ -18,10 +18,14 @@ import Button from 'components/common/Button';
 import { useSnackbar } from 'hooks/useSnackbar';
 import useSWR from 'swr';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import LitShareModal from 'lit-share-modal-v3-react-17';
+import dynamic from 'next/dynamic';
 import getLitChainFromChainId from 'lib/token-gates/getLitChainFromChainId';
 import Legend from '../../../Legend';
 import TokenGatesTable from './components/TokenGatesTable';
+
+const LitShareModal = dynamic(() => import('lit-share-modal-v3-react-17'), {
+  ssr: false
+});
 
 const ShareModalContainer = styled.div`
 

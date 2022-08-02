@@ -5,7 +5,6 @@ import { AssignedBountyPermissions } from 'lib/bounties';
 import dynamic from 'next/dynamic';
 
 const CharmEditor = dynamic(() => import('components/common/CharmEditor'), {
-  loading: () => <header />,
   ssr: false
 });
 

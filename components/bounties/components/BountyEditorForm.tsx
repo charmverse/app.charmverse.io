@@ -36,7 +36,6 @@ import { useForm, UseFormWatch } from 'react-hook-form';
 import * as yup from 'yup';
 
 const CharmEditor = dynamic(() => import('components/common/CharmEditor'), {
-  loading: () => <header />,
   ssr: false
 });
 
