@@ -12,8 +12,7 @@ export function useNavigationLock (isDirty: boolean, onConfirm: () => void) {
     const handleWindowClose = (e: BeforeUnloadEvent) => {
       if (!isDirty) return;
       e.preventDefault();
-      e.returnValue = warningText;
-      return e.returnValue;
+      return warningText;
     };
     const handleBrowseAway = () => {
       if (!isDirty) return;
