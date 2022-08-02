@@ -122,7 +122,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
             pageActionDisplay={!insideModal ? currentPageActionDisplay : null}
             pageId={page.id}
             disablePageSpecificFeatures={isSharedPage}
-            enableVoting={page.type !== 'proposal'}
+            enableVoting={true}
           >
             <PageHeader
               headerImage={page.headerImage}
