@@ -374,17 +374,23 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
       }}
     >
       {permissions && (user?.id === bounty.createdBy) && (
-        <BountyHeader
-          bounty={bounty}
-        />
+        <>
+          <hr />
+          <BountyHeader
+            bounty={bounty}
+          />
+        </>
       )}
       <Stack flexDirection='row' justifyContent='space-between' gap={2} alignItems='center'>
         {
           (permissions && !permissions.userPermissions?.review) ? (
-            <BountyReviewers
-              bounty={bounty}
-              permissions={permissions}
-            />
+            <Stack gap={1} mb={1} width='100%'>
+              <hr />
+              <BountyReviewers
+                bounty={bounty}
+                permissions={permissions}
+              />
+            </Stack>
           ) : (
             <div
               className='octo-propertyrow'

@@ -69,7 +69,6 @@ const Dialog = React.memo((props: Props) => {
             {props.children}
           </div>
         </div>
-        {props.children}
       </div>
     </Modal >
   );
