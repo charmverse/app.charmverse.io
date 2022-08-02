@@ -4,7 +4,7 @@ import { aggregateVoteResult } from './aggregateVoteResult';
 import { DEFAULT_THRESHOLD, ExtendedVote, VoteDTO, VOTE_STATUS } from './interfaces';
 
 export async function createVote (vote: VoteDTO & {spaceId: string}): Promise<ExtendedVote> {
-  const { spaceId, createdBy, pageId, title, threshold, description, deadline, type, voteOptions } = vote;
+  const { spaceId, createdBy, pageId, title, threshold, description, deadline, type, voteOptions, context } = vote;
   const dbVote = await prisma.vote.create({
     data: {
       description,
@@ -13,6 +13,7 @@ export async function createVote (vote: VoteDTO & {spaceId: string}): Promise<Ex
       deadline: new Date(deadline),
       status: VOTE_STATUS[0],
       type,
+      context,
       page: {
         connect: {
           id: pageId
