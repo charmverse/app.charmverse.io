@@ -6,6 +6,7 @@ import charmClient from 'charmClient';
 import FieldLabel from 'components/common/form/FieldLabel';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useNavigationLock } from 'hooks/useNavigationLock';
 import { getSnapshotSpace } from 'lib/snapshot/get-space';
 import { SystemError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
@@ -41,7 +42,8 @@ export default function ConnectSnapshot () {
     register,
     handleSubmit,
     watch,
-    formState: { errors, isValid }
+    formState: { errors, isValid, isDirty },
+    getValues
   } = useForm<FormValues>({
     defaultValues: {
       defaultVotingDuration: space?.defaultVotingDuration ?? DEFAULT_VOTING_DURATION,
@@ -56,15 +58,18 @@ export default function ConnectSnapshot () {
   async function onSubmit (formValues: FormValues) {
 
     setFormError(null);
-
-    charmClient.updateSnapshotConnection(space?.id as any, formValues)
-      .then((spaceWithDomain) => {
-        setSpace(spaceWithDomain);
-      })
-      .catch(err => {
-        setFormError(err);
-      });
+    try {
+      const spaceWithDomain = await charmClient.updateSnapshotConnection(space?.id as any, formValues);
+      setSpace(spaceWithDomain);
+    }
+    catch (err) {
+      setFormError(err as any);
+    }
   }
+
+  useNavigationLock(isDirty, async () => {
+    await onSubmit(getValues());
+  });
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>

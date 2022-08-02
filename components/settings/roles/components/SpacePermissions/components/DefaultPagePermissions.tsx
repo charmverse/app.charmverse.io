@@ -9,10 +9,11 @@ import { permissionLevels } from 'lib/permissions/pages/page-permission-mapping'
 import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/hooks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import charmClient from 'charmClient';
 import Typography from '@mui/material/Typography';
 import { PagePermissionLevelWithoutCustom } from 'lib/permissions/pages/page-permission-interfaces';
+import { useNavigationLock } from 'hooks/useNavigationLock';
 
 const pagePermissionDescriptions: Record<PagePermissionLevelWithoutCustom, string> = {
   full_access: 'Workspace members can edit and share pages.',
@@ -28,7 +29,7 @@ export default function DefaultSpacePagePermissions () {
   const [isUpdatingPagePermission, setIsUpdatingPagePermission] = useState(false);
 
   const isAdmin = useIsAdmin();
-
+  const touched = useRef<boolean>(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'workspace-default-page-permission' });
 
   // Permission states
@@ -58,7 +59,6 @@ export default function DefaultSpacePagePermissions () {
       });
 
       setSpace(updatedSpace);
-
     }
   }
 
@@ -66,6 +66,10 @@ export default function DefaultSpacePagePermissions () {
     updateSpaceDefaultPagePermission();
     updateSpaceDefaultPublicPages();
   }
+
+  useNavigationLock(touched.current, () => {
+    updateSpaceDefaults();
+  });
 
   if (!space) {
     return null;
@@ -112,6 +116,7 @@ export default function DefaultSpacePagePermissions () {
                   onClick={() => {
                     setSelectedPagePermission(permissionLevel);
                     popupState.close();
+                    touched.current = true;
                   }}
                 >
                   <StyledListItemText
@@ -138,10 +143,10 @@ export default function DefaultSpacePagePermissions () {
             control={(
               <Switch
                 disabled={!isAdmin}
-//                        checked={newValues[operation]}
                 onChange={(ev) => {
                   const { checked: publiclyAccessible } = ev.target;
                   setDefaultPublicPages(publiclyAccessible);
+                  touched.current = true;
                 }}
                 defaultChecked={defaultPublicPages}
               />

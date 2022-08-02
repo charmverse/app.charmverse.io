@@ -16,6 +16,7 @@ import Legend from 'components/settings/Legend';
 import ImportNotionWorkspace from 'components/settings/workspace/ImportNotionWorkspace';
 import Avatar from 'components/settings/workspace/LargeAvatar';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useNavigationLock } from 'hooks/useNavigationLock';
 import { setTitle } from 'hooks/usePageTitle';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
@@ -32,16 +33,16 @@ export default function WorkspaceSettings () {
   const [spaces, setSpaces] = useSpaces();
   const [user] = useUser();
   const isAdmin = isSpaceAdmin(user, space?.id);
-
   const workspaceRemoveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-remove' });
   const workspaceLeaveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-leave' });
-
+  const unsavedChangesModalState = usePopupState({ variant: 'popover', popupId: 'unsaved-changes' });
   const {
     register,
     handleSubmit,
     reset,
     setValue,
     watch,
+    getValues,
     formState: { errors, isDirty }
   } = useForm<FormValues>({
     defaultValues: space,
@@ -73,8 +74,13 @@ export default function WorkspaceSettings () {
     workspaceRemoveModalState.open();
   }
 
+  useNavigationLock(isDirty, () => {
+    onSubmit(getValues());
+  });
+
   return (
     <>
+
       <Legend>Space Details</Legend>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid container direction='column' spacing={3}>
@@ -187,6 +193,20 @@ export default function WorkspaceSettings () {
         }}
       />
       )}
+      <ConfirmDeleteModal
+        open={unsavedChangesModalState.isOpen}
+        title='You have unsaved changes'
+        onClose={() => {
+          // discard
+          unsavedChangesModalState.close();
+        }}
+        buttonText='Save changes'
+        question='Are you sure you want to discard unsaved changes'
+        onConfirm={() => {
+          // save
+          unsavedChangesModalState.close();
+        }}
+      />
     </>
   );
 }

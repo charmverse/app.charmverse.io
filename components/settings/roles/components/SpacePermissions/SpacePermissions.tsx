@@ -1,12 +1,11 @@
 
-import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import charmClient from 'charmClient';
 import Loader from 'components/common/Loader';
 import useIsAdmin from 'hooks/useIsAdmin';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { yupResolver } from '@hookform/resolvers/yup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -14,6 +13,7 @@ import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
 import { SpaceOperation } from '@prisma/client';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useNavigationLock } from 'hooks/useNavigationLock';
 import { AssignablePermissionGroups } from 'lib/permissions/interfaces';
 import { AvailableSpacePermissions, spaceOperationLabels, spaceOperations, SpacePermissionFlags } from 'lib/permissions/spaces/client';
 import { useForm } from 'react-hook-form';
@@ -45,18 +45,21 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
   const [space] = useCurrentSpace();
 
   const isAdmin = useIsAdmin();
-
+  // custom onChange is used for switches so isDirty from useForm doesn't change it value
+  const touched = useRef<boolean>(false);
   const {
-    register,
     handleSubmit,
-    reset,
-    formState: { errors, isValid },
     setValue,
-    watch
+    watch,
+    getValues
   } = useForm<FormValues>({
     mode: 'onChange',
     defaultValues: assignedPermissions ?? new AvailableSpacePermissions().empty,
     resolver: yupResolver(schema)
+  });
+
+  useNavigationLock(touched.current, () => {
+    submitted(getValues());
   });
 
   const newValues = watch();
@@ -183,6 +186,9 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
                         onChange={(ev) => {
                           const { checked: nowHasAccess } = ev.target;
                           setValue(operation, nowHasAccess);
+                          if (!touched.current) {
+                            touched.current = true;
+                          }
                         }}
                         defaultChecked={userCanPerformAction}
                       />

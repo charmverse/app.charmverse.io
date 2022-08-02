@@ -1,23 +1,19 @@
+import CloseIcon from '@mui/icons-material/Close';
+import DoneIcon from '@mui/icons-material/Done';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Menu, MenuItem } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch from '@mui/material/Switch';
-import { PagePermissionLevel, SpacePermissionConfigurationMode } from '@prisma/client';
+import Typography from '@mui/material/Typography';
+import { SpacePermissionConfigurationMode } from '@prisma/client';
+import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { StyledListItemText } from 'components/common/StyledListItemText';
-import { permissionLevels } from 'lib/permissions/pages/page-permission-mapping';
-import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/hooks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import DoneIcon from '@mui/icons-material/Done';
-import CloseIcon from '@mui/icons-material/Close';
 import useIsAdmin from 'hooks/useIsAdmin';
-import { useState } from 'react';
-import charmClient from 'charmClient';
-import Typography from '@mui/material/Typography';
-import { PagePermissionLevelWithoutCustom } from 'lib/permissions/pages/page-permission-interfaces';
+import { useNavigationLock } from 'hooks/useNavigationLock';
 import { configurationModeDescription, configurationModeName, getTemplateExplanation } from 'lib/permissions/meta/preset-templates';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { useRef, useState } from 'react';
 
 interface Props {
   permissionModeSelected?: (mode: SpacePermissionConfigurationMode) => void;
@@ -31,6 +27,7 @@ export default function PermissionConfigurationMode ({ permissionModeSelected = 
   const [selectedConfigurationMode, setSelectedConfigurationMode] = useState<SpacePermissionConfigurationMode>(space?.permissionConfigurationMode ?? 'custom');
 
   const [isUpdatingPermissionMode, setIsUpdatingPermissionMode] = useState(false);
+  const touched = useRef<boolean>(false);
 
   const popupState = usePopupState({ variant: 'popover', popupId: 'workspace-permission-mode' });
 
@@ -47,6 +44,10 @@ export default function PermissionConfigurationMode ({ permissionModeSelected = 
       setIsUpdatingPermissionMode(false);
     }
   }
+
+  useNavigationLock(touched.current, () => {
+    updateSettings();
+  });
 
   if (!space) {
     return null;
@@ -102,6 +103,9 @@ export default function PermissionConfigurationMode ({ permissionModeSelected = 
                     setSelectedConfigurationMode(mode);
                     permissionModeSelected(mode);
                     popupState.close();
+                    if (!touched.current) {
+                      touched.current = true;
+                    }
                   }}
                 >
                   <StyledListItemText
@@ -154,7 +158,6 @@ export default function PermissionConfigurationMode ({ permissionModeSelected = 
         isAdmin && (
           <Grid item xs>
             <Button onClick={() => updateSettings()} disabled={!settingsChanged} type='submit' variant='contained' color='primary' sx={{ mr: 1 }}>Save</Button>
-
           </Grid>
         )
       }
