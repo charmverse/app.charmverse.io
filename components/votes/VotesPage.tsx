@@ -41,7 +41,8 @@ export default function VotesPage () {
     deadline: null,
     pageId: page!.id,
     status: 'Draft',
-    title: ''
+    title: '',
+    context: 'proposal'
   }));
 
   const filteredVotes = data ? filterVotes<VoteRow>(draftVotes.concat(data), viewState.filterBy) : undefined;

@@ -1,9 +1,10 @@
-import { Page, VoteStatus } from '@prisma/client';
+import { Page, VoteContext, VoteStatus } from '@prisma/client';
 import { useState, useCallback, useEffect } from 'react';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 import { Tooltip, Typography, Box, Grid } from '@mui/material';
 import Link from 'components/common/Link';
+import TaskIcon from '@mui/icons-material/Task';
 import VoteIcon from '@mui/icons-material/HowToVoteOutlined';
 import GridHeader from 'components/common/Grid/GridHeader';
 import GridContainer from 'components/common/Grid/GridContainer';
@@ -29,6 +30,7 @@ export interface VoteRow {
   createdBy: string;
   deadline: any | null;
   status: VoteStatus | 'Draft';
+  context: VoteContext;
 }
 
 export default function VotesTable ({ votes, mutateVotes }: { votes?: (ExtendedVote | VoteRow)[], mutateVotes: () => void }) {
@@ -128,18 +130,17 @@ export default function VotesTable ({ votes, mutateVotes }: { votes?: (ExtendedV
       {votes?.map(vote => (
         <GridContainer key={vote.id}>
           <Grid item xs={8} sm={8} md={5} sx={{ cursor: 'pointer' }}>
-            {pages[vote.pageId]?.type === 'proposal' && (
+            {vote.context === 'proposal' ? (
               <Box display='flex' alignItems='center' justifyContent='space-between' onClick={() => openPage(vote.pageId)}>
                 <Box display='flex' alignItems='flex-start' gap={1}>
-                  <Box component='span' sx={{ display: { xs: 'none', md: 'inline' } }}><VoteIcon color='secondary' /></Box>
+                  <Box component='span' sx={{ display: { xs: 'none', md: 'inline' } }}><TaskIcon color='primary' /></Box>
                   <div>
                     <Typography><strong>{pages[vote.pageId]?.title || 'Untitled'}</strong></Typography>
                   </div>
                 </Box>
                 <Button className='show-on-hover' color='secondary' variant='outlined' size='small'>Open</Button>
               </Box>
-            )}
-            {pages[vote.pageId]?.type !== 'proposal' && (
+            ) : (
               <Box display='flex' alignItems='center' justifyContent='space-between'>
                 <Box display='flex' alignItems='flex-start' gap={1}>
                   <Box component='span' sx={{ display: { xs: 'none', md: 'inline' } }}><VoteIcon color='secondary' /></Box>
