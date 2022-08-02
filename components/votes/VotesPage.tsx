@@ -47,7 +47,7 @@ export default function VotesPage () {
   }));
 
   const sortedVotes = sortVotes(
-    filterVotes<VoteRow>(draftVotes.concat(data ?? []), viewState.filterBy),
+    filterVotes<VoteRow>(draftVotes.concat(data as VoteRow[] ?? []), viewState.filterBy),
     viewState.sortBy
   ) as ExtendedVote[];
 
