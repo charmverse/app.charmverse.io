@@ -5,6 +5,7 @@ import { CenteredPageContent } from 'components/common/PageLayout/components/Pag
 import { filterVotes, sortVotes, ViewOptions, VoteFilter, VoteSort } from 'components/[pageId]/DocumentPage/components/VotesSidebar';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
+import { ExtendedVote } from 'lib/votes/interfaces';
 import { Reducer, useReducer } from 'react';
 import useSWR from 'swr';
 import NewProposalButton from './components/NewProposalButton';
@@ -29,11 +30,11 @@ export default function VotesPage () {
   const [viewState, setViewState] = useReducer<ViewStateReducer>((state, updates) => ({ ...state, ...updates }), defaultViewState);
 
   const [currentSpace] = useCurrentSpace();
-  const { data, mutate } = useSWR(() => `votesBySpace/${currentSpace?.id}`, () => currentSpace ? charmClient.getVotesBySpace(currentSpace.id) : []);
+  const { data, mutate: mutateVotes } = useSWR(() => `votesBySpace/${currentSpace?.id}`, () => currentSpace ? charmClient.getVotesBySpace(currentSpace.id) : []);
 
   // votes dont exist right away for proposals, so treat them like draft votes
   const { pages } = usePages();
-  const proposalsWithoutVotes = Object.values(pages).filter(page => page?.type === 'proposal' && !page.deletedAt && !data?.some(vote => vote.pageId === page.id));
+  const proposalsWithoutVotes = Object.values(pages).filter(page => page?.type === 'proposal' && !page.deletedAt && !data?.some(vote => vote.pageId === page.id && vote.context === 'proposal'));
   const draftVotes: VoteRow[] = proposalsWithoutVotes.map(page => ({
     id: page!.id,
     createdAt: page!.createdAt,
@@ -45,8 +46,10 @@ export default function VotesPage () {
     context: 'proposal'
   }));
 
-  const filteredVotes = data ? filterVotes<VoteRow>(draftVotes.concat(data), viewState.filterBy) : undefined;
-  const sortedVotes = filteredVotes ? sortVotes(filteredVotes, viewState.sortBy) : undefined;
+  const sortedVotes = sortVotes(
+    filterVotes<VoteRow>(draftVotes.concat(data ?? []), viewState.filterBy),
+    viewState.sortBy
+  ) as ExtendedVote[];
 
   function setVoteSort (sortBy: VoteSort) {
     setViewState({ sortBy });
@@ -71,7 +74,7 @@ export default function VotesPage () {
           </Box>
         </Grid>
       </Grid>
-      <VotesTable votes={data ? sortedVotes : undefined} mutateVotes={mutate} />
+      <VotesTable votes={sortedVotes} mutateVotes={mutateVotes} />
     </CenteredPageContent>
   );
 }

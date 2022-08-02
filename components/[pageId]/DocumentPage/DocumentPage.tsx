@@ -44,7 +44,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
   const { bounties } = useBounties();
   const bounty = bounties.find(_bounty => _bounty.page?.id === page.id);
 
-  const pageVote = Object.values(votes)[0];
+  const pageVote = Object.values(votes).find(v => v.context === 'proposal');
 
   const board = useAppSelector((state) => {
     if (page.type === 'card' && page.parentId) {
