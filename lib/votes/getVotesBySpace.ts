@@ -31,7 +31,8 @@ export async function getVotesBySpace ({ spaceId, userId }: SpaceVotesRequest): 
     },
     include: {
       userVotes: true,
-      voteOptions: true
+      voteOptions: true,
+      proposal: true
     }
   });
 

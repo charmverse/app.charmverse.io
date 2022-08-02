@@ -20,6 +20,7 @@ export async function getVote (id: string, userId: string): Promise<ExtendedVote
           }
         }
       },
+      proposal: true,
       voteOptions: true
     }
   });

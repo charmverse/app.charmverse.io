@@ -754,7 +754,7 @@ class CharmClient {
     return http.GET<UserVoteExtendedDTO[]>(`/api/votes/${voteId}/user-votes`);
   }
 
-  createProposal (proposal: ProposalCreationData): Promise<PageWithProposal> {
+  createProposal (proposal: Omit<ProposalCreationData, 'userId'>): Promise<PageWithProposal> {
     return http.POST('/api/proposals', proposal);
   }
 }

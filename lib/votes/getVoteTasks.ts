@@ -1,7 +1,8 @@
+import { Page } from '@prisma/client';
 import { prisma } from 'db';
 import { aggregateVoteResult } from './aggregateVoteResult';
 import { calculateVoteStatus } from './calculateVoteStatus';
-import { VoteTask } from './interfaces';
+import { VoteTask, VoteTaskWithProposal } from './interfaces';
 
 export async function getVoteTasks (userId: string): Promise<VoteTask[]> {
   const votes = await prisma.vote.findMany({
@@ -30,6 +31,11 @@ export async function getVoteTasks (userId: string): Promise<VoteTask[]> {
     },
     include: {
       page: true,
+      proposal: {
+        include: {
+          page: true
+        }
+      },
       space: true,
       userVotes: true,
       voteOptions: true
@@ -49,6 +55,7 @@ export async function getVoteTasks (userId: string): Promise<VoteTask[]> {
 
     return {
       ...vote,
+      page: vote.proposal ? (vote as any as VoteTask<'proposal'>).proposal.page as Page : vote.page as Page,
       aggregatedResult,
       userChoice,
       status: voteStatus,

@@ -12,6 +12,7 @@ export async function getVotesByPage ({ pageId, userId }: {pageId: string, userI
       }
     },
     include: {
+      proposal: true,
       userVotes: {
         orderBy: {
           updatedAt: 'desc'
