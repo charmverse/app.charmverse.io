@@ -1,8 +1,9 @@
-import { Page, VoteStatus } from '@prisma/client';
+import { Page, Proposal, ProposalStatus, VoteStatus } from '@prisma/client';
 import { useState, useCallback, useEffect } from 'react';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 import { Tooltip, Typography, Box, Grid } from '@mui/material';
+import TaskIcon from '@mui/icons-material/Task';
 import Link from 'components/common/Link';
 import VoteIcon from '@mui/icons-material/HowToVoteOutlined';
 import GridHeader from 'components/common/Grid/GridHeader';
@@ -28,10 +29,11 @@ export interface VoteRow {
   createdAt: Date;
   createdBy: string;
   deadline: any | null;
-  status: VoteStatus | 'Draft';
+  status: VoteStatus | ProposalStatus;
+  proposal?: Proposal
 }
 
-export default function VotesTable ({ votes, mutateVotes }: { votes?: (ExtendedVote | VoteRow)[], mutateVotes: () => void }) {
+export default function VotesTable ({ votes, mutateVotes }: { votes?: (VoteRow)[], mutateVotes: () => void }) {
   const router = useRouter();
   const { pages, setPages } = usePages();
   const { mutate: mutateTasks } = useTasks();
@@ -125,21 +127,25 @@ export default function VotesTable ({ votes, mutateVotes }: { votes?: (ExtendedV
           <NoVotesMessage message='There are no votes yet. Create a vote from a page to get started!' />
         </Box>
       )}
-      {votes?.map(vote => (
+      {(votes as ExtendedVote[])?.map(vote => (
         <GridContainer key={vote.id}>
           <Grid item xs={8} sm={8} md={5} sx={{ cursor: 'pointer' }}>
-            {pages[vote.pageId]?.type === 'proposal' && (
-              <Box display='flex' alignItems='center' justifyContent='space-between' onClick={() => openPage(vote.pageId)}>
+
+            {/** Open actual proposals within the modal */}
+            {vote.proposal && (
+              <Box display='flex' alignItems='center' justifyContent='space-between' onClick={() => openPage(vote.proposal.pageId)}>
                 <Box display='flex' alignItems='flex-start' gap={1}>
-                  <Box component='span' sx={{ display: { xs: 'none', md: 'inline' } }}><VoteIcon color='secondary' /></Box>
+                  <Box component='span' sx={{ display: { xs: 'none', md: 'inline' } }}><TaskIcon color='secondary' /></Box>
                   <div>
-                    <Typography><strong>{pages[vote.pageId]?.title || 'Untitled'}</strong></Typography>
+                    <Typography><strong>{pages[vote.proposal.pageId]?.title || 'Untitled'}</strong></Typography>
                   </div>
                 </Box>
                 <Button className='show-on-hover' color='secondary' variant='outlined' size='small'>Open</Button>
               </Box>
             )}
-            {pages[vote.pageId]?.type !== 'proposal' && (
+            {/** Direct non proposal pages to the page */}
+            {!vote.proposal && (
+
               <Box display='flex' alignItems='center' justifyContent='space-between'>
                 <Box display='flex' alignItems='flex-start' gap={1}>
                   <Box component='span' sx={{ display: { xs: 'none', md: 'inline' } }}><VoteIcon color='secondary' /></Box>
@@ -168,7 +174,7 @@ export default function VotesTable ({ votes, mutateVotes }: { votes?: (ExtendedV
           </Grid>
           <Grid item xs={2} sx={{ display: { xs: 'none', md: 'flex' } }} justifyContent='center'>
             <Tooltip arrow placement='top' title={vote.deadline ? humanFriendlyDate(vote.deadline, { withTime: true }) : ''}>
-              <Typography color={vote.deadline ? 'inherit' : 'secondary'}>{vote.deadline ? DateTime.fromISO(vote.deadline).toRelative({ base: DateTime.now() }) : 'N/A'}</Typography>
+              <Typography color={vote.deadline ? 'inherit' : 'secondary'}>{vote.deadline ? DateTime.fromISO(vote.deadline.toString()).toRelative({ base: DateTime.now() }) : 'N/A'}</Typography>
             </Tooltip>
           </Grid>
           <Grid item xs={2} sx={{ display: { xs: 'none', md: 'flex' } }} display='flex' justifyContent='center'>
@@ -178,7 +184,7 @@ export default function VotesTable ({ votes, mutateVotes }: { votes?: (ExtendedV
           </Grid>
           <Grid item xs={1} display='flex' justifyContent='flex-end'>
             <VoteActionsMenu
-              deleteVote={vote.status === 'Draft' ? undefined : deleteVote}
+              deleteVote={vote.status === 'draft' ? undefined : deleteVote}
               cancelVote={cancelVote}
               deleteProposal={pages[vote.pageId]?.type === 'proposal' ? deleteProposal : undefined}
               editProposal={pages[vote.pageId]?.type === 'proposal' ? editProposal : undefined}

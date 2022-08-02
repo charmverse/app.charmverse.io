@@ -1,5 +1,5 @@
 import { Box, Grid, Typography } from '@mui/material';
-import { VoteStatus } from '@prisma/client';
+import { ProposalStatus, VoteStatus } from '@prisma/client';
 import charmClient from 'charmClient';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { filterVotes, sortVotes, ViewOptions, VoteFilter, VoteSort } from 'components/[pageId]/DocumentPage/components/VotesSidebar';
@@ -33,15 +33,17 @@ export default function VotesPage () {
 
   // votes dont exist right away for proposals, so treat them like draft votes
   const { pages } = usePages();
-  const proposalsWithoutVotes = Object.values(pages).filter(page => page?.type === 'proposal' && !page.deletedAt && !data?.some(vote => vote.pageId === page.id));
+  const proposalsWithoutVotes = Object.values(pages)
+    .filter(page => page?.proposal && !page.deletedAt && !data?.some(vote => vote.proposal?.id === page.proposal?.id));
   const draftVotes: VoteRow[] = proposalsWithoutVotes.map(page => ({
     id: page!.id,
     createdAt: page!.createdAt,
     createdBy: page!.createdBy,
     deadline: null,
     pageId: page!.id,
-    status: 'Draft',
-    title: ''
+    status: page?.proposal?.status as VoteStatus,
+    title: '',
+    proposal: page?.proposal
   }));
 
   const filteredVotes = data ? filterVotes<VoteRow>(draftVotes.concat(data), viewState.filterBy) : undefined;

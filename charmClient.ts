@@ -36,7 +36,7 @@ import { PublicPageResponse } from 'lib/pages/interfaces';
 import { PublicBountyToggle } from 'lib/spaces/interfaces';
 import type { MarkTask } from 'lib/tasks/markTasks';
 import { TransactionCreationData } from 'lib/transactions/interface';
-import { ExtendedVote, UserVoteExtendedDTO, VoteDTO } from 'lib/votes/interfaces';
+import { ExtendedVote, UserVoteExtendedDTO, VoteCreationData, VoteDTO } from 'lib/votes/interfaces';
 import { PublicUser } from 'pages/api/public/profile/[userPath]';
 import { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
 import { PageWithProposal, ProposalCreationData } from 'lib/proposals/interfaces';
@@ -730,7 +730,7 @@ class CharmClient {
     return http.GET<ExtendedVote[]>(`/api/spaces/${spaceId}/votes`);
   }
 
-  createVote (votePayload: VoteDTO) {
+  createVote (votePayload: VoteCreationData) {
     return http.POST<ExtendedVote>('/api/votes', votePayload);
   }
 
