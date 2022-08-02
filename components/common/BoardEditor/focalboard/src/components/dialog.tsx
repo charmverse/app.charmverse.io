@@ -12,64 +12,67 @@ import CloseIcon from '../widgets/icons/close'
 import MuiIconButton from "@mui/material/IconButton"
 
 type Props = {
-    children: React.ReactNode
-    toolsMenu?: React.ReactNode // some dialogs may not  require a toolmenu
-    toolbar?: React.ReactNode
-    hideCloseButton?: boolean
-    className?: string
-    onClose: () => void,
+  children: React.ReactNode
+  toolsMenu?: React.ReactNode // some dialogs may not  require a toolmenu
+  toolbar?: React.ReactNode
+  hideCloseButton?: boolean
+  className?: string
+  onClose: () => void,
 }
 
 const Dialog = React.memo((props: Props) => {
-    const {toolsMenu} = props
-    const {toolbar} = props
-    const intl = useIntl()
+  const { toolsMenu } = props;
+  const { toolbar } = props;
+  const intl = useIntl();
 
-    const closeDialogText = intl.formatMessage({
-        id: 'Dialog.closeDialog',
-        defaultMessage: 'Close dialog',
-    })
+  const closeDialogText = intl.formatMessage({
+    id: 'Dialog.closeDialog',
+    defaultMessage: 'Close dialog'
+  });
 
-    useHotkeys('esc', () => props.onClose())
+  useHotkeys('esc', () => props.onClose());
 
-    return (
-        <Modal open={true}>
-        <div className={`Dialog dialog-back ${props.className}`}>
-            <div
-                className='wrapper'
-                onClick={(e) => {
-                    if (e.target === e.currentTarget) {
-                        props.onClose()
-                    }
-                }}
-            >
-                <div
-                    role='dialog'
-                    className='dialog'
-                >
-                    <div className='toolbar'>
-                        {
-                            !props.hideCloseButton &&
-                            <IconButton
-                                onClick={props.onClose}
-                                icon={<CloseIcon/>}
-                                title={closeDialogText}
-                                className='IconButton--large'
-                            />
-                        }
-                        {toolbar && <div className='cardToolbar'>{toolbar}</div>}
-                        {toolsMenu && <PopperPopup closeOnClick popupContent={toolsMenu}>
-                          <MuiIconButton size="small">
-                            <MoreHorizIcon fontSize="small" />
-                          </MuiIconButton>
-                        </PopperPopup>}
-                    </div>
-                    {props.children}
-                </div>
+  return (
+    <Modal open={true}>
+      <div className={`Dialog dialog-back ${props.className}`}>
+        <div
+          className='wrapper'
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              props.onClose();
+            }
+          }}
+        >
+          <div
+            role='dialog'
+            className='dialog'
+          >
+            <div className='toolbar'>
+              {
+                !props.hideCloseButton
+                && (
+                  <IconButton
+                    onClick={props.onClose}
+                    icon={<CloseIcon />}
+                    title={closeDialogText}
+                    className='IconButton--large'
+                  />
+                )
+              }
+              {toolbar && <div className='cardToolbar'>{toolbar}</div>}
+              {toolsMenu && <PopperPopup closeOnClick popupContent={toolsMenu}>
+                <MuiIconButton size="small">
+                  <MoreHorizIcon fontSize="small" />
+                </MuiIconButton>
+              </PopperPopup>}
             </div>
+            {props.children}
+          </div>
         </div>
-        </Modal>
-    )
-})
+        {props.children}
+      </div>
+    </Modal >
+  );
+});
 
-export default Dialog
+export default Dialog;

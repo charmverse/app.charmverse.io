@@ -1,16 +1,16 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 /* eslint-disable max-lines */
-import React from 'react'
+import React from 'react';
 
-import {useDrop} from 'react-dnd'
+import { useDrop } from 'react-dnd';
 
-import {Board, IPropertyOption, IPropertyTemplate, BoardGroup} from '../../blocks/board'
-import {BoardView} from '../../blocks/boardView'
-import {Card} from '../../blocks/card'
+import { Board, IPropertyOption, IPropertyTemplate, BoardGroup } from '../../blocks/board';
+import { BoardView } from '../../blocks/boardView';
+import { Card } from '../../blocks/card';
 
-import TableGroupHeaderRow from './tableGroupHeaderRow'
-import TableRows from './tableRows'
+import TableGroupHeaderRow from './tableGroupHeaderRow';
+import TableRows from './tableRows';
 
 type Props = {
     board: Board
@@ -32,62 +32,64 @@ type Props = {
 }
 
 const TableGroup = React.memo((props: Props): JSX.Element => {
-    const {board, activeView, group, onDropToGroup, groupByProperty} = props
-    const groupId = group.option.id
+  const { board, activeView, group, onDropToGroup, groupByProperty } = props;
+  const groupId = group.option.id;
 
-    const [{isOver}, drop] = useDrop<Card, any, { isOver: boolean }>(() => ({
-        accept: 'card',
-        collect: (monitor) => ({
-            isOver: monitor.isOver(),
-        }),
-        drop: (item: Card, monitor) => {
-            if (monitor.isOver({shallow: true})) {
-                onDropToGroup(item, groupId, '')
-            }
-        },
-    }), [onDropToGroup, groupId])
-
-    let className = 'octo-table-group'
-    if (isOver) {
-        className += ' dragover'
+  const [{ isOver }, drop] = useDrop<Card, any, { isOver: boolean }>(() => ({
+    accept: 'card',
+    collect: (monitor) => ({
+      isOver: monitor.isOver()
+    }),
+    drop: (item: Card, monitor) => {
+      if (monitor.isOver({ shallow: true })) {
+        onDropToGroup(item, groupId, '');
+      }
     }
+  }), [onDropToGroup, groupId]);
 
-    return (
-        <div
-            ref={drop}
-            className={className}
-            key={group.option.id}
-        >
-            <TableGroupHeaderRow
-                group={group}
-                board={board}
-                activeView={activeView}
-                groupByProperty={groupByProperty}
-                hideGroup={props.hideGroup}
-                addCard={props.addCard}
-                readonly={props.readonly}
-                propertyNameChanged={props.propertyNameChanged}
-                onDrop={props.onDropToGroupHeader}
-            />
+  let className = 'octo-table-group';
+  if (isOver) {
+    className += ' dragover';
+  }
 
-            {(group.cards.length > 0) &&
+  return (
+    <div
+      ref={drop}
+      className={className}
+      key={group.option.id}
+    >
+      <TableGroupHeaderRow
+        group={group}
+        board={board}
+        activeView={activeView}
+        groupByProperty={groupByProperty}
+        hideGroup={props.hideGroup}
+        addCard={props.addCard}
+        readonly={props.readonly}
+        propertyNameChanged={props.propertyNameChanged}
+        onDrop={props.onDropToGroupHeader}
+      />
+
+      {(group.cards.length > 0)
+            && (
             <TableRows
-                board={board}
-                activeView={activeView}
-                columnRefs={props.columnRefs}
-                cards={group.cards}
-                selectedCardIds={props.selectedCardIds}
-                readonly={props.readonly}
-                cardIdToFocusOnRender={props.cardIdToFocusOnRender}
-                showCard={props.showCard}
-                resizingColumn={''}
-                offset={0}
-                addCard={props.addCard}
-                onCardClicked={props.onCardClicked}
-                onDrop={props.onDropToCard}
-            />}
-        </div>
-    )
-})
+              board={board}
+              activeView={activeView}
+              columnRefs={props.columnRefs}
+              cards={group.cards}
+              selectedCardIds={props.selectedCardIds}
+              readonly={props.readonly}
+              cardIdToFocusOnRender={props.cardIdToFocusOnRender}
+              showCard={props.showCard}
+              resizingColumn=''
+              offset={0}
+              addCard={props.addCard}
+              onCardClicked={props.onCardClicked}
+              onDrop={props.onDropToCard}
+            />
+            )}
+    </div>
+  );
+});
 
-export default TableGroup
+export default TableGroup;

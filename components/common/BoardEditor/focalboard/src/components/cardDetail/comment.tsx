@@ -1,22 +1,21 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import React, {FC} from 'react'
-import {useIntl} from 'react-intl'
+import React, { FC } from 'react';
+import { useIntl } from 'react-intl';
 
-import {Block} from '../../blocks/block'
-import mutator from '../../mutator'
-import {Utils} from '../../utils'
-import IconButton from '../../widgets/buttons/iconButton'
-import DeleteIcon from '../../widgets/icons/delete'
-import OptionsIcon from '../../widgets/icons/options'
-import Menu from '../../widgets/menu'
-import MenuWrapper from '../../widgets/menuWrapper'
-import {getUser} from '../../store/users'
-import {useAppSelector} from '../../store/hooks'
-import Tooltip from '../../widgets/tooltip'
-import Avatar from 'components/common/Avatar'
-import { useContributors } from 'hooks/useContributors'
-
+import Avatar from 'components/common/Avatar';
+import { useContributors } from 'hooks/useContributors';
+import { Block } from '../../blocks/block';
+import mutator from '../../mutator';
+import { Utils } from '../../utils';
+import IconButton from '../../widgets/buttons/iconButton';
+import DeleteIcon from '../../widgets/icons/delete';
+import OptionsIcon from '../../widgets/icons/options';
+import Menu from '../../widgets/menu';
+import MenuWrapper from '../../widgets/menuWrapper';
+import { getUser } from '../../store/users';
+import { useAppSelector } from '../../store/hooks';
+import Tooltip from '../../widgets/tooltip';
 
 type Props = {
     comment: Block
@@ -26,51 +25,53 @@ type Props = {
 }
 
 const Comment: FC<Props> = (props: Props) => {
-    const {comment, userId, userImageUrl} = props
-    const intl = useIntl()
-    const html = Utils.htmlFromMarkdown(comment.title)
-    const user = useAppSelector(getUser(userId))
-    const date = new Date(comment.createdAt)
-    const [contributors] = useContributors()
-    const contributor = contributors.find(_contributor => _contributor.id === userId);
+  const { comment, userId, userImageUrl } = props;
+  const intl = useIntl();
+  const html = Utils.htmlFromMarkdown(comment.title);
+  const user = useAppSelector(getUser(userId));
+  const date = new Date(comment.createdAt);
+  const [contributors] = useContributors();
+  const contributor = contributors.find(_contributor => _contributor.id === userId);
 
-    return (
-        <div
-            key={comment.id}
-            className='Comment comment'
-        >
-            <div className='comment-header'>
-                {contributor ? <Avatar size={"small"} name={contributor.username as string} avatar={contributor.avatar} /> : <img
-                    className='comment-avatar'
-                    src={userImageUrl}
-                />}
-                <div className='comment-username'>{user?.username}</div>
-                <Tooltip title={Utils.displayDateTime(date, intl)}>
-                    <div className='comment-date'>
-                        {Utils.relativeDisplayDateTime(date, intl)}
-                    </div>
-                </Tooltip>
+  return (
+    <div
+      key={comment.id}
+      className='Comment comment'
+    >
+      <div className='comment-header'>
+        {contributor ? <Avatar size='small' name={contributor.username as string} avatar={contributor.avatar} /> : (
+          <img
+            className='comment-avatar'
+            src={userImageUrl}
+          />
+        )}
+        <div className='comment-username'>{user?.username}</div>
+        <Tooltip title={Utils.displayDateTime(date, intl)}>
+          <div className='comment-date'>
+            {Utils.relativeDisplayDateTime(date, intl)}
+          </div>
+        </Tooltip>
 
-                {!props.readonly && (
-                    <MenuWrapper>
-                        <IconButton icon={<OptionsIcon/>}/>
-                        <Menu position='left'>
-                            <Menu.Text
-                                icon={<DeleteIcon/>}
-                                id='delete'
-                                name={intl.formatMessage({id: 'Comment.delete', defaultMessage: 'Delete'})}
-                                onClick={() => mutator.deleteBlock(comment)}
-                            />
-                        </Menu>
-                    </MenuWrapper>
-                )}
-            </div>
-            <div
-                className='comment-text'
-                dangerouslySetInnerHTML={{__html: html}}
+        {!props.readonly && (
+        <MenuWrapper>
+          <IconButton icon={<OptionsIcon />} />
+          <Menu position='left'>
+            <Menu.Text
+              icon={<DeleteIcon />}
+              id='delete'
+              name={intl.formatMessage({ id: 'Comment.delete', defaultMessage: 'Delete' })}
+              onClick={() => mutator.deleteBlock(comment)}
             />
-        </div>
-    )
-}
+          </Menu>
+        </MenuWrapper>
+        )}
+      </div>
+      <div
+        className='comment-text'
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
+    </div>
+  );
+};
 
-export default Comment
+export default Comment;

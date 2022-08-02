@@ -1,6 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import {Block, createBlock} from './block'
+import { Block, createBlock } from './block';
 
 type IContentBlockWithCords = {
     block: Block,
@@ -9,7 +9,7 @@ type IContentBlockWithCords = {
 
 type ContentBlock = Block
 
-const createContentBlock = createBlock
+const createContentBlock = createBlock;
 
-export {createContentBlock}
-export type {ContentBlock, IContentBlockWithCords}
+export { createContentBlock };
+export type { ContentBlock, IContentBlockWithCords };

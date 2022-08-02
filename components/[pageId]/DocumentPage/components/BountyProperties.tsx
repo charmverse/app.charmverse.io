@@ -88,7 +88,7 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
   const router = useRouter();
   const isSharedPage = router.pathname.startsWith('/share');
 
-  const canEdit = user && !readOnly && ((bounty.createdBy === user.id && bounty.status !== 'suggestion') || (bounty.status === 'suggestion' && isAdmin) || isAdmin);
+  const canEdit = user && !readOnly && ((bounty.createdBy === user.id && bounty.status !== 'suggestion') || (bounty.status === 'suggestion' && isAdmin));
 
   async function refreshBountyPermissions (bountyId: string) {
     setPermissions(await charmClient.computeBountyPermissions({
@@ -373,13 +373,10 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
         }
       }}
     >
-      {permissions && (user?.id === bounty.createdBy || isAdmin) && (
-        <>
-          <hr />
-          <BountyHeader
-            bounty={bounty}
-          />
-        </>
+      {permissions && (user?.id === bounty.createdBy) && (
+        <BountyHeader
+          bounty={bounty}
+        />
       )}
       <Stack flexDirection='row' justifyContent='space-between' gap={2} alignItems='center'>
         {

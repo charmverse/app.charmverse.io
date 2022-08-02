@@ -35,7 +35,7 @@ function emojiSpec ({ defaultEmoji = '😃' }: { defaultEmoji?: string } = {}): 
       },
       inline: true,
       group: 'inline',
-      draggable: true,
+      draggable: false,
       atom: true,
       toDOM: (node) => {
         const twemojiImage = getTwitterEmoji(node.attrs.emoji);

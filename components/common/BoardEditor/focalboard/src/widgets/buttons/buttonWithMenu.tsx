@@ -1,10 +1,9 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import React from 'react'
+import React from 'react';
 
-import DropdownIcon from '../icons/dropdown'
-import MenuWrapper from '../menuWrapper'
-
+import DropdownIcon from '../icons/dropdown';
+import MenuWrapper from '../menuWrapper';
 
 type Props = {
     onClick?: (e: React.MouseEvent<HTMLDivElement>) => void
@@ -13,24 +12,24 @@ type Props = {
     text: React.ReactNode
 }
 
-function ButtonWithMenu(props: Props): JSX.Element {
-    return (
-        <div
-            onClick={props.onClick}
-            className='Button filled'
-            title={props.title}
-        >
-            <div className='button-text'>
-                {props.text}
-            </div>
-            {/* <MenuWrapper stopPropagationOnToggle={true}>
+function ButtonWithMenu (props: Props): JSX.Element {
+  return (
+    <div
+      onClick={props.onClick}
+      className='Button filled'
+      title={props.title}
+    >
+      <div className='button-text'>
+        {props.text}
+      </div>
+      {/* <MenuWrapper stopPropagationOnToggle={true}>
                 <div className='button-dropdown'>
                     <DropdownIcon/>
                 </div>
                 {props.children}
             </MenuWrapper> */}
-        </div>
-    )
+    </div>
+  );
 }
 
-export default React.memo(ButtonWithMenu)
+export default React.memo(ButtonWithMenu);

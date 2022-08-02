@@ -15,49 +15,49 @@ type Props = {
     readonly: boolean
 }
 
-const CardDetail = (props: Props): JSX.Element|null => {
-    const {card, readonly} = props
+function CardDetail (props: Props): JSX.Element|null {
+  const { card, readonly } = props;
 
-    const mounted = useRef(false);
+  const mounted = useRef(false);
 
-    useEffect(() => {
-      mounted.current = true;
-      return () => {
-        mounted.current = false;
-      }
-    }, [])
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
 
-    const { pages, setPages } = usePages();
+  const { pages, setPages } = usePages();
 
-    const debouncedPageUpdate = debouncePromise(async (updates: Partial<Page>) => {
-        const updatedPage = await charmClient.updatePage(updates);
-        setPages((_pages) => ({
-          ..._pages,
-          [card.id]: updatedPage
-        }));
-        return updatedPage;
-    }, 500);
+  const debouncedPageUpdate = debouncePromise(async (updates: Partial<Page>) => {
+    const updatedPage = await charmClient.updatePage(updates);
+    setPages((_pages) => ({
+      ..._pages,
+      [card.id]: updatedPage
+    }));
+    return updatedPage;
+  }, 500);
 
-    const setPage = useCallback(async (updates: Partial<Page>) => {
-      if (mounted.current) {
-        debouncedPageUpdate({ id: card.id, ...updates } as Partial<Page>)
-          .catch((err: any) => {
-            log.error('Error saving page', err);
-          });
-      }
-    }, [card]);
-
-    const page = pages[card?.id];
-    if (!card || !page) {
-      return null
+  const setPage = useCallback(async (updates: Partial<Page>) => {
+    if (mounted.current) {
+      debouncedPageUpdate({ id: card.id, ...updates } as Partial<Page>)
+        .catch((err: any) => {
+          log.error('Error saving page', err);
+        });
     }
-    return (
-      <DocumentPage
-        page={page} 
-        setPage={setPage} 
-        readOnly={readonly} 
-      />
-    )
+  }, [card]);
+
+  const page = pages[card?.id];
+  if (!card || !page) {
+    return null;
+  }
+  return (
+    <DocumentPage
+      page={page}
+      setPage={setPage}
+      readOnly={readonly}
+    />
+  );
 }
 
-export default CardDetail
+export default CardDetail;
