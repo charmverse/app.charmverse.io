@@ -3,6 +3,7 @@ import { useWeb3React } from '@web3-react/core';
 import { useRouter } from 'next/router';
 import getLayout from 'components/common/BaseLayout/BaseLayout';
 import LoginPageContent from 'components/login/LoginPageContent';
+import { getKey } from 'hooks/useLocalStorage';
 import { usePageTitle } from 'hooks/usePageTitle';
 import Footer from 'components/login/Footer';
 import { useSpaces } from 'hooks/useSpaces';
@@ -13,6 +14,7 @@ export default function LoginPage () {
   const { account } = useWeb3React();
   const { triedEager } = useContext(Web3Connection);
   const router = useRouter();
+  const defaultWorkspace = typeof window !== 'undefined' && localStorage.getItem(getKey('last-workspace'));
   const [, setTitleState] = usePageTitle();
   const [user, setUser, isUserLoaded] = useUser();
   const [spaces, setSpaces, isSpacesLoaded] = useSpaces();
@@ -28,8 +30,12 @@ export default function LoginPage () {
     if (typeof router.query.returnUrl === 'string') {
       router.push(router.query.returnUrl);
     }
+    else if (defaultWorkspace === '/nexus') {
+      router.push('/nexus');
+    }
     else if (spaces.length > 0) {
-      router.push(`/${spaces[0].domain}`);
+      const isValidDefaultWorkspace = !!defaultWorkspace && spaces.some(space => defaultWorkspace.startsWith(`/${space.domain}`));
+      router.push(isValidDefaultWorkspace ? defaultWorkspace : `/${spaces[0].domain}`);
     }
     else {
       router.push('/signup');

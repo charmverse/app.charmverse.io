@@ -1,14 +1,13 @@
 
+import { BountyPermission, BountyPermissionLevel, Space, User } from '@prisma/client';
+import { prisma } from 'db';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { generateBounty, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
-import { flatArrayMap } from 'lib/utilities/array';
-import { Bounty, BountyPermission, BountyPermissionLevel, Space, User } from '@prisma/client';
-import { prisma } from 'db';
 import { addBountyPermissionGroup } from '../addBountyPermissionGroup';
+import { BountyPermissionAssignment, BulkBountyPermissionAssignment } from '../interfaces';
 import { queryBountyPermissions } from '../queryBountyPermissions';
 import { setBountyPermissions } from '../setBountyPermissions';
-import { BountyPermissionAssignment, BulkBountyPermissionAssignment } from '../interfaces';
 
 let user: User;
 let space: Space;
@@ -54,7 +53,7 @@ describe('setBountyPermissions', () => {
       // Only 1 permission should exist
       permissionsToAssign: [
         {
-          level: 'viewer',
+          level: 'reviewer',
           assignee: {
             group: 'user',
             id: user.id
@@ -67,10 +66,9 @@ describe('setBountyPermissions', () => {
       bountyId: bounty.id
     });
 
-    expect(queryResult.viewer.some(p => p.group === 'user' && p.id === user.id)).toBe(true);
-    expect(queryResult.viewer.length === 1).toBe(true);
+    expect(queryResult.reviewer.some(p => p.group === 'user' && p.id === user.id)).toBe(true);
+    expect(queryResult.reviewer.length === 1).toBe(true);
     expect(queryResult.submitter.length === 0).toBe(true);
-    expect(queryResult.reviewer.length === 0).toBe(true);
   });
 
   it('should accept bounty permissions as an input too', async () => {
@@ -86,7 +84,7 @@ describe('setBountyPermissions', () => {
       bountyId: bounty.id,
       // Only 1 permission should exist
       permissionsToAssign: {
-        viewer: [{
+        reviewer: [{
           group: 'space',
           id: space.id
         }]
@@ -97,7 +95,7 @@ describe('setBountyPermissions', () => {
       bountyId: bounty.id
     });
 
-    expect(queryResult.viewer.some(p => p.group === 'space' && p.id === space.id)).toBe(true);
+    expect(queryResult.reviewer.some(p => p.group === 'space' && p.id === space.id)).toBe(true);
 
   });
 
@@ -108,7 +106,7 @@ describe('setBountyPermissions', () => {
       spaceId: space.id
     });
 
-    const permissionLevel: BountyPermissionLevel = 'viewer';
+    const permissionLevel: BountyPermissionLevel = 'reviewer';
 
     const bounty = await generateBounty({
       createdBy: user.id,
@@ -170,7 +168,7 @@ describe('setBountyPermissions', () => {
       // Only 1 permission should exist
       permissionsToAssign: [
         {
-          level: 'viewer',
+          level: 'reviewer',
           assignee: {
             group: 'user',
             id: user.id

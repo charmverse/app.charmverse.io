@@ -4,6 +4,7 @@ import { getUserS3Folder, uploadToS3 } from 'lib/aws/uploadToS3Server';
 import { sessionUserRelations } from 'lib/session/config';
 import { v4 as uuid } from 'uuid';
 import { IDENTITY_TYPES } from 'models';
+import { postToDiscord } from 'lib/log/userEvents';
 
 export default async function loginByDiscord ({ code, hostName }: { code: string, hostName?: string }) {
 
@@ -49,6 +50,16 @@ export default async function loginByDiscord ({ code, hostName }: { code: string
       include: sessionUserRelations
     });
 
+    logSignupViaDiscord();
+
     return newUser;
   }
+}
+
+export async function logSignupViaDiscord () {
+  postToDiscord({
+    funnelStage: 'acquisition',
+    eventType: 'create_user',
+    message: 'A new user has joined Charmverse using their Discord account'
+  });
 }

@@ -28,7 +28,7 @@ type Props = {
     cards: Card[]
     groupByProperty?: IPropertyTemplate
     addCard: () => void
-    //addCardFromTemplate: (cardTemplateId: string) => void
+    // addCardFromTemplate: (cardTemplateId: string) => void
     addCardTemplate: () => void
     editCardTemplate: (cardTemplateId: string) => void
     readonly: boolean
@@ -36,137 +36,144 @@ type Props = {
 }
 
 const ViewHeader = React.memo((props: Props) => {
-    const router = useRouter()
-    const [showFilter, setShowFilter] = useState(false)
+  const router = useRouter();
+  const [showFilter, setShowFilter] = useState(false);
 
-    const {board, activeView, views, groupByProperty, cards, dateDisplayProperty} = props
+  const { board, activeView, views, groupByProperty, cards, dateDisplayProperty } = props;
 
-    const withGroupBy = activeView.fields.viewType === 'board' || activeView.fields.viewType === 'table'
-    const withDisplayBy = activeView.fields.viewType === 'calendar'
-    const withSortBy = activeView.fields.viewType !== 'calendar'
+  const withGroupBy = activeView.fields.viewType === 'board' || activeView.fields.viewType === 'table';
+  const withDisplayBy = activeView.fields.viewType === 'calendar';
+  const withSortBy = activeView.fields.viewType !== 'calendar';
 
-    const hasFilter = activeView.fields.filter && activeView.fields.filter.filters?.length > 0
+  const hasFilter = activeView.fields.filter && activeView.fields.filter.filters?.length > 0;
 
-    const showView = useCallback((viewId) => {
-        router.push({ pathname: router.pathname, query: {
-            ...router.query,
-            viewId: viewId || ''
-        } }, undefined, { shallow: true });
-    }, [router.query, history])
+  const showView = useCallback((viewId) => {
+    router.push({ pathname: router.pathname,
+      query: {
+        ...router.query,
+        viewId: viewId || ''
+      } }, undefined, { shallow: true });
+  }, [router.query, history]);
 
+  return (
+    <div className='ViewHeader'>
 
-    return (
-        <div className='ViewHeader'>
+      <ViewTabs
+        views={views}
+        readonly={props.readonly}
+        showView={showView}
+        board={board}
+        activeView={activeView}
+      />
 
-            <ViewTabs
-                views={views}
-                readonly={props.readonly}
-                showView={showView}
-                board={board}
+      {/* add a view */}
+
+      {!props.readonly && views.length <= 3 && (
+        <AddViewMenu
+          board={board}
+          activeView={activeView}
+          views={views}
+          showView={showView}
+        />
+      )}
+
+      <div className='octo-spacer' />
+
+      {!props.readonly
+            && (
+            <>
+
+              {/* Card properties */}
+
+              <ViewHeaderPropertiesMenu
+                properties={board.fields.cardProperties}
                 activeView={activeView}
-            />
+              />
 
-            {/* add a view */}
+              {/* Group by */}
 
-            {!props.readonly && views.length <= 3 && (
-                <AddViewMenu
-                    board={board}
-                    activeView={activeView}
-                    views={views}
-                    showView={showView}
-                />
+              {withGroupBy
+                    && (
+                    <ViewHeaderGroupByMenu
+                      properties={board.fields.cardProperties}
+                      activeView={activeView}
+                      groupByProperty={groupByProperty}
+                    />
+                    )}
+
+              {/* Display by */}
+
+              {withDisplayBy
+                    && (
+                    <ViewHeaderDisplayByMenu
+                      properties={board.fields.cardProperties}
+                      activeView={activeView}
+                      dateDisplayPropertyName={dateDisplayProperty?.name}
+                    />
+                    )}
+
+              {/* Filter */}
+
+              <ModalWrapper>
+                <Button
+                  active={hasFilter}
+                  onClick={() => setShowFilter(true)}
+                >
+                  <FormattedMessage
+                    id='ViewHeader.filter'
+                    defaultMessage='Filter'
+                  />
+                </Button>
+                {showFilter
+                    && (
+                    <FilterComponent
+                      board={board}
+                      activeView={activeView}
+                      onClose={() => setShowFilter(false)}
+                    />
+                    )}
+              </ModalWrapper>
+
+              {/* Sort */}
+
+              {withSortBy
+                    && (
+                    <ViewHeaderSortMenu
+                      properties={board.fields.cardProperties}
+                      activeView={activeView}
+                      orderedCards={cards}
+                    />
+                    )}
+            </>
             )}
 
+      {/* Search - disabled until we can access page data inside the redux selector */}
 
-            <div className='octo-spacer'/>
+      {/* <ViewHeaderSearch/> */}
 
-            {!props.readonly &&
+      {/* Options menu */}
+
+      {!props.readonly
+            && (
             <>
+              <ViewHeaderActionsMenu
+                board={board}
+                activeView={activeView}
+                cards={cards}
+              />
 
+              {/* New card button */}
 
-                {/* Card properties */}
-
-                <ViewHeaderPropertiesMenu
-                    properties={board.fields.cardProperties}
-                    activeView={activeView}
-                />
-
-                {/* Group by */}
-
-                {withGroupBy &&
-                    <ViewHeaderGroupByMenu
-                        properties={board.fields.cardProperties}
-                        activeView={activeView}
-                        groupByProperty={groupByProperty}
-                    />}
-
-                {/* Display by */}
-
-                {withDisplayBy &&
-                    <ViewHeaderDisplayByMenu
-                        properties={board.fields.cardProperties}
-                        activeView={activeView}
-                        dateDisplayPropertyName={dateDisplayProperty?.name}
-                    />}
-
-                {/* Filter */}
-
-                <ModalWrapper>
-                    <Button
-                        active={hasFilter}
-                        onClick={() => setShowFilter(true)}
-                    >
-                        <FormattedMessage
-                            id='ViewHeader.filter'
-                            defaultMessage='Filter'
-                        />
-                    </Button>
-                    {showFilter &&
-                    <FilterComponent
-                        board={board}
-                        activeView={activeView}
-                        onClose={() => setShowFilter(false)}
-                    />}
-                </ModalWrapper>
-
-                {/* Sort */}
-
-                {withSortBy &&
-                    <ViewHeaderSortMenu
-                        properties={board.fields.cardProperties}
-                        activeView={activeView}
-                        orderedCards={cards}
-                    />
-                }
-            </>
-            }
-
-            {/* Search */}
-
-            <ViewHeaderSearch/>
-
-            {/* Options menu */}
-
-            {!props.readonly &&
-            <>
-                <ViewHeaderActionsMenu
-                    board={board}
-                    activeView={activeView}
-                    cards={cards}
-                />
-
-                {/* New card button */}
-
-                <NewCardButton
-                    addCard={props.addCard}
+              <NewCardButton
+                addCard={props.addCard}
                    // addCardFromTemplate={props.addCardFromTemplate}
-                    addCardTemplate={props.addCardTemplate}
-                    editCardTemplate={props.editCardTemplate}
-                />
+                addCardTemplate={props.addCardTemplate}
+                editCardTemplate={props.editCardTemplate}
+              />
             </>
-            }
-        </div>
-    )
-})
+            )}
+    </div>
+  );
+});
 
-export default ViewHeader
+export default ViewHeader;

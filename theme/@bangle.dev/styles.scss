@@ -2,10 +2,6 @@
   border-radius: 8px;
 }
 
-.bangle-editor li[data-bangle-is-todo] > span:first-child > input {
-  margin-top: 0.45rem;
-}
-
 .bangle-editor .selected-node {
   animation-duration: 0.75s;
   animation-name: editorSelectedNode;
@@ -183,7 +179,6 @@ img.ProseMirror-separator {
 .bangle-editor h6,
 .bangle-editor blockquote,
 .bangle-editor pre,
-.bangle-editor hr,
 .bangle-editor figure,
 .bangle-editor dl,
 .bangle-editor dd {
@@ -227,7 +222,6 @@ img.ProseMirror-separator {
 
 .bangle-editor hr {
   margin: 0.5em 0;
-  padding: 2px 2px;
 }
 
 .bangle-editor h1 {
@@ -329,7 +323,7 @@ ol li {
 }
 
 .ProseMirror-selectednode {
-  background-color: rgba(46, 170, 220, 0.2);
+  background-color: var(--charmeditor-active);
   transition: background-color 150ms ease-in-out;
 }
 
@@ -341,7 +335,10 @@ ol li {
   display: flex;
   flex-direction: row;
   position: relative;
-  left: -1.5rem;
+}
+
+.bangle-editor li[data-bangle-is-todo] > span:first-child {
+  margin-left: -1.5rem;
 }
 
 .bangle-editor li[data-bangle-is-todo] > span:first-child > input {
@@ -486,7 +483,6 @@ details {
 // handles on the side of each row
 .row-handle {
   display: initial;
-  cursor: pointer;
   left: 20px;
   top: -1000px;
   position: absolute;
@@ -496,7 +492,8 @@ details {
   opacity: 0;
   transition: opacity 0.2s ease-in-out;
 
-  svg {
+  .charm-drag-handle {
+    cursor: grab;
     opacity: .5;
     transition: opacity 0.2s ease-in-out;
 
@@ -511,5 +508,25 @@ details {
     .row-handle {
       opacity: 1;
     }
+  }
+}
+
+// for inline comments
+.charm-row-decoration {
+
+  background-color: var(--background-default);
+  cursor: pointer;
+  position: absolute;
+  right: -70px;
+  // add a width so that icons are left-aligned even if counts get large
+  width: 40px;
+
+  svg {
+    color: rgba(var(--center-channel-color-rgb), .5);
+  }
+
+  .MuiTypography-root {
+    color: rgba(var(--center-channel-color-rgb), .8);
+    font-size: .8rem;
   }
 }

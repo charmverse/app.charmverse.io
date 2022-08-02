@@ -1,9 +1,9 @@
 
-import { BountySubmitterPoolSize, getBounty, calculateBountySubmitterPoolSize, BountySubmitterPoolCalculation } from 'lib/bounties';
+import { BountySubmitterPoolCalculation, BountySubmitterPoolSize, calculateBountySubmitterPoolSize, getBountyOrThrow } from 'lib/bounties';
 import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { BountyPermissions, computeBountyPermissions } from 'lib/permissions/bounties';
+import { BountyPermissions } from 'lib/permissions/bounties';
+import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
-import { DataNotFoundError } from 'lib/utilities/errors';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -25,17 +25,13 @@ async function getBountySubmitterPoolPermissionsController (req: NextApiRequest,
 
   }
 
-  const bounty = await getBounty(bountyId as string);
-
-  if (!bounty) {
-    throw new DataNotFoundError(`Bounty with id ${bountyId} not found`);
-  }
+  const bounty = await getBountyOrThrow(bountyId as string);
 
   const userId = req.session.user.id;
 
-  const permissions = await computeBountyPermissions({
+  const permissions = await computeUserPagePermissions({
     allowAdminBypass: true,
-    resourceId: bounty.id,
+    pageId: bounty.page.id,
     userId
   });
 
@@ -54,7 +50,7 @@ async function getBountySubmitterPoolPermissionsController (req: NextApiRequest,
     return res.status(200).json(pool);
   }
   // Don't give any actual info to someone without view permission or who is not space member
-  else if (!permissions.view || error) {
+  else if (!permissions.grant_permissions || error) {
     const emptyPool: BountySubmitterPoolSize = {
       mode: 'space',
       roleups: [],
@@ -62,8 +58,8 @@ async function getBountySubmitterPoolPermissionsController (req: NextApiRequest,
     };
     return res.status(200).json(emptyPool);
   }
-  // Only allow a space member
 
+  // Return the current submitter pool size
   const pool = await calculateBountySubmitterPoolSize({
     resourceId: bounty.id
   });

@@ -37,7 +37,7 @@ export default function Workspaces () {
   const [space] = useCurrentSpace();
   const [spaces, setSpaces] = useSpaces();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
-  const [user, setUser] = useUser();
+  const [, setUser] = useUser();
 
   function showSpaceForm () {
     setSpaceFormOpen(true);
@@ -59,25 +59,11 @@ export default function Workspaces () {
   return (
     <WorkspacesContainer>
       <Grid container spacing={2} flexDirection='column'>
-        {/* <Grid item>
-          <AvatarLink href='/nexus' passHref>
-            <MuiLink>
-              <Tooltip title={userName} placement='right' arrow>
-                <span>
-                  <MyAvatar active={router.pathname.startsWith('/profile')} avatar={user?.avatar} name={userName} />
-                </span>
-              </Tooltip>
-            </MuiLink>
-          </AvatarLink>
-        </Grid>
-        <Grid item>
-          <Divider sx={{ borderTopWidth: 2, width: '80%', m: '0 auto' }} />
-        </Grid> */}
         {spaces.map(workspace => (
           <Grid item key={workspace.domain}>
             <AvatarLink href={`/${workspace.domain}`} passHref>
               <MuiLink>
-                <Tooltip title={workspace.name} placement='right' arrow>
+                <Tooltip title={workspace.name} placement='top' arrow>
                   <span>
                     <WorkspaceAvatar
                       active={space?.domain === workspace.domain}
@@ -91,7 +77,7 @@ export default function Workspaces () {
           </Grid>
         ))}
         <Grid item>
-          <Tooltip title='Create or join a workspace' placement='right' arrow>
+          <Tooltip title='Create or join a workspace' placement='top' arrow>
             <IconButton sx={{ borderRadius: '8px' }} onClick={showSpaceForm}><AddIcon /></IconButton>
           </Tooltip>
         </Grid>

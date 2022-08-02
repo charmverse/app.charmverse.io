@@ -206,7 +206,7 @@ interface PageThreadProps {
 
 function ThreadCreatedDate ({ createdAt }: {createdAt: Date}) {
   return (
-    <Tooltip arrow placement='bottom' title={new Date(createdAt).toLocaleString()}>
+    <Tooltip arrow placement='top' title={new Date(createdAt).toLocaleString()}>
       <Typography
         sx={{
           cursor: 'pointer',
@@ -235,13 +235,13 @@ const CommentDate = memo<{createdAt: Date, updatedAt?: Date | null}>(({ createdA
       color='secondary'
       variant='subtitle1'
     >
-      <Tooltip arrow placement='bottom' title={new Date(createdAt).toLocaleString()}>
+      <Tooltip arrow placement='top' title={new Date(createdAt).toLocaleString()}>
         <span>
           {DateTime.fromJSDate(new Date(createdAt)).toRelative({ base: DateTime.now(), style: 'short' })}
         </span>
       </Tooltip>
       {updatedAt && (
-      <Tooltip arrow placement='bottom' title={new Date(updatedAt).toLocaleString()}>
+      <Tooltip arrow placement='top' title={new Date(updatedAt).toLocaleString()}>
         <span style={{ marginLeft: '4px' }}>
           (edited)
         </span>
@@ -283,6 +283,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
   }
 
   async function onClickDeleteComment () {
+
     if (actionComment && thread) {
       // If we delete the last comment, delete the whole thread
       if (thread.comments.length === 1) {
@@ -301,6 +302,13 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
       }
     }
     menuState.close();
+  }
+
+  async function toggleResolved () {
+    setIsMutating(true);
+    await resolveThread(threadId);
+    removeInlineCommentMark(view, threadId);
+    setIsMutating(false);
   }
 
   if (!thread) {
@@ -361,12 +369,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                         />
                       )}
                       disabled={isMutating || !permissions.comment}
-                      onClick={async () => {
-                        setIsMutating(true);
-                        await resolveThread(threadId);
-                        removeInlineCommentMark(view, thread.id);
-                        setIsMutating(false);
-                      }}
+                      onClick={toggleResolved}
                     />
                   ) : (comment.userId === user?.id && permissions.comment)
                   && (

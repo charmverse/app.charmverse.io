@@ -5,12 +5,18 @@ import { usePageTitle } from 'hooks/usePageTitle';
 import { usePages } from 'hooks/usePages';
 import { useRouter } from 'next/router';
 import { ReactNode } from 'react';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { StyledPageIcon } from '../../PageIcon';
 
 const NEXUS_ROUTES = ['/nexus', '/profile', '/integrations'];
 
 const BreadCrumb = styled.span`
-  display: inline-flex;
+  display: none;
+
+  ${({ theme }) => theme.breakpoints.up('md')} {
+    display: inline-flex;
+  }
+
   :after {
     content: ' / ';
     opacity: .5;
@@ -32,11 +38,17 @@ const PageIcon = styled(StyledPageIcon)`
   }
 `;
 
-function PageTitleWrapper ({ children, sx = {} }: { children: ReactNode, sx?: object }) {
+const StyledPageTitle = styled(Typography)`
+  font-size: .9rem;
+  text-overflow: ellipsis;
+  max-width: 500px;
+` as typeof Typography;
+
+function PageTitle ({ children, sx = {} }: { children: ReactNode, sx?: object }) {
   return (
-    <Typography noWrap component='div' sx={{ fontWeight: 500, maxWidth: 500, textOverflow: 'ellipsis', ...sx }}>
+    <StyledPageTitle noWrap component='div' sx={sx}>
       {children}
-    </Typography>
+    </StyledPageTitle>
   );
 }
 
@@ -77,32 +89,26 @@ function DocumentPageTitle ({ basePath }: { basePath: string }) {
         <BreadCrumb key={crumb.path}>
           {crumb.path ? (
             <Link href={`${basePath}/${crumb.path}`}>
-              <PageTitleWrapper sx={{ maxWidth: 160 }}>
+              <PageTitle sx={{ maxWidth: 160 }}>
                 {crumb.icon && <PageIcon icon={crumb.icon} />}
                 {crumb.title || 'Untitled'}
-              </PageTitleWrapper>
+              </PageTitle>
             </Link>
           ) : (
-            <PageTitleWrapper>
+            <PageTitle>
               {crumb.title}
-            </PageTitleWrapper>
+            </PageTitle>
           )}
         </BreadCrumb>
       ))}
       {currentPage && (
-        <PageTitleWrapper sx={{ maxWidth: 240 }}>
+        <PageTitle sx={{ maxWidth: 240 }}>
           {currentPage.icon && <PageIcon icon={currentPage.icon} />}
           {currentPage.title || 'Untitled'}
-        </PageTitleWrapper>
+        </PageTitle>
       )}
       {isEditing && (
-        <Box sx={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 1,
-          ml: 2
-        }}
-        >
+        <Box display='inline-flex' alignItems='center' gap={1} ml={2}>
           <CircularProgress size={12} />
           <Typography variant='subtitle2'>
             Saving
@@ -116,14 +122,31 @@ function DocumentPageTitle ({ basePath }: { basePath: string }) {
 function BountyPageTitle ({ basePath }: { basePath: string }) {
   const [pageTitle] = usePageTitle();
   return (
-    <PageTitleWrapper>
+    <PageTitle>
       <BreadCrumb>
         <Link href={`${basePath}/bounties`}>
           Bounties
         </Link>
       </BreadCrumb>
       {pageTitle}
-    </PageTitleWrapper>
+    </PageTitle>
+  );
+}
+
+function PublicBountyPageTitle () {
+  const [space] = useCurrentSpace();
+  return (
+    <PageTitle>
+      {space && (
+        <>
+          <BreadCrumb>
+            {`${space.name}`}
+          </BreadCrumb>
+          Bounties
+        </>
+      )}
+
+    </PageTitle>
   );
 }
 
@@ -134,7 +157,7 @@ function NexusPageTitle ({ route }: { route: string }) {
   const showNexusParent = route !== '/nexus';
 
   return (
-    <PageTitleWrapper>
+    <PageTitle>
       {showNexusParent && (
         <BreadCrumb>
           <Link href='/nexus'>
@@ -143,16 +166,16 @@ function NexusPageTitle ({ route }: { route: string }) {
         </BreadCrumb>
       )}
       {pageTitle}
-    </PageTitleWrapper>
+    </PageTitle>
   );
 }
 
 function DefaultPageTitle () {
   const [pageTitle] = usePageTitle();
   return (
-    <PageTitleWrapper>
+    <PageTitle>
       {pageTitle}
-    </PageTitleWrapper>
+    </PageTitle>
   );
 }
 
@@ -162,7 +185,11 @@ function EmptyPageTitle () {
 
 export default function PageTitleWithBreadcrumbs () {
   const router = useRouter();
-  if (router.route === '/[domain]/bounties/[bountyId]') {
+
+  if (router.route === '/share/[...pageId]' && router.query?.pageId?.[1] === 'bounties') {
+    return <PublicBountyPageTitle />;
+  }
+  else if (router.route === '/[domain]/bounties/[bountyId]') {
     return <BountyPageTitle basePath={`/${router.query.domain}`} />;
   }
   else if (router.route === '/[domain]/[pageId]') {

@@ -1,13 +1,9 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import React, { useState, MouseEvent } from 'react'
-import {FormattedMessage} from 'react-intl'
-import {IPropertyTemplate, PropertyType} from '../../blocks/board'
-import {BoardView} from '../../blocks/boardView'
-import mutator from '../../mutator'
-import Button from '../../widgets/buttons/button'
-import Menu from '@mui/material/Menu'
-import { IconButton, ListItemIcon, ListItemText, MenuItem, SvgIconProps } from '@mui/material'
+import React, { useState, MouseEvent } from 'react';
+import { FormattedMessage } from 'react-intl';
+import Menu from '@mui/material/Menu';
+import { IconButton, ListItemIcon, ListItemText, MenuItem, SvgIconProps } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
@@ -22,6 +18,10 @@ import PhoneIcon from '@mui/icons-material/Phone';
 import ArrowDropDownCircleIcon from '@mui/icons-material/ArrowDropDownCircle';
 import SubjectIcon from '@mui/icons-material/Subject';
 import LinkIcon from '@mui/icons-material/Link';
+import Button from '../../widgets/buttons/button';
+import mutator from '../../mutator';
+import { BoardView } from '../../blocks/boardView';
+import { IPropertyTemplate, PropertyType } from '../../blocks/board';
 
 type Props = {
     properties: readonly IPropertyTemplate[]
@@ -29,80 +29,89 @@ type Props = {
 }
 
 export const iconForPropertyType = (propertyType: PropertyType, props?: SvgIconProps) => {
-  switch(propertyType) {
-    case "checkbox": return <CheckBoxIcon fontSize="small" {...props}/>
-    case "createdBy": return <PersonIcon fontSize="small" {...props} />
-    case "createdTime": return <AccessTimeIcon fontSize="small" {...props}/>
-    case "date": return <EventNoteIcon fontSize="small" {...props}/>
-    case "email": return <AlternateEmailIcon fontSize="small" {...props}/>
-    case "file": return <AttachFileIcon fontSize="small" {...props}/>
-    case "multiSelect": return <ListIcon fontSize="small" {...props}/>
-    case "number": return <NumbersIcon fontSize="small" {...props}/>
-    case "person": return <PersonIcon fontSize="small" {...props} />
-    case "phone": return <PhoneIcon fontSize="small" {...props}/>
-    case "select": return <ArrowDropDownCircleIcon fontSize="small" {...props}/>
-    case "text": return <SubjectIcon fontSize="small" {...props}/>
-    case "updatedBy": return <PersonIcon fontSize="small" {...props} />
-    case "updatedTime": return <AccessTimeIcon fontSize="small" {...props}/>
-    case "url": return <LinkIcon fontSize="small" {...props}/>
+  switch (propertyType) {
+    case 'checkbox': return <CheckBoxIcon fontSize='small' {...props} />;
+    case 'createdBy': return <PersonIcon fontSize='small' {...props} />;
+    case 'createdTime': return <AccessTimeIcon fontSize='small' {...props} />;
+    case 'date': return <EventNoteIcon fontSize='small' {...props} />;
+    case 'email': return <AlternateEmailIcon fontSize='small' {...props} />;
+    case 'file': return <AttachFileIcon fontSize='small' {...props} />;
+    case 'multiSelect': return <ListIcon fontSize='small' {...props} />;
+    case 'number': return <NumbersIcon fontSize='small' {...props} />;
+    case 'person': return <PersonIcon fontSize='small' {...props} />;
+    case 'phone': return <PhoneIcon fontSize='small' {...props} />;
+    case 'select': return <ArrowDropDownCircleIcon fontSize='small' {...props} />;
+    case 'text': return <SubjectIcon fontSize='small' {...props} />;
+    case 'updatedBy': return <PersonIcon fontSize='small' {...props} />;
+    case 'updatedTime': return <AccessTimeIcon fontSize='small' {...props} />;
+    case 'url': return <LinkIcon fontSize='small' {...props} />;
   }
-}
+};
 
 const ViewHeaderPropertiesMenu = React.memo((props: Props) => {
-    const {properties, activeView} = props
-    const {visiblePropertyIds} = activeView.fields
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const { properties, activeView } = props;
+  const { visiblePropertyIds } = activeView.fields;
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-    const toggleVisibility = (propertyId: string) => {
-        let newVisiblePropertyIds = []
-        if (visiblePropertyIds.includes(propertyId)) {
-            newVisiblePropertyIds = visiblePropertyIds.filter((o: string) => o !== propertyId)
-        } else {
-            newVisiblePropertyIds = [...visiblePropertyIds, propertyId]
-        }
-        mutator.changeViewVisibleProperties(activeView.id, visiblePropertyIds, newVisiblePropertyIds)
+  const toggleVisibility = (propertyId: string) => {
+    let newVisiblePropertyIds = [];
+    if (visiblePropertyIds.includes(propertyId)) {
+      newVisiblePropertyIds = visiblePropertyIds.filter((o: string) => o !== propertyId);
     }
-
-    const showPropertiesMenu = (event: MouseEvent<HTMLButtonElement>) => {
-      event.stopPropagation();
-      event.preventDefault()
-      setAnchorEl(event.currentTarget);
+    else {
+      newVisiblePropertyIds = [...visiblePropertyIds, propertyId];
     }
+    mutator.changeViewVisibleProperties(activeView.id, visiblePropertyIds, newVisiblePropertyIds);
+  };
 
-    const hidePropertiesMenu = () => {
-      setAnchorEl(null);
-    }
+  const showPropertiesMenu = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    event.preventDefault();
+    setAnchorEl(event.currentTarget);
+  };
 
-    return (
-      <>
-        <Button onClick={showPropertiesMenu}>
-          <FormattedMessage
-              id='ViewHeader.properties'
-              defaultMessage='Properties'
-          />
-        </Button>
-        <Menu
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={hidePropertiesMenu}
-        >
-          {
-            properties.map(property => <MenuItem sx={{
-              minWidth: 250
-            }} key={property.id}>
-              <ListItemIcon>{iconForPropertyType(property.type)}</ListItemIcon>
-              <ListItemText>{property.name}</ListItemText>
-                <IconButton size="small" onClick={() => {
-                  toggleVisibility(property.id)
-                }}>
-                  {visiblePropertyIds.includes(property.id) ? <VisibilityIcon fontSize="small"/> : <VisibilityOffIcon fontSize="small" color="secondary"/>}
+  const hidePropertiesMenu = () => {
+    setAnchorEl(null);
+  };
+
+  return (
+    <>
+      <Button onClick={showPropertiesMenu}>
+        <FormattedMessage
+          id='ViewHeader.properties'
+          defaultMessage='Properties'
+        />
+      </Button>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={hidePropertiesMenu}
+      >
+        {
+            properties.map(property => (
+              <MenuItem
+                sx={{
+                  minWidth: 250
+                }}
+                key={property.id}
+              >
+                <ListItemIcon>{iconForPropertyType(property.type)}</ListItemIcon>
+                <ListItemText>{property.name}</ListItemText>
+                <IconButton
+                  size='small'
+                  onClick={() => {
+                    toggleVisibility(property.id);
+                  }}
+                >
+                  {visiblePropertyIds.includes(property.id) ? <VisibilityIcon fontSize='small' /> : <VisibilityOffIcon fontSize='small' color='secondary' />}
                 </IconButton>
-            </MenuItem>)
+              </MenuItem>
+            ))
           }
-        </Menu>
+      </Menu>
 
-        {/* <MenuWrapper label={intl.formatMessage({id: 'ViewHeader.properties-menu', defaultMessage: 'Properties menu'})}>
-            
+      {/* <MenuWrapper label={intl.formatMessage({id: 'ViewHeader.properties-menu', defaultMessage: 'Properties menu'})}>
+
             <Menu>
                 {activeView.fields.viewType === 'gallery' &&
                     <Menu.Switch
@@ -123,8 +132,8 @@ const ViewHeaderPropertiesMenu = React.memo((props: Props) => {
                 ))}
             </Menu>
         </MenuWrapper> */}
-      </>
-    )
-})
+    </>
+  );
+});
 
-export default ViewHeaderPropertiesMenu
+export default ViewHeaderPropertiesMenu;

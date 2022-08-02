@@ -1,7 +1,8 @@
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import { Box, InputLabel, List, MenuItem, Select, Typography } from '@mui/material';
-import PageInlineVote from 'components/common/CharmEditor/components/inlineVote/components/PageInlineVote';
+import { uniq } from 'lodash';
+import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import { useVotes } from 'hooks/useVotes';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { highlightDomElement, silentlyUpdateURL } from 'lib/browser';
@@ -11,14 +12,9 @@ import { ExtendedVote } from 'lib/votes/interfaces';
 import { useEffect, useState } from 'react';
 import NoVotesMessage from 'components/votes/components/NoVotesMessage';
 import PageActionToggle from './PageActionToggle';
+import { StyledSidebar as CommentsSidebar } from './CommentsSidebar';
 
-const VotesContainer = styled(List)`
-  overflow: auto;
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing(1)};
-  padding-top: 0px;
-  padding-bottom: 0px;
+const StyledSidebar = styled(CommentsSidebar)`
   height: calc(100%);
 `;
 
@@ -26,7 +22,7 @@ export type VoteSort = 'position' | 'latest_deadline' | 'highest_votes' | 'lates
 export type VoteFilter = 'in_progress' | 'completed' | 'all';
 
 export default function VotesSidebar () {
-  const { votes } = useVotes();
+  const { votes, cancelVote, castVote, deleteVote } = useVotes();
   const votesArray = Object.values(votes);
   const view = useEditorViewContext();
   const [voteFilter, setVoteFilter] = useState<VoteFilter>('in_progress');
@@ -87,17 +83,20 @@ export default function VotesSidebar () {
         setVoteFilter={setVoteFilter}
         setVoteSort={setVoteSort}
       />
-      <VotesContainer>
+      <StyledSidebar>
         {sortedVotes.length === 0
           ? <NoVotesMessage message={`No ${voteFilter === 'completed' ? 'completed' : 'in progress'} votes yet`} />
           : sortedVotes.map(inlineVote => (
-            <PageInlineVote
+            <VoteDetail
+              cancelVote={cancelVote}
+              castVote={castVote}
+              deleteVote={deleteVote}
               key={inlineVote.id}
               detailed={false}
-              inlineVote={inlineVote}
+              vote={inlineVote}
             />
           ))}
-      </VotesContainer>
+      </StyledSidebar>
     </Box>
   );
 }

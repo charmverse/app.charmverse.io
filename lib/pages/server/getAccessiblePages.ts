@@ -2,7 +2,64 @@ import { Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { IPageWithPermissions, PagesRequest } from '../interfaces';
 
-function generateAccessiblePagesQuery ({ spaceId, userId, archived }: PagesRequest): Prisma.PageFindManyArgs {
+/**
+ * Utility for getting permissions of a page
+ * @returns
+ */
+export function includePagePermissions (): Prisma.PageInclude & {
+  permissions: {
+    include: {
+      sourcePermission: true
+    }
+  }
+  } {
+  return {
+    permissions: {
+      include: {
+        sourcePermission: true
+      }
+    }
+  };
+}
+
+export function accessiblePagesByPermissionsQuery ({ spaceId, userId }: {spaceId: string, userId: string}): Prisma.PagePermissionListRelationFilter {
+  return {
+    some: {
+      OR: [
+        {
+          role: {
+            spaceRolesToRole: {
+              some: {
+                spaceRole: {
+                  userId,
+                  spaceId
+                }
+              }
+            }
+          }
+        },
+        {
+          userId
+        },
+        {
+          space: {
+            spaceRoles: {
+              some: {
+                userId,
+                spaceId
+              }
+            }
+          }
+        },
+        {
+          public: true
+        }
+      ]
+    }
+  };
+}
+
+export function generateAccessiblePagesQuery ({ spaceId, userId, archived }: PagesRequest): Prisma.PageFindManyArgs {
 
   // Return only pages with public permissions
   if (!userId) {
@@ -31,38 +88,10 @@ function generateAccessiblePagesQuery ({ spaceId, userId, archived }: PagesReque
       OR: [
         {
           spaceId,
-          permissions: {
-            some: {
-              OR: [
-                {
-                  role: {
-                    spaceRolesToRole: {
-                      some: {
-                        spaceRole: {
-                          userId
-                        }
-                      }
-                    }
-                  }
-                },
-                {
-                  userId
-                },
-                {
-                  space: {
-                    spaceRoles: {
-                      some: {
-                        userId
-                      }
-                    }
-                  }
-                },
-                {
-                  public: true
-                }
-              ]
-            }
-          }
+          permissions: accessiblePagesByPermissionsQuery({
+            spaceId,
+            userId
+          })
         },
         // Admin override to always return all pages
         {

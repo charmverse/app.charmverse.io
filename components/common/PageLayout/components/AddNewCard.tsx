@@ -18,7 +18,7 @@ function AddNewCard ({ pageId }: {pageId: string}) {
   const dispatch = useAppDispatch();
 
   return (
-    <Tooltip disableInteractive title='Add a page inside' leaveDelay={0} placement='right' arrow>
+    <Tooltip disableInteractive title='Add a page inside' leaveDelay={0} placement='top' arrow>
       <StyledIconButton onClick={async () => {
         const card = createCard();
         const page = pages[pageId];

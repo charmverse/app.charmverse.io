@@ -12,7 +12,8 @@ const vote: Vote = {
   status: VOTE_STATUS[0],
   createdAt: new Date(),
   spaceId: '4a581759-a677-4613-a088-e7712b7615a9',
-  description: ''
+  description: '',
+  type: 'Approval'
 };
 
 describe('voting status', () => {

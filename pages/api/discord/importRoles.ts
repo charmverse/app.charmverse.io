@@ -7,6 +7,7 @@ import { handleDiscordResponse } from 'lib/discord/handleDiscordResponse';
 import { findOrCreateRoles } from 'lib/roles/createRoles';
 import { assignRolesFromDiscord, DiscordGuildMember } from 'lib/discord/assignRoles';
 import { DiscordServerRole } from 'lib/discord/interface';
+import { RateLimit } from 'async-sema';
 
 const handler = nc({
   onError,
@@ -19,6 +20,8 @@ export interface ImportDiscordRolesPayload {
 }
 
 export type ImportRolesResponse = { importedRoleCount: number };
+
+const MEMBERS_PER_REQUEST = 100;
 
 async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRolesResponse | { error: string }>) {
   const { spaceId, guildId } = req.body as ImportDiscordRolesPayload;
@@ -53,7 +56,7 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
   }
 
   let lastUserId = '0';
-  let discordGuildMembersResponse = await handleDiscordResponse<DiscordGuildMember[]>(`https://discord.com/api/v8/guilds/${guildId}/members?limit=100`);
+  let discordGuildMembersResponse = await handleDiscordResponse<DiscordGuildMember[]>(`https://discord.com/api/v8/guilds/${guildId}/members?limit=${MEMBERS_PER_REQUEST}`);
 
   while (discordGuildMembersResponse.status === 'success' && discordGuildMembersResponse.data.length > 0) {
     discordGuildMembers.push(...discordGuildMembersResponse.data);
@@ -62,7 +65,7 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
       throw new Error('Guild member does not have a user property');
     }
     lastUserId = guildMember.user.id;
-    discordGuildMembersResponse = await handleDiscordResponse<DiscordGuildMember[]>(`https://discord.com/api/v8/guilds/${guildId}/members?limit=100&after=${lastUserId}`);
+    discordGuildMembersResponse = await handleDiscordResponse<DiscordGuildMember[]>(`https://discord.com/api/v8/guilds/${guildId}/members?limit=${MEMBERS_PER_REQUEST}&after=${lastUserId}`);
   }
 
   if (discordGuildMembersResponse.status !== 'success') {

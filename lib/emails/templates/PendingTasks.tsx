@@ -2,7 +2,6 @@ import {
   MjmlSection,
   MjmlColumn,
   MjmlText,
-  MjmlButton,
   MjmlDivider
 } from 'mjml-react';
 import { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
@@ -13,7 +12,7 @@ import { MentionedTask } from 'lib/mentions/interfaces';
 import { VoteTask } from 'lib/votes/interfaces';
 import { DateTime } from 'luxon';
 import { User } from '@prisma/client';
-import { HR, Feedback, Footer, Header, EmailWrapper } from './components';
+import { Feedback, Footer, Header, EmailWrapper } from './components';
 
 const charmverseUrl = process.env.DOMAIN;
 
@@ -69,7 +68,7 @@ export default function PendingTasks (props: PendingTasksProps) {
           >
             <span style={h2Style}>{totalMentionTasks} Mention{totalMentionTasks > 1 ? 's' : ''}</span>
           </a>
-          <a href={nexusVoteLink} style={buttonStyle}>
+          <a href={nexusDiscussionLink} style={buttonStyle}>
             View
           </a>
         </div>
@@ -81,6 +80,7 @@ export default function PendingTasks (props: PendingTasksProps) {
         />
       ))}
       {totalMentionTasks > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusDiscussionLink} /> : null}
+      <MjmlDivider />
     </>
   ) : null;
 
@@ -100,7 +100,7 @@ export default function PendingTasks (props: PendingTasksProps) {
             <span style={h2Style}>{totalVoteTasks} Vote{totalVoteTasks > 1 ? 's' : ''}</span>
           </a>
           <a href={nexusVoteLink} style={buttonStyle}>
-            Vote
+            Vote now
           </a>
         </div>
       </MjmlText>
@@ -148,20 +148,14 @@ export default function PendingTasks (props: PendingTasksProps) {
           <Header />
 
           <MjmlText paddingBottom={0} paddingTop={0}>
-            <h3>{props.totalTasks} tasks need your attention.</h3>
+            <h3>{tasksRequiresYourAttention({ count: props.totalTasks })}.</h3>
           </MjmlText>
-          <MjmlButton align='left' padding-bottom='20px' href={`${charmverseUrl}/nexus`}>
-            View
-          </MjmlButton>
           {multisigSection}
           {voteSection}
           {mentionSection}
 
         </MjmlColumn>
       </MjmlSection>
-
-      <HR />
-
       <Feedback />
       <Footer />
     </EmailWrapper>
@@ -225,4 +219,8 @@ function MultisigTask ({ task }: { task: GnosisSafeTasks }) {
       </strong>
     </MjmlText>
   );
+}
+
+export function tasksRequiresYourAttention ({ count, includeName }: { count: number, includeName?: boolean }) {
+  return `${count} ${includeName ? 'CharmVerse ' : ''}task${count > 1 ? 's' : ''} need${count > 1 ? '' : 's'} your attention`;
 }

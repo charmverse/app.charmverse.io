@@ -1,0 +1,42 @@
+{
+  "id": "6b69d59c-e47b-4319-b7f1-830aaaa66d0e",
+  "deletedAt": null,
+  "createdAt": "2022-06-17T19:56:10.821Z",
+  "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+  "updatedAt": "2022-06-18T12:31:31.437Z",
+  "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+  "spaceId": "da74cab3-c2b6-40bb-8734-0de5375b0fce",
+  "parentId": "68048336-2c49-4985-8373-253753181e62",
+  "rootId": "68048336-2c49-4985-8373-253753181e62",
+  "schema": 1,
+  "type": "view",
+  "title": "Gallery view",
+  "fields": {
+    "filter": {
+      "filters": [],
+      "operation": "and"
+    },
+    "viewType": "gallery",
+    "cardOrder": [
+      "dbd21ca8-abd5-44a6-99dc-4e2d12d810c3",
+      "ae6a3f83-c0ca-4d33-b742-86dde3906e41",
+      "f21cf5a4-e615-4123-b4b8-8fdd65feb77c",
+      "7931f536-dd68-49f7-9c29-321cc73adb9f",
+      "3e374812-1112-4c66-961a-d41db942852b"
+    ],
+    "sortOptions": [],
+    "columnWidths": {},
+    "hiddenOptionIds": [],
+    "visibleOptionIds": [],
+    "defaultTemplateId": "",
+    "collapsedOptionIds": [],
+    "columnCalculations": {},
+    "kanbanCalculations": {},
+    "visiblePropertyIds": [
+      "__title",
+      "a81231c7-6de2-42f0-8667-9dfc6479cc14",
+      "a9bcc8ef-9d60-4320-9f2a-5639ff686d9d",
+      "81b997de-e26d-4694-a062-78df2368d199"
+    ]
+  }
+}

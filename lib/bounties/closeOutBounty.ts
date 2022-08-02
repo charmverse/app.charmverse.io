@@ -1,17 +1,12 @@
-import { countValueOccurrences } from 'lib/utilities/numbers';
-import { countValidSubmissions } from 'lib/applications/shared';
 import { prisma } from 'db';
+import { countValidSubmissions } from 'lib/applications/shared';
+import { includePagePermissions } from 'lib/pages/server';
 import { BountyWithDetails } from '../../models/Bounty';
-import { DataNotFoundError } from '../utilities/errors';
-import { getBounty } from './getBounty';
-import { rollupBountyStatus } from './rollupBountyStatus';
-import { closeNewApplicationsAndSubmissions } from './closeNewApplicationsAndSubmissions';
+import { getBountyOrThrow } from './getBounty';
 
 export async function closeOutBounty (bountyId: string): Promise<BountyWithDetails> {
-  const bounty = await getBounty(bountyId);
-  if (!bounty) {
-    throw new DataNotFoundError(`Bounty with ID ${bountyId} not found`);
-  }
+
+  const bounty = await getBountyOrThrow(bountyId);
 
   const validSubmissions = countValidSubmissions(bounty.applications);
 
@@ -32,7 +27,7 @@ export async function closeOutBounty (bountyId: string): Promise<BountyWithDetai
 
   const validSubmissionsAfterUpdate = validSubmissions - applicationsToReject.length;
 
-  const updatedBounty = await prisma.bounty.update({
+  return prisma.bounty.update({
     where: {
       id: bounty.id
     },
@@ -41,10 +36,10 @@ export async function closeOutBounty (bountyId: string): Promise<BountyWithDetai
       maxSubmissions: validSubmissionsAfterUpdate
     },
     include: {
-      applications: true
+      applications: true,
+      page: {
+        include: includePagePermissions()
+      }
     }
-  });
-
-  return updatedBounty;
-
+  }) as Promise<BountyWithDetails>;
 }

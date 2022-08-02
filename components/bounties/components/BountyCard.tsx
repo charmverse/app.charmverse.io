@@ -1,48 +1,45 @@
-import Link from 'next/link';
-import { Box, Card, CardActionArea, CardHeader, Typography } from '@mui/material';
-import { Bounty as IBounty } from '@prisma/client';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { Box, CardHeader, Typography } from '@mui/material';
+import { Page } from '@prisma/client';
 import { fancyTrim } from 'lib/utilities/strings';
+import { BountyWithDetails } from 'models';
+import { memo } from 'react';
 import BountyStatusBadge from './BountyStatusBadge';
 
-export interface IBountyInput {
-  bounty: IBounty
-  truncate?: boolean
+interface Props {
+  bounty: BountyWithDetails;
+  page: Page;
+  onClick?: () => void;
 }
 
-export function BountyCard ({ truncate = true, bounty }: IBountyInput) {
-  const [space] = useCurrentSpace();
-  const bountyUrl = `/${space?.domain}/bounties/${bounty.id}`;
-
+function BountyCard ({ bounty, page, onClick }: Props) {
   return (
-    <Card
+    <Box
+      onClick={onClick}
+      className='KanbanCard'
       sx={{
-        width: 290,
-        minHeight: 200,
-        height: '100%',
-        display: 'grid' // make child full height
+        height: 150,
+        display: 'grid' // make child full height,
       }}
-      variant='outlined'
     >
-      <Link href={bountyUrl} passHref>
-        <CardActionArea
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            height: '100%',
-            alignItems: 'flex-start',
-            justifyContent: 'space-between'
-          }}
-        >
-          <CardHeader title={bounty.title} titleTypographyProps={{ sx: { fontSize: '1rem', fontWeight: 'bold' } }} />
-          <Box p={2} width='100%' display='flex' flex={1} flexDirection='column' justifyContent='space-between'>
-            <Typography paragraph={true}>
-              {fancyTrim(bounty.description, 120)}
-            </Typography>
-            <BountyStatusBadge truncate={truncate} bounty={bounty} />
-          </Box>
-        </CardActionArea>
-      </Link>
-    </Card>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between'
+        }}
+      >
+        <CardHeader title={page?.title || 'Untitled'} sx={{ p: 0 }} titleTypographyProps={{ sx: { fontSize: '1rem', fontWeight: 'bold' } }} />
+        <Box width='100%' display='flex' flex={1} flexDirection='column' justifyContent='space-between'>
+          <Typography paragraph={true}>
+            {fancyTrim(page?.contentText, 50)}
+          </Typography>
+          <BountyStatusBadge bounty={bounty} hideStatus={true} />
+        </Box>
+      </Box>
+    </Box>
   );
 }
+
+export default memo(BountyCard);

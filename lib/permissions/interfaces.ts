@@ -70,7 +70,11 @@ export type TargetPermissionGroup<G extends Exclude<AssignablePermissionGroupsWi
 // Example is page permission {editor: ['view', 'edit', 'comment']}
 export type OperationGroupMapping<G extends string, O extends string> = {[key in G]: Readonly<O[]>}
 
+/**
+ * @publicOnly If true, ensures that authenticated requests will be treated as unauthenticated requests, only returning publicly available resources
+ */
 export interface AvailableResourcesRequest {
   spaceId: string
   userId?: string
+  publicOnly?: boolean
 }

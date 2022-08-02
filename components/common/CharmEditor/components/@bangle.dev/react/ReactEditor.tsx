@@ -42,14 +42,14 @@ export const BangleEditor = React.forwardRef<
       placeholderComponent,
       editorRef
     },
-    ref,
+    ref
   ) => {
     const renderRef = useRef<HTMLDivElement>(null);
     const onReadyRef = useRef(onReady);
     const editorViewPayloadRef = useRef({
       state,
       focusOnInit,
-      pmViewOpts,
+      pmViewOpts
     });
     const [editor, setEditor] = useState<CoreBangleEditor>();
     const nodeViews = useNodeViews(renderRef);
@@ -59,18 +59,17 @@ export const BangleEditor = React.forwardRef<
       () => {
         return editor;
       },
-      [editor],
+      [editor]
     );
 
     useEffect(() => {
       const editor = new CoreBangleEditor(
         renderRef.current!,
-        editorViewPayloadRef.current,
+        editorViewPayloadRef.current
       );
       (editor.view as any)._updatePluginWatcher = updatePluginWatcher(editor);
       onReadyRef.current(editor);
       setEditor(editor);
-
       return () => {
         editor.destroy();
       };
@@ -78,34 +77,32 @@ export const BangleEditor = React.forwardRef<
 
     if (nodeViews.length > 0 && renderNodeViews == null) {
       throw new Error(
-        'When using nodeViews, you must provide renderNodeViews callback',
+        'When using nodeViews, you must provide renderNodeViews callback'
       );
     }
 
     return (
-      <React.Fragment>
-        <EditorViewContext.Provider value={editor?.view as any}>
-          <div ref={editorRef} className="bangle-editor-core">
-            {editor ? children : null}
-            <div ref={renderRef} id={id} className={className} style={style} />
-            {editor ? placeholderComponent : null}
-          </div>
-          {nodeViews.map((nodeView) => {
-            return reactDOM.createPortal(
-              <NodeViewWrapper
-                debugKey={objectUid.get(nodeView)}
-                nodeViewUpdateStore={nodeViewUpdateStore}
-                nodeView={nodeView}
-                renderNodeViews={renderNodeViews!}
-              />,
+      <EditorViewContext.Provider value={editor?.view as any}>
+        <div ref={editorRef} className='bangle-editor-core'>
+          {editor ? children : null}
+          <div ref={renderRef} id={id} className={className} style={style} />
+          {editor ? placeholderComponent : null}
+        </div>
+        {nodeViews.map((nodeView) => {
+          return reactDOM.createPortal(
+            <NodeViewWrapper
+              debugKey={objectUid.get(nodeView)}
+              nodeViewUpdateStore={nodeViewUpdateStore}
+              nodeView={nodeView}
+              renderNodeViews={renderNodeViews!}
+            />,
               nodeView.containerDOM!,
-              objectUid.get(nodeView),
-            );
-          })}
-        </EditorViewContext.Provider>
-      </React.Fragment>
+              objectUid.get(nodeView)
+          );
+        })}
+      </EditorViewContext.Provider>
     );
-  },
+  }
 );
 
 const updatePluginWatcher = (editor: CoreBangleEditor) => {
@@ -121,7 +118,7 @@ const updatePluginWatcher = (editor: CoreBangleEditor) => {
       : [...state.plugins, watcher];
 
     state = state.reconfigure({
-      plugins: newPlugins,
+      plugins: newPlugins
     });
 
     editor.view.updateState(state);

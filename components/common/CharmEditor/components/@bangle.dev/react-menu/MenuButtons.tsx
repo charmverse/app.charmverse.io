@@ -12,7 +12,7 @@ import {
   strike,
   underline
 } from '@bangle.dev/base-components';
-import { EditorState, PluginKey } from '@bangle.dev/pm';
+import { Command, EditorState, PluginKey } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { BoldIcon, BulletListIcon, CodeIcon, ItalicIcon, LinkIcon, OrderedListIcon, ParagraphIcon, RedoIcon, TodoListIcon, UndoIcon } from '@bangle.dev/react-menu';
 import { HintPos } from '@bangle.dev/react-menu/dist/types';
@@ -22,16 +22,18 @@ import {
 import { filter, rafCommandExec } from '@bangle.dev/utils';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import React, { useCallback } from 'react';
-import { MenuButton } from './Icon';
 import InsertCommentOutlinedIcon from '@mui/icons-material/InsertCommentOutlined';
-import { SubMenu, toggleSubMenu } from './floating-menu';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
+import { createCommentBlock } from 'components/common/BoardEditor/focalboard/src/blocks/commentBlock';
+import { MenuButton } from './Icon';
+import { SubMenu, toggleSubMenu } from './floating-menu';
 import { createInlineVote } from '../../inlineVote';
+import { createInlineComment } from '../../inlineComment';
 
 const {
   defaultKeys: orderedListKeys,
   queryIsOrderedListActive,
-  toggleOrderedList,
+  toggleOrderedList
 } = orderedList;
 const { defaultKeys: italicKeys, queryIsItalicActive, toggleItalic } = italic;
 const { defaultKeys: historyKeys, undo, redo } = history;
@@ -43,12 +45,12 @@ const { defaultKeys: strikeKeys, queryIsStrikeActive, toggleStrike } = strike;
 const {
   defaultKeys: paragraphKeys,
   queryIsTopLevelParagraph,
-  convertToParagraph,
+  convertToParagraph
 } = paragraph;
 const {
   defaultKeys: headingKeys,
   queryIsHeadingActive,
-  toggleHeading,
+  toggleHeading
 } = heading;
 
 const { createLink, queryIsLinkActive } = link;
@@ -57,7 +59,7 @@ const {
   queryIsBulletListActive,
   queryIsTodoListActive,
   toggleBulletList,
-  toggleTodoList,
+  toggleTodoList
 } = bulletList;
 
 interface ButtonProps {
@@ -66,7 +68,7 @@ interface ButtonProps {
   children?: React.ReactNode;
 }
 
-export function BoldButton({
+export function BoldButton ({
   hints = ['Bold', boldKeys.toggleBold],
   hintPos = 'top',
   children = <BoldIcon fontSize={16} />,
@@ -80,7 +82,7 @@ export function BoldButton({
         view.focus();
       }
     },
-    [view],
+    [view]
   );
   return (
     <MenuButton
@@ -96,29 +98,30 @@ export function BoldButton({
   );
 }
 
-export function InlineActionButton({
+export function InlineActionButton ({
   hints = [],
   hintPos = 'top',
   children,
   menuKey,
   enable,
   subMenu,
+  commandFn,
   ...props
-}: ButtonProps & {subMenu: SubMenu, menuKey: PluginKey, enable: boolean}) {
+}: ButtonProps & {commandFn: () => Command, subMenu: SubMenu, menuKey: PluginKey, enable: boolean}) {
   const view = useEditorViewContext();
-  
+
   const onMouseDown = useCallback(
     (e) => {
       e.preventDefault();
       const command = filter(
-        (state: EditorState) => createInlineVote()(state),
+        (state: EditorState) => commandFn()(state),
         (_state, dispatch, view) => {
           if (dispatch) {
             toggleSubMenu(menuKey, subMenu)(view!.state, view!.dispatch, view);
             rafCommandExec(view!, focusFloatingMenuInput(menuKey));
           }
           return true;
-        },
+        }
       );
       if (command(view.state, view.dispatch, view)) {
         if (view.dispatch as any) {
@@ -126,7 +129,7 @@ export function InlineActionButton({
         }
       }
     },
-    [view, menuKey],
+    [view, menuKey]
   );
 
   return (
@@ -143,55 +146,63 @@ export function InlineActionButton({
   );
 }
 
-export function InlineCommentButton({
+export function InlineCommentButton ({
   hints = ['Comment'],
   hintPos = 'top',
   children = <InsertCommentOutlinedIcon sx={{
     fontSize: 12,
-    position: "relative"
-  }}/>,
+    position: 'relative'
+  }}
+  />,
   menuKey,
   enableComments,
   ...props
 }: ButtonProps & {menuKey: PluginKey, enableComments: boolean}) {
 
-  return <InlineActionButton 
-    {...props}
-    enable={enableComments}
-    menuKey={menuKey}
-    hints={['Comment']}
-    subMenu='inlineCommentSubMenu'
-  >
-    {children}
-  </InlineActionButton>
+  return (
+    <InlineActionButton
+      {...props}
+      commandFn={createInlineComment}
+      enable={enableComments}
+      menuKey={menuKey}
+      hints={['Comment']}
+      subMenu='inlineCommentSubMenu'
+    >
+      {children}
+    </InlineActionButton>
+  );
 }
 
-export function InlineVoteButton({
+export function InlineVoteButton ({
   hints = ['Vote'],
   hintPos = 'top',
   children = <HowToVoteIcon sx={{
     fontSize: 12,
-    position: "relative"
-  }}/>,
+    position: 'relative'
+  }}
+  />,
   menuKey,
   enableVotes,
   ...props
 }: ButtonProps & {menuKey: PluginKey, enableVotes: boolean}) {
-  return <InlineActionButton 
-    {...props}
-    enable={enableVotes}
-    menuKey={menuKey}
-    hints={['Vote']}
-    subMenu='inlineVoteSubMenu'
-  >
-    {children}
-  </InlineActionButton>
+  return (
+    <InlineActionButton
+      {...props}
+      commandFn={createInlineVote}
+      enable={enableVotes}
+      menuKey={menuKey}
+      hints={['Vote']}
+      subMenu='inlineVoteSubMenu'
+    >
+      {children}
+    </InlineActionButton>
+  );
 }
 
-export function StrikeButton({
+export function StrikeButton ({
   hints = ['Strike', strikeKeys.toggleStrike],
   hintPos = 'top',
-  children = <span style={{ textDecoration: "line-through", fontSize: 18, marginLeft: 5, marginRight: 5 }}>S</span>,
+  children = <span style={{ textDecoration: 'line-through', fontSize: 18, marginLeft: 5, marginRight: 5 }}>S</span>,
   ...props
 }: ButtonProps) {
   const view = useEditorViewContext();
@@ -202,7 +213,7 @@ export function StrikeButton({
         view.focus();
       }
     },
-    [view],
+    [view]
   );
   return (
     <MenuButton
@@ -218,10 +229,10 @@ export function StrikeButton({
   );
 }
 
-export function UnderlineButton({
+export function UnderlineButton ({
   hints = ['Underline', underlineKeys.toggleUnderline],
   hintPos = 'top',
-  children = <span style={{ textDecoration: "underline", fontSize: 18, marginLeft: 5, marginRight: 5 }}>U</span>,
+  children = <span style={{ textDecoration: 'underline', fontSize: 18, marginLeft: 5, marginRight: 5 }}>U</span>,
   ...props
 }: ButtonProps) {
   const view = useEditorViewContext();
@@ -232,7 +243,7 @@ export function UnderlineButton({
         view.focus();
       }
     },
-    [view],
+    [view]
   );
   return (
     <MenuButton
@@ -248,14 +259,15 @@ export function UnderlineButton({
   );
 }
 
-export function CalloutButton({
+export function CalloutButton ({
   hints = ['Callout', blockquote.defaultKeys.wrapIn],
   hintPos = 'top',
   children = <ChatBubbleIcon sx={{
     fontSize: 12,
     top: 2,
-    position: "relative"
-  }}/>,
+    position: 'relative'
+  }}
+  />,
   ...props
 }: ButtonProps) {
   const view = useEditorViewContext();
@@ -268,7 +280,7 @@ export function CalloutButton({
         view.focus();
       }
     },
-    [view],
+    [view]
   );
   return (
     <MenuButton
@@ -286,7 +298,7 @@ export function CalloutButton({
   );
 }
 
-export function ItalicButton({
+export function ItalicButton ({
   hints = ['Italic', italicKeys.toggleItalic],
   hintPos = 'top',
   children = <ItalicIcon fontSize={16} />,
@@ -302,7 +314,7 @@ export function ItalicButton({
         }
       }
     },
-    [view],
+    [view]
   );
   return (
     <MenuButton
@@ -318,7 +330,7 @@ export function ItalicButton({
   );
 }
 
-export function UndoButton({
+export function UndoButton ({
   hints = ['Undo', historyKeys.undo],
   hintPos = 'top',
   children = <UndoIcon />,
@@ -334,7 +346,7 @@ export function UndoButton({
         }
       }
     },
-    [view],
+    [view]
   );
   return (
     <MenuButton
@@ -349,7 +361,7 @@ export function UndoButton({
   );
 }
 
-export function RedoButton({
+export function RedoButton ({
   hints = ['Redo', historyKeys.redo],
   hintPos = 'top',
   children = <RedoIcon />,
@@ -365,7 +377,7 @@ export function RedoButton({
         }
       }
     },
-    [view],
+    [view]
   );
   return (
     <MenuButton
@@ -380,7 +392,7 @@ export function RedoButton({
   );
 }
 
-export function CodeButton({
+export function CodeButton ({
   hints = ['Code', codeKeys.toggleCode],
   hintPos = 'top',
   children = <CodeIcon fontSize={16} />,
@@ -396,7 +408,7 @@ export function CodeButton({
         }
       }
     },
-    [view],
+    [view]
   );
   return (
     <MenuButton
@@ -412,7 +424,7 @@ export function CodeButton({
   );
 }
 
-export function BulletListButton({
+export function BulletListButton ({
   hints = ['BulletList', bulletListKeys.toggle],
   hintPos = 'top',
   children = <BulletListIcon />,
@@ -428,7 +440,7 @@ export function BulletListButton({
         }
       }
     },
-    [view],
+    [view]
   );
   return (
     <MenuButton
@@ -438,8 +450,8 @@ export function BulletListButton({
       hints={hints}
       isDisabled={!view.editable}
       isActive={
-        queryIsBulletListActive()(view.state) &&
-        !queryIsTodoListActive()(view.state)
+        queryIsBulletListActive()(view.state)
+        && !queryIsTodoListActive()(view.state)
       }
     >
       {children}
@@ -447,7 +459,7 @@ export function BulletListButton({
   );
 }
 
-export function OrderedListButton({
+export function OrderedListButton ({
   hints = ['Ordered list', orderedListKeys.toggle],
   hintPos = 'top',
   children = <OrderedListIcon />,
@@ -463,7 +475,7 @@ export function OrderedListButton({
         }
       }
     },
-    [view],
+    [view]
   );
   return (
     <MenuButton
@@ -479,7 +491,7 @@ export function OrderedListButton({
   );
 }
 
-export function TodoListButton({
+export function TodoListButton ({
   hints = ['Todo list', bulletListKeys.toggleTodo],
   hintPos = 'top',
   children = <TodoListIcon />,
@@ -496,7 +508,7 @@ export function TodoListButton({
         }
       }
     },
-    [view],
+    [view]
   );
   return (
     <MenuButton
@@ -512,19 +524,19 @@ export function TodoListButton({
   );
 }
 
-export function HeadingButton({
+export function HeadingButton ({
   level,
-  hints = [`Heading ${level}`, headingKeys['toH' + level] ?? "1"],
+  hints = [`Heading ${level}`, headingKeys[`toH${level}`] ?? '1'],
   hintPos = 'top',
-  children = 
-    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fontSize={16}>
+  children =
+    <svg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg' fontSize={16}>
       <text
-        x="12"
-        y="12"
-        stroke="currentColor"
-        textAnchor="middle"
-        alignmentBaseline="central"
-        dominantBaseline="middle"
+        x='12'
+        y='12'
+        stroke='currentColor'
+        textAnchor='middle'
+        alignmentBaseline='central'
+        dominantBaseline='middle'
       >
         H{level}
       </text>
@@ -542,7 +554,7 @@ export function HeadingButton({
         }
       }
     },
-    [view, level],
+    [view, level]
   );
   return (
     <MenuButton
@@ -558,8 +570,8 @@ export function HeadingButton({
   );
 }
 
-export function ParagraphButton({
-  hints = [`Paragraph`, paragraphKeys.convertToParagraph],
+export function ParagraphButton ({
+  hints = ['Paragraph', paragraphKeys.convertToParagraph],
   hintPos = 'top',
   children = <ParagraphIcon fontSize={16} />,
   ...props
@@ -574,7 +586,7 @@ export function ParagraphButton({
         }
       }
     },
-    [view],
+    [view]
   );
 
   return (
@@ -591,11 +603,11 @@ export function ParagraphButton({
   );
 }
 
-export function FloatingLinkButton({
+export function FloatingLinkButton ({
   hints = ['Create a link', floatingMenuKeys.toggleLink],
   hintPos = 'top',
   children = <LinkIcon />,
-  menuKey,
+  menuKey
 }: ButtonProps & { menuKey: PluginKey }) {
   const view = useEditorViewContext();
 
@@ -606,11 +618,11 @@ export function FloatingLinkButton({
         (state: EditorState) => createLink('')(state),
         (_state, dispatch, view) => {
           if (dispatch) {
-            toggleSubMenu(menuKey, "linkSubMenu")(view!.state, view!.dispatch, view);
+            toggleSubMenu(menuKey, 'linkSubMenu')(view!.state, view!.dispatch, view);
             rafCommandExec(view!, focusFloatingMenuInput(menuKey));
           }
           return true;
-        },
+        }
       );
       if (command(view.state, view.dispatch, view)) {
         if (view.dispatch as any) {
@@ -618,7 +630,7 @@ export function FloatingLinkButton({
         }
       }
     },
-    [view, menuKey],
+    [view, menuKey]
   );
 
   return (

@@ -1,9 +1,8 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import React from 'react'
+import React from 'react';
 
-import {Constants} from '../constants'
-
+import { Constants } from '../constants';
 
 type Props = {
     color?: string
@@ -13,19 +12,19 @@ type Props = {
 }
 
 // Switch is an on-off style switch / checkbox
-function Label(props: Props): JSX.Element {
-    let color = 'empty'
-    if (props.color && props.color in Constants.menuColors) {
-        color = props.color
-    }
-    return (
-        <span
-            className={`Label ${color} ${props.className ? props.className : ''}`}
-            title={props.title}
-        >
-            {props.children}
-        </span>
-    )
+function Label (props: Props): JSX.Element {
+  let color = 'empty';
+  if (props.color && props.color in Constants.menuColors) {
+    color = props.color;
+  }
+  return (
+    <span
+      className={`Label ${color} ${props.className ? props.className : ''}`}
+      title={props.title}
+    >
+      {props.children}
+    </span>
+  );
 }
 
-export default React.memo(Label)
+export default React.memo(Label);

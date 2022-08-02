@@ -1,10 +1,10 @@
 
 import { Space, User } from '@prisma/client';
-import { createBounty } from 'lib/bounties';
-import { assignRole } from 'lib/roles';
-import { generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { prisma } from 'db';
-import { addBountyPermissionGroup } from '../../permissions/bounties';
+import { assignRole } from 'lib/roles';
+import { DataNotFoundError } from 'lib/utilities/errors';
+import { generateBounty, generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { v4 } from 'uuid';
 import { listAvailableBounties } from '../listAvailableBounties';
 
 let nonAdminUser: User;
@@ -18,9 +18,12 @@ beforeAll(async () => {
 
 });
 
+// We only rely on page permissions to determine if a user can view a bounty
 describe('listAvailableBounties', () => {
-  it('should only return the bounties the user has access to', async () => {
 
+  it('should return the bounties where a user has access to the underlying page', async () => {
+
+    // This will be used to create a bounty in a different space, and ensure we don't get bounties from that space
     const { space: otherSpace, user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     const extraUser = await generateSpaceUser({
@@ -28,53 +31,6 @@ describe('listAvailableBounties', () => {
       spaceId: space.id
     });
 
-    const bounties = await Promise.all([
-      createBounty({
-        createdBy: nonAdminUser.id,
-        spaceId: space.id,
-        title: 'Bounty by user'
-      }),
-      createBounty({
-        createdBy: otherUser.id,
-        spaceId: otherSpace.id,
-        title: 'Bounty by other user'
-      }),
-      createBounty({
-        createdBy: nonAdminUser.id,
-        spaceId: space.id,
-        title: 'Bounty by role'
-      }),
-      createBounty({
-        createdBy: nonAdminUser.id,
-        spaceId: space.id,
-        title: 'Bounty by space you cant see'
-      }),
-      createBounty({
-        createdBy: nonAdminUser.id,
-        spaceId: space.id,
-        title: 'Bounty by space'
-      }),
-      // User did not create this, so they should not see it
-      createBounty({
-        createdBy: nonAdminUser.id,
-        spaceId: space.id,
-        title: 'Bounty by space'
-      })
-    ]);
-
-    const [bountyByUser, bountyByOtherUser, bountyByRole, bountyBySpace, bountyByPublic, invisibleBounty] = bounties;
-
-    // 1/4 - Permission the user
-    await addBountyPermissionGroup({
-      level: 'viewer',
-      resourceId: bountyByUser.id,
-      assignee: {
-        group: 'user',
-        id: extraUser.id
-      }
-    });
-
-    // 2/4 - Permission the role
     const role = await generateRole({
       spaceId: space.id,
       createdBy: nonAdminUser.id
@@ -85,34 +41,100 @@ describe('listAvailableBounties', () => {
       userId: extraUser.id
     });
 
-    await addBountyPermissionGroup({
-      level: 'viewer',
-      resourceId: bountyByRole.id,
-      assignee: {
-        group: 'role',
-        id: role.id
-      }
-    });
-
-    // 3/4 - Permission the space
-    await addBountyPermissionGroup({
-      level: 'viewer',
-      resourceId: bountyBySpace.id,
-      assignee: {
-        group: 'space',
-        id: space.id
-      }
-    });
-
-    // 4/4 - Permission the public
-    await addBountyPermissionGroup({
-      level: 'viewer',
-      resourceId: bountyByPublic.id,
-      assignee: {
-        group: 'public',
-        id: undefined
-      }
-    });
+    // We are explicitly initialising the bounty with no bounty permissions
+    const [
+      bountyWithUserPermission,
+      bountyWithRolePermission,
+      bountyWithSpacePermission,
+      bountyWithPublicPermission,
+      bountyByOtherUser,
+      bountyInOtherSpace
+    ] = await Promise.all([
+      generateBounty({
+        createdBy: nonAdminUser.id,
+        spaceId: space.id,
+        title: 'Bounty with user permission as user created it',
+        status: 'open',
+        rewardAmount: 1,
+        rewardToken: 'ETH',
+        approveSubmitters: false,
+        bountyPermissions: {},
+        pagePermissions: [{
+          permissionLevel: 'view',
+          userId: extraUser.id
+        }]
+      }),
+      generateBounty({
+        createdBy: nonAdminUser.id,
+        spaceId: space.id,
+        title: 'Bounty with role permission',
+        status: 'open',
+        rewardAmount: 1,
+        rewardToken: 'ETH',
+        approveSubmitters: false,
+        bountyPermissions: {},
+        pagePermissions: [{
+          permissionLevel: 'view',
+          roleId: role.id
+        }]
+      }),
+      generateBounty({
+        createdBy: nonAdminUser.id,
+        spaceId: space.id,
+        title: 'Bounty with space permission',
+        status: 'open',
+        rewardAmount: 1,
+        rewardToken: 'ETH',
+        approveSubmitters: false,
+        bountyPermissions: {},
+        pagePermissions: [{
+          permissionLevel: 'view',
+          spaceId: space.id
+        }]
+      }),
+      generateBounty({
+        createdBy: nonAdminUser.id,
+        spaceId: space.id,
+        title: 'Bounty with public permission',
+        status: 'open',
+        rewardAmount: 1,
+        rewardToken: 'ETH',
+        approveSubmitters: false,
+        bountyPermissions: {},
+        pagePermissions: [{
+          permissionLevel: 'view',
+          public: true
+        }]
+      }),
+      // -------- Invisible bounties -------
+      // Bounty in current space but no permissions created
+      generateBounty({
+        createdBy: nonAdminUser.id,
+        spaceId: space.id,
+        title: 'Bounty by other space user',
+        status: 'open',
+        rewardAmount: 1,
+        rewardToken: 'ETH',
+        approveSubmitters: false,
+        bountyPermissions: {},
+        pagePermissions: []
+      }),
+      // Bounty in different space we shouldn't see
+      generateBounty({
+        createdBy: otherUser.id,
+        spaceId: otherSpace.id,
+        title: 'Bounty in other space',
+        status: 'open',
+        rewardAmount: 1,
+        rewardToken: 'ETH',
+        approveSubmitters: false,
+        bountyPermissions: {},
+        pagePermissions: [{
+          permissionLevel: 'view',
+          spaceId: otherSpace.id
+        }]
+      })
+    ]);
 
     const available = await listAvailableBounties({
       spaceId: space.id,
@@ -121,30 +143,30 @@ describe('listAvailableBounties', () => {
 
     expect(available.length).toBe(4);
 
-    // Cleanup bounties
-    await prisma.bounty.deleteMany({
-      where: {
-        OR: bounties.map(b => {
-          return { id: b.id };
-        })
-      }
-    });
+    // Check for created bounties
+    expect(available.some(b => b.id === bountyWithUserPermission.id)).toBe(true);
+    expect(available.some(b => b.id === bountyWithRolePermission.id)).toBe(true);
+    expect(available.some(b => b.id === bountyWithSpacePermission.id)).toBe(true);
+    expect(available.some(b => b.id === bountyWithPublicPermission.id)).toBe(true);
+
+    // Make sure these are missing
+    expect(available.every(b => b.id !== bountyInOtherSpace.id)).toBe(true);
+    expect(available.every(b => b.id !== bountyByOtherUser.id)).toBe(true);
   });
 
-  it('should always display the bounties the user created in the space', async () => {
+  it('should not show the bounty to the creating the user if they do not have the corresponding page permission', async () => {
     const { space: otherSpace, user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, false);
     // No permissions provided
-    const bounty = await createBounty({
+    const bounty = await generateBounty({
       createdBy: otherUser.id,
       spaceId: otherSpace.id,
-      title: 'Bounty by space'
-    });
-
-    // This one will be ignored
-    await createBounty({
-      createdBy: otherUser.id,
-      spaceId: space.id,
-      title: 'Bounty by space'
+      title: 'Bounty by space',
+      status: 'open',
+      rewardAmount: 1,
+      rewardToken: 'ETH',
+      approveSubmitters: false,
+      bountyPermissions: {},
+      pagePermissions: []
     });
 
     const bounties = await listAvailableBounties({
@@ -152,8 +174,7 @@ describe('listAvailableBounties', () => {
       userId: otherUser.id
     });
 
-    expect(bounties.length).toBe(1);
-    expect(bounties[0].id).toBe(bounty.id);
+    expect(bounties.length).toBe(0);
 
   });
 
@@ -165,17 +186,32 @@ describe('listAvailableBounties', () => {
     });
 
     // No permissions provided
-    await createBounty({
+    await generateBounty({
       createdBy: otherUser.id,
       spaceId: otherSpace.id,
-      title: 'Bounty by space'
+      title: 'Bounty by space',
+      status: 'open',
+      rewardAmount: 1,
+      rewardToken: 'ETH',
+      approveSubmitters: false,
+      bountyPermissions: {},
+      pagePermissions: []
     });
 
-    // This one will be ignored
-    await createBounty({
-      createdBy: otherUser.id,
+    // This one will be ignored as it is in a separate space
+    await generateBounty({
+      createdBy: nonAdminUser.id,
       spaceId: space.id,
-      title: 'Bounty by space'
+      title: 'Bounty by space',
+      status: 'open',
+      rewardAmount: 1,
+      rewardToken: 'ETH',
+      approveSubmitters: false,
+      bountyPermissions: {},
+      pagePermissions: [{
+        permissionLevel: 'view',
+        spaceId: space.id
+      }]
     });
 
     const bounties = await listAvailableBounties({
@@ -187,4 +223,274 @@ describe('listAvailableBounties', () => {
 
   });
 
+  it('should display all space-accessible and public bounties to a non-logged in user, if the space has activated public bounty boards', async () => {
+    const { space: otherSpace, user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, false);
+
+    await prisma.space.update({
+      where: {
+        id: otherSpace.id
+      },
+      data: {
+        publicBountyBoard: true
+      }
+    });
+
+    // eslint-disable-next-line prefer-const
+    let [publicBounty, spaceBounty, invisibleBounty] = await Promise.all([
+      // A bounty which should show
+      generateBounty({
+        createdBy: otherUser.id,
+        spaceId: otherSpace.id,
+        title: 'Bounty for public',
+        status: 'open',
+        approveSubmitters: false,
+        bountyPermissions: {},
+        pagePermissions: [{
+          permissionLevel: 'view',
+          public: true
+        }]
+      }),
+      // A bounty which space can work on, which should show
+      generateBounty({
+        createdBy: otherUser.id,
+        spaceId: otherSpace.id,
+        title: 'Bounty for space',
+        status: 'open',
+        approveSubmitters: false,
+        bountyPermissions: {},
+        pagePermissions: [{
+          permissionLevel: 'view',
+          spaceId: otherSpace.id
+        }]
+      }),
+      // A bounty accessible to a user only, which should not show
+      generateBounty({
+        createdBy: otherUser.id,
+        spaceId: otherSpace.id,
+        title: 'Invisible bounty',
+        status: 'open',
+        rewardAmount: 1,
+        rewardToken: 'ETH',
+        approveSubmitters: false,
+        bountyPermissions: {},
+        pagePermissions: [{
+          permissionLevel: 'view',
+          userId: otherUser.id
+        }]
+      })
+    ]);
+
+    const bounties = await listAvailableBounties({
+      spaceId: otherSpace.id
+    });
+
+    expect(bounties.length).toBe(2);
+
+    expect(bounties.every(b => b.id !== invisibleBounty.id)).toBe(true);
+    expect(bounties.some(b => b.id === spaceBounty.id)).toBe(true);
+    expect(bounties.some(b => b.id === publicBounty.id)).toBe(true);
+
+  });
+
+  it('should display all space-accessible and public bounties to a non-space member, if the space has activated public bounty boards', async () => {
+    const { space: otherSpace, user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, false);
+    const { user: userInDifferentSpace } = await generateUserAndSpaceWithApiToken(undefined, false);
+
+    await prisma.space.update({
+      where: {
+        id: otherSpace.id
+      },
+      data: {
+        publicBountyBoard: true
+      }
+    });
+
+    const [publicBounty, spaceBounty, invisibleBounty] = await Promise.all([
+      // A bounty which should show
+      generateBounty({
+        createdBy: otherUser.id,
+        spaceId: otherSpace.id,
+        title: 'Bounty for public',
+        status: 'open',
+        approveSubmitters: false,
+        bountyPermissions: {},
+        pagePermissions: [{
+          permissionLevel: 'view',
+          public: true
+        }]
+      }),
+      generateBounty({
+        createdBy: otherUser.id,
+        spaceId: otherSpace.id,
+        title: 'Bounty for public',
+        status: 'open',
+        approveSubmitters: false,
+        bountyPermissions: {},
+        pagePermissions: [{
+          permissionLevel: 'view',
+          spaceId: otherSpace.id
+        }]
+      }),
+      // A bounty accessible to a user only, which should not show
+      generateBounty({
+        createdBy: otherUser.id,
+        spaceId: otherSpace.id,
+        title: 'Invisible bounty',
+        status: 'open',
+        rewardAmount: 1,
+        rewardToken: 'ETH',
+        approveSubmitters: false,
+        bountyPermissions: {},
+        pagePermissions: [{
+          permissionLevel: 'view',
+          userId: otherUser.id
+        }]
+      })
+    ]);
+
+    const bounties = await listAvailableBounties({
+      spaceId: otherSpace.id,
+      userId: userInDifferentSpace.id
+    });
+
+    expect(bounties.length).toBe(2);
+
+    expect(bounties.every(b => b.id !== invisibleBounty.id)).toBe(true);
+    expect(bounties.some(b => b.id === spaceBounty.id)).toBe(true);
+    expect(bounties.some(b => b.id === publicBounty.id)).toBe(true);
+
+  });
+
+  it('should return an empty list for to a non-logged in user, if the space has not activated public bounty boards', async () => {
+    const { space: otherSpace, user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, false);
+
+    await prisma.space.update({
+      where: {
+        id: otherSpace.id
+      },
+      data: {
+        publicBountyBoard: false
+      }
+    });
+
+    // No permissions provided
+    const [publicBounty, spaceBounty, invisibleBounty] = await Promise.all([
+      // A bounty which should show
+      generateBounty({
+        createdBy: otherUser.id,
+        spaceId: otherSpace.id,
+        title: 'Bounty for public',
+        status: 'open',
+        approveSubmitters: false,
+        bountyPermissions: {},
+        pagePermissions: [{
+          permissionLevel: 'view',
+          public: true
+        }]
+      }),
+      // A bounty which space can work on, which should show
+      generateBounty({
+        createdBy: otherUser.id,
+        spaceId: otherSpace.id,
+        title: 'Bounty for space',
+        status: 'open',
+        approveSubmitters: false,
+        bountyPermissions: {},
+        pagePermissions: [{
+          permissionLevel: 'view',
+          spaceId: otherSpace.id
+        }]
+      }),
+      // A bounty accessible to a user only, which should not show
+      generateBounty({
+        createdBy: otherUser.id,
+        spaceId: otherSpace.id,
+        title: 'Invisible bounty',
+        status: 'open',
+        approveSubmitters: false,
+        bountyPermissions: {},
+        pagePermissions: [{
+          permissionLevel: 'view',
+          userId: otherUser.id
+        }]
+      })
+    ]);
+
+    const bounties = await listAvailableBounties({
+      spaceId: otherSpace.id
+    });
+
+    expect(bounties.length).toBe(0);
+  });
+
+  it('should return an empty list for to a non space member, if the space has not activated public bounty boards', async () => {
+    const { space: otherSpace, user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, false);
+    const { user: userInDifferentSpace } = await generateUserAndSpaceWithApiToken(undefined, false);
+
+    await prisma.space.update({
+      where: {
+        id: otherSpace.id
+      },
+      data: {
+        publicBountyBoard: false
+      }
+    });
+
+    // No permissions provided
+    const [publicBounty, spaceBounty, invisibleBounty] = await Promise.all([
+      // A bounty which would show if the space had activated public bounty boards
+      generateBounty({
+        createdBy: otherUser.id,
+        spaceId: otherSpace.id,
+        title: 'Bounty for public',
+        status: 'open',
+        approveSubmitters: false,
+        bountyPermissions: {},
+        pagePermissions: [{
+          permissionLevel: 'view',
+          public: true
+        }]
+      }),
+      // A bounty which would show if the space had activated public bounty boards
+      generateBounty({
+        createdBy: otherUser.id,
+        spaceId: otherSpace.id,
+        title: 'Bounty for space',
+        status: 'open',
+        approveSubmitters: false,
+        bountyPermissions: {},
+        pagePermissions: [{
+          permissionLevel: 'view',
+          spaceId: otherSpace.id
+        }]
+      }),
+      // A bounty accessible to a user only, which should never show
+      generateBounty({
+        createdBy: otherUser.id,
+        spaceId: otherSpace.id,
+        title: 'Invisible bounty',
+        status: 'open',
+        approveSubmitters: false,
+        bountyPermissions: {},
+        pagePermissions: [{
+          permissionLevel: 'view',
+          userId: otherUser.id
+        }]
+      })
+    ]);
+
+    const bounties = await listAvailableBounties({
+      spaceId: otherSpace.id,
+      userId: userInDifferentSpace.id
+    });
+
+    expect(bounties.length).toBe(0);
+
+  });
+
+  it('should fail if the space does not exist', async () => {
+    await expect(listAvailableBounties({
+      spaceId: v4()
+    })).rejects.toBeInstanceOf(DataNotFoundError);
+  });
 });

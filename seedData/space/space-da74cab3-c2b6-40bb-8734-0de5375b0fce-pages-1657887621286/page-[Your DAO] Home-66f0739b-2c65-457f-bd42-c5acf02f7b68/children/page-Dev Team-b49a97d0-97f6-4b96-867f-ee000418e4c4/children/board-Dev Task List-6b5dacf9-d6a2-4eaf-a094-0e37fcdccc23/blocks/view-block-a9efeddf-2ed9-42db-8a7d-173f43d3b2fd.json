@@ -1,0 +1,45 @@
+{
+  "id": "a9efeddf-2ed9-42db-8a7d-173f43d3b2fd",
+  "deletedAt": null,
+  "createdAt": "2022-06-30T12:48:31.867Z",
+  "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+  "updatedAt": "2022-07-08T16:30:58.308Z",
+  "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+  "spaceId": "da74cab3-c2b6-40bb-8734-0de5375b0fce",
+  "parentId": "6b5dacf9-d6a2-4eaf-a094-0e37fcdccc23",
+  "rootId": "6b5dacf9-d6a2-4eaf-a094-0e37fcdccc23",
+  "schema": 1,
+  "type": "view",
+  "title": "Board view",
+  "fields": {
+    "filter": {
+      "filters": [],
+      "operation": "and"
+    },
+    "viewType": "board",
+    "cardOrder": [
+      "9a85f906-ee7a-4cdf-86dd-5b19042c1dfd",
+      "ea3d31d8-e84a-4184-8a34-32086e1dffb3",
+      "8a52ecb8-591a-4366-b680-e9abbe7523e1",
+      "8464eaf7-3490-4def-a938-c144f560454e"
+    ],
+    "sortOptions": [],
+    "columnWidths": {},
+    "hiddenOptionIds": [
+      ""
+    ],
+    "visibleOptionIds": [
+      "1e4f3635-40ec-4838-bd5a-b3c9e4107381",
+      "9c047d40-c4e2-416e-bb0b-d54e79983564",
+      "57f75b39-2aab-4df6-bbd1-ec887c8e340d",
+      "2efe3884-7b4e-49fd-b340-c9cce44d50c0"
+    ],
+    "defaultTemplateId": "",
+    "collapsedOptionIds": [],
+    "columnCalculations": {},
+    "kanbanCalculations": {},
+    "visiblePropertyIds": [
+      "57039289-9873-4ce9-a637-05c4697f899a"
+    ]
+  }
+}

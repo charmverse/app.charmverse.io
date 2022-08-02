@@ -11,7 +11,7 @@ export default function BountyPage () {
   const router = useRouter();
   useEffect(() => {
     updateCurrentBountyId((router.query.bountyId as string) ?? null);
-  }, [router.query.bountyId]);
+  }, [router.query.bountyId, router.query.pageId]);
 
   return (
     <BountyDetails />

@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Space, User } from '@prisma/client';
-import { BountySubmitterPoolCalculation, BountySubmitterPoolSize, createBounty } from 'lib/bounties';
+import { BountyCreationData, BountySubmitterPoolCalculation, BountySubmitterPoolSize, createBounty } from 'lib/bounties';
 import { addBountyPermissionGroup } from 'lib/permissions/bounties';
 import { assignRole } from 'lib/roles';
+import { BountyWithDetails } from 'models';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateBounty, generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
@@ -21,18 +22,11 @@ beforeAll(async () => {
 
 describe('POST /api/bounties/pool - Return breakdown of how many people can apply', () => {
 
-  it('should return the bounty pool size based on current bounty permissions and respond with 200', async () => {
+  it('should return the bounty pool size based on current amount of bounty submitters and respond with 200', async () => {
 
     const extraUser = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
 
     const extraUserCookie = await loginUser(extraUser);
-
-    const bounty = await generateBounty({
-      spaceId: nonAdminUserSpace.id,
-      status: 'suggestion',
-      approveSubmitters: false,
-      createdBy: nonAdminUser.id
-    });
 
     const role = await generateRole({
       createdBy: nonAdminUser.id,
@@ -43,6 +37,24 @@ describe('POST /api/bounties/pool - Return breakdown of how many people can appl
       roleId: role.id,
       userId: extraUser.id
     });
+
+    const bounty = (await request(baseUrl)
+      .post('/api/bounties')
+      .set('Cookie', extraUserCookie)
+      .send({
+        spaceId: nonAdminUserSpace.id,
+        status: 'suggestion',
+        approveSubmitters: false,
+        createdBy: nonAdminUser.id,
+        title: 'Test title',
+        permissions: {
+          submitter: [{
+            group: 'role',
+            id: role.id
+          }]
+        }
+      } as BountyCreationData)
+      .expect(201)).body as BountyWithDetails;
 
     // This should be ignored in following call
     await addBountyPermissionGroup({
@@ -61,6 +73,7 @@ describe('POST /api/bounties/pool - Return breakdown of how many people can appl
         resourceId: bounty.id
       })
       .expect(200)).body as BountySubmitterPoolSize;
+      // sf
 
     expect(mode === 'role').toBe(true);
     expect(roleups.length).toBe(1);
@@ -185,7 +198,7 @@ describe('POST /api/bounties/pool - Return breakdown of how many people can appl
     expect(total).toBe(2);
   });
 
-  it('should respond with empty permissions if user does not have view permission', async () => {
+  it('should respond with empty dataset if user does not have view permission', async () => {
 
     const externalUser = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
 

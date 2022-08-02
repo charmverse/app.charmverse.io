@@ -8,6 +8,7 @@ export default function useTasks () {
     // 10 minutes
     refreshInterval: 1000 * 10 * 60
   });
+
   const error = serverError?.message || serverError;
   const isLoading = !tasks;
 

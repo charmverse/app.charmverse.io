@@ -1,25 +1,28 @@
-import { Bounty, BountyStatus, Prisma } from '@prisma/client';
+import { BountyStatus, Prisma } from '@prisma/client';
 import { prisma } from 'db';
+import { getBountyPagePermissionSet } from 'lib/bounties/shared';
 import { setBountyPermissions } from 'lib/permissions/bounties';
 import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
+import { BountyWithDetails } from 'models';
+import { v4 } from 'uuid';
+import { getBountyOrThrow } from './getBounty';
 import { BountyCreationData } from './interfaces';
 
+/**
+ * You can create a bounty suggestion using only title, spaceId and createdBy. You will see many unit tests using this limited dataset, which will then default the bounty to suggestion status. Your logic should account for this.
+ */
 export async function createBounty ({
-  title,
   spaceId,
   createdBy,
   status = 'suggestion',
   chainId = 1,
-  description = '',
-  descriptionNodes = '',
-  linkedTaskId,
+  linkedPageId,
   approveSubmitters = true,
   maxSubmissions,
   rewardAmount = 0,
   rewardToken = 'ETH',
-  reviewer,
   permissions
-}: BountyCreationData): Promise<Bounty> {
+}: BountyCreationData) {
 
   const validCreationStatuses: BountyStatus[] = ['suggestion', 'open'];
 
@@ -37,8 +40,10 @@ export async function createBounty ({
     throw new PositiveNumbersOnlyError();
   }
 
+  const bountyId = v4();
+
   const bountyCreateInput: Prisma.BountyCreateInput = {
-    title,
+    id: bountyId,
     space: {
       connect: {
         id: spaceId
@@ -51,31 +56,104 @@ export async function createBounty ({
     },
     status,
     chainId,
-    description,
-    descriptionNodes: descriptionNodes as string,
     approveSubmitters,
     maxSubmissions,
     rewardAmount,
-    rewardToken,
-    reviewer,
-    linkedTaskId
+    rewardToken
   };
 
-  if (status === 'suggestion') {
+  const isSuggestion = status === 'suggestion';
+
+  if (isSuggestion) {
     bountyCreateInput.suggestedBy = createdBy;
   }
 
-  const bounty = await prisma.bounty.create({
-    data: bountyCreateInput
-  });
+  const bountyPagePermissionSet: Omit<Prisma.PagePermissionCreateManyInput, 'pageId'>[] = getBountyPagePermissionSet({ createdBy, status, spaceId, permissions, linkedPageId });
 
-  if (permissions) {
+  if (!linkedPageId) {
+    await prisma.$transaction([
+      prisma.bounty.create({
+        data: {
+          ...bountyCreateInput,
+          page: {
+            create: {
+              id: bountyId,
+              path: `page-${Math.random().toString().replace('0.', '')}`,
+              title: '',
+              contentText: '',
+              content: undefined,
+              space: {
+                connect: {
+                  id: spaceId
+                }
+              },
+              updatedBy: createdBy,
+              author: {
+                connect: {
+                  id: createdBy
+                }
+              },
+              type: 'bounty'
+            }
+          }
+        }
+      }),
+      prisma.pagePermission.createMany({
+        data: bountyPagePermissionSet.map(p => {
+          return {
+            ...p,
+            pageId: bountyId
+          };
+        })
+      })
+    ]);
+  }
+  else {
+    await prisma.$transaction([
+      prisma.bounty.create({
+        data: {
+          ...bountyCreateInput
+        }
+      }),
+      prisma.page.update({
+        where: {
+          id: linkedPageId
+        },
+        data: {
+          type: 'card',
+          bountyId
+        }
+      }),
+      prisma.pagePermission.createMany({
+        data: bountyPagePermissionSet.map(p => {
+          return {
+            ...p,
+            pageId: linkedPageId
+          };
+        })
+      })
+    ]);
+  }
+
+  // Initialise suggestions with a view permission
+  if (isSuggestion) {
     await setBountyPermissions({
-      bountyId: bounty.id,
+      bountyId,
+      permissionsToAssign: {
+        creator: [{
+          group: 'user',
+          id: createdBy
+        }]
+      }
+    });
+  }
+  // Pass custom permissions
+  else if (permissions) {
+    await setBountyPermissions({
+      bountyId,
       permissionsToAssign: permissions
     });
   }
 
-  return bounty;
-
+  return getBountyOrThrow(bountyId);
 }

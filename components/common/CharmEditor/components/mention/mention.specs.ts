@@ -37,7 +37,7 @@ export function mentionSpecs (): RawSpecs {
         },
         inline: true,
         group: 'inline',
-        draggable: true,
+        draggable: false,
         atom: true,
         parseDOM: [{ tag: 'span.charm-mention-value' }],
         toDOM: (): DOMOutputSpec => {

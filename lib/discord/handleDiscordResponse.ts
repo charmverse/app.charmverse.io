@@ -1,4 +1,5 @@
 import * as http from 'adapters/http';
+import { RateLimit } from 'async-sema';
 import log from 'lib/log';
 
 const discordBotToken = process.env.DISCORD_BOT_TOKEN as string;
@@ -12,10 +13,14 @@ export async function authenticatedRequest<T> (endpoint: string) {
   return http.GET<T>(endpoint, undefined, discordApiHeaders);
 }
 
-export async function handleDiscordResponse<T> (endpoint: string): Promise<{status: number, error: string, redirectLink?: string} | {status: 'success', data: T}> {
+// requests per second = 35, timeUnit = 1sec
+const rateLimiter = RateLimit(30);
 
+export async function handleDiscordResponse<T> (endpoint: string): Promise<{status: number, error: string, redirectLink?: string} | {status: 'success', data: T}> {
   try {
+    await rateLimiter();
     const response = await authenticatedRequest<T>(endpoint);
+    log.info(`[Discord API]: ${endpoint}`);
     return {
       status: 'success',
       data: response

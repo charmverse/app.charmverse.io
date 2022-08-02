@@ -1,6 +1,6 @@
 import { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import { ExtendedVote } from 'lib/votes/interfaces';
-import { useRouter } from 'next/router';
+import { isSmallScreen } from 'lib/browser';
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 import { useSWRConfig } from 'swr';
 import { useVotes } from './useVotes';
@@ -18,15 +18,26 @@ export const PageActionDisplayContext = createContext<IPageActionDisplayContext>
 });
 
 export function PageActionDisplayProvider ({ children }: { children: ReactNode }) {
+
+  // only calculate once
+  const smallScreen = useMemo(() => isSmallScreen(), []);
   const { currentPageId } = usePages();
   const { isValidating: isValidatingInlineComments } = useThreads();
   const { isValidating: isValidatingInlineVotes } = useVotes();
   const { cache } = useSWRConfig();
-  const [currentPageActionDisplay, setCurrentPageActionDisplay] = useState<IPageActionDisplayContext['currentPageActionDisplay']>(null);
+  const [currentPageActionDisplay, _setCurrentPageActionDisplay] = useState<IPageActionDisplayContext['currentPageActionDisplay']>(null);
+
+  const setCurrentPageActionDisplay: typeof _setCurrentPageActionDisplay = (value) => {
+    // dont show action for mobile screens
+    if (!smallScreen) {
+      _setCurrentPageActionDisplay(value);
+    }
+  };
+
   useEffect(() => {
     const highlightedCommentId = (new URLSearchParams(window.location.search)).get('commentId');
     if (currentPageId && !isValidatingInlineComments && !isValidatingInlineVotes) {
-      const cachedInlineVotesData: ExtendedVote[] = cache.get(`pages/${currentPageId}/inline-votes`);
+      const cachedInlineVotesData: ExtendedVote[] = cache.get(`pages/${currentPageId}/votes`);
       const cachedInlineCommentData: ThreadWithCommentsAndAuthors[] | undefined = cache.get(`pages/${currentPageId}/threads`);
       // Vote takes precedence over comments, so if a page has in progress votes and unresolved comments, show the votes
       if (!highlightedCommentId && cachedInlineVotesData && cachedInlineVotesData.find(inlineVote => inlineVote.status === 'InProgress')) {
@@ -39,9 +50,6 @@ export function PageActionDisplayProvider ({ children }: { children: ReactNode }
       else {
         setCurrentPageActionDisplay(null);
       }
-    }
-    else {
-      setCurrentPageActionDisplay(null);
     }
   }, [isValidatingInlineComments, isValidatingInlineVotes, currentPageId]);
 

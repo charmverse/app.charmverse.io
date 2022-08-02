@@ -1,7 +1,9 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
+import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
 import MoonIcon from '@mui/icons-material/DarkMode';
 import GetAppIcon from '@mui/icons-material/GetApp';
+import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import FavoritedIcon from '@mui/icons-material/Star';
@@ -27,13 +29,12 @@ import { useUser } from 'hooks/useUser';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
 import { useRouter } from 'next/router';
 import { useRef, useState } from 'react';
-import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
-import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useVotes } from 'hooks/useVotes';
+import CreateVoteModal from 'components/votes/components/CreateVoteModal';
 import Account from '../Account';
 import ShareButton from '../ShareButton';
-import CreateVoteModal from '../../../../votes/components/CreateVoteModal';
+import BountyShareButton from './BountyShareButton/BountyShareButton';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
 import NotificationsBadge from './components/NotificationsBadge';
 
@@ -70,6 +71,8 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
   const isExportablePage = pageType === 'card' || pageType === 'page' || pageType === 'proposal';
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const isBountyBoard = router.route === '/[domain]/bounties';
 
   async function toggleFavorite () {
     if (!currentPage || !user) return;
@@ -109,11 +112,8 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
         onClick={openSidebar}
         edge='start'
         sx={{
-          display: {
-            xs: hideSidebarOnSmallScreen ? 'none' : 'inline-flex',
-            md: 'inline-flex'
-          },
-          marginRight: '36px',
+          display: 'inline-flex',
+          mr: 2,
           ...(open && { display: 'none' })
         }}
       >
@@ -130,12 +130,18 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
       >
         <PageTitleWithBreadcrumbs />
         <Box display='flex' alignItems='center'>
+          {
+            isBountyBoard && (
+              <BountyShareButton headerHeight={headerHeight} />
+            )
+          }
+
           {isPage && (
             <>
               {currentPage?.deletedAt === null && <ShareButton headerHeight={headerHeight} />}
-              <IconButton size='small' onClick={toggleFavorite} color='inherit'>
-                <Tooltip title={isFavorite ? 'Remove from sidebar' : 'Pin this page to your sidebar'} arrow placement='bottom'>
-                  {isFavorite ? <FavoritedIcon color='secondary' /> : <NotFavoritedIcon color='secondary' />}
+              <IconButton sx={{ display: { xs: 'none', md: 'inline-flex' } }} size='small' onClick={toggleFavorite} color='inherit'>
+                <Tooltip title={isFavorite ? 'Remove from sidebar' : 'Pin this page to your sidebar'} arrow placement='top'>
+                  {isFavorite ? <FavoritedIcon fontSize='small' color='secondary' /> : <NotFavoritedIcon fontSize='small' color='secondary' />}
                 </Tooltip>
               </IconButton>
             </>
@@ -151,7 +157,7 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
                 }}
               >
                 <Tooltip title='View comments, votes, export content and more' arrow>
-                  <MoreHorizIcon />
+                  <MoreHorizIcon color='secondary' />
                 </Tooltip>
               </IconButton>
               <Popover
@@ -259,12 +265,13 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
               </Popover>
             </Box>
           )}
+          {/** End of CharmEditor page specific header content */}
 
           {/** dark mode toggle */}
           {user && (
-            <IconButton size='small' sx={{ mx: 1 }} onClick={colorMode.toggleColorMode} color='inherit'>
-              <Tooltip title={`Enable ${theme.palette.mode === 'dark' ? 'light mode' : 'dark mode'}`} arrow placement='bottom'>
-                {theme.palette.mode === 'dark' ? <SunIcon color='secondary' /> : <MoonIcon color='secondary' />}
+            <IconButton size='small' sx={{ display: { xs: 'none', md: 'inline-flex' }, mx: 1 }} onClick={colorMode.toggleColorMode} color='inherit'>
+              <Tooltip title={`Enable ${theme.palette.mode === 'dark' ? 'light mode' : 'dark mode'}`} arrow placement='top'>
+                {theme.palette.mode === 'dark' ? <SunIcon fontSize='small' color='secondary' /> : <MoonIcon fontSize='small' color='secondary' />}
               </Tooltip>
             </IconButton>
           )}

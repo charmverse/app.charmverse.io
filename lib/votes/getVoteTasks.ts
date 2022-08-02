@@ -1,4 +1,6 @@
 import { prisma } from 'db';
+import { aggregateVoteResult } from './aggregateVoteResult';
+import { calculateVoteStatus } from './calculateVoteStatus';
 import { VoteTask } from './interfaces';
 
 export async function getVoteTasks (userId: string): Promise<VoteTask[]> {
@@ -28,9 +30,29 @@ export async function getVoteTasks (userId: string): Promise<VoteTask[]> {
     },
     include: {
       page: true,
-      space: true
+      space: true,
+      userVotes: true,
+      voteOptions: true
     }
   });
 
-  return votes;
+  return votes.map(vote => {
+    const voteStatus = calculateVoteStatus(vote);
+    const userVotes = vote.userVotes;
+    const { aggregatedResult, userChoice } = aggregateVoteResult({
+      userId,
+      userVotes,
+      voteOptions: vote.voteOptions
+    });
+
+    delete (vote as any).userVotes;
+
+    return {
+      ...vote,
+      aggregatedResult,
+      userChoice,
+      status: voteStatus,
+      totalVotes: userVotes.length
+    };
+  });
 }

@@ -7,7 +7,7 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DiscordUser } from '@prisma/client';
-import { logSignup } from '../profile';
+import { postToDiscord } from 'lib/log/userEvents';
 
 const handler = nc({
   onError,
@@ -48,7 +48,7 @@ export async function createAccountWithDiscord (req: NextApiRequest, res: NextAp
     });
     return;
   }
-  logSignup();
+
   req.session.user = newUser;
   await req.session.save();
   res.status(200).json({
@@ -63,3 +63,11 @@ export async function createAccountWithDiscord (req: NextApiRequest, res: NextAp
 handler.post(createAccountWithDiscord);
 
 export default withSessionRoute(handler);
+
+export async function logSignupViaDiscord () {
+  postToDiscord({
+    funnelStage: 'acquisition',
+    eventType: 'create_user',
+    message: 'A new user has joined Charmverse using their Discord account'
+  });
+}

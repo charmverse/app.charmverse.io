@@ -3,7 +3,7 @@ import { generateUserAndSpaceWithApiToken, generateBountyWithSingleApplication }
 import { v4 } from 'uuid';
 import { ExpectedAnError } from 'testing/errors';
 import { DataNotFoundError } from 'lib/utilities/errors';
-import { closeNewApplicationsAndSubmissions } from '../closeNewApplicationsAndSubmissions';
+import { lockApplicationAndSubmissions } from '../lockApplicationAndSubmissions';
 
 let nonAdminUser: User;
 let space: Space;
@@ -16,8 +16,8 @@ beforeAll(async () => {
 
 });
 
-describe('closeNewApplicationsAndSubmissions', () => {
-  it('should update the cap of the bounty to the current amount of active / accepted submissions', async () => {
+describe('lockApplicationAndSubmissions', () => {
+  it('should lock submissions', async () => {
     const bounty = await generateBountyWithSingleApplication({
       bountyStatus: 'open',
       applicationStatus: 'inProgress',
@@ -26,30 +26,15 @@ describe('closeNewApplicationsAndSubmissions', () => {
       userId: nonAdminUser.id
     });
 
-    const updatedBounty = await closeNewApplicationsAndSubmissions(bounty.id);
+    const updatedBounty = await lockApplicationAndSubmissions(bounty.id);
 
-    expect(updatedBounty.maxSubmissions).toBe(1);
-  });
-
-  // See rollupBountyStatus for how this works
-  it('should rollup the bounty status after the new submission cap', async () => {
-    const bounty = await generateBountyWithSingleApplication({
-      bountyStatus: 'open',
-      applicationStatus: 'inProgress',
-      bountyCap: 2,
-      spaceId: space.id,
-      userId: nonAdminUser.id
-    });
-
-    const updatedBounty = await closeNewApplicationsAndSubmissions(bounty.id);
-
-    expect(updatedBounty.status).toBe('inProgress');
+    expect(updatedBounty.submissionsLocked).toBe(true);
   });
 
   it('should fail if the bounty does not exist', async () => {
 
     try {
-      await closeNewApplicationsAndSubmissions(v4());
+      await lockApplicationAndSubmissions(v4());
       throw new ExpectedAnError();
     }
     catch (err) {

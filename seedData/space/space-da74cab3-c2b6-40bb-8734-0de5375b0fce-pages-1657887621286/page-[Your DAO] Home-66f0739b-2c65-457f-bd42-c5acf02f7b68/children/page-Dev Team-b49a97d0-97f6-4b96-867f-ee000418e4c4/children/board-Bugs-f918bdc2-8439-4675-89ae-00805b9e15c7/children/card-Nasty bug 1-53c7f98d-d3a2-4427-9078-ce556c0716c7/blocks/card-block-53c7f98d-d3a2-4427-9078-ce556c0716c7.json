@@ -1,0 +1,25 @@
+{
+  "id": "53c7f98d-d3a2-4427-9078-ce556c0716c7",
+  "deletedAt": null,
+  "createdAt": "2022-07-08T16:31:59.323Z",
+  "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+  "updatedAt": "2022-07-08T16:37:14.808Z",
+  "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+  "spaceId": "da74cab3-c2b6-40bb-8734-0de5375b0fce",
+  "parentId": "f918bdc2-8439-4675-89ae-00805b9e15c7",
+  "rootId": "f918bdc2-8439-4675-89ae-00805b9e15c7",
+  "schema": 1,
+  "type": "card",
+  "title": "",
+  "fields": {
+    "icon": "",
+    "isTemplate": false,
+    "properties": {
+      "263415dc-5b6a-452f-9f10-73ec396148a8": "cf9b12fb-3262-4c6a-a745-9f653a420077",
+      "4baf4732-513b-4177-89bb-f5d8c88cb238": "c01f4e69-68c2-45aa-9adb-51b7b2bc275d",
+      "af0adc7a-4f3b-4f99-b529-8f9381cb464a": "5c2836de-6630-482b-81a4-3d6ee0a2fe50"
+    },
+    "headerImage": null,
+    "contentOrder": []
+  }
+}

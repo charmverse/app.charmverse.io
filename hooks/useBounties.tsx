@@ -1,11 +1,11 @@
 import { Bounty } from '@prisma/client';
 import charmClient from 'charmClient';
-import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
 import useRefState from 'hooks/useRefState';
 import { UpdateableBountyFields } from 'lib/bounties/interfaces';
-import { useUser } from './useUser';
+import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
 import { BountyWithDetails } from '../models';
 import { useCurrentSpace } from './useCurrentSpace';
+import { useUser } from './useUser';
 
 type IContext = {
   bounties: BountyWithDetails[],
@@ -14,9 +14,10 @@ type IContext = {
   updateCurrentBountyId: (bountyId: string | null) => void,
   currentBounty: BountyWithDetails | null
   setCurrentBounty: (bounty: BountyWithDetails) => void,
-  updateBounty: (bountyId: string, update: Partial<Bounty>) => Promise<BountyWithDetails>
+  updateBounty: (bountyId: string, update: Partial<UpdateableBountyFields>) => Promise<BountyWithDetails>
   deleteBounty: (bountyId: string) => Promise<true>
   refreshBounty: (bountyId: string) => Promise<void>
+  loadingBounties: boolean
 };
 
 export const BountiesContext = createContext<Readonly<IContext>>({
@@ -28,22 +29,29 @@ export const BountiesContext = createContext<Readonly<IContext>>({
   setCurrentBounty: () => undefined,
   updateBounty: () => Promise.resolve({} as any),
   deleteBounty: () => Promise.resolve(true),
-  refreshBounty: () => Promise.resolve(undefined)
+  refreshBounty: () => Promise.resolve(undefined),
+  loadingBounties: false
 });
 
 export function BountiesProvider ({ children }: { children: ReactNode }) {
   const [space] = useCurrentSpace();
+
   const [user] = useUser();
   const [bounties, bountiesRef, setBounties] = useRefState<BountyWithDetails[]>([]);
+
+  const [isLoading, setIsLoading] = useState(false);
+
   useEffect(() => {
-    if (space) {
+    if (space?.id) {
+      setIsLoading(true);
       setBounties([]);
-      charmClient.listBounties(space.id)
+      charmClient.listBounties(space?.id)
         .then(_bounties => {
           setBounties(_bounties);
+          setIsLoading(false);
         });
     }
-  }, [space?.id, user?.id]);
+  }, [user?.id, space?.id]);
 
   const [currentBountyId, setCurrentBountyId] = useState<string | null>(null);
 
@@ -134,8 +142,9 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
     setCurrentBounty: _setCurrentBounty,
     updateBounty,
     deleteBounty,
-    refreshBounty
-  }), [bounties, currentBountyId, currentBounty]);
+    refreshBounty,
+    loadingBounties: isLoading
+  }), [bounties, currentBountyId, currentBounty, isLoading]);
 
   return (
     <BountiesContext.Provider value={value}>

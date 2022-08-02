@@ -1,18 +1,17 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import React, {useState, useEffect} from 'react'
-import {createNanoEvents} from 'nanoevents'
-
+import React, { useState, useEffect } from 'react';
+import { createNanoEvents } from 'nanoevents';
 
 export type FlashMessage = {
     content: React.ReactNode
     severity: 'low' | 'normal' | 'high'
 }
 
-const emitter = createNanoEvents()
+const emitter = createNanoEvents();
 
-export function sendFlashMessage(message: FlashMessage): void {
-    emitter.emit('message', message)
+export function sendFlashMessage (message: FlashMessage): void {
+  emitter.emit('message', message);
 }
 
 type Props = {
@@ -20,55 +19,55 @@ type Props = {
 }
 
 export const FlashMessages = React.memo((props: Props) => {
-    const [message, setMessage] = useState<FlashMessage|null>()
-    const [fadeOut, setFadeOut] = useState(false)
-    const [timeoutId, setTimeoutId] = useState<ReturnType<typeof setTimeout>|null>(null)
+  const [message, setMessage] = useState<FlashMessage|null>();
+  const [fadeOut, setFadeOut] = useState(false);
+  const [timeoutId, setTimeoutId] = useState<ReturnType<typeof setTimeout>|null>(null);
 
-    useEffect(() => {
-        let isSubscribed = true
-        emitter.on('message', (newMessage: FlashMessage) => {
-            if (isSubscribed) {
-                if (timeoutId) {
-                    clearTimeout(timeoutId)
-                    setTimeoutId(null)
-                }
-                setTimeoutId(setTimeout(handleFadeOut, props.milliseconds - 200))
-                setMessage(newMessage)
-            }
-        })
-        return () => {
-            isSubscribed = false
-        }
-    }, [])
-
-    const handleFadeOut = (): void => {
-        setFadeOut(true)
-        setTimeoutId(setTimeout(handleTimeout, 200))
-    }
-
-    const handleTimeout = (): void => {
-        setMessage(null)
-        setFadeOut(false)
-    }
-
-    const handleClick = (): void => {
+  useEffect(() => {
+    let isSubscribed = true;
+    emitter.on('message', (newMessage: FlashMessage) => {
+      if (isSubscribed) {
         if (timeoutId) {
-            clearTimeout(timeoutId)
-            setTimeoutId(null)
+          clearTimeout(timeoutId);
+          setTimeoutId(null);
         }
-        handleFadeOut()
-    }
+        setTimeoutId(setTimeout(handleFadeOut, props.milliseconds - 200));
+        setMessage(newMessage);
+      }
+    });
+    return () => {
+      isSubscribed = false;
+    };
+  }, []);
 
-    if (!message) {
-        return null
-    }
+  const handleFadeOut = (): void => {
+    setFadeOut(true);
+    setTimeoutId(setTimeout(handleTimeout, 200));
+  };
 
-    return (
-        <div
-            className={'FlashMessages ' + message.severity + (fadeOut ? ' flashOut' : ' flashIn')}
-            onClick={handleClick}
-        >
-            {message.content}
-        </div>
-    )
-})
+  const handleTimeout = (): void => {
+    setMessage(null);
+    setFadeOut(false);
+  };
+
+  const handleClick = (): void => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      setTimeoutId(null);
+    }
+    handleFadeOut();
+  };
+
+  if (!message) {
+    return null;
+  }
+
+  return (
+    <div
+      className={`FlashMessages ${message.severity}${fadeOut ? ' flashOut' : ' flashIn'}`}
+      onClick={handleClick}
+    >
+      {message.content}
+    </div>
+  );
+});

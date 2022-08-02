@@ -6,8 +6,7 @@ export function mapBountyPermissions (bountyPermissions: BountyPermission[]): Bo
   const mapping: BountyPermissions = {
     creator: [],
     reviewer: [],
-    submitter: [],
-    viewer: []
+    submitter: []
   };
 
   for (const permission of bountyPermissions) {
