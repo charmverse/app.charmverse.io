@@ -258,7 +258,7 @@ model Vote {
   spaceId     String        @db.Uuid
   threshold   Int
   type        VoteType      @default(SingleChoice)
-  context     VoteContext   @default(inline)
+  context     VoteContext?   @default(inline)
   author      User          @relation(fields: [createdBy], references: [id], onDelete: Cascade)
   page        Page          @relation(fields: [pageId], references: [id], onDelete: Cascade)
   space       Space         @relation(fields: [spaceId], references: [id], onDelete: Cascade)

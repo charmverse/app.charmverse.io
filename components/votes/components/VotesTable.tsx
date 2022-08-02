@@ -4,8 +4,6 @@ import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 import { Tooltip, Typography, Box, Grid } from '@mui/material';
 import Link from 'components/common/Link';
-import TaskIcon from '@mui/icons-material/Task';
-import VoteIcon from '@mui/icons-material/HowToVoteOutlined';
 import GridHeader from 'components/common/Grid/GridHeader';
 import GridContainer from 'components/common/Grid/GridContainer';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -18,6 +16,7 @@ import { ExtendedVote } from 'lib/votes/interfaces';
 import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import Modal from 'components/common/Modal';
 import PageDialog from 'components/common/Page/PageDialog';
+import VoteIcon from './VoteIcon';
 import NoVotesMessage from './NoVotesMessage';
 import VoteStatusChip from './VoteStatusChip';
 import VoteActionsMenu from './VoteActionsMenu';
@@ -133,7 +132,7 @@ export default function VotesTable ({ votes, mutateVotes }: { votes?: (ExtendedV
             {vote.context === 'proposal' ? (
               <Box display='flex' alignItems='center' justifyContent='space-between' onClick={() => openPage(vote.pageId)}>
                 <Box display='flex' alignItems='flex-start' gap={1}>
-                  <Box component='span' sx={{ display: { xs: 'none', md: 'inline' } }}><TaskIcon color='primary' /></Box>
+                  <Box component='span' sx={{ display: { xs: 'none', md: 'inline' } }}><VoteIcon {...vote} /></Box>
                   <div>
                     <Typography><strong>{pages[vote.pageId]?.title || 'Untitled'}</strong></Typography>
                   </div>
@@ -143,7 +142,7 @@ export default function VotesTable ({ votes, mutateVotes }: { votes?: (ExtendedV
             ) : (
               <Box display='flex' alignItems='center' justifyContent='space-between'>
                 <Box display='flex' alignItems='flex-start' gap={1}>
-                  <Box component='span' sx={{ display: { xs: 'none', md: 'inline' } }}><VoteIcon color='secondary' /></Box>
+                  <Box component='span' sx={{ display: { xs: 'none', md: 'inline' } }}><VoteIcon {...vote} /></Box>
                   <div>
                     <Link color='textPrimary' href={getVoteUrl({ domain: router.query.domain as string, path: pages[vote.pageId]?.path || '', voteId: vote.id })}>
                       <Typography><strong>{vote.title}</strong></Typography>

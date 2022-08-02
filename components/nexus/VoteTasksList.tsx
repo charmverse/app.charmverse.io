@@ -1,11 +1,15 @@
 import HowToVote from '@mui/icons-material/HowToVote';
 import { Alert, Box, Card, Grid, Typography } from '@mui/material';
+import { Page } from '@prisma/client';
+import TaskIcon from '@mui/icons-material/TaskOutlined';
+import VoteIcon from '@mui/icons-material/HowToVoteOutlined';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import VoteDetail, { VoteDetailProps } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';
+import { usePages } from 'hooks/usePages';
 import { VoteTask } from 'lib/votes/interfaces';
 import { DateTime } from 'luxon';
 import { GetTasksResponse } from 'pages/api/tasks/list';
@@ -18,6 +22,9 @@ interface VoteTasksListProps {
   mutateTasks: KeyedMutator<GetTasksResponse>
 }
 
+/**
+ * Page only needs to be provided for proposal type votes
+ */
 export function VoteTasksListRow (
   props: {voteTask: VoteTask, mutateTasks: KeyedMutator<GetTasksResponse>}
 ) {
@@ -36,6 +43,7 @@ export function VoteTasksListRow (
 
   const voteLink = `/${spaceDomain}/${pagePath}?voteId=${id}`;
   const voteLocation = `${pageTitle || 'Untitled'} in ${spaceName}`;
+  const voteTitleToUse = voteTask.context === 'proposal' ? 'Proposal' : voteTitle;
 
   function removeVoteFromTask (voteId: string) {
     mutateTasks((tasks) => {
@@ -84,7 +92,14 @@ export function VoteTasksListRow (
             }}
             fontSize={{ sm: 16, xs: 18 }}
           >
-            {voteTitle}
+            {
+              voteTask.context === 'proposal' ? (
+                <TaskIcon color='primary' />
+              ) : (
+                <VoteIcon color='secondary' />
+              )
+            }
+            {voteTitleToUse}
           </Grid>
           <Grid
             item
@@ -145,6 +160,8 @@ export function VoteTasksListRow (
 }
 
 export function VoteTasksList ({ error, tasks, mutateTasks }: VoteTasksListProps) {
+
+  const { pages } = usePages();
 
   if (error) {
     return (
