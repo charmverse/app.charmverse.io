@@ -18,11 +18,8 @@ import RootPortal from 'components/common/BoardEditor/focalboard/src/components/
 import { silentlyUpdateURL } from 'lib/browser';
 import { usePages } from 'hooks/usePages';
 import ReactDndProvider from 'components/common/ReactDndProvider';
-import { IntlProvider } from 'react-intl';
+import IntlProvider from 'components/common/IntlProvider';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
-import { getMessages } from 'components/common/BoardEditor/focalboard/src/i18n';
-import { fetchLanguage, getLanguage } from 'components/common/BoardEditor/focalboard/src/store/language';
-
 /**
  *
  * For the original version of this file, see src/boardPage.tsx in focalboard
@@ -169,18 +166,8 @@ export function BoardPage ({ page, setPage, readonly }: Props) {
 
 export default function BoardPageWithContext (props: Props) {
 
-  const language = useAppSelector<string>(getLanguage);
-  const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    dispatch(fetchLanguage());
-  }, []);
-
   return (
-    <IntlProvider
-      locale={language.split(/[_]/)[0]}
-      messages={getMessages(language)}
-    >
+    <IntlProvider>
       <ReactDndProvider>
         <FlashMessages milliseconds={2000} />
 

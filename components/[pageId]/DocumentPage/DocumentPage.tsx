@@ -6,6 +6,7 @@ import { getCardComments } from 'components/common/BoardEditor/focalboard/src/st
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
+import IntlProvider from 'components/common/IntlProvider';
 import { useBounties } from 'hooks/useBounties';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
@@ -148,22 +149,23 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
                 />
               </Box>
             )}
-            <div className='focalboard-body'>
-              <div className='CardDetail content'>
-                {/* Property list */}
-                {card && board && (
-                <CardDetailProperties
-                  board={board}
-                  card={card}
-                  cards={cards}
-                  activeView={activeView}
-                  views={boardViews}
-                  readonly={readOnly}
-                  pageUpdatedAt={page.updatedAt.toString()}
-                  pageUpdatedBy={page.updatedBy}
-                />
-                )}
-                {!bounty && page.type === 'card' && (
+            <IntlProvider>
+              <div className='focalboard-body'>
+                <div className='CardDetail content'>
+                  {/* Property list */}
+                  {card && board && (
+                  <CardDetailProperties
+                    board={board}
+                    card={card}
+                    cards={cards}
+                    activeView={activeView}
+                    views={boardViews}
+                    readonly={readOnly}
+                    pageUpdatedAt={page.updatedAt.toString()}
+                    pageUpdatedBy={page.updatedBy}
+                  />
+                  )}
+                  {!bounty && page.type === 'card' && (
                   <>
                     <hr />
                     <CommentsList
@@ -173,8 +175,8 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
                       readonly={readOnly}
                     />
                   </>
-                )}
-                {bounty && (
+                  )}
+                  {bounty && (
                   <BountyProperties bounty={bounty} readOnly={readOnly}>
                     <CommentsList
                       comments={comments}
@@ -183,9 +185,10 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
                       readonly={readOnly}
                     />
                   </BountyProperties>
-                )}
+                  )}
+                </div>
               </div>
-            </div>
+            </IntlProvider>
           </CharmEditor>
 
           {page.type === 'proposal' && !isLoading && !pageVote && (
