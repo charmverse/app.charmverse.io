@@ -11,7 +11,8 @@ import Typography from '@mui/material/Typography';
 import { Bounty, PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import CharmEditor, { ICharmEditorOutput, UpdatePageContent } from 'components/common/CharmEditor/CharmEditor';
+import dynamic from 'next/dynamic';
+import type { ICharmEditorOutput, UpdatePageContent } from 'components/common/CharmEditor/CharmEditor';
 import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
 import { InputSearchContributorMultiple } from 'components/common/form/InputSearchContributor';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
@@ -21,7 +22,6 @@ import { CryptoCurrency, getChainById } from 'connectors';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
-import { useLocalStorage } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
@@ -34,6 +34,11 @@ import { BountyWithDetails, PageContent } from 'models';
 import { useEffect, useState } from 'react';
 import { useForm, UseFormWatch } from 'react-hook-form';
 import * as yup from 'yup';
+
+const CharmEditor = dynamic(() => import('components/common/CharmEditor'), {
+  loading: () => <header />,
+  ssr: false
+});
 
 export type FormMode = 'create' | 'update' | 'suggest';
 

@@ -1,8 +1,13 @@
 import Box from '@mui/material/Box';
-import CharmEditor from 'components/common/CharmEditor/CharmEditor';
 import { BountyWithDetails, PageContent } from 'models';
 import { useMemo } from 'react';
 import { AssignedBountyPermissions } from 'lib/bounties';
+import dynamic from 'next/dynamic';
+
+const CharmEditor = dynamic(() => import('components/common/CharmEditor'), {
+  loading: () => <header />,
+  ssr: false
+});
 
 interface Props {
   bounty: BountyWithDetails;
