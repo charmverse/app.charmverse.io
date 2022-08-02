@@ -246,7 +246,7 @@ model VoteOptions {
 
 model Vote {
   id          String        @id @default(uuid()) @db.Uuid
-  pageId      String        @db.Uuid
+  pageId      String?        @db.Uuid
   title       String
   description String?
   deadline    DateTime
@@ -621,7 +621,6 @@ enum ProposalStatus {
   cancelled
   complete
 }
-
 model Proposal {
   id        String     @id @default(uuid()) @db.Uuid
   createdAt DateTime   @default(now())

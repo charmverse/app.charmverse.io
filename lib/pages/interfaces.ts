@@ -1,7 +1,8 @@
-import { Block, Page, PagePermission, Space } from '@prisma/client';
+import { Block, Page, PagePermission, Proposal, Space } from '@prisma/client';
 
 export interface IPageWithPermissions extends Page {
   permissions: (PagePermission & {sourcePermission: PagePermission | null}) []
+  proposal?: Proposal | null
 }
 
 export interface PageWithChildren extends IPageWithPermissions {

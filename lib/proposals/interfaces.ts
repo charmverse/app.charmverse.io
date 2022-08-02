@@ -1,4 +1,4 @@
-import { Proposal } from '@prisma/client';
+import { Proposal, ProposalStatus } from '@prisma/client';
 import { IPageWithPermissions } from 'lib/pages/interfaces';
 import { ExtendedVote } from 'lib/votes/interfaces';
 
@@ -12,5 +12,13 @@ export interface ProposalWithVote extends Proposal {
 }
 
 export interface PageWithProposal extends IPageWithPermissions {
+  type: 'proposal',
   proposal: ProposalWithVote
 }
+
+export const proposalStatusLabels: Record<ProposalStatus, string> = {
+  in_progress: 'Complete',
+  complete: 'Complete',
+  draft: 'Draft',
+  cancelled: 'Cancelled'
+};
