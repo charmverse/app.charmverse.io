@@ -79,6 +79,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
   async function setCurrentBlockNumberAsDefault () {
     if (snapshotSpace) {
       try {
+        const snapshot = (await import('@snapshot-labs/snapshot.js')).default;
         const provider = await snapshot.utils.getProvider(snapshotSpace.network);
         const blockNum = await provider.getBlockNumber();
         setSnapshotBlockNumber(blockNum);
