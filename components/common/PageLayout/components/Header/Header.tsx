@@ -30,7 +30,6 @@ import { generateMarkdown } from 'lib/pages/generateMarkdown';
 import { useRouter } from 'next/router';
 import { useRef, useState } from 'react';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
-import { useVotes } from 'hooks/useVotes';
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
 import Account from '../Account';
 import ShareButton from '../ShareButton';
@@ -49,16 +48,14 @@ export const StyledToolbar = styled(Toolbar)`
 interface HeaderProps {
   open: boolean;
   openSidebar: () => void;
-  hideSidebarOnSmallScreen?: boolean;
 }
 
-export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }: HeaderProps) {
+export default function Header ({ open, openSidebar }: HeaderProps) {
   const router = useRouter();
   const colorMode = useColorMode();
   const { pages, currentPageId, setPages } = usePages();
   const [user, setUser] = useUser();
   const theme = useTheme();
-  const { createVote } = useVotes();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
   const [pageMenuAnchorElement, setPageMenuAnchorElement] = useState<null | Element>(null);
   const pageMenuAnchor = useRef();
@@ -283,9 +280,8 @@ export default function Header ({ open, openSidebar, hideSidebarOnSmallScreen }:
       {/** inject the modal based on open status so it resets the form each time */}
       {isModalOpen && (
         <CreateVoteModal
-          createVote={createVote}
           open={isModalOpen}
-          postCreateVote={() => {
+          onCreateVote={() => {
             setIsModalOpen(false);
           }}
           onClose={() => {
