@@ -24,7 +24,6 @@ import { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import debouncePromise from 'lib/utilities/debouncePromise';
 import { isTruthy } from 'lib/utilities/types';
 import { BountyWithDetails } from 'models';
-import { useRouter } from 'next/router';
 import { ReactNode, useCallback, useEffect, useState } from 'react';
 
 function rollupPermissions ({
@@ -70,7 +69,7 @@ function rollupPermissions ({
   return permissionsToSend;
 }
 
-export default function BountyProperties (props: {children: ReactNode, readOnly?: boolean, bounty: BountyWithDetails}) {
+export default function BountyProperties (props: {children: ReactNode, readOnly?: boolean, bounty: BountyWithDetails, isSharedPage?: boolean}) {
   const { bounty, readOnly = false, children } = props;
   const [paymentMethods] = usePaymentMethods();
   const { updateBounty } = useBounties();
@@ -85,8 +84,7 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
   const assignedRoleSubmitters = permissions?.bountyPermissions?.submitter?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
   const selectedReviewerUsers = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'user').map(p => p.id as string) ?? [];
   const selectedReviewerRoles = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
-  const router = useRouter();
-  const isSharedPage = router.pathname.startsWith('/share');
+  const isSharedPage = props.isSharedPage ?? false;
 
   const canEdit = user && !readOnly && ((bounty.createdBy === user.id && bounty.status !== 'suggestion') || (bounty.status === 'suggestion' && isAdmin));
 

@@ -1,20 +1,15 @@
-import { Box, List, ListItemButton, ListItemText, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { BountyStatus, Page } from '@prisma/client';
-import PageDialog from 'components/common/Page/PageDialog';
-import { BountyWithDetails } from 'models';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
-import { usePages } from 'hooks/usePages';
-import { getUriWithParam } from 'lib/utilities/strings';
-import { silentlyUpdateURL } from 'lib/browser';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
-import { useSnackbar } from 'hooks/useSnackbar';
-import LinkIcon from '@mui/icons-material/Link';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import charmClient from 'charmClient';
-import { BountyStatusChip } from './BountyStatusBadge';
+import PageDialog from 'components/common/Page/PageDialog';
+import { usePages } from 'hooks/usePages';
+import { silentlyUpdateURL } from 'lib/browser';
+import { getUriWithParam } from 'lib/utilities/strings';
+import { BountyWithDetails } from 'models';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import BountyCard from './BountyCard';
+import { BountyStatusChip } from './BountyStatusBadge';
 
 const bountyStatuses: BountyStatus[] = ['open', 'inProgress', 'complete', 'paid', 'suggestion'];
 
@@ -24,10 +19,8 @@ interface Props {
 }
 
 export default function BountiesKanbanView ({ bounties, refreshBounty }: Omit<Props, 'publicMode'>) {
-  const [bountyPage, setBountyPage] = useState<Page | null>(null);
-  const [selectedBounty, setSelectedBounty] = useState<BountyWithDetails | null>(null);
-  const { pages, deletePage, getPagePermissions } = usePages();
-  const pagePermission = bountyPage ? getPagePermissions(bountyPage.id) : null;
+  const [activeBountyPage, setActiveBountyPage] = useState<{page: Page, bounty: BountyWithDetails} | null>(null);
+  const { pages, deletePage } = usePages();
   const router = useRouter();
   const [initialBountyId, setInitialBountyId] = useState(router.query.bountyId as string || '');
 
@@ -49,10 +42,8 @@ export default function BountiesKanbanView ({ bounties, refreshBounty }: Omit<Pr
     }
   }
 
-  const { showMessage } = useSnackbar();
-
   function closePopup () {
-    setBountyPage(null);
+    setActiveBountyPage(null);
     const newUrl = getUriWithParam(window.location.href, { bountyId: null });
     silentlyUpdateURL(newUrl);
   }
@@ -61,8 +52,12 @@ export default function BountiesKanbanView ({ bounties, refreshBounty }: Omit<Pr
     const page = (bounty?.page.id && pages[bounty.page.id]) || null;
     const newUrl = getUriWithParam(window.location.href, { bountyId: bounty.id });
     silentlyUpdateURL(newUrl);
-    setBountyPage(page);
-    setSelectedBounty(bounty);
+    if (page) {
+      setActiveBountyPage({
+        bounty,
+        page
+      });
+    }
   }
 
   useEffect(() => {
@@ -103,53 +98,21 @@ export default function BountiesKanbanView ({ bounties, refreshBounty }: Omit<Pr
         ))}
       </div>
 
-      {bountyPage && selectedBounty && (
+      {activeBountyPage?.page && activeBountyPage?.bounty && (
       <PageDialog
-        toolsMenu={(
-          <List dense>
-            <ListItemButton
-              disabled={!pagePermission?.delete}
-              onClick={async () => {
-                await deletePage({
-                  pageId: bountyPage.id
-                });
-                closePopup();
-              }}
-            >
-              <DeleteIcon
-                sx={{
-                  mr: 1
-                }}
-                fontSize='small'
-              />
-              <ListItemText primary='Delete' />
-            </ListItemButton>
-            <ListItemButton onClick={() => {
-              Utils.copyTextToClipboard(window.location.href);
-              showMessage('Copied card link to clipboard', 'success');
-            }}
-            >
-              <LinkIcon
-                sx={{
-                  mr: 1
-                }}
-                fontSize='small'
-              />
-              <ListItemText primary='Copy link' />
-            </ListItemButton>
-            <ListItemButton disabled={selectedBounty.status === 'complete'} onClick={() => closeBounty(selectedBounty.id)}>
-              <CheckCircleIcon
-                sx={{
-                  mr: 1
-                }}
-                fontSize='small'
-              />
-              <ListItemText primary='Mark complete' />
-            </ListItemButton>
-          </List>
-      )}
-        page={bountyPage}
-        onClose={closePopup}
+        page={activeBountyPage.page}
+        onClickDelete={() => {
+          deletePage({
+            pageId: activeBountyPage.page.id
+          });
+        }}
+        onClose={() => {
+          closePopup();
+        }}
+        bounty={activeBountyPage?.bounty}
+        onMarkCompleted={() => {
+          closeBounty(activeBountyPage?.bounty.id);
+        }}
       />
       )}
     </div>

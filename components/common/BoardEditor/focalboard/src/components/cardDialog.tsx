@@ -28,6 +28,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import InsertLinkIcon from '@mui/icons-material/InsertLink';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CardDetail from './cardDetail/cardDetail';
+import PageDialog from 'components/common/Page/PageDialog';
 
 type Props = {
   board: Board
@@ -137,79 +138,19 @@ const CardDialog = (props: Props): JSX.Element | null => {
 
   return card && pages[card.id] ? (
     <>
-      <Dialog
+      <PageDialog
         onClose={onClose}
-        hideCloseButton
-        toolsMenu={!readonly && <List dense>
-          <ListItemButton disabled={!pagePermission?.delete} onClick={handleDeleteButtonOnClick}>
-            <DeleteIcon sx={{
-              mr: 1
-            }} fontSize='small' />
-            <ListItemText primary='Delete' />
-          </ListItemButton>
-          <ListItemButton onClick={() => {
-            let cardLink = window.location.href
-
-            const queryString = new URLSearchParams(window.location.search)
-            if (queryString.get('cardId') !== card!.id) {
-              const newUrl = new URL(window.location.toString())
-              newUrl.searchParams.set('cardId', card!.id)
-              cardLink = newUrl.toString()
-            }
-
-            Utils.copyTextToClipboard(cardLink)
-            showMessage('Copied card link to clipboard', 'success')
-          }}>
-            <InsertLinkIcon sx={{
-              mr: 1
-            }} fontSize='small' />
-            <ListItemText primary='Copy link' />
-          </ListItemButton>
-          {bounty && <ListItemButton disabled={bounty.status === "complete"} onClick={closeBounty}>
-            <CheckCircleIcon sx={{
-              mr: 1
-            }} fontSize="small"/>
-            <ListItemText primary="Mark complete"/>
-          </ListItemButton>}
-        </List>}
-        toolbar={!isSharedPage && (
-          <Box display="flex" justifyContent={"space-between"}>
-            <Button
-              size='small'
-              color='secondary'
-              href={`/${router.query.domain}/${pages[card.id]!.path}`}
-              variant='text'
-              startIcon={<OpenInFullIcon fontSize='small' />}>
-              Open as Page
-            </Button>
-            {spacePermissions?.createBounty && !isSharedPage && cardPage && !bounty && !readonly && <CreateBountyButton onClick={(createdBounty) => {
-              setBounty(createdBounty)
-            }} pageId={cardId} />}
-          </Box>
-        )
+        readOnly={readonly}
+        bounty={bounty}
+        onClickDelete={handleDeleteButtonOnClick}
+        onMarkCompleted={closeBounty}
+        toolbar={
+          spacePermissions?.createBounty && !isSharedPage && cardPage && !bounty && !readonly && <CreateBountyButton onClick={(createdBounty) => {
+            setBounty(createdBounty)
+          }} pageId={cardId} />
         }
-      >
-        {card && card.fields.isTemplate &&
-          <div className='banner'>
-            <FormattedMessage
-              id='CardDialog.editing-template'
-              defaultMessage="You're editing a template."
-            />
-          </div>}
-        {card &&
-          <CardDetail
-            card={card}
-            readonly={Boolean(readonly || isSharedPage)}
-          />}
-
-        {!card &&
-          <div className='banner error'>
-            <FormattedMessage
-              id='CardDialog.nocard'
-              defaultMessage="This card doesn't exist or is inaccessible."
-            />
-          </div>}
-      </Dialog>
+        page={cardPage}
+      />
 
       {showConfirmationDialogBox && <ConfirmationDialogBox dialogBox={confirmDialogProps} />}
     </>
