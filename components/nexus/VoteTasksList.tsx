@@ -155,8 +155,6 @@ export function VoteTasksListRow (
 
 export function VoteTasksList ({ error, tasks, mutateTasks }: VoteTasksListProps) {
 
-  const { pages } = usePages();
-
   if (error) {
     return (
       <Box>
