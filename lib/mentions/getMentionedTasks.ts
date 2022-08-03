@@ -51,7 +51,7 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
   // Array of space ids the user is part of
   const spaceIds = spaceRoles.map(spaceRole => spaceRole.spaceId);
 
-  const markedMentionTasks = await prisma.userNotification.findMany({
+  const notifications = await prisma.userNotification.findMany({
     where: {
       userId,
       type: 'mention'
@@ -81,7 +81,7 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
   });
 
   // Get the marked mention task ids (all the discussion type tasks that exist in the db)
-  const markedMentionTaskIds = new Set(markedMentionTasks.map(markedMentionTask => markedMentionTask.taskId));
+  const notifiedTaskIds = new Set(notifications.map(notification => notification.taskId));
 
   const context: GetMentionsInput = { userId, username, spaceRecord, spaceIds };
 
@@ -94,7 +94,7 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
     // aggregate the results
     return results.reduce((acc, result) => {
       Object.assign(acc.mentions, result.mentions);
-      acc.mentionedUserIds = uniq(acc.mentionedUserIds.concat(result.mentionedUserIds));
+      acc.mentionedUserIds = acc.mentionedUserIds.concat(result.mentionedUserIds);
       return acc;
     }, { mentions: {}, mentionedUserIds: [] });
   });
@@ -103,32 +103,36 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
   const users = await prisma.user.findMany({
     where: {
       id: {
-        in: mentionedUserIds
+        in: uniq(mentionedUserIds)
       }
     }
   });
 
   // Create a record for the user
-  const usersRecord: Record<string, User> = users.reduce((acc, cur) => ({ ...acc, [cur.id]: cur }), {});
-
-  const mentionedTasks: MentionedTasksGroup = { marked: [], unmarked: [] };
+  const usersRecord = users.reduce<Record<string, User>>((acc, cur) => ({ ...acc, [cur.id]: cur }), {});
 
   // Loop through each mentioned task and attach the user data using usersRecord
-  Object.values(mentions).forEach(mentionedTaskWithoutUser => {
-    // joining the mentioned task with the user
-    const mentionedTask = { ...mentionedTaskWithoutUser, createdBy: usersRecord[mentionedTaskWithoutUser.userId] } as MentionedTask;
-    if (markedMentionTaskIds.has(mentionedTask.mentionId)) {
-      mentionedTasks.marked.push(mentionedTask);
-    }
-    else {
-      mentionedTasks.unmarked.push(mentionedTask);
-    }
-  });
+  const mentionedTasks = Object.values(mentions).reduce<MentionedTasksGroup>((acc, mentionedTaskWithoutUser) => {
+
+    const mentionedTask = {
+      ...mentionedTaskWithoutUser,
+      createdBy: usersRecord[mentionedTaskWithoutUser.userId]
+    } as MentionedTask;
+
+    const taskList = notifiedTaskIds.has(mentionedTask.mentionId) ? acc.marked : acc.unmarked;
+    taskList.push(mentionedTask);
+
+    return acc;
+  }, { marked: [], unmarked: [] });
 
   return {
-    marked: mentionedTasks.marked.sort((mentionTaskA, mentionTaskB) => mentionTaskA.createdAt > mentionTaskB.createdAt ? -1 : 1),
-    unmarked: mentionedTasks.unmarked.sort((mentionTaskA, mentionTaskB) => mentionTaskA.createdAt > mentionTaskB.createdAt ? -1 : 1)
+    marked: mentionedTasks.marked.sort(sortByDate),
+    unmarked: mentionedTasks.unmarked.sort(sortByDate)
   };
+}
+
+function sortByDate <T extends { createdAt: string }> (a: T, b: T): number {
+  return a.createdAt > b.createdAt ? -1 : 1;
 }
 
 async function getMentionsFromBounties ({ userId, username, spaceRecord, spaceIds }: GetMentionsInput): Promise<GetMentionsResponse> {
