@@ -241,7 +241,7 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
   return (
     <>
       {permissions.userPermissions.review && (
-        <Box width='100%' display='flex' mb={1} justifyContent='space-between'>
+        <Box width='100%' display='flex' mb={1} justifyContent='space-between' alignItems='center'>
           <Box display='flex' gap={1} alignItems='center'>
             <Chip
               sx={{
