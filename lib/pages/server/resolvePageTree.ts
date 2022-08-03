@@ -1,6 +1,6 @@
 import { prisma } from 'db';
-import { PageNodeWithPermissions, TargetPageTree } from '../interfaces';
-import { mapTargetPageTree } from '../mapPageTree';
+import { PageNodeWithPermissions, TargetPageTree, TargetPageTreeWithFlatChildren } from '../interfaces';
+import { mapTargetPageTree, flattenTree } from '../mapPageTree';
 import { PageNotFoundError } from './errors';
 
 /**
@@ -8,9 +8,16 @@ import { PageNotFoundError } from './errors';
  *
  * Parents is an ordered array from closest ancestor up to the root
  * Children is a recursive array of children in tree format
+ *
+ * Pass flatten children prop to also receive a flat array of children
  */
-export async function resolvePageTree ({ pageId }: {pageId: string}):
-  Promise<TargetPageTree<PageNodeWithPermissions>> {
+export async function resolvePageTree ({ pageId, flattenChildren }:
+  {pageId: string, flattenChildren?: undefined | false}): Promise<TargetPageTree<PageNodeWithPermissions>>
+export async function resolvePageTree ({ pageId, flattenChildren }:
+    {pageId: string, flattenChildren: true}): Promise<TargetPageTreeWithFlatChildren<PageNodeWithPermissions>>
+export async function resolvePageTree ({ pageId, flattenChildren = false }:
+  {pageId: string, flattenChildren?: boolean}):
+  Promise<TargetPageTree<PageNodeWithPermissions> | TargetPageTreeWithFlatChildren<PageNodeWithPermissions>> {
 
   const pageWithSpaceIdOnly = await prisma.page.findUnique({
     where: {
@@ -67,7 +74,8 @@ export async function resolvePageTree ({ pageId }: {pageId: string}):
 
   return {
     parents,
-    targetPage
+    targetPage,
+    flatChildren: flattenChildren ? flattenTree(targetPage) : undefined
   };
 
 }
