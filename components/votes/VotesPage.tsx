@@ -5,7 +5,6 @@ import { CenteredPageContent } from 'components/common/PageLayout/components/Pag
 import { filterVotes, sortVotes, ViewOptions, VoteFilter, VoteSort } from 'components/[pageId]/DocumentPage/components/VotesSidebar';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
-import { ExtendedVote } from 'lib/votes/interfaces';
 import { Reducer, useReducer } from 'react';
 import useSWR from 'swr';
 import NewProposalButton from './components/NewProposalButton';
@@ -47,9 +46,9 @@ export default function VotesPage () {
   }));
 
   const sortedVotes = sortVotes(
-    filterVotes<VoteRow>(draftVotes.concat(data as VoteRow[] ?? []), viewState.filterBy),
+    filterVotes<VoteRow>(draftVotes.concat(data as any as VoteRow[] ?? []), viewState.filterBy),
     viewState.sortBy
-  ) as ExtendedVote[];
+  ) as VoteRow[];
 
   function setVoteSort (sortBy: VoteSort) {
     setViewState({ sortBy });

@@ -187,8 +187,24 @@ export default function VotesTable ({ votes, mutateVotes }: { votes?: (ExtendedV
           </Grid>
         </GridContainer>
       ))}
-      {activePage && <PageDialog page={activePage} onClose={closePage} />}
-      <Modal title='Vote details' size='large' open={!!activeVote} onClose={() => setActiveVote(null)}>
+      {activePage && (
+      <PageDialog
+        page={activePage}
+        onClose={() => {
+          closePage();
+          mutateTasks();
+          mutateVotes();
+        }}
+      />
+      )}
+      <Modal
+        title='Vote details'
+        size='large'
+        open={!!activeVote}
+        onClose={() => {
+          setActiveVote(null);
+        }}
+      >
         <VoteDetail
           detailed
           vote={activeVote!}
