@@ -34,10 +34,11 @@ const CommentsList = React.memo((props: Props) => {
       Utils.assertValue(cardId);
 
       const comment = createCommentBlock();
+      const { content, contentText } = newComment;
       comment.parentId = cardId;
       comment.rootId = rootId;
-      comment.title = newComment.contentText || '';
-      comment.fields = { ...newComment}
+      comment.title = contentText || '';
+      comment.fields = { content }
       mutator.insertBlock(comment, 'add comment');
       setNewComment(null);
     }
