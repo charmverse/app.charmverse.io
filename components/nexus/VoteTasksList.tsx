@@ -2,7 +2,7 @@ import HowToVote from '@mui/icons-material/HowToVote';
 import { Alert, Box, Card, Grid, Typography } from '@mui/material';
 import { Page } from '@prisma/client';
 import TaskIcon from '@mui/icons-material/TaskOutlined';
-import VoteIcon from '@mui/icons-material/HowToVoteOutlined';
+import VoteIcon from 'components/votes/components/VoteIcon';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import VoteDetail, { VoteDetailProps } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
@@ -92,13 +92,7 @@ export function VoteTasksListRow (
             }}
             fontSize={{ sm: 16, xs: 18 }}
           >
-            {
-              voteTask.context === 'proposal' ? (
-                <TaskIcon color='primary' />
-              ) : (
-                <VoteIcon color='secondary' />
-              )
-            }
+            <VoteIcon {...voteTask} />
             {voteTitleToUse}
           </Grid>
           <Grid
