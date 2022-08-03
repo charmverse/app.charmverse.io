@@ -43,17 +43,18 @@ export const Container = styled(Box)<{ top: number, fullWidth?: boolean }>`
 export interface DocumentPageProps {
   page: Page, setPage: (p: Partial<Page>) => void,
   readOnly?: boolean,
-  insideModal?: boolean,
-  pagePermissions?: IPagePermissionFlags
+  insideModal?: boolean
 }
 
-function DocumentPage ({ page, setPage, insideModal, readOnly = false, pagePermissions }: DocumentPageProps) {
-  const { pages } = usePages();
+function DocumentPage ({ page, setPage, insideModal, readOnly = false }: DocumentPageProps) {
+  const { pages, getPagePermissions } = usePages();
   const { cancelVote, castVote, deleteVote, votes, isLoading } = useVotes();
   const { bounties } = useBounties();
   const bounty = bounties.find(_bounty => _bounty.page?.id === page.id);
+  const pagePermissions = getPagePermissions(page.id);
 
   const cannotEdit = readOnly || !pagePermissions?.edit_content;
+
   const pageVote = Object.values(votes).find(v => v.context === 'proposal');
 
   const board = useAppSelector((state) => {
