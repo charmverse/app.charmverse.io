@@ -29,6 +29,7 @@ export default function BountiesKanbanView ({ bounties, refreshBounty }: Omit<Pr
   const { pages, deletePage, getPagePermissions } = usePages();
   const pagePermission = bountyPage ? getPagePermissions(bountyPage.id) : null;
   const router = useRouter();
+  const [initialBountyId, setInitialBountyId] = useState(router.query.bountyId as string || '');
 
   const bountiesGroupedByStatus = bounties.reduce<Record<BountyStatus, BountyWithDetails[]>>((record, bounty) => {
     record[bounty.status].push(bounty);
@@ -56,22 +57,21 @@ export default function BountiesKanbanView ({ bounties, refreshBounty }: Omit<Pr
     silentlyUpdateURL(newUrl);
   }
 
-  function showBounty (bountyId: string | null) {
-    const bounty = bounties.find(b => b.id === bountyId) ?? null;
+  function showBounty (bounty: BountyWithDetails) {
     const page = (bounty?.page.id && pages[bounty.page.id]) || null;
-    const newUrl = getUriWithParam(window.location.href, { bountyId });
+    const newUrl = getUriWithParam(window.location.href, { bountyId: bounty.id });
     silentlyUpdateURL(newUrl);
     setBountyPage(page);
     setSelectedBounty(bounty);
   }
 
-  // load bounty from URL
   useEffect(() => {
-    const bountyId = router.query.bountyId as string;
-    if (bountyId) {
-      showBounty(bountyId);
+    const bounty = bounties.find(b => b.id === initialBountyId) ?? null;
+    if (bounty) {
+      showBounty(bounty);
+      setInitialBountyId('');
     }
-  }, [router.query.bountyId, bounties, pages]);
+  }, [bounties]);
 
   return (
     <div className='Kanban'>
@@ -95,7 +95,7 @@ export default function BountiesKanbanView ({ bounties, refreshBounty }: Omit<Pr
                   bounty={bounty}
                   page={pages[bounty.page.id] as Page}
                   onClick={() => {
-                    showBounty(bounty.id);
+                    showBounty(bounty);
                   }}
                 />
             ))}
