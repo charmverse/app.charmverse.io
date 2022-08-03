@@ -1,4 +1,3 @@
-import { Bounty } from '@prisma/client';
 import charmClient from 'charmClient';
 import useRefState from 'hooks/useRefState';
 import { UpdateableBountyFields } from 'lib/bounties/interfaces';

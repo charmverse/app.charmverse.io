@@ -2,6 +2,8 @@ import { FormControlLabel, IconButton, ListItem, Radio, RadioGroup, TextField, T
 import { Box } from '@mui/system';
 import { VoteType } from '@prisma/client';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
 import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Modal from 'components/common/Modal';
@@ -29,7 +31,11 @@ function InlineVoteOptions (
     <div>
       {options.map((option, index) => {
         return (
-          <ListItem sx={{ px: 0, pt: 0, display: 'flex', gap: 0.5 }}>
+          <ListItem
+            // eslint-disable-next-line react/no-array-index-key
+            key={index}
+            sx={{ px: 0, pt: 0, display: 'flex', gap: 0.5 }}
+          >
             <TextField
               // Disable changing text for No change option
               fullWidth
@@ -45,7 +51,7 @@ function InlineVoteOptions (
             <Tooltip arrow placement='top' title={index < 2 ? 'At least two options are required' : ''}>
               <div>
                 <IconButton
-                  disabled={(index <= 1)}
+                  disabled={(options.length <= 2)}
                   size='small'
                   onClick={() => {
                     setOptions([...options.slice(0, index), ...options.slice(index + 1)]);
@@ -179,35 +185,38 @@ export default function CreateVoteModal ({ open = true, onClose, onCreateVote, i
         <Box display='flex' gap={1}>
           <Box flexDirection='column' display='flex' flexGrow={1}>
             <FieldLabel>Deadline</FieldLabel>
-            <DateTimePicker
-              minDate={DateTime.fromMillis(Date.now())}
-              value={deadline}
-              onAccept={async (value) => {
-                if (value) {
-                  setDeadline(value);
-                }
-              }}
-              onChange={(value) => {
-                if (value) {
-                  setDeadline(value);
-                }
-              }}
-              renderInput={(props) => (
-                <TextField
-                  {...props}
-                  inputProps={{
-                    ...props.inputProps,
-                    readOnly: true
-                  }}
-                  fullWidth
-                  onClick={() => {
-                    setIsDateTimePickerOpen((_isDateTimePickerOpen) => !_isDateTimePickerOpen);
-                  }}
-                />
-              )}
-              onClose={() => setIsDateTimePickerOpen(false)}
-              open={isDateTimePickerOpen}
-            />
+            {/* This as any statement is to save time. We are providing an official adapter from MUI Library as outlined here https://mui.com/x/react-date-pickers/date-picker/#basic-usage */}
+            <LocalizationProvider dateAdapter={AdapterLuxon as any}>
+              <DateTimePicker
+                minDate={DateTime.fromMillis(Date.now())}
+                value={deadline}
+                onAccept={async (value) => {
+                  if (value) {
+                    setDeadline(value);
+                  }
+                }}
+                onChange={(value) => {
+                  if (value) {
+                    setDeadline(value);
+                  }
+                }}
+                renderInput={(props) => (
+                  <TextField
+                    {...props}
+                    inputProps={{
+                      ...props.inputProps,
+                      readOnly: true
+                    }}
+                    fullWidth
+                    onClick={() => {
+                      setIsDateTimePickerOpen((_isDateTimePickerOpen) => !_isDateTimePickerOpen);
+                    }}
+                  />
+                )}
+                onClose={() => setIsDateTimePickerOpen(false)}
+                open={isDateTimePickerOpen}
+              />
+            </LocalizationProvider>
           </Box>
           <Box flexDirection='column' display='flex' flexGrow={1}>
             <FieldLabel>Pass Threshold (%)</FieldLabel>

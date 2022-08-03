@@ -17,7 +17,6 @@ import ViewTitle from './viewTitle';
 
 jest.mock('../mutator');
 jest.mock('../utils');
-jest.mock('draft-js/lib/generateRandomKey', () => () => '123');
 
 const mockedMutator = jest.mocked(mutator, true);
 const mockedUtils = jest.mocked(Utils, true);

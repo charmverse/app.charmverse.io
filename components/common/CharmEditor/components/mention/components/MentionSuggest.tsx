@@ -2,7 +2,7 @@ import { usePluginState, useEditorViewContext } from '@bangle.dev/react';
 import { Typography, Divider, MenuItem } from '@mui/material';
 import { Box } from '@mui/system';
 import { Page } from '@prisma/client';
-import { ReviewerOption } from 'components/common/form/InputSearchContributor';
+import UserDisplay from 'components/common/UserDisplay';
 import { useContributors } from 'hooks/useContributors';
 import { usePages } from 'hooks/usePages';
 import { safeScrollIntoViewIfNeeded } from 'lib/browser';
@@ -60,6 +60,7 @@ function MentionSuggestMenu ({ pluginKey }: {pluginKey: PluginKey}) {
   return (
     <PopoverMenu
       container={tooltipContentDOM}
+      maxHeight='300px'
       isOpen={isVisible}
       onClose={() => {
         hideSuggestionsTooltip(suggestTooltipKey)(view.state, view.dispatch, view);
@@ -68,8 +69,6 @@ function MentionSuggestMenu ({ pluginKey }: {pluginKey: PluginKey}) {
     >
       <Box
         sx={{
-          overflow: 'auto',
-          maxHeight: 300,
           py: 1
         }}
       >
@@ -88,10 +87,8 @@ function MentionSuggestMenu ({ pluginKey }: {pluginKey: PluginKey}) {
                   data-type='user'
                   className={isSelected ? 'mention-selected' : ''}
                 >
-                  <ReviewerOption
-                    style={{
-                      alignItems: 'center'
-                    }}
+                  <UserDisplay
+                    fontSize={14}
                     user={contributor}
                     avatarSize='small'
                   />

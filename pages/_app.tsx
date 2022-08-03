@@ -1,3 +1,43 @@
+import type { NextPage } from 'next';
+import type { AppProps } from 'next/app';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { ReactElement, ReactNode, useEffect, useMemo, useState } from 'react';
+import { Provider as ReduxProvider } from 'react-redux';
+import createCache from '@emotion/cache';
+import { CacheProvider, Global } from '@emotion/react'; // create a cache so we dont conflict with emotion from react-windowed-select
+import type { ExternalProvider, JsonRpcFetchFunc } from '@ethersproject/providers';
+import { Web3Provider } from '@ethersproject/providers';
+import { PaletteMode } from '@mui/material';
+import CssBaseline from '@mui/material/CssBaseline';
+import { ThemeProvider } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { Web3ReactProvider } from '@web3-react/core';
+import IconButton from '@mui/material/IconButton';
+import RefreshIcon from '@mui/icons-material/Refresh';
+
+import log from 'lib/log';
+import ErrorBoundary from 'components/common/errors/ErrorBoundary';
+import RouteGuard from 'components/common/RouteGuard';
+import store from 'components/common/BoardEditor/focalboard/src/store';
+import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { setTheme as setFocalBoardTheme } from 'components/common/BoardEditor/focalboard/src/theme';
+import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
+import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
+import Snackbar from 'components/common/Snackbar';
+import IntlProvider from 'components/common/IntlProvider';
+import { ColorModeContext } from 'context/darkMode';
+import { BountiesProvider } from 'hooks/useBounties';
+import { PaymentMethodsProvider } from 'hooks/usePaymentMethods';
+import { useInterval } from 'hooks/useInterval';
+import { useLocalStorage } from 'hooks/useLocalStorage';
+import { PagesProvider } from 'hooks/usePages';
+import { ContributorsProvider } from 'hooks/useContributors';
+import { PageTitleProvider, usePageTitle } from 'hooks/usePageTitle';
+import { SpacesProvider } from 'hooks/useSpaces';
+import { UserProvider } from 'hooks/useUser';
+import { SnackbarProvider } from 'hooks/useSnackbar';
+
 import '@bangle.dev/tooltip/style.css';
 import '@skiff-org/prosemirror-tables/style/tables.css';
 import '@skiff-org/prosemirror-tables/style/table-popup.css';
@@ -5,27 +45,14 @@ import '@skiff-org/prosemirror-tables/style/table-headers.css';
 import '@skiff-org/prosemirror-tables/style/table-filters.css';
 import 'prosemirror-menu/style/menu.css';
 import 'theme/prosemirror-tables/prosemirror-tables.scss';
-import createCache from '@emotion/cache';
-import { CacheProvider, Global } from '@emotion/react'; // create a cache so we dont conflict with emotion from react-windowed-select
-import type { ExternalProvider, JsonRpcFetchFunc } from '@ethersproject/providers';
-import { Web3Provider } from '@ethersproject/providers';
 // fullcalendar css
 import '@fullcalendar/common/main.css';
 import '@fullcalendar/daygrid/main.css';
 // init focalboard
 import '@mattermost/compass-icons/css/compass-icons.css';
-import { PaletteMode } from '@mui/material';
-import CssBaseline from '@mui/material/CssBaseline';
-import { ThemeProvider } from '@mui/material/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import { Web3ReactProvider } from '@web3-react/core';
-import log from 'lib/log';
-import ErrorBoundary from 'components/common/errors/ErrorBoundary';
-import RouteGuard from 'components/common/RouteGuard';
 import 'theme/focalboard/focalboard.button.scss';
 import 'theme/focalboard/focalboard.main.scss';
 import 'theme/focalboard/focalboard.typography.scss';
-import ReactDndProvider from 'components/common/ReactDndProvider';
 import 'components/common/BoardEditor/focalboard/src/components/blockIconSelector.scss';
 import 'components/common/BoardEditor/focalboard/src/components/calculations/calculation.scss';
 import 'components/common/BoardEditor/focalboard/src/components/calendar/fullcalendar.scss';
@@ -36,7 +63,6 @@ import 'components/common/BoardEditor/focalboard/src/components/cardDialog.scss'
 import 'components/common/BoardEditor/focalboard/src/components/centerPanel.scss';
 import 'components/common/BoardEditor/focalboard/src/components/confirmationDialogBox.scss';
 import 'components/common/BoardEditor/focalboard/src/components/dialog.scss';
-import { FlashMessages } from 'components/common/BoardEditor/focalboard/src/components/flashMessages';
 import 'components/common/BoardEditor/focalboard/src/components/flashMessages.scss';
 import 'components/common/BoardEditor/focalboard/src/components/gallery/gallery.scss';
 import 'components/common/BoardEditor/focalboard/src/components/gallery/galleryCard.scss';
@@ -45,9 +71,6 @@ import 'components/common/BoardEditor/focalboard/src/components/kanban/calculati
 import 'components/common/BoardEditor/focalboard/src/components/kanban/kanban.scss';
 import 'components/common/BoardEditor/focalboard/src/components/kanban/kanbanCard.scss';
 import 'components/common/BoardEditor/focalboard/src/components/kanban/kanbanColumn.scss';
-import 'components/common/BoardEditor/focalboard/src/components/markdownEditor.scss';
-import 'components/common/BoardEditor/focalboard/src/components/markdownEditorInput/entryComponent/entryComponent.scss';
-import 'components/common/BoardEditor/focalboard/src/components/markdownEditorInput/markdownEditorInput.scss';
 import 'components/common/BoardEditor/focalboard/src/components/modal.scss';
 import 'components/common/BoardEditor/focalboard/src/components/modalWrapper.scss';
 import 'components/common/BoardEditor/focalboard/src/components/newVersionBanner.scss';
@@ -73,14 +96,9 @@ import 'components/common/BoardEditor/focalboard/src/components/viewHeader/filte
 import 'components/common/BoardEditor/focalboard/src/components/viewHeader/filterEntry.scss';
 import 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeader.scss';
 import 'components/common/BoardEditor/focalboard/src/components/viewTitle.scss';
-import { getMessages } from 'components/common/BoardEditor/focalboard/src/i18n';
-import store from 'components/common/BoardEditor/focalboard/src/store';
-import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { fetchLanguage, getLanguage } from 'components/common/BoardEditor/focalboard/src/store/language';
 import 'components/common/BoardEditor/focalboard/src/styles/labels.scss';
 import 'components/common/BoardEditor/focalboard/src/styles/variables.scss';
 import 'components/common/BoardEditor/focalboard/src/styles/_markdown.scss';
-import { setTheme as setFocalBoardTheme } from 'components/common/BoardEditor/focalboard/src/theme';
 // import 'components/common/BoardEditor/focalboard/src/widgets/buttons/button.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/buttons/buttonWithMenu.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/buttons/iconButton.scss';
@@ -133,29 +151,9 @@ import 'components/common/BoardEditor/focalboard/src/widgets/propertyMenu.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/switch.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/tooltip.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/valueSelector.scss';
-import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
-import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
-import { ColorModeContext } from 'context/darkMode';
-import { BountiesProvider } from 'hooks/useBounties';
-import { PaymentMethodsProvider } from 'hooks/usePaymentMethods';
-import { FocalboardViewsProvider } from 'hooks/useFocalboardViews';
-import { useInterval } from 'hooks/useInterval';
-import { useLocalStorage } from 'hooks/useLocalStorage';
-import { PagesProvider } from 'hooks/usePages';
-import { ContributorsProvider } from 'hooks/useContributors';
-import { PageTitleProvider, usePageTitle } from 'hooks/usePageTitle';
-import { SpacesProvider } from 'hooks/useSpaces';
-import { UserProvider } from 'hooks/useUser';
 // Lit Protocol CSS
 import 'lit-share-modal-v3-react-17/dist/ShareModal.css';
 import 'theme/lit-protocol/lit-protocol.scss';
-import type { NextPage } from 'next';
-import type { AppProps } from 'next/app';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { ReactElement, ReactNode, useEffect, useMemo, useState } from 'react';
-import { IntlProvider } from 'react-intl';
-import { Provider as ReduxProvider } from 'react-redux';
 import 'react-resizable/css/styles.css';
 import { createThemeLightSensitive } from 'theme';
 import 'theme/@bangle.dev/styles.scss';
@@ -166,13 +164,6 @@ import {
 import { setDarkMode } from 'theme/darkMode';
 import cssVariables from 'theme/cssVariables';
 import 'theme/styles.scss';
-import Snackbar from 'components/common/Snackbar';
-import { SnackbarProvider } from 'hooks/useSnackbar';
-import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
-import IconButton from '@mui/material/IconButton';
-import RefreshIcon from '@mui/icons-material/Refresh';
 
 import charmClient from 'charmClient';
 
@@ -254,68 +245,41 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
       <ColorModeContext.Provider value={colorModeContext}>
         <ThemeProvider theme={theme}>
           <Web3ReactProvider getLibrary={getLibrary}>
-            {/* This as any statement is to save time. We are providing an official adapter from MUI Library as outlined here https://mui.com/x/react-date-pickers/date-picker/#basic-usage */}
-            <LocalizationProvider dateAdapter={AdapterLuxon as any}>
-              <Web3ConnectionManager>
-                <ReduxProvider store={store}>
-                  <FocalBoardProviders>
-                    <DataProviders>
-                      <SnackbarProvider>
-                        <PageMetaTags />
-                        <CssBaseline enableColorScheme={true} />
-                        <Global styles={cssVariables} />
-                        <RouteGuard>
-                          <ErrorBoundary>
-                            <Snackbar
-                              isOpen={isOldBuild}
-                              message='New CharmVerse platform update available. Please refresh.'
-                              actions={[
-                                <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                  <RefreshIcon fontSize='small' />
-                                </IconButton>
-                              ]}
-                              origin={{ vertical: 'top', horizontal: 'center' }}
-                              severity='warning'
-                              handleClose={() => setIsOldBuild(false)}
-                            />
-                            {getLayout(<Component {...pageProps} />)}
-                            <Snackbar />
-                          </ErrorBoundary>
-                        </RouteGuard>
-                      </SnackbarProvider>
-                    </DataProviders>
-                  </FocalBoardProviders>
-                  {/** include the root portal for focalboard's popup */}
-                  <FocalBoardPortal />
-                </ReduxProvider>
-              </Web3ConnectionManager>
-            </LocalizationProvider>
+            <Web3ConnectionManager>
+              <ReduxProvider store={store}>
+                <IntlProvider>
+                  <DataProviders>
+                    <SnackbarProvider>
+                      <PageMetaTags />
+                      <CssBaseline enableColorScheme={true} />
+                      <Global styles={cssVariables} />
+                      <RouteGuard>
+                        <ErrorBoundary>
+                          <Snackbar
+                            isOpen={isOldBuild}
+                            message='New CharmVerse platform update available. Please refresh.'
+                            actions={[
+                              <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                <RefreshIcon fontSize='small' />
+                              </IconButton>
+                            ]}
+                            origin={{ vertical: 'top', horizontal: 'center' }}
+                            severity='warning'
+                            handleClose={() => setIsOldBuild(false)}
+                          />
+                          {getLayout(<Component {...pageProps} />)}
+                          <Snackbar />
+                        </ErrorBoundary>
+                      </RouteGuard>
+                    </SnackbarProvider>
+                  </DataProviders>
+                </IntlProvider>
+              </ReduxProvider>
+            </Web3ConnectionManager>
           </Web3ReactProvider>
         </ThemeProvider>
       </ColorModeContext.Provider>
     </CacheProvider>
-  );
-}
-
-function FocalBoardProviders ({ children }: { children: ReactNode }) {
-
-  const language = useAppSelector<string>(getLanguage);
-  const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    dispatch(fetchLanguage());
-  }, []);
-
-  return (
-    <IntlProvider
-      locale={language.split(/[_]/)[0]}
-      messages={getMessages(language)}
-    >
-      <ReactDndProvider>
-        <FlashMessages milliseconds={2000} />
-        {children}
-      </ReactDndProvider>
-    </IntlProvider>
   );
 }
 
@@ -337,9 +301,7 @@ function DataProviders ({ children }: { children: ReactNode }) {
             <PaymentMethodsProvider>
               <PagesProvider>
                 <PageTitleProvider>
-                  <FocalboardViewsProvider>
-                    {children}
-                  </FocalboardViewsProvider>
+                  {children}
                 </PageTitleProvider>
               </PagesProvider>
             </PaymentMethodsProvider>

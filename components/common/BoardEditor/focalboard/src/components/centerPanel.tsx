@@ -24,12 +24,14 @@ import { addCard, addTemplate } from '../store/cards';
 import { updateView } from '../store/views';
 import { UserSettings } from '../userSettings';
 import { Utils } from '../utils';
-import CalendarFullView from './calendar/fullCalendar';
 import Gallery from './gallery/gallery';
 import Kanban from './kanban/kanban';
 import Table from './table/table';
 import ViewHeader from './viewHeader/viewHeader';
 import ViewTitle from './viewTitle';
+import dynamic from 'next/dynamic';
+
+const CalendarFullView = dynamic(() => import('./calendar/fullCalendar'), { ssr: false });
 
 type Props = {
   clientConfig?: ClientConfig

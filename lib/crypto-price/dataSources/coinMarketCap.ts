@@ -12,7 +12,7 @@ const CoinMarketCapCryptoMapping: Record<CryptoCurrency | string, number> = {
   XDAI: 8635
 };
 
-const apiServiceToken = process.env.CMC_API_TOKEN!;
+const apiServiceToken = process.env.CMC_API_TOKEN as string;
 
 export function getPriceFromCoinMarketCap (
   base: CryptoCurrency | string,
@@ -27,7 +27,7 @@ export function getPriceFromCoinMarketCap (
       return;
     }
 
-    fetch(`https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?id=${cmcCryptoCurrencyId}&convert=${quote}`, {
+    fetch<any>(`https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?id=${cmcCryptoCurrencyId}&convert=${quote}`, {
       headers: { 'X-CMC_PRO_API_KEY': apiToken }
     })
       .then(data => {

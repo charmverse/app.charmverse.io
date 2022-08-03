@@ -93,64 +93,64 @@ export default function PageDialog (props: Props) {
         <Dialog
           hideCloseButton
           toolsMenu={!hideToolsMenu && !readOnly
-            && (
-            <List dense>
-              {onClickDelete && (
-              <ListItemButton
-                disabled={!pagePermission?.delete}
-                onClick={async () => {
-                  onClickDelete();
-                  onClose();
-                }}
-              >
-                <DeleteIcon
-                  sx={{
-                    mr: 1
+              && (
+                <List dense>
+                  {onClickDelete && (
+                  <ListItemButton
+                    disabled={!pagePermission?.delete}
+                    onClick={async () => {
+                      onClickDelete();
+                      onClose();
+                    }}
+                  >
+                    <DeleteIcon
+                      sx={{
+                        mr: 1
+                      }}
+                      fontSize='small'
+                    />
+                    <ListItemText primary='Delete' />
+                  </ListItemButton>
+                  )}
+                  <ListItemButton onClick={() => {
+                    Utils.copyTextToClipboard(window.location.href);
+                    showMessage('Copied card link to clipboard', 'success');
                   }}
-                  fontSize='small'
-                />
-                <ListItemText primary='Delete' />
-              </ListItemButton>
+                  >
+                    <InsertLinkIcon
+                      sx={{
+                        mr: 1
+                      }}
+                      fontSize='small'
+                    />
+                    <ListItemText primary='Copy link' />
+                  </ListItemButton>
+                  {bounty && onMarkCompleted && (
+                  <ListItemButton disabled={bounty.status === 'complete'} onClick={() => onMarkCompleted(bounty.id)}>
+                    <CheckCircleIcon
+                      sx={{
+                        mr: 1
+                      }}
+                      fontSize='small'
+                    />
+                    <ListItemText primary='Mark complete' />
+                  </ListItemButton>
+                  )}
+                </List>
               )}
-              <ListItemButton onClick={() => {
-                Utils.copyTextToClipboard(window.location.href);
-                showMessage('Copied card link to clipboard', 'success');
-              }}
-              >
-                <InsertLinkIcon
-                  sx={{
-                    mr: 1
-                  }}
-                  fontSize='small'
-                />
-                <ListItemText primary='Copy link' />
-              </ListItemButton>
-              {bounty && onMarkCompleted && (
-              <ListItemButton disabled={bounty.status === 'complete'} onClick={() => onMarkCompleted(bounty.id)}>
-                <CheckCircleIcon
-                  sx={{
-                    mr: 1
-                  }}
-                  fontSize='small'
-                />
-                <ListItemText primary='Mark complete' />
-              </ListItemButton>
-              )}
-            </List>
-            )}
           toolbar={!isSharedPage && (
-            <Box display='flex' justifyContent='space-between'>
-              <Button
-                size='small'
-                color='secondary'
-                href={`/${router.query.domain}/${page?.path}`}
-                variant='text'
-                startIcon={<OpenInFullIcon fontSize='small' />}
-              >
-                Open as Page
-              </Button>
-              {toolbar}
-            </Box>
+          <Box display='flex' justifyContent='space-between'>
+            <Button
+              size='small'
+              color='secondary'
+              href={`/${router.query.domain}/${page?.path}`}
+              variant='text'
+              startIcon={<OpenInFullIcon fontSize='small' />}
+            >
+              Open as Page
+            </Button>
+            {toolbar}
+          </Box>
           )}
           onClose={onClose}
         >

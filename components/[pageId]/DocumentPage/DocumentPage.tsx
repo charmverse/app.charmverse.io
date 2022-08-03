@@ -14,12 +14,17 @@ import { IPagePermissionFlags } from 'lib/permissions/pages';
 import { Page, PageContent } from 'models';
 import { useRouter } from 'next/router';
 import { memo, useCallback } from 'react';
-import CharmEditor, { ICharmEditorOutput } from '../../common/CharmEditor/CharmEditor';
+import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
+import dynamic from 'next/dynamic';
 import BountyProperties from './components/BountyProperties';
 import CreateVoteBox from './components/CreateVoteBox';
 import PageBanner from './components/PageBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
 import PageHeader from './components/PageHeader';
+
+const CharmEditor = dynamic(() => import('components/common/CharmEditor'), {
+  ssr: false
+});
 
 export const Container = styled(Box)<{ top: number, fullWidth?: boolean }>`
   width: ${({ fullWidth }) => fullWidth ? '100%' : '860px'};

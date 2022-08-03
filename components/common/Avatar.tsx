@@ -3,7 +3,7 @@ import Avatar from '@mui/material/Avatar';
 import { stringToColor } from 'lib/utilities/strings';
 import React from 'react';
 
-const SizeStyleMap: Record<'small' | 'medium' | 'large', React.CSSProperties> = {
+const SizeStyleMap: Record<'xSmall' | 'small' | 'medium' | 'large', React.CSSProperties> = {
   large: {
     height: 54,
     width: 54,
@@ -18,6 +18,11 @@ const SizeStyleMap: Record<'small' | 'medium' | 'large', React.CSSProperties> = 
     height: 24,
     width: 24,
     fontSize: '1rem !important'
+  },
+  xSmall: {
+    height: 20,
+    width: 20,
+    fontSize: '.9rem !important'
   }
 };
 
@@ -31,7 +36,7 @@ export type InitialAvatarProps = {
   className?: string;
   name?: string;
   variant?: 'circular' | 'rounded' | 'square';
-  size?: 'small' | 'medium' | 'large';
+  size?: 'xSmall' | 'small' | 'medium' | 'large';
 };
 
 export default function InitialAvatar ({ avatar, className, name, variant, size = 'medium' }: InitialAvatarProps) {
