@@ -74,7 +74,7 @@ function CreateBountyButton(props: {
           onClick(createdBounty);
         }}
         >
-          Create bounty
+          Convert to bounty
         </Button>
       )}
     </Box>
