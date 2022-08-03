@@ -25,6 +25,7 @@ import { setTheme as setFocalBoardTheme } from 'components/common/BoardEditor/fo
 import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
 import Snackbar from 'components/common/Snackbar';
+import IntlProvider from 'components/common/IntlProvider';
 import { ColorModeContext } from 'context/darkMode';
 import { BountiesProvider } from 'hooks/useBounties';
 import { PaymentMethodsProvider } from 'hooks/usePaymentMethods';
@@ -249,31 +250,33 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
           <Web3ReactProvider getLibrary={getLibrary}>
             <Web3ConnectionManager>
               <ReduxProvider store={store}>
-                <DataProviders>
-                  <SnackbarProvider>
-                    <PageMetaTags />
-                    <CssBaseline enableColorScheme={true} />
-                    <Global styles={cssVariables} />
-                    <RouteGuard>
-                      <ErrorBoundary>
-                        <Snackbar
-                          isOpen={isOldBuild}
-                          message='New CharmVerse platform update available. Please refresh.'
-                          actions={[
-                            <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                              <RefreshIcon fontSize='small' />
-                            </IconButton>
-                          ]}
-                          origin={{ vertical: 'top', horizontal: 'center' }}
-                          severity='warning'
-                          handleClose={() => setIsOldBuild(false)}
-                        />
-                        {getLayout(<Component {...pageProps} />)}
-                        <Snackbar />
-                      </ErrorBoundary>
-                    </RouteGuard>
-                  </SnackbarProvider>
-                </DataProviders>
+                <IntlProvider>
+                  <DataProviders>
+                    <SnackbarProvider>
+                      <PageMetaTags />
+                      <CssBaseline enableColorScheme={true} />
+                      <Global styles={cssVariables} />
+                      <RouteGuard>
+                        <ErrorBoundary>
+                          <Snackbar
+                            isOpen={isOldBuild}
+                            message='New CharmVerse platform update available. Please refresh.'
+                            actions={[
+                              <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                <RefreshIcon fontSize='small' />
+                              </IconButton>
+                            ]}
+                            origin={{ vertical: 'top', horizontal: 'center' }}
+                            severity='warning'
+                            handleClose={() => setIsOldBuild(false)}
+                          />
+                          {getLayout(<Component {...pageProps} />)}
+                          <Snackbar />
+                        </ErrorBoundary>
+                      </RouteGuard>
+                    </SnackbarProvider>
+                  </DataProviders>
+                </IntlProvider>
               </ReduxProvider>
             </Web3ConnectionManager>
           </Web3ReactProvider>

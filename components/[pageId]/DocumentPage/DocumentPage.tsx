@@ -6,7 +6,6 @@ import { getCardComments } from 'components/common/BoardEditor/focalboard/src/st
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
-import IntlProvider from 'components/common/IntlProvider';
 import { useBounties } from 'hooks/useBounties';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
@@ -149,11 +148,10 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
                 />
               </Box>
             )}
-            <IntlProvider>
-              <div className='focalboard-body'>
-                <div className='CardDetail content'>
-                  {/* Property list */}
-                  {card && board && (
+            <div className='focalboard-body'>
+              <div className='CardDetail content'>
+                {/* Property list */}
+                {card && board && (
                   <CardDetailProperties
                     board={board}
                     card={card}
@@ -164,8 +162,8 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
                     pageUpdatedAt={page.updatedAt.toString()}
                     pageUpdatedBy={page.updatedBy}
                   />
-                  )}
-                  {!bounty && page.type === 'card' && (
+                )}
+                {!bounty && page.type === 'card' && (
                   <>
                     <hr />
                     <CommentsList
@@ -175,20 +173,19 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
                       readonly={readOnly}
                     />
                   </>
-                  )}
-                  {bounty && (
-                    <BountyProperties isSharedPage={isSharedPage} bounty={bounty} readOnly={readOnly}>
-                      <CommentsList
-                        comments={comments}
-                        rootId={card?.rootId ?? page.spaceId}
-                        cardId={card?.id ?? page.id}
-                        readonly={readOnly}
-                      />
-                    </BountyProperties>
-                  )}
-                </div>
+                )}
+                {bounty && (
+                <BountyProperties isSharedPage={isSharedPage} bounty={bounty} readOnly={readOnly}>
+                  <CommentsList
+                    comments={comments}
+                    rootId={card?.rootId ?? page.spaceId}
+                    cardId={card?.id ?? page.id}
+                    readonly={readOnly}
+                  />
+                </BountyProperties>
+                )}
               </div>
-            </IntlProvider>
+            </div>
           </CharmEditor>
 
           {page.type === 'proposal' && !isLoading && !pageVote && (

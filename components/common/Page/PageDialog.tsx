@@ -17,7 +17,6 @@ import InsertLinkIcon from '@mui/icons-material/InsertLink';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { BountyWithDetails } from 'models';
 import { useSnackbar } from 'hooks/useSnackbar';
-import IntlProvider from 'components/common/IntlProvider';
 import { Utils } from '../BoardEditor/focalboard/src/utils';
 
 interface Props {
@@ -91,74 +90,72 @@ export default function PageDialog (props: Props) {
   return (
     <RootPortal>
       {popupState.isOpen && (
-        <IntlProvider>
-          <Dialog
-            hideCloseButton
-            toolsMenu={!hideToolsMenu && !readOnly
-            && (
-              <List dense>
-                {onClickDelete && (
-                <ListItemButton
-                  disabled={!pagePermission?.delete}
-                  onClick={async () => {
-                    onClickDelete();
-                    onClose();
+        <Dialog
+          hideCloseButton
+          toolsMenu={!hideToolsMenu && !readOnly
+              && (
+                <List dense>
+                  {onClickDelete && (
+                  <ListItemButton
+                    disabled={!pagePermission?.delete}
+                    onClick={async () => {
+                      onClickDelete();
+                      onClose();
+                    }}
+                  >
+                    <DeleteIcon
+                      sx={{
+                        mr: 1
+                      }}
+                      fontSize='small'
+                    />
+                    <ListItemText primary='Delete' />
+                  </ListItemButton>
+                  )}
+                  <ListItemButton onClick={() => {
+                    Utils.copyTextToClipboard(window.location.href);
+                    showMessage('Copied card link to clipboard', 'success');
                   }}
-                >
-                  <DeleteIcon
-                    sx={{
-                      mr: 1
-                    }}
-                    fontSize='small'
-                  />
-                  <ListItemText primary='Delete' />
-                </ListItemButton>
-                )}
-                <ListItemButton onClick={() => {
-                  Utils.copyTextToClipboard(window.location.href);
-                  showMessage('Copied card link to clipboard', 'success');
-                }}
-                >
-                  <InsertLinkIcon
-                    sx={{
-                      mr: 1
-                    }}
-                    fontSize='small'
-                  />
-                  <ListItemText primary='Copy link' />
-                </ListItemButton>
-                {bounty && onMarkCompleted && (
-                <ListItemButton disabled={bounty.status === 'complete'} onClick={() => onMarkCompleted(bounty.id)}>
-                  <CheckCircleIcon
-                    sx={{
-                      mr: 1
-                    }}
-                    fontSize='small'
-                  />
-                  <ListItemText primary='Mark complete' />
-                </ListItemButton>
-                )}
-              </List>
-            )}
-            toolbar={!isSharedPage && (
-              <Box display='flex' justifyContent='space-between'>
-                <Button
-                  size='small'
-                  color='secondary'
-                  href={`/${router.query.domain}/${page?.path}`}
-                  variant='text'
-                  startIcon={<OpenInFullIcon fontSize='small' />}
-                >
-                  Open as Page
-                </Button>
-                {toolbar}
-              </Box>
-            )}
-            onClose={onClose}
-          >
-            {page && <DocumentPage insideModal page={page} setPage={setPage} readOnly={props.readOnly} />}
-          </Dialog>
-        </IntlProvider>
+                  >
+                    <InsertLinkIcon
+                      sx={{
+                        mr: 1
+                      }}
+                      fontSize='small'
+                    />
+                    <ListItemText primary='Copy link' />
+                  </ListItemButton>
+                  {bounty && onMarkCompleted && (
+                  <ListItemButton disabled={bounty.status === 'complete'} onClick={() => onMarkCompleted(bounty.id)}>
+                    <CheckCircleIcon
+                      sx={{
+                        mr: 1
+                      }}
+                      fontSize='small'
+                    />
+                    <ListItemText primary='Mark complete' />
+                  </ListItemButton>
+                  )}
+                </List>
+              )}
+          toolbar={!isSharedPage && (
+          <Box display='flex' justifyContent='space-between'>
+            <Button
+              size='small'
+              color='secondary'
+              href={`/${router.query.domain}/${page?.path}`}
+              variant='text'
+              startIcon={<OpenInFullIcon fontSize='small' />}
+            >
+              Open as Page
+            </Button>
+            {toolbar}
+          </Box>
+          )}
+          onClose={onClose}
+        >
+          {page && <DocumentPage insideModal page={page} setPage={setPage} readOnly={props.readOnly} />}
+        </Dialog>
       )}
     </RootPortal>
   );

@@ -18,7 +18,6 @@ import RootPortal from 'components/common/BoardEditor/focalboard/src/components/
 import { silentlyUpdateURL } from 'lib/browser';
 import { usePages } from 'hooks/usePages';
 import ReactDndProvider from 'components/common/ReactDndProvider';
-import IntlProvider from 'components/common/IntlProvider';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 /**
  *
@@ -167,14 +166,12 @@ export function BoardPage ({ page, setPage, readonly }: Props) {
 export default function BoardPageWithContext (props: Props) {
 
   return (
-    <IntlProvider>
-      <ReactDndProvider>
-        <FlashMessages milliseconds={2000} />
+    <ReactDndProvider>
+      <FlashMessages milliseconds={2000} />
 
-        <BoardPage {...props} />
-        {/** include the root portal for focalboard's popup */}
-        <FocalBoardPortal />
-      </ReactDndProvider>
-    </IntlProvider>
+      <BoardPage {...props} />
+      {/** include the root portal for focalboard's popup */}
+      <FocalBoardPortal />
+    </ReactDndProvider>
   );
 }
