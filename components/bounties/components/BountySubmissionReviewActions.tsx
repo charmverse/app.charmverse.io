@@ -19,7 +19,7 @@ import { AssignedBountyPermissions } from 'lib/bounties/interfaces';
 import { SystemError } from 'lib/utilities/errors';
 import { eToNumber } from 'lib/utilities/numbers';
 import { SyntheticEvent, useState } from 'react';
-import BountyPaymentButton from '../[bountyId]/components/BountyPaymentButton';
+import BountyPaymentButton from './BountyPaymentButton';
 
 export interface BountySubmissionReviewActionsProps {
   bounty: Bounty,

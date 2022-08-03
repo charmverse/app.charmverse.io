@@ -127,7 +127,8 @@ export default function CreateVoteModal ({ open = true, onClose, onCreateVote, i
       description: voteDescription,
       pageId: cardId ?? currentPageId,
       threshold: +passThreshold,
-      type: voteType
+      type: voteType,
+      context: isProposal ? 'proposal' : 'inline'
     });
 
     if (onCreateVote) {

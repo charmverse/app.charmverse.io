@@ -241,6 +241,11 @@ model VoteOptions {
   @@unique([voteId, name])
 }
 
+enum VoteContext {
+  inline
+  proposal
+}
+
 model Vote {
   id          String        @id @default(uuid()) @db.Uuid
   pageId      String        @db.Uuid
@@ -253,6 +258,7 @@ model Vote {
   spaceId     String        @db.Uuid
   threshold   Int
   type        VoteType      @default(SingleChoice)
+  context     VoteContext   @default(inline)
   author      User          @relation(fields: [createdBy], references: [id], onDelete: Cascade)
   page        Page          @relation(fields: [pageId], references: [id], onDelete: Cascade)
   space       Space         @relation(fields: [spaceId], references: [id], onDelete: Cascade)

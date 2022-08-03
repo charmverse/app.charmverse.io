@@ -49,8 +49,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, pagePermi
   const bounty = bounties.find(_bounty => _bounty.page?.id === page.id);
 
   const cannotEdit = readOnly || !pagePermissions?.edit_content;
-
-  const pageVote = Object.values(votes)[0];
+  const pageVote = Object.values(votes).find(v => v.context === 'proposal');
 
   const board = useAppSelector((state) => {
     if (page.type === 'card' && page.parentId) {
@@ -128,7 +127,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, pagePermi
             pageActionDisplay={!insideModal ? currentPageActionDisplay : null}
             pageId={page.id}
             disablePageSpecificFeatures={isSharedPage}
-            enableVoting={page.type !== 'proposal'}
+            enableVoting={true}
           >
             <PageHeader
               headerImage={page.headerImage}

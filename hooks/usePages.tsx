@@ -10,6 +10,10 @@ import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffe
 import useSWR from 'swr';
 import { isTruthy } from 'lib/utilities/types';
 import useRefState from 'hooks/useRefState';
+import { useIntl } from 'react-intl';
+import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
+import { untitledPage } from 'seedData';
+import { Block } from 'lib/focalboard/block';
 import { useCurrentSpace } from './useCurrentSpace';
 import { useSpaces } from './useSpaces';
 import { useUser } from './useUser';
@@ -27,6 +31,7 @@ export type PagesContext = {
   isEditing: boolean
   refreshPage: (pageId: string) => Promise<IPageWithPermissions>
   setIsEditing: React.Dispatch<React.SetStateAction<boolean>>
+  deletePage: (data: {pageId: string, board?: Block}) => Promise<void>
   getPagePermissions: (pageId: string, page?: IPageWithPermissions) => IPagePermissionFlags,
 };
 
@@ -40,7 +45,8 @@ export const PagesContext = createContext<Readonly<PagesContext>>({
   isEditing: true,
   setIsEditing: () => { },
   getPagePermissions: () => new AllowedPagePermissions(),
-  refreshPage: () => Promise.resolve({} as any)
+  refreshPage: () => Promise.resolve({} as any),
+  deletePage: () => Promise.resolve({} as any)
 });
 
 export function PagesProvider ({ children }: { children: ReactNode }) {
@@ -57,6 +63,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   const [spaces] = useSpaces();
   const publicPageSpace = router.route === '/share/[...pageId]' ? spaces[0] : null;
   const space = spaceFromUrl || publicPageSpace;
+  const intl = useIntl();
 
   const { data, mutate } = useSWR(() => space ? `pages/${space?.id}` : null, () => {
 
@@ -124,6 +131,50 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     return computedPermissions;
   }
 
+  async function deletePage ({ pageId, board }: {pageId: string, board?: Block}) {
+    const page = pages[pageId];
+    const totalNonArchivedPages = Object.values(pages).filter((p => p?.deletedAt === null && (p?.type === 'page' || p?.type === 'board'))).length;
+
+    if (page && user && space) {
+      const { pageIds } = await charmClient.archivePage(page.id);
+      let newPage: null | IPageWithPermissions = null;
+      if (totalNonArchivedPages - pageIds.length === 0 && pageIds.length !== 0) {
+        newPage = await charmClient.createPage(untitledPage({
+          userId: user.id,
+          spaceId: space.id
+        }));
+      }
+
+      // Delete the page associated with the card
+      if (board) {
+        mutator.deleteBlock(
+          board,
+          intl.formatMessage({ id: 'Sidebar.delete-board', defaultMessage: 'Delete board' }),
+          async () => {
+            // success
+          },
+          async () => {
+            // error
+          }
+        );
+      }
+
+      setPages((_pages) => {
+        pageIds.forEach(_pageId => {
+          _pages[_pageId] = {
+            ..._pages[_pageId],
+            deletedAt: new Date()
+          } as IPageWithPermissions;
+        });
+        // If a new page was created add that to state
+        if (newPage) {
+          _pages[newPage.id] = newPage;
+        }
+        return { ..._pages };
+      });
+    }
+  }
+
   async function refreshPage (pageId: string): Promise<IPageWithPermissions> {
     const freshPageVersion = await charmClient.getPage(pageId);
     _setPages(_pages => ({
@@ -138,6 +189,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     currentPageId,
     isEditing,
     setIsEditing,
+    deletePage,
     pages,
     setCurrentPageId,
     setPages: _setPages,
