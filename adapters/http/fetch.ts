@@ -24,6 +24,6 @@ export function transformResponse (response: Response | NodeFetchResponse) {
     });
 }
 
-export default function fetchWrapper (resource: string, init?: RequestInit) {
-  return fetch(resource, init).then(transformResponse);
+export default function fetchWrapper<T> (resource: string, init?: RequestInit): Promise<T> {
+  return fetch(resource, init).then(transformResponse) as Promise<T>;
 }
