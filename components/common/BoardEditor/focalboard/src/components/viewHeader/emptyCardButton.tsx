@@ -35,7 +35,7 @@ const EmptyCardButton = React.memo((props: Props) => {
       }}
       rightIcon={(
         <MenuWrapper stopPropagationOnToggle={true}>
-          <IconButton icon={<MoreHorizIcon fontsize='small' />} />
+          <IconButton icon={<MoreHorizIcon fontSize='small' />} />
           <Menu position='left'>
             <Menu.Text
               icon={<CheckIcon />}

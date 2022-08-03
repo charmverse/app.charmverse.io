@@ -64,7 +64,7 @@ function Option (props: {data: OptionProps}): JSX.Element {
       }}
     >
       <span>
-        {props.data.label} {props.data.value !== 'count' && <ChevronRightIcon fontsize='small' />}
+        {props.data.label} {props.data.value !== 'count' && <ChevronRightIcon fontSize='small' />}
       </span>
 
       {

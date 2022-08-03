@@ -41,7 +41,7 @@ const NewCardButtonTemplateItem = React.memo((props: Props) => {
       }}
       rightIcon={(
         <MenuWrapper stopPropagationOnToggle={true}>
-          <IconButton icon={<MoreHorizIcon fontsize='small' />} />
+          <IconButton icon={<MoreHorizIcon fontSize='small' />} />
           <Menu position='left'>
             <Menu.Text
               icon={<CheckIcon />}
@@ -60,7 +60,7 @@ const NewCardButtonTemplateItem = React.memo((props: Props) => {
               }}
             />
             <Menu.Text
-              icon={<DeleteOutlineIcon  fontsize='small' color='secondary' />}
+              icon={<DeleteOutlineIcon  fontSize='small' color='secondary' />}
               id='delete'
               name={intl.formatMessage({ id: 'ViewHeader.delete-template', defaultMessage: 'Delete' })}
               onClick={async () => {
