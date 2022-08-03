@@ -9,7 +9,11 @@ html {
 .focalboard-body {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+
+  &.full-page {
+    overflow: hidden;
+  }
+
   width: 100%;
   margin: 0;
   padding: 0;
@@ -23,7 +27,8 @@ html {
   input,
   textarea,
   select {
-    font-size: 100%; /* Normalize */
+    font-size: 100%;
+    /* Normalize */
   }
 
   input,
