@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import ImageIcon from '@mui/icons-material/Image';
-import CharmEditor, { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
+import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
 import { randomIntFromInterval } from 'lib/utilities/random';
 import { Page, PageContent } from 'models';
@@ -16,6 +16,11 @@ import EmojiIcon from '../widgets/icons/emoji';
 import HideIcon from '../widgets/icons/hide';
 import ShowIcon from '../widgets/icons/show';
 import BlockIconSelector from './blockIconSelector';
+import dynamic from 'next/dynamic';
+const CharmEditor = dynamic(() => import('components/common/CharmEditor'), {
+  ssr: false
+})
+
 
 type Props = {
     board: Board

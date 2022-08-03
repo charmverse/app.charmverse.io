@@ -13,7 +13,6 @@ import { randomEmojiList } from 'components/common/BoardEditor/focalboard/src/em
 import { randomIntFromInterval } from 'lib/utilities/random';
 import { Page } from 'models';
 import { ChangeEvent, memo } from 'react';
-import { useIntl } from 'react-intl';
 import EmojiIcon from 'components/common/Emoji';
 import { randomBannerImage } from './PageBanner';
 import PageTitleInput from './PageTitleInput';
@@ -63,7 +62,6 @@ interface PageHeaderProps {
 }
 
 function PageHeader ({ headerImage, icon, readOnly, setPage, title }: PageHeaderProps) {
-  const intl = useIntl();
 
   function addPageIcon () {
     const _icon = randomEmojiList[randomIntFromInterval(0, randomEmojiList.length - 1)];
@@ -92,7 +90,7 @@ function PageHeader ({ headerImage, icon, readOnly, setPage, title }: PageHeader
             <Menu.Text
               id='random'
               icon={<FBEmojiIcon />}
-              name={intl.formatMessage({ id: 'ViewTitle.random-icon', defaultMessage: 'Random' })}
+              name='Random'
               onClick={() => {
                 updatePageIcon(BlockIcons.shared.randomIcon());
               }}
@@ -100,7 +98,7 @@ function PageHeader ({ headerImage, icon, readOnly, setPage, title }: PageHeader
             <Menu.SubMenu
               id='pick'
               icon={<FBEmojiIcon />}
-              name={intl.formatMessage({ id: 'ViewTitle.pick-icon', defaultMessage: 'Pick icon' })}
+              name='Pick icon'
             >
               <EmojiPicker onSelect={(emoji) => {
                 updatePageIcon(emoji);
@@ -110,7 +108,7 @@ function PageHeader ({ headerImage, icon, readOnly, setPage, title }: PageHeader
             <Menu.Text
               id='remove'
               icon={<DeleteIcon />}
-              name={intl.formatMessage({ id: 'ViewTitle.remove-icon', defaultMessage: 'Remove icon' })}
+              name='Remove icon'
               onClick={() => {
                 updatePageIcon(null);
               }}

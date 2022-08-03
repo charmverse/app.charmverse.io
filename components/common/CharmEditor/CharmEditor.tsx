@@ -59,6 +59,7 @@ import * as trailingNode from './components/trailingNode';
 import paragraph from './components/paragraph';
 import DevTools from './DevTools';
 import { checkForEmpty } from './utils';
+import { specRegistry } from './specRegistry';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -72,46 +73,6 @@ const floatingMenuPluginKey = new PluginKey('floatingMenu');
 const nestedPagePluginKey = new PluginKey(nestedPagePluginKeyName);
 const inlineCommentPluginKey = new PluginKey(inlineComment.pluginKeyName);
 const inlineVotePluginKey = new PluginKey(inlineVote.pluginKeyName);
-
-export const specRegistry = new SpecRegistry([
-  // Comments to the right of each spec show if it supports markdown export
-  // OK => Component exports markdown
-  // ?? => Could not test component or identify it
-  // NO => Not supported
-  //
-  // MAKE SURE THIS IS ALWAYS AT THE TOP! Or deleting all contents will leave the wrong component in the editor
-  paragraph.spec(), // OK
-  mentionSpecs(), // NO
-  inlineComment.spec(),
-  inlineVote.spec(),
-  bold.spec(), // OK
-  bulletList.spec(), // OK
-  hardBreak.spec(), // OK
-  horizontalRule.spec(), // OK
-  italic.spec(), // OK
-  link.spec(), // OK
-  listItem.spec(), // OK
-  orderedList.spec(), // OK
-  strike.spec(), // OK
-  underline.spec(), // OK
-  emoji.specs(), // OK
-  code.spec(), // OK
-  codeBlock.spec(), // OK
-  iframe.spec(), // OK
-  heading.spec(), // OK
-  inlinePaletteSpecs(), // Not required
-  callout.spec(), // OK
-  cryptoPriceSpec(), // NO
-  pdfSpec(), // NO
-  imageSpec(), // OK
-  columnLayout.rowSpec(), // NO
-  columnLayout.columnSpec(), // NO
-  nestedPageSpec(), // NO
-  quote.spec(), // OK
-  tabIndent.spec(),
-  table.spec(), // OK - only for text content
-  disclosure.spec()
-]);
 
 export function charmEditorPlugins (
   {

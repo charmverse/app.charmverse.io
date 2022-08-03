@@ -2,7 +2,7 @@ import { BangleEditorState } from '@bangle.dev/core';
 import { markdownSerializer } from '@bangle.dev/markdown';
 import { Node } from '@bangle.dev/pm';
 import { Page } from '@prisma/client';
-import { specRegistry } from 'components/common/CharmEditor/CharmEditor';
+import { specRegistry } from 'components/common/CharmEditor/specRegistry';
 import { replaceNestedPages } from 'components/common/CharmEditor/components/nestedPage';
 import { PageContent } from 'models';
 
