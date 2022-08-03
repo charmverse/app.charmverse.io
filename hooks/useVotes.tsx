@@ -87,7 +87,7 @@ export function VotesProvider ({ children }: { children: ReactNode }) {
     const extendedVote = await charmClient.createVote({
       ...votePayload,
       createdBy: user.id,
-      pageId: cardId ?? currentPageId,
+      pageId: votePayload.pageId ?? cardId ?? currentPageId,
       spaceId: currentSpace.id
     });
 
