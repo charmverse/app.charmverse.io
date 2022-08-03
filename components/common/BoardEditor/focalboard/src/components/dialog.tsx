@@ -60,11 +60,13 @@ const Dialog = React.memo((props: Props) => {
                 )
               }
               {toolbar && <div className='cardToolbar'>{toolbar}</div>}
-              {toolsMenu && <PopperPopup closeOnClick popupContent={toolsMenu}>
-                <MuiIconButton size="small">
-                  <MoreHorizIcon fontSize="small" />
-                </MuiIconButton>
-              </PopperPopup>}
+              {toolsMenu && (
+                <PopperPopup closeOnClick popupContent={toolsMenu}>
+                  <MuiIconButton size="small">
+                    <MoreHorizIcon fontSize="small" />
+                  </MuiIconButton>
+                </PopperPopup>
+              )}
             </div>
             {props.children}
           </div>
