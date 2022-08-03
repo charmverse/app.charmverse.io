@@ -4,9 +4,9 @@ import { Box, Collapse, Divider, FormLabel, IconButton, Stack, TextField } from 
 import { PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
 import BountyHeader from 'components/bounties/components/BountyHeader';
+import BountyReviewers from 'components/bounties/components/BountyReviewers';
 import BountySubmissionsTable from 'components/bounties/components/BountySubmissionsTable';
 import BountySuggestionApproval from 'components/bounties/components/BountySuggestionApproval';
-import BountyReviewers from 'components/bounties/[bountyId]/components_v3/BountyReviewers';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
 import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
@@ -69,7 +69,7 @@ function rollupPermissions ({
   return permissionsToSend;
 }
 
-export default function BountyProperties (props: {children: ReactNode, readOnly?: boolean, bounty: BountyWithDetails}) {
+export default function BountyProperties (props: {children: ReactNode, readOnly?: boolean, bounty: BountyWithDetails, isSharedPage?: boolean}) {
   const { bounty, readOnly = false, children } = props;
   const [paymentMethods] = usePaymentMethods();
   const { updateBounty } = useBounties();
@@ -84,6 +84,7 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
   const assignedRoleSubmitters = permissions?.bountyPermissions?.submitter?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
   const selectedReviewerUsers = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'user').map(p => p.id as string) ?? [];
   const selectedReviewerRoles = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
+  const isSharedPage = props.isSharedPage ?? false;
 
   const canEdit = user && !readOnly && ((bounty.createdBy === user.id && bounty.status !== 'suggestion') || (bounty.status === 'suggestion' && isAdmin));
 
@@ -371,18 +372,23 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
       }}
     >
       {permissions && (user?.id === bounty.createdBy) && (
-        <BountyHeader
-          bounty={bounty}
-          permissions={permissions}
-        />
+        <>
+          <hr />
+          <BountyHeader
+            bounty={bounty}
+          />
+        </>
       )}
       <Stack flexDirection='row' justifyContent='space-between' gap={2} alignItems='center'>
         {
           (permissions && !permissions.userPermissions?.review) ? (
-            <BountyReviewers
-              bounty={bounty}
-              permissions={permissions}
-            />
+            <Stack gap={1} mb={1} width='100%'>
+              <hr />
+              <BountyReviewers
+                bounty={bounty}
+                permissions={permissions}
+              />
+            </Stack>
           ) : (
             <div
               className='octo-propertyrow'
@@ -422,7 +428,7 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
         }
       </Stack>
 
-      {canEdit && bountyProperties}
+      {(canEdit || isSharedPage) && bountyProperties}
 
       <Divider
         sx={{

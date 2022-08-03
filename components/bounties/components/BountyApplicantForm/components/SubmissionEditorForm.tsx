@@ -182,9 +182,7 @@ export default function BountySubmissionForm (
             <Button disabled={!isValid} type='submit'>Submit</Button>
           </Grid>
           )}
-
         </Grid>
-
       </form>
     </Stack>
   );

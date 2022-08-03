@@ -170,7 +170,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
                   </>
                 )}
                 {bounty && (
-                  <BountyProperties bounty={bounty} readOnly={readOnly}>
+                  <BountyProperties isSharedPage={isSharedPage} bounty={bounty} readOnly={readOnly}>
                     <CommentsList
                       comments={comments}
                       rootId={card?.rootId ?? page.spaceId}

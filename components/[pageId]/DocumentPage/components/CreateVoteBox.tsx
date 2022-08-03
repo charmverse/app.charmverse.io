@@ -2,11 +2,8 @@ import { useState } from 'react';
 import { Card, Stack, Typography } from '@mui/material';
 import Button from 'components/common/PrimaryButton';
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
-import { useVotes } from 'hooks/useVotes';
 
 export default function CreateVoteBox () {
-
-  const { createVote } = useVotes();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -25,10 +22,9 @@ export default function CreateVoteBox () {
         </Stack>
       </Card>
       <CreateVoteModal
-        createVote={createVote}
         isProposal={true}
         open={isModalOpen}
-        postCreateVote={() => {
+        onCreateVote={() => {
           setIsModalOpen(false);
         }}
         onClose={() => {

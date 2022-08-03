@@ -12,7 +12,7 @@ import PageDialog from 'components/common/Page/PageDialog';
 export default function NewBountyButton () {
   const [user] = useUser();
   const [currentSpace] = useCurrentSpace();
-  const [page, setPage] = useState<Page | null>(null);
+  const [activeBountyPage, setActiveBountyPage] = useState<{page: Page, bounty: BountyWithDetails} | null>(null);
   const [currentUserPermissions] = useCurrentSpacePermissions();
   const suggestBounties = currentUserPermissions?.createBounty === false;
   const { setBounties } = useBounties();
@@ -54,7 +54,10 @@ export default function NewBountyButton () {
         });
       }
       setBounties((bounties) => [...bounties, createdBounty]);
-      setPage(createdBounty.page);
+      setActiveBountyPage({
+        bounty: createdBounty,
+        page: createdBounty.page
+      });
     }
   }
 
@@ -63,7 +66,14 @@ export default function NewBountyButton () {
       <Button onClick={onClickCreate}>
         {suggestBounties ? 'Suggest Bounty' : 'Create Bounty'}
       </Button>
-      {page && <PageDialog page={page} onClose={() => setPage(null)} />}
+      {activeBountyPage
+      && (
+      <PageDialog
+        hideToolsMenu={suggestBounties}
+        page={activeBountyPage.page}
+        onClose={() => setActiveBountyPage(null)}
+      />
+      )}
     </>
   );
 }
