@@ -197,7 +197,7 @@ model Page {
   favorites          FavoritePage[]
   permissions        PagePermission[]
   bountyId           String?          @unique @db.Uuid
-  bounty             Bounty?          @relation(fields: [bountyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  bounty             Bounty?          @relation(fields: [bountyId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   threads            Thread[]
   votes              Vote[]
 }
