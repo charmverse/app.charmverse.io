@@ -1,12 +1,13 @@
 import { Box, Typography } from '@mui/material';
 import { BountyStatus, Page } from '@prisma/client';
+import charmClient from 'charmClient';
 import PageDialog from 'components/common/Page/PageDialog';
-import { BountyWithDetails } from 'models';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
 import { usePages } from 'hooks/usePages';
-import { getUriWithParam } from 'lib/utilities/strings';
 import { silentlyUpdateURL } from 'lib/browser';
+import { getUriWithParam } from 'lib/utilities/strings';
+import { BountyWithDetails } from 'models';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import BountyCard from './BountyCard';
 import { BountyStatusChip } from './BountyStatusBadge';
 
@@ -14,13 +15,14 @@ const bountyStatuses: BountyStatus[] = ['open', 'inProgress', 'complete', 'paid'
 
 interface Props {
   bounties: BountyWithDetails[];
+  refreshBounty?: (bountyId: string) => void
 }
 
-export default function BountiesKanbanView ({ bounties }: Omit<Props, 'publicMode'>) {
-
-  const [activeBountyPage, setBountyPage] = useState<Page | null>(null);
-  const { pages } = usePages();
+export default function BountiesKanbanView ({ bounties, refreshBounty }: Omit<Props, 'publicMode'>) {
+  const [activeBountyPage, setActiveBountyPage] = useState<{page: Page, bounty: BountyWithDetails} | null>(null);
+  const { pages, deletePage } = usePages();
   const router = useRouter();
+  const [initialBountyId, setInitialBountyId] = useState(router.query.bountyId as string || '');
 
   const bountiesGroupedByStatus = bounties.reduce<Record<BountyStatus, BountyWithDetails[]>>((record, bounty) => {
     record[bounty.status].push(bounty);
@@ -33,27 +35,38 @@ export default function BountiesKanbanView ({ bounties }: Omit<Props, 'publicMod
     suggestion: []
   });
 
+  async function closeBounty (bountyId: string) {
+    await charmClient.closeBounty(bountyId);
+    if (refreshBounty) {
+      refreshBounty(bountyId);
+    }
+  }
+
   function closePopup () {
-    setBountyPage(null);
+    setActiveBountyPage(null);
     const newUrl = getUriWithParam(window.location.href, { bountyId: null });
     silentlyUpdateURL(newUrl);
   }
 
-  function showBounty (bountyId: string | null) {
-    const bounty = bounties.find(b => b.id === bountyId);
-    const bountyPage = (bounty?.page.id && pages[bounty.page.id]) || null;
-    const newUrl = getUriWithParam(window.location.href, { bountyId });
+  function showBounty (bounty: BountyWithDetails) {
+    const page = (bounty?.page.id && pages[bounty.page.id]) || null;
+    const newUrl = getUriWithParam(window.location.href, { bountyId: bounty.id });
     silentlyUpdateURL(newUrl);
-    setBountyPage(bountyPage);
+    if (page) {
+      setActiveBountyPage({
+        bounty,
+        page
+      });
+    }
   }
 
-  // load bounty from URL
   useEffect(() => {
-    const bountyId = router.query.bountyId as string;
-    if (bountyId) {
-      showBounty(bountyId);
+    const bounty = bounties.find(b => b.id === initialBountyId) ?? null;
+    if (bounty) {
+      showBounty(bounty);
+      setInitialBountyId('');
     }
-  }, [router.query.bountyId, bounties, pages]);
+  }, [bounties]);
 
   return (
     <div className='Kanban'>
@@ -70,21 +83,38 @@ export default function BountiesKanbanView ({ bounties }: Omit<Props, 'publicMod
       <div className='octo-board-body'>
         {bountyStatuses.map(bountyStatus => (
           <div className='octo-board-column' key={bountyStatus}>
-            {bountiesGroupedByStatus[bountyStatus].filter(bounty => Boolean(pages[bounty.page?.id])).map(bounty => (
-              <BountyCard
-                key={bounty.id}
-                bounty={bounty}
-                page={pages[bounty.page.id] as Page}
-                onClick={() => {
-                  showBounty(bounty.id);
-                }}
-              />
+            {bountiesGroupedByStatus[bountyStatus].filter(bounty => Boolean(pages[bounty.page?.id])
+              && pages[bounty.page.id]?.deletedAt === null).map(bounty => (
+                <BountyCard
+                  key={bounty.id}
+                  bounty={bounty}
+                  page={pages[bounty.page.id] as Page}
+                  onClick={() => {
+                    showBounty(bounty);
+                  }}
+                />
             ))}
           </div>
         ))}
       </div>
 
-      {activeBountyPage && <PageDialog page={activeBountyPage} onClose={closePopup} />}
+      {activeBountyPage?.page && activeBountyPage?.bounty && (
+      <PageDialog
+        page={activeBountyPage.page}
+        onClickDelete={() => {
+          deletePage({
+            pageId: activeBountyPage.page.id
+          });
+        }}
+        onClose={() => {
+          closePopup();
+        }}
+        bounty={activeBountyPage?.bounty}
+        onMarkCompleted={() => {
+          closeBounty(activeBountyPage?.bounty.id);
+        }}
+      />
+      )}
     </div>
   );
 }

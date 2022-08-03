@@ -8,7 +8,6 @@ import { Modal } from 'components/common/Modal';
 import { useBounties } from 'hooks/useBounties';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import BountyDelete from './BountyDelete';
 
 interface Props {
   bounty: Bounty
@@ -69,7 +68,7 @@ export default function BountySuggestionApproval ({ bounty }: Props) {
 
       {/* Reject bounty suggestion */}
       <Modal title='Reject bounty suggestion' open={bountyDeleteModal.isOpen} onClose={bountyDeleteModal.close}>
-        <BountyDelete bounty={bounty} onCancel={bountyDeleteModal.close} onDelete={bountyDeleteModal.close} />
+        {/* <BountyDelete bounty={bounty} onCancel={bountyDeleteModal.close} onDelete={bountyDeleteModal.close} /> */}
       </Modal>
 
       {/* Confirm bounty approval */}
