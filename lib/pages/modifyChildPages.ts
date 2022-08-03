@@ -25,6 +25,16 @@ export async function modifyChildPages (parentId: string, userId: string, action
   }
 
   if (action === 'delete') {
+    await prisma.bounty.deleteMany({
+      where: {
+        page: {
+          id: {
+            in: modifiedChildPageIds
+          }
+        }
+      }
+    });
+
     await prisma.page.deleteMany({
       where: {
         id: {

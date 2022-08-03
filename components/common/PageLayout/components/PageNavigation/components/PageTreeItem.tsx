@@ -1,42 +1,38 @@
-import React, { forwardRef, ReactNode, SyntheticEvent, useCallback, useMemo, memo } from 'react';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import { useIntl } from 'react-intl';
-import { Page, PageType } from '@prisma/client';
-import Link from 'next/link';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import TreeItem, { treeItemClasses, TreeItemContentProps } from '@mui/lab/TreeItem';
 import IconButton from '@mui/material/IconButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import Menu from '@mui/material/Menu';
-import Tooltip from '@mui/material/Tooltip';
-import MenuItem from '@mui/material/MenuItem';
 import ListItemText from '@mui/material/ListItemText';
-import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import { IPageWithPermissions } from 'lib/pages';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Tooltip from '@mui/material/Tooltip';
+import { Page, PageType } from '@prisma/client';
 import charmClient from 'charmClient';
-import TreeItemContent from 'components/common/TreeItemContent';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
-import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
+import TreeItemContent from 'components/common/TreeItemContent';
+import type { Identifier } from 'dnd-core';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePages } from 'hooks/usePages';
-import type { Identifier } from 'dnd-core';
-import { greyColor2 } from 'theme/colors';
-import { untitledPage } from 'seedData';
-import { useUser } from 'hooks/useUser';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import NewPageMenu from '../../NewPageMenu';
-import { StyledPageIcon, StyledDatabaseIcon } from '../../PageIcon';
-import PageTitle from '../../PageTitle';
+import { IPageWithPermissions } from 'lib/pages';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import Link from 'next/link';
+import React, { forwardRef, memo, ReactNode, SyntheticEvent, useCallback, useMemo } from 'react';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { greyColor2 } from 'theme/colors';
 import AddNewCard from '../../AddNewCard';
+import NewPageMenu from '../../NewPageMenu';
+import { StyledDatabaseIcon, StyledPageIcon } from '../../PageIcon';
+import PageTitle from '../../PageTitle';
 
 interface PageTreeItemProps {
   addSubPage: (page: Partial<Page>) => void;
@@ -376,63 +372,24 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
 });
 
 function PageActionsMenu ({ closeMenu, pageId, pagePath }: { closeMenu: () => void, pageId: string, pagePath: string }) {
-  const [user] = useUser();
-  const [space] = useCurrentSpace();
   const boards = useAppSelector(getSortedBoards);
-  const intl = useIntl();
-  const { setPages, getPagePermissions, pages } = usePages();
+  const { deletePage, getPagePermissions, pages } = usePages();
   const { showMessage } = useSnackbar();
   const permissions = getPagePermissions(pageId);
 
   const deletePageDisabled = !permissions.delete;
 
-  async function deletePage () {
+  async function deletePageWithBoard () {
     if (deletePageDisabled) {
       return;
     }
-
     const page = pages[pageId];
-    const totalNonArchivedPages = Object.values(pages).filter((p => p?.deletedAt === null && (p?.type === 'page' || p?.type === 'board'))).length;
+    const board = boards.find(b => b.id === page?.id);
 
-    if (page && user && space) {
-      const { pageIds } = await charmClient.archivePage(page.id);
-      let newPage: null | IPageWithPermissions = null;
-      if (totalNonArchivedPages - pageIds.length === 0 && pageIds.length !== 0) {
-        newPage = await charmClient.createPage(untitledPage({
-          userId: user.id,
-          spaceId: space.id
-        }));
-      }
-
-      const board = boards.find(b => b.id === page.id);
-      // Delete the page associated with the card
-      if (board) {
-        mutator.deleteBlock(
-          board,
-          intl.formatMessage({ id: 'Sidebar.delete-board', defaultMessage: 'Delete board' }),
-          async () => {
-            // success
-          },
-          async () => {
-            // error
-          }
-        );
-      }
-
-      setPages((_pages) => {
-        pageIds.forEach(_pageId => {
-          _pages[_pageId] = {
-            ..._pages[_pageId],
-            deletedAt: new Date()
-          } as IPageWithPermissions;
-        });
-        // If a new page was created add that to state
-        if (newPage) {
-          _pages[newPage.id] = newPage;
-        }
-        return { ..._pages };
-      });
-    }
+    await deletePage({
+      board,
+      pageId
+    });
   }
 
   function onCopy () {
@@ -451,7 +408,7 @@ function PageActionsMenu ({ closeMenu, pageId, pagePath }: { closeMenu: () => vo
     <>
       <Tooltip arrow placement='top' title={deletePageDisabled ? 'You do not have permission to delete this page' : ''}>
         <div>
-          <PageMenuItem dense disabled={deletePageDisabled} onClick={deletePage}>
+          <PageMenuItem dense disabled={deletePageDisabled} onClick={deletePageWithBoard}>
             <ListItemIcon><DeleteIcon /></ListItemIcon>
             <ListItemText>Delete</ListItemText>
           </PageMenuItem>

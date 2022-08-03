@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/fo
 import { getMessages } from 'components/common/BoardEditor/focalboard/src/i18n';
 import { fetchLanguage, getLanguage } from 'components/common/BoardEditor/focalboard/src/store/language';
 
-export default function ReactDndProvider ({ children }: { children: ReactNode }) {
+export default function IntlProvider ({ children }: { children: ReactNode }) {
 
   const language = useAppSelector<string>(getLanguage);
   const dispatch = useAppDispatch();

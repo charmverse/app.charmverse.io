@@ -40,7 +40,9 @@ export function PageActionDisplayProvider ({ children }: { children: ReactNode }
       const cachedInlineVotesData: ExtendedVote[] = cache.get(`pages/${currentPageId}/votes`);
       const cachedInlineCommentData: ThreadWithCommentsAndAuthors[] | undefined = cache.get(`pages/${currentPageId}/threads`);
       // Vote takes precedence over comments, so if a page has in progress votes and unresolved comments, show the votes
-      if (!highlightedCommentId && cachedInlineVotesData && cachedInlineVotesData.find(inlineVote => inlineVote.status === 'InProgress')) {
+      if (!highlightedCommentId && cachedInlineVotesData && cachedInlineVotesData.find(inlineVote => inlineVote.status === 'InProgress'
+      // We don't want to open the sidebar for a proposal-type vote
+      && inlineVote.context !== 'proposal')) {
         setCurrentPageActionDisplay('votes');
       }
       // For some reason we cant get the threads map using useThreads, its empty even after isValidating is true (data has loaded)

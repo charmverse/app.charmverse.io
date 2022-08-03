@@ -50,7 +50,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
   const { bounties } = useBounties();
   const bounty = bounties.find(_bounty => _bounty.page?.id === page.id);
 
-  const pageVote = Object.values(votes)[0];
+  const pageVote = Object.values(votes).find(v => v.context === 'proposal');
 
   const board = useAppSelector((state) => {
     if (page.type === 'card' && page.parentId) {
@@ -128,7 +128,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
             pageActionDisplay={!insideModal ? currentPageActionDisplay : null}
             pageId={page.id}
             disablePageSpecificFeatures={isSharedPage}
-            enableVoting={page.type !== 'proposal'}
+            enableVoting={true}
           >
             <PageHeader
               headerImage={page.headerImage}
@@ -177,14 +177,14 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
                   </>
                   )}
                   {bounty && (
-                  <BountyProperties bounty={bounty} readOnly={readOnly}>
-                    <CommentsList
-                      comments={comments}
-                      rootId={card?.rootId ?? page.spaceId}
-                      cardId={card?.id ?? page.id}
-                      readonly={readOnly}
-                    />
-                  </BountyProperties>
+                    <BountyProperties isSharedPage={isSharedPage} bounty={bounty} readOnly={readOnly}>
+                      <CommentsList
+                        comments={comments}
+                        rootId={card?.rootId ?? page.spaceId}
+                        cardId={card?.id ?? page.id}
+                        readonly={readOnly}
+                      />
+                    </BountyProperties>
                   )}
                 </div>
               </div>
