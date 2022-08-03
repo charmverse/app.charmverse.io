@@ -11,7 +11,7 @@ export function GET<T = Response> (
     .filter(key => !!data[key])
     .map(key => `${key}=${encodeURIComponent(data[key])}`)
     .join('&');
-  return fetch(
+  return fetch<T>(
     requestURL + (queryStr ? `?${queryStr}` : ''),
     {
       method: 'GET',
@@ -29,7 +29,7 @@ export function DELETE<T> (
   data: Params = {},
   { headers = {} }: { headers?: any } = {}
 ): Promise<T> {
-  return fetch(
+  return fetch<T>(
     requestURL,
     {
       body: JSON.stringify(data),
@@ -49,7 +49,7 @@ export function POST<T> (
   data: Params | string = {},
   { headers = {}, noHeaders, skipStringifying }: { headers?: any, noHeaders?: boolean, skipStringifying?: boolean } = {}
 ): Promise<T> {
-  return fetch(
+  return fetch<T>(
     requestURL,
     {
       body: !skipStringifying ? JSON.stringify(data) : data as string,
@@ -69,7 +69,7 @@ export function PUT<T> (
   data: Params = {},
   { headers = {} }: { headers?: any } = {}
 ): Promise<T> {
-  return fetch(
+  return fetch<T>(
     requestURL,
     {
       body: JSON.stringify(data),

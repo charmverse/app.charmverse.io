@@ -131,7 +131,7 @@ export function BoardPage ({ page, setPage, readonly }: Props) {
     }
 
     return (
-      <div className='focalboard-body' style={{ flexGrow: 1, height: '100%' }}>
+      <div className='focalboard-body full-page'>
         <CenterPanel
           clientConfig={clientConfig}
           readonly={!!readonly}

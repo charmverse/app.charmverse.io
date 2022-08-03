@@ -14,16 +14,9 @@ import { initialLoad } from './initialLoad';
 
 import { RootState } from './index';
 
-export const fetchMe = createAsyncThunk(
-  'users/fetchMe',
-  async () => client.getMe()
-);
-
 type UsersStatus = {
-    me: IUser|null
-    workspaceUsers: {[key: string]: IUser}
-    loggedIn: boolean|null
-    blockSubscriptions: Array<Subscription>
+  workspaceUsers: {[key: string]: IUser}
+  blockSubscriptions: Array<Subscription>
 }
 
 export const fetchUserBlockSubscriptions = createAsyncThunk(
@@ -32,9 +25,7 @@ export const fetchUserBlockSubscriptions = createAsyncThunk(
 );
 
 const initialState = {
-  me: null,
   workspaceUsers: {},
-  loggedIn: null,
   userWorkspaces: [],
   blockSubscriptions: []
 } as UsersStatus;
@@ -43,9 +34,6 @@ const usersSlice = createSlice({
   name: 'users',
   initialState,
   reducers: {
-    setMe: (state, action: PayloadAction<IUser>) => {
-      state.me = action.payload;
-    },
     setWorkspaceUsers: (state, action: PayloadAction<IUser[]>) => {
       state.workspaceUsers = action.payload.reduce((acc: {[key: string]: IUser}, user: IUser) => {
         acc[user.id] = user;
@@ -61,14 +49,6 @@ const usersSlice = createSlice({
     }
   },
   extraReducers: (builder) => {
-    builder.addCase(fetchMe.fulfilled, (state, action) => {
-      state.me = action.payload || null;
-      state.loggedIn = Boolean(state.me);
-    });
-    builder.addCase(fetchMe.rejected, (state) => {
-      state.me = null;
-      state.loggedIn = false;
-    });
     builder.addCase(initialLoad.fulfilled, (state, action) => {
       state.workspaceUsers = action.payload.workspaceUsers.reduce((acc: {[key: string]: IUser}, user: IUser) => {
         acc[user.id] = user;
@@ -81,11 +61,9 @@ const usersSlice = createSlice({
   }
 });
 
-export const { setMe, setWorkspaceUsers } = usersSlice.actions;
+export const { setWorkspaceUsers } = usersSlice.actions;
 export const { reducer } = usersSlice;
 
-export const getMe = (state: RootState): IUser|null => state.users.me;
-export const getLoggedIn = (state: RootState): boolean|null => state.users.loggedIn;
 export const getWorkspaceUsers = (state: RootState): {[key: string]: IUser} => state.users.workspaceUsers;
 
 export const getWorkspaceUsersList = createSelector(

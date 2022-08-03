@@ -7,7 +7,7 @@ export function getPriceFromCryptoCompare (
   quote: FiatCurrency
 ) {
 
-  return fetch(`https://min-api.cryptocompare.com/data/price?fsym=${base}&tsyms=${quote}`)
+  return fetch<any>(`https://min-api.cryptocompare.com/data/price?fsym=${base}&tsyms=${quote}`)
     .then(data => {
 
       if (!data[quote]) {

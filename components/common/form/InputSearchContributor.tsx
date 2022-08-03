@@ -1,8 +1,8 @@
-import { Autocomplete, AutocompleteProps, Box, BoxProps, TextField, Typography } from '@mui/material';
+import { Autocomplete, AutocompleteProps, TextField } from '@mui/material';
 import { useContributors } from 'hooks/useContributors';
 import { Contributor, User } from 'models';
-import Avatar from 'components/common/Avatar';
-import { HTMLAttributes, useState, useEffect, ElementType } from 'react';
+import UserDisplay from 'components/common/UserDisplay';
+import { useState, useEffect } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import { useWeb3React } from '@web3-react/core';
 import { useSWRConfig } from 'swr';
@@ -56,7 +56,7 @@ function InputSearchContributorBase ({ filter, options, disableCloseOnSelect, pl
       // user can also be a string if freeSolo=true
       getOptionLabel={(user) => cache.get(`@"ENS",102~,"${(user as Contributor).username}",${chainId},`) ?? (user as Contributor).username}
       renderOption={(_props, user) => (
-        <ReviewerOption
+        <UserDisplay
           {..._props as any}
           user={user}
         />
@@ -152,14 +152,5 @@ export function InputSearchContributorMultiple ({ onChange, disableCloseOnSelect
       {...props}
       options={contributors}
     />
-  );
-}
-
-export function ReviewerOption ({ user, avatarSize, fontSize, fontWeight, ...props }: { fontSize?: string | number, fontWeight?: number | string, user: Omit<User, 'addresses'>, avatarSize?: 'small' | 'medium' } & HTMLAttributes<HTMLLIElement> & {component?: ElementType} & BoxProps) {
-  return (
-    <Box display='flex' gap={1} {...props} component={props.component ?? 'li'}>
-      <Avatar size={avatarSize} name={user.username as string} avatar={user.avatar} />
-      <Typography fontSize={fontSize} fontWeight={fontWeight}>{user.username}</Typography>
-    </Box>
   );
 }

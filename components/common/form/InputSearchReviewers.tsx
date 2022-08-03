@@ -1,5 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { Autocomplete, TextField, Typography } from '@mui/material';
+import { Autocomplete, TextField } from '@mui/material';
 import { Role } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
 import { useContributors } from 'hooks/useContributors';
@@ -8,7 +8,7 @@ import { Contributor } from 'models/User';
 import { ListSpaceRolesResponse } from 'pages/api/roles';
 import { ComponentProps, SyntheticEvent } from 'react';
 import { useSWRConfig } from 'swr';
-import { ReviewerOption } from './InputSearchContributor';
+import UserDisplay from 'components/common/UserDisplay';
 
 type ReducedRole = Role | ListSpaceRolesResponse
 
@@ -68,7 +68,7 @@ export default function InputSearchReviewers ({
           );
         }
         return (
-          <ReviewerOption
+          <UserDisplay
             {..._props as any}
             user={option}
             avatarSize='small'

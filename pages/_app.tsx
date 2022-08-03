@@ -71,9 +71,6 @@ import 'components/common/BoardEditor/focalboard/src/components/kanban/calculati
 import 'components/common/BoardEditor/focalboard/src/components/kanban/kanban.scss';
 import 'components/common/BoardEditor/focalboard/src/components/kanban/kanbanCard.scss';
 import 'components/common/BoardEditor/focalboard/src/components/kanban/kanbanColumn.scss';
-import 'components/common/BoardEditor/focalboard/src/components/markdownEditor.scss';
-import 'components/common/BoardEditor/focalboard/src/components/markdownEditorInput/entryComponent/entryComponent.scss';
-import 'components/common/BoardEditor/focalboard/src/components/markdownEditorInput/markdownEditorInput.scss';
 import 'components/common/BoardEditor/focalboard/src/components/modal.scss';
 import 'components/common/BoardEditor/focalboard/src/components/modalWrapper.scss';
 import 'components/common/BoardEditor/focalboard/src/components/newVersionBanner.scss';
