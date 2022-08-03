@@ -30,8 +30,8 @@ import { humanFriendlyDate } from 'lib/utilities/dates';
 import { BountyWithDetails } from 'models';
 import { useEffect, useState } from 'react';
 import { BrandColor } from 'theme/colors';
-import BountyApplicantForm from './BountyApplicantForm/BountyApplicantForm';
 import { ApplicationEditorForm } from './BountyApplicantForm/components/ApplicationEditorForm';
+
 import SubmissionEditorForm from './BountyApplicantForm/components/SubmissionEditorForm';
 import BountySubmissionReviewActions from './BountySubmissionReviewActions';
 
@@ -238,7 +238,7 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
 
   return (
     <>
-      {permissions.userPermissions.review && (
+
       <Box width='100%' display='flex' mb={1} justifyContent='space-between'>
         <Box display='flex' gap={1} alignItems='center'>
           <Chip
@@ -261,76 +261,68 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
           )}
         </Box>
       </Box>
-      )}
-      {(userApplication || permissions.userPermissions.review) && (
-        <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
-          <TableHead sx={{
-            background: theme.palette.background.dark,
-            '.MuiTableCell-root': {
-              background: theme.palette.settingsHeader.background
-            }
-          }}
+      {(permissions.userPermissions.review) && (
+        applications.length === 0 ? (
+          <Box
+            my={3}
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              opacity: 0.5
+            }}
           >
-            <TableRow>
-              {/* Width should always be same as Bounty Applicant list status column, so submitter and applicant columns align */}
-              <TableCell>
-                <Box sx={{
-                  display: 'flex',
-                  alignItems: 'center'
-                }}
-                >
-                  Applicant
-                </Box>
-              </TableCell>
-              <TableCell sx={{ width: 120 }} align='left'>
-                Status
-              </TableCell>
-              <TableCell>
-                Last updated
-              </TableCell>
-              <TableCell>
-              </TableCell>
-              <TableCell align='center'>
-                Action
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {(isReviewer ? applications : applications.filter(application => application.createdBy === user?.id)).map((submission) => (
-              <BountySubmissionsTableRow
-                bounty={bounty}
-                totalAcceptedApplications={acceptedApplications.length}
-                permissions={permissions}
-                submission={submission}
-                key={submission.id}
-                refreshSubmissions={refreshSubmissions}
-              />
-            ))}
-          </TableBody>
-        </Table>
-      )}
-      {applications.length === 0 && permissions.userPermissions.review && (
-        <Box
-          my={3}
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            opacity: 0.5
-          }}
-        >
-          <Typography variant='h6'>
-            No submissions
-          </Typography>
-        </Box>
-      )}
-      {!userApplication && (
-        <BountyApplicantForm
-          bounty={bounty}
-          submissions={applications}
-          permissions={permissions}
-          refreshSubmissions={refreshSubmissions}
-        />
-      )}
+            <Typography variant='h6'>
+              No submissions
+            </Typography>
+          </Box>
+        ) : (
+          <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
+            <TableHead sx={{
+              background: theme.palette.background.dark,
+              '.MuiTableCell-root': {
+                background: theme.palette.settingsHeader.background
+              }
+            }}
+            >
+              <TableRow>
+                {/* Width should always be same as Bounty Applicant list status column, so submitter and applicant columns align */}
+                <TableCell>
+                  <Box sx={{
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}
+                  >
+                    Applicant
+                  </Box>
+                </TableCell>
+                <TableCell sx={{ width: 120 }} align='left'>
+                  Status
+                </TableCell>
+                <TableCell>
+                  Last updated
+                </TableCell>
+                <TableCell>
+                </TableCell>
+                <TableCell align='center'>
+                  Action
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {applications.map((submission) => (
+                <BountySubmissionsTableRow
+                  bounty={bounty}
+                  totalAcceptedApplications={acceptedApplications.length}
+                  permissions={permissions}
+                  submission={submission}
+                  key={submission.id}
+                  refreshSubmissions={refreshSubmissions}
+                />
+              ))}
+            </TableBody>
+          </Table>
+        ))}
+
     </>
   );
 }

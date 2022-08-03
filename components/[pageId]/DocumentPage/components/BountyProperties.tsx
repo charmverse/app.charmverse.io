@@ -3,6 +3,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Box, Collapse, Divider, FormLabel, IconButton, Stack, TextField } from '@mui/material';
 import { PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
+import BountyApplicantForm from 'components/bounties/components/BountyApplicantForm';
 import BountyHeader from 'components/bounties/components/BountyHeader';
 import BountyReviewers from 'components/bounties/components/BountyReviewers';
 import BountySubmissionsTable from 'components/bounties/components/BountySubmissionsTable';
@@ -16,9 +17,9 @@ import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole'
 import { CryptoCurrency, getChainById } from 'connectors';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import useIsAdmin from 'hooks/useIsAdmin';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
+import { ApplicationWithTransactions } from 'lib/applications/interfaces';
 import { AssignedBountyPermissions, BountyPermissions, UpdateableBountyFields } from 'lib/bounties';
 import { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import debouncePromise from 'lib/utilities/debouncePromise';
@@ -83,6 +84,19 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
   const assignedRoleSubmitters = permissions?.bountyPermissions?.submitter?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
   const selectedReviewerUsers = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'user').map(p => p.id as string) ?? [];
   const selectedReviewerRoles = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
+
+  // Copied from BountySubmissionsTable
+  const [applications, setListApplications] = useState<ApplicationWithTransactions[]>([]);
+  async function refreshSubmissions () {
+    if (bounty) {
+      const listApplicationsResponse = await charmClient.listApplications(bounty.id);
+      setListApplications(listApplicationsResponse);
+    }
+  }
+  useEffect(() => {
+    refreshSubmissions();
+  }, [bounty]);
+  // -----
 
   async function refreshBountyPermissions (bountyId: string) {
     setPermissions(await charmClient.computeBountyPermissions({
@@ -432,6 +446,18 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
         }}
       />
       {children}
+
+      {
+        permissions && (
+          <BountyApplicantForm
+            bounty={bounty}
+            submissions={applications}
+            permissions={permissions}
+            refreshSubmissions={refreshSubmissions}
+          />
+        )
+      }
+
       {permissions && bounty.status !== 'suggestion' && (
         <>
           <BountySubmissionsTable
