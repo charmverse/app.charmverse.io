@@ -3,7 +3,6 @@ import { prisma } from 'db';
 import { getBountyPagePermissionSet } from 'lib/bounties/shared';
 import { setBountyPermissions } from 'lib/permissions/bounties';
 import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
-import { BountyWithDetails } from 'models';
 import { v4 } from 'uuid';
 import { getBountyOrThrow } from './getBounty';
 import { BountyCreationData } from './interfaces';

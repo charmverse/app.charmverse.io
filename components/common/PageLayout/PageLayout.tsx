@@ -54,7 +54,7 @@ export const AppBar = styled(MuiAppBar, { shouldForwardProp: (prop: string) => p
   ` : ''}
 `;
 
-const Drawer = styled(MuiDrawer, { shouldForwardProp: prop => prop !== 'open' && prop !== 'sidebarWidth' && prop !== 'hideSidebarOnSmallScreen' })
+const Drawer = styled(MuiDrawer, { shouldForwardProp: prop => prop !== 'open' && prop !== 'sidebarWidth' })
   // @ts-ignore mixin isnt typesafe
   // eslint-disable-next-line no-unexpected-multiline
   <{ open: boolean, sidebarWidth: number }>(({ sidebarWidth, theme, open }) => ({

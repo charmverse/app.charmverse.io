@@ -5,10 +5,11 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Modal from 'components/common/Modal';
-import { VoteDTO, ExtendedVote } from 'lib/votes/interfaces';
+import { ExtendedVote } from 'lib/votes/interfaces';
 import { DateTime } from 'luxon';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { usePages } from 'hooks/usePages';
+import { useVotes } from 'hooks/useVotes';
 import AddCircle from '@mui/icons-material/AddCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
 
@@ -78,19 +79,20 @@ function InlineVoteOptions (
 
 interface CreateVoteModalProps {
   onClose?: () => void;
-  createVote: (votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId'>) => Promise<ExtendedVote>;
-  postCreateVote?: (vote: ExtendedVote) => void;
+  onCreateVote?: (vote: ExtendedVote) => void;
   open?: boolean;
   isProposal?: boolean;
 }
 
-export default function CreateVoteModal ({ open = true, onClose, createVote, postCreateVote, isProposal }: CreateVoteModalProps) {
+export default function CreateVoteModal ({ open = true, onClose, onCreateVote, isProposal }: CreateVoteModalProps) {
   const [voteTitle, setVoteTitle] = useState('');
   const [voteDescription, setVoteDescription] = useState('');
   const [passThreshold, setPassThreshold] = useState<number>(50);
   const [voteType, setVoteType] = useState<VoteType>(VoteType.Approval);
   const [options, setOptions] = useState<{ name: string }[]>([]);
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
+
+  const { createVote } = useVotes();
 
   useEffect(() => {
     if (voteType === VoteType.SingleChoice) {
@@ -125,11 +127,12 @@ export default function CreateVoteModal ({ open = true, onClose, createVote, pos
       description: voteDescription,
       pageId: cardId ?? currentPageId,
       threshold: +passThreshold,
-      type: voteType
+      type: voteType,
+      context: isProposal ? 'proposal' : 'inline'
     });
 
-    if (postCreateVote) {
-      postCreateVote(vote);
+    if (onCreateVote) {
+      onCreateVote(vote);
     }
   };
 
