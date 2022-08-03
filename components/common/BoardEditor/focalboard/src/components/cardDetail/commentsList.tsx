@@ -8,16 +8,10 @@ import { useUser } from 'hooks/useUser';
 import Avatar from 'components/common/Avatar';
 import { CommentBlock, createCommentBlock } from '../../blocks/commentBlock';
 import mutator from '../../mutator';
-import { useAppSelector } from '../../store/hooks';
 import { Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
 
-import { MarkdownEditor } from '../markdownEditor';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
-import { PageContent } from 'models';
-
-import { IUser } from '../../user';
-import { getMe } from '../../store/users';
 
 import Comment from './comment';
 
@@ -30,8 +24,6 @@ type Props = {
 
 const CommentsList = React.memo((props: Props) => {
   const [newComment, setNewComment] = useState<CommentBlock['fields'] | null>(null);
-  // a value to allow us to reset CharmEditor state
-  const [newCommentKey, setNewCommentKey] = useState<number>(1);
   const [currentUser] = useUser();
   const [contributors] = useContributors();
 
@@ -48,7 +40,6 @@ const CommentsList = React.memo((props: Props) => {
       comment.fields = { ...newComment}
       mutator.insertBlock(comment, 'add comment');
       setNewComment(null);
-      setNewCommentKey(newCommentKey + 1);
     }
   };
 
@@ -59,7 +50,7 @@ const CommentsList = React.memo((props: Props) => {
     <div className='CommentsList__new'>
       <Avatar size='xSmall' name={currentUser?.username} avatar={currentUser?.avatar} />
       <InlineCharmEditor
-        key={newCommentKey}
+        key={comments.length} // use the size of comments so it resets when the new one is added
         onContentChange={({ doc, rawText }) => {
           setNewComment({ content: doc, contentText: rawText });
         }}
