@@ -202,6 +202,7 @@ export default function CharmEditor (
       placeholderComponent={(
         <Placeholder
           sx={{
+            fontSize: style?.fontSize,
             zIndex: 20,
             top: noPadding ? 2 : 8,
             left: noPadding ? 0 : 8,

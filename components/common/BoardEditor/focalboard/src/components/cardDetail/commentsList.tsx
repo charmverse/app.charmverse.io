@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { useContributors } from 'hooks/useContributors';
+import { useUser } from 'hooks/useUser';
 import Avatar from 'components/common/Avatar';
 import { CommentBlock, createCommentBlock } from '../../blocks/commentBlock';
 import mutator from '../../mutator';
@@ -11,6 +13,8 @@ import { Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
 
 import { MarkdownEditor } from '../markdownEditor';
+import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
+import { PageContent } from 'models';
 
 import { IUser } from '../../user';
 import { getMe } from '../../store/users';
@@ -25,22 +29,26 @@ type Props = {
 }
 
 const CommentsList = React.memo((props: Props) => {
-  const [newComment, setNewComment] = useState('');
-  const me = useAppSelector<IUser|null>(getMe);
+  const [newComment, setNewComment] = useState<CommentBlock['fields'] | null>(null);
+  // a value to allow us to reset CharmEditor state
+  const [newCommentKey, setNewCommentKey] = useState<number>(1);
+  const [currentUser] = useUser();
+  const [contributors] = useContributors();
 
   const onSendClicked = () => {
-    const commentText = newComment;
-    if (commentText) {
+    if (newComment) {
       const { rootId, cardId } = props;
-      Utils.log(`Send comment: ${commentText}`);
+      Utils.log(`Send comment: ${newComment.contentText}`);
       Utils.assertValue(cardId);
 
       const comment = createCommentBlock();
       comment.parentId = cardId;
       comment.rootId = rootId;
-      comment.title = commentText;
+      comment.title = newComment.contentText || '';
+      comment.fields = { ...newComment}
       mutator.insertBlock(comment, 'add comment');
-      setNewComment('');
+      setNewComment(null);
+      setNewCommentKey(newCommentKey + 1);
     }
   };
 
@@ -49,33 +57,28 @@ const CommentsList = React.memo((props: Props) => {
 
   const newCommentComponent = (
     <div className='CommentsList__new'>
-      <img
-        className='comment-avatar'
-        src={Utils.getProfilePicture(me?.id)}
-      />
-      <MarkdownEditor
-        className='newcomment'
-        text={newComment}
-        placeholderText={intl.formatMessage({ id: 'CardDetail.new-comment-placeholder', defaultMessage: 'Add a comment...' })}
-        onChange={(value: string) => {
-          if (newComment !== value) {
-            setNewComment(value);
-          }
+      <Avatar size='xSmall' name={currentUser?.username} avatar={currentUser?.avatar} />
+      <InlineCharmEditor
+        key={newCommentKey}
+        onContentChange={({ doc, rawText }) => {
+          setNewComment({ content: doc, contentText: rawText });
         }}
+        placeholderText={intl.formatMessage({ id: 'CardDetail.new-comment-placeholder', defaultMessage: 'Add a comment...' })}
+        style={{ fontSize: '14px' }}
       />
 
       {newComment
-            && (
-            <Button
-              filled={true}
-              onClick={onSendClicked}
-            >
-              <FormattedMessage
-                id='CommentsList.send'
-                defaultMessage='Send'
-              />
-            </Button>
-            )}
+        && (
+        <Button
+          filled={true}
+          onClick={onSendClicked}
+        >
+          <FormattedMessage
+            id='CommentsList.send'
+            defaultMessage='Send'
+          />
+        </Button>
+      )}
     </div>
   );
 
@@ -88,8 +91,7 @@ const CommentsList = React.memo((props: Props) => {
         <Comment
           key={comment.id}
           comment={comment}
-          userImageUrl={Utils.getProfilePicture(comment.updatedBy)}
-          userId={comment.updatedBy}
+          contributor={contributors.find(_contributor => _contributor.id === comment.createdBy)}
           readonly={props.readonly}
         />
       ))}
