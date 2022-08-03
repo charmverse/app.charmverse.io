@@ -67,7 +67,6 @@ enum BountyStatus {
 enum BountyOperation {
   work
   review
-  delete
   lock
   approve_applications
   grant_permissions
