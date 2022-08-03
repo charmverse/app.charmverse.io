@@ -1,50 +1,49 @@
 import { Prisma } from '@prisma/client';
 import { prisma } from 'db';
+import { resolvePageTree } from './server';
 
 export type ChildModificationAction = 'delete' | 'restore' | 'archive'
 
 export async function modifyChildPages (parentId: string, userId: string, action: ChildModificationAction) {
-  const modifiedChildPageIds: string[] = [];
-  let childPageIds = [parentId];
 
-  while (childPageIds.length !== 0) {
-    modifiedChildPageIds.push(...childPageIds);
-    childPageIds = (await prisma.page.findMany({
-      where: {
-        deletedAt: (action === 'restore' || action === 'delete') ? {
-          not: null
-        } : null,
-        parentId: {
-          in: childPageIds
-        }
-      },
-      select: {
-        id: true
-      }
-    })).map(childPage => childPage.id);
-  }
+  const { flatChildren } = await resolvePageTree({
+    pageId: parentId,
+    flattenChildren: true
+  });
+
+  const modifiedChildPageIds: string[] = [parentId, ...flatChildren.map(p => p.id)];
 
   if (action === 'delete') {
-    await prisma.page.deleteMany({
-      where: {
-        id: {
-          in: modifiedChildPageIds
+    await prisma.$transaction([
+      prisma.bounty.deleteMany({
+        where: {
+          page: {
+            id: {
+              in: modifiedChildPageIds
+            }
+          }
         }
-      }
-    });
-
-    await prisma.block.deleteMany({
-      where: {
-        OR: [{
+      }),
+      prisma.page.deleteMany({
+        where: {
           id: {
             in: modifiedChildPageIds
-          },
-          parentId: {
-            in: modifiedChildPageIds
           }
-        }]
-      }
-    });
+        }
+      }),
+      prisma.block.deleteMany({
+        where: {
+          OR: [{
+            id: {
+              in: modifiedChildPageIds
+            },
+            parentId: {
+              in: modifiedChildPageIds
+            }
+          }]
+        }
+      })
+    ]);
   }
   else {
     const data: Prisma.PageUncheckedUpdateManyInput = {};
