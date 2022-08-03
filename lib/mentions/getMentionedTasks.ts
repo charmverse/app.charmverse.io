@@ -216,7 +216,7 @@ async function getMentionsFromCommentBlocks ({ userId, username, spaceRecord, sp
   const mentionedUserIds: string[] = [];
 
   for (const comment of blockComments) {
-    const content = comment.fields?.content as PageContent;
+    const content = (comment.fields as any)?.content as PageContent;
     if (content) {
       const mentions = extractMentions(content, username);
       mentions.forEach(mention => {
