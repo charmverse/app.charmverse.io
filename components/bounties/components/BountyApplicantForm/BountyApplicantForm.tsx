@@ -88,9 +88,6 @@ export default function BountyApplicantForm (props: BountyApplicationFormProps) 
   }
   else {
 
-    const expanded = userApplication.status === 'applied' ? 'application' : 'submission';
-    const showSubmission = userApplication.status !== 'applied';
-
     return (
       <>
         <ApplicationEditorForm
