@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 import React, { FC } from 'react';
 import { useIntl } from 'react-intl';
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 
 import Avatar from 'components/common/Avatar';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
@@ -66,8 +66,8 @@ const Comment: FC<Props> = (props: Props) => {
           />
         ) : (
           // support old model until we completely migrate to new model
-          <div
-            className='comment-text'
+          <Typography
+            sx={{ fontSize: '14px', pl: 1 }}
             dangerouslySetInnerHTML={{ __html: html }}
           />
         )}
