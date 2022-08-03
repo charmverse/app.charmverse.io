@@ -5,7 +5,8 @@ import React from 'react';
 
 import { FormattedMessage } from 'react-intl';
 
-import HelpIcon from '../widgets/icons/help';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+
 import { Utils } from '../utils';
 import { Constants } from '../constants';
 
@@ -60,7 +61,7 @@ const TopBar = React.memo((): JSX.Element => {
         target='_blank'
         rel='noreferrer'
       >
-        <HelpIcon />
+        <HelpOutlineIcon fontSize='small' />
       </a>
     </div>
   );

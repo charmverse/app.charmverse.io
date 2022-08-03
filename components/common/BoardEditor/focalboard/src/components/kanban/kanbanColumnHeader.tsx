@@ -11,16 +11,18 @@ import { BoardView } from '../../blocks/boardView';
 import { Card } from '../../blocks/card';
 import mutator from '../../mutator';
 import IconButton from '../../widgets/buttons/iconButton';
-import AddIcon from '../../widgets/icons/add';
-import DeleteIcon from '../../widgets/icons/delete';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import HideIcon from '../../widgets/icons/hide';
-import OptionsIcon from '../../widgets/icons/options';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
 import Editable from '../../widgets/editable';
 import Label from '../../widgets/label';
 
 import { KanbanCalculation } from './calculation/calculation';
+
+
 
 type Props = {
     board: Board
@@ -155,7 +157,7 @@ export default function KanbanColumnHeader (props: Props): JSX.Element {
                 && (
                 <>
                   <MenuWrapper>
-                    <IconButton icon={<OptionsIcon />} />
+                    <IconButton icon={<MoreHorizIcon fontSize='small' />} />
                     <Menu>
                       <Menu.Text
                         id='hide'
@@ -168,7 +170,7 @@ export default function KanbanColumnHeader (props: Props): JSX.Element {
                                 <>
                                   <Menu.Text
                                     id='delete'
-                                    icon={<DeleteIcon />}
+                                    icon={<DeleteOutlineIcon fontSize='small'  color='secondary' />}
                                     name={intl.formatMessage({ id: 'BoardComponent.delete', defaultMessage: 'Delete' })}
                                     onClick={() => mutator.deletePropertyOption(board, groupByProperty!, group.option)}
                                   />
@@ -186,7 +188,7 @@ export default function KanbanColumnHeader (props: Props): JSX.Element {
                     </Menu>
                   </MenuWrapper>
                   <IconButton
-                    icon={<AddIcon />}
+                    icon={<AddIcon fontSize='small' />}
                     onClick={() => {
                       props.addCard(group.option.id, true);
                     }}

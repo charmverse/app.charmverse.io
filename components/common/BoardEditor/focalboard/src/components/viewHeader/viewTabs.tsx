@@ -23,7 +23,7 @@ import { Box } from '@mui/system';
 import { Typography } from '@mui/material';
 import Link from 'next/link';
 import AddViewMenu from '../addViewMenu';
-import DeleteIcon from '../../widgets/icons/delete';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import mutator from '../../mutator';
 import { iconForViewType } from '../viewMenu';
 import { BoardView, createBoardView } from '../../blocks/boardView';
@@ -214,7 +214,7 @@ function ViewTabs ({ board, activeView, intl, readonly, showView, views }: ViewT
         </MenuItem>
         {views.length !== 1 && (
         <MenuItem dense onClick={handleDeleteView}>
-          <ListItemIcon><DeleteIcon /></ListItemIcon>
+          <ListItemIcon><DeleteOutlineIcon fontSize='small' /></ListItemIcon>
           <ListItemText>{deleteViewText}</ListItemText>
         </MenuItem>
         )}

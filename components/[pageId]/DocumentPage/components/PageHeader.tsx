@@ -5,7 +5,7 @@ import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
 import ImageIcon from '@mui/icons-material/Image';
 import { BlockIcons } from 'components/common/BoardEditor/focalboard/src/blockIcons';
 import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
-import DeleteIcon from 'components/common/BoardEditor/focalboard/src/widgets/icons/delete';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import FBEmojiIcon from 'components/common/BoardEditor/focalboard/src/widgets/icons/emoji';
 import Menu from 'components/common/BoardEditor/focalboard/src/widgets/menu';
 import MenuWrapper from 'components/common/BoardEditor/focalboard/src/widgets/menuWrapper';
@@ -109,7 +109,7 @@ function PageHeader ({ headerImage, icon, readOnly, setPage, title }: PageHeader
             </Menu.SubMenu>
             <Menu.Text
               id='remove'
-              icon={<DeleteIcon />}
+              icon={<DeleteOutlineIcon fontSize='small' color='secondary' />}
               name={intl.formatMessage({ id: 'ViewTitle.remove-icon', defaultMessage: 'Remove icon' })}
               onClick={() => {
                 updatePageIcon(null);

@@ -11,11 +11,11 @@ import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
 import Button from '../../widgets/buttons/button';
 import IconButton from '../../widgets/buttons/iconButton';
-import AddIcon from '../../widgets/icons/add';
-import DeleteIcon from '../../widgets/icons/delete';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import DisclosureTriangle from '../../widgets/icons/disclosureTriangle';
 import HideIcon from '../../widgets/icons/hide';
-import OptionsIcon from '../../widgets/icons/options';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
 import Editable from '../../widgets/editable';
@@ -116,7 +116,7 @@ const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
                 && (
                 <>
                   <MenuWrapper>
-                    <IconButton icon={<OptionsIcon />} />
+                    <IconButton icon={<MoreHorizIcon fontSize='small' />} />
                     <Menu>
                       <Menu.Text
                         id='hide'
@@ -129,7 +129,7 @@ const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
                                 <>
                                   <Menu.Text
                                     id='delete'
-                                    icon={<DeleteIcon />}
+                                    icon={<DeleteOutlineIcon fontSize='small' color='secondary' />}
                                     name={intl.formatMessage({ id: 'BoardComponent.delete', defaultMessage: 'Delete' })}
                                     onClick={() => mutator.deletePropertyOption(board, groupByProperty!, group.option)}
                                   />
@@ -147,7 +147,7 @@ const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
                     </Menu>
                   </MenuWrapper>
                   <IconButton
-                    icon={<AddIcon />}
+                    icon={<AddIcon fontSize='small' />}
                     onClick={() => props.addCard(group.option.id)}
                   />
                 </>

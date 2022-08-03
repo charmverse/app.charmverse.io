@@ -19,8 +19,8 @@ import mutator from '../mutator';
 import { getCard } from '../store/cards';
 import { useAppSelector } from '../store/hooks';
 import { Utils } from '../utils';
-import DeleteIcon from '../widgets/icons/delete';
-import LinkIcon from '../widgets/icons/Link';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import LinkIcon from '@mui/icons-material/Link';
 import Menu from '../widgets/menu';
 import CardDetail from './cardDetail/cardDetail';
 import ConfirmationDialogBox, { ConfirmationDialogBoxProps } from './confirmationDialogBox';
@@ -131,12 +131,12 @@ function CardDialog (props: Props): JSX.Element | null {
     <Menu position='bottom-end'>
       <Menu.Text
         id='delete'
-        icon={<DeleteIcon />}
+        icon={<DeleteOutlineIcon fontSize='small' color='secondary' />}
         name='Delete'
         onClick={handleDeleteButtonOnClick}
       />
       <Menu.Text
-        icon={<LinkIcon />}
+        icon={<LinkIcon fontSize='small' color='secondary' />}
         id='copy'
         name={intl.formatMessage({ id: 'CardDialog.copyLink', defaultMessage: 'Copy link' })}
         onClick={() => {

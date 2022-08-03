@@ -12,7 +12,8 @@ import { wrapDNDIntl } from '../testUtils';
 
 import Menu from '../widgets/menu';
 
-import OptionsIcon from '../widgets/icons/options';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+
 
 import Dialog from './dialog';
 
@@ -50,7 +51,7 @@ describe('components/dialog', () => {
         <Menu position='left'>
           <Menu.Text
             id='test'
-            icon={<OptionsIcon />}
+            icon={<MoreHorizIcon fontSize='small' />}
             name='Test'
             onClick={async () => {
               jest.fn();
@@ -73,7 +74,7 @@ describe('components/dialog', () => {
           <Menu position='left'>
             <Menu.Text
               id='test'
-              icon={<OptionsIcon />}
+              icon={<MoreHorizIcon fontSize='small' />}
               name='Test'
               onClick={async () => {
                 onTest();
@@ -99,7 +100,7 @@ describe('components/dialog', () => {
           <Menu position='left'>
             <Menu.Text
               id='test'
-              icon={<OptionsIcon />}
+              icon={<MoreHorizIcon fontSize='small' />}
               name='Test'
               onClick={async () => {
                 jest.fn();

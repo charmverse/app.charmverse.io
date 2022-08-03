@@ -9,8 +9,8 @@ import { Block } from '../../blocks/block';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
 import IconButton from '../../widgets/buttons/iconButton';
-import DeleteIcon from '../../widgets/icons/delete';
-import OptionsIcon from '../../widgets/icons/options';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
 import { getUser } from '../../store/users';
@@ -54,10 +54,10 @@ const Comment: FC<Props> = (props: Props) => {
 
         {!props.readonly && (
         <MenuWrapper>
-          <IconButton icon={<OptionsIcon />} />
+          <IconButton icon={<MoreHorizIcon fontSize='small' />} />
           <Menu position='left'>
             <Menu.Text
-              icon={<DeleteIcon />}
+              icon={<DeleteOutlineIcon fontSize='small' />}
               id='delete'
               name={intl.formatMessage({ id: 'Comment.delete', defaultMessage: 'Delete' })}
               onClick={() => mutator.deleteBlock(comment)}

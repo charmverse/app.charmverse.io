@@ -11,7 +11,7 @@ import { useAppSelector } from '../../store/hooks';
 import { getMe } from '../../store/users';
 import { IUser } from '../../user';
 import IconButton from '../../widgets/buttons/iconButton';
-import OptionsIcon from '../../widgets/icons/options';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
 import { sendFlashMessage } from '../flashMessages';
@@ -51,7 +51,7 @@ const ViewHeaderActionsMenu = React.memo((props: Props) => {
     <Box ml={0} mr={2}>
       <ModalWrapper>
         <MenuWrapper label={intl.formatMessage({ id: 'ViewHeader.view-menu', defaultMessage: 'View menu' })}>
-          <IconButton icon={<OptionsIcon />} />
+          <IconButton icon={<MoreHorizIcon fontSize='small' />} />
           <Menu>
             <Menu.Text
               id='exportCsv'

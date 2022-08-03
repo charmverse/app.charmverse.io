@@ -6,8 +6,8 @@ import { useHotkeys } from 'react-hotkeys-hook';
 
 import Modal from '@mui/material/Modal';
 import IconButton from '../widgets/buttons/iconButton';
-import CloseIcon from '../widgets/icons/close';
-import OptionsIcon from '../widgets/icons/options';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import CloseIcon from '@mui/icons-material/Close';
 import MenuWrapper from '../widgets/menuWrapper';
 
 type Props = {
@@ -52,7 +52,7 @@ const Dialog = React.memo((props: Props) => {
                             && (
                             <IconButton
                               onClick={props.onClose}
-                              icon={<CloseIcon />}
+                              icon={<CloseIcon fontSize='small' />}
                               title={closeDialogText}
                               className='IconButton--large'
                             />
@@ -63,7 +63,7 @@ const Dialog = React.memo((props: Props) => {
               <MenuWrapper>
                 <IconButton
                   className='IconButton--large'
-                  icon={<OptionsIcon />}
+                  icon={<MoreHorizIcon fontSize='small' color='secondary' />}
                 />
                 {toolsMenu}
               </MenuWrapper>

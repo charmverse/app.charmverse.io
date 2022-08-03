@@ -9,7 +9,7 @@ import CardIcon from '../../widgets/icons/card';
 import Menu from '../../widgets/menu';
 
 import MenuWrapper from '../../widgets/menuWrapper';
-import OptionsIcon from '../../widgets/icons/options';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import IconButton from '../../widgets/buttons/iconButton';
 import CheckIcon from '../../widgets/icons/check';
 import mutator from '../../mutator';
@@ -35,7 +35,7 @@ const EmptyCardButton = React.memo((props: Props) => {
       }}
       rightIcon={(
         <MenuWrapper stopPropagationOnToggle={true}>
-          <IconButton icon={<OptionsIcon />} />
+          <IconButton icon={<MoreHorizIcon fontsize='small' />} />
           <Menu position='left'>
             <Menu.Text
               icon={<CheckIcon />}

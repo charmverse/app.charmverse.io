@@ -7,7 +7,8 @@ import { Card } from '../../blocks/card';
 
 import { IPropertyTemplate } from '../../blocks/board';
 
-import ChevronUp from '../../widgets/icons/chevronUp';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+
 
 import { CommonCalculationOptionProps, Options, optionDisplayNameString } from './options';
 
@@ -68,7 +69,7 @@ function Calculation (props: Props): JSX.Element {
 
       {
                 value === Options.none.value
-                && <ChevronUp />
+                && <ExpandLessIcon fontSize='small' />
             }
 
       {

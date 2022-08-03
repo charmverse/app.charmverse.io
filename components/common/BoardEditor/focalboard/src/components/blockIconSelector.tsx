@@ -9,7 +9,7 @@ import { Board } from '../blocks/board';
 import { Card } from '../blocks/card';
 import mutator from '../mutator';
 import EmojiPicker from '../widgets/emojiPicker';
-import DeleteIcon from '../widgets/icons/delete';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import EmojiIcon from '../widgets/icons/emoji';
 import Menu from '../widgets/menu';
 import MenuWrapper from '../widgets/menuWrapper';
@@ -75,7 +75,7 @@ const BlockIconSelector = React.memo((props: Props) => {
                 </Menu.SubMenu>
                 <Menu.Text
                   id='remove'
-                  icon={<DeleteIcon />}
+                  icon={<DeleteOutlineIcon fontSize='small' />}
                   name={intl.formatMessage({ id: 'ViewTitle.remove-icon', defaultMessage: 'Remove icon' })}
                   onClick={() => {
                     onRemoveIcon();

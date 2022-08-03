@@ -7,9 +7,9 @@ import { useIntl } from 'react-intl';
 import mutator from '../../mutator';
 import { Card } from '../../blocks/card';
 import IconButton from '../../widgets/buttons/iconButton';
-import DeleteIcon from '../../widgets/icons/delete';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import EditIcon from '../../widgets/icons/edit';
-import OptionsIcon from '../../widgets/icons/options';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
 import CheckIcon from '../../widgets/icons/check';
@@ -41,7 +41,7 @@ const NewCardButtonTemplateItem = React.memo((props: Props) => {
       }}
       rightIcon={(
         <MenuWrapper stopPropagationOnToggle={true}>
-          <IconButton icon={<OptionsIcon />} />
+          <IconButton icon={<MoreHorizIcon fontsize='small' />} />
           <Menu position='left'>
             <Menu.Text
               icon={<CheckIcon />}
@@ -60,7 +60,7 @@ const NewCardButtonTemplateItem = React.memo((props: Props) => {
               }}
             />
             <Menu.Text
-              icon={<DeleteIcon />}
+              icon={<DeleteOutlineIcon  fontsize='small' color='secondary' />}
               id='delete'
               name={intl.formatMessage({ id: 'ViewHeader.delete-template', defaultMessage: 'Delete' })}
               onClick={async () => {
