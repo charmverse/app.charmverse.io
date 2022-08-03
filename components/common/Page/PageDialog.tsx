@@ -11,6 +11,7 @@ import debouncePromise from 'lib/utilities/debouncePromise';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useRef } from 'react';
+import IntlProvider from 'components/common/IntlProvider';
 
 interface Props {
   page?: Page | null;
@@ -75,23 +76,25 @@ export default function PageDialog (props: Props) {
   return (
     <RootPortal>
       {popupState.isOpen && (
-        <Dialog
-          hideCloseButton={true}
-          toolbar={(
-            <Button
-              size='small'
-              color='secondary'
-              href={`/${router.query.domain}/${props.page?.path}`}
-              variant='text'
-              startIcon={<OpenInFullIcon fontSize='small' />}
-            >
-              Open as Page
-            </Button>
-          )}
-          onClose={onClose}
-        >
-          {props.page && <DocumentPage insideModal page={props.page} setPage={setPage} readOnly={props.readOnly} />}
-        </Dialog>
+        <IntlProvider>
+          <Dialog
+            hideCloseButton={true}
+            toolbar={(
+              <Button
+                size='small'
+                color='secondary'
+                href={`/${router.query.domain}/${props.page?.path}`}
+                variant='text'
+                startIcon={<OpenInFullIcon fontSize='small' />}
+              >
+                Open as Page
+              </Button>
+            )}
+            onClose={onClose}
+          >
+            {props.page && <DocumentPage insideModal page={props.page} setPage={setPage} readOnly={props.readOnly} />}
+          </Dialog>
+        </IntlProvider>
       )}
     </RootPortal>
   );

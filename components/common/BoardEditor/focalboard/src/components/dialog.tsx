@@ -11,12 +11,12 @@ import OptionsIcon from '../widgets/icons/options';
 import MenuWrapper from '../widgets/menuWrapper';
 
 type Props = {
-    children: React.ReactNode
-    toolsMenu?: React.ReactNode // some dialogs may not  require a toolmenu
-    toolbar?: React.ReactNode
-    hideCloseButton?: boolean
-    className?: string
-    onClose: () => void,
+  children: React.ReactNode
+  toolsMenu?: React.ReactNode // some dialogs may not  require a toolmenu
+  toolbar?: React.ReactNode
+  hideCloseButton?: boolean
+  className?: string
+  onClose: () => void,
 }
 
 const Dialog = React.memo((props: Props) => {
@@ -48,25 +48,25 @@ const Dialog = React.memo((props: Props) => {
           >
             <div className='toolbar'>
               {
-                            !props.hideCloseButton
-                            && (
-                            <IconButton
-                              onClick={props.onClose}
-                              icon={<CloseIcon />}
-                              title={closeDialogText}
-                              className='IconButton--large'
-                            />
-                            )
-                        }
+                !props.hideCloseButton
+                && (
+                  <IconButton
+                    onClick={props.onClose}
+                    icon={<CloseIcon />}
+                    title={closeDialogText}
+                    className='IconButton--large'
+                  />
+                )
+              }
               {toolbar && <div className='cardToolbar'>{toolbar}</div>}
               {toolsMenu && (
-              <MenuWrapper>
-                <IconButton
-                  className='IconButton--large'
-                  icon={<OptionsIcon />}
-                />
-                {toolsMenu}
-              </MenuWrapper>
+                <MenuWrapper>
+                  <IconButton
+                    className='IconButton--large'
+                    icon={<OptionsIcon />}
+                  />
+                  {toolsMenu}
+                </MenuWrapper>
               )}
             </div>
             {props.children}
