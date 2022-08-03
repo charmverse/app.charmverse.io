@@ -8,7 +8,6 @@ import { BoardView } from '../../blocks/boardView';
 import { Card } from '../../blocks/card';
 import { CsvExporter } from '../../csvExporter';
 import { useAppSelector } from '../../store/hooks';
-import { getMe } from '../../store/users';
 import { IUser } from '../../user';
 import IconButton from '../../widgets/buttons/iconButton';
 import OptionsIcon from '../../widgets/icons/options';
@@ -44,7 +43,6 @@ function onExportCsvTrigger (board: Board, activeView: BoardView, cards: Card[],
 const ViewHeaderActionsMenu = React.memo((props: Props) => {
 
   const { board, activeView, cards } = props;
-  const user = useAppSelector<IUser|null>(getMe);
   const intl = useIntl();
 
   return (
