@@ -238,7 +238,6 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
 
   return (
     <>
-      {permissions.userPermissions.review && (
       <Box width='100%' display='flex' mb={1} justifyContent='space-between'>
         <Box display='flex' gap={1} alignItems='center'>
           <Chip
@@ -261,7 +260,6 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
           )}
         </Box>
       </Box>
-      )}
       {(userApplication || permissions.userPermissions.review) && (
         <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
           <TableHead sx={{
