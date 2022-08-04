@@ -277,8 +277,7 @@ async function getMentionsFromPages ({ userId, username, spaceRecord, spaceIds }
       path: true,
       title: true,
       createdBy: true,
-      spaceId: true,
-      type: true
+      spaceId: true
     }
   });
 
@@ -307,7 +306,7 @@ async function getMentionsFromPages ({ userId, username, spaceRecord, spaceIds }
             text: mention.text,
             bountyTitle: page.title,
             commentId: null,
-            type: (page.type === 'bounty' || page.type === 'page') ? page.type : 'page'
+            type: page.bountyId ? 'bounty' : 'page'
           };
         }
       });
