@@ -103,7 +103,7 @@ export default function BountySubmissionReviewActions (
       }
         {
         canReview && (
-          <Box sx={{ minWidth: '150px', dislay: 'flex' }}>
+          <Box sx={{ minWidth: '150px', display: 'flex' }}>
             <Button
               color='primary'
               size='small'
