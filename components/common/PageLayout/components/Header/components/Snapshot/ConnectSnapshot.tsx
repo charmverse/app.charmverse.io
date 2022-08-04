@@ -37,12 +37,13 @@ export default function ConnectSnapshot () {
 
   const [space, setSpace] = useCurrentSpace();
   const [formError, setFormError] = useState<SystemError | null>(null);
+  const [touched, setTouched] = useState<boolean>(false);
 
   const {
     register,
     handleSubmit,
     watch,
-    formState: { errors, isValid, isDirty }
+    formState: { errors, isValid }
   } = useForm<FormValues>({
     defaultValues: {
       defaultVotingDuration: space?.defaultVotingDuration ?? DEFAULT_VOTING_DURATION,
@@ -64,9 +65,10 @@ export default function ConnectSnapshot () {
     catch (err) {
       setFormError(err as any);
     }
+    setTouched(false);
   }
 
-  usePreventReload(isDirty);
+  usePreventReload(touched);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -74,7 +76,11 @@ export default function ConnectSnapshot () {
         <Grid item>
           <FieldLabel>Snapshot domain</FieldLabel>
           <TextField
-            {...register('snapshotDomain')}
+            {...register('snapshotDomain', {
+              onChange: () => {
+                setTouched(true);
+              }
+            })}
             fullWidth
             error={!!errors.snapshotDomain}
             helperText={errors.snapshotDomain?.message}
@@ -85,7 +91,11 @@ export default function ConnectSnapshot () {
             <Grid item>
               <FieldLabel>Default voting duration (days)</FieldLabel>
               <TextField
-                {...register('defaultVotingDuration')}
+                {...register('defaultVotingDuration', {
+                  onChange: () => {
+                    setTouched(true);
+                  }
+                })}
                 fullWidth
                 error={!!errors.defaultVotingDuration}
                 helperText={errors.defaultVotingDuration?.message}
