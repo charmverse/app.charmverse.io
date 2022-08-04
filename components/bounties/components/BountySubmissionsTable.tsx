@@ -184,8 +184,8 @@ function BountySubmissionsTableRow ({
 
             {permissions.userPermissions.review && submission.status !== 'rejected' && submission.createdBy !== user?.id && (
               <>
-                <FieldLabel>Message for Applicant (optional)</FieldLabel>
-                <div className='CommentsList'>
+                <Typography><strong>Message for Applicant (optional)</strong></Typography>
+                <div className='CommentsList' style={{ paddingTop: 0 }}>
                   <NewCommentInput
                     initialValue={newComment?.content}
                     key={newComment ? 'ready' : 'loading'}
