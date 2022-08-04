@@ -123,11 +123,11 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
     }
   }
 
-  const isDisabled = !gnosisSafeAddress || transactions.length === 0;
+  const isDisabled = !gnosisSafeChainId || !gnosisSafeAddress || transactions.length === 0;
 
   return (
     <>
-      <Tooltip arrow placement='top' title={isDisabled ? `Batch payment requires at least one Completed bounty on the ${getChainById(gnosisSafeChainId)?.chainName} network` : ''}>
+      <Tooltip arrow placement='top' title={isDisabled ? `Batch payment requires at least one Completed bounty on the ${getChainById(gnosisSafeChainId || 1)?.chainName} network` : ''}>
         <div>
           <Button
             {...bindTrigger(popupState)}
@@ -140,64 +140,65 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
           </Button>
         </div>
       </Tooltip>
-      <Modal {...bindPopover(popupState)} size='large'>
-        <DialogTitle onClose={popupState.close}>
-          Pay Bount{transactions.length > 1 ? 'ies' : 'y'}
-        </DialogTitle>
-        <Box pb={2}>
-          <List>
-            {transactions.map(({ title, chainId: _chainId, rewardAmount, rewardToken, userId, applicationId }) => {
-              const user = contributors.find(contributor => contributor.id === userId);
-              const isChecked = selectedApplicationIds.includes(applicationId);
-              if (user) {
-                return (
-                  <ListItem key={`${userId}.${_chainId}.${applicationId}`}>
-                    <Checkbox
-                      disableFocusRipple
-                      disableRipple
-                      disableTouchRipple
-                      sx={{
-                        p: 0,
-                        pr: 1
-                      }}
-                      size='medium'
-                      checked={isChecked}
-                      onChange={(event) => {
-                        if (!event.target.checked) {
-                          setSelectedApplicationIds(selectedApplicationIds.filter(selectedApplicationId => selectedApplicationId !== applicationId));
-                        }
-                        else {
-                          setSelectedApplicationIds([...selectedApplicationIds, applicationId]);
-                        }
-                      }}
-                    />
-                    <Box display='flex' justifyContent='space-between' sx={{ width: '100%' }}>
-                      <Box display='flex' gap={2} alignItems='center'>
-                        <UserDisplay
-                          avatarSize='small'
-                          user={user}
-                        />
-                        <Typography variant='body2' color='secondary'>
-                          {title}
-                        </Typography>
-                      </Box>
-                      <BountyAmount
-                        bounty={{
-                          chainId: _chainId,
-                          rewardAmount,
-                          rewardToken
+      {!isDisabled && (
+        <Modal {...bindPopover(popupState)} size='large'>
+          <DialogTitle onClose={popupState.close}>
+            Pay Bount{transactions.length > 1 ? 'ies' : 'y'}
+          </DialogTitle>
+          <Box pb={2}>
+            <List>
+              {transactions.map(({ title, chainId: _chainId, rewardAmount, rewardToken, userId, applicationId }) => {
+                const user = contributors.find(contributor => contributor.id === userId);
+                const isChecked = selectedApplicationIds.includes(applicationId);
+                if (user) {
+                  return (
+                    <ListItem key={`${userId}.${_chainId}.${applicationId}`}>
+                      <Checkbox
+                        disableFocusRipple
+                        disableRipple
+                        disableTouchRipple
+                        sx={{
+                          p: 0,
+                          pr: 1
+                        }}
+                        size='medium'
+                        checked={isChecked}
+                        onChange={(event) => {
+                          if (!event.target.checked) {
+                            const ids = selectedApplicationIds.filter(selectedApplicationId => selectedApplicationId !== applicationId);
+                            setSelectedApplicationIds(ids);
+                          }
+                          else {
+                            setSelectedApplicationIds([...selectedApplicationIds, applicationId]);
+                          }
                         }}
                       />
-                    </Box>
-                  </ListItem>
-                );
-              }
-              return null;
-            })}
+                      <Box display='flex' justifyContent='space-between' sx={{ width: '100%' }}>
+                        <Box display='flex' gap={2} alignItems='center'>
+                          <UserDisplay
+                            avatarSize='small'
+                            user={user}
+                          />
+                          <Typography variant='body2' color='secondary'>
+                            {title}
+                          </Typography>
+                        </Box>
+                        <BountyAmount
+                          bounty={{
+                            chainId: _chainId,
+                            rewardAmount,
+                            rewardToken
+                          }}
+                        />
+                      </Box>
+                    </ListItem>
+                  );
+                }
+                return null;
+              })}
 
-          </List>
-        </Box>
-        {gnosisSafeChainId && gnosisSafeAddress && (
+            </List>
+          </Box>
           <Box display='flex' gap={2} alignItems='center'>
             <MultiPaymentButton
               chainId={gnosisSafeChainId}
@@ -209,8 +210,8 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
 
             <Typography color='secondary' variant='caption'>Safe address: {shortenHex(gnosisSafeAddress)}</Typography>
           </Box>
-        )}
-      </Modal>
+        </Modal>
+      )}
     </>
   );
 }
