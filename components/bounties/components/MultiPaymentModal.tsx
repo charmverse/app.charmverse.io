@@ -19,7 +19,7 @@ import { getChainById } from 'connectors';
 import useGnosisSigner from 'hooks/useWeb3Signer';
 import { useWeb3React } from '@web3-react/core';
 import useSWR from 'swr';
-import { getSafesForAddress } from 'lib/gnosis';
+import { getSafesForAddress, SafeData } from 'lib/gnosis';
 import { shortenHex } from 'lib/utilities/strings';
 import { isTruthy } from 'lib/utilities/types';
 import MultiPaymentButton, { MultiPaymentResult } from './MultiPaymentButton';
@@ -41,13 +41,13 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
   const { account, chainId } = useWeb3React();
   const signer = useGnosisSigner();
   const { data: safeInfos } = useSWR(
-    (signer && account) ? `/connected-gnosis-safes/${account}` : null,
+    (signer && account && chainId) ? `/connected-gnosis-safes/${account}` : null,
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     () => getSafesForAddress({ signer: signer!, chainId: chainId!, address: account! })
   );
 
   // use first multisig wallet
-  const multiSigWallet = (safeInfos || [])[0];
+  const multiSigWallet = (safeInfos || [])[0] as SafeData | undefined;
   const gnosisSafeAddress = multiSigWallet?.address;
   const gnosisSafeChainId = multiSigWallet?.chainId;
 
@@ -94,7 +94,7 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
   });
 
   async function onPaymentSuccess (result: MultiPaymentResult) {
-    if (gnosisSafeAddress) {
+    if (gnosisSafeAddress && gnosisSafeChainId) {
       setIsLoading(true);
       await Promise.all(
         result.transactions.map(async (transaction) => {
@@ -197,17 +197,19 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
 
           </List>
         </Box>
-        <Box display='flex' gap={2} alignItems='center'>
-          <MultiPaymentButton
-            chainId={gnosisSafeChainId}
-            safeAddress={gnosisSafeAddress}
-            transactions={selectedApplicationIds.map(selectedApplicationId => applicationTransactionRecord[selectedApplicationId])}
-            onSuccess={onPaymentSuccess}
-            isLoading={isLoading}
-          />
+        {gnosisSafeChainId && gnosisSafeAddress && (
+          <Box display='flex' gap={2} alignItems='center'>
+            <MultiPaymentButton
+              chainId={gnosisSafeChainId}
+              safeAddress={gnosisSafeAddress}
+              transactions={selectedApplicationIds.map(selectedApplicationId => applicationTransactionRecord[selectedApplicationId])}
+              onSuccess={onPaymentSuccess}
+              isLoading={isLoading}
+            />
 
-          <Typography color='secondary' variant='caption'>Safe address: {shortenHex(gnosisSafeAddress)}</Typography>
-        </Box>
+            <Typography color='secondary' variant='caption'>Safe address: {shortenHex(gnosisSafeAddress)}</Typography>
+          </Box>
+        )}
       </Modal>
     </>
   );
