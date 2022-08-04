@@ -36,7 +36,7 @@ function MentionedTaskRow (
   let mentionTitle = '';
 
   if (type === 'bounty') {
-    mentionLink = `${baseUrl}/${spaceDomain}/bounties/${bountyId}?mentionId=${mentionId}`;
+    mentionLink = `${baseUrl}/${spaceDomain}/bounties?bountyId=${bountyId}`;
     mentionTitle = `${bountyTitle || 'Untitled'} in ${spaceName}`;
   }
   else if (type === 'page') {
