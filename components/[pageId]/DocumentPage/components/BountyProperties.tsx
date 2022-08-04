@@ -71,8 +71,14 @@ function rollupPermissions ({
   return permissionsToSend;
 }
 
-export default function BountyProperties (props: {children: ReactNode, readOnly?: boolean, bounty: BountyWithDetails}) {
-  const { bounty, readOnly = false, children } = props;
+export default function BountyProperties (props: {
+  children: ReactNode,
+  readOnly?: boolean,
+  bounty: BountyWithDetails,
+  permissions: AssignedBountyPermissions,
+  refreshBountyPermissions: (bountyId: string) => void
+}) {
+  const { bounty, readOnly = false, children, permissions, refreshBountyPermissions } = props;
   const [paymentMethods] = usePaymentMethods();
   const { updateBounty } = useBounties();
   const [availableCryptos, setAvailableCryptos] = useState<Array<string | CryptoCurrency>>([]);
@@ -81,7 +87,7 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
   const [capSubmissions, setCapSubmissions] = useState(currentBounty.maxSubmissions !== null);
   const [space] = useCurrentSpace();
   const [user] = useUser();
-  const [permissions, setPermissions] = useState<AssignedBountyPermissions | null>(null);
+
   const assignedRoleSubmitters = permissions?.bountyPermissions?.submitter?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
   const selectedReviewerUsers = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'user').map(p => p.id as string) ?? [];
   const selectedReviewerRoles = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
@@ -98,12 +104,6 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
     refreshSubmissions();
   }, [bounty]);
   // -----
-
-  async function refreshBountyPermissions (bountyId: string) {
-    setPermissions(await charmClient.computeBountyPermissions({
-      resourceId: bountyId
-    }));
-  }
 
   function refreshCryptoList (chainId: number, rewardToken?: string) {
 
@@ -160,7 +160,7 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
   }, []);
 
   useEffect(() => {
-    refreshBountyPermissions(currentBounty.id);
+
     refreshCryptoList(currentBounty.chainId, currentBounty.rewardToken);
   }, []);
 
