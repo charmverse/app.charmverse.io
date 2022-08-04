@@ -82,6 +82,7 @@ export async function listAvailableBounties ({ spaceId, userId }: AvailableResou
         page: {
           // Prevents returning bounties from other spaces
           spaceId,
+          deletedAt: null,
           permissions: {
             some: {
               // Returns bounties accessible to the whole spaces
@@ -106,6 +107,9 @@ export async function listAvailableBounties ({ spaceId, userId }: AvailableResou
   return prisma.bounty.findMany({
     where: {
       spaceId,
+      page: {
+        deletedAt: null
+      },
       OR: [
         // Admin override
         {

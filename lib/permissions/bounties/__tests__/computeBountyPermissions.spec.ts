@@ -233,7 +233,7 @@ describe('computeBountyPermissions', () => {
     });
   });
 
-  it('should return true to all operations if user is a space admin and admin bypass was enabled', async () => {
+  it('should return true to all operations if user is a space admin and admin bypass was enabled, except [allowing an admin to apply to their own bounty]', async () => {
 
     const { space, user } = await generateUserAndSpaceWithApiToken(undefined, true);
 
@@ -251,7 +251,13 @@ describe('computeBountyPermissions', () => {
     });
 
     typedKeys(BountyOperation).forEach(op => {
-      expect(computed[op]).toBe(true);
+      if (op === 'work') {
+        expect(computed[op]).toBe(false);
+      }
+      else {
+        expect(computed[op]).toBe(true);
+      }
+
     });
 
   });

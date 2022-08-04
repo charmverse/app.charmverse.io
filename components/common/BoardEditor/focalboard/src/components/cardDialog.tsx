@@ -74,7 +74,7 @@ function CreateBountyButton(props: {
           onClick(createdBounty);
         }}
         >
-          Create bounty
+          Convert to bounty
         </Button>
       )}
     </Box>
@@ -86,15 +86,13 @@ const CardDialog = (props: Props): JSX.Element | null => {
   const card = useAppSelector(getCard(cardId))
   const intl = useIntl()
   const [showConfirmationDialogBox, setShowConfirmationDialogBox] = useState<boolean>(false)
-  const { pages, getPagePermissions } = usePages()
+  const { pages } = usePages()
   const { refreshBounty, bounties } = useBounties()
   const router = useRouter();
   const isSharedPage = router.route.startsWith('/share')
   const cardPage = pages[cardId]
   const [spacePermissions] = useCurrentSpacePermissions()
   const [bounty, setBounty] = useState<BountyWithDetails | null>(null)
-  const pagePermission = cardPage ? getPagePermissions(cardPage.id) : null
-  const { showMessage } = useSnackbar()
 
   useEffect(() => {
     setBounty(bounties.find(bounty => bounty.page?.id === cardId) ?? null)
@@ -123,12 +121,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
     // use may be renaming a card title
     // and accidently delete the card
     // so adding des
-    if (card?.title === '' && card?.fields.contentOrder.length === 0) {
-      handleDeleteCard()
-      return
-    }
-
-    setShowConfirmationDialogBox(true)
+    handleDeleteCard()
   }
 
   async function closeBounty () {

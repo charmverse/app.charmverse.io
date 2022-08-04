@@ -17,6 +17,9 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { FormMode } from '../../BountyEditorForm';
 
+/**
+ * @expandedOnLoad Use this to expand the application initially
+ */
 interface IApplicationFormProps {
   onSubmit?: (application: Application) => any,
   bountyId: string
@@ -25,6 +28,7 @@ interface IApplicationFormProps {
   onCancel?: () => void
   readOnly?: boolean
   showHeader?: boolean
+  expandedOnLoad?: boolean
 }
 
 export const schema = yup.object({
@@ -33,9 +37,9 @@ export const schema = yup.object({
 
 type FormValues = yup.InferType<typeof schema>
 
-export function ApplicationEditorForm ({ showHeader = false, readOnly = false, onCancel, onSubmit, bountyId, proposal, mode = 'create' }: IApplicationFormProps) {
+export function ApplicationEditorForm ({ showHeader = false, readOnly = false, onCancel, onSubmit, bountyId, proposal, mode = 'create', expandedOnLoad }: IApplicationFormProps) {
   const { refreshBounty } = useBounties();
-  const [isVisible, setIsVisible] = useState(proposal?.status === 'applied' || mode === 'create');
+  const [isVisible, setIsVisible] = useState(mode === 'create' || expandedOnLoad);
   const [user] = useUser();
 
   const [applicationMessage, setApplicationMessage] = useLocalStorage(`${bountyId}.${user?.id}.application`, '');
@@ -93,7 +97,7 @@ export function ApplicationEditorForm ({ showHeader = false, readOnly = false, o
               fontWeight: 'bold'
             }}
           >
-            Application
+            {proposal?.createdBy === user?.id ? 'Your application' : 'Application'}
           </FormLabel>
           <IconButton
             sx={{
@@ -145,8 +149,20 @@ export function ApplicationEditorForm ({ showHeader = false, readOnly = false, o
 
             {!readOnly && (
             <Grid item display='flex' gap={1}>
-              <Button disabled={!isValid} type='submit'>{mode === 'create' ? ' Submit' : 'Update'}</Button>
-              {onCancel && <Button onClick={onCancel} variant='outlined' color='secondary'>Cancel</Button>}
+              <Button
+                disabled={!isValid}
+                type='submit'
+              >{mode === 'create' ? ' Submit' : 'Update'}
+              </Button>
+              <Button
+                onClick={() => {
+                  onCancel?.();
+                  setIsVisible(false);
+                }}
+                variant='outlined'
+                color='secondary'
+              >Cancel
+              </Button>
             </Grid>
             )}
           </Grid>

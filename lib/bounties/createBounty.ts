@@ -122,15 +122,15 @@ export async function createBounty ({
           type: 'card',
           bountyId
         }
-      }),
-      prisma.pagePermission.createMany({
-        data: bountyPagePermissionSet.map(p => {
-          return {
-            ...p,
-            pageId: linkedPageId
-          };
-        })
       })
+      // prisma.pagePermission.createMany({
+      //   data: bountyPagePermissionSet.map(p => {
+      //     return {
+      //       ...p,
+      //       pageId: linkedPageId
+      //     };
+      //   })
+      // })
     ]);
   }
 

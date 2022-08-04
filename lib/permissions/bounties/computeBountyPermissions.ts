@@ -50,54 +50,71 @@ export async function computeBountyPermissions ({
     return allowedOperations.empty;
   }
 
-  if (isAdmin && allowAdminBypass) {
-    return allowedOperations.full;
-  }
+  // Start actually evaluating permissions
+  let basePermissions = allowedOperations.empty as BountyPermissionFlags;
 
+  // Provision full set of operations
+  if (isAdmin && allowAdminBypass) {
+    basePermissions = allowedOperations.full;
+  }
+  // Calculate actual available permissions
+  else {
   // At the point we execute this query, we are certain there is a requesting user who is a member of the target space
-  const query: Prisma.BountyPermissionWhereInput = {
-    AND: [
-      {
-        bountyId: resourceId
-      },
-      {
-        OR: [
-          {
-            public: true
-          },
-          {
-            spaceId: bounty.spaceId
-          },
-          {
-            userId
-          },
-          {
-            role: {
-              spaceRolesToRole: {
-                some: {
-                  spaceRole: {
-                    userId
+    const query: Prisma.BountyPermissionWhereInput = {
+      AND: [
+        {
+          bountyId: resourceId
+        },
+        {
+          OR: [
+            {
+              public: true
+            },
+            {
+              spaceId: bounty.spaceId
+            },
+            {
+              userId
+            },
+            {
+              role: {
+                spaceRolesToRole: {
+                  some: {
+                    spaceRole: {
+                      userId
+                    }
                   }
                 }
               }
             }
-          }
-        ]
-      }
-    ]
-  };
+          ]
+        }
+      ]
+    };
 
-  const bountyPermissions = await prisma.bountyPermission.findMany({
-    where: query
-  });
+    const bountyPermissions = await prisma.bountyPermission.findMany({
+      where: query
+    });
 
-  bountyPermissions.forEach(p => {
-    allowedOperations.addPermissions(bountyPermissionMapping[p.permissionLevel].slice());
-  });
-
-  if (bounty.createdBy === userId) {
-    allowedOperations.addPermissions(bountyPermissionMapping.creator.slice());
+    bountyPermissions.forEach(p => {
+      allowedOperations.addPermissions(bountyPermissionMapping[p.permissionLevel].slice());
+    });
+    basePermissions = allowedOperations.operationFlags;
   }
 
-  return allowedOperations.operationFlags;
+  // ADD case-specific permissions
+  // 1. If the bounty is created by the user, they always have creator-like abilities
+  if (bounty.createdBy === userId) {
+    bountyPermissionMapping.creator.forEach(op => {
+      basePermissions[op] = true;
+    });
+  }
+
+  // DENY case-specific permissions
+  // 1. Don't allow bounty creator to apply to their own bounty
+  if (bounty.createdBy === userId) {
+    basePermissions.work = false;
+  }
+
+  return basePermissions;
 }

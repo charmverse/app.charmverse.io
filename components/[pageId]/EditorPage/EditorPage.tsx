@@ -86,7 +86,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
   const currentPage = pages[pageId];
   const memoizedCurrentPage = useMemo(
     () => pages[pageId],
-    [pageId, currentPage?.headerImage, currentPage?.icon, currentPage?.title, currentPage?.deletedAt, currentPage?.fullWidth]
+    [pageId, currentPage?.headerImage, currentPage?.icon, currentPage?.title, currentPage?.deletedAt, currentPage?.fullWidth, currentPagePermissions]
   );
 
   if (isAccessDenied) {
@@ -115,10 +115,10 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
     }
     else {
       return (
+        // Document page is used in a few places, so it is responsible for retrieving its own permissions
         <DocumentPage
           page={memoizedCurrentPage}
           setPage={setPage}
-          readOnly={currentPagePermissions.edit_content !== true}
         />
       );
     }

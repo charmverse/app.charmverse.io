@@ -3,6 +3,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Box, Collapse, Divider, FormLabel, IconButton, Stack, TextField } from '@mui/material';
 import { PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
+import BountyApplicantForm from 'components/bounties/components/BountyApplicantForm';
 import BountyHeader from 'components/bounties/components/BountyHeader';
 import BountyReviewers from 'components/bounties/components/BountyReviewers';
 import BountySubmissionsTable from 'components/bounties/components/BountySubmissionsTable';
@@ -16,9 +17,9 @@ import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole'
 import { CryptoCurrency, getChainById } from 'connectors';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import useIsAdmin from 'hooks/useIsAdmin';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
+import { ApplicationWithTransactions } from 'lib/applications/interfaces';
 import { AssignedBountyPermissions, BountyPermissions, UpdateableBountyFields } from 'lib/bounties';
 import { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import debouncePromise from 'lib/utilities/debouncePromise';
@@ -69,7 +70,7 @@ function rollupPermissions ({
   return permissionsToSend;
 }
 
-export default function BountyProperties (props: {children: ReactNode, readOnly?: boolean, bounty: BountyWithDetails, isSharedPage?: boolean}) {
+export default function BountyProperties (props: {children: ReactNode, readOnly?: boolean, bounty: BountyWithDetails}) {
   const { bounty, readOnly = false, children } = props;
   const [paymentMethods] = usePaymentMethods();
   const { updateBounty } = useBounties();
@@ -79,14 +80,23 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
   const [capSubmissions, setCapSubmissions] = useState(currentBounty.maxSubmissions !== null);
   const [space] = useCurrentSpace();
   const [user] = useUser();
-  const isAdmin = useIsAdmin();
   const [permissions, setPermissions] = useState<AssignedBountyPermissions | null>(null);
   const assignedRoleSubmitters = permissions?.bountyPermissions?.submitter?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
   const selectedReviewerUsers = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'user').map(p => p.id as string) ?? [];
   const selectedReviewerRoles = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
-  const isSharedPage = props.isSharedPage ?? false;
 
-  const canEdit = user && !readOnly && ((bounty.createdBy === user.id && bounty.status !== 'suggestion') || (bounty.status === 'suggestion' && isAdmin));
+  // Copied from BountySubmissionsTable
+  const [applications, setListApplications] = useState<ApplicationWithTransactions[]>([]);
+  async function refreshSubmissions () {
+    if (bounty) {
+      const listApplicationsResponse = await charmClient.listApplications(bounty.id);
+      setListApplications(listApplicationsResponse);
+    }
+  }
+  useEffect(() => {
+    refreshSubmissions();
+  }, [bounty]);
+  // -----
 
   async function refreshBountyPermissions (bountyId: string) {
     setPermissions(await charmClient.computeBountyPermissions({
@@ -169,8 +179,8 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
           <Button>Chain</Button>
         </div>
         <InputSearchBlockchain
-          disabled={!canEdit}
-          readOnly={!canEdit}
+          disabled={readOnly}
+          readOnly={readOnly}
           chainId={currentBounty.chainId}
           sx={{
             width: '100%'
@@ -196,8 +206,8 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
           <Button>Reward token</Button>
         </div>
         <InputSearchCrypto
-          disabled={!canEdit}
-          readOnly={!canEdit}
+          disabled={readOnly}
+          readOnly={readOnly}
           cryptoList={availableCryptos}
           chainId={currentBounty?.chainId}
           defaultValue={currentBounty?.rewardToken}
@@ -230,7 +240,7 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
           sx={{
             width: '100%'
           }}
-          disabled={!canEdit}
+          disabled={readOnly}
           value={currentBounty.rewardAmount}
           type='number'
           size='small'
@@ -276,8 +286,8 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
                 approveSubmitters: isOn
               });
             }}
-            disabled={!canEdit}
-            readOnly={!canEdit}
+            disabled={readOnly}
+            readOnly={readOnly}
           />
         </div>
         <div
@@ -305,8 +315,8 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
             }}
             filter={{ mode: 'exclude', userIds: assignedRoleSubmitters }}
             showWarningOnNoRoles={true}
-            disabled={!canEdit}
-            readOnly={!canEdit}
+            disabled={readOnly}
+            readOnly={readOnly}
             sx={{
               width: '100%'
             }}
@@ -330,8 +340,8 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
                 maxSubmissions: isOn ? (currentBounty.maxSubmissions ?? 1) : null
               });
             }}
-            readOnly={!canEdit}
-            disabled={!canEdit}
+            readOnly={readOnly}
+            disabled={readOnly}
           />
         </div>
         {capSubmissions && (
@@ -353,7 +363,7 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
             sx={{
               width: '100%'
             }}
-            disabled={!canEdit}
+            disabled={readOnly}
             onChange={updateBountyMaxSubmissions}
           />
         </div>
@@ -371,7 +381,7 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
         }
       }}
     >
-      {permissions && (user?.id === bounty.createdBy) && (
+      {bounty && (
         <>
           <hr />
           <BountyHeader
@@ -381,7 +391,7 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
       )}
       <Stack flexDirection='row' justifyContent='space-between' gap={2} alignItems='center'>
         {
-          (permissions && !permissions.userPermissions?.review) ? (
+          permissions && (readOnly ? (
             <Stack gap={1} mb={1} width='100%'>
               <hr />
               <BountyReviewers
@@ -401,8 +411,8 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
                 <Button>Reviewer</Button>
               </div>
               <InputSearchReviewers
-                disabled={!canEdit}
-                readOnly={!canEdit}
+                disabled={readOnly}
+                readOnly={readOnly}
                 value={permissions?.bountyPermissions?.reviewer ?? []}
                 disableCloseOnSelect={true}
                 onChange={async (e, options) => {
@@ -424,11 +434,11 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
                 }}
               />
             </div>
-          )
+          ))
         }
       </Stack>
 
-      {(canEdit || isSharedPage) && bountyProperties}
+      {!readOnly && bountyProperties}
 
       <Divider
         sx={{
@@ -436,6 +446,18 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
         }}
       />
       {children}
+
+      {// Bounty creator cannot apply to their own bounty
+        permissions && bounty.createdBy !== user?.id && (
+          <BountyApplicantForm
+            bounty={bounty}
+            submissions={applications}
+            permissions={permissions}
+            refreshSubmissions={refreshSubmissions}
+          />
+        )
+      }
+
       {permissions && bounty.status !== 'suggestion' && (
         <>
           <BountySubmissionsTable

@@ -23,14 +23,13 @@ import { useBounties } from 'hooks/useBounties';
 import { useContributors } from 'hooks/useContributors';
 import { useUser } from 'hooks/useUser';
 import { ApplicationWithTransactions } from 'lib/applications/actions';
-import { applicantIsSubmitter, countValidSubmissions } from 'lib/applications/shared';
+import { countValidSubmissions, submissionsCapReached as submissionsCapReachedFn } from 'lib/applications/shared';
 import { AssignedBountyPermissions } from 'lib/bounties/interfaces';
 import { isBountyLockable } from 'lib/bounties/shared';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 import { BountyWithDetails } from 'models';
 import { useEffect, useState } from 'react';
 import { BrandColor } from 'theme/colors';
-import BountyApplicantForm from './BountyApplicantForm/BountyApplicantForm';
 import { ApplicationEditorForm } from './BountyApplicantForm/components/ApplicationEditorForm';
 import SubmissionEditorForm from './BountyApplicantForm/components/SubmissionEditorForm';
 import BountySubmissionReviewActions from './BountySubmissionReviewActions';
@@ -59,7 +58,7 @@ export const SubmissionStatusLabels: Record<ApplicationStatus, string> = {
 };
 
 interface BountySubmissionsTableRowProps {
-  totalAcceptedApplications: number
+  submissionsCapReached: boolean
   submission: ApplicationWithTransactions
   permissions: AssignedBountyPermissions
   bounty: BountyWithDetails
@@ -70,7 +69,7 @@ function BountySubmissionsTableRow ({
   submission,
   permissions,
   bounty,
-  totalAcceptedApplications,
+  submissionsCapReached,
   refreshSubmissions
 }:
   BountySubmissionsTableRowProps) {
@@ -125,15 +124,14 @@ function BountySubmissionsTableRow ({
           </IconButton>
         </TableCell>
         <TableCell align='right'>
-          <Box display='flex' justifyContent='center' gap={2}>
+          <Box display='flex' justifyContent='left' gap={2}>
             {submission.status !== 'inProgress' && (
               <BountySubmissionReviewActions
-                totalAcceptedApplications={totalAcceptedApplications}
                 bounty={bounty}
                 submission={submission}
                 reviewComplete={() => { }}
                 permissions={permissions}
-                disableRejectButton
+                submissionsCapReached={submissionsCapReached}
               />
             )}
           </Box>
@@ -168,7 +166,7 @@ function BountySubmissionsTableRow ({
               />
             )}
 
-            {permissions.userPermissions.review && submission.status !== 'rejected' && (
+            {permissions.userPermissions.review && submission.status !== 'rejected' && submission.createdBy !== user?.id && (
               <>
                 <Stack mt={1}>
                   <FieldLabel>Message for Applicant (optional)</FieldLabel>
@@ -193,11 +191,11 @@ function BountySubmissionsTableRow ({
                 </Stack>
                 <Box width='100%' display='flex' gap={1} my={2} justifyContent='center'>
                   <BountySubmissionReviewActions
-                    totalAcceptedApplications={totalAcceptedApplications}
                     bounty={bounty}
                     submission={submission}
                     reviewComplete={() => { }}
                     permissions={permissions}
+                    submissionsCapReached={submissionsCapReached}
                   />
                 </Box>
               </>
@@ -210,14 +208,10 @@ function BountySubmissionsTableRow ({
 }
 
 export default function BountySubmissionsTable ({ bounty, permissions }: Props) {
-  const [user] = useUser();
   const theme = useTheme();
 
   const [applications, setListApplications] = useState<ApplicationWithTransactions[]>([]);
-  const acceptedApplications = applications.filter(applicantIsSubmitter);
   const validSubmissions = countValidSubmissions(applications);
-  const userApplication = applications.find(app => app.createdBy === user?.id);
-  const isReviewer = permissions.userPermissions?.review;
   const { refreshBounty } = useBounties();
 
   async function refreshSubmissions () {
@@ -226,6 +220,11 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
       setListApplications(listApplicationsResponse);
     }
   }
+
+  const submissionsCapReached = submissionsCapReachedFn({
+    bounty,
+    submissions: applications
+  });
 
   useEffect(() => {
     refreshSubmissions();
@@ -260,75 +259,68 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
           )}
         </Box>
       </Box>
-      {(userApplication || permissions.userPermissions.review) && (
-        <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
-          <TableHead sx={{
-            background: theme.palette.background.dark,
-            '.MuiTableCell-root': {
-              background: theme.palette.settingsHeader.background
-            }
-          }}
+      {(permissions.userPermissions.review) && (
+        applications.length === 0 ? (
+          <Box
+            my={3}
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              opacity: 0.5
+            }}
           >
-            <TableRow>
-              {/* Width should always be same as Bounty Applicant list status column, so submitter and applicant columns align */}
-              <TableCell>
-                <Box sx={{
-                  display: 'flex',
-                  alignItems: 'center'
-                }}
-                >
-                  Applicant
-                </Box>
-              </TableCell>
-              <TableCell sx={{ width: 120 }} align='left'>
-                Status
-              </TableCell>
-              <TableCell>
-                Last updated
-              </TableCell>
-              <TableCell>
-              </TableCell>
-              <TableCell align='center'>
-                Action
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {(isReviewer ? applications : applications.filter(application => application.createdBy === user?.id)).map((submission) => (
-              <BountySubmissionsTableRow
-                bounty={bounty}
-                totalAcceptedApplications={acceptedApplications.length}
-                permissions={permissions}
-                submission={submission}
-                key={submission.id}
-                refreshSubmissions={refreshSubmissions}
-              />
-            ))}
-          </TableBody>
-        </Table>
-      )}
-      {applications.length === 0 && permissions.userPermissions.review && (
-        <Box
-          my={3}
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            opacity: 0.5
-          }}
-        >
-          <Typography variant='h6'>
-            No submissions
-          </Typography>
-        </Box>
-      )}
-      {!userApplication && (
-        <BountyApplicantForm
-          bounty={bounty}
-          submissions={applications}
-          permissions={permissions}
-          refreshSubmissions={refreshSubmissions}
-        />
-      )}
+            <Typography variant='h6'>
+              No submissions
+            </Typography>
+          </Box>
+        ) : (
+          <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
+            <TableHead sx={{
+              background: theme.palette.background.dark,
+              '.MuiTableCell-root': {
+                background: theme.palette.settingsHeader.background
+              }
+            }}
+            >
+              <TableRow>
+                {/* Width should always be same as Bounty Applicant list status column, so submitter and applicant columns align */}
+                <TableCell>
+                  <Box sx={{
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}
+                  >
+                    Applicant
+                  </Box>
+                </TableCell>
+                <TableCell sx={{ width: 120 }} align='left'>
+                  Status
+                </TableCell>
+                <TableCell>
+                  Last updated
+                </TableCell>
+                <TableCell>
+                </TableCell>
+                <TableCell align='center'>
+                  Action
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {applications.map((submission) => (
+                <BountySubmissionsTableRow
+                  bounty={bounty}
+                  permissions={permissions}
+                  submission={submission}
+                  key={submission.id}
+                  refreshSubmissions={refreshSubmissions}
+                  submissionsCapReached={submissionsCapReached}
+                />
+              ))}
+            </TableBody>
+          </Table>
+        ))}
+
     </>
   );
 }
