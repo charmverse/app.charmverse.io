@@ -86,7 +86,6 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
   const context: GetMentionsInput = { userId, username, spaceRecord, spaceIds };
 
   const { mentions, mentionedUserIds } = await Promise.all([
-    getMentionsFromBounties(context),
     getMentionsFromComments(context),
     getMentionsFromPages(context),
     getMentionsFromCommentBlocks(context)
@@ -135,63 +134,6 @@ function sortByDate <T extends { createdAt: string }> (a: T, b: T): number {
   return a.createdAt > b.createdAt ? -1 : 1;
 }
 
-async function getMentionsFromBounties ({ userId, username, spaceRecord, spaceIds }: GetMentionsInput): Promise<GetMentionsResponse> {
-
-  const bounties = await prisma.bounty.findMany({
-    where: {
-      spaceId: {
-        in: spaceIds
-      }
-    },
-    select: {
-      id: true,
-      createdBy: true,
-      spaceId: true,
-      page: {
-        select: {
-          content: true,
-          title: true
-        }
-      }
-    }
-  });
-
-  const mentionsMap: GetMentionsResponse['mentions'] = {};
-  const mentionedUserIds: string[] = [];
-
-  for (const bounty of bounties) {
-    const content = bounty.page?.content as PageContent;
-    if (content) {
-      const mentions = extractMentions(content, username);
-      mentions.forEach(mention => {
-        if (bounty.spaceId && mention.value === userId && mention.createdBy !== userId) {
-          mentionedUserIds.push(mention.createdBy);
-          mentionsMap[mention.id] = {
-            mentionId: mention.id,
-            createdAt: mention.createdAt,
-            pageId: null,
-            spaceId: bounty.spaceId,
-            spaceDomain: spaceRecord[bounty.spaceId].domain,
-            pagePath: null,
-            spaceName: spaceRecord[bounty.spaceId].name,
-            userId: mention.createdBy,
-            pageTitle: null,
-            text: mention.text,
-            bountyId: bounty.id,
-            bountyTitle: bounty.page?.title || 'Untitled',
-            commentId: null,
-            type: 'bounty'
-          };
-        }
-      });
-    }
-  }
-  return {
-    mentions: mentionsMap,
-    mentionedUserIds
-  };
-}
-
 async function getMentionsFromCommentBlocks ({ userId, username, spaceRecord, spaceIds }: GetMentionsInput): Promise<GetMentionsResponse> {
 
   const blockComments = await prisma.block.findMany({
@@ -199,19 +141,22 @@ async function getMentionsFromCommentBlocks ({ userId, username, spaceRecord, sp
       type: 'comment',
       spaceId: {
         in: spaceIds
-      }
+      },
+      deletedAt: null
     },
     select: {
       id: true,
       createdBy: true,
       spaceId: true,
       fields: true,
-      page: {
-        select: {
-          id: true,
-          title: true,
-          path: true
-        }
+      rootId: true
+    }
+  });
+
+  const pages = await prisma.page.findMany({
+    where: {
+      id: {
+        in: blockComments.map(block => block.rootId)
       }
     }
   });
@@ -224,18 +169,19 @@ async function getMentionsFromCommentBlocks ({ userId, username, spaceRecord, sp
     if (content) {
       const mentions = extractMentions(content, username);
       mentions.forEach(mention => {
-        if (comment.spaceId && mention.value === userId && mention.createdBy !== userId && comment.createdBy !== userId) {
+        const page = pages.find(p => p.id === comment.rootId);
+        if (page && mention.value === userId && mention.createdBy !== userId && comment.createdBy !== userId) {
           mentionedUserIds.push(mention.createdBy);
           mentionsMap[mention.id] = {
             mentionId: mention.id,
             createdAt: mention.createdAt,
-            pageId: comment.page?.id || '',
+            pageId: page.id,
             spaceId: comment.spaceId,
             spaceDomain: spaceRecord[comment.spaceId].domain,
-            pagePath: comment.page?.path || '',
+            pagePath: page.path,
             spaceName: spaceRecord[comment.spaceId].name,
             userId: mention.createdBy,
-            pageTitle: comment.page?.title || '',
+            pageTitle: page.title,
             text: mention.text,
             bountyId: null,
             bountyTitle: null,
@@ -258,6 +204,9 @@ async function getMentionsFromComments ({ userId, username, spaceRecord, spaceId
     where: {
       spaceId: {
         in: spaceIds
+      },
+      page: {
+        deletedAt: null
       }
     },
     select: {
@@ -283,7 +232,7 @@ async function getMentionsFromComments ({ userId, username, spaceRecord, spaceId
     if (content) {
       const mentions = extractMentions(content, username);
       mentions.forEach(mention => {
-        if (comment.spaceId && mention.value === userId && mention.createdBy !== userId && comment.userId !== userId) {
+        if (mention.value === userId && mention.createdBy !== userId && comment.userId !== userId) {
           mentionedUserIds.push(mention.createdBy);
           mentionsMap[mention.id] = {
             mentionId: mention.id,
@@ -318,9 +267,11 @@ async function getMentionsFromPages ({ userId, username, spaceRecord, spaceIds }
     where: {
       spaceId: {
         in: spaceIds
-      }
+      },
+      deletedAt: null
     },
     select: {
+      bountyId: true,
       content: true,
       id: true,
       path: true,
@@ -339,10 +290,11 @@ async function getMentionsFromPages ({ userId, username, spaceRecord, spaceIds }
       const mentions = extractMentions(content, username);
       mentions.forEach(mention => {
         // Skip mentions not for the user, self mentions and inside user created pages
-        if (page.spaceId && mention.value === userId && mention.createdBy !== userId) {
+        if (mention.value === userId && mention.createdBy !== userId) {
           mentionedUserIds.push(mention.createdBy);
           mentionsMap[mention.id] = {
             mentionId: mention.id,
+            bountyId: page.bountyId,
             createdAt: mention.createdAt,
             pageId: page.id,
             spaceId: page.spaceId,
@@ -352,10 +304,9 @@ async function getMentionsFromPages ({ userId, username, spaceRecord, spaceIds }
             userId: mention.createdBy,
             pageTitle: page.title,
             text: mention.text,
-            bountyId: null,
-            bountyTitle: null,
+            bountyTitle: page.title,
             commentId: null,
-            type: 'page'
+            type: page.bountyId ? 'bounty' : 'page'
           };
         }
       });
