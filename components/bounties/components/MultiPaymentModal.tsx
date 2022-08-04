@@ -10,7 +10,7 @@ import { useBounties } from 'hooks/useBounties';
 import { eToNumber } from 'lib/utilities/numbers';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useEffect, useMemo, useState } from 'react';
-import { Checkbox, List, ListItem, Typography } from '@mui/material';
+import { Checkbox, List, ListItem, Tooltip, Typography } from '@mui/material';
 import UserDisplay from 'components/common/UserDisplay';
 import { useContributors } from 'hooks/useContributors';
 import { BountyWithDetails } from 'models';
@@ -123,20 +123,23 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
     }
   }
 
-  if (!gnosisSafeAddress || transactions.length === 0) {
-    return null;
-  }
+  const isDisabled = !gnosisSafeAddress || transactions.length === 0;
 
   return (
     <>
-      <Button
-        {...bindTrigger(popupState)}
-        sx={{ ml: 1 }}
-        variant='outlined'
-        color='secondary'
-      >
-        Batch Payment ({selectedApplicationIds.length})
-      </Button>
+      <Tooltip arrow placement='top' title={isDisabled ? `Batch payment requires at least one Completed bounty on the ${getChainById(gnosisSafeChainId)?.chainName} network` : ''}>
+        <div>
+          <Button
+            {...bindTrigger(popupState)}
+            sx={{ ml: 1 }}
+            variant='outlined'
+            color='secondary'
+            disabled={isDisabled}
+          >
+            Batch Payment ({selectedApplicationIds.length})
+          </Button>
+        </div>
+      </Tooltip>
       <Modal {...bindPopover(popupState)} size='large'>
         <DialogTitle onClose={popupState.close}>
           Pay Bount{transactions.length > 1 ? 'ies' : 'y'}

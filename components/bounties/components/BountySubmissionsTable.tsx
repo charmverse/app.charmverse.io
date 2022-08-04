@@ -23,7 +23,7 @@ import { useBounties } from 'hooks/useBounties';
 import { useContributors } from 'hooks/useContributors';
 import { useUser } from 'hooks/useUser';
 import { ApplicationWithTransactions } from 'lib/applications/actions';
-import { applicantIsSubmitter, countValidSubmissions, submissionsCapReached as submissionsCapReachedFn } from 'lib/applications/shared';
+import { countValidSubmissions, submissionsCapReached as submissionsCapReachedFn } from 'lib/applications/shared';
 import { AssignedBountyPermissions } from 'lib/bounties/interfaces';
 import { isBountyLockable } from 'lib/bounties/shared';
 import { humanFriendlyDate } from 'lib/utilities/dates';
@@ -208,11 +208,9 @@ function BountySubmissionsTableRow ({
 }
 
 export default function BountySubmissionsTable ({ bounty, permissions }: Props) {
-  const [user] = useUser();
   const theme = useTheme();
 
   const [applications, setListApplications] = useState<ApplicationWithTransactions[]>([]);
-  const acceptedApplications = applications.filter(applicantIsSubmitter);
   const validSubmissions = countValidSubmissions(applications);
   const { refreshBounty } = useBounties();
 
@@ -239,7 +237,6 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
 
   return (
     <>
-
       <Box width='100%' display='flex' mb={1} justifyContent='space-between'>
         <Box display='flex' gap={1} alignItems='center'>
           <Chip
