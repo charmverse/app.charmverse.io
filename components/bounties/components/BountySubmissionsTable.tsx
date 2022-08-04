@@ -23,7 +23,7 @@ import { useBounties } from 'hooks/useBounties';
 import { useContributors } from 'hooks/useContributors';
 import { useUser } from 'hooks/useUser';
 import { ApplicationWithTransactions } from 'lib/applications/actions';
-import { countValidSubmissions, submissionsCapReached as submissionsCapReachedFn } from 'lib/applications/shared';
+import { applicantIsSubmitter, countValidSubmissions, submissionsCapReached as submissionsCapReachedFn } from 'lib/applications/shared';
 import { AssignedBountyPermissions } from 'lib/bounties/interfaces';
 import { isBountyLockable } from 'lib/bounties/shared';
 import { humanFriendlyDate } from 'lib/utilities/dates';
@@ -146,7 +146,6 @@ function BountySubmissionsTableRow ({
                   bountyId={bounty.id}
                   readOnly={user?.id !== submission.createdBy || (submission.status !== 'inProgress' && submission.status !== 'review')}
                   submission={submission}
-                  showHeader
                   onSubmit={async () => {
                     await refreshSubmissions();
                     await refreshBounty(bounty.id);
@@ -162,11 +161,11 @@ function BountySubmissionsTableRow ({
                 proposal={submission}
                 readOnly={user?.id !== submission.createdBy || submission.status !== 'applied'}
                 mode='update'
-                showHeader
               />
             )}
 
-            {permissions.userPermissions.review && submission.status !== 'rejected' && submission.createdBy !== user?.id && (
+            {// Reviewer cannot review their own submission
+            permissions.userPermissions.review && submission.status !== 'rejected' && submission.createdBy !== user?.id && (
               <>
                 <Stack mt={1}>
                   <FieldLabel>Message for Applicant (optional)</FieldLabel>
@@ -199,7 +198,8 @@ function BountySubmissionsTableRow ({
                   />
                 </Box>
               </>
-            )}
+            )
+}
           </Collapse>
         </TableCell>
       </TableRow>
@@ -283,7 +283,6 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
             }}
             >
               <TableRow>
-                {/* Width should always be same as Bounty Applicant list status column, so submitter and applicant columns align */}
                 <TableCell>
                   <Box sx={{
                     display: 'flex',
