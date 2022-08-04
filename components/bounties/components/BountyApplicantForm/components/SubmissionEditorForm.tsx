@@ -1,5 +1,8 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { FormLabel, lighten, Stack, Typography } from '@mui/material';
+import { FormLabel, lighten, Typography } from '@mui/material';
+import IconButton from '@mui/material/IconButton';
+import Stack from '@mui/material/Stack';
+import Collapse from '@mui/material/Collapse';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
@@ -18,6 +21,8 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { AssignedBountyPermissions } from 'lib/bounties';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
 const schema = yup.object({
   submission: yup.string().required(),
@@ -36,13 +41,15 @@ interface Props {
   onSubmit?: (submission: Application) => void
   showHeader?: boolean
   readOnly?: boolean
-  permissions: AssignedBountyPermissions
+  permissions: AssignedBountyPermissions,
+  expandedOnLoad?: boolean
 }
 
 export default function BountySubmissionForm (
-  { permissions, readOnly = false, showHeader = false, submission, onSubmit: onSubmitProp, bountyId }: Props
+  { permissions, readOnly = false, showHeader = false, submission, onSubmit: onSubmitProp, bountyId, expandedOnLoad }: Props
 ) {
   const [user] = useUser();
+  const [isVisible, setIsVisible] = useState(expandedOnLoad ?? false);
 
   const {
     register,
@@ -84,6 +91,7 @@ export default function BountySubmissionForm (
       if (onSubmitProp) {
         onSubmitProp(application);
       }
+      setIsVisible(false);
     }
     catch (err: any) {
       setFormError(err);
@@ -92,7 +100,37 @@ export default function BountySubmissionForm (
 
   return (
     <Stack my={2} gap={1}>
-      {readOnly && submission?.walletAddress && (
+      <Stack
+        flexDirection='row'
+        gap={0.5}
+        onClick={() => {
+          setIsVisible(!isVisible);
+        }}
+      >
+        {
+        showHeader && (
+          <>
+            <FormLabel sx={{
+              fontWeight: 'bold'
+            }}
+            >
+              {submission?.createdBy === user?.id ? 'Your submission' : 'Submission'}
+            </FormLabel>
+            <IconButton
+              sx={{
+                top: -2.5,
+                position: 'relative'
+              }}
+              size='small'
+            >
+              {isVisible ? <KeyboardArrowUpIcon fontSize='small' /> : <KeyboardArrowDownIcon fontSize='small' />}
+            </IconButton>
+          </>
+        )
+      }
+      </Stack>
+      <Collapse in={isVisible} timeout='auto' unmountOnExit>
+        {readOnly && submission?.walletAddress && (
         <Typography sx={{
           display: 'flex',
           alignItems: 'center',
@@ -112,62 +150,53 @@ export default function BountySubmissionForm (
             <OpenInNewIcon fontSize='small' />
           </Link>
         </Typography>
-      )}
-      {
-        showHeader && (
-        <FormLabel sx={{
-          fontWeight: 'bold'
-        }}
-        >Submission
-        </FormLabel>
-        )
-      }
-      <form onSubmit={handleSubmit(onSubmit)} style={{ margin: 'auto', width: '100%' }}>
-        <Grid container direction='column' spacing={2}>
+        )}
+        <form onSubmit={handleSubmit(onSubmit)} style={{ margin: 'auto', width: '100%' }}>
+          <Grid container direction='column' spacing={2}>
 
-          <Grid
-            item
-          >
-            <InlineCharmEditor
-              content={submission?.submissionNodes ? JSON.parse(submission?.submissionNodes) : null}
-              onContentChange={content => {
-                setValue('submission', content.rawText, {
-                  shouldValidate: true
-                });
-                setValue('submissionNodes', content.doc, {
-                  shouldValidate: true
-                });
-              }}
-              style={{
-                backgroundColor: 'var(--input-bg)',
-                border: '1px solid var(--input-border)',
-                borderRadius: 3,
-                minHeight: 130
-              }}
-              readOnly={readOnly}
-              placeholderText={permissions.userPermissions.review ? 'No submission yet' : 'Enter the content of your submission here.'}
-            />
+            <Grid
+              item
+            >
+              <InlineCharmEditor
+                content={submission?.submissionNodes ? JSON.parse(submission?.submissionNodes) : null}
+                onContentChange={content => {
+                  setValue('submission', content.rawText, {
+                    shouldValidate: true
+                  });
+                  setValue('submissionNodes', content.doc, {
+                    shouldValidate: true
+                  });
+                }}
+                style={{
+                  backgroundColor: 'var(--input-bg)',
+                  border: '1px solid var(--input-border)',
+                  borderRadius: 3,
+                  minHeight: 130
+                }}
+                readOnly={readOnly}
+                placeholderText={permissions.userPermissions.review ? 'No submission yet' : 'Enter the content of your submission here.'}
+              />
 
-          </Grid>
+            </Grid>
 
-          {!readOnly && (
-          <Grid item>
-            <InputLabel>
-              Address to get paid for this bounty
-            </InputLabel>
-            <TextField
-              {...register('walletAddress')}
-              type='text'
-              fullWidth
-              error={!!errors.walletAddress}
-              helperText={errors.walletAddress?.message}
-              disabled={readOnly}
-            />
+            {!readOnly && (
+            <Grid item>
+              <InputLabel>
+                Address to get paid for this bounty
+              </InputLabel>
+              <TextField
+                {...register('walletAddress')}
+                type='text'
+                fullWidth
+                error={!!errors.walletAddress}
+                helperText={errors.walletAddress?.message}
+                disabled={readOnly}
+              />
 
-          </Grid>
-          )}
+            </Grid>
+            )}
 
-          {
+            {
             formError && (
               <Grid item>
                 <Alert severity={formError.severity}>
@@ -177,13 +206,26 @@ export default function BountySubmissionForm (
             )
           }
 
-          {!readOnly && (
-          <Grid item display='flex' gap={1}>
-            <Button disabled={!isValid} type='submit'>Submit</Button>
+            {!readOnly && (
+            <Grid item display='flex' gap={1}>
+              <Button disabled={!isValid} type='submit'>
+                {
+                  submission?.submission ? 'Update' : 'Submit'
+                }
+              </Button>
+              <Button
+                onClick={() => {
+                  setIsVisible(false);
+                }}
+                variant='outlined'
+                color='secondary'
+              >Cancel
+              </Button>
+            </Grid>
+            )}
           </Grid>
-          )}
-        </Grid>
-      </form>
+        </form>
+      </Collapse>
     </Stack>
   );
 }

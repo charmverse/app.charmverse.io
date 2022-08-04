@@ -18,7 +18,7 @@ import { ReviewDecision, SubmissionReview } from 'lib/applications/interfaces';
 import { AssignedBountyPermissions } from 'lib/bounties/interfaces';
 import { SystemError } from 'lib/utilities/errors';
 import { eToNumber } from 'lib/utilities/numbers';
-import { SyntheticEvent, useState } from 'react';
+import { useState } from 'react';
 import BountyPaymentButton from './BountyPaymentButton';
 
 export interface BountySubmissionReviewActionsProps {
@@ -26,13 +26,11 @@ export interface BountySubmissionReviewActionsProps {
   submission: ApplicationWithTransactions,
   permissions: AssignedBountyPermissions,
   reviewComplete: (updatedApplication: Application) => void
-  onSubmission?: (eventOrAnchorEl?: HTMLElement | SyntheticEvent<any, Event> | null | undefined) => void
-  totalAcceptedApplications: number
-  disableRejectButton?: boolean
+  submissionsCapReached: boolean
 }
 
 export default function BountySubmissionReviewActions (
-  { disableRejectButton = false, totalAcceptedApplications, onSubmission, bounty, submission, reviewComplete, permissions }:
+  { submissionsCapReached, bounty, submission, reviewComplete, permissions }:
     BountySubmissionReviewActionsProps
 ) {
   const [user] = useUser();
@@ -82,48 +80,66 @@ export default function BountySubmissionReviewActions (
     setApiError(null);
   }
 
-  const canReview = (bounty.maxSubmissions === null || (submission.status === 'applied' && (totalAcceptedApplications < bounty.maxSubmissions)) || submission.status === 'review') && permissions?.userPermissions?.review && submission.status !== 'rejected';
+  const canAcceptApplication = permissions?.userPermissions?.review && submission.status === 'applied' && !submissionsCapReached;
+
+  // We can only review or accept application. These are mutually exclusive.
+  const canReview = !canAcceptApplication && permissions?.userPermissions?.review && (submission.status === 'inProgress' || submission.status === 'review') && submission.createdBy !== user?.id;
 
   return (
     <>
-      {
+      <Box display='inline-flex' sx={{ height: '30px' }}>
+        {
+        canAcceptApplication && (
+        <Button
+          color='primary'
+          size='small'
+          onClick={() => {
+            approveApplication(submission.id);
+          }}
+        >
+          Assign
+        </Button>
+        )
+      }
+        {
         canReview && (
-          <>
+          <Box sx={{ minWidth: '150px', display: 'flex' }}>
             <Button
               color='primary'
               size='small'
               onClick={() => {
-                if (submission.status === 'applied') {
-                  approveApplication(submission.id);
-                }
-                else if (submission.status === 'review') {
-                  setReviewDecision({ decision: 'approve', submissionId: submission.id, userId: user?.id as string });
-                }
+                setReviewDecision({ decision: 'approve', submissionId: submission.id, userId: user?.id as string });
               }}
-            >{submission.status === 'applied' ? 'Approve application' : submission.status === 'review' ? 'Approve' : ''}
+              sx={{ mr: 1 }}
+            >
+              Approve
             </Button>
-            {!disableRejectButton && <Button color='error' onClick={() => setReviewDecision({ submissionId: submission.id, decision: 'reject', userId: user?.id as string })}>Reject</Button>}
-          </>
+            <Button
+              color='error'
+              size='small'
+              onClick={() => setReviewDecision({ submissionId: submission.id, decision: 'reject', userId: user?.id as string })}
+            >
+              Reject
+            </Button>
+
+          </Box>
         )
       }
-      {
-        onSubmission && submission.status === 'inProgress' && submission.createdBy === user?.id && (
-          <Button type='submit' onClick={onSubmission}>Submit</Button>
-        )
-      }
+      </Box>
+
       {
         submission.status === 'review' && submission.createdBy === user?.id && (
-          <Typography variant='body2' color='secondary'>Waiting review</Typography>
+          <Typography variant='body2' color='secondary'>Awaiting review</Typography>
         )
       }
       {
         submission.status === 'applied' && submission.createdBy === user?.id && (
-          <Typography variant='body2' color='secondary'>Waiting assignment</Typography>
+          <Typography variant='body2' color='secondary'>Awaiting assignment</Typography>
         )
       }
       {
         submission.status === 'complete' && submission.createdBy === user?.id && (
-          <Typography variant='body2' color='secondary'>Waiting payment</Typography>
+          <Typography variant='body2' color='secondary'>Awaiting payment</Typography>
         )
       }
       {isAdmin && submission.status === 'complete' && submission.walletAddress && <BountyPaymentButton onSuccess={recordTransaction} receiver={submission.walletAddress} amount={eToNumber(bounty.rewardAmount)} tokenSymbolOrAddress={bounty.rewardToken} chainIdToUse={bounty.chainId} />}

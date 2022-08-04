@@ -493,4 +493,87 @@ describe('listAvailableBounties', () => {
       spaceId: v4()
     })).rejects.toBeInstanceOf(DataNotFoundError);
   });
+
+  it('should ignore bounties whose linked page has been deleted', async () => {
+    const { space: otherSpace, user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, false);
+
+    await prisma.space.update({
+      where: {
+        id: otherSpace.id
+      },
+      data: {
+        publicBountyBoard: true
+      }
+    });
+
+    // No permissions provided
+    const [publicBountyDeleted, spaceBountyDeleted, spaceBountyThatShows] = await Promise.all([
+      // A bounty which would show if the page were not deleted
+      generateBounty({
+        createdBy: otherUser.id,
+        spaceId: otherSpace.id,
+        title: 'Bounty for public',
+        status: 'open',
+        approveSubmitters: false,
+        bountyPermissions: {},
+        pagePermissions: [{
+          permissionLevel: 'view',
+          public: true
+        }],
+        page: {
+          deletedAt: new Date()
+        }
+      }),
+      // A bounty which would show if the page were not deleted
+      generateBounty({
+        createdBy: otherUser.id,
+        spaceId: otherSpace.id,
+        title: 'Bounty for space',
+        status: 'open',
+        approveSubmitters: false,
+        bountyPermissions: {},
+        pagePermissions: [{
+          permissionLevel: 'view',
+          spaceId: otherSpace.id
+        }],
+        page: {
+          deletedAt: new Date()
+        }
+      }),
+      // A normal space-accessible bounty which should show
+      generateBounty({
+        createdBy: otherUser.id,
+        spaceId: otherSpace.id,
+        title: 'Bounty for space',
+        status: 'open',
+        approveSubmitters: false,
+        bountyPermissions: {},
+        pagePermissions: [{
+          permissionLevel: 'view',
+          spaceId: otherSpace.id
+        }]
+      })
+    ]);
+
+    const spaceMemberBounties = await listAvailableBounties({
+      spaceId: otherSpace.id,
+      userId: otherUser.id
+    });
+
+    const publicBounties = await listAvailableBounties({
+      spaceId: otherSpace.id,
+      userId: otherUser.id
+    });
+
+    [spaceMemberBounties, publicBounties].forEach(list => {
+      expect(list.length).toBe(1);
+      expect(list[0].id).toBe(spaceBountyThatShows.id);
+    });
+  });
+
+  it('should fail if the space does not exist', async () => {
+    await expect(listAvailableBounties({
+      spaceId: v4()
+    })).rejects.toBeInstanceOf(DataNotFoundError);
+  });
 });
