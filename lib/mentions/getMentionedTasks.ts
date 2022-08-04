@@ -149,14 +149,14 @@ async function getMentionsFromCommentBlocks ({ userId, username, spaceRecord, sp
       createdBy: true,
       spaceId: true,
       fields: true,
-      rootId: true
+      parentId: true
     }
   });
 
   const pages = await prisma.page.findMany({
     where: {
       id: {
-        in: blockComments.map(block => block.rootId)
+        in: blockComments.map(block => block.parentId)
       }
     }
   });
@@ -165,11 +165,11 @@ async function getMentionsFromCommentBlocks ({ userId, username, spaceRecord, sp
   const mentionedUserIds: string[] = [];
 
   for (const comment of blockComments) {
+    const page = pages.find(p => p.id === comment.parentId);
     const content = (comment.fields as any)?.content as PageContent;
-    if (content) {
+    if (page && content) {
       const mentions = extractMentions(content, username);
       mentions.forEach(mention => {
-        const page = pages.find(p => p.id === comment.rootId);
         if (page && mention.value === userId && mention.createdBy !== userId && comment.createdBy !== userId) {
           mentionedUserIds.push(mention.createdBy);
           mentionsMap[mention.id] = {

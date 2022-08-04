@@ -168,7 +168,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
                     <hr />
                     <CommentsList
                       comments={comments}
-                      rootId={card?.rootId ?? page.spaceId}
+                      rootId={card?.rootId ?? page.id}
                       cardId={card?.id ?? page.id}
                       readonly={readOnly}
                     />
@@ -178,7 +178,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
                 <BountyProperties isSharedPage={isSharedPage} bounty={bounty} readOnly={readOnly}>
                   <CommentsList
                     comments={comments}
-                    rootId={card?.rootId ?? page.spaceId}
+                    rootId={card?.rootId ?? page.id}
                     cardId={card?.id ?? page.id}
                     readonly={readOnly}
                   />
