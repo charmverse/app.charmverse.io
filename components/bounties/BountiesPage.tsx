@@ -59,14 +59,14 @@ export default function BountiesPage ({ refreshBounty, publicMode = false, bount
 
               {!publicMode && (
                 <Box width='fit-content' display='flex' gap={1}>
-                  { !!csvData.length
-                      && (
-                        <CSVLink data={csvData} filename='Gnosis Safe Airdrop.csv' style={{ textDecoration: 'none' }}>
-                          <Button color='secondary' variant='outlined'>
-                            Export to CSV
-                          </Button>
-                        </CSVLink>
-                      )}
+                  {!!csvData.length
+                    && (
+                      <CSVLink data={csvData} filename='Gnosis Safe Airdrop.csv' style={{ textDecoration: 'none' }}>
+                        <Button color='secondary' variant='outlined'>
+                          Export to CSV
+                        </Button>
+                      </CSVLink>
+                    )}
                   <MultiPaymentModal bounties={bounties} />
                   <NewBountyButton />
                 </Box>
