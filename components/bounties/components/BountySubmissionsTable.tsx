@@ -125,15 +125,13 @@ function BountySubmissionsTableRow ({
         </TableCell>
         <TableCell align='right'>
           <Box display='flex' justifyContent='left' gap={2}>
-            {submission.status !== 'inProgress' && (
-              <BountySubmissionReviewActions
-                bounty={bounty}
-                submission={submission}
-                reviewComplete={() => { }}
-                permissions={permissions}
-                submissionsCapReached={submissionsCapReached}
-              />
-            )}
+            <BountySubmissionReviewActions
+              bounty={bounty}
+              submission={submission}
+              reviewComplete={() => { }}
+              permissions={permissions}
+              submissionsCapReached={submissionsCapReached}
+            />
           </Box>
         </TableCell>
       </TableRow>
@@ -166,38 +164,27 @@ function BountySubmissionsTableRow ({
 
             {// Reviewer cannot review their own submission
             permissions.userPermissions.review && submission.status !== 'rejected' && submission.createdBy !== user?.id && (
-              <>
-                <Stack mt={1}>
-                  <FieldLabel>Message for Applicant (optional)</FieldLabel>
-                  <Stack mb={1} flexDirection='row' gap={1}><TextField
-                    value={applicationComment}
-                    onChange={(e) => {
-                      setApplicationComment(e.target.value);
+              <Stack mt={1}>
+                <FieldLabel>Message {submission.status === 'applied' ? 'applicant' : 'submitter'}</FieldLabel>
+                <Stack mb={1} flexDirection='row' gap={1}><TextField
+                  value={applicationComment}
+                  onChange={(e) => {
+                    setApplicationComment(e.target.value);
+                  }}
+                  sx={{
+                    flexGrow: 1
+                  }}
+                />
+                  <Button
+                    disabled={applicationComment.length === 0}
+                    onClick={() => {
+                      setApplicationComment('');
+                      onSendClicked();
                     }}
-                    sx={{
-                      flexGrow: 1
-                    }}
-                  />
-                    <Button
-                      disabled={applicationComment.length === 0}
-                      onClick={() => {
-                        setApplicationComment('');
-                        onSendClicked();
-                      }}
-                    >Send
-                    </Button>
-                  </Stack>
+                  >Send
+                  </Button>
                 </Stack>
-                <Box width='100%' display='flex' gap={1} my={2} justifyContent='center'>
-                  <BountySubmissionReviewActions
-                    bounty={bounty}
-                    submission={submission}
-                    reviewComplete={() => { }}
-                    permissions={permissions}
-                    submissionsCapReached={submissionsCapReached}
-                  />
-                </Box>
-              </>
+              </Stack>
             )
 }
           </Collapse>

@@ -39,13 +39,14 @@ interface Props {
   submission?: Application,
   bountyId: string,
   onSubmit?: (submission: Application) => void
+  onCancel?: () => void;
   readOnly?: boolean
   permissions: AssignedBountyPermissions,
   expandedOnLoad?: boolean
 }
 
 export default function BountySubmissionForm (
-  { permissions, readOnly = false, submission, onSubmit: onSubmitProp, bountyId, expandedOnLoad }: Props
+  { permissions, readOnly = false, submission, onSubmit: onSubmitProp, bountyId, expandedOnLoad, onCancel = () => null }: Props
 ) {
   const [user] = useUser();
   const [isVisible, setIsVisible] = useState(expandedOnLoad ?? false);
@@ -211,6 +212,7 @@ export default function BountySubmissionForm (
               <Button
                 onClick={() => {
                   setIsVisible(false);
+                  onCancel();
                 }}
                 variant='outlined'
                 color='secondary'
