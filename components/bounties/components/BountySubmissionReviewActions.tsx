@@ -83,7 +83,7 @@ export default function BountySubmissionReviewActions (
   const canAcceptApplication = permissions?.userPermissions?.review && submission.status === 'applied' && !submissionsCapReached;
 
   // We can only review or accept application. These are mutually exclusive.
-  const canReview = !canAcceptApplication && permissions?.userPermissions?.review && (submission.status === 'inProgress' || submission.status === 'review');
+  const canReview = !canAcceptApplication && permissions?.userPermissions?.review && (submission.status === 'inProgress' || submission.status === 'review') && submission.createdBy !== user?.id;
 
   return (
     <>

@@ -447,8 +447,8 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
       />
       {children}
 
-      {
-        permissions && (
+      {// Bounty creator cannot apply to their own bounty
+        permissions && bounty.createdBy !== user?.id && (
           <BountyApplicantForm
             bounty={bounty}
             submissions={applications}
