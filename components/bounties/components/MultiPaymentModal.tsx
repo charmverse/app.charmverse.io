@@ -131,7 +131,6 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
         <div>
           <Button
             {...bindTrigger(popupState)}
-            sx={{ ml: 1 }}
             variant='outlined'
             color='secondary'
             disabled={isDisabled}
