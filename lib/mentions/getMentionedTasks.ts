@@ -1,4 +1,4 @@
-import { Space } from '@prisma/client';
+import { Page, Space } from '@prisma/client';
 import { prisma } from 'db';
 import { extractMentions } from 'lib/prosemirror/extractMentions';
 import { shortenHex } from 'lib/utilities/strings';
@@ -12,12 +12,13 @@ export type MentionedTasksGroup = {
 }
 
 type Mention = Omit<MentionedTask, 'createdBy'> & { userId: string };
+type SpaceRecord = Record<string, Pick<Space, 'name' | 'domain' | 'id'>>;
 
 interface GetMentionsInput {
   userId: string;
   username: string;
   spaceIds: string[];
-  spaceRecord: Record<string, Pick<Space, 'name' | 'domain' | 'id'>>;
+  spaceRecord: SpaceRecord;
 }
 
 interface GetMentionsResponse {
@@ -74,7 +75,7 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
     }
   });
 
-  const spaceRecord: Record<string, Pick<Space, 'name' | 'domain' | 'id'>> = {};
+  const spaceRecord: SpaceRecord = {};
 
   spaces.forEach(space => {
     spaceRecord[space.id] = space;
@@ -130,10 +131,6 @@ export async function getMentionedTasks (userId: string): Promise<MentionedTasks
   };
 }
 
-function sortByDate <T extends { createdAt: string }> (a: T, b: T): number {
-  return a.createdAt > b.createdAt ? -1 : 1;
-}
-
 async function getMentionsFromCommentBlocks ({ userId, username, spaceRecord, spaceIds }: GetMentionsInput): Promise<GetMentionsResponse> {
 
   const blockComments = await prisma.block.findMany({
@@ -173,20 +170,12 @@ async function getMentionsFromCommentBlocks ({ userId, username, spaceRecord, sp
         if (page && mention.value === userId && mention.createdBy !== userId && comment.createdBy !== userId) {
           mentionedUserIds.push(mention.createdBy);
           mentionsMap[mention.id] = {
+            ...getPropertiesFromPage(page, spaceRecord),
             mentionId: mention.id,
             createdAt: mention.createdAt,
-            pageId: page.id,
-            spaceId: comment.spaceId,
-            spaceDomain: spaceRecord[comment.spaceId].domain,
-            pagePath: page.path,
-            spaceName: spaceRecord[comment.spaceId].name,
             userId: mention.createdBy,
-            pageTitle: page.title || 'Untitled',
             text: mention.text,
-            bountyId: page.bountyId,
-            bountyTitle: page.title,
-            commentId: comment.id,
-            type: page.bountyId ? 'bounty' : 'page'
+            commentId: comment.id
           };
         }
       });
@@ -219,7 +208,8 @@ async function getMentionsFromComments ({ userId, username, spaceRecord, spaceId
           title: true,
           id: true,
           path: true,
-          bountyId: true
+          bountyId: true,
+          spaceId: true
         }
       }
     }
@@ -236,20 +226,12 @@ async function getMentionsFromComments ({ userId, username, spaceRecord, spaceId
         if (mention.value === userId && mention.createdBy !== userId && comment.userId !== userId) {
           mentionedUserIds.push(mention.createdBy);
           mentionsMap[mention.id] = {
+            ...getPropertiesFromPage(comment.page, spaceRecord),
             mentionId: mention.id,
             createdAt: mention.createdAt,
-            pageId: comment.page.id,
-            spaceId: comment.spaceId,
-            spaceDomain: spaceRecord[comment.spaceId].domain,
-            pagePath: comment.page.path,
-            spaceName: spaceRecord[comment.spaceId].name,
             userId: mention.createdBy,
-            pageTitle: comment.page.title || 'Untitled',
             text: mention.text,
-            bountyId: comment.page.bountyId,
-            bountyTitle: comment.page.title,
-            commentId: comment.id,
-            type: comment.page.bountyId ? 'bounty' : 'page'
+            commentId: comment.id
           };
         }
       });
@@ -294,20 +276,12 @@ async function getMentionsFromPages ({ userId, username, spaceRecord, spaceIds }
         if (mention.value === userId && mention.createdBy !== userId) {
           mentionedUserIds.push(mention.createdBy);
           mentionsMap[mention.id] = {
+            ...getPropertiesFromPage(page, spaceRecord),
             mentionId: mention.id,
-            bountyId: page.bountyId,
             createdAt: mention.createdAt,
-            pageId: page.id,
-            spaceId: page.spaceId,
-            spaceDomain: spaceRecord[page.spaceId].domain,
-            pagePath: page.path,
-            spaceName: spaceRecord[page.spaceId].name,
             userId: mention.createdBy,
-            pageTitle: page.title || 'Untitled',
             text: mention.text,
-            bountyTitle: page.title,
-            commentId: null,
-            type: page.bountyId ? 'bounty' : 'page'
+            commentId: null
           };
         }
       });
@@ -318,4 +292,24 @@ async function getMentionsFromPages ({ userId, username, spaceRecord, spaceIds }
     mentions: mentionsMap,
     mentionedUserIds
   };
+}
+
+// utils
+
+function sortByDate <T extends { createdAt: string }> (a: T, b: T): number {
+  return a.createdAt > b.createdAt ? -1 : 1;
+}
+
+function getPropertiesFromPage (page: Pick<Page, 'bountyId' | 'spaceId' | 'title' | 'id' | 'path'>, spaceRecord: SpaceRecord) {
+  return {
+    pageId: page.id,
+    spaceId: page.spaceId,
+    spaceDomain: spaceRecord[page.spaceId].domain,
+    pagePath: page.path,
+    spaceName: spaceRecord[page.spaceId].name,
+    pageTitle: page.title || 'Untitled',
+    bountyId: page.bountyId,
+    bountyTitle: page.title,
+    type: page.bountyId ? 'bounty' : 'page'
+  } as const;
 }
