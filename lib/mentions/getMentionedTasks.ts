@@ -181,12 +181,12 @@ async function getMentionsFromCommentBlocks ({ userId, username, spaceRecord, sp
             pagePath: page.path,
             spaceName: spaceRecord[comment.spaceId].name,
             userId: mention.createdBy,
-            pageTitle: page.title,
+            pageTitle: page.title || 'Untitled',
             text: mention.text,
-            bountyId: null,
-            bountyTitle: null,
+            bountyId: page.bountyId,
+            bountyTitle: page.title,
             commentId: comment.id,
-            type: 'page'
+            type: page.bountyId ? 'bounty' : 'page'
           };
         }
       });
@@ -218,7 +218,8 @@ async function getMentionsFromComments ({ userId, username, spaceRecord, spaceId
         select: {
           title: true,
           id: true,
-          path: true
+          path: true,
+          bountyId: true
         }
       }
     }
@@ -243,12 +244,12 @@ async function getMentionsFromComments ({ userId, username, spaceRecord, spaceId
             pagePath: comment.page.path,
             spaceName: spaceRecord[comment.spaceId].name,
             userId: mention.createdBy,
-            pageTitle: comment.page.title,
+            pageTitle: comment.page.title || 'Untitled',
             text: mention.text,
-            bountyId: null,
-            bountyTitle: null,
+            bountyId: comment.page.bountyId,
+            bountyTitle: comment.page.title,
             commentId: comment.id,
-            type: 'page'
+            type: comment.page.bountyId ? 'bounty' : 'page'
           };
         }
       });
@@ -302,7 +303,7 @@ async function getMentionsFromPages ({ userId, username, spaceRecord, spaceIds }
             pagePath: page.path,
             spaceName: spaceRecord[page.spaceId].name,
             userId: mention.createdBy,
-            pageTitle: page.title,
+            pageTitle: page.title || 'Untitled',
             text: mention.text,
             bountyTitle: page.title,
             commentId: null,
