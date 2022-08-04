@@ -16,7 +16,7 @@ export default function BountyHeader ({ bounty }: Props) {
       alignItems: 'center'
     }}
     >
-      <Typography fontWeight={500}>Bounty properties</Typography>
+      <Typography fontWeight='bold'>Bounty information</Typography>
       {/* Provide the bounty menu options */}
       <Box display='flex'>
         <BountyStatusBadge

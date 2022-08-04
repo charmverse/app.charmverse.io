@@ -24,11 +24,13 @@ export default function BountySlots ({ bounty, submissions }: BountyReviewersPro
 
   return (
     <Box display='flex' alignItems='center' gap={2}>
-      <Typography sx={{
-        fontWeight: 'bold'
-      }}
+      <Typography
+        sx={{
+          fontWeight: 'bold'
+        }}
+        className='octo-propertyname octo-propertyname--readonly'
       >
-        Remaining submissions:
+        Submissions
       </Typography>
 
       {

@@ -399,7 +399,8 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
                 bounty={bounty}
                 permissions={permissions}
               />
-              <hr />
+              {/* Extra space so this looks like the focalboard properties */}
+              <div style={{ marginTop: 2 }}></div>
               <BountySlots
                 bounty={bounty}
                 submissions={bounty.applications}

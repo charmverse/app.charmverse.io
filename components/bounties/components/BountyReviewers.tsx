@@ -93,11 +93,13 @@ export default function BountyReviewers ({ bounty, permissions }: BountyReviewer
 
   return (
     <Box display='flex' alignItems='center' gap={2}>
-      <Typography sx={{
-        fontWeight: 'bold'
-      }}
+      <Typography
+        sx={{
+          fontWeight: 'bold'
+        }}
+        className='octo-propertyname octo-propertyname--readonly'
       >
-        Reviewers:
+        Reviewers
       </Typography>
 
       {
