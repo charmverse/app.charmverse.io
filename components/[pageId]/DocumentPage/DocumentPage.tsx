@@ -10,6 +10,7 @@ import { useBounties } from 'hooks/useBounties';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
 import { useVotes } from 'hooks/useVotes';
+import { IPagePermissionFlags } from 'lib/permissions/pages';
 import { Page, PageContent } from 'models';
 import { useRouter } from 'next/router';
 import { memo, useCallback } from 'react';
@@ -40,14 +41,19 @@ export const Container = styled(Box)<{ top: number, fullWidth?: boolean }>`
 `;
 
 export interface DocumentPageProps {
-  page: Page, setPage: (p: Partial<Page>) => void, readOnly?: boolean, insideModal?: boolean
+  page: Page, setPage: (p: Partial<Page>) => void,
+  readOnly?: boolean,
+  insideModal?: boolean
 }
 
 function DocumentPage ({ page, setPage, insideModal, readOnly = false }: DocumentPageProps) {
-  const { pages } = usePages();
+  const { pages, getPagePermissions } = usePages();
   const { cancelVote, castVote, deleteVote, votes, isLoading } = useVotes();
   const { bounties } = useBounties();
   const bounty = bounties.find(_bounty => _bounty.page?.id === page.id);
+  const pagePermissions = getPagePermissions(page.id);
+
+  const cannotEdit = readOnly || !pagePermissions?.edit_content;
 
   const pageVote = Object.values(votes).find(v => v.context === 'proposal');
 
@@ -114,7 +120,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
       }}
       >
         {page.deletedAt && <PageDeleteBanner pageId={page.id} />}
-        {page.headerImage && <PageBanner headerImage={page.headerImage} readOnly={readOnly} setPage={setPage} />}
+        {page.headerImage && <PageBanner headerImage={page.headerImage} readOnly={cannotEdit} setPage={setPage} />}
         <Container
           top={pageTop}
           fullWidth={page.fullWidth ?? false}
@@ -123,7 +129,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
             key={page.id}
             content={page.content as PageContent}
             onContentChange={updatePageContent}
-            readOnly={readOnly}
+            readOnly={cannotEdit}
             pageActionDisplay={!insideModal ? currentPageActionDisplay : null}
             pageId={page.id}
             disablePageSpecificFeatures={isSharedPage}
@@ -133,7 +139,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
               headerImage={page.headerImage}
               icon={page.icon}
               title={page.title}
-              readOnly={readOnly}
+              readOnly={cannotEdit}
               setPage={setPage}
             />
             {page.type === 'proposal' && !isLoading && pageVote && (
@@ -152,16 +158,16 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
               <div className='CardDetail content'>
                 {/* Property list */}
                 {card && board && (
-                  <CardDetailProperties
-                    board={board}
-                    card={card}
-                    cards={cards}
-                    activeView={activeView}
-                    views={boardViews}
-                    readonly={readOnly}
-                    pageUpdatedAt={page.updatedAt.toString()}
-                    pageUpdatedBy={page.updatedBy}
-                  />
+                <CardDetailProperties
+                  board={board}
+                  card={card}
+                  cards={cards}
+                  activeView={activeView}
+                  views={boardViews}
+                  readonly={cannotEdit}
+                  pageUpdatedAt={page.updatedAt.toString()}
+                  pageUpdatedBy={page.updatedBy}
+                />
                 )}
                 {!bounty && page.type === 'card' && (
                   <>
@@ -170,19 +176,19 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
                       comments={comments}
                       rootId={card?.rootId ?? page.id}
                       cardId={card?.id ?? page.id}
-                      readonly={readOnly}
+                      readonly={cannotEdit}
                     />
                   </>
                 )}
                 {bounty && (
-                <BountyProperties isSharedPage={isSharedPage} bounty={bounty} readOnly={readOnly}>
-                  <CommentsList
-                    comments={comments}
-                    rootId={card?.rootId ?? page.id}
-                    cardId={card?.id ?? page.id}
-                    readonly={readOnly}
-                  />
-                </BountyProperties>
+                  <BountyProperties bounty={bounty} readOnly={cannotEdit}>
+                    <CommentsList
+                      comments={comments}
+                      rootId={card?.rootId ?? page.spaceId}
+                      cardId={card?.id ?? page.id}
+                      readonly={cannotEdit}
+                    />
+                  </BountyProperties>
                 )}
               </div>
             </div>

@@ -18,6 +18,7 @@ import { useUser } from 'hooks/useUser';
 import EmailIcon from '@mui/icons-material/Email';
 import { GetTasksResponse } from 'pages/api/tasks/list';
 import { KeyedMutator } from 'swr';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { GnosisConnectCard } from '../integrations/components/GnosisSafes';
 import useTasksState from './hooks/useTasksState';
 
@@ -291,6 +292,7 @@ export default function GnosisTasksSection ({ error, mutateTasks, tasks }: Gnosi
   const isSnoozed = snoozedForDate !== null;
 
   const [isLoadingSafes, setIsLoadingSafes] = useState(false);
+  const { showMessage } = useSnackbar();
 
   async function importSafes () {
     if (gnosisSigner && user) {
@@ -300,8 +302,14 @@ export default function GnosisTasksSection ({ error, mutateTasks, tasks }: Gnosi
           signer: gnosisSigner,
           addresses: user.addresses
         });
-        await mutate();
+        const safes = await mutate();
         await mutateTasks();
+        if (!safes || safes.length === 0) {
+          showMessage('You don\'t have any gnosis safes connected to your wallet');
+        }
+        else {
+          showMessage(`Successfully connected ${safes.length} safes`, 'success');
+        }
       }
       finally {
         setIsLoadingSafes(false);

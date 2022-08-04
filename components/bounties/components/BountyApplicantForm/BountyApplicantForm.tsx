@@ -3,7 +3,7 @@ import { Application, Bounty } from '@prisma/client';
 import { useState } from 'react';
 import { useBounties } from 'hooks/useBounties';
 import { useUser } from 'hooks/useUser';
-import { countValidSubmissions } from 'lib/applications/shared';
+import { countValidSubmissions, submissionsCapReached } from 'lib/applications/shared';
 import { AssignedBountyPermissions } from 'lib/bounties';
 import { useContributors } from 'hooks/useContributors';
 import { ApplicationEditorForm } from './components/ApplicationEditorForm';
@@ -19,18 +19,22 @@ interface BountyApplicationFormProps {
 
 export default function BountyApplicantForm (props: BountyApplicationFormProps) {
   const { refreshSubmissions, bounty, permissions, submissions } = props;
-  const validSubmissionsCount = countValidSubmissions(submissions);
   const { refreshBounty } = useBounties();
   const [contributors] = useContributors();
   const [user,, isUserLoaded] = useUser();
   const [showApplication, setShowApplication] = useState(false);
+  const userApplication = submissions.find(s => s.createdBy === user?.id);
 
   // Only applies if there is a submissions cap
-  const capReached = bounty.maxSubmissions !== null && (validSubmissionsCount >= bounty.maxSubmissions);
-  const canCreateSubmission = !bounty.submissionsLocked
+  const capReached = submissionsCapReached({
+    bounty,
+    submissions
+  });
+
+  const canCreateSubmission = !userApplication && !bounty.submissionsLocked
     && !capReached
-    && permissions?.userPermissions.work
-    && bounty.createdBy !== user?.id;
+    && permissions?.userPermissions.work;
+
   const newSubmissionTooltip = bounty.submissionsLocked
     ? 'Submissions locked'
     : !permissions?.userPermissions.work
@@ -50,27 +54,24 @@ export default function BountyApplicantForm (props: BountyApplicationFormProps) 
     );
   }
 
-  if (!showApplication && bounty.createdBy !== user?.id && !permissions.userPermissions.review) {
+  if (!userApplication) {
     return (
-      <Box display='flex' justifyContent='center' my={3}>
-        <Tooltip placement='top' title={newSubmissionTooltip} arrow>
-          <span>
-            <Button
-              disabled={!canCreateSubmission}
-              onClick={() => {
-                setShowApplication(true);
-              }}
-            >
-              Apply to this bounty
-            </Button>
-          </span>
-        </Tooltip>
-      </Box>
-    );
-  }
-  else if (showApplication) {
-    if (bounty.approveSubmitters) {
-      return (
+      !showApplication ? (
+        <Box display='flex' justifyContent='center' my={3}>
+          <Tooltip placement='top' title={newSubmissionTooltip} arrow>
+            <span>
+              <Button
+                disabled={!canCreateSubmission}
+                onClick={() => {
+                  setShowApplication(true);
+                }}
+              >
+                Apply to this bounty
+              </Button>
+            </span>
+          </Tooltip>
+        </Box>
+      ) : (
         <ApplicationEditorForm
           bountyId={bounty.id}
           mode='create'
@@ -82,20 +83,43 @@ export default function BountyApplicantForm (props: BountyApplicationFormProps) 
           }}
           showHeader
         />
-      );
-    }
-    return (
-      <SubmissionEditorForm
-        bountyId={bounty.id}
-        showHeader
-        onSubmit={async () => {
-          await refreshSubmissions();
-          await refreshBounty(bounty.id);
-          setShowApplication(false);
-        }}
-        permissions={permissions}
-      />
+      )
     );
   }
-  return null;
+  else {
+
+    return (
+      <>
+        <ApplicationEditorForm
+          bountyId={bounty.id}
+          mode='update'
+          proposal={userApplication}
+          onSubmit={() => {
+            setShowApplication(false);
+          }}
+          onCancel={() => {
+            setShowApplication(false);
+          }}
+          showHeader
+        />
+
+        {
+          userApplication.status !== 'applied' && (
+            <SubmissionEditorForm
+              bountyId={bounty.id}
+              showHeader
+              onSubmit={async () => {
+                await refreshSubmissions();
+                await refreshBounty(bounty.id);
+                setShowApplication(false);
+              }}
+              submission={userApplication}
+              permissions={permissions}
+              expandedOnLoad={true}
+            />
+          )
+        }
+      </>
+    );
+  }
 }
