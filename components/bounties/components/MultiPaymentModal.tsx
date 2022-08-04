@@ -127,7 +127,7 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
 
   return (
     <>
-      <Tooltip arrow placement='top' title={isDisabled ? 'Please ensure that your wallet is connected and on the right chain.' : ''}>
+      <Tooltip arrow placement='top' title={isDisabled ? `Batch payment requires at least one Completed bounty on the ${getChainById(gnosisSafeChainId)?.chainName} network` : ''}>
         <div>
           <Button
             {...bindTrigger(popupState)}
@@ -140,7 +140,6 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
           </Button>
         </div>
       </Tooltip>
-      {!isDisabled && (
       <Modal {...bindPopover(popupState)} size='large'>
         <DialogTitle onClose={popupState.close}>
           Pay Bount{transactions.length > 1 ? 'ies' : 'y'}
@@ -210,7 +209,6 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
           <Typography color='secondary' variant='caption'>Safe address: {shortenHex(gnosisSafeAddress)}</Typography>
         </Box>
       </Modal>
-      )}
     </>
   );
 }
