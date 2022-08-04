@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState, useMemo } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import CenterPanel from 'components/common/BoardEditor/focalboard/src/components/centerPanel';
-import { sendFlashMessage } from 'components/common/BoardEditor/focalboard/src/components/flashMessages';
+import { sendFlashMessage, FlashMessages } from 'components/common/BoardEditor/focalboard/src/components/flashMessages';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { getCurrentBoard, setCurrent as setCurrentBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { getCurrentViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
@@ -17,7 +17,8 @@ import CardDialog from 'components/common/BoardEditor/focalboard/src/components/
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import { silentlyUpdateURL } from 'lib/browser';
 import { usePages } from 'hooks/usePages';
-
+import ReactDndProvider from 'components/common/ReactDndProvider';
+import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 /**
  *
  * For the original version of this file, see src/boardPage.tsx in focalboard
@@ -29,7 +30,7 @@ interface Props {
   setPage: (p: Partial<Page>) => void;
 }
 
-export default function BoardPage ({ page, setPage, readonly }: Props) {
+export function BoardPage ({ page, setPage, readonly }: Props) {
   const router = useRouter();
   const board = useAppSelector(getCurrentBoard);
   const cards = useAppSelector(getCurrentViewCardsSortedFilteredAndGrouped);
@@ -130,7 +131,7 @@ export default function BoardPage ({ page, setPage, readonly }: Props) {
     }
 
     return (
-      <div className='focalboard-body' style={{ flexGrow: 1 }}>
+      <div className='focalboard-body full-page'>
         <CenterPanel
           clientConfig={clientConfig}
           readonly={!!readonly}
@@ -160,4 +161,17 @@ export default function BoardPage ({ page, setPage, readonly }: Props) {
   }
 
   return null;
+}
+
+export default function BoardPageWithContext (props: Props) {
+
+  return (
+    <ReactDndProvider>
+      <FlashMessages milliseconds={2000} />
+
+      <BoardPage {...props} />
+      {/** include the root portal for focalboard's popup */}
+      <FocalBoardPortal />
+    </ReactDndProvider>
+  );
 }

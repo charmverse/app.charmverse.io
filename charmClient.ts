@@ -4,44 +4,42 @@ import {
   Role, Space, TelegramUser, TokenGate, TokenGateToRole, User, UserDetails, UserGnosisSafe, UserVote
 } from '@prisma/client';
 import * as http from 'adapters/http';
-import { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/focalboard/src/blocks/block';
-import { IWorkspace } from 'components/common/BoardEditor/focalboard/src/blocks/workspace';
-import { OctoUtils } from 'components/common/BoardEditor/focalboard/src/octoUtils';
-import { IUser, UserWorkspace } from 'components/common/BoardEditor/focalboard/src/user';
-import { FiatCurrency, IPairQuote } from 'connectors';
+import type { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/focalboard/src/blocks/block';
+import type { IWorkspace } from 'components/common/BoardEditor/focalboard/src/blocks/workspace';
+import type { IUser, UserWorkspace } from 'components/common/BoardEditor/focalboard/src/user';
+import type { FiatCurrency, IPairQuote } from 'connectors';
 import type { FailedImportsError } from 'lib/notion/types';
-import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee, IPagePermissionWithSource, SpaceDefaultPublicPageToggle } from 'lib/permissions/pages/page-permission-interfaces';
-import { GetPoapsResponse, UpdatePoapsRequest } from 'lib/poap';
-import { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
-import { BountyWithDetails, Contributor, LoggedInUser, PageContent } from 'models';
+import type { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee, IPagePermissionWithSource, SpaceDefaultPublicPageToggle } from 'lib/permissions/pages/page-permission-interfaces';
+import type { GetPoapsResponse, UpdatePoapsRequest } from 'lib/poap';
+import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
+import type { BountyWithDetails, Contributor, LoggedInUser, PageContent } from 'models';
 import type { ServerBlockFields } from 'pages/api/blocks';
-import { InviteLinkPopulated } from 'pages/api/invites/index';
+import type { InviteLinkPopulated } from 'pages/api/invites/index';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
-// TODO: Maybe move these types to another place so that we dont import from backend
-import { ApplicationWithTransactions, ReviewDecision, SubmissionContent, SubmissionCreationData } from 'lib/applications/interfaces';
-import { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
-import { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
-import { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
-import { TokenGateVerification, TokenGateEvaluationAttempt, TokenGateEvaluationResult, TokenGateWithRoles } from 'lib/token-gates/interfaces';
-import { ConnectDiscordPayload, ConnectDiscordResponse } from 'pages/api/discord/connect';
-import { ImportDiscordRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
-import { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
-import { ListSpaceRolesResponse } from 'pages/api/roles';
-import { GetTasksResponse } from 'pages/api/tasks/list';
-import { GetTasksStateResponse, UpdateTasksState } from 'pages/api/tasks/state';
-import { TelegramAccount } from 'pages/api/telegram/connect';
-import { AssignedBountyPermissions, BountyCreationData, BountySubmitterPoolCalculation, BountySubmitterPoolSize, BountyUpdate, SuggestionAction } from 'lib/bounties/interfaces';
-import { DeepDaoAggregateData } from 'lib/deepdao/client';
-import { PublicPageResponse } from 'lib/pages/interfaces';
-import { PublicBountyToggle } from 'lib/spaces/interfaces';
+import type { ApplicationWithTransactions, ReviewDecision, SubmissionContent, SubmissionCreationData } from 'lib/applications/interfaces';
+import type { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
+import type { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
+import type { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
+import type { TokenGateVerification, TokenGateEvaluationAttempt, TokenGateEvaluationResult, TokenGateWithRoles } from 'lib/token-gates/interfaces';
+import type { ConnectDiscordPayload, ConnectDiscordResponse } from 'pages/api/discord/connect';
+import type { ImportDiscordRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
+import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
+import type { ListSpaceRolesResponse } from 'pages/api/roles';
+import type { GetTasksResponse } from 'pages/api/tasks/list';
+import type { GetTasksStateResponse, UpdateTasksState } from 'pages/api/tasks/state';
+import type { TelegramAccount } from 'pages/api/telegram/connect';
+import type { AssignedBountyPermissions, BountyCreationData, BountySubmitterPoolCalculation, BountySubmitterPoolSize, BountyUpdate, SuggestionAction } from 'lib/bounties/interfaces';
+import type { DeepDaoAggregateData } from 'lib/deepdao/client';
+import type { PublicPageResponse } from 'lib/pages/interfaces';
+import type { PublicBountyToggle } from 'lib/spaces/interfaces';
 import type { MarkTask } from 'lib/tasks/markTasks';
-import { TransactionCreationData } from 'lib/transactions/interface';
-import { ExtendedVote, UserVoteExtendedDTO, VoteDTO } from 'lib/votes/interfaces';
-import { PublicUser } from 'pages/api/public/profile/[userPath]';
-import { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
-import { AssignedPermissionsQuery, Resource } from './lib/permissions/interfaces';
-import { SpacePermissionConfigurationUpdate } from './lib/permissions/meta/interfaces';
-import { SpacePermissionFlags, SpacePermissionModification } from './lib/permissions/spaces';
+import type { TransactionCreationData } from 'lib/transactions/interface';
+import type { ExtendedVote, UserVoteExtendedDTO, VoteDTO } from 'lib/votes/interfaces';
+import type { PublicUser } from 'pages/api/public/profile/[userPath]';
+import type { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
+import type { AssignedPermissionsQuery, Resource } from './lib/permissions/interfaces';
+import type { SpacePermissionConfigurationUpdate } from './lib/permissions/meta/interfaces';
+import type { SpacePermissionFlags, SpacePermissionModification } from './lib/permissions/spaces';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -314,7 +312,8 @@ class CharmClient {
       .then(blocks => this.fixBlocks(blocks));
   }
 
-  fixBlocks (blocks: FBBlock[]): FBBlock[] {
+  async fixBlocks (blocks: FBBlock[]): Promise<FBBlock[]> {
+    const OctoUtils = (await import('components/common/BoardEditor/focalboard/src/octoUtils')).OctoUtils;
     // Hydrate is important, as it ensures that each block is complete to the current model
     const fixedBlocks = OctoUtils.hydrateBlocks(blocks);
     return fixedBlocks;

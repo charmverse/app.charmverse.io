@@ -17,7 +17,6 @@ import CardDialog from './cardDialog';
 
 jest.mock('../mutator');
 jest.mock('../utils');
-jest.mock('draft-js/lib/generateRandomKey', () => () => '123');
 
 const mockedUtils = jest.mocked(Utils, true);
 const mockedMutator = jest.mocked(mutator, true);

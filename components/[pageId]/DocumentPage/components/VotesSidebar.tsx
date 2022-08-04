@@ -30,7 +30,8 @@ export default function VotesSidebar () {
   const inlineVoteIds = voteSort === 'position' ? findTotalInlineVotes(view, view.state.doc, votes).voteIds : [];
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
 
-  const filteredVotes = filterVotes(votesArray, voteFilter);
+  // Don't show a proposal vote inside the votes
+  const filteredVotes = filterVotes(votesArray, voteFilter).filter(v => v.context !== 'proposal');
 
   const sortedVotes = sortVotes(filteredVotes, voteSort, inlineVoteIds, votes);
 
@@ -39,7 +40,7 @@ export default function VotesSidebar () {
     const highlightedVoteId = (new URLSearchParams(window.location.search)).get('voteId');
     if (highlightedVoteId) {
       const highlightedVote = votes[highlightedVoteId];
-      if (highlightedVote) {
+      if (highlightedVote && votes[highlightedVoteId].context !== 'proposal') {
         const highlightedVoteDomNode = document.getElementById(`vote.${highlightedVoteId}`);
         if (highlightedVoteDomNode) {
           setTimeout(() => {

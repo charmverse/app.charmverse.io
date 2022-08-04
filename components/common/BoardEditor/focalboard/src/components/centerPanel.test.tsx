@@ -28,7 +28,6 @@ jest.mock('react-router-dom', () => {
 jest.mock('../utils');
 jest.mock('../mutator');
 jest.mock('../telemetry/telemetryClient');
-jest.mock('draft-js/lib/generateRandomKey', () => () => '123');
 const mockedUtils = jest.mocked(Utils, true);
 const mockedMutator = jest.mocked(Mutator, true);
 mockedUtils.createGuid.mockReturnValue('test-id');

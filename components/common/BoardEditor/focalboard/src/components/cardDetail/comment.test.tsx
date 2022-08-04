@@ -23,8 +23,7 @@ const dateFixed = Date.parse('01 Oct 2020');
 comment.createdAt = dateFixed;
 comment.updatedAt = dateFixed;
 comment.title = 'Test comment';
-
-const userImageUrl = 'data:image/svg+xml';
+const contributor = { username: 'Test user', avatar: null };
 
 describe('components/cardDetail/comment', () => {
   const state = {
@@ -54,8 +53,7 @@ describe('components/cardDetail/comment', () => {
       <ReduxProvider store={store}>
         <Comment
           comment={comment}
-          userId={comment.updatedBy}
-          userImageUrl={userImageUrl}
+          contributor={contributor}
           readonly={false}
         />
       </ReduxProvider>
@@ -70,8 +68,7 @@ describe('components/cardDetail/comment', () => {
       <ReduxProvider store={store}>
         <Comment
           comment={comment}
-          userId={comment.updatedBy}
-          userImageUrl={userImageUrl}
+          contributor={contributor}
           readonly={true}
         />
       </ReduxProvider>
@@ -84,8 +81,7 @@ describe('components/cardDetail/comment', () => {
       <ReduxProvider store={store}>
         <Comment
           comment={comment}
-          userId={comment.updatedBy}
-          userImageUrl={userImageUrl}
+          contributor={contributor}
           readonly={false}
         />
       </ReduxProvider>
