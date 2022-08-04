@@ -5,7 +5,7 @@ import Grid from '@mui/material/Grid';
 import charmClient from 'charmClient';
 import Loader from 'components/common/Loader';
 import useIsAdmin from 'hooks/useIsAdmin';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { yupResolver } from '@hookform/resolvers/yup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -46,7 +46,7 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
 
   const isAdmin = useIsAdmin();
   // custom onChange is used for switches so isDirty from useForm doesn't change it value
-  const touched = useRef<boolean>(false);
+  const [touched, setTouched] = useState<boolean>(false);
   const {
     handleSubmit,
     setValue,
@@ -57,7 +57,7 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
     resolver: yupResolver(schema)
   });
 
-  usePreventReload(touched.current);
+  usePreventReload(touched);
 
   const newValues = watch();
 
@@ -135,6 +135,7 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
       // Force a refresh of rendered components
       setAssignedPermissions(newPermissionState);
       callback();
+      setTouched(false);
     }
   }
 
@@ -179,15 +180,12 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
                     control={(
                       <Switch
                         disabled={!isAdmin}
-//                        checked={newValues[operation]}
+                        defaultChecked={userCanPerformAction}
                         onChange={(ev) => {
                           const { checked: nowHasAccess } = ev.target;
                           setValue(operation, nowHasAccess);
-                          if (!touched.current) {
-                            touched.current = true;
-                          }
+                          setTouched(true);
                         }}
-                        defaultChecked={userCanPerformAction}
                       />
                   )}
                     label={actionLabel}

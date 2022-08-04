@@ -1,19 +1,19 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Menu, MenuItem } from '@mui/material';
-import Grid from '@mui/material/Grid';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import Grid from '@mui/material/Grid';
 import Switch from '@mui/material/Switch';
+import Typography from '@mui/material/Typography';
+import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { StyledListItemText } from 'components/common/StyledListItemText';
-import { permissionLevels } from 'lib/permissions/pages/page-permission-mapping';
-import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/hooks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
-import { useRef, useState } from 'react';
-import charmClient from 'charmClient';
-import Typography from '@mui/material/Typography';
-import { PagePermissionLevelWithoutCustom } from 'lib/permissions/pages/page-permission-interfaces';
 import { usePreventReload } from 'hooks/usePreventReload';
+import { PagePermissionLevelWithoutCustom } from 'lib/permissions/pages/page-permission-interfaces';
+import { permissionLevels } from 'lib/permissions/pages/page-permission-mapping';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { useState } from 'react';
 
 const pagePermissionDescriptions: Record<PagePermissionLevelWithoutCustom, string> = {
   full_access: 'Workspace members can edit and share pages.',
@@ -29,7 +29,7 @@ export default function DefaultSpacePagePermissions () {
   const [isUpdatingPagePermission, setIsUpdatingPagePermission] = useState(false);
 
   const isAdmin = useIsAdmin();
-  const touched = useRef<boolean>(false);
+  const [touched, setTouched] = useState<boolean>(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'workspace-default-page-permission' });
 
   // Permission states
@@ -65,9 +65,10 @@ export default function DefaultSpacePagePermissions () {
   function updateSpaceDefaults () {
     updateSpaceDefaultPagePermission();
     updateSpaceDefaultPublicPages();
+    setTouched(false);
   }
 
-  usePreventReload(touched.current);
+  usePreventReload(touched);
 
   if (!space) {
     return null;
@@ -114,7 +115,7 @@ export default function DefaultSpacePagePermissions () {
                   onClick={() => {
                     setSelectedPagePermission(permissionLevel);
                     popupState.close();
-                    touched.current = true;
+                    setTouched(true);
                   }}
                 >
                   <StyledListItemText
@@ -144,11 +145,11 @@ export default function DefaultSpacePagePermissions () {
                 onChange={(ev) => {
                   const { checked: publiclyAccessible } = ev.target;
                   setDefaultPublicPages(publiclyAccessible);
-                  touched.current = true;
+                  setTouched(true);
                 }}
                 defaultChecked={defaultPublicPages}
               />
-                  )}
+            )}
             label='Accessible to public'
           />
         </Grid>

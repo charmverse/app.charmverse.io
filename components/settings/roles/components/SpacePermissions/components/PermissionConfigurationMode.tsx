@@ -13,7 +13,7 @@ import useIsAdmin from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { configurationModeDescription, configurationModeName, getTemplateExplanation } from 'lib/permissions/meta/preset-templates';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
 interface Props {
   permissionModeSelected?: (mode: SpacePermissionConfigurationMode) => void;
@@ -27,7 +27,7 @@ export default function PermissionConfigurationMode ({ permissionModeSelected = 
   const [selectedConfigurationMode, setSelectedConfigurationMode] = useState<SpacePermissionConfigurationMode>(space?.permissionConfigurationMode ?? 'custom');
 
   const [isUpdatingPermissionMode, setIsUpdatingPermissionMode] = useState(false);
-  const touched = useRef<boolean>(false);
+  const [touched, setTouched] = useState<boolean>(false);
 
   const popupState = usePopupState({ variant: 'popover', popupId: 'workspace-permission-mode' });
 
@@ -42,10 +42,11 @@ export default function PermissionConfigurationMode ({ permissionModeSelected = 
 
       setSpace(updatedSpace);
       setIsUpdatingPermissionMode(false);
+      setTouched(false);
     }
   }
 
-  usePreventReload(touched.current);
+  usePreventReload(touched);
 
   if (!space) {
     return null;
@@ -101,9 +102,7 @@ export default function PermissionConfigurationMode ({ permissionModeSelected = 
                     setSelectedConfigurationMode(mode);
                     permissionModeSelected(mode);
                     popupState.close();
-                    if (!touched.current) {
-                      touched.current = true;
-                    }
+                    setTouched(true);
                   }}
                 >
                   <StyledListItemText
