@@ -45,7 +45,9 @@ export default function BountiesPage ({ refreshBounty, publicMode = false, bount
   }, [bountiesSorted]);
 
   return (
-    <div className='focalboard-body'>
+    <div
+      className='focalboard-body full-page'
+    >
       <div className='BoardComponent'>
         <div className='top-head'>
           <Grid container display='flex' justifyContent='space-between' alignContent='center' mb={3} mt={10}>
