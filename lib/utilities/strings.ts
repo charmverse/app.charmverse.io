@@ -44,7 +44,7 @@ export function stringToColor (name: string, saturation = 50, lightness = 60) {
   return `hsl(${h}, ${saturation}%, ${lightness}%)`;
 }
 
-export const shortenHex = (hex: string, length = 4): string => {
+export const shortenHex = (hex: string = '', length = 4): string => {
   return `${hex.substring(0, length + 2)}…${hex.substring(hex.length - length)}`;
 };
 
