@@ -39,14 +39,13 @@ interface Props {
   submission?: Application,
   bountyId: string,
   onSubmit?: (submission: Application) => void
-  showHeader?: boolean
   readOnly?: boolean
   permissions: AssignedBountyPermissions,
   expandedOnLoad?: boolean
 }
 
 export default function BountySubmissionForm (
-  { permissions, readOnly = false, showHeader = false, submission, onSubmit: onSubmitProp, bountyId, expandedOnLoad }: Props
+  { permissions, readOnly = false, submission, onSubmit: onSubmitProp, bountyId, expandedOnLoad }: Props
 ) {
   const [user] = useUser();
   const [isVisible, setIsVisible] = useState(expandedOnLoad ?? false);
@@ -107,27 +106,23 @@ export default function BountySubmissionForm (
           setIsVisible(!isVisible);
         }}
       >
-        {
-        showHeader && (
-          <>
-            <FormLabel sx={{
-              fontWeight: 'bold'
+        <>
+          <FormLabel sx={{
+            fontWeight: 'bold'
+          }}
+          >
+            {submission?.createdBy === user?.id ? 'Your submission' : 'Submission'}
+          </FormLabel>
+          <IconButton
+            sx={{
+              top: -2.5,
+              position: 'relative'
             }}
-            >
-              {submission?.createdBy === user?.id ? 'Your submission' : 'Submission'}
-            </FormLabel>
-            <IconButton
-              sx={{
-                top: -2.5,
-                position: 'relative'
-              }}
-              size='small'
-            >
-              {isVisible ? <KeyboardArrowUpIcon fontSize='small' /> : <KeyboardArrowDownIcon fontSize='small' />}
-            </IconButton>
-          </>
-        )
-      }
+            size='small'
+          >
+            {isVisible ? <KeyboardArrowUpIcon fontSize='small' /> : <KeyboardArrowDownIcon fontSize='small' />}
+          </IconButton>
+        </>
       </Stack>
       <Collapse in={isVisible} timeout='auto' unmountOnExit>
         {readOnly && submission?.walletAddress && (

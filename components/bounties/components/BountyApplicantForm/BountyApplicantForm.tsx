@@ -1,14 +1,14 @@
 import { Box, Button, Tooltip } from '@mui/material';
 import { Application, Bounty } from '@prisma/client';
-import { useState } from 'react';
 import { useBounties } from 'hooks/useBounties';
-import { useUser } from 'hooks/useUser';
-import { countValidSubmissions, submissionsCapReached } from 'lib/applications/shared';
-import { AssignedBountyPermissions } from 'lib/bounties';
 import { useContributors } from 'hooks/useContributors';
+import { useUser } from 'hooks/useUser';
+import { submissionsCapReached } from 'lib/applications/shared';
+import { AssignedBountyPermissions } from 'lib/bounties';
+import { useState } from 'react';
 import { ApplicationEditorForm } from './components/ApplicationEditorForm';
-import SubmissionEditorForm from './components/SubmissionEditorForm';
 import SignupButton from './components/BountySignupButton';
+import SubmissionEditorForm from './components/SubmissionEditorForm';
 
 interface BountyApplicationFormProps {
   permissions: AssignedBountyPermissions
@@ -31,7 +31,7 @@ export default function BountyApplicantForm (props: BountyApplicationFormProps) 
     submissions
   });
 
-  const canCreateSubmission = !userApplication && !bounty.submissionsLocked
+  const canCreateApplication = !userApplication && !bounty.submissionsLocked
     && !capReached
     && permissions?.userPermissions.work;
 
@@ -61,7 +61,7 @@ export default function BountyApplicantForm (props: BountyApplicationFormProps) 
           <Tooltip placement='top' title={newSubmissionTooltip} arrow>
             <span>
               <Button
-                disabled={!canCreateSubmission}
+                disabled={!canCreateApplication}
                 onClick={() => {
                   setShowApplication(true);
                 }}
@@ -81,7 +81,6 @@ export default function BountyApplicantForm (props: BountyApplicationFormProps) 
           onCancel={() => {
             setShowApplication(false);
           }}
-          showHeader
         />
       )
     );
@@ -100,14 +99,12 @@ export default function BountyApplicantForm (props: BountyApplicationFormProps) 
           onCancel={() => {
             setShowApplication(false);
           }}
-          showHeader
         />
 
         {
           userApplication.status !== 'applied' && (
             <SubmissionEditorForm
               bountyId={bounty.id}
-              showHeader
               onSubmit={async () => {
                 await refreshSubmissions();
                 await refreshBounty(bounty.id);
