@@ -7,6 +7,7 @@ import { handleDiscordResponse } from 'lib/discord/handleDiscordResponse';
 import { findOrCreateRoles } from 'lib/roles/createRoles';
 import { assignRolesFromDiscord, DiscordGuildMember } from 'lib/discord/assignRoles';
 import { DiscordServerRole } from 'lib/discord/interface';
+import { isTruthy } from 'lib/utilities/types';
 
 const handler = nc({
   onError,
@@ -73,9 +74,28 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
     }
   });
 
-  // TODO: How to handle error fetching a single user
-  const discordGuildMemberResponses = await Promise.all(discordConnectedMembers.map(discordConnectedMember => (handleDiscordResponse<DiscordGuildMember>(`https://discord.com/api/v8/guilds/${guildId}/members/${discordConnectedMember.discordUser!.discordId}`) as Promise<{status: 'success', data: DiscordGuildMember}>)));
-  discordGuildMembers.push(...discordGuildMemberResponses.filter(discordGuildMemberResponse => discordGuildMemberResponse.status === 'success').map((discordGuildMemberResponse) => discordGuildMemberResponse.data));
+  const discordGuildMemberResponses = await Promise.all(
+    discordConnectedMembers.map(
+      discordConnectedMember => (
+        new Promise<DiscordGuildMember | null>((resolve) => {
+          handleDiscordResponse<DiscordGuildMember>(
+            `https://discord.com/api/v8/guilds/${guildId}/members/${discordConnectedMember.discordUser!.discordId}`
+          ).then(resolvedData => {
+            if (resolvedData.status === 'success') {
+              resolve(resolvedData.data);
+            }
+            else {
+              resolve(null);
+            }
+          }).catch(() => {
+            resolve(null);
+          });
+        })
+      )
+    )
+  );
+
+  discordGuildMembers.push(...discordGuildMemberResponses.filter(isTruthy));
 
   const rolesRecord = await findOrCreateRoles(discordServerRoles, spaceId, req.session.user.id);
   // Remove the roles imported from guild.xyz
