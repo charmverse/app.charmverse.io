@@ -13,7 +13,7 @@ import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
 import { SpaceOperation } from '@prisma/client';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useNavigationLock } from 'hooks/useNavigationLock';
+import { usePreventReload } from 'hooks/usePreventReload';
 import { AssignablePermissionGroups } from 'lib/permissions/interfaces';
 import { AvailableSpacePermissions, spaceOperationLabels, spaceOperations, SpacePermissionFlags } from 'lib/permissions/spaces/client';
 import { useForm } from 'react-hook-form';
@@ -50,17 +50,14 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
   const {
     handleSubmit,
     setValue,
-    watch,
-    getValues
+    watch
   } = useForm<FormValues>({
     mode: 'onChange',
     defaultValues: assignedPermissions ?? new AvailableSpacePermissions().empty,
     resolver: yupResolver(schema)
   });
 
-  useNavigationLock(touched.current, () => {
-    submitted(getValues());
-  });
+  usePreventReload(touched.current);
 
   const newValues = watch();
 

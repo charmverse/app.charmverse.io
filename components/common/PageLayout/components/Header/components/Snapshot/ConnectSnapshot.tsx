@@ -6,7 +6,7 @@ import charmClient from 'charmClient';
 import FieldLabel from 'components/common/form/FieldLabel';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useNavigationLock } from 'hooks/useNavigationLock';
+import { usePreventReload } from 'hooks/usePreventReload';
 import { getSnapshotSpace } from 'lib/snapshot/get-space';
 import { SystemError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
@@ -42,8 +42,7 @@ export default function ConnectSnapshot () {
     register,
     handleSubmit,
     watch,
-    formState: { errors, isValid, isDirty },
-    getValues
+    formState: { errors, isValid, isDirty }
   } = useForm<FormValues>({
     defaultValues: {
       defaultVotingDuration: space?.defaultVotingDuration ?? DEFAULT_VOTING_DURATION,
@@ -67,9 +66,7 @@ export default function ConnectSnapshot () {
     }
   }
 
-  useNavigationLock(isDirty, async () => {
-    await onSubmit(getValues());
-  });
+  usePreventReload(isDirty);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>

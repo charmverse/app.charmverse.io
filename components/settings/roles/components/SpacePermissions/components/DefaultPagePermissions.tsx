@@ -13,7 +13,7 @@ import { useRef, useState } from 'react';
 import charmClient from 'charmClient';
 import Typography from '@mui/material/Typography';
 import { PagePermissionLevelWithoutCustom } from 'lib/permissions/pages/page-permission-interfaces';
-import { useNavigationLock } from 'hooks/useNavigationLock';
+import { usePreventReload } from 'hooks/usePreventReload';
 
 const pagePermissionDescriptions: Record<PagePermissionLevelWithoutCustom, string> = {
   full_access: 'Workspace members can edit and share pages.',
@@ -67,9 +67,7 @@ export default function DefaultSpacePagePermissions () {
     updateSpaceDefaultPublicPages();
   }
 
-  useNavigationLock(touched.current, () => {
-    updateSpaceDefaults();
-  });
+  usePreventReload(touched.current);
 
   if (!space) {
     return null;

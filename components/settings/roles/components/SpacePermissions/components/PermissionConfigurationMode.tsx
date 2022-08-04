@@ -10,7 +10,7 @@ import Button from 'components/common/Button';
 import { StyledListItemText } from 'components/common/StyledListItemText';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
-import { useNavigationLock } from 'hooks/useNavigationLock';
+import { usePreventReload } from 'hooks/usePreventReload';
 import { configurationModeDescription, configurationModeName, getTemplateExplanation } from 'lib/permissions/meta/preset-templates';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useRef, useState } from 'react';
@@ -45,9 +45,7 @@ export default function PermissionConfigurationMode ({ permissionModeSelected = 
     }
   }
 
-  useNavigationLock(touched.current, () => {
-    updateSettings();
-  });
+  usePreventReload(touched.current);
 
   if (!space) {
     return null;

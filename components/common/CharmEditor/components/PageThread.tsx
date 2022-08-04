@@ -18,7 +18,7 @@ import { DateTime } from 'luxon';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { usePopupState, bindMenu } from 'material-ui-popup-state/hooks';
 import { BoxProps } from '@mui/system';
-import { useNavigationLock } from 'hooks/useNavigationLock';
+import { usePreventReload } from 'hooks/usePreventReload';
 import InlineCharmEditor from '../InlineCharmEditor';
 import { checkForEmpty } from '../utils';
 import { scrollToThread } from './inlineComment/inlineComment.utils';
@@ -105,11 +105,7 @@ function AddCommentCharmEditor (
 
   const touched = useRef(false);
 
-  useNavigationLock(touched.current, () => {
-    if (commentContent) {
-      addComment(threadId, commentContent);
-    }
-  });
+  usePreventReload(touched.current);
 
   return (
     <Box display='flex' px={1} pb={1} sx={sx} flexDirection='column' gap={1} mt={thread.comments.length !== 0 ? 1 : 0}>

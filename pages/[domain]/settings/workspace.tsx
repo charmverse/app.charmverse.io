@@ -16,7 +16,7 @@ import Legend from 'components/settings/Legend';
 import ImportNotionWorkspace from 'components/settings/workspace/ImportNotionWorkspace';
 import Avatar from 'components/settings/workspace/LargeAvatar';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useNavigationLock } from 'hooks/useNavigationLock';
+import { usePreventReload } from 'hooks/usePreventReload';
 import { setTitle } from 'hooks/usePageTitle';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
@@ -42,7 +42,6 @@ export default function WorkspaceSettings () {
     reset,
     setValue,
     watch,
-    getValues,
     formState: { errors, isDirty }
   } = useForm<FormValues>({
     defaultValues: space,
@@ -74,9 +73,7 @@ export default function WorkspaceSettings () {
     workspaceRemoveModalState.open();
   }
 
-  useNavigationLock(isDirty, () => {
-    onSubmit(getValues());
-  });
+  usePreventReload(isDirty);
 
   return (
     <>
