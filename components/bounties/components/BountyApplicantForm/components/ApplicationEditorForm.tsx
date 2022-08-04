@@ -149,8 +149,20 @@ export function ApplicationEditorForm ({ showHeader = false, readOnly = false, o
 
             {!readOnly && (
             <Grid item display='flex' gap={1}>
-              <Button disabled={!isValid} type='submit'>{mode === 'create' ? ' Submit' : 'Update'}</Button>
-              {onCancel && <Button onClick={onCancel} variant='outlined' color='secondary'>Cancel</Button>}
+              <Button
+                disabled={!isValid}
+                type='submit'
+              >{mode === 'create' ? ' Submit' : 'Update'}
+              </Button>
+              <Button
+                onClick={() => {
+                  onCancel?.();
+                  setIsVisible(false);
+                }}
+                variant='outlined'
+                color='secondary'
+              >Cancel
+              </Button>
             </Grid>
             )}
           </Grid>

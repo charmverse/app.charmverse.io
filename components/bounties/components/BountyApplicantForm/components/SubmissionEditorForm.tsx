@@ -91,6 +91,7 @@ export default function BountySubmissionForm (
       if (onSubmitProp) {
         onSubmitProp(application);
       }
+      setIsVisible(false);
     }
     catch (err: any) {
       setFormError(err);
@@ -106,27 +107,6 @@ export default function BountySubmissionForm (
           setIsVisible(!isVisible);
         }}
       >
-        {readOnly && submission?.walletAddress && (
-        <Typography sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1
-        }}
-        >
-          Payment address:
-          <Link
-            sx={{
-              display: 'flex',
-              alignItems: 'center'
-            }}
-            external
-            target='_blank'
-            href={`https://etherscan.io/address/${submission.walletAddress}`}
-          >{shortenHex(submission.walletAddress)}
-            <OpenInNewIcon fontSize='small' />
-          </Link>
-        </Typography>
-        )}
         {
         showHeader && (
           <>
@@ -150,6 +130,27 @@ export default function BountySubmissionForm (
       }
       </Stack>
       <Collapse in={isVisible} timeout='auto' unmountOnExit>
+        {readOnly && submission?.walletAddress && (
+        <Typography sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1
+        }}
+        >
+          Payment address:
+          <Link
+            sx={{
+              display: 'flex',
+              alignItems: 'center'
+            }}
+            external
+            target='_blank'
+            href={`https://etherscan.io/address/${submission.walletAddress}`}
+          >{shortenHex(submission.walletAddress)}
+            <OpenInNewIcon fontSize='small' />
+          </Link>
+        </Typography>
+        )}
         <form onSubmit={handleSubmit(onSubmit)} style={{ margin: 'auto', width: '100%' }}>
           <Grid container direction='column' spacing={2}>
 
@@ -207,7 +208,19 @@ export default function BountySubmissionForm (
 
             {!readOnly && (
             <Grid item display='flex' gap={1}>
-              <Button disabled={!isValid} type='submit'>Submit</Button>
+              <Button disabled={!isValid} type='submit'>
+                {
+                  submission?.submission ? 'Update' : 'Submit'
+                }
+              </Button>
+              <Button
+                onClick={() => {
+                  setIsVisible(false);
+                }}
+                variant='outlined'
+                color='secondary'
+              >Cancel
+              </Button>
             </Grid>
             )}
           </Grid>
