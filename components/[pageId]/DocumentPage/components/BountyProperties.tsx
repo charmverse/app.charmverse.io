@@ -6,6 +6,7 @@ import charmClient from 'charmClient';
 import BountyApplicantForm from 'components/bounties/components/BountyApplicantForm';
 import BountyHeader from 'components/bounties/components/BountyHeader';
 import BountyReviewers from 'components/bounties/components/BountyReviewers';
+import BountySlots from 'components/bounties/components/BountySlots';
 import BountySubmissionsTable from 'components/bounties/components/BountySubmissionsTable';
 import BountySuggestionApproval from 'components/bounties/components/BountySuggestionApproval';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
@@ -398,6 +399,11 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
                 bounty={bounty}
                 permissions={permissions}
               />
+              <hr />
+              <BountySlots
+                bounty={bounty}
+                submissions={bounty.applications}
+              />
             </Stack>
           ) : (
             <div
@@ -458,7 +464,7 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
         )
       }
 
-      {permissions && bounty.status !== 'suggestion' && (
+      {permissions?.userPermissions?.review && bounty.status !== 'suggestion' && (
         <>
           <BountySubmissionsTable
             bounty={currentBounty}

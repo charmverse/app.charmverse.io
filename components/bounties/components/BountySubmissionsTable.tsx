@@ -259,7 +259,7 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
           )}
         </Box>
       </Box>
-      {(permissions.userPermissions.review) && (
+      {
         applications.length === 0 ? (
           <Box
             my={3}
@@ -318,8 +318,8 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
               ))}
             </TableBody>
           </Table>
-        ))}
-
+        )
+      }
     </>
   );
 }
