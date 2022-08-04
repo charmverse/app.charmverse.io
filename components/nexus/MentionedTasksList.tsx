@@ -25,7 +25,6 @@ function MentionedTaskRow (
     createdBy,
     text,
     bountyId,
-    bountyTitle,
     type,
     commentId
   }: MentionedTask & { marked: boolean }
@@ -35,13 +34,13 @@ function MentionedTaskRow (
   let mentionLink = '';
   let mentionTitle = '';
 
-  if (type === 'bounty') {
-    mentionLink = `${baseUrl}/${spaceDomain}/bounties/${bountyId}?mentionId=${mentionId}`;
-    mentionTitle = `${bountyTitle || 'Untitled'} in ${spaceName}`;
+  if (type === 'bounty' && bountyId) {
+    mentionLink = `${baseUrl}/${spaceDomain}/bounties?bountyId=${bountyId}`;
+    mentionTitle = `${pageTitle} in ${spaceName}`;
   }
   else if (type === 'page') {
     mentionLink = `${baseUrl}/${spaceDomain}/${pagePath}?${commentId ? `commentId=${commentId}` : `mentionId=${mentionId}`}`;
-    mentionTitle = `${pageTitle || 'Untitled'} in ${spaceName}`;
+    mentionTitle = `${pageTitle} in ${spaceName}`;
   }
 
   return (
