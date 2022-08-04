@@ -23,61 +23,35 @@ type Props = {
 }
 
 const CommentsList = React.memo((props: Props) => {
-  const [newComment, setNewComment] = useState<CommentBlock['fields'] | null>(null);
   const [currentUser] = useUser();
   const [contributors] = useContributors();
 
-  const onSendClicked = () => {
-    if (newComment) {
-      const { rootId, cardId } = props;
-      Utils.log(`Send comment: ${newComment.contentText}`);
-      Utils.assertValue(cardId);
+  const onSendClicked = (newComment: CommentBlock['fields']) => {
+    const { rootId, cardId } = props;
+    Utils.log(`Send comment: ${newComment.contentText}`);
+    Utils.assertValue(cardId);
 
-      const comment = createCommentBlock();
-      const { content, contentText } = newComment;
-      comment.parentId = cardId;
-      comment.rootId = rootId;
-      comment.title = contentText || '';
-      comment.fields = { content }
-      mutator.insertBlock(comment, 'add comment');
-      setNewComment(null);
-    }
+    const comment = createCommentBlock();
+    const { content, contentText } = newComment;
+    comment.parentId = cardId;
+    comment.rootId = rootId;
+    comment.title = contentText || '';
+    comment.fields = { content }
+    mutator.insertBlock(comment, 'add comment');
   };
 
   const { comments } = props;
-  const intl = useIntl();
-
-  const newCommentComponent = (
-    <div className='CommentsList__new'>
-      <Avatar size='xSmall' name={currentUser?.username} avatar={currentUser?.avatar} />
-      <InlineCharmEditor
-        key={comments.length} // use the size of comments so it resets when the new one is added
-        onContentChange={({ doc, rawText }) => {
-          setNewComment({ content: doc, contentText: rawText });
-        }}
-        placeholderText={intl.formatMessage({ id: 'CardDetail.new-comment-placeholder', defaultMessage: 'Add a comment...' })}
-        style={{ fontSize: '14px' }}
-      />
-
-      {newComment
-        && (
-        <Button
-          filled={true}
-          onClick={onSendClicked}
-        >
-          <FormattedMessage
-            id='CommentsList.send'
-            defaultMessage='Send'
-          />
-        </Button>
-      )}
-    </div>
-  );
 
   return (
     <div className='CommentsList'>
       {/* New comment */}
-      {!props.readonly && newCommentComponent}
+      {!props.readonly && (
+        <NewCommentInput
+          avatar={currentUser?.avatar}
+          username={currentUser?.username}
+          onSubmit={onSendClicked}
+        />
+      )}
 
       {comments.slice(0).reverse().map((comment) => (
         <Comment
@@ -93,5 +67,48 @@ const CommentsList = React.memo((props: Props) => {
     </div>
   );
 });
+
+interface NewCommentProps {
+  initialValue?: any | null;
+  key?: string | number;
+  username?: string;
+  avatar?: string | null;
+  onSubmit: (i: CommentBlock['fields']) => void;
+}
+
+export function NewCommentInput ({ initialValue, key, username, avatar, onSubmit }: NewCommentProps) {
+
+  const intl = useIntl();
+  const [newComment, setNewComment] = useState<CommentBlock['fields'] | null>(null);
+
+  return (
+    <div className='CommentsList__new'>
+      <Avatar size='xSmall' name={username} avatar={avatar} />
+      <InlineCharmEditor
+        content={initialValue}
+        key={key} // use the size of comments so it resets when the new one is added
+        onContentChange={({ doc, rawText }) => {
+          setNewComment({ content: doc, contentText: rawText });
+        }}
+        placeholderText={intl.formatMessage({ id: 'CardDetail.new-comment-placeholder', defaultMessage: 'Add a comment...' })}
+        style={{ fontSize: '14px' }}
+      />
+
+      {newComment
+        && (
+        <Button
+          filled={true}
+          onClick={() => onSubmit(newComment)}
+        >
+          <FormattedMessage
+            id='CommentsList.send'
+            defaultMessage='Send'
+          />
+        </Button>
+      )}
+    </div>
+  );
+}
+
 
 export default CommentsList;

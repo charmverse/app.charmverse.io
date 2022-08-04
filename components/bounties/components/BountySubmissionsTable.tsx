@@ -4,9 +4,9 @@ import { LockOpen } from '@mui/icons-material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import LockIcon from '@mui/icons-material/Lock';
-import { Collapse, IconButton, Stack, Tooltip } from '@mui/material';
+import { Collapse, IconButton, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
+import Button from 'components/common/Button';
 import Chip from '@mui/material/Chip';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -17,6 +17,7 @@ import Typography from '@mui/material/Typography';
 import { ApplicationStatus } from '@prisma/client';
 import charmClient from 'charmClient';
 import { createCommentBlock, CommentBlock } from 'components/common/BoardEditor/focalboard/src/blocks/commentBlock';
+import { NewCommentInput } from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import FieldLabel from 'components/common/form/FieldLabel';
 import UserDisplay from 'components/common/UserDisplay';
@@ -184,21 +185,15 @@ function BountySubmissionsTableRow ({
             {permissions.userPermissions.review && submission.status !== 'rejected' && submission.createdBy !== user?.id && (
               <>
                 <FieldLabel>Message for Applicant (optional)</FieldLabel>
-                <Box display='flex' mb={3} gap={1}>
-                  <InlineCharmEditor
-                      // set a key so that it reloads the editor once we set the default value
+                <div className='CommentsList'>
+                  <NewCommentInput
+                    initialValue={newComment?.content}
                     key={newComment ? 'ready' : 'loading'}
-                    content={newComment?.content}
-                    onContentChange={({ doc, rawText }) => {
-                      setNewComment({ content: doc, contentText: rawText });
-                    }}
-                    placeholderText='Add a comment...'
-                    style={{ border: '1px solid var(--input-border)', backgroundColor: 'var(--input-bg)' }}
+                    username={user?.username}
+                    avatar={user?.avatar}
+                    onSubmit={onSendClicked}
                   />
-                  <Button onClick={onSendClicked}>
-                    Send
-                  </Button>
-                </Box>
+                </div>
               </>
             )}
           </Collapse>
@@ -213,14 +208,19 @@ function getContentWithMention ({ myUserId, targetUserId }: { myUserId: string, 
     type: 'doc',
     content: [{
       type: 'paragraph',
-      content: [{ type: 'mention',
+      content: [{
+        type: 'mention',
         attrs: {
           id: uuid(),
           type: 'user',
           value: targetUserId,
           createdAt: new Date().toISOString(),
           createdBy: myUserId
-        } }]
+        }
+      }, {
+        type: 'text',
+        text: ' '
+      }]
     }]
   };
 }
