@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import log from 'lib/log';
-import { getCookie, deleteCookie } from 'lib/browser';
+import { getCookie, deleteCookie, silentlyUpdateURL } from 'lib/browser';
 import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/discord/constants';
 
 interface State {
@@ -84,6 +84,7 @@ export default function DiscordProvider ({ children }: Props) {
           setDiscordError(err.message || err.error || 'Something went wrong. Please try again');
         })
         .finally(() => {
+          silentlyUpdateURL(window.location.href.split('?')[0]);
           setIsConnectDiscordLoading(false);
         });
     }
