@@ -128,6 +128,11 @@ export default function BountySubmissionReviewActions (
       </Box>
 
       {
+        submission.status === 'inProgress' && submission.createdBy === user?.id && (
+          <Typography variant='body2' color='secondary'>Awaiting submission</Typography>
+        )
+      }
+      {
         submission.status === 'review' && submission.createdBy === user?.id && (
           <Typography variant='body2' color='secondary'>Awaiting review</Typography>
         )
