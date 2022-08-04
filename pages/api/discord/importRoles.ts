@@ -1,13 +1,12 @@
-import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from 'db';
-import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
-import nc from 'next-connect';
-import { withSessionRoute } from 'lib/session/withSession';
-import { handleDiscordResponse } from 'lib/discord/handleDiscordResponse';
-import { findOrCreateRoles } from 'lib/roles/createRoles';
 import { assignRolesFromDiscord, DiscordGuildMember } from 'lib/discord/assignRoles';
+import { handleDiscordResponse } from 'lib/discord/handleDiscordResponse';
 import { DiscordServerRole } from 'lib/discord/interface';
-import { isTruthy } from 'lib/utilities/types';
+import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
+import { findOrCreateRoles } from 'lib/roles/createRoles';
+import { withSessionRoute } from 'lib/session/withSession';
+import { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc({
   onError,
@@ -76,26 +75,17 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
 
   const discordGuildMemberResponses = await Promise.all(
     discordConnectedMembers.map(
-      discordConnectedMember => (
-        new Promise<DiscordGuildMember | null>((resolve) => {
-          handleDiscordResponse<DiscordGuildMember>(
-            `https://discord.com/api/v8/guilds/${guildId}/members/${discordConnectedMember.discordUser!.discordId}`
-          ).then(resolvedData => {
-            if (resolvedData.status === 'success') {
-              resolve(resolvedData.data);
-            }
-            else {
-              resolve(null);
-            }
-          }).catch(() => {
-            resolve(null);
-          });
-        })
+      discordConnectedMember => handleDiscordResponse<DiscordGuildMember>(
+        `https://discord.com/api/v8/guilds/${guildId}/members/${discordConnectedMember.discordUser!.discordId}`
       )
     )
-  );
+  ) as {status: 'success', data: DiscordGuildMember | null}[];
 
-  discordGuildMembers.push(...discordGuildMemberResponses.filter(isTruthy));
+  discordGuildMemberResponses.forEach(discordGuildMemberResponse => {
+    if (discordGuildMemberResponse.status === 'success' && discordGuildMemberResponse.data) {
+      discordGuildMembers.push(discordGuildMemberResponse.data);
+    }
+  });
 
   const rolesRecord = await findOrCreateRoles(discordServerRoles, spaceId, req.session.user.id);
   // Remove the roles imported from guild.xyz
