@@ -463,12 +463,19 @@ export default function BountyProperties (props: {
 
       {// Bounty creator cannot apply to their own bounty
         permissions && bounty.createdBy !== user?.id && (
-          <BountyApplicantForm
-            bounty={bounty}
-            submissions={applications}
-            permissions={permissions}
-            refreshSubmissions={refreshSubmissions}
-          />
+          <>
+            <BountyApplicantForm
+              bounty={bounty}
+              submissions={applications}
+              permissions={permissions}
+              refreshSubmissions={refreshSubmissions}
+            />
+            <Divider
+              sx={{
+                my: 3
+              }}
+            />
+          </>
         )
       }
 

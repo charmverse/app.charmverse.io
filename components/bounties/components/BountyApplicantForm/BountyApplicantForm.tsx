@@ -52,53 +52,53 @@ export default function BountyApplicantForm (props: BountyApplicationFormProps) 
         </Tooltip>
       </Box>
     );
+
+  // Submissions cap exists and user has not applied yet
   }
-
-  switch (true) {
-    // Submissions cap exists and user has not applied yet
-    case !userApplication && bounty.approveSubmitters:
-      return (
-        !showApplication ? (
-          <Box display='flex' justifyContent='center' my={3}>
-            <Tooltip placement='top' title={newSubmissionTooltip} arrow>
-              <span>
-                <Button
-                  disabled={!canCreateApplication}
-                  onClick={() => {
-                    setShowApplication(true);
-                  }}
-                >
-                  Apply to this bounty
-                </Button>
-              </span>
-            </Tooltip>
-          </Box>
-        ) : (
-          <ApplicationEditorForm
-            bountyId={bounty.id}
-            mode='create'
-            onSubmit={() => {
-              setShowApplication(false);
-            }}
-            onCancel={() => {
-              setShowApplication(false);
-            }}
-          />
-        )
-      );
+  else if (!userApplication && bounty.approveSubmitters) {
+    return (
+      !showApplication ? (
+        <Box display='flex' justifyContent='center' my={3}>
+          <Tooltip placement='top' title={newSubmissionTooltip} arrow>
+            <span>
+              <Button
+                disabled={!canCreateApplication}
+                onClick={() => {
+                  setShowApplication(true);
+                }}
+              >
+                Apply to this bounty
+              </Button>
+            </span>
+          </Tooltip>
+        </Box>
+      ) : (
+        <ApplicationEditorForm
+          bountyId={bounty.id}
+          mode='create'
+          onSubmit={() => {
+            setShowApplication(false);
+          }}
+          onCancel={() => {
+            setShowApplication(false);
+          }}
+        />
+      )
+    );
     // Submissions cap exists and user has applied
-    case userApplication && bounty.approveSubmitters:
-      return (
-        <>
-          <ApplicationEditorForm
-            bountyId={bounty.id}
-            proposal={userApplication}
-            mode='update'
-            onSubmit={() => {
-              setShowApplication(false);
-            }}
-          />
-          { userApplication?.status !== 'applied' && (
+  }
+  else if (userApplication && bounty.approveSubmitters) {
+    return (
+      <>
+        <ApplicationEditorForm
+          bountyId={bounty.id}
+          proposal={userApplication}
+          mode='update'
+          onSubmit={() => {
+            setShowApplication(false);
+          }}
+        />
+        { userApplication?.status !== 'applied' && (
 
           <SubmissionEditorForm
             bountyId={bounty.id}
@@ -114,45 +114,47 @@ export default function BountyApplicantForm (props: BountyApplicationFormProps) 
               setShowApplication(false);
             }}
           />
-          )}
-        </>
-      );
+        )}
+      </>
+    );
     // When we don't need to apply
-    case !bounty.approveSubmitters:
-      return (
-        !showApplication && !userApplication ? (
-          <Box display='flex' justifyContent='center' my={3}>
-            <Tooltip placement='top' title={newSubmissionTooltip} arrow>
-              <span>
-                <Button
-                  disabled={!canCreateApplication}
-                  onClick={() => {
-                    setShowApplication(true);
-                  }}
-                >
-                  New submission
-                </Button>
-              </span>
-            </Tooltip>
-          </Box>
-        ) : (
-          <SubmissionEditorForm
-            bountyId={bounty.id}
-            onSubmit={async () => {
-              await refreshSubmissions();
-              await refreshBounty(bounty.id);
-              setShowApplication(false);
-            }}
-            onCancel={() => {
-              setShowApplication(false);
-            }}
-            submission={userApplication}
-            permissions={permissions}
-            expandedOnLoad={true}
-          />
-        )
-      );
-    default:
-      return null;
+  }
+  else if (!bounty.approveSubmitters) {
+    return (
+      !showApplication && !userApplication ? (
+        <Box display='flex' justifyContent='center' my={3}>
+          <Tooltip placement='top' title={newSubmissionTooltip} arrow>
+            <span>
+              <Button
+                disabled={!canCreateApplication}
+                onClick={() => {
+                  setShowApplication(true);
+                }}
+              >
+                New submission
+              </Button>
+            </span>
+          </Tooltip>
+        </Box>
+      ) : (
+        <SubmissionEditorForm
+          bountyId={bounty.id}
+          onSubmit={async () => {
+            await refreshSubmissions();
+            await refreshBounty(bounty.id);
+            setShowApplication(false);
+          }}
+          onCancel={() => {
+            setShowApplication(false);
+          }}
+          submission={userApplication}
+          permissions={permissions}
+          expandedOnLoad={true}
+        />
+      )
+    );
+  }
+  else {
+    return null;
   }
 }
