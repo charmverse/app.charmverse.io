@@ -16,6 +16,7 @@ import * as yup from 'yup';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { FormMode } from '../../BountyEditorForm';
+import BountySubmissionStatus from './BountySubmissionStatus';
 
 /**
  * @expandedOnLoad Use this to expand the application initially
@@ -27,7 +28,6 @@ interface IApplicationFormProps {
   proposal?: Application
   onCancel?: () => void
   readOnly?: boolean
-  showHeader?: boolean
   expandedOnLoad?: boolean
 }
 
@@ -37,7 +37,7 @@ export const schema = yup.object({
 
 type FormValues = yup.InferType<typeof schema>
 
-export function ApplicationEditorForm ({ showHeader = false, readOnly = false, onCancel, onSubmit, bountyId, proposal, mode = 'create', expandedOnLoad }: IApplicationFormProps) {
+export function ApplicationEditorForm ({ readOnly = false, onCancel, onSubmit, bountyId, proposal, mode = 'create', expandedOnLoad }: IApplicationFormProps) {
   const { refreshBounty } = useBounties();
   const [isVisible, setIsVisible] = useState(mode === 'create' || expandedOnLoad);
   const [user] = useUser();
@@ -83,34 +83,37 @@ export function ApplicationEditorForm ({ showHeader = false, readOnly = false, o
 
   return (
     <Stack my={1} gap={1}>
-      {
-        showHeader && (
-        <Stack
-          flexDirection='row'
-          gap={0.5}
-          onClick={() => {
-            setIsVisible(!isVisible);
+      <Stack
+        flexDirection='row'
+        gap={0.5}
+        onClick={() => {
+          setIsVisible(!isVisible);
+        }}
+      >
+        <FormLabel
+          sx={{
+            fontWeight: 'bold'
           }}
         >
-          <FormLabel
-            sx={{
-              fontWeight: 'bold'
-            }}
-          >
-            {proposal?.createdBy === user?.id ? 'Your application' : 'Application'}
-          </FormLabel>
-          <IconButton
-            sx={{
-              top: -2.5,
-              position: 'relative'
-            }}
-            size='small'
-          >
-            {isVisible ? <KeyboardArrowUpIcon fontSize='small' /> : <KeyboardArrowDownIcon fontSize='small' />}
-          </IconButton>
-        </Stack>
-        )
-      }
+          {proposal?.createdBy === user?.id ? 'Your application' : 'Application'}
+
+          {
+          proposal && proposal.status === 'applied' && proposal.createdBy === user?.id && (
+            <BountySubmissionStatus submission={proposal} />
+          )
+        }
+        </FormLabel>
+        <IconButton
+          sx={{
+            top: -2.5,
+            position: 'relative'
+          }}
+          size='small'
+        >
+          {isVisible ? <KeyboardArrowUpIcon fontSize='small' /> : <KeyboardArrowDownIcon fontSize='small' />}
+        </IconButton>
+
+      </Stack>
       <Collapse in={isVisible} timeout='auto' unmountOnExit>
         <form onSubmit={handleSubmit(formValue => submitted(formValue as Application))} style={{ margin: 'auto', width: '100%' }}>
           <Grid container direction='column' spacing={3}>
@@ -168,6 +171,7 @@ export function ApplicationEditorForm ({ showHeader = false, readOnly = false, o
           </Grid>
 
         </form>
+
       </Collapse>
     </Stack>
   );

@@ -16,6 +16,7 @@ interface Props {
   tokenSymbolOrAddress: string;
   chainIdToUse: number
   onSuccess?: (txId: string, chainId: number) => void;
+  onClick?: () => void
   onError?: (err: any, severity?: AlertColor) => void;
   children?: React.ReactChild | React.ReactChild[];
 }
@@ -91,6 +92,7 @@ export default function BountyPaymentButton ({
   chainIdToUse,
   tokenSymbolOrAddress,
   onSuccess = (tx: string, chainId: number) => {},
+  onClick = () => null,
   onError = () => {},
   children = 'Make payment'
 }: Props) {
@@ -194,7 +196,10 @@ export default function BountyPaymentButton ({
     <Button
       variant='outlined'
       color='secondary'
-      onClick={makePayment}
+      onClick={() => {
+        onClick();
+        makePayment();
+      }}
     >{children}
     </Button>
   );

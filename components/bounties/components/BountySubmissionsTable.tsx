@@ -23,7 +23,7 @@ import { useBounties } from 'hooks/useBounties';
 import { useContributors } from 'hooks/useContributors';
 import { useUser } from 'hooks/useUser';
 import { ApplicationWithTransactions } from 'lib/applications/actions';
-import { countValidSubmissions, submissionsCapReached as submissionsCapReachedFn } from 'lib/applications/shared';
+import { applicantIsSubmitter, countValidSubmissions, submissionsCapReached as submissionsCapReachedFn } from 'lib/applications/shared';
 import { AssignedBountyPermissions } from 'lib/bounties/interfaces';
 import { isBountyLockable } from 'lib/bounties/shared';
 import { humanFriendlyDate } from 'lib/utilities/dates';
@@ -125,15 +125,13 @@ function BountySubmissionsTableRow ({
         </TableCell>
         <TableCell align='right'>
           <Box display='flex' justifyContent='left' gap={2}>
-            {submission.status !== 'inProgress' && (
-              <BountySubmissionReviewActions
-                bounty={bounty}
-                submission={submission}
-                reviewComplete={() => { }}
-                permissions={permissions}
-                submissionsCapReached={submissionsCapReached}
-              />
-            )}
+            <BountySubmissionReviewActions
+              bounty={bounty}
+              submission={submission}
+              reviewComplete={() => { }}
+              permissions={permissions}
+              submissionsCapReached={submissionsCapReached}
+            />
           </Box>
         </TableCell>
       </TableRow>
@@ -146,13 +144,13 @@ function BountySubmissionsTableRow ({
                   bountyId={bounty.id}
                   readOnly={user?.id !== submission.createdBy || (submission.status !== 'inProgress' && submission.status !== 'review')}
                   submission={submission}
-                  showHeader
                   onSubmit={async () => {
                     await refreshSubmissions();
                     await refreshBounty(bounty.id);
                     setIsViewingDetails(false);
                   }}
                   permissions={permissions}
+                  expandedOnLoad={true}
                 />
               </Box>
             )}
@@ -162,44 +160,34 @@ function BountySubmissionsTableRow ({
                 proposal={submission}
                 readOnly={user?.id !== submission.createdBy || submission.status !== 'applied'}
                 mode='update'
-                showHeader
               />
             )}
 
-            {permissions.userPermissions.review && submission.status !== 'rejected' && submission.createdBy !== user?.id && (
-              <>
-                <Stack mt={1}>
-                  <FieldLabel>Message for Applicant (optional)</FieldLabel>
-                  <Stack mb={1} flexDirection='row' gap={1}><TextField
-                    value={applicationComment}
-                    onChange={(e) => {
-                      setApplicationComment(e.target.value);
+            {// Reviewer cannot review their own submission
+            permissions.userPermissions.review && submission.status !== 'rejected' && submission.createdBy !== user?.id && (
+              <Stack mt={1}>
+                <FieldLabel>Message {submission.status === 'applied' ? 'applicant' : 'submitter'}</FieldLabel>
+                <Stack mb={1} flexDirection='row' gap={1}><TextField
+                  value={applicationComment}
+                  onChange={(e) => {
+                    setApplicationComment(e.target.value);
+                  }}
+                  sx={{
+                    flexGrow: 1
+                  }}
+                />
+                  <Button
+                    disabled={applicationComment.length === 0}
+                    onClick={() => {
+                      setApplicationComment('');
+                      onSendClicked();
                     }}
-                    sx={{
-                      flexGrow: 1
-                    }}
-                  />
-                    <Button
-                      disabled={applicationComment.length === 0}
-                      onClick={() => {
-                        setApplicationComment('');
-                        onSendClicked();
-                      }}
-                    >Send
-                    </Button>
-                  </Stack>
+                  >Send
+                  </Button>
                 </Stack>
-                <Box width='100%' display='flex' gap={1} my={2} justifyContent='center'>
-                  <BountySubmissionReviewActions
-                    bounty={bounty}
-                    submission={submission}
-                    reviewComplete={() => { }}
-                    permissions={permissions}
-                    submissionsCapReached={submissionsCapReached}
-                  />
-                </Box>
-              </>
-            )}
+              </Stack>
+            )
+}
           </Collapse>
         </TableCell>
       </TableRow>
@@ -259,7 +247,7 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
           )}
         </Box>
       </Box>
-      {(permissions.userPermissions.review) && (
+      {
         applications.length === 0 ? (
           <Box
             my={3}
@@ -283,7 +271,6 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
             }}
             >
               <TableRow>
-                {/* Width should always be same as Bounty Applicant list status column, so submitter and applicant columns align */}
                 <TableCell>
                   <Box sx={{
                     display: 'flex',
@@ -319,8 +306,8 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
               ))}
             </TableBody>
           </Table>
-        ))}
-
+        )
+      }
     </>
   );
 }
