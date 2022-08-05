@@ -6,6 +6,7 @@ import charmClient from 'charmClient';
 import FieldLabel from 'components/common/form/FieldLabel';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePreventReload } from 'hooks/usePreventReload';
 import { getSnapshotSpace } from 'lib/snapshot/get-space';
 import { SystemError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
@@ -36,6 +37,7 @@ export default function ConnectSnapshot () {
 
   const [space, setSpace] = useCurrentSpace();
   const [formError, setFormError] = useState<SystemError | null>(null);
+  const [touched, setTouched] = useState<boolean>(false);
 
   const {
     register,
@@ -56,15 +58,17 @@ export default function ConnectSnapshot () {
   async function onSubmit (formValues: FormValues) {
 
     setFormError(null);
-
-    charmClient.updateSnapshotConnection(space?.id as any, formValues)
-      .then((spaceWithDomain) => {
-        setSpace(spaceWithDomain);
-      })
-      .catch(err => {
-        setFormError(err);
-      });
+    try {
+      const spaceWithDomain = await charmClient.updateSnapshotConnection(space?.id as any, formValues);
+      setSpace(spaceWithDomain);
+    }
+    catch (err) {
+      setFormError(err as any);
+    }
+    setTouched(false);
   }
+
+  usePreventReload(touched);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -72,7 +76,11 @@ export default function ConnectSnapshot () {
         <Grid item>
           <FieldLabel>Snapshot domain</FieldLabel>
           <TextField
-            {...register('snapshotDomain')}
+            {...register('snapshotDomain', {
+              onChange: () => {
+                setTouched(true);
+              }
+            })}
             fullWidth
             error={!!errors.snapshotDomain}
             helperText={errors.snapshotDomain?.message}
@@ -83,7 +91,11 @@ export default function ConnectSnapshot () {
             <Grid item>
               <FieldLabel>Default voting duration (days)</FieldLabel>
               <TextField
-                {...register('defaultVotingDuration')}
+                {...register('defaultVotingDuration', {
+                  onChange: () => {
+                    setTouched(true);
+                  }
+                })}
                 fullWidth
                 error={!!errors.defaultVotingDuration}
                 helperText={errors.defaultVotingDuration?.message}
