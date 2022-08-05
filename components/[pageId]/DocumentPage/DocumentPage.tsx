@@ -193,7 +193,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
                     <hr />
                     <CommentsList
                       comments={comments}
-                      rootId={card?.rootId ?? page.spaceId}
+                      rootId={card?.rootId ?? page.id}
                       cardId={card?.id ?? page.id}
                       readonly={cannotEdit}
                     />
