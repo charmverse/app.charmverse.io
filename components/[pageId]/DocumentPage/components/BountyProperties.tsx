@@ -21,6 +21,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
 import { ApplicationWithTransactions } from 'lib/applications/interfaces';
+import { countValidSubmissions } from 'lib/applications/shared';
 import { AssignedBountyPermissions, BountyPermissions, UpdateableBountyFields } from 'lib/bounties';
 import { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import debouncePromise from 'lib/utilities/debouncePromise';
@@ -400,11 +401,17 @@ export default function BountyProperties (props: {
                 permissions={permissions}
               />
               {/* Extra space so this looks like the focalboard properties */}
-              <div style={{ marginTop: 2 }}></div>
-              <BountySlots
-                bounty={bounty}
-                submissions={bounty.applications}
-              />
+              {
+                bounty.maxSubmissions && (
+                  <>
+                    <div style={{ marginTop: 2 }}></div>
+                    <BountySlots
+                      maxSubmissions={bounty.maxSubmissions}
+                      validSubmissions={countValidSubmissions(bounty.applications)}
+                    />
+                  </>
+                )
+              }
             </Stack>
           ) : (
             <div

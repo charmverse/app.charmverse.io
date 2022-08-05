@@ -23,6 +23,7 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { AssignedBountyPermissions } from 'lib/bounties';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import BountySubmissionStatus from './BountySubmissionStatus';
 
 const schema = yup.object({
   submission: yup.string().required(),
@@ -113,6 +114,11 @@ export default function BountySubmissionForm (
           }}
           >
             {submission?.createdBy === user?.id ? 'Your submission' : 'Submission'}
+            {
+          submission && submission.status !== 'applied' && submission.createdBy === user?.id && (
+            <BountySubmissionStatus submission={submission} />
+          )
+        }
           </FormLabel>
           <IconButton
             sx={{
@@ -123,6 +129,7 @@ export default function BountySubmissionForm (
           >
             {isVisible ? <KeyboardArrowUpIcon fontSize='small' /> : <KeyboardArrowDownIcon fontSize='small' />}
           </IconButton>
+
         </>
       </Stack>
       <Collapse in={isVisible} timeout='auto' unmountOnExit>
@@ -222,6 +229,7 @@ export default function BountySubmissionForm (
             )}
           </Grid>
         </form>
+
       </Collapse>
     </Stack>
   );

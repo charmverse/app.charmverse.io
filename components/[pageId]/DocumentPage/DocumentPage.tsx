@@ -53,7 +53,6 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
   const { pages, getPagePermissions } = usePages();
   const { cancelVote, castVote, deleteVote, votes, isLoading } = useVotes();
   const { bounties } = useBounties();
-  const [user] = useUser();
   const bounty = bounties.find(_bounty => _bounty.page?.id === page.id);
   const pagePermissions = getPagePermissions(page.id);
 
@@ -70,7 +69,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
     if (page.bountyId) {
       refreshBountyPermissions(page.bountyId);
     }
-  }, [page]);
+  }, [page.bountyId]);
 
   const cannotEdit = readOnly || !pagePermissions?.edit_content;
 

@@ -150,6 +150,7 @@ function BountySubmissionsTableRow ({
                     setIsViewingDetails(false);
                   }}
                   permissions={permissions}
+                  expandedOnLoad={true}
                 />
               </Box>
             )}
@@ -200,6 +201,7 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
   const [applications, setListApplications] = useState<ApplicationWithTransactions[]>([]);
   const validSubmissions = countValidSubmissions(applications);
   const { refreshBounty } = useBounties();
+  const [user] = useUser();
 
   async function refreshSubmissions () {
     if (bounty) {

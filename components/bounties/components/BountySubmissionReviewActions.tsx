@@ -127,26 +127,6 @@ export default function BountySubmissionReviewActions (
       }
       </Box>
 
-      {
-        submission.status === 'inProgress' && submission.createdBy === user?.id && (
-          <Typography variant='body2' color='secondary'>Awaiting submission</Typography>
-        )
-      }
-      {
-        submission.status === 'review' && submission.createdBy === user?.id && (
-          <Typography variant='body2' color='secondary'>Awaiting review</Typography>
-        )
-      }
-      {
-        submission.status === 'applied' && submission.createdBy === user?.id && (
-          <Typography variant='body2' color='secondary'>Awaiting assignment</Typography>
-        )
-      }
-      {
-        submission.status === 'complete' && submission.createdBy === user?.id && (
-          <Typography variant='body2' color='secondary'>Awaiting payment</Typography>
-        )
-      }
       {isAdmin && submission.status === 'complete' && submission.walletAddress && <BountyPaymentButton onSuccess={recordTransaction} receiver={submission.walletAddress} amount={eToNumber(bounty.rewardAmount)} tokenSymbolOrAddress={bounty.rewardToken} chainIdToUse={bounty.chainId} />}
       {
         (submission.status === 'paid' && submission.transactions.length !== 0) && (

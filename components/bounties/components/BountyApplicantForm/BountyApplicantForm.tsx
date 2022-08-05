@@ -5,7 +5,6 @@ import { useContributors } from 'hooks/useContributors';
 import { useUser } from 'hooks/useUser';
 import { submissionsCapReached } from 'lib/applications/shared';
 import { AssignedBountyPermissions } from 'lib/bounties';
-import { isTruthy } from 'lib/utilities/types';
 import { useState } from 'react';
 import { ApplicationEditorForm } from './components/ApplicationEditorForm';
 import SignupButton from './components/BountySignupButton';

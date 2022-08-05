@@ -16,6 +16,7 @@ import * as yup from 'yup';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { FormMode } from '../../BountyEditorForm';
+import BountySubmissionStatus from './BountySubmissionStatus';
 
 /**
  * @expandedOnLoad Use this to expand the application initially
@@ -95,6 +96,12 @@ export function ApplicationEditorForm ({ readOnly = false, onCancel, onSubmit, b
           }}
         >
           {proposal?.createdBy === user?.id ? 'Your application' : 'Application'}
+
+          {
+          proposal && proposal.status === 'applied' && proposal.createdBy === user?.id && (
+            <BountySubmissionStatus submission={proposal} />
+          )
+        }
         </FormLabel>
         <IconButton
           sx={{
@@ -105,6 +112,7 @@ export function ApplicationEditorForm ({ readOnly = false, onCancel, onSubmit, b
         >
           {isVisible ? <KeyboardArrowUpIcon fontSize='small' /> : <KeyboardArrowDownIcon fontSize='small' />}
         </IconButton>
+
       </Stack>
       <Collapse in={isVisible} timeout='auto' unmountOnExit>
         <form onSubmit={handleSubmit(formValue => submitted(formValue as Application))} style={{ margin: 'auto', width: '100%' }}>
@@ -163,6 +171,7 @@ export function ApplicationEditorForm ({ readOnly = false, onCancel, onSubmit, b
           </Grid>
 
         </form>
+
       </Collapse>
     </Stack>
   );
