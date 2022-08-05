@@ -176,7 +176,7 @@ export default function BountySubmissionForm (
                   borderRadius: 3,
                   minHeight: 130
                 }}
-                readOnly={readOnly}
+                readOnly={readOnly || submission?.status === 'complete' || submission?.status === 'paid'}
                 placeholderText={permissions.userPermissions.review ? 'No submission yet' : 'Enter the content of your submission here.'}
               />
 
