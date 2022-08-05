@@ -81,8 +81,9 @@ function BountySubmissionsTableRow ({
   const [isViewingDetails, setIsViewingDetails] = useState(false);
   const contributor = contributors.find(c => c.id === submission.createdBy);
   const { refreshBounty } = useBounties();
+  const [editorKey, setEditorKey] = useState(0); // a key to allow us to reset charmeditor contents
 
-  const [defaultComment, seDefaultComment] = useState<CommentBlock['fields'] | null>(null);
+  const [defaultComment, setDefaultComment] = useState<CommentBlock['fields'] | null>(null);
 
   function onSendClicked (newComment: CommentBlock['fields']) {
     const comment = createCommentBlock();
@@ -92,14 +93,22 @@ function BountySubmissionsTableRow ({
     comment.title = contentText || '';
     comment.fields = { content };
     mutator.insertBlock(comment, 'add comment');
-    seDefaultComment(null);
+    resetInput();
+  }
+
+  function resetInput () {
+    if (user && contributor) {
+      const content = getContentWithMention({ myUserId: user?.id, targetUserId: contributor?.id });
+      setDefaultComment({ content });
+    }
+    else {
+      setDefaultComment(null);
+    }
+    setEditorKey(key => key + 1);
   }
 
   useEffect(() => {
-    if (user && contributor) {
-      const content = getContentWithMention({ myUserId: user?.id, targetUserId: contributor?.id });
-      seDefaultComment({ content });
-    }
+    resetInput();
   }, [user, contributor]);
 
   return (
@@ -186,7 +195,7 @@ function BountySubmissionsTableRow ({
                 <div className='CommentsList' style={{ paddingTop: 0 }}>
                   <NewCommentInput
                     initialValue={defaultComment}
-                    key={defaultComment ? 'ready' : 'loading'}
+                    key={editorKey}
                     username={user?.username}
                     avatar={user?.avatar}
                     onSubmit={onSendClicked}
