@@ -82,25 +82,23 @@ function BountySubmissionsTableRow ({
   const contributor = contributors.find(c => c.id === submission.createdBy);
   const { refreshBounty } = useBounties();
 
-  const [newComment, setNewComment] = useState<CommentBlock['fields'] | null>(null);
+  const [defaultComment, seDefaultComment] = useState<CommentBlock['fields'] | null>(null);
 
-  function onSendClicked () {
-    if (newComment) {
-      const comment = createCommentBlock();
-      const { content, contentText } = newComment;
-      comment.parentId = bounty.page.id;
-      comment.rootId = bounty.page.id;
-      comment.title = contentText || '';
-      comment.fields = { content };
-      mutator.insertBlock(comment, 'add comment');
-      setNewComment(null);
-    }
+  function onSendClicked (newComment: CommentBlock['fields']) {
+    const comment = createCommentBlock();
+    const { content, contentText } = newComment;
+    comment.parentId = bounty.page.id;
+    comment.rootId = bounty.page.id;
+    comment.title = contentText || '';
+    comment.fields = { content };
+    mutator.insertBlock(comment, 'add comment');
+    seDefaultComment(null);
   }
 
   useEffect(() => {
     if (user && contributor) {
-      const defaultMessage = getContentWithMention({ myUserId: user?.id, targetUserId: contributor?.id });
-      setNewComment({ content: defaultMessage });
+      const content = getContentWithMention({ myUserId: user?.id, targetUserId: contributor?.id });
+      seDefaultComment({ content });
     }
   }, [user, contributor]);
 
@@ -187,8 +185,8 @@ function BountySubmissionsTableRow ({
                 <Typography><strong>Message for Applicant (optional)</strong></Typography>
                 <div className='CommentsList' style={{ paddingTop: 0 }}>
                   <NewCommentInput
-                    initialValue={newComment?.content}
-                    key={newComment ? 'ready' : 'loading'}
+                    initialValue={defaultComment}
+                    key={defaultComment ? 'ready' : 'loading'}
                     username={user?.username}
                     avatar={user?.avatar}
                     onSubmit={onSendClicked}

@@ -76,16 +76,18 @@ interface NewCommentProps {
   onSubmit: (i: CommentBlock['fields']) => void;
 }
 
-export function NewCommentInput ({ initialValue, key, username, avatar, onSubmit }: NewCommentProps) {
+export function NewCommentInput ({ initialValue = null, key, username, avatar, onSubmit }: NewCommentProps) {
 
   const intl = useIntl();
-  const [newComment, setNewComment] = useState<CommentBlock['fields'] | null>(null);
+  const [newComment, setNewComment] = useState<CommentBlock['fields'] | null>(initialValue);
+
+  console.log('new comment input', newComment)
 
   return (
     <div className='CommentsList__new'>
       <Avatar size='xSmall' name={username} avatar={avatar} />
       <InlineCharmEditor
-        content={initialValue}
+        content={newComment?.content}
         key={key} // use the size of comments so it resets when the new one is added
         onContentChange={({ doc, rawText }) => {
           setNewComment({ content: doc, contentText: rawText });
@@ -94,8 +96,7 @@ export function NewCommentInput ({ initialValue, key, username, avatar, onSubmit
         style={{ fontSize: '14px' }}
       />
 
-      {newComment
-        && (
+      {newComment && (
         <Button
           filled={true}
           onClick={() => onSubmit(newComment)}
