@@ -16,7 +16,7 @@ import { useUser } from 'hooks/useUser';
 import { ApplicationWithTransactions } from 'lib/applications/actions';
 import { ReviewDecision, SubmissionReview } from 'lib/applications/interfaces';
 import { AssignedBountyPermissions } from 'lib/bounties/interfaces';
-import { SystemError } from 'lib/utilities/errors';
+import { InvalidInputError, SystemError } from 'lib/utilities/errors';
 import { eToNumber } from 'lib/utilities/numbers';
 import { useState } from 'react';
 import BountyPaymentButton from './BountyPaymentButton';
@@ -39,6 +39,7 @@ export default function BountySubmissionReviewActions (
 
   const [reviewDecision, setReviewDecision] = useState<SubmissionReview | null>(null);
   const [apiError, setApiError] = useState<SystemError | null>();
+  const [paymentError, setPaymentError] = useState<SystemError | null>();
 
   async function approveApplication (applicationId: string) {
     await charmClient.approveApplication(applicationId);
@@ -127,22 +128,32 @@ export default function BountySubmissionReviewActions (
       }
       </Box>
 
-      {
-        submission.status === 'review' && submission.createdBy === user?.id && (
-          <Typography variant='body2' color='secondary'>Awaiting review</Typography>
-        )
-      }
-      {
-        submission.status === 'applied' && submission.createdBy === user?.id && (
-          <Typography variant='body2' color='secondary'>Awaiting assignment</Typography>
-        )
-      }
-      {
-        submission.status === 'complete' && submission.createdBy === user?.id && (
-          <Typography variant='body2' color='secondary'>Awaiting payment</Typography>
-        )
-      }
-      {isAdmin && submission.status === 'complete' && submission.walletAddress && <BountyPaymentButton onSuccess={recordTransaction} receiver={submission.walletAddress} amount={eToNumber(bounty.rewardAmount)} tokenSymbolOrAddress={bounty.rewardToken} chainIdToUse={bounty.chainId} />}
+      {(isAdmin || permissions.userPermissions.review) && submission.status === 'complete' && submission.walletAddress
+      && (
+
+        <Box textAlign='left'>
+          <BountyPaymentButton
+            onSuccess={recordTransaction}
+            onError={(errorMessage) => setPaymentError(new InvalidInputError(errorMessage))}
+            onClick={() => setPaymentError(null)}
+            receiver={submission.walletAddress}
+            amount={eToNumber(bounty.rewardAmount)}
+            tokenSymbolOrAddress={bounty.rewardToken}
+            chainIdToUse={bounty.chainId}
+          />
+          {
+          paymentError && (
+            <>
+              <br />
+              <Typography variant='caption'>
+                {paymentError.message}
+              </Typography>
+            </>
+          )
+        }
+
+        </Box>
+      )}
       {
         (submission.status === 'paid' && submission.transactions.length !== 0) && (
           <div>

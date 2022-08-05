@@ -23,6 +23,7 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { AssignedBountyPermissions } from 'lib/bounties';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import BountySubmissionStatus from './BountySubmissionStatus';
 
 const schema = yup.object({
   submission: yup.string().required(),
@@ -39,14 +40,14 @@ interface Props {
   submission?: Application,
   bountyId: string,
   onSubmit?: (submission: Application) => void
-  showHeader?: boolean
+  onCancel?: () => void;
   readOnly?: boolean
   permissions: AssignedBountyPermissions,
   expandedOnLoad?: boolean
 }
 
 export default function BountySubmissionForm (
-  { permissions, readOnly = false, showHeader = false, submission, onSubmit: onSubmitProp, bountyId, expandedOnLoad }: Props
+  { permissions, readOnly = false, submission, onSubmit: onSubmitProp, bountyId, expandedOnLoad, onCancel = () => null }: Props
 ) {
   const [user] = useUser();
   const [isVisible, setIsVisible] = useState(expandedOnLoad ?? false);
@@ -107,27 +108,29 @@ export default function BountySubmissionForm (
           setIsVisible(!isVisible);
         }}
       >
-        {
-        showHeader && (
-          <>
-            <FormLabel sx={{
-              fontWeight: 'bold'
+        <>
+          <FormLabel sx={{
+            fontWeight: 'bold'
+          }}
+          >
+            {submission?.createdBy === user?.id ? 'Your submission' : 'Submission'}
+            {
+          submission && submission.status !== 'applied' && submission.createdBy === user?.id && (
+            <BountySubmissionStatus submission={submission} />
+          )
+        }
+          </FormLabel>
+          <IconButton
+            sx={{
+              top: -2.5,
+              position: 'relative'
             }}
-            >
-              {submission?.createdBy === user?.id ? 'Your submission' : 'Submission'}
-            </FormLabel>
-            <IconButton
-              sx={{
-                top: -2.5,
-                position: 'relative'
-              }}
-              size='small'
-            >
-              {isVisible ? <KeyboardArrowUpIcon fontSize='small' /> : <KeyboardArrowDownIcon fontSize='small' />}
-            </IconButton>
-          </>
-        )
-      }
+            size='small'
+          >
+            {isVisible ? <KeyboardArrowUpIcon fontSize='small' /> : <KeyboardArrowDownIcon fontSize='small' />}
+          </IconButton>
+
+        </>
       </Stack>
       <Collapse in={isVisible} timeout='auto' unmountOnExit>
         {readOnly && submission?.walletAddress && (
@@ -173,7 +176,7 @@ export default function BountySubmissionForm (
                   borderRadius: 3,
                   minHeight: 130
                 }}
-                readOnly={readOnly}
+                readOnly={readOnly || submission?.status === 'complete' || submission?.status === 'paid'}
                 placeholderText={permissions.userPermissions.review ? 'No submission yet' : 'Enter the content of your submission here.'}
               />
 
@@ -216,6 +219,7 @@ export default function BountySubmissionForm (
               <Button
                 onClick={() => {
                   setIsVisible(false);
+                  onCancel();
                 }}
                 variant='outlined'
                 color='secondary'
@@ -225,6 +229,7 @@ export default function BountySubmissionForm (
             )}
           </Grid>
         </form>
+
       </Collapse>
     </Stack>
   );

@@ -6,6 +6,7 @@ import charmClient from 'charmClient';
 import BountyApplicantForm from 'components/bounties/components/BountyApplicantForm';
 import BountyHeader from 'components/bounties/components/BountyHeader';
 import BountyReviewers from 'components/bounties/components/BountyReviewers';
+import BountySlots from 'components/bounties/components/BountySlots';
 import BountySubmissionsTable from 'components/bounties/components/BountySubmissionsTable';
 import BountySuggestionApproval from 'components/bounties/components/BountySuggestionApproval';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
@@ -20,6 +21,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
 import { ApplicationWithTransactions } from 'lib/applications/interfaces';
+import { countValidSubmissions } from 'lib/applications/shared';
 import { AssignedBountyPermissions, BountyPermissions, UpdateableBountyFields } from 'lib/bounties';
 import { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import debouncePromise from 'lib/utilities/debouncePromise';
@@ -70,8 +72,14 @@ function rollupPermissions ({
   return permissionsToSend;
 }
 
-export default function BountyProperties (props: {children: ReactNode, readOnly?: boolean, bounty: BountyWithDetails}) {
-  const { bounty, readOnly = false, children } = props;
+export default function BountyProperties (props: {
+  children: ReactNode,
+  readOnly?: boolean,
+  bounty: BountyWithDetails,
+  permissions: AssignedBountyPermissions,
+  refreshBountyPermissions: (bountyId: string) => void
+}) {
+  const { bounty, readOnly = false, children, permissions, refreshBountyPermissions } = props;
   const [paymentMethods] = usePaymentMethods();
   const { updateBounty } = useBounties();
   const [availableCryptos, setAvailableCryptos] = useState<Array<string | CryptoCurrency>>([]);
@@ -80,7 +88,7 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
   const [capSubmissions, setCapSubmissions] = useState(currentBounty.maxSubmissions !== null);
   const [space] = useCurrentSpace();
   const [user] = useUser();
-  const [permissions, setPermissions] = useState<AssignedBountyPermissions | null>(null);
+
   const assignedRoleSubmitters = permissions?.bountyPermissions?.submitter?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
   const selectedReviewerUsers = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'user').map(p => p.id as string) ?? [];
   const selectedReviewerRoles = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
@@ -97,12 +105,6 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
     refreshSubmissions();
   }, [bounty]);
   // -----
-
-  async function refreshBountyPermissions (bountyId: string) {
-    setPermissions(await charmClient.computeBountyPermissions({
-      resourceId: bountyId
-    }));
-  }
 
   function refreshCryptoList (chainId: number, rewardToken?: string) {
 
@@ -159,7 +161,7 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
   }, []);
 
   useEffect(() => {
-    refreshBountyPermissions(currentBounty.id);
+
     refreshCryptoList(currentBounty.chainId, currentBounty.rewardToken);
   }, []);
 
@@ -398,6 +400,18 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
                 bounty={bounty}
                 permissions={permissions}
               />
+              {/* Extra space so this looks like the focalboard properties */}
+              {
+                bounty.maxSubmissions && (
+                  <>
+                    <div style={{ marginTop: 2 }}></div>
+                    <BountySlots
+                      maxSubmissions={bounty.maxSubmissions}
+                      validSubmissions={countValidSubmissions(bounty.applications)}
+                    />
+                  </>
+                )
+              }
             </Stack>
           ) : (
             <div
@@ -449,16 +463,23 @@ export default function BountyProperties (props: {children: ReactNode, readOnly?
 
       {// Bounty creator cannot apply to their own bounty
         permissions && bounty.createdBy !== user?.id && (
-          <BountyApplicantForm
-            bounty={bounty}
-            submissions={applications}
-            permissions={permissions}
-            refreshSubmissions={refreshSubmissions}
-          />
+          <>
+            <BountyApplicantForm
+              bounty={bounty}
+              submissions={applications}
+              permissions={permissions}
+              refreshSubmissions={refreshSubmissions}
+            />
+            <Divider
+              sx={{
+                my: 3
+              }}
+            />
+          </>
         )
       }
 
-      {permissions && bounty.status !== 'suggestion' && (
+      {permissions?.userPermissions?.review && bounty.status !== 'suggestion' && (
         <>
           <BountySubmissionsTable
             bounty={currentBounty}
