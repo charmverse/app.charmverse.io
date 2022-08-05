@@ -8,6 +8,7 @@ import { useBounties } from 'hooks/useBounties';
 import charmClient from 'charmClient';
 import { BountyWithDetails } from 'models';
 import PageDialog from 'components/common/Page/PageDialog';
+import { usePages } from 'hooks/usePages';
 
 export default function NewBountyButton () {
   const [user] = useUser();
@@ -16,6 +17,7 @@ export default function NewBountyButton () {
   const [currentUserPermissions] = useCurrentSpacePermissions();
   const suggestBounties = currentUserPermissions?.createBounty === false;
   const { setBounties } = useBounties();
+  const { setPages } = usePages();
 
   async function onClickCreate () {
     if (currentSpace && user) {
@@ -58,6 +60,7 @@ export default function NewBountyButton () {
         bounty: createdBounty,
         page: createdBounty.page
       });
+      setPages((pages) => ({ ...pages, [createdBounty.page.id]: createdBounty.page }));
     }
   }
 
