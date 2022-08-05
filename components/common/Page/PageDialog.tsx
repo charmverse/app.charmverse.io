@@ -126,7 +126,7 @@ export default function PageDialog (props: Props) {
                     <ListItemText primary='Copy link' />
                   </ListItemButton>
                   {bounty && onMarkCompleted && (
-                  <ListItemButton disabled={bounty.status === 'complete'} onClick={() => onMarkCompleted(bounty.id)}>
+                  <ListItemButton disabled={bounty.status === 'complete' || (bounty.status !== 'inProgress' && bounty.status !== 'open')} onClick={() => onMarkCompleted(bounty.id)}>
                     <CheckCircleIcon
                       sx={{
                         mr: 1

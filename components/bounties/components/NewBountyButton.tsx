@@ -17,7 +17,7 @@ export default function NewBountyButton () {
   const [currentUserPermissions] = useCurrentSpacePermissions();
   const suggestBounties = currentUserPermissions?.createBounty === false;
   const { setBounties } = useBounties();
-  const { pages, setPages } = usePages();
+  const { setPages } = usePages();
 
   async function onClickCreate () {
     if (currentSpace && user) {
@@ -55,11 +55,8 @@ export default function NewBountyButton () {
           }
         });
       }
+      setPages((pages) => ({ ...pages, [createdBounty.page.id]: createdBounty.page }));
       setBounties((bounties) => [...bounties, createdBounty]);
-      setPages({
-        ...pages,
-        [createdBounty.page.id]: createdBounty.page
-      });
       setActiveBountyPage({
         bounty: createdBounty,
         page: createdBounty.page
