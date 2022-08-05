@@ -1,12 +1,10 @@
 import { useTheme } from '@emotion/react';
-import { v4 as uuid } from 'uuid';
 import { LockOpen } from '@mui/icons-material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import LockIcon from '@mui/icons-material/Lock';
 import { Collapse, IconButton, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
-import Button from 'components/common/Button';
 import Chip from '@mui/material/Chip';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -16,10 +14,9 @@ import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import { ApplicationStatus } from '@prisma/client';
 import charmClient from 'charmClient';
-import { createCommentBlock, CommentBlock } from 'components/common/BoardEditor/focalboard/src/blocks/commentBlock';
+import { createCommentBlock } from 'components/common/BoardEditor/focalboard/src/blocks/commentBlock';
 import { NewCommentInput } from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
-import FieldLabel from 'components/common/form/FieldLabel';
 import UserDisplay from 'components/common/UserDisplay';
 import { useBounties } from 'hooks/useBounties';
 import { useContributors } from 'hooks/useContributors';
@@ -29,10 +26,10 @@ import { countValidSubmissions, submissionsCapReached as submissionsCapReachedFn
 import { AssignedBountyPermissions } from 'lib/bounties/interfaces';
 import { isBountyLockable } from 'lib/bounties/shared';
 import { humanFriendlyDate } from 'lib/utilities/dates';
-import { BountyWithDetails } from 'models';
+import { BountyWithDetails, PageContent } from 'models';
 import { useEffect, useState } from 'react';
 import { BrandColor } from 'theme/colors';
-import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
+import { v4 as uuid } from 'uuid';
 import { ApplicationEditorForm } from './BountyApplicantForm/components/ApplicationEditorForm';
 import SubmissionEditorForm from './BountyApplicantForm/components/SubmissionEditorForm';
 import BountySubmissionReviewActions from './BountySubmissionReviewActions';
@@ -82,7 +79,7 @@ function BountySubmissionsTableRow ({
   const contributor = contributors.find(c => c.id === submission.createdBy);
   const { refreshBounty } = useBounties();
 
-  const [newComment, setNewComment] = useState<CommentBlock['fields'] | null>(null);
+  const [newComment, setNewComment] = useState<{content: PageContent, contentText: string} | null>(null);
 
   function onSendClicked () {
     if (newComment) {
@@ -100,7 +97,7 @@ function BountySubmissionsTableRow ({
   useEffect(() => {
     if (user && contributor) {
       const defaultMessage = getContentWithMention({ myUserId: user?.id, targetUserId: contributor?.id });
-      setNewComment({ content: defaultMessage });
+      setNewComment({ content: defaultMessage, contentText: '' });
     }
   }, [user, contributor]);
 
@@ -187,7 +184,10 @@ function BountySubmissionsTableRow ({
                 <Typography><strong>Message for Applicant (optional)</strong></Typography>
                 <div className='CommentsList' style={{ paddingTop: 0 }}>
                   <NewCommentInput
-                    initialValue={newComment?.content}
+                    comment={newComment?.content}
+                    setComment={(output) => {
+                      setNewComment({ content: output.doc, contentText: output.rawText });
+                    }}
                     key={newComment ? 'ready' : 'loading'}
                     username={user?.username}
                     avatar={user?.avatar}

@@ -14,6 +14,8 @@ import Button from '../../widgets/buttons/button';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 
 import Comment from './comment';
+import { PageContent } from 'models';
+import { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 
 type Props = {
     comments: readonly CommentBlock[]
@@ -25,19 +27,20 @@ type Props = {
 const CommentsList = React.memo((props: Props) => {
   const [currentUser] = useUser();
   const [contributors] = useContributors();
+  const [newComment, setNewComment] = useState<{content: PageContent, contentText: string} | null>(null);
+  const { cardId, rootId } = props;
 
-  const onSendClicked = (newComment: CommentBlock['fields']) => {
-    const { rootId, cardId } = props;
-    Utils.log(`Send comment: ${newComment.contentText}`);
-    Utils.assertValue(cardId);
-
-    const comment = createCommentBlock();
-    const { content, contentText } = newComment;
-    comment.parentId = cardId;
-    comment.rootId = rootId;
-    comment.title = contentText || '';
-    comment.fields = { content }
-    mutator.insertBlock(comment, 'add comment');
+  const onSendClicked = () => {
+    if (newComment) {
+      const comment = createCommentBlock();
+      const { content, contentText } = newComment;
+      comment.parentId = cardId;
+      comment.rootId = rootId;
+      comment.title = contentText || '';
+      comment.fields = { content };
+      mutator.insertBlock(comment, 'add comment');
+      setNewComment(null);
+    }
   };
 
   const { comments } = props;
@@ -50,6 +53,10 @@ const CommentsList = React.memo((props: Props) => {
           avatar={currentUser?.avatar}
           username={currentUser?.username}
           onSubmit={onSendClicked}
+          comment={newComment?.content}
+          setComment={(output) => {
+            setNewComment({ content: output.doc, contentText: output.rawText });
+          }}
         />
       )}
 
@@ -69,36 +76,35 @@ const CommentsList = React.memo((props: Props) => {
 });
 
 interface NewCommentProps {
-  initialValue?: any | null;
+  comment?: PageContent | null;
   key?: string | number;
   username?: string;
   avatar?: string | null;
-  onSubmit: (i: CommentBlock['fields']) => void;
+  onSubmit: () => void;
+  setComment?: (output: ICharmEditorOutput) => void
 }
 
-export function NewCommentInput ({ initialValue, key, username, avatar, onSubmit }: NewCommentProps) {
-
+export function NewCommentInput ({ comment, setComment, key, username, avatar, onSubmit }: NewCommentProps) {
   const intl = useIntl();
-  const [newComment, setNewComment] = useState<CommentBlock['fields'] | null>(null);
 
   return (
     <div className='CommentsList__new'>
       <Avatar size='xSmall' name={username} avatar={avatar} />
       <InlineCharmEditor
-        content={initialValue}
+        content={comment}
         key={key} // use the size of comments so it resets when the new one is added
         onContentChange={({ doc, rawText }) => {
-          setNewComment({ content: doc, contentText: rawText });
+          setComment?.({ doc, rawText });
         }}
         placeholderText={intl.formatMessage({ id: 'CardDetail.new-comment-placeholder', defaultMessage: 'Add a comment...' })}
         style={{ fontSize: '14px' }}
       />
 
-      {newComment
+      {comment
         && (
         <Button
           filled={true}
-          onClick={() => onSubmit(newComment)}
+          onClick={() => onSubmit()}
         >
           <FormattedMessage
             id='CommentsList.send'
