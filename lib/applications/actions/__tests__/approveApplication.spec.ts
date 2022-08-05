@@ -1,7 +1,7 @@
 
 import { Space, User } from '@prisma/client';
 import { createBounty, updateBountySettings } from 'lib/bounties';
-import { LimitReachedError } from 'lib/utilities/errors';
+import { LimitReachedError, UndesirableOperationError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
@@ -27,7 +27,6 @@ describe('approveApplication', () => {
     });
 
     const bounty = await createBounty({
-      title: 'My bounty',
       createdBy: user.id,
       spaceId: space.id,
       maxSubmissions: 20,
@@ -57,8 +56,12 @@ describe('approveApplication', () => {
 
     const { user: adminUser, space: adminSpace } = await generateUserAndSpaceWithApiToken(undefined, true);
 
+    const reviewerUser = await generateSpaceUser({
+      spaceId: adminSpace.id,
+      isAdmin: false
+    });
+
     const bounty = await createBounty({
-      title: 'My bounty',
       createdBy: adminUser.id,
       spaceId: adminSpace.id
     });
@@ -78,7 +81,7 @@ describe('approveApplication', () => {
 
     try {
       await approveApplication({
-        userId: adminUser.id,
+        userId: reviewerUser.id,
         applicationOrApplicationId: application
       });
       throw new ExpectedAnError();
@@ -86,6 +89,31 @@ describe('approveApplication', () => {
     catch (error) {
       expect(error).toBeInstanceOf(LimitReachedError);
     }
+
+  });
+
+  it('should fail if a user tries to approve their own application, even if they are an admin', async () => {
+
+    const bounty = await createBounty({
+      createdBy: user.id,
+      spaceId: space.id,
+      maxSubmissions: 20,
+      permissions: {
+        reviewer: [{ group: 'user', id: user.id }],
+        submitter: [{ group: 'space', id: space.id }]
+      }
+    });
+
+    const application = await createApplication({
+      bountyId: bounty.id,
+      message: 'My application message',
+      userId: user.id
+    });
+
+    await expect(approveApplication({
+      userId: user.id,
+      applicationOrApplicationId: application
+    })).rejects.toBeInstanceOf(UndesirableOperationError);
 
   });
 
