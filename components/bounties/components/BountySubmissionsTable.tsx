@@ -201,6 +201,7 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
   const [applications, setListApplications] = useState<ApplicationWithTransactions[]>([]);
   const validSubmissions = countValidSubmissions(applications);
   const { refreshBounty } = useBounties();
+  const [user] = useUser();
 
   async function refreshSubmissions () {
     if (bounty) {
@@ -223,32 +224,38 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
     refreshBounty(updatedBounty.id);
   }
 
+  const filteredApplications = applications?.filter(a => a.createdBy !== user?.id);
+
   return (
     <>
-      <Box width='100%' display='flex' mb={1} justifyContent='space-between'>
-        <Box display='flex' gap={1} alignItems='center'>
-          <Chip
-            sx={{
-              my: 1
-            }}
-            label={`Submissions: ${bounty?.maxSubmissions ? `${validSubmissions} / ${bounty.maxSubmissions}` : validSubmissions}`}
-          />
-          { permissions?.userPermissions?.lock && isBountyLockable(bounty) && (
-          <Tooltip key='stop-new' arrow placement='top' title={`${bounty.submissionsLocked ? 'Enable' : 'Prevent'} new ${bounty.approveSubmitters ? 'applications' : 'submissions'} from being made.`}>
-            <IconButton
-              size='small'
-              onClick={() => {
-                lockBountySubmissions();
-              }}
-            >
-              { !bounty.submissionsLocked ? <LockOpen color='secondary' fontSize='small' /> : <LockIcon color='secondary' fontSize='small' />}
-            </IconButton>
-          </Tooltip>
-          )}
-        </Box>
-      </Box>
       {
-        applications.length === 0 ? (
+        validSubmissions > 0 && (
+          <Box width='100%' display='flex' mb={1} justifyContent='space-between'>
+            <Box display='flex' gap={1} alignItems='center'>
+              <Chip
+                sx={{
+                  my: 1
+                }}
+                label={`Submissions: ${bounty?.maxSubmissions ? `${validSubmissions} / ${bounty.maxSubmissions}` : validSubmissions}`}
+              />
+              { permissions?.userPermissions?.lock && isBountyLockable(bounty) && (
+              <Tooltip key='stop-new' arrow placement='top' title={`${bounty.submissionsLocked ? 'Enable' : 'Prevent'} new ${bounty.approveSubmitters ? 'applications' : 'submissions'} from being made.`}>
+                <IconButton
+                  size='small'
+                  onClick={() => {
+                    lockBountySubmissions();
+                  }}
+                >
+                  { !bounty.submissionsLocked ? <LockOpen color='secondary' fontSize='small' /> : <LockIcon color='secondary' fontSize='small' />}
+                </IconButton>
+              </Tooltip>
+              )}
+            </Box>
+          </Box>
+        )
+      }
+      {
+        filteredApplications.length === 0 ? (
           <Box
             my={3}
             sx={{
@@ -258,7 +265,7 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
             }}
           >
             <Typography variant='h6'>
-              No submissions
+              No submissions to review
             </Typography>
           </Box>
         ) : (
@@ -294,7 +301,7 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
               </TableRow>
             </TableHead>
             <TableBody>
-              {applications.map((submission) => (
+              {filteredApplications.map((submission) => (
                 <BountySubmissionsTableRow
                   bounty={bounty}
                   permissions={permissions}
