@@ -39,7 +39,7 @@ export function AggregatedDataItem ({ value, label }: {value: number, label: str
   );
 }
 
-export function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>) {
+export default function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>) {
   const { data, isValidating } = useSWRImmutable(user ? `userAggregatedData/${user.id}` : null, () => {
     return charmClient.getAggregatedData(user.id);
   });
@@ -59,11 +59,11 @@ export function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>) {
 
   return (
     <Grid container display='flex' gap={2} flexDirection='column'>
-      <Box display='flex' gap={2} mr={2}>
+      <Box display='flex' gap={2}>
         <AggregatedDataItem label='communities' value={data.daos} />
         <AggregatedDataItem label='votes' value={data.votes} />
       </Box>
-      <Box display='flex' gap={2} mr={2}>
+      <Box display='flex' gap={2}>
         <AggregatedDataItem label='proposals' value={data.proposals} />
         <AggregatedDataItem label={data.bounties > 1 ? 'bounties' : 'bounty'} value={data.bounties} />
       </Box>

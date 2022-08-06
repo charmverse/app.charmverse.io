@@ -1,21 +1,29 @@
-import { Divider, Grid, Stack } from '@mui/material';
+import { Card, Divider, Grid, Stack } from '@mui/material';
 import UserDetails, { UserDetailsProps } from './components/UserDetails';
 import PoapSection from './components/PoapSection';
-import { AggregatedData } from './components/AggregatedData';
+import AggregatedData from './components/AggregatedData';
+import CollablandCredentials from './components/CollablandCredentials/CollablandCredentials';
 
 export default function PublicProfile (props: UserDetailsProps) {
   return (
     <Stack spacing={2}>
       <UserDetails {...props} />
       <Divider />
-      <Grid container direction='row' rowSpacing={3}>
-        <Grid item xs={12} md={7}>
-          <AggregatedData user={props.user} />
+      <div>
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={7}>
+            <Stack spacing={2}>
+              <AggregatedData user={props.user} />
+              <Card>
+                <CollablandCredentials />
+              </Card>
+            </Stack>
+          </Grid>
+          <Grid item xs={12} md={5}>
+            <PoapSection user={props.user} />
+          </Grid>
         </Grid>
-        <Grid item xs={12} md={5}>
-          <PoapSection user={props.user} />
-        </Grid>
-      </Grid>
+      </div>
     </Stack>
   );
 }
