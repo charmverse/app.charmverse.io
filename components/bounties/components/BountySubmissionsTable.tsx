@@ -1,11 +1,12 @@
 import { useTheme } from '@emotion/react';
+import { v4 as uuid } from 'uuid';
 import { LockOpen } from '@mui/icons-material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import LockIcon from '@mui/icons-material/Lock';
-import { Collapse, IconButton, Stack, TextField, Tooltip } from '@mui/material';
+import { Collapse, IconButton, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
+import Button from 'components/common/Button';
 import Chip from '@mui/material/Chip';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -15,7 +16,8 @@ import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import { ApplicationStatus } from '@prisma/client';
 import charmClient from 'charmClient';
-import { createCommentBlock } from 'components/common/BoardEditor/focalboard/src/blocks/commentBlock';
+import { createCommentBlock, CommentBlock } from 'components/common/BoardEditor/focalboard/src/blocks/commentBlock';
+import { NewCommentInput } from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import FieldLabel from 'components/common/form/FieldLabel';
 import UserDisplay from 'components/common/UserDisplay';
@@ -23,13 +25,14 @@ import { useBounties } from 'hooks/useBounties';
 import { useContributors } from 'hooks/useContributors';
 import { useUser } from 'hooks/useUser';
 import { ApplicationWithTransactions } from 'lib/applications/actions';
-import { countValidSubmissions, submissionsCapReached as submissionsCapReachedFn } from 'lib/applications/shared';
+import { applicantIsSubmitter, countValidSubmissions, submissionsCapReached as submissionsCapReachedFn } from 'lib/applications/shared';
 import { AssignedBountyPermissions } from 'lib/bounties/interfaces';
 import { isBountyLockable } from 'lib/bounties/shared';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 import { BountyWithDetails } from 'models';
 import { useEffect, useState } from 'react';
 import { BrandColor } from 'theme/colors';
+import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import { ApplicationEditorForm } from './BountyApplicantForm/components/ApplicationEditorForm';
 import SubmissionEditorForm from './BountyApplicantForm/components/SubmissionEditorForm';
 import BountySubmissionReviewActions from './BountySubmissionReviewActions';
@@ -76,17 +79,37 @@ function BountySubmissionsTableRow ({
   const [contributors] = useContributors();
   const [user] = useUser();
   const [isViewingDetails, setIsViewingDetails] = useState(false);
-  const [applicationComment, setApplicationComment] = useState('');
   const contributor = contributors.find(c => c.id === submission.createdBy);
   const { refreshBounty } = useBounties();
+  const [editorKey, setEditorKey] = useState(0); // a key to allow us to reset charmeditor contents
 
-  const onSendClicked = () => {
+  const [defaultComment, setDefaultComment] = useState<CommentBlock['fields'] | null>(null);
+
+  function onSendClicked (newComment: CommentBlock['fields']) {
     const comment = createCommentBlock();
-    comment.parentId = bounty.page?.id;
-    comment.rootId = bounty.page?.id;
-    comment.title = `@${contributor?.username} ${applicationComment}`;
+    const { content, contentText } = newComment;
+    comment.parentId = bounty.page.id;
+    comment.rootId = bounty.page.id;
+    comment.title = contentText || '';
+    comment.fields = { content };
     mutator.insertBlock(comment, 'add comment');
-  };
+    resetInput();
+  }
+
+  function resetInput () {
+    if (user && contributor) {
+      const content = getContentWithMention({ myUserId: user?.id, targetUserId: contributor?.id });
+      setDefaultComment({ content });
+    }
+    else {
+      setDefaultComment(null);
+    }
+    setEditorKey(key => key + 1);
+  }
+
+  useEffect(() => {
+    resetInput();
+  }, [user, contributor]);
 
   return (
     <>
@@ -125,15 +148,13 @@ function BountySubmissionsTableRow ({
         </TableCell>
         <TableCell align='right'>
           <Box display='flex' justifyContent='left' gap={2}>
-            {submission.status !== 'inProgress' && (
-              <BountySubmissionReviewActions
-                bounty={bounty}
-                submission={submission}
-                reviewComplete={() => { }}
-                permissions={permissions}
-                submissionsCapReached={submissionsCapReached}
-              />
-            )}
+            <BountySubmissionReviewActions
+              bounty={bounty}
+              submission={submission}
+              reviewComplete={() => { }}
+              permissions={permissions}
+              submissionsCapReached={submissionsCapReached}
+            />
           </Box>
         </TableCell>
       </TableRow>
@@ -146,13 +167,13 @@ function BountySubmissionsTableRow ({
                   bountyId={bounty.id}
                   readOnly={user?.id !== submission.createdBy || (submission.status !== 'inProgress' && submission.status !== 'review')}
                   submission={submission}
-                  showHeader
                   onSubmit={async () => {
                     await refreshSubmissions();
                     await refreshBounty(bounty.id);
                     setIsViewingDetails(false);
                   }}
                   permissions={permissions}
+                  expandedOnLoad={true}
                 />
               </Box>
             )}
@@ -162,42 +183,21 @@ function BountySubmissionsTableRow ({
                 proposal={submission}
                 readOnly={user?.id !== submission.createdBy || submission.status !== 'applied'}
                 mode='update'
-                showHeader
               />
             )}
 
             {permissions.userPermissions.review && submission.status !== 'rejected' && submission.createdBy !== user?.id && (
               <>
-                <Stack mt={1}>
-                  <FieldLabel>Message for Applicant (optional)</FieldLabel>
-                  <Stack mb={1} flexDirection='row' gap={1}><TextField
-                    value={applicationComment}
-                    onChange={(e) => {
-                      setApplicationComment(e.target.value);
-                    }}
-                    sx={{
-                      flexGrow: 1
-                    }}
+                <Typography><strong>Message for Applicant (optional)</strong></Typography>
+                <div className='CommentsList' style={{ paddingTop: 0 }}>
+                  <NewCommentInput
+                    initialValue={defaultComment}
+                    key={editorKey}
+                    username={user?.username}
+                    avatar={user?.avatar}
+                    onSubmit={onSendClicked}
                   />
-                    <Button
-                      disabled={applicationComment.length === 0}
-                      onClick={() => {
-                        setApplicationComment('');
-                        onSendClicked();
-                      }}
-                    >Send
-                    </Button>
-                  </Stack>
-                </Stack>
-                <Box width='100%' display='flex' gap={1} my={2} justifyContent='center'>
-                  <BountySubmissionReviewActions
-                    bounty={bounty}
-                    submission={submission}
-                    reviewComplete={() => { }}
-                    permissions={permissions}
-                    submissionsCapReached={submissionsCapReached}
-                  />
-                </Box>
+                </div>
               </>
             )}
           </Collapse>
@@ -205,6 +205,28 @@ function BountySubmissionsTableRow ({
       </TableRow>
     </>
   );
+}
+
+function getContentWithMention ({ myUserId, targetUserId }: { myUserId: string, targetUserId: string }) {
+  return {
+    type: 'doc',
+    content: [{
+      type: 'paragraph',
+      content: [{
+        type: 'mention',
+        attrs: {
+          id: uuid(),
+          type: 'user',
+          value: targetUserId,
+          createdAt: new Date().toISOString(),
+          createdBy: myUserId
+        }
+      }, {
+        type: 'text',
+        text: ' '
+      }]
+    }]
+  };
 }
 
 export default function BountySubmissionsTable ({ bounty, permissions }: Props) {
@@ -259,7 +281,7 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
           )}
         </Box>
       </Box>
-      {(permissions.userPermissions.review) && (
+      {
         applications.length === 0 ? (
           <Box
             my={3}
@@ -283,7 +305,6 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
             }}
             >
               <TableRow>
-                {/* Width should always be same as Bounty Applicant list status column, so submitter and applicant columns align */}
                 <TableCell>
                   <Box sx={{
                     display: 'flex',
@@ -319,8 +340,8 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
               ))}
             </TableBody>
           </Table>
-        ))}
-
+        )
+      }
     </>
   );
 }

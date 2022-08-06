@@ -170,6 +170,7 @@ export default function CharmEditor (
       // well, we tried
     }
   }
+
   const initialValue = contentJSON ? Node.fromJSON(specRegistry.schema, contentJSON) : '';
 
   const state = useEditorState({

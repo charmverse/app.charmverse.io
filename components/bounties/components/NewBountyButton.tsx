@@ -55,12 +55,12 @@ export default function NewBountyButton () {
           }
         });
       }
+      setPages((pages) => ({ ...pages, [createdBounty.page.id]: createdBounty.page }));
       setBounties((bounties) => [...bounties, createdBounty]);
       setActiveBountyPage({
         bounty: createdBounty,
         page: createdBounty.page
       });
-      setPages((pages) => ({ ...pages, [createdBounty.page.id]: createdBounty.page }));
     }
   }
 
