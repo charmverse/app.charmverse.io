@@ -6,7 +6,7 @@ import useSWRImmutable from 'swr/immutable';
 import charmClient from 'charmClient';
 import type { CollablandCredential } from 'lib/collabland';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { humanFriendlyDate, toMonthDate } from 'lib/utilities/dates';
+import { toMonthDate } from 'lib/utilities/dates';
 
 export default function CollablandCredentials () {
 

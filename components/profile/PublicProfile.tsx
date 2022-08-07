@@ -1,4 +1,4 @@
-import { Card, Divider, Grid, Stack } from '@mui/material';
+import { Box, Card, Divider, Grid, Stack, Typography } from '@mui/material';
 import UserDetails, { UserDetailsProps } from './components/UserDetails';
 import PoapSection from './components/PoapSection';
 import AggregatedData from './components/AggregatedData';
@@ -15,6 +15,9 @@ export default function PublicProfile (props: UserDetailsProps) {
             <Stack spacing={2}>
               <AggregatedData user={props.user} />
               <Card>
+                <Box p={2} pb={0}>
+                  <Typography fontWeight={700} fontSize={20}>Credentials</Typography>
+                </Box>
                 <CollablandCredentials />
               </Card>
             </Stack>
