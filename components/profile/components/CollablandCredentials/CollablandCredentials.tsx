@@ -1,10 +1,12 @@
 import { Typography, Box, Stack } from '@mui/material';
+import Avatar from 'components/common/Avatar';
 import Button from 'components/common/Button';
 import { useRouter } from 'next/router';
 import useSWRImmutable from 'swr/immutable';
 import charmClient from 'charmClient';
 import type { CollablandCredential } from 'lib/collabland';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { humanFriendlyDate, toMonthDate } from 'lib/utilities/dates';
 
 export default function CollablandCredentials () {
 
@@ -60,8 +62,18 @@ function Credentials ({ credentials }: { credentials: CollablandCredential[] }) 
       )}
       {credentials.map((credential, i) => (
         // eslint-disable-next-line react/no-array-index-key
-        <Box key={i} display='flex' justifyContent='center'>
-          {credential}
+        <Box key={i} display='flex' justifyContent='center' my={2}>
+          <Box px={2}>
+            <Avatar size='xLarge' avatar={credential.discordGuildAvatar} />
+          </Box>
+          <Stack flexGrow={1} pr={2} justifyContent='center'>
+            <Typography variant='body2'>
+              {credential.discordGuildName}
+            </Typography>
+            <Typography variant='caption' color='secondary'>
+              <strong>{credential.discordRoleName}</strong> issued on {toMonthDate(credential.createdAt)}
+            </Typography>
+          </Stack>
         </Box>
       ))}
       <Box display='flex' justifyContent='center' pb={2}>
@@ -74,5 +86,5 @@ function Credentials ({ credentials }: { credentials: CollablandCredential[] }) 
 }
 
 function getCollablandLogin () {
-  return `https://login-qa.collab.land?redirect_uri=${encodeURIComponent(window.location.href.split('?')[0])}`;
+  return `https://login-qa.collab.land?state=foobar&redirect_uri=${encodeURIComponent(window.location.href.split('?')[0])}`;
 }
