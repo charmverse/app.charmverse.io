@@ -21,11 +21,6 @@ import { ApplicationEditorForm } from '../BountyApplicantForm/components/Applica
 import SubmissionEditorForm from '../BountyApplicantForm/components/SubmissionEditorForm';
 import BountySubmissionReviewActions from './BountyApplicantActions';
 
-interface Props {
-  bounty: BountyWithDetails
-  permissions: AssignedBountyPermissions
-}
-
 const SubmissionStatusColors: Record<ApplicationStatus, BrandColor> = {
   applied: 'teal',
   rejected: 'red',
