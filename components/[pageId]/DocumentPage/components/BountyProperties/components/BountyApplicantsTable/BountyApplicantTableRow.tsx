@@ -1,48 +1,32 @@
-import { useTheme } from '@emotion/react';
+
 import { v4 as uuid } from 'uuid';
-import { LockOpen } from '@mui/icons-material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import LockIcon from '@mui/icons-material/Lock';
-import { Collapse, IconButton, Tooltip } from '@mui/material';
-import Box from '@mui/material/Box';
-import Button from 'components/common/Button';
-import Chip from '@mui/material/Chip';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Typography from '@mui/material/Typography';
+import { Collapse, IconButton, Box, Chip, TableCell, TableRow, Typography } from '@mui/material';
 import { ApplicationStatus } from '@prisma/client';
-import charmClient from 'charmClient';
 import { createCommentBlock, CommentBlock } from 'components/common/BoardEditor/focalboard/src/blocks/commentBlock';
 import { NewCommentInput } from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
-import FieldLabel from 'components/common/form/FieldLabel';
 import UserDisplay from 'components/common/UserDisplay';
 import { useBounties } from 'hooks/useBounties';
 import { useContributors } from 'hooks/useContributors';
 import { useUser } from 'hooks/useUser';
 import { ApplicationWithTransactions } from 'lib/applications/actions';
-import { applicantIsSubmitter, countValidSubmissions, submissionsCapReached as submissionsCapReachedFn } from 'lib/applications/shared';
 import { AssignedBountyPermissions } from 'lib/bounties/interfaces';
-import { isBountyLockable } from 'lib/bounties/shared';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 import { BountyWithDetails } from 'models';
 import { useEffect, useState } from 'react';
 import { BrandColor } from 'theme/colors';
-import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
-import { ApplicationEditorForm } from './BountyApplicantForm/components/ApplicationEditorForm';
-import SubmissionEditorForm from './BountyApplicantForm/components/SubmissionEditorForm';
-import BountySubmissionReviewActions from './BountySubmissionReviewActions';
+import { ApplicationEditorForm } from '../BountyApplicantForm/components/ApplicationEditorForm';
+import SubmissionEditorForm from '../BountyApplicantForm/components/SubmissionEditorForm';
+import BountySubmissionReviewActions from './BountyApplicantActions';
 
 interface Props {
   bounty: BountyWithDetails
   permissions: AssignedBountyPermissions
 }
 
-export const SubmissionStatusColors: Record<ApplicationStatus, BrandColor> = {
+const SubmissionStatusColors: Record<ApplicationStatus, BrandColor> = {
   applied: 'teal',
   rejected: 'red',
   inProgress: 'yellow',
@@ -51,7 +35,7 @@ export const SubmissionStatusColors: Record<ApplicationStatus, BrandColor> = {
   paid: 'gray'
 };
 
-export const SubmissionStatusLabels: Record<ApplicationStatus, string> = {
+const SubmissionStatusLabels: Record<ApplicationStatus, string> = {
   applied: 'Applied',
   rejected: 'Rejected',
   inProgress: 'In Progress',
@@ -60,7 +44,7 @@ export const SubmissionStatusLabels: Record<ApplicationStatus, string> = {
   paid: 'Paid'
 };
 
-interface BountySubmissionsTableRowProps {
+interface BountyApplicantTableRowProps {
   submissionsCapReached: boolean
   submission: ApplicationWithTransactions
   permissions: AssignedBountyPermissions
@@ -68,14 +52,14 @@ interface BountySubmissionsTableRowProps {
   refreshSubmissions: () => Promise<void>
 }
 
-function BountySubmissionsTableRow ({
+export default function BountyApplicantTableRow ({
   submission,
   permissions,
   bounty,
   submissionsCapReached,
   refreshSubmissions
 }:
-  BountySubmissionsTableRowProps) {
+  BountyApplicantTableRowProps) {
   const [contributors] = useContributors();
   const [user] = useUser();
   const [isViewingDetails, setIsViewingDetails] = useState(false);
@@ -227,128 +211,4 @@ function getContentWithMention ({ myUserId, targetUserId }: { myUserId: string, 
       }]
     }]
   };
-}
-
-export default function BountySubmissionsTable ({ bounty, permissions }: Props) {
-  const theme = useTheme();
-
-  const [applications, setListApplications] = useState<ApplicationWithTransactions[]>([]);
-  const validSubmissions = countValidSubmissions(applications);
-  const { refreshBounty } = useBounties();
-  const [user] = useUser();
-
-  async function refreshSubmissions () {
-    if (bounty) {
-      const listApplicationsResponse = await charmClient.listApplications(bounty.id);
-      setListApplications(listApplicationsResponse);
-    }
-  }
-
-  const submissionsCapReached = submissionsCapReachedFn({
-    bounty,
-    submissions: applications
-  });
-
-  useEffect(() => {
-    refreshSubmissions();
-  }, [bounty]);
-
-  async function lockBountySubmissions () {
-    const updatedBounty = await charmClient.lockBountySubmissions(bounty!.id, !bounty.submissionsLocked);
-    refreshBounty(updatedBounty.id);
-  }
-
-  const filteredApplications = applications?.filter(a => a.createdBy !== user?.id);
-
-  return (
-    <>
-      {
-        validSubmissions > 0 && (
-          <Box width='100%' display='flex' mb={1} justifyContent='space-between'>
-            <Box display='flex' gap={1} alignItems='center'>
-              <Chip
-                sx={{
-                  my: 1
-                }}
-                label={`Submissions: ${bounty?.maxSubmissions ? `${validSubmissions} / ${bounty.maxSubmissions}` : validSubmissions}`}
-              />
-              { permissions?.userPermissions?.lock && isBountyLockable(bounty) && (
-              <Tooltip key='stop-new' arrow placement='top' title={`${bounty.submissionsLocked ? 'Enable' : 'Prevent'} new ${bounty.approveSubmitters ? 'applications' : 'submissions'} from being made.`}>
-                <IconButton
-                  size='small'
-                  onClick={() => {
-                    lockBountySubmissions();
-                  }}
-                >
-                  { !bounty.submissionsLocked ? <LockOpen color='secondary' fontSize='small' /> : <LockIcon color='secondary' fontSize='small' />}
-                </IconButton>
-              </Tooltip>
-              )}
-            </Box>
-          </Box>
-        )
-      }
-      {
-        filteredApplications.length === 0 ? (
-          <Box
-            my={3}
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              opacity: 0.5
-            }}
-          >
-            <Typography variant='h6'>
-              No submissions to review
-            </Typography>
-          </Box>
-        ) : (
-          <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
-            <TableHead sx={{
-              background: theme.palette.background.dark,
-              '.MuiTableCell-root': {
-                background: theme.palette.settingsHeader.background
-              }
-            }}
-            >
-              <TableRow>
-                <TableCell>
-                  <Box sx={{
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}
-                  >
-                    Applicant
-                  </Box>
-                </TableCell>
-                <TableCell sx={{ width: 120 }} align='left'>
-                  Status
-                </TableCell>
-                <TableCell>
-                  Last updated
-                </TableCell>
-                <TableCell>
-                </TableCell>
-                <TableCell align='center'>
-                  Action
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredApplications.map((submission) => (
-                <BountySubmissionsTableRow
-                  bounty={bounty}
-                  permissions={permissions}
-                  submission={submission}
-                  key={submission.id}
-                  refreshSubmissions={refreshSubmissions}
-                  submissionsCapReached={submissionsCapReached}
-                />
-              ))}
-            </TableBody>
-          </Table>
-        )
-      }
-    </>
-  );
 }
