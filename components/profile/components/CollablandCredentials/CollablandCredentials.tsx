@@ -60,18 +60,18 @@ function Credentials ({ credentials }: { credentials: CollablandCredential[] }) 
           </Typography>
         </Box>
       )}
-      {credentials.map((credential, i) => (
+      {credentials.map(credential => (
         // eslint-disable-next-line react/no-array-index-key
-        <Box key={i} display='flex' justifyContent='center' my={2}>
+        <Box key={credential.id} display='flex' justifyContent='center' my={2}>
           <Box px={2}>
-            <Avatar size='xLarge' avatar={credential.discordGuildAvatar} />
+            <Avatar size='xLarge' avatar={credential.discord.guildAvatar} />
           </Box>
           <Stack flexGrow={1} pr={2} justifyContent='center'>
             <Typography variant='body2'>
-              {credential.discordGuildName}
+              {credential.discord.guildName}
             </Typography>
             <Typography variant='caption' color='secondary'>
-              <strong>{credential.discordRoleName}</strong> issued on {toMonthDate(credential.createdAt)}
+              {credential.discord.roles.map((role, i) => <><strong>{role.name} </strong>{i < credential.discord.roles.length - 1 && ' and '}</>)} issued on {toMonthDate(credential.createdAt)}
             </Typography>
           </Stack>
         </Box>

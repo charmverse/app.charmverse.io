@@ -3,7 +3,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { prisma } from 'db';
 import { getCredentials } from 'lib/collabland';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
