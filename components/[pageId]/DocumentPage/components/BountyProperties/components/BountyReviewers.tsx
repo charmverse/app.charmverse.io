@@ -103,14 +103,6 @@ export default function BountyReviewers ({ bounty, permissions }: BountyReviewer
       </Typography>
 
       {
-        reviewerNames.roles.length === 0 && reviewerNames.users.length === 0 && (
-          <Typography variant='body2'>
-            There are no reviewers assigned to this bounty yet.
-          </Typography>
-        )
-      }
-
-      {
         reviewerNames.roles.length > 0 && (
           <Box display='flex' alignItems='center'>
 

@@ -113,13 +113,13 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
                   Applicant
                 </TableCell>
                 <TableCell>
-                  Last updated
+                  Status
                 </TableCell>
                 <TableCell>
+                  Last updated
                 </TableCell>
-                <TableCell align='center'>
-                  Action
-                </TableCell>
+                <TableCell />
+                <TableCell />
               </TableRow>
             </TableHead>
             <TableBody>

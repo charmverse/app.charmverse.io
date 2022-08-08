@@ -1,11 +1,7 @@
-
-import LaunchIcon from '@mui/icons-material/LaunchOutlined';
-import { Box, Tooltip, Typography } from '@mui/material';
+import { Box, Tooltip } from '@mui/material';
 import { Bounty } from '@prisma/client';
-import Link from 'components/common/Link';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import { getChainExplorerLink } from 'connectors';
 import { useBounties } from 'hooks/useBounties';
 import { ApplicationWithTransactions } from 'lib/applications/actions';
 import { eToNumber } from 'lib/utilities/numbers';
@@ -41,22 +37,10 @@ export default function BountyApplicantActions ({ bounty, isExpanded, submission
 
   return (
     <Box display='flex' justifyContent='center' alignItems='center' width='100%'>
-      {submission.status === 'applied' && (
+      {(submission.status === 'applied' || submission.status === 'review') && (
         <Button color='primary' size='small' onClick={expandRow} sx={{ opacity: isExpanded ? 0 : 1, transition: 'opacity .2s' }}>
-          Review application
+          Review
         </Button>
-      )}
-
-      {submission.status === 'review' && (
-        <Button color='primary' size='small' onClick={expandRow} sx={{ opacity: isExpanded ? 0 : 1, transition: 'opacity .2s' }}>
-          Review submission
-        </Button>
-      )}
-
-      {submission.status === 'inProgress' && (
-        <Typography color='secondary' variant='body2'>
-          In Progress
-        </Typography>
       )}
 
       {submission.status === 'complete' && (
@@ -79,27 +63,6 @@ export default function BountyApplicantActions ({ bounty, isExpanded, submission
             </Tooltip>
           )}
         </Box>
-      )}
-
-      {submission.status === 'rejected' && (
-        <Typography color='error' variant='body2'>
-          Rejected
-        </Typography>
-      )}
-
-      {submission.status === 'paid' && (
-      <Link
-        external
-        href={submission.transactions[0] ? getChainExplorerLink(submission.transactions[0].chainId, submission.transactions[0].transactionId) : ''}
-        target='_blank'
-      >
-        <Tooltip title={submission.transactions[0] ? 'View transaction' : ''} placement='top' arrow>
-          <Typography color='success' variant='body2'>
-            {'Paid '}
-            <LaunchIcon sx={{ fontSize: 14 }} />
-          </Typography>
-        </Tooltip>
-      </Link>
       )}
     </Box>
   );

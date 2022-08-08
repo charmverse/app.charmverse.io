@@ -396,10 +396,12 @@ export default function BountyProperties (props: {
           permissions && (readOnly ? (
             <Stack gap={1} mb={1} width='100%'>
               <hr />
-              <BountyReviewers
-                bounty={bounty}
-                permissions={permissions}
-              />
+              {permissions?.bountyPermissions.reviewer.length > 0 && (
+                <BountyReviewers
+                  bounty={bounty}
+                  permissions={permissions}
+                />
+              )}
               {/* Extra space so this looks like the focalboard properties */}
               {
                 bounty.maxSubmissions && (

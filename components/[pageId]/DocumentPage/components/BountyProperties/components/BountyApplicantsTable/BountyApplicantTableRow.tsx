@@ -25,6 +25,7 @@ import { shortenHex } from 'lib/utilities/strings';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import ApplicationInput from '../BountyApplicantForm/components/ApplicationInput';
 import SubmissionInput from '../BountyApplicantForm/components/SubmissionInput';
+import BountyApplicantStatus from './BountyApplicantStatus';
 import BountyApplicantActions from './BountyApplicantActions';
 
 interface Props {
@@ -126,6 +127,9 @@ export default function BountyApplicantTableRow ({
             />
           ) : 'Anonymous'}
         </TableCell>
+        <TableCell>
+          <BountyApplicantStatus submission={submission} />
+        </TableCell>
         <TableCell>{humanFriendlyDate(submission.updatedAt, { withTime: true })}</TableCell>
         <TableCell>
           <Tooltip title={isExpandedRow ? 'Hide details' : 'View details'}>
@@ -178,7 +182,7 @@ export default function BountyApplicantTableRow ({
                   }
                 </Box>
               )}
-              {submission.status !== 'applied' && (
+              {submission.submission && (
                 <Box mb={2}>
                   <SubmissionInput
                     bountyId={bounty.id}
@@ -235,7 +239,7 @@ export default function BountyApplicantTableRow ({
               )}
 
               {submission.status !== 'rejected' && submission.createdBy !== user?.id && (
-                <Card variant='outlined' sx={{ p: 2, pb: 0 }}>
+                <>
                   <FormLabel><strong>Send a message (optional)</strong></FormLabel>
                   <div className='CommentsList' style={{ padding: 0 }}>
                     <NewCommentInput
@@ -246,7 +250,7 @@ export default function BountyApplicantTableRow ({
                       onSubmit={onSendClicked}
                     />
                   </div>
-                </Card>
+                </>
               )}
             </Box>
 
