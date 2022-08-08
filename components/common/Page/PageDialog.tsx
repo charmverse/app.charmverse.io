@@ -64,9 +64,6 @@ export default function PageDialog (props: Props) {
     if (page?.id) {
       setCurrentPageId(page?.id);
     }
-    return () => {
-      setCurrentPageId('');
-    };
   }, [page?.id]);
 
   const debouncedPageUpdate = debouncePromise(async (updates: Partial<Page>) => {
