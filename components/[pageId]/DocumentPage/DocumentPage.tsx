@@ -209,7 +209,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
                       comments={comments}
                       rootId={card?.rootId ?? page.spaceId}
                       cardId={card?.id ?? page.id}
-                      readonly={pagePermissions.comment}
+                      readonly={!pagePermissions.comment}
                     />
                   </BountyProperties>
                 )}
