@@ -160,24 +160,34 @@ export default function BountyApplicantTableRow ({
                 <Box mb={2}>
                   <ApplicationInput
                     bountyId={bounty.id}
-                    alwaysExpanded={showAcceptApplication}
+                    alwaysExpanded={!submission.submission}
                     proposal={submission}
                     readOnly={user?.id !== submission.createdBy || submission.status !== 'applied'}
                     mode='update'
                   />
                   {
                     showAcceptApplication && (
-                      <Tooltip title={submissionsCapReached ? 'Submissions cap reached' : ''}>
+                      <Box display='flex' gap={1} mb={3}>
+                        <Tooltip title={submissionsCapReached ? 'Submissions cap reached' : ''}>
+                          <Button
+                            disabled={submissionsCapReached}
+                            color='primary'
+                            onClick={() => {
+                              approveApplication(submission.id);
+                            }}
+                          >
+                            Accept application
+                          </Button>
+                        </Tooltip>
                         <Button
-                          disabled={submissionsCapReached}
-                          color='primary'
-                          onClick={() => {
-                            approveApplication(submission.id);
-                          }}
+                          color='error'
+                          variant='outlined'
+                          disabled={submission.status === 'inProgress'}
+                          onClick={() => setReviewDecision({ submissionId: submission.id, decision: 'reject', userId: user?.id as string })}
                         >
-                          Accept application
+                          Reject
                         </Button>
-                      </Tooltip>
+                      </Box>
                     )
                   }
                 </Box>
