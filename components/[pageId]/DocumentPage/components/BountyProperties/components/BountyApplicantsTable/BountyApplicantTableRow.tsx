@@ -192,7 +192,7 @@ export default function BountyApplicantTableRow ({
                     permissions={permissions}
                     alwaysExpanded={true}
                   />
-                  <Box mb={3}>
+                  {/* disabled - maybe we dont need to show address here? <Box mb={3}>
                     <Typography variant='body2'>
                       Payment address:
                       {submission.walletAddress ? (
@@ -206,20 +206,23 @@ export default function BountyApplicantTableRow ({
                         </Link>
                       ) : <strong>{' Not set'}</strong>}
                     </Typography>
-                  </Box>
+                  </Box> */}
                   {
                     showAcceptSubmission && (
                       <Box display='flex' gap={1} mb={3}>
                         <Button
                           color='primary'
+                          disabled={submission.status === 'inProgress'}
                           onClick={() => {
                             setReviewDecision({ decision: 'approve', submissionId: submission.id, userId: user?.id as string });
                           }}
                         >
-                          Approve
+                          Approve submission
                         </Button>
                         <Button
                           color='error'
+                          variant='outlined'
+                          disabled={submission.status === 'inProgress'}
                           onClick={() => setReviewDecision({ submissionId: submission.id, decision: 'reject', userId: user?.id as string })}
                         >
                           Reject
