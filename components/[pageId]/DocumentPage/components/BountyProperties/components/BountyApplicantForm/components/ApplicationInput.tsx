@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Collapse, FormLabel, IconButton, Stack } from '@mui/material';
+import { Box, Collapse, FormLabel, IconButton, Stack } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
@@ -83,30 +83,24 @@ export default function ApplicationInput ({ readOnly = false, onCancel, onSubmit
 
   return (
     <Stack my={1} gap={1}>
-      <Stack
+      <Box
+        display='flex'
+        justifyContent='space-between'
         flexDirection='row'
         gap={0.5}
+        sx={{ cursor: !alwaysExpanded ? 'pointer' : 'inherit' }}
         onClick={() => {
           if (!alwaysExpanded) {
             setIsVisible(!isVisible);
           }
         }}
       >
-        <FormLabel
-          sx={{
-            fontWeight: 'bold'
-          }}
-        >
-          {proposal?.createdBy === user?.id ? 'Your application' : 'Application'}
+        <Box display='flex' gap={0.5}>
+          <FormLabel sx={{ fontWeight: 'bold' }}>
+            {proposal?.createdBy === user?.id ? 'Your application' : 'Application'}
+          </FormLabel>
 
-          {
-            proposal && proposal.status === 'applied' && proposal.createdBy === user?.id && (
-              <BountyApplicantStatus submission={proposal} />
-            )
-          }
-        </FormLabel>
-
-        {!alwaysExpanded && (
+          {!alwaysExpanded && (
           <IconButton
             sx={{
               top: -2.5,
@@ -116,9 +110,13 @@ export default function ApplicationInput ({ readOnly = false, onCancel, onSubmit
           >
             {isVisible ? <KeyboardArrowUpIcon fontSize='small' /> : <KeyboardArrowDownIcon fontSize='small' />}
           </IconButton>
+          )}
+        </Box>
+        {proposal && proposal.status === 'applied' && proposal.createdBy === user?.id && (
+          <BountyApplicantStatus submission={proposal} />
         )}
 
-      </Stack>
+      </Box>
       <Collapse in={isVisible} timeout='auto' unmountOnExit>
         <form onSubmit={handleSubmit(formValue => submitted(formValue as Application))} style={{ margin: 'auto', width: '100%' }}>
           <Grid container direction='column' spacing={3}>

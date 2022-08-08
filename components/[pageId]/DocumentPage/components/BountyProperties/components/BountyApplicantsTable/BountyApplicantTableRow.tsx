@@ -194,7 +194,7 @@ export default function BountyApplicantTableRow ({
                       setIsExpandedRow(false);
                     }}
                     permissions={permissions}
-                    alwaysExpanded={true}
+                    alwaysExpanded={false}
                   />
                   {/* disabled - maybe we dont need to show address here? <Box mb={3}>
                     <Typography variant='body2'>

@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { FormLabel } from '@mui/material';
+import { Box, FormLabel } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
 import Collapse from '@mui/material/Collapse';
@@ -99,26 +99,21 @@ export default function SubmissionInput (
 
   return (
     <Stack my={2} gap={1}>
-      <Stack
+      <Box
+        display='flex'
+        justifyContent='space-between'
         flexDirection='row'
         gap={0.5}
+        sx={{ cursor: !alwaysExpanded ? 'pointer' : 'inherit' }}
         onClick={() => {
           if (!alwaysExpanded) {
             setIsVisible(!isVisible);
           }
         }}
       >
-        <>
-          <FormLabel sx={{
-            fontWeight: 'bold'
-          }}
-          >
+        <Box display='flex' gap={0.5}>
+          <FormLabel sx={{ fontWeight: 'bold' }}>
             {submission?.createdBy === user?.id ? 'Your submission' : 'Submission'}
-            {
-          submission && submission.status !== 'applied' && submission.createdBy === user?.id && (
-            <BountyApplicantStatus submission={submission} />
-          )
-        }
           </FormLabel>
           {!alwaysExpanded && (
             <IconButton
@@ -131,8 +126,11 @@ export default function SubmissionInput (
               {isVisible ? <KeyboardArrowUpIcon fontSize='small' /> : <KeyboardArrowDownIcon fontSize='small' />}
             </IconButton>
           )}
-        </>
-      </Stack>
+        </Box>
+        {submission && submission.status !== 'applied' && submission.createdBy === user?.id && (
+          <BountyApplicantStatus submission={submission} />
+        )}
+      </Box>
       <Collapse in={isVisible} timeout='auto' unmountOnExit>
         <form onSubmit={handleSubmit(onSubmit)} style={{ margin: 'auto', width: '100%' }}>
           <Grid container direction='column' spacing={2}>
