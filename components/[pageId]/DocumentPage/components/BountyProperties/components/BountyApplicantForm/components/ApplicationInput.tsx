@@ -15,7 +15,7 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import BountySubmissionStatus from './BountySubmissionStatus';
+import BountyApplicantStatus from '../../BountyApplicantStatus';
 
 /**
  * @expandedOnLoad Use this to expand the application initially
@@ -101,7 +101,7 @@ export default function ApplicationInput ({ readOnly = false, onCancel, onSubmit
 
           {
             proposal && proposal.status === 'applied' && proposal.createdBy === user?.id && (
-              <BountySubmissionStatus submission={proposal} />
+              <BountyApplicantStatus submission={proposal} />
             )
           }
         </FormLabel>

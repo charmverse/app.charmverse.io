@@ -20,7 +20,7 @@ import * as yup from 'yup';
 import { AssignedBountyPermissions } from 'lib/bounties';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import BountySubmissionStatus from './BountySubmissionStatus';
+import BountyApplicantStatus from '../../BountyApplicantStatus';
 
 const schema = yup.object({
   submission: yup.string().required(),
@@ -116,7 +116,7 @@ export default function SubmissionInput (
             {submission?.createdBy === user?.id ? 'Your submission' : 'Submission'}
             {
           submission && submission.status !== 'applied' && submission.createdBy === user?.id && (
-            <BountySubmissionStatus submission={submission} />
+            <BountyApplicantStatus submission={submission} />
           )
         }
           </FormLabel>
@@ -190,22 +190,24 @@ export default function SubmissionInput (
           }
 
             {!readOnly && (
-            <Grid item display='flex' gap={1}>
-              <Button disabled={!isValid} type='submit'>
-                {
-                  submission?.submission ? 'Update' : 'Submit'
-                }
-              </Button>
-              <Button
-                onClick={() => {
-                  setIsVisible(false);
-                  onCancel();
-                }}
-                variant='outlined'
-                color='secondary'
-              >Cancel
-              </Button>
-            </Grid>
+              <Grid item display='flex' gap={1}>
+                <Button disabled={!isValid} type='submit'>
+                  {
+                    submission?.submission ? 'Update' : 'Submit'
+                  }
+                </Button>
+                {!submission?.submission && (
+                  <Button
+                    onClick={() => {
+                      setIsVisible(false);
+                      onCancel();
+                    }}
+                    variant='outlined'
+                    color='secondary'
+                  >Cancel
+                  </Button>
+                )}
+              </Grid>
             )}
           </Grid>
         </form>

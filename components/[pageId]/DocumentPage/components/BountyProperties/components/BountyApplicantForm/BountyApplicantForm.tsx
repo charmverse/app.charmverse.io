@@ -113,6 +113,7 @@ export default function BountyApplicantForm (props: BountyApplicationFormProps) 
             onCancel={() => {
               setShowApplication(false);
             }}
+            alwaysExpanded={true}
           />
         )}
       </>
@@ -149,7 +150,7 @@ export default function BountyApplicantForm (props: BountyApplicationFormProps) 
           }}
           submission={userApplication}
           permissions={permissions}
-          expandedOnLoad={true}
+          alwaysExpanded={true}
         />
       )
     );

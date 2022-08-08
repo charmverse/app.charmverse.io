@@ -3,19 +3,22 @@ import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import { Box, Tooltip, Typography } from '@mui/material';
 import Link from 'components/common/Link';
 import { getChainExplorerLink } from 'connectors';
+import { Application } from '@prisma/client';
 import { ApplicationWithTransactions } from 'lib/applications/actions';
 
 interface Props {
-  submission: ApplicationWithTransactions;
+  submission: ApplicationWithTransactions | Application;
 }
 
 export default function BountyApplicantActions ({ submission }: Props) {
+
+  const transaction = (submission as ApplicationWithTransactions).transactions[0];
 
   return (
     <>
       {submission.status === 'inProgress' && (
         <Typography color='secondary' variant='body2'>
-          In Progress
+          Awaiting submission
         </Typography>
       )}
 
@@ -27,13 +30,13 @@ export default function BountyApplicantActions ({ submission }: Props) {
 
       {submission.status === 'complete' && (
         <Typography color='secondary' variant='body2'>
-          Needs payment
+          Awaiting payment
         </Typography>
       )}
 
       {submission.status === 'applied' && (
         <Typography color='secondary' variant='body2'>
-          Application submitted
+          Awaiting assignment
         </Typography>
       )}
 
@@ -46,10 +49,10 @@ export default function BountyApplicantActions ({ submission }: Props) {
       {submission.status === 'paid' && (
         <Link
           external
-          href={submission.transactions[0] ? getChainExplorerLink(submission.transactions[0].chainId, submission.transactions[0].transactionId) : ''}
+          href={transaction ? getChainExplorerLink(transaction.chainId, transaction.transactionId) : ''}
           target='_blank'
         >
-          <Tooltip title={submission.transactions[0] ? 'View transaction' : ''} placement='top' arrow>
+          <Tooltip title={transaction ? 'View transaction' : ''} placement='top' arrow>
             <Typography color='success' variant='body2'>
               {'Paid '}
               <LaunchIcon sx={{ fontSize: 14 }} />

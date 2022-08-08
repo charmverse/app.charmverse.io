@@ -25,7 +25,7 @@ import { shortenHex } from 'lib/utilities/strings';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import ApplicationInput from '../BountyApplicantForm/components/ApplicationInput';
 import SubmissionInput from '../BountyApplicantForm/components/SubmissionInput';
-import BountyApplicantStatus from './BountyApplicantStatus';
+import BountyApplicantStatus from '../BountyApplicantStatus';
 import BountyApplicantActions from './BountyApplicantActions';
 
 interface Props {
