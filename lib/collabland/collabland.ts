@@ -97,7 +97,7 @@ export async function getCredentials ({ aeToken }: { aeToken: string }): Promise
       const last = newList[newList.length - 1];
       // if previous VC was the same server and <24 hours, just append the roles
       const lastIsSameServer = last && last.discord.guildId === curr.discord.guildId;
-      const lastIsRecent = last && new Date(last.createdAt).getTime() > new Date().getTime() - (24 * 60 * 60 * 1000);
+      const lastIsRecent = last && new Date(last.createdAt).getTime() > new Date(curr.createdAt).getTime() - (24 * 60 * 60 * 1000);
       if (lastIsSameServer && lastIsRecent) {
         last.discord.roles.push(curr.discord.roles[0]);
       }
