@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { FormLabel, lighten, Typography } from '@mui/material';
+import { FormLabel, Typography } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
 import Collapse from '@mui/material/Collapse';

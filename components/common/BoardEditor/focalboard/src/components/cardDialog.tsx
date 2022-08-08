@@ -86,7 +86,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
   const card = useAppSelector(getCard(cardId))
   const intl = useIntl()
   const [showConfirmationDialogBox, setShowConfirmationDialogBox] = useState<boolean>(false)
-  const { pages } = usePages()
+  const { pages, setPages } = usePages()
   const { refreshBounty, bounties } = useBounties()
   const router = useRouter();
   const isSharedPage = router.route.startsWith('/share')
@@ -140,6 +140,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
         toolbar={
           spacePermissions?.createBounty && !isSharedPage && cardPage && !bounty && !readonly && <CreateBountyButton onClick={(createdBounty) => {
             setBounty(createdBounty)
+            setPages((pages) => ({ ...pages, [createdBounty.page.id]: createdBounty.page }));
           }} pageId={cardId} />
         }
         page={cardPage}

@@ -3,12 +3,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Box, Collapse, Divider, FormLabel, IconButton, Stack, TextField } from '@mui/material';
 import { PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
-import BountyApplicantForm from 'components/bounties/components/BountyApplicantForm';
 import BountyHeader from 'components/bounties/components/BountyHeader';
-import BountyReviewers from 'components/bounties/components/BountyReviewers';
-import BountySlots from 'components/bounties/components/BountySlots';
-import BountySubmissionsTable from 'components/bounties/components/BountySubmissionsTable';
-import BountySuggestionApproval from 'components/bounties/components/BountySuggestionApproval';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
 import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
@@ -28,6 +23,11 @@ import debouncePromise from 'lib/utilities/debouncePromise';
 import { isTruthy } from 'lib/utilities/types';
 import { BountyWithDetails } from 'models';
 import { ReactNode, useCallback, useEffect, useState } from 'react';
+import BountyReviewers from './components/BountyReviewers';
+import BountySlots from './components/BountySlots';
+import BountySuggestionApproval from './components/BountySuggestionApproval';
+import BountyApplicantForm from './components/BountyApplicantForm';
+import BountyApplicantsTable from './components/BountyApplicantsTable';
 
 function rollupPermissions ({
   selectedReviewerUsers,
@@ -93,7 +93,7 @@ export default function BountyProperties (props: {
   const selectedReviewerUsers = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'user').map(p => p.id as string) ?? [];
   const selectedReviewerRoles = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
 
-  // Copied from BountySubmissionsTable
+  // Copied from BountyApplicantsTable
   const [applications, setListApplications] = useState<ApplicationWithTransactions[]>([]);
   async function refreshSubmissions () {
     if (bounty) {
@@ -481,7 +481,7 @@ export default function BountyProperties (props: {
 
       {permissions?.userPermissions?.review && bounty.status !== 'suggestion' && (
         <>
-          <BountySubmissionsTable
+          <BountyApplicantsTable
             bounty={currentBounty}
             permissions={permissions}
           />

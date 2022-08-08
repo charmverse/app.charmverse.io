@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Collapse, FormLabel, IconButton, Stack, Typography } from '@mui/material';
+import { Collapse, FormLabel, IconButton, Stack } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
@@ -15,27 +15,26 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { FormMode } from '../../BountyEditorForm';
 import BountySubmissionStatus from './BountySubmissionStatus';
 
 /**
  * @expandedOnLoad Use this to expand the application initially
  */
 interface IApplicationFormProps {
-  onSubmit?: (application: Application) => any,
-  bountyId: string
-  mode?: FormMode
-  proposal?: Application
-  onCancel?: () => void
-  readOnly?: boolean
-  expandedOnLoad?: boolean
+  onSubmit?: (application: Application) => any;
+  bountyId: string;
+  mode?: 'create' | 'update' | 'suggest';
+  proposal?: Application;
+  onCancel?: () => void;
+  readOnly?: boolean;
+  expandedOnLoad?: boolean;
 }
 
 export const schema = yup.object({
   message: yup.string().required('Please enter a proposal.').min(MINIMUM_APPLICATION_MESSAGE_CHARACTERS, `Application proposal must contain at least ${MINIMUM_APPLICATION_MESSAGE_CHARACTERS} characters.`)
 });
 
-type FormValues = yup.InferType<typeof schema>
+type FormValues = yup.InferType<typeof schema>;
 
 export function ApplicationEditorForm ({ readOnly = false, onCancel, onSubmit, bountyId, proposal, mode = 'create', expandedOnLoad }: IApplicationFormProps) {
   const { refreshBounty } = useBounties();

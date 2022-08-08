@@ -37,6 +37,7 @@
   ],
   "include": [
     "**/*.ts",
-    "**/*.tsx"
+    "**/*.tsx",
+    "components/bounties/components/BountyApplicantsTable"
   ]
 }
