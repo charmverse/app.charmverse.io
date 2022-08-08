@@ -88,18 +88,18 @@ export default function BountyApplicantActions ({ bounty, isExpanded, submission
       )}
 
       {submission.status === 'paid' && (
-        <Tooltip title={submission.transactions[0] ? 'View transaction details' : ''} placement='top' arrow>
-          <Link
-            external
-            href={submission.transactions[0] ? getChainExplorerLink(submission.transactions[0].chainId, submission.transactions[0].transactionId) : ''}
-            target='_blank'
-          >
-            <Typography color='success' variant='body2'>
-              Paid
-              <LaunchIcon fontSize='small' />
-            </Typography>
-          </Link>
+      <Link
+        external
+        href={submission.transactions[0] ? getChainExplorerLink(submission.transactions[0].chainId, submission.transactions[0].transactionId) : ''}
+        target='_blank'
+      >
+        <Tooltip title={submission.transactions[0] ? 'View transaction' : ''} placement='top' arrow>
+          <Typography color='success' variant='body2'>
+            {'Paid '}
+            <LaunchIcon sx={{ fontSize: 14 }} />
+          </Typography>
         </Tooltip>
+      </Link>
       )}
     </Box>
   );

@@ -100,7 +100,7 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
             </Typography>
           </Box>
         ) : (
-          <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
+          <Table stickyHeader aria-label='bounty applicant table'>
             <TableHead sx={{
               background: theme.palette.background.dark,
               '.MuiTableCell-root': {
