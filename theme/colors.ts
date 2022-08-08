@@ -4,6 +4,7 @@ export const blackColor = '#111';
 export const yellowColor = '#EAD637';
 
 export const blueColor = '#009Fb7';
+export const blueColorRGB = '0, 159, 183';
 export const darkBlueColor = darken(blueColor, 0.1);
 export const whiteColor = '#fff';
 export const lightGreyColor = '#eff1f3';

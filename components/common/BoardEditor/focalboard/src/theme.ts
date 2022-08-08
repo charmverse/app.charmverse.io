@@ -4,6 +4,7 @@
 import { CSSObject } from '@emotion/serialize';
 import isEqual from 'lodash/isEqual';
 import color from 'color';
+import * as colors from 'theme/colors';
 
 import { Utils } from './utils';
 
@@ -43,7 +44,7 @@ export const defaultThemeName = 'default-theme';
 export const defaultTheme = {
   mainBg: '255, 255, 255',
   mainFg: '63, 67, 80',
-  buttonBg: '28, 88, 217',
+  buttonBg: colors.blueColorRGB,// '80, 170, 221',
   buttonFg: '255, 255, 255',
   sidebarBg: '30, 50, 92',
   sidebarFg: '255, 255, 255',
@@ -72,8 +73,6 @@ export const darkTheme = {
 
   mainBg: '47, 52, 55',
   mainFg: '220, 220, 220',
-  buttonBg: '80, 170, 221',
-  buttonFg: '255, 255, 255',
   sidebarBg: '75, 73, 67',
   sidebarFg: '255, 255, 255',
   sidebarTextActiveBorder: '102, 185, 167',
@@ -101,8 +100,6 @@ export const lightTheme = {
 
   mainBg: '255, 255, 255',
   mainFg: '55, 53, 47',
-  buttonBg: '80, 170, 221',
-  buttonFg: '255, 255, 255',
   sidebarBg: '247, 246, 243',
   sidebarFg: '55, 53, 47',
   sidebarTextActiveBorder: '87, 158, 255',

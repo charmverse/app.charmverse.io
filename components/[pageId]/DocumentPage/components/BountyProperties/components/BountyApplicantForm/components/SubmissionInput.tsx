@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { FormLabel, Typography } from '@mui/material';
+import { FormLabel } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
 import Collapse from '@mui/material/Collapse';
@@ -11,15 +11,12 @@ import TextField from '@mui/material/TextField';
 import { Application } from '@prisma/client';
 import charmClient from 'charmClient';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
-import Link from 'components/common/Link';
 import { useUser } from 'hooks/useUser';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import { SystemError } from 'lib/utilities/errors';
-import { shortenHex } from 'lib/utilities/strings';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { AssignedBountyPermissions } from 'lib/bounties';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
@@ -37,20 +34,21 @@ const schema = yup.object({
 type FormValues = yup.InferType<typeof schema>
 
 interface Props {
-  submission?: Application,
-  bountyId: string,
-  onSubmit?: (submission: Application) => void
+  submission?: Application;
+  bountyId: string;
+  onSubmit?: (submission: Application) => void;
   onCancel?: () => void;
-  readOnly?: boolean
-  permissions: AssignedBountyPermissions,
-  expandedOnLoad?: boolean
+  readOnly?: boolean;
+  permissions: AssignedBountyPermissions;
+  expandedOnLoad?: boolean;
+  alwaysExpanded?: boolean;
 }
 
-export default function BountySubmissionForm (
-  { permissions, readOnly = false, submission, onSubmit: onSubmitProp, bountyId, expandedOnLoad, onCancel = () => null }: Props
+export default function SubmissionInput (
+  { permissions, readOnly = false, submission, onSubmit: onSubmitProp, bountyId, alwaysExpanded, expandedOnLoad, onCancel = () => null }: Props
 ) {
   const [user] = useUser();
-  const [isVisible, setIsVisible] = useState(expandedOnLoad ?? false);
+  const [isVisible, setIsVisible] = useState(expandedOnLoad ?? alwaysExpanded ?? false);
 
   const {
     register,
@@ -105,7 +103,9 @@ export default function BountySubmissionForm (
         flexDirection='row'
         gap={0.5}
         onClick={() => {
-          setIsVisible(!isVisible);
+          if (!alwaysExpanded) {
+            setIsVisible(!isVisible);
+          }
         }}
       >
         <>
@@ -120,40 +120,20 @@ export default function BountySubmissionForm (
           )
         }
           </FormLabel>
-          <IconButton
-            sx={{
-              top: -2.5,
-              position: 'relative'
-            }}
-            size='small'
-          >
-            {isVisible ? <KeyboardArrowUpIcon fontSize='small' /> : <KeyboardArrowDownIcon fontSize='small' />}
-          </IconButton>
-
+          {!alwaysExpanded && (
+            <IconButton
+              sx={{
+                top: -2.5,
+                position: 'relative'
+              }}
+              size='small'
+            >
+              {isVisible ? <KeyboardArrowUpIcon fontSize='small' /> : <KeyboardArrowDownIcon fontSize='small' />}
+            </IconButton>
+          )}
         </>
       </Stack>
       <Collapse in={isVisible} timeout='auto' unmountOnExit>
-        {readOnly && submission?.walletAddress && (
-        <Typography sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1
-        }}
-        >
-          Payment address:
-          <Link
-            sx={{
-              display: 'flex',
-              alignItems: 'center'
-            }}
-            external
-            target='_blank'
-            href={`https://etherscan.io/address/${submission.walletAddress}`}
-          >{shortenHex(submission.walletAddress)}
-            <OpenInNewIcon fontSize='small' />
-          </Link>
-        </Typography>
-        )}
         <form onSubmit={handleSubmit(onSubmit)} style={{ margin: 'auto', width: '100%' }}>
           <Grid container direction='column' spacing={2}>
 

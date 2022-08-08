@@ -28,6 +28,7 @@ interface IApplicationFormProps {
   onCancel?: () => void;
   readOnly?: boolean;
   expandedOnLoad?: boolean;
+  alwaysExpanded?: boolean;
 }
 
 export const schema = yup.object({
@@ -36,9 +37,9 @@ export const schema = yup.object({
 
 type FormValues = yup.InferType<typeof schema>;
 
-export function ApplicationEditorForm ({ readOnly = false, onCancel, onSubmit, bountyId, proposal, mode = 'create', expandedOnLoad }: IApplicationFormProps) {
+export default function ApplicationInput ({ readOnly = false, onCancel, onSubmit, bountyId, proposal, mode = 'create', alwaysExpanded, expandedOnLoad }: IApplicationFormProps) {
   const { refreshBounty } = useBounties();
-  const [isVisible, setIsVisible] = useState(mode === 'create' || expandedOnLoad);
+  const [isVisible, setIsVisible] = useState(mode === 'create' || expandedOnLoad || alwaysExpanded);
   const [user] = useUser();
 
   const [applicationMessage, setApplicationMessage] = useLocalStorage(`${bountyId}.${user?.id}.application`, '');
@@ -86,7 +87,9 @@ export function ApplicationEditorForm ({ readOnly = false, onCancel, onSubmit, b
         flexDirection='row'
         gap={0.5}
         onClick={() => {
-          setIsVisible(!isVisible);
+          if (!alwaysExpanded) {
+            setIsVisible(!isVisible);
+          }
         }}
       >
         <FormLabel
@@ -97,20 +100,23 @@ export function ApplicationEditorForm ({ readOnly = false, onCancel, onSubmit, b
           {proposal?.createdBy === user?.id ? 'Your application' : 'Application'}
 
           {
-          proposal && proposal.status === 'applied' && proposal.createdBy === user?.id && (
-            <BountySubmissionStatus submission={proposal} />
-          )
-        }
+            proposal && proposal.status === 'applied' && proposal.createdBy === user?.id && (
+              <BountySubmissionStatus submission={proposal} />
+            )
+          }
         </FormLabel>
-        <IconButton
-          sx={{
-            top: -2.5,
-            position: 'relative'
-          }}
-          size='small'
-        >
-          {isVisible ? <KeyboardArrowUpIcon fontSize='small' /> : <KeyboardArrowDownIcon fontSize='small' />}
-        </IconButton>
+
+        {!alwaysExpanded && (
+          <IconButton
+            sx={{
+              top: -2.5,
+              position: 'relative'
+            }}
+            size='small'
+          >
+            {isVisible ? <KeyboardArrowUpIcon fontSize='small' /> : <KeyboardArrowDownIcon fontSize='small' />}
+          </IconButton>
+        )}
 
       </Stack>
       <Collapse in={isVisible} timeout='auto' unmountOnExit>
@@ -150,22 +156,22 @@ export function ApplicationEditorForm ({ readOnly = false, onCancel, onSubmit, b
             </Grid>
 
             {!readOnly && (
-            <Grid item display='flex' gap={1}>
-              <Button
-                disabled={!isValid}
-                type='submit'
-              >{mode === 'create' ? ' Submit' : 'Update'}
-              </Button>
-              <Button
-                onClick={() => {
-                  onCancel?.();
-                  setIsVisible(false);
-                }}
-                variant='outlined'
-                color='secondary'
-              >Cancel
-              </Button>
-            </Grid>
+              <Grid item display='flex' gap={1}>
+                <Button
+                  disabled={!isValid}
+                  type='submit'
+                >{mode === 'create' ? ' Submit' : 'Update'}
+                </Button>
+                <Button
+                  onClick={() => {
+                    onCancel?.();
+                    setIsVisible(false);
+                  }}
+                  variant='outlined'
+                  color='secondary'
+                >Cancel
+                </Button>
+              </Grid>
             )}
           </Grid>
 

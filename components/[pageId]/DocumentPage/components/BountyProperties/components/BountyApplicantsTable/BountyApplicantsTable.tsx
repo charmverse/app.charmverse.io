@@ -110,16 +110,7 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
             >
               <TableRow>
                 <TableCell>
-                  <Box sx={{
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}
-                  >
-                    Applicant
-                  </Box>
-                </TableCell>
-                <TableCell sx={{ width: 120 }} align='left'>
-                  Status
+                  Applicant
                 </TableCell>
                 <TableCell>
                   Last updated
