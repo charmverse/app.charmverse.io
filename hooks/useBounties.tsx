@@ -119,6 +119,7 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
       rewardAmount: 1,
       rewardToken: 'ETH',
       linkedPageId: pageId,
+      maxSubmissions: 1,
       permissions: {
         submitter: [{
           group: 'space',
