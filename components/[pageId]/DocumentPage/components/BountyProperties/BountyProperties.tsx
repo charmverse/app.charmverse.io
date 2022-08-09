@@ -176,7 +176,7 @@ export default function BountyProperties (props: {
           height: 'fit-content'
         }}
       >
-        <div className='octo-propertyname'>
+        <div className='octo-propertyname octo-propertyname--readonly'>
           <Button>Chain</Button>
         </div>
         <InputSearchBlockchain
@@ -203,7 +203,7 @@ export default function BountyProperties (props: {
           height: 'fit-content'
         }}
       >
-        <div className='octo-propertyname'>
+        <div className='octo-propertyname octo-propertyname--readonly'>
           <Button>Reward token</Button>
         </div>
         <InputSearchCrypto
@@ -233,7 +233,7 @@ export default function BountyProperties (props: {
           height: 'fit-content'
         }}
       >
-        <div className='octo-propertyname'>
+        <div className='octo-propertyname octo-propertyname--readonly'>
           <Button>Reward amount</Button>
         </div>
         <TextField
@@ -260,7 +260,7 @@ export default function BountyProperties (props: {
           setIsShowingAdvancedSettings(!isShowingAdvancedSettings);
         }}
       >
-        <div className='octo-propertyname'>
+        <div className='octo-propertyname octo-propertyname--readonly'>
           <Button>Advanced settings</Button>
         </div>
         <Tooltip title={isShowingAdvancedSettings ? 'Hide advanced settings' : 'Expand advanced settings'}>
@@ -273,7 +273,7 @@ export default function BountyProperties (props: {
       </Stack>
       <Collapse in={isShowingAdvancedSettings} timeout='auto' unmountOnExit>
         <div className='octo-propertyrow'>
-          <div className='octo-propertyname'>
+          <div className='octo-propertyname octo-propertyname--readonly'>
             <Button>Require applications</Button>
           </div>
           <Switch
@@ -294,7 +294,7 @@ export default function BountyProperties (props: {
             height: 'fit-content'
           }}
         >
-          <div className='octo-propertyname'>
+          <div className='octo-propertyname octo-propertyname--readonly'>
             <Button>Applicant role(s)</Button>
           </div>
           <InputSearchRoleMultiple
@@ -326,8 +326,8 @@ export default function BountyProperties (props: {
             height: 'fit-content'
           }}
         >
-          <div className='octo-propertyname'>
-            <Button>Submissions limit</Button>
+          <div className='octo-propertyname octo-propertyname--readonly'>
+            <Button>Submission limit</Button>
           </div>
           <Switch
             isOn={capSubmissions}
@@ -349,7 +349,7 @@ export default function BountyProperties (props: {
             height: 'fit-content'
           }}
         >
-          <div className='octo-propertyname'>
+          <div className='octo-propertyname octo-propertyname--readonly'>
             <Button>Max submissions</Button>
           </div>
           <TextField
@@ -390,8 +390,7 @@ export default function BountyProperties (props: {
       <Stack flexDirection='row' justifyContent='space-between' gap={2} alignItems='center'>
         {
           permissions && (readOnly ? (
-            <Stack gap={1} mb={1} width='100%'>
-              <hr />
+            <Stack mb={1} width='100%'>
               {permissions?.bountyPermissions.reviewer.length > 0 && (
                 <BountyReviewers
                   bounty={bounty}
@@ -419,7 +418,7 @@ export default function BountyProperties (props: {
                 flexGrow: 1
               }}
             >
-              <div className='octo-propertyname'>
+              <div className='octo-propertyname octo-propertyname--readonly'>
                 <Button>Reviewer</Button>
               </div>
               <InputSearchReviewers
