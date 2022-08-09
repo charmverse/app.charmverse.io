@@ -59,7 +59,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
   const intl = useIntl()
   const [showConfirmationDialogBox, setShowConfirmationDialogBox] = useState<boolean>(false)
   const { pages } = usePages()
-  const { refreshBounty, bounties } = useBounties()
+  const { draftBounty, cancelDraftBounty, refreshBounty, bounties } = useBounties()
   const router = useRouter();
   const isSharedPage = router.route.startsWith('/share')
   const cardPage = pages[cardId]
@@ -69,6 +69,14 @@ const CardDialog = (props: Props): JSX.Element | null => {
   useEffect(() => {
     setBounty(bounties.find(bounty => bounty.page?.id === cardId) ?? null)
   }, [bounties.length, cardId])
+
+  // clear draft bounty on close, just in case
+  useEffect(() => {
+    return () => {
+      console.log('clear draft')
+      cancelDraftBounty()
+    }
+  }, []);
 
   const handleDeleteCard = async () => {
     if (!card) {
@@ -110,7 +118,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
         onClickDelete={handleDeleteButtonOnClick}
         onMarkCompleted={closeBounty}
         toolbar={
-          spacePermissions?.createBounty && !isSharedPage && cardPage && !bounty && !readonly && <CreateBountyButton pageId={cardId} />
+          spacePermissions?.createBounty && !isSharedPage && cardPage && !bounty && !draftBounty && !readonly && <CreateBountyButton pageId={cardId} />
         }
         page={cardPage}
       />
