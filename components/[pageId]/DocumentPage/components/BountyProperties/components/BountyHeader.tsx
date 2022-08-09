@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { BountyWithDetails } from 'models';
-import BountyStatusBadge from './BountyStatusBadge';
+import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge';
 
 interface Props {
   bounty: BountyWithDetails
