@@ -72,6 +72,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
   }, [page.bountyId]);
 
   const cannotEdit = readOnly || !pagePermissions?.edit_content;
+  const cannotComment = readOnly || pagePermissions?.comment;
 
   const pageVote = Object.values(votes).find(v => v.context === 'proposal');
 
@@ -187,31 +188,21 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
                   pageUpdatedBy={page.updatedBy}
                 />
                 )}
-                {!bounty && page.type === 'card' && (
-                  <>
-                    <hr />
-                    <CommentsList
-                      comments={comments}
-                      rootId={card?.rootId ?? page.id}
-                      cardId={card?.id ?? page.id}
-                      readonly={cannotEdit}
-                    />
-                  </>
-                )}
                 {bounty && bountyPermissions && (
                   <BountyProperties
                     bounty={bounty}
                     readOnly={cannotEdit}
                     permissions={bountyPermissions}
                     refreshBountyPermissions={refreshBountyPermissions}
-                  >
-                    <CommentsList
-                      comments={comments}
-                      rootId={card?.rootId ?? page.spaceId}
-                      cardId={card?.id ?? page.id}
-                      readonly={!pagePermissions.comment}
-                    />
-                  </BountyProperties>
+                  />
+                )}
+                {(bounty || page.type === 'card') && (
+                  <CommentsList
+                    comments={comments}
+                    rootId={card?.rootId ?? page.id}
+                    cardId={card?.id ?? page.id}
+                    readonly={cannotComment}
+                  />
                 )}
               </div>
             </div>

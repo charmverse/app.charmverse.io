@@ -94,11 +94,12 @@ export default function BountyApplicantForm (props: BountyApplicationFormProps) 
           bountyId={bounty.id}
           proposal={userApplication}
           mode='update'
+          readOnly={userApplication?.status !== 'applied'}
           onSubmit={() => {
             setShowApplication(false);
           }}
         />
-        { userApplication?.status !== 'applied' && (
+        {userApplication?.status !== 'applied' && (
 
           <SubmissionInput
             bountyId={bounty.id}
@@ -113,6 +114,7 @@ export default function BountyApplicantForm (props: BountyApplicationFormProps) 
             onCancel={() => {
               setShowApplication(false);
             }}
+            readOnly={userApplication?.status !== 'inProgress'}
             alwaysExpanded={true}
           />
         )}
@@ -148,6 +150,7 @@ export default function BountyApplicantForm (props: BountyApplicationFormProps) 
           onCancel={() => {
             setShowApplication(false);
           }}
+          readOnly={userApplication?.status === 'rejected'}
           submission={userApplication}
           permissions={permissions}
           alwaysExpanded={true}

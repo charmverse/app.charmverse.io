@@ -161,40 +161,29 @@ export default function SubmissionInput (
             </Grid>
 
             {!readOnly && (
-            <Grid item>
-              <InputLabel>
-                Address to get paid for this bounty
-              </InputLabel>
-              <TextField
-                {...register('walletAddress')}
-                type='text'
-                fullWidth
-                error={!!errors.walletAddress}
-                helperText={errors.walletAddress?.message}
-                disabled={readOnly}
-              />
-
-            </Grid>
-            )}
-
-            {
-            formError && (
               <Grid item>
-                <Alert severity={formError.severity}>
-                  {formError.message}
-                </Alert>
+                <InputLabel>
+                  Address to get paid for this bounty
+                </InputLabel>
+                <TextField
+                  {...register('walletAddress')}
+                  type='text'
+                  fullWidth
+                  error={!!errors.walletAddress}
+                  helperText={errors.walletAddress?.message}
+                  disabled={readOnly}
+                />
               </Grid>
-            )
-          }
+            )}
 
             {!readOnly && (
               <Grid item display='flex' gap={1}>
-                <Button disabled={!isValid} type='submit'>
+                <Button disabled={!isValid && submission?.status === 'inProgress'} type='submit'>
                   {
                     submission?.submission ? 'Update' : 'Submit'
                   }
                 </Button>
-                {!submission?.submission && (
+                {(!submission?.submission && !alwaysExpanded) && (
                   <Button
                     onClick={() => {
                       setIsVisible(false);
@@ -207,6 +196,16 @@ export default function SubmissionInput (
                 )}
               </Grid>
             )}
+
+            {
+              formError && (
+                <Grid item>
+                  <Alert severity={formError.severity}>
+                    {formError.message}
+                  </Alert>
+                </Grid>
+              )
+            }
           </Grid>
         </form>
 

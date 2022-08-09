@@ -101,15 +101,15 @@ export default function ApplicationInput ({ readOnly = false, onCancel, onSubmit
           </FormLabel>
 
           {!alwaysExpanded && (
-          <IconButton
-            sx={{
-              top: -2.5,
-              position: 'relative'
-            }}
-            size='small'
-          >
-            {isVisible ? <KeyboardArrowUpIcon fontSize='small' /> : <KeyboardArrowDownIcon fontSize='small' />}
-          </IconButton>
+            <IconButton
+              sx={{
+                top: -2.5,
+                position: 'relative'
+              }}
+              size='small'
+            >
+              {isVisible ? <KeyboardArrowUpIcon fontSize='small' /> : <KeyboardArrowDownIcon fontSize='small' />}
+            </IconButton>
           )}
         </Box>
         {proposal && proposal.status === 'applied' && proposal.createdBy === user?.id && (

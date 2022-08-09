@@ -1,6 +1,6 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Box, Collapse, Divider, FormLabel, IconButton, Stack, TextField } from '@mui/material';
+import { Box, Collapse, Divider, Tooltip, IconButton, Stack, TextField } from '@mui/material';
 import { PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
 import BountyHeader from 'components/bounties/components/BountyHeader';
@@ -22,7 +22,7 @@ import { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import debouncePromise from 'lib/utilities/debouncePromise';
 import { isTruthy } from 'lib/utilities/types';
 import { BountyWithDetails } from 'models';
-import { ReactNode, useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import BountyReviewers from './components/BountyReviewers';
 import BountySlots from './components/BountySlots';
 import BountySuggestionApproval from './components/BountySuggestionApproval';
@@ -73,13 +73,12 @@ function rollupPermissions ({
 }
 
 export default function BountyProperties (props: {
-  children: ReactNode,
   readOnly?: boolean,
   bounty: BountyWithDetails,
   permissions: AssignedBountyPermissions,
   refreshBountyPermissions: (bountyId: string) => void
 }) {
-  const { bounty, readOnly = false, children, permissions, refreshBountyPermissions } = props;
+  const { bounty, readOnly = false, permissions, refreshBountyPermissions } = props;
   const [paymentMethods] = usePaymentMethods();
   const { updateBounty } = useBounties();
   const [availableCryptos, setAvailableCryptos] = useState<Array<string | CryptoCurrency>>([]);
@@ -255,25 +254,22 @@ export default function BountyProperties (props: {
       <Stack
         gap={0.5}
         flexDirection='row'
+        alignItems='center'
         mt={2}
         onClick={() => {
           setIsShowingAdvancedSettings(!isShowingAdvancedSettings);
         }}
       >
-        <FormLabel sx={{
-          fontWeight: 500
-        }}
-        >Advanced settings
-        </FormLabel>
-        <IconButton
-          size='small'
-          sx={{
-            top: -2.5,
-            position: 'relative'
-          }}
-        >
-          {isShowingAdvancedSettings ? <KeyboardArrowUpIcon fontSize='small' /> : <KeyboardArrowDownIcon fontSize='small' />}
-        </IconButton>
+        <div className='octo-propertyname'>
+          <Button>Advanced settings</Button>
+        </div>
+        <Tooltip title={isShowingAdvancedSettings ? 'Hide advanced settings' : 'Expand advanced settings'}>
+          <IconButton
+            size='small'
+          >
+            {isShowingAdvancedSettings ? <KeyboardArrowUpIcon fontSize='small' /> : <KeyboardArrowDownIcon fontSize='small' />}
+          </IconButton>
+        </Tooltip>
       </Stack>
       <Collapse in={isShowingAdvancedSettings} timeout='auto' unmountOnExit>
         <div className='octo-propertyrow'>
@@ -461,7 +457,6 @@ export default function BountyProperties (props: {
           my: 1
         }}
       />
-      {children}
 
       {// Bounty creator cannot apply to their own bounty
         permissions && bounty.createdBy !== user?.id && (
@@ -482,17 +477,10 @@ export default function BountyProperties (props: {
       }
 
       {permissions?.userPermissions?.review && bounty.status !== 'suggestion' && (
-        <>
-          <BountyApplicantsTable
-            bounty={currentBounty}
-            permissions={permissions}
-          />
-          <Divider
-            sx={{
-              my: 1
-            }}
-          />
-        </>
+        <BountyApplicantsTable
+          bounty={currentBounty}
+          permissions={permissions}
+        />
       )}
 
       {permissions?.userPermissions?.review && bounty.status === 'suggestion' && bounty.createdBy !== user?.id && (
