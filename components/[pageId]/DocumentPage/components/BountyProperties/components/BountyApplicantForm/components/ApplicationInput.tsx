@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Collapse, FormLabel, IconButton, Stack } from '@mui/material';
+import { Box, Collapse, FormLabel, IconButton, Stack } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
@@ -15,7 +15,7 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import BountySubmissionStatus from './BountySubmissionStatus';
+import BountyApplicantStatus from '../../BountyApplicantStatus';
 
 /**
  * @expandedOnLoad Use this to expand the application initially
@@ -28,6 +28,7 @@ interface IApplicationFormProps {
   onCancel?: () => void;
   readOnly?: boolean;
   expandedOnLoad?: boolean;
+  alwaysExpanded?: boolean;
 }
 
 export const schema = yup.object({
@@ -36,9 +37,9 @@ export const schema = yup.object({
 
 type FormValues = yup.InferType<typeof schema>;
 
-export function ApplicationEditorForm ({ readOnly = false, onCancel, onSubmit, bountyId, proposal, mode = 'create', expandedOnLoad }: IApplicationFormProps) {
+export default function ApplicationInput ({ readOnly = false, onCancel, onSubmit, bountyId, proposal, mode = 'create', alwaysExpanded, expandedOnLoad }: IApplicationFormProps) {
   const { refreshBounty } = useBounties();
-  const [isVisible, setIsVisible] = useState(mode === 'create' || expandedOnLoad);
+  const [isVisible, setIsVisible] = useState(mode === 'create' || expandedOnLoad || alwaysExpanded);
   const [user] = useUser();
 
   const [applicationMessage, setApplicationMessage] = useLocalStorage(`${bountyId}.${user?.id}.application`, '');
@@ -82,37 +83,40 @@ export function ApplicationEditorForm ({ readOnly = false, onCancel, onSubmit, b
 
   return (
     <Stack my={1} gap={1}>
-      <Stack
+      <Box
+        display='flex'
+        justifyContent='space-between'
         flexDirection='row'
         gap={0.5}
+        sx={{ cursor: !alwaysExpanded ? 'pointer' : 'inherit' }}
         onClick={() => {
-          setIsVisible(!isVisible);
+          if (!alwaysExpanded) {
+            setIsVisible(!isVisible);
+          }
         }}
       >
-        <FormLabel
-          sx={{
-            fontWeight: 'bold'
-          }}
-        >
-          {proposal?.createdBy === user?.id ? 'Your application' : 'Application'}
+        <Box display='flex' gap={0.5}>
+          <FormLabel sx={{ fontWeight: 'bold' }}>
+            {proposal?.createdBy === user?.id ? 'Your application' : 'Application'}
+          </FormLabel>
 
-          {
-          proposal && proposal.status === 'applied' && proposal.createdBy === user?.id && (
-            <BountySubmissionStatus submission={proposal} />
-          )
-        }
-        </FormLabel>
-        <IconButton
-          sx={{
-            top: -2.5,
-            position: 'relative'
-          }}
-          size='small'
-        >
-          {isVisible ? <KeyboardArrowUpIcon fontSize='small' /> : <KeyboardArrowDownIcon fontSize='small' />}
-        </IconButton>
+          {!alwaysExpanded && (
+            <IconButton
+              sx={{
+                top: -2.5,
+                position: 'relative'
+              }}
+              size='small'
+            >
+              {isVisible ? <KeyboardArrowUpIcon fontSize='small' /> : <KeyboardArrowDownIcon fontSize='small' />}
+            </IconButton>
+          )}
+        </Box>
+        {proposal && proposal.status === 'applied' && proposal.createdBy === user?.id && (
+          <BountyApplicantStatus submission={proposal} />
+        )}
 
-      </Stack>
+      </Box>
       <Collapse in={isVisible} timeout='auto' unmountOnExit>
         <form onSubmit={handleSubmit(formValue => submitted(formValue as Application))} style={{ margin: 'auto', width: '100%' }}>
           <Grid container direction='column' spacing={3}>
@@ -150,22 +154,22 @@ export function ApplicationEditorForm ({ readOnly = false, onCancel, onSubmit, b
             </Grid>
 
             {!readOnly && (
-            <Grid item display='flex' gap={1}>
-              <Button
-                disabled={!isValid}
-                type='submit'
-              >{mode === 'create' ? ' Submit' : 'Update'}
-              </Button>
-              <Button
-                onClick={() => {
-                  onCancel?.();
-                  setIsVisible(false);
-                }}
-                variant='outlined'
-                color='secondary'
-              >Cancel
-              </Button>
-            </Grid>
+              <Grid item display='flex' gap={1}>
+                <Button
+                  disabled={!isValid}
+                  type='submit'
+                >{mode === 'create' ? ' Submit' : 'Update'}
+                </Button>
+                <Button
+                  onClick={() => {
+                    onCancel?.();
+                    setIsVisible(false);
+                  }}
+                  variant='outlined'
+                  color='secondary'
+                >Cancel
+                </Button>
+              </Grid>
             )}
           </Grid>
 

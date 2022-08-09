@@ -62,7 +62,7 @@ export default function PageTitle ({ value, onChange, readOnly }: PageTitleProps
   }
 
   if (readOnly) {
-    return <StyledReadOnlyTitle>{value}</StyledReadOnlyTitle>;
+    return <StyledReadOnlyTitle>{value || 'Untitled'}</StyledReadOnlyTitle>;
   }
   return (
     <StyledPageTitle

@@ -137,7 +137,7 @@ const CardDetailProperties = React.memo((props: Props) => {
   }
 
   return (
-    <div className='octo-propertylist CardDetailProperties'>
+    <div className='octo-propertylist'>
       {board.fields.cardProperties.map((propertyTemplate: IPropertyTemplate) => {
         const propertyValue = card.fields.properties[propertyTemplate.id];
         return (

@@ -4,6 +4,7 @@
 import { CSSObject } from '@emotion/serialize';
 import isEqual from 'lodash/isEqual';
 import color from 'color';
+import * as colors from 'theme/colors';
 
 import { Utils } from './utils';
 
@@ -42,8 +43,8 @@ export const defaultThemeName = 'default-theme';
 
 export const defaultTheme = {
   mainBg: '255, 255, 255',
-  mainFg: '63, 67, 80',
-  buttonBg: '28, 88, 217',
+  mainFg: colors.inputBackground,//'63, 67, 80',
+  buttonBg: colors.blueColorRGB,// '80, 170, 221',
   buttonFg: '255, 255, 255',
   sidebarBg: '30, 50, 92',
   sidebarFg: '255, 255, 255',
@@ -72,8 +73,6 @@ export const darkTheme = {
 
   mainBg: '47, 52, 55',
   mainFg: '220, 220, 220',
-  buttonBg: '80, 170, 221',
-  buttonFg: '255, 255, 255',
   sidebarBg: '75, 73, 67',
   sidebarFg: '255, 255, 255',
   sidebarTextActiveBorder: '102, 185, 167',
@@ -101,8 +100,6 @@ export const lightTheme = {
 
   mainBg: '255, 255, 255',
   mainFg: '55, 53, 47',
-  buttonBg: '80, 170, 221',
-  buttonFg: '255, 255, 255',
   sidebarBg: '247, 246, 243',
   sidebarFg: '55, 53, 47',
   sidebarTextActiveBorder: '87, 158, 255',
@@ -172,33 +169,6 @@ export function setTheme (theme: Theme | null): Theme {
   return consolidatedTheme;
 }
 
-export function setMattermostTheme (theme: any): Theme {
-  if (!theme) {
-    return setTheme(defaultTheme);
-  }
-
-  document.documentElement.style.setProperty('--center-channel-bg-rgb', color(theme.centerChannelBg).rgb().array().join(', '));
-  document.documentElement.style.setProperty('--center-channel-color-rgb', color(theme.centerChannelColor).rgb().array().join(', '));
-  document.documentElement.style.setProperty('--button-bg-rgb', color(theme.buttonBg).rgb().array().join(', '));
-  document.documentElement.style.setProperty('--button-color-rgb', color(theme.buttonColor).rgb().array().join(', '));
-  document.documentElement.style.setProperty('--sidebar-bg-rgb', color(theme.sidebarBg).rgb().array().join(', '));
-  document.documentElement.style.setProperty('--sidebar-text-rgb', color(theme.sidebarText).rgb().array().join(', '));
-  document.documentElement.style.setProperty('--link-color-rgb', theme.linkColor);
-  document.documentElement.style.setProperty('--sidebar-text-active-border-rgb', color(theme.sidebarTextActiveBorder).rgb().array().join(', '));
-
-  return setTheme({
-    ...defaultTheme,
-    mainBg: color(theme.centerChannelBg).rgb().array().join(', '),
-    mainFg: color(theme.centerChannelColor).rgb().array().join(', '),
-    buttonBg: color(theme.buttonBg).rgb().array().join(', '),
-    buttonFg: color(theme.buttonColor).rgb().array().join(', '),
-    sidebarBg: color(theme.sidebarBg).rgb().array().join(', '),
-    sidebarFg: color(theme.sidebarColor || '#ffffff').rgb().array().join(', '),
-    sidebarTextActiveBorder: color(theme.sidebarTextActiveBorder).rgb().array().join(', '),
-    link: theme.linkColor
-  });
-}
-
 function setActiveThemeName (consolidatedTheme: Theme, theme: Theme | null) {
   if (theme === null) {
     activeThemeName = systemThemeName;
@@ -230,24 +200,6 @@ export function loadTheme (): Theme {
   else {
     return setTheme(null);
   }
-}
-
-export function initThemes (): void {
-  const darkThemeMq = window.matchMedia('(prefers-color-scheme: dark)');
-  const changeHandler = () => {
-    const themeStr = UserSettings.theme;
-    if (!themeStr) {
-      setTheme(null);
-    }
-  };
-  if (darkThemeMq.addEventListener) {
-    darkThemeMq.addEventListener('change', changeHandler);
-  }
-  else if (darkThemeMq.addListener) {
-    // Safari and Mac app support
-    darkThemeMq.addListener(changeHandler);
-  }
-  loadTheme();
 }
 
 export function getSelectBaseStyle () {
@@ -311,8 +263,4 @@ export function getSelectBaseStyle () {
       overflowX: 'hidden'
     })
   };
-}
-
-export function getActiveThemeName (): string {
-  return activeThemeName || defaultThemeName;
 }

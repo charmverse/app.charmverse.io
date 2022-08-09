@@ -6,6 +6,7 @@ import useRoles from 'hooks/useRoles';
 import { AssignedBountyPermissions } from 'lib/bounties';
 import { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import { Contributor } from 'models';
+import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import { useMemo, useState } from 'react';
 
 interface BountyReviewersProps {
@@ -91,24 +92,13 @@ export default function BountyReviewers ({ bounty, permissions }: BountyReviewer
     return reduced;
   }, [bounty, permissions, roleups]);
 
-  return (
-    <Box display='flex' alignItems='center' gap={2}>
-      <Typography
-        sx={{
-          fontWeight: 'bold'
-        }}
-        className='octo-propertyname octo-propertyname--readonly'
-      >
-        Reviewers
-      </Typography>
+  const hasMultipleReviewers = (reviewerNames.users.length > 1 || reviewerNames.roles.length > 0);
 
-      {
-        reviewerNames.roles.length === 0 && reviewerNames.users.length === 0 && (
-          <Typography variant='body2'>
-            There are no reviewers assigned to this bounty yet.
-          </Typography>
-        )
-      }
+  return (
+    <Box className='octo-propertyrow' display='flex' alignItems='center' gap={2}>
+      <div className='octo-propertyname octo-propertyname--readonly'>
+        <Button>Reviewer{hasMultipleReviewers ? 's' : ''}</Button>
+      </div>
 
       {
         reviewerNames.roles.length > 0 && (
@@ -119,7 +109,7 @@ export default function BountyReviewers ({ bounty, permissions }: BountyReviewer
                 <Chip size='small' key={reviewer.id} label={reviewer.name} color='purple' sx={{ mr: 1 }} />
               );
             })}
-            <Typography variant='subtitle2'>(Roles)</Typography>
+            {reviewerNames.users.length > 0 && <Typography variant='subtitle2'>(Roles)</Typography>}
           </Box>
         )
       }
@@ -144,7 +134,7 @@ export default function BountyReviewers ({ bounty, permissions }: BountyReviewer
                 })
               }
             </AvatarGroup>
-            <Typography variant='subtitle2'>(Users)</Typography>
+            {reviewerNames.roles.length > 0 && <Typography variant='subtitle2'>(Users)</Typography>}
           </Box>
         )
       }
