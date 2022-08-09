@@ -28,35 +28,12 @@ type Props = {
   readonly: boolean
 }
 
-function CreateBountyButton(props: {
-  onClick: (createdBounty: BountyWithDetails) => void
-  pageId: string
-}) {
-  const { onClick, pageId } = props;
-  const { setBounties } = useBounties();
+function CreateBountyButton(props: { pageId: string }) {
+  const { pageId } = props;
+  const { createDraftBounty } = useBounties();
   const [user] = useUser();
   const [space] = useCurrentSpace();
   const [userSpacePermissions] = useCurrentSpacePermissions();
-
-  async function convertToBounty ({ spaceId, userId }: { spaceId: string, userId: string}) {
-    const createdBounty = await charmClient.createBounty({
-      chainId: 1,
-      status: 'open',
-      spaceId,
-      createdBy: userId,
-      rewardAmount: 1,
-      rewardToken: 'ETH',
-      linkedPageId: pageId,
-      permissions: {
-        submitter: [{
-          group: 'space',
-          id: spaceId
-        }]
-      }
-    });
-    setBounties((bounties) => [...bounties, createdBounty]);
-    onClick(createdBounty);
-  }
 
   return (
     <Box sx={{
@@ -67,7 +44,7 @@ function CreateBountyButton(props: {
         <Button
           disableElevation
           size='small'
-          onClick={() => convertToBounty({ userId: user.id, spaceId: space.id })}
+          onClick={() => createDraftBounty({ pageId, userId: user.id, spaceId: space.id })}
         >
           Convert to bounty
         </Button>
@@ -81,7 +58,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
   const card = useAppSelector(getCard(cardId))
   const intl = useIntl()
   const [showConfirmationDialogBox, setShowConfirmationDialogBox] = useState<boolean>(false)
-  const { pages, setPages } = usePages()
+  const { pages } = usePages()
   const { refreshBounty, bounties } = useBounties()
   const router = useRouter();
   const isSharedPage = router.route.startsWith('/share')
@@ -91,7 +68,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
 
   useEffect(() => {
     setBounty(bounties.find(bounty => bounty.page?.id === cardId) ?? null)
-  }, [bounties, cardId])
+  }, [bounties.length, cardId])
 
   const handleDeleteCard = async () => {
     if (!card) {
@@ -133,10 +110,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
         onClickDelete={handleDeleteButtonOnClick}
         onMarkCompleted={closeBounty}
         toolbar={
-          spacePermissions?.createBounty && !isSharedPage && cardPage && !bounty && !readonly && <CreateBountyButton onClick={(createdBounty) => {
-            setBounty(createdBounty)
-            setPages((pages) => ({ ...pages, [createdBounty.page.id]: createdBounty.page }));
-          }} pageId={cardId} />
+          spacePermissions?.createBounty && !isSharedPage && cardPage && !bounty && !readonly && <CreateBountyButton pageId={cardId} />
         }
         page={cardPage}
       />

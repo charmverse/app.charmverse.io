@@ -5,6 +5,7 @@ import { PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
+import CharmButton from 'components/common/Button';
 import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
@@ -13,6 +14,7 @@ import { CryptoCurrency, getChainById } from 'connectors';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
+import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import { ApplicationWithTransactions } from 'lib/applications/interfaces';
 import { countValidSubmissions } from 'lib/applications/shared';
@@ -74,19 +76,22 @@ function rollupPermissions ({
 
 export default function BountyProperties (props: {
   readOnly?: boolean,
-  bounty: BountyWithDetails,
-  permissions: AssignedBountyPermissions,
+  bountyId: string | null,
+  pageId: string,
+  permissions: AssignedBountyPermissions | null,
   refreshBountyPermissions: (bountyId: string) => void
 }) {
-  const { bounty, readOnly = false, permissions, refreshBountyPermissions } = props;
+  const { bountyId, pageId, readOnly = false, permissions, refreshBountyPermissions } = props;
   const [paymentMethods] = usePaymentMethods();
-  const { updateBounty } = useBounties();
+  const { draftBounty, bounties, cancelDraftBounty, createBounty, updateBounty } = useBounties();
   const [availableCryptos, setAvailableCryptos] = useState<Array<string | CryptoCurrency>>([]);
   const [isShowingAdvancedSettings, setIsShowingAdvancedSettings] = useState(false);
-  const [currentBounty, setCurrentBounty] = useState<BountyWithDetails>(bounty);
-  const [capSubmissions, setCapSubmissions] = useState(currentBounty.maxSubmissions !== null);
+  const bounty = bounties.find(b => b.id === bountyId);
+  const [currentBounty, setCurrentBounty] = useState<BountyWithDetails | null>(bounty || (draftBounty as BountyWithDetails));
+  const [capSubmissions, setCapSubmissions] = useState(currentBounty?.maxSubmissions !== null);
   const [space] = useCurrentSpace();
   const [user] = useUser();
+  const { setPages } = usePages();
 
   const assignedRoleSubmitters = permissions?.bountyPermissions?.submitter?.filter(p => p.group === 'role').map(p => p.id as string) ?? [];
   const selectedReviewerUsers = permissions?.bountyPermissions?.reviewer?.filter(p => p.group === 'user').map(p => p.id as string) ?? [];
@@ -100,10 +105,6 @@ export default function BountyProperties (props: {
       setListApplications(listApplicationsResponse);
     }
   }
-  useEffect(() => {
-    refreshSubmissions();
-  }, [bounty]);
-  // -----
 
   function refreshCryptoList (chainId: number, rewardToken?: string) {
 
@@ -125,48 +126,75 @@ export default function BountyProperties (props: {
       cryptosToDisplay.push(...contractAddresses);
 
       setAvailableCryptos(cryptosToDisplay);
-      setCurrentBounty((_currentBounty) => ({ ..._currentBounty, rewardToken: rewardToken || nativeCurrency }));
+      setCurrentBounty((_currentBounty) => ({ ..._currentBounty as BountyWithDetails, rewardToken: rewardToken || nativeCurrency }));
     }
     return selectedChain?.nativeCurrency.symbol;
   }
 
-  function onNewPaymentMethod (paymentMethod: PaymentMethod) {
+  async function onNewPaymentMethod (paymentMethod: PaymentMethod) {
     if (paymentMethod.contractAddress) {
-      setCurrentBounty((_currentBounty) => ({ ..._currentBounty, chainId: paymentMethod.chainId }));
+      await applyBountyUpdates({ chainId: paymentMethod.chainId });
       refreshCryptoList(paymentMethod.chainId, paymentMethod.contractAddress);
     }
   }
 
-  const debouncedBountyUpdate = debouncePromise(async (bountyId, updates: Partial<UpdateableBountyFields>) => {
-    updateBounty(bountyId, updates);
+  async function applyBountyUpdates (updates: Partial<BountyWithDetails>) {
+    if (currentBounty?.id) {
+      await updateBounty(currentBounty.id, updates);
+    }
+    setCurrentBounty((_currentBounty) => ({ ..._currentBounty as BountyWithDetails, ...updates }));
+  }
+
+  const updateBountyDebounced = debouncePromise(async (updates: Partial<UpdateableBountyFields>) => {
+    if (currentBounty) {
+      updateBounty(currentBounty.id, updates);
+    }
   }, 2500);
 
+  async function applyBountyUpdatesDebounced (updates: Partial<BountyWithDetails>) {
+    if (currentBounty?.id) {
+      await updateBountyDebounced(currentBounty.id, updates);
+    }
+    setCurrentBounty((_currentBounty) => ({ ..._currentBounty as BountyWithDetails, ...updates }));
+  }
+
   const updateBountyAmount = useCallback((e) => {
-    setCurrentBounty((_currentBounty) => ({ ..._currentBounty,
-      rewardAmount: Number(e.target.value)
-    }));
-    debouncedBountyUpdate(currentBounty.id, {
+    applyBountyUpdatesDebounced({
       rewardAmount: Number(e.target.value)
     });
   }, []);
 
   const updateBountyMaxSubmissions = useCallback((e) => {
-    setCurrentBounty((_currentBounty) => ({ ..._currentBounty,
-      maxSubmissions: Number(e.target.value)
-    }));
-    debouncedBountyUpdate(currentBounty.id, {
+    applyBountyUpdatesDebounced({
       maxSubmissions: Number(e.target.value)
     });
   }, []);
 
-  useEffect(() => {
+  async function confirmNewBounty () {
+    if (currentBounty) {
+      const createdBounty = await createBounty(currentBounty);
+      setPages(_pages => ({ ..._pages,
+        [pageId]: {
+          ..._pages[pageId],
+          bountyId: createdBounty.id
+        }
+      }));
+    }
+  }
 
-    refreshCryptoList(currentBounty.chainId, currentBounty.rewardToken);
-  }, []);
-
   useEffect(() => {
-    setCurrentBounty(bounty);
+    refreshSubmissions();
   }, [bounty]);
+
+  useEffect(() => {
+    if (currentBounty) {
+      refreshCryptoList(currentBounty.chainId, currentBounty.rewardToken);
+    }
+  }, [currentBounty?.chainId, currentBounty?.rewardToken]);
+
+  useEffect(() => {
+    setCurrentBounty((draftBounty as BountyWithDetails) || bounty);
+  }, [draftBounty, bounty]);
 
   const bountyProperties = (
     <>
@@ -182,17 +210,16 @@ export default function BountyProperties (props: {
         <InputSearchBlockchain
           disabled={readOnly}
           readOnly={readOnly}
-          chainId={currentBounty.chainId}
+          chainId={currentBounty?.chainId}
           sx={{
             width: '100%'
           }}
           onChange={async (chainId) => {
             const newNativeCurrency = refreshCryptoList(chainId);
-            await updateBounty(currentBounty.id, {
+            applyBountyUpdates({
               chainId,
               rewardToken: newNativeCurrency
             });
-            setCurrentBounty((_currentBounty) => ({ ..._currentBounty, chainId }));
           }}
         />
       </div>
@@ -212,11 +239,10 @@ export default function BountyProperties (props: {
           cryptoList={availableCryptos}
           chainId={currentBounty?.chainId}
           defaultValue={currentBounty?.rewardToken}
-          value={currentBounty.rewardToken}
+          value={currentBounty?.rewardToken}
           hideBackdrop={true}
           onChange={newToken => {
-            setCurrentBounty((_currentBounty) => ({ ..._currentBounty, rewardToken: newToken }));
-            updateBounty(currentBounty.id, {
+            applyBountyUpdates({
               rewardToken: newToken
             });
           }}
@@ -242,7 +268,7 @@ export default function BountyProperties (props: {
             width: '100%'
           }}
           disabled={readOnly}
-          value={currentBounty.rewardAmount}
+          value={currentBounty?.rewardAmount}
           type='number'
           size='small'
           onChange={updateBountyAmount}
@@ -277,10 +303,9 @@ export default function BountyProperties (props: {
             <Button>Require applications</Button>
           </div>
           <Switch
-            isOn={Boolean(currentBounty.approveSubmitters)}
+            isOn={Boolean(currentBounty?.approveSubmitters)}
             onChanged={(isOn) => {
-              setCurrentBounty((_currentBounty) => ({ ..._currentBounty, approveSubmitters: isOn }));
-              updateBounty(currentBounty.id, {
+              applyBountyUpdates({
                 approveSubmitters: isOn
               });
             }}
@@ -301,6 +326,9 @@ export default function BountyProperties (props: {
             disableCloseOnSelect={true}
             defaultValue={assignedRoleSubmitters}
             onChange={async (roleIds) => {
+              if (!currentBounty?.id) {
+                return;
+              }
               await updateBounty(currentBounty.id, {
                 permissions: rollupPermissions({
                   assignedRoleSubmitters: roleIds,
@@ -333,9 +361,8 @@ export default function BountyProperties (props: {
             isOn={capSubmissions}
             onChanged={(isOn) => {
               setCapSubmissions(isOn);
-              setCurrentBounty((_currentBounty) => ({ ..._currentBounty, maxSubmissions: isOn ? (_currentBounty.maxSubmissions ?? 1) : null }));
-              updateBounty(currentBounty.id, {
-                maxSubmissions: isOn ? (currentBounty.maxSubmissions ?? 1) : null
+              applyBountyUpdates({
+                maxSubmissions: isOn ? (currentBounty?.maxSubmissions ?? 1) : null
               });
             }}
             readOnly={readOnly}
@@ -343,68 +370,69 @@ export default function BountyProperties (props: {
           />
         </div>
         {capSubmissions && (
-        <div
-          className='octo-propertyrow'
-          style={{
-            height: 'fit-content'
-          }}
-        >
-          <div className='octo-propertyname octo-propertyname--readonly'>
-            <Button>Max submissions</Button>
-          </div>
-          <TextField
-            required
-            value={currentBounty.maxSubmissions}
-            type='number'
-            size='small'
-            inputProps={{ step: 1, min: 1 }}
-            sx={{
-              width: '100%'
+          <div
+            className='octo-propertyrow'
+            style={{
+              height: 'fit-content'
             }}
-            disabled={readOnly}
-            onChange={updateBountyMaxSubmissions}
-          />
-        </div>
+          >
+            <div className='octo-propertyname octo-propertyname--readonly'>
+              <Button>Max submissions</Button>
+            </div>
+            <TextField
+              required
+              value={currentBounty?.maxSubmissions}
+              type='number'
+              size='small'
+              inputProps={{ step: 1, min: 1 }}
+              sx={{
+                width: '100%'
+              }}
+              disabled={readOnly}
+              onChange={updateBountyMaxSubmissions}
+            />
+          </div>
         )}
       </Collapse>
     </>
   );
 
+  if (!currentBounty) {
+    return null;
+  }
+
   return (
     <Box
-      className='octo-propertylist CardDetailProperties'
+      className='octo-propertylist'
       sx={{
         '& .MuiInputBase-input': {
           background: 'none'
         }
       }}
+      mt={2}
     >
-      {bounty && (
-        <>
-          <hr />
-          <BountyPropertiesHeader
-            bounty={bounty}
-          />
-        </>
-      )}
+      <Divider />
+      <BountyPropertiesHeader
+        bounty={currentBounty}
+      />
       <Stack flexDirection='row' justifyContent='space-between' gap={2} alignItems='center'>
         {
           permissions && (readOnly ? (
             <Stack mb={1} width='100%'>
               {permissions?.bountyPermissions.reviewer.length > 0 && (
                 <BountyReviewers
-                  bounty={bounty}
+                  bounty={currentBounty}
                   permissions={permissions}
                 />
               )}
               {/* Extra space so this looks like the focalboard properties */}
               {
-                bounty.maxSubmissions && (
+                currentBounty.maxSubmissions && (
                   <>
                     <div style={{ marginTop: 2 }}></div>
                     <BountySlots
-                      maxSubmissions={bounty.maxSubmissions}
-                      validSubmissions={countValidSubmissions(bounty.applications)}
+                      maxSubmissions={currentBounty.maxSubmissions}
+                      validSubmissions={countValidSubmissions(currentBounty.applications)}
                     />
                   </>
                 )
@@ -458,10 +486,10 @@ export default function BountyProperties (props: {
       />
 
       {// Bounty creator cannot apply to their own bounty
-        permissions && bounty.createdBy !== user?.id && (
+        permissions && currentBounty.createdBy !== user?.id && (
           <>
             <BountyApplicantForm
-              bounty={bounty}
+              bounty={currentBounty}
               submissions={applications}
               permissions={permissions}
               refreshSubmissions={refreshSubmissions}
@@ -475,14 +503,25 @@ export default function BountyProperties (props: {
         )
       }
 
-      {permissions?.userPermissions?.review && bounty.status !== 'suggestion' && (
+      {permissions?.userPermissions?.review && currentBounty.status !== 'suggestion' && !draftBounty && (
         <BountyApplicantsTable
           bounty={currentBounty}
           permissions={permissions}
         />
       )}
 
-      {permissions?.userPermissions?.review && bounty.status === 'suggestion' && bounty.createdBy !== user?.id && (
+      {draftBounty && (
+        <Box display='flex' gap={2} my={2}>
+          <CharmButton color='primary' onClick={confirmNewBounty}>
+            Confirm new bounty
+          </CharmButton>
+          <CharmButton color='secondary' variant='outlined' onClick={cancelDraftBounty}>
+            Cancel
+          </CharmButton>
+        </Box>
+      )}
+
+      {permissions?.userPermissions?.review && currentBounty.status === 'suggestion' && currentBounty.createdBy !== user?.id && (
         <>
           <BountySuggestionApproval
             bounty={currentBounty}
