@@ -7,7 +7,7 @@ interface Props {
   bounty: BountyWithDetails
 }
 
-export default function BountyHeader ({ bounty }: Props) {
+export default function BountyPropertiesHeader ({ bounty }: Props) {
   return (
     <Box sx={{
       justifyContent: 'space-between',

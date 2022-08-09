@@ -22,7 +22,7 @@ import debouncePromise from 'lib/utilities/debouncePromise';
 import { isTruthy } from 'lib/utilities/types';
 import { BountyWithDetails } from 'models';
 import { useCallback, useEffect, useState } from 'react';
-import BountyHeader from './components/BountyHeader';
+import BountyPropertiesHeader from './components/BountyPropertiesHeader';
 import BountyReviewers from './components/BountyReviewers';
 import BountySlots from './components/BountySlots';
 import BountySuggestionApproval from './components/BountySuggestionApproval';
@@ -382,7 +382,7 @@ export default function BountyProperties (props: {
       {bounty && (
         <>
           <hr />
-          <BountyHeader
+          <BountyPropertiesHeader
             bounty={bounty}
           />
         </>
