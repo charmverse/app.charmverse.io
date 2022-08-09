@@ -22,7 +22,7 @@ export const backgroundDarkColor = darken(backgroundColor, 0.1);
 export const settingsHeaderBackgroundColor = lighten(backgroundLightColor, 0.4);
 export const scrollBarTrackBackgroundColor = darken(backgroundLightColor, 0.1);
 export const scrollBarThumbBackgroundColor = lighten(scrollBarTrackBackgroundColor, 0.5);
-export const inputBackground = 'rgba(242, 241, 238, 0.6)';
+export const inputBackground = 'rgb(245, 246, 247)';
 export const inputBorder = 'rgba(15, 15, 15, 0.1)';
 
 // dark mode

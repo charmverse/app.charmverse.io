@@ -1,33 +1,23 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import OpenInFullIcon from '@mui/icons-material/OpenInFull';
-import { List, ListItemButton, ListItemText } from '@mui/material';
 import { Box } from '@mui/system';
-import { Bounty } from '@prisma/client';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePages } from 'hooks/usePages';
-import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { BountyWithDetails } from 'models';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 import { Board } from '../blocks/board';
 import mutator from '../mutator';
 import { getCard } from '../store/cards';
 import { useAppSelector } from '../store/hooks';
 import { Utils } from '../utils';
-import Menu from '../widgets/menu';
 import ConfirmationDialogBox, { ConfirmationDialogBoxProps } from './confirmationDialogBox';
-import Dialog from './dialog';
-import DeleteIcon from '@mui/icons-material/Delete';
-import InsertLinkIcon from '@mui/icons-material/InsertLink';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CardDetail from './cardDetail/cardDetail';
 import PageDialog from 'components/common/Page/PageDialog';
 
 type Props = {
@@ -48,31 +38,36 @@ function CreateBountyButton(props: {
   const [space] = useCurrentSpace();
   const [userSpacePermissions] = useCurrentSpacePermissions();
 
+  async function convertToBounty ({ spaceId, userId }: { spaceId: string, userId: string}) {
+    const createdBounty = await charmClient.createBounty({
+      chainId: 1,
+      status: 'open',
+      spaceId,
+      createdBy: userId,
+      rewardAmount: 1,
+      rewardToken: 'ETH',
+      linkedPageId: pageId,
+      permissions: {
+        submitter: [{
+          group: 'space',
+          id: spaceId
+        }]
+      }
+    });
+    setBounties((bounties) => [...bounties, createdBounty]);
+    onClick(createdBounty);
+  }
+
   return (
     <Box sx={{
       whiteSpace: 'nowrap'
     }}
     >
       {!userSpacePermissions?.createBounty || !space || !user ? null : (
-        <Button onClick={async () => {
-          const createdBounty = await charmClient.createBounty({
-            chainId: 1,
-            status: 'open',
-            spaceId: space.id,
-            createdBy: user.id,
-            rewardAmount: 1,
-            rewardToken: 'ETH',
-            linkedPageId: pageId,
-            permissions: {
-              submitter: [{
-                group: 'space',
-                id: space.id
-              }]
-            }
-          });
-          setBounties((bounties) => [...bounties, createdBounty]);
-          onClick(createdBounty);
-        }}
+        <Button
+          disableElevation
+          size='small'
+          onClick={() => convertToBounty({ userId: user.id, spaceId: space.id })}
         >
           Convert to bounty
         </Button>
