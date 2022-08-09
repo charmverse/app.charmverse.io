@@ -186,7 +186,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
                     pageUpdatedBy={page.updatedBy}
                   />
                 )}
-                {(draftBounty || (page.bountyId && bountyPermissions)) && (
+                {(draftBounty || page.bountyId) && (
                   <BountyProperties
                     bountyId={page.bountyId}
                     pageId={page.id}

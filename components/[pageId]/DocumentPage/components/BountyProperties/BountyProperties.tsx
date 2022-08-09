@@ -83,11 +83,11 @@ export default function BountyProperties (props: {
 }) {
   const { bountyId, pageId, readOnly = false, permissions, refreshBountyPermissions } = props;
   const [paymentMethods] = usePaymentMethods();
-  const { draftBounty, bounties, cancelDraftBounty, createBounty, updateBounty } = useBounties();
+  const { draftBounty, bounties, cancelDraftBounty, setBounties, updateBounty } = useBounties();
   const [availableCryptos, setAvailableCryptos] = useState<Array<string | CryptoCurrency>>([]);
   const [isShowingAdvancedSettings, setIsShowingAdvancedSettings] = useState(false);
-  const bounty = bounties.find(b => b.id === bountyId);
-  const [currentBounty, setCurrentBounty] = useState<BountyWithDetails | null>(bounty || (draftBounty as BountyWithDetails));
+  const bountyFromContext = bounties.find(b => b.id === bountyId);
+  const [currentBounty, setCurrentBounty] = useState<BountyWithDetails | null>(null);
   const [capSubmissions, setCapSubmissions] = useState(currentBounty?.maxSubmissions !== null);
   const [space] = useCurrentSpace();
   const [user] = useUser();
@@ -100,8 +100,8 @@ export default function BountyProperties (props: {
   // Copied from BountyApplicantsTable
   const [applications, setListApplications] = useState<ApplicationWithTransactions[]>([]);
   async function refreshSubmissions () {
-    if (bounty) {
-      const listApplicationsResponse = await charmClient.listApplications(bounty.id);
+    if (bountyId) {
+      const listApplicationsResponse = await charmClient.listApplications(bountyId);
       setListApplications(listApplicationsResponse);
     }
   }
@@ -145,17 +145,15 @@ export default function BountyProperties (props: {
     setCurrentBounty((_currentBounty) => ({ ..._currentBounty as BountyWithDetails, ...updates }));
   }
 
-  const updateBountyDebounced = debouncePromise(async (updates: Partial<UpdateableBountyFields>) => {
-    if (currentBounty) {
-      updateBounty(currentBounty.id, updates);
-    }
+  const updateBountyDebounced = debouncePromise(async (_bountyId: string, updates: Partial<UpdateableBountyFields>) => {
+    updateBounty(_bountyId, updates);
   }, 2500);
 
   async function applyBountyUpdatesDebounced (updates: Partial<BountyWithDetails>) {
-    if (currentBounty?.id) {
-      await updateBountyDebounced(currentBounty.id, updates);
-    }
     setCurrentBounty((_currentBounty) => ({ ..._currentBounty as BountyWithDetails, ...updates }));
+    if (bountyId) {
+      updateBountyDebounced(bountyId, updates);
+    }
   }
 
   const updateBountyAmount = useCallback((e) => {
@@ -172,19 +170,21 @@ export default function BountyProperties (props: {
 
   async function confirmNewBounty () {
     if (currentBounty) {
-      const createdBounty = await createBounty(currentBounty);
+      const createdBounty = await charmClient.createBounty(currentBounty);
+      setBounties((_bounties) => [..._bounties, createdBounty]);
       setPages(_pages => ({ ..._pages,
         [pageId]: {
           ..._pages[pageId]!,
           bountyId: createdBounty.id
         }
       }));
+      cancelDraftBounty();
     }
   }
 
   useEffect(() => {
     refreshSubmissions();
-  }, [bounty]);
+  }, [currentBounty]);
 
   useEffect(() => {
     if (currentBounty) {
@@ -193,8 +193,8 @@ export default function BountyProperties (props: {
   }, [currentBounty?.chainId, currentBounty?.rewardToken]);
 
   useEffect(() => {
-    setCurrentBounty((draftBounty as BountyWithDetails) || bounty);
-  }, [draftBounty, bounty]);
+    setCurrentBounty((draftBounty as BountyWithDetails) || bountyFromContext);
+  }, [draftBounty, bountyFromContext]);
 
   const bountyProperties = (
     <>
@@ -416,17 +416,16 @@ export default function BountyProperties (props: {
         bounty={currentBounty}
       />
       <Stack flexDirection='row' justifyContent='space-between' gap={2} alignItems='center'>
-        {
-          permissions && (readOnly ? (
-            <Stack mb={1} width='100%'>
-              {permissions?.bountyPermissions.reviewer.length > 0 && (
-                <BountyReviewers
-                  bounty={currentBounty}
-                  permissions={permissions}
-                />
-              )}
-              {/* Extra space so this looks like the focalboard properties */}
-              {
+        {readOnly && (
+          <Stack mb={1} width='100%'>
+            {permissions && permissions.bountyPermissions.reviewer.length > 0 && (
+              <BountyReviewers
+                bounty={currentBounty}
+                permissions={permissions}
+              />
+            )}
+            {/* Extra space so this looks like the focalboard properties */}
+            {
                 currentBounty.maxSubmissions && (
                   <>
                     <div style={{ marginTop: 2 }}></div>
@@ -437,44 +436,44 @@ export default function BountyProperties (props: {
                   </>
                 )
               }
-            </Stack>
-          ) : (
-            <div
-              className='octo-propertyrow'
-              style={{
-                height: 'fit-content',
-                flexGrow: 1
-              }}
-            >
-              <div className='octo-propertyname octo-propertyname--readonly'>
-                <Button>Reviewer</Button>
-              </div>
-              <InputSearchReviewers
-                disabled={readOnly}
-                readOnly={readOnly}
-                value={permissions?.bountyPermissions?.reviewer ?? []}
-                disableCloseOnSelect={true}
-                onChange={async (e, options) => {
-                  const roles = options.filter(option => option.group === 'role');
-                  const contributors = options.filter(option => option.group === 'user');
-                  await updateBounty(currentBounty.id, {
-                    permissions: rollupPermissions({
-                      assignedRoleSubmitters,
-                      selectedReviewerRoles: roles.map(role => role.id),
-                      selectedReviewerUsers: contributors.map(contributor => contributor.id),
-                      spaceId: space!.id
-                    })
-                  });
-                  await refreshBountyPermissions(currentBounty.id);
-                }}
-                excludedIds={[...selectedReviewerUsers, ...selectedReviewerRoles]}
-                sx={{
-                  width: '100%'
-                }}
-              />
+          </Stack>
+        )}
+        {!readOnly && currentBounty.id && (
+          <div
+            className='octo-propertyrow'
+            style={{
+              height: 'fit-content',
+              flexGrow: 1
+            }}
+          >
+            <div className='octo-propertyname octo-propertyname--readonly'>
+              <Button>Reviewer</Button>
             </div>
-          ))
-        }
+            <InputSearchReviewers
+              disabled={readOnly}
+              readOnly={readOnly}
+              value={permissions?.bountyPermissions?.reviewer ?? []}
+              disableCloseOnSelect={true}
+              onChange={async (e, options) => {
+                const roles = options.filter(option => option.group === 'role');
+                const contributors = options.filter(option => option.group === 'user');
+                await updateBounty(currentBounty.id, {
+                  permissions: rollupPermissions({
+                    assignedRoleSubmitters,
+                    selectedReviewerRoles: roles.map(role => role.id),
+                    selectedReviewerUsers: contributors.map(contributor => contributor.id),
+                    spaceId: space!.id
+                  })
+                });
+                await refreshBountyPermissions(currentBounty.id);
+              }}
+              excludedIds={[...selectedReviewerUsers, ...selectedReviewerRoles]}
+              sx={{
+                width: '100%'
+              }}
+            />
+          </div>
+        )}
       </Stack>
 
       {!readOnly && bountyProperties}

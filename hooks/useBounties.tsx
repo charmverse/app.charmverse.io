@@ -9,7 +9,6 @@ import { useUser } from './useUser';
 type IContext = {
   bounties: BountyWithDetails[];
   setBounties: Dispatch<SetStateAction<BountyWithDetails[]>>;
-  createBounty: (data: BountyCreationData) => Promise<BountyWithDetails>;
   draftBounty?: BountyCreationData | null;
   createDraftBounty: (data: { pageId: string, spaceId: string, userId: string }) => void;
   cancelDraftBounty: () => void;
@@ -26,7 +25,6 @@ type IContext = {
 export const BountiesContext = createContext<Readonly<IContext>>({
   bounties: [],
   setBounties: () => undefined,
-  createBounty: () => Promise.resolve({} as any),
   createDraftBounty: () => undefined,
   cancelDraftBounty: () => undefined,
   currentBountyId: null,
@@ -134,13 +132,6 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
     setDraftBounty(null);
   }
 
-  async function createBounty (bounty: BountyCreationData) {
-    const createdBounty = await charmClient.createBounty(bounty);
-    setBounties((_bounties) => [..._bounties, createdBounty]);
-    setDraftBounty(null);
-    return createdBounty;
-  }
-
   async function deleteBounty (bountyId: string): Promise<true> {
     await charmClient.deleteBounty(bountyId);
     setBounties(_bounties => _bounties.filter(bounty => bounty.id !== bountyId));
@@ -170,7 +161,6 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
 
   const value = useMemo(() => ({
     bounties,
-    createBounty,
     createDraftBounty,
     cancelDraftBounty,
     draftBounty,
