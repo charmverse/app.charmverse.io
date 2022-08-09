@@ -175,7 +175,7 @@ export default function BountyProperties (props: {
       const createdBounty = await createBounty(currentBounty);
       setPages(_pages => ({ ..._pages,
         [pageId]: {
-          ..._pages[pageId],
+          ..._pages[pageId]!,
           bountyId: createdBounty.id
         }
       }));
@@ -479,6 +479,17 @@ export default function BountyProperties (props: {
 
       {!readOnly && bountyProperties}
 
+      {draftBounty && (
+        <Box display='flex' gap={2} my={2}>
+          <CharmButton color='primary' onClick={confirmNewBounty}>
+            Confirm new bounty
+          </CharmButton>
+          <CharmButton color='secondary' variant='outlined' onClick={cancelDraftBounty}>
+            Cancel
+          </CharmButton>
+        </Box>
+      )}
+
       <Divider
         sx={{
           my: 1
@@ -508,17 +519,6 @@ export default function BountyProperties (props: {
           bounty={currentBounty}
           permissions={permissions}
         />
-      )}
-
-      {draftBounty && (
-        <Box display='flex' gap={2} my={2}>
-          <CharmButton color='primary' onClick={confirmNewBounty}>
-            Confirm new bounty
-          </CharmButton>
-          <CharmButton color='secondary' variant='outlined' onClick={cancelDraftBounty}>
-            Cancel
-          </CharmButton>
-        </Box>
       )}
 
       {permissions?.userPermissions?.review && currentBounty.status === 'suggestion' && currentBounty.createdBy !== user?.id && (
