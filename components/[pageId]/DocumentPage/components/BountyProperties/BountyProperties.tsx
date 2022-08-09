@@ -93,7 +93,7 @@ export default function BountyProperties (props: {
 
   async function onNewPaymentMethod (paymentMethod: PaymentMethod) {
     if (paymentMethod.contractAddress) {
-      await applyBountyUpdates({ chainId: paymentMethod.chainId });
+      await applyBountyUpdates({ chainId: paymentMethod.chainId, rewardToken: paymentMethod.contractAddress });
       refreshCryptoList(paymentMethod.chainId, paymentMethod.contractAddress);
     }
   }
