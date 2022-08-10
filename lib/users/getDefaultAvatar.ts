@@ -3,6 +3,7 @@ import { alchemyApi } from 'lib/blockchain/provider/alchemy';
 import log from 'lib/log';
 import { mapNftFromAlchemy } from 'lib/nft/utilities/mapNftFromAlchemy';
 import { UserAvatar } from 'lib/users/interfaces';
+import { getFilenameWithExtension } from 'lib/utilities/getFilenameWithExtension';
 
 const EMPTY_AVATAR: UserAvatar = {
   avatar: null,
@@ -18,7 +19,7 @@ export async function getDefaultAvatar (address: string, userId: string): Promis
   if (nfts?.length) {
     const nft = mapNftFromAlchemy(nfts[0], chainId);
     try {
-      const { url: avatar } = await uploadToS3({ fileName: getUserS3Folder({ userId, url: nft.image }), url: nft.image });
+      const { url: avatar } = await uploadToS3({ fileName: getUserS3Folder({ userId, url: getFilenameWithExtension(nft.image) }), url: nft.image });
 
       return {
         avatar,

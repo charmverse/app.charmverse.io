@@ -9,6 +9,7 @@ import { SetAvatarRequest } from 'lib/users/interfaces';
 import { LoggedInUser } from 'models';
 import { mapNftFromAlchemy } from 'lib/nft/utilities/mapNftFromAlchemy';
 import { getUserProfile } from 'lib/users/getUser';
+import { getFilenameWithExtension } from 'lib/utilities/getFilenameWithExtension';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -42,7 +43,7 @@ async function updateAvatar (req: NextApiRequest, res: NextApiResponse<LoggedInU
     const mappedNft = mapNftFromAlchemy(nft, chainId);
 
     if (mappedNft.image) {
-      avatarUrl = mappedNft.image;
+      avatarUrl = getFilenameWithExtension(mappedNft.image);
     }
   }
 
