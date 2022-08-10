@@ -37,6 +37,8 @@ import type { TransactionCreationData } from 'lib/transactions/interface';
 import type { ExtendedVote, UserVoteExtendedDTO, VoteDTO } from 'lib/votes/interfaces';
 import type { PublicUser } from 'pages/api/public/profile/[userPath]';
 import type { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
+import { encodeFilename } from 'lib/utilities/encodeFilename';
+import { SetAvatarRequest } from 'lib/users/interfaces';
 import type { AssignedPermissionsQuery, Resource } from './lib/permissions/interfaces';
 import type { SpacePermissionConfigurationUpdate } from './lib/permissions/meta/interfaces';
 import type { SpacePermissionFlags, SpacePermissionModification } from './lib/permissions/spaces';
@@ -94,6 +96,10 @@ class CharmClient {
 
   updateUserDetails (data: Partial<UserDetails>) {
     return http.PUT<UserDetails>('/api/profile/details', data);
+  }
+
+  setUserAvatar (data: SetAvatarRequest) {
+    return http.PUT<LoggedInUser>('/api/profile/avatar', data);
   }
 
   async createSpace (spaceOpts: Prisma.SpaceCreateInput) {
@@ -499,9 +505,7 @@ class CharmClient {
 
   // AWS
   uploadToS3 (file: File): Promise<{ token: any, bucket: string, key: string, region: string }> {
-    const extension = file.name.split('.').pop() || ''; // lowercase the extension to simplify possible values
-    const filename = encodeURIComponent(file.name.replace(extension, extension.toLowerCase()));
-    return http.GET('/api/aws/s3-upload', { filename });
+    return http.GET('/api/aws/s3-upload', { filename: encodeFilename(file.name) });
   }
 
   deleteFromS3 (src: string) {
