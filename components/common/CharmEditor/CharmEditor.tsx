@@ -37,21 +37,22 @@ import { userDataPlugin } from './components/charm/charm.plugins';
 import * as columnLayout from './components/columnLayout';
 import LayoutColumn from './components/columnLayout/Column';
 import LayoutRow from './components/columnLayout/Row';
-import { CryptoPrice, cryptoPriceSpec } from './components/CryptoPrice';
+import { CryptoPrice } from './components/CryptoPrice';
+import InlineDatabase from './components/inlineDatabase/components/InlineDatabase';
 import * as disclosure from './components/disclosure';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
 import * as floatingMenu from './components/floatingMenu';
 import * as iframe from './components/iframe';
 import InlineCommentThread, * as inlineComment from './components/inlineComment';
-import InlinePalette, { plugins as inlinePalettePlugins, spec as inlinePaletteSpecs } from './components/inlinePalette';
+import InlinePalette, { plugins as inlinePalettePlugins } from './components/inlinePalette';
 import * as inlineVote from './components/inlineVote';
 import InlineVoteList from './components/inlineVote/components/InlineVoteList';
-import Mention, { mentionPluginKeyName, mentionPlugins, mentionSpecs, MentionSuggest } from './components/mention';
-import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList, nestedPageSpec } from './components/nestedPage';
+import Mention, { mentionPluginKeyName, mentionPlugins, MentionSuggest } from './components/mention';
+import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList } from './components/nestedPage';
 import Placeholder from './components/Placeholder';
-import Quote, * as quote from './components/quote';
-import ResizableImage, { imageSpec } from './components/ResizableImage';
-import ResizablePDF, { pdfSpec } from './components/ResizablePDF';
+import Quote from './components/quote';
+import ResizableImage from './components/ResizableImage';
+import ResizablePDF from './components/ResizablePDF';
 import RowActionsMenu, * as rowActions from './components/rowActions';
 import * as tabIndent from './components/tabIndent';
 import * as table from './components/table';
@@ -170,6 +171,10 @@ export function charmEditorPlugins (
       name: 'quote',
       containerDOM: ['blockquote', { class: 'charm-quote' }],
       contentDOM: ['div']
+    }),
+    NodeView.createPlugin({
+      name: 'inlineDatabase',
+      containerDOM: ['div', { draggable: 'false' }]
     }),
     tabIndent.plugins(),
     table.tableEditing({ allowTableNodeSelection: true }),
@@ -509,6 +514,14 @@ function CharmEditor (
               <ResizablePDF
                 readOnly={readOnly}
                 onResizeStop={onResizeStop}
+                {...props}
+              />
+            );
+          }
+          case 'inlineDatabase': {
+            return (
+              <InlineDatabase
+                readOnly={readOnly}
                 {...props}
               />
             );

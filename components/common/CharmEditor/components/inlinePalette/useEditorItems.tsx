@@ -621,7 +621,32 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, 'group'>[]> 
         };
       }
     }
-  ]
+  ],
+  database: [{
+    uid: 'inlineDatabase',
+    title: 'Inline Board',
+    icon: <DatabaseIcon sx={{ fontSize: 16 }} />,
+    description: 'Embed a view from an existing board',
+    editorExecuteCommand: () => {
+      return (state, dispatch, view) => {
+        // Execute the animation
+        rafCommandExec(view!, (_state, _dispatch) => {
+          const node = _state.schema.nodes.inlineDatabase.create();
+          if (_dispatch && isAtBeginningOfLine(state)) {
+            _dispatch(_state.tr.replaceSelectionWith(node));
+            return true;
+          }
+          return insertNode(_state, _dispatch, node);
+        });
+        return replaceSuggestionMarkWith(palettePluginKey, '')(
+          state,
+          dispatch,
+          view
+        );
+
+      };
+    }
+  }]
 };
 
 export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: PluginKey<NestedPagePluginState>}) {
