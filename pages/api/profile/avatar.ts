@@ -8,11 +8,12 @@ import { sessionUserRelations } from 'lib/session/config';
 import { SetAvatarRequest } from 'lib/users/interfaces';
 import { LoggedInUser } from 'models';
 import { mapNftFromAlchemy } from 'lib/nft/utilities/mapNftFromAlchemy';
+import { getUserProfile } from 'lib/users/getUser';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
-  .post(updateAvatar);
+  .put(updateAvatar);
 
 async function updateAvatar (req: NextApiRequest, res: NextApiResponse<LoggedInUser | {error: string}>) {
   const { url, tokenId, contractAddress } = req.body as SetAvatarRequest;
@@ -28,13 +29,7 @@ async function updateAvatar (req: NextApiRequest, res: NextApiResponse<LoggedInU
 
   // Provided NFT data
   if (isNftAvatar) {
-    const user = await prisma.user.findUnique({
-      where: {
-        id: req.session.user.id
-      },
-      include: sessionUserRelations
-    });
-
+    const user = await getUserProfile('id', req.session.user.id);
     const owners = await alchemyApi.getOwners(contractAddress, tokenId, chainId);
     const isOwner = user?.addresses.some(a => owners.includes(a));
 
