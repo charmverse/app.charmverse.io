@@ -2,8 +2,8 @@
 export type UserAvatar = {
   avatar: string | null
 } & (
-  { contractAddress: string; tokenId: string; tokenChain: number } |
-  { contractAddress: null; tokenId: null; tokenChain: null }
+  { avatarContract: string; avatarTokenId: string; avatarTokenChain: number } |
+  { avatarContract: null; avatarTokenId: null; avatarTokenChain: null }
 )
 
 export interface SetAvatarRequest {

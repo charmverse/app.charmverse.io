@@ -6,9 +6,9 @@ import { UserAvatar } from 'lib/users/interfaces';
 
 const EMPTY_AVATAR: UserAvatar = {
   avatar: null,
-  contractAddress: null,
-  tokenId: null,
-  tokenChain: null
+  avatarContract: null,
+  avatarTokenId: null,
+  avatarTokenChain: null
 };
 
 export async function getDefaultAvatar (address: string, userId: string): Promise<UserAvatar> {
@@ -22,9 +22,9 @@ export async function getDefaultAvatar (address: string, userId: string): Promis
 
       return {
         avatar,
-        contractAddress: nft.contract,
-        tokenId: nft.tokenId,
-        tokenChain: nft.chainId
+        avatarContract: nft.contract,
+        avatarTokenId: nft.tokenId,
+        avatarTokenChain: nft.chainId
       };
     }
     // eslint-disable-next-line no-empty
