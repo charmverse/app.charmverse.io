@@ -5,7 +5,6 @@ import {
 } from '@prisma/client';
 import * as http from 'adapters/http';
 import type { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/focalboard/src/blocks/block';
-import type { IWorkspace } from 'components/common/BoardEditor/focalboard/src/blocks/workspace';
 import type { IUser, UserWorkspace } from 'components/common/BoardEditor/focalboard/src/user';
 import type { FiatCurrency, IPairQuote } from 'connectors';
 import type { FailedImportsError } from 'lib/notion/types';
@@ -253,10 +252,6 @@ class CharmClient {
     return http.POST<{importedRolesCount: number}>('/api/guild-xyz/importRoles', payload);
   }
 
-  // FocalBoard
-
-  // TODO: we shouldn't have to ask the server for the current space, but it will take time to pass spaceId through focalboard!
-
   async getUserWorkspaces (): Promise<UserWorkspace[]> {
     const spaces = await this.getSpaces();
     return spaces.map(space => ({
@@ -285,7 +280,7 @@ class CharmClient {
   }
 
   async getAllBlocks (spaceId: string): Promise<FBBlock[]> {
-    return http.GET<Block[]>('/api/blocks')
+    return http.GET<Block[]>('/api/blocks', { spaceId })
       .then(blocks => blocks.map(this.blockToFBBlock))
       .then(blocks => this.fixBlocks(blocks));
   }
