@@ -12,23 +12,25 @@ import {
   strike,
   underline
 } from '@bangle.dev/base-components';
-import { BangleEditorState, NodeView, Plugin, RawPlugins, SpecRegistry } from '@bangle.dev/core';
+import { BangleEditorState, NodeView, Plugin, RawPlugins } from '@bangle.dev/core';
 import { markdownSerializer } from '@bangle.dev/markdown';
 import { EditorView, Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import { Box, Divider, Slide } from '@mui/material';
+import charmClient from 'charmClient';
 import * as codeBlock from 'components/common/CharmEditor/components/@bangle.dev/base-components/code-block';
 import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
-import PageInlineVotesList from 'components/[pageId]/DocumentPage/components/VotesSidebar';
 import CommentsSidebar from 'components/[pageId]/DocumentPage/components/CommentsSidebar';
+import PageInlineVotesList from 'components/[pageId]/DocumentPage/components/VotesSidebar';
 import { CryptoCurrency, FiatCurrency } from 'connectors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
 import { useUser } from 'hooks/useUser';
 import { silentlyUpdateURL } from 'lib/browser';
+import { extractDeletedThreadIds } from 'lib/inline-comments/extractDeletedThreadIds';
 import debounce from 'lodash/debounce';
 import { PageContent } from 'models';
 import { CSSProperties, memo, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
@@ -37,29 +39,29 @@ import { userDataPlugin } from './components/charm/charm.plugins';
 import * as columnLayout from './components/columnLayout';
 import LayoutColumn from './components/columnLayout/Column';
 import LayoutRow from './components/columnLayout/Row';
-import { CryptoPrice, cryptoPriceSpec } from './components/CryptoPrice';
+import { CryptoPrice } from './components/CryptoPrice';
 import * as disclosure from './components/disclosure';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
 import * as floatingMenu from './components/floatingMenu';
 import * as iframe from './components/iframe';
 import InlineCommentThread, * as inlineComment from './components/inlineComment';
-import InlinePalette, { plugins as inlinePalettePlugins, spec as inlinePaletteSpecs } from './components/inlinePalette';
+import InlinePalette, { plugins as inlinePalettePlugins } from './components/inlinePalette';
 import * as inlineVote from './components/inlineVote';
 import InlineVoteList from './components/inlineVote/components/InlineVoteList';
-import Mention, { mentionPluginKeyName, mentionPlugins, mentionSpecs, MentionSuggest } from './components/mention';
-import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList, nestedPageSpec } from './components/nestedPage';
+import Mention, { mentionPluginKeyName, mentionPlugins, MentionSuggest } from './components/mention';
+import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList } from './components/nestedPage';
+import paragraph from './components/paragraph';
 import Placeholder from './components/Placeholder';
-import Quote, * as quote from './components/quote';
-import ResizableImage, { imageSpec } from './components/ResizableImage';
-import ResizablePDF, { pdfSpec } from './components/ResizablePDF';
+import Quote from './components/quote';
+import ResizableImage from './components/ResizableImage';
+import ResizablePDF from './components/ResizablePDF';
 import RowActionsMenu, * as rowActions from './components/rowActions';
 import * as tabIndent from './components/tabIndent';
 import * as table from './components/table';
 import * as trailingNode from './components/trailingNode';
-import paragraph from './components/paragraph';
 import DevTools from './DevTools';
-import { checkForEmpty } from './utils';
 import { specRegistry } from './specRegistry';
+import { checkForEmpty } from './utils';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -90,7 +92,7 @@ export function charmEditorPlugins (
       pageId?: string | null,
       userId?: string | null,
       readOnly?: boolean,
-      onContentChange?: (view: EditorView) => void,
+      onContentChange?: (view: EditorView, prevDoc: Node<any>) => void,
       disablePageSpecificFeatures?: boolean,
       enableVoting?: boolean,
       enableComments?: boolean
@@ -102,7 +104,7 @@ export function charmEditorPlugins (
       view: () => ({
         update: (view, prevState) => {
           if (onContentChange && !view.state.doc.eq(prevState.doc)) {
-            onContentChange(view);
+            onContentChange(view, prevState.doc);
           }
         }
       })
@@ -345,17 +347,30 @@ function CharmEditor (
   const _isEmpty = checkForEmpty(content);
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
   const [currentUser] = useUser();
-  const onContentChangeDebounced = onContentChange ? debounce((view: EditorView) => {
+  const onContentChangeDebounced = onContentChange ? debounce((view: EditorView, prevDoc?: Node<any>) => {
     const doc = view.state.doc.toJSON() as PageContent;
     const rawText = view.state.doc.textContent as string;
+    if (prevDoc && pageId) {
+      const deletedThreadIds = extractDeletedThreadIds(
+        specRegistry.schema,
+        view.state.doc,
+        prevDoc
+      );
+      if (deletedThreadIds.length) {
+        charmClient.resolveMultipleThreads({
+          threadIds: deletedThreadIds,
+          pageId
+        });
+      }
+    }
     onContentChange({ doc, rawText });
-  }, 100) : undefined;
+  }, 1000) : undefined;
 
-  function _onContentChange (view: EditorView) {
+  function _onContentChange (view: EditorView, prevDoc: Node<any>) {
     // @ts-ignore missing types from the @bangle.dev/react package
     setIsEmpty(checkForEmpty(view.state.doc.toJSON() as PageContent));
     if (onContentChangeDebounced) {
-      onContentChangeDebounced(view);
+      onContentChangeDebounced(view, prevDoc);
     }
   }
 
