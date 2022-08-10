@@ -273,6 +273,7 @@ model User {
   avatar            String?
   avatarContract    String?
   avatarTokenId     String?
+  avatarTokenChain  Int?
   username          String
   isBot             Boolean?               @default(false)
   path              String?                @unique
