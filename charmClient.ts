@@ -5,7 +5,7 @@ import {
 } from '@prisma/client';
 import * as http from 'adapters/http';
 import type { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/focalboard/src/blocks/block';
-import type { IUser, UserWorkspace } from 'components/common/BoardEditor/focalboard/src/user';
+import type { IUser } from 'components/common/BoardEditor/focalboard/src/user';
 import type { FiatCurrency, IPairQuote } from 'connectors';
 import type { FailedImportsError } from 'lib/notion/types';
 import type { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee, IPagePermissionWithSource, SpaceDefaultPublicPageToggle } from 'lib/permissions/pages/page-permission-interfaces';
@@ -250,15 +250,6 @@ class CharmClient {
 
   importRolesFromGuild (payload: ImportGuildRolesPayload) {
     return http.POST<{importedRolesCount: number}>('/api/guild-xyz/importRoles', payload);
-  }
-
-  async getUserWorkspaces (): Promise<UserWorkspace[]> {
-    const spaces = await this.getSpaces();
-    return spaces.map(space => ({
-      id: space.id,
-      title: space.name,
-      boardCount: 0
-    }));
   }
 
   async getWorkspaceUsers (spaceId: string): Promise<IUser[]> {
