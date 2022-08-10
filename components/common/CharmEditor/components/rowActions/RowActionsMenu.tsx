@@ -100,7 +100,7 @@ function Component ({ menuState }: { menuState: PluginState }) {
         });
         const newTr = safeInsert(newNode, node.nodeEnd)(tr);
         view.dispatch(newTr.scrollIntoView());
-        dispatch(initialLoad());
+        // dispatch(initialLoad());
         await mutate(`pages/${currentSpace.id}`, (_pages: Page[]) => {
           return [..._pages, duplicatedPage];
         }, {

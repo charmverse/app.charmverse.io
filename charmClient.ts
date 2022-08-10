@@ -257,21 +257,6 @@ class CharmClient {
 
   // TODO: we shouldn't have to ask the server for the current space, but it will take time to pass spaceId through focalboard!
 
-  async getWorkspace (): Promise<IWorkspace> {
-    const space = await http.GET<Space>('/api/spaces/current');
-    if (!space) {
-      throw new Error('No workspace found');
-    }
-    return {
-      id: space.id,
-      title: space.name,
-      signupToken: '',
-      settings: {},
-      updatedBy: space.updatedBy,
-      updatedAt: space.updatedAt ? new Date(space.updatedAt).getTime() : 0
-    };
-  }
-
   async getUserWorkspaces (): Promise<UserWorkspace[]> {
     const spaces = await this.getSpaces();
     return spaces.map(space => ({
@@ -281,9 +266,8 @@ class CharmClient {
     }));
   }
 
-  async getWorkspaceUsers (): Promise<IUser[]> {
-    const currentSpace = await this.getWorkspace();
-    const contributors = await this.getContributors(currentSpace.id);
+  async getWorkspaceUsers (spaceId: string): Promise<IUser[]> {
+    const contributors = await this.getContributors(spaceId);
 
     return contributors.map((contributor: Contributor) => ({
       id: contributor.id,
@@ -300,7 +284,7 @@ class CharmClient {
     return http.GET<Space>(`/api/spaces/${spaceId}/public`);
   }
 
-  async getAllBlocks (): Promise<FBBlock[]> {
+  async getAllBlocks (spaceId: string): Promise<FBBlock[]> {
     return http.GET<Block[]>('/api/blocks')
       .then(blocks => blocks.map(this.blockToFBBlock))
       .then(blocks => this.fixBlocks(blocks));
