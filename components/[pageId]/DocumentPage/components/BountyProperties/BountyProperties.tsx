@@ -380,7 +380,7 @@ export default function BountyProperties (props: {
             {bountyPermissions?.reviewer && bountyPermissions.reviewer.length > 0 && (
               <BountyReviewers
                 bounty={currentBounty}
-                permissions={bountyPermissions as AssignedBountyPermissions}
+                permissions={bountyPermissions}
               />
             )}
             {/* Extra space so this looks like the focalboard properties */}

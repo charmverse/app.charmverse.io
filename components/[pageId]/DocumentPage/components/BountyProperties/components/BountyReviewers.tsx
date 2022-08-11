@@ -3,14 +3,14 @@ import { Bounty } from '@prisma/client';
 import Avatar from 'components/common/Avatar';
 import { useContributors } from 'hooks/useContributors';
 import useRoles from 'hooks/useRoles';
-import { AssignedBountyPermissions } from 'lib/bounties';
+import { AssignedBountyPermissions, BountyPermissions } from 'lib/bounties';
 import { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import { Contributor } from 'models';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import { useMemo, useState } from 'react';
 
 interface BountyReviewersProps {
-  permissions: AssignedBountyPermissions
+  permissions: Partial<BountyPermissions>
   bounty: Bounty
 }
 
@@ -26,7 +26,7 @@ export default function BountyReviewers ({ bounty, permissions }: BountyReviewer
     roles: ({ id: string, name: string, users: Contributor[] })[]
     users: ({ id: string, name: string, profilePic?: string | null })[]
   } = useMemo(() => {
-    const mapped = (permissions?.bountyPermissions.reviewer ?? []).map(reviewer => {
+    const mapped = (permissions?.reviewer ?? []).map(reviewer => {
 
       if (reviewer.group === 'role') {
         const name: string = roleups?.find(r => r.id === reviewer.id)?.name ?? '';
