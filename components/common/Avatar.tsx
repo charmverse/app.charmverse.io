@@ -32,7 +32,7 @@ const StyledAvatar = styled(Avatar)`
   font-weight: 500;
 `;
 
-const HexagonWrapper = styled(Box)`
+const HexagonAvatar = styled(StyledAvatar)`
   clip-path: url(#hexagon-avatar);
   overflow: hidden;
 `;
@@ -49,18 +49,18 @@ export default function InitialAvatar ({ avatar, className, name, variant, size 
   const nameStr = (name || '').replace('0x', ''); // ignore the universal prefix of addresses
   const isHexagonal = variant === 'hexagon';
   const muiVariant = isHexagonal ? 'square' : variant;
-  const Wrapper = isHexagonal ? HexagonWrapper : Box;
+  const AvatarComponent = isHexagonal ? HexagonAvatar : StyledAvatar;
 
   return (
-    <Wrapper>
-      <StyledAvatar
-        className={className}
-        sx={{ backgroundColor: avatar ? 'initial' : stringToColor(nameStr), ...SizeStyleMap[size] }}
-        variant={muiVariant}
-        src={avatar ?? undefined}
-      >
-        {nameStr.charAt(0).toUpperCase()}
-      </StyledAvatar>
-    </Wrapper>
+
+    <AvatarComponent
+      className={className}
+      sx={{ backgroundColor: avatar ? 'initial' : stringToColor(nameStr), ...SizeStyleMap[size] }}
+      variant={muiVariant}
+      src={avatar ?? undefined}
+    >
+      {nameStr.charAt(0).toUpperCase()}
+    </AvatarComponent>
+
   );
 }

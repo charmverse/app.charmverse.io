@@ -9,7 +9,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
 import { AvatarEditMenu } from 'components/settings/workspace/AvatarEditMenu';
-import log from 'lib/log';
+import { NftAvatarGallery } from 'components/profile/components/NftAvatarGallery/NftAvatarGallery';
 
 const StyledBox = styled(Box)`
   display: inline-block;
@@ -71,6 +71,7 @@ export default function LargeAvatar (props: LargeAvatarProps) {
   const inputFile = useRef<HTMLInputElement>(null);
   const editIconRef = useRef(null);
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [isGalleryVisible, setIsGalleryVisible] = useState(false);
 
   const onUploadClick = () => {
     inputFile?.current?.click();
@@ -141,12 +142,17 @@ export default function LargeAvatar (props: LargeAvatarProps) {
         variant={variant}
         icons={icons}
       />
-      <AvatarEditMenu
-        anchorEl={menuAnchorEl}
-        onClose={() => setMenuAnchorEl(null)}
-        onUploadClick={onUploadClick}
-        onNftClick={() => log.debug('🔥', 'nftclick')}
-      />
+      {canSetNft && (
+      <>
+        <AvatarEditMenu
+          anchorEl={menuAnchorEl}
+          onClose={() => setMenuAnchorEl(null)}
+          onUploadClick={onUploadClick}
+          onNftClick={() => setIsGalleryVisible(true)}
+        />
+        <NftAvatarGallery isVisible={isGalleryVisible} onClose={() => setIsGalleryVisible(false)} />
+      </>
+      )}
     </StyledBox>
   );
 }
