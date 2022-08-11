@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
 import Avatar from '@mui/material/Avatar';
+import { Box } from '@mui/system';
 import { stringToColor } from 'lib/utilities/strings';
 import React from 'react';
 
@@ -31,24 +32,35 @@ const StyledAvatar = styled(Avatar)`
   font-weight: 500;
 `;
 
+const HexagonWrapper = styled(Box)`
+  clip-path: url(#hexagon-avatar);
+  overflow: hidden;
+`;
+
 export type InitialAvatarProps = {
   avatar: string | null | undefined;
   className?: string;
   name?: string;
-  variant?: 'circular' | 'rounded' | 'square';
+  variant?: 'circular' | 'rounded' | 'square' | 'hexagon';
   size?: 'xSmall' | 'small' | 'medium' | 'large';
 };
 
 export default function InitialAvatar ({ avatar, className, name, variant, size = 'medium' }: InitialAvatarProps) {
   const nameStr = (name || '').replace('0x', ''); // ignore the universal prefix of addresses
+  const isHexagonal = variant === 'hexagon';
+  const muiVariant = isHexagonal ? 'square' : variant;
+  const Wrapper = isHexagonal ? HexagonWrapper : Box;
+
   return (
-    <StyledAvatar
-      className={className}
-      sx={{ backgroundColor: avatar ? 'initial' : stringToColor(nameStr), ...SizeStyleMap[size] }}
-      variant={variant}
-      src={avatar ?? undefined}
-    >
-      {nameStr.charAt(0).toUpperCase()}
-    </StyledAvatar>
+    <Wrapper>
+      <StyledAvatar
+        className={className}
+        sx={{ backgroundColor: avatar ? 'initial' : stringToColor(nameStr), ...SizeStyleMap[size] }}
+        variant={muiVariant}
+        src={avatar ?? undefined}
+      >
+        {nameStr.charAt(0).toUpperCase()}
+      </StyledAvatar>
+    </Wrapper>
   );
 }

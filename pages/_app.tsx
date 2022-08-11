@@ -166,6 +166,7 @@ import cssVariables from 'theme/cssVariables';
 import 'theme/styles.scss';
 
 import charmClient from 'charmClient';
+import { HexagonalAvatarMask } from 'components/common/HexagonalAvatarMask';
 
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
 
@@ -268,6 +269,7 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
                             handleClose={() => setIsOldBuild(false)}
                           />
                           {getLayout(<Component {...pageProps} />)}
+                          <HexagonalAvatarMask />
                           <Snackbar />
                         </ErrorBoundary>
                       </RouteGuard>
