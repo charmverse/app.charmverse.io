@@ -81,6 +81,7 @@
     "@harmony-js/core": "^0.1.57",
     "@hookform/resolvers": "^2.8.8",
     "@koa/router": "^10.1.1",
+    "@manuscripts/track-changes": "^0.3.3",
     "@material-ui/pickers": "^3.3.10",
     "@mattermost/compass-icons": "^0.1.21",
     "@metamask/onboarding": "^1.0.1",

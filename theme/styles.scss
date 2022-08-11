@@ -43,3 +43,120 @@ blockquote .bangle-nv-child-container {
 .telegram-login-CharmverseBot {
   width: 100%;
 }
+
+
+.commit {
+  margin-bottom: 4px;
+}
+.commit-revert {
+  color: #a22;
+}
+
+.annotation,
+.annotation-focused {
+  display: inline-block;
+  padding: 5px;
+}
+.annotation-focused {
+  border: 1px solid blue;
+}
+
+.blame-info {
+  position: fixed;
+  border: 1px solid silver;
+  background: white;
+  padding: 3px 8px;
+  z-index: 3;
+}
+.blame-wrap {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+#commit {
+  margin: 6px 0;
+  position: relative;
+}
+
+.track-changes--blame {
+  background-color: rgba(57, 255, 20, 0.3);
+}
+.track-changes--blame.track-changes--blame-uncommitted {
+  background-color: rgba(255, 218, 20, 0.6);
+}
+.track-changes--blame.track-changes--focused {
+  background-color: rgba(255, 218, 20, 0.6);
+}
+
+.track-changes--blame-point {
+  position: relative;
+}
+.track-changes--blame-point::after {
+  position: absolute;
+  left: -2.5px;
+  display: inline-block;
+  content: ' ';
+  border: 1px solid rgba(255, 0, 0);
+  transform: rotate(45deg);
+  border-top: none;
+  border-left: none;
+  width: 5px;
+  height: 5px;
+}
+
+.track-changes--replaced {
+  color: rgba(0, 0, 0, 0.5);
+  text-decoration: line-through;
+}
+
+.track-changes--annotation {
+  background-color: rgba(var(--annotation-color), 0.3);
+}
+.track-changes--annotation.track-changes--focused {
+  background-color: rgba(var(--annotation-color), 0.6);
+}
+
+.track-changes--control {
+  display: none;
+  position: absolute;
+}
+
+:is(.track-changes--blame:hover, .track-changes--replaced:hover)
+  + .track-changes--control,
+.track-changes--control.track-changes--focused,
+.track-changes--control:hover {
+  display: inline-flex;
+}
+
+:is(.track-changes--control, .track-changes--annotation-control) > button {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  border: none;
+  vertical-align: middle;
+}
+
+:is(.track-changes--control, .track-changes--annotation-control)
+  > button:hover {
+  background: gray;
+}
+
+:is(.track-changes--control, .track-changes--annotation-control)
+  > button
+  > svg {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+}
+
+.track-changes--annotation-control {
+  display: inline-flex;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+.track-changes--annotation-control > button {
+  position: absolute;
+  top: -2em;
+}

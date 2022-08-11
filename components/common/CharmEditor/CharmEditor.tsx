@@ -12,7 +12,7 @@ import {
   strike,
   underline
 } from '@bangle.dev/base-components';
-import { BangleEditorState, NodeView, Plugin, RawPlugins, SpecRegistry } from '@bangle.dev/core';
+import { BangleEditorState, NodeView, Plugin, RawPlugins } from '@bangle.dev/core';
 import { markdownSerializer } from '@bangle.dev/markdown';
 import { EditorView, Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
@@ -22,8 +22,8 @@ import * as codeBlock from 'components/common/CharmEditor/components/@bangle.dev
 import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
-import PageInlineVotesList from 'components/[pageId]/DocumentPage/components/VotesSidebar';
 import CommentsSidebar from 'components/[pageId]/DocumentPage/components/CommentsSidebar';
+import PageInlineVotesList from 'components/[pageId]/DocumentPage/components/VotesSidebar';
 import { CryptoCurrency, FiatCurrency } from 'connectors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
@@ -32,34 +32,35 @@ import { silentlyUpdateURL } from 'lib/browser';
 import debounce from 'lodash/debounce';
 import { PageContent } from 'models';
 import { CSSProperties, memo, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import trackPlugin, { getTrackPluginState } from '@manuscripts/track-changes';
 import Callout, * as callout from './components/callout';
 import { userDataPlugin } from './components/charm/charm.plugins';
 import * as columnLayout from './components/columnLayout';
 import LayoutColumn from './components/columnLayout/Column';
 import LayoutRow from './components/columnLayout/Row';
-import { CryptoPrice, cryptoPriceSpec } from './components/CryptoPrice';
+import { CryptoPrice } from './components/CryptoPrice';
 import * as disclosure from './components/disclosure';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
 import * as floatingMenu from './components/floatingMenu';
 import * as iframe from './components/iframe';
 import InlineCommentThread, * as inlineComment from './components/inlineComment';
-import InlinePalette, { plugins as inlinePalettePlugins, spec as inlinePaletteSpecs } from './components/inlinePalette';
+import InlinePalette, { plugins as inlinePalettePlugins } from './components/inlinePalette';
 import * as inlineVote from './components/inlineVote';
 import InlineVoteList from './components/inlineVote/components/InlineVoteList';
-import Mention, { mentionPluginKeyName, mentionPlugins, mentionSpecs, MentionSuggest } from './components/mention';
-import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList, nestedPageSpec } from './components/nestedPage';
+import Mention, { mentionPluginKeyName, mentionPlugins, MentionSuggest } from './components/mention';
+import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList } from './components/nestedPage';
+import paragraph from './components/paragraph';
 import Placeholder from './components/Placeholder';
-import Quote, * as quote from './components/quote';
-import ResizableImage, { imageSpec } from './components/ResizableImage';
-import ResizablePDF, { pdfSpec } from './components/ResizablePDF';
+import Quote from './components/quote';
+import ResizableImage from './components/ResizableImage';
+import ResizablePDF from './components/ResizablePDF';
 import RowActionsMenu, * as rowActions from './components/rowActions';
 import * as tabIndent from './components/tabIndent';
 import * as table from './components/table';
 import * as trailingNode from './components/trailingNode';
-import paragraph from './components/paragraph';
 import DevTools from './DevTools';
-import { checkForEmpty } from './utils';
 import { specRegistry } from './specRegistry';
+import { checkForEmpty } from './utils';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -83,7 +84,8 @@ export function charmEditorPlugins (
     enableComments = true,
     userId = null,
     pageId = null,
-    spaceId = null
+    spaceId = null,
+    content = undefined
   }:
     {
       spaceId?: string | null,
@@ -93,7 +95,8 @@ export function charmEditorPlugins (
       onContentChange?: (view: EditorView) => void,
       disablePageSpecificFeatures?: boolean,
       enableVoting?: boolean,
-      enableComments?: boolean
+      enableComments?: boolean,
+      content?: Node
     } = {}
 ): () => RawPlugins[] {
 
@@ -184,7 +187,10 @@ export function charmEditorPlugins (
     // @ts-ignore missing type
     table.TableFiltersMenu(),
     trailingNode.plugins(),
-    disclosure.plugins()
+    disclosure.plugins(),
+    trackPlugin({
+      ancestorDoc: content
+    })
     // TODO: Pasting iframe or image link shouldn't create those blocks for now
     // iframePlugin,
     // pasteImagePlugin
@@ -360,7 +366,7 @@ function CharmEditor (
   }
 
   const editorRef = useRef<HTMLDivElement>(null);
-
+  const jsonContent = content ? Node.fromJSON(specRegistry.schema, content) : '';
   const state = useEditorState({
     specRegistry,
     plugins: charmEditorPlugins({
@@ -370,9 +376,10 @@ function CharmEditor (
       enableVoting,
       pageId,
       spaceId: currentSpace?.id,
-      userId: currentUser?.id
+      userId: currentUser?.id,
+      content: content ? Node.fromJSON(specRegistry.schema, content) : undefined
     }),
-    initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
+    initialValue: jsonContent,
     dropCursorOpts: {
       color: 'var(--charmeditor-active)'
     }
