@@ -284,7 +284,7 @@ export default function BountyProperties (props: {
             height: 'fit-content'
           }}
         >
-          <div className='octo-propertyname octo-propertyname--readonly'>
+          <div className='octo-propertyname octo-propertyname--readonly' style={{ alignSelf: 'baseline', paddingTop: 8 }}>
             <Button>Applicant role(s)</Button>
           </div>
           <div style={{ width: '100%' }}>
@@ -415,14 +415,15 @@ export default function BountyProperties (props: {
           <div
             className='octo-propertyrow'
             style={{
+              display: 'flex',
               height: 'fit-content',
               flexGrow: 1
             }}
           >
-            <div className='octo-propertyname octo-propertyname--readonly'>
+            <div className='octo-propertyname octo-propertyname--readonly' style={{ alignSelf: 'baseline', paddingTop: 12 }}>
               <Button>Reviewer</Button>
             </div>
-            <div>
+            <div style={{ width: '100%' }}>
               <InputSearchReviewers
                 disabled={readOnly}
                 readOnly={readOnly}
