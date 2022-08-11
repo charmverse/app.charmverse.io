@@ -15,6 +15,10 @@ const alchemyApis: Record<SupportedChainId, string> = {
   42161: 'arb-mainnet'
 };
 
+const FILTERED_NFT_CONTRACTS = [
+  '0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85' // ENS
+];
+
 export const getAlchemyBaseUrl = (chainId: SupportedChainId = 1, apiSuffix: AlchemyApiSuffix = ''): string => {
   const apiKey = process.env.ALCHEMY_API_KEY;
 
@@ -53,7 +57,9 @@ export const getNfts = async (addresses: string[], chainId: SupportedChainId = 1
     }
   }, [])
     // Filter out invalid NFTs
-    .filter(n => !!n.media?.length && !!n.media[0].gateway);
+    .filter(n => !!n.media?.length
+      && !!n.media[0].gateway
+      && !FILTERED_NFT_CONTRACTS.includes(n.contract.address));
 
   const sortedNfts = orderBy(nfts, (nft) => new Date(nft.timeLastUpdated), 'desc');
 

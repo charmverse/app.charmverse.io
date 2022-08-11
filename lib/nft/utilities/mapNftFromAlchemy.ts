@@ -7,7 +7,7 @@ export const mapNftFromAlchemy = (nft: AlchemyNft, chainId: number): NftData => 
     tokenIdInt: parseInt(nft.id.tokenId, 16) || null,
     contract: nft.contract.address,
     imageRaw: nft.media[0].raw,
-    image: nft.media[0].gateway,
+    image: nft.media[0].raw?.startsWith('https://') ? nft.media[0].raw : nft.media[0].gateway,
     imageThumb: nft.media[0].thumbnail,
     title: nft.title,
     description: nft.description,
