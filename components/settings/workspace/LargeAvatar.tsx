@@ -55,6 +55,7 @@ type LargeAvatarProps = {
   name: string;
   image?: string | null | undefined;
   updateAvatar?: (avatar: UserAvatar) => void;
+  updateImage?: (url: string) => void;
   variant?: 'circular' | 'rounded' | 'square';
   editable?: boolean;
   canSetNft?: boolean;
@@ -70,7 +71,7 @@ const getIcons = (editIcon: ReactNode, deleteIcon: ReactNode, avatar: string | n
 };
 
 export default function LargeAvatar (props: LargeAvatarProps) {
-  const { name, image, updateAvatar, variant, editable, canSetNft, isSaving } = props;
+  const { name, image, updateAvatar, variant, editable, canSetNft, isSaving, updateImage } = props;
   const inputFile = useRef<HTMLInputElement>(null);
   const editIconRef = useRef(null);
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
@@ -101,6 +102,11 @@ export default function LargeAvatar (props: LargeAvatarProps) {
   };
 
   const updateImageAvatar = (url: string) => {
+    if (updateImage) {
+      updateImage(url);
+      return;
+    }
+
     const userAvatar: UserAvatar = {
       avatar: url,
       avatarContract: null,
