@@ -2,9 +2,8 @@
 // See LICENSE.txt for license information.
 import { Block, BlockPatch } from './blocks/block';
 import { ISharing } from './blocks/sharing';
-import { IWorkspace } from './blocks/workspace';
 import { OctoUtils } from './octoUtils';
-import { IUser, UserWorkspace } from './user';
+import { IUser } from './user';
 import { Utils } from './utils';
 import { ClientConfig } from './config/clientConfig';
 import { UserSettings } from './userSettings';
