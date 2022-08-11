@@ -56,7 +56,7 @@ function UserDisplay ({ user, linkToProfile = false, ...props }: UserDisplayProp
 
   if (linkToProfile) {
     return (
-      <Link href={userLink} key={user?.id} external={false}>
+      <Link color='inherit' href={userLink} key={user?.id} external={false}>
         <BaseComponent username={user.username as string} avatar={user.avatar} {...props} />
       </Link>
     );

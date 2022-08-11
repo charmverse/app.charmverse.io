@@ -1,14 +1,14 @@
 import { Box, Button, Tooltip } from '@mui/material';
 import { Application, Bounty } from '@prisma/client';
-import { useState } from 'react';
 import { useBounties } from 'hooks/useBounties';
-import { useUser } from 'hooks/useUser';
-import { countValidSubmissions, submissionsCapReached } from 'lib/applications/shared';
-import { AssignedBountyPermissions } from 'lib/bounties';
 import { useContributors } from 'hooks/useContributors';
-import { ApplicationEditorForm } from './components/ApplicationEditorForm';
-import SubmissionEditorForm from './components/SubmissionEditorForm';
+import { useUser } from 'hooks/useUser';
+import { submissionsCapReached } from 'lib/applications/shared';
+import { AssignedBountyPermissions } from 'lib/bounties';
+import { useState } from 'react';
+import ApplicationInput from './components/ApplicationInput';
 import SignupButton from './components/BountySignupButton';
+import SubmissionInput from './components/SubmissionInput';
 
 interface BountyApplicationFormProps {
   permissions: AssignedBountyPermissions
@@ -31,14 +31,14 @@ export default function BountyApplicantForm (props: BountyApplicationFormProps) 
     submissions
   });
 
-  const canCreateSubmission = !userApplication && !bounty.submissionsLocked
+  const canCreateApplication = !userApplication && !bounty.submissionsLocked
     && !capReached
     && permissions?.userPermissions.work;
 
   const newSubmissionTooltip = bounty.submissionsLocked
     ? 'Submissions locked'
     : !permissions?.userPermissions.work
-      ? 'You do not have the correct role to submit work to this bounty'
+      ? 'You do not have the correct role to work on this bounty'
       : (capReached ? 'The submissions cap has been reached. This bounty is closed to new submissions.' : '');
 
   const isSpaceMember = Boolean(user && contributors.some(c => c.id === user.id));
@@ -52,16 +52,17 @@ export default function BountyApplicantForm (props: BountyApplicationFormProps) 
         </Tooltip>
       </Box>
     );
-  }
 
-  if (!userApplication) {
+  // Submissions cap exists and user has not applied yet
+  }
+  else if (!userApplication && bounty.approveSubmitters) {
     return (
       !showApplication ? (
         <Box display='flex' justifyContent='center' my={3}>
           <Tooltip placement='top' title={newSubmissionTooltip} arrow>
             <span>
               <Button
-                disabled={!canCreateSubmission}
+                disabled={!canCreateApplication}
                 onClick={() => {
                   setShowApplication(true);
                 }}
@@ -72,7 +73,7 @@ export default function BountyApplicantForm (props: BountyApplicationFormProps) 
           </Tooltip>
         </Box>
       ) : (
-        <ApplicationEditorForm
+        <ApplicationInput
           bountyId={bounty.id}
           mode='create'
           onSubmit={() => {
@@ -81,45 +82,83 @@ export default function BountyApplicantForm (props: BountyApplicationFormProps) 
           onCancel={() => {
             setShowApplication(false);
           }}
-          showHeader
         />
       )
     );
+    // Submissions cap exists and user has applied
   }
-  else {
-
+  else if (userApplication && bounty.approveSubmitters) {
     return (
       <>
-        <ApplicationEditorForm
+        <ApplicationInput
           bountyId={bounty.id}
-          mode='update'
           proposal={userApplication}
+          mode='update'
+          readOnly={userApplication?.status !== 'applied'}
           onSubmit={() => {
+            setShowApplication(false);
+          }}
+        />
+        {userApplication?.status !== 'applied' && (
+
+          <SubmissionInput
+            bountyId={bounty.id}
+            onSubmit={async () => {
+              await refreshSubmissions();
+              await refreshBounty(bounty.id);
+              setShowApplication(false);
+            }}
+            submission={userApplication}
+            permissions={permissions}
+            expandedOnLoad={true}
+            onCancel={() => {
+              setShowApplication(false);
+            }}
+            readOnly={userApplication?.status !== 'inProgress'}
+            alwaysExpanded={true}
+          />
+        )}
+      </>
+    );
+    // When we don't need to apply
+  }
+  else if (!bounty.approveSubmitters) {
+    return (
+      !showApplication && !userApplication ? (
+        <Box display='flex' justifyContent='center' my={3}>
+          <Tooltip placement='top' title={newSubmissionTooltip} arrow>
+            <span>
+              <Button
+                disabled={!canCreateApplication}
+                onClick={() => {
+                  setShowApplication(true);
+                }}
+              >
+                New submission
+              </Button>
+            </span>
+          </Tooltip>
+        </Box>
+      ) : (
+        <SubmissionInput
+          bountyId={bounty.id}
+          onSubmit={async () => {
+            await refreshSubmissions();
+            await refreshBounty(bounty.id);
             setShowApplication(false);
           }}
           onCancel={() => {
             setShowApplication(false);
           }}
-          showHeader
+          readOnly={userApplication?.status === 'rejected'}
+          submission={userApplication}
+          permissions={permissions}
+          alwaysExpanded={true}
         />
-
-        {
-          userApplication.status !== 'applied' && (
-            <SubmissionEditorForm
-              bountyId={bounty.id}
-              showHeader
-              onSubmit={async () => {
-                await refreshSubmissions();
-                await refreshBounty(bounty.id);
-                setShowApplication(false);
-              }}
-              submission={userApplication}
-              permissions={permissions}
-              expandedOnLoad={true}
-            />
-          )
-        }
-      </>
+      )
     );
+  }
+  else {
+    return null;
   }
 }

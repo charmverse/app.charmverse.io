@@ -202,9 +202,9 @@ img.ProseMirror-separator {
 }
 
 .bangle-editor > p:first-child,
-.bangle-editor > h1:first-child,
-.bangle-editor > h2:first-child,
-.bangle-editor > h3:first-child,
+// .bangle-editor > h1:first-child,
+// .bangle-editor > h2:first-child,
+// .bangle-editor > h3:first-child,
 .bangle-editor > h4:first-child,
 .bangle-editor > h5:first-child,
 .bangle-editor > h6:first-child,
@@ -224,20 +224,32 @@ img.ProseMirror-separator {
   margin: 0.5em 0;
 }
 
+// header styles copied from notion.so
 .bangle-editor h1 {
-  font-size: 3rem;
-  margin-top: 1.5rem;
+  font-size: 1.875em;
+  font-weight: 600;
+  line-height: 1.3;
+  margin-top: 2rem;
+  margin-bottom: 4px;
+  max-width: 1040px;
 }
 
 .bangle-editor h2 {
-  font-size: 1.875rem;
-  margin-top: 1.5rem;
+  font-size: 1.5em;
+  font-weight: 600;
+  line-height: 1.3;
+  margin-top: 1.4rem;
+  margin-bottom: 1px;
+  max-width: 1040px;
 }
 
 .bangle-editor h3 {
-  font-size: 1.25rem;
-  font-weight: 500;
-  margin-top: 1.25rem;
+  font-size: 1.25em;
+  font-weight: 600;
+  line-height: 1.3;
+  margin-top: 1rem;
+  margin-bottom: 1px;
+  max-width: 1040px;
 }
 
 .bangle-editor h4 {

@@ -8,7 +8,7 @@ import { ethers } from 'ethers';
 import { BigNumber } from '@ethersproject/bignumber';
 import { getChainById } from 'connectors';
 import { isValidChainAddress } from 'lib/tokens/validation';
-import ERC20ABI from '../../../abis/ERC20ABI.json';
+import ERC20ABI from '../../../../../../../abis/ERC20ABI.json';
 
 interface Props {
   receiver: string;
@@ -16,22 +16,25 @@ interface Props {
   tokenSymbolOrAddress: string;
   chainIdToUse: number
   onSuccess?: (txId: string, chainId: number) => void;
-  onError?: (err: any, severity?: AlertColor) => void;
-  children?: React.ReactChild | React.ReactChild[];
+  onClick?: () => void
+  onError?: (err: string, severity?: AlertColor) => void;
 }
 
 function extractWalletErrorMessage (error: any): string {
   if ((error)?.code === 'INSUFFICIENT_FUNDS') {
-    return 'You do not have sufficient funds to perform this transaction.';
+    return 'You do not have sufficient funds to perform this transaction';
   }
   else if ((error)?.code === 4001) {
-    return 'You rejected this transaction.';
+    return 'You rejected the transaction';
   }
   else if ((error)?.code === -32602) {
     return 'A valid recipient must be provided';
   }
   else if ((error)?.reason) {
     return error.reason;
+  }
+  else if ((error)?.message) {
+    return error.message;
   }
   else if (typeof error === 'object') {
     return JSON.stringify(error);
@@ -91,16 +94,14 @@ export default function BountyPaymentButton ({
   chainIdToUse,
   tokenSymbolOrAddress,
   onSuccess = (tx: string, chainId: number) => {},
-  onError = () => {},
-  children = 'Make payment'
+  onClick = () => null,
+  onError = () => {}
 }: Props) {
   const { account, library, chainId } = useWeb3React();
 
   const [paymentMethods] = usePaymentMethods();
 
   const makePayment = async () => {
-
-    onError(null);
 
     if (!chainIdToUse) {
       onError('Please provide a chainId');
@@ -175,7 +176,7 @@ export default function BountyPaymentButton ({
         onSuccess(tx.hash, chainToUse!.chainId);
       }
       else {
-        onError('Please provide a valid contract address', 'error');
+        onError('Please provide a valid contract address');
       }
     }
     catch (err: any) {
@@ -192,10 +193,14 @@ export default function BountyPaymentButton ({
 
   return (
     <Button
-      variant='outlined'
-      color='secondary'
-      onClick={makePayment}
-    >{children}
+      color='primary'
+      size='small'
+      onClick={() => {
+        onClick();
+        makePayment();
+      }}
+    >
+      Send Payment
     </Button>
   );
 }
