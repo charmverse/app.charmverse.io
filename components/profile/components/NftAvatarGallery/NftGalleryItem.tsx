@@ -29,7 +29,7 @@ export function NftGalleryItem ({ nft, isSelected, onClick }: Props) {
 
   return (
     <Card
-      sx={{ p: 1, cursor: isSelected ? 'auto' : 'pointer', position: 'relative' }}
+      sx={{ p: 1, cursor: isSelected ? 'auto' : 'pointer', position: 'relative', height: '100%' }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       raised={isHovered || isSelected}
