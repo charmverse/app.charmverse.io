@@ -148,6 +148,7 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
           updateImage={(url: string) => handleUserUpdate({ avatar: url })}
           editable={!readOnly}
           variant='circular'
+          canSetNft
         />
         <Grid container direction='column' spacing={0.5}>
           <Grid item>
