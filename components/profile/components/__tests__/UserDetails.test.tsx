@@ -4,7 +4,7 @@ import { UserDetails } from '@prisma/client';
 import { ThemeProvider } from '@mui/material/styles';
 import { createThemeLightSensitive } from 'theme';
 import IdentityModal from '../IdentityModal';
-import UserDetailsComponent from '../UserDetails';
+import UserDetailsComponent from '../UserDetails/UserDetails';
 
 const theme = createThemeLightSensitive('light');
 

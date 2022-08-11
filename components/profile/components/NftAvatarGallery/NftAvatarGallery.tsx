@@ -8,7 +8,7 @@ import Stack from '@mui/material/Stack';
 
 import Grid from '@mui/material/Grid';
 
-import { DialogContent, Typography } from '@mui/material';
+import { CircularProgress, DialogContent, Typography } from '@mui/material';
 import { NftGalleryItem } from 'components/profile/components/NftAvatarGallery/NftGalleryItem';
 import Box from '@mui/system/Box';
 import { NftData } from 'lib/nft/types';
@@ -17,10 +17,11 @@ import { useUser } from 'hooks/useUser';
 type Props = {
   onSelect?: (avatar: NftData) => void
   isVisible: boolean;
-  onClose: () => void
+  onClose: () => void;
+  isSaving?: boolean;
 };
 
-export function NftAvatarGallery ({ onSelect, isVisible, onClose }: Props) {
+export function NftAvatarGallery ({ onSelect, isVisible, onClose, isSaving }: Props) {
   const [user] = useUser();
   const { nfts, isLoading } = useMyNfts();
 
@@ -38,7 +39,7 @@ export function NftAvatarGallery ({ onSelect, isVisible, onClose }: Props) {
     <Dialog onClose={onClose} open={isVisible} scroll='paper'>
       <DialogTitle>Your NFTs gallery</DialogTitle>
 
-      <DialogContent dividers>
+      <DialogContent dividers sx={{ position: 'relative' }}>
         {isLoading ? (
           <Grid container spacing={1}>
             {[0, 1, 2].map(id => (
@@ -58,6 +59,12 @@ export function NftAvatarGallery ({ onSelect, isVisible, onClose }: Props) {
               </Grid>
             )) : <Box sx={{ p: 4, textAlign: 'center' }}><Typography>You do not own any NFTs</Typography></Box>}
           </Grid>
+        )}
+
+        {isSaving && (
+        <Box sx={{ position: 'absolute', top: 0, right: 0, left: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <CircularProgress />
+        </Box>
         )}
       </DialogContent>
     </Dialog>

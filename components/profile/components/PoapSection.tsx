@@ -12,7 +12,7 @@ import type { PublicUser } from 'pages/api/public/profile/[userPath]';
 import Button from 'components/common/Button';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import ManagePOAPModal from './ManagePOAPModal';
-import { isPublicUser } from './UserDetails';
+import { isPublicUser } from './UserDetails/UserDetails';
 
 const StyledBox = styled(Box)`
   background-color: ${({ theme }) => theme.palette.background.light};

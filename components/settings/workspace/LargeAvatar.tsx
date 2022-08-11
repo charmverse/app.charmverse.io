@@ -58,6 +58,7 @@ type LargeAvatarProps = {
   variant?: 'circular' | 'rounded' | 'square';
   editable?: boolean;
   canSetNft?: boolean;
+  isSaving?: boolean
 };
 
 const getIcons = (editIcon: ReactNode, deleteIcon: ReactNode, avatar: string | null | undefined) => {
@@ -69,7 +70,7 @@ const getIcons = (editIcon: ReactNode, deleteIcon: ReactNode, avatar: string | n
 };
 
 export default function LargeAvatar (props: LargeAvatarProps) {
-  const { name, image, updateAvatar, variant, editable, canSetNft } = props;
+  const { name, image, updateAvatar, variant, editable, canSetNft, isSaving } = props;
   const inputFile = useRef<HTMLInputElement>(null);
   const editIconRef = useRef(null);
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
@@ -171,7 +172,7 @@ export default function LargeAvatar (props: LargeAvatarProps) {
           onUploadClick={onUploadClick}
           onNftClick={() => setIsGalleryVisible(true)}
         />
-        <NftAvatarGallery isVisible={isGalleryVisible} onClose={() => setIsGalleryVisible(false)} onSelect={onNftSelect} />
+        <NftAvatarGallery isVisible={isGalleryVisible} onClose={() => setIsGalleryVisible(false)} onSelect={onNftSelect} isSaving={isSaving} />
       </>
       )}
     </StyledBox>

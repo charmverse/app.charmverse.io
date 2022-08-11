@@ -1,5 +1,5 @@
 import { Divider, Grid, Stack } from '@mui/material';
-import UserDetails, { UserDetailsProps } from './components/UserDetails';
+import UserDetails, { UserDetailsProps } from './components/UserDetails/UserDetails';
 import PoapSection from './components/PoapSection';
 import { AggregatedData } from './components/AggregatedData';
 
