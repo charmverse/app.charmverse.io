@@ -23,6 +23,7 @@ import useENSName from 'hooks/useENSName';
 import { UserAvatar } from 'lib/users/interfaces';
 import { useUserDetails } from 'components/profile/components/UserDetails/userDetails.hook';
 import { PublicUser } from 'pages/api/public/profile/[userPath]';
+import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 import DescriptionModal from '../DescriptionModal';
 import UserPathModal from '../UserPathModal';
 import SocialModal from '../SocialModal';
@@ -139,6 +140,7 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
           variant='circular'
           canSetNft
           isSaving={isSaving}
+          isNft={hasNftAvatar(user)}
         />
         <Grid container direction='column' spacing={0.5}>
           <Grid item>

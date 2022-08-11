@@ -41,15 +41,15 @@ export type InitialAvatarProps = {
   avatar: string | null | undefined;
   className?: string;
   name?: string;
-  variant?: 'circular' | 'rounded' | 'square' | 'hexagon';
+  variant?: 'circular' | 'rounded' | 'square';
   size?: 'xSmall' | 'small' | 'medium' | 'large';
+  isNft?: boolean;
 };
 
-export default function InitialAvatar ({ avatar, className, name, variant, size = 'medium' }: InitialAvatarProps) {
+export default function InitialAvatar ({ avatar, className, name, variant, size = 'medium', isNft }: InitialAvatarProps) {
   const nameStr = (name || '').replace('0x', ''); // ignore the universal prefix of addresses
-  const isHexagonal = variant === 'hexagon';
-  const muiVariant = isHexagonal ? 'square' : variant;
-  const AvatarComponent = isHexagonal ? HexagonAvatar : StyledAvatar;
+  const muiVariant = isNft ? 'square' : variant;
+  const AvatarComponent = isNft ? HexagonAvatar : StyledAvatar;
 
   return (
 
