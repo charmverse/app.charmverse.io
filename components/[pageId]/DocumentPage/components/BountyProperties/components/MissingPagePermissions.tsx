@@ -2,6 +2,7 @@ import { Bounty, BountyPermissionLevel } from '@prisma/client';
 import { BountyPermissions } from 'lib/bounties';
 import { IPagePermissionWithSource } from 'lib/permissions/pages';
 import { isTruthy } from 'lib/utilities/types';
+import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import CloseIcon from '@mui/icons-material/Close';
@@ -50,19 +51,17 @@ export default function MissingPagePermissions ({ bountyPermissions, pagePermiss
   const componentLabel = target === 'reviewer' ? 'Reviewers' : 'Submitters';
 
   return (
-    <Box sx={{ my: 1 }}>
-      <Typography variant='body2'>{componentLabel} without page access</Typography>
+    <Alert severity='warning'>
       {
         missingPermissionsWithName.map(bountyPermissionAssignee => (
+
           <Typography variant='caption' display='flex' sx={{ alignItems: 'center' }}>
-            <CloseIcon />
-            <div>
-              {bountyPermissionAssignee.group === 'space' ? 'Workspace members' : bountyPermissionAssignee.group === 'role' ? `Role ${bountyPermissionAssignee.name}` : `User ${bountyPermissionAssignee.name}`} cannot view this page
-            </div>
+            {bountyPermissionAssignee.group === 'space' ? 'Workspace members' : bountyPermissionAssignee.group === 'role' ? `${bountyPermissionAssignee.name} role` : `${bountyPermissionAssignee.name}`} cannot view this page
           </Typography>
+
         ))
       }
-    </Box>
+    </Alert>
   );
 
 }
