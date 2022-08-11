@@ -18,5 +18,9 @@
     {
       "HostDirectory": "/sys/fs/cgroup/",
       "ContainerDirectory": "/host/sys/fs/cgroup/"
+    }, 
+	{
+      "HostDirectory": "/opt/datadog-agent/run",
+      "ContainerDirectory": "/opt/datadog-agent/run"
     }]
 }
