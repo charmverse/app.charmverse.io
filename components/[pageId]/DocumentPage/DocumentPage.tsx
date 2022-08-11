@@ -140,7 +140,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
         <Button onClick={() => {
           setIsSuggestMode(!isSuggestMode);
         }}
-        >{isSuggestMode ? 'Commit suggestion' : 'Suggestion Mode'}
+        >{isSuggestMode ? 'Edit Mode' : 'Suggestion Mode'}
         </Button>
         <Container
           top={pageTop}
@@ -156,6 +156,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
             pageId={page.id}
             disablePageSpecificFeatures={isSharedPage}
             enableVoting={true}
+            suggestion={page.documentSuggestion?.[0]?.suggestion}
           >
             <PageHeader
               headerImage={page.headerImage}

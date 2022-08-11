@@ -14,10 +14,12 @@ import {
 } from '@bangle.dev/base-components';
 import { BangleEditorState, NodeView, Plugin, RawPlugins } from '@bangle.dev/core';
 import { markdownSerializer } from '@bangle.dev/markdown';
-import { EditorView, Node, PluginKey } from '@bangle.dev/pm';
+import { EditorView, Node, PluginKey, Schema } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
 import styled from '@emotion/styled';
+import trackPlugin, { commitFromJSON, commitToJSON, getTrackPluginState } from '@manuscripts/track-changes';
 import { Box, Divider, Slide } from '@mui/material';
+import charmClient from 'charmClient';
 import * as codeBlock from 'components/common/CharmEditor/components/@bangle.dev/base-components/code-block';
 import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
@@ -32,7 +34,6 @@ import { silentlyUpdateURL } from 'lib/browser';
 import debounce from 'lodash/debounce';
 import { PageContent } from 'models';
 import { CSSProperties, memo, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
-import trackPlugin, { getTrackPluginState } from '@manuscripts/track-changes';
 import Callout, * as callout from './components/callout';
 import { userDataPlugin } from './components/charm/charm.plugins';
 import * as columnLayout from './components/columnLayout';
@@ -86,7 +87,9 @@ export function charmEditorPlugins (
     pageId = null,
     spaceId = null,
     content = undefined,
-    suggestMode = false
+    suggestMode = false,
+    suggestion = null,
+    schema
   }:
     {
       spaceId?: string | null,
@@ -98,7 +101,9 @@ export function charmEditorPlugins (
       enableVoting?: boolean,
       enableComments?: boolean,
       content?: Node,
-      suggestMode?: boolean
+      suggestMode?: boolean,
+      suggestion?: any | null,
+      schema?: Schema
     } = {}
 ): () => RawPlugins[] {
 
@@ -195,9 +200,10 @@ export function charmEditorPlugins (
     // pasteImagePlugin
   ];
 
-  if (!readOnly && suggestMode) {
+  if (!readOnly && (suggestMode || suggestion)) {
     basePlugins.push(trackPlugin({
-      ancestorDoc: content
+      ancestorDoc: content,
+      commit: suggestion && schema ? commitFromJSON(suggestion, schema) : undefined
     }));
   }
 
@@ -315,6 +321,7 @@ interface CharmEditorProps {
   enableVoting?: boolean;
   pageId?: string | null;
   suggestMode?: boolean
+  suggestion?: any | null
 }
 
 export function convertPageContentToMarkdown (content: PageContent, title?: string): string {
@@ -348,7 +355,8 @@ function CharmEditor (
     disablePageSpecificFeatures = false,
     enableVoting,
     pageId,
-    suggestMode = false
+    suggestMode = false,
+    suggestion = null
   }:
   CharmEditorProps
 ) {
@@ -358,10 +366,16 @@ function CharmEditor (
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
   const [currentUser] = useUser();
   const onContentChangeDebounced = onContentChange ? debounce((view: EditorView) => {
+    if (suggestMode && pageId) {
+      const state = getTrackPluginState(view.state);
+      charmClient.trackChanges(pageId, {
+        suggestion: commitToJSON(state.commit, 'containerId')
+      });
+    }
     const doc = view.state.doc.toJSON() as PageContent;
     const rawText = view.state.doc.textContent as string;
     onContentChange({ doc, rawText });
-  }, 100) : undefined;
+  }, 500) : undefined;
 
   function _onContentChange (view: EditorView) {
     // @ts-ignore missing types from the @bangle.dev/react package
@@ -384,7 +398,9 @@ function CharmEditor (
       pageId,
       spaceId: currentSpace?.id,
       userId: currentUser?.id,
-      content: content ? Node.fromJSON(specRegistry.schema, content) : undefined
+      content: content ? Node.fromJSON(specRegistry.schema, content) : undefined,
+      suggestion,
+      schema: specRegistry.schema
     }),
     initialValue: jsonContent,
     dropCursorOpts: {

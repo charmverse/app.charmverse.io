@@ -319,6 +319,15 @@ class CharmClient {
     return fixedBlocks;
   }
 
+  async trackChanges (pageId: string, payload: {
+    suggestion: any
+  }) {
+    return http.POST(`/api/pages/${pageId}/track`, {
+      pageId,
+      suggestion: payload.suggestion
+    });
+  }
+
   private blockToFBBlock (block: Block): FBBlock {
     return {
       ...block,
