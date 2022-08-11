@@ -1,7 +1,22 @@
 {
 	"AWSEBDockerrunVersion": "1",
-	"Ports": [{
+	"Ports": [
+	  { 
 		"ContainerPort": 3000,
 		"HostPort": 80
-	}]
+	  }
+	], 
+	"Volumes": [
+    {
+      "HostDirectory": "/var/run/docker.sock",
+      "ContainerDirectory": "/var/run/docker.sock"
+    }, 
+    {
+      "HostDirectory": "/proc/",
+      "ContainerDirectory": "/host/proc/"
+    }, 
+    {
+      "HostDirectory": "/sys/fs/cgroup/",
+      "ContainerDirectory": "/host/sys/fs/cgroup/"
+    }]
 }
