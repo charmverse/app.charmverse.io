@@ -13,11 +13,12 @@ const StyledAvatarItem = styled(Avatar)`
 `;
 
 type Props = {
-  nft: NftData,
-  isSelected: boolean
+  nft: NftData;
+  isSelected: boolean;
+  onClick: () => void;
 };
 
-export function NftGalleryItem ({ nft, isSelected }: Props) {
+export function NftGalleryItem ({ nft, isSelected, onClick }: Props) {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -26,6 +27,7 @@ export function NftGalleryItem ({ nft, isSelected }: Props) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       raised={isHovered || isSelected}
+      onClick={onClick}
     >
       <Stack>
         <Box sx={{ alignItems: 'center', justifyContent: 'center', display: 'flex' }}>

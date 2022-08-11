@@ -22,6 +22,7 @@ import { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { TelegramAccount } from 'pages/api/telegram/connect';
 import { shortenHex } from 'lib/utilities/strings';
 import useENSName from 'hooks/useENSName';
+import { UserAvatar } from 'lib/users/interfaces';
 import DescriptionModal from './DescriptionModal';
 import UserPathModal from './UserPathModal';
 import SocialModal from './SocialModal';
@@ -63,6 +64,13 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
 
   const handleUserUpdate = async (data: Partial<User>) => {
     const updatedUser = await charmClient.updateUser(data);
+    if (updateUser) {
+      updateUser(updatedUser);
+    }
+  };
+
+  const handleNftAvatarUpdate = async (data: UserAvatar) => {
+    const updatedUser = await charmClient.profile.setAvatar(data);
     if (updateUser) {
       updateUser(updatedUser);
     }
@@ -145,7 +153,7 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
         <Avatar
           name={user?.username || ''}
           image={user?.avatar}
-          updateImage={(url: string) => handleUserUpdate({ avatar: url })}
+          updateAvatar={(avatar: UserAvatar) => avatar.avatarContract ? handleNftAvatarUpdate(avatar) : handleUserUpdate(avatar)}
           editable={!readOnly}
           variant='circular'
           canSetNft

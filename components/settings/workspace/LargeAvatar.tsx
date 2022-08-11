@@ -10,6 +10,8 @@ import IconButton from '@mui/material/IconButton';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
 import { AvatarEditMenu } from 'components/settings/workspace/AvatarEditMenu';
 import { NftAvatarGallery } from 'components/profile/components/NftAvatarGallery/NftAvatarGallery';
+import { NftData } from 'lib/nft/types';
+import { UserAvatar } from 'lib/users/interfaces';
 
 const StyledBox = styled(Box)`
   display: inline-block;
@@ -52,7 +54,7 @@ function StyledIconButton ({ children, ...props }: { children: ReactNode, key: s
 type LargeAvatarProps = {
   name: string;
   image?: string | null | undefined;
-  updateImage?: (url: string) => void;
+  updateAvatar?: (avatar: UserAvatar) => void;
   variant?: 'circular' | 'rounded' | 'square';
   editable?: boolean;
   canSetNft?: boolean;
@@ -67,7 +69,7 @@ const getIcons = (editIcon: ReactNode, deleteIcon: ReactNode, avatar: string | n
 };
 
 export default function LargeAvatar (props: LargeAvatarProps) {
-  const { name, image, updateImage, variant, editable, canSetNft } = props;
+  const { name, image, updateAvatar, variant, editable, canSetNft } = props;
   const inputFile = useRef<HTMLInputElement>(null);
   const editIconRef = useRef(null);
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
@@ -84,6 +86,28 @@ export default function LargeAvatar (props: LargeAvatarProps) {
     else {
       onUploadClick();
     }
+  };
+
+  const onNftSelect = (nft: NftData) => {
+    const userAvatar: UserAvatar = {
+      avatar: nft.image,
+      avatarContract: nft.contract,
+      avatarTokenId: nft.tokenId,
+      avatarTokenChain: nft.chainId
+    };
+
+    updateAvatar?.(userAvatar);
+  };
+
+  const updateImageAvatar = (url: string) => {
+    const userAvatar: UserAvatar = {
+      avatar: url,
+      avatarContract: null,
+      avatarTokenId: null,
+      avatarTokenChain: null
+    };
+
+    updateAvatar?.(userAvatar);
   };
 
   if (!editable) {
@@ -103,9 +127,8 @@ export default function LargeAvatar (props: LargeAvatarProps) {
         fontSize='small'
       />
     </StyledIconButton>,
-    <StyledIconButton key='delete-avatar' onClick={() => updateImage && updateImage('')}>
+    <StyledIconButton key='delete-avatar' onClick={() => updateImageAvatar('')}>
       <DeleteIcon
-        onClick={() => updateImage && updateImage('')}
         fontSize='small'
       />
     </StyledIconButton>,
@@ -127,9 +150,7 @@ export default function LargeAvatar (props: LargeAvatarProps) {
 
           const { url } = await uploadToS3(firstFile);
 
-          if (updateImage) {
-            updateImage(url);
-          }
+          updateImageAvatar(url);
 
           // This is a fix for when trying to select the same file again after
           // having removed it.
@@ -150,7 +171,7 @@ export default function LargeAvatar (props: LargeAvatarProps) {
           onUploadClick={onUploadClick}
           onNftClick={() => setIsGalleryVisible(true)}
         />
-        <NftAvatarGallery isVisible={isGalleryVisible} onClose={() => setIsGalleryVisible(false)} />
+        <NftAvatarGallery isVisible={isGalleryVisible} onClose={() => setIsGalleryVisible(false)} onSelect={onNftSelect} />
       </>
       )}
     </StyledBox>
