@@ -10,24 +10,16 @@ import { RootState } from './index';
 
 export const initialLoad = createAsyncThunk(
   'initialLoad',
-  async () => {
+  async ({ spaceId }: { spaceId: string }) => {
 
-    const [workspace, workspaceUsers, blocks, userWorkspaces] = await Promise.all([
-      charmClient.getWorkspace(),
-      charmClient.getWorkspaceUsers(),
-      charmClient.getAllBlocks(),
-      charmClient.getUserWorkspaces()
+    const [workspaceUsers, blocks] = await Promise.all([
+      charmClient.getWorkspaceUsers(spaceId),
+      charmClient.getAllBlocks(spaceId)
     ]);
 
-    // if no workspace, either bad id, or user doesn't have access
-    if (workspace === undefined) {
-      throw new Error('Workspace undefined');
-    }
     return {
-      workspace,
       workspaceUsers,
-      blocks,
-      userWorkspaces
+      blocks
     };
   }
 );
