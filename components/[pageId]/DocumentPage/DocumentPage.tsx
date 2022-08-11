@@ -1,24 +1,23 @@
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
+import charmClient from 'charmClient';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
 import { getCardComments } from 'components/common/BoardEditor/focalboard/src/store/comments';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import Button from 'components/common/Button';
+import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { useBounties } from 'hooks/useBounties';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
-import { BountyWithDetails, Page, PageContent } from 'models';
 import { useVotes } from 'hooks/useVotes';
-import { IPagePermissionFlags } from 'lib/permissions/pages';
-import { AssignedBountyPermissions, BountyPermissions, UpdateableBountyFields } from 'lib/bounties';
+import { AssignedBountyPermissions } from 'lib/bounties';
+import { Page, PageContent } from 'models';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { memo, useCallback, useEffect, useState } from 'react';
-import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
-import dynamic from 'next/dynamic';
-import charmClient from 'charmClient';
-import { useUser } from 'hooks/useUser';
 import BountyProperties from './components/BountyProperties';
 import CreateVoteBox from './components/CreateVoteBox';
 import PageBanner from './components/PageBanner';
@@ -73,7 +72,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
   const cannotComment = readOnly || !pagePermissions?.comment;
 
   const pageVote = Object.values(votes).find(v => v.context === 'proposal');
-
+  const [isSuggestMode, setIsSuggestMode] = useState<boolean>(false);
   const board = useAppSelector((state) => {
     if (page.type === 'card' && page.parentId) {
       const parentPage = pages[page.parentId];
@@ -138,12 +137,18 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
       >
         {page.deletedAt && <PageDeleteBanner pageId={page.id} />}
         {page.headerImage && <PageBanner headerImage={page.headerImage} readOnly={cannotEdit} setPage={setPage} />}
+        <Button onClick={() => {
+          setIsSuggestMode(!isSuggestMode);
+        }}
+        >{isSuggestMode ? 'Commit suggestion' : 'Suggestion Mode'}
+        </Button>
         <Container
           top={pageTop}
           fullWidth={page.fullWidth ?? false}
         >
           <CharmEditor
-            key={page.id}
+            suggestMode={isSuggestMode}
+            key={`${page.id}.${isSuggestMode}`}
             content={page.content as PageContent}
             onContentChange={updatePageContent}
             readOnly={cannotEdit}

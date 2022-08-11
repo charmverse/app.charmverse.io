@@ -85,7 +85,8 @@ export function charmEditorPlugins (
     userId = null,
     pageId = null,
     spaceId = null,
-    content = undefined
+    content = undefined,
+    suggestMode = false
   }:
     {
       spaceId?: string | null,
@@ -96,7 +97,8 @@ export function charmEditorPlugins (
       disablePageSpecificFeatures?: boolean,
       enableVoting?: boolean,
       enableComments?: boolean,
-      content?: Node
+      content?: Node,
+      suggestMode?: boolean
     } = {}
 ): () => RawPlugins[] {
 
@@ -187,14 +189,17 @@ export function charmEditorPlugins (
     // @ts-ignore missing type
     table.TableFiltersMenu(),
     trailingNode.plugins(),
-    disclosure.plugins(),
-    trackPlugin({
-      ancestorDoc: content
-    })
+    disclosure.plugins()
     // TODO: Pasting iframe or image link shouldn't create those blocks for now
     // iframePlugin,
     // pasteImagePlugin
   ];
+
+  if (!readOnly && suggestMode) {
+    basePlugins.push(trackPlugin({
+      ancestorDoc: content
+    }));
+  }
 
   if (!readOnly) {
     basePlugins.push(rowActions.plugins({
@@ -309,6 +314,7 @@ interface CharmEditorProps {
   disablePageSpecificFeatures?: boolean;
   enableVoting?: boolean;
   pageId?: string | null;
+  suggestMode?: boolean
 }
 
 export function convertPageContentToMarkdown (content: PageContent, title?: string): string {
@@ -341,11 +347,11 @@ function CharmEditor (
     readOnly = false,
     disablePageSpecificFeatures = false,
     enableVoting,
-    pageId
+    pageId,
+    suggestMode = false
   }:
   CharmEditorProps
 ) {
-
   const [currentSpace] = useCurrentSpace();
   // check empty state of page on first load
   const _isEmpty = checkForEmpty(content);
@@ -371,6 +377,7 @@ function CharmEditor (
     specRegistry,
     plugins: charmEditorPlugins({
       onContentChange: _onContentChange,
+      suggestMode,
       readOnly,
       disablePageSpecificFeatures,
       enableVoting,
