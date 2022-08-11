@@ -53,7 +53,7 @@ export const getNfts = async (addresses: string[], chainId: SupportedChainId = 1
     }
   }, [])
     // Filter out invalid NFTs
-    .filter(n => !!n.media?.length);
+    .filter(n => !!n.media?.length && !!n.media[0].gateway);
 
   const sortedNfts = orderBy(nfts, (nft) => new Date(nft.timeLastUpdated), 'desc');
 
