@@ -10,7 +10,7 @@ import IconButton from '@mui/material/IconButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
+import ListItemButton from '@mui/material/ListItemButton';
 import Tooltip from '@mui/material/Tooltip';
 import { Page, PageType } from '@prisma/client';
 import charmClient from 'charmClient';
@@ -246,8 +246,7 @@ const TreeItemComponent = React.forwardRef<React.Ref<HTMLDivElement>, TreeItemCo
 
 const MemoizedIconButton = memo(IconButton);
 
-const PageMenuItem = styled(MenuItem)`
-  padding: 3px 12px;
+const PageMenuItem = styled(ListItemButton)`
   .MuiTypography-root {
     font-weight: 600;
   }

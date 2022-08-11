@@ -1,13 +1,13 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { BountyWithDetails } from 'models';
-import BountyStatusBadge from './BountyStatusBadge';
+import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge';
 
 interface Props {
   bounty: BountyWithDetails
 }
 
-export default function BountyHeader ({ bounty }: Props) {
+export default function BountyPropertiesHeader ({ bounty }: Props) {
   return (
     <Box sx={{
       justifyContent: 'space-between',

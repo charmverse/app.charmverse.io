@@ -17,22 +17,24 @@ interface Props {
   chainIdToUse: number
   onSuccess?: (txId: string, chainId: number) => void;
   onClick?: () => void
-  onError?: (err: any, severity?: AlertColor) => void;
-  children?: React.ReactChild | React.ReactChild[];
+  onError?: (err: string, severity?: AlertColor) => void;
 }
 
 function extractWalletErrorMessage (error: any): string {
   if ((error)?.code === 'INSUFFICIENT_FUNDS') {
-    return 'You do not have sufficient funds to perform this transaction.';
+    return 'You do not have sufficient funds to perform this transaction';
   }
   else if ((error)?.code === 4001) {
-    return 'You rejected this transaction.';
+    return 'You rejected the transaction';
   }
   else if ((error)?.code === -32602) {
     return 'A valid recipient must be provided';
   }
   else if ((error)?.reason) {
     return error.reason;
+  }
+  else if ((error)?.message) {
+    return error.message;
   }
   else if (typeof error === 'object') {
     return JSON.stringify(error);
@@ -93,16 +95,13 @@ export default function BountyPaymentButton ({
   tokenSymbolOrAddress,
   onSuccess = (tx: string, chainId: number) => {},
   onClick = () => null,
-  onError = () => {},
-  children = 'Make payment'
+  onError = () => {}
 }: Props) {
   const { account, library, chainId } = useWeb3React();
 
   const [paymentMethods] = usePaymentMethods();
 
   const makePayment = async () => {
-
-    onError(null);
 
     if (!chainIdToUse) {
       onError('Please provide a chainId');
@@ -177,7 +176,7 @@ export default function BountyPaymentButton ({
         onSuccess(tx.hash, chainToUse!.chainId);
       }
       else {
-        onError('Please provide a valid contract address', 'error');
+        onError('Please provide a valid contract address');
       }
     }
     catch (err: any) {
@@ -194,13 +193,14 @@ export default function BountyPaymentButton ({
 
   return (
     <Button
-      variant='outlined'
-      color='secondary'
+      color='primary'
+      size='small'
       onClick={() => {
         onClick();
         makePayment();
       }}
-    >{children}
+    >
+      Send Payment
     </Button>
   );
 }

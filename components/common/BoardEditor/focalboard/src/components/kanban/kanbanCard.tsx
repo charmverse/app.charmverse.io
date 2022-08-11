@@ -49,6 +49,7 @@ const BountyFooter = styled.div`
   justify-content: space-between;
   width: 100%;
   padding-top: ${({ theme }) => theme.spacing(1)};
+  margin-top: ${({ theme }) => theme.spacing(1)};
 `;
 
 const CurrencyIcon = styled.span`
