@@ -23,12 +23,13 @@ interface Props {
   bounty: BountyWithDetails,
   bountyPermissions?: Partial<BountyPermissions>,
   pagePermissions?: PagePermission[]
+  pageId: string
 }
 
-export default function BountyPropertiesHeader ({ bounty, bountyPermissions, pagePermissions }: Props) {
+export default function BountyPropertiesHeader ({ bounty, bountyPermissions, pagePermissions, pageId }: Props) {
 
   const { roleups } = useRoles();
-  const { pages, setPages, currentPageId } = usePages();
+  const { pages, setPages } = usePages();
   const { showMessage } = useSnackbar();
 
   const [updatingPermissions, setUpdatingPermissions] = useState(false);
@@ -45,7 +46,7 @@ export default function BountyPropertiesHeader ({ bounty, bountyPermissions, pag
   function restrictPermissions () {
     setUpdatingPermissions(true);
     charmClient.restrictPagePermissions({
-      pageId: currentPageId
+      pageId
     }).then(page => {
       setPages({
         ...pages,
