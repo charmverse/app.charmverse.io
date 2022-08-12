@@ -118,7 +118,9 @@ function createColumnPaletteItem (colCount: number): Omit<PaletteItemType, 'grou
   };
 }
 
-const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, 'group'>[]> = {
+type PaletteGroup = 'list' | 'media' | 'other' | 'text' | 'database';
+
+const paletteGroupItemsRecord: Record<PaletteGroup, Omit<PaletteItemType, 'group'>[]> = {
   other: [
     {
       uid: 'price',
@@ -624,7 +626,7 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, 'group'>[]> 
   ],
   database: [{
     uid: 'inlineDatabase',
-    title: 'Inline Board',
+    title: 'Linked view of database',
     icon: <DatabaseIcon sx={{ fontSize: 16 }} />,
     description: 'Embed a view from an existing board',
     editorExecuteCommand: () => {
@@ -649,91 +651,101 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, 'group'>[]> 
   }]
 };
 
+const sortedGroupList: PaletteGroup[] = ['list', 'media', 'other', 'text', 'database'];
+
 export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: PluginKey<NestedPagePluginState>}) {
   const { addNestedPage } = useNestedPage();
 
   const [userSpacePermissions] = useCurrentSpacePermissions();
 
-  const paletteItems = useMemo(() => {
-    const itemGroups = Object.entries({ ...paletteGroupItemsRecord,
-      other: ([
-        ...paletteGroupItemsRecord.other,
-        {
-          uid: 'insert-board',
-          title: 'Insert board',
-          requiredSpacePermission: 'createPage',
-          icon: <DatabaseIcon sx={{
-            fontSize: 16
-          }}
-          />,
-          description: 'Insert a new board',
-          editorExecuteCommand: (() => {
-            return (async (state, dispatch, view) => {
-              await addNestedPage('board');
-              return replaceSuggestionMarkWith(palettePluginKey, '')(
-                state,
-                dispatch,
-                view
-              );
-            }) as PromisedCommand;
-          })
-        },
-        {
-          uid: 'insert-page',
-          title: 'Insert page',
-          requiredSpacePermission: 'createPage',
-          icon: <DescriptionOutlinedIcon sx={{
-            fontSize: 16
-          }}
-          />,
-          description: 'Insert a new page',
-          editorExecuteCommand: (() => {
-            return (async (state, dispatch, view) => {
-              await addNestedPage();
-              return replaceSuggestionMarkWith(palettePluginKey, '')(
-                state,
-                dispatch,
-                view
-              );
-            }) as PromisedCommand;
-          })
-        },
-        {
-          uid: 'link-to-page',
-          title: 'Link to page',
-          icon: <DescriptionOutlinedIcon sx={{
-            fontSize: 16
-          }}
-          />,
-          description: 'Link to a new page',
-          editorExecuteCommand: (() => {
-            return (async (state, dispatch, view) => {
-              if (nestedPagePluginKey) {
-                const nestedPagePluginState = nestedPagePluginKey.getState(state);
-                if (nestedPagePluginState) {
-                  replaceSuggestionMarkWith(palettePluginKey, state.schema.text(' ', state.schema.marks[nestedPageSuggestMarkName].create({})), true)(
-                    state,
-                    dispatch,
-                    view
-                  );
-                }
-                return false;
-              }
-              return false;
-            }) as PromisedCommand;
-          })
-        }
-      ] as PaletteItemType[]).filter(paletteItem => {
-        return !paletteItem.requiredSpacePermission
-        || (paletteItem.requiredSpacePermission && userSpacePermissions?.[paletteItem.requiredSpacePermission]);
+  const dynamicOther = [
+    {
+      uid: 'insert-board',
+      title: 'Insert board',
+      requiredSpacePermission: 'createPage',
+      icon: <DatabaseIcon sx={{
+        fontSize: 16
+      }}
+      />,
+      description: 'Insert a new board',
+      editorExecuteCommand: (() => {
+        return (async (state, dispatch, view) => {
+          await addNestedPage('board');
+          return replaceSuggestionMarkWith(palettePluginKey, '')(
+            state,
+            dispatch,
+            view
+          );
+        }) as PromisedCommand;
       })
-    })
-      .map(([group, paletteItemsWithoutGroup]) => {
-        return paletteItemsWithoutGroup.map(paletteItem => PaletteItem.create({
-          ...paletteItem,
-          group
-        }));
-      });
+    },
+    {
+      uid: 'insert-page',
+      title: 'Insert page',
+      requiredSpacePermission: 'createPage',
+      icon: <DescriptionOutlinedIcon sx={{
+        fontSize: 16
+      }}
+      />,
+      description: 'Insert a new page',
+      editorExecuteCommand: (() => {
+        return (async (state, dispatch, view) => {
+          await addNestedPage();
+          return replaceSuggestionMarkWith(palettePluginKey, '')(
+            state,
+            dispatch,
+            view
+          );
+        }) as PromisedCommand;
+      })
+    },
+    {
+      uid: 'link-to-page',
+      title: 'Link to page',
+      icon: <DescriptionOutlinedIcon sx={{
+        fontSize: 16
+      }}
+      />,
+      description: 'Link to a new page',
+      editorExecuteCommand: (() => {
+        return (async (state, dispatch, view) => {
+          if (nestedPagePluginKey) {
+            const nestedPagePluginState = nestedPagePluginKey.getState(state);
+            if (nestedPagePluginState) {
+              replaceSuggestionMarkWith(palettePluginKey, state.schema.text(' ', state.schema.marks[nestedPageSuggestMarkName].create({})), true)(
+                state,
+                dispatch,
+                view
+              );
+            }
+            return false;
+          }
+          return false;
+        }) as PromisedCommand;
+      })
+    }
+  ] as Omit<PaletteItemType, 'group'>[];
+
+  const allowedOther = dynamicOther.filter(paletteItem => {
+    return !paletteItem.requiredSpacePermission
+    || (paletteItem.requiredSpacePermission && userSpacePermissions?.[paletteItem.requiredSpacePermission]);
+  });
+
+  const groupConfig = {
+    ...paletteGroupItemsRecord,
+    other: [
+      ...paletteGroupItemsRecord.other,
+      ...allowedOther
+    ]
+  };
+
+  const paletteItems = useMemo(() => {
+    const itemGroups = sortedGroupList.map(group => {
+      return groupConfig[group].map(paletteItem => PaletteItem.create({
+        ...paletteItem,
+        group
+      }));
+    });
     return itemGroups.flat();
   }, [addNestedPage]);
 
