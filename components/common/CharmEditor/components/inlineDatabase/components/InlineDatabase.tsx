@@ -7,7 +7,7 @@ import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/st
 import { getViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { getClientConfig } from 'components/common/BoardEditor/focalboard/src/store/clientConfig';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { getCurrentBoardViews, getCurrentViewDisplayBy, getCurrentViewGroupBy, getView, getSortedViews, setCurrent as setCurrentView } from 'components/common/BoardEditor/focalboard/src/store/views';
+import { getCurrentViewDisplayBy, getCurrentViewGroupBy, getView, getSortedViews } from 'components/common/BoardEditor/focalboard/src/store/views';
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import { usePages } from 'hooks/usePages';
@@ -19,6 +19,7 @@ import { isTruthy } from 'lib/utilities/types';
 
 import ErrorPage from 'components/common/errors/ErrorPage';
 import BoardSelection from './BoardSelection';
+import ViewSelection from './ViewSelection';
 
 // Lazy load focalboard entrypoint (ignoring the redux state stuff for now)
 const CenterPanel = dynamic(() => import('components/common/BoardEditor/focalboard/src/components/centerPanel'), {
@@ -91,13 +92,7 @@ interface DatabaseViewAttrs {
 
 export default function DatabaseView ({ readOnly: readOnlyOverride }: DatabaseViewProps) {
 
-  const __pageId = '';// 38c15b30-5aa9-4b03-9226-2ed5b6263e72';
-  // const viewId = '45ff0d07-22d2-4a4c-8513-e92dfcd02d84'; // gallery view
-  // const viewId = '4c90e179-3ef4-465f-9162-45817208aa74'; // table
-  // const viewId = '64634dfc-19c0-4601-a1fc-78178d401655'; // kanban
-  const __viewId = 'b6830f74-6db2-4b87-a901-84ddd215fe83'; // calendar view
-
-  const [attrs, setAttrs] = useState<DatabaseViewAttrs>({ viewId: __viewId, pageId: __pageId });
+  const [attrs, setAttrs] = useState<DatabaseViewAttrs>({});
 
   const boards = useAppSelector(getSortedBoards);
   const board = boards.find(b => b.id === attrs.pageId);
@@ -108,7 +103,6 @@ export default function DatabaseView ({ readOnly: readOnlyOverride }: DatabaseVi
   const allViews = useAppSelector(getSortedViews);
   const boardViews = allViews.filter(view => view.parentId === attrs.pageId);
   const activeView = useAppSelector(getView(attrs.viewId || ''));
-  // const boardViews = useAppSelector(getCurrentBoardViews);
   const groupByProperty = useAppSelector(getCurrentViewGroupBy);
   const dateDisplayProperty = useAppSelector(getCurrentViewDisplayBy);
   const clientConfig = useAppSelector(getClientConfig);
@@ -134,22 +128,12 @@ export default function DatabaseView ({ readOnly: readOnlyOverride }: DatabaseVi
     setAttrs(_attrs => ({ ..._attrs, viewId }));
   }
 
-  // TODO: we might need this if we set a local context for subcomponents
-  // useEffect(() => {
-
-  //   if (boardId) {
-  //     dispatch(setCurrentBoard(boardId));
-  //     dispatch(setCurrentView(viewId || ''));
-  //   }
-
-  // }, [boardId, viewId, boardViews]);
-
   if (!board) {
     return <BoardSelection pages={boardPages} onSelect={selectBoard} />;
   }
 
-  if (!board || !activeView) {
-    return <ErrorPage message='Database not found' />;
+  if (!activeView) {
+    return <ViewSelection views={boardViews} title={board.title} onSelect={selectView} />;
   }
 
   let property = groupByProperty;

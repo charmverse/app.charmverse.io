@@ -7,7 +7,7 @@ interface Props {
   onSelect: (boardId: string) => void;
 }
 
-export default function BoardList (props: Props) {
+export default function BoardSelection (props: Props) {
   return (
     <Box>
       <Typography variant='h3'>Inline Database</Typography>
