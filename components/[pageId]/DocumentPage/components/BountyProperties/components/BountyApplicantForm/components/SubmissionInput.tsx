@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { FormLabel, Typography } from '@mui/material';
+import { Box, FormLabel } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
 import Collapse from '@mui/material/Collapse';
@@ -11,19 +11,16 @@ import TextField from '@mui/material/TextField';
 import { Application } from '@prisma/client';
 import charmClient from 'charmClient';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
-import Link from 'components/common/Link';
 import { useUser } from 'hooks/useUser';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import { SystemError } from 'lib/utilities/errors';
-import { shortenHex } from 'lib/utilities/strings';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { AssignedBountyPermissions } from 'lib/bounties';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import BountySubmissionStatus from './BountySubmissionStatus';
+import BountyApplicantStatus from '../../BountyApplicantStatus';
 
 const schema = yup.object({
   submission: yup.string().required(),
@@ -37,20 +34,21 @@ const schema = yup.object({
 type FormValues = yup.InferType<typeof schema>
 
 interface Props {
-  submission?: Application,
-  bountyId: string,
-  onSubmit?: (submission: Application) => void
+  submission?: Application;
+  bountyId: string;
+  onSubmit?: (submission: Application) => void;
   onCancel?: () => void;
-  readOnly?: boolean
-  permissions: AssignedBountyPermissions,
-  expandedOnLoad?: boolean
+  readOnly?: boolean;
+  permissions: AssignedBountyPermissions;
+  expandedOnLoad?: boolean;
+  alwaysExpanded?: boolean;
 }
 
-export default function BountySubmissionForm (
-  { permissions, readOnly = false, submission, onSubmit: onSubmitProp, bountyId, expandedOnLoad, onCancel = () => null }: Props
+export default function SubmissionInput (
+  { permissions, readOnly = false, submission, onSubmit: onSubmitProp, bountyId, alwaysExpanded, expandedOnLoad, onCancel = () => null }: Props
 ) {
   const [user] = useUser();
-  const [isVisible, setIsVisible] = useState(expandedOnLoad ?? false);
+  const [isVisible, setIsVisible] = useState(expandedOnLoad ?? alwaysExpanded ?? false);
 
   const {
     register,
@@ -101,59 +99,39 @@ export default function BountySubmissionForm (
 
   return (
     <Stack my={2} gap={1}>
-      <Stack
+      <Box
+        display='flex'
+        justifyContent='space-between'
         flexDirection='row'
         gap={0.5}
+        sx={{ cursor: !alwaysExpanded ? 'pointer' : 'inherit' }}
         onClick={() => {
-          setIsVisible(!isVisible);
+          if (!alwaysExpanded) {
+            setIsVisible(!isVisible);
+          }
         }}
       >
-        <>
-          <FormLabel sx={{
-            fontWeight: 'bold'
-          }}
-          >
+        <Box display='flex' gap={0.5}>
+          <FormLabel sx={{ fontWeight: 'bold' }}>
             {submission?.createdBy === user?.id ? 'Your submission' : 'Submission'}
-            {
-          submission && submission.status !== 'applied' && submission.createdBy === user?.id && (
-            <BountySubmissionStatus submission={submission} />
-          )
-        }
           </FormLabel>
-          <IconButton
-            sx={{
-              top: -2.5,
-              position: 'relative'
-            }}
-            size='small'
-          >
-            {isVisible ? <KeyboardArrowUpIcon fontSize='small' /> : <KeyboardArrowDownIcon fontSize='small' />}
-          </IconButton>
-
-        </>
-      </Stack>
-      <Collapse in={isVisible} timeout='auto' unmountOnExit>
-        {readOnly && submission?.walletAddress && (
-        <Typography sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1
-        }}
-        >
-          Payment address:
-          <Link
-            sx={{
-              display: 'flex',
-              alignItems: 'center'
-            }}
-            external
-            target='_blank'
-            href={`https://etherscan.io/address/${submission.walletAddress}`}
-          >{shortenHex(submission.walletAddress)}
-            <OpenInNewIcon fontSize='small' />
-          </Link>
-        </Typography>
+          {!alwaysExpanded && (
+            <IconButton
+              sx={{
+                top: -2.5,
+                position: 'relative'
+              }}
+              size='small'
+            >
+              {isVisible ? <KeyboardArrowUpIcon fontSize='small' /> : <KeyboardArrowDownIcon fontSize='small' />}
+            </IconButton>
+          )}
+        </Box>
+        {submission && submission.status !== 'applied' && submission.createdBy === user?.id && (
+          <BountyApplicantStatus submission={submission} />
         )}
+      </Box>
+      <Collapse in={isVisible} timeout='auto' unmountOnExit>
         <form onSubmit={handleSubmit(onSubmit)} style={{ margin: 'auto', width: '100%' }}>
           <Grid container direction='column' spacing={2}>
 
@@ -183,50 +161,51 @@ export default function BountySubmissionForm (
             </Grid>
 
             {!readOnly && (
-            <Grid item>
-              <InputLabel>
-                Address to get paid for this bounty
-              </InputLabel>
-              <TextField
-                {...register('walletAddress')}
-                type='text'
-                fullWidth
-                error={!!errors.walletAddress}
-                helperText={errors.walletAddress?.message}
-                disabled={readOnly}
-              />
+              <Grid item>
+                <InputLabel>
+                  Address to get paid for this bounty
+                </InputLabel>
+                <TextField
+                  {...register('walletAddress')}
+                  type='text'
+                  fullWidth
+                  error={!!errors.walletAddress}
+                  helperText={errors.walletAddress?.message}
+                  disabled={readOnly}
+                />
+              </Grid>
+            )}
 
-            </Grid>
+            {!readOnly && (
+              <Grid item display='flex' gap={1}>
+                <Button disabled={!isValid && submission?.status === 'inProgress'} type='submit'>
+                  {
+                    submission?.submission ? 'Update' : 'Submit'
+                  }
+                </Button>
+                {(!submission?.submission && !alwaysExpanded) && (
+                  <Button
+                    onClick={() => {
+                      setIsVisible(false);
+                      onCancel();
+                    }}
+                    variant='outlined'
+                    color='secondary'
+                  >Cancel
+                  </Button>
+                )}
+              </Grid>
             )}
 
             {
-            formError && (
-              <Grid item>
-                <Alert severity={formError.severity}>
-                  {formError.message}
-                </Alert>
-              </Grid>
-            )
-          }
-
-            {!readOnly && (
-            <Grid item display='flex' gap={1}>
-              <Button disabled={!isValid} type='submit'>
-                {
-                  submission?.submission ? 'Update' : 'Submit'
-                }
-              </Button>
-              <Button
-                onClick={() => {
-                  setIsVisible(false);
-                  onCancel();
-                }}
-                variant='outlined'
-                color='secondary'
-              >Cancel
-              </Button>
-            </Grid>
-            )}
+              formError && (
+                <Grid item>
+                  <Alert severity={formError.severity}>
+                    {formError.message}
+                  </Alert>
+                </Grid>
+              )
+            }
           </Grid>
         </form>
 

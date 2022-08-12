@@ -6,9 +6,9 @@ import { useUser } from 'hooks/useUser';
 import { submissionsCapReached } from 'lib/applications/shared';
 import { AssignedBountyPermissions } from 'lib/bounties';
 import { useState } from 'react';
-import { ApplicationEditorForm } from './components/ApplicationEditorForm';
+import ApplicationInput from './components/ApplicationInput';
 import SignupButton from './components/BountySignupButton';
-import SubmissionEditorForm from './components/SubmissionEditorForm';
+import SubmissionInput from './components/SubmissionInput';
 
 interface BountyApplicationFormProps {
   permissions: AssignedBountyPermissions
@@ -73,7 +73,7 @@ export default function BountyApplicantForm (props: BountyApplicationFormProps) 
           </Tooltip>
         </Box>
       ) : (
-        <ApplicationEditorForm
+        <ApplicationInput
           bountyId={bounty.id}
           mode='create'
           onSubmit={() => {
@@ -90,17 +90,18 @@ export default function BountyApplicantForm (props: BountyApplicationFormProps) 
   else if (userApplication && bounty.approveSubmitters) {
     return (
       <>
-        <ApplicationEditorForm
+        <ApplicationInput
           bountyId={bounty.id}
           proposal={userApplication}
           mode='update'
+          readOnly={userApplication?.status !== 'applied'}
           onSubmit={() => {
             setShowApplication(false);
           }}
         />
-        { userApplication?.status !== 'applied' && (
+        {userApplication?.status !== 'applied' && (
 
-          <SubmissionEditorForm
+          <SubmissionInput
             bountyId={bounty.id}
             onSubmit={async () => {
               await refreshSubmissions();
@@ -113,6 +114,8 @@ export default function BountyApplicantForm (props: BountyApplicationFormProps) 
             onCancel={() => {
               setShowApplication(false);
             }}
+            readOnly={userApplication?.status !== 'inProgress'}
+            alwaysExpanded={true}
           />
         )}
       </>
@@ -137,7 +140,7 @@ export default function BountyApplicantForm (props: BountyApplicationFormProps) 
           </Tooltip>
         </Box>
       ) : (
-        <SubmissionEditorForm
+        <SubmissionInput
           bountyId={bounty.id}
           onSubmit={async () => {
             await refreshSubmissions();
@@ -147,9 +150,10 @@ export default function BountyApplicantForm (props: BountyApplicationFormProps) 
           onCancel={() => {
             setShowApplication(false);
           }}
+          readOnly={userApplication?.status === 'rejected'}
           submission={userApplication}
           permissions={permissions}
-          expandedOnLoad={true}
+          alwaysExpanded={true}
         />
       )
     );

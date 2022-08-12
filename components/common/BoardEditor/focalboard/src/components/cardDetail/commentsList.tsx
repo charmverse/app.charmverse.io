@@ -25,6 +25,7 @@ type Props = {
 const CommentsList = React.memo((props: Props) => {
   const [currentUser] = useUser();
   const [contributors] = useContributors();
+  const [editorKey, setEditorKey] = useState(0); // a key to allow us to reset charmeditor contents
 
   const onSendClicked = (newComment: CommentBlock['fields']) => {
     const { rootId, cardId } = props;
@@ -38,6 +39,8 @@ const CommentsList = React.memo((props: Props) => {
     comment.title = contentText || '';
     comment.fields = { content }
     mutator.insertBlock(comment, 'add comment');
+    // clear the editor
+    setEditorKey(key => key + 1);
   };
 
   const { comments } = props;
@@ -47,6 +50,7 @@ const CommentsList = React.memo((props: Props) => {
       {/* New comment */}
       {!props.readonly && (
         <NewCommentInput
+          key={editorKey}
           avatar={currentUser?.avatar}
           username={currentUser?.username}
           onSubmit={onSendClicked}
@@ -80,8 +84,6 @@ export function NewCommentInput ({ initialValue = null, key, username, avatar, o
 
   const intl = useIntl();
   const [newComment, setNewComment] = useState<CommentBlock['fields'] | null>(initialValue);
-
-  console.log('new comment input', newComment)
 
   return (
     <div className='CommentsList__new'>

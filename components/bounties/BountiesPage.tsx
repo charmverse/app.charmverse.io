@@ -71,12 +71,9 @@ export default function BountiesPage ({ refreshBounty, publicMode = false, bount
                   <NewBountyButton />
                 </Box>
               )}
-
             </Grid>
 
           </Grid>
-          {/* include ViewHEader to include the horizontal line */}
-          <div className='ViewHeader' />
         </div>
         <div className='container-container'>
           {bounties.length === 0
