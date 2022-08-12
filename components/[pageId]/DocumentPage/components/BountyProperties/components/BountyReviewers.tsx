@@ -8,6 +8,12 @@ import { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import { Contributor } from 'models';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import { useMemo, useState } from 'react';
+import { hasNftAvatar } from 'lib/users/hasNftAvatar';
+
+type ReviewersData = {
+  roles: ({ id: string, name: string, users: Contributor[] })[]
+  users: ({ id: string, name: string, profilePic?: string | null, hasNftAvatar?: boolean })[]
+}
 
 interface BountyReviewersProps {
   permissions: AssignedBountyPermissions
@@ -22,10 +28,7 @@ export default function BountyReviewers ({ bounty, permissions }: BountyReviewer
   const [contributors] = useContributors();
   const { roleups } = useRoles();
 
-  const reviewerNames: {
-    roles: ({ id: string, name: string, users: Contributor[] })[]
-    users: ({ id: string, name: string, profilePic?: string | null })[]
-  } = useMemo(() => {
+  const reviewerNames: ReviewersData = useMemo(() => {
     const mapped = (permissions?.bountyPermissions.reviewer ?? []).map(reviewer => {
 
       if (reviewer.group === 'role') {
@@ -41,7 +44,8 @@ export default function BountyReviewers ({ bounty, permissions }: BountyReviewer
         return {
           ...(reviewer as TargetPermissionGroup<'user'>),
           name: reviewerUser?.username ?? '',
-          profilePic: reviewerUser?.avatar
+          profilePic: reviewerUser?.avatar,
+          hasNftAvatar: reviewerUser?.hasNftAvatar
         };
 
       }
@@ -62,7 +66,8 @@ export default function BountyReviewers ({ bounty, permissions }: BountyReviewer
             return {
               id: u.id,
               name: u.username,
-              profilePic: u.avatar
+              profilePic: u.avatar,
+              hasNftAvatar: hasNftAvatar(u)
             };
           });
 
@@ -77,10 +82,7 @@ export default function BountyReviewers ({ bounty, permissions }: BountyReviewer
     }, {
       roles: [],
       users: []
-    } as {
-      roles: { id: string, name: string, users: Contributor[] }[]
-      users: { id: string, name: string, profilePic?: string | null }[]
-    });
+    } as ReviewersData);
 
     reduced.users = reduced.users.filter((listedUser, index) => {
       // Only look ahead in the array to see if the user is already in the list
@@ -127,7 +129,7 @@ export default function BountyReviewers ({ bounty, permissions }: BountyReviewer
                   return (
                     <Tooltip placement='top' key={reviewer.id} title={!reviewer.name ? userName : reviewer.name}>
                       <Box>
-                        <Avatar size='small' name={userName.slice(0, 1)} avatar={reviewer.profilePic as string} />
+                        <Avatar size='small' name={userName.slice(0, 1)} avatar={reviewer.profilePic as string} isNft={reviewer.hasNftAvatar} />
                       </Box>
                     </Tooltip>
                   );
