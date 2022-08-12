@@ -10,7 +10,7 @@ interface Props {
 export default function BoardSelection (props: Props) {
   return (
     <Box>
-      <Typography variant='h3'>Inline Database</Typography>
+      <Typography variant='h3'>Embed a database</Typography>
       <Card raised sx={{ my: 2 }}>
         <Box px={2} pt={1} pb={0}>
           <Typography fontWeight='bold'>Select a data source:</Typography>

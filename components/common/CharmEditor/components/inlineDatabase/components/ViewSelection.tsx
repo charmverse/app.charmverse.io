@@ -14,7 +14,7 @@ export default function ViewSelection (props: Props) {
   return (
     <Box>
       <Box display='flex' alignItems='flex-end' justifyContent='space-between'>
-        <Typography variant='h3'>Inline Database: {props.title}</Typography>
+        <Typography variant='h3'>Embed a database: {props.title}</Typography>
         <Button size='small' color='secondary' variant='outlined' onClick={props.onClickBack}>
           <ArrowBackIosIcon sx={{ fontSize: '14px' }} /> Go back
         </Button>
