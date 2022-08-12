@@ -109,7 +109,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
         <BoardPage
           page={memoizedCurrentPage}
           setPage={setPage}
-          readonly={currentPagePermissions.edit_content !== true}
+          readOnly={currentPagePermissions.edit_content !== true}
         />
       );
     }

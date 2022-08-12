@@ -26,11 +26,11 @@ import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 
 interface Props {
   page: Page;
-  readonly?: boolean;
+  readOnly?: boolean;
   setPage: (p: Partial<Page>) => void;
 }
 
-export function BoardPage ({ page, setPage, readonly }: Props) {
+export function BoardPage ({ page, setPage, readOnly }: Props) {
   const router = useRouter();
   const board = useAppSelector(getCurrentBoard);
   const cards = useAppSelector(getCurrentViewCardsSortedFilteredAndGrouped);
@@ -72,7 +72,7 @@ export function BoardPage ({ page, setPage, readonly }: Props) {
 
   // load initial data for readonly boards - otherwise its loaded in _app.tsx
   useEffect(() => {
-    if (readonly && page.boardId) {
+    if (readOnly && page.boardId) {
       dispatch(initialReadOnlyLoad(page.boardId));
     }
   }, [page.boardId]);
@@ -134,7 +134,7 @@ export function BoardPage ({ page, setPage, readonly }: Props) {
       <div className='focalboard-body full-page'>
         <CenterPanel
           clientConfig={clientConfig}
-          readonly={!!readonly}
+          readonly={Boolean(readOnly)}
           board={board}
           setPage={setPage}
           cards={accessibleCards}
@@ -151,7 +151,7 @@ export function BoardPage ({ page, setPage, readonly }: Props) {
               cardId={shownCardId}
               onClose={() => showCard(undefined)}
               showCard={(cardId) => showCard(cardId)}
-              readonly={Boolean(readonly)}
+              readonly={Boolean(readOnly)}
             />
           </RootPortal>
         )}

@@ -4,7 +4,6 @@ import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import ImageIcon from '@mui/icons-material/Image';
 import { Box, ListItem, Typography } from '@mui/material';
-import charmClient from 'charmClient';
 import { HTMLAttributes, memo, useCallback } from 'react';
 import ImageSelector from 'components/common/ImageSelector/ImageSelector';
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/image/constants';

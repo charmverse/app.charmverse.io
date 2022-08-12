@@ -178,7 +178,7 @@ export default function PublicPage () {
               ? <PublicBountiesPage />
               : (currentPage?.type === 'board'
                 ? (
-                  <BoardPage page={currentPage} setPage={() => {}} readonly={true} />
+                  <BoardPage page={currentPage} setPage={() => {}} readOnly={true} />
                 ) : (
                   currentPage && <DocumentPage page={currentPage} setPage={() => {}} readOnly={true} />
                 )
