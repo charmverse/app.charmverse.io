@@ -30,8 +30,8 @@ const StylesContainer = styled.div`
   }
 
   .container-container {
-    min-width: 0;
-    overflow: auto;
+    min-width: unset;
+    overflow-x: auto;
     padding: 0;
     // offset padding around document
     margin: 0 -24px;
@@ -72,7 +72,8 @@ export default function DatabaseView ({ readOnly: readOnlyOverride }: DatabaseVi
   const pageId = '38c15b30-5aa9-4b03-9226-2ed5b6263e72';
   // const viewId = '45ff0d07-22d2-4a4c-8513-e92dfcd02d84'; // gallery view
   // const viewId = '4c90e179-3ef4-465f-9162-45817208aa74'; // table
-  const viewId = '64634dfc-19c0-4601-a1fc-78178d401655'; // kanban
+  // const viewId = '64634dfc-19c0-4601-a1fc-78178d401655'; // kanban
+  const viewId = 'b6830f74-6db2-4b87-a901-84ddd215fe83'; // calendar view
 
   const [attrs, setAttrs] = useState<DatabaseViewAttrs>({ viewId, pageId });
 

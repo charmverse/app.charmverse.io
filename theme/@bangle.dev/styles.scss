@@ -61,6 +61,7 @@
   vertical-align: top;
   box-sizing: border-box;
   position: relative;
+  background-color: var(--background-default);
 }
 
 .ProseMirror .column-resize-handle {
@@ -102,7 +103,7 @@
 }
 
 .ProseMirror table {
-  margin: 0;
+  margin: 0 !important;
 }
 
 .ProseMirror th,
@@ -110,6 +111,10 @@
   min-width: 1em;
   border: 1px solid #ddd;
   padding: 3px 5px;
+}
+
+.ProseMirror th {
+  background-color: var(--prop-gray);
 }
 
 .ProseMirror .tableWrapper {
