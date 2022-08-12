@@ -19,7 +19,7 @@ import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDoma
 import type { ApplicationWithTransactions, ReviewDecision, SubmissionContent, SubmissionCreationData } from 'lib/applications/interfaces';
 import type { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
 import type { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
-import type { ResolveMultipleThreads, ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
+import type { MultipleThreadsInput, ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import type { TokenGateVerification, TokenGateEvaluationAttempt, TokenGateEvaluationResult, TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import type { ConnectDiscordPayload, ConnectDiscordResponse } from 'pages/api/discord/connect';
 import type { ImportDiscordRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
@@ -662,7 +662,7 @@ class CharmClient {
     return http.PUT(`/api/threads/${threadId}/resolve`, request);
   }
 
-  resolveMultipleThreads (payload: ResolveMultipleThreads) {
+  resolveMultipleThreads (payload: MultipleThreadsInput) {
     return http.POST('/api/threads/resolve', payload);
   }
 

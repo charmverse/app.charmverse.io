@@ -28,7 +28,7 @@ export interface ThreadWithCommentsAndAuthors extends Thread {
   comments: CommentWithUser[]
 }
 
-export interface ResolveMultipleThreads {
+export interface MultipleThreadsInput {
   threadIds: string[]
   pageId: string
 }
