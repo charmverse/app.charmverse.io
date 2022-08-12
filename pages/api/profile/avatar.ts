@@ -3,7 +3,7 @@ import { prisma } from 'db';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { getUserS3Folder, uploadToS3 } from 'lib/aws/uploadToS3Server';
-import { onError, onNoMatch } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { sessionUserRelations } from 'lib/session/config';
 
 import { LoggedInUser } from 'models';
@@ -17,6 +17,7 @@ import { InvalidInputError } from 'lib/utilities/errors';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
+  .use(requireUser)
   .put(updateAvatar);
 
 async function updateAvatar (req: NextApiRequest, res: NextApiResponse<LoggedInUser | {error: string}>) {

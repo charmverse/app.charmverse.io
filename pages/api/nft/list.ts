@@ -1,7 +1,7 @@
 import { NftData } from 'lib/nft/types';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { onError, onNoMatch } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { alchemyApi } from 'lib/blockchain/provider/alchemy';
 import { withSessionRoute } from 'lib/session/withSession';
 import { mapNftFromAlchemy } from 'lib/nft/utilities/mapNftFromAlchemy';
@@ -9,6 +9,7 @@ import { mapNftFromAlchemy } from 'lib/nft/utilities/mapNftFromAlchemy';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
+  .use(requireUser)
   .get(getNfts);
 
 async function getNfts (req: NextApiRequest, res: NextApiResponse<NftData[] | {error: string}>) {
