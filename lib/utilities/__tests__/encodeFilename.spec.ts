@@ -1,6 +1,6 @@
 import { encodeFilename } from '../encodeFilename';
 
-describe('amount formatting', () => {
+describe('encoding filename', () => {
 
   it('should escape unsafe characters', () => {
     const formatted = encodeFilename('foo@bar.png');
