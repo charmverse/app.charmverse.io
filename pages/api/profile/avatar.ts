@@ -1,4 +1,4 @@
-import { alchemyApi } from 'lib/blockchain/provider/alchemy';
+import * as alchemyApi from 'lib/blockchain/provider/alchemy';
 import { prisma } from 'db';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';

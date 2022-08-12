@@ -2,7 +2,7 @@ import { NftData } from 'lib/nft/types';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { onError, onNoMatch } from 'lib/middleware';
-import { alchemyApi } from 'lib/blockchain/provider/alchemy';
+import * as alchemyApi from 'lib/blockchain/provider/alchemy';
 import { withSessionRoute } from 'lib/session/withSession';
 import { mapNftFromAlchemy } from 'lib/nft/utilities/mapNftFromAlchemy';
 import { InvalidInputError } from 'lib/utilities/errors';

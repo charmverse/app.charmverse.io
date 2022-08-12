@@ -1,5 +1,5 @@
 import { getUserS3Folder, uploadToS3 } from 'lib/aws/uploadToS3Server';
-import { alchemyApi } from 'lib/blockchain/provider/alchemy';
+import * as alchemyApi from 'lib/blockchain/provider/alchemy';
 import log from 'lib/log';
 import { mapNftFromAlchemy } from 'lib/nft/utilities/mapNftFromAlchemy';
 import { UserAvatar } from 'lib/users/interfaces';

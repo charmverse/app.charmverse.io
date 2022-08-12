@@ -80,4 +80,3 @@ export const getOwners = async (contractAddress: string, tokenId: string, chainI
   return res.owners;
 };
 
-export const alchemyApi = { getNfts, getNft, getOwners };
