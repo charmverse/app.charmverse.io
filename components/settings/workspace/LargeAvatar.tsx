@@ -78,20 +78,20 @@ export default function LargeAvatar (props: LargeAvatarProps) {
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [isGalleryVisible, setIsGalleryVisible] = useState(false);
 
-  const onUploadClick = () => {
+  function onUploadClick () {
     inputFile?.current?.click();
-  };
+  }
 
-  const onEditClick = (event: React.MouseEvent<HTMLElement>) => {
+  function onEditClick (event: React.MouseEvent<HTMLElement>) {
     if (canSetNft) {
       setMenuAnchorEl(event.currentTarget);
     }
     else {
       onUploadClick();
     }
-  };
+  }
 
-  const onNftSelect = (nft: NftData) => {
+  function onNftSelect (nft: NftData) {
     const userAvatar: UserAvatar = {
       avatar: nft.image,
       avatarContract: nft.contract,
@@ -100,9 +100,9 @@ export default function LargeAvatar (props: LargeAvatarProps) {
     };
 
     updateAvatar?.(userAvatar);
-  };
+  }
 
-  const updateImageAvatar = (url: string) => {
+  function updateImageAvatar (url: string) {
     if (updateImage) {
       updateImage(url);
       return;
@@ -116,7 +116,7 @@ export default function LargeAvatar (props: LargeAvatarProps) {
     };
 
     updateAvatar?.(userAvatar);
-  };
+  }
 
   if (!editable) {
     return (
