@@ -56,6 +56,11 @@ const StylesContainer = styled.div`
   .octo-board-header {
     padding-top: 0;
   }
+
+  // remove extra margin on calendar view
+  .fc .fc-toolbar.fc-header-toolbar {
+    margin-top: 0;
+  }
 `;
 
 interface DatabaseViewProps extends NodeViewProps {
