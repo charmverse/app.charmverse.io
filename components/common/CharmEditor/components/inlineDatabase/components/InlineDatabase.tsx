@@ -1,6 +1,6 @@
 
 import dynamic from 'next/dynamic';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Box, Typography } from '@mui/material';
 import { NodeViewProps } from '@bangle.dev/core';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
@@ -17,7 +17,6 @@ import log from 'lib/log';
 import styled from '@emotion/styled';
 import { isTruthy } from 'lib/utilities/types';
 
-import ErrorPage from 'components/common/errors/ErrorPage';
 import BoardSelection from './BoardSelection';
 import ViewSelection from './ViewSelection';
 
@@ -86,13 +85,14 @@ interface DatabaseViewProps extends NodeViewProps {
 }
 
 interface DatabaseViewAttrs {
-  pageId?: string;
-  viewId?: string;
+  pageId: string | null;
+  viewId: string | null;
+  source: 'board_page' | null;
 }
 
-export default function DatabaseView ({ readOnly: readOnlyOverride }: DatabaseViewProps) {
+export default function DatabaseView ({ readOnly: readOnlyOverride, node, updateAttrs }: DatabaseViewProps) {
 
-  const [attrs, setAttrs] = useState<DatabaseViewAttrs>({});
+  const [attrs, setAttrs] = useState<DatabaseViewAttrs>(node.attrs as DatabaseViewAttrs);
 
   const boards = useAppSelector(getSortedBoards);
   const board = boards.find(b => b.id === attrs.pageId);
@@ -120,17 +120,24 @@ export default function DatabaseView ({ readOnly: readOnlyOverride }: DatabaseVi
 
   function selectBoard (boardId: string) {
     const _boardViews = allViews.filter(view => view.parentId === boardId);
-    const viewId = _boardViews.length === 1 ? _boardViews[0].id : '';
-    setAttrs({ viewId, pageId: boardId });
+    const viewId = _boardViews.length === 1 ? _boardViews[0].id : null;
+    setAttrs({ pageId: boardId, viewId });
   }
 
   function clearSelection () {
-    setAttrs({ });
+    setAttrs({ viewId: null, pageId: null, source: null });
   }
 
   function selectView (viewId: string) {
     setAttrs(_attrs => ({ ..._attrs, viewId }));
   }
+
+  useEffect(() => {
+    updateAttrs({
+      ...attrs,
+      source: 'board_view'
+    });
+  }, [attrs]);
 
   if (!board) {
     return <BoardSelection pages={boardPages} onSelect={selectBoard} />;

@@ -62,7 +62,7 @@ function CenterPanel (props: Props) {
     cardIdToFocusOnRender: '',
     selectedCardIds: []
   });
-  console.log('props', props);
+
   const [space] = useCurrentSpace();
 
   const backgroundRef = React.createRef<HTMLDivElement>();

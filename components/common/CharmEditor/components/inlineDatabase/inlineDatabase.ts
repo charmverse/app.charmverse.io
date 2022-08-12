@@ -13,11 +13,14 @@ function databaseSpec (): BaseRawNodeSpec {
     type: 'node',
     schema: {
       attrs: {
-        sourceId: {
+        pageId: {
+          default: null
+        },
+        viewId: {
           default: null
         },
         source: {
-          default: 'page'
+          default: null
         }
       },
       atom: true,
