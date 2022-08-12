@@ -4,6 +4,7 @@ import useENSName from 'hooks/useENSName';
 import { User } from '@prisma/client';
 import Avatar from 'components/common/Avatar';
 import Link from 'components/common/Link';
+import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
 interface StyleProps extends BoxProps {
   fontSize?: string | number;
@@ -14,13 +15,14 @@ interface StyleProps extends BoxProps {
 interface BaseComponentProps extends StyleProps {
   username: string;
   avatar?: string | null;
+  isNft?: boolean;
 }
 
-function BaseComponent ({ avatar, username, avatarSize, fontSize, fontWeight, ...props }: BaseComponentProps) {
+function BaseComponent ({ avatar, username, avatarSize, fontSize, fontWeight, isNft, ...props }: BaseComponentProps) {
 
   return (
     <Box display='flex' alignItems='center' gap={1} {...props}>
-      <Avatar size={avatarSize} name={username} avatar={avatar} />
+      <Avatar size={avatarSize} name={username} avatar={avatar} isNft={isNft} />
       <Typography whiteSpace='nowrap' fontSize={fontSize} fontWeight={fontWeight}>{username}</Typography>
     </Box>
   );
@@ -53,17 +55,18 @@ function UserDisplay ({ user, linkToProfile = false, ...props }: UserDisplayProp
   const hostname = typeof window !== 'undefined' ? window.location.origin : '';
   const userPath = user.path || user.id;
   const userLink = `${hostname}/u/${userPath}`;
+  const isNft = hasNftAvatar(user);
 
   if (linkToProfile) {
     return (
       <Link color='inherit' href={userLink} key={user?.id} external={false}>
-        <BaseComponent username={user.username as string} avatar={user.avatar} {...props} />
+        <BaseComponent username={user.username as string} avatar={user.avatar} isNft={isNft} {...props} />
       </Link>
     );
   }
 
   return (
-    <BaseComponent username={user.username as string} avatar={user.avatar} {...props} />
+    <BaseComponent username={user.username as string} avatar={user.avatar} isNft={isNft} {...props} />
   );
 
 }

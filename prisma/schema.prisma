@@ -271,6 +271,9 @@ model User {
   updatedAt         DateTime               @default(now())
   addresses         String[]
   avatar            String?
+  avatarContract    String?
+  avatarTokenId     String?
+  avatarChain       Int?
   username          String
   isBot             Boolean?               @default(false)
   path              String?                @unique

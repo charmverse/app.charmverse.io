@@ -15,7 +15,7 @@ import charmClient from 'charmClient';
 export default function BountySignupButton () {
 
   const { account } = useWeb3React();
-  const [user, setUser] = useUser();
+  const { user, setUser } = useUser();
   const [space] = useCurrentSpace();
   const loginViaTokenGateModal = usePopupState({ variant: 'popover', popupId: 'login-via-token-gate' });
   const { openWalletSelectorModal } = useContext(Web3Connection);

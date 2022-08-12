@@ -56,7 +56,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   const [pages, pagesRef, setPages] = useRefState<PagesContext['pages']>({});
   const [currentPageId, setCurrentPageId] = useState<string>('');
   const router = useRouter();
-  const [user] = useUser();
+  const { user } = useUser();
 
   // retrieve space for public pages
   const [spaces] = useSpaces();

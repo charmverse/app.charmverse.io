@@ -11,7 +11,7 @@ import PageDialog from 'components/common/Page/PageDialog';
 import { usePages } from 'hooks/usePages';
 
 export default function NewBountyButton () {
-  const [user] = useUser();
+  const { user } = useUser();
   const [currentSpace] = useCurrentSpace();
   const [activeBountyPage, setActiveBountyPage] = useState<{page: Page, bounty: BountyWithDetails} | null>(null);
   const [currentUserPermissions] = useCurrentSpacePermissions();

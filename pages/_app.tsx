@@ -33,6 +33,7 @@ import { PageTitleProvider, usePageTitle } from 'hooks/usePageTitle';
 import { SpacesProvider } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
 import { SnackbarProvider } from 'hooks/useSnackbar';
+import HexagonalAvatarMask from 'components/common/HexagonalAvatarMask';
 
 import '@skiff-org/prosemirror-tables/style/tables.css';
 import '@skiff-org/prosemirror-tables/style/table-popup.css';
@@ -266,6 +267,7 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
                               handleClose={() => setIsOldBuild(false)}
                             />
                             {getLayout(<Component {...pageProps} />)}
+                            <HexagonalAvatarMask id='hexagon-avatar' />
                             <Snackbar />
                           </ErrorBoundary>
                         </RouteGuard>

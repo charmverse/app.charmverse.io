@@ -47,7 +47,7 @@ interface Props {
 
 export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit, onCancel, submitText }: Props) {
 
-  const [user] = useUser();
+  const { user } = useUser();
   const [saveError, setSaveError] = useState<any | null>(null);
   const {
     register,

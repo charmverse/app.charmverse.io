@@ -89,7 +89,7 @@ function PageNavigation ({
   const router = useRouter();
   const { pages, currentPageId, setPages } = usePages();
   const [space] = useCurrentSpace();
-  const [user] = useUser();
+  const { user } = useUser();
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${space!.id}.expanded-pages`, []);
 
   const pagesArray: MenuNode[] = filterVisiblePages(Object.values(pages))

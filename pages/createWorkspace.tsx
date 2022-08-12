@@ -11,7 +11,7 @@ import { AlternateRouteButton } from './join';
 
 export default function CreateSpace () {
 
-  const [user, setUser] = useUser();
+  const { user, setUser } = useUser();
   const [spaces, setSpaces] = useSpaces();
   const router = useRouter();
 

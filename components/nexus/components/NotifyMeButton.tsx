@@ -9,7 +9,7 @@ import NotifyMeModal from './NotifyMeModal';
 
 export default function NotifyMeButton () {
 
-  const [user, setUser] = useUser();
+  const { user, setUser } = useUser();
 
   const popupState = usePopupState({
     popupId: 'snooze-transactions-message',

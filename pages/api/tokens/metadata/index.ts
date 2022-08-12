@@ -4,6 +4,7 @@ import { getTokenMetaData, ITokenMetadata } from 'lib/tokens/tokenData';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import { SupportedChainId } from 'lib/blockchain/provider/alchemy';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -29,7 +30,7 @@ async function loadTokenMetaData (req: NextApiRequest, res: NextApiResponse<ITok
   }
 
   const tokenMetaData = await getTokenMetaData({
-    chainId: parsedChainId,
+    chainId: parsedChainId as SupportedChainId,
     contractAddress: contractAddress as string
   });
 

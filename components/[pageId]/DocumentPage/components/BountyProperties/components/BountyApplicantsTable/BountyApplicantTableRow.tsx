@@ -44,7 +44,7 @@ export default function BountyApplicantTableRow ({
   refreshSubmissions
 }: Props) {
   const [contributors] = useContributors();
-  const [user] = useUser();
+  const { user } = useUser();
   const [isExpandedRow, setIsExpandedRow] = useState(false);
   const contributor = contributors.find(c => c.id === submission.createdBy);
   const { refreshBounty } = useBounties();

@@ -54,7 +54,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
   const router = useRouter();
   const colorMode = useColorMode();
   const { pages, currentPageId, setPages } = usePages();
-  const [user, setUser] = useUser();
+  const { user, setUser } = useUser();
   const theme = useTheme();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
   const [pageMenuAnchorElement, setPageMenuAnchorElement] = useState<null | Element>(null);

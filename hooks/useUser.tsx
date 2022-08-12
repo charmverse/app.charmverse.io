@@ -3,14 +3,19 @@ import charmClient from 'charmClient';
 import { LoggedInUser } from 'models';
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 
-type IContext = [
+type IContext = {
   user: LoggedInUser | null,
   setUser: (user: LoggedInUser | any) => void,
   isLoaded: boolean,
   setIsLoaded: (isLoaded: boolean) => void
-];
+};
 
-export const UserContext = createContext<Readonly<IContext>>([null, () => undefined, false, () => undefined]);
+export const UserContext = createContext<Readonly<IContext>>({
+  user: null,
+  setUser: () => undefined,
+  isLoaded: false,
+  setIsLoaded: () => undefined
+});
 
 export function UserProvider ({ children }: { children: ReactNode }) {
   const { account } = useWeb3React();
@@ -31,7 +36,7 @@ export function UserProvider ({ children }: { children: ReactNode }) {
     }
   }, [account]);
 
-  const value = useMemo(() => [user, setUser, isLoaded, setIsLoaded] as IContext, [user, isLoaded]);
+  const value = useMemo(() => ({ user, setUser, isLoaded, setIsLoaded }) as IContext, [user, isLoaded]);
 
   return (
     <UserContext.Provider value={value}>
