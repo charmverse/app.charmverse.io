@@ -166,6 +166,7 @@ const ViewHeader = React.memo((props: Props) => {
 
               <NewCardButton
                 addCard={props.addCard}
+                view={activeView}
                    // addCardFromTemplate={props.addCardFromTemplate}
                 addCardTemplate={props.addCardTemplate}
                 editCardTemplate={props.editCardTemplate}

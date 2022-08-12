@@ -13,15 +13,15 @@ import OptionsIcon from '../../widgets/icons/options';
 import IconButton from '../../widgets/buttons/iconButton';
 import CheckIcon from '../../widgets/icons/check';
 import mutator from '../../mutator';
-import { useAppSelector } from '../../store/hooks';
-import { getCurrentView } from '../../store/views';
+import { BoardView } from '../../blocks/boardView';
 
 type Props = {
     addCard: () => void
+    view: BoardView
 }
 
 const EmptyCardButton = React.memo((props: Props) => {
-  const currentView = useAppSelector(getCurrentView);
+  const currentView = props.view;
   const intl = useIntl();
 
   return (
