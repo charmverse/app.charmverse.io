@@ -269,7 +269,7 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
                             handleClose={() => setIsOldBuild(false)}
                           />
                           {getLayout(<Component {...pageProps} />)}
-                          <HexagonalAvatarMask />
+                          <HexagonalAvatarMask id='hexagon-avatar' />
                           <Snackbar />
                         </ErrorBoundary>
                       </RouteGuard>

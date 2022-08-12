@@ -1,10 +1,14 @@
 import React from 'react';
 
-export function HexagonalAvatarMask () {
+type Props = {
+  id: string
+}
+
+export function HexagonalAvatarMask ({ id }: Props) {
   return (
     <svg height='0' viewBox='0 0 200 188' width='0'>
       <defs>
-        <clipPath clipPathUnits='objectBoundingBox' id='hexagon-avatar' transform='scale(0.005 0.005319148936170213)'>
+        <clipPath clipPathUnits='objectBoundingBox' id={id} transform='scale(0.005 0.005319148936170213)'>
           <path d='M193.248 69.51C185.95 54.1634 177.44 39.4234 167.798 25.43L164.688 20.96C160.859 15.4049 155.841
             10.7724 149.998 7.3994C144.155 4.02636 137.633 1.99743 130.908 1.46004L125.448 1.02004C108.508 -0.340012
             91.4873 -0.340012 74.5479 1.02004L69.0879 1.46004C62.3625 1.99743 55.8413 4.02636 49.9981 7.3994C44.155
