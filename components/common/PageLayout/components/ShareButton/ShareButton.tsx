@@ -12,7 +12,7 @@ import ShareToWeb from './components/ShareToWeb';
 
 export default function ShareButton ({ headerHeight }: { headerHeight: number }) {
 
-  const { currentPageId, pages, refreshPage } = usePages();
+  const { currentPageId, refreshPage } = usePages();
   const popupState = usePopupState({ variant: 'popover', popupId: 'share-menu' });
   const [pagePermissions, setPagePermissions] = useState<IPagePermissionWithAssignee[] | null>(null);
 
@@ -26,10 +26,8 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
 
   // watch changes to the page in case permissions get updated
   useEffect(() => {
-    if (popupState.isOpen) {
-      refreshPermissions();
-    }
-  }, [pages[currentPageId], popupState.isOpen]);
+    refreshPermissions();
+  }, [currentPageId, popupState.isOpen]);
 
   return (
     <>
