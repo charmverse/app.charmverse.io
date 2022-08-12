@@ -15,7 +15,7 @@ interface StyleProps extends BoxProps {
 interface BaseComponentProps extends StyleProps {
   username: string;
   avatar?: string | null;
-  isNft?: boolean
+  isNft?: boolean;
 }
 
 function BaseComponent ({ avatar, username, avatarSize, fontSize, fontWeight, isNft, ...props }: BaseComponentProps) {

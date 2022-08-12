@@ -5,7 +5,7 @@ export { FavoritePage, SpaceRole, User };
 export interface Contributor extends Omit<User, 'addresses'> {
   isAdmin: boolean;
   joinDate: string;
-  hasNftAvatar?: boolean
+  hasNftAvatar?: boolean;
 }
 
 interface NestedMemberships {
