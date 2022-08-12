@@ -1,4 +1,5 @@
-import { Role, Space, User } from '@prisma/client';
+import { BountyOperation, PageOperations, PagePermission, Role, Space, User } from '@prisma/client';
+import { BountyPermissions } from './bounties';
 
 export type Resource = {
   resourceId: string;
@@ -77,4 +78,16 @@ export interface AvailableResourcesRequest {
   spaceId: string
   userId?: string
   publicOnly?: boolean
+}
+
+export interface BountyPagePermissionIntersectionQuery {
+  bountyOperations: BountyOperation[];
+  bountyPermissions: BountyPermissions;
+  pageOperations: PageOperations[];
+  pagePermissions: PagePermission[];
+}
+
+export interface BountyPagePermissionIntersection {
+  hasPermissions: TargetPermissionGroup[];
+  missingPermissions: TargetPermissionGroup[];
 }
