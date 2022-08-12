@@ -4,9 +4,21 @@ import Skeleton from '@mui/material/Skeleton';
 import Stack from '@mui/material/Stack';
 import { Dialog, DialogTitle, CircularProgress, DialogContent, Typography, Grid, Box } from '@mui/material';
 
-import { NftGalleryItem } from 'components/profile/components/NftAvatarGallery/NftGalleryItem';
 import { NftData } from 'lib/nft/types';
 import { useUser } from 'hooks/useUser';
+import styled from '@emotion/styled';
+import NftGalleryItem from './NftGalleryItem';
+
+const ProgressContainer = styled.div`
+  position: 'absolute';
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
 
 type Props = {
   onSelect?: (avatar: NftData) => void
@@ -15,7 +27,7 @@ type Props = {
   isSaving?: boolean;
 };
 
-export function NftAvatarGallery ({ onSelect, isVisible, onClose, isSaving }: Props) {
+export default function NftAvatarGallery ({ onSelect, isVisible, onClose, isSaving }: Props) {
   const [user] = useUser();
   const { nfts, isLoading } = useMyNfts();
 
@@ -51,14 +63,18 @@ export function NftAvatarGallery ({ onSelect, isVisible, onClose, isSaving }: Pr
               <Grid key={`${nft.contract}-${nft.tokenId}`} item xs={6} sm={3} sx={{ minWidth: 110 }}>
                 <NftGalleryItem nft={nft} onClick={() => onSelect?.(nft)} isSelected={getIsSelected(nft)} />
               </Grid>
-            )) : <Box sx={{ p: 4, textAlign: 'center' }}><Typography>You do not own any NFTs</Typography></Box>}
+            )) : (
+              <Box p={4} textAlign='center' flex={1}>
+                <Typography>You do not own any NFTs</Typography>
+              </Box>
+            )}
           </Grid>
         )}
 
         {isSaving && (
-        <Box sx={{ position: 'absolute', top: 0, right: 0, left: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <CircularProgress />
-        </Box>
+          <ProgressContainer>
+            <CircularProgress />
+          </ProgressContainer>
         )}
       </DialogContent>
     </Dialog>

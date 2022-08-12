@@ -16,7 +16,7 @@ type Props = {
   onClick: () => void;
 };
 
-export function NftGalleryItem ({ nft, isSelected, onClick }: Props) {
+export default function NftGalleryItem ({ nft, isSelected, onClick }: Props) {
   const [isHovered, setIsHovered] = useState(false);
   const onAvatarClick = () => {
     if (!isSelected) {
@@ -46,7 +46,7 @@ export function NftGalleryItem ({ nft, isSelected, onClick }: Props) {
       </Stack>
 
       {isSelected && (
-        <Box sx={{ position: 'absolute', top: 3, right: 3 }}>
+        <Box position='absolute' top={3} right={3}>
           <CheckBoxIcon />
         </Box>
       )}
