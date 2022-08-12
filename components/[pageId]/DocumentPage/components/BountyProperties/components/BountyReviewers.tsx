@@ -1,12 +1,12 @@
 import { AvatarGroup, Box, Chip, Tooltip, Typography } from '@mui/material';
 import { Bounty } from '@prisma/client';
 import Avatar from 'components/common/Avatar';
+import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import { useContributors } from 'hooks/useContributors';
 import useRoles from 'hooks/useRoles';
 import { BountyPermissions } from 'lib/bounties';
 import { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import { Contributor } from 'models';
-import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import { useMemo, useState } from 'react';
 
 interface BountyReviewersProps {

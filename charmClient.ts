@@ -591,6 +591,10 @@ class CharmClient {
     return http.DELETE('/api/permissions', { permissionId });
   }
 
+  restrictPagePermissions ({ pageId }: {pageId: string}): Promise<IPageWithPermissions> {
+    return http.POST(`/api/pages/${pageId}/restrict-permissions`, {});
+  }
+
   addSpacePermissions ({ forSpaceId, operations, roleId, spaceId, userId }: SpacePermissionModification): Promise<SpacePermissionFlags> {
     return http.POST<SpacePermissionFlags>(`/api/permissions/space/${forSpaceId}/add`, {
       operations,
