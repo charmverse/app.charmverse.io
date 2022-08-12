@@ -63,6 +63,21 @@ const StylesContainer = styled.div`
   .fc .fc-toolbar.fc-header-toolbar {
     margin-top: 0;
   }
+
+  // adjust columns on Gallery view
+  @media screen and (min-width: 600px) {
+    .Gallery {
+      padding-right: 48px; // offset the left padding from .container-container
+      ${({ theme }) => theme.breakpoints.up('md')} {
+        padding-right: 80px;
+      }
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    .GalleryCard {
+      width: auto;
+    }
+  }
 `;
 
 interface DatabaseViewProps extends NodeViewProps {
