@@ -12,6 +12,7 @@ import { getUserProfile } from 'lib/users/getUser';
 import { getFilenameWithExtension } from 'lib/utilities/getFilenameWithExtension';
 import { UserAvatar } from 'lib/users/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
+import { InvalidInputError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -23,7 +24,7 @@ async function updateAvatar (req: NextApiRequest, res: NextApiResponse<LoggedInU
   const { id: userId } = req.session.user;
 
   if (!avatar || !avatarContract || !avatarTokenId) {
-    res.status(400).json({ error: 'Invalid avatar data' });
+    throw new InvalidInputError('Invalid avatar data');
   }
 
   let avatarUrl = avatar || '';
@@ -40,8 +41,7 @@ async function updateAvatar (req: NextApiRequest, res: NextApiResponse<LoggedInU
     });
 
     if (!isOwner) {
-      res.status(400).json({ error: 'You do not own selected NFT' });
-      return;
+      throw new InvalidInputError('You do not own selected NFT');
     }
 
     const nft = await alchemyApi.getNft(avatarContract, avatarTokenId, chainId);

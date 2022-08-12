@@ -5,6 +5,7 @@ import { onError, onNoMatch } from 'lib/middleware';
 import { alchemyApi } from 'lib/blockchain/provider/alchemy';
 import { withSessionRoute } from 'lib/session/withSession';
 import { mapNftFromAlchemy } from 'lib/nft/utilities/mapNftFromAlchemy';
+import { InvalidInputError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -16,8 +17,7 @@ async function getNfts (req: NextApiRequest, res: NextApiResponse<NftData | {err
   const chainId = 1;
 
   if (typeof tokenId !== 'string' || typeof contractAddress !== 'string') {
-    res.status(400).json({ error: 'Invalid NFT params' });
-    return;
+    throw new InvalidInputError('Invalid NFT params');
   }
 
   const nft = await alchemyApi.getNft(contractAddress, tokenId, chainId);
