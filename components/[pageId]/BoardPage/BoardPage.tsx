@@ -17,7 +17,6 @@ import CardDialog from 'components/common/BoardEditor/focalboard/src/components/
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import { silentlyUpdateURL } from 'lib/browser';
 import { usePages } from 'hooks/usePages';
-import ReactDndProvider from 'components/common/ReactDndProvider';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 /**
  *
@@ -30,7 +29,7 @@ interface Props {
   setPage: (p: Partial<Page>) => void;
 }
 
-export function BoardPage ({ page, setPage, readOnly }: Props) {
+export default function BoardPage ({ page, setPage, readOnly }: Props) {
   const router = useRouter();
   const board = useAppSelector(getCurrentBoard);
   const cards = useAppSelector(getCurrentViewCardsSortedFilteredAndGrouped);
@@ -131,21 +130,23 @@ export function BoardPage ({ page, setPage, readOnly }: Props) {
     }
 
     return (
-      <div className='focalboard-body full-page'>
-        <CenterPanel
-          clientConfig={clientConfig}
-          readonly={Boolean(readOnly)}
-          board={board}
-          setPage={setPage}
-          cards={accessibleCards}
-          showCard={showCard}
-          showHeader={true}
-          activeView={activeView}
-          groupByProperty={property}
-          dateDisplayProperty={displayProperty}
-          views={boardViews}
-        />
-        {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
+      <>
+        <FlashMessages milliseconds={2000} />
+        <div className='focalboard-body full-page'>
+          <CenterPanel
+            clientConfig={clientConfig}
+            readonly={Boolean(readOnly)}
+            board={board}
+            setPage={setPage}
+            cards={accessibleCards}
+            showCard={showCard}
+            showHeader={true}
+            activeView={activeView}
+            groupByProperty={property}
+            dateDisplayProperty={displayProperty}
+            views={boardViews}
+          />
+          {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
           <RootPortal>
             <CardDialog
               key={shownCardId}
@@ -155,23 +156,13 @@ export function BoardPage ({ page, setPage, readOnly }: Props) {
               readonly={Boolean(readOnly)}
             />
           </RootPortal>
-        )}
-      </div>
+          )}
+        </div>
+        {/** include the root portal for focalboard's popup */}
+        <FocalBoardPortal />
+      </>
     );
   }
 
   return null;
-}
-
-export default function BoardPageWithContext (props: Props) {
-
-  return (
-    <ReactDndProvider>
-      <FlashMessages milliseconds={2000} />
-
-      <BoardPage {...props} />
-      {/** include the root portal for focalboard's popup */}
-      <FocalBoardPortal />
-    </ReactDndProvider>
-  );
 }

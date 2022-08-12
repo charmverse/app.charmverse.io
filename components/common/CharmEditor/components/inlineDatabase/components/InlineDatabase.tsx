@@ -157,7 +157,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
   const readOnly = typeof readOnlyOverride === 'undefined' ? currentPagePermissions.edit_content !== true : readOnlyOverride;
 
   return (
-    <ReactDndProvider>
+    <>
       <StylesContainer className='focalboard-body'>
         <Box mb={1}>
           <Typography variant='h3'>
@@ -191,6 +191,6 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
         </RootPortal>
       )}
       <FocalBoardPortal />
-    </ReactDndProvider>
+    </>
   );
 }
