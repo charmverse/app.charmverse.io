@@ -121,7 +121,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
   function selectBoard (boardId: string) {
     const _boardViews = allViews.filter(view => view.parentId === boardId);
     const viewId = _boardViews.length === 1 ? _boardViews[0].id : null;
-    setAttrs({ pageId: boardId, viewId });
+    setAttrs({ source: 'board_page', pageId: boardId, viewId });
   }
 
   function clearSelection () {
@@ -133,10 +133,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
   }
 
   useEffect(() => {
-    updateAttrs({
-      ...attrs,
-      source: 'board_view'
-    });
+    updateAttrs(attrs);
   }, [attrs]);
 
   if (!board) {
