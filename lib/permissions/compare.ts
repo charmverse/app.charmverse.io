@@ -1,11 +1,11 @@
-import { AllowedPagePermissions, permissionTemplates } from 'lib/permissions/pages';
-import { AvailableBountyPermissions, BountyPermissionFlags, BountyPermissions, bountyPermissionMapping } from 'lib/permissions/bounties';
+import { AvailableBountyPermissions, bountyPermissionMapping } from 'lib/permissions/bounties/client';
 import { typedKeys } from 'lib/utilities/objects';
+import { AllowedPagePermissions } from './pages/available-page-permissions.class';
+import { permissionTemplates } from './pages/page-permission-mapping';
 import { AssignablePermissionGroupsWithPublic, BountyPagePermissionIntersection, BountyPagePermissionIntersectionQuery } from './interfaces';
-import { Permissions } from './permissions.class';
 
 export function compareBountyPagePermissions ({
-  bountyOperations, bountyPermissions, pageOperations, pagePermissions
+  bountyOperations, bountyPermissions, pageOperations, pagePermissions, roleups
 }: BountyPagePermissionIntersectionQuery): BountyPagePermissionIntersection {
 
   const permissionsMap: Record<
@@ -15,7 +15,7 @@ export function compareBountyPagePermissions ({
 
   // Populate each bounty assignee
   typedKeys(bountyPermissions).forEach(bountyPermissionLevel => {
-    bountyPermissions[bountyPermissionLevel].forEach(assignee => {
+    bountyPermissions[bountyPermissionLevel]?.forEach(assignee => {
 
       const mapKey = assignee.group === 'public' ? 'public' : assignee.id as string;
 
@@ -41,12 +41,29 @@ export function compareBountyPagePermissions ({
         pagePermissions: new AllowedPagePermissions()
       };
     }
+    permissionsMap[mapKey].pagePermissions.addPermissions(permissionTemplates[permission.permissionLevel].slice());
   });
 
   const intersection: BountyPagePermissionIntersection = {
     hasPermissions: [],
     missingPermissions: []
   };
+
+  // Add role permissions to any user already in the map with this role
+  roleups.forEach(roleWithMembers => {
+
+    const rolePermissions = permissionsMap[roleWithMembers.id];
+
+    if (rolePermissions) {
+      roleWithMembers.users.forEach(u => {
+
+        const roleUserPermissions = permissionsMap[u.id];
+
+        roleUserPermissions?.bountyPermissions.addPermissions(rolePermissions.bountyPermissions.operationFlags);
+        roleUserPermissions?.pagePermissions.addPermissions(rolePermissions.pagePermissions.operationFlags);
+      });
+    }
+  });
 
   typedKeys(permissionsMap).forEach(assigneeId => {
     const { bountyPermissions: assigneeBountyPermissions, pagePermissions: assigneePagePermissions, group } = permissionsMap[assigneeId];

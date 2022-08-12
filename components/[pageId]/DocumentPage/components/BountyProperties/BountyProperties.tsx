@@ -387,6 +387,8 @@ export default function BountyProperties (props: {
       <Divider />
       <BountyPropertiesHeader
         bounty={currentBounty}
+        bountyPermissions={bountyPermissions}
+        pagePermissions={bountyPagePermissions}
       />
       <Stack flexDirection='row' justifyContent='space-between' gap={2} alignItems='center'>
         {readOnly && (
