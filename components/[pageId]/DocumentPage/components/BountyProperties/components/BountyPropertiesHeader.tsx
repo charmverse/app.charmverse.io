@@ -57,9 +57,9 @@ export default function BountyPropertiesHeader ({ bounty, bountyPermissions, pag
   }
 
   return (
-    <Grid container gap={2}>
+    <>
       {/* Bounty price and status  */}
-      <Grid container item xs={12}>
+      <Grid container mb={2}>
         <Grid item xs={8}>
           <Typography fontWeight='bold'>Bounty information</Typography>
         </Grid>
@@ -88,27 +88,22 @@ export default function BountyPropertiesHeader ({ bounty, bountyPermissions, pag
       {/* Warning for applicants */}
       {
         intersection.hasPermissions.length > 0 && (
-          <Grid container item xs={12} mb={2}>
-            <Grid item xs={8}>
-              <Alert severity='info' sx={{ width: '90%' }}>
-                The current page permissions allow applicants to edit the details of this bounty.
-              </Alert>
-            </Grid>
-
-            <Grid item xs={4} display='flex' flexDirection='column' justifyContent='center'>
-              <Button onClick={restrictPermissions} loading={updatingPermissions}>
-                Restrict editing
-              </Button>
-
-              <Typography variant='caption'>
-                Update this bounty's page permissions to view-only (except the bounty creator).
-              </Typography>
-
-            </Grid>
-          </Grid>
+          <Alert
+            severity='info'
+            sx={{ mb: 2 }}
+            action={(
+              <Tooltip title={'Update this bounty\'s page permissions to view-only (except the bounty creator).'}>
+                <Button size='small' variant='outlined' onClick={restrictPermissions} loading={updatingPermissions}>
+                  Restrict editing
+                </Button>
+              </Tooltip>
+                  )}
+          >
+            The current page permissions allow applicants to edit the details of this bounty.
+          </Alert>
         )
       }
 
-    </Grid>
+    </>
   );
 }
