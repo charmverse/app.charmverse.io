@@ -253,10 +253,6 @@ class CharmClient {
     return http.POST<{importedRolesCount: number}>('/api/guild-xyz/importRoles', payload);
   }
 
-  resolveMultipleThreads (payload: ResolveMultipleThreads) {
-    return http.POST('/api/threads/resolve', payload);
-  }
-
   // FocalBoard
 
   // TODO: we shouldn't have to ask the server for the current space, but it will take time to pass spaceId through focalboard!
@@ -664,6 +660,10 @@ class CharmClient {
 
   resolveThread (threadId: string, request: ResolveThreadRequest) {
     return http.PUT(`/api/threads/${threadId}/resolve`, request);
+  }
+
+  resolveMultipleThreads (payload: ResolveMultipleThreads) {
+    return http.POST('/api/threads/resolve', payload);
   }
 
   addComment (request: Omit<CommentCreate, 'userId'>): Promise<CommentWithUser> {

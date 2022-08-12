@@ -14,7 +14,7 @@ import {
 } from '@bangle.dev/base-components';
 import { BangleEditorState, NodeView, Plugin, RawPlugins } from '@bangle.dev/core';
 import { markdownSerializer } from '@bangle.dev/markdown';
-import { EditorView, Node, PluginKey } from '@bangle.dev/pm';
+import { EditorState, EditorView, Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import { Box, Divider, Slide } from '@mui/material';
@@ -31,6 +31,7 @@ import { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
 import { useUser } from 'hooks/useUser';
 import { silentlyUpdateURL } from 'lib/browser';
 import { extractDeletedThreadIds } from 'lib/inline-comments/extractDeletedThreadIds';
+import log from 'lib/log';
 import debounce from 'lodash/debounce';
 import { PageContent } from 'models';
 import { CSSProperties, memo, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
@@ -92,7 +93,7 @@ export function charmEditorPlugins (
       pageId?: string | null,
       userId?: string | null,
       readOnly?: boolean,
-      onContentChange?: (view: EditorView, prevDoc: Node<any>) => void,
+      onContentChange?: (view: EditorView, prevDoc: EditorState['doc']) => void,
       disablePageSpecificFeatures?: boolean,
       enableVoting?: boolean,
       enableComments?: boolean
@@ -347,24 +348,30 @@ function CharmEditor (
   const _isEmpty = checkForEmpty(content);
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
   const [currentUser] = useUser();
-  const onContentChangeDebounced = onContentChange ? debounce((view: EditorView, prevDoc?: Node<any>) => {
+  // eslint-disable-next-line
+  const onThreadResolveDebounced = debounce((pageId: string, doc: EditorState['doc'], prevDoc: EditorState['doc']) => {
+    const deletedThreadIds = extractDeletedThreadIds(
+      specRegistry.schema,
+      doc,
+      prevDoc
+    );
+    if (deletedThreadIds.length) {
+      charmClient.resolveMultipleThreads({
+        threadIds: deletedThreadIds,
+        pageId
+      }).catch((err) => {
+        log.warn('Auto resolving threads failed', err);
+      });
+    }
+  }, 1000);
+  const onContentChangeDebounced = onContentChange ? debounce((view: EditorView, prevDoc?: EditorState['doc']) => {
     const doc = view.state.doc.toJSON() as PageContent;
     const rawText = view.state.doc.textContent as string;
-    if (prevDoc && pageId) {
-      const deletedThreadIds = extractDeletedThreadIds(
-        specRegistry.schema,
-        view.state.doc,
-        prevDoc
-      );
-      if (deletedThreadIds.length) {
-        charmClient.resolveMultipleThreads({
-          threadIds: deletedThreadIds,
-          pageId
-        });
-      }
+    if (pageId && prevDoc) {
+      onThreadResolveDebounced(pageId, view.state.doc, prevDoc);
     }
     onContentChange({ doc, rawText });
-  }, 1000) : undefined;
+  }, 100) : undefined;
 
   function _onContentChange (view: EditorView, prevDoc: Node<any>) {
     // @ts-ignore missing types from the @bangle.dev/react package
