@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { User } from '@prisma/client';
 import charmClient from 'charmClient';
 import { UserAvatar } from 'lib/users/interfaces';
-import { UserDetailsProps } from 'components/profile/components/UserDetails/UserDetails';
+import { UserDetailsProps } from 'components/profile/components/UserDetails';
 
 export const useUserDetails = ({ updateUser }: UserDetailsProps) => {
   const [isSaving, setIsSaving] = useState(false);

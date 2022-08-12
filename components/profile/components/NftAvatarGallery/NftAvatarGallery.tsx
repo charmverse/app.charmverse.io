@@ -1,16 +1,10 @@
 import React from 'react';
-import { UserAvatar } from 'lib/users/interfaces';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
 import { useMyNfts } from 'hooks/useMyNfts';
 import Skeleton from '@mui/material/Skeleton';
 import Stack from '@mui/material/Stack';
+import { Dialog, DialogTitle, CircularProgress, DialogContent, Typography, Grid, Box } from '@mui/material';
 
-import Grid from '@mui/material/Grid';
-
-import { CircularProgress, DialogContent, Typography } from '@mui/material';
 import { NftGalleryItem } from 'components/profile/components/NftAvatarGallery/NftGalleryItem';
-import Box from '@mui/system/Box';
 import { NftData } from 'lib/nft/types';
 import { useUser } from 'hooks/useUser';
 

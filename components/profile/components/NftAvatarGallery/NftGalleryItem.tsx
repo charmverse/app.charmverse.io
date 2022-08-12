@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
 import styled from '@emotion/styled';
-import Card from '@mui/material/Card';
-import Stack from '@mui/material/Stack';
 import { NftData } from 'lib/nft/types';
 import Avatar from 'components/common/Avatar';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/system/Box';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import { Box, Card, Stack, Typography } from '@mui/material';
 
 const StyledAvatarItem = styled(Avatar)`
   width: 80px;

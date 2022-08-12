@@ -1,7 +1,7 @@
 import { Box, CircularProgress, Grid, Paper, Typography } from '@mui/material';
 import charmClient from 'charmClient';
 import useSWRImmutable from 'swr/immutable';
-import { UserDetailsProps } from './UserDetails/UserDetails';
+import { UserDetailsProps } from './UserDetails';
 
 export function AggregatedDataItem ({ value, label }: {value: number, label: string}) {
 
