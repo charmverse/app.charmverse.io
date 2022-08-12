@@ -1,24 +1,15 @@
 
 import dynamic from 'next/dynamic';
-import { Page } from 'models';
-import { useRouter } from 'next/router';
-import { useCallback, useEffect, useState, useMemo } from 'react';
+import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { NodeViewProps } from '@bangle.dev/core';
-import { useHotkeys } from 'react-hotkeys-hook';
-import CenterPanel from 'components/common/BoardEditor/focalboard/src/components/centerPanel';
-import { sendFlashMessage, FlashMessages } from 'components/common/BoardEditor/focalboard/src/components/flashMessages';
-import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { getBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
-import { getCurrentViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
+import { getViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { getClientConfig } from 'components/common/BoardEditor/focalboard/src/store/clientConfig';
-import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { initialReadOnlyLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
+import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { getCurrentBoardViews, getCurrentViewDisplayBy, getCurrentViewGroupBy, getView, getSortedViews, setCurrent as setCurrentView } from 'components/common/BoardEditor/focalboard/src/store/views';
-import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
-import { silentlyUpdateURL } from 'lib/browser';
 import { usePages } from 'hooks/usePages';
 import ReactDndProvider from 'components/common/ReactDndProvider';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
@@ -27,9 +18,28 @@ import styled from '@emotion/styled';
 
 import ErrorPage from 'components/common/errors/ErrorPage';
 
+// Lazy load focalboard entrypoint (ignoring the redux state stuff for now)
+const CenterPanel = dynamic(() => import('components/common/BoardEditor/focalboard/src/components/centerPanel'), {
+  ssr: false
+});
+
 const StylesContainer = styled.div`
+
+  .BoardComponent {
+    overflow: visible;
+  }
+
   .container-container {
+    min-width: 0;
+    overflow: auto;
     padding: 0;
+    // offset padding around document
+    margin: 0 -24px;
+    padding-left: 24px;
+    ${({ theme }) => theme.breakpoints.up('md')} {
+      margin: 0 -80px;
+      padding-left: 80px;
+    }
   }
 
   // remove extra padding on Table view
@@ -43,11 +53,6 @@ const StylesContainer = styled.div`
   }
 `;
 
-// TODO: Lazy load focalboard
-// const BoardEditor = dynamic(() => import('components/common/BoardEditor/focalboard/src/components/centerPanel'), {
-//   ssr: false
-// });
-
 interface DatabaseViewProps extends NodeViewProps {
   readOnly?: boolean
 }
@@ -59,7 +64,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride }: DatabaseVi
   //  const viewId = '4c90e179-3ef4-465f-9162-45817208aa74'; // table
   const viewId = '64634dfc-19c0-4601-a1fc-78178d401655'; // kanban
   const board = useAppSelector(getBoard(pageId));
-  const cards = useAppSelector(getCurrentViewCardsSortedFilteredAndGrouped);
+  const cards = useAppSelector(getViewCardsSortedFilteredAndGrouped({ boardId: pageId, viewId }));
   const allViews = useAppSelector(getSortedViews);
   const views = allViews.filter(view => view.parentId === pageId);
   const activeView = useAppSelector(getView(viewId));
@@ -68,7 +73,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride }: DatabaseVi
   const dateDisplayProperty = useAppSelector(getCurrentViewDisplayBy);
   const clientConfig = useAppSelector(getClientConfig);
   const { pages, getPagePermissions } = usePages();
-  const accessibleCards = useMemo(() => cards.filter(card => pages[card.id]), [cards, Object.keys(pages).toString()]);
+  const accessibleCards = cards.filter(card => pages[card.id]);
 
   const [shownCardId, setShownCardId] = useState<string | undefined>('');
 
@@ -138,7 +143,6 @@ export default function DatabaseView ({ readOnly: readOnlyOverride }: DatabaseVi
           />
         </RootPortal>
       )}
-      <FlashMessages milliseconds={2000} />
       <FocalBoardPortal />
     </ReactDndProvider>
   );
