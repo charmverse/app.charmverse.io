@@ -5,9 +5,13 @@ import PageTitle from 'components/common/PageLayout/components/PageTitle';
 import { PageContent } from 'models';
 import { checkForEmpty } from '../utils';
 
-export function PagesList (
-  { activeItemIndex = -1, pages, onSelectPage }: { activeItemIndex?: number, pages: Page[], onSelectPage: (page: Page) => void }
-) {
+interface Props {
+  activeItemIndex?: number;
+  pages: Page[];
+  onSelectPage: (page: Page) => void;
+}
+
+export default function PagesList ({ activeItemIndex = -1, pages, onSelectPage }: Props) {
   return (
     pages.length === 0 ? <Typography sx={{ ml: 2, mb: 1 }} variant='subtitle2' color='secondary'>No pages found</Typography> : (
       <div>

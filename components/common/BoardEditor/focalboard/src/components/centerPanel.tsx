@@ -344,15 +344,15 @@ function CenterPanel (props: Props) {
         onKeyDown={keydownHandler}
       />
       {!!board.deletedAt && <PageDeleteBanner pageId={board.id} />}
-      {board.fields.headerImage && (
-      <Box className='PageBanner' width='100%' mb={2}>
-        <PageBanner
-          focalBoard
-          headerImage={board.fields.headerImage}
-          readOnly={props.readonly}
-          setPage={({ headerImage }) => setRandomHeaderImage(board, headerImage!)}
-        />
-      </Box>
+      {props.showHeader && board.fields.headerImage && (
+        <Box className='PageBanner' width='100%' mb={2}>
+          <PageBanner
+            focalBoard
+            headerImage={board.fields.headerImage}
+            readOnly={props.readonly}
+            setPage={({ headerImage }) => setRandomHeaderImage(board, headerImage!)}
+          />
+        </Box>
       )}
       {props.showHeader && (
         <div className='top-head'>
