@@ -56,7 +56,7 @@ function Account (): JSX.Element {
   const router = useRouter();
 
   const networkModalState = usePopupState({ variant: 'popover', popupId: 'network-modal' });
-  const [user, , isUserLoaded] = useUser();
+  const { user, isLoaded } = useUser();
 
   if (typeof window === 'undefined') {
     return (
@@ -66,7 +66,7 @@ function Account (): JSX.Element {
     );
   }
 
-  if (isUserLoaded && !user) {
+  if (isLoaded && !user) {
     return (
       <AccountCard>
         <AccountButton href='/'>

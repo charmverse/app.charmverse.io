@@ -92,7 +92,7 @@ function PageLayout ({ sidebarWidth = 300, children, sidebar: SidebarOverride }:
 
   const smallScreen = React.useMemo(() => isSmallScreen(), []);
   const [open, setOpen] = React.useState(!smallScreen);
-  const [user] = useUser();
+  const { user } = useUser();
 
   const handleDrawerOpen = React.useCallback(() => {
     setOpen(true);

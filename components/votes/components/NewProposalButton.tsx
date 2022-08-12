@@ -7,7 +7,7 @@ import { addPage } from 'lib/pages/addPage';
 import { useState } from 'react';
 
 export default function NewProposalButton () {
-  const [user] = useUser();
+  const { user } = useUser();
   const [currentSpace] = useCurrentSpace();
   const [page, setPage] = useState<Page | null>(null);
 

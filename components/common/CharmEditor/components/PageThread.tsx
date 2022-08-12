@@ -260,7 +260,7 @@ const CommentDate = memo<{createdAt: Date, updatedAt?: Date | null}>(({ createdA
 const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton = false, threadId, inline = false }, ref) => {
   showFindButton = showFindButton ?? (!inline);
   const { deleteThread, resolveThread, deleteComment, threads } = useThreads();
-  const [user] = useUser();
+  const { user } = useUser();
   const [isMutating, setIsMutating] = useState(false);
   const [editedCommentId, setEditedCommentId] = useState<null | string>(null);
   const { getPagePermissions, currentPageId } = usePages();

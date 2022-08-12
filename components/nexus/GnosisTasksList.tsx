@@ -286,7 +286,7 @@ interface GnosisTasksSectionProps {
 export default function GnosisTasksSection ({ error, mutateTasks, tasks }: GnosisTasksSectionProps) {
   const { data: safeData, mutate } = useMultiWalletSigs();
   const { snoozedForDate } = useTasksState();
-  const [user] = useUser();
+  const { user } = useUser();
   const gnosisSigner = useGnosisSigner();
 
   const isSnoozed = snoozedForDate !== null;

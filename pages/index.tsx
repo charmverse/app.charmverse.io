@@ -16,12 +16,12 @@ export default function LoginPage () {
   const router = useRouter();
   const defaultWorkspace = typeof window !== 'undefined' && localStorage.getItem(getKey('last-workspace'));
   const [, setTitleState] = usePageTitle();
-  const [user, setUser, isUserLoaded] = useUser();
-  const [spaces, setSpaces, isSpacesLoaded] = useSpaces();
+  const { user, isLoaded } = useUser();
+  const [spaces,, isSpacesLoaded] = useSpaces();
   const [showLogin, setShowLogin] = useState(false); // capture isLoaded state to prevent render on route change
   const isLogInWithDiscord = typeof router.query.code === 'string' && router.query.discord === '1' && router.query.type === 'login';
 
-  const isDataLoaded = triedEager && isSpacesLoaded && isUserLoaded;
+  const isDataLoaded = triedEager && isSpacesLoaded && isLoaded;
   useEffect(() => {
     setTitleState('Welcome');
   }, []);

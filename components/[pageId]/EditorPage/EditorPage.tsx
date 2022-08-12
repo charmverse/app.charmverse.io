@@ -17,7 +17,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
   const [pageNotFound, setPageNotFound] = useState(false);
   const [space] = useCurrentSpace();
   const [isAccessDenied, setIsAccessDenied] = useState(false);
-  const [user] = useUser();
+  const { user } = useUser();
   const currentPagePermissions = getPagePermissions(pageId);
 
   const pagesLoaded = Object.keys(pages).length > 0;

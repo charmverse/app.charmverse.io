@@ -9,7 +9,7 @@ const emptySidebar = () => <div></div>;
 export default function NexusLayout (props: { children: ReactNode }) {
 
   // hide sidebar for public users for now, since they can't create a workspace
-  const [user] = useUser();
+  const { user } = useUser();
 
   return (
     <PageLayout sidebarWidth={user ? 55 : 0} sidebar={user ? NexusSidebar : emptySidebar}>

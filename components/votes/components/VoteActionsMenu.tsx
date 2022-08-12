@@ -18,7 +18,7 @@ interface VoteActionsProps {
 
 export default function VoteActionsMenu ({ cancelVote, deleteVote, deleteProposal, editProposal, removeFromPage, vote }: VoteActionsProps) {
 
-  const [user] = useUser();
+  const { user } = useUser();
   const actionsPopup = usePopupState({ variant: 'popover', popupId: 'inline-votes-action' });
   const popupState = usePopupState({ variant: 'popover', popupId: 'delete-inline-vote' });
   const hasPassedDeadline = Boolean(vote.deadline && new Date(vote.deadline) <= new Date());

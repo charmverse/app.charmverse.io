@@ -6,7 +6,7 @@ import { useUser } from 'hooks/useUser';
 
 export default function NotificationsBadge () {
 
-  const [user] = useUser();
+  const { user } = useUser();
   const { tasks } = useTasks();
 
   const userNotificationState = user?.notificationState;
