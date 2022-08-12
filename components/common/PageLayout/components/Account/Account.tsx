@@ -14,6 +14,7 @@ import { getChainById } from 'connectors';
 import { useContext } from 'react';
 import NetworkModal from 'components/common/PageLayout/components/Account/components/NetworkModal';
 import styled from '@emotion/styled';
+import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
 const AccountCard = styled.div`
   display: inline-flex;
@@ -114,7 +115,7 @@ function Account (): JSX.Element {
             borderTopLeftRadius: '0 !important',
             borderBottomLeftRadius: '0 !important'
           }) : {}}
-          endIcon={<Avatar avatar={user?.avatar} name={user?.username || ''} size='small' />}
+          endIcon={<Avatar avatar={user?.avatar} name={user?.username || ''} isNft={hasNftAvatar(user)} size='small' />}
         >
           {user?.username}
         </AccountButton>

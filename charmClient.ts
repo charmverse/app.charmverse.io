@@ -36,6 +36,9 @@ import type { TransactionCreationData } from 'lib/transactions/interface';
 import type { ExtendedVote, UserVoteExtendedDTO, VoteDTO } from 'lib/votes/interfaces';
 import type { PublicUser } from 'pages/api/public/profile/[userPath]';
 import type { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
+import { encodeFilename } from 'lib/utilities/encodeFilename';
+import { ProfileApi } from 'lib/charmClient/profileApi';
+import { NftApi } from './lib/charmClient/nftApi';
 import type { AssignedPermissionsQuery, Resource } from './lib/permissions/interfaces';
 import type { SpacePermissionConfigurationUpdate } from './lib/permissions/meta/interfaces';
 import type { SpacePermissionFlags, SpacePermissionModification } from './lib/permissions/spaces';
@@ -46,6 +49,10 @@ type BlockUpdater = (blocks: FBBlock[]) => void;
 // CharmClient is the client interface to the server APIs
 //
 class CharmClient {
+  nft = new NftApi();
+
+  profile = new ProfileApi();
+
   async login (address: string) {
     const user = await http.POST<LoggedInUser>('/api/session/login', {
       address
@@ -469,9 +476,7 @@ class CharmClient {
 
   // AWS
   uploadToS3 (file: File): Promise<{ token: any, bucket: string, key: string, region: string }> {
-    const extension = file.name.split('.').pop() || ''; // lowercase the extension to simplify possible values
-    const filename = encodeURIComponent(file.name.replace(extension, extension.toLowerCase()));
-    return http.GET('/api/aws/s3-upload', { filename });
+    return http.GET('/api/aws/s3-upload', { filename: encodeFilename(file.name) });
   }
 
   deleteFromS3 (src: string) {
