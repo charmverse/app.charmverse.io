@@ -9,7 +9,7 @@ const EMPTY_AVATAR: UserAvatar = {
   avatar: null,
   avatarContract: null,
   avatarTokenId: null,
-  avatarTokenChain: null
+  avatarChain: null
 };
 
 export async function getDefaultAvatar (address: string, userId: string): Promise<UserAvatar> {
@@ -25,7 +25,7 @@ export async function getDefaultAvatar (address: string, userId: string): Promis
         avatar,
         avatarContract: nft.contract,
         avatarTokenId: nft.tokenId,
-        avatarTokenChain: nft.chainId
+        avatarChain: nft.chainId
       };
     }
     // eslint-disable-next-line no-empty

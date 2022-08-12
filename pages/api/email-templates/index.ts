@@ -39,7 +39,7 @@ const createMentionTask = ({ pageTitle, spaceName, mentionText }: {spaceName: st
       identityType: 'Discord',
       avatarContract: null,
       avatarTokenId: null,
-      avatarTokenChain: null
+      avatarChain: null
     }
   };
 };

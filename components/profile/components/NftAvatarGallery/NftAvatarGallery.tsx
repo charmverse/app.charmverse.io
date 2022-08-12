@@ -32,7 +32,7 @@ export function NftAvatarGallery ({ onSelect, isVisible, onClose, isSaving }: Pr
 
     return user.avatarContract?.toLowerCase() === nft.contract.toLowerCase()
     && user.avatarTokenId?.toLowerCase() === nft.tokenId.toLowerCase()
-    && user.avatarTokenChain === nft.chainId;
+    && user.avatarChain === nft.chainId;
   };
 
   return (

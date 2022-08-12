@@ -64,7 +64,7 @@ async function updateAvatar (req: NextApiRequest, res: NextApiResponse<LoggedInU
       avatar: uploadedAvatar,
       avatarContract: avatarContract || null,
       avatarTokenId: avatarTokenId || null,
-      avatarTokenChain: isNftAvatar ? chainId : null
+      avatarChain: isNftAvatar ? chainId : null
     }
   });
 

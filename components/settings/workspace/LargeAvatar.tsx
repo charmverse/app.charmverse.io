@@ -96,7 +96,7 @@ export default function LargeAvatar (props: LargeAvatarProps) {
       avatar: nft.image,
       avatarContract: nft.contract,
       avatarTokenId: nft.tokenId,
-      avatarTokenChain: nft.chainId
+      avatarChain: nft.chainId
     };
 
     updateAvatar?.(userAvatar);
@@ -112,7 +112,7 @@ export default function LargeAvatar (props: LargeAvatarProps) {
       avatar: url,
       avatarContract: null,
       avatarTokenId: null,
-      avatarTokenChain: null
+      avatarChain: null
     };
 
     updateAvatar?.(userAvatar);
