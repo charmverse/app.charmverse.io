@@ -10,7 +10,7 @@ export default function PageTitle ({ subPage }: { subPage?: string }) {
   const MyNexus = 'My Nexus';
   const { account } = useWeb3React();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [, setUser] = useUser();
+  const { setUser } = useUser();
   const router = useRouter();
 
   return (

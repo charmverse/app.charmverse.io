@@ -31,7 +31,7 @@ export default function WorkspaceSettings () {
   const router = useRouter();
   const [space, setSpace] = useCurrentSpace();
   const [spaces, setSpaces] = useSpaces();
-  const [user] = useUser();
+  const { user } = useUser();
   const isAdmin = isSpaceAdmin(user, space?.id);
   const workspaceRemoveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-remove' });
   const workspaceLeaveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-leave' });

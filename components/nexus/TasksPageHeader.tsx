@@ -25,15 +25,15 @@ const TasksPageHeaderContainer = styled.div`
 `;
 
 export default function TasksPageHeader () {
-  const [currentUser] = useUser();
+  const { user } = useUser();
   const { account, active } = useWeb3React();
   const metamaskConnected = account && active;
-  const discordConnected = currentUser?.discordUser;
-  const telegramConnected = currentUser?.telegramUser;
+  const discordConnected = user?.discordUser;
+  const telegramConnected = user?.telegramUser;
   const totalIntegrations = (metamaskConnected ? 1 : 0) + (discordConnected ? 1 : 0) + (telegramConnected ? 1 : 0);
   const { data: safes } = useMultiWalletSigs();
 
-  return currentUser && (
+  return user && (
     <TasksPageHeaderContainer>
       <Grid container spacing={{ sm: 2, xs: 1 }}>
         <Grid item xs>
@@ -182,7 +182,7 @@ export default function TasksPageHeader () {
                     }
                   }}
                 >
-                  <Avatar size='large' variant='circular' name={currentUser.username} avatar={currentUser.avatar} />
+                  <Avatar size='large' variant='circular' name={user.username} avatar={user.avatar} />
                   <Typography fontWeight={500} color='secondary'>
                     My Profile
                   </Typography>

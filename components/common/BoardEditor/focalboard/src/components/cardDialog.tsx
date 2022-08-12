@@ -31,7 +31,7 @@ type Props = {
 function CreateBountyButton(props: { pageId: string }) {
   const { pageId } = props;
   const { createDraftBounty } = useBounties();
-  const [user] = useUser();
+  const { user } = useUser();
   const [space] = useCurrentSpace();
   const [userSpacePermissions] = useCurrentSpacePermissions();
 

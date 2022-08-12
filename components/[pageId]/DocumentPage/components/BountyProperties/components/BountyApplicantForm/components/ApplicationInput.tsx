@@ -40,7 +40,7 @@ type FormValues = yup.InferType<typeof schema>;
 export default function ApplicationInput ({ readOnly = false, onCancel, onSubmit, bountyId, proposal, mode = 'create', alwaysExpanded, expandedOnLoad }: IApplicationFormProps) {
   const { refreshBounty } = useBounties();
   const [isVisible, setIsVisible] = useState(mode === 'create' || expandedOnLoad || alwaysExpanded);
-  const [user] = useUser();
+  const { user } = useUser();
 
   const [applicationMessage, setApplicationMessage] = useLocalStorage(`${bountyId}.${user?.id}.application`, '');
 

@@ -348,7 +348,7 @@ function CharmEditor (
   // check empty state of page on first load
   const _isEmpty = checkForEmpty(content);
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
-  const [currentUser] = useUser();
+  const { user } = useUser();
   // eslint-disable-next-line
   const onThreadResolveDebounced = debounce((pageId: string, doc: EditorState['doc'], prevDoc: EditorState['doc']) => {
     const deletedThreadIds = extractDeletedThreadIds(
@@ -399,7 +399,7 @@ function CharmEditor (
       enableVoting,
       pageId,
       spaceId: currentSpace?.id,
-      userId: currentUser?.id
+      userId: user?.id
     }),
     initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
     dropCursorOpts: {

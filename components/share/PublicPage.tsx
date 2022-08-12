@@ -40,7 +40,7 @@ const LayoutContainer = styled.div`
 export default function PublicPage () {
 
   const { account } = useWeb3React();
-  const [, setUser] = useUser();
+  const { setUser } = useUser();
 
   const theme = useTheme();
   const colorMode = useColorMode();

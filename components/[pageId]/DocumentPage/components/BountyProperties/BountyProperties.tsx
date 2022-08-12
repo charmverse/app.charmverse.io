@@ -49,7 +49,7 @@ export default function BountyProperties (props: {
   const [currentBounty, setCurrentBounty] = useState<(BountyCreationData & BountyWithDetails) | null>(null);
   const [capSubmissions, setCapSubmissions] = useState(currentBounty?.maxSubmissions !== null);
   const [space] = useCurrentSpace();
-  const [user] = useUser();
+  const { user } = useUser();
   const { setPages, pages } = usePages();
 
   const bountyPermissions = permissions?.bountyPermissions || currentBounty?.permissions;

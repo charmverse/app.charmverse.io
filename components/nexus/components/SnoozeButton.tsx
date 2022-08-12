@@ -17,7 +17,7 @@ import { LoggedInUser } from 'models';
 import useTasksState from '../hooks/useTasksState';
 
 export default function SnoozeButton () {
-  const [, setUser] = useUser();
+  const { setUser } = useUser();
   const { isLoading, snoozedForDate, snoozedMessage, mutate: mutateTasks } = useTasksState();
 
   const isSnoozed = snoozedForDate !== null;

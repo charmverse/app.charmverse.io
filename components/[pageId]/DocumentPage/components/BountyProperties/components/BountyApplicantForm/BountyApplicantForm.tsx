@@ -21,7 +21,7 @@ export default function BountyApplicantForm (props: BountyApplicationFormProps) 
   const { refreshSubmissions, bounty, permissions, submissions } = props;
   const { refreshBounty } = useBounties();
   const [contributors] = useContributors();
-  const [user,, isUserLoaded] = useUser();
+  const { user, isLoaded: isUserLoaded } = useUser();
   const [showApplication, setShowApplication] = useState(false);
   const userApplication = submissions.find(s => s.createdBy === user?.id);
 

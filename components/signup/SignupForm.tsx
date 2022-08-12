@@ -42,7 +42,7 @@ const ImageContainer = styled.div`
 export default function SignupPageContent () {
 
   const router = useRouter();
-  const [user] = useUser();
+  const { user } = useUser();
 
   async function createWorkspace () {
     router.push('/createWorkspace');
