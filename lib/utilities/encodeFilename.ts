@@ -1,5 +1,6 @@
 export const encodeFilename = (rawName: string): string => {
-  const [name, extension = ''] = rawName.split('.');
+  const extension = rawName.split('.').pop() || ''; // lowercase the extension to simplify possible values
+  const filename = encodeURIComponent(rawName.replace(extension, extension.toLowerCase()));
 
-  return encodeURIComponent(`${name}.${extension.toLowerCase()}`);
+  return encodeURIComponent(filename);
 };
