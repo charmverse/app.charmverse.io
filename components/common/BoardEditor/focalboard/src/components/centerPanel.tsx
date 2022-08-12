@@ -40,7 +40,9 @@ type Props = {
   activeView: BoardView
   views: BoardView[]
   groupByProperty?: IPropertyTemplate
+  showHeader?: boolean
   dateDisplayProperty?: IPropertyTemplate
+
   intl: IntlShape
   readonly: boolean
   addCard: (card: Card) => void
@@ -352,27 +354,29 @@ function CenterPanel (props: Props) {
         />
       </Box>
       )}
-      <div className='top-head'>
-        <ViewTitle
-          key={board.id + board.title}
-          board={board}
-          readonly={props.readonly}
-          setPage={props.setPage}
-        />
-        <ViewHeader
-          board={props.board}
-          activeView={props.activeView}
-          cards={props.cards}
-          views={props.views}
-          groupByProperty={props.groupByProperty}
-          dateDisplayProperty={props.dateDisplayProperty}
-          addCard={() => addCard('', true)}
-          // addCardFromTemplate={addCardFromTemplate}
-          addCardTemplate={addCardTemplate}
-          editCardTemplate={editCardTemplate}
-          readonly={props.readonly}
-        />
-      </div>
+      {props.showHeader && (
+        <div className='top-head'>
+          <ViewTitle
+            key={board.id + board.title}
+            board={board}
+            readonly={props.readonly}
+            setPage={props.setPage}
+          />
+          <ViewHeader
+            board={props.board}
+            activeView={props.activeView}
+            cards={props.cards}
+            views={props.views}
+            groupByProperty={props.groupByProperty}
+            dateDisplayProperty={props.dateDisplayProperty}
+            addCard={() => addCard('', true)}
+            // addCardFromTemplate={addCardFromTemplate}
+            addCardTemplate={addCardTemplate}
+            editCardTemplate={editCardTemplate}
+            readonly={props.readonly}
+          />
+        </div>
+      )}
 
       <div className='container-container'>
         {activeView.fields.viewType === 'board'

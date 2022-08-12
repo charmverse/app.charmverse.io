@@ -3,6 +3,7 @@ import dynamic from 'next/dynamic';
 import { Page } from 'models';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState, useMemo } from 'react';
+import { Box, Typography } from '@mui/material';
 import { NodeViewProps } from '@bangle.dev/core';
 import { useHotkeys } from 'react-hotkeys-hook';
 import CenterPanel from 'components/common/BoardEditor/focalboard/src/components/centerPanel';
@@ -22,8 +23,25 @@ import { usePages } from 'hooks/usePages';
 import ReactDndProvider from 'components/common/ReactDndProvider';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 import log from 'lib/log';
+import styled from '@emotion/styled';
 
 import ErrorPage from 'components/common/errors/ErrorPage';
+
+const StylesContainer = styled.div`
+  .container-container {
+    padding: 0;
+  }
+
+  // remove extra padding on Table view
+  .Table {
+    margin-top: 0;
+  }
+
+  // remove extra padding on Kanban view
+  .octo-board-header {
+    padding-top: 0;
+  }
+`;
 
 // TODO: Lazy load focalboard
 // const BoardEditor = dynamic(() => import('components/common/BoardEditor/focalboard/src/components/centerPanel'), {
@@ -37,7 +55,9 @@ interface DatabaseViewProps extends NodeViewProps {
 export default function DatabaseView ({ readOnly: readOnlyOverride }: DatabaseViewProps) {
 
   const pageId = '38c15b30-5aa9-4b03-9226-2ed5b6263e72';
-  const viewId = '45ff0d07-22d2-4a4c-8513-e92dfcd02d84';
+  // const viewId = '45ff0d07-22d2-4a4c-8513-e92dfcd02d84'; // gallery view
+  //  const viewId = '4c90e179-3ef4-465f-9162-45817208aa74'; // table
+  const viewId = '64634dfc-19c0-4601-a1fc-78178d401655'; // kanban
   const board = useAppSelector(getBoard(pageId));
   const cards = useAppSelector(getCurrentViewCardsSortedFilteredAndGrouped);
   const allViews = useAppSelector(getSortedViews);
@@ -86,21 +106,27 @@ export default function DatabaseView ({ readOnly: readOnlyOverride }: DatabaseVi
 
   return (
     <ReactDndProvider>
-      <h1>Inline Database goes here :D</h1>
-      <CenterPanel
-        clientConfig={clientConfig}
-        readonly={readOnly}
-        board={board}
-        setPage={(p) => {
-          log.warn('Ignoring update page properties of inline database', p);
-        }}
-        cards={accessibleCards}
-        showCard={showCard}
-        activeView={activeView}
-        groupByProperty={property}
-        dateDisplayProperty={displayProperty}
-        views={boardViews}
-      />
+      <StylesContainer>
+        <Box mb={1}>
+          <Typography variant='h3'>
+            {board.title}
+          </Typography>
+        </Box>
+        <CenterPanel
+          clientConfig={clientConfig}
+          readonly={readOnly}
+          board={board}
+          setPage={(p) => {
+            log.warn('Ignoring update page properties of inline database', p);
+          }}
+          cards={accessibleCards}
+          showCard={showCard}
+          activeView={activeView}
+          groupByProperty={property}
+          dateDisplayProperty={displayProperty}
+          views={boardViews}
+        />
+      </StylesContainer>
       {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
         <RootPortal>
           <CardDialog

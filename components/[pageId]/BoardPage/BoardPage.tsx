@@ -139,6 +139,7 @@ export function BoardPage ({ page, setPage, readOnly }: Props) {
           setPage={setPage}
           cards={accessibleCards}
           showCard={showCard}
+          showHeader={true}
           activeView={activeView}
           groupByProperty={property}
           dateDisplayProperty={displayProperty}
