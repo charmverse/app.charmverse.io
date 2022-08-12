@@ -1,5 +1,5 @@
 import { GET } from 'adapters/http';
-import { AlchemyNft, AlchemyNftResponse } from 'lib/blockchain/provider/types';
+import { AlchemyNft, AlchemyNftResponse } from 'lib/blockchain/provider/interfaces';
 import orderBy from 'lodash/orderBy';
 
 export type SupportedChainId = 1 | 4 | 5 | 137 | 80001 | 42161

@@ -30,7 +30,7 @@ export async function getDefaultAvatar (address: string, userId: string): Promis
     }
     // eslint-disable-next-line no-empty
     catch (e) {
-      log.debug('Failed to upload default NFT avatar', e);
+      log.warn('Failed to upload default NFT avatar', e);
     }
   }
 

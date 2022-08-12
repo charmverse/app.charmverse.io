@@ -4,7 +4,7 @@ type Props = {
   id: string
 }
 
-export function HexagonalAvatarMask ({ id }: Props) {
+export default function HexagonalAvatarMask ({ id }: Props) {
   return (
     <svg height='0' viewBox='0 0 200 188' width='0'>
       <defs>

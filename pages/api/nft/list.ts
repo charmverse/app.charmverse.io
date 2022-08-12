@@ -12,15 +12,10 @@ handler
   .get(getNfts);
 
 async function getNfts (req: NextApiRequest, res: NextApiResponse<NftData[] | {error: string}>) {
-  const { addresses } = req.query;
+  const { addresses } = req.session.user;
   const chainId = 1;
 
-  let userAddresses = addresses;
-  if (typeof userAddresses === 'string') {
-    userAddresses = userAddresses.split(',').map(a => a.trim());
-  }
-
-  const nfts = await alchemyApi.getNfts(userAddresses || [], chainId);
+  const nfts = await alchemyApi.getNfts(addresses || [], chainId);
   const mappedNfts = nfts.map(nft => mapNftFromAlchemy(nft, chainId));
 
   res.status(200).json(mappedNfts);

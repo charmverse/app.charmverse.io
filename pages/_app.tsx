@@ -37,6 +37,7 @@ import { PageTitleProvider, usePageTitle } from 'hooks/usePageTitle';
 import { SpacesProvider } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
 import { SnackbarProvider } from 'hooks/useSnackbar';
+import HexagonalAvatarMask from 'components/common/HexagonalAvatarMask';
 
 import '@bangle.dev/tooltip/style.css';
 import '@skiff-org/prosemirror-tables/style/tables.css';
@@ -166,7 +167,6 @@ import cssVariables from 'theme/cssVariables';
 import 'theme/styles.scss';
 
 import charmClient from 'charmClient';
-import { HexagonalAvatarMask } from 'components/common/HexagonalAvatarMask';
 
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
 
