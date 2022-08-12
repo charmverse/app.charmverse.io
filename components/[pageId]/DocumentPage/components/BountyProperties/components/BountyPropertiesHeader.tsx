@@ -97,9 +97,9 @@ export default function BountyPropertiesHeader ({ bounty, bountyPermissions, pag
                   Restrict editing
                 </Button>
               </Tooltip>
-                  )}
+            )}
           >
-            The current page permissions allow applicants to edit the details of this bounty.
+            The current permissions allow applicants to edit the details of this bounty.
           </Alert>
         )
       }
