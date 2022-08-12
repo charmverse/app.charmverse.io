@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic';
 import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { NodeViewProps } from '@bangle.dev/core';
-import { getBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
+import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { getViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { getClientConfig } from 'components/common/BoardEditor/focalboard/src/store/clientConfig';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
@@ -45,6 +45,11 @@ const StylesContainer = styled.div`
   // remove extra padding on Table view
   .Table {
     margin-top: 0;
+
+    // Hide calculations footer
+    .CalculationRow {
+      display: none;
+    }
   }
 
   // remove extra padding on Kanban view
@@ -54,17 +59,29 @@ const StylesContainer = styled.div`
 `;
 
 interface DatabaseViewProps extends NodeViewProps {
-  readOnly?: boolean
+  readOnly?: boolean;
+}
+
+interface DatabaseViewAttrs {
+  pageId?: string;
+  viewId?: string;
 }
 
 export default function DatabaseView ({ readOnly: readOnlyOverride }: DatabaseViewProps) {
 
   const pageId = '38c15b30-5aa9-4b03-9226-2ed5b6263e72';
   // const viewId = '45ff0d07-22d2-4a4c-8513-e92dfcd02d84'; // gallery view
-  //  const viewId = '4c90e179-3ef4-465f-9162-45817208aa74'; // table
+  // const viewId = '4c90e179-3ef4-465f-9162-45817208aa74'; // table
   const viewId = '64634dfc-19c0-4601-a1fc-78178d401655'; // kanban
-  const board = useAppSelector(getBoard(pageId));
-  const cards = useAppSelector(getViewCardsSortedFilteredAndGrouped({ boardId: pageId, viewId }));
+
+  const [attrs, setAttrs] = useState<DatabaseViewAttrs>({ viewId, pageId });
+
+  const boards = useAppSelector(getSortedBoards);
+  const board = boards.find(b => b.id === attrs.pageId);
+  const cards = useAppSelector(getViewCardsSortedFilteredAndGrouped({
+    boardId: attrs.pageId || '',
+    viewId: attrs.viewId || ''
+  }));
   const allViews = useAppSelector(getSortedViews);
   const views = allViews.filter(view => view.parentId === pageId);
   const activeView = useAppSelector(getView(viewId));
@@ -81,6 +98,14 @@ export default function DatabaseView ({ readOnly: readOnlyOverride }: DatabaseVi
 
   function showCard (cardId?: string) {
     setShownCardId(cardId);
+  }
+
+  function selectBoard (_pageId: string) {
+    setAttrs(_attrs => ({ ..._attrs, pageId: _pageId }));
+  }
+
+  function selectView (_viewId: string) {
+    setAttrs(_attrs => ({ ..._attrs, viewId: _viewId }));
   }
 
   // TODO: we might need this if we set a local context for subcomponents
@@ -111,7 +136,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride }: DatabaseVi
 
   return (
     <ReactDndProvider>
-      <StylesContainer>
+      <StylesContainer className='focalboard-body'>
         <Box mb={1}>
           <Typography variant='h3'>
             {board.title}
