@@ -1,12 +1,12 @@
 import { AvatarGroup, Box, Chip, Tooltip, Typography } from '@mui/material';
 import { Bounty } from '@prisma/client';
 import Avatar from 'components/common/Avatar';
+import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import { useContributors } from 'hooks/useContributors';
 import useRoles from 'hooks/useRoles';
-import { AssignedBountyPermissions } from 'lib/bounties';
+import { BountyPermissions } from 'lib/bounties';
 import { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import { Contributor } from 'models';
-import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import { useMemo, useState } from 'react';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
@@ -16,8 +16,8 @@ type ReviewersData = {
 }
 
 interface BountyReviewersProps {
-  permissions: AssignedBountyPermissions
-  bounty: Bounty
+  permissions: Partial<BountyPermissions>;
+  bounty: Bounty;
 }
 
 // Initial number of avatars we show, and the number to add each time the user clicks
@@ -29,8 +29,7 @@ export default function BountyReviewers ({ bounty, permissions }: BountyReviewer
   const { roleups } = useRoles();
 
   const reviewerNames: ReviewersData = useMemo(() => {
-    const mapped = (permissions?.bountyPermissions.reviewer ?? []).map(reviewer => {
-
+    const mapped = (permissions.reviewer ?? []).map(reviewer => {
       if (reviewer.group === 'role') {
         const name: string = roleups?.find(r => r.id === reviewer.id)?.name ?? '';
         return {

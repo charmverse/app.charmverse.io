@@ -23,7 +23,7 @@ import { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import debouncePromise from 'lib/utilities/debouncePromise';
 import { isTruthy } from 'lib/utilities/types';
 import { BountyWithDetails } from 'models';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { BountyCreationData } from 'lib/bounties/interfaces';
 import BountyPropertiesHeader from './components/BountyPropertiesHeader';
 import BountyReviewers from './components/BountyReviewers';
@@ -31,6 +31,7 @@ import BountySlots from './components/BountySlots';
 import BountySuggestionApproval from './components/BountySuggestionApproval';
 import BountyApplicantForm from './components/BountyApplicantForm';
 import BountyApplicantsTable from './components/BountyApplicantsTable';
+import MissingPagePermissions from './components/MissingPagePermissions';
 
 export default function BountyProperties (props: {
   readOnly?: boolean,
@@ -49,7 +50,7 @@ export default function BountyProperties (props: {
   const [capSubmissions, setCapSubmissions] = useState(currentBounty?.maxSubmissions !== null);
   const [space] = useCurrentSpace();
   const [user] = useUser();
-  const { setPages } = usePages();
+  const { setPages, pages } = usePages();
 
   const bountyPermissions = permissions?.bountyPermissions || currentBounty?.permissions;
 
@@ -155,6 +156,10 @@ export default function BountyProperties (props: {
   useEffect(() => {
     setCurrentBounty((draftBounty as BountyWithDetails) || bountyFromContext);
   }, [draftBounty, bountyFromContext]);
+
+  const bountyPagePermissions = useMemo(() => {
+    return pages[pageId]?.permissions;
+  }, [pages[pageId]?.permissions]);
 
   const bountyProperties = (
     <>
@@ -279,33 +284,42 @@ export default function BountyProperties (props: {
             height: 'fit-content'
           }}
         >
-          <div className='octo-propertyname octo-propertyname--readonly'>
+          <div className='octo-propertyname octo-propertyname--readonly' style={{ alignSelf: 'baseline', paddingTop: 8 }}>
             <Button>Applicant role(s)</Button>
           </div>
-          <InputSearchRoleMultiple
-            disableCloseOnSelect={true}
-            defaultValue={assignedRoleSubmitters}
-            onChange={async (roleIds) => {
-              await applyBountyUpdates({
-                permissions: rollupPermissions({
-                  assignedRoleSubmitters: roleIds,
-                  selectedReviewerRoles,
-                  selectedReviewerUsers,
-                  spaceId: space!.id
-                })
-              });
-              if (currentBounty?.id) {
-                await refreshBountyPermissions(currentBounty.id);
-              }
-            }}
-            filter={{ mode: 'exclude', userIds: assignedRoleSubmitters }}
-            showWarningOnNoRoles={true}
-            disabled={readOnly}
-            readOnly={readOnly}
-            sx={{
-              width: '100%'
-            }}
-          />
+          <div style={{ width: '100%' }}>
+            <InputSearchRoleMultiple
+              disableCloseOnSelect={true}
+              fullWidth
+              defaultValue={assignedRoleSubmitters}
+              onChange={async (roleIds) => {
+                await applyBountyUpdates({
+                  permissions: rollupPermissions({
+                    assignedRoleSubmitters: roleIds,
+                    selectedReviewerRoles,
+                    selectedReviewerUsers,
+                    spaceId: space!.id
+                  })
+                });
+                if (currentBounty?.id) {
+                  await refreshBountyPermissions(currentBounty.id);
+                }
+              }}
+              filter={{ mode: 'exclude', userIds: assignedRoleSubmitters }}
+              showWarningOnNoRoles={true}
+              disabled={readOnly}
+              readOnly={readOnly}
+              sx={{
+                width: '100%'
+              }}
+            />
+            {
+              bountyPagePermissions && bountyPermissions && (
+                <MissingPagePermissions target='submitter' bountyPermissions={bountyPermissions} pagePermissions={bountyPagePermissions} />
+              )
+            }
+          </div>
+
         </div>
         <div
           className='octo-propertyrow'
@@ -373,6 +387,9 @@ export default function BountyProperties (props: {
       <Divider />
       <BountyPropertiesHeader
         bounty={currentBounty}
+        bountyPermissions={bountyPermissions}
+        pagePermissions={bountyPagePermissions}
+        pageId={pageId}
       />
       <Stack flexDirection='row' justifyContent='space-between' gap={2} alignItems='center'>
         {readOnly && (
@@ -380,7 +397,7 @@ export default function BountyProperties (props: {
             {bountyPermissions?.reviewer && bountyPermissions.reviewer.length > 0 && (
               <BountyReviewers
                 bounty={currentBounty}
-                permissions={bountyPermissions as AssignedBountyPermissions}
+                permissions={bountyPermissions}
               />
             )}
             {/* Extra space so this looks like the focalboard properties */}
@@ -401,38 +418,46 @@ export default function BountyProperties (props: {
           <div
             className='octo-propertyrow'
             style={{
+              display: 'flex',
               height: 'fit-content',
               flexGrow: 1
             }}
           >
-            <div className='octo-propertyname octo-propertyname--readonly'>
+            <div className='octo-propertyname octo-propertyname--readonly' style={{ alignSelf: 'baseline', paddingTop: 12 }}>
               <Button>Reviewer</Button>
             </div>
-            <InputSearchReviewers
-              disabled={readOnly}
-              readOnly={readOnly}
-              value={bountyPermissions?.reviewer ?? []}
-              disableCloseOnSelect={true}
-              onChange={async (e, options) => {
-                const roles = options.filter(option => option.group === 'role');
-                const contributors = options.filter(option => option.group === 'user');
-                await applyBountyUpdates({
-                  permissions: rollupPermissions({
-                    assignedRoleSubmitters,
-                    selectedReviewerRoles: roles.map(role => role.id),
-                    selectedReviewerUsers: contributors.map(contributor => contributor.id),
-                    spaceId: space!.id
-                  })
-                });
-                if (currentBounty?.id) {
-                  await refreshBountyPermissions(currentBounty.id);
-                }
-              }}
-              excludedIds={[...selectedReviewerUsers, ...selectedReviewerRoles]}
-              sx={{
-                width: '100%'
-              }}
-            />
+            <div style={{ width: '100%' }}>
+              <InputSearchReviewers
+                disabled={readOnly}
+                readOnly={readOnly}
+                value={bountyPermissions?.reviewer ?? []}
+                disableCloseOnSelect={true}
+                onChange={async (e, options) => {
+                  const roles = options.filter(option => option.group === 'role');
+                  const contributors = options.filter(option => option.group === 'user');
+                  await applyBountyUpdates({
+                    permissions: rollupPermissions({
+                      assignedRoleSubmitters,
+                      selectedReviewerRoles: roles.map(role => role.id),
+                      selectedReviewerUsers: contributors.map(contributor => contributor.id),
+                      spaceId: space!.id
+                    })
+                  });
+                  if (currentBounty?.id) {
+                    await refreshBountyPermissions(currentBounty.id);
+                  }
+                }}
+                excludedIds={[...selectedReviewerUsers, ...selectedReviewerRoles]}
+                sx={{
+                  width: '100%'
+                }}
+              />
+              {
+                bountyPagePermissions && bountyPermissions && (
+                  <MissingPagePermissions target='reviewer' bountyPermissions={bountyPermissions} pagePermissions={bountyPagePermissions} />
+                )
+              }
+            </div>
           </div>
         )}
       </Stack>

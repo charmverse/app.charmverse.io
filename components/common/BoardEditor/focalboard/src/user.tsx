@@ -12,9 +12,3 @@ export interface IUser {
     is_bot: boolean,
     wallet_address?: string
 }
-
-export interface UserWorkspace {
-    id: string
-    title: string
-    boardCount: number
-}

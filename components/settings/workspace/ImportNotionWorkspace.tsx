@@ -50,7 +50,7 @@ export default function ImportNotionWorkspace () {
           mutate(`pages/${space.id}`);
           // Fetch all the focalboard blocks,
           // TODO: Refactor to only return the imported blocks
-          dispatch(initialLoad());
+          dispatch(initialLoad({ spaceId: space.id }));
           if (failedImports.length === 0) {
             showMessage('Notion workspace successfully imported');
             closeModal();
