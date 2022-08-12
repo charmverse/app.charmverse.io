@@ -124,6 +124,10 @@ export default function DatabaseView ({ readOnly: readOnlyOverride }: DatabaseVi
     setAttrs({ viewId, pageId: boardId });
   }
 
+  function clearSelection () {
+    setAttrs({ });
+  }
+
   function selectView (viewId: string) {
     setAttrs(_attrs => ({ ..._attrs, viewId }));
   }
@@ -133,7 +137,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride }: DatabaseVi
   }
 
   if (!activeView) {
-    return <ViewSelection views={boardViews} title={board.title} onSelect={selectView} />;
+    return <ViewSelection views={boardViews} title={board.title} onSelect={selectView} onClickBack={clearSelection} />;
   }
 
   let property = groupByProperty;
