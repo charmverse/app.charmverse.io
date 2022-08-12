@@ -24,6 +24,7 @@ export function extractDeletedThreadIds (schema: Schema, curDoc: Node, prevDoc: 
 
   const prevDocThreadIds = extractThreadIds(prevDocInlineCommentNodes);
   const curDocThreadIds = extractThreadIds(currentDocInlineCommentNodes);
+
   const deletedThreadIds: string[] = [];
   prevDocThreadIds.forEach(prevDocThreadId => {
     if (!curDocThreadIds.has(prevDocThreadId)) {
