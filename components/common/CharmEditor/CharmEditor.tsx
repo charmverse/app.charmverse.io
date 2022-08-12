@@ -35,6 +35,7 @@ import log from 'lib/log';
 import debounce from 'lodash/debounce';
 import { PageContent } from 'models';
 import { CSSProperties, memo, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import { useSWRConfig } from 'swr';
 import Callout, * as callout from './components/callout';
 import { userDataPlugin } from './components/charm/charm.plugins';
 import * as columnLayout from './components/columnLayout';
@@ -342,7 +343,7 @@ function CharmEditor (
   }:
   CharmEditorProps
 ) {
-
+  const { mutate } = useSWRConfig();
   const [currentSpace] = useCurrentSpace();
   // check empty state of page on first load
   const _isEmpty = checkForEmpty(content);
@@ -359,8 +360,14 @@ function CharmEditor (
       charmClient.resolveMultipleThreads({
         threadIds: deletedThreadIds,
         pageId
+      }).then(() => {
+        charmClient.getPageThreads(pageId).then((threads) => {
+          mutate(`pages/${pageId}/threads`, threads);
+        }).catch((err) => {
+          log.warn(`Failed to fetch threads for page ${pageId}`, err);
+        });
       }).catch((err) => {
-        log.warn('Auto resolving threads failed', err);
+        log.warn('Failed to auto resolve threads', err);
       });
     }
   }, 1000);
