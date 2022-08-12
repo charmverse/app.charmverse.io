@@ -1,5 +1,5 @@
 import { BountyOperation, PageOperations, PagePermission, Role, Space, User } from '@prisma/client';
-import { RoleupWithMembers } from 'lib/roles';
+import { RoleupWithMembers, RoleWithMembers } from 'lib/roles';
 import { BountyPermissions } from './bounties';
 
 export type Resource = {
@@ -86,7 +86,7 @@ export interface BountyPagePermissionIntersectionQuery {
   bountyPermissions: Partial<BountyPermissions>;
   pageOperations: PageOperations[];
   pagePermissions: PagePermission[];
-  roleups: RoleupWithMembers[];
+  roleups: Array<RoleupWithMembers | RoleWithMembers>;
 }
 
 export interface BountyPagePermissionIntersection {

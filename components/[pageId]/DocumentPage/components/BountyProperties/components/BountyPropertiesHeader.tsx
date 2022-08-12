@@ -8,7 +8,7 @@ import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
 import { BountyPermissions } from 'lib/bounties';
 import { PagePermission } from '@prisma/client';
-import { compareBountyPagePermissions } from 'lib/permissions/compare';
+import { compareBountyPagePermissions } from 'lib/permissions/compareBountyPagePermissions';
 import { BountyPagePermissionIntersection } from 'lib/permissions/interfaces';
 import useRoles from 'hooks/useRoles';
 import charmClient from 'charmClient';
@@ -92,7 +92,7 @@ export default function BountyPropertiesHeader ({ bounty, bountyPermissions, pag
             severity='info'
             sx={{ mb: 2 }}
             action={(
-              <Tooltip title={'Update this bounty\'s page permissions to view-only (except the bounty creator).'}>
+              <Tooltip title={'Update this bounty\'s page permissions to view-only (except for the bounty creator).'}>
                 <Button size='small' variant='outlined' onClick={restrictPermissions} loading={updatingPermissions}>
                   Restrict editing
                 </Button>
