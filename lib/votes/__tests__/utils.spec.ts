@@ -13,7 +13,8 @@ const vote: Vote = {
   createdAt: new Date(),
   spaceId: '4a581759-a677-4613-a088-e7712b7615a9',
   description: '',
-  type: 'Approval'
+  type: 'Approval',
+  context: 'proposal'
 };
 
 describe('voting status', () => {
