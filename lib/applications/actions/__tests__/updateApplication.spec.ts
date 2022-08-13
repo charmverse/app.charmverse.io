@@ -25,7 +25,6 @@ describe('updateApplication', () => {
   it('should only update the application message', async () => {
 
     const bounty = await createBounty({
-      title: 'My bounty',
       createdBy: user.id,
       spaceId: space.id
     });
@@ -68,7 +67,6 @@ describe('updateApplication', () => {
   it(`should fail if the new message has less than ${MINIMUM_APPLICATION_MESSAGE_CHARACTERS} characters`, async () => {
 
     const bounty = await createBounty({
-      title: 'My bounty',
       createdBy: user.id,
       spaceId: space.id
     });
