@@ -19,6 +19,7 @@ export interface LoggedInUser extends User {
   discordUser?: DiscordUser | null
   telegramUser?: TelegramUser | null
   notificationState?: UserNotificationState | null
+  isNew?: boolean
 }
 
 export interface ExtendedPoap extends Poap {

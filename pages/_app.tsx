@@ -15,7 +15,6 @@ import { Web3ReactProvider } from '@web3-react/core';
 import IconButton from '@mui/material/IconButton';
 import RefreshIcon from '@mui/icons-material/Refresh';
 
-import log from 'lib/log';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import RouteGuard from 'components/common/RouteGuard';
 import FocalBoardProvider from 'components/common/BoardEditor/FocalBoardProvider';
@@ -34,7 +33,6 @@ import { PageTitleProvider, usePageTitle } from 'hooks/usePageTitle';
 import { SpacesProvider } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
 import { SnackbarProvider } from 'hooks/useSnackbar';
-import HexagonalAvatarMask from 'components/common/HexagonalAvatarMask';
 
 import '@bangle.dev/tooltip/style.css';
 import '@skiff-org/prosemirror-tables/style/tables.css';
@@ -164,6 +162,7 @@ import cssVariables from 'theme/cssVariables';
 import 'theme/styles.scss';
 
 import charmClient from 'charmClient';
+import GlobalComponents from 'components/_app/GlobalComponents';
 
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
 
@@ -266,8 +265,7 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
                             handleClose={() => setIsOldBuild(false)}
                           />
                           {getLayout(<Component {...pageProps} />)}
-                          <HexagonalAvatarMask id='hexagon-avatar' />
-                          <Snackbar />
+                          <GlobalComponents />
                         </ErrorBoundary>
                       </RouteGuard>
                     </SnackbarProvider>
