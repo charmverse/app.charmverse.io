@@ -8,10 +8,10 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
 import { AvatarEditMenu } from 'components/settings/workspace/AvatarEditMenu';
-import NftAvatarGallery from 'components/profile/components/NftAvatarGallery';
 import { NftData } from 'lib/nft/types';
 import { UserAvatar } from 'lib/users/interfaces';
 import { useS3UploadInput } from 'hooks/useS3UploadInput';
+import NftAvatarGalleryPopup from 'components/profile/components/NftAvatarGallery/NftAvatarGalleryPopup';
 
 const StyledBox = styled(Box)`
   display: inline-block;
@@ -165,7 +165,7 @@ export default function LargeAvatar (props: LargeAvatarProps) {
           onUploadClick={openFilePicker}
           onNftClick={() => setIsGalleryVisible(true)}
         />
-        <NftAvatarGallery isVisible={isGalleryVisible} onClose={() => setIsGalleryVisible(false)} onSelect={onNftSelect} isSaving={isSaving} />
+        <NftAvatarGalleryPopup isVisible={isGalleryVisible} onClose={() => setIsGalleryVisible(false)} onSelect={onNftSelect} isSaving={isSaving} />
       </>
       )}
     </StyledBox>
