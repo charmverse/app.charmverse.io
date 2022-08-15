@@ -34,6 +34,7 @@ import { silentlyUpdateURL } from 'lib/browser';
 import debounce from 'lodash/debounce';
 import { PageContent } from 'models';
 import { CSSProperties, memo, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import { blameDecorationPlugin } from './components/blameDecoration';
 import Callout, * as callout from './components/callout';
 import { userDataPlugin } from './components/charm/charm.plugins';
 import * as columnLayout from './components/columnLayout';
@@ -200,11 +201,20 @@ export function charmEditorPlugins (
     // pasteImagePlugin
   ];
 
-  if (!readOnly && (suggestMode || suggestion)) {
-    basePlugins.push(trackPlugin({
-      ancestorDoc: content,
-      commit: suggestion && schema ? commitFromJSON(suggestion, schema) : undefined
-    }));
+  if (!readOnly) {
+    // Only add the original plugin if we are in suggest mode
+    if (suggestMode) {
+      basePlugins.push(trackPlugin({
+        ancestorDoc: content,
+        commit: suggestion && schema ? commitFromJSON(suggestion, schema) : undefined
+      }));
+    }
+    // Otherwise add a new temporary plugin to decorate the blame
+    else if (suggestion) {
+      basePlugins.push(blameDecorationPlugin({
+        commit: suggestion
+      }));
+    }
   }
 
   if (!readOnly) {
@@ -366,8 +376,9 @@ function CharmEditor (
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
   const [currentUser] = useUser();
   const onContentChangeDebounced = onContentChange ? debounce((view: EditorView) => {
+    const state = getTrackPluginState(view.state);
+
     if (suggestMode && pageId) {
-      const state = getTrackPluginState(view.state);
       charmClient.trackChanges(pageId, {
         suggestion: commitToJSON(state.commit, 'containerId')
       });
