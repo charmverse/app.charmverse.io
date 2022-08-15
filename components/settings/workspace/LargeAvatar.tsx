@@ -1,4 +1,3 @@
-import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { useRef, ReactNode, useState } from 'react';
 import Avatar from 'components/common/Avatar';
@@ -17,20 +16,7 @@ const StyledBox = styled(Box)`
   display: inline-block;
 `;
 
-const baseAvatarStyles = css`
-  font-size: 90px;
-  width: 150px;
-  height: 150px;
-`;
-
-const StyledAvatar = styled(Avatar)`
-  ${baseAvatarStyles}
-  ${({ variant }) => variant === 'rounded' && 'border-radius: 25px'};
-`;
-
 const StyledAvatarWithIcons = styled(AvatarWithIcons)`
-  ${baseAvatarStyles}
-  ${({ variant }) => variant === 'rounded' && 'border-radius: 25px'};
   &:hover .edit-avatar-icon, .delete-avatar-icon {
     display: initial;
   }
@@ -117,11 +103,12 @@ export default function LargeAvatar (props: LargeAvatarProps) {
 
   if (!editable) {
     return (
-      <StyledAvatar
+      <Avatar
         avatar={image}
         name={name}
         variant={variant}
         isNft={isNft}
+        size='2xl'
       />
     );
   }
@@ -156,6 +143,7 @@ export default function LargeAvatar (props: LargeAvatarProps) {
         variant={variant}
         icons={icons}
         isNft={isNft}
+        size='2xl'
       />
       {canSetNft && (
       <>

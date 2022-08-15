@@ -4,8 +4,9 @@ import { stringToColor } from 'lib/utilities/strings';
 import React from 'react';
 
 export type AvatarSize = 'xSmall' | 'small' | 'medium' | 'large' | 'xl' | '2xl';
+export type AvatarVariant = 'circular' | 'rounded' | 'square';
 
-const SizeStyleMap: Record<AvatarSize, React.CSSProperties> = {
+const sizeStyleMap: Record<AvatarSize, React.CSSProperties> = {
   '2xl': {
     height: 150,
     width: 150,
@@ -38,6 +39,26 @@ const SizeStyleMap: Record<AvatarSize, React.CSSProperties> = {
   }
 };
 
+const sizeVariantStyleMap: Partial<Record<AvatarSize, Record<AvatarVariant, React.CSSProperties | null>>> = {
+  '2xl': {
+    rounded: { borderRadius: '1.625rem' },
+    circular: null,
+    square: null
+  },
+  xl: {
+    rounded: { borderRadius: '0.825rem' },
+    circular: null,
+    square: null
+  }
+};
+
+function getAvatarCustomStyles (variant: AvatarVariant | undefined, size: AvatarSize) {
+  const sizeStyles = sizeStyleMap[size];
+  const variantStyles = (variant && sizeVariantStyleMap[size]?.[variant]) || {};
+
+  return { ...sizeStyles, ...variantStyles };
+}
+
 const StyledAvatar = styled(Avatar)`
   color: white !important; // override CSS from Chip avatar
   font-weight: 500;
@@ -66,7 +87,7 @@ export default function InitialAvatar ({ avatar, className, name, variant, size 
 
     <AvatarComponent
       className={className}
-      sx={{ backgroundColor: avatar ? 'initial' : stringToColor(nameStr), ...SizeStyleMap[size] }}
+      sx={{ backgroundColor: avatar ? 'initial' : stringToColor(nameStr), ...getAvatarCustomStyles(variant, size) }}
       variant={muiVariant}
       src={avatar ?? undefined}
     >
