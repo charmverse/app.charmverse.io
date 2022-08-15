@@ -2,7 +2,6 @@ import { UserAvatar } from 'lib/users/interfaces';
 import { useCallback, useState } from 'react';
 import { useUser } from 'hooks/useUser';
 import charmClient from 'charmClient';
-import { stubTrue } from 'lodash';
 
 const isAvatarObject = (
   avatar: string | UserAvatar
@@ -20,7 +19,7 @@ export const useUpdateProfileAvatar = () => {
       avatarTokenId: null
     };
 
-    setIsSaving(stubTrue);
+    setIsSaving(true);
     try {
       const updatedUser = await charmClient.profile.setAvatar(updatedAvatar);
       setUser(updatedUser);
