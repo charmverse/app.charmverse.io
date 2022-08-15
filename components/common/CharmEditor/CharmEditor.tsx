@@ -673,7 +673,7 @@ function CharmEditor (
         </Slide>
         <Slide
           direction='left'
-          in={pageActionDisplay === 'suggestions' && suggestion}
+          in={pageActionDisplay === 'suggestions' && Boolean(suggestion)}
           style={{
             transformOrigin: 'left top'
           }}

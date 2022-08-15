@@ -1,7 +1,8 @@
 import { useEditorViewContext } from '@bangle.dev/react';
-import { Commit, getChangeSummary } from '@manuscripts/track-changes';
-import { Stack, Typography } from '@mui/material';
+import { checkout, Commit, getChangeSummary, getTrackPluginState, rebases } from '@manuscripts/track-changes';
+import { Button, Stack, Typography } from '@mui/material';
 import { DateTime } from 'luxon';
+import { Box } from '@mui/system';
 
 export function smoosh<T> (
   commit: Commit,
@@ -18,20 +19,41 @@ export function smoosh<T> (
 }
 
 export default function SuggestionsSidebar ({ suggestion }: {suggestion: Commit}) {
-  const { state } = useEditorViewContext();
+  const view = useEditorViewContext();
+  const { state, update } = view;
+  const { commit } = getTrackPluginState(state);
 
   const commits = suggestion ? smoosh(suggestion, (c) => ({ updatedAt: c.updatedAt, _id: c._id, changeID: c.changeID })) : [];
   return (
     <div>
       <strong>Edit suggestions:</strong>
-      <Stack gap={1}>
+      <Stack gap={2}>
         {commits.map(({ updatedAt, _id, changeID }) => {
           return (
-            <Stack className='commit' key={_id}>
+            <Stack className='commit' key={_id} gap={1}>
               <Typography variant='subtitle2'>{updatedAt ? DateTime.fromJSDate(new Date(updatedAt)).toRelative({ base: (DateTime.now()) }) : 'N/A'}</Typography>
               <Typography>
                 {getChangeSummary(state, changeID)?.insertion}
               </Typography>
+              <Box display='flex' gap={1}>
+                <Button
+                  onClick={() => {
+                    const { commit: next, mapping } = rebases.without(commit, [changeID]);
+                    if (next) {
+                      view.updateState(checkout(state.doc, state, next, mapping));
+                    }
+                  }}
+                  size='small'
+                  variant='outlined'
+                >Approve
+                </Button>
+                <Button
+                  size='small'
+                  variant='outlined'
+                  color='error'
+                >Reject
+                </Button>
+              </Box>
             </Stack>
           );
         })}
