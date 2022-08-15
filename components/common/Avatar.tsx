@@ -73,7 +73,7 @@ export type InitialAvatarProps = {
   avatar: string | null | undefined;
   className?: string;
   name?: string;
-  variant?: 'circular' | 'rounded' | 'square';
+  variant?: AvatarVariant;
   size?: AvatarSize;
   isNft?: boolean;
 };
