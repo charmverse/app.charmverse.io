@@ -1,7 +1,9 @@
 import { useEditorViewContext } from '@bangle.dev/react';
 import { Commit, getChangeSummary } from '@manuscripts/track-changes';
+import { Stack, Typography } from '@mui/material';
+import { DateTime } from 'luxon';
 
-function smoosh<T> (
+export function smoosh<T> (
   commit: Commit,
   selector: (commit: Commit) => T | Array<T>
 ): Array<T> {
@@ -18,20 +20,22 @@ function smoosh<T> (
 export default function SuggestionsSidebar ({ suggestion }: {suggestion: Commit}) {
   const { state } = useEditorViewContext();
 
-  const list = suggestion ? smoosh(suggestion, (c) => ({ _id: c._id, changeID: c.changeID })) : [];
-
+  const commits = suggestion ? smoosh(suggestion, (c) => ({ updatedAt: c.updatedAt, _id: c._id, changeID: c.changeID })) : [];
   return (
     <div>
       <strong>Edit suggestions:</strong>
-      {list.map(({ _id, changeID }) => {
-        return (
-          <div className='commit' key={_id}>
-            <div>
-              {changeID} | {_id}
-            </div>
-          </div>
-        );
-      })}
+      <Stack gap={1}>
+        {commits.map(({ updatedAt, _id, changeID }) => {
+          return (
+            <Stack className='commit' key={_id}>
+              <Typography variant='subtitle2'>{updatedAt ? DateTime.fromJSDate(new Date(updatedAt)).toRelative({ base: (DateTime.now()) }) : 'N/A'}</Typography>
+              <Typography>
+                {getChangeSummary(state, changeID)?.insertion}
+              </Typography>
+            </Stack>
+          );
+        })}
+      </Stack>
     </div>
   );
 }

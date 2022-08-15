@@ -5,7 +5,6 @@ import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/c
 import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
 import { getCardComments } from 'components/common/BoardEditor/focalboard/src/store/comments';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import Button from 'components/common/Button';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
@@ -72,7 +71,6 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
   const cannotComment = readOnly || !pagePermissions?.comment;
 
   const pageVote = Object.values(votes).find(v => v.context === 'proposal');
-  const [isSuggestMode, setIsSuggestMode] = useState<boolean>(false);
   const board = useAppSelector((state) => {
     if (page.type === 'card' && page.parentId) {
       const parentPage = pages[page.parentId];
@@ -104,7 +102,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
   const { currentPageActionDisplay } = usePageActionDisplay();
 
   const updatePageContent = useCallback((content: ICharmEditorOutput) => {
-    setPage({ content: content.doc, contentText: content.rawText });
+    setPage({ content: content.doc, contentText: content.rawText, suggestion: content.suggestion });
   }, [setPage]);
 
   const card = cards.find(_card => _card.id === page.id);
@@ -114,6 +112,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
   const showPageActionSidebar = (currentPageActionDisplay !== null) && !insideModal;
   const router = useRouter();
   const isSharedPage = router.pathname.startsWith('/share');
+  const [isSuggestMode, setIsSuggestMode] = useState<boolean>(false);
 
   return (
     <ScrollableWindow
@@ -137,18 +136,12 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
       >
         {page.deletedAt && <PageDeleteBanner pageId={page.id} />}
         {page.headerImage && <PageBanner headerImage={page.headerImage} readOnly={cannotEdit} setPage={setPage} />}
-        <Button onClick={() => {
-          setIsSuggestMode(!isSuggestMode);
-        }}
-        >{isSuggestMode ? 'Edit Mode' : 'Suggestion Mode'}
-        </Button>
         <Container
           top={pageTop}
           fullWidth={page.fullWidth ?? false}
         >
           <CharmEditor
-            suggestMode={isSuggestMode}
-            key={`${page.id}.${isSuggestMode}`}
+            key={page.id}
             content={page.content as PageContent}
             onContentChange={updatePageContent}
             readOnly={cannotEdit}
@@ -156,7 +149,11 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
             pageId={page.id}
             disablePageSpecificFeatures={isSharedPage}
             enableVoting={true}
-            suggestion={page.documentSuggestion?.[0]?.suggestion}
+            suggestMode={isSuggestMode}
+            suggestion={page.suggestion}
+            onSuggestModeChange={() => {
+              setIsSuggestMode(!isSuggestMode);
+            }}
           >
             <PageHeader
               headerImage={page.headerImage}

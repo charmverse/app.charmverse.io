@@ -15,17 +15,19 @@ import {
 import { BangleEditorState, NodeView, Plugin, RawPlugins } from '@bangle.dev/core';
 import { markdownSerializer } from '@bangle.dev/markdown';
 import { EditorView, Node, PluginKey, Schema } from '@bangle.dev/pm';
-import { useEditorState } from '@bangle.dev/react';
+import { useEditorState, useEditorViewContext } from '@bangle.dev/react';
+import { uuid } from '@bangle.dev/utils';
 import styled from '@emotion/styled';
-import trackPlugin, { commitFromJSON, commitToJSON, getTrackPluginState } from '@manuscripts/track-changes';
-import { Box, Divider, Slide } from '@mui/material';
+import trackPlugin, { commands as trackChangesCommands, Commit, commitFromJSON, commitToJSON, getTrackPluginState, reset } from '@manuscripts/track-changes';
+import { TrackPluginState } from '@manuscripts/track-changes/build/types/src/plugin';
+import { Box, Button, Divider, Slide } from '@mui/material';
 import charmClient from 'charmClient';
 import * as codeBlock from 'components/common/CharmEditor/components/@bangle.dev/base-components/code-block';
 import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import CommentsSidebar from 'components/[pageId]/DocumentPage/components/CommentsSidebar';
-import SuggestionsSidebar from 'components/[pageId]/DocumentPage/components/SuggestionsSidebar';
+import SuggestionsSidebar, { smoosh } from 'components/[pageId]/DocumentPage/components/SuggestionsSidebar';
 import PageInlineVotesList from 'components/[pageId]/DocumentPage/components/VotesSidebar';
 import { CryptoCurrency, FiatCurrency } from 'connectors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -35,6 +37,7 @@ import { silentlyUpdateURL } from 'lib/browser';
 import debounce from 'lodash/debounce';
 import { PageContent } from 'models';
 import { CSSProperties, memo, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import { v4 } from 'uuid';
 import { blameDecorationPlugin } from './components/blameDecoration';
 import Callout, * as callout from './components/callout';
 import { userDataPlugin } from './components/charm/charm.plugins';
@@ -68,6 +71,7 @@ import { checkForEmpty } from './utils';
 export interface ICharmEditorOutput {
   doc: PageContent,
   rawText: string
+  suggestion: any
 }
 
 const actionsPluginKey = new PluginKey('row-actions');
@@ -203,22 +207,10 @@ export function charmEditorPlugins (
   ];
 
   if (!readOnly) {
-    // Only add the original plugin if we are in suggest mode
-    if (suggestMode || suggestion) {
-      basePlugins.push(trackPlugin({
-        ancestorDoc: content,
-        commit: suggestion && schema ? commitFromJSON(suggestion, schema) : undefined
-      }));
-    }
-    // Otherwise add a new temporary plugin to decorate the blame
-    // else if (suggestion) {
-    //   basePlugins.push(blameDecorationPlugin({
-    //     commit: suggestion
-    //   }));
-    // }
-  }
-
-  if (!readOnly) {
+    basePlugins.push(trackPlugin({
+      ancestorDoc: content,
+      commit: suggestion && schema ? commitFromJSON(suggestion, schema) : undefined
+    }));
     basePlugins.push(rowActions.plugins({
       key: actionsPluginKey
     }));
@@ -238,7 +230,7 @@ export function charmEditorPlugins (
   return () => basePlugins;
 }
 
-const StyledReactBangleEditor = styled(ReactBangleEditor)<{disablePageSpecificFeatures?: boolean}>`
+const StyledReactBangleEditor = styled(ReactBangleEditor)<{disablePageSpecificFeatures?: boolean, suggestMode?: boolean}>`
   position: relative;
 
   /** DONT REMOVE THIS STYLING */
@@ -292,6 +284,21 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{disablePageSpecificFe
       cursor: pointer;
     }
   `}
+  
+  /** Don't highlight un-committed blames */
+  .track-changes--blame:not(.track-changes--blame-uncommitted) {
+    background-color: rgba(57, 255, 20, 0.3);
+  }
+
+  /** Only highlight them if the suggestion mode is on */
+  ${({ suggestMode }) => suggestMode && `
+    .track-changes--blame.track-changes--blame-uncommitted,.blame {
+      background-color: rgba(255, 218, 20, 0.6);
+    }
+    .track-changes--blame.track-changes--focused {
+      background-color: rgba(255, 218, 20, 0.6);
+    }
+  `}
 `;
 
 const PageActionListBox = styled.div`
@@ -331,8 +338,9 @@ interface CharmEditorProps {
   disablePageSpecificFeatures?: boolean;
   enableVoting?: boolean;
   pageId?: string | null;
-  suggestMode?: boolean
   suggestion?: any | null
+  suggestMode?: boolean
+  onSuggestModeChange?: () => void
 }
 
 export function convertPageContentToMarkdown (content: PageContent, title?: string): string {
@@ -355,6 +363,65 @@ export function convertPageContentToMarkdown (content: PageContent, title?: stri
   return markdown;
 }
 
+const hashString = (input: string) => {
+  let hash = 0;
+
+  if (input.length === 0) {
+    return btoa('0');
+  }
+
+  for (let i = 0; i < input.length; i++) {
+    const charCode = input.charCodeAt(i);
+    hash = (hash << 7) - hash + charCode;
+    hash &= hash;
+  }
+  return btoa(hash.toString());
+};
+
+export const getCommitID = (changeIDs: string[]): string => {
+  return `MPCommit:${hashString(changeIDs.slice().sort().join())}`;
+};
+
+export const buildCommit = (
+  data: Omit<Commit, '_id' | 'updatedAt' | 'createdAt'>
+): Commit => {
+  const changeIDs = data.prev
+    ? [data.changeID, ...smoosh(data.prev, (c) => c.changeID)]
+    : [data.changeID];
+
+  return {
+    _id: getCommitID(changeIDs),
+    updatedAt: Date.now() / 1000,
+    createdAt: Date.now() / 1000,
+    ...data
+  };
+};
+
+function SuggestModeToggleButton (
+  { onSuggestModeChange, suggestMode, onSuggestModeToEditMode }:
+  {suggestMode: boolean, onSuggestModeChange: () => void, onSuggestModeToEditMode: (pluginState: TrackPluginState) => void}
+) {
+  const view = useEditorViewContext();
+  const { state, dispatch } = view;
+  return (
+    <Button onClick={() => {
+      if (!suggestMode) {
+        // Reset plugin state
+        // reset(state.doc, state);
+      }
+      // Only create commit if we go from suggest mode -> edit mode
+      if (suggestMode) {
+        const trackPluginState = getTrackPluginState(state);
+        trackChangesCommands.freezeCommit()(state, dispatch, view);
+        onSuggestModeToEditMode(trackPluginState);
+      }
+      onSuggestModeChange();
+    }}
+    >{suggestMode ? 'Edit Mode' : 'Suggestion Mode'}
+    </Button>
+  );
+}
+
 function CharmEditor (
   {
     pageActionDisplay = null,
@@ -367,10 +434,12 @@ function CharmEditor (
     enableVoting,
     pageId,
     suggestMode = false,
-    suggestion = null
+    suggestion = null,
+    onSuggestModeChange
   }:
   CharmEditorProps
 ) {
+
   const [currentSpace] = useCurrentSpace();
   // check empty state of page on first load
   const _isEmpty = checkForEmpty(content);
@@ -378,15 +447,9 @@ function CharmEditor (
   const [currentUser] = useUser();
   const onContentChangeDebounced = onContentChange ? debounce((view: EditorView) => {
     const state = getTrackPluginState(view.state);
-
-    if (suggestMode && pageId) {
-      charmClient.trackChanges(pageId, {
-        suggestion: commitToJSON(state.commit, 'containerId')
-      });
-    }
     const doc = view.state.doc.toJSON() as PageContent;
     const rawText = view.state.doc.textContent as string;
-    onContentChange({ doc, rawText });
+    onContentChange({ doc, rawText, suggestion: commitToJSON(state.commit, 'containerId') });
   }, 500) : undefined;
 
   function _onContentChange (view: EditorView) {
@@ -449,6 +512,7 @@ function CharmEditor (
 
   return (
     <StyledReactBangleEditor
+      suggestMode={suggestMode}
       disablePageSpecificFeatures={disablePageSpecificFeatures}
       style={{
         ...(style ?? {}),
@@ -561,6 +625,25 @@ function CharmEditor (
         }
       }}
     >
+      {onSuggestModeChange && pageId && suggestMode !== undefined && suggestMode !== null && (
+      <SuggestModeToggleButton
+        onSuggestModeChange={onSuggestModeChange}
+        suggestMode={suggestMode}
+        onSuggestModeToEditMode={(trackPluginState) => {
+          // Create a new commit and store updated content for the page
+          onContentChange?.({
+            doc: state.pmState.doc.toJSON() as PageContent,
+            rawText: state.pmState.doc.text as string,
+            suggestion: commitToJSON(buildCommit({
+              changeID: v4(),
+              blame: trackPluginState.commit.blame,
+              steps: [],
+              prev: trackPluginState.commit
+            }), '')
+          });
+        }}
+      />
+      )}
       <floatingMenu.FloatingMenu enableComments={!disablePageSpecificFeatures} enableVoting={enableVoting} pluginKey={floatingMenuPluginKey} />
       <MentionSuggest pluginKey={mentionPluginKey} />
       <NestedPagesList pluginKey={nestedPagePluginKey} />

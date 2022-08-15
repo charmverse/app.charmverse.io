@@ -78,16 +78,6 @@ blockquote .bangle-nv-child-container {
   position: relative;
 }
 
-.track-changes--blame {
-  background-color: rgba(57, 255, 20, 0.3);
-}
-.track-changes--blame.track-changes--blame-uncommitted,.blame {
-  background-color: rgba(255, 218, 20, 0.6);
-}
-.track-changes--blame.track-changes--focused {
-  background-color: rgba(255, 218, 20, 0.6);
-}
-
 .track-changes--blame-point {
   position: relative;
 }

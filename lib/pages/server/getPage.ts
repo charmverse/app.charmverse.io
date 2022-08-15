@@ -26,8 +26,7 @@ export async function getPage (pageIdOrPath: string, spaceId?: string): Promise<
         include: {
           sourcePermission: true
         }
-      },
-      documentSuggestion: true
+      }
     }
   });
 }
