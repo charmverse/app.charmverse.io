@@ -24,7 +24,7 @@ const Transition = React.forwardRef((
 
 export default function SetAvatarPopup () {
   const [isVisible, setIsVisible] = useState(false);
-  const { user } = useUser();
+  const { user, updateUser } = useUser();
   const { updateProfileAvatar } = useUpdateProfileAvatar();
   const [isSavingPic, setIsSavingPic] = useState(false);
   const [isSavingNft, setIsSavingNft] = useState(false);
@@ -60,6 +60,7 @@ export default function SetAvatarPopup () {
 
   function close () {
     setIsVisible(false);
+    updateUser({ isNew: false });
   }
 
   useEffect(() => {
