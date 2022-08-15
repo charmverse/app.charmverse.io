@@ -24,5 +24,5 @@ export const useUpdateProfileAvatar = () => {
     return updatedUser;
   }, []);
 
-  return updateProfileAvatar;
+  return { updateProfileAvatar };
 };

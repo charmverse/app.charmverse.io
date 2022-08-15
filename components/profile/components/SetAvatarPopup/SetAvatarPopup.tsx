@@ -8,6 +8,10 @@ import NftAvatarSection from 'components/profile/components/SetAvatarPopup/NftAv
 
 import Slide from '@mui/material/Slide';
 import { TransitionProps } from '@mui/material/transitions';
+import { useS3UploadInput } from 'hooks/useS3UploadInput';
+import { useUpdateProfileAvatar } from 'components/profile/components/UserDetails/hooks/useUpdateProfileAvatar';
+import { NftData } from 'lib/nft/types';
+import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
 const Transition = React.forwardRef((
   props: TransitionProps & {
@@ -21,13 +25,45 @@ const Transition = React.forwardRef((
 export default function SetAvatarPopup () {
   const [isVisible, setIsVisible] = useState(false);
   const { user } = useUser();
+  const { updateProfileAvatar } = useUpdateProfileAvatar();
+  const [isSavingPic, setIsSavingPic] = useState(false);
+  const [isSavingNft, setIsSavingNft] = useState(false);
+
+  async function savePicAvatar (url: string) {
+    setIsSavingPic(true);
+
+    try {
+      await updateProfileAvatar(url);
+    }
+    finally {
+      setIsSavingPic(false);
+    }
+  }
+
+  async function saveNftAvatar (nft: NftData) {
+    setIsSavingNft(true);
+
+    try {
+      await updateProfileAvatar({
+        avatar: nft.imageThumb || nft.image,
+        avatarChain: nft.chainId,
+        avatarContract: nft.contract,
+        avatarTokenId: nft.tokenId
+      });
+    }
+    finally {
+      setIsSavingNft(false);
+    }
+  }
+
+  const { inputRef, openFilePicker, onFileChange } = useS3UploadInput(savePicAvatar);
 
   function close () {
     setIsVisible(false);
   }
 
   useEffect(() => {
-    setIsVisible(!user?.isNew || false);
+    setIsVisible(user?.isNew || false);
   }, [user?.isNew]);
 
   return (
@@ -51,16 +87,29 @@ export default function SetAvatarPopup () {
         <Stack justifyContent='center'>
           <Box flex={1} justifyContent='center' display='flex'>
             <Box>
-              <Avatar size='2xl' avatar={user?.avatar} name={user?.username || ''} variant='circular' />
+              <Avatar
+                size='2xl'
+                avatar={user?.avatar}
+                name={user?.username || ''}
+                variant='circular'
+                isNft={hasNftAvatar(user)}
+              />
             </Box>
           </Box>
 
           <Box justifyContent='center' flex={1} display='flex' mt={2}>
-            <PrimaryButton sx={{ px: 4 }}>Upload your image</PrimaryButton>
+            <input
+              type='file'
+              hidden
+              accept='image/*'
+              ref={inputRef}
+              onChange={onFileChange}
+            />
+            <PrimaryButton sx={{ px: 4 }} onClick={openFilePicker} loading={isSavingPic}>Upload your image</PrimaryButton>
           </Box>
 
           <Box justifyContent='center' flex={1} display='flex' mt={2}>
-            <NftAvatarSection />
+            <NftAvatarSection onSelect={saveNftAvatar} isSaving={isSavingNft} />
           </Box>
         </Stack>
       </DialogContent>
