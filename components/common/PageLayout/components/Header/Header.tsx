@@ -31,6 +31,7 @@ import { useRouter } from 'next/router';
 import { useRef, useState } from 'react';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
+import EditIcon from '@mui/icons-material/Edit';
 import Account from '../Account';
 import ShareButton from '../ShareButton';
 import BountyShareButton from './BountyShareButton/BountyShareButton';
@@ -216,6 +217,21 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
                         }}
                       />
                       <ListItemText primary='View comments' />
+                    </ListItemButton>
+                  )}
+                  {isPage && (
+                    <ListItemButton onClick={() => {
+                      setCurrentPageActionDisplay('suggestions');
+                      setPageMenuOpen(false);
+                    }}
+                    >
+                      <EditIcon
+                        fontSize='small'
+                        sx={{
+                          mr: 1
+                        }}
+                      />
+                      <ListItemText primary='View suggestions' />
                     </ListItemButton>
                   )}
                   <ListItemButton onClick={() => {

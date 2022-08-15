@@ -25,6 +25,7 @@ import { plugins as imagePlugins } from 'components/common/CharmEditor/component
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import CommentsSidebar from 'components/[pageId]/DocumentPage/components/CommentsSidebar';
+import SuggestionsSidebar from 'components/[pageId]/DocumentPage/components/SuggestionsSidebar';
 import PageInlineVotesList from 'components/[pageId]/DocumentPage/components/VotesSidebar';
 import { CryptoCurrency, FiatCurrency } from 'connectors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -203,18 +204,18 @@ export function charmEditorPlugins (
 
   if (!readOnly) {
     // Only add the original plugin if we are in suggest mode
-    if (suggestMode) {
+    if (suggestMode || suggestion) {
       basePlugins.push(trackPlugin({
         ancestorDoc: content,
         commit: suggestion && schema ? commitFromJSON(suggestion, schema) : undefined
       }));
     }
     // Otherwise add a new temporary plugin to decorate the blame
-    else if (suggestion) {
-      basePlugins.push(blameDecorationPlugin({
-        commit: suggestion
-      }));
-    }
+    // else if (suggestion) {
+    //   basePlugins.push(blameDecorationPlugin({
+    //     commit: suggestion
+    //   }));
+    // }
   }
 
   if (!readOnly) {
@@ -585,6 +586,24 @@ function CharmEditor (
             id='page-thread-list-box'
           >
             <CommentsSidebar />
+          </PageActionListBox>
+        </Slide>
+        <Slide
+          direction='left'
+          in={pageActionDisplay === 'suggestions' && suggestion}
+          style={{
+            transformOrigin: 'left top'
+          }}
+          easing={{
+            enter: 'ease-in',
+            exit: 'ease-out'
+          }}
+          timeout={250}
+        >
+          <PageActionListBox
+            id='page-suggestions-list-box'
+          >
+            <SuggestionsSidebar suggestion={suggestion} />
           </PageActionListBox>
         </Slide>
         <Slide

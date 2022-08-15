@@ -8,7 +8,7 @@ import { usePages } from './usePages';
 import { useThreads } from './useThreads';
 
 export interface IPageActionDisplayContext {
-  currentPageActionDisplay: null | 'votes' | 'comments',
+  currentPageActionDisplay: null | 'votes' | 'comments' | 'suggestions',
   setCurrentPageActionDisplay: React.Dispatch<React.SetStateAction<IPageActionDisplayContext['currentPageActionDisplay']>>
 }
 
