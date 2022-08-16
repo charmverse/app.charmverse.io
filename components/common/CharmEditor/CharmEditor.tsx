@@ -18,7 +18,7 @@ import { EditorView, Node, PluginKey, Schema } from '@bangle.dev/pm';
 import { useEditorState, useEditorViewContext } from '@bangle.dev/react';
 import { uuid } from '@bangle.dev/utils';
 import styled from '@emotion/styled';
-import trackPlugin, { commands as trackChangesCommands, Commit, commitFromJSON, commitToJSON, getTrackPluginState, reset } from '@manuscripts/track-changes';
+import trackPlugin, { checkout, commands as trackChangesCommands, Commit, commitFromJSON, commitToJSON, getTrackPluginState, rebases, reset } from '@manuscripts/track-changes';
 import { TrackPluginState } from '@manuscripts/track-changes/build/types/src/plugin';
 import { Box, Button, Divider, Slide } from '@mui/material';
 import charmClient from 'charmClient';
@@ -402,10 +402,16 @@ function SuggestModeToggleButton (
   {suggestMode: boolean, onSuggestModeChange: () => void, onSuggestModeToEditMode: (pluginState: TrackPluginState) => void}
 ) {
   const view = useEditorViewContext();
+  const { commit } = getTrackPluginState(view.state);
+
   const { state, dispatch } = view;
   return (
     <Button onClick={() => {
       if (!suggestMode) {
+        const { commit: next, mapping } = rebases.without(commit, [commit._id]);
+        if (next) {
+          view.updateState(checkout(state.doc, state, next, mapping));
+        }
         // Reset plugin state
         // reset(state.doc, state);
       }
