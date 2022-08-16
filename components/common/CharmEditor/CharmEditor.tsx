@@ -14,7 +14,7 @@ import {
 } from '@bangle.dev/base-components';
 import { BangleEditorState, NodeView, Plugin, RawPlugins } from '@bangle.dev/core';
 import { markdownSerializer } from '@bangle.dev/markdown';
-import { EditorView, Node, PluginKey, Schema } from '@bangle.dev/pm';
+import { EditorState, EditorView, Node, PluginKey, Schema } from '@bangle.dev/pm';
 import { useEditorState, useEditorViewContext } from '@bangle.dev/react';
 import { uuid } from '@bangle.dev/utils';
 import styled from '@emotion/styled';
@@ -34,9 +34,12 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
 import { useUser } from 'hooks/useUser';
 import { silentlyUpdateURL } from 'lib/browser';
+import { extractDeletedThreadIds } from 'lib/inline-comments/extractDeletedThreadIds';
+import log from 'lib/log';
 import debounce from 'lodash/debounce';
 import { PageContent } from 'models';
 import { CSSProperties, memo, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import { useSWRConfig } from 'swr';
 import { v4 } from 'uuid';
 import { blameDecorationPlugin } from './components/blameDecoration';
 import Callout, * as callout from './components/callout';
@@ -102,7 +105,7 @@ export function charmEditorPlugins (
       pageId?: string | null,
       userId?: string | null,
       readOnly?: boolean,
-      onContentChange?: (view: EditorView) => void,
+      onContentChange?: (view: EditorView, prevDoc: EditorState['doc']) => void,
       disablePageSpecificFeatures?: boolean,
       enableVoting?: boolean,
       enableComments?: boolean,
@@ -118,7 +121,7 @@ export function charmEditorPlugins (
       view: () => ({
         update: (view, prevState) => {
           if (onContentChange && !view.state.doc.eq(prevState.doc)) {
-            onContentChange(view);
+            onContentChange(view, prevState.doc);
           }
         }
       })
@@ -445,24 +448,48 @@ function CharmEditor (
   }:
   CharmEditorProps
 ) {
-
+  const { mutate } = useSWRConfig();
   const [currentSpace] = useCurrentSpace();
   // check empty state of page on first load
   const _isEmpty = checkForEmpty(content);
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
-  const [currentUser] = useUser();
-  const onContentChangeDebounced = onContentChange ? debounce((view: EditorView) => {
-    const state = getTrackPluginState(view.state);
+  const { user } = useUser();
+  // eslint-disable-next-line
+  const onThreadResolveDebounced = debounce((pageId: string, doc: EditorState['doc'], prevDoc: EditorState['doc']) => {
+    const deletedThreadIds = extractDeletedThreadIds(
+      specRegistry.schema,
+      doc,
+      prevDoc
+    );
+    if (deletedThreadIds.length) {
+      charmClient.resolveMultipleThreads({
+        threadIds: deletedThreadIds,
+        pageId
+      }).then(() => {
+        charmClient.getPageThreads(pageId).then((threads) => {
+          mutate(`pages/${pageId}/threads`, threads);
+        }).catch((err) => {
+          log.warn(`Failed to fetch threads for page ${pageId}`, err);
+        });
+      }).catch((err) => {
+        log.warn('Failed to auto resolve threads', err);
+      });
+    }
+  }, 1000);
+  const onContentChangeDebounced = onContentChange ? debounce((view: EditorView, prevDoc?: EditorState['doc']) => {
     const doc = view.state.doc.toJSON() as PageContent;
     const rawText = view.state.doc.textContent as string;
-    onContentChange({ doc, rawText, suggestion: commitToJSON(state.commit, 'containerId') });
-  }, 500) : undefined;
+    if (pageId && prevDoc) {
+      onThreadResolveDebounced(pageId, view.state.doc, prevDoc);
+    }
+    onContentChange({ doc, rawText, suggestion });
+  }, 100) : undefined;
 
-  function _onContentChange (view: EditorView) {
+  function _onContentChange (view: EditorView, prevDoc: Node<any>) {
     // @ts-ignore missing types from the @bangle.dev/react package
     setIsEmpty(checkForEmpty(view.state.doc.toJSON() as PageContent));
     if (onContentChangeDebounced) {
-      onContentChangeDebounced(view);
+      onContentChangeDebounced(view, prevDoc);
     }
   }
 
@@ -478,7 +505,7 @@ function CharmEditor (
       enableVoting,
       pageId,
       spaceId: currentSpace?.id,
-      userId: currentUser?.id,
+      userId: user?.id,
       content: content ? Node.fromJSON(specRegistry.schema, content) : undefined,
       suggestion,
       schema: specRegistry.schema

@@ -142,7 +142,7 @@ export default function CharmEditor (
   CharmEditorProps
 ) {
   const [currentSpace] = useCurrentSpace();
-  const [currentUser] = useUser();
+  const { user } = useUser();
 
   const _isEmpty = !content || checkForEmpty(content);
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
@@ -179,7 +179,7 @@ export default function CharmEditor (
       onContentChange: _onContentChange,
       readOnly,
       spaceId: currentSpace?.id,
-      userId: currentUser?.id
+      userId: user?.id
     }),
     initialValue,
     dropCursorOpts: {

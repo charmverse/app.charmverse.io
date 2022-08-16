@@ -54,7 +54,7 @@ const TASK_TABS = [
 
 export default function TasksPage () {
   const router = useRouter();
-  const [user] = useUser();
+  const { user } = useUser();
   const [currentTask, setCurrentTask] = useState(router.query?.task ?? 'multisig');
   const { error, mutate: mutateTasks, tasks } = useTasks();
   const theme = useTheme();

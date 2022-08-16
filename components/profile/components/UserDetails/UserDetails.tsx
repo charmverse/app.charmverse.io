@@ -1,8 +1,7 @@
-import { Dispatch, SetStateAction, useMemo, useState } from 'react';
+import { useMemo, Dispatch, SetStateAction, useState } from 'react';
 import useSWRImmutable from 'swr/immutable';
 import styled from '@emotion/styled';
 import { Box, Divider, Grid, Link as ExternalLink, Stack, SvgIcon, Typography, Tooltip } from '@mui/material';
-import { User } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import Avatar from 'components/settings/workspace/LargeAvatar';
 import EditIcon from '@mui/icons-material/Edit';
@@ -13,7 +12,6 @@ import Link from 'components/common/Link';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import charmClient from 'charmClient';
-import type { PublicUser } from 'pages/api/public/profile/[userPath]';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DiscordIcon from 'public/images/discord_logo.svg';
 import { LoggedInUser, IDENTITY_TYPES, IdentityType } from 'models';
@@ -22,23 +20,27 @@ import { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { TelegramAccount } from 'pages/api/telegram/connect';
 import { shortenHex } from 'lib/utilities/strings';
 import useENSName from 'hooks/useENSName';
-import DescriptionModal from './DescriptionModal';
-import UserPathModal from './UserPathModal';
-import SocialModal from './SocialModal';
-import IdentityModal, { getIdentityIcon, IntegrationModel } from './IdentityModal';
-import { Social } from '../interfaces';
+import { UserAvatar } from 'lib/users/interfaces';
+import { PublicUser } from 'pages/api/public/profile/[userPath]';
+import { hasNftAvatar } from 'lib/users/hasNftAvatar';
+import { useUserDetails } from 'components/profile/components/UserDetails/hooks/useUserDetails';
+import DescriptionModal from '../DescriptionModal';
+import UserPathModal from '../UserPathModal';
+import SocialModal from '../SocialModal';
+import IdentityModal, { getIdentityIcon, IntegrationModel } from '../IdentityModal';
+import { Social } from '../../interfaces';
 
 const StyledDivider = styled(Divider)`
   height: 36px;
 `;
+
+export const isPublicUser = (user: PublicUser | LoggedInUser): user is PublicUser => user.hasOwnProperty('profile');
 
 export interface UserDetailsProps {
   readOnly?: boolean;
   user: PublicUser | LoggedInUser;
   updateUser?: Dispatch<SetStateAction<LoggedInUser | null>>;
 }
-
-export const isPublicUser = (user: PublicUser | LoggedInUser): user is PublicUser => user.hasOwnProperty('profile');
 
 function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
   const { account } = useWeb3React();
@@ -61,31 +63,19 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
     setTimeout(() => setIsDiscordUsernameCopied(false), 1000);
   };
 
-  const handleUserUpdate = async (data: Partial<User>) => {
-    const updatedUser = await charmClient.updateUser(data);
-    if (updateUser) {
-      updateUser(updatedUser);
-    }
-  };
+  const { handleUserUpdate, handleNftAvatarUpdate, isSaving } = useUserDetails({ readOnly, user, updateUser });
 
   const onLinkCopy = () => {
     setIsPersonalLinkCopied(true);
     setTimeout(() => setIsPersonalLinkCopied(false), 1000);
   };
 
-  let socialDetails: Social = {};
-
-  if (userDetails?.social) {
-    socialDetails = userDetails.social as Social;
-  }
-  else {
-    socialDetails = {
-      twitterURL: '',
-      githubURL: '',
-      discordUsername: '',
-      linkedinURL: ''
-    };
-  }
+  const socialDetails: Social = userDetails?.social ? userDetails?.social as Social : {
+    twitterURL: '',
+    githubURL: '',
+    discordUsername: '',
+    linkedinURL: ''
+  };
 
   const hasAnySocialInformation = (model: Social) => model.twitterURL || model.githubURL || model.discordUsername || model.linkedinURL;
 
@@ -145,9 +135,12 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
         <Avatar
           name={user?.username || ''}
           image={user?.avatar}
-          updateImage={(url: string) => handleUserUpdate({ avatar: url })}
+          updateAvatar={(avatar: UserAvatar) => avatar.avatarContract ? handleNftAvatarUpdate(avatar) : handleUserUpdate(avatar)}
           editable={!readOnly}
           variant='circular'
+          canSetNft
+          isSaving={isSaving}
+          isNft={hasNftAvatar(user)}
         />
         <Grid container direction='column' spacing={0.5}>
           <Grid item>

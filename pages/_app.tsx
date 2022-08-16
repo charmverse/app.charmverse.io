@@ -3,7 +3,6 @@ import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { ReactElement, ReactNode, useEffect, useMemo, useState } from 'react';
-import { Provider as ReduxProvider } from 'react-redux';
 import createCache from '@emotion/cache';
 import { CacheProvider, Global } from '@emotion/react'; // create a cache so we dont conflict with emotion from react-windowed-select
 import type { ExternalProvider, JsonRpcFetchFunc } from '@ethersproject/providers';
@@ -19,10 +18,8 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import log from 'lib/log';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import RouteGuard from 'components/common/RouteGuard';
-import store from 'components/common/BoardEditor/focalboard/src/store';
-import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import FocalBoardProvider from 'components/common/BoardEditor/FocalBoardProvider';
 import { setTheme as setFocalBoardTheme } from 'components/common/BoardEditor/focalboard/src/theme';
-import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
 import Snackbar from 'components/common/Snackbar';
 import IntlProvider from 'components/common/IntlProvider';
@@ -37,6 +34,7 @@ import { PageTitleProvider, usePageTitle } from 'hooks/usePageTitle';
 import { SpacesProvider } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
 import { SnackbarProvider } from 'hooks/useSnackbar';
+import HexagonalAvatarMask from 'components/common/HexagonalAvatarMask';
 
 import '@bangle.dev/tooltip/style.css';
 import '@skiff-org/prosemirror-tables/style/tables.css';
@@ -246,9 +244,9 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
         <ThemeProvider theme={theme}>
           <Web3ReactProvider getLibrary={getLibrary}>
             <Web3ConnectionManager>
-              <ReduxProvider store={store}>
-                <IntlProvider>
-                  <DataProviders>
+              <DataProviders>
+                <FocalBoardProvider>
+                  <IntlProvider>
                     <SnackbarProvider>
                       <PageMetaTags />
                       <CssBaseline enableColorScheme={true} />
@@ -268,13 +266,14 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
                             handleClose={() => setIsOldBuild(false)}
                           />
                           {getLayout(<Component {...pageProps} />)}
+                          <HexagonalAvatarMask id='hexagon-avatar' />
                           <Snackbar />
                         </ErrorBoundary>
                       </RouteGuard>
                     </SnackbarProvider>
-                  </DataProviders>
-                </IntlProvider>
-              </ReduxProvider>
+                  </IntlProvider>
+                </FocalBoardProvider>
+              </DataProviders>
             </Web3ConnectionManager>
           </Web3ReactProvider>
         </ThemeProvider>
@@ -284,14 +283,6 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
 }
 
 function DataProviders ({ children }: { children: ReactNode }) {
-  const dispatch = useAppDispatch();
-  const router = useRouter();
-  useEffect(() => {
-    log.debug('Load focalboard data');
-    if (router.query.domain) {
-      dispatch(initialLoad());
-    }
-  }, [router.query.domain]);
 
   return (
     <UserProvider>

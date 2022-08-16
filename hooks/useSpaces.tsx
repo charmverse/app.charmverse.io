@@ -10,7 +10,7 @@ export const SpacesContext = createContext<Readonly<IContext>>([[], () => undefi
 
 export function SpacesProvider ({ children }: { children: ReactNode }) {
 
-  const [user, _, isUserLoaded] = useUser();
+  const { user, isLoaded: isUserLoaded } = useUser();
   const [spaces, setSpaces] = useState<Space[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const router = useRouter();

@@ -25,11 +25,8 @@ describe('updateBountySettings', () => {
       createdBy: user.id,
       spaceId: space.id,
       // Different values from what will be updated
-      title: 'My bounty',
       approveSubmitters: true,
       chainId: 2,
-      description: 'Old description',
-      descriptionNodes: '{"type":"doc","content":[{"type":"paragraph","content":[{"text":"Old description","type":"text"}]}]}',
       maxSubmissions: 3,
       rewardAmount: 4,
       rewardToken: 'ETH'
@@ -61,7 +58,6 @@ describe('updateBountySettings', () => {
     const bounty = await createBounty({
       createdBy: user.id,
       spaceId: space.id,
-      title: 'My bounty',
       status: 'suggestion'
     });
 
@@ -83,7 +79,6 @@ describe('updateBountySettings', () => {
     const bounty = await createBounty({
       createdBy: user.id,
       spaceId: space.id,
-      title: 'My bounty',
       status: 'suggestion'
     });
 

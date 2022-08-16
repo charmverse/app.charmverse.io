@@ -54,7 +54,6 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
   const { draftBounty } = useBounties();
   // Only populate bounty permission data if this is a bounty page
   const [bountyPermissions, setBountyPermissions] = useState<AssignedBountyPermissions | null>(null);
-
   async function refreshBountyPermissions (bountyId: string) {
     setBountyPermissions(await charmClient.computeBountyPermissions({
       resourceId: bountyId

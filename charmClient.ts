@@ -5,8 +5,7 @@ import {
 } from '@prisma/client';
 import * as http from 'adapters/http';
 import type { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/focalboard/src/blocks/block';
-import type { IWorkspace } from 'components/common/BoardEditor/focalboard/src/blocks/workspace';
-import type { IUser, UserWorkspace } from 'components/common/BoardEditor/focalboard/src/user';
+import type { IUser } from 'components/common/BoardEditor/focalboard/src/user';
 import type { FiatCurrency, IPairQuote } from 'connectors';
 import type { FailedImportsError } from 'lib/notion/types';
 import type { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee, IPagePermissionWithSource, SpaceDefaultPublicPageToggle } from 'lib/permissions/pages/page-permission-interfaces';
@@ -19,7 +18,7 @@ import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDoma
 import type { ApplicationWithTransactions, ReviewDecision, SubmissionContent, SubmissionCreationData } from 'lib/applications/interfaces';
 import type { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
 import type { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
-import type { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
+import type { MultipleThreadsInput, ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import type { TokenGateVerification, TokenGateEvaluationAttempt, TokenGateEvaluationResult, TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import type { ConnectDiscordPayload, ConnectDiscordResponse } from 'pages/api/discord/connect';
 import type { ImportDiscordRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
@@ -37,6 +36,9 @@ import type { TransactionCreationData } from 'lib/transactions/interface';
 import type { ExtendedVote, UserVoteExtendedDTO, VoteDTO } from 'lib/votes/interfaces';
 import type { PublicUser } from 'pages/api/public/profile/[userPath]';
 import type { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
+import { encodeFilename } from 'lib/utilities/encodeFilename';
+import { ProfileApi } from 'lib/charmClient/profileApi';
+import { NftApi } from './lib/charmClient/nftApi';
 import type { AssignedPermissionsQuery, Resource } from './lib/permissions/interfaces';
 import type { SpacePermissionConfigurationUpdate } from './lib/permissions/meta/interfaces';
 import type { SpacePermissionFlags, SpacePermissionModification } from './lib/permissions/spaces';
@@ -47,6 +49,10 @@ type BlockUpdater = (blocks: FBBlock[]) => void;
 // CharmClient is the client interface to the server APIs
 //
 class CharmClient {
+  nft = new NftApi();
+
+  profile = new ProfileApi();
+
   async login (address: string) {
     const user = await http.POST<LoggedInUser>('/api/session/login', {
       address
@@ -253,37 +259,8 @@ class CharmClient {
     return http.POST<{importedRolesCount: number}>('/api/guild-xyz/importRoles', payload);
   }
 
-  // FocalBoard
-
-  // TODO: we shouldn't have to ask the server for the current space, but it will take time to pass spaceId through focalboard!
-
-  async getWorkspace (): Promise<IWorkspace> {
-    const space = await http.GET<Space>('/api/spaces/current');
-    if (!space) {
-      throw new Error('No workspace found');
-    }
-    return {
-      id: space.id,
-      title: space.name,
-      signupToken: '',
-      settings: {},
-      updatedBy: space.updatedBy,
-      updatedAt: space.updatedAt ? new Date(space.updatedAt).getTime() : 0
-    };
-  }
-
-  async getUserWorkspaces (): Promise<UserWorkspace[]> {
-    const spaces = await this.getSpaces();
-    return spaces.map(space => ({
-      id: space.id,
-      title: space.name,
-      boardCount: 0
-    }));
-  }
-
-  async getWorkspaceUsers (): Promise<IUser[]> {
-    const currentSpace = await this.getWorkspace();
-    const contributors = await this.getContributors(currentSpace.id);
+  async getWorkspaceUsers (spaceId: string): Promise<IUser[]> {
+    const contributors = await this.getContributors(spaceId);
 
     return contributors.map((contributor: Contributor) => ({
       id: contributor.id,
@@ -300,8 +277,8 @@ class CharmClient {
     return http.GET<Space>(`/api/spaces/${spaceId}/public`);
   }
 
-  async getAllBlocks (): Promise<FBBlock[]> {
-    return http.GET<Block[]>('/api/blocks')
+  async getAllBlocks (spaceId: string): Promise<FBBlock[]> {
+    return http.GET<Block[]>('/api/blocks', { spaceId })
       .then(blocks => blocks.map(this.blockToFBBlock))
       .then(blocks => this.fixBlocks(blocks));
   }
@@ -499,9 +476,7 @@ class CharmClient {
 
   // AWS
   uploadToS3 (file: File): Promise<{ token: any, bucket: string, key: string, region: string }> {
-    const extension = file.name.split('.').pop() || ''; // lowercase the extension to simplify possible values
-    const filename = encodeURIComponent(file.name.replace(extension, extension.toLowerCase()));
-    return http.GET('/api/aws/s3-upload', { filename });
+    return http.GET('/api/aws/s3-upload', { filename: encodeFilename(file.name) });
   }
 
   deleteFromS3 (src: string) {
@@ -621,6 +596,10 @@ class CharmClient {
     return http.DELETE('/api/permissions', { permissionId });
   }
 
+  restrictPagePermissions ({ pageId }: {pageId: string}): Promise<IPageWithPermissions> {
+    return http.POST(`/api/pages/${pageId}/restrict-permissions`, {});
+  }
+
   addSpacePermissions ({ forSpaceId, operations, roleId, spaceId, userId }: SpacePermissionModification): Promise<SpacePermissionFlags> {
     return http.POST<SpacePermissionFlags>(`/api/permissions/space/${forSpaceId}/add`, {
       operations,
@@ -660,6 +639,10 @@ class CharmClient {
 
   resolveThread (threadId: string, request: ResolveThreadRequest) {
     return http.PUT(`/api/threads/${threadId}/resolve`, request);
+  }
+
+  resolveMultipleThreads (payload: MultipleThreadsInput) {
+    return http.POST('/api/threads/resolve', payload);
   }
 
   addComment (request: Omit<CommentCreate, 'userId'>): Promise<CommentWithUser> {

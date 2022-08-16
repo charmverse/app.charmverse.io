@@ -39,7 +39,7 @@ export default function GnosisSafesList () {
   const { data: safeData, mutate } = useMultiWalletSigs();
 
   const gnosisSigner = useGnosisSigner();
-  const [user] = useUser();
+  const { user } = useUser();
   const [isLoadingSafes, setIsLoadingSafes] = useState(false);
 
   async function importSafes () {

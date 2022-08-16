@@ -8,6 +8,7 @@ import { ethers } from 'ethers';
 import { BigNumber } from '@ethersproject/bignumber';
 import { getChainById } from 'connectors';
 import { isValidChainAddress } from 'lib/tokens/validation';
+import { SupportedChainId } from 'lib/blockchain/provider/alchemy';
 import ERC20ABI from '../../../../../../../abis/ERC20ABI.json';
 
 interface Props {
@@ -150,7 +151,7 @@ export default function BountyPaymentButton ({
         if (typeof tokenDecimals !== 'number') {
           try {
             const tokenInfo = await charmClient.getTokenMetaData({
-              chainId: chainToUse!.chainId,
+              chainId: chainToUse!.chainId as SupportedChainId,
               contractAddress: tokenSymbolOrAddress
             });
             tokenDecimals = tokenInfo.decimals;

@@ -52,6 +52,9 @@ export async function evalueTokenGateEligibility ({ authSig, spaceIdOrDomain, us
     space.TokenGate.map(tokenGate => {
       return litClient.getSignedToken({
         authSig,
+        // note that we used to store 'chain' but now it is an array
+        // TODO: migrate old token gate conditions to all be an array?
+        chain: (tokenGate.conditions as any).chains?.[0],
         resourceId: tokenGate.resourceId,
         ...tokenGate.conditions as any
       })

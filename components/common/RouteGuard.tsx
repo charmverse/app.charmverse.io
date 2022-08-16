@@ -20,11 +20,11 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   const [authorized, setAuthorized] = useState(true);
   const { triedEager } = useContext(Web3Connection);
   const { account } = useWeb3React();
-  const [user, setUser, isUserRequestComplete] = useUser();
-  const [spaces, _, isSpacesLoaded] = useSpaces();
+  const { user, setUser, isLoaded } = useUser();
+  const [spaces,, isSpacesLoaded] = useSpaces();
   const isWalletLoading = (!triedEager && !account);
   const isRouterLoading = !router.isReady;
-  const isLoading = !isUserRequestComplete || isWalletLoading || isRouterLoading || !isSpacesLoaded;
+  const isLoading = !isLoaded || isWalletLoading || isRouterLoading || !isSpacesLoaded;
 
   if (typeof window !== 'undefined') {
     const pathSegments: string[] = router.asPath.split('?')[0].split('/').filter(segment => !!segment);

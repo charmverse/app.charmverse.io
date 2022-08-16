@@ -37,7 +37,7 @@ export default function Workspaces () {
   const [space] = useCurrentSpace();
   const [spaces, setSpaces] = useSpaces();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
-  const [, setUser] = useUser();
+  const { setUser } = useUser();
 
   function showSpaceForm () {
     setSpaceFormOpen(true);
