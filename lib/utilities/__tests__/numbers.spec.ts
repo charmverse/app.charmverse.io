@@ -1,4 +1,4 @@
-import { countValueOccurrences } from '../numbers';
+import { countValueOccurrences, nanofy } from '../numbers';
 
 type Fruit = 'banana' | 'watermelon' | 'mango'
 
@@ -29,5 +29,66 @@ describe('countValueOccurrences', () => {
 
   it('should return a matching breakdown and total', () => {
     expect(counted.total).toBe(3);
+  });
+});
+
+describe('nanofy', () => {
+  it('should return the number if it is equal to or above 1', () => {
+
+    const above1 = 1.0033454;
+
+    expect(nanofy({ number: above1 })).toEqual(above1.toString());
+    expect(nanofy({ number: 1 })).toEqual('1');
+  });
+
+  it('should return the 3 most significant digits with the correct unit, and a space if this parameter is provided', () => {
+
+    const milliNum = 0.99722345;
+    const microNum = milliNum / 1000;
+    const nanoNum = microNum / 1000;
+    const picoNum = nanoNum / 1000;
+    const femtoNum = picoNum / 1000;
+    const attoNum = femtoNum / 1000;
+
+    expect(nanofy({ number: milliNum })).toBe('997m');
+
+    expect(nanofy({ number: microNum, spaceUnit: true })).toBe('997 µ');
+
+    // Don't provide spaceUnit to check that the default false behaviour is respected
+    expect(nanofy({ number: nanoNum })).toBe('997n');
+
+    expect(nanofy({ number: picoNum, spaceUnit: true })).toBe('997 p');
+
+    expect(nanofy({ number: femtoNum, spaceUnit: false })).toBe('997f');
+
+    expect(nanofy({ number: attoNum, spaceUnit: true })).toBe('997 a');
+
+  });
+
+  it('should work when the first decimal is 0', () => {
+
+    const milliNum = 0.0099722;
+    const microNum = milliNum / 1000;
+    const nanoNum = microNum / 1000;
+    const picoNum = nanoNum / 1000;
+    const femtoNum = picoNum / 1000;
+    const attoNum = femtoNum / 1000;
+
+    expect(nanofy({ number: milliNum })).toBe('9.97m');
+
+    expect(nanofy({ number: microNum, spaceUnit: true })).toBe('9.97 µ');
+
+    // Don't provide spaceUnit to check that the default false behaviour is respected
+    expect(nanofy({ number: nanoNum })).toBe('9.97n');
+
+    expect(nanofy({ number: picoNum, spaceUnit: true })).toBe('9.97 p');
+
+    expect(nanofy({ number: femtoNum, spaceUnit: false })).toBe('9.97f');
+
+    expect(nanofy({ number: attoNum, spaceUnit: true })).toBe('9.97 a');
+
+    const numberWithZero = 0.0090004;
+    expect(nanofy({ number: numberWithZero })).toBe('9m');
+
   });
 });

@@ -1,5 +1,7 @@
 /* eslint-disable */
 
+import { isTruthy } from "./types";
+
 // source: https://stackoverflow.com/questions/1685680/how-to-avoid-scientific-notation-for-large-numbers-in-javascript
 
 /** ****************************************************************
@@ -53,5 +55,68 @@ export function countValueOccurrences<V extends string, T = any>(objectList: T [
   reduced.total = objectList.length
 
   return reduced
+}
+
+/**
+ * Use this for converting numbers between 0 and 1 to a prefixed number
+ * @abstract Only works up to atto (10^-18)
+ * @param number 
+ * @param spaceUnit Whether to add spacing for the target unit. Defaults to false
+ */
+export function nanofy({number, spaceUnit = false}: {number: string | number, spaceUnit?: boolean}): string {
+
+  let parsedAsNum = parseFloat(number.toString());
+
+  if (parsedAsNum >= 1 || parsedAsNum <= -1) {
+    return parsedAsNum.toString()
+  } else if (!isTruthy(parsedAsNum)) {
+    return "0";
+  }
+
+  // This prevents scientific notation being used
+  // See https://stackoverflow.com/a/1685917 for more information
+  let numberAsString = parsedAsNum.toFixed(20)
+
+  // milli (3), micro (6), nano (9), pico (12), femto (15), atto (18)
+  const units = ['m', 'µ', 'n', 'p', 'f', 'a'];
+
+
+  let splitted = numberAsString.split("")
+    // Remove the decimal dot
+    .slice(2);
+
+  let rebuiltString = '';
+  let currentUnit = ''
+
+  for (let i = 0; i < splitted.length; i++) {
+
+    if (i % 3 === 0 && rebuiltString === '') {
+      currentUnit = units[units.indexOf(currentUnit) + 1]
+    } else if (i % 3 === 0 && rebuiltString !== '') {
+      rebuiltString += '.'
+    }
+
+    const currentCharacter = splitted[i];
+
+    // Ensure the leading character is not 0
+    if (currentCharacter !== '0' || rebuiltString.length >= 1) {
+      rebuiltString += currentCharacter
+    }
+
+    if ((rebuiltString.length === 3 && !rebuiltString.match(".")) || rebuiltString.length === 4) {
+      break;
+    }
+
+  }
+
+  // Prevent last character being a dot or a bunch of zeros
+  if (rebuiltString[rebuiltString.length - 1] === ".") {
+    rebuiltString = rebuiltString.slice(0, rebuiltString.length -1)
+  } else if (parseInt(rebuiltString.split(".")[1] ?? "0") === 0) {
+    rebuiltString = rebuiltString.split(".")[0]
+  }
+
+  return `${rebuiltString}${spaceUnit? ' ' : ''}${currentUnit}`
+
 }
 
