@@ -405,16 +405,11 @@ function SuggestModeToggleButton (
   {suggestMode: boolean, onSuggestModeChange: () => void, onSuggestModeToEditMode: (pluginState: TrackPluginState) => void}
 ) {
   const view = useEditorViewContext();
-  const { commit } = getTrackPluginState(view.state);
-
   const { state, dispatch } = view;
   return (
     <Button onClick={() => {
       if (!suggestMode) {
-        const { commit: next, mapping } = rebases.without(commit, [commit._id]);
-        if (next) {
-          view.updateState(checkout(state.doc, state, next, mapping));
-        }
+        view.updateState(reset(state.doc, state));
         // Reset plugin state
         // reset(state.doc, state);
       }
@@ -482,7 +477,7 @@ function CharmEditor (
     if (pageId && prevDoc) {
       onThreadResolveDebounced(pageId, view.state.doc, prevDoc);
     }
-    onContentChange({ doc, rawText, suggestion });
+    onContentChange({ doc, rawText, suggestion: suggestion ?? undefined });
   }, 100) : undefined;
 
   function _onContentChange (view: EditorView, prevDoc: Node<any>) {
