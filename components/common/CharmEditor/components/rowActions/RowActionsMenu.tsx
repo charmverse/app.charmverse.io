@@ -5,7 +5,8 @@ import { ContentCopy as DuplicateIcon, DeleteOutlined as DeleteIcon, DragIndicat
 import { ListItemIcon, ListItemText, Menu, ListItemButton, MenuProps } from '@mui/material';
 import { Page } from '@prisma/client';
 import charmClient from 'charmClient';
-import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
+import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
@@ -29,10 +30,11 @@ const menuPosition: Partial<MenuProps> = {
 function Component ({ menuState }: { menuState: PluginState }) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'user-role' });
   const view = useEditorViewContext();
-  const { currentPageId, pages } = usePages();
+  const { deletePage, currentPageId, pages } = usePages();
   const currentPage = pages[currentPageId];
   const [currentSpace] = useCurrentSpace();
   const dispatch = useAppDispatch();
+  const boards = useAppSelector(getSortedBoards);
 
   function _getNode () {
     if (!menuState.rowPos || !menuState.rowDOM) {
@@ -86,6 +88,18 @@ function Component ({ menuState }: { menuState: PluginState }) {
       }
       view.dispatch(view.state.tr.deleteRange(start, end));
       popupState.close();
+
+      // If its an embedded inline database delete the board page
+      if (node.node.attrs?.type === 'embedded') {
+        const page = pages[node.node.attrs.pageId];
+        const board = boards.find(b => b.id === page?.id);
+        if (page) {
+          deletePage({
+            board,
+            pageId: page.id
+          });
+        }
+      }
     }
   }
 

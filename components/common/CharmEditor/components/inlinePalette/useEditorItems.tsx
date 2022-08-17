@@ -743,7 +743,8 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
             const node = _state.schema.nodes.inlineDatabase.create({
               source: 'board_page',
               pageId: page.id,
-              viewId: boardView?.id
+              viewId: boardView?.id,
+              type: 'embedded'
             });
             if (_dispatch && isAtBeginningOfLine(state)) {
               _dispatch(_state.tr.replaceSelectionWith(node));

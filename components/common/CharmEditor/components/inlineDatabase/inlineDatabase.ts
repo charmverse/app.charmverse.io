@@ -21,6 +21,9 @@ function databaseSpec (): BaseRawNodeSpec {
         },
         source: {
           default: null
+        },
+        type: {
+          default: 'linked'
         }
       },
       atom: true,
