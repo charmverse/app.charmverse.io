@@ -18,7 +18,7 @@ export async function addPage ({ createdBy, spaceId, ...page }: NewPageInput) {
 
   const pageProperties: Partial<Page> = {
     id,
-    boardId: page.type === 'board' ? id : undefined,
+    boardId: (page.type === 'board' || page.type === 'inline_board') ? id : undefined,
     content: undefined as any,
     contentText: '',
     createdAt: new Date(),
