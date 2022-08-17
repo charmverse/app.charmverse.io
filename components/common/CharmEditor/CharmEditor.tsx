@@ -1,28 +1,11 @@
-import {
-  bold,
-  bulletList,
-  code,
-  hardBreak,
-  heading,
-  horizontalRule,
-  italic,
-  link,
-  listItem,
-  orderedList,
-  strike,
-  underline
-} from '@bangle.dev/base-components';
-import { BangleEditorState, NodeView, Plugin, RawPlugins } from '@bangle.dev/core';
+import { BangleEditorState } from '@bangle.dev/core';
 import { markdownSerializer } from '@bangle.dev/markdown';
-import { EditorState, EditorView, Node, PluginKey, Schema } from '@bangle.dev/pm';
+import { EditorState, EditorView, Node } from '@bangle.dev/pm';
 import { useEditorState, useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import trackPlugin, { commands as trackChangesCommands, Commit, commitFromJSON, commitToJSON, getTrackPluginState, reset } from '@manuscripts/track-changes';
-import { TrackPluginState } from '@manuscripts/track-changes/build/types/src/plugin';
+import { commands as trackChangesCommands, Commit, commitToJSON, getTrackPluginState, reset } from '@manuscripts/track-changes';
 import { Box, Button, Divider, Slide } from '@mui/material';
 import charmClient from 'charmClient';
-import * as codeBlock from 'components/common/CharmEditor/components/@bangle.dev/base-components/code-block';
-import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import CommentsSidebar from 'components/[pageId]/DocumentPage/components/CommentsSidebar';
@@ -40,32 +23,25 @@ import { PageContent } from 'models';
 import { CSSProperties, memo, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { useSWRConfig } from 'swr';
 import { v4 } from 'uuid';
-import Callout, * as callout from './components/callout';
-import { userDataPlugin } from './components/charm/charm.plugins';
-import * as columnLayout from './components/columnLayout';
+import Callout from './components/callout';
 import LayoutColumn from './components/columnLayout/Column';
 import LayoutRow from './components/columnLayout/Row';
 import { CryptoPrice } from './components/CryptoPrice';
-import * as disclosure from './components/disclosure';
-import EmojiSuggest, * as emoji from './components/emojiSuggest';
+import EmojiSuggest from './components/emojiSuggest';
 import * as floatingMenu from './components/floatingMenu';
 import * as iframe from './components/iframe';
-import InlineCommentThread, * as inlineComment from './components/inlineComment';
-import InlinePalette, { plugins as inlinePalettePlugins } from './components/inlinePalette';
-import * as inlineVote from './components/inlineVote';
+import InlineCommentThread from './components/inlineComment';
+import InlinePalette from './components/inlinePalette';
 import InlineVoteList from './components/inlineVote/components/InlineVoteList';
-import Mention, { mentionPluginKeyName, mentionPlugins, MentionSuggest } from './components/mention';
-import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList } from './components/nestedPage';
-import paragraph from './components/paragraph';
+import Mention, { MentionSuggest } from './components/mention';
+import NestedPage, { NestedPagesList } from './components/nestedPage';
 import Placeholder from './components/Placeholder';
 import Quote from './components/quote';
 import ResizableImage from './components/ResizableImage';
 import ResizablePDF from './components/ResizablePDF';
-import RowActionsMenu, * as rowActions from './components/rowActions';
-import * as tabIndent from './components/tabIndent';
-import * as table from './components/table';
-import * as trailingNode from './components/trailingNode';
+import RowActionsMenu from './components/rowActions';
 import DevTools from './DevTools';
+import { actionsPluginKey, charmEditorPlugins, emojiPluginKey, floatingMenuPluginKey, inlineCommentPluginKey, inlineVotePluginKey, mentionPluginKey, nestedPagePluginKey } from './plugins';
 import { specRegistry } from './specRegistry';
 import { checkForEmpty } from './utils';
 
@@ -73,162 +49,6 @@ export interface ICharmEditorOutput {
   doc: PageContent,
   rawText: string
   suggestion: any
-}
-
-const actionsPluginKey = new PluginKey('row-actions');
-const emojiPluginKey = new PluginKey(emoji.pluginKeyName);
-const mentionPluginKey = new PluginKey(mentionPluginKeyName);
-const floatingMenuPluginKey = new PluginKey('floatingMenu');
-const nestedPagePluginKey = new PluginKey(nestedPagePluginKeyName);
-const inlineCommentPluginKey = new PluginKey(inlineComment.pluginKeyName);
-const inlineVotePluginKey = new PluginKey(inlineVote.pluginKeyName);
-
-export function charmEditorPlugins (
-  {
-    onContentChange,
-    readOnly,
-    disablePageSpecificFeatures = false,
-    enableVoting,
-    enableComments = true,
-    userId = null,
-    pageId = null,
-    spaceId = null,
-    content = undefined,
-    suggestMode = false,
-    suggestion = null,
-    schema
-  }:
-    {
-      spaceId?: string | null,
-      pageId?: string | null,
-      userId?: string | null,
-      readOnly?: boolean,
-      onContentChange?: (view: EditorView, prevDoc: EditorState['doc']) => void,
-      disablePageSpecificFeatures?: boolean,
-      enableVoting?: boolean,
-      enableComments?: boolean,
-      content?: Node,
-      suggestMode?: boolean,
-      suggestion?: any | null,
-      schema?: Schema
-    } = {}
-): () => RawPlugins[] {
-
-  const basePlugins: RawPlugins[] = [
-    new Plugin({
-      view: () => ({
-        update: (view, prevState) => {
-          if (onContentChange && !view.state.doc.eq(prevState.doc)) {
-            onContentChange(view, prevState.doc);
-          }
-        }
-      })
-    }),
-    userDataPlugin({
-      userId,
-      pageId,
-      spaceId
-    }),
-    nestedPagePlugins({
-      key: nestedPagePluginKey
-    }),
-    imagePlugins({
-      handleDragAndDrop: false
-    }),
-    mentionPlugins({
-      key: mentionPluginKey
-    }),
-    inlinePalettePlugins(),
-    bold.plugins(),
-    bulletList.plugins(),
-    code.plugins(),
-    codeBlock.plugins(),
-    hardBreak.plugins(),
-    heading.plugins(),
-    horizontalRule.plugins(),
-    italic.plugins(),
-    link.plugins(),
-    listItem.plugins(),
-    orderedList.plugins(),
-    columnLayout.plugins(),
-    paragraph.plugins(),
-    strike.plugins(),
-    underline.plugins(),
-    emoji.plugins({
-      key: emojiPluginKey
-    }),
-    floatingMenu.plugins({
-      key: floatingMenuPluginKey,
-      readOnly,
-      enableComments
-    }),
-    callout.plugins(),
-    NodeView.createPlugin({
-      name: 'image',
-      containerDOM: ['div', { draggable: 'false' }]
-    }),
-    NodeView.createPlugin({
-      name: 'horizontalRule',
-      containerDOM: ['div', { draggable: 'false' }]
-    }),
-    NodeView.createPlugin({
-      name: 'pdf',
-      containerDOM: ['div', { draggable: 'false' }]
-    }),
-    NodeView.createPlugin({
-      name: 'cryptoPrice',
-      containerDOM: ['div']
-    }),
-    NodeView.createPlugin({
-      name: 'iframe',
-      containerDOM: ['div', { class: 'iframe-container', draggable: 'false' }]
-    }),
-    NodeView.createPlugin({
-      name: 'quote',
-      containerDOM: ['blockquote', { class: 'charm-quote' }],
-      contentDOM: ['div']
-    }),
-    tabIndent.plugins(),
-    table.tableEditing({ allowTableNodeSelection: true }),
-    table.columnHandles(),
-    table.columnResizing({}),
-    // @ts-ignore missing type
-    table.tablePopUpMenu(),
-    // @ts-ignore missing type
-    table.tableHeadersMenu(),
-    // @ts-ignore missing type
-    table.selectionShadowPlugin(),
-    // @ts-ignore missing type
-    table.TableFiltersMenu(),
-    trailingNode.plugins(),
-    disclosure.plugins()
-    // TODO: Pasting iframe or image link shouldn't create those blocks for now
-    // iframePlugin,
-    // pasteImagePlugin
-  ];
-
-  if (!readOnly) {
-    basePlugins.push(trackPlugin({
-      ancestorDoc: content,
-      commit: suggestion && schema ? commitFromJSON(suggestion, schema) : undefined
-    }));
-    basePlugins.push(rowActions.plugins({
-      key: actionsPluginKey
-    }));
-  }
-
-  if (!disablePageSpecificFeatures) {
-    basePlugins.push(inlineComment.plugin({
-      key: inlineCommentPluginKey
-    }));
-    if (enableVoting) {
-      basePlugins.push(inlineVote.plugin({
-        key: inlineVotePluginKey
-      }));
-    }
-  }
-
-  return () => basePlugins;
 }
 
 const StyledReactBangleEditor = styled(ReactBangleEditor)<{disablePageSpecificFeatures?: boolean, suggestMode?: boolean}>`

@@ -111,7 +111,6 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
   const showPageActionSidebar = (currentPageActionDisplay !== null) && !insideModal;
   const router = useRouter();
   const isSharedPage = router.pathname.startsWith('/share');
-  const [isSuggestMode, setIsSuggestMode] = useState<boolean>(false);
 
   return (
     <ScrollableWindow
@@ -148,11 +147,6 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
             pageId={page.id}
             disablePageSpecificFeatures={isSharedPage}
             enableVoting={true}
-            suggestMode={isSuggestMode}
-            suggestion={page.suggestion}
-            onSuggestModeChange={() => {
-              setIsSuggestMode(!isSuggestMode);
-            }}
           >
             <PageHeader
               headerImage={page.headerImage}
