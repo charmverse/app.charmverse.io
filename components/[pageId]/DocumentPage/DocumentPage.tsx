@@ -147,6 +147,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
             pageId={page.id}
             disablePageSpecificFeatures={isSharedPage}
             enableVoting={true}
+            suggestion={page.suggestion}
           >
             <PageHeader
               headerImage={page.headerImage}

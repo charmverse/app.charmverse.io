@@ -298,14 +298,7 @@ function CharmEditor (
 
     const trackPluginState = getTrackPluginState(view.state);
 
-    const _suggestion = commitToJSON(buildCommit({
-      changeID: v4(),
-      blame: trackPluginState.commit.blame,
-      steps: [],
-      prev: trackPluginState.commit
-    }), '');
-
-    onContentChange({ doc, rawText, suggestion: _suggestion });
+    onContentChange({ doc, rawText, suggestion: commitToJSON(trackPluginState.commit, '') });
 
   }, 100) : undefined;
 
