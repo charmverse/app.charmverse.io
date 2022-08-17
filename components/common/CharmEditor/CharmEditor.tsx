@@ -16,9 +16,8 @@ import { BangleEditorState, NodeView, Plugin, RawPlugins } from '@bangle.dev/cor
 import { markdownSerializer } from '@bangle.dev/markdown';
 import { EditorState, EditorView, Node, PluginKey, Schema } from '@bangle.dev/pm';
 import { useEditorState, useEditorViewContext } from '@bangle.dev/react';
-import { uuid } from '@bangle.dev/utils';
 import styled from '@emotion/styled';
-import trackPlugin, { checkout, commands as trackChangesCommands, Commit, commitFromJSON, commitToJSON, getTrackPluginState, rebases, reset } from '@manuscripts/track-changes';
+import trackPlugin, { commands as trackChangesCommands, Commit, commitFromJSON, commitToJSON, getTrackPluginState, reset } from '@manuscripts/track-changes';
 import { TrackPluginState } from '@manuscripts/track-changes/build/types/src/plugin';
 import { Box, Button, Divider, Slide } from '@mui/material';
 import charmClient from 'charmClient';
@@ -41,7 +40,6 @@ import { PageContent } from 'models';
 import { CSSProperties, memo, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { useSWRConfig } from 'swr';
 import { v4 } from 'uuid';
-import { blameDecorationPlugin } from './components/blameDecoration';
 import Callout, * as callout from './components/callout';
 import { userDataPlugin } from './components/charm/charm.plugins';
 import * as columnLayout from './components/columnLayout';
@@ -402,27 +400,19 @@ export const buildCommit = (
 
 function SuggestModeToggleButton (
   { onSuggestModeChange, suggestMode, onSuggestModeToEditMode }:
-  {suggestMode: boolean, onSuggestModeChange: () => void, onSuggestModeToEditMode: (pluginState: TrackPluginState) => void}
+  {suggestMode: boolean, onSuggestModeChange: () => void, onSuggestModeToEditMode: () => void}
 ) {
   const view = useEditorViewContext();
-  const { commit } = getTrackPluginState(view.state);
-
   const { state, dispatch } = view;
   return (
     <Button onClick={() => {
       if (!suggestMode) {
-        const { commit: next, mapping } = rebases.without(commit, [commit._id]);
-        if (next) {
-          view.updateState(checkout(state.doc, state, next, mapping));
-        }
-        // Reset plugin state
-        // reset(state.doc, state);
+        view.updateState(reset(state.doc, state));
       }
       // Only create commit if we go from suggest mode -> edit mode
       if (suggestMode) {
-        const trackPluginState = getTrackPluginState(state);
         trackChangesCommands.freezeCommit()(state, dispatch, view);
-        onSuggestModeToEditMode(trackPluginState);
+        onSuggestModeToEditMode();
       }
       onSuggestModeChange();
     }}
@@ -482,7 +472,7 @@ function CharmEditor (
     if (pageId && prevDoc) {
       onThreadResolveDebounced(pageId, view.state.doc, prevDoc);
     }
-    onContentChange({ doc, rawText, suggestion });
+    onContentChange({ doc, rawText, suggestion: suggestion ?? undefined });
   }, 100) : undefined;
 
   function _onContentChange (view: EditorView, prevDoc: Node<any>) {
@@ -662,7 +652,8 @@ function CharmEditor (
       <SuggestModeToggleButton
         onSuggestModeChange={onSuggestModeChange}
         suggestMode={suggestMode}
-        onSuggestModeToEditMode={(trackPluginState) => {
+        onSuggestModeToEditMode={() => {
+          const trackPluginState = getTrackPluginState(state.pmState);
           // Create a new commit and store updated content for the page
           onContentChange?.({
             doc: state.pmState.doc.toJSON() as PageContent,
