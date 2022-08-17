@@ -75,7 +75,7 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
     },
     data: {
       ...req.body,
-      suggestion: req.body.suggestion === null ? Prisma.DbNull : undefined,
+      suggestion: req.body.suggestion === null ? Prisma.DbNull : req.body.suggestion,
       updatedAt: new Date(),
       updatedBy: userId
     },

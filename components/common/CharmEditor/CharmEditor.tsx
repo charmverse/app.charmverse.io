@@ -160,7 +160,6 @@ interface CharmEditorProps {
   enableVoting?: boolean;
   pageId?: string | null;
   suggestion?: any | null
-  suggestMode?: boolean
   onSuggestModeChange?: () => void
 }
 
@@ -220,19 +219,22 @@ export const buildCommit = (
 
 function SuggestModeToggleButton (
   { onSuggestModeChange, suggestMode, onSuggestModeToEditMode }:
-  {suggestMode: boolean, onSuggestModeChange: () => void, onSuggestModeToEditMode: () => void}
+  {suggestMode: boolean, onSuggestModeChange: () => void, onSuggestModeToEditMode: (view: EditorView) => void}
 ) {
   const view = useEditorViewContext();
   const { state, dispatch } = view;
   return (
     <Button onClick={() => {
+      // Moving into suggest mode
       if (!suggestMode) {
+        // Lock the current state as if no changes have been made
         view.updateState(reset(state.doc, state));
       }
+      // Moving back to edit mode
       // Only create commit if we go from suggest mode -> edit mode
       if (suggestMode) {
         trackChangesCommands.freezeCommit()(state, dispatch, view);
-        onSuggestModeToEditMode();
+        onSuggestModeToEditMode(view);
       }
       onSuggestModeChange();
     }}
@@ -252,7 +254,6 @@ function CharmEditor (
     disablePageSpecificFeatures = false,
     enableVoting,
     pageId,
-    suggestMode = false,
     suggestion = null,
     onSuggestModeChange
   }:
@@ -264,6 +265,8 @@ function CharmEditor (
   const _isEmpty = checkForEmpty(content);
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
   const { user } = useUser();
+  const [suggestMode, setSuggestMode] = useState(false);
+
   // eslint-disable-next-line
   const onThreadResolveDebounced = debounce((pageId: string, doc: EditorState['doc'], prevDoc: EditorState['doc']) => {
     const deletedThreadIds = extractDeletedThreadIds(
@@ -292,7 +295,18 @@ function CharmEditor (
     if (pageId && prevDoc) {
       onThreadResolveDebounced(pageId, view.state.doc, prevDoc);
     }
-    onContentChange({ doc, rawText, suggestion: suggestion ?? undefined });
+
+    const trackPluginState = getTrackPluginState(view.state);
+
+    const _suggestion = commitToJSON(buildCommit({
+      changeID: v4(),
+      blame: trackPluginState.commit.blame,
+      steps: [],
+      prev: trackPluginState.commit
+    }), '');
+
+    onContentChange({ doc, rawText, suggestion: _suggestion });
+
   }, 100) : undefined;
 
   function _onContentChange (view: EditorView, prevDoc: Node<any>) {
@@ -468,23 +482,12 @@ function CharmEditor (
         }
       }}
     >
-      {onSuggestModeChange && pageId && suggestMode !== undefined && suggestMode !== null && (
+      {pageId && (
       <SuggestModeToggleButton
-        onSuggestModeChange={onSuggestModeChange}
+        onSuggestModeChange={() => setSuggestMode(!suggestMode)}
         suggestMode={suggestMode}
-        onSuggestModeToEditMode={() => {
-          const trackPluginState = getTrackPluginState(state.pmState);
-          // Create a new commit and store updated content for the page
-          onContentChange?.({
-            doc: state.pmState.doc.toJSON() as PageContent,
-            rawText: state.pmState.doc.text as string,
-            suggestion: commitToJSON(buildCommit({
-              changeID: v4(),
-              blame: trackPluginState.commit.blame,
-              steps: [],
-              prev: trackPluginState.commit
-            }), '')
-          });
+        onSuggestModeToEditMode={(view: EditorView) => {
+          onContentChangeDebounced?.(view);
         }}
       />
       )}
