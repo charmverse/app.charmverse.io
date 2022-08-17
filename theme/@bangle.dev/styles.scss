@@ -26,7 +26,7 @@
   z-index: var(--z-index-modal);
 }
 
-.bangle-editor a {
+.bangle-editor a:not(.MuiTypography-root) {
   text-decoration: underline;
 }
 
@@ -196,12 +196,13 @@ img.ProseMirror-separator {
  * Component-Styling
  */
 
-.bangle-editor a {
+// Making sure inline database header link doesn't have underlines
+.bangle-editor a:not(.MuiTypography-root) {
   color: #4299e1;
   text-decoration: underline;
 }
 
-.bangle-editor a:hover {
+.bangle-editor a:hover:not(.MuiTypography-root) {
   color: #24659b;
   text-decoration: underline;
 }

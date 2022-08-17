@@ -1,7 +1,7 @@
 
 import dynamic from 'next/dynamic';
 import { useState, useEffect } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, IconButton, Typography } from '@mui/material';
 import { NodeViewProps } from '@bangle.dev/core';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { getViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
@@ -16,7 +16,10 @@ import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 import log from 'lib/log';
 import styled from '@emotion/styled';
 import { isTruthy } from 'lib/utilities/types';
+import Button from 'components/common/Button';
 
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 import BoardSelection from './BoardSelection';
 import ViewSelection from './ViewSelection';
 
@@ -26,6 +29,7 @@ const CenterPanel = dynamic(() => import('components/common/BoardEditor/focalboa
 });
 
 const StylesContainer = styled.div`
+  margin-top: ${({ theme }) => theme.spacing(2)};
 
   .BoardComponent {
     overflow: visible;
@@ -93,7 +97,7 @@ interface DatabaseViewAttrs {
 export default function DatabaseView ({ readOnly: readOnlyOverride, node, updateAttrs }: DatabaseViewProps) {
 
   const [attrs, setAttrs] = useState<DatabaseViewAttrs>(node.attrs as DatabaseViewAttrs);
-
+  const router = useRouter();
   const boards = useAppSelector(getSortedBoards);
   const board = boards.find(b => b.id === attrs.pageId);
   const cards = useAppSelector(getViewCardsSortedFilteredAndGrouped({
@@ -111,6 +115,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
 
   const boardPages = Object.values(pages).filter(p => p?.type === 'board').filter(isTruthy);
   const accessibleCards = cards.filter(card => pages[card.id]);
+  const boardPage = board ? pages[board.id] : null;
 
   const currentPagePermissions = getPagePermissions(attrs.pageId || '');
 
@@ -159,10 +164,23 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
   return (
     <>
       <StylesContainer className='focalboard-body'>
-        <Box mb={1}>
-          <Typography variant='h3'>
-            {board.title}
-          </Typography>
+        <Box display='flex' justifyContent='space-between'>
+          <Button
+            color='secondary'
+            variant='text'
+            sx={{
+              h3: {
+                textDecoration: 'none',
+                mt: 0
+              }
+            }}
+            href={`/${router.query.domain}/${boardPage?.path ?? board.id}`}
+            component='span'
+          >
+            <Typography variant='h3'>
+              {board.title || 'Untitled'}
+            </Typography>
+          </Button>
         </Box>
         <CenterPanel
           clientConfig={clientConfig}
