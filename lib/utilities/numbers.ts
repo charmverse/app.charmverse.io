@@ -103,7 +103,7 @@ export function nanofy({number, spaceUnit = false}: {number: string | number, sp
       rebuiltString += currentCharacter
     }
 
-    if ((rebuiltString.length === 3 && !rebuiltString.match(".")) || rebuiltString.length === 4) {
+    if ((rebuiltString.length === 3 && !rebuiltString.match(".")) || rebuiltString.length >= 4) {
       break;
     }
 
@@ -112,7 +112,11 @@ export function nanofy({number, spaceUnit = false}: {number: string | number, sp
   // Prevent last character being a dot or a bunch of zeros
   if (rebuiltString[rebuiltString.length - 1] === ".") {
     rebuiltString = rebuiltString.slice(0, rebuiltString.length -1)
+  // Drop decimals if there are only zeros
   } else if (parseInt(rebuiltString.split(".")[1] ?? "0") === 0) {
+    rebuiltString = rebuiltString.split(".")[0]
+  // If there are 3 significant digits before the decimal, drop the decimal
+  } else if (rebuiltString.match(".") !== null && rebuiltString.split(".")[0].length === 3) {
     rebuiltString = rebuiltString.split(".")[0]
   }
 

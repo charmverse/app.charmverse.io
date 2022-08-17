@@ -66,6 +66,31 @@ describe('nanofy', () => {
   });
 
   it('should work when the first decimal is 0', () => {
+    const milliNum = 0.099722;
+    const microNum = milliNum / 1000;
+    const nanoNum = microNum / 1000;
+    const picoNum = nanoNum / 1000;
+    const femtoNum = picoNum / 1000;
+    const attoNum = femtoNum / 1000;
+
+    expect(nanofy({ number: milliNum })).toBe('99.7m');
+
+    expect(nanofy({ number: microNum, spaceUnit: true })).toBe('99.7 µ');
+
+    // Don't provide spaceUnit to check that the default false behaviour is respected
+    expect(nanofy({ number: nanoNum })).toBe('99.7n');
+
+    expect(nanofy({ number: picoNum, spaceUnit: true })).toBe('99.7 p');
+
+    expect(nanofy({ number: femtoNum, spaceUnit: false })).toBe('99.7f');
+
+    expect(nanofy({ number: attoNum, spaceUnit: true })).toBe('99.7 a');
+
+    const numberWithZero = 0.0090004;
+    expect(nanofy({ number: numberWithZero })).toBe('9m');
+  });
+
+  it('should work when the first and second decimal is 0', () => {
 
     const milliNum = 0.0099722;
     const microNum = milliNum / 1000;
@@ -91,4 +116,5 @@ describe('nanofy', () => {
     expect(nanofy({ number: numberWithZero })).toBe('9m');
 
   });
+
 });
