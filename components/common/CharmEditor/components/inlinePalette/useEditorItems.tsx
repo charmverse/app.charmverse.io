@@ -24,6 +24,7 @@ import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import useNestedPage from 'components/common/CharmEditor/components/nestedPage/hooks/useNestedPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
+import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, VIDEO_ASPECT_RATIO } from 'lib/embed/constants';
 import { addPage } from 'lib/pages';
@@ -659,6 +660,7 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
   const { addNestedPage } = useNestedPage();
   const [space] = useCurrentSpace();
   const { user } = useUser();
+  const { currentPageId } = usePages();
   const [userSpacePermissions] = useCurrentSpacePermissions();
 
   const dynamicOther = [
@@ -740,7 +742,7 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
           // Execute the animation
           rafCommandExec(view!, (_state, _dispatch) => {
             // The page must be created before the node can be created
-            addPage({ type: 'inline_board', spaceId: space.id, createdBy: user.id }).then(({ page, view: boardView }) => {
+            addPage({ type: 'inline_board', parentId: currentPageId, spaceId: space.id, createdBy: user.id }).then(({ page, view: boardView }) => {
               const node = _state.schema.nodes.inlineDatabase.create({
                 source: 'board_page',
                 pageId: page.id,
