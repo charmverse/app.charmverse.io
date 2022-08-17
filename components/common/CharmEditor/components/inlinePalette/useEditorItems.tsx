@@ -739,7 +739,7 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
         return (state, dispatch, view) => {
           // Execute the animation
           rafCommandExec(view!, async (_state, _dispatch) => {
-            const { page, view: boardView } = await addPage({ type: 'board', spaceId: space.id, createdBy: user.id });
+            const { page, view: boardView } = await addPage({ type: 'inline_board', spaceId: space.id, createdBy: user.id });
             const node = _state.schema.nodes.inlineDatabase.create({
               source: 'board_page',
               pageId: page.id,

@@ -45,7 +45,7 @@ export async function addPage ({ createdBy, spaceId, ...page }: NewPageInput) {
     cards: [],
     view: null
   };
-  if (pageProperties.type === 'board') {
+  if (pageProperties.type === 'board' || pageProperties.type === 'inline_board') {
     const artifacts = await createDefaultBoardData(() => null, id);
     pageArtifacts.board = artifacts.board;
     pageArtifacts.view = artifacts.view;
@@ -56,7 +56,7 @@ export async function addPage ({ createdBy, spaceId, ...page }: NewPageInput) {
     return [...pages, newPage];
   }, {
     // revalidate pages for board since we create 3 default ones
-    revalidate: pageProperties.type === 'board'
+    revalidate: pageProperties.type === 'board' || pageProperties.type === 'inline_board'
   });
 
   return pageArtifacts;
