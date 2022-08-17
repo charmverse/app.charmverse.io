@@ -1,5 +1,5 @@
 
-import { Page } from '@prisma/client';
+import { Page, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { IPageWithPermissions, ModifyChildPagesResponse } from 'lib/pages';
@@ -75,6 +75,7 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
     },
     data: {
       ...req.body,
+      suggestion: req.body.suggestion === null ? Prisma.DbNull : undefined,
       updatedAt: new Date(),
       updatedBy: userId
     },
