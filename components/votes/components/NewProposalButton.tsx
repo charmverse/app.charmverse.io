@@ -13,7 +13,7 @@ export default function NewProposalButton () {
 
   async function onClickCreate () {
     if (currentSpace && user) {
-      const newPage = await addPage({
+      const { page: newPage } = await addPage({
         spaceId: currentSpace.id,
         createdBy: user.id,
         type: 'proposal'

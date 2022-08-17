@@ -15,18 +15,20 @@ import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
 import ImageIcon from '@mui/icons-material/Image';
 import InsertChartIcon from '@mui/icons-material/InsertChart';
 import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
-import PreviewIcon from '@mui/icons-material/Preview';
-import TextFieldsIcon from '@mui/icons-material/TextFields';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import PreviewIcon from '@mui/icons-material/Preview';
+import DatabaseIcon from '@mui/icons-material/TableChart';
+import TextFieldsIcon from '@mui/icons-material/TextFields';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import useNestedPage from 'components/common/CharmEditor/components/nestedPage/hooks/useNestedPage';
-import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MIN_EMBED_WIDTH, VIDEO_ASPECT_RATIO } from 'lib/embed/constants';
-import { PluginKey, TextSelection } from 'prosemirror-state';
-import { useMemo } from 'react';
-import DatabaseIcon from '@mui/icons-material/TableChart';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
+import { useUser } from 'hooks/useUser';
+import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, VIDEO_ASPECT_RATIO } from 'lib/embed/constants';
+import { addPage } from 'lib/pages';
+import { PluginKey, TextSelection } from 'prosemirror-state';
+import { useMemo } from 'react';
 import { insertNode } from '../../utils';
 import { NestedPagePluginState, nestedPageSuggestMarkName } from '../nestedPage';
 import {
@@ -625,7 +627,7 @@ const paletteGroupItemsRecord: Record<PaletteGroup, Omit<PaletteItemType, 'group
     }
   ],
   database: [{
-    uid: 'inlineDatabase',
+    uid: 'inlineLinkedDatabase',
     title: 'Linked view of database',
     icon: <DatabaseIcon sx={{ fontSize: 16 }} />,
     description: 'Embed a view from an existing board',
@@ -655,7 +657,8 @@ const sortedGroupList: PaletteGroup[] = ['list', 'media', 'other', 'text', 'data
 
 export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: PluginKey<NestedPagePluginState>}) {
   const { addNestedPage } = useNestedPage();
-
+  const [space] = useCurrentSpace();
+  const { user } = useUser();
   const [userSpacePermissions] = useCurrentSpacePermissions();
 
   const dynamicOther = [
@@ -725,6 +728,38 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
       })
     }
   ] as Omit<PaletteItemType, 'group'>[];
+
+  if (space && user) {
+    dynamicOther.push({
+      uid: 'inlineDatabase',
+      title: 'Database - inline',
+      icon: <DatabaseIcon sx={{ fontSize: 16 }} />,
+      description: 'Add a new inline database to this page',
+      editorExecuteCommand: () => {
+        return (state, dispatch, view) => {
+          // Execute the animation
+          rafCommandExec(view!, async (_state, _dispatch) => {
+            const { page, view: boardView } = await addPage({ type: 'board', spaceId: space.id, createdBy: user.id });
+            const node = _state.schema.nodes.inlineDatabase.create({
+              source: 'board_page',
+              pageId: page.id,
+              viewId: boardView?.id
+            });
+            if (_dispatch && isAtBeginningOfLine(state)) {
+              _dispatch(_state.tr.replaceSelectionWith(node));
+              return true;
+            }
+            return insertNode(_state, _dispatch, node);
+          });
+          return replaceSuggestionMarkWith(palettePluginKey, '')(
+            state,
+            dispatch,
+            view
+          );
+        };
+      }
+    });
+  }
 
   const allowedOther = dynamicOther.filter(paletteItem => {
     return !paletteItem.requiredSpacePermission
