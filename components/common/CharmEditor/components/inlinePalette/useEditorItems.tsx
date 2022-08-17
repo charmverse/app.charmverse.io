@@ -738,21 +738,23 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
           // Execute the animation
-          rafCommandExec(view!, async (_state, _dispatch) => {
+          rafCommandExec(view!, (_state, _dispatch) => {
             // The page must be created before the node can be created
-            const { page, view: boardView } = await addPage({ type: 'inline_board', spaceId: space.id, createdBy: user.id });
-            const node = _state.schema.nodes.inlineDatabase.create({
-              source: 'board_page',
-              pageId: page.id,
-              viewId: boardView?.id,
-              type: 'embedded'
-            });
+            addPage({ type: 'inline_board', spaceId: space.id, createdBy: user.id }).then(({ page, view: boardView }) => {
+              const node = _state.schema.nodes.inlineDatabase.create({
+                source: 'board_page',
+                pageId: page.id,
+                viewId: boardView?.id,
+                type: 'embedded'
+              });
 
-            if (_dispatch && isAtBeginningOfLine(state)) {
-              _dispatch(_state.tr.replaceSelectionWith(node));
-              return true;
-            }
-            return insertNode(_state, _dispatch, node);
+              if (_dispatch && isAtBeginningOfLine(state)) {
+                _dispatch(_state.tr.replaceSelectionWith(node));
+                return true;
+              }
+              return insertNode(_state, _dispatch, node);
+            });
+            return true;
           });
           return replaceSuggestionMarkWith(palettePluginKey, '')(
             state,
