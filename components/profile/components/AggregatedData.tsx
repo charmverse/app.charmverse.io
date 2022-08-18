@@ -65,7 +65,7 @@ interface DeepDaoOrganizationRowProps {
 
 const TASK_TABS = [
   { icon: <HowToVoteIcon />, label: 'Votes', type: 'vote' },
-  { icon: <ForumIcon />, label: 'Discussion', type: 'proposal' }
+  { icon: <ForumIcon />, label: 'Proposals', type: 'proposal' }
 ] as const;
 
 function DeepDaoOrganizationRow ({ votes, proposals, organization, earliestEventDate, latestEventDate }: DeepDaoOrganizationRowProps) {
@@ -76,7 +76,7 @@ function DeepDaoOrganizationRow ({ votes, proposals, organization, earliestEvent
   return (
     <Stack key={organization.organizationId} gap={1}>
       <Stack flexDirection='row' justifyContent='space-between'>
-        <Typography variant='h5'>{organization.name}</Typography>
+        <Typography fontWeight={500} variant='h5'>{organization.name}</Typography>
         <IconButton
           size='small'
           onClick={() => setIsCollapsed(!isCollapsed)}
@@ -84,7 +84,7 @@ function DeepDaoOrganizationRow ({ votes, proposals, organization, earliestEvent
           {isCollapsed ? <ExpandMoreIcon fontSize='small' /> : <ExpandLessIcon fontSize='small' />}
         </IconButton>
       </Stack>
-      <Typography variant='subtitle1'>{showDateWithMonthAndYear(earliestEventDate) ?? '?'} - {showDateWithMonthAndYear(latestEventDate) ?? '?'}</Typography>
+      <Typography>{showDateWithMonthAndYear(earliestEventDate) ?? '?'} - {showDateWithMonthAndYear(latestEventDate) ?? '?'}</Typography>
 
       <Collapse in={!isCollapsed}>
         <Box>
@@ -120,7 +120,7 @@ function DeepDaoOrganizationRow ({ votes, proposals, organization, earliestEvent
           {(currentTask === 'vote' ? (
             <Stack gap={2}>
               {votes.map((vote, voteNumber) => (
-                <Stack flexDirection='row' justifyContent='space-between'>
+                <Stack key={vote.voteId} flexDirection='row' justifyContent='space-between'>
                   <Stack flexDirection='row' gap={1} alignItems='center'>
                     {vote.successful ? <ThumbUpIcon color='success' fontSize='small' /> : <ThumbDownIcon color='error' fontSize='small' />}
                     <Typography fontWeight={500}>{voteNumber + 1}.</Typography>
@@ -130,7 +130,20 @@ function DeepDaoOrganizationRow ({ votes, proposals, organization, earliestEvent
                 </Stack>
               ))}
             </Stack>
-          ) : proposals.map(proposal => <Box>{proposal.title}</Box>))}
+          ) : (
+            <Stack gap={2}>
+              {proposals.map((proposal, proposalNumber) => (
+                <Stack key={proposal.proposalId} flexDirection='row' justifyContent='space-between'>
+                  <Stack flexDirection='row' gap={1} alignItems='center'>
+                    {proposal.outcome === proposal.voteChoice ? <ThumbUpIcon color='success' fontSize='small' /> : <ThumbDownIcon color='error' fontSize='small' />}
+                    <Typography fontWeight={500}>{proposalNumber + 1}.</Typography>
+                    <Typography>{proposal.title}</Typography>
+                  </Stack>
+                  <Typography variant='subtitle1'>{showDateWithMonthAndYear(proposal.createdAt, true)}</Typography>
+                </Stack>
+              ))}
+            </Stack>
+          ))}
         </Box>
       </Collapse>
     </Stack>
