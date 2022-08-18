@@ -29,7 +29,7 @@ export async function getAggregatedData (userPath: string, apiToken?: string): P
   )).filter(isTruthy);
 
   const profiles = (await Promise.all(
-    user.addresses.map(address => getProfile('0xef8305e140ac520225daf050e2f71d5fbcc543e7', apiToken)
+    user.addresses.map(address => getProfile(address, apiToken)
       .catch(error => {
         log.error('Error calling DEEP DAO API', error);
         return null;

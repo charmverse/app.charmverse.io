@@ -73,6 +73,9 @@ function DeepDaoOrganizationRow ({ votes, proposals, organization, earliestEvent
   const [currentTask, setCurrentTask] = useState<'vote' | 'proposal'>('vote');
   const theme = useTheme();
 
+  proposals = proposals.sort((proposalA, proposalB) => proposalA.createdAt > proposalB.createdAt ? -1 : 1);
+  votes = votes.sort((voteA, voteB) => voteA.createdAt > voteB.createdAt ? -1 : 1);
+
   return (
     <Stack key={organization.organizationId} gap={1}>
       <Stack flexDirection='row' justifyContent='space-between'>
@@ -186,7 +189,7 @@ export function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>) {
 
   // Sort the proposals and votes based on their created at date and attach organization data with it
   const events = [...data.proposals, ...data.votes]
-    .sort((eventA, eventB) => eventA.createdAt > eventB.createdAt ? -1 : 1)
+    .sort((eventA, eventB) => eventA.createdAt > eventB.createdAt ? 1 : -1)
     .map(event => ({ ...event, organization: organizationsRecord[event.organizationId] }));
 
   const organizationIdSet: Set<string> = new Set();
@@ -216,7 +219,7 @@ export function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>) {
     }
   });
 
-  const sortedOrganizations = sortedOrganizationIds.map(organizationId => organizationsRecord[organizationId]);
+  const sortedOrganizations = sortedOrganizationIds.reverse().map(organizationId => organizationsRecord[organizationId]);
 
   return (
     <Grid container display='flex' gap={2} flexDirection='column'>
