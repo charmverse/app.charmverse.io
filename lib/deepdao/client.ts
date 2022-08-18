@@ -14,35 +14,41 @@ interface DeepDaoParticipationScore {
   votes: number
 }
 
+export type DeepDaoOrganization = {
+  name: string
+  organizationId: string
+  description: string
+}
+
+export type DeepDaoProposal = {
+  title: string
+  status: string
+  choices: string[]
+  outcome: number
+  createdAt: string
+  description: string
+  voteChoice: number
+  organizationId: string
+  successfulVote: boolean
+}
+
+export type DeepDaoVote = {
+  title: string
+  daoId: string
+  organizationId: string
+  choices: string[]
+  voteId: string
+  createdAt: string
+  successful: null | boolean
+  description: string
+}
+
 export type DeepDaoProfile = {
   totalVotes: number
   totalProposals: number
-  organizations: {
-    name: string
-    organizationId: string
-    description: string
-  }[]
-  proposals: {
-    title: string
-    status: string
-    choices: string[]
-    outcome: number
-    createdAt: string
-    description: string
-    voteChoice: number
-    organizationId: string
-    successfulVote: boolean
-  }[]
-  votes: {
-    title: string
-    daoId: string
-    organizationId: string
-    choices: string[]
-    voteId: string
-    createdAt: string
-    successful: null | boolean
-    description: string
-  }[]
+  organizations: DeepDaoOrganization[]
+  proposals: DeepDaoProposal[]
+  votes: DeepDaoVote[]
 }
 
 type GetParticipationScoreResponse = DeepDaoApiResponse<DeepDaoParticipationScore>
