@@ -31,6 +31,22 @@ export default function SuggestionsSidebar ({ suggestion }: {suggestion: Commit}
   // The track changes plugin generates an in progress commit with current changes. We always want to ignore this, so we start with commit n-1
   const commits = suggestion?.prev ? smoosh(suggestion.prev, (c) => ({ updatedAt: c.updatedAt, _id: c._id, changeID: c.changeID })) : [];
 
+  function approveSuggestion (changeID: string) {
+    const { commit: next, mapping } = rebases.without(commit, [changeID]);
+    let newState: EditorState = state;
+    if (next) {
+      newState = checkout(state.doc, state, next, mapping);
+    }
+    charmClient.updatePage({
+      id: currentPageId,
+      content: newState.doc.toJSON(),
+      suggestion: next ? commitToJSON(next, '') as any : null
+    }).then((newPage) => {
+      view.updateState(newState);
+      setPages((pages) => ({ ...pages, [newPage.id]: newPage }));
+    });
+  }
+
   return (
     <div>
       <strong>Edit suggestions:</strong>
@@ -45,19 +61,7 @@ export default function SuggestionsSidebar ({ suggestion }: {suggestion: Commit}
               <Box display='flex' gap={1}>
                 <Button
                   onClick={() => {
-                    const { commit: next, mapping } = rebases.without(commit, [changeID]);
-                    let newState: EditorState = state;
-                    if (next) {
-                      newState = checkout(state.doc, state, next, mapping);
-                    }
-                    charmClient.updatePage({
-                      id: currentPageId,
-                      content: newState.doc.toJSON(),
-                      suggestion: next ? commitToJSON(next, '') as any : null
-                    }).then((newPage) => {
-                      view.updateState(newState);
-                      setPages((pages) => ({ ...pages, [newPage.id]: newPage }));
-                    });
+                    approveSuggestion(changeID);
                   }}
                   size='small'
                   variant='outlined'
