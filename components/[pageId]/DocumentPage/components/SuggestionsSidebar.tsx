@@ -1,8 +1,12 @@
 import { useEditorViewContext } from '@bangle.dev/react';
-import { checkout, Commit, getChangeSummary, getTrackPluginState, rebases } from '@manuscripts/track-changes';
+import { checkout, Commit, commitToJSON, getChangeSummary, getTrackPluginState, rebases } from '@manuscripts/track-changes';
 import { Button, Stack, Typography } from '@mui/material';
 import { DateTime } from 'luxon';
 import { Box } from '@mui/system';
+import { usePages } from 'hooks/usePages';
+import charmClient from 'charmClient';
+import { Prisma } from '@prisma/client';
+import { EditorState } from 'prosemirror-state';
 
 export function smoosh<T> (
   commit: Commit,
@@ -21,6 +25,7 @@ export function smoosh<T> (
 export default function SuggestionsSidebar ({ suggestion }: {suggestion: Commit}) {
   const view = useEditorViewContext();
   const { state, update } = view;
+  const { currentPageId, setPages } = usePages();
   const { commit } = getTrackPluginState(state);
 
   // The track changes plugin generates an in progress commit with current changes. We always want to ignore this, so we start with commit n-1
@@ -41,9 +46,18 @@ export default function SuggestionsSidebar ({ suggestion }: {suggestion: Commit}
                 <Button
                   onClick={() => {
                     const { commit: next, mapping } = rebases.without(commit, [changeID]);
+                    let newState: EditorState = state;
                     if (next) {
-                      view.updateState(checkout(state.doc, state, next, mapping));
+                      newState = checkout(state.doc, state, next, mapping);
                     }
+                    charmClient.updatePage({
+                      id: currentPageId,
+                      content: newState.doc.toJSON(),
+                      suggestion: next ? commitToJSON(next, '') as any : null
+                    }).then((newPage) => {
+                      view.updateState(newState);
+                      setPages((pages) => ({ ...pages, [newPage.id]: newPage }));
+                    });
                   }}
                   size='small'
                   variant='outlined'
