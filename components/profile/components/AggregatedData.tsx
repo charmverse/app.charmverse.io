@@ -48,7 +48,6 @@ export function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>) {
     return (
       <Box display='flex' alignItems='center' gap={1}>
         <CircularProgress size={24} />
-        <Typography variant='subtitle1' color='secondary'>Fetching data</Typography>
       </Box>
     );
   }
@@ -61,10 +60,10 @@ export function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>) {
     <Grid container display='flex' gap={2} flexDirection='column'>
       <Box display='flex' gap={2} mr={2}>
         <AggregatedDataItem label='communities' value={data.daos} />
-        <AggregatedDataItem label='votes' value={data.votes} />
+        <AggregatedDataItem label='votes' value={data.totalVotes} />
       </Box>
       <Box display='flex' gap={2} mr={2}>
-        <AggregatedDataItem label='proposals' value={data.proposals} />
+        <AggregatedDataItem label='proposals' value={data.totalProposals} />
         <AggregatedDataItem label={data.bounties > 1 ? 'bounties' : 'bounty'} value={data.bounties} />
       </Box>
     </Grid>

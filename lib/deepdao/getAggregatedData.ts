@@ -5,7 +5,7 @@ import { getCompletedApplicationsOfUser } from 'lib/applications/getCompletedApp
 import { getSpacesCount } from 'lib/spaces/getSpacesCount';
 import { isTruthy } from 'lib/utilities/types';
 import log from 'lib/log';
-import { getParticipationScore, DeepDaoAggregateData } from './client';
+import { getParticipationScore, DeepDaoAggregateData, getProfile, DeepDaoProfile } from './client';
 
 export async function getAggregatedData (userPath: string, apiToken?: string): Promise<DeepDaoAggregateData> {
   const user = await prisma.user.findFirst({
@@ -28,6 +28,14 @@ export async function getAggregatedData (userPath: string, apiToken?: string): P
       }))
   )).filter(isTruthy);
 
+  const profiles = (await Promise.all(
+    user.addresses.map(address => getProfile(address, apiToken)
+      .catch(error => {
+        log.error('Error calling DEEP DAO API', error);
+        return null;
+      }))
+  )).filter(isTruthy);
+
   const [completedBountiesCount, workspacesCount, totalCharmverseVotes] = await Promise.all([
     getCompletedApplicationsOfUser(user.id),
     getSpacesCount(user.id),
@@ -40,8 +48,11 @@ export async function getAggregatedData (userPath: string, apiToken?: string): P
 
   return {
     daos: workspacesCount + participationScores.reduce((acc, cur) => acc + cur.data.daos, 0),
-    proposals: participationScores.reduce((acc, cur) => acc + cur.data.proposals, 0),
-    votes: participationScores.reduce((acc, cur) => acc + cur.data.votes, 0) + totalCharmverseVotes,
+    totalProposals: profiles.reduce((acc, profile) => acc + profile.data.totalProposals, 0),
+    totalVotes: profiles.reduce((acc, profile) => acc + profile.data.totalVotes, 0),
+    organizations: profiles.reduce<DeepDaoProfile['organizations']>((orgs, profile) => ([...orgs, ...profile.data.organizations]), []),
+    proposals: profiles.reduce<DeepDaoProfile['proposals']>((proposals, profile) => ([...proposals, ...profile.data.proposals]), []),
+    votes: profiles.reduce<DeepDaoProfile['votes']>((votes, profile) => ([...votes, ...profile.data.votes]), []),
     bounties: completedBountiesCount
   };
 }
