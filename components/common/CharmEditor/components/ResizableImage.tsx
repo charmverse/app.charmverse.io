@@ -1,13 +1,17 @@
+import Alert from '@mui/material/Alert';
 import { NodeViewProps, Plugin, RawSpecs } from '@bangle.dev/core';
 import { EditorState, EditorView, Node, Slice, Transaction } from '@bangle.dev/pm';
+import { useEditorViewContext } from '@bangle.dev/react';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import ImageIcon from '@mui/icons-material/Image';
 import { Box, ListItem, Typography } from '@mui/material';
-import charmClient from 'charmClient';
-import { HTMLAttributes, memo, useCallback } from 'react';
 import ImageSelector from 'components/common/ImageSelector/ImageSelector';
+import LoadingComponent from 'components/common/LoadingComponent';
+import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/image/constants';
+import { HTMLAttributes, memo, useCallback, useState } from 'react';
+import { v4 } from 'uuid';
 import Resizable from './Resizable/Resizable';
 
 const StyledEmptyImageContainer = styled(Box)`
@@ -23,6 +27,7 @@ export const pasteImagePlugin = new Plugin({
     handlePaste: (view: EditorView, rawEvent: ClipboardEvent, slice: Slice) => {
       // @ts-ignore
       const contentRow = slice.content.content?.[0].content.content?.[0];
+
       if ((contentRow?.text as string)?.startsWith('http')) {
         const embedUrl = contentRow.text.split('.');
         if (embedUrl[embedUrl.length - 1].match(/(jpeg|jpg|png|webp|gif)/)) {
@@ -138,12 +143,30 @@ export function imageSpec (): RawSpecs {
   };
 }
 
-function ResizableImage ({ readOnly, onResizeStop, node, updateAttrs, selected }:
-  NodeViewProps & {readOnly?: boolean, onResizeStop?: (view: EditorView) => void }) {
-  readOnly = readOnly ?? false;
+interface ResizableImageProps extends NodeViewProps {
+  readOnly?: boolean,
+  onResizeStop?: (view: EditorView) => void
+}
+
+function ResizableImage ({ readOnly = false, onResizeStop, node, updateAttrs, selected }: ResizableImageProps) {
+
+  const view = useEditorViewContext();
+
+  const imageSource = node.attrs.src;
+
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  const [uploadFailed, setUploadFailed] = useState(false);
+
+  const onDelete = useCallback(() => {
+    updateAttrs({
+      src: null,
+      aspectRatio: 1
+    });
+  }, []);
 
   // If there are no source for the node, return the image select component
-  if (!node.attrs.src) {
+  if (!imageSource) {
     if (readOnly) {
       return <EmptyImageContainer readOnly={readOnly} isSelected={selected} />;
     }
@@ -163,15 +186,49 @@ function ResizableImage ({ readOnly, onResizeStop, node, updateAttrs, selected }
       );
     }
   }
+  else if (imageSource.startsWith('data') && !uploadingImage && !readOnly && onResizeStop && !uploadFailed) {
+    setUploadingImage(true);
 
-  const onDelete = useCallback(() => {
-    updateAttrs({
-      src: null,
-      aspectRatio: 1
-    });
-  }, []);
+    const fileExtension = imageSource.split('image/')[1].split(';')[0];
+    const fileName = `${v4()}.${fileExtension}`;
 
-  if (readOnly) {
+    const rawFileContent = imageSource.split(';base64,')[1];
+
+    const fileContent = Buffer.from(rawFileContent, 'base64');
+
+    // Break the buffer string into chunks of 1 kilobyte
+    const chunkSize = 1024 * 1;
+
+    const bufferLength = fileContent.length;
+
+    const bufferChunks = [];
+
+    for (let i = 0; i < bufferLength; i += chunkSize) {
+      const chunk = fileContent.slice(i, i + chunkSize);
+      bufferChunks.push(chunk);
+    }
+
+    const file: File = new File(bufferChunks, fileName, { type: `image/${fileExtension}` });
+
+    uploadToS3(file)
+      .then(({ url }) => {
+        node.attrs.src = url;
+      })
+      .catch(() => {
+        setUploadFailed(true);
+      })
+      .finally(() => {
+        setUploadingImage(false);
+        onResizeStop(view);
+      });
+  }
+  if (uploadFailed) {
+    return <Alert severity='warning'>Image upload failed</Alert>;
+  }
+  else if (uploadingImage) {
+    return <LoadingComponent isLoading label='Uploading' />;
+  }
+  else if (readOnly) {
     return (
       <StyledImage
         draggable={false}
