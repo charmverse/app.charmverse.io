@@ -1,5 +1,5 @@
 import { useEditorViewContext } from '@bangle.dev/react';
-import { checkout, Commit, commitToJSON, getChangeSummary, getTrackPluginState, rebases } from '@manuscripts/track-changes';
+import { checkout, Commit, commitToJSON, findCommitWithin, getChangeSummary, getTrackPluginState, rebases, reverseMapping } from '@manuscripts/track-changes';
 import { Button, Stack, Typography } from '@mui/material';
 import { DateTime } from 'luxon';
 import { Box } from '@mui/system';
@@ -47,6 +47,38 @@ export default function SuggestionsSidebar ({ suggestion }: {suggestion: Commit}
     });
   }
 
+  function rejectSuggestion (changeID: string) {
+    const { commit: next, mapping } = rebases.without(commit, [changeID]);
+
+    const rejectedCommit = findCommitWithin(commit)(changeID);
+
+    if (rejectedCommit) {
+      const stepsMapping = reverseMapping(rejectedCommit?.steps ?? []);
+
+      //      console.log('stepsMapping', stepsMapping, 'commit', rejectedCommit);
+
+      stepsMapping.maps.forEach(map => {
+        //        view.state.apply(view.state.tr.delete(map.));
+      });
+
+      //      ;
+
+      let newState: EditorState = state;
+      if (next) {
+        newState = checkout(state.doc, state, next, stepsMapping);
+      }
+
+      // charmClient.updatePage({
+      //   id: currentPageId,
+      //   content: newState.doc.toJSON(),
+      //   suggestion: next ? commitToJSON(next, '') as any : null
+      // }).then((newPage) => {
+      //   view.updateState(newState);
+      //   setPages((pages) => ({ ...pages, [newPage.id]: newPage }));
+      // });
+    }
+  }
+
   return (
     <div>
       <strong>Edit suggestions:</strong>
@@ -71,6 +103,9 @@ export default function SuggestionsSidebar ({ suggestion }: {suggestion: Commit}
                   size='small'
                   variant='outlined'
                   color='error'
+                  onClick={() => {
+                    rejectSuggestion(changeID);
+                  }}
                 >Reject
                 </Button>
               </Box>
