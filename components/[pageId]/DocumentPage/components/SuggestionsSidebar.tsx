@@ -23,7 +23,9 @@ export default function SuggestionsSidebar ({ suggestion }: {suggestion: Commit}
   const { state, update } = view;
   const { commit } = getTrackPluginState(state);
 
-  const commits = suggestion ? smoosh(suggestion, (c) => ({ updatedAt: c.updatedAt, _id: c._id, changeID: c.changeID })) : [];
+  // The track changes plugin generates an in progress commit with current changes. We always want to ignore this, so we start with commit n-1
+  const commits = suggestion?.prev ? smoosh(suggestion.prev, (c) => ({ updatedAt: c.updatedAt, _id: c._id, changeID: c.changeID })) : [];
+
   return (
     <div>
       <strong>Edit suggestions:</strong>
