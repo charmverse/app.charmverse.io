@@ -53,29 +53,21 @@ export default function SuggestionsSidebar ({ suggestion }: {suggestion: Commit}
     const rejectedCommit = findCommitWithin(commit)(changeID);
 
     if (rejectedCommit) {
-      const stepsMapping = reverseMapping(rejectedCommit?.steps ?? []);
 
-      //      console.log('stepsMapping', stepsMapping, 'commit', rejectedCommit);
+      const deleteRange = [rejectedCommit.steps[0].toJSON().from, rejectedCommit.steps[rejectedCommit.steps.length - 1].toJSON().to];
 
-      stepsMapping.maps.forEach(map => {
-        //        view.state.apply(view.state.tr.delete(map.));
+      const stateWithChangeRemoved = view.state.apply(view.state.tr.delete(deleteRange[0], deleteRange[1] + 1));
+
+      const newState: EditorState = checkout(stateWithChangeRemoved.doc, stateWithChangeRemoved, next as any, mapping);
+
+      charmClient.updatePage({
+        id: currentPageId,
+        content: newState.doc.toJSON(),
+        suggestion: next ? commitToJSON(next, '') as any : null
+      }).then((newPage) => {
+        view.updateState(newState);
+        setPages((pages) => ({ ...pages, [newPage.id]: newPage }));
       });
-
-      //      ;
-
-      let newState: EditorState = state;
-      if (next) {
-        newState = checkout(state.doc, state, next, stepsMapping);
-      }
-
-      // charmClient.updatePage({
-      //   id: currentPageId,
-      //   content: newState.doc.toJSON(),
-      //   suggestion: next ? commitToJSON(next, '') as any : null
-      // }).then((newPage) => {
-      //   view.updateState(newState);
-      //   setPages((pages) => ({ ...pages, [newPage.id]: newPage }));
-      // });
     }
   }
 
