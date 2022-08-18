@@ -1,10 +1,14 @@
-import { Box, CircularProgress, Grid, IconButton, Paper, Stack, Typography } from '@mui/material';
+import { Box, CircularProgress, Divider, Grid, IconButton, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
 import charmClient from 'charmClient';
-import { DeepDaoOrganization } from 'lib/deepdao/client';
+import { useTheme } from '@emotion/react';
+import { DeepDaoOrganization, DeepDaoProposal, DeepDaoVote } from 'lib/deepdao/client';
 import useSWRImmutable from 'swr/immutable';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import HowToVoteIcon from '@mui/icons-material/HowToVote';
+import ForumIcon from '@mui/icons-material/Forum';
 import { useState } from 'react';
+import { tabStyles } from 'components/nexus/TasksPage';
 import { UserDetailsProps } from './UserDetails';
 
 export function AggregatedDataItem ({ value, label }: { value: number, label: string }) {
@@ -43,18 +47,33 @@ export function AggregatedDataItem ({ value, label }: { value: number, label: st
   );
 }
 
-function showDateWithMonthAndYear (dateInput: Date | string) {
+function showDateWithMonthAndYear (dateInput: Date | string, showDate?: boolean) {
   const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
   return `${date.toLocaleString('default', {
     month: 'long'
-  })} ${date.getFullYear()}`;
+  })}${showDate ? ` ${date.getDate()},` : ''} ${date.getFullYear()}`;
 }
 
-function DeepDaoOrganization ({ organization, earliestEventDate, latestEventDate }:
-  { organization: DeepDaoOrganization, earliestEventDate: string, latestEventDate: string }) {
+interface DeepDaoOrganizationRowProps {
+  organization: DeepDaoOrganization
+  earliestEventDate: string
+  latestEventDate: string
+  proposals: DeepDaoProposal[]
+  votes: DeepDaoVote[]
+}
+
+const TASK_TABS = [
+  { icon: <HowToVoteIcon />, label: 'Votes', type: 'vote' },
+  { icon: <ForumIcon />, label: 'Discussion', type: 'proposal' }
+] as const;
+
+function DeepDaoOrganizationRow ({ votes, proposals, organization, earliestEventDate, latestEventDate }: DeepDaoOrganizationRowProps) {
   const [isCollapsed, setIsCollapsed] = useState(true);
+  const [currentTask, setCurrentTask] = useState<'vote' | 'proposal'>('vote');
+  const theme = useTheme();
+
   return (
-    <Stack key={organization.organizationId}>
+    <Stack key={organization.organizationId} gap={1}>
       <Stack flexDirection='row' justifyContent='space-between'>
         <Typography variant='h5'>{organization.name}</Typography>
         <IconButton
@@ -66,6 +85,49 @@ function DeepDaoOrganization ({ organization, earliestEventDate, latestEventDate
       </Stack>
       <Typography variant='subtitle1'>{showDateWithMonthAndYear(earliestEventDate) ?? '?'} - {showDateWithMonthAndYear(latestEventDate) ?? '?'}</Typography>
 
+      {
+        !isCollapsed && (
+        <Tabs
+          indicatorColor='primary'
+          value={TASK_TABS.findIndex(taskTab => taskTab.type === currentTask)}
+        >
+          {TASK_TABS.map(task => (
+            <Tab
+              component='div'
+              disableRipple
+              iconPosition='start'
+              icon={task.icon}
+              key={task.label}
+              sx={{
+                px: 1.5,
+                fontSize: 14,
+                minHeight: 0,
+                '&.MuiTab-root': {
+                  color: theme.palette.secondary.main
+                }
+              }}
+              label={task.label}
+              onClick={() => {
+                setCurrentTask(task.type);
+              }}
+            />
+          ))}
+        </Tabs>
+        )
+      }
+      {!isCollapsed && (currentTask === 'vote' ? (
+        <Stack gap={2}>
+          {votes.map((vote, voteNumber) => (
+            <Stack flexDirection='row' justifyContent='space-between'>
+              <Stack flexDirection='row' gap={1} alignItems='center'>
+                <Typography fontWeight={500}>{voteNumber + 1}.</Typography>
+                <Typography>{vote.title}</Typography>
+              </Stack>
+              <Typography variant='subtitle1'>{showDateWithMonthAndYear(vote.createdAt, true)}</Typography>
+            </Stack>
+          ))}
+        </Stack>
+      ) : proposals.map(proposal => <Box>{proposal.title}</Box>))}
     </Stack>
   );
 
@@ -88,8 +150,21 @@ export function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>) {
     return null;
   }
 
-  const organizationsRecord: Record<string, DeepDaoOrganization> = data.organizations
-    .reduce((acc, org) => ({ ...acc, [org.organizationId]: org }), {});
+  const organizationsRecord: Record<string, DeepDaoOrganization & {proposals: DeepDaoProposal[], votes: DeepDaoVote[]}> = data.organizations
+    .reduce((acc, org) => ({ ...acc,
+      [org.organizationId]: {
+        ...org,
+        proposals: [],
+        votes: []
+      } }), {});
+
+  data.proposals.forEach(proposal => {
+    organizationsRecord[proposal.organizationId].proposals.push(proposal);
+  });
+
+  data.votes.forEach(vote => {
+    organizationsRecord[vote.organizationId].votes.push(vote);
+  });
 
   // Sort the proposals and votes based on their created at date and attach organization data with it
   const events = [...data.proposals, ...data.votes]
@@ -138,12 +213,21 @@ export function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>) {
 
       <Stack gap={2}>
         {sortedOrganizations.map(organization => (
-          <DeepDaoOrganization
-            organization={organization}
+          <Box
             key={organization.organizationId}
-            latestEventDate={organizationEventDates[organization.organizationId]?.latest}
-            earliestEventDate={organizationEventDates[organization.organizationId]?.oldest}
-          />
+          >
+            <DeepDaoOrganizationRow
+              votes={organizationsRecord[organization.organizationId].votes}
+              proposals={organizationsRecord[organization.organizationId].proposals}
+              organization={organization}
+              latestEventDate={organizationEventDates[organization.organizationId]?.latest}
+              earliestEventDate={organizationEventDates[organization.organizationId]?.oldest}
+            />
+            <Divider sx={{
+              mt: 2
+            }}
+            />
+          </Box>
         ))}
       </Stack>
     </Grid>
