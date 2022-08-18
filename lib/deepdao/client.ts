@@ -30,6 +30,7 @@ export type DeepDaoProposal = {
   voteChoice: number
   organizationId: string
   successfulVote: boolean
+  proposalId: string
 }
 
 export type DeepDaoVote = {
