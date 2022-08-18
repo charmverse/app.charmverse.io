@@ -1,5 +1,5 @@
 Dockerfile
-Dockerrun.aws.json
+docker-compose.yml
 .ebextensions
 .env
 .env.staging
