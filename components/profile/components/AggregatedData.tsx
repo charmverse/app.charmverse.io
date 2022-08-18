@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Divider, Grid, IconButton, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
+import { Box, CircularProgress, Collapse, Divider, Grid, IconButton, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
 import charmClient from 'charmClient';
 import { useTheme } from '@emotion/react';
 import { DeepDaoOrganization, DeepDaoProposal, DeepDaoVote } from 'lib/deepdao/client';
@@ -8,7 +8,8 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import ForumIcon from '@mui/icons-material/Forum';
 import { useState } from 'react';
-import { tabStyles } from 'components/nexus/TasksPage';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import { UserDetailsProps } from './UserDetails';
 
 export function AggregatedDataItem ({ value, label }: { value: number, label: string }) {
@@ -85,49 +86,53 @@ function DeepDaoOrganizationRow ({ votes, proposals, organization, earliestEvent
       </Stack>
       <Typography variant='subtitle1'>{showDateWithMonthAndYear(earliestEventDate) ?? '?'} - {showDateWithMonthAndYear(latestEventDate) ?? '?'}</Typography>
 
-      {
-        !isCollapsed && (
-        <Tabs
-          indicatorColor='primary'
-          value={TASK_TABS.findIndex(taskTab => taskTab.type === currentTask)}
-        >
-          {TASK_TABS.map(task => (
-            <Tab
-              component='div'
-              disableRipple
-              iconPosition='start'
-              icon={task.icon}
-              key={task.label}
-              sx={{
-                px: 1.5,
-                fontSize: 14,
-                minHeight: 0,
-                '&.MuiTab-root': {
-                  color: theme.palette.secondary.main
-                }
-              }}
-              label={task.label}
-              onClick={() => {
-                setCurrentTask(task.type);
-              }}
-            />
-          ))}
-        </Tabs>
-        )
-      }
-      {!isCollapsed && (currentTask === 'vote' ? (
-        <Stack gap={2}>
-          {votes.map((vote, voteNumber) => (
-            <Stack flexDirection='row' justifyContent='space-between'>
-              <Stack flexDirection='row' gap={1} alignItems='center'>
-                <Typography fontWeight={500}>{voteNumber + 1}.</Typography>
-                <Typography>{vote.title}</Typography>
-              </Stack>
-              <Typography variant='subtitle1'>{showDateWithMonthAndYear(vote.createdAt, true)}</Typography>
+      <Collapse in={!isCollapsed}>
+        <Box>
+          <Tabs
+            sx={{
+              mb: 2
+            }}
+            indicatorColor='primary'
+            value={TASK_TABS.findIndex(taskTab => taskTab.type === currentTask)}
+          >
+            {TASK_TABS.map(task => (
+              <Tab
+                component='div'
+                disableRipple
+                iconPosition='start'
+                icon={task.icon}
+                key={task.label}
+                sx={{
+                  px: 1.5,
+                  fontSize: 14,
+                  minHeight: 0,
+                  '&.MuiTab-root': {
+                    color: theme.palette.secondary.main
+                  }
+                }}
+                label={task.label}
+                onClick={() => {
+                  setCurrentTask(task.type);
+                }}
+              />
+            ))}
+          </Tabs>
+          {(currentTask === 'vote' ? (
+            <Stack gap={2}>
+              {votes.map((vote, voteNumber) => (
+                <Stack flexDirection='row' justifyContent='space-between'>
+                  <Stack flexDirection='row' gap={1} alignItems='center'>
+                    {vote.successful ? <ThumbUpIcon color='success' fontSize='small' /> : <ThumbDownIcon color='error' fontSize='small' />}
+                    <Typography fontWeight={500}>{voteNumber + 1}.</Typography>
+                    <Typography>{vote.title}</Typography>
+                  </Stack>
+                  <Typography variant='subtitle1'>{showDateWithMonthAndYear(vote.createdAt, true)}</Typography>
+                </Stack>
+              ))}
             </Stack>
-          ))}
-        </Stack>
-      ) : proposals.map(proposal => <Box>{proposal.title}</Box>))}
+          ) : proposals.map(proposal => <Box>{proposal.title}</Box>))}
+        </Box>
+      </Collapse>
     </Stack>
   );
 
