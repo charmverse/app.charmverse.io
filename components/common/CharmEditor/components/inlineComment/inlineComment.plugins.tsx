@@ -122,22 +122,23 @@ function getDecorations ({ schema, doc }: { doc: Node, schema: Schema }) {
   const rows = extractInlineCommentRows(schema, doc);
   const uniqueCommentIds: Set<string> = new Set();
 
-  const decorations: Decoration[] = rows.map(row => {
+  const decorations: Decoration[] = [];
+
+  rows.forEach(row => {
     // inject decoration at the start of the paragraph/header
     const firstPos = row.pos + 1;
     const commentIds = row.nodes.map(node => node.marks[0]?.attrs.id).filter(Boolean);
+    const newIds = commentIds.filter(commentId => !uniqueCommentIds.has(commentId));
+    commentIds.forEach(commentId => uniqueCommentIds.add(commentId));
 
-    return Decoration.widget(firstPos, () => {
-      const newIds = commentIds.filter(commentId => !uniqueCommentIds.has(commentId));
-      commentIds.map(commentId => uniqueCommentIds.add(commentId));
+    if (newIds.length !== 0) {
       const container = document.createElement('div');
-      if (newIds.length !== 0) {
-        container.className = 'charm-row-decoration-comments charm-row-decoration';
-        container.setAttribute('data-ids', newIds.join(','));
-        reactDOM.render(<RowDecoration count={newIds.length} />, container);
-      }
-      return container;
-    }, { key: commentIds.join(',') });
+      container.className = 'charm-row-decoration-comments charm-row-decoration';
+      container.setAttribute('data-ids', newIds.join(','));
+      reactDOM.render(<RowDecoration count={newIds.length} />, container);
+
+      decorations.push(Decoration.widget(firstPos, () => container, { key: commentIds.join(',') }));
+    }
   });
 
   return DecorationSet.create(doc, decorations);
