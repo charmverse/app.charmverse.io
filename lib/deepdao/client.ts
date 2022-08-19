@@ -58,8 +58,6 @@ type GetProfileResponse = DeepDaoApiResponse<DeepDaoProfile>
 export type DeepDaoAggregateData = Pick<DeepDaoParticipationScore, 'daos'> & Pick<DeepDaoProfile, 'organizations' | 'totalProposals' | 'totalVotes' | 'proposals' | 'votes'> & {bounties: number}
 
 export async function getParticipationScore (address: string, apiToken = DEEPDAO_API_KEY): Promise<GetParticipationScoreResponse | null> {
-  address = '0xef8305e140ac520225daf050e2f71d5fbcc543e7';
-
   if (!apiToken) {
     log.debug('Skip request: No API Key for DeepDAO');
     return null;

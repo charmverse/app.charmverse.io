@@ -36,14 +36,9 @@ export async function getAggregatedData (userPath: string, apiToken?: string): P
       }))
   )).filter(isTruthy);
 
-  const [completedBountiesCount, workspacesCount, totalCharmverseVotes] = await Promise.all([
+  const [completedBountiesCount, workspacesCount] = await Promise.all([
     getCompletedApplicationsOfUser(user.id),
-    getSpacesCount(user.id),
-    prisma.userVote.count({
-      where: {
-        userId: user.id
-      }
-    })
+    getSpacesCount(user.id)
   ]);
 
   return {
