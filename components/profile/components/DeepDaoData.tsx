@@ -10,6 +10,8 @@ import ForumIcon from '@mui/icons-material/Forum';
 import { useState } from 'react';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
+import { GetPoapsResponse } from 'lib/poap';
+import { ExtendedPoap } from 'models';
 import { UserDetailsProps } from './UserDetails';
 
 export function AggregatedDataItem ({ value, label }: { value: number, label: string }) {
@@ -154,7 +156,14 @@ function DeepDaoOrganizationRow ({ votes, proposals, organization, earliestEvent
 
 }
 
-export function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>) {
+type OrganizationDetails = DeepDaoOrganization & {
+  proposals: DeepDaoProposal[],
+  votes: DeepDaoVote[],
+  oldestEventDate: string,
+  latestEventDate: string
+}
+
+export function DeepDaoData ({ user, poapData }: Pick<UserDetailsProps, 'user'> & {poapData: GetPoapsResponse | undefined}) {
   const { data, isValidating } = useSWRImmutable(user ? `userAggregatedData/${user.id}` : null, () => {
     return charmClient.getAggregatedData(user.id);
   });
@@ -171,12 +180,28 @@ export function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>) {
     return null;
   }
 
-  const organizationsRecord: Record<string, DeepDaoOrganization & {proposals: DeepDaoProposal[], votes: DeepDaoVote[]}> = data.organizations
+  const poaps: (Partial<ExtendedPoap> & {createdAt: string})[] = [];
+
+  const hiddenPoapIds: Set<string> = new Set();
+  const visiblePoapIds: Set<string> = new Set();
+
+  poapData?.hiddenPoaps.forEach(poap => {
+    poaps.push({ ...poap, createdAt: poap.created as string });
+    hiddenPoapIds.add(poap.id as string);
+  });
+  poapData?.visiblePoaps.forEach(poap => {
+    poaps.push({ ...poap, createdAt: poap.created as string });
+    visiblePoapIds.add(poap.id as string);
+  });
+
+  const organizationsRecord: Record<string, OrganizationDetails> = data.organizations
     .reduce((acc, org) => ({ ...acc,
       [org.organizationId]: {
         ...org,
         proposals: [],
-        votes: []
+        votes: [],
+        oldestEventDate: '',
+        latestEventDate: ''
       } }), {});
 
   data.proposals.forEach(proposal => {
@@ -188,16 +213,11 @@ export function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>) {
   });
 
   // Sort the proposals and votes based on their created at date and attach organization data with it
-  const events = [...data.proposals, ...data.votes]
-    .sort((eventA, eventB) => eventA.createdAt > eventB.createdAt ? 1 : -1)
-    .map(event => ({ ...event, organization: organizationsRecord[event.organizationId] }));
+  const events = [...data.proposals.map(proposal => ({ type: 'proposal', ...proposal })), ...data.votes.map(vote => ({ type: 'vote', ...vote }))]
+    .sort((eventA, eventB) => eventA.createdAt > eventB.createdAt ? 1 : -1);
 
   const organizationIdSet: Set<string> = new Set();
   const sortedOrganizationIds: string[] = [];
-  const organizationEventDates: Record<string, {
-    oldest: string
-    latest: string
-  }> = {};
 
   events.forEach(event => {
     if (!organizationIdSet.has(event.organizationId)) {
@@ -205,17 +225,18 @@ export function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>) {
       organizationIdSet.add(event.organizationId);
     }
 
-    if (!organizationEventDates[event.organizationId]) {
-      organizationEventDates[event.organizationId] = {
-        oldest: event.createdAt,
-        latest: event.createdAt
-      };
+    if (!organizationsRecord[event.organizationId].oldestEventDate) {
+      organizationsRecord[event.organizationId].oldestEventDate = event.createdAt;
     }
-    else if (organizationEventDates[event.organizationId].latest < event.createdAt) {
-      organizationEventDates[event.organizationId].latest = event.createdAt;
+    else if (organizationsRecord[event.organizationId].oldestEventDate > event.createdAt) {
+      organizationsRecord[event.organizationId].oldestEventDate = event.createdAt;
     }
-    else if (organizationEventDates[event.organizationId].oldest > event.createdAt) {
-      organizationEventDates[event.organizationId].oldest = event.createdAt;
+
+    if (!organizationsRecord[event.organizationId].latestEventDate) {
+      organizationsRecord[event.organizationId].latestEventDate = event.createdAt;
+    }
+    else if (organizationsRecord[event.organizationId].latestEventDate < event.createdAt) {
+      organizationsRecord[event.organizationId].latestEventDate = event.createdAt;
     }
   });
 
@@ -241,8 +262,8 @@ export function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>) {
               votes={organizationsRecord[organization.organizationId].votes}
               proposals={organizationsRecord[organization.organizationId].proposals}
               organization={organization}
-              latestEventDate={organizationEventDates[organization.organizationId]?.latest}
-              earliestEventDate={organizationEventDates[organization.organizationId]?.oldest}
+              latestEventDate={organizationsRecord[organization.organizationId]?.latestEventDate}
+              earliestEventDate={organizationsRecord[organization.organizationId]?.oldestEventDate}
             />
             <Divider sx={{
               mt: 2

@@ -20,7 +20,8 @@ export default async function getPOAPs (addresses: Array<string>): Promise<Array
   const poaps = rawPoapInformation.map(rawPoap => ({
     tokenId: rawPoap.tokenId,
     walletAddress: rawPoap.owner,
-    imageURL: rawPoap.event?.image_url
+    imageURL: rawPoap.event?.image_url,
+    created: rawPoap.created
   }));
 
   return poaps;
