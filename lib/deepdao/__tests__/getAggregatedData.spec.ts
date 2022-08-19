@@ -5,7 +5,7 @@ import { DataNotFoundError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
-import { DEEP_DAO_BASE_URL } from 'lib/deepdao/interfaces';
+import { DEEP_DAO_BASE_URL } from 'lib/deepdao/client';
 import { getAggregatedData } from 'lib/deepdao/getAggregatedData';
 
 nock.disableNetConnect();
