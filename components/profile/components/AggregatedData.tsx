@@ -10,6 +10,7 @@ import ForumIcon from '@mui/icons-material/Forum';
 import { useState } from 'react';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
+import { isTruthy } from 'lib/utilities/types';
 import { UserDetailsProps } from './UserDetails';
 
 export function AggregatedDataItem ({ value, label }: { value: number, label: string }) {
@@ -171,20 +172,25 @@ export function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>) {
     return null;
   }
 
-  const organizationsRecord: Record<string, DeepDaoOrganization & {proposals: DeepDaoProposal[], votes: DeepDaoVote[]}> = data.organizations
-    .reduce((acc, org) => ({ ...acc,
+  const organizationsRecord: Record<
+    string,
+    DeepDaoOrganization & { proposals: DeepDaoProposal[], votes: DeepDaoVote[] } | undefined
+  > = data.organizations
+    .reduce((acc, org) => ({
+      ...acc,
       [org.organizationId]: {
         ...org,
         proposals: [],
         votes: []
-      } }), {});
+      }
+    }), {});
 
   data.proposals.forEach(proposal => {
-    organizationsRecord[proposal.organizationId].proposals.push(proposal);
+    organizationsRecord[proposal.organizationId]?.proposals.push(proposal);
   });
 
   data.votes.forEach(vote => {
-    organizationsRecord[vote.organizationId].votes.push(vote);
+    organizationsRecord[vote.organizationId]?.votes.push(vote);
   });
 
   // Sort the proposals and votes based on their created at date and attach organization data with it
@@ -219,7 +225,7 @@ export function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>) {
     }
   });
 
-  const sortedOrganizations = sortedOrganizationIds.reverse().map(organizationId => organizationsRecord[organizationId]);
+  const sortedOrganizations = sortedOrganizationIds.reverse().map(organizationId => organizationsRecord[organizationId]).filter(isTruthy);
 
   return (
     <Grid container display='flex' gap={2} flexDirection='column'>
@@ -238,8 +244,8 @@ export function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>) {
             key={organization.organizationId}
           >
             <DeepDaoOrganizationRow
-              votes={organizationsRecord[organization.organizationId].votes}
-              proposals={organizationsRecord[organization.organizationId].proposals}
+              votes={organization.votes}
+              proposals={organization.proposals}
               organization={organization}
               latestEventDate={organizationEventDates[organization.organizationId]?.latest}
               earliestEventDate={organizationEventDates[organization.organizationId]?.oldest}
