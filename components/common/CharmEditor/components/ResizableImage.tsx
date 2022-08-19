@@ -150,8 +150,6 @@ interface ResizableImageProps extends NodeViewProps {
 
 function ResizableImage ({ readOnly = false, onResizeStop, node, updateAttrs, selected }: ResizableImageProps) {
 
-  const view = useEditorViewContext();
-
   const imageSource = node.attrs.src;
 
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -212,14 +210,15 @@ function ResizableImage ({ readOnly = false, onResizeStop, node, updateAttrs, se
 
     uploadToS3(file)
       .then(({ url }) => {
-        node.attrs.src = url;
+        updateAttrs({
+          src: url
+        });
       })
       .catch(() => {
         setUploadFailed(true);
       })
       .finally(() => {
         setUploadingImage(false);
-        onResizeStop(view);
       });
   }
   if (uploadFailed) {
