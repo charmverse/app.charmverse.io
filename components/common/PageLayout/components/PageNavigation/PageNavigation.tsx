@@ -18,6 +18,7 @@ import { ComponentProps, Dispatch, memo, ReactNode, SetStateAction, SyntheticEve
 import { useDrop } from 'react-dnd';
 
 import ReactDndProvider from 'components/common/ReactDndProvider';
+import { useSnackbar } from 'hooks/useSnackbar';
 import TreeNode, { MenuNode, ParentMenuNode } from './components/TreeNode';
 
 const StyledTreeRoot = styled(TreeRoot)<{ isFavorites?: boolean }>`
@@ -92,6 +93,7 @@ function PageNavigation ({
   const [space] = useCurrentSpace();
   const { user } = useUser();
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${space!.id}.expanded-pages`, []);
+  const { showMessage } = useSnackbar();
 
   const pagesArray: MenuNode[] = filterVisiblePages(Object.values(pages))
     .map((page): MenuNode => ({
@@ -170,16 +172,16 @@ function PageNavigation ({
       id: droppedItem.id,
       index, // send it to the end
       parentId
-    });
+    }).then(((updatedPage) => {
+      setPages(_pages => ({
+        ..._pages,
+        [droppedItem.id]: updatedPage
+      }));
+    }))
+      .catch(err => {
+        showMessage(err.message, 'error');
+      });
 
-    setPages(_pages => ({
-      ..._pages,
-      [droppedItem.id]: {
-        ..._pages[droppedItem.id]!,
-        index,
-        parentId
-      }
-    }));
   }, []);
 
   useEffect(() => {
