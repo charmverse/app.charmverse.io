@@ -16,12 +16,12 @@ export default function PublicProfile (props: UserDetailsProps) {
       <UserDetails {...props} />
       <Divider />
       <Grid container direction='row' rowSpacing={3}>
-        <Grid item xs={12} md={6} mr={1}>
+        <Grid item xs={12} md={12} mr={1}>
           <DeepDaoData user={props.user} poapData={poapData} />
         </Grid>
-        <Grid item xs={12} md={5.75}>
+        {/* <Grid item xs={12} md={5.75}>
           <PoapSection user={props.user} mutatePoaps={mutatePoaps} poapData={poapData} />
-        </Grid>
+        </Grid> */}
       </Grid>
     </Stack>
   );

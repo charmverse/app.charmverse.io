@@ -73,10 +73,22 @@ const TASK_TABS = [
 function PoapRow ({ poap }: {poap: ExtendedPoap}) {
   return (
     <Stack gap={1}>
-      <Stack flexDirection='row' justifyContent='space-between'>
-        <Typography fontWeight={500} variant='h5'>{poap.id}</Typography>
+      <Stack flexDirection='row' gap={2}>
+        <Box>
+          <img
+            src={poap.imageURL}
+            width={50}
+            height='100%'
+            style={{
+              objectFit: 'contain'
+            }}
+          />
+        </Box>
+        <Stack justifyContent='space-between'>
+          <Typography fontWeight={500} variant='h5'>{poap.name}</Typography>
+          <Typography>{showDateWithMonthAndYear(poap.created) ?? '?'}</Typography>
+        </Stack>
       </Stack>
-      <Typography>{showDateWithMonthAndYear(poap.created) ?? '?'}</Typography>
     </Stack>
   );
 }

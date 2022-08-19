@@ -25,6 +25,7 @@ export interface ExtendedPoap extends Poap {
   imageURL: string;
   isHidden: boolean;
   created: string
+  name: string
 }
 
 export const IDENTITY_TYPES = ['Wallet', 'Discord', 'Telegram', 'RandomName'] as const;

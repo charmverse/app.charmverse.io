@@ -21,7 +21,8 @@ export default async function getPOAPs (addresses: Array<string>): Promise<Array
     tokenId: rawPoap.tokenId,
     walletAddress: rawPoap.owner,
     imageURL: rawPoap.event?.image_url,
-    created: rawPoap.created
+    created: rawPoap.created,
+    name: rawPoap.event?.name
   }));
 
   return poaps;
