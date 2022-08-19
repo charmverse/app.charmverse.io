@@ -70,6 +70,17 @@ const TASK_TABS = [
   { icon: <ForumIcon />, label: 'Proposals', type: 'proposal' }
 ] as const;
 
+function PoapRow ({ poap }: {poap: ExtendedPoap}) {
+  return (
+    <Stack gap={1}>
+      <Stack flexDirection='row' justifyContent='space-between'>
+        <Typography fontWeight={500} variant='h5'>{poap.id}</Typography>
+      </Stack>
+      <Typography>{showDateWithMonthAndYear(poap.created) ?? '?'}</Typography>
+    </Stack>
+  );
+}
+
 function DeepDaoOrganizationRow ({ votes, proposals, organization, earliestEventDate, latestEventDate }: DeepDaoOrganizationRowProps) {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [currentTask, setCurrentTask] = useState<'vote' | 'proposal'>('vote');
@@ -79,7 +90,7 @@ function DeepDaoOrganizationRow ({ votes, proposals, organization, earliestEvent
   votes = votes.sort((voteA, voteB) => voteA.createdAt > voteB.createdAt ? -1 : 1);
 
   return (
-    <Stack key={organization.organizationId} gap={1}>
+    <Stack gap={1}>
       <Stack flexDirection='row' justifyContent='space-between'>
         <Typography fontWeight={500} variant='h5'>{organization.name}</Typography>
         <IconButton
@@ -261,8 +272,8 @@ export function DeepDaoData ({ user, poapData }: Pick<UserDetailsProps, 'user'> 
           <Box
             key={item.type === 'poap' ? item.id : item.organizationId}
           >
-            {item.type === 'organization' && (organizationsRecord[item.organizationId].proposals.length !== 0 || organizationsRecord[item.organizationId].votes.length !== 0) ? (
-              <>
+            {item.type === 'organization' ? (organizationsRecord[item.organizationId].proposals.length !== 0 || organizationsRecord[item.organizationId].votes.length !== 0) ? (
+              <Box key={item.organizationId}>
                 <DeepDaoOrganizationRow
                   votes={organizationsRecord[item.organizationId].votes}
                   proposals={organizationsRecord[item.organizationId].proposals}
@@ -274,8 +285,16 @@ export function DeepDaoData ({ user, poapData }: Pick<UserDetailsProps, 'user'> 
                   mt: 2
                 }}
                 />
-              </>
-            ) : null}
+              </Box>
+            ) : null : (
+              <Box key={item.id}>
+                <PoapRow poap={item} />
+                <Divider sx={{
+                  mt: 2
+                }}
+                />
+              </Box>
+            )}
           </Box>
         ))}
       </Stack>
