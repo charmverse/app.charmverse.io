@@ -1,7 +1,7 @@
 import { Box, CircularProgress, Collapse, Divider, Grid, IconButton, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
 import charmClient from 'charmClient';
 import { useTheme } from '@emotion/react';
-import { DeepDaoOrganization, DeepDaoProposal, DeepDaoVote } from 'lib/deepdao/client';
+import { DeepDaoOrganization, DeepDaoProposal, DeepDaoVote } from 'lib/deepdao/interfaces';
 import useSWRImmutable from 'swr/immutable';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
