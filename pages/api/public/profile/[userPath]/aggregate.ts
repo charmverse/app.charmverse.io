@@ -1,6 +1,6 @@
 
 import { getAggregatedData } from 'lib/deepdao/getAggregatedData';
-import { DeepDaoAggregateData } from 'lib/deepdao/client';
+import { DeepDaoAggregateData } from 'lib/deepdao/interfaces';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';

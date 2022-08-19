@@ -5,7 +5,7 @@ import { getCompletedApplicationsOfUser } from 'lib/applications/getCompletedApp
 import { getSpacesCount } from 'lib/spaces/getSpacesCount';
 import { isTruthy } from 'lib/utilities/types';
 import log from 'lib/log';
-import { getParticipationScore, DeepDaoAggregateData, getProfile, DeepDaoProfile } from './client';
+import { getParticipationScore, DeepDaoAggregateData, getProfile, DeepDaoProfile } from './interfaces';
 
 export async function getAggregatedData (userPath: string, apiToken?: string): Promise<DeepDaoAggregateData> {
   const user = await prisma.user.findFirst({
