@@ -23,7 +23,7 @@ export async function getParticipationScore (address: string, apiToken = DEEPDAO
 
 export async function getProfile (address: string, apiToken = DEEPDAO_API_KEY): Promise<GetProfileResponse | null> {
   // Use this address for testing as it has alot of on-chain data
-  // address = '0x155b6485305ccab44ef7da58ac886c62ce105cf9';
+  address = '0x155b6485305ccab44ef7da58ac886c62ce105cf9';
 
   if (!apiToken) {
     log.debug('Skip request: No API Key for DeepDAO');
