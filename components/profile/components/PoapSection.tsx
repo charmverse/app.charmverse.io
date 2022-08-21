@@ -11,7 +11,6 @@ import type { PublicUser } from 'pages/api/public/profile/[userPath]';
 import PoapIcon from 'public/images/poap_logo.svg';
 import { useContext } from 'react';
 import { KeyedMutator } from 'swr';
-import ManagePOAPModal from './ManagePOAPModal';
 import { isPublicUser } from './UserDetails';
 
 const StyledBox = styled(Box)`
@@ -100,20 +99,7 @@ function PoapSection (props: PoapSectionProps) {
           )
         }
       </Grid>
-      {
-        !isPublic && poapData && (
-        <ManagePOAPModal
-          isOpen={managePoapModalState.isOpen}
-          close={managePoapModalState.close}
-          save={async () => {
-            mutatePoaps();
-            managePoapModalState.close();
-          }}
-          visiblePoaps={poapData.visiblePoaps}
-          hiddenPoaps={poapData.hiddenPoaps}
-        />
-        )
-      }
+
     </StyledBox>
   );
 }

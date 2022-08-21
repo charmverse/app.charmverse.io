@@ -1,18 +1,20 @@
-import { Box, Chip, CircularProgress, Divider, Grid, Link, Paper, Stack, Typography } from '@mui/material';
+import { Box, Chip, CircularProgress, Divider, Grid, IconButton, Link, Paper, Stack, Typography } from '@mui/material';
 import charmClient from 'charmClient';
 import { DeepDaoProposal, DeepDaoVote } from 'lib/deepdao/interfaces';
 import useSWRImmutable from 'swr/immutable';
-
+import EditIcon from '@mui/icons-material/Edit';
 import styled from '@emotion/styled';
 import { GetPoapsResponse } from 'lib/poap';
 import { isTruthy } from 'lib/utilities/types';
 import { ExtendedPoap } from 'models';
 import { showDateWithMonthAndYear } from 'lib/utilities/dates';
+import { usePopupState } from 'material-ui-popup-state/hooks';
+import { KeyedMutator } from 'swr';
 import DeepDaoOrganizationRow, { OrganizationDetails } from './DeepDaoOrganizationRow';
-import { UserDetailsProps } from './UserDetails';
+import { isPublicUser, UserDetailsProps } from './UserDetails';
+import ManagePOAPModal from './ManagePOAPModal';
 
 export function AggregatedDataItem ({ value, label }: { value: number, label: string }) {
-
   return (
     <Paper
       sx={{
@@ -69,7 +71,7 @@ function PoapRow ({ poap }: {poap: ExtendedPoap}) {
     >
       <Box
         width={{
-          sm: 75,
+          sm: 60,
           xs: 100
         }}
       >
@@ -78,14 +80,25 @@ function PoapRow ({ poap }: {poap: ExtendedPoap}) {
         </Link>
       </Box>
       <Stack>
-        <Typography fontWeight={500} variant='h6'>{poap.name}</Typography>
+        <Typography
+          fontWeight='bold'
+          sx={{
+            typography: {
+              sm: 'h5',
+              xs: 'h6'
+            }
+          }}
+        >{poap.name}
+        </Typography>
         <Typography variant='subtitle2'>{showDateWithMonthAndYear(poap.created) ?? '?'}</Typography>
       </Stack>
     </Stack>
   );
 }
 
-export function DeepDaoData ({ user, poapData }: Pick<UserDetailsProps, 'user'> & {poapData: GetPoapsResponse | undefined}) {
+export function DeepDaoData ({ user, poapData, mutatePoaps }: Pick<UserDetailsProps, 'user'> & {mutatePoaps: KeyedMutator<GetPoapsResponse>, poapData: GetPoapsResponse | undefined}) {
+  const isPublic = isPublicUser(user);
+  const managePoapModalState = usePopupState({ variant: 'popover', popupId: 'poap-modal' });
 
   const poaps: ExtendedPoap[] = [];
 
@@ -184,7 +197,7 @@ export function DeepDaoData ({ user, poapData }: Pick<UserDetailsProps, 'user'> 
           fontWeight={500}
         >Organizations
         </Typography>
-        <Chip size='small' label={sortedOrganizations.length} />
+        <Chip label={sortedOrganizations.length} />
       </Stack>
       <Stack gap={2}>
         {sortedOrganizations.map(organization => (
@@ -203,17 +216,24 @@ export function DeepDaoData ({ user, poapData }: Pick<UserDetailsProps, 'user'> 
       </Stack>
 
       <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
-        <Typography
-          fontWeight={500}
-          sx={{
-            typography: {
-              sm: 'h4',
-              xs: 'h5'
-            }
-          }}
-        >Poap/NFTs
-        </Typography>
-        <Chip size='small' label={poaps.length} />
+        <Stack flexDirection='row' gap={1}>
+          <Typography
+            fontWeight={500}
+            sx={{
+              typography: {
+                sm: 'h4',
+                xs: 'h5'
+              }
+            }}
+          >Poap/NFTs
+          </Typography>
+          {!isPublic && (
+          <IconButton onClick={managePoapModalState.open}>
+            <EditIcon data-testid='edit-description' />
+          </IconButton>
+          )}
+        </Stack>
+        <Chip label={poaps.length} />
       </Stack>
       <Stack gap={2}>
         {poaps.map(poap => (
@@ -229,6 +249,20 @@ export function DeepDaoData ({ user, poapData }: Pick<UserDetailsProps, 'user'> 
             />
           </Box>
         ))}
+        {
+          !isPublic && poapData && (
+          <ManagePOAPModal
+            isOpen={managePoapModalState.isOpen}
+            close={managePoapModalState.close}
+            save={async () => {
+              mutatePoaps();
+              managePoapModalState.close();
+            }}
+            visiblePoaps={poapData.visiblePoaps}
+            hiddenPoaps={poapData.hiddenPoaps}
+          />
+          )
+        }
       </Stack>
     </Grid>
   );
