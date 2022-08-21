@@ -97,13 +97,35 @@ function PoapRow ({ poap }: {poap: ExtendedPoap}) {
   );
 }
 
+interface DeepDaoEvent {
+  id: string
+  title: string
+  createdAt: string
+  verdict: boolean
+}
+
 function DeepDaoOrganizationRow ({ organization }: DeepDaoOrganizationRowProps) {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [currentTask, setCurrentTask] = useState<'vote' | 'proposal'>('vote');
   const theme = useTheme();
 
-  organization.proposals = organization.proposals.sort((proposalA, proposalB) => proposalA.createdAt > proposalB.createdAt ? -1 : 1);
-  organization.votes = organization.votes.sort((voteA, voteB) => voteA.createdAt > voteB.createdAt ? -1 : 1);
+  const proposals: DeepDaoEvent[] = organization.proposals
+    .sort((proposalA, proposalB) => proposalA.createdAt > proposalB.createdAt ? -1 : 1)
+    .map(proposal => ({
+      createdAt: proposal.createdAt,
+      id: proposal.proposalId,
+      title: proposal.title,
+      verdict: proposal.outcome === proposal.voteChoice
+    }));
+
+  const votes: DeepDaoEvent[] = organization.votes
+    .sort((voteA, voteB) => voteA.createdAt > voteB.createdAt ? -1 : 1)
+    .map(vote => ({
+      createdAt: vote.createdAt,
+      id: vote.voteId,
+      title: vote.title,
+      verdict: Boolean(vote.successful)
+    }));
 
   return (
     <Stack gap={1}>
@@ -149,33 +171,20 @@ function DeepDaoOrganizationRow ({ organization }: DeepDaoOrganizationRowProps) 
               />
             ))}
           </Tabs>
-          {(currentTask === 'vote' ? (
-            <Stack gap={2}>
-              {organization.votes.map((vote, voteNumber) => (
-                <Stack key={vote.voteId} flexDirection='row' justifyContent='space-between'>
-                  <Stack flexDirection='row' gap={1} alignItems='center'>
-                    {vote.successful ? <ThumbUpIcon color='success' fontSize='small' /> : <ThumbDownIcon color='error' fontSize='small' />}
-                    <Typography fontWeight={500}>{voteNumber + 1}.</Typography>
-                    <Typography>{vote.title}</Typography>
+          <Stack gap={2}>
+            {
+                (currentTask === 'vote' ? votes : proposals).map((event, eventNumber) => (
+                  <Stack key={event.id} flexDirection='row' justifyContent='space-between'>
+                    <Stack flexDirection='row' gap={1} alignItems='center'>
+                      {event.verdict ? <ThumbUpIcon color='success' fontSize='small' /> : <ThumbDownIcon color='error' fontSize='small' />}
+                      <Typography fontWeight={500}>{eventNumber + 1}.</Typography>
+                      <Typography>{event.title}</Typography>
+                    </Stack>
+                    <Typography variant='subtitle1'>{showDateWithMonthAndYear(event.createdAt, true)}</Typography>
                   </Stack>
-                  <Typography variant='subtitle1'>{showDateWithMonthAndYear(vote.createdAt, true)}</Typography>
-                </Stack>
-              ))}
-            </Stack>
-          ) : (
-            <Stack gap={2}>
-              {organization.proposals.map((proposal, proposalNumber) => (
-                <Stack key={proposal.proposalId} flexDirection='row' justifyContent='space-between'>
-                  <Stack flexDirection='row' gap={1} alignItems='center'>
-                    {proposal.outcome === proposal.voteChoice ? <ThumbUpIcon color='success' fontSize='small' /> : <ThumbDownIcon color='error' fontSize='small' />}
-                    <Typography fontWeight={500}>{proposalNumber + 1}.</Typography>
-                    <Typography>{proposal.title}</Typography>
-                  </Stack>
-                  <Typography variant='subtitle1'>{showDateWithMonthAndYear(proposal.createdAt, true)}</Typography>
-                </Stack>
-              ))}
-            </Stack>
-          ))}
+                ))
+              }
+          </Stack>
         </Box>
       </Collapse>
     </Stack>
