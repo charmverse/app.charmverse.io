@@ -133,11 +133,10 @@ export function DeepDaoData ({ user }: Pick<UserDetailsProps, 'user'>) {
             <Typography
               sx={{
                 typography: {
-                  sm: 'h4',
-                  xs: 'h5'
+                  sm: 'h1',
+                  xs: 'h2'
                 }
               }}
-              fontWeight={500}
             >Organizations
             </Typography>
             <Chip label={sortedOrganizations.length} />

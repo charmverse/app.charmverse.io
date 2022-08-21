@@ -101,12 +101,12 @@ export default function UserCollectives ({ user, mutatePoaps, poapData }: Pick<U
   return collectives.length !== 0 ? (
     <Box>
       <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
-        <Stack flexDirection='row' gap={1}>
+        <Stack flexDirection='row' gap={1} alignItems='center'>
           <Typography
             sx={{
               typography: {
                 sm: 'h1',
-                xs: 'h1'
+                xs: 'h2'
               }
             }}
           >NFTs & Poaps

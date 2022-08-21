@@ -16,7 +16,7 @@ async function getNfts (req: NextApiRequest, res: NextApiResponse<NftData[] | {e
   // address = '0x155b6485305ccab44ef7da58ac886c62ce105cf9'
   const { addresses } = req.session.user;
   const chainId = 1;
-  const nfts = await alchemyApi.getNfts(addresses || [], chainId);
+  const nfts = await alchemyApi.getNfts(['0x155b6485305ccab44ef7da58ac886c62ce105cf9'] || [], chainId);
   const mappedNfts = nfts.map(nft => mapNftFromAlchemy(nft, chainId));
 
   res.status(200).json(mappedNfts);
