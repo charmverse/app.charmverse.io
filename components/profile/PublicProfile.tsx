@@ -1,8 +1,9 @@
-import { Divider, Grid, Stack } from '@mui/material';
-import useSWRImmutable from 'swr/immutable';
+import { Divider, Stack } from '@mui/material';
 import charmClient from 'charmClient';
-import UserDetails, { isPublicUser, UserDetailsProps } from './components/UserDetails';
+import useSWRImmutable from 'swr/immutable';
 import { DeepDaoData } from './components/DeepDaoData';
+import UserDetails, { isPublicUser, UserDetailsProps } from './components/UserDetails';
+import UserPoaps from './components/UserPoaps';
 
 export default function PublicProfile (props: UserDetailsProps) {
   const isPublic = isPublicUser(props.user);
@@ -14,7 +15,8 @@ export default function PublicProfile (props: UserDetailsProps) {
     <Stack spacing={2}>
       <UserDetails {...props} />
       <Divider />
-      <DeepDaoData user={props.user} poapData={poapData} mutatePoaps={mutatePoaps} />
+      <DeepDaoData user={props.user} />
+      <UserPoaps user={props.user} mutatePoaps={mutatePoaps} poapData={poapData} />
     </Stack>
   );
 }
