@@ -1,4 +1,4 @@
-import { Box, Chip, CircularProgress, Collapse, Divider, Grid, IconButton, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
+import { Box, Chip, CircularProgress, Collapse, Divider, Link, Grid, IconButton, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
 import charmClient from 'charmClient';
 import { useTheme } from '@emotion/react';
 import { DeepDaoOrganization, DeepDaoProposal, DeepDaoVote } from 'lib/deepdao/interfaces';
@@ -13,6 +13,7 @@ import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import { isTruthy } from 'lib/utilities/types';
 import { ExtendedPoap } from 'models';
 import { GetPoapsResponse } from 'lib/poap';
+import styled from '@emotion/styled';
 import { UserDetailsProps } from './UserDetails';
 
 export function AggregatedDataItem ({ value, label }: { value: number, label: string }) {
@@ -77,29 +78,6 @@ const TASK_TABS = [
   { icon: <ForumIcon />, label: 'Proposals', type: 'proposal' }
 ] as const;
 
-function PoapRow ({ poap }: {poap: ExtendedPoap}) {
-  return (
-    <Stack gap={1}>
-      <Stack flexDirection='row' gap={2}>
-        <Box>
-          <img
-            src={poap.imageURL}
-            width={50}
-            height='100%'
-            style={{
-              objectFit: 'contain'
-            }}
-          />
-        </Box>
-        <Stack justifyContent='space-between'>
-          <Typography fontWeight={500} variant='h5'>{poap.name}</Typography>
-          <Typography>{showDateWithMonthAndYear(poap.created) ?? '?'}</Typography>
-        </Stack>
-      </Stack>
-    </Stack>
-  );
-}
-
 interface DeepDaoEvent {
   id: string
   title: string
@@ -131,9 +109,18 @@ function DeepDaoOrganizationRow ({ organization }: DeepDaoOrganizationRowProps) 
     }));
 
   return (
-    <Stack gap={1}>
+    <Stack gap={0.5}>
       <Stack flexDirection='row' justifyContent='space-between'>
-        <Typography fontWeight={500} variant='h5'>{organization.name}</Typography>
+        <Typography
+          sx={{
+            typography: {
+              sm: 'h5',
+              xs: 'h6'
+            }
+          }}
+          fontWeight={500}
+        >{organization.name}
+        </Typography>
         <IconButton
           size='small'
           onClick={() => setIsCollapsed(!isCollapsed)}
@@ -222,7 +209,48 @@ function DeepDaoOrganizationRow ({ organization }: DeepDaoOrganizationRowProps) 
   );
 }
 
+const StyledImage = styled.img`
+  width: 100%;
+  border-radius: 50%;
+`;
+
+function PoapRow ({ poap }: {poap: ExtendedPoap}) {
+
+  return (
+    <Stack
+      sx={{
+        flexDirection: {
+          sm: 'row',
+          xs: 'column'
+        }
+      }}
+      gap={2}
+    >
+      <Box
+        width={{
+          sm: 75,
+          xs: 100
+        }}
+      >
+        <Link href={`https://app.poap.xyz/token/${poap.tokenId}`} target='_blank' display='flex'>
+          <StyledImage src={poap.imageURL} />
+        </Link>
+      </Box>
+      <Stack justifyContent='space-between' gap={0.5}>
+        <Typography fontWeight={500} variant='h6'>{poap.name}</Typography>
+        <Typography variant='subtitle2'>{showDateWithMonthAndYear(poap.created) ?? '?'}</Typography>
+      </Stack>
+    </Stack>
+  );
+}
+
 export function DeepDaoData ({ user, poapData }: Pick<UserDetailsProps, 'user'> & {poapData: GetPoapsResponse | undefined}) {
+
+  const poaps: ExtendedPoap[] = [];
+
+  poapData?.hiddenPoaps.forEach(poap => poaps.push(poap as any));
+  poapData?.visiblePoaps.forEach(poap => poaps.push(poap as any));
+
   const { data, isValidating } = useSWRImmutable(user ? `userAggregatedData/${user.id}` : null, () => {
     return charmClient.getAggregatedData(user.id);
   });
@@ -305,7 +333,16 @@ export function DeepDaoData ({ user, poapData }: Pick<UserDetailsProps, 'user'> 
       </Box>
 
       <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
-        <Typography variant='h4' fontWeight={500}>Organizations</Typography>
+        <Typography
+          sx={{
+            typography: {
+              sm: 'h4',
+              xs: 'h5'
+            }
+          }}
+          fontWeight={500}
+        >Organizations
+        </Typography>
         <Chip size='small' label={sortedOrganizations.length} />
       </Stack>
       <Stack gap={2}>
@@ -315,6 +352,35 @@ export function DeepDaoData ({ user, poapData }: Pick<UserDetailsProps, 'user'> 
           >
             <DeepDaoOrganizationRow
               organization={organization}
+            />
+            <Divider sx={{
+              mt: 2
+            }}
+            />
+          </Box>
+        ))}
+      </Stack>
+
+      <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
+        <Typography
+          fontWeight={500}
+          sx={{
+            typography: {
+              sm: 'h4',
+              xs: 'h5'
+            }
+          }}
+        >Poap/NFTs
+        </Typography>
+        <Chip size='small' label={poaps.length} />
+      </Stack>
+      <Stack gap={2}>
+        {poaps.map(poap => (
+          <Box
+            key={poap.id}
+          >
+            <PoapRow
+              poap={poap}
             />
             <Divider sx={{
               mt: 2

@@ -20,7 +20,7 @@ export default function PublicProfile (props: UserDetailsProps) {
           <DeepDaoData user={props.user} poapData={poapData} />
         </Grid>
         {/* <Grid item xs={12} md={5.75}>
-          <PoapSection user={props.user} mutatePoaps={mutatePoaps} poapData={poapData} />
+        <PoapSection user={props.user} mutatePoaps={mutatePoaps} poapData={poapData} />
         </Grid> */}
       </Grid>
     </Stack>
