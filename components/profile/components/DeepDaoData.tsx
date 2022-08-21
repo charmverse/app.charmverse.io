@@ -127,35 +127,38 @@ export function DeepDaoData ({ user }: Pick<UserDetailsProps, 'user'>) {
         <AggregatedDataItem label='Bounties' value={data.bounties} />
       </Box>
 
-      <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
-        <Typography
-          sx={{
-            typography: {
-              sm: 'h4',
-              xs: 'h5'
-            }
-          }}
-          fontWeight={500}
-        >Organizations
-        </Typography>
-        <Chip label={sortedOrganizations.length} />
-      </Stack>
-      <Stack gap={2}>
-        {sortedOrganizations.map(organization => (
-          <Box
-            key={organization.organizationId}
-          >
-            <DeepDaoOrganizationRow
-              organization={organization}
-            />
-            <Divider sx={{
-              mt: 2
-            }}
-            />
-          </Box>
-        ))}
-      </Stack>
-
+      {sortedOrganizations.length !== 0 ? (
+        <>
+          <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
+            <Typography
+              sx={{
+                typography: {
+                  sm: 'h4',
+                  xs: 'h5'
+                }
+              }}
+              fontWeight={500}
+            >Organizations
+            </Typography>
+            <Chip label={sortedOrganizations.length} />
+          </Stack>
+          <Stack gap={2}>
+            {sortedOrganizations.map(organization => (
+              <Box
+                key={organization.organizationId}
+              >
+                <DeepDaoOrganizationRow
+                  organization={organization}
+                />
+                <Divider sx={{
+                  mt: 2
+                }}
+                />
+              </Box>
+            ))}
+          </Stack>
+        </>
+      ) : null}
     </Grid>
   );
 }

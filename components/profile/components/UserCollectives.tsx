@@ -105,19 +105,18 @@ export default function UserCollectives ({ user, mutatePoaps, poapData }: Pick<U
 
   collectives = collectives.sort((collectiveA, collectiveB) => collectiveA.date > collectiveB.date ? -1 : 1);
 
-  return (
+  return collectives.length !== 0 ? (
     <Box>
       <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
         <Stack flexDirection='row' gap={1}>
           <Typography
-            fontWeight={500}
             sx={{
               typography: {
                 sm: 'h4',
                 xs: 'h5'
               }
             }}
-          >Poap/NFTs
+          >NFTs & Poaps
           </Typography>
           {!isPublic && (
           <IconButton onClick={managePoapModalState.open}>
@@ -157,5 +156,5 @@ export default function UserCollectives ({ user, mutatePoaps, poapData }: Pick<U
       }
       </Stack>
     </Box>
-  );
+  ) : null;
 }
