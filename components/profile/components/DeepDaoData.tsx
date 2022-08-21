@@ -10,8 +10,9 @@ import ForumIcon from '@mui/icons-material/Forum';
 import { useState } from 'react';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
-import { GetPoapsResponse } from 'lib/poap';
+import { isTruthy } from 'lib/utilities/types';
 import { ExtendedPoap } from 'models';
+import { GetPoapsResponse } from 'lib/poap';
 import { UserDetailsProps } from './UserDetails';
 
 export function AggregatedDataItem ({ value, label }: { value: number, label: string }) {
@@ -57,12 +58,15 @@ function showDateWithMonthAndYear (dateInput: Date | string, showDate?: boolean)
   })}${showDate ? ` ${date.getDate()},` : ''} ${date.getFullYear()}`;
 }
 
-interface DeepDaoOrganizationRowProps {
-  organization: DeepDaoOrganization
-  earliestEventDate: string
+type OrganizationDetails = DeepDaoOrganization & {
+  proposals: DeepDaoProposal[],
+  votes: DeepDaoVote[],
+  oldestEventDate: string,
   latestEventDate: string
-  proposals: DeepDaoProposal[]
-  votes: DeepDaoVote[]
+}
+
+interface DeepDaoOrganizationRowProps {
+  organization: OrganizationDetails
 }
 
 const TASK_TABS = [
@@ -93,13 +97,13 @@ function PoapRow ({ poap }: {poap: ExtendedPoap}) {
   );
 }
 
-function DeepDaoOrganizationRow ({ votes, proposals, organization, earliestEventDate, latestEventDate }: DeepDaoOrganizationRowProps) {
+function DeepDaoOrganizationRow ({ organization }: DeepDaoOrganizationRowProps) {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [currentTask, setCurrentTask] = useState<'vote' | 'proposal'>('vote');
   const theme = useTheme();
 
-  proposals = proposals.sort((proposalA, proposalB) => proposalA.createdAt > proposalB.createdAt ? -1 : 1);
-  votes = votes.sort((voteA, voteB) => voteA.createdAt > voteB.createdAt ? -1 : 1);
+  organization.proposals = organization.proposals.sort((proposalA, proposalB) => proposalA.createdAt > proposalB.createdAt ? -1 : 1);
+  organization.votes = organization.votes.sort((voteA, voteB) => voteA.createdAt > voteB.createdAt ? -1 : 1);
 
   return (
     <Stack gap={1}>
@@ -112,7 +116,7 @@ function DeepDaoOrganizationRow ({ votes, proposals, organization, earliestEvent
           {isCollapsed ? <ExpandMoreIcon fontSize='small' /> : <ExpandLessIcon fontSize='small' />}
         </IconButton>
       </Stack>
-      <Typography>{showDateWithMonthAndYear(earliestEventDate) ?? '?'} - {showDateWithMonthAndYear(latestEventDate) ?? '?'}</Typography>
+      <Typography variant='subtitle2'>{showDateWithMonthAndYear(organization.oldestEventDate) ?? '?'} - {showDateWithMonthAndYear(organization.latestEventDate) ?? '?'}</Typography>
 
       <Collapse in={!isCollapsed}>
         <Box>
@@ -147,7 +151,7 @@ function DeepDaoOrganizationRow ({ votes, proposals, organization, earliestEvent
           </Tabs>
           {(currentTask === 'vote' ? (
             <Stack gap={2}>
-              {votes.map((vote, voteNumber) => (
+              {organization.votes.map((vote, voteNumber) => (
                 <Stack key={vote.voteId} flexDirection='row' justifyContent='space-between'>
                   <Stack flexDirection='row' gap={1} alignItems='center'>
                     {vote.successful ? <ThumbUpIcon color='success' fontSize='small' /> : <ThumbDownIcon color='error' fontSize='small' />}
@@ -160,7 +164,7 @@ function DeepDaoOrganizationRow ({ votes, proposals, organization, earliestEvent
             </Stack>
           ) : (
             <Stack gap={2}>
-              {proposals.map((proposal, proposalNumber) => (
+              {organization.proposals.map((proposal, proposalNumber) => (
                 <Stack key={proposal.proposalId} flexDirection='row' justifyContent='space-between'>
                   <Stack flexDirection='row' gap={1} alignItems='center'>
                     {proposal.outcome === proposal.voteChoice ? <ThumbUpIcon color='success' fontSize='small' /> : <ThumbDownIcon color='error' fontSize='small' />}
@@ -177,13 +181,6 @@ function DeepDaoOrganizationRow ({ votes, proposals, organization, earliestEvent
     </Stack>
   );
 
-}
-
-type OrganizationDetails = DeepDaoOrganization & {
-  proposals: DeepDaoProposal[],
-  votes: DeepDaoVote[],
-  oldestEventDate: string,
-  latestEventDate: string
 }
 
 export function DeepDaoData ({ user, poapData }: Pick<UserDetailsProps, 'user'> & {poapData: GetPoapsResponse | undefined}) {
@@ -203,70 +200,52 @@ export function DeepDaoData ({ user, poapData }: Pick<UserDetailsProps, 'user'> 
     return null;
   }
 
-  const poaps: (Partial<ExtendedPoap> & {createdAt: string})[] = [];
-
-  const hiddenPoapIds: Set<string> = new Set();
-  const visiblePoapIds: Set<string> = new Set();
-
-  poapData?.hiddenPoaps.forEach(poap => {
-    poaps.push({ ...poap, createdAt: poap.created as string });
-    hiddenPoapIds.add(poap.id as string);
-  });
-  poapData?.visiblePoaps.forEach(poap => {
-    poaps.push({ ...poap, createdAt: poap.created as string });
-    visiblePoapIds.add(poap.id as string);
-  });
-
-  const organizationsRecord: Record<string, OrganizationDetails> = data.organizations
-    .reduce((acc, org) => ({ ...acc,
+  const organizationsRecord: Record<
+    string,
+    OrganizationDetails | undefined
+  > = data.organizations
+    .reduce((acc, org) => ({
+      ...acc,
       [org.organizationId]: {
         ...org,
-        proposals: [],
-        votes: [],
         oldestEventDate: '',
-        latestEventDate: ''
-      } }), {});
+        latestEventDate: '',
+        proposals: [],
+        votes: []
+      }
+    }), {});
 
   // Sort the proposals and votes based on their created at date and attach organization data with it
   const events = [...data.proposals.map(proposal => ({ type: 'proposal', ...proposal })), ...data.votes.map(vote => ({ type: 'vote', ...vote }))];
 
   events.forEach(event => {
-    if (event.type === 'proposal') {
-      organizationsRecord[event.organizationId].proposals.push(event as DeepDaoProposal);
-    }
-    else if (event.type === 'vote') {
-      organizationsRecord[event.organizationId].votes.push(event as DeepDaoVote);
-    }
-    if (!organizationsRecord[event.organizationId].oldestEventDate) {
-      organizationsRecord[event.organizationId].oldestEventDate = event.createdAt;
-    }
-    else if (organizationsRecord[event.organizationId].oldestEventDate > event.createdAt) {
-      organizationsRecord[event.organizationId].oldestEventDate = event.createdAt;
-    }
+    const organization = organizationsRecord[event.organizationId];
+    if (organization) {
+      if (event.type === 'proposal') {
+        organization.proposals.push(event as DeepDaoProposal);
+      }
+      else if (event.type === 'vote') {
+        organization.votes.push(event as DeepDaoVote);
+      }
+      if (!organization.oldestEventDate) {
+        organization.oldestEventDate = event.createdAt;
+      }
+      else if (organization.oldestEventDate > event.createdAt) {
+        organization.oldestEventDate = event.createdAt;
+      }
 
-    if (!organizationsRecord[event.organizationId].latestEventDate) {
-      organizationsRecord[event.organizationId].latestEventDate = event.createdAt;
-    }
-    else if (organizationsRecord[event.organizationId].latestEventDate < event.createdAt) {
-      organizationsRecord[event.organizationId].latestEventDate = event.createdAt;
+      if (!organization.latestEventDate) {
+        organization.latestEventDate = event.createdAt;
+      }
+      else if (organization.latestEventDate < event.createdAt) {
+        organization.latestEventDate = event.createdAt;
+      }
     }
   });
 
-  const sortedItems = ([...Object.values(organizationsRecord).map(org => ({ ...org, type: 'organization' as const })), ...poaps.map(poap => ({ ...poap, type: 'poap' } as any))] as ((OrganizationDetails & {type: 'organization'}) | ({type: 'poap'} & ExtendedPoap))[]).sort((itemA, itemB) => {
-    if (itemA.type === 'organization' && itemB.type === 'poap') {
-      return itemA.oldestEventDate > itemB.created ? -1 : 1;
-    }
-    else if (itemA.type === 'organization' && itemB.type === 'organization') {
-      return itemA.oldestEventDate > itemB.oldestEventDate ? -1 : 1;
-    }
-    else if (itemA.type === 'poap' && itemB.type === 'organization') {
-      return itemA.created > itemB.oldestEventDate ? -1 : 1;
-    }
-    else if (itemA.type === 'poap' && itemB.type === 'poap') {
-      return itemA.created > itemB.created ? -1 : 1;
-    }
-    return 0;
-  });
+  const sortedOrganizations = Object.values(organizationsRecord).filter(isTruthy)
+    .sort((orgA, orgB) => orgA.latestEventDate > orgB.latestEventDate ? -1 : 1)
+    .filter((organization) => (organization.votes.length !== 0 || organization.proposals.length !== 0));
 
   return (
     <Grid container display='flex' gap={2} flexDirection='column'>
@@ -280,33 +259,17 @@ export function DeepDaoData ({ user, poapData }: Pick<UserDetailsProps, 'user'> 
       </Box>
 
       <Stack gap={2}>
-        {sortedItems.map(item => (
+        {sortedOrganizations.map(organization => (
           <Box
-            key={item.type === 'poap' ? item.id : item.organizationId}
+            key={organization.organizationId}
           >
-            {item.type === 'organization' ? (organizationsRecord[item.organizationId].proposals.length !== 0 || organizationsRecord[item.organizationId].votes.length !== 0) ? (
-              <Box key={item.organizationId}>
-                <DeepDaoOrganizationRow
-                  votes={organizationsRecord[item.organizationId].votes}
-                  proposals={organizationsRecord[item.organizationId].proposals}
-                  organization={item}
-                  latestEventDate={organizationsRecord[item.organizationId]?.latestEventDate}
-                  earliestEventDate={organizationsRecord[item.organizationId]?.oldestEventDate}
-                />
-                <Divider sx={{
-                  mt: 2
-                }}
-                />
-              </Box>
-            ) : null : (
-              <Box key={item.id}>
-                <PoapRow poap={item} />
-                <Divider sx={{
-                  mt: 2
-                }}
-                />
-              </Box>
-            )}
+            <DeepDaoOrganizationRow
+              organization={organization}
+            />
+            <Divider sx={{
+              mt: 2
+            }}
+            />
           </Box>
         ))}
       </Stack>
