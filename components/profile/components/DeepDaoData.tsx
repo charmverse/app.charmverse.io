@@ -1,19 +1,14 @@
-import { Box, Chip, CircularProgress, Collapse, Divider, Link, Grid, IconButton, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
+import { Box, Chip, CircularProgress, Divider, Grid, Link, Paper, Stack, Typography } from '@mui/material';
 import charmClient from 'charmClient';
-import { useTheme } from '@emotion/react';
-import { DeepDaoOrganization, DeepDaoProposal, DeepDaoVote } from 'lib/deepdao/interfaces';
+import { DeepDaoProposal, DeepDaoVote } from 'lib/deepdao/interfaces';
 import useSWRImmutable from 'swr/immutable';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import HowToVoteIcon from '@mui/icons-material/HowToVote';
-import ForumIcon from '@mui/icons-material/Forum';
-import { useState } from 'react';
-import ThumbUpIcon from '@mui/icons-material/ThumbUp';
-import ThumbDownIcon from '@mui/icons-material/ThumbDown';
+
+import styled from '@emotion/styled';
+import { GetPoapsResponse } from 'lib/poap';
 import { isTruthy } from 'lib/utilities/types';
 import { ExtendedPoap } from 'models';
-import { GetPoapsResponse } from 'lib/poap';
-import styled from '@emotion/styled';
+import { showDateWithMonthAndYear } from 'lib/utilities/dates';
+import DeepDaoOrganizationRow, { OrganizationDetails } from './DeepDaoOrganizationRow';
 import { UserDetailsProps } from './UserDetails';
 
 export function AggregatedDataItem ({ value, label }: { value: number, label: string }) {
@@ -55,160 +50,6 @@ export function AggregatedDataItem ({ value, label }: { value: number, label: st
   );
 }
 
-function showDateWithMonthAndYear (dateInput: Date | string, showDate?: boolean) {
-  const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
-  return `${date.toLocaleString('default', {
-    month: 'long'
-  })}${showDate ? ` ${date.getDate()},` : ''} ${date.getFullYear()}`;
-}
-
-type OrganizationDetails = DeepDaoOrganization & {
-  proposals: DeepDaoProposal[],
-  votes: DeepDaoVote[],
-  oldestEventDate: string,
-  latestEventDate: string
-}
-
-interface DeepDaoOrganizationRowProps {
-  organization: OrganizationDetails
-}
-
-const TASK_TABS = [
-  { icon: <HowToVoteIcon />, label: 'Votes', type: 'vote' },
-  { icon: <ForumIcon />, label: 'Proposals', type: 'proposal' }
-] as const;
-
-interface DeepDaoEvent {
-  id: string
-  title: string
-  createdAt: string
-  verdict: boolean
-}
-
-function DeepDaoOrganizationRow ({ organization }: DeepDaoOrganizationRowProps) {
-  const [isCollapsed, setIsCollapsed] = useState(true);
-  const [currentTask, setCurrentTask] = useState<'vote' | 'proposal'>('vote');
-  const theme = useTheme();
-
-  const proposals: DeepDaoEvent[] = organization.proposals
-    .sort((proposalA, proposalB) => proposalA.createdAt > proposalB.createdAt ? -1 : 1)
-    .map(proposal => ({
-      createdAt: proposal.createdAt,
-      id: proposal.proposalId,
-      title: proposal.title,
-      verdict: proposal.outcome === proposal.voteChoice
-    }));
-
-  const votes: DeepDaoEvent[] = organization.votes
-    .sort((voteA, voteB) => voteA.createdAt > voteB.createdAt ? -1 : 1)
-    .map(vote => ({
-      createdAt: vote.createdAt,
-      id: vote.voteId,
-      title: vote.title,
-      verdict: Boolean(vote.successful)
-    }));
-
-  return (
-    <Stack gap={0.5}>
-      <Stack flexDirection='row' justifyContent='space-between'>
-        <Typography
-          sx={{
-            typography: {
-              sm: 'h5',
-              xs: 'h6'
-            }
-          }}
-          fontWeight={500}
-        >{organization.name}
-        </Typography>
-        <IconButton
-          size='small'
-          onClick={() => setIsCollapsed(!isCollapsed)}
-        >
-          {isCollapsed ? <ExpandMoreIcon fontSize='small' /> : <ExpandLessIcon fontSize='small' />}
-        </IconButton>
-      </Stack>
-      <Typography variant='subtitle2'>{showDateWithMonthAndYear(organization.oldestEventDate) ?? '?'} - {showDateWithMonthAndYear(organization.latestEventDate) ?? '?'}</Typography>
-
-      <Collapse in={!isCollapsed}>
-        <Box>
-          <Tabs
-            sx={{
-              mb: 2
-            }}
-            indicatorColor='primary'
-            value={TASK_TABS.findIndex(taskTab => taskTab.type === currentTask)}
-          >
-            {TASK_TABS.map(task => (
-              <Tab
-                component='div'
-                disableRipple
-                iconPosition='start'
-                icon={task.icon}
-                key={task.label}
-                sx={{
-                  px: 1.5,
-                  fontSize: 14,
-                  minHeight: 0,
-                  '&.MuiTab-root': {
-                    color: theme.palette.secondary.main
-                  }
-                }}
-                label={task.label}
-                onClick={() => {
-                  setCurrentTask(task.type);
-                }}
-              />
-            ))}
-          </Tabs>
-          <Stack gap={2}>
-            {
-                (currentTask === 'vote' ? votes : proposals).map((event, eventNumber) => (
-                  <Stack key={event.id} flexDirection='row' gap={1}>
-                    <Stack
-                      flexDirection='row'
-                      gap={1}
-                      alignItems='center'
-                      sx={{
-                        alignSelf: 'flex-start'
-                      }}
-                    >
-                      {event.verdict ? (
-                        <ThumbUpIcon
-                          color='success'
-                          fontSize='small'
-                        />
-                      ) : <ThumbDownIcon color='error' fontSize='small' />}
-                      <Typography fontWeight={500}>{eventNumber + 1}.</Typography>
-                    </Stack>
-                    <Stack
-                      gap={0.5}
-                      sx={{
-                        flexGrow: 1,
-                        flexDirection: {
-                          sm: 'column',
-                          md: 'row'
-                        },
-                        alignItems: 'flex-start'
-                      }}
-                    >
-                      <Typography sx={{
-                        flexGrow: 1
-                      }}
-                      >{event.title}
-                      </Typography>
-                      <Typography variant='subtitle1' color='secondary' textAlign={{ sm: 'left', md: 'right' }} minWidth={100}>{showDateWithMonthAndYear(event.createdAt, true)}</Typography>
-                    </Stack>
-                  </Stack>
-                ))
-              }
-          </Stack>
-        </Box>
-      </Collapse>
-    </Stack>
-  );
-}
-
 const StyledImage = styled.img`
   width: 100%;
   border-radius: 50%;
@@ -236,7 +77,7 @@ function PoapRow ({ poap }: {poap: ExtendedPoap}) {
           <StyledImage src={poap.imageURL} />
         </Link>
       </Box>
-      <Stack justifyContent='space-between' gap={0.5}>
+      <Stack>
         <Typography fontWeight={500} variant='h6'>{poap.name}</Typography>
         <Typography variant='subtitle2'>{showDateWithMonthAndYear(poap.created) ?? '?'}</Typography>
       </Stack>
