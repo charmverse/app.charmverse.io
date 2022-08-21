@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Collapse, Divider, Grid, IconButton, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
+import { Box, Chip, CircularProgress, Collapse, Divider, Grid, IconButton, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
 import charmClient from 'charmClient';
 import { useTheme } from '@emotion/react';
 import { DeepDaoOrganization, DeepDaoProposal, DeepDaoVote } from 'lib/deepdao/interfaces';
@@ -304,6 +304,10 @@ export function DeepDaoData ({ user, poapData }: Pick<UserDetailsProps, 'user'> 
         <AggregatedDataItem label='Bounties' value={data.bounties} />
       </Box>
 
+      <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
+        <Typography variant='h4' fontWeight={500}>Organizations</Typography>
+        <Chip size='small' label={sortedOrganizations.length} />
+      </Stack>
       <Stack gap={2}>
         {sortedOrganizations.map(organization => (
           <Box
