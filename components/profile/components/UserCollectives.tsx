@@ -33,16 +33,9 @@ function UserCollectiveRow ({ collective }: {collective: Collective}) {
       gap={2}
     >
       {collective.type === 'poap' ? (
-        <Box
-          width={{
-            sm: 60,
-            xs: 100
-          }}
-        >
-          <Link href={collective.link} target='_blank' display='flex'>
-            <Avatar size='large' avatar={collective.image} />
-          </Link>
-        </Box>
+        <Link href={collective.link} target='_blank' display='flex'>
+          <Avatar size='large' avatar={collective.image} />
+        </Link>
       ) : <Avatar isNft size='large' avatar={collective.image} />}
       <Stack justifyContent='center'>
         <Typography
@@ -112,8 +105,8 @@ export default function UserCollectives ({ user, mutatePoaps, poapData }: Pick<U
           <Typography
             sx={{
               typography: {
-                sm: 'h4',
-                xs: 'h5'
+                sm: 'h1',
+                xs: 'h1'
               }
             }}
           >NFTs & Poaps
