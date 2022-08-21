@@ -18,36 +18,39 @@ import { UserDetailsProps } from './UserDetails';
 export function AggregatedDataItem ({ value, label }: { value: number, label: string }) {
 
   return (
-    <Grid item xs={6}>
-      <Paper
+    <Paper
+      sx={{
+        gap: 1,
+        px: 2,
+        py: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        flexGrow: 1,
+        textAlign: {
+          sm: 'left',
+          xs: 'center'
+        }
+      }}
+    >
+      <Typography
+        color='secondary'
         sx={{
-          gap: 1,
-          px: 2,
-          py: 1,
-          display: 'flex',
-          alignItems: 'center'
+          fontWeight: 500
         }}
+      > {label}
+      </Typography>
+      <Typography sx={{
+        fontSize: {
+          xs: '1.5rem',
+          sm: '1.75rem'
+        },
+        fontWeight: 'bold'
+      }}
       >
-        <Typography sx={{
-          fontSize: {
-            xs: '1.25rem',
-            sm: '1.5rem'
-          },
-          fontWeight: 'bold'
-        }}
-        >
-          {value}
-        </Typography>
-        <Typography
-          color='secondary'
-          sx={{
-            fontWeight: 500
-          }}
-        > {label}
-        </Typography>
-      </Paper>
+        {value}
+      </Typography>
 
-    </Grid>
+    </Paper>
   );
 }
 
@@ -207,7 +210,7 @@ function DeepDaoOrganizationRow ({ organization }: DeepDaoOrganizationRowProps) 
                       }}
                       >{event.title}
                       </Typography>
-                      <Typography variant='subtitle2' textAlign={{ sm: 'left', md: 'right' }} minWidth={100}>{showDateWithMonthAndYear(event.createdAt, true)}</Typography>
+                      <Typography variant='subtitle1' color='secondary' textAlign={{ sm: 'left', md: 'right' }} minWidth={100}>{showDateWithMonthAndYear(event.createdAt, true)}</Typography>
                     </Stack>
                   </Stack>
                 ))
@@ -217,7 +220,6 @@ function DeepDaoOrganizationRow ({ organization }: DeepDaoOrganizationRowProps) 
       </Collapse>
     </Stack>
   );
-
 }
 
 export function DeepDaoData ({ user, poapData }: Pick<UserDetailsProps, 'user'> & {poapData: GetPoapsResponse | undefined}) {
@@ -286,13 +288,20 @@ export function DeepDaoData ({ user, poapData }: Pick<UserDetailsProps, 'user'> 
 
   return (
     <Grid container display='flex' gap={2} flexDirection='column'>
-      <Box display='flex' gap={2} mr={2}>
-        <AggregatedDataItem label='communities' value={data.daos} />
-        <AggregatedDataItem label='votes' value={data.totalVotes} />
-      </Box>
-      <Box display='flex' gap={2} mr={2}>
-        <AggregatedDataItem label='proposals' value={data.totalProposals} />
-        <AggregatedDataItem label={data.bounties > 1 ? 'bounties' : 'bounty'} value={data.bounties} />
+      <Box
+        gap={1}
+        sx={{
+          display: 'flex',
+          flexDirection: {
+            xs: 'column',
+            sm: 'row'
+          }
+        }}
+      >
+        <AggregatedDataItem label='Communities' value={data.daos} />
+        <AggregatedDataItem label='Proposals' value={data.totalProposals} />
+        <AggregatedDataItem label='Votes' value={data.totalVotes} />
+        <AggregatedDataItem label='Bounties' value={data.bounties} />
       </Box>
 
       <Stack gap={2}>
