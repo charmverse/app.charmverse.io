@@ -174,13 +174,41 @@ function DeepDaoOrganizationRow ({ organization }: DeepDaoOrganizationRowProps) 
           <Stack gap={2}>
             {
                 (currentTask === 'vote' ? votes : proposals).map((event, eventNumber) => (
-                  <Stack key={event.id} flexDirection='row' justifyContent='space-between'>
-                    <Stack flexDirection='row' gap={1} alignItems='center'>
-                      {event.verdict ? <ThumbUpIcon color='success' fontSize='small' /> : <ThumbDownIcon color='error' fontSize='small' />}
+                  <Stack key={event.id} flexDirection='row' gap={1}>
+                    <Stack
+                      flexDirection='row'
+                      gap={1}
+                      alignItems='center'
+                      sx={{
+                        alignSelf: 'flex-start'
+                      }}
+                    >
+                      {event.verdict ? (
+                        <ThumbUpIcon
+                          color='success'
+                          fontSize='small'
+                        />
+                      ) : <ThumbDownIcon color='error' fontSize='small' />}
                       <Typography fontWeight={500}>{eventNumber + 1}.</Typography>
-                      <Typography>{event.title}</Typography>
                     </Stack>
-                    <Typography variant='subtitle1'>{showDateWithMonthAndYear(event.createdAt, true)}</Typography>
+                    <Stack
+                      gap={0.5}
+                      sx={{
+                        flexGrow: 1,
+                        flexDirection: {
+                          sm: 'column',
+                          md: 'row'
+                        },
+                        alignItems: 'flex-start'
+                      }}
+                    >
+                      <Typography sx={{
+                        flexGrow: 1
+                      }}
+                      >{event.title}
+                      </Typography>
+                      <Typography variant='subtitle2' textAlign={{ sm: 'left', md: 'right' }} minWidth={100}>{showDateWithMonthAndYear(event.createdAt, true)}</Typography>
+                    </Stack>
                   </Stack>
                 ))
               }
