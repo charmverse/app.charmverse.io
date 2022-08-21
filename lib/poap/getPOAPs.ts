@@ -3,7 +3,7 @@ import { ExtendedPoap } from 'models';
 
 const getPOAPsURL = (address: string) => `https://api.poap.tech/actions/scan/${address}`;
 
-export default async function getPOAPs (addresses: Array<string>): Promise<Array<Partial<ExtendedPoap>>> {
+export default async function getPOAPs (addresses: Array<string>): Promise<Array<ExtendedPoap>> {
   const requests: Array<Promise<any>> = [];
 
   addresses.forEach(address => {
@@ -22,7 +22,8 @@ export default async function getPOAPs (addresses: Array<string>): Promise<Array
     walletAddress: rawPoap.owner,
     imageURL: rawPoap.event?.image_url,
     created: rawPoap.created,
-    name: rawPoap.event?.name
+    name: rawPoap.event?.name,
+    isHidden: false
   }));
 
   return poaps;

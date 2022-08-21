@@ -41,10 +41,10 @@ async function getUserPoaps (req: NextApiRequest, res: NextApiResponse<GetPoapsR
     throw new InvalidStateError('User not found');
   }
 
-  const poaps: Partial<ExtendedPoap>[] = await getPOAPs(user.addresses);
+  const poaps: ExtendedPoap[] = await getPOAPs(user.addresses);
 
-  const hiddenPoaps = poaps.filter((poap: Partial<ExtendedPoap>) => hiddenPoapIDs.find((tokenId :string) => poap.tokenId === tokenId));
-  const visiblePoaps = poaps.filter((poap: Partial<ExtendedPoap>) => !hiddenPoapIDs.find((tokenId :string) => poap.tokenId === tokenId));
+  const hiddenPoaps = poaps.filter((poap: ExtendedPoap) => hiddenPoapIDs.find((tokenId :string) => poap.tokenId === tokenId));
+  const visiblePoaps = poaps.filter((poap: ExtendedPoap) => !hiddenPoapIDs.find((tokenId :string) => poap.tokenId === tokenId));
 
   return res.status(200).json({
     hiddenPoaps,

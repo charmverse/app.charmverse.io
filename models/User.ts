@@ -1,4 +1,4 @@
-import type { DiscordUser, FavoritePage, Poap, SpaceRole, User, Role as RoleMembership, SpaceRoleToRole, TelegramUser, UserNotificationState } from '@prisma/client';
+import type { DiscordUser, FavoritePage, Role as RoleMembership, SpaceRole, SpaceRoleToRole, TelegramUser, User, UserNotificationState } from '@prisma/client';
 
 export { FavoritePage, SpaceRole, User };
 
@@ -21,9 +21,11 @@ export interface LoggedInUser extends User {
   notificationState?: UserNotificationState | null
 }
 
-export interface ExtendedPoap extends Poap {
+export interface ExtendedPoap {
   imageURL: string;
   isHidden: boolean;
+  walletAddress: string
+  tokenId: string
   created: string
   name: string
 }

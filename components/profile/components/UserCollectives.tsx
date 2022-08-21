@@ -67,7 +67,7 @@ export default function UserCollectives ({ user, mutatePoaps, poapData }: Pick<U
     collectives.push({
       type: 'poap',
       date: poap.created as string,
-      id: poap.id,
+      id: poap.tokenId,
       image: poap.imageURL,
       title: poap.name,
       link: `https://app.poap.xyz/token/${poap.tokenId}`
@@ -78,7 +78,7 @@ export default function UserCollectives ({ user, mutatePoaps, poapData }: Pick<U
     collectives.push({
       type: 'poap',
       date: poap.created as string,
-      id: poap.id,
+      id: poap.tokenId,
       image: poap.imageURL,
       title: poap.name,
       link: `https://app.poap.xyz/token/${poap.tokenId}`
@@ -117,7 +117,7 @@ export default function UserCollectives ({ user, mutatePoaps, poapData }: Pick<U
           </IconButton>
           )}
         </Stack>
-        <Chip label={poaps.length} />
+        <Chip label={poaps.length + nfts.length} />
       </Stack>
       <Stack gap={2}>
         {collectives.map(collective => (
