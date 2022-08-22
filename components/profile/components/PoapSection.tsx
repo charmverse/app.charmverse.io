@@ -1,17 +1,16 @@
-import { useContext } from 'react';
-import useSWRImmutable from 'swr/immutable';
-import charmClient from 'charmClient';
-import { Box, Grid, Link, Stack, SvgIcon, Typography } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import IconButton from '@mui/material/IconButton';
 import styled from '@emotion/styled';
-import { usePopupState } from 'material-ui-popup-state/hooks';
-import PoapIcon from 'public/images/poap_logo.svg';
-import { LoggedInUser } from 'models';
-import type { PublicUser } from 'pages/api/public/profile/[userPath]';
+import EditIcon from '@mui/icons-material/Edit';
+import { Box, Grid, Link, Stack, SvgIcon, Typography } from '@mui/material';
+import IconButton from '@mui/material/IconButton';
 import Button from 'components/common/Button';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
-import ManagePOAPModal from './ManagePOAPModal';
+import { GetPoapsResponse } from 'lib/poap';
+import { usePopupState } from 'material-ui-popup-state/hooks';
+import { LoggedInUser } from 'models';
+import type { PublicUser } from 'pages/api/public/profile/[userPath]';
+import PoapIcon from 'public/images/poap_logo.svg';
+import { useContext } from 'react';
+import { KeyedMutator } from 'swr';
 import { isPublicUser } from './UserDetails';
 
 const StyledBox = styled(Box)`
@@ -26,16 +25,15 @@ const StyledImage = styled.img`
 
 type PoapSectionProps = {
   user: PublicUser | LoggedInUser;
+  poapData: GetPoapsResponse | undefined
+  mutatePoaps: KeyedMutator<GetPoapsResponse>
 };
 
 function PoapSection (props: PoapSectionProps) {
-  const { user } = props;
+  const { user, poapData, mutatePoaps } = props;
   const managePoapModalState = usePopupState({ variant: 'popover', popupId: 'poap-modal' });
   const { openWalletSelectorModal } = useContext(Web3Connection);
   const isPublic = isPublicUser(user);
-  const { data: poapData, mutate: mutatePoaps } = useSWRImmutable(`/poaps/${user.id}/${isPublic}`, () => {
-    return isPublicUser(user) ? Promise.resolve({ visiblePoaps: user.visiblePoaps, hiddenPoaps: [] }) : charmClient.getUserPoaps();
-  });
 
   const hasConnectedWallet: boolean = !isPublic && user.addresses.length !== 0;
 
@@ -101,20 +99,7 @@ function PoapSection (props: PoapSectionProps) {
           )
         }
       </Grid>
-      {
-        !isPublic && poapData && (
-        <ManagePOAPModal
-          isOpen={managePoapModalState.isOpen}
-          close={managePoapModalState.close}
-          save={async () => {
-            mutatePoaps();
-            managePoapModalState.close();
-          }}
-          visiblePoaps={poapData.visiblePoaps}
-          hiddenPoaps={poapData.hiddenPoaps}
-        />
-        )
-      }
+
     </StyledBox>
   );
 }
