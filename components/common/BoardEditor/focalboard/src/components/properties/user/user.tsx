@@ -23,7 +23,7 @@ const selectStyles = {
   })
 };
 
-function UserProperty (props: Props): JSX.Element {
+function UserProperty (props: Props): JSX.Element | null {
   const [contributors] = useContributors();
   const contributorMap = contributors.reduce<Record<string, Contributor>>((acc, contributor) => {
     acc[contributor.id] = contributor;
@@ -31,11 +31,12 @@ function UserProperty (props: Props): JSX.Element {
   }, {})
 
   if (props.readonly) {
-    return (
-      <div className='UserProperty octo-propertyvalue readonly'>
-        {contributorMap[props.value]?.username || (props.value ? '(missing name)' : '')}
-      </div>
-    );
+    if (contributorMap[props.value]) {
+      return (
+        <UserDisplay user={contributorMap[props.value]} avatarSize='small' fontSize='small' />
+      );
+    }
+    return null;
   }
 
   return (
@@ -46,7 +47,7 @@ function UserProperty (props: Props): JSX.Element {
       backspaceRemovesValue={true}
       className='UserProperty octo-propertyvalue'
       classNamePrefix='react-select'
-      formatOptionLabel={u => <UserDisplay user={u} avatarSize='small' />}
+      formatOptionLabel={u => <UserDisplay user={u} avatarSize='small' fontSize='small' />}
       styles={selectStyles}
       placeholder='Empty'
       getOptionLabel={(o: Contributor) => o.username}
