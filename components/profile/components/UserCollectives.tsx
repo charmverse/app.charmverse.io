@@ -91,7 +91,7 @@ export default function UserCollectives ({ user, mutatePoaps, poapData }: Pick<U
       type: 'nft',
       date: nft.timeLastUpdated,
       id: nft.tokenId,
-      image: nft.image,
+      image: nft.imageThumb ?? nft.image,
       title: nft.title,
       link: `https://app.poap.xyz/token/${nft.tokenId}`
     });
