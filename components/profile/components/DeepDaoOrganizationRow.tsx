@@ -62,9 +62,9 @@ export default function DeepDaoOrganizationRow ({ organization }: DeepDaoOrganiz
       <Stack flexDirection='row' justifyContent='space-between'>
         <Typography
           sx={{
-            typography: {
-              sm: 'h5',
-              xs: 'h6'
+            fontSize: {
+              sm: '1.15rem',
+              xs: '1.05rem'
             }
           }}
           fontWeight={500}

@@ -41,9 +41,9 @@ function UserCollectiveRow ({ collective }: {collective: Collective}) {
         <Typography
           fontWeight='bold'
           sx={{
-            typography: {
-              sm: 'h5',
-              xs: 'h6'
+            fontSize: {
+              sm: '1.15rem',
+              xs: '1.05rem'
             }
           }}
         >{collective.title}
