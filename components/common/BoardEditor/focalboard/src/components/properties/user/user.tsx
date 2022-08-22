@@ -1,22 +1,18 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import { useState } from 'react';
 import Select from 'react-select';
 import { CSSObject } from '@emotion/serialize';
 
-import { IUser } from '../../../user';
-import { getWorkspaceUsersList, getWorkspaceUsers } from '../../../store/users';
-import { useAppSelector } from '../../../store/hooks';
+import { useContributors, Contributor } from 'hooks/useContributors';
+import UserDisplay from 'components/common/UserDisplay';
 
 import { getSelectBaseStyle } from '../../../theme';
 
-const imageURLForUser = (typeof window !== 'undefined') ? (window as any).Components?.imageURLForUser : undefined;
-
 type Props = {
-    value: string,
-    readonly: boolean,
-    onChange: (value: string) => void,
+  value: string,
+  readonly: boolean,
+  onChange: (value: string) => void,
 }
 
 const selectStyles = {
@@ -27,47 +23,35 @@ const selectStyles = {
   })
 };
 
-function FormatOptionLabel ({ user }: { user: IUser }) {
-  let profileImg;
-  if (imageURLForUser) {
-    profileImg = imageURLForUser(user.id);
-  }
-
-  return (
-    <div className='UserProperty-item'>
-      {profileImg && (
-        <img
-          alt='UserProperty-avatar'
-          src={profileImg}
-        />
-      )}
-      {user.username}
-    </div>
-  );
-}
-
 function UserProperty (props: Props): JSX.Element {
-  const workspaceUsers = useAppSelector<IUser[]>(getWorkspaceUsersList);
-  const workspaceUsersById = useAppSelector<{[key:string]: IUser}>(getWorkspaceUsers);
+  const [contributors] = useContributors();
+  const contributorMap = contributors.reduce<Record<string, Contributor>>((acc, contributor) => {
+    acc[contributor.id] = contributor;
+    return acc;
+  }, {})
 
   if (props.readonly) {
-    return (<div className='UserProperty octo-propertyvalue readonly'>{workspaceUsersById[props.value]?.username || (props.value ? '(missing name)' : '')}</div>);
+    return (
+      <div className='UserProperty octo-propertyvalue readonly'>
+        {contributorMap[props.value]?.username || (props.value ? '(missing name)' : '')}
+      </div>
+    );
   }
 
   return (
     <Select
-      options={workspaceUsers}
+      options={contributors}
       isSearchable={true}
       isClearable={true}
       backspaceRemovesValue={true}
       className='UserProperty octo-propertyvalue'
       classNamePrefix='react-select'
-      formatOptionLabel={u => <FormatOptionLabel user={u} />}
+      formatOptionLabel={u => <UserDisplay user={u} avatarSize='small' />}
       styles={selectStyles}
       placeholder='Empty'
-      getOptionLabel={(o: IUser) => o.username}
-      getOptionValue={(a: IUser) => a.id}
-      value={workspaceUsersById[props.value] || null}
+      getOptionLabel={(o: Contributor) => o.username}
+      getOptionValue={(a: Contributor) => a.id}
+      value={contributorMap[props.value] || null}
       onChange={(item, action) => {
         if (action.action === 'select-option') {
           props.onChange(item?.id || '');
