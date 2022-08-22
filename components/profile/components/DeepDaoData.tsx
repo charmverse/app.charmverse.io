@@ -62,22 +62,23 @@ export function DeepDaoData ({ user }: Pick<UserDetailsProps, 'user'>) {
     return null;
   }
 
-  const organizationsRecord: Record<
+  const organizationsRecord = data.organizations
+    .reduce<Record<
     string,
     OrganizationDetails | undefined
-  > = data.organizations
-    .reduce((acc, org) => ({
-      ...acc,
-      [org.organizationId]: {
-        ...org,
-        oldestEventDate: '',
-        latestEventDate: '',
-        proposals: [],
-        votes: []
-      }
-    }), {});
+  >>((acc, org) => {
+    acc[org.organizationId] = {
+      ...org,
+      // Using empty values to indicate that these haven't been set yet
+      oldestEventDate: '',
+      latestEventDate: '',
+      proposals: [],
+      votes: []
+    };
+    return acc;
+  }, {});
 
-  // Sort the proposals and votes based on their created at date and attach organization data with it
+  // Sort the proposals and votes based on their created at date
   const events = [...data.proposals.map(proposal => ({ type: 'proposal', ...proposal })), ...data.votes.map(vote => ({ type: 'vote', ...vote }))];
 
   events.forEach(event => {
@@ -107,6 +108,7 @@ export function DeepDaoData ({ user }: Pick<UserDetailsProps, 'user'>) {
 
   const sortedOrganizations = Object.values(organizationsRecord).filter(isTruthy)
     .sort((orgA, orgB) => orgA.latestEventDate > orgB.latestEventDate ? -1 : 1)
+    // Remove the organizations that have not votes or proposals, so there wont be any latest or earliest dates
     .filter((organization) => (organization.votes.length !== 0 || organization.proposals.length !== 0));
 
   return (

@@ -60,7 +60,7 @@ export default function UserCollectives ({ user, mutatePoaps, poapData }: Pick<U
   const poaps: ExtendedPoap[] = [];
   const { nfts = [] } = useMyNfts();
 
-  let collectives: Collective[] = [];
+  const collectives: Collective[] = [];
 
   poapData?.hiddenPoaps.forEach(poap => {
     poaps.push(poap);
@@ -96,7 +96,7 @@ export default function UserCollectives ({ user, mutatePoaps, poapData }: Pick<U
     });
   });
 
-  collectives = collectives.sort((collectiveA, collectiveB) => collectiveA.date > collectiveB.date ? -1 : 1);
+  collectives.sort((collectiveA, collectiveB) => new Date(collectiveB.date) > new Date(collectiveA.date) ? 1 : -1);
 
   return collectives.length !== 0 ? (
     <Box>
