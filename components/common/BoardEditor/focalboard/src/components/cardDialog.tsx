@@ -73,7 +73,6 @@ const CardDialog = (props: Props): JSX.Element | null => {
   // clear draft bounty on close, just in case
   useEffect(() => {
     return () => {
-      console.log('clear draft')
       cancelDraftBounty()
     }
   }, []);
