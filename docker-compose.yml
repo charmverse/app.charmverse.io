@@ -7,6 +7,8 @@ services:
     command: [ "npm", "run", "${NPM_SCRIPT}" ]
     labels:
       com.datadoghq.ad.logs: "[{\"source\": \"nodejs\", \"service\": \"${SERVICE_NAME}\"}]"
+    environment:
+      DATABASE_URL: "postgres://${DB_USER}:${DB_PASSWD}@${DB_HOSTNAME}:5432/${DB_NAME}"
 
   datadog_agent:
     image: public.ecr.aws/datadog/agent
