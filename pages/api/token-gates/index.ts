@@ -8,7 +8,6 @@ import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { AccessControlCondition } from 'lit-js-sdk';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { isTruthy } from 'lib/utilities/types';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -29,7 +28,7 @@ async function saveTokenGate (req: NextApiRequest, res: NextApiResponse) {
   }
 
   // Make sure token gate has at least 1 condition.
-  const hasValidCondition = (req.body.conditions?.unifiedAccessControlConditions as AccessControlCondition[])?.some(c => isTruthy(c.chain));
+  const hasValidCondition = (req.body.conditions?.unifiedAccessControlConditions as AccessControlCondition[])?.some(c => Boolean(c.chain));
 
   if (!hasValidCondition) {
     throw new InvalidInputError('Your token gate must contain at least one condition.');
