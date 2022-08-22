@@ -1,9 +1,8 @@
 import { Box, Chip, CircularProgress, Divider, Grid, Paper, Stack, Typography } from '@mui/material';
 import charmClient from 'charmClient';
-import { DeepDaoProposal, DeepDaoVote } from 'lib/deepdao/interfaces';
-import { isTruthy } from 'lib/utilities/types';
+import { sortDeepdaoOrgs } from 'lib/deepdao/sortDeepdaoOrgs';
 import useSWRImmutable from 'swr/immutable';
-import DeepDaoOrganizationRow, { OrganizationDetails } from './DeepDaoOrganizationRow';
+import DeepDaoOrganizationRow from './DeepDaoOrganizationRow';
 import { UserDetailsProps } from './UserDetails';
 
 export function AggregatedDataItem ({ value, label }: { value: number, label: string }) {
@@ -62,54 +61,7 @@ export function DeepDaoData ({ user }: Pick<UserDetailsProps, 'user'>) {
     return null;
   }
 
-  const organizationsRecord = data.organizations
-    .reduce<Record<
-    string,
-    OrganizationDetails | undefined
-  >>((acc, org) => {
-    acc[org.organizationId] = {
-      ...org,
-      // Using empty values to indicate that these haven't been set yet
-      oldestEventDate: '',
-      latestEventDate: '',
-      proposals: [],
-      votes: []
-    };
-    return acc;
-  }, {});
-
-  // Sort the proposals and votes based on their created at date
-  const events = [...data.proposals.map(proposal => ({ type: 'proposal', ...proposal })), ...data.votes.map(vote => ({ type: 'vote', ...vote }))];
-
-  events.forEach(event => {
-    const organization = organizationsRecord[event.organizationId];
-    if (organization) {
-      if (event.type === 'proposal') {
-        organization.proposals.push(event as DeepDaoProposal);
-      }
-      else if (event.type === 'vote') {
-        organization.votes.push(event as DeepDaoVote);
-      }
-      if (!organization.oldestEventDate) {
-        organization.oldestEventDate = event.createdAt;
-      }
-      else if (organization.oldestEventDate > event.createdAt) {
-        organization.oldestEventDate = event.createdAt;
-      }
-
-      if (!organization.latestEventDate) {
-        organization.latestEventDate = event.createdAt;
-      }
-      else if (organization.latestEventDate < event.createdAt) {
-        organization.latestEventDate = event.createdAt;
-      }
-    }
-  });
-
-  const sortedOrganizations = Object.values(organizationsRecord).filter(isTruthy)
-    .sort((orgA, orgB) => orgA.latestEventDate > orgB.latestEventDate ? -1 : 1)
-    // Remove the organizations that have not votes or proposals, so there wont be any latest or earliest dates
-    .filter((organization) => (organization.votes.length !== 0 || organization.proposals.length !== 0));
+  const sortedOrganizations = sortDeepdaoOrgs(data);
 
   return (
     <Grid container display='flex' gap={2} flexDirection='column'>

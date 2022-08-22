@@ -36,7 +36,7 @@ interface DeepDaoOrganizationRowProps {
 
 export default function DeepDaoOrganizationRow ({ organization }: DeepDaoOrganizationRowProps) {
   const [isCollapsed, setIsCollapsed] = useState(true);
-  const [currentTask, setCurrentTask] = useState<'vote' | 'proposal'>('vote');
+  const [currentTab, setCurrentTab] = useState<'vote' | 'proposal'>('vote');
   const theme = useTheme();
 
   const proposals: DeepDaoEvent[] = organization.proposals
@@ -86,7 +86,7 @@ export default function DeepDaoOrganizationRow ({ organization }: DeepDaoOrganiz
               mb: 2
             }}
             indicatorColor='primary'
-            value={TASK_TABS.findIndex(taskTab => taskTab.type === currentTask)}
+            value={TASK_TABS.findIndex(taskTab => taskTab.type === currentTab)}
           >
             {TASK_TABS.map(task => (
               <Tab
@@ -105,14 +105,14 @@ export default function DeepDaoOrganizationRow ({ organization }: DeepDaoOrganiz
                 }}
                 label={task.label}
                 onClick={() => {
-                  setCurrentTask(task.type);
+                  setCurrentTab(task.type);
                 }}
               />
             ))}
           </Tabs>
           <Stack gap={2}>
             {
-                (currentTask === 'vote' ? votes : proposals).map((event, eventNumber) => (
+                (currentTab === 'vote' ? votes : proposals).map((event, eventNumber) => (
                   <Stack key={event.id} flexDirection='row' gap={1}>
                     <Stack
                       flexDirection='row'
