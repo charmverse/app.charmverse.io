@@ -2,7 +2,7 @@ import { Divider, Stack } from '@mui/material';
 import charmClient from 'charmClient';
 import useSWRImmutable from 'swr/immutable';
 import { GetPoapsResponse } from 'lib/poap';
-import { DeepDaoData } from './components/DeepDaoData';
+import AggregatedData from './components/AggregatedData';
 import UserDetails, { isPublicUser, UserDetailsProps } from './components/UserDetails';
 import UserCollectives from './components/UserCollectives';
 
@@ -18,7 +18,7 @@ export default function PublicProfile (props: UserDetailsProps) {
     <Stack spacing={2}>
       <UserDetails {...props} />
       <Divider />
-      <DeepDaoData user={props.user} />
+      <AggregatedData user={props.user} />
       <UserCollectives user={props.user} mutatePoaps={mutatePoaps} poapData={poapData} />
     </Stack>
   );

@@ -58,7 +58,8 @@ export default function UserCollectives ({ user, mutatePoaps, poapData }: Pick<U
   const isPublic = isPublicUser(user);
   const managePoapModalState = usePopupState({ variant: 'popover', popupId: 'poap-modal' });
   const poaps: ExtendedPoap[] = [];
-  const { nfts = [] } = useMyNfts();
+
+  const { nfts = [] } = useMyNfts(user.id);
 
   const collectives: Collective[] = [];
 

@@ -43,7 +43,7 @@ export function AggregatedDataItem ({ value, label }: { value: number, label: st
   );
 }
 
-export function DeepDaoData ({ user }: Pick<UserDetailsProps, 'user'>) {
+export default function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>) {
 
   const { data, isValidating } = useSWRImmutable(user ? `userAggregatedData/${user.id}` : null, () => {
     return charmClient.getAggregatedData(user.id);
