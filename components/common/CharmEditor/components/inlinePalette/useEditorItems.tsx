@@ -629,6 +629,7 @@ const paletteGroupItemsRecord: Record<PaletteGroup, Omit<PaletteItemType, 'group
   ],
   database: [{
     uid: 'inlineLinkedDatabase',
+    keywords: ['database', 'board'],
     title: 'Linked view of database',
     icon: <DatabaseIcon sx={{ fontSize: 16 }} />,
     description: 'Embed a view from an existing board',
@@ -667,6 +668,7 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
     {
       uid: 'insert-board',
       title: 'Insert board',
+      keywords: ['board'],
       requiredSpacePermission: 'createPage',
       icon: <DatabaseIcon sx={{
         fontSize: 16
@@ -688,6 +690,7 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
       uid: 'insert-page',
       title: 'Insert page',
       requiredSpacePermission: 'createPage',
+      keywords: ['page'],
       icon: <DescriptionOutlinedIcon sx={{
         fontSize: 16
       }}
@@ -707,6 +710,7 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
     {
       uid: 'link-to-page',
       title: 'Link to page',
+      keywords: ['link', 'page'],
       icon: <DescriptionOutlinedIcon sx={{
         fontSize: 16
       }}
@@ -737,6 +741,7 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
       title: 'Database - inline',
       icon: <DatabaseIcon sx={{ fontSize: 16 }} />,
       description: 'Add a new inline database to this page',
+      keywords: ['database', 'board'],
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
           // Execute the animation
