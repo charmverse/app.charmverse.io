@@ -13,6 +13,7 @@ handler
   .get(getNfts);
 
 async function getNfts (req: NextApiRequest, res: NextApiResponse<NftData[] | {error: string}>) {
+  // Use this address for testing as it has alot of on-chain data
   // address = '0x155b6485305ccab44ef7da58ac886c62ce105cf9'
   const { addresses } = req.session.user;
   const chainId = 1;
