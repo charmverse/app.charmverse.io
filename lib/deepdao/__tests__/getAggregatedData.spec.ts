@@ -56,40 +56,55 @@ describe('GET /api/public/profile/[userPath]', () => {
       userId: user.id
     });
 
-    const scope = nock(DEEP_DAO_BASE_URL as string)
+    const participationScoreScope = nock(DEEP_DAO_BASE_URL as string)
       .get(`/v0.1/people/participation_score/${walletAddresses[0]}`)
       .reply(200, {
         data: {
-          daos: 4,
-          proposals: 12,
-          votes: 9
+          daos: 4
         }
       })
       .get(`/v0.1/people/participation_score/${walletAddresses[1]}`)
       .reply(200, {
         data: {
-          daos: 6,
-          proposals: 8,
-          votes: 6
+          daos: 6
         }
       });
 
-    // scope.on('request', (req, interceptor) => {
-    //   console.log('interceptor matched request', interceptor.uri);
-    // });
-    // scope.on('replied', (req, interceptor) => {
-    //   console.log('response replied with nocked payload', interceptor.uri);
-    // });
+    const profileScope = nock(DEEP_DAO_BASE_URL as string)
+      .get(`/v0.1/people/profile/${walletAddresses[0]}`)
+      .reply(200, {
+        data: {
+          totalProposals: 1,
+          proposals: ['proposal 1'],
+          totalVotes: 1,
+          votes: ['vote 1'],
+          organizations: ['organization 1']
+        }
+      })
+      .get(`/v0.1/people/profile/${walletAddresses[1]}`)
+      .reply(200, {
+        data: {
+          totalProposals: 2,
+          proposals: ['proposal 2'],
+          totalVotes: 3,
+          votes: ['vote 2'],
+          organizations: ['organization 2']
+        }
+      });
 
     const aggregatedData = await getAggregatedData(user.id, 'dummy_key');
 
-    expect(scope.isDone());
+    expect(participationScoreScope.isDone());
+    expect(profileScope.isDone());
 
     expect(aggregatedData).toStrictEqual({
       daos: 11,
-      proposals: 20,
-      votes: 15,
-      bounties: 1
+      bounties: 1,
+      totalProposals: 3,
+      totalVotes: 4,
+      votes: ['vote 1', 'vote 2'],
+      proposals: ['proposal 1', 'proposal 2'],
+      organizations: ['organization 1', 'organization 2']
     });
   });
 });

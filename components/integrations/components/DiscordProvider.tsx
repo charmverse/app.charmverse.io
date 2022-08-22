@@ -19,7 +19,7 @@ interface Props {
 
 export default function DiscordProvider ({ children }: Props) {
 
-  const [user, setUser] = useUser();
+  const { user, setUser } = useUser();
   const { showMessage } = useSnackbar();
   const authCode = getCookie(AUTH_CODE_COOKIE);
   const authError = getCookie(AUTH_ERROR_COOKIE);

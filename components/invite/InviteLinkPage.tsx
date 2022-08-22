@@ -13,7 +13,7 @@ import { CenteredBox } from './components/CenteredBox';
 
 export default function InvitationPage ({ invite }: { invite: InviteLinkPopulated }) {
 
-  const [user] = useUser();
+  const { user } = useUser();
   const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
   const { account } = useWeb3React();
 

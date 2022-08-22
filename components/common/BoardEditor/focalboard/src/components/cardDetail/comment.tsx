@@ -19,7 +19,7 @@ import { Contributor } from 'models';
 
 type Props = {
   comment: Block;
-  contributor?: Pick<Contributor, 'username' | 'avatar'>;
+  contributor?: Pick<Contributor, 'username' | 'avatar' | 'hasNftAvatar'>;
   readonly: boolean;
 }
 
@@ -35,7 +35,7 @@ const Comment: FC<Props> = (props: Props) => {
       className='Comment comment'
     >
       <div className='comment-header'>
-        <Avatar size='xSmall' name={contributor?.username} avatar={contributor?.avatar} />
+        <Avatar size='xSmall' name={contributor?.username} avatar={contributor?.avatar} isNft={contributor?.hasNftAvatar} />
         <div className='comment-username'>{contributor?.username}</div>
         <Tooltip title={Utils.displayDateTime(date, intl)}>
           <div className='comment-date'>

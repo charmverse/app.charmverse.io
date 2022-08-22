@@ -38,24 +38,35 @@ const StyledAvatar = styled(Avatar)`
   font-weight: 500;
 `;
 
+export const HexagonAvatar = styled(StyledAvatar)`
+  clip-path: url(#hexagon-avatar);
+  overflow: hidden;
+`;
+
 export type InitialAvatarProps = {
   avatar: string | null | undefined;
   className?: string;
   name?: string;
   variant?: 'circular' | 'rounded' | 'square';
   size?: AvatarSize;
+  isNft?: boolean;
 };
 
-export default function InitialAvatar ({ avatar, className, name, variant, size = 'medium' }: InitialAvatarProps) {
+export default function InitialAvatar ({ avatar, className, name, variant, size = 'medium', isNft }: InitialAvatarProps) {
   const nameStr = (name || '').replace('0x', ''); // ignore the universal prefix of addresses
+  const muiVariant = isNft ? 'square' : variant;
+  const AvatarComponent = isNft ? HexagonAvatar : StyledAvatar;
+
   return (
-    <StyledAvatar
+
+    <AvatarComponent
       className={className}
       sx={{ backgroundColor: avatar ? 'initial' : stringToColor(nameStr), ...configBySize[size] }}
-      variant={variant}
+      variant={muiVariant}
       src={avatar ?? undefined}
     >
       {nameStr.charAt(0).toUpperCase()}
-    </StyledAvatar>
+    </AvatarComponent>
+
   );
 }

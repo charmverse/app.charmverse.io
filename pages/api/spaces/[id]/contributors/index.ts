@@ -2,6 +2,7 @@
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 import { Contributor } from 'models';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -24,7 +25,8 @@ async function getContributors (req: NextApiRequest, res: NextApiResponse<Contri
       ...spaceRole.user,
       addresses: [],
       isAdmin: spaceRole.isAdmin,
-      joinDate: spaceRole.createdAt.toISOString()
+      joinDate: spaceRole.createdAt.toISOString(),
+      hasNftAvatar: hasNftAvatar(spaceRole.user)
     } as Contributor;
   })
     .sort((a, b) => b.createdAt > a.createdAt ? -1 : 1); // sort oldest first

@@ -11,7 +11,7 @@ import { Page } from '@prisma/client';
 
 export default function useNestedPage () {
   const [space] = useCurrentSpace();
-  const [user] = useUser();
+  const { user } = useUser();
   const { currentPageId } = usePages();
   const view = useEditorViewContext();
   const router = useRouter();

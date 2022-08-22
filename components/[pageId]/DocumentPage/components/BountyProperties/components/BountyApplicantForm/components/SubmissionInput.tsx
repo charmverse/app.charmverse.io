@@ -47,7 +47,7 @@ interface Props {
 export default function SubmissionInput (
   { permissions, readOnly = false, submission, onSubmit: onSubmitProp, bountyId, alwaysExpanded, expandedOnLoad, onCancel = () => null }: Props
 ) {
-  const [user] = useUser();
+  const { user } = useUser();
   const [isVisible, setIsVisible] = useState(expandedOnLoad ?? alwaysExpanded ?? false);
 
   const {

@@ -31,7 +31,7 @@ type Props = {
 function CreateBountyButton(props: { pageId: string }) {
   const { pageId } = props;
   const { createDraftBounty } = useBounties();
-  const [user] = useUser();
+  const { user } = useUser();
   const [space] = useCurrentSpace();
   const [userSpacePermissions] = useCurrentSpacePermissions();
 
@@ -73,7 +73,6 @@ const CardDialog = (props: Props): JSX.Element | null => {
   // clear draft bounty on close, just in case
   useEffect(() => {
     return () => {
-      console.log('clear draft')
       cancelDraftBounty()
     }
   }, []);

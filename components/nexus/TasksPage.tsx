@@ -18,7 +18,7 @@ import SnoozeButton from './components/SnoozeButton';
 import useTasks from './hooks/useTasks';
 import { VoteTasksList } from './VoteTasksList';
 
-const tabStyles = {
+export const tabStyles = {
   mb: 2,
   minHeight: {
     xs: '34px',
@@ -54,7 +54,7 @@ const TASK_TABS = [
 
 export default function TasksPage () {
   const router = useRouter();
-  const [user] = useUser();
+  const { user } = useUser();
   const [currentTask, setCurrentTask] = useState(router.query?.task ?? 'multisig');
   const { error, mutate: mutateTasks, tasks } = useTasks();
   const theme = useTheme();

@@ -42,7 +42,7 @@ const MAX_DESCRIPTION_LENGTH = 200;
 
 export default function VoteDetail ({ cancelVote, castVote, deleteVote, detailed = false, vote, isProposal }: VoteDetailProps) {
   const { deadline, totalVotes, description, id, title, userChoice, voteOptions, aggregatedResult } = vote;
-  const [user] = useUser();
+  const { user } = useUser();
   const view = useEditorViewContext();
   const { data: userVotes, mutate } = useSWR(detailed ? `/votes/${id}/user-votes` : null, () => charmClient.getUserVotes(id));
 

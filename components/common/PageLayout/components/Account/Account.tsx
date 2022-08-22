@@ -14,6 +14,7 @@ import { getChainById } from 'connectors';
 import { useContext } from 'react';
 import NetworkModal from 'components/common/PageLayout/components/Account/components/NetworkModal';
 import styled from '@emotion/styled';
+import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
 const AccountCard = styled.div`
   display: inline-flex;
@@ -55,7 +56,7 @@ function Account (): JSX.Element {
   const router = useRouter();
 
   const networkModalState = usePopupState({ variant: 'popover', popupId: 'network-modal' });
-  const [user, , isUserLoaded] = useUser();
+  const { user, isLoaded } = useUser();
 
   if (typeof window === 'undefined') {
     return (
@@ -65,7 +66,7 @@ function Account (): JSX.Element {
     );
   }
 
-  if (isUserLoaded && !user) {
+  if (isLoaded && !user) {
     return (
       <AccountCard>
         <AccountButton href='/'>
@@ -114,7 +115,7 @@ function Account (): JSX.Element {
             borderTopLeftRadius: '0 !important',
             borderBottomLeftRadius: '0 !important'
           }) : {}}
-          endIcon={<Avatar avatar={user?.avatar} name={user?.username || ''} size='small' />}
+          endIcon={<Avatar avatar={user?.avatar} name={user?.username || ''} isNft={hasNftAvatar(user)} size='small' />}
         >
           {user?.username}
         </AccountButton>

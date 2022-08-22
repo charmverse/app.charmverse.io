@@ -23,7 +23,7 @@ type Props = {
 }
 
 const CommentsList = React.memo((props: Props) => {
-  const [currentUser] = useUser();
+  const {user} = useUser();
   const [contributors] = useContributors();
   const [editorKey, setEditorKey] = useState(0); // a key to allow us to reset charmeditor contents
 
@@ -51,8 +51,8 @@ const CommentsList = React.memo((props: Props) => {
       {!props.readonly && (
         <NewCommentInput
           key={editorKey}
-          avatar={currentUser?.avatar}
-          username={currentUser?.username}
+          avatar={user?.avatar}
+          username={user?.username}
           onSubmit={onSendClicked}
         />
       )}
