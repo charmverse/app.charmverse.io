@@ -732,7 +732,7 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
   ] as Omit<PaletteItemType, 'group'>[];
 
   if (space && user) {
-    dynamicOther.push({
+    paletteGroupItemsRecord.database.push({
       uid: 'inlineDatabase',
       title: 'Database - inline',
       icon: <DatabaseIcon sx={{ fontSize: 16 }} />,
