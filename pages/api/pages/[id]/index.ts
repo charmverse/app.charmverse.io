@@ -65,15 +65,24 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
     throw new ActionNotPermittedError('You do not have permission to update this page');
   }
 
-  const page = await getPage(pageId);
+  const page = await prisma.page.findUnique({
+    where: {
+      id: pageId
+    },
+    select: {
+      id: true,
+      parentId: true
+    }
+  });
 
   if (!page) {
     throw new NotFoundError();
   }
 
-  const hasNewParentPage = typeof updateContent.parentId === 'string';
+  const hasNewParentPage = (updateContent.parentId !== page.parentId && (typeof updateContent.parentId === 'string' || updateContent.parentId === null));
 
-  if (hasNewParentPage) {
+  // Only perform validation if repositioning below another page
+  if (hasNewParentPage && typeof updateContent.parentId === 'string') {
     const { flatChildren } = await resolvePageTree({
       pageId,
       flattenChildren: true
@@ -85,8 +94,6 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
       throw new UndesirableOperationError(`You cannot reposition a page to be a child of ${newParentId === pageId ? 'itself' : 'one of its child pages'}`);
     }
   }
-
-  const repositioningPage = updateContent.parentId === null || hasNewParentPage;
 
   const pageWithPermission = await prisma.page.update({
     where: {
@@ -106,7 +113,7 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
     }
   });
 
-  if (repositioningPage) {
+  if (hasNewParentPage) {
     const updatedPage = await setupPermissionsAfterPageRepositioned(pageId);
     return res.status(200).json(updatedPage);
   }
