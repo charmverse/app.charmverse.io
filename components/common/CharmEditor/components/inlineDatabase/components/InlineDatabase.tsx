@@ -21,6 +21,7 @@ import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import { createBoardView } from 'lib/focalboard/boardView';
 import { Add } from '@mui/icons-material';
+import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import BoardSelection from './BoardSelection';
 
 // Lazy load focalboard entrypoint (ignoring the redux state stuff for now)
@@ -93,16 +94,24 @@ interface DataSource {
   source: 'board_page';
 }
 
+const MAX_DATA_SOURCES = 2;
+
 export default function DatabaseView ({ readOnly: readOnlyOverride, node, updateAttrs }: DatabaseViewProps) {
   const [dataSources, setDataSources] = useState<DataSource[]>(node.attrs.dataSources);
+
+  const shownDataSources = dataSources.slice(0, MAX_DATA_SOURCES);
+  const hiddenDataSources = dataSources.slice(MAX_DATA_SOURCES);
+  const showHiddenDataSourcesPopupState = usePopupState({ variant: 'popover', popupId: 'show-views-popup' });
+  const showHiddenDataSourcesTriggerState = bindTrigger(showHiddenDataSourcesPopupState);
+
   // Keep track of which board is currently being viewed
-  const [currentDataSource, setCurrentDataSource] = useState<DataSource | null>(dataSources.length !== 0 ? dataSources[0] : null);
+  const [currentDataSourceIndex, setCurrentDataSourceIndex] = useState<number>(dataSources.length !== 0 ? 0 : -1);
   const [isSelectingSource, setIsSelectingSource] = useState(false);
 
   const boards = useAppSelector(getSortedBoards);
   // Always display the first page and view
-  const viewId = currentDataSource?.viewId;
-  const pageId = currentDataSource?.pageId;
+  const viewId = currentDataSourceIndex !== -1 ? dataSources[currentDataSourceIndex].viewId : null;
+  const pageId = currentDataSourceIndex !== -1 ? dataSources[currentDataSourceIndex].pageId : null;
 
   const board = boards.find(b => b.id === pageId);
   const cards = useAppSelector(getViewCardsSortedFilteredAndGrouped({
@@ -140,11 +149,13 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
     const newDataSource: DataSource = { pageId: boardId, viewId: view.id, source: 'board_page' };
     setDataSources([...dataSources, newDataSource]);
     setIsSelectingSource(false);
-    setCurrentDataSource(newDataSource);
+    setCurrentDataSourceIndex(dataSources.length);
   }
 
   useEffect(() => {
-    updateAttrs(dataSources);
+    updateAttrs({
+      dataSources
+    });
   }, [dataSources]);
 
   if (!board || isSelectingSource) {
@@ -196,7 +207,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
             viewTabs={(
               <Box display='flex' gap={1}>
                 <Tabs textColor='primary' indicatorColor='secondary' value={`${pageId}.${viewId}`} sx={{ minHeight: 40 }}>
-                  {dataSources.map((dataSource) => {
+                  {shownDataSources.map((dataSource, dataSourceIndex) => {
                     const _board = boards.find(b => b.id === dataSource.pageId);
                     return _board ? (
                       <Tab
@@ -210,18 +221,35 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
                             color={(pageId === dataSource.pageId && viewId === dataSource.viewId) ? 'textPrimary' : 'secondary'}
                             sx={{ px: 1.5 }}
                             onClick={() => {
-                              setCurrentDataSource(dataSource);
+                              setCurrentDataSourceIndex(dataSourceIndex);
                             }}
                           >
                             {_board.title}
                           </Button>
-                    )}
+                        )}
                         sx={{ p: 0 }}
                         value={`${dataSource.pageId}.${dataSource.viewId}`}
                       />
                     ) : null;
                   })}
+                  {hiddenDataSources.length !== 0 && (
+                    <Tab
+                      component='div'
+                      disableRipple
+                      label={(
+                        <Button
+                          variant='text'
+                          size='small'
+                          color='secondary'
+                          {...showHiddenDataSourcesTriggerState}
+                        >
+                          {hiddenDataSources.length} more...
+                        </Button>
+                      )}
+                    />
+                  )}
                 </Tabs>
+                {hiddenDataSources.length === 0 && (
                 <IconButton
                   sx={{
                     width: 'fit-content',
@@ -237,6 +265,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
                 >
                   <Add fontSize='small' />
                 </IconButton>
+                )}
               </Box>
 )}
             showHeader
