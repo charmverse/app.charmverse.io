@@ -191,7 +191,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
         }}
         >
           <Box mb={1} display='flex' gap={1}>
-            <Tabs textColor='primary' indicatorColor='secondary' value={pageId} sx={{ minHeight: 40 }}>
+            <Tabs textColor='primary' indicatorColor='secondary' value={`${pageId}.${boardIndex}`} sx={{ minHeight: 40 }}>
               {attrs.pageIds.map((_pageId, index) => {
                 const _board = boards.find(b => b.id === _pageId);
                 return _board ? (
@@ -203,7 +203,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
                       <Button
                         variant='text'
                         startIcon={<PageIcon icon={pages[_pageId]?.icon} pageType='board' isEditorEmpty={false} />}
-                        color={pageId === _pageId ? 'textPrimary' : 'secondary'}
+                        color={(pageId === _pageId && index === boardIndex) ? 'textPrimary' : 'secondary'}
                         sx={{ px: 1.5 }}
                         onClick={() => {
                           if (index !== boardIndex) {
@@ -215,7 +215,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
                       </Button>
                 )}
                     sx={{ p: 0 }}
-                    value={_pageId}
+                    value={`${_pageId}.${index}`}
                   />
                 ) : null;
               })}
