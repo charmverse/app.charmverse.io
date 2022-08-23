@@ -11,7 +11,6 @@ import { getCurrentViewDisplayBy, getCurrentViewGroupBy, getView, getSortedViews
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import { usePages } from 'hooks/usePages';
-import ReactDndProvider from 'components/common/ReactDndProvider';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 import log from 'lib/log';
 import styled from '@emotion/styled';
@@ -85,9 +84,9 @@ interface DatabaseViewProps extends NodeViewProps {
 }
 
 interface DatabaseViewAttrs {
-  pageId: string | null;
-  viewId: string | null;
-  source: 'board_page' | null;
+  pageIds: string[];
+  viewIds: string[];
+  sources: ('board_page')[];
 }
 
 export default function DatabaseView ({ readOnly: readOnlyOverride, node, updateAttrs }: DatabaseViewProps) {
@@ -95,14 +94,18 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
   const [attrs, setAttrs] = useState<DatabaseViewAttrs>(node.attrs as DatabaseViewAttrs);
 
   const boards = useAppSelector(getSortedBoards);
-  const board = boards.find(b => b.id === attrs.pageId);
+  // Always display the first page and view
+  const pageId = attrs.pageIds[0];
+  const viewId = attrs.viewIds[0];
+
+  const board = boards.find(b => b.id === pageId);
   const cards = useAppSelector(getViewCardsSortedFilteredAndGrouped({
-    boardId: attrs.pageId || '',
-    viewId: attrs.viewId || ''
+    boardId: pageId || '',
+    viewId: viewId || ''
   }));
   const allViews = useAppSelector(getSortedViews);
-  const boardViews = allViews.filter(view => view.parentId === attrs.pageId);
-  const activeView = useAppSelector(getView(attrs.viewId || ''));
+  const boardViews = allViews.filter(view => view.parentId === pageId);
+  const activeView = useAppSelector(getView(viewId || ''));
   const groupByProperty = useAppSelector(getCurrentViewGroupBy);
   const dateDisplayProperty = useAppSelector(getCurrentViewDisplayBy);
   const clientConfig = useAppSelector(getClientConfig);
@@ -112,7 +115,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
   const boardPages = Object.values(pages).filter(p => p?.type === 'board').filter(isTruthy);
   const accessibleCards = cards.filter(card => pages[card.id]);
 
-  const currentPagePermissions = getPagePermissions(attrs.pageId || '');
+  const currentPagePermissions = getPagePermissions(pageId || '');
 
   function showCard (cardId?: string) {
     setShownCardId(cardId);
@@ -120,16 +123,16 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
 
   function selectBoard (boardId: string) {
     const _boardViews = allViews.filter(view => view.parentId === boardId);
-    const viewId = _boardViews.length === 1 ? _boardViews[0].id : null;
-    setAttrs({ source: 'board_page', pageId: boardId, viewId });
+    const _viewId = _boardViews.length === 1 ? _boardViews[0].id : null;
+    setAttrs({ sources: [...attrs.sources, 'board_page'], pageIds: [...attrs.pageIds, boardId], viewIds: _viewId ? [...attrs.viewIds, _viewId] : attrs.viewIds });
   }
 
   function clearSelection () {
-    setAttrs({ viewId: null, pageId: null, source: null });
+    setAttrs(attrs);
   }
 
-  function selectView (viewId: string) {
-    setAttrs(_attrs => ({ ..._attrs, viewId }));
+  function selectView (_viewId: string) {
+    setAttrs(_attrs => ({ ..._attrs, viewIds: [..._attrs.viewIds, _viewId] }));
   }
 
   useEffect(() => {
