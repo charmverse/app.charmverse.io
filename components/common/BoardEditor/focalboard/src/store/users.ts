@@ -66,11 +66,6 @@ export const { reducer } = usersSlice;
 
 export const getWorkspaceUsers = (state: RootState): {[key: string]: IUser} => state.users.workspaceUsers;
 
-export const getWorkspaceUsersList = createSelector(
-  getWorkspaceUsers,
-  (workspaceUsers) => Object.values(workspaceUsers).sort((a, b) => a.username.localeCompare(b.username))
-);
-
 export const getUser = (userId: string): (state: RootState) => IUser|undefined => {
   return (state: RootState): IUser|undefined => {
     const users = getWorkspaceUsers(state);

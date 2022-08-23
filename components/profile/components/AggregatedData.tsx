@@ -1,45 +1,50 @@
-import { Box, CircularProgress, Grid, Paper, Typography } from '@mui/material';
+import { Box, Chip, CircularProgress, Divider, Grid, Paper, Stack, Typography } from '@mui/material';
 import charmClient from 'charmClient';
+import { sortDeepdaoOrgs } from 'lib/deepdao/sortDeepdaoOrgs';
 import useSWRImmutable from 'swr/immutable';
+import DeepDaoOrganizationRow from './DeepDaoOrganizationRow';
 import { UserDetailsProps } from './UserDetails';
 
-export function AggregatedDataItem ({ value, label }: {value: number, label: string}) {
-
+export function AggregatedDataItem ({ value, label }: { value: number, label: string }) {
   return (
-    <Grid item xs={6}>
-      <Paper
+    <Paper
+      sx={{
+        gap: 1,
+        px: 2,
+        py: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        flexGrow: 1,
+        textAlign: {
+          sm: 'left',
+          xs: 'center'
+        }
+      }}
+    >
+      <Typography
+        color='secondary'
         sx={{
-          gap: 1,
-          px: 2,
-          py: 1,
-          display: 'flex',
-          alignItems: 'center'
+          fontWeight: 500
         }}
+      > {label}
+      </Typography>
+      <Typography sx={{
+        fontSize: {
+          xs: '1.5rem',
+          sm: '1.75rem'
+        },
+        fontWeight: 'bold'
+      }}
       >
-        <Typography sx={{
-          fontSize: {
-            xs: '1.25rem',
-            sm: '1.5rem'
-          },
-          fontWeight: 'bold'
-        }}
-        >
-          {value}
-        </Typography>
-        <Typography
-          color='secondary'
-          sx={{
-            fontWeight: 500
-          }}
-        > {label}
-        </Typography>
-      </Paper>
+        {value}
+      </Typography>
 
-    </Grid>
+    </Paper>
   );
 }
 
-export function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>) {
+export default function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>) {
+
   const { data, isValidating } = useSWRImmutable(user ? `userAggregatedData/${user.id}` : null, () => {
     return charmClient.getAggregatedData(user.id);
   });
@@ -48,7 +53,6 @@ export function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>) {
     return (
       <Box display='flex' alignItems='center' gap={1}>
         <CircularProgress size={24} />
-        <Typography variant='subtitle1' color='secondary'>Fetching data</Typography>
       </Box>
     );
   }
@@ -57,16 +61,57 @@ export function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>) {
     return null;
   }
 
+  const sortedOrganizations = sortDeepdaoOrgs(data);
+
   return (
     <Grid container display='flex' gap={2} flexDirection='column'>
-      <Box display='flex' gap={2} mr={2}>
-        <AggregatedDataItem label='communities' value={data.daos} />
-        <AggregatedDataItem label='votes' value={data.votes} />
+      <Box
+        gap={1}
+        sx={{
+          display: 'flex',
+          flexDirection: {
+            xs: 'column',
+            sm: 'row'
+          }
+        }}
+      >
+        <AggregatedDataItem label='Communities' value={data.daos} />
+        <AggregatedDataItem label='Proposals' value={data.totalProposals} />
+        <AggregatedDataItem label='Votes' value={data.totalVotes} />
+        <AggregatedDataItem label='Bounties' value={data.bounties} />
       </Box>
-      <Box display='flex' gap={2} mr={2}>
-        <AggregatedDataItem label='proposals' value={data.proposals} />
-        <AggregatedDataItem label={data.bounties > 1 ? 'bounties' : 'bounty'} value={data.bounties} />
-      </Box>
+
+      {sortedOrganizations.length !== 0 ? (
+        <>
+          <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
+            <Typography
+              sx={{
+                typography: {
+                  sm: 'h1',
+                  xs: 'h2'
+                }
+              }}
+            >Organizations
+            </Typography>
+            <Chip label={sortedOrganizations.length} />
+          </Stack>
+          <Stack gap={2}>
+            {sortedOrganizations.map(organization => (
+              <Box
+                key={organization.organizationId}
+              >
+                <DeepDaoOrganizationRow
+                  organization={organization}
+                />
+                <Divider sx={{
+                  mt: 2
+                }}
+                />
+              </Box>
+            ))}
+          </Stack>
+        </>
+      ) : null}
     </Grid>
   );
 }

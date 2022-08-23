@@ -14,10 +14,11 @@ class MyDocument extends Document {
           <link rel='icon' href='/favicon.png' />
           <meta name='description' content='web3 operations platform handling docs, tasks, bounties, proposals, and votes.' />
           <meta property='og:title' content='CharmVerse' />
-          <meta property='og:image' content='https://app.charmverse.io/images/charmverse_logo_sm_black.png' />
+          <meta property='og:image' content='https://app.charmverse.io/images/logo_black_lightgrey_opengraph.png' />
+          <meta property='og:description' content='web3 operations platform handling docs, tasks, bounties, proposals, and votes.' />
           <meta property='twitter:title' content='CharmVerse' />
           <meta property='twitter:description' content='web3 operations platform handling docs, tasks, bounties, proposals, and votes.' />
-          <meta property='twitter:image' content='https://app.charmverse.io/images/charmverse_logo_sm_black.png' />
+          <meta property='twitter:image' content='https://app.charmverse.io/images/logo_black_lightgrey_opengraph.png' />
         </Head>
         <body>
           <Main />

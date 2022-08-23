@@ -1,11 +1,11 @@
 import { ExtendedPoap } from 'models';
 
 export interface GetPoapsResponse {
-    visiblePoaps: Array<Partial<ExtendedPoap>>;
-    hiddenPoaps: Array<Partial<ExtendedPoap>>;
+    visiblePoaps: ExtendedPoap[];
+    hiddenPoaps: ExtendedPoap[];
 }
 
 export interface UpdatePoapsRequest {
-    newShownPoaps: Array<ExtendedPoap>;
-    newHiddenPoaps: Array<ExtendedPoap>;
+    newShownPoaps: ExtendedPoap[];
+    newHiddenPoaps: ExtendedPoap[];
 }

@@ -39,7 +39,7 @@ async function disconnectTelegram (req: NextApiRequest, res: NextApiResponse) {
 
   // If identity type is not Telegram
   if (user.identityType !== IDENTITY_TYPES[2]) {
-    res.status(200).json({ success: 'ok' });
+    return res.status(200).json({ success: 'ok' });
   }
 
   let newUserName: string;
