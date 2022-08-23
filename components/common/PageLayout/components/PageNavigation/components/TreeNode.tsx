@@ -151,7 +151,9 @@ function DraggableTreeNode ({ item, onDropAdjacent, onDropChild, pathPrefix, add
         ? <div>{/* empty div to trick TreeView into showing expand icon */}</div>
         : (
           item.type === 'board' ? (
+            // Don't show inline view as they were created for inline databases
             views.map(view => (
+              !view.fields.inline && (
               <BoardViewTreeItem
                 key={view.id}
                 href={`${pathPrefix}/${item.path}?viewId=${view.id}`}
@@ -159,6 +161,7 @@ function DraggableTreeNode ({ item, onDropAdjacent, onDropChild, pathPrefix, add
                 nodeId={view.id}
                 viewType={view.fields.viewType}
               />
+              )
             ))
           ) : (
             item.children.length > 0

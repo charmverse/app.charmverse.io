@@ -50,7 +50,7 @@ function ViewTabs ({ board, activeView, intl, readonly, showView, views }: ViewT
   const showViewsMenuState = bindMenu(showViewsPopupState);
 
   const { setFocalboardViewsRecord } = useFocalboardViews();
-
+  views = views.filter(view => !view.fields.inline)
   // Find the index of the current view
   const currentViewId = router.query.viewId || activeView.id;
   const currentViewIndex = views.findIndex(view => view.id === currentViewId);
