@@ -123,7 +123,7 @@ function createColumnPaletteItem (colCount: number): Omit<PaletteItemType, 'grou
 
 type PaletteGroup = 'list' | 'media' | 'other' | 'text' | 'database';
 
-const paletteGroupItemsRecord: Record<PaletteGroup, Omit<PaletteItemType, 'group'>[]> = {
+const paletteGroupItemsRecord: Record<PaletteGroup, readonly Omit<PaletteItemType, 'group'>[]> = {
   other: [
     {
       uid: 'price',
