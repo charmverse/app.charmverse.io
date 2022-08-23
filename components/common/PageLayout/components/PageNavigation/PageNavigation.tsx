@@ -18,6 +18,7 @@ import { ComponentProps, Dispatch, memo, ReactNode, SetStateAction, SyntheticEve
 import { useDrop } from 'react-dnd';
 
 import ReactDndProvider from 'components/common/ReactDndProvider';
+import { useSnackbar } from 'hooks/useSnackbar';
 import TreeNode, { MenuNode, ParentMenuNode } from './components/TreeNode';
 
 const StyledTreeRoot = styled(TreeRoot)<{ isFavorites?: boolean }>`
@@ -92,6 +93,7 @@ function PageNavigation ({
   const [space] = useCurrentSpace();
   const { user } = useUser();
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${space!.id}.expanded-pages`, []);
+  const { showMessage } = useSnackbar();
 
   const pagesArray: MenuNode[] = filterVisiblePages(Object.values(pages))
     .map((page): MenuNode => ({
@@ -156,31 +158,53 @@ function PageNavigation ({
 
   const onDropChild = useCallback((droppedItem: MenuNode, containerItem: MenuNode) => {
 
-    if (containerItem.type === 'board') {
+    if (containerItem?.type === 'board') {
       return;
     }
 
+    // Prevent a page becoming child of itself
     if (droppedItem.id === containerItem?.id) {
       return;
     }
+
+    // Make sure the new parent is not in the children of this page
+    let currentNode: MenuNode | undefined = containerItem;
+    while (currentNode) {
+      if (currentNode.parentId === droppedItem.id) {
+        return;
+      }
+      // We reached the current node. It's fine to reorder under a parent or root
+      else if (currentNode.id === droppedItem.id || !currentNode.parentId) {
+        break;
+      }
+      else {
+        currentNode = pages[currentNode.parentId];
+      }
+    }
+
     const index = 1000; // send it to the end
-    const parentId = containerItem.id;
-    // console.log('onDropChild:', droppedItem.title, 'under', containerItem.title);
-    charmClient.updatePage({
-      id: droppedItem.id,
-      index, // send it to the end
-      parentId
-    });
+    const parentId = (containerItem as MenuNode)?.id ?? null;
+
+    const page = pages[droppedItem.id] as IPageWithPermissions;
 
     setPages(_pages => ({
       ..._pages,
       [droppedItem.id]: {
-        ..._pages[droppedItem.id]!,
-        index,
+        ...page,
         parentId
       }
     }));
-  }, []);
+
+    charmClient.updatePage({
+      id: droppedItem.id,
+      index, // send it to the end
+      parentId
+    })
+      .catch(err => {
+        showMessage(err.message, 'error');
+      });
+
+  }, [pages]);
 
   useEffect(() => {
     const currentPage = pages[currentPageId];
