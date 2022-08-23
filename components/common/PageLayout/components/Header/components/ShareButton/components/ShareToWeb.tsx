@@ -49,7 +49,7 @@ interface Props {
 export default function ShareToWeb ({ pageId, pagePermissions, refreshPermissions }: Props) {
 
   const router = useRouter();
-  const { pages, getPagePermissions, refreshPage } = usePages();
+  const { pages, getPagePermissions } = usePages();
   const [copied, setCopied] = useState<boolean>(false);
   const [space] = useCurrentSpace();
   const publicPermission = pagePermissions.find(publicPerm => publicPerm.public === true) ?? null;
@@ -72,7 +72,6 @@ export default function ShareToWeb ({ pageId, pagePermissions, refreshPermission
         public: true
       });
     }
-    refreshPage(pageId);
     refreshPermissions();
   }
 

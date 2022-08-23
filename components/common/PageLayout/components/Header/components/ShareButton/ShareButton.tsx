@@ -16,7 +16,7 @@ export default function ShareButton ({ headerHeight, pageId }: { headerHeight: n
   const popupState = usePopupState({ variant: 'popover', popupId: 'share-menu' });
   const [pagePermissions, setPagePermissions] = useState<IPagePermissionWithAssignee[] | null>(null);
 
-  async function refreshPermissions () {
+  async function refreshPageAndPermissions () {
     charmClient.listPagePermissions(pageId)
       .then(permissions => {
         setPagePermissions(permissions);
@@ -26,7 +26,7 @@ export default function ShareButton ({ headerHeight, pageId }: { headerHeight: n
 
   // watch changes to the page in case permissions get updated
   useEffect(() => {
-    refreshPermissions();
+    refreshPageAndPermissions();
   }, [pageId, popupState.isOpen]);
 
   return (
@@ -37,7 +37,7 @@ export default function ShareButton ({ headerHeight, pageId }: { headerHeight: n
           variant='text'
           size='small'
           onClick={() => {
-            refreshPermissions();
+            refreshPageAndPermissions();
             popupState.open();
           }}
         >
@@ -71,12 +71,12 @@ export default function ShareButton ({ headerHeight, pageId }: { headerHeight: n
                 <ShareToWeb
                   pageId={pageId}
                   pagePermissions={pagePermissions}
-                  refreshPermissions={refreshPermissions}
+                  refreshPermissions={refreshPageAndPermissions}
                 />
                 <Divider />
                 <PagePermissions
                   pageId={pageId}
-                  refreshPermissions={refreshPermissions}
+                  refreshPermissions={refreshPageAndPermissions}
                   pagePermissions={pagePermissions}
                 />
               </>
