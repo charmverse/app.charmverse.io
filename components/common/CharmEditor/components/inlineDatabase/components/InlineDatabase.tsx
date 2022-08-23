@@ -229,6 +229,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
             </Button>
           </Box>
           <CenterPanel
+            hideBanner
             showHeader
             hideViewTabs
             clientConfig={clientConfig}

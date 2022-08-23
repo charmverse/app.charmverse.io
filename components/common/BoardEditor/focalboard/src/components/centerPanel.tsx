@@ -44,6 +44,7 @@ type Props = {
   showTitle?: boolean
   dateDisplayProperty?: IPropertyTemplate
   hideViewTabs?: boolean
+  hideBanner?: boolean
 
   intl: IntlShape
   readonly: boolean
@@ -346,7 +347,7 @@ function CenterPanel (props: Props) {
         onKeyDown={keydownHandler}
       />
       {!!board.deletedAt && <PageDeleteBanner pageId={board.id} />}
-      {props.showHeader && board.fields.headerImage && (
+      {props.showHeader && !props.hideBanner &&  board.fields.headerImage && (
         <Box className='PageBanner' width='100%' mb={2}>
           <PageBanner
             focalBoard
