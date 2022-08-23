@@ -36,7 +36,7 @@ export function generatePageNode ({
   deletedAt = null,
   createdAt = new Date(),
   title = 'Untitled'
-}: Partial<PageNode<Pick<Page, 'title' | 'type'>>>): PageNode<Pick<Page, 'title' | 'type'>> {
+}: Partial<PageNode<Pick<Page, 'title' | 'type' | 'deletedAt'>>>): PageNode<Pick<Page, 'title' | 'type' | 'deletedAt'>> {
   return {
     id,
     type,
