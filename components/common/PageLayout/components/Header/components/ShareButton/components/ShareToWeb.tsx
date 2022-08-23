@@ -89,7 +89,7 @@ export default function ShareToWeb ({ pageId, pagePermissions, refreshPermission
     if (!publicPermission) {
       setShareLink(null);
     }
-    else if (currentPage?.type === 'page' || currentPage?.type === 'card') {
+    else if (currentPage?.type === 'page' || currentPage?.type === 'card' || currentPage?.type === 'proposal') {
       const shareLinkToSet = (typeof window !== 'undefined')
         ? `${window.location.origin}/share/${space?.domain}/${currentPage.path}` : '';
       setShareLink(shareLinkToSet);

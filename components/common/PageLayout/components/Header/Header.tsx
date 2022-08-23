@@ -102,6 +102,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
   }
 
   const isFullWidth = basePage?.fullWidth ?? false;
+  const isBasePageDocument = basePage?.type === 'page' || basePage?.type === 'card' || basePage?.type === 'proposal' || basePage?.type === 'bounty';
 
   return (
     <StyledToolbar variant='dense'>
@@ -145,7 +146,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
             </>
           )}
 
-          {(basePage?.type === 'page' || basePage?.type === 'card') && (
+          {isBasePageDocument && (
             <Box sx={{ ml: 1 }} ref={pageMenuAnchor}>
               <IconButton
                 size='small'
