@@ -32,8 +32,8 @@ import { useRef, useState } from 'react';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
 import Account from '../Account';
-import ShareButton from '../ShareButton';
-import BountyShareButton from './BountyShareButton/BountyShareButton';
+import ShareButton from './components/ShareButton';
+import BountyShareButton from './components/BountyShareButton/BountyShareButton';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
 import NotificationsBadge from './components/NotificationsBadge';
 
@@ -51,29 +51,30 @@ interface HeaderProps {
 }
 
 export default function Header ({ open, openSidebar }: HeaderProps) {
+
   const router = useRouter();
   const colorMode = useColorMode();
-  const { pages, currentPageId, setPages } = usePages();
+  const { pages, setPages } = usePages();
   const { user, setUser } = useUser();
   const theme = useTheme();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
   const [pageMenuAnchorElement, setPageMenuAnchorElement] = useState<null | Element>(null);
   const pageMenuAnchor = useRef();
-  const currentPage = currentPageId ? pages[currentPageId] : undefined;
-  const isFavorite = currentPage && user?.favorites.some(({ pageId }) => pageId === currentPage.id);
   const [currentSpacePermissions] = useCurrentSpacePermissions();
-
-  const isPage = router.route.includes('pageId');
-  const pageType = (currentPage as Page)?.type;
-  const isExportablePage = pageType === 'card' || pageType === 'page' || pageType === 'proposal';
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const basePageId = router.query.pageId as string;
+  const basePage = Object.values(pages).find(page => page?.id === basePageId || page?.path === basePageId);
+  const isFavorite = basePage && user?.favorites.some(({ pageId }) => pageId === basePage.id);
+  const pageType = basePage?.type;
+  const isExportablePage = pageType === 'card' || pageType === 'page' || pageType === 'proposal';
 
   const isBountyBoard = router.route === '/[domain]/bounties';
 
   async function toggleFavorite () {
-    if (!currentPage || !user) return;
-    const pageId = currentPage.id;
+    if (!basePage || !user) return;
+    const pageId = basePage.id;
     const updatedFields = isFavorite
       ? await charmClient.unfavoritePage(pageId)
       : await charmClient.favoritePage(pageId);
@@ -81,14 +82,14 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
   }
 
   async function exportMarkdown () {
-    const markdownContent = await generateMarkdown(currentPage as Page);
+    const markdownContent = await generateMarkdown(basePage as Page);
 
     if (markdownContent) {
       const data = new Blob([markdownContent], { type: 'text/plain' });
 
       const linkElement = document.createElement('a');
 
-      linkElement.download = `${currentPage?.title || 'page'}.md`;
+      linkElement.download = `${basePage?.title || 'page'}.md`;
 
       const downloadLink = URL.createObjectURL(data);
 
@@ -100,7 +101,8 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
     }
   }
 
-  const isFullWidth = currentPage?.fullWidth ?? false;
+  const isFullWidth = basePage?.fullWidth ?? false;
+  const isBasePageDocument = basePage?.type === 'page' || basePage?.type === 'card' || basePage?.type === 'proposal' || basePage?.type === 'bounty';
 
   return (
     <StyledToolbar variant='dense'>
@@ -133,9 +135,9 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
             )
           }
 
-          {isPage && (
+          {basePage && (
             <>
-              {currentPage?.deletedAt === null && <ShareButton headerHeight={headerHeight} />}
+              {basePage?.deletedAt === null && <ShareButton headerHeight={headerHeight} pageId={basePage.id} />}
               <IconButton sx={{ display: { xs: 'none', md: 'inline-flex' } }} size='small' onClick={toggleFavorite} color='inherit'>
                 <Tooltip title={isFavorite ? 'Remove from sidebar' : 'Pin this page to your sidebar'} arrow placement='top'>
                   {isFavorite ? <FavoritedIcon fontSize='small' color='secondary' /> : <NotFavoritedIcon fontSize='small' color='secondary' />}
@@ -144,7 +146,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
             </>
           )}
 
-          {currentPage && isPage && isExportablePage && (
+          {isBasePageDocument && (
             <Box sx={{ ml: 1 }} ref={pageMenuAnchor}>
               <IconButton
                 size='small'
@@ -167,70 +169,66 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
                 }}
               >
                 <List dense>
-                  {isPage && (
-                    <>
-                      {(currentPage?.type === 'page' || currentPage?.type === 'card') && currentSpacePermissions?.createVote && (
-                        <ListItemButton onClick={() => {
-                          setPageMenuOpen(false);
-                          setIsModalOpen(true);
-                        }}
-                        >
-                          <HowToVoteOutlinedIcon
-                            fontSize='small'
-                            sx={{
-                              mr: 1
-                            }}
-                          />
-                          <ListItemText primary='Create a vote' />
-                        </ListItemButton>
-                      )}
-                      {(currentPage?.type === 'page' || currentPage?.type === 'card') && (
-                        <ListItemButton onClick={() => {
-                          setCurrentPageActionDisplay('votes');
-                          setPageMenuOpen(false);
-                        }}
-                        >
-                          <FormatListBulletedIcon
-                            fontSize='small'
-                            sx={{
-                              mr: 1
-                            }}
-                          />
-                          <ListItemText primary='View votes' />
-                        </ListItemButton>
-                      )}
-                      <PublishToSnapshot page={currentPage as Page} />
-                    </>
-                  )}
-                  <Divider />
-                  {isPage && (
-                    <ListItemButton onClick={() => {
-                      setCurrentPageActionDisplay('comments');
-                      setPageMenuOpen(false);
-                    }}
+                  {currentSpacePermissions?.createVote && (
+                    <ListItemButton
+                      onClick={() => {
+                        setPageMenuOpen(false);
+                        setIsModalOpen(true);
+                      }}
                     >
-                      <CommentOutlinedIcon
+                      <HowToVoteOutlinedIcon
                         fontSize='small'
                         sx={{
                           mr: 1
                         }}
                       />
-                      <ListItemText primary='View comments' />
+                      <ListItemText primary='Create a vote' />
                     </ListItemButton>
                   )}
-                  <ListItemButton onClick={() => {
-                    exportMarkdown();
-                    setPageMenuOpen(false);
-                  }}
+                  <ListItemButton
+                    onClick={() => {
+                      setCurrentPageActionDisplay('votes');
+                      setPageMenuOpen(false);
+                    }}
                   >
-                    <GetAppIcon
+                    <FormatListBulletedIcon
                       fontSize='small'
                       sx={{
                         mr: 1
                       }}
                     />
-                    <ListItemText primary='Export to markdown' />
+                    <ListItemText primary='View votes' />
                   </ListItemButton>
+                  <PublishToSnapshot page={basePage as Page} />
+                  <Divider />
+                  <ListItemButton onClick={() => {
+                    setCurrentPageActionDisplay('comments');
+                    setPageMenuOpen(false);
+                  }}
+                  >
+                    <CommentOutlinedIcon
+                      fontSize='small'
+                      sx={{
+                        mr: 1
+                      }}
+                    />
+                    <ListItemText primary='View comments' />
+                  </ListItemButton>
+                  {isExportablePage && (
+                    <ListItemButton onClick={() => {
+                      exportMarkdown();
+                      setPageMenuOpen(false);
+                    }}
+                    >
+                      <GetAppIcon
+                        fontSize='small'
+                        sx={{
+                          mr: 1
+                        }}
+                      />
+                      <ListItemText primary='Export to markdown' />
+                    </ListItemButton>
+                  )}
 
                   <Divider />
                   <ListItemButton>
@@ -248,10 +246,10 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
                           checked={isFullWidth}
                           onChange={async () => {
                             await charmClient.updatePage({
-                              id: currentPage.id,
+                              id: basePage.id,
                               fullWidth: !isFullWidth
                             });
-                            setPages((_pages) => ({ ..._pages, [currentPageId]: { ...currentPage, fullWidth: !isFullWidth } }));
+                            setPages((_pages) => ({ ..._pages, [basePageId]: { ...basePage, fullWidth: !isFullWidth } }));
                           }}
                         />
                       )}

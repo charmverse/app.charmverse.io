@@ -53,7 +53,7 @@ export default function PublicPage () {
   const [, setSpaces] = useSpaces();
   const [, setTitleState] = usePageTitle();
   // keep track of the pageId by path since currentPageId may change when a page is viewed inside a modal
-  const [pageIdFromPath, setPageIdFromPath] = useState('');
+  const [basePageId, setBasePageId] = useState('');
   const [pageNotFound, setPageNotFound] = useState(false);
   const isBountiesPage = router.query.pageId?.[1] === 'bounties';
 
@@ -76,7 +76,7 @@ export default function PublicPage () {
 
         setTitleState(rootPage.title);
         setCurrentPageId(rootPage.id);
-        setPageIdFromPath(rootPage.id);
+        setBasePageId(rootPage.id);
         setSpaces([space]);
 
         if (pageBlock) {
@@ -135,7 +135,7 @@ export default function PublicPage () {
     return <ErrorPage message={'Sorry, that page doesn\'t exist'} />;
   }
 
-  const currentPage = pages[pageIdFromPath];
+  const currentPage = pages[basePageId];
 
   return (
     <>
