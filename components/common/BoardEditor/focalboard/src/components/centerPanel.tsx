@@ -6,7 +6,7 @@ import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/
 import PageDeleteBanner from 'components/[pageId]/DocumentPage/components/PageDeleteBanner';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { Page } from '@prisma/client';
-import React, { useState } from 'react';
+import React, { ReactNode, useState } from 'react';
 import Hotkeys from 'react-hot-keys';
 import { mutate } from 'swr';
 import { injectIntl, IntlShape } from 'react-intl';
@@ -45,7 +45,7 @@ type Props = {
   dateDisplayProperty?: IPropertyTemplate
   hideViewTabs?: boolean
   hideBanner?: boolean
-
+  viewTabs?: ReactNode
   intl: IntlShape
   readonly: boolean
   addCard: (card: Card) => void
@@ -366,6 +366,7 @@ function CenterPanel (props: Props) {
             setPage={props.setPage}
             />}
           <ViewHeader
+            viewTabs={props.viewTabs}
             hideViewTabs={props.hideViewTabs}
             board={props.board}
             activeView={props.activeView}

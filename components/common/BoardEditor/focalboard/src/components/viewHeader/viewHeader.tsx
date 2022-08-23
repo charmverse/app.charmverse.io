@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import { useRouter } from 'next/router';
-import React, { useCallback, useState } from 'react';
+import React, { ReactNode, useCallback, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Board, IPropertyTemplate } from '../../blocks/board';
 import { BoardView } from '../../blocks/boardView';
@@ -34,6 +34,8 @@ type Props = {
     readonly: boolean
     dateDisplayProperty?: IPropertyTemplate
     hideViewTabs?: boolean
+    // For passing custom react elements on view tabs area
+    viewTabs?: ReactNode
 }
 
 const ViewHeader = React.memo((props: Props) => {
@@ -42,7 +44,7 @@ const ViewHeader = React.memo((props: Props) => {
 
   const views = props.views.filter(view => !view.fields.inline)
 
-  const { board, activeView, groupByProperty, cards, dateDisplayProperty } = props;
+  const { viewTabs = null, board, activeView, groupByProperty, cards, dateDisplayProperty } = props;
 
   const withGroupBy = activeView.fields.viewType === 'board' || activeView.fields.viewType === 'table';
   const withDisplayBy = activeView.fields.viewType === 'calendar';
@@ -60,6 +62,7 @@ const ViewHeader = React.memo((props: Props) => {
 
   return (
     <div className='ViewHeader'>
+      {viewTabs}
       {!props.hideViewTabs && <>
         <ViewTabs
           views={views}

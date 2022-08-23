@@ -191,54 +191,56 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
           }
         }}
         >
-          <Box mb={1} display='flex' gap={1}>
-            <Tabs textColor='primary' indicatorColor='secondary' value={`${pageId}.${boardIndex}`} sx={{ minHeight: 40 }}>
-              {attrs.pageIds.map((_pageId, index) => {
-                const _board = boards.find(b => b.id === _pageId);
-                return _board ? (
-                  <Tab
-                    component='div'
-                    disableRipple
-                    key={_pageId}
-                    label={(
-                      <Button
-                        variant='text'
-                        startIcon={<PageIcon icon={pages[_pageId]?.icon} pageType='board' isEditorEmpty={false} />}
-                        color={(pageId === _pageId && index === boardIndex) ? 'textPrimary' : 'secondary'}
-                        sx={{ px: 1.5 }}
-                        onClick={() => {
-                          if (index !== boardIndex) {
-                            setBoardIndex(index);
-                          }
-                        }}
-                      >
-                        {_board.title}
-                      </Button>
-                    )}
-                    sx={{ p: 0 }}
-                    value={`${_pageId}.${index}`}
-                  />
-                ) : null;
-              })}
-            </Tabs>
-            <IconButton
-              sx={{
-                width: 'fit-content',
-                height: 'fit-content',
-                position: 'relative',
-                top: 3
-              }}
-              onClick={() => {
-                setIsSelectingSource(true);
-              }}
-              color='secondary'
-              size='small'
-            >
-              <Add fontSize='small' />
-            </IconButton>
-          </Box>
           <CenterPanel
             hideBanner
+            viewTabs={(
+              <Box mb={1} display='flex' gap={1}>
+                <Tabs textColor='primary' indicatorColor='secondary' value={`${pageId}.${boardIndex}`} sx={{ minHeight: 40 }}>
+                  {attrs.pageIds.map((_pageId, index) => {
+                    const _board = boards.find(b => b.id === _pageId);
+                    return _board ? (
+                      <Tab
+                        component='div'
+                        disableRipple
+                        key={_pageId}
+                        label={(
+                          <Button
+                            variant='text'
+                            startIcon={<PageIcon icon={pages[_pageId]?.icon} pageType='board' isEditorEmpty={false} />}
+                            color={(pageId === _pageId && index === boardIndex) ? 'textPrimary' : 'secondary'}
+                            sx={{ px: 1.5 }}
+                            onClick={() => {
+                              if (index !== boardIndex) {
+                                setBoardIndex(index);
+                              }
+                            }}
+                          >
+                            {_board.title}
+                          </Button>
+                    )}
+                        sx={{ p: 0 }}
+                        value={`${_pageId}.${index}`}
+                      />
+                    ) : null;
+                  })}
+                </Tabs>
+                <IconButton
+                  sx={{
+                    width: 'fit-content',
+                    height: 'fit-content',
+                    position: 'relative',
+                    top: 3
+                  }}
+                  onClick={() => {
+                    setIsSelectingSource(true);
+                  }}
+                  color='secondary'
+                  size='small'
+                >
+                  <Add fontSize='small' />
+                </IconButton>
+              </Box>
+)}
             showHeader
             hideViewTabs
             clientConfig={clientConfig}
