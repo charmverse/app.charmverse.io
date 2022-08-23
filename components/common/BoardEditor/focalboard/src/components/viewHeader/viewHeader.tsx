@@ -40,7 +40,9 @@ const ViewHeader = React.memo((props: Props) => {
   const router = useRouter();
   const [showFilter, setShowFilter] = useState(false);
 
-  const { board, activeView, views, groupByProperty, cards, dateDisplayProperty } = props;
+  const views = props.views.filter(view => !view.fields.inline)
+
+  const { board, activeView, groupByProperty, cards, dateDisplayProperty } = props;
 
   const withGroupBy = activeView.fields.viewType === 'board' || activeView.fields.viewType === 'table';
   const withDisplayBy = activeView.fields.viewType === 'calendar';
