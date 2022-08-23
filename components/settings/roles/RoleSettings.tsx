@@ -13,7 +13,7 @@ import useIsAdmin from 'hooks/useIsAdmin';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useRef, useState } from 'react';
 import InviteLinkList from 'components/settings/contributors/InviteLinks/InviteLinks';
-import ShareBountyBoard from 'components/common/PageLayout/components/Header/BountyShareButton/ShareBountyBoard';
+import ShareBountyBoard from 'components/common/PageLayout/components/Header/components/BountyShareButton/ShareBountyBoard';
 import ImportDiscordRolesMenuItem from './components/ImportDiscordRolesMenuItem';
 import RoleForm from './components/RoleForm';
 import RoleRow from './components/RoleRow';

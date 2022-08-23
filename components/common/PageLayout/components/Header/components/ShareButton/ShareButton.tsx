@@ -10,24 +10,24 @@ import { IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permissi
 import PagePermissions from './components/PagePermissions';
 import ShareToWeb from './components/ShareToWeb';
 
-export default function ShareButton ({ headerHeight }: { headerHeight: number }) {
+export default function ShareButton ({ headerHeight, pageId }: { headerHeight: number, pageId: string }) {
 
-  const { currentPageId, refreshPage } = usePages();
+  const { refreshPage } = usePages();
   const popupState = usePopupState({ variant: 'popover', popupId: 'share-menu' });
   const [pagePermissions, setPagePermissions] = useState<IPagePermissionWithAssignee[] | null>(null);
 
   async function refreshPermissions () {
-    charmClient.listPagePermissions(currentPageId)
+    charmClient.listPagePermissions(pageId)
       .then(permissions => {
         setPagePermissions(permissions);
-        refreshPage(currentPageId);
+        refreshPage(pageId);
       });
   }
 
   // watch changes to the page in case permissions get updated
   useEffect(() => {
     refreshPermissions();
-  }, [currentPageId, popupState.isOpen]);
+  }, [pageId, popupState.isOpen]);
 
   return (
     <>
@@ -68,10 +68,14 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
             ? (<Box sx={{ height: 100 }}><Loader size={20} sx={{ height: 600 }} /></Box>)
             : (
               <>
-                <ShareToWeb pageId={currentPageId} pagePermissions={pagePermissions} />
+                <ShareToWeb
+                  pageId={pageId}
+                  pagePermissions={pagePermissions}
+                  refreshPermissions={refreshPermissions}
+                />
                 <Divider />
                 <PagePermissions
-                  pageId={currentPageId}
+                  pageId={pageId}
                   refreshPermissions={refreshPermissions}
                   pagePermissions={pagePermissions}
                 />

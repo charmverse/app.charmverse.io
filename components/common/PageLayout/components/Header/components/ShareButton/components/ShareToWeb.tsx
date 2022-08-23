@@ -43,9 +43,10 @@ const CopyButton = styled((props: any) => <Button color='secondary' variant='out
 interface Props {
   pageId: string;
   pagePermissions: IPagePermissionWithAssignee[];
+  refreshPermissions: () => void;
 }
 
-export default function ShareToWeb ({ pageId, pagePermissions }: Props) {
+export default function ShareToWeb ({ pageId, pagePermissions, refreshPermissions }: Props) {
 
   const router = useRouter();
   const { pages, getPagePermissions, refreshPage } = usePages();
@@ -63,7 +64,6 @@ export default function ShareToWeb ({ pageId, pagePermissions }: Props) {
   async function togglePublic () {
     if (publicPermission) {
       await charmClient.deletePermission(publicPermission.id);
-      refreshPage(pageId);
     }
     else {
       await charmClient.createPermission({
@@ -71,8 +71,9 @@ export default function ShareToWeb ({ pageId, pagePermissions }: Props) {
         permissionLevel: 'view',
         public: true
       });
-      refreshPage(pageId);
     }
+    refreshPage(pageId);
+    refreshPermissions();
   }
 
   useEffect(() => {
