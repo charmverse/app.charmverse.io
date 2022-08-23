@@ -87,22 +87,22 @@ interface DatabaseViewProps extends NodeViewProps {
   readOnly?: boolean;
 }
 
-interface DatabaseViewAttrs {
-  pageIds: string[];
-  viewIds: string[];
-  sources: ('board_page')[];
+interface DataSource {
+  pageId: string;
+  viewId: string;
+  source: 'board_page';
 }
 
 export default function DatabaseView ({ readOnly: readOnlyOverride, node, updateAttrs }: DatabaseViewProps) {
-  const [attrs, setAttrs] = useState<DatabaseViewAttrs>(node.attrs as DatabaseViewAttrs);
+  const [dataSources, setDataSources] = useState<DataSource[]>(node.attrs.dataSources);
   // Keep track of which board is currently being viewed
-  const [boardIndex, setBoardIndex] = useState<null | number>(attrs.pageIds.length !== 0 ? 0 : null);
+  const [currentDataSource, setCurrentDataSource] = useState<DataSource | null>(dataSources.length !== 0 ? dataSources[0] : null);
   const [isSelectingSource, setIsSelectingSource] = useState(false);
 
   const boards = useAppSelector(getSortedBoards);
   // Always display the first page and view
-  const pageId = boardIndex !== null ? attrs.pageIds[boardIndex] : null;
-  const viewId = boardIndex !== null ? attrs.viewIds[boardIndex] : null;
+  const viewId = currentDataSource?.viewId;
+  const pageId = currentDataSource?.pageId;
 
   const board = boards.find(b => b.id === pageId);
   const cards = useAppSelector(getViewCardsSortedFilteredAndGrouped({
@@ -137,14 +137,15 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
     view.fields.inline = true;
 
     await mutator.insertBlock(view);
-    setAttrs({ sources: [...attrs.sources, 'board_page'], pageIds: [...attrs.pageIds, boardId], viewIds: [...attrs.viewIds, view.id] });
+    const newDataSource: DataSource = { pageId: boardId, viewId: view.id, source: 'board_page' };
+    setDataSources([...dataSources, newDataSource]);
     setIsSelectingSource(false);
-    setBoardIndex(boardIndex === null ? 0 : boardIndex + 1);
+    setCurrentDataSource(newDataSource);
   }
 
   useEffect(() => {
-    updateAttrs(attrs);
-  }, [attrs]);
+    updateAttrs(dataSources);
+  }, [dataSources]);
 
   if (!board || isSelectingSource) {
     return (
@@ -152,7 +153,6 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
         pages={boardPages}
         onSelect={selectBoard}
         onClickBack={() => {
-          setBoardIndex(boardIndex === null ? 0 : boardIndex);
           setIsSelectingSource(false);
         }}
       />
@@ -194,32 +194,30 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
           <CenterPanel
             hideBanner
             viewTabs={(
-              <Box mb={1} display='flex' gap={1}>
-                <Tabs textColor='primary' indicatorColor='secondary' value={`${pageId}.${boardIndex}`} sx={{ minHeight: 40 }}>
-                  {attrs.pageIds.map((_pageId, index) => {
-                    const _board = boards.find(b => b.id === _pageId);
+              <Box display='flex' gap={1}>
+                <Tabs textColor='primary' indicatorColor='secondary' value={`${pageId}.${viewId}`} sx={{ minHeight: 40 }}>
+                  {dataSources.map((dataSource) => {
+                    const _board = boards.find(b => b.id === dataSource.pageId);
                     return _board ? (
                       <Tab
                         component='div'
                         disableRipple
-                        key={_pageId}
+                        key={`${dataSource.pageId}.${dataSource.viewId}`}
                         label={(
                           <Button
                             variant='text'
-                            startIcon={<PageIcon icon={pages[_pageId]?.icon} pageType='board' isEditorEmpty={false} />}
-                            color={(pageId === _pageId && index === boardIndex) ? 'textPrimary' : 'secondary'}
+                            startIcon={<PageIcon icon={pages[dataSource.pageId]?.icon} pageType='board' isEditorEmpty={false} />}
+                            color={(pageId === dataSource.pageId && viewId === dataSource.viewId) ? 'textPrimary' : 'secondary'}
                             sx={{ px: 1.5 }}
                             onClick={() => {
-                              if (index !== boardIndex) {
-                                setBoardIndex(index);
-                              }
+                              setCurrentDataSource(dataSource);
                             }}
                           >
                             {_board.title}
                           </Button>
                     )}
                         sx={{ p: 0 }}
-                        value={`${_pageId}.${index}`}
+                        value={`${dataSource.pageId}.${dataSource.viewId}`}
                       />
                     ) : null;
                   })}

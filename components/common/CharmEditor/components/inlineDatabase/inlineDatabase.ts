@@ -13,13 +13,7 @@ function databaseSpec (): BaseRawNodeSpec {
     type: 'node',
     schema: {
       attrs: {
-        pageIds: {
-          default: []
-        },
-        viewIds: {
-          default: []
-        },
-        sources: {
+        dataSources: {
           default: []
         }
       },

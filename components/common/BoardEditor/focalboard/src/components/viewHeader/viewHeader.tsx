@@ -18,7 +18,6 @@ import ViewHeaderActionsMenu from './viewHeaderActionsMenu';
 import ViewHeaderDisplayByMenu from './viewHeaderDisplayByMenu';
 import ViewHeaderGroupByMenu from './viewHeaderGroupByMenu';
 import ViewHeaderPropertiesMenu from './viewHeaderPropertiesMenu';
-import ViewHeaderSearch from './viewHeaderSearch';
 import ViewHeaderSortMenu from './viewHeaderSortMenu';
 
 type Props = {
