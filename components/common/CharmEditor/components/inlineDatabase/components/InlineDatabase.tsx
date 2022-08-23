@@ -142,7 +142,16 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
     setShownCardId(cardId);
   }
 
-  async function selectBoard (boardId: string) {
+  function updateDataSourcesList (dataSource: DataSource, dataSourceIndex: number) {
+    const edgeDataSource = dataSources[MAX_DATA_SOURCES - 1];
+    dataSources[MAX_DATA_SOURCES - 1] = dataSource;
+    dataSources[MAX_DATA_SOURCES + dataSourceIndex] = edgeDataSource;
+    setDataSources([...dataSources]);
+    showHiddenDataSourcesMenuState.onClose();
+    setCurrentDataSourceIndex(MAX_DATA_SOURCES - 1);
+  }
+
+  async function onSelectBoard (boardId: string) {
     const view = createBoardView();
     view.fields.viewType = 'board';
     view.parentId = boardId;
@@ -154,9 +163,18 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
     await mutator.insertBlock(view);
     const newDataSource: DataSource = { pageId: boardId, viewId: view.id, source: 'board_page', title: pages[boardId]?.title || null };
     const newDataSources = [...dataSources, newDataSource];
-    setDataSources(newDataSources);
+    if (newDataSources.length > MAX_DATA_SOURCES) {
+      const edgeDataSource = newDataSources[MAX_DATA_SOURCES - 1];
+      newDataSources[MAX_DATA_SOURCES - 1] = newDataSource;
+      newDataSources[newDataSources.length - 1] = edgeDataSource;
+      setDataSources([...newDataSources]);
+      setCurrentDataSourceIndex(MAX_DATA_SOURCES - 1);
+    }
+    else {
+      setCurrentDataSourceIndex(newDataSources.length - 1);
+      setDataSources(newDataSources);
+    }
     setIsSelectingSource(false);
-    setCurrentDataSourceIndex(Math.min(newDataSources.length, MAX_DATA_SOURCES - 1));
   }
 
   useEffect(() => {
@@ -169,7 +187,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
     return (
       <BoardSelection
         pages={boardPages}
-        onSelect={selectBoard}
+        onSelect={onSelectBoard}
         onClickBack={() => {
           setIsSelectingSource(false);
         }}
@@ -325,12 +343,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
                   key={`${dataSource.pageId}.${dataSource.viewId}`}
                   dense
                   onClick={() => {
-                    const edgeDataSource = dataSources[MAX_DATA_SOURCES - 1];
-                    dataSources[MAX_DATA_SOURCES - 1] = dataSource;
-                    dataSources[MAX_DATA_SOURCES + dataSourceIndex] = edgeDataSource;
-                    setDataSources([...dataSources]);
-                    showHiddenDataSourcesMenuState.onClose();
-                    setCurrentDataSourceIndex(MAX_DATA_SOURCES - 1);
+                    updateDataSourcesList(dataSource, dataSourceIndex);
                   }}
                 >
                   <PageIcon icon={pages[dataSource.pageId]?.icon} pageType='board' isEditorEmpty={false} />
@@ -351,7 +364,6 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
             onClick={() => {
               setIsSelectingSource(true);
               showHiddenDataSourcesMenuState.onClose();
-              setCurrentDataSourceIndex(MAX_DATA_SOURCES - 1);
             }}
           >
             Add source
