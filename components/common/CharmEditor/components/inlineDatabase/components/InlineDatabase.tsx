@@ -26,7 +26,7 @@ const CenterPanel = dynamic(() => import('components/common/BoardEditor/focalboa
   ssr: false
 });
 
-const StylesContainer = styled.div`
+const StylesContainer = styled.div<{ containerWidth?: number }>`
   margin-top: ${({ theme }) => theme.spacing(2)};
 
   .BoardComponent {
@@ -41,8 +41,9 @@ const StylesContainer = styled.div`
     margin: 0 -24px;
     padding-left: 24px;
     ${({ theme }) => theme.breakpoints.up('md')} {
-      margin: 0 -80px;
-      padding-left: 80px;
+      --side-margin: ${({ containerWidth }) => `calc((${containerWidth}px - 100%) / 2)`};
+      margin: 0 calc(-1 * var(--side-margin));
+      padding-left: var(--side-margin);
     }
   }
 
@@ -83,6 +84,7 @@ const StylesContainer = styled.div`
 `;
 
 interface DatabaseViewProps extends NodeViewProps {
+  containerWidth?: number; // pass in the container width so we can extend full width
   readOnly?: boolean;
 }
 
@@ -92,7 +94,7 @@ interface DatabaseViewAttrs {
   source: 'board_page' | null;
 }
 
-export default function DatabaseView ({ readOnly: readOnlyOverride, node, updateAttrs }: DatabaseViewProps) {
+export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverride, node, updateAttrs }: DatabaseViewProps) {
 
   const [attrs, setAttrs] = useState<DatabaseViewAttrs>(node.attrs as DatabaseViewAttrs);
   const router = useRouter();
@@ -162,7 +164,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
 
   return (
     <>
-      <StylesContainer className='focalboard-body'>
+      <StylesContainer className='focalboard-body' containerWidth={containerWidth}>
         <Box display='flex' justifyContent='space-between'>
           <Button
             color='secondary'
