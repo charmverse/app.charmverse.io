@@ -1,7 +1,7 @@
 
 import { NodeViewProps } from '@bangle.dev/core';
 import styled from '@emotion/styled';
-import { Box, IconButton, Tab, Tabs } from '@mui/material';
+import { Box, Divider, IconButton, ListItemText, Menu, MenuItem, Tab, Tabs } from '@mui/material';
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
@@ -21,7 +21,7 @@ import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import { createBoardView } from 'lib/focalboard/boardView';
 import { Add } from '@mui/icons-material';
-import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import BoardSelection from './BoardSelection';
 
 // Lazy load focalboard entrypoint (ignoring the redux state stuff for now)
@@ -101,8 +101,9 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
 
   const shownDataSources = dataSources.slice(0, MAX_DATA_SOURCES);
   const hiddenDataSources = dataSources.slice(MAX_DATA_SOURCES);
-  const showHiddenDataSourcesPopupState = usePopupState({ variant: 'popover', popupId: 'show-views-popup' });
+  const showHiddenDataSourcesPopupState = usePopupState({ variant: 'popover', popupId: 'show-data-sources-popup' });
   const showHiddenDataSourcesTriggerState = bindTrigger(showHiddenDataSourcesPopupState);
+  const showHiddenDataSourcesMenuState = bindMenu(showHiddenDataSourcesPopupState);
 
   // Keep track of which board is currently being viewed
   const [currentDataSourceIndex, setCurrentDataSourceIndex] = useState<number>(dataSources.length !== 0 ? 0 : -1);
@@ -284,6 +285,44 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
             views={boardViews}
           />
         </Box>
+        <Menu
+          {...showHiddenDataSourcesMenuState}
+        >
+          <Box sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 1,
+            mb: 1
+          }}
+          >
+            {hiddenDataSources.map(dataSource => {
+              const _board = boards.find(b => b.id === dataSource.pageId);
+
+              return _board ? (
+                <MenuItem component='a' key={`${dataSource.pageId}.${dataSource.viewId}`} dense>
+                  <PageIcon icon={pages[dataSource.pageId]?.icon} pageType='board' isEditorEmpty={false} />
+                  <ListItemText>{_board.title}</ListItemText>
+                </MenuItem>
+              ) : null;
+            })}
+          </Box>
+          <Divider />
+          <Button
+            sx={{
+              width: '100%'
+            }}
+            color='secondary'
+            size='small'
+            startIcon={<Add />}
+            variant='text'
+            onClick={() => {
+              setIsSelectingSource(true);
+              showHiddenDataSourcesMenuState.onClose();
+            }}
+          >
+            Add source
+          </Button>
+        </Menu>
       </StylesContainer>
       {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
         <RootPortal>
