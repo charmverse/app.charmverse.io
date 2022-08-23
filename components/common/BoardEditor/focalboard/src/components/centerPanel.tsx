@@ -41,6 +41,7 @@ type Props = {
   views: BoardView[]
   groupByProperty?: IPropertyTemplate
   showHeader?: boolean
+  showTitle?: boolean
   dateDisplayProperty?: IPropertyTemplate
 
   intl: IntlShape
@@ -318,7 +319,7 @@ function CenterPanel (props: Props) {
     }
     const allVisibleOptionIds = [...visibleOptionIds, ...unassignedOptionIds];
 
-    // If the empty group positon is not explicitly specified, make it the first visible column
+    // If the empty group position is not explicitly specified, make it the first visible column
     if (!allVisibleOptionIds.includes('') && !hiddenOptionIds.includes('')) {
       allVisibleOptionIds.unshift('');
     }
@@ -356,12 +357,12 @@ function CenterPanel (props: Props) {
       )}
       {props.showHeader && (
         <div className='top-head'>
-          <ViewTitle
+          {props.showTitle && <ViewTitle
             key={board.id + board.title}
             board={board}
             readonly={props.readonly}
             setPage={props.setPage}
-          />
+          />}
           <ViewHeader
             board={props.board}
             activeView={props.activeView}

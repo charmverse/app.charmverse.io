@@ -168,6 +168,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
           </Typography>
         </Box>
         <CenterPanel
+          showHeader
           clientConfig={clientConfig}
           readonly={readOnly}
           board={board}
