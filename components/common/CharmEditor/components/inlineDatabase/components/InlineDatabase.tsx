@@ -1,7 +1,7 @@
 
 import { NodeViewProps } from '@bangle.dev/core';
 import styled from '@emotion/styled';
-import { Box, Tab, Tabs } from '@mui/material';
+import { Box, IconButton, Tab, Tabs } from '@mui/material';
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
@@ -20,6 +20,7 @@ import { useEffect, useState } from 'react';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import { createBoardView } from 'lib/focalboard/boardView';
+import { Add } from '@mui/icons-material';
 import BoardSelection from './BoardSelection';
 
 // Lazy load focalboard entrypoint (ignoring the redux state stuff for now)
@@ -213,20 +214,28 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
                       >
                         {_board.title}
                       </Button>
-                )}
+                    )}
                     sx={{ p: 0 }}
                     value={`${_pageId}.${index}`}
                   />
                 ) : null;
               })}
             </Tabs>
-            <Button
-              size='small'
+            <IconButton
+              sx={{
+                width: 'fit-content',
+                height: 'fit-content',
+                position: 'relative',
+                top: 3
+              }}
               onClick={() => {
                 setIsSelectingSource(true);
               }}
-            >New source
-            </Button>
+              color='secondary'
+              size='small'
+            >
+              <Add fontSize='small' />
+            </IconButton>
           </Box>
           <CenterPanel
             hideBanner
