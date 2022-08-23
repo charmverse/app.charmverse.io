@@ -109,7 +109,7 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
             <TableCell sx={{ px: 0 }}>Description</TableCell>
             <TableCell>
               <Tooltip arrow placement='top' title='Automatically assign these roles to new users'>
-                <span>Included Roles</span>
+                <span>Assigned Roles</span>
               </Tooltip>
             </TableCell>
             <TableCell />
