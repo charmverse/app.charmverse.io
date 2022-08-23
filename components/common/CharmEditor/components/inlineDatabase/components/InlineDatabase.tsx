@@ -268,7 +268,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
                 </IconButton>
                 )}
               </Box>
-)}
+            )}
             showHeader
             hideViewTabs
             clientConfig={clientConfig}
@@ -295,11 +295,22 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
             mb: 1
           }}
           >
-            {hiddenDataSources.map(dataSource => {
+            {hiddenDataSources.map((dataSource, dataSourceIndex) => {
               const _board = boards.find(b => b.id === dataSource.pageId);
-
               return _board ? (
-                <MenuItem component='a' key={`${dataSource.pageId}.${dataSource.viewId}`} dense>
+                <MenuItem
+                  component='a'
+                  key={`${dataSource.pageId}.${dataSource.viewId}`}
+                  dense
+                  onClick={() => {
+                    const edgeDataSource = dataSources[MAX_DATA_SOURCES - 1];
+                    dataSources[MAX_DATA_SOURCES - 1] = dataSource;
+                    dataSources[MAX_DATA_SOURCES + dataSourceIndex] = edgeDataSource;
+                    setDataSources([...dataSources]);
+                    showHiddenDataSourcesMenuState.onClose();
+                    setCurrentDataSourceIndex(MAX_DATA_SOURCES - 1);
+                  }}
+                >
                   <PageIcon icon={pages[dataSource.pageId]?.icon} pageType='board' isEditorEmpty={false} />
                   <ListItemText>{_board.title}</ListItemText>
                 </MenuItem>
