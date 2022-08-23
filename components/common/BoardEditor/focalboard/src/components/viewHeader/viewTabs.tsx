@@ -194,9 +194,8 @@ function ViewTabs ({ board, activeView, intl, readonly, showView, views }: ViewT
             >
               {restViews.length} more...
             </Button>
-      )}
-        />
-        )}
+          )}
+        />)}
       </Tabs>
       <Menu
         anchorEl={anchorEl}

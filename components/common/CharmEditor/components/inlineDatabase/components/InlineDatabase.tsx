@@ -1,7 +1,7 @@
 
 import dynamic from 'next/dynamic';
 import { useState, useEffect } from 'react';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Tab, Tabs, Typography } from '@mui/material';
 import { NodeViewProps } from '@bangle.dev/core';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { getViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
@@ -15,7 +15,9 @@ import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 import log from 'lib/log';
 import styled from '@emotion/styled';
 import { isTruthy } from 'lib/utilities/types';
+import Button from 'components/common/Button';
 
+import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import BoardSelection from './BoardSelection';
 import ViewSelection from './ViewSelection';
 
@@ -179,24 +181,35 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
         }}
         >
           <Box mb={1} display='flex' gap={1}>
-            {attrs.pageIds.map((_pageId, index) => {
-              const _board = boards.find(b => b.id === _pageId);
-              if (_board) {
-                return (
-                  <Typography
-                    variant='h3'
-                    onClick={() => {
-                      if (index !== boardIndex) {
-                        setBoardIndex(index);
-                      }
-                    }}
-                  >
-                    {_board.title}
-                  </Typography>
-                );
-              }
-              return null;
-            })}
+            <Tabs textColor='primary' indicatorColor='secondary' value={pageId} sx={{ minHeight: 40 }}>
+              {attrs.pageIds.map((_pageId, index) => {
+                const _board = boards.find(b => b.id === _pageId);
+                return _board ? (
+                  <Tab
+                    component='div'
+                    disableRipple
+                    key={_pageId}
+                    label={(
+                      <Button
+                        variant='text'
+                        startIcon={<PageIcon icon={pages[_pageId]?.icon} pageType='board' isEditorEmpty={false} />}
+                        color={pageId === _pageId ? 'textPrimary' : 'secondary'}
+                        sx={{ px: 1.5 }}
+                        onClick={() => {
+                          if (index !== boardIndex) {
+                            setBoardIndex(index);
+                          }
+                        }}
+                      >
+                        {_board.title}
+                      </Button>
+                )}
+                    sx={{ p: 0 }}
+                    value={_pageId}
+                  />
+                ) : null;
+              })}
+            </Tabs>
             <Button
               size='small'
               onClick={() => {

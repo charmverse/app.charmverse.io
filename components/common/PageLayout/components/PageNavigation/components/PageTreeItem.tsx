@@ -193,7 +193,6 @@ export function PageLink ({ showPicker = true, children, href, label, labelIcon,
       <PageAnchor onClick={stopPropagation}>
         {labelIcon && (
           <span onClick={preventDefault}>
-            <StyledPageIcon icon={labelIcon} {...triggerState} onClick={showPicker ? triggerState.onClick : undefined} />
           </span>
         )}
         <PageTitle hasContent={isempty}>
