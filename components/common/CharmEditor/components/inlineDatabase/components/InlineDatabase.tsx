@@ -4,7 +4,7 @@ import styled from '@emotion/styled';
 import { Add } from '@mui/icons-material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { Box, Divider, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Tab, Tabs } from '@mui/material';
+import { Box, Divider, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Tab, Tabs, TextField } from '@mui/material';
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
@@ -23,6 +23,7 @@ import { isTruthy } from 'lib/utilities/types';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
+import Modal from 'components/common/Modal';
 import BoardSelection from './BoardSelection';
 
 // Lazy load focalboard entrypoint (ignoring the redux state stuff for now)
@@ -107,6 +108,8 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
   const showHiddenDataSourcesTriggerState = bindTrigger(showHiddenDataSourcesPopupState);
   const showHiddenDataSourcesMenuState = bindMenu(showHiddenDataSourcesPopupState);
 
+  const renameDataSourcePopupState = usePopupState({ variant: 'popover', popupId: 'rename-data-source-popup' });
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   // Keep track of which board is currently being viewed
@@ -132,6 +135,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
   const clientConfig = useAppSelector(getClientConfig);
   const { pages, getPagePermissions } = usePages();
   const [shownCardId, setShownCardId] = useState<string | undefined>('');
+  const [renameText, setRenameText] = useState<string>('');
 
   const boardPages = Object.values(pages).filter(p => p?.type === 'board').filter(isTruthy);
   const accessibleCards = cards.filter(card => pages[card.id]);
@@ -182,6 +186,10 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
       dataSources
     });
   }, [dataSources]);
+
+  useEffect(() => {
+    setRenameText(currentDataSource?.title ?? '');
+  }, [currentDataSource]);
 
   if (!board || isSelectingSource) {
     return (
@@ -384,7 +392,12 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
             setAnchorEl(null);
           }}
         >
-          <MenuItem dense onClick={() => {}}>
+          <MenuItem
+            dense
+            onClick={() => {
+              renameDataSourcePopupState.open();
+            }}
+          >
             <ListItemIcon><EditIcon fontSize='small' /></ListItemIcon>
             <ListItemText>Rename</ListItemText>
           </MenuItem>
@@ -397,6 +410,35 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
             <ListItemText>Delete</ListItemText>
           </MenuItem>
         </Menu>
+        <Modal
+          open={renameDataSourcePopupState.isOpen}
+          onClose={() => {
+            renameDataSourcePopupState.close();
+            setAnchorEl(null);
+            setRenameText('');
+          }}
+          title='Rename source'
+        >
+          <form onSubmit={() => {
+            setDataSources(dataSources.map(dataSource => {
+              const isCurrentDataSource = dataSource.pageId === currentDataSource?.pageId && dataSource.viewId === currentDataSource?.viewId;
+              if (isCurrentDataSource) {
+                return {
+                  ...dataSource,
+                  title: renameText
+                };
+              }
+              return dataSource;
+            }));
+            renameDataSourcePopupState.close();
+            setAnchorEl(null);
+            setRenameText('');
+          }}
+          >
+            <TextField value={renameText} onChange={(e) => setRenameText(e.target.value)} defaultValue={currentDataSource?.title} autoFocus />
+            <Button type='submit'>Save</Button>
+          </form>
+        </Modal>
       </StylesContainer>
       {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
         <RootPortal>
