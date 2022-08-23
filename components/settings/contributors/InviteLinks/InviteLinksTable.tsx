@@ -12,6 +12,7 @@ import AllInclusiveIcon from '@mui/icons-material/AllInclusive';
 import Tooltip from '@mui/material/Tooltip';
 import Chip from '@mui/material/Chip';
 import ButtonChip from 'components/common/ButtonChip';
+import UserDisplay from 'components/common/UserDisplay';
 import { InviteLinkPopulated } from 'pages/api/invites/index';
 import TableRow from 'components/common/Table/TableRow';
 
@@ -31,7 +32,7 @@ export default function InvitesTable (props: Props) {
   }
 
   return (
-    <Table aria-label='simple table'>
+    <Table size='small' aria-label='simple table'>
       <TableHead>
         <TableRow>
           <TableCell sx={{ px: 0 }}>Inviter</TableCell>
@@ -45,7 +46,7 @@ export default function InvitesTable (props: Props) {
         {props.invites.map((row) => (
           <TableRow key={row.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
             <TableCell sx={{ px: 0 }}>
-              <Typography><strong>{row.author.username}</strong></Typography>
+              <UserDisplay sx={{ my: 1 }} user={row.author} avatarSize='small' />
             </TableCell>
             {/* <TableCell><Typography>{row.code}</Typography></TableCell> */}
             <TableCell>
