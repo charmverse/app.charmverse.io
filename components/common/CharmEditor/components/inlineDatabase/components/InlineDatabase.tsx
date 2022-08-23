@@ -1,7 +1,7 @@
 
 import dynamic from 'next/dynamic';
 import { useState, useEffect } from 'react';
-import { Box, Tab, Tabs, Typography } from '@mui/material';
+import { Box, Tab, Tabs } from '@mui/material';
 import { NodeViewProps } from '@bangle.dev/core';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { getViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
@@ -146,7 +146,16 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
   }, [attrs]);
 
   if (!board || isSelectingSource) {
-    return <BoardSelection pages={boardPages} onSelect={selectBoard} />;
+    return (
+      <BoardSelection
+        pages={boardPages}
+        onSelect={selectBoard}
+        onClickBack={() => {
+          setBoardIndex(boardIndex === null ? 0 : boardIndex + 1);
+          setIsSelectingSource(false);
+        }}
+      />
+    );
   }
 
   if (!activeView) {
