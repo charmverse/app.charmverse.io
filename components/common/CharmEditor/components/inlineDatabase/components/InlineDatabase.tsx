@@ -312,7 +312,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
                   component='a'
                   key={`${dataSource.pageId}.${dataSource.viewId}`}
                   dense
-                  onClick={(e) => {
+                  onClick={() => {
                     const edgeDataSource = dataSources[MAX_DATA_SOURCES - 1];
                     dataSources[MAX_DATA_SOURCES - 1] = dataSource;
                     dataSources[MAX_DATA_SOURCES + dataSourceIndex] = edgeDataSource;
@@ -356,7 +356,17 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
             <ListItemText>Rename</ListItemText>
           </MenuItem>
           <Divider />
-          <MenuItem dense onClick={() => {}}>
+          <MenuItem
+            dense
+            onClick={() => {
+              setAnchorEl(null);
+              const leftDataSources = dataSources.filter(
+                dataSource => (dataSource.pageId !== currentDataSource?.pageId) && (dataSource.viewId !== currentDataSource?.viewId)
+              );
+              setDataSources(leftDataSources);
+              setCurrentDataSourceIndex(leftDataSources.length !== 0 ? leftDataSources.length - 1 : -1);
+            }}
+          >
             <ListItemIcon><DeleteIcon /></ListItemIcon>
             <ListItemText>Delete</ListItemText>
           </MenuItem>
