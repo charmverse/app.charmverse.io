@@ -1,22 +1,23 @@
 
-import dynamic from 'next/dynamic';
-import { useState, useEffect } from 'react';
-import { Box, Typography } from '@mui/material';
 import { NodeViewProps } from '@bangle.dev/core';
+import styled from '@emotion/styled';
+import { Box, Typography } from '@mui/material';
+import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
+import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { getViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { getClientConfig } from 'components/common/BoardEditor/focalboard/src/store/clientConfig';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { getCurrentViewDisplayBy, getCurrentViewGroupBy, getView, getSortedViews } from 'components/common/BoardEditor/focalboard/src/store/views';
-import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
-import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
-import { usePages } from 'hooks/usePages';
-import ReactDndProvider from 'components/common/ReactDndProvider';
+import { getCurrentViewDisplayBy, getCurrentViewGroupBy, getSortedViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
+import Button from 'components/common/Button';
+import { usePages } from 'hooks/usePages';
 import log from 'lib/log';
-import styled from '@emotion/styled';
 import { isTruthy } from 'lib/utilities/types';
+import dynamic from 'next/dynamic';
+import { useEffect, useState } from 'react';
 
+import { useRouter } from 'next/router';
 import BoardSelection from './BoardSelection';
 import ViewSelection from './ViewSelection';
 
@@ -26,6 +27,7 @@ const CenterPanel = dynamic(() => import('components/common/BoardEditor/focalboa
 });
 
 const StylesContainer = styled.div`
+  margin-top: ${({ theme }) => theme.spacing(2)};
 
   .BoardComponent {
     overflow: visible;
@@ -93,13 +95,14 @@ interface DatabaseViewAttrs {
 export default function DatabaseView ({ readOnly: readOnlyOverride, node, updateAttrs }: DatabaseViewProps) {
 
   const [attrs, setAttrs] = useState<DatabaseViewAttrs>(node.attrs as DatabaseViewAttrs);
-
+  const router = useRouter();
   const boards = useAppSelector(getSortedBoards);
   const board = boards.find(b => b.id === attrs.pageId);
   const cards = useAppSelector(getViewCardsSortedFilteredAndGrouped({
     boardId: attrs.pageId || '',
     viewId: attrs.viewId || ''
   }));
+
   const allViews = useAppSelector(getSortedViews);
   const boardViews = allViews.filter(view => view.parentId === attrs.pageId);
   const activeView = useAppSelector(getView(attrs.viewId || ''));
@@ -108,8 +111,9 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
   const clientConfig = useAppSelector(getClientConfig);
   const { pages, getPagePermissions } = usePages();
   const [shownCardId, setShownCardId] = useState<string | undefined>('');
+  const boardPage = attrs.pageId ? pages[attrs.pageId] : null;
+  const boardPages = Object.values(pages).filter(p => p?.type === 'board' || p?.type === 'inline_board').filter(isTruthy);
 
-  const boardPages = Object.values(pages).filter(p => p?.type === 'board').filter(isTruthy);
   const accessibleCards = cards.filter(card => pages[card.id]);
 
   const currentPagePermissions = getPagePermissions(attrs.pageId || '');
@@ -159,10 +163,23 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
   return (
     <>
       <StylesContainer className='focalboard-body'>
-        <Box mb={1}>
-          <Typography variant='h3'>
-            {board.title}
-          </Typography>
+        <Box display='flex' justifyContent='space-between'>
+          <Button
+            color='secondary'
+            variant='text'
+            sx={{
+              h3: {
+                textDecoration: 'none',
+                mt: 0
+              }
+            }}
+            href={`/${router.query.domain}/${boardPage?.path}`}
+            component='span'
+          >
+            <Typography variant='h3'>
+              {boardPage?.title || 'Untitled'}
+            </Typography>
+          </Button>
         </Box>
         <CenterPanel
           clientConfig={clientConfig}
