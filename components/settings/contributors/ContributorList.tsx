@@ -84,14 +84,14 @@ export default function ContributorList ({ isAdmin, spaceId, spaceOwner }: Props
         </TableBody>
       </Table>
       {removedContributor && (
-      <ConfirmDeleteModal
-        title='Remove contributor'
-        onClose={popupState.close}
-        open={menuState.open}
-        buttonText={`Remove ${removedContributor.username}`}
-        onConfirm={removeContributor}
-        question={`Are you sure you want to remove ${removedContributor.username} from space?`}
-      />
+        <ConfirmDeleteModal
+          title='Remove contributor'
+          onClose={popupState.close}
+          open={menuState.open}
+          buttonText={`Remove ${removedContributor.username}`}
+          onConfirm={removeContributor}
+          question={`Are you sure you want to remove ${removedContributor.username} from space?`}
+        />
       )}
     </>
   );

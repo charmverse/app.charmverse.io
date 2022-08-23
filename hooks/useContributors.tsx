@@ -4,6 +4,8 @@ import { createContext, useContext, useEffect, useMemo, useState, ReactNode } fr
 import useSWR from 'swr';
 import { useCurrentSpace } from './useCurrentSpace';
 
+export type { Contributor };
+
 type Context = [users: Contributor[], setSpaces: (users: Contributor[]) => void];
 
 const ContributorsContext = createContext<Readonly<Context>>([[], () => undefined]);
