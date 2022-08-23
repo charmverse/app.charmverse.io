@@ -664,7 +664,7 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
   const { currentPageId } = usePages();
   const [userSpacePermissions] = useCurrentSpacePermissions();
 
-  const dynamicOther = [
+  const dynamicOtherItems = [
     {
       uid: 'insert-board',
       title: 'Insert board',
@@ -735,8 +735,10 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
     }
   ] as Omit<PaletteItemType, 'group'>[];
 
+  let dynamicDatabaseItems: Omit<PaletteItemType, 'group'>[] = [];
+
   if (space && user) {
-    paletteGroupItemsRecord.database.push({
+    dynamicDatabaseItems = [{
       uid: 'inlineDatabase',
       title: 'Database - inline',
       icon: <DatabaseIcon sx={{ fontSize: 16 }} />,
@@ -747,20 +749,21 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
           // Execute the animation
           rafCommandExec(view!, (_state, _dispatch) => {
             // The page must be created before the node can be created
-            addPage({ type: 'inline_board', parentId: currentPageId, spaceId: space.id, createdBy: user.id }).then(({ page, view: boardView }) => {
-              const node = _state.schema.nodes.inlineDatabase.create({
-                source: 'board_page',
-                pageId: page.id,
-                viewId: boardView?.id,
-                type: 'embedded'
-              });
+            addPage({ type: 'inline_board', parentId: currentPageId, spaceId: space.id, createdBy: user.id })
+              .then(({ page, view: boardView }) => {
+                const node = _state.schema.nodes.inlineDatabase.create({
+                  source: 'board_page',
+                  pageId: page.id,
+                  viewId: boardView?.id,
+                  type: 'embedded'
+                });
 
-              if (_dispatch && isAtBeginningOfLine(state)) {
-                _dispatch(_state.tr.replaceSelectionWith(node));
-                return true;
-              }
-              return insertNode(_state, _dispatch, node);
-            });
+                if (_dispatch && isAtBeginningOfLine(state)) {
+                  _dispatch(_state.tr.replaceSelectionWith(node));
+                  return true;
+                }
+                return insertNode(_state, _dispatch, node);
+              });
             return true;
           });
           return replaceSuggestionMarkWith(palettePluginKey, '')(
@@ -770,23 +773,28 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
           );
         };
       }
-    });
+    }];
   }
 
-  const allowedOther = dynamicOther.filter(paletteItem => {
-    return !paletteItem.requiredSpacePermission
-    || (paletteItem.requiredSpacePermission && userSpacePermissions?.[paletteItem.requiredSpacePermission]);
-  });
-
-  const groupConfig = {
-    ...paletteGroupItemsRecord,
-    other: [
-      ...paletteGroupItemsRecord.other,
-      ...allowedOther
-    ]
-  };
-
   const paletteItems = useMemo(() => {
+
+    const allowedDynamicOtherItems = dynamicOtherItems.filter(paletteItem => {
+      return !paletteItem.requiredSpacePermission
+      || (paletteItem.requiredSpacePermission && userSpacePermissions?.[paletteItem.requiredSpacePermission]);
+    });
+
+    const groupConfig = {
+      ...paletteGroupItemsRecord,
+      database: [
+        ...paletteGroupItemsRecord.database,
+        ...dynamicDatabaseItems
+      ],
+      other: [
+        ...paletteGroupItemsRecord.other,
+        ...allowedDynamicOtherItems
+      ]
+    };
+
     const itemGroups = sortedGroupList.map(group => {
       return groupConfig[group].map(paletteItem => PaletteItem.create({
         ...paletteItem,
@@ -794,7 +802,7 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
       }));
     });
     return itemGroups.flat();
-  }, [addNestedPage]);
+  }, [addNestedPage, currentPageId, dynamicOtherItems.length, dynamicDatabaseItems.length]);
 
   return paletteItems;
 }
