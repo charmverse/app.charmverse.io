@@ -6,7 +6,7 @@ type Props = {
 
 export default function HexagonalAvatarMask ({ id }: Props) {
   return (
-    <svg height='0' viewBox='0 0 200 188' width='0'>
+    <svg height='0' viewBox='0 0 200 188' width='0' style={{ position: 'absolute' }}>
       <defs>
         <clipPath clipPathUnits='objectBoundingBox' id={id} transform='scale(0.005 0.005319148936170213)'>
           <path d='M193.248 69.51C185.95 54.1634 177.44 39.4234 167.798 25.43L164.688 20.96C160.859 15.4049 155.841
