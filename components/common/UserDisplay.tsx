@@ -2,14 +2,14 @@ import { memo } from 'react';
 import { Box, BoxProps, Typography } from '@mui/material';
 import useENSName from 'hooks/useENSName';
 import { User } from '@prisma/client';
-import Avatar from 'components/common/Avatar';
+import Avatar, { InitialAvatarProps } from 'components/common/Avatar';
 import Link from 'components/common/Link';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
 interface StyleProps extends BoxProps {
   fontSize?: string | number;
   fontWeight?: number | string;
-  avatarSize?: 'small' | 'medium';
+  avatarSize?: InitialAvatarProps['size'];
 }
 
 interface BaseComponentProps extends StyleProps {
