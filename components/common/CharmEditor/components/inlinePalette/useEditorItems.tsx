@@ -664,7 +664,7 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
   const { currentPageId } = usePages();
   const [userSpacePermissions] = useCurrentSpacePermissions();
 
-  const dynamicOther = [
+  const dynamicOtherItems = [
     {
       uid: 'insert-board',
       title: 'Insert board',
@@ -735,9 +735,10 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
     }
   ] as Omit<PaletteItemType, 'group'>[];
 
-  let databases: Omit<PaletteItemType, 'group'>[] = [];
+  let dynamicDatabaseItems: Omit<PaletteItemType, 'group'>[] = [];
+
   if (space && user) {
-    databases = [{
+    dynamicDatabaseItems = [{
       uid: 'inlineDatabase',
       title: 'Database - inline',
       icon: <DatabaseIcon sx={{ fontSize: 16 }} />,
@@ -777,7 +778,7 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
 
   const paletteItems = useMemo(() => {
 
-    const allowedOther = dynamicOther.filter(paletteItem => {
+    const allowedDynamicOtherItems = dynamicOtherItems.filter(paletteItem => {
       return !paletteItem.requiredSpacePermission
       || (paletteItem.requiredSpacePermission && userSpacePermissions?.[paletteItem.requiredSpacePermission]);
     });
@@ -786,11 +787,11 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
       ...paletteGroupItemsRecord,
       database: [
         ...paletteGroupItemsRecord.database,
-        ...databases
+        ...dynamicDatabaseItems
       ],
       other: [
         ...paletteGroupItemsRecord.other,
-        ...allowedOther
+        ...allowedDynamicOtherItems
       ]
     };
 
@@ -801,7 +802,7 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
       }));
     });
     return itemGroups.flat();
-  }, [addNestedPage, currentPageId, dynamicOther.length, databases.length]);
+  }, [addNestedPage, currentPageId, dynamicOtherItems.length, dynamicDatabaseItems.length]);
 
   return paletteItems;
 }
