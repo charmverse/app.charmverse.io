@@ -4,7 +4,7 @@ import styled from '@emotion/styled';
 import { Add } from '@mui/icons-material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { Box, ButtonProps, Divider, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Tab, Tabs } from '@mui/material';
+import { Box, Divider, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Tab, Tabs } from '@mui/material';
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
@@ -22,7 +22,7 @@ import log from 'lib/log';
 import { isTruthy } from 'lib/utilities/types';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import dynamic from 'next/dynamic';
-import { MouseEventHandler, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import BoardSelection from './BoardSelection';
 
 // Lazy load focalboard entrypoint (ignoring the redux state stuff for now)
@@ -93,6 +93,7 @@ interface DataSource {
   pageId: string;
   viewId: string;
   source: 'board_page';
+  title: string | null
 }
 
 const MAX_DATA_SOURCES = 2;
@@ -151,10 +152,11 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
     view.fields.inline = true;
 
     await mutator.insertBlock(view);
-    const newDataSource: DataSource = { pageId: boardId, viewId: view.id, source: 'board_page' };
-    setDataSources([...dataSources, newDataSource]);
+    const newDataSource: DataSource = { pageId: boardId, viewId: view.id, source: 'board_page', title: pages[boardId]?.title || null };
+    const newDataSources = [...dataSources, newDataSource];
+    setDataSources(newDataSources);
     setIsSelectingSource(false);
-    setCurrentDataSourceIndex(dataSources.length);
+    setCurrentDataSourceIndex(Math.min(newDataSources.length, MAX_DATA_SOURCES - 1));
   }
 
   useEffect(() => {
@@ -173,6 +175,16 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
         }}
       />
     );
+  }
+
+  function deleteDataSource () {
+    // TODO: Ideally we would also delete the actual view, as it can't be referenced anywhere anymore
+    setAnchorEl(null);
+    const leftDataSources = dataSources.filter(
+      dataSource => (dataSource.pageId !== currentDataSource?.pageId) || (dataSource.viewId !== currentDataSource?.viewId)
+    );
+    setDataSources(leftDataSources);
+    setCurrentDataSourceIndex(leftDataSources.length !== 0 ? leftDataSources.length - 1 : -1);
   }
 
   // If there are no active view then auto view creation process didn't work as expected
@@ -235,7 +247,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
                               }
                             }}
                           >
-                            {_board.title}
+                            {dataSource.title ?? _board.title}
                           </Button>
                         )}
                         sx={{ p: 0 }}
@@ -322,7 +334,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
                   }}
                 >
                   <PageIcon icon={pages[dataSource.pageId]?.icon} pageType='board' isEditorEmpty={false} />
-                  <ListItemText>{_board.title}</ListItemText>
+                  <ListItemText>{dataSource.title ?? _board.title}</ListItemText>
                 </MenuItem>
               ) : null;
             })}
@@ -339,6 +351,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
             onClick={() => {
               setIsSelectingSource(true);
               showHiddenDataSourcesMenuState.onClose();
+              setCurrentDataSourceIndex(MAX_DATA_SOURCES - 1);
             }}
           >
             Add source
@@ -358,14 +371,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
           <Divider />
           <MenuItem
             dense
-            onClick={() => {
-              setAnchorEl(null);
-              const leftDataSources = dataSources.filter(
-                dataSource => (dataSource.pageId !== currentDataSource?.pageId) && (dataSource.viewId !== currentDataSource?.viewId)
-              );
-              setDataSources(leftDataSources);
-              setCurrentDataSourceIndex(leftDataSources.length !== 0 ? leftDataSources.length - 1 : -1);
-            }}
+            onClick={deleteDataSource}
           >
             <ListItemIcon><DeleteIcon /></ListItemIcon>
             <ListItemText>Delete</ListItemText>
