@@ -1,7 +1,7 @@
 
 import dynamic from 'next/dynamic';
 import { useState, useEffect } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { NodeViewProps } from '@bangle.dev/core';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { getViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
@@ -90,13 +90,15 @@ interface DatabaseViewAttrs {
 }
 
 export default function DatabaseView ({ readOnly: readOnlyOverride, node, updateAttrs }: DatabaseViewProps) {
-
   const [attrs, setAttrs] = useState<DatabaseViewAttrs>(node.attrs as DatabaseViewAttrs);
+  // Keep track of which board is currently being viewed
+  const [boardIndex, setBoardIndex] = useState<null | number>(attrs.pageIds.length !== 0 ? 0 : null);
+  const [isSelectingSource, setIsSelectingSource] = useState(false);
 
   const boards = useAppSelector(getSortedBoards);
   // Always display the first page and view
-  const pageId = attrs.pageIds[0];
-  const viewId = attrs.viewIds[0];
+  const pageId = boardIndex !== null ? attrs.pageIds[boardIndex] : null;
+  const viewId = boardIndex !== null ? attrs.viewIds[boardIndex] : null;
 
   const board = boards.find(b => b.id === pageId);
   const cards = useAppSelector(getViewCardsSortedFilteredAndGrouped({
@@ -125,6 +127,8 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
     const _boardViews = allViews.filter(view => view.parentId === boardId);
     const _viewId = _boardViews.length === 1 ? _boardViews[0].id : null;
     setAttrs({ sources: [...attrs.sources, 'board_page'], pageIds: [...attrs.pageIds, boardId], viewIds: _viewId ? [...attrs.viewIds, _viewId] : attrs.viewIds });
+    setIsSelectingSource(false);
+    setBoardIndex(boardIndex === null ? 0 : boardIndex + 1);
   }
 
   function clearSelection () {
@@ -139,7 +143,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
     updateAttrs(attrs);
   }, [attrs]);
 
-  if (!board) {
+  if (!board || isSelectingSource) {
     return <BoardSelection pages={boardPages} onSelect={selectBoard} />;
   }
 
@@ -162,26 +166,61 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
   return (
     <>
       <StylesContainer className='focalboard-body'>
-        <Box mb={1}>
-          <Typography variant='h3'>
-            {board.title}
-          </Typography>
+        <Box sx={{
+          '.top-head': {
+            padding: 0
+          },
+          '.MuiTypography-root': {
+            textDecoration: 'none'
+          },
+          '.MuiTypography-root:hover': {
+            textDecoration: 'none'
+          }
+        }}
+        >
+          <Box mb={1} display='flex' gap={1}>
+            {attrs.pageIds.map((_pageId, index) => {
+              const _board = boards.find(b => b.id === _pageId);
+              if (_board) {
+                return (
+                  <Typography
+                    variant='h3'
+                    onClick={() => {
+                      if (index !== boardIndex) {
+                        setBoardIndex(index);
+                      }
+                    }}
+                  >
+                    {_board.title}
+                  </Typography>
+                );
+              }
+              return null;
+            })}
+            <Button
+              size='small'
+              onClick={() => {
+                setIsSelectingSource(true);
+              }}
+            >New source
+            </Button>
+          </Box>
+          <CenterPanel
+            showHeader
+            clientConfig={clientConfig}
+            readonly={readOnly}
+            board={board}
+            setPage={(p) => {
+              log.warn('Ignoring update page properties of inline database', p);
+            }}
+            cards={accessibleCards}
+            showCard={showCard}
+            activeView={activeView}
+            groupByProperty={property}
+            dateDisplayProperty={displayProperty}
+            views={boardViews}
+          />
         </Box>
-        <CenterPanel
-          showHeader
-          clientConfig={clientConfig}
-          readonly={readOnly}
-          board={board}
-          setPage={(p) => {
-            log.warn('Ignoring update page properties of inline database', p);
-          }}
-          cards={accessibleCards}
-          showCard={showCard}
-          activeView={activeView}
-          groupByProperty={property}
-          dateDisplayProperty={displayProperty}
-          views={boardViews}
-        />
       </StylesContainer>
       {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
         <RootPortal>
