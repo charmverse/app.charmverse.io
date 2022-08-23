@@ -1,9 +1,13 @@
 
 import { NodeViewProps } from '@bangle.dev/core';
 import styled from '@emotion/styled';
-import { Box, Divider, IconButton, ListItemText, Menu, MenuItem, Tab, Tabs } from '@mui/material';
+import { Add } from '@mui/icons-material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import { Box, ButtonProps, Divider, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Tab, Tabs } from '@mui/material';
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
+import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { getViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { getClientConfig } from 'components/common/BoardEditor/focalboard/src/store/clientConfig';
@@ -11,17 +15,14 @@ import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/sto
 import { getCurrentViewDisplayBy, getCurrentViewGroupBy, getSortedViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 import Button from 'components/common/Button';
+import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import { usePages } from 'hooks/usePages';
+import { createBoardView } from 'lib/focalboard/boardView';
 import log from 'lib/log';
 import { isTruthy } from 'lib/utilities/types';
-import dynamic from 'next/dynamic';
-import { useEffect, useState } from 'react';
-
-import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
-import PageIcon from 'components/common/PageLayout/components/PageIcon';
-import { createBoardView } from 'lib/focalboard/boardView';
-import { Add } from '@mui/icons-material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import dynamic from 'next/dynamic';
+import { MouseEventHandler, useEffect, useState } from 'react';
 import BoardSelection from './BoardSelection';
 
 // Lazy load focalboard entrypoint (ignoring the redux state stuff for now)
@@ -105,14 +106,17 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
   const showHiddenDataSourcesTriggerState = bindTrigger(showHiddenDataSourcesPopupState);
   const showHiddenDataSourcesMenuState = bindMenu(showHiddenDataSourcesPopupState);
 
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
   // Keep track of which board is currently being viewed
   const [currentDataSourceIndex, setCurrentDataSourceIndex] = useState<number>(dataSources.length !== 0 ? 0 : -1);
   const [isSelectingSource, setIsSelectingSource] = useState(false);
 
+  const currentDataSource = currentDataSourceIndex !== -1 ? dataSources[currentDataSourceIndex] : null;
   const boards = useAppSelector(getSortedBoards);
   // Always display the first page and view
-  const viewId = currentDataSourceIndex !== -1 ? dataSources[currentDataSourceIndex].viewId : null;
-  const pageId = currentDataSourceIndex !== -1 ? dataSources[currentDataSourceIndex].pageId : null;
+  const viewId = currentDataSource?.viewId;
+  const pageId = currentDataSource?.pageId;
 
   const board = boards.find(b => b.id === pageId);
   const cards = useAppSelector(getViewCardsSortedFilteredAndGrouped({
@@ -221,8 +225,14 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
                             startIcon={<PageIcon icon={pages[dataSource.pageId]?.icon} pageType='board' isEditorEmpty={false} />}
                             color={(pageId === dataSource.pageId && viewId === dataSource.viewId) ? 'textPrimary' : 'secondary'}
                             sx={{ px: 1.5 }}
-                            onClick={() => {
-                              setCurrentDataSourceIndex(dataSourceIndex);
+                            onClick={(e: any) => {
+                              // Show the datasource menu
+                              if (currentDataSource?.pageId === dataSource.pageId && currentDataSource?.viewId === dataSource.viewId) {
+                                setAnchorEl(e.currentTarget);
+                              }
+                              else {
+                                setCurrentDataSourceIndex(dataSourceIndex);
+                              }
                             }}
                           >
                             {_board.title}
@@ -302,7 +312,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
                   component='a'
                   key={`${dataSource.pageId}.${dataSource.viewId}`}
                   dense
-                  onClick={() => {
+                  onClick={(e) => {
                     const edgeDataSource = dataSources[MAX_DATA_SOURCES - 1];
                     dataSources[MAX_DATA_SOURCES - 1] = dataSource;
                     dataSources[MAX_DATA_SOURCES + dataSourceIndex] = edgeDataSource;
@@ -333,6 +343,23 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
           >
             Add source
           </Button>
+        </Menu>
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={() => {
+            setAnchorEl(null);
+          }}
+        >
+          <MenuItem dense onClick={() => {}}>
+            <ListItemIcon><EditIcon fontSize='small' /></ListItemIcon>
+            <ListItemText>Rename</ListItemText>
+          </MenuItem>
+          <Divider />
+          <MenuItem dense onClick={() => {}}>
+            <ListItemIcon><DeleteIcon /></ListItemIcon>
+            <ListItemText>Delete</ListItemText>
+          </MenuItem>
         </Menu>
       </StylesContainer>
       {typeof shownCardId === 'string' && shownCardId.length !== 0 && (

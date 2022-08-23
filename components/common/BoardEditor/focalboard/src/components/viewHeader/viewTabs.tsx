@@ -74,7 +74,6 @@ function ViewTabs ({ board, activeView, intl, readonly, showView, views }: ViewT
     event.stopPropagation();
     if (readonly) return;
     const view = views.find(v => v.id === event.currentTarget.id);
-    // event.detail tells us how many times the mouse was clicked
     if (event.currentTarget.id === currentViewId) {
       event.preventDefault();
       setAnchorEl(event.currentTarget);
