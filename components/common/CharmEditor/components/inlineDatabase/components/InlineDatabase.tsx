@@ -151,7 +151,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
         pages={boardPages}
         onSelect={selectBoard}
         onClickBack={() => {
-          setBoardIndex(boardIndex === null ? 0 : boardIndex + 1);
+          setBoardIndex(boardIndex === null ? 0 : boardIndex);
           setIsSelectingSource(false);
         }}
       />

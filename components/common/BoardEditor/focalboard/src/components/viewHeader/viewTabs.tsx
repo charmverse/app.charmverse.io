@@ -20,7 +20,6 @@ import { useForm } from 'react-hook-form';
 import { useFocalboardViews } from 'hooks/useFocalboardViews';
 import { Board } from 'lib/focalboard/board';
 import { Box } from '@mui/system';
-import { Typography } from '@mui/material';
 import Link from 'next/link';
 import AddViewMenu from '../addViewMenu';
 import DeleteIcon from '../../widgets/icons/delete';
