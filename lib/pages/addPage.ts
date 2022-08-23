@@ -75,7 +75,6 @@ async function createDefaultBoardData (showBoard: (id: string) => void, newBoard
     [board, view, ...blocks],
     'add board',
     async (newBlocks: Block[]) => {
-      // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.CreateBoard, {board: newBoardId})
       showBoard(newBlocks[0].id);
     },
     async () => {

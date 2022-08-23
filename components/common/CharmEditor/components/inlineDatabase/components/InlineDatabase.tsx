@@ -1,25 +1,26 @@
 
-import dynamic from 'next/dynamic';
-import { useState, useEffect } from 'react';
-import { Box, Tab, Tabs } from '@mui/material';
 import { NodeViewProps } from '@bangle.dev/core';
+import styled from '@emotion/styled';
+import { Box, Tab, Tabs } from '@mui/material';
+import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
+import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { getViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { getClientConfig } from 'components/common/BoardEditor/focalboard/src/store/clientConfig';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { getCurrentViewDisplayBy, getCurrentViewGroupBy, getView, getSortedViews } from 'components/common/BoardEditor/focalboard/src/store/views';
-import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
-import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
-import { usePages } from 'hooks/usePages';
+import { getCurrentViewDisplayBy, getCurrentViewGroupBy, getSortedViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
-import log from 'lib/log';
-import styled from '@emotion/styled';
-import { isTruthy } from 'lib/utilities/types';
 import Button from 'components/common/Button';
+import { usePages } from 'hooks/usePages';
+import log from 'lib/log';
+import { isTruthy } from 'lib/utilities/types';
+import dynamic from 'next/dynamic';
+import { useEffect, useState } from 'react';
 
+import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
+import { createBoardView } from 'lib/focalboard/boardView';
 import BoardSelection from './BoardSelection';
-import ViewSelection from './ViewSelection';
 
 // Lazy load focalboard entrypoint (ignoring the redux state stuff for now)
 const CenterPanel = dynamic(() => import('components/common/BoardEditor/focalboard/src/components/centerPanel'), {
@@ -125,20 +126,19 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
     setShownCardId(cardId);
   }
 
-  function selectBoard (boardId: string) {
-    const _boardViews = allViews.filter(view => view.parentId === boardId);
-    const _viewId = _boardViews.length === 1 ? _boardViews[0].id : null;
-    setAttrs({ sources: [...attrs.sources, 'board_page'], pageIds: [...attrs.pageIds, boardId], viewIds: _viewId ? [...attrs.viewIds, _viewId] : attrs.viewIds });
+  async function selectBoard (boardId: string) {
+    const view = createBoardView();
+    view.fields.viewType = 'board';
+    view.parentId = boardId;
+    view.rootId = boards.find(_board => _board.id === boardId)?.rootId ?? boardId;
+    view.title = 'Board view';
+    // A new property to indicate that this view was creating for inline databases only
+    view.fields.inline = true;
+
+    await mutator.insertBlock(view);
+    setAttrs({ sources: [...attrs.sources, 'board_page'], pageIds: [...attrs.pageIds, boardId], viewIds: [...attrs.viewIds, view.id] });
     setIsSelectingSource(false);
     setBoardIndex(boardIndex === null ? 0 : boardIndex + 1);
-  }
-
-  function clearSelection () {
-    setAttrs(attrs);
-  }
-
-  function selectView (_viewId: string) {
-    setAttrs(_attrs => ({ ..._attrs, viewIds: [..._attrs.viewIds, _viewId] }));
   }
 
   useEffect(() => {
@@ -158,8 +158,9 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
     );
   }
 
+  // If there are no active view then auto view creation process didn't work as expected
   if (!activeView) {
-    return <ViewSelection views={boardViews} title={board.title} onSelect={selectView} onClickBack={clearSelection} />;
+    return null;
   }
 
   let property = groupByProperty;
