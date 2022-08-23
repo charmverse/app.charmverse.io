@@ -33,7 +33,9 @@ function UserProperty (props: Props): JSX.Element | null {
   if (props.readonly) {
     if (contributorMap[props.value]) {
       return (
-        <UserDisplay user={contributorMap[props.value]} avatarSize='small' fontSize='small' />
+        <div className='UserProperty octo-propertyvalue'>
+          <UserDisplay user={contributorMap[props.value]} avatarSize='xSmall' fontSize='small' />
+        </div>
       );
     }
     return null;
