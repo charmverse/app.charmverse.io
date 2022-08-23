@@ -202,7 +202,12 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
       dataSource => (dataSource.pageId !== currentDataSource?.pageId) || (dataSource.viewId !== currentDataSource?.viewId)
     );
     setDataSources(leftDataSources);
-    setCurrentDataSourceIndex(leftDataSources.length !== 0 ? leftDataSources.length - 1 : -1);
+    if (leftDataSources.length > MAX_DATA_SOURCES) {
+      setCurrentDataSourceIndex(MAX_DATA_SOURCES - 1);
+    }
+    else {
+      setCurrentDataSourceIndex(leftDataSources.length !== 0 ? leftDataSources.length - 1 : -1);
+    }
   }
 
   // If there are no active view then auto view creation process didn't work as expected
@@ -279,6 +284,9 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
                       disableRipple
                       label={(
                         <Button
+                          sx={{
+                            p: 0
+                          }}
                           variant='text'
                           size='small'
                           color='secondary'
