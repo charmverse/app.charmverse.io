@@ -109,6 +109,7 @@ export default function RoleSettings () {
           key={role.id}
         />
       ))}
+      {roles?.length === 0 && <Typography color='secondary'>No roles yet</Typography>}
 
       {/* Token gates section */}
       <TokenGates isAdmin={isAdmin} spaceId={space?.id as string} />

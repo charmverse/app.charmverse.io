@@ -52,7 +52,7 @@ export default function InviteLinkList ({ isAdmin, spaceId }: { isAdmin: boolean
     <>
       <Legend>
         Invite Links
-        {isAdmin && <Button variant='outlined' sx={{ float: 'right' }} onClick={open}>Create a link</Button>}
+        {isAdmin && <Button sx={{ float: 'right' }} onClick={open}>Add a link</Button>}
       </Legend>
       {data && data.length === 0 && <Typography color='secondary'>No invite links yet</Typography>}
       {data && data?.length > 0 && <InvitesTable isAdmin={isAdmin} invites={data} onDelete={deleteLink} />}
