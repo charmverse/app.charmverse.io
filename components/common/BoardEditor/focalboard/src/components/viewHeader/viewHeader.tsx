@@ -33,6 +33,7 @@ type Props = {
     editCardTemplate: (cardTemplateId: string) => void
     readonly: boolean
     dateDisplayProperty?: IPropertyTemplate
+    hideViewTabs?: boolean
 }
 
 const ViewHeader = React.memo((props: Props) => {
@@ -57,25 +58,26 @@ const ViewHeader = React.memo((props: Props) => {
 
   return (
     <div className='ViewHeader'>
-
-      <ViewTabs
-        views={views}
-        readonly={props.readonly}
-        showView={showView}
-        board={board}
-        activeView={activeView}
-      />
-
-      {/* add a view */}
-
-      {!props.readonly && views.length <= 3 && (
-        <AddViewMenu
+      {!props.hideViewTabs && <>
+        <ViewTabs
+          views={views}
+          readonly={props.readonly}
+          showView={showView}
           board={board}
           activeView={activeView}
-          views={views}
-          showView={showView}
         />
-      )}
+
+        {/* add a view */}
+
+        {!props.readonly && views.length <= 3 && (
+          <AddViewMenu
+            board={board}
+            activeView={activeView}
+            views={views}
+            showView={showView}
+          />
+        )}
+      </>}
 
       <div className='octo-spacer' />
 
