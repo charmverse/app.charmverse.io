@@ -230,17 +230,21 @@ function ViewTabs ({ maxTabsShown = 3, onViewTabClick, disableUpdatingUrl, addVi
           mb: 1
         }}
         >
-          {restViews.map(view => (
-            <Link
-              href={!disableUpdatingUrl ? getViewUrl(view.id) : ''}
-              passHref
-            >
-              <MenuItem component='a' key={view.id} dense>
-                <ListItemIcon>{iconForViewType(view.fields.viewType)}</ListItemIcon>
-                <ListItemText>{view.title}</ListItemText>
-              </MenuItem>
-            </Link>
-          ))}
+          {restViews.map(view => {
+            const content = <MenuItem onClick={() => {
+              onViewTabClick?.(view.id)
+              showViewsMenuState.onClose()
+            }} component='a' key={view.id} dense>
+              <ListItemIcon>{iconForViewType(view.fields.viewType)}</ListItemIcon>
+              <ListItemText>{view.title}</ListItemText>
+            </MenuItem>
+            return disableUpdatingUrl ? content : <Link
+            href={getViewUrl(view.id)}
+            passHref
+          >
+            {content}
+          </Link>
+          })}
         </Box>
         <Divider />
         {addViewMenu ?? <AddViewMenu

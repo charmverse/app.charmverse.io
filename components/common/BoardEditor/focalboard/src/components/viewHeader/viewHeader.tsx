@@ -82,7 +82,7 @@ const ViewHeader = React.memo((props: Props) => {
 
         {/* add a view */}
 
-        {!props.readonly && views.length <= 2 && (
+        {!props.readonly && views.length <= (props.maxTabsShown ?? 3) && (
           props.addViewMenu ?? <AddViewMenu
             board={board}
             activeView={activeView}
