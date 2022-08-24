@@ -52,6 +52,8 @@ type Props = {
   updateView: (view: BoardView) => void
   addTemplate: (template: Card) => void
   showCard: (cardId?: string) => void
+  // A custom menu component to allow adding new view
+  addViewMenu?: ReactNode
 }
 
 type State = {
@@ -365,6 +367,7 @@ function CenterPanel (props: Props) {
             setPage={props.setPage}
             />}
           <ViewHeader
+            addViewMenu={props.addViewMenu}
             hideViewTabs={props.hideViewTabs}
             board={props.board}
             activeView={props.activeView}

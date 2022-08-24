@@ -1,6 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import { useState, useCallback, MouseEvent } from 'react';
+import { useState, useCallback, MouseEvent, ReactNode } from 'react';
 import { injectIntl, IntlShape } from 'react-intl';
 import { useRouter } from 'next/router';
 import Modal from 'components/common/Modal';
@@ -35,11 +35,12 @@ interface ViewTabsProps {
   readonly?: boolean;
   views: BoardView[];
   showView: (viewId: string) => void;
+  addViewMenu?: ReactNode
 }
 
 const SHOWN_VIEWS = 3;
 
-function ViewTabs ({ board, activeView, intl, readonly, showView, views }: ViewTabsProps) {
+function ViewTabs ({ addViewMenu, board, activeView, intl, readonly, showView, views }: ViewTabsProps) {
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [currentView, setCurrentView] = useState<BoardView | null>(null);
@@ -240,7 +241,7 @@ function ViewTabs ({ board, activeView, intl, readonly, showView, views }: ViewT
           ))}
         </Box>
         <Divider />
-        <AddViewMenu
+        {addViewMenu ?? <AddViewMenu
           sx={{
             width: '100%'
           }}
@@ -249,7 +250,7 @@ function ViewTabs ({ board, activeView, intl, readonly, showView, views }: ViewT
           activeView={activeView}
           showView={showView}
           views={views}
-        />
+        />}
       </Menu>
 
       {/* Form to rename views */}

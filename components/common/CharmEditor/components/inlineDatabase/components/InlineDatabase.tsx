@@ -11,6 +11,7 @@ import { getClientConfig } from 'components/common/BoardEditor/focalboard/src/st
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { getCurrentViewDisplayBy, getCurrentViewGroupBy, getSortedViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
+import Button from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
@@ -20,6 +21,7 @@ import { addPage } from 'lib/pages';
 import { isTruthy } from 'lib/utilities/types';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
+import { Add } from '@mui/icons-material';
 import BoardSelection from './BoardSelection';
 
 // Lazy load focalboard entrypoint (ignoring the redux state stuff for now)
@@ -179,6 +181,7 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
         <>
           {/* {viewTabs} */}
           <BoardSelection
+            onClickBack={() => setIsSelectingSource(false)}
             pages={boardPages}
             onCreate={createDatabase}
             onSelect={selectDatabase}
@@ -187,7 +190,7 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
       );
     }
   }
-  if (!board) {
+  if (!board || !currentView) {
     return null;
   }
 
@@ -217,6 +220,19 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
         }}
         >
           <CenterPanel
+            addViewMenu={(
+              <Button
+                onClick={() => {
+                  setIsSelectingSource(true);
+                }}
+                color='secondary'
+                size='small'
+                startIcon={<Add />}
+                variant='text'
+              >
+                Add source
+              </Button>
+            )}
             hideBanner
             showHeader
             clientConfig={clientConfig}
@@ -227,7 +243,7 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
             }}
             cards={accessibleCards}
             showCard={showCard}
-            activeView={currentView!}
+            activeView={currentView}
             groupByProperty={property}
             dateDisplayProperty={displayProperty}
             views={views}

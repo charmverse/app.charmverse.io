@@ -33,6 +33,7 @@ type Props = {
     readonly: boolean
     dateDisplayProperty?: IPropertyTemplate
     hideViewTabs?: boolean
+    addViewMenu?: ReactNode
     // For passing custom react elements on view tabs area
 }
 
@@ -62,6 +63,7 @@ const ViewHeader = React.memo((props: Props) => {
     <div className='ViewHeader'>
       {!props.hideViewTabs && <>
         <ViewTabs
+          addViewMenu={props.addViewMenu}
           views={views}
           readonly={props.readonly}
           showView={showView}
@@ -72,7 +74,7 @@ const ViewHeader = React.memo((props: Props) => {
         {/* add a view */}
 
         {!props.readonly && views.length <= 3 && (
-          <AddViewMenu
+          props.addViewMenu ?? <AddViewMenu
             board={board}
             activeView={activeView}
             views={views}
