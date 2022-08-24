@@ -17,7 +17,7 @@ export default function NotificationsBadge ({ children }: { children: JSX.Elemen
 
   return (
     <Badge
-      badgeContent={4}
+      badgeContent={totalTasks}
       overlap='circular'
       color='error'
       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
