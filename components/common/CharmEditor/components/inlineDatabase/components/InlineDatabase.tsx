@@ -7,6 +7,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import { Box, Divider, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Tab, Tabs, TextField } from '@mui/material';
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
+import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { getViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { getClientConfig } from 'components/common/BoardEditor/focalboard/src/store/clientConfig';
@@ -14,18 +15,18 @@ import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/sto
 import { getCurrentViewDisplayBy, getCurrentViewGroupBy, getSortedViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 import Button from 'components/common/Button';
+import Modal from 'components/common/Modal';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { createBoardView } from 'lib/focalboard/boardView';
 import log from 'lib/log';
 import { addPage } from 'lib/pages';
+import { isTruthy } from 'lib/utilities/types';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
-import Modal from 'components/common/Modal';
-import { isTruthy } from 'lib/utilities/types';
 import BoardSelection from './BoardSelection';
 
 // Lazy load focalboard entrypoint (ignoring the redux state stuff for now)
@@ -114,7 +115,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  // Keep track of which board is currently being viewed
+  // Keep track of which data source is currently being viewed
   const [currentDataSourceIndex, setCurrentDataSourceIndex] = useState<number>(dataSources.length !== 0 ? 0 : -1);
   const [isSelectingSource, setIsSelectingSource] = useState(false);
 
@@ -169,6 +170,21 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
     view.title = 'Board view';
     // A new property to indicate that this view was creating for inline databases only
     view.fields.inline = true;
+    await mutator.insertBlock(view);
+    const newDataSource: DataSource = { pageId: boardId, viewId: view.id, source: 'board_page', title: pages[boardId]?.title || null };
+    const newDataSources = [...dataSources, newDataSource];
+    if (newDataSources.length > MAX_DATA_SOURCES) {
+      const edgeDataSource = newDataSources[MAX_DATA_SOURCES - 1];
+      newDataSources[MAX_DATA_SOURCES - 1] = newDataSource;
+      newDataSources[newDataSources.length - 1] = edgeDataSource;
+      setDataSources([...newDataSources]);
+      setCurrentDataSourceIndex(MAX_DATA_SOURCES - 1);
+    }
+    else {
+      setCurrentDataSourceIndex(newDataSources.length - 1);
+      setDataSources(newDataSources);
+    }
+    setIsSelectingSource(false);
   }
 
   useEffect(() => {
@@ -202,16 +218,6 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
     setRenameText(currentDataSource?.title ?? '');
   }, [currentDataSource]);
 
-  if (!board || isSelectingSource) {
-    return (
-      <BoardSelection
-        pages={boardPages}
-        onCreate={createDatabase}
-        onSelect={onSelectBoard}
-      />
-    );
-  }
-
   function deleteDataSource () {
     // TODO: Ideally we would also delete the actual view, as it can't be referenced anywhere anymore
     setAnchorEl(null);
@@ -225,6 +231,97 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
     else {
       setCurrentDataSourceIndex(leftDataSources.length !== 0 ? leftDataSources.length - 1 : -1);
     }
+  }
+
+  const readOnly = typeof readOnlyOverride === 'undefined' ? currentPagePermissions.edit_content !== true : readOnlyOverride;
+
+  const viewTabs = (
+    <Box display='flex' gap={1}>
+      <Tabs textColor='primary' indicatorColor='secondary' value={`${pageId}.${viewId}`} sx={{ minHeight: 40 }}>
+        {shownDataSources.map((dataSource, dataSourceIndex) => {
+          const _board = boards.find(b => b.id === dataSource.pageId);
+          return _board ? (
+            <Tab
+              component='div'
+              disableRipple
+              key={`${dataSource.pageId}.${dataSource.viewId}`}
+              label={(
+                <Button
+                  variant='text'
+                  startIcon={<PageIcon icon={pages[dataSource.pageId]?.icon} pageType='board' isEditorEmpty={false} />}
+                  color={(pageId === dataSource.pageId && viewId === dataSource.viewId) ? 'textPrimary' : 'secondary'}
+                  sx={{ px: 1.5 }}
+                  onClick={(e: any) => {
+                    setIsSelectingSource(false);
+                    // Show the datasource menu
+                    if (currentDataSource?.pageId === dataSource.pageId && currentDataSource?.viewId === dataSource.viewId) {
+                      setAnchorEl(e.currentTarget);
+                    }
+                    else {
+                      setCurrentDataSourceIndex(dataSourceIndex);
+                    }
+                  }}
+                >
+                  {dataSource.title ?? _board.title}
+                </Button>
+            )}
+              sx={{ p: 0 }}
+              value={`${dataSource.pageId}.${dataSource.viewId}`}
+            />
+          ) : null;
+        })}
+        {hiddenDataSources.length !== 0 && (
+        <Tab
+          component='div'
+          disableRipple
+          label={(
+            <Button
+              sx={{
+                p: 0
+              }}
+              variant='text'
+              size='small'
+              color='secondary'
+              {...showHiddenDataSourcesTriggerState}
+            >
+              {hiddenDataSources.length} more...
+            </Button>
+          )}
+        />
+        )}
+      </Tabs>
+      {hiddenDataSources.length === 0 && (
+      <IconButton
+        sx={{
+          width: 'fit-content',
+          height: 'fit-content',
+          position: 'relative',
+          top: 3
+        }}
+        onClick={() => {
+          setIsSelectingSource(true);
+          setCurrentDataSourceIndex(-1);
+        }}
+        color='secondary'
+        size='small'
+      >
+        <Add fontSize='small' />
+      </IconButton>
+      )}
+    </Box>
+  );
+
+  if (!board || isSelectingSource) {
+    return (
+      <>
+        {viewTabs}
+        <BoardSelection
+          pages={boardPages}
+          onCreate={createDatabase}
+          onSelect={onSelectBoard}
+        />
+      </>
+    );
   }
 
   // If there are no active view then auto view creation process didn't work as expected
@@ -241,8 +338,6 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
   if (!displayProperty && activeView.fields.viewType === 'calendar') {
     displayProperty = board.fields.cardProperties.find((o: any) => o.type === 'date');
   }
-
-  const readOnly = typeof readOnlyOverride === 'undefined' ? currentPagePermissions.edit_content !== true : readOnlyOverride;
 
   return (
     <>
@@ -261,79 +356,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
         >
           <CenterPanel
             hideBanner
-            viewTabs={(
-              <Box display='flex' gap={1}>
-                <Tabs textColor='primary' indicatorColor='secondary' value={`${pageId}.${viewId}`} sx={{ minHeight: 40 }}>
-                  {shownDataSources.map((dataSource, dataSourceIndex) => {
-                    const _board = boards.find(b => b.id === dataSource.pageId);
-                    return _board ? (
-                      <Tab
-                        component='div'
-                        disableRipple
-                        key={`${dataSource.pageId}.${dataSource.viewId}`}
-                        label={(
-                          <Button
-                            variant='text'
-                            startIcon={<PageIcon icon={pages[dataSource.pageId]?.icon} pageType='board' isEditorEmpty={false} />}
-                            color={(pageId === dataSource.pageId && viewId === dataSource.viewId) ? 'textPrimary' : 'secondary'}
-                            sx={{ px: 1.5 }}
-                            onClick={(e: any) => {
-                              // Show the datasource menu
-                              if (currentDataSource?.pageId === dataSource.pageId && currentDataSource?.viewId === dataSource.viewId) {
-                                setAnchorEl(e.currentTarget);
-                              }
-                              else {
-                                setCurrentDataSourceIndex(dataSourceIndex);
-                              }
-                            }}
-                          >
-                            {dataSource.title ?? _board.title}
-                          </Button>
-                        )}
-                        sx={{ p: 0 }}
-                        value={`${dataSource.pageId}.${dataSource.viewId}`}
-                      />
-                    ) : null;
-                  })}
-                  {hiddenDataSources.length !== 0 && (
-                    <Tab
-                      component='div'
-                      disableRipple
-                      label={(
-                        <Button
-                          sx={{
-                            p: 0
-                          }}
-                          variant='text'
-                          size='small'
-                          color='secondary'
-                          {...showHiddenDataSourcesTriggerState}
-                        >
-                          {hiddenDataSources.length} more...
-                        </Button>
-                      )}
-                    />
-                  )}
-                </Tabs>
-                {hiddenDataSources.length === 0 && (
-                <IconButton
-                  sx={{
-                    width: 'fit-content',
-                    height: 'fit-content',
-                    position: 'relative',
-                    top: 3
-                  }}
-                  onClick={() => {
-                    setIsSelectingSource(true);
-                  }}
-                  color='secondary'
-                  size='small'
-                >
-                  <Add fontSize='small' />
-                </IconButton>
-                )}
-              </Box>
-            )}
+            viewTabs={viewTabs}
             showHeader
             hideViewTabs
             clientConfig={clientConfig}
@@ -389,6 +412,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
             onClick={() => {
               setIsSelectingSource(true);
               showHiddenDataSourcesMenuState.onClose();
+              setCurrentDataSourceIndex(-1);
             }}
           >
             Add source
@@ -444,7 +468,12 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
             setRenameText('');
           }}
           >
-            <TextField value={renameText} onChange={(e) => setRenameText(e.target.value)} defaultValue={currentDataSource?.title} autoFocus />
+            <TextField
+              value={renameText}
+              onChange={(e) => setRenameText(e.target.value)}
+              defaultValue={currentDataSource?.title}
+              autoFocus
+            />
             <Button type='submit'>Save</Button>
           </form>
         </Modal>
