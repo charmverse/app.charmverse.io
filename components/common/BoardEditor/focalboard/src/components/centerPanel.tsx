@@ -45,7 +45,6 @@ type Props = {
   dateDisplayProperty?: IPropertyTemplate
   hideViewTabs?: boolean
   hideBanner?: boolean
-  viewTabs?: ReactNode
   intl: IntlShape
   readonly: boolean
   addCard: (card: Card) => void
@@ -366,7 +365,6 @@ function CenterPanel (props: Props) {
             setPage={props.setPage}
             />}
           <ViewHeader
-            viewTabs={props.viewTabs}
             hideViewTabs={props.hideViewTabs}
             board={props.board}
             activeView={props.activeView}

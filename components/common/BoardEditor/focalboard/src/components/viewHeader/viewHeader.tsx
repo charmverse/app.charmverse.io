@@ -34,7 +34,6 @@ type Props = {
     dateDisplayProperty?: IPropertyTemplate
     hideViewTabs?: boolean
     // For passing custom react elements on view tabs area
-    viewTabs?: ReactNode
 }
 
 const ViewHeader = React.memo((props: Props) => {
@@ -43,7 +42,7 @@ const ViewHeader = React.memo((props: Props) => {
 
   const views = props.views.filter(view => !view.fields.inline)
 
-  const { viewTabs = null, board, activeView, groupByProperty, cards, dateDisplayProperty } = props;
+  const { board, activeView, groupByProperty, cards, dateDisplayProperty } = props;
 
   const withGroupBy = activeView.fields.viewType === 'board' || activeView.fields.viewType === 'table';
   const withDisplayBy = activeView.fields.viewType === 'calendar';
@@ -61,7 +60,6 @@ const ViewHeader = React.memo((props: Props) => {
 
   return (
     <div className='ViewHeader'>
-      {viewTabs}
       {!props.hideViewTabs && <>
         <ViewTabs
           views={views}

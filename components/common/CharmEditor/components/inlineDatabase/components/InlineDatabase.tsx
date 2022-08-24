@@ -294,7 +294,6 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
           <CenterPanel
             hideBanner
             showHeader
-            hideViewTabs
             clientConfig={clientConfig}
             readonly={readOnly}
             board={board}

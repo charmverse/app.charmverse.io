@@ -13,7 +13,17 @@ interface Props {
 
 export default function PagesList ({ activeItemIndex = -1, pages, onSelectPage }: Props) {
   return (
-    pages.length === 0 ? <Typography sx={{ ml: 2, mb: 1 }} variant='subtitle2' color='secondary'>No pages found</Typography> : (
+    pages.length === 0 ? (
+      <Typography
+        style={{
+          marginLeft: 16,
+          marginBottom: 8
+        }}
+        variant='subtitle2'
+        color='secondary'
+      >No pages found
+      </Typography>
+    ) : (
       <div>
         {pages.map((page, pageIndex) => {
           const docContent = ((page.content) as PageContent);
