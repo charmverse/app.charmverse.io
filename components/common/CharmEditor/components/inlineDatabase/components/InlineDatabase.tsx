@@ -105,7 +105,6 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
   const allViews = useAppSelector(getSortedViews);
 
   const views = allViews.filter(view => view.parentId === linkedSourceId);
-
   // Make the first view active view
   // Keep track of which view is currently visible
   const [currentViewId, setCurrentViewId] = useState<string | null>(views[0]?.id || null);
@@ -221,6 +220,7 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
         }}
         >
           <CenterPanel
+            disableUpdatingUrl
             addViewMenu={(
               <Button
                 onClick={() => {
@@ -234,6 +234,9 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
                 Add
               </Button>
             )}
+            onViewTabClick={(viewId) => {
+              setCurrentViewId(viewId);
+            }}
             hideBanner
             showHeader
             clientConfig={clientConfig}

@@ -36,11 +36,12 @@ interface ViewTabsProps {
   views: BoardView[];
   showView: (viewId: string) => void;
   addViewMenu?: ReactNode
+  onViewTabClick?: (viewId: string) => void
 }
 
 const SHOWN_VIEWS = 3;
 
-function ViewTabs ({ addViewMenu, board, activeView, intl, readonly, showView, views }: ViewTabsProps) {
+function ViewTabs ({ onViewTabClick, addViewMenu, board, activeView, intl, readonly, showView, views }: ViewTabsProps) {
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [currentView, setCurrentView] = useState<BoardView | null>(null);
@@ -75,6 +76,7 @@ function ViewTabs ({ addViewMenu, board, activeView, intl, readonly, showView, v
     event.stopPropagation();
     if (readonly) return;
     const view = views.find(v => v.id === event.currentTarget.id);
+    view && onViewTabClick?.(view.id)
     if (event.currentTarget.id === currentViewId) {
       event.preventDefault();
       setAnchorEl(event.currentTarget);

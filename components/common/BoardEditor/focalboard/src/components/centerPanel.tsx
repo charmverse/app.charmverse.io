@@ -54,6 +54,8 @@ type Props = {
   showCard: (cardId?: string) => void
   // A custom menu component to allow adding new view
   addViewMenu?: ReactNode
+  onViewTabClick?: (viewId: string) => void
+  disableUpdatingUrl?: boolean
 }
 
 type State = {
@@ -367,6 +369,8 @@ function CenterPanel (props: Props) {
             setPage={props.setPage}
             />}
           <ViewHeader
+            disableUpdatingUrl={props.disableUpdatingUrl}
+            onViewTabClick={props.onViewTabClick}
             addViewMenu={props.addViewMenu}
             hideViewTabs={props.hideViewTabs}
             board={props.board}

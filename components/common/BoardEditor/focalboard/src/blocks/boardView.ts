@@ -52,7 +52,7 @@ function createBoardView (block?: Block): BoardView {
       columnCalculations: { ...(block?.fields.columnCalculations) || {} },
       kanbanCalculations: { ...(block?.fields.kanbanCalculations) || {} },
       defaultTemplateId: block?.fields.defaultTemplateId || '',
-      inline: block?.fields.inline ?? false,
+      linkedSourceId: block?.fields.linkedSourceId ?? null,
     }
   };
 }

@@ -21,20 +21,21 @@ import ViewHeaderPropertiesMenu from './viewHeaderPropertiesMenu';
 import ViewHeaderSortMenu from './viewHeaderSortMenu';
 
 type Props = {
-    board: Board
-    activeView: BoardView
-    views: BoardView[]
-    cards: Card[]
-    groupByProperty?: IPropertyTemplate
-    addCard: () => void
-    // addCardFromTemplate: (cardTemplateId: string) => void
-    addCardTemplate: () => void
-    editCardTemplate: (cardTemplateId: string) => void
-    readonly: boolean
-    dateDisplayProperty?: IPropertyTemplate
-    hideViewTabs?: boolean
-    addViewMenu?: ReactNode
-    // For passing custom react elements on view tabs area
+  board: Board
+  activeView: BoardView
+  views: BoardView[]
+  cards: Card[]
+  groupByProperty?: IPropertyTemplate
+  addCard: () => void
+  // addCardFromTemplate: (cardTemplateId: string) => void
+  addCardTemplate: () => void
+  editCardTemplate: (cardTemplateId: string) => void
+  readonly: boolean
+  dateDisplayProperty?: IPropertyTemplate
+  hideViewTabs?: boolean
+  addViewMenu?: ReactNode
+  onViewTabClick?: (viewId: string) => void
+  disableUpdatingUrl?: boolean
 }
 
 const ViewHeader = React.memo((props: Props) => {
@@ -52,17 +53,23 @@ const ViewHeader = React.memo((props: Props) => {
   const hasFilter = activeView.fields.filter && activeView.fields.filter.filters?.length > 0;
 
   const showView = useCallback((viewId) => {
-    router.push({ pathname: router.pathname,
-      query: {
-        ...router.query,
-        viewId: viewId || ''
-      } }, undefined, { shallow: true });
+    debugger;
+    if (!props.disableUpdatingUrl) {
+      router.push({
+        pathname: router.pathname,
+        query: {
+          ...router.query,
+          viewId: viewId || ''
+        }
+      }, undefined, { shallow: true });
+    }
   }, [router.query, history]);
 
   return (
     <div className='ViewHeader'>
       {!props.hideViewTabs && <>
         <ViewTabs
+          onViewTabClick={props.onViewTabClick}
           addViewMenu={props.addViewMenu}
           views={views}
           readonly={props.readonly}
@@ -86,72 +93,72 @@ const ViewHeader = React.memo((props: Props) => {
       <div className='octo-spacer' />
 
       {!props.readonly
-            && (
-            <>
+        && (
+          <>
 
-              {/* Card properties */}
+            {/* Card properties */}
 
-              <ViewHeaderPropertiesMenu
-                properties={board.fields.cardProperties}
-                activeView={activeView}
-              />
+            <ViewHeaderPropertiesMenu
+              properties={board.fields.cardProperties}
+              activeView={activeView}
+            />
 
-              {/* Group by */}
+            {/* Group by */}
 
-              {withGroupBy
-                    && (
-                    <ViewHeaderGroupByMenu
-                      properties={board.fields.cardProperties}
-                      activeView={activeView}
-                      groupByProperty={groupByProperty}
-                    />
-                    )}
+            {withGroupBy
+              && (
+                <ViewHeaderGroupByMenu
+                  properties={board.fields.cardProperties}
+                  activeView={activeView}
+                  groupByProperty={groupByProperty}
+                />
+              )}
 
-              {/* Display by */}
+            {/* Display by */}
 
-              {withDisplayBy
-                    && (
-                    <ViewHeaderDisplayByMenu
-                      properties={board.fields.cardProperties}
-                      activeView={activeView}
-                      dateDisplayPropertyName={dateDisplayProperty?.name}
-                    />
-                    )}
+            {withDisplayBy
+              && (
+                <ViewHeaderDisplayByMenu
+                  properties={board.fields.cardProperties}
+                  activeView={activeView}
+                  dateDisplayPropertyName={dateDisplayProperty?.name}
+                />
+              )}
 
-              {/* Filter */}
+            {/* Filter */}
 
-              <ModalWrapper>
-                <Button
-                  active={hasFilter}
-                  onClick={() => setShowFilter(true)}
-                >
-                  <FormattedMessage
-                    id='ViewHeader.filter'
-                    defaultMessage='Filter'
+            <ModalWrapper>
+              <Button
+                active={hasFilter}
+                onClick={() => setShowFilter(true)}
+              >
+                <FormattedMessage
+                  id='ViewHeader.filter'
+                  defaultMessage='Filter'
+                />
+              </Button>
+              {showFilter
+                && (
+                  <FilterComponent
+                    board={board}
+                    activeView={activeView}
+                    onClose={() => setShowFilter(false)}
                   />
-                </Button>
-                {showFilter
-                    && (
-                    <FilterComponent
-                      board={board}
-                      activeView={activeView}
-                      onClose={() => setShowFilter(false)}
-                    />
-                    )}
-              </ModalWrapper>
+                )}
+            </ModalWrapper>
 
-              {/* Sort */}
+            {/* Sort */}
 
-              {withSortBy
-                    && (
-                    <ViewHeaderSortMenu
-                      properties={board.fields.cardProperties}
-                      activeView={activeView}
-                      orderedCards={cards}
-                    />
-                    )}
-            </>
-            )}
+            {withSortBy
+              && (
+                <ViewHeaderSortMenu
+                  properties={board.fields.cardProperties}
+                  activeView={activeView}
+                  orderedCards={cards}
+                />
+              )}
+          </>
+        )}
 
       {/* Search - disabled until we can access page data inside the redux selector */}
 
@@ -160,25 +167,25 @@ const ViewHeader = React.memo((props: Props) => {
       {/* Options menu */}
 
       {!props.readonly
-            && (
-            <>
-              <ViewHeaderActionsMenu
-                board={board}
-                activeView={activeView}
-                cards={cards}
-              />
+        && (
+          <>
+            <ViewHeaderActionsMenu
+              board={board}
+              activeView={activeView}
+              cards={cards}
+            />
 
-              {/* New card button */}
+            {/* New card button */}
 
-              <NewCardButton
-                addCard={props.addCard}
-                view={activeView}
-                   // addCardFromTemplate={props.addCardFromTemplate}
-                addCardTemplate={props.addCardTemplate}
-                editCardTemplate={props.editCardTemplate}
-              />
-            </>
-            )}
+            <NewCardButton
+              addCard={props.addCard}
+              view={activeView}
+              // addCardFromTemplate={props.addCardFromTemplate}
+              addCardTemplate={props.addCardTemplate}
+              editCardTemplate={props.editCardTemplate}
+            />
+          </>
+        )}
     </div>
   );
 });
