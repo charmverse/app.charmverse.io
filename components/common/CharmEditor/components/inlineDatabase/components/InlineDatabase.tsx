@@ -22,6 +22,7 @@ import { isTruthy } from 'lib/utilities/types';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import { Add } from '@mui/icons-material';
+import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import BoardSelection from './BoardSelection';
 
 // Lazy load focalboard entrypoint (ignoring the redux state stuff for now)
@@ -219,6 +220,15 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
           }
         }}
         >
+          <Button
+            color='secondary'
+            startIcon={<PageIcon isEditorEmpty={false} pageType='board' icon={board ? pages[board.id]?.icon : null} />}
+            variant='text'
+            // TODO: Respect shared page
+            href={space && pages[board.id] ? `/${space?.domain}/${pages[board.id]!.path ?? ''}` : ''}
+          >
+            {pages[board.id]?.title || 'Untitled'}
+          </Button>
           <CenterPanel
             maxTabsShown={1}
             disableUpdatingUrl
