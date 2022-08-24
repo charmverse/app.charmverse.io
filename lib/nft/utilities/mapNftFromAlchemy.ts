@@ -11,6 +11,7 @@ export const mapNftFromAlchemy = (nft: AlchemyNft, chainId: number): NftData => 
     imageThumb: nft.media[0].thumbnail,
     title: nft.title,
     description: nft.description,
-    chainId
+    chainId,
+    timeLastUpdated: nft.timeLastUpdated
   };
 };

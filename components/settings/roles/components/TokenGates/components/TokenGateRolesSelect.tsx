@@ -1,5 +1,6 @@
-import { Box, Chip, FormControl, MenuItem, Select } from '@mui/material';
+import { Box, Chip, FormControl, MenuItem, Select, Tooltip, Typography } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
+import { InfoOutlined as InfoOutlinedIcon } from '@mui/icons-material';
 import { useMemo } from 'react';
 import styled from '@emotion/styled';
 import Button from 'components/common/Button';
@@ -50,6 +51,19 @@ export default function TokenGateRolesSelect ({ onDelete, selectedRoleIds, onCha
 
   const isAdmin = useIsAdmin();
 
+  if (roles?.length === 0) {
+    return (
+      <Box display='flex' justifyContent='center'>
+        <Tooltip title='Add roles to enable this feature'>
+          <InfoOutlinedIcon
+            color='secondary'
+            fontSize='small'
+          />
+        </Tooltip>
+      </Box>
+    );
+  }
+
   return (
     <StyledFormControl size='small'>
       <Select<string[]>
@@ -62,7 +76,7 @@ export default function TokenGateRolesSelect ({ onDelete, selectedRoleIds, onCha
         disabled={!isAdmin || roles?.length === 0}
         renderValue={(roleIds) => (
           (roleIds.length === 0) ? (
-            <Button disabled size='small' variant='text' color='secondary'>+ Add roles</Button>
+            <Typography color='secondary' fontSize='small'>+ Assign role</Typography>
           ) : (
             <Box display='flex' flexWrap='wrap' gap={0.5} maxWidth={400}>
               {

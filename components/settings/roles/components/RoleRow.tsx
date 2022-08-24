@@ -86,7 +86,7 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
 
   return (
     <Box mb={3}>
-      <Box display='flex' justifyContent='space-between' alignItems='center'>
+      <Box display='flex' justifyContent='space-between' alignItems='center' pb={0.5}>
         <Box display='flex' gap={1} alignItems='center'>
           <Typography variant='h6' sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
             {role.name} {role.source === 'guild_xyz' ? (

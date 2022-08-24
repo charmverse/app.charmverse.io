@@ -18,7 +18,7 @@ import SnoozeButton from './components/SnoozeButton';
 import useTasks from './hooks/useTasks';
 import { VoteTasksList } from './VoteTasksList';
 
-const tabStyles = {
+export const tabStyles = {
   mb: 2,
   minHeight: {
     xs: '34px',

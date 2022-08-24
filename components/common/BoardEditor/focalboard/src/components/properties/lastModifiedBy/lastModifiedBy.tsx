@@ -1,17 +1,16 @@
 
-import { IUser } from '../../../user';
-import { getWorkspaceUsers } from '../../../store/users';
-import { useAppSelector } from '../../../store/hooks';
+import { useContributors } from 'hooks/useContributors';
 
 type Props = {
-    updatedBy: string
+  updatedBy: string
 }
 
 function LastModifiedBy (props: Props): JSX.Element {
-  const workspaceUsersById = useAppSelector<{[key:string]: IUser}>(getWorkspaceUsers);
+  const [contributors] = useContributors();
+  const contributor = contributors.find(user => user.id === props.updatedBy);
   return (
     <div className='LastModifiedBy octo-propertyvalue readonly'>
-      {(workspaceUsersById && workspaceUsersById[props.updatedBy]?.username) || props.updatedBy}
+      {contributor?.username ?? props.updatedBy}
     </div>
   );
 }

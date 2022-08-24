@@ -32,7 +32,7 @@ const StyledAvatar = styled(Avatar)`
   font-weight: 500;
 `;
 
-const HexagonAvatar = styled(StyledAvatar)`
+export const HexagonAvatar = styled(StyledAvatar)`
   clip-path: url(#hexagon-avatar);
   overflow: hidden;
 `;

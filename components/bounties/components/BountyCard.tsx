@@ -35,7 +35,7 @@ function BountyCard ({ bounty, page, onClick }: Props) {
           <Typography paragraph={true}>
             {fancyTrim(page?.contentText, 50)}
           </Typography>
-          <BountyStatusBadge bounty={bounty} hideStatus={true} />
+          <BountyStatusBadge bounty={bounty} hideStatus={true} truncate />
         </Box>
       </Box>
     </Box>

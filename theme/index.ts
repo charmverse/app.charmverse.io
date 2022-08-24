@@ -106,10 +106,6 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
         fontSize: '2rem',
         fontWeight: 700
       },
-      h2: {
-        fontSize: '1.05rem',
-        fontWeight: 500
-      },
       subtitle1: {
         fontSize: '0.85rem',
         fontWeight: 600
