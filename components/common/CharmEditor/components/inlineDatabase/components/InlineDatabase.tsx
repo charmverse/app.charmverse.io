@@ -116,11 +116,12 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
   const [space] = useCurrentSpace();
   const { user } = useUser();
   const { currentPageId, pages, getPagePermissions } = usePages();
+
   const [shownCardId, setShownCardId] = useState<string | undefined>('');
   const boardPages = Object.values(pages).filter(p => p?.type === 'board').filter(isTruthy);
 
   const boards = useAppSelector(getSortedBoards);
-  const board = boards.find(b => b.id === linkedSourceId);
+  const board = boards.find(b => b.id === currentView?.fields.linkedSourceId);
 
   const cards = useAppSelector(getViewCardsSortedFilteredAndGrouped({
     boardId: board?.id || '',
@@ -140,7 +141,7 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
     const view = createBoardView();
     view.fields.viewType = 'board';
     view.parentId = linkedSourceId;
-    view.rootId = boards.find(_board => _board.id === boardId)?.rootId ?? boardId;
+    view.rootId = linkedSourceId;
     view.title = 'Board view';
     // A new property to indicate that this view was creating for inline databases only
     view.fields.sourceType = 'board_page';
