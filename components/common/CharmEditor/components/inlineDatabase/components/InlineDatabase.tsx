@@ -27,6 +27,7 @@ import { isTruthy } from 'lib/utilities/types';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
+import DuplicateIcon from '@mui/icons-material/ContentCopy';
 import BoardSelection from './BoardSelection';
 
 // Lazy load focalboard entrypoint (ignoring the redux state stuff for now)
@@ -162,7 +163,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
     setCurrentDataSourceIndex(MAX_DATA_SOURCES - 1);
   }
 
-  async function onSelectBoard (boardId: string) {
+  async function selectDatabase (boardId: string) {
     const view = createBoardView();
     view.fields.viewType = 'board';
     view.parentId = boardId;
@@ -173,6 +174,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
     await mutator.insertBlock(view);
     const newDataSource: DataSource = { pageId: boardId, viewId: view.id, source: 'board_page', title: pages[boardId]?.title || null };
     const newDataSources = [...dataSources, newDataSource];
+
     if (newDataSources.length > MAX_DATA_SOURCES) {
       const edgeDataSource = newDataSources[MAX_DATA_SOURCES - 1];
       newDataSources[MAX_DATA_SOURCES - 1] = newDataSource;
@@ -208,6 +210,13 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
       viewId: boardView?.id ?? null,
       title: null // TODO: Fix the title
     } as DataSource]);
+  }
+
+  function duplicateDatabase () {
+    if (currentDataSource) {
+      selectDatabase(currentDataSource.pageId);
+      setAnchorEl(null);
+    }
   }
 
   useEffect(() => {
@@ -318,7 +327,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
         <BoardSelection
           pages={boardPages}
           onCreate={createDatabase}
-          onSelect={onSelectBoard}
+          onSelect={selectDatabase}
         />
       </>
     );
@@ -427,12 +436,17 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
         >
           <MenuItem
             dense
-            onClick={() => {
-              renameDataSourcePopupState.open();
-            }}
+            onClick={renameDataSourcePopupState.open}
           >
             <ListItemIcon><EditIcon fontSize='small' /></ListItemIcon>
             <ListItemText>Rename</ListItemText>
+          </MenuItem>
+          <MenuItem
+            dense
+            onClick={duplicateDatabase}
+          >
+            <ListItemIcon><DuplicateIcon fontSize='small' /></ListItemIcon>
+            <ListItemText>Duplicate</ListItemText>
           </MenuItem>
           <Divider />
           <MenuItem
