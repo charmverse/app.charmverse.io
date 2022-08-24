@@ -38,11 +38,10 @@ interface ViewTabsProps {
   addViewMenu?: ReactNode
   onViewTabClick?: (viewId: string) => void
   disableUpdatingUrl?: boolean
+  maxTabsShown?: number
 }
 
-const SHOWN_VIEWS = 3;
-
-function ViewTabs ({ onViewTabClick, disableUpdatingUrl, addViewMenu, board, activeView, intl, readonly, showView, views }: ViewTabsProps) {
+function ViewTabs ({ maxTabsShown = 3, onViewTabClick, disableUpdatingUrl, addViewMenu, board, activeView, intl, readonly, showView, views }: ViewTabsProps) {
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [currentView, setCurrentView] = useState<BoardView | null>(null);
@@ -56,14 +55,14 @@ function ViewTabs ({ onViewTabClick, disableUpdatingUrl, addViewMenu, board, act
   // Find the index of the current view
   const currentViewId = router.query.viewId || activeView.id;
   const currentViewIndex = views.findIndex(view => view.id === currentViewId);
-  const shownViews = views.slice(0, SHOWN_VIEWS);
-  let restViews = views.slice(SHOWN_VIEWS);
+  const shownViews = views.slice(0, maxTabsShown);
+  let restViews = views.slice(maxTabsShown);
 
   // If the current view index is more than what we can show in the screen
-  if (currentViewIndex >= SHOWN_VIEWS) {
-    const replacedView = shownViews[SHOWN_VIEWS - 1];
+  if (currentViewIndex >= maxTabsShown) {
+    const replacedView = shownViews[maxTabsShown - 1];
     // Replace the current view as the last view of the shown views
-    shownViews[SHOWN_VIEWS - 1] = views[currentViewIndex];
+    shownViews[maxTabsShown - 1] = views[currentViewIndex];
     restViews = restViews.filter(restView => restView.id !== currentViewId);
     restViews.unshift(replacedView);
   }

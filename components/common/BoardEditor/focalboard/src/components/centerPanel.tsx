@@ -56,6 +56,7 @@ type Props = {
   addViewMenu?: ReactNode
   onViewTabClick?: (viewId: string) => void
   disableUpdatingUrl?: boolean
+  maxTabsShown?: number
 }
 
 type State = {
@@ -369,6 +370,7 @@ function CenterPanel (props: Props) {
             setPage={props.setPage}
             />}
           <ViewHeader
+            maxTabsShown={props.maxTabsShown}
             disableUpdatingUrl={props.disableUpdatingUrl}
             onViewTabClick={props.onViewTabClick}
             addViewMenu={props.addViewMenu}

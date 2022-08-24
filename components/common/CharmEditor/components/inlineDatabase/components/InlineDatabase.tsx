@@ -220,6 +220,7 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
         }}
         >
           <CenterPanel
+            maxTabsShown={1}
             disableUpdatingUrl
             addViewMenu={(
               <Button

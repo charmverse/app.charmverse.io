@@ -36,6 +36,7 @@ type Props = {
   addViewMenu?: ReactNode
   onViewTabClick?: (viewId: string) => void
   disableUpdatingUrl?: boolean
+  maxTabsShown?: number
 }
 
 const ViewHeader = React.memo((props: Props) => {
@@ -76,11 +77,12 @@ const ViewHeader = React.memo((props: Props) => {
           board={board}
           activeView={activeView}
           disableUpdatingUrl={props.disableUpdatingUrl}
+          maxTabsShown={props.maxTabsShown}
         />
 
         {/* add a view */}
 
-        {!props.readonly && views.length <= 3 && (
+        {!props.readonly && views.length <= 2 && (
           props.addViewMenu ?? <AddViewMenu
             board={board}
             activeView={activeView}
