@@ -7,7 +7,6 @@ import EditIcon from '@mui/icons-material/Edit';
 import { Box, Divider, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Tab, Tabs, TextField } from '@mui/material';
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
-import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { getViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { getClientConfig } from 'components/common/BoardEditor/focalboard/src/store/clientConfig';
@@ -17,13 +16,16 @@ import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 import Button from 'components/common/Button';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import { usePages } from 'hooks/usePages';
+import { useUser } from 'hooks/useUser';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { createBoardView } from 'lib/focalboard/boardView';
 import log from 'lib/log';
-import { isTruthy } from 'lib/utilities/types';
+import { addPage } from 'lib/pages';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import Modal from 'components/common/Modal';
+import { isTruthy } from 'lib/utilities/types';
 import BoardSelection from './BoardSelection';
 
 // Lazy load focalboard entrypoint (ignoring the redux state stuff for now)
@@ -108,7 +110,6 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
   const showHiddenDataSourcesPopupState = usePopupState({ variant: 'popover', popupId: 'show-data-sources-popup' });
   const showHiddenDataSourcesTriggerState = bindTrigger(showHiddenDataSourcesPopupState);
   const showHiddenDataSourcesMenuState = bindMenu(showHiddenDataSourcesPopupState);
-
   const renameDataSourcePopupState = usePopupState({ variant: 'popover', popupId: 'rename-data-source-popup' });
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -118,6 +119,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
   const [isSelectingSource, setIsSelectingSource] = useState(false);
 
   const currentDataSource = currentDataSourceIndex !== -1 ? dataSources[currentDataSourceIndex] : null;
+
   const boards = useAppSelector(getSortedBoards);
   // Always display the first page and view
   const viewId = currentDataSource?.viewId;
@@ -135,9 +137,12 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
   const groupByProperty = useAppSelector(getCurrentViewGroupBy);
   const dateDisplayProperty = useAppSelector(getCurrentViewDisplayBy);
   const clientConfig = useAppSelector(getClientConfig);
-  const { pages, getPagePermissions } = usePages();
+  const [space] = useCurrentSpace();
+  const { user } = useUser();
+  const { currentPageId, pages, getPagePermissions } = usePages();
   const [shownCardId, setShownCardId] = useState<string | undefined>('');
   const [renameText, setRenameText] = useState<string>('');
+  const boardPages = Object.values(pages).filter(p => p?.type === 'board').filter(isTruthy);
 
   const accessibleCards = cards.filter(card => pages[card.id]);
 
@@ -164,22 +169,6 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
     view.title = 'Board view';
     // A new property to indicate that this view was creating for inline databases only
     view.fields.inline = true;
-
-    await mutator.insertBlock(view);
-    const newDataSource: DataSource = { pageId: boardId, viewId: view.id, source: 'board_page', title: pages[boardId]?.title || null };
-    const newDataSources = [...dataSources, newDataSource];
-    if (newDataSources.length > MAX_DATA_SOURCES) {
-      const edgeDataSource = newDataSources[MAX_DATA_SOURCES - 1];
-      newDataSources[MAX_DATA_SOURCES - 1] = newDataSource;
-      newDataSources[newDataSources.length - 1] = edgeDataSource;
-      setDataSources([...newDataSources]);
-      setCurrentDataSourceIndex(MAX_DATA_SOURCES - 1);
-    }
-    else {
-      setCurrentDataSourceIndex(newDataSources.length - 1);
-      setDataSources(newDataSources);
-    }
-    setIsSelectingSource(false);
   }
 
   useEffect(() => {
@@ -187,6 +176,27 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
       dataSources
     });
   }, [dataSources]);
+
+  async function createDatabase () {
+    if (!space || !user) return;
+
+    const { page, view: boardView } = await addPage({
+      type: 'inline_board',
+      parentId: currentPageId,
+      spaceId: space.id,
+      createdBy: user.id
+    });
+    setDataSources([...dataSources, {
+      source: 'board_page',
+      pageId: page.id,
+      viewId: boardView?.id ?? null,
+      title: null // TODO: Fix the title
+    } as DataSource]);
+  }
+
+  useEffect(() => {
+    setRenameText(currentDataSource?.title ?? '');
+  }, [currentDataSource]);
 
   useEffect(() => {
     setRenameText(currentDataSource?.title ?? '');
@@ -196,10 +206,8 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
     return (
       <BoardSelection
         pages={boardPages}
+        onCreate={createDatabase}
         onSelect={onSelectBoard}
-        onClickBack={() => {
-          setIsSelectingSource(false);
-        }}
       />
     );
   }
