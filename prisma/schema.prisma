@@ -15,6 +15,7 @@ enum PageType {
   page
   card
   proposal
+  inline_board
 }
 
 enum PermissionLevel {

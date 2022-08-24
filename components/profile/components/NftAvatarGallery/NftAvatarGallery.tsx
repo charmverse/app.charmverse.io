@@ -29,7 +29,7 @@ type Props = {
 
 export default function NftAvatarGallery ({ onSelect, isVisible, onClose, isSaving }: Props) {
   const { user } = useUser();
-  const { nfts, isLoading } = useMyNfts();
+  const { nfts, isLoading } = useMyNfts(user?.id ?? '');
 
   const getIsSelected = (nft: NftData) => {
     if (!user) {

@@ -5,6 +5,7 @@ import { hasAccessToSpace, onError, onNoMatch, requireSpaceMembership } from 'li
 import { withSessionRoute } from 'lib/session/withSession';
 import { TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
+import { AccessControlCondition } from 'lit-js-sdk';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -24,6 +25,13 @@ async function saveTokenGate (req: NextApiRequest, res: NextApiResponse) {
   });
   if (error) {
     throw error;
+  }
+
+  // Make sure token gate has at least 1 condition.
+  const hasValidCondition = (req.body.conditions?.unifiedAccessControlConditions as AccessControlCondition[])?.some(c => Boolean(c.chain));
+
+  if (!hasValidCondition) {
+    throw new InvalidInputError('Your token gate must contain at least one condition.');
   }
 
   const result = await prisma.tokenGate.create({

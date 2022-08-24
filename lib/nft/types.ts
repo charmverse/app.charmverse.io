@@ -8,4 +8,5 @@ export type NftData = {
   image: string;
   imageRaw: string;
   imageThumb?: string
+  timeLastUpdated: string
 }

@@ -32,6 +32,7 @@ const CenterPanel = dynamic(() => import('components/common/BoardEditor/focalboa
 });
 
 const StylesContainer = styled.div`
+  margin-top: ${({ theme }) => theme.spacing(2)};
 
   .BoardComponent {
     overflow: visible;
@@ -127,6 +128,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
     boardId: pageId || '',
     viewId: viewId || ''
   }));
+
   const allViews = useAppSelector(getSortedViews);
   const boardViews = allViews.filter(view => view.parentId === pageId);
   const activeView = useAppSelector(getView(viewId || ''));
@@ -137,7 +139,6 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
   const [shownCardId, setShownCardId] = useState<string | undefined>('');
   const [renameText, setRenameText] = useState<string>('');
 
-  const boardPages = Object.values(pages).filter(p => p?.type === 'board').filter(isTruthy);
   const accessibleCards = cards.filter(card => pages[card.id]);
 
   const currentPagePermissions = getPagePermissions(pageId || '');

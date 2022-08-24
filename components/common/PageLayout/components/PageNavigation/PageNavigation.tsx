@@ -28,7 +28,7 @@ const StyledTreeRoot = styled(TreeRoot)<{ isFavorites?: boolean }>`
 export function filterVisiblePages (pages: (Page | undefined)[], rootPageIds: string[] = []) {
   return pages
     .filter((page): page is IPageWithPermissions => isTruthy(
-      page && (page.type === 'board' || page.type === 'page' || rootPageIds?.includes(page.id))
+      page && (page.type === 'board' || page.type === 'inline_board' || page.type === 'page' || rootPageIds?.includes(page.id))
     ));
 }
 
@@ -155,7 +155,7 @@ function PageNavigation ({
 
   const onDropChild = useCallback((droppedItem: MenuNode, containerItem: MenuNode) => {
 
-    if (containerItem.type === 'board') {
+    if (containerItem.type === 'board' || containerItem.type === 'inline_board') {
       return;
     }
 

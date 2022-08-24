@@ -38,7 +38,9 @@ export default function PageDialog (props: Props) {
   const { setCurrentPageId, setPages, getPagePermissions } = usePages();
   const pagePermission = page ? getPagePermissions(page.id) : null;
   const { showMessage } = useSnackbar();
-  const isSharedPage = router.route.startsWith('/share');
+  // extract domain from shared pages: /share/<domain>/<page_path>
+  const domain = router.query.domain || /^\/share\/(.*)\//.exec(router.asPath)?.[1];
+  const fullPageUrl = router.route.startsWith('/share') ? `/share/${domain}/${page?.path}` : `/${domain}/${page?.path}`;
 
   // keep track if charmeditor is mounted. There is a bug that it calls the update method on closing the modal, but content is empty
   useEffect(() => {
@@ -137,12 +139,12 @@ export default function PageDialog (props: Props) {
               )}
             </List>
           )}
-          toolbar={!isSharedPage && (
+          toolbar={(
             <Box display='flex' justifyContent='space-between'>
               <Button
                 size='small'
                 color='secondary'
-                href={`/${router.query.domain}/${page?.path}`}
+                href={fullPageUrl}
                 variant='text'
                 startIcon={<OpenInFullIcon fontSize='small' />}
               >

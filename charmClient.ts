@@ -28,7 +28,7 @@ import type { GetTasksResponse } from 'pages/api/tasks/list';
 import type { GetTasksStateResponse, UpdateTasksState } from 'pages/api/tasks/state';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 import type { AssignedBountyPermissions, BountyCreationData, BountySubmitterPoolCalculation, BountySubmitterPoolSize, BountyUpdate, SuggestionAction } from 'lib/bounties/interfaces';
-import type { DeepDaoAggregateData } from 'lib/deepdao/client';
+import type { DeepDaoAggregateData } from 'lib/deepdao/interfaces';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
 import type { PublicBountyToggle } from 'lib/spaces/interfaces';
 import type { MarkTask } from 'lib/tasks/markTasks';
