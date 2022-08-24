@@ -2,7 +2,6 @@ Dockerfile
 docker-compose.yml
 .ebextensions
 .next
-.env.staging
 next.base.js
 next.config.js
 node_modules
