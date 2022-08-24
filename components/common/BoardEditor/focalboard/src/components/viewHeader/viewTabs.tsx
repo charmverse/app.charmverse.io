@@ -37,11 +37,12 @@ interface ViewTabsProps {
   showView: (viewId: string) => void;
   addViewMenu?: ReactNode
   onViewTabClick?: (viewId: string) => void
+  disableUpdatingUrl?: boolean
 }
 
 const SHOWN_VIEWS = 3;
 
-function ViewTabs ({ onViewTabClick, addViewMenu, board, activeView, intl, readonly, showView, views }: ViewTabsProps) {
+function ViewTabs ({ onViewTabClick, disableUpdatingUrl, addViewMenu, board, activeView, intl, readonly, showView, views }: ViewTabsProps) {
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [currentView, setCurrentView] = useState<BoardView | null>(null);
@@ -172,7 +173,7 @@ function ViewTabs ({ onViewTabClick, addViewMenu, board, activeView, intl, reado
                 size='small'
                 color={currentViewId === view.id ? 'textPrimary' : 'secondary'}
                 id={view.id}
-                href={currentViewId === view.id ? null : getViewUrl(view.id)}
+                href={!disableUpdatingUrl ? (currentViewId === view.id ? null : getViewUrl(view.id)) : ''}
                 sx={{ px: 1.5 }}
               >
                 {view.title}
@@ -232,7 +233,7 @@ function ViewTabs ({ onViewTabClick, addViewMenu, board, activeView, intl, reado
         >
           {restViews.map(view => (
             <Link
-              href={getViewUrl(view.id)}
+              href={!disableUpdatingUrl ? getViewUrl(view.id) : ''}
               passHref
             >
               <MenuItem component='a' key={view.id} dense>

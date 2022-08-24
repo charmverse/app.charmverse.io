@@ -53,7 +53,6 @@ const ViewHeader = React.memo((props: Props) => {
   const hasFilter = activeView.fields.filter && activeView.fields.filter.filters?.length > 0;
 
   const showView = useCallback((viewId) => {
-    debugger;
     if (!props.disableUpdatingUrl) {
       router.push({
         pathname: router.pathname,
@@ -76,6 +75,7 @@ const ViewHeader = React.memo((props: Props) => {
           showView={showView}
           board={board}
           activeView={activeView}
+          disableUpdatingUrl={props.disableUpdatingUrl}
         />
 
         {/* add a view */}
