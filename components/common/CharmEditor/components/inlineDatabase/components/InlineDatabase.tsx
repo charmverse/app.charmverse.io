@@ -12,8 +12,11 @@ import { getCurrentViewDisplayBy, getCurrentViewGroupBy, getSortedViews, getView
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 import Button from 'components/common/Button';
 import { usePages } from 'hooks/usePages';
+import { useUser } from 'hooks/useUser';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import log from 'lib/log';
 import { isTruthy } from 'lib/utilities/types';
+import { addPage } from 'lib/pages';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 
@@ -90,12 +93,14 @@ interface DatabaseViewAttrs {
   pageId: string | null;
   viewId: string | null;
   source: 'board_page' | null;
+  type?: 'embedded';
 }
 
 export default function DatabaseView ({ readOnly: readOnlyOverride, node, updateAttrs }: DatabaseViewProps) {
 
   const [attrs, setAttrs] = useState<DatabaseViewAttrs>(node.attrs as DatabaseViewAttrs);
   const router = useRouter();
+
   const boards = useAppSelector(getSortedBoards);
   const board = boards.find(b => b.id === attrs.pageId);
   const cards = useAppSelector(getViewCardsSortedFilteredAndGrouped({
@@ -109,7 +114,9 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
   const groupByProperty = useAppSelector(getCurrentViewGroupBy);
   const dateDisplayProperty = useAppSelector(getCurrentViewDisplayBy);
   const clientConfig = useAppSelector(getClientConfig);
-  const { pages, getPagePermissions } = usePages();
+  const [space] = useCurrentSpace();
+  const { user } = useUser();
+  const { currentPageId, pages, getPagePermissions } = usePages();
   const [shownCardId, setShownCardId] = useState<string | undefined>('');
   const boardPage = attrs.pageId ? pages[attrs.pageId] : null;
   const boardPages = Object.values(pages).filter(p => p?.type === 'board' || p?.type === 'inline_board').filter(isTruthy);
@@ -136,12 +143,29 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
     setAttrs(_attrs => ({ ..._attrs, viewId }));
   }
 
+  async function createDatabase () {
+    if (!space || !user) return;
+
+    const { page, view: boardView } = await addPage({
+      type: 'inline_board',
+      parentId: currentPageId,
+      spaceId: space.id,
+      createdBy: user.id
+    });
+    setAttrs({
+      source: 'board_page',
+      pageId: page.id,
+      viewId: boardView?.id ?? null,
+      type: 'embedded'
+    });
+  }
+
   useEffect(() => {
     updateAttrs(attrs);
   }, [attrs]);
 
   if (!board) {
-    return <BoardSelection pages={boardPages} onSelect={selectBoard} />;
+    return <BoardSelection pages={boardPages} onCreate={createDatabase} onSelect={selectBoard} />;
   }
 
   if (!activeView) {

@@ -636,14 +636,16 @@ const paletteGroupItemsRecord: Record<PaletteGroup, readonly Omit<PaletteItemTyp
     editorExecuteCommand: () => {
       return (state, dispatch, view) => {
         // Execute the animation
-        rafCommandExec(view!, (_state, _dispatch) => {
-          const node = _state.schema.nodes.inlineDatabase.create();
-          if (_dispatch && isAtBeginningOfLine(state)) {
-            _dispatch(_state.tr.replaceSelectionWith(node));
-            return true;
-          }
-          return insertNode(_state, _dispatch, node);
-        });
+        if (view) {
+          rafCommandExec(view, (_state, _dispatch) => {
+            const node = _state.schema.nodes.inlineDatabase.create();
+            if (_dispatch && isAtBeginningOfLine(state)) {
+              _dispatch(_state.tr.replaceSelectionWith(node));
+              return true;
+            }
+            return insertNode(_state, _dispatch, node);
+          });
+        }
         return replaceSuggestionMarkWith(palettePluginKey, '')(
           state,
           dispatch,
@@ -747,25 +749,27 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
           // Execute the animation
-          rafCommandExec(view!, (_state, _dispatch) => {
-            // The page must be created before the node can be created
-            addPage({ type: 'inline_board', parentId: currentPageId, spaceId: space.id, createdBy: user.id })
-              .then(({ page, view: boardView }) => {
-                const node = _state.schema.nodes.inlineDatabase.create({
-                  source: 'board_page',
-                  pageId: page.id,
-                  viewId: boardView?.id,
-                  type: 'embedded'
-                });
+          if (view) {
+            rafCommandExec(view, (_state, _dispatch) => {
+              // The page must be created before the node can be created
+              addPage({ type: 'inline_board', parentId: currentPageId, spaceId: space.id, createdBy: user.id })
+                .then(({ page, view: boardView }) => {
+                  const node = _state.schema.nodes.inlineDatabase.create({
+                    source: 'board_page',
+                    pageId: page.id,
+                    viewId: boardView?.id,
+                    type: 'embedded'
+                  });
 
-                if (_dispatch && isAtBeginningOfLine(state)) {
-                  _dispatch(_state.tr.replaceSelectionWith(node));
-                  return true;
-                }
-                return insertNode(_state, _dispatch, node);
-              });
-            return true;
-          });
+                  if (_dispatch && isAtBeginningOfLine(state)) {
+                    _dispatch(_state.tr.replaceSelectionWith(node));
+                    return true;
+                  }
+                  return insertNode(_state, _dispatch, node);
+                });
+              return true;
+            });
+          }
           return replaceSuggestionMarkWith(palettePluginKey, '')(
             state,
             dispatch,
