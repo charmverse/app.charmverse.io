@@ -8,12 +8,14 @@ export default function NotificationsBadge ({ children }: { children: JSX.Elemen
   const { tasks } = useTasks();
 
   const userNotificationState = user?.notificationState;
+
+  const voteTasks = tasks?.votes.length ?? 0;
+  const mentionTasks = tasks?.mentioned.unmarked.length ?? 0;
   // If the user has snoozed multisig tasks don't count them
-  const totalTasks = tasks
-    ? (tasks.votes.length + tasks.mentioned.unmarked.length + (userNotificationState
-      ? (userNotificationState.snoozedUntil && new Date(userNotificationState.snoozedUntil) > new Date() ? 0
-        : tasks.gnosis.length) : tasks.gnosis.length))
-    : 0;
+  const excludeGnosisTasks = userNotificationState?.snoozedUntil && new Date(userNotificationState.snoozedUntil) > new Date();
+  const gnosisTasks = excludeGnosisTasks ? 0 : tasks?.gnosis.length ?? 0;
+
+  const totalTasks = voteTasks + mentionTasks + gnosisTasks;
 
   return (
     <Badge
