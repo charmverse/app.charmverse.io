@@ -13,12 +13,12 @@ import { v4 } from 'uuid';
 
 export type NewPageInput = Partial<Page> & { spaceId: string, createdBy: string };
 
-export async function addPage ({ createdBy, spaceId, ...page }: NewPageInput) {
+export async function addPage ({ createdBy, spaceId, ...page }: NewPageInput, shouldCreateDefaultBoardData?: boolean) {
   const id = v4();
-
+  shouldCreateDefaultBoardData = shouldCreateDefaultBoardData ?? true;
   const pageProperties: Partial<Page> = {
     id,
-    boardId: (page.type === 'board' || page.type === 'inline_board') ? id : undefined,
+    boardId: (page.type === 'board' || page.type === 'inline_board' || page.type === 'inline_linked_board') ? id : undefined,
     content: undefined as any,
     contentText: '',
     createdAt: new Date(),
@@ -45,18 +45,32 @@ export async function addPage ({ createdBy, spaceId, ...page }: NewPageInput) {
     cards: [],
     view: null
   };
-  if (pageProperties.type === 'board' || pageProperties.type === 'inline_board') {
-    const artifacts = await createDefaultBoardData(() => null, id);
-    pageArtifacts.board = artifacts.board;
-    pageArtifacts.view = artifacts.view;
-    pageArtifacts.cards = artifacts.cards;
+  if (pageProperties.type === 'board' || pageProperties.type === 'inline_board' || pageProperties.type === 'inline_linked_board') {
+    if (shouldCreateDefaultBoardData) {
+      const artifacts = await createDefaultBoardData(() => null, id);
+      pageArtifacts.board = artifacts.board;
+      if (shouldCreateDefaultBoardData) {
+        pageArtifacts.view = artifacts.view;
+        pageArtifacts.cards = artifacts.cards;
+      }
+    }
+    else {
+      const board = createBoard({ addDefaultProperty: true });
+      if (id) {
+        board.id = id;
+      }
+      board.rootId = board.id;
+      await mutator.insertBlocks(
+        [board]
+      );
+    }
   }
 
   await mutate(`pages/${spaceId}`, (pages: Page[]) => {
     return [...pages, newPage];
   }, {
     // revalidate pages for board since we create 3 default ones
-    revalidate: pageProperties.type === 'board' || pageProperties.type === 'inline_board'
+    revalidate: pageProperties.type === 'board' || pageProperties.type === 'inline_board' || pageProperties.type === 'inline_linked_board'
   });
 
   return pageArtifacts;

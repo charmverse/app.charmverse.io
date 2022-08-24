@@ -13,8 +13,14 @@ function databaseSpec (): BaseRawNodeSpec {
     type: 'node',
     schema: {
       attrs: {
-        dataSources: {
-          default: []
+        source: {
+          default: 'board_page'
+        },
+        linkedSourceId: {
+          default: null
+        },
+        type: {
+          default: 'linked'
         }
       },
       atom: true,

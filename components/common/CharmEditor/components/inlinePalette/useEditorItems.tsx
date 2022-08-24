@@ -762,7 +762,7 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
             // Execute the animation
             if (view) {
               rafCommandExec(view, (_state, _dispatch) => {
-                addPage({ title: 'Linked Database', type: 'inline_linked_board', parentId: currentPageId, spaceId: space.id, createdBy: user.id })
+                addPage({ title: 'Linked Database', type: 'inline_linked_board', parentId: currentPageId, spaceId: space.id, createdBy: user.id }, false)
                   .then(({ page }) => {
                     const node = _state.schema.nodes.inlineDatabase.create({
                       source: 'board_page',
