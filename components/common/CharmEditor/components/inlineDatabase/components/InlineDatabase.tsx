@@ -23,6 +23,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import BoardSelection from './BoardSelection';
 import ViewSelection from './ViewSelection';
+import InlineDatabaseError from './InlineDatabaseError';
 
 // Lazy load focalboard entrypoint (ignoring the redux state stuff for now)
 const CenterPanel = dynamic(() => import('components/common/BoardEditor/focalboard/src/components/centerPanel'), {
@@ -164,25 +165,34 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
     updateAttrs(attrs);
   }, [attrs]);
 
-  if (!board) {
-    return <BoardSelection pages={boardPages} onCreate={createDatabase} onSelect={selectBoard} />;
+  const readOnly = typeof readOnlyOverride === 'undefined' ? currentPagePermissions.edit_content !== true : readOnlyOverride;
+
+  if (!readOnly) {
+    if (!board) {
+      return <BoardSelection pages={boardPages} onCreate={createDatabase} onSelect={selectBoard} />;
+    }
+
+    if (!activeView) {
+      return <ViewSelection views={boardViews} title={board.title} onSelect={selectView} onClickBack={clearSelection} />;
+    }
   }
 
-  if (!activeView) {
-    return <ViewSelection views={boardViews} title={board.title} onSelect={selectView} onClickBack={clearSelection} />;
+  if (!board) {
+    return <InlineDatabaseError message='Database not found' />;
+  }
+  else if (!activeView) {
+    return <InlineDatabaseError message='View not found' />;
   }
 
   let property = groupByProperty;
-  if ((!property || property.type !== 'select') && activeView.fields.viewType === 'board') {
-    property = board?.fields.cardProperties.find((o: any) => o.type === 'select');
+  if ((!property || property.type !== 'select') && activeView?.fields.viewType === 'board') {
+    property = board.fields.cardProperties.find((o: any) => o.type === 'select');
   }
 
   let displayProperty = dateDisplayProperty;
-  if (!displayProperty && activeView.fields.viewType === 'calendar') {
+  if (!displayProperty && activeView?.fields.viewType === 'calendar') {
     displayProperty = board.fields.cardProperties.find((o: any) => o.type === 'date');
   }
-
-  const readOnly = typeof readOnlyOverride === 'undefined' ? currentPagePermissions.edit_content !== true : readOnlyOverride;
 
   return (
     <>
