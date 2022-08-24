@@ -102,7 +102,7 @@ interface DatabaseView {
 
 export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverride, node, updateAttrs }: DatabaseViewProps) {
   const [databaseView, setDatabaseView] = useState(node.attrs as DatabaseView);
-  const { linkedSourceId } = databaseView;
+  const { linkedSourceId, type } = databaseView;
   const allViews = useAppSelector(getSortedViews);
 
   const views = allViews.filter(view => view.parentId === linkedSourceId);
@@ -123,7 +123,7 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
   const boardPages = Object.values(pages).filter(p => p?.type === 'board').filter(isTruthy);
 
   const boards = useAppSelector(getSortedBoards);
-  const board = boards.find(b => b.id === currentView?.fields.linkedSourceId);
+  const board = boards.find(b => type === 'linked' ? b.id === currentView?.fields.linkedSourceId : b.id === currentView?.parentId);
 
   const cards = useAppSelector(getViewCardsSortedFilteredAndGrouped({
     boardId: board?.id || '',
@@ -160,17 +160,22 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
   async function createDatabase () {
     if (!space || !user) return;
 
-    const { page } = await addPage({
+    const { page, view } = await addPage({
       type: 'inline_board',
       parentId: currentPageId,
       spaceId: space.id,
       createdBy: user.id
     });
+
     setDatabaseView({
       source: 'board_page',
       linkedSourceId: page.id,
       type: 'embedded'
     });
+
+    if (view) {
+      setCurrentViewId(view.id);
+    }
   }
 
   const readOnly = typeof readOnlyOverride === 'undefined' ? currentPagePermissions.edit_content !== true : readOnlyOverride;
@@ -191,6 +196,7 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
       );
     }
   }
+
   if (!board || !currentView) {
     return null;
   }
@@ -232,7 +238,7 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
           <CenterPanel
             maxTabsShown={1}
             disableUpdatingUrl
-            addViewMenu={(
+            addViewMenu={type === 'linked' ? (
               <Button
                 onClick={() => {
                   setIsSelectingSource(true);
@@ -244,7 +250,7 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
               >
                 Add
               </Button>
-            )}
+            ) : undefined}
             onViewTabClick={(viewId) => {
               setCurrentViewId(viewId);
             }}
