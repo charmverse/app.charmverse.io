@@ -35,7 +35,7 @@ const CenterPanel = dynamic(() => import('components/common/BoardEditor/focalboa
   ssr: false
 });
 
-const StylesContainer = styled.div`
+const StylesContainer = styled.div<{ containerWidth?: number }>`
   margin-top: ${({ theme }) => theme.spacing(2)};
 
   .BoardComponent {
@@ -50,8 +50,9 @@ const StylesContainer = styled.div`
     margin: 0 -24px;
     padding-left: 24px;
     ${({ theme }) => theme.breakpoints.up('md')} {
-      margin: 0 -80px;
-      padding-left: 80px;
+      --side-margin: ${({ containerWidth }) => `calc((${containerWidth}px - 100%) / 2)`};
+      margin: 0 calc(-1 * var(--side-margin));
+      padding-left: var(--side-margin);
     }
   }
 
@@ -92,6 +93,7 @@ const StylesContainer = styled.div`
 `;
 
 interface DatabaseViewProps extends NodeViewProps {
+  containerWidth?: number; // pass in the container width so we can extend full width
   readOnly?: boolean;
 }
 
@@ -104,7 +106,7 @@ interface DataSource {
 
 const MAX_DATA_SOURCES = 2;
 
-export default function DatabaseView ({ readOnly: readOnlyOverride, node, updateAttrs }: DatabaseViewProps) {
+export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverride, node, updateAttrs }: DatabaseViewProps) {
   const [dataSources, setDataSources] = useState<DataSource[]>(node.attrs.dataSources);
 
   const shownDataSources = dataSources.slice(0, MAX_DATA_SOURCES);
@@ -320,31 +322,31 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
     </Box>
   );
 
-  if (!board || isSelectingSource) {
-    return (
-      <>
-        {viewTabs}
-        <BoardSelection
-          pages={boardPages}
-          onCreate={createDatabase}
-          onSelect={selectDatabase}
-        />
-      </>
-    );
+  if (!readOnly) {
+    if (!board || isSelectingSource) {
+      return (
+        <>
+          {viewTabs}
+          <BoardSelection
+            pages={boardPages}
+            onCreate={createDatabase}
+            onSelect={selectDatabase}
+          />
+        </>
+      );
+    }
   }
-
-  // If there are no active view then auto view creation process didn't work as expected
-  if (!activeView) {
+  else if (!activeView || !board) {
     return null;
   }
 
   let property = groupByProperty;
-  if ((!property || property.type !== 'select') && activeView.fields.viewType === 'board') {
-    property = board?.fields.cardProperties.find((o: any) => o.type === 'select');
+  if ((!property || property.type !== 'select') && activeView?.fields.viewType === 'board') {
+    property = board.fields.cardProperties.find((o: any) => o.type === 'select');
   }
 
   let displayProperty = dateDisplayProperty;
-  if (!displayProperty && activeView.fields.viewType === 'calendar') {
+  if (!displayProperty && activeView?.fields.viewType === 'calendar') {
     displayProperty = board.fields.cardProperties.find((o: any) => o.type === 'date');
   }
 
@@ -376,7 +378,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
             }}
             cards={accessibleCards}
             showCard={showCard}
-            activeView={activeView}
+            activeView={activeView!}
             groupByProperty={property}
             dateDisplayProperty={displayProperty}
             views={boardViews}

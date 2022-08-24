@@ -312,6 +312,7 @@ interface CharmEditorProps {
   disablePageSpecificFeatures?: boolean;
   enableVoting?: boolean;
   pageId?: string | null;
+  containerWidth?: number;
 }
 
 export function convertPageContentToMarkdown (content: PageContent, title?: string): string {
@@ -344,7 +345,8 @@ function CharmEditor (
     readOnly = false,
     disablePageSpecificFeatures = false,
     enableVoting,
-    pageId
+    pageId,
+    containerWidth
   }:
   CharmEditorProps
 ) {
@@ -550,6 +552,7 @@ function CharmEditor (
           case 'inlineDatabase': {
             return (
               <InlineDatabase
+                containerWidth={containerWidth}
                 readOnly={readOnly}
                 {...props}
               />
