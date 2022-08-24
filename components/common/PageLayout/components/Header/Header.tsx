@@ -270,9 +270,9 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
               </Tooltip>
             </IconButton>
           )}
-          <NotificationsBadge />
+          {/* <NotificationsBadge /> */}
           {/** user account */}
-          <Account />
+          {/* <Account /> */}
         </Box>
       </Box>
       {/** inject the modal based on open status so it resets the form each time */}

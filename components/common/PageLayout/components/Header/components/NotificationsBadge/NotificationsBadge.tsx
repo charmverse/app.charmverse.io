@@ -19,7 +19,7 @@ export default function NotificationsBadge () {
 
   return (
     <Link href='/nexus'>
-      <IconButton size='small' sx={{ mr: 1 }}>
+      <IconButton size='small'>
         <Tooltip arrow title='Your Notifications'>
           <Badge
             badgeContent={totalTasks}
