@@ -14,6 +14,7 @@ interface Props {
   pages: Page[];
   onSelect: (boardId: string) => void;
   onClickBack: () => void
+  showGoBackButton: boolean
 }
 
 const StyledSidebar = styled.div`
@@ -47,11 +48,13 @@ export default function BoardSelection (props: Props) {
 
   return (
     <>
+      {props.showGoBackButton && (
       <Box display='flex' justifyContent='flex-end'>
         <Button size='small' color='secondary' variant='outlined' onClick={props.onClickBack}>
           <ArrowBackIosIcon sx={{ fontSize: '14px' }} /> Go back
         </Button>
       </Box>
+      )}
       <Divider light />
       <Box display='flex'>
         <Box flexGrow={1} display='flex' justifyContent='center' alignItems='center'>

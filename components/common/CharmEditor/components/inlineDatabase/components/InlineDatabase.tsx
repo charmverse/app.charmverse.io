@@ -181,6 +181,7 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
         <>
           {/* {viewTabs} */}
           <BoardSelection
+            showGoBackButton={views.length !== 0}
             onClickBack={() => setIsSelectingSource(false)}
             pages={boardPages}
             onCreate={createDatabase}
@@ -230,7 +231,7 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
                 startIcon={<Add />}
                 variant='text'
               >
-                Add source
+                Add
               </Button>
             )}
             hideBanner
