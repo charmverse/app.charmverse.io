@@ -23,7 +23,6 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import BoardSelection from './BoardSelection';
 import ViewSelection from './ViewSelection';
-import InlineDatabaseError from './InlineDatabaseError';
 
 // Lazy load focalboard entrypoint (ignoring the redux state stuff for now)
 const CenterPanel = dynamic(() => import('components/common/BoardEditor/focalboard/src/components/centerPanel'), {
@@ -176,11 +175,9 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
       return <ViewSelection views={boardViews} title={board.title} onSelect={selectView} onClickBack={clearSelection} />;
     }
   }
-  else if (!board) {
-    return <InlineDatabaseError message='Database not found' />;
-  }
-  else if (!activeView) {
-    return <InlineDatabaseError message='View not found' />;
+  // if user does not have access, just hide the content
+  else if (!board || !activeView) {
+    return null;
   }
 
   let property = groupByProperty;
