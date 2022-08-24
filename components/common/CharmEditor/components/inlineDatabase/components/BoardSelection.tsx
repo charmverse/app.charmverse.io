@@ -14,7 +14,7 @@ interface Props {
   onSelect: (boardId: string) => void;
 }
 
-const StyledSidebar = styled(Box)`
+const StyledSidebar = styled.div`
   border-left: 1px solid rgb(var(--center-channel-color-rgb), 0.12);
   display: flex;
   flex-direction: column;

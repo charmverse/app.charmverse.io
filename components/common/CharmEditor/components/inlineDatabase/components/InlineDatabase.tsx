@@ -164,25 +164,31 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
     updateAttrs(attrs);
   }, [attrs]);
 
-  if (!board) {
-    return <BoardSelection pages={boardPages} onCreate={createDatabase} onSelect={selectBoard} />;
-  }
+  const readOnly = typeof readOnlyOverride === 'undefined' ? currentPagePermissions.edit_content !== true : readOnlyOverride;
 
-  if (!activeView) {
-    return <ViewSelection views={boardViews} title={board.title} onSelect={selectView} onClickBack={clearSelection} />;
+  if (!readOnly) {
+    if (!board) {
+      return <BoardSelection pages={boardPages} onCreate={createDatabase} onSelect={selectBoard} />;
+    }
+
+    if (!activeView) {
+      return <ViewSelection views={boardViews} title={board.title} onSelect={selectView} onClickBack={clearSelection} />;
+    }
+  }
+  // if user does not have access, just hide the content
+  else if (!board || !activeView) {
+    return null;
   }
 
   let property = groupByProperty;
-  if ((!property || property.type !== 'select') && activeView.fields.viewType === 'board') {
-    property = board?.fields.cardProperties.find((o: any) => o.type === 'select');
+  if ((!property || property.type !== 'select') && activeView?.fields.viewType === 'board') {
+    property = board.fields.cardProperties.find((o: any) => o.type === 'select');
   }
 
   let displayProperty = dateDisplayProperty;
-  if (!displayProperty && activeView.fields.viewType === 'calendar') {
+  if (!displayProperty && activeView?.fields.viewType === 'calendar') {
     displayProperty = board.fields.cardProperties.find((o: any) => o.type === 'date');
   }
-
-  const readOnly = typeof readOnlyOverride === 'undefined' ? currentPagePermissions.edit_content !== true : readOnlyOverride;
 
   return (
     <>
