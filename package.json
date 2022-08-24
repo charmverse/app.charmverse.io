@@ -144,6 +144,7 @@
     "node-cron": "^3.0.0",
     "node-fetch": "^3.2.9",
     "patch-package": "^6.4.7",
+    "playwright": "^1.25.1",
     "promise-retry": "^2.0.1",
     "prosemirror-dev-tools": "https://s3.amazonaws.com/charm.public/npm/prosemirror-dev-tools-3.3.4.tgz",
     "prosemirror-menu": "^1.1.4",
@@ -185,6 +186,7 @@
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^12.0.10",
+    "@playwright/test": "^1.25.1",
     "@svgr/webpack": "^6.1.2",
     "@testing-library/cypress": "^8.0.2",
     "@testing-library/dom": "^8.11.3",
