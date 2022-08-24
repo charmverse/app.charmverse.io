@@ -120,7 +120,7 @@ export default function DatabaseView ({ readOnly: readOnlyOverride, node, update
   const { currentPageId, pages, getPagePermissions } = usePages();
   const [shownCardId, setShownCardId] = useState<string | undefined>('');
   const boardPage = attrs.pageId ? pages[attrs.pageId] : null;
-  const boardPages = Object.values(pages).filter(p => p?.type === 'board').filter(isTruthy);
+  const boardPages = Object.values(pages).filter(p => p?.type === 'board' || p?.type === 'inline_board').filter(isTruthy);
 
   const accessibleCards = cards.filter(card => pages[card.id]);
 
