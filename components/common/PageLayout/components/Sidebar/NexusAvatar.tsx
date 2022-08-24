@@ -3,11 +3,11 @@ import styled from '@emotion/styled';
 import { LoggedInUser } from 'models';
 import { useRouter } from 'next/router';
 import Avatar from 'components/common/Avatar';
-import MuiLink from '@mui/material/Link';
 import Tooltip from '@mui/material/Tooltip';
-import NextLink from 'next/link';
+import Link from 'components/common/Link';
+import NotificationsBadge from './NotificationsBadge';
 
-const AvatarLink = styled(NextLink)`
+const AvatarLink = styled(Link)`
   cursor: pointer;
 `;
 
@@ -27,14 +27,14 @@ export default function NexusAvatar ({ user }: { user: Pick<LoggedInUser, 'avata
   const isNexusActive = nexusRoutes.some(route => router.pathname === route);
 
   return (
-    <AvatarLink href='/nexus' passHref>
-      <MuiLink>
-        <Tooltip title='My Nexus' placement='right' arrow>
-          <span>
+    <AvatarLink href='/nexus'>
+      <Tooltip title='My Nexus' placement='right' arrow>
+        <span>
+          <NotificationsBadge>
             <MyAvatar active={isNexusActive} avatar={user?.avatar} name={user?.username} />
-          </span>
-        </Tooltip>
-      </MuiLink>
+          </NotificationsBadge>
+        </span>
+      </Tooltip>
     </AvatarLink>
   );
 }

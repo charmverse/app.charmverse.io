@@ -35,7 +35,6 @@ import Account from '../Account';
 import ShareButton from './components/ShareButton';
 import BountyShareButton from './components/BountyShareButton/BountyShareButton';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
-import NotificationsBadge from './components/NotificationsBadge';
 
 export const headerHeight = 56;
 
@@ -128,7 +127,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
       }}
       >
         <PageTitleWithBreadcrumbs />
-        <Box display='flex' alignItems='center'>
+        <Box display='flex' alignItems='center' mr={-1}>
           {
             isBountyBoard && (
               <BountyShareButton headerHeight={headerHeight} />
@@ -147,7 +146,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
           )}
 
           {isBasePageDocument && (
-            <Box sx={{ ml: 1 }} ref={pageMenuAnchor}>
+            <Box ml={1} ref={pageMenuAnchor}>
               <IconButton
                 size='small'
                 onClick={() => {
