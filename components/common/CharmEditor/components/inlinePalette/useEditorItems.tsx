@@ -727,11 +727,10 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
               rafCommandExec(view, (_state, _dispatch) => {
                 // The page must be created before the node can be created
                 addPage({ type: 'inline_board', parentId: currentPageId, spaceId: space.id, createdBy: user.id })
-                  .then(({ page, view: boardView }) => {
+                  .then(({ page }) => {
                     const node = _state.schema.nodes.inlineDatabase.create({
                       source: 'board_page',
-                      pageId: page.id,
-                      viewId: boardView?.id,
+                      linkedSourceId: page.id,
                       type: 'embedded'
                     });
 
@@ -763,7 +762,7 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
             // Execute the animation
             if (view) {
               rafCommandExec(view, (_state, _dispatch) => {
-                addPage({ type: 'inline_linked_board', parentId: currentPageId, spaceId: space.id, createdBy: user.id })
+                addPage({ title: 'Linked Database', type: 'inline_linked_board', parentId: currentPageId, spaceId: space.id, createdBy: user.id })
                   .then(({ page }) => {
                     const node = _state.schema.nodes.inlineDatabase.create({
                       source: 'board_page',
