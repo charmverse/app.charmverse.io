@@ -352,7 +352,7 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
 
   return (
     <>
-      <StylesContainer className='focalboard-body'>
+      <StylesContainer className='focalboard-body' containerWidth={containerWidth}>
         <Box sx={{
           '.top-head': {
             padding: 0
