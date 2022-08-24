@@ -1,6 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import { useState, useCallback, MouseEvent } from 'react';
+import { useState, useCallback, MouseEvent, ReactNode } from 'react';
 import { injectIntl, IntlShape } from 'react-intl';
 import { useRouter } from 'next/router';
 import Modal from 'components/common/Modal';
@@ -20,7 +20,6 @@ import { useForm } from 'react-hook-form';
 import { useFocalboardViews } from 'hooks/useFocalboardViews';
 import { Board } from 'lib/focalboard/board';
 import { Box } from '@mui/system';
-import { Typography } from '@mui/material';
 import Link from 'next/link';
 import AddViewMenu from '../addViewMenu';
 import DeleteIcon from '../../widgets/icons/delete';
@@ -36,11 +35,14 @@ interface ViewTabsProps {
   readonly?: boolean;
   views: BoardView[];
   showView: (viewId: string) => void;
+  addViewMenu?: ReactNode
+  onViewTabClick?: (viewId: string) => void
+  onDeleteView?: (viewId: string) => void
+  disableUpdatingUrl?: boolean
+  maxTabsShown?: number
 }
 
-const SHOWN_VIEWS = 3;
-
-function ViewTabs ({ board, activeView, intl, readonly, showView, views }: ViewTabsProps) {
+function ViewTabs ({ onDeleteView, maxTabsShown = 3, onViewTabClick, disableUpdatingUrl, addViewMenu, board, activeView, intl, readonly, showView, views }: ViewTabsProps) {
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [currentView, setCurrentView] = useState<BoardView | null>(null);
@@ -50,18 +52,18 @@ function ViewTabs ({ board, activeView, intl, readonly, showView, views }: ViewT
   const showViewsMenuState = bindMenu(showViewsPopupState);
 
   const { setFocalboardViewsRecord } = useFocalboardViews();
-
+  views = views.filter(view => !view.fields.inline)
   // Find the index of the current view
   const currentViewId = router.query.viewId || activeView.id;
   const currentViewIndex = views.findIndex(view => view.id === currentViewId);
-  const shownViews = views.slice(0, SHOWN_VIEWS);
-  let restViews = views.slice(SHOWN_VIEWS);
+  const shownViews = views.slice(0, maxTabsShown);
+  let restViews = views.slice(maxTabsShown);
 
   // If the current view index is more than what we can show in the screen
-  if (currentViewIndex >= SHOWN_VIEWS) {
-    const replacedView = shownViews[SHOWN_VIEWS - 1];
+  if (currentViewIndex >= maxTabsShown) {
+    const replacedView = shownViews[maxTabsShown - 1];
     // Replace the current view as the last view of the shown views
-    shownViews[SHOWN_VIEWS - 1] = views[currentViewIndex];
+    shownViews[maxTabsShown - 1] = views[currentViewIndex];
     restViews = restViews.filter(restView => restView.id !== currentViewId);
     restViews.unshift(replacedView);
   }
@@ -75,7 +77,7 @@ function ViewTabs ({ board, activeView, intl, readonly, showView, views }: ViewT
     event.stopPropagation();
     if (readonly) return;
     const view = views.find(v => v.id === event.currentTarget.id);
-    // event.detail tells us how many times the mouse was clicked
+    view && onViewTabClick?.(view.id)
     if (event.currentTarget.id === currentViewId) {
       event.preventDefault();
       setAnchorEl(event.currentTarget);
@@ -128,6 +130,8 @@ function ViewTabs ({ board, activeView, intl, readonly, showView, views }: ViewT
 
     const nextView = views.find((o) => o !== currentView);
     mutator.deleteBlock(currentView, 'delete view');
+    onDeleteView?.(currentView.id)
+    setAnchorEl(null)
     if (nextView) {
       showView(nextView.id);
       setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [board.id]: nextView.id }));
@@ -171,7 +175,7 @@ function ViewTabs ({ board, activeView, intl, readonly, showView, views }: ViewT
                 size='small'
                 color={currentViewId === view.id ? 'textPrimary' : 'secondary'}
                 id={view.id}
-                href={currentViewId === view.id ? null : getViewUrl(view.id)}
+                href={!disableUpdatingUrl ? (currentViewId === view.id ? null : getViewUrl(view.id)) : ''}
                 sx={{ px: 1.5 }}
               >
                 {view.title}
@@ -194,9 +198,8 @@ function ViewTabs ({ board, activeView, intl, readonly, showView, views }: ViewT
             >
               {restViews.length} more...
             </Button>
-      )}
-        />
-        )}
+          )}
+        />)}
       </Tabs>
       <Menu
         anchorEl={anchorEl}
@@ -230,20 +233,24 @@ function ViewTabs ({ board, activeView, intl, readonly, showView, views }: ViewT
           mb: 1
         }}
         >
-          {restViews.map(view => (
-            <Link
-              href={getViewUrl(view.id)}
-              passHref
-            >
-              <MenuItem component='a' key={view.id} dense>
-                <ListItemIcon>{iconForViewType(view.fields.viewType)}</ListItemIcon>
-                <ListItemText>{view.title}</ListItemText>
-              </MenuItem>
-            </Link>
-          ))}
+          {restViews.map(view => {
+            const content = <MenuItem onClick={() => {
+              onViewTabClick?.(view.id)
+              showViewsMenuState.onClose()
+            }} component='a' key={view.id} dense>
+              <ListItemIcon>{iconForViewType(view.fields.viewType)}</ListItemIcon>
+              <ListItemText>{view.title}</ListItemText>
+            </MenuItem>
+            return disableUpdatingUrl ? content : <Link
+            href={getViewUrl(view.id)}
+            passHref
+          >
+            {content}
+          </Link>
+          })}
         </Box>
         <Divider />
-        <AddViewMenu
+        {addViewMenu ?? <AddViewMenu
           sx={{
             width: '100%'
           }}
@@ -252,7 +259,7 @@ function ViewTabs ({ board, activeView, intl, readonly, showView, views }: ViewT
           activeView={activeView}
           showView={showView}
           views={views}
-        />
+        />}
       </Menu>
 
       {/* Form to rename views */}

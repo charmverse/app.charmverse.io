@@ -77,7 +77,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
   const board = useAppSelector((state) => {
     if (page.type === 'card' && page.parentId) {
       const parentPage = pages[page.parentId];
-      return parentPage?.boardId && (parentPage?.type === 'board' || parentPage?.type === 'inline_board') ? state.boards.boards[parentPage.boardId] : null;
+      return parentPage?.boardId && (parentPage?.type === 'board' || parentPage?.type === 'inline_board' || parentPage?.type === 'inline_linked_board') ? state.boards.boards[parentPage.boardId] : null;
     }
     return null;
   });

@@ -140,7 +140,8 @@ export default function BoardPage ({ page, setPage, readOnly }: Props) {
             setPage={setPage}
             cards={accessibleCards}
             showCard={showCard}
-            showHeader={true}
+            showHeader
+            showTitle
             activeView={activeView}
             groupByProperty={property}
             dateDisplayProperty={displayProperty}

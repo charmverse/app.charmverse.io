@@ -1,9 +1,10 @@
 
 import { NodeViewProps } from '@bangle.dev/core';
 import styled from '@emotion/styled';
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
+import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { getViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { getClientConfig } from 'components/common/BoardEditor/focalboard/src/store/clientConfig';
@@ -11,18 +12,18 @@ import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/sto
 import { getCurrentViewDisplayBy, getCurrentViewGroupBy, getSortedViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 import Button from 'components/common/Button';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { createBoardView } from 'lib/focalboard/boardView';
 import log from 'lib/log';
-import { isTruthy } from 'lib/utilities/types';
 import { addPage } from 'lib/pages';
+import { isTruthy } from 'lib/utilities/types';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
-
-import { useRouter } from 'next/router';
+import { Add } from '@mui/icons-material';
+import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import BoardSelection from './BoardSelection';
-import ViewSelection from './ViewSelection';
 
 // Lazy load focalboard entrypoint (ignoring the redux state stuff for now)
 const CenterPanel = dynamic(() => import('components/common/BoardEditor/focalboard/src/components/centerPanel'), {
@@ -91,142 +92,187 @@ interface DatabaseViewProps extends NodeViewProps {
   readOnly?: boolean;
 }
 
-interface DatabaseViewAttrs {
-  pageId: string | null;
-  viewId: string | null;
-  source: 'board_page' | null;
-  type?: 'embedded';
+interface DatabaseView {
+  // Not using linkedPageId as the source could be other things
+  // source field would be used to figure out what type of source it actually is
+  linkedSourceId: string;
+  source: 'board_page';
+  type: 'linked' | 'embedded'
 }
 
 export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverride, node, updateAttrs }: DatabaseViewProps) {
-
-  const [attrs, setAttrs] = useState<DatabaseViewAttrs>(node.attrs as DatabaseViewAttrs);
-  const router = useRouter();
-
-  const boards = useAppSelector(getSortedBoards);
-  const board = boards.find(b => b.id === attrs.pageId);
-  const cards = useAppSelector(getViewCardsSortedFilteredAndGrouped({
-    boardId: attrs.pageId || '',
-    viewId: attrs.viewId || ''
-  }));
-
+  const [databaseView, setDatabaseView] = useState(node.attrs as DatabaseView);
+  const { linkedSourceId, type } = databaseView;
   const allViews = useAppSelector(getSortedViews);
-  const boardViews = allViews.filter(view => view.parentId === attrs.pageId);
-  const activeView = useAppSelector(getView(attrs.viewId || ''));
+
+  const views = allViews.filter(view => view.parentId === linkedSourceId);
+  // Make the first view active view
+  // Keep track of which view is currently visible
+  const [currentViewId, setCurrentViewId] = useState<string | null>(views[0]?.id || null);
+  const [isSelectingSource, setIsSelectingSource] = useState(currentViewId === null);
+  const currentView = useAppSelector(getView(currentViewId || ''));
+
   const groupByProperty = useAppSelector(getCurrentViewGroupBy);
   const dateDisplayProperty = useAppSelector(getCurrentViewDisplayBy);
   const clientConfig = useAppSelector(getClientConfig);
   const [space] = useCurrentSpace();
   const { user } = useUser();
   const { currentPageId, pages, getPagePermissions } = usePages();
+
   const [shownCardId, setShownCardId] = useState<string | undefined>('');
-  const boardPage = attrs.pageId ? pages[attrs.pageId] : null;
-  const boardPages = Object.values(pages).filter(p => p?.type === 'board' || p?.type === 'inline_board').filter(isTruthy);
+  const boardPages = Object.values(pages).filter(p => p?.type === 'board').filter(isTruthy);
+
+  const boards = useAppSelector(getSortedBoards);
+  const board = boards.find(b => type === 'linked' ? b.id === currentView?.fields.linkedSourceId : b.id === currentView?.parentId);
+
+  const cards = useAppSelector(getViewCardsSortedFilteredAndGrouped({
+    boardId: board?.id || '',
+    viewId: currentViewId || ''
+  }));
 
   const accessibleCards = cards.filter(card => pages[card.id]);
 
-  const currentPagePermissions = getPagePermissions(attrs.pageId || '');
+  // TODO: Handle for other sources in future like workspace users
+  const currentPagePermissions = getPagePermissions(linkedSourceId || '');
 
   function showCard (cardId?: string) {
     setShownCardId(cardId);
   }
 
-  function selectBoard (boardId: string) {
-    const _boardViews = allViews.filter(view => view.parentId === boardId);
-    const viewId = _boardViews.length === 1 ? _boardViews[0].id : null;
-    setAttrs({ source: 'board_page', pageId: boardId, viewId });
+  async function selectDatabase (boardId: string) {
+    const view = createBoardView();
+    view.fields.viewType = 'board';
+    view.parentId = linkedSourceId;
+    view.rootId = linkedSourceId;
+    view.title = 'Board view';
+    // A new property to indicate that this view was creating for inline databases only
+    view.fields.sourceType = 'board_page';
+    view.fields.linkedSourceId = boardId;
+    await mutator.insertBlock(view);
+    setIsSelectingSource(false);
+    setCurrentViewId(view.id);
   }
 
-  function clearSelection () {
-    setAttrs({ viewId: null, pageId: null, source: null });
-  }
-
-  function selectView (viewId: string) {
-    setAttrs(_attrs => ({ ..._attrs, viewId }));
-  }
+  useEffect(() => {
+    updateAttrs(databaseView);
+  }, [databaseView]);
 
   async function createDatabase () {
     if (!space || !user) return;
 
-    const { page, view: boardView } = await addPage({
+    const { page, view } = await addPage({
       type: 'inline_board',
       parentId: currentPageId,
       spaceId: space.id,
       createdBy: user.id
     });
-    setAttrs({
+
+    setDatabaseView({
       source: 'board_page',
-      pageId: page.id,
-      viewId: boardView?.id ?? null,
+      linkedSourceId: page.id,
       type: 'embedded'
     });
-  }
 
-  useEffect(() => {
-    updateAttrs(attrs);
-  }, [attrs]);
+    if (view) {
+      setCurrentViewId(view.id);
+    }
+  }
 
   const readOnly = typeof readOnlyOverride === 'undefined' ? currentPagePermissions.edit_content !== true : readOnlyOverride;
 
   if (!readOnly) {
-    if (!board) {
-      return <BoardSelection pages={boardPages} onCreate={createDatabase} onSelect={selectBoard} />;
-    }
-
-    if (!activeView) {
-      return <ViewSelection views={boardViews} title={board.title} onSelect={selectView} onClickBack={clearSelection} />;
+    if (isSelectingSource) {
+      return (
+        <>
+          {/* {viewTabs} */}
+          <BoardSelection
+            showGoBackButton={views.length !== 0}
+            onClickBack={() => setIsSelectingSource(false)}
+            pages={boardPages}
+            onCreate={createDatabase}
+            onSelect={selectDatabase}
+          />
+        </>
+      );
     }
   }
-  // if user does not have access, just hide the content
-  else if (!board || !activeView) {
+
+  if (!board || !currentView) {
     return null;
   }
 
   let property = groupByProperty;
-  if ((!property || property.type !== 'select') && activeView?.fields.viewType === 'board') {
+  if ((!property || property.type !== 'select') && currentView?.fields.viewType === 'board') {
     property = board.fields.cardProperties.find((o: any) => o.type === 'select');
   }
 
   let displayProperty = dateDisplayProperty;
-  if (!displayProperty && activeView?.fields.viewType === 'calendar') {
+  if (!displayProperty && currentView?.fields.viewType === 'calendar') {
     displayProperty = board.fields.cardProperties.find((o: any) => o.type === 'date');
   }
 
   return (
     <>
       <StylesContainer className='focalboard-body' containerWidth={containerWidth}>
-        <Box display='flex' justifyContent='space-between'>
+        <Box sx={{
+          '.top-head': {
+            padding: 0
+          },
+          '.MuiTypography-root': {
+            textDecoration: 'none'
+          },
+          '.MuiTypography-root:hover': {
+            textDecoration: 'none'
+          }
+        }}
+        >
           <Button
             color='secondary'
+            startIcon={<PageIcon isEditorEmpty={false} pageType='board' icon={board ? pages[board.id]?.icon : null} />}
             variant='text'
-            sx={{
-              h3: {
-                textDecoration: 'none',
-                mt: 0
-              }
-            }}
-            href={`/${router.query.domain}/${boardPage?.path}`}
-            component='span'
+            // TODO: Respect shared page
+            href={space && pages[board.id] ? `/${space?.domain}/${pages[board.id]!.path ?? ''}` : ''}
           >
-            <Typography variant='h3'>
-              {boardPage?.title || 'Untitled'}
-            </Typography>
+            {pages[board.id]?.title || 'Untitled'}
           </Button>
+          <CenterPanel
+            maxTabsShown={1}
+            disableUpdatingUrl
+            addViewMenu={type === 'linked' ? (
+              <Button
+                onClick={() => {
+                  setIsSelectingSource(true);
+                }}
+                color='secondary'
+                size='small'
+                startIcon={<Add />}
+                variant='text'
+              >
+                Add
+              </Button>
+            ) : undefined}
+            onViewTabClick={(viewId) => {
+              setCurrentViewId(viewId);
+            }}
+            onDeleteView={(viewId) => {
+              setCurrentViewId(views.filter(view => view.id !== viewId)?.[0]?.id ?? null);
+            }}
+            hideBanner
+            showHeader
+            clientConfig={clientConfig}
+            readonly={readOnly}
+            board={board}
+            setPage={(p) => {
+              log.warn('Ignoring update page properties of inline database', p);
+            }}
+            cards={accessibleCards}
+            showCard={showCard}
+            activeView={currentView}
+            groupByProperty={property}
+            dateDisplayProperty={displayProperty}
+            views={views}
+          />
         </Box>
-        <CenterPanel
-          clientConfig={clientConfig}
-          readonly={readOnly}
-          board={board}
-          setPage={(p) => {
-            log.warn('Ignoring update page properties of inline database', p);
-          }}
-          cards={accessibleCards}
-          showCard={showCard}
-          activeView={activeView}
-          groupByProperty={property}
-          dateDisplayProperty={displayProperty}
-          views={boardViews}
-        />
       </StylesContainer>
       {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
         <RootPortal>

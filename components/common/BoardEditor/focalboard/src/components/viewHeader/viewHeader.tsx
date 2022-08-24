@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import { useRouter } from 'next/router';
-import React, { useCallback, useState } from 'react';
+import React, { ReactNode, useCallback, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Board, IPropertyTemplate } from '../../blocks/board';
 import { BoardView } from '../../blocks/boardView';
@@ -18,28 +18,35 @@ import ViewHeaderActionsMenu from './viewHeaderActionsMenu';
 import ViewHeaderDisplayByMenu from './viewHeaderDisplayByMenu';
 import ViewHeaderGroupByMenu from './viewHeaderGroupByMenu';
 import ViewHeaderPropertiesMenu from './viewHeaderPropertiesMenu';
-import ViewHeaderSearch from './viewHeaderSearch';
 import ViewHeaderSortMenu from './viewHeaderSortMenu';
 
 type Props = {
-    board: Board
-    activeView: BoardView
-    views: BoardView[]
-    cards: Card[]
-    groupByProperty?: IPropertyTemplate
-    addCard: () => void
-    // addCardFromTemplate: (cardTemplateId: string) => void
-    addCardTemplate: () => void
-    editCardTemplate: (cardTemplateId: string) => void
-    readonly: boolean
-    dateDisplayProperty?: IPropertyTemplate
+  board: Board
+  activeView: BoardView
+  views: BoardView[]
+  cards: Card[]
+  groupByProperty?: IPropertyTemplate
+  addCard: () => void
+  // addCardFromTemplate: (cardTemplateId: string) => void
+  addCardTemplate: () => void
+  editCardTemplate: (cardTemplateId: string) => void
+  readonly: boolean
+  dateDisplayProperty?: IPropertyTemplate
+  hideViewTabs?: boolean
+  addViewMenu?: ReactNode
+  onViewTabClick?: (viewId: string) => void
+  disableUpdatingUrl?: boolean
+  maxTabsShown?: number
+  onDeleteView?: (viewId: string) => void
 }
 
 const ViewHeader = React.memo((props: Props) => {
   const router = useRouter();
   const [showFilter, setShowFilter] = useState(false);
 
-  const { board, activeView, views, groupByProperty, cards, dateDisplayProperty } = props;
+  const views = props.views.filter(view => !view.fields.inline)
+
+  const { board, activeView, groupByProperty, cards, dateDisplayProperty } = props;
 
   const withGroupBy = activeView.fields.viewType === 'board' || activeView.fields.viewType === 'table';
   const withDisplayBy = activeView.fields.viewType === 'calendar';
@@ -48,104 +55,114 @@ const ViewHeader = React.memo((props: Props) => {
   const hasFilter = activeView.fields.filter && activeView.fields.filter.filters?.length > 0;
 
   const showView = useCallback((viewId) => {
-    router.push({ pathname: router.pathname,
-      query: {
-        ...router.query,
-        viewId: viewId || ''
-      } }, undefined, { shallow: true });
+    if (!props.disableUpdatingUrl) {
+      router.push({
+        pathname: router.pathname,
+        query: {
+          ...router.query,
+          viewId: viewId || ''
+        }
+      }, undefined, { shallow: true });
+    }
   }, [router.query, history]);
 
   return (
     <div className='ViewHeader'>
-
-      <ViewTabs
-        views={views}
-        readonly={props.readonly}
-        showView={showView}
-        board={board}
-        activeView={activeView}
-      />
-
-      {/* add a view */}
-
-      {!props.readonly && views.length <= 3 && (
-        <AddViewMenu
+      {!props.hideViewTabs && <>
+        <ViewTabs
+          onDeleteView={props.onDeleteView}
+          onViewTabClick={props.onViewTabClick}
+          addViewMenu={props.addViewMenu}
+          views={views}
+          readonly={props.readonly}
+          showView={showView}
           board={board}
           activeView={activeView}
-          views={views}
-          showView={showView}
+          disableUpdatingUrl={props.disableUpdatingUrl}
+          maxTabsShown={props.maxTabsShown}
         />
-      )}
+
+        {/* add a view */}
+
+        {!props.readonly && views.length <= (props.maxTabsShown ?? 3) && (
+          props.addViewMenu ?? <AddViewMenu
+            board={board}
+            activeView={activeView}
+            views={views}
+            showView={showView}
+          />
+        )}
+      </>}
 
       <div className='octo-spacer' />
 
       {!props.readonly
-            && (
-            <>
+        && (
+          <>
 
-              {/* Card properties */}
+            {/* Card properties */}
 
-              <ViewHeaderPropertiesMenu
-                properties={board.fields.cardProperties}
-                activeView={activeView}
-              />
+            <ViewHeaderPropertiesMenu
+              properties={board.fields.cardProperties}
+              activeView={activeView}
+            />
 
-              {/* Group by */}
+            {/* Group by */}
 
-              {withGroupBy
-                    && (
-                    <ViewHeaderGroupByMenu
-                      properties={board.fields.cardProperties}
-                      activeView={activeView}
-                      groupByProperty={groupByProperty}
-                    />
-                    )}
+            {withGroupBy
+              && (
+                <ViewHeaderGroupByMenu
+                  properties={board.fields.cardProperties}
+                  activeView={activeView}
+                  groupByProperty={groupByProperty}
+                />
+              )}
 
-              {/* Display by */}
+            {/* Display by */}
 
-              {withDisplayBy
-                    && (
-                    <ViewHeaderDisplayByMenu
-                      properties={board.fields.cardProperties}
-                      activeView={activeView}
-                      dateDisplayPropertyName={dateDisplayProperty?.name}
-                    />
-                    )}
+            {withDisplayBy
+              && (
+                <ViewHeaderDisplayByMenu
+                  properties={board.fields.cardProperties}
+                  activeView={activeView}
+                  dateDisplayPropertyName={dateDisplayProperty?.name}
+                />
+              )}
 
-              {/* Filter */}
+            {/* Filter */}
 
-              <ModalWrapper>
-                <Button
-                  active={hasFilter}
-                  onClick={() => setShowFilter(true)}
-                >
-                  <FormattedMessage
-                    id='ViewHeader.filter'
-                    defaultMessage='Filter'
+            <ModalWrapper>
+              <Button
+                active={hasFilter}
+                onClick={() => setShowFilter(true)}
+              >
+                <FormattedMessage
+                  id='ViewHeader.filter'
+                  defaultMessage='Filter'
+                />
+              </Button>
+              {showFilter
+                && (
+                  <FilterComponent
+                    board={board}
+                    activeView={activeView}
+                    onClose={() => setShowFilter(false)}
                   />
-                </Button>
-                {showFilter
-                    && (
-                    <FilterComponent
-                      board={board}
-                      activeView={activeView}
-                      onClose={() => setShowFilter(false)}
-                    />
-                    )}
-              </ModalWrapper>
+                )}
+            </ModalWrapper>
 
-              {/* Sort */}
+            {/* Sort */}
 
-              {withSortBy
-                    && (
-                    <ViewHeaderSortMenu
-                      properties={board.fields.cardProperties}
-                      activeView={activeView}
-                      orderedCards={cards}
-                    />
-                    )}
-            </>
-            )}
+            {withSortBy
+              && (
+                <ViewHeaderSortMenu
+                  properties={board.fields.cardProperties}
+                  activeView={activeView}
+                  orderedCards={cards}
+                />
+              )}
+          </>
+        )}
 
       {/* Search - disabled until we can access page data inside the redux selector */}
 
@@ -154,25 +171,25 @@ const ViewHeader = React.memo((props: Props) => {
       {/* Options menu */}
 
       {!props.readonly
-            && (
-            <>
-              <ViewHeaderActionsMenu
-                board={board}
-                activeView={activeView}
-                cards={cards}
-              />
+        && (
+          <>
+            <ViewHeaderActionsMenu
+              board={board}
+              activeView={activeView}
+              cards={cards}
+            />
 
-              {/* New card button */}
+            {/* New card button */}
 
-              <NewCardButton
-                addCard={props.addCard}
-                view={activeView}
-                   // addCardFromTemplate={props.addCardFromTemplate}
-                addCardTemplate={props.addCardTemplate}
-                editCardTemplate={props.editCardTemplate}
-              />
-            </>
-            )}
+            <NewCardButton
+              addCard={props.addCard}
+              view={activeView}
+              // addCardFromTemplate={props.addCardFromTemplate}
+              addCardTemplate={props.addCardTemplate}
+              editCardTemplate={props.editCardTemplate}
+            />
+          </>
+        )}
     </div>
   );
 });

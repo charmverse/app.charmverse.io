@@ -6,7 +6,7 @@ import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/
 import PageDeleteBanner from 'components/[pageId]/DocumentPage/components/PageDeleteBanner';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { Page } from '@prisma/client';
-import React, { useState } from 'react';
+import React, { ReactNode, useState } from 'react';
 import Hotkeys from 'react-hot-keys';
 import { mutate } from 'swr';
 import { injectIntl, IntlShape } from 'react-intl';
@@ -41,8 +41,10 @@ type Props = {
   views: BoardView[]
   groupByProperty?: IPropertyTemplate
   showHeader?: boolean
+  showTitle?: boolean
   dateDisplayProperty?: IPropertyTemplate
-
+  hideViewTabs?: boolean
+  hideBanner?: boolean
   intl: IntlShape
   readonly: boolean
   addCard: (card: Card) => void
@@ -50,6 +52,12 @@ type Props = {
   updateView: (view: BoardView) => void
   addTemplate: (template: Card) => void
   showCard: (cardId?: string) => void
+  // A custom menu component to allow adding new view
+  addViewMenu?: ReactNode
+  onViewTabClick?: (viewId: string) => void
+  disableUpdatingUrl?: boolean
+  maxTabsShown?: number
+  onDeleteView?: (viewId: string) => void
 }
 
 type State = {
@@ -318,7 +326,7 @@ function CenterPanel (props: Props) {
     }
     const allVisibleOptionIds = [...visibleOptionIds, ...unassignedOptionIds];
 
-    // If the empty group positon is not explicitly specified, make it the first visible column
+    // If the empty group position is not explicitly specified, make it the first visible column
     if (!allVisibleOptionIds.includes('') && !hiddenOptionIds.includes('')) {
       allVisibleOptionIds.unshift('');
     }
@@ -344,7 +352,7 @@ function CenterPanel (props: Props) {
         onKeyDown={keydownHandler}
       />
       {!!board.deletedAt && <PageDeleteBanner pageId={board.id} />}
-      {props.showHeader && board.fields.headerImage && (
+      {props.showHeader && !props.hideBanner &&  board.fields.headerImage && (
         <Box className='PageBanner' width='100%' mb={2}>
           <PageBanner
             focalBoard
@@ -356,13 +364,19 @@ function CenterPanel (props: Props) {
       )}
       {props.showHeader && (
         <div className='top-head'>
-          <ViewTitle
+          {props.showTitle && <ViewTitle
             key={board.id + board.title}
             board={board}
             readonly={props.readonly}
             setPage={props.setPage}
-          />
+            />}
           <ViewHeader
+            onDeleteView={props.onDeleteView}
+            maxTabsShown={props.maxTabsShown}
+            disableUpdatingUrl={props.disableUpdatingUrl}
+            onViewTabClick={props.onViewTabClick}
+            addViewMenu={props.addViewMenu}
+            hideViewTabs={props.hideViewTabs}
             board={props.board}
             activeView={props.activeView}
             cards={props.cards}

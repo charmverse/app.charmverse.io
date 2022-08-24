@@ -23,12 +23,12 @@ const CharmEditor = dynamic(() => import('components/common/CharmEditor'), {
 
 
 type Props = {
-    board: Board
-    readonly: boolean
-    setPage: (page: Partial<Page>) => void
+  board: Board
+  readonly: boolean
+  setPage: (page: Partial<Page>) => void
 }
 
-function ViewTitle (props: Props) {
+function ViewTitle(props: Props) {
   const { board } = props;
 
   const [title, setTitle] = useState(board.title);
@@ -60,62 +60,62 @@ function ViewTitle (props: Props) {
     <div className='ViewTitle'>
       <div className='add-buttons add-visible'>
         {!props.readonly && !board.fields.headerImage
-                  && (
-                  <div className='add-buttons'>
-                    <Button
-                      onClick={() => setRandomHeaderImage()}
-                      icon={(
-                        <ImageIcon
-                          fontSize='small'
-                          sx={{ marginRight: 1 }}
-                        />
-)}
-                    >
-                      <FormattedMessage
-                        id='CardDetail.add-cover'
-                        defaultMessage='Add cover'
-                      />
-                    </Button>
-                  </div>
-                  )}
+          && (
+            <div className='add-buttons'>
+              <Button
+                onClick={() => setRandomHeaderImage()}
+                icon={(
+                  <ImageIcon
+                    fontSize='small'
+                    sx={{ marginRight: 1 }}
+                  />
+                )}
+              >
+                <FormattedMessage
+                  id='CardDetail.add-cover'
+                  defaultMessage='Add cover'
+                />
+              </Button>
+            </div>
+          )}
         {!props.readonly && !board.fields.icon
-                    && (
-                    <Button
-                      onClick={() => {
-                        props.setPage({ icon: onAddRandomIcon() });
-                      }}
-                      icon={<EmojiIcon />}
-                    >
-                      <FormattedMessage
-                        id='TableComponent.add-icon'
-                        defaultMessage='Add icon'
-                      />
-                    </Button>
-                    )}
+          && (
+            <Button
+              onClick={() => {
+                props.setPage({ icon: onAddRandomIcon() });
+              }}
+              icon={<EmojiIcon />}
+            >
+              <FormattedMessage
+                id='TableComponent.add-icon'
+                defaultMessage='Add icon'
+              />
+            </Button>
+          )}
         {!props.readonly && board.fields.showDescription
-                    && (
-                    <Button
-                      onClick={onHideDescription}
-                      icon={<HideIcon />}
-                    >
-                      <FormattedMessage
-                        id='ViewTitle.hide-description'
-                        defaultMessage='hide description'
-                      />
-                    </Button>
-                    )}
+          && (
+            <Button
+              onClick={onHideDescription}
+              icon={<HideIcon />}
+            >
+              <FormattedMessage
+                id='ViewTitle.hide-description'
+                defaultMessage='hide description'
+              />
+            </Button>
+          )}
         {!props.readonly && !board.fields.showDescription
-                    && (
-                    <Button
-                      onClick={onShowDescription}
-                      icon={<ShowIcon />}
-                    >
-                      <FormattedMessage
-                        id='ViewTitle.show-description'
-                        defaultMessage='show description'
-                      />
-                    </Button>
-                    )}
+          && (
+            <Button
+              onClick={onShowDescription}
+              icon={<ShowIcon />}
+            >
+              <FormattedMessage
+                id='ViewTitle.show-description'
+                defaultMessage='show description'
+              />
+            </Button>
+          )}
       </div>
 
       <div className='title'>
@@ -134,17 +134,17 @@ function ViewTitle (props: Props) {
       </div>
 
       {board.fields.showDescription
-                && (
-                <div className='description'>
-                  <CharmEditor
-                    disablePageSpecificFeatures
-                    content={board.fields.description}
-                    onContentChange={(content: ICharmEditorOutput) => {
-                      onDescriptionChange(content.doc);
-                    }}
-                  />
-                </div>
-                )}
+        && (
+          <div className='description'>
+            <CharmEditor
+              disablePageSpecificFeatures
+              content={board.fields.description}
+              onContentChange={(content: ICharmEditorOutput) => {
+                onDescriptionChange(content.doc);
+              }}
+            />
+          </div>
+        )}
     </div>
   );
 }

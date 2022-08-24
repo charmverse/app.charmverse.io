@@ -124,7 +124,7 @@ function DraggableTreeNode ({ item, onDropAdjacent, onDropChild, pathPrefix, add
 
   useEffect(() => {
     const focalboardViewId = focalboardViewsRecord[item.id];
-    if (views && focalboardViewId && (item.type === 'board' || item.type === 'inline_board') && !views.some(view => view.id === focalboardViewId)) {
+    if (views && focalboardViewId && (item.type === 'board' || item.type === 'inline_board' || item.type === 'inline_linked_board') && !views.some(view => view.id === focalboardViewId)) {
       const firstView = views[0];
       if (firstView) {
         setFocalboardViewsRecord((_focalboardViewsRecord) => ({ ..._focalboardViewsRecord, [firstView.parentId]: firstView.id }));
@@ -140,7 +140,7 @@ function DraggableTreeNode ({ item, onDropAdjacent, onDropChild, pathPrefix, add
       hasSelectedChildView={hasSelectedChildView}
       ref={mergeRefs([ref, drag, drop, dragPreview, focusListener])}
       label={item.title}
-      href={`${pathPrefix}/${item.path}${(item.type === 'board' || item.type === 'inline_board') && focalboardViewsRecord[item.id] ? `?viewId=${focalboardViewsRecord[item.id]}` : ''}`}
+      href={`${pathPrefix}/${item.path}${(item.type === 'board' || item.type === 'inline_board' || item.type === 'inline_linked_board') && focalboardViewsRecord[item.id] ? `?viewId=${focalboardViewsRecord[item.id]}` : ''}`}
       isActive={isActive}
       isAdjacent={isAdjacentActive}
       isEmptyContent={item.isEmptyContent}
@@ -150,8 +150,9 @@ function DraggableTreeNode ({ item, onDropAdjacent, onDropChild, pathPrefix, add
       {hideChildren
         ? <div>{/* empty div to trick TreeView into showing expand icon */}</div>
         : (
-          (item.type === 'board' || item.type === 'inline_board') ? (
+          (item.type === 'board' || item.type === 'inline_board' || item.type === 'inline_linked_board') ? (
             views.map(view => (
+              !view.fields.inline && (
               <BoardViewTreeItem
                 key={view.id}
                 href={`${pathPrefix}/${item.path}?viewId=${view.id}`}
@@ -159,6 +160,7 @@ function DraggableTreeNode ({ item, onDropAdjacent, onDropChild, pathPrefix, add
                 nodeId={view.id}
                 viewType={view.fields.viewType}
               />
+              )
             ))
           ) : (
             item.children.length > 0

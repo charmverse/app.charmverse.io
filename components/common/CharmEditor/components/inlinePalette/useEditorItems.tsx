@@ -2,7 +2,7 @@ import {
   bulletList, orderedList,
   paragraph
 } from '@bangle.dev/base-components';
-import { EditorState, Fragment, Node, setBlockType, Transaction } from '@bangle.dev/pm';
+import { Command, EditorState, Fragment, Node, setBlockType, Transaction } from '@bangle.dev/pm';
 import { rafCommandExec } from '@bangle.dev/utils';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForwardIos';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
@@ -124,6 +124,7 @@ function createColumnPaletteItem (colCount: number): Omit<PaletteItemType, 'grou
 type PaletteGroup = 'list' | 'media' | 'other' | 'text' | 'database';
 
 const paletteGroupItemsRecord: Record<PaletteGroup, readonly Omit<PaletteItemType, 'group'>[]> = {
+  database: [],
   other: [
     {
       uid: 'price',
@@ -626,35 +627,7 @@ const paletteGroupItemsRecord: Record<PaletteGroup, readonly Omit<PaletteItemTyp
         };
       }
     }
-  ],
-  database: [{
-    uid: 'inlineLinkedDatabase',
-    keywords: ['database', 'board'],
-    title: 'Linked view of database',
-    icon: <DatabaseIcon sx={{ fontSize: 16 }} />,
-    description: 'Embed a view from an existing board',
-    editorExecuteCommand: () => {
-      return (state, dispatch, view) => {
-        // Execute the animation
-        if (view) {
-          rafCommandExec(view, (_state, _dispatch) => {
-            const node = _state.schema.nodes.inlineDatabase.create();
-            if (_dispatch && isAtBeginningOfLine(state)) {
-              _dispatch(_state.tr.replaceSelectionWith(node));
-              return true;
-            }
-            return insertNode(_state, _dispatch, node);
-          });
-        }
-        return replaceSuggestionMarkWith(palettePluginKey, '')(
-          state,
-          dispatch,
-          view
-        );
-
-      };
-    }
-  }]
+  ]
 };
 
 const sortedGroupList: PaletteGroup[] = ['list', 'media', 'other', 'text', 'database'];
@@ -740,44 +713,82 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
   let dynamicDatabaseItems: Omit<PaletteItemType, 'group'>[] = [];
 
   if (space && user) {
-    dynamicDatabaseItems = [{
-      uid: 'inlineDatabase',
-      title: 'Database - inline',
-      icon: <DatabaseIcon sx={{ fontSize: 16 }} />,
-      description: 'Add a new inline database to this page',
-      keywords: ['database', 'board'],
-      editorExecuteCommand: () => {
-        return (state, dispatch, view) => {
-          // Execute the animation
-          if (view) {
-            rafCommandExec(view, (_state, _dispatch) => {
-              // The page must be created before the node can be created
-              addPage({ type: 'inline_board', parentId: currentPageId, spaceId: space.id, createdBy: user.id })
-                .then(({ page, view: boardView }) => {
-                  const node = _state.schema.nodes.inlineDatabase.create({
-                    source: 'board_page',
-                    pageId: page.id,
-                    viewId: boardView?.id,
-                    type: 'embedded'
-                  });
+    dynamicDatabaseItems = [
+      {
+        uid: 'inlineDatabase',
+        title: 'Database - inline',
+        icon: <DatabaseIcon sx={{ fontSize: 16 }} />,
+        description: 'Add a new inline database to this page',
+        keywords: ['database', 'board'],
+        editorExecuteCommand: () => {
+          return (state, dispatch, view) => {
+            // Execute the animation
+            if (view) {
+              rafCommandExec(view, (_state, _dispatch) => {
+                // The page must be created before the node can be created
+                addPage({ type: 'inline_board', parentId: currentPageId, spaceId: space.id, createdBy: user.id })
+                  .then(({ page }) => {
+                    const node = _state.schema.nodes.inlineDatabase.create({
+                      source: 'board_page',
+                      linkedSourceId: page.id,
+                      type: 'embedded'
+                    });
 
-                  if (_dispatch && isAtBeginningOfLine(state)) {
-                    _dispatch(_state.tr.replaceSelectionWith(node));
-                    return true;
-                  }
-                  return insertNode(_state, _dispatch, node);
-                });
-              return true;
-            });
-          }
-          return replaceSuggestionMarkWith(palettePluginKey, '')(
-            state,
-            dispatch,
-            view
-          );
-        };
+                    if (_dispatch && isAtBeginningOfLine(state)) {
+                      _dispatch(_state.tr.replaceSelectionWith(node));
+                      return true;
+                    }
+                    return insertNode(_state, _dispatch, node);
+                  });
+                return true;
+              });
+            }
+            return replaceSuggestionMarkWith(palettePluginKey, '')(
+              state,
+              dispatch,
+              view
+            );
+          };
+        }
+      },
+      {
+        uid: 'inlineLinkedDatabase',
+        keywords: ['database', 'board'],
+        title: 'Linked view of database',
+        icon: <DatabaseIcon sx={{ fontSize: 16 }} />,
+        description: 'Embed a view from an existing board',
+        editorExecuteCommand: () => {
+          return (state, dispatch, view) => {
+            // Execute the animation
+            if (view) {
+              rafCommandExec(view, (_state, _dispatch) => {
+                addPage({ title: 'Linked Database', type: 'inline_linked_board', parentId: currentPageId, spaceId: space.id, createdBy: user.id }, false)
+                  .then(({ page }) => {
+                    const node = _state.schema.nodes.inlineDatabase.create({
+                      source: 'board_page',
+                      linkedSourceId: page.id,
+                      type: 'linked'
+                    });
+
+                    if (_dispatch && isAtBeginningOfLine(state)) {
+                      _dispatch(_state.tr.replaceSelectionWith(node));
+                      return true;
+                    }
+                    return insertNode(_state, _dispatch, node);
+                  });
+                return true;
+              });
+            }
+            return replaceSuggestionMarkWith(palettePluginKey, '')(
+              state,
+              dispatch,
+              view
+            );
+
+          };
+        }
       }
-    }];
+    ];
   }
 
   const paletteItems = useMemo(() => {
