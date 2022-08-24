@@ -37,6 +37,7 @@ type Props = {
   onViewTabClick?: (viewId: string) => void
   disableUpdatingUrl?: boolean
   maxTabsShown?: number
+  onDeleteView?: (viewId: string) => void
 }
 
 const ViewHeader = React.memo((props: Props) => {
@@ -69,6 +70,7 @@ const ViewHeader = React.memo((props: Props) => {
     <div className='ViewHeader'>
       {!props.hideViewTabs && <>
         <ViewTabs
+          onDeleteView={props.onDeleteView}
           onViewTabClick={props.onViewTabClick}
           addViewMenu={props.addViewMenu}
           views={views}

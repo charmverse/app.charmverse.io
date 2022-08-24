@@ -238,6 +238,9 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
             onViewTabClick={(viewId) => {
               setCurrentViewId(viewId);
             }}
+            onDeleteView={(viewId) => {
+              setCurrentViewId(views.filter(view => view.id !== viewId)?.[0]?.id ?? null);
+            }}
             hideBanner
             showHeader
             clientConfig={clientConfig}

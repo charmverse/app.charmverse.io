@@ -37,11 +37,12 @@ interface ViewTabsProps {
   showView: (viewId: string) => void;
   addViewMenu?: ReactNode
   onViewTabClick?: (viewId: string) => void
+  onDeleteView?: (viewId: string) => void
   disableUpdatingUrl?: boolean
   maxTabsShown?: number
 }
 
-function ViewTabs ({ maxTabsShown = 3, onViewTabClick, disableUpdatingUrl, addViewMenu, board, activeView, intl, readonly, showView, views }: ViewTabsProps) {
+function ViewTabs ({ onDeleteView, maxTabsShown = 3, onViewTabClick, disableUpdatingUrl, addViewMenu, board, activeView, intl, readonly, showView, views }: ViewTabsProps) {
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [currentView, setCurrentView] = useState<BoardView | null>(null);
@@ -129,6 +130,8 @@ function ViewTabs ({ maxTabsShown = 3, onViewTabClick, disableUpdatingUrl, addVi
 
     const nextView = views.find((o) => o !== currentView);
     mutator.deleteBlock(currentView, 'delete view');
+    onDeleteView?.(currentView.id)
+    setAnchorEl(null)
     if (nextView) {
       showView(nextView.id);
       setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [board.id]: nextView.id }));

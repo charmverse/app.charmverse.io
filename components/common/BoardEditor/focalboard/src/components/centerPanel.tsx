@@ -57,6 +57,7 @@ type Props = {
   onViewTabClick?: (viewId: string) => void
   disableUpdatingUrl?: boolean
   maxTabsShown?: number
+  onDeleteView?: (viewId: string) => void
 }
 
 type State = {
@@ -370,6 +371,7 @@ function CenterPanel (props: Props) {
             setPage={props.setPage}
             />}
           <ViewHeader
+            onDeleteView={props.onDeleteView}
             maxTabsShown={props.maxTabsShown}
             disableUpdatingUrl={props.disableUpdatingUrl}
             onViewTabClick={props.onViewTabClick}
