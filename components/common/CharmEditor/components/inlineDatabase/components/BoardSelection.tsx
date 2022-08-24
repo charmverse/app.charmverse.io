@@ -1,5 +1,10 @@
-import { Box, Card, Divider, Typography } from '@mui/material';
+import { Box, Collapse, Divider, IconButton, Stack, Typography } from '@mui/material';
+import { useState } from 'react';
+import Button from 'components/common/Button';
+import CloseIcon from '@mui/icons-material/Close';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { Page } from '@prisma/client';
+import styled from '@emotion/styled';
 import PagesList from '../../PageList';
 
 interface Props {
@@ -7,17 +12,61 @@ interface Props {
   onSelect: (boardId: string) => void;
 }
 
+const StyledSidebar = styled(Box)`
+  border-left: 1px solid rgb(var(--center-channel-color-rgb), 0.12);
+  height: 300px;
+  overflow-y: auto;
+  width: 100%;
+  ${({ theme }) => theme.breakpoints.up('md')} {
+    width: 250px;
+  }
+`;
+
 export default function BoardSelection (props: Props) {
+
+  const [sidebarState, setSidebarState] = useState<'select-source' | null>('select-source');
+
+  function openSidebar () {
+    setSidebarState(!sidebarState ? 'select-source' : null);
+  }
+
+  function closeSidebar () {
+    setSidebarState(null);
+  }
+
   return (
-    <Box>
-      <Typography variant='h3'>Embed a database</Typography>
-      <Card raised sx={{ my: 2 }}>
-        <Box px={2} pt={1} pb={0}>
-          <Typography fontWeight='bold'>Select a data source:</Typography>
+    <>
+      <Divider light />
+      <Box display='flex'>
+        <Box flexGrow={1} display='flex' justifyContent='center' alignItems='center'>
+          <Stack alignItems='center' spacing={0}>
+            <HelpOutlineIcon color='secondary' fontSize='large' />
+            <Typography color='secondary'><strong>No data source</strong></Typography>
+            <Typography display='flex' alignItems='center' color='secondary' variant='body2'>
+              <Button
+                color='secondary'
+                component='span'
+                onClick={openSidebar}
+                variant='text'
+                sx={{ fontSize: 'inherit', textDecoration: 'underline' }}
+              >
+                Select a data source
+              </Button>to continue
+            </Typography>
+          </Stack>
         </Box>
-        <Divider light />
-        <PagesList pages={props.pages} onSelectPage={page => props.onSelect(page.id)} />
-      </Card>
-    </Box>
+        <Collapse in={Boolean(sidebarState)} orientation='horizontal'>
+          <StyledSidebar>
+            <Box px={2} pt={1} pb={1} display='flex' justifyContent='space-between' alignItems='center'>
+              <Typography fontWeight='bold'>Select data source</Typography>
+              <IconButton onClick={closeSidebar} size='small'>
+                <CloseIcon fontSize='small' />
+              </IconButton>
+            </Box>
+            <PagesList pages={props.pages} onSelectPage={page => props.onSelect(page.id)} />
+          </StyledSidebar>
+        </Collapse>
+      </Box>
+    </>
   );
 }
