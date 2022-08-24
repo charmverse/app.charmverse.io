@@ -1,5 +1,5 @@
 import { prisma } from 'db';
-import { PageNodeWithPermissions, TargetPageTree, TargetPageTreeWithFlatChildren } from '../interfaces';
+import { PageNodeWithPermissions, PageTreeResolveInput, TargetPageTree, TargetPageTreeWithFlatChildren } from '../interfaces';
 import { mapTargetPageTree, flattenTree } from '../mapPageTree';
 import { PageNotFoundError } from './errors';
 
@@ -12,11 +12,11 @@ import { PageNotFoundError } from './errors';
  * Pass flatten children prop to also receive a flat array of children
  */
 export async function resolvePageTree ({ pageId, flattenChildren }:
-  {pageId: string, flattenChildren?: undefined | false}): Promise<TargetPageTree<PageNodeWithPermissions>>
+  PageTreeResolveInput & {flattenChildren?: undefined | false}): Promise<TargetPageTree<PageNodeWithPermissions>>
 export async function resolvePageTree ({ pageId, flattenChildren }:
-    {pageId: string, flattenChildren: true}): Promise<TargetPageTreeWithFlatChildren<PageNodeWithPermissions>>
-export async function resolvePageTree ({ pageId, flattenChildren = false }:
-  {pageId: string, flattenChildren?: boolean}):
+  PageTreeResolveInput & {flattenChildren: true}): Promise<TargetPageTreeWithFlatChildren<PageNodeWithPermissions>>
+export async function resolvePageTree ({ pageId, flattenChildren = false, includeDeletedPages = false }:
+  PageTreeResolveInput):
   Promise<TargetPageTree<PageNodeWithPermissions> | TargetPageTreeWithFlatChildren<PageNodeWithPermissions>> {
 
   const pageWithSpaceIdOnly = await prisma.page.findUnique({
@@ -35,7 +35,8 @@ export async function resolvePageTree ({ pageId, flattenChildren = false }:
   const pagesInSpace = await prisma.page.findMany({
     where: {
       spaceId: pageWithSpaceIdOnly.spaceId,
-      deletedAt: null
+      // Soft deleted pages have a value for deletedAt. Active pages are null
+      deletedAt: includeDeletedPages ? undefined : null
     },
     select: {
       id: true,
@@ -54,7 +55,8 @@ export async function resolvePageTree ({ pageId, flattenChildren = false }:
 
   const { parents, targetPage } = mapTargetPageTree<PageNodeWithPermissions>({
     items: pagesInSpace,
-    targetPageId: pageId
+    targetPageId: pageId,
+    includeDeletedPages
   });
 
   // Prune the parent references so we have a direct chain

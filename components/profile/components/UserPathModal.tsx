@@ -69,7 +69,7 @@ export default function UserPathModal (props: Props) {
     save(values.path);
   }
 
-  const hostname = typeof window !== 'undefined' ? window.location.origin : '';
+  const hostname = typeof window !== 'undefined' ? `${window.location.origin}/u` : '';
   const pathValue = watch('path');
 
   let statusIcon = null;
