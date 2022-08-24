@@ -16,7 +16,7 @@ type EditorExecuteCommand = (arg: {
 /**
  * @requiredSpacePermission Optional parameter. If this is provided, the palette item should not be available to a user without this space permission.
  */
-export interface PaletteItemType {
+export interface PaletteItemTypeNoGroup {
   uid: string;
   title: string;
   type?: string;
@@ -26,10 +26,13 @@ export interface PaletteItemType {
   disabled?: ((state: EditorState<any>) => boolean) | boolean;
   hidden?: boolean | ((state: EditorState) => boolean);
   editorExecuteCommand: EditorExecuteCommand;
-  group: string;
   skipFiltering?: boolean;
-  _isItemDisabled?: boolean
-  icon?: JSX.Element | null | undefined
+  _isItemDisabled?: boolean;
+  icon?: JSX.Element | null | undefined;
+}
+
+export interface PaletteItemType extends PaletteItemTypeNoGroup {
+  group: string;
 }
 
 export class PaletteItem implements PaletteItemType {

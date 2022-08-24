@@ -37,7 +37,9 @@ import {
 } from './commands';
 import { palettePluginKey } from './config';
 import { replaceSuggestionMarkWith } from './inlinePalette';
-import { PaletteItem, PaletteItemType, PromisedCommand } from './paletteItem';
+import { PaletteItem, PaletteItemTypeNoGroup, PromisedCommand } from './paletteItem';
+import { items as databaseItems } from './items/database';
+import { items as otherItems } from './items/other';
 
 const { convertToParagraph } = paragraph;
 const {
@@ -69,7 +71,7 @@ function createTableHeader (state: EditorState, text: string) {
   ]));
 }
 
-function createColumnPaletteItem (colCount: number): Omit<PaletteItemType, 'group'> {
+function createColumnPaletteItem (colCount: number): PaletteItemTypeNoGroup {
   return {
     uid: `column ${colCount}`,
     title: `${colCount} Columns`,
@@ -123,7 +125,7 @@ function createColumnPaletteItem (colCount: number): Omit<PaletteItemType, 'grou
 
 type PaletteGroup = 'list' | 'media' | 'other' | 'text' | 'database';
 
-const paletteGroupItemsRecord: Record<PaletteGroup, readonly Omit<PaletteItemType, 'group'>[]> = {
+const paletteGroupItemsRecord: Record<PaletteGroup, readonly PaletteItemTypeNoGroup[]> = {
   database: [],
   other: [
     {
@@ -553,7 +555,7 @@ const paletteGroupItemsRecord: Record<PaletteGroup, readonly Omit<PaletteItemTyp
             );
           };
         }
-      } as Omit<PaletteItemType, 'group'>;
+      } as PaletteItemTypeNoGroup;
     })
   ],
   list: [
@@ -639,175 +641,12 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
   const { currentPageId } = usePages();
   const [userSpacePermissions] = useCurrentSpacePermissions();
 
-  const dynamicOtherItems = [
-    {
-      uid: 'insert-board',
-      title: 'Insert board',
-      keywords: ['board'],
-      requiredSpacePermission: 'createPage',
-      icon: <DatabaseIcon sx={{
-        fontSize: 16
-      }}
-      />,
-      description: 'Insert a new board',
-      editorExecuteCommand: (() => {
-        return (async (state, dispatch, view) => {
-          await addNestedPage('board');
-          return replaceSuggestionMarkWith(palettePluginKey, '')(
-            state,
-            dispatch,
-            view
-          );
-        }) as PromisedCommand;
-      })
-    },
-    {
-      uid: 'insert-page',
-      title: 'Insert page',
-      requiredSpacePermission: 'createPage',
-      keywords: ['page'],
-      icon: <DescriptionOutlinedIcon sx={{
-        fontSize: 16
-      }}
-      />,
-      description: 'Insert a new page',
-      editorExecuteCommand: (() => {
-        return (async (state, dispatch, view) => {
-          await addNestedPage();
-          return replaceSuggestionMarkWith(palettePluginKey, '')(
-            state,
-            dispatch,
-            view
-          );
-        }) as PromisedCommand;
-      })
-    },
-    {
-      uid: 'link-to-page',
-      title: 'Link to page',
-      keywords: ['link', 'page'],
-      icon: <DescriptionOutlinedIcon sx={{
-        fontSize: 16
-      }}
-      />,
-      description: 'Link to a new page',
-      editorExecuteCommand: (() => {
-        return (async (state, dispatch, view) => {
-          if (nestedPagePluginKey) {
-            const nestedPagePluginState = nestedPagePluginKey.getState(state);
-            if (nestedPagePluginState) {
-              replaceSuggestionMarkWith(palettePluginKey, state.schema.text(' ', state.schema.marks[nestedPageSuggestMarkName].create({})), true)(
-                state,
-                dispatch,
-                view
-              );
-            }
-            return false;
-          }
-          return false;
-        }) as PromisedCommand;
-      })
-    }
-  ] as Omit<PaletteItemType, 'group'>[];
-
-  let dynamicDatabaseItems: Omit<PaletteItemType, 'group'>[] = [];
-
-  if (space && user) {
-    dynamicDatabaseItems = [
-      {
-        uid: 'inlineDatabase',
-        title: 'Database - inline',
-        icon: <DatabaseIcon sx={{ fontSize: 16 }} />,
-        description: 'Add a new inline database to this page',
-        keywords: ['database', 'board'],
-        editorExecuteCommand: () => {
-          return (state, dispatch, view) => {
-            // Execute the animation
-            if (view) {
-              rafCommandExec(view, (_state, _dispatch) => {
-                // The page must be created before the node can be created
-                addPage({ type: 'inline_board', parentId: currentPageId, spaceId: space.id, createdBy: user.id })
-                  .then(({ page }) => {
-                    const node = _state.schema.nodes.inlineDatabase.create({
-                      source: 'board_page',
-                      linkedSourceId: page.id,
-                      type: 'embedded'
-                    });
-
-                    if (_dispatch && isAtBeginningOfLine(state)) {
-                      _dispatch(_state.tr.replaceSelectionWith(node));
-                      return true;
-                    }
-                    return insertNode(_state, _dispatch, node);
-                  });
-                return true;
-              });
-            }
-            return replaceSuggestionMarkWith(palettePluginKey, '')(
-              state,
-              dispatch,
-              view
-            );
-          };
-        }
-      },
-      {
-        uid: 'inlineLinkedDatabase',
-        keywords: ['database', 'board'],
-        title: 'Linked view of database',
-        icon: <DatabaseIcon sx={{ fontSize: 16 }} />,
-        description: 'Embed a view from an existing board',
-        editorExecuteCommand: () => {
-          return (state, dispatch, view) => {
-            // Execute the animation
-            if (view) {
-              rafCommandExec(view, (_state, _dispatch) => {
-                addPage({ title: 'Linked Database', type: 'inline_linked_board', parentId: currentPageId, spaceId: space.id, createdBy: user.id }, false)
-                  .then(({ page }) => {
-                    const node = _state.schema.nodes.inlineDatabase.create({
-                      source: 'board_page',
-                      linkedSourceId: page.id,
-                      type: 'linked'
-                    });
-
-                    if (_dispatch && isAtBeginningOfLine(state)) {
-                      _dispatch(_state.tr.replaceSelectionWith(node));
-                      return true;
-                    }
-                    return insertNode(_state, _dispatch, node);
-                  });
-                return true;
-              });
-            }
-            return replaceSuggestionMarkWith(palettePluginKey, '')(
-              state,
-              dispatch,
-              view
-            );
-
-          };
-        }
-      }
-    ];
-  }
-
   const paletteItems = useMemo(() => {
-
-    const allowedDynamicOtherItems = dynamicOtherItems.filter(paletteItem => {
-      return !paletteItem.requiredSpacePermission
-      || (paletteItem.requiredSpacePermission && userSpacePermissions?.[paletteItem.requiredSpacePermission]);
-    });
 
     const groupConfig = {
       ...paletteGroupItemsRecord,
-      database: [
-        ...paletteGroupItemsRecord.database,
-        ...dynamicDatabaseItems
-      ],
-      other: [
-        ...paletteGroupItemsRecord.other,
-        ...allowedDynamicOtherItems
-      ]
+      database: (user && space) ? databaseItems({ addNestedPage, currentPageId, userId: user.id, space }) : [],
+      other: otherItems({ addNestedPage, nestedPagePluginKey, userSpacePermissions })
     };
 
     const itemGroups = sortedGroupList.map(group => {
@@ -817,7 +656,7 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
       }));
     });
     return itemGroups.flat();
-  }, [addNestedPage, currentPageId, dynamicOtherItems.length, dynamicDatabaseItems.length]);
+  }, [addNestedPage, currentPageId, user, space]);
 
   return paletteItems;
 }
