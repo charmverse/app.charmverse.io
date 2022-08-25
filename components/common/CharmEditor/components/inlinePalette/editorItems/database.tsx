@@ -34,12 +34,16 @@ export function items ({ addNestedPage, currentPageId, userId, space }: ItemsPro
           if (view) {
             rafCommandExec(view, (_state, _dispatch) => {
               // The page must be created before the node can be created
-              addPage({ type: 'inline_board', parentId: currentPageId, spaceId: space.id, createdBy: userId })
+              addPage({
+                type: 'inline_board',
+                parentId: currentPageId,
+                spaceId: space.id,
+                createdBy: userId
+              })
                 .then(({ page }) => {
                   const node = _state.schema.nodes.inlineDatabase.create({
                     source: 'board_page',
-                    linkedSourceId: page.id,
-                    type: 'embedded'
+                    linkedSourceId: page.id
                   });
 
                   if (_dispatch && isAtBeginningOfLine(state)) {
@@ -100,8 +104,7 @@ export function items ({ addNestedPage, currentPageId, userId, space }: ItemsPro
                 .then(({ page }) => {
                   const node = _state.schema.nodes.inlineDatabase.create({
                     source: 'board_page',
-                    linkedSourceId: page.id,
-                    type: 'linked'
+                    linkedSourceId: page.id
                   });
 
                   if (_dispatch && isAtBeginningOfLine(state)) {

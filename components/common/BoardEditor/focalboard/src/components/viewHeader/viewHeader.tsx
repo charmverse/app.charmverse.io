@@ -22,7 +22,7 @@ import ViewHeaderSortMenu from './viewHeaderSortMenu';
 
 type Props = {
   board: Board
-  activeView: BoardView
+  activeView?: BoardView
   views: BoardView[]
   cards: Card[]
   groupByProperty?: IPropertyTemplate
@@ -38,9 +38,10 @@ type Props = {
   maxTabsShown?: number
   onDeleteView?: (viewId: string) => void
   showActionsOnHover?: boolean
+  showView: (viewId: string) => void
 }
 
-const ViewHeader = React.memo(({ maxTabsShown = 3, ...props }: Props) => {
+const ViewHeader = React.memo(({ maxTabsShown = 3, showView, ...props }: Props) => {
   const router = useRouter();
   const [showFilter, setShowFilter] = useState(false);
 
@@ -48,43 +49,33 @@ const ViewHeader = React.memo(({ maxTabsShown = 3, ...props }: Props) => {
 
   const { board, activeView, groupByProperty, cards, dateDisplayProperty } = props;
 
-  const withGroupBy = activeView.fields.viewType === 'board' || activeView.fields.viewType === 'table';
-  const withDisplayBy = activeView.fields.viewType === 'calendar';
-  const withSortBy = activeView.fields.viewType !== 'calendar';
+  const withGroupBy = activeView?.fields.viewType === 'board' || activeView?.fields.viewType === 'table';
+  const withDisplayBy = activeView?.fields.viewType === 'calendar';
+  const withSortBy = activeView?.fields.viewType !== 'calendar';
 
-  const hasFilter = activeView.fields.filter && activeView.fields.filter.filters?.length > 0;
-
-  const showView = useCallback((viewId) => {
-    if (!props.disableUpdatingUrl) {
-      router.push({
-        pathname: router.pathname,
-        query: {
-          ...router.query,
-          viewId: viewId || ''
-        }
-      }, undefined, { shallow: true });
-    }
-  }, [router.query, history]);
+  const hasFilter = activeView?.fields.filter && activeView?.fields.filter.filters?.length > 0;
 
   return (
     <div className={`ViewHeader ${props.showActionsOnHover ? 'hide-actions' : ''}`}>
-      <ViewTabs
-        onDeleteView={props.onDeleteView}
-        onViewTabClick={props.onViewTabClick}
-        addViewMenu={props.addViewMenu}
-        views={views}
-        readonly={props.readonly}
-        showView={showView}
-        board={board}
-        activeView={activeView}
-        disableUpdatingUrl={props.disableUpdatingUrl}
-        maxTabsShown={maxTabsShown}
-      />
+      {activeView && (
+        <ViewTabs
+          onDeleteView={props.onDeleteView}
+          onViewTabClick={props.onViewTabClick}
+          addViewMenu={props.addViewMenu}
+          views={views}
+          readonly={props.readonly}
+          showView={showView}
+          board={board}
+          activeView={activeView}
+          disableUpdatingUrl={props.disableUpdatingUrl}
+          maxTabsShown={maxTabsShown}
+        />
+      )}
 
       {/* add a view */}
 
       {!props.readonly && views.length <= maxTabsShown && (
-        props.addViewMenu ?? <AddViewMenu
+        <AddViewMenu
           board={board}
           activeView={activeView}
           views={views}
@@ -96,7 +87,7 @@ const ViewHeader = React.memo(({ maxTabsShown = 3, ...props }: Props) => {
 
       <div className='view-actions'>
 
-      {!props.readonly
+      {!props.readonly && activeView
         && (
           <>
 
@@ -173,7 +164,7 @@ const ViewHeader = React.memo(({ maxTabsShown = 3, ...props }: Props) => {
 
       {/* Options menu */}
 
-      {!props.readonly
+      {!props.readonly && activeView
         && (
           <>
             <ViewHeaderActionsMenu

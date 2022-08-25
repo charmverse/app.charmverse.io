@@ -573,46 +573,46 @@ function CharmEditor (
       <InlinePalette nestedPagePluginKey={nestedPagePluginKey} disableNestedPage={disablePageSpecificFeatures} />
       {children}
       {!disablePageSpecificFeatures && (
-      <>
-        <Slide
-          direction='left'
-          in={pageActionDisplay === 'comments'}
-          style={{
-            transformOrigin: 'left top'
-          }}
-          easing={{
-            enter: 'ease-in',
-            exit: 'ease-out'
-          }}
-          timeout={250}
-        >
-          <PageActionListBox
-            id='page-thread-list-box'
+        <>
+          <Slide
+            direction='left'
+            in={pageActionDisplay === 'comments'}
+            style={{
+              transformOrigin: 'left top'
+            }}
+            easing={{
+              enter: 'ease-in',
+              exit: 'ease-out'
+            }}
+            timeout={250}
           >
-            <CommentsSidebar />
-          </PageActionListBox>
-        </Slide>
-        <Slide
-          direction='left'
-          in={pageActionDisplay === 'votes'}
-          style={{
-            transformOrigin: 'left top'
-          }}
-          easing={{
-            enter: 'ease-in',
-            exit: 'ease-out'
-          }}
-          timeout={250}
-        >
-          <PageActionListBox
-            id='page-vote-list-box'
+            <PageActionListBox
+              id='page-thread-list-box'
+            >
+              <CommentsSidebar />
+            </PageActionListBox>
+          </Slide>
+          <Slide
+            direction='left'
+            in={pageActionDisplay === 'votes'}
+            style={{
+              transformOrigin: 'left top'
+            }}
+            easing={{
+              enter: 'ease-in',
+              exit: 'ease-out'
+            }}
+            timeout={250}
           >
-            <PageInlineVotesList />
-          </PageActionListBox>
-        </Slide>
-        <InlineCommentThread pluginKey={inlineCommentPluginKey} />
-        {enableVoting && <InlineVoteList pluginKey={inlineVotePluginKey} />}
-      </>
+            <PageActionListBox
+              id='page-vote-list-box'
+            >
+              <PageInlineVotesList />
+            </PageActionListBox>
+          </Slide>
+          <InlineCommentThread pluginKey={inlineCommentPluginKey} />
+          {enableVoting && <InlineVoteList pluginKey={inlineVotePluginKey} />}
+        </>
       )}
       {!readOnly && <DevTools />}
     </StyledReactBangleEditor>

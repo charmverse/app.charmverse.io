@@ -147,15 +147,15 @@ export default function BoardPage ({ page, setPage, readOnly }: Props) {
             views={boardViews}
           />
           {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
-          <RootPortal>
-            <CardDialog
-              key={shownCardId}
-              cardId={shownCardId}
-              onClose={() => showCard(undefined)}
-              showCard={(cardId) => showCard(cardId)}
-              readonly={Boolean(readOnly)}
-            />
-          </RootPortal>
+            <RootPortal>
+              <CardDialog
+                key={shownCardId}
+                cardId={shownCardId}
+                onClose={() => showCard(undefined)}
+                showCard={(cardId) => showCard(cardId)}
+                readonly={Boolean(readOnly)}
+              />
+            </RootPortal>
           )}
         </div>
         {/** include the root portal for focalboard's popup */}

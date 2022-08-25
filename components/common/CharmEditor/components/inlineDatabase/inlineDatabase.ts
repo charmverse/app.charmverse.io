@@ -1,7 +1,5 @@
-import { BaseRawNodeSpec, RawPlugins } from '@bangle.dev/core';
-import { parentHasDirectParentOfType } from '@bangle.dev/pm-commands';
-import { DOMOutputSpec, keymap } from '@bangle.dev/pm';
-import { filter, findParentNodeOfType } from '@bangle.dev/utils';
+import { BaseRawNodeSpec } from '@bangle.dev/core';
+import { DOMOutputSpec } from '@bangle.dev/pm';
 
 export function spec () {
   return [
@@ -20,9 +18,6 @@ function databaseSpec (): BaseRawNodeSpec {
         },
         linkedSourceId: {
           default: null
-        },
-        type: {
-          default: 'linked'
         }
       },
       atom: true,

@@ -268,7 +268,7 @@ function ViewTabs ({ onDeleteView, maxTabsShown, onViewTabClick, disableUpdating
           })}
         </Box>
         <Divider />
-        {addViewMenu ?? <AddViewMenu
+        <AddViewMenu
           sx={{
             width: '100%'
           }}
@@ -277,7 +277,7 @@ function ViewTabs ({ onDeleteView, maxTabsShown, onViewTabClick, disableUpdating
           activeView={activeView}
           showView={showView}
           views={views}
-        />}
+        />
       </Menu>
 
       {/* Form to rename views */}
