@@ -32,7 +32,6 @@ jobs:
       - name: Add playwright dependencies
         run: sudo apt-get install gstreamer1.0-libav
 
-      - name: Checkout
       - uses: actions/checkout@v2
 
       - name: Install dependencies and build app
