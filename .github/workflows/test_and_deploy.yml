@@ -51,7 +51,7 @@ jobs:
       # - name: Run browser tests
       #   run: npm run test:browser:ci
       - name: Add playwright dependencies
-        run: sudo apt-get install gstreamer1.0-libav && npx playwright install
+        run: sudo npx playwright install-deps && npx playwright install
 
       - name: Run browser e2e tests
         run: npx playwright test
