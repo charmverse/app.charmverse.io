@@ -97,7 +97,7 @@ function CenterPanel (props: Props) {
   const _dateDisplayProperty = useAppSelector(getCurrentViewDisplayBy);
   const boards = useAppSelector(getSortedBoards);
 
-  const isEmbedded = props.pageType === 'inline_board' || props.pageType === 'inline_linked_board';
+  const isEmbedded = !!props.embeddedBoardPath;
 
   // for 'linked' boards, each view has its own board which we use to determine the cards to show
   const activeBoardId = props.activeView?.fields.linkedSourceId || props.board.id;
@@ -483,10 +483,10 @@ function CenterPanel (props: Props) {
         </Box>
       )}
       <div className='top-head'>
-        {props.pageType === 'board' && (
+        {(activeBoard && (props.pageType === 'board' || (!isEmbedded && props.pageType === 'inline_board'))) && (
           <ViewTitle
-            key={board.id + board.title}
-            board={board}
+            key={activeBoard.id + activeBoard.title}
+            board={activeBoard}
             readonly={props.readonly}
             setPage={props.setPage}
           />
@@ -512,15 +512,15 @@ function CenterPanel (props: Props) {
           readonly={props.readonly}
           embeddedBoardPath={props.embeddedBoardPath}
         />
-        {props.pageType === 'inline_board' && (
+        {activeBoard && isEmbedded && props.pageType === 'inline_board' && (
           <InlineViewTitle
-            key={board.id + board.title}
-            board={board}
+            key={activeBoard.id + activeBoard.title}
+            board={activeBoard}
             readonly={props.readonly}
             setPage={props.setPage}
           />
         )}
-        {activeView && props.pageType === 'inline_linked_board' && (
+        {activeBoard && props.pageType === 'inline_linked_board' && (
           <Button
             color='secondary'
             startIcon={<CallMadeIcon />}
@@ -530,7 +530,7 @@ function CenterPanel (props: Props) {
             href={`/${space?.domain}/${activePage?.path}`}
             sx={{ fontSize: 22, fontWeight: 700, py: 0 }}
           >
-            {board.title || 'Untitled'}
+            {activeBoard.title || 'Untitled'}
           </Button>
         )}
       </div>
