@@ -8,7 +8,7 @@ import { BoardView, ISortOption } from '../../blocks/boardView';
 import { Constants } from '../../constants';
 import { Card } from '../../blocks/card';
 import mutator from '../../mutator';
-import Button from '../../widgets/buttons/button';
+import Button from 'components/common/Button';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
 import SortDownIcon from '../../widgets/icons/sortDown';
@@ -56,7 +56,7 @@ const ViewHeaderSortMenu = React.memo((props: Props) => {
 
   return (
     <MenuWrapper>
-      <Button active={hasSort}>
+      <Button color='secondary' variant='text' size='small' sx={{ minWidth: 0 }} active={hasSort}>
         <FormattedMessage
           id='ViewHeader.sort'
           defaultMessage='Sort'

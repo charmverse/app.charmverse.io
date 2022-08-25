@@ -43,7 +43,6 @@ type Props = {
   showHeader?: boolean
   showTitle?: boolean
   dateDisplayProperty?: IPropertyTemplate
-  hideViewTabs?: boolean
   hideBanner?: boolean
   intl: IntlShape
   readonly: boolean
@@ -376,7 +375,6 @@ function CenterPanel (props: Props) {
             disableUpdatingUrl={props.disableUpdatingUrl}
             onViewTabClick={props.onViewTabClick}
             addViewMenu={props.addViewMenu}
-            hideViewTabs={props.hideViewTabs}
             board={props.board}
             activeView={props.activeView}
             cards={props.cards}

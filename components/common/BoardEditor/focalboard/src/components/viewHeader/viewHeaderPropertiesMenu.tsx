@@ -18,7 +18,7 @@ import PhoneIcon from '@mui/icons-material/Phone';
 import ArrowDropDownCircleIcon from '@mui/icons-material/ArrowDropDownCircle';
 import SubjectIcon from '@mui/icons-material/Subject';
 import LinkIcon from '@mui/icons-material/Link';
-import Button from '../../widgets/buttons/button';
+import Button from 'components/common/Button';
 import mutator from '../../mutator';
 import { BoardView } from '../../blocks/boardView';
 import { IPropertyTemplate, PropertyType } from '../../blocks/board';
@@ -76,7 +76,7 @@ const ViewHeaderPropertiesMenu = React.memo((props: Props) => {
 
   return (
     <>
-      <Button onClick={showPropertiesMenu}>
+      <Button color='secondary' size='small' variant='text' onClick={showPropertiesMenu}>
         <FormattedMessage
           id='ViewHeader.properties'
           defaultMessage='Properties'

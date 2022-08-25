@@ -6,7 +6,7 @@ import { FormattedMessage } from 'react-intl';
 import { Board, IPropertyTemplate } from '../../blocks/board';
 import { BoardView } from '../../blocks/boardView';
 import { Card } from '../../blocks/card';
-import Button from '../../widgets/buttons/button';
+import Button from 'components/common/Button';
 import AddViewMenu from '../addViewMenu';
 import ViewTabs from './viewTabs';
 
@@ -32,7 +32,6 @@ type Props = {
   editCardTemplate: (cardTemplateId: string) => void
   readonly: boolean
   dateDisplayProperty?: IPropertyTemplate
-  hideViewTabs?: boolean
   addViewMenu?: ReactNode
   onViewTabClick?: (viewId: string) => void
   disableUpdatingUrl?: boolean
@@ -40,7 +39,7 @@ type Props = {
   onDeleteView?: (viewId: string) => void
 }
 
-const ViewHeader = React.memo((props: Props) => {
+const ViewHeader = React.memo(({ maxTabsShown = 3, ...props }: Props) => {
   const router = useRouter();
   const [showFilter, setShowFilter] = useState(false);
 
@@ -68,31 +67,29 @@ const ViewHeader = React.memo((props: Props) => {
 
   return (
     <div className='ViewHeader'>
-      {!props.hideViewTabs && <>
-        <ViewTabs
-          onDeleteView={props.onDeleteView}
-          onViewTabClick={props.onViewTabClick}
-          addViewMenu={props.addViewMenu}
-          views={views}
-          readonly={props.readonly}
-          showView={showView}
+      <ViewTabs
+        onDeleteView={props.onDeleteView}
+        onViewTabClick={props.onViewTabClick}
+        addViewMenu={props.addViewMenu}
+        views={views}
+        readonly={props.readonly}
+        showView={showView}
+        board={board}
+        activeView={activeView}
+        disableUpdatingUrl={props.disableUpdatingUrl}
+        maxTabsShown={maxTabsShown}
+      />
+
+      {/* add a view */}
+
+      {!props.readonly && views.length <= maxTabsShown && (
+        props.addViewMenu ?? <AddViewMenu
           board={board}
           activeView={activeView}
-          disableUpdatingUrl={props.disableUpdatingUrl}
-          maxTabsShown={props.maxTabsShown}
+          views={views}
+          showView={showView}
         />
-
-        {/* add a view */}
-
-        {!props.readonly && views.length <= (props.maxTabsShown ?? 3) && (
-          props.addViewMenu ?? <AddViewMenu
-            board={board}
-            activeView={activeView}
-            views={views}
-            showView={showView}
-          />
-        )}
-      </>}
+      )}
 
       <div className='octo-spacer' />
 
@@ -133,6 +130,10 @@ const ViewHeader = React.memo((props: Props) => {
 
             <ModalWrapper>
               <Button
+                color='secondary'
+                variant='text'
+                size='small'
+                sx={{ minWidth: 0 }}
                 active={hasFilter}
                 onClick={() => setShowFilter(true)}
               >

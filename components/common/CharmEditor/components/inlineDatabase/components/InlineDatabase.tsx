@@ -23,7 +23,7 @@ import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import { Add } from '@mui/icons-material';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
-import BoardSelection from './BoardSelection';
+import BoardSelection from './SourceSelection';
 
 // Lazy load focalboard entrypoint (ignoring the redux state stuff for now)
 const CenterPanel = dynamic(() => import('components/common/BoardEditor/focalboard/src/components/centerPanel'), {
@@ -138,7 +138,7 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
     setShownCardId(cardId);
   }
 
-  async function selectDatabase (boardId: string) {
+  async function selectDatabase ({ boardId }: { boardId: string }) {
     const view = createBoardView();
     view.fields.viewType = 'board';
     view.parentId = linkedSourceId;
@@ -182,16 +182,13 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
   if (!readOnly) {
     if (isSelectingSource) {
       return (
-        <>
-          {/* {viewTabs} */}
-          <BoardSelection
-            showGoBackButton={views.length !== 0}
-            onClickBack={() => setIsSelectingSource(false)}
-            pages={boardPages}
-            onCreate={createDatabase}
-            onSelect={selectDatabase}
-          />
-        </>
+        <BoardSelection
+          showGoBackButton={views.length !== 0}
+          onClickBack={() => setIsSelectingSource(false)}
+          pages={boardPages}
+          onCreate={createDatabase}
+          onSelect={selectDatabase}
+        />
       );
     }
   }
@@ -235,7 +232,6 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
             {pages[board.id]?.title || 'Untitled'}
           </Button>
           <CenterPanel
-            maxTabsShown={1}
             disableUpdatingUrl
             addViewMenu={type === 'linked' ? (
               <Button

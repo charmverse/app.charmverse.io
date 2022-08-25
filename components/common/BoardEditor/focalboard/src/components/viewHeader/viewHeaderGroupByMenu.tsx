@@ -7,7 +7,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { IPropertyTemplate } from '../../blocks/board';
 import { BoardView } from '../../blocks/boardView';
 import mutator from '../../mutator';
-import Button from '../../widgets/buttons/button';
+import Button from 'components/common/Button';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
 import CheckIcon from '../../widgets/icons/check';
@@ -26,7 +26,7 @@ const ViewHeaderGroupByMenu = React.memo((props: Props) => {
 
   return (
     <MenuWrapper className={hasPropertiesToGroupBy ? '' : 'disabled'}>
-      <Button>
+      <Button size='small' variant='text' color='secondary'>
         <FormattedMessage
           id='ViewHeader.group-by'
           defaultMessage='Group by: {property}'

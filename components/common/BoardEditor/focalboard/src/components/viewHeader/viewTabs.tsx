@@ -27,6 +27,16 @@ import mutator from '../../mutator';
 import { iconForViewType } from '../viewMenu';
 import { BoardView, createBoardView } from '../../blocks/boardView';
 import { IDType, Utils } from '../../utils';
+import styled from '@emotion/styled';
+
+const StyledButton = styled(Button)`
+  padding: ${({ theme }) => theme.spacing(0.5, 1)};
+
+  .Icon {
+    width: 20px;
+    height: 20px;
+  }
+`
 
 interface ViewTabsProps {
   intl: IntlShape;
@@ -39,10 +49,10 @@ interface ViewTabsProps {
   onViewTabClick?: (viewId: string) => void
   onDeleteView?: (viewId: string) => void
   disableUpdatingUrl?: boolean
-  maxTabsShown?: number
+  maxTabsShown: number
 }
 
-function ViewTabs ({ onDeleteView, maxTabsShown = 3, onViewTabClick, disableUpdatingUrl, addViewMenu, board, activeView, intl, readonly, showView, views }: ViewTabsProps) {
+function ViewTabs ({ onDeleteView, maxTabsShown, onViewTabClick, disableUpdatingUrl, addViewMenu, board, activeView, intl, readonly, showView, views }: ViewTabsProps) {
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [currentView, setCurrentView] = useState<BoardView | null>(null);
@@ -161,14 +171,14 @@ function ViewTabs ({ onDeleteView, maxTabsShown = 3, onViewTabClick, disableUpda
 
   return (
     <>
-      <Tabs textColor='primary' indicatorColor='secondary' value={currentViewId} sx={{ minHeight: 40 }}>
+      <Tabs textColor='primary' indicatorColor='secondary' value={currentViewId} sx={{ minHeight: 0, mb: '-4px' }}>
         {shownViews.map(view => (
           <Tab
             component='div'
             disableRipple
             key={view.id}
             label={(
-              <Button
+              <StyledButton
                 startIcon={iconForViewType(view.fields.viewType)}
                 onClick={handleViewClick}
                 variant='text'
@@ -176,30 +186,31 @@ function ViewTabs ({ onDeleteView, maxTabsShown = 3, onViewTabClick, disableUpda
                 color={currentViewId === view.id ? 'textPrimary' : 'secondary'}
                 id={view.id}
                 href={!disableUpdatingUrl ? (currentViewId === view.id ? null : getViewUrl(view.id)) : ''}
-                sx={{ px: 1.5 }}
               >
                 {view.title}
-              </Button>
+              </StyledButton>
           )}
-            sx={{ p: 0 }}
+            sx={{ p: 0, mb: 0.5 }}
             value={view.id}
           />
         ))}
         {restViews.length !== 0 && (
-        <Tab
-          component='div'
-          disableRipple
-          label={(
-            <Button
-              variant='text'
-              size='small'
-              color='secondary'
-              {...showViewsTriggerState}
-            >
-              {restViews.length} more...
-            </Button>
-          )}
-        />)}
+          <Tab
+            component='div'
+            disableRipple
+            sx={{ p: 0, mb: 0.5 }}
+            label={(
+              <Button
+                variant='text'
+                size='small'
+                color='secondary'
+                {...showViewsTriggerState}
+              >
+                {restViews.length} more...
+              </Button>
+            )}
+          />
+        )}
       </Tabs>
       <Menu
         anchorEl={anchorEl}

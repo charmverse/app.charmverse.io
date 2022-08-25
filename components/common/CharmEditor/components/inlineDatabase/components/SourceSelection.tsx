@@ -12,7 +12,7 @@ import PagesList from '../../PageList';
 interface Props {
   onCreate?: () => void;
   pages: Page[];
-  onSelect: (boardId: string) => void;
+  onSelect: (selected: { boardId: string }) => void;
   onClickBack: () => void
   showGoBackButton: boolean
 }
@@ -34,7 +34,7 @@ const SidebarContent = styled.div`
   border-bottom: 1px solid rgb(var(--center-channel-color-rgb), 0.12);
 `;
 
-export default function BoardSelection (props: Props) {
+export default function SourceSelection (props: Props) {
 
   const [sidebarState, setSidebarState] = useState<'select-source' | null>('select-source');
 
@@ -83,7 +83,7 @@ export default function BoardSelection (props: Props) {
               </IconButton>
             </Box>
             <SidebarContent>
-              <PagesList pages={props.pages} onSelectPage={page => props.onSelect(page.id)} />
+              <PagesList pages={props.pages} onSelectPage={page => props.onSelect({ boardId: page.id })} />
             </SidebarContent>
             <MenuItem onClick={props.onCreate}>
               <ListItemIcon><AddIcon color='secondary' /></ListItemIcon>

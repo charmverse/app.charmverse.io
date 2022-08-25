@@ -201,19 +201,19 @@ function AddViewMenu (props: AddViewProps) {
         </StyledIconButton>
       )}
       <Menu {...bindMenu(popupState)}>
-        <MenuItem onClick={handleAddViewBoard}>
+        <MenuItem dense onClick={handleAddViewBoard}>
           <ListItemIcon><BoardIcon /></ListItemIcon>
           <ListItemText>{boardText}</ListItemText>
         </MenuItem>
-        <MenuItem onClick={handleAddViewTable}>
+        <MenuItem dense onClick={handleAddViewTable}>
           <ListItemIcon><TableIcon /></ListItemIcon>
           <ListItemText>{tableText}</ListItemText>
         </MenuItem>
-        <MenuItem onClick={handleAddViewGallery}>
+        <MenuItem dense onClick={handleAddViewGallery}>
           <ListItemIcon><GalleryIcon /></ListItemIcon>
           <ListItemText>{galleryText}</ListItemText>
         </MenuItem>
-        <MenuItem onClick={handleAddViewCalendar}>
+        <MenuItem dense onClick={handleAddViewCalendar}>
           <ListItemIcon><CalendarIcon /></ListItemIcon>
           <ListItemText>Calendar</ListItemText>
         </MenuItem>

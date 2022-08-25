@@ -46,10 +46,10 @@ const ViewHeaderActionsMenu = React.memo((props: Props) => {
   const intl = useIntl();
 
   return (
-    <Box ml={0} mr={2}>
+    <Box ml={0} mr={1}>
       <ModalWrapper>
         <MenuWrapper label={intl.formatMessage({ id: 'ViewHeader.view-menu', defaultMessage: 'View menu' })}>
-          <IconButton icon={<OptionsIcon />} />
+          <IconButton icon={<OptionsIcon />} style={{ width: '32px' }} />
           <Menu>
             <Menu.Text
               id='exportCsv'
