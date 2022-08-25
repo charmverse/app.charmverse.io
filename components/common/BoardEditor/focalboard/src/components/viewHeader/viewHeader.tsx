@@ -37,6 +37,7 @@ type Props = {
   disableUpdatingUrl?: boolean
   maxTabsShown?: number
   onDeleteView?: (viewId: string) => void
+  showActionsOnHover?: boolean
 }
 
 const ViewHeader = React.memo(({ maxTabsShown = 3, ...props }: Props) => {
@@ -66,7 +67,7 @@ const ViewHeader = React.memo(({ maxTabsShown = 3, ...props }: Props) => {
   }, [router.query, history]);
 
   return (
-    <div className='ViewHeader'>
+    <div className={`ViewHeader ${props.showActionsOnHover ? 'hide-actions' : ''}`}>
       <ViewTabs
         onDeleteView={props.onDeleteView}
         onViewTabClick={props.onViewTabClick}
@@ -92,6 +93,8 @@ const ViewHeader = React.memo(({ maxTabsShown = 3, ...props }: Props) => {
       )}
 
       <div className='octo-spacer' />
+
+      <div className='view-actions'>
 
       {!props.readonly
         && (
@@ -130,11 +133,10 @@ const ViewHeader = React.memo(({ maxTabsShown = 3, ...props }: Props) => {
 
             <ModalWrapper>
               <Button
-                color='secondary'
+                color={hasFilter ? 'primary' : 'secondary'}
                 variant='text'
                 size='small'
                 sx={{ minWidth: 0 }}
-                active={hasFilter}
                 onClick={() => setShowFilter(true)}
               >
                 <FormattedMessage
@@ -191,6 +193,7 @@ const ViewHeader = React.memo(({ maxTabsShown = 3, ...props }: Props) => {
             />
           </>
         )}
+        </div>
     </div>
   );
 });

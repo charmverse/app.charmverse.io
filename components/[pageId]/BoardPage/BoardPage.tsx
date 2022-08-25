@@ -137,11 +137,10 @@ export default function BoardPage ({ page, setPage, readOnly }: Props) {
             clientConfig={clientConfig}
             readonly={Boolean(readOnly)}
             board={board}
+            pageType='board'
             setPage={setPage}
             cards={accessibleCards}
             showCard={showCard}
-            showHeader
-            showTitle
             activeView={activeView}
             groupByProperty={property}
             dateDisplayProperty={displayProperty}

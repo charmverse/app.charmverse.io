@@ -35,7 +35,6 @@ function AddViewMenu (props: AddViewProps) {
 
   const intl = props.intl;
   const showView = props.showView;
-  console.log('showLabel', props)
 
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-view-menu' });
 

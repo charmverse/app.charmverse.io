@@ -1,5 +1,7 @@
-import { BaseRawNodeSpec } from '@bangle.dev/core';
-import { DOMOutputSpec } from '@bangle.dev/pm';
+import { BaseRawNodeSpec, RawPlugins } from '@bangle.dev/core';
+import { parentHasDirectParentOfType } from '@bangle.dev/pm-commands';
+import { DOMOutputSpec, keymap } from '@bangle.dev/pm';
+import { filter, findParentNodeOfType } from '@bangle.dev/utils';
 
 export function spec () {
   return [

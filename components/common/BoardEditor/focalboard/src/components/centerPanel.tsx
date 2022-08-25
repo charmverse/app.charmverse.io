@@ -4,9 +4,12 @@
 import { Box } from '@mui/system';
 import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
 import PageDeleteBanner from 'components/[pageId]/DocumentPage/components/PageDeleteBanner';
+import CallMadeIcon from '@mui/icons-material/CallMade';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { Page } from '@prisma/client';
+import { Page, PageType } from '@prisma/client';
 import React, { ReactNode, useState } from 'react';
+import Button from 'components/common/Button';
+import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import Hotkeys from 'react-hot-keys';
 import { mutate } from 'swr';
 import { injectIntl, IntlShape } from 'react-intl';
@@ -19,6 +22,7 @@ import { BoardView } from '../blocks/boardView';
 import { Card, createCard } from '../blocks/card';
 import { CardFilter } from '../cardFilter';
 import { ClientConfig } from '../config/clientConfig';
+import Editable from '../widgets/editable';
 import mutator from '../mutator';
 import { addCard, addTemplate } from '../store/cards';
 import { updateView } from '../store/views';
@@ -28,7 +32,7 @@ import Gallery from './gallery/gallery';
 import Kanban from './kanban/kanban';
 import Table from './table/table';
 import ViewHeader from './viewHeader/viewHeader';
-import ViewTitle from './viewTitle';
+import ViewTitle, { InlineViewTitle } from './viewTitle';
 import dynamic from 'next/dynamic';
 
 const CalendarFullView = dynamic(() => import('./calendar/fullCalendar'), { ssr: false });
@@ -36,12 +40,12 @@ const CalendarFullView = dynamic(() => import('./calendar/fullCalendar'), { ssr:
 type Props = {
   clientConfig?: ClientConfig
   board: Board
+  pagePath?: string
+  pageType: PageType
   cards: Card[]
   activeView: BoardView
   views: BoardView[]
   groupByProperty?: IPropertyTemplate
-  showHeader?: boolean
-  showTitle?: boolean
   dateDisplayProperty?: IPropertyTemplate
   hideBanner?: boolean
   intl: IntlShape
@@ -56,6 +60,7 @@ type Props = {
   onViewTabClick?: (viewId: string) => void
   disableUpdatingUrl?: boolean
   maxTabsShown?: number
+  showInlineTitle?: boolean
   onDeleteView?: (viewId: string) => void
 }
 
@@ -338,9 +343,11 @@ function CenterPanel (props: Props) {
   const { groupByProperty, activeView, board, views, cards } = props;
   const { visible: visibleGroups, hidden: hiddenGroups } = getVisibleAndHiddenGroups(cards, activeView.fields.visibleOptionIds, activeView.fields.hiddenOptionIds, groupByProperty);
 
+  const isEmbedded = props.pageType === 'inline_board' || props.pageType === 'inline_linked_board';
+
   return (
     <div
-      className='BoardComponent'
+      className={`BoardComponent ${isEmbedded ? 'embedded-board' : ''}`}
       ref={backgroundRef}
       onClick={(e) => {
         backgroundClicked(e);
@@ -351,7 +358,7 @@ function CenterPanel (props: Props) {
         onKeyDown={keydownHandler}
       />
       {!!board.deletedAt && <PageDeleteBanner pageId={board.id} />}
-      {props.showHeader && !props.hideBanner &&  board.fields.headerImage && (
+      {!props.hideBanner &&  board.fields.headerImage && (
         <Box className='PageBanner' width='100%' mb={2}>
           <PageBanner
             focalBoard
@@ -361,34 +368,55 @@ function CenterPanel (props: Props) {
           />
         </Box>
       )}
-      {props.showHeader && (
-        <div className='top-head'>
-          {props.showTitle && <ViewTitle
+      <div className='top-head'>
+        {props.pageType === 'board' && (
+          <ViewTitle
             key={board.id + board.title}
             board={board}
             readonly={props.readonly}
             setPage={props.setPage}
-            />}
-          <ViewHeader
-            onDeleteView={props.onDeleteView}
-            maxTabsShown={props.maxTabsShown}
-            disableUpdatingUrl={props.disableUpdatingUrl}
-            onViewTabClick={props.onViewTabClick}
-            addViewMenu={props.addViewMenu}
-            board={props.board}
-            activeView={props.activeView}
-            cards={props.cards}
-            views={props.views}
-            groupByProperty={props.groupByProperty}
-            dateDisplayProperty={props.dateDisplayProperty}
-            addCard={() => addCard('', true)}
-            // addCardFromTemplate={addCardFromTemplate}
-            addCardTemplate={addCardTemplate}
-            editCardTemplate={editCardTemplate}
-            readonly={props.readonly}
           />
-        </div>
-      )}
+        )}
+        <ViewHeader
+          onDeleteView={props.onDeleteView}
+          maxTabsShown={props.maxTabsShown}
+          disableUpdatingUrl={props.disableUpdatingUrl}
+          onViewTabClick={props.onViewTabClick}
+          addViewMenu={props.addViewMenu}
+          board={props.board}
+          activeView={props.activeView}
+          cards={props.cards}
+          views={props.views}
+          groupByProperty={props.groupByProperty}
+          dateDisplayProperty={props.dateDisplayProperty}
+          addCard={() => addCard('', true)}
+          // addCardFromTemplate={addCardFromTemplate}
+          addCardTemplate={addCardTemplate}
+          editCardTemplate={editCardTemplate}
+          readonly={props.readonly}
+        />
+        {props.pageType === 'inline_board' && (
+          <InlineViewTitle
+            key={board.id + board.title}
+            board={board}
+            readonly={props.readonly}
+            setPage={props.setPage}
+          />
+        )}
+        {props.pageType === 'inline_linked_board' && (
+          <Button
+            color='secondary'
+            startIcon={<CallMadeIcon />}
+            variant='text'
+            size='large'
+            // TODO: Respect shared page
+            href={`/${space?.domain}/${props.pagePath}`}
+            sx={{ fontSize: 22, fontWeight: 700, py: 0 }}
+          >
+            {board.title || 'Untitled'}
+          </Button>
+        )}
+      </div>
 
       <div className='container-container'>
         {activeView.fields.viewType === 'board'

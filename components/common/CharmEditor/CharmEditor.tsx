@@ -43,6 +43,7 @@ import LayoutColumn from './components/columnLayout/Column';
 import LayoutRow from './components/columnLayout/Row';
 import { CryptoPrice } from './components/CryptoPrice';
 import InlineDatabase from './components/inlineDatabase/components/InlineDatabase';
+import * as inlineDatabase from './components/inlineDatabase';
 import * as disclosure from './components/disclosure';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
 import * as floatingMenu from './components/floatingMenu';

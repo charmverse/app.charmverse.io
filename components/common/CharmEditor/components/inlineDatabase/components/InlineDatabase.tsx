@@ -2,6 +2,7 @@
 import { NodeViewProps } from '@bangle.dev/core';
 import styled from '@emotion/styled';
 import { Box, IconButton } from '@mui/material';
+import { Page } from '@prisma/client';
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
@@ -11,18 +12,17 @@ import { getClientConfig } from 'components/common/BoardEditor/focalboard/src/st
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { getCurrentViewDisplayBy, getCurrentViewGroupBy, getSortedViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
-import Button from 'components/common/Button';
+import debouncePromise from 'lib/utilities/debouncePromise';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import { createBoardView } from 'lib/focalboard/boardView';
-import log from 'lib/log';
 import { addPage } from 'lib/pages';
 import { isTruthy } from 'lib/utilities/types';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import { Add } from '@mui/icons-material';
-import PageIcon from 'components/common/PageLayout/components/PageIcon';
+import charmClient from 'charmClient';
 import BoardSelection from './SourceSelection';
 
 // Lazy load focalboard entrypoint (ignoring the redux state stuff for now)
@@ -116,7 +116,7 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
   const clientConfig = useAppSelector(getClientConfig);
   const [space] = useCurrentSpace();
   const { user } = useUser();
-  const { currentPageId, pages, getPagePermissions } = usePages();
+  const { currentPageId, pages, setPages, getPagePermissions } = usePages();
 
   const [shownCardId, setShownCardId] = useState<string | undefined>('');
   const boardPages = Object.values(pages).filter(p => p?.type === 'board').filter(isTruthy);
@@ -151,6 +151,19 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
     setIsSelectingSource(false);
     setCurrentViewId(view.id);
   }
+
+  const debouncedPageUpdate = debouncePromise(async (updates: Partial<Page>) => {
+    const pageId = board?.id;
+    if (!pageId) {
+      return;
+    }
+    const updatedPage = await charmClient.updatePage({ id: pageId, ...updates });
+    setPages((_pages) => ({
+      ..._pages,
+      [pageId]: updatedPage
+    }));
+    return updatedPage;
+  }, 500);
 
   useEffect(() => {
     updateAttrs(databaseView);
@@ -222,15 +235,6 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
           }
         }}
         >
-          <Button
-            color='secondary'
-            startIcon={<PageIcon isEditorEmpty={false} pageType='board' icon={board ? pages[board.id]?.icon : null} />}
-            variant='text'
-            // TODO: Respect shared page
-            href={space && pages[board.id] ? `/${space?.domain}/${pages[board.id]?.path ?? ''}` : ''}
-          >
-            {pages[board.id]?.title || 'Untitled'}
-          </Button>
           <CenterPanel
             disableUpdatingUrl
             addViewMenu={type === 'linked' ? (
@@ -251,15 +255,15 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
               setCurrentViewId(views.filter(view => view.id !== viewId)?.[0]?.id ?? null);
             }}
             hideBanner
-            showHeader
             clientConfig={clientConfig}
             readonly={readOnly}
             board={board}
-            setPage={(p) => {
-              log.warn('Ignoring update page properties of inline database', p);
-            }}
+            pageType={type === 'linked' ? 'inline_linked_board' : 'inline_board'}
+            pagePath={pages[board.id]?.path}
+            setPage={debouncedPageUpdate}
             cards={accessibleCards}
             showCard={showCard}
+            showInlineTitle={true}
             activeView={currentView}
             groupByProperty={property}
             dateDisplayProperty={displayProperty}
