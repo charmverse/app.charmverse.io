@@ -17,6 +17,7 @@
     "migrate:staging": "npx dotenv -e .env.staging -- prisma migrate deploy",
     "server:dev": "next dev",
     "debug": "NODE_OPTIONS='--inspect' next",
+    "debug:playwright": "dotenv -e .env.test.local -- npx playwright test __e2e__/public-page.spec.ts --headed --timeout=0",
     "server:prod": "node --require dd-trace/init node_modules/.bin/next start",
     "server:prod:win": "node --require dd-trace/init node_modules/next/dist/bin/next start",
     "server:staging": "npx react-env --path .env.staging -- node --require dd-trace/init node_modules/.bin/next start",

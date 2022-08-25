@@ -139,6 +139,7 @@ export default function ShareToWeb ({ pageId, pagePermissions, refreshPermission
           shareLink && (
           <Box p={1}>
             <StyledInput
+              data-test='share-link'
               fullWidth
               disabled
               value={shareLink}
