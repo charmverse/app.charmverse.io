@@ -56,7 +56,7 @@ const ViewHeaderSortMenu = React.memo((props: Props) => {
 
   return (
     <MenuWrapper>
-      <Button color='secondary' variant='text' size='small' sx={{ minWidth: 0 }} active={hasSort}>
+      <Button color={hasSort ? 'primary' : 'secondary'} variant='text' size='small' sx={{ minWidth: 0 }}>
         <FormattedMessage
           id='ViewHeader.sort'
           defaultMessage='Sort'

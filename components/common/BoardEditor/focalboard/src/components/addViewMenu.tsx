@@ -29,6 +29,7 @@ type AddViewProps = {
   showLabel?: boolean,
   showView: (viewId: string) => void,
   sx?: SxProps
+  onClick?: () => void
 }
 
 function AddViewMenu (props: AddViewProps) {
@@ -177,21 +178,22 @@ function AddViewMenu (props: AddViewProps) {
     );
   }, [props.board, props.activeView, props.intl, showView]);
 
+  const triggers = props.onClick ? { onClick: props.onClick } : bindTrigger(popupState);
+
   return (
     <>
       {props.showLabel ? (
         <Button
-          {...bindTrigger(popupState)}
+          {...triggers}
           color='secondary'
           size='small'
           startIcon={<Add />}
           variant='text'
-          sx={{ ...(props.sx ?? {}) }}
         >
           Add view
         </Button>
       ) : (
-        <IconButton {...bindTrigger(popupState)} color='secondary' size='small'>
+        <IconButton {...triggers} color='secondary' size='small'>
           <Add fontSize='small' />
         </IconButton>
       )}

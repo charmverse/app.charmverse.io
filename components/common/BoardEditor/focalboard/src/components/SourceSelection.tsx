@@ -51,9 +51,7 @@ export default function SourceSelection (props: Props) {
     setSidebarState(null);
   }
 
-  useEffect(() => {
-    setSidebarState(props.sidebarState || null);
-  }, [props.sidebarState])
+  console.log('sidebarState', sidebarState);
 
   return (
     <>

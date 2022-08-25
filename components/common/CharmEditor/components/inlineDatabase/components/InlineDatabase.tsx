@@ -6,7 +6,6 @@ import { Page } from '@prisma/client';
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
-import { getViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { getClientConfig } from 'components/common/BoardEditor/focalboard/src/store/clientConfig';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { getCurrentViewDisplayBy, getCurrentViewGroupBy, getSortedViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
@@ -26,6 +25,10 @@ const StylesContainer = styled.div<{ containerWidth?: number }>`
 
   .BoardComponent {
     overflow: visible;
+  }
+
+  .top-head {
+    padding: 0;
   }
 
   .container-container {
@@ -86,16 +89,15 @@ interface DatabaseViewProps extends NodeViewProps {
 interface DatabaseView {
   // Not using linkedPageId as the source could be other things
   // source field would be used to figure out what type of source it actually is
-  linkedSourceId: string;
+  pageId: string;
   source: 'board_page';
 }
 
-export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverride, node, updateAttrs }: DatabaseViewProps) {
-  const databaseView = node.attrs as DatabaseView;
-  const { linkedSourceId } = databaseView;
+export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverride, node }: DatabaseViewProps) {
+  const pageId = node.attrs.pageId as string;
   const allViews = useAppSelector(getSortedViews);
 
-  const views = allViews.filter(view => view.parentId === linkedSourceId);
+  const views = allViews.filter(view => view.parentId === pageId);
   // Make the first view active view
   // Keep track of which view is currently visible
   const [currentViewId, setCurrentViewId] = useState<string | null>(views[0]?.id || null);
@@ -109,27 +111,16 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
   const [shownCardId, setShownCardId] = useState<string | undefined>('');
 
   const boards = useAppSelector(getSortedBoards);
-  const board = boards.find(b => b.id === linkedSourceId);
-
-  const cards = useAppSelector(getViewCardsSortedFilteredAndGrouped({
-    boardId: board?.id || '',
-    viewId: currentViewId || ''
-  }));
-
-  const accessibleCards = cards.filter(card => pages[card.id]);
+  const board = boards.find(b => b.id === pageId);
 
   // TODO: Handle for other sources in future like workspace users
-  const currentPagePermissions = getPagePermissions(linkedSourceId || '');
+  const currentPagePermissions = getPagePermissions(pageId || '');
 
   function showCard (cardId?: string) {
     setShownCardId(cardId);
   }
 
   const debouncedPageUpdate = debouncePromise(async (updates: Partial<Page>) => {
-    const pageId = board?.id;
-    if (!pageId) {
-      return;
-    }
     const updatedPage = await charmClient.updatePage({ id: pageId, ...updates });
     setPages((_pages) => ({
       ..._pages,
@@ -157,43 +148,27 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
   return (
     <>
       <StylesContainer className='focalboard-body' containerWidth={containerWidth}>
-        <Box sx={{
-          '.top-head': {
-            padding: 0
-          },
-          '.MuiTypography-root': {
-            textDecoration: 'none'
-          },
-          '.MuiTypography-root:hover': {
-            textDecoration: 'none'
-          }
-        }}
-        >
-          <CenterPanel
-            disableUpdatingUrl
-            onViewTabClick={(viewId) => {
-              setCurrentViewId(viewId);
-            }}
-            onDeleteView={(viewId) => {
-              setCurrentViewId(views.filter(view => view.id !== viewId)?.[0]?.id ?? null);
-            }}
-            hideBanner
-            clientConfig={clientConfig}
-            readonly={readOnly}
-            board={board}
-            pageType={pages[board.id]?.type === 'inline_linked_board' ? 'inline_linked_board' : 'inline_board'}
-            pagePath={pages[board.id]?.path}
-            setPage={debouncedPageUpdate}
-            cards={accessibleCards}
-            showCard={showCard}
-            showInlineTitle={true}
-            activeView={currentView}
-            groupByProperty={property}
-            dateDisplayProperty={displayProperty}
-            views={views}
-            maxTabsShown={2}
-          />
-        </Box>
+        <CenterPanel
+          disableUpdatingUrl
+          onViewTabClick={(viewId) => {
+            setCurrentViewId(viewId);
+          }}
+          onDeleteView={(viewId) => {
+            setCurrentViewId(views.filter(view => view.id !== viewId)?.[0]?.id ?? null);
+          }}
+          hideBanner
+          clientConfig={clientConfig}
+          readonly={readOnly}
+          board={board}
+          pageType={pages[pageId]?.type === 'inline_linked_board' ? 'inline_linked_board' : 'inline_board'}
+          embeddedBoardPath={pages[pageId]?.path}
+          setPage={debouncedPageUpdate}
+          showCard={showCard}
+          showInlineTitle={true}
+          activeView={currentView}
+          views={views}
+          maxTabsShown={2}
+        />
       </StylesContainer>
       {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
         <RootPortal>

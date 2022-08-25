@@ -42,8 +42,7 @@ export function items ({ addNestedPage, currentPageId, userId, space }: ItemsPro
               })
                 .then(({ page }) => {
                   const node = _state.schema.nodes.inlineDatabase.create({
-                    source: 'board_page',
-                    linkedSourceId: page.id
+                    pageId: page.id
                   });
 
                   if (_dispatch && isAtBeginningOfLine(state)) {
@@ -94,7 +93,6 @@ export function items ({ addNestedPage, currentPageId, userId, space }: ItemsPro
           if (view) {
             rafCommandExec(view, (_state, _dispatch) => {
               addPage({
-                title: 'Linked Database',
                 type: 'inline_linked_board',
                 parentId: currentPageId,
                 spaceId: space.id,
@@ -103,11 +101,11 @@ export function items ({ addNestedPage, currentPageId, userId, space }: ItemsPro
               })
                 .then(({ page }) => {
                   const node = _state.schema.nodes.inlineDatabase.create({
-                    source: 'board_page',
-                    linkedSourceId: page.id
+                    pageId: page.id
                   });
 
                   if (_dispatch && isAtBeginningOfLine(state)) {
+                    _state.tr.scrollIntoView();
                     _dispatch(_state.tr.replaceSelectionWith(node));
                     return true;
                   }
