@@ -22,6 +22,7 @@ interface ItemsProps {
 }
 
 export function items ({ addNestedPage, currentPageId, userId, space }: ItemsProps): PaletteItemTypeNoGroup[] {
+
   return [
     {
       uid: 'database-inline',
