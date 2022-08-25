@@ -28,6 +28,12 @@ export function insertNode (state: EditorState, dispatch: ((tr: Transaction<any>
   return true;
 }
 
+export function isAtBeginningOfLine (state: EditorState) {
+  // @ts-ignore types package is missing $cursor property as of 1.2.8
+  const parentOffset = state.selection.$cursor.parentOffset;
+  return parentOffset === 0;
+}
+
 export const safeRequestAnimationFrame = typeof window !== 'undefined' && window.requestAnimationFrame
   ? window.requestAnimationFrame
   : function (callback: ((time: number) => void)) {

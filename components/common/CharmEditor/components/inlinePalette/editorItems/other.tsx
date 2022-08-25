@@ -2,10 +2,14 @@
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import { PluginKey } from 'prosemirror-state';
 import type { SpacePermissionFlags } from 'lib/permissions/spaces';
-import { NestedPagePluginState, nestedPageSuggestMarkName } from '../../nestedPage';
-import { palettePluginKey } from '../config';
-import { replaceSuggestionMarkWith } from '../inlinePalette';
+import { rafCommandExec } from '@bangle.dev/utils';
+import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
+import InsertChartIcon from '@mui/icons-material/InsertChart';
 import { PaletteItemTypeNoGroup, PromisedCommand } from '../paletteItem';
+import { replaceSuggestionMarkWith } from '../inlinePalette';
+import { palettePluginKey } from '../config';
+import { NestedPagePluginState, nestedPageSuggestMarkName } from '../../nestedPage';
+import { insertNode, isAtBeginningOfLine } from '../../../utils';
 
 interface ItemsProps {
   addNestedPage: () => Promise<void>;
@@ -16,6 +20,60 @@ interface ItemsProps {
 export function items ({ addNestedPage, nestedPagePluginKey, userSpacePermissions }: ItemsProps): PaletteItemTypeNoGroup[] {
 
   const dynamicOtherItems = [
+    {
+      uid: 'price',
+      title: 'Crypto price',
+      icon: <InsertChartIcon sx={{ fontSize: 16 }} />,
+      description: 'Display a crypto price',
+      editorExecuteCommand: () => {
+        return (state, dispatch, view) => {
+          if (view) {
+            // Execute the animation
+            rafCommandExec(view!, (_state, _dispatch) => {
+
+              const node = _state.schema.nodes.cryptoPrice.create();
+
+              if (_dispatch && isAtBeginningOfLine(_state)) {
+                _dispatch(_state.tr.replaceSelectionWith(node));
+                return true;
+              }
+              return insertNode(_state, _dispatch, node);
+            });
+          }
+          return replaceSuggestionMarkWith(palettePluginKey, '')(
+            state,
+            dispatch,
+            view
+          );
+
+        };
+      }
+    },
+    {
+      uid: 'horizontal_rule',
+      title: 'Horizontal Rule',
+      icon: <HorizontalRuleIcon sx={{ fontSize: 16 }} />,
+      description: 'Display horizontal rule',
+      editorExecuteCommand: () => {
+        return (state, dispatch, view) => {
+          // Execute the animation
+          rafCommandExec(view!, (_state, _dispatch) => {
+            const node = _state.schema.nodes.horizontalRule.create();
+            if (_dispatch && isAtBeginningOfLine(state)) {
+              _dispatch(_state.tr.replaceSelectionWith(node));
+              return true;
+            }
+            return insertNode(_state, _dispatch, node);
+          });
+          return replaceSuggestionMarkWith(palettePluginKey, '')(
+            state,
+            dispatch,
+            view
+          );
+
+        };
+      }
+    },
     {
       uid: 'insert-page',
       title: 'Insert page',
