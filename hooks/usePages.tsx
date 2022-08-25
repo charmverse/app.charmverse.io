@@ -10,7 +10,6 @@ import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffe
 import useSWR from 'swr';
 import { isTruthy } from 'lib/utilities/types';
 import useRefState from 'hooks/useRefState';
-import { useIntl } from 'react-intl';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { untitledPage } from 'seedData';
 import { Block } from 'lib/focalboard/block';
@@ -57,13 +56,12 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   const [pages, pagesRef, setPages] = useRefState<PagesContext['pages']>({});
   const [currentPageId, setCurrentPageId] = useState<string>('');
   const router = useRouter();
-  const [user] = useUser();
+  const { user } = useUser();
 
   // retrieve space for public pages
   const [spaces] = useSpaces();
   const publicPageSpace = router.route === '/share/[...pageId]' ? spaces[0] : null;
   const space = spaceFromUrl || publicPageSpace;
-  const intl = useIntl();
 
   const { data, mutate } = useSWR(() => space ? `pages/${space?.id}` : null, () => {
 
@@ -149,7 +147,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
       if (board) {
         mutator.deleteBlock(
           board,
-          intl.formatMessage({ id: 'Sidebar.delete-board', defaultMessage: 'Delete board' }),
+          'Delete board',
           async () => {
             // success
           },

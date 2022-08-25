@@ -167,7 +167,7 @@ interface SidebarProps {
 
 export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const router = useRouter();
-  const [user] = useUser();
+  const { user } = useUser();
   const [space] = useCurrentSpace();
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const [isScrolled, setIsScrolled] = useState(false);

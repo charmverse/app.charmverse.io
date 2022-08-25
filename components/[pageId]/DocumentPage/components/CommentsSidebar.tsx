@@ -68,7 +68,7 @@ function getCommentFromThreads (threads: (ThreadWithCommentsAndAuthors | undefin
 export default function CommentsSidebar ({ sx, inline, ...props }: BoxProps & {inline?: boolean}) {
 
   const { threads } = useThreads();
-  const [user] = useUser();
+  const { user } = useUser();
 
   const allThreads = Object.values(threads);
   const unResolvedThreads = allThreads.filter(thread => thread && !thread.resolved) as ThreadWithCommentsAndAuthors[];

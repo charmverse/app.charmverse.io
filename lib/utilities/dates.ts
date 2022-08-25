@@ -79,3 +79,10 @@ export function toMonthDate (date: DateInput): string {
 
   return parsedDate.toFormat('MMM d');
 }
+
+export function showDateWithMonthAndYear (dateInput: Date | string, showDate?: boolean) {
+  const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+  return `${date.toLocaleString('default', {
+    month: 'long'
+  })}${showDate ? ` ${date.getDate()},` : ''} ${date.getFullYear()}`;
+}

@@ -14,6 +14,7 @@ import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import { ISystemError } from 'lib/utilities/errors';
+import { SupportedChainId } from 'lib/blockchain/provider/alchemy';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -75,7 +76,7 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
     const newContractAddress = watch(({ contractAddress, chainId }, { value, name }) => {
 
       if ((name === 'contractAddress' || name === 'chainId') && isValidChainAddress(contractAddress as string)) {
-        loadToken({ chainId: chainId as number, contractAddress: contractAddress as string });
+        loadToken({ chainId: chainId as SupportedChainId, contractAddress: contractAddress as string });
       }
       // Remove the current token as the contract address is being modified
       else if (name === 'contractAddress' && !isValidChainAddress(contractAddress as string)) {

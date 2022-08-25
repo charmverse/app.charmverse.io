@@ -106,10 +106,6 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
         fontSize: '2rem',
         fontWeight: 700
       },
-      h2: {
-        fontSize: '1.05rem',
-        fontWeight: 500
-      },
       subtitle1: {
         fontSize: '0.85rem',
         fontWeight: 600
@@ -270,13 +266,6 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
           html: {
             // this makes the text look lighter
             MozOsxFontSmoothing: 'none'
-          }
-        }
-      },
-      MuiListItemButton: {
-        styleOverrides: {
-          root: {
-            padding: '8px'
           }
         }
       },

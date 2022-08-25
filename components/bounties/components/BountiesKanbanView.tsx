@@ -70,6 +70,8 @@ export default function BountiesKanbanView ({ bounties, refreshBounty }: Omit<Pr
 
   return (
     <div className='Kanban'>
+      {/* include ViewHeader to include the horizontal line */}
+      <div className='ViewHeader' />
       <div className='octo-board-header'>
         {bountyStatuses.map(bountyStatus => (
           <Box className='octo-board-header-cell' key={bountyStatus}>

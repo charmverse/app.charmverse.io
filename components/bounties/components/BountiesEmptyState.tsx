@@ -3,7 +3,7 @@ import { Typography } from '@mui/material';
 export default function BountiesEmptyState () {
   return (
     <div>
-      <Typography variant='h6'>
+      <Typography variant='h6' gutterBottom>
         Getting started with bounties
       </Typography>
 

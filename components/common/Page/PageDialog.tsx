@@ -38,7 +38,9 @@ export default function PageDialog (props: Props) {
   const { setCurrentPageId, setPages, getPagePermissions } = usePages();
   const pagePermission = page ? getPagePermissions(page.id) : null;
   const { showMessage } = useSnackbar();
-  const isSharedPage = router.route.startsWith('/share');
+  // extract domain from shared pages: /share/<domain>/<page_path>
+  const domain = router.query.domain || /^\/share\/(.*)\//.exec(router.asPath)?.[1];
+  const fullPageUrl = router.route.startsWith('/share') ? `/share/${domain}/${page?.path}` : `/${domain}/${page?.path}`;
 
   // keep track if charmeditor is mounted. There is a bug that it calls the update method on closing the modal, but content is empty
   useEffect(() => {
@@ -92,65 +94,64 @@ export default function PageDialog (props: Props) {
       {popupState.isOpen && (
         <Dialog
           hideCloseButton
-          toolsMenu={!hideToolsMenu && !readOnly
-              && (
-                <List dense>
-                  {onClickDelete && (
-                  <ListItemButton
-                    disabled={!pagePermission?.delete}
-                    onClick={async () => {
-                      onClickDelete();
-                      onClose();
-                    }}
-                  >
-                    <DeleteIcon
-                      sx={{
-                        mr: 1
-                      }}
-                      fontSize='small'
-                    />
-                    <ListItemText primary='Delete' />
-                  </ListItemButton>
-                  )}
-                  <ListItemButton onClick={() => {
-                    Utils.copyTextToClipboard(window.location.href);
-                    showMessage('Copied card link to clipboard', 'success');
+          toolsMenu={!hideToolsMenu && !readOnly && (
+            <List dense>
+              {onClickDelete && (
+              <ListItemButton
+                disabled={!pagePermission?.delete}
+                onClick={async () => {
+                  onClickDelete();
+                  onClose();
+                }}
+              >
+                <DeleteIcon
+                  sx={{
+                    mr: 1
                   }}
-                  >
-                    <InsertLinkIcon
-                      sx={{
-                        mr: 1
-                      }}
-                      fontSize='small'
-                    />
-                    <ListItemText primary='Copy link' />
-                  </ListItemButton>
-                  {bounty && onMarkCompleted && (
-                  <ListItemButton disabled={bounty.status === 'complete'} onClick={() => onMarkCompleted(bounty.id)}>
-                    <CheckCircleIcon
-                      sx={{
-                        mr: 1
-                      }}
-                      fontSize='small'
-                    />
-                    <ListItemText primary='Mark complete' />
-                  </ListItemButton>
-                  )}
-                </List>
+                  fontSize='small'
+                />
+                <ListItemText primary='Delete' />
+              </ListItemButton>
               )}
-          toolbar={!isSharedPage && (
-          <Box display='flex' justifyContent='space-between'>
-            <Button
-              size='small'
-              color='secondary'
-              href={`/${router.query.domain}/${page?.path}`}
-              variant='text'
-              startIcon={<OpenInFullIcon fontSize='small' />}
-            >
-              Open as Page
-            </Button>
-            {toolbar}
-          </Box>
+              <ListItemButton onClick={() => {
+                Utils.copyTextToClipboard(window.location.href);
+                showMessage('Copied card link to clipboard', 'success');
+              }}
+              >
+                <InsertLinkIcon
+                  sx={{
+                    mr: 1
+                  }}
+                  fontSize='small'
+                />
+                <ListItemText primary='Copy link' />
+              </ListItemButton>
+              {bounty && onMarkCompleted && (
+                <ListItemButton disabled={bounty.status === 'complete' || (bounty.status !== 'inProgress' && bounty.status !== 'open')} onClick={() => onMarkCompleted(bounty.id)}>
+                  <CheckCircleIcon
+                    sx={{
+                      mr: 1
+                    }}
+                    fontSize='small'
+                  />
+                  <ListItemText primary='Mark complete' />
+                </ListItemButton>
+              )}
+            </List>
+          )}
+          toolbar={(
+            <Box display='flex' justifyContent='space-between'>
+              <Button
+                size='small'
+                color='secondary'
+                href={fullPageUrl}
+                variant='text'
+                startIcon={<OpenInFullIcon fontSize='small' />}
+              >
+                Open as Page
+              </Button>
+              {toolbar}
+            </Box>
           )}
           onClose={onClose}
         >

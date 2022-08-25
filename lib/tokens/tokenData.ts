@@ -1,9 +1,11 @@
 import * as http from 'adapters/http';
 import { PaymentMethod } from '@prisma/client';
 import { TokenLogoPaths, CryptoCurrency, CryptoCurrencyList, getChainById, IChainDetails } from 'connectors';
+import { getAlchemyBaseUrl } from 'lib/blockchain/provider/alchemy';
+import { SupportedChainId } from '../blockchain/provider/alchemy';
 
 export interface ITokenMetadataRequest {
-  chainId: number,
+  chainId: SupportedChainId,
   contractAddress: string
 }
 
@@ -26,29 +28,12 @@ export function getTokenMetaData ({ chainId, contractAddress }: ITokenMetadataRe
       reject(new Error('Please provide a valid chainId and contractAddress'));
     }
 
-    const apiKey = process.env.ALCHEMY_API_KEY;
-
-    const alchemyApis: Record<number, string> = {
-      1: 'eth-mainnet',
-      4: 'eth-rinkeby',
-      5: 'eth-goerli',
-      137: 'polygon-mainnet',
-      80001: 'polygon-mumbai',
-      42161: 'arb-mainnet'
-    };
-
-    const apiSubdomain = alchemyApis[chainId];
-
-    if (!apiSubdomain) {
-      reject(new Error('Chain not supported'));
-      return;
+    let baseUrl = '';
+    try {
+      baseUrl = getAlchemyBaseUrl(chainId);
     }
-
-    const baseUrl = `https://${apiSubdomain}.g.alchemy.com/v2/${apiKey}`;
-
-    if (!apiKey) {
-      reject('Alchemy API key is missing when requesting token data');
-      return;
+    catch (e: unknown) {
+      reject(e);
     }
 
     http.POST(baseUrl, {

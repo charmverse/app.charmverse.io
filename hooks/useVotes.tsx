@@ -31,7 +31,7 @@ const VotesContext = createContext<Readonly<IContext>>({
 export function VotesProvider ({ children }: { children: ReactNode }) {
   const { currentPageId } = usePages();
   const [votes, setVotes] = useState<IContext['votes']>({});
-  const [user] = useUser();
+  const { user } = useUser();
 
   const cardId = typeof window !== 'undefined' ? (new URLSearchParams(window.location.href)).get('cardId') : null;
 

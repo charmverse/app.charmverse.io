@@ -88,8 +88,7 @@ describe('POST /api/bounties/pool - Return breakdown of how many people can appl
 
     const bounty = await createBounty({
       spaceId: nonAdminUserSpace.id,
-      createdBy: nonAdminUser.id,
-      title: 'Example'
+      createdBy: nonAdminUser.id
     });
 
     const role = await generateRole({
@@ -147,8 +146,7 @@ describe('POST /api/bounties/pool - Return breakdown of how many people can appl
 
     const bounty = await createBounty({
       spaceId: nonAdminUserSpace.id,
-      createdBy: extraUser.id,
-      title: 'Example'
+      createdBy: extraUser.id
     });
 
     const role = await generateRole({

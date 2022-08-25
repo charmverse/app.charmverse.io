@@ -58,7 +58,7 @@ export default function ContributorRow ({ isAdmin, isSpaceOwner, contributor, on
     <TableRow>
       <TableCell>
         <Box display='flex' alignItems='center'>
-          <Avatar name={contributor.username} avatar={contributor?.avatar} />
+          <Avatar name={contributor.username} avatar={contributor?.avatar} isNft={contributor?.hasNftAvatar} />
           <Box pl={2}>
             <Typography variant='body1'><strong>{contributor.username}</strong></Typography>
           </Box>

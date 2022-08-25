@@ -2,7 +2,7 @@ import { PluginKey } from '@bangle.dev/core';
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { safeInsert } from '@bangle.dev/utils';
 import { ContentCopy as DuplicateIcon, DeleteOutlined as DeleteIcon, DragIndicator as DragIndicatorIcon } from '@mui/icons-material';
-import { ListItemIcon, ListItemText, Menu, MenuItem, MenuProps } from '@mui/material';
+import { ListItemIcon, ListItemText, Menu, ListItemButton, MenuProps } from '@mui/material';
 import { Page } from '@prisma/client';
 import charmClient from 'charmClient';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
@@ -100,7 +100,7 @@ function Component ({ menuState }: { menuState: PluginState }) {
         });
         const newTr = safeInsert(newNode, node.nodeEnd)(tr);
         view.dispatch(newTr.scrollIntoView());
-        dispatch(initialLoad());
+        dispatch(initialLoad({ spaceId: currentSpace.id }));
         await mutate(`pages/${currentSpace.id}`, (_pages: Page[]) => {
           return [..._pages, duplicatedPage];
         }, {
@@ -126,14 +126,14 @@ function Component ({ menuState }: { menuState: PluginState }) {
         {...bindMenu(popupState)}
         {...menuPosition}
       >
-        <MenuItem onClick={deleteRow} dense>
+        <ListItemButton onClick={deleteRow} dense>
           <ListItemIcon><DeleteIcon color='secondary' /></ListItemIcon>
-          <ListItemText>Delete</ListItemText>
-        </MenuItem>
-        <MenuItem onClick={duplicateRow} dense>
+          <ListItemText primary='Delete' />
+        </ListItemButton>
+        <ListItemButton onClick={duplicateRow} dense>
           <ListItemIcon><DuplicateIcon color='secondary' /></ListItemIcon>
-          <ListItemText>Duplicate</ListItemText>
-        </MenuItem>
+          <ListItemText primary='Duplicate' />
+        </ListItemButton>
       </Menu>
     </>
   );

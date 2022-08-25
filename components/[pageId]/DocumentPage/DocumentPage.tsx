@@ -1,21 +1,22 @@
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
+import charmClient from 'charmClient';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
 import { getCardComments } from 'components/common/BoardEditor/focalboard/src/store/comments';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { useBounties } from 'hooks/useBounties';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
 import { useVotes } from 'hooks/useVotes';
-import { IPagePermissionFlags } from 'lib/permissions/pages';
+import { AssignedBountyPermissions } from 'lib/bounties';
 import { Page, PageContent } from 'models';
-import { useRouter } from 'next/router';
-import { memo, useCallback } from 'react';
-import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
+import { memo, useCallback, useEffect, useState } from 'react';
 import BountyProperties from './components/BountyProperties';
 import CreateVoteBox from './components/CreateVoteBox';
 import PageBanner from './components/PageBanner';
@@ -49,11 +50,24 @@ export interface DocumentPageProps {
 function DocumentPage ({ page, setPage, insideModal, readOnly = false }: DocumentPageProps) {
   const { pages, getPagePermissions } = usePages();
   const { cancelVote, castVote, deleteVote, votes, isLoading } = useVotes();
-  const { bounties } = useBounties();
-  const bounty = bounties.find(_bounty => _bounty.page?.id === page.id);
   const pagePermissions = getPagePermissions(page.id);
+  const { draftBounty } = useBounties();
+  // Only populate bounty permission data if this is a bounty page
+  const [bountyPermissions, setBountyPermissions] = useState<AssignedBountyPermissions | null>(null);
+  async function refreshBountyPermissions (bountyId: string) {
+    setBountyPermissions(await charmClient.computeBountyPermissions({
+      resourceId: bountyId
+    }));
+  }
+
+  useEffect(() => {
+    if (page.bountyId) {
+      refreshBountyPermissions(page.bountyId);
+    }
+  }, [page.bountyId]);
 
   const cannotEdit = readOnly || !pagePermissions?.edit_content;
+  const cannotComment = readOnly || !pagePermissions?.comment;
 
   const pageVote = Object.values(votes).find(v => v.context === 'proposal');
 
@@ -158,37 +172,33 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
               <div className='CardDetail content'>
                 {/* Property list */}
                 {card && board && (
-                <CardDetailProperties
-                  board={board}
-                  card={card}
-                  cards={cards}
-                  activeView={activeView}
-                  views={boardViews}
-                  readonly={cannotEdit}
-                  pageUpdatedAt={page.updatedAt.toString()}
-                  pageUpdatedBy={page.updatedBy}
-                />
+                  <CardDetailProperties
+                    board={board}
+                    card={card}
+                    cards={cards}
+                    activeView={activeView}
+                    views={boardViews}
+                    readonly={cannotEdit}
+                    pageUpdatedAt={page.updatedAt.toString()}
+                    pageUpdatedBy={page.updatedBy}
+                  />
                 )}
-                {!bounty && page.type === 'card' && (
-                  <>
-                    <hr />
-                    <CommentsList
-                      comments={comments}
-                      rootId={card?.rootId ?? page.id}
-                      cardId={card?.id ?? page.id}
-                      readonly={cannotEdit}
-                    />
-                  </>
+                {(draftBounty || page.bountyId) && (
+                  <BountyProperties
+                    bountyId={page.bountyId}
+                    pageId={page.id}
+                    readOnly={cannotEdit}
+                    permissions={bountyPermissions}
+                    refreshBountyPermissions={refreshBountyPermissions}
+                  />
                 )}
-                {bounty && (
-                  <BountyProperties bounty={bounty} readOnly={cannotEdit}>
-                    <CommentsList
-                      comments={comments}
-                      rootId={card?.rootId ?? page.spaceId}
-                      cardId={card?.id ?? page.id}
-                      readonly={cannotEdit}
-                    />
-                  </BountyProperties>
+                {(page.type === 'bounty' || page.type === 'card') && (
+                  <CommentsList
+                    comments={comments}
+                    rootId={card?.rootId ?? page.id}
+                    cardId={card?.id ?? page.id}
+                    readonly={cannotComment}
+                  />
                 )}
               </div>
             </div>
