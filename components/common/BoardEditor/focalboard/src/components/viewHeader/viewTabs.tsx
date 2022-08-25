@@ -1,6 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import { useState, useCallback, MouseEvent, ReactNode } from 'react';
+import { useState, useCallback, useEffect, MouseEvent, ReactNode } from 'react';
 import { injectIntl, IntlShape } from 'react-intl';
 import { useRouter } from 'next/router';
 import Modal from 'components/common/Modal';
@@ -55,7 +55,7 @@ interface ViewTabsProps {
 function ViewTabs ({ onDeleteView, maxTabsShown, onViewTabClick, disableUpdatingUrl, addViewMenu, board, activeView, intl, readonly, showView, views }: ViewTabsProps) {
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [currentView, setCurrentView] = useState<BoardView | null>(null);
+  const [dropdownView, setDropdownView] = useState<BoardView | null>(null);
   const renameViewPopupState = usePopupState({ variant: 'popover', popupId: 'rename-view-popup' });
   const showViewsPopupState = usePopupState({ variant: 'popover', popupId: 'show-views-popup' });
   const showViewsTriggerState = bindTrigger(showViewsPopupState);
@@ -64,8 +64,7 @@ function ViewTabs ({ onDeleteView, maxTabsShown, onViewTabClick, disableUpdating
   const { setFocalboardViewsRecord } = useFocalboardViews();
   views = views.filter(view => !view.fields.inline)
   // Find the index of the current view
-  const currentViewId = router.query.viewId || activeView.id;
-  const currentViewIndex = views.findIndex(view => view.id === currentViewId);
+  const currentViewIndex = views.findIndex(view => view.id === activeView.id);
   const shownViews = views.slice(0, maxTabsShown);
   let restViews = views.slice(maxTabsShown);
 
@@ -74,25 +73,28 @@ function ViewTabs ({ onDeleteView, maxTabsShown, onViewTabClick, disableUpdating
     const replacedView = shownViews[maxTabsShown - 1];
     // Replace the current view as the last view of the shown views
     shownViews[maxTabsShown - 1] = views[currentViewIndex];
-    restViews = restViews.filter(restView => restView.id !== currentViewId);
+    restViews = restViews.filter(restView => restView.id !== activeView.id);
     restViews.unshift(replacedView);
   }
 
   const {
     register,
-    handleSubmit
-  } = useForm<{ title: string }>();
+    handleSubmit,
+    setValue
+  } = useForm<{ title: string }>({
+    defaultValues: { title: dropdownView?.title || '' }
+  });
 
   function handleViewClick (event: MouseEvent<HTMLElement>) {
     event.stopPropagation();
     if (readonly) return;
     const view = views.find(v => v.id === event.currentTarget.id);
     view && onViewTabClick?.(view.id)
-    if (event.currentTarget.id === currentViewId) {
+    if (event.currentTarget.id === activeView.id) {
       event.preventDefault();
       setAnchorEl(event.currentTarget);
       if (view) {
-        setCurrentView(view);
+        setDropdownView(view);
       }
     }
     if (view) {
@@ -102,7 +104,7 @@ function ViewTabs ({ onDeleteView, maxTabsShown, onViewTabClick, disableUpdating
 
   function handleClose () {
     setAnchorEl(null);
-    setCurrentView(null);
+    setDropdownView(null);
   }
 
   function getViewUrl (viewId: string) {
@@ -116,10 +118,10 @@ function ViewTabs ({ onDeleteView, maxTabsShown, onViewTabClick, disableUpdating
   }
 
   const handleDuplicateView = useCallback(() => {
-    if (!currentView) return;
+    if (!dropdownView) return;
 
-    const newView = createBoardView(currentView);
-    newView.title = `${currentView.title} copy`;
+    const newView = createBoardView(dropdownView);
+    newView.title = `${dropdownView.title} copy`;
     newView.id = Utils.createGuid(IDType.View);
     mutator.insertBlock(
       newView,
@@ -129,24 +131,24 @@ function ViewTabs ({ onDeleteView, maxTabsShown, onViewTabClick, disableUpdating
         setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [board.id]: newView.id }));
       },
       async () => {
-        showView(currentView.id);
+        showView(dropdownView.id);
       }
     );
-  }, [currentView, showView]);
+  }, [dropdownView, showView]);
 
   const handleDeleteView = useCallback(() => {
     Utils.log('deleteView');
-    if (!currentView) return;
+    if (!dropdownView) return;
 
-    const nextView = views.find((o) => o !== currentView);
-    mutator.deleteBlock(currentView, 'delete view');
-    onDeleteView?.(currentView.id)
+    const nextView = views.find((o) => o !== dropdownView);
+    mutator.deleteBlock(dropdownView, 'delete view');
+    onDeleteView?.(dropdownView.id)
     setAnchorEl(null)
     if (nextView) {
       showView(nextView.id);
       setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [board.id]: nextView.id }));
     }
-  }, [views, currentView, showView]);
+  }, [views, dropdownView, showView]);
 
   function handleRenameView () {
     setAnchorEl(null);
@@ -154,8 +156,8 @@ function ViewTabs ({ onDeleteView, maxTabsShown, onViewTabClick, disableUpdating
   }
 
   function saveViewTitle (form: { title: string }) {
-    if (currentView) {
-      mutator.changeTitle(currentView.id, currentView.title, form.title);
+    if (dropdownView) {
+      mutator.changeTitle(dropdownView.id, dropdownView.title, form.title);
       renameViewPopupState.close();
     }
   }
@@ -169,9 +171,14 @@ function ViewTabs ({ onDeleteView, maxTabsShown, onViewTabClick, disableUpdating
     defaultMessage: 'Delete view'
   });
 
+  // keep form title updated with dropdownView title
+  useEffect(() => {
+    setValue('title', dropdownView?.title || '');
+  }, [dropdownView]);
+
   return (
     <>
-      <Tabs textColor='primary' indicatorColor='secondary' value={currentViewId} sx={{ minHeight: 0, mb: '-4px' }}>
+      <Tabs textColor='primary' indicatorColor='secondary' value={activeView.id} sx={{ minHeight: 0, mb: '-4px' }}>
         {shownViews.map(view => (
           <Tab
             component='div'
@@ -183,9 +190,9 @@ function ViewTabs ({ onDeleteView, maxTabsShown, onViewTabClick, disableUpdating
                 onClick={handleViewClick}
                 variant='text'
                 size='small'
-                color={currentViewId === view.id ? 'textPrimary' : 'secondary'}
+                color={activeView.id === view.id ? 'textPrimary' : 'secondary'}
                 id={view.id}
-                href={!disableUpdatingUrl ? (currentViewId === view.id ? null : getViewUrl(view.id)) : ''}
+                href={!disableUpdatingUrl ? (activeView.id === view.id ? null : getViewUrl(view.id)) : ''}
               >
                 {view.title}
               </StyledButton>
@@ -274,12 +281,12 @@ function ViewTabs ({ onDeleteView, maxTabsShown, onViewTabClick, disableUpdating
       </Menu>
 
       {/* Form to rename views */}
-      <Modal open={renameViewPopupState.isOpen} onClose={renameViewPopupState.close} title='Rename the view'>
+      {<Modal open={renameViewPopupState.isOpen} onClose={renameViewPopupState.close} title='Rename the view'>
         <form onSubmit={handleSubmit(saveViewTitle)}>
-          <TextField {...register('title')} defaultValue={currentView?.title} autoFocus />
+          <TextField {...register('title')} autoFocus />
           <Button type='submit'>Save</Button>
         </form>
-      </Modal>
+      </Modal>}
     </>
   );
 }

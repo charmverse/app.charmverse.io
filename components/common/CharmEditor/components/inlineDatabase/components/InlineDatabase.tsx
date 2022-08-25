@@ -266,6 +266,7 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
             groupByProperty={property}
             dateDisplayProperty={displayProperty}
             views={views}
+            maxTabsShown={2}
           />
         </Box>
       </StylesContainer>
