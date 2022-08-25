@@ -12,7 +12,7 @@ services:
     environment:
       DATABASE_URL: "postgres://${DB_USER}:${DB_PASSWD}@${DB_HOSTNAME}:5432/${DB_NAME}"
 
-  datadog_agent:
+  datadog-agent:
     image: public.ecr.aws/datadog/agent
     hostname: datadog-agent
     volumes:
@@ -24,7 +24,7 @@ services:
     environment:
       DD_LOGS_ENABLED: "true"
       DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL: "true"
-      DD_CONTAINER_EXCLUDE: "name:datadog-agent"
+      DD_CONTAINER_EXCLUDE: "image:public.ecr.aws/datadog/agent"
       DD_SITE: "datadoghq.com"
       DD_APM_ENABLED: "true"
       DD_APM_NON_LOCAL_TRAFFIC: "true"
