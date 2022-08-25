@@ -89,7 +89,14 @@ export function items ({ addNestedPage, currentPageId, userId, space }: ItemsPro
           // Execute the animation
           if (view) {
             rafCommandExec(view, (_state, _dispatch) => {
-              addPage({ title: 'Linked Database', type: 'inline_linked_board', parentId: currentPageId, spaceId: space.id, createdBy: userId }, false)
+              addPage({
+                title: 'Linked Database',
+                type: 'inline_linked_board',
+                parentId: currentPageId,
+                spaceId: space.id,
+                createdBy: userId,
+                shouldCreateDefaultBoardData: false
+              })
                 .then(({ page }) => {
                   const node = _state.schema.nodes.inlineDatabase.create({
                     source: 'board_page',

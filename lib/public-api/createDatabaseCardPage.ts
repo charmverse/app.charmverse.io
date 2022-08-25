@@ -2,6 +2,7 @@ import { Page } from '@prisma/client';
 import { prisma } from 'db';
 import { v4, validate } from 'uuid';
 import { InvalidInputError } from 'lib/utilities/errors';
+import { getPagePath } from 'lib/pages';
 import { DatabasePageNotFoundError } from './errors';
 import { PageProperty } from './interfaces';
 import { PageFromBlock } from './pageFromBlock.class';
@@ -128,7 +129,7 @@ export async function createDatabaseCardPage (pageInfo: Record<keyof Pick<Page, 
       },
       content: { type: 'doc', content: [] },
       contentText: '',
-      path: `page-${Math.random().toString().replace('0.', '')}`,
+      path: getPagePath(),
       type: 'card',
       title: pageInfo.title || '',
       parentId: pageInfo.boardId,

@@ -5,6 +5,7 @@ import { v4 } from 'uuid';
 import { MentionedTask } from 'lib/mentions/interfaces';
 import randomName from 'lib/utilities/randomName';
 import { VoteTask } from 'lib/votes/interfaces';
+import { getPagePath } from 'lib/pages';
 
 const handler = nc({
   onError,
@@ -18,7 +19,7 @@ const createMentionTask = ({ pageTitle, spaceName, mentionText }: {spaceName: st
     pageId: v4(),
     spaceId: v4(),
     spaceDomain: randomName(),
-    pagePath: `page-${Math.random().toString().replace('0.', '')}`,
+    pagePath: getPagePath(),
     spaceName,
     pageTitle,
     text: mentionText,
@@ -49,7 +50,7 @@ const createVoteTasks = ({ voteTitle, deadline, pageTitle, spaceName }: {voteTit
     deadline,
     id: v4(),
     page: {
-      path: `page-${Math.random().toString().replace('0.', '')}`,
+      path: getPagePath(),
       title: pageTitle
     } as any,
     space: {

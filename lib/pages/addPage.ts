@@ -1,6 +1,5 @@
 import { Page } from '@prisma/client';
 import charmClient from 'charmClient';
-import { Block } from 'components/common/BoardEditor/focalboard/src/blocks/block';
 import { createBoard } from 'components/common/BoardEditor/focalboard/src/blocks/board';
 import { createBoardView } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
 import { Card, createCard } from 'components/common/BoardEditor/focalboard/src/blocks/card';
@@ -10,22 +9,34 @@ import { BoardView } from 'lib/focalboard/boardView';
 import { NextRouter } from 'next/router';
 import { mutate } from 'swr';
 import { v4 } from 'uuid';
+import { getPagePath } from './utils';
 
-export type NewPageInput = Partial<Page> & { spaceId: string, createdBy: string };
+export type NewPageInput = Partial<Page> & { spaceId: string, createdBy: string, shouldCreateDefaultBoardData?: boolean };
 
-export async function addPage ({ createdBy, spaceId, ...page }: NewPageInput, shouldCreateDefaultBoardData?: boolean) {
-  const id = v4();
+interface AddPageResponse {
+  board: Board | null;
+  view: BoardView | null;
+  cards: Card[];
+  page: Page;
+}
+
+export async function addPage ({ createdBy, spaceId, shouldCreateDefaultBoardData, ...page }: NewPageInput): Promise<AddPageResponse> {
+
+  const pageId = v4();
+
   shouldCreateDefaultBoardData = shouldCreateDefaultBoardData ?? true;
+  const isBoardPage = (page.type === 'board' || page.type === 'inline_board' || page.type === 'inline_linked_board');
+
   const pageProperties: Partial<Page> = {
-    id,
-    boardId: (page.type === 'board' || page.type === 'inline_board' || page.type === 'inline_linked_board') ? id : undefined,
+    id: pageId,
+    boardId: isBoardPage ? pageId : undefined,
     content: undefined as any,
     contentText: '',
     createdAt: new Date(),
     createdBy,
     updatedAt: new Date(),
     updatedBy: createdBy,
-    path: `page-${id}`,
+    path: getPagePath(),
     spaceId,
     title: '',
     type: page.type ?? 'page',
@@ -34,35 +45,29 @@ export async function addPage ({ createdBy, spaceId, ...page }: NewPageInput, sh
 
   const newPage = await charmClient.createPage(pageProperties);
 
-  const pageArtifacts: {
-    board: Board | null
-    view: BoardView | null
-    cards: Card[]
-    page: Page
-  } = {
+  const result: AddPageResponse = {
     board: null,
     page: newPage,
     cards: [],
     view: null
   };
-  if (pageProperties.type === 'board' || pageProperties.type === 'inline_board' || pageProperties.type === 'inline_linked_board') {
+
+  if (isBoardPage) {
+
+    const { board, view, cards } = createDefaultBoardData({ boardId: pageId });
+
     if (shouldCreateDefaultBoardData) {
-      const artifacts = await createDefaultBoardData(() => null, id);
-      pageArtifacts.board = artifacts.board;
-      if (shouldCreateDefaultBoardData) {
-        pageArtifacts.view = artifacts.view;
-        pageArtifacts.cards = artifacts.cards;
-      }
+      result.board = board;
+      result.view = view;
+      result.cards = cards;
+      await mutator.insertBlocks(
+        [board, view, ...cards],
+        'add board'
+      );
     }
     else {
-      const board = createBoard({ addDefaultProperty: true });
-      if (id) {
-        board.id = id;
-      }
-      board.rootId = board.id;
-      await mutator.insertBlocks(
-        [board]
-      );
+      result.board = board;
+      await mutator.insertBlocks([board]);
     }
   }
 
@@ -70,18 +75,20 @@ export async function addPage ({ createdBy, spaceId, ...page }: NewPageInput, sh
     return [...pages, newPage];
   }, {
     // revalidate pages for board since we create 3 default ones
-    revalidate: pageProperties.type === 'board' || pageProperties.type === 'inline_board' || pageProperties.type === 'inline_linked_board'
+    revalidate: isBoardPage
   });
 
-  return pageArtifacts;
+  return result;
 }
 
-async function createDefaultBoardData (showBoard: (id: string) => void, newBoardId?: string, activeBoardId?: string) {
-  const oldBoardId = activeBoardId;
+interface DefaultBoardProps {
+  boardId: string;
+}
+
+function createDefaultBoardData ({ boardId }: DefaultBoardProps) {
+
   const board = createBoard({ addDefaultProperty: true });
-  if (newBoardId) {
-    board.id = newBoardId;
-  }
+  board.id = boardId;
   board.rootId = board.id;
 
   const view = createBoardView();
@@ -101,19 +108,6 @@ async function createDefaultBoardData (showBoard: (id: string) => void, newBoard
     view.fields.cardOrder.push(card.id);
     cards.push(card);
   }
-
-  await mutator.insertBlocks(
-    [board, view, ...cards],
-    'add board',
-    async (newBlocks: Block[]) => {
-      showBoard(newBlocks[0].id);
-    },
-    async () => {
-      if (oldBoardId) {
-        showBoard(oldBoardId);
-      }
-    }
-  );
 
   return {
     board,
