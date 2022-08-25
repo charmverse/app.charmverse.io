@@ -31,7 +31,6 @@ const CenterPanel = dynamic(() => import('components/common/BoardEditor/focalboa
 });
 
 const StylesContainer = styled.div<{ containerWidth?: number }>`
-  margin-top: ${({ theme }) => theme.spacing(2)};
 
   .BoardComponent {
     overflow: visible;
@@ -231,7 +230,7 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
             startIcon={<PageIcon isEditorEmpty={false} pageType='board' icon={board ? pages[board.id]?.icon : null} />}
             variant='text'
             // TODO: Respect shared page
-            href={space && pages[board.id] ? `/${space?.domain}/${pages[board.id]!.path ?? ''}` : ''}
+            href={space && pages[board.id] ? `/${space?.domain}/${pages[board.id]?.path ?? ''}` : ''}
           >
             {pages[board.id]?.title || 'Untitled'}
           </Button>
