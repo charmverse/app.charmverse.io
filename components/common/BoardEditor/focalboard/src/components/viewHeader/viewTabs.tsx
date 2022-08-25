@@ -197,7 +197,7 @@ function ViewTabs ({ onDeleteView, maxTabsShown, onViewTabClick, disableUpdating
                 {view.title}
               </StyledButton>
           )}
-            sx={{ p: 0, mb: 0.5 }}
+            sx={{ p: 0, mb: '5px' }}
             value={view.id}
           />
         ))}

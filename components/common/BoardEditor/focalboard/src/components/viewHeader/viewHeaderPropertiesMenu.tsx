@@ -90,6 +90,7 @@ const ViewHeaderPropertiesMenu = React.memo((props: Props) => {
         {
             properties.map(property => (
               <MenuItem
+                dense
                 sx={{
                   minWidth: 250
                 }}

@@ -1,7 +1,7 @@
 
 import { NodeViewProps } from '@bangle.dev/core';
 import styled from '@emotion/styled';
-import { Box } from '@mui/material';
+import { Box, IconButton } from '@mui/material';
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
@@ -234,17 +234,15 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
           <CenterPanel
             disableUpdatingUrl
             addViewMenu={type === 'linked' ? (
-              <Button
+              <IconButton
                 onClick={() => {
                   setIsSelectingSource(true);
                 }}
                 color='secondary'
                 size='small'
-                startIcon={<Add />}
-                variant='text'
               >
-                Add
-              </Button>
+                <Add fontSize='small' />
+              </IconButton>
             ) : undefined}
             onViewTabClick={(viewId) => {
               setCurrentViewId(viewId);

@@ -31,15 +31,11 @@ type AddViewProps = {
   sx?: SxProps
 }
 
-const StyledIconButton = styled(IconButton)`
-  position: relative;
-  top: -3px;
-`;
-
 function AddViewMenu (props: AddViewProps) {
 
   const intl = props.intl;
   const showView = props.showView;
+  console.log('showLabel', props)
 
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-view-menu' });
 
@@ -196,9 +192,9 @@ function AddViewMenu (props: AddViewProps) {
           Add view
         </Button>
       ) : (
-        <StyledIconButton {...bindTrigger(popupState)} color='secondary' size='small'>
+        <IconButton {...bindTrigger(popupState)} color='secondary' size='small'>
           <Add fontSize='small' />
-        </StyledIconButton>
+        </IconButton>
       )}
       <Menu {...bindMenu(popupState)}>
         <MenuItem dense onClick={handleAddViewBoard}>
