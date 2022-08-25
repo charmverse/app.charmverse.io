@@ -49,8 +49,9 @@ const config: PlaywrightTestConfig = {
       use: {
         ...devices['Desktop Chrome']
       }
-    },
+    }
 
+    /* Only test Chrome for now
     {
       name: 'firefox',
       use: {
@@ -64,6 +65,7 @@ const config: PlaywrightTestConfig = {
         ...devices['Desktop Safari']
       }
     }
+    */
 
     /* Test against mobile viewports. */
     // {
@@ -92,16 +94,16 @@ const config: PlaywrightTestConfig = {
     //     channel: 'chrome',
     //   },
     // },
-  ]
-
+  ],
   /* Folder for test artifacts such as screenshots, videos, traces, etc. */
   // outputDir: 'test-results/',
 
   /* Run your local dev server before starting the tests */
-  // webServer: {
-  //   command: 'npm run start',
-  //   port: 3000,
-  // },
+  webServer: {
+    command: 'NODE_OPTIONS="--max_old_space_size=4096" npm run start',
+    port: 3335,
+    reuseExistingServer: true
+  }
 };
 
 export default config;
