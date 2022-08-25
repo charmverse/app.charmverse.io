@@ -29,9 +29,6 @@ jobs:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
     steps:
-      - name: Add playwright dependencies
-        run: sudo apt-get install gstreamer1.0-libav
-
       - uses: actions/checkout@v2
 
       - name: Install dependencies and build app
@@ -53,6 +50,8 @@ jobs:
 
       # - name: Run browser tests
       #   run: npm run test:browser:ci
+      - name: Add playwright dependencies
+        run: sudo apt-get install gstreamer1.0-libav && npx playwright install
 
       - name: Run browser e2e tests
         run: npx playwright test
