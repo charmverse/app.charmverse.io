@@ -80,6 +80,7 @@ jobs:
       - name: Update and Package background worker
         run: |
           rm -rf .ebextensions && mv .ebextensions_cron .ebextensions
+          mv docker-compose-cron.yml docker-compose.yml
           cat files_to_zip.txt | zip --symlinks -r@ deploy_cron.zip
 
       # - name: Deploy to Beanstalk
