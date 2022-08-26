@@ -113,14 +113,6 @@
         ]
       }
     ],
-    "react/jsx-indent": [
-      2,
-      2,
-      {
-        "checkAttributes": true,
-        "indentLogicalExpressions": true
-      }
-    ],
     "react/jsx-no-bind": "off",
     "react/jsx-one-expression-per-line": "off",
     "react/jsx-props-no-spreading": "off",
