@@ -147,6 +147,7 @@ export function BoardPage ({ page, setPage, readonly }: Props) {
         {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
           <RootPortal>
             <CardDialog
+              data-test='card-popup'
               board={board}
               key={shownCardId}
               cardId={shownCardId}

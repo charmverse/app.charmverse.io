@@ -35,6 +35,7 @@
     "db-tool:test": "dotenv -e .env.test.local -- npx prisma studio",
     "test:setup-db": "./scripts/configure-db.sh",
     "test:browser": "npm run test-setup && jest --config='./jest.config-client.ts'",
+    "test:browser:e2e": "dotenv -e .env.test.local -- npx playwright test __e2e__/public-page.spec.ts --timeout=60000",
     "test": "npm run test:ci -- --verbose --watch",
     "test:ci": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local --override -- npx jest --config='./jest.config.ts'",
     "test:debug": "dotenv -e .env.test.local --override -- node --inspect-brk --expose-gc ./node_modules/.bin/jest --runInBand --logHeapUsage --config='./jest.config-server.ts' --verbose",

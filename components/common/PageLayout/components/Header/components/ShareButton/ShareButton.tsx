@@ -33,6 +33,7 @@ export default function ShareButton ({ headerHeight, pageId }: { headerHeight: n
     <>
       <Tooltip arrow title='Share or publish to the web'>
         <Button
+          data-test='toggle-page-permissions-dialog'
           color='secondary'
           variant='text'
           size='small'
