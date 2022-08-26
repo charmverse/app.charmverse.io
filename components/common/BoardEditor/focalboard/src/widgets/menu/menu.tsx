@@ -55,7 +55,7 @@ function Menu (props: Props) {
   }, []);
 
   return (
-    <StyledPopper anchorEl={anchorEl} open={true} placement={position || 'bottom-start'}>
+    <StyledPopper anchorEl={anchorEl} open={true} disablePortal placement={position || 'bottom-start'}>
       <div
         ref={popperRef}
         style={{ maxHeight: maxHeight || 'none' }}
