@@ -93,6 +93,7 @@ function CenterPanel (props: Props) {
   const boards = useAppSelector(getSortedBoards);
 
   const isEmbedded = !!props.embeddedBoardPath;
+  const boardPageType = pages[board.id]?.type;
 
   // for 'linked' boards, each view has its own board which we use to determine the cards to show
   const activeBoardId = props.activeView && (props.activeView?.fields.linkedSourceId || props.board.id);
@@ -445,7 +446,7 @@ function CenterPanel (props: Props) {
     activeView={activeView}
     views={views}
     showView={showView}
-    onClick={(activePage?.type === 'inline_linked_board') ? openSelectSourceSidebar : undefined}
+    onClick={(boardPageType === 'inline_linked_board') ? openSelectSourceSidebar : undefined}
   />;
 
   useEffect(() => {
@@ -478,7 +479,7 @@ function CenterPanel (props: Props) {
         </Box>
       )}
       <div className='top-head'>
-        {(board && (activePage?.type === 'board' || !isEmbedded)) && (
+        {(board && (boardPageType === 'board' || !isEmbedded)) && (
           <ViewTitle
             key={board.id + board.title}
             board={board}
@@ -507,7 +508,7 @@ function CenterPanel (props: Props) {
           readonly={props.readonly}
           embeddedBoardPath={props.embeddedBoardPath}
         />
-        {activeBoard && isEmbedded && activePage?.type === 'inline_board' && (
+        {activeBoard && isEmbedded && boardPageType === 'inline_board' && (
           <InlineViewTitle
             key={activePage.id + activePage.title}
             board={activeBoard}
@@ -515,7 +516,7 @@ function CenterPanel (props: Props) {
             setPage={props.setPage}
           />
         )}
-        {activePage?.type === 'inline_linked_board' && (
+        {activePage && boardPageType === 'inline_linked_board' && (
           <Button
             color='secondary'
             startIcon={<CallMadeIcon />}
