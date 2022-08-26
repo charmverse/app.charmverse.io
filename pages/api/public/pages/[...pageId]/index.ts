@@ -1,13 +1,14 @@
+import { Block, Page } from '@prisma/client';
+import { prisma } from 'db';
+import { Card } from 'lib/focalboard/card';
+import { onError, onNoMatch } from 'lib/middleware';
+import { NotFoundError } from 'lib/middleware/errors';
+import { PublicPageResponse } from 'lib/pages';
+import { computeUserPagePermissions } from 'lib/permissions/pages';
+import { withSessionRoute } from 'lib/session/withSession';
+import { isUUID } from 'lib/utilities/strings';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { onError, onNoMatch } from 'lib/middleware';
-import { withSessionRoute } from 'lib/session/withSession';
-import { Block, Page, Space } from '@prisma/client';
-import { prisma } from 'db';
-import { isUUID } from 'lib/utilities/strings';
-import { NotFoundError } from 'lib/middleware/errors';
-import { computeUserPagePermissions } from 'lib/permissions/pages';
-import { PublicPageResponse } from 'lib/pages';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -24,6 +25,7 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
   if (isPageId) {
     page = await prisma.page.findFirst({ where: { deletedAt: null, id: pageIdOrPath[0] } });
   }
+
   // Tuple array of path segments [spaceDomain, pagePath]
 
   const [spaceDomain, pagePath] = pageIdOrPath;
@@ -55,30 +57,42 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
     throw new NotFoundError('Page not found');
   }
 
-  let boardPage: Page | null = null;
-  let boardBlock: Block | null = null;
-  let pageBlock: Block | null = null;
+  const boardPages: Page[] = [];
+  const boardBlocks: Block[] = [];
+  const pageBlocks: Card[] = [];
 
   if (page.type === 'card' && page.parentId) {
-    boardPage = await prisma.page.findFirst({
+    const boardPage = await prisma.page.findFirst({
       where: {
         deletedAt: null,
         id: page.parentId
       }
     });
-    pageBlock = await prisma.block.findFirst({
+    if (boardPage) {
+      boardPages.push(boardPage);
+    }
+
+    const pageBlock = await prisma.block.findFirst({
       where: {
         deletedAt: null,
         id: page.id
       }
-    });
+    }) as unknown as Card;
 
-    boardBlock = await prisma.block.findFirst({
+    if (pageBlock) {
+      pageBlocks.push(pageBlock);
+    }
+
+    const boardBlock = await prisma.block.findFirst({
       where: {
         deletedAt: null,
         id: page.parentId
       }
     });
+
+    if (boardBlock) {
+      boardBlocks.push(boardBlock);
+    }
   }
 
   const space = await prisma.space.findFirst({
@@ -93,9 +107,10 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
 
   return res.status(200).json({
     page,
-    boardPage,
-    pageBlock,
-    boardBlock,
+    boardPages,
+    pageBlocks,
+    boardBlocks,
+    views: [],
     space
   });
 }

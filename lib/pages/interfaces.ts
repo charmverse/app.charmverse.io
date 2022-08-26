@@ -1,4 +1,6 @@
 import { Block, Page, PagePermission, Space } from '@prisma/client';
+import { BoardView } from 'lib/focalboard/boardView';
+import { Card } from 'lib/focalboard/card';
 
 export interface IPageWithPermissions extends Page {
   permissions: (PagePermission & {sourcePermission: PagePermission | null}) []
@@ -27,9 +29,10 @@ export interface PagesRequest {
 
 export interface PublicPageResponse {
   page: Page;
-  boardPage: Page | null;
-  pageBlock: Block | null;
-  boardBlock: Block | null;
+  boardPages: Page[];
+  pageBlocks: Card[];
+  boardBlocks: Block[];
+  views: BoardView[]
   space: Space;
 }
 

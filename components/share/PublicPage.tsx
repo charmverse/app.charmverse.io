@@ -6,7 +6,7 @@ import { Box, IconButton, Tooltip } from '@mui/material';
 import { useWeb3React } from '@web3-react/core';
 import charmClient from 'charmClient';
 import { Card } from 'components/common/BoardEditor/focalboard/src/blocks/card';
-import { addBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
+import { updateBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { addCard } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { setCurrent } from 'components/common/BoardEditor/focalboard/src/store/views';
@@ -72,20 +72,23 @@ export default function PublicPage () {
     }
     else {
       try {
-        const { page: rootPage, pageBlock, boardBlock, space } = await charmClient.getPublicPage(pageIdOrPath);
+        const { page: rootPage, pageBlocks, boardBlocks, space } = await charmClient.getPublicPage(pageIdOrPath);
 
         setTitleState(rootPage.title);
         setCurrentPageId(rootPage.id);
         setBasePageId(rootPage.id);
         setSpaces([space]);
 
-        if (pageBlock) {
-          dispatch(setCurrent(pageBlock.id));
-          dispatch(addCard(pageBlock as unknown as Card));
+        if (pageBlocks.length !== 0) {
+          dispatch(setCurrent(rootPage.id));
+          pageBlocks.forEach(pageBlock => {
+            dispatch(addCard(pageBlock as unknown as Card));
+          });
         }
-        if (boardBlock) {
-          dispatch(addBoard(boardBlock as unknown as Board));
-        }
+
+        boardBlocks.forEach(boardBlock => {
+          dispatch(updateBoards([boardBlock as any as Board]));
+        });
       }
       catch (err) {
         setPageNotFound(true);
