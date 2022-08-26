@@ -33,6 +33,7 @@ export interface PublicPageResponse {
   pageBlocks: Card[];
   boardBlocks: Block[];
   space: Space;
+  views: BoardView[]
 }
 
 // These 2 types are used for reducing a list of pages to a tree

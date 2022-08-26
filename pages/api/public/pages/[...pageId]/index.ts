@@ -1,5 +1,6 @@
 import { Block, Page } from '@prisma/client';
 import { prisma } from 'db';
+import { BoardView } from 'lib/focalboard/boardView';
 import { Card } from 'lib/focalboard/card';
 import { onError, onNoMatch } from 'lib/middleware';
 import { NotFoundError } from 'lib/middleware/errors';
@@ -71,6 +72,7 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
   const boardPages: Page[] = [];
   const boardBlocks: Block[] = [];
   const pageBlocks: Card[] = [];
+  const views: BoardView[] = [];
 
   if (page.type === 'card' && page.parentId) {
     const boardPage = await prisma.page.findFirst({
@@ -125,6 +127,17 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
       }
     });
 
+    const boardViews = await prisma.block.findMany({
+      where: {
+        parentId: {
+          in: linkedPageIds
+        },
+        type: 'view'
+      }
+    });
+
+    boardViews.forEach(view => views.push(view as unknown as BoardView));
+
     _boardBlocks.forEach(boardBlock => boardBlocks.push(boardBlock));
   }
 
@@ -143,7 +156,8 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
     boardPages,
     pageBlocks,
     boardBlocks,
-    space
+    space,
+    views
   });
 }
 

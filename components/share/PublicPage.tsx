@@ -9,7 +9,7 @@ import { Card } from 'components/common/BoardEditor/focalboard/src/blocks/card';
 import { updateBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { addCard } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { setCurrent } from 'components/common/BoardEditor/focalboard/src/store/views';
+import { addView, setCurrent } from 'components/common/BoardEditor/focalboard/src/store/views';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import Account from 'components/common/PageLayout/components/Account';
@@ -72,19 +72,21 @@ export default function PublicPage () {
     }
     else {
       try {
-        const { page: rootPage, pageBlocks, boardBlocks, space } = await charmClient.getPublicPage(pageIdOrPath);
+        const { page: rootPage, pageBlocks, boardBlocks, space, views } = await charmClient.getPublicPage(pageIdOrPath);
 
         setTitleState(rootPage.title);
         setCurrentPageId(rootPage.id);
         setBasePageId(rootPage.id);
         setSpaces([space]);
 
-        if (pageBlocks.length !== 0) {
-          dispatch(setCurrent(rootPage.id));
-          pageBlocks.forEach(pageBlock => {
-            dispatch(addCard(pageBlock as unknown as Card));
-          });
-        }
+        dispatch(setCurrent(rootPage.id));
+        pageBlocks.forEach(pageBlock => {
+          dispatch(addCard(pageBlock as unknown as Card));
+        });
+
+        views.forEach(view => {
+          dispatch(addView(view));
+        });
 
         boardBlocks.forEach(boardBlock => {
           dispatch(updateBoards([boardBlock as any as Board]));
