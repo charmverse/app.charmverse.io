@@ -43,7 +43,7 @@ import ViewTitle, { InlineViewTitle } from './viewTitle';
 import dynamic from 'next/dynamic';
 import AddViewMenu from './addViewMenu';
 import SourceSelection from './SourceSelection';
-import ViewOptionsSidebar from './viewOptionsSidebar';
+import ViewSidebar from './viewSidebar/viewSidebar';
 
 const CalendarFullView = dynamic(() => import('./calendar/fullCalendar'), { ssr: false });
 
@@ -601,7 +601,7 @@ function CenterPanel (props: Props) {
             )}
           </Box>
           {activeBoard && activeView && (
-            <ViewOptionsSidebar board={activeBoard} view={activeView} isOpen={state.showSettings === 'view-options'} closeSidebar={closeSettings} />
+            <ViewSidebar board={activeBoard} view={activeView} isOpen={state.showSettings === 'view-options'} closeSidebar={closeSettings} groupByProperty={groupByProperty} />
           )}
         </Box>
       </div>
