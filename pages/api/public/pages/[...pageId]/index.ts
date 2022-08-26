@@ -27,6 +27,31 @@ function recurse (node: PageContent, cb: (node: PageContent) => void) {
   cb(node);
 }
 
+async function filterPublicPages (pageIds: string[]) {
+  // Check if the linked pages have public share access
+  const publicPages = await prisma.pagePermission.findMany({
+    where: {
+      pageId: {
+        in: pageIds
+      }
+    },
+    select: {
+      public: true,
+      pageId: true
+    }
+  });
+
+  // Filter the linked pages that is publicly available
+  const publicPagesIds: string[] = [];
+  publicPages.forEach(publicPage => {
+    if (publicPage.public) {
+      publicPagesIds.push(publicPage.pageId);
+    }
+  });
+
+  return publicPagesIds;
+}
+
 async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPageResponse>) {
 
   const { pageId: pageIdOrPath } = req.query as { pageId: string[] };
@@ -120,15 +145,18 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
       }
     });
 
+    // Filter the linked pages that is publicly available
+    const publicPagesIds = await filterPublicPages(linkedPageIds);
+
     const blocks = await prisma.block.findMany({
       where: {
         OR: [{
           id: {
-            in: linkedPageIds
+            in: publicPagesIds
           }
         }, {
           parentId: {
-            in: linkedPageIds
+            in: publicPagesIds
           }
         }]
       }
@@ -152,15 +180,17 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
       }
     });
 
+    const publicLinkedSourceIds = await filterPublicPages(linkedSourceIds);
+
     const extraBlocks = await prisma.block.findMany({
       where: {
         OR: [{
           id: {
-            in: linkedSourceIds
+            in: publicLinkedSourceIds
           }
         }, {
           parentId: {
-            in: linkedSourceIds
+            in: publicLinkedSourceIds
           }
         }]
       }
