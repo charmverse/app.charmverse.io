@@ -11,9 +11,9 @@ import { useState, useEffect } from 'react';
 import { IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
 import ShareBountyBoard from './ShareBountyBoard';
 
-export default function BountyShareButton ({ headerHeight }: { headerHeight: number }) {
+export default function BountyShareButton ({ headerHeight, pageId: currentPageId }: { headerHeight: number, pageId: string }) {
 
-  const { currentPageId, pages } = usePages();
+  const { pages } = usePages();
   const popupState = usePopupState({ variant: 'popover', popupId: 'share-menu' });
   const [pagePermissions, setPagePermissions] = useState<IPagePermissionWithAssignee[] | null>(null);
 

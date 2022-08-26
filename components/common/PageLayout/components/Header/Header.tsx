@@ -31,7 +31,6 @@ import { useRouter } from 'next/router';
 import { useRef, useState } from 'react';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
-import Account from '../Account';
 import ShareButton from './components/ShareButton';
 import BountyShareButton from './components/BountyShareButton/BountyShareButton';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
@@ -126,11 +125,11 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
         width: '100%'
       }}
       >
-        <PageTitleWithBreadcrumbs />
+        <PageTitleWithBreadcrumbs pageId={basePage?.id} />
         <Box display='flex' alignItems='center' mr={-1}>
           {
-            isBountyBoard && (
-              <BountyShareButton headerHeight={headerHeight} />
+            basePage && isBountyBoard && (
+              <BountyShareButton headerHeight={headerHeight} pageId={basePage.id} />
             )
           }
 
