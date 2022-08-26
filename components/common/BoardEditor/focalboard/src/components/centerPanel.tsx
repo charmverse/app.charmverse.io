@@ -514,7 +514,7 @@ function CenterPanel (props: Props) {
 
       <div className={`container-container ${!!state.showSettings ? 'sidebar-visible' : ''}`}>
         <Box display='flex'>
-          <Box>
+          <Box width='100%'>
             {activeBoard && activePage && isEmbedded && boardPageType === 'inline_board' && (
               <InlineViewTitle
                 key={activePage.id + activePage.title}
