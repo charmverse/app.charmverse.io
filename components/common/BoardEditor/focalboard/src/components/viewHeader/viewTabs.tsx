@@ -22,7 +22,7 @@ import { Board } from 'lib/focalboard/board';
 import { Box } from '@mui/system';
 import Link from 'next/link';
 import AddViewMenu from '../addViewMenu';
-import DeleteIcon from '../../widgets/icons/delete';
+import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import mutator from '../../mutator';
 import { iconForViewType } from '../viewMenu';
 import { BoardView, createBoardView } from '../../blocks/boardView';
