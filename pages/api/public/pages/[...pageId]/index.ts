@@ -1,5 +1,6 @@
 import { Block, Page } from '@prisma/client';
 import { prisma } from 'db';
+import { Board } from 'lib/focalboard/board';
 import { BoardView } from 'lib/focalboard/boardView';
 import { Card } from 'lib/focalboard/card';
 import { onError, onNoMatch } from 'lib/middleware';
@@ -70,8 +71,8 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
   }
 
   const boardPages: Page[] = [];
-  const boardBlocks: Block[] = [];
-  const pageBlocks: Card[] = [];
+  const boards: Board[] = [];
+  const cards: Card[] = [];
   const views: BoardView[] = [];
 
   if (page.type === 'card' && page.parentId) {
@@ -85,26 +86,26 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
       boardPages.push(boardPage);
     }
 
-    const pageBlock = await prisma.block.findFirst({
+    const card = await prisma.block.findFirst({
       where: {
         deletedAt: null,
         id: page.id
       }
     }) as unknown as Card;
 
-    if (pageBlock) {
-      pageBlocks.push(pageBlock);
+    if (card) {
+      cards.push(card);
     }
 
-    const boardBlock = await prisma.block.findFirst({
+    const board = await prisma.block.findFirst({
       where: {
         deletedAt: null,
         id: page.parentId
       }
-    });
+    }) as unknown as Board;
 
-    if (boardBlock) {
-      boardBlocks.push(boardBlock);
+    if (board) {
+      boards.push(board);
     }
   }
   else if (page.type === 'page') {
@@ -119,7 +120,7 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
       }
     });
 
-    const _boardBlocks = await prisma.block.findMany({
+    const boardBlocks = await prisma.block.findMany({
       where: {
         id: {
           in: linkedPageIds
@@ -138,7 +139,7 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
 
     boardViews.forEach(view => views.push(view as unknown as BoardView));
 
-    _boardBlocks.forEach(boardBlock => boardBlocks.push(boardBlock));
+    boardBlocks.forEach(board => boards.push(board as unknown as Board));
   }
 
   const space = await prisma.space.findFirst({
@@ -154,8 +155,8 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
   return res.status(200).json({
     page,
     boardPages,
-    pageBlocks,
-    boardBlocks,
+    cards,
+    boards,
     space,
     views
   });

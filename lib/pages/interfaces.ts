@@ -1,4 +1,5 @@
 import { Block, Page, PagePermission, Space } from '@prisma/client';
+import { Board } from 'lib/focalboard/board';
 import { BoardView } from 'lib/focalboard/boardView';
 import { Card } from 'lib/focalboard/card';
 
@@ -30,9 +31,9 @@ export interface PagesRequest {
 export interface PublicPageResponse {
   page: Page;
   boardPages: Page[];
-  pageBlocks: Card[];
-  boardBlocks: Block[];
   space: Space;
+  cards: Card[];
+  boards: Board[];
   views: BoardView[]
 }
 

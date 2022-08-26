@@ -5,7 +5,6 @@ import SunIcon from '@mui/icons-material/WbSunny';
 import { Box, IconButton, Tooltip } from '@mui/material';
 import { useWeb3React } from '@web3-react/core';
 import charmClient from 'charmClient';
-import { Card } from 'components/common/BoardEditor/focalboard/src/blocks/card';
 import { updateBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { addCard } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
@@ -26,7 +25,6 @@ import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import { Board } from 'lib/focalboard/board';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -72,7 +70,7 @@ export default function PublicPage () {
     }
     else {
       try {
-        const { page: rootPage, pageBlocks, boardBlocks, space, views } = await charmClient.getPublicPage(pageIdOrPath);
+        const { page: rootPage, cards, boards, space, views } = await charmClient.getPublicPage(pageIdOrPath);
 
         setTitleState(rootPage.title);
         setCurrentPageId(rootPage.id);
@@ -80,17 +78,15 @@ export default function PublicPage () {
         setSpaces([space]);
 
         dispatch(setCurrent(rootPage.id));
-        pageBlocks.forEach(pageBlock => {
-          dispatch(addCard(pageBlock as unknown as Card));
+        cards.forEach(card => {
+          dispatch(addCard(card));
         });
 
         views.forEach(view => {
           dispatch(addView(view));
         });
 
-        boardBlocks.forEach(boardBlock => {
-          dispatch(updateBoards([boardBlock as any as Board]));
-        });
+        dispatch(updateBoards(boards));
       }
       catch (err) {
         setPageNotFound(true);
