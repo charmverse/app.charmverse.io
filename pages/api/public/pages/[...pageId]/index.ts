@@ -117,6 +117,15 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
       }
     });
 
+    const _boardBlocks = await prisma.block.findMany({
+      where: {
+        id: {
+          in: linkedPageIds
+        }
+      }
+    });
+
+    _boardBlocks.forEach(boardBlock => boardBlocks.push(boardBlock));
   }
 
   const space = await prisma.space.findFirst({
@@ -134,7 +143,6 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
     boardPages,
     pageBlocks,
     boardBlocks,
-    views: [],
     space
   });
 }

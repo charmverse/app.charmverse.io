@@ -32,7 +32,6 @@ export interface PublicPageResponse {
   boardPages: Page[];
   pageBlocks: Card[];
   boardBlocks: Block[];
-  views: BoardView[]
   space: Space;
 }
 
