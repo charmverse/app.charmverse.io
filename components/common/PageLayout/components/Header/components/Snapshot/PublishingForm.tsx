@@ -249,7 +249,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
             </Box>
             {
           !snapshotSpace && (
-          <ConnectSnapshot />
+            <ConnectSnapshot />
           )
         }
           </>

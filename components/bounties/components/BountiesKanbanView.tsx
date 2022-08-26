@@ -101,21 +101,21 @@ export default function BountiesKanbanView ({ bounties, refreshBounty }: Omit<Pr
       </div>
 
       {activeBountyPage?.page && activeBountyPage?.bounty && (
-      <PageDialog
-        page={activeBountyPage.page}
-        onClickDelete={() => {
-          deletePage({
-            pageId: activeBountyPage.page.id
-          });
-        }}
-        onClose={() => {
-          closePopup();
-        }}
-        bounty={activeBountyPage?.bounty}
-        onMarkCompleted={() => {
-          closeBounty(activeBountyPage?.bounty.id);
-        }}
-      />
+        <PageDialog
+          page={activeBountyPage.page}
+          onClickDelete={() => {
+            deletePage({
+              pageId: activeBountyPage.page.id
+            });
+          }}
+          onClose={() => {
+            closePopup();
+          }}
+          bounty={activeBountyPage?.bounty}
+          onMarkCompleted={() => {
+            closeBounty(activeBountyPage?.bounty.id);
+          }}
+        />
       )}
     </div>
   );

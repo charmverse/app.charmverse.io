@@ -242,15 +242,15 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
           </Box>
           <ScrollingContainer isScrolled={isScrolled} onScroll={onScroll} className='page-navigation'>
             {favoritePageIds.length > 0 && (
-            <Box mb={2}>
-              <SectionName>
-                FAVORITES
-              </SectionName>
-              <PageNavigation
-                isFavorites={true}
-                rootPageIds={favoritePageIds}
-              />
-            </Box>
+              <Box mb={2}>
+                <SectionName>
+                  FAVORITES
+                </SectionName>
+                <PageNavigation
+                  isFavorites={true}
+                  rootPageIds={favoritePageIds}
+                />
+              </Box>
             )}
             <WorkspaceLabel>
               <SectionName>

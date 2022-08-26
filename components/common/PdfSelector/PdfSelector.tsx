@@ -52,7 +52,7 @@ export default function PdfSelector ({ autoOpen = false, children, onPdfSelect }
           ]}
           />
         </Box>
-  )}
+      )}
     >
       {children}
     </PopperPopup>

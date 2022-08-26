@@ -97,21 +97,21 @@ export default function PageDialog (props: Props) {
           toolsMenu={!hideToolsMenu && !readOnly && (
             <List dense>
               {onClickDelete && (
-              <ListItemButton
-                disabled={!pagePermission?.delete}
-                onClick={async () => {
-                  onClickDelete();
-                  onClose();
-                }}
-              >
-                <DeleteIcon
-                  sx={{
-                    mr: 1
+                <ListItemButton
+                  disabled={!pagePermission?.delete}
+                  onClick={async () => {
+                    onClickDelete();
+                    onClose();
                   }}
-                  fontSize='small'
-                />
-                <ListItemText primary='Delete' />
-              </ListItemButton>
+                >
+                  <DeleteIcon
+                    sx={{
+                      mr: 1
+                    }}
+                    fontSize='small'
+                  />
+                  <ListItemText primary='Delete' />
+                </ListItemButton>
               )}
               <ListItemButton onClick={() => {
                 Utils.copyTextToClipboard(window.location.href);

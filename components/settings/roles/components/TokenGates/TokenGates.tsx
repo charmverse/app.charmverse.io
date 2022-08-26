@@ -166,19 +166,19 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
       </Modal>
       <ErrorModal message={apiError} open={errorPopupState.isOpen} onClose={errorPopupState.close} />
       {removedTokenGate && (
-      <ConfirmDeleteModal
-        title='Delete token gate'
-        onClose={closeTokenGateDeleteModal}
-        open={deletePopupState.isOpen}
-        buttonText='Delete token gate'
-        question='Are you sure you want to delete this invite link?'
-        onConfirm={async () => {
-          await charmClient.deleteTokenGate(removedTokenGate.id);
-          // update the list of links
-          await mutate();
-          setRemovedTokenGate(null);
-        }}
-      />
+        <ConfirmDeleteModal
+          title='Delete token gate'
+          onClose={closeTokenGateDeleteModal}
+          open={deletePopupState.isOpen}
+          buttonText='Delete token gate'
+          question='Are you sure you want to delete this invite link?'
+          onConfirm={async () => {
+            await charmClient.deleteTokenGate(removedTokenGate.id);
+            // update the list of links
+            await mutate();
+            setRemovedTokenGate(null);
+          }}
+        />
       )}
     </>
   );

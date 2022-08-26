@@ -60,19 +60,19 @@ export default function InviteLinkList ({ isAdmin, spaceId }: { isAdmin: boolean
         <InviteForm onSubmit={createLink} onClose={close} />
       </Modal>
       {removedInviteLink && (
-      <ConfirmDeleteModal
-        title='Delete invite link'
-        onClose={closeInviteLinkDeleteModal}
-        open={isInviteLinkDeleteOpen}
-        buttonText='Delete'
-        question='Are you sure you want to delete this invite link?'
-        onConfirm={async () => {
-          await charmClient.deleteInviteLink(removedInviteLink.id);
-          // update the list of links
-          await mutate();
-          setRemovedInviteLink(null);
-        }}
-      />
+        <ConfirmDeleteModal
+          title='Delete invite link'
+          onClose={closeInviteLinkDeleteModal}
+          open={isInviteLinkDeleteOpen}
+          buttonText='Delete'
+          question='Are you sure you want to delete this invite link?'
+          onConfirm={async () => {
+            await charmClient.deleteInviteLink(removedInviteLink.id);
+            // update the list of links
+            await mutate();
+            setRemovedInviteLink(null);
+          }}
+        />
       )}
     </>
   );
