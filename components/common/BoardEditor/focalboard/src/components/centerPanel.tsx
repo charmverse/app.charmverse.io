@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 /* eslint-disable max-lines */
-import { Box } from '@mui/system';
+import { Box } from '@mui/material';
 import { useRouter } from 'next/router';
 import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
 import PageDeleteBanner from 'components/[pageId]/DocumentPage/components/PageDeleteBanner';
@@ -43,6 +43,7 @@ import ViewTitle, { InlineViewTitle } from './viewTitle';
 import dynamic from 'next/dynamic';
 import AddViewMenu from './addViewMenu';
 import SourceSelection from './SourceSelection';
+import ViewOptionsSidebar from './viewOptionsSidebar';
 
 const CalendarFullView = dynamic(() => import('./calendar/fullCalendar'), { ssr: false });
 
@@ -71,7 +72,7 @@ type Props = {
 type State = {
   selectedCardIds: string[];
   cardIdToFocusOnRender: string;
-  showLinkedViewMenu: boolean;
+  showSettings: 'create-linked-view' | 'view-options' | null;
 }
 
 function CenterPanel (props: Props) {
@@ -81,12 +82,12 @@ function CenterPanel (props: Props) {
   const [state, setState] = useState<State>({
     cardIdToFocusOnRender: '',
     selectedCardIds: [],
-    showLinkedViewMenu: !props.activeView
+    // assume this is a page type 'inline_linked_board' if no view exists yet
+    showSettings: !props.activeView ? 'create-linked-view' : null,
   });
 
   const router = useRouter();
   const [space] = useCurrentSpace();
-  const { user } = useUser();
   const { pages } = usePages();
   const _groupByProperty = useAppSelector(getCurrentViewGroupBy);
   const _dateDisplayProperty = useAppSelector(getCurrentViewDisplayBy);
@@ -409,7 +410,6 @@ function CenterPanel (props: Props) {
 
   async function createLinkedView ({ boardId: sourceBoardId }: { boardId: string }) {
     const view = createBoardView();
-    console.log('source', sourceBoardId);
     view.fields.viewType = 'board';
     view.parentId = board.id;
     view.rootId = board.id;
@@ -426,24 +426,27 @@ function CenterPanel (props: Props) {
     showView(view.id);
   }
 
-  function openSelectSourceSidebar () {
-    setState({ ...state, showLinkedViewMenu: true });
+  function openSelectSource () {
+    setState({ ...state, showSettings: 'create-linked-view' });
     props.onViewTabClick?.('');
   }
 
-  const addViewButton = <AddViewMenu
-    board={board}
-    activeView={activeView}
-    views={views}
-    showView={showView}
-    onClick={(boardPageType === 'inline_linked_board') ? openSelectSourceSidebar : undefined}
-  />;
+  function toggleViewOptions (enable?: boolean) {
+    enable = enable ?? state.showSettings !== 'view-options'
+    const showSettings = enable ? 'view-options' : null;
+    setState({ ...state, showSettings });
+  }
 
+  function closeSettings () {
+    setState({ ...state, showSettings: null });
+  }
+
+  // close settings once a view has been added
   useEffect(() => {
     if (activeView) {
-      setState({ ...state, showLinkedViewMenu: false });
+      closeSettings();
     }
-  }, [activeView]);
+  }, [activeView?.id]);
 
   return (
     <div
@@ -482,10 +485,19 @@ function CenterPanel (props: Props) {
           maxTabsShown={props.maxTabsShown}
           disableUpdatingUrl={props.disableUpdatingUrl}
           onViewTabClick={props.onViewTabClick}
-          addViewButton={addViewButton}
+          addViewButton={(
+            <AddViewMenu
+              board={board}
+              activeView={activeView}
+              views={views}
+              showView={showView}
+              onClick={(boardPageType === 'inline_linked_board') ? openSelectSource : undefined}
+            />
+          )}
           board={board}
           activeBoard={activeBoard}
           activeView={props.activeView}
+          toggleViewOptions={toggleViewOptions}
           cards={cards}
           views={props.views}
           groupByProperty={groupByProperty}
@@ -498,97 +510,100 @@ function CenterPanel (props: Props) {
           readonly={props.readonly}
           embeddedBoardPath={props.embeddedBoardPath}
         />
-        {activeBoard && activePage && isEmbedded && boardPageType === 'inline_board' && (
-          <InlineViewTitle
-            key={activePage.id + activePage.title}
-            board={activeBoard}
-            readonly={props.readonly}
-            setPage={props.setPage}
-          />
-        )}
-        {activePage && boardPageType === 'inline_linked_board' && (
-          <Button
-            color='secondary'
-            startIcon={<CallMadeIcon />}
-            variant='text'
-            size='large'
-            // TODO: Respect shared page
-            href={`/${space?.domain}/${activePage?.path}`}
-            sx={{ fontSize: 22, fontWeight: 700, py: 0 }}
-          >
-            {activePage.title || 'Untitled'}
-          </Button>
-        )}
       </div>
 
-      <div className={`container-container ${state.showLinkedViewMenu ? 'sidebar-visible' : ''}`}>
-        {!activeView && state.showLinkedViewMenu && (
-          <SourceSelection
-            onSelectSource={createLinkedView}
-            onCreateDatabase={createDatabase}
-            showCreateDatabase={views.length === 0}
-          />
-        )}
-        {activeBoard && activeView?.fields.viewType === 'board'
-          && (
-            <Kanban
-              board={activeBoard}
-              activeView={activeView}
-              cards={cards}
-              groupByProperty={groupByProperty}
-              visibleGroups={visibleGroups}
-              hiddenGroups={hiddenGroups}
-              selectedCardIds={state.selectedCardIds}
-              readonly={props.readonly}
-              onCardClicked={cardClicked}
-              addCard={addCard}
-              showCard={showCard}
-            />
-          )}
-        {activeBoard && activeView?.fields.viewType === 'table'
-          && (
-            <Table
-              board={activeBoard}
-              activeView={activeView}
-              cards={cards}
-              groupByProperty={groupByProperty}
-              views={props.views}
-              visibleGroups={visibleGroups}
-              selectedCardIds={state.selectedCardIds}
-              readonly={props.readonly}
-              cardIdToFocusOnRender={state.cardIdToFocusOnRender}
-              showCard={showCard}
-              addCard={addCard}
-              onCardClicked={cardClicked}
-            />
-          )}
-        {activeBoard && activeView?.fields.viewType === 'calendar'
-          && (
-            <CalendarFullView
-              board={activeBoard}
-              cards={cards}
-              activeView={activeView}
-              readonly={props.readonly}
-              dateDisplayProperty={dateDisplayProperty}
-              showCard={showCard}
-              addCard={(properties: Record<string, string>) => {
-                addCard('', true, properties);
-              }}
-            />
-          )}
+      <div className={`container-container ${!!state.showSettings ? 'sidebar-visible' : ''}`}>
+        <Box display='flex'>
+          <Box>
+            {activeBoard && activePage && isEmbedded && boardPageType === 'inline_board' && (
+              <InlineViewTitle
+                key={activePage.id + activePage.title}
+                board={activeBoard}
+                readonly={props.readonly}
+                setPage={props.setPage}
+              />
+            )}
+            {activePage && boardPageType === 'inline_linked_board' && (
+              <Button
+                color='secondary'
+                startIcon={<CallMadeIcon />}
+                variant='text'
+                size='large'
+                // TODO: Respect shared page
+                href={`/${space?.domain}/${activePage?.path}`}
+                sx={{ fontSize: 22, fontWeight: 700, py: 0 }}
+              >
+                {activePage.title || 'Untitled'}
+              </Button>
+            )}
+            {!activeView && state.showSettings === 'create-linked-view' && (
+              <SourceSelection
+                onSelectSource={createLinkedView}
+                onCreateDatabase={createDatabase}
+                showCreateDatabase={views.length === 0}
+              />
+            )}
+            {activeBoard && activeView?.fields.viewType === 'board' && (
+              <Kanban
+                board={activeBoard}
+                activeView={activeView}
+                cards={cards}
+                groupByProperty={groupByProperty}
+                visibleGroups={visibleGroups}
+                hiddenGroups={hiddenGroups}
+                selectedCardIds={state.selectedCardIds}
+                readonly={props.readonly}
+                onCardClicked={cardClicked}
+                addCard={addCard}
+                showCard={showCard}
+              />
+            )}
+            {activeBoard && activeView?.fields.viewType === 'table' && (
+              <Table
+                board={activeBoard}
+                activeView={activeView}
+                cards={cards}
+                groupByProperty={groupByProperty}
+                views={props.views}
+                visibleGroups={visibleGroups}
+                selectedCardIds={state.selectedCardIds}
+                readonly={props.readonly}
+                cardIdToFocusOnRender={state.cardIdToFocusOnRender}
+                showCard={showCard}
+                addCard={addCard}
+                onCardClicked={cardClicked}
+              />
+            )}
+            {activeBoard && activeView?.fields.viewType === 'calendar' && (
+              <CalendarFullView
+                board={activeBoard}
+                cards={cards}
+                activeView={activeView}
+                readonly={props.readonly}
+                dateDisplayProperty={dateDisplayProperty}
+                showCard={showCard}
+                addCard={(properties: Record<string, string>) => {
+                  addCard('', true, properties);
+                }}
+              />
+            )}
 
-        {activeBoard && activeView?.fields.viewType === 'gallery'
-          && (
-            <Gallery
-              board={activeBoard}
-              cards={cards}
-              activeView={activeView}
-              readonly={props.readonly}
-              onCardClicked={cardClicked}
-              selectedCardIds={state.selectedCardIds}
-              addCard={(show) => addCard('', show)}
-            />
+            {activeBoard && activeView?.fields.viewType === 'gallery' && (
+              <Gallery
+                board={activeBoard}
+                cards={cards}
+                activeView={activeView}
+                readonly={props.readonly}
+                onCardClicked={cardClicked}
+                selectedCardIds={state.selectedCardIds}
+                addCard={(show) => addCard('', show)}
+              />
+            )}
+          </Box>
+          {activeBoard && activeView && (
+            <ViewOptionsSidebar board={activeBoard} view={activeView} isOpen={state.showSettings === 'view-options'} closeSidebar={closeSettings} />
           )}
+        </Box>
       </div>
     </div>
   );
