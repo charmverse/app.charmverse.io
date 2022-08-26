@@ -166,7 +166,6 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
           showInlineTitle={true}
           activeView={currentView}
           views={views}
-          maxTabsShown={2}
         />
       </StylesContainer>
       {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
