@@ -44,9 +44,10 @@ type Props = {
   showActionsOnHover?: boolean
   showView: (viewId: string) => void
   embeddedBoardPath?: string
+  toggleViewOptions: (enable?: boolean) => void
 }
 
-const ViewHeader = React.memo(({ maxTabsShown = 3, showView, ...props }: Props) => {
+const ViewHeader = React.memo(({ maxTabsShown = 3, showView, toggleViewOptions, ...props }: Props) => {
   const [showFilter, setShowFilter] = useState(false);
   const router = useRouter();
 
@@ -73,6 +74,7 @@ const ViewHeader = React.memo(({ maxTabsShown = 3, showView, ...props }: Props) 
         activeView={activeView}
         disableUpdatingUrl={props.disableUpdatingUrl}
         maxTabsShown={maxTabsShown}
+        openViewOptions={() => toggleViewOptions(true)}
       />
 
       {/* add a view */}
@@ -174,12 +176,7 @@ const ViewHeader = React.memo(({ maxTabsShown = 3, showView, ...props }: Props) 
       {!props.readonly && activeView
         && (
           <>
-
-            <ViewHeaderActionsMenu
-              board={board}
-              activeView={activeView}
-              cards={cards}
-            />
+            <ViewHeaderActionsMenu onClick={() => toggleViewOptions()} />
 
             {/* New card button */}
 
