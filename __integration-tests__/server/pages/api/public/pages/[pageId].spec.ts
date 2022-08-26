@@ -27,7 +27,8 @@ describe('GET /api/public/pages/[pageId] - Load public page', () => {
       createdBy: nonAdminUser.id,
       spaceId: nonAdminUserSpace.id,
       contentText: exampleText,
-      path: pagePath
+      path: pagePath,
+      content: {}
     });
 
     const publicPermission = await upsertPermission((await page).id, {
@@ -54,7 +55,8 @@ describe('GET /api/public/pages/[pageId] - Load public page', () => {
       createdBy: nonAdminUser.id,
       spaceId: nonAdminUserSpace.id,
       contentText: exampleText,
-      path: pagePath
+      path: pagePath,
+      content: {}
     });
 
     const publicPermission = await upsertPermission((await page).id, {
@@ -80,7 +82,8 @@ describe('GET /api/public/pages/[pageId] - Load public page', () => {
       createdBy: nonAdminUser.id,
       spaceId: nonAdminUserSpace.id,
       contentText: exampleText,
-      path: pagePath
+      path: pagePath,
+      content: {}
     });
 
     await request(baseUrl)

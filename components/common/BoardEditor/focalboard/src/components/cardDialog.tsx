@@ -12,7 +12,6 @@ import { BountyWithDetails } from 'models';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Board } from '../blocks/board';
 import mutator from '../mutator';
 import { getCard } from '../store/cards';
 import { useAppSelector } from '../store/hooks';
@@ -21,7 +20,6 @@ import ConfirmationDialogBox, { ConfirmationDialogBoxProps } from './confirmatio
 import PageDialog from 'components/common/Page/PageDialog';
 
 type Props = {
-  board: Board
   cardId: string
   onClose: () => void
   showCard: (cardId?: string) => void

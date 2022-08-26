@@ -3,6 +3,7 @@ import {
   isTouchDevice,
   safeScrollIntoViewIfNeeded
 } from 'lib/browser';
+import { Box } from '@mui/material';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 interface InlinePaletteRowProps {
@@ -77,7 +78,7 @@ export default function InlinePaletteRow ({
       className={className}
       style={style}
     >
-      {icon}
+      <Box display='flex' sx={{ color: 'secondary.light' }} component='span'>{icon}</Box>
       {title}
     </StyledInlinePaletteRow>
   );

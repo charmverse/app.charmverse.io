@@ -1,4 +1,7 @@
 import { Block, Page, PagePermission, Space } from '@prisma/client';
+import { Board } from 'lib/focalboard/board';
+import { BoardView } from 'lib/focalboard/boardView';
+import { Card } from 'lib/focalboard/card';
 
 export interface IPageWithPermissions extends Page {
   permissions: (PagePermission & {sourcePermission: PagePermission | null}) []
@@ -27,10 +30,11 @@ export interface PagesRequest {
 
 export interface PublicPageResponse {
   page: Page;
-  boardPage: Page | null;
-  pageBlock: Block | null;
-  boardBlock: Block | null;
+  boardPages: Page[];
   space: Space;
+  cards: Card[];
+  boards: Board[];
+  views: BoardView[]
 }
 
 // These 2 types are used for reducing a list of pages to a tree

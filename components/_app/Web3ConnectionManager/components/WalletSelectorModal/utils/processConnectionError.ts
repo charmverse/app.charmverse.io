@@ -4,7 +4,7 @@ import {
   UserRejectedRequestError as UserRejectedRequestErrorInjected
 } from '@web3-react/injected-connector';
 import { UserRejectedRequestError as UserRejectedRequestErrorWalletConnect } from '@web3-react/walletconnect-connector';
-import { ErrorInfo } from 'components/common/Error';
+import { ErrorInfo } from 'components/common/errors/WalletError';
 
 const processConnectionError = (error: Error): ErrorInfo => {
   switch (error.constructor) {

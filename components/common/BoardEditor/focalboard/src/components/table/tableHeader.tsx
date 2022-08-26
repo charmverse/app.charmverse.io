@@ -70,7 +70,7 @@ function TableHeader (props: Props): JSX.Element {
             }
           })}
           </div>
-          <Typography variant='subtitle1'>{props.name}</Typography>
+          <Typography component='div' variant='subtitle1'>{props.name}</Typography>
           {props.sorted === 'up' && <SortUpIcon />}
           {props.sorted === 'down' && <SortDownIcon />}
         </Label>

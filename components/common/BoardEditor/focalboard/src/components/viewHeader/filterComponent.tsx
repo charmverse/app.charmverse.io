@@ -78,8 +78,6 @@ const FilterComponent = React.memo((props: Props): JSX.Element => {
           />
         ))}
 
-        <br />
-
         <Button onClick={() => addFilterClicked()}>
           <FormattedMessage
             id='FilterComponent.add-filter'

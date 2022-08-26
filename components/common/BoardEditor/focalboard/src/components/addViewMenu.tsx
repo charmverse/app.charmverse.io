@@ -23,18 +23,14 @@ import TableIcon from '../widgets/icons/table';
 
 type AddViewProps = {
   board: Board,
-  activeView: BoardView,
+  activeView?: BoardView,
   views: BoardView[],
   intl: IntlShape,
   showLabel?: boolean,
   showView: (viewId: string) => void,
   sx?: SxProps
+  onClick?: () => void
 }
-
-const StyledIconButton = styled(IconButton)`
-  position: relative;
-  top: -3px;
-`;
 
 function AddViewMenu (props: AddViewProps) {
 
@@ -65,9 +61,9 @@ function AddViewMenu (props: AddViewProps) {
     view.fields.viewType = 'board';
     view.parentId = board.id;
     view.rootId = board.rootId;
-    view.fields.cardOrder = activeView.fields.cardOrder;
+    view.fields.cardOrder = activeView?.fields.cardOrder ?? [];
 
-    const oldViewId = activeView.id;
+    const oldViewId = activeView?.id;
 
     mutator.insertBlock(
       view,
@@ -81,9 +77,10 @@ function AddViewMenu (props: AddViewProps) {
         showView(block.id);
       },
       async () => {
-        showView(oldViewId);
+        oldViewId && showView(oldViewId);
       }
     );
+    popupState.close();
   }, [props.activeView, props.board, props.intl, showView]);
 
   const handleAddViewTable = useCallback(() => {
@@ -98,9 +95,9 @@ function AddViewMenu (props: AddViewProps) {
     view.fields.visiblePropertyIds = board.fields.cardProperties.map((o: IPropertyTemplate) => o.id);
     view.fields.columnWidths = {};
     view.fields.columnWidths[Constants.titleColumnId] = Constants.defaultTitleColumnWidth;
-    view.fields.cardOrder = activeView.fields.cardOrder;
+    view.fields.cardOrder = activeView?.fields.cardOrder ?? [];
 
-    const oldViewId = activeView.id;
+    const oldViewId = activeView?.id;
 
     mutator.insertBlock(
       view,
@@ -114,9 +111,10 @@ function AddViewMenu (props: AddViewProps) {
         showView(block.id);
       },
       async () => {
-        showView(oldViewId);
+        oldViewId && showView(oldViewId);
       }
     );
+    popupState.close();
   }, [props.activeView, props.board, props.intl, showView]);
 
   const handleAddViewGallery = useCallback(() => {
@@ -129,9 +127,9 @@ function AddViewMenu (props: AddViewProps) {
     view.parentId = board.id;
     view.rootId = board.rootId;
     view.fields.visiblePropertyIds = [Constants.titleColumnId];
-    view.fields.cardOrder = activeView.fields.cardOrder;
+    view.fields.cardOrder = activeView?.fields.cardOrder ?? [];
 
-    const oldViewId = activeView.id;
+    const oldViewId = activeView?.id;
 
     mutator.insertBlock(
       view,
@@ -144,9 +142,10 @@ function AddViewMenu (props: AddViewProps) {
         }, 120);
       },
       async () => {
-        showView(oldViewId);
+        oldViewId && showView(oldViewId);
       }
     );
+    popupState.close();
   }, [props.board, props.activeView, props.intl, showView]);
 
   const handleAddViewCalendar = useCallback(() => {
@@ -159,9 +158,9 @@ function AddViewMenu (props: AddViewProps) {
     view.parentId = board.id;
     view.rootId = board.rootId;
     view.fields.visiblePropertyIds = [Constants.titleColumnId];
-    view.fields.cardOrder = activeView.fields.cardOrder;
+    view.fields.cardOrder = activeView?.fields.cardOrder ?? [];
 
-    const oldViewId = activeView.id;
+    const oldViewId = activeView?.id;
 
     // Find first date property
     view.fields.dateDisplayPropertyId = board.fields.cardProperties.find((o: IPropertyTemplate) => o.type === 'date')?.id;
@@ -177,43 +176,45 @@ function AddViewMenu (props: AddViewProps) {
         }, 120);
       },
       async () => {
-        showView(oldViewId);
+        oldViewId && showView(oldViewId);
       }
     );
+    popupState.close();
   }, [props.board, props.activeView, props.intl, showView]);
+
+  const triggers = props.onClick ? { onClick: props.onClick } : bindTrigger(popupState);
 
   return (
     <>
       {props.showLabel ? (
         <Button
-          {...bindTrigger(popupState)}
+          {...triggers}
           color='secondary'
           size='small'
           startIcon={<Add />}
           variant='text'
-          sx={{ ...(props.sx ?? {}) }}
         >
           Add view
         </Button>
       ) : (
-        <StyledIconButton {...bindTrigger(popupState)} color='secondary' size='small'>
+        <IconButton {...triggers} color='secondary' size='small'>
           <Add fontSize='small' />
-        </StyledIconButton>
+        </IconButton>
       )}
       <Menu {...bindMenu(popupState)}>
-        <MenuItem onClick={handleAddViewBoard}>
+        <MenuItem dense onClick={handleAddViewBoard}>
           <ListItemIcon><BoardIcon /></ListItemIcon>
           <ListItemText>{boardText}</ListItemText>
         </MenuItem>
-        <MenuItem onClick={handleAddViewTable}>
+        <MenuItem dense onClick={handleAddViewTable}>
           <ListItemIcon><TableIcon /></ListItemIcon>
           <ListItemText>{tableText}</ListItemText>
         </MenuItem>
-        <MenuItem onClick={handleAddViewGallery}>
+        <MenuItem dense onClick={handleAddViewGallery}>
           <ListItemIcon><GalleryIcon /></ListItemIcon>
           <ListItemText>{galleryText}</ListItemText>
         </MenuItem>
-        <MenuItem onClick={handleAddViewCalendar}>
+        <MenuItem dense onClick={handleAddViewCalendar}>
           <ListItemIcon><CalendarIcon /></ListItemIcon>
           <ListItemText>Calendar</ListItemText>
         </MenuItem>

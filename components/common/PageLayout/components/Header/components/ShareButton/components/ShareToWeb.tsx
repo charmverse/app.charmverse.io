@@ -93,7 +93,7 @@ export default function ShareToWeb ({ pageId, pagePermissions, refreshPermission
         ? `${window.location.origin}/share/${space?.domain}/${currentPage.path}` : '';
       setShareLink(shareLinkToSet);
     }
-    else if (currentPage?.type === 'board') {
+    else if (currentPage?.type.match(/board/)) {
       const viewIdToProvide = router.query.viewId;
       const shareLinkToSet = (typeof window !== 'undefined')
         ? `${window.location.origin}/share/${space?.domain}/${currentPage.path}?viewId=${viewIdToProvide}` : '';
@@ -127,7 +127,7 @@ export default function ShareToWeb ({ pageId, pagePermissions, refreshPermission
         />
       </Box>
       {
-        currentPage?.type === 'board' && (
+        (currentPage?.type.match(/board/)) && (
           <Alert severity='info'>
             Updates to this board's permissions, including whether it is public, will also apply to its cards.
           </Alert>
