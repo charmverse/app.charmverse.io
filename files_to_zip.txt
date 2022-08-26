@@ -1,6 +1,8 @@
 Dockerfile
-docker-compose.yml
+Dockerrun.aws.json
 .ebextensions
+.env
+.env.staging
 .next
 next.base.js
 next.config.js
