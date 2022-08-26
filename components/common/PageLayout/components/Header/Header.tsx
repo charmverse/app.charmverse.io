@@ -1,4 +1,4 @@
-import { useTheme, ReactNode } from '@emotion/react';
+import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
 import MoonIcon from '@mui/icons-material/DarkMode';
@@ -21,7 +21,6 @@ import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import { Page } from '@prisma/client';
 import charmClient from 'charmClient';
-import { onExportCsvTrigger } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderActionsMenu';
 import PublishToSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/PublishToSnapshot';
 import { useColorMode } from 'context/darkMode';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
@@ -29,7 +28,7 @@ import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
 import { useRouter } from 'next/router';
-import { useRef, useState } from 'react';
+import { useRef, useState, ReactNode } from 'react';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
 import ShareButton from './components/ShareButton';
@@ -201,7 +200,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
     setPageMenuOpen(false);
   }
 
-  const databaseOptions = basePage ? <DatabasePageOptions page={basePage} closeMenu={closeMenu} /> : null;
+  const databaseOptions = basePage ? <DatabasePageOptions closeMenu={closeMenu} /> : null;
 
   let pageOptionsList: ReactNode;
   if (isBasePageDocument) {
