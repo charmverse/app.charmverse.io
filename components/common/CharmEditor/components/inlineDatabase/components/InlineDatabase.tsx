@@ -160,7 +160,6 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
           clientConfig={clientConfig}
           readonly={readOnly}
           board={board}
-          pageType={pages[pageId]?.type === 'inline_linked_board' ? 'inline_linked_board' : 'inline_board'}
           embeddedBoardPath={pages[pageId]?.path}
           setPage={debouncedPageUpdate}
           showCard={showCard}

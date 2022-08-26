@@ -10,14 +10,11 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { getViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { Page, PageType } from '@prisma/client';
-import { IconButton } from '@mui/material';
-import { Add } from '@mui/icons-material';
 import { usePages } from 'hooks/usePages';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { getCurrentViewDisplayBy, getCurrentViewGroupBy } from 'components/common/BoardEditor/focalboard/src/store/views';
 import React, { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import Button from 'components/common/Button';
-import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import { addPage } from 'lib/pages';
 import { useUser } from 'hooks/useUser';
 import { createBoardView } from 'lib/focalboard/boardView';
@@ -33,7 +30,6 @@ import { BoardView } from '../blocks/boardView';
 import { Card, createCard } from '../blocks/card';
 import { CardFilter } from '../cardFilter';
 import { ClientConfig } from '../config/clientConfig';
-import Editable from '../widgets/editable';
 import mutator from '../mutator';
 import { addCard, addTemplate } from '../store/cards';
 import { updateView } from '../store/views';
@@ -54,7 +50,6 @@ type Props = {
   clientConfig?: ClientConfig
   board: Board
   embeddedBoardPath?: string
-  pageType: PageType
   // cards: Card[]
   activeView?: BoardView
   views: BoardView[]
@@ -450,7 +445,7 @@ function CenterPanel (props: Props) {
     activeView={activeView}
     views={views}
     showView={showView}
-    onClick={(props.pageType === 'inline_linked_board') ? openSelectSourceSidebar : undefined}
+    onClick={(activePage?.type === 'inline_linked_board') ? openSelectSourceSidebar : undefined}
   />;
 
   useEffect(() => {
@@ -483,10 +478,10 @@ function CenterPanel (props: Props) {
         </Box>
       )}
       <div className='top-head'>
-        {(activeBoard && (props.pageType === 'board' || (!isEmbedded && props.pageType === 'inline_board'))) && (
+        {(board && (activePage?.type === 'board' || !isEmbedded)) && (
           <ViewTitle
-            key={activeBoard.id + activeBoard.title}
-            board={activeBoard}
+            key={board.id + board.title}
+            board={board}
             readonly={props.readonly}
             setPage={props.setPage}
           />
@@ -512,15 +507,15 @@ function CenterPanel (props: Props) {
           readonly={props.readonly}
           embeddedBoardPath={props.embeddedBoardPath}
         />
-        {activeBoard && isEmbedded && props.pageType === 'inline_board' && (
+        {activeBoard && isEmbedded && activePage?.type === 'inline_board' && (
           <InlineViewTitle
-            key={activeBoard.id + activeBoard.title}
+            key={activePage.id + activePage.title}
             board={activeBoard}
             readonly={props.readonly}
             setPage={props.setPage}
           />
         )}
-        {activeBoard && props.pageType === 'inline_linked_board' && (
+        {activePage?.type === 'inline_linked_board' && (
           <Button
             color='secondary'
             startIcon={<CallMadeIcon />}
@@ -530,7 +525,7 @@ function CenterPanel (props: Props) {
             href={`/${space?.domain}/${activePage?.path}`}
             sx={{ fontSize: 22, fontWeight: 700, py: 0 }}
           >
-            {activeBoard.title || 'Untitled'}
+            {activePage.title || 'Untitled'}
           </Button>
         )}
       </div>

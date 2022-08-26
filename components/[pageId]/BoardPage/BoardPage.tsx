@@ -122,7 +122,6 @@ export default function BoardPage ({ page, setPage, readOnly }: Props) {
             clientConfig={clientConfig}
             readonly={Boolean(readOnly)}
             board={board}
-            pageType='board'
             setPage={setPage}
             showCard={showCard}
             activeView={activeView}
