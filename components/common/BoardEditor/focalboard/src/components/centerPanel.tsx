@@ -92,6 +92,7 @@ function CenterPanel (props: Props) {
   const _groupByProperty = useAppSelector(getCurrentViewGroupBy);
   const _dateDisplayProperty = useAppSelector(getCurrentViewDisplayBy);
   const boards = useAppSelector(getSortedBoards);
+  console.log({centerPanelBoards: boards});
 
   const isEmbedded = !!props.embeddedBoardPath;
   const boardPageType = pages[board.id]?.type;
@@ -529,8 +530,7 @@ function CenterPanel (props: Props) {
                 startIcon={<CallMadeIcon />}
                 variant='text'
                 size='large'
-                // TODO: Respect shared page
-                href={`/${space?.domain}/${activePage?.path}`}
+                href={`${router.pathname.startsWith('/share') ? '/share' : ''}/${space?.domain}/${activePage?.path}`}
                 sx={{ fontSize: 22, fontWeight: 700, py: 0 }}
               >
                 {activePage.title || 'Untitled'}
@@ -538,6 +538,7 @@ function CenterPanel (props: Props) {
             )}
             {!activeView && state.showSettings === 'create-linked-view' && (
               <SourceSelection
+                readOnly={props.readonly}
                 onSelectSource={createLinkedView}
                 onCreateDatabase={createDatabase}
                 showCreateDatabase={views.length === 0}

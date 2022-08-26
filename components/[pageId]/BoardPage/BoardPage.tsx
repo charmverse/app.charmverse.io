@@ -63,8 +63,9 @@ export default function BoardPage ({ page, setPage, readOnly }: Props) {
   }, [page.boardId, router.query.viewId, boardViews]);
 
   // load initial data for readonly boards - otherwise its loaded in _app.tsx
+  // inline linked board will be loaded manually
   useEffect(() => {
-    if (readOnly && page.boardId) {
+    if (readOnly && page.boardId && page.type !== 'inline_linked_board') {
       dispatch(initialReadOnlyLoad(page.boardId));
     }
   }, [page.boardId]);

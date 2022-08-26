@@ -157,7 +157,7 @@ function PageNavigation ({
 
   const onDropChild = useCallback((droppedItem: MenuNode, containerItem: MenuNode) => {
 
-    if (containerItem.type === 'board' || containerItem.type === 'inline_board' || containerItem.type === 'inline_linked_board') {
+    if (containerItem.type.match(/board/)) {
       return;
     }
 

@@ -10,6 +10,7 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { usePages } from 'hooks/usePages';
 import PagesList from 'components/common/CharmEditor/components/PageList';
 import { isTruthy } from 'lib/utilities/types';
+import { useRouter } from 'next/router';
 
 type SidebarState = 'select-source' | null;
 
@@ -18,6 +19,7 @@ interface Props {
   onSelectSource: (selected: { boardId: string }) => void;
   sidebarState?: SidebarState;
   showCreateDatabase?: boolean;
+  readOnly?: boolean
 }
 
 const StyledSidebar = styled.div`
@@ -38,7 +40,6 @@ const SidebarContent = styled.div`
 `;
 
 export default function SourceSelection (props: Props) {
-
   const [sidebarState, setSidebarState] = useState<SidebarState>('select-source');
 
   const { pages } = usePages();
@@ -66,13 +67,14 @@ export default function SourceSelection (props: Props) {
                 onClick={openSidebar}
                 variant='text'
                 sx={{ fontSize: 'inherit', textDecoration: 'underline' }}
+                disabled={props.readOnly}
               >
                 Select a data source
               </Button>to continue
             </Typography>
           </Stack>
         </Box>
-        <Collapse in={Boolean(sidebarState)} orientation='horizontal'>
+        <Collapse in={props.readOnly === true ? false : Boolean(sidebarState)} orientation='horizontal'>
           <StyledSidebar>
             <Box px={2} pt={1} pb={1} display='flex' justifyContent='space-between' alignItems='center'>
               <Typography fontWeight='bold'>Select data source</Typography>

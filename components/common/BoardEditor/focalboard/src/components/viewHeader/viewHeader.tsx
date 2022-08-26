@@ -56,7 +56,7 @@ const ViewHeader = React.memo(({ maxTabsShown = 3, showView, toggleViewOptions, 
   const withSortBy = activeView?.fields.viewType !== 'calendar';
 
   const hasFilter = activeView?.fields.filter && activeView?.fields.filter.filters?.length > 0;
-
+  
   return (
     <div className={`ViewHeader ${props.showActionsOnHover ? 'hide-actions' : ''}`}>
       <ViewTabs
@@ -142,7 +142,7 @@ const ViewHeader = React.memo(({ maxTabsShown = 3, showView, toggleViewOptions, 
 
       {/* Link to view embedded table in full */}
       {props.embeddedBoardPath && (
-        <Link href={`/${router.query.domain}/${props.embeddedBoardPath}`}>
+        <Link href={router.pathname.startsWith('/share') ? `/share/${router.query.pageId?.[0]}/${props.embeddedBoardPath}` : `/${router.query.domain}/${props.embeddedBoardPath}`}>
           <Tooltip title='Open as full page' placement='top'>
             <IconButton style={{ width: '32px' }}><OpenInFullIcon color='secondary' sx={{ fontSize: 14 }} /></IconButton>
           </Tooltip>
