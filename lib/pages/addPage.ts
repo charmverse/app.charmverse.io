@@ -91,6 +91,17 @@ function createDefaultBoardData ({ boardId }: DefaultBoardProps) {
   board.id = boardId;
   board.rootId = board.id;
 
+  const { cards, view } = createDefaultViewsAndCards({ board });
+
+  return {
+    board,
+    view,
+    cards
+  };
+}
+
+export function createDefaultViewsAndCards ({ board }: { board: Board }) {
+
   const view = createBoardView();
   view.fields.viewType = 'board';
   view.parentId = board.id;
@@ -109,11 +120,7 @@ function createDefaultBoardData ({ boardId }: DefaultBoardProps) {
     cards.push(card);
   }
 
-  return {
-    board,
-    view,
-    cards
-  };
+  return { view, cards };
 }
 
 export async function addPageAndRedirect (page: NewPageInput, router: NextRouter) {

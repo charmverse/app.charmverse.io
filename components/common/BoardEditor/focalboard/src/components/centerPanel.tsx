@@ -15,7 +15,7 @@ import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/sto
 import { getCurrentViewDisplayBy, getCurrentViewGroupBy } from 'components/common/BoardEditor/focalboard/src/store/views';
 import React, { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import Button from 'components/common/Button';
-import { addPage } from 'lib/pages';
+import { addPage, convertToInlineBoard } from 'lib/pages';
 import { useUser } from 'hooks/useUser';
 import { createBoardView } from 'lib/focalboard/boardView';
 import Hotkeys from 'react-hot-keys';
@@ -422,18 +422,8 @@ function CenterPanel (props: Props) {
   }
 
   async function createDatabase () {
-    if (!space || !user) return;
-
-    const { page, view } = await addPage({
-      type: 'inline_board',
-      parentId: board.id,
-      spaceId: space.id,
-      createdBy: user.id
-    });
-
-    if (view) {
-      showView(view.id);
-    }
+    const { view } = await convertToInlineBoard({ board });
+    showView(view.id);
   }
 
   function openSelectSourceSidebar () {
@@ -532,8 +522,12 @@ function CenterPanel (props: Props) {
       </div>
 
       <div className={`container-container ${state.showLinkedViewMenu ? 'sidebar-visible' : ''}`}>
-        {state.showLinkedViewMenu && (
-          <SourceSelection onSelect={createLinkedView} onCreate={createDatabase} />
+        {!activeView && state.showLinkedViewMenu && (
+          <SourceSelection
+            onSelectSource={createLinkedView}
+            onCreateDatabase={createDatabase}
+            showCreateDatabase={views.length === 0}
+          />
         )}
         {activeBoard && activeView?.fields.viewType === 'board'
           && (
