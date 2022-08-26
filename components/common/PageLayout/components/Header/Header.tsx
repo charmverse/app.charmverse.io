@@ -151,19 +151,19 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
         <ListItemText primary='View comments' />
       </ListItemButton>
       {isExportablePage && (
-      <ListItemButton onClick={() => {
-        exportMarkdown();
-        setPageMenuOpen(false);
-      }}
-      >
-        <GetAppIcon
-          fontSize='small'
-          sx={{
-            mr: 1
-          }}
-        />
-        <ListItemText primary='Export to markdown' />
-      </ListItemButton>
+        <ListItemButton onClick={() => {
+          exportMarkdown();
+          setPageMenuOpen(false);
+        }}
+        >
+          <GetAppIcon
+            fontSize='small'
+            sx={{
+              mr: 1
+            }}
+          />
+          <ListItemText primary='Export to markdown' />
+        </ListItemButton>
       )}
 
       <Divider />
@@ -189,7 +189,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
                 setPages((_pages) => ({ ..._pages, [basePageId]: { ...basePage, fullWidth: !isFullWidth } }));
               }}
             />
-        )}
+          )}
           label={<Typography variant='body2'>Full Width</Typography>}
         />
       </ListItemButton>
@@ -229,12 +229,13 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
+        alignSelf: 'stretch',
         gap: 1,
         width: '100%'
       }}
       >
         <PageTitleWithBreadcrumbs pageId={basePage?.id} />
-        <Box display='flex' alignItems='center' mr={-1}>
+        <Box display='flex' alignItems='center' alignSelf='stretch' mr={-1}>
           {
             basePage && isBountyBoard && (
               <BountyShareButton headerHeight={headerHeight} pageId={basePage.id} />
@@ -246,25 +247,27 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
               {basePage?.deletedAt === null && <ShareButton headerHeight={headerHeight} pageId={basePage.id} />}
               <IconButton sx={{ display: { xs: 'none', md: 'inline-flex' } }} size='small' onClick={toggleFavorite} color='inherit'>
                 <Tooltip title={isFavorite ? 'Remove from sidebar' : 'Pin this page to your sidebar'} arrow placement='top'>
-                  {isFavorite ? <FavoritedIcon fontSize='small' color='secondary' /> : <NotFavoritedIcon fontSize='small' color='secondary' />}
+                  {isFavorite ? <FavoritedIcon color='secondary' /> : <NotFavoritedIcon color='secondary' />}
                 </Tooltip>
               </IconButton>
             </>
           )}
 
           {pageOptionsList && (
-            <Box ml={1} ref={pageMenuAnchor}>
-              <IconButton
-                size='small'
-                onClick={() => {
-                  setPageMenuOpen(!pageMenuOpen);
-                  setPageMenuAnchorElement(pageMenuAnchor.current || null);
-                }}
-              >
-                <Tooltip title='View comments, votes, export content and more' arrow>
-                  <MoreHorizIcon color='secondary' />
-                </Tooltip>
-              </IconButton>
+            <Box ml={1} ref={pageMenuAnchor} display='flex' alignSelf='stretch' alignItems='center'>
+              <div>
+                <IconButton
+                  size='small'
+                  onClick={() => {
+                    setPageMenuOpen(!pageMenuOpen);
+                    setPageMenuAnchorElement(pageMenuAnchor.current || null);
+                  }}
+                >
+                  <Tooltip title='View comments, votes, export content and more' arrow>
+                    <MoreHorizIcon color='secondary' />
+                  </Tooltip>
+                </IconButton>
+              </div>
               <Popover
                 anchorEl={pageMenuAnchorElement}
                 open={pageMenuOpen}
