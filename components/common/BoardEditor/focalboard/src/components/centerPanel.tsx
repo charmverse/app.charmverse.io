@@ -445,7 +445,7 @@ function CenterPanel (props: Props) {
     if (activeView) {
       closeSettings();
     }
-  }, [activeView]);
+  }, [!!activeView]);
 
   return (
     <div
