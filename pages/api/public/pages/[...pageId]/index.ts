@@ -214,6 +214,7 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
     });
   }
   else if (page.type === 'inline_linked_board') {
+
     const blocks = await prisma.block.findMany({
       where: {
         OR: [{
@@ -246,18 +247,28 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
       }
     });
 
+    const publicLinkedSourceIds = await filterPublicPages(linkedSourceIds);
+
     const extraBlocks = await prisma.block.findMany({
       where: {
         OR: [{
           id: {
-            in: linkedSourceIds
+            in: publicLinkedSourceIds
           }
         }, {
           parentId: {
-            in: linkedSourceIds
+            in: publicLinkedSourceIds
           }
         }]
       }
+    });
+
+    views = views.filter(view => {
+      // Don't show view for pages that are not publicly shared
+      if (view.fields.linkedSourceId && !publicLinkedSourceIds.includes(view.fields.linkedSourceId)) {
+        return false;
+      }
+      return true;
     });
 
     extraBlocks.forEach(block => {

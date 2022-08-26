@@ -92,6 +92,7 @@ function CenterPanel (props: Props) {
   const _groupByProperty = useAppSelector(getCurrentViewGroupBy);
   const _dateDisplayProperty = useAppSelector(getCurrentViewDisplayBy);
   const boards = useAppSelector(getSortedBoards);
+  console.log({centerPanelBoards: boards});
 
   const isEmbedded = !!props.embeddedBoardPath;
   const boardPageType = pages[board.id]?.type;

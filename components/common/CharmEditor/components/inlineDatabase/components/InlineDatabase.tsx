@@ -15,6 +15,7 @@ import { usePages } from 'hooks/usePages';
 import dynamic from 'next/dynamic';
 import { useState } from 'react';
 import charmClient from 'charmClient';
+import { useRouter } from 'next/router';
 
 // Lazy load focalboard entrypoint (ignoring the redux state stuff for now)
 const CenterPanel = dynamic(() => import('components/common/BoardEditor/focalboard/src/components/centerPanel'), {
@@ -96,10 +97,9 @@ interface DatabaseView {
 export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverride, node }: DatabaseViewProps) {
   const pageId = node.attrs.pageId as string;
   const allViews = useAppSelector(getSortedViews);
+  const router = useRouter();
 
   const views = allViews.filter(view => view.parentId === pageId);
-  // Make the first view active view
-  // Keep track of which view is currently visible
   const [currentViewId, setCurrentViewId] = useState<string | null>(views[0]?.id || null);
   const currentView = useAppSelector(getView(currentViewId || '')) ?? undefined;
 
@@ -166,7 +166,8 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
           showInlineTitle={true}
           activeView={currentView}
           views={views}
-          maxTabsShown={2}
+          // Show more tabs on shared inline database as the space gets increased
+          maxTabsShown={router.pathname.startsWith('/share') ? 5 : 2}
         />
       </StylesContainer>
       {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
