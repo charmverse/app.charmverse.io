@@ -175,6 +175,62 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
       }
     });
   }
+  else if (page.type === 'inline_linked_board') {
+    const blocks = await prisma.block.findMany({
+      where: {
+        OR: [{
+          id: {
+            in: page.id
+          }
+        }, {
+          parentId: {
+            in: page.id
+          }
+        }]
+      }
+    });
+
+    const linkedSourceIds: string[] = [];
+
+    blocks.forEach(block => {
+      if (block.type === 'board') {
+        boards.push(block as unknown as Board);
+      }
+      else if (block.type === 'view') {
+        const view = block as unknown as BoardView;
+        views.push(view);
+        if (view.fields?.linkedSourceId) {
+          linkedSourceIds.push(view.fields.linkedSourceId);
+        }
+      }
+      else if (block.type === 'card') {
+        cards.push(block as unknown as Card);
+      }
+    });
+
+    const extraBlocks = await prisma.block.findMany({
+      where: {
+        OR: [{
+          id: {
+            in: linkedSourceIds
+          }
+        }, {
+          parentId: {
+            in: linkedSourceIds
+          }
+        }]
+      }
+    });
+
+    extraBlocks.forEach(block => {
+      if (block.type === 'board') {
+        boards.push(block as unknown as Board);
+      }
+      else if (block.type === 'card') {
+        cards.push(block as unknown as Card);
+      }
+    });
+  }
 
   const space = await prisma.space.findFirst({
     where: {
