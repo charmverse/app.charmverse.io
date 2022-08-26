@@ -1,5 +1,5 @@
 import { Box, Collapse, Divider, IconButton, ListItemIcon, MenuItem, Stack, Typography } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Button from 'components/common/Button';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
@@ -7,14 +7,16 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { Page } from '@prisma/client';
 import styled from '@emotion/styled';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import PagesList from '../../PageList';
+import { usePages } from 'hooks/usePages';
+import PagesList from 'components/common/CharmEditor/components/PageList';
+import { isTruthy } from 'lib/utilities/types';
+
+type SidebarState = 'select-source' | null;
 
 interface Props {
   onCreate?: () => void;
-  pages: Page[];
   onSelect: (selected: { boardId: string }) => void;
-  onClickBack: () => void
-  showGoBackButton: boolean
+  sidebarState?: SidebarState;
 }
 
 const StyledSidebar = styled.div`
@@ -36,7 +38,10 @@ const SidebarContent = styled.div`
 
 export default function SourceSelection (props: Props) {
 
-  const [sidebarState, setSidebarState] = useState<'select-source' | null>('select-source');
+  const [sidebarState, setSidebarState] = useState<SidebarState>('select-source');
+
+  const { pages } = usePages();
+  const boardPages = Object.values(pages).filter(p => p?.type === 'board').filter(isTruthy);
 
   function openSidebar () {
     setSidebarState(!sidebarState ? 'select-source' : null);
@@ -46,16 +51,10 @@ export default function SourceSelection (props: Props) {
     setSidebarState(null);
   }
 
+  console.log('sidebarState', sidebarState);
+
   return (
     <>
-      {props.showGoBackButton && (
-      <Box display='flex' justifyContent='flex-end'>
-        <Button size='small' color='secondary' variant='outlined' onClick={props.onClickBack}>
-          <ArrowBackIosIcon sx={{ fontSize: '14px' }} /> Go back
-        </Button>
-      </Box>
-      )}
-      <Divider light />
       <Box display='flex'>
         <Box flexGrow={1} display='flex' justifyContent='center' alignItems='center'>
           <Stack alignItems='center' spacing={0}>
@@ -83,7 +82,7 @@ export default function SourceSelection (props: Props) {
               </IconButton>
             </Box>
             <SidebarContent>
-              <PagesList pages={props.pages} onSelectPage={page => props.onSelect({ boardId: page.id })} />
+              <PagesList pages={boardPages} onSelectPage={page => props.onSelect({ boardId: page.id })} />
             </SidebarContent>
             <MenuItem onClick={props.onCreate}>
               <ListItemIcon><AddIcon color='secondary' /></ListItemIcon>

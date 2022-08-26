@@ -59,6 +59,9 @@
     //     padding-left: 20px;
     //     -webkit-overflow-scrolling: touch;
     // }
+    &.sidebar-visible {
+      margin-right: 0;
+    }
   }
 
   // hide view actions for embedded databases

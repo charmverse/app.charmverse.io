@@ -41,18 +41,18 @@ const StyledButton = styled(Button)`
 interface ViewTabsProps {
   intl: IntlShape;
   board: Board
-  activeView: BoardView
+  activeView?: BoardView | null
   readonly?: boolean;
   views: BoardView[];
   showView: (viewId: string) => void;
-  addViewMenu?: ReactNode
+  addViewButton?: ReactNode
   onViewTabClick?: (viewId: string) => void
   onDeleteView?: (viewId: string) => void
   disableUpdatingUrl?: boolean
   maxTabsShown: number
 }
 
-function ViewTabs ({ onDeleteView, maxTabsShown, onViewTabClick, disableUpdatingUrl, addViewMenu, board, activeView, intl, readonly, showView, views }: ViewTabsProps) {
+function ViewTabs ({ onDeleteView, maxTabsShown, onViewTabClick, disableUpdatingUrl, addViewButton, board, activeView, intl, readonly, showView, views }: ViewTabsProps) {
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [dropdownView, setDropdownView] = useState<BoardView | null>(null);
@@ -64,7 +64,7 @@ function ViewTabs ({ onDeleteView, maxTabsShown, onViewTabClick, disableUpdating
   const { setFocalboardViewsRecord } = useFocalboardViews();
   views = views.filter(view => !view.fields.inline)
   // Find the index of the current view
-  const currentViewIndex = views.findIndex(view => view.id === activeView.id);
+  const currentViewIndex = views.findIndex(view => view.id === activeView?.id);
   const shownViews = views.slice(0, maxTabsShown);
   let restViews = views.slice(maxTabsShown);
 
@@ -73,7 +73,7 @@ function ViewTabs ({ onDeleteView, maxTabsShown, onViewTabClick, disableUpdating
     const replacedView = shownViews[maxTabsShown - 1];
     // Replace the current view as the last view of the shown views
     shownViews[maxTabsShown - 1] = views[currentViewIndex];
-    restViews = restViews.filter(restView => restView.id !== activeView.id);
+    restViews = restViews.filter(restView => restView.id !== activeView?.id);
     restViews.unshift(replacedView);
   }
 
@@ -90,7 +90,7 @@ function ViewTabs ({ onDeleteView, maxTabsShown, onViewTabClick, disableUpdating
     if (readonly) return;
     const view = views.find(v => v.id === event.currentTarget.id);
     view && onViewTabClick?.(view.id)
-    if (event.currentTarget.id === activeView.id) {
+    if (event.currentTarget.id === activeView?.id) {
       event.preventDefault();
       setAnchorEl(event.currentTarget);
       if (view) {
@@ -178,7 +178,7 @@ function ViewTabs ({ onDeleteView, maxTabsShown, onViewTabClick, disableUpdating
 
   return (
     <>
-      <Tabs textColor='primary' indicatorColor='secondary' value={activeView.id} sx={{ minHeight: 0, mb: '-4px' }}>
+      <Tabs textColor='primary' indicatorColor='secondary' value={activeView?.id ?? false} sx={{ minHeight: 0, mb: '-4px' }}>
         {shownViews.map(view => (
           <Tab
             component='div'
@@ -190,9 +190,9 @@ function ViewTabs ({ onDeleteView, maxTabsShown, onViewTabClick, disableUpdating
                 onClick={handleViewClick}
                 variant='text'
                 size='small'
-                color={activeView.id === view.id ? 'textPrimary' : 'secondary'}
+                color={activeView?.id === view.id ? 'textPrimary' : 'secondary'}
                 id={view.id}
-                href={!disableUpdatingUrl ? (activeView.id === view.id ? null : getViewUrl(view.id)) : ''}
+                href={!disableUpdatingUrl ? (activeView?.id === view.id ? null : getViewUrl(view.id)) : ''}
               >
                 {view.title}
               </StyledButton>
@@ -268,7 +268,8 @@ function ViewTabs ({ onDeleteView, maxTabsShown, onViewTabClick, disableUpdating
           })}
         </Box>
         <Divider />
-        {addViewMenu ?? <AddViewMenu
+        {addViewButton}
+        {/* <AddViewMenu
           sx={{
             width: '100%'
           }}
@@ -277,7 +278,7 @@ function ViewTabs ({ onDeleteView, maxTabsShown, onViewTabClick, disableUpdating
           activeView={activeView}
           showView={showView}
           views={views}
-        />}
+        /> */}
       </Menu>
 
       {/* Form to rename views */}

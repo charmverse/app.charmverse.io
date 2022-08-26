@@ -22,6 +22,7 @@ interface ItemsProps {
 }
 
 export function items ({ addNestedPage, currentPageId, userId, space }: ItemsProps): PaletteItemTypeNoGroup[] {
+
   return [
     {
       uid: 'database-inline',
@@ -34,16 +35,19 @@ export function items ({ addNestedPage, currentPageId, userId, space }: ItemsPro
           if (view) {
             rafCommandExec(view, (_state, _dispatch) => {
               // The page must be created before the node can be created
-              addPage({ type: 'inline_board', parentId: currentPageId, spaceId: space.id, createdBy: userId })
+              addPage({
+                type: 'inline_board',
+                parentId: currentPageId,
+                spaceId: space.id,
+                createdBy: userId
+              })
                 .then(({ page }) => {
                   const node = _state.schema.nodes.inlineDatabase.create({
-                    source: 'board_page',
-                    linkedSourceId: page.id,
-                    type: 'embedded'
+                    pageId: page.id
                   });
 
                   if (_dispatch && isAtBeginningOfLine(state)) {
-                    _dispatch(_state.tr.replaceSelectionWith(node));
+                    _dispatch(_state.tr.replaceSelectionWith(node).scrollIntoView());
                     return true;
                   }
                   return insertNode(_state, _dispatch, node);
@@ -90,7 +94,6 @@ export function items ({ addNestedPage, currentPageId, userId, space }: ItemsPro
           if (view) {
             rafCommandExec(view, (_state, _dispatch) => {
               addPage({
-                title: 'Linked Database',
                 type: 'inline_linked_board',
                 parentId: currentPageId,
                 spaceId: space.id,
@@ -99,13 +102,11 @@ export function items ({ addNestedPage, currentPageId, userId, space }: ItemsPro
               })
                 .then(({ page }) => {
                   const node = _state.schema.nodes.inlineDatabase.create({
-                    source: 'board_page',
-                    linkedSourceId: page.id,
-                    type: 'linked'
+                    pageId: page.id
                   });
 
                   if (_dispatch && isAtBeginningOfLine(state)) {
-                    _dispatch(_state.tr.replaceSelectionWith(node));
+                    _dispatch(_state.tr.replaceSelectionWith(node).scrollIntoView());
                     return true;
                   }
                   return insertNode(_state, _dispatch, node);

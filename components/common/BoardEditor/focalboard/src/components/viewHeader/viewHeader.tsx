@@ -1,13 +1,16 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import { useRouter } from 'next/router';
 import React, { ReactNode, useCallback, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Board, IPropertyTemplate } from '../../blocks/board';
 import { BoardView } from '../../blocks/boardView';
 import { Card } from '../../blocks/card';
+import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import Button from 'components/common/Button';
+import { IconButton, Tooltip } from '@mui/material';
+import Link from 'components/common/Link';
 import AddViewMenu from '../addViewMenu';
+import { useRouter } from 'next/router';
 import ViewTabs from './viewTabs';
 
 import ModalWrapper from '../modalWrapper';
@@ -22,7 +25,8 @@ import ViewHeaderSortMenu from './viewHeaderSortMenu';
 
 type Props = {
   board: Board
-  activeView: BoardView
+  activeBoard?: Board
+  activeView?: BoardView
   views: BoardView[]
   cards: Card[]
   groupByProperty?: IPropertyTemplate
@@ -32,46 +36,36 @@ type Props = {
   editCardTemplate: (cardTemplateId: string) => void
   readonly: boolean
   dateDisplayProperty?: IPropertyTemplate
-  addViewMenu?: ReactNode
+  addViewButton?: ReactNode
   onViewTabClick?: (viewId: string) => void
   disableUpdatingUrl?: boolean
   maxTabsShown?: number
   onDeleteView?: (viewId: string) => void
   showActionsOnHover?: boolean
+  showView: (viewId: string) => void
+  embeddedBoardPath?: string
 }
 
-const ViewHeader = React.memo(({ maxTabsShown = 3, ...props }: Props) => {
-  const router = useRouter();
+const ViewHeader = React.memo(({ maxTabsShown = 3, showView, ...props }: Props) => {
   const [showFilter, setShowFilter] = useState(false);
+  const router = useRouter();
 
   const views = props.views.filter(view => !view.fields.inline)
 
-  const { board, activeView, groupByProperty, cards, dateDisplayProperty } = props;
+  const { board, activeBoard, activeView, groupByProperty, cards, dateDisplayProperty } = props;
 
-  const withGroupBy = activeView.fields.viewType === 'board' || activeView.fields.viewType === 'table';
-  const withDisplayBy = activeView.fields.viewType === 'calendar';
-  const withSortBy = activeView.fields.viewType !== 'calendar';
+  const withGroupBy = activeView?.fields.viewType === 'board' || activeView?.fields.viewType === 'table';
+  const withDisplayBy = activeView?.fields.viewType === 'calendar';
+  const withSortBy = activeView?.fields.viewType !== 'calendar';
 
-  const hasFilter = activeView.fields.filter && activeView.fields.filter.filters?.length > 0;
-
-  const showView = useCallback((viewId) => {
-    if (!props.disableUpdatingUrl) {
-      router.push({
-        pathname: router.pathname,
-        query: {
-          ...router.query,
-          viewId: viewId || ''
-        }
-      }, undefined, { shallow: true });
-    }
-  }, [router.query, history]);
+  const hasFilter = activeView?.fields.filter && activeView?.fields.filter.filters?.length > 0;
 
   return (
     <div className={`ViewHeader ${props.showActionsOnHover ? 'hide-actions' : ''}`}>
       <ViewTabs
         onDeleteView={props.onDeleteView}
         onViewTabClick={props.onViewTabClick}
-        addViewMenu={props.addViewMenu}
+        addViewButton={props.addViewButton}
         views={views}
         readonly={props.readonly}
         showView={showView}
@@ -84,26 +78,21 @@ const ViewHeader = React.memo(({ maxTabsShown = 3, ...props }: Props) => {
       {/* add a view */}
 
       {!props.readonly && views.length <= maxTabsShown && (
-        props.addViewMenu ?? <AddViewMenu
-          board={board}
-          activeView={activeView}
-          views={views}
-          showView={showView}
-        />
+        props.addViewButton
       )}
 
       <div className='octo-spacer' />
 
       <div className='view-actions'>
 
-      {!props.readonly
+      {!props.readonly && activeView && activeBoard
         && (
           <>
 
             {/* Card properties */}
 
             <ViewHeaderPropertiesMenu
-              properties={board.fields.cardProperties}
+              properties={activeBoard.fields.cardProperties}
               activeView={activeView}
             />
 
@@ -112,7 +101,7 @@ const ViewHeader = React.memo(({ maxTabsShown = 3, ...props }: Props) => {
             {withGroupBy
               && (
                 <ViewHeaderGroupByMenu
-                  properties={board.fields.cardProperties}
+                  properties={activeBoard.fields.cardProperties}
                   activeView={activeView}
                   groupByProperty={groupByProperty}
                 />
@@ -123,7 +112,7 @@ const ViewHeader = React.memo(({ maxTabsShown = 3, ...props }: Props) => {
             {withDisplayBy
               && (
                 <ViewHeaderDisplayByMenu
-                  properties={board.fields.cardProperties}
+                  properties={activeBoard.fields.cardProperties}
                   activeView={activeView}
                   dateDisplayPropertyName={dateDisplayProperty?.name}
                 />
@@ -171,11 +160,21 @@ const ViewHeader = React.memo(({ maxTabsShown = 3, ...props }: Props) => {
 
       {/* <ViewHeaderSearch/> */}
 
+      {/* Link to view embedded table in full */}
+      {props.embeddedBoardPath && (
+        <Link href={`/${router.query.domain}/${props.embeddedBoardPath}`}>
+          <Tooltip title='Open as full page' placement='top'>
+            <IconButton style={{ width: '32px' }}><OpenInFullIcon color='secondary' sx={{ fontSize: 14 }} /></IconButton>
+          </Tooltip>
+        </Link>
+      )}
+
       {/* Options menu */}
 
-      {!props.readonly
+      {!props.readonly && activeView
         && (
           <>
+
             <ViewHeaderActionsMenu
               board={board}
               activeView={activeView}

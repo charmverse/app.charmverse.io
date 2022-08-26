@@ -23,12 +23,13 @@ import TableIcon from '../widgets/icons/table';
 
 type AddViewProps = {
   board: Board,
-  activeView: BoardView,
+  activeView?: BoardView,
   views: BoardView[],
   intl: IntlShape,
   showLabel?: boolean,
   showView: (viewId: string) => void,
   sx?: SxProps
+  onClick?: () => void
 }
 
 function AddViewMenu (props: AddViewProps) {
@@ -60,9 +61,9 @@ function AddViewMenu (props: AddViewProps) {
     view.fields.viewType = 'board';
     view.parentId = board.id;
     view.rootId = board.rootId;
-    view.fields.cardOrder = activeView.fields.cardOrder;
+    view.fields.cardOrder = activeView?.fields.cardOrder ?? [];
 
-    const oldViewId = activeView.id;
+    const oldViewId = activeView?.id;
 
     mutator.insertBlock(
       view,
@@ -76,7 +77,7 @@ function AddViewMenu (props: AddViewProps) {
         showView(block.id);
       },
       async () => {
-        showView(oldViewId);
+        oldViewId && showView(oldViewId);
       }
     );
   }, [props.activeView, props.board, props.intl, showView]);
@@ -93,9 +94,9 @@ function AddViewMenu (props: AddViewProps) {
     view.fields.visiblePropertyIds = board.fields.cardProperties.map((o: IPropertyTemplate) => o.id);
     view.fields.columnWidths = {};
     view.fields.columnWidths[Constants.titleColumnId] = Constants.defaultTitleColumnWidth;
-    view.fields.cardOrder = activeView.fields.cardOrder;
+    view.fields.cardOrder = activeView?.fields.cardOrder ?? [];
 
-    const oldViewId = activeView.id;
+    const oldViewId = activeView?.id;
 
     mutator.insertBlock(
       view,
@@ -109,7 +110,7 @@ function AddViewMenu (props: AddViewProps) {
         showView(block.id);
       },
       async () => {
-        showView(oldViewId);
+        oldViewId && showView(oldViewId);
       }
     );
   }, [props.activeView, props.board, props.intl, showView]);
@@ -124,9 +125,9 @@ function AddViewMenu (props: AddViewProps) {
     view.parentId = board.id;
     view.rootId = board.rootId;
     view.fields.visiblePropertyIds = [Constants.titleColumnId];
-    view.fields.cardOrder = activeView.fields.cardOrder;
+    view.fields.cardOrder = activeView?.fields.cardOrder ?? [];
 
-    const oldViewId = activeView.id;
+    const oldViewId = activeView?.id;
 
     mutator.insertBlock(
       view,
@@ -139,7 +140,7 @@ function AddViewMenu (props: AddViewProps) {
         }, 120);
       },
       async () => {
-        showView(oldViewId);
+        oldViewId && showView(oldViewId);
       }
     );
   }, [props.board, props.activeView, props.intl, showView]);
@@ -154,9 +155,9 @@ function AddViewMenu (props: AddViewProps) {
     view.parentId = board.id;
     view.rootId = board.rootId;
     view.fields.visiblePropertyIds = [Constants.titleColumnId];
-    view.fields.cardOrder = activeView.fields.cardOrder;
+    view.fields.cardOrder = activeView?.fields.cardOrder ?? [];
 
-    const oldViewId = activeView.id;
+    const oldViewId = activeView?.id;
 
     // Find first date property
     view.fields.dateDisplayPropertyId = board.fields.cardProperties.find((o: IPropertyTemplate) => o.type === 'date')?.id;
@@ -172,26 +173,27 @@ function AddViewMenu (props: AddViewProps) {
         }, 120);
       },
       async () => {
-        showView(oldViewId);
+        oldViewId && showView(oldViewId);
       }
     );
   }, [props.board, props.activeView, props.intl, showView]);
+
+  const triggers = props.onClick ? { onClick: props.onClick } : bindTrigger(popupState);
 
   return (
     <>
       {props.showLabel ? (
         <Button
-          {...bindTrigger(popupState)}
+          {...triggers}
           color='secondary'
           size='small'
           startIcon={<Add />}
           variant='text'
-          sx={{ ...(props.sx ?? {}) }}
         >
           Add view
         </Button>
       ) : (
-        <IconButton {...bindTrigger(popupState)} color='secondary' size='small'>
+        <IconButton {...triggers} color='secondary' size='small'>
           <Add fontSize='small' />
         </IconButton>
       )}

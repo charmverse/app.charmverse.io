@@ -90,15 +90,13 @@ function Component ({ menuState }: { menuState: PluginState }) {
       popupState.close();
 
       // If its an embedded inline database delete the board page
-      if (node.node.attrs?.type === 'embedded') {
-        const page = pages[node.node.attrs.pageId];
-        const board = boards.find(b => b.id === page?.id);
-        if (page) {
-          deletePage({
-            board,
-            pageId: page.id
-          });
-        }
+      const page = pages[node.node.attrs.pageId];
+      if (page?.type === 'inline_board' || page?.type === 'inline_linked_board') {
+        const board = boards.find(b => b.id === page.id);
+        deletePage({
+          board,
+          pageId: page.id
+        });
       }
     }
   }

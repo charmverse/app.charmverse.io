@@ -16,7 +16,6 @@ import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import { silentlyUpdateURL } from 'lib/browser';
-import { usePages } from 'hooks/usePages';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 /**
  *
@@ -32,16 +31,11 @@ interface Props {
 export default function BoardPage ({ page, setPage, readOnly }: Props) {
   const router = useRouter();
   const board = useAppSelector(getCurrentBoard);
-  const cards = useAppSelector(getCurrentViewCardsSortedFilteredAndGrouped);
   const activeView = useAppSelector(getView(router.query.viewId as string));
   const boardViews = useAppSelector(getCurrentBoardViews);
-  const groupByProperty = useAppSelector(getCurrentViewGroupBy);
-  const dateDisplayProperty = useAppSelector(getCurrentViewDisplayBy);
   const clientConfig = useAppSelector(getClientConfig);
   const dispatch = useAppDispatch();
   const [shownCardId, setShownCardId] = useState(router.query.cardId);
-  const { pages } = usePages();
-  const accessibleCards = useMemo(() => cards.filter(card => pages[card.id]), [cards, Object.keys(pages).toString()]);
 
   useEffect(() => {
     const boardId = page.boardId;
@@ -119,15 +113,6 @@ export default function BoardPage ({ page, setPage, readOnly }: Props) {
   }, [router.query]);
 
   if (board && activeView) {
-    let property = groupByProperty;
-    if ((!property || property.type !== 'select') && activeView.fields.viewType === 'board') {
-      property = board?.fields.cardProperties.find((o: any) => o.type === 'select');
-    }
-
-    let displayProperty = dateDisplayProperty;
-    if (!displayProperty && activeView.fields.viewType === 'calendar') {
-      displayProperty = board.fields.cardProperties.find((o: any) => o.type === 'date');
-    }
 
     return (
       <>
@@ -137,25 +122,21 @@ export default function BoardPage ({ page, setPage, readOnly }: Props) {
             clientConfig={clientConfig}
             readonly={Boolean(readOnly)}
             board={board}
-            pageType='board'
             setPage={setPage}
-            cards={accessibleCards}
             showCard={showCard}
             activeView={activeView}
-            groupByProperty={property}
-            dateDisplayProperty={displayProperty}
             views={boardViews}
           />
           {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
-          <RootPortal>
-            <CardDialog
-              key={shownCardId}
-              cardId={shownCardId}
-              onClose={() => showCard(undefined)}
-              showCard={(cardId) => showCard(cardId)}
-              readonly={Boolean(readOnly)}
-            />
-          </RootPortal>
+            <RootPortal>
+              <CardDialog
+                key={shownCardId}
+                cardId={shownCardId}
+                onClose={() => showCard(undefined)}
+                showCard={(cardId) => showCard(cardId)}
+                readonly={Boolean(readOnly)}
+              />
+            </RootPortal>
           )}
         </div>
         {/** include the root portal for focalboard's popup */}
