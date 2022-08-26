@@ -82,7 +82,7 @@ function CenterPanel (props: Props) {
   const [state, setState] = useState<State>({
     cardIdToFocusOnRender: '',
     selectedCardIds: [],
-    // assume this is a page type 'inline_linked_board' if no view exists yet
+    // assume this is a page type 'inline_linked_board' if no view exists
     showSettings: !props.activeView ? 'create-linked-view' : null,
   });
 
