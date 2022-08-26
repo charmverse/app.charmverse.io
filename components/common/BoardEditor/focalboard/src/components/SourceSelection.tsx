@@ -10,6 +10,7 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { usePages } from 'hooks/usePages';
 import PagesList from 'components/common/CharmEditor/components/PageList';
 import { isTruthy } from 'lib/utilities/types';
+import { useRouter } from 'next/router';
 
 type SidebarState = 'select-source' | null;
 
@@ -37,7 +38,7 @@ const SidebarContent = styled.div`
 `;
 
 export default function SourceSelection (props: Props) {
-
+  const router = useRouter();
   const [sidebarState, setSidebarState] = useState<SidebarState>('select-source');
 
   const { pages } = usePages();
@@ -51,7 +52,7 @@ export default function SourceSelection (props: Props) {
     setSidebarState(null);
   }
 
-  console.log('sidebarState', sidebarState);
+  const isSharedPage = router.pathname.startsWith('/share');
 
   return (
     <>
@@ -84,12 +85,12 @@ export default function SourceSelection (props: Props) {
             <SidebarContent>
               <PagesList pages={boardPages} onSelectPage={page => props.onSelect({ boardId: page.id })} />
             </SidebarContent>
-            <MenuItem onClick={props.onCreate}>
+            {!isSharedPage && <MenuItem  onClick={props.onCreate}>
               <ListItemIcon><AddIcon color='secondary' /></ListItemIcon>
               <Typography variant='body2' color='secondary'>
                 New database
               </Typography>
-            </MenuItem>
+            </MenuItem>}
           </StyledSidebar>
         </Collapse>
       </Box>
