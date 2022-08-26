@@ -513,7 +513,7 @@ function CenterPanel (props: Props) {
             variant='text'
             size='large'
             // TODO: Respect shared page
-            href={`/${space?.domain}/${activePage?.path}`}
+            href={`${router.pathname.startsWith('/share') ? '/share' : ''}/${space?.domain}/${activePage?.path}`}
             sx={{ fontSize: 22, fontWeight: 700, py: 0 }}
           >
             {activePage.title || 'Untitled'}
