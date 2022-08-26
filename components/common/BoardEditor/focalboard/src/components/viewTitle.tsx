@@ -118,10 +118,9 @@ function ViewTitle (props: Props) {
                     )}
       </div>
 
-      <div className='title'>
+      <div className='title' data-test='board-title'>
         <BlockIconSelector readonly={props.readonly} block={board} setPage={props.setPage} />
         <Editable
-          data-test='board-title'
           className='title'
           value={title}
           placeholderText={intl.formatMessage({ id: 'ViewTitle.untitled-board', defaultMessage: 'Untitled board' })}

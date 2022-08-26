@@ -92,71 +92,77 @@ export default function PageDialog (props: Props) {
   return (
     <RootPortal>
       {popupState.isOpen && (
-        <Dialog
-          hideCloseButton
-          toolsMenu={!hideToolsMenu && !readOnly && (
-            <List dense>
-              {onClickDelete && (
-              <ListItemButton
-                disabled={!pagePermission?.delete}
-                onClick={async () => {
-                  onClickDelete();
-                  onClose();
-                }}
-              >
-                <DeleteIcon
-                  sx={{
-                    mr: 1
-                  }}
-                  fontSize='small'
-                />
-                <ListItemText primary='Delete' />
-              </ListItemButton>
-              )}
-              <ListItemButton onClick={() => {
-                Utils.copyTextToClipboard(window.location.href);
-                showMessage('Copied card link to clipboard', 'success');
+
+      <Dialog
+        data-test='page-dialog'
+        hideCloseButton
+        toolsMenu={!hideToolsMenu && !readOnly && (
+
+        <List dense>
+          {onClickDelete && (
+          <ListItemButton
+            disabled={!pagePermission?.delete}
+            onClick={async () => {
+              onClickDelete();
+              onClose();
+            }}
+          >
+            <DeleteIcon
+              sx={{
+                mr: 1
               }}
-              >
-                <InsertLinkIcon
-                  sx={{
-                    mr: 1
-                  }}
-                  fontSize='small'
-                />
-                <ListItemText primary='Copy link' />
-              </ListItemButton>
-              {bounty && onMarkCompleted && (
-                <ListItemButton disabled={bounty.status === 'complete' || (bounty.status !== 'inProgress' && bounty.status !== 'open')} onClick={() => onMarkCompleted(bounty.id)}>
-                  <CheckCircleIcon
-                    sx={{
-                      mr: 1
-                    }}
-                    fontSize='small'
-                  />
-                  <ListItemText primary='Mark complete' />
-                </ListItemButton>
-              )}
-            </List>
+              fontSize='small'
+            />
+            <ListItemText primary='Delete' />
+          </ListItemButton>
           )}
-          toolbar={(
-            <Box display='flex' justifyContent='space-between'>
-              <Button
-                size='small'
-                color='secondary'
-                href={fullPageUrl}
-                variant='text'
-                startIcon={<OpenInFullIcon fontSize='small' />}
-              >
-                Open as Page
-              </Button>
-              {toolbar}
-            </Box>
+          <ListItemButton onClick={() => {
+            Utils.copyTextToClipboard(window.location.href);
+            showMessage('Copied card link to clipboard', 'success');
+          }}
+          >
+            <InsertLinkIcon
+              sx={{
+                mr: 1
+              }}
+              fontSize='small'
+            />
+            <ListItemText primary='Copy link' />
+          </ListItemButton>
+          {bounty && onMarkCompleted && (
+          <ListItemButton disabled={bounty.status === 'complete' || (bounty.status !== 'inProgress' && bounty.status !== 'open')} onClick={() => onMarkCompleted(bounty.id)}>
+            <CheckCircleIcon
+              sx={{
+                mr: 1
+              }}
+              fontSize='small'
+            />
+            <ListItemText primary='Mark complete' />
+          </ListItemButton>
           )}
-          onClose={onClose}
-        >
+        </List>
+        )}
+        toolbar={(
+          <Box display='flex' justifyContent='space-between'>
+            <Button
+              size='small'
+              color='secondary'
+              href={fullPageUrl}
+              variant='text'
+              startIcon={<OpenInFullIcon fontSize='small' />}
+            >
+              Open as Page
+            </Button>
+            {toolbar}
+          </Box>
+          )}
+        onClose={onClose}
+      >
+        <div data-test='page-dialog'>
           {page && <DocumentPage insideModal page={page} setPage={setPage} readOnly={props.readOnly} />}
-        </Dialog>
+        </div>
+      </Dialog>
+
       )}
     </RootPortal>
   );

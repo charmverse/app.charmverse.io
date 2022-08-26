@@ -1,60 +1,61 @@
-import { Browser, chromium, test, expect } from '@playwright/test';
-import { Space } from '@prisma/client';
-import { IPageWithPermissions } from 'lib/pages/interfaces';
-import { LoggedInUser } from 'models';
+import { Browser, chromium, expect, test } from '@playwright/test';
 import { baseUrl } from 'testing/mockApiCall';
 import { createUserAndSpace } from 'testing/playwright';
-import { v4 } from 'uuid';
 
 let browser: Browser;
 
 test.beforeAll(async () => {
-  browser = await chromium.launch({ headless: false });
+  // Change headless to false to visually debug the test
+  browser = await chromium.launch({ headless: true });
 });
 
 test('public page - makes a page public', async () => {
 
+  // Arrange ------------------
   const userContext = await browser.newContext({ permissions: ['clipboard-read', 'clipboard-write'] });
   const page = await userContext.newPage();
 
-  // Arrange
   const { user: profile, space, pages } = await createUserAndSpace({ browserPage: page });
 
   const domain = space.domain;
 
-  // Act
-
   const boardPage = pages.find(p => p.type === 'board' && p.title.match(/tasks/i) !== null);
 
-  //
   await page.goto(`${baseUrl}`);
-
-  // Click p:has-text("[Your DAO] Home"
 
   const targetRedirectPath = `${baseUrl}/${domain}/${boardPage?.path}`;
 
   await page.goto(targetRedirectPath);
 
+  // Act ----------------------
+  // Part A - Prepare the page as a logged in user
+  // 1. Make sure the board page exists and cards are visible
   await page.waitForResponse(/\/api\/blocks/);
 
+  await expect(page.locator('data-test=kanban-card').first()).toBeVisible();
+
+  // 2. Open the share dialog and make the page public
   await page.locator('data-test=toggle-page-permissions-dialog').click();
 
-  const publicShareToggle = await page.locator('data-test=toggle-public-page');
+  const publicShareToggle = page.locator('data-test=toggle-public-page');
 
   await publicShareToggle.click();
   const shareUrl = `${baseUrl}/share/${domain}/${boardPage?.path}`;
 
   await page.waitForResponse(/\/api\/permissions/);
 
-  // Test that the content of the input will contain the url and that it gets passed to the clipboard
-  const shareLinkInput = await page.locator('data-test=share-link').locator('input');
+  // 3. Copy the public link to the clipboard
+  const shareLinkInput = page.locator('data-test=share-link').locator('input');
 
-  //  expect(shareLinkInput.innerText()).toBe(shareUrl);
   const inputValue = await shareLinkInput.inputValue();
 
   expect(inputValue.match(shareUrl)).not.toBe(null);
 
-  await page.locator('data-test=copy-button').click({ force: true });
+  const copyButton = page.locator('data-test=copy-button');
+
+  await expect(copyButton).toBeVisible();
+
+  await copyButton.click({ force: true });
 
   const clipboardContent = await page.evaluate(async () => {
     return navigator.clipboard.readText();
@@ -62,30 +63,31 @@ test('public page - makes a page public', async () => {
 
   expect(clipboardContent.match(shareUrl)).not.toBe(null);
 
-  // Open new page as non logged in user ------------------------------------------------------
+  // Part B - Visit this page as a non logged in user
   const publicContext = await browser.newContext({});
 
   const page1 = await publicContext.newPage();
 
-  // Go to http://localhost:3335/share/domain-3459c5af-272f-40f0-9dcf-899c85e95b72/page-19377272787222233
-  await page1.goto(shareUrl);
+  // 1. Visit the page
+  await page1.goto(clipboardContent);
 
-  // Clipboard should contain the url and view ID
-  await page1.waitForURL(`${clipboardContent}*`);
+  // 2. Make sure the board renders
+  const boardTitle = page.locator('data-test=board-title').locator('input');
 
-  const boardTitle = await page.locator('data-test=board-title').inputValue();
+  await expect(boardTitle).toBeVisible();
 
-  expect(boardTitle).toBe(boardPage?.title);
+  expect(await boardTitle.inputValue()).toBe(boardPage?.title);
 
-  // Click text=Partner with CharmVerse
-  await page1.locator('data-test=kanban-card').first().click();
+  // 3. Wait for the card, click on it
+  const cardToOpen = page1.locator('data-test=kanban-card').first();
+  await expect(cardToOpen).toBeVisible();
 
-  await page1.waitForURL(new RegExp(`${shareUrl}&cardId=`));
+  await cardToOpen.click();
 
-  // Click text=Not started
-  await page1.locator('text=Open as page').isVisible();
+  // 4. Open the card and make sure it renders content
+  await page1.waitForURL(`${shareUrl}*cardId*`);
 
-  const openedCardUrl = await page.evaluate(() => window.location.href);
+  const openedCardUrl = await page1.evaluate(() => window.location.href);
 
   const queryParams = new URLSearchParams(openedCardUrl.split('?')[1]);
 
@@ -95,13 +97,15 @@ test('public page - makes a page public', async () => {
 
   expect(openedCardPage).toBeDefined();
 
-  // Click div[role="dialog"] >> text=High
-  await page1.locator('div[role="dialog"] >> text=High').click();
+  const cardPopup = page1.locator('data-test=page-dialog');
 
-  // Click div[role="dialog"] >> text=Partnerships
-  await page1.locator('div[role="dialog"] >> text=Partnerships').click();
+  await expect(cardPopup).toBeVisible();
 
-  // Assert -------------
+  const documentTitle = cardPopup.locator('data-test=editor-page-title');
+
+  await expect(documentTitle).toBeVisible();
+
+  expect(await documentTitle.innerText()).toBe(openedCardPage?.title);
 
 });
 
