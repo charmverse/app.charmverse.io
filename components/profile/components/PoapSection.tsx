@@ -45,12 +45,12 @@ function PoapSection (props: PoapSectionProps) {
         <Grid item xs={8} pl={1}>
           {
             !isPublic && hasConnectedWallet && (
-            <Stack direction='row' alignItems='center' spacing={1}>
-              <Typography fontWeight={700} fontSize={20}>My POAPs</Typography>
-              <IconButton onClick={managePoapModalState.open}>
-                <EditIcon fontSize='small' data-testid='edit-description' />
-              </IconButton>
-            </Stack>
+              <Stack direction='row' alignItems='center' spacing={1}>
+                <Typography fontWeight={700} fontSize={20}>My POAPs</Typography>
+                <IconButton onClick={managePoapModalState.open}>
+                  <EditIcon fontSize='small' data-testid='edit-description' />
+                </IconButton>
+              </Stack>
             )
           }
           {
@@ -70,8 +70,8 @@ function PoapSection (props: PoapSectionProps) {
         </Grid>
         {
             poaps.length !== 0 && (
-            <Grid item container xs={12} py={2}>
-              {
+              <Grid item container xs={12} py={2}>
+                {
                 poaps.map(poap => (
                   <Grid item xs={4} p={1} key={poap.tokenId}>
                     <Link href={`https://app.poap.xyz/token/${poap.tokenId}`} target='_blank' display='flex'>
@@ -80,22 +80,22 @@ function PoapSection (props: PoapSectionProps) {
                   </Grid>
                 ))
               }
-            </Grid>
+              </Grid>
             )
         }
         {
           !poaps.length && (
-          <Grid item container xs={12} justifyContent='center' py={2}>
-            {
+            <Grid item container xs={12} justifyContent='center' py={2}>
+              {
               isPublic && <Typography>There are no POAPs</Typography>
             }
-            {
+              {
               !isPublic && !hasConnectedWallet && <Button onClick={openWalletSelectorModal}>Connect Wallet</Button>
             }
-            {
+              {
               !isPublic && hasConnectedWallet && <Typography>You have no POAPs</Typography>
             }
-          </Grid>
+            </Grid>
           )
         }
       </Grid>

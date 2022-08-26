@@ -95,7 +95,7 @@ export default function ImageSelector ({ autoOpen = false, children, galleryImag
             ]}
           />
         </Box>
-  )}
+      )}
     >
       {children}
     </PopperPopup>

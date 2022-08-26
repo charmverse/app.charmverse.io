@@ -268,9 +268,9 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
                     />
                     {
                       (errors?.tokenLogo || (validTokenLogoAddressFormat && !logoLoadSuccess)) && (
-                      <Alert severity='error'>
-                        Invalid token logo url
-                      </Alert>
+                        <Alert severity='error'>
+                          Invalid token logo url
+                        </Alert>
                       )
                     }
                   </Grid>

@@ -71,11 +71,11 @@ export default function NewBountyButton () {
       </Button>
       {activeBountyPage
       && (
-      <PageDialog
-        hideToolsMenu={suggestBounties}
-        page={activeBountyPage.page}
-        onClose={() => setActiveBountyPage(null)}
-      />
+        <PageDialog
+          hideToolsMenu={suggestBounties}
+          page={activeBountyPage.page}
+          onClose={() => setActiveBountyPage(null)}
+        />
       )}
     </>
   );

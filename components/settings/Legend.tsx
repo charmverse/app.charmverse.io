@@ -31,9 +31,9 @@ function Legend ({ children, helperText, ...props }: TypographyTypeMap['props'] 
         {children}
       </StyledTypography>
       {helperText && (
-      <Typography color='secondary' mt={0.5} variant='caption' component='p'>
-        {helperText}
-      </Typography>
+        <Typography color='secondary' mt={0.5} variant='caption' component='p'>
+          {helperText}
+        </Typography>
       )}
     </StyledBox>
   );
