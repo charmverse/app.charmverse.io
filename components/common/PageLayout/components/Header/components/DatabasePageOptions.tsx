@@ -11,6 +11,7 @@ import { getViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEdi
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 import { usePages } from 'hooks/usePages';
+import { isTruthy } from 'lib/utilities/types';
 
 interface Props {
   closeMenu: () => void;
@@ -34,16 +35,29 @@ export default function DatabaseOptions ({ closeMenu }: Props) {
     boardId: board.id,
     viewId: view.id
   }));
-  // @ts-ignore filter cards by whats accessible
-  const cards = _cards.filter(card => !!pages[card.id]);
+
+  const exportCsv = () => {
+    const cards = _cards.map(card => {
+      const page = pages[card.id];
+      // filter cards by whats accessible
+      if (!page) {
+        return null;
+      }
+      return {
+        ...card,
+        // update the title from correct model
+        title: page?.title
+      };
+    }).filter(isTruthy);
+
+    onExportCsvTrigger(board, view, cards, intl);
+    closeMenu();
+  };
 
   return (
     <List dense>
       <ListItemButton
-        onClick={() => {
-          onExportCsvTrigger(board, view, cards, intl);
-          closeMenu();
-        }}
+        onClick={exportCsv}
       >
         <FormatListBulletedIcon
           fontSize='small'
