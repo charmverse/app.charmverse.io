@@ -403,7 +403,7 @@ ol li {
 }
 
 /** Bullet List */
-.bangle-editor ul {
+.bangle-editor ul:not(.MuiList-root) {
   list-style-type: disc;
   list-style-position: outside;
   padding-left: 1.5rem;

@@ -15,6 +15,7 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import DuplicateIcon from '@mui/icons-material/ContentCopy';
 import EditIcon from '@mui/icons-material/Edit';
+import TuneIcon from '@mui/icons-material/Tune';
 import { usePopupState, bindTrigger, bindMenu } from 'material-ui-popup-state/hooks';
 import { useForm } from 'react-hook-form';
 import { useFocalboardViews } from 'hooks/useFocalboardViews';
@@ -50,9 +51,10 @@ interface ViewTabsProps {
   onDeleteView?: (viewId: string) => void
   disableUpdatingUrl?: boolean
   maxTabsShown: number
+  openViewOptions: () => void
 }
 
-function ViewTabs ({ onDeleteView, maxTabsShown, onViewTabClick, disableUpdatingUrl, addViewButton, board, activeView, intl, readonly, showView, views }: ViewTabsProps) {
+function ViewTabs ({ onDeleteView, openViewOptions, maxTabsShown, onViewTabClick, disableUpdatingUrl, addViewButton, board, activeView, intl, readonly, showView, views }: ViewTabsProps) {
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [dropdownView, setDropdownView] = useState<BoardView | null>(null);
@@ -155,6 +157,11 @@ function ViewTabs ({ onDeleteView, maxTabsShown, onViewTabClick, disableUpdating
     renameViewPopupState.open();
   }
 
+  function handleViewOptions () {
+    openViewOptions();
+    setAnchorEl(null);
+  }
+
   function saveViewTitle (form: { title: string }) {
     if (dropdownView) {
       mutator.changeTitle(dropdownView.id, dropdownView.title, form.title);
@@ -221,12 +228,17 @@ function ViewTabs ({ onDeleteView, maxTabsShown, onViewTabClick, disableUpdating
       </Tabs>
       <Menu
         anchorEl={anchorEl}
+        disablePortal
         open={Boolean(anchorEl)}
         onClose={handleClose}
       >
         <MenuItem dense onClick={handleRenameView}>
           <ListItemIcon><EditIcon fontSize='small' /></ListItemIcon>
           <ListItemText>Rename</ListItemText>
+        </MenuItem>
+        <MenuItem dense onClick={handleViewOptions}>
+          <ListItemIcon><TuneIcon fontSize='small' /></ListItemIcon>
+          <ListItemText>Edit View</ListItemText>
         </MenuItem>
         <Divider />
         <MenuItem dense onClick={handleDuplicateView}>
