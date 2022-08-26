@@ -9,7 +9,7 @@ import { safeScrollIntoViewIfNeeded } from 'lib/browser';
 import { PluginKey } from 'prosemirror-state';
 import { useCallback, useEffect, memo } from 'react';
 import { SuggestTooltipPluginState, hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
-import { PagesList } from '../../PageList';
+import PagesList from '../../PageList';
 import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
 import { MentionPluginState } from '../mention.interfaces';
 import { selectMention } from '../mention.utils';

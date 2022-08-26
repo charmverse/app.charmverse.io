@@ -174,15 +174,15 @@ export default function LargeAvatar (props: LargeAvatarProps) {
         isNft={isNft}
       />
       {canSetNft && (
-      <>
-        <AvatarEditMenu
-          anchorEl={menuAnchorEl}
-          onClose={() => setMenuAnchorEl(null)}
-          onUploadClick={onUploadClick}
-          onNftClick={() => setIsGalleryVisible(true)}
-        />
-        <NftAvatarGallery isVisible={isGalleryVisible} onClose={() => setIsGalleryVisible(false)} onSelect={onNftSelect} isSaving={isSaving} />
-      </>
+        <>
+          <AvatarEditMenu
+            anchorEl={menuAnchorEl}
+            onClose={() => setMenuAnchorEl(null)}
+            onUploadClick={onUploadClick}
+            onNftClick={() => setIsGalleryVisible(true)}
+          />
+          <NftAvatarGallery isVisible={isGalleryVisible} onClose={() => setIsGalleryVisible(false)} onSelect={onNftSelect} isSaving={isSaving} />
+        </>
       )}
     </StyledBox>
   );

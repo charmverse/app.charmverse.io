@@ -8,7 +8,7 @@ import { safeScrollIntoViewIfNeeded } from 'lib/browser';
 import { insertNestedPage } from 'lib/prosemirror/insertNestedPage';
 import { hideSuggestionsTooltip, SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
-import { PagesList } from '../../PageList';
+import PagesList from '../../PageList';
 import { NestedPagePluginState } from '../nestedPage.interfaces';
 
 function NestedPagesList ({ pluginKey }: {pluginKey: PluginKey<NestedPagePluginState>}) {

@@ -106,36 +106,36 @@ export default function ImportNotionWorkspace () {
       <Modal open={modalOpen} onClose={closeModal} size='fluid'>
         <Box display='flex' alignItems='center' gap={2} flexDirection='column'>
           {notionState.loading && (
-          <>
-            <CircularProgress size={30} />
-            <Typography sx={{ mb: 0 }}>
-              Importing your files from Notion. This might take a few minutes...
-            </Typography>
-          </>
+            <>
+              <CircularProgress size={30} />
+              <Typography sx={{ mb: 0 }}>
+                Importing your files from Notion. This might take a few minutes...
+              </Typography>
+            </>
           )}
           {!notionState.loading && notionState.failedImports?.length && (
-          <>
-            <CompleteIcon color='success' fontSize='large' />
-            <Typography sx={{ mb: 0 }}>
-              Import complete! Pages where we encountered issues are highlighted below.
-            </Typography>
-          </>
+            <>
+              <CompleteIcon color='success' fontSize='large' />
+              <Typography sx={{ mb: 0 }}>
+                Import complete! Pages where we encountered issues are highlighted below.
+              </Typography>
+            </>
           )}
           {notionState.warning && (
-          <>
-            <WarningIcon color='orange' fontSize='large' />
-            <Typography sx={{ mb: 0 }} align='center'>
-              {notionState.warning}
-            </Typography>
-          </>
+            <>
+              <WarningIcon color='orange' fontSize='large' />
+              <Typography sx={{ mb: 0 }} align='center'>
+                {notionState.warning}
+              </Typography>
+            </>
           )}
           {notionState.error && (
-          <>
-            <ErrorIcon color='error' fontSize='large' />
-            <Typography sx={{ mb: 0 }} align='center'>
-              {notionState.error}
-            </Typography>
-          </>
+            <>
+              <ErrorIcon color='error' fontSize='large' />
+              <Typography sx={{ mb: 0 }} align='center'>
+                {notionState.error}
+              </Typography>
+            </>
           )}
         </Box>
         {notionState.failedImports && notionState.failedImports?.length > 0 && (

@@ -8,7 +8,7 @@ import MetaMaskOnboarding from '@metamask/onboarding';
 import { AbstractConnector } from '@web3-react/abstract-connector';
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
 import Link from 'components/common/Link';
-import { Error } from 'components/common/Error';
+import ErrorComponent from 'components/common/errors/WalletError';
 import { injected, walletConnect, walletLink } from 'connectors';
 import ArrowSquareOut from '@mui/icons-material/Launch';
 import { useEffect, useRef } from 'react';
@@ -71,7 +71,7 @@ function WalletSelectorModal ({
   return (
     <Modal open={isModalOpen} onClose={closeModal}>
       <DialogTitle onClose={closeModal}>Connect to a wallet</DialogTitle>
-      <Error error={error} processError={processConnectionError} />
+      <ErrorComponent error={error} processError={processConnectionError} />
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <ConnectorButton

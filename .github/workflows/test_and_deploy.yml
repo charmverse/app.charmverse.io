@@ -76,13 +76,9 @@ jobs:
           npm prune --production
           rm -rf .next/cache
 
-      - name: Add Datadog API Key
+      - name: Configure env_var to prod settings
         run: |
-          sed -i 's/{API_KEY}/${{ secrets.DATADOG_API_KEY }}/g' .ebextensions/99_datadog.config
-          sed -i 's/{API_KEY}/${{ secrets.DATADOG_API_KEY }}/g' .ebextensions_cron/99_datadog.config
-
-      - name: Configure Docker npm command
-        run: sed -i 's/{DOCKER_NPM_COMMAND}/start:prod/g' .ebextensions/00_env_vars.config
+          sed -i 's/staging/prod/g' .ebextensions/00_env_vars.config
 
       - name: Package
         run: cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
@@ -90,20 +86,21 @@ jobs:
       - name: Update and Package background worker
         run: |
           rm -rf .ebextensions && mv .ebextensions_cron .ebextensions
+          mv docker-compose-cron.yml docker-compose.yml
           cat files_to_zip.txt | zip --symlinks -r@ deploy_cron.zip
 
-      - name: Deploy to Beanstalk
-        uses: einaregilsson/beanstalk-deploy@v18
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: web3-workspace
-          environment_name: web3-workspace-production
-          version_label: ${{ github.sha }}
-          region: us-east-1
-          deployment_package: deploy.zip
-          use_existing_version_if_available: true # allows triggering re-deploys with same version
-          wait_for_deployment: false # set to false to save sweet Github minutes
+      # - name: Deploy to Beanstalk
+      #   uses: einaregilsson/beanstalk-deploy@v18
+      #   with:
+      #     aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     application_name: web3-workspace
+      #     environment_name: test-docker-compose
+      #     version_label: ${{ github.sha }}
+      #     region: us-east-1
+      #     deployment_package: deploy.zip
+      #     use_existing_version_if_available: true # allows triggering re-deploys with same version
+      #     wait_for_deployment: false # set to false to save sweet Github minutes
 
       - name: Deploy Background to Beanstalk
         uses: einaregilsson/beanstalk-deploy@v18

@@ -134,22 +134,22 @@ export default function ShareBountyBoard ({ padding = 1 }: Props) {
       <Collapse in={bountiesArePublic}>
         {
           shareLink && (
-          <Box p={padding} sx={{ mt: padding === 0 ? 1 : undefined }}>
-            <StyledInput
-              fullWidth
-              disabled
-              value={shareLink}
-              endAdornment={(
-                <CopyToClipboard text={shareLink} onCopy={onCopy}>
-                  <InputAdornment position='end'>
-                    <CopyButton>
-                      {copied ? 'Copied!' : 'Copy'}
-                    </CopyButton>
-                  </InputAdornment>
-                </CopyToClipboard>
-              )}
-            />
-          </Box>
+            <Box p={padding} sx={{ mt: padding === 0 ? 1 : undefined }}>
+              <StyledInput
+                fullWidth
+                disabled
+                value={shareLink}
+                endAdornment={(
+                  <CopyToClipboard text={shareLink} onCopy={onCopy}>
+                    <InputAdornment position='end'>
+                      <CopyButton>
+                        {copied ? 'Copied!' : 'Copy'}
+                      </CopyButton>
+                    </InputAdornment>
+                  </CopyToClipboard>
+                )}
+              />
+            </Box>
           )
         }
       </Collapse>

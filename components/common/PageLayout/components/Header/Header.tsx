@@ -28,13 +28,13 @@ import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
 import { useRouter } from 'next/router';
-import { useRef, useState } from 'react';
+import { useRef, useState, ReactNode } from 'react';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
-import Account from '../Account';
 import ShareButton from './components/ShareButton';
 import BountyShareButton from './components/BountyShareButton/BountyShareButton';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
+import DatabasePageOptions from './components/DatabasePageOptions';
 
 export const headerHeight = 56;
 
@@ -103,6 +103,113 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
   const isFullWidth = basePage?.fullWidth ?? false;
   const isBasePageDocument = basePage?.type === 'page' || basePage?.type === 'card' || basePage?.type === 'proposal' || basePage?.type === 'bounty';
 
+  const documentOptions = (
+    <List dense>
+      {currentSpacePermissions?.createVote && (
+        <ListItemButton
+          onClick={() => {
+            setPageMenuOpen(false);
+            setIsModalOpen(true);
+          }}
+        >
+          <HowToVoteOutlinedIcon
+            fontSize='small'
+            sx={{
+              mr: 1
+            }}
+          />
+          <ListItemText primary='Create a vote' />
+        </ListItemButton>
+      )}
+      <ListItemButton
+        onClick={() => {
+          setCurrentPageActionDisplay('votes');
+          setPageMenuOpen(false);
+        }}
+      >
+        <FormatListBulletedIcon
+          fontSize='small'
+          sx={{
+            mr: 1
+          }}
+        />
+        <ListItemText primary='View votes' />
+      </ListItemButton>
+      <PublishToSnapshot page={basePage as Page} />
+      <Divider />
+      <ListItemButton onClick={() => {
+        setCurrentPageActionDisplay('comments');
+        setPageMenuOpen(false);
+      }}
+      >
+        <CommentOutlinedIcon
+          fontSize='small'
+          sx={{
+            mr: 1
+          }}
+        />
+        <ListItemText primary='View comments' />
+      </ListItemButton>
+      {isExportablePage && (
+        <ListItemButton onClick={() => {
+          exportMarkdown();
+          setPageMenuOpen(false);
+        }}
+        >
+          <GetAppIcon
+            fontSize='small'
+            sx={{
+              mr: 1
+            }}
+          />
+          <ListItemText primary='Export to markdown' />
+        </ListItemButton>
+      )}
+
+      <Divider />
+      <ListItemButton>
+        <FormControlLabel
+          sx={{
+            marginLeft: 0.5,
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'space-between'
+          }}
+          labelPlacement='start'
+          control={(
+            <Switch
+              size='small'
+              checked={isFullWidth}
+              onChange={async () => {
+                await charmClient.updatePage({
+                  id: basePage?.id,
+                  fullWidth: !isFullWidth
+                });
+                // @ts-ignore
+                setPages((_pages) => ({ ..._pages, [basePageId]: { ...basePage, fullWidth: !isFullWidth } }));
+              }}
+            />
+          )}
+          label={<Typography variant='body2'>Full Width</Typography>}
+        />
+      </ListItemButton>
+    </List>
+  );
+
+  function closeMenu () {
+    setPageMenuOpen(false);
+  }
+
+  const databaseOptions = basePage ? <DatabasePageOptions closeMenu={closeMenu} /> : null;
+
+  let pageOptionsList: ReactNode;
+  if (isBasePageDocument) {
+    pageOptionsList = documentOptions;
+  }
+  else if (/board/.test(basePage?.type ?? '')) {
+    pageOptionsList = databaseOptions;
+  }
+
   return (
     <StyledToolbar variant='dense'>
       <IconButton
@@ -122,15 +229,16 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
+        alignSelf: 'stretch',
         gap: 1,
         width: '100%'
       }}
       >
-        <PageTitleWithBreadcrumbs />
-        <Box display='flex' alignItems='center' mr={-1}>
+        <PageTitleWithBreadcrumbs pageId={basePage?.id} />
+        <Box display='flex' alignItems='center' alignSelf='stretch' mr={-1}>
           {
-            isBountyBoard && (
-              <BountyShareButton headerHeight={headerHeight} />
+            basePage && isBountyBoard && (
+              <BountyShareButton headerHeight={headerHeight} pageId={basePage.id} />
             )
           }
 
@@ -139,25 +247,27 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
               {basePage?.deletedAt === null && <ShareButton headerHeight={headerHeight} pageId={basePage.id} />}
               <IconButton sx={{ display: { xs: 'none', md: 'inline-flex' } }} size='small' onClick={toggleFavorite} color='inherit'>
                 <Tooltip title={isFavorite ? 'Remove from sidebar' : 'Pin this page to your sidebar'} arrow placement='top'>
-                  {isFavorite ? <FavoritedIcon fontSize='small' color='secondary' /> : <NotFavoritedIcon fontSize='small' color='secondary' />}
+                  {isFavorite ? <FavoritedIcon color='secondary' /> : <NotFavoritedIcon color='secondary' />}
                 </Tooltip>
               </IconButton>
             </>
           )}
 
-          {isBasePageDocument && (
-            <Box ml={1} ref={pageMenuAnchor}>
-              <IconButton
-                size='small'
-                onClick={() => {
-                  setPageMenuOpen(!pageMenuOpen);
-                  setPageMenuAnchorElement(pageMenuAnchor.current || null);
-                }}
-              >
-                <Tooltip title='View comments, votes, export content and more' arrow>
-                  <MoreHorizIcon color='secondary' />
-                </Tooltip>
-              </IconButton>
+          {pageOptionsList && (
+            <Box ml={1} ref={pageMenuAnchor} display='flex' alignSelf='stretch' alignItems='center'>
+              <div>
+                <IconButton
+                  size='small'
+                  onClick={() => {
+                    setPageMenuOpen(!pageMenuOpen);
+                    setPageMenuAnchorElement(pageMenuAnchor.current || null);
+                  }}
+                >
+                  <Tooltip title='View comments, votes, export content and more' arrow>
+                    <MoreHorizIcon color='secondary' />
+                  </Tooltip>
+                </IconButton>
+              </div>
               <Popover
                 anchorEl={pageMenuAnchorElement}
                 open={pageMenuOpen}
@@ -167,95 +277,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
                   horizontal: 'left'
                 }}
               >
-                <List dense>
-                  {currentSpacePermissions?.createVote && (
-                    <ListItemButton
-                      onClick={() => {
-                        setPageMenuOpen(false);
-                        setIsModalOpen(true);
-                      }}
-                    >
-                      <HowToVoteOutlinedIcon
-                        fontSize='small'
-                        sx={{
-                          mr: 1
-                        }}
-                      />
-                      <ListItemText primary='Create a vote' />
-                    </ListItemButton>
-                  )}
-                  <ListItemButton
-                    onClick={() => {
-                      setCurrentPageActionDisplay('votes');
-                      setPageMenuOpen(false);
-                    }}
-                  >
-                    <FormatListBulletedIcon
-                      fontSize='small'
-                      sx={{
-                        mr: 1
-                      }}
-                    />
-                    <ListItemText primary='View votes' />
-                  </ListItemButton>
-                  <PublishToSnapshot page={basePage as Page} />
-                  <Divider />
-                  <ListItemButton onClick={() => {
-                    setCurrentPageActionDisplay('comments');
-                    setPageMenuOpen(false);
-                  }}
-                  >
-                    <CommentOutlinedIcon
-                      fontSize='small'
-                      sx={{
-                        mr: 1
-                      }}
-                    />
-                    <ListItemText primary='View comments' />
-                  </ListItemButton>
-                  {isExportablePage && (
-                    <ListItemButton onClick={() => {
-                      exportMarkdown();
-                      setPageMenuOpen(false);
-                    }}
-                    >
-                      <GetAppIcon
-                        fontSize='small'
-                        sx={{
-                          mr: 1
-                        }}
-                      />
-                      <ListItemText primary='Export to markdown' />
-                    </ListItemButton>
-                  )}
-
-                  <Divider />
-                  <ListItemButton>
-                    <FormControlLabel
-                      sx={{
-                        marginLeft: 0.5,
-                        width: '100%',
-                        display: 'flex',
-                        justifyContent: 'space-between'
-                      }}
-                      labelPlacement='start'
-                      control={(
-                        <Switch
-                          size='small'
-                          checked={isFullWidth}
-                          onChange={async () => {
-                            await charmClient.updatePage({
-                              id: basePage.id,
-                              fullWidth: !isFullWidth
-                            });
-                            setPages((_pages) => ({ ..._pages, [basePageId]: { ...basePage, fullWidth: !isFullWidth } }));
-                          }}
-                        />
-                      )}
-                      label={<Typography variant='body2'>Full Width</Typography>}
-                    />
-                  </ListItemButton>
-                </List>
+                {pageOptionsList}
               </Popover>
             </Box>
           )}

@@ -5,7 +5,7 @@ import AlertTitle from '@mui/material/AlertTitle';
 import Collapse from '@mui/material/Collapse';
 import { useEffect, useState } from 'react';
 
-type ErrorInfo = {
+export type ErrorInfo = {
   title: string
   description: string
 }
@@ -16,7 +16,7 @@ type Props<ErrorType> = {
 }
 
 // tailing comma for generics to sidestep the JSX ambiguity
-function Error<ErrorType> ({
+export default function Error<ErrorType> ({
   error,
   processError
 }: Props<ErrorType>) {
@@ -49,6 +49,3 @@ function Error<ErrorType> ({
     </Collapse>
   );
 }
-
-export { Error };
-export type { ErrorInfo };

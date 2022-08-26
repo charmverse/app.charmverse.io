@@ -4,6 +4,7 @@ import React from 'react';
 
 import DropdownIcon from '../icons/dropdown';
 import MenuWrapper from '../menuWrapper';
+import Button from 'components/common/Button';
 
 type Props = {
     onClick?: (e: React.MouseEvent<HTMLDivElement>) => void
@@ -14,21 +15,19 @@ type Props = {
 
 function ButtonWithMenu (props: Props): JSX.Element {
   return (
-    <div
+    <Button
+      disableElevation
+      size='small'
       onClick={props.onClick}
-      className='Button filled'
-      title={props.title}
     >
-      <div className='button-text'>
-        {props.text}
-      </div>
+      {props.text}
       {/* <MenuWrapper stopPropagationOnToggle={true}>
                 <div className='button-dropdown'>
                     <DropdownIcon/>
                 </div>
                 {props.children}
             </MenuWrapper> */}
-    </div>
+    </Button>
   );
 }
 

@@ -42,6 +42,8 @@ import * as columnLayout from './components/columnLayout';
 import LayoutColumn from './components/columnLayout/Column';
 import LayoutRow from './components/columnLayout/Row';
 import { CryptoPrice } from './components/CryptoPrice';
+import InlineDatabase from './components/inlineDatabase/components/InlineDatabase';
+import * as inlineDatabase from './components/inlineDatabase';
 import * as disclosure from './components/disclosure';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
 import * as floatingMenu from './components/floatingMenu';
@@ -175,6 +177,10 @@ export function charmEditorPlugins (
       containerDOM: ['blockquote', { class: 'charm-quote' }],
       contentDOM: ['div']
     }),
+    NodeView.createPlugin({
+      name: 'inlineDatabase',
+      containerDOM: ['div', { draggable: 'false' }]
+    }),
     tabIndent.plugins(),
     table.tableEditing({ allowTableNodeSelection: true }),
     table.columnHandles(),
@@ -307,6 +313,7 @@ interface CharmEditorProps {
   disablePageSpecificFeatures?: boolean;
   enableVoting?: boolean;
   pageId?: string | null;
+  containerWidth?: number;
 }
 
 export function convertPageContentToMarkdown (content: PageContent, title?: string): string {
@@ -339,7 +346,8 @@ function CharmEditor (
     readOnly = false,
     disablePageSpecificFeatures = false,
     enableVoting,
-    pageId
+    pageId,
+    containerWidth
   }:
   CharmEditorProps
 ) {
@@ -542,6 +550,15 @@ function CharmEditor (
               />
             );
           }
+          case 'inlineDatabase': {
+            return (
+              <InlineDatabase
+                containerWidth={containerWidth}
+                readOnly={readOnly}
+                {...props}
+              />
+            );
+          }
           default: {
             return null;
           }
@@ -556,46 +573,46 @@ function CharmEditor (
       <InlinePalette nestedPagePluginKey={nestedPagePluginKey} disableNestedPage={disablePageSpecificFeatures} />
       {children}
       {!disablePageSpecificFeatures && (
-      <>
-        <Slide
-          direction='left'
-          in={pageActionDisplay === 'comments'}
-          style={{
-            transformOrigin: 'left top'
-          }}
-          easing={{
-            enter: 'ease-in',
-            exit: 'ease-out'
-          }}
-          timeout={250}
-        >
-          <PageActionListBox
-            id='page-thread-list-box'
+        <>
+          <Slide
+            direction='left'
+            in={pageActionDisplay === 'comments'}
+            style={{
+              transformOrigin: 'left top'
+            }}
+            easing={{
+              enter: 'ease-in',
+              exit: 'ease-out'
+            }}
+            timeout={250}
           >
-            <CommentsSidebar />
-          </PageActionListBox>
-        </Slide>
-        <Slide
-          direction='left'
-          in={pageActionDisplay === 'votes'}
-          style={{
-            transformOrigin: 'left top'
-          }}
-          easing={{
-            enter: 'ease-in',
-            exit: 'ease-out'
-          }}
-          timeout={250}
-        >
-          <PageActionListBox
-            id='page-vote-list-box'
+            <PageActionListBox
+              id='page-thread-list-box'
+            >
+              <CommentsSidebar />
+            </PageActionListBox>
+          </Slide>
+          <Slide
+            direction='left'
+            in={pageActionDisplay === 'votes'}
+            style={{
+              transformOrigin: 'left top'
+            }}
+            easing={{
+              enter: 'ease-in',
+              exit: 'ease-out'
+            }}
+            timeout={250}
           >
-            <PageInlineVotesList />
-          </PageActionListBox>
-        </Slide>
-        <InlineCommentThread pluginKey={inlineCommentPluginKey} />
-        {enableVoting && <InlineVoteList pluginKey={inlineVotePluginKey} />}
-      </>
+            <PageActionListBox
+              id='page-vote-list-box'
+            >
+              <PageInlineVotesList />
+            </PageActionListBox>
+          </Slide>
+          <InlineCommentThread pluginKey={inlineCommentPluginKey} />
+          {enableVoting && <InlineVoteList pluginKey={inlineVotePluginKey} />}
+        </>
       )}
       {!readOnly && <DevTools />}
     </StyledReactBangleEditor>

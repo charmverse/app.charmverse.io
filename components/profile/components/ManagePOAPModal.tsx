@@ -156,9 +156,9 @@ function ManagePOAPModal (props: ManagePOAPModalProps) {
 
         {
           displayedShownPoaps.length === 0 && (
-          <Grid item container xs={12} justifyContent='center' py={2}>
-            <Typography>There are no visible POAPs</Typography>
-          </Grid>
+            <Grid item container xs={12} justifyContent='center' py={2}>
+              <Typography>There are no visible POAPs</Typography>
+            </Grid>
           )
         }
       </TabPanel>
@@ -184,9 +184,9 @@ function ManagePOAPModal (props: ManagePOAPModalProps) {
         }
         {
           displayedHiddenPoaps.length === 0 && (
-          <Grid item container xs={12} justifyContent='center' py={2}>
-            <Typography>There are no hidden POAPs</Typography>
-          </Grid>
+            <Grid item container xs={12} justifyContent='center' py={2}>
+              <Typography>There are no hidden POAPs</Typography>
+            </Grid>
           )
         }
       </TabPanel>

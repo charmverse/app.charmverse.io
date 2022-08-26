@@ -2,6 +2,7 @@ import { PrismaPromise, Prisma, Page, Block } from '@prisma/client';
 import { createBoard } from 'lib/focalboard/board';
 import { createBoardView } from 'lib/focalboard/boardView';
 import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
+import { getPagePath } from 'lib/pages';
 import { v4 } from 'uuid';
 import { prisma } from 'db';
 import { createBlock } from 'lib/focalboard/block';
@@ -35,7 +36,7 @@ export async function duplicatePage (pageId: string, userId: string, parentId?: 
           id: userId
         }
       },
-      path: `page-${createdPageId}`,
+      path: getPagePath(),
       space: {
         connect: {
           id: page.spaceId as string
@@ -154,7 +155,7 @@ export async function duplicatePage (pageId: string, userId: string, parentId?: 
             snapshotProposalId: cardPage.snapshotProposalId,
             type: cardPage.type,
             spaceId: cardPage.spaceId,
-            path: `page-${duplicateCardId}`
+            path: getPagePath()
           });
           duplicatedCardBlockIds.push(duplicateCardId);
         });
