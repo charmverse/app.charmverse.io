@@ -522,7 +522,7 @@ function CenterPanel (props: Props) {
       </div>
 
       <div className={`container-container ${state.showLinkedViewMenu ? 'sidebar-visible' : ''}`}>
-        {state.showLinkedViewMenu && (
+        {!activeView && state.showLinkedViewMenu && (
           <SourceSelection
             onSelectSource={createLinkedView}
             onCreateDatabase={createDatabase}
