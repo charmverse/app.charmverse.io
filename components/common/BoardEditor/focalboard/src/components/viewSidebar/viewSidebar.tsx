@@ -58,7 +58,8 @@ export default function ViewOptionsSidebar (props: Props) {
 
   const currentGroup = props.board.fields.cardProperties.find(prop => prop.id === props.groupByProperty?.id)?.name;
   const currentLayout = props.view.fields.viewType;
-  const currentProperties = props.view.fields.visiblePropertyIds?.length ?? 0;
+  const visiblePropertyIds = props.view.fields.visiblePropertyIds ?? [];
+  const currentProperties = visiblePropertyIds.filter(id => props.board.fields.cardProperties.some(c => c.id === id)).length;
 
   return (
     <>
