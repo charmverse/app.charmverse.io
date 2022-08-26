@@ -25,7 +25,7 @@ export async function addPage ({ createdBy, spaceId, shouldCreateDefaultBoardDat
   const pageId = v4();
 
   shouldCreateDefaultBoardData = shouldCreateDefaultBoardData ?? true;
-  const isBoardPage = (page.type === 'board' || page.type === 'inline_board' || page.type === 'inline_linked_board');
+  const isBoardPage = (page.type?.match(/board/));
 
   const pageProperties: Partial<Page> = {
     id: pageId,

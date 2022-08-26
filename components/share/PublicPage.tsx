@@ -177,7 +177,7 @@ export default function PublicPage () {
           {
             isBountiesPage
               ? <PublicBountiesPage />
-              : (currentPage?.type === 'board' || currentPage?.type === 'inline_board' || currentPage?.type === 'inline_linked_board'
+              : (currentPage?.type.match(/board/)
                 ? (
                   <BoardPage page={currentPage} setPage={() => {}} readOnly={true} />
                 ) : (
