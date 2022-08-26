@@ -18,6 +18,7 @@ interface Props {
   onCreate?: () => void;
   onSelect: (selected: { boardId: string }) => void;
   sidebarState?: SidebarState;
+  readOnly?: boolean
 }
 
 const StyledSidebar = styled.div`
@@ -38,7 +39,6 @@ const SidebarContent = styled.div`
 `;
 
 export default function SourceSelection (props: Props) {
-  const router = useRouter();
   const [sidebarState, setSidebarState] = useState<SidebarState>('select-source');
 
   const { pages } = usePages();
@@ -51,8 +51,6 @@ export default function SourceSelection (props: Props) {
   function closeSidebar () {
     setSidebarState(null);
   }
-
-  const isSharedPage = router.pathname.startsWith('/share');
 
   return (
     <>
@@ -85,7 +83,7 @@ export default function SourceSelection (props: Props) {
             <SidebarContent>
               <PagesList pages={boardPages} onSelectPage={page => props.onSelect({ boardId: page.id })} />
             </SidebarContent>
-            {!isSharedPage && <MenuItem  onClick={props.onCreate}>
+            {!props.readOnly && <MenuItem  onClick={props.onCreate}>
               <ListItemIcon><AddIcon color='secondary' /></ListItemIcon>
               <Typography variant='body2' color='secondary'>
                 New database
