@@ -1,13 +1,12 @@
 import { useCallback } from 'react';
 import { IntlShape, injectIntl } from 'react-intl';
 import { Box, Card, Grid, Typography } from '@mui/material';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import { Block } from '../blocks/block';
 import { Board, IPropertyTemplate } from '../blocks/board';
 import { BoardView, createBoardView } from '../blocks/boardView';
+import { updateView } from '../store/views';
+import {useAppDispatch} from '../store/hooks'
 import { Constants } from '../constants';
 import mutator from '../mutator';
-import { Utils } from '../utils';
 import BoardIcon from '../widgets/icons/board';
 import CalendarIcon from '../widgets/icons/calendar';
 import GalleryIcon from '../widgets/icons/gallery';
@@ -21,7 +20,10 @@ interface LayoutOptionsProps {
 
 function LayoutOptions (props: LayoutOptionsProps) {
 
+  const dispatch = useAppDispatch();
+
   const intl = props.intl;
+  const activeView = props.view;
 
   const boardText = intl.formatMessage({
     id: 'View.Board',
@@ -36,133 +38,81 @@ function LayoutOptions (props: LayoutOptionsProps) {
     defaultMessage: 'Gallery'
   });
 
-  const handleAddViewBoard = useCallback(() => {
-    const { board, view: activeView, intl } = props;
-    Utils.log('addview-board');
-    // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.CreateBoardView, {board: board.id, view: activeView.id})
-    const view = createBoardView();
-    view.title = intl.formatMessage({ id: 'View.NewBoardTitle', defaultMessage: 'Board view' });
-    view.fields.viewType = 'board';
-    view.parentId = board.id;
-    view.rootId = board.rootId;
-    view.fields.cardOrder = activeView?.fields.cardOrder ?? [];
+  const handleAddViewBoard = useCallback(async () => {
+    const newView = createBoardView(activeView)
+    newView.fields.viewType = 'board';
+    newView.fields.cardOrder = newView.fields.cardOrder ?? [];
+    try {
+      dispatch(updateView(newView))
+      await mutator.updateBlock(newView, activeView, 'change view type')
+    } catch {
+      dispatch(updateView(activeView))
+    }
+  }, [activeView]);
 
-    mutator.insertBlock(
-      view,
-      'add view',
-      async (block: Block) => {
-        // This delay is needed because WSClient has a default 100 ms notification delay before updates
-        // setTimeout(() => {
-        //     Utils.log(`showView: ${block.id}`)
-        //     showView(block.id)
-        // }, 120)
-      },
-      async () => {
-      }
-    );
-  }, [props.view, props.board, props.intl]);
+  const handleAddViewTable = useCallback(async () => {
+    const { board } = props;
+    const newView = createBoardView(activeView)
+    newView.fields.viewType = 'table';
+    newView.fields.visiblePropertyIds = board.fields.cardProperties.map((o: IPropertyTemplate) => o.id);
+    newView.fields.columnWidths = {};
+    newView.fields.columnWidths[Constants.titleColumnId] = Constants.defaultTitleColumnWidth;
+    newView.fields.cardOrder = newView.fields.cardOrder ?? [];
+    try {
+      dispatch(updateView(newView))
+      await mutator.updateBlock(newView, activeView, 'change view type')
+    } catch {
+      dispatch(updateView(activeView))
+    }
+  }, [activeView]);
 
-  const handleAddViewTable = useCallback(() => {
-    const { board, view: activeView, intl } = props;
+  const handleAddViewGallery = useCallback(async () => {
+    const newView = createBoardView(activeView)
+    newView.fields.viewType = 'gallery';
+    newView.fields.visiblePropertyIds = [Constants.titleColumnId];
+    newView.fields.cardOrder = newView?.fields.cardOrder ?? [];
+    try {
+      dispatch(updateView(newView))
+      await mutator.updateBlock(newView, activeView, 'change view type')
+    } catch {
+      dispatch(updateView(activeView))
+    }
+  }, [activeView]);
 
-    Utils.log('addview-table');
-    const view = createBoardView();
-    view.title = intl.formatMessage({ id: 'View.NewTableTitle', defaultMessage: 'Table view' });
-    view.fields.viewType = 'table';
-    view.parentId = board.id;
-    view.rootId = board.rootId;
-    view.fields.visiblePropertyIds = board.fields.cardProperties.map((o: IPropertyTemplate) => o.id);
-    view.fields.columnWidths = {};
-    view.fields.columnWidths[Constants.titleColumnId] = Constants.defaultTitleColumnWidth;
-    view.fields.cardOrder = activeView?.fields.cardOrder ?? [];
-
-    mutator.insertBlock(
-      view,
-      'add view',
-      async (block: Block) => {
-        // This delay is needed because WSClient has a default 100 ms notification delay before updates
-        // setTimeout(() => {
-        //     Utils.log(`showView: ${block.id}`)
-        //     showView(block.id)
-        // }, 120)
-      },
-      async () => {
-      }
-    );
-  }, [props.view, props.board, props.intl]);
-
-  const handleAddViewGallery = useCallback(() => {
-    const { board, view: activeView, intl } = props;
-
-    Utils.log('addview-gallery');
-    const view = createBoardView();
-    view.title = intl.formatMessage({ id: 'View.NewGalleryTitle', defaultMessage: 'Gallery view' });
-    view.fields.viewType = 'gallery';
-    view.parentId = board.id;
-    view.rootId = board.rootId;
-    view.fields.visiblePropertyIds = [Constants.titleColumnId];
-    view.fields.cardOrder = activeView?.fields.cardOrder ?? [];
-
-    mutator.insertBlock(
-      view,
-      'add view',
-      async (block: Block) => {
-        // This delay is needed because WSClient has a default 100 ms notification delay before updates
-        setTimeout(() => {
-          Utils.log(`showView: ${block.id}`);
-        }, 120);
-      },
-      async () => {
-      }
-    );
-  }, [props.board, props.view, props.intl]);
-
-  const handleAddViewCalendar = useCallback(() => {
-    const { board, view: activeView, intl } = props;
-
-    Utils.log('addview-calendar');
-    const view = createBoardView();
-    view.title = intl.formatMessage({ id: 'View.NewCalendarTitle', defaultMessage: 'Calendar View' });
-    view.fields.viewType = 'calendar';
-    view.parentId = board.id;
-    view.rootId = board.rootId;
-    view.fields.visiblePropertyIds = [Constants.titleColumnId];
-    view.fields.cardOrder = activeView?.fields.cardOrder ?? [];
-
-    // Find first date property
-    view.fields.dateDisplayPropertyId = board.fields.cardProperties.find((o: IPropertyTemplate) => o.type === 'date')?.id;
-
-    mutator.insertBlock(
-      view,
-      'add view',
-      async (block: Block) => {
-      },
-      async () => {
-      }
-    );
-  }, [props.board, props.view, props.intl]);
+  const handleAddViewCalendar = useCallback(async () => {
+    const newView = createBoardView(activeView)
+    newView.fields.viewType = 'calendar';
+    newView.fields.visiblePropertyIds = [Constants.titleColumnId];
+    newView.fields.cardOrder = activeView?.fields.cardOrder ?? [];
+    try {
+      dispatch(updateView(newView))
+      await mutator.updateBlock(newView, activeView, 'change view type')
+    } catch {
+      dispatch(updateView(activeView))
+    }
+  }, [activeView]);
 
   return (
-    <>
+    <Box onClick={e => e.stopPropagation()}>
       <Grid container spacing={1} px={1}>
-        <LayoutOption active={true} onClick={handleAddViewBoard}>
+        <LayoutOption active={activeView.fields.viewType === 'board'} onClick={handleAddViewBoard}>
           <BoardIcon />
           {boardText}
         </LayoutOption>
-        <LayoutOption onClick={handleAddViewTable}>
+        <LayoutOption active={activeView.fields.viewType === 'table'} onClick={handleAddViewTable}>
           <TableIcon />
           {tableText}
         </LayoutOption>
-        <LayoutOption onClick={handleAddViewGallery}>
+        <LayoutOption active={activeView.fields.viewType === 'gallery'} onClick={handleAddViewGallery}>
           <GalleryIcon />
           {galleryText}
         </LayoutOption>
-        <LayoutOption onClick={handleAddViewCalendar}>
+        <LayoutOption active={activeView.fields.viewType === 'calendar'} onClick={handleAddViewCalendar}>
           <CalendarIcon />
           Calendar
         </LayoutOption>
       </Grid>
-    </>
+    </Box>
   );
 }
 

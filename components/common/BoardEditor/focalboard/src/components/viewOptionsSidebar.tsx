@@ -1,12 +1,10 @@
 import { Box, Collapse, Divider, IconButton, ListItemIcon,ListItemText, MenuItem, Typography } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
 import PreviewIcon from '@mui/icons-material/Preview';
 import ArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import BackIcon from '@mui/icons-material/ArrowBack';
 import CloseIcon from '@mui/icons-material/Close';
 import styled from '@emotion/styled';
-import { NestedMenuItem } from 'mui-nested-menu';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ViewLayoutOptions from './viewLayoutOptions';
 import { Board } from '../blocks/board';
 import { BoardView } from '../blocks/boardView';
@@ -42,6 +40,14 @@ export default function ViewOptionsSidebar (props: Props) {
   function viewLayout () {
     setSidebarView('layout');
   }
+  console.log('sidebar View', sidebarView);
+
+  useEffect(() => {
+    // reset state on close
+    if (!props.isOpen) {
+      setSidebarView('viewOptions');
+    }
+  }, [props.isOpen])
 
   return (
     <>

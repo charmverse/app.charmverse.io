@@ -88,7 +88,6 @@ function CenterPanel (props: Props) {
 
   const router = useRouter();
   const [space] = useCurrentSpace();
-  const { user } = useUser();
   const { pages } = usePages();
   const _groupByProperty = useAppSelector(getCurrentViewGroupBy);
   const _dateDisplayProperty = useAppSelector(getCurrentViewDisplayBy);
@@ -411,7 +410,6 @@ function CenterPanel (props: Props) {
 
   async function createLinkedView ({ boardId: sourceBoardId }: { boardId: string }) {
     const view = createBoardView();
-    console.log('source', sourceBoardId);
     view.fields.viewType = 'board';
     view.parentId = board.id;
     view.rootId = board.id;
