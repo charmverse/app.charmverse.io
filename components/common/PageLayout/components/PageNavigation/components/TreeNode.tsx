@@ -153,13 +153,13 @@ function DraggableTreeNode ({ item, onDropAdjacent, onDropChild, pathPrefix, add
           (item.type === 'board' || item.type === 'inline_board' || item.type === 'inline_linked_board') ? (
             views.map(view => (
               !view.fields.inline && (
-              <BoardViewTreeItem
-                key={view.id}
-                href={`${pathPrefix}/${item.path}?viewId=${view.id}`}
-                label={view.title}
-                nodeId={view.id}
-                viewType={view.fields.viewType}
-              />
+                <BoardViewTreeItem
+                  key={view.id}
+                  href={`${pathPrefix}/${item.path}?viewId=${view.id}`}
+                  label={view.title}
+                  nodeId={view.id}
+                  viewType={view.fields.viewType}
+                />
               )
             ))
           ) : (

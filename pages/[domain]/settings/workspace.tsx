@@ -157,38 +157,38 @@ export default function WorkspaceSettings () {
         <ConnectSnapshot />
       </Box>
       {space && (
-      <ConfirmDeleteModal
-        title='Delete workspace'
-        onClose={closeInviteLinkDeleteModal}
-        open={workspaceRemoveModalState.isOpen}
-        buttonText={`Delete ${space.name}`}
-        question={`Are you sure you want to delete ${space.name}? This action cannot be undone`}
-        onConfirm={async () => {
-          if (isAdmin) {
-            await charmClient.deleteSpace(space.id);
+        <ConfirmDeleteModal
+          title='Delete workspace'
+          onClose={closeInviteLinkDeleteModal}
+          open={workspaceRemoveModalState.isOpen}
+          buttonText={`Delete ${space.name}`}
+          question={`Are you sure you want to delete ${space.name}? This action cannot be undone`}
+          onConfirm={async () => {
+            if (isAdmin) {
+              await charmClient.deleteSpace(space.id);
+              const filteredSpaces = spaces.filter(s => s.id !== space.id);
+              setSpaces(filteredSpaces);
+              window.location.href = filteredSpaces.length !== 0 ? `/${filteredSpaces[0].domain}` : '/signup';
+            }
+          }}
+        />
+      )}
+      {space && (
+        <ConfirmDeleteModal
+          title='Leave workspace'
+          onClose={() => {
+            workspaceLeaveModalState.close();
+          }}
+          open={workspaceLeaveModalState.isOpen}
+          buttonText={`Leave ${space.name}`}
+          question={`Are you sure you want to leave ${space.name}?`}
+          onConfirm={async () => {
+            await charmClient.leaveSpace(space.id);
             const filteredSpaces = spaces.filter(s => s.id !== space.id);
             setSpaces(filteredSpaces);
             window.location.href = filteredSpaces.length !== 0 ? `/${filteredSpaces[0].domain}` : '/signup';
-          }
-        }}
-      />
-      )}
-      {space && (
-      <ConfirmDeleteModal
-        title='Leave workspace'
-        onClose={() => {
-          workspaceLeaveModalState.close();
-        }}
-        open={workspaceLeaveModalState.isOpen}
-        buttonText={`Leave ${space.name}`}
-        question={`Are you sure you want to leave ${space.name}?`}
-        onConfirm={async () => {
-          await charmClient.leaveSpace(space.id);
-          const filteredSpaces = spaces.filter(s => s.id !== space.id);
-          setSpaces(filteredSpaces);
-          window.location.href = filteredSpaces.length !== 0 ? `/${filteredSpaces[0].domain}` : '/signup';
-        }}
-      />
+          }}
+        />
       )}
       <ConfirmDeleteModal
         open={unsavedChangesModalState.isOpen}

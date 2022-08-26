@@ -187,7 +187,7 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
                           setTouched(true);
                         }}
                       />
-                  )}
+                    )}
                     label={actionLabel}
                   />
                 </Grid>

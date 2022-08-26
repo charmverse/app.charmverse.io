@@ -22,7 +22,7 @@ type Props = {
     cards: Card[]
 }
 
-function onExportCsvTrigger (board: Board, activeView: BoardView, cards: Card[], intl: IntlShape) {
+export function onExportCsvTrigger (board: Board, activeView: BoardView, cards: Card[], intl: IntlShape) {
   try {
     CsvExporter.exportTableCsv(board, activeView, cards, intl);
     const exportCompleteMessage = intl.formatMessage({

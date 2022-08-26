@@ -15,9 +15,10 @@ import { useRouter } from 'next/router';
 type SidebarState = 'select-source' | null;
 
 interface Props {
-  onCreate?: () => void;
-  onSelect: (selected: { boardId: string }) => void;
+  onCreateDatabase?: () => void;
+  onSelectSource: (selected: { boardId: string }) => void;
   sidebarState?: SidebarState;
+  showCreateDatabase?: boolean;
   readOnly?: boolean
 }
 
@@ -82,14 +83,16 @@ export default function SourceSelection (props: Props) {
               </IconButton>
             </Box>
             <SidebarContent>
-              <PagesList pages={boardPages} onSelectPage={page => props.onSelect({ boardId: page.id })} />
+              <PagesList pages={boardPages} onSelectPage={page => props.onSelectSource({ boardId: page.id })} />
             </SidebarContent>
-            <MenuItem  onClick={props.onCreate}>
-              <ListItemIcon><AddIcon color='secondary' /></ListItemIcon>
-              <Typography variant='body2' color='secondary'>
-                New database
-              </Typography>
-            </MenuItem>
+            {props.showCreateDatabase && (
+              <MenuItem onClick={props.onCreateDatabase}>
+                <ListItemIcon><AddIcon color='secondary' /></ListItemIcon>
+                <Typography variant='body2' color='secondary'>
+                  New database
+                </Typography>
+              </MenuItem>
+            )}
           </StyledSidebar>
         </Collapse>
       </Box>

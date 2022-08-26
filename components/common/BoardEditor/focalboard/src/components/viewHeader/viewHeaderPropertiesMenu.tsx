@@ -84,31 +84,32 @@ const ViewHeaderPropertiesMenu = React.memo((props: Props) => {
       </Button>
       <Menu
         anchorEl={anchorEl}
+        disablePortal
         open={Boolean(anchorEl)}
         onClose={hidePropertiesMenu}
       >
         {
-            properties.map(property => (
-              <MenuItem
-                dense
-                sx={{
-                  minWidth: 250
+          properties.map(property => (
+            <MenuItem
+              dense
+              sx={{
+                minWidth: 250
+              }}
+              key={property.id}
+            >
+              <ListItemIcon>{iconForPropertyType(property.type)}</ListItemIcon>
+              <ListItemText>{property.name}</ListItemText>
+              <IconButton
+                size='small'
+                onClick={() => {
+                  toggleVisibility(property.id);
                 }}
-                key={property.id}
               >
-                <ListItemIcon>{iconForPropertyType(property.type)}</ListItemIcon>
-                <ListItemText>{property.name}</ListItemText>
-                <IconButton
-                  size='small'
-                  onClick={() => {
-                    toggleVisibility(property.id);
-                  }}
-                >
-                  {visiblePropertyIds.includes(property.id) ? <VisibilityIcon fontSize='small' /> : <VisibilityOffIcon fontSize='small' color='secondary' />}
-                </IconButton>
-              </MenuItem>
-            ))
-          }
+                {visiblePropertyIds.includes(property.id) ? <VisibilityIcon fontSize='small' /> : <VisibilityOffIcon fontSize='small' color='secondary' />}
+              </IconButton>
+            </MenuItem>
+          ))
+        }
       </Menu>
 
       {/* <MenuWrapper label={intl.formatMessage({id: 'ViewHeader.properties-menu', defaultMessage: 'Properties menu'})}>

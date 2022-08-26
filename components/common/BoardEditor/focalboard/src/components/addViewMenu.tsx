@@ -80,6 +80,7 @@ function AddViewMenu (props: AddViewProps) {
         oldViewId && showView(oldViewId);
       }
     );
+    popupState.close();
   }, [props.activeView, props.board, props.intl, showView]);
 
   const handleAddViewTable = useCallback(() => {
@@ -113,6 +114,7 @@ function AddViewMenu (props: AddViewProps) {
         oldViewId && showView(oldViewId);
       }
     );
+    popupState.close();
   }, [props.activeView, props.board, props.intl, showView]);
 
   const handleAddViewGallery = useCallback(() => {
@@ -143,6 +145,7 @@ function AddViewMenu (props: AddViewProps) {
         oldViewId && showView(oldViewId);
       }
     );
+    popupState.close();
   }, [props.board, props.activeView, props.intl, showView]);
 
   const handleAddViewCalendar = useCallback(() => {
@@ -176,6 +179,7 @@ function AddViewMenu (props: AddViewProps) {
         oldViewId && showView(oldViewId);
       }
     );
+    popupState.close();
   }, [props.board, props.activeView, props.intl, showView]);
 
   const triggers = props.onClick ? { onClick: props.onClick } : bindTrigger(popupState);

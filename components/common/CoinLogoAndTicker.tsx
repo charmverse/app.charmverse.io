@@ -14,9 +14,9 @@ export function CoinLogoAndTicker ({ tokenSymbol, tokenLogo }: CoinLogoAndTicker
     <Stack direction='row' alignItems='center' spacing={0.5}>
       {
         tokenLogo && (
-        <StyledImg
-          src={tokenLogo as string}
-        />
+          <StyledImg
+            src={tokenLogo as string}
+          />
         )
 
      }

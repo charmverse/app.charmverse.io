@@ -68,16 +68,16 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
             label={`Submissions: ${bounty?.maxSubmissions ? `${validSubmissions} / ${bounty.maxSubmissions}` : validSubmissions}`}
           />
           { permissions?.userPermissions?.lock && isBountyLockable(bounty) && (
-          <Tooltip key='stop-new' arrow placement='top' title={`${bounty.submissionsLocked ? 'Enable' : 'Prevent'} new ${bounty.approveSubmitters ? 'applications' : 'submissions'} from being made.`}>
-            <IconButton
-              size='small'
-              onClick={() => {
-                lockBountySubmissions();
-              }}
-            >
-              { !bounty.submissionsLocked ? <LockOpen color='secondary' fontSize='small' /> : <LockIcon color='secondary' fontSize='small' />}
-            </IconButton>
-          </Tooltip>
+            <Tooltip key='stop-new' arrow placement='top' title={`${bounty.submissionsLocked ? 'Enable' : 'Prevent'} new ${bounty.approveSubmitters ? 'applications' : 'submissions'} from being made.`}>
+              <IconButton
+                size='small'
+                onClick={() => {
+                  lockBountySubmissions();
+                }}
+              >
+                { !bounty.submissionsLocked ? <LockOpen color='secondary' fontSize='small' /> : <LockIcon color='secondary' fontSize='small' />}
+              </IconButton>
+            </Tooltip>
           )}
         </Box>
       </Box>
@@ -118,25 +118,25 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
         </TableBody>
       </Table>
       {filteredApplications.length === 0 && (
-      <>
-        <Box
-          display='flex'
-          justifyContent='center'
-          my={3}
-          sx={{
-            opacity: 0.5
-          }}
-        >
-          <Typography variant='h6'>
-            No submissions to review
-          </Typography>
-        </Box>
-        <Divider
-          sx={{
-            my: 1
-          }}
-        />
-      </>
+        <>
+          <Box
+            display='flex'
+            justifyContent='center'
+            my={3}
+            sx={{
+              opacity: 0.5
+            }}
+          >
+            <Typography variant='h6'>
+              No submissions to review
+            </Typography>
+          </Box>
+          <Divider
+            sx={{
+              my: 1
+            }}
+          />
+        </>
       )}
     </>
   );
