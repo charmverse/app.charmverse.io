@@ -137,22 +137,22 @@ export default function ShareToWeb ({ pageId, pagePermissions, refreshPermission
       <Collapse in={!!publicPermission}>
         {
           shareLink && (
-          <Box p={1}>
-            <StyledInput
-              fullWidth
-              disabled
-              value={shareLink}
-              endAdornment={(
-                <CopyToClipboard text={shareLink} onCopy={onCopy}>
-                  <InputAdornment position='end'>
-                    <CopyButton>
-                      {copied ? 'Copied!' : 'Copy'}
-                    </CopyButton>
-                  </InputAdornment>
-                </CopyToClipboard>
-              )}
-            />
-          </Box>
+            <Box p={1}>
+              <StyledInput
+                fullWidth
+                disabled
+                value={shareLink}
+                endAdornment={(
+                  <CopyToClipboard text={shareLink} onCopy={onCopy}>
+                    <InputAdornment position='end'>
+                      <CopyButton>
+                        {copied ? 'Copied!' : 'Copy'}
+                      </CopyButton>
+                    </InputAdornment>
+                  </CopyToClipboard>
+                )}
+              />
+            </Box>
           )
         }
       </Collapse>

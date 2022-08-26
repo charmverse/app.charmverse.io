@@ -70,17 +70,17 @@ export default function InvitesTable (props: Props) {
                 </Box>
               </Tooltip>
               {props.isAdmin && (
-              <Tooltip arrow placement='top' title='Delete'>
-                <ButtonChip
-                  className='row-actions'
-                  icon={<DeleteIcon />}
-                  clickable
-                  color='secondary'
-                  size='small'
-                  variant='outlined'
-                  onClick={() => props.onDelete(row)}
-                />
-              </Tooltip>
+                <Tooltip arrow placement='top' title='Delete'>
+                  <ButtonChip
+                    className='row-actions'
+                    icon={<DeleteIcon />}
+                    clickable
+                    color='secondary'
+                    size='small'
+                    variant='outlined'
+                    onClick={() => props.onDelete(row)}
+                  />
+                </Tooltip>
               )}
             </TableCell>
           </TableRow>
