@@ -7,12 +7,23 @@ import { PublicPageResponse } from 'lib/pages';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { isUUID } from 'lib/utilities/strings';
+import { PageContent } from 'models';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.get(getPublicPage);
+
+function recurse (node: PageContent, cb: (node: PageContent) => void) {
+  if (node.content) {
+    node.content.forEach(childNode => {
+      recurse(childNode, cb);
+    });
+  }
+
+  cb(node);
+}
 
 async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPageResponse>) {
 
@@ -93,6 +104,19 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
     if (boardBlock) {
       boardBlocks.push(boardBlock);
     }
+  }
+  else if (page.type === 'page') {
+    const linkedPageIds: string[] = [];
+    recurse(page.content as PageContent, (node) => {
+      // Checking if all the mention attributes exist or not, and continue only if they exist
+      if (node.type === 'inlineDatabase' && node.attrs) {
+        // Some pageids are null
+        if (node.attrs.pageId) {
+          linkedPageIds.push(node.attrs.pageId);
+        }
+      }
+    });
+
   }
 
   const space = await prisma.space.findFirst({
