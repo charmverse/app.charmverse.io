@@ -1,8 +1,8 @@
 
 import { NodeViewProps } from '@bangle.dev/core';
 import styled from '@emotion/styled';
-import { Box } from '@mui/material';
 import { Page } from '@prisma/client';
+import charmClient from 'charmClient';
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
@@ -10,12 +10,11 @@ import { getClientConfig } from 'components/common/BoardEditor/focalboard/src/st
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { getCurrentViewDisplayBy, getCurrentViewGroupBy, getSortedViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
-import debouncePromise from 'lib/utilities/debouncePromise';
 import { usePages } from 'hooks/usePages';
+import debouncePromise from 'lib/utilities/debouncePromise';
 import dynamic from 'next/dynamic';
-import { useState } from 'react';
-import charmClient from 'charmClient';
 import { useRouter } from 'next/router';
+import { useState } from 'react';
 
 // Lazy load focalboard entrypoint (ignoring the redux state stuff for now)
 const CenterPanel = dynamic(() => import('components/common/BoardEditor/focalboard/src/components/centerPanel'), {
@@ -38,11 +37,14 @@ const StylesContainer = styled.div<{ containerWidth?: number }>`
     padding: 0;
     // offset padding around document
     margin: 0 -24px;
-    padding-left: 24px;
+    padding: 0 24px;
     ${({ theme }) => theme.breakpoints.up('md')} {
       --side-margin: ${({ containerWidth }) => `calc((${containerWidth}px - 100%) / 2)`};
       margin: 0 calc(-1 * var(--side-margin));
-      padding-left: var(--side-margin);
+      padding: 0 var(--side-margin);
+    }
+    &.sidebar-visible {
+      padding-right: 0;
     }
   }
 
@@ -167,7 +169,7 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
           activeView={currentView}
           views={views}
           // Show more tabs on shared inline database as the space gets increased
-          maxTabsShown={router.pathname.startsWith('/share') ? 5 : 2}
+          maxTabsShown={router.pathname.startsWith('/share') ? 5 : 3}
         />
       </StylesContainer>
       {typeof shownCardId === 'string' && shownCardId.length !== 0 && (

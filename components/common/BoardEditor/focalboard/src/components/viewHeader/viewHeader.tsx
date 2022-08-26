@@ -9,7 +9,6 @@ import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import Button from 'components/common/Button';
 import { IconButton, Tooltip } from '@mui/material';
 import Link from 'components/common/Link';
-import AddViewMenu from '../addViewMenu';
 import { useRouter } from 'next/router';
 import ViewTabs from './viewTabs';
 
@@ -19,8 +18,6 @@ import FilterComponent from './filterComponent';
 import NewCardButton from './newCardButton';
 import ViewHeaderActionsMenu from './viewHeaderActionsMenu';
 import ViewHeaderDisplayByMenu from './viewHeaderDisplayByMenu';
-import ViewHeaderGroupByMenu from './viewHeaderGroupByMenu';
-import ViewHeaderPropertiesMenu from './viewHeaderPropertiesMenu';
 import ViewHeaderSortMenu from './viewHeaderSortMenu';
 
 type Props = {
@@ -55,7 +52,6 @@ const ViewHeader = React.memo(({ maxTabsShown = 3, showView, toggleViewOptions, 
 
   const { board, activeBoard, activeView, groupByProperty, cards, dateDisplayProperty } = props;
 
-  const withGroupBy = activeView?.fields.viewType === 'board' || activeView?.fields.viewType === 'table';
   const withDisplayBy = activeView?.fields.viewType === 'calendar';
   const withSortBy = activeView?.fields.viewType !== 'calendar';
 
@@ -90,24 +86,6 @@ const ViewHeader = React.memo(({ maxTabsShown = 3, showView, toggleViewOptions, 
       {!props.readonly && activeView && activeBoard
         && (
           <>
-
-            {/* Card properties */}
-
-            <ViewHeaderPropertiesMenu
-              properties={activeBoard.fields.cardProperties}
-              activeView={activeView}
-            />
-
-            {/* Group by */}
-
-            {withGroupBy
-              && (
-                <ViewHeaderGroupByMenu
-                  properties={activeBoard.fields.cardProperties}
-                  activeView={activeView}
-                  groupByProperty={groupByProperty}
-                />
-              )}
 
             {/* Display by */}
 

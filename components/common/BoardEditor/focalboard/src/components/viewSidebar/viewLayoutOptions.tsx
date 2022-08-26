@@ -1,16 +1,16 @@
 import { useCallback } from 'react';
 import { IntlShape, injectIntl } from 'react-intl';
 import { Box, Card, Grid, Typography } from '@mui/material';
-import { Board, IPropertyTemplate } from '../blocks/board';
-import { BoardView, createBoardView } from '../blocks/boardView';
-import { updateView } from '../store/views';
-import {useAppDispatch} from '../store/hooks'
-import { Constants } from '../constants';
-import mutator from '../mutator';
-import BoardIcon from '../widgets/icons/board';
-import CalendarIcon from '../widgets/icons/calendar';
-import GalleryIcon from '../widgets/icons/gallery';
-import TableIcon from '../widgets/icons/table';
+import { Board, IPropertyTemplate } from '../../blocks/board';
+import { BoardView, createBoardView } from '../../blocks/boardView';
+import { updateView } from '../../store/views';
+import {useAppDispatch} from '../../store/hooks'
+import { Constants } from '../../constants';
+import mutator from '../../mutator';
+import BoardIcon from '../../widgets/icons/board';
+import CalendarIcon from '../../widgets/icons/calendar';
+import GalleryIcon from '../../widgets/icons/gallery';
+import TableIcon from '../../widgets/icons/table';
 
 interface LayoutOptionsProps {
   board: Board;
