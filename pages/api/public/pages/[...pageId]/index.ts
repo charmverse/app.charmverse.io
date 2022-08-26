@@ -1,4 +1,4 @@
-import { Block, Page } from '@prisma/client';
+import { Page } from '@prisma/client';
 import { prisma } from 'db';
 import { Board } from 'lib/focalboard/board';
 import { BoardView } from 'lib/focalboard/boardView';
@@ -29,7 +29,7 @@ function recurse (node: PageContent, cb: (node: PageContent) => void) {
 
 async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPageResponse>) {
 
-  const { pageId: pageIdOrPath } = req.query as {pageId: string[]};
+  const { pageId: pageIdOrPath } = req.query as { pageId: string[] };
 
   const isPageId = typeof pageIdOrPath[0] === 'string' && isUUID(pageIdOrPath[0]);
 
@@ -120,26 +120,31 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
       }
     });
 
-    const boardBlocks = await prisma.block.findMany({
+    const blocks = await prisma.block.findMany({
       where: {
-        id: {
-          in: linkedPageIds
-        }
+        OR: [{
+          id: {
+            in: linkedPageIds
+          }
+        }, {
+          parentId: {
+            in: linkedPageIds
+          }
+        }]
       }
     });
 
-    const boardViews = await prisma.block.findMany({
-      where: {
-        parentId: {
-          in: linkedPageIds
-        },
-        type: 'view'
+    blocks.forEach(block => {
+      if (block.type === 'board') {
+        boards.push(block as unknown as Board);
+      }
+      else if (block.type === 'view') {
+        views.push(block as unknown as BoardView);
+      }
+      else if (block.type === 'card') {
+        cards.push(block as unknown as Card);
       }
     });
-
-    boardViews.forEach(view => views.push(view as unknown as BoardView));
-
-    boardBlocks.forEach(board => boards.push(board as unknown as Board));
   }
 
   const space = await prisma.space.findFirst({
