@@ -43,6 +43,9 @@ const StylesContainer = styled.div<{ containerWidth?: number }>`
       margin: 0 calc(-1 * var(--side-margin));
       padding: 0 var(--side-margin);
     }
+    &.sidebar-visible {
+      padding-right: 0;
+    }
   }
 
   // remove extra padding on Table view
