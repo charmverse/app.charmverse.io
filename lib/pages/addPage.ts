@@ -75,7 +75,7 @@ export async function addPage ({ createdBy, spaceId, shouldCreateDefaultBoardDat
     return [...pages, newPage];
   }, {
     // revalidate pages for board since we create 3 default ones
-    revalidate: isBoardPage
+    revalidate: Boolean(isBoardPage)
   });
 
   return result;
