@@ -100,7 +100,7 @@ function CenterPanel (props: Props) {
   const isEmbedded = !!props.embeddedBoardPath;
 
   // for 'linked' boards, each view has its own board which we use to determine the cards to show
-  const activeBoardId = props.activeView?.fields.linkedSourceId || props.board.id;
+  const activeBoardId = props.activeView && (props.activeView?.fields.linkedSourceId || props.board.id);
   const activeBoard = boards.find(b => b.id === activeBoardId);
   const activePage = pages[activeBoardId];
 
@@ -535,7 +535,7 @@ function CenterPanel (props: Props) {
         )}
       </div>
 
-      <div className='container-container'>
+      <div className={`container-container ${state.showLinkedViewMenu ? 'sidebar-visible' : ''}`}>
         {state.showLinkedViewMenu && (
           <SourceSelection onSelect={createLinkedView} onCreate={createDatabase} />
         )}

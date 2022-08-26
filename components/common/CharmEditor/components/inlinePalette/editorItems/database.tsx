@@ -47,7 +47,7 @@ export function items ({ addNestedPage, currentPageId, userId, space }: ItemsPro
                   });
 
                   if (_dispatch && isAtBeginningOfLine(state)) {
-                    _dispatch(_state.tr.replaceSelectionWith(node));
+                    _dispatch(_state.tr.replaceSelectionWith(node).scrollIntoView());
                     return true;
                   }
                   return insertNode(_state, _dispatch, node);
@@ -106,8 +106,7 @@ export function items ({ addNestedPage, currentPageId, userId, space }: ItemsPro
                   });
 
                   if (_dispatch && isAtBeginningOfLine(state)) {
-                    _state.tr.scrollIntoView();
-                    _dispatch(_state.tr.replaceSelectionWith(node));
+                    _dispatch(_state.tr.replaceSelectionWith(node).scrollIntoView());
                     return true;
                   }
                   return insertNode(_state, _dispatch, node);
