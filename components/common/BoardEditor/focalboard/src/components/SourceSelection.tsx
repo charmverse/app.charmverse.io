@@ -66,13 +66,14 @@ export default function SourceSelection (props: Props) {
                 onClick={openSidebar}
                 variant='text'
                 sx={{ fontSize: 'inherit', textDecoration: 'underline' }}
+                disabled={props.readOnly}
               >
                 Select a data source
               </Button>to continue
             </Typography>
           </Stack>
         </Box>
-        <Collapse in={Boolean(sidebarState)} orientation='horizontal'>
+        <Collapse in={props.readOnly === true ? false : Boolean(sidebarState)} orientation='horizontal'>
           <StyledSidebar>
             <Box px={2} pt={1} pb={1} display='flex' justifyContent='space-between' alignItems='center'>
               <Typography fontWeight='bold'>Select data source</Typography>
@@ -83,12 +84,12 @@ export default function SourceSelection (props: Props) {
             <SidebarContent>
               <PagesList pages={boardPages} onSelectPage={page => props.onSelect({ boardId: page.id })} />
             </SidebarContent>
-            {!props.readOnly && <MenuItem  onClick={props.onCreate}>
+            <MenuItem  onClick={props.onCreate}>
               <ListItemIcon><AddIcon color='secondary' /></ListItemIcon>
               <Typography variant='body2' color='secondary'>
                 New database
               </Typography>
-            </MenuItem>}
+            </MenuItem>
           </StyledSidebar>
         </Collapse>
       </Box>
