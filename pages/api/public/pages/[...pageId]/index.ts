@@ -52,6 +52,85 @@ async function filterPublicPages (pageIds: string[]) {
   return publicPagesIds;
 }
 
+async function extractPageArtifacts (linkedPageIds: string[]) {
+  const boards: Board[] = [];
+  let views: BoardView[] = [];
+  const cards: Card[] = [];
+  // Filter the linked pages that is publicly available
+  const publicPagesIds = await filterPublicPages(linkedPageIds);
+
+  const blocks = await prisma.block.findMany({
+    where: {
+      OR: [{
+        id: {
+          in: publicPagesIds
+        }
+      }, {
+        parentId: {
+          in: publicPagesIds
+        }
+      }]
+    }
+  });
+
+  const linkedSourceIds: string[] = [];
+
+  blocks.forEach(block => {
+    if (block.type === 'board') {
+      boards.push(block as unknown as Board);
+    }
+    else if (block.type === 'view') {
+      const view = block as unknown as BoardView;
+      views.push(view);
+      if (view.fields?.linkedSourceId) {
+        linkedSourceIds.push(view.fields.linkedSourceId);
+      }
+    }
+    else if (block.type === 'card') {
+      cards.push(block as unknown as Card);
+    }
+  });
+
+  const publicLinkedSourceIds = await filterPublicPages(linkedSourceIds);
+
+  const extraBlocks = await prisma.block.findMany({
+    where: {
+      OR: [{
+        id: {
+          in: publicLinkedSourceIds
+        }
+      }, {
+        parentId: {
+          in: publicLinkedSourceIds
+        }
+      }]
+    }
+  });
+
+  views = views.filter(view => {
+    // Don't show view for pages that are not publicly shared
+    if (view.fields.linkedSourceId && !publicLinkedSourceIds.includes(view.fields.linkedSourceId)) {
+      return false;
+    }
+    return true;
+  });
+
+  extraBlocks.forEach(block => {
+    if (block.type === 'board') {
+      boards.push(block as unknown as Board);
+    }
+    else if (block.type === 'card') {
+      cards.push(block as unknown as Card);
+    }
+  });
+
+  return {
+    cards,
+    views,
+    boards
+  };
+}
+
 async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPageResponse>) {
 
   const { pageId: pageIdOrPath } = req.query as { pageId: string[] };
@@ -96,8 +175,8 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
   }
 
   const boardPages: Page[] = [];
-  const boards: Board[] = [];
-  const cards: Card[] = [];
+  let boards: Board[] = [];
+  let cards: Card[] = [];
   let views: BoardView[] = [];
 
   if (page.type === 'card' && page.parentId) {
@@ -145,140 +224,16 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
       }
     });
 
-    // Filter the linked pages that is publicly available
-    const publicPagesIds = await filterPublicPages(linkedPageIds);
-
-    const blocks = await prisma.block.findMany({
-      where: {
-        OR: [{
-          id: {
-            in: publicPagesIds
-          }
-        }, {
-          parentId: {
-            in: publicPagesIds
-          }
-        }]
-      }
-    });
-
-    const linkedSourceIds: string[] = [];
-
-    blocks.forEach(block => {
-      if (block.type === 'board') {
-        boards.push(block as unknown as Board);
-      }
-      else if (block.type === 'view') {
-        const view = block as unknown as BoardView;
-        views.push(view);
-        if (view.fields?.linkedSourceId) {
-          linkedSourceIds.push(view.fields.linkedSourceId);
-        }
-      }
-      else if (block.type === 'card') {
-        cards.push(block as unknown as Card);
-      }
-    });
-
-    const publicLinkedSourceIds = await filterPublicPages(linkedSourceIds);
-
-    const extraBlocks = await prisma.block.findMany({
-      where: {
-        OR: [{
-          id: {
-            in: publicLinkedSourceIds
-          }
-        }, {
-          parentId: {
-            in: publicLinkedSourceIds
-          }
-        }]
-      }
-    });
-
-    views = views.filter(view => {
-      // Don't show view for pages that are not publicly shared
-      if (view.fields.linkedSourceId && !publicLinkedSourceIds.includes(view.fields.linkedSourceId)) {
-        return false;
-      }
-      return true;
-    });
-
-    extraBlocks.forEach(block => {
-      if (block.type === 'board') {
-        boards.push(block as unknown as Board);
-      }
-      else if (block.type === 'card') {
-        cards.push(block as unknown as Card);
-      }
-    });
+    const { boards: linkedBoards, cards: linkedCards, views: linkedViews } = await extractPageArtifacts(linkedPageIds);
+    boards = linkedBoards;
+    cards = linkedCards;
+    views = linkedViews;
   }
   else if (page.type === 'inline_linked_board') {
-
-    const blocks = await prisma.block.findMany({
-      where: {
-        OR: [{
-          id: {
-            in: page.id
-          }
-        }, {
-          parentId: {
-            in: page.id
-          }
-        }]
-      }
-    });
-
-    const linkedSourceIds: string[] = [];
-
-    blocks.forEach(block => {
-      if (block.type === 'board') {
-        boards.push(block as unknown as Board);
-      }
-      else if (block.type === 'view') {
-        const view = block as unknown as BoardView;
-        views.push(view);
-        if (view.fields?.linkedSourceId) {
-          linkedSourceIds.push(view.fields.linkedSourceId);
-        }
-      }
-      else if (block.type === 'card') {
-        cards.push(block as unknown as Card);
-      }
-    });
-
-    const publicLinkedSourceIds = await filterPublicPages(linkedSourceIds);
-
-    const extraBlocks = await prisma.block.findMany({
-      where: {
-        OR: [{
-          id: {
-            in: publicLinkedSourceIds
-          }
-        }, {
-          parentId: {
-            in: publicLinkedSourceIds
-          }
-        }]
-      }
-    });
-
-    views = views.filter(view => {
-      // Don't show view for pages that are not publicly shared
-      if (view.fields.linkedSourceId && !publicLinkedSourceIds.includes(view.fields.linkedSourceId)) {
-        return false;
-      }
-      return true;
-    });
-
-    extraBlocks.forEach(block => {
-      if (block.type === 'board') {
-        boards.push(block as unknown as Board);
-      }
-      else if (block.type === 'card') {
-        cards.push(block as unknown as Card);
-      }
-    });
+    const { boards: linkedBoards, cards: linkedCards, views: linkedViews } = await extractPageArtifacts([page.id]);
+    boards = linkedBoards;
+    cards = linkedCards;
+    views = linkedViews;
   }
 
   const space = await prisma.space.findFirst({
