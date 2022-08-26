@@ -20,8 +20,6 @@ import ViewHeaderActionsMenu from './viewHeaderActionsMenu';
 import ViewHeaderDisplayByMenu from './viewHeaderDisplayByMenu';
 import ViewHeaderSortMenu from './viewHeaderSortMenu';
 
-const maxTabsShown = 3;
-
 type Props = {
   board: Board
   activeBoard?: Board
@@ -46,7 +44,7 @@ type Props = {
   toggleViewOptions: (enable?: boolean) => void
 }
 
-const ViewHeader = React.memo(({ showView, toggleViewOptions, ...props }: Props) => {
+const ViewHeader = React.memo(({ maxTabsShown = 3, showView, toggleViewOptions, ...props }: Props) => {
   const [showFilter, setShowFilter] = useState(false);
   const router = useRouter();
 
