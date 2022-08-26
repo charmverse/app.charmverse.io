@@ -98,7 +98,7 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
   const boardPages: Page[] = [];
   const boards: Board[] = [];
   const cards: Card[] = [];
-  const views: BoardView[] = [];
+  let views: BoardView[] = [];
 
   if (page.type === 'card' && page.parentId) {
     const boardPage = await prisma.page.findFirst({
@@ -194,6 +194,14 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
           }
         }]
       }
+    });
+
+    views = views.filter(view => {
+      // Don't show view for pages that are not publicly shared
+      if (view.fields.linkedSourceId && !publicLinkedSourceIds.includes(view.fields.linkedSourceId)) {
+        return false;
+      }
+      return true;
     });
 
     extraBlocks.forEach(block => {
