@@ -441,11 +441,12 @@ function CenterPanel (props: Props) {
     setState({ ...state, showSettings: null });
   }
 
+  // close settings once a view has been added
   useEffect(() => {
     if (activeView) {
       closeSettings();
     }
-  }, [!!activeView]);
+  }, [activeView?.id]);
 
   return (
     <div
