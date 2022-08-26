@@ -87,9 +87,9 @@ function ViewTabs ({ onDeleteView, maxTabsShown, onViewTabClick, disableUpdating
 
   function handleViewClick (event: MouseEvent<HTMLElement>) {
     event.stopPropagation();
-    if (readonly) return;
     const view = views.find(v => v.id === event.currentTarget.id);
     view && onViewTabClick?.(view.id)
+    if (readonly) return;
     if (event.currentTarget.id === activeView?.id) {
       event.preventDefault();
       setAnchorEl(event.currentTarget);
