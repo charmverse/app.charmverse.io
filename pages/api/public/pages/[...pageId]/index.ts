@@ -18,8 +18,8 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.get(getPublicPage);
 
 function recurse (node: PageContent, cb: (node: PageContent) => void) {
-  if (node.content) {
-    node.content.forEach(childNode => {
+  if (node?.content) {
+    node?.content.forEach(childNode => {
       recurse(childNode, cb);
     });
   }
@@ -214,7 +214,7 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
   }
   else if (page.type === 'page') {
     const linkedPageIds: string[] = [];
-    recurse(page.content as PageContent, (node) => {
+    recurse(page?.content as PageContent, (node) => {
       // Checking if all the mention attributes exist or not, and continue only if they exist
       if (node.type === 'inlineDatabase' && node.attrs) {
         // Some pageids are null
