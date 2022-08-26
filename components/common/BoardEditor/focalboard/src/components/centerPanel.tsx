@@ -601,7 +601,9 @@ function CenterPanel (props: Props) {
               />
             )}
           </Box>
-          <ViewOptionsSidebar isOpen={state.showSettings === 'view-options'} closeSidebar={closeSettings} />
+          {activeBoard && activeView && (
+            <ViewOptionsSidebar board={activeBoard} view={activeView} isOpen={state.showSettings === 'view-options'} closeSidebar={closeSettings} />
+          )}
         </Box>
       </div>
     </div>
