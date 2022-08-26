@@ -37,11 +37,14 @@ const StylesContainer = styled.div<{ containerWidth?: number }>`
     padding: 0;
     // offset padding around document
     margin: 0 -24px;
-    padding-left: 24px;
+    padding: 0 24px;
     ${({ theme }) => theme.breakpoints.up('md')} {
       --side-margin: ${({ containerWidth }) => `calc((${containerWidth}px - 100%) / 2)`};
       margin: 0 calc(-1 * var(--side-margin));
-      padding-left: var(--side-margin);
+      padding: 0 var(--side-margin);
+    }
+    &.sidebar-visible {
+      padding-right: 0;
     }
   }
 
@@ -166,7 +169,6 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
           showInlineTitle={true}
           activeView={currentView}
           views={views}
-          maxTabsShown={2}
         />
       </StylesContainer>
       {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
