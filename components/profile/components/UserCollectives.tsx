@@ -113,9 +113,9 @@ export default function UserCollectives ({ user, mutatePoaps, poapData }: Pick<U
           >NFTs & Poaps
           </Typography>
           {!isPublic && (
-          <IconButton onClick={managePoapModalState.open}>
-            <EditIcon data-testid='edit-description' />
-          </IconButton>
+            <IconButton onClick={managePoapModalState.open}>
+              <EditIcon data-testid='edit-description' />
+            </IconButton>
           )}
         </Stack>
         <Chip label={poaps.length + nfts.length} />
@@ -136,16 +136,16 @@ export default function UserCollectives ({ user, mutatePoaps, poapData }: Pick<U
         ))}
         {
         !isPublic && poapData && (
-        <ManagePOAPModal
-          isOpen={managePoapModalState.isOpen}
-          close={managePoapModalState.close}
-          save={async () => {
-            mutatePoaps();
-            managePoapModalState.close();
-          }}
-          visiblePoaps={poapData.visiblePoaps}
-          hiddenPoaps={poapData.hiddenPoaps}
-        />
+          <ManagePOAPModal
+            isOpen={managePoapModalState.isOpen}
+            close={managePoapModalState.close}
+            save={async () => {
+              mutatePoaps();
+              managePoapModalState.close();
+            }}
+            visiblePoaps={poapData.visiblePoaps}
+            hiddenPoaps={poapData.hiddenPoaps}
+          />
         )
       }
       </Stack>

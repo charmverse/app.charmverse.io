@@ -17,7 +17,6 @@ import { useRouter } from 'next/router';
 import { ComponentProps, Dispatch, memo, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo } from 'react';
 import { useDrop } from 'react-dnd';
 
-import ReactDndProvider from 'components/common/ReactDndProvider';
 import { useSnackbar } from 'hooks/useSnackbar';
 import TreeNode, { MenuNode, ParentMenuNode } from './components/TreeNode';
 
@@ -158,7 +157,7 @@ function PageNavigation ({
 
   const onDropChild = useCallback((droppedItem: MenuNode, containerItem: MenuNode) => {
 
-    if (containerItem?.type === 'board') {
+    if (containerItem.type.match(/board/)) {
       return;
     }
 
@@ -240,33 +239,31 @@ function PageNavigation ({
   }, []);
 
   return (
-    <ReactDndProvider>
-      <StyledTreeRoot
-        setPages={setPages}
-        expanded={expanded}
+    <StyledTreeRoot
+      setPages={setPages}
+      expanded={expanded}
       // @ts-ignore - we use null instead of undefined to control the element
-        selected={selectedNodeId}
-        onNodeToggle={onNodeToggle}
-        aria-label='items navigator'
-        defaultCollapseIcon={<ExpandMoreIcon fontSize='large' />}
-        defaultExpandIcon={<ChevronRightIcon fontSize='large' />}
-        isFavorites={isFavorites}
-      >
-        {mappedItems.map((item) => (
-          <TreeNode
-            key={item.id}
-            item={item}
-            onDropChild={onDropChild}
-            onDropAdjacent={onDropAdjacent}
-            pathPrefix={`/${router.query.domain}`}
+      selected={selectedNodeId}
+      onNodeToggle={onNodeToggle}
+      aria-label='items navigator'
+      defaultCollapseIcon={<ExpandMoreIcon fontSize='large' />}
+      defaultExpandIcon={<ChevronRightIcon fontSize='large' />}
+      isFavorites={isFavorites}
+    >
+      {mappedItems.map((item) => (
+        <TreeNode
+          key={item.id}
+          item={item}
+          onDropChild={onDropChild}
+          onDropAdjacent={onDropAdjacent}
+          pathPrefix={`/${router.query.domain}`}
           // pass down so parent databases can highlight themselves
-            selectedNodeId={selectedNodeId}
-            addPage={addPage}
-            deletePage={deletePage}
-          />
-        ))}
-      </StyledTreeRoot>
-    </ReactDndProvider>
+          selectedNodeId={selectedNodeId}
+          addPage={addPage}
+          deletePage={deletePage}
+        />
+      ))}
+    </StyledTreeRoot>
   );
 }
 

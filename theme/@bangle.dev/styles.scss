@@ -26,7 +26,7 @@
   z-index: var(--z-index-modal);
 }
 
-.bangle-editor a {
+.bangle-editor a:not(.MuiTypography-root) {
   text-decoration: underline;
 }
 
@@ -61,6 +61,7 @@
   vertical-align: top;
   box-sizing: border-box;
   position: relative;
+  background-color: var(--background-default);
 }
 
 .ProseMirror .column-resize-handle {
@@ -102,7 +103,7 @@
 }
 
 .ProseMirror table {
-  margin: 0;
+  margin: 0 !important;
 }
 
 .ProseMirror th,
@@ -110,6 +111,10 @@
   min-width: 1em;
   border: 1px solid #ddd;
   padding: 3px 5px;
+}
+
+.ProseMirror th {
+  background-color: var(--prop-gray);
 }
 
 .ProseMirror .tableWrapper {
@@ -191,12 +196,13 @@ img.ProseMirror-separator {
  * Component-Styling
  */
 
-.bangle-editor a {
+// Making sure inline database header link doesn't have underlines
+.bangle-editor a:not(.MuiTypography-root) {
   color: #4299e1;
   text-decoration: underline;
 }
 
-.bangle-editor a:hover {
+.bangle-editor a:hover:not(.MuiTypography-root) {
   color: #24659b;
   text-decoration: underline;
 }
@@ -397,7 +403,7 @@ ol li {
 }
 
 /** Bullet List */
-.bangle-editor ul {
+.bangle-editor ul:not(.MuiList-root) {
   list-style-type: disc;
   list-style-position: outside;
   padding-left: 1.5rem;

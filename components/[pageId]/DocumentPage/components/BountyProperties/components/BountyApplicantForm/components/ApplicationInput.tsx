@@ -145,9 +145,9 @@ export default function ApplicationInput ({ readOnly = false, onCancel, onSubmit
               />
               {
                 errors?.message && (
-                <Alert severity='error'>
-                  {errors.message.message}
-                </Alert>
+                  <Alert severity='error'>
+                    {errors.message.message}
+                  </Alert>
                 )
               }
 

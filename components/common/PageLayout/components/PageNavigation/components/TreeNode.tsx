@@ -7,6 +7,7 @@ import { useCallback, useRef, memo, useEffect } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { greyColor2 } from 'theme/colors';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { getSortedViews } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { useTreeItem } from '@mui/lab/TreeItem';
 import PageTreeItem from './PageTreeItem';
 import BoardViewTreeItem from './BoardViewTreeItem';
@@ -114,8 +115,8 @@ function DraggableTreeNode ({ item, onDropAdjacent, onDropChild, pathPrefix, add
 
   const { focalboardViewsRecord, setFocalboardViewsRecord } = useFocalboardViews();
 
-  const viewsRecord = useAppSelector((state) => state.views.views);
-  const views = Object.values(viewsRecord).filter(view => view?.parentId === item.id);
+  const allViews = useAppSelector(getSortedViews);
+  const views = allViews.filter(view => view.parentId === item.id);
 
   const hasSelectedChildView = views.some(view => view.id === selectedNodeId);
   const { expanded } = useTreeItem(item.id);
@@ -123,7 +124,7 @@ function DraggableTreeNode ({ item, onDropAdjacent, onDropChild, pathPrefix, add
 
   useEffect(() => {
     const focalboardViewId = focalboardViewsRecord[item.id];
-    if (views && focalboardViewId && item.type === 'board' && !views.some(view => view.id === focalboardViewId)) {
+    if (views && focalboardViewId && (item.type.match(/board/)) && !views.some(view => view.id === focalboardViewId)) {
       const firstView = views[0];
       if (firstView) {
         setFocalboardViewsRecord((_focalboardViewsRecord) => ({ ..._focalboardViewsRecord, [firstView.parentId]: firstView.id }));
@@ -139,7 +140,7 @@ function DraggableTreeNode ({ item, onDropAdjacent, onDropChild, pathPrefix, add
       hasSelectedChildView={hasSelectedChildView}
       ref={mergeRefs([ref, drag, drop, dragPreview, focusListener])}
       label={item.title}
-      href={`${pathPrefix}/${item.path}${item.type === 'board' && focalboardViewsRecord[item.id] ? `?viewId=${focalboardViewsRecord[item.id]}` : ''}`}
+      href={`${pathPrefix}/${item.path}${(item.type.match(/board/)) && focalboardViewsRecord[item.id] ? `?viewId=${focalboardViewsRecord[item.id]}` : ''}`}
       isActive={isActive}
       isAdjacent={isAdjacentActive}
       isEmptyContent={item.isEmptyContent}
@@ -149,15 +150,17 @@ function DraggableTreeNode ({ item, onDropAdjacent, onDropChild, pathPrefix, add
       {hideChildren
         ? <div>{/* empty div to trick TreeView into showing expand icon */}</div>
         : (
-          item.type === 'board' ? (
+          (item.type.match(/board/)) ? (
             views.map(view => (
-              <BoardViewTreeItem
-                key={view.id}
-                href={`${pathPrefix}/${item.path}?viewId=${view.id}`}
-                label={view.title}
-                nodeId={view.id}
-                viewType={view.fields.viewType}
-              />
+              !view.fields.inline && (
+                <BoardViewTreeItem
+                  key={view.id}
+                  href={`${pathPrefix}/${item.path}?viewId=${view.id}`}
+                  label={view.title}
+                  nodeId={view.id}
+                  viewType={view.fields.viewType}
+                />
+              )
             ))
           ) : (
             item.children.length > 0

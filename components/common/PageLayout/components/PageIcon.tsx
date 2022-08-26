@@ -29,7 +29,7 @@ export default function PageIcon ({ icon, isEditorEmpty, pageType }: { icon?: Re
   if (icon) {
     return <StyledPageIcon icon={icon} />;
   }
-  if (pageType === 'board') {
+  if (pageType === 'board' || pageType === 'inline_board') {
     return <StyledPageIcon icon={<StyledDatabaseIcon />} />;
   }
   else if (isEditorEmpty) {

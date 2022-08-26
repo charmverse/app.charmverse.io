@@ -56,7 +56,7 @@ async function togglePageArchiveStatus (req: NextApiRequest, res: NextApiRespons
         }
       });
 
-      if (page?.type === 'board') {
+      if (page?.type.match(/board/)) {
         await prisma.block.update({
           where: {
             id: pageId

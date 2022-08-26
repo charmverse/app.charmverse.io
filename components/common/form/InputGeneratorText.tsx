@@ -91,9 +91,9 @@ export default function InputGeneratorText ({ onChange, title = 'Options', minim
             />
             {
               keys.length > 1 && (
-              <IconButton size='small' onClick={() => removeRow(key)}>
-                <DeleteIcon />
-              </IconButton>
+                <IconButton size='small' onClick={() => removeRow(key)}>
+                  <DeleteIcon />
+                </IconButton>
               )
             }
           </Grid>

@@ -66,7 +66,7 @@ async function addPagePermission (req: NextApiRequest, res: NextApiResponse<IPag
   const createdPermission = await upsertPermission(pageId, req.body);
 
   // Override behaviour, we always cascade board permissions downwards
-  if (page.type === 'board') {
+  if (page.type.match(/board/)) {
     await boardPagePermissionUpdated({ boardId: pageId, permissionId: createdPermission.id });
 
   }

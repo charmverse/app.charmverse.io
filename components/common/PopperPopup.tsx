@@ -48,9 +48,9 @@ export default function PopperPopup (props: PopperPopupProps) {
   return (
     <div ref={toggleRef}>
       {children && (
-      <div {...bindToggle(popupState)}>
-        {children}
-      </div>
+        <div {...bindToggle(popupState)}>
+          {children}
+        </div>
       )}
       <Popover
         disableRestoreFocus

@@ -9,12 +9,12 @@ import { CardFilter } from '../cardFilter';
 import { Constants } from '../constants';
 import { IUser } from '../user';
 import { Utils } from '../utils';
-import { getCurrentBoard } from './boards';
+import { getCurrentBoard, getBoard } from './boards';
 import { RootState } from './index';
 import { initialLoad, initialReadOnlyLoad } from './initialLoad';
 import { getSearchText } from './searchText';
 import { getWorkspaceUsers } from './users';
-import { getCurrentView } from './views';
+import { getCurrentView, getView } from './views';
 
 type CardsState = {
     current: string
@@ -128,6 +128,13 @@ export const getCurrentBoardCards = createSelector(
   (state: RootState) => state.boards.current,
   getCards,
   (boardId: string, cards: {[key: string]: Card}) => {
+    return Object.values(cards).filter((c) => c.parentId === boardId) as Card[];
+  }
+);
+
+export const getBoardCards = (boardId: string) => createSelector(
+  getCards,
+  (cards: {[key: string]: Card}) => {
     return Object.values(cards).filter((c) => c.parentId === boardId) as Card[];
   }
 );
@@ -349,6 +356,25 @@ export const getCurrentViewCardsSortedFilteredAndGrouped = createSelector(
     if (searchText) {
       result = searchFilterCards(result, board, searchText);
     }
+    result = sortCards(result, board, view, users);
+    return result;
+  }
+);
+
+export const getViewCardsSortedFilteredAndGrouped = (props: { viewId: string, boardId: string }) => createSelector(
+  getBoardCards(props.boardId),
+  getBoard(props.boardId),
+  getView(props.viewId),
+  getWorkspaceUsers,
+  (cards, board, view, users) => {
+    if (!view || !board || !users || !cards) {
+      return [];
+    }
+    let result = cards;
+    if (view.fields.filter) {
+      result = CardFilter.applyFilterGroup(view.fields.filter, board.fields.cardProperties, result);
+    }
+
     result = sortCards(result, board, view, users);
     return result;
   }

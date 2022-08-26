@@ -22,22 +22,22 @@ export default function Mention ({ node }: NodeViewProps) {
   if (attrs.type === 'page') {
     const page = pages[attrs.value];
     value = page && (
-    <Link
-      href={`/${space?.domain}/${page.path}`}
-      passHref
-    >
-      <Box sx={{
-        display: 'flex',
-        alignItems: 'center',
-        position: 'relative',
-        top: 5,
-        cursor: 'pointer'
-      }}
+      <Link
+        href={`/${space?.domain}/${page.path}`}
+        passHref
       >
-        <PageIcon icon={page.icon} isEditorEmpty={checkForEmpty(page.content as PageContent)} pageType={page.type} />
-        <div>{page.title || 'Untitled'}</div>
-      </Box>
-    </Link>
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          position: 'relative',
+          top: 5,
+          cursor: 'pointer'
+        }}
+        >
+          <PageIcon icon={page.icon} isEditorEmpty={checkForEmpty(page.content as PageContent)} pageType={page.type} />
+          <div>{page.title || 'Untitled'}</div>
+        </Box>
+      </Link>
     );
   }
   else if (attrs.type === 'user') {

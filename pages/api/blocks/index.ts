@@ -4,8 +4,8 @@ import nc from 'next-connect';
 import { Block, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser, NotFoundError, InvalidStateError } from 'lib/middleware';
-import { DataNotFoundError, UnauthorisedActionError, MissingDataError } from 'lib/utilities/errors';
 import { withSessionRoute } from 'lib/session/withSession';
+import { getPagePath } from 'lib/pages';
 
 // TODO: frontend should tell us which space to use
 export type ServerBlockFields = 'spaceId' | 'updatedBy' | 'createdBy';
@@ -116,7 +116,7 @@ async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
             }
           },
           createdAt: cardBlock.createdAt,
-          path: `page-${Math.random().toString().replace('0.', '')}`,
+          path: getPagePath(),
           title: cardBlock.title,
           icon: cardBlock.fields.icon,
           type: 'card',
