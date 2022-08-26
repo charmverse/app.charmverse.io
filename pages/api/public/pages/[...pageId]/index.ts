@@ -134,12 +134,41 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
       }
     });
 
+    const linkedSourceIds: string[] = [];
+
     blocks.forEach(block => {
       if (block.type === 'board') {
         boards.push(block as unknown as Board);
       }
       else if (block.type === 'view') {
-        views.push(block as unknown as BoardView);
+        const view = block as unknown as BoardView;
+        views.push(view);
+        if (view.fields?.linkedSourceId) {
+          linkedSourceIds.push(view.fields.linkedSourceId);
+        }
+      }
+      else if (block.type === 'card') {
+        cards.push(block as unknown as Card);
+      }
+    });
+
+    const extraBlocks = await prisma.block.findMany({
+      where: {
+        OR: [{
+          id: {
+            in: linkedSourceIds
+          }
+        }, {
+          parentId: {
+            in: linkedSourceIds
+          }
+        }]
+      }
+    });
+
+    extraBlocks.forEach(block => {
+      if (block.type === 'board') {
+        boards.push(block as unknown as Board);
       }
       else if (block.type === 'card') {
         cards.push(block as unknown as Card);
