@@ -40,7 +40,11 @@ async function getUserProfile (req: NextApiRequest, res: NextApiResponse<PublicU
     where: condition,
     include: {
       profile: true,
-      poaps: true
+      profileItems: {
+        where: {
+          type: 'poap'
+        }
+      }
     }
   });
 
@@ -51,7 +55,7 @@ async function getUserProfile (req: NextApiRequest, res: NextApiResponse<PublicU
     const allPoaps = await getPOAPs(userById.addresses);
 
     // eslint-disable-next-line max-len
-    const visiblePoaps = allPoaps.filter(poap => !userById.poaps.find(p => p.isHidden && p.tokenId === poap.tokenId && p.walletAddress === poap.walletAddress));
+    const visiblePoaps = allPoaps.filter(poap => !userById.profileItems.find(profileItem => profileItem.isHidden && profileItem.id === poap.tokenId && profileItem.walletAddress === poap.walletAddress));
 
     res.status(200).json({
       ...userById,
@@ -63,7 +67,7 @@ async function getUserProfile (req: NextApiRequest, res: NextApiResponse<PublicU
     const allPoaps = await getPOAPs(user.addresses);
 
     // eslint-disable-next-line max-len
-    const visiblePoaps = allPoaps.filter(poap => !user.poaps.find(p => p.isHidden && p.tokenId === poap.tokenId && p.walletAddress === poap.walletAddress));
+    const visiblePoaps = allPoaps.filter(poap => !user.profileItems.find(profileItem => profileItem.isHidden && profileItem.id === poap.tokenId && profileItem.walletAddress === poap.walletAddress));
 
     res.status(200).json({
       ...user,
