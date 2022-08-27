@@ -8,20 +8,14 @@ import { palettePluginKey } from '../config';
 import { replaceSuggestionMarkWith } from '../inlinePalette';
 import { PaletteItemTypeNoGroup, PromisedCommand } from '../paletteItem';
 
-// function databaseItem (): PaletteItemTypeNoGroup {
-//   return {
-
-//   };
-// }
-
-interface ItemsProps {
+interface DatabaseItemsProps {
   addNestedPage: (type?: PageType) => Promise<void>;
   currentPageId: string;
   userId: string;
   space: any;
 }
 
-export function items ({ addNestedPage, currentPageId, userId, space }: ItemsProps): PaletteItemTypeNoGroup[] {
+export function items ({ addNestedPage, currentPageId, userId, space }: DatabaseItemsProps): PaletteItemTypeNoGroup[] {
 
   return [
     {

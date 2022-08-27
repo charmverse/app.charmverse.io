@@ -21,10 +21,10 @@ import ViewHeaderDisplayByMenu from './viewHeaderDisplayByMenu';
 import ViewHeaderSortMenu from './viewHeaderSortMenu';
 
 type Props = {
-  board: Board
   activeBoard?: Board
   activeView?: BoardView
   views: BoardView[]
+  viewsBoardId: string
   cards: Card[]
   groupByProperty?: IPropertyTemplate
   addCard: () => void
@@ -44,19 +44,19 @@ type Props = {
   toggleViewOptions: (enable?: boolean) => void
 }
 
-const ViewHeader = React.memo(({ maxTabsShown = 3, showView, toggleViewOptions, ...props }: Props) => {
+const ViewHeader = (props: Props) => {
   const [showFilter, setShowFilter] = useState(false);
   const router = useRouter();
 
   const views = props.views.filter(view => !view.fields.inline)
 
-  const { board, activeBoard, activeView, groupByProperty, cards, dateDisplayProperty } = props;
+  const { maxTabsShown = 3, showView, toggleViewOptions, viewsBoardId, activeBoard, activeView, groupByProperty, cards, dateDisplayProperty } = props;
 
   const withDisplayBy = activeView?.fields.viewType === 'calendar';
   const withSortBy = activeView?.fields.viewType !== 'calendar';
 
   const hasFilter = activeView?.fields.filter && activeView?.fields.filter.filters?.length > 0;
-  
+
   return (
     <div className={`ViewHeader ${props.showActionsOnHover ? 'hide-actions' : ''}`}>
       <ViewTabs
@@ -66,7 +66,7 @@ const ViewHeader = React.memo(({ maxTabsShown = 3, showView, toggleViewOptions, 
         views={views}
         readonly={props.readonly}
         showView={showView}
-        board={board}
+        viewsBoardId={viewsBoardId}
         activeView={activeView}
         disableUpdatingUrl={props.disableUpdatingUrl}
         maxTabsShown={maxTabsShown}
@@ -116,7 +116,7 @@ const ViewHeader = React.memo(({ maxTabsShown = 3, showView, toggleViewOptions, 
               {showFilter
                 && (
                   <FilterComponent
-                    board={board}
+                    board={activeBoard}
                     activeView={activeView}
                     onClose={() => setShowFilter(false)}
                   />
@@ -128,7 +128,7 @@ const ViewHeader = React.memo(({ maxTabsShown = 3, showView, toggleViewOptions, 
             {withSortBy
               && (
                 <ViewHeaderSortMenu
-                  properties={board.fields.cardProperties}
+                  properties={activeBoard.fields.cardProperties}
                   activeView={activeView}
                   orderedCards={cards}
                 />
@@ -170,6 +170,6 @@ const ViewHeader = React.memo(({ maxTabsShown = 3, showView, toggleViewOptions, 
         </div>
     </div>
   );
-});
+};
 
-export default ViewHeader;
+export default React.memo(ViewHeader);
