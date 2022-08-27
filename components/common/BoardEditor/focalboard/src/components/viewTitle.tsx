@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import ImageIcon from '@mui/icons-material/Image';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';

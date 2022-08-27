@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import React, { ReactNode, useCallback, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Board, IPropertyTemplate } from '../../blocks/board';
@@ -56,7 +54,7 @@ const ViewHeader = React.memo(({ maxTabsShown = 3, showView, toggleViewOptions, 
   const withSortBy = activeView?.fields.viewType !== 'calendar';
 
   const hasFilter = activeView?.fields.filter && activeView?.fields.filter.filters?.length > 0;
-  
+
   return (
     <div className={`ViewHeader ${props.showActionsOnHover ? 'hide-actions' : ''}`}>
       <ViewTabs
