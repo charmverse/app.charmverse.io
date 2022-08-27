@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import { SvgIconProps } from '@mui/material';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import PersonIcon from '@mui/icons-material/Person';

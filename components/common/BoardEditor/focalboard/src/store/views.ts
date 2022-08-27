@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { BoardView, createBoardView } from '../blocks/boardView';

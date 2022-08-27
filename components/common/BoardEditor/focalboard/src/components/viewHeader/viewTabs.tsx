@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import { useState, useCallback, useEffect, MouseEvent, ReactNode } from 'react';
 import { injectIntl, IntlShape } from 'react-intl';
 import { useRouter } from 'next/router';

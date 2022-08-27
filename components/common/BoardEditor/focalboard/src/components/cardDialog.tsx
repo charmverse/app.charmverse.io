@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import { Box } from '@mui/system';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
