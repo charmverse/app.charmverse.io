@@ -80,21 +80,20 @@ jobs:
       - name: Update and Package background worker
         run: |
           rm -rf .ebextensions && mv .ebextensions_cron .ebextensions
-          mv docker-compose-cron.yml docker-compose.yml
           cat files_to_zip.txt | zip --symlinks -r@ deploy_cron.zip
 
-      # - name: Deploy to Beanstalk
-      #   uses: einaregilsson/beanstalk-deploy@v18
-      #   with:
-      #     aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     application_name: web3-workspace
-      #     environment_name: test-docker-compose
-      #     version_label: ${{ github.sha }}
-      #     region: us-east-1
-      #     deployment_package: deploy.zip
-      #     use_existing_version_if_available: true # allows triggering re-deploys with same version
-      #     wait_for_deployment: false # set to false to save sweet Github minutes
+      - name: Deploy to Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v18
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: web3-workspace
+          environment_name: prod-web3-workspace
+          version_label: ${{ github.sha }}
+          region: us-east-1
+          deployment_package: deploy.zip
+          use_existing_version_if_available: true # allows triggering re-deploys with same version
+          wait_for_deployment: false # set to false to save sweet Github minutes
 
       - name: Deploy Background to Beanstalk
         uses: einaregilsson/beanstalk-deploy@v18
@@ -102,7 +101,7 @@ jobs:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: charmverse-worker
-          environment_name: charmverse-worker-production
+          environment_name: prod-charmverse-worker-1
           version_label: ${{ github.sha }}
           region: us-east-1
           deployment_package: deploy_cron.zip
