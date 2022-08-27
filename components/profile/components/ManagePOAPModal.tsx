@@ -126,7 +126,7 @@ function ManagePOAPModal (props: ManagePOAPModalProps) {
       onClose={close}
       size='large'
     >
-      <DialogTitle onClose={close}>Manage my POAP Collection</DialogTitle>
+      <DialogTitle onClose={close}>Manage my NFT & POAP Collection</DialogTitle>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={tabIndex} onChange={(_event, value: number) => setTabIndex(value)} aria-label='poap tabs'>
           <Tab label='Visible' id='visible-tab' aria-controls='visible-tabpanel' />
@@ -157,7 +157,7 @@ function ManagePOAPModal (props: ManagePOAPModalProps) {
         {
           displayedShownPoaps.length === 0 && (
             <Grid item container xs={12} justifyContent='center' py={2}>
-              <Typography>There are no visible POAPs</Typography>
+              <Typography>There are no visible NFTs or POAPs</Typography>
             </Grid>
           )
         }
@@ -185,7 +185,7 @@ function ManagePOAPModal (props: ManagePOAPModalProps) {
         {
           displayedHiddenPoaps.length === 0 && (
             <Grid item container xs={12} justifyContent='center' py={2}>
-              <Typography>There are no hidden POAPs</Typography>
+              <Typography>There are no hidden NFTs or POAPs</Typography>
             </Grid>
           )
         }
