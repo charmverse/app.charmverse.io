@@ -495,7 +495,7 @@ function CenterPanel (props: Props) {
               onClick={(boardPageType === 'inline_linked_board') ? openSelectSource : undefined}
             />
           )}
-          board={board}
+          viewsBoardId={board.id}
           activeBoard={activeBoard}
           activeView={props.activeView}
           toggleViewOptions={toggleViewOptions}
