@@ -2,14 +2,16 @@ import { UserAvatar } from 'lib/users/interfaces';
 import { useCallback, useState } from 'react';
 import { useUser } from 'hooks/useUser';
 import charmClient from 'charmClient';
+import { useSnackbar } from 'hooks/useSnackbar';
 
 const isAvatarObject = (
   avatar: string | UserAvatar
 ): avatar is UserAvatar => typeof avatar === 'object';
 
-export const useUpdateProfileAvatar = () => {
+export function useUpdateProfileAvatar () {
   const { setUser, user } = useUser();
   const [isSaving, setIsSaving] = useState(false);
+  const { showMessage } = useSnackbar();
 
   const updateProfileAvatar = useCallback(async (avatar: string | UserAvatar) => {
     const updatedAvatar = isAvatarObject(avatar) ? avatar : {
@@ -27,6 +29,7 @@ export const useUpdateProfileAvatar = () => {
       return updatedUser;
     }
     catch (e) {
+      showMessage('Failed to update avatar. Please try again.', 'error');
       return user;
     }
     finally {
@@ -36,4 +39,4 @@ export const useUpdateProfileAvatar = () => {
   }, []);
 
   return { updateProfileAvatar, isSaving };
-};
+}
