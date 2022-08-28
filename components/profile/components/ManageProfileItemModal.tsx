@@ -137,7 +137,7 @@ function ManageProfileItemModal (props: ManageProfileItemModalProps) {
     profileItemsRecord[nft.tokenId] = {
       id: nft.tokenId,
       metadata: {
-        imageURL: nft.imageThumb ?? nft.image,
+        imageURL: nft.image ?? nft.imageThumb,
         title: nft.title,
         date: nft.timeLastUpdated
       },
