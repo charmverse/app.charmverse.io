@@ -32,16 +32,23 @@ async function updateUserProfileItems (req: NextApiRequest, res: NextApiResponse
   }
 
   if (hiddenProfileItems.length) {
-    await prisma.profileItem.createMany({
-      data: hiddenProfileItems.map(profileItem => ({
+    await Promise.all(hiddenProfileItems.map(profileItem => prisma.profileItem.upsert({
+      where: {
+        id: profileItem.id
+      },
+      update: {
+        id: profileItem.id,
+        isHidden: true
+      },
+      create: {
         id: profileItem.id,
         walletAddress: profileItem.walletAddress,
         userId: req.session.user.id,
         metadata: profileItem.metadata === null ? undefined : profileItem.metadata,
         isHidden: true,
         type: 'poap' as ProfileItemType
-      }))
-    });
+      }
+    })));
   }
 
   return res.status(200).json({});
