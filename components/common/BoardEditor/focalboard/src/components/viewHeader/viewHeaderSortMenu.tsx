@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import React, { useCallback } from 'react';
 import { FormattedMessage } from 'react-intl';
 
@@ -8,7 +6,7 @@ import { BoardView, ISortOption } from '../../blocks/boardView';
 import { Constants } from '../../constants';
 import { Card } from '../../blocks/card';
 import mutator from '../../mutator';
-import Button from '../../widgets/buttons/button';
+import Button from 'components/common/Button';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
 import SortDownIcon from '../../widgets/icons/sortDown';
@@ -56,7 +54,7 @@ const ViewHeaderSortMenu = React.memo((props: Props) => {
 
   return (
     <MenuWrapper>
-      <Button active={hasSort}>
+      <Button color={hasSort ? 'primary' : 'secondary'} variant='text' size='small' sx={{ minWidth: 0 }}>
         <FormattedMessage
           id='ViewHeader.sort'
           defaultMessage='Sort'

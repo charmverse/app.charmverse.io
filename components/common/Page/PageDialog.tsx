@@ -11,7 +11,7 @@ import log from 'lib/log';
 import debouncePromise from 'lib/utilities/debouncePromise';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
-import { ReactNode, useCallback, useEffect, useRef } from 'react';
+import { ReactNode, useCallback, useEffect, useRef, useMemo } from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
 import InsertLinkIcon from '@mui/icons-material/InsertLink';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -35,10 +35,14 @@ export default function PageDialog (props: Props) {
   const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'page-dialog' });
   const router = useRouter();
-  const { setCurrentPageId, setPages, getPagePermissions } = usePages();
+  const { currentPageId, setCurrentPageId, setPages, getPagePermissions } = usePages();
   const pagePermission = page ? getPagePermissions(page.id) : null;
   const { showMessage } = useSnackbar();
-  const isSharedPage = router.route.startsWith('/share');
+  // extract domain from shared pages: /share/<domain>/<page_path>
+  const domain = router.query.domain || /^\/share\/(.*)\//.exec(router.asPath)?.[1];
+  const fullPageUrl = router.route.startsWith('/share') ? `/share/${domain}/${page?.path}` : `/${domain}/${page?.path}`;
+
+  const ogCurrentPageId = useMemo(() => currentPageId, []);
 
   // keep track if charmeditor is mounted. There is a bug that it calls the update method on closing the modal, but content is empty
   useEffect(() => {
@@ -65,7 +69,8 @@ export default function PageDialog (props: Props) {
       setCurrentPageId(page?.id);
     }
     return () => {
-      setCurrentPageId('');
+      // kind of a hack for focalboards that are embedded inside CharmEditor. TODO: use localized currentPageId and dont import from usePages
+      setCurrentPageId(ogCurrentPageId);
     };
   }, [page?.id]);
 
@@ -95,21 +100,21 @@ export default function PageDialog (props: Props) {
           toolsMenu={!hideToolsMenu && !readOnly && (
             <List dense>
               {onClickDelete && (
-              <ListItemButton
-                disabled={!pagePermission?.delete}
-                onClick={async () => {
-                  onClickDelete();
-                  onClose();
-                }}
-              >
-                <DeleteIcon
-                  sx={{
-                    mr: 1
+                <ListItemButton
+                  disabled={!pagePermission?.delete}
+                  onClick={async () => {
+                    onClickDelete();
+                    onClose();
                   }}
-                  fontSize='small'
-                />
-                <ListItemText primary='Delete' />
-              </ListItemButton>
+                >
+                  <DeleteIcon
+                    sx={{
+                      mr: 1
+                    }}
+                    fontSize='small'
+                  />
+                  <ListItemText primary='Delete' />
+                </ListItemButton>
               )}
               <ListItemButton onClick={() => {
                 Utils.copyTextToClipboard(window.location.href);
@@ -137,12 +142,12 @@ export default function PageDialog (props: Props) {
               )}
             </List>
           )}
-          toolbar={!isSharedPage && (
+          toolbar={(
             <Box display='flex' justifyContent='space-between'>
               <Button
                 size='small'
                 color='secondary'
-                href={`/${router.query.domain}/${page?.path}`}
+                href={fullPageUrl}
                 variant='text'
                 startIcon={<OpenInFullIcon fontSize='small' />}
               >

@@ -58,10 +58,10 @@ interface PageBreadCrumb {
   title: string;
 }
 
-function DocumentPageTitle ({ basePath }: { basePath: string }) {
-  const { currentPageId, pages, isEditing } = usePages();
+function DocumentPageTitle ({ basePath, pageId }: { basePath: string, pageId?: string }) {
+  const { pages, isEditing } = usePages();
 
-  const currentPage = pages[currentPageId];
+  const currentPage = pageId ? pages[pageId] : undefined;
 
   // find parent pages
   let activePage = currentPage;
@@ -183,7 +183,7 @@ function EmptyPageTitle () {
   return <div></div>;
 }
 
-export default function PageTitleWithBreadcrumbs () {
+export default function PageTitleWithBreadcrumbs ({ pageId }: { pageId?: string }) {
   const router = useRouter();
 
   if (router.route === '/share/[...pageId]' && router.query?.pageId?.[1] === 'bounties') {
@@ -193,10 +193,10 @@ export default function PageTitleWithBreadcrumbs () {
     return <BountyPageTitle basePath={`/${router.query.domain}`} />;
   }
   else if (router.route === '/[domain]/[pageId]') {
-    return <DocumentPageTitle basePath={`/${router.query.domain}`} />;
+    return <DocumentPageTitle basePath={`/${router.query.domain}`} pageId={pageId} />;
   }
   else if (router.route === '/share/[...pageId]') {
-    return <DocumentPageTitle basePath={`/share/${(router.query.pageId as string[])[0]}`} />;
+    return <DocumentPageTitle basePath={`/share/${(router.query.pageId as string[])[0]}`} pageId={pageId} />;
   }
   else if (NEXUS_ROUTES.includes(router.route)) {
     return <NexusPageTitle route={router.route} />;

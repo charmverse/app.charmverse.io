@@ -253,8 +253,9 @@ export default function BountyApplicantTableRow ({
                   <FormLabel><strong>Send a message (optional)</strong></FormLabel>
                   <div className='CommentsList' style={{ padding: 0 }}>
                     <NewCommentInput
-                      initialValue={defaultComment}
+                      $key={editorKey}
                       key={editorKey}
+                      initialValue={defaultComment}
                       username={user?.username}
                       avatar={user?.avatar}
                       onSubmit={onSendClicked}

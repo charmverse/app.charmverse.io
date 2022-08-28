@@ -1,18 +1,19 @@
 
 import Button from 'components/common/Button';
-import { Box, Divider, Popover, Tooltip } from '@mui/material';
+import Popover from '@mui/material/Popover';
+import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
 import Loader from 'components/common/Loader';
 import charmClient from 'charmClient';
 import { usePages } from 'hooks/usePages';
 import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 import { useState, useEffect } from 'react';
 import { IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
-import PagePermissions from './components/PagePermissions';
-import ShareToWeb from './components/ShareToWeb';
+import ShareBountyBoard from './ShareBountyBoard';
 
-export default function ShareButton ({ headerHeight }: { headerHeight: number }) {
+export default function BountyShareButton ({ headerHeight, pageId: currentPageId }: { headerHeight: number, pageId: string }) {
 
-  const { currentPageId, refreshPage } = usePages();
+  const { pages } = usePages();
   const popupState = usePopupState({ variant: 'popover', popupId: 'share-menu' });
   const [pagePermissions, setPagePermissions] = useState<IPagePermissionWithAssignee[] | null>(null);
 
@@ -20,30 +21,29 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
     charmClient.listPagePermissions(currentPageId)
       .then(permissions => {
         setPagePermissions(permissions);
-        refreshPage(currentPageId);
       });
   }
 
   // watch changes to the page in case permissions get updated
   useEffect(() => {
-    refreshPermissions();
-  }, [currentPageId, popupState.isOpen]);
+    if (popupState.isOpen) {
+      refreshPermissions();
+    }
+  }, [pages[currentPageId], popupState.isOpen]);
 
   return (
     <>
-      <Tooltip arrow title='Share or publish to the web'>
-        <Button
-          color='secondary'
-          variant='text'
-          size='small'
-          onClick={() => {
-            refreshPermissions();
-            popupState.open();
-          }}
-        >
-          Share
-        </Button>
-      </Tooltip>
+      <Button
+        color='secondary'
+        variant='text'
+        size='small'
+        onClick={() => {
+          refreshPermissions();
+          popupState.open();
+        }}
+      >
+        Share
+      </Button>
       <Popover
         {...bindPopover(popupState)}
         anchorOrigin={{
@@ -67,15 +67,9 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
           !pagePermissions
             ? (<Box sx={{ height: 100 }}><Loader size={20} sx={{ height: 600 }} /></Box>)
             : (
-              <>
-                <ShareToWeb pageId={currentPageId} pagePermissions={pagePermissions} />
-                <Divider />
-                <PagePermissions
-                  pageId={currentPageId}
-                  refreshPermissions={refreshPermissions}
-                  pagePermissions={pagePermissions}
-                />
-              </>
+
+              <ShareBountyBoard />
+
             )
         }
       </Popover>

@@ -3,6 +3,7 @@ import { useMyNfts } from 'hooks/useMyNfts';
 import { Dialog, DialogTitle, DialogContent } from '@mui/material';
 
 import { NftData } from 'lib/nft/types';
+import { useUser } from 'hooks/useUser';
 import NftAvatarGallery from './NftAvatarGallery';
 
 type Props = {
@@ -13,7 +14,8 @@ type Props = {
 };
 
 export default function NftAvatarGalleryPopup ({ onSelect, isVisible, onClose, isSaving }: Props) {
-  const { nfts, isLoading } = useMyNfts();
+  const { user } = useUser();
+  const { nfts, isLoading } = useMyNfts(user?.id || '');
 
   return (
     <Dialog onClose={onClose} open={isVisible} scroll='paper'>

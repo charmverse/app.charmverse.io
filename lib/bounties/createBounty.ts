@@ -4,6 +4,7 @@ import { getBountyPagePermissionSet } from 'lib/bounties/shared';
 import { setBountyPermissions } from 'lib/permissions/bounties';
 import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
 import { v4 } from 'uuid';
+import { getPagePath } from 'lib/pages';
 import { getBountyOrThrow } from './getBounty';
 import { BountyCreationData } from './interfaces';
 
@@ -77,7 +78,7 @@ export async function createBounty ({
           page: {
             create: {
               id: bountyId,
-              path: `page-${Math.random().toString().replace('0.', '')}`,
+              path: getPagePath(),
               title: '',
               contentText: '',
               content: undefined,

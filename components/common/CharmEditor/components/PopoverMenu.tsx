@@ -12,8 +12,8 @@ interface Props {
   maxHeight?: string;
 }
 
-const StyledPaper = styled(Paper)<{ maxHeight: string }>`
-  max-height: ${(props) => props.maxHeight};
+const StyledPaper = styled(Paper)<{ maxheight: string }>`
+  max-height: ${(props) => props.maxheight};
   overflow-y: auto;
 `;
 
@@ -30,7 +30,7 @@ export default function PopoverMenu ({ children, container, maxHeight = '40vh', 
             transformOrigin: 'left top'
           }}
         >
-          <StyledPaper maxHeight={maxHeight} sx={{ width }}>
+          <StyledPaper maxheight={maxHeight} sx={{ width }}>
             {children}
           </StyledPaper>
         </Grow>

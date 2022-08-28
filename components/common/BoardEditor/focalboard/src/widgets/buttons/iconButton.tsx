@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import React from 'react';
 
 type Props = {
@@ -7,7 +5,8 @@ type Props = {
     title?: string
     icon?: React.ReactNode
     className?: string
-    onMouseDown?: (e: React.MouseEvent<HTMLButtonElement>) => void
+    onMouseDown?: (e: React.MouseEvent<HTMLButtonElement>) => void,
+    style?: React.CSSProperties
 }
 
 function IconButton (props: Props): JSX.Element {
@@ -23,6 +22,7 @@ function IconButton (props: Props): JSX.Element {
       className={className}
       title={props.title}
       aria-label={props.title}
+      style={props.style}
     >
       {props.icon}
     </button>

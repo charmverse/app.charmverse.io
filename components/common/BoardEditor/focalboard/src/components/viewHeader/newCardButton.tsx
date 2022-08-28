@@ -1,12 +1,10 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
+import { BoardView } from '../../blocks/boardView';
 import { Card } from '../../blocks/card';
 import { getCurrentBoardTemplates } from '../../store/cards';
 import { useAppSelector } from '../../store/hooks';
-import { getCurrentView } from '../../store/views';
 import ButtonWithMenu from '../../widgets/buttons/buttonWithMenu';
 import Menu from '../../widgets/menu';
 import EmptyCardButton from './emptyCardButton';
@@ -16,11 +14,12 @@ type Props = {
     // addCardFromTemplate: (cardTemplateId: string) => void
     addCardTemplate: () => void
     editCardTemplate: (cardTemplateId: string) => void
+    view: BoardView
 }
 
 const NewCardButton = React.memo((props: Props): JSX.Element => {
   const cardTemplates: Card[] = useAppSelector(getCurrentBoardTemplates);
-  const currentView = useAppSelector(getCurrentView);
+  const currentView = props.view;
 
   return (
     <ButtonWithMenu
@@ -37,7 +36,7 @@ const NewCardButton = React.memo((props: Props): JSX.Element => {
           id='ViewHeader.new'
           defaultMessage='New'
         />
-            )}
+      )}
     >
       <Menu position='bottom-end'>
         {cardTemplates.length > 0 && (
@@ -58,6 +57,7 @@ const NewCardButton = React.memo((props: Props): JSX.Element => {
         {/* {cardTemplates.map((cardTemplate) => (
                     <NewCardButtonTemplateItem
                         key={cardTemplate.id}
+                        view={currentView}
                         cardTemplate={cardTemplate}
                         addCardFromTemplate={props.addCardFromTemplate}
                         editCardTemplate={props.editCardTemplate}
@@ -66,6 +66,7 @@ const NewCardButton = React.memo((props: Props): JSX.Element => {
 
         <EmptyCardButton
           addCard={props.addCard}
+          view={currentView}
         />
 
         {/* <Menu.Text

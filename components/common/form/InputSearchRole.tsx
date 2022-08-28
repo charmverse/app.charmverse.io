@@ -59,7 +59,7 @@ function InputSearchRoleBase ({
       noOptionsText='No options available'
       // @ts-ignore - not sure why this fails
       options={
-        filteredRoles
+      filteredRoles
       }
       autoHighlight
       getOptionLabel={(role) => role.name}

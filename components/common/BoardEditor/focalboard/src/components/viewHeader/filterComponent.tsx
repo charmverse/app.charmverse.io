@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
@@ -77,8 +75,6 @@ const FilterComponent = React.memo((props: Props): JSX.Element => {
             filter={filter}
           />
         ))}
-
-        <br />
 
         <Button onClick={() => addFilterClicked()}>
           <FormattedMessage

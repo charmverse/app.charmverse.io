@@ -1,10 +1,9 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 
 import React from 'react';
 import { useIntl } from 'react-intl';
 
 import mutator from '../../mutator';
+import { BoardView } from '../../blocks/boardView';
 import { Card } from '../../blocks/card';
 import IconButton from '../../widgets/buttons/iconButton';
 import DeleteIcon from '../../widgets/icons/delete';
@@ -13,17 +12,16 @@ import OptionsIcon from '../../widgets/icons/options';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
 import CheckIcon from '../../widgets/icons/check';
-import { useAppSelector } from '../../store/hooks';
-import { getCurrentView } from '../../store/views';
 
 type Props = {
     cardTemplate: Card
+    view: BoardView
     addCardFromTemplate: (cardTemplateId: string) => void
     editCardTemplate: (cardTemplateId: string) => void
 }
 
 const NewCardButtonTemplateItem = React.memo((props: Props) => {
-  const currentView = useAppSelector(getCurrentView);
+  const currentView = props.view;
   const { cardTemplate } = props;
   const intl = useIntl();
   const displayName = cardTemplate.title || intl.formatMessage({ id: 'ViewHeader.untitled', defaultMessage: 'Untitled' });

@@ -1,4 +1,7 @@
 import { Block, Page, PagePermission, Space } from '@prisma/client';
+import { Board } from 'lib/focalboard/board';
+import { BoardView } from 'lib/focalboard/boardView';
+import { Card } from 'lib/focalboard/card';
 
 export interface IPageWithPermissions extends Page {
   permissions: (PagePermission & {sourcePermission: PagePermission | null}) []
@@ -27,10 +30,11 @@ export interface PagesRequest {
 
 export interface PublicPageResponse {
   page: Page;
-  boardPage: Page | null;
-  pageBlock: Block | null;
-  boardBlock: Block | null;
+  boardPages: Page[];
   space: Space;
+  cards: Card[];
+  boards: Board[];
+  views: BoardView[]
 }
 
 // These 2 types are used for reducing a list of pages to a tree
@@ -48,12 +52,20 @@ export type PageNodeWithPermissions = PageNode<{permissions: (PagePermission & {
  * @rootPageIds The list of roots we want to track
  * @targetPageId Overrides root pageIds. Ensures only the root containing the target page ID will be returned
  * @includeCards Whether to include focalboard cards in the children. Should default to false. These were originally cards left out as mapPageTree was only used for showing page tree in the User Interface, and we did not want to show the actual cards
+ * @includeDeletedPages By default, we want to drop deleted pages from the tree.
  */
 export interface PageTreeMappingInput<T extends PageNode> {
   items: T[],
   rootPageIds?: string[],
   targetPageId?: string,
-  includeCards?: boolean
+  includeCards?: boolean,
+  includeDeletedPages?: boolean
+}
+
+export interface PageTreeResolveInput {
+  pageId: string,
+  flattenChildren?: boolean,
+  includeDeletedPages?: boolean
 }
 
 export type TargetPageTree<T extends PageNode = PageNode> = {

@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import React, { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -50,6 +48,7 @@ const CommentsList = React.memo((props: Props) => {
       {/* New comment */}
       {!props.readonly && (
         <NewCommentInput
+          $key={editorKey}
           key={editorKey}
           avatar={user?.avatar}
           username={user?.username}
@@ -74,23 +73,23 @@ const CommentsList = React.memo((props: Props) => {
 
 interface NewCommentProps {
   initialValue?: any | null;
-  key?: string | number;
+  $key?: string | number;
   username?: string;
   avatar?: string | null;
   onSubmit: (i: CommentBlock['fields']) => void;
 }
 
-export function NewCommentInput ({ initialValue = null, key, username, avatar, onSubmit }: NewCommentProps) {
+export function NewCommentInput ({ initialValue = null, $key, username, avatar, onSubmit }: NewCommentProps) {
 
   const intl = useIntl();
   const [newComment, setNewComment] = useState<CommentBlock['fields'] | null>(initialValue);
-
+  console.log($key)
   return (
     <div className='CommentsList__new'>
       <Avatar size='xSmall' name={username} avatar={avatar} />
       <InlineCharmEditor
         content={newComment?.content}
-        key={key} // use the size of comments so it resets when the new one is added
+        key={$key} // use the size of comments so it resets when the new one is added
         onContentChange={({ doc, rawText }) => {
           setNewComment({ content: doc, contentText: rawText });
         }}

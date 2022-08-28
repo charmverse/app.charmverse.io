@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 
 import { CSSObject } from '@emotion/serialize';
 import isEqual from 'lodash/isEqual';
@@ -51,7 +49,7 @@ export const defaultTheme = {
   sidebarTextActiveBorder: '93, 137, 243',
   sidebarWhiteLogo: 'true',
 
-  link: '#0000ee',
+  link: colors.darkBlueColor,
   linkVisited: '#551a8b',
 
   propDefault: '#fff',
@@ -78,7 +76,7 @@ export const darkTheme = {
   sidebarTextActiveBorder: '102, 185, 167',
   sidebarWhiteLogo: 'true',
 
-  link: '#0090ff',
+  link: colors.darkBlueColor,
   linkVisited: 'hsla(270, 68%, 70%, 1.0)',
 
   propDefault: 'hsla(0, 100%, 100%, 0.08)',

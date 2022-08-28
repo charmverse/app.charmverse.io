@@ -7,6 +7,7 @@ const globalCSS = css`
     --input-bg: ${colors.inputBackground};
     --input-border: ${colors.inputBorder};
     --input-border-hover: #37352f;
+    --primary-color: ${colors.blueColor};
 
     /* copied from https://mui.com/material-ui/customization/z-index/#main-content */
     --z-index-mobileStepper: 1000;
@@ -42,6 +43,7 @@ const globalCSS = css`
     --background-default: ${colors.backgroundColor};
     --background-paper: ${colors.backgroundColor};
     --background-dark: ${colors.backgroundDarkColor};
+    --background-light: ${colors.backgroundLightColor};
 
     --charmeditor-active: rgba(46, 170, 220, 0.2);
 
@@ -62,6 +64,8 @@ const globalCSS = css`
     --background-default: ${colors.backgroundColorDarkMode};
     --background-paper: ${colors.backgroundLightColorDarkMode};
     --background-dark: ${colors.backgroundDarkColorDarkMode};
+    --background-light: ${colors.backgroundLightColorDarkMode};
+
   }
 
 `;

@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import { Box } from '@mui/system';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
@@ -12,7 +10,6 @@ import { BountyWithDetails } from 'models';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Board } from '../blocks/board';
 import mutator from '../mutator';
 import { getCard } from '../store/cards';
 import { useAppSelector } from '../store/hooks';
@@ -21,7 +18,6 @@ import ConfirmationDialogBox, { ConfirmationDialogBoxProps } from './confirmatio
 import PageDialog from 'components/common/Page/PageDialog';
 
 type Props = {
-  board: Board
   cardId: string
   onClose: () => void
   showCard: (cardId?: string) => void
@@ -73,7 +69,6 @@ const CardDialog = (props: Props): JSX.Element | null => {
   // clear draft bounty on close, just in case
   useEffect(() => {
     return () => {
-      console.log('clear draft')
       cancelDraftBounty()
     }
   }, []);

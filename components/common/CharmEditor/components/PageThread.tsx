@@ -247,11 +247,11 @@ const CommentDate = memo<{createdAt: Date, updatedAt?: Date | null}>(({ createdA
         </span>
       </Tooltip>
       {updatedAt && (
-      <Tooltip arrow placement='top' title={new Date(updatedAt).toLocaleString()}>
-        <span style={{ marginLeft: '4px' }}>
-          (edited)
-        </span>
-      </Tooltip>
+        <Tooltip arrow placement='top' title={new Date(updatedAt).toLocaleString()}>
+          <span style={{ marginLeft: '4px' }}>
+            (edited)
+          </span>
+        </Tooltip>
       )}
     </Typography>
   );

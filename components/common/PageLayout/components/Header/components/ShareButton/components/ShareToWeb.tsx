@@ -43,12 +43,13 @@ const CopyButton = styled((props: any) => <Button color='secondary' variant='out
 interface Props {
   pageId: string;
   pagePermissions: IPagePermissionWithAssignee[];
+  refreshPermissions: () => void;
 }
 
-export default function ShareToWeb ({ pageId, pagePermissions }: Props) {
+export default function ShareToWeb ({ pageId, pagePermissions, refreshPermissions }: Props) {
 
   const router = useRouter();
-  const { pages, getPagePermissions, refreshPage } = usePages();
+  const { pages, getPagePermissions } = usePages();
   const [copied, setCopied] = useState<boolean>(false);
   const [space] = useCurrentSpace();
   const publicPermission = pagePermissions.find(publicPerm => publicPerm.public === true) ?? null;
@@ -63,7 +64,6 @@ export default function ShareToWeb ({ pageId, pagePermissions }: Props) {
   async function togglePublic () {
     if (publicPermission) {
       await charmClient.deletePermission(publicPermission.id);
-      refreshPage(pageId);
     }
     else {
       await charmClient.createPermission({
@@ -71,8 +71,8 @@ export default function ShareToWeb ({ pageId, pagePermissions }: Props) {
         permissionLevel: 'view',
         public: true
       });
-      refreshPage(pageId);
     }
+    refreshPermissions();
   }
 
   useEffect(() => {
@@ -88,12 +88,12 @@ export default function ShareToWeb ({ pageId, pagePermissions }: Props) {
     if (!publicPermission) {
       setShareLink(null);
     }
-    else if (currentPage?.type === 'page' || currentPage?.type === 'card') {
+    else if (currentPage?.type === 'page' || currentPage?.type === 'card' || currentPage?.type === 'proposal') {
       const shareLinkToSet = (typeof window !== 'undefined')
         ? `${window.location.origin}/share/${space?.domain}/${currentPage.path}` : '';
       setShareLink(shareLinkToSet);
     }
-    else if (currentPage?.type === 'board') {
+    else if (currentPage?.type.match(/board/)) {
       const viewIdToProvide = router.query.viewId;
       const shareLinkToSet = (typeof window !== 'undefined')
         ? `${window.location.origin}/share/${space?.domain}/${currentPage.path}?viewId=${viewIdToProvide}` : '';
@@ -127,7 +127,7 @@ export default function ShareToWeb ({ pageId, pagePermissions }: Props) {
         />
       </Box>
       {
-        currentPage?.type === 'board' && (
+        (currentPage?.type.match(/board/)) && (
           <Alert severity='info'>
             Updates to this board's permissions, including whether it is public, will also apply to its cards.
           </Alert>
@@ -137,22 +137,22 @@ export default function ShareToWeb ({ pageId, pagePermissions }: Props) {
       <Collapse in={!!publicPermission}>
         {
           shareLink && (
-          <Box p={1}>
-            <StyledInput
-              fullWidth
-              disabled
-              value={shareLink}
-              endAdornment={(
-                <CopyToClipboard text={shareLink} onCopy={onCopy}>
-                  <InputAdornment position='end'>
-                    <CopyButton>
-                      {copied ? 'Copied!' : 'Copy'}
-                    </CopyButton>
-                  </InputAdornment>
-                </CopyToClipboard>
-              )}
-            />
-          </Box>
+            <Box p={1}>
+              <StyledInput
+                fullWidth
+                disabled
+                value={shareLink}
+                endAdornment={(
+                  <CopyToClipboard text={shareLink} onCopy={onCopy}>
+                    <InputAdornment position='end'>
+                      <CopyButton>
+                        {copied ? 'Copied!' : 'Copy'}
+                      </CopyButton>
+                    </InputAdornment>
+                  </CopyToClipboard>
+                )}
+              />
+            </Box>
           )
         }
       </Collapse>

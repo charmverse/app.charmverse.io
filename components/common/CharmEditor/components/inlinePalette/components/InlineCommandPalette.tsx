@@ -23,15 +23,13 @@ function getItemsAndHints (
   editorItems: PaletteItem[],
   isItemDisabled: (paletteItem: PaletteItem) => boolean
 ) {
-  let items = [...editorItems];
-  if (!items.every((item) => item instanceof PaletteItem)) {
-    throw new Error(
-      `uid: "${items.find((item) => !(item instanceof PaletteItem))?.uid
-      }" must be an instance of PaletteItem `
-    );
+
+  const invalidItem = editorItems.find((item) => !(item instanceof PaletteItem));
+  if (invalidItem) {
+    throw new Error(`uid: "${invalidItem.uid}" must be an instance of PaletteItem`);
   }
 
-  items = items.filter((item) => typeof item.hidden === 'function' ? !item.hidden(view.state) : !item.hidden);
+  let items = editorItems.filter((item) => typeof item.hidden === 'function' ? !item.hidden(view.state) : !item.hidden);
 
   // TODO This is hacky
   items.forEach((item) => {
@@ -40,25 +38,7 @@ function getItemsAndHints (
   items = items
     .filter(
       (item) => queryMatch(item, query) && item.type === PALETTE_ITEM_REGULAR_TYPE
-    )
-    .sort((a, b) => {
-      let result = fieldExistenceSort(a, b, 'highPriority');
-
-      if (result !== 0) {
-        return result;
-      }
-
-      result = fieldExistenceSort(a, b, '_isItemDisabled', true);
-
-      if (result !== 0) {
-        return result;
-      }
-
-      if (a.group === b.group) {
-        return a.title.localeCompare(b.title);
-      }
-      return a.group.localeCompare(b.group);
-    });
+    );
   return { items };
 }
 

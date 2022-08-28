@@ -4,6 +4,7 @@ import { Stack, Typography } from '@mui/material';
 
 import { NftData } from 'lib/nft/types';
 import NftAvatarGallery from 'components/profile/components/NftAvatarGallery';
+import { useUser } from 'hooks/useUser';
 
 type Props = {
   onSelect?: (avatar: NftData) => void
@@ -11,7 +12,8 @@ type Props = {
 };
 
 export default function NftAvatarSection ({ onSelect, isSaving }: Props) {
-  const { nfts, isLoading } = useMyNfts();
+  const { user } = useUser();
+  const { nfts, isLoading } = useMyNfts(user?.id || '');
 
   if (nfts?.length === 0) {
     return null;
