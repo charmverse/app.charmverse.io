@@ -9,7 +9,7 @@ import type { IUser } from 'components/common/BoardEditor/focalboard/src/user';
 import type { FiatCurrency, IPairQuote } from 'connectors';
 import type { FailedImportsError } from 'lib/notion/types';
 import type { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee, IPagePermissionWithSource, SpaceDefaultPublicPageToggle } from 'lib/permissions/pages/page-permission-interfaces';
-import type { GetPoapsResponse, UpdatePoapsRequest } from 'lib/poap';
+import type { GetPoapsResponse } from 'lib/poap';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import type { BountyWithDetails, Contributor, LoggedInUser, PageContent } from 'models';
 import type { ServerBlockFields } from 'pages/api/blocks';
@@ -38,6 +38,7 @@ import type { PublicUser } from 'pages/api/public/profile/[userPath]';
 import type { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
 import { encodeFilename } from 'lib/utilities/encodeFilename';
 import { ProfileApi } from 'lib/charmClient/profileApi';
+import { UpdateProfileItemRequest } from 'lib/profileItem/interfaces';
 import { NftApi } from './lib/charmClient/nftApi';
 import type { AssignedPermissionsQuery, Resource } from './lib/permissions/interfaces';
 import type { SpacePermissionConfigurationUpdate } from './lib/permissions/meta/interfaces';
@@ -94,8 +95,8 @@ class CharmClient {
     return http.GET<GetPoapsResponse>('/api/profile/poaps');
   }
 
-  updateUserPoaps (data: UpdatePoapsRequest) {
-    return http.PUT<GetPoapsResponse>('/api/profile/poaps', data);
+  updateUserProfileItem (data: UpdateProfileItemRequest) {
+    return http.PUT('/api/profile/items', data);
   }
 
   updateUserDetails (data: Partial<UserDetails>) {

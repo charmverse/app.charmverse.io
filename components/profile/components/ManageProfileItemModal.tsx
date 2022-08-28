@@ -3,10 +3,11 @@ import AddIcon from '@mui/icons-material/Add';
 import ClearIcon from '@mui/icons-material/Clear';
 import { Box, Grid, Link, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { Prisma, ProfileItem } from '@prisma/client';
+import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { DialogTitle, Modal } from 'components/common/Modal';
 import { ExtendedPoap } from 'models';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type ManageProfileItemModalProps = {
     visiblePoaps: ExtendedPoap[];
@@ -62,18 +63,25 @@ const StyledStack = styled(Stack)`
 function ManageProfileItemModal (props: ManageProfileItemModalProps) {
   const { visiblePoaps, hiddenPoaps, close, isOpen, save } = props;
   const [tabIndex, setTabIndex] = useState(0);
-  const [hiddenProfileItemIds, setHiddenProfileItemIds] = useState<string[]>(hiddenPoaps.map(poap => (poap.tokenId)));
-  const [shownProfileItemIds, setShownProfileItemIds] = useState<string[]>(visiblePoaps.map(poap => poap.tokenId));
+  const [hiddenProfileItemIds, setHiddenProfileItemIds] = useState<string[]>([]);
+  const [shownProfileItemIds, setShownProfileItemIds] = useState<string[]>([]);
 
-  const profileItemsRecord: Record<string, Pick<ProfileItem, 'id' | 'metadata' | 'type'>> = {};
+  useEffect(() => {
+    setHiddenProfileItemIds(hiddenPoaps.map(poap => (poap.tokenId)));
+    setShownProfileItemIds(visiblePoaps.map(poap => (poap.tokenId)));
+  }, [hiddenPoaps, visiblePoaps]);
+
+  const profileItemsRecord: Record<string, Pick<ProfileItem, 'id' | 'metadata' | 'type' | 'walletAddress'>> = {};
 
   [...visiblePoaps, ...hiddenPoaps].forEach(profileItem => {
     profileItemsRecord[profileItem.tokenId] = {
       id: profileItem.tokenId,
       metadata: {
         imageURL: profileItem.imageURL,
-        name: profileItem.name
+        name: profileItem.name,
+        created: profileItem.created
       },
+      walletAddress: profileItem.walletAddress,
       type: 'poap'
     };
   });
@@ -97,10 +105,14 @@ function ManageProfileItemModal (props: ManageProfileItemModalProps) {
   };
 
   const handleSave = async () => {
-    // await charmClient.updateUserPoaps({
-    //   newShownPoaps,
-    //   newHiddenPoaps
-    // } as UpdatePoapsRequest);
+    await charmClient.updateUserProfileItem({
+      hiddenProfileItems: hiddenProfileItemIds
+        .filter(profileItemId => !hiddenPoaps.find(poap => poap.tokenId === profileItemId))
+        .map(hiddenProfileItemId => profileItemsRecord[hiddenProfileItemId]),
+      shownProfileItems: shownProfileItemIds
+        .filter(profileItemId => !visiblePoaps.find(poap => poap.tokenId === profileItemId))
+        .map(shownProfileItemId => profileItemsRecord[shownProfileItemId])
+    });
 
     setShownProfileItemIds([]);
     setHiddenProfileItemIds([]);
