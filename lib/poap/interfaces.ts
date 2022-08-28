@@ -1,3 +1,4 @@
+import { ProfileItem } from '@prisma/client';
 import { ExtendedPoap } from 'models';
 
 export interface GetPoapsResponse {
@@ -6,6 +7,6 @@ export interface GetPoapsResponse {
 }
 
 export interface UpdatePoapsRequest {
-    newShownPoaps: ExtendedPoap[];
-    newHiddenPoaps: ExtendedPoap[];
+    newShownPoaps: ProfileItem[];
+    newHiddenPoaps: ProfileItem[];
 }

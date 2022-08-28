@@ -1,17 +1,16 @@
-import { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
-import charmClient from 'charmClient';
-import { Modal, DialogTitle } from 'components/common/Modal';
-import Button from 'components/common/Button';
 import AddIcon from '@mui/icons-material/Add';
 import ClearIcon from '@mui/icons-material/Clear';
-import { UpdatePoapsRequest } from 'lib/poap';
 import { Box, Grid, Link, Stack, Tab, Tabs, Typography } from '@mui/material';
+import { Prisma, ProfileItem } from '@prisma/client';
+import Button from 'components/common/Button';
+import { DialogTitle, Modal } from 'components/common/Modal';
 import { ExtendedPoap } from 'models';
+import { useState } from 'react';
 
-type ManagePOAPModalProps = {
-    visiblePoaps: Array<Partial<ExtendedPoap>>;
-    hiddenPoaps: Array<Partial<ExtendedPoap>>;
+type ManageProfileItemModalProps = {
+    visiblePoaps: ExtendedPoap[];
+    hiddenPoaps: ExtendedPoap[];
     save: () => void,
     close: () => void,
     isOpen: boolean,
@@ -60,61 +59,51 @@ const StyledStack = styled(Stack)`
     }
 `;
 
-function ManagePOAPModal (props: ManagePOAPModalProps) {
+function ManageProfileItemModal (props: ManageProfileItemModalProps) {
   const { visiblePoaps, hiddenPoaps, close, isOpen, save } = props;
   const [tabIndex, setTabIndex] = useState(0);
-  const [newHiddenPoaps, setNewHiddenPoaps] = useState<Array<Partial<ExtendedPoap>>>([]);
-  const [newShownPoaps, setNewShownPoaps] = useState<Array<Partial<ExtendedPoap>>>([]);
-  const [displayedHiddenPoaps, setDisplayedHiddenPoaps] = useState<Array<Partial<ExtendedPoap>>>([]);
-  const [displayedShownPoaps, setDisplayedShownPoaps] = useState<Array<Partial<ExtendedPoap>>>([]);
+  const [hiddenProfileItemIds, setHiddenProfileItemIds] = useState<string[]>(hiddenPoaps.map(poap => (poap.tokenId)));
+  const [shownProfileItemIds, setShownProfileItemIds] = useState<string[]>(visiblePoaps.map(poap => poap.tokenId));
 
-  useEffect(() => {
-    setDisplayedHiddenPoaps([
-      ...hiddenPoaps.filter((poap: Partial<ExtendedPoap>) => !newShownPoaps.some(p => p.tokenId === poap.tokenId)),
-      ...newHiddenPoaps
-    ]);
-    setDisplayedShownPoaps([
-      ...visiblePoaps.filter((poap: Partial<ExtendedPoap>) => !newHiddenPoaps.some(p => p.tokenId === poap.tokenId)),
-      ...newShownPoaps
-    ]);
-  }, [visiblePoaps, hiddenPoaps, newHiddenPoaps, newShownPoaps]);
+  const profileItemsRecord: Record<string, Pick<ProfileItem, 'id' | 'metadata' | 'type'>> = {};
 
-  const handleHidePoap = (poap: Partial<ExtendedPoap>) => {
-    if (newShownPoaps.some((p: Partial<ExtendedPoap>) => p.tokenId === poap.tokenId)) {
-      setNewShownPoaps([
-        ...newShownPoaps.filter((p: Partial<ExtendedPoap>) => p.tokenId !== poap.tokenId)
-      ]);
-      return;
-    }
+  [...visiblePoaps, ...hiddenPoaps].forEach(profileItem => {
+    profileItemsRecord[profileItem.tokenId] = {
+      id: profileItem.tokenId,
+      metadata: {
+        imageURL: profileItem.imageURL,
+        name: profileItem.name
+      },
+      type: 'poap'
+    };
+  });
 
-    setNewHiddenPoaps([
-      ...newHiddenPoaps,
-      poap
+  const handleHideProfileItem = (profileItemId: string) => {
+    setHiddenProfileItemIds([
+      ...hiddenProfileItemIds,
+      profileItemId
     ]);
+
+    setShownProfileItemIds(shownProfileItemIds.filter(shownProfileItem => shownProfileItem !== profileItemId));
   };
 
-  const handleShowPoap = (poap: Partial<ExtendedPoap>) => {
-    if (newHiddenPoaps.some((p: Partial<ExtendedPoap>) => p.tokenId === poap.tokenId)) {
-      setNewHiddenPoaps([
-        ...newHiddenPoaps.filter((p: Partial<ExtendedPoap>) => p.tokenId !== poap.tokenId)
-      ]);
-      return;
-    }
-
-    setNewShownPoaps([
-      ...newShownPoaps,
-      poap
+  const handleShowProfileItem = (profileItemId: string) => {
+    setShownProfileItemIds([
+      ...shownProfileItemIds,
+      profileItemId
     ]);
+
+    setHiddenProfileItemIds(hiddenProfileItemIds.filter(hiddenProfileItem => hiddenProfileItem !== profileItemId));
   };
 
   const handleSave = async () => {
-    await charmClient.updateUserPoaps({
-      newShownPoaps,
-      newHiddenPoaps
-    } as UpdatePoapsRequest);
+    // await charmClient.updateUserPoaps({
+    //   newShownPoaps,
+    //   newHiddenPoaps
+    // } as UpdatePoapsRequest);
 
-    setNewHiddenPoaps([]);
-    setNewShownPoaps([]);
+    setShownProfileItemIds([]);
+    setHiddenProfileItemIds([]);
     setTabIndex(0);
 
     save();
@@ -135,18 +124,18 @@ function ManagePOAPModal (props: ManagePOAPModalProps) {
       </Box>
       <TabPanel hidden={tabIndex !== 0} py={2}>
         {
-          displayedShownPoaps.length !== 0 && (
+          shownProfileItemIds.length !== 0 && (
             <Grid item container xs={12} py={2}>
-              { displayedShownPoaps.map((poap: Partial<ExtendedPoap>) => (
-                <StyledGridItem item xs={6} md={4} p={1} key={poap.tokenId}>
+              { shownProfileItemIds.map((profileItemId) => (
+                <StyledGridItem item xs={6} md={4} p={1} key={profileItemId}>
                   <StyledStack direction='row' spacing={2} p={0.5} className='icons-stack'>
                     <ClearIcon
-                      onClick={() => handleHidePoap(poap)}
+                      onClick={() => handleHideProfileItem(profileItemId)}
                       fontSize='small'
                     />
                   </StyledStack>
-                  <Link href={`https://app.poap.xyz/token/${poap.tokenId}`} target='_blank' display='flex'>
-                    <StyledImage src={poap.imageURL} />
+                  <Link href={`https://app.poap.xyz/token/${profileItemId}`} target='_blank' display='flex'>
+                    <StyledImage src={(profileItemsRecord[profileItemId].metadata as Prisma.JsonObject)?.imageURL as string} />
                   </Link>
                 </StyledGridItem>
               ))}
@@ -155,7 +144,7 @@ function ManagePOAPModal (props: ManagePOAPModalProps) {
         }
 
         {
-          displayedShownPoaps.length === 0 && (
+          shownProfileItemIds.length === 0 && (
             <Grid item container xs={12} justifyContent='center' py={2}>
               <Typography>There are no visible NFTs or POAPs</Typography>
             </Grid>
@@ -164,18 +153,18 @@ function ManagePOAPModal (props: ManagePOAPModalProps) {
       </TabPanel>
       <TabPanel hidden={tabIndex !== 1} py={2}>
         {
-          displayedHiddenPoaps.length !== 0 && (
+          hiddenProfileItemIds.length !== 0 && (
             <Grid item container xs={12} py={2}>
-              { displayedHiddenPoaps.map((poap: Partial<ExtendedPoap>) => (
-                <StyledGridItem item xs={6} md={4} p={1} key={poap.tokenId}>
+              { hiddenProfileItemIds.map((profileItemId) => (
+                <StyledGridItem item xs={6} md={4} p={1} key={profileItemId}>
                   <StyledStack direction='row' spacing={2} p={0.5} className='icons-stack'>
                     <AddIcon
-                      onClick={() => handleShowPoap(poap)}
+                      onClick={() => handleShowProfileItem(profileItemId)}
                       fontSize='small'
                     />
                   </StyledStack>
-                  <Link href={`https://app.poap.xyz/token/${poap.tokenId}`} target='_blank' display='flex'>
-                    <StyledImage src={poap.imageURL} />
+                  <Link href={`https://app.poap.xyz/token/${profileItemId}`} target='_blank' display='flex'>
+                    <StyledImage src={(profileItemsRecord[profileItemId].metadata as Prisma.JsonObject)?.imageURL as string} />
                   </Link>
                 </StyledGridItem>
               ))}
@@ -183,7 +172,7 @@ function ManagePOAPModal (props: ManagePOAPModalProps) {
           )
         }
         {
-          displayedHiddenPoaps.length === 0 && (
+          hiddenProfileItemIds.length === 0 && (
             <Grid item container xs={12} justifyContent='center' py={2}>
               <Typography>There are no hidden NFTs or POAPs</Typography>
             </Grid>
@@ -201,4 +190,4 @@ function ManagePOAPModal (props: ManagePOAPModalProps) {
   );
 }
 
-export default ManagePOAPModal;
+export default ManageProfileItemModal;

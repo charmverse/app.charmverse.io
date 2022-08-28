@@ -8,7 +8,7 @@ import { showDateWithMonthAndYear } from 'lib/utilities/dates';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { ExtendedPoap } from 'models';
 import { KeyedMutator } from 'swr';
-import ManagePOAPModal from './ManagePOAPModal';
+import ManageProfileItemModal from './ManageProfileItemModal';
 import { isPublicUser, UserDetailsProps } from './UserDetails';
 
 interface Collective {
@@ -136,7 +136,7 @@ export default function UserCollectives ({ user, mutatePoaps, poapData }: Pick<U
         ))}
         {
         !isPublic && poapData && (
-          <ManagePOAPModal
+          <ManageProfileItemModal
             isOpen={managePoapModalState.isOpen}
             close={managePoapModalState.close}
             save={async () => {
