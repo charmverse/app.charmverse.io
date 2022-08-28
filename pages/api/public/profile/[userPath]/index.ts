@@ -61,6 +61,8 @@ async function getUserProfile (req: NextApiRequest, res: NextApiResponse<PublicU
       .filter(nft => !userById.profileItems
         .find(profileItem => profileItem.isHidden && profileItem.id === nft.tokenId));
 
+    delete (userById as any).profileItems;
+
     res.status(200).json({
       ...userById,
       visiblePoaps,

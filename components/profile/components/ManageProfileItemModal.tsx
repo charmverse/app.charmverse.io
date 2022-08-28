@@ -110,6 +110,9 @@ function ManageProfileItemModal (props: ManageProfileItemModalProps) {
   const [hiddenProfileItemIds, setHiddenProfileItemIds] = useState<string[]>([]);
   const [shownProfileItemIds, setShownProfileItemIds] = useState<string[]>([]);
 
+  const existingVisibleProfileItemIds: string[] = [...visiblePoaps.map(poap => poap.tokenId), ...visibleNfts.map(nft => nft.tokenId)];
+  const existingHiddenProfileItemIds: string[] = [...hiddenPoaps.map(poap => poap.tokenId), ...hiddenNfts.map(nft => nft.tokenId)];
+
   useEffect(() => {
     setHiddenProfileItemIds([...hiddenPoaps.map(poap => (poap.tokenId)), ...hiddenNfts.map(nft => nft.tokenId)]);
     setShownProfileItemIds([...visiblePoaps.map(poap => (poap.tokenId)), ...visibleNfts.map(nft => nft.tokenId)]);
@@ -162,16 +165,12 @@ function ManageProfileItemModal (props: ManageProfileItemModalProps) {
 
   const handleSave = async () => {
     await charmClient.updateUserProfileItem({
-      hiddenProfileItems: hiddenProfileItemIds
+      hiddenProfileItems: hiddenProfileItemIds.filter(profileItemId => !existingHiddenProfileItemIds.includes(profileItemId))
         .map(hiddenProfileItemId => profileItemsRecord[hiddenProfileItemId]),
-      shownProfileItems: shownProfileItemIds
+      shownProfileItems: shownProfileItemIds.filter(profileItemId => !existingVisibleProfileItemIds.includes(profileItemId))
         .map(shownProfileItemId => profileItemsRecord[shownProfileItemId])
     });
-
-    setShownProfileItemIds([]);
-    setHiddenProfileItemIds([]);
     setTabIndex(0);
-
     save();
   };
 

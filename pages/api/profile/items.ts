@@ -1,5 +1,4 @@
 
-import { ProfileItemType } from '@prisma/client';
 import { prisma } from 'db';
 import log from 'lib/log';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
@@ -44,11 +43,10 @@ async function updateUserProfileItems (req: NextApiRequest, res: NextApiResponse
         },
         create: {
           id: profileItem.id,
-          walletAddress: profileItem.walletAddress,
           userId: req.session.user.id,
           metadata: profileItem.metadata === null ? undefined : profileItem.metadata,
           isHidden: true,
-          type: 'poap' as ProfileItemType
+          type: profileItem.type
         }
       })));
     }

@@ -1,6 +1,5 @@
 import styled from '@emotion/styled';
 import Avatar from '@mui/material/Avatar';
-import { Box } from '@mui/system';
 import { stringToColor } from 'lib/utilities/strings';
 import React from 'react';
 
