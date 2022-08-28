@@ -140,8 +140,10 @@ export default function UserCollectives ({ user, mutatePoaps, poapData, nftData,
               mutateNfts();
               managePoapModalState.close();
             }}
-            visiblePoaps={poapData.visiblePoaps}
-            hiddenPoaps={poapData.hiddenPoaps}
+            hiddenNfts={hiddenNfts}
+            visibleNfts={visibleNfts}
+            visiblePoaps={visiblePoaps}
+            hiddenPoaps={hiddenPoaps}
           />
         )
       }

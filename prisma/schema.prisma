@@ -629,11 +629,10 @@ model Comment {
 }
 
 model ProfileItem {
-  id            String          @id
-  userId        String          @db.Uuid
-  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  isHidden      Boolean?
-  metadata      Json?
-  type          ProfileItemType
-  walletAddress String
+  id       String          @id
+  userId   String          @db.Uuid
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isHidden Boolean?
+  metadata Json?
+  type     ProfileItemType
 }

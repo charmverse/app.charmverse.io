@@ -1,17 +1,20 @@
 import styled from '@emotion/styled';
-import AddIcon from '@mui/icons-material/Add';
 import ClearIcon from '@mui/icons-material/Clear';
 import { Box, Grid, Link, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { Prisma, ProfileItem } from '@prisma/client';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { DialogTitle, Modal } from 'components/common/Modal';
+import { NftData } from 'lib/nft/types';
 import { ExtendedPoap } from 'models';
 import { useEffect, useState } from 'react';
+import AddIcon from '@mui/icons-material/Add';
 
 type ManageProfileItemModalProps = {
     visiblePoaps: ExtendedPoap[];
     hiddenPoaps: ExtendedPoap[];
+    hiddenNfts: NftData[];
+    visibleNfts: NftData[];
     save: () => void,
     close: () => void,
     isOpen: boolean,
@@ -60,29 +63,82 @@ const StyledStack = styled(Stack)`
     }
 `;
 
+function ProfileItemsTab ({ profileItems, onClick, tab }: { tab: 'visible' | 'hidden', onClick: (profileItemId: string) => void, profileItems: Pick<ProfileItem, 'id' | 'metadata' | 'type'>[]}) {
+  return (
+    <Grid item container xs={12} py={2}>
+      { profileItems.map((profileItem) => (
+        <StyledGridItem item xs={4} md={3} p={1} key={profileItem.id}>
+          <StyledStack direction='row' spacing={2} p={0.5} className='icons-stack'>
+            { tab === 'visible' ? (
+              <ClearIcon
+                onClick={() => onClick(profileItem.id)}
+                fontSize='small'
+              />
+            ) : (
+              <AddIcon
+                onClick={() => onClick(profileItem.id)}
+                fontSize='small'
+              />
+            )}
+          </StyledStack>
+          {
+            profileItem.type === 'nft' ? (
+              <img
+                style={{
+                  clipPath: 'url(#hexagon-avatar)',
+                  width: '100%'
+                }}
+                src={(profileItem.metadata as Prisma.JsonObject)?.imageURL as string}
+              />
+            ) : (
+              <Link href={`https://app.poap.xyz/token/${profileItem.id}`} target='_blank' display='flex'>
+                <StyledImage
+                  src={(profileItem.metadata as Prisma.JsonObject)?.imageURL as string}
+                />
+              </Link>
+            )
+          }
+        </StyledGridItem>
+      ))}
+    </Grid>
+  );
+}
+
 function ManageProfileItemModal (props: ManageProfileItemModalProps) {
-  const { visiblePoaps, hiddenPoaps, close, isOpen, save } = props;
+  const { visiblePoaps, hiddenPoaps, hiddenNfts, visibleNfts, close, isOpen, save } = props;
   const [tabIndex, setTabIndex] = useState(0);
   const [hiddenProfileItemIds, setHiddenProfileItemIds] = useState<string[]>([]);
   const [shownProfileItemIds, setShownProfileItemIds] = useState<string[]>([]);
 
   useEffect(() => {
-    setHiddenProfileItemIds(hiddenPoaps.map(poap => (poap.tokenId)));
-    setShownProfileItemIds(visiblePoaps.map(poap => (poap.tokenId)));
-  }, [hiddenPoaps, visiblePoaps]);
+    setHiddenProfileItemIds([...hiddenPoaps.map(poap => (poap.tokenId)), ...hiddenNfts.map(nft => nft.tokenId)]);
+    setShownProfileItemIds([...visiblePoaps.map(poap => (poap.tokenId)), ...visibleNfts.map(nft => nft.tokenId)]);
+  }, [hiddenPoaps, visiblePoaps, visibleNfts, hiddenNfts]);
 
-  const profileItemsRecord: Record<string, Pick<ProfileItem, 'id' | 'metadata' | 'type' | 'walletAddress'>> = {};
+  const profileItemsRecord: Record<string, Pick<ProfileItem, 'id' | 'metadata' | 'type'>> = {};
 
-  [...visiblePoaps, ...hiddenPoaps].forEach(profileItem => {
-    profileItemsRecord[profileItem.tokenId] = {
-      id: profileItem.tokenId,
+  [...visiblePoaps, ...hiddenPoaps].forEach(poap => {
+    profileItemsRecord[poap.tokenId] = {
+      id: poap.tokenId,
       metadata: {
-        imageURL: profileItem.imageURL,
-        name: profileItem.name,
-        created: profileItem.created
+        imageURL: poap.imageURL,
+        name: poap.name,
+        created: poap.created,
+        walletAddress: poap.walletAddress
       },
-      walletAddress: profileItem.walletAddress,
       type: 'poap'
+    };
+  });
+
+  [...visibleNfts, ...hiddenNfts].forEach(nft => {
+    profileItemsRecord[nft.tokenId] = {
+      id: nft.tokenId,
+      metadata: {
+        imageURL: nft.imageThumb ?? nft.image,
+        title: nft.title,
+        date: nft.timeLastUpdated
+      },
+      type: 'nft'
     };
   });
 
@@ -107,10 +163,8 @@ function ManageProfileItemModal (props: ManageProfileItemModalProps) {
   const handleSave = async () => {
     await charmClient.updateUserProfileItem({
       hiddenProfileItems: hiddenProfileItemIds
-        .filter(profileItemId => !hiddenPoaps.find(poap => poap.tokenId === profileItemId))
         .map(hiddenProfileItemId => profileItemsRecord[hiddenProfileItemId]),
       shownProfileItems: shownProfileItemIds
-        .filter(profileItemId => !visiblePoaps.find(poap => poap.tokenId === profileItemId))
         .map(shownProfileItemId => profileItemsRecord[shownProfileItemId])
     });
 
@@ -120,6 +174,9 @@ function ManageProfileItemModal (props: ManageProfileItemModalProps) {
 
     save();
   };
+
+  const shownProfileItems = shownProfileItemIds.map(profileItemId => profileItemsRecord[profileItemId]);
+  const hiddenProfileItems = hiddenProfileItemIds.map(profileItemId => profileItemsRecord[profileItemId]);
 
   return (
     <Modal
@@ -136,27 +193,15 @@ function ManageProfileItemModal (props: ManageProfileItemModalProps) {
       </Box>
       <TabPanel hidden={tabIndex !== 0} py={2}>
         {
-          shownProfileItemIds.length !== 0 && (
-            <Grid item container xs={12} py={2}>
-              { shownProfileItemIds.map((profileItemId) => (
-                <StyledGridItem item xs={6} md={4} p={1} key={profileItemId}>
-                  <StyledStack direction='row' spacing={2} p={0.5} className='icons-stack'>
-                    <ClearIcon
-                      onClick={() => handleHideProfileItem(profileItemId)}
-                      fontSize='small'
-                    />
-                  </StyledStack>
-                  <Link href={`https://app.poap.xyz/token/${profileItemId}`} target='_blank' display='flex'>
-                    <StyledImage src={(profileItemsRecord[profileItemId].metadata as Prisma.JsonObject)?.imageURL as string} />
-                  </Link>
-                </StyledGridItem>
-              ))}
-            </Grid>
-          )
-        }
-
-        {
-          shownProfileItemIds.length === 0 && (
+          shownProfileItems.length !== 0 ? (
+            <ProfileItemsTab
+              tab='visible'
+              profileItems={shownProfileItems}
+              onClick={(profileItemId) => {
+                handleHideProfileItem(profileItemId);
+              }}
+            />
+          ) : (
             <Grid item container xs={12} justifyContent='center' py={2}>
               <Typography>There are no visible NFTs or POAPs</Typography>
             </Grid>
@@ -165,26 +210,15 @@ function ManageProfileItemModal (props: ManageProfileItemModalProps) {
       </TabPanel>
       <TabPanel hidden={tabIndex !== 1} py={2}>
         {
-          hiddenProfileItemIds.length !== 0 && (
-            <Grid item container xs={12} py={2}>
-              { hiddenProfileItemIds.map((profileItemId) => (
-                <StyledGridItem item xs={6} md={4} p={1} key={profileItemId}>
-                  <StyledStack direction='row' spacing={2} p={0.5} className='icons-stack'>
-                    <AddIcon
-                      onClick={() => handleShowProfileItem(profileItemId)}
-                      fontSize='small'
-                    />
-                  </StyledStack>
-                  <Link href={`https://app.poap.xyz/token/${profileItemId}`} target='_blank' display='flex'>
-                    <StyledImage src={(profileItemsRecord[profileItemId].metadata as Prisma.JsonObject)?.imageURL as string} />
-                  </Link>
-                </StyledGridItem>
-              ))}
-            </Grid>
-          )
-        }
-        {
-          hiddenProfileItemIds.length === 0 && (
+          hiddenProfileItems.length !== 0 ? (
+            <ProfileItemsTab
+              tab='hidden'
+              profileItems={hiddenProfileItems}
+              onClick={(profileItemId) => {
+                handleShowProfileItem(profileItemId);
+              }}
+            />
+          ) : (
             <Grid item container xs={12} justifyContent='center' py={2}>
               <Typography>There are no hidden NFTs or POAPs</Typography>
             </Grid>

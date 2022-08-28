@@ -56,7 +56,7 @@ async function getUserProfile (req: NextApiRequest, res: NextApiResponse<PublicU
 
     const visiblePoaps = allPoaps
       .filter(poap => !userById.profileItems
-        .find(profileItem => profileItem.isHidden && profileItem.id === poap.tokenId && profileItem.walletAddress === poap.walletAddress));
+        .find(profileItem => profileItem.isHidden && profileItem.id === poap.tokenId));
     const visibleNfts = allNfts
       .filter(nft => !userById.profileItems
         .find(profileItem => profileItem.isHidden && profileItem.id === nft.tokenId));
