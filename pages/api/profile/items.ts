@@ -1,4 +1,5 @@
 
+import { ProfileItemType } from '@prisma/client';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { UpdateProfileItemRequest } from 'lib/profileItem/interfaces';
@@ -36,8 +37,9 @@ async function updateUserProfileItems (req: NextApiRequest, res: NextApiResponse
         id: profileItem.id,
         walletAddress: profileItem.walletAddress,
         userId: req.session.user.id,
+        metadata: profileItem.metadata === null ? undefined : profileItem.metadata,
         isHidden: true,
-        type: 'poap'
+        type: 'poap' as ProfileItemType
       }))
     });
   }
