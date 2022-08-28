@@ -1,6 +1,7 @@
 
 import { ProfileItemType } from '@prisma/client';
 import { prisma } from 'db';
+import log from 'lib/log';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { UpdateProfileItemRequest } from 'lib/profileItem/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -32,23 +33,28 @@ async function updateUserProfileItems (req: NextApiRequest, res: NextApiResponse
   }
 
   if (hiddenProfileItems.length) {
-    await Promise.all(hiddenProfileItems.map(profileItem => prisma.profileItem.upsert({
-      where: {
-        id: profileItem.id
-      },
-      update: {
-        id: profileItem.id,
-        isHidden: true
-      },
-      create: {
-        id: profileItem.id,
-        walletAddress: profileItem.walletAddress,
-        userId: req.session.user.id,
-        metadata: profileItem.metadata === null ? undefined : profileItem.metadata,
-        isHidden: true,
-        type: 'poap' as ProfileItemType
-      }
-    })));
+    try {
+      await Promise.all(hiddenProfileItems.map(profileItem => prisma.profileItem.upsert({
+        where: {
+          id: profileItem.id
+        },
+        update: {
+          id: profileItem.id,
+          isHidden: true
+        },
+        create: {
+          id: profileItem.id,
+          walletAddress: profileItem.walletAddress,
+          userId: req.session.user.id,
+          metadata: profileItem.metadata === null ? undefined : profileItem.metadata,
+          isHidden: true,
+          type: 'poap' as ProfileItemType
+        }
+      })));
+    }
+    catch (err) {
+      log.error('Error updating profile items', err);
+    }
   }
 
   return res.status(200).json({});

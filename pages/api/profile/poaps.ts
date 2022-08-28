@@ -18,7 +18,8 @@ async function getUserPoaps (req: NextApiRequest, res: NextApiResponse<GetPoapsR
   const hiddenPoapIDs: Array<string> = (await prisma.profileItem.findMany({
     where: {
       userId: req.session.user.id,
-      isHidden: true
+      isHidden: true,
+      type: 'poap'
     },
     select: {
       id: true
@@ -40,8 +41,8 @@ async function getUserPoaps (req: NextApiRequest, res: NextApiResponse<GetPoapsR
 
   const poaps: ExtendedPoap[] = await getPOAPs(user.addresses);
 
-  const hiddenPoaps = poaps.filter((poap: ExtendedPoap) => hiddenPoapIDs.includes(poap.tokenId));
-  const visiblePoaps = poaps.filter((poap: ExtendedPoap) => !hiddenPoapIDs.includes(poap.tokenId));
+  const hiddenPoaps = poaps.filter((poap) => hiddenPoapIDs.includes(poap.tokenId));
+  const visiblePoaps = poaps.filter((poap) => !hiddenPoapIDs.includes(poap.tokenId));
 
   return res.status(200).json({
     hiddenPoaps,

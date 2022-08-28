@@ -1,9 +1,9 @@
 import * as http from 'adapters/http';
-import { NftDataResponse } from './interface';
+import { GetNftsResponse } from './interface';
 
 export class NftApi {
   async list (userId: string) {
-    const data = await http.GET<NftDataResponse>(`/api/nft/list/${userId}`);
+    const data = await http.GET<GetNftsResponse>(`/api/nft/list/${userId}`);
 
     return data;
   }

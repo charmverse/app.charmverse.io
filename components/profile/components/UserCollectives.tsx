@@ -2,11 +2,10 @@ import EditIcon from '@mui/icons-material/Edit';
 import { Chip, Divider, IconButton, Link, Stack, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import Avatar from 'components/common/Avatar';
-import { useMyNfts } from 'hooks/useMyNfts';
+import { GetNftsResponse } from 'lib/charmClient/interface';
 import { GetPoapsResponse } from 'lib/poap';
 import { showDateWithMonthAndYear } from 'lib/utilities/dates';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { ExtendedPoap } from 'models';
 import { KeyedMutator } from 'swr';
 import ManageProfileItemModal from './ManageProfileItemModal';
 import { isPublicUser, UserDetailsProps } from './UserDetails';
@@ -54,28 +53,25 @@ function UserCollectiveRow ({ collective }: {collective: Collective}) {
   );
 }
 
-export default function UserCollectives ({ user, mutatePoaps, poapData }: Pick<UserDetailsProps, 'user'> & {mutatePoaps: KeyedMutator<GetPoapsResponse>, poapData: GetPoapsResponse | undefined}) {
+interface UserCollectivesProps extends Pick<UserDetailsProps, 'user'>{
+  mutatePoaps: KeyedMutator<GetPoapsResponse>,
+  mutateNfts: KeyedMutator<GetNftsResponse>,
+  poapData: GetPoapsResponse | undefined
+  nftData: GetNftsResponse | undefined
+}
+
+export default function UserCollectives ({ user, mutatePoaps, poapData, nftData, mutateNfts }: UserCollectivesProps) {
   const isPublic = isPublicUser(user);
   const managePoapModalState = usePopupState({ variant: 'popover', popupId: 'poap-modal' });
-  const poaps: ExtendedPoap[] = [];
-
-  const { nfts = [] } = useMyNfts(user.id);
 
   const collectives: Collective[] = [];
 
-  poapData?.hiddenPoaps.forEach(poap => {
-    poaps.push(poap);
-    collectives.push({
-      type: 'poap',
-      date: poap.created as string,
-      id: poap.tokenId,
-      image: poap.imageURL,
-      title: poap.name,
-      link: `https://app.poap.xyz/token/${poap.tokenId}`
-    });
-  });
-  poapData?.visiblePoaps.forEach(poap => {
-    poaps.push(poap);
+  const hiddenPoaps = poapData?.hiddenPoaps ?? [];
+  const visiblePoaps = poapData?.visiblePoaps ?? [];
+  const visibleNfts = nftData?.visibleNfts ?? [];
+  const hiddenNfts = nftData?.hiddenNfts ?? [];
+
+  [...hiddenPoaps, ...visiblePoaps].forEach(poap => {
     collectives.push({
       type: 'poap',
       date: poap.created as string,
@@ -86,7 +82,7 @@ export default function UserCollectives ({ user, mutatePoaps, poapData }: Pick<U
     });
   });
 
-  nfts.forEach(nft => {
+  [...visibleNfts, ...hiddenNfts].forEach(nft => {
     collectives.push({
       type: 'nft',
       date: nft.timeLastUpdated,
@@ -118,7 +114,7 @@ export default function UserCollectives ({ user, mutatePoaps, poapData }: Pick<U
             </IconButton>
           )}
         </Stack>
-        <Chip label={poaps.length + nfts.length} />
+        <Chip label={collectives.length} />
       </Stack>
       <Stack gap={2}>
         {collectives.map(collective => (
@@ -141,6 +137,7 @@ export default function UserCollectives ({ user, mutatePoaps, poapData }: Pick<U
             close={managePoapModalState.close}
             save={async () => {
               mutatePoaps();
+              mutateNfts();
               managePoapModalState.close();
             }}
             visiblePoaps={poapData.visiblePoaps}
