@@ -100,7 +100,7 @@ function IdentityModal (props: IdentityModalProps) {
       </Box>
       <Link href='/integrations'>
         <Button variant='text' color='secondary' endIcon={<NavigateNextIcon />}>
-          Manage Integrations
+          Manage identities
         </Button>
       </Link>
     </Modal>
