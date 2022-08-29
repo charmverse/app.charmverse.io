@@ -1,8 +1,8 @@
 import EditIcon from '@mui/icons-material/Edit';
 import { Chip, Divider, IconButton, Link, Stack, Typography } from '@mui/material';
 import { Box } from '@mui/system';
+import { GetNftsResponse } from 'charmClient/apis/interface';
 import Avatar from 'components/common/Avatar';
-import { GetNftsResponse } from 'lib/charmClient/interface';
 import { GetPoapsResponse } from 'lib/poap';
 import { showDateWithMonthAndYear } from 'lib/utilities/dates';
 import { usePopupState } from 'material-ui-popup-state/hooks';

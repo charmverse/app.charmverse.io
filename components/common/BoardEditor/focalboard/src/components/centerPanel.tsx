@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 /* eslint-disable max-lines */
 import { Box } from '@mui/material';
 import { useRouter } from 'next/router';
@@ -495,7 +493,7 @@ function CenterPanel (props: Props) {
               onClick={(boardPageType === 'inline_linked_board') ? openSelectSource : undefined}
             />
           )}
-          board={board}
+          viewsBoardId={board.id}
           activeBoard={activeBoard}
           activeView={props.activeView}
           toggleViewOptions={toggleViewOptions}

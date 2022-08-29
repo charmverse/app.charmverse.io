@@ -2,7 +2,7 @@ import { Divider, Stack } from '@mui/material';
 import charmClient from 'charmClient';
 import useSWRImmutable from 'swr/immutable';
 import { GetPoapsResponse } from 'lib/poap';
-import { GetNftsResponse } from 'lib/charmClient/interface';
+import { GetNftsResponse } from 'charmClient/apis/interface';
 import AggregatedData from './components/AggregatedData';
 import UserDetails, { isPublicUser, UserDetailsProps } from './components/UserDetails';
 import UserCollectives from './components/UserCollectives';

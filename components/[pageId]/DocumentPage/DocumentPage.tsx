@@ -58,7 +58,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
   const [containerRef, { width: containerWidth }] = useElementSize();
 
   async function refreshBountyPermissions (bountyId: string) {
-    setBountyPermissions(await charmClient.computeBountyPermissions({
+    setBountyPermissions(await charmClient.bounties.computePermissions({
       resourceId: bountyId
     }));
   }

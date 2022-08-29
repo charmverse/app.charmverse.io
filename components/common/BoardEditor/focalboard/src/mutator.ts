@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import charmClient from 'charmClient';
 import { Page, PageContent } from 'models';
 import { publishIncrementalUpdate } from '../../publisher';
