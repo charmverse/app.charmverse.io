@@ -1,8 +1,6 @@
-import { Box, Chip, CircularProgress, Divider, Grid, Paper, Stack, Typography } from '@mui/material';
+import { Box, CircularProgress, Grid, Paper, Typography } from '@mui/material';
 import charmClient from 'charmClient';
-import { sortDeepdaoOrgs } from 'lib/deepdao/sortDeepdaoOrgs';
 import useSWRImmutable from 'swr/immutable';
-import DeepDaoOrganizationRow, { OrganizationDetails } from './DeepDaoOrganizationRow';
 import { isPublicUser, UserDetailsProps } from './UserDetails';
 
 export function AggregatedDataItem ({ value, label }: { value: number, label: string }) {
@@ -62,19 +60,6 @@ export default function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>
     return null;
   }
 
-  const sortedOrganizations = sortDeepdaoOrgs(data);
-
-  const visibleDaos: OrganizationDetails[] = [];
-  const hiddenDaos: OrganizationDetails[] = [];
-  sortedOrganizations.forEach(dao => {
-    if (dao.isHidden) {
-      hiddenDaos.push(dao);
-    }
-    else {
-      visibleDaos.push(dao);
-    }
-  });
-
   return (
     <Grid container display='flex' gap={2} flexDirection='column'>
       <Box
@@ -92,126 +77,6 @@ export default function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>
         <AggregatedDataItem label='Votes' value={data.totalVotes} />
         <AggregatedDataItem label='Bounties' value={data.bounties} />
       </Box>
-
-      {visibleDaos.length !== 0 ? (
-        <>
-          <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
-            <Typography
-              sx={{
-                typography: {
-                  sm: 'h1',
-                  xs: 'h2'
-                }
-              }}
-            >Organizations
-            </Typography>
-            <Chip label={visibleDaos.length} />
-          </Stack>
-          <Stack gap={2}>
-            {visibleDaos.map(organization => (
-              <Box
-                key={organization.organizationId}
-              >
-                <DeepDaoOrganizationRow
-                  onClick={async () => {
-                    await charmClient.profile.updateProfileItem({
-                      profileItems: [{
-                        id: organization.organizationId,
-                        isHidden: true,
-                        type: 'dao',
-                        metadata: null
-                      }]
-                    });
-                    mutate(() => {
-                      return {
-                        ...data,
-                        organizations: data.organizations.map(dao => {
-                          if (dao.organizationId === organization.organizationId) {
-                            return {
-                              ...dao,
-                              isHidden: true
-                            };
-                          }
-                          return dao;
-                        })
-                      };
-                    }, {
-                      revalidate: false
-                    });
-                  }}
-                  visible={true}
-                  showVisibilityIcon={!isPublic}
-                  organization={organization}
-                />
-                <Divider sx={{
-                  mt: 2
-                }}
-                />
-              </Box>
-            ))}
-          </Stack>
-        </>
-      ) : null}
-
-      {hiddenDaos.length !== 0 ? (
-        <>
-          <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
-            <Typography
-              sx={{
-                typography: {
-                  sm: 'h1',
-                  xs: 'h2'
-                }
-              }}
-            >Hidden Organizations
-            </Typography>
-            <Chip label={hiddenDaos.length} />
-          </Stack>
-          <Stack gap={2}>
-            {hiddenDaos.map(organization => (
-              <Box
-                key={organization.organizationId}
-              >
-                <DeepDaoOrganizationRow
-                  onClick={async () => {
-                    await charmClient.profile.updateProfileItem({
-                      profileItems: [{
-                        id: organization.organizationId,
-                        isHidden: false,
-                        type: 'dao',
-                        metadata: null
-                      }]
-                    });
-                    mutate(() => {
-                      return {
-                        ...data,
-                        organizations: data.organizations.map(dao => {
-                          if (dao.organizationId === organization.organizationId) {
-                            return {
-                              ...dao,
-                              isHidden: false
-                            };
-                          }
-                          return dao;
-                        })
-                      };
-                    }, {
-                      revalidate: false
-                    });
-                  }}
-                  visible={false}
-                  showVisibilityIcon={!isPublic}
-                  organization={organization}
-                />
-                <Divider sx={{
-                  mt: 2
-                }}
-                />
-              </Box>
-            ))}
-          </Stack>
-        </>
-      ) : null}
     </Grid>
   );
 }
