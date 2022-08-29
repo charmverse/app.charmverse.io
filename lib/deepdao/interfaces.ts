@@ -13,6 +13,7 @@ interface DeepDaoParticipationScore {
 export type DeepDaoOrganization = {
   name: string;
   organizationId: string;
+  isHidden: boolean;
 }
 
 export type DeepDaoProposal = {
