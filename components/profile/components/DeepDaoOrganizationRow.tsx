@@ -113,7 +113,7 @@ export default function DeepDaoOrganizationRow ({ organization, showVisibilityIc
           {isCollapsed ? <ExpandMoreIcon fontSize='small' /> : <ExpandLessIcon fontSize='small' />}
         </IconButton>
       </Stack>
-      <Typography variant='subtitle2'>{showDateWithMonthAndYear(organization.oldestEventDate) ?? '?'} - {showDateWithMonthAndYear(organization.latestEventDate) ?? '?'}</Typography>
+      {organization.oldestEventDate && organization.latestEventDate && <Typography variant='subtitle2'>{showDateWithMonthAndYear(organization.oldestEventDate)} - {showDateWithMonthAndYear(organization.latestEventDate)}</Typography>}
 
       <Collapse in={!isCollapsed}>
         <Box>

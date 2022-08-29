@@ -54,7 +54,6 @@ export function sortDeepdaoOrgs ({ organizations, proposals, votes }: {
 
   // Remove the organizations that have not votes or proposals, so there wont be any latest or earliest dates
   return (Object.values(organizationsRecord)
-    .filter((organization) => isTruthy(organization)
-      && (organization.votes.length !== 0 || organization.proposals.length !== 0)) as OrganizationDetails[])
-    .sort((orgA, orgB) => orgA.latestEventDate > orgB.latestEventDate ? -1 : 1);
+    .filter(isTruthy)
+    .sort((orgA, orgB) => orgA.latestEventDate > orgB.latestEventDate ? -1 : 1));
 }

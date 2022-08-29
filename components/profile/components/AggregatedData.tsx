@@ -72,7 +72,7 @@ export default function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>
           }
         }}
       >
-        <AggregatedDataItem label='Communities' value={data.daos} />
+        <AggregatedDataItem label='Communities' value={data.organizations.length} />
         <AggregatedDataItem label='Proposals' value={data.totalProposals} />
         <AggregatedDataItem label='Votes' value={data.totalVotes} />
         <AggregatedDataItem label='Bounties' value={data.bounties} />
