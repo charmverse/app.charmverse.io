@@ -94,10 +94,6 @@ class CharmClient {
     return http.GET<GetPoapsResponse>('/api/profile/poaps');
   }
 
-  updateUserProfileItem (data: UpdateProfileItemRequest) {
-    return http.PUT('/api/profile/items', data);
-  }
-
   updateUserDetails (data: Partial<UserDetails>) {
     return http.PUT<UserDetails>('/api/profile/details', data);
   }

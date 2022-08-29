@@ -1,12 +1,13 @@
 import EditIcon from '@mui/icons-material/Edit';
 import { Chip, Divider, IconButton, Link, Stack, Typography } from '@mui/material';
 import { Box } from '@mui/system';
+import charmClient from 'charmClient';
 import { GetNftsResponse } from 'charmClient/apis/interface';
 import Avatar from 'components/common/Avatar';
 import { GetPoapsResponse } from 'lib/poap';
 import { showDateWithMonthAndYear } from 'lib/utilities/dates';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { KeyedMutator } from 'swr';
+import useSWRImmutable from 'swr/immutable';
 import ManageProfileItemModal from './ManageProfileItemModal';
 import { isPublicUser, UserDetailsProps } from './UserDetails';
 
@@ -53,15 +54,19 @@ function UserCollectiveRow ({ collective }: {collective: Collective}) {
   );
 }
 
-interface UserCollectivesProps extends Pick<UserDetailsProps, 'user'>{
-  mutatePoaps: KeyedMutator<GetPoapsResponse>,
-  mutateNfts: KeyedMutator<GetNftsResponse>,
-  poapData: GetPoapsResponse | undefined
-  nftData: GetNftsResponse | undefined
-}
-
-export default function UserCollectives ({ user, mutatePoaps, poapData, nftData, mutateNfts }: UserCollectivesProps) {
+export default function UserCollectives ({ user }: Pick<UserDetailsProps, 'user'>) {
   const isPublic = isPublicUser(user);
+  const { data: poapData, mutate: mutatePoaps } = useSWRImmutable(`/poaps/${user.id}/${isPublic}`, () => {
+    return isPublicUser(user)
+      ? Promise.resolve({ visiblePoaps: user.visiblePoaps, hiddenPoaps: [] } as GetPoapsResponse)
+      : charmClient.getUserPoaps();
+  });
+
+  const { data: nftData, mutate: mutateNfts } = useSWRImmutable(`/nfts/${user.id}/${isPublic}`, () => {
+    return isPublicUser(user)
+      ? Promise.resolve({ visibleNfts: user.visibleNfts, hiddenNfts: [] } as GetNftsResponse)
+      : charmClient.nft.list(user.id);
+  });
   const managePoapModalState = usePopupState({ variant: 'popover', popupId: 'poap-modal' });
 
   const collectives: Collective[] = [];

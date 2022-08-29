@@ -164,7 +164,7 @@ function ManageProfileItemModal (props: ManageProfileItemModalProps) {
   };
 
   const handleSave = async () => {
-    await charmClient.updateUserProfileItem({
+    await charmClient.profile.updateProfileItem({
       hiddenProfileItems: hiddenProfileItemIds.filter(profileItemId => !existingHiddenProfileItemIds.includes(profileItemId))
         .map(hiddenProfileItemId => profileItemsRecord[hiddenProfileItemId]),
       shownProfileItems: shownProfileItemIds.filter(profileItemId => !existingVisibleProfileItemIds.includes(profileItemId))
