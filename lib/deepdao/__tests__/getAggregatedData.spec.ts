@@ -78,7 +78,9 @@ describe('GET /api/public/profile/[userPath]', () => {
           proposals: ['proposal 1'],
           totalVotes: 1,
           votes: ['vote 1'],
-          organizations: ['organization 1']
+          organizations: [{
+            title: 'organization 1'
+          }]
         }
       })
       .get(`/v0.1/people/profile/${walletAddresses[1]}`)
@@ -88,7 +90,9 @@ describe('GET /api/public/profile/[userPath]', () => {
           proposals: ['proposal 2'],
           totalVotes: 3,
           votes: ['vote 2'],
-          organizations: ['organization 2']
+          organizations: [{
+            title: 'organization 2'
+          }]
         }
       });
 
@@ -104,7 +108,13 @@ describe('GET /api/public/profile/[userPath]', () => {
       totalVotes: 4,
       votes: ['vote 1', 'vote 2'],
       proposals: ['proposal 1', 'proposal 2'],
-      organizations: ['organization 1', 'organization 2']
+      organizations: [{
+        title: 'organization 1',
+        isHidden: false
+      }, {
+        title: 'organization 2',
+        isHidden: false
+      }]
     });
   });
 });
