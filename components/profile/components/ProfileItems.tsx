@@ -3,14 +3,15 @@ import { Chip, Divider, IconButton, Link, Stack, Tooltip, Typography } from '@mu
 import { Box } from '@mui/system';
 import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
-import { GetNftsResponse } from 'lib/nft/interfaces';
+import { GetNftsResponse, NftData } from 'lib/nft/interfaces';
 import { GetPoapsResponse } from 'lib/poap';
 import { showDateWithMonthAndYear } from 'lib/utilities/dates';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import useSWRImmutable from 'swr/immutable';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import styled from '@emotion/styled';
-import ManageProfileItemModal from './ManageProfileItemModal';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import { ExtendedPoap } from 'models';
 import { isPublicUser, UserDetailsProps } from './UserDetails';
 
 interface Collective {
@@ -20,6 +21,7 @@ interface Collective {
   image: string
   type: 'poap' | 'nft'
   link: string
+  isHidden: boolean
 }
 
 const StyledStack = styled(Stack)`
@@ -37,7 +39,14 @@ const StyledStack = styled(Stack)`
   gap: ${({ theme }) => theme.spacing(2)};
 `;
 
-function ProfileItem ({ collective }: {collective: Collective}) {
+interface ProfileItemProps {
+  onClick: () => void,
+  visible: boolean,
+  showVisibilityIcon: boolean,
+  collective: Collective
+}
+
+function ProfileItem ({ onClick, collective, visible, showVisibilityIcon }: ProfileItemProps) {
   return (
     <StyledStack>
       {collective.type === 'poap' ? (
@@ -61,16 +70,48 @@ function ProfileItem ({ collective }: {collective: Collective}) {
             }}
           >{collective.title}
           </Typography>
-          <IconButton size='small'>
-            <Tooltip title={`Hide ${collective.type.toUpperCase()} from profile`}>
-              <VisibilityOffIcon className='action' fontSize='small' />
-            </Tooltip>
-          </IconButton>
+          {showVisibilityIcon && (
+            <IconButton size='small' onClick={onClick}>
+              {visible ? (
+                <Tooltip title={`Hide ${collective.type.toUpperCase()} from profile`}>
+                  <VisibilityOffIcon className='action' fontSize='small' />
+                </Tooltip>
+              ) : (
+                <Tooltip title={`Show ${collective.type.toUpperCase()} in profile`}>
+                  <VisibilityIcon className='action' fontSize='small' />
+                </Tooltip>
+              )}
+            </IconButton>
+          )}
         </Box>
         <Typography variant='subtitle2'>{showDateWithMonthAndYear(collective.date) ?? '?'}</Typography>
       </Stack>
     </StyledStack>
   );
+}
+
+function transformPoap (poap: ExtendedPoap, isHidden: boolean): Collective {
+  return {
+    type: 'poap',
+    date: poap.created as string,
+    id: poap.tokenId,
+    image: poap.imageURL,
+    title: poap.name,
+    link: `https://app.poap.xyz/token/${poap.tokenId}`,
+    isHidden
+  };
+}
+
+function transformNft (nft: NftData, isHidden: boolean): Collective {
+  return {
+    type: 'nft',
+    date: nft.timeLastUpdated,
+    id: nft.tokenId,
+    image: nft.image ?? nft.imageThumb,
+    title: nft.title,
+    link: '',
+    isHidden
+  };
 }
 
 export default function ProfileItems ({ user }: Pick<UserDetailsProps, 'user'>) {
@@ -88,34 +129,17 @@ export default function ProfileItems ({ user }: Pick<UserDetailsProps, 'user'>) 
   });
   const managePoapModalState = usePopupState({ variant: 'popover', popupId: 'poap-modal' });
 
-  const collectives: Collective[] = [];
-
   const hiddenPoaps = poapData?.hiddenPoaps ?? [];
   const visiblePoaps = poapData?.visiblePoaps ?? [];
   const visibleNfts = nftData?.visibleNfts ?? [];
   const hiddenNfts = nftData?.hiddenNfts ?? [];
 
-  [...hiddenPoaps, ...visiblePoaps].forEach(poap => {
-    collectives.push({
-      type: 'poap',
-      date: poap.created as string,
-      id: poap.tokenId,
-      image: poap.imageURL,
-      title: poap.name,
-      link: `https://app.poap.xyz/token/${poap.tokenId}`
-    });
-  });
-
-  [...visibleNfts, ...hiddenNfts].forEach(nft => {
-    collectives.push({
-      type: 'nft',
-      date: nft.timeLastUpdated,
-      id: nft.tokenId,
-      image: nft.image ?? nft.imageThumb,
-      title: nft.title,
-      link: ''
-    });
-  });
+  const collectives: Collective[] = [
+    ...hiddenPoaps.map(poap => transformPoap(poap, true)),
+    ...visiblePoaps.map(poap => transformPoap(poap, false)),
+    ...visibleNfts.map(nft => transformNft(nft, true)),
+    ...hiddenNfts.map(poap => transformNft(poap, false))
+  ];
 
   collectives.sort((collectiveA, collectiveB) => new Date(collectiveB.date) > new Date(collectiveA.date) ? 1 : -1);
 
@@ -146,6 +170,16 @@ export default function ProfileItems ({ user }: Pick<UserDetailsProps, 'user'>) 
             key={collective.id}
           >
             <ProfileItem
+              showVisibilityIcon={!isPublic}
+              visible={!collective.isHidden}
+              onClick={() => {
+                if (collective.type === 'nft') {
+                  mutateNfts();
+                }
+                else {
+                  mutatePoaps();
+                }
+              }}
               collective={collective}
             />
             <Divider sx={{
@@ -154,23 +188,6 @@ export default function ProfileItems ({ user }: Pick<UserDetailsProps, 'user'>) 
             />
           </Box>
         ))}
-        {
-        !isPublic && poapData && (
-          <ManageProfileItemModal
-            isOpen={managePoapModalState.isOpen}
-            close={managePoapModalState.close}
-            save={async () => {
-              mutatePoaps();
-              mutateNfts();
-              managePoapModalState.close();
-            }}
-            hiddenNfts={hiddenNfts}
-            visibleNfts={visibleNfts}
-            visiblePoaps={visiblePoaps}
-            hiddenPoaps={hiddenPoaps}
-          />
-        )
-      }
       </Stack>
     </Box>
   ) : null;
