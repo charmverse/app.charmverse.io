@@ -41,7 +41,8 @@
     "test:debug": "dotenv -e .env.test.local --override -- node --inspect-brk --expose-gc ./node_modules/.bin/jest --runInBand --logHeapUsage --config='./jest.config-server.ts' --verbose",
     "test:server": "npm run test:server:ci -- --verbose --watch",
     "test:server:ci": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local --override -- npx jest --config='./jest.config-server.ts'",
-    "test:browser:ci": "dotenv -e .env.test.local --override -- npx jest --config='./jest.config-browser.ts'"
+    "test:browser:ci": "dotenv -e .env.test.local --override -- npx jest --config='./jest.config-browser.ts'",
+    "test:browser:ci:e2e": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local -- npx playwright test"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

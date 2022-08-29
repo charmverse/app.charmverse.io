@@ -55,7 +55,7 @@ jobs:
         run: sudo npx playwright install-deps && npx playwright install
 
       - name: Run browser e2e tests
-        run: npx playwright test
+        run: npm run test:browser:ci:e2e
 
   deploy:
     name: Deploy to production

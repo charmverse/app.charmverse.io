@@ -100,7 +100,7 @@ const config: PlaywrightTestConfig = {
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'NODE_OPTIONS="--max_old_space_size=4096" npm run start',
+    command: 'dotenv -e .env.test.local -- npm run start',
     port: 3335,
     reuseExistingServer: true
   }
