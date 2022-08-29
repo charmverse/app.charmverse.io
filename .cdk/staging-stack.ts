@@ -16,7 +16,7 @@ export class CdkDeployStack extends Stack {
       path: `${__dirname}/../deploy.zip`,
     });
     // Create a ElasticBeanStalk app. - must be 40 characters or less
-    const appName = sanitizeAppName('CharmVerse-staging-' + process.env.STAGE);
+    const appName = sanitizeAppName('stg-charmverse-' + process.env.STAGE);
 
     const ebApp = new elasticbeanstalk.CfnApplication(this, 'Application', {
       applicationName: appName,
