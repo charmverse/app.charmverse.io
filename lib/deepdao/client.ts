@@ -30,7 +30,7 @@ export async function getProfile (address: string, apiToken = DEEPDAO_API_KEY): 
     return null;
   }
 
-  return fetch<GetProfileResponse>(`${DEEP_DAO_BASE_URL}/v0.1/people/profile/0xef8305e140ac520225daf050e2f71d5fbcc543e7`, {
+  return fetch<GetProfileResponse>(`${DEEP_DAO_BASE_URL}/v0.1/people/profile/${address}`, {
     method: 'GET',
     headers: {
       'x-api-key': apiToken

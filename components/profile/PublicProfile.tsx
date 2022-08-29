@@ -2,16 +2,43 @@ import { Box, Chip, Divider, Stack, Typography } from '@mui/material';
 import useSWRImmutable from 'swr/immutable';
 import charmClient from 'charmClient';
 import { sortDeepdaoOrgs } from 'lib/deepdao/sortDeepdaoOrgs';
+import { ExtendedPoap } from 'models';
+import { NftData } from 'lib/nft/interfaces';
 import AggregatedData from './components/AggregatedData';
 import UserDetails, { isPublicUser, UserDetailsProps } from './components/UserDetails';
-import ProfileItems from './components/ProfileItems';
+import { Collective, ProfileItemsList } from './components/ProfileItems';
 import DeepDaoOrganizationRow, { OrganizationDetails } from './components/DeepDaoOrganizationRow';
 
+function transformPoap (poap: ExtendedPoap): Collective {
+  return {
+    type: 'poap',
+    date: poap.created as string,
+    id: poap.tokenId,
+    image: poap.imageURL,
+    title: poap.name,
+    link: `https://app.poap.xyz/token/${poap.tokenId}`,
+    isHidden: poap.isHidden
+  };
+}
+
+function transformNft (nft: NftData): Collective {
+  return {
+    type: 'nft',
+    date: nft.timeLastUpdated,
+    id: nft.tokenId,
+    image: nft.image ?? nft.imageThumb,
+    title: nft.title,
+    link: '',
+    isHidden: nft.isHidden
+  };
+}
+
 export default function PublicProfile (props: UserDetailsProps) {
-  const { data, mutate } = useSWRImmutable(props.user ? `userAggregatedData/${props.user.id}` : null, () => {
-    return charmClient.getAggregatedData(props.user.id);
+  const { user } = props;
+  const { data, mutate } = useSWRImmutable(user ? `userAggregatedData/${user.id}` : null, () => {
+    return charmClient.getAggregatedData(user.id);
   });
-  const isPublic = isPublicUser(props.user);
+  const isPublic = isPublicUser(user);
 
   const sortedOrganizations = data ? sortDeepdaoOrgs(data) : [];
 
@@ -23,6 +50,39 @@ export default function PublicProfile (props: UserDetailsProps) {
     }
     else {
       visibleDaos.push(dao);
+    }
+  });
+
+  const { data: poapData, mutate: mutatePoaps } = useSWRImmutable(`/poaps/${user.id}/${isPublic}`, () => {
+    return isPublicUser(user)
+      ? Promise.resolve(user.visiblePoaps as ExtendedPoap[])
+      : charmClient.getUserPoaps();
+  });
+
+  const { data: nftData, mutate: mutateNfts } = useSWRImmutable(`/nfts/${user.id}/${isPublic}`, () => {
+    return isPublicUser(user)
+      ? Promise.resolve(user.visibleNfts)
+      : charmClient.nft.list(user.id);
+  });
+
+  const hiddenCollectives: Collective[] = [];
+  const visibleCollectives: Collective[] = [];
+
+  poapData?.forEach(poap => {
+    if (poap.isHidden) {
+      hiddenCollectives.push(transformPoap(poap));
+    }
+    else {
+      visibleCollectives.push(transformPoap(poap));
+    }
+  });
+
+  nftData?.forEach(nft => {
+    if (nft.isHidden) {
+      hiddenCollectives.push(transformNft(nft));
+    }
+    else {
+      visibleCollectives.push(transformNft(nft));
     }
   });
 
@@ -55,11 +115,13 @@ export default function PublicProfile (props: UserDetailsProps) {
     }
   }
 
+  const totalHiddenItems = hiddenCollectives.length + hiddenDaos.length;
+
   return (
     <Stack spacing={2}>
       <UserDetails {...props} />
       <Divider />
-      <AggregatedData user={props.user} />
+      <AggregatedData user={user} />
       {data && visibleDaos.length !== 0 ? (
         <>
           <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
@@ -96,28 +158,75 @@ export default function PublicProfile (props: UserDetailsProps) {
           </Stack>
         </>
       ) : null}
-      <ProfileItems user={props.user} />
-      {!isPublic && data && hiddenDaos.length !== 0 ? (
-        <Stack gap={2}>
-          {hiddenDaos.map(organization => (
-            <Box
-              key={organization.organizationId}
-            >
-              <DeepDaoOrganizationRow
-                onClick={() => {
-                  updateDaoProfileItem(organization);
+
+      {visibleCollectives.length ? (
+        <Box>
+          <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
+            <Stack flexDirection='row' gap={1} alignItems='center'>
+              <Typography
+                sx={{
+                  typography: {
+                    sm: 'h1',
+                    xs: 'h2'
+                  }
                 }}
-                visible={false}
-                showVisibilityIcon={!isPublic}
-                organization={organization}
-              />
-              <Divider sx={{
-                mt: 2
-              }}
-              />
-            </Box>
-          ))}
-        </Stack>
+              >NFTs & POAPs
+              </Typography>
+            </Stack>
+            <Chip label={visibleCollectives.length} />
+          </Stack>
+          <ProfileItemsList
+            collectives={visibleCollectives.sort((collectiveA, collectiveB) => new Date(collectiveB.date) > new Date(collectiveA.date) ? 1 : -1)}
+            isPublic={isPublic}
+            mutateNfts={mutateNfts}
+            mutatePoaps={mutatePoaps}
+          />
+        </Box>
+      ) : null}
+
+      {totalHiddenItems && !isPublic && data ? (
+        <Box>
+          <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
+            <Stack flexDirection='row' gap={1} alignItems='center'>
+              <Typography
+                sx={{
+                  typography: {
+                    sm: 'h1',
+                    xs: 'h2'
+                  }
+                }}
+              >Hidden items
+              </Typography>
+            </Stack>
+            <Chip label={hiddenCollectives.length + hiddenDaos.length} />
+          </Stack>
+          <Stack gap={2} my={2}>
+            {hiddenDaos.map(organization => (
+              <Box
+                key={organization.organizationId}
+              >
+                <DeepDaoOrganizationRow
+                  onClick={() => {
+                    updateDaoProfileItem(organization);
+                  }}
+                  visible={false}
+                  showVisibilityIcon={!isPublic}
+                  organization={organization}
+                />
+                <Divider sx={{
+                  mt: 2
+                }}
+                />
+              </Box>
+            ))}
+          </Stack>
+          <ProfileItemsList
+            collectives={hiddenCollectives.sort((collectiveA, collectiveB) => new Date(collectiveB.date) > new Date(collectiveA.date) ? 1 : -1)}
+            isPublic={isPublic}
+            mutateNfts={mutateNfts}
+            mutatePoaps={mutatePoaps}
+          />
+        </Box>
       ) : null}
     </Stack>
   );
