@@ -145,7 +145,7 @@ export default function ShareToWeb ({ pageId, pagePermissions, refreshPermission
                 disabled
                 value={shareLink}
                 endAdornment={(
-                  <CopyToClipboard text={shareLink} onCopy={onCopy}>
+                  <CopyToClipboard data-test='copy-button' text={shareLink} onCopy={onCopy}>
                     <InputAdornment position='end'>
                       <CopyButton>
                         {copied ? 'Copied!' : 'Copy'}

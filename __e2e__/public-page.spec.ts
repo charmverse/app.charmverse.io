@@ -5,8 +5,8 @@ import { createUserAndSpace } from 'testing/playwright';
 let browser: Browser;
 
 test.beforeAll(async () => {
-  // Change headless to false to visually debug the test
-  browser = await chromium.launch({ headless: true });
+  // Set headless to false in chromium.launch to visually debug the test
+  browser = await chromium.launch();
 });
 
 test('public page - makes a page public', async () => {
