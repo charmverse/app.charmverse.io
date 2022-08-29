@@ -15,7 +15,7 @@ handler
   .get(getUserPoaps);
 
 async function getUserPoaps (req: NextApiRequest, res: NextApiResponse<GetPoapsResponse | { error: any }>) {
-  const hiddenPoapIDs: Array<string> = (await prisma.profileItem.findMany({
+  const hiddenPoapIDs: string[] = (await prisma.profileItem.findMany({
     where: {
       userId: req.session.user.id,
       isHidden: true,

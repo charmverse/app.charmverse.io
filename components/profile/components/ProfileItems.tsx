@@ -2,8 +2,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import { Chip, Divider, IconButton, Link, Stack, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import charmClient from 'charmClient';
-import { GetNftsResponse } from 'charmClient/apis/interface';
 import Avatar from 'components/common/Avatar';
+import { GetNftsResponse } from 'lib/nft/interfaces';
 import { GetPoapsResponse } from 'lib/poap';
 import { showDateWithMonthAndYear } from 'lib/utilities/dates';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -20,7 +20,7 @@ interface Collective {
   link: string
 }
 
-function UserCollectiveRow ({ collective }: {collective: Collective}) {
+function ProfileItem ({ collective }: {collective: Collective}) {
 
   return (
     <Stack
@@ -54,7 +54,7 @@ function UserCollectiveRow ({ collective }: {collective: Collective}) {
   );
 }
 
-export default function UserCollectives ({ user }: Pick<UserDetailsProps, 'user'>) {
+export default function ProfileItems ({ user }: Pick<UserDetailsProps, 'user'>) {
   const isPublic = isPublicUser(user);
   const { data: poapData, mutate: mutatePoaps } = useSWRImmutable(`/poaps/${user.id}/${isPublic}`, () => {
     return isPublicUser(user)
@@ -126,7 +126,7 @@ export default function UserCollectives ({ user }: Pick<UserDetailsProps, 'user'
           <Box
             key={collective.id}
           >
-            <UserCollectiveRow
+            <ProfileItem
               collective={collective}
             />
             <Divider sx={{

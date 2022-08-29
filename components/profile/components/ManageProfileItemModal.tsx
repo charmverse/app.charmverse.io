@@ -5,7 +5,7 @@ import { Prisma, ProfileItem } from '@prisma/client';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { DialogTitle, Modal } from 'components/common/Modal';
-import { NftData } from 'lib/nft/types';
+import { NftData } from 'lib/nft/interfaces';
 import { ExtendedPoap } from 'models';
 import { useEffect, useState } from 'react';
 import AddIcon from '@mui/icons-material/Add';
@@ -19,10 +19,6 @@ type ManageProfileItemModalProps = {
     close: () => void,
     isOpen: boolean,
 };
-
-const TabPanel = styled(Box)`
-  width: 100%;
-`;
 
 const StyledImage = styled.img`
   width: 100%;
@@ -190,7 +186,7 @@ function ManageProfileItemModal (props: ManageProfileItemModalProps) {
           <Tab label='Hidden' id='hidden-tab' aria-controls='hidden-tabpanel' />
         </Tabs>
       </Box>
-      <TabPanel hidden={tabIndex !== 0} py={2}>
+      <Box hidden={tabIndex !== 0} py={2}>
         {
           shownProfileItems.length !== 0 ? (
             <ProfileItemsTab
@@ -206,8 +202,8 @@ function ManageProfileItemModal (props: ManageProfileItemModalProps) {
             </Grid>
           )
         }
-      </TabPanel>
-      <TabPanel hidden={tabIndex !== 1} py={2}>
+      </Box>
+      <Box hidden={tabIndex !== 1} py={2}>
         {
           hiddenProfileItems.length !== 0 ? (
             <ProfileItemsTab
@@ -223,7 +219,7 @@ function ManageProfileItemModal (props: ManageProfileItemModalProps) {
             </Grid>
           )
         }
-      </TabPanel>
+      </Box>
       <Box mt={4} sx={{ display: 'flex' }}>
         <Button
           onClick={() => handleSave()}

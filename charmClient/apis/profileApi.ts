@@ -1,7 +1,12 @@
+import { ProfileItem } from '@prisma/client';
 import * as http from 'adapters/http';
-import { UpdateProfileItemRequest } from 'lib/profileItem/interfaces';
 import { UserAvatar } from 'lib/users/interfaces';
 import { LoggedInUser } from 'models';
+
+export interface UpdateProfileItemRequest {
+  shownProfileItems: Pick<ProfileItem, 'id' | 'metadata' | 'type'>[];
+  hiddenProfileItems: UpdateProfileItemRequest['shownProfileItems'];
+}
 
 export class ProfileApi {
   setAvatar (data: UserAvatar) {

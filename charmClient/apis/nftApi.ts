@@ -1,5 +1,5 @@
 import * as http from 'adapters/http';
-import { GetNftsResponse } from './interface';
+import { GetNftsResponse } from 'lib/nft/interfaces';
 
 export class NftApi {
   async list (userId: string) {

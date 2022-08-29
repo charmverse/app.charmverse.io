@@ -1,11 +1,10 @@
+import { prisma } from 'db';
+import { InvalidStateError, onError, onNoMatch } from 'lib/middleware';
+import { getNFTs } from 'lib/nft/getNfts';
+import { GetNftsResponse } from 'lib/nft/interfaces';
+import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { InvalidStateError, onError, onNoMatch } from 'lib/middleware';
-import * as alchemyApi from 'lib/blockchain/provider/alchemy';
-import { withSessionRoute } from 'lib/session/withSession';
-import { mapNftFromAlchemy } from 'lib/nft/utilities/mapNftFromAlchemy';
-import { prisma } from 'db';
-import { GetNftsResponse } from 'charmClient/apis/interface';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -16,7 +15,7 @@ async function getNfts (req: NextApiRequest, res: NextApiResponse<GetNftsRespons
   // address = '0x155b6485305ccab44ef7da58ac886c62ce105cf9'
   const userId = req.query.userId as string;
 
-  const hiddenNftIds: Array<string> = (await prisma.profileItem.findMany({
+  const hiddenNftIds: string[] = (await prisma.profileItem.findMany({
     where: {
       userId,
       isHidden: true,
@@ -41,10 +40,7 @@ async function getNfts (req: NextApiRequest, res: NextApiResponse<GetNftsRespons
   }
 
   const { addresses } = user;
-  const chainId = 1;
-  const nfts = await alchemyApi.getNfts(addresses, chainId);
-
-  const mappedNfts = nfts.map(nft => mapNftFromAlchemy(nft, chainId));
+  const mappedNfts = await getNFTs(addresses);
   const hiddenNfts = mappedNfts.filter((nft) => hiddenNftIds.includes(nft.tokenId));
   const visibleNfts = mappedNfts.filter((nft) => !hiddenNftIds.includes(nft.tokenId));
 

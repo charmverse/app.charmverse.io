@@ -1,7 +1,7 @@
 import { Divider, Stack } from '@mui/material';
 import AggregatedData from './components/AggregatedData';
 import UserDetails, { UserDetailsProps } from './components/UserDetails';
-import UserCollectives from './components/UserCollectives';
+import ProfileItems from './components/ProfileItems';
 
 export default function PublicProfile (props: UserDetailsProps) {
   return (
@@ -9,7 +9,7 @@ export default function PublicProfile (props: UserDetailsProps) {
       <UserDetails {...props} />
       <Divider />
       <AggregatedData user={props.user} />
-      <UserCollectives user={props.user} />
+      <ProfileItems user={props.user} />
     </Stack>
   );
 }

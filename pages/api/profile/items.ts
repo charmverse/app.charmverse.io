@@ -1,8 +1,7 @@
 
+import { UpdateProfileItemRequest } from 'charmClient/apis/profileApi';
 import { prisma } from 'db';
-import log from 'lib/log';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { UpdateProfileItemRequest } from 'lib/profileItem/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -32,30 +31,25 @@ async function updateUserProfileItems (req: NextApiRequest, res: NextApiResponse
   }
 
   if (hiddenProfileItems.length) {
-    try {
-      await Promise.all(hiddenProfileItems.map(profileItem => prisma.profileItem.upsert({
-        where: {
-          id: profileItem.id
-        },
-        update: {
-          id: profileItem.id,
-          isHidden: true
-        },
-        create: {
-          id: profileItem.id,
-          userId: req.session.user.id,
-          metadata: profileItem.metadata === null ? undefined : profileItem.metadata,
-          isHidden: true,
-          type: profileItem.type
-        }
-      })));
-    }
-    catch (err) {
-      log.error('Error updating profile items', err);
-    }
+    await Promise.all(hiddenProfileItems.map(profileItem => prisma.profileItem.upsert({
+      where: {
+        id: profileItem.id
+      },
+      update: {
+        id: profileItem.id,
+        isHidden: true
+      },
+      create: {
+        id: profileItem.id,
+        userId: req.session.user.id,
+        metadata: profileItem.metadata === null ? undefined : profileItem.metadata,
+        isHidden: true,
+        type: profileItem.type
+      }
+    })));
   }
 
-  return res.status(200).json({});
+  return res.status(200).end();
 }
 
 export default withSessionRoute(handler);

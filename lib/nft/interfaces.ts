@@ -10,3 +10,8 @@ export type NftData = {
   imageThumb?: string
   timeLastUpdated: string
 }
+
+export interface GetNftsResponse {
+  visibleNfts: NftData[]
+  hiddenNfts: NftData[]
+}

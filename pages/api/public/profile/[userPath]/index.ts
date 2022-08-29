@@ -8,7 +8,7 @@ import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
 import { ExtendedPoap } from 'models';
 import { getPOAPs } from 'lib/poap';
-import { NftData } from 'lib/nft/types';
+import { NftData } from 'lib/nft/interfaces';
 import { getNFTs } from 'lib/nft/getNfts';
 
 export type PublicUser = Pick<User, 'id' | 'username' | 'avatar' | 'path'> & {
