@@ -13,7 +13,6 @@ interface DeepDaoParticipationScore {
 export type DeepDaoOrganization = {
   name: string
   organizationId: string
-  description: string
 }
 
 export type DeepDaoProposal = {
@@ -31,9 +30,7 @@ export type DeepDaoProposal = {
 
 export type DeepDaoVote = {
   title: string
-  daoId: string
   organizationId: string
-  choices: string[]
   voteId: string
   createdAt: string
   successful: null | boolean
