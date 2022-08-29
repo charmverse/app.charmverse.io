@@ -5,54 +5,58 @@ import Button from 'components/common/Button';
 import CheckIcon from '@mui/icons-material/Check';
 import { IdentityType } from 'models';
 
-const StyledBox = styled(Box)`
+const IntegrationName = styled(Typography)`
   background-color: ${({ theme }) => theme.palette.background.light};
-  display: inline-flex;
+  display: inline-block;
   border-radius: 7px;
-  padding: 5px 7px;
+  padding: 3px 7px;
 `;
 
 type IntegrationProps = {
     isInUse: boolean;
     icon: ReactNode;
-    actions?: Array<ReactNode>;
+    action?: ReactNode;
     identityType: IdentityType;
     name: string;
-    id: string;
+    username: string;
     useIntegration: (id: string, type: IdentityType) => void;
 };
 
 function Integration (props: IntegrationProps) {
-  const { isInUse, icon, actions = [], id, name, identityType, useIntegration } = props;
+  const { isInUse, icon, action, username, name, identityType, useIntegration } = props;
 
   return (
-    <Grid container spacing={1}>
-      <Grid item container xs={10} direction='row' alignItems='end'>
-        { icon }
-        <Typography ml={1} component='span' fontSize='1.4em' fontWeight={700}>{ name }</Typography>
+    <Grid container>
+      <Grid item xs={10}>
+        <Box py={2} px={1} display='flex' alignItems='center' gap={1}>
+          { icon }
+          <div>
+            <Typography fontSize='1.4em' fontWeight={700}>
+              { username }
+              { action }
+            </Typography>
+            <IntegrationName variant='caption'>
+              { name }
+            </IntegrationName>
+          </div>
+        </Box>
       </Grid>
-      <Grid item container direction='column' xs={2} spacing={1}>
-        <Grid item container direction='row'>
+      <Grid item container direction='column' xs={2}>
+        <Box display='flex' alignItems='center' justifyContent='flex-end' height='100%'>
           {
-            isInUse ? (<><CheckIcon /><Typography ml={1}>In use</Typography></>) : (
-              <Button
-                onClick={() => useIntegration(id, identityType)}
-              >
-                Use
+            isInUse ? (
+              <>
+                <CheckIcon fontSize='small' /><Typography ml={1} variant='body2'>Selected</Typography>
+              </>
+            ) : (
+              <Button size='small' onClick={() => useIntegration(username, identityType)}>
+                Select
               </Button>
             )
           }
-        </Grid>
+        </Box>
       </Grid>
-      <Grid item container xs={10} alignItems='center'>
-        <StyledBox mr={1}>
-          { id }
-        </StyledBox>
-        {
-          actions.map((action) => action)
-        }
-      </Grid>
-      <Grid item xs={12} py={2}>
+      <Grid item xs={12}>
         <Divider />
       </Grid>
     </Grid>
