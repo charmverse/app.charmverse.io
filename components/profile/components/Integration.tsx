@@ -6,7 +6,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import { IdentityType } from 'models';
 
 const IntegrationName = styled(Typography)`
-  background-color: ${({ theme }) => theme.palette.background.light};
+  background-color: ${({ theme }) => theme.palette.background.dark};
   display: inline-block;
   border-radius: 7px;
   padding: 3px 7px;
@@ -28,18 +28,18 @@ function Integration (props: IntegrationProps) {
   return (
     <Grid container>
       <Grid item xs={10}>
-        <Box py={2} px={1} display='flex' alignItems='center' gap={1}>
-          { icon }
-          <div>
+        <Box py={2} px={1}>
+          <Box display='flex' gap={1} alignItems='flex-end' mb={1}>
+            { icon }
             {/* use smaller font size fofr wallet addresses and larger strings */}
-            <Typography fontSize={username.length < 40 ? '1.4em' : '.9em'} fontWeight={700}>
+            <Typography component='span' fontSize={username.length < 40 ? '1.4em' : '.9em'} fontWeight={700}>
               { username }
               { action }
             </Typography>
-            <IntegrationName variant='caption'>
-              { name }
-            </IntegrationName>
-          </div>
+          </Box>
+          <IntegrationName variant='caption'>
+            { name }
+          </IntegrationName>
         </Box>
       </Grid>
       <Grid item container direction='column' xs={2}>
