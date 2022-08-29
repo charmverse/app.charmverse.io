@@ -91,7 +91,7 @@ export default function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>
                   xs: 'h2'
                 }
               }}
-            >Organizations
+            >Communities
             </Typography>
             <Chip label={sortedOrganizations.length} />
           </Stack>
