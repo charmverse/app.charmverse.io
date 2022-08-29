@@ -30,7 +30,7 @@ async function updateUserProfileItems (req: NextApiRequest, res: NextApiResponse
   });
 
   if (shownProfileItems.length) {
-    const ids: string[] = shownProfileItems.map((profileItem) => profileItem.id || '');
+    const ids: string[] = shownProfileItems.map((profileItem) => profileItem.id);
     await prisma.profileItem.updateMany({
       where: {
         id: {
