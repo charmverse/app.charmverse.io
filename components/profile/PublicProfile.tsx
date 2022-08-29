@@ -87,32 +87,30 @@ export default function PublicProfile (props: UserDetailsProps) {
   });
 
   async function updateDaoProfileItem (organization: OrganizationDetails) {
-    if (data) {
-      await charmClient.profile.updateProfileItem({
-        profileItems: [{
-          id: organization.organizationId,
-          isHidden: !organization.isHidden,
-          type: 'dao',
-          metadata: null
-        }]
-      });
-      mutate(() => {
-        return {
-          ...data,
-          organizations: data.organizations.map(dao => {
-            if (dao.organizationId === organization.organizationId) {
-              return {
-                ...dao,
-                isHidden: !organization.isHidden
-              };
-            }
-            return dao;
-          })
-        };
-      }, {
-        revalidate: false
-      });
-    }
+    await charmClient.profile.updateProfileItem({
+      profileItems: [{
+        id: organization.organizationId,
+        isHidden: !organization.isHidden,
+        type: 'dao',
+        metadata: null
+      }]
+    });
+    mutate((aggregateData) => {
+      return aggregateData ? {
+        ...aggregateData,
+        organizations: aggregateData.organizations.map(dao => {
+          if (dao.organizationId === organization.organizationId) {
+            return {
+              ...dao,
+              isHidden: !organization.isHidden
+            };
+          }
+          return dao;
+        })
+      } : undefined;
+    }, {
+      revalidate: false
+    });
   }
 
   const totalHiddenItems = hiddenCollectives.length + hiddenDaos.length;

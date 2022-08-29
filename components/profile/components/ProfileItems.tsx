@@ -114,10 +114,40 @@ export function ProfileItemsList ({ collectives, isPublic, mutateNfts, mutatePoa
                 }]
               });
               if (collective.type === 'nft') {
-                mutateNfts();
+                mutateNfts((nftData) => {
+                  if (nftData) {
+                    return nftData.map(nft => {
+                      if (nft.tokenId === collective.id) {
+                        return {
+                          ...nft,
+                          isHidden: !collective.isHidden
+                        };
+                      }
+                      return nft;
+                    });
+                  }
+                  return nftData;
+                }, {
+                  revalidate: false
+                });
               }
               else {
-                mutatePoaps();
+                mutatePoaps((poapData) => {
+                  if (poapData) {
+                    return poapData.map(poap => {
+                      if (poap.tokenId === collective.id) {
+                        return {
+                          ...poap,
+                          isHidden: !collective.isHidden
+                        };
+                      }
+                      return poap;
+                    });
+                  }
+                  return poapData;
+                }, {
+                  revalidate: false
+                });
               }
             }}
             collective={collective}
