@@ -1,5 +1,5 @@
 import EditIcon from '@mui/icons-material/Edit';
-import { Chip, Divider, IconButton, Link, Stack, Typography } from '@mui/material';
+import { Chip, Divider, IconButton, Link, Stack, Tooltip, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
@@ -8,6 +8,8 @@ import { GetPoapsResponse } from 'lib/poap';
 import { showDateWithMonthAndYear } from 'lib/utilities/dates';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import useSWRImmutable from 'swr/immutable';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { useTheme } from '@emotion/react';
 import ManageProfileItemModal from './ManageProfileItemModal';
 import { isPublicUser, UserDetailsProps } from './UserDetails';
 
@@ -21,6 +23,7 @@ interface Collective {
 }
 
 function ProfileItem ({ collective }: {collective: Collective}) {
+  const theme = useTheme();
 
   return (
     <Stack
@@ -28,6 +31,20 @@ function ProfileItem ({ collective }: {collective: Collective}) {
         flexDirection: {
           sm: 'row',
           xs: 'column'
+        },
+        '&:hover .action': {
+          opacity: 1,
+          transition: theme.transitions.create('opacity', {
+            duration: theme.transitions.duration.short,
+            easing: theme.transitions.easing.easeInOut
+          })
+        },
+        '.action': {
+          opacity: 0,
+          transition: theme.transitions.create('opacity', {
+            duration: theme.transitions.duration.short,
+            easing: theme.transitions.easing.easeInOut
+          })
         }
       }}
       gap={2}
@@ -38,16 +55,27 @@ function ProfileItem ({ collective }: {collective: Collective}) {
         </Link>
       ) : <Avatar isNft size='large' avatar={collective.image} />}
       <Stack justifyContent='center'>
-        <Typography
-          fontWeight='bold'
-          sx={{
-            fontSize: {
-              sm: '1.15rem',
-              xs: '1.05rem'
-            }
-          }}
-        >{collective.title}
-        </Typography>
+        <Box
+          display='flex'
+          gap={1}
+          alignItems='center'
+        >
+          <Typography
+            fontWeight='bold'
+            sx={{
+              fontSize: {
+                sm: '1.15rem',
+                xs: '1.05rem'
+              }
+            }}
+          >{collective.title}
+          </Typography>
+          <IconButton size='small'>
+            <Tooltip title={`Hide ${collective.type.toUpperCase()} from profile`}>
+              <VisibilityOffIcon className='action' fontSize='small' />
+            </Tooltip>
+          </IconButton>
+        </Box>
         <Typography variant='subtitle2'>{showDateWithMonthAndYear(collective.date) ?? '?'}</Typography>
       </Stack>
     </Stack>
