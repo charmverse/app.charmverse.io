@@ -1,5 +1,5 @@
 import React from 'react';
-import { Snackbar } from '@mui/material';
+import Snackbar from 'components/common/Snackbar';
 import HexagonalAvatarMask from 'components/common/HexagonalAvatarMask';
 import SetAvatarPopup from 'components/profile/components/SetAvatarPopup/SetAvatarPopup';
 
