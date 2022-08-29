@@ -38,10 +38,10 @@ export async function getProfile (address: string, apiToken = DEEPDAO_API_KEY): 
   });
 }
 
-export async function getAllOrganizations (apiToken = DEEPDAO_API_KEY): Promise<GetAllDeepDaoOrganizationsResponse | null> {
+export async function getAllOrganizations (apiToken = DEEPDAO_API_KEY): Promise<GetAllDeepDaoOrganizationsResponse> {
   if (!apiToken) {
     log.debug('Skip request: No API Key for DeepDAO');
-    return null;
+    return { data: { resources: [], totalResources: 0 } };
   }
 
   return fetch<GetAllDeepDaoOrganizationsResponse>(`${DEEP_DAO_BASE_URL}/v0.1/organizations`, {

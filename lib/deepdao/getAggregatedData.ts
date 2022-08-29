@@ -31,11 +31,10 @@ export async function getAggregatedData (userPath: string, apiToken?: string): P
 
   const allOrganizations = await getAllOrganizations(apiToken);
 
-  const daoLogos: Record<string, string | null> = {};
-
-  allOrganizations?.data.resources.forEach(org => {
-    daoLogos[org.organizationId] = org.logo;
-  });
+  const daoLogos = allOrganizations.data.resources.reduce<Record<string, string | null>>((logos, org) => {
+    logos[org.organizationId] = org.logo;
+    return logos;
+  }, {});
 
   const [completedBountiesCount, userWorkspaces] = await Promise.all([
     getCompletedApplicationsOfUser(user.id),
