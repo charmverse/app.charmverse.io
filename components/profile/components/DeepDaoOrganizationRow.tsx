@@ -18,21 +18,21 @@ const TASK_TABS = [
 ] as const;
 
 interface DeepDaoEvent {
-  id: string
-  title: string
-  createdAt: string
-  verdict: boolean
+  id: string;
+  title: string;
+  createdAt: string;
+  verdict: boolean;
 }
 
 export type OrganizationDetails = DeepDaoOrganization & {
-  proposals: DeepDaoProposal[],
-  votes: DeepDaoVote[],
-  oldestEventDate: string,
-  latestEventDate: string
+  proposals: DeepDaoProposal[];
+  votes: DeepDaoVote[];
+  joinDate?: string;
+  latestEventDate?: string;
 }
 
 interface DeepDaoOrganizationRowProps {
-  organization: OrganizationDetails
+  organization: OrganizationDetails;
 }
 
 export default function DeepDaoOrganizationRow ({ organization }: DeepDaoOrganizationRowProps) {
@@ -64,6 +64,7 @@ export default function DeepDaoOrganizationRow ({ organization }: DeepDaoOrganiz
         <Avatar
           avatar={organization.logo}
           name={organization.name}
+          variant='rounded'
           size='large'
         />
         <Stack width='100%' justifyContent='center'>
@@ -85,7 +86,11 @@ export default function DeepDaoOrganizationRow ({ organization }: DeepDaoOrganiz
               {isCollapsed ? <ExpandMoreIcon fontSize='small' /> : <ExpandLessIcon fontSize='small' />}
             </IconButton>
           </Stack>
-          {organization.oldestEventDate && organization.latestEventDate && <Typography variant='subtitle2'>{showDateWithMonthAndYear(organization.oldestEventDate)} - {showDateWithMonthAndYear(organization.latestEventDate)}</Typography>}
+          {organization.joinDate && (
+            <Typography variant='subtitle2'>
+              {showDateWithMonthAndYear(organization.joinDate)} - {organization.latestEventDate ? showDateWithMonthAndYear(organization.latestEventDate) : 'Present'}
+            </Typography>
+          )}
 
         </Stack>
       </Box>

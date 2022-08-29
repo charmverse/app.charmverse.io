@@ -22,7 +22,7 @@ export async function getAggregatedData (userPath: string, apiToken?: string): P
   }
 
   const profiles = (await Promise.all(
-    user.addresses.map(address => getProfile(address, apiToken)
+    ['0x155b6485305ccab44ef7da58ac886c62ce105cf9'].map(address => getProfile(address, apiToken)
       .catch(error => {
         log.error('Error calling DEEP DAO API', error);
         return null;
@@ -31,10 +31,10 @@ export async function getAggregatedData (userPath: string, apiToken?: string): P
 
   const allOrganizations = await getAllOrganizations(apiToken);
 
-  const organizationsRecord: Record<string, string | null> = {};
+  const daoLogos: Record<string, string | null> = {};
 
   allOrganizations?.data.resources.forEach(org => {
-    organizationsRecord[org.organizationId] = org.logo;
+    daoLogos[org.organizationId] = org.logo;
   });
 
   const [completedBountiesCount, userWorkspaces] = await Promise.all([
@@ -75,18 +75,26 @@ export async function getAggregatedData (userPath: string, apiToken?: string): P
     }
   });
 
+  const deepDaoOrgs = Object.values(profiles).map(profile => profile.data.organizations).flat()
+    .map(org => ({
+      ...org,
+      // sometimes the logo is just a filename, do some basic validation
+      logo: daoLogos[org.organizationId]?.includes('http') ? daoLogos[org.organizationId] : null
+    }));
+  const charmVerseOrgs = userWorkspaces.map(userWorkspace => ({
+    joinDate: userWorkspace.spaceRoles.find(spaceRole => spaceRole.userId === user.id)?.createdAt.toISOString(),
+    organizationId: userWorkspace.id,
+    name: userWorkspace.name,
+    logo: userWorkspace.spaceImage
+  }));
+
+  const allOrgs = [...deepDaoOrgs, ...charmVerseOrgs];
+  // const organizations: DeepDaoOrganization[] = allOrgs.map(org => ({ ...org, isHidden: hiddenDaoProfileItemIds.includes(org.organizationId) }));
+
   return {
     totalProposals: profiles.reduce((acc, profile) => acc + profile.data.totalProposals, 0),
     totalVotes: profiles.reduce((acc, profile) => acc + profile.data.totalVotes, 0),
-    organizations:
-      [
-        ...profiles.reduce<DeepDaoProfile['organizations']>((orgs, profile) => ([...orgs, ...profile.data.organizations]), []).map(org => ({ ...org, logo: organizationsRecord[org.organizationId] })),
-        ...userWorkspaces.map(userWorkspace => ({
-          organizationId: userWorkspace.id,
-          name: userWorkspace.name,
-          logo: userWorkspace.spaceImage
-        } as DeepDaoOrganization))
-      ],
+    organizations: allOrgs,
     proposals: profiles.reduce<DeepDaoProfile['proposals']>((proposals, profile) => ([...proposals, ...profile.data.proposals]), []),
     votes: [
       // Deepdao votes
