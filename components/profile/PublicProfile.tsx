@@ -160,17 +160,15 @@ export default function PublicProfile (props: UserDetailsProps) {
       {visibleCollectives.length ? (
         <Box>
           <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
-            <Stack flexDirection='row' gap={1} alignItems='center'>
-              <Typography
-                sx={{
-                  typography: {
-                    sm: 'h1',
-                    xs: 'h2'
-                  }
-                }}
-              >NFTs & POAPs
-              </Typography>
-            </Stack>
+            <Typography
+              sx={{
+                typography: {
+                  sm: 'h1',
+                  xs: 'h2'
+                }
+              }}
+            >NFTs & POAPs
+            </Typography>
             <Chip label={visibleCollectives.length} />
           </Stack>
           <ProfileItemsList
@@ -184,21 +182,18 @@ export default function PublicProfile (props: UserDetailsProps) {
 
       {totalHiddenItems && !isPublic && data ? (
         <Box>
-          <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
-            <Stack flexDirection='row' gap={1} alignItems='center'>
-              <Typography
-                sx={{
-                  typography: {
-                    sm: 'h1',
-                    xs: 'h2'
-                  }
-                }}
-              >Hidden items
-              </Typography>
-            </Stack>
+          <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={1}>
+            <Typography
+              sx={{
+                fontWeight: 'bold',
+                fontSize: '1.25rem'
+              }}
+              color='secondary'
+            >Hidden items
+            </Typography>
             <Chip label={hiddenCollectives.length + hiddenDaos.length} />
           </Stack>
-          <Stack gap={2} my={2}>
+          <Stack gap={2} my={1}>
             {hiddenDaos.map(organization => (
               <Box
                 key={organization.organizationId}
