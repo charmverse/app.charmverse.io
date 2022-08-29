@@ -56,20 +56,6 @@ describe('GET /api/public/profile/[userPath]', () => {
       userId: user.id
     });
 
-    const participationScoreScope = nock(DEEP_DAO_BASE_URL as string)
-      .get(`/v0.1/people/participation_score/${walletAddresses[0]}`)
-      .reply(200, {
-        data: {
-          daos: 4
-        }
-      })
-      .get(`/v0.1/people/participation_score/${walletAddresses[1]}`)
-      .reply(200, {
-        data: {
-          daos: 6
-        }
-      });
-
     const profileScope = nock(DEEP_DAO_BASE_URL as string)
       .get(`/v0.1/people/profile/${walletAddresses[0]}`)
       .reply(200, {
@@ -94,17 +80,18 @@ describe('GET /api/public/profile/[userPath]', () => {
 
     const aggregatedData = await getAggregatedData(user.id, 'dummy_key');
 
-    expect(participationScoreScope.isDone());
     expect(profileScope.isDone());
 
     expect(aggregatedData).toStrictEqual({
-      daos: 11,
       bounties: 1,
       totalProposals: 3,
       totalVotes: 4,
       votes: ['vote 1', 'vote 2'],
       proposals: ['proposal 1', 'proposal 2'],
-      organizations: ['organization 1', 'organization 2']
+      organizations: ['organization 1', 'organization 2', {
+        name: space.name,
+        organizationId: space.id
+      }]
     });
   });
 });

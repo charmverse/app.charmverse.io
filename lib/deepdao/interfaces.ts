@@ -13,7 +13,6 @@ interface DeepDaoParticipationScore {
 export type DeepDaoOrganization = {
   name: string
   organizationId: string
-  description: string
 }
 
 export type DeepDaoProposal = {
@@ -31,9 +30,7 @@ export type DeepDaoProposal = {
 
 export type DeepDaoVote = {
   title: string
-  daoId: string
   organizationId: string
-  choices: string[]
   voteId: string
   createdAt: string
   successful: null | boolean
@@ -51,4 +48,4 @@ export type DeepDaoProfile = {
 export type GetParticipationScoreResponse = DeepDaoApiResponse<DeepDaoParticipationScore>
 export type GetProfileResponse = DeepDaoApiResponse<DeepDaoProfile>
 
-export type DeepDaoAggregateData = Pick<DeepDaoParticipationScore, 'daos'> & Pick<DeepDaoProfile, 'organizations' | 'totalProposals' | 'totalVotes' | 'proposals' | 'votes'> & {bounties: number}
+export type DeepDaoAggregateData = Pick<DeepDaoProfile, 'organizations' | 'totalProposals' | 'totalVotes' | 'proposals' | 'votes'> & {bounties: number}
