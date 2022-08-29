@@ -56,7 +56,7 @@ export default async function loginByDiscord ({ code, hostName }: { code: string
   }
 }
 
-export async function logSignupViaDiscord () {
+async function logSignupViaDiscord () {
   postToDiscord({
     funnelStage: 'acquisition',
     eventType: 'create_user',
