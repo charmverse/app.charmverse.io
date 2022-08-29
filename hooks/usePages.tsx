@@ -72,7 +72,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     const isPublicBountiesPage = (router.route === '/share/[...pageId]') && (router.query.pageId?.[1] === 'bounties');
     if (isPublicBountiesPage) {
       // retrieve the pages we need for public bounties
-      return charmClient.listBounties(space.id, true)
+      return charmClient.bounties.listBounties(space.id, true)
         .then(bounties => bounties.map(bounty => bounty.page).filter(isTruthy));
     }
     else {

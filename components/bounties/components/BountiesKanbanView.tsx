@@ -36,7 +36,7 @@ export default function BountiesKanbanView ({ bounties, refreshBounty }: Omit<Pr
   });
 
   async function closeBounty (bountyId: string) {
-    await charmClient.closeBounty(bountyId);
+    await charmClient.bounties.closeBounty(bountyId);
     if (refreshBounty) {
       refreshBounty(bountyId);
     }

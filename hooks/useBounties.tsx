@@ -50,7 +50,7 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
     if (space?.id) {
       setIsLoading(true);
       setBounties([]);
-      charmClient.listBounties(space?.id)
+      charmClient.bounties.listBounties(space?.id)
         .then(_bounties => {
           setBounties(_bounties);
           setIsLoading(false);
@@ -81,7 +81,7 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
 
   async function updateBounty (bountyId: string, bountyUpdate: UpdateableBountyFields) {
 
-    const updatedBounty = await charmClient.updateBounty({ bountyId, updateContent: bountyUpdate });
+    const updatedBounty = await charmClient.bounties.updateBounty({ bountyId, updateContent: bountyUpdate });
 
     refreshBountyList(updatedBounty);
 
@@ -101,7 +101,7 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
         setCurrentBounty(bountyFromCache);
       }
       // get latest state just in case
-      const refreshed = await charmClient.getBounty(id);
+      const refreshed = await charmClient.bounties.getBounty(id);
       refreshBountyList(refreshed);
       setCurrentBounty(refreshed);
     }
@@ -134,7 +134,7 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
   }
 
   async function deleteBounty (bountyId: string): Promise<true> {
-    await charmClient.deleteBounty(bountyId);
+    await charmClient.bounties.deleteBounty(bountyId);
     setBounties(_bounties => _bounties.filter(bounty => bounty.id !== bountyId));
     if (currentBounty?.id === bountyId) {
       setCurrentBounty(null);
@@ -143,7 +143,7 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
   }
 
   async function refreshBounty (bountyId: string) {
-    const refreshed = await charmClient.getBounty(bountyId);
+    const refreshed = await charmClient.bounties.getBounty(bountyId);
     if (currentBounty?.id === bountyId) {
       setCurrentBounty(refreshed);
     }
