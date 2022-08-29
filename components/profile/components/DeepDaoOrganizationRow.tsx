@@ -27,7 +27,7 @@ interface DeepDaoEvent {
 export type OrganizationDetails = DeepDaoOrganization & {
   proposals: DeepDaoProposal[];
   votes: DeepDaoVote[];
-  joinDate?: string;
+  joinDate: string;
   latestEventDate?: string;
 }
 
