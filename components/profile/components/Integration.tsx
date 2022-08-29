@@ -31,7 +31,8 @@ function Integration (props: IntegrationProps) {
         <Box py={2} px={1} display='flex' alignItems='center' gap={1}>
           { icon }
           <div>
-            <Typography fontSize='1.4em' fontWeight={700}>
+            {/* use smaller font size fofr wallet addresses and larger strings */}
+            <Typography fontSize={username.length < 40 ? '1.4em' : '.9em'} fontWeight={700}>
               { username }
               { action }
             </Typography>
