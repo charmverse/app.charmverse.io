@@ -10,6 +10,7 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import { showDateWithMonthAndYear } from 'lib/utilities/dates';
 import { DeepDaoOrganization, DeepDaoProposal, DeepDaoVote } from 'lib/deepdao/interfaces';
+import Avatar from 'components/common/Avatar';
 
 const TASK_TABS = [
   { icon: <HowToVoteIcon />, label: 'Votes', type: 'vote' },
@@ -17,21 +18,21 @@ const TASK_TABS = [
 ] as const;
 
 interface DeepDaoEvent {
-  id: string
-  title: string
-  createdAt: string
-  verdict: boolean
+  id: string;
+  title: string;
+  createdAt: string;
+  verdict: boolean;
 }
 
 export type OrganizationDetails = DeepDaoOrganization & {
-  proposals: DeepDaoProposal[],
-  votes: DeepDaoVote[],
-  oldestEventDate: string,
-  latestEventDate: string
+  proposals: DeepDaoProposal[];
+  votes: DeepDaoVote[];
+  joinDate: string;
+  latestEventDate?: string;
 }
 
 interface DeepDaoOrganizationRowProps {
-  organization: OrganizationDetails
+  organization: OrganizationDetails;
 }
 
 export default function DeepDaoOrganizationRow ({ organization }: DeepDaoOrganizationRowProps) {
@@ -59,25 +60,40 @@ export default function DeepDaoOrganizationRow ({ organization }: DeepDaoOrganiz
 
   return (
     <Stack gap={0.5}>
-      <Stack flexDirection='row' justifyContent='space-between'>
-        <Typography
-          sx={{
-            fontSize: {
-              sm: '1.15rem',
-              xs: '1.05rem'
-            }
-          }}
-          fontWeight={500}
-        >{organization.name}
-        </Typography>
-        <IconButton
-          size='small'
-          onClick={() => setIsCollapsed(!isCollapsed)}
-        >
-          {isCollapsed ? <ExpandMoreIcon fontSize='small' /> : <ExpandLessIcon fontSize='small' />}
-        </IconButton>
-      </Stack>
-      {organization.oldestEventDate && organization.latestEventDate && <Typography variant='subtitle2'>{showDateWithMonthAndYear(organization.oldestEventDate)} - {showDateWithMonthAndYear(organization.latestEventDate)}</Typography>}
+      <Box display='flex' gap={2} flexDirection='row'>
+        <Avatar
+          avatar={organization.logo}
+          name={organization.name}
+          variant='rounded'
+          size='large'
+        />
+        <Stack width='100%' justifyContent='center'>
+          <Stack flexDirection='row' justifyContent='space-between'>
+            <Typography
+              sx={{
+                fontSize: {
+                  sm: '1.15rem',
+                  xs: '1.05rem'
+                }
+              }}
+              fontWeight={500}
+            >{organization.name}
+            </Typography>
+            <IconButton
+              size='small'
+              onClick={() => setIsCollapsed(!isCollapsed)}
+            >
+              {isCollapsed ? <ExpandMoreIcon fontSize='small' /> : <ExpandLessIcon fontSize='small' />}
+            </IconButton>
+          </Stack>
+          {organization.joinDate && (
+            <Typography variant='subtitle2'>
+              {showDateWithMonthAndYear(organization.joinDate)} - {organization.latestEventDate ? showDateWithMonthAndYear(organization.latestEventDate) : 'Present'}
+            </Typography>
+          )}
+
+        </Stack>
+      </Box>
 
       <Collapse in={!isCollapsed}>
         <Box>

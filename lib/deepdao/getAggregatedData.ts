@@ -5,8 +5,8 @@ import { getSpacesOfUser } from 'lib/spaces/getSpacesOfUser';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
 import { isTruthy } from 'lib/utilities/types';
-import { getProfile } from './client';
-import { DeepDaoAggregateData, DeepDaoOrganization, DeepDaoProfile, DeepDaoVote } from './interfaces';
+import { getAllOrganizations, getProfile } from './client';
+import { DeepDaoAggregateData, DeepDaoProfile, DeepDaoVote } from './interfaces';
 
 export async function getAggregatedData (userPath: string, apiToken?: string): Promise<DeepDaoAggregateData> {
   const user = await prisma.user.findFirst({
@@ -28,6 +28,13 @@ export async function getAggregatedData (userPath: string, apiToken?: string): P
         return null;
       }))
   )).filter(isTruthy);
+
+  const allOrganizations = await getAllOrganizations(apiToken);
+
+  const daoLogos = allOrganizations.data.resources.reduce<Record<string, string | null>>((logos, org) => {
+    logos[org.organizationId] = org.logo;
+    return logos;
+  }, {});
 
   const [completedBountiesCount, userWorkspaces] = await Promise.all([
     getCompletedApplicationsOfUser(user.id),
@@ -67,16 +74,26 @@ export async function getAggregatedData (userPath: string, apiToken?: string): P
     }
   });
 
+  const deepDaoOrgs = Object.values(profiles).map(profile => profile.data.organizations).flat()
+    .map(org => ({
+      ...org,
+      // sometimes the logo is just a filename, do some basic validation
+      logo: daoLogos[org.organizationId]?.includes('http') ? daoLogos[org.organizationId] : null
+    }));
+  const charmVerseOrgs = userWorkspaces.map(userWorkspace => ({
+    joinDate: userWorkspace.spaceRoles.find(spaceRole => spaceRole.userId === user.id)?.createdAt.toISOString(),
+    organizationId: userWorkspace.id,
+    name: userWorkspace.name,
+    logo: userWorkspace.spaceImage
+  }));
+
+  const allOrgs = [...deepDaoOrgs, ...charmVerseOrgs];
+  // const organizations: DeepDaoOrganization[] = allOrgs.map(org => ({ ...org, isHidden: hiddenDaoProfileItemIds.includes(org.organizationId) }));
+
   return {
     totalProposals: profiles.reduce((acc, profile) => acc + profile.data.totalProposals, 0),
     totalVotes: profiles.reduce((acc, profile) => acc + profile.data.totalVotes, 0),
-    organizations:
-      [...profiles.reduce<DeepDaoProfile['organizations']>((orgs, profile) => ([...orgs, ...profile.data.organizations]), []),
-        ...userWorkspaces.map(userWorkspace => ({
-          organizationId: userWorkspace.id,
-          name: userWorkspace.name
-        } as DeepDaoOrganization))
-      ],
+    organizations: allOrgs,
     proposals: profiles.reduce<DeepDaoProfile['proposals']>((proposals, profile) => ([...proposals, ...profile.data.proposals]), []),
     votes: [
       // Deepdao votes
