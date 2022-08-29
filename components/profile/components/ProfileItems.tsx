@@ -9,7 +9,7 @@ import { showDateWithMonthAndYear } from 'lib/utilities/dates';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import useSWRImmutable from 'swr/immutable';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { useTheme } from '@emotion/react';
+import styled from '@emotion/styled';
 import ManageProfileItemModal from './ManageProfileItemModal';
 import { isPublicUser, UserDetailsProps } from './UserDetails';
 
@@ -22,33 +22,24 @@ interface Collective {
   link: string
 }
 
-function ProfileItem ({ collective }: {collective: Collective}) {
-  const theme = useTheme();
+const StyledStack = styled(Stack)`
+  flex-direction: ${({ theme }) => theme.breakpoints.down('sm') ? 'row' : 'column'};
+  &:hover .action {
+    opacity: 1;
+    transition: ${({ theme }) => `${theme.transitions.duration.short}ms opacity ${theme.transitions.easing.easeInOut}`};
+  }
 
+  .action {
+    opacity: 0;
+    transition: ${({ theme }) => `${theme.transitions.duration.short}ms opacity ${theme.transitions.easing.easeInOut}`};
+  }
+
+  gap: ${({ theme }) => theme.spacing(2)};
+`;
+
+function ProfileItem ({ collective }: {collective: Collective}) {
   return (
-    <Stack
-      sx={{
-        flexDirection: {
-          sm: 'row',
-          xs: 'column'
-        },
-        '&:hover .action': {
-          opacity: 1,
-          transition: theme.transitions.create('opacity', {
-            duration: theme.transitions.duration.short,
-            easing: theme.transitions.easing.easeInOut
-          })
-        },
-        '.action': {
-          opacity: 0,
-          transition: theme.transitions.create('opacity', {
-            duration: theme.transitions.duration.short,
-            easing: theme.transitions.easing.easeInOut
-          })
-        }
-      }}
-      gap={2}
-    >
+    <StyledStack>
       {collective.type === 'poap' ? (
         <Link href={collective.link} target='_blank' display='flex'>
           <Avatar size='large' avatar={collective.image} />
@@ -78,7 +69,7 @@ function ProfileItem ({ collective }: {collective: Collective}) {
         </Box>
         <Typography variant='subtitle2'>{showDateWithMonthAndYear(collective.date) ?? '?'}</Typography>
       </Stack>
-    </Stack>
+    </StyledStack>
   );
 }
 
