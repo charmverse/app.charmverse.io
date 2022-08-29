@@ -22,12 +22,12 @@ export default function BountyApplicantActions ({ bounty, isExpanded, submission
 
   async function recordTransaction (transactionId: string, chainId: number) {
     try {
-      await charmClient.recordTransaction({
+      await charmClient.bounties.recordTransaction({
         applicationId: submission.id,
         chainId: chainId.toString(),
         transactionId
       });
-      await charmClient.markSubmissionAsPaid(submission.id);
+      await charmClient.bounties.markSubmissionAsPaid(submission.id);
       await refreshBounty(bounty.id);
     }
     catch (err: any) {

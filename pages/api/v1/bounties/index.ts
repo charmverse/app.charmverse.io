@@ -92,6 +92,17 @@ export interface PublicApiBounty {
   }[];
 }
 
+interface BountyVC {
+  id: string;
+  action: string; // created, started, completed
+  actionDate: string;
+  description: string;
+  rewardAmount: number;
+  rewardChain: number;
+  rewardToken: string;
+  title: string;
+  url: string;
+}
 /**
  * @swagger
  * /bounties:

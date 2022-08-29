@@ -62,7 +62,7 @@ export default function BountyProperties (props: {
   const [applications, setListApplications] = useState<ApplicationWithTransactions[]>([]);
   async function refreshSubmissions () {
     if (bountyId) {
-      const listApplicationsResponse = await charmClient.listApplications(bountyId);
+      const listApplicationsResponse = await charmClient.bounties.listApplications(bountyId);
       setListApplications(listApplicationsResponse);
     }
   }
@@ -131,7 +131,7 @@ export default function BountyProperties (props: {
 
   async function confirmNewBounty () {
     if (currentBounty) {
-      const createdBounty = await charmClient.createBounty(currentBounty);
+      const createdBounty = await charmClient.bounties.createBounty(currentBounty);
       setBounties((_bounties) => [..._bounties, createdBounty]);
       setPages(_pages => ({ ..._pages,
         [pageId]: {

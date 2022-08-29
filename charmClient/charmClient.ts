@@ -1,6 +1,6 @@
 
 import {
-  Application, Block, InviteLink, Page, PagePermissionLevel, PaymentMethod, Prisma,
+  Block, InviteLink, Page, PagePermissionLevel, PaymentMethod, Prisma,
   Role, Space, TelegramUser, TokenGate, TokenGateToRole, User, UserDetails, UserGnosisSafe, UserVote
 } from '@prisma/client';
 import * as http from 'adapters/http';
@@ -11,11 +11,10 @@ import type { FailedImportsError } from 'lib/notion/types';
 import type { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee, IPagePermissionWithSource, SpaceDefaultPublicPageToggle } from 'lib/permissions/pages/page-permission-interfaces';
 import type { GetPoapsResponse, UpdatePoapsRequest } from 'lib/poap';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
-import type { BountyWithDetails, Contributor, LoggedInUser, PageContent } from 'models';
+import type { Contributor, LoggedInUser, PageContent } from 'models';
 import type { ServerBlockFields } from 'pages/api/blocks';
 import type { InviteLinkPopulated } from 'pages/api/invites/index';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
-import type { ApplicationWithTransactions, ReviewDecision, SubmissionContent, SubmissionCreationData } from 'lib/applications/interfaces';
 import type { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
 import type { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import type { MultipleThreadsInput, ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
@@ -27,22 +26,20 @@ import type { ListSpaceRolesResponse } from 'pages/api/roles';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 import type { GetTasksStateResponse, UpdateTasksState } from 'pages/api/tasks/state';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
-import type { AssignedBountyPermissions, BountyCreationData, BountySubmitterPoolCalculation, BountySubmitterPoolSize, BountyUpdate, SuggestionAction } from 'lib/bounties/interfaces';
 import type { DeepDaoAggregateData } from 'lib/deepdao/interfaces';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
-import type { PublicBountyToggle } from 'lib/spaces/interfaces';
 import type { MarkTask } from 'lib/tasks/markTasks';
-import type { TransactionCreationData } from 'lib/transactions/interface';
 import type { ExtendedVote, UserVoteExtendedDTO, VoteDTO } from 'lib/votes/interfaces';
 import type { PublicUser } from 'pages/api/public/profile/[userPath]';
 import type { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
 import type { SpacePermissionFlags, SpacePermissionModification } from 'lib/permissions/spaces';
 import { encodeFilename } from 'lib/utilities/encodeFilename';
-import { ProfileApi } from 'lib/charmClient/profileApi';
-import { NftApi } from './lib/charmClient/nftApi';
-import { CollablandApi } from './lib/charmClient/collablandApi';
-import type { AssignedPermissionsQuery, Resource } from './lib/permissions/interfaces';
-import type { SpacePermissionConfigurationUpdate } from './lib/permissions/meta/interfaces';
+import type { AssignedPermissionsQuery } from 'lib/permissions/interfaces';
+import type { SpacePermissionConfigurationUpdate } from 'lib/permissions/meta/interfaces';
+import { ProfileApi } from './apis/profileApi';
+import { NftApi } from './apis/nftApi';
+import { BountiesApi } from './apis/bountiesApi';
+import { CollablandApi } from './apis/collablandApi';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -53,6 +50,8 @@ class CharmClient {
   nft = new NftApi();
 
   profile = new ProfileApi();
+
+  bounties = new BountiesApi();
 
   collabland = new CollablandApi();
 
@@ -372,104 +371,6 @@ class CharmClient {
     updater(fbBlocks);
   }
 
-  listBounties (spaceId: string, publicOnly?: boolean): Promise<BountyWithDetails[]> {
-    return http.GET('/api/bounties', { spaceId, publicOnly });
-  }
-
-  async createBounty (bounty: Partial<BountyCreationData>) {
-
-    const data = await http.POST<BountyWithDetails>('/api/bounties', bounty);
-
-    return data;
-  }
-
-  async getBountyApplicantPool ({ resourceId, permissions }: BountySubmitterPoolCalculation): Promise<BountySubmitterPoolSize> {
-    return http.POST<BountySubmitterPoolSize>('/api/bounties/pool', { permissions, resourceId });
-  }
-
-  /**
-   * Get full set of permissions for a specific user on a certain page
-   */
-  async computeBountyPermissions ({ resourceId }: Resource): Promise<AssignedBountyPermissions> {
-    return http.GET(`/api/bounties/${resourceId}/permissions`);
-  }
-
-  async reviewBountySuggestion ({ bountyId, decision }: SuggestionAction): Promise<BountyWithDetails | {success: true}> {
-    return http.POST<BountyWithDetails>(`/api/bounties/${bountyId}/review-suggestion`, { decision });
-  }
-
-  async getBounty (bountyId: string): Promise<BountyWithDetails> {
-
-    const data = await http.GET<BountyWithDetails>(`/api/bounties/${bountyId}`);
-
-    return data;
-  }
-
-  async deleteBounty (bountyId: string): Promise<any> {
-
-    return http.DELETE(`/api/bounties/${bountyId}`);
-  }
-
-  async updateBounty ({ bountyId, updateContent }: BountyUpdate): Promise<BountyWithDetails> {
-
-    return http.PUT<BountyWithDetails>(`/api/bounties/${bountyId}`, updateContent);
-  }
-
-  async lockBountySubmissions (bountyId: string, lock?: boolean): Promise<BountyWithDetails> {
-    return http.POST<BountyWithDetails>(`/api/bounties/${bountyId}/lock?lock=${lock ?? true}`);
-  }
-
-  async closeBounty (bountyId: string): Promise<BountyWithDetails> {
-    return http.POST<BountyWithDetails>(`/api/bounties/${bountyId}/close`);
-  }
-
-  async approveApplication (applicationId: string): Promise<Application> {
-    return http.POST<Application>(`/api/applications/${applicationId}/approve`);
-  }
-
-  async updateApplication (applicationId: string, update: Partial<Application>): Promise<Application> {
-
-    const data = await http.PUT<Application>(`/api/applications/${applicationId}`, update);
-
-    return data;
-  }
-
-  async createApplication (application: Pick<Application, 'bountyId' | 'message' | 'status'>): Promise<Application> {
-
-    const data = await http.POST<Application>('/api/applications', application);
-
-    return data;
-  }
-
-  listApplications (bountyId: string): Promise<ApplicationWithTransactions[]> {
-    return http.GET('/api/applications', { bountyId });
-  }
-
-  async createSubmission (content: Omit<SubmissionCreationData, 'userId'>): Promise<Application> {
-
-    return http.POST<Application>('/api/submissions', content);
-  }
-
-  async updateSubmission ({ submissionId, content }: { submissionId: string, content: SubmissionContent }): Promise<Application> {
-
-    return http.PUT<Application>(`/api/submissions/${submissionId}`, content);
-  }
-
-  async reviewSubmission (submissionId: string, decision: ReviewDecision): Promise<Application> {
-
-    return http.POST<Application>(`/api/submissions/${submissionId}/review`, {
-      decision
-    });
-  }
-
-  async markSubmissionAsPaid (submissionId: string) {
-    return http.POST<Application>(`/api/submissions/${submissionId}/mark-as-paid`);
-  }
-
-  recordTransaction (data: TransactionCreationData) {
-    return http.POST('/api/transactions', data);
-  }
-
   async getPricing (base: string, quote: FiatCurrency): Promise<IPairQuote> {
 
     const data = await http.GET<IPairQuote>('/api/crypto-price', { base, quote });
@@ -681,12 +582,6 @@ class CharmClient {
   setDefaultPublicPages ({ spaceId, defaultPublicPages }: SpaceDefaultPublicPageToggle) {
     return http.POST<Space>(`/api/spaces/${spaceId}/set-default-public-pages`, {
       defaultPublicPages
-    });
-  }
-
-  setPublicBountyBoard ({ publicBountyBoard, spaceId }: PublicBountyToggle): Promise<Space> {
-    return http.POST<Space>(`/api/spaces/${spaceId}/set-public-bounty-board`, {
-      publicBountyBoard
     });
   }
 

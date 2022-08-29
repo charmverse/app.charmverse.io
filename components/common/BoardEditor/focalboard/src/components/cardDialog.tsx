@@ -100,7 +100,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
   }
 
   async function closeBounty () {
-    const updatedBounty = await charmClient.closeBounty(bounty!.id);
+    const updatedBounty = await charmClient.bounties.closeBounty(bounty!.id);
     refreshBounty(updatedBounty.id);
   }
 

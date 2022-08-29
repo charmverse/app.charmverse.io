@@ -24,7 +24,7 @@ export default function NewBountyButton () {
       let createdBounty: BountyWithDetails;
 
       if (suggestBounties) {
-        createdBounty = await charmClient.createBounty({
+        createdBounty = await charmClient.bounties.createBounty({
           chainId: 1,
           status: 'suggestion',
           spaceId: currentSpace.id,
@@ -40,7 +40,7 @@ export default function NewBountyButton () {
         });
       }
       else {
-        createdBounty = await charmClient.createBounty({
+        createdBounty = await charmClient.bounties.createBounty({
           chainId: 1,
           status: 'open',
           spaceId: currentSpace.id,

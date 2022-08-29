@@ -1,6 +1,5 @@
 import fetch from 'adapters/http/fetch.server';
 import log from 'lib/log';
-import { Bounty } from '@prisma/client';
 
 const DOMAIN = 'https://api-qa.collab.land';
 const API_KEY = process.env.COLLAB_API_KEY as string;
@@ -80,24 +79,5 @@ export function createCredential ({ aeToken, credential }: { aeToken: string, cr
       Authorization: `AE ${aeToken}`
     },
     body: JSON.stringify(credential)
-  });
-}
-
-export function createBountyCreatedCredential ({ aeToken, bounty, discordUserId }: { aeToken: string, bounty: Bounty, discordUserId: string }) {
-
-  return createCredential({
-    aeToken,
-    credential: {
-      id: discordUserId,
-      eventName: 'bounty_created',
-      eventDate: new Date().toISOString(),
-      bountyId: bounty.id,
-      bountyDescription: bounty.description,
-      bountyRewardAmount: bounty.rewardAmount,
-      bountyRewardChain: bounty.rewardChain,
-      bountyRewardToken: bounty.rewardToken,
-      bountyTitle: bounty.title,
-      bountyUrl: bounty.url
-    }
   });
 }

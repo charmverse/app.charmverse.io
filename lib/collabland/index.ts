@@ -1,1 +1,2 @@
-export * from './collabland';
+export * from './bountyCredentials';
+export * from './getCredentials';

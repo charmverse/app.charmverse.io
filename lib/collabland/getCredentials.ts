@@ -63,7 +63,3 @@ export async function getCredentials ({ aeToken }: { aeToken: string }): Promise
 
   return credentials;
 }
-
-export async function createCredential ({ aeToken }: { aeToken: string }) {
-  await client.createCredential({ aeToken });
-}
