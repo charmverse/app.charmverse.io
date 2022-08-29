@@ -5,7 +5,7 @@ import { getSpacesOfUser } from 'lib/spaces/getSpacesOfUser';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
 import { isTruthy } from 'lib/utilities/types';
-import { getProfile } from './client';
+import { getAllOrganizations, getProfile } from './client';
 import { DeepDaoAggregateData, DeepDaoOrganization, DeepDaoProfile, DeepDaoVote } from './interfaces';
 
 export async function getAggregatedData (userPath: string, apiToken?: string): Promise<DeepDaoAggregateData> {
@@ -28,6 +28,14 @@ export async function getAggregatedData (userPath: string, apiToken?: string): P
         return null;
       }))
   )).filter(isTruthy);
+
+  const allOrganizations = await getAllOrganizations(apiToken);
+
+  const organizationsRecord: Record<string, string | null> = {};
+
+  allOrganizations?.data.resources.forEach(org => {
+    organizationsRecord[org.organizationId] = org.logo;
+  });
 
   const [completedBountiesCount, userWorkspaces] = await Promise.all([
     getCompletedApplicationsOfUser(user.id),
@@ -71,10 +79,12 @@ export async function getAggregatedData (userPath: string, apiToken?: string): P
     totalProposals: profiles.reduce((acc, profile) => acc + profile.data.totalProposals, 0),
     totalVotes: profiles.reduce((acc, profile) => acc + profile.data.totalVotes, 0),
     organizations:
-      [...profiles.reduce<DeepDaoProfile['organizations']>((orgs, profile) => ([...orgs, ...profile.data.organizations]), []),
+      [
+        ...profiles.reduce<DeepDaoProfile['organizations']>((orgs, profile) => ([...orgs, ...profile.data.organizations]), []).map(org => ({ ...org, logo: organizationsRecord[org.organizationId] })),
         ...userWorkspaces.map(userWorkspace => ({
           organizationId: userWorkspace.id,
-          name: userWorkspace.name
+          name: userWorkspace.name,
+          logo: userWorkspace.spaceImage
         } as DeepDaoOrganization))
       ],
     proposals: profiles.reduce<DeepDaoProfile['proposals']>((proposals, profile) => ([...proposals, ...profile.data.proposals]), []),
