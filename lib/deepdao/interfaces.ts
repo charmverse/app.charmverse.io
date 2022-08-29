@@ -14,6 +14,7 @@ export type DeepDaoOrganization = {
   name: string
   organizationId: string
   description: string
+  isHidden: boolean
 }
 
 export type DeepDaoProposal = {

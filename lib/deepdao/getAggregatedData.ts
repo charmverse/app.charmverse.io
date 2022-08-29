@@ -42,11 +42,20 @@ export async function getAggregatedData (userPath: string, apiToken?: string): P
     getSpacesCount(user.id)
   ]);
 
+  const hiddenDaoProfileItemIds = (await prisma.profileItem.findMany({
+    where: {
+      type: 'dao'
+    },
+    select: {
+      id: true
+    }
+  })).map(profileItem => profileItem.id);
+
   return {
     daos: workspacesCount + participationScores.reduce((acc, cur) => acc + cur.data.daos, 0),
     totalProposals: profiles.reduce((acc, profile) => acc + profile.data.totalProposals, 0),
     totalVotes: profiles.reduce((acc, profile) => acc + profile.data.totalVotes, 0),
-    organizations: profiles.reduce<DeepDaoProfile['organizations']>((orgs, profile) => ([...orgs, ...profile.data.organizations]), []),
+    organizations: profiles.reduce<DeepDaoProfile['organizations']>((orgs, profile) => ([...orgs, ...profile.data.organizations]), []).map(org => ({ ...org, isHidden: hiddenDaoProfileItemIds.includes(org.organizationId) })),
     proposals: profiles.reduce<DeepDaoProfile['proposals']>((proposals, profile) => ([...proposals, ...profile.data.proposals]), []),
     votes: profiles.reduce<DeepDaoProfile['votes']>((votes, profile) => ([...votes, ...profile.data.votes]), []),
     bounties: completedBountiesCount

@@ -2,8 +2,8 @@ import { Box, Chip, CircularProgress, Divider, Grid, Paper, Stack, Typography } 
 import charmClient from 'charmClient';
 import { sortDeepdaoOrgs } from 'lib/deepdao/sortDeepdaoOrgs';
 import useSWRImmutable from 'swr/immutable';
-import DeepDaoOrganizationRow from './DeepDaoOrganizationRow';
-import { UserDetailsProps } from './UserDetails';
+import DeepDaoOrganizationRow, { OrganizationDetails } from './DeepDaoOrganizationRow';
+import { isPublicUser, UserDetailsProps } from './UserDetails';
 
 export function AggregatedDataItem ({ value, label }: { value: number, label: string }) {
   return (
@@ -44,6 +44,7 @@ export function AggregatedDataItem ({ value, label }: { value: number, label: st
 }
 
 export default function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>) {
+  const isPublic = isPublicUser(user);
 
   const { data, isValidating } = useSWRImmutable(user ? `userAggregatedData/${user.id}` : null, () => {
     return charmClient.getAggregatedData(user.id);
@@ -63,6 +64,17 @@ export default function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>
 
   const sortedOrganizations = sortDeepdaoOrgs(data);
 
+  const visibleDaos: OrganizationDetails[] = [];
+  const hiddenDaos: OrganizationDetails[] = [];
+  sortedOrganizations.forEach(dao => {
+    if (dao.isHidden) {
+      hiddenDaos.push(dao);
+    }
+    else {
+      visibleDaos.push(dao);
+    }
+  });
+
   return (
     <Grid container display='flex' gap={2} flexDirection='column'>
       <Box
@@ -81,7 +93,7 @@ export default function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>
         <AggregatedDataItem label='Bounties' value={data.bounties} />
       </Box>
 
-      {sortedOrganizations.length !== 0 ? (
+      {visibleDaos.length !== 0 ? (
         <>
           <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
             <Typography
@@ -93,14 +105,19 @@ export default function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>
               }}
             >Organizations
             </Typography>
-            <Chip label={sortedOrganizations.length} />
+            <Chip label={visibleDaos.length} />
           </Stack>
           <Stack gap={2}>
-            {sortedOrganizations.map(organization => (
+            {visibleDaos.map(organization => (
               <Box
                 key={organization.organizationId}
               >
                 <DeepDaoOrganizationRow
+                  onClick={() => {
+
+                  }}
+                  visible={false}
+                  showVisibilityIcon={!isPublic}
                   organization={organization}
                 />
                 <Divider sx={{

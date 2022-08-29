@@ -22,7 +22,7 @@ interface Collective {
   isHidden: boolean
 }
 
-const StyledStack = styled(Stack)`
+const ProfileItemStack = styled(Stack)`
   flex-direction: ${({ theme }) => theme.breakpoints.down('sm') ? 'row' : 'column'};
   &:hover .action {
     opacity: 1;
@@ -46,7 +46,7 @@ interface ProfileItemProps {
 
 function ProfileItem ({ onClick, collective, visible, showVisibilityIcon }: ProfileItemProps) {
   return (
-    <StyledStack>
+    <ProfileItemStack>
       {collective.type === 'poap' ? (
         <Link href={collective.link} target='_blank' display='flex'>
           <Avatar size='large' avatar={collective.image} />
@@ -84,7 +84,7 @@ function ProfileItem ({ onClick, collective, visible, showVisibilityIcon }: Prof
         </Box>
         <Typography variant='subtitle2'>{showDateWithMonthAndYear(collective.date) ?? '?'}</Typography>
       </Stack>
-    </StyledStack>
+    </ProfileItemStack>
   );
 }
 
