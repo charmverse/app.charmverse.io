@@ -48,4 +48,4 @@ export type DeepDaoProfile = {
 export type GetParticipationScoreResponse = DeepDaoApiResponse<DeepDaoParticipationScore>
 export type GetProfileResponse = DeepDaoApiResponse<DeepDaoProfile>
 
-export type DeepDaoAggregateData = Pick<DeepDaoParticipationScore, 'daos'> & Pick<DeepDaoProfile, 'organizations' | 'totalProposals' | 'totalVotes' | 'proposals' | 'votes'> & {bounties: number}
+export type DeepDaoAggregateData = Pick<DeepDaoProfile, 'organizations' | 'totalProposals' | 'totalVotes' | 'proposals' | 'votes'> & {bounties: number}

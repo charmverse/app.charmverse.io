@@ -5,7 +5,7 @@ import { getSpacesOfUser } from 'lib/spaces/getSpacesOfUser';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
 import { isTruthy } from 'lib/utilities/types';
-import { getParticipationScore, getProfile } from './client';
+import { getProfile } from './client';
 import { DeepDaoAggregateData, DeepDaoOrganization, DeepDaoProfile, DeepDaoVote } from './interfaces';
 
 export async function getAggregatedData (userPath: string, apiToken?: string): Promise<DeepDaoAggregateData> {
@@ -20,14 +20,6 @@ export async function getAggregatedData (userPath: string, apiToken?: string): P
   if (!user) {
     throw new DataNotFoundError();
   }
-
-  const participationScores = (await Promise.all(
-    user.addresses.map(address => getParticipationScore(address, apiToken)
-      .catch(error => {
-        log.error('Error calling DEEP DAO API', error);
-        return null;
-      }))
-  )).filter(isTruthy);
 
   const profiles = (await Promise.all(
     user.addresses.map(address => getProfile(address, apiToken)
@@ -76,7 +68,6 @@ export async function getAggregatedData (userPath: string, apiToken?: string): P
   });
 
   return {
-    daos: userWorkspaces.length + participationScores.reduce((acc, cur) => acc + cur.data.daos, 0),
     totalProposals: profiles.reduce((acc, profile) => acc + profile.data.totalProposals, 0),
     totalVotes: profiles.reduce((acc, profile) => acc + profile.data.totalVotes, 0),
     organizations:
