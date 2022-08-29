@@ -13,7 +13,7 @@ export default function CollablandCredentials () {
   const router = useRouter();
   const aeToken = typeof router.query.aeToken === 'string' ? router.query.aeToken : router.query.aeToken?.[0];
 
-  const { data: credentials, error } = useSWRImmutable(() => !!aeToken, () => charmClient.getCollablandCredentials(aeToken as string));
+  const { data: credentials, error } = useSWRImmutable(() => !!aeToken, () => charmClient.collabland.getCredentials(aeToken as string));
 
   if (error) {
     return (

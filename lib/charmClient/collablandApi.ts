@@ -3,7 +3,7 @@ import type { CollablandCredential } from 'lib/collabland';
 
 export class CollablandApi {
 
-  getCollablandCredentials (aeToken: string) {
+  getCredentials (aeToken: string) {
     return http.POST<CollablandCredential[]>('/api/collabland/saveCredentials', { aeToken });
   }
 }
