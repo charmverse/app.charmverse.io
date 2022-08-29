@@ -33,7 +33,6 @@ import type { ExtendedVote, UserVoteExtendedDTO, VoteDTO } from 'lib/votes/inter
 import type { PublicUser } from 'pages/api/public/profile/[userPath]';
 import type { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
 import type { SpacePermissionFlags, SpacePermissionModification } from 'lib/permissions/spaces';
-import type { CollablandCredential } from 'lib/collabland';
 import { encodeFilename } from 'lib/utilities/encodeFilename';
 import { ProfileApi } from './apis/profileApi';
 import { NftApi } from './apis/nftApi';
@@ -629,10 +628,6 @@ class CharmClient {
 
   getUserVotes (voteId: string) {
     return http.GET<UserVoteExtendedDTO[]>(`/api/votes/${voteId}/user-votes`);
-  }
-
-  getCollablandCredentials (aeToken: string) {
-    return http.POST<CollablandCredential[]>('/api/collabland/saveCredentials', { aeToken });
   }
 }
 
