@@ -14,14 +14,13 @@ import type { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'l
 import type { PublicPageResponse } from 'lib/pages/interfaces';
 import type { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee, IPagePermissionWithSource, SpaceDefaultPublicPageToggle } from 'lib/permissions/pages/page-permission-interfaces';
 import type { SpacePermissionFlags, SpacePermissionModification } from 'lib/permissions/spaces';
-import type { GetPoapsResponse } from 'lib/poap';
 import type { MarkTask } from 'lib/tasks/markTasks';
 import type { MultipleThreadsInput, ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import type { TokenGateEvaluationAttempt, TokenGateEvaluationResult, TokenGateVerification, TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { encodeFilename } from 'lib/utilities/encodeFilename';
 import type { ExtendedVote, UserVoteExtendedDTO, VoteDTO } from 'lib/votes/interfaces';
-import type { Contributor, LoggedInUser, PageContent } from 'models';
+import type { Contributor, ExtendedPoap, LoggedInUser, PageContent } from 'models';
 import type { ServerBlockFields } from 'pages/api/blocks';
 import type { ConnectDiscordPayload, ConnectDiscordResponse } from 'pages/api/discord/connect';
 import type { ImportDiscordRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
@@ -90,7 +89,7 @@ class CharmClient {
   }
 
   getUserPoaps () {
-    return http.GET<GetPoapsResponse>('/api/profile/poaps');
+    return http.GET<ExtendedPoap[]>('/api/profile/poaps');
   }
 
   updateUserDetails (data: Partial<UserDetails>) {

@@ -40,8 +40,6 @@ export default function NftAvatarGallery ({ onSelect, isVisible, onClose, isSavi
     && user.avatarChain === nft.chainId;
   };
 
-  const allNfts = [...(nfts?.hiddenNfts ?? []), ...(nfts?.visibleNfts ?? [])];
-
   return (
     <Dialog onClose={onClose} open={isVisible} scroll='paper'>
       <DialogTitle>Your NFTs gallery</DialogTitle>
@@ -60,7 +58,7 @@ export default function NftAvatarGallery ({ onSelect, isVisible, onClose, isSavi
           </Grid>
         ) : (
           <Grid container spacing={1}>
-            {allNfts.length ? allNfts.map(nft => (
+            {nfts?.length ? nfts.map(nft => (
               <Grid key={`${nft.contract}-${nft.tokenId}`} item xs={6} sm={3} sx={{ minWidth: 110 }}>
                 <NftGalleryItem nft={nft} onClick={() => onSelect?.(nft)} isSelected={getIsSelected(nft)} />
               </Grid>

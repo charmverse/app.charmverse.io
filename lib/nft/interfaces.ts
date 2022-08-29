@@ -9,9 +9,5 @@ export type NftData = {
   imageRaw: string;
   imageThumb?: string
   timeLastUpdated: string
-}
-
-export interface GetNftsResponse {
-  visibleNfts: NftData[]
-  hiddenNfts: NftData[]
+  isHidden: boolean
 }

@@ -2,7 +2,7 @@
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { InvalidStateError } from 'lib/middleware/errors';
-import { getPOAPs, GetPoapsResponse } from 'lib/poap';
+import { getPOAPs } from 'lib/poap';
 import { withSessionRoute } from 'lib/session/withSession';
 import { ExtendedPoap } from 'models';
 import { NextApiRequest, NextApiResponse } from 'next';
@@ -14,7 +14,7 @@ handler
   .use(requireUser)
   .get(getUserPoaps);
 
-async function getUserPoaps (req: NextApiRequest, res: NextApiResponse<GetPoapsResponse | { error: any }>) {
+async function getUserPoaps (req: NextApiRequest, res: NextApiResponse<ExtendedPoap[] | { error: any }>) {
   const hiddenPoapIDs: string[] = (await prisma.profileItem.findMany({
     where: {
       userId: req.session.user.id,
@@ -41,13 +41,7 @@ async function getUserPoaps (req: NextApiRequest, res: NextApiResponse<GetPoapsR
 
   const poaps: ExtendedPoap[] = await getPOAPs(user.addresses);
 
-  const hiddenPoaps = poaps.filter((poap) => hiddenPoapIDs.includes(poap.tokenId));
-  const visiblePoaps = poaps.filter((poap) => !hiddenPoapIDs.includes(poap.tokenId));
-
-  return res.status(200).json({
-    hiddenPoaps,
-    visiblePoaps
-  });
+  return res.status(200).json(poaps.map(poap => ({ ...poap, isHidden: hiddenPoapIDs.includes(poap.tokenId) })));
 }
 
 export default withSessionRoute(handler);
