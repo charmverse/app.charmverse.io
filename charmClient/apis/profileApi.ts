@@ -4,8 +4,7 @@ import { UserAvatar } from 'lib/users/interfaces';
 import { LoggedInUser } from 'models';
 
 export interface UpdateProfileItemRequest {
-  shownProfileItems: Pick<ProfileItem, 'id' | 'metadata' | 'type'>[];
-  hiddenProfileItems: UpdateProfileItemRequest['shownProfileItems'];
+  profileItems: Omit<ProfileItem, 'userId'>[];
 }
 
 export class ProfileApi {

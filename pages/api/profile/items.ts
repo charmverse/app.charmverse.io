@@ -1,4 +1,5 @@
 
+import { ProfileItem } from '@prisma/client';
 import { UpdateProfileItemRequest } from 'charmClient/apis/profileApi';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
@@ -14,7 +15,19 @@ handler
 
 async function updateUserProfileItems (req: NextApiRequest, res: NextApiResponse<any | {error: string}>) {
 
-  const { shownProfileItems, hiddenProfileItems }: UpdateProfileItemRequest = req.body;
+  const { profileItems }: UpdateProfileItemRequest = req.body;
+
+  const shownProfileItems: Omit<ProfileItem, 'userId'>[] = [];
+  const hiddenProfileItems: Omit<ProfileItem, 'userId'>[] = [];
+
+  profileItems.forEach(profileItem => {
+    if (!profileItem.isHidden) {
+      shownProfileItems.push(profileItem);
+    }
+    else {
+      hiddenProfileItems.push(profileItem);
+    }
+  });
 
   if (shownProfileItems.length) {
     const ids: string[] = shownProfileItems.map((profileItem) => profileItem.id || '');

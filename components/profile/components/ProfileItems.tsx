@@ -74,11 +74,11 @@ function ProfileItem ({ onClick, collective, visible, showVisibilityIcon }: Prof
             <IconButton size='small' onClick={onClick}>
               {visible ? (
                 <Tooltip title={`Hide ${collective.type.toUpperCase()} from profile`}>
-                  <VisibilityOffIcon className='action' fontSize='small' />
+                  <VisibilityIcon className='action' fontSize='small' />
                 </Tooltip>
               ) : (
                 <Tooltip title={`Show ${collective.type.toUpperCase()} in profile`}>
-                  <VisibilityIcon className='action' fontSize='small' />
+                  <VisibilityOffIcon className='action' fontSize='small' />
                 </Tooltip>
               )}
             </IconButton>
@@ -172,7 +172,15 @@ export default function ProfileItems ({ user }: Pick<UserDetailsProps, 'user'>) 
             <ProfileItem
               showVisibilityIcon={!isPublic}
               visible={!collective.isHidden}
-              onClick={() => {
+              onClick={async () => {
+                await charmClient.profile.updateProfileItem({
+                  profileItems: [{
+                    id: collective.id,
+                    isHidden: !collective.isHidden,
+                    type: collective.type,
+                    metadata: null
+                  }]
+                });
                 if (collective.type === 'nft') {
                   mutateNfts();
                 }
