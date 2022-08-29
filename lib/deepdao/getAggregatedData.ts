@@ -6,7 +6,7 @@ import { DataNotFoundError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
 import { isTruthy } from 'lib/utilities/types';
 import { getAllOrganizations, getProfile } from './client';
-import { DeepDaoAggregateData, DeepDaoOrganization, DeepDaoProfile, DeepDaoVote } from './interfaces';
+import { DeepDaoAggregateData, DeepDaoProfile, DeepDaoVote } from './interfaces';
 
 export async function getAggregatedData (userPath: string, apiToken?: string): Promise<DeepDaoAggregateData> {
   const user = await prisma.user.findFirst({
@@ -22,7 +22,7 @@ export async function getAggregatedData (userPath: string, apiToken?: string): P
   }
 
   const profiles = (await Promise.all(
-    ['0x155b6485305ccab44ef7da58ac886c62ce105cf9'].map(address => getProfile(address, apiToken)
+    user.addresses.map(address => getProfile(address, apiToken)
       .catch(error => {
         log.error('Error calling DEEP DAO API', error);
         return null;
