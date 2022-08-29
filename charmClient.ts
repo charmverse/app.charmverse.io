@@ -37,10 +37,10 @@ import type { ExtendedVote, UserVoteExtendedDTO, VoteDTO } from 'lib/votes/inter
 import type { PublicUser } from 'pages/api/public/profile/[userPath]';
 import type { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
 import type { SpacePermissionFlags, SpacePermissionModification } from 'lib/permissions/spaces';
-import type { CollablandCredential } from 'lib/collabland';
 import { encodeFilename } from 'lib/utilities/encodeFilename';
 import { ProfileApi } from 'lib/charmClient/profileApi';
 import { NftApi } from './lib/charmClient/nftApi';
+import { CollablandApi } from './lib/charmClient/collablandApi';
 import type { AssignedPermissionsQuery, Resource } from './lib/permissions/interfaces';
 import type { SpacePermissionConfigurationUpdate } from './lib/permissions/meta/interfaces';
 
@@ -53,6 +53,8 @@ class CharmClient {
   nft = new NftApi();
 
   profile = new ProfileApi();
+
+  collabland = new CollablandApi();
 
   async login (address: string) {
     const user = await http.POST<LoggedInUser>('/api/session/login', {
@@ -734,10 +736,6 @@ class CharmClient {
 
   getUserVotes (voteId: string) {
     return http.GET<UserVoteExtendedDTO[]>(`/api/votes/${voteId}/user-votes`);
-  }
-
-  getCollablandCredentials (aeToken: string) {
-    return http.POST<CollablandCredential[]>('/api/collabland/saveCredentials', { aeToken });
   }
 }
 
