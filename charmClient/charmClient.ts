@@ -19,8 +19,9 @@ import type { MultipleThreadsInput, ThreadCreate, ThreadWithCommentsAndAuthors }
 import type { TokenGateEvaluationAttempt, TokenGateEvaluationResult, TokenGateVerification, TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { encodeFilename } from 'lib/utilities/encodeFilename';
+import { ExtendedPoap } from 'lib/blockchain/interfaces';
 import type { ExtendedVote, UserVoteExtendedDTO, VoteDTO } from 'lib/votes/interfaces';
-import type { Contributor, ExtendedPoap, LoggedInUser, PageContent } from 'models';
+import type { Contributor, LoggedInUser, PageContent } from 'models';
 import type { ServerBlockFields } from 'pages/api/blocks';
 import type { ConnectDiscordPayload, ConnectDiscordResponse } from 'pages/api/discord/connect';
 import type { ImportDiscordRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
@@ -35,9 +36,9 @@ import type { TelegramAccount } from 'pages/api/telegram/connect';
 import type { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
 import type { AssignedPermissionsQuery } from 'lib/permissions/interfaces';
 import type { SpacePermissionConfigurationUpdate } from 'lib/permissions/meta/interfaces';
-import { ProfileApi } from './apis/profileApi';
-import { NftApi } from './apis/nftApi';
 import { BountiesApi } from './apis/bountiesApi';
+import { BlockchainApi } from './apis/blockchainApi';
+import { ProfileApi } from './apis/profileApi';
 import { CollablandApi } from './apis/collablandApi';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
@@ -46,7 +47,7 @@ type BlockUpdater = (blocks: FBBlock[]) => void;
 // CharmClient is the client interface to the server APIs
 //
 class CharmClient {
-  nft = new NftApi();
+  blockchain = new BlockchainApi();
 
   profile = new ProfileApi();
 
