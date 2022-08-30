@@ -7,11 +7,13 @@ import { isUUID } from 'lib/utilities/strings';
 import { isTruthy } from 'lib/utilities/types';
 import { getAllOrganizations, getProfile } from 'lib/deepdao/client';
 import { DeepDaoProfile, DeepDaoVote } from 'lib/deepdao/interfaces';
+import { CommunityDetails } from 'components/profile/components/CommunityRow';
 import { UserCommunity } from './interfaces';
+import { sortCommunities } from './sortCommunities';
 
-export type AggregatedProfileData = Pick<DeepDaoProfile, 'totalProposals' | 'totalVotes' | 'proposals' | 'votes'> & {
+export type AggregatedProfileData = Pick<DeepDaoProfile, 'totalProposals' | 'totalVotes'> & {
   bounties: number;
-  communities: UserCommunity[];
+  communities: CommunityDetails[];
 };
 
 export async function getAggregatedData (userPath: string, apiToken?: string): Promise<AggregatedProfileData> {
@@ -109,26 +111,30 @@ export async function getAggregatedData (userPath: string, apiToken?: string): P
   }));
 
   const communities = [...deepDaoCommunities, ...charmVerseCommunities];
+  const proposals = profiles.reduce<DeepDaoProfile['proposals']>((_proposals, profile) => ([..._proposals, ...profile.data.proposals]), []);
+  const votes = [
+    // Deepdao votes
+    ...profiles.reduce<DeepDaoProfile['votes']>((_votes, profile) => ([..._votes, ...profile.data.votes]), []),
+    ...userVotes.map(vote => ({
+      createdAt: vote.createdAt.toString(),
+      description: vote.description ?? '',
+      organizationId: vote.spaceId,
+      title: vote.title,
+      voteId: vote.id,
+      successful: vote.status === 'Passed'
+    } as DeepDaoVote))
+  ];
+
+  const sortedCommunities = sortCommunities({
+    communities,
+    proposals,
+    votes
+  });
 
   return {
     totalProposals: profiles.reduce((acc, profile) => acc + profile.data.totalProposals, 0),
     totalVotes: profiles.reduce((acc, profile) => acc + profile.data.totalVotes, 0),
-    communities,
-    // @ts-ignore leave an 'organizations' field to be backwards compatible temporarily until clients update
-    organizations: [],
-    proposals: profiles.reduce<DeepDaoProfile['proposals']>((proposals, profile) => ([...proposals, ...profile.data.proposals]), []),
-    votes: [
-      // Deepdao votes
-      ...profiles.reduce<DeepDaoProfile['votes']>((votes, profile) => ([...votes, ...profile.data.votes]), []),
-      ...userVotes.map(vote => ({
-        createdAt: vote.createdAt.toString(),
-        description: vote.description ?? '',
-        organizationId: vote.spaceId,
-        title: vote.title,
-        voteId: vote.id,
-        successful: vote.status === 'Passed'
-      } as DeepDaoVote))
-    ],
+    communities: sortedCommunities,
     bounties: completedBountiesCount
   };
 }

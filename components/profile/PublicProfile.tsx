@@ -1,7 +1,6 @@
 import { Box, Chip, Divider, Stack, Typography } from '@mui/material';
 import useSWRImmutable from 'swr/immutable';
 import charmClient from 'charmClient';
-import { sortCommunities } from 'lib/profile/sortCommunities';
 import { ExtendedPoap } from 'models';
 import { NftData } from 'lib/nft/interfaces';
 import AggregatedData from './components/AggregatedData';
@@ -39,8 +38,6 @@ export default function PublicProfile (props: UserDetailsProps) {
     return charmClient.getAggregatedData(user.id);
   });
   const isPublic = isPublicUser(user);
-
-  const sortedCommunities = data ? sortCommunities(data) : [];
 
   const { data: poapData, mutate: mutatePoaps } = useSWRImmutable(`/poaps/${user.id}/${isPublic}`, () => {
     return isPublicUser(user)
@@ -96,16 +93,16 @@ export default function PublicProfile (props: UserDetailsProps) {
       <UserDetails {...props} />
       <Divider />
       <AggregatedData user={user} />
-      {data && sortedCommunities.length !== 0 ? (
+      {data && data.communities.length !== 0 ? (
         <>
           <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
             <SectionTitle>
               Communities
             </SectionTitle>
-            <Chip label={sortedCommunities.length} />
+            <Chip label={data.communities.length} />
           </Stack>
           <Stack gap={2}>
-            {sortedCommunities.map(community => (
+            {data.communities.map(community => (
               <Box
                 key={community.id}
               >
