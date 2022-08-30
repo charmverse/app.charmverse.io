@@ -10,7 +10,7 @@ import IconButton from '@mui/material/IconButton';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
 import { AvatarEditMenu } from 'components/settings/workspace/AvatarEditMenu';
 import NftAvatarGallery from 'components/profile/components/NftAvatarGallery';
-import { NftData } from 'lib/nft/types';
+import { NftData } from 'lib/nft/interfaces';
 import { UserAvatar } from 'lib/users/interfaces';
 
 const StyledBox = styled(Box)`

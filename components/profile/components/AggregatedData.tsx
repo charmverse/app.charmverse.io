@@ -1,9 +1,4 @@
-import { Box, Chip, CircularProgress, Divider, Grid, Paper, Stack, Typography } from '@mui/material';
-import charmClient from 'charmClient';
-import { sortDeepdaoOrgs } from 'lib/deepdao/sortDeepdaoOrgs';
-import useSWRImmutable from 'swr/immutable';
-import DeepDaoOrganizationRow from './DeepDaoOrganizationRow';
-import { UserDetailsProps } from './UserDetails';
+import { Box, Grid, Paper, Typography } from '@mui/material';
 
 export function AggregatedDataItem ({ value, label }: { value: number, label: string }) {
   return (
@@ -43,26 +38,12 @@ export function AggregatedDataItem ({ value, label }: { value: number, label: st
   );
 }
 
-export default function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>) {
-
-  const { data, isValidating } = useSWRImmutable(user ? `userAggregatedData/${user.id}` : null, () => {
-    return charmClient.getAggregatedData(user.id);
-  });
-
-  if (isValidating) {
-    return (
-      <Box display='flex' alignItems='center' gap={1}>
-        <CircularProgress size={24} />
-      </Box>
-    );
-  }
-
-  if (!data) {
-    return null;
-  }
-
-  const sortedOrganizations = sortDeepdaoOrgs(data);
-
+export default function AggregatedData ({ totalBounties, totalCommunities, totalProposals, totalVotes }: {
+  totalCommunities: number
+  totalProposals: number
+  totalVotes: number
+  totalBounties: number
+}) {
   return (
     <Grid container display='flex' gap={2} flexDirection='column'>
       <Box
@@ -75,43 +56,11 @@ export default function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>
           }
         }}
       >
-        <AggregatedDataItem label='Communities' value={data.organizations.length} />
-        <AggregatedDataItem label='Proposals' value={data.totalProposals} />
-        <AggregatedDataItem label='Votes' value={data.totalVotes} />
-        <AggregatedDataItem label='Bounties' value={data.bounties} />
+        <AggregatedDataItem label='Communities' value={totalCommunities} />
+        <AggregatedDataItem label='Proposals' value={totalProposals} />
+        <AggregatedDataItem label='Votes' value={totalVotes} />
+        <AggregatedDataItem label='Bounties' value={totalBounties} />
       </Box>
-
-      {sortedOrganizations.length !== 0 ? (
-        <>
-          <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
-            <Typography
-              sx={{
-                typography: {
-                  sm: 'h1',
-                  xs: 'h2'
-                }
-              }}
-            >Communities
-            </Typography>
-            <Chip label={sortedOrganizations.length} />
-          </Stack>
-          <Stack gap={2}>
-            {sortedOrganizations.map(organization => (
-              <Box
-                key={organization.organizationId}
-              >
-                <DeepDaoOrganizationRow
-                  organization={organization}
-                />
-                <Divider sx={{
-                  mt: 2
-                }}
-                />
-              </Box>
-            ))}
-          </Stack>
-        </>
-      ) : null}
     </Grid>
   );
 }
