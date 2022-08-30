@@ -42,14 +42,14 @@ export default function PublicProfile (props: UserDetailsProps) {
 
   const sortedCommunities = data ? sortCommunities(data) : [];
 
-  const visibleDaos: CommunityDetails[] = [];
-  const hiddenDaos: CommunityDetails[] = [];
-  sortedCommunities.forEach(dao => {
-    if (dao.isHidden) {
-      hiddenDaos.push(dao);
+  const visibleCommunities: CommunityDetails[] = [];
+  const hiddenCommunities: CommunityDetails[] = [];
+  sortedCommunities.forEach(comm => {
+    if (comm.isHidden) {
+      hiddenCommunities.push(comm);
     }
     else {
-      visibleDaos.push(dao);
+      visibleCommunities.push(comm);
     }
   });
 
@@ -86,26 +86,26 @@ export default function PublicProfile (props: UserDetailsProps) {
     }
   });
 
-  async function updateDaoProfileItem (organization: CommunityDetails) {
+  async function updateDaoProfileItem (community: CommunityDetails) {
     await charmClient.profile.updateProfileItem({
       profileItems: [{
-        id: organization.organizationId,
-        isHidden: !organization.isHidden,
-        type: 'dao',
+        id: community.id,
+        isHidden: !community.isHidden,
+        type: 'community',
         metadata: null
       }]
     });
     mutate((aggregateData) => {
       return aggregateData ? {
         ...aggregateData,
-        organizations: aggregateData.organizations.map(dao => {
-          if (dao.organizationId === organization.organizationId) {
+        communities: aggregateData.communities.map(comm => {
+          if (comm.id === community.id) {
             return {
-              ...dao,
-              isHidden: !organization.isHidden
+              ...comm,
+              isHidden: !community.isHidden
             };
           }
-          return dao;
+          return comm;
         })
       } : undefined;
     }, {
@@ -113,14 +113,14 @@ export default function PublicProfile (props: UserDetailsProps) {
     });
   }
 
-  const totalHiddenItems = hiddenCollectives.length + hiddenDaos.length;
+  const totalHiddenItems = hiddenCollectives.length + hiddenCommunities.length;
 
   return (
     <Stack spacing={2}>
       <UserDetails {...props} />
       <Divider />
       <AggregatedData user={user} />
-      {data && visibleDaos.length !== 0 ? (
+      {data && visibleCommunities.length !== 0 ? (
         <>
           <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
             <Typography
@@ -132,20 +132,20 @@ export default function PublicProfile (props: UserDetailsProps) {
               }}
             >Organizations
             </Typography>
-            <Chip label={visibleDaos.length} />
+            <Chip label={visibleCommunities.length} />
           </Stack>
           <Stack gap={2}>
-            {visibleDaos.map(organization => (
+            {visibleCommunities.map(community => (
               <Box
-                key={organization.organizationId}
+                key={community.id}
               >
                 <CommunityRow
                   onClick={() => {
-                    updateDaoProfileItem(organization);
+                    updateDaoProfileItem(community);
                   }}
                   visible={true}
                   showVisibilityIcon={!isPublic}
-                  organization={organization}
+                  community={community}
                 />
                 <Divider sx={{
                   mt: 2
@@ -191,20 +191,20 @@ export default function PublicProfile (props: UserDetailsProps) {
               color='secondary'
             >Hidden items
             </Typography>
-            <Chip label={hiddenCollectives.length + hiddenDaos.length} />
+            <Chip label={hiddenCollectives.length + hiddenCommunities.length} />
           </Stack>
           <Stack gap={2} my={1}>
-            {hiddenDaos.map(organization => (
+            {hiddenCommunities.map(community => (
               <Box
-                key={organization.organizationId}
+                key={community.id}
               >
                 <CommunityRow
                   onClick={() => {
-                    updateDaoProfileItem(organization);
+                    updateDaoProfileItem(community);
                   }}
                   visible={false}
                   showVisibilityIcon={!isPublic}
-                  organization={organization}
+                  community={community}
                 />
                 <Divider sx={{
                   mt: 2

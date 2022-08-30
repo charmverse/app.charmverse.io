@@ -9,12 +9,12 @@ import { getAllOrganizations, getProfile } from 'lib/deepdao/client';
 import { DeepDaoProfile, DeepDaoVote } from 'lib/deepdao/interfaces';
 import { UserCommunity } from './interfaces';
 
-export type AggregateProfileData = Pick<DeepDaoProfile, 'totalProposals' | 'totalVotes' | 'proposals' | 'votes'> & {
+export type AggregatedProfileData = Pick<DeepDaoProfile, 'totalProposals' | 'totalVotes' | 'proposals' | 'votes'> & {
   bounties: number;
   communities: UserCommunity[];
 };
 
-export async function getAggregatedData (userPath: string, apiToken?: string): Promise<AggregateProfileData> {
+export async function getAggregatedData (userPath: string, apiToken?: string): Promise<AggregatedProfileData> {
   const user = await prisma.user.findFirst({
     where: isUUID(userPath as string) ? {
       id: userPath as string
