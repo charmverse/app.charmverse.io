@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { v4 } from 'uuid';
-import { baseUrl } from 'testing/mockApiCall';
+import { baseUrl } from './utilities';
 
 test('login - sets a cookie inside the user browser', async ({ page }) => {
 

@@ -3,10 +3,13 @@ import { LoggedInUser } from 'models';
 import { v4 } from 'uuid';
 import { Page as BrowserPage } from '@playwright/test';
 import { IPageWithPermissions } from 'lib/pages/interfaces';
-import { baseUrl } from './mockApiCall';
+import { baseUrl } from 'testing/mockApiCall';
+
+export { baseUrl } from 'testing/mockApiCall';
 
 export async function createUser ({ browserPage, walletAddress }: {browserPage: BrowserPage,
   walletAddress?: string}): Promise<LoggedInUser> {
+
   return browserPage.request.post(`${baseUrl}/api/profile`, {
     data: {
       address: walletAddress

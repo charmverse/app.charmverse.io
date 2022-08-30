@@ -1,7 +1,6 @@
 import { Browser, chromium, expect, test } from '@playwright/test';
 import { IPageWithPermissions } from 'lib/pages/interfaces';
-import { baseUrl } from 'testing/mockApiCall';
-import { createUserAndSpace } from 'testing/playwright';
+import { createUserAndSpace, baseUrl } from './utilities';
 
 let browser: Browser;
 
