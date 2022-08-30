@@ -49,6 +49,7 @@ function ProfileItem ({ onClick, collective, visible, showVisibilityIcon }: Prof
         sm: 'column',
         md: 'row'
       },
+      alignItems: 'center',
       opacity: visible ? 1 : 0.25
     }}
     >
@@ -57,7 +58,12 @@ function ProfileItem ({ onClick, collective, visible, showVisibilityIcon }: Prof
           <Avatar size='large' avatar={collective.image} />
         </Link>
       ) : <Avatar isNft size='large' avatar={collective.image} />}
-      <Stack justifyContent='center'>
+      <Stack
+        justifyContent='center'
+        sx={{
+          flexGrow: 1
+        }}
+      >
         <Box
           display='flex'
           gap={1}
@@ -73,22 +79,22 @@ function ProfileItem ({ onClick, collective, visible, showVisibilityIcon }: Prof
             }}
           >{collective.title}
           </Typography>
-          {showVisibilityIcon && (
-            <IconButton size='small' onClick={onClick}>
-              {visible ? (
-                <Tooltip title={`Hide ${collective.type.toUpperCase()} from profile`}>
-                  <VisibilityIcon className='action' fontSize='small' />
-                </Tooltip>
-              ) : (
-                <Tooltip title={`Show ${collective.type.toUpperCase()} in profile`}>
-                  <VisibilityOffIcon className='action' fontSize='small' />
-                </Tooltip>
-              )}
-            </IconButton>
-          )}
         </Box>
         <Typography variant='subtitle2'>{showDateWithMonthAndYear(collective.date) ?? '?'}</Typography>
       </Stack>
+      {showVisibilityIcon && (
+        <IconButton size='small' onClick={onClick}>
+          {visible ? (
+            <Tooltip title={`Hide ${collective.type.toUpperCase()} from profile`}>
+              <VisibilityIcon className='action' fontSize='small' />
+            </Tooltip>
+          ) : (
+            <Tooltip title={`Show ${collective.type.toUpperCase()} in profile`}>
+              <VisibilityOffIcon className='action' fontSize='small' />
+            </Tooltip>
+          )}
+        </IconButton>
+      )}
     </ProfileItemContainer>
   );
 }

@@ -51,7 +51,8 @@ export async function getAggregatedData (userPath: string, apiToken?: string): P
 
   const hiddenItems = (await prisma.profileItem.findMany({
     where: {
-      type: 'community'
+      type: 'community',
+      isHidden: true
     },
     select: {
       id: true
