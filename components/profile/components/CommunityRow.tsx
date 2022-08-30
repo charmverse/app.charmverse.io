@@ -14,6 +14,7 @@ import { UserCommunity } from 'lib/profile/interfaces';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import Avatar from 'components/common/Avatar';
+import { ProfileItemContainer } from './ProfileItems';
 
 const TASK_TABS = [
   { icon: <HowToVoteIcon />, label: 'Votes', type: 'vote' },
@@ -65,18 +66,10 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
     }));
 
   return (
-    <Stack
+    <ProfileItemContainer
       gap={0.5}
       sx={{
-        '&:hover .action': {
-          opacity: 1,
-          transition: `${theme.transitions.duration.short}ms opacity ${theme.transitions.easing.easeInOut}`
-        },
-        '& .action': {
-          opacity: 0,
-          transition: `${theme.transitions.duration.short}ms opacity ${theme.transitions.easing.easeInOut}`
-        },
-        opacity: visible ? 1 : 0.75
+        opacity: visible ? 1 : 0.25
       }}
     >
       <Box
@@ -115,7 +108,7 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
               </Typography>
             )}
           </Box>
-          <Box display='flex' alignItems='center'>
+          <Box display='flex' alignItems='center' gap={0.5}>
             {showVisibilityIcon && (
               <IconButton
                 size='small'
@@ -220,6 +213,6 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
           </Stack>
         </Box>
       </Collapse>
-    </Stack>
+    </ProfileItemContainer>
   );
 }

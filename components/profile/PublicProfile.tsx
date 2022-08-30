@@ -90,6 +90,8 @@ export default function PublicProfile (props: UserDetailsProps) {
     });
   }
 
+  const communities = (data?.communities ?? []).filter((community) => isPublic ? !community.isHidden : true);
+
   return (
     <Stack spacing={2}>
       <UserDetails {...props} />
@@ -101,17 +103,22 @@ export default function PublicProfile (props: UserDetailsProps) {
           </Box>
         ) : (
           <>
-            <AggregatedData data={data} />
-            {data.communities.length !== 0 ? (
+            <AggregatedData
+              totalBounties={data.bounties}
+              totalCommunities={communities.length}
+              totalProposals={data.totalProposals}
+              totalVotes={data.totalVotes}
+            />
+            {communities.length !== 0 ? (
               <>
                 <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
                   <SectionTitle>
                     Communities
                   </SectionTitle>
-                  <Chip label={data.communities.length} />
+                  <Chip label={communities.length} />
                 </Stack>
                 <Stack gap={2}>
-                  {data.communities.map(community => (
+                  {communities.map(community => (
                     <Box
                       key={community.id}
                     >

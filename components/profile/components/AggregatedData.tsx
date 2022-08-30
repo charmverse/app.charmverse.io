@@ -1,5 +1,4 @@
 import { Box, Grid, Paper, Typography } from '@mui/material';
-import { AggregatedProfileData } from 'lib/profile';
 
 export function AggregatedDataItem ({ value, label }: { value: number, label: string }) {
   return (
@@ -39,7 +38,12 @@ export function AggregatedDataItem ({ value, label }: { value: number, label: st
   );
 }
 
-export default function AggregatedData ({ data }: {data: AggregatedProfileData}) {
+export default function AggregatedData ({ totalBounties, totalCommunities, totalProposals, totalVotes }: {
+  totalCommunities: number
+  totalProposals: number
+  totalVotes: number
+  totalBounties: number
+}) {
   return (
     <Grid container display='flex' gap={2} flexDirection='column'>
       <Box
@@ -52,10 +56,10 @@ export default function AggregatedData ({ data }: {data: AggregatedProfileData})
           }
         }}
       >
-        <AggregatedDataItem label='Communities' value={data.communities.length} />
-        <AggregatedDataItem label='Proposals' value={data.totalProposals} />
-        <AggregatedDataItem label='Votes' value={data.totalVotes} />
-        <AggregatedDataItem label='Bounties' value={data.bounties} />
+        <AggregatedDataItem label='Communities' value={totalCommunities} />
+        <AggregatedDataItem label='Proposals' value={totalProposals} />
+        <AggregatedDataItem label='Votes' value={totalVotes} />
+        <AggregatedDataItem label='Bounties' value={totalBounties} />
       </Box>
     </Grid>
   );

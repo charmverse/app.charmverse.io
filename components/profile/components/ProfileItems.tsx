@@ -20,8 +20,7 @@ export interface Collective {
   isHidden: boolean
 }
 
-const ProfileItemStack = styled(Stack)`
-  flex-direction: ${({ theme }) => theme.breakpoints.down('sm') ? 'row' : 'column'};
+export const ProfileItemContainer = styled(Stack)`
   &:hover .action {
     opacity: 1;
     transition: ${({ theme }) => `${theme.transitions.duration.short}ms opacity ${theme.transitions.easing.easeInOut}`};
@@ -33,6 +32,7 @@ const ProfileItemStack = styled(Stack)`
   }
 
   gap: ${({ theme }) => theme.spacing(2)};
+  transition: ${({ theme }) => `${theme.transitions.duration.short}ms opacity ${theme.transitions.easing.easeInOut}`};
 `;
 
 interface ProfileItemProps {
@@ -44,8 +44,12 @@ interface ProfileItemProps {
 
 function ProfileItem ({ onClick, collective, visible, showVisibilityIcon }: ProfileItemProps) {
   return (
-    <ProfileItemStack sx={{
-      opacity: visible ? 1 : 0.75
+    <ProfileItemContainer sx={{
+      flexDirection: {
+        sm: 'column',
+        md: 'row'
+      },
+      opacity: visible ? 1 : 0.25
     }}
     >
       {collective.type === 'poap' ? (
@@ -85,7 +89,7 @@ function ProfileItem ({ onClick, collective, visible, showVisibilityIcon }: Prof
         </Box>
         <Typography variant='subtitle2'>{showDateWithMonthAndYear(collective.date) ?? '?'}</Typography>
       </Stack>
-    </ProfileItemStack>
+    </ProfileItemContainer>
   );
 }
 
