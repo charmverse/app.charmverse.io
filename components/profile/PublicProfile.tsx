@@ -1,7 +1,7 @@
 import { Box, Chip, Divider, Stack, Typography } from '@mui/material';
 import useSWRImmutable from 'swr/immutable';
 import charmClient from 'charmClient';
-import { sortCommunities, UserCommunity } from 'lib/profile';
+import { sortCommunities } from 'lib/profile/sortCommunities';
 import { ExtendedPoap } from 'models';
 import { NftData } from 'lib/nft/interfaces';
 import AggregatedData from './components/AggregatedData';
