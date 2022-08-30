@@ -1,4 +1,5 @@
 import { Browser, chromium, expect, test } from '@playwright/test';
+import { IPageWithPermissions } from 'lib/pages/interfaces';
 import { baseUrl } from 'testing/mockApiCall';
 import { createUserAndSpace } from 'testing/playwright';
 
@@ -9,105 +10,122 @@ test.beforeAll(async () => {
   browser = await chromium.launch();
 });
 
-test('public page - makes a page public', async () => {
+test.describe.serial('Make a page public and visit it', async () => {
+  // Will be set by the first test
+  let shareUrl = '';
+  let boardPage: IPageWithPermissions;
+  let pages: IPageWithPermissions[] = [];
 
-  // Arrange ------------------
-  const userContext = await browser.newContext({ permissions: ['clipboard-read', 'clipboard-write'] });
-  const page = await userContext.newPage();
+  test('make a page public', async () => {
 
-  const { user: profile, space, pages } = await createUserAndSpace({ browserPage: page });
+    // Arrange ------------------
+    const userContext = await browser.newContext({ permissions: ['clipboard-read', 'clipboard-write'] });
+    const page = await userContext.newPage();
 
-  const domain = space.domain;
+    const { user: profile, space, pages: spacePages } = await createUserAndSpace({ browserPage: page });
 
-  const boardPage = pages.find(p => p.type === 'board' && p.title.match(/tasks/i) !== null);
+    pages = spacePages;
 
-  await page.goto(`${baseUrl}`);
+    const domain = space.domain;
 
-  const targetRedirectPath = `${baseUrl}/${domain}/${boardPage?.path}`;
+    boardPage = pages.find(p => p.type === 'board' && p.title.match(/tasks/i) !== null) as IPageWithPermissions;
 
-  await page.goto(targetRedirectPath);
+    await page.goto(`${baseUrl}`);
 
-  // Act ----------------------
-  // Part A - Prepare the page as a logged in user
-  // 1. Make sure the board page exists and cards are visible
-  await page.waitForResponse(/\/api\/blocks/);
+    const targetRedirectPath = `${baseUrl}/${domain}/${boardPage?.path}`;
 
-  await expect(page.locator('data-test=kanban-card').first()).toBeVisible();
+    await page.goto(targetRedirectPath);
 
-  // 2. Open the share dialog and make the page public
-  const permissionDialog = page.locator('data-test=toggle-page-permissions-dialog');
+    // Act ----------------------
+    // Part A - Prepare the page as a logged in user
+    // 1. Make sure the board page exists and cards are visible
+    await page.waitForResponse(/\/api\/blocks/);
 
-  await permissionDialog.click();
+    await expect(page.locator('data-test=kanban-card').first()).toBeVisible();
 
-  const publicShareToggle = page.locator('data-test=toggle-public-page');
+    // 2. Open the share dialog and make the page public
+    const permissionDialog = page.locator('data-test=toggle-page-permissions-dialog');
 
-  await publicShareToggle.click();
-  const shareUrl = `${baseUrl}/share/${domain}/${boardPage?.path}`;
+    await permissionDialog.click();
 
-  await page.waitForResponse(/\/api\/permissions/);
+    const publicShareToggle = page.locator('data-test=toggle-public-page');
 
-  // 3. Copy the public link to the clipboard
-  const shareLinkInput = page.locator('data-test=share-link').locator('input');
+    await publicShareToggle.click();
+    shareUrl = `${baseUrl}/share/${domain}/${boardPage?.path}`;
 
-  const inputValue = await shareLinkInput.inputValue();
+    await page.waitForResponse(/\/api\/permissions/);
 
-  expect(inputValue.match(shareUrl)).not.toBe(null);
+    // 3. Copy the public link to the clipboard
+    const shareLinkInput = page.locator('data-test=share-link').locator('input');
 
-  const copyButton = page.locator('data-test=copy-button');
+    const inputValue = await shareLinkInput.inputValue();
 
-  await expect(copyButton).toBeVisible();
+    expect(inputValue.match(shareUrl)).not.toBe(null);
 
-  await copyButton.click({ force: true });
+    const copyButton = page.locator('data-test=copy-button');
 
-  const clipboardContent = await page.evaluate(async () => {
-    return navigator.clipboard.readText();
+    await expect(copyButton).toBeVisible();
+
+    await copyButton.click({ force: true });
+
+    const clipboardContent = await page.evaluate(async () => {
+      return navigator.clipboard.readText();
+    });
+
+    expect(clipboardContent.match(shareUrl)).not.toBe(null);
+
+    // Set the share URL we will visit to be the exact clipboard content
+    shareUrl = clipboardContent;
+
   });
 
-  expect(clipboardContent.match(shareUrl)).not.toBe(null);
+  test('visit the public page', async () => {
 
-  // Part B - Visit this page as a non logged in user
-  const publicContext = await browser.newContext({});
+    // Part B - Visit this page as a non logged in user
+    const publicContext = await browser.newContext({});
 
-  const page1 = await publicContext.newPage();
+    const page = await publicContext.newPage();
 
-  // 1. Visit the page
-  await page1.goto(clipboardContent);
+    // 1. Visit the page
+    await page.goto(shareUrl);
 
-  // 2. Make sure the board renders
-  const boardTitle = page.locator('data-test=board-title').locator('input');
+    // 2. Make sure the board renders
+    const boardTitle = page.locator('data-test=board-title').locator('input');
 
-  await expect(boardTitle).toBeVisible();
+    await expect(boardTitle).toBeVisible();
 
-  expect(await boardTitle.inputValue()).toBe(boardPage?.title);
+    expect(await boardTitle.inputValue()).toBe(boardPage?.title);
 
-  // 3. Wait for the card, click on it
-  const cardToOpen = page1.locator('data-test=kanban-card').first();
-  await expect(cardToOpen).toBeVisible();
+    // 3. Wait for the card, click on it
+    const cardToOpen = page.locator('data-test=kanban-card').first();
+    await expect(cardToOpen).toBeVisible();
 
-  await cardToOpen.click();
+    await cardToOpen.click();
 
-  // 4. Open the card and make sure it renders content
-  await page1.waitForURL(`${shareUrl}*cardId*`);
+    // 4. Open the card and make sure it renders content
+    await page.waitForURL(`${shareUrl}*cardId*`);
 
-  const openedCardUrl = await page1.evaluate(() => window.location.href);
+    const openedCardUrl = await page.evaluate(() => window.location.href);
 
-  const queryParams = new URLSearchParams(openedCardUrl.split('?')[1]);
+    const queryParams = new URLSearchParams(openedCardUrl.split('?')[1]);
 
-  const openedCardId = queryParams.get('cardId');
+    const openedCardId = queryParams.get('cardId');
 
-  const openedCardPage = pages.find(p => p.id === openedCardId);
+    const openedCardPage = pages.find(p => p.id === openedCardId);
 
-  expect(openedCardPage).toBeDefined();
+    expect(openedCardPage).toBeDefined();
 
-  const cardPopup = page1.locator('div.Dialog');
+    const cardPopup = page.locator('div.Dialog');
 
-  await expect(cardPopup).toBeVisible();
+    await expect(cardPopup).toBeVisible();
 
-  const documentTitle = cardPopup.locator('data-test=editor-page-title');
+    const documentTitle = cardPopup.locator('data-test=editor-page-title');
 
-  await expect(documentTitle).toBeVisible();
+    await expect(documentTitle).toBeVisible();
 
-  expect(await documentTitle.innerText()).toBe(openedCardPage?.title);
+    expect(await documentTitle.innerText()).toBe(openedCardPage?.title);
+
+  });
 
 });
 
