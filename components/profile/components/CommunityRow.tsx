@@ -182,7 +182,7 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
 
   const hasVotes = community.votes.length > 0;
   const hasProposals = community.proposals.length > 0;
-  const hasVCs = true;
+  const hasVCs = false;
   const isCollapsible = hasVotes || hasProposals || hasVCs;
 
   function toggleCollapse () {
