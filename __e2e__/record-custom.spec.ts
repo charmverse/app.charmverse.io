@@ -1,7 +1,11 @@
 import { chromium } from '@playwright/test';
 import { LoggedInUser } from 'models';
 import { baseUrl } from 'testing/mockApiCall';
+import { createUserAndSpace } from 'testing/playwright';
 import { v4 } from 'uuid';
+
+// Run the test server with npm run start:test, then execute 'dotenv -e .env.test.local -- ts-node __e2e__/record-custom.spec.ts'
+// Once the page loads, click 'Record' to start recording your interaction with the app
 
 // (async () => {
 //   // ARRANGE
@@ -15,44 +19,12 @@ import { v4 } from 'uuid';
 //   // Pause the page, and start recording manually.
 //   const page = await context.newPage();
 
-//   const walletAddress = v4();
-
-//   const profile: LoggedInUser = await (page.request.post(`${baseUrl}/api/profile`, {
-//     data: {
-//       address: walletAddress
-//     }
-//   }).then(res => res.json()));
-
 //   const domain = `domain-${v4()}`;
 
-//   await page.request.post(`${baseUrl}/api/spaces`, {
-//     data: {
-//       author: {
-//         connect: {
-//           id: profile.id
-//         }
-//       },
-//       createdAt: new Date(),
-//       updatedAt: new Date(),
-//       updatedBy: profile.id,
-//       spaceRoles: {
-//         create: [{
-//           isAdmin: true,
-//           user: {
-//             connect: {
-//               id: profile!.id
-//             }
-//           }
-//         }]
-//       },
-//       domain,
-//       name: 'Testing space'
-//     }
+//   const { space, user } = await createUserAndSpace({
+//     browserPage: page
 //   });
 
-//   // ACT
-
-//   // ASSERT
 //   page.goto(baseUrl as string);
 
 //   await page.pause();
