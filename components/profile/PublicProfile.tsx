@@ -140,7 +140,7 @@ export default function PublicProfile (props: UserDetailsProps) {
       <Divider />
       {
         isLoading ? (
-          <LoadingComponent isLoading height={300} />
+          <LoadingComponent isLoading minHeight={300} />
         ) : (
           <>
             <AggregatedData
@@ -197,7 +197,7 @@ export default function PublicProfile (props: UserDetailsProps) {
             ) : null}
             <Card>
               <Box p={2} pb={0}>
-                <Typography fontWeight={700} fontSize={20}>Credentials</Typography>
+                <Typography fontWeight={700} fontSize={20}>Verified Credentials</Typography>
               </Box>
               <CollablandCredentials />
             </Card>

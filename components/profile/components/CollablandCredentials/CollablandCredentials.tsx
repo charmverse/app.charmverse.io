@@ -41,10 +41,10 @@ function Authorize () {
   return (
     <Stack my={3} alignItems='center' spacing={3}>
       <Typography fontWeight='strong'>
-        Add credentials from Collab.land
+        Authenticate with Collab.land to import credentials
       </Typography>
       <Button href={connectUrl} external variant='outlined'>
-        Import credentials
+        Connect
       </Button>
     </Stack>
   );
