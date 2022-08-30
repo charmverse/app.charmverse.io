@@ -1,4 +1,4 @@
-import { NftData } from 'lib/nft/types';
+import { NftData } from 'lib/nft/interfaces';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { onError, onNoMatch } from 'lib/middleware';

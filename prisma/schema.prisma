@@ -123,6 +123,13 @@ enum SpaceOperation {
   createVote
 }
 
+enum ProfileItemType {
+  community
+  nft
+  poap
+  vc
+}
+
 enum ProposalStatus {
   private_draft
   draft
@@ -314,6 +321,7 @@ model User {
   notificationState UserNotificationState?
   userVotes         UserVote[]
   initiatedVotes    Vote[]
+  profileItems      ProfileItem[]
   proposalAuthors   ProposalAuthor[]
   proposalReviewers ProposalReviewer[]
 }
@@ -658,4 +666,13 @@ model ProposalReviewer {
   reviewer   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([proposalId, userId])
+}
+
+model ProfileItem {
+  id       String          @id
+  userId   String          @db.Uuid
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isHidden Boolean?
+  metadata Json?
+  type     ProfileItemType
 }

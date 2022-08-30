@@ -1,5 +1,5 @@
 import { AlchemyNft } from 'lib/blockchain/provider/interfaces';
-import { NftData } from 'lib/nft/types';
+import { NftData } from 'lib/nft/interfaces';
 
 export const mapNftFromAlchemy = (nft: AlchemyNft, chainId: number): NftData => {
   return {
@@ -12,6 +12,7 @@ export const mapNftFromAlchemy = (nft: AlchemyNft, chainId: number): NftData => 
     title: nft.title,
     description: nft.description,
     chainId,
-    timeLastUpdated: nft.timeLastUpdated
+    timeLastUpdated: nft.timeLastUpdated,
+    isHidden: false
   };
 };

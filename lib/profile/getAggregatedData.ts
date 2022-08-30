@@ -5,10 +5,18 @@ import { getSpacesOfUser } from 'lib/spaces/getSpacesOfUser';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
 import { isTruthy } from 'lib/utilities/types';
-import { getAllOrganizations, getProfile } from './client';
-import { DeepDaoAggregateData, DeepDaoProfile, DeepDaoVote } from './interfaces';
+import { getAllOrganizations, getProfile } from 'lib/deepdao/client';
+import { DeepDaoProfile, DeepDaoVote } from 'lib/deepdao/interfaces';
+import { CommunityDetails } from 'components/profile/components/CommunityRow';
+import { UserCommunity } from './interfaces';
+import { sortCommunities } from './sortCommunities';
 
-export async function getAggregatedData (userPath: string, apiToken?: string): Promise<DeepDaoAggregateData> {
+export type AggregatedProfileData = Pick<DeepDaoProfile, 'totalProposals' | 'totalVotes'> & {
+  bounties: number;
+  communities: CommunityDetails[];
+};
+
+export async function getAggregatedData (userPath: string, apiToken?: string): Promise<AggregatedProfileData> {
   const user = await prisma.user.findFirst({
     where: isUUID(userPath as string) ? {
       id: userPath as string
@@ -40,6 +48,16 @@ export async function getAggregatedData (userPath: string, apiToken?: string): P
     getCompletedApplicationsOfUser(user.id),
     getSpacesOfUser(user.id)
   ]);
+
+  const hiddenItems = (await prisma.profileItem.findMany({
+    where: {
+      type: 'community',
+      isHidden: true
+    },
+    select: {
+      id: true
+    }
+  })).map(profileItem => profileItem.id);
 
   const userVotes = await prisma.vote.findMany({
     where: {
@@ -74,39 +92,50 @@ export async function getAggregatedData (userPath: string, apiToken?: string): P
     }
   });
 
-  const deepDaoOrgs = Object.values(profiles).map(profile => profile.data.organizations).flat()
-    .map(org => ({
-      ...org,
-      // sometimes the logo is just a filename, do some basic validation
-      logo: daoLogos[org.organizationId]?.includes('http') ? daoLogos[org.organizationId] : null
-    }));
-  const charmVerseOrgs = userWorkspaces.map(userWorkspace => ({
+  const deepDaoCommunities: UserCommunity[] = Object.values(profiles)
+    .map(profile => profile.data.organizations
+      .map(org => ({
+        joinDate: '',
+        id: org.organizationId,
+        isHidden: hiddenItems.includes(org.organizationId),
+        name: org.name,
+        // sometimes the logo is just a filename, do some basic validation
+        logo: daoLogos[org.organizationId]?.includes('http') ? daoLogos[org.organizationId] : null
+      }))).flat();
+
+  const charmVerseCommunities: UserCommunity[] = userWorkspaces.map(userWorkspace => ({
+    id: userWorkspace.id,
+    isHidden: hiddenItems.includes(userWorkspace.id),
     joinDate: userWorkspace.spaceRoles.find(spaceRole => spaceRole.userId === user.id)?.createdAt.toISOString(),
-    organizationId: userWorkspace.id,
     name: userWorkspace.name,
     logo: userWorkspace.spaceImage
   }));
 
-  const allOrgs = [...deepDaoOrgs, ...charmVerseOrgs];
-  // const organizations: DeepDaoOrganization[] = allOrgs.map(org => ({ ...org, isHidden: hiddenDaoProfileItemIds.includes(org.organizationId) }));
+  const communities = [...deepDaoCommunities, ...charmVerseCommunities];
+  const proposals = profiles.reduce<DeepDaoProfile['proposals']>((_proposals, profile) => ([..._proposals, ...profile.data.proposals]), []);
+  const votes = [
+    // Deepdao votes
+    ...profiles.reduce<DeepDaoProfile['votes']>((_votes, profile) => ([..._votes, ...profile.data.votes]), []),
+    ...userVotes.map(vote => ({
+      createdAt: vote.createdAt.toString(),
+      description: vote.description ?? '',
+      organizationId: vote.spaceId,
+      title: vote.title,
+      voteId: vote.id,
+      successful: vote.status === 'Passed'
+    } as DeepDaoVote))
+  ];
+
+  const sortedCommunities = sortCommunities({
+    communities,
+    proposals,
+    votes
+  });
 
   return {
     totalProposals: profiles.reduce((acc, profile) => acc + profile.data.totalProposals, 0),
     totalVotes: profiles.reduce((acc, profile) => acc + profile.data.totalVotes, 0),
-    organizations: allOrgs,
-    proposals: profiles.reduce<DeepDaoProfile['proposals']>((proposals, profile) => ([...proposals, ...profile.data.proposals]), []),
-    votes: [
-      // Deepdao votes
-      ...profiles.reduce<DeepDaoProfile['votes']>((votes, profile) => ([...votes, ...profile.data.votes]), []),
-      ...userVotes.map(vote => ({
-        createdAt: vote.createdAt.toString(),
-        description: vote.description ?? '',
-        organizationId: vote.spaceId,
-        title: vote.title,
-        voteId: vote.id,
-        successful: vote.status === 'Passed'
-      } as DeepDaoVote))
-    ],
+    communities: sortedCommunities,
     bounties: completedBountiesCount
   };
 }

@@ -3,7 +3,7 @@ import { ExtendedPoap } from 'models';
 
 const getPOAPsURL = (address: string) => `https://api.poap.tech/actions/scan/${address}`;
 
-export default async function getPOAPs (addresses: Array<string>): Promise<Array<ExtendedPoap>> {
+export default async function getPOAPs (addresses: string[]): Promise<ExtendedPoap[]> {
   const requests: Array<Promise<any>> = [];
 
   addresses.forEach(address => {
