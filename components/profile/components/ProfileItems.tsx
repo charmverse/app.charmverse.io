@@ -23,7 +23,6 @@ export const ProfileItemContainer = styled(Stack)`
   }
 
   .action {
-    opacity: 0;
     transition: ${({ theme }) => `${theme.transitions.duration.short}ms opacity ${theme.transitions.easing.easeInOut}`};
   }
 
@@ -79,6 +78,12 @@ function ProfileItem ({ onClick, collective, visible, showVisibilityIcon }: Prof
         <IconButton
           size='small'
           className='action'
+          sx={{
+            opacity: {
+              md: 0,
+              sm: 1
+            }
+          }}
           onClick={onClick}
         >
           {visible ? (
