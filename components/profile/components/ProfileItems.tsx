@@ -23,7 +23,6 @@ export const ProfileItemContainer = styled(Stack)`
   }
 
   .action {
-    opacity: 0;
     transition: ${({ theme }) => `${theme.transitions.duration.short}ms opacity ${theme.transitions.easing.easeInOut}`};
   }
 
@@ -46,7 +45,12 @@ function ProfileItem ({ onClick, collective, visible, showVisibilityIcon }: Prof
         md: 'row'
       },
       alignItems: 'center',
-      opacity: visible ? 1 : 0.25
+      opacity: visible ? 1 : 0.25,
+      textAlign: {
+        xs: 'center',
+        sm: 'center',
+        md: 'initial'
+      }
     }}
     >
       {collective.type === 'poap' ? (
@@ -79,14 +83,24 @@ function ProfileItem ({ onClick, collective, visible, showVisibilityIcon }: Prof
         <Typography variant='subtitle2'>{showDateWithMonthAndYear(collective.date) ?? '?'}</Typography>
       </Stack>
       {showVisibilityIcon && (
-        <IconButton size='small' onClick={onClick}>
+        <IconButton
+          size='small'
+          className='action'
+          sx={{
+            opacity: {
+              md: 0,
+              sm: 1
+            }
+          }}
+          onClick={onClick}
+        >
           {visible ? (
             <Tooltip title={`Hide ${collective.type.toUpperCase()} from profile`}>
-              <VisibilityIcon className='action' fontSize='small' />
+              <VisibilityIcon fontSize='small' />
             </Tooltip>
           ) : (
             <Tooltip title={`Show ${collective.type.toUpperCase()} in profile`}>
-              <VisibilityOffIcon className='action' fontSize='small' />
+              <VisibilityOffIcon fontSize='small' />
             </Tooltip>
           )}
         </IconButton>
