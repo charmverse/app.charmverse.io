@@ -40,7 +40,7 @@ async function getNFTsMiddleware (req: NextApiRequest, res: NextApiResponse<NftD
   }
 
   const { addresses } = user;
-  const mappedNfts = await getNFTs(['0x3B60e31CFC48a9074CD5bEbb26C9EAa77650a43F']);
+  const mappedNfts = await getNFTs(addresses);
 
   res.status(200).json(mappedNfts.map(nft => ({
     ...nft,

@@ -8,7 +8,7 @@ export async function getNFTs (addresses: string[], chainId: alchemyApi.Supporte
 }
 
 export async function getNFT (contractAddress: string, tokenId: string, chainId: alchemyApi.SupportedChainId = 1) {
-  const nft = alchemyApi.getNFT(contractAddress, tokenId, chainId);
+  const nft = await alchemyApi.getNFT(contractAddress, tokenId, chainId);
   return mapNftFromAlchemy(nft, chainId);
 }
 

@@ -43,7 +43,7 @@ function CountIcon ({ label, icon, count }: { label: string, icon: ReactNode, co
   return (
     <Tooltip title={label}>
       <Typography variant='subtitle2' sx={{ pr: 1, gap: 0.5, display: 'inline-flex', alignItems: 'center' }}>
-        <span style={{ fontSize: '12px' }}>{icon}</span> {count}
+        <Box mt={0.5} sx={{ svg: { fontSize: '16px' } }}>{icon}</Box> {count}
       </Typography>
     </Tooltip>
   );
@@ -122,8 +122,8 @@ function VotesPanel ({ events }: { events: DeepDaoVote[] }) {
               createdAt={event.createdAt}
               title={event.title}
               icon={event.successful
-                ? <ThumbUpIcon color='success' fontSize='small' />
-                : <ThumbDownIcon color='error' fontSize='small' />}
+                ? <ThumbUpIcon color='success' sx={{ fontSize: '16px' }} />
+                : <ThumbDownIcon color='error' sx={{ fontSize: '16px' }} />}
               eventNumber={index + 1}
             />
           ))
@@ -144,8 +144,8 @@ function ProposalsPanel ({ events }: { events: DeepDaoProposal[] }) {
               createdAt={event.createdAt}
               title={event.title}
               icon={event.outcome === event.voteChoice
-                ? <ThumbUpIcon color='success' fontSize='small' />
-                : <ThumbDownIcon color='error' fontSize='small' />}
+                ? <ThumbUpIcon color='success' sx={{ fontSize: '16px' }} />
+                : <ThumbDownIcon color='error' sx={{ fontSize: '16px' }} />}
               eventNumber={index + 1}
             />
           ))
@@ -166,8 +166,8 @@ function VerifiableCredentialsPanel ({ events }: { events: DeepDaoProposal[] }) 
               createdAt={event.createdAt}
               title={event.title}
               icon={event.outcome === event.voteChoice
-                ? <ThumbUpIcon color='success' fontSize='small' />
-                : <ThumbDownIcon color='error' fontSize='small' />}
+                ? <ThumbUpIcon color='success' sx={{ fontSize: '16px' }} />
+                : <ThumbDownIcon color='error' sx={{ fontSize: '16px' }} />}
               eventNumber={index + 1}
             />
           ))
