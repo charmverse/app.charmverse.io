@@ -44,7 +44,10 @@ interface ProfileItemProps {
 
 function ProfileItem ({ onClick, collective, visible, showVisibilityIcon }: ProfileItemProps) {
   return (
-    <ProfileItemStack>
+    <ProfileItemStack sx={{
+      opacity: visible ? 1 : 0.75
+    }}
+    >
       {collective.type === 'poap' ? (
         <Link href={collective.link} target='_blank' display='flex'>
           <Avatar size='large' avatar={collective.image} />

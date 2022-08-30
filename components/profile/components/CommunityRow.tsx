@@ -75,7 +75,8 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
         '& .action': {
           opacity: 0,
           transition: `${theme.transitions.duration.short}ms opacity ${theme.transitions.easing.easeInOut}`
-        }
+        },
+        opacity: visible ? 1 : 0.75
       }}
     >
       <Box
@@ -116,7 +117,14 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
           </Box>
           <Box display='flex' alignItems='center'>
             {showVisibilityIcon && (
-              <IconButton size='small' onClick={onClick}>
+              <IconButton
+                size='small'
+                onClick={(e) => {
+                  // Don't want visibility icon to toggle the proposal and votes list
+                  e.stopPropagation();
+                  onClick();
+                }}
+              >
                 {visible ? (
                   <Tooltip title='Hide Community from profile'>
                     <VisibilityIcon className='action' fontSize='small' />

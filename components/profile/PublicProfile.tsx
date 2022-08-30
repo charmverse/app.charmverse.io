@@ -42,17 +42,6 @@ export default function PublicProfile (props: UserDetailsProps) {
 
   const sortedCommunities = data ? sortCommunities(data) : [];
 
-  const visibleCommunities: CommunityDetails[] = [];
-  const hiddenCommunities: CommunityDetails[] = [];
-  sortedCommunities.forEach(comm => {
-    if (comm.isHidden) {
-      hiddenCommunities.push(comm);
-    }
-    else {
-      visibleCommunities.push(comm);
-    }
-  });
-
   const { data: poapData, mutate: mutatePoaps } = useSWRImmutable(`/poaps/${user.id}/${isPublic}`, () => {
     return isPublicUser(user)
       ? Promise.resolve(user.visiblePoaps as ExtendedPoap[])
@@ -65,25 +54,14 @@ export default function PublicProfile (props: UserDetailsProps) {
       : charmClient.nft.list(user.id);
   });
 
-  const hiddenCollectives: Collective[] = [];
-  const visibleCollectives: Collective[] = [];
+  const collectives: Collective[] = [];
 
   poapData?.forEach(poap => {
-    if (poap.isHidden) {
-      hiddenCollectives.push(transformPoap(poap));
-    }
-    else {
-      visibleCollectives.push(transformPoap(poap));
-    }
+    collectives.push(transformPoap(poap));
   });
 
   nftData?.forEach(nft => {
-    if (nft.isHidden) {
-      hiddenCollectives.push(transformNft(nft));
-    }
-    else {
-      visibleCollectives.push(transformNft(nft));
-    }
+    collectives.push(transformNft(nft));
   });
 
   async function updateDaoProfileItem (community: CommunityDetails) {
@@ -113,23 +91,21 @@ export default function PublicProfile (props: UserDetailsProps) {
     });
   }
 
-  const totalHiddenItems = hiddenCollectives.length + hiddenCommunities.length;
-
   return (
     <Stack spacing={2}>
       <UserDetails {...props} />
       <Divider />
       <AggregatedData user={user} />
-      {data && visibleCommunities.length !== 0 ? (
+      {data && sortedCommunities.length !== 0 ? (
         <>
           <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
             <SectionTitle>
               Communities
             </SectionTitle>
-            <Chip label={visibleCommunities.length} />
+            <Chip label={sortedCommunities.length} />
           </Stack>
           <Stack gap={2}>
-            {visibleCommunities.map(community => (
+            {sortedCommunities.map(community => (
               <Box
                 key={community.id}
               >
@@ -137,7 +113,7 @@ export default function PublicProfile (props: UserDetailsProps) {
                   onClick={() => {
                     updateDaoProfileItem(community);
                   }}
-                  visible={true}
+                  visible={!community.isHidden}
                   showVisibilityIcon={!isPublic}
                   community={community}
                 />
@@ -151,59 +127,16 @@ export default function PublicProfile (props: UserDetailsProps) {
         </>
       ) : null}
 
-      {visibleCollectives.length ? (
+      {collectives.length ? (
         <Box>
           <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
             <SectionTitle>
               NFTs & POAPs
             </SectionTitle>
-            <Chip label={visibleCollectives.length} />
+            <Chip label={collectives.length} />
           </Stack>
           <ProfileItemsList
-            collectives={visibleCollectives.sort((collectiveA, collectiveB) => new Date(collectiveB.date) > new Date(collectiveA.date) ? 1 : -1)}
-            isPublic={isPublic}
-            mutateNfts={mutateNfts}
-            mutatePoaps={mutatePoaps}
-          />
-        </Box>
-      ) : null}
-
-      {totalHiddenItems && !isPublic && data ? (
-        <Box>
-          <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={1}>
-            <Typography
-              sx={{
-                fontWeight: 'bold',
-                fontSize: '1.25rem'
-              }}
-              color='secondary'
-            >
-              Hidden items
-            </Typography>
-            <Chip label={hiddenCollectives.length + hiddenCommunities.length} />
-          </Stack>
-          <Stack gap={2} my={1}>
-            {hiddenCommunities.map(community => (
-              <Box
-                key={community.id}
-              >
-                <CommunityRow
-                  onClick={() => {
-                    updateDaoProfileItem(community);
-                  }}
-                  visible={false}
-                  showVisibilityIcon={!isPublic}
-                  community={community}
-                />
-                <Divider sx={{
-                  mt: 2
-                }}
-                />
-              </Box>
-            ))}
-          </Stack>
-          <ProfileItemsList
-            collectives={hiddenCollectives.sort((collectiveA, collectiveB) => new Date(collectiveB.date) > new Date(collectiveA.date) ? 1 : -1)}
+            collectives={collectives.sort((collectiveA, collectiveB) => new Date(collectiveB.date) > new Date(collectiveA.date) ? 1 : -1)}
             isPublic={isPublic}
             mutateNfts={mutateNfts}
             mutatePoaps={mutatePoaps}
