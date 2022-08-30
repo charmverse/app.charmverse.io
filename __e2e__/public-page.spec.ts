@@ -35,7 +35,9 @@ test('public page - makes a page public', async () => {
   await expect(page.locator('data-test=kanban-card').first()).toBeVisible();
 
   // 2. Open the share dialog and make the page public
-  await page.locator('data-test=toggle-page-permissions-dialog').click();
+  const permissionDialog = page.locator('data-test=toggle-page-permissions-dialog');
+
+  await permissionDialog.click();
 
   const publicShareToggle = page.locator('data-test=toggle-public-page');
 
@@ -97,7 +99,7 @@ test('public page - makes a page public', async () => {
 
   expect(openedCardPage).toBeDefined();
 
-  const cardPopup = page1.locator('data-test=page-dialog');
+  const cardPopup = page1.locator('div.Dialog');
 
   await expect(cardPopup).toBeVisible();
 

@@ -160,9 +160,7 @@ export default function PageDialog (props: Props) {
           )}
           onClose={onClose}
         >
-          <div data-test='page-dialog'>
-            {page && <DocumentPage insideModal page={page} setPage={setPage} readOnly={props.readOnly} />}
-          </div>
+          {page && <DocumentPage insideModal page={page} setPage={setPage} readOnly={props.readOnly} />}
         </Dialog>
 
       )}
