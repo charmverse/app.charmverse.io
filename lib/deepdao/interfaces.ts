@@ -14,6 +14,7 @@ export type DeepDaoOrganization = {
   name: string;
   organizationId: string;
   isHidden: boolean;
+  logo: string | null;
 }
 
 export type DeepDaoProposal = {
@@ -50,3 +51,28 @@ export type GetParticipationScoreResponse = DeepDaoApiResponse<DeepDaoParticipat
 export type GetProfileResponse = DeepDaoApiResponse<DeepDaoProfile>;
 
 export type DeepDaoAggregateData = Pick<DeepDaoProfile, 'organizations' | 'totalProposals' | 'totalVotes' | 'proposals' | 'votes'> & { bounties: number };
+
+export interface DeepDaoOrganizationDetails {
+  organizationId: string;
+  name: string;
+  description: string;
+  logo: string | null;
+  members: 21;
+  activeMembers: 0;
+  proposals: 1;
+  votes: 20;
+  tokens: string[];
+  governance: {
+    platform: string;
+    id: string;
+    name: string;
+    address: string;
+  }[];
+  updatedAt: string;
+}
+
+export type GetAllDeepDaoOrganizationsResponse = DeepDaoApiResponse<{
+  totalResources: number;
+  resources: DeepDaoOrganizationDetails[];
+}>;
+

@@ -47,19 +47,15 @@ export async function generateSpaceUser ({ spaceId, isAdmin }: { spaceId: string
  * @param walletAddress
  * @returns
  */
-export async function generateUserAndSpaceWithApiToken (walletAddress: string = v4(), isAdmin = true): Promise<{
-  user: LoggedInUser,
-  space: Space,
-  apiToken: SpaceApiToken
-}> {
+export async function generateUserAndSpaceWithApiToken (walletAddress: string = v4(), isAdmin = true) {
   const user = await createUserFromWallet(walletAddress);
 
   const existingSpaceId = user.spaceRoles?.[0]?.spaceId;
 
-  let space: Space | null = null;
+  let space = null;
 
   if (existingSpaceId) {
-    space = await prisma.space.findUnique({ where: { id: user.spaceRoles?.[0]?.spaceId }, include: { apiToken: true } });
+    space = await prisma.space.findUnique({ where: { id: user.spaceRoles?.[0]?.spaceId }, include: { apiToken: true, spaceRoles: true } });
   }
 
   if (!space) {
@@ -83,7 +79,8 @@ export async function generateUserAndSpaceWithApiToken (walletAddress: string = 
         }
       },
       include: {
-        apiToken: true
+        apiToken: true,
+        spaceRoles: true
       }
     });
   }

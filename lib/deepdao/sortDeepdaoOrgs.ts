@@ -8,18 +8,14 @@ export function sortDeepdaoOrgs ({ organizations, proposals, votes }: {
   votes: DeepDaoVote[]
 }) {
 
-  const organizationsRecord = organizations
-    .reduce<Record<
-    string,
-    OrganizationDetails | undefined
-  >>((acc, org) => {
+  const organizationsRecord = organizations.reduce<Record<string, OrganizationDetails | undefined>>((acc, org) => {
     acc[org.organizationId] = {
-      ...org,
       // Using empty values to indicate that these haven't been set yet
-      oldestEventDate: '',
+      joinDate: '',
       latestEventDate: '',
       proposals: [],
-      votes: []
+      votes: [],
+      ...org
     };
     return acc;
   }, {});
@@ -36,11 +32,11 @@ export function sortDeepdaoOrgs ({ organizations, proposals, votes }: {
       else if (event.type === 'vote') {
         organization.votes.push(event as DeepDaoVote);
       }
-      if (!organization.oldestEventDate) {
-        organization.oldestEventDate = event.createdAt;
+      if (!organization.joinDate) {
+        organization.joinDate = event.createdAt;
       }
-      else if (organization.oldestEventDate > event.createdAt) {
-        organization.oldestEventDate = event.createdAt;
+      else if (organization.joinDate > event.createdAt) {
+        organization.joinDate = event.createdAt;
       }
 
       if (!organization.latestEventDate) {
@@ -55,5 +51,5 @@ export function sortDeepdaoOrgs ({ organizations, proposals, votes }: {
   // Remove the organizations that have not votes or proposals, so there wont be any latest or earliest dates
   return (Object.values(organizationsRecord)
     .filter(isTruthy)
-    .sort((orgA, orgB) => orgA.latestEventDate > orgB.latestEventDate ? -1 : 1));
+    .sort((orgA, orgB) => orgA.joinDate > orgB.joinDate ? -1 : 1));
 }

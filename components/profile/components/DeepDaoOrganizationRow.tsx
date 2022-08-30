@@ -12,6 +12,7 @@ import { showDateWithMonthAndYear } from 'lib/utilities/dates';
 import { DeepDaoOrganization, DeepDaoProposal, DeepDaoVote } from 'lib/deepdao/interfaces';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import Avatar from 'components/common/Avatar';
 
 const TASK_TABS = [
   { icon: <HowToVoteIcon />, label: 'Votes', type: 'vote' },
@@ -19,24 +20,24 @@ const TASK_TABS = [
 ] as const;
 
 interface DeepDaoEvent {
-  id: string
-  title: string
-  createdAt: string
-  verdict: boolean
+  id: string;
+  title: string;
+  createdAt: string;
+  verdict: boolean;
 }
 
 export type OrganizationDetails = DeepDaoOrganization & {
-  proposals: DeepDaoProposal[],
-  votes: DeepDaoVote[],
-  oldestEventDate: string,
-  latestEventDate: string
+  proposals: DeepDaoProposal[];
+  votes: DeepDaoVote[];
+  joinDate: string;
+  latestEventDate?: string;
 }
 
 interface DeepDaoOrganizationRowProps {
-  organization: OrganizationDetails
-  showVisibilityIcon: boolean
-  visible: boolean
-  onClick: () => void,
+  organization: OrganizationDetails;
+  showVisibilityIcon: boolean;
+  visible: boolean;
+  onClick: () => void;
 }
 
 export default function DeepDaoOrganizationRow ({ organization, showVisibilityIcon, visible, onClick }: DeepDaoOrganizationRowProps) {
@@ -76,44 +77,56 @@ export default function DeepDaoOrganizationRow ({ organization, showVisibilityIc
         }
       }}
     >
-      <Stack flexDirection='row' justifyContent='space-between'>
-        <Box
-          display='flex'
-          gap={1}
-          alignItems='center'
-        >
-          <Typography
-            sx={{
-              fontSize: {
-                sm: '1.15rem',
-                xs: '1.05rem'
-              }
-            }}
-            fontWeight={500}
-          >{organization.name}
+      <Box display='flex' gap={2} flexDirection='row'>
+        <Avatar
+          avatar={organization.logo}
+          name={organization.name}
+          variant='rounded'
+          size='large'
+        />
+        <Stack flexDirection='row' justifyContent='space-between'>
+          <Box
+            display='flex'
+            gap={1}
+            alignItems='center'
+          >
+            <Typography
+              sx={{
+                fontSize: {
+                  sm: '1.15rem',
+                  xs: '1.05rem'
+                }
+              }}
+              fontWeight={500}
+            >{organization.name}
+            </Typography>
+            {showVisibilityIcon && (
+              <IconButton size='small' onClick={onClick}>
+                {visible ? (
+                  <Tooltip title='Hide DAO from profile'>
+                    <VisibilityIcon className='action' fontSize='small' />
+                  </Tooltip>
+                ) : (
+                  <Tooltip title='Show DAO in profile'>
+                    <VisibilityOffIcon className='action' fontSize='small' />
+                  </Tooltip>
+                )}
+              </IconButton>
+            )}
+          </Box>
+          <IconButton
+            size='small'
+            onClick={() => setIsCollapsed(!isCollapsed)}
+          >
+            {isCollapsed ? <ExpandMoreIcon fontSize='small' /> : <ExpandLessIcon fontSize='small' />}
+          </IconButton>
+        </Stack>
+        {organization.joinDate && (
+          <Typography variant='subtitle2'>
+            {showDateWithMonthAndYear(organization.joinDate)} - {organization.latestEventDate ? showDateWithMonthAndYear(organization.latestEventDate) : 'Present'}
           </Typography>
-          {showVisibilityIcon && (
-            <IconButton size='small' onClick={onClick}>
-              {visible ? (
-                <Tooltip title='Hide DAO from profile'>
-                  <VisibilityIcon className='action' fontSize='small' />
-                </Tooltip>
-              ) : (
-                <Tooltip title='Show DAO in profile'>
-                  <VisibilityOffIcon className='action' fontSize='small' />
-                </Tooltip>
-              )}
-            </IconButton>
-          )}
-        </Box>
-        <IconButton
-          size='small'
-          onClick={() => setIsCollapsed(!isCollapsed)}
-        >
-          {isCollapsed ? <ExpandMoreIcon fontSize='small' /> : <ExpandLessIcon fontSize='small' />}
-        </IconButton>
-      </Stack>
-      {organization.oldestEventDate && organization.latestEventDate && <Typography variant='subtitle2'>{showDateWithMonthAndYear(organization.oldestEventDate)} - {showDateWithMonthAndYear(organization.latestEventDate)}</Typography>}
+        )}
+      </Box>
 
       <Collapse in={!isCollapsed}>
         <Box>

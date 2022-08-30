@@ -1,16 +1,18 @@
-import { Space, User } from '@prisma/client';
+import { Space, SpaceRole } from '@prisma/client';
 import { prisma } from 'db';
 import nock from 'nock';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { LoggedInUser } from 'models';
 import { v4 } from 'uuid';
 import { DEEP_DAO_BASE_URL } from 'lib/deepdao/client';
 import { getAggregatedData } from 'lib/deepdao/getAggregatedData';
 
 nock.disableNetConnect();
-let user: User;
-let space: Space;
+
+let user: LoggedInUser;
+let space: Space & { spaceRoles: SpaceRole[] };
 
 const walletAddresses = [v4(), v4()];
 
@@ -64,9 +66,7 @@ describe('GET /api/public/profile/[userPath]', () => {
           proposals: ['proposal 1'],
           totalVotes: 1,
           votes: ['vote 1'],
-          organizations: [{
-            title: 'organization 1'
-          }]
+          organizations: [{ name: 'organization 1' }]
         }
       })
       .get(`/v0.1/people/profile/${walletAddresses[1]}`)
@@ -76,9 +76,14 @@ describe('GET /api/public/profile/[userPath]', () => {
           proposals: ['proposal 2'],
           totalVotes: 3,
           votes: ['vote 2'],
-          organizations: [{
-            title: 'organization 2'
-          }]
+          organizations: [{ name: 'organization 2' }]
+        }
+      })
+      .get('/v0.1/organizations')
+      .reply(200, {
+        data: {
+          resources: [],
+          totalResources: 0
         }
       });
 
@@ -94,10 +99,18 @@ describe('GET /api/public/profile/[userPath]', () => {
       proposals: ['proposal 1', 'proposal 2'],
       organizations: [{
         title: 'organization 1',
-        isHidden: false
+        isHidden: false,
+        logo: null
       }, {
-        title: 'organization 2',
-        isHidden: false
+        name: 'organization 2',
+        isHidden: false,
+        logo: null
+      }, {
+        joinDate: space.spaceRoles[0].createdAt.toISOString(),
+        name: space.name,
+        organizationId: space.id,
+        isHidden: false,
+        logo: null
       }]
     });
   });

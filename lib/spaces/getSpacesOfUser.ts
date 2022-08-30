@@ -9,6 +9,9 @@ export function getSpacesOfUser (userId: string) {
           userId
         }
       }
+    },
+    include: {
+      spaceRoles: true
     }
   });
 }
