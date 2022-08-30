@@ -7,33 +7,32 @@ import * as http from 'adapters/http';
 import type { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/focalboard/src/blocks/block';
 import type { IUser } from 'components/common/BoardEditor/focalboard/src/user';
 import type { FiatCurrency, IPairQuote } from 'connectors';
-import type { FailedImportsError } from 'lib/notion/types';
-import type { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee, IPagePermissionWithSource, SpaceDefaultPublicPageToggle } from 'lib/permissions/pages/page-permission-interfaces';
-import type { GetPoapsResponse, UpdatePoapsRequest } from 'lib/poap';
-import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
-import type { Contributor, LoggedInUser, PageContent } from 'models';
-import type { ServerBlockFields } from 'pages/api/blocks';
-import type { InviteLinkPopulated } from 'pages/api/invites/index';
-import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 import type { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
+import type { AggregatedProfileData } from 'lib/profile';
+import type { FailedImportsError } from 'lib/notion/types';
 import type { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
+import type { PublicPageResponse } from 'lib/pages/interfaces';
+import type { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee, IPagePermissionWithSource, SpaceDefaultPublicPageToggle } from 'lib/permissions/pages/page-permission-interfaces';
+import type { SpacePermissionFlags, SpacePermissionModification } from 'lib/permissions/spaces';
+import type { MarkTask } from 'lib/tasks/markTasks';
 import type { MultipleThreadsInput, ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
-import type { TokenGateVerification, TokenGateEvaluationAttempt, TokenGateEvaluationResult, TokenGateWithRoles } from 'lib/token-gates/interfaces';
+import type { TokenGateEvaluationAttempt, TokenGateEvaluationResult, TokenGateVerification, TokenGateWithRoles } from 'lib/token-gates/interfaces';
+import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
+import { encodeFilename } from 'lib/utilities/encodeFilename';
+import type { ExtendedVote, UserVoteExtendedDTO, VoteDTO } from 'lib/votes/interfaces';
+import type { Contributor, ExtendedPoap, LoggedInUser, PageContent } from 'models';
+import type { ServerBlockFields } from 'pages/api/blocks';
 import type { ConnectDiscordPayload, ConnectDiscordResponse } from 'pages/api/discord/connect';
 import type { ImportDiscordRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
 import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
+import type { InviteLinkPopulated } from 'pages/api/invites/index';
+import type { PublicUser } from 'pages/api/public/profile/[userPath]';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
+import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 import type { GetTasksStateResponse, UpdateTasksState } from 'pages/api/tasks/state';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
-import type { DeepDaoAggregateData } from 'lib/deepdao/interfaces';
-import type { PublicPageResponse } from 'lib/pages/interfaces';
-import type { MarkTask } from 'lib/tasks/markTasks';
-import type { ExtendedVote, UserVoteExtendedDTO, VoteDTO } from 'lib/votes/interfaces';
-import type { PublicUser } from 'pages/api/public/profile/[userPath]';
 import type { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
-import type { SpacePermissionFlags, SpacePermissionModification } from 'lib/permissions/spaces';
-import { encodeFilename } from 'lib/utilities/encodeFilename';
 import type { AssignedPermissionsQuery } from 'lib/permissions/interfaces';
 import type { SpacePermissionConfigurationUpdate } from 'lib/permissions/meta/interfaces';
 import { ProfileApi } from './apis/profileApi';
@@ -93,11 +92,7 @@ class CharmClient {
   }
 
   getUserPoaps () {
-    return http.GET<GetPoapsResponse>('/api/profile/poaps');
-  }
-
-  updateUserPoaps (data: UpdatePoapsRequest) {
-    return http.PUT<GetPoapsResponse>('/api/profile/poaps', data);
+    return http.GET<ExtendedPoap[]>('/api/profile/poaps');
   }
 
   updateUserDetails (data: Partial<UserDetails>) {
@@ -598,7 +593,7 @@ class CharmClient {
   }
 
   getAggregatedData (userPath: string) {
-    return http.GET<DeepDaoAggregateData>(`/api/public/profile/${userPath}/aggregate`);
+    return http.GET<AggregatedProfileData>(`/api/public/profile/${userPath}/aggregate`);
   }
 
   getVotesByPage (pageId: string) {

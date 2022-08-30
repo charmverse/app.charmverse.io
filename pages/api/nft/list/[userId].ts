@@ -1,11 +1,10 @@
-import { NftData } from 'lib/nft/types';
+import { prisma } from 'db';
+import { InvalidStateError, onError, onNoMatch } from 'lib/middleware';
+import { getNFTs } from 'lib/nft/getNfts';
+import { NftData } from 'lib/nft/interfaces';
+import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { InvalidStateError, onError, onNoMatch } from 'lib/middleware';
-import * as alchemyApi from 'lib/blockchain/provider/alchemy';
-import { withSessionRoute } from 'lib/session/withSession';
-import { mapNftFromAlchemy } from 'lib/nft/utilities/mapNftFromAlchemy';
-import { prisma } from 'db';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -15,6 +14,18 @@ handler
 async function getNfts (req: NextApiRequest, res: NextApiResponse<NftData[] | {error: string}>) {
   // address = '0x155b6485305ccab44ef7da58ac886c62ce105cf9'
   const userId = req.query.userId as string;
+
+  const hiddenNftIds: string[] = (await prisma.profileItem.findMany({
+    where: {
+      userId,
+      isHidden: true,
+      type: 'nft'
+    },
+    select: {
+      id: true
+    }
+  })).map(p => p.id);
+
   const user = await prisma.user.findUnique({
     where: {
       id: userId
@@ -29,11 +40,9 @@ async function getNfts (req: NextApiRequest, res: NextApiResponse<NftData[] | {e
   }
 
   const { addresses } = user;
-  const chainId = 1;
-  const nfts = await alchemyApi.getNfts(addresses, chainId);
-  const mappedNfts = nfts.map(nft => mapNftFromAlchemy(nft, chainId));
+  const mappedNfts = await getNFTs(addresses);
 
-  res.status(200).json(mappedNfts);
+  res.status(200).json(mappedNfts.map(nft => ({ ...nft, isHidden: hiddenNftIds.includes(nft.tokenId) })));
 }
 
 export default withSessionRoute(handler);

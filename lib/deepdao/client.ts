@@ -1,6 +1,15 @@
 import log from 'loglevel';
 import fetch from 'adapters/http/fetch.server';
-import { GetAllDeepDaoOrganizationsResponse, GetParticipationScoreResponse, GetProfileResponse } from './interfaces';
+import { DeepDaoOrganizationDetails, DeepDaoParticipationScore, DeepDaoProfile } from './interfaces';
+
+type ApiResponse<T> = { data: T };
+
+type GetParticipationScoreResponse = ApiResponse<DeepDaoParticipationScore>;
+type GetProfileResponse = ApiResponse<DeepDaoProfile>;
+type GetOrganizationsResponse = ApiResponse<{
+  totalResources: number;
+  resources: DeepDaoOrganizationDetails[];
+}>;
 
 export const { DEEPDAO_API_KEY, DEEP_DAO_BASE_URL } = process.env;
 
@@ -38,13 +47,13 @@ export async function getProfile (address: string, apiToken = DEEPDAO_API_KEY): 
   });
 }
 
-export async function getAllOrganizations (apiToken = DEEPDAO_API_KEY): Promise<GetAllDeepDaoOrganizationsResponse> {
+export async function getAllOrganizations (apiToken = DEEPDAO_API_KEY): Promise<GetOrganizationsResponse> {
   if (!apiToken) {
     log.debug('Skip request: No API Key for DeepDAO');
     return { data: { resources: [], totalResources: 0 } };
   }
 
-  return fetch<GetAllDeepDaoOrganizationsResponse>(`${DEEP_DAO_BASE_URL}/v0.1/organizations`, {
+  return fetch<GetOrganizationsResponse>(`${DEEP_DAO_BASE_URL}/v0.1/organizations`, {
     method: 'GET',
     headers: {
       'x-api-key': apiToken

@@ -9,4 +9,5 @@ export type NftData = {
   imageRaw: string;
   imageThumb?: string
   timeLastUpdated: string
+  isHidden: boolean
 }
