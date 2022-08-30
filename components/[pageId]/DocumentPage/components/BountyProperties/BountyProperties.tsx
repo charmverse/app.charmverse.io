@@ -392,28 +392,6 @@ export default function BountyProperties (props: {
         pageId={pageId}
       />
       <Stack flexDirection='row' justifyContent='space-between' gap={2} alignItems='center'>
-        {readOnly && (
-          <Stack mb={1} width='100%'>
-            {bountyPermissions?.reviewer && bountyPermissions.reviewer.length > 0 && (
-              <BountyReviewers
-                bounty={currentBounty}
-                permissions={bountyPermissions}
-              />
-            )}
-            {/* Extra space so this looks like the focalboard properties */}
-            {
-                currentBounty.maxSubmissions && (
-                  <>
-                    <div style={{ marginTop: 2 }}></div>
-                    <BountySlots
-                      maxSubmissions={currentBounty.maxSubmissions}
-                      validSubmissions={countValidSubmissions(currentBounty.applications)}
-                    />
-                  </>
-                )
-              }
-          </Stack>
-        )}
         {!readOnly && (
           <div
             className='octo-propertyrow'
