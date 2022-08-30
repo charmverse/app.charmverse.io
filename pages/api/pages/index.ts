@@ -11,6 +11,8 @@ import nc from 'next-connect';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 import log from 'lib/log';
+import { v4 } from 'uuid';
+import { createProposal } from 'lib/proposal/createProposal';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -55,7 +57,36 @@ async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
     }
   };
 
-  const page = await prisma.page.create({ data: typedPageCreationData });
+  let page: Page;
+
+  if (typedPageCreationData.type === 'proposal') {
+    const proposalId = v4();
+    typedPageCreationData.proposalId = proposalId;
+    // Using a transaction to ensure both the proposal and page gets created together
+    const [createdPage] = await prisma.$transaction([
+      prisma.page.create({ data: typedPageCreationData }),
+      createProposal({
+        createdBy: userId,
+        id: proposalId,
+        spaceId,
+        status: 'draft',
+        // Add page creator as the proposal's first author
+        authors: {
+          create: {
+            author: {
+              connect: {
+                id: userId
+              }
+            }
+          }
+        }
+      })
+    ]);
+    page = createdPage;
+  }
+  else {
+    page = await prisma.page.create({ data: typedPageCreationData });
+  }
   try {
 
     const pageWithPermissions = await setupPermissionsAfterPageCreated(page.id);

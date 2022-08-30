@@ -210,9 +210,9 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
               </div>
             </CharmEditor>
 
-            {page.type === 'proposal' && !isLoading && !pageVote && (
+            {/* {page.type === 'proposal' && !isLoading && !pageVote && (
               <CreateVoteBox />
-            )}
+            )} */}
           </Container>
         </div>
       </Box>
