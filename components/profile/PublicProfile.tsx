@@ -90,6 +90,53 @@ export default function PublicProfile (props: UserDetailsProps) {
     });
   }
 
+  async function updateCollectiveProfileItem (collective: Collective) {
+    await charmClient.profile.updateProfileItem({
+      profileItems: [{
+        id: collective.id,
+        isHidden: !collective.isHidden,
+        type: collective.type,
+        metadata: null
+      }]
+    });
+    if (collective.type === 'nft') {
+      mutateNfts((_nftData) => {
+        if (_nftData) {
+          return _nftData.map(nft => {
+            if (nft.tokenId === collective.id) {
+              return {
+                ...nft,
+                isHidden: !collective.isHidden
+              };
+            }
+            return nft;
+          });
+        }
+        return _nftData;
+      }, {
+        revalidate: false
+      });
+    }
+    else {
+      mutatePoaps((_poapData) => {
+        if (_poapData) {
+          return _poapData.map(poap => {
+            if (poap.tokenId === collective.id) {
+              return {
+                ...poap,
+                isHidden: !collective.isHidden
+              };
+            }
+            return poap;
+          });
+        }
+        return _poapData;
+      }, {
+        revalidate: false
+      });
+    }
+  }
+
   const communities = (data?.communities ?? []).filter((community) => isPublic ? !community.isHidden : true);
 
   return (
@@ -151,8 +198,7 @@ export default function PublicProfile (props: UserDetailsProps) {
                 <ProfileItemsList
                   collectives={collectives.sort((collectiveA, collectiveB) => new Date(collectiveB.date) > new Date(collectiveA.date) ? 1 : -1)}
                   isPublic={isPublic}
-                  mutateNfts={mutateNfts}
-                  mutatePoaps={mutatePoaps}
+                  onVisibilityToggle={updateCollectiveProfileItem}
                 />
               </Box>
             ) : null}

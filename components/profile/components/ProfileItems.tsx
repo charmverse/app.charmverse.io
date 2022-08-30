@@ -3,12 +3,8 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { Divider, IconButton, Link, Stack, Tooltip, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
-import { NftData } from 'lib/nft/interfaces';
 import { showDateWithMonthAndYear } from 'lib/utilities/dates';
-import { ExtendedPoap } from 'models';
-import { KeyedMutator } from 'swr';
 
 export interface Collective {
   title: string
@@ -100,13 +96,12 @@ function ProfileItem ({ onClick, collective, visible, showVisibilityIcon }: Prof
 }
 
 interface ProfileItemsListProps {
-  mutateNfts: KeyedMutator<NftData[]>,
-  mutatePoaps: KeyedMutator<ExtendedPoap[]>,
+  onVisibilityToggle: (collective: Collective) => void
   isPublic: boolean,
   collectives: Collective[]
 }
 
-export function ProfileItemsList ({ collectives, isPublic, mutateNfts, mutatePoaps }: ProfileItemsListProps) {
+export function ProfileItemsList ({ collectives, isPublic, onVisibilityToggle }: ProfileItemsListProps) {
 
   return (
     <Stack gap={2}>
@@ -118,50 +113,7 @@ export function ProfileItemsList ({ collectives, isPublic, mutateNfts, mutatePoa
             showVisibilityIcon={!isPublic}
             visible={!collective.isHidden}
             onClick={async () => {
-              await charmClient.profile.updateProfileItem({
-                profileItems: [{
-                  id: collective.id,
-                  isHidden: !collective.isHidden,
-                  type: collective.type,
-                  metadata: null
-                }]
-              });
-              if (collective.type === 'nft') {
-                mutateNfts((nftData) => {
-                  if (nftData) {
-                    return nftData.map(nft => {
-                      if (nft.tokenId === collective.id) {
-                        return {
-                          ...nft,
-                          isHidden: !collective.isHidden
-                        };
-                      }
-                      return nft;
-                    });
-                  }
-                  return nftData;
-                }, {
-                  revalidate: false
-                });
-              }
-              else {
-                mutatePoaps((poapData) => {
-                  if (poapData) {
-                    return poapData.map(poap => {
-                      if (poap.tokenId === collective.id) {
-                        return {
-                          ...poap,
-                          isHidden: !collective.isHidden
-                        };
-                      }
-                      return poap;
-                    });
-                  }
-                  return poapData;
-                }, {
-                  revalidate: false
-                });
-              }
+              onVisibilityToggle(collective);
             }}
             collective={collective}
           />
