@@ -1,7 +1,5 @@
-import { Box, CircularProgress, Grid, Paper, Typography } from '@mui/material';
-import charmClient from 'charmClient';
-import useSWRImmutable from 'swr/immutable';
-import { isPublicUser, UserDetailsProps } from './UserDetails';
+import { Box, Grid, Paper, Typography } from '@mui/material';
+import { AggregatedProfileData } from 'lib/profile';
 
 export function AggregatedDataItem ({ value, label }: { value: number, label: string }) {
   return (
@@ -41,25 +39,7 @@ export function AggregatedDataItem ({ value, label }: { value: number, label: st
   );
 }
 
-export default function AggregatedData ({ user }: Pick<UserDetailsProps, 'user'>) {
-  const isPublic = isPublicUser(user);
-
-  const { data, isValidating, mutate } = useSWRImmutable(user ? `userAggregatedData/${user.id}` : null, () => {
-    return charmClient.getAggregatedData(user.id);
-  });
-
-  if (isValidating) {
-    return (
-      <Box display='flex' alignItems='center' gap={1}>
-        <CircularProgress size={24} />
-      </Box>
-    );
-  }
-
-  if (!data) {
-    return null;
-  }
-
+export default function AggregatedData ({ data }: {data: AggregatedProfileData}) {
   return (
     <Grid container display='flex' gap={2} flexDirection='column'>
       <Box
