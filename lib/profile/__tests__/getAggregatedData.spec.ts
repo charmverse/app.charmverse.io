@@ -66,7 +66,7 @@ describe('GET /api/public/profile/[userPath]', () => {
           proposals: ['proposal 1'],
           totalVotes: 1,
           votes: ['vote 1'],
-          organizations: [{ name: 'organization 1' }]
+          organizations: [{ organizationId: '1', name: 'organization 1' }]
         }
       })
       .get(`/v0.1/people/profile/${walletAddresses[1]}`)
@@ -76,7 +76,7 @@ describe('GET /api/public/profile/[userPath]', () => {
           proposals: ['proposal 2'],
           totalVotes: 3,
           votes: ['vote 2'],
-          organizations: [{ name: 'organization 2' }]
+          organizations: [{ organizationId: '2', name: 'organization 2' }]
         }
       })
       .get('/v0.1/organizations')
@@ -97,18 +97,23 @@ describe('GET /api/public/profile/[userPath]', () => {
       totalVotes: 4,
       votes: ['vote 1', 'vote 2'],
       proposals: ['proposal 1', 'proposal 2'],
-      organizations: [{
-        title: 'organization 1',
+      organizations: [],
+      communities: [{
+        id: '1',
+        name: 'organization 1',
         isHidden: false,
-        logo: null
+        logo: null,
+        joinDate: ''
       }, {
+        id: '2',
         name: 'organization 2',
         isHidden: false,
-        logo: null
+        logo: null,
+        joinDate: ''
       }, {
+        id: space.id,
         joinDate: space.spaceRoles[0].createdAt.toISOString(),
         name: space.name,
-        organizationId: space.id,
         isHidden: false,
         logo: null
       }]
