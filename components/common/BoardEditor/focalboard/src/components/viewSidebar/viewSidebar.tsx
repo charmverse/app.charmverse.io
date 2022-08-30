@@ -49,11 +49,6 @@ export default function ViewOptionsSidebar (props: Props) {
     setSidebarView(initialState);
   }
 
-  function closeSidebar (e: MouseEvent | TouchEvent) {
-    console.log('e', e);
-    props.closeSidebar();
-  }
-
   useEffect(() => {
     // reset state on close
     if (!props.isOpen) {
@@ -67,7 +62,7 @@ export default function ViewOptionsSidebar (props: Props) {
   const currentProperties = visiblePropertyIds.filter(id => props.board.fields.cardProperties.some(c => c.id === id)).length;
 
   return (
-    <ClickAwayListener onClickAway={closeSidebar}>
+    <ClickAwayListener onClickAway={props.closeSidebar}>
       <Collapse in={props.isOpen} orientation='horizontal' sx={{ position: 'absolute', right: 0, top: 0, bottom: 0, zIndex: 1000 }}>
 
         <StyledSidebar>
