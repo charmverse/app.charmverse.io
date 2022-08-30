@@ -1,15 +1,15 @@
-import type { OrganizationDetails } from 'components/profile/components/DeepDaoOrganizationRow';
-import { isTruthy } from 'lib/utilities/types';
-import { DeepDaoOrganization, DeepDaoProposal, DeepDaoVote } from './interfaces';
+import type { CommunityDetails } from 'components/profile/components/CommunityRow';
+import { DeepDaoProposal, DeepDaoVote } from 'lib/deepdao/interfaces';
+import { UserCommunity } from './interfaces';
 
-export function sortDeepdaoOrgs ({ organizations, proposals, votes }: {
-  organizations: DeepDaoOrganization[],
+export function sortCommunities ({ communities, proposals, votes }: {
+  communities: UserCommunity[],
   proposals: DeepDaoProposal[],
   votes: DeepDaoVote[]
 }) {
 
-  const organizationsRecord = organizations.reduce<Record<string, OrganizationDetails | undefined>>((acc, org) => {
-    acc[org.organizationId] = {
+  const organizationsRecord = communities.reduce<Record<string, CommunityDetails>>((acc, org) => {
+    acc[org.id] = {
       // Using empty values to indicate that these haven't been set yet
       joinDate: '',
       latestEventDate: '',
@@ -48,8 +48,6 @@ export function sortDeepdaoOrgs ({ organizations, proposals, votes }: {
     }
   });
 
-  // Remove the organizations that have not votes or proposals, so there wont be any latest or earliest dates
   return (Object.values(organizationsRecord)
-    .filter(isTruthy)
     .sort((orgA, orgB) => orgA.joinDate > orgB.joinDate ? -1 : 1));
 }

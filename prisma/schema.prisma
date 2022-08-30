@@ -124,7 +124,7 @@ enum SpaceOperation {
 }
 
 enum ProfileItemType {
-  dao
+  community
   nft
   poap
   vc

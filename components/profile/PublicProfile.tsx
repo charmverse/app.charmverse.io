@@ -1,13 +1,13 @@
 import { Box, Chip, Divider, Stack, Typography } from '@mui/material';
 import useSWRImmutable from 'swr/immutable';
 import charmClient from 'charmClient';
-import { sortDeepdaoOrgs } from 'lib/deepdao/sortDeepdaoOrgs';
+import { sortCommunities } from 'lib/profile/sortCommunities';
 import { ExtendedPoap } from 'models';
 import { NftData } from 'lib/nft/interfaces';
 import AggregatedData from './components/AggregatedData';
 import UserDetails, { isPublicUser, UserDetailsProps } from './components/UserDetails';
 import { Collective, ProfileItemsList } from './components/ProfileItems';
-import DeepDaoOrganizationRow, { OrganizationDetails } from './components/DeepDaoOrganizationRow';
+import CommunityRow, { CommunityDetails } from './components/CommunityRow';
 
 function transformPoap (poap: ExtendedPoap): Collective {
   return {
@@ -40,16 +40,16 @@ export default function PublicProfile (props: UserDetailsProps) {
   });
   const isPublic = isPublicUser(user);
 
-  const sortedOrganizations = data ? sortDeepdaoOrgs(data) : [];
+  const sortedCommunities = data ? sortCommunities(data) : [];
 
-  const visibleDaos: OrganizationDetails[] = [];
-  const hiddenDaos: OrganizationDetails[] = [];
-  sortedOrganizations.forEach(dao => {
-    if (dao.isHidden) {
-      hiddenDaos.push(dao);
+  const visibleCommunities: CommunityDetails[] = [];
+  const hiddenCommunities: CommunityDetails[] = [];
+  sortedCommunities.forEach(comm => {
+    if (comm.isHidden) {
+      hiddenCommunities.push(comm);
     }
     else {
-      visibleDaos.push(dao);
+      visibleCommunities.push(comm);
     }
   });
 
@@ -86,26 +86,26 @@ export default function PublicProfile (props: UserDetailsProps) {
     }
   });
 
-  async function updateDaoProfileItem (organization: OrganizationDetails) {
+  async function updateDaoProfileItem (community: CommunityDetails) {
     await charmClient.profile.updateProfileItem({
       profileItems: [{
-        id: organization.organizationId,
-        isHidden: !organization.isHidden,
-        type: 'dao',
+        id: community.id,
+        isHidden: !community.isHidden,
+        type: 'community',
         metadata: null
       }]
     });
     mutate((aggregateData) => {
       return aggregateData ? {
         ...aggregateData,
-        organizations: aggregateData.organizations.map(dao => {
-          if (dao.organizationId === organization.organizationId) {
+        communities: aggregateData.communities.map(comm => {
+          if (comm.id === community.id) {
             return {
-              ...dao,
-              isHidden: !organization.isHidden
+              ...comm,
+              isHidden: !community.isHidden
             };
           }
-          return dao;
+          return comm;
         })
       } : undefined;
     }, {
@@ -113,39 +113,33 @@ export default function PublicProfile (props: UserDetailsProps) {
     });
   }
 
-  const totalHiddenItems = hiddenCollectives.length + hiddenDaos.length;
+  const totalHiddenItems = hiddenCollectives.length + hiddenCommunities.length;
 
   return (
     <Stack spacing={2}>
       <UserDetails {...props} />
       <Divider />
       <AggregatedData user={user} />
-      {data && visibleDaos.length !== 0 ? (
+      {data && visibleCommunities.length !== 0 ? (
         <>
           <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
-            <Typography
-              sx={{
-                typography: {
-                  sm: 'h1',
-                  xs: 'h2'
-                }
-              }}
-            >Organizations
-            </Typography>
-            <Chip label={visibleDaos.length} />
+            <SectionTitle>
+              Communities
+            </SectionTitle>
+            <Chip label={visibleCommunities.length} />
           </Stack>
           <Stack gap={2}>
-            {visibleDaos.map(organization => (
+            {visibleCommunities.map(community => (
               <Box
-                key={organization.organizationId}
+                key={community.id}
               >
-                <DeepDaoOrganizationRow
+                <CommunityRow
                   onClick={() => {
-                    updateDaoProfileItem(organization);
+                    updateDaoProfileItem(community);
                   }}
                   visible={true}
                   showVisibilityIcon={!isPublic}
-                  organization={organization}
+                  community={community}
                 />
                 <Divider sx={{
                   mt: 2
@@ -160,15 +154,9 @@ export default function PublicProfile (props: UserDetailsProps) {
       {visibleCollectives.length ? (
         <Box>
           <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
-            <Typography
-              sx={{
-                typography: {
-                  sm: 'h1',
-                  xs: 'h2'
-                }
-              }}
-            >NFTs & POAPs
-            </Typography>
+            <SectionTitle>
+              NFTs & POAPs
+            </SectionTitle>
             <Chip label={visibleCollectives.length} />
           </Stack>
           <ProfileItemsList
@@ -189,22 +177,23 @@ export default function PublicProfile (props: UserDetailsProps) {
                 fontSize: '1.25rem'
               }}
               color='secondary'
-            >Hidden items
+            >
+              Hidden items
             </Typography>
-            <Chip label={hiddenCollectives.length + hiddenDaos.length} />
+            <Chip label={hiddenCollectives.length + hiddenCommunities.length} />
           </Stack>
           <Stack gap={2} my={1}>
-            {hiddenDaos.map(organization => (
+            {hiddenCommunities.map(community => (
               <Box
-                key={organization.organizationId}
+                key={community.id}
               >
-                <DeepDaoOrganizationRow
+                <CommunityRow
                   onClick={() => {
-                    updateDaoProfileItem(organization);
+                    updateDaoProfileItem(community);
                   }}
                   visible={false}
                   showVisibilityIcon={!isPublic}
-                  organization={organization}
+                  community={community}
                 />
                 <Divider sx={{
                   mt: 2
@@ -222,5 +211,21 @@ export default function PublicProfile (props: UserDetailsProps) {
         </Box>
       ) : null}
     </Stack>
+  );
+}
+
+function SectionTitle ({ children }: { children: React.ReactNode }) {
+  return (
+    <Typography
+      sx={{
+        fontSize: {
+          sm: '2em',
+          xs: '1.2em'
+        },
+        fontWeight: 700
+      }}
+    >
+      {children}
+    </Typography>
   );
 }
