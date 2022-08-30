@@ -48,7 +48,7 @@ export default function PublicProfile (props: UserDetailsProps) {
   const { data: nftData, mutate: mutateNfts, isValidating: isNftDataValidating } = useSWRImmutable(`/nfts/${user.id}/${isPublic}`, () => {
     return isPublicUser(user)
       ? Promise.resolve(user.visibleNfts)
-      : charmClient.nft.list(user.id);
+      : charmClient.blockchain.listNFTs(user.id);
   });
 
   const isLoading = !data || !poapData || !nftData || isNftDataValidating || isPoapDataValidating || isAggregatedDataValidating;
