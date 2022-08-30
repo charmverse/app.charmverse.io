@@ -3,6 +3,7 @@ import useSWRImmutable from 'swr/immutable';
 import charmClient from 'charmClient';
 import { ExtendedPoap } from 'models';
 import { NftData } from 'lib/nft/interfaces';
+import LoadingComponent from 'components/common/LoadingComponent';
 import AggregatedData from './components/AggregatedData';
 import UserDetails, { isPublicUser, UserDetailsProps } from './components/UserDetails';
 import { Collective, ProfileItemsList } from './components/ProfileItems';
@@ -145,9 +146,7 @@ export default function PublicProfile (props: UserDetailsProps) {
       <Divider />
       {
         isLoading ? (
-          <Box display='flex' alignItems='center' gap={1}>
-            <CircularProgress size={24} />
-          </Box>
+          <LoadingComponent isLoading />
         ) : (
           <>
             <AggregatedData
