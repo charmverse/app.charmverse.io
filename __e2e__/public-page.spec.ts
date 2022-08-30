@@ -30,16 +30,13 @@ test.describe.serial('Make a page public and visit it', async () => {
 
     boardPage = pages.find(p => p.type === 'board' && p.title.match(/tasks/i) !== null) as IPageWithPermissions;
 
-    await page.goto(`${baseUrl}`);
+    const targetPage = `${baseUrl}/${domain}/${boardPage?.path}`;
 
-    const targetRedirectPath = `${baseUrl}/${domain}/${boardPage?.path}`;
-
-    await page.goto(targetRedirectPath);
+    await page.goto(targetPage);
 
     // Act ----------------------
     // Part A - Prepare the page as a logged in user
     // 1. Make sure the board page exists and cards are visible
-    await page.waitForResponse(/\/api\/blocks/);
 
     await expect(page.locator('data-test=kanban-card').first()).toBeVisible();
 
