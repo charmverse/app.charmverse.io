@@ -7,7 +7,7 @@ import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken }
 import { LoggedInUser } from 'models';
 import { v4 } from 'uuid';
 import { DEEP_DAO_BASE_URL } from 'lib/deepdao/client';
-import { getAggregatedData } from 'lib/deepdao/getAggregatedData';
+import { getAggregatedData } from 'lib/profile/getAggregatedData';
 
 nock.disableNetConnect();
 

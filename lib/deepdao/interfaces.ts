@@ -1,7 +1,5 @@
 
-type DeepDaoApiResponse<T> = { data: T };
-
-interface DeepDaoParticipationScore {
+export interface DeepDaoParticipationScore {
   score: number;
   rank: number;
   relativeScore: null | number;
@@ -10,14 +8,14 @@ interface DeepDaoParticipationScore {
   votes: number;
 }
 
-export type DeepDaoOrganization = {
+interface DeepDaoOrganization {
   name: string;
   organizationId: string;
   isHidden: boolean;
   logo: string | null;
 }
 
-export type DeepDaoProposal = {
+export interface DeepDaoProposal {
   title: string;
   status: string;
   choices: string[];
@@ -30,7 +28,7 @@ export type DeepDaoProposal = {
   proposalId: string;
 }
 
-export type DeepDaoVote = {
+export interface DeepDaoVote {
   title: string;
   organizationId: string;
   voteId: string;
@@ -39,18 +37,13 @@ export type DeepDaoVote = {
   description: string;
 }
 
-export type DeepDaoProfile = {
+export interface DeepDaoProfile {
   totalVotes: number;
   totalProposals: number;
   organizations: DeepDaoOrganization[];
   proposals: DeepDaoProposal[];
   votes: DeepDaoVote[];
 }
-
-export type GetParticipationScoreResponse = DeepDaoApiResponse<DeepDaoParticipationScore>;
-export type GetProfileResponse = DeepDaoApiResponse<DeepDaoProfile>;
-
-export type DeepDaoAggregateData = Pick<DeepDaoProfile, 'organizations' | 'totalProposals' | 'totalVotes' | 'proposals' | 'votes'> & { bounties: number };
 
 export interface DeepDaoOrganizationDetails {
   organizationId: string;
@@ -70,9 +63,3 @@ export interface DeepDaoOrganizationDetails {
   }[];
   updatedAt: string;
 }
-
-export type GetAllDeepDaoOrganizationsResponse = DeepDaoApiResponse<{
-  totalResources: number;
-  resources: DeepDaoOrganizationDetails[];
-}>;
-

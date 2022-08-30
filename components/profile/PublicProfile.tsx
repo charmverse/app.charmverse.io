@@ -1,13 +1,13 @@
 import { Box, Chip, Divider, Stack, Typography } from '@mui/material';
 import useSWRImmutable from 'swr/immutable';
 import charmClient from 'charmClient';
-import { sortDeepdaoOrgs } from 'lib/deepdao/sortDeepdaoOrgs';
+import { sortCommunities, UserCommunity } from 'lib/profile';
 import { ExtendedPoap } from 'models';
 import { NftData } from 'lib/nft/interfaces';
 import AggregatedData from './components/AggregatedData';
 import UserDetails, { isPublicUser, UserDetailsProps } from './components/UserDetails';
 import { Collective, ProfileItemsList } from './components/ProfileItems';
-import DeepDaoOrganizationRow, { OrganizationDetails } from './components/DeepDaoOrganizationRow';
+import CommunityRow, { CommunityDetails } from './components/CommunityRow';
 
 function transformPoap (poap: ExtendedPoap): Collective {
   return {
@@ -40,11 +40,11 @@ export default function PublicProfile (props: UserDetailsProps) {
   });
   const isPublic = isPublicUser(user);
 
-  const sortedOrganizations = data ? sortDeepdaoOrgs(data) : [];
+  const sortedCommunities = data ? sortCommunities(data) : [];
 
-  const visibleDaos: OrganizationDetails[] = [];
-  const hiddenDaos: OrganizationDetails[] = [];
-  sortedOrganizations.forEach(dao => {
+  const visibleDaos: CommunityDetails[] = [];
+  const hiddenDaos: CommunityDetails[] = [];
+  sortedCommunities.forEach(dao => {
     if (dao.isHidden) {
       hiddenDaos.push(dao);
     }
@@ -86,7 +86,7 @@ export default function PublicProfile (props: UserDetailsProps) {
     }
   });
 
-  async function updateDaoProfileItem (organization: OrganizationDetails) {
+  async function updateDaoProfileItem (organization: CommunityDetails) {
     await charmClient.profile.updateProfileItem({
       profileItems: [{
         id: organization.organizationId,
@@ -139,7 +139,7 @@ export default function PublicProfile (props: UserDetailsProps) {
               <Box
                 key={organization.organizationId}
               >
-                <DeepDaoOrganizationRow
+                <CommunityRow
                   onClick={() => {
                     updateDaoProfileItem(organization);
                   }}
@@ -198,7 +198,7 @@ export default function PublicProfile (props: UserDetailsProps) {
               <Box
                 key={organization.organizationId}
               >
-                <DeepDaoOrganizationRow
+                <CommunityRow
                   onClick={() => {
                     updateDaoProfileItem(organization);
                   }}

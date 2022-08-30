@@ -8,7 +8,7 @@ import type { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor
 import type { IUser } from 'components/common/BoardEditor/focalboard/src/user';
 import type { FiatCurrency, IPairQuote } from 'connectors';
 import type { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
-import type { DeepDaoAggregateData } from 'lib/deepdao/interfaces';
+import type { AggregatedProfileData } from 'lib/profile';
 import type { FailedImportsError } from 'lib/notion/types';
 import type { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
@@ -590,7 +590,7 @@ class CharmClient {
   }
 
   getAggregatedData (userPath: string) {
-    return http.GET<DeepDaoAggregateData>(`/api/public/profile/${userPath}/aggregate`);
+    return http.GET<AggregatedProfileData>(`/api/public/profile/${userPath}/aggregate`);
   }
 
   getVotesByPage (pageId: string) {

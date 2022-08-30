@@ -9,7 +9,8 @@ import ForumIcon from '@mui/icons-material/Forum';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import { showDateWithMonthAndYear } from 'lib/utilities/dates';
-import { DeepDaoOrganization, DeepDaoProposal, DeepDaoVote } from 'lib/deepdao/interfaces';
+import { DeepDaoProposal, DeepDaoVote } from 'lib/deepdao/interfaces';
+import { UserCommunity } from 'lib/profile/interfaces';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import Avatar from 'components/common/Avatar';
@@ -26,26 +27,26 @@ interface DeepDaoEvent {
   verdict: boolean;
 }
 
-export type OrganizationDetails = DeepDaoOrganization & {
+export type CommunityDetails = UserCommunity & {
   proposals: DeepDaoProposal[];
   votes: DeepDaoVote[];
   joinDate: string;
   latestEventDate?: string;
 }
 
-interface DeepDaoOrganizationRowProps {
-  organization: OrganizationDetails;
+interface CommunityRowProps {
+  community: CommunityDetails;
   showVisibilityIcon: boolean;
   visible: boolean;
   onClick: () => void;
 }
 
-export default function DeepDaoOrganizationRow ({ organization, showVisibilityIcon, visible, onClick }: DeepDaoOrganizationRowProps) {
+export default function CommunityRow ({ community, showVisibilityIcon, visible, onClick }: CommunityRowProps) {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [currentTab, setCurrentTab] = useState<'vote' | 'proposal'>('vote');
   const theme = useTheme();
 
-  const proposals: DeepDaoEvent[] = organization.proposals
+  const proposals: DeepDaoEvent[] = community.proposals
     .sort((proposalA, proposalB) => proposalA.createdAt > proposalB.createdAt ? -1 : 1)
     .map(proposal => ({
       createdAt: proposal.createdAt,
@@ -54,7 +55,7 @@ export default function DeepDaoOrganizationRow ({ organization, showVisibilityIc
       verdict: proposal.outcome === proposal.voteChoice
     }));
 
-  const votes: DeepDaoEvent[] = organization.votes
+  const votes: DeepDaoEvent[] = community.votes
     .sort((voteA, voteB) => voteA.createdAt > voteB.createdAt ? -1 : 1)
     .map(vote => ({
       createdAt: vote.createdAt,
@@ -79,8 +80,8 @@ export default function DeepDaoOrganizationRow ({ organization, showVisibilityIc
     >
       <Box display='flex' gap={2} flexDirection='row'>
         <Avatar
-          avatar={organization.logo}
-          name={organization.name}
+          avatar={community.logo}
+          name={community.name}
           variant='rounded'
           size='large'
         />
@@ -98,7 +99,7 @@ export default function DeepDaoOrganizationRow ({ organization, showVisibilityIc
                 }
               }}
               fontWeight={500}
-            >{organization.name}
+            >{community.name}
             </Typography>
             {showVisibilityIcon && (
               <IconButton size='small' onClick={onClick}>
@@ -121,9 +122,9 @@ export default function DeepDaoOrganizationRow ({ organization, showVisibilityIc
             {isCollapsed ? <ExpandMoreIcon fontSize='small' /> : <ExpandLessIcon fontSize='small' />}
           </IconButton>
         </Stack>
-        {organization.joinDate && (
+        {community.joinDate && (
           <Typography variant='subtitle2'>
-            {showDateWithMonthAndYear(organization.joinDate)} - {organization.latestEventDate ? showDateWithMonthAndYear(organization.latestEventDate) : 'Present'}
+            {showDateWithMonthAndYear(community.joinDate)} - {community.latestEventDate ? showDateWithMonthAndYear(community.latestEventDate) : 'Present'}
           </Typography>
         )}
       </Box>
