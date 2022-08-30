@@ -78,19 +78,25 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
         }
       }}
     >
-      <Box display='flex' gap={2} flexDirection='row'>
+      <Box
+        display='flex'
+        gap={2}
+        flexDirection='row'
+        onClick={() => setIsCollapsed(!isCollapsed)}
+      >
         <Avatar
           avatar={community.logo}
           name={community.name}
           variant='rounded'
           size='large'
         />
-        <Stack flexDirection='row' justifyContent='space-between'>
-          <Box
-            display='flex'
-            gap={1}
-            alignItems='center'
-          >
+        <Box
+          align-items='center'
+          display='flex'
+          justifyContent='space-between'
+          flexGrow={1}
+        >
+          <Box>
             <Typography
               sx={{
                 fontSize: {
@@ -99,34 +105,36 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
                 }
               }}
               fontWeight={500}
-            >{community.name}
+            >
+              {community.name}
             </Typography>
+            {community.joinDate && (
+              <Typography variant='subtitle2'>
+                {showDateWithMonthAndYear(community.joinDate)} - {community.latestEventDate ? showDateWithMonthAndYear(community.latestEventDate) : 'Present'}
+              </Typography>
+            )}
+          </Box>
+          <Box display='flex' alignItems='center'>
             {showVisibilityIcon && (
               <IconButton size='small' onClick={onClick}>
                 {visible ? (
-                  <Tooltip title='Hide DAO from profile'>
+                  <Tooltip title='Hide Community from profile'>
                     <VisibilityIcon className='action' fontSize='small' />
                   </Tooltip>
                 ) : (
-                  <Tooltip title='Show DAO in profile'>
+                  <Tooltip title='Show Community in profile'>
                     <VisibilityOffIcon className='action' fontSize='small' />
                   </Tooltip>
                 )}
               </IconButton>
             )}
+            <IconButton
+              size='small'
+            >
+              {isCollapsed ? <ExpandMoreIcon fontSize='small' /> : <ExpandLessIcon fontSize='small' />}
+            </IconButton>
           </Box>
-          <IconButton
-            size='small'
-            onClick={() => setIsCollapsed(!isCollapsed)}
-          >
-            {isCollapsed ? <ExpandMoreIcon fontSize='small' /> : <ExpandLessIcon fontSize='small' />}
-          </IconButton>
-        </Stack>
-        {community.joinDate && (
-          <Typography variant='subtitle2'>
-            {showDateWithMonthAndYear(community.joinDate)} - {community.latestEventDate ? showDateWithMonthAndYear(community.latestEventDate) : 'Present'}
-          </Typography>
-        )}
+        </Box>
       </Box>
 
       <Collapse in={!isCollapsed}>
