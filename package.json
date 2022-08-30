@@ -17,7 +17,7 @@
     "migrate:staging": "npx dotenv -e .env.staging -- prisma migrate deploy",
     "server:dev": "next dev",
     "debug": "NODE_OPTIONS='--inspect' next",
-    "debug:playwright": "dotenv -e .env.test.local -- npx playwright test __e2e__/public-page.spec.ts --headed --timeout=0",
+    "debug:e2e": "dotenv -e .env.test.local -- npx playwright test __e2e__/public-page.spec.ts --headed --timeout=0",
     "server:prod": "node --require dd-trace/init node_modules/.bin/next start",
     "server:prod:win": "node --require dd-trace/init node_modules/next/dist/bin/next start",
     "server:staging": "npx react-env --path .env.staging -- node --require dd-trace/init node_modules/.bin/next start",
@@ -35,14 +35,14 @@
     "db-tool:test": "dotenv -e .env.test.local -- npx prisma studio",
     "test:setup-db": "./scripts/configure-db.sh",
     "test:browser": "npm run test-setup && jest --config='./jest.config-client.ts'",
-    "test:browser:e2e": "dotenv -e .env.test.local -- npx playwright test --timeout=0",
+    "test:e2e": "dotenv -e .env.test.local -- npx playwright test --timeout=0",
     "test": "npm run test:ci -- --verbose --watch",
     "test:ci": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local --override -- npx jest --config='./jest.config.ts'",
     "test:debug": "dotenv -e .env.test.local --override -- node --inspect-brk --expose-gc ./node_modules/.bin/jest --runInBand --logHeapUsage --config='./jest.config-server.ts' --verbose",
     "test:server": "npm run test:server:ci -- --verbose --watch",
     "test:server:ci": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local --override -- npx jest --config='./jest.config-server.ts'",
     "test:browser:ci": "dotenv -e .env.test.local --override -- npx jest --config='./jest.config-browser.ts'",
-    "test:browser:ci:e2e": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local -- npx playwright test"
+    "test:e2e:ci": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local -- npx playwright test"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
