@@ -211,6 +211,15 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       ...(mode === 'dark' ? darkThemeFocalBoard : lightThemeFocalBoard)
     },
     components: {
+      MuiAvatar: {
+        styleOverrides: {
+          root: ({ ownerState, theme }) => ({
+            ...(ownerState.variant === 'rounded' && {
+              borderRadius: 10
+            })
+          })
+        }
+      },
       MuiAutocomplete: {
         styleOverrides: {
           popper: {

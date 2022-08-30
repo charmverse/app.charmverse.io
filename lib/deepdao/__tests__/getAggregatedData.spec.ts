@@ -1,16 +1,18 @@
-import { Space, User } from '@prisma/client';
+import { Space, SpaceRole } from '@prisma/client';
 import { prisma } from 'db';
 import nock from 'nock';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { LoggedInUser } from 'models';
 import { v4 } from 'uuid';
 import { DEEP_DAO_BASE_URL } from 'lib/deepdao/client';
 import { getAggregatedData } from 'lib/deepdao/getAggregatedData';
 
 nock.disableNetConnect();
-let user: User;
-let space: Space;
+
+let user: LoggedInUser;
+let space: Space & { spaceRoles: SpaceRole[] };
 
 const walletAddresses = [v4(), v4()];
 
@@ -56,20 +58,6 @@ describe('GET /api/public/profile/[userPath]', () => {
       userId: user.id
     });
 
-    const participationScoreScope = nock(DEEP_DAO_BASE_URL as string)
-      .get(`/v0.1/people/participation_score/${walletAddresses[0]}`)
-      .reply(200, {
-        data: {
-          daos: 4
-        }
-      })
-      .get(`/v0.1/people/participation_score/${walletAddresses[1]}`)
-      .reply(200, {
-        data: {
-          daos: 6
-        }
-      });
-
     const profileScope = nock(DEEP_DAO_BASE_URL as string)
       .get(`/v0.1/people/profile/${walletAddresses[0]}`)
       .reply(200, {
@@ -78,7 +66,7 @@ describe('GET /api/public/profile/[userPath]', () => {
           proposals: ['proposal 1'],
           totalVotes: 1,
           votes: ['vote 1'],
-          organizations: ['organization 1']
+          organizations: [{ name: 'organization 1' }]
         }
       })
       .get(`/v0.1/people/profile/${walletAddresses[1]}`)
@@ -88,23 +76,39 @@ describe('GET /api/public/profile/[userPath]', () => {
           proposals: ['proposal 2'],
           totalVotes: 3,
           votes: ['vote 2'],
-          organizations: ['organization 2']
+          organizations: [{ name: 'organization 2' }]
+        }
+      })
+      .get('/v0.1/organizations')
+      .reply(200, {
+        data: {
+          resources: [],
+          totalResources: 0
         }
       });
 
     const aggregatedData = await getAggregatedData(user.id, 'dummy_key');
 
-    expect(participationScoreScope.isDone());
     expect(profileScope.isDone());
 
     expect(aggregatedData).toStrictEqual({
-      daos: 11,
       bounties: 1,
       totalProposals: 3,
       totalVotes: 4,
       votes: ['vote 1', 'vote 2'],
       proposals: ['proposal 1', 'proposal 2'],
-      organizations: ['organization 1', 'organization 2']
+      organizations: [{
+        name: 'organization 1',
+        logo: null
+      }, {
+        name: 'organization 2',
+        logo: null
+      }, {
+        joinDate: space.spaceRoles[0].createdAt.toISOString(),
+        name: space.name,
+        organizationId: space.id,
+        logo: null
+      }]
     });
   });
 });

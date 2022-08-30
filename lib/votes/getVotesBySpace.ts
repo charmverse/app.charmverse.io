@@ -1,4 +1,3 @@
-import { Vote } from '@prisma/client';
 import { prisma } from 'db';
 import { accessiblePagesByPermissionsQuery } from 'lib/pages/server';
 import { aggregateVoteResult } from './aggregateVoteResult';

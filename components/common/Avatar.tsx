@@ -58,7 +58,6 @@ export default function InitialAvatar ({ avatar, className, name, variant, size 
   const AvatarComponent = isNft ? HexagonAvatar : StyledAvatar;
 
   return (
-
     <AvatarComponent
       className={className}
       sx={{ backgroundColor: avatar ? 'initial' : stringToColor(nameStr), ...configBySize[size] }}
