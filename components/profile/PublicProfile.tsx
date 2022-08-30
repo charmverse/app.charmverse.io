@@ -123,15 +123,9 @@ export default function PublicProfile (props: UserDetailsProps) {
       {data && visibleCommunities.length !== 0 ? (
         <>
           <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
-            <Typography
-              sx={{
-                typography: {
-                  sm: 'h1',
-                  xs: 'h2'
-                }
-              }}
-            >Organizations
-            </Typography>
+            <SectionTitle>
+              Communities
+            </SectionTitle>
             <Chip label={visibleCommunities.length} />
           </Stack>
           <Stack gap={2}>
@@ -160,15 +154,9 @@ export default function PublicProfile (props: UserDetailsProps) {
       {visibleCollectives.length ? (
         <Box>
           <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
-            <Typography
-              sx={{
-                typography: {
-                  sm: 'h1',
-                  xs: 'h2'
-                }
-              }}
-            >NFTs & POAPs
-            </Typography>
+            <SectionTitle>
+              NFTs & POAPs
+            </SectionTitle>
             <Chip label={visibleCollectives.length} />
           </Stack>
           <ProfileItemsList
@@ -189,7 +177,8 @@ export default function PublicProfile (props: UserDetailsProps) {
                 fontSize: '1.25rem'
               }}
               color='secondary'
-            >Hidden items
+            >
+              Hidden items
             </Typography>
             <Chip label={hiddenCollectives.length + hiddenCommunities.length} />
           </Stack>
@@ -222,5 +211,21 @@ export default function PublicProfile (props: UserDetailsProps) {
         </Box>
       ) : null}
     </Stack>
+  );
+}
+
+function SectionTitle ({ children }: { children: React.ReactNode }) {
+  return (
+    <Typography
+      sx={{
+        fontSize: {
+          sm: '2em',
+          xs: '1.2em'
+        },
+        fontWeight: 700
+      }}
+    >
+      {children}
+    </Typography>
   );
 }
