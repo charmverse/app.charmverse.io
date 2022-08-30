@@ -1,18 +1,17 @@
-import { NftData } from 'lib/nft/interfaces';
+import { NftData } from 'lib/blockchain/interfaces';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { onError, onNoMatch } from 'lib/middleware';
-import * as alchemyApi from 'lib/blockchain/provider/alchemy';
+import { getNFT } from 'lib/blockchain/nfts';
 import { withSessionRoute } from 'lib/session/withSession';
-import { mapNftFromAlchemy } from 'lib/nft/utilities/mapNftFromAlchemy';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
-  .get(getNfts);
+  .get(getNFTs);
 
-async function getNfts (req: NextApiRequest, res: NextApiResponse<NftData | {error: string}>) {
+async function getNFTs (req: NextApiRequest, res: NextApiResponse<NftData>) {
   const { tokenId, contractAddress } = req.query;
   const chainId = 1;
 
@@ -20,10 +19,9 @@ async function getNfts (req: NextApiRequest, res: NextApiResponse<NftData | {err
     throw new InvalidInputError('Invalid NFT params');
   }
 
-  const nft = await alchemyApi.getNft(contractAddress, tokenId, chainId);
-  const mappedNft = mapNftFromAlchemy(nft, chainId);
+  const nft = await getNFT(contractAddress, tokenId, chainId);
 
-  res.status(200).json(mappedNft);
+  res.status(200).json(nft);
 }
 
 export default withSessionRoute(handler);

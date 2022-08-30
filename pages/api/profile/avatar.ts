@@ -7,7 +7,7 @@ import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { sessionUserRelations } from 'lib/session/config';
 
 import { LoggedInUser } from 'models';
-import { mapNftFromAlchemy } from 'lib/nft/utilities/mapNftFromAlchemy';
+import { getNFT } from 'lib/blockchain/nfts';
 import { getUserProfile } from 'lib/users/getUser';
 import { getFilenameWithExtension } from 'lib/utilities/getFilenameWithExtension';
 import { UserAvatar } from 'lib/users/interfaces';
@@ -45,11 +45,10 @@ async function updateAvatar (req: NextApiRequest, res: NextApiResponse<LoggedInU
       throw new InvalidInputError('You do not own selected NFT');
     }
 
-    const nft = await alchemyApi.getNft(avatarContract, avatarTokenId, chainId);
-    const mappedNft = mapNftFromAlchemy(nft, chainId);
+    const nft = await getNFT(avatarContract, avatarTokenId, chainId);
 
-    if (mappedNft.image) {
-      avatarUrl = mappedNft.image;
+    if (nft.image) {
+      avatarUrl = nft.image;
     }
   }
 

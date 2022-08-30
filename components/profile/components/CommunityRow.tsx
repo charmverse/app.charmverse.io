@@ -1,7 +1,7 @@
-import { useTheme } from '@emotion/react';
+
 import { Stack, Typography, IconButton, Collapse, Tabs, Tab, Tooltip } from '@mui/material';
 import { Box } from '@mui/system';
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
@@ -18,15 +18,9 @@ import { ProfileItemContainer } from './ProfileItems';
 
 const TASK_TABS = [
   { icon: <HowToVoteIcon />, label: 'Votes', type: 'vote' },
-  { icon: <ForumIcon />, label: 'Proposals', type: 'proposal' }
+  { icon: <ForumIcon />, label: 'Proposals', type: 'proposal' },
+  { icon: <ForumIcon />, label: 'VCs', type: 'verifiable_credential' }
 ] as const;
-
-interface DeepDaoEvent {
-  id: string;
-  title: string;
-  createdAt: string;
-  verdict: boolean;
-}
 
 export type CommunityDetails = UserCommunity & {
   proposals: DeepDaoProposal[];
@@ -42,28 +36,160 @@ interface CommunityRowProps {
   onClick: () => void;
 }
 
+function CountIcon ({ label, icon, count }: { label: string, icon: ReactNode, count: number }) {
+  if (count === 0) {
+    return null;
+  }
+  return (
+    <Tooltip title={label}>
+      <Typography variant='subtitle2' sx={{ pr: 1, gap: 0.5, display: 'inline-flex', alignItems: 'center' }}>
+        <span style={{ fontSize: '12px' }}>{icon}</span> {count}
+      </Typography>
+    </Tooltip>
+  );
+}
+
+function TaskTab ({ task, onClick }: { task: typeof TASK_TABS[number], onClick: () => void }) {
+  return (
+    <Tab
+      iconPosition='start'
+      icon={task.icon}
+      key={task.label}
+      sx={{
+        px: 1.5,
+        fontSize: 14,
+        minHeight: 0,
+        '&.MuiTab-root': {
+          color: 'palette.secondary.main'
+        }
+      }}
+      label={task.label}
+      onClick={onClick}
+    />
+  );
+}
+
+interface EventRowProps {
+  eventNumber: number;
+  icon: ReactNode;
+  title: string;
+  createdAt: string;
+}
+
+function EventRow (event: EventRowProps) {
+
+  return (
+    <Stack flexDirection='row' gap={1}>
+      <Stack
+        flexDirection='row'
+        gap={1}
+        alignItems='center'
+        alignSelf='flex-start'
+      >
+        {event.icon}
+        <Typography fontWeight={500}>{event.eventNumber}.</Typography>
+      </Stack>
+      <Stack
+        gap={0.5}
+        sx={{
+          flexGrow: 1,
+          flexDirection: {
+            sm: 'column',
+            md: 'row'
+          },
+          alignItems: 'flex-start'
+        }}
+      >
+        <Typography sx={{ flexGrow: 1 }}>
+          {event.title}
+        </Typography>
+        <Typography variant='subtitle1' color='secondary' textAlign={{ sm: 'left', md: 'right' }} minWidth={100}>{showDateWithMonthAndYear(event.createdAt, true)}</Typography>
+      </Stack>
+    </Stack>
+  );
+}
+
+function VotesPanel ({ events }: { events: DeepDaoVote[] }) {
+
+  return (
+    <>
+      {
+        events
+          .sort((eventA, eventB) => eventA.createdAt > eventB.createdAt ? -1 : 1)
+          .map((event, index) => (
+            <EventRow
+              key={event.voteId}
+              createdAt={event.createdAt}
+              title={event.title}
+              icon={event.successful
+                ? <ThumbUpIcon color='success' fontSize='small' />
+                : <ThumbDownIcon color='error' fontSize='small' />}
+              eventNumber={index + 1}
+            />
+          ))
+      }
+    </>
+  );
+}
+
+function ProposalsPanel ({ events }: { events: DeepDaoProposal[] }) {
+
+  return (
+    <>
+      {
+        events.sort((eventA, eventB) => eventA.createdAt > eventB.createdAt ? -1 : 1)
+          .map((event, index) => (
+            <EventRow
+              key={event.proposalId}
+              createdAt={event.createdAt}
+              title={event.title}
+              icon={event.outcome === event.voteChoice
+                ? <ThumbUpIcon color='success' fontSize='small' />
+                : <ThumbDownIcon color='error' fontSize='small' />}
+              eventNumber={index + 1}
+            />
+          ))
+        }
+    </>
+  );
+}
+
+function VerifiableCredentialsPanel ({ events }: { events: DeepDaoProposal[] }) {
+
+  return (
+    <>
+      {
+        events.sort((eventA, eventB) => eventA.createdAt > eventB.createdAt ? -1 : 1)
+          .map((event, index) => (
+            <EventRow
+              key={event.proposalId}
+              createdAt={event.createdAt}
+              title={event.title}
+              icon={event.outcome === event.voteChoice
+                ? <ThumbUpIcon color='success' fontSize='small' />
+                : <ThumbDownIcon color='error' fontSize='small' />}
+              eventNumber={index + 1}
+            />
+          ))
+        }
+    </>
+  );
+}
+
 export default function CommunityRow ({ community, showVisibilityIcon, visible, onClick }: CommunityRowProps) {
   const [isCollapsed, setIsCollapsed] = useState(true);
-  const [currentTab, setCurrentTab] = useState<'vote' | 'proposal'>('vote');
-  const theme = useTheme();
+  const [currentTab, setCurrentTab] = useState<typeof TASK_TABS[number]['type']>('vote');
 
-  const proposals: DeepDaoEvent[] = community.proposals
-    .sort((proposalA, proposalB) => proposalA.createdAt > proposalB.createdAt ? -1 : 1)
-    .map(proposal => ({
-      createdAt: proposal.createdAt,
-      id: proposal.proposalId,
-      title: proposal.title,
-      verdict: proposal.outcome === proposal.voteChoice
-    }));
+  const hasVotes = community.votes.length > 0;
+  const hasProposals = community.proposals.length > 0;
+  const hasVCs = true;
+  const isCollapsible = hasVotes || hasProposals || hasVCs;
 
-  const votes: DeepDaoEvent[] = community.votes
-    .sort((voteA, voteB) => voteA.createdAt > voteB.createdAt ? -1 : 1)
-    .map(vote => ({
-      createdAt: vote.createdAt,
-      id: vote.voteId,
-      title: vote.title,
-      verdict: Boolean(vote.successful)
-    }));
+  function toggleCollapse () {
+    if (isCollapsible) {
+      setIsCollapsed(!isCollapsed);
+    }
+  }
 
   return (
     <ProfileItemContainer
@@ -76,7 +202,8 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
         display='flex'
         gap={2}
         flexDirection='row'
-        onClick={() => setIsCollapsed(!isCollapsed)}
+        alignItems='center'
+        onClick={toggleCollapse}
       >
         <Avatar
           avatar={community.logo}
@@ -107,40 +234,41 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
                 {showDateWithMonthAndYear(community.joinDate)} - {community.latestEventDate ? showDateWithMonthAndYear(community.latestEventDate) : 'Present'}
               </Typography>
             )}
+            <CountIcon icon={<HowToVoteIcon />} label='Votes' count={community.votes.length} />
+            <CountIcon icon={<ForumIcon />} label='Proposals' count={community.proposals.length} />
+            <CountIcon icon={<ForumIcon />} label='VCs' count={community.proposals.length} />
           </Box>
           <Box display='flex' alignItems='center' gap={0.5}>
             {showVisibilityIcon && (
-              <IconButton
-                className='action'
-                size='small'
-                onClick={(e) => {
-                  // Don't want visibility icon to toggle the proposal and votes list
-                  e.stopPropagation();
-                  onClick();
-                }}
-                sx={{
-                  opacity: {
-                    md: 0,
-                    sm: 1
-                  }
-                }}
-              >
-                {visible ? (
-                  <Tooltip title='Hide Community from profile'>
+              <Tooltip title={`${visible ? 'Hide' : 'Show'} Community from profile`}>
+                <IconButton
+                  className='action'
+                  size='small'
+                  onClick={(e) => {
+                    // Don't want visibility icon to toggle the proposal and votes list
+                    e.stopPropagation();
+                    onClick();
+                  }}
+                  sx={{
+                    opacity: {
+                      md: 0,
+                      sm: 1
+                    }
+                  }}
+                >
+                  {visible ? (
                     <VisibilityIcon fontSize='small' />
-                  </Tooltip>
-                ) : (
-                  <Tooltip title='Show Community in profile'>
+                  ) : (
                     <VisibilityOffIcon fontSize='small' />
-                  </Tooltip>
-                )}
+                  )}
+                </IconButton>
+              </Tooltip>
+            )}
+            {isCollapsible && (
+              <IconButton size='small'>
+                {isCollapsed ? <ExpandMoreIcon fontSize='small' /> : <ExpandLessIcon fontSize='small' />}
               </IconButton>
             )}
-            <IconButton
-              size='small'
-            >
-              {isCollapsed ? <ExpandMoreIcon fontSize='small' /> : <ExpandLessIcon fontSize='small' />}
-            </IconButton>
           </Box>
         </Box>
       </Box>
@@ -154,69 +282,14 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
             indicatorColor='primary'
             value={TASK_TABS.findIndex(taskTab => taskTab.type === currentTab)}
           >
-            {TASK_TABS.map(task => (
-              <Tab
-                component='div'
-                disableRipple
-                iconPosition='start'
-                icon={task.icon}
-                key={task.label}
-                sx={{
-                  px: 1.5,
-                  fontSize: 14,
-                  minHeight: 0,
-                  '&.MuiTab-root': {
-                    color: theme.palette.secondary.main
-                  }
-                }}
-                label={task.label}
-                onClick={() => {
-                  setCurrentTab(task.type);
-                }}
-              />
-            ))}
+            {hasVotes && <TaskTab task={TASK_TABS[0]} onClick={() => setCurrentTab(TASK_TABS[0].type)} />}
+            {hasProposals && <TaskTab task={TASK_TABS[1]} onClick={() => setCurrentTab(TASK_TABS[1].type)} />}
+            {hasVCs && <TaskTab task={TASK_TABS[2]} onClick={() => setCurrentTab(TASK_TABS[2].type)} />}
           </Tabs>
           <Stack gap={2}>
-            {
-              (currentTab === 'vote' ? votes : proposals).map((event, eventNumber) => (
-                <Stack key={event.id} flexDirection='row' gap={1}>
-                  <Stack
-                    flexDirection='row'
-                    gap={1}
-                    alignItems='center'
-                    sx={{
-                      alignSelf: 'flex-start'
-                    }}
-                  >
-                    {event.verdict ? (
-                      <ThumbUpIcon
-                        color='success'
-                        fontSize='small'
-                      />
-                    ) : <ThumbDownIcon color='error' fontSize='small' />}
-                    <Typography fontWeight={500}>{eventNumber + 1}.</Typography>
-                  </Stack>
-                  <Stack
-                    gap={0.5}
-                    sx={{
-                      flexGrow: 1,
-                      flexDirection: {
-                        sm: 'column',
-                        md: 'row'
-                      },
-                      alignItems: 'flex-start'
-                    }}
-                  >
-                    <Typography sx={{
-                      flexGrow: 1
-                    }}
-                    >{event.title}
-                    </Typography>
-                    <Typography variant='subtitle1' color='secondary' textAlign={{ sm: 'left', md: 'right' }} minWidth={100}>{showDateWithMonthAndYear(event.createdAt, true)}</Typography>
-                  </Stack>
-                </Stack>
-              ))
-            }
+            {currentTab === 'vote' && <VotesPanel events={community.votes} />}
+            {currentTab === 'proposal' && <ProposalsPanel events={community.proposals} />}
+            {currentTab === 'verifiable_credential' && <VerifiableCredentialsPanel events={community.proposals} />}
           </Stack>
         </Box>
       </Collapse>

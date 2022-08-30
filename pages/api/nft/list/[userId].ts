@@ -1,7 +1,7 @@
 import { prisma } from 'db';
 import { InvalidStateError, onError, onNoMatch } from 'lib/middleware';
-import { getNFTs } from 'lib/nft/getNfts';
-import { NftData } from 'lib/nft/interfaces';
+import { getNFTs } from 'lib/blockchain/nfts';
+import { NftData } from 'lib/blockchain/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -9,9 +9,9 @@ import nc from 'next-connect';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
-  .get(getNfts);
+  .get(getNFTsMiddleware);
 
-async function getNfts (req: NextApiRequest, res: NextApiResponse<NftData[] | {error: string}>) {
+async function getNFTsMiddleware (req: NextApiRequest, res: NextApiResponse<NftData[] | {error: string}>) {
   // address = '0x155b6485305ccab44ef7da58ac886c62ce105cf9'
   const userId = req.query.userId as string;
 
@@ -40,9 +40,12 @@ async function getNfts (req: NextApiRequest, res: NextApiResponse<NftData[] | {e
   }
 
   const { addresses } = user;
-  const mappedNfts = await getNFTs(addresses);
+  const mappedNfts = await getNFTs(['0x3B60e31CFC48a9074CD5bEbb26C9EAa77650a43F']);
 
-  res.status(200).json(mappedNfts.map(nft => ({ ...nft, isHidden: hiddenNftIds.includes(nft.tokenId) })));
+  res.status(200).json(mappedNfts.map(nft => ({
+    ...nft,
+    isHidden: hiddenNftIds.includes(nft.id)
+  })));
 }
 
 export default withSessionRoute(handler);

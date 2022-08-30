@@ -6,10 +6,9 @@ import { User, UserDetails } from '@prisma/client';
 import { prisma } from 'db';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
-import { ExtendedPoap } from 'models';
-import { getPOAPs } from 'lib/poap';
-import { NftData } from 'lib/nft/interfaces';
-import { getNFTs } from 'lib/nft/getNfts';
+import { getPOAPs } from 'lib/blockchain/poaps';
+import { NftData, ExtendedPoap } from 'lib/blockchain/interfaces';
+import { getNFTs } from 'lib/blockchain/nfts';
 
 export type PublicUser = Pick<User, 'id' | 'username' | 'avatar' | 'path'> & {
   profile: UserDetails | null;
@@ -50,28 +49,27 @@ async function getUserProfile (req: NextApiRequest, res: NextApiResponse<PublicU
   // prefer match by user id
   const userById = users.find(user => user.id === userPath) ?? users[0];
 
-  if (userById) {
-    const allPoaps = await getPOAPs(userById.addresses);
-    const allNfts = await getNFTs(userById.addresses);
-
-    const visiblePoaps = allPoaps
-      .filter(poap => !userById.profileItems
-        .find(profileItem => profileItem.isHidden && profileItem.id === poap.tokenId));
-    const visibleNfts = allNfts
-      .filter(nft => !userById.profileItems
-        .find(profileItem => profileItem.isHidden && profileItem.id === nft.tokenId));
-
-    delete (userById as any).profileItems;
-
-    res.status(200).json({
-      ...userById,
-      visiblePoaps,
-      visibleNfts
-    });
-  }
-  else {
+  if (!userById) {
     throw new DataNotFoundError('User not found');
   }
+
+  function isVisible (item: { id: string }): boolean {
+    return !userById.profileItems.some(profileItem => profileItem.isHidden && profileItem.id === item.id);
+  }
+
+  const allPoaps = await getPOAPs(userById.addresses);
+  const allNfts = await getNFTs(userById.addresses);
+
+  const visiblePoaps = allPoaps.filter(isVisible);
+  const visibleNfts = allNfts.filter(isVisible);
+
+  delete (userById as any).profileItems;
+
+  res.status(200).json({
+    ...userById,
+    visiblePoaps,
+    visibleNfts
+  });
 }
 
 export default withSessionRoute(handler);
