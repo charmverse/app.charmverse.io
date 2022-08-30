@@ -1,13 +1,13 @@
-import { Box, Chip, CircularProgress, Divider, Stack, Typography } from '@mui/material';
-import useSWRImmutable from 'swr/immutable';
+import { Box, Chip, Divider, Stack, Typography } from '@mui/material';
 import charmClient from 'charmClient';
-import { ExtendedPoap } from 'models';
-import { NftData } from 'lib/nft/interfaces';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { NftData } from 'lib/nft/interfaces';
+import { ExtendedPoap } from 'models';
+import useSWRImmutable from 'swr/immutable';
 import AggregatedData from './components/AggregatedData';
-import UserDetails, { isPublicUser, UserDetailsProps } from './components/UserDetails';
-import { Collective, ProfileItemsList } from './components/ProfileItems';
 import CommunityRow, { CommunityDetails } from './components/CommunityRow';
+import { Collective, ProfileItemsList } from './components/ProfileItems';
+import UserDetails, { isPublicUser, UserDetailsProps } from './components/UserDetails';
 
 function transformPoap (poap: ExtendedPoap): Collective {
   return {

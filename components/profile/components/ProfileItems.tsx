@@ -23,6 +23,7 @@ export const ProfileItemContainer = styled(Stack)`
   }
 
   .action {
+    opacity: 0;
     transition: ${({ theme }) => `${theme.transitions.duration.short}ms opacity ${theme.transitions.easing.easeInOut}`};
   }
 
@@ -40,17 +41,9 @@ interface ProfileItemProps {
 function ProfileItem ({ onClick, collective, visible, showVisibilityIcon }: ProfileItemProps) {
   return (
     <ProfileItemContainer sx={{
-      flexDirection: {
-        sm: 'column',
-        md: 'row'
-      },
+      flexDirection: 'row',
       alignItems: 'center',
-      opacity: visible ? 1 : 0.25,
-      textAlign: {
-        xs: 'center',
-        sm: 'center',
-        md: 'initial'
-      }
+      opacity: visible ? 1 : 0.25
     }}
     >
       {collective.type === 'poap' ? (
@@ -86,12 +79,6 @@ function ProfileItem ({ onClick, collective, visible, showVisibilityIcon }: Prof
         <IconButton
           size='small'
           className='action'
-          sx={{
-            opacity: {
-              md: 0,
-              sm: 1
-            }
-          }}
           onClick={onClick}
         >
           {visible ? (
