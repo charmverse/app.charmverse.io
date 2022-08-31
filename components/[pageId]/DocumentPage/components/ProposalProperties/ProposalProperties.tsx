@@ -3,24 +3,43 @@ import { Box } from '@mui/system';
 import charmClient from 'charmClient';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import { InputSearchContributorBase } from 'components/common/form/InputSearchContributor';
+import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
 import { Contributor, useContributors } from 'hooks/useContributors';
+import useRoles from 'hooks/useRoles';
 import { ProposalWithUsers } from 'lib/proposal/interface';
+import { ListSpaceRolesResponse } from 'pages/api/roles';
 import { ProposalStatusChip } from './ProposalStatusBadge';
 
 interface ProposalPropertiesProps {
   proposal: ProposalWithUsers,
   readOnly?: boolean
-  pageId: string
   refreshPage?: () => void
 }
 
-export default function ProposalProperties ({ refreshPage, pageId, proposal, readOnly }: ProposalPropertiesProps) {
+export default function ProposalProperties ({ refreshPage, proposal, readOnly }: ProposalPropertiesProps) {
   const { status } = proposal;
 
   const canUpdateAuthors = status === 'draft' || status === 'private_draft' || status === 'discussion';
   const canUpdateReviewers = status === 'draft' || status === 'private_draft';
 
   const [contributors] = useContributors();
+  const { roles = [] } = useRoles();
+
+  const reviewerOptionsRecord: Record<string, ({group: 'role'} & ListSpaceRolesResponse) | ({group: 'user'} & Contributor)> = {};
+
+  contributors.forEach(contributor => {
+    reviewerOptionsRecord[contributor.id] = {
+      ...contributor,
+      group: 'user'
+    };
+  });
+
+  roles.forEach(role => {
+    reviewerOptionsRecord[role.id] = {
+      ...role,
+      group: 'role'
+    };
+  });
 
   return (
     <Box
@@ -77,7 +96,7 @@ export default function ProposalProperties ({ refreshPage, pageId, proposal, rea
                 if ((_contributors as Contributor[]).length !== 0) {
                   await charmClient.proposals.updateProposal(proposal.id, {
                     authors: (_contributors as Contributor[]).map(contributor => contributor.id),
-                    reviewers: proposal.reviewers.map(reviewer => reviewer.userId)
+                    reviewers: proposal.reviewers.map(reviewer => ({ group: reviewer.group, id: (reviewer.group === 'role' ? reviewer.roleId : reviewer.userId) as string }))
                   });
                   if (refreshPage) {
                     refreshPage();
@@ -107,24 +126,21 @@ export default function ProposalProperties ({ refreshPage, pageId, proposal, rea
             <Button>Reviewer</Button>
           </div>
           <div style={{ width: '100%' }}>
-            <InputSearchContributorBase
-              filterSelectedOptions
-              multiple
-              placeholder='Select reviewers'
-              value={contributors.filter(contributor => proposal.reviewers.find(reviewer => contributor.id === reviewer.userId))}
-              disableCloseOnSelect
-              onChange={async (_, _contributors) => {
+            <InputSearchReviewers
+              disabled={readOnly || !canUpdateReviewers}
+              readOnly={readOnly}
+              value={proposal.reviewers.map(reviewer => reviewerOptionsRecord[(reviewer.group === 'role' ? reviewer.roleId : reviewer.userId) as string])}
+              disableCloseOnSelect={true}
+              excludedIds={proposal.reviewers.map(reviewer => (reviewer.group === 'role' ? reviewer.roleId : reviewer.userId) as string)}
+              onChange={async (e, options) => {
                 await charmClient.proposals.updateProposal(proposal.id, {
                   authors: proposal.authors.map(author => author.userId),
-                  reviewers: (_contributors as Contributor[]).map(contributor => contributor.id)
+                  reviewers: options.map(option => ({ group: option.group, id: option.id }))
                 });
                 if (refreshPage) {
                   refreshPage();
                 }
               }}
-              disabled={readOnly || !canUpdateReviewers}
-              readOnly={readOnly}
-              options={contributors}
               sx={{
                 width: '100%'
               }}
