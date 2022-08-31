@@ -8,6 +8,7 @@ import CollablandCredentials from './components/CollablandCredentials';
 import CommunityRow, { CommunityDetails } from './components/CommunityRow';
 import ProfileItemRow, { Collective } from './components/ProfileItemRow';
 import UserDetails, { isPublicUser, UserDetailsProps } from './components/UserDetails';
+import { useCollablandCredentials } from './hooks/useCollablandCredentials';
 
 function transformPoap (poap: ExtendedPoap): Collective {
   return {
@@ -34,7 +35,12 @@ function transformNft (nft: NftData): Collective {
 }
 
 export default function PublicProfile (props: UserDetailsProps) {
+
   const { user } = props;
+
+  const { aeToken } = useCollablandCredentials();
+  const { data: credentials, error } = useSWRImmutable(() => !!aeToken, () => charmClient.collabland.importCredentials(aeToken as string));
+
   const { data, mutate, isValidating: isAggregatedDataValidating } = useSWRImmutable(user ? `userAggregatedData/${user.id}` : null, () => {
     return charmClient.getAggregatedData(user.id);
   });
@@ -134,7 +140,31 @@ export default function PublicProfile (props: UserDetailsProps) {
     }
   }
 
-  const communities = (data?.communities ?? []).filter((community) => readOnly ? !community.isHidden : true);
+  const bountyEvents = credentials?.bountyEvents ?? [];
+
+  const communities = (data?.communities ?? [])
+    .filter((community) => readOnly ? !community.isHidden : true)
+    .map((community) => {
+      return {
+        ...community,
+        bounties: bountyEvents.filter(event => event.subject.workspaceId === community.id)
+      };
+    });
+
+  const discordCommunities = (credentials?.discordEvents ?? []).map((credential): CommunityDetails => ({
+    isHidden: false,
+    joinDate: credential.createdAt,
+    id: credential.subject.discordGuildId,
+    name: credential.subject.discordGuildName,
+    logo: credential.subject.discordGuildAvatar,
+    votes: [],
+    proposals: [],
+    bounties: []
+    // roles: credential.subject.discordRoles.map((role, i) => <><strong>{role.name} </strong>{i < credential.subject.discordRoles.length - 1 && ' and '}</>)} issued on {toMonthDate(credential.createdAt)
+  }));
+
+  const allCommunities = communities.concat(discordCommunities)
+    .sort((commA, commB) => commB.joinDate > commA.joinDate ? 1 : -1);
 
   return (
     <Stack spacing={2}>
@@ -147,11 +177,11 @@ export default function PublicProfile (props: UserDetailsProps) {
           totalProposals={data?.totalProposals || 0}
           totalVotes={data?.totalVotes || 0}
         />
-        {communities.length > 0 ? (
+        {allCommunities.length > 0 ? (
           <>
-            <SectionHeader title='Communities' count={communities.length} />
+            <SectionHeader title='Communities' count={allCommunities.length} />
             <Stack gap={2}>
-              {communities.map(community => (
+              {allCommunities.map(community => (
                 <CommunityRow
                   key={community.id}
                   onClick={() => {
@@ -188,7 +218,7 @@ export default function PublicProfile (props: UserDetailsProps) {
           <Box p={2} pb={0}>
             <Typography fontWeight={700} fontSize={20}>Verified Credentials</Typography>
           </Box>
-          <CollablandCredentials />
+          <CollablandCredentials error={error} />
         </Card>
       </LoadingComponent>
     </Stack>

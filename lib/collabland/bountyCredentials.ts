@@ -5,20 +5,19 @@ const DOMAIN = process.env.DOMAIN;
 
 interface CharmVerseBounty extends Bounty {
   page: Page;
+  space: { domain: string, name: string };
 }
 
 interface RequestParams {
   bounty: CharmVerseBounty;
   discordUserId: string;
-  spaceDomain: string;
 }
 
-export function createBountyCreatedCredential ({ bounty, discordUserId, spaceDomain }: RequestParams) {
+export function createBountyCreatedCredential ({ bounty, discordUserId }: RequestParams) {
 
   return client.createCredential({
-    subject: getCredentialSubject({
+    subject: getBountySubject({
       bounty,
-      spaceDomain,
       id: discordUserId,
       eventName: 'bounty_created',
       eventDate: new Date().toISOString()
@@ -26,12 +25,11 @@ export function createBountyCreatedCredential ({ bounty, discordUserId, spaceDom
   });
 }
 
-export function createBountyStartedCredential ({ bounty, discordUserId, spaceDomain }: RequestParams) {
+export function createBountyStartedCredential ({ bounty, discordUserId }: RequestParams) {
 
   return client.createCredential({
-    subject: getCredentialSubject({
+    subject: getBountySubject({
       bounty,
-      spaceDomain,
       id: discordUserId,
       eventName: 'bounty_started',
       eventDate: new Date().toISOString()
@@ -39,11 +37,11 @@ export function createBountyStartedCredential ({ bounty, discordUserId, spaceDom
   });
 }
 
-export function createBountyCompletedCredential ({ bounty, discordUserId, spaceDomain }: RequestParams) {
+export function createBountyCompletedCredential ({ bounty, discordUserId }: RequestParams) {
 
   return client.createCredential({
-    subject: getCredentialSubject({ bounty,
-      spaceDomain,
+    subject: getBountySubject({
+      bounty,
       id: discordUserId,
       eventName: 'bounty_completed',
       eventDate: new Date().toISOString()
@@ -53,15 +51,14 @@ export function createBountyCompletedCredential ({ bounty, discordUserId, spaceD
 
 // utils
 
-interface GetCredentialInput {
+interface BountySubjectParams {
   bounty: CharmVerseBounty;
-  spaceDomain: string;
   id: string;
   eventName: client.BountyEventSubject['eventName'];
   eventDate: string;
 }
 
-function getCredentialSubject ({ bounty, spaceDomain, ...info }: GetCredentialInput): client.BountyEventSubject {
+function getBountySubject ({ bounty, ...info }: BountySubjectParams): client.BountyEventSubject {
   return {
     ...info,
     bountyId: bounty.id,
@@ -70,9 +67,9 @@ function getCredentialSubject ({ bounty, spaceDomain, ...info }: GetCredentialIn
     bountyRewardChain: bounty.chainId,
     bountyRewardToken: bounty.rewardToken,
     bountyTitle: bounty.page.title,
-    bountyUrl: `${DOMAIN}/${spaceDomain}/${bounty.page.id}`,
+    bountyUrl: `${DOMAIN}/${bounty.space.domain}/${bounty.page.id}`,
     workspaceId: 'not_an_id',
-    workspaceUrl: `${DOMAIN}/${spaceDomain}`,
-    workspaceName: spaceDomain
+    workspaceUrl: `${DOMAIN}/${bounty.space.domain}`,
+    workspaceName: bounty.space.name
   };
 }

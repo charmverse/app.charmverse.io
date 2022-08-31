@@ -22,7 +22,7 @@ function isBountyEventCredential (cred: client.AnyCredentialType['verifiableCred
 
 export interface CredentialsResult {
   bountyEvents: VerifiedCredential<client.BountyEventSubject>[];
-  discordRoles: VerifiedCredential<DiscordRoleSubject>[];
+  discordEvents: VerifiedCredential<DiscordRoleSubject>[];
 }
 
 export async function getCredentials ({ aeToken }: { aeToken: string }): Promise<CredentialsResult> {
@@ -30,7 +30,7 @@ export async function getCredentials ({ aeToken }: { aeToken: string }): Promise
   const res = await client.getCredentials({ aeToken });
 
   const bountyEvents: CredentialsResult['bountyEvents'] = [];
-  const discordRoles: CredentialsResult['discordRoles'] = [];
+  const discordEvents: CredentialsResult['discordEvents'] = [];
 
   res.forEach(({ verifiableCredential }) => {
     if (isBountyEventCredential(verifiableCredential)) {
@@ -42,7 +42,7 @@ export async function getCredentials ({ aeToken }: { aeToken: string }): Promise
       });
     }
     else {
-      discordRoles.push({
+      discordEvents.push({
         id: verifiableCredential.id,
         createdAt: verifiableCredential.issuanceDate,
         type: verifiableCredential.type,
@@ -58,11 +58,11 @@ export async function getCredentials ({ aeToken }: { aeToken: string }): Promise
   bountyEvents
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-  discordRoles
+  discordEvents
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   // group Discord VCs by role
-  const discordRolesGrouped = discordRoles.reduce<CredentialsResult['discordRoles']>((newList, curr) => {
+  const discordEventsGrouped = discordEvents.reduce<CredentialsResult['discordEvents']>((newList, curr) => {
     const last = newList[newList.length - 1];
     // if previous VC was the same server and <24 hours, just append the roles
     const lastIsSameServer = last && last.subject.discordGuildId === curr.subject.discordGuildId;
@@ -81,6 +81,6 @@ export async function getCredentials ({ aeToken }: { aeToken: string }): Promise
 
   return {
     bountyEvents,
-    discordRoles: discordRolesGrouped
+    discordEvents: discordEventsGrouped
   };
 }

@@ -2,6 +2,7 @@
 import { Stack, Typography, IconButton, Collapse, Tabs, Tab, Tooltip } from '@mui/material';
 import { Box } from '@mui/system';
 import { ReactNode, useState } from 'react';
+import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
@@ -14,17 +15,19 @@ import { UserCommunity } from 'lib/profile/interfaces';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import Avatar from 'components/common/Avatar';
+import type { CredentialsResult } from 'lib/collabland';
 import { ProfileItemContainer } from './ProfileItemRow';
 
 const TASK_TABS = [
   { icon: <HowToVoteIcon />, label: 'Votes', type: 'vote' },
   { icon: <ForumIcon />, label: 'Proposals', type: 'proposal' },
-  { icon: <ForumIcon />, label: 'VCs', type: 'verifiable_credential' }
+  { icon: <BountyIcon />, label: 'Bounties', type: 'bounty' }
 ] as const;
 
 export type CommunityDetails = UserCommunity & {
   proposals: DeepDaoProposal[];
   votes: DeepDaoVote[];
+  bounties: CredentialsResult['bountyEvents'];
   joinDate: string;
   latestEventDate?: string;
 }
@@ -50,6 +53,7 @@ function CountIcon ({ label, icon, count }: { label: string, icon: ReactNode, co
 }
 
 function TaskTab ({ task, onClick }: { task: typeof TASK_TABS[number], onClick: () => void }) {
+
   return (
     <Tab
       iconPosition='start'
@@ -64,6 +68,7 @@ function TaskTab ({ task, onClick }: { task: typeof TASK_TABS[number], onClick: 
         }
       }}
       label={task.label}
+      value={task.type}
       onClick={onClick}
     />
   );
@@ -154,7 +159,7 @@ function ProposalsPanel ({ events }: { events: DeepDaoProposal[] }) {
   );
 }
 
-function VerifiableCredentialsPanel ({ events }: { events: DeepDaoProposal[] }) {
+function BountyEventsPanel ({ events }: { events: CredentialsResult['bountyEvents'] }) {
 
   return (
     <>
@@ -162,12 +167,10 @@ function VerifiableCredentialsPanel ({ events }: { events: DeepDaoProposal[] }) 
         events.sort((eventA, eventB) => eventA.createdAt > eventB.createdAt ? -1 : 1)
           .map((event, index) => (
             <EventRow
-              key={event.proposalId}
+              key={event.subject.bountyId}
               createdAt={event.createdAt}
-              title={event.title}
-              icon={event.outcome === event.voteChoice
-                ? <ThumbUpIcon color='success' sx={{ fontSize: '16px' }} />
-                : <ThumbDownIcon color='error' sx={{ fontSize: '16px' }} />}
+              title={event.subject.bountyTitle}
+              icon={null}
               eventNumber={index + 1}
             />
           ))
@@ -177,13 +180,15 @@ function VerifiableCredentialsPanel ({ events }: { events: DeepDaoProposal[] }) 
 }
 
 export default function CommunityRow ({ community, showVisibilityIcon, visible, onClick }: CommunityRowProps) {
-  const [isCollapsed, setIsCollapsed] = useState(true);
-  const [currentTab, setCurrentTab] = useState<typeof TASK_TABS[number]['type']>('vote');
 
   const hasVotes = community.votes.length > 0;
   const hasProposals = community.proposals.length > 0;
-  const hasVCs = false;
-  const isCollapsible = hasVotes || hasProposals || hasVCs;
+  const hasBounties = community.bounties.length > 0;
+  const isCollapsible = hasVotes || hasProposals || hasBounties;
+  const defaultTab = hasVotes ? 'vote' : hasProposals ? 'proposal' : hasBounties ? 'bounty' : null;
+
+  const [currentTab, setCurrentTab] = useState<typeof TASK_TABS[number]['type']>(defaultTab || 'vote');
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   function toggleCollapse () {
     if (isCollapsible) {
@@ -231,7 +236,7 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
             )}
             <CountIcon icon={<HowToVoteIcon />} label='Votes' count={community.votes.length} />
             <CountIcon icon={<ForumIcon />} label='Proposals' count={community.proposals.length} />
-            <CountIcon icon={<ForumIcon />} label='VCs' count={community.proposals.length} />
+            <CountIcon icon={<BountyIcon />} label='Bounties' count={community.bounties.length} />
           </Box>
           <Box display='flex' alignItems='center' gap={0.5}>
             {showVisibilityIcon && (
@@ -275,16 +280,16 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
               mb: 2
             }}
             indicatorColor='primary'
-            value={TASK_TABS.findIndex(taskTab => taskTab.type === currentTab)}
+            value={currentTab}
           >
             {hasVotes && <TaskTab task={TASK_TABS[0]} onClick={() => setCurrentTab(TASK_TABS[0].type)} />}
             {hasProposals && <TaskTab task={TASK_TABS[1]} onClick={() => setCurrentTab(TASK_TABS[1].type)} />}
-            {hasVCs && <TaskTab task={TASK_TABS[2]} onClick={() => setCurrentTab(TASK_TABS[2].type)} />}
+            {hasBounties && <TaskTab task={TASK_TABS[2]} onClick={() => setCurrentTab(TASK_TABS[2].type)} />}
           </Tabs>
           <Stack gap={2}>
             {currentTab === 'vote' && <VotesPanel events={community.votes} />}
             {currentTab === 'proposal' && <ProposalsPanel events={community.proposals} />}
-            {currentTab === 'verifiable_credential' && <VerifiableCredentialsPanel events={community.proposals} />}
+            {currentTab === 'bounty' && <BountyEventsPanel events={community.bounties} />}
           </Stack>
         </Box>
       </Collapse>
