@@ -1,4 +1,4 @@
-import { PrismaPromise } from '@prisma/client';
+import { PrismaPromise, ProposalReviewerGroup } from '@prisma/client';
 import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
@@ -11,15 +11,34 @@ export async function updateProposal ({
 }: {
   proposal: ProposalWithUsers,
   authors: string[],
-  reviewers: string[]
+  reviewers: {
+    id: string,
+    group: ProposalReviewerGroup
+  }[]
 }) {
   const { status, id: proposalId, authors: existingAuthors, reviewers: existingReviewers } = proposal;
 
   const newAuthors = authors.filter(author => !existingAuthors.some(existingAuthor => existingAuthor.userId === author));
   const deletedAuthors = existingAuthors.filter(existingAuthor => !authors.some(author => existingAuthor.userId === author));
 
-  const newReviewers = reviewers.filter(reviewer => !existingReviewers.some(existingReviewer => existingReviewer.userId === reviewer));
-  const deletedReviewers = existingReviewers.filter(existingReviewer => !reviewers.some(reviewer => existingReviewer.userId === reviewer));
+  const existingReviewerRoles = existingReviewers.filter(existingReviewer => existingReviewer.roleId && existingReviewer.group === 'role');
+  const existingReviewerUsers = existingReviewers.filter(existingReviewer => existingReviewer.userId && existingReviewer.group === 'user');
+
+  const reviewerRoles = reviewers.filter(reviewer => reviewer.group === 'role');
+  const reviewerUsers = reviewers.filter(reviewer => reviewer.group === 'user');
+
+  const newReviewerRoles = reviewerRoles
+    .filter(reviewer => !existingReviewerRoles
+      .some(existingReviewer => (existingReviewer.roleId === reviewer.id)));
+  const newReviewerUsers = reviewerUsers
+    .filter(reviewer => !existingReviewerUsers
+      .some(existingReviewer => (existingReviewer.userId === reviewer.id)));
+  const deletedReviewerRoles = existingReviewerRoles
+    .filter(existingReviewer => !reviewerRoles
+      .some(reviewer => (existingReviewer.roleId === reviewer.id)));
+  const deletedReviewerUsers = existingReviewerUsers
+    .filter(existingReviewer => !reviewerUsers
+      .some(reviewer => (existingReviewer.roleId === reviewer.id)));
 
   const transactionPipeline: PrismaPromise<any>[] = [];
 
@@ -33,7 +52,7 @@ export async function updateProposal ({
   }
 
   // Updating reviewers should fail if proposal is in "discussion" stage or later
-  if (status !== 'draft' && status !== 'private_draft' && (newReviewers.length !== 0 || deletedReviewers.length !== 0)) {
+  if (status !== 'draft' && status !== 'private_draft' && (newReviewerRoles.length !== 0 || newReviewerUsers.length !== 0 || deletedReviewerRoles.length !== 0 || deletedReviewerUsers.length !== 0)) {
     throw new UnauthorisedActionError();
   }
 
@@ -58,21 +77,42 @@ export async function updateProposal ({
     );
   }
 
-  if (newReviewers.length) {
+  if (newReviewerRoles.length) {
     transactionPipeline.push(
       prisma.proposalReviewer.createMany({
-        data: newReviewers.map(reviewer => ({ proposalId, userId: reviewer }))
+        data: newReviewerRoles.map(reviewer => ({ proposalId, roleId: reviewer.id, group: 'role' }))
       })
     );
   }
 
-  if (deletedReviewers.length) {
+  if (newReviewerUsers.length) {
+    transactionPipeline.push(
+      prisma.proposalReviewer.createMany({
+        data: newReviewerUsers.map(reviewer => ({ proposalId, userId: reviewer.id, group: 'user' }))
+      })
+    );
+  }
+
+  if (deletedReviewerRoles.length) {
+    transactionPipeline.push(
+      prisma.proposalReviewer.deleteMany({
+        where: {
+          proposalId,
+          roleId: {
+            in: deletedReviewerRoles.map(deletedReviewer => deletedReviewer.roleId as string)
+          }
+        }
+      })
+    );
+  }
+
+  if (deletedReviewerUsers.length) {
     transactionPipeline.push(
       prisma.proposalReviewer.deleteMany({
         where: {
           proposalId,
           userId: {
-            in: deletedReviewers.map(deletedReviewer => deletedReviewer.userId)
+            in: deletedReviewerUsers.map(deletedReviewer => deletedReviewer.userId as string)
           }
         }
       })
