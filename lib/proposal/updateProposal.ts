@@ -81,7 +81,7 @@ export async function updateProposal ({
   if (newReviewerRoles.length) {
     transactionPipeline.push(
       prisma.proposalReviewer.createMany({
-        data: newReviewerRoles.map(reviewer => ({ proposalId, roleId: reviewer.id, group: 'role' }))
+        data: newReviewerRoles.map(reviewer => ({ proposalId, roleId: reviewer.id, group: 'role' as ProposalReviewerGroup }))
       })
     );
   }
@@ -89,7 +89,7 @@ export async function updateProposal ({
   if (newReviewerUsers.length) {
     transactionPipeline.push(
       prisma.proposalReviewer.createMany({
-        data: newReviewerUsers.map(reviewer => ({ proposalId, userId: reviewer.id, group: 'user' }))
+        data: newReviewerUsers.map(reviewer => ({ proposalId, userId: reviewer.id, group: 'user' as ProposalReviewerGroup }))
       })
     );
   }
