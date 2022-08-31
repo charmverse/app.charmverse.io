@@ -1,5 +1,6 @@
 import { Page, Prisma } from '@prisma/client';
 import { prisma } from 'db';
+import { PageWithProposal } from 'lib/pages';
 import { v4 } from 'uuid';
 
 export async function createProposal ({
@@ -10,7 +11,7 @@ export async function createProposal ({
   pageCreateInput: Prisma.PageCreateInput
   spaceId: string
   userId: string
-}): Promise<Page | null> {
+}): Promise<PageWithProposal | null> {
   const proposalId = v4();
   // Making the page id same as proposalId
   const pageData: Prisma.PageCreateInput = { ...pageCreateInput, id: proposalId };
@@ -18,6 +19,7 @@ export async function createProposal ({
   const createdPage = await prisma.page.create({
     data: {
       ...pageData,
+      type: 'proposal',
       proposal: {
         create: {
           createdBy: userId,
@@ -34,6 +36,14 @@ export async function createProposal ({
               }
             }
           }
+        }
+      }
+    },
+    include: {
+      proposal: {
+        include: {
+          authors: true,
+          reviewers: true
         }
       }
     }
