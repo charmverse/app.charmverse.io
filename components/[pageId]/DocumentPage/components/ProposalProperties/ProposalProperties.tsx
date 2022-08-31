@@ -1,9 +1,8 @@
-import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
-import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import { Box } from '@mui/system';
-import { Stack } from '@mui/material';
+import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
+import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
 
-export function ProposalProperties ({ readOnly }: {readOnly?: boolean}) {
+export default function ProposalProperties ({ readOnly }: {readOnly?: boolean}) {
   return (
     <Box
       className='octo-propertylist'
@@ -14,7 +13,7 @@ export function ProposalProperties ({ readOnly }: {readOnly?: boolean}) {
       }}
       mt={2}
     >
-      <Stack flexDirection='row' justifyContent='space-between' gap={2} alignItems='center'>
+      <Box justifyContent='space-between' gap={2} alignItems='center'>
         <div
           className='octo-propertyrow'
           style={{
@@ -42,8 +41,8 @@ export function ProposalProperties ({ readOnly }: {readOnly?: boolean}) {
             />
           </div>
         </div>
-      </Stack>
-      <Stack flexDirection='row' justifyContent='space-between' gap={2} alignItems='center'>
+      </Box>
+      <Box justifyContent='space-between' gap={2} alignItems='center'>
         <div
           className='octo-propertyrow'
           style={{
@@ -71,7 +70,7 @@ export function ProposalProperties ({ readOnly }: {readOnly?: boolean}) {
             />
           </div>
         </div>
-      </Stack>
+      </Box>
     </Box>
   );
 }

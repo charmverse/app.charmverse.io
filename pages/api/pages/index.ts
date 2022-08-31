@@ -60,29 +60,11 @@ async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
   let page: Page;
 
   if (typedPageCreationData.type === 'proposal') {
-    const proposalId = v4();
-    typedPageCreationData.proposalId = proposalId;
-    // Using a transaction to ensure both the proposal and page gets created together
-    const [createdPage] = await prisma.$transaction([
-      prisma.page.create({ data: typedPageCreationData }),
-      createProposal({
-        createdBy: userId,
-        id: proposalId,
-        spaceId,
-        status: 'draft',
-        // Add page creator as the proposal's first author
-        authors: {
-          create: {
-            author: {
-              connect: {
-                id: userId
-              }
-            }
-          }
-        }
-      })
-    ]);
-    page = createdPage;
+    page = await createProposal({
+      pageCreateInput: typedPageCreationData,
+      spaceId,
+      userId
+    });
   }
   else {
     page = await prisma.page.create({ data: typedPageCreationData });
