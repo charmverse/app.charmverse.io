@@ -16,7 +16,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import Avatar from 'components/common/Avatar';
 import type { CredentialsResult } from 'lib/collabland';
-import { ProfileItemContainer } from './ProfileItemRow';
+import { ProfileItemContainer } from './CollectibleRow';
 
 const TASK_TABS = [
   { icon: <HowToVoteIcon />, label: 'Votes', type: 'vote' },

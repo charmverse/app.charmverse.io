@@ -6,21 +6,21 @@ import { Box } from '@mui/system';
 import Avatar from 'components/common/Avatar';
 import { showDateWithMonthAndYear } from 'lib/utilities/dates';
 
-export interface Collective {
-  title: string
-  date: string
-  id: string
-  image: string
-  type: 'poap' | 'nft'
-  link: string
-  isHidden: boolean
+export interface Collectable {
+  title: string;
+  date: string;
+  id: string;
+  image: string;
+  type: 'poap' | 'nft';
+  link: string;
+  isHidden: boolean;
 }
 
 interface ProfileItemProps {
-  onClick: () => void,
-  visible: boolean,
-  showVisibilityIcon: boolean,
-  collective: Collective
+  onClick: () => void;
+  visible: boolean;
+  showVisibilityIcon: boolean;
+  collectable: Collectable;
 }
 
 export const ProfileItemContainer = styled(({ visible, ...props }: any) => <Stack {...props} />)<{ visible: boolean }>`
@@ -41,7 +41,7 @@ export const ProfileItemContainer = styled(({ visible, ...props }: any) => <Stac
   transition: ${({ theme }) => `${theme.transitions.duration.short}ms opacity ${theme.transitions.easing.easeInOut}`};
 `;
 
-export default function ProfileItemRow ({ onClick, collective, visible, showVisibilityIcon }: ProfileItemProps) {
+export default function CollectibleRow ({ onClick, collectable, visible, showVisibilityIcon }: ProfileItemProps) {
   return (
     <ProfileItemContainer
       visible={visible}
@@ -49,11 +49,11 @@ export default function ProfileItemRow ({ onClick, collective, visible, showVisi
       gap={2}
       flexDirection='row'
     >
-      {collective.type === 'poap' ? (
-        <Link href={collective.link} target='_blank' display='flex'>
-          <Avatar size='large' avatar={collective.image} />
+      {collectable.type === 'poap' ? (
+        <Link href={collectable.link} target='_blank' display='flex'>
+          <Avatar size='large' avatar={collectable.image} />
         </Link>
-      ) : <Avatar isNft size='large' avatar={collective.image} />}
+      ) : <Avatar isNft size='large' avatar={collectable.image} />}
       <Stack
         justifyContent='center'
         flexGrow={1}
@@ -71,10 +71,10 @@ export default function ProfileItemRow ({ onClick, collective, visible, showVisi
                 xs: '1.05rem'
               }
             }}
-          >{collective.title}
+          >{collectable.title}
           </Typography>
         </Box>
-        <Typography variant='subtitle2'>{showDateWithMonthAndYear(collective.date) ?? '?'}</Typography>
+        <Typography variant='subtitle2'>{showDateWithMonthAndYear(collectable.date) ?? '?'}</Typography>
       </Stack>
       {showVisibilityIcon && (
         <IconButton
@@ -89,11 +89,11 @@ export default function ProfileItemRow ({ onClick, collective, visible, showVisi
           onClick={onClick}
         >
           {visible ? (
-            <Tooltip title={`Hide ${collective.type.toUpperCase()} from profile`}>
+            <Tooltip title={`Hide ${collectable.type.toUpperCase()} from profile`}>
               <VisibilityIcon fontSize='small' />
             </Tooltip>
           ) : (
-            <Tooltip title={`Show ${collective.type.toUpperCase()} in profile`}>
+            <Tooltip title={`Show ${collectable.type.toUpperCase()} in profile`}>
               <VisibilityOffIcon fontSize='small' />
             </Tooltip>
           )}

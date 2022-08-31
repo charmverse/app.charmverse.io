@@ -6,11 +6,11 @@ import useSWRImmutable from 'swr/immutable';
 import AggregatedData from './components/AggregatedData';
 import CollablandCredentials from './components/CollablandCredentials';
 import CommunityRow, { CommunityDetails } from './components/CommunityRow';
-import ProfileItemRow, { Collective } from './components/ProfileItemRow';
+import CollectableRow, { Collectable } from './components/CollectibleRow';
 import UserDetails, { isPublicUser, UserDetailsProps } from './components/UserDetails';
 import { useCollablandCredentials } from './hooks/useCollablandCredentials';
 
-function transformPoap (poap: ExtendedPoap): Collective {
+function transformPoap (poap: ExtendedPoap): Collectable {
   return {
     type: 'poap',
     date: poap.created as string,
@@ -22,7 +22,7 @@ function transformPoap (poap: ExtendedPoap): Collective {
   };
 }
 
-function transformNft (nft: NftData): Collective {
+function transformNft (nft: NftData): Collectable {
   return {
     type: 'nft',
     date: nft.timeLastUpdated,
@@ -60,17 +60,17 @@ export default function PublicProfile (props: UserDetailsProps) {
 
   const isLoading = !data || !poapData || !nftData || isNftDataValidating || isPoapDataValidating || isAggregatedDataValidating;
 
-  const collectives: Collective[] = [];
+  const collectables: Collectable[] = [];
 
   poapData?.forEach(poap => {
-    collectives.push(transformPoap(poap));
+    collectables.push(transformPoap(poap));
   });
 
   nftData?.forEach(nft => {
-    collectives.push(transformNft(nft));
+    collectables.push(transformNft(nft));
   });
 
-  collectives.sort((collectiveA, collectiveB) => new Date(collectiveB.date) > new Date(collectiveA.date) ? 1 : -1);
+  collectables.sort((itemA, itemB) => new Date(itemB.date) > new Date(itemA.date) ? 1 : -1);
 
   async function toggleCommunityVisibility (community: CommunityDetails) {
     await charmClient.profile.updateProfileItem({
@@ -99,22 +99,22 @@ export default function PublicProfile (props: UserDetailsProps) {
     });
   }
 
-  async function toggleCollectibleVisibility (collective: Collective) {
+  async function toggleCollectibleVisibility (item: Collectable) {
     await charmClient.profile.updateProfileItem({
       profileItems: [{
-        id: collective.id,
-        isHidden: !collective.isHidden,
-        type: collective.type,
+        id: item.id,
+        isHidden: !item.isHidden,
+        type: item.type,
         metadata: null
       }]
     });
-    if (collective.type === 'nft') {
+    if (item.type === 'nft') {
       mutateNfts((_nftData) => {
         return _nftData?.map(nft => {
-          if (nft.id === collective.id) {
+          if (nft.id === item.id) {
             return {
               ...nft,
-              isHidden: !collective.isHidden
+              isHidden: !item.isHidden
             };
           }
           return nft;
@@ -126,10 +126,10 @@ export default function PublicProfile (props: UserDetailsProps) {
     else {
       mutatePoaps((_poapData) => {
         return _poapData?.map(poap => {
-          if (poap.id === collective.id) {
+          if (poap.id === item.id) {
             return {
               ...poap,
-              isHidden: !collective.isHidden
+              isHidden: !item.isHidden
             };
           }
           return poap;
@@ -196,19 +196,19 @@ export default function PublicProfile (props: UserDetailsProps) {
           </>
         ) : null}
 
-        {collectives.length > 0 ? (
+        {collectables.length > 0 ? (
           <>
-            <SectionHeader title='NFTs & POAPs' count={collectives.length} />
+            <SectionHeader title='NFTs & POAPs' count={collectables.length} />
             <Stack gap={2}>
-              {collectives.map(collective => (
-                <ProfileItemRow
-                  key={collective.id}
+              {collectables.map(collectable => (
+                <CollectableRow
+                  key={collectable.id}
                   showVisibilityIcon={!readOnly}
-                  visible={!collective.isHidden}
+                  visible={!collectable.isHidden}
                   onClick={() => {
-                    toggleCollectibleVisibility(collective);
+                    toggleCollectibleVisibility(collectable);
                   }}
-                  collective={collective}
+                  collectable={collectable}
                 />
               ))}
             </Stack>
