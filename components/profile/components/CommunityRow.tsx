@@ -52,7 +52,7 @@ function CountIcon ({ label, icon, count }: { label: string, icon: ReactNode, co
   );
 }
 
-function TaskTab ({ task, onClick }: { task: typeof TASK_TABS[number], onClick: () => void }) {
+function TaskTab ({ task, value, onClick }: { task: typeof TASK_TABS[number], value: number, onClick: () => void }) {
 
   return (
     <Tab
@@ -68,7 +68,7 @@ function TaskTab ({ task, onClick }: { task: typeof TASK_TABS[number], onClick: 
         }
       }}
       label={task.label}
-      value={task.type}
+      value={value}
       onClick={onClick}
     />
   );
@@ -185,9 +185,9 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
   const hasProposals = community.proposals.length > 0;
   const hasBounties = community.bounties.length > 0;
   const isCollapsible = hasVotes || hasProposals || hasBounties;
-  const defaultTab = hasVotes ? 'vote' : hasProposals ? 'proposal' : hasBounties ? 'bounty' : null;
+  const defaultTab = hasVotes ? 0 : hasProposals ? 1 : hasBounties ? 2 : null;
 
-  const [currentTab, setCurrentTab] = useState<typeof TASK_TABS[number]['type']>(defaultTab || 'vote');
+  const [currentTab, setCurrentTab] = useState<number>(defaultTab || 0);
   const [isCollapsed, setIsCollapsed] = useState(true);
 
   function toggleCollapse () {
@@ -282,14 +282,14 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
             indicatorColor='primary'
             value={currentTab}
           >
-            {hasVotes && <TaskTab task={TASK_TABS[0]} onClick={() => setCurrentTab(TASK_TABS[0].type)} />}
-            {hasProposals && <TaskTab task={TASK_TABS[1]} onClick={() => setCurrentTab(TASK_TABS[1].type)} />}
-            {hasBounties && <TaskTab task={TASK_TABS[2]} onClick={() => setCurrentTab(TASK_TABS[2].type)} />}
+            {hasVotes && <TaskTab task={TASK_TABS[0]} value={0} onClick={() => setCurrentTab(0)} />}
+            {hasProposals && <TaskTab task={TASK_TABS[1]} value={1} onClick={() => setCurrentTab(1)} />}
+            {hasBounties && <TaskTab task={TASK_TABS[2]} value={2} onClick={() => setCurrentTab(2)} />}
           </Tabs>
           <Stack gap={2}>
-            {currentTab === 'vote' && <VotesPanel events={community.votes} />}
-            {currentTab === 'proposal' && <ProposalsPanel events={community.proposals} />}
-            {currentTab === 'bounty' && <BountyEventsPanel events={community.bounties} />}
+            {currentTab === 0 && <VotesPanel events={community.votes} />}
+            {currentTab === 1 && <ProposalsPanel events={community.proposals} />}
+            {currentTab === 2 && <BountyEventsPanel events={community.bounties} />}
           </Stack>
         </Box>
       </Collapse>
