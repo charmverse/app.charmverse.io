@@ -218,6 +218,7 @@ model Page {
   permissions        PagePermission[]
   bountyId           String?          @unique @db.Uuid
   bounty             Bounty?          @relation(fields: [bountyId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  proposal           Proposal?        @relation(fields: [proposalId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   threads            Thread[]
   votes              Vote[]
 }
@@ -650,6 +651,7 @@ model Proposal {
   authors   ProposalAuthor[]
   reviewers ProposalReviewer[]
   space     Space              @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  page      Page?
 }
 
 model ProposalAuthor {

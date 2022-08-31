@@ -1,6 +1,7 @@
 import { Box } from '@mui/system';
 import charmClient from 'charmClient';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
+import { InputSearchContributorMultiple } from 'components/common/form/InputSearchContributor';
 import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
 import { ProposalWithUsers } from 'lib/proposal/interface';
 
@@ -36,12 +37,11 @@ export default function ProposalProperties ({ proposal, readOnly }: ProposalProp
             <InputSearchReviewers
               disabled={readOnly}
               readOnly={readOnly}
-              value={[]}
+              defaultValue={proposal.authors.map(author => author.userId)}
               disableCloseOnSelect={true}
-              onChange={async (e, options) => {
+              onChange={(authorIds) => {
 
               }}
-              excludedIds={proposal.authors.map(author => author.userId)}
               sx={{
                 width: '100%'
               }}
@@ -62,15 +62,14 @@ export default function ProposalProperties ({ proposal, readOnly }: ProposalProp
             <Button>Reviewer</Button>
           </div>
           <div style={{ width: '100%' }}>
-            <InputSearchReviewers
+            <InputSearchContributorMultiple
               disabled={readOnly}
               readOnly={readOnly}
-              value={[]}
+              defaultValue={proposal.reviewers.map(reviewer => reviewer.userId)}
               disableCloseOnSelect={true}
-              onChange={async (e, options) => {
+              onChange={(reviewerIds) => {
 
               }}
-              excludedIds={proposal.reviewers.map(reviewer => reviewer.userId)}
               sx={{
                 width: '100%'
               }}

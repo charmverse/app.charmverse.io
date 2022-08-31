@@ -26,6 +26,12 @@ export async function getPage (pageIdOrPath: string, spaceId?: string): Promise<
         include: {
           sourcePermission: true
         }
+      },
+      proposal: {
+        include: {
+          authors: true,
+          reviewers: true
+        }
       }
     }
   });

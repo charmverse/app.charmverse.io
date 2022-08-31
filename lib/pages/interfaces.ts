@@ -6,7 +6,7 @@ import { ProposalWithUsers } from 'lib/proposal/interface';
 
 export interface IPageWithPermissions extends Page {
   permissions: (PagePermission & {sourcePermission: PagePermission | null}) []
-  proposal?: ProposalWithUsers
+  proposal?: ProposalWithUsers | null
 }
 
 export interface PageWithChildren extends IPageWithPermissions {
@@ -83,3 +83,5 @@ export type TargetPageTreeWithFlatChildren<T extends PageNode = PageNode> = {
   targetPage: PageNodeWithChildren<T>,
   flatChildren: PageNodeWithChildren<T>[]
 }
+
+export type PageWithProposal = (Page & {proposal: ProposalWithUsers | null})

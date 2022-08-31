@@ -1,10 +1,10 @@
-import { Autocomplete, AutocompleteProps, TextField } from '@mui/material';
-import { useContributors } from 'hooks/useContributors';
-import { Contributor, User } from 'models';
-import UserDisplay from 'components/common/UserDisplay';
-import { useState, useEffect } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
+import { Autocomplete, AutocompleteProps, TextField } from '@mui/material';
 import { useWeb3React } from '@web3-react/core';
+import UserDisplay from 'components/common/UserDisplay';
+import { useContributors } from 'hooks/useContributors';
+import { Contributor } from 'models';
+import { useEffect, useState } from 'react';
 import { useSWRConfig } from 'swr';
 
 interface IContributorsFilter {

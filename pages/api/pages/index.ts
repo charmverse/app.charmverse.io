@@ -3,7 +3,7 @@ import { Page, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { IEventToLog, postToDiscord } from 'lib/log/userEvents';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { IPageWithPermissions } from 'lib/pages/server';
+import { IPageWithPermissions, PageWithProposal } from 'lib/pages/server';
 import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
@@ -63,7 +63,7 @@ async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
       pageCreateInput: typedPageCreationData,
       spaceId,
       userId
-    });
+    }) as PageWithProposal;
   }
   else {
     page = await prisma.page.create({ data: typedPageCreationData });
