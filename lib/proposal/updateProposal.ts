@@ -33,12 +33,13 @@ export async function updateProposal ({
   const newReviewerUsers = reviewerUsers
     .filter(reviewer => !existingReviewerUsers
       .some(existingReviewer => (existingReviewer.userId === reviewer.id)));
+
   const deletedReviewerRoles = existingReviewerRoles
     .filter(existingReviewer => !reviewerRoles
       .some(reviewer => (existingReviewer.roleId === reviewer.id)));
   const deletedReviewerUsers = existingReviewerUsers
     .filter(existingReviewer => !reviewerUsers
-      .some(reviewer => (existingReviewer.roleId === reviewer.id)));
+      .some(reviewer => (existingReviewer.userId === reviewer.id)));
 
   const transactionPipeline: PrismaPromise<any>[] = [];
 

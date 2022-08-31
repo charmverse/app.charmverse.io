@@ -40,13 +40,16 @@ describe('Update proposal specific data', () => {
     await updateProposal({
       proposal,
       authors: [author2.id],
-      reviewers: [reviewer1.id]
+      reviewers: [{
+        group: 'user',
+        id: reviewer1.id
+      }]
     });
 
     const [proposalReviewer1, proposalReviewer2, proposalAuthor1, proposalAuthor2] = await Promise.all([
       prisma.proposalReviewer.findUnique({
         where: {
-          proposalId_userId: {
+          userId_proposalId: {
             proposalId: proposal.id,
             userId: reviewer1.id
           }
@@ -54,7 +57,7 @@ describe('Update proposal specific data', () => {
       }),
       prisma.proposalReviewer.findUnique({
         where: {
-          proposalId_userId: {
+          userId_proposalId: {
             proposalId: proposal.id,
             userId: reviewer2.id
           }
@@ -101,7 +104,10 @@ describe('Update proposal specific data', () => {
     await expect(updateProposal({
       proposal,
       authors: [],
-      reviewers: [reviewer1.id]
+      reviewers: [{
+        group: 'user',
+        id: reviewer1.id
+      }]
     })).rejects.toBeInstanceOf(InvalidStateError);
   });
 
@@ -139,7 +145,10 @@ describe('Update proposal specific data', () => {
     await expect(updateProposal({
       proposal,
       authors: [author1.id],
-      reviewers: [reviewer1.id]
+      reviewers: [{
+        group: 'user',
+        id: reviewer1.id
+      }]
     })).rejects.toBeInstanceOf(UnauthorisedActionError);
   });
 

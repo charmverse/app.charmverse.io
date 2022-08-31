@@ -399,7 +399,7 @@ export async function createProposalWithUsers ({ proposalStatus = 'draft', autho
           },
           reviewers: {
             createMany: {
-              data: reviewers.map(reviewer => ({ userId: reviewer }))
+              data: reviewers.map(reviewer => ({ userId: reviewer, group: 'user' }))
             }
           }
         }
