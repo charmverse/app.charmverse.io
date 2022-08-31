@@ -39,10 +39,10 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
   }
 
   let discordAccount: DiscordAccount;
-  log.info('CONNECT DISCORD', req.headers.host);
-  log.info('HEADAERS', req.headers);
+
   try {
-    discordAccount = await getDiscordAccount(code, req.headers.host?.startsWith('localhost') ? `http://${req.headers.host}/api/discord/callback` : 'https://pr-782-collab-land.charmverse.co/api/discord/callback');
+    const domain = req.headers.host?.startsWith('localhost') ? `http://${req.headers.host}` : `https://${req.headers.host}`;
+    discordAccount = await getDiscordAccount(code, `${domain}/api/discord/callback`);
   }
   catch (error) {
     log.warn('Error while connecting to Discord', error);
