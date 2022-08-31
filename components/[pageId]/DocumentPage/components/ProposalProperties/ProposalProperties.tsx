@@ -2,7 +2,6 @@ import { Box } from '@mui/system';
 import charmClient from 'charmClient';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import { InputSearchContributorMultiple } from 'components/common/form/InputSearchContributor';
-import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
 import { ProposalWithUsers } from 'lib/proposal/interface';
 
 interface ProposalPropertiesProps {
@@ -11,6 +10,11 @@ interface ProposalPropertiesProps {
 }
 
 export default function ProposalProperties ({ proposal, readOnly }: ProposalPropertiesProps) {
+  const { status } = proposal;
+
+  const canUpdateAuthors = status === 'draft' || status === 'private_draft' || status === 'discussion';
+  const canUpdateReviewers = status === 'draft' || status === 'private_draft';
+
   return (
     <Box
       className='octo-propertylist'
@@ -34,13 +38,16 @@ export default function ProposalProperties ({ proposal, readOnly }: ProposalProp
             <Button>Author</Button>
           </div>
           <div style={{ width: '100%' }}>
-            <InputSearchReviewers
-              disabled={readOnly}
+            <InputSearchContributorMultiple
+              disabled={readOnly || !canUpdateAuthors}
               readOnly={readOnly}
               defaultValue={proposal.authors.map(author => author.userId)}
               disableCloseOnSelect={true}
               onChange={(authorIds) => {
-
+                charmClient.proposals.updateProposal(proposal.id, {
+                  authors: authorIds,
+                  reviewers: proposal.reviewers.map(reviewer => reviewer.userId)
+                });
               }}
               sx={{
                 width: '100%'
@@ -63,12 +70,15 @@ export default function ProposalProperties ({ proposal, readOnly }: ProposalProp
           </div>
           <div style={{ width: '100%' }}>
             <InputSearchContributorMultiple
-              disabled={readOnly}
+              disabled={readOnly || !canUpdateReviewers}
               readOnly={readOnly}
               defaultValue={proposal.reviewers.map(reviewer => reviewer.userId)}
               disableCloseOnSelect={true}
               onChange={(reviewerIds) => {
-
+                charmClient.proposals.updateProposal(proposal.id, {
+                  authors: proposal.authors.map(author => author.userId),
+                  reviewers: reviewerIds
+                });
               }}
               sx={{
                 width: '100%'

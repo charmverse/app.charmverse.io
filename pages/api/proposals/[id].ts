@@ -32,7 +32,7 @@ async function updateProposalController (req: NextApiRequest, res: NextApiRespon
     throw new NotFoundError();
   }
 
-  if (proposal.status !== 'draft' && proposal.status !== 'private_draft') {
+  if (proposal.status !== 'draft' && proposal.status !== 'private_draft' && proposal.status !== 'discussion') {
     throw new UnauthorisedActionError();
   }
 

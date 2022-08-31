@@ -15,14 +15,15 @@ export async function updateProposal ({
 }) {
   const { status, id: proposalId, authors: existingAuthors, reviewers: existingReviewers } = proposal;
 
-  const newAuthors = authors.filter(author => existingAuthors.find(existingAuthor => existingAuthor.userId !== author));
-  const deletedAuthors = existingAuthors.filter(existingAuthor => authors.find(author => existingAuthor.userId !== author));
-  const newReviewers = reviewers.filter(reviewer => existingReviewers.find(existingReviewer => existingReviewer.userId !== reviewer));
-  const deletedReviewers = existingReviewers.filter(existingReviewer => reviewers.find(reviewer => existingReviewer.userId !== reviewer));
+  const newAuthors = authors.filter(author => !existingAuthors.some(existingAuthor => existingAuthor.userId === author));
+  const deletedAuthors = existingAuthors.filter(existingAuthor => !authors.some(author => existingAuthor.userId === author));
+
+  const newReviewers = reviewers.filter(reviewer => !existingReviewers.some(existingReviewer => existingReviewer.userId === reviewer));
+  const deletedReviewers = existingReviewers.filter(existingReviewer => !reviewers.some(reviewer => existingReviewer.userId === reviewer));
 
   const transactionPipeline: PrismaPromise<any>[] = [];
 
-  if (newAuthors.length - deletedAuthors.length === 0) {
+  if (authors.length === 0) {
     throw new InvalidStateError('Proposal must have atleast 1 author');
   }
 
