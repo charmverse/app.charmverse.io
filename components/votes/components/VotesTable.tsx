@@ -35,7 +35,7 @@ export interface VoteRow {
 
 export default function VotesTable ({ votes, mutateVotes }: { votes?: (ExtendedVote | VoteRow)[], mutateVotes: () => void }) {
   const router = useRouter();
-  const { pages, setPages } = usePages();
+  const { pages, setPages, refreshPage: refresh } = usePages();
   const { mutate: mutateTasks } = useTasks();
   const [activeVote, setActiveVote] = useState<ExtendedVote | null>(null);
   const [activePage, setActivePage] = useState<IPageWithPermissions | null>(null);
@@ -46,6 +46,13 @@ export default function VotesTable ({ votes, mutateVotes }: { votes?: (ExtendedV
       setActivePage(page);
     }
   }, [pages]);
+
+  async function refreshPage () {
+    if (activePage) {
+      const refreshedPage = await refresh(activePage.id);
+      setActivePage(refreshedPage);
+    }
+  }
 
   function closePage () {
     setActivePage(null);
@@ -190,6 +197,7 @@ export default function VotesTable ({ votes, mutateVotes }: { votes?: (ExtendedV
       ))}
       {activePage && (
         <PageDialog
+          refreshPage={refreshPage}
           page={activePage}
           onClose={() => {
             closePage();

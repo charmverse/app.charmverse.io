@@ -10,9 +10,11 @@ import { ProposalStatusChip } from './ProposalStatusBadge';
 interface ProposalPropertiesProps {
   proposal: ProposalWithUsers,
   readOnly?: boolean
+  pageId: string
+  refreshPage?: () => void
 }
 
-export default function ProposalProperties ({ proposal, readOnly }: ProposalPropertiesProps) {
+export default function ProposalProperties ({ refreshPage, pageId, proposal, readOnly }: ProposalPropertiesProps) {
   const { status } = proposal;
 
   const canUpdateAuthors = status === 'draft' || status === 'private_draft' || status === 'discussion';
@@ -67,19 +69,22 @@ export default function ProposalProperties ({ proposal, readOnly }: ProposalProp
             <InputSearchContributorBase
               filterSelectedOptions
               multiple
-              placeholder='Select users'
+              placeholder='Select authors'
               value={contributors.filter(contributor => proposal.authors.find(author => contributor.id === author.userId))}
               disableCloseOnSelect
-              onChange={(_, _contributors) => {
+              onChange={async (_, _contributors) => {
                 // Must have atleast one author of proposal
                 if ((_contributors as Contributor[]).length !== 0) {
-                  charmClient.proposals.updateProposal(proposal.id, {
+                  await charmClient.proposals.updateProposal(proposal.id, {
                     authors: (_contributors as Contributor[]).map(contributor => contributor.id),
                     reviewers: proposal.reviewers.map(reviewer => reviewer.userId)
                   });
+                  if (refreshPage) {
+                    refreshPage();
+                  }
                 }
               }}
-              disabled={readOnly || !canUpdateReviewers}
+              disabled={readOnly || !canUpdateAuthors}
               readOnly={readOnly}
               options={contributors}
               sx={{
@@ -105,16 +110,19 @@ export default function ProposalProperties ({ proposal, readOnly }: ProposalProp
             <InputSearchContributorBase
               filterSelectedOptions
               multiple
-              placeholder='Select users'
+              placeholder='Select reviewers'
               value={contributors.filter(contributor => proposal.reviewers.find(reviewer => contributor.id === reviewer.userId))}
               disableCloseOnSelect
-              onChange={(_, _contributors) => {
-                charmClient.proposals.updateProposal(proposal.id, {
+              onChange={async (_, _contributors) => {
+                await charmClient.proposals.updateProposal(proposal.id, {
                   authors: proposal.authors.map(author => author.userId),
                   reviewers: (_contributors as Contributor[]).map(contributor => contributor.id)
                 });
+                if (refreshPage) {
+                  refreshPage();
+                }
               }}
-              disabled={readOnly || !canUpdateAuthors}
+              disabled={readOnly || !canUpdateReviewers}
               readOnly={readOnly}
               options={contributors}
               sx={{
