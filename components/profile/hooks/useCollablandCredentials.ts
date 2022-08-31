@@ -22,7 +22,7 @@ export function useCollablandCredentials () {
   }
 
   return {
-    aeToken,
+    aeToken: tokenFromUrl || aeToken,
     getCollablandLogin
   };
 }

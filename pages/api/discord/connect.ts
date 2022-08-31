@@ -19,13 +19,13 @@ const handler = nc({
 });
 
 export interface ConnectDiscordPayload {
-  code: string
+  code: string;
 }
 
 export interface ConnectDiscordResponse {
-  discordUser: DiscordUser,
-  avatar: string | null,
-  username: string | null
+  discordUser: DiscordUser;
+  avatar: string | null;
+  username: string | null;
 }
 
 // TODO: Add nonce for oauth state
@@ -39,9 +39,10 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
   }
 
   let discordAccount: DiscordAccount;
-
+  log.info('CONNECT DISCORD', req.headers.host);
+  log.info('HEADAERS', req.headers);
   try {
-    discordAccount = await getDiscordAccount(code, req.headers.host?.startsWith('localhost') ? `http://${req.headers.host}/api/discord/callback` : 'https://app.charmverse.io/api/discord/callback');
+    discordAccount = await getDiscordAccount(code, req.headers.host?.startsWith('localhost') ? `http://${req.headers.host}/api/discord/callback` : 'https://pr-782-collab-land.charmverse.co/api/discord/callback');
   }
   catch (error) {
     log.warn('Error while connecting to Discord', error);

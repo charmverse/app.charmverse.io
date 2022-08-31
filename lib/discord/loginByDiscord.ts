@@ -8,7 +8,7 @@ import { postToDiscord } from 'lib/log/userEvents';
 
 export default async function loginByDiscord ({ code, hostName }: { code: string, hostName?: string }) {
 
-  const discordAccount = await getDiscordAccount(code, hostName?.startsWith('localhost') ? `http://${hostName}/api/discord/callback` : 'https://app.charmverse.io/api/discord/callback');
+  const discordAccount = await getDiscordAccount(code, hostName?.startsWith('localhost') ? `http://${hostName}/api/discord/callback` : 'https://pr-782-collab-land.charmverse.co/api/discord/callback');
   const discordUser = await prisma.discordUser.findUnique({
     where: {
       discordId: discordAccount.id

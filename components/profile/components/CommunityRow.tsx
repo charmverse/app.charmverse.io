@@ -169,7 +169,7 @@ function BountyEventsPanel ({ events }: { events: CredentialsResult['bountyEvent
             <EventRow
               key={event.subject.bountyId}
               createdAt={event.createdAt}
-              title={event.subject.bountyTitle}
+              title={`${bountyStatus(event.subject.eventName)}: ${event.subject.bountyTitle || 'Untitled'}`}
               icon={null}
               eventNumber={index + 1}
             />
@@ -177,6 +177,19 @@ function BountyEventsPanel ({ events }: { events: CredentialsResult['bountyEvent
         }
     </>
   );
+}
+
+function bountyStatus (status: 'bounty_created' | 'bounty_started' | 'bounty_completed') {
+  switch (status) {
+    case 'bounty_created':
+      return 'Created bounty';
+    case 'bounty_completed':
+      return 'Completed bounty';
+    case 'bounty_started':
+      return 'Started bounty';
+    default:
+      return 'Bounty event';
+  }
 }
 
 export default function CommunityRow ({ community, showVisibilityIcon, visible, onClick }: CommunityRowProps) {
