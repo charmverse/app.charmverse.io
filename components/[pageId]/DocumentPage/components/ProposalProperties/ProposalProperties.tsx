@@ -1,8 +1,10 @@
+import { Grid, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import charmClient from 'charmClient';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import { InputSearchContributorMultiple } from 'components/common/form/InputSearchContributor';
 import { ProposalWithUsers } from 'lib/proposal/interface';
+import { ProposalStatusChip } from './ProposalStatusBadge';
 
 interface ProposalPropertiesProps {
   proposal: ProposalWithUsers,
@@ -25,6 +27,27 @@ export default function ProposalProperties ({ proposal, readOnly }: ProposalProp
       }}
       mt={2}
     >
+      <Grid container mb={2}>
+        <Grid item xs={8}>
+          <Typography fontWeight='bold'>Proposal information</Typography>
+        </Grid>
+        <Grid item xs={4}>
+          <Box sx={{
+            justifyContent: 'flex-end',
+            gap: 1,
+            display: 'flex',
+            alignItems: 'center'
+          }}
+          >
+
+            <Box display='flex'>
+              <ProposalStatusChip status={proposal.status} />
+            </Box>
+          </Box>
+        </Grid>
+
+      </Grid>
+
       <Box justifyContent='space-between' gap={2} alignItems='center'>
         <div
           className='octo-propertyrow'
