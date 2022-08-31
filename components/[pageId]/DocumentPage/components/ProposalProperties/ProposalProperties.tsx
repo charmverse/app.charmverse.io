@@ -1,8 +1,9 @@
-import { Grid, Typography } from '@mui/material';
+import { Divider, Grid, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import charmClient from 'charmClient';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
-import { InputSearchContributorMultiple } from 'components/common/form/InputSearchContributor';
+import { InputSearchContributorBase } from 'components/common/form/InputSearchContributor';
+import { Contributor, useContributors } from 'hooks/useContributors';
 import { ProposalWithUsers } from 'lib/proposal/interface';
 import { ProposalStatusChip } from './ProposalStatusBadge';
 
@@ -16,6 +17,8 @@ export default function ProposalProperties ({ proposal, readOnly }: ProposalProp
 
   const canUpdateAuthors = status === 'draft' || status === 'private_draft' || status === 'discussion';
   const canUpdateReviewers = status === 'draft' || status === 'private_draft';
+
+  const [contributors] = useContributors();
 
   return (
     <Box
@@ -61,17 +64,24 @@ export default function ProposalProperties ({ proposal, readOnly }: ProposalProp
             <Button>Author</Button>
           </div>
           <div style={{ width: '100%' }}>
-            <InputSearchContributorMultiple
-              disabled={readOnly || !canUpdateAuthors}
-              readOnly={readOnly}
-              defaultValue={proposal.authors.map(author => author.userId)}
-              disableCloseOnSelect={true}
-              onChange={(authorIds) => {
-                charmClient.proposals.updateProposal(proposal.id, {
-                  authors: authorIds,
-                  reviewers: proposal.reviewers.map(reviewer => reviewer.userId)
-                });
+            <InputSearchContributorBase
+              filterSelectedOptions
+              multiple
+              placeholder='Select users'
+              value={contributors.filter(contributor => proposal.authors.find(author => contributor.id === author.userId))}
+              disableCloseOnSelect
+              onChange={(_, _contributors) => {
+                // Must have atleast one author of proposal
+                if ((_contributors as Contributor[]).length !== 0) {
+                  charmClient.proposals.updateProposal(proposal.id, {
+                    authors: (_contributors as Contributor[]).map(contributor => contributor.id),
+                    reviewers: proposal.reviewers.map(reviewer => reviewer.userId)
+                  });
+                }
               }}
+              disabled={readOnly || !canUpdateReviewers}
+              readOnly={readOnly}
+              options={contributors}
               sx={{
                 width: '100%'
               }}
@@ -92,17 +102,21 @@ export default function ProposalProperties ({ proposal, readOnly }: ProposalProp
             <Button>Reviewer</Button>
           </div>
           <div style={{ width: '100%' }}>
-            <InputSearchContributorMultiple
-              disabled={readOnly || !canUpdateReviewers}
-              readOnly={readOnly}
-              defaultValue={proposal.reviewers.map(reviewer => reviewer.userId)}
-              disableCloseOnSelect={true}
-              onChange={(reviewerIds) => {
+            <InputSearchContributorBase
+              filterSelectedOptions
+              multiple
+              placeholder='Select users'
+              value={contributors.filter(contributor => proposal.reviewers.find(reviewer => contributor.id === reviewer.userId))}
+              disableCloseOnSelect
+              onChange={(_, _contributors) => {
                 charmClient.proposals.updateProposal(proposal.id, {
                   authors: proposal.authors.map(author => author.userId),
-                  reviewers: reviewerIds
+                  reviewers: (_contributors as Contributor[]).map(contributor => contributor.id)
                 });
               }}
+              disabled={readOnly || !canUpdateAuthors}
+              readOnly={readOnly}
+              options={contributors}
               sx={{
                 width: '100%'
               }}
@@ -110,6 +124,10 @@ export default function ProposalProperties ({ proposal, readOnly }: ProposalProp
           </div>
         </div>
       </Box>
+      <Divider sx={{
+        my: 2
+      }}
+      />
     </Box>
   );
 }

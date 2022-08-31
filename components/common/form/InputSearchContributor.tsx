@@ -1,11 +1,8 @@
-import { Web3Provider } from '@ethersproject/providers';
 import { Autocomplete, AutocompleteProps, TextField } from '@mui/material';
-import { useWeb3React } from '@web3-react/core';
 import UserDisplay from 'components/common/UserDisplay';
 import { useContributors } from 'hooks/useContributors';
 import { Contributor } from 'models';
 import { useEffect, useState } from 'react';
-import { useSWRConfig } from 'swr';
 
 interface IContributorsFilter {
   mode: 'include' | 'exclude',
@@ -35,12 +32,7 @@ interface Props extends Omit<AutocompleteProps<Contributor, BooleanField, Boolea
   disableCloseOnSelect?: boolean
 }
 
-function InputSearchContributorBase ({ filter, options, disableCloseOnSelect, placeholder, ...props }: Props) {
-
-  const { chainId } = useWeb3React<Web3Provider>();
-
-  const { cache } = useSWRConfig();
-
+export function InputSearchContributorBase ({ filter, options, disableCloseOnSelect, placeholder, ...props }: Props) {
   const filteredOptions = filter ? filterContributors(options, filter) : options;
 
   return (
@@ -54,7 +46,7 @@ function InputSearchContributorBase ({ filter, options, disableCloseOnSelect, pl
       options={filteredOptions}
       autoHighlight
       // user can also be a string if freeSolo=true
-      getOptionLabel={(user) => cache.get(`@"ENS",102~,"${(user as Contributor).username}",${chainId},`) ?? (user as Contributor).username}
+      getOptionLabel={(user) => (user as Contributor).username}
       renderOption={(_props, user) => (
         <UserDisplay
           {..._props as any}
