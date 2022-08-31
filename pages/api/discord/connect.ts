@@ -81,7 +81,12 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
   const avatarUrl = discordAccount.avatar ? `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png` : undefined;
   let avatar: string | null = null;
   if (avatarUrl) {
-    ({ url: avatar } = await uploadToS3({ fileName: getUserS3Folder({ userId, url: avatarUrl }), url: avatarUrl }));
+    try {
+      ({ url: avatar } = await uploadToS3({ fileName: getUserS3Folder({ userId, url: avatarUrl }), url: avatarUrl }));
+    }
+    catch (err) {
+      log.warn('Error while uploading avatar to S3', err);
+    }
   }
 
   const updatedUser = await prisma.user.update({
