@@ -164,6 +164,7 @@ const ViewHeader = (props: Props) => {
               addCardTemplate={props.addCardTemplate}
               editCardTemplate={props.editCardTemplate}
               showCard={props.showCard}
+              board={props.activeBoard as Board}
             />
           </>
         )}

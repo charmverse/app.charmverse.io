@@ -10,8 +10,11 @@ import ButtonWithMenu from '../../widgets/buttons/buttonWithMenu';
 import Menu from '../../widgets/menu';
 import EmptyCardButton from './emptyCardButton';
 import { usePages } from 'hooks/usePages';
+import { Board } from '../../blocks/board';
+import {TemplateCardMenuItemWithActions} from './templateCardMenuItemWithActions'
 
 type Props = {
+    board: Board
     addCard: () => void
     // addCardFromTemplate: (cardTemplateId: string) => void
     addCardTemplate: () => void
@@ -44,10 +47,7 @@ const NewCardButton = React.memo((props: Props): JSX.Element => {
           <>
             <Menu.Label>
               <b>
-                <FormattedMessage
-                  id='ViewHeader.select-a-template'
-                  defaultMessage='Select a template'
-                />
+                Templates for {pages[props.board?.id]?.title || 'Untitled' }
               </b>
             </Menu.Label>
 
@@ -56,19 +56,21 @@ const NewCardButton = React.memo((props: Props): JSX.Element => {
         )}
         {/** TODO: Add support for templates */}
         {cardTemplates.map((cardTemplate) => (
-          <Menu.Text
-            id={cardTemplate.id}
-            name={pages[cardTemplate.id]?.title || 'Untitled'}
-            onClick={() => props.showCard(cardTemplate.id)}
-                    />
+          <TemplateCardMenuItemWithActions
+            addCardFromTemplate={() => null}
+            board={props.board}
+            cardId={cardTemplate.id}
+            deleteTemplate={() => null}
+            view={props.view}
+            showCard={props.showCard}
+          />
       ))}
 
-
-        <Menu.Text
-          icon={<AddIcon/>}
-          id='add-template'
-          name={intl.formatMessage({id: 'ViewHeader.add-template', defaultMessage: 'New template'})}
-          onClick={() => props.addCardTemplate()}
+      <Menu.Text
+        icon={<AddIcon/>}
+        id='add-template'
+        name={intl.formatMessage({id: 'ViewHeader.add-template', defaultMessage: 'New template'})}
+        onClick={() => props.addCardTemplate()}
       />
       </Menu>
     </ButtonWithMenu>
