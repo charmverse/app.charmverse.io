@@ -32,11 +32,14 @@ async function updateProposalController (req: NextApiRequest, res: NextApiRespon
     throw new NotFoundError();
   }
 
-  if (proposal.status !== 'draft' && proposal.status !== 'private_draft' && proposal.status !== 'discussion') {
+  const isCurrentUserProposalAuthor = proposal.authors.some(author => author.userId === req.session.user.id);
+
+  if (isCurrentUserProposalAuthor) {
+    await updateProposal({ proposal, authors, reviewers });
+  }
+  else {
     throw new UnauthorisedActionError();
   }
-
-  await updateProposal({ proposal, authors, reviewers });
 
   res.status(200).end();
 
