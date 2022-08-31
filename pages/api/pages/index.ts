@@ -11,7 +11,6 @@ import nc from 'next-connect';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 import log from 'lib/log';
-import { v4 } from 'uuid';
 import { createProposal } from 'lib/proposal/createProposal';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
