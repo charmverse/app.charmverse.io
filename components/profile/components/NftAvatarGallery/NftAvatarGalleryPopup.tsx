@@ -2,7 +2,7 @@ import React from 'react';
 import { useMyNfts } from 'hooks/useMyNfts';
 import { Dialog, DialogTitle, DialogContent } from '@mui/material';
 
-import { NftData } from 'lib/nft/types';
+import { NftData } from 'lib/blockchain/interfaces';
 import { useUser } from 'hooks/useUser';
 import NftAvatarGallery from './NftAvatarGallery';
 
