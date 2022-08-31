@@ -1,6 +1,7 @@
 import { Box } from '@mui/system';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
+import useSWR from 'swr';
 
 export default function ProposalProperties ({ readOnly }: {readOnly?: boolean}) {
   return (

@@ -38,6 +38,7 @@ import type { SpacePermissionConfigurationUpdate } from '../lib/permissions/meta
 import { BountiesApi } from './apis/bountiesApi';
 import { NftApi } from './apis/nftApi';
 import { ProfileApi } from './apis/profileApi';
+import { ProposalsApi } from './apis/proposalsApi';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -50,6 +51,8 @@ class CharmClient {
   profile = new ProfileApi();
 
   bounties = new BountiesApi();
+
+  proposals = new ProposalsApi();
 
   async login (address: string) {
     const user = await http.POST<LoggedInUser>('/api/session/login', {
