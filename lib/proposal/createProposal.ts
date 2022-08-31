@@ -12,10 +12,11 @@ export async function createProposal ({
   userId: string
 }) {
   const proposalId = v4();
-  pageCreateInput.proposalId = proposalId;
+  // Making the page id same as proposalId
+  const pageData: Prisma.PageCreateInput = { ...pageCreateInput, proposalId, id: proposalId };
   // Using a transaction to ensure both the proposal and page gets created together
   const [createdPage] = await prisma.$transaction([
-    prisma.page.create({ data: pageCreateInput }),
+    prisma.page.create({ data: pageData }),
     prisma.proposal.create({
       data: {
         createdBy: userId,

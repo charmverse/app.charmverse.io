@@ -1,14 +1,15 @@
-import { PrismaPromise, Proposal, ProposalAuthor, ProposalReviewer } from '@prisma/client';
+import { PrismaPromise } from '@prisma/client';
 import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
+import { ProposalWithUsers } from './interface';
 
 export async function updateProposal ({
   proposal,
   authors,
   reviewers
 }: {
-  proposal: Proposal & {authors: ProposalAuthor[], reviewers: ProposalReviewer[]},
+  proposal: ProposalWithUsers,
   authors: string[],
   reviewers: string[]
 }) {

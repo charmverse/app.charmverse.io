@@ -1,9 +1,15 @@
 import { Box } from '@mui/system';
+import charmClient from 'charmClient';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
-import useSWR from 'swr';
+import { ProposalWithUsers } from 'lib/proposal/interface';
 
-export default function ProposalProperties ({ readOnly }: {readOnly?: boolean}) {
+interface ProposalPropertiesProps {
+  proposal: ProposalWithUsers,
+  readOnly?: boolean
+}
+
+export default function ProposalProperties ({ proposal, readOnly }: ProposalPropertiesProps) {
   return (
     <Box
       className='octo-propertylist'
@@ -35,7 +41,7 @@ export default function ProposalProperties ({ readOnly }: {readOnly?: boolean}) 
               onChange={async (e, options) => {
 
               }}
-            // excludedIds={[...selectedReviewerUsers, ...selectedReviewerRoles]}
+              excludedIds={proposal.authors.map(author => author.userId)}
               sx={{
                 width: '100%'
               }}
@@ -64,7 +70,7 @@ export default function ProposalProperties ({ readOnly }: {readOnly?: boolean}) 
               onChange={async (e, options) => {
 
               }}
-            // excludedIds={[...selectedReviewerUsers, ...selectedReviewerRoles]}
+              excludedIds={proposal.reviewers.map(reviewer => reviewer.userId)}
               sx={{
                 width: '100%'
               }}
