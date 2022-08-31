@@ -23,7 +23,7 @@ interface ProfileItemProps {
   collective: Collective
 }
 
-export const ProfileItemContainer = styled(Stack)<{ visible: boolean }>`
+export const ProfileItemContainer = styled(({ visible, ...props }: any) => <Stack {...props} />)<{ visible: boolean }>`
 
   opacity: ${({ visible }) => (visible ? 1 : 0.25)};
   border-bottom: 1px solid ${({ theme }) => theme.palette.divider};

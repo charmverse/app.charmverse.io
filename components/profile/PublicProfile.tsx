@@ -38,16 +38,16 @@ export default function PublicProfile (props: UserDetailsProps) {
   const { data, mutate, isValidating: isAggregatedDataValidating } = useSWRImmutable(user ? `userAggregatedData/${user.id}` : null, () => {
     return charmClient.getAggregatedData(user.id);
   });
-  const isPublic = isPublicUser(user);
+  const readOnly = isPublicUser(user);
 
-  const { data: poapData, mutate: mutatePoaps, isValidating: isPoapDataValidating } = useSWRImmutable(`/poaps/${user.id}/${isPublic}`, () => {
-    return isPublicUser(user)
+  const { data: poapData, mutate: mutatePoaps, isValidating: isPoapDataValidating } = useSWRImmutable(`/poaps/${user.id}/${readOnly}`, () => {
+    return readOnly
       ? Promise.resolve(user.visiblePoaps as ExtendedPoap[])
       : charmClient.getUserPoaps();
   });
 
-  const { data: nftData, mutate: mutateNfts, isValidating: isNftDataValidating } = useSWRImmutable(`/nfts/${user.id}/${isPublic}`, () => {
-    return isPublicUser(user)
+  const { data: nftData, mutate: mutateNfts, isValidating: isNftDataValidating } = useSWRImmutable(`/nfts/${user.id}/${readOnly}`, () => {
+    return readOnly
       ? Promise.resolve(user.visibleNfts)
       : charmClient.blockchain.listNFTs(user.id);
   });
@@ -134,7 +134,7 @@ export default function PublicProfile (props: UserDetailsProps) {
     }
   }
 
-  const communities = (data?.communities ?? []).filter((community) => isPublic ? !community.isHidden : true);
+  const communities = (data?.communities ?? []).filter((community) => readOnly ? !community.isHidden : true);
 
   return (
     <Stack spacing={2}>
@@ -158,7 +158,7 @@ export default function PublicProfile (props: UserDetailsProps) {
                     toggleCommunityVisibility(community);
                   }}
                   visible={!community.isHidden}
-                  showVisibilityIcon={!isPublic}
+                  showVisibilityIcon={!readOnly}
                   community={community}
                 />
               ))}
@@ -173,7 +173,7 @@ export default function PublicProfile (props: UserDetailsProps) {
               {collectives.map(collective => (
                 <ProfileItemRow
                   key={collective.id}
-                  showVisibilityIcon={!isPublic}
+                  showVisibilityIcon={!readOnly}
                   visible={!collective.isHidden}
                   onClick={() => {
                     toggleCollectibleVisibility(collective);

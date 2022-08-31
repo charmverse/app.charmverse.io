@@ -1,9 +1,9 @@
 import * as http from 'adapters/http';
-import type { CollablandCredential } from 'lib/collabland';
+import type { CredentialsResult } from 'lib/collabland';
 
 export class CollablandApi {
 
-  getCredentials (aeToken: string) {
-    return http.POST<CollablandCredential[]>('/api/collabland/import', { aeToken });
+  importCredentials (aeToken: string) {
+    return http.POST<CredentialsResult>('/api/collabland/import', { aeToken });
   }
 }

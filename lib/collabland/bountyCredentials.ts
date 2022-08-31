@@ -9,16 +9,14 @@ interface CharmVerseBounty extends Bounty {
 
 interface RequestParams {
   bounty: CharmVerseBounty;
-  aeToken: string;
   discordUserId: string;
   spaceDomain: string;
 }
 
-export function createBountyCreatedCredential ({ aeToken, bounty, discordUserId, spaceDomain }: RequestParams) {
+export function createBountyCreatedCredential ({ bounty, discordUserId, spaceDomain }: RequestParams) {
 
   return client.createCredential({
-    aeToken,
-    credential: getCredentialInfo({
+    subject: getCredentialSubject({
       bounty,
       spaceDomain,
       id: discordUserId,
@@ -28,11 +26,10 @@ export function createBountyCreatedCredential ({ aeToken, bounty, discordUserId,
   });
 }
 
-export function createBountyStartedCredential ({ aeToken, bounty, discordUserId, spaceDomain }: RequestParams) {
+export function createBountyStartedCredential ({ bounty, discordUserId, spaceDomain }: RequestParams) {
 
   return client.createCredential({
-    aeToken,
-    credential: getCredentialInfo({
+    subject: getCredentialSubject({
       bounty,
       spaceDomain,
       id: discordUserId,
@@ -42,11 +39,10 @@ export function createBountyStartedCredential ({ aeToken, bounty, discordUserId,
   });
 }
 
-export function createBountyCompletedCredential ({ aeToken, bounty, discordUserId, spaceDomain }: RequestParams) {
+export function createBountyCompletedCredential ({ bounty, discordUserId, spaceDomain }: RequestParams) {
 
   return client.createCredential({
-    aeToken,
-    credential: getCredentialInfo({ bounty,
+    subject: getCredentialSubject({ bounty,
       spaceDomain,
       id: discordUserId,
       eventName: 'bounty_completed',
@@ -61,11 +57,11 @@ interface GetCredentialInput {
   bounty: CharmVerseBounty;
   spaceDomain: string;
   id: string;
-  eventName: client.CharmVerseBountyEvent['eventName'];
+  eventName: client.BountyEventSubject['eventName'];
   eventDate: string;
 }
 
-function getCredentialInfo ({ bounty, spaceDomain, ...info }: GetCredentialInput): client.CharmVerseBountyEvent {
+function getCredentialSubject ({ bounty, spaceDomain, ...info }: GetCredentialInput): client.BountyEventSubject {
   return {
     ...info,
     bountyId: bounty.id,
@@ -74,6 +70,9 @@ function getCredentialInfo ({ bounty, spaceDomain, ...info }: GetCredentialInput
     bountyRewardChain: bounty.chainId,
     bountyRewardToken: bounty.rewardToken,
     bountyTitle: bounty.page.title,
-    bountyUrl: `${DOMAIN}/${spaceDomain}/${bounty.page.id}`
+    bountyUrl: `${DOMAIN}/${spaceDomain}/${bounty.page.id}`,
+    workspaceId: 'not_an_id',
+    workspaceUrl: `${DOMAIN}/${spaceDomain}`,
+    workspaceName: spaceDomain
   };
 }

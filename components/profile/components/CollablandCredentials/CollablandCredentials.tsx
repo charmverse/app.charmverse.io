@@ -4,7 +4,7 @@ import Button from 'components/common/Button';
 import { useRouter } from 'next/router';
 import useSWRImmutable from 'swr/immutable';
 import charmClient from 'charmClient';
-import type { CollablandCredential } from 'lib/collabland';
+import type { CredentialsResult } from 'lib/collabland';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { toMonthDate } from 'lib/utilities/dates';
 
@@ -13,7 +13,7 @@ export default function CollablandCredentials () {
   const router = useRouter();
   const aeToken = typeof router.query.aeToken === 'string' ? router.query.aeToken : router.query.aeToken?.[0];
 
-  const { data: credentials, error } = useSWRImmutable(() => !!aeToken, () => charmClient.collabland.getCredentials(aeToken as string));
+  const { data: credentials, error } = useSWRImmutable(() => !!aeToken, () => charmClient.collabland.importCredentials(aeToken as string));
 
   if (error) {
     return (
@@ -29,7 +29,7 @@ export default function CollablandCredentials () {
     if (!credentials) {
       return <LoadingComponent isLoading={true} />;
     }
-    return <Credentials credentials={credentials} />;
+    return <DiscordCredentials credentials={credentials.discordRoles} />;
   }
   return <Authorize />;
 }
@@ -50,7 +50,7 @@ function Authorize () {
   );
 }
 
-function Credentials ({ credentials }: { credentials: CollablandCredential[] }) {
+function DiscordCredentials ({ credentials }: { credentials: CredentialsResult['discordRoles'] }) {
   return (
     <>
       {credentials.length === 0 && (
@@ -64,14 +64,14 @@ function Credentials ({ credentials }: { credentials: CollablandCredential[] }) 
         // eslint-disable-next-line react/no-array-index-key
         <Box key={credential.id} display='flex' justifyContent='center' my={2}>
           <Box px={2}>
-            <Avatar size='xLarge' avatar={credential.discord.guildAvatar} />
+            <Avatar size='xLarge' avatar={credential.subject.discordGuildAvatar} />
           </Box>
           <Stack flexGrow={1} pr={2} justifyContent='center'>
             <Typography variant='body2'>
-              {credential.discord.guildName}
+              {credential.subject.discordGuildName}
             </Typography>
             <Typography variant='caption' color='secondary'>
-              {credential.discord.roles.map((role, i) => <><strong>{role.name} </strong>{i < credential.discord.roles.length - 1 && ' and '}</>)} issued on {toMonthDate(credential.createdAt)}
+              {credential.subject.discordRoles.map((role, i) => <><strong>{role.name} </strong>{i < credential.subject.discordRoles.length - 1 && ' and '}</>)} issued on {toMonthDate(credential.createdAt)}
             </Typography>
           </Stack>
         </Box>
