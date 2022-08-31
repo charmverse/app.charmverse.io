@@ -14,46 +14,45 @@ export async function rollupBountyStatus (bountyId: string): Promise<BountyWithD
     return bounty;
   }
 
-  function statusUpdate (newStatus: BountyStatus): Promise<BountyWithDetails> {
-    return prisma.bounty.update({
-      where: {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        id: bounty!.id
-      },
-      data: {
-        status: newStatus
-      },
-      include: {
-        applications: true,
-        page: {
-          include: includePagePermissions()
-        }
-      }
-    }) as Promise<BountyWithDetails>;
-  }
-
   const capReached = submissionsCapReached({
     bounty,
     submissions: bounty.applications
   });
 
   if (!capReached) {
-    return statusUpdate('open');
+    return statusUpdate(bounty.id, 'open');
   }
 
   const submissionSummary = countValueOccurrences<ApplicationStatus>(bounty.applications, 'status');
 
   if (submissionSummary.inProgress > 0 || submissionSummary.review > 0) {
-    return statusUpdate('inProgress');
+    return statusUpdate(bounty.id, 'inProgress');
   }
   else if (submissionSummary.complete > 0) {
-    return statusUpdate('complete');
+    return statusUpdate(bounty.id, 'complete');
   }
   else if (submissionSummary.paid === bounty.maxSubmissions) {
-    return statusUpdate('paid');
+    return statusUpdate(bounty.id, 'paid');
   }
 
   return bounty;
 
 }
 
+function statusUpdate (bountyId: string, newStatus: BountyStatus): Promise<BountyWithDetails> {
+  return prisma.bounty.update({
+    where: {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      id: bountyId
+    },
+    data: {
+      status: newStatus
+    },
+    include: {
+      applications: true,
+      page: {
+        include: includePagePermissions()
+      }
+    }
+  }) as Promise<BountyWithDetails>;
+}

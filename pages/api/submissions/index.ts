@@ -53,7 +53,7 @@ async function createSubmissionController (req: NextApiRequest, res: NextApiResp
     submissionContent
   });
 
-  rollupBountyStatus(createdSubmission.bountyId);
+  await rollupBountyStatus(createdSubmission.bountyId);
 
   return res.status(201).json(createdSubmission);
 

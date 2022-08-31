@@ -9,6 +9,7 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
+import * as collabland from 'lib/collabland';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -48,7 +49,32 @@ async function approveUserApplication (req: NextApiRequest, res: NextApiResponse
     userId
   });
 
-  rollupBountyStatus(approvedApplication.bountyId);
+  const bounty = await rollupBountyStatus(approvedApplication.bountyId);
+
+  const author = await prisma.user.findUnique({
+    where: {
+      id: approvedApplication.createdBy
+    },
+    include: {
+      discordUser: true
+    }
+  });
+
+  if (author?.discordUser) {
+    const space = await prisma.space.findUnique({
+      where: {
+        id: bounty.spaceId
+      }
+    });
+    if (space) {
+      await collabland.createBountyStartedCredential({
+        bounty,
+        page: bounty.page,
+        space,
+        discordUserId: author.discordUser.discordId
+      });
+    }
+  }
 
   return res.status(200).json(approvedApplication);
 }
