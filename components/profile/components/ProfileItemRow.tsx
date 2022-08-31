@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { Divider, IconButton, Link, Stack, Tooltip, Typography } from '@mui/material';
+import { IconButton, Link, Stack, Tooltip, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import Avatar from 'components/common/Avatar';
 import { showDateWithMonthAndYear } from 'lib/utilities/dates';
@@ -16,7 +16,19 @@ export interface Collective {
   isHidden: boolean
 }
 
-export const ProfileItemContainer = styled(Stack)`
+interface ProfileItemProps {
+  onClick: () => void,
+  visible: boolean,
+  showVisibilityIcon: boolean,
+  collective: Collective
+}
+
+export const ProfileItemContainer = styled(Stack)<{ visible: boolean }>`
+
+  opacity: ${({ visible }) => (visible ? 1 : 0.25)};
+  border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
+  padding-bottom: ${({ theme }) => theme.spacing(2)};
+
   &:hover .action {
     opacity: 1;
     transition: ${({ theme }) => `${theme.transitions.duration.short}ms opacity ${theme.transitions.easing.easeInOut}`};
@@ -29,21 +41,13 @@ export const ProfileItemContainer = styled(Stack)`
   transition: ${({ theme }) => `${theme.transitions.duration.short}ms opacity ${theme.transitions.easing.easeInOut}`};
 `;
 
-interface ProfileItemProps {
-  onClick: () => void,
-  visible: boolean,
-  showVisibilityIcon: boolean,
-  collective: Collective
-}
-
-function ProfileItem ({ onClick, collective, visible, showVisibilityIcon }: ProfileItemProps) {
+export default function ProfileItemRow ({ onClick, collective, visible, showVisibilityIcon }: ProfileItemProps) {
   return (
-    <ProfileItemContainer sx={{
-      flexDirection: 'row',
-      alignItems: 'center',
-      opacity: visible ? 1 : 0.25,
-      gap: 2
-    }}
+    <ProfileItemContainer
+      visible={visible}
+      display='flex'
+      gap={2}
+      flexDirection='row'
     >
       {collective.type === 'poap' ? (
         <Link href={collective.link} target='_blank' display='flex'>
@@ -96,32 +100,5 @@ function ProfileItem ({ onClick, collective, visible, showVisibilityIcon }: Prof
         </IconButton>
       )}
     </ProfileItemContainer>
-  );
-}
-
-interface ProfileItemsListProps {
-  onVisibilityToggle: (collective: Collective) => void
-  isPublic: boolean,
-  collectives: Collective[]
-}
-
-export function ProfileItemsList ({ collectives, isPublic, onVisibilityToggle }: ProfileItemsListProps) {
-
-  return (
-    <Stack gap={2}>
-      {collectives.map(collective => (
-        <Box key={collective.id}>
-          <ProfileItem
-            showVisibilityIcon={!isPublic}
-            visible={!collective.isHidden}
-            onClick={() => {
-              onVisibilityToggle(collective);
-            }}
-            collective={collective}
-          />
-          <Divider sx={{ mt: 2 }} />
-        </Box>
-      ))}
-    </Stack>
   );
 }

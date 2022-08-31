@@ -8,9 +8,9 @@ import { getCredentials } from 'lib/collabland';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
-  .post(requireKeys(['aeToken'], 'body'), saveCredentials);
+  .post(requireKeys(['aeToken'], 'body'), importCredentials);
 
-async function saveCredentials (req: NextApiRequest, res: NextApiResponse) {
+async function importCredentials (req: NextApiRequest, res: NextApiResponse) {
 
   const credentials = await getCredentials({
     aeToken: req.body.aeToken

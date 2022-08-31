@@ -4,7 +4,7 @@ import log from 'lib/log';
 const DOMAIN = 'https://api-qa.collab.land';
 const API_KEY = process.env.COLLAB_API_KEY as string;
 
-interface CharmVerseBountyEvent {
+export interface CharmVerseBountyEvent {
   id: string; // discord user id
   eventDate: string;
   eventName: 'bounty_created' | 'bounty_started' | 'bounty_completed'; // created, started, completed

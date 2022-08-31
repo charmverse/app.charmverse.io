@@ -6,7 +6,7 @@ import useSWRImmutable from 'swr/immutable';
 import AggregatedData from './components/AggregatedData';
 import CollablandCredentials from './components/CollablandCredentials';
 import CommunityRow, { CommunityDetails } from './components/CommunityRow';
-import { Collective, ProfileItemsList } from './components/ProfileItems';
+import ProfileItemRow, { Collective } from './components/ProfileItemRow';
 import UserDetails, { isPublicUser, UserDetailsProps } from './components/UserDetails';
 
 function transformPoap (poap: ExtendedPoap): Collective {
@@ -63,6 +63,8 @@ export default function PublicProfile (props: UserDetailsProps) {
   nftData?.forEach(nft => {
     collectives.push(transformNft(nft));
   });
+
+  collectives.sort((collectiveA, collectiveB) => new Date(collectiveB.date) > new Date(collectiveA.date) ? 1 : -1);
 
   async function toggleCommunityVisibility (community: CommunityDetails) {
     await charmClient.profile.updateProfileItem({
@@ -138,88 +140,76 @@ export default function PublicProfile (props: UserDetailsProps) {
     <Stack spacing={2}>
       <UserDetails {...props} />
       <Divider />
-      {
-        isLoading ? (
-          <LoadingComponent isLoading minHeight={300} />
-        ) : (
+      <LoadingComponent isLoading={isLoading} minHeight={300}>
+        <AggregatedData
+          totalBounties={data?.bounties || 0}
+          totalCommunities={communities.length}
+          totalProposals={data?.totalProposals || 0}
+          totalVotes={data?.totalVotes || 0}
+        />
+        {communities.length > 0 ? (
           <>
-            <AggregatedData
-              totalBounties={data.bounties}
-              totalCommunities={communities.length}
-              totalProposals={data.totalProposals}
-              totalVotes={data.totalVotes}
-            />
-            {communities.length !== 0 ? (
-              <>
-                <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
-                  <SectionTitle>
-                    Communities
-                  </SectionTitle>
-                  <Chip label={communities.length} />
-                </Stack>
-                <Stack gap={2}>
-                  {communities.map(community => (
-                    <Box
-                      key={community.id}
-                    >
-                      <CommunityRow
-                        onClick={() => {
-                          toggleCommunityVisibility(community);
-                        }}
-                        visible={!community.isHidden}
-                        showVisibilityIcon={!isPublic}
-                        community={community}
-                      />
-                      <Divider sx={{
-                        mt: 2
-                      }}
-                      />
-                    </Box>
-                  ))}
-                </Stack>
-              </>
-            ) : null}
-
-            {collectives.length ? (
-              <Box>
-                <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
-                  <SectionTitle>
-                    NFTs & POAPs
-                  </SectionTitle>
-                  <Chip label={collectives.length} />
-                </Stack>
-                <ProfileItemsList
-                  collectives={collectives.sort((collectiveA, collectiveB) => new Date(collectiveB.date) > new Date(collectiveA.date) ? 1 : -1)}
-                  isPublic={isPublic}
-                  onVisibilityToggle={toggleCollectibleVisibility}
+            <SectionHeader title='Communities' count={communities.length} />
+            <Stack gap={2}>
+              {communities.map(community => (
+                <CommunityRow
+                  key={community.id}
+                  onClick={() => {
+                    toggleCommunityVisibility(community);
+                  }}
+                  visible={!community.isHidden}
+                  showVisibilityIcon={!isPublic}
+                  community={community}
                 />
-              </Box>
-            ) : null}
-            <Card>
-              <Box p={2} pb={0}>
-                <Typography fontWeight={700} fontSize={20}>Verified Credentials</Typography>
-              </Box>
-              <CollablandCredentials />
-            </Card>
+              ))}
+            </Stack>
           </>
-        )
-      }
+        ) : null}
+
+        {collectives.length > 0 ? (
+          <>
+            <SectionHeader title='NFTs & POAPs' count={collectives.length} />
+            <Stack gap={2}>
+              {collectives.map(collective => (
+                <ProfileItemRow
+                  key={collective.id}
+                  showVisibilityIcon={!isPublic}
+                  visible={!collective.isHidden}
+                  onClick={() => {
+                    toggleCollectibleVisibility(collective);
+                  }}
+                  collective={collective}
+                />
+              ))}
+            </Stack>
+          </>
+        ) : null}
+        <Card>
+          <Box p={2} pb={0}>
+            <Typography fontWeight={700} fontSize={20}>Verified Credentials</Typography>
+          </Box>
+          <CollablandCredentials />
+        </Card>
+      </LoadingComponent>
     </Stack>
   );
 }
 
-function SectionTitle ({ children }: { children: React.ReactNode }) {
+function SectionHeader ({ title, count }: { title: string, count: number }) {
   return (
-    <Typography
-      sx={{
-        fontSize: {
-          sm: '2em',
-          xs: '1.2em'
-        },
-        fontWeight: 700
-      }}
-    >
-      {children}
-    </Typography>
+    <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
+      <Typography
+        sx={{
+          fontSize: {
+            sm: '2em',
+            xs: '1.2em'
+          },
+          fontWeight: 700
+        }}
+      >
+        {title}
+      </Typography>
+      <Chip label={count} />
+    </Stack>
   );
 }
