@@ -76,6 +76,7 @@ export function getCredentials ({ aeToken }: { aeToken: string }) {
   });
 }
 
+// @ref: https://api-qa.collab.land/explorer/#/VeramoController/VeramoController.requestToIssueVcred
 export function createCredential<T = BountyEventSubject> ({ subject }: { subject: T }) {
 
   if (!API_KEY) {
@@ -87,7 +88,8 @@ export function createCredential<T = BountyEventSubject> ({ subject }: { subject
     method: 'POST',
     headers: {
       Accept: 'application/json',
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'X-API-KEY': API_KEY
     },
     body: JSON.stringify({ credentialSubjects: [subject] })
   });

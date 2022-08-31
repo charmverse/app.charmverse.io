@@ -3,7 +3,7 @@ import * as client from './collablandClient';
 
 const DOMAIN = process.env.DOMAIN;
 
-interface Space { domain: string, name: string }
+interface Space { id: string, domain: string, name: string }
 
 interface RequestParams {
   bounty: Bounty;
@@ -63,7 +63,7 @@ function getBountySubject ({ bounty, discordUserId, page, space, ...info }: Boun
     bountyRewardToken: bounty.rewardToken,
     bountyTitle: page.title,
     bountyUrl: `${DOMAIN}/${space.domain}/${page.id}`,
-    workspaceId: 'not_an_id',
+    workspaceId: space.id,
     workspaceUrl: `${DOMAIN}/${space.domain}`,
     workspaceName: space.name
   };

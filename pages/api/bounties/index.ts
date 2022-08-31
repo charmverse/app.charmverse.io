@@ -11,6 +11,7 @@ import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { BountyWithDetails } from 'models';
 import { NextApiRequest, NextApiResponse } from 'next';
+import * as collabland from 'lib/collabland';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -67,6 +68,33 @@ async function createBountyController (req: NextApiRequest, res: NextApiResponse
     ...req.body,
     createdBy: req.session.user.id
   });
+
+  // add a little delay to capture the full bounty title after user has edited it
+  setTimeout(async () => {
+    const bounty = await prisma.bounty.findUniqueOrThrow({
+      where: {
+        id: createdBounty.id
+      },
+      include: {
+        author: {
+          include: {
+            discordUser: true
+          }
+        },
+        space: true,
+        page: true
+      }
+    });
+
+    if (bounty.page && bounty.author.discordUser) {
+      await collabland.createBountyCreatedCredential({
+        bounty,
+        page: bounty.page,
+        space: bounty.space,
+        discordUserId: bounty.author.discordUser.discordId
+      });
+    }
+  }, 60 * 1000);
 
   logWorkspaceFirstBountyEvents(createdBounty);
   logUserFirstBountyEvents(createdBounty);

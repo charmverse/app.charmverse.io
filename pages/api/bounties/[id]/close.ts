@@ -7,6 +7,8 @@ import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { BountyWithDetails } from 'models';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import * as collabland from 'lib/collabland';
+import { prisma } from 'db';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -32,6 +34,30 @@ async function closeBountyController (req: NextApiRequest, res: NextApiResponse<
   }
 
   const completeBounty = await closeOutBounty(bountyId as string);
+
+  const completedApplications = completeBounty.applications.filter((application) => application.status === 'complete');
+
+  const space = await prisma.space.findUnique({
+    where: {
+      id: completeBounty.spaceId
+    }
+  });
+
+  for (const application of completedApplications) {
+    const discordUser = await prisma.discordUser.findUnique({
+      where: {
+        userId: application.createdBy
+      }
+    });
+    if (space && discordUser) {
+      await collabland.createBountyCompletedCredential({
+        bounty,
+        page: bounty.page,
+        space,
+        discordUserId: discordUser.discordId
+      });
+    }
+  }
 
   return res.status(200).json(completeBounty);
 }
