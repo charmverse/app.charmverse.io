@@ -5,6 +5,7 @@ import { setBountyPermissions } from 'lib/permissions/bounties';
 import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
 import { v4 } from 'uuid';
 import { getPagePath } from 'lib/pages';
+import * as collabland from 'lib/collabland';
 import { getBountyOrThrow } from './getBounty';
 import { BountyCreationData } from './interfaces';
 
@@ -155,5 +156,30 @@ export async function createBounty ({
     });
   }
 
+  const bounty = await prisma.bounty.findUniqueOrThrow({
+    where: {
+      id: bountyId
+    },
+    include: {
+      author: {
+        include: {
+          discordUser: true
+        }
+      },
+      space: true,
+      page: true
+    }
+  });
+
+  if (bounty.page && bounty.author.discordUser) {
+    await collabland.createBountyCreatedCredential({
+      bounty,
+      page: bounty.page,
+      space: bounty.space,
+      discordUserId: bounty.author.discordUser?.discordId
+    });
+  }
+
   return getBountyOrThrow(bountyId);
+
 }

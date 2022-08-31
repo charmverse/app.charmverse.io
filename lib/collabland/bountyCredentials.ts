@@ -3,46 +3,42 @@ import * as client from './collablandClient';
 
 const DOMAIN = process.env.DOMAIN;
 
-interface CharmVerseBounty extends Bounty {
-  page: Page;
-  space: { domain: string, name: string };
-}
+interface Space { domain: string, name: string }
 
 interface RequestParams {
-  bounty: CharmVerseBounty;
+  bounty: Bounty;
+  page: Page;
+  space: Space;
   discordUserId: string;
 }
 
-export function createBountyCreatedCredential ({ bounty, discordUserId }: RequestParams) {
+export function createBountyCreatedCredential (params: RequestParams) {
 
   return client.createCredential({
     subject: getBountySubject({
-      bounty,
-      id: discordUserId,
+      ...params,
       eventName: 'bounty_created',
       eventDate: new Date().toISOString()
     })
   });
 }
 
-export function createBountyStartedCredential ({ bounty, discordUserId }: RequestParams) {
+export function createBountyStartedCredential (params: RequestParams) {
 
   return client.createCredential({
     subject: getBountySubject({
-      bounty,
-      id: discordUserId,
+      ...params,
       eventName: 'bounty_started',
       eventDate: new Date().toISOString()
     })
   });
 }
 
-export function createBountyCompletedCredential ({ bounty, discordUserId }: RequestParams) {
+export function createBountyCompletedCredential (params: RequestParams) {
 
   return client.createCredential({
     subject: getBountySubject({
-      bounty,
-      id: discordUserId,
+      ...params,
       eventName: 'bounty_completed',
       eventDate: new Date().toISOString()
     })
@@ -51,25 +47,24 @@ export function createBountyCompletedCredential ({ bounty, discordUserId }: Requ
 
 // utils
 
-interface BountySubjectParams {
-  bounty: CharmVerseBounty;
-  id: string;
+interface BountySubjectParams extends RequestParams {
   eventName: client.BountyEventSubject['eventName'];
   eventDate: string;
 }
 
-function getBountySubject ({ bounty, ...info }: BountySubjectParams): client.BountyEventSubject {
+function getBountySubject ({ bounty, discordUserId, page, space, ...info }: BountySubjectParams): client.BountyEventSubject {
   return {
     ...info,
+    id: discordUserId,
     bountyId: bounty.id,
-    bountyDescription: bounty.page.contentText,
+    bountyDescription: page.contentText,
     bountyRewardAmount: bounty.rewardAmount,
     bountyRewardChain: bounty.chainId,
     bountyRewardToken: bounty.rewardToken,
-    bountyTitle: bounty.page.title,
-    bountyUrl: `${DOMAIN}/${bounty.space.domain}/${bounty.page.id}`,
+    bountyTitle: page.title,
+    bountyUrl: `${DOMAIN}/${space.domain}/${page.id}`,
     workspaceId: 'not_an_id',
-    workspaceUrl: `${DOMAIN}/${bounty.space.domain}`,
-    workspaceName: bounty.space.name
+    workspaceUrl: `${DOMAIN}/${space.domain}`,
+    workspaceName: space.name
   };
 }
