@@ -27,13 +27,6 @@ jobs:
           npm prune --production
           rm -rf .next/cache
 
-      # - name: Add Datadog API Key
-      #   run: |
-      #     sed -i 's/{API_KEY}/${{ secrets.DATADOG_API_KEY }}/g' .ebextensions_cron/99_datadog.config
-
-      #- name: Configure Docker npm command
-      #  run: sed -i 's/start:prod/start:staging/g' .ebextensions/00_env_vars.config
-
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
 
