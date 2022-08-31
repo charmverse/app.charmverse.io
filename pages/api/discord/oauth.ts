@@ -31,7 +31,9 @@ async function oauth (req: NextApiRequest, res: NextApiResponse) {
     discordQueryParams.push(...['scope=guilds%20bot', 'permissions=0']);
   }
 
-  const oauthUrl = `${discordUrl}&${discordQueryParams.join('&')}&state=${state}&redirect_uri=${encodeURIComponent(req.headers.host?.startsWith('localhost') ? `http://${req.headers.host}/api/discord/callback` : 'https://app.charmverse.io/api/discord/callback')}`;
+  log.info('CONNECT DISCORD', req.headers.host);
+  log.info('HEADAERS', req.headers);
+  const oauthUrl = `${discordUrl}&${discordQueryParams.join('&')}&state=${state}&redirect_uri=${encodeURIComponent(req.headers.host?.startsWith('localhost') ? `http://${req.headers.host}/api/discord/callback` : 'https://pr-782-collab-land.charmverse.co/api/discord/callback')}`;
   res.redirect(oauthUrl);
 }
 
