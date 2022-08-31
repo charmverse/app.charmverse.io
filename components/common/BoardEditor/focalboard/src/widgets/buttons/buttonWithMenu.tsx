@@ -1,5 +1,5 @@
 import React from 'react';
-
+import Box from '@mui/material/Box';
 import DropdownIcon from '../icons/dropdown';
 import MenuWrapper from '../menuWrapper';
 import Button from 'components/common/Button';
@@ -20,9 +20,12 @@ function ButtonWithMenu (props: Props): JSX.Element {
     >
       {props.text}
       <MenuWrapper stopPropagationOnToggle={true}>
-        <div className='button-dropdown'>
-          <DropdownIcon />
-        </div>
+        <Box
+          sx={{pl: 1}}
+          className='button-dropdown'
+        >
+          <DropdownIcon  />
+        </Box>
         {props.children}
       </MenuWrapper>
     </Button>
