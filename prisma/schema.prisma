@@ -140,6 +140,11 @@ enum ProposalStatus {
   vote_closed
 }
 
+enum ProposalReviewerGroup {
+  role
+  user
+}
+
 model Space {
   id                          String                            @id @default(uuid()) @db.Uuid
   deletedAt                   DateTime?
@@ -546,6 +551,7 @@ model Role {
   spacePermissions  SpacePermission[]
   spaceRolesToRole  SpaceRoleToRole[]
   TokenGateToRole   TokenGateToRole[]
+  proposalReviewer  ProposalReviewer[]
 
   @@unique([spaceId, name])
 }
@@ -664,12 +670,17 @@ model ProposalAuthor {
 }
 
 model ProposalReviewer {
-  proposalId String   @db.Uuid
-  proposal   Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
-  userId     String   @db.Uuid
-  reviewer   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id         String                @id @default(uuid()) @db.Uuid
+  proposalId String                @db.Uuid
+  proposal   Proposal              @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  roleId     String?               @db.Uuid
+  userId     String?               @db.Uuid
+  role       Role?                 @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  reviewer   User?                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group      ProposalReviewerGroup
 
-  @@unique([proposalId, userId])
+  @@unique([userId, proposalId], name: "userId_proposalId")
+  @@unique([roleId, proposalId], name: "roleId_proposalId")
 }
 
 model ProfileItem {
