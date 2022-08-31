@@ -19,12 +19,12 @@ function ButtonWithMenu (props: Props): JSX.Element {
       onClick={props.onClick}
     >
       {props.text}
-      {/* <MenuWrapper stopPropagationOnToggle={true}>
-                <div className='button-dropdown'>
-                    <DropdownIcon/>
-                </div>
-                {props.children}
-            </MenuWrapper> */}
+      <MenuWrapper stopPropagationOnToggle={true}>
+        <div className='button-dropdown'>
+          <DropdownIcon />
+        </div>
+        {props.children}
+      </MenuWrapper>
     </Button>
   );
 }

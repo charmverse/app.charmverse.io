@@ -1,5 +1,6 @@
 
 import React from 'react';
+import AddIcon from '@mui/icons-material/Add';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { BoardView } from '../../blocks/boardView';
 import { Card } from '../../blocks/card';
@@ -8,6 +9,7 @@ import { useAppSelector } from '../../store/hooks';
 import ButtonWithMenu from '../../widgets/buttons/buttonWithMenu';
 import Menu from '../../widgets/menu';
 import EmptyCardButton from './emptyCardButton';
+import { usePages } from 'hooks/usePages';
 
 type Props = {
     addCard: () => void
@@ -15,21 +17,20 @@ type Props = {
     addCardTemplate: () => void
     editCardTemplate: (cardTemplateId: string) => void
     view: BoardView
+    showCard: (cardId: string) => void
 }
 
 const NewCardButton = React.memo((props: Props): JSX.Element => {
   const cardTemplates: Card[] = useAppSelector(getCurrentBoardTemplates);
   const currentView = props.view;
 
+  const intl = useIntl();
+  const {pages} = usePages()
+
   return (
     <ButtonWithMenu
       onClick={() => {
-        if (currentView.fields.defaultTemplateId) {
-          // props.addCardFromTemplate(currentView.fields.defaultTemplateId)
-        }
-        else {
           props.addCard();
-        }
       }}
       text={(
         <FormattedMessage
@@ -54,27 +55,21 @@ const NewCardButton = React.memo((props: Props): JSX.Element => {
           </>
         )}
         {/** TODO: Add support for templates */}
-        {/* {cardTemplates.map((cardTemplate) => (
-                    <NewCardButtonTemplateItem
-                        key={cardTemplate.id}
-                        view={currentView}
-                        cardTemplate={cardTemplate}
-                        addCardFromTemplate={props.addCardFromTemplate}
-                        editCardTemplate={props.editCardTemplate}
+        {cardTemplates.map((cardTemplate) => (
+          <Menu.Text
+            id={cardTemplate.id}
+            name={pages[cardTemplate.id]?.title || 'Untitled'}
+            onClick={() => props.showCard(cardTemplate.id)}
                     />
-                ))} */}
+      ))}
 
-        <EmptyCardButton
-          addCard={props.addCard}
-          view={currentView}
-        />
 
-        {/* <Menu.Text
-                    icon={<AddIcon/>}
-                    id='add-template'
-                    name={intl.formatMessage({id: 'ViewHeader.add-template', defaultMessage: 'New template'})}
-                    onClick={() => props.addCardTemplate()}
-                /> */}
+        <Menu.Text
+          icon={<AddIcon/>}
+          id='add-template'
+          name={intl.formatMessage({id: 'ViewHeader.add-template', defaultMessage: 'New template'})}
+          onClick={() => props.addCardTemplate()}
+      />
       </Menu>
     </ButtonWithMenu>
   );

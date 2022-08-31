@@ -75,13 +75,15 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
   const pageVote = Object.values(votes).find(v => v.context === 'proposal');
 
   const board = useAppSelector((state) => {
-    if (page.type === 'card' && page.parentId) {
+    if ((page.type === 'card' || page.type === 'card_template') && page.parentId) {
       const parentPage = pages[page.parentId];
       return parentPage?.boardId && (parentPage?.type.match(/board/)) ? state.boards.boards[parentPage.boardId] : null;
     }
     return null;
   });
-  const cards = useAppSelector((state) => board ? Object.values(state.cards.cards).filter(card => card.parentId === board.id) : []);
+  const cards = useAppSelector((state) => {
+    return board ? [...Object.values(state.cards.cards), ...Object.values(state.cards.templates)].filter(card => card.parentId === board.id) : [];
+  });
   const boardViews = useAppSelector((state) => {
     if (board) {
       return Object.values(state.views.views).filter(view => view.parentId === board.id);

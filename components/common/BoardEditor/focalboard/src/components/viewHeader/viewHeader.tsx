@@ -26,6 +26,7 @@ type Props = {
   cards: Card[]
   groupByProperty?: IPropertyTemplate
   addCard: () => void
+  showCard: () => void;
   // addCardFromTemplate: (cardTemplateId: string) => void
   addCardTemplate: () => void
   editCardTemplate: (cardTemplateId: string) => void
@@ -155,13 +156,14 @@ const ViewHeader = (props: Props) => {
             <ViewHeaderActionsMenu onClick={() => toggleViewOptions()} />
 
             {/* New card button */}
-
+            
             <NewCardButton
               addCard={props.addCard}
               view={activeView}
               // addCardFromTemplate={props.addCardFromTemplate}
               addCardTemplate={props.addCardTemplate}
               editCardTemplate={props.editCardTemplate}
+              showCard={props.showCard}
             />
           </>
         )}
