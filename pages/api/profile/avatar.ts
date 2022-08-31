@@ -7,7 +7,7 @@ import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { sessionUserRelations } from 'lib/session/config';
 
 import { LoggedInUser } from 'models';
-import { mapNftFromAlchemy } from 'lib/nft/utilities/mapNftFromAlchemy';
+import { getNFT } from 'lib/blockchain/nfts';
 import { getUserProfile } from 'lib/users/getUser';
 import { getFilenameWithExtension } from 'lib/utilities/getFilenameWithExtension';
 import { UserAvatar } from 'lib/users/interfaces';
@@ -48,12 +48,11 @@ async function updateAvatar (req: NextApiRequest, res: NextApiResponse<LoggedInU
       throw new InvalidInputError('You do not own selected NFT');
     }
 
-    const nft = await alchemyApi.getNft(updatedContract, updatedTokenId, chainId);
-    const mappedNft = mapNftFromAlchemy(nft, chainId);
+    const nft = await getNFT(updatedContract, updatedTokenId, chainId);
 
-    if (mappedNft.image) {
-      const fileName = getUserS3Folder({ userId, url: getFilenameWithExtension(mappedNft.image) });
-      const { url } = await uploadToS3({ fileName, url: mappedNft.image });
+    if (nft.image) {
+      const fileName = getUserS3Folder({ userId, url: getFilenameWithExtension(nft.image) });
+      const { url } = await uploadToS3({ fileName, url: nft.image });
       avatarUrl = url;
     }
 

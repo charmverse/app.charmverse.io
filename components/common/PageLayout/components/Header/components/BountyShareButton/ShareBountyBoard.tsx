@@ -59,7 +59,7 @@ export default function ShareBountyBoard ({ padding = 1 }: Props) {
   const bountiesArePublic = !!space?.publicBountyBoard;
 
   async function togglePublic () {
-    const updatedSpace = await charmClient.setPublicBountyBoard({
+    const updatedSpace = await charmClient.bounties.setPublicBountyBoard({
       publicBountyBoard: !bountiesArePublic,
       spaceId: space?.id as string
     });

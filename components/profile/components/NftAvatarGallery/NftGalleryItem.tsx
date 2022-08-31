@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { NftData } from 'lib/nft/types';
+import { useState } from 'react';
+import { NftData } from 'lib/blockchain/interfaces';
 import Avatar from 'components/common/Avatar';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { Box, Card, Stack, Typography } from '@mui/material';
@@ -28,7 +28,7 @@ export default function NftGalleryItem ({ nft, isSelected, onClick }: Props) {
     >
       <Stack>
         <Box sx={{ alignItems: 'center', justifyContent: 'center', display: 'flex' }}>
-          <Avatar avatar={nft.image} isNft size='xl' />
+          <Avatar avatar={nft.image ?? nft.imageThumb} isNft size='xl' />
         </Box>
 
         <Typography noWrap variant='subtitle1'>

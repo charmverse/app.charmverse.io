@@ -39,7 +39,7 @@ export default function CustomizedSnackbar (props: CustomizedSnackbarProps) {
   } = props;
 
   return (
-    <Stack spacing={2} sx={{ width: '100%', position: 'fixed', zIndex: 2000 }}>
+    <Stack spacing={2} sx={{ width: '100%', position: 'fixed', zIndex: 5000 }}>
       <Snackbar
         open={isOpenProp ?? isOpen}
         autoHideDuration={autoHideDuration}

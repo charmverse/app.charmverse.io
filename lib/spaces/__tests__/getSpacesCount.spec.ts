@@ -1,7 +1,7 @@
 import { User } from '@prisma/client';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { prisma } from 'db';
-import { getSpacesCount } from '../getSpacesCount';
+import { getSpacesOfUser } from '../getSpacesOfUser';
 
 let user: User;
 
@@ -24,7 +24,7 @@ beforeAll(async () => {
 
 describe('getSpacesCount', () => {
   it('Should get count of spaces the user is part of', async () => {
-    const spacesCount = await getSpacesCount(user.id);
-    expect(spacesCount).toBe(2);
+    const spaces = await getSpacesOfUser(user.id);
+    expect(spaces.length).toBe(2);
   });
 });

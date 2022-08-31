@@ -10,8 +10,8 @@ import Slide from '@mui/material/Slide';
 import { TransitionProps } from '@mui/material/transitions';
 import { useS3UploadInput } from 'hooks/useS3UploadInput';
 import { useUpdateProfileAvatar } from 'components/profile/components/UserDetails/hooks/useUpdateProfileAvatar';
-import { NftData } from 'lib/nft/types';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
+import { NftData } from 'lib/blockchain/interfaces';
 
 const Transition = React.forwardRef((
   props: TransitionProps & {

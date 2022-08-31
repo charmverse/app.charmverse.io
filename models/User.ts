@@ -22,14 +22,5 @@ export interface LoggedInUser extends User {
   isNew?: boolean
 }
 
-export interface ExtendedPoap {
-  imageURL: string;
-  isHidden: boolean;
-  walletAddress: string
-  tokenId: string
-  created: string
-  name: string
-}
-
 export const IDENTITY_TYPES = ['Wallet', 'Discord', 'Telegram', 'RandomName'] as const;
 export type IdentityType = typeof IDENTITY_TYPES[number];

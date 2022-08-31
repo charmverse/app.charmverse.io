@@ -7,10 +7,12 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
 import { AvatarEditMenu } from 'components/settings/workspace/AvatarEditMenu';
-import { NftData } from 'lib/nft/types';
-import { UserAvatar } from 'lib/users/interfaces';
+
 import { useS3UploadInput } from 'hooks/useS3UploadInput';
 import NftAvatarGalleryPopup from 'components/profile/components/NftAvatarGallery/NftAvatarGalleryPopup';
+
+import type { NftData } from 'lib/blockchain/interfaces';
+import type { UserAvatar } from 'lib/users/interfaces';
 
 const StyledBox = styled(Box)`
   display: inline-block;

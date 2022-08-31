@@ -1,14 +1,21 @@
 import fetch from 'node-fetch';
-import { ExtendedPoap } from 'models';
+import log from 'lib/log';
+import { ExtendedPoap } from './interfaces';
 
 const getPOAPsURL = (address: string) => `https://api.poap.tech/actions/scan/${address}`;
 
-export default async function getPOAPs (addresses: Array<string>): Promise<Array<ExtendedPoap>> {
+export async function getPOAPs (addresses: string[]): Promise<ExtendedPoap[]> {
   const requests: Array<Promise<any>> = [];
+
+  const apiKey = process.env.POAP_API_KEY;
+  if (typeof apiKey !== 'string') {
+    log.debug('No API key for POAPs');
+    return [];
+  }
 
   addresses.forEach(address => {
     const request = fetch(getPOAPsURL(address), {
-      headers: { 'X-API-Key': <string>process.env.POAP_API_KEY }
+      headers: { 'X-API-Key': apiKey }
     });
     requests.push(request);
   });
@@ -18,6 +25,7 @@ export default async function getPOAPs (addresses: Array<string>): Promise<Array
 
   const rawPoapInformation = data.flat(1);
   const poaps = rawPoapInformation.map(rawPoap => ({
+    id: `poap_${rawPoap.tokenId}`,
     tokenId: rawPoap.tokenId,
     walletAddress: rawPoap.owner,
     imageURL: rawPoap.event?.image_url,

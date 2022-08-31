@@ -1,16 +1,18 @@
-import { Space, User } from '@prisma/client';
+import { Space, SpaceRole } from '@prisma/client';
 import { prisma } from 'db';
 import nock from 'nock';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { LoggedInUser } from 'models';
 import { v4 } from 'uuid';
 import { DEEP_DAO_BASE_URL } from 'lib/deepdao/client';
-import { getAggregatedData } from 'lib/deepdao/getAggregatedData';
+import { getAggregatedData } from 'lib/profile';
 
 nock.disableNetConnect();
-let user: User;
-let space: Space;
+
+let user: LoggedInUser;
+let space: Space & { spaceRoles: SpaceRole[] };
 
 const walletAddresses = [v4(), v4()];
 
@@ -56,55 +58,93 @@ describe('GET /api/public/profile/[userPath]', () => {
       userId: user.id
     });
 
-    const participationScoreScope = nock(DEEP_DAO_BASE_URL as string)
-      .get(`/v0.1/people/participation_score/${walletAddresses[0]}`)
-      .reply(200, {
-        data: {
-          daos: 4
-        }
-      })
-      .get(`/v0.1/people/participation_score/${walletAddresses[1]}`)
-      .reply(200, {
-        data: {
-          daos: 6
-        }
-      });
+    const proposal1 = {
+      organizationId: '1',
+      createdAt: new Date().toString()
+    }; const
+      proposal2 = {
+        organizationId: '1',
+        createdAt: new Date().toString()
+      };
+
+    const vote1 = {
+      organizationId: '1',
+      createdAt: new Date().toString()
+    }; const
+      vote2 = {
+        organizationId: '1',
+        createdAt: new Date().toString()
+      }; const
+      vote3 = {
+        organizationId: '2',
+        createdAt: new Date().toString()
+      };
 
     const profileScope = nock(DEEP_DAO_BASE_URL as string)
       .get(`/v0.1/people/profile/${walletAddresses[0]}`)
       .reply(200, {
         data: {
           totalProposals: 1,
-          proposals: ['proposal 1'],
+          proposals: [proposal1, proposal2],
           totalVotes: 1,
-          votes: ['vote 1'],
-          organizations: ['organization 1']
+          votes: [vote1, vote2],
+          organizations: [{ organizationId: '1', name: 'organization 1' }]
         }
       })
       .get(`/v0.1/people/profile/${walletAddresses[1]}`)
       .reply(200, {
         data: {
           totalProposals: 2,
-          proposals: ['proposal 2'],
+          proposals: [],
           totalVotes: 3,
-          votes: ['vote 2'],
-          organizations: ['organization 2']
+          votes: [vote3],
+          organizations: [{ organizationId: '2', name: 'organization 2' }]
+        }
+      })
+      .get('/v0.1/organizations')
+      .reply(200, {
+        data: {
+          resources: [],
+          totalResources: 0
         }
       });
 
     const aggregatedData = await getAggregatedData(user.id, 'dummy_key');
 
-    expect(participationScoreScope.isDone());
     expect(profileScope.isDone());
 
     expect(aggregatedData).toStrictEqual({
-      daos: 11,
       bounties: 1,
       totalProposals: 3,
       totalVotes: 4,
-      votes: ['vote 1', 'vote 2'],
-      proposals: ['proposal 1', 'proposal 2'],
-      organizations: ['organization 1', 'organization 2']
+      communities: [{
+        id: '1',
+        name: 'organization 1',
+        isHidden: false,
+        logo: null,
+        joinDate: proposal1.createdAt,
+        votes: [{ ...vote1, type: 'vote' }, { ...vote2, type: 'vote' }],
+        proposals: [{ ...proposal1, type: 'proposal' }, { ...proposal2, type: 'proposal' }],
+        latestEventDate: vote2.createdAt
+      }, {
+        id: '2',
+        name: 'organization 2',
+        isHidden: false,
+        logo: null,
+        joinDate: vote3.createdAt,
+        votes: [{ ...vote3, type: 'vote' }],
+        proposals: [],
+        latestEventDate: vote3.createdAt
+      }, {
+        id: space.id,
+        joinDate: space.spaceRoles[0].createdAt.toISOString(),
+        name: space.name,
+        isHidden: false,
+        logo: null,
+        votes: [],
+        proposals: [],
+        latestEventDate: ''
+      }]
     });
   });
 });

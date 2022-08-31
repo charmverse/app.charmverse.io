@@ -6,12 +6,14 @@ import { User, UserDetails } from '@prisma/client';
 import { prisma } from 'db';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
-import { ExtendedPoap } from 'models';
-import { getPOAPs } from 'lib/poap';
+import { getPOAPs } from 'lib/blockchain/poaps';
+import { NftData, ExtendedPoap } from 'lib/blockchain/interfaces';
+import { getNFTs } from 'lib/blockchain/nfts';
 
 export type PublicUser = Pick<User, 'id' | 'username' | 'avatar' | 'path'> & {
   profile: UserDetails | null;
-  visiblePoaps: Array<Partial<ExtendedPoap>>;
+  visiblePoaps: Partial<ExtendedPoap>[];
+  visibleNfts: NftData[]
 }
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -40,39 +42,34 @@ async function getUserProfile (req: NextApiRequest, res: NextApiResponse<PublicU
     where: condition,
     include: {
       profile: true,
-      poaps: true
+      profileItems: true
     }
   });
 
   // prefer match by user id
-  const userById = users.find(user => user.id === userPath);
+  const userById = users.find(user => user.id === userPath) ?? users[0];
 
-  if (userById) {
-    const allPoaps = await getPOAPs(userById.addresses);
-
-    // eslint-disable-next-line max-len
-    const visiblePoaps = allPoaps.filter(poap => !userById.poaps.find(p => p.isHidden && p.tokenId === poap.tokenId && p.walletAddress === poap.walletAddress));
-
-    res.status(200).json({
-      ...userById,
-      visiblePoaps
-    });
-  }
-  else if (users.length > 0) {
-    const user = users[0];
-    const allPoaps = await getPOAPs(user.addresses);
-
-    // eslint-disable-next-line max-len
-    const visiblePoaps = allPoaps.filter(poap => !user.poaps.find(p => p.isHidden && p.tokenId === poap.tokenId && p.walletAddress === poap.walletAddress));
-
-    res.status(200).json({
-      ...user,
-      visiblePoaps
-    });
-  }
-  else {
+  if (!userById) {
     throw new DataNotFoundError('User not found');
   }
+
+  function isVisible (item: { id: string }): boolean {
+    return !userById.profileItems.some(profileItem => profileItem.isHidden && profileItem.id === item.id);
+  }
+
+  const allPoaps = await getPOAPs(userById.addresses);
+  const allNfts = await getNFTs(userById.addresses);
+
+  const visiblePoaps = allPoaps.filter(isVisible);
+  const visibleNfts = allNfts.filter(isVisible);
+
+  delete (userById as any).profileItems;
+
+  res.status(200).json({
+    ...userById,
+    visiblePoaps,
+    visibleNfts
+  });
 }
 
 export default withSessionRoute(handler);

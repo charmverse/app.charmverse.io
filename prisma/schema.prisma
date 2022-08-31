@@ -123,6 +123,13 @@ enum SpaceOperation {
   createVote
 }
 
+enum ProfileItemType {
+  community
+  nft
+  poap
+  vc
+}
+
 model Space {
   id                          String                            @id @default(uuid()) @db.Uuid
   deletedAt                   DateTime?
@@ -303,6 +310,7 @@ model User {
   notificationState UserNotificationState?
   userVotes         UserVote[]
   initiatedVotes    Vote[]
+  profileItems      ProfileItem[]
 }
 
 model UserNotificationState {
@@ -618,4 +626,13 @@ model Comment {
   space     Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   thread    Thread    @relation(fields: [threadId], references: [id], onDelete: Cascade)
   user      User      @relation(fields: [userId], references: [id])
+}
+
+model ProfileItem {
+  id       String          @id
+  userId   String          @db.Uuid
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isHidden Boolean?
+  metadata Json?
+  type     ProfileItemType
 }

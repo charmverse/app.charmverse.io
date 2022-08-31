@@ -1,9 +1,8 @@
-import React from 'react';
 import Skeleton from '@mui/material/Skeleton';
 import Stack from '@mui/material/Stack';
 import { CircularProgress, Grid, Box } from '@mui/material';
 
-import { NftData } from 'lib/nft/types';
+import { NftData } from 'lib/blockchain/interfaces';
 import { useUser } from 'hooks/useUser';
 import styled from '@emotion/styled';
 import EmptyAvatarGallery from 'components/profile/components/NftAvatarGallery/RenderEmptyAvatarGallery';
@@ -52,7 +51,7 @@ export default function NftAvatarGallery ({ onSelect, isSaving, nfts, isLoading,
             </Stack>
           </Grid>
         ))
-          : nfts?.length ? nfts?.map(nft => (
+          : nfts?.length ? nfts.map(nft => (
             <Grid key={`${nft.contract}-${nft.tokenId}`} item xs={6} sm={3} sx={{ minWidth: 110 }}>
               <NftGalleryItem nft={nft} onClick={() => onSelect?.(nft)} isSelected={getIsSelected(nft)} />
             </Grid>
