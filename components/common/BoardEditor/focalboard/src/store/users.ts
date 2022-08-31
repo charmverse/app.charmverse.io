@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 
 import { createSlice, createAsyncThunk, PayloadAction, createSelector } from '@reduxjs/toolkit';
 
@@ -65,11 +63,6 @@ export const { setWorkspaceUsers } = usersSlice.actions;
 export const { reducer } = usersSlice;
 
 export const getWorkspaceUsers = (state: RootState): {[key: string]: IUser} => state.users.workspaceUsers;
-
-export const getWorkspaceUsersList = createSelector(
-  getWorkspaceUsers,
-  (workspaceUsers) => Object.values(workspaceUsers).sort((a, b) => a.username.localeCompare(b.username))
-);
 
 export const getUser = (userId: string): (state: RootState) => IUser|undefined => {
   return (state: RootState): IUser|undefined => {

@@ -1,5 +1,5 @@
 import { useState, ReactNode } from 'react';
-import styled from '@emotion/styled';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import Link from 'next/link';
 import { Box, Stack, SvgIcon, Tooltip, Typography } from '@mui/material';
 import Button from 'components/common/Button';
@@ -13,15 +13,6 @@ import PersonIcon from '@mui/icons-material/Person';
 import { IdentityType, IDENTITY_TYPES } from 'models';
 import randomName from 'lib/utilities/randomName';
 import Integration from './Integration';
-
-const StyledButton = styled(Button)`
-  background-color: ${({ theme }) => theme.palette.background.light};
-  color: ${({ theme }) => theme.palette.text.primary};
-
-  &:hover {
-    background-color: ${({ theme }) => theme.palette.background.light};
-  }
-`;
 
 export type IntegrationModel = {
   username: string,
@@ -81,39 +72,37 @@ function IdentityModal (props: IdentityModalProps) {
       onClose={close}
       size='large'
     >
-      <DialogTitle onClose={close}>Public Identity</DialogTitle>
-      <Typography>Select which integration you want to show as your public identity</Typography>
-      <Stack mt={2}>
+      <DialogTitle onClose={close}>Select a public identity</DialogTitle>
+      <Typography>Select which integration you want to show as your username</Typography>
+      <Box mb={2}>
         {
           identityTypes.map((item: IntegrationModel) => (
             <Integration
               isInUse={item.type === IDENTITY_TYPES[3] && generatedName !== item.username ? false : item.isInUse}
               icon={item.icon}
               identityType={item.type}
-              name={item.type === IDENTITY_TYPES[3] ? 'Anonymus' : item.type}
-              id={item.type === IDENTITY_TYPES[3] ? generatedName : item.username}
+              name={item.type === IDENTITY_TYPES[3] ? 'Anonymous' : item.type}
+              username={item.type === IDENTITY_TYPES[3] ? generatedName : item.username}
               useIntegration={save}
-              actions={
-                item.type === IDENTITY_TYPES[3] ? [
-                  <Tooltip arrow placement='top' title='Regenerate'>
+              action={
+                item.type === IDENTITY_TYPES[3] ? (
+                  <Tooltip arrow placement='top' title='Generate a new name'>
                     <IconButton onClick={() => setGeneratedName(randomName())}>
                       <RefreshIcon fontSize='small' />
                     </IconButton>
-                  </Tooltip>] : []
-
+                  </Tooltip>
+                ) : null
               }
               key={item.type}
             />
           ))
         }
-        <Box justifyContent='end' mt={3} sx={{ display: 'flex' }}>
-          <Link href='/nexus'>
-            <StyledButton>
-              Manage Integrations
-            </StyledButton>
-          </Link>
-        </Box>
-      </Stack>
+      </Box>
+      <Link href='/integrations'>
+        <Button variant='text' color='secondary' endIcon={<NavigateNextIcon />}>
+          Manage identities
+        </Button>
+      </Link>
     </Modal>
   );
 }

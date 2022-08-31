@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Board } from '../blocks/board';
@@ -23,6 +21,8 @@ const boardsSlice = createSlice({
       state.boards[action.payload.id] = action.payload;
     },
     updateBoards: (state, action: PayloadAction<Board[]>) => {
+      console.log({boards: action.payload});
+
       for (const board of action.payload) {
         /* if (board.deletedAt !== 0 && board.deletedAt !== null) {
                     delete state.boards[board.id]

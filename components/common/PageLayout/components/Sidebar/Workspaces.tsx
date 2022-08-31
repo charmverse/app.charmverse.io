@@ -1,5 +1,6 @@
 
 import styled from '@emotion/styled';
+import { Divider } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { useRouter } from 'next/router';
 import NavigateNextIcon from '@mui/icons-material/ArrowRightAlt';
@@ -19,6 +20,7 @@ import { useSpaces } from 'hooks/useSpaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import WorkspaceAvatar from './WorkspaceAvatar';
+import NexusAvatar from './NexusAvatar';
 
 const AvatarLink = styled(NextLink)`
   cursor: pointer;
@@ -37,7 +39,7 @@ export default function Workspaces () {
   const [space] = useCurrentSpace();
   const [spaces, setSpaces] = useSpaces();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
-  const [, setUser] = useUser();
+  const { user, setUser } = useUser();
 
   function showSpaceForm () {
     setSpaceFormOpen(true);
@@ -59,11 +61,17 @@ export default function Workspaces () {
   return (
     <WorkspacesContainer>
       <Grid container spacing={2} flexDirection='column'>
+        <Grid item>
+          <NexusAvatar user={user} />
+        </Grid>
+        <Grid item>
+          <Divider sx={{ borderTopWidth: 2, width: '80%', m: '0 auto' }} />
+        </Grid>
         {spaces.map(workspace => (
           <Grid item key={workspace.domain}>
             <AvatarLink href={`/${workspace.domain}`} passHref>
               <MuiLink>
-                <Tooltip title={workspace.name} placement='top' arrow>
+                <Tooltip title={workspace.name} placement='right' arrow>
                   <span>
                     <WorkspaceAvatar
                       active={space?.domain === workspace.domain}

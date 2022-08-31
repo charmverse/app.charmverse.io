@@ -3,8 +3,9 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { Block, Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireUser, NotFoundError, InvalidStateError } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { getPagePath } from 'lib/pages';
 
 // TODO: frontend should tell us which space to use
 export type ServerBlockFields = 'spaceId' | 'updatedBy' | 'createdBy';
@@ -14,6 +15,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser).get(getBlocks).post(createBlocks).put(updateBlocks);
 
 async function getBlocks (req: NextApiRequest, res: NextApiResponse<Block[] | { error: string }>) {
+
   const referer = req.headers.referer as string;
   const url = new URL(referer);
   url.hash = '';
@@ -21,43 +23,52 @@ async function getBlocks (req: NextApiRequest, res: NextApiResponse<Block[] | { 
   const pathnameParts = referer ? url.pathname.split('/') : [];
   const spaceDomain = pathnameParts[1];
   if (!spaceDomain) {
-    return res.status(400).json({ error: 'spaceId is required' });
+    throw new InvalidStateError('invalid referrer url');
   }
   // publicly shared focalboard
   if (spaceDomain === 'share') {
     const pageId = pathnameParts[2];
     if (!pageId) {
-      return res.status(400).json({ error: 'pageId is required' });
+      throw new InvalidStateError('invalid referrer url');
     }
     const page = await prisma.page.findUnique({ where: { id: pageId } });
     if (!page) {
-      return res.status(404).json({ error: 'page not found' });
+      throw new NotFoundError('page not found');
     }
     const blocks = page.boardId ? await prisma.block.findMany({ where: { rootId: page.boardId } }) : [];
     return res.status(200).json(blocks);
   }
 
-  const space = await prisma.space.findUnique({
-    where: {
-      domain: spaceDomain
+  else {
+    let spaceId = req.query.spaceId as string | undefined;
+
+    // TODO: Once all clients are updated to pass in spaceId, we should remove this way of looking up the space id
+    if (!spaceId) {
+      const space = await prisma.space.findUnique({
+        where: {
+          domain: spaceDomain
+        }
+      });
+      spaceId = space?.id;
     }
-  });
-  if (space) {
+
+    if (!spaceId) {
+      throw new NotFoundError('workspace not found');
+    }
+
     const blocks = await prisma.block.findMany({
       where: {
+        spaceId,
         id: req.query.id
           ? req.query.id as string
           : req.query.ids
             ? {
               in: req.query.ids as string[]
             }
-            : undefined,
-        spaceId: space.id
-      }
+            : undefined }
     });
     return res.status(200).json(blocks);
   }
-  return res.status(400).json({ error: 'spaceId is invalid' });
 }
 
 async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>) {
@@ -105,7 +116,7 @@ async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
             }
           },
           createdAt: cardBlock.createdAt,
-          path: `page-${Math.random().toString().replace('0.', '')}`,
+          path: getPagePath(),
           title: cardBlock.title,
           icon: cardBlock.fields.icon,
           type: 'card',

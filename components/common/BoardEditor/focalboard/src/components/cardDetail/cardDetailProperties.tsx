@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -137,7 +135,7 @@ const CardDetailProperties = React.memo((props: Props) => {
   }
 
   return (
-    <div className='octo-propertylist CardDetailProperties'>
+    <div className='octo-propertylist'>
       {board.fields.cardProperties.map((propertyTemplate: IPropertyTemplate) => {
         const propertyValue = card.fields.properties[propertyTemplate.id];
         return (

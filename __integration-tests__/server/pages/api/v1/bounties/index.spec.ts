@@ -45,7 +45,7 @@ describe('GET /api/v1/bounties', () => {
     expect(bountyWithPaidFromApi).toEqual<PublicApiBounty>(
       expect.objectContaining<PublicApiBounty>({
         createdAt: bountyWithPaidApplication.createdAt.toISOString(),
-        description: bountyWithPaidApplication.description,
+        description: (bountyWithPaidApplication as unknown as PublicApiBounty).description,
         id: bountyWithPaidApplication.id,
         issuer: {
           address: user.addresses[0]
@@ -58,7 +58,7 @@ describe('GET /api/v1/bounties', () => {
           chain: bountyWithPaidApplication.chainId,
           token: bountyWithPaidApplication.rewardToken
         },
-        title: bountyWithPaidApplication.title,
+        title: (bountyWithPaidApplication as unknown as PublicApiBounty).title,
         status: bountyWithPaidApplication.status,
         url: `${baseUrl}/${space.domain}/bounties/${bountyWithPaidApplication.id}`
       })
@@ -69,7 +69,7 @@ describe('GET /api/v1/bounties', () => {
     expect(bountyWithInProgressFromApi).toEqual<PublicApiBounty>(
       expect.objectContaining<PublicApiBounty>({
         createdAt: bountyWithInProgressWork.createdAt.toISOString(),
-        description: bountyWithInProgressWork.description,
+        description: (bountyWithInProgressWork as unknown as PublicApiBounty).description,
         id: bountyWithInProgressWork.id,
         issuer: {
           address: secondUser.addresses[0]
@@ -81,7 +81,7 @@ describe('GET /api/v1/bounties', () => {
           chain: bountyWithInProgressWork.chainId,
           token: bountyWithInProgressWork.rewardToken
         },
-        title: bountyWithInProgressWork.title,
+        title: (bountyWithInProgressWork as unknown as PublicApiBounty).title,
         status: bountyWithInProgressWork.status,
         url: `${baseUrl}/${space.domain}/bounties/${bountyWithInProgressWork.id}`
       })

@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import { useEffect, useRef, useState } from 'react';
 import Popper from '@mui/material/Popper';
 import styled from '@emotion/styled';
@@ -55,7 +53,7 @@ function Menu (props: Props) {
   }, []);
 
   return (
-    <StyledPopper anchorEl={anchorEl} open={true} placement={position || 'bottom-start'}>
+    <StyledPopper anchorEl={anchorEl} open={true} disablePortal placement={position || 'bottom-start'}>
       <div
         ref={popperRef}
         style={{ maxHeight: maxHeight || 'none' }}

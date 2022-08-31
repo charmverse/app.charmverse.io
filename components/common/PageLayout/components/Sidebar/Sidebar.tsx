@@ -167,7 +167,7 @@ interface SidebarProps {
 
 export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const router = useRouter();
-  const [user] = useUser();
+  const { user } = useUser();
   const [space] = useCurrentSpace();
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -242,15 +242,15 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
           </Box>
           <ScrollingContainer isScrolled={isScrolled} onScroll={onScroll} className='page-navigation'>
             {favoritePageIds.length > 0 && (
-            <Box mb={2}>
-              <SectionName>
-                FAVORITES
-              </SectionName>
-              <PageNavigation
-                isFavorites={true}
-                rootPageIds={favoritePageIds}
-              />
-            </Box>
+              <Box mb={2}>
+                <SectionName>
+                  FAVORITES
+                </SectionName>
+                <PageNavigation
+                  isFavorites={true}
+                  rootPageIds={favoritePageIds}
+                />
+              </Box>
             )}
             <WorkspaceLabel>
               <SectionName>

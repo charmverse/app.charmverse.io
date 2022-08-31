@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 
 import { Block, createBlock } from './block';
 import { FilterGroup, createFilterGroup } from './filterGroup';
@@ -51,7 +49,8 @@ function createBoardView (block?: Block): BoardView {
       columnWidths: { ...(block?.fields.columnWidths || {}) },
       columnCalculations: { ...(block?.fields.columnCalculations) || {} },
       kanbanCalculations: { ...(block?.fields.kanbanCalculations) || {} },
-      defaultTemplateId: block?.fields.defaultTemplateId || ''
+      defaultTemplateId: block?.fields.defaultTemplateId || '',
+      linkedSourceId: block?.fields.linkedSourceId ?? null,
     }
   };
 }

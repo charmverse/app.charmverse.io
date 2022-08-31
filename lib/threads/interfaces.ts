@@ -27,3 +27,8 @@ export interface ThreadCreate {
 export interface ThreadWithCommentsAndAuthors extends Thread {
   comments: CommentWithUser[]
 }
+
+export interface MultipleThreadsInput {
+  threadIds: string[]
+  pageId: string
+}

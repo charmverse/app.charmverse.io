@@ -15,6 +15,8 @@ enum PageType {
   page
   card
   proposal
+  inline_board
+  inline_linked_board
 }
 
 enum PermissionLevel {
@@ -119,6 +121,13 @@ enum SpaceOperation {
   createPage
   createBounty
   createVote
+}
+
+enum ProfileItemType {
+  community
+  nft
+  poap
+  vc
 }
 
 model Space {
@@ -271,6 +280,9 @@ model User {
   updatedAt         DateTime               @default(now())
   addresses         String[]
   avatar            String?
+  avatarContract    String?
+  avatarTokenId     String?
+  avatarChain       Int?
   username          String
   isBot             Boolean?               @default(false)
   path              String?                @unique
@@ -298,6 +310,7 @@ model User {
   notificationState UserNotificationState?
   userVotes         UserVote[]
   initiatedVotes    Vote[]
+  profileItems      ProfileItem[]
 }
 
 model UserNotificationState {
@@ -613,4 +626,13 @@ model Comment {
   space     Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   thread    Thread    @relation(fields: [threadId], references: [id], onDelete: Cascade)
   user      User      @relation(fields: [userId], references: [id])
+}
+
+model ProfileItem {
+  id       String          @id
+  userId   String          @db.Uuid
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isHidden Boolean?
+  metadata Json?
+  type     ProfileItemType
 }

@@ -5,11 +5,10 @@ import SunIcon from '@mui/icons-material/WbSunny';
 import { Box, IconButton, Tooltip } from '@mui/material';
 import { useWeb3React } from '@web3-react/core';
 import charmClient from 'charmClient';
-import { Card } from 'components/common/BoardEditor/focalboard/src/blocks/card';
-import { addBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
+import { updateBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { addCard } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { setCurrent } from 'components/common/BoardEditor/focalboard/src/store/views';
+import { addView, setCurrent } from 'components/common/BoardEditor/focalboard/src/store/views';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import Account from 'components/common/PageLayout/components/Account';
@@ -26,7 +25,6 @@ import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import { Board } from 'lib/focalboard/board';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -40,18 +38,20 @@ const LayoutContainer = styled.div`
 export default function PublicPage () {
 
   const { account } = useWeb3React();
-  const [, setUser] = useUser();
+  const { setUser } = useUser();
 
   const theme = useTheme();
   const colorMode = useColorMode();
   const router = useRouter();
   const pageIdOrPath = router.query.pageId instanceof Array ? router.query.pageId.join('/') : router.query.pageId as string;
   const dispatch = useAppDispatch();
-  const { pages, currentPageId, setCurrentPageId } = usePages();
+  const { pages, setCurrentPageId } = usePages();
   const [loadingSpace, setLoadingSpace] = useState(true);
   const [currentSpace] = useCurrentSpace();
   const [, setSpaces] = useSpaces();
   const [, setTitleState] = usePageTitle();
+  // keep track of the pageId by path since currentPageId may change when a page is viewed inside a modal
+  const [basePageId, setBasePageId] = useState('');
   const [pageNotFound, setPageNotFound] = useState(false);
   const isBountiesPage = router.query.pageId?.[1] === 'bounties';
 
@@ -70,19 +70,23 @@ export default function PublicPage () {
     }
     else {
       try {
-        const { page: rootPage, pageBlock, boardBlock, space } = await charmClient.getPublicPage(pageIdOrPath);
+        const { page: rootPage, cards, boards, space, views } = await charmClient.getPublicPage(pageIdOrPath);
 
         setTitleState(rootPage.title);
         setCurrentPageId(rootPage.id);
+        setBasePageId(rootPage.id);
         setSpaces([space]);
 
-        if (pageBlock) {
-          dispatch(setCurrent(pageBlock.id));
-          dispatch(addCard(pageBlock as unknown as Card));
-        }
-        if (boardBlock) {
-          dispatch(addBoard(boardBlock as unknown as Board));
-        }
+        dispatch(setCurrent(rootPage.id));
+        cards.forEach(card => {
+          dispatch(addCard(card));
+        });
+
+        views.forEach(view => {
+          dispatch(addView(view));
+        });
+
+        dispatch(updateBoards(boards));
       }
       catch (err) {
         setPageNotFound(true);
@@ -132,7 +136,7 @@ export default function PublicPage () {
     return <ErrorPage message={'Sorry, that page doesn\'t exist'} />;
   }
 
-  const currentPage = pages[currentPageId];
+  const currentPage = pages[basePageId];
 
   return (
     <>
@@ -173,9 +177,9 @@ export default function PublicPage () {
           {
             isBountiesPage
               ? <PublicBountiesPage />
-              : (currentPage?.type === 'board'
+              : (currentPage?.type.match(/board/)
                 ? (
-                  <BoardPage page={currentPage} setPage={() => {}} readonly={true} />
+                  <BoardPage page={currentPage} setPage={() => {}} readOnly={true} />
                 ) : (
                   currentPage && <DocumentPage page={currentPage} setPage={() => {}} readOnly={true} />
                 )

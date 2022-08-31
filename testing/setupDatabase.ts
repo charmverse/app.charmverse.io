@@ -2,7 +2,7 @@ import { ApplicationStatus, Block, Bounty, BountyStatus, Comment, Page, Prisma, 
 import { prisma } from 'db';
 import { getBountyOrThrow } from 'lib/bounties';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
-import { IPageWithPermissions } from 'lib/pages';
+import { IPageWithPermissions, getPagePath } from 'lib/pages';
 import { BountyPermissions } from 'lib/permissions/bounties';
 import { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import { createUserFromWallet } from 'lib/users/createUser';
@@ -47,19 +47,15 @@ export async function generateSpaceUser ({ spaceId, isAdmin }: { spaceId: string
  * @param walletAddress
  * @returns
  */
-export async function generateUserAndSpaceWithApiToken (walletAddress: string = v4(), isAdmin = true): Promise<{
-  user: LoggedInUser,
-  space: Space,
-  apiToken: SpaceApiToken
-}> {
+export async function generateUserAndSpaceWithApiToken (walletAddress: string = v4(), isAdmin = true) {
   const user = await createUserFromWallet(walletAddress);
 
   const existingSpaceId = user.spaceRoles?.[0]?.spaceId;
 
-  let space: Space | null = null;
+  let space = null;
 
   if (existingSpaceId) {
-    space = await prisma.space.findUnique({ where: { id: user.spaceRoles?.[0]?.spaceId }, include: { apiToken: true } });
+    space = await prisma.space.findUnique({ where: { id: user.spaceRoles?.[0]?.spaceId }, include: { apiToken: true, spaceRoles: true } });
   }
 
   if (!space) {
@@ -83,7 +79,8 @@ export async function generateUserAndSpaceWithApiToken (walletAddress: string = 
         }
       },
       include: {
-        apiToken: true
+        apiToken: true,
+        spaceRoles: true
       }
     });
   }
@@ -143,7 +140,7 @@ export async function generateBounty ({ content = undefined, contentText = '', s
             createdBy,
             contentText,
             content: content ?? undefined,
-            path: `page-${pageId}`,
+            path: getPagePath(),
             title: title || 'Root',
             type: 'bounty',
             updatedBy: createdBy,
@@ -284,7 +281,7 @@ export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'cre
     data: {
       id: options.id ?? v4(),
       contentText: options.contentText ?? '',
-      path: options.path ?? `page-${v4()}`,
+      path: options.path ?? getPagePath(),
       title: options.title || 'Example',
       type: options.type ?? 'page',
       updatedBy: options.createdBy,

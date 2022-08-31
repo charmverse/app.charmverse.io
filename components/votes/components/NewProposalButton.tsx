@@ -7,13 +7,13 @@ import { addPage } from 'lib/pages/addPage';
 import { useState } from 'react';
 
 export default function NewProposalButton () {
-  const [user] = useUser();
+  const { user } = useUser();
   const [currentSpace] = useCurrentSpace();
   const [page, setPage] = useState<Page | null>(null);
 
   async function onClickCreate () {
     if (currentSpace && user) {
-      const newPage = await addPage({
+      const { page: newPage } = await addPage({
         spaceId: currentSpace.id,
         createdBy: user.id,
         type: 'proposal'

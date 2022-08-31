@@ -11,7 +11,7 @@ import { Page } from '@prisma/client';
 
 export default function useNestedPage () {
   const [space] = useCurrentSpace();
-  const [user] = useUser();
+  const { user } = useUser();
   const { currentPageId } = usePages();
   const view = useEditorViewContext();
   const router = useRouter();
@@ -20,7 +20,7 @@ export default function useNestedPage () {
   const addNestedPage = useCallback(async (type?: Page['type']) => {
     if (user && space) {
       const pageId = v4();
-      const newPage = await addPage({
+      const { page } = await addPage({
         id: pageId,
         createdBy: user.id,
         spaceId: space.id,
@@ -36,11 +36,11 @@ export default function useNestedPage () {
           if (isInsideCard) {
             // A small delay to let the inserted page be saved in the editor
             setTimeout(() => {
-              router.push(`/${router.query.domain}/${newPage.path}`);
+              router.push(`/${router.query.domain}/${page.path}`);
             }, 150);
           }
           else {
-            router.push(`/${router.query.domain}/${newPage.path}`);
+            router.push(`/${router.query.domain}/${page.path}`);
           }
         }
         return true;

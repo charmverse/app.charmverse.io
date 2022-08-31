@@ -36,7 +36,7 @@ export default function BountiesKanbanView ({ bounties, refreshBounty }: Omit<Pr
   });
 
   async function closeBounty (bountyId: string) {
-    await charmClient.closeBounty(bountyId);
+    await charmClient.bounties.closeBounty(bountyId);
     if (refreshBounty) {
       refreshBounty(bountyId);
     }
@@ -70,6 +70,8 @@ export default function BountiesKanbanView ({ bounties, refreshBounty }: Omit<Pr
 
   return (
     <div className='Kanban'>
+      {/* include ViewHeader to include the horizontal line */}
+      <div className='ViewHeader' />
       <div className='octo-board-header'>
         {bountyStatuses.map(bountyStatus => (
           <Box className='octo-board-header-cell' key={bountyStatus}>
@@ -99,21 +101,21 @@ export default function BountiesKanbanView ({ bounties, refreshBounty }: Omit<Pr
       </div>
 
       {activeBountyPage?.page && activeBountyPage?.bounty && (
-      <PageDialog
-        page={activeBountyPage.page}
-        onClickDelete={() => {
-          deletePage({
-            pageId: activeBountyPage.page.id
-          });
-        }}
-        onClose={() => {
-          closePopup();
-        }}
-        bounty={activeBountyPage?.bounty}
-        onMarkCompleted={() => {
-          closeBounty(activeBountyPage?.bounty.id);
-        }}
-      />
+        <PageDialog
+          page={activeBountyPage.page}
+          onClickDelete={() => {
+            deletePage({
+              pageId: activeBountyPage.page.id
+            });
+          }}
+          onClose={() => {
+            closePopup();
+          }}
+          bounty={activeBountyPage?.bounty}
+          onMarkCompleted={() => {
+            closeBounty(activeBountyPage?.bounty.id);
+          }}
+        />
       )}
     </div>
   );

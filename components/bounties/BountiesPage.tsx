@@ -45,7 +45,9 @@ export default function BountiesPage ({ refreshBounty, publicMode = false, bount
   }, [bountiesSorted]);
 
   return (
-    <div className='focalboard-body'>
+    <div
+      className='focalboard-body full-page'
+    >
       <div className='BoardComponent'>
         <div className='top-head'>
           <Grid container display='flex' justifyContent='space-between' alignContent='center' mb={3} mt={10}>
@@ -57,24 +59,21 @@ export default function BountiesPage ({ refreshBounty, publicMode = false, bount
 
               {!publicMode && (
                 <Box width='fit-content' display='flex' gap={1}>
-                  { !!csvData.length
-                      && (
-                        <CSVLink data={csvData} filename='Gnosis Safe Airdrop.csv' style={{ textDecoration: 'none' }}>
-                          <Button color='secondary' variant='outlined'>
-                            Export to CSV
-                          </Button>
-                        </CSVLink>
-                      )}
+                  {!!csvData.length
+                    && (
+                      <CSVLink data={csvData} filename='Gnosis Safe Airdrop.csv' style={{ textDecoration: 'none' }}>
+                        <Button color='secondary' variant='outlined'>
+                          Export to CSV
+                        </Button>
+                      </CSVLink>
+                    )}
                   <MultiPaymentModal bounties={bounties} />
                   <NewBountyButton />
                 </Box>
               )}
-
             </Grid>
 
           </Grid>
-          {/* include ViewHEader to include the horizontal line */}
-          <div className='ViewHeader' />
         </div>
         <div className='container-container'>
           {bounties.length === 0

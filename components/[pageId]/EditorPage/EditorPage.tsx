@@ -17,7 +17,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
   const [pageNotFound, setPageNotFound] = useState(false);
   const [space] = useCurrentSpace();
   const [isAccessDenied, setIsAccessDenied] = useState(false);
-  const [user] = useUser();
+  const { user } = useUser();
   const currentPagePermissions = getPagePermissions(pageId);
 
   const pagesLoaded = Object.keys(pages).length > 0;
@@ -104,12 +104,12 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
     return <ErrorPage message={'Sorry, you don\'t have access to this page'} />;
   }
   else if (currentPagePermissions.read === true) {
-    if (currentPage?.type === 'board') {
+    if (currentPage?.type === 'board' || currentPage?.type === 'inline_board' || currentPage?.type === 'inline_linked_board') {
       return (
         <BoardPage
           page={memoizedCurrentPage}
           setPage={setPage}
-          readonly={currentPagePermissions.edit_content !== true}
+          readOnly={currentPagePermissions.edit_content !== true}
         />
       );
     }

@@ -54,13 +54,13 @@ export default function FloatingMenuComponent (
                 {displayInlineVoteButton && <InlineVoteButton enableVotes menuKey={pluginKey} />}
               </MenuGroup>
               {!inline && (
-              <MenuGroup isLastGroup>
-                <ParagraphButton />
-                <CalloutButton />
-                <HeadingButton level={1} />
-                <HeadingButton level={2} />
-                <HeadingButton level={3} />
-              </MenuGroup>
+                <MenuGroup isLastGroup>
+                  <ParagraphButton />
+                  <CalloutButton />
+                  <HeadingButton level={1} />
+                  <HeadingButton level={2} />
+                  <HeadingButton level={3} />
+                </MenuGroup>
               )}
             </Menu>
           );

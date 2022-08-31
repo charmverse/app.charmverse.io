@@ -32,10 +32,13 @@
     "isolatedModules": true
   },
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "**/focalboard/**/*.test.ts",
+    "**/focalboard/**/*.test.tsx"
   ],
   "include": [
     "**/*.ts",
-    "**/*.tsx"
+    "**/*.tsx",
+    "components/bounties/components/BountyApplicantsTable"
   ]
 }

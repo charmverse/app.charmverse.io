@@ -98,17 +98,17 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
       setIsLoading(true);
       await Promise.all(
         result.transactions.map(async (transaction) => {
-          await charmClient.recordTransaction({
+          await charmClient.bounties.recordTransaction({
             applicationId: transaction.applicationId,
             transactionId: result.txHash,
             chainId: gnosisSafeChainId.toString()
           });
-          await charmClient.markSubmissionAsPaid(transaction.applicationId);
+          await charmClient.bounties.markSubmissionAsPaid(transaction.applicationId);
         })
       );
 
       if (currentSpace) {
-        charmClient.listBounties(currentSpace.id)
+        charmClient.bounties.listBounties(currentSpace.id)
           .then(_bounties => {
             setBounties(_bounties);
             const newCurrentBounty = _bounties.find(_bounty => _bounty.id === currentBountyId);
@@ -131,7 +131,6 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
         <div>
           <Button
             {...bindTrigger(popupState)}
-            sx={{ ml: 1 }}
             variant='outlined'
             color='secondary'
             disabled={isDisabled}

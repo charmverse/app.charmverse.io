@@ -41,7 +41,7 @@ async function deletePaymentMethod (req: NextApiRequest, res: NextApiResponse) {
       id
     }
   });
-  return res.status(200).json({});
+  return res.status(200).end();
 }
 
 export default withSessionRoute(handler);

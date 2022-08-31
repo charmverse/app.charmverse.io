@@ -8,21 +8,23 @@ import { useBounties } from 'hooks/useBounties';
 import charmClient from 'charmClient';
 import { BountyWithDetails } from 'models';
 import PageDialog from 'components/common/Page/PageDialog';
+import { usePages } from 'hooks/usePages';
 
 export default function NewBountyButton () {
-  const [user] = useUser();
+  const { user } = useUser();
   const [currentSpace] = useCurrentSpace();
   const [activeBountyPage, setActiveBountyPage] = useState<{page: Page, bounty: BountyWithDetails} | null>(null);
   const [currentUserPermissions] = useCurrentSpacePermissions();
   const suggestBounties = currentUserPermissions?.createBounty === false;
   const { setBounties } = useBounties();
+  const { setPages } = usePages();
 
   async function onClickCreate () {
     if (currentSpace && user) {
       let createdBounty: BountyWithDetails;
 
       if (suggestBounties) {
-        createdBounty = await charmClient.createBounty({
+        createdBounty = await charmClient.bounties.createBounty({
           chainId: 1,
           status: 'suggestion',
           spaceId: currentSpace.id,
@@ -38,7 +40,7 @@ export default function NewBountyButton () {
         });
       }
       else {
-        createdBounty = await charmClient.createBounty({
+        createdBounty = await charmClient.bounties.createBounty({
           chainId: 1,
           status: 'open',
           spaceId: currentSpace.id,
@@ -53,6 +55,7 @@ export default function NewBountyButton () {
           }
         });
       }
+      setPages((pages) => ({ ...pages, [createdBounty.page.id]: createdBounty.page }));
       setBounties((bounties) => [...bounties, createdBounty]);
       setActiveBountyPage({
         bounty: createdBounty,
@@ -68,11 +71,11 @@ export default function NewBountyButton () {
       </Button>
       {activeBountyPage
       && (
-      <PageDialog
-        hideToolsMenu={suggestBounties}
-        page={activeBountyPage.page}
-        onClose={() => setActiveBountyPage(null)}
-      />
+        <PageDialog
+          hideToolsMenu={suggestBounties}
+          page={activeBountyPage.page}
+          onClose={() => setActiveBountyPage(null)}
+        />
       )}
     </>
   );

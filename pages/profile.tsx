@@ -9,7 +9,7 @@ export default function PublicProfilePage () {
 
   setTitle('My Profile');
 
-  const [user, setUser] = useUser();
+  const { user, setUser } = useUser();
 
   if (!user) {
     return null;

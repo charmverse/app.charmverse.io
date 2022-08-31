@@ -1,10 +1,11 @@
-import type { DiscordUser, FavoritePage, Poap, SpaceRole, User, Role as RoleMembership, SpaceRoleToRole, TelegramUser, UserNotificationState } from '@prisma/client';
+import type { DiscordUser, FavoritePage, Role as RoleMembership, SpaceRole, SpaceRoleToRole, TelegramUser, User, UserNotificationState } from '@prisma/client';
 
 export { FavoritePage, SpaceRole, User };
 
 export interface Contributor extends Omit<User, 'addresses'> {
   isAdmin: boolean;
   joinDate: string;
+  hasNftAvatar?: boolean;
 }
 
 interface NestedMemberships {
@@ -18,11 +19,6 @@ export interface LoggedInUser extends User {
   discordUser?: DiscordUser | null
   telegramUser?: TelegramUser | null
   notificationState?: UserNotificationState | null
-}
-
-export interface ExtendedPoap extends Poap {
-  imageURL: string;
-  isHidden: boolean;
 }
 
 export const IDENTITY_TYPES = ['Wallet', 'Discord', 'Telegram', 'RandomName'] as const;

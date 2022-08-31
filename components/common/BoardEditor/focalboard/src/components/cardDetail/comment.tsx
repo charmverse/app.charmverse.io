@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import React, { FC } from 'react';
 import { useIntl } from 'react-intl';
 import { Box, Typography } from '@mui/material';
@@ -19,7 +17,7 @@ import { Contributor } from 'models';
 
 type Props = {
   comment: Block;
-  contributor?: Pick<Contributor, 'username' | 'avatar'>;
+  contributor?: Pick<Contributor, 'username' | 'avatar' | 'hasNftAvatar'>;
   readonly: boolean;
 }
 
@@ -35,7 +33,7 @@ const Comment: FC<Props> = (props: Props) => {
       className='Comment comment'
     >
       <div className='comment-header'>
-        <Avatar size='xSmall' name={contributor?.username} avatar={contributor?.avatar} />
+        <Avatar size='xSmall' name={contributor?.username} avatar={contributor?.avatar} isNft={contributor?.hasNftAvatar} />
         <div className='comment-username'>{contributor?.username}</div>
         <Tooltip title={Utils.displayDateTime(date, intl)}>
           <div className='comment-date'>

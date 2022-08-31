@@ -58,7 +58,7 @@ export default function ContributorRow ({ isAdmin, isSpaceOwner, contributor, on
     <TableRow>
       <TableCell>
         <Box display='flex' alignItems='center'>
-          <Avatar name={contributor.username} avatar={contributor?.avatar} />
+          <Avatar name={contributor.username} avatar={contributor?.avatar} isNft={contributor?.hasNftAvatar} />
           <Box pl={2}>
             <Typography variant='body1'><strong>{contributor.username}</strong></Typography>
           </Box>
@@ -93,27 +93,27 @@ export default function ContributorRow ({ isAdmin, isSpaceOwner, contributor, on
                   onClick={() => handleMenuItemClick(action)}
                 >
                   {action === 'makeAdmin' && (
-                  <StyledListItemText
-                    primary='Admin'
-                    secondary='Can access all settings and invite new members to the workspace'
-                  />
+                    <StyledListItemText
+                      primary='Admin'
+                      secondary='Can access all settings and invite new members to the workspace'
+                    />
                   )}
                   {action === 'makeContributor' && (
-                  <StyledListItemText
-                    primary='Contributor'
-                    secondary='Cannot change workspace settings or invite new members to the workspace'
-                  />
+                    <StyledListItemText
+                      primary='Contributor'
+                      secondary='Cannot change workspace settings or invite new members to the workspace'
+                    />
                   )}
                   {action === 'removeFromSpace' && (
-                  <StyledListItemText
-                    primaryTypographyProps={{ fontWeight: 500, color: 'error' }}
-                    primary='Remove from team'
-                  />
+                    <StyledListItemText
+                      primaryTypographyProps={{ fontWeight: 500, color: 'error' }}
+                      primary='Remove from team'
+                    />
                   )}
                   {action === activeRoleAction && (
-                  <ListItemIcon>
-                    <CheckIcon fontSize='small' />
-                  </ListItemIcon>
+                    <ListItemIcon>
+                      <CheckIcon fontSize='small' />
+                    </ListItemIcon>
                   )}
                 </MenuItem>
               ))}

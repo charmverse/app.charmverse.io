@@ -27,7 +27,7 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
   const { account, chainId } = useWeb3React();
   const { showMessage } = useSnackbar();
   const [spaces, setSpaces] = useSpaces();
-  const [user, setUser] = useUser();
+  const { user, setUser } = useUser();
 
   const [tokenGates, setTokenGates] = useState<TokenGateWithRoles[] | null>(null);
 

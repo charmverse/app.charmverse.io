@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import styled from '@emotion/styled';
 import { Box } from '@mui/material';
 import { BountyStatusChip } from 'components/bounties/components/BountyStatusBadge';
@@ -49,6 +47,7 @@ const BountyFooter = styled.div`
   justify-content: space-between;
   width: 100%;
   padding-top: ${({ theme }) => theme.spacing(1)};
+  margin-top: ${({ theme }) => theme.spacing(1)};
 `;
 
 const CurrencyIcon = styled.span`

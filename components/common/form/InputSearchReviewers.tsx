@@ -48,16 +48,16 @@ export default function InputSearchReviewers ({
       noOptionsText='No options available'
       // @ts-ignore - not sure why this fails
       options={
-        options
+      options
       }
       autoHighlight
       groupBy={(option) => option.group[0].toUpperCase() + option.group.slice(1)}
       getOptionLabel={(groupWithId) => {
-        const option = optionsRecord[groupWithId.id];
+        const option = optionsRecord[groupWithId.id] ?? {};
         if (option.group === 'user') {
           return cache.get(`@"ENS",102~,"${option.username}",${chainId},`) ?? option.username;
         }
-        return option.name;
+        return option.name ?? '';
       }}
       renderOption={(_props, option) => {
         if (option.group === 'role') {

@@ -181,12 +181,12 @@ function TransactionRow (
                   <UserDisplay avatarSize='small' user={snoozedUser} />
                   <Box display='flex' gap={1} alignItems='center'>
                     {snoozedUser.notificationState?.snoozeMessage && (
-                    <Tooltip arrow placement='top' title={snoozedUser.notificationState.snoozeMessage}>
-                      <EmailIcon
-                        fontSize='small'
-                        color='secondary'
-                      />
-                    </Tooltip>
+                      <Tooltip arrow placement='top' title={snoozedUser.notificationState.snoozeMessage}>
+                        <EmailIcon
+                          fontSize='small'
+                          color='secondary'
+                        />
+                      </Tooltip>
                     )}
                     <Typography variant='subtitle1' color='secondary'>
                       for {DateTime.fromJSDate(new Date(snoozedUser.notificationState?.snoozedUntil as Date))
@@ -286,7 +286,7 @@ interface GnosisTasksSectionProps {
 export default function GnosisTasksSection ({ error, mutateTasks, tasks }: GnosisTasksSectionProps) {
   const { data: safeData, mutate } = useMultiWalletSigs();
   const { snoozedForDate } = useTasksState();
-  const [user] = useUser();
+  const { user } = useUser();
   const gnosisSigner = useGnosisSigner();
 
   const isSnoozed = snoozedForDate !== null;

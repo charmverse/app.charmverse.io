@@ -1,21 +1,23 @@
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
+import charmClient from 'charmClient';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
 import { getCardComments } from 'components/common/BoardEditor/focalboard/src/store/comments';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { useBounties } from 'hooks/useBounties';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
 import { useVotes } from 'hooks/useVotes';
-import { IPagePermissionFlags } from 'lib/permissions/pages';
+import { AssignedBountyPermissions } from 'lib/bounties';
 import { Page, PageContent } from 'models';
-import { useRouter } from 'next/router';
-import { memo, useCallback } from 'react';
-import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
+import { memo, useCallback, useEffect, useState } from 'react';
+import { useElementSize } from 'usehooks-ts';
 import BountyProperties from './components/BountyProperties';
 import CreateVoteBox from './components/CreateVoteBox';
 import PageBanner from './components/PageBanner';
@@ -49,18 +51,33 @@ export interface DocumentPageProps {
 function DocumentPage ({ page, setPage, insideModal, readOnly = false }: DocumentPageProps) {
   const { pages, getPagePermissions } = usePages();
   const { cancelVote, castVote, deleteVote, votes, isLoading } = useVotes();
-  const { bounties } = useBounties();
-  const bounty = bounties.find(_bounty => _bounty.page?.id === page.id);
   const pagePermissions = getPagePermissions(page.id);
+  const { draftBounty } = useBounties();
+  // Only populate bounty permission data if this is a bounty page
+  const [bountyPermissions, setBountyPermissions] = useState<AssignedBountyPermissions | null>(null);
+  const [containerRef, { width: containerWidth }] = useElementSize();
+
+  async function refreshBountyPermissions (bountyId: string) {
+    setBountyPermissions(await charmClient.bounties.computePermissions({
+      resourceId: bountyId
+    }));
+  }
+
+  useEffect(() => {
+    if (page.bountyId) {
+      refreshBountyPermissions(page.bountyId);
+    }
+  }, [page.bountyId]);
 
   const cannotEdit = readOnly || !pagePermissions?.edit_content;
+  const cannotComment = readOnly || !pagePermissions?.comment;
 
   const pageVote = Object.values(votes).find(v => v.context === 'proposal');
 
   const board = useAppSelector((state) => {
     if (page.type === 'card' && page.parentId) {
       const parentPage = pages[page.parentId];
-      return parentPage?.boardId && parentPage?.type === 'board' ? state.boards.boards[parentPage.boardId] : null;
+      return parentPage?.boardId && (parentPage?.type.match(/board/)) ? state.boards.boards[parentPage.boardId] : null;
     }
     return null;
   });
@@ -107,97 +124,97 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
         }
       }}
     >
-      <Box sx={{
-        width: {
-          md: showPageActionSidebar ? 'calc(100% - 425px)' : '100%'
-        },
-        height: {
-          md: showPageActionSidebar ? 'calc(100vh - 65px)' : '100%'
-        },
-        overflow: {
-          md: showPageActionSidebar ? 'auto' : 'inherit'
-        }
-      }}
+      <Box
+        sx={{
+          width: {
+            md: showPageActionSidebar ? 'calc(100% - 425px)' : '100%'
+          },
+          height: {
+            md: showPageActionSidebar ? 'calc(100vh - 65px)' : '100%'
+          },
+          overflow: {
+            md: showPageActionSidebar ? 'auto' : 'inherit'
+          }
+        }}
       >
-        {page.deletedAt && <PageDeleteBanner pageId={page.id} />}
-        {page.headerImage && <PageBanner headerImage={page.headerImage} readOnly={cannotEdit} setPage={setPage} />}
-        <Container
-          top={pageTop}
-          fullWidth={page.fullWidth ?? false}
-        >
-          <CharmEditor
-            key={page.id}
-            content={page.content as PageContent}
-            onContentChange={updatePageContent}
-            readOnly={cannotEdit}
-            pageActionDisplay={!insideModal ? currentPageActionDisplay : null}
-            pageId={page.id}
-            disablePageSpecificFeatures={isSharedPage}
-            enableVoting={true}
+        <div ref={containerRef}>
+          {page.deletedAt && <PageDeleteBanner pageId={page.id} />}
+          {page.headerImage && <PageBanner headerImage={page.headerImage} readOnly={cannotEdit} setPage={setPage} />}
+          <Container
+            top={pageTop}
+            fullWidth={page.fullWidth ?? false}
           >
-            <PageHeader
-              headerImage={page.headerImage}
-              icon={page.icon}
-              title={page.title}
+            <CharmEditor
+              key={page.id}
+              content={page.content as PageContent}
+              onContentChange={updatePageContent}
               readOnly={cannotEdit}
-              setPage={setPage}
-            />
-            {page.type === 'proposal' && !isLoading && pageVote && (
-              <Box my={2}>
-                <VoteDetail
-                  cancelVote={cancelVote}
-                  deleteVote={deleteVote}
-                  castVote={castVote}
-                  vote={pageVote}
-                  detailed={false}
-                  isProposal={true}
-                />
-              </Box>
-            )}
-            <div className='focalboard-body'>
-              <div className='CardDetail content'>
-                {/* Property list */}
-                {card && board && (
-                <CardDetailProperties
-                  board={board}
-                  card={card}
-                  cards={cards}
-                  activeView={activeView}
-                  views={boardViews}
-                  readonly={cannotEdit}
-                  pageUpdatedAt={page.updatedAt.toString()}
-                  pageUpdatedBy={page.updatedBy}
-                />
-                )}
-                {!bounty && page.type === 'card' && (
-                  <>
-                    <hr />
+              pageActionDisplay={!insideModal ? currentPageActionDisplay : null}
+              pageId={page.id}
+              disablePageSpecificFeatures={isSharedPage}
+              enableVoting={true}
+              containerWidth={containerWidth}
+            >
+              <PageHeader
+                headerImage={page.headerImage}
+                icon={page.icon}
+                title={page.title}
+                readOnly={cannotEdit}
+                setPage={setPage}
+              />
+              {page.type === 'proposal' && !isLoading && pageVote && (
+                <Box my={2}>
+                  <VoteDetail
+                    cancelVote={cancelVote}
+                    deleteVote={deleteVote}
+                    castVote={castVote}
+                    vote={pageVote}
+                    detailed={false}
+                    isProposal={true}
+                  />
+                </Box>
+              )}
+              <div className='focalboard-body'>
+                <div className='CardDetail content'>
+                  {/* Property list */}
+                  {card && board && (
+                    <CardDetailProperties
+                      board={board}
+                      card={card}
+                      cards={cards}
+                      activeView={activeView}
+                      views={boardViews}
+                      readonly={cannotEdit}
+                      pageUpdatedAt={page.updatedAt.toString()}
+                      pageUpdatedBy={page.updatedBy}
+                    />
+                  )}
+                  {(draftBounty || page.bountyId) && (
+                    <BountyProperties
+                      bountyId={page.bountyId}
+                      pageId={page.id}
+                      readOnly={cannotEdit}
+                      permissions={bountyPermissions}
+                      refreshBountyPermissions={refreshBountyPermissions}
+                    />
+                  )}
+                  {(page.type === 'bounty' || page.type === 'card') && (
                     <CommentsList
                       comments={comments}
                       rootId={card?.rootId ?? page.id}
                       cardId={card?.id ?? page.id}
-                      readonly={cannotEdit}
+                      readonly={cannotComment}
                     />
-                  </>
-                )}
-                {bounty && (
-                  <BountyProperties bounty={bounty} readOnly={cannotEdit}>
-                    <CommentsList
-                      comments={comments}
-                      rootId={card?.rootId ?? page.spaceId}
-                      cardId={card?.id ?? page.id}
-                      readonly={cannotEdit}
-                    />
-                  </BountyProperties>
-                )}
+                  )}
+                </div>
               </div>
-            </div>
-          </CharmEditor>
+            </CharmEditor>
 
-          {page.type === 'proposal' && !isLoading && !pageVote && (
-            <CreateVoteBox />
-          )}
-        </Container>
+            {page.type === 'proposal' && !isLoading && !pageVote && (
+              <CreateVoteBox />
+            )}
+          </Container>
+        </div>
       </Box>
     </ScrollableWindow>
   );

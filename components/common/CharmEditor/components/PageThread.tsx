@@ -8,7 +8,7 @@ import { usePages } from 'hooks/usePages';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
-import { forwardRef, memo, MouseEvent, useState } from 'react';
+import { forwardRef, memo, MouseEvent, useRef, useState } from 'react';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import { PageContent } from 'models';
@@ -18,6 +18,7 @@ import { DateTime } from 'luxon';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { usePopupState, bindMenu } from 'material-ui-popup-state/hooks';
 import { BoxProps } from '@mui/system';
+import { usePreventReload } from 'hooks/usePreventReload';
 import InlineCharmEditor from '../InlineCharmEditor';
 import { checkForEmpty } from '../utils';
 import { scrollToThread } from './inlineComment/inlineComment.utils';
@@ -102,6 +103,10 @@ function AddCommentCharmEditor (
   const { addComment, threads } = useThreads();
   const thread = threads[threadId] as ThreadWithCommentsAndAuthors;
 
+  const touched = useRef(false);
+
+  usePreventReload(touched.current);
+
   return (
     <Box display='flex' px={1} pb={1} sx={sx} flexDirection='column' gap={1} mt={thread.comments.length !== 0 ? 1 : 0}>
       <InlineCharmEditor
@@ -112,6 +117,7 @@ function AddCommentCharmEditor (
         content={commentContent}
         onContentChange={({ doc }) => {
           setCommentContent(doc);
+          touched.current = true;
         }}
         readOnly={readOnly || disabled}
       />
@@ -241,11 +247,11 @@ const CommentDate = memo<{createdAt: Date, updatedAt?: Date | null}>(({ createdA
         </span>
       </Tooltip>
       {updatedAt && (
-      <Tooltip arrow placement='top' title={new Date(updatedAt).toLocaleString()}>
-        <span style={{ marginLeft: '4px' }}>
-          (edited)
-        </span>
-      </Tooltip>
+        <Tooltip arrow placement='top' title={new Date(updatedAt).toLocaleString()}>
+          <span style={{ marginLeft: '4px' }}>
+            (edited)
+          </span>
+        </Tooltip>
       )}
     </Typography>
   );
@@ -254,7 +260,7 @@ const CommentDate = memo<{createdAt: Date, updatedAt?: Date | null}>(({ createdA
 const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton = false, threadId, inline = false }, ref) => {
   showFindButton = showFindButton ?? (!inline);
   const { deleteThread, resolveThread, deleteComment, threads } = useThreads();
-  const [user] = useUser();
+  const { user } = useUser();
   const [isMutating, setIsMutating] = useState(false);
   const [editedCommentId, setEditedCommentId] = useState<null | string>(null);
   const { getPagePermissions, currentPageId } = usePages();

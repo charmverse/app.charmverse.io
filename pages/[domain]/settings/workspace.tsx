@@ -16,6 +16,7 @@ import Legend from 'components/settings/Legend';
 import ImportNotionWorkspace from 'components/settings/workspace/ImportNotionWorkspace';
 import Avatar from 'components/settings/workspace/LargeAvatar';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePreventReload } from 'hooks/usePreventReload';
 import { setTitle } from 'hooks/usePageTitle';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
@@ -30,12 +31,11 @@ export default function WorkspaceSettings () {
   const router = useRouter();
   const [space, setSpace] = useCurrentSpace();
   const [spaces, setSpaces] = useSpaces();
-  const [user] = useUser();
+  const { user } = useUser();
   const isAdmin = isSpaceAdmin(user, space?.id);
-
   const workspaceRemoveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-remove' });
   const workspaceLeaveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-leave' });
-
+  const unsavedChangesModalState = usePopupState({ variant: 'popover', popupId: 'unsaved-changes' });
   const {
     register,
     handleSubmit,
@@ -73,8 +73,11 @@ export default function WorkspaceSettings () {
     workspaceRemoveModalState.open();
   }
 
+  usePreventReload(isDirty);
+
   return (
     <>
+
       <Legend>Space Details</Legend>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid container direction='column' spacing={3}>
@@ -154,39 +157,53 @@ export default function WorkspaceSettings () {
         <ConnectSnapshot />
       </Box>
       {space && (
-      <ConfirmDeleteModal
-        title='Delete workspace'
-        onClose={closeInviteLinkDeleteModal}
-        open={workspaceRemoveModalState.isOpen}
-        buttonText={`Delete ${space.name}`}
-        question={`Are you sure you want to delete ${space.name}? This action cannot be undone`}
-        onConfirm={async () => {
-          if (isAdmin) {
-            await charmClient.deleteSpace(space.id);
+        <ConfirmDeleteModal
+          title='Delete workspace'
+          onClose={closeInviteLinkDeleteModal}
+          open={workspaceRemoveModalState.isOpen}
+          buttonText={`Delete ${space.name}`}
+          question={`Are you sure you want to delete ${space.name}? This action cannot be undone`}
+          onConfirm={async () => {
+            if (isAdmin) {
+              await charmClient.deleteSpace(space.id);
+              const filteredSpaces = spaces.filter(s => s.id !== space.id);
+              setSpaces(filteredSpaces);
+              window.location.href = filteredSpaces.length !== 0 ? `/${filteredSpaces[0].domain}` : '/signup';
+            }
+          }}
+        />
+      )}
+      {space && (
+        <ConfirmDeleteModal
+          title='Leave workspace'
+          onClose={() => {
+            workspaceLeaveModalState.close();
+          }}
+          open={workspaceLeaveModalState.isOpen}
+          buttonText={`Leave ${space.name}`}
+          question={`Are you sure you want to leave ${space.name}?`}
+          onConfirm={async () => {
+            await charmClient.leaveSpace(space.id);
             const filteredSpaces = spaces.filter(s => s.id !== space.id);
             setSpaces(filteredSpaces);
             window.location.href = filteredSpaces.length !== 0 ? `/${filteredSpaces[0].domain}` : '/signup';
-          }
-        }}
-      />
+          }}
+        />
       )}
-      {space && (
       <ConfirmDeleteModal
-        title='Leave workspace'
+        open={unsavedChangesModalState.isOpen}
+        title='You have unsaved changes'
         onClose={() => {
-          workspaceLeaveModalState.close();
+          // discard
+          unsavedChangesModalState.close();
         }}
-        open={workspaceLeaveModalState.isOpen}
-        buttonText={`Leave ${space.name}`}
-        question={`Are you sure you want to leave ${space.name}?`}
-        onConfirm={async () => {
-          await charmClient.leaveSpace(space.id);
-          const filteredSpaces = spaces.filter(s => s.id !== space.id);
-          setSpaces(filteredSpaces);
-          window.location.href = filteredSpaces.length !== 0 ? `/${filteredSpaces[0].domain}` : '/signup';
+        buttonText='Save changes'
+        question='Are you sure you want to discard unsaved changes'
+        onConfirm={() => {
+          // save
+          unsavedChangesModalState.close();
         }}
       />
-      )}
     </>
   );
 }

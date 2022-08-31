@@ -1,32 +1,30 @@
 
-import { Poap } from '@prisma/client';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { withSessionRoute } from 'lib/session/withSession';
-import { NextApiRequest, NextApiResponse } from 'next';
-import { getPOAPs, GetPoapsResponse, UpdatePoapsRequest } from 'lib/poap';
 import { InvalidStateError } from 'lib/middleware/errors';
+import { getPOAPs } from 'lib/blockchain/poaps';
+import { withSessionRoute } from 'lib/session/withSession';
+import { ExtendedPoap } from 'lib/blockchain/interfaces';
+import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { v4 as uuid } from 'uuid';
-import { ExtendedPoap } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  .get(getUserPoaps)
-  .put(updateUserPoaps);
+  .get(getUserPoaps);
 
-async function getUserPoaps (req: NextApiRequest, res: NextApiResponse<GetPoapsResponse | { error: any }>) {
-  const hiddenPoapIDs: Array<string> = (await prisma.poap.findMany({
+async function getUserPoaps (req: NextApiRequest, res: NextApiResponse<ExtendedPoap[]>) {
+  const hiddenPoapIDs: string[] = (await prisma.profileItem.findMany({
     where: {
       userId: req.session.user.id,
-      isHidden: true
+      isHidden: true,
+      type: 'poap'
     },
     select: {
-      tokenId: true
+      id: true
     }
-  })).map(p => p.tokenId);
+  })).map(p => p.id);
 
   const user = await prisma.user.findUnique({
     where: {
@@ -41,44 +39,13 @@ async function getUserPoaps (req: NextApiRequest, res: NextApiResponse<GetPoapsR
     throw new InvalidStateError('User not found');
   }
 
-  const poaps: Partial<ExtendedPoap>[] = await getPOAPs(user.addresses);
-  const hiddenPoaps = poaps.filter((poap: Partial<ExtendedPoap>) => hiddenPoapIDs.find((tokenId :string) => poap.tokenId === tokenId));
-  const visiblePoaps = poaps.filter((poap: Partial<ExtendedPoap>) => !hiddenPoapIDs.find((tokenId :string) => poap.tokenId === tokenId));
+  const poaps = await getPOAPs(user.addresses);
+  const poapsWithHidden = poaps.map(poap => ({
+    ...poap,
+    isHidden: hiddenPoapIDs.includes(poap.id)
+  }));
 
-  return res.status(200).json({
-    hiddenPoaps,
-    visiblePoaps
-  });
-}
-
-async function updateUserPoaps (req: NextApiRequest, res: NextApiResponse<any | {error: string}>) {
-
-  const { newShownPoaps, newHiddenPoaps }: UpdatePoapsRequest = req.body;
-
-  if (newShownPoaps.length) {
-    const ids: Array<string> = newShownPoaps.map((poap: Partial<ExtendedPoap>) => poap.tokenId || '');
-    await prisma.poap.deleteMany({
-      where: {
-        tokenId: {
-          in: ids
-        }
-      }
-    });
-  }
-
-  if (newHiddenPoaps.length) {
-    await prisma.poap.createMany({
-      data: newHiddenPoaps.map(poap => ({
-        id: uuid(),
-        tokenId: poap.tokenId,
-        walletAddress: poap.walletAddress,
-        userId: req.session.user.id,
-        isHidden: true
-      }) as Poap)
-    });
-  }
-
-  return res.status(200).json({});
+  return res.status(200).json(poapsWithHidden);
 }
 
 export default withSessionRoute(handler);

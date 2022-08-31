@@ -106,7 +106,7 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
       });
 
       await mutate(`pages/${space.id}`);
-      dispatch(initialLoad());
+      dispatch(initialLoad({ spaceId: space.id }));
     }
   }
 
@@ -167,12 +167,12 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
             <Typography variant='body2' color='secondary'>{Object.keys(archivedPages).length} pages</Typography>
           </Box>
           { archivedPagesExist && (
-          <TextField
-            placeholder='Filter by page title...'
-            fullWidth
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-          />
+            <TextField
+              placeholder='Filter by page title...'
+              fullWidth
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+            />
           )}
         </Box>
       )}

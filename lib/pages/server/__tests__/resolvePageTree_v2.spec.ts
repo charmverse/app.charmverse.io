@@ -167,4 +167,79 @@ describe('resolvePageTree', () => {
     validateRootNode(targetPage);
 
   });
+
+  it('should ignore deleted pages by default', async () => {
+
+    const rootPage = await createPage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    const childPage_1 = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      parentId: rootPage.id
+    });
+
+    const childPage_1_1 = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      parentId: childPage_1.id,
+      deletedAt: new Date()
+    });
+
+    const childPage_1_1_1 = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      parentId: childPage_1_1.id,
+      deletedAt: new Date()
+    });
+
+    const { parents, targetPage } = await resolvePageTree({ pageId: childPage_1.id });
+
+    expect(parents.length).toBe(1);
+    expect(parents[0].id).toBe(rootPage.id);
+
+    expect(targetPage.children.length).toBe(0);
+
+  });
+
+  it('should include deleted pages if requested', async () => {
+    const rootPage = await createPage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    const childPage_1 = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      parentId: rootPage.id
+    });
+
+    const childPage_1_1 = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      parentId: childPage_1.id,
+      deletedAt: new Date()
+    });
+
+    const childPage_1_1_1 = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      parentId: childPage_1_1.id,
+      deletedAt: new Date()
+    });
+
+    const { parents, targetPage } = await resolvePageTree({ pageId: childPage_1.id, includeDeletedPages: true });
+
+    expect(parents.length).toBe(1);
+    expect(parents[0].id).toBe(rootPage.id);
+
+    expect(targetPage.children.length).toBe(1);
+    expect(targetPage.children[0].id).toBe(childPage_1_1.id);
+
+    expect(targetPage.children[0].children.length).toBe(1);
+    expect(targetPage.children[0].children[0].id).toBe(childPage_1_1_1.id);
+
+  });
 });

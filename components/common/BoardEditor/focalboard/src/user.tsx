@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 
 export interface IUser {
     id: string,
@@ -11,10 +9,4 @@ export interface IUser {
     update_at: number,
     is_bot: boolean,
     wallet_address?: string
-}
-
-export interface UserWorkspace {
-    id: string
-    title: string
-    boardCount: number
 }

@@ -86,7 +86,7 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
 
   return (
     <Box mb={3}>
-      <Box display='flex' justifyContent='space-between' alignItems='center'>
+      <Box display='flex' justifyContent='space-between' alignItems='center' pb={0.5}>
         <Box display='flex' gap={1} alignItems='center'>
           <Typography variant='h6' sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
             {role.name} {role.source === 'guild_xyz' ? (
@@ -162,16 +162,16 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
       >
         {/* We can only rename roles if not managed by Guild.xyv */}
         {role.source !== 'guild_xyz' && (
-        <MenuItem
-          sx={{ padding: '3px 12px' }}
-          onClick={() => {
-            popupState.open();
-            menuState.close();
-          }}
-        >
-          <ListItemIcon><EditOutlinedIcon fontSize='small' /></ListItemIcon>
-          <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Rename</Typography>
-        </MenuItem>
+          <MenuItem
+            sx={{ padding: '3px 12px' }}
+            onClick={() => {
+              popupState.open();
+              menuState.close();
+            }}
+          >
+            <ListItemIcon><EditOutlinedIcon fontSize='small' /></ListItemIcon>
+            <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Rename</Typography>
+          </MenuItem>
         )}
         {/* Only admins can update role space permissions */}
         <MenuItem
