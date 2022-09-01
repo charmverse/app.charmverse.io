@@ -1,25 +1,26 @@
-import { Page, VoteContext, VoteStatus } from '@prisma/client';
-import { useState, useCallback, useEffect } from 'react';
-import { DateTime } from 'luxon';
-import { useRouter } from 'next/router';
-import { Tooltip, Typography, Box, Grid } from '@mui/material';
-import Link from 'components/common/Link';
-import GridHeader from 'components/common/Grid/GridHeader';
-import GridContainer from 'components/common/Grid/GridContainer';
-import LoadingComponent from 'components/common/LoadingComponent';
-import Button from 'components/common/Button';
-import useTasks from 'components/nexus/hooks/useTasks';
-import { humanFriendlyDate, toMonthDate } from 'lib/utilities/dates';
-import { usePages } from 'hooks/usePages';
+import { Box, Grid, Tooltip, Typography } from '@mui/material';
+import { VoteContext, VoteStatus } from '@prisma/client';
 import charmClient from 'charmClient';
-import { ExtendedVote } from 'lib/votes/interfaces';
+import Button from 'components/common/Button';
 import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
+import GridContainer from 'components/common/Grid/GridContainer';
+import GridHeader from 'components/common/Grid/GridHeader';
+import Link from 'components/common/Link';
+import LoadingComponent from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';
 import PageDialog from 'components/common/Page/PageDialog';
-import VoteIcon from './VoteIcon';
+import useTasks from 'components/nexus/hooks/useTasks';
+import { usePages } from 'hooks/usePages';
+import { IPageWithPermissions } from 'lib/pages';
+import { humanFriendlyDate, toMonthDate } from 'lib/utilities/dates';
+import { ExtendedVote } from 'lib/votes/interfaces';
+import { DateTime } from 'luxon';
+import { useRouter } from 'next/router';
+import { useCallback, useEffect, useState } from 'react';
 import NoVotesMessage from './NoVotesMessage';
-import VoteStatusChip from './VoteStatusChip';
 import VoteActionsMenu from './VoteActionsMenu';
+import VoteIcon from './VoteIcon';
+import VoteStatusChip from './VoteStatusChip';
 
 export interface VoteRow {
   id: string;
@@ -37,7 +38,7 @@ export default function VotesTable ({ votes, mutateVotes }: { votes?: (ExtendedV
   const { pages, setPages } = usePages();
   const { mutate: mutateTasks } = useTasks();
   const [activeVote, setActiveVote] = useState<ExtendedVote | null>(null);
-  const [activePage, setActivePage] = useState<Page | null>(null);
+  const [activePage, setActivePage] = useState<IPageWithPermissions | null>(null);
 
   const openPage = useCallback((pageId: string) => {
     const page = pages[pageId];

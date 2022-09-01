@@ -1,6 +1,6 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Box, Collapse, Divider, Tooltip, IconButton, Stack, TextField } from '@mui/material';
+import { Box, Collapse, Divider, IconButton, Stack, TextField, Tooltip } from '@mui/material';
 import { PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
@@ -13,24 +13,21 @@ import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole'
 import { CryptoCurrency, getChainById } from 'connectors';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { usePages } from 'hooks/usePages';
+import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
 import { ApplicationWithTransactions } from 'lib/applications/interfaces';
-import { countValidSubmissions } from 'lib/applications/shared';
 import { AssignedBountyPermissions, BountyPermissions, UpdateableBountyFields } from 'lib/bounties';
+import { BountyCreationData } from 'lib/bounties/interfaces';
 import { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import debouncePromise from 'lib/utilities/debouncePromise';
 import { isTruthy } from 'lib/utilities/types';
 import { BountyWithDetails } from 'models';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { BountyCreationData } from 'lib/bounties/interfaces';
-import BountyPropertiesHeader from './components/BountyPropertiesHeader';
-import BountyReviewers from './components/BountyReviewers';
-import BountySlots from './components/BountySlots';
-import BountySuggestionApproval from './components/BountySuggestionApproval';
 import BountyApplicantForm from './components/BountyApplicantForm';
 import BountyApplicantsTable from './components/BountyApplicantsTable';
+import BountyPropertiesHeader from './components/BountyPropertiesHeader';
+import BountySuggestionApproval from './components/BountySuggestionApproval';
 import MissingPagePermissions from './components/MissingPagePermissions';
 
 export default function BountyProperties (props: {
@@ -391,29 +388,7 @@ export default function BountyProperties (props: {
         pagePermissions={bountyPagePermissions}
         pageId={pageId}
       />
-      <Stack flexDirection='row' justifyContent='space-between' gap={2} alignItems='center'>
-        {readOnly && (
-          <Stack mb={1} width='100%'>
-            {bountyPermissions?.reviewer && bountyPermissions.reviewer.length > 0 && (
-              <BountyReviewers
-                bounty={currentBounty}
-                permissions={bountyPermissions}
-              />
-            )}
-            {/* Extra space so this looks like the focalboard properties */}
-            {
-                currentBounty.maxSubmissions && (
-                  <>
-                    <div style={{ marginTop: 2 }}></div>
-                    <BountySlots
-                      maxSubmissions={currentBounty.maxSubmissions}
-                      validSubmissions={countValidSubmissions(currentBounty.applications)}
-                    />
-                  </>
-                )
-              }
-          </Stack>
-        )}
+      <Box justifyContent='space-between' gap={2} alignItems='center'>
         {!readOnly && (
           <div
             className='octo-propertyrow'
@@ -460,7 +435,7 @@ export default function BountyProperties (props: {
             </div>
           </div>
         )}
-      </Stack>
+      </Box>
 
       {!readOnly && bountyProperties}
 

@@ -3,7 +3,7 @@ import { Page, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { IEventToLog, postToDiscord } from 'lib/log/userEvents';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { IPageWithPermissions } from 'lib/pages/server';
+import { IPageWithPermissions, PageWithProposal } from 'lib/pages/server';
 import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
@@ -11,6 +11,7 @@ import nc from 'next-connect';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 import log from 'lib/log';
+import { createProposal } from 'lib/proposal/createProposal';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -40,6 +41,7 @@ async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
   // Remove parent ID and pass it to the creation input
   // This became necessary after adding a formal parentPage relation related to page.parentId
   // We now need to specify this as a ParentPage.connect prisma argument instead of a raw string
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { createdBy, spaceId: droppedSpaceId, ...pageCreationData } = data;
   const typedPageCreationData = pageCreationData as any as Prisma.PageCreateInput;
 
@@ -55,7 +57,19 @@ async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
     }
   };
 
-  const page = await prisma.page.create({ data: typedPageCreationData });
+  let page: Page;
+
+  if (typedPageCreationData.type === 'proposal') {
+    page = await createProposal({
+      pageCreateInput: typedPageCreationData,
+      spaceId,
+      userId
+    });
+  }
+  else {
+    page = await prisma.page.create({ data: typedPageCreationData });
+  }
+
   try {
 
     const pageWithPermissions = await setupPermissionsAfterPageCreated(page.id);

@@ -40,6 +40,7 @@ import { BountiesApi } from './apis/bountiesApi';
 import { BlockchainApi } from './apis/blockchainApi';
 import { ProfileApi } from './apis/profileApi';
 import { CollablandApi } from './apis/collablandApi';
+import { ProposalsApi } from './apis/proposalsApi';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -47,13 +48,16 @@ type BlockUpdater = (blocks: FBBlock[]) => void;
 // CharmClient is the client interface to the server APIs
 //
 class CharmClient {
-  blockchain = new BlockchainApi();
 
-  profile = new ProfileApi();
+  blockchain = new BlockchainApi();
 
   bounties = new BountiesApi();
 
   collabland = new CollablandApi();
+
+  profile = new ProfileApi();
+
+  proposals = new ProposalsApi();
 
   async login (address: string) {
     const user = await http.POST<LoggedInUser>('/api/session/login', {
