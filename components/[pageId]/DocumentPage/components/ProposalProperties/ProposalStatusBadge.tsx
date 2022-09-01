@@ -1,11 +1,11 @@
 import styled from '@emotion/styled';
-import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import ContactSupportIcon from '@mui/icons-material/ContactSupport';
-import DoDisturbIcon from '@mui/icons-material/DoDisturb';
-import HowToVoteIcon from '@mui/icons-material/HowToVote';
-import ModeIcon from '@mui/icons-material/Mode';
-import ReviewsIcon from '@mui/icons-material/Reviews';
-import SecurityIcon from '@mui/icons-material/Security';
+import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
+import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
+import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
+import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
+import ReviewsOutlinedIcon from '@mui/icons-material/ReviewsOutlined';
 import { Chip, ChipProps } from '@mui/material';
 import { ProposalStatus } from '@prisma/client';
 import { ReactNode } from 'react';
@@ -15,30 +15,30 @@ export const PROPOSAL_STATUS_LABELS: Record<ProposalStatus, string> = {
   private_draft: 'Private draft',
   draft: 'Draft',
   discussion: 'Discussion',
-  review: 'In review',
+  review: 'In Review',
   reviewed: 'Reviewed',
-  vote_active: 'Active vote',
-  vote_closed: 'Closed vote'
+  vote_active: 'Vote Active',
+  vote_closed: 'Vote Closed'
 };
 
 const PROPOSAL_STATUS_ICONS : Record<ProposalStatus, ReactNode> = {
-  private_draft: <SecurityIcon />,
-  draft: <ModeIcon />,
-  discussion: <ContactSupportIcon />,
-  review: <ReviewsIcon />,
-  reviewed: <CheckBoxIcon />,
-  vote_active: <HowToVoteIcon />,
-  vote_closed: <DoDisturbIcon />
+  private_draft: <LockOutlinedIcon />,
+  draft: <ModeEditOutlineOutlinedIcon />,
+  discussion: <ChatOutlinedIcon />,
+  review: <ReviewsOutlinedIcon />,
+  reviewed: <CheckOutlinedIcon />,
+  vote_active: <HowToVoteOutlinedIcon />,
+  vote_closed: <BarChartOutlinedIcon />
 };
 
 export const ProposalStatusColors: Record<ProposalStatus, BrandColor> = {
-  private_draft: 'purple',
-  draft: 'teal',
-  discussion: 'yellow',
-  review: 'pink',
-  reviewed: 'gray',
-  vote_active: 'turquoise',
-  vote_closed: 'orange'
+  private_draft: 'gray',
+  draft: 'gray',
+  discussion: 'teal',
+  review: 'yellow',
+  reviewed: 'purple',
+  vote_active: 'pink',
+  vote_closed: 'red'
 };
 
 const StyledProposalStatusChip = styled(Chip)<{ status: ProposalStatus }>`
