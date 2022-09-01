@@ -19,34 +19,27 @@ import { Page } from '@prisma/client';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 
 type Props = {
-  deleteTemplate: (cardId: string) => void
-  addCardFromTemplate: (cardId: string) => void
-  showCard: (cardId: string) => void
-  view: BoardView
-  cardId: string
-  board: Board
+  deleteTemplate: (pageId: string) => void
+  addPageFromTemplate: (pageId: string) => void
+  showPage: (showPage: string) => void
+  pageId: string
+  isDefaultTemplate?: boolean
 }
 
-export const TemplateCardMenuItemWithActions = React.memo((props: Props) => {
-  const currentView = props.view;
-  const intl = useIntl();
+export const TemplatePageMenuItemWithActions = React.memo(({addPageFromTemplate, deleteTemplate, pageId, showPage, isDefaultTemplate}: Props) => {
 
   const {pages} = usePages(); 
 
   return (
     <Menu.Text
       icon={<DescriptionOutlinedIcon />}
-      id={`card-template-${props.cardId}`}
-      name={pages[props.cardId]?.title || 'Untitled'}
-      className={currentView.fields.defaultTemplateId ? '' : 'bold-menu-text'}
-      onClick={async() => {
-        const [blocks] = await mutator.duplicateCard({
-          board: props.board,
-          cardId: props.cardId,
-          cardPage: pages[props.cardId] as Page
-        });
-        console.log('Created blocks', blocks)
-        props.showCard(blocks[0]?.id)
+      id={`page-template-${pageId}`}
+      name={pages[pageId]?.title || 'Untitled'}
+      onClick={() => {
+        addPageFromTemplate(pageId);
+      }}
+      css={{
+        fontWeight: isDefaultTemplate ? 'bold' : 'normal'
       }}
       rightIcon={(
         <MenuWrapper stopPropagationOnToggle={true}>
@@ -58,9 +51,8 @@ export const TemplateCardMenuItemWithActions = React.memo((props: Props) => {
               icon={<ModeEditOutlineOutlinedIcon sx={{hidden: null}} />}
               id='default'
               name='Edit'
-              onClick={async () => {
-                props.showCard(props.cardId)
-                
+              onClick={() => {
+                showPage(pageId)
               }}
             />
 

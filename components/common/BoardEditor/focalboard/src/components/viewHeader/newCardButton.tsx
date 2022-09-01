@@ -11,7 +11,9 @@ import Menu from '../../widgets/menu';
 import EmptyCardButton from './emptyCardButton';
 import { usePages } from 'hooks/usePages';
 import { Board } from '../../blocks/board';
-import {TemplateCardMenuItemWithActions} from './templateCardMenuItemWithActions'
+import {TemplatePageMenuItemWithActions} from './templatePageMenuItemWithActions'
+import mutator from '../../mutator';
+import { Page } from '@prisma/client';
 
 type Props = {
     board: Board
@@ -29,6 +31,16 @@ const NewCardButton = React.memo((props: Props): JSX.Element => {
 
   const intl = useIntl();
   const {pages} = usePages()
+
+  async function addPageFromTemplate(pageId: string) {
+    const [blocks] = await mutator.duplicateCard({
+      board: props.board,
+      cardId: pageId,
+      cardPage: pages[pageId] as Page
+    });
+    console.log('Created blocks', blocks)
+    props.showCard(blocks[0]?.id)
+  }
 
   return (
     <ButtonWithMenu
@@ -56,13 +68,11 @@ const NewCardButton = React.memo((props: Props): JSX.Element => {
         )}
         {/** TODO: Add support for templates */}
         {cardTemplates.map((cardTemplate) => (
-          <TemplateCardMenuItemWithActions
-            addCardFromTemplate={() => null}
-            board={props.board}
-            cardId={cardTemplate.id}
+          <TemplatePageMenuItemWithActions
+            addPageFromTemplate={() => addPageFromTemplate(cardTemplate.id)}
+            pageId={cardTemplate.id}
             deleteTemplate={() => null}
-            view={props.view}
-            showCard={props.showCard}
+            showPage={props.showCard}
           />
       ))}
 
