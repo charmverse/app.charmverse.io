@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Box, Card, Chip, Divider, Stack, Typography } from '@mui/material';
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -38,8 +39,11 @@ export default function PublicProfile (props: UserDetailsProps) {
 
   const { user } = props;
 
-  const { aeToken } = useCollablandCredentials();
-  const { data: credentials, error } = useSWRImmutable(() => !!aeToken, () => charmClient.collabland.importCredentials(aeToken as string));
+  const { aeToken, setAeToken } = useCollablandCredentials();
+  const { data: credentials, error: collabError } = useSWRImmutable(
+    () => !!aeToken,
+    () => charmClient.collabland.importCredentials(aeToken as string)
+  );
 
   const { data, mutate, isValidating: isAggregatedDataValidating } = useSWRImmutable(user ? `userAggregatedData/${user.id}` : null, () => {
     return charmClient.getAggregatedData(user.id);
@@ -166,6 +170,13 @@ export default function PublicProfile (props: UserDetailsProps) {
   const allCommunities = communities.concat(discordCommunities)
     .sort((commA, commB) => commB.joinDate > commA.joinDate ? 1 : -1);
 
+  // clear the  api token if it fails once
+  useEffect(() => {
+    if (collabError) {
+      setAeToken('');
+    }
+  }, [collabError]);
+
   return (
     <Stack spacing={2}>
       <UserDetails {...props} />
@@ -180,7 +191,7 @@ export default function PublicProfile (props: UserDetailsProps) {
         {allCommunities.length > 0 ? (
           <>
             <SectionHeader title='Communities' count={allCommunities.length} />
-            <Stack gap={2}>
+            <Stack gap={2} mb={2}>
               {allCommunities.map(community => (
                 <CommunityRow
                   key={community.id}
@@ -199,7 +210,7 @@ export default function PublicProfile (props: UserDetailsProps) {
         {collectables.length > 0 ? (
           <>
             <SectionHeader title='NFTs & POAPs' count={collectables.length} />
-            <Stack gap={2}>
+            <Stack gap={2} mb={2}>
               {collectables.map(collectable => (
                 <CollectableRow
                   key={collectable.id}
@@ -214,12 +225,7 @@ export default function PublicProfile (props: UserDetailsProps) {
             </Stack>
           </>
         ) : null}
-        <Card>
-          <Box p={2} pb={0}>
-            <Typography fontWeight={700} fontSize={20}>Verified Credentials</Typography>
-          </Box>
-          <CollablandCredentials error={error} />
-        </Card>
+        <CollablandCredentials error={collabError} />
       </LoadingComponent>
     </Stack>
   );

@@ -25,6 +25,7 @@ export function useCollablandCredentials () {
 
   return {
     aeToken: tokenFromUrl || aeToken,
+    setAeToken,
     getCollablandLogin
   };
 }
