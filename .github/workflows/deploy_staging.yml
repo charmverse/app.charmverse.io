@@ -41,7 +41,7 @@ jobs:
               (with(.option_settings |
                   ."aws:elasticbeanstalk:application:environment" |
                   .COMPOSE_PROJECT_NAME; . = "pr${{ github.event.number }}" | . style="double"))
-              ' 00_env_vars.config
+              ' .ebextensions/00_env_vars.config
 
       - name: Create a github deployment
         uses: bobheadxi/deployments@v0.5.2
