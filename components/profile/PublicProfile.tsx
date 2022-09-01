@@ -150,16 +150,19 @@ export default function PublicProfile (props: UserDetailsProps) {
   const communities = (data?.communities ?? [])
     .filter((community) => readOnly ? !community.isHidden : true)
     .map((community) => {
+      community.bounties.forEach(bounty => {
+        bounty.hasCredential = bountyEvents.some((event) => event.subject.bountyId === bounty.bountyId);
+      });
       return {
-        ...community,
-        bounties: bountyEvents.filter(event => event.subject.workspaceId === community.id)
-          .map((event): ProfileBountyEvent => ({
-            bountyId: event.subject.bountyId,
-            bountyTitle: event.subject.bountyTitle,
-            createdAt: event.createdAt,
-            eventName: event.subject.eventName,
-            organizationId: event.subject.workspaceId
-          }))
+        ...community
+        // bounties: bountyEvents.filter(event => event.subject.workspaceId === community.id)
+        //   .map((event): ProfileBountyEvent => ({
+        //     bountyId: event.subject.bountyId,
+        //     bountyTitle: event.subject.bountyTitle,
+        //     createdAt: event.createdAt,
+        //     eventName: event.subject.eventName,
+        //     organizationId: event.subject.workspaceId
+        //   }))
       };
     });
 

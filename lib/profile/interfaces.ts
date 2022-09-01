@@ -12,4 +12,5 @@ export interface ProfileBountyEvent {
   organizationId: string;
   eventName: 'bounty_created' | 'bounty_started' | 'bounty_completed';
   bountyTitle?: string;
+  hasCredential?: boolean;
 }

@@ -161,7 +161,7 @@ export async function getAggregatedData (userId: string, apiToken?: string): Pro
       bountyTitle: bounty.page?.title,
       createdAt: bounty.createdAt.toISOString(),
       organizationId: bounty.spaceId,
-      eventName: 'bounty_created' as const
+      eventName: 'bounty_created'
     })),
     ...bountyApplications.map((app): ProfileBountyEvent => ({
       bountyId: app.bounty.id,
