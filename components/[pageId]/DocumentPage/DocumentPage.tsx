@@ -193,7 +193,7 @@ function DocumentPage ({ refreshPage, page, setPage, insideModal, readOnly = fal
                       pageUpdatedBy={page.updatedBy}
                     />
                   )}
-                  {page.proposal && <ProposalProperties refreshPage={refreshPage} proposal={page.proposal} />}
+                  {/* {page.proposalId && <ProposalProperties readOnly={readOnly} refreshPage={refreshPage} proposalId={page.proposalId} />} */}
                   {(draftBounty || page.bountyId) && (
                     <BountyProperties
                       bountyId={page.bountyId}
