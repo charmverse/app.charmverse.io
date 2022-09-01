@@ -29,11 +29,10 @@ interface Props {
   onMarkCompleted?: (bountyId: string) => void
   toolbar?: ReactNode
   hideToolsMenu?: boolean
-  refreshPage?: () => void
 }
 
 export default function PageDialog (props: Props) {
-  const { refreshPage, hideToolsMenu = false, page, bounty, onMarkCompleted, toolbar, readOnly, onClickDelete } = props;
+  const { hideToolsMenu = false, page, bounty, onMarkCompleted, toolbar, readOnly, onClickDelete } = props;
   const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'page-dialog' });
   const router = useRouter();
@@ -160,7 +159,7 @@ export default function PageDialog (props: Props) {
           )}
           onClose={onClose}
         >
-          {page && <DocumentPage refreshPage={refreshPage} insideModal page={page} setPage={setPage} readOnly={props.readOnly} />}
+          {page && <DocumentPage insideModal page={page} setPage={setPage} readOnly={props.readOnly} />}
         </Dialog>
       )}
     </RootPortal>
