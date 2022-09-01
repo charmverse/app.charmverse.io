@@ -6,8 +6,8 @@ import { isTruthy } from 'lib/utilities/types';
 import { getAllOrganizations, getProfile } from 'lib/deepdao/client';
 import { DeepDaoProfile, DeepDaoVote } from 'lib/deepdao/interfaces';
 import { CommunityDetails } from 'components/profile/components/CommunityRow';
-import { UserCommunity } from './interfaces';
-import { combineCommunityData, CommunityBounty } from './combineCommunityData';
+import { UserCommunity, ProfileBountyEvent } from './interfaces';
+import { combineCommunityData } from './combineCommunityData';
 
 export type AggregatedProfileData = Pick<DeepDaoProfile, 'totalProposals' | 'totalVotes'> & {
   bounties: number;
@@ -43,14 +43,24 @@ export async function getAggregatedData (userId: string, apiToken?: string): Pro
     prisma.bounty.findMany({
       where: {
         createdBy: user.id
+      },
+      include: {
+        page: true
       }
     }),
     prisma.application.findMany({
       where: {
-        createdBy: userId
+        createdBy: userId,
+        status: {
+          in: ['inProgress', 'complete', 'review', 'paid']
+        }
       },
       include: {
-        bounty: true
+        bounty: {
+          include: {
+            page: true
+          }
+        }
       }
     }),
     getSpacesOfUser(user.id)
@@ -61,7 +71,7 @@ export async function getAggregatedData (userId: string, apiToken?: string): Pro
     return logos;
   }, {});
 
-  const completedApplications = bountyApplications.filter(application => application.status === 'complete');
+  const completedApplications = bountyApplications.filter(application => application.status === 'complete' || application.status === 'paid');
 
   const hiddenItems = (await prisma.profileItem.findMany({
     where: {
@@ -145,14 +155,20 @@ export async function getAggregatedData (userId: string, apiToken?: string): Pro
     } as DeepDaoVote))
   ];
 
-  const bounties: CommunityBounty[] = [
-    ...bountiesCreated.map(bounty => ({
+  const bounties: ProfileBountyEvent[] = [
+    ...bountiesCreated.map((bounty): ProfileBountyEvent => ({
+      bountyId: bounty.id,
+      bountyTitle: bounty.page?.title,
       createdAt: bounty.createdAt.toISOString(),
-      organizationId: bounty.spaceId
+      organizationId: bounty.spaceId,
+      eventName: 'bounty_created' as const
     })),
-    ...bountyApplications.map(app => ({
+    ...bountyApplications.map((app): ProfileBountyEvent => ({
+      bountyId: app.bounty.id,
+      bountyTitle: app.bounty.page?.title,
       createdAt: app.createdAt.toISOString(),
-      organizationId: app.spaceId
+      organizationId: app.spaceId,
+      eventName: (app.status === 'complete' || app.status === 'paid') ? 'bounty_completed' : 'bounty_started'
     }))
   ];
 

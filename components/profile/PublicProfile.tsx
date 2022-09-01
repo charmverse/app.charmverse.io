@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
-import { Box, Card, Chip, Divider, Stack, Typography } from '@mui/material';
+import { Chip, Divider, Stack, Typography } from '@mui/material';
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { NftData, ExtendedPoap } from 'lib/blockchain/interfaces';
+import type { NftData, ExtendedPoap } from 'lib/blockchain/interfaces';
 import useSWRImmutable from 'swr/immutable';
+import { ProfileBountyEvent } from 'lib/profile/interfaces';
 import AggregatedData from './components/AggregatedData';
 import CollablandCredentials from './components/CollablandCredentials';
 import CommunityRow, { CommunityDetails } from './components/CommunityRow';
@@ -152,6 +153,13 @@ export default function PublicProfile (props: UserDetailsProps) {
       return {
         ...community,
         bounties: bountyEvents.filter(event => event.subject.workspaceId === community.id)
+          .map((event): ProfileBountyEvent => ({
+            bountyId: event.subject.bountyId,
+            bountyTitle: event.subject.bountyTitle,
+            createdAt: event.createdAt,
+            eventName: event.subject.eventName,
+            organizationId: event.subject.workspaceId
+          }))
       };
     });
 

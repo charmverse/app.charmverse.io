@@ -11,11 +11,10 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import { showDateWithMonthAndYear } from 'lib/utilities/dates';
 import { DeepDaoProposal, DeepDaoVote } from 'lib/deepdao/interfaces';
-import { UserCommunity } from 'lib/profile/interfaces';
+import { UserCommunity, ProfileBountyEvent } from 'lib/profile/interfaces';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import Avatar from 'components/common/Avatar';
-import type { CredentialsResult } from 'lib/collabland';
 import { ProfileItemContainer } from './CollectibleRow';
 
 const TASK_TABS = [
@@ -27,7 +26,7 @@ const TASK_TABS = [
 export type CommunityDetails = UserCommunity & {
   proposals: DeepDaoProposal[];
   votes: DeepDaoVote[];
-  bounties: CredentialsResult['bountyEvents'];
+  bounties: ProfileBountyEvent[];
   joinDate: string;
   latestEventDate?: string;
 }
@@ -159,7 +158,7 @@ function ProposalsPanel ({ events }: { events: DeepDaoProposal[] }) {
   );
 }
 
-function BountyEventsPanel ({ events }: { events: CredentialsResult['bountyEvents'] }) {
+function BountyEventsPanel ({ events }: { events: ProfileBountyEvent[] }) {
 
   return (
     <>
@@ -167,9 +166,9 @@ function BountyEventsPanel ({ events }: { events: CredentialsResult['bountyEvent
         events.sort((eventA, eventB) => eventA.createdAt > eventB.createdAt ? -1 : 1)
           .map((event, index) => (
             <EventRow
-              key={event.subject.bountyId}
+              key={event.bountyId}
               createdAt={event.createdAt}
-              title={`${bountyStatus(event.subject.eventName)}: ${event.subject.bountyTitle || 'Untitled'}`}
+              title={`${bountyStatus(event.eventName)}: ${event.bountyTitle || 'Untitled'}`}
               icon={null}
               eventNumber={index + 1}
             />
@@ -179,7 +178,7 @@ function BountyEventsPanel ({ events }: { events: CredentialsResult['bountyEvent
   );
 }
 
-function bountyStatus (status: 'bounty_created' | 'bounty_started' | 'bounty_completed') {
+function bountyStatus (status: ProfileBountyEvent['eventName']) {
   switch (status) {
     case 'bounty_created':
       return 'Created bounty';

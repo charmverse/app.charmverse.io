@@ -5,3 +5,11 @@ export interface UserCommunity {
   isHidden: boolean;
   logo: string | null;
 }
+
+export interface ProfileBountyEvent {
+  bountyId: string;
+  createdAt: string;
+  organizationId: string;
+  eventName: 'bounty_created' | 'bounty_started' | 'bounty_completed';
+  bountyTitle?: string;
+}

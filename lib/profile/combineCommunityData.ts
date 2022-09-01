@@ -1,20 +1,15 @@
 import type { CommunityDetails } from 'components/profile/components/CommunityRow';
 import { DeepDaoProposal, DeepDaoVote } from 'lib/deepdao/interfaces';
-import { UserCommunity } from './interfaces';
+import { UserCommunity, ProfileBountyEvent } from './interfaces';
 
-export interface CommunityBounty {
-  createdAt: string;
-  organizationId: string;
-}
-
-interface CommunitiesParams {
+interface CommunitiesData {
   communities: UserCommunity[];
   proposals: DeepDaoProposal[];
   votes: DeepDaoVote[];
-  bounties: CommunityBounty[];
+  bounties: ProfileBountyEvent[];
 }
 
-export function combineCommunityData (params: CommunitiesParams): CommunityDetails[] {
+export function combineCommunityData (params: CommunitiesData): CommunityDetails[] {
 
   const { communities, proposals, votes, bounties } = params;
 
