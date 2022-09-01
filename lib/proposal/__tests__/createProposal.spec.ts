@@ -53,7 +53,7 @@ describe('Creates a page and proposal with relevant configuration', () => {
       type: 'proposal',
       proposal: expect.objectContaining({
         authors: [{
-          proposalId: expect.any(String),
+          proposalId: pageWithProposal.id,
           userId: user.id
         }],
         reviewers: []

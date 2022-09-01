@@ -53,6 +53,7 @@ async function getProposalController (req: NextApiRequest, res: NextApiResponse<
 async function updateProposalController (req: NextApiRequest, res: NextApiResponse) {
 
   const proposalId = req.query.id as string;
+  const userId = req.session.user.id;
 
   const { authors, reviewers } = req.body;
 
@@ -70,9 +71,21 @@ async function updateProposalController (req: NextApiRequest, res: NextApiRespon
     throw new NotFoundError();
   }
 
-  const isCurrentUserProposalAuthor = proposal.authors.some(author => author.userId === req.session.user.id);
+  const computed = await computeUserPagePermissions({
+    // Proposal id is the same as page
+    pageId: proposal?.id,
+    userId
+  });
 
-  if (!isCurrentUserProposalAuthor) {
+  // TODO: Needs to be updated
+  if (computed.read !== true) {
+    throw new NotFoundError();
+  }
+
+  const isCurrentUserProposalAuthor = proposal.authors.some(author => author.userId === userId);
+
+  // TODO: Is this condition needed as the permissions can be obtained from above
+  if (!isCurrentUserProposalAuthor || (proposal.status !== 'discussion' && proposal.status !== 'private_draft' && proposal.status !== 'draft')) {
     throw new UnauthorisedActionError();
   }
 

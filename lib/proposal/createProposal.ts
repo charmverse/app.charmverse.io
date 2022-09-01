@@ -1,6 +1,5 @@
-import { Page, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { PageWithProposal } from 'lib/pages';
 import { v4 } from 'uuid';
 
 export async function createProposal ({
@@ -36,6 +35,14 @@ export async function createProposal ({
               }
             }
           }
+        }
+      }
+    },
+    include: {
+      proposal: {
+        include: {
+          authors: true,
+          reviewers: true
         }
       }
     }
