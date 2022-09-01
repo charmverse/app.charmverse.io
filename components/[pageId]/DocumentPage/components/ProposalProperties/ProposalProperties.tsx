@@ -6,25 +6,29 @@ import { InputSearchContributorBase } from 'components/common/form/InputSearchCo
 import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
 import { Contributor, useContributors } from 'hooks/useContributors';
 import useRoles from 'hooks/useRoles';
-import { ProposalWithUsers } from 'lib/proposal/interface';
 import { ListSpaceRolesResponse } from 'pages/api/roles';
+import useSWR from 'swr';
 import { ProposalStatusChip } from './ProposalStatusBadge';
 
 interface ProposalPropertiesProps {
-  proposal: ProposalWithUsers,
+  proposalId: string,
   readOnly?: boolean
-  refreshPage?: () => void
 }
 
-export default function ProposalProperties ({ refreshPage, proposal, readOnly }: ProposalPropertiesProps) {
-  const { status } = proposal;
-
-  const canUpdateAuthors = status === 'draft' || status === 'private_draft' || status === 'discussion';
-  const canUpdateReviewers = status === 'draft' || status === 'private_draft';
+export default function ProposalProperties ({ proposalId, readOnly }: ProposalPropertiesProps) {
+  const { data: proposal, mutate: refreshProposal } = useSWR(`proposal/${proposalId}`, () => charmClient.proposals.getProposal(proposalId));
 
   const [contributors] = useContributors();
   const { roles = [] } = useRoles();
 
+  if (!proposal) {
+    return null;
+  }
+
+  const { status } = proposal;
+
+  const canUpdateAuthors = status === 'draft' || status === 'private_draft' || status === 'discussion';
+  const canUpdateReviewers = status === 'draft' || status === 'private_draft';
   const reviewerOptionsRecord: Record<string, ({group: 'role'} & ListSpaceRolesResponse) | ({group: 'user'} & Contributor)> = {};
 
   contributors.forEach(contributor => {
@@ -98,9 +102,7 @@ export default function ProposalProperties ({ refreshPage, proposal, readOnly }:
                     authors: (_contributors as Contributor[]).map(contributor => contributor.id),
                     reviewers: proposal.reviewers.map(reviewer => ({ group: reviewer.group, id: (reviewer.group === 'role' ? reviewer.roleId : reviewer.userId) as string }))
                   });
-                  if (refreshPage) {
-                    refreshPage();
-                  }
+                  refreshProposal();
                 }
               }}
               disabled={readOnly || !canUpdateAuthors}
@@ -137,9 +139,7 @@ export default function ProposalProperties ({ refreshPage, proposal, readOnly }:
                   authors: proposal.authors.map(author => author.userId),
                   reviewers: options.map(option => ({ group: option.group, id: option.id }))
                 });
-                if (refreshPage) {
-                  refreshPage();
-                }
+                refreshProposal();
               }}
               sx={{
                 width: '100%'
