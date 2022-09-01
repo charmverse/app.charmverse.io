@@ -3,7 +3,7 @@ import { Page, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { IEventToLog, postToDiscord } from 'lib/log/userEvents';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { IPageWithPermissions } from 'lib/pages/server';
+import { IPageWithPermissions, PageWithProposal } from 'lib/pages/server';
 import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
@@ -11,6 +11,7 @@ import nc from 'next-connect';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 import log from 'lib/log';
+import { createProposal } from 'lib/proposal/createProposal';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -56,7 +57,18 @@ async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
     }
   };
 
-  const page = await prisma.page.create({ data: typedPageCreationData });
+  let page: Page;
+
+  if (typedPageCreationData.type === 'proposal') {
+    page = await createProposal({
+      pageCreateInput: typedPageCreationData,
+      spaceId,
+      userId
+    });
+  }
+  else {
+    page = await prisma.page.create({ data: typedPageCreationData });
+  }
 
   try {
 

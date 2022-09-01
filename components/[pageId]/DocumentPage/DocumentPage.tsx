@@ -13,6 +13,7 @@ import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
 import { useVotes } from 'hooks/useVotes';
 import { AssignedBountyPermissions } from 'lib/bounties';
+import { IPageWithPermissions } from 'lib/pages';
 import { Page, PageContent } from 'models';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
@@ -23,6 +24,7 @@ import CreateVoteBox from './components/CreateVoteBox';
 import PageBanner from './components/PageBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
 import PageHeader from './components/PageHeader';
+import { ProposalProperties } from './components/ProposalProperties';
 
 const CharmEditor = dynamic(() => import('components/common/CharmEditor'), {
   ssr: false
@@ -43,7 +45,8 @@ export const Container = styled(Box)<{ top: number, fullWidth?: boolean }>`
 `;
 
 export interface DocumentPageProps {
-  page: Page, setPage: (p: Partial<Page>) => void,
+  page: IPageWithPermissions,
+  setPage: (p: Partial<Page>) => void,
   readOnly?: boolean,
   insideModal?: boolean
 }
@@ -189,6 +192,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
                       pageUpdatedBy={page.updatedBy}
                     />
                   )}
+                  {page.proposalId && <ProposalProperties readOnly={readOnly} proposalId={page.proposalId} />}
                   {(draftBounty || page.bountyId) && (
                     <BountyProperties
                       bountyId={page.bountyId}
