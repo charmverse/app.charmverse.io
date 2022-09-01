@@ -1,15 +1,15 @@
-import { Page } from '@prisma/client';
 import Button from 'components/common/Button';
 import PageDialog from 'components/common/Page/PageDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
+import { IPageWithPermissions } from 'lib/pages';
 import { addPage } from 'lib/pages/addPage';
 import { useState } from 'react';
 
 export default function NewProposalButton () {
   const { user } = useUser();
   const [currentSpace] = useCurrentSpace();
-  const [page, setPage] = useState<Page | null>(null);
+  const [page, setPage] = useState<IPageWithPermissions | null>(null);
 
   async function onClickCreate () {
     if (currentSpace && user) {

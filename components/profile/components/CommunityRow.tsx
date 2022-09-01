@@ -159,7 +159,6 @@ function ProposalsPanel ({ events }: { events: DeepDaoProposal[] }) {
 }
 
 function BountyEventsPanel ({ events }: { events: ProfileBountyEvent[] }) {
-
   return (
     <>
       {

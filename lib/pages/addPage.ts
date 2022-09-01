@@ -9,6 +9,7 @@ import { BoardView } from 'lib/focalboard/boardView';
 import { NextRouter } from 'next/router';
 import { mutate } from 'swr';
 import { v4 } from 'uuid';
+import { IPageWithPermissions } from './interfaces';
 import { getPagePath } from './utils';
 
 export type NewPageInput = Partial<Page> & { spaceId: string, createdBy: string, shouldCreateDefaultBoardData?: boolean };
@@ -17,12 +18,12 @@ interface AddPageResponse {
   board: Board | null;
   view: BoardView | null;
   cards: Card[];
-  page: Page;
+  page: IPageWithPermissions;
 }
 
 export async function addPage ({ createdBy, spaceId, shouldCreateDefaultBoardData, ...page }: NewPageInput): Promise<AddPageResponse> {
 
-  const pageId = v4();
+  const pageId = page?.id || v4();
 
   shouldCreateDefaultBoardData = shouldCreateDefaultBoardData ?? true;
   const isBoardPage = (page.type?.match(/board/));
@@ -40,7 +41,7 @@ export async function addPage ({ createdBy, spaceId, shouldCreateDefaultBoardDat
     spaceId,
     title: '',
     type: page.type ?? 'page',
-    ...(page ?? {})
+    ...page
   };
 
   const newPage = await charmClient.createPage(pageProperties);

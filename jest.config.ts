@@ -1,4 +1,3 @@
-import path from 'node:path';
 import createJestConfig from 'testing/createJestConfig';
 /*
  * For a detailed explanation regarding each configuration property and type check, visit:
@@ -40,7 +39,6 @@ export const jestConfig = {
   transform: {
     '^.+\\.(ts)$': 'ts-jest'
   }
-
 };
 
 export default createJestConfig(jestConfig);

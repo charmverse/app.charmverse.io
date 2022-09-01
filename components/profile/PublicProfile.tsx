@@ -233,7 +233,7 @@ export default function PublicProfile (props: UserDetailsProps) {
             </Stack>
           </>
         ) : null}
-        <CollablandCredentials error={collabError} />
+        {/* <CollablandCredentials error={collabError} /> */}
       </LoadingComponent>
     </Stack>
   );

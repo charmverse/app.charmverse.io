@@ -86,7 +86,15 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
   const currentPage = pages[pageId];
   const memoizedCurrentPage = useMemo(
     () => pages[pageId],
-    [pageId, currentPage?.headerImage, currentPage?.icon, currentPage?.title, currentPage?.deletedAt, currentPage?.fullWidth, currentPagePermissions]
+    [
+      pageId,
+      currentPage?.headerImage,
+      currentPage?.icon,
+      currentPage?.title,
+      currentPage?.deletedAt,
+      currentPage?.fullWidth,
+      currentPagePermissions
+    ]
   );
 
   if (isAccessDenied) {
