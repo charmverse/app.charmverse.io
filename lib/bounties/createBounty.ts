@@ -156,5 +156,4 @@ export async function createBounty ({
   }
 
   return getBountyOrThrow(bountyId);
-
 }
