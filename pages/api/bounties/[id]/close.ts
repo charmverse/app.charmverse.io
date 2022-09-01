@@ -43,7 +43,7 @@ async function closeBountyController (req: NextApiRequest, res: NextApiResponse<
       bountyId,
       userId: application.createdBy
     })
-      ?.catch(error => {
+      .catch(error => {
         log.error('Error creating a collabland VC for completing bounty', error);
       });
   }
