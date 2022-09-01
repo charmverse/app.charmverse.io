@@ -6,6 +6,7 @@ import { InputSearchContributorBase } from 'components/common/form/InputSearchCo
 import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
 import { Contributor, useContributors } from 'hooks/useContributors';
 import useRoles from 'hooks/useRoles';
+import { useUser } from 'hooks/useUser';
 import { ListSpaceRolesResponse } from 'pages/api/roles';
 import useSWR from 'swr';
 import { ProposalStatusChip } from './ProposalStatusBadge';
@@ -20,6 +21,7 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
 
   const [contributors] = useContributors();
   const { roles = [] } = useRoles();
+  const { user } = useUser();
 
   if (!proposal) {
     return null;
@@ -100,12 +102,12 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
                 if ((_contributors as Contributor[]).length !== 0) {
                   await charmClient.proposals.updateProposal(proposal.id, {
                     authors: (_contributors as Contributor[]).map(contributor => contributor.id),
-                    reviewers: proposal.reviewers.map(reviewer => ({ group: reviewer.group, id: (reviewer.group === 'role' ? reviewer.roleId : reviewer.userId) as string }))
+                    reviewers: proposal.reviewers.map(reviewer => ({ group: reviewer.roleId ? 'role' : 'user', id: reviewer.roleId ?? reviewer.userId as string }))
                   });
                   refreshProposal();
                 }
               }}
-              disabled={readOnly || !canUpdateAuthors}
+              disabled={!user || readOnly || !canUpdateAuthors || (user && !proposal.authors.map(author => author.userId).includes(user.id))}
               readOnly={readOnly}
               options={contributors}
               sx={{
@@ -129,11 +131,11 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
           </div>
           <div style={{ width: '100%' }}>
             <InputSearchReviewers
-              disabled={readOnly || !canUpdateReviewers}
+              disabled={!user || readOnly || !canUpdateReviewers || (user && !proposal.authors.map(author => author.userId).includes(user.id))}
               readOnly={readOnly}
-              value={proposal.reviewers.map(reviewer => reviewerOptionsRecord[(reviewer.group === 'role' ? reviewer.roleId : reviewer.userId) as string])}
+              value={proposal.reviewers.map(reviewer => reviewerOptionsRecord[(reviewer.roleId ?? reviewer.userId) as string])}
               disableCloseOnSelect={true}
-              excludedIds={proposal.reviewers.map(reviewer => (reviewer.group === 'role' ? reviewer.roleId : reviewer.userId) as string)}
+              excludedIds={proposal.reviewers.map(reviewer => (reviewer.roleId ?? reviewer.userId) as string)}
               onChange={async (e, options) => {
                 await charmClient.proposals.updateProposal(proposal.id, {
                   authors: proposal.authors.map(author => author.userId),

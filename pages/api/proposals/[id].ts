@@ -43,10 +43,6 @@ async function getProposalController (req: NextApiRequest, res: NextApiResponse<
     throw new NotFoundError();
   }
 
-  if (proposal.status === 'private_draft' && !proposal.authors.some(author => author.userId === userId)) {
-    throw new UnauthorisedActionError();
-  }
-
   return res.status(200).json(proposal);
 }
 

@@ -1,4 +1,3 @@
-import { PrismaPromise, ProposalReviewerGroup } from '@prisma/client';
 import type { UpdateProposalRequest } from 'charmClient/apis/proposalsApi';
 import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
@@ -12,13 +11,13 @@ export async function updateProposal ({
 }: {
   proposal: ProposalWithUsers,
 } & UpdateProposalRequest) {
-  const { status, id: proposalId, authors: existingAuthors, reviewers: existingReviewers } = proposal;
+  const { status, authors: existingAuthors, reviewers: existingReviewers } = proposal;
 
   const newAuthors = authors.filter(author => !existingAuthors.some(existingAuthor => existingAuthor.userId === author));
   const deletedAuthors = existingAuthors.filter(existingAuthor => !authors.some(author => existingAuthor.userId === author));
 
-  const existingReviewerRoles = existingReviewers.filter(existingReviewer => existingReviewer.roleId && existingReviewer.group === 'role');
-  const existingReviewerUsers = existingReviewers.filter(existingReviewer => existingReviewer.userId && existingReviewer.group === 'user');
+  const existingReviewerRoles = existingReviewers.filter(existingReviewer => existingReviewer.roleId);
+  const existingReviewerUsers = existingReviewers.filter(existingReviewer => existingReviewer.userId);
 
   const reviewerRoles = reviewers.filter(reviewer => reviewer.group === 'role');
   const reviewerUsers = reviewers.filter(reviewer => reviewer.group === 'user');
@@ -37,8 +36,6 @@ export async function updateProposal ({
     .filter(existingReviewer => !reviewerUsers
       .some(reviewer => (existingReviewer.userId === reviewer.id)));
 
-  const transactionPipeline: PrismaPromise<any>[] = [];
-
   if (authors.length === 0) {
     throw new InvalidStateError('Proposal must have atleast 1 author');
   }
@@ -53,68 +50,29 @@ export async function updateProposal ({
     throw new UnauthorisedActionError();
   }
 
-  if (newAuthors.length) {
-    transactionPipeline.push(
-      prisma.proposalAuthor.createMany({
-        data: newAuthors.map(author => ({ proposalId, userId: author }))
-      })
-    );
-  }
+  await prisma.$transaction([
+    prisma.proposalAuthor.deleteMany({
+      where: {
+        proposalId: proposal.id
+      }
+    }),
+    prisma.proposalAuthor.createMany({
+      data: authors.map(author => ({ proposalId: proposal.id, userId: author }))
+    })
+  ]);
 
-  if (deletedAuthors.length) {
-    transactionPipeline.push(
-      prisma.proposalAuthor.deleteMany({
-        where: {
-          proposalId,
-          userId: {
-            in: deletedAuthors.map(deletedAuthor => deletedAuthor.userId)
-          }
-        }
-      })
-    );
-  }
-
-  if (newReviewerRoles.length) {
-    transactionPipeline.push(
-      prisma.proposalReviewer.createMany({
-        data: newReviewerRoles.map(reviewer => ({ proposalId, roleId: reviewer.id, group: 'role' as ProposalReviewerGroup }))
-      })
-    );
-  }
-
-  if (newReviewerUsers.length) {
-    transactionPipeline.push(
-      prisma.proposalReviewer.createMany({
-        data: newReviewerUsers.map(reviewer => ({ proposalId, userId: reviewer.id, group: 'user' as ProposalReviewerGroup }))
-      })
-    );
-  }
-
-  if (deletedReviewerRoles.length) {
-    transactionPipeline.push(
-      prisma.proposalReviewer.deleteMany({
-        where: {
-          proposalId,
-          roleId: {
-            in: deletedReviewerRoles.map(deletedReviewer => deletedReviewer.roleId as string)
-          }
-        }
-      })
-    );
-  }
-
-  if (deletedReviewerUsers.length) {
-    transactionPipeline.push(
-      prisma.proposalReviewer.deleteMany({
-        where: {
-          proposalId,
-          userId: {
-            in: deletedReviewerUsers.map(deletedReviewer => deletedReviewer.userId as string)
-          }
-        }
-      })
-    );
-  }
-
-  await prisma.$transaction(transactionPipeline);
+  await prisma.$transaction([
+    prisma.proposalReviewer.deleteMany({
+      where: {
+        proposalId: proposal.id
+      }
+    }),
+    prisma.proposalReviewer.createMany({
+      data: reviewers.map(reviewer => ({
+        proposalId: proposal.id,
+        userId: reviewer.group === 'user' ? reviewer.id : null,
+        roleId: reviewer.group === 'role' ? reviewer.id : null
+      }))
+    })
+  ]);
 }

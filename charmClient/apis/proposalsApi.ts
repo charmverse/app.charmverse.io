@@ -1,11 +1,10 @@
-import { ProposalReviewerGroup } from '@prisma/client';
 import * as http from 'adapters/http';
 import { ProposalWithUsers } from 'lib/proposal/interface';
 
 export interface UpdateProposalRequest {
   authors: string[]
   reviewers: {
-    group: ProposalReviewerGroup
+    group: 'role' | 'user'
     id: string
   }[]
 }

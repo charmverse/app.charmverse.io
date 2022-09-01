@@ -670,14 +670,13 @@ model ProposalAuthor {
 }
 
 model ProposalReviewer {
-  id         String                @id @default(uuid()) @db.Uuid
-  proposalId String                @db.Uuid
-  proposal   Proposal              @relation(fields: [proposalId], references: [id], onDelete: Cascade)
-  roleId     String?               @db.Uuid
-  userId     String?               @db.Uuid
-  role       Role?                 @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  reviewer   User?                 @relation(fields: [userId], references: [id], onDelete: Cascade)
-  group      ProposalReviewerGroup
+  id         String   @id @default(uuid()) @db.Uuid
+  proposalId String   @db.Uuid
+  proposal   Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  roleId     String?  @db.Uuid
+  userId     String?  @db.Uuid
+  role       Role?    @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  reviewer   User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, proposalId], name: "userId_proposalId")
   @@unique([roleId, proposalId], name: "roleId_proposalId")
