@@ -21,6 +21,7 @@ import { useElementSize } from 'usehooks-ts';
 import BountyProperties from './components/BountyProperties';
 import CreateVoteBox from './components/CreateVoteBox';
 import PageBanner from './components/PageBanner';
+import { PageTemplateBanner } from './components/PageTemplateBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
 import PageHeader from './components/PageHeader';
 
@@ -141,6 +142,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
       >
         <div ref={containerRef}>
           {page.deletedAt && <PageDeleteBanner pageId={page.id} />}
+          <PageTemplateBanner pageId={page.id} />
           {page.headerImage && <PageBanner headerImage={page.headerImage} readOnly={cannotEdit} setPage={setPage} />}
           <Container
             top={pageTop}
