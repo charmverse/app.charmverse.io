@@ -11,7 +11,7 @@ export async function createProposal ({
   pageCreateInput: Prisma.PageCreateInput
   spaceId: string
   userId: string
-}): Promise<PageWithProposal | null> {
+}): Promise<PageWithProposal> {
   const proposalId = v4();
   // Making the page id same as proposalId
   const pageData: Prisma.PageCreateInput = { ...pageCreateInput, id: proposalId };

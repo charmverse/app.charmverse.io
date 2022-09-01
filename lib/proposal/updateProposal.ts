@@ -1,4 +1,5 @@
 import { PrismaPromise, ProposalReviewerGroup } from '@prisma/client';
+import type { UpdateProposalRequest } from 'charmClient/apis/proposalsApi';
 import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
@@ -10,12 +11,7 @@ export async function updateProposal ({
   reviewers
 }: {
   proposal: ProposalWithUsers,
-  authors: string[],
-  reviewers: {
-    id: string,
-    group: ProposalReviewerGroup
-  }[]
-}) {
+} & UpdateProposalRequest) {
   const { status, id: proposalId, authors: existingAuthors, reviewers: existingReviewers } = proposal;
 
   const newAuthors = authors.filter(author => !existingAuthors.some(existingAuthor => existingAuthor.userId === author));

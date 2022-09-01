@@ -1,5 +1,13 @@
+import { ProposalReviewerGroup } from '@prisma/client';
 import * as http from 'adapters/http';
-import { UpdateProposalRequest } from 'lib/proposal/interface';
+
+export interface UpdateProposalRequest {
+  authors: string[]
+  reviewers: {
+    group: ProposalReviewerGroup
+    id: string
+  }[]
+}
 
 export class ProposalsApi {
   updateProposal (proposalId: string, data: UpdateProposalRequest) {

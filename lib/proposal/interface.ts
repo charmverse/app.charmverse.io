@@ -1,11 +1,6 @@
-import { Proposal, ProposalAuthor, ProposalReviewer, ProposalReviewerGroup } from '@prisma/client';
+import { Proposal, ProposalAuthor, ProposalReviewer } from '@prisma/client';
 
-export interface UpdateProposalRequest {
-  authors: string[]
-  reviewers: {
-    group: ProposalReviewerGroup
-    id: string
-  }[]
+export interface ProposalWithUsers extends Proposal {
+  authors: ProposalAuthor[],
+  reviewers: ProposalReviewer[]
 }
-
-export type ProposalWithUsers = Proposal & {authors: ProposalAuthor[], reviewers: ProposalReviewer[]}

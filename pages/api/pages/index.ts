@@ -63,7 +63,7 @@ async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
       pageCreateInput: typedPageCreationData,
       spaceId,
       userId
-    }) as PageWithProposal;
+    });
   }
   else {
     page = await prisma.page.create({ data: typedPageCreationData });
