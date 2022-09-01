@@ -73,7 +73,6 @@ describe('GET /api/proposals/[id] - Get proposal', () => {
       ]),
       reviewers: [
         expect.objectContaining({
-          group: 'user',
           id: expect.any(String),
           roleId: null,
           proposalId: pageWithProposal.proposalId,
@@ -109,26 +108,5 @@ describe('GET /api/proposals/[id] - Get proposal', () => {
       .get(`/api/proposals/${pageWithProposal.proposalId}`)
       .set('Cookie', authorCookie)
       .expect(404));
-  });
-
-  it('should throw error if the proposal is in private_draft and user is not an author', async () => {
-    const pageWithProposal = await createProposalWithUsers({
-      spaceId: space.id,
-      userId: author.id,
-      authors: [],
-      reviewers: [reviewer.id],
-      proposalStatus: 'private_draft'
-    });
-
-    await upsertPermission(pageWithProposal.id, {
-      permissionLevel: 'full_access',
-      pageId: pageWithProposal.id,
-      userId: reviewer.id
-    });
-
-    (await request(baseUrl)
-      .get(`/api/proposals/${pageWithProposal.proposalId}`)
-      .set('Cookie', reviewerCookie)
-      .expect(401));
   });
 });
