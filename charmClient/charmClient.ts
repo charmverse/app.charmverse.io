@@ -27,7 +27,7 @@ import type { ConnectDiscordPayload, ConnectDiscordResponse } from 'pages/api/di
 import type { ImportDiscordRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
 import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import type { InviteLinkPopulated } from 'pages/api/invites/index';
-import type { PublicUser } from 'pages/api/public/profile/[userPath]';
+import type { PublicUser } from 'pages/api/public/profile/[userId]';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
@@ -593,8 +593,8 @@ class CharmClient {
     return http.POST('/api/tasks/mark', tasks);
   }
 
-  getAggregatedData (userPath: string) {
-    return http.GET<AggregatedProfileData>(`/api/public/profile/${userPath}/aggregate`);
+  getAggregatedData (userId: string) {
+    return http.GET<AggregatedProfileData>(`/api/public/profile/${userId}/aggregate`);
   }
 
   getVotesByPage (pageId: string) {
