@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from '@emotion/styled';
-import { NftData } from 'lib/nft/interfaces';
+import { NftData } from 'lib/blockchain/interfaces';
 import Avatar from 'components/common/Avatar';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { Box, Card, Stack, Typography } from '@mui/material';

@@ -3,7 +3,7 @@ import Skeleton from '@mui/material/Skeleton';
 import Stack from '@mui/material/Stack';
 import { Dialog, DialogTitle, CircularProgress, DialogContent, Typography, Grid, Box } from '@mui/material';
 
-import { NftData } from 'lib/nft/interfaces';
+import { NftData } from 'lib/blockchain/interfaces';
 import { useUser } from 'hooks/useUser';
 import styled from '@emotion/styled';
 import NftGalleryItem from './NftGalleryItem';

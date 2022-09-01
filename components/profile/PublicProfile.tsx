@@ -1,8 +1,7 @@
 import { Box, Chip, Divider, Stack, Typography } from '@mui/material';
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { NftData } from 'lib/nft/interfaces';
-import { ExtendedPoap } from 'models';
+import { NftData, ExtendedPoap } from 'lib/blockchain/interfaces';
 import useSWRImmutable from 'swr/immutable';
 import AggregatedData from './components/AggregatedData';
 import CommunityRow, { CommunityDetails } from './components/CommunityRow';
@@ -13,7 +12,7 @@ function transformPoap (poap: ExtendedPoap): Collective {
   return {
     type: 'poap',
     date: poap.created as string,
-    id: poap.tokenId,
+    id: poap.id,
     image: poap.imageURL,
     title: poap.name,
     link: `https://app.poap.xyz/token/${poap.tokenId}`,
@@ -25,10 +24,10 @@ function transformNft (nft: NftData): Collective {
   return {
     type: 'nft',
     date: nft.timeLastUpdated,
-    id: nft.tokenId,
+    id: nft.id,
     image: nft.image ?? nft.imageThumb,
     title: nft.title,
-    link: '',
+    link: `https://opensea.io/assets/ethereum/${nft.contract}/${nft.tokenId}`,
     isHidden: nft.isHidden
   };
 }
@@ -49,7 +48,7 @@ export default function PublicProfile (props: UserDetailsProps) {
   const { data: nftData, mutate: mutateNfts, isValidating: isNftDataValidating } = useSWRImmutable(`/nfts/${user.id}/${isPublic}`, () => {
     return isPublicUser(user)
       ? Promise.resolve(user.visibleNfts)
-      : charmClient.nft.list(user.id);
+      : charmClient.blockchain.listNFTs(user.id);
   });
 
   const isLoading = !data || !poapData || !nftData || isNftDataValidating || isPoapDataValidating || isAggregatedDataValidating;
@@ -64,7 +63,7 @@ export default function PublicProfile (props: UserDetailsProps) {
     collectives.push(transformNft(nft));
   });
 
-  async function updateDaoProfileItem (community: CommunityDetails) {
+  async function toggleCommunityVisibility (community: CommunityDetails) {
     await charmClient.profile.updateProfileItem({
       profileItems: [{
         id: community.id,
@@ -91,7 +90,7 @@ export default function PublicProfile (props: UserDetailsProps) {
     });
   }
 
-  async function updateCollectiveProfileItem (collective: Collective) {
+  async function toggleCollectibleVisibility (collective: Collective) {
     await charmClient.profile.updateProfileItem({
       profileItems: [{
         id: collective.id,
@@ -102,36 +101,30 @@ export default function PublicProfile (props: UserDetailsProps) {
     });
     if (collective.type === 'nft') {
       mutateNfts((_nftData) => {
-        if (_nftData) {
-          return _nftData.map(nft => {
-            if (nft.tokenId === collective.id) {
-              return {
-                ...nft,
-                isHidden: !collective.isHidden
-              };
-            }
-            return nft;
-          });
-        }
-        return _nftData;
+        return _nftData?.map(nft => {
+          if (nft.id === collective.id) {
+            return {
+              ...nft,
+              isHidden: !collective.isHidden
+            };
+          }
+          return nft;
+        });
       }, {
         revalidate: false
       });
     }
     else {
       mutatePoaps((_poapData) => {
-        if (_poapData) {
-          return _poapData.map(poap => {
-            if (poap.tokenId === collective.id) {
-              return {
-                ...poap,
-                isHidden: !collective.isHidden
-              };
-            }
-            return poap;
-          });
-        }
-        return _poapData;
+        return _poapData?.map(poap => {
+          if (poap.id === collective.id) {
+            return {
+              ...poap,
+              isHidden: !collective.isHidden
+            };
+          }
+          return poap;
+        });
       }, {
         revalidate: false
       });
@@ -146,7 +139,7 @@ export default function PublicProfile (props: UserDetailsProps) {
       <Divider />
       {
         isLoading ? (
-          <LoadingComponent isLoading />
+          <LoadingComponent isLoading height={300} />
         ) : (
           <>
             <AggregatedData
@@ -170,7 +163,7 @@ export default function PublicProfile (props: UserDetailsProps) {
                     >
                       <CommunityRow
                         onClick={() => {
-                          updateDaoProfileItem(community);
+                          toggleCommunityVisibility(community);
                         }}
                         visible={!community.isHidden}
                         showVisibilityIcon={!isPublic}
@@ -197,7 +190,7 @@ export default function PublicProfile (props: UserDetailsProps) {
                 <ProfileItemsList
                   collectives={collectives.sort((collectiveA, collectiveB) => new Date(collectiveB.date) > new Date(collectiveA.date) ? 1 : -1)}
                   isPublic={isPublic}
-                  onVisibilityToggle={updateCollectiveProfileItem}
+                  onVisibilityToggle={toggleCollectibleVisibility}
                 />
               </Box>
             ) : null}

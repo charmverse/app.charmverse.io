@@ -26,7 +26,6 @@ export const ProfileItemContainer = styled(Stack)`
     transition: ${({ theme }) => `${theme.transitions.duration.short}ms opacity ${theme.transitions.easing.easeInOut}`};
   }
 
-  gap: ${({ theme }) => theme.spacing(2)};
   transition: ${({ theme }) => `${theme.transitions.duration.short}ms opacity ${theme.transitions.easing.easeInOut}`};
 `;
 
@@ -42,7 +41,8 @@ function ProfileItem ({ onClick, collective, visible, showVisibilityIcon }: Prof
     <ProfileItemContainer sx={{
       flexDirection: 'row',
       alignItems: 'center',
-      opacity: visible ? 1 : 0.25
+      opacity: visible ? 1 : 0.25,
+      gap: 2
     }}
     >
       {collective.type === 'poap' ? (
@@ -52,9 +52,7 @@ function ProfileItem ({ onClick, collective, visible, showVisibilityIcon }: Prof
       ) : <Avatar isNft size='large' avatar={collective.image} />}
       <Stack
         justifyContent='center'
-        sx={{
-          flexGrow: 1
-        }}
+        flexGrow={1}
       >
         <Box
           display='flex'
@@ -112,21 +110,16 @@ export function ProfileItemsList ({ collectives, isPublic, onVisibilityToggle }:
   return (
     <Stack gap={2}>
       {collectives.map(collective => (
-        <Box
-          key={collective.id}
-        >
+        <Box key={collective.id}>
           <ProfileItem
             showVisibilityIcon={!isPublic}
             visible={!collective.isHidden}
-            onClick={async () => {
+            onClick={() => {
               onVisibilityToggle(collective);
             }}
             collective={collective}
           />
-          <Divider sx={{
-            mt: 2
-          }}
-          />
+          <Divider sx={{ mt: 2 }} />
         </Box>
       ))}
     </Stack>

@@ -41,6 +41,7 @@ async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
   // Remove parent ID and pass it to the creation input
   // This became necessary after adding a formal parentPage relation related to page.parentId
   // We now need to specify this as a ParentPage.connect prisma argument instead of a raw string
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { createdBy, spaceId: droppedSpaceId, ...pageCreationData } = data;
   const typedPageCreationData = pageCreationData as any as Prisma.PageCreateInput;
 
@@ -68,6 +69,7 @@ async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
   else {
     page = await prisma.page.create({ data: typedPageCreationData });
   }
+
   try {
 
     const pageWithPermissions = await setupPermissionsAfterPageCreated(page.id);
