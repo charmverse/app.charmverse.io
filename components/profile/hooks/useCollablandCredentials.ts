@@ -18,6 +18,7 @@ export function useCollablandCredentials () {
     }
   }, [tokenFromUrl]);
 
+  // use window.location to determine redirect URI, since we sometimes change the URL without updating next.js router (it triggers a rerender)
   function getCollablandLogin () {
     return `https://login-qa.collab.land?state=foobar&redirect_uri=${encodeURIComponent(window.location.href.split('?')[0])}`;
   }
