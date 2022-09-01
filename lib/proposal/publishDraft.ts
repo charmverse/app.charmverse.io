@@ -1,24 +1,15 @@
+import { Proposal } from '@prisma/client';
 import { prisma } from 'db';
-import { InvalidStateError, NotFoundError } from 'lib/middleware';
+import { InvalidStateError } from 'lib/middleware';
 
-export async function publishDraft (proposalId: string) {
-  const proposal = await prisma.proposal.findUnique({
-    where: {
-      id: proposalId
-    }
-  });
-
-  if (!proposal) {
-    throw new NotFoundError();
-  }
-
+export async function publishDraft (proposal: Proposal) {
   if (proposal.status !== 'private_draft') {
     throw new InvalidStateError();
   }
 
   return prisma.proposal.update({
     where: {
-      id: proposalId
+      id: proposal.id
     },
     data: {
       status: 'draft'
