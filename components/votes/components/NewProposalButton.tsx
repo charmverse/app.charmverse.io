@@ -12,15 +12,6 @@ export default function NewProposalButton () {
   const [currentSpace] = useCurrentSpace();
   const [page, setPage] = useState<IPageWithPermissions | null>(null);
 
-  const { refreshPage: refresh } = usePages();
-
-  async function refreshPage () {
-    if (page) {
-      const refreshedPage = await refresh(page.id);
-      setPage(refreshedPage);
-    }
-  }
-
   async function onClickCreate () {
     if (currentSpace && user) {
       const { page: newPage } = await addPage({
@@ -37,7 +28,7 @@ export default function NewProposalButton () {
       <Button onClick={onClickCreate}>
         Create Proposal
       </Button>
-      {page && <PageDialog page={page} refreshPage={refreshPage} onClose={() => setPage(null)} />}
+      {page && <PageDialog page={page} onClose={() => setPage(null)} />}
     </>
   );
 }
