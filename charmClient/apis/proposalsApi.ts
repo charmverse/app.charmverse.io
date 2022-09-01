@@ -26,4 +26,12 @@ export class ProposalsApi {
   openDiscussion (proposalId: string) {
     return http.PUT(`/api/proposals/${proposalId}/open-discussion`);
   }
+
+  unpublishDraft (proposalId: string) {
+    return http.PUT(`/api/proposals/${proposalId}/unpublish-draft`);
+  }
+
+  closeDiscussion (proposalId: string) {
+    return http.PUT(`/api/proposals/${proposalId}/close-discussion`);
+  }
 }
