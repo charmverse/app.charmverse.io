@@ -1,4 +1,4 @@
-import { Divider, Grid, Typography } from '@mui/material';
+import { Divider, Grid, IconButton, Menu, MenuItem, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import charmClient from 'charmClient';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
@@ -8,6 +8,9 @@ import { Contributor, useContributors } from 'hooks/useContributors';
 import useRoles from 'hooks/useRoles';
 import { ListSpaceRolesResponse } from 'pages/api/roles';
 import useSWR from 'swr';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { ProposalStatusChip } from './ProposalStatusBadge';
 
 interface ProposalPropertiesProps {
@@ -20,6 +23,7 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
 
   const [contributors] = useContributors();
   const { roles = [] } = useRoles();
+  const proposalMenuState = usePopupState({ popupId: 'proposal-info', variant: 'popover' });
 
   if (!proposal) {
     return null;
@@ -57,7 +61,12 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
     >
       <Grid container mb={2}>
         <Grid item xs={8}>
-          <Typography fontWeight='bold'>Proposal information</Typography>
+          <Box display='flex' gap={1} alignItems='center'>
+            <Typography fontWeight='bold'>Proposal information</Typography>
+            <IconButton size='small' {...bindTrigger(proposalMenuState)}>
+              <MoreHorizIcon fontSize='small' />
+            </IconButton>
+          </Box>
         </Grid>
         <Grid item xs={4}>
           <Box sx={{
@@ -152,6 +161,27 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
         my: 2
       }}
       />
+      <Menu {...bindMenu(proposalMenuState)}>
+        <MenuItem
+          onClick={async () => {
+            if (proposal.status === 'private_draft') {
+              await charmClient.proposals.publishDraft(proposal.id);
+            }
+            else if (proposal.status === 'draft') {
+              await charmClient.proposals.openDiscussion(proposal.id);
+            }
+            refreshProposal();
+            proposalMenuState.close();
+          }}
+        >
+          <Box display='flex' alignItems='center' gap={1}>
+            <ArrowForwardIcon fontSize='small' />
+            <Typography>
+              {proposal.status === 'private_draft' ? 'Publish draft' : 'Open discussion'}
+            </Typography>
+          </Box>
+        </MenuItem>
+      </Menu>
     </Box>
   );
 }

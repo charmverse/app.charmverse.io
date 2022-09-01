@@ -52,6 +52,7 @@ describe('Creates a page and proposal with relevant configuration', () => {
       title: 'page-title',
       type: 'proposal',
       proposal: expect.objectContaining({
+        status: 'private_draft',
         authors: [{
           proposalId: pageWithProposal.id,
           userId: user.id

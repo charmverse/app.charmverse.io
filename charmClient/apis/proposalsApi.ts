@@ -18,4 +18,12 @@ export class ProposalsApi {
   getProposal (proposalId: string) {
     return http.GET<ProposalWithUsers>(`/api/proposals/${proposalId}`);
   }
+
+  publishDraft (proposalId: string) {
+    return http.PUT(`/api/proposals/${proposalId}/publish-draft`);
+  }
+
+  openDiscussion (proposalId: string) {
+    return http.PUT(`/api/proposals/${proposalId}/open-discussion`);
+  }
 }
