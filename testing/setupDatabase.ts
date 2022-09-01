@@ -363,9 +363,12 @@ export async function createProposalWithUsers ({ proposalStatus = 'draft', autho
   userId: string,
   proposalStatus?: ProposalStatus
 } & Partial<Prisma.PageCreateInput>): Promise<PageWithProposal> {
+  const proposalId = v4();
+
   return prisma.page.create({
     data: {
       ...pageCreateInput,
+      id: proposalId,
       author: {
         connect: {
           id: userId
@@ -383,6 +386,7 @@ export async function createProposalWithUsers ({ proposalStatus = 'draft', autho
       type: 'proposal',
       proposal: {
         create: {
+          id: proposalId,
           space: {
             connect: {
               id: spaceId

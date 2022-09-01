@@ -43,9 +43,7 @@ async function getProposalController (req: NextApiRequest, res: NextApiResponse<
     throw new NotFoundError();
   }
 
-  const isCurrentUserProposalAuthor = proposal.authors.some(author => author.userId === userId);
-
-  if (!isCurrentUserProposalAuthor) {
+  if (proposal.status === 'private_draft' && !proposal.authors.some(author => author.userId === userId)) {
     throw new UnauthorisedActionError();
   }
 
