@@ -49,6 +49,15 @@ const aeToken = 'AQICAHhuh8o15jTBiKupSn4nNWgkQFmby0vKwGFSbeVzkjpvbQHcPmNUBrjt458
     //     log.info('res', JSON.stringify(res));
     //   }
 
+    // const res = await fetch('https://api-qa.collab.land/veramo/vcs', {
+    //   method: 'GET',
+    //   headers: {
+    //     Accept: 'application/json',
+    //     'X-API-KEY': API_KEY,
+    //     Authorization: `AE ${aeToken}`,
+    //     'Content-Type': 'application/json'
+    //   }
+    // });
   }
   catch (e) {
     log.error(e);

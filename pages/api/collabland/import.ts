@@ -17,7 +17,7 @@ async function importCredentials (req: NextApiRequest, res: NextApiResponse<Cred
     aeToken: req.body.aeToken
   });
 
-  log.info('Received token for Collab.land', req.body);
+  log.info('Received request to import Collab.land');
 
   return res.status(200).json(credentials);
 }
