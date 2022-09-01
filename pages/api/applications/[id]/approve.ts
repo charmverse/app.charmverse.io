@@ -10,6 +10,7 @@ import { prisma } from 'db';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
 import * as collabland from 'lib/collabland';
+import log from 'lib/log';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -49,32 +50,16 @@ async function approveUserApplication (req: NextApiRequest, res: NextApiResponse
     userId
   });
 
-  const bounty = await rollupBountyStatus(approvedApplication.bountyId);
+  await rollupBountyStatus(approvedApplication.bountyId);
 
-  const author = await prisma.user.findUnique({
-    where: {
-      id: approvedApplication.createdBy
-    },
-    include: {
-      discordUser: true
-    }
-  });
-
-  if (author?.discordUser) {
-    const space = await prisma.space.findUnique({
-      where: {
-        id: bounty.spaceId
-      }
+  // dont wait for API response
+  collabland.createBountyStartedCredential({
+    bountyId: approvedApplication.bountyId,
+    userId: approvedApplication.createdBy
+  })
+    .catch(error => {
+      log.error('Error creating collabland VC', error);
     });
-    if (space) {
-      await collabland.createBountyStartedCredential({
-        bounty,
-        page: bounty.page,
-        space,
-        discordUserId: author.discordUser.discordId
-      });
-    }
-  }
 
   return res.status(200).json(approvedApplication);
 }

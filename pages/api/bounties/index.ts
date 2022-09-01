@@ -13,6 +13,7 @@ import { BountyWithDetails } from 'models';
 import { NextApiRequest, NextApiResponse } from 'next';
 import * as collabland from 'lib/collabland';
 import nc from 'next-connect';
+import log from 'lib/log';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -70,30 +71,13 @@ async function createBountyController (req: NextApiRequest, res: NextApiResponse
   });
 
   // add a little delay to capture the full bounty title after user has edited it
-  setTimeout(async () => {
-    const bounty = await prisma.bounty.findUniqueOrThrow({
-      where: {
-        id: createdBounty.id
-      },
-      include: {
-        author: {
-          include: {
-            discordUser: true
-          }
-        },
-        space: true,
-        page: true
-      }
-    });
+  setTimeout(() => {
 
-    if (bounty.page && bounty.author.discordUser) {
-      await collabland.createBountyCreatedCredential({
-        bounty,
-        page: bounty.page,
-        space: bounty.space,
-        discordUserId: bounty.author.discordUser.discordId
+    collabland.createBountyCreatedCredential({ bountyId: createdBounty.id })
+      .catch(err => {
+        log.error('Error creating bounty created credential', err);
       });
-    }
+
   }, 60 * 1000);
 
   logWorkspaceFirstBountyEvents(createdBounty);

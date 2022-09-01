@@ -1,7 +1,8 @@
 import { Bounty, Page } from '@prisma/client';
+import { prisma } from 'db';
 import * as client from './collablandClient';
 
-const DOMAIN = process.env.DOMAIN;
+const DOMAIN = process.env.DOMAIN || 'https://test.charmverse.io';
 
 interface Space { id: string, domain: string, name: string }
 
@@ -12,26 +13,71 @@ interface RequestParams {
   discordUserId: string;
 }
 
-export function createBountyCreatedCredential (params: RequestParams) {
+export async function createBountyCreatedCredential ({ bountyId }: { bountyId: string }) {
 
-  return client.createCredential({
-    subject: getBountySubject({
-      ...params,
-      eventName: 'bounty_created',
-      eventDate: new Date().toISOString()
-    })
+  const bounty = await prisma.bounty.findUniqueOrThrow({
+    where: {
+      id: bountyId
+    },
+    include: {
+      author: {
+        include: {
+          discordUser: true
+        }
+      },
+      space: true,
+      page: true
+    }
   });
+
+  if (bounty.page && bounty.author.discordUser) {
+    return client.createCredential({
+      subject: getBountySubject({
+        bounty,
+        page: bounty.page,
+        space: bounty.space,
+        discordUserId: bounty.author.discordUser.discordId,
+        eventName: 'bounty_created',
+        eventDate: new Date().toISOString()
+      })
+    });
+  }
 }
 
-export function createBountyStartedCredential (params: RequestParams) {
+export async function createBountyStartedCredential ({ bountyId, userId }: { bountyId: string, userId: string }) {
 
-  return client.createCredential({
-    subject: getBountySubject({
-      ...params,
-      eventName: 'bounty_started',
-      eventDate: new Date().toISOString()
-    })
+  const bounty = await prisma.bounty.findUniqueOrThrow({
+    where: {
+      id: bountyId
+    },
+    include: {
+      space: true,
+      page: true
+    }
   });
+
+  const author = await prisma.user.findUnique({
+    where: {
+      id: userId
+    },
+    include: {
+      discordUser: true
+    }
+  });
+
+  if (bounty.page && author?.discordUser) {
+    return client.createCredential({
+      subject: getBountySubject({
+        bounty,
+        page: bounty.page,
+        space: bounty.space,
+        discordUserId: author.discordUser.discordId,
+        eventName: 'bounty_started',
+        eventDate: new Date().toISOString()
+      })
+    });
+  }
+
 }
 
 export function createBountyCompletedCredential (params: RequestParams) {
