@@ -8,6 +8,7 @@ export function useCollablandCredentials () {
   const router = useRouter();
   const [aeToken, setAeToken] = useLocalStorage('collab-token', '');
 
+  // check for the token when user is redirected back from collab.land and save it to local storage
   const tokenFromUrl = typeof router.query.aeToken === 'string' ? router.query.aeToken : router.query.aeToken?.[0];
 
   useEffect(() => {
