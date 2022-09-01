@@ -109,12 +109,6 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
         include: {
           sourcePermission: true
         }
-      },
-      proposal: {
-        include: {
-          authors: true,
-          reviewers: true
-        }
       }
     }
   });

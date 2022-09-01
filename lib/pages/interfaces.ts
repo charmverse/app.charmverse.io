@@ -6,7 +6,6 @@ import { ProposalWithUsers } from 'lib/proposal/interface';
 
 export interface IPageWithPermissions extends Page {
   permissions: (PagePermission & {sourcePermission: PagePermission | null}) []
-  proposal?: ProposalWithUsers | null
 }
 
 export interface PageWithChildren extends IPageWithPermissions {

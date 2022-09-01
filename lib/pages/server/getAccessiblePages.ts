@@ -113,12 +113,6 @@ export function generateAccessiblePagesQuery ({ spaceId, userId, archived }: Pag
         include: {
           sourcePermission: true
         }
-      },
-      proposal: {
-        include: {
-          authors: true,
-          reviewers: true
-        }
       }
     }
   };
