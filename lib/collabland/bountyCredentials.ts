@@ -6,13 +6,6 @@ const DOMAIN = process.env.DOMAIN || 'https://test.charmverse.io';
 
 interface Space { id: string, domain: string, name: string }
 
-interface RequestParams {
-  bounty: Bounty;
-  page: Page;
-  space: Space;
-  discordUserId: string;
-}
-
 export async function createBountyCreatedCredential ({ bountyId }: { bountyId: string }) {
 
   const bounty = await prisma.bounty.findUniqueOrThrow({
@@ -56,22 +49,19 @@ export async function createBountyStartedCredential ({ bountyId, userId }: { bou
     }
   });
 
-  const author = await prisma.user.findUnique({
+  const discordUser = await prisma.discordUser.findUnique({
     where: {
-      id: userId
-    },
-    include: {
-      discordUser: true
+      userId
     }
   });
 
-  if (bounty.page && author?.discordUser) {
+  if (bounty.page && discordUser) {
     return client.createCredential({
       subject: getBountySubject({
         bounty,
         page: bounty.page,
         space: bounty.space,
-        discordUserId: author.discordUser.discordId,
+        discordUserId: discordUser.discordId,
         eventName: 'bounty_started',
         eventDate: new Date().toISOString()
       })
@@ -80,20 +70,45 @@ export async function createBountyStartedCredential ({ bountyId, userId }: { bou
 
 }
 
-export function createBountyCompletedCredential (params: RequestParams) {
+export async function createBountyCompletedCredential ({ bountyId, userId }: { bountyId: string, userId: string}) {
 
-  return client.createCredential({
-    subject: getBountySubject({
-      ...params,
-      eventName: 'bounty_completed',
-      eventDate: new Date().toISOString()
-    })
+  const bounty = await prisma.bounty.findUniqueOrThrow({
+    where: {
+      id: bountyId
+    },
+    include: {
+      space: true,
+      page: true
+    }
   });
+
+  const discordUser = await prisma.discordUser.findUnique({
+    where: {
+      userId
+    }
+  });
+
+  if (bounty.page && discordUser) {
+    return client.createCredential({
+      subject: getBountySubject({
+        bounty,
+        page: bounty.page,
+        space: bounty.space,
+        discordUserId: discordUser.discordId,
+        eventName: 'bounty_completed',
+        eventDate: new Date().toISOString()
+      })
+    });
+  }
 }
 
 // utils
 
-interface BountySubjectParams extends RequestParams {
+interface BountySubjectParams {
+  bounty: Bounty;
+  page: Page;
+  space: Space;
+  discordUserId: string;
   eventName: client.BountyEventSubject['eventName'];
   eventDate: string;
 }
