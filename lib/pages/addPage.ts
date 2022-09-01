@@ -22,7 +22,7 @@ interface AddPageResponse {
 
 export async function addPage ({ createdBy, spaceId, shouldCreateDefaultBoardData, ...page }: NewPageInput): Promise<AddPageResponse> {
 
-  const pageId = v4();
+  const pageId = page?.id || v4();
 
   shouldCreateDefaultBoardData = shouldCreateDefaultBoardData ?? true;
   const isBoardPage = (page.type?.match(/board/));
@@ -40,7 +40,7 @@ export async function addPage ({ createdBy, spaceId, shouldCreateDefaultBoardDat
     spaceId,
     title: '',
     type: page.type ?? 'page',
-    ...(page ?? {})
+    ...page
   };
 
   const newPage = await charmClient.createPage(pageProperties);

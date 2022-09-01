@@ -37,7 +37,7 @@ export default function useNestedPage () {
             // A small delay to let the inserted page be saved in the editor
             setTimeout(() => {
               router.push(`/${router.query.domain}/${page.path}`);
-            }, 150);
+            }, 100);
           }
           else {
             router.push(`/${router.query.domain}/${page.path}`);

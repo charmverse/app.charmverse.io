@@ -83,7 +83,7 @@ export function NewCommentInput ({ initialValue = null, $key, username, avatar, 
 
   const intl = useIntl();
   const [newComment, setNewComment] = useState<CommentBlock['fields'] | null>(initialValue);
-  console.log($key)
+
   return (
     <div className='CommentsList__new'>
       <Avatar size='xSmall' name={username} avatar={avatar} />
