@@ -49,10 +49,9 @@ export interface DocumentPageProps {
   setPage: (p: Partial<Page>) => void,
   readOnly?: boolean,
   insideModal?: boolean
-  refreshPage?: () => void
 }
 
-function DocumentPage ({ refreshPage, page, setPage, insideModal, readOnly = false }: DocumentPageProps) {
+function DocumentPage ({ page, setPage, insideModal, readOnly = false }: DocumentPageProps) {
   const { pages, getPagePermissions } = usePages();
   const { cancelVote, castVote, deleteVote, votes, isLoading } = useVotes();
   const pagePermissions = getPagePermissions(page.id);
@@ -215,9 +214,9 @@ function DocumentPage ({ refreshPage, page, setPage, insideModal, readOnly = fal
               </div>
             </CharmEditor>
 
-            {/* {page.type === 'proposal' && !isLoading && !pageVote && (
+            {page.type === 'proposal' && !isLoading && !pageVote && (
               <CreateVoteBox />
-            )} */}
+            )}
           </Container>
         </div>
       </Box>
