@@ -75,7 +75,7 @@ jobs:
           sed -i 's/staging/prod/g' .ebextensions/00_env_vars.config
           sed -i 's/stg/prd/g' .ebextensions/00_env_vars.config
 
-      - name: Package
+      - name: Package Webapp
         run: cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
 
       - name: Update and Package background worker
