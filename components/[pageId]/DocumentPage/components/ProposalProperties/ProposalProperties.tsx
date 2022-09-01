@@ -11,6 +11,7 @@ import useSWR from 'swr';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { ProposalStatusChip } from './ProposalStatusBadge';
 
 interface ProposalPropertiesProps {
@@ -168,17 +169,58 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
               await charmClient.proposals.publishDraft(proposal.id);
             }
             else if (proposal.status === 'draft') {
-              await charmClient.proposals.openDiscussion(proposal.id);
+              await charmClient.proposals.unpublishDraft(proposal.id);
             }
             refreshProposal();
             proposalMenuState.close();
           }}
         >
           <Box display='flex' alignItems='center' gap={1}>
-            <ArrowForwardIcon fontSize='small' />
-            <Typography>
-              {proposal.status === 'private_draft' ? 'Publish draft' : 'Open discussion'}
-            </Typography>
+            {proposal.status === 'private_draft' ? (
+              <>
+                <ArrowForwardIcon fontSize='small' />
+                <Typography>Move to public draft</Typography>
+              </>
+            ) : (
+              <>
+                <ArrowBackIcon fontSize='small' />
+                <Typography>
+                  Move to private draft
+                </Typography>
+              </>
+            )}
+          </Box>
+        </MenuItem>
+
+        <MenuItem
+          onClick={async () => {
+            if (proposal.status === 'draft' || proposal.status === 'private_draft') {
+              await charmClient.proposals.openDiscussion(proposal.id);
+            }
+            else if (proposal.status === 'discussion') {
+              await charmClient.proposals.closeDiscussion(proposal.id);
+            }
+            refreshProposal();
+            proposalMenuState.close();
+          }}
+        >
+          <Box display='flex' alignItems='center' gap={1}>
+
+            {proposal.status === 'draft' || proposal.status === 'private_draft' ? (
+              <>
+                <ArrowForwardIcon fontSize='small' />
+                <Typography>
+                  Move to discussion
+                </Typography>
+              </>
+            ) : (
+              <>
+                <ArrowBackIcon fontSize='small' />
+                <Typography>
+                  Move to private draft
+                </Typography>
+              </>
+            )}
           </Box>
         </MenuItem>
       </Menu>
