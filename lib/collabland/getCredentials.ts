@@ -9,6 +9,7 @@ interface DiscordRoleSubject extends client.DiscordRoleSubject {
   expiresAt: string | null;
 }
 
+// VerifiedCredential is like a wrapper around the 'subject' which contains the actual data
 export interface VerifiedCredential<T> {
   id: string;
   createdAt: string;
