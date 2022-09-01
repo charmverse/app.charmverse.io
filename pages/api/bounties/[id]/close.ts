@@ -7,6 +7,8 @@ import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { BountyWithDetails } from 'models';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import * as collabland from 'lib/collabland';
+import log from 'lib/log';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -15,9 +17,9 @@ handler.use(requireUser)
 
 async function closeBountyController (req: NextApiRequest, res: NextApiResponse<BountyWithDetails>) {
 
-  const { id: bountyId } = req.query;
+  const { id: bountyId } = req.query as { id: string };
 
-  const bounty = await getBountyOrThrow(bountyId as string);
+  const bounty = await getBountyOrThrow(bountyId);
 
   const userId = req.session.user.id;
 
@@ -31,12 +33,22 @@ async function closeBountyController (req: NextApiRequest, res: NextApiResponse<
     throw new UnauthorisedActionError('You do not have the permission to close this bounty');
   }
 
-  const completeBounty = await closeOutBounty(bountyId as string);
+  const completeBounty = await closeOutBounty(bountyId);
+
+  const completedApplications = completeBounty.applications.filter((application) => application.status === 'complete');
+
+  for (const application of completedApplications) {
+
+    collabland.createBountyCompletedCredential({
+      bountyId,
+      userId: application.createdBy
+    })
+      .catch(error => {
+        log.error('Error creating a collabland VC for completing bounty', error);
+      });
+  }
 
   return res.status(200).json(completeBounty);
 }
 
 export default withSessionRoute(handler);
-
-// --------- Add logging events
-// These events as

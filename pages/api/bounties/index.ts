@@ -11,7 +11,9 @@ import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { BountyWithDetails } from 'models';
 import { NextApiRequest, NextApiResponse } from 'next';
+import * as collabland from 'lib/collabland';
 import nc from 'next-connect';
+import log from 'lib/log';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -67,6 +69,16 @@ async function createBountyController (req: NextApiRequest, res: NextApiResponse
     ...req.body,
     createdBy: req.session.user.id
   });
+
+  // add a little delay to capture the full bounty title after user has edited it
+  setTimeout(() => {
+
+    collabland.createBountyCreatedCredential({ bountyId: createdBounty.id })
+      .catch(err => {
+        log.error('Error creating bounty created credential', err);
+      });
+
+  }, 60 * 1000);
 
   logWorkspaceFirstBountyEvents(createdBounty);
   logUserFirstBountyEvents(createdBounty);

@@ -46,7 +46,7 @@ async function markSubmissionAsPaidController (req: NextApiRequest, res: NextApi
 
   const updatedSubmission = await markSubmissionAsPaid(submissionId as string);
 
-  rollupBountyStatus(updatedSubmission.bountyId);
+  await rollupBountyStatus(updatedSubmission.bountyId);
 
   return res.status(200).json(updatedSubmission);
 }

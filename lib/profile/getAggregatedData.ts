@@ -71,6 +71,11 @@ export async function getAggregatedData (userPath: string, apiToken?: string): P
       }
     },
     select: {
+      page: {
+        select: {
+          title: true
+        }
+      },
       spaceId: true,
       description: true,
       title: true,
@@ -120,7 +125,7 @@ export async function getAggregatedData (userPath: string, apiToken?: string): P
       createdAt: vote.createdAt.toString(),
       description: vote.description ?? '',
       organizationId: vote.spaceId,
-      title: vote.title,
+      title: vote.title || vote.page?.title,
       voteId: vote.id,
       successful: vote.status === 'Passed'
     } as DeepDaoVote))

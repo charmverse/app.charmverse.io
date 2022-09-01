@@ -51,7 +51,7 @@ async function reviewSubmissionController (req: NextApiRequest, res: NextApiResp
     userId
   });
 
-  rollupBountyStatus(updatedSubmission.bountyId);
+  await rollupBountyStatus(updatedSubmission.bountyId);
 
   return res.status(200).json(updatedSubmission);
 }

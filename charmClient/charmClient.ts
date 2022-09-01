@@ -34,11 +34,12 @@ import type { GetTasksResponse } from 'pages/api/tasks/list';
 import type { GetTasksStateResponse, UpdateTasksState } from 'pages/api/tasks/state';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 import type { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
-import type { AssignedPermissionsQuery } from '../lib/permissions/interfaces';
-import type { SpacePermissionConfigurationUpdate } from '../lib/permissions/meta/interfaces';
+import type { AssignedPermissionsQuery } from 'lib/permissions/interfaces';
+import type { SpacePermissionConfigurationUpdate } from 'lib/permissions/meta/interfaces';
 import { BountiesApi } from './apis/bountiesApi';
 import { BlockchainApi } from './apis/blockchainApi';
 import { ProfileApi } from './apis/profileApi';
+import { CollablandApi } from './apis/collablandApi';
 import { ProposalsApi } from './apis/proposalsApi';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
@@ -47,11 +48,14 @@ type BlockUpdater = (blocks: FBBlock[]) => void;
 // CharmClient is the client interface to the server APIs
 //
 class CharmClient {
+
   blockchain = new BlockchainApi();
 
-  profile = new ProfileApi();
-
   bounties = new BountiesApi();
+
+  collabland = new CollablandApi();
+
+  profile = new ProfileApi();
 
   proposals = new ProposalsApi();
 
