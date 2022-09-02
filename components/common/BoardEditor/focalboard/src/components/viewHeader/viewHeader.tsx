@@ -192,6 +192,7 @@ const ViewHeader = (props: Props) => {
               editCardTemplate={props.editCardTemplate}
               showCard={props.showCard}
               deleteCardTemplate={deleteCardTemplate}
+              boardId={viewsBoardId}
             />
           </>
         )}

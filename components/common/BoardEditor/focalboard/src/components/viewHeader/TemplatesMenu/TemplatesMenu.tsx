@@ -9,6 +9,7 @@ import { useTheme } from "@emotion/react";
 import { DocumentPageIcon } from 'components/common/Icons/DocumentPageIcon';
 import { bindMenu, PopupState } from 'material-ui-popup-state/hooks';
 import { TemplatePageMenuActions } from './TemplatePageMenuActions';
+import { fancyTrim } from 'lib/utilities/strings';
 
 interface Props {
   pages: Page[];
@@ -17,39 +18,34 @@ interface Props {
   deleteTemplate: (pageId: string) => void;
   addPageFromTemplate: (pageId: string) => void;
   anchorEl?: Element;
-  popupState: PopupState
+  popupState: PopupState;
+  boardTitle?: string;
 }
 
-export function TemplatesMenu({pages, anchorEl, addPageFromTemplate, createTemplate, deleteTemplate, editTemplate, popupState}: Props) {
+export function TemplatesMenu({pages, anchorEl, addPageFromTemplate, createTemplate, deleteTemplate, editTemplate, popupState, boardTitle}: Props) {
 
   const theme = useTheme();
 
-  const maxTitleLength = 20;
+  const maxTitleLength = 35;
 
   return (
     <Menu  {...bindMenu(popupState)} onClose={popupState.close} anchorEl={anchorEl} >
-      <MenuItem>Templates</MenuItem>
+      <MenuItem>Templates {boardTitle ? (<>for <b style={{marginLeft: 4}}>{boardTitle}</b></>) : ''} </MenuItem>
       <Divider />
       {
         pages.map((page) => {
 
-          const pageTitle = page.title || 'Untitled'
-
-          const shortTitle = pageTitle.length > maxTitleLength ? page.title.substring(0, maxTitleLength) + '...' : pageTitle;
-
           return (
-        <MenuItem >
-          <Box sx={{display: 'inline-block', justifyContent: 'space-between'}}>
-            <DocumentPageIcon onClick={() => addPageFromTemplate(page.id)} label={shortTitle} />
+        <MenuItem sx={{display: 'flex', justifyContent: 'space-between'}} >
+            <DocumentPageIcon onClick={() => addPageFromTemplate(page.id)} label={fancyTrim(page.title || 'Untitled', maxTitleLength)} />
 
             {/* TODO - Revisit nested menu using this npm package https://github.com/steviebaa/mui-nested-menu */}
             <TemplatePageMenuActions editTemplate={editTemplate} deleteTemplate={deleteTemplate} page={page} />
-          </Box>
         </MenuItem>
           )
       })}
       <Divider />
-      <MenuItem onClick={createTemplate}>
+      <MenuItem sx={{color: theme.palette.primary.main + ' !important'}} onClick={createTemplate}>
         <AddIcon />
         <ListItemText>New template</ListItemText>
       </MenuItem>
