@@ -1,21 +1,22 @@
 
 import { Stack, Typography, IconButton, Collapse, Tabs, Tab, Tooltip } from '@mui/material';
 import { Box } from '@mui/system';
-import { ReactNode, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import CheckIcon from '@mui/icons-material/Check';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import ForumIcon from '@mui/icons-material/Forum';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import { showDateWithMonthAndYear } from 'lib/utilities/dates';
 import { DeepDaoProposal, DeepDaoVote } from 'lib/deepdao/interfaces';
-import { UserCommunity } from 'lib/profile/interfaces';
+import { UserCommunity, ProfileBountyEvent } from 'lib/profile/interfaces';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import Avatar from 'components/common/Avatar';
-import type { CredentialsResult } from 'lib/collabland';
+import Link from 'components/common/Link';
 import { ProfileItemContainer } from './CollectibleRow';
 
 const TASK_TABS = [
@@ -27,7 +28,7 @@ const TASK_TABS = [
 export type CommunityDetails = UserCommunity & {
   proposals: DeepDaoProposal[];
   votes: DeepDaoVote[];
-  bounties: CredentialsResult['bountyEvents'];
+  bounties: ProfileBountyEvent[];
   joinDate: string;
   latestEventDate?: string;
 }
@@ -77,7 +78,7 @@ function TaskTab ({ task, value, onClick }: { task: typeof TASK_TABS[number], va
 interface EventRowProps {
   eventNumber: number;
   icon: ReactNode;
-  title: string;
+  title: string | ReactNode;
   createdAt: string;
 }
 
@@ -92,7 +93,7 @@ function EventRow (event: EventRowProps) {
         alignSelf='flex-start'
       >
         {event.icon}
-        <Typography fontWeight={500}>{event.eventNumber}.</Typography>
+        <Typography variant='body2' color='secondary'>{event.eventNumber || ' '}.</Typography>
       </Stack>
       <Stack
         gap={0.5}
@@ -105,7 +106,7 @@ function EventRow (event: EventRowProps) {
           alignItems: 'flex-start'
         }}
       >
-        <Typography sx={{ flexGrow: 1 }}>
+        <Typography variant='body2' sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
           {event.title}
         </Typography>
         <Typography variant='subtitle1' color='secondary' textAlign={{ sm: 'left', md: 'right' }} minWidth={100}>{showDateWithMonthAndYear(event.createdAt, true)}</Typography>
@@ -159,17 +160,28 @@ function ProposalsPanel ({ events }: { events: DeepDaoProposal[] }) {
   );
 }
 
-function BountyEventsPanel ({ events }: { events: CredentialsResult['bountyEvents'] }) {
-
+function BountyEventsPanel ({ events }: { events: ProfileBountyEvent[] }) {
   return (
     <>
       {
         events.sort((eventA, eventB) => eventA.createdAt > eventB.createdAt ? -1 : 1)
           .map((event, index) => (
             <EventRow
-              key={event.subject.bountyId}
+              key={event.bountyId}
               createdAt={event.createdAt}
-              title={`${bountyStatus(event.subject.eventName)}: ${event.subject.bountyTitle || 'Untitled'}`}
+              title={(
+                <>
+                  {bountyStatus(event.eventName)}:&nbsp;
+                  <Link href={event.bountyPath} color='inherit'>
+                    <strong>{event.bountyTitle || 'Untitled'}</strong>
+                  </Link>
+                  {event.hasCredential && (
+                    <Tooltip color='success' title='Verified with Collab.land'>
+                      <CheckIcon fontSize='small' />
+                    </Tooltip>
+                  )}
+                </>
+              )}
               icon={null}
               eventNumber={index + 1}
             />
@@ -179,16 +191,16 @@ function BountyEventsPanel ({ events }: { events: CredentialsResult['bountyEvent
   );
 }
 
-function bountyStatus (status: 'bounty_created' | 'bounty_started' | 'bounty_completed') {
+function bountyStatus (status: ProfileBountyEvent['eventName']) {
   switch (status) {
     case 'bounty_created':
-      return 'Created bounty';
+      return 'Created';
     case 'bounty_completed':
-      return 'Completed bounty';
+      return 'Completed';
     case 'bounty_started':
-      return 'Started bounty';
+      return 'Started';
     default:
-      return 'Bounty event';
+      return 'Event';
   }
 }
 
@@ -200,8 +212,14 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
   const isCollapsible = hasVotes || hasProposals || hasBounties;
   const defaultTab = hasVotes ? 0 : hasProposals ? 1 : hasBounties ? 2 : null;
 
-  const [currentTab, setCurrentTab] = useState<number>(defaultTab || 0);
+  const [currentTab, setCurrentTab] = useState<number>(0);
   const [isCollapsed, setIsCollapsed] = useState(true);
+
+  useEffect(() => {
+    if (defaultTab !== null) {
+      setCurrentTab(defaultTab);
+    }
+  }, [defaultTab]);
 
   function toggleCollapse () {
     if (isCollapsible) {
@@ -219,6 +237,7 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
         onClick={toggleCollapse}
       >
         <Avatar
+          className='hidden-on-visible'
           avatar={community.logo}
           name={community.name}
           variant='rounded'
@@ -230,7 +249,7 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
           justifyContent='space-between'
           flexGrow={1}
         >
-          <Box>
+          <Box className='hidden-on-visible'>
             <Typography
               sx={{
                 fontSize: {
@@ -278,7 +297,7 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
               </Tooltip>
             )}
             {isCollapsible && (
-              <IconButton size='small'>
+              <IconButton className='hidden-on-visible' size='small'>
                 {isCollapsed ? <ExpandMoreIcon fontSize='small' /> : <ExpandLessIcon fontSize='small' />}
               </IconButton>
             )}
@@ -287,7 +306,7 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
       </Box>
 
       <Collapse in={!isCollapsed}>
-        <Box>
+        <Box className='hidden-on-visible'>
           <Tabs
             sx={{
               mb: 2
