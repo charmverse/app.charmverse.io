@@ -1,7 +1,7 @@
 
 import { Stack, Typography, IconButton, Collapse, Tabs, Tab, Tooltip } from '@mui/material';
 import { Box } from '@mui/system';
-import { ReactNode, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -212,8 +212,14 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
   const isCollapsible = hasVotes || hasProposals || hasBounties;
   const defaultTab = hasVotes ? 0 : hasProposals ? 1 : hasBounties ? 2 : null;
 
-  const [currentTab, setCurrentTab] = useState<number>(defaultTab || 0);
+  const [currentTab, setCurrentTab] = useState<number>(0);
   const [isCollapsed, setIsCollapsed] = useState(true);
+
+  useEffect(() => {
+    if (defaultTab !== null) {
+      setCurrentTab(defaultTab);
+    }
+  }, [defaultTab]);
 
   function toggleCollapse () {
     if (isCollapsible) {
