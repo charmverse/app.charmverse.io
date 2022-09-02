@@ -1,6 +1,7 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import AddIcon from '@mui/icons-material/Add';
+import Box from '@mui/material/Box';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { BoardView } from '../../blocks/boardView';
 import { Card } from '../../blocks/card';
@@ -11,16 +12,23 @@ import Menu from '../../widgets/menu';
 import EmptyCardButton from './emptyCardButton';
 import { usePages } from 'hooks/usePages';
 import { Board } from '../../blocks/board';
-import {TemplatePageMenuItemWithActions} from './templatePageMenuItemWithActions'
+import {TemplatesMenu} from './TemplatesMenu'
 import mutator from '../../mutator';
 import { Page } from '@prisma/client';
+import { bindMenu } from 'material-ui-popup-state';
+import Button from 'components/common/Button'
+import { DownIcon } from 'components/common/Icons/DownIcon';
+import { usePopupState, bindTrigger } from 'material-ui-popup-state/hooks';
+import { Divider } from '@mui/material';
+
 
 type Props = {
     board: Board
     addCard: () => void
-    // addCardFromTemplate: (cardTemplateId: string) => void
+    addCardFromTemplate: (cardTemplateId: string) => void
     addCardTemplate: () => void
     editCardTemplate: (cardTemplateId: string) => void
+    deleteCardTemplate: (cardTemplateId: string) => void
     view: BoardView
     showCard: (cardId: string) => void
 }
@@ -28,9 +36,12 @@ type Props = {
 const NewCardButton = React.memo((props: Props): JSX.Element => {
   const cardTemplates: Card[] = useAppSelector(getCurrentBoardTemplates);
   const currentView = props.view;
+  const buttonRef = React.useRef<HTMLButtonElement>(null);
 
   const intl = useIntl();
   const {pages} = usePages()
+
+  const cardTemplatesPages = cardTemplates.map(c => pages[c.id]).filter(p => p !== undefined) as Page[]
 
   async function addPageFromTemplate(pageId: string) {
     const [blocks] = await mutator.duplicateCard({
@@ -42,48 +53,38 @@ const NewCardButton = React.memo((props: Props): JSX.Element => {
     props.showCard(blocks[0]?.id)
   }
 
+  const popupState = usePopupState({variant: 'popover', popupId: 'templates-menu'});
+
   return (
-    <ButtonWithMenu
-      onClick={() => {
-          props.addCard();
-      }}
-      text={(
-        <FormattedMessage
-          id='ViewHeader.new'
-          defaultMessage='New'
-        />
-      )}
+    <>
+    <Button
+      sx={{p: 0}}
+      ref={buttonRef}
     >
-      <Menu position='bottom-end'>
-        {cardTemplates.length > 0 && (
-          <>
-            <Menu.Label>
-              <b>
-                Templates for {pages[props.board?.id]?.title || 'Untitled' }
-              </b>
-            </Menu.Label>
+      <Box
+        sx={{pl:'15px'}}
+        onClick={() => {
+          props.addCard();
+      }}>
+      New
+      </Box>
 
-            <Menu.Separator />
-          </>
-        )}
-        {/** TODO: Add support for templates */}
-        {cardTemplates.map((cardTemplate) => (
-          <TemplatePageMenuItemWithActions
-            addPageFromTemplate={() => addPageFromTemplate(cardTemplate.id)}
-            pageId={cardTemplate.id}
-            deleteTemplate={() => null}
-            showPage={props.showCard}
-          />
-      ))}
-
-      <Menu.Text
-        icon={<AddIcon/>}
-        id='add-template'
-        name={intl.formatMessage({id: 'ViewHeader.add-template', defaultMessage: 'New template'})}
-        onClick={() => props.addCardTemplate()}
+      <Box sx={{pl: 1}}
+        {...bindTrigger(popupState)}>
+        <DownIcon />
+      </Box>
+    </Button>
+    <TemplatesMenu
+        addPageFromTemplate={addPageFromTemplate}
+        createTemplate={props.addCardTemplate}
+        editTemplate={props.showCard}
+        deleteTemplate={props.deleteCardTemplate}
+        pages={cardTemplatesPages}
+        anchorEl={buttonRef.current as Element}
+        popupState={popupState}
       />
-      </Menu>
-    </ButtonWithMenu>
+    </>
+    
   );
 });
 

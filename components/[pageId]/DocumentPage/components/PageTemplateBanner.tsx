@@ -74,7 +74,7 @@ export function PageTemplateBanner ({ pageId }: {pageId: string}) {
                 }}
                 color={theme.palette.templateBanner.highlightedText}
               >
-                <DocumentPageIcon iconSize='small' fontSize={theme.palette.templateBanner.fontSize} label={board?.title} />
+                <DocumentPageIcon iconSize='small' fontSize={theme.palette.templateBanner.fontSize} label={board?.title || 'Untitled'} />
               </Link>
             </>
 
