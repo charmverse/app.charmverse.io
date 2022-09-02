@@ -11,12 +11,18 @@ import { useRouter } from 'next/router';
 import ViewTabs from './viewTabs';
 
 import ModalWrapper from '../modalWrapper';
+import { mutator } from '../../mutator'
 
 import FilterComponent from './filterComponent';
 import NewCardButton from './newCardButton';
 import ViewHeaderActionsMenu from './viewHeaderActionsMenu';
 import ViewHeaderDisplayByMenu from './viewHeaderDisplayByMenu';
 import ViewHeaderSortMenu from './viewHeaderSortMenu';
+import { Page } from '@prisma/client';
+import { usePages } from 'hooks/usePages';
+import { useAppSelector } from '../../store/hooks';
+import { getBoardCards, getCurrentBoardTemplates } from '../../store/cards';
+import { mutate } from 'swr';
 
 type Props = {
   activeBoard?: Board
@@ -26,6 +32,7 @@ type Props = {
   cards: Card[]
   groupByProperty?: IPropertyTemplate
   addCard: () => void
+  showCard: (cardId?: string) => void;
   // addCardFromTemplate: (cardTemplateId: string) => void
   addCardTemplate: () => void
   editCardTemplate: (cardTemplateId: string) => void
@@ -45,6 +52,8 @@ type Props = {
 const ViewHeader = (props: Props) => {
   const [showFilter, setShowFilter] = useState(false);
   const router = useRouter();
+  const {pages, refreshPage} = usePages();
+  const cardTemplates: Card[] = useAppSelector(getCurrentBoardTemplates);
 
   const views = props.views.filter(view => !view.fields.inline)
 
@@ -54,6 +63,28 @@ const ViewHeader = (props: Props) => {
   const withSortBy = activeView?.fields.viewType !== 'calendar';
 
   const hasFilter = activeView?.fields.filter && activeView?.fields.filter.filters?.length > 0;
+
+  async function addPageFromTemplate(pageId: string) {
+    const [blocks] = await mutator.duplicateCard({
+      board: props.activeBoard as Board,
+      cardId: pageId,
+      cardPage: pages[pageId] as Page
+    });
+    console.log('Created blocks', blocks)
+    const newPageId = blocks[0].id;
+    await refreshPage(newPageId);
+    props.showCard(newPageId)
+  }
+
+  async function deleteCardTemplate(pageId: string) {
+    const card = cardTemplates.find(c => c.id === pageId)
+    console.log('Found card', card, 'page', pages[pageId])
+    if (card) {
+      await mutator.deleteBlock(card, 'delete card');
+      mutate(`pages/${card.spaceId}`);
+    }
+  }
+
 
   return (
     <div className={`ViewHeader ${props.showActionsOnHover ? 'hide-actions' : ''}`}>
@@ -155,13 +186,15 @@ const ViewHeader = (props: Props) => {
             <ViewHeaderActionsMenu onClick={() => toggleViewOptions()} />
 
             {/* New card button */}
-
+            
             <NewCardButton
               addCard={props.addCard}
-              view={activeView}
-              // addCardFromTemplate={props.addCardFromTemplate}
+              addCardFromTemplate={addPageFromTemplate}
               addCardTemplate={props.addCardTemplate}
               editCardTemplate={props.editCardTemplate}
+              showCard={props.showCard}
+              deleteCardTemplate={deleteCardTemplate}
+              boardId={viewsBoardId}
             />
           </>
         )}

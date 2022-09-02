@@ -8,6 +8,9 @@ export default function DropdownIcon (): JSX.Element {
     <CompassIcon
       icon='chevron-down'
       className='DropdownIcon'
+      css={{
+        color: 'white'
+      }}
     />
   );
 }

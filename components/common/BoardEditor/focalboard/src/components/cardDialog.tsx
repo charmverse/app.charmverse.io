@@ -113,7 +113,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
         onClickDelete={handleDeleteButtonOnClick}
         onMarkCompleted={closeBounty}
         toolbar={
-          spacePermissions?.createBounty && !isSharedPage && cardPage && !bounty && !draftBounty && !readonly && <CreateBountyButton pageId={cardId} />
+          spacePermissions?.createBounty && !isSharedPage && cardPage && !bounty && !draftBounty && !readonly && cardPage.type.match('template') === null && <CreateBountyButton pageId={cardId} />
         }
         page={cardPage}
       />

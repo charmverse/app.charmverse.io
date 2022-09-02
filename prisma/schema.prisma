@@ -9,15 +9,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum PageType {
-  board
-  bounty
-  page
-  card
-  proposal
-  inline_board
-  inline_linked_board
-}
+
 
 enum PermissionLevel {
   full_access
@@ -187,6 +179,21 @@ model SpaceApiToken {
   @@unique([token, spaceId])
 }
 
+enum PageType {
+  board
+  board_template
+  bounty
+  bounty_template
+  page
+  page_template
+  card
+  card_template
+  proposal
+  proposal_template
+  inline_board
+  inline_linked_board
+}
+
 model Page {
   id                 String           @id @default(uuid()) @db.Uuid
   deletedAt          DateTime?
@@ -200,6 +207,7 @@ model Page {
   headerImage        String?
   icon               String?
   path               String
+  isTemplate         Boolean?         @default(false)
   parentId           String?          @db.Uuid
   spaceId            String           @db.Uuid
   type               PageType
