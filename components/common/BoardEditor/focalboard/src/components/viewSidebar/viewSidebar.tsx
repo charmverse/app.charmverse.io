@@ -1,4 +1,4 @@
-import { Box, Collapse, Divider, IconButton, ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
+import { Box, ClickAwayListener, Portal, Collapse, Divider, IconButton, ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
 import PreviewIcon from '@mui/icons-material/Preview';
 import ArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
@@ -62,8 +62,9 @@ export default function ViewOptionsSidebar (props: Props) {
   const currentProperties = visiblePropertyIds.filter(id => props.board.fields.cardProperties.some(c => c.id === id)).length;
 
   return (
-    <>
+    <ClickAwayListener onClickAway={props.closeSidebar}>
       <Collapse in={props.isOpen} orientation='horizontal' sx={{ position: 'absolute', right: 0, top: 0, bottom: 0, zIndex: 1000 }}>
+
         <StyledSidebar>
           {sidebarView === 'view-options' && (
             <>
@@ -112,7 +113,7 @@ export default function ViewOptionsSidebar (props: Props) {
           )}
         </StyledSidebar>
       </Collapse>
-    </>
+          </ClickAwayListener>
   );
 }
 

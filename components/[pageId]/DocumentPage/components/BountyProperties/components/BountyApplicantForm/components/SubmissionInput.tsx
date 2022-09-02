@@ -75,14 +75,14 @@ export default function SubmissionInput (
     try {
       if (submission) {
         // Update
-        application = await charmClient.updateSubmission({
+        application = await charmClient.bounties.updateSubmission({
           submissionId: submission.id,
           content: values
         });
       }
       else {
         // create
-        application = await charmClient.createSubmission({
+        application = await charmClient.bounties.createSubmission({
           bountyId,
           submissionContent: values
         });

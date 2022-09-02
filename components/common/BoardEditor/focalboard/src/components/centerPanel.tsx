@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 /* eslint-disable max-lines */
 import { Box } from '@mui/material';
 import { useRouter } from 'next/router';
@@ -92,7 +90,6 @@ function CenterPanel (props: Props) {
   const _groupByProperty = useAppSelector(getCurrentViewGroupBy);
   const _dateDisplayProperty = useAppSelector(getCurrentViewDisplayBy);
   const boards = useAppSelector(getSortedBoards);
-  console.log({centerPanelBoards: boards});
 
   const isEmbedded = !!props.embeddedBoardPath;
   const boardPageType = pages[board.id]?.type;
@@ -428,14 +425,20 @@ function CenterPanel (props: Props) {
   }
 
   function openSelectSource () {
-    setState({ ...state, showSettings: 'create-linked-view' });
+    // delay the sidebar opening so that we dont trigger it to close right away
+    setTimeout(() => {
+      setState({ ...state, showSettings: 'create-linked-view' });
+    });
     props.onViewTabClick?.('');
   }
 
   function toggleViewOptions (enable?: boolean) {
     enable = enable ?? state.showSettings !== 'view-options'
     const showSettings = enable ? 'view-options' : null;
-    setState({ ...state, showSettings });
+    // delay the sidebar opening so that we dont trigger it to close right away
+    setTimeout(() => {
+      setState({ ...state, showSettings });
+    });
   }
 
   function closeSettings () {
@@ -495,7 +498,7 @@ function CenterPanel (props: Props) {
               onClick={(boardPageType === 'inline_linked_board') ? openSelectSource : undefined}
             />
           )}
-          board={board}
+          viewsBoardId={board.id}
           activeBoard={activeBoard}
           activeView={props.activeView}
           toggleViewOptions={toggleViewOptions}

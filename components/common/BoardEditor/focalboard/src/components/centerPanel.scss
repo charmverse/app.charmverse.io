@@ -36,10 +36,6 @@
         padding: 0 8px;
       }
     }
-
-    &:last-child {
-      padding-bottom: 8px;
-    }
   }
 
   > .top-head {
@@ -50,8 +46,7 @@
   }
 
   > .container-container {
-    padding-bottom: 180px;
-    // margin-left: 80px;
+    flex-grow: 1;
     min-width: fit-content;
 
     // @media (max-width: 768px) {
@@ -61,6 +56,8 @@
     // }
     > div {
       position: relative;
+      padding-bottom: var(--page-layout-pb);
+      height: 100%;
     }
 
     &.sidebar-visible {

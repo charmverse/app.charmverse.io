@@ -8,7 +8,8 @@ import { postToDiscord } from 'lib/log/userEvents';
 
 export default async function loginByDiscord ({ code, hostName }: { code: string, hostName?: string }) {
 
-  const discordAccount = await getDiscordAccount(code, hostName?.startsWith('localhost') ? `http://${hostName}/api/discord/callback` : 'https://app.charmverse.io/api/discord/callback');
+  const domain = hostName?.startsWith('localhost') ? `http://${hostName}` : `https://${hostName}`;
+  const discordAccount = await getDiscordAccount(code, `${domain}/api/discord/callback`);
   const discordUser = await prisma.discordUser.findUnique({
     where: {
       discordId: discordAccount.id
@@ -56,7 +57,7 @@ export default async function loginByDiscord ({ code, hostName }: { code: string
   }
 }
 
-export async function logSignupViaDiscord () {
+async function logSignupViaDiscord () {
   postToDiscord({
     funnelStage: 'acquisition',
     eventType: 'create_user',

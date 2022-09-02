@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import { useState, useCallback, useEffect, MouseEvent, ReactNode } from 'react';
 import { injectIntl, IntlShape } from 'react-intl';
 import { useRouter } from 'next/router';
@@ -41,7 +39,7 @@ const StyledButton = styled(Button)`
 
 interface ViewTabsProps {
   intl: IntlShape;
-  board: Board
+  viewsBoardId: string
   activeView?: BoardView | null
   readonly?: boolean;
   views: BoardView[];
@@ -54,7 +52,7 @@ interface ViewTabsProps {
   openViewOptions: () => void
 }
 
-function ViewTabs ({ onDeleteView, openViewOptions, maxTabsShown, onViewTabClick, disableUpdatingUrl, addViewButton, board, activeView, intl, readonly, showView, views }: ViewTabsProps) {
+function ViewTabs ({ onDeleteView, openViewOptions, maxTabsShown, onViewTabClick, disableUpdatingUrl, addViewButton, viewsBoardId, activeView, intl, readonly, showView, views }: ViewTabsProps) {
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [dropdownView, setDropdownView] = useState<BoardView | null>(null);
@@ -100,7 +98,7 @@ function ViewTabs ({ onDeleteView, openViewOptions, maxTabsShown, onViewTabClick
       }
     }
     if (view) {
-      setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [board.id]: view.id }));
+      setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [viewsBoardId]: view.id }));
     }
   }
 
@@ -130,7 +128,7 @@ function ViewTabs ({ onDeleteView, openViewOptions, maxTabsShown, onViewTabClick
       'duplicate view',
       async (block) => {
         showView(block.id);
-        setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [board.id]: newView.id }));
+        setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [viewsBoardId]: newView.id }));
       },
       async () => {
         showView(dropdownView.id);
@@ -148,7 +146,7 @@ function ViewTabs ({ onDeleteView, openViewOptions, maxTabsShown, onViewTabClick
     setAnchorEl(null)
     if (nextView) {
       showView(nextView.id);
-      setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [board.id]: nextView.id }));
+      setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [viewsBoardId]: nextView.id }));
     }
   }, [views, dropdownView, showView]);
 

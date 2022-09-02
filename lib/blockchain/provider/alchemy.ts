@@ -1,10 +1,40 @@
 import { GET } from 'adapters/http';
-import { AlchemyNft, AlchemyNftResponse } from 'lib/blockchain/provider/interfaces';
 import orderBy from 'lodash/orderBy';
 
-export type SupportedChainId = 1 | 4 | 5 | 137 | 80001 | 42161
+export type SupportedChainId = 1 | 4 | 5 | 137 | 80001 | 42161;
 
-export type AlchemyApiSuffix = '' | 'nft'
+interface NftMedia {
+  bytes: number;
+  format: string;
+  gateway: string;
+  raw: string;
+  thumbnail: string;
+}
+
+type AlchemyApiSuffix = '' | 'nft';
+
+export interface AlchemyNft {
+  contract: {
+    address: string;
+  };
+  id: {
+    tokenId: string;
+  };
+  title: string;
+  description: string;
+  tokenUri: {
+    raw: string;
+    gateway: string;
+  };
+  media: NftMedia[];
+  timeLastUpdated: string;
+}
+
+interface AlchemyNftResponse {
+  blockHash: string;
+  ownedNfts: AlchemyNft[];
+  totalCount: number;
+}
 
 const alchemyApis: Record<SupportedChainId, string> = {
   1: 'eth-mainnet',
@@ -43,7 +73,7 @@ export const getAddressNfts = async (address: string, chainId: SupportedChainId 
   return res.ownedNfts;
 };
 
-export const getNfts = async (addresses: string[], chainId: SupportedChainId = 1) => {
+export const getNFTs = async (addresses: string[], chainId: SupportedChainId = 1) => {
   const promises = addresses.map(address => getAddressNfts(address, chainId));
 
   const results = await Promise.allSettled(promises);
@@ -66,7 +96,7 @@ export const getNfts = async (addresses: string[], chainId: SupportedChainId = 1
   return sortedNfts;
 };
 
-export const getNft = async (contractAddress: string, tokenId: string, chainId: SupportedChainId = 1) => {
+export const getNFT = async (contractAddress: string, tokenId: string, chainId: SupportedChainId = 1) => {
   const url = `${getAlchemyBaseUrl(chainId)}/getNFTMetadata?contractAddress=${contractAddress}&tokenId=${tokenId}`;
   const res = await GET<AlchemyNft>(url);
 

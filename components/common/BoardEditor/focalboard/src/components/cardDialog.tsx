@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import { Box } from '@mui/system';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
@@ -102,7 +100,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
   }
 
   async function closeBounty () {
-    const updatedBounty = await charmClient.closeBounty(bounty!.id);
+    const updatedBounty = await charmClient.bounties.closeBounty(bounty!.id);
     refreshBounty(updatedBounty.id);
   }
 

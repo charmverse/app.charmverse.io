@@ -1,11 +1,11 @@
 
-import useNestedPage from 'components/common/CharmEditor/components/nestedPage/hooks/useNestedPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import { PluginKey } from 'prosemirror-state';
 import { useMemo } from 'react';
+import useNestedPage from '../nestedPage/hooks/useNestedPage';
 import { NestedPagePluginState } from '../nestedPage';
 import { PaletteItem, PaletteItemTypeNoGroup } from './paletteItem';
 import { items as databaseItems } from './editorItems/database';

@@ -36,7 +36,7 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
 
   async function refreshSubmissions () {
     if (bounty) {
-      const listApplicationsResponse = await charmClient.listApplications(bounty.id);
+      const listApplicationsResponse = await charmClient.bounties.listApplications(bounty.id);
       setListApplications(listApplicationsResponse);
     }
   }
@@ -51,7 +51,7 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
   }, [bounty]);
 
   async function lockBountySubmissions () {
-    const updatedBounty = await charmClient.lockBountySubmissions(bounty!.id, !bounty.submissionsLocked);
+    const updatedBounty = await charmClient.bounties.lockSubmissions(bounty!.id, !bounty.submissionsLocked);
     refreshBounty(updatedBounty.id);
   }
 

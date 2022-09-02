@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import React, { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -85,7 +83,7 @@ export function NewCommentInput ({ initialValue = null, $key, username, avatar, 
 
   const intl = useIntl();
   const [newComment, setNewComment] = useState<CommentBlock['fields'] | null>(initialValue);
-  console.log($key)
+
   return (
     <div className='CommentsList__new'>
       <Avatar size='xSmall' name={username} avatar={avatar} />

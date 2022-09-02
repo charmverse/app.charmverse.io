@@ -1,19 +1,19 @@
-import { useState } from 'react';
-import { Page } from '@prisma/client';
+import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import { useUser } from 'hooks/useUser';
+import PageDialog from 'components/common/Page/PageDialog';
+import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
-import { useBounties } from 'hooks/useBounties';
-import charmClient from 'charmClient';
-import { BountyWithDetails } from 'models';
-import PageDialog from 'components/common/Page/PageDialog';
 import { usePages } from 'hooks/usePages';
+import { useUser } from 'hooks/useUser';
+import { IPageWithPermissions } from 'lib/pages';
+import { BountyWithDetails } from 'models';
+import { useState } from 'react';
 
 export default function NewBountyButton () {
   const { user } = useUser();
   const [currentSpace] = useCurrentSpace();
-  const [activeBountyPage, setActiveBountyPage] = useState<{page: Page, bounty: BountyWithDetails} | null>(null);
+  const [activeBountyPage, setActiveBountyPage] = useState<{page: IPageWithPermissions, bounty: BountyWithDetails} | null>(null);
   const [currentUserPermissions] = useCurrentSpacePermissions();
   const suggestBounties = currentUserPermissions?.createBounty === false;
   const { setBounties } = useBounties();
@@ -24,7 +24,7 @@ export default function NewBountyButton () {
       let createdBounty: BountyWithDetails;
 
       if (suggestBounties) {
-        createdBounty = await charmClient.createBounty({
+        createdBounty = await charmClient.bounties.createBounty({
           chainId: 1,
           status: 'suggestion',
           spaceId: currentSpace.id,
@@ -40,7 +40,7 @@ export default function NewBountyButton () {
         });
       }
       else {
-        createdBounty = await charmClient.createBounty({
+        createdBounty = await charmClient.bounties.createBounty({
           chainId: 1,
           status: 'open',
           spaceId: currentSpace.id,

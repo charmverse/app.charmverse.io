@@ -47,6 +47,8 @@ const globalCSS = css`
 
     --charmeditor-active: rgba(46, 170, 220, 0.2);
 
+    --page-layout-pb: 180px;
+
   }
 
   /* lit protocol */

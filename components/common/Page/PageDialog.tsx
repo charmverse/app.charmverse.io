@@ -17,10 +17,11 @@ import InsertLinkIcon from '@mui/icons-material/InsertLink';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { BountyWithDetails } from 'models';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { IPageWithPermissions } from 'lib/pages';
 import { Utils } from '../BoardEditor/focalboard/src/utils';
 
 interface Props {
-  page?: Page | null;
+  page?: IPageWithPermissions | null;
   onClose: () => void;
   readOnly?: boolean;
   onClickDelete?: () => void
