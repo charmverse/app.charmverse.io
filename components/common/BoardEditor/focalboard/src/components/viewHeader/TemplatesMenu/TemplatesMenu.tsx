@@ -24,21 +24,27 @@ export function TemplatesMenu({pages, anchorEl, addPageFromTemplate, createTempl
 
   const theme = useTheme();
 
+  const maxTitleLength = 20;
+
   return (
     <Menu  {...bindMenu(popupState)} onClose={popupState.close} anchorEl={anchorEl} >
       <MenuItem>Templates</MenuItem>
       <Divider />
       {
         pages.map((page) => {
+
+          const pageTitle = page.title || 'Untitled'
+
+          const shortTitle = pageTitle.length > maxTitleLength ? page.title.substring(0, maxTitleLength) + '...' : pageTitle;
+
           return (
         <MenuItem >
           <Box sx={{display: 'inline-block', justifyContent: 'space-between'}}>
-            <DocumentPageIcon onClick={() => addPageFromTemplate(page.id)} label={page.title || 'Untited'} />
+            <DocumentPageIcon onClick={() => addPageFromTemplate(page.id)} label={shortTitle} />
 
             {/* TODO - Revisit nested menu using this npm package https://github.com/steviebaa/mui-nested-menu */}
             <TemplatePageMenuActions editTemplate={editTemplate} deleteTemplate={deleteTemplate} page={page} />
           </Box>
-          
         </MenuItem>
           )
       })}
