@@ -140,7 +140,7 @@
     "mjml": "^4.13.0",
     "mjml-react": "^2.0.8",
     "nanoevents": "^6.0.2",
-    "next": "^12.2.3",
+    "next": "^12.2.4",
     "next-connect": "^0.12.2",
     "next-swagger-doc": "^0.2.1",
     "next-transpile-modules": "^9.0.0",
