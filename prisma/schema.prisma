@@ -140,11 +140,6 @@ enum ProposalStatus {
   vote_closed
 }
 
-enum ProposalReviewerGroup {
-  role
-  user
-}
-
 model Space {
   id                          String                            @id @default(uuid()) @db.Uuid
   deletedAt                   DateTime?
