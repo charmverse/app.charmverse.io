@@ -23,6 +23,7 @@ export function TemplatePageMenuActions ({deleteTemplate, page, editTemplate, is
     <Menu {...bindMenu(popupState)} open={popupState.isOpen}>
       <MenuItem onClick={(e) => {
         e.stopPropagation();
+        popupState.close();
         editTemplate(page.id);
       }}>
         <EditIcon fontSize="small" />
@@ -34,6 +35,7 @@ export function TemplatePageMenuActions ({deleteTemplate, page, editTemplate, is
 
       <MenuItem onClick={(e) => {
         e.stopPropagation();
+        popupState.close();
         deleteTemplate(page.id);
       }}>
         <EditIcon fontSize="small" />

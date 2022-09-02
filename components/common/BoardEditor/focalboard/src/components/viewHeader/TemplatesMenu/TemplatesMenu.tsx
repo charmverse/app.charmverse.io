@@ -25,15 +25,15 @@ export function TemplatesMenu({pages, anchorEl, addPageFromTemplate, createTempl
   const theme = useTheme();
 
   return (
-    <Menu {...bindMenu(popupState)} onClose={popupState.close} anchorEl={anchorEl} >
+    <Menu  {...bindMenu(popupState)} onClose={popupState.close} anchorEl={anchorEl} >
       <MenuItem>Templates</MenuItem>
       <Divider />
       {
         pages.map((page) => {
           return (
-        <MenuItem onClick={() => addPageFromTemplate(page.id)}>
+        <MenuItem >
           <Box sx={{display: 'inline-block', justifyContent: 'space-between'}}>
-            <DocumentPageIcon label={page.title || 'Untited'} />
+            <DocumentPageIcon onClick={() => addPageFromTemplate(page.id)} label={page.title || 'Untited'} />
 
             {/* TODO - Revisit nested menu using this npm package https://github.com/steviebaa/mui-nested-menu */}
             <TemplatePageMenuActions editTemplate={editTemplate} deleteTemplate={deleteTemplate} page={page} />

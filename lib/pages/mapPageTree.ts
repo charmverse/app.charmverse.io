@@ -50,7 +50,7 @@ export function reducePagesToPageTree<
       // Make sure its not a database page or a focalboard card
       if (parentNode.type === 'page' || (
         includeCards && (
-          (parentNode.type.match(/board/) && node.type === 'card')
+          (parentNode.type.match(/board/) && node.type.match('card') !== null)
            || (parentNode.type === 'card' && node.type === 'page')
         ))) {
         parentNode.children.push(node);

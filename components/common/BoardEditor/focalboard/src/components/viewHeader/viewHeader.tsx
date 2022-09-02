@@ -20,6 +20,9 @@ import ViewHeaderDisplayByMenu from './viewHeaderDisplayByMenu';
 import ViewHeaderSortMenu from './viewHeaderSortMenu';
 import { Page } from '@prisma/client';
 import { usePages } from 'hooks/usePages';
+import { useAppSelector } from '../../store/hooks';
+import { getBoardCards, getCurrentBoardTemplates } from '../../store/cards';
+import { mutate } from 'swr';
 
 type Props = {
   activeBoard?: Board
@@ -50,6 +53,7 @@ const ViewHeader = (props: Props) => {
   const [showFilter, setShowFilter] = useState(false);
   const router = useRouter();
   const {pages} = usePages();
+  const cardTemplates: Card[] = useAppSelector(getCurrentBoardTemplates);
 
   const views = props.views.filter(view => !view.fields.inline)
 
@@ -68,6 +72,15 @@ const ViewHeader = (props: Props) => {
     });
     console.log('Created blocks', blocks)
     props.showCard(blocks[0]?.id)
+  }
+
+  async function deleteCardTemplate(pageId: string) {
+    const card = cardTemplates.find(c => c.id === pageId)
+    console.log('Found card', card, 'page', pages[pageId])
+    if (card) {
+      await mutator.deleteBlock(card, 'delete card');
+      mutate(`pages/${card.spaceId}`);
+    }
   }
 
 
@@ -178,7 +191,7 @@ const ViewHeader = (props: Props) => {
               addCardTemplate={props.addCardTemplate}
               editCardTemplate={props.editCardTemplate}
               showCard={props.showCard}
-              deleteCardTemplate={() => null}
+              deleteCardTemplate={deleteCardTemplate}
             />
           </>
         )}
