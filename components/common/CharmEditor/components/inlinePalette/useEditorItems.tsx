@@ -28,7 +28,7 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
     const itemGroups: [string, PaletteItemTypeNoGroup[]][] = [
       ['list', listItems()],
       ['media', mediaItems()],
-      ['other', otherItems({ addNestedPage, nestedPagePluginKey, userSpacePermissions })],
+      ['other', otherItems({ addNestedPage, nestedPagePluginKey, userSpacePermissions, pageType })],
       ['text', textItems()],
       ['database', (user && space) ? databaseItems({ addNestedPage, currentPageId, userId: user.id, space, pageType }) : []]
     ];
