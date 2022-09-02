@@ -1,6 +1,6 @@
 import { ProposalStatus } from '@prisma/client';
 import { prisma } from 'db';
-import { InvalidStateError, NotFoundError } from 'lib/middleware';
+import { InvalidStateError } from 'lib/middleware';
 
 const proposalStatusTransitionRecord: Record<ProposalStatus, ProposalStatus[]> = {
   private_draft: ['draft', 'discussion'],
@@ -12,18 +12,16 @@ const proposalStatusTransitionRecord: Record<ProposalStatus, ProposalStatus[]> =
   vote_closed: []
 };
 
-export async function updateStatus (proposalId: string, newStatus: ProposalStatus) {
-  const proposal = await prisma.proposal.findUnique({
-    where: {
-      id: proposalId
-    }
-  });
-
-  if (!proposal) {
-    throw new NotFoundError();
-  }
-
-  if (!proposalStatusTransitionRecord[proposal.status].includes(newStatus)) {
+export async function updateProposalStatus ({
+  proposalId,
+  newStatus,
+  currentStatus
+}: {
+  proposalId: string,
+  newStatus: ProposalStatus,
+  currentStatus: ProposalStatus
+}) {
+  if (!proposalStatusTransitionRecord[currentStatus].includes(newStatus)) {
     throw new InvalidStateError();
   }
 
