@@ -3,7 +3,7 @@ import Avatar from '@mui/material/Avatar';
 import { stringToColor } from 'lib/utilities/strings';
 import React from 'react';
 
-export type AvatarSize = 'xSmall' | 'small' | 'medium' | 'large' |'xLarge' | '2xLarge';
+export type AvatarSize = 'xSmall' | 'small' | 'medium' | 'large' | 'xLarge' | '2xLarge';
 export type AvatarVariant = 'circular' | 'rounded' | 'square';
 
 const sizeStyleMap: Record<AvatarSize, React.CSSProperties> = {
