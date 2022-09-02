@@ -11,12 +11,15 @@ import { useRouter } from 'next/router';
 import ViewTabs from './viewTabs';
 
 import ModalWrapper from '../modalWrapper';
+import { mutator } from '../../mutator'
 
 import FilterComponent from './filterComponent';
 import NewCardButton from './newCardButton';
 import ViewHeaderActionsMenu from './viewHeaderActionsMenu';
 import ViewHeaderDisplayByMenu from './viewHeaderDisplayByMenu';
 import ViewHeaderSortMenu from './viewHeaderSortMenu';
+import { Page } from '@prisma/client';
+import { usePages } from 'hooks/usePages';
 
 type Props = {
   activeBoard?: Board
@@ -26,7 +29,7 @@ type Props = {
   cards: Card[]
   groupByProperty?: IPropertyTemplate
   addCard: () => void
-  showCard: () => void;
+  showCard: (cardId?: string) => void;
   // addCardFromTemplate: (cardTemplateId: string) => void
   addCardTemplate: () => void
   editCardTemplate: (cardTemplateId: string) => void
@@ -46,6 +49,7 @@ type Props = {
 const ViewHeader = (props: Props) => {
   const [showFilter, setShowFilter] = useState(false);
   const router = useRouter();
+  const {pages} = usePages();
 
   const views = props.views.filter(view => !view.fields.inline)
 
@@ -55,6 +59,17 @@ const ViewHeader = (props: Props) => {
   const withSortBy = activeView?.fields.viewType !== 'calendar';
 
   const hasFilter = activeView?.fields.filter && activeView?.fields.filter.filters?.length > 0;
+
+  async function addPageFromTemplate(pageId: string) {
+    const [blocks] = await mutator.duplicateCard({
+      board: props.activeBoard as Board,
+      cardId: pageId,
+      cardPage: pages[pageId] as Page
+    });
+    console.log('Created blocks', blocks)
+    props.showCard(blocks[0]?.id)
+  }
+
 
   return (
     <div className={`ViewHeader ${props.showActionsOnHover ? 'hide-actions' : ''}`}>
@@ -159,12 +174,11 @@ const ViewHeader = (props: Props) => {
             
             <NewCardButton
               addCard={props.addCard}
-              view={activeView}
-              // addCardFromTemplate={props.addCardFromTemplate}
+              addCardFromTemplate={addPageFromTemplate}
               addCardTemplate={props.addCardTemplate}
               editCardTemplate={props.editCardTemplate}
               showCard={props.showCard}
-              board={props.activeBoard as Board}
+              deleteCardTemplate={() => null}
             />
           </>
         )}
