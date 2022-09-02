@@ -16,6 +16,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import Avatar from 'components/common/Avatar';
 import type { CredentialsResult } from 'lib/collabland';
+import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { ProfileItemContainer } from './CollectibleRow';
 
 const TASK_TABS = [
@@ -160,6 +161,7 @@ function ProposalsPanel ({ events }: { events: DeepDaoProposal[] }) {
 }
 
 function BountyEventsPanel ({ events }: { events: CredentialsResult['bountyEvents'] }) {
+  const { showPage } = usePageDialog();
 
   return (
     <>

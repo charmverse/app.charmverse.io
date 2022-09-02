@@ -8,7 +8,7 @@ import GridHeader from 'components/common/Grid/GridHeader';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';
-import PageDialog from 'components/common/Page/PageDialog';
+import PageDialog from 'components/common/PageDialog';
 import useTasks from 'components/nexus/hooks/useTasks';
 import { usePages } from 'hooks/usePages';
 import { IPageWithPermissions } from 'lib/pages';

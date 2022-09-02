@@ -1,6 +1,6 @@
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import PageDialog from 'components/common/Page/PageDialog';
+import PageDialog from 'components/common/PageDialog';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';

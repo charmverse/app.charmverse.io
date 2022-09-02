@@ -153,6 +153,10 @@ export default function PublicProfile (props: UserDetailsProps) {
         ...community,
         bounties: bountyEvents.filter(event => event.subject.workspaceId === community.id)
       };
+      community.bounties.forEach(bounty => {
+        bounty.hasCredential = bountyEvents.some((event) => event.subject.bountyId === bounty.bountyId);
+      });
+      return community;
     });
 
   const discordCommunities = (credentials?.discordEvents ?? []).map((credential): CommunityDetails => ({

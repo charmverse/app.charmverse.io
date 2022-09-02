@@ -15,7 +15,7 @@ import { getCard } from '../store/cards';
 import { useAppSelector } from '../store/hooks';
 import { Utils } from '../utils';
 import ConfirmationDialogBox, { ConfirmationDialogBoxProps } from './confirmationDialogBox';
-import PageDialog from 'components/common/Page/PageDialog';
+import PageDialog from 'components/common/PageDialog';
 
 type Props = {
   cardId: string
@@ -92,26 +92,12 @@ const CardDialog = (props: Props): JSX.Element | null => {
     },
   }
 
-  const handleDeleteButtonOnClick = () => {
-    // use may be renaming a card title
-    // and accidently delete the card
-    // so adding des
-    handleDeleteCard()
-  }
-
-  async function closeBounty () {
-    const updatedBounty = await charmClient.bounties.closeBounty(bounty!.id);
-    refreshBounty(updatedBounty.id);
-  }
-
   return card && pages[card.id] ? (
     <>
       <PageDialog
         onClose={onClose}
         readOnly={readonly}
         bounty={bounty}
-        onClickDelete={handleDeleteButtonOnClick}
-        onMarkCompleted={closeBounty}
         toolbar={
           spacePermissions?.createBounty && !isSharedPage && cardPage && !bounty && !draftBounty && !readonly && <CreateBountyButton pageId={cardId} />
         }

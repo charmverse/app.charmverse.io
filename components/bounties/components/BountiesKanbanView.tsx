@@ -1,7 +1,6 @@
 import { Box, Typography } from '@mui/material';
 import { BountyStatus, Page } from '@prisma/client';
-import charmClient from 'charmClient';
-import PageDialog from 'components/common/Page/PageDialog';
+import PageDialog from 'components/common/PageDialog';
 import { usePages } from 'hooks/usePages';
 import { silentlyUpdateURL } from 'lib/browser';
 import { IPageWithPermissions } from 'lib/pages';
@@ -16,10 +15,9 @@ const bountyStatuses: BountyStatus[] = ['open', 'inProgress', 'complete', 'paid'
 
 interface Props {
   bounties: BountyWithDetails[];
-  refreshBounty?: (bountyId: string) => void
 }
 
-export default function BountiesKanbanView ({ bounties, refreshBounty }: Omit<Props, 'publicMode'>) {
+export default function BountiesKanbanView ({ bounties }: Omit<Props, 'publicMode'>) {
   const [activeBountyPage, setActiveBountyPage] = useState<{page: IPageWithPermissions, bounty: BountyWithDetails} | null>(null);
   const { pages, deletePage } = usePages();
   const router = useRouter();
@@ -35,13 +33,6 @@ export default function BountiesKanbanView ({ bounties, refreshBounty }: Omit<Pr
     paid: [],
     suggestion: []
   });
-
-  async function closeBounty (bountyId: string) {
-    await charmClient.bounties.closeBounty(bountyId);
-    if (refreshBounty) {
-      refreshBounty(bountyId);
-    }
-  }
 
   function closePopup () {
     setActiveBountyPage(null);
@@ -104,18 +95,10 @@ export default function BountiesKanbanView ({ bounties, refreshBounty }: Omit<Pr
       {activeBountyPage?.page && activeBountyPage?.bounty && (
         <PageDialog
           page={activeBountyPage.page}
-          onClickDelete={() => {
-            deletePage({
-              pageId: activeBountyPage.page.id
-            });
-          }}
           onClose={() => {
             closePopup();
           }}
           bounty={activeBountyPage?.bounty}
-          onMarkCompleted={() => {
-            closeBounty(activeBountyPage?.bounty.id);
-          }}
         />
       )}
     </div>

@@ -20,6 +20,8 @@ import RouteGuard from 'components/common/RouteGuard';
 import FocalBoardProvider from 'components/common/BoardEditor/FocalBoardProvider';
 import { setTheme as setFocalBoardTheme } from 'components/common/BoardEditor/focalboard/src/theme';
 import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
+import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
+import PageDialogGlobalModal from 'components/common/PageDialog/PageDialogGlobal';
 import Snackbar from 'components/common/Snackbar';
 import IntlProvider from 'components/common/IntlProvider';
 import { ColorModeContext } from 'context/darkMode';
@@ -254,21 +256,24 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
                         <Global styles={cssVariables} />
                         <RouteGuard>
                           <ErrorBoundary>
-                            <Snackbar
-                              isOpen={isOldBuild}
-                              message='New CharmVerse platform update available. Please refresh.'
-                              actions={[
-                                <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                  <RefreshIcon fontSize='small' />
-                                </IconButton>
-                              ]}
-                              origin={{ vertical: 'top', horizontal: 'center' }}
-                              severity='warning'
-                              handleClose={() => setIsOldBuild(false)}
-                            />
-                            {getLayout(<Component {...pageProps} />)}
-                            <HexagonalAvatarMask id='hexagon-avatar' />
-                            <Snackbar />
+                            <PageDialogProvider>
+                              <Snackbar
+                                isOpen={isOldBuild}
+                                message='New CharmVerse platform update available. Please refresh.'
+                                actions={[
+                                  <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                    <RefreshIcon fontSize='small' />
+                                  </IconButton>
+                                ]}
+                                origin={{ vertical: 'top', horizontal: 'center' }}
+                                severity='warning'
+                                handleClose={() => setIsOldBuild(false)}
+                              />
+                              {getLayout(<Component {...pageProps} />)}
+                              <HexagonalAvatarMask id='hexagon-avatar' />
+                              <Snackbar />
+                              <PageDialogGlobalModal />
+                            </PageDialogProvider>
                           </ErrorBoundary>
                         </RouteGuard>
                       </SnackbarProvider>

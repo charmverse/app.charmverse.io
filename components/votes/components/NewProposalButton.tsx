@@ -1,5 +1,5 @@
 import Button from 'components/common/Button';
-import PageDialog from 'components/common/Page/PageDialog';
+import PageDialog from 'components/common/PageDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import { IPageWithPermissions } from 'lib/pages';
