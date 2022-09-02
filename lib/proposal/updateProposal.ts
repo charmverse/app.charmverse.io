@@ -3,6 +3,7 @@ import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { ProposalWithUsers } from './interface';
+import { generateSyncProposalPermissions } from './proposalStatusPagePermissions';
 
 export async function updateProposal ({
   proposal,
@@ -61,6 +62,8 @@ export async function updateProposal ({
     })
   ]);
 
+  const [deleteArgs, createArgs, childCreateArgs] = await generateSyncProposalPermissions({ proposalId: proposal.id });
+
   await prisma.$transaction([
     prisma.proposalReviewer.deleteMany({
       where: {
@@ -73,6 +76,9 @@ export async function updateProposal ({
         userId: reviewer.group === 'user' ? reviewer.id : null,
         roleId: reviewer.group === 'role' ? reviewer.id : null
       }))
-    })
+    }),
+    prisma.pagePermission.deleteMany(deleteArgs),
+    prisma.pagePermission.createMany(createArgs),
+    prisma.pagePermission.createMany(childCreateArgs)
   ]);
 }
