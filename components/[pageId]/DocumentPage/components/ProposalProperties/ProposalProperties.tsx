@@ -41,7 +41,7 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
   const canUpdateAuthors = status === 'draft' || status === 'private_draft' || status === 'discussion';
   const canUpdateReviewers = status === 'draft' || status === 'private_draft';
   const reviewerOptionsRecord: Record<string, ({group: 'role'} & ListSpaceRolesResponse) | ({group: 'user'} & Contributor)> = {};
-  const isProposalAuthor = (user && proposal.authors.map(author => author.userId).includes(user.id));
+  const isProposalAuthor = (user && proposal.authors.some(author => author.userId === user.id));
 
   contributors.forEach(contributor => {
     reviewerOptionsRecord[contributor.id] = {
