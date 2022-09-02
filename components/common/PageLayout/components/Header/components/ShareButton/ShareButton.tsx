@@ -7,12 +7,13 @@ import { usePages } from 'hooks/usePages';
 import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 import { useState, useEffect } from 'react';
 import { IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
+import { PageType } from '@prisma/client';
 import PagePermissions from './components/PagePermissions';
 import ShareToWeb from './components/ShareToWeb';
 
 export default function ShareButton ({ headerHeight, pageId }: { headerHeight: number, pageId: string }) {
 
-  const { refreshPage } = usePages();
+  const { refreshPage, pages } = usePages();
   const popupState = usePopupState({ variant: 'popover', popupId: 'share-menu' });
   const [pagePermissions, setPagePermissions] = useState<IPagePermissionWithAssignee[] | null>(null);
 
@@ -79,6 +80,7 @@ export default function ShareButton ({ headerHeight, pageId }: { headerHeight: n
                   pageId={pageId}
                   refreshPermissions={refreshPageAndPermissions}
                   pagePermissions={pagePermissions}
+                  pageType={pages[pageId]?.type as PageType}
                 />
               </>
             )

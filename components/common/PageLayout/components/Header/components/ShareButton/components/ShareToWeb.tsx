@@ -15,6 +15,9 @@ import { IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permissi
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { isEditablePageType } from 'lib/pages/utils';
+import EditableDayPicker from 'components/common/BoardEditor/focalboard/src/widgets/editableDayPicker';
+import { PageType } from '@prisma/client';
 
 const StyledInput = styled(Input)`
   font-size: .8em;
@@ -57,6 +60,8 @@ export default function ShareToWeb ({ pageId, pagePermissions, refreshPermission
   const currentPagePermissions = getPagePermissions(pageId);
 
   const currentPage = pages[pageId];
+
+  const disablePublicToggle = currentPagePermissions.edit_isPublic !== true || !isEditablePageType({ pageType: currentPage?.type as PageType });
 
   // Current values of the public permission
   const [shareLink, setShareLink] = useState<null | string>(null);
@@ -123,7 +128,7 @@ export default function ShareToWeb ({ pageId, pagePermissions, refreshPermission
         <Switch
           data-test='toggle-public-page'
           checked={!!publicPermission}
-          disabled={currentPagePermissions?.edit_isPublic !== true}
+          disabled={disablePublicToggle}
           onChange={togglePublic}
         />
       </Box>
@@ -131,6 +136,22 @@ export default function ShareToWeb ({ pageId, pagePermissions, refreshPermission
         (currentPage?.type.match(/board/)) && (
           <Alert severity='info'>
             Updates to this board's permissions, including whether it is public, will also apply to its cards.
+          </Alert>
+        )
+      }
+
+      {
+        (currentPage?.type === 'proposal') && (
+          <Alert severity='info'>
+            Proposal permissions update automatically based on the proposal stage and authors / reviewers.
+          </Alert>
+        )
+      }
+
+      {
+        (currentPage?.type === 'card_template') && (
+          <Alert severity='info'>
+            This template inherits permissions from its parent board.
           </Alert>
         )
       }
