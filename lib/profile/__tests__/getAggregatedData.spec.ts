@@ -151,12 +151,14 @@ describe('GET /api/public/profile/[userPath]', () => {
           createdAt: bounty.applications[0].createdAt.toISOString(),
           eventName: 'bounty_completed',
           organizationId: space.id,
+          bountyPath: `/${space.domain}/${bounty.page.path}`,
           bountyTitle: bounty.page?.title
         }, {
           bountyId: bounty.id,
           createdAt: bounty.createdAt.toISOString(),
           eventName: 'bounty_created',
           organizationId: space.id,
+          bountyPath: `/${space.domain}/${bounty.page.path}`,
           bountyTitle: bounty.page?.title
         }]
       }]
