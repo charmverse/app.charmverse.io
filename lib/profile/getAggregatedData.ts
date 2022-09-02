@@ -45,7 +45,8 @@ export async function getAggregatedData (userId: string, apiToken?: string): Pro
         createdBy: user.id
       },
       include: {
-        page: true
+        page: true,
+        space: true
       }
     }),
     prisma.application.findMany({
@@ -58,7 +59,8 @@ export async function getAggregatedData (userId: string, apiToken?: string): Pro
       include: {
         bounty: {
           include: {
-            page: true
+            page: true,
+            space: true
           }
         }
       }
@@ -158,6 +160,7 @@ export async function getAggregatedData (userId: string, apiToken?: string): Pro
   const bounties: ProfileBountyEvent[] = [
     ...bountiesCreated.map((bounty): ProfileBountyEvent => ({
       bountyId: bounty.id,
+      bountyPath: `/${bounty.space.domain}/${bounty.page?.path}`,
       bountyTitle: bounty.page?.title,
       createdAt: bounty.createdAt.toISOString(),
       organizationId: bounty.spaceId,
@@ -165,6 +168,7 @@ export async function getAggregatedData (userId: string, apiToken?: string): Pro
     })),
     ...bountyApplications.map((app): ProfileBountyEvent => ({
       bountyId: app.bounty.id,
+      bountyPath: `/${app.bounty.space.domain}/${app.bounty.page?.path}`,
       bountyTitle: app.bounty.page?.title,
       createdAt: app.createdAt.toISOString(),
       organizationId: app.spaceId,

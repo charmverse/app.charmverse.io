@@ -15,6 +15,7 @@ import { UserCommunity, ProfileBountyEvent } from 'lib/profile/interfaces';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import Avatar from 'components/common/Avatar';
+import Link from 'components/common/Link';
 import { ProfileItemContainer } from './CollectibleRow';
 
 const TASK_TABS = [
@@ -76,7 +77,7 @@ function TaskTab ({ task, value, onClick }: { task: typeof TASK_TABS[number], va
 interface EventRowProps {
   eventNumber: number;
   icon: ReactNode;
-  title: string;
+  title: string | ReactNode;
   createdAt: string;
 }
 
@@ -91,7 +92,7 @@ function EventRow (event: EventRowProps) {
         alignSelf='flex-start'
       >
         {event.icon}
-        <Typography fontWeight={500}>{event.eventNumber}.</Typography>
+        <Typography variant='body2' color='secondary'>{event.eventNumber}.</Typography>
       </Stack>
       <Stack
         gap={0.5}
@@ -104,7 +105,7 @@ function EventRow (event: EventRowProps) {
           alignItems: 'flex-start'
         }}
       >
-        <Typography sx={{ flexGrow: 1 }}>
+        <Typography variant='body2' sx={{ flexGrow: 1 }}>
           {event.title}
         </Typography>
         <Typography variant='subtitle1' color='secondary' textAlign={{ sm: 'left', md: 'right' }} minWidth={100}>{showDateWithMonthAndYear(event.createdAt, true)}</Typography>
@@ -167,7 +168,14 @@ function BountyEventsPanel ({ events }: { events: ProfileBountyEvent[] }) {
             <EventRow
               key={event.bountyId}
               createdAt={event.createdAt}
-              title={`${bountyStatus(event.eventName)}: ${event.bountyTitle || 'Untitled'}`}
+              title={(
+                <>
+                  {bountyStatus(event.eventName)}:&nbsp;
+                  <Link href={event.bountyPath} color='inherit'>
+                    <strong>{event.bountyTitle || 'Untitled'}</strong>
+                  </Link>
+                </>
+              )}
               icon={null}
               eventNumber={index + 1}
             />
@@ -180,13 +188,13 @@ function BountyEventsPanel ({ events }: { events: ProfileBountyEvent[] }) {
 function bountyStatus (status: ProfileBountyEvent['eventName']) {
   switch (status) {
     case 'bounty_created':
-      return 'Created bounty';
+      return 'Created';
     case 'bounty_completed':
-      return 'Completed bounty';
+      return 'Completed';
     case 'bounty_started':
-      return 'Started bounty';
+      return 'Started';
     default:
-      return 'Bounty event';
+      return 'Event';
   }
 }
 
@@ -217,6 +225,7 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
         onClick={toggleCollapse}
       >
         <Avatar
+          className='hidden-on-visible'
           avatar={community.logo}
           name={community.name}
           variant='rounded'
@@ -228,7 +237,7 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
           justifyContent='space-between'
           flexGrow={1}
         >
-          <Box>
+          <Box className='hidden-on-visible'>
             <Typography
               sx={{
                 fontSize: {
@@ -276,7 +285,7 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
               </Tooltip>
             )}
             {isCollapsible && (
-              <IconButton size='small'>
+              <IconButton className='hidden-on-visible' size='small'>
                 {isCollapsed ? <ExpandMoreIcon fontSize='small' /> : <ExpandLessIcon fontSize='small' />}
               </IconButton>
             )}
@@ -285,7 +294,7 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
       </Box>
 
       <Collapse in={!isCollapsed}>
-        <Box>
+        <Box className='hidden-on-visible'>
           <Tabs
             sx={{
               mb: 2

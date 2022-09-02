@@ -8,6 +8,7 @@ export interface UserCommunity {
 
 export interface ProfileBountyEvent {
   bountyId: string;
+  bountyPath: string;
   createdAt: string;
   organizationId: string;
   eventName: 'bounty_created' | 'bounty_started' | 'bounty_completed';
