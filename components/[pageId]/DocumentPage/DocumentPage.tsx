@@ -53,7 +53,7 @@ export interface DocumentPageProps {
 }
 
 function DocumentPage ({ page, setPage, insideModal, readOnly = false }: DocumentPageProps) {
-  const { pages, getPagePermissions } = usePages();
+  const { pages, getPagePermissions, refreshPage } = usePages();
   const { cancelVote, castVote, deleteVote, votes, isLoading } = useVotes();
   const pagePermissions = getPagePermissions(page.id);
   const { draftBounty } = useBounties();
@@ -197,7 +197,13 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
                       pageUpdatedBy={page.updatedBy}
                     />
                   )}
-                  {page.proposalId && <ProposalProperties readOnly={readOnly} proposalId={page.proposalId} />}
+                  {page.proposalId && (
+                    <ProposalProperties
+                      readOnly={readOnly}
+                      proposalId={page.proposalId}
+                      refreshPage={() => refreshPage(page.id)}
+                    />
+                  )}
                   {(draftBounty || page.bountyId) && (
                     <BountyProperties
                       bountyId={page.bountyId}

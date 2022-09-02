@@ -19,14 +19,14 @@ import { ProposalStatusChip } from './ProposalStatusBadge';
 
 interface ProposalPropertiesProps {
   proposalId: string,
-  readOnly?: boolean
+  readOnly?: boolean,
+  refreshPage: () => void
 }
 
 const proposalStatuses = Object.keys(proposalStatusTransitionRecord);
 
-export default function ProposalProperties ({ proposalId, readOnly }: ProposalPropertiesProps) {
+export default function ProposalProperties ({ proposalId, readOnly, refreshPage }: ProposalPropertiesProps) {
   const { data: proposal, mutate: refreshProposal } = useSWR(`proposal/${proposalId}`, () => charmClient.proposals.getProposal(proposalId));
-
   const [contributors] = useContributors();
   const { roles = [] } = useRoles();
   const { user } = useUser();
@@ -60,6 +60,7 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
   async function updateProposalStatus (newStatus: ProposalStatus) {
     await charmClient.proposals.updateStatus(proposalId, newStatus);
     refreshProposal();
+    refreshPage();
     proposalMenuState.close();
   }
 
@@ -126,6 +127,7 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
                     reviewers: proposal.reviewers.map(reviewer => ({ group: reviewer.roleId ? 'role' : 'user', id: reviewer.roleId ?? reviewer.userId as string }))
                   });
                   refreshProposal();
+                  refreshPage();
                 }
               }}
               disabled={!user || readOnly || !canUpdateAuthors || !isProposalAuthor}
@@ -163,6 +165,7 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
                   reviewers: options.map(option => ({ group: option.group, id: option.id }))
                 });
                 refreshProposal();
+                refreshPage();
               }}
               sx={{
                 width: '100%'
