@@ -1,4 +1,4 @@
-import { Divider, Grid, Typography } from '@mui/material';
+import { Divider, Grid, Menu, MenuItem, IconButton, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import charmClient from 'charmClient';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
@@ -7,8 +7,14 @@ import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
 import { Contributor, useContributors } from 'hooks/useContributors';
 import useRoles from 'hooks/useRoles';
 import { useUser } from 'hooks/useUser';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { ListSpaceRolesResponse } from 'pages/api/roles';
 import useSWR from 'swr';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { proposalStatusTransitionRecord, PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
+import { ProposalStatus } from '@prisma/client';
 import { ProposalStatusChip } from './ProposalStatusBadge';
 
 interface ProposalPropertiesProps {
@@ -16,12 +22,15 @@ interface ProposalPropertiesProps {
   readOnly?: boolean
 }
 
+const proposalStatuses = Object.keys(proposalStatusTransitionRecord);
+
 export default function ProposalProperties ({ proposalId, readOnly }: ProposalPropertiesProps) {
   const { data: proposal, mutate: refreshProposal } = useSWR(`proposal/${proposalId}`, () => charmClient.proposals.getProposal(proposalId));
 
   const [contributors] = useContributors();
   const { roles = [] } = useRoles();
   const { user } = useUser();
+  const proposalMenuState = usePopupState({ popupId: 'proposal-info', variant: 'popover' });
 
   if (!proposal) {
     return null;
@@ -32,6 +41,7 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
   const canUpdateAuthors = status === 'draft' || status === 'private_draft' || status === 'discussion';
   const canUpdateReviewers = status === 'draft' || status === 'private_draft';
   const reviewerOptionsRecord: Record<string, ({group: 'role'} & ListSpaceRolesResponse) | ({group: 'user'} & Contributor)> = {};
+  const isProposalAuthor = (user && proposal.authors.some(author => author.userId === user.id));
 
   contributors.forEach(contributor => {
     reviewerOptionsRecord[contributor.id] = {
@@ -47,6 +57,12 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
     };
   });
 
+  async function updateProposalStatus (newStatus: ProposalStatus) {
+    await charmClient.proposals.updateStatus(proposalId, newStatus);
+    refreshProposal();
+    proposalMenuState.close();
+  }
+
   return (
     <Box
       className='octo-propertylist'
@@ -59,7 +75,12 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
     >
       <Grid container mb={2}>
         <Grid item xs={8}>
-          <Typography fontWeight='bold'>Proposal information</Typography>
+          <Box display='flex' gap={1} alignItems='center'>
+            <Typography fontWeight='bold'>Proposal information</Typography>
+            <IconButton size='small' {...bindTrigger(proposalMenuState)}>
+              <MoreHorizIcon fontSize='small' />
+            </IconButton>
+          </Box>
         </Grid>
         <Grid item xs={4}>
           <Box sx={{
@@ -107,7 +128,7 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
                   refreshProposal();
                 }
               }}
-              disabled={!user || readOnly || !canUpdateAuthors || (user && !proposal.authors.map(author => author.userId).includes(user.id))}
+              disabled={!user || readOnly || !canUpdateAuthors || !isProposalAuthor}
               readOnly={readOnly}
               options={contributors}
               sx={{
@@ -154,6 +175,27 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
         my: 2
       }}
       />
+      <Menu {...bindMenu(proposalMenuState)}>
+        {
+          proposalStatusTransitionRecord[proposal.status]?.map(newStatus => {
+            const currentStatusIndex = proposalStatuses.indexOf(proposal.status);
+            const newStatusIndex = proposalStatuses.indexOf(newStatus);
+
+            return (
+              <MenuItem
+                key={newStatus}
+                disabled={!isProposalAuthor}
+                onClick={() => updateProposalStatus(newStatus)}
+              >
+                <Box display='flex' alignItems='center' gap={1}>
+                  {currentStatusIndex < newStatusIndex ? <ArrowForwardIcon fontSize='small' /> : <ArrowBackIcon fontSize='small' />}
+                  <Typography>Move to {PROPOSAL_STATUS_LABELS[newStatus]}</Typography>
+                </Box>
+              </MenuItem>
+            );
+          })
+        }
+      </Menu>
     </Box>
   );
 }
