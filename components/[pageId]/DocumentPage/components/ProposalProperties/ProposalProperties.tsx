@@ -13,12 +13,16 @@ import useSWR from 'swr';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { proposalStatusTransitionRecord, PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
+import { ProposalStatus } from '@prisma/client';
 import { ProposalStatusChip } from './ProposalStatusBadge';
 
 interface ProposalPropertiesProps {
   proposalId: string,
   readOnly?: boolean
 }
+
+const proposalStatuses = Object.keys(proposalStatusTransitionRecord);
 
 export default function ProposalProperties ({ proposalId, readOnly }: ProposalPropertiesProps) {
   const { data: proposal, mutate: refreshProposal } = useSWR(`proposal/${proposalId}`, () => charmClient.proposals.getProposal(proposalId));
@@ -52,6 +56,12 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
       group: 'role'
     };
   });
+
+  async function updateProposalStatus (newStatus: ProposalStatus) {
+    await charmClient.proposals.updateStatus(proposalId, newStatus);
+    refreshProposal();
+    proposalMenuState.close();
+  }
 
   return (
     <Box
@@ -166,60 +176,25 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
       }}
       />
       <Menu {...bindMenu(proposalMenuState)}>
-        <MenuItem
-          disabled={!isProposalAuthor}
-          onClick={async () => {
-            await charmClient.proposals.updateStatus(proposal.id, proposal.status === 'private_draft' ? 'draft' : proposal.status === 'draft' ? 'private_draft' : 'draft');
-            refreshProposal();
-            proposalMenuState.close();
-          }}
-        >
-          <Box display='flex' alignItems='center' gap={1}>
-            {proposal.status === 'private_draft' ? (
-              <>
-                <ArrowForwardIcon fontSize='small' />
-                <Typography>Move to public draft</Typography>
-              </>
-            ) : (
-              <>
-                <ArrowBackIcon fontSize='small' />
-                <Typography>
-                  Move to {proposal.status === 'draft' ? 'private' : 'public'} draft
-                </Typography>
-              </>
-            )}
-          </Box>
-        </MenuItem>
+        {
+          proposalStatusTransitionRecord[proposal.status]?.map(newStatus => {
+            const currentStatusIndex = proposalStatuses.indexOf(proposal.status);
+            const newStatusIndex = proposalStatuses.indexOf(newStatus);
 
-        {(proposal.status === 'private_draft' || proposal.status === 'draft') && (
-          <MenuItem
-            disabled={!isProposalAuthor}
-            onClick={async () => {
-              await charmClient.proposals.updateStatus(proposal.id, (proposal.status === 'private_draft' || proposal.status === 'draft') ? 'discussion' : 'private_draft');
-              refreshProposal();
-              proposalMenuState.close();
-            }}
-          >
-            <Box display='flex' alignItems='center' gap={1}>
-
-              {proposal.status === 'draft' || proposal.status === 'private_draft' ? (
-                <>
-                  <ArrowForwardIcon fontSize='small' />
-                  <Typography>
-                    Move to discussion
-                  </Typography>
-                </>
-              ) : (
-                <>
-                  <ArrowBackIcon fontSize='small' />
-                  <Typography>
-                    Move to private draft
-                  </Typography>
-                </>
-              )}
-            </Box>
-          </MenuItem>
-        )}
+            return (
+              <MenuItem
+                key={newStatus}
+                disabled={!isProposalAuthor}
+                onClick={() => updateProposalStatus(newStatus)}
+              >
+                <Box display='flex' alignItems='center' gap={1}>
+                  {currentStatusIndex < newStatusIndex ? <ArrowForwardIcon fontSize='small' /> : <ArrowBackIcon fontSize='small' />}
+                  <Typography>Move to {PROPOSAL_STATUS_LABELS[newStatus]}</Typography>
+                </Box>
+              </MenuItem>
+            );
+          })
+        }
       </Menu>
     </Box>
   );
