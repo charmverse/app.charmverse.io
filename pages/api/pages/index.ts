@@ -12,6 +12,7 @@ import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 import log from 'lib/log';
 import { createProposal } from 'lib/proposal/createProposal';
+import { execSyncProposalPermissions } from 'lib/proposal/proposalStatusPagePermissions';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -72,7 +73,7 @@ async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
 
   try {
 
-    const pageWithPermissions = await setupPermissionsAfterPageCreated(page.id);
+    const pageWithPermissions = await (page.type === 'proposal' ? execSyncProposalPermissions({ proposalId: page.proposalId as string }) : setupPermissionsAfterPageCreated(page.id));
 
     logFirstWorkspacePageCreation(page);
     logFirstUserPageCreation(page);

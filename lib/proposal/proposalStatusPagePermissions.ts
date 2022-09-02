@@ -127,7 +127,10 @@ export async function generateSyncProposalPermissions ({ proposalId }: ProposalP
   if (proposalPermissionMapping[currentStage].reviewer !== null) {
     proposal.reviewers.forEach(r => {
 
-      if (r.roleId || r.userId) {
+      if ((r.roleId || r.userId) && (
+        permissionsToAssign.every(p => r.userId ? r.userId !== p.userId : r.roleId !== p.roleId)
+      )) {
+
         permissionsToAssign.push({
           pageId: page.id,
           // Only one of these should exist
