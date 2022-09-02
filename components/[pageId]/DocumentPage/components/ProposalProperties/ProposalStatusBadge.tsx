@@ -8,18 +8,9 @@ import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutl
 import ReviewsOutlinedIcon from '@mui/icons-material/ReviewsOutlined';
 import { Chip, ChipProps } from '@mui/material';
 import { ProposalStatus } from '@prisma/client';
+import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import { ReactNode } from 'react';
 import { BrandColor } from 'theme/colors';
-
-export const PROPOSAL_STATUS_LABELS: Record<ProposalStatus, string> = {
-  private_draft: 'Private draft',
-  draft: 'Draft',
-  discussion: 'Discussion',
-  review: 'In Review',
-  reviewed: 'Reviewed',
-  vote_active: 'Vote Active',
-  vote_closed: 'Vote Closed'
-};
 
 const PROPOSAL_STATUS_ICONS : Record<ProposalStatus, ReactNode> = {
   private_draft: <LockOutlinedIcon />,
