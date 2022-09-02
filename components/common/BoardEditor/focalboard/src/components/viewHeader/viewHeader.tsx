@@ -52,7 +52,7 @@ type Props = {
 const ViewHeader = (props: Props) => {
   const [showFilter, setShowFilter] = useState(false);
   const router = useRouter();
-  const {pages} = usePages();
+  const {pages, refreshPage} = usePages();
   const cardTemplates: Card[] = useAppSelector(getCurrentBoardTemplates);
 
   const views = props.views.filter(view => !view.fields.inline)
@@ -71,7 +71,9 @@ const ViewHeader = (props: Props) => {
       cardPage: pages[pageId] as Page
     });
     console.log('Created blocks', blocks)
-    props.showCard(blocks[0]?.id)
+    const newPageId = blocks[0].id;
+    await refreshPage(newPageId);
+    props.showCard(newPageId)
   }
 
   async function deleteCardTemplate(pageId: string) {

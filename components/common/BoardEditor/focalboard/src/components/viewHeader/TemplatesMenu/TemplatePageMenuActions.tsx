@@ -2,6 +2,7 @@ import Menu from '@mui/material/Menu';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
+import {DeleteIcon} from 'components/common/Icons/DeleteIcon';
 import { EditIcon } from 'components/common/Icons/EditIcon';
 import { Page } from '@prisma/client';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
@@ -38,7 +39,7 @@ export function TemplatePageMenuActions ({deleteTemplate, page, editTemplate, is
         popupState.close();
         deleteTemplate(page.id);
       }}>
-        <EditIcon fontSize="small" />
+        <DeleteIcon fontSize="small" />
         <Typography variant="body2" color="text.secondary">
           Delete
         </Typography>
