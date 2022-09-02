@@ -158,6 +158,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
               disablePageSpecificFeatures={isSharedPage}
               enableVoting={true}
               containerWidth={containerWidth}
+              pageType={page.type}
             >
               <PageHeader
                 headerImage={page.headerImage}

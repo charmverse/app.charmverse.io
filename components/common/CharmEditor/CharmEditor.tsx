@@ -18,6 +18,7 @@ import { EditorState, EditorView, Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import { Box, Divider, Slide } from '@mui/material';
+import { PageType } from '@prisma/client';
 import charmClient from 'charmClient';
 import * as codeBlock from 'components/common/CharmEditor/components/@bangle.dev/base-components/code-block';
 import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
@@ -42,13 +43,12 @@ import * as columnLayout from './components/columnLayout';
 import LayoutColumn from './components/columnLayout/Column';
 import LayoutRow from './components/columnLayout/Row';
 import { CryptoPrice } from './components/CryptoPrice';
-import InlineDatabase from './components/inlineDatabase/components/InlineDatabase';
-import * as inlineDatabase from './components/inlineDatabase';
 import * as disclosure from './components/disclosure';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
 import * as floatingMenu from './components/floatingMenu';
 import * as iframe from './components/iframe';
 import InlineCommentThread, * as inlineComment from './components/inlineComment';
+import InlineDatabase from './components/inlineDatabase/components/InlineDatabase';
 import InlinePalette, { plugins as inlinePalettePlugins } from './components/inlinePalette';
 import * as inlineVote from './components/inlineVote';
 import InlineVoteList from './components/inlineVote/components/InlineVoteList';
@@ -314,6 +314,7 @@ interface CharmEditorProps {
   enableVoting?: boolean;
   pageId?: string | null;
   containerWidth?: number;
+  pageType?: PageType;
 }
 
 export function convertPageContentToMarkdown (content: PageContent, title?: string): string {
@@ -347,7 +348,8 @@ function CharmEditor (
     disablePageSpecificFeatures = false,
     enableVoting,
     pageId,
-    containerWidth
+    containerWidth,
+    pageType
   }:
   CharmEditorProps
 ) {
@@ -565,7 +567,12 @@ function CharmEditor (
         }
       }}
     >
-      <floatingMenu.FloatingMenu enableComments={!disablePageSpecificFeatures} enableVoting={enableVoting} pluginKey={floatingMenuPluginKey} />
+      <floatingMenu.FloatingMenu
+        enableComments={!disablePageSpecificFeatures}
+        enableVoting={enableVoting}
+        pluginKey={floatingMenuPluginKey}
+        pageType={pageType}
+      />
       <MentionSuggest pluginKey={mentionPluginKey} />
       <NestedPagesList pluginKey={nestedPagePluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
