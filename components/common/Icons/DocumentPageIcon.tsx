@@ -7,11 +7,12 @@ interface Props {
   iconSize?: SvgIconTypeMap['props']['fontSize'];
   fontSize?: string;
   label?: string;
+  onClick?: () => void;
 }
 
-export function DocumentPageIcon ({ iconSize, label, fontSize }: Props) {
+export function DocumentPageIcon ({ iconSize, label, fontSize, onClick }: Props) {
   return (
-    <IconWrapper>
+    <IconWrapper onClick={onClick}>
       <DescriptionOutlinedIcon fontSize={iconSize} />
       <Box component='span' fontSize={fontSize}>
         {label}
