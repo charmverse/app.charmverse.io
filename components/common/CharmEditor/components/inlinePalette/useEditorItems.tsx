@@ -18,8 +18,10 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
   const { addNestedPage } = useNestedPage();
   const [space] = useCurrentSpace();
   const { user } = useUser();
-  const { currentPageId } = usePages();
+  const { currentPageId, pages } = usePages();
   const [userSpacePermissions] = useCurrentSpacePermissions();
+
+  const pageType = currentPageId ? pages[currentPageId]?.type : undefined;
 
   const paletteItems = useMemo(() => {
 
@@ -28,7 +30,7 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
       ['media', mediaItems()],
       ['other', otherItems({ addNestedPage, nestedPagePluginKey, userSpacePermissions })],
       ['text', textItems()],
-      ['database', (user && space) ? databaseItems({ addNestedPage, currentPageId, userId: user.id, space }) : []]
+      ['database', (user && space) ? databaseItems({ addNestedPage, currentPageId, userId: user.id, space, pageType }) : []]
     ];
 
     const itemList = itemGroups.map(([group, items]) => (
