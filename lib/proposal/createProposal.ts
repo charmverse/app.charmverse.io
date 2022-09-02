@@ -24,7 +24,7 @@ export async function createProposal ({
           createdBy: userId,
           id: proposalId,
           spaceId,
-          status: 'draft',
+          status: 'private_draft',
           // Add page creator as the proposal's first author
           authors: {
             create: {

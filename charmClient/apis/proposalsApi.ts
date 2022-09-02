@@ -20,6 +20,6 @@ export class ProposalsApi {
   }
 
   updateStatus (proposalId: string, newStatus: ProposalStatus) {
-    return http.PUT(`/api/proposals/${proposalId}`, { newStatus });
+    return http.PUT(`/api/proposals/${proposalId}/status`, { newStatus });
   }
 }

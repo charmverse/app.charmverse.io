@@ -3,6 +3,7 @@ import { ProposalStatus } from '@prisma/client';
 import { prisma } from 'db';
 import { NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { updateProposalStatus } from 'lib/proposal/updateProposalStatus';
+import { withSessionRoute } from 'lib/session/withSession';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -44,3 +45,5 @@ async function updateProposalStatusController (req: NextApiRequest, res: NextApi
 
   return res.status(200).end();
 }
+
+export default withSessionRoute(handler);

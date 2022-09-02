@@ -1,4 +1,4 @@
-import { Divider, Grid, Typography } from '@mui/material';
+import { Divider, Grid, Menu, MenuItem, IconButton, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import charmClient from 'charmClient';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
@@ -7,8 +7,12 @@ import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
 import { Contributor, useContributors } from 'hooks/useContributors';
 import useRoles from 'hooks/useRoles';
 import { useUser } from 'hooks/useUser';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { ListSpaceRolesResponse } from 'pages/api/roles';
 import useSWR from 'swr';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { ProposalStatusChip } from './ProposalStatusBadge';
 
 interface ProposalPropertiesProps {
@@ -22,6 +26,7 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
   const [contributors] = useContributors();
   const { roles = [] } = useRoles();
   const { user } = useUser();
+  const proposalMenuState = usePopupState({ popupId: 'proposal-info', variant: 'popover' });
 
   if (!proposal) {
     return null;
@@ -32,6 +37,7 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
   const canUpdateAuthors = status === 'draft' || status === 'private_draft' || status === 'discussion';
   const canUpdateReviewers = status === 'draft' || status === 'private_draft';
   const reviewerOptionsRecord: Record<string, ({group: 'role'} & ListSpaceRolesResponse) | ({group: 'user'} & Contributor)> = {};
+  const isProposalAuthor = (user && proposal.authors.map(author => author.userId).includes(user.id));
 
   contributors.forEach(contributor => {
     reviewerOptionsRecord[contributor.id] = {
@@ -59,7 +65,12 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
     >
       <Grid container mb={2}>
         <Grid item xs={8}>
-          <Typography fontWeight='bold'>Proposal information</Typography>
+          <Box display='flex' gap={1} alignItems='center'>
+            <Typography fontWeight='bold'>Proposal information</Typography>
+            <IconButton size='small' {...bindTrigger(proposalMenuState)}>
+              <MoreHorizIcon fontSize='small' />
+            </IconButton>
+          </Box>
         </Grid>
         <Grid item xs={4}>
           <Box sx={{
@@ -107,7 +118,7 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
                   refreshProposal();
                 }
               }}
-              disabled={!user || readOnly || !canUpdateAuthors || (user && !proposal.authors.map(author => author.userId).includes(user.id))}
+              disabled={!user || readOnly || !canUpdateAuthors || !isProposalAuthor}
               readOnly={readOnly}
               options={contributors}
               sx={{
@@ -154,6 +165,62 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
         my: 2
       }}
       />
+      <Menu {...bindMenu(proposalMenuState)}>
+        <MenuItem
+          disabled={!isProposalAuthor}
+          onClick={async () => {
+            await charmClient.proposals.updateStatus(proposal.id, proposal.status === 'private_draft' ? 'draft' : proposal.status === 'draft' ? 'private_draft' : 'draft');
+            refreshProposal();
+            proposalMenuState.close();
+          }}
+        >
+          <Box display='flex' alignItems='center' gap={1}>
+            {proposal.status === 'private_draft' ? (
+              <>
+                <ArrowForwardIcon fontSize='small' />
+                <Typography>Move to public draft</Typography>
+              </>
+            ) : (
+              <>
+                <ArrowBackIcon fontSize='small' />
+                <Typography>
+                  Move to {proposal.status === 'draft' ? 'private' : 'public'} draft
+                </Typography>
+              </>
+            )}
+          </Box>
+        </MenuItem>
+
+        {(proposal.status === 'private_draft' || proposal.status === 'draft') && (
+          <MenuItem
+            disabled={!isProposalAuthor}
+            onClick={async () => {
+              await charmClient.proposals.updateStatus(proposal.id, (proposal.status === 'private_draft' || proposal.status === 'draft') ? 'discussion' : 'private_draft');
+              refreshProposal();
+              proposalMenuState.close();
+            }}
+          >
+            <Box display='flex' alignItems='center' gap={1}>
+
+              {proposal.status === 'draft' || proposal.status === 'private_draft' ? (
+                <>
+                  <ArrowForwardIcon fontSize='small' />
+                  <Typography>
+                    Move to discussion
+                  </Typography>
+                </>
+              ) : (
+                <>
+                  <ArrowBackIcon fontSize='small' />
+                  <Typography>
+                    Move to private draft
+                  </Typography>
+                </>
+              )}
+            </Box>
+          </MenuItem>
+        )}
+      </Menu>
     </Box>
   );
 }
