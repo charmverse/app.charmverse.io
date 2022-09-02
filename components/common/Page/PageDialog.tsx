@@ -117,10 +117,11 @@ export default function PageDialog (props: Props) {
                   <ListItemText primary='Delete' />
                 </ListItemButton>
               )}
-              <ListItemButton onClick={() => {
-                Utils.copyTextToClipboard(window.location.href);
-                showMessage('Copied card link to clipboard', 'success');
-              }}
+              <ListItemButton
+                onClick={() => {
+                  Utils.copyTextToClipboard(window.location.href);
+                  showMessage('Copied card link to clipboard', 'success');
+                }}
               >
                 <InsertLinkIcon
                   sx={{
@@ -130,6 +131,7 @@ export default function PageDialog (props: Props) {
                 />
                 <ListItemText primary='Copy link' />
               </ListItemButton>
+
               {bounty && onMarkCompleted && (
                 <ListItemButton disabled={bounty.status === 'complete' || (bounty.status !== 'inProgress' && bounty.status !== 'open')} onClick={() => onMarkCompleted(bounty.id)}>
                   <CheckCircleIcon
@@ -161,6 +163,7 @@ export default function PageDialog (props: Props) {
         >
           {page && <DocumentPage insideModal page={page} setPage={setPage} readOnly={props.readOnly} />}
         </Dialog>
+
       )}
     </RootPortal>
   );

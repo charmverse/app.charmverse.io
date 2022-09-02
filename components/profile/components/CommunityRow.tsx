@@ -5,7 +5,7 @@ import { ReactNode, useEffect, useState } from 'react';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import CheckIcon from '@mui/icons-material/Check';
+import CheckIcon from '@mui/icons-material/VerifiedUser';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import ForumIcon from '@mui/icons-material/Forum';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';

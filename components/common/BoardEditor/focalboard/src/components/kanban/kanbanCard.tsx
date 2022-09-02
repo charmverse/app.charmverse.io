@@ -118,6 +118,7 @@ const KanbanCard = React.memo((props: Props) => {
         draggable={!props.readonly}
         style={{ opacity: isDragging ? 0.5 : 1 }}
         onClick={props.onClick}
+        data-test='kanban-card'
       >
         {!props.readonly
           && (

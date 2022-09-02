@@ -31,17 +31,18 @@ async function deleteBlock (req: NextApiRequest, res: NextApiResponse<{deletedCo
     });
   }
 
-  if (rootBlock.type === 'card' || rootBlock.type === 'board') {
-    const permissionsSet = await computeUserPagePermissions({
-      pageId: req.query.id as string,
-      userId: req.session.user.id as string
-    });
+  const permissionsSet = await computeUserPagePermissions({
+    pageId: req.query.id as string,
+    userId: req.session.user.id as string
+  });
 
-    if (!permissionsSet.delete) {
-      return res.status(401).json({
-        error: 'You are not allowed to perform this action'
-      });
-    }
+  if (!permissionsSet.delete) {
+    return res.status(401).json({
+      error: 'You are not allowed to perform this action'
+    });
+  }
+
+  if (rootBlock.type === 'card' || rootBlock.type === 'card_template' || rootBlock.type === 'board') {
 
     const deletedChildPageIds = await modifyChildPages(blockId, userId, 'archive');
     deletedCount = deletedChildPageIds.length;

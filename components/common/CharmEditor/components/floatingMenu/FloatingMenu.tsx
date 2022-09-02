@@ -4,6 +4,7 @@ import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
+import { PageType } from '@prisma/client';
 import { SubMenu } from '../@bangle.dev/react-menu/floating-menu';
 import { LinkSubMenu } from '../@bangle.dev/react-menu/LinkSubMenu';
 import { Menu } from '../@bangle.dev/react-menu/Menu';
@@ -14,19 +15,26 @@ import InlineVoteSubMenu from '../inlineVote/components/InlineVoteSubmenu';
 
 type FloatingMenuVariant = 'defaultMenu' | 'linkSubMenu' | 'inlineCommentSubMenu' | 'commentOnlyMenu';
 
+interface Props {
+  enableComments?: boolean,
+  enableVoting?: boolean,
+  pluginKey: PluginKey,
+  inline?: boolean,
+  pageType?: PageType
+}
+
 export default function FloatingMenuComponent (
   {
-    pluginKey, enableComments = true, enableVoting = false, inline = false }:
-    {enableComments?: boolean, enableVoting?: boolean, pluginKey: PluginKey, inline?: boolean
-  }
+    pluginKey, enableComments = true, enableVoting = false, inline = false, pageType }: Props
+
 ) {
   const { showMessage } = useSnackbar();
   const { getPagePermissions, currentPageId } = usePages();
   const permissions = currentPageId ? getPagePermissions(currentPageId) : new AllowedPagePermissions();
   const [currentUserPermissions] = useCurrentSpacePermissions();
-  const displayInlineCommentButton = !inline && permissions.comment && enableComments;
+  const displayInlineCommentButton = !inline && permissions.comment && enableComments && pageType !== 'card_template';
 
-  const displayInlineVoteButton = !inline && permissions.comment && currentUserPermissions?.createVote && enableVoting;
+  const displayInlineVoteButton = !inline && permissions.comment && currentUserPermissions?.createVote && enableVoting && pageType !== 'card_template';
   return (
     <FloatingMenu
       menuKey={pluginKey}
