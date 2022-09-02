@@ -121,6 +121,7 @@ export default function ShareToWeb ({ pageId, pagePermissions, refreshPermission
           </Typography>
         </Box>
         <Switch
+          data-test='toggle-public-page'
           checked={!!publicPermission}
           disabled={currentPagePermissions?.edit_isPublic !== true}
           onChange={togglePublic}
@@ -139,11 +140,12 @@ export default function ShareToWeb ({ pageId, pagePermissions, refreshPermission
           shareLink && (
             <Box p={1}>
               <StyledInput
+                data-test='share-link'
                 fullWidth
                 disabled
                 value={shareLink}
                 endAdornment={(
-                  <CopyToClipboard text={shareLink} onCopy={onCopy}>
+                  <CopyToClipboard data-test='copy-button' text={shareLink} onCopy={onCopy}>
                     <InputAdornment position='end'>
                       <CopyButton>
                         {copied ? 'Copied!' : 'Copy'}

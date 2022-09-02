@@ -312,6 +312,7 @@ function Kanban (props: Props) {
             >
               {group.cards.map((card) => (
                 <KanbanCard
+                  
                   card={card}
                   board={board}
                   visiblePropertyTemplates={visiblePropertyTemplates}
