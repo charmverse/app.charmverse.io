@@ -125,6 +125,7 @@ describe('GET /api/public/profile/[userPath]', () => {
         joinDate: proposal1.createdAt,
         votes: [{ ...vote1, type: 'vote' }, { ...vote2, type: 'vote' }],
         proposals: [{ ...proposal1, type: 'proposal' }, { ...proposal2, type: 'proposal' }],
+        bounties: [],
         latestEventDate: vote2.createdAt
       }, {
         id: '2',
@@ -134,6 +135,7 @@ describe('GET /api/public/profile/[userPath]', () => {
         joinDate: vote3.createdAt,
         votes: [{ ...vote3, type: 'vote' }],
         proposals: [],
+        bounties: [],
         latestEventDate: vote3.createdAt
       }, {
         id: space.id,
@@ -143,6 +145,7 @@ describe('GET /api/public/profile/[userPath]', () => {
         logo: null,
         votes: [],
         proposals: [],
+        bounties: [],
         latestEventDate: ''
       }]
     });

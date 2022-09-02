@@ -2,6 +2,7 @@ import { Block, Page, PagePermission, Space } from '@prisma/client';
 import { Board } from 'lib/focalboard/board';
 import { BoardView } from 'lib/focalboard/boardView';
 import { Card } from 'lib/focalboard/card';
+import { ProposalWithUsers } from 'lib/proposal/interface';
 
 export interface IPageWithPermissions extends Page {
   permissions: (PagePermission & {sourcePermission: PagePermission | null}) []
@@ -81,3 +82,5 @@ export type TargetPageTreeWithFlatChildren<T extends PageNode = PageNode> = {
   targetPage: PageNodeWithChildren<T>,
   flatChildren: PageNodeWithChildren<T>[]
 }
+
+export type PageWithProposal = (Page & {proposal: ProposalWithUsers | null})

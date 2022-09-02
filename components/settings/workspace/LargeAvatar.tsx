@@ -110,7 +110,7 @@ export default function LargeAvatar (props: LargeAvatarProps) {
         name={name}
         variant={variant}
         isNft={isNft}
-        size='2xl'
+        size='2xLarge'
       />
     );
   }
@@ -145,7 +145,7 @@ export default function LargeAvatar (props: LargeAvatarProps) {
         variant={variant}
         icons={icons}
         isNft={isNft}
-        size='2xl'
+        size='2xLarge'
       />
       {canSetNft && (
         <>

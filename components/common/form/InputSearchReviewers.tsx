@@ -1,14 +1,11 @@
-import { Web3Provider } from '@ethersproject/providers';
 import { Autocomplete, TextField } from '@mui/material';
 import { Role } from '@prisma/client';
-import { useWeb3React } from '@web3-react/core';
+import UserDisplay from 'components/common/UserDisplay';
 import { useContributors } from 'hooks/useContributors';
 import useRoles from 'hooks/useRoles';
 import { Contributor } from 'models/User';
 import { ListSpaceRolesResponse } from 'pages/api/roles';
 import { ComponentProps, SyntheticEvent } from 'react';
-import { useSWRConfig } from 'swr';
-import UserDisplay from 'components/common/UserDisplay';
 
 type ReducedRole = Role | ListSpaceRolesResponse
 
@@ -20,8 +17,6 @@ export default function InputSearchReviewers ({
   disableCloseOnSelect = false, excludedIds, ...props
 }: Partial<Omit<ComponentProps<typeof Autocomplete>, 'onChange'>> & { excludedIds?: string[], onChange: (event: SyntheticEvent<Element, Event>, value: GroupedOption[]) => void }) {
   const { roles } = useRoles();
-  const { chainId } = useWeb3React<Web3Provider>();
-  const { cache } = useSWRConfig();
   const [contributors] = useContributors();
 
   const excludedIdsSet = new Set(excludedIds);
@@ -55,7 +50,7 @@ export default function InputSearchReviewers ({
       getOptionLabel={(groupWithId) => {
         const option = optionsRecord[groupWithId.id] ?? {};
         if (option.group === 'user') {
-          return cache.get(`@"ENS",102~,"${option.username}",${chainId},`) ?? option.username;
+          return option.username;
         }
         return option.name ?? '';
       }}

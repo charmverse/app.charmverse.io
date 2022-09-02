@@ -142,7 +142,7 @@
     "next-swagger-doc": "^0.2.1",
     "next-transpile-modules": "^9.0.0",
     "node-cron": "^3.0.0",
-    "node-fetch": "^3.2.9",
+    "node-fetch": "^2.6.7",
     "patch-package": "^6.4.7",
     "promise-retry": "^2.0.1",
     "prosemirror-dev-tools": "https://s3.amazonaws.com/charm.public/npm/prosemirror-dev-tools-3.3.4.tgz",

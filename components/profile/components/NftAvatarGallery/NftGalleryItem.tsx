@@ -28,7 +28,7 @@ export default function NftGalleryItem ({ nft, isSelected, onClick }: Props) {
     >
       <Stack>
         <Box sx={{ alignItems: 'center', justifyContent: 'center', display: 'flex' }}>
-          <Avatar avatar={nft.image ?? nft.imageThumb} isNft size='xl' />
+          <Avatar avatar={nft.image ?? nft.imageThumb} isNft size='xLarge' />
         </Box>
 
         <Typography noWrap variant='subtitle1'>

@@ -4,6 +4,7 @@ import charmClient from 'charmClient';
 import PageDialog from 'components/common/Page/PageDialog';
 import { usePages } from 'hooks/usePages';
 import { silentlyUpdateURL } from 'lib/browser';
+import { IPageWithPermissions } from 'lib/pages';
 import { getUriWithParam } from 'lib/utilities/strings';
 import { BountyWithDetails } from 'models';
 import { useRouter } from 'next/router';
@@ -19,7 +20,7 @@ interface Props {
 }
 
 export default function BountiesKanbanView ({ bounties, refreshBounty }: Omit<Props, 'publicMode'>) {
-  const [activeBountyPage, setActiveBountyPage] = useState<{page: Page, bounty: BountyWithDetails} | null>(null);
+  const [activeBountyPage, setActiveBountyPage] = useState<{page: IPageWithPermissions, bounty: BountyWithDetails} | null>(null);
   const { pages, deletePage } = usePages();
   const router = useRouter();
   const [initialBountyId, setInitialBountyId] = useState(router.query.bountyId as string || '');

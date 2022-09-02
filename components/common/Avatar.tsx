@@ -3,19 +3,19 @@ import Avatar from '@mui/material/Avatar';
 import { stringToColor } from 'lib/utilities/strings';
 import React from 'react';
 
-export type AvatarSize = 'xSmall' | 'small' | 'medium' | 'large' | 'xl' | '2xl';
+export type AvatarSize = 'xSmall' | 'small' | 'medium' | 'large' |'xLarge' | '2xLarge';
 export type AvatarVariant = 'circular' | 'rounded' | 'square';
 
 const sizeStyleMap: Record<AvatarSize, React.CSSProperties> = {
-  '2xl': {
+  '2xLarge': {
     height: 150,
     width: 150,
     fontSize: '5.625rem'
   },
-  xl: {
-    height: 80,
-    width: 80,
-    fontSize: '2.5rem'
+  xLarge: {
+    height: 96,
+    width: 96,
+    fontSize: '1.5rem'
   },
   large: {
     height: 54,
@@ -40,12 +40,12 @@ const sizeStyleMap: Record<AvatarSize, React.CSSProperties> = {
 };
 
 const sizeVariantStyleMap: Partial<Record<AvatarSize, Record<AvatarVariant, React.CSSProperties | null>>> = {
-  '2xl': {
+  '2xLarge': {
     rounded: { borderRadius: '1.625rem' },
     circular: null,
     square: null
   },
-  xl: {
+  xLarge: {
     rounded: { borderRadius: '0.825rem' },
     circular: null,
     square: null

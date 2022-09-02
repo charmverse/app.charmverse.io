@@ -89,7 +89,7 @@ export default function SetAvatarPopup () {
           <Box flex={1} justifyContent='center' display='flex'>
             <Box>
               <Avatar
-                size='2xl'
+                size='2xLarge'
                 avatar={user?.avatar}
                 name={user?.username || ''}
                 variant='circular'

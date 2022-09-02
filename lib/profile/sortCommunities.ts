@@ -13,6 +13,7 @@ export function sortCommunities ({ communities, proposals, votes }: {
       // Using empty values to indicate that these haven't been set yet
       joinDate: '',
       latestEventDate: '',
+      bounties: [],
       proposals: [],
       votes: [],
       ...org
