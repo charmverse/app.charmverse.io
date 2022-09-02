@@ -5,6 +5,7 @@ import { ReactNode, useState } from 'react';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import CheckIcon from '@mui/icons-material/Check';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import ForumIcon from '@mui/icons-material/Forum';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
@@ -92,7 +93,7 @@ function EventRow (event: EventRowProps) {
         alignSelf='flex-start'
       >
         {event.icon}
-        <Typography variant='body2' color='secondary'>{event.eventNumber}.</Typography>
+        <Typography variant='body2' color='secondary'>{event.eventNumber || ' '}.</Typography>
       </Stack>
       <Stack
         gap={0.5}
@@ -105,7 +106,7 @@ function EventRow (event: EventRowProps) {
           alignItems: 'flex-start'
         }}
       >
-        <Typography variant='body2' sx={{ flexGrow: 1 }}>
+        <Typography variant='body2' sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
           {event.title}
         </Typography>
         <Typography variant='subtitle1' color='secondary' textAlign={{ sm: 'left', md: 'right' }} minWidth={100}>{showDateWithMonthAndYear(event.createdAt, true)}</Typography>
@@ -174,6 +175,11 @@ function BountyEventsPanel ({ events }: { events: ProfileBountyEvent[] }) {
                   <Link href={event.bountyPath} color='inherit'>
                     <strong>{event.bountyTitle || 'Untitled'}</strong>
                   </Link>
+                  {event.hasCredential && (
+                    <Tooltip color='success' title='Verified with Collab.land'>
+                      <CheckIcon fontSize='small' />
+                    </Tooltip>
+                  )}
                 </>
               )}
               icon={null}
