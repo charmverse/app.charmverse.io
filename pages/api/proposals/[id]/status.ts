@@ -1,7 +1,7 @@
 
 import { ProposalStatus } from '@prisma/client';
 import { prisma } from 'db';
-import { NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { updateProposalStatus } from 'lib/proposal/updateProposalStatus';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
@@ -11,6 +11,7 @@ import nc from 'next-connect';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
+  .use(requireKeys(['newStatus'], 'body'))
   .put(updateProposalStatusController);
 
 async function updateProposalStatusController (req: NextApiRequest, res: NextApiResponse<{newStatus: ProposalStatus}>) {
