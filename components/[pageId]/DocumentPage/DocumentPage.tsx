@@ -53,6 +53,8 @@ export interface DocumentPageProps {
 }
 
 function DocumentPage ({ page, setPage, insideModal, readOnly = false }: DocumentPageProps) {
+
+  const router = useRouter();
   const { pages, getPagePermissions } = usePages();
   const { cancelVote, castVote, deleteVote, votes, isLoading } = useVotes();
   const pagePermissions = getPagePermissions(page.id);
@@ -119,7 +121,6 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
   const comments = useAppSelector(getCardComments(card?.id ?? page.id));
 
   const showPageActionSidebar = (currentPageActionDisplay !== null) && !insideModal;
-  const router = useRouter();
   const isSharedPage = router.pathname.startsWith('/share');
 
   return (
