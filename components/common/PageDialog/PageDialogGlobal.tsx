@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import charmClient from 'charmClient';
+import type { IPageWithPermissions } from 'lib/pages/interfaces';
 import { useBounties } from 'hooks/useBounties';
 import log from 'lib/log';
 import PageDialog from './PageDialog';
@@ -7,7 +8,7 @@ import { usePageDialog } from './hooks/usePageDialog';
 
 // a wrapper of page dialog that uses usePageDialogHook
 export default function PageDialogGlobal () {
-  const [page, setPage] = useState<IPageWithPermissions>(null);
+  const [page, setPage] = useState<IPageWithPermissions | null>(null);
   const { bounties } = useBounties();
   const { props, hidePage } = usePageDialog();
   const { bountyId, hideToolsMenu, pageId, readOnly, toolbar } = props;
