@@ -1,9 +1,8 @@
 import { Box, Typography } from '@mui/material';
 import { BountyStatus, Page } from '@prisma/client';
-import PageDialog from 'components/common/PageDialog';
+import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { usePages } from 'hooks/usePages';
 import { silentlyUpdateURL } from 'lib/browser';
-import { IPageWithPermissions } from 'lib/pages';
 import { getUriWithParam } from 'lib/utilities/strings';
 import { BountyWithDetails } from 'models';
 import { useRouter } from 'next/router';
@@ -18,8 +17,9 @@ interface Props {
 }
 
 export default function BountiesKanbanView ({ bounties }: Omit<Props, 'publicMode'>) {
-  const [activeBountyPage, setActiveBountyPage] = useState<{page: IPageWithPermissions, bounty: BountyWithDetails} | null>(null);
-  const { pages, deletePage } = usePages();
+  const { pages } = usePages();
+  const { showPage } = usePageDialog();
+
   const router = useRouter();
   const [initialBountyId, setInitialBountyId] = useState(router.query.bountyId as string || '');
 
@@ -35,19 +35,17 @@ export default function BountiesKanbanView ({ bounties }: Omit<Props, 'publicMod
   });
 
   function closePopup () {
-    setActiveBountyPage(null);
     const newUrl = getUriWithParam(window.location.href, { bountyId: null });
     silentlyUpdateURL(newUrl);
   }
 
   function showBounty (bounty: BountyWithDetails) {
-    const page = (bounty?.page.id && pages[bounty.page.id]) || null;
     const newUrl = getUriWithParam(window.location.href, { bountyId: bounty.id });
     silentlyUpdateURL(newUrl);
-    if (page) {
-      setActiveBountyPage({
-        bounty,
-        page
+    if (bounty?.page.id) {
+      showPage({
+        pageId: bounty?.page.id,
+        onClose: closePopup
       });
     }
   }
@@ -92,15 +90,6 @@ export default function BountiesKanbanView ({ bounties }: Omit<Props, 'publicMod
         ))}
       </div>
 
-      {activeBountyPage?.page && activeBountyPage?.bounty && (
-        <PageDialog
-          page={activeBountyPage.page}
-          onClose={() => {
-            closePopup();
-          }}
-          bounty={activeBountyPage?.bounty}
-        />
-      )}
     </div>
   );
 }

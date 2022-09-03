@@ -6,15 +6,17 @@ interface PageDialogContext {
   readOnly?: boolean;
   toolbar?: ReactNode;
   hideToolsMenu?: boolean;
+  onClose?: () => void;
 }
 
-interface Context extends PageDialogContext {
-  onCloseDialog?: () => void;
+interface Context {
+  props: PageDialogContext;
   hidePage: () => void;
   showPage: (context: PageDialogContext) => void;
 }
 
 const ContextElement = createContext<Readonly<Context>>({
+  props: {},
   hidePage: () => {},
   showPage: () => {}
 });
@@ -23,21 +25,22 @@ export const usePageDialog = () => useContext(ContextElement);
 
 export function PageDialogProvider ({ children }: { children: ReactNode }) {
 
-  const [context, setContext] = useState<PageDialogContext>({});
+  const [props, setProps] = useState<PageDialogContext>({});
 
   function hidePage () {
-    setContext({});
+    props?.onClose?.();
+    setProps({});
   }
 
   function showPage (_context: PageDialogContext) {
-    setContext(_context);
+    setProps(_context);
   }
 
   const value = useMemo(() => ({
-    ...context,
+    props,
     hidePage,
     showPage
-  }), [context]);
+  }), [props]);
 
   return (
     <ContextElement.Provider value={value}>

@@ -1,15 +1,13 @@
 import Button from 'components/common/Button';
-import PageDialog from 'components/common/PageDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
-import { IPageWithPermissions } from 'lib/pages';
+import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { addPage } from 'lib/pages/addPage';
-import { useState } from 'react';
 
 export default function NewProposalButton () {
   const { user } = useUser();
   const [currentSpace] = useCurrentSpace();
-  const [page, setPage] = useState<IPageWithPermissions | null>(null);
+  const { showPage } = usePageDialog();
 
   async function onClickCreate () {
     if (currentSpace && user) {
@@ -18,16 +16,15 @@ export default function NewProposalButton () {
         createdBy: user.id,
         type: 'proposal'
       });
-      setPage(newPage);
+      showPage({
+        pageId: newPage.id
+      });
     }
   }
 
   return (
-    <>
-      <Button onClick={onClickCreate}>
-        Create Proposal
-      </Button>
-      {page && <PageDialog page={page} onClose={() => setPage(null)} />}
-    </>
+    <Button onClick={onClickCreate}>
+      Create Proposal
+    </Button>
   );
 }

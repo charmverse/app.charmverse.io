@@ -1,6 +1,7 @@
-import { ReactNode } from 'react';
+import { MouseEvent, ReactNode } from 'react';
 import NextLink from 'next/link';
 import MuiLink from '@mui/material/Link';
+import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { Theme } from '@mui/material';
 import { SxProps } from '@mui/system';
 
@@ -24,16 +25,28 @@ const StyledMuiLink = styled(MuiLink)`
 `;
 
 type Props = {
-  children: ReactNode,
-  className?: string,
-  color?: string,
-  sx?: SxProps<Theme>,
-  href: string,
-  external?: boolean,
-  target?: string
+  children: ReactNode;
+  className?: string;
+  color?: string;
+  sx?: SxProps<Theme>;
+  href: string;
+  external?: boolean;
+  target?: string;
+  pageId?: string;
+  bountyId?: string;
 };
 
-export default function Link ({ href, children, sx, className, color = 'primary', external, target }: Props) {
+export default function Link ({ href, bountyId, pageId, children, sx, className, color = 'primary', external, target }: Props) {
+
+  const { showPage } = usePageDialog();
+
+  function onClickInternalLink (e: MouseEvent<HTMLAnchorElement>) {
+    if (bountyId || pageId) {
+      showPage({ bountyId, pageId });
+      e.preventDefault();
+    }
+  }
+
   return (
     external ? (
       <StyledMuiLink className={className} color={color} href={href} sx={sx} target={target} rel='noreferrer' underline='none'>
@@ -41,7 +54,7 @@ export default function Link ({ href, children, sx, className, color = 'primary'
       </StyledMuiLink>
     ) : (
       <NextLink href={href} passHref>
-        <StyledMuiLink className={className} color={color} sx={sx} target={target} underline='none'>
+        <StyledMuiLink onClick={onClickInternalLink} className={className} color={color} sx={sx} target={target} underline='none'>
           {children}
         </StyledMuiLink>
       </NextLink>

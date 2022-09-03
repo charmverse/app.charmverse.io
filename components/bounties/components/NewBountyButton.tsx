@@ -1,23 +1,21 @@
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import PageDialog from 'components/common/PageDialog';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
+import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
-import { IPageWithPermissions } from 'lib/pages';
 import { BountyWithDetails } from 'models';
-import { useState } from 'react';
 
 export default function NewBountyButton () {
   const { user } = useUser();
   const [currentSpace] = useCurrentSpace();
-  const [activeBountyPage, setActiveBountyPage] = useState<{page: IPageWithPermissions, bounty: BountyWithDetails} | null>(null);
   const [currentUserPermissions] = useCurrentSpacePermissions();
   const suggestBounties = currentUserPermissions?.createBounty === false;
   const { setBounties } = useBounties();
   const { setPages } = usePages();
+  const { showPage } = usePageDialog();
 
   async function onClickCreate () {
     if (currentSpace && user) {
@@ -57,26 +55,16 @@ export default function NewBountyButton () {
       }
       setPages((pages) => ({ ...pages, [createdBounty.page.id]: createdBounty.page }));
       setBounties((bounties) => [...bounties, createdBounty]);
-      setActiveBountyPage({
-        bounty: createdBounty,
-        page: createdBounty.page
+      showPage({
+        pageId: createdBounty.page.id,
+        hideToolsMenu: suggestBounties
       });
     }
   }
 
   return (
-    <>
-      <Button onClick={onClickCreate}>
-        {suggestBounties ? 'Suggest Bounty' : 'Create Bounty'}
-      </Button>
-      {activeBountyPage
-      && (
-        <PageDialog
-          hideToolsMenu={suggestBounties}
-          page={activeBountyPage.page}
-          onClose={() => setActiveBountyPage(null)}
-        />
-      )}
-    </>
+    <Button onClick={onClickCreate}>
+      {suggestBounties ? 'Suggest Bounty' : 'Create Bounty'}
+    </Button>
   );
 }
