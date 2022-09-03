@@ -1,7 +1,7 @@
 
 import { Space } from '@prisma/client';
 import { prisma } from 'db';
-import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
+import { onError, onNoMatch, requireSpaceMembership, ActionNotPermittedError } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -14,6 +14,18 @@ handler
   .delete(deleteSpace);
 
 async function updateSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
+
+  const spaceDomain = req.body.domain as string | undefined;
+
+  const existing = (typeof spaceDomain === 'string') ? await prisma.space.findFirst({
+    where: {
+      domain: spaceDomain
+    }
+  }) : null;
+
+  if (existing && existing.id !== req.query.id) {
+    throw new ActionNotPermittedError('This domain is already in use');
+  }
 
   const space = await prisma.space.update({
     where: {

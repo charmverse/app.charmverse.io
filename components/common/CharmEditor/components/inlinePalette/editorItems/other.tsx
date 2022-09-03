@@ -5,6 +5,8 @@ import type { SpacePermissionFlags } from 'lib/permissions/spaces';
 import { rafCommandExec } from '@bangle.dev/utils';
 import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
 import InsertChartIcon from '@mui/icons-material/InsertChart';
+import { PageType } from '@prisma/client';
+import dynamic from 'next/dynamic';
 import { PaletteItemTypeNoGroup, PromisedCommand } from '../paletteItem';
 import { replaceSuggestionMarkWith } from '../inlinePalette';
 import { palettePluginKey } from '../config';
@@ -15,11 +17,11 @@ interface ItemsProps {
   addNestedPage: () => Promise<void>;
   nestedPagePluginKey?: PluginKey<NestedPagePluginState>;
   userSpacePermissions?: SpacePermissionFlags;
+  pageType?: PageType;
 }
 
-export function items ({ addNestedPage, nestedPagePluginKey, userSpacePermissions }: ItemsProps): PaletteItemTypeNoGroup[] {
-
-  const dynamicOtherItems = [
+export function items ({ addNestedPage, nestedPagePluginKey, userSpacePermissions, pageType }: ItemsProps): PaletteItemTypeNoGroup[] {
+  const dynamicOtherItems: PaletteItemTypeNoGroup[] = [
     {
       uid: 'price',
       title: 'Crypto price',
@@ -73,8 +75,11 @@ export function items ({ addNestedPage, nestedPagePluginKey, userSpacePermission
 
         };
       }
-    },
-    {
+    }
+  ];
+
+  if (pageType !== 'card_template') {
+    dynamicOtherItems.push({
       uid: 'insert-page',
       title: 'Insert page',
       requiredSpacePermission: 'createPage',
@@ -94,7 +99,10 @@ export function items ({ addNestedPage, nestedPagePluginKey, userSpacePermission
           );
         }) as PromisedCommand;
       })
-    },
+    });
+  }
+
+  dynamicOtherItems.push(
     {
       uid: 'link-to-page',
       title: 'Link to page',
@@ -121,7 +129,7 @@ export function items ({ addNestedPage, nestedPagePluginKey, userSpacePermission
         }) as PromisedCommand;
       })
     }
-  ] as PaletteItemTypeNoGroup[];
+  );
 
   const allowedDynamicOtherItems = dynamicOtherItems.filter(paletteItem => {
     return !paletteItem.requiredSpacePermission

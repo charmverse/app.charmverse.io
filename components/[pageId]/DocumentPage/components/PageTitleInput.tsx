@@ -62,10 +62,11 @@ export default function PageTitle ({ value, onChange, readOnly }: PageTitleProps
   }
 
   if (readOnly) {
-    return <StyledReadOnlyTitle>{value || 'Untitled'}</StyledReadOnlyTitle>;
+    return <StyledReadOnlyTitle data-test='editor-page-title'>{value || 'Untitled'}</StyledReadOnlyTitle>;
   }
   return (
     <StyledPageTitle
+      data-test='editor-page-title'
       inputRef={titleInput}
       value={title}
       onChange={_onChange}

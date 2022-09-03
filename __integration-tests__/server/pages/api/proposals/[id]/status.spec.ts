@@ -1,11 +1,9 @@
 import { Space, User } from '@prisma/client';
-import { upsertPermission } from 'lib/permissions/pages';
-import { ProposalWithUsers } from 'lib/proposal/interface';
+import { prisma } from 'db';
 import request from 'supertest';
 import { baseUrl } from 'testing/mockApiCall';
 import { createProposalWithUsers, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
-import { prisma } from 'db';
 
 let author: User;
 let reviewer: User;
@@ -40,49 +38,22 @@ beforeAll(async () => {
   });
 });
 
-describe('GET /api/proposals/[id] - Get proposal', () => {
-  it('should return the proposal with the author and reviewers', async () => {
-    const pageWithProposal = await createProposalWithUsers({
+describe('PUT /api/proposals/[id]/status - Update proposal status', () => {
+  it('should throw error and return 400 if the newStatus is not passed in body', async () => {
+    const proposalPage = await createProposalWithUsers({
       spaceId: space.id,
       userId: author.id,
       authors: [],
       reviewers: [reviewer.id]
     });
 
-    await upsertPermission(pageWithProposal.id, {
-      permissionLevel: 'full_access',
-      pageId: pageWithProposal.id,
-      userId: author.id
-    });
-
-    const proposal = (await request(baseUrl)
-      .get(`/api/proposals/${pageWithProposal.proposalId}`)
-      .set('Cookie', authorCookie)
-      .expect(200)).body as ProposalWithUsers;
-
-    expect(proposal).toMatchObject(expect.objectContaining({
-      id: expect.any(String),
-      spaceId: space.id,
-      createdBy: author.id,
-      status: 'draft',
-      authors: expect.arrayContaining([
-        expect.objectContaining({
-          proposalId: pageWithProposal.proposalId,
-          userId: author.id
-        })
-      ]),
-      reviewers: [
-        expect.objectContaining({
-          id: expect.any(String),
-          roleId: null,
-          proposalId: pageWithProposal.proposalId,
-          userId: reviewer.id
-        })
-      ]
-    }));
+    (await request(baseUrl)
+      .put(`/api/proposals/${proposalPage.proposalId}/status`)
+      .set('Cookie', reviewerCookie)
+      .expect(400));
   });
 
-  it('should throw error if proposal doesn\'t exist', async () => {
+  it('should throw error and return 404 if the proposal doesn\'t exist', async () => {
     await createProposalWithUsers({
       spaceId: space.id,
       userId: author.id,
@@ -91,13 +62,16 @@ describe('GET /api/proposals/[id] - Get proposal', () => {
     });
 
     (await request(baseUrl)
-      .get(`/api/proposals/${v4()}`)
+      .put(`/api/proposals/${v4()}/status`)
       .set('Cookie', authorCookie)
+      .send({
+        newStatus: 'draft'
+      })
       .expect(404));
   });
 
-  it('should throw error if user doesn\'t have read access to proposal page', async () => {
-    const pageWithProposal = await createProposalWithUsers({
+  it('should throw error and return 401 if the author is not the one updating the status', async () => {
+    const proposalPage = await createProposalWithUsers({
       spaceId: space.id,
       userId: author.id,
       authors: [],
@@ -105,8 +79,28 @@ describe('GET /api/proposals/[id] - Get proposal', () => {
     });
 
     (await request(baseUrl)
-      .get(`/api/proposals/${pageWithProposal.proposalId}`)
+      .put(`/api/proposals/${proposalPage.proposalId}/status`)
+      .set('Cookie', reviewerCookie)
+      .send({
+        newStatus: 'draft'
+      })
+      .expect(401));
+  });
+
+  it('should successfully update the status of proposal and return 200', async () => {
+    const proposalPage = await createProposalWithUsers({
+      spaceId: space.id,
+      userId: author.id,
+      authors: [],
+      reviewers: [reviewer.id]
+    });
+
+    (await request(baseUrl)
+      .put(`/api/proposals/${proposalPage.proposalId}/status`)
       .set('Cookie', authorCookie)
-      .expect(404));
+      .send({
+        newStatus: 'private_draft'
+      })
+      .expect(200));
   });
 });
