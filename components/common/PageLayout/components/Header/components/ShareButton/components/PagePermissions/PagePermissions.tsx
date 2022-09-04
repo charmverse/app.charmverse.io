@@ -11,7 +11,7 @@ import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
-import { isEditablePageType } from 'lib/pages';
+import { canReceiveManualPermissionUpdates } from 'lib/pages';
 import { IPagePermissionWithAssignee, PagePermissionLevelType } from 'lib/permissions/pages/page-permission-interfaces';
 import { permissionLevels } from 'lib/permissions/pages/page-permission-mapping';
 import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
@@ -141,7 +141,7 @@ export default function PagePermissions ({ pageId, pagePermissions, refreshPermi
   const { custom, ...permissionsWithoutCustom } = permissionLevels as Record<string, string>;
   const permissionsWithRemove = { ...permissionsWithoutCustom, delete: 'Remove' };
 
-  const canEdit = userPagePermissions?.grant_permissions === true && isEditablePageType({ pageType });
+  const canEdit = userPagePermissions?.grant_permissions === true && canReceiveManualPermissionUpdates({ pageType });
 
   return (
     <Box p={1}>

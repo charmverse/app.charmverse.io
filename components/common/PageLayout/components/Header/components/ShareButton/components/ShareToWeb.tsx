@@ -15,7 +15,7 @@ import { IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permissi
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { isEditablePageType } from 'lib/pages/utils';
+import { canReceiveManualPermissionUpdates } from 'lib/pages/utils';
 import EditableDayPicker from 'components/common/BoardEditor/focalboard/src/widgets/editableDayPicker';
 import { PageType } from '@prisma/client';
 
@@ -61,7 +61,7 @@ export default function ShareToWeb ({ pageId, pagePermissions, refreshPermission
 
   const currentPage = pages[pageId];
 
-  const disablePublicToggle = currentPagePermissions.edit_isPublic !== true || !isEditablePageType({ pageType: currentPage?.type as PageType });
+  const disablePublicToggle = currentPagePermissions.edit_isPublic !== true;
 
   // Current values of the public permission
   const [shareLink, setShareLink] = useState<null | string>(null);

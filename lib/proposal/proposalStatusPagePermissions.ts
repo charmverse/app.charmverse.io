@@ -11,17 +11,17 @@ type ProposalStagePagePermissionMapping = Record<ProposalParticipant, PagePermis
 
 export const proposalPermissionMapping: Record<ProposalStatus, ProposalStagePagePermissionMapping> = {
   private_draft: {
-    author: 'editor',
+    author: 'full_access',
     reviewer: null,
     community: null
   },
   draft: {
-    author: 'editor',
+    author: 'full_access',
     reviewer: null,
     community: 'view'
   },
   discussion: {
-    author: 'editor',
+    author: 'full_access',
     reviewer: null,
     community: 'view_comment'
   },
@@ -103,6 +103,10 @@ export async function generateSyncProposalPermissions ({ proposalId }: ProposalP
     where: {
       pageId: {
         in: [page.id, ...children.map(child => child.id)]
+      },
+      // Don't mess with existing public permissions
+      public: {
+        not: true
       }
     }
   };
