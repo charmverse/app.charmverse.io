@@ -32,11 +32,33 @@ type Props = {
   href: string;
   external?: boolean;
   target?: string;
-  pageId?: string;
-  bountyId?: string;
+  onClick?: (e: MouseEvent<HTMLAnchorElement>) => void;
 };
 
-export default function Link ({ href, bountyId, pageId, children, sx, className, color = 'primary', external, target }: Props) {
+export default function Link ({ href, onClick, children, sx, className, color = 'primary', external, target }: Props) {
+
+  return (
+    external ? (
+      <StyledMuiLink className={className} color={color} href={href} sx={sx} target={target} rel='noreferrer' underline='none'>
+        {children}
+      </StyledMuiLink>
+    ) : (
+      <NextLink href={href} passHref>
+        <StyledMuiLink onClick={onClick} className={className} color={color} sx={sx} target={target} underline='none'>
+          {children}
+        </StyledMuiLink>
+      </NextLink>
+    )
+  );
+}
+
+interface PageLinkProps extends Props {
+  bountyId?: string;
+  pageId?: string;
+}
+
+// use this link component to display a page inside a modal
+export function PageLink ({ bountyId, pageId, ...props }: PageLinkProps) {
 
   const { showPage } = usePageDialog();
 
@@ -48,16 +70,6 @@ export default function Link ({ href, bountyId, pageId, children, sx, className,
   }
 
   return (
-    external ? (
-      <StyledMuiLink className={className} color={color} href={href} sx={sx} target={target} rel='noreferrer' underline='none'>
-        {children}
-      </StyledMuiLink>
-    ) : (
-      <NextLink href={href} passHref>
-        <StyledMuiLink onClick={onClickInternalLink} className={className} color={color} sx={sx} target={target} underline='none'>
-          {children}
-        </StyledMuiLink>
-      </NextLink>
-    )
+    <Link onClick={onClickInternalLink} {...props} />
   );
 }

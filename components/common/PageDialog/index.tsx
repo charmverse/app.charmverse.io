@@ -1,3 +1,1 @@
-import PageDialog from './PageDialog';
-
-export default PageDialog;
+export { default } from './PageDialog';
