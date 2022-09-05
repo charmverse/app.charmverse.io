@@ -141,8 +141,10 @@ export default function BountyProperties (props: {
   }
 
   useEffect(() => {
-    refreshSubmissions();
-  }, [currentBounty]);
+    if (currentBounty?.id) {
+      refreshSubmissions();
+    }
+  }, [currentBounty?.id]);
 
   useEffect(() => {
     if (currentBounty?.chainId) {

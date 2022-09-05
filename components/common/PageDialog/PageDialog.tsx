@@ -17,26 +17,26 @@ import InsertLinkIcon from '@mui/icons-material/InsertLink';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { BountyWithDetails } from 'models';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useBounties } from 'hooks/useBounties';
 import { IPageWithPermissions } from 'lib/pages';
-import { Utils } from '../BoardEditor/focalboard/src/utils';
+import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 
 interface Props {
   page?: IPageWithPermissions | null;
   onClose: () => void;
   readOnly?: boolean;
-  onClickDelete?: () => void
-  bounty?: BountyWithDetails | null
-  onMarkCompleted?: (bountyId: string) => void
-  toolbar?: ReactNode
-  hideToolsMenu?: boolean
+  bounty?: BountyWithDetails | null;
+  toolbar?: ReactNode;
+  hideToolsMenu?: boolean;
 }
 
 export default function PageDialog (props: Props) {
-  const { hideToolsMenu = false, page, bounty, onMarkCompleted, toolbar, readOnly, onClickDelete } = props;
+  const { hideToolsMenu = false, page, bounty, toolbar, readOnly } = props;
   const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'page-dialog' });
   const router = useRouter();
-  const { currentPageId, setCurrentPageId, setPages, getPagePermissions } = usePages();
+  const { refreshBounty } = useBounties();
+  const { currentPageId, setCurrentPageId, setPages, getPagePermissions, deletePage } = usePages();
   const pagePermission = page ? getPagePermissions(page.id) : null;
   const { showMessage } = useSnackbar();
   // extract domain from shared pages: /share/<domain>/<page_path>
@@ -60,9 +60,16 @@ export default function PageDialog (props: Props) {
     }
   }, [!!page]);
 
+  async function onClickDelete () {
+    if (page) {
+      await deletePage({ pageId: page.id });
+      onClose();
+    }
+  }
+
   function onClose () {
-    props.onClose();
     popupState.close();
+    props.onClose();
   }
 
   useEffect(() => {
@@ -92,6 +99,13 @@ export default function PageDialog (props: Props) {
         log.error('Error saving page', err);
       });
   }, [page]);
+
+  async function closeBounty (bountyId: string) {
+    await charmClient.bounties.closeBounty(bountyId);
+    if (refreshBounty) {
+      refreshBounty(bountyId);
+    }
+  }
 
   return (
     <RootPortal>
@@ -131,9 +145,8 @@ export default function PageDialog (props: Props) {
                 />
                 <ListItemText primary='Copy link' />
               </ListItemButton>
-
-              {bounty && onMarkCompleted && (
-                <ListItemButton disabled={bounty.status === 'complete' || (bounty.status !== 'inProgress' && bounty.status !== 'open')} onClick={() => onMarkCompleted(bounty.id)}>
+              {bounty && (
+                <ListItemButton disabled={bounty.status === 'complete' || (bounty.status !== 'inProgress' && bounty.status !== 'open')} onClick={() => closeBounty(bounty.id)}>
                   <CheckCircleIcon
                     sx={{
                       mr: 1

@@ -10,7 +10,7 @@ import { usePages } from 'hooks/usePages';
 import { IPageWithPermissions } from 'lib/pages';
 
 const StyledPageTemplateBanner = styled(Box)<{card?: boolean}>`
-  
+
   top: ${({ card }) => card ? '50px' : '55px'};
   width: ${({ card }) => card ? '100%' : 'calc(100% - 300px)'};
   z-index: var(--z-index-appBar);
@@ -77,7 +77,6 @@ export function PageTemplateBanner ({ pageId }: {pageId: string}) {
                 <DocumentPageIcon iconSize='small' fontSize={theme.palette.templateBanner.fontSize} label={board?.title || 'Untitled'} />
               </Link>
             </>
-
           )
         }
         </Grid>
