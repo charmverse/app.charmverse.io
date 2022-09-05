@@ -48,11 +48,13 @@ export default function ProposalsTable ({ proposals, mutateProposals }: { propos
   return (
     <>
       <GridHeader>
-        <Grid item xs={8} md={7}>
+        <Grid item xs={8} md={6}>
           Title
         </Grid>
         <Grid item xs={3} md={2} display='flex' justifyContent='center'>
           Status
+        </Grid>
+        <Grid item xs={1} sx={{ display: { xs: 'none', md: 'flex' } }} justifyContent='center'>
         </Grid>
         <Grid item xs={2} sx={{ display: { xs: 'none', md: 'flex' } }} justifyContent='center'>
           Created
@@ -71,7 +73,7 @@ export default function ProposalsTable ({ proposals, mutateProposals }: { propos
         const proposalPage = pages[proposal.id];
         return proposalPage ? (
           <GridContainer key={proposal.id}>
-            <Grid item xs={8} sm={8} md={5} sx={{ cursor: 'pointer' }}>
+            <Grid item xs={8} sm={8} md={6} sx={{ cursor: 'pointer' }}>
               <Box display='flex' alignItems='center' justifyContent='space-between' onClick={() => openPage(proposal.id)}>
                 <Box display='flex' alignItems='flex-start' gap={1}>
                   <Box component='span' sx={{ display: { xs: 'none', md: 'inline' } }}><TaskOutlinedIcon color='secondary' /></Box>
@@ -84,6 +86,8 @@ export default function ProposalsTable ({ proposals, mutateProposals }: { propos
             </Grid>
             <Grid item xs={3} md={2} display='flex' justifyContent='center'>
               <ProposalStatusChip status={proposal.status} />
+            </Grid>
+            <Grid item xs={1} sx={{ display: { xs: 'none', md: 'flex' } }} justifyContent='center'>
             </Grid>
             <Grid item xs={2} sx={{ display: { xs: 'none', md: 'flex' } }} display='flex' justifyContent='center'>
               <Tooltip arrow placement='top' title={`Created on ${humanFriendlyDate(proposalPage.createdAt, { withTime: true })}`}>

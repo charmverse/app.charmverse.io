@@ -3,13 +3,14 @@ import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import NewProposalButton from 'components/votes/components/NewProposalButton';
-import VotesTable from 'components/votes/components/VotesTable';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useSWR from 'swr';
+import ProposalsTable from './components/ProposalsTable';
 
 export default function ProposalsPage () {
   const [currentSpace] = useCurrentSpace();
-  const { data, mutate: mutateVotes } = useSWR(() => `votesBySpace/${currentSpace?.id}`, () => currentSpace ? charmClient.getVotesBySpace(currentSpace.id) : [], {
+
+  const { data, mutate: mutateProposals } = useSWR(() => `proposals/${currentSpace?.id}`, () => currentSpace ? charmClient.proposals.getProposalsBySpace(currentSpace.id) : [], {
     fallbackData: undefined
   });
 
@@ -38,7 +39,7 @@ export default function ProposalsPage () {
                   </Box>
                 </Grid>
                 <Grid item xs={12} sx={{ mt: 5 }}>
-                  <VotesTable votes={data} mutateVotes={mutateVotes} />
+                  <ProposalsTable proposals={data} mutateProposals={mutateProposals} />
                 </Grid>
               </>
             )

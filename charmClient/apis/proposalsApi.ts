@@ -24,6 +24,6 @@ export class ProposalsApi {
   }
 
   getProposalsBySpace (spaceId: string) {
-    return http.GET(`/api/space/${spaceId}/proposals`);
+    return http.GET<ProposalWithUsers[]>(`/api/spaces/${spaceId}/proposals`);
   }
 }
