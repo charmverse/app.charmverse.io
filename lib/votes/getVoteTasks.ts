@@ -13,6 +13,7 @@ export async function getVoteTasks (userId: string): Promise<VoteTask[]> {
           }
         }
       },
+      context: 'inline',
       status: 'InProgress',
       // No need to fetch votes that have been casted by the user
       userVotes: {
