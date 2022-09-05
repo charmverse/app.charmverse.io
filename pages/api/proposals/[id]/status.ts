@@ -2,6 +2,7 @@
 import { ProposalStatus } from '@prisma/client';
 import { prisma } from 'db';
 import { NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { proposalStatusUserTransitionRecord } from 'lib/proposal/proposalStatusTransition';
 import { updateProposalStatus } from 'lib/proposal/updateProposalStatus';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
@@ -32,9 +33,43 @@ async function updateProposalStatusController (req: NextApiRequest, res: NextApi
     throw new NotFoundError();
   }
 
-  const isCurrentUserProposalAuthor = proposal.authors.some(author => author.userId === userId);
+  const reviewerUserIds: string[] = [];
+  const reviewerRoleIds: string[] = [];
 
-  if (!isCurrentUserProposalAuthor) {
+  proposal.reviewers.forEach(reviewer => {
+    if (reviewer.userId) {
+      reviewerUserIds.push(reviewer.userId);
+    }
+    else if (reviewer.roleId) {
+      reviewerRoleIds.push(reviewer.roleId);
+    }
+  });
+
+  let isCurrentUserProposalReviewer = reviewerUserIds.includes(userId);
+
+  if (!isCurrentUserProposalReviewer) {
+    isCurrentUserProposalReviewer = Boolean((await prisma.role.findFirst({
+      where: {
+        spaceId: proposal.spaceId,
+        spaceRolesToRole: {
+          some: {
+            roleId: {
+              in: reviewerRoleIds
+            },
+            spaceRole: {
+              userId,
+              spaceId: proposal.spaceId
+            }
+          }
+        }
+      }
+    })));
+  }
+
+  const isCurrentUserProposalAuthor = proposal.authors.some(author => author.userId === userId);
+  const proposalUserGroup = isCurrentUserProposalAuthor ? 'author' : isCurrentUserProposalReviewer ? 'reviewer' : null;
+
+  if (proposalUserGroup === null || (!proposalStatusUserTransitionRecord[proposal.status]?.[proposalUserGroup]?.includes(req.body.newStatus))) {
     throw new UnauthorisedActionError();
   }
 

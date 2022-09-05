@@ -34,6 +34,6 @@ export const proposalStatusUserTransitionRecord: Partial<Record<ProposalStatus, 
   },
   review: {
     author: ['discussion'],
-    reviewer: ['review']
+    reviewer: ['reviewed']
   }
 };
