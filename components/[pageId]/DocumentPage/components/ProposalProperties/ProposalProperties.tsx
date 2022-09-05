@@ -28,7 +28,7 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
   const { data: proposal, mutate: refreshProposal } = useSWR(`proposal/${proposalId}`, () => charmClient.proposals.getProposal(proposalId));
 
   const [contributors] = useContributors();
-  const { roles = [] } = useRoles();
+  const { roles = [], roleups } = useRoles();
   const { user } = useUser();
   const proposalMenuState = usePopupState({ popupId: 'proposal-info', variant: 'popover' });
 
@@ -42,6 +42,12 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
   const canUpdateReviewers = status === 'draft' || status === 'private_draft';
   const reviewerOptionsRecord: Record<string, ({group: 'role'} & ListSpaceRolesResponse) | ({group: 'user'} & Contributor)> = {};
   const isProposalAuthor = (user && proposal.authors.some(author => author.userId === user.id));
+  const isProposalReviewer = (user && (proposal.reviewers.some(reviewer => {
+    if (reviewer.userId) {
+      return reviewer.userId === user.id;
+    }
+    return roleups.some(role => role.id === reviewer.roleId && role.users.some(_user => _user.id === user.id));
+  })));
 
   contributors.forEach(contributor => {
     reviewerOptionsRecord[contributor.id] = {
@@ -184,7 +190,7 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
             return (
               <MenuItem
                 key={newStatus}
-                disabled={!isProposalAuthor}
+                disabled={!isProposalAuthor || !isProposalReviewer}
                 onClick={() => updateProposalStatus(newStatus)}
               >
                 <Box display='flex' alignItems='center' gap={1}>

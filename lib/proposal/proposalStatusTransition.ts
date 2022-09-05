@@ -3,8 +3,8 @@ import { ProposalStatus } from '@prisma/client';
 export const proposalStatusTransitionRecord: Record<ProposalStatus, ProposalStatus[]> = {
   private_draft: ['draft', 'discussion'],
   draft: ['private_draft', 'discussion'],
-  discussion: ['private_draft', 'draft'],
-  review: [],
+  discussion: ['private_draft', 'draft', 'review'],
+  review: ['discussion', 'reviewed'],
   reviewed: [],
   vote_active: [],
   vote_closed: []
