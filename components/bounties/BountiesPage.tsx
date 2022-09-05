@@ -15,10 +15,9 @@ const bountyStatuses: BountyStatus[] = ['open', 'inProgress', 'complete', 'paid'
 interface Props {
   publicMode?: boolean;
   bounties: BountyWithDetails[];
-  refreshBounty?: (bountyId: string) => void
 }
 
-export default function BountiesPage ({ refreshBounty, publicMode = false, bounties }: Props) {
+export default function BountiesPage ({ publicMode = false, bounties }: Props) {
 
   const bountiesSorted = bounties ? sortArrayByObjectProperty(bounties, 'status', bountyStatuses) : [];
 
@@ -80,7 +79,7 @@ export default function BountiesPage ({ refreshBounty, publicMode = false, bount
             ? (
               <BountiesEmptyState />
             ) : (
-              <BountiesKanbanView bounties={bounties} refreshBounty={refreshBounty} />
+              <BountiesKanbanView bounties={bounties} />
             )}
         </div>
       </div>

@@ -5,6 +5,7 @@ import { sessionUserRelations } from 'lib/session/config';
 import { v4 as uuid } from 'uuid';
 import { IDENTITY_TYPES } from 'models';
 import { postToDiscord } from 'lib/log/userEvents';
+import log from 'lib/log';
 
 export default async function loginByDiscord ({ code, hostName }: { code: string, hostName?: string }) {
 
@@ -32,7 +33,12 @@ export default async function loginByDiscord ({ code, hostName }: { code: string
     let avatar: string | null = null;
     const userId = uuid();
     if (avatarUrl) {
-      ({ url: avatar } = await uploadToS3({ fileName: getUserS3Folder({ userId, url: avatarUrl }), url: avatarUrl }));
+      try {
+        ({ url: avatar } = await uploadToS3({ fileName: getUserS3Folder({ userId, url: avatarUrl }), url: avatarUrl }));
+      }
+      catch (error) {
+        log.warn('Error while uploading avatar to S3', error);
+      }
     }
 
     const newUser = await prisma.user.create({

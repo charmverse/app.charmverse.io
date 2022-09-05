@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { prisma } from 'db';
-import { onError, onNoMatch } from 'lib/middleware';
+import { onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { LoggedInUser } from 'models';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
@@ -9,7 +9,9 @@ import { sessionUserRelations } from 'lib/session/config';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.post(login);
+handler
+  .use(requireKeys(['address'], 'body'))
+  .post(login);
 
 async function login (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
   const { address } = req.body;
