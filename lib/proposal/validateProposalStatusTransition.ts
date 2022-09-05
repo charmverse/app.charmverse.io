@@ -1,26 +1,21 @@
-import { ProposalAuthor, ProposalReviewer, ProposalStatus } from '@prisma/client';
+import { ProposalStatus } from '@prisma/client';
 import { prisma } from 'db';
-import { proposalStatusUserTransitionRecord } from './proposalStatusTransition';
+import { ProposalWithUsers } from './interface';
+import { proposalStatusTransitionPermission } from './proposalStatusTransition';
 
 export async function validateProposalStatusTransition ({
-  currentStatus,
+  proposal,
   newStatus,
-  authors,
-  reviewers,
-  spaceId,
   userId
 }: {
-  newStatus: ProposalStatus,
-  currentStatus: ProposalStatus,
-  spaceId: string,
-  userId: string
-  authors: ProposalAuthor[],
-  reviewers: ProposalReviewer[]
+  proposal: ProposalWithUsers,
+  userId: string,
+  newStatus: ProposalStatus
 }) {
   const reviewerUserIds: string[] = [];
   const reviewerRoleIds: string[] = [];
 
-  reviewers.forEach(reviewer => {
+  proposal.reviewers.forEach(reviewer => {
     if (reviewer.userId) {
       reviewerUserIds.push(reviewer.userId);
     }
@@ -31,10 +26,11 @@ export async function validateProposalStatusTransition ({
 
   let isCurrentUserProposalReviewer = reviewerUserIds.includes(userId);
 
+  // Only check role if the user id doesn't match any of the reviewer id
   if (!isCurrentUserProposalReviewer) {
-    isCurrentUserProposalReviewer = Boolean((await prisma.role.findFirst({
+    const existingRole = await prisma.role.findFirst({
       where: {
-        spaceId,
+        spaceId: proposal.spaceId,
         spaceRolesToRole: {
           some: {
             roleId: {
@@ -42,15 +38,16 @@ export async function validateProposalStatusTransition ({
             },
             spaceRole: {
               userId,
-              spaceId
+              spaceId: proposal.spaceId
             }
           }
         }
       }
-    })));
+    });
+    isCurrentUserProposalReviewer = Boolean(existingRole);
   }
 
-  const isCurrentUserProposalAuthor = authors.some(author => author.userId === userId);
+  const isCurrentUserProposalAuthor = proposal.authors.some(author => author.userId === userId);
   const proposalUserGroup = isCurrentUserProposalAuthor ? 'author' : isCurrentUserProposalReviewer ? 'reviewer' : null;
-  return proposalUserGroup !== null && (!proposalStatusUserTransitionRecord[currentStatus]?.[proposalUserGroup]?.includes(newStatus) ?? false);
+  return proposalUserGroup !== null && (proposalStatusTransitionPermission[proposal.status]?.[proposalUserGroup]?.includes(newStatus));
 }

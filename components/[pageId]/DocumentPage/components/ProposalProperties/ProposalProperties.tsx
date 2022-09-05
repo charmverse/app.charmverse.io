@@ -13,7 +13,7 @@ import useSWR from 'swr';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { proposalStatusTransitionRecord, proposalStatusUserTransitionRecord, PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
+import { proposalStatusTransitionRecord, proposalStatusTransitionPermission, PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import { ProposalStatus } from '@prisma/client';
 import UserDisplay from 'components/common/UserDisplay';
 import { ProposalStatusChip } from './ProposalStatusBadge';
@@ -205,7 +205,7 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
                 key={newStatus}
                 disabled={
                   currentUserGroup === null
-                  || (!proposalStatusUserTransitionRecord[proposal.status]?.[currentUserGroup]?.includes(newStatus))
+                  || (!proposalStatusTransitionPermission[proposal.status]?.[currentUserGroup]?.includes(newStatus))
                 }
                 onClick={() => updateProposalStatus(newStatus)}
               >

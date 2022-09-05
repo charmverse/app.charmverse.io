@@ -35,11 +35,8 @@ async function updateProposalStatusController (req: NextApiRequest, res: NextApi
   }
 
   const isUserAuthorizedToUpdateProposalStatus = validateProposalStatusTransition({
-    authors: proposal.authors,
-    currentStatus: proposal.status,
+    proposal,
     newStatus,
-    reviewers: proposal.reviewers,
-    spaceId: proposal.spaceId,
     userId
   });
 
