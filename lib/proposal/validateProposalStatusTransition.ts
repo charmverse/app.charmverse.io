@@ -48,6 +48,28 @@ export async function validateProposalStatusTransition ({
   }
 
   const isCurrentUserProposalAuthor = proposal.authors.some(author => author.userId === userId);
-  const proposalUserGroup = isCurrentUserProposalAuthor ? 'author' : isCurrentUserProposalReviewer ? 'reviewer' : null;
-  return proposalUserGroup !== null && (proposalStatusTransitionPermission[proposal.status]?.[proposalUserGroup]?.includes(newStatus));
+
+  const proposalUserGroups: ('author' | 'reviewer')[] = [];
+
+  if (isCurrentUserProposalAuthor) {
+    proposalUserGroups.push('author');
+  }
+
+  if (isCurrentUserProposalReviewer) {
+    proposalUserGroups.push('reviewer');
+  }
+
+  let isUserAuthorizedToUpdateProposalStatus = false;
+
+  // Check if the current user (if an author of proposal) has the permission to update the status
+  if (!isUserAuthorizedToUpdateProposalStatus && proposalUserGroups.includes('author')) {
+    isUserAuthorizedToUpdateProposalStatus = proposalStatusTransitionPermission[proposal.status]?.author?.includes(newStatus) ?? false;
+  }
+
+  // Check if the current user (if an review of proposal) has the permission to update the status (only if its not attainable via being author. A proposal author can be a reviewer as well)
+  if (!isUserAuthorizedToUpdateProposalStatus && proposalUserGroups.includes('reviewer')) {
+    isUserAuthorizedToUpdateProposalStatus = proposalStatusTransitionPermission[proposal.status]?.reviewer?.includes(newStatus) ?? false;
+  }
+
+  return isUserAuthorizedToUpdateProposalStatus;
 }
