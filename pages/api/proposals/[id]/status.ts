@@ -2,8 +2,8 @@
 import { ProposalStatus } from '@prisma/client';
 import { prisma } from 'db';
 import { NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { proposalStatusUserTransitionRecord } from 'lib/proposal/proposalStatusTransition';
 import { updateProposalStatus } from 'lib/proposal/updateProposalStatus';
+import { validateProposalStatusTransition } from 'lib/proposal/validateProposalStatusTransition';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { NextApiRequest, NextApiResponse } from 'next';
@@ -33,43 +33,16 @@ async function updateProposalStatusController (req: NextApiRequest, res: NextApi
     throw new NotFoundError();
   }
 
-  const reviewerUserIds: string[] = [];
-  const reviewerRoleIds: string[] = [];
-
-  proposal.reviewers.forEach(reviewer => {
-    if (reviewer.userId) {
-      reviewerUserIds.push(reviewer.userId);
-    }
-    else if (reviewer.roleId) {
-      reviewerRoleIds.push(reviewer.roleId);
-    }
+  const isUserAuthorizedToUpdateProposalStatus = validateProposalStatusTransition({
+    authors: proposal.authors,
+    currentStatus: proposal.status,
+    newStatus: req.body.newStatus,
+    reviewers: proposal.reviewers,
+    spaceId: proposal.spaceId,
+    userId
   });
 
-  let isCurrentUserProposalReviewer = reviewerUserIds.includes(userId);
-
-  if (!isCurrentUserProposalReviewer) {
-    isCurrentUserProposalReviewer = Boolean((await prisma.role.findFirst({
-      where: {
-        spaceId: proposal.spaceId,
-        spaceRolesToRole: {
-          some: {
-            roleId: {
-              in: reviewerRoleIds
-            },
-            spaceRole: {
-              userId,
-              spaceId: proposal.spaceId
-            }
-          }
-        }
-      }
-    })));
-  }
-
-  const isCurrentUserProposalAuthor = proposal.authors.some(author => author.userId === userId);
-  const proposalUserGroup = isCurrentUserProposalAuthor ? 'author' : isCurrentUserProposalReviewer ? 'reviewer' : null;
-
-  if (proposalUserGroup === null || (!proposalStatusUserTransitionRecord[proposal.status]?.[proposalUserGroup]?.includes(req.body.newStatus))) {
+  if (!isUserAuthorizedToUpdateProposalStatus) {
     throw new UnauthorisedActionError();
   }
 
