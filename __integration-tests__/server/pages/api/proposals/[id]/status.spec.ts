@@ -84,7 +84,7 @@ describe('PUT /api/proposals/[id]/status - Update proposal status', () => {
       .send({
         newStatus: 'draft'
       })
-      .expect(401));
+      .expect(421));
   });
 
   it('should successfully update the status of proposal and return 200', async () => {

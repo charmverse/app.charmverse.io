@@ -187,7 +187,7 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
                   }}
                 />
               )
-}
+            }
           </div>
         </div>
       </Box>

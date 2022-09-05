@@ -52,5 +52,5 @@ export async function validateProposalStatusTransition ({
 
   const isCurrentUserProposalAuthor = authors.some(author => author.userId === userId);
   const proposalUserGroup = isCurrentUserProposalAuthor ? 'author' : isCurrentUserProposalReviewer ? 'reviewer' : null;
-  return proposalUserGroup === null || (!proposalStatusUserTransitionRecord[currentStatus]?.[proposalUserGroup]?.includes(newStatus));
+  return proposalUserGroup !== null && (!proposalStatusUserTransitionRecord[currentStatus]?.[proposalUserGroup]?.includes(newStatus) ?? false);
 }
