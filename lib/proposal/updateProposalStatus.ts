@@ -3,7 +3,7 @@ import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
 import { MissingDataError } from 'lib/utilities/errors';
 import { proposalStatusTransitionRecord } from './proposalStatusTransition';
-import { execSyncProposalPermissions } from './proposalStatusPagePermissions';
+import { execSyncProposalPermissions } from './syncProposalPermissions';
 
 export async function updateProposalStatus ({
   proposalId,

@@ -157,24 +157,6 @@ export async function generateSyncProposalPermissions ({ proposalId }: ProposalP
 
   const childPermissionsToAssign: (IPagePermissionToCreate & {pageId: string})[] = [];
 
-  if (children.length > 0) {
-    const { flatChildren } = await resolvePageTree({
-      pageId: page.id,
-      flattenChildren: true,
-      includeDeletedPages: true
-    });
-
-    flatChildren.forEach(child => {
-      permissionsToAssign.forEach(perm => {
-        childPermissionsToAssign.push({
-          ...perm,
-          pageId: child.id,
-          inheritedFromPermission: perm.id
-        });
-      });
-    });
-  }
-
   return [
     deletePermissionsArgs,
     {
@@ -191,11 +173,11 @@ export async function execSyncProposalPermissions ({ proposalId }: ProposalPermi
 
   const [deleteArgs, proposalArgs, childArgs] = await generateSyncProposalPermissions({ proposalId });
 
-  return prisma.$transaction([
-    prisma.pagePermission.deleteMany(deleteArgs),
-    prisma.pagePermission.createMany(proposalArgs),
-    prisma.pagePermission.createMany(childArgs),
-    prisma.page.findUnique({
+  return prisma.$transaction(async () => {
+    await prisma.pagePermission.deleteMany(deleteArgs);
+    await prisma.pagePermission.createMany(proposalArgs);
+    await prisma.pagePermission.createMany(childArgs);
+    return prisma.page.findUnique({
       where: {
         proposalId
       },
@@ -206,8 +188,7 @@ export async function execSyncProposalPermissions ({ proposalId }: ProposalPermi
           }
         }
       }
-    })
-  ]).then(data => {
-    return data[3] as IPageWithPermissions;
+    }) as Promise<IPageWithPermissions>;
   });
+
 }

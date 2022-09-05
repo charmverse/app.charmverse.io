@@ -1,14 +1,7 @@
 import { ProposalStatus } from '@prisma/client';
 import * as http from 'adapters/http';
-import { ProposalWithUsers } from 'lib/proposal/interface';
-
-export interface UpdateProposalRequest {
-  authors: string[]
-  reviewers: {
-    group: 'role' | 'user'
-    id: string
-  }[]
-}
+import { AssignablePermissionGroups } from 'lib/permissions/interfaces';
+import { ProposalReviewerInput, ProposalWithUsers, UpdateProposalRequest } from 'lib/proposal/interface';
 
 export class ProposalsApi {
   updateProposal (proposalId: string, data: UpdateProposalRequest) {

@@ -1,9 +1,8 @@
-import type { UpdateProposalRequest } from 'charmClient/apis/proposalsApi';
 import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
-import { ProposalWithUsers } from './interface';
-import { generateSyncProposalPermissions } from './proposalStatusPagePermissions';
+import { ProposalWithUsers, UpdateProposalRequest } from './interface';
+import { generateSyncProposalPermissions } from './syncProposalPermissions';
 
 export async function updateProposal ({
   proposal,
