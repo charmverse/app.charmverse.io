@@ -13,7 +13,7 @@ import useSWR from 'swr';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { proposalStatusTransitionRecord, PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
+import { proposalStatusTransitionRecord, proposalStatusUserTransitionRecord, PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import { ProposalStatus } from '@prisma/client';
 import { ProposalStatusChip } from './ProposalStatusBadge';
 
@@ -48,6 +48,8 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
     }
     return roleups.some(role => role.id === reviewer.roleId && role.users.some(_user => _user.id === user.id));
   })));
+
+  const currentUserGroup = isProposalAuthor ? 'author' : isProposalReviewer ? 'reviewer' : null;
 
   contributors.forEach(contributor => {
     reviewerOptionsRecord[contributor.id] = {
@@ -186,11 +188,13 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
           proposalStatusTransitionRecord[proposal.status]?.map(newStatus => {
             const currentStatusIndex = proposalStatuses.indexOf(proposal.status);
             const newStatusIndex = proposalStatuses.indexOf(newStatus);
-
             return (
               <MenuItem
                 key={newStatus}
-                disabled={!isProposalAuthor || !isProposalReviewer}
+                disabled={
+                  currentUserGroup === null
+                  || (!proposalStatusUserTransitionRecord[proposal.status]?.[currentUserGroup]?.includes(newStatus))
+                }
                 onClick={() => updateProposalStatus(newStatus)}
               >
                 <Box display='flex' alignItems='center' gap={1}>

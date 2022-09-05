@@ -19,3 +19,21 @@ export const PROPOSAL_STATUS_LABELS: Record<ProposalStatus, string> = {
   vote_active: 'Vote Active',
   vote_closed: 'Vote Closed'
 };
+
+type ProposalUserGroup = 'reviewer' | 'author';
+
+export const proposalStatusUserTransitionRecord: Partial<Record<ProposalStatus, Partial<Record<ProposalUserGroup, ProposalStatus[]>>>> = {
+  private_draft: {
+    author: ['draft', 'discussion']
+  },
+  draft: {
+    author: ['private_draft', 'discussion']
+  },
+  discussion: {
+    author: ['private_draft', 'draft', 'review']
+  },
+  review: {
+    author: ['discussion'],
+    reviewer: ['review']
+  }
+};
