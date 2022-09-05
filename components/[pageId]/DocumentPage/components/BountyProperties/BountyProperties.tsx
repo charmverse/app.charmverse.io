@@ -141,7 +141,9 @@ export default function BountyProperties (props: {
   }
 
   useEffect(() => {
-    refreshSubmissions();
+    if (currentBounty?.id) {
+      refreshSubmissions();
+    }
   }, [currentBounty?.id]);
 
   useEffect(() => {
