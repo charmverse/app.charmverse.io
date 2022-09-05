@@ -9,8 +9,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-
 enum PermissionLevel {
   full_access
   editor
@@ -334,6 +332,7 @@ model User {
   profileItems      ProfileItem[]
   proposalsAuthored ProposalAuthor[]
   proposalsReviewed ProposalReviewer[]
+  reviewedProposals Proposal[]
 }
 
 model UserNotificationState {
@@ -653,14 +652,17 @@ model Comment {
 }
 
 model Proposal {
-  id        String             @id @default(uuid()) @db.Uuid
-  createdBy String             @db.Uuid
-  spaceId   String             @db.Uuid
-  status    ProposalStatus
-  authors   ProposalAuthor[]
-  reviewers ProposalReviewer[]
-  space     Space              @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  page      Page?
+  id         String             @id @default(uuid()) @db.Uuid
+  createdBy  String             @db.Uuid
+  spaceId    String             @db.Uuid
+  status     ProposalStatus
+  authors    ProposalAuthor[]
+  reviewers  ProposalReviewer[]
+  space      Space              @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  page       Page?
+  reviewedBy String?            @db.Uuid
+  reviewer   User?              @relation(fields: [reviewedBy], references: [id], onDelete: Cascade)
+  reviewedAt DateTime?
 }
 
 model ProposalAuthor {
