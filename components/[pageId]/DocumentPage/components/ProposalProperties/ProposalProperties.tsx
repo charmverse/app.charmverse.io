@@ -15,6 +15,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { proposalStatusTransitionRecord, proposalStatusUserTransitionRecord, PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import { ProposalStatus } from '@prisma/client';
+import UserDisplay from 'components/common/UserDisplay';
 import { ProposalStatusChip } from './ProposalStatusBadge';
 
 interface ProposalPropertiesProps {
@@ -31,6 +32,8 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
   const { roles = [], roleups } = useRoles();
   const { user } = useUser();
   const proposalMenuState = usePopupState({ popupId: 'proposal-info', variant: 'popover' });
+
+  const proposalReviewer = contributors?.find(contributor => contributor.id === proposal?.reviewedBy);
 
   if (!proposal) {
     return null;
@@ -159,23 +162,32 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
             <Button>Reviewer</Button>
           </div>
           <div style={{ width: '100%' }}>
-            <InputSearchReviewers
-              disabled={!user || readOnly || !canUpdateReviewers || (user && !proposal.authors.map(author => author.userId).includes(user.id))}
-              readOnly={readOnly}
-              value={proposal.reviewers.map(reviewer => reviewerOptionsRecord[(reviewer.roleId ?? reviewer.userId) as string])}
-              disableCloseOnSelect={true}
-              excludedIds={proposal.reviewers.map(reviewer => (reviewer.roleId ?? reviewer.userId) as string)}
-              onChange={async (e, options) => {
-                await charmClient.proposals.updateProposal(proposal.id, {
-                  authors: proposal.authors.map(author => author.userId),
-                  reviewers: options.map(option => ({ group: option.group, id: option.id }))
-                });
-                refreshProposal();
-              }}
-              sx={{
-                width: '100%'
-              }}
-            />
+            {
+              proposal.status === 'reviewed' && proposalReviewer ? (
+                <UserDisplay
+                  user={proposalReviewer}
+                  avatarSize='small'
+                />
+              ) : (
+                <InputSearchReviewers
+                  disabled={!user || readOnly || !canUpdateReviewers || (user && !proposal.authors.map(author => author.userId).includes(user.id))}
+                  readOnly={readOnly}
+                  value={proposal.reviewers.map(reviewer => reviewerOptionsRecord[(reviewer.roleId ?? reviewer.userId) as string])}
+                  disableCloseOnSelect={true}
+                  excludedIds={proposal.reviewers.map(reviewer => (reviewer.roleId ?? reviewer.userId) as string)}
+                  onChange={async (e, options) => {
+                    await charmClient.proposals.updateProposal(proposal.id, {
+                      authors: proposal.authors.map(author => author.userId),
+                      reviewers: options.map(option => ({ group: option.group, id: option.id }))
+                    });
+                    refreshProposal();
+                  }}
+                  sx={{
+                    width: '100%'
+                  }}
+                />
+              )
+}
           </div>
         </div>
       </Box>
