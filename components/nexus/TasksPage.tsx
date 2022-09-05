@@ -48,7 +48,7 @@ const StyledTypography = styled(Typography)`
 const TASK_TABS = [
   { icon: <KeyIcon />, label: 'Multisig', type: 'multisig' },
   // { icon: <BountyIcon />, label: 'Bounty', type: 'bounty' },
-  { icon: <HowToVoteIcon />, label: 'Votes', type: 'vote' },
+  { icon: <HowToVoteIcon />, label: 'Poll', type: 'vote' },
   { icon: <ForumIcon />, label: 'Discussion', type: 'discussion' }
 ] as const;
 
