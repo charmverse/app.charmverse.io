@@ -8,8 +8,8 @@ import { usePages } from 'hooks/usePages';
 import { Reducer, useReducer } from 'react';
 import LoadingComponent from 'components/common/LoadingComponent';
 import useSWR from 'swr';
-import NewProposalButton from './components/NewProposalButton';
-import VotesTable, { VoteRow } from './components/VotesTable';
+import NewProposalButton from 'components/votes/components/NewProposalButton';
+import VotesTable, { VoteRow } from 'components/votes/components/VotesTable';
 
 export interface ViewState {
   sortBy: VoteSort;
@@ -25,7 +25,7 @@ const defaultViewState: ViewState = {
 
 type ViewStateReducer = Reducer<ViewState, Partial<ViewState>>;
 
-export default function VotesPage () {
+export default function ProposalsPage () {
 
   const [viewState, setViewState] = useReducer<ViewStateReducer>((state, updates) => ({ ...state, ...updates }), defaultViewState);
 
@@ -70,7 +70,7 @@ export default function VotesPage () {
       <Grid container mb={6}>
         <Grid item xs>
           <Typography variant='h1' gutterBottom>
-            Votes
+            Proposals
           </Typography>
         </Grid>
 
