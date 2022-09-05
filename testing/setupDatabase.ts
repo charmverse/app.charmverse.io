@@ -5,6 +5,7 @@ import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import { getPagePath, IPageWithPermissions, PageWithProposal } from 'lib/pages';
 import { BountyPermissions } from 'lib/permissions/bounties';
 import { TargetPermissionGroup } from 'lib/permissions/interfaces';
+import { ProposalReviewerInput } from 'lib/proposal/interface';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { typedKeys } from 'lib/utilities/objects';
 import { BountyWithDetails, IDENTITY_TYPES, LoggedInUser } from 'models';
@@ -508,6 +509,71 @@ export function createBlock (options: Partial<Block> & Pick<Block, 'createdBy' |
       parentId: options.parentId || options.rootId,
       schema: 0,
       id: options.id ?? v4()
+    }
+  });
+}
+
+/**
+ * Creates a proposal with the linked authors and reviewers
+ */
+export async function generateProposal ({ userId, spaceId, proposalStatus, authors, reviewers }:
+  {userId: string, spaceId: string, authors: string[], reviewers: ProposalReviewerInput[], proposalStatus: ProposalStatus}):
+  Promise<PageWithProposal> {
+  const proposalId = v4();
+
+  return prisma.page.create({
+    data: {
+      id: proposalId,
+      contentText: '',
+      path: `path-${v4()}`,
+      title: 'Proposal',
+      type: 'proposal',
+      author: {
+        connect: {
+          id: userId
+        }
+      },
+      updatedBy: userId,
+      space: {
+        connect: {
+          id: spaceId
+        }
+      },
+      proposal: {
+        create: {
+          id: proposalId,
+          createdBy: userId,
+          status: proposalStatus,
+          space: {
+            connect: {
+              id: spaceId
+            }
+          },
+          authors: {
+            createMany: {
+              data: authors.map(authorId => ({ userId: authorId }))
+            }
+          },
+          reviewers: {
+            createMany: {
+              data: (reviewers ?? []).map(r => {
+                return {
+                  userId: r.group === 'user' ? r.id : undefined,
+                  roleId: r.group === 'role' ? r.id : undefined
+                };
+              })
+            }
+          }
+        }
+      }
+    },
+    include: {
+      proposal: {
+        include: {
+          authors: true,
+          reviewers: true
+        }
+      }
     }
   });
 }
