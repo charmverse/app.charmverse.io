@@ -18,6 +18,7 @@ handler.use(requireUser)
 async function updateProposalStatusController (req: NextApiRequest, res: NextApiResponse<{newStatus: ProposalStatus}>) {
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
+  const newStatus = req.body.newStatus as ProposalStatus;
 
   const proposal = await prisma.proposal.findUnique({
     where: {
@@ -36,7 +37,7 @@ async function updateProposalStatusController (req: NextApiRequest, res: NextApi
   const isUserAuthorizedToUpdateProposalStatus = validateProposalStatusTransition({
     authors: proposal.authors,
     currentStatus: proposal.status,
-    newStatus: req.body.newStatus,
+    newStatus,
     reviewers: proposal.reviewers,
     spaceId: proposal.spaceId,
     userId
@@ -46,9 +47,26 @@ async function updateProposalStatusController (req: NextApiRequest, res: NextApi
     throw new UnauthorisedActionError();
   }
 
+  // Going from review to review, mark the reviewer in the proposal
+  if (proposal.status === 'review' && newStatus === 'reviewed') {
+    await prisma.proposal.update({
+      where: {
+        id: proposalId
+      },
+      data: {
+        reviewer: {
+          connect: {
+            id: userId
+          }
+        },
+        reviewedAt: new Date()
+      }
+    });
+  }
+
   await updateProposalStatus({
     currentStatus: proposal.status,
-    newStatus: req.body.newStatus,
+    newStatus,
     proposalId
   });
 
