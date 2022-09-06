@@ -3,6 +3,7 @@ import { createUserFromWallet } from 'lib/users/createUser';
 import { createProposalWithUsers, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { prisma } from 'db';
+import isEqual from 'lodash/isEqual';
 import { getProposalsBySpace } from '../getProposalsBySpace';
 
 let accessibleSpaceUser1: User;
@@ -81,13 +82,9 @@ describe('Get all proposals of a space', () => {
       spaceId: accessibleSpace.id
     });
 
-    expect(adminAccessibleProposals).toMatchObject([
-      expect.objectContaining({
-        id: accessibleSpacePageProposal1.id
-      }),
-      expect.objectContaining({
-        id: accessibleSpacePageProposal2.id
-      })
-    ]);
+    expect(isEqual(adminAccessibleProposals.map(adminAccessibleProposal => adminAccessibleProposal.id), [
+      accessibleSpacePageProposal1.id,
+      accessibleSpacePageProposal2.id
+    ])).toBe(true);
   });
 });
