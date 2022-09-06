@@ -92,6 +92,7 @@ enum RoleSource {
 
 enum PagePermissionLevel {
   full_access
+  proposal_editor
   editor
   view_comment
   view

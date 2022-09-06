@@ -11,17 +11,17 @@ type ProposalStagePagePermissionMapping = Record<ProposalParticipant, PagePermis
 
 export const proposalPermissionMapping: Record<ProposalStatus, ProposalStagePagePermissionMapping> = {
   private_draft: {
-    author: 'full_access',
+    author: 'proposal_editor',
     reviewer: null,
     community: null
   },
   draft: {
-    author: null,
+    author: 'proposal_editor',
     reviewer: null,
     community: 'view'
   },
   discussion: {
-    author: 'full_access',
+    author: 'proposal_editor',
     reviewer: null,
     community: 'view_comment'
   },

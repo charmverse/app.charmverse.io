@@ -38,12 +38,11 @@ async function addPagePermission (req: NextApiRequest, res: NextApiResponse<IPag
     userId: req.session.user.id
   });
 
-  if (computedPermissions.grant_permissions !== true) {
-    throw new ActionNotPermittedError('You cannot manage permissions for this page');
-  }
-
   if (req.body.public === true && computedPermissions.edit_isPublic !== true) {
     throw new ActionNotPermittedError('You cannot make page public.');
+  }
+  else if (req.body.public !== true && computedPermissions.grant_permissions !== true) {
+    throw new ActionNotPermittedError('You cannot manage permissions for this page');
   }
 
   const page = await prisma.page.findUnique({
@@ -101,7 +100,10 @@ async function removePagePermission (req: NextApiRequest, res: NextApiResponse) 
     userId: req.session.user.id
   });
 
-  if (computedPermissions.grant_permissions !== true) {
+  if (permission.public && computedPermissions.edit_isPublic !== true) {
+    throw new ActionNotPermittedError('You cannot manage permissions for this page');
+  }
+  else if (!permission.public && computedPermissions.grant_permissions !== true) {
     throw new ActionNotPermittedError('You cannot manage permissions for this page');
   }
 

@@ -4,7 +4,7 @@ import { prisma } from 'db';
 import log from 'lib/log';
 import { IEventToLog, postToDiscord } from 'lib/log/userEvents';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { IPageWithPermissions } from 'lib/pages/server';
+import { getPage, IPageWithPermissions, resolvePageTree } from 'lib/pages/server';
 import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { createProposal } from 'lib/proposal/createProposal';
@@ -73,7 +73,15 @@ async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
 
   try {
 
-    const pageWithPermissions = await (page.type === 'proposal' ? syncProposalPermissions({ proposalId: page.proposalId as string }) : setupPermissionsAfterPageCreated(page.id));
+    const proposalIdForPermissions = page.type === 'proposal' ? page.id : (page.parentId ? (await resolvePageTree({
+      pageId: page.id
+      // includeDeletedPages: true
+    })).parents.find(p => p.type === 'proposal')?.id : undefined);
+
+    await (proposalIdForPermissions ? syncProposalPermissions({ proposalId: proposalIdForPermissions as string })
+      : setupPermissionsAfterPageCreated(page.id));
+
+    const pageWithPermissions = await getPage(page.id) as IPageWithPermissions;
 
     logFirstWorkspacePageCreation(page);
     logFirstUserPageCreation(page);
