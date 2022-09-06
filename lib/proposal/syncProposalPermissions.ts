@@ -81,7 +81,7 @@ export async function generateSyncProposalPermissions ({ proposalId }: ProposalP
   }
 
   // Delete permissions
-  // Check if there are children so we don't perform resolve page tree operation for nothin
+  // Check if there are children so we don't perform resolve page tree operation for nothing
   let children = await prisma.page.findMany({
     where: {
       parentId: page.id
@@ -99,10 +99,12 @@ export async function generateSyncProposalPermissions ({ proposalId }: ProposalP
     })).flatChildren;
   }
 
+  const deletePermissionPageIds = children.length === 0 ? [page.id] : [page.id, ...children.map((child) => child.id)];
+
   const deletePermissionsArgs: Prisma.PagePermissionDeleteManyArgs = {
     where: {
       pageId: {
-        in: [page.id, ...children.map(child => child.id)]
+        in: deletePermissionPageIds
       },
       // Don't mess with existing public permissions
       public: {
@@ -110,6 +112,8 @@ export async function generateSyncProposalPermissions ({ proposalId }: ProposalP
       }
     }
   };
+  // -------------------- Create permissions
+  // const createPermissionArgs: Prisma.PagePermissionUpsertArgs[] = [];
 
   // Create permissions
 
@@ -121,6 +125,7 @@ export async function generateSyncProposalPermissions ({ proposalId }: ProposalP
     proposal.authors.forEach(a => {
 
       permissionsToAssign.push({
+        id: v4(),
         pageId: page.id,
         userId: a.userId,
         permissionLevel: proposalPermissionMapping[currentStage].author as PagePermissionLevel
@@ -129,17 +134,18 @@ export async function generateSyncProposalPermissions ({ proposalId }: ProposalP
   }
 
   if (proposalPermissionMapping[currentStage].reviewer !== null) {
-    proposal.reviewers.forEach(r => {
+    proposal.reviewers.forEach(reviewer => {
 
-      if ((r.roleId || r.userId) && (
-        permissionsToAssign.every(p => r.userId ? r.userId !== p.userId : r.roleId !== p.roleId)
+      if ((reviewer.roleId || reviewer.userId) && (
+        permissionsToAssign.every(permission => reviewer.userId ? reviewer.userId !== permission.userId : reviewer.roleId !== permission.roleId)
       )) {
 
         permissionsToAssign.push({
+          id: v4(),
           pageId: page.id,
           // Only one of these should exist
-          userId: r.userId,
-          roleId: r.roleId,
+          userId: reviewer.userId,
+          roleId: reviewer.roleId,
           permissionLevel: proposalPermissionMapping[currentStage].reviewer as PagePermissionLevel
         });
       }
@@ -157,6 +163,22 @@ export async function generateSyncProposalPermissions ({ proposalId }: ProposalP
 
   const childPermissionsToAssign: (IPagePermissionToCreate & {pageId: string})[] = [];
 
+  if (children.length > 0) {
+    children.forEach(child => {
+      permissionsToAssign.forEach(permission => {
+        childPermissionsToAssign.push({
+          id: v4(),
+          pageId: child.id,
+          spaceId: permission.spaceId,
+          userId: permission.userId,
+          roleId: permission.roleId,
+          permissionLevel: permission.permissionLevel,
+          inheritedFromPermission: permission.id
+        });
+      });
+    });
+  }
+
   return [
     deletePermissionsArgs,
     {
@@ -169,11 +191,11 @@ export async function generateSyncProposalPermissions ({ proposalId }: ProposalP
 
 }
 
-export async function execSyncProposalPermissions ({ proposalId }: ProposalPermissionsSync): Promise<IPageWithPermissions> {
+export async function syncProposalPermissions ({ proposalId }: ProposalPermissionsSync): Promise<IPageWithPermissions> {
 
   const [deleteArgs, proposalArgs, childArgs] = await generateSyncProposalPermissions({ proposalId });
 
-  return prisma.$transaction(async () => {
+  const page = await prisma.$transaction(async () => {
     await prisma.pagePermission.deleteMany(deleteArgs);
     await prisma.pagePermission.createMany(proposalArgs);
     await prisma.pagePermission.createMany(childArgs);
@@ -190,5 +212,7 @@ export async function execSyncProposalPermissions ({ proposalId }: ProposalPermi
       }
     }) as Promise<IPageWithPermissions>;
   });
+
+  return page;
 
 }
