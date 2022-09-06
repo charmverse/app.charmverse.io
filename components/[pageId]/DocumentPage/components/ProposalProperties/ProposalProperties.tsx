@@ -17,16 +17,19 @@ import { proposalStatusTransitionRecord, proposalStatusTransitionPermission, PRO
 import { ProposalStatus } from '@prisma/client';
 import UserDisplay from 'components/common/UserDisplay';
 import DoneIcon from '@mui/icons-material/Done';
+import PublishToSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/PublishToSnapshot';
+import { IPageWithPermissions } from 'lib/pages';
 import { ProposalStatusChip } from '../../../../proposals/components/ProposalStatusBadge';
 
 interface ProposalPropertiesProps {
   proposalId: string,
   readOnly?: boolean
+  page: IPageWithPermissions
 }
 
 const proposalStatuses = Object.keys(proposalStatusTransitionRecord);
 
-export default function ProposalProperties ({ proposalId, readOnly }: ProposalPropertiesProps) {
+export default function ProposalProperties ({ page, proposalId, readOnly }: ProposalPropertiesProps) {
   const { data: proposal, mutate: refreshProposal } = useSWR(`proposal/${proposalId}`, () => charmClient.proposals.getProposal(proposalId));
 
   const [contributors] = useContributors();
@@ -240,6 +243,9 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
               </MenuItem>
             );
           })
+        }
+        {
+          proposal.status === 'reviewed' && <PublishToSnapshot page={page} />
         }
       </Menu>
     </Box>
