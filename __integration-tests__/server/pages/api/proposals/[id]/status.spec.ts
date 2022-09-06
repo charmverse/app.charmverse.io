@@ -84,7 +84,7 @@ describe('PUT /api/proposals/[id]/status - Update proposal status', () => {
       .send({
         newStatus: 'draft'
       })
-      .expect(421));
+      .expect(401));
   });
 
   it('should successfully update the status of proposal and return 200', async () => {
@@ -99,7 +99,7 @@ describe('PUT /api/proposals/[id]/status - Update proposal status', () => {
       .put(`/api/proposals/${proposalPage.proposalId}/status`)
       .set('Cookie', authorCookie)
       .send({
-        newStatus: 'private_draft'
+        newStatus: 'draft'
       })
       .expect(200));
   });

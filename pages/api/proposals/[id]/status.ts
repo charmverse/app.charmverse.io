@@ -34,7 +34,7 @@ async function updateProposalStatusController (req: NextApiRequest, res: NextApi
     throw new NotFoundError();
   }
 
-  const isUserAuthorizedToUpdateProposalStatus = validateProposalStatusTransition({
+  const isUserAuthorizedToUpdateProposalStatus = await validateProposalStatusTransition({
     proposal,
     newStatus,
     userId
