@@ -2,7 +2,7 @@
 import { Page, PagePermission, PrismaPromise, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { deletePagePermission, IPagePermissionRequest, IPagePermissionToDelete, IPagePermissionWithAssignee, listPagePermissions, setupPermissionsAfterPagePermissionAdded, upsertPermission, computeUserPagePermissions, getPagePermission, IPagePermissionWithSource } from 'lib/permissions/pages';
+import { deletePagePermission, IPagePermissionRequest, IPagePermissionToDelete, IPagePermissionWithAssignee, listPagePermissions, setupPermissionsAfterPagePermissionAdded, upsertPermission, computeUserPagePermissions, getPagePermission, IPagePermissionWithSource, IPagePermissionToCreate } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 
@@ -31,7 +31,7 @@ async function findPagePermissions (req: NextApiRequest, res: NextApiResponse<IP
 
 async function addPagePermission (req: NextApiRequest, res: NextApiResponse<IPagePermissionWithSource>) {
 
-  const { pageId } = req.body;
+  const { pageId, permissionLevel } = req.body as Required<IPagePermissionToCreate>;
 
   const computedPermissions = await computeUserPagePermissions({
     pageId,
@@ -43,6 +43,9 @@ async function addPagePermission (req: NextApiRequest, res: NextApiResponse<IPag
   }
   else if (req.body.public !== true && computedPermissions.grant_permissions !== true) {
     throw new ActionNotPermittedError('You cannot manage permissions for this page');
+  }
+  else if (permissionLevel === 'proposal_editor') {
+    throw new ActionNotPermittedError('This permission level can only be created automatically by proposals.');
   }
 
   const page = await prisma.page.findUnique({

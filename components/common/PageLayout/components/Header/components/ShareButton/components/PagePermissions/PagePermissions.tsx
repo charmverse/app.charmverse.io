@@ -138,7 +138,9 @@ export default function PagePermissions ({ pageId, pagePermissions, refreshPermi
 
   const sortedPermissions = sortPagePermissions(pagePermissions);
 
-  const { custom, ...permissionsWithoutCustom } = permissionLevels as Record<string, string>;
+  // Remove proposal editor as it is not selectable
+  // eslint-disable-next-line camelcase
+  const { custom, proposal_editor, ...permissionsWithoutCustom } = permissionLevels as Record<string, string>;
   const permissionsWithRemove = { ...permissionsWithoutCustom, delete: 'Remove' };
 
   const canEdit = userPagePermissions?.grant_permissions === true && canReceiveManualPermissionUpdates({ pageType });

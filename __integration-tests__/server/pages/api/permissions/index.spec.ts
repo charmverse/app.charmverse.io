@@ -127,6 +127,31 @@ describe('POST /api/permissions - Add page permissions', () => {
       .expect(401);
   });
 
+  it('should fail if trying to manually assign the proposal editor value and respond 401', async () => {
+
+    const page = await createPage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    await upsertPermission(page.id, {
+      permissionLevel: 'full_access',
+      userId: user.id
+    });
+
+    const permission: IPagePermissionToCreate = {
+      permissionLevel: 'proposal_editor',
+      pageId: page.id,
+      roleId: role.id
+    };
+
+    await request(baseUrl)
+      .post('/api/permissions')
+      .set('Cookie', userCookie)
+      .send(permission)
+      .expect(401);
+  });
+
 });
 
 describe('POST /api/permissions - Add page permissions', () => {
