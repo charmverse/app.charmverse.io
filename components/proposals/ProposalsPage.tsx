@@ -32,7 +32,7 @@ export default function ProposalsPage () {
               <>
                 <Grid item xs={12} lg={8} display='flex'>
                   <Box gap={3} sx={{ display: 'flex', alignItems: { xs: 'flex-start', lg: 'center' }, width: '100%', justifyContent: { xs: 'flex-start', lg: 'flex-end' }, flexDirection: { xs: 'column-reverse', lg: 'row' } }}>
-                    <NewProposalButton />
+                    <NewProposalButton mutateProposals={mutateProposals} />
                   </Box>
                 </Grid>
                 <Grid item xs={12} sx={{ mt: 5 }}>
