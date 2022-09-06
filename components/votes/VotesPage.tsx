@@ -1,14 +1,13 @@
-import { Box, Grid, Typography } from '@mui/material';
+import { Grid, Typography } from '@mui/material';
 import { VoteStatus } from '@prisma/client';
 import charmClient from 'charmClient';
+import LoadingComponent from 'components/common/LoadingComponent';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
-import { filterVotes, sortVotes, ViewOptions, VoteFilter, VoteSort } from 'components/[pageId]/DocumentPage/components/VotesSidebar';
+import { filterVotes, sortVotes, VoteFilter, VoteSort } from 'components/[pageId]/DocumentPage/components/VotesSidebar';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { Reducer, useReducer } from 'react';
-import LoadingComponent from 'components/common/LoadingComponent';
 import useSWR from 'swr';
-import NewProposalButton from './components/NewProposalButton';
 import VotesTable, { VoteRow } from './components/VotesTable';
 
 export interface ViewState {
@@ -55,14 +54,6 @@ export default function VotesPage () {
     viewState.sortBy
   ) as VoteRow[];
 
-  function setVoteSort (sortBy: VoteSort) {
-    setViewState({ sortBy });
-  }
-
-  function setVoteFilter (filterBy: VoteFilter) {
-    setViewState({ filterBy });
-  }
-
   return (
     <CenteredPageContent>
       <Grid container mb={6}>
@@ -78,22 +69,9 @@ export default function VotesPage () {
                 <LoadingComponent isLoading size={50} />
               </Grid>
             ) : (
-              <>
-                <Grid item xs={12} lg={8} display='flex'>
-                  <Box gap={3} sx={{ display: 'flex', alignItems: { xs: 'flex-start', lg: 'center' }, width: '100%', justifyContent: { xs: 'flex-start', lg: 'flex-end' }, flexDirection: { xs: 'column-reverse', lg: 'row' } }}>
-                    <ViewOptions
-                      voteSort={viewState.sortBy}
-                      voteFilter={viewState.filterBy}
-                      setVoteSort={setVoteSort}
-                      setVoteFilter={setVoteFilter}
-                    />
-                    <NewProposalButton />
-                  </Box>
-                </Grid>
-                <Grid item xs={12} sx={{ mt: 5 }}>
-                  <VotesTable votes={sortedVotes} mutateVotes={mutateVotes} />
-                </Grid>
-              </>
+              <Grid item xs={12} sx={{ mt: 5 }}>
+                <VotesTable votes={sortedVotes} mutateVotes={mutateVotes} />
+              </Grid>
             )
           }
       </Grid>
