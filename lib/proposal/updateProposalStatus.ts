@@ -3,7 +3,7 @@ import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
 import { MissingDataError } from 'lib/utilities/errors';
 import { proposalStatusTransitionRecord } from './proposalStatusTransition';
-import { execSyncProposalPermissions } from './syncProposalPermissions';
+import { syncProposalPermissions } from './syncProposalPermissions';
 
 export async function updateProposalStatus ({
   proposalId,
@@ -40,7 +40,7 @@ export async function updateProposalStatus ({
       }
     });
 
-    await execSyncProposalPermissions({
+    await syncProposalPermissions({
       proposalId: updatedProposal.id
     });
 
