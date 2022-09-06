@@ -8,10 +8,9 @@ import GridHeader from 'components/common/Grid/GridHeader';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';
-import PageDialog from 'components/common/Page/PageDialog';
+import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import useTasks from 'components/nexus/hooks/useTasks';
 import { usePages } from 'hooks/usePages';
-import { IPageWithPermissions } from 'lib/pages';
 import { humanFriendlyDate, toMonthDate } from 'lib/utilities/dates';
 import { ExtendedVote } from 'lib/votes/interfaces';
 import { DateTime } from 'luxon';
@@ -37,19 +36,15 @@ export default function VotesTable ({ votes, mutateVotes }: { votes?: (ExtendedV
   const router = useRouter();
   const { pages, setPages } = usePages();
   const { mutate: mutateTasks } = useTasks();
+  const { showPage } = usePageDialog();
   const [activeVote, setActiveVote] = useState<ExtendedVote | null>(null);
-  const [activePage, setActivePage] = useState<IPageWithPermissions | null>(null);
 
   const openPage = useCallback((pageId: string) => {
-    const page = pages[pageId];
-    if (page) {
-      setActivePage(page);
-    }
+    showPage({
+      pageId,
+      onClose: refreshVotesAndTasks
+    });
   }, [pages]);
-
-  function closePage () {
-    setActivePage(null);
-  }
 
   useEffect(() => {
     if (activeVote && votes) {
@@ -73,18 +68,20 @@ export default function VotesTable ({ votes, mutateVotes }: { votes?: (ExtendedV
     else {
       await charmClient.deleteVote(voteId);
     }
-    mutateTasks();
-    mutateVotes();
+    refreshVotesAndTasks();
   }
 
   async function deleteVote (voteId: string) {
     await charmClient.deleteVote(voteId);
-    mutateTasks();
-    mutateVotes();
+    refreshVotesAndTasks();
   }
 
   async function cancelVote (voteId: string) {
     await charmClient.cancelVote(voteId);
+    refreshVotesAndTasks();
+  }
+
+  function refreshVotesAndTasks () {
     mutateTasks();
     mutateVotes();
   }
@@ -188,16 +185,6 @@ export default function VotesTable ({ votes, mutateVotes }: { votes?: (ExtendedV
           </Grid>
         </GridContainer>
       ))}
-      {activePage && (
-        <PageDialog
-          page={activePage}
-          onClose={() => {
-            closePage();
-            mutateTasks();
-            mutateVotes();
-          }}
-        />
-      )}
       <Modal
         title='Vote details'
         size='large'
