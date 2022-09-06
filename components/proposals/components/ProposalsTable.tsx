@@ -4,13 +4,13 @@ import Button from 'components/common/Button';
 import GridContainer from 'components/common/Grid/GridContainer';
 import GridHeader from 'components/common/Grid/GridHeader';
 import LoadingComponent from 'components/common/LoadingComponent';
-import PageDialog from 'components/common/Page/PageDialog';
 import useTasks from 'components/nexus/hooks/useTasks';
 import { usePages } from 'hooks/usePages';
 import { IPageWithPermissions } from 'lib/pages';
 import { ProposalWithUsers } from 'lib/proposal/interface';
 import { humanFriendlyDate, toMonthDate } from 'lib/utilities/dates';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { ProposalStatusChip } from './ProposalStatusBadge';
 import NoProposalsMessage from './NoProposalsMessage';
 import VoteActionsMenu from './ProposalActionsMenu';
@@ -20,6 +20,8 @@ export default function ProposalsTable ({ proposals, mutateProposals }: { propos
   const { mutate: mutateTasks } = useTasks();
   const [activePage, setActivePage] = useState<IPageWithPermissions | null>(null);
 
+  const { showPage } = usePageDialog();
+
   const openPage = useCallback((pageId: string) => {
     const page = pages[pageId];
     if (page) {
@@ -27,15 +29,24 @@ export default function ProposalsTable ({ proposals, mutateProposals }: { propos
     }
   }, [pages]);
 
-  function closePage () {
-    setActivePage(null);
-  }
-
   async function deleteProposal (proposalId: string) {
     await deletePage({ pageId: proposalId });
     mutateTasks();
     mutateProposals();
   }
+
+  useEffect(() => {
+    if (activePage) {
+      showPage({
+        pageId: activePage.id,
+        onClose () {
+          setActivePage(null);
+          mutateTasks();
+          mutateProposals();
+        }
+      });
+    }
+  }, [activePage]);
 
   return (
     <>
@@ -96,16 +107,6 @@ export default function ProposalsTable ({ proposals, mutateProposals }: { propos
           </GridContainer>
         ) : null;
       })}
-      {activePage && (
-        <PageDialog
-          page={activePage}
-          onClose={() => {
-            closePage();
-            mutateTasks();
-            mutateProposals();
-          }}
-        />
-      )}
     </>
   );
 }
