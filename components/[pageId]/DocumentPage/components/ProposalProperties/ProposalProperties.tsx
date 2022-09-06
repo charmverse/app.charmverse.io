@@ -16,6 +16,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { proposalStatusTransitionRecord, proposalStatusTransitionPermission, PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import { ProposalStatus } from '@prisma/client';
 import UserDisplay from 'components/common/UserDisplay';
+import DoneIcon from '@mui/icons-material/Done';
 import { ProposalStatusChip } from './ProposalStatusBadge';
 
 interface ProposalPropertiesProps {
@@ -199,6 +200,19 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
           proposalStatusTransitionRecord[proposal.status]?.map(newStatus => {
             const currentStatusIndex = proposalStatuses.indexOf(proposal.status);
             const newStatusIndex = proposalStatuses.indexOf(newStatus);
+
+            let icon = null;
+            let label = null;
+
+            if (newStatus === 'reviewed' && proposal.status === 'review') {
+              icon = <DoneIcon fontSize='small' />;
+              label = <Typography>Approve</Typography>;
+            }
+            else {
+              icon = currentStatusIndex < newStatusIndex ? <ArrowForwardIcon fontSize='small' /> : <ArrowBackIcon fontSize='small' />;
+              label = <Typography>Move to {PROPOSAL_STATUS_LABELS[newStatus]}</Typography>;
+            }
+
             return (
               <MenuItem
                 key={newStatus}
@@ -211,8 +225,8 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
                 onClick={() => updateProposalStatus(newStatus)}
               >
                 <Box display='flex' alignItems='center' gap={1}>
-                  {currentStatusIndex < newStatusIndex ? <ArrowForwardIcon fontSize='small' /> : <ArrowBackIcon fontSize='small' />}
-                  <Typography>Move to {PROPOSAL_STATUS_LABELS[newStatus]}</Typography>
+                  {icon}
+                  {label}
                 </Box>
               </MenuItem>
             );
