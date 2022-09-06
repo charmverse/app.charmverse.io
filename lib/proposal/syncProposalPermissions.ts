@@ -262,7 +262,7 @@ export async function generateSyncProposalPermissions ({ proposalId }: ProposalP
 
       const newId = v4();
 
-      const inheritId = v4() as string;
+      const inheritId = permission.create.id as string;
 
       upsertChildProposalPermissionArgs.push({
         where: assignee === 'user' ? {
@@ -366,14 +366,20 @@ export async function generateSyncProposalPermissions ({ proposalId }: ProposalP
 
   const deletePermissionArgs: Prisma.PagePermissionDeleteManyArgs = {
     where: {
-      pageId: {
-        in: [page, ...children].map(_page => _page.id)
-      },
-      OR: [{
-        public: false
-      }, {
-        public: null
-      }]
+      AND: [
+        {
+          pageId: {
+            in: [page, ...children].map(_page => _page.id)
+          }
+        },
+        {
+          OR: [{
+            public: false
+          }, {
+            public: null
+          }]
+        }
+      ]
     }
   };
 
