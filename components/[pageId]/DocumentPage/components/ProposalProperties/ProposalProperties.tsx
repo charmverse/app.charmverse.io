@@ -218,6 +218,12 @@ export default function ProposalProperties ({ page, proposalId, readOnly }: Prop
       <Menu {...bindMenu(proposalMenuState)}>
         {
           proposalStatusTransitionRecord[proposal.status]?.map(newStatus => {
+
+            // Show the custom Create button rather than Move to Vote Active
+            if (proposal.status === 'reviewed' && newStatus === 'vote_active') {
+              return null;
+            }
+
             const currentStatusIndex = proposalStatuses.indexOf(proposal.status);
             const newStatusIndex = proposalStatuses.indexOf(newStatus);
 
@@ -272,7 +278,8 @@ export default function ProposalProperties ({ page, proposalId, readOnly }: Prop
       <CreateVoteModal
         isProposal={true}
         open={isModalOpen}
-        onCreateVote={() => {
+        onCreateVote={async () => {
+          await updateProposalStatus('vote_active');
           setIsModalOpen(false);
         }}
         onClose={() => {
