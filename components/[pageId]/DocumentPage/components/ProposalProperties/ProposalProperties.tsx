@@ -15,7 +15,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { proposalStatusTransitionRecord, PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import { ProposalStatus } from '@prisma/client';
-import { ProposalStatusChip } from './ProposalStatusBadge';
+import { ProposalStatusChip } from '../../../../proposals/components/ProposalStatusBadge';
 
 interface ProposalPropertiesProps {
   proposalId: string,

@@ -1,6 +1,5 @@
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { Box, Grid, Tooltip, Typography } from '@mui/material';
-import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import GridContainer from 'components/common/Grid/GridContainer';
 import GridHeader from 'components/common/Grid/GridHeader';
@@ -12,12 +11,12 @@ import { IPageWithPermissions } from 'lib/pages';
 import { ProposalWithUsers } from 'lib/proposal/interface';
 import { humanFriendlyDate, toMonthDate } from 'lib/utilities/dates';
 import { useCallback, useState } from 'react';
-import { ProposalStatusChip } from '../../../components/[pageId]/DocumentPage/components/ProposalProperties/ProposalStatusBadge';
+import { ProposalStatusChip } from './ProposalStatusBadge';
 import NoProposalsMessage from './NoProposalsMessage';
 import VoteActionsMenu from './ProposalActionsMenu';
 
 export default function ProposalsTable ({ proposals, mutateProposals }: { proposals?: (ProposalWithUsers)[], mutateProposals: () => void }) {
-  const { pages, setPages } = usePages();
+  const { pages, deletePage } = usePages();
   const { mutate: mutateTasks } = useTasks();
   const [activePage, setActivePage] = useState<IPageWithPermissions | null>(null);
 
@@ -33,16 +32,9 @@ export default function ProposalsTable ({ proposals, mutateProposals }: { propos
   }
 
   async function deleteProposal (proposalId: string) {
-    const page = pages[proposalId];
-    if (page) {
-      await charmClient.archivePage(page.id);
-      setPages((_pages) => {
-        _pages[page.id] = { ...page, deletedAt: new Date() };
-        return { ..._pages };
-      });
-      mutateTasks();
-      mutateProposals();
-    }
+    await deletePage({ pageId: proposalId });
+    mutateTasks();
+    mutateProposals();
   }
 
   return (
