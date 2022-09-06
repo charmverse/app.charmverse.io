@@ -1,15 +1,17 @@
 import Button from 'components/common/Button';
-import PageDialog from 'components/common/Page/PageDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
-import { IPageWithPermissions } from 'lib/pages';
+import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { addPage } from 'lib/pages/addPage';
-import { useState } from 'react';
+import { usePages } from 'hooks/usePages';
+import { KeyedMutator } from 'swr';
+import { ProposalWithUsers } from 'lib/proposal/interface';
 
-export default function NewProposalButton () {
+export default function NewProposalButton ({ mutateProposals }: {mutateProposals: KeyedMutator<ProposalWithUsers[]>}) {
   const { user } = useUser();
   const [currentSpace] = useCurrentSpace();
-  const [page, setPage] = useState<IPageWithPermissions | null>(null);
+  const { showPage } = usePageDialog();
+  const { setPages } = usePages();
 
   async function onClickCreate () {
     if (currentSpace && user) {
@@ -18,16 +20,22 @@ export default function NewProposalButton () {
         createdBy: user.id,
         type: 'proposal'
       });
-      setPage(newPage);
+
+      setPages(pages => ({
+        ...pages,
+        [newPage.id]: newPage
+      }));
+
+      mutateProposals();
+      showPage({
+        pageId: newPage.id
+      });
     }
   }
 
   return (
-    <>
-      <Button onClick={onClickCreate}>
-        Create Proposal
-      </Button>
-      {page && <PageDialog page={page} onClose={() => setPage(null)} />}
-    </>
+    <Button onClick={onClickCreate}>
+      Create Proposal
+    </Button>
   );
 }
