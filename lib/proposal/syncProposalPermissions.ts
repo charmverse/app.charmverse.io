@@ -1,10 +1,9 @@
-import { PagePermission, PagePermissionLevel, Prisma, ProposalStatus } from '@prisma/client';
+import { PagePermissionLevel, Prisma, ProposalStatus } from '@prisma/client';
 import { prisma } from 'db';
 import { IPageWithPermissions } from 'lib/pages';
 import { resolvePageTree } from 'lib/pages/server';
-import { createPage } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
-import { comparePermissionLevels, IPagePermissionToCreate } from '../permissions/pages';
+import { comparePermissionLevels } from '../permissions/pages';
 
 type ProposalParticipant = 'author' | 'reviewer' | 'community';
 
@@ -56,7 +55,7 @@ export interface ProposalPermissionsSync {
  * Generates proposal page permission prisma arguments to be consumed inside updateProposalStatus
  */
 export async function generateSyncProposalPermissions ({ proposalId }: ProposalPermissionsSync):
-  Promise<[Prisma.PagePermissionDeleteManyArgs, Prisma.PagePermissionUpsertArgs[]]> {
+  Promise<[Prisma.PagePermissionDeleteManyArgs, Prisma.PagePermissionCreateArgs[]]> {
   const [page, proposal] = await Promise.all([
     prisma.page.findUnique({
       where: {
@@ -106,8 +105,8 @@ export async function generateSyncProposalPermissions ({ proposalId }: ProposalP
   }
 
   // -------------------- Create permissions
-  const upsertProposalPermissionArgs: Prisma.PagePermissionUpsertArgs[] = [];
-  const upsertChildProposalPermissionArgs: Prisma.PagePermissionUpsertArgs[] = [];
+  const createProposalPermissionArgs: Prisma.PagePermissionCreateArgs[] = [];
+  const createChildProposalPermissionArgs: Prisma.PagePermissionCreateArgs[] = [];
 
   // Create permissions
 
@@ -122,14 +121,8 @@ export async function generateSyncProposalPermissions ({ proposalId }: ProposalP
 
       const newId = v4();
 
-      const authorPermission: Prisma.PagePermissionUpsertArgs = {
-        where: {
-          userId_PageId: {
-            pageId: page.id,
-            userId: a.userId
-          }
-        },
-        create: {
+      const authorPermission: Prisma.PagePermissionCreateArgs = {
+        data: {
           id: newId,
           permissionLevel: authorPermissionSetting,
           user: {
@@ -142,48 +135,30 @@ export async function generateSyncProposalPermissions ({ proposalId }: ProposalP
               id: page.id
             }
           }
-        },
-        update: {
-          id: newId,
-          permissionLevel: authorPermissionSetting,
-          sourcePermission: {
-            disconnect: true
-          }
         }
       };
 
-      upsertProposalPermissionArgs.push(authorPermission);
+      createProposalPermissionArgs.push(authorPermission);
     });
   }
 
   if (reviewerPermissionSetting !== null) {
     proposal.reviewers.forEach(reviewer => {
 
-      const assignedAuthor = reviewer.userId ? upsertProposalPermissionArgs.find(permissionArgs => {
-        return permissionArgs.create.user?.connect?.id === reviewer.userId;
+      const assignedAuthor = reviewer.userId ? createProposalPermissionArgs.find(permissionArgs => {
+        return permissionArgs.data.user?.connect?.id === reviewer.userId;
       }) : undefined;
 
       // If author is also a reviewer, only assign a permission if this is higher
       if (assignedAuthor && comparePermissionLevels({
-        base: assignedAuthor.update.permissionLevel as PagePermissionLevel, comparison: reviewerPermissionSetting }) === 'more'
+        base: assignedAuthor.data.permissionLevel as PagePermissionLevel, comparison: reviewerPermissionSetting }) === 'more'
       ) {
-        assignedAuthor.update.permissionLevel = reviewerPermissionSetting;
+        assignedAuthor.data.permissionLevel = reviewerPermissionSetting;
       }
       else if (!assignedAuthor) {
         const newId = v4();
-        const reviewerPermission: Prisma.PagePermissionUpsertArgs = {
-          where: reviewer.userId ? {
-            userId_PageId: {
-              pageId: page.id,
-              userId: reviewer.userId
-            }
-          } : {
-            roleId_pageId: {
-              pageId: page.id,
-              roleId: reviewer.roleId as string
-            }
-          },
-          create: {
+        const reviewerPermission: Prisma.PagePermissionCreateArgs = {
+          data: {
             id: newId,
             permissionLevel: reviewerPermissionSetting,
             role: reviewer.roleId ? {
@@ -201,17 +176,10 @@ export async function generateSyncProposalPermissions ({ proposalId }: ProposalP
                 id: page.id
               }
             }
-          },
-          update: {
-            id: newId,
-            permissionLevel: reviewerPermissionSetting,
-            sourcePermission: {
-              disconnect: true
-            }
           }
         };
 
-        upsertProposalPermissionArgs.push(reviewerPermission);
+        createProposalPermissionArgs.push(reviewerPermission);
       }
     });
   }
@@ -220,14 +188,8 @@ export async function generateSyncProposalPermissions ({ proposalId }: ProposalP
 
     const newId = v4();
 
-    upsertProposalPermissionArgs.push({
-      where: {
-        spaceId_pageId: {
-          pageId: page.id,
-          spaceId: proposal.spaceId
-        }
-      },
-      create: {
+    createProposalPermissionArgs.push({
+      data: {
         id: newId,
         permissionLevel: communityPermissionSetting,
         space: {
@@ -240,48 +202,25 @@ export async function generateSyncProposalPermissions ({ proposalId }: ProposalP
             id: page.id
           }
         }
-      },
-      update: {
-        id: newId,
-        permissionLevel: communityPermissionSetting,
-        sourcePermission: {
-          disconnect: true
-        }
       }
     });
   }
 
   children.forEach(child => {
-    upsertProposalPermissionArgs.forEach(permission => {
+    createProposalPermissionArgs.forEach(permission => {
 
-      const assignee: 'user' | 'role' | 'space' = permission.where.userId_PageId ? 'user' : permission.where.roleId_pageId ? 'role' : 'space';
+      const assignee: 'user' | 'role' | 'space' = permission.data.user ? 'user' : permission.data.role ? 'role' : 'space';
 
-      const assigneeId = (assignee === 'user' ? permission.where.userId_PageId?.userId : assignee === 'role' ? permission.where.roleId_pageId?.roleId : permission.where.spaceId_pageId?.spaceId) as string;
+      const assigneeId = (assignee === 'user' ? permission.data.user?.connect?.id : assignee === 'role' ? permission.data.role?.connect?.id : permission.data.space?.connect?.id) as string;
 
-      const permissionLevel = permission.update.permissionLevel as PagePermissionLevel;
+      const permissionLevel = permission.data.permissionLevel as PagePermissionLevel;
 
       const newId = v4();
 
-      const inheritId = permission.create.id as string;
+      const inheritId = permission.data.id as string;
 
-      upsertChildProposalPermissionArgs.push({
-        where: assignee === 'user' ? {
-          userId_PageId: {
-            pageId: child.id,
-            userId: assigneeId
-          }
-        } : assignee === 'role' ? {
-          roleId_pageId: {
-            pageId: child.id,
-            roleId: assigneeId
-          }
-        } : {
-          spaceId_pageId: {
-            pageId: child.id,
-            spaceId: assigneeId
-          }
-        },
-        create: {
+      createChildProposalPermissionArgs.push({
+        data: {
           id: newId,
           permissionLevel,
           role: assignee === 'role' ? {
@@ -309,67 +248,19 @@ export async function generateSyncProposalPermissions ({ proposalId }: ProposalP
               id: inheritId
             }
           }
-        },
-        update: {
-          id: newId,
-          permissionLevel,
-          sourcePermission: {
-            connect: {
-              id: inheritId
-            }
-          }
         }
       });
     });
   });
 
-  // const deletePermissionPageIds = children.length === 0 ? [page.id] : [page.id, ...children.map((child) => child.id)];
-
-  // const permissionIdsToIgnore = upsertProposalPermissionArgs.map((permission) => permission.create.id) as string[];
-
-  // const deleteProposalPermissionsArgs: Prisma.PagePermissionDeleteManyArgs = {
-  //   where: {
-  //     id: {
-  //       notIn: permissionIdsToIgnore
-  //     },
-  //     pageId: {
-  //       in: deletePermissionPageIds
-  //     },
-  //     OR: [{
-  //       public: false
-  //     }, {
-  //       public: null
-  //     }]
-  //   }
-  // };
-
-  // const updateManyInput: Partial<Pick<PagePermission, 'pageId' | 'userId' | 'roleId' | 'spaceId'>>[] = upsertChildProposalPermissionArgs.map((upsert) => {
-  //   if (upsert.where.userId_PageId) {
-  //     return {
-  //       userId: upsert.where.userId_PageId.userId,
-  //       pageId: upsert.where.userId_PageId.pageId
-  //     };
-  //   }
-  //   else if (upsert.where.roleId_pageId) {
-  //     return {
-  //       roleId: upsert.where.roleId_pageId.roleId,
-  //       pageId: upsert.where.roleId_pageId.pageId
-  //     };
-  //   }
-  //   else {
-  //     return {
-  //       spaceId: upsert.where.spaceId_pageId?.spaceId as string,
-  //       pageId: upsert.where.spaceId_pageId?.pageId as string
-  //     };
-  //   }
-  // });
+  const deletePermissionPageIds = children.length === 0 ? [page.id] : [page.id, ...children.map((child) => child.id)];
 
   const deletePermissionArgs: Prisma.PagePermissionDeleteManyArgs = {
     where: {
       AND: [
         {
           pageId: {
-            in: [page, ...children].map(_page => _page.id)
+            in: deletePermissionPageIds
           }
         },
         {
@@ -385,8 +276,7 @@ export async function generateSyncProposalPermissions ({ proposalId }: ProposalP
 
   return [
     deletePermissionArgs,
-    [...upsertProposalPermissionArgs, ...upsertChildProposalPermissionArgs]
-    // deleteProposalPermissionsArgs
+    [...createProposalPermissionArgs, ...createChildProposalPermissionArgs]
   ];
 
 }
@@ -399,7 +289,7 @@ export async function syncProposalPermissions ({ proposalId }: ProposalPermissio
 
   await prisma.$transaction([
     prisma.pagePermission.deleteMany(deletePermissionArgs),
-    ...upsertPermissionArgs.map(arg => prisma.pagePermission.upsert(arg)) as any[]
+    ...upsertPermissionArgs.map(arg => prisma.pagePermission.create(arg))
   ]);
 
   return prisma.page.findUnique({

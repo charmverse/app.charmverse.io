@@ -37,7 +37,7 @@ export async function updateProposal ({
       .some(reviewer => (existingReviewer.userId === reviewer.id)));
 
   if (authors.length === 0) {
-    throw new InvalidStateError('Proposal must have atleast 1 author');
+    throw new InvalidStateError('Proposal must have at least 1 author');
   }
 
   // Updating authors should fail if proposal is in review state or later
@@ -50,6 +50,8 @@ export async function updateProposal ({
     throw new UnauthorisedActionError();
   }
 
+  const [deleteArgs, createArgs] = await generateSyncProposalPermissions({ proposalId: proposal.id });
+
   await prisma.$transaction([
     prisma.proposalAuthor.deleteMany({
       where: {
@@ -58,12 +60,7 @@ export async function updateProposal ({
     }),
     prisma.proposalAuthor.createMany({
       data: authors.map(author => ({ proposalId: proposal.id, userId: author }))
-    })
-  ]);
-
-  const [deleteArgs, createArgs, childCreateArgs] = await generateSyncProposalPermissions({ proposalId: proposal.id });
-
-  await prisma.$transaction([
+    }),
     prisma.proposalReviewer.deleteMany({
       where: {
         proposalId: proposal.id
@@ -77,7 +74,6 @@ export async function updateProposal ({
       }))
     }),
     prisma.pagePermission.deleteMany(deleteArgs),
-    prisma.pagePermission.createMany(createArgs),
-    prisma.pagePermission.createMany(childCreateArgs)
+    ...createArgs.map(arg => prisma.pagePermission.create(arg))
   ]);
 }
