@@ -30,9 +30,7 @@ export default function VotesPage () {
   const [viewState, setViewState] = useReducer<ViewStateReducer>((state, updates) => ({ ...state, ...updates }), defaultViewState);
 
   const [currentSpace] = useCurrentSpace();
-  const { data, mutate: mutateVotes } = useSWR(() => `votesBySpace/${currentSpace?.id}`, () => currentSpace ? charmClient.getVotesBySpace(currentSpace.id) : [], {
-    fallbackData: undefined
-  });
+  const { data, mutate: mutateVotes } = useSWR(() => currentSpace ? `votesBySpace/${currentSpace.id}` : null, () => charmClient.getVotesBySpace(currentSpace!.id));
 
   // votes dont exist right away for proposals, so treat them like draft votes
   const { pages } = usePages();

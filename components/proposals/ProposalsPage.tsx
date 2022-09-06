@@ -10,11 +10,8 @@ import ProposalsTable from './components/ProposalsTable';
 export default function ProposalsPage () {
   const [currentSpace] = useCurrentSpace();
 
-  const { data, mutate: mutateProposals } = useSWR(() => `proposals/${currentSpace?.id}`, () => currentSpace ? charmClient.proposals.getProposalsBySpace(currentSpace.id) : [], {
-    fallbackData: undefined
-  });
+  const { data, mutate: mutateProposals } = useSWR(() => currentSpace ? `proposals/${currentSpace.id}` : null, () => charmClient.proposals.getProposalsBySpace(currentSpace!.id));
 
-  // For now, consider that empty pages list means we are loading pages
   const loadingData = !data;
 
   return (
