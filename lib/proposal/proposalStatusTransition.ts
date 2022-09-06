@@ -5,7 +5,7 @@ export const proposalStatusTransitionRecord: Record<ProposalStatus, ProposalStat
   draft: ['private_draft', 'discussion'],
   discussion: ['private_draft', 'draft', 'review'],
   review: ['discussion', 'reviewed'],
-  reviewed: [],
+  reviewed: ['discussion'],
   vote_active: [],
   vote_closed: []
 };
@@ -37,5 +37,8 @@ export const proposalStatusTransitionPermission: Partial<Record<ProposalStatus, 
   review: {
     author: ['discussion'],
     reviewer: ['reviewed']
+  },
+  reviewed: {
+    author: ['discussion']
   }
 };

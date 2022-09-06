@@ -60,6 +60,17 @@ async function updateProposalStatusController (req: NextApiRequest, res: NextApi
       }
     });
   }
+  else if (proposal.status === 'reviewed' && newStatus === 'discussion') {
+    await prisma.proposal.update({
+      where: {
+        id: proposal.id
+      },
+      data: {
+        reviewedBy: null,
+        reviewedAt: null
+      }
+    });
+  }
 
   await updateProposalStatus({
     currentStatus: proposal.status,
