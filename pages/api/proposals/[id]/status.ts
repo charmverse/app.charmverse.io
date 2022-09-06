@@ -44,38 +44,11 @@ async function updateProposalStatusController (req: NextApiRequest, res: NextApi
     throw new UnauthorisedActionError();
   }
 
-  // Going from review to review, mark the reviewer in the proposal
-  if (proposal.status === 'review' && newStatus === 'reviewed') {
-    await prisma.proposal.update({
-      where: {
-        id: proposalId
-      },
-      data: {
-        reviewer: {
-          connect: {
-            id: userId
-          }
-        },
-        reviewedAt: new Date()
-      }
-    });
-  }
-  else if (proposal.status === 'reviewed' && newStatus === 'discussion') {
-    await prisma.proposal.update({
-      where: {
-        id: proposal.id
-      },
-      data: {
-        reviewedBy: null,
-        reviewedAt: null
-      }
-    });
-  }
-
   await updateProposalStatus({
     currentStatus: proposal.status,
     newStatus,
-    proposalId
+    proposalId,
+    userId
   });
 
   return res.status(200).end();

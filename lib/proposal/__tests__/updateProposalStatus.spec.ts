@@ -39,7 +39,8 @@ describe('Updates the proposal of a page', () => {
     const updatedProposal = await updateProposalStatus({
       currentStatus: 'private_draft',
       newStatus: 'draft',
-      proposalId: pageWithProposal.proposalId as string
+      proposalId: pageWithProposal.proposalId as string,
+      userId: user.id
     });
     expect(updatedProposal.status).toBe('draft');
   });
@@ -69,7 +70,8 @@ describe('Updates the proposal of a page', () => {
     await expect(updateProposalStatus({
       currentStatus: 'private_draft',
       newStatus: 'review',
-      proposalId: pageWithProposal.proposalId as string
+      proposalId: pageWithProposal.proposalId as string,
+      userId: user.id
     })).rejects.toBeInstanceOf(InvalidStateError);
   });
 });
