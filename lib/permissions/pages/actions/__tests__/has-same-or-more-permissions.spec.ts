@@ -4,7 +4,7 @@ import { prisma } from 'db';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { getPage, IPageWithPermissions } from 'lib/pages/server';
-import { hasSameOrMorePermissions } from '../has-same-or-more-permissions';
+import { hasSameOrMorePermissions, comparePermissionLevels } from '../has-same-or-more-permissions';
 import { upsertPermission } from '../upsert-permission';
 
 let user: User;
@@ -132,5 +132,27 @@ describe('hasSameOrMorePermissions', () => {
     const hasEqualOrMorePermissions = hasSameOrMorePermissions(root!.permissions, child!.permissions);
 
     expect(hasEqualOrMorePermissions).toBe(false);
+  });
+});
+
+describe('comparePermissionLevels', () => {
+  it('should return "more" if the comparison permission level provides more operations than the base permission level', () => {
+    const comparison = comparePermissionLevels({ base: 'view', comparison: 'full_access' });
+    expect(comparison).toBe('more');
+  });
+
+  it('should return "less" if the comparison permission level provides less operations than the base permission level', () => {
+    const comparison = comparePermissionLevels({ base: 'full_access', comparison: 'view' });
+    expect(comparison).toBe('less');
+  });
+
+  it('should return "equal" if the comparison permission level provides the same operations as the base permission level', () => {
+    const comparison = comparePermissionLevels({ base: 'full_access', comparison: 'full_access' });
+    expect(comparison).toBe('equal');
+  });
+
+  it('should return "different" if at least one set of operations does not fully intersect with the other', () => {
+    const comparison = comparePermissionLevels({ base: 'view', comparison: ['edit_content'] });
+    expect(comparison).toBe('different');
   });
 });
