@@ -2,7 +2,6 @@ import { User, Space } from '@prisma/client';
 import { createProposalWithUsers, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
-import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { updateProposal } from '../updateProposal';
 import { ProposalWithUsers } from '../interface';
 
@@ -38,7 +37,7 @@ describe('Update proposal specific data', () => {
     const proposal = pageWithProposal.proposal as ProposalWithUsers;
 
     await updateProposal({
-      proposal,
+      proposalId: proposal.id,
       authors: [author2.id],
       reviewers: [{
         group: 'user',
@@ -102,7 +101,7 @@ describe('Update proposal specific data', () => {
     const proposal = pageWithProposal.proposal as ProposalWithUsers;
 
     await expect(updateProposal({
-      proposal,
+      proposalId: proposal.id,
       authors: [],
       reviewers: [{
         group: 'user',
@@ -110,46 +109,4 @@ describe('Update proposal specific data', () => {
       }]
     })).rejects.toBeInstanceOf(InvalidStateError);
   });
-
-  it('Should throw error if authors are updated when proposal is in review', async () => {
-    // Create a test proposal first
-    const pageWithProposal = await createProposalWithUsers({
-      spaceId: space.id,
-      userId: author1.id,
-      authors: [],
-      proposalStatus: 'review',
-      reviewers: [reviewer2.id]
-    });
-
-    const proposal = pageWithProposal.proposal as ProposalWithUsers;
-
-    await expect(updateProposal({
-      proposal,
-      authors: [reviewer1.id],
-      reviewers: []
-    })).rejects.toBeInstanceOf(UnauthorisedActionError);
-  });
-
-  it('Should throw error if reviewers are updated when proposal is in discussion', async () => {
-    // Create a test proposal first
-    const pageWithProposal = await createProposalWithUsers({
-      spaceId: space.id,
-      userId: author1.id,
-      authors: [],
-      proposalStatus: 'discussion',
-      reviewers: [reviewer2.id]
-    });
-
-    const proposal = pageWithProposal.proposal as ProposalWithUsers;
-
-    await expect(updateProposal({
-      proposal,
-      authors: [author1.id],
-      reviewers: [{
-        group: 'user',
-        id: reviewer1.id
-      }]
-    })).rejects.toBeInstanceOf(UnauthorisedActionError);
-  });
-
 });

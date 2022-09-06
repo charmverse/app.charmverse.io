@@ -69,6 +69,7 @@ async function updateProposalController (req: NextApiRequest, res: NextApiRespon
 
   const isCurrentUserProposalAuthor = proposal.authors.some(author => author.userId === userId);
 
+  // A proposal can only be updated when its in private_draft, draft or discussion status and only the proposal author can update it
   if (!isCurrentUserProposalAuthor || (proposal.status !== 'discussion' && proposal.status !== 'private_draft' && proposal.status !== 'draft')) {
     throw new UnauthorisedActionError();
   }
