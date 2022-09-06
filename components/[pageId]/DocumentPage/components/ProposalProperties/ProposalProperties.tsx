@@ -19,6 +19,9 @@ import UserDisplay from 'components/common/UserDisplay';
 import DoneIcon from '@mui/icons-material/Done';
 import PublishToSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/PublishToSnapshot';
 import { IPageWithPermissions } from 'lib/pages';
+import { useState } from 'react';
+import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
+import CreateVoteModal from 'components/votes/components/CreateVoteModal';
 import { ProposalStatusChip } from '../../../../proposals/components/ProposalStatusBadge';
 
 interface ProposalPropertiesProps {
@@ -31,6 +34,11 @@ const proposalStatuses = Object.keys(proposalStatusTransitionRecord);
 
 export default function ProposalProperties ({ page, proposalId, readOnly }: ProposalPropertiesProps) {
   const { data: proposal, mutate: refreshProposal } = useSWR(`proposal/${proposalId}`, () => charmClient.proposals.getProposal(proposalId));
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  function openVoteModal () {
+    setIsModalOpen(true);
+  }
 
   const [contributors] = useContributors();
   const { roles = [], roleups } = useRoles();
@@ -245,9 +253,32 @@ export default function ProposalProperties ({ page, proposalId, readOnly }: Prop
           })
         }
         {
-          proposal.status === 'reviewed' && <PublishToSnapshot page={page} />
+          proposal.status === 'reviewed' && (
+            <>
+              <PublishToSnapshot button={false} disabled={!isProposalAuthor} page={page} />
+              <MenuItem
+                disabled={!isProposalAuthor}
+                onClick={openVoteModal}
+              >
+                <Box display='flex' alignItems='center' gap={1}>
+                  <HowToVoteOutlinedIcon fontSize='small' />
+                  Create Vote
+                </Box>
+              </MenuItem>
+            </>
+          )
         }
       </Menu>
+      <CreateVoteModal
+        isProposal={true}
+        open={isModalOpen}
+        onCreateVote={() => {
+          setIsModalOpen(false);
+        }}
+        onClose={() => {
+          setIsModalOpen(false);
+        }}
+      />
     </Box>
   );
 }

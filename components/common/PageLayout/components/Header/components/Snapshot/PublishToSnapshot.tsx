@@ -1,6 +1,6 @@
-import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import PublishIcon from '@mui/icons-material/ElectricBolt';
-import Box from '@mui/material/Box';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import { MenuItem } from '@mui/material';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import { Page } from '@prisma/client';
@@ -15,7 +15,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 import PublishingForm from './PublishingForm';
 
-export default function PublishToSnapshot ({ page }: {page: Page}) {
+export default function PublishToSnapshot ({ page, disabled = false, button = true }: {button?: boolean, disabled?: boolean, page: Page}) {
 
   const [checkingProposal, setCheckingProposal] = useState(!!page.snapshotProposalId);
   const [proposal, setProposal] = useState<SnapshotProposal | null>(null);
@@ -53,52 +53,62 @@ export default function PublishToSnapshot ({ page }: {page: Page}) {
 
   }, [page, page?.snapshotProposalId]);
 
+  const content = (
+    <>
+      {
+      checkingProposal && (
+        <>
+          <LoadingIcon size={18} sx={{ mr: 1 }} />
+          <ListItemText primary='Checking proposal' />
+        </>
+      )
+    }
+      {
+      !checkingProposal && !proposal && (
+        <>
+          <PublishIcon
+            fontSize='small'
+            sx={{
+              mr: 1
+            }}
+            onClick={open}
+          />
+          <ListItemText onClick={open} primary='Publish to Snapshot' />
+
+          <Modal size='large' open={isOpen} onClose={close} title={`Publish to Snapshot ${currentSpace?.snapshotDomain ? `(${currentSpace.snapshotDomain})` : ''}`}>
+            <PublishingForm onSubmit={close} page={page} />
+          </Modal>
+        </>
+      )
+    }
+      {
+      !checkingProposal && proposal && (
+        <Link sx={{ display: 'flex', verticalAlign: 'center' }} color='textPrimary' external target='_blank' href={`https://snapshot.org/#/${proposal.space.id}/proposal/${proposal.id}`}>
+          <ExitToAppIcon
+            fontSize='small'
+            sx={{
+              m: 'auto',
+              mr: 1
+            }}
+
+          />
+          <ListItemText primary='View on Snapshot' />
+
+        </Link>
+      )
+    }
+    </>
+  );
+
   return (
-    <ListItemButton>
-      {
-        checkingProposal && (
-          <>
-            <LoadingIcon size={18} sx={{ mr: 1 }} />
-            <ListItemText primary='Checking proposal' />
-          </>
-        )
-      }
-      {
-        !checkingProposal && !proposal && (
-          <>
-            <PublishIcon
-              fontSize='small'
-              sx={{
-                mr: 1
-              }}
-              onClick={open}
-            />
-            <ListItemText onClick={open} primary='Publish to Snapshot' />
-
-            <Modal size='large' open={isOpen} onClose={close} title={`Publish to Snapshot ${currentSpace?.snapshotDomain ? `(${currentSpace.snapshotDomain})` : ''}`}>
-              <PublishingForm onSubmit={close} page={page} />
-            </Modal>
-          </>
-        )
-      }
-      {
-        !checkingProposal && proposal && (
-          <Link sx={{ display: 'flex', verticalAlign: 'center' }} color='textPrimary' external target='_blank' href={`https://snapshot.org/#/${proposal.space.id}/proposal/${proposal.id}`}>
-            <ExitToAppIcon
-              fontSize='small'
-              sx={{
-                m: 'auto',
-                mr: 1
-              }}
-
-            />
-            <ListItemText primary='View on Snapshot' />
-
-          </Link>
-        )
-      }
-
-    </ListItemButton>
-
+    button ? (
+      <ListItemButton disabled={disabled}>
+        {content}
+      </ListItemButton>
+    ) : (
+      <MenuItem>
+        {content}
+      </MenuItem>
+    )
   );
 }
