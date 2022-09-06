@@ -52,11 +52,9 @@ export default function CollectibleRow ({ onClick, collectable, visible, showVis
       gap={2}
       flexDirection='row'
     >
-      {collectable.type === 'poap' ? (
-        <Link className='hidden-on-visible' href={collectable.link} target='_blank' display='flex'>
-          <Avatar size='large' avatar={collectable.image} />
-        </Link>
-      ) : <Avatar className='hidden-on-visible' isNft size='large' avatar={collectable.image} />}
+      <Link className='hidden-on-visible' href={collectable.link} target='_blank' display='flex'>
+        <Avatar size='large' isNft={collectable.type === 'nft'} avatar={collectable.image} />
+      </Link>
       <Stack
         className='hidden-on-visible'
         justifyContent='center'
