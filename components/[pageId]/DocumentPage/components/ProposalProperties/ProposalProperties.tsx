@@ -41,8 +41,7 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
 
   const { status } = proposal;
 
-  const canUpdateAuthors = status === 'draft' || status === 'private_draft' || status === 'discussion';
-  const canUpdateReviewers = status === 'draft' || status === 'private_draft';
+  const canUpdate = status === 'draft' || status === 'private_draft' || status === 'discussion';
   const reviewerOptionsRecord: Record<string, ({group: 'role'} & ListSpaceRolesResponse) | ({group: 'user'} & Contributor)> = {};
   const isProposalAuthor = (user && proposal.authors.some(author => author.userId === user.id));
   const isProposalReviewer = (user && (proposal.reviewers.some(reviewer => {
@@ -139,7 +138,7 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
                   refreshProposal();
                 }
               }}
-              disabled={!user || readOnly || !canUpdateAuthors || !isProposalAuthor}
+              disabled={!user || readOnly || !canUpdate || !isProposalAuthor}
               readOnly={readOnly}
               options={contributors}
               sx={{
@@ -170,7 +169,7 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
                 />
               ) : (
                 <InputSearchReviewers
-                  disabled={!user || readOnly || !canUpdateReviewers || (user && !proposal.authors.map(author => author.userId).includes(user.id))}
+                  disabled={!user || readOnly || !canUpdate || (user && !proposal.authors.map(author => author.userId).includes(user.id))}
                   readOnly={readOnly}
                   value={proposal.reviewers.map(reviewer => reviewerOptionsRecord[(reviewer.roleId ?? reviewer.userId) as string])}
                   disableCloseOnSelect={true}
@@ -206,6 +205,8 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
                 disabled={
                   currentUserGroup === null
                   || (!proposalStatusTransitionPermission[proposal.status]?.[currentUserGroup]?.includes(newStatus))
+                  // Before moving to review there should atleast be one reviewer
+                  || (proposal.status === 'discussion' && newStatus === 'review' && proposal.reviewers.length === 0)
                 }
                 onClick={() => updateProposalStatus(newStatus)}
               >
