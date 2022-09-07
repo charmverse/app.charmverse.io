@@ -54,6 +54,7 @@ export default function ProposalProperties ({ page, proposalId, readOnly }: Prop
   const { status } = proposal;
 
   const isProposalAuthor = (user && proposal.authors.some(author => author.userId === user.id));
+
   const isProposalReviewer = (user && (proposal.reviewers.some(reviewer => {
     if (reviewer.userId) {
       return reviewer.userId === user.id;

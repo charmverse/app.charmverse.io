@@ -106,7 +106,7 @@ export default function PublishToSnapshot ({ page, disabled = false, button = tr
         {content}
       </ListItemButton>
     ) : (
-      <MenuItem>
+      <MenuItem disabled={disabled}>
         {content}
       </MenuItem>
     )
