@@ -72,7 +72,7 @@ export default function PageTitle ({ value, onChange, readOnly }: PageTitleProps
       value={title}
       onChange={_onChange}
       placeholder='Untitled'
-      autoFocus={!readOnly && isTouchScreen()}
+      autoFocus={!readOnly && !isTouchScreen()}
       multiline
       variant='standard'
       onKeyDown={(e) => {
