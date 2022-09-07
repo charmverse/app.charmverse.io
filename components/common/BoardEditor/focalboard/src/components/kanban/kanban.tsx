@@ -223,8 +223,8 @@ function Kanban (props: Props) {
   };
 
   const ScrollingComponent = withScrolling('div');
-  const hStrength = createHorizontalStrength(Utils.isMobile() ? 60 : 250);
-  const vStrength = createVerticalStrength(Utils.isMobile() ? 60 : 250);
+  const hStrength = createHorizontalStrength(Utils.isTouchScreen() ? 60 : 250);
+  const vStrength = createVerticalStrength(Utils.isTouchScreen() ? 60 : 250);
 
   const menuTriggerProps = !props.readonly ? bindTrigger(popupState) : {};
   return (
@@ -312,7 +312,7 @@ function Kanban (props: Props) {
             >
               {group.cards.map((card) => (
                 <KanbanCard
-                  
+
                   card={card}
                   board={board}
                   visiblePropertyTemplates={visiblePropertyTemplates}

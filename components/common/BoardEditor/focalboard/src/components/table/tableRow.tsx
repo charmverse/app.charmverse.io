@@ -11,7 +11,7 @@ import { Constants } from '../../constants';
 import Button from '../../widgets/buttons/button';
 import Editable from '../../widgets/editable';
 import { useSortable } from '../../hooks/sortable';
-import { isMobile } from 'lib/browser';
+import { isTouchScreen } from 'lib/browser';
 
 import PropertyValueElement from '../propertyValueElement';
 
@@ -49,7 +49,7 @@ function TableRow (props: Props) {
   const [title, setTitle] = useState('');
   const isManualSort = activeView.fields.sortOptions.length === 0;
   const isGrouped = Boolean(activeView.fields.groupById);
-  const [isDragging, isOver, cardRef] = useSortable('card', card, !isMobile() && !props.readonly && (isManualSort || isGrouped), props.onDrop);
+  const [isDragging, isOver, cardRef] = useSortable('card', card, !isTouchScreen() && !props.readonly && (isManualSort || isGrouped), props.onDrop);
 
   useEffect(() => {
     if (props.focusOnMount) {

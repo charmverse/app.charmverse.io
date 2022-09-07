@@ -460,7 +460,7 @@ class Utils {
     return result;
   }
 
-  static isMobile (): boolean {
+  static isTouchScreen (): boolean {
     const toMatch = [
       /Android/i,
       /webOS/i,
