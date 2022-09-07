@@ -56,7 +56,8 @@ export async function resolvePageTree ({ pageId, flattenChildren = false, includ
   const { parents, targetPage } = mapTargetPageTree<PageNodeWithPermissions>({
     items: pagesInSpace,
     targetPageId: pageId,
-    includeDeletedPages
+    includeDeletedPages,
+    includeProposals: true
   });
 
   // Prune the parent references so we have a direct chain

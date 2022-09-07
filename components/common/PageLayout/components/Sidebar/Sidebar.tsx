@@ -5,7 +5,6 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import SettingsIcon from '@mui/icons-material/Settings';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
-import VoteIcon from '@mui/icons-material/HowToVoteOutlined';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search';
@@ -22,6 +21,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { BoxProps } from '@mui/system';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import ForumIcon from '@mui/icons-material/Forum';
 import { headerHeight } from '../Header/Header';
 import NewPageMenu from '../NewPageMenu';
 import Workspaces from './Workspaces';
@@ -211,10 +211,10 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               label='Bounties'
             />
             <SidebarLink
-              href={`/${space.domain}/votes`}
-              active={router.pathname.startsWith('/[domain]/votes')}
-              icon={<VoteIcon fontSize='small' />}
-              label='Votes'
+              href={`/${space.domain}/proposals`}
+              active={router.pathname.startsWith('/[domain]/proposals')}
+              icon={<ForumIcon fontSize='small' />}
+              label='Proposals'
             />
             <Divider sx={{ mx: 2, my: 1 }} />
             <SidebarBox

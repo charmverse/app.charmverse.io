@@ -1,8 +1,7 @@
 import { Space, User } from '@prisma/client';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createProposalWithUsers, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { InvalidStateError } from 'lib/middleware';
 import { updateProposalStatus } from '../updateProposalStatus';
-import { createProposal } from '../createProposal';
 
 let user: User;
 let space: Space;
@@ -14,62 +13,59 @@ beforeAll(async () => {
 });
 
 describe('Updates the proposal of a page', () => {
-  it('Move a private draft proposal to draft status', async () => {
-    const pageWithProposal = await createProposal({
-      pageCreateInput: {
-        author: {
-          connect: {
-            id: user.id
-          }
-        },
-        contentText: '',
-        path: 'path',
-        space: {
-          connect: {
-            id: space.id
-          }
-        },
-        title: 'page-title',
-        type: 'proposal',
-        updatedBy: user.id
-      },
+  it('Move a review proposal to reviewed status and assign proposal reviewer and reviewed at fields', async () => {
+    const pageWithProposal = await createProposalWithUsers({
       spaceId: space.id,
+      userId: user.id,
+      authors: [],
+      reviewers: [],
+      proposalStatus: 'review'
+    });
+
+    const updatedProposal = await updateProposalStatus({
+      currentStatus: pageWithProposal.proposal!.status,
+      newStatus: 'reviewed',
+      proposalId: pageWithProposal.proposalId as string,
       userId: user.id
     });
-    const updatedProposal = await updateProposalStatus({
-      currentStatus: 'private_draft',
-      newStatus: 'draft',
-      proposalId: pageWithProposal.proposalId as string
+    expect(updatedProposal.status).toBe('reviewed');
+    expect(updatedProposal.reviewedBy).not.toBeNull();
+    expect(updatedProposal.reviewedAt).not.toBeNull();
+  });
+
+  it('Move a reviewed proposal to discussion status and unassign proposal reviewer and reviewed at fields', async () => {
+    const pageWithProposal = await createProposalWithUsers({
+      spaceId: space.id,
+      userId: user.id,
+      authors: [],
+      reviewers: [],
+      proposalStatus: 'reviewed'
     });
-    expect(updatedProposal.status).toBe('draft');
+
+    const updatedProposal = await updateProposalStatus({
+      currentStatus: pageWithProposal.proposal!.status,
+      newStatus: 'discussion',
+      proposalId: pageWithProposal.proposalId as string,
+      userId: user.id
+    });
+    expect(updatedProposal.status).toBe('discussion');
+    expect(updatedProposal.reviewedBy).toBeNull();
+    expect(updatedProposal.reviewedAt).toBeNull();
   });
 
   it('Throw error when trying to move a draft proposal to review', async () => {
-    const pageWithProposal = await createProposal({
-      pageCreateInput: {
-        author: {
-          connect: {
-            id: user.id
-          }
-        },
-        contentText: '',
-        path: 'path',
-        space: {
-          connect: {
-            id: space.id
-          }
-        },
-        title: 'page-title',
-        type: 'proposal',
-        updatedBy: user.id
-      },
+    const pageWithProposal = await createProposalWithUsers({
       spaceId: space.id,
-      userId: user.id
+      userId: user.id,
+      authors: [],
+      reviewers: [],
+      proposalStatus: 'reviewed'
     });
     await expect(updateProposalStatus({
       currentStatus: 'private_draft',
       newStatus: 'review',
-      proposalId: pageWithProposal.proposalId as string
+      proposalId: pageWithProposal.proposalId as string,
+      userId: user.id
     })).rejects.toBeInstanceOf(InvalidStateError);
   });
 });

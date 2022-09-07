@@ -22,7 +22,7 @@ import { IPageWithPermissions } from 'lib/pages';
 import { useState } from 'react';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
-import { ProposalStatusChip } from './ProposalStatusBadge';
+import { ProposalStatusChip } from '../../../../proposals/components/ProposalStatusBadge';
 
 interface ProposalPropertiesProps {
   proposalId: string,
@@ -63,7 +63,14 @@ export default function ProposalProperties ({ page, proposalId, readOnly }: Prop
     return roleups.some(role => role.id === reviewer.roleId && role.users.some(_user => _user.id === user.id));
   })));
 
-  const currentUserGroup = isProposalAuthor ? 'author' : isProposalReviewer ? 'reviewer' : null;
+  const currentUserGroups: ('author' | 'reviewer')[] = [];
+  if (isProposalAuthor) {
+    currentUserGroups.push('author');
+  }
+
+  if (isProposalReviewer) {
+    currentUserGroups.push('reviewer');
+  }
 
   contributors.forEach(contributor => {
     reviewerOptionsRecord[contributor.id] = {
@@ -233,12 +240,11 @@ export default function ProposalProperties ({ page, proposalId, readOnly }: Prop
             return (
               <MenuItem
                 key={newStatus}
-                disabled={
-                  currentUserGroup === null
-                  || (!proposalStatusTransitionPermission[proposal.status]?.[currentUserGroup]?.includes(newStatus))
+                disabled={(
+                  !currentUserGroups
+                    .some(userGroup => proposalStatusTransitionPermission[proposal.status]?.[userGroup]?.includes(newStatus)))
                   // Before moving to review there should atleast be one reviewer
-                  || (proposal.status === 'discussion' && newStatus === 'review' && proposal.reviewers.length === 0)
-                }
+                  || (proposal.status === 'discussion' && newStatus === 'review' && proposal.reviewers.length === 0)}
                 onClick={() => updateProposalStatus(newStatus)}
               >
                 <Box display='flex' alignItems='center' gap={1}>
