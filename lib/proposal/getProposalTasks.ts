@@ -1,7 +1,7 @@
 import { prisma } from 'db';
-import { ExtendedProposals } from './interface';
+import { ExtendedProposal } from './interface';
 
-export async function getProposalTasks (userId: string): Promise<ExtendedProposals[]> {
+export async function getProposalTasks (userId: string): Promise<ExtendedProposal[]> {
   const proposals = await prisma.proposal.findMany({
     include: {
       authors: true,
@@ -11,5 +11,5 @@ export async function getProposalTasks (userId: string): Promise<ExtendedProposa
     }
   });
 
-  return proposals;
+  return proposals as ExtendedProposal[];
 }

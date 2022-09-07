@@ -5,7 +5,7 @@ export interface ProposalWithUsers extends Proposal {
   reviewers: ProposalReviewer[]
 }
 
-export interface ExtendedProposals extends ProposalWithUsers {
+export interface ExtendedProposal extends ProposalWithUsers {
   space: Space
-  page: Page | null
+  page: Page
 }
