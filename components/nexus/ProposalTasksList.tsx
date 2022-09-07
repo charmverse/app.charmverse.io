@@ -5,6 +5,9 @@ import { GetTasksResponse } from 'pages/api/tasks/list';
 import ForumIcon from '@mui/icons-material/Forum';
 import { KeyedMutator } from 'swr';
 import { ExtendedProposal } from 'lib/proposal/interface';
+import { useUser } from 'hooks/useUser';
+import { useContributors } from 'hooks/useContributors';
+import useRoles from 'hooks/useRoles';
 
 /**
  * Page only needs to be provided for proposal type proposals
@@ -15,6 +18,8 @@ export function ProposalTasksListRow (
   const {
     proposalTask
   } = props;
+  const { user } = useUser();
+  const { roleups } = useRoles();
 
   const {
     page: { path: pagePath, title: pageTitle },
@@ -24,6 +29,37 @@ export function ProposalTasksListRow (
 
   const proposalLink = `/${spaceDomain}/${pagePath}?proposalId=${id}`;
   const proposalLocation = `${pageTitle || 'Untitled'} in ${spaceName}`;
+
+  const isProposalAuthor = (user && proposalTask.authors.some(author => author.userId === user.id));
+  const isProposalReviewer = (user && (proposalTask.reviewers.some(reviewer => {
+    if (reviewer.userId) {
+      return reviewer.userId === user.id;
+    }
+    return roleups.some(role => role.id === reviewer.roleId && role.users.some(_user => _user.id === user.id));
+  })));
+
+  let buttonLabel = '';
+
+  if (isProposalAuthor) {
+    if (proposalTask.status.match('draft')) {
+      buttonLabel = 'Discussion';
+    }
+    else if (proposalTask.status === 'reviewed') {
+      buttonLabel = 'Start vote';
+    }
+  }
+  else if (isProposalReviewer) {
+    if (proposalTask.status === 'review') {
+      buttonLabel = 'Review';
+    }
+  }
+  else if (proposalTask.status === 'discussion') {
+    buttonLabel = 'Discuss';
+  }
+
+  if (proposalTask.status === 'vote_active') {
+    buttonLabel = 'Vote';
+  }
 
   return (
     <Box>
@@ -68,7 +104,7 @@ export function ProposalTasksListRow (
           >
             <Button onClick={() => {
             }}
-            >Proposal
+            >{buttonLabel}
             </Button>
           </Grid>
         </Grid>
