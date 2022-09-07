@@ -1,5 +1,5 @@
 
-import { IAppWindow } from './types';
+import type { IAppWindow } from './types';
 import { exportUserSettingsBlob, importUserSettingsBlob } from './userSettings';
 
 declare interface INativeApp {
