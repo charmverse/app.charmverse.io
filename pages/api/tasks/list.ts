@@ -6,6 +6,8 @@ import { getPendingGnosisTasks, GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks'
 import { getMentionedTasks, MentionedTasksGroup } from 'lib/mentions/getMentionedTasks';
 import { getVoteTasks } from 'lib/votes/getVoteTasks';
 import { VoteTask } from 'lib/votes/interfaces';
+import { getProposalTasks } from 'lib/proposal/getProposalTasks';
+import { ExtendedProposals } from 'lib/proposal/interface';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -15,6 +17,7 @@ export interface GetTasksResponse {
   gnosis: GnosisSafeTasks[];
   mentioned: MentionedTasksGroup
   votes: VoteTask[]
+  proposals: ExtendedProposals[]
 }
 
 async function getTasks (req: NextApiRequest, res: NextApiResponse<GetTasksResponse>) {
@@ -22,7 +25,8 @@ async function getTasks (req: NextApiRequest, res: NextApiResponse<GetTasksRespo
   const gnosisTasks = await getPendingGnosisTasks(userId);
   const mentionedTasksGroup = await getMentionedTasks(userId);
   const voteTasks = await getVoteTasks(userId);
-  return res.status(200).json({ votes: voteTasks, gnosis: gnosisTasks, mentioned: mentionedTasksGroup });
+  const proposalTasks = await getProposalTasks(userId);
+  return res.status(200).json({ proposals: proposalTasks, votes: voteTasks, gnosis: gnosisTasks, mentioned: mentionedTasksGroup });
 }
 
 export default withSessionRoute(handler);

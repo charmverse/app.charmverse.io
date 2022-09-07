@@ -49,7 +49,8 @@ const TASK_TABS = [
   { icon: <KeyIcon />, label: 'Multisig', type: 'multisig' },
   // { icon: <BountyIcon />, label: 'Bounty', type: 'bounty' },
   { icon: <HowToVoteIcon />, label: 'Poll', type: 'vote' },
-  { icon: <ForumIcon />, label: 'Discussion', type: 'discussion' }
+  { icon: <ForumIcon />, label: 'Discussion', type: 'discussion' },
+  { icon: <ForumIcon />, label: 'Proposal', type: 'proposal' }
 ] as const;
 
 export default function TasksPage () {
@@ -67,7 +68,8 @@ export default function TasksPage () {
   const notificationCount: Record<(typeof TASK_TABS)[number]['type'], number> = {
     multisig: (tasks && !hasSnoozedNotifications) ? tasks.gnosis.length : 0,
     vote: tasks ? tasks.votes.length : 0,
-    discussion: tasks ? tasks.mentioned.unmarked.length : 0
+    discussion: tasks ? tasks.mentioned.unmarked.length : 0,
+    proposal: tasks ? tasks.proposals.length : 0
   };
 
   return (
