@@ -2,7 +2,7 @@ import { Space } from '@prisma/client';
 import { LoggedInUser } from 'models';
 import { v4 } from 'uuid';
 import { Page as BrowserPage } from '@playwright/test';
-import { IPageWithPermissions } from 'lib/pages/interfaces';
+import type { IPageWithPermissions } from 'lib/pages/interfaces';
 import { baseUrl } from 'testing/mockApiCall';
 
 export { baseUrl } from 'testing/mockApiCall';
