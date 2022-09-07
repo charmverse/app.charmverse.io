@@ -17,6 +17,7 @@ import NotifyMeButton from './components/NotifyMeButton';
 import SnoozeButton from './components/SnoozeButton';
 import useTasks from './hooks/useTasks';
 import { VoteTasksList } from './VoteTasksList';
+import ProposalTasksList from './ProposalTasksList';
 
 export const tabStyles = {
   mb: 2,
@@ -53,10 +54,12 @@ const TASK_TABS = [
   { icon: <ForumIcon />, label: 'Proposal', type: 'proposal' }
 ] as const;
 
+type TaskType = (typeof TASK_TABS)[number]['type'];
+
 export default function TasksPage () {
   const router = useRouter();
   const { user } = useUser();
-  const [currentTask, setCurrentTask] = useState(router.query?.task ?? 'multisig');
+  const [currentTask, setCurrentTask] = useState<TaskType>((router.query?.task ?? 'multisig') as TaskType);
   const { error, mutate: mutateTasks, tasks } = useTasks();
   const theme = useTheme();
 
@@ -133,7 +136,7 @@ export default function TasksPage () {
           />
         ))}
       </Tabs>
-      {currentTask === 'multisig' ? <GnosisTasksList error={error} mutateTasks={mutateTasks} tasks={tasks} /> : currentTask === 'discussion' ? <MentionedTasksList mutateTasks={mutateTasks} error={error} tasks={tasks} /> : currentTask === 'vote' ? <VoteTasksList mutateTasks={mutateTasks} error={error} tasks={tasks} /> : null}
+      {currentTask === 'multisig' ? <GnosisTasksList error={error} mutateTasks={mutateTasks} tasks={tasks} /> : currentTask === 'discussion' ? <MentionedTasksList mutateTasks={mutateTasks} error={error} tasks={tasks} /> : currentTask === 'vote' ? <VoteTasksList mutateTasks={mutateTasks} error={error} tasks={tasks} /> : currentTask === 'proposal' ? <ProposalTasksList error={error} tasks={tasks} /> : null}
     </>
   );
 }
