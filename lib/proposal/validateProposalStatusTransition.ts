@@ -1,7 +1,7 @@
 import { ProposalStatus } from '@prisma/client';
 import { prisma } from 'db';
 import { ProposalWithUsers } from './interface';
-import { proposalStatusTransitionPermission } from './proposalStatusTransition';
+import { proposalStatusTransitionPermission, ProposalUserGroup } from './proposalStatusTransition';
 
 export async function validateProposalStatusTransition ({
   proposal,
@@ -49,7 +49,7 @@ export async function validateProposalStatusTransition ({
 
   const isCurrentUserProposalAuthor = proposal.authors.some(author => author.userId === userId);
 
-  const proposalUserGroups: ('author' | 'reviewer')[] = [];
+  const proposalUserGroups: ProposalUserGroup[] = [];
 
   if (isCurrentUserProposalAuthor) {
     proposalUserGroups.push('author');
