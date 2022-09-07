@@ -8,6 +8,7 @@ import { useRouter } from 'next/router';
 import * as React from 'react';
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
+import type { PagesMap } from 'lib/pages/interfaces';
 import { isTruthy } from 'lib/utilities/types';
 import useRefState from 'hooks/useRefState';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
@@ -19,8 +20,6 @@ import { useUser } from './useUser';
 import useIsAdmin from './useIsAdmin';
 
 export type LinkedPage = (Page & {children: LinkedPage[], parent: null | LinkedPage});
-
-export type PagesMap = Record<string, IPageWithPermissions | undefined>;
 
 export type PagesContext = {
   currentPageId: string,

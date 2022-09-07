@@ -1,13 +1,14 @@
 
-import Button from 'components/common/Button';
 import { Box, Divider, Popover, Tooltip } from '@mui/material';
-import Loader from 'components/common/Loader';
-import charmClient from 'charmClient';
-import { usePages } from 'hooks/usePages';
-import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
-import { useState, useEffect } from 'react';
-import { IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
 import { PageType } from '@prisma/client';
+import charmClient from 'charmClient';
+import Button from 'components/common/Button';
+import Loader from 'components/common/Loader';
+import { usePages } from 'hooks/usePages';
+import { findParentOfType } from 'lib/pages/findParentOfType';
+import { IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
+import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
+import { useEffect, useState } from 'react';
 import PagePermissions from './components/PagePermissions';
 import ShareToWeb from './components/ShareToWeb';
 
@@ -24,6 +25,8 @@ export default function ShareButton ({ headerHeight, pageId }: { headerHeight: n
         refreshPage(pageId);
       });
   }
+
+  const proposalParentId = findParentOfType({ pageId, pageType: 'proposal', pageMap: pages });
 
   // watch changes to the page in case permissions get updated
   useEffect(() => {
@@ -74,6 +77,7 @@ export default function ShareButton ({ headerHeight, pageId }: { headerHeight: n
                   pageId={pageId}
                   pagePermissions={pagePermissions}
                   refreshPermissions={refreshPageAndPermissions}
+                  proposalParentId={proposalParentId}
                 />
                 <Divider />
                 <PagePermissions
@@ -81,6 +85,7 @@ export default function ShareButton ({ headerHeight, pageId }: { headerHeight: n
                   refreshPermissions={refreshPageAndPermissions}
                   pagePermissions={pagePermissions}
                   pageType={pages[pageId]?.type as PageType}
+                  proposalParentId={proposalParentId}
                 />
               </>
             )

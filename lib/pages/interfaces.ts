@@ -85,3 +85,5 @@ export type TargetPageTreeWithFlatChildren<T extends PageNode = PageNode> = {
 }
 
 export type PageWithProposal = (Page & {proposal: ProposalWithUsers | null})
+
+export type PagesMap = Record<string, IPageWithPermissions | undefined>;

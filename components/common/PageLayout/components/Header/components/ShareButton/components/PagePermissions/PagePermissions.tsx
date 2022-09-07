@@ -3,6 +3,7 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import InputAdornment from '@mui/material/InputAdornment';
 import Input from '@mui/material/OutlinedInput';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { PageType } from '@prisma/client';
 import charmClient from 'charmClient';
@@ -87,9 +88,10 @@ interface Props {
   pageType: PageType;
   refreshPermissions: () => void;
   pagePermissions: IPagePermissionWithAssignee[];
+  proposalParentId?: string | null;
 }
 
-export default function PagePermissions ({ pageId, pagePermissions, refreshPermissions, pageType }: Props) {
+export default function PagePermissions ({ pageId, pagePermissions, refreshPermissions, pageType, proposalParentId }: Props) {
 
   const { pages, getPagePermissions } = usePages();
   const [space] = useCurrentSpace();
@@ -143,7 +145,7 @@ export default function PagePermissions ({ pageId, pagePermissions, refreshPermi
   const { custom, proposal_editor, ...permissionsWithoutCustom } = permissionLevels as Record<string, string>;
   const permissionsWithRemove = { ...permissionsWithoutCustom, delete: 'Remove' };
 
-  const canEdit = userPagePermissions?.grant_permissions === true && canReceiveManualPermissionUpdates({ pageType });
+  const canEdit = userPagePermissions?.grant_permissions === true && canReceiveManualPermissionUpdates({ pageType }) && !proposalParentId;
 
   return (
     <Box p={1}>
@@ -182,12 +184,14 @@ export default function PagePermissions ({ pageId, pagePermissions, refreshPermi
                 defaultValue={spaceLevelPermission?.permissionLevel ?? 'No access'}
               />
             ) : (
-              <Typography
-                color='secondary'
-                variant='caption'
-              >
-                {spaceLevelPermission ? permissionsWithoutCustom[spaceLevelPermission.permissionLevel] : 'No access'}
-              </Typography>
+              <Tooltip title={userPagePermissions?.edit_isPublic && Boolean(proposalParentId) ? 'You can only change this setting from the top proposal page.' : ''}>
+                <Typography
+                  color='secondary'
+                  variant='caption'
+                >
+                  {spaceLevelPermission ? permissionsWithoutCustom[spaceLevelPermission.permissionLevel] : 'No access'}
+                </Typography>
+              </Tooltip>
             )
           }
           </div>
@@ -226,9 +230,11 @@ export default function PagePermissions ({ pageId, pagePermissions, refreshPermi
                       defaultValue={permission.permissionLevel}
                     />
                   ) : (
-                    <Typography color='secondary' variant='caption'>
-                      {permissionLevels[permission.permissionLevel]}
-                    </Typography>
+                    <Tooltip title={userPagePermissions?.edit_isPublic && Boolean(proposalParentId) ? 'You can only change this setting from the top proposal page.' : ''}>
+                      <Typography color='secondary' variant='caption'>
+                        {permissionLevels[permission.permissionLevel]}
+                      </Typography>
+                    </Tooltip>
                   )
                 }
                 </div>
