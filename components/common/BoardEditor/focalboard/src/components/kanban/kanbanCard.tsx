@@ -63,7 +63,7 @@ const CurrencyIcon = styled.span`
 const KanbanCard = React.memo((props: Props) => {
   const { card, board } = props;
   const intl = useIntl();
-  const [isDragging, isOver, cardRef] = useSortable('card', card, !props.readonly, props.onDrop);
+  const [isDragging, isOver, cardRef] = useSortable('card', card, !props.readonly && !isMobile(), props.onDrop);
   const visiblePropertyTemplates = props.visiblePropertyTemplates || [];
   let className = props.isSelected ? 'KanbanCard selected' : 'KanbanCard';
   if (props.isManualSort && isOver) {
@@ -73,9 +73,6 @@ const KanbanCard = React.memo((props: Props) => {
 
   const { bounties } = useBounties();
   const linkedBounty = bounties.find(bounty => bounty.page?.id === card.id);
-
-  // disable dragging on mobile for now because it prevents scrolling
-  const disableDragging = isMobile() || props.readonly;
 
   const { pages, getPagePermissions } = usePages();
   const cardPage = pages[card.id];
@@ -117,9 +114,9 @@ const KanbanCard = React.memo((props: Props) => {
   return (
     <>
       <div
-        ref={disableDragging ? () => null : cardRef}
+        ref={props.readonly ? () => null : cardRef}
         className={className}
-        draggable={!disableDragging}
+        draggable={!props.readonly}
         style={{ opacity: isDragging ? 0.5 : 1 }}
         onClick={props.onClick}
         data-test='kanban-card'
