@@ -4,7 +4,12 @@ FROM node:16-alpine AS BASE_APP
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-COPY . .
+COPY *.json ./
+RUN npm ci --no-audit --no-fund --omit dev
+
+COPY . ./
+RUN npm run build:prisma
+RUN npm run build
 
 ENV PORT 3000
 
@@ -15,19 +20,3 @@ ENV NEXT_TELEMETRY_DISABLED 1
 
 EXPOSE 3000
 CMD ["npm", "run", "start:test"]
-
-# Start of Staging web app
-# FROM BASE_APP as Staging_WebAPP
-# LABEL "com.datadoghq.ad.logs"='[{"source": "nodejs", "service": "webapp"}]'
-# CMD ["npm", "run", "start:staging"]
-
-
-# # Start of Prod web app
-# FROM BASE_APP as Prod_WebAPP 
-# LABEL "com.datadoghq.ad.logs"='[{"source": "nodejs", "service": "webapp"}]'
-# CMD ["npm", "run", "start:prod"]
-
-
-# FROM BASE_APP as Prod_Cron
-# LABEL "com.datadoghq.ad.logs"='[{"source": "nodejs", "service": "cron"}]'
-# CMD ["npm", "run", "cron:prod"]

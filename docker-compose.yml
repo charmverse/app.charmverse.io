@@ -1,12 +1,13 @@
 services:
   webapp:
-    build:
-      context: .
+    image: "310849459438.dkr.ecr.us-east-1.amazonaws.com/charmverse-web3-workspace:${IMGTAG}"
     ports:
       - "80:3000"
     command: [ "npm", "run", "${NPM_SCRIPT}" ]
     labels:
       com.datadoghq.ad.logs: "[{\"source\": \"nodejs\", \"service\": \"${SERVICE_NAME}\"}]"
+    volumes:
+      - $PWD/.env:/app/.env
     env_file:
       - ".env"
     environment:
@@ -19,6 +20,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /proc/:/host/proc/:ro
       - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
+      - $PWD/.env:/app/.env
     env_file:
       - ".env"
     environment:
