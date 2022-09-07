@@ -23,9 +23,8 @@ describe('Updates the proposal of a page', () => {
     });
 
     const updatedProposal = await updateProposalStatus({
-      currentStatus: pageWithProposal.proposal!.status,
+      proposal: pageWithProposal.proposal!,
       newStatus: 'reviewed',
-      proposalId: pageWithProposal.proposalId as string,
       userId: user.id
     });
     expect(updatedProposal.status).toBe('reviewed');
@@ -43,9 +42,8 @@ describe('Updates the proposal of a page', () => {
     });
 
     const updatedProposal = await updateProposalStatus({
-      currentStatus: pageWithProposal.proposal!.status,
+      proposal: pageWithProposal.proposal!,
       newStatus: 'discussion',
-      proposalId: pageWithProposal.proposalId as string,
       userId: user.id
     });
     expect(updatedProposal.status).toBe('discussion');
@@ -62,9 +60,23 @@ describe('Updates the proposal of a page', () => {
       proposalStatus: 'reviewed'
     });
     await expect(updateProposalStatus({
-      currentStatus: 'private_draft',
+      proposal: pageWithProposal.proposal!,
       newStatus: 'review',
-      proposalId: pageWithProposal.proposalId as string,
+      userId: user.id
+    })).rejects.toBeInstanceOf(InvalidStateError);
+  });
+
+  it('Throw error when trying to move a discussion proposal to review without any reviewers attached', async () => {
+    const pageWithProposal = await createProposalWithUsers({
+      spaceId: space.id,
+      userId: user.id,
+      authors: [],
+      reviewers: [],
+      proposalStatus: 'discussion'
+    });
+    await expect(updateProposalStatus({
+      proposal: pageWithProposal.proposal!,
+      newStatus: 'review',
       userId: user.id
     })).rejects.toBeInstanceOf(InvalidStateError);
   });

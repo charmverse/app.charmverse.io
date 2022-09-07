@@ -13,7 +13,7 @@ import useSWR from 'swr';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { proposalStatusTransitionRecord, proposalStatusTransitionPermission, PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
+import { proposalStatusTransitionRecord, proposalStatusTransitionPermission, PROPOSAL_STATUS_LABELS, ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';
 import { ProposalStatus } from '@prisma/client';
 import UserDisplay from 'components/common/UserDisplay';
 import DoneIcon from '@mui/icons-material/Done';
@@ -53,8 +53,6 @@ export default function ProposalProperties ({ page, proposalId, readOnly }: Prop
 
   const { status } = proposal;
 
-  const canUpdate = status === 'draft' || status === 'private_draft' || status === 'discussion';
-  const reviewerOptionsRecord: Record<string, ({group: 'role'} & ListSpaceRolesResponse) | ({group: 'user'} & Contributor)> = {};
   const isProposalAuthor = (user && proposal.authors.some(author => author.userId === user.id));
   const isProposalReviewer = (user && (proposal.reviewers.some(reviewer => {
     if (reviewer.userId) {
@@ -63,7 +61,11 @@ export default function ProposalProperties ({ page, proposalId, readOnly }: Prop
     return roleups.some(role => role.id === reviewer.roleId && role.users.some(_user => _user.id === user.id));
   })));
 
-  const currentUserGroups: ('author' | 'reviewer')[] = [];
+  const canUpdateAuthorsOrReviewers = (status === 'draft' || status === 'private_draft' || status === 'discussion') && isProposalAuthor;
+
+  const reviewerOptionsRecord: Record<string, ({group: 'role'} & ListSpaceRolesResponse) | ({group: 'user'} & Contributor)> = {};
+
+  const currentUserGroups: ProposalUserGroup[] = [];
   if (isProposalAuthor) {
     currentUserGroups.push('author');
   }
@@ -159,7 +161,7 @@ export default function ProposalProperties ({ page, proposalId, readOnly }: Prop
                   refreshProposal();
                 }
               }}
-              disabled={!user || readOnly || !canUpdate || !isProposalAuthor}
+              disabled={readOnly || !canUpdateAuthorsOrReviewers}
               readOnly={readOnly}
               options={contributors}
               sx={{
@@ -190,7 +192,7 @@ export default function ProposalProperties ({ page, proposalId, readOnly }: Prop
                 />
               ) : (
                 <InputSearchReviewers
-                  disabled={!user || readOnly || !canUpdate || (user && !proposal.authors.map(author => author.userId).includes(user.id))}
+                  disabled={readOnly || !canUpdateAuthorsOrReviewers}
                   readOnly={readOnly}
                   value={proposal.reviewers.map(reviewer => reviewerOptionsRecord[(reviewer.roleId ?? reviewer.userId) as string])}
                   disableCloseOnSelect={true}
@@ -243,10 +245,11 @@ export default function ProposalProperties ({ page, proposalId, readOnly }: Prop
               <MenuItem
                 key={newStatus}
                 disabled={(
+                  // A user can be both author and reviewer, so check if they are allowed to change the status either as reviewer or author
                   !currentUserGroups
                     .some(userGroup => proposalStatusTransitionPermission[proposal.status]?.[userGroup]?.includes(newStatus)))
                   // Before moving to review there should atleast be one reviewer
-                  || (proposal.status === 'discussion' && newStatus === 'review' && proposal.reviewers.length === 0)}
+                  || (newStatus === 'review' && proposal.reviewers.length === 0)}
                 onClick={() => updateProposalStatus(newStatus)}
               >
                 <Box display='flex' alignItems='center' gap={1}>
