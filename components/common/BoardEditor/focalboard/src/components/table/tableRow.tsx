@@ -49,9 +49,7 @@ function TableRow (props: Props) {
   const [title, setTitle] = useState('');
   const isManualSort = activeView.fields.sortOptions.length === 0;
   const isGrouped = Boolean(activeView.fields.groupById);
-  const [isDragging, isOver, cardRef] = useSortable('card', card, !props.readonly && (isManualSort || isGrouped), props.onDrop);
-
-  const disableDragging = isMobile() || props.readonly;
+  const [isDragging, isOver, cardRef] = useSortable('card', card, !isMobile() && !props.readonly && (isManualSort || isGrouped), props.onDrop);
 
   useEffect(() => {
     if (props.focusOnMount) {
@@ -83,7 +81,7 @@ function TableRow (props: Props) {
     <div
       className={className}
       onClick={e => props.onClick?.(e, card)}
-      ref={disableDragging ? () => null : cardRef}
+      ref={cardRef}
       style={{ opacity: isDragging ? 0.5 : 1 }}
     >
       {/* Name / title */}

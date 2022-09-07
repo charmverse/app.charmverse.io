@@ -12,6 +12,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { Board, IPropertyTemplate } from '../../blocks/board';
 import { Card } from '../../blocks/card';
 import { useSortable } from '../../hooks/sortable';
+import { isMobile } from 'lib/browser';
 import mutator from '../../mutator';
 import { getCardComments } from '../../store/comments';
 import { useAppSelector } from '../../store/hooks';
@@ -45,7 +46,7 @@ const GalleryCard = React.memo((props: Props) => {
   const { pages, getPagePermissions } = usePages();
   const [space] = useCurrentSpace();
   const intl = useIntl();
-  const [isDragging, isOver, cardRef] = useSortable('card', card, props.isManualSort && !props.readonly, props.onDrop);
+  const [isDragging, isOver, cardRef] = useSortable('card', card, props.isManualSort && !props.readonly && !isMobile(), props.onDrop);
   const comments = useAppSelector(getCardComments(card.id));
   const cardPage = pages[card.id];
 
