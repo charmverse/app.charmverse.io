@@ -17,6 +17,7 @@ import mutator, { BlockChange } from '../../mutator';
 import { Utils, IDType } from '../../utils';
 // import Button from '../../widgets/buttons/button'
 import { Constants } from '../../constants';
+import { isTouchScreen } from 'lib/browser';
 
 import { dragAndDropRearrange } from '../cardDetail/cardDetailContentsUtility';
 
@@ -223,8 +224,8 @@ function Kanban (props: Props) {
   };
 
   const ScrollingComponent = withScrolling('div');
-  const hStrength = createHorizontalStrength(Utils.isTouchScreen() ? 60 : 250);
-  const vStrength = createVerticalStrength(Utils.isTouchScreen() ? 60 : 250);
+  const hStrength = createHorizontalStrength(isTouchScreen() ? 60 : 250);
+  const vStrength = createVerticalStrength(isTouchScreen() ? 60 : 250);
 
   const menuTriggerProps = !props.readonly ? bindTrigger(popupState) : {};
   return (
