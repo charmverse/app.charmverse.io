@@ -25,6 +25,11 @@ export async function updateVote (id: string, userId: string, status: VoteStatus
     throw new UndesirableOperationError('Votes can only be cancelled.');
   }
 
+  // If vote has a Cancelled status, it can't be updated.
+  if (existingVote.context === 'proposal') {
+    throw new UndesirableOperationError("Proposal votes can't be cancelled");
+  }
+
   const userPermissions = await computeSpacePermissions({
     allowAdminBypass: true,
     resourceId: existingVote.spaceId,
