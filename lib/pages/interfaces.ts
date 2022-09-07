@@ -60,7 +60,8 @@ export interface PageTreeMappingInput<T extends PageNode> {
   rootPageIds?: string[],
   targetPageId?: string,
   includeCards?: boolean,
-  includeDeletedPages?: boolean
+  includeDeletedPages?: boolean,
+  includeProposals?: boolean
 }
 
 export interface PageTreeResolveInput {

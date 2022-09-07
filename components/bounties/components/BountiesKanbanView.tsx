@@ -1,10 +1,8 @@
 import { Box, Typography } from '@mui/material';
 import { BountyStatus, Page } from '@prisma/client';
-import charmClient from 'charmClient';
-import PageDialog from 'components/common/Page/PageDialog';
+import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { usePages } from 'hooks/usePages';
 import { silentlyUpdateURL } from 'lib/browser';
-import { IPageWithPermissions } from 'lib/pages';
 import { getUriWithParam } from 'lib/utilities/strings';
 import { BountyWithDetails } from 'models';
 import { useRouter } from 'next/router';
@@ -16,12 +14,12 @@ const bountyStatuses: BountyStatus[] = ['open', 'inProgress', 'complete', 'paid'
 
 interface Props {
   bounties: BountyWithDetails[];
-  refreshBounty?: (bountyId: string) => void
 }
 
-export default function BountiesKanbanView ({ bounties, refreshBounty }: Omit<Props, 'publicMode'>) {
-  const [activeBountyPage, setActiveBountyPage] = useState<{page: IPageWithPermissions, bounty: BountyWithDetails} | null>(null);
-  const { pages, deletePage } = usePages();
+export default function BountiesKanbanView ({ bounties }: Omit<Props, 'publicMode'>) {
+  const { pages } = usePages();
+  const { showPage } = usePageDialog();
+
   const router = useRouter();
   const [initialBountyId, setInitialBountyId] = useState(router.query.bountyId as string || '');
 
@@ -36,27 +34,18 @@ export default function BountiesKanbanView ({ bounties, refreshBounty }: Omit<Pr
     suggestion: []
   });
 
-  async function closeBounty (bountyId: string) {
-    await charmClient.bounties.closeBounty(bountyId);
-    if (refreshBounty) {
-      refreshBounty(bountyId);
-    }
-  }
-
   function closePopup () {
-    setActiveBountyPage(null);
     const newUrl = getUriWithParam(window.location.href, { bountyId: null });
     silentlyUpdateURL(newUrl);
   }
 
   function showBounty (bounty: BountyWithDetails) {
-    const page = (bounty?.page.id && pages[bounty.page.id]) || null;
     const newUrl = getUriWithParam(window.location.href, { bountyId: bounty.id });
     silentlyUpdateURL(newUrl);
-    if (page) {
-      setActiveBountyPage({
-        bounty,
-        page
+    if (bounty?.page.id) {
+      showPage({
+        pageId: bounty?.page.id,
+        onClose: closePopup
       });
     }
   }
@@ -101,23 +90,6 @@ export default function BountiesKanbanView ({ bounties, refreshBounty }: Omit<Pr
         ))}
       </div>
 
-      {activeBountyPage?.page && activeBountyPage?.bounty && (
-        <PageDialog
-          page={activeBountyPage.page}
-          onClickDelete={() => {
-            deletePage({
-              pageId: activeBountyPage.page.id
-            });
-          }}
-          onClose={() => {
-            closePopup();
-          }}
-          bounty={activeBountyPage?.bounty}
-          onMarkCompleted={() => {
-            closeBounty(activeBountyPage?.bounty.id);
-          }}
-        />
-      )}
     </div>
   );
 }

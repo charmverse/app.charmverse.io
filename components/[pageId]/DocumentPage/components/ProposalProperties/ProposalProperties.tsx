@@ -13,9 +13,11 @@ import useSWR from 'swr';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { proposalStatusTransitionRecord, PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
+import { proposalStatusTransitionRecord, proposalStatusTransitionPermission, PROPOSAL_STATUS_LABELS, ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';
 import { ProposalStatus } from '@prisma/client';
-import { ProposalStatusChip } from './ProposalStatusBadge';
+import UserDisplay from 'components/common/UserDisplay';
+import DoneIcon from '@mui/icons-material/Done';
+import { ProposalStatusChip } from '../../../../proposals/components/ProposalStatusBadge';
 
 interface ProposalPropertiesProps {
   proposalId: string,
@@ -28,9 +30,11 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
   const { data: proposal, mutate: refreshProposal } = useSWR(`proposal/${proposalId}`, () => charmClient.proposals.getProposal(proposalId));
 
   const [contributors] = useContributors();
-  const { roles = [] } = useRoles();
+  const { roles = [], roleups } = useRoles();
   const { user } = useUser();
   const proposalMenuState = usePopupState({ popupId: 'proposal-info', variant: 'popover' });
+
+  const proposalReviewer = contributors?.find(contributor => contributor.id === proposal?.reviewedBy);
 
   if (!proposal) {
     return null;
@@ -38,10 +42,26 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
 
   const { status } = proposal;
 
-  const canUpdateAuthors = status === 'draft' || status === 'private_draft' || status === 'discussion';
-  const canUpdateReviewers = status === 'draft' || status === 'private_draft';
-  const reviewerOptionsRecord: Record<string, ({group: 'role'} & ListSpaceRolesResponse) | ({group: 'user'} & Contributor)> = {};
   const isProposalAuthor = (user && proposal.authors.some(author => author.userId === user.id));
+  const isProposalReviewer = (user && (proposal.reviewers.some(reviewer => {
+    if (reviewer.userId) {
+      return reviewer.userId === user.id;
+    }
+    return roleups.some(role => role.id === reviewer.roleId && role.users.some(_user => _user.id === user.id));
+  })));
+
+  const canUpdateAuthorsOrReviewers = (status === 'draft' || status === 'private_draft' || status === 'discussion') && isProposalAuthor;
+
+  const reviewerOptionsRecord: Record<string, ({group: 'role'} & ListSpaceRolesResponse) | ({group: 'user'} & Contributor)> = {};
+
+  const currentUserGroups: ProposalUserGroup[] = [];
+  if (isProposalAuthor) {
+    currentUserGroups.push('author');
+  }
+
+  if (isProposalReviewer) {
+    currentUserGroups.push('reviewer');
+  }
 
   contributors.forEach(contributor => {
     reviewerOptionsRecord[contributor.id] = {
@@ -128,7 +148,7 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
                   refreshProposal();
                 }
               }}
-              disabled={!user || readOnly || !canUpdateAuthors || !isProposalAuthor}
+              disabled={readOnly || !canUpdateAuthorsOrReviewers}
               readOnly={readOnly}
               options={contributors}
               sx={{
@@ -151,23 +171,32 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
             <Button>Reviewer</Button>
           </div>
           <div style={{ width: '100%' }}>
-            <InputSearchReviewers
-              disabled={!user || readOnly || !canUpdateReviewers || (user && !proposal.authors.map(author => author.userId).includes(user.id))}
-              readOnly={readOnly}
-              value={proposal.reviewers.map(reviewer => reviewerOptionsRecord[(reviewer.roleId ?? reviewer.userId) as string])}
-              disableCloseOnSelect={true}
-              excludedIds={proposal.reviewers.map(reviewer => (reviewer.roleId ?? reviewer.userId) as string)}
-              onChange={async (e, options) => {
-                await charmClient.proposals.updateProposal(proposal.id, {
-                  authors: proposal.authors.map(author => author.userId),
-                  reviewers: options.map(option => ({ group: option.group, id: option.id }))
-                });
-                refreshProposal();
-              }}
-              sx={{
-                width: '100%'
-              }}
-            />
+            {
+              proposal.status === 'reviewed' && proposalReviewer ? (
+                <UserDisplay
+                  user={proposalReviewer}
+                  avatarSize='small'
+                />
+              ) : (
+                <InputSearchReviewers
+                  disabled={readOnly || !canUpdateAuthorsOrReviewers}
+                  readOnly={readOnly}
+                  value={proposal.reviewers.map(reviewer => reviewerOptionsRecord[(reviewer.roleId ?? reviewer.userId) as string])}
+                  disableCloseOnSelect={true}
+                  excludedIds={proposal.reviewers.map(reviewer => (reviewer.roleId ?? reviewer.userId) as string)}
+                  onChange={async (e, options) => {
+                    await charmClient.proposals.updateProposal(proposal.id, {
+                      authors: proposal.authors.map(author => author.userId),
+                      reviewers: options.map(option => ({ group: option.group, id: option.id }))
+                    });
+                    refreshProposal();
+                  }}
+                  sx={{
+                    width: '100%'
+                  }}
+                />
+              )
+            }
           </div>
         </div>
       </Box>
@@ -181,15 +210,32 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
             const currentStatusIndex = proposalStatuses.indexOf(proposal.status);
             const newStatusIndex = proposalStatuses.indexOf(newStatus);
 
+            let icon = null;
+            let label = null;
+
+            if (newStatus === 'reviewed' && proposal.status === 'review') {
+              icon = <DoneIcon fontSize='small' />;
+              label = <Typography>Approve</Typography>;
+            }
+            else {
+              icon = currentStatusIndex < newStatusIndex ? <ArrowForwardIcon fontSize='small' /> : <ArrowBackIcon fontSize='small' />;
+              label = <Typography>Move to {PROPOSAL_STATUS_LABELS[newStatus]}</Typography>;
+            }
+
             return (
               <MenuItem
                 key={newStatus}
-                disabled={!isProposalAuthor}
+                disabled={(
+                  // A user can be both author and reviewer, so check if they are allowed to change the status either as reviewer or author
+                  !currentUserGroups
+                    .some(userGroup => proposalStatusTransitionPermission[proposal.status]?.[userGroup]?.includes(newStatus)))
+                  // Before moving to review there should atleast be one reviewer
+                  || (newStatus === 'review' && proposal.reviewers.length === 0)}
                 onClick={() => updateProposalStatus(newStatus)}
               >
                 <Box display='flex' alignItems='center' gap={1}>
-                  {currentStatusIndex < newStatusIndex ? <ArrowForwardIcon fontSize='small' /> : <ArrowBackIcon fontSize='small' />}
-                  <Typography>Move to {PROPOSAL_STATUS_LABELS[newStatus]}</Typography>
+                  {icon}
+                  {label}
                 </Box>
               </MenuItem>
             );

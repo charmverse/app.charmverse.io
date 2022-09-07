@@ -5,6 +5,7 @@ import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import { getPagePath, IPageWithPermissions, PageWithProposal } from 'lib/pages';
 import { BountyPermissions } from 'lib/permissions/bounties';
 import { TargetPermissionGroup } from 'lib/permissions/interfaces';
+import { upsertPermission } from 'lib/permissions/pages';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { typedKeys } from 'lib/utilities/objects';
 import { BountyWithDetails, IDENTITY_TYPES, LoggedInUser } from 'models';
@@ -356,16 +357,16 @@ export async function createVote ({ userVotes = [], voteOptions = [], spaceId, c
   });
 }
 
-export async function createProposalWithUsers ({ proposalStatus = 'draft', authors, reviewers, userId, spaceId, ...pageCreateInput }: {
+export async function createProposalWithUsers ({ proposalStatus = 'private_draft', authors, reviewers, userId, spaceId, ...pageCreateInput }: {
   authors: string[],
-  reviewers: string[],
+  reviewers: (string | {type: 'role', roleId: string})[],
   spaceId: string,
   userId: string,
   proposalStatus?: ProposalStatus
 } & Partial<Prisma.PageCreateInput>): Promise<PageWithProposal> {
   const proposalId = v4();
 
-  return prisma.page.create({
+  const proposalPage = await prisma.page.create({
     data: {
       ...pageCreateInput,
       id: proposalId,
@@ -403,7 +404,7 @@ export async function createProposalWithUsers ({ proposalStatus = 'draft', autho
           },
           reviewers: {
             createMany: {
-              data: reviewers.map(reviewer => ({ userId: reviewer }))
+              data: reviewers.map(reviewer => typeof reviewer === 'string' ? ({ userId: reviewer }) : ({ roleId: reviewer.roleId }))
             }
           }
         }
@@ -418,6 +419,20 @@ export async function createProposalWithUsers ({ proposalStatus = 'draft', autho
       }
     }
   });
+
+  // proposal authors will have full_access to the page
+  await Promise.all(
+    [userId, ...authors].map(author => upsertPermission(
+      proposalPage.id,
+      {
+        permissionLevel: 'full_access',
+        pageId: proposalPage.id,
+        userId: author
+      }
+    ))
+  );
+
+  return proposalPage;
 }
 
 export async function generateCommentWithThreadAndPage ({ userId, spaceId, commentContent }: {
