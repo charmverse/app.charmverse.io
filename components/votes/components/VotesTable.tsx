@@ -34,7 +34,7 @@ export interface VoteRow {
 
 export default function VotesTable ({ votes, mutateVotes }: { votes?: (ExtendedVote | VoteRow)[], mutateVotes: () => void }) {
   const router = useRouter();
-  const { pages, setPages } = usePages();
+  const { pages } = usePages();
   const { mutate: mutateTasks } = useTasks();
   const { showPage } = usePageDialog();
   const [activeVote, setActiveVote] = useState<ExtendedVote | null>(null);
@@ -51,25 +51,6 @@ export default function VotesTable ({ votes, mutateVotes }: { votes?: (ExtendedV
       setActiveVote(votes.find(vote => vote.id === activeVote.id) as ExtendedVote);
     }
   }, [votes, activeVote]);
-
-  async function deleteProposal (voteId: string) {
-    // delete the related page instead of deleting the vote
-    const vote = votes?.find(v => v.id === voteId);
-    if (vote?.pageId) {
-      const page = pages[vote.pageId];
-      if (page) {
-        await charmClient.archivePage(page.id);
-        setPages((_pages) => {
-          _pages[page.id] = { ...page, deletedAt: new Date() };
-          return { ..._pages };
-        });
-      }
-    }
-    else {
-      await charmClient.deleteVote(voteId);
-    }
-    refreshVotesAndTasks();
-  }
 
   async function deleteVote (voteId: string) {
     await charmClient.deleteVote(voteId);
@@ -90,13 +71,6 @@ export default function VotesTable ({ votes, mutateVotes }: { votes?: (ExtendedV
     const userVote = await charmClient.castVote(voteId, choice);
     mutateVotes();
     return userVote;
-  }
-
-  function editProposal (voteId: string) {
-    const vote = votes?.find(v => v.id === voteId);
-    if (vote) {
-      openPage(vote.pageId);
-    }
   }
 
   return (
@@ -176,10 +150,8 @@ export default function VotesTable ({ votes, mutateVotes }: { votes?: (ExtendedV
           </Grid>
           <Grid item xs={1} display='flex' justifyContent='flex-end'>
             <VoteActionsMenu
-              deleteVote={vote.status === 'Draft' ? undefined : deleteVote}
+              deleteVote={deleteVote}
               cancelVote={cancelVote}
-              deleteProposal={pages[vote.pageId]?.type === 'proposal' ? deleteProposal : undefined}
-              editProposal={pages[vote.pageId]?.type === 'proposal' ? editProposal : undefined}
               vote={vote}
             />
           </Grid>
