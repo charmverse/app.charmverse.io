@@ -9,6 +9,7 @@ import CollectableRow, { Collectable } from './components/CollectibleRow';
 import CommunityRow, { CommunityDetails } from './components/CommunityRow';
 import UserDetails, { isPublicUser, UserDetailsProps } from './components/UserDetails';
 import { useCollablandCredentials } from './hooks/useCollablandCredentials';
+import CollablandCredentials from './components/CollablandCredentials';
 
 function transformPoap (poap: ExtendedPoap): Collectable {
   return {
@@ -40,7 +41,7 @@ export default function PublicProfile (props: UserDetailsProps) {
 
   const { aeToken, setAeToken } = useCollablandCredentials();
   const { data: credentials, error: collabError } = useSWRImmutable(
-    () => !!aeToken,
+    () => aeToken,
     () => charmClient.collabland.importCredentials(aeToken as string)
   );
 
@@ -224,7 +225,7 @@ export default function PublicProfile (props: UserDetailsProps) {
             </Stack>
           </>
         ) : null}
-        <CollablandCredentials error={collabError} />
+        <CollablandCredentials />
       </LoadingComponent>
     </Stack>
   );
