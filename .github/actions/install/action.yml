@@ -27,7 +27,7 @@ runs:
       uses: actions/cache@v2
       with:
         path: ./node_modules
-        key: node-modules-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch') }}
+        key: node-modules-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch') }}
 
     - name: Install npm dependencies
       shell: bash
