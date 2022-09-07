@@ -16,16 +16,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install dependencies and build app
-        uses: ./.github/actions/install
+      # - name: Install dependencies and build app
+      #   uses: ./.github/actions/install
 
       - name: Build app
         uses: ./.github/actions/build
 
-      - name: Remove dev dependencies
-        run: |
-          npm prune --production
-          rm -rf .next/cache
+      # - name: Remove dev dependencies
+      #   run: |
+      #     npm prune --production
+      #     rm -rf .next/cache
 
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
@@ -38,9 +38,9 @@ jobs:
         with:
           cmd: |
             yq -I 4 -i '
-              (with(.option_settings |
-                  ."aws:elasticbeanstalk:application:environment" |
-                  .COMPOSE_PROJECT_NAME; . = "pr${{ github.event.number }}" | . style="double"))
+              with(.option_settings."aws:elasticbeanstalk:application:environment";
+                    .COMPOSE_PROJECT_NAME = "pr${{ github.event.number }}" |
+                    .IMGTAG = "pr${{ github.event.number }}-${{ github.sha }}")
               ' .ebextensions/00_env_vars.config
 
       - name: Create a github deployment
@@ -62,7 +62,7 @@ jobs:
           aws-region: us-east-1
 
       - name: Package
-        run: cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
+        run: cat files_to_zip_compose_only.txt | zip --symlinks -r@ deploy.zip
 
       - name: Deploy to staging
         id: cdk_deploy
