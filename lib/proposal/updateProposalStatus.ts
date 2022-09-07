@@ -1,49 +1,91 @@
-import { Proposal, ProposalStatus } from '@prisma/client';
+import { ProposalStatus } from '@prisma/client';
 import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
 import { MissingDataError } from 'lib/utilities/errors';
+import { ProposalWithUsers } from './interface';
 import { proposalStatusTransitionRecord } from './proposalStatusTransition';
-import { syncProposalPermissions } from './syncProposalPermissions';
+import { generateSyncProposalPermissions } from './syncProposalPermissions';
 
 export async function updateProposalStatus ({
-  proposalId,
-  newStatus
+  proposal,
+  newStatus,
+  userId
 }: {
-  proposalId: string,
-  newStatus: ProposalStatus
-}): Promise<Proposal> {
+  userId: string
+  newStatus: ProposalStatus,
+  proposal: ProposalWithUsers | string
+}) {
 
-  const proposal = await prisma.proposal.findUnique({
-    where: {
-      id: proposalId
-    },
-    select: {
-      status: true
-    }
-  });
+  if (typeof proposal === 'string') {
+    proposal = await prisma.proposal.findUnique({
+      where: {
+        id: proposal
+      },
+      select: {
+        status: true
+      }
+    }) as ProposalWithUsers;
+  }
 
   if (!proposal) {
-    throw new MissingDataError(`Proposal with id ${proposalId} not found`);
+    throw new MissingDataError(`Proposal with id ${proposal} not found`);
+  }
+
+  const currentStatus = proposal.status;
+  const proposalId = proposal.id;
+
+  // Going from review to review, mark the reviewer in the proposal
+  if (currentStatus === 'review' && newStatus === 'reviewed') {
+    await prisma.proposal.update({
+      where: {
+        id: proposalId
+      },
+      data: {
+        reviewer: {
+          connect: {
+            id: userId
+          }
+        },
+        reviewedAt: new Date()
+      }
+    });
+  }
+  else if (currentStatus === 'reviewed' && newStatus === 'discussion') {
+    await prisma.proposal.update({
+      where: {
+        id: proposalId
+      },
+      data: {
+        reviewedBy: null,
+        reviewedAt: null
+      }
+    });
+  }
+
+  if (newStatus === 'review' && proposal.reviewers.length === 0) {
+    throw new InvalidStateError('Proposal must have atleast one reviewer');
+  }
+
+  if (!proposalStatusTransitionRecord[currentStatus].includes(newStatus)) {
+    throw new InvalidStateError();
   }
 
   if (!proposalStatusTransitionRecord[proposal.status].includes(newStatus)) {
     throw new InvalidStateError();
   }
 
-  return prisma.$transaction(async () => {
-    const updatedProposal = await prisma.proposal.update({
+  const [deleteArgs, createArgs] = await generateSyncProposalPermissions({ proposalId });
+
+  return prisma.$transaction([
+    prisma.proposal.update({
       where: {
         id: proposalId
       },
       data: {
         status: newStatus
       }
-    });
-
-    await syncProposalPermissions({
-      proposalId: updatedProposal.id
-    });
-
-    return updatedProposal;
-  });
+    }),
+    prisma.pagePermission.deleteMany(deleteArgs),
+    ...createArgs.map(arg => prisma.pagePermission.create(arg))
+  ]).then(tx => tx[0]);
 }

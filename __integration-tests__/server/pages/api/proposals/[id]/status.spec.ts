@@ -99,7 +99,7 @@ describe('PUT /api/proposals/[id]/status - Update proposal status', () => {
       .put(`/api/proposals/${proposalPage.proposalId}/status`)
       .set('Cookie', authorCookie)
       .send({
-        newStatus: 'private_draft'
+        newStatus: 'draft'
       })
       .expect(200));
   });

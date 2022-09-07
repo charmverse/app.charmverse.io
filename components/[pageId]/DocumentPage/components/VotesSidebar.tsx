@@ -1,18 +1,17 @@
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import { Box, InputLabel, List, MenuItem, Select, Typography } from '@mui/material';
-import { uniq } from 'lodash';
+import { Box, InputLabel, MenuItem, Select, Typography } from '@mui/material';
 import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
-import { useVotes } from 'hooks/useVotes';
+import NoVotesMessage from 'components/votes/components/NoVotesMessage';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
+import { useVotes } from 'hooks/useVotes';
 import { highlightDomElement, silentlyUpdateURL } from 'lib/browser';
 import { findTotalInlineVotes } from 'lib/inline-votes/findTotalInlineVotes';
 import { isTruthy } from 'lib/utilities/types';
 import { ExtendedVote } from 'lib/votes/interfaces';
 import { useEffect, useState } from 'react';
-import NoVotesMessage from 'components/votes/components/NoVotesMessage';
-import PageActionToggle from './PageActionToggle';
 import { StyledSidebar as CommentsSidebar } from './CommentsSidebar';
+import PageActionToggle from './PageActionToggle';
 
 const StyledSidebar = styled(CommentsSidebar)`
   height: calc(100%);

@@ -9,6 +9,7 @@ import { objectUid } from '@bangle.dev/utils';
 import React, { ReactNode, RefObject, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import reactDOM from 'react-dom';
 import { NodeViewWrapper, RenderNodeViewsFunction } from './NodeViewWrapper';
+import { isTouchScreen } from 'lib/browser';
 
 interface BangleEditorProps<PluginMetadata = any>
   extends CoreBangleEditorProps<PluginMetadata> {
@@ -33,7 +34,7 @@ export const BangleEditor = React.forwardRef<
       id,
       state,
       children,
-      focusOnInit = true,
+      focusOnInit = !isTouchScreen(),
       pmViewOpts,
       renderNodeViews,
       className,

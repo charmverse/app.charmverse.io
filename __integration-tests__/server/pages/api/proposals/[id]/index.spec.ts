@@ -11,6 +11,7 @@ let author: User;
 let reviewer: User;
 let space: Space;
 let authorCookie: string;
+let reviewerCookie: string;
 
 beforeAll(async () => {
   const generated1 = await generateUserAndSpaceWithApiToken(undefined, false);
@@ -23,6 +24,12 @@ beforeAll(async () => {
     .post('/api/session/login')
     .send({
       address: author.addresses[0]
+    })).headers['set-cookie'][0];
+
+  reviewerCookie = (await request(baseUrl)
+    .post('/api/session/login')
+    .send({
+      address: reviewer.addresses[0]
     })).headers['set-cookie'][0];
 
   await prisma.spaceRole.create({
@@ -57,7 +64,7 @@ describe('GET /api/proposals/[id] - Get proposal', () => {
       id: expect.any(String),
       spaceId: space.id,
       createdBy: author.id,
-      status: 'draft',
+      status: 'private_draft',
       authors: expect.arrayContaining([
         expect.objectContaining({
           proposalId: pageWithProposal.proposalId,
@@ -99,7 +106,7 @@ describe('GET /api/proposals/[id] - Get proposal', () => {
 
     (await request(baseUrl)
       .get(`/api/proposals/${pageWithProposal.proposalId}`)
-      .set('Cookie', authorCookie)
+      .set('Cookie', reviewerCookie)
       .expect(404));
   });
 });

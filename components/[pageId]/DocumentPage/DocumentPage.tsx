@@ -137,8 +137,9 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
     >
       <Box
         sx={{
+          transition: 'width ease-in 0.25s',
           width: {
-            md: showPageActionSidebar ? 'calc(100% - 425px)' : '100%'
+            md: showPageActionSidebar ? 'calc(100% - 416px)' : '100%'
           },
           height: {
             md: showPageActionSidebar ? 'calc(100vh - 65px)' : '100%'

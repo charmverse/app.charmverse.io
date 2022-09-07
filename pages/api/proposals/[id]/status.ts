@@ -3,6 +3,7 @@ import { ProposalStatus } from '@prisma/client';
 import { prisma } from 'db';
 import { NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { updateProposalStatus } from 'lib/proposal/updateProposalStatus';
+import { validateProposalStatusTransition } from 'lib/proposal/validateProposalStatusTransition';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { NextApiRequest, NextApiResponse } from 'next';
@@ -17,6 +18,7 @@ handler.use(requireUser)
 async function updateProposalStatusController (req: NextApiRequest, res: NextApiResponse<{newStatus: ProposalStatus}>) {
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
+  const newStatus = req.body.newStatus as ProposalStatus;
 
   const proposal = await prisma.proposal.findUnique({
     where: {
@@ -32,15 +34,20 @@ async function updateProposalStatusController (req: NextApiRequest, res: NextApi
     throw new NotFoundError();
   }
 
-  const isCurrentUserProposalAuthor = proposal.authors.some(author => author.userId === userId);
+  const isUserAuthorizedToUpdateProposalStatus = await validateProposalStatusTransition({
+    proposal,
+    newStatus,
+    userId
+  });
 
-  if (!isCurrentUserProposalAuthor) {
+  if (!isUserAuthorizedToUpdateProposalStatus) {
     throw new UnauthorisedActionError();
   }
 
   await updateProposalStatus({
-    newStatus: req.body.newStatus,
-    proposalId
+    proposal,
+    newStatus,
+    userId
   });
 
   return res.status(200).end();
