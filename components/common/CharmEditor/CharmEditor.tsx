@@ -280,6 +280,7 @@ const PageActionListBox = styled.div`
   position: fixed;
   right: 0px;
   width: 416px;
+  max-width: 100%;
   top: 56px; // height of MUI Toolbar
   z-index: var(--z-index-drawer);
   height: calc(100% - 80px);
