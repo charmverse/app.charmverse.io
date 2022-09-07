@@ -11,6 +11,7 @@ import { Constants } from '../../constants';
 import Button from '../../widgets/buttons/button';
 import Editable from '../../widgets/editable';
 import { useSortable } from '../../hooks/sortable';
+import { isMobile } from 'lib/browser';
 
 import PropertyValueElement from '../propertyValueElement';
 
@@ -49,6 +50,9 @@ function TableRow (props: Props) {
   const isManualSort = activeView.fields.sortOptions.length === 0;
   const isGrouped = Boolean(activeView.fields.groupById);
   const [isDragging, isOver, cardRef] = useSortable('card', card, !props.readonly && (isManualSort || isGrouped), props.onDrop);
+
+  const disableDragging = isMobile() || props.readonly;
+
   useEffect(() => {
     if (props.focusOnMount) {
       setTimeout(() => titleRef.current?.focus(), 10);
@@ -79,7 +83,7 @@ function TableRow (props: Props) {
     <div
       className={className}
       onClick={e => props.onClick?.(e, card)}
-      ref={cardRef}
+      ref={disableDragging ? () => null : cardRef}
       style={{ opacity: isDragging ? 0.5 : 1 }}
     >
       {/* Name / title */}

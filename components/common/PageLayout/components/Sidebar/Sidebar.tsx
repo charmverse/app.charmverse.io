@@ -52,7 +52,7 @@ const SidebarContainer = styled.div`
     transition: opacity 0.2s ease-in-out;
   }
 
-  ${({ theme }) => theme.breakpoints.up('sm')} {
+  ${({ theme }) => theme.breakpoints.up('md')} {
     .sidebar-header .MuiIconButton-root {
       opacity: 0;
     }
