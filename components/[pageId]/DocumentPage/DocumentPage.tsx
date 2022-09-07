@@ -217,10 +217,6 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
                 </div>
               </div>
             </CharmEditor>
-
-            {page.type === 'proposal' && !isLoading && !pageVote && (
-              <CreateVoteBox />
-            )}
           </Container>
         </div>
       </Box>
