@@ -11,6 +11,7 @@ import { createUserFromWallet } from 'lib/users/createUser';
 import { typedKeys } from 'lib/utilities/objects';
 import { BountyWithDetails, IDENTITY_TYPES, LoggedInUser } from 'models';
 import { v4 } from 'uuid';
+import { syncProposalPermissions } from 'lib/proposal/syncProposalPermissions';
 
 export async function generateSpaceUser ({ spaceId, isAdmin }: { spaceId: string, isAdmin: boolean }): Promise<LoggedInUser> {
   return prisma.user.create({
@@ -422,16 +423,7 @@ export async function createProposalWithUsers ({ proposalStatus = 'private_draft
   });
 
   // proposal authors will have full_access to the page
-  await Promise.all(
-    [userId, ...authors].map(author => upsertPermission(
-      proposalPage.id,
-      {
-        permissionLevel: 'full_access',
-        pageId: proposalPage.id,
-        userId: author
-      }
-    ))
-  );
+  await syncProposalPermissions({ proposalId });
 
   return proposalPage;
 }
