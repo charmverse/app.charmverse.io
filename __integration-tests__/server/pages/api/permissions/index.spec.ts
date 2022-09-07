@@ -152,9 +152,120 @@ describe('POST /api/permissions - Add page permissions', () => {
       .expect(401);
   });
 
+  it('should allow a proposal editor to make a proposal page public and respond 201', async () => {
+
+    const page = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      type: 'proposal'
+    });
+
+    await upsertPermission(page.id, {
+      permissionLevel: 'proposal_editor',
+      userId: user.id
+    });
+
+    const permission: IPagePermissionToCreate = {
+      permissionLevel: 'view',
+      pageId: page.id,
+      public: true
+    };
+
+    await request(baseUrl)
+      .post('/api/permissions')
+      .set('Cookie', userCookie)
+      .send(permission)
+      .expect(201);
+  });
+
+  it('should fail if trying to provide permissions other than "view" to the public and respond 401', async () => {
+
+    const page = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      type: 'page'
+    });
+
+    await upsertPermission(page.id, {
+      permissionLevel: 'full_access',
+      userId: user.id
+    });
+
+    const permission: IPagePermissionToCreate = {
+      permissionLevel: 'full_access',
+      pageId: page.id,
+      public: true
+    };
+
+    await request(baseUrl)
+      .post('/api/permissions')
+      .set('Cookie', userCookie)
+      .send(permission)
+      .expect(401);
+  });
+
+  it('should fail if trying to assign permissions other than public to a proposal page and respond 401', async () => {
+
+    const page = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      type: 'proposal'
+    });
+
+    await upsertPermission(page.id, {
+      permissionLevel: 'full_access',
+      userId: user.id
+    });
+
+    const permission: IPagePermissionToCreate = {
+      permissionLevel: 'view_comment',
+      pageId: page.id,
+      roleId: role.id
+    };
+
+    await request(baseUrl)
+      .post('/api/permissions')
+      .set('Cookie', userCookie)
+      .send(permission)
+      .expect(401);
+  });
+
+  it('should fail if trying to manually assign permissions to children of a proposal page and respond 401', async () => {
+
+    const page = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      type: 'proposal'
+    });
+
+    const childPage = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      type: 'page',
+      parentId: page.id
+    });
+
+    await upsertPermission(page.id, {
+      permissionLevel: 'full_access',
+      userId: user.id
+    });
+
+    const permission: IPagePermissionToCreate = {
+      permissionLevel: 'view_comment',
+      pageId: childPage.id,
+      roleId: role.id
+    };
+
+    await request(baseUrl)
+      .post('/api/permissions')
+      .set('Cookie', userCookie)
+      .send(permission)
+      .expect(401);
+  });
+
 });
 
-describe('POST /api/permissions - Add page permissions', () => {
+describe('DELETE /api/permissions - Delete page permissions', () => {
 
   it('should delete a permission if the user has the grant_permissions operation and respond 200', async () => {
 
@@ -224,7 +335,7 @@ describe('POST /api/permissions - Add page permissions', () => {
       .expect(200);
   });
 
-  it('should fail to delete a permission if the user does not have the grant_permissions operation and respond 200', async () => {
+  it('should fail to delete a permission if the user does not have the grant_permissions operation and respond 401', async () => {
 
     const page = await createPage({
       createdBy: user.id,
@@ -250,6 +361,41 @@ describe('POST /api/permissions - Add page permissions', () => {
     });
 
     const permissionToDelete = await upsertPermission(page.id, {
+      // Can only toggle public
+      permissionLevel: 'view',
+      roleId: role.id
+    });
+
+    await request(baseUrl)
+      .delete('/api/permissions')
+      .set('Cookie', userCookie)
+      .send({
+        permissionId: permissionToDelete.id
+      })
+      .expect(401);
+  });
+
+  it('should fail to delete a permission on child pages of a proposal and respond 401', async () => {
+
+    const page = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      type: 'proposal'
+    });
+
+    const childPage = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      type: 'page',
+      parentId: page.id
+    });
+
+    await upsertPermission(childPage.id, {
+      permissionLevel: 'full_access',
+      userId: user.id
+    });
+
+    const permissionToDelete = await upsertPermission(childPage.id, {
       // Can only toggle public
       permissionLevel: 'view',
       roleId: role.id
