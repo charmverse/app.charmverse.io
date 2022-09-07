@@ -39,8 +39,24 @@ function ModifiedBackend (...args: any) {
 }
 
 export default function ReactDndProvider ({ children }: { children: ReactNode }) {
+  if (isMobile()) {
+    return (
+      <DndProvider
+        backend={TouchBackend}
+        options={{
+          // enable vertical scrolling. see example at https://react-dnd.github.io/react-dnd/docs/backends/touch
+          scrollAngleRanges: [
+            { start: 30, end: 150 },
+            { start: 210, end: 330 }
+          ]
+        }}
+      >
+        {children}
+      </DndProvider>
+    );
+  }
   return (
-    <DndProvider backend={isMobile() ? TouchBackend : ModifiedBackend}>
+    <DndProvider backend={ModifiedBackend}>
       {children}
     </DndProvider>
   );
