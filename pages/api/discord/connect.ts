@@ -70,7 +70,7 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
     });
   }
   catch (error) {
-    log.warn('Error while connecting to Discord', error);
+    log.warn('Error while creating Discord record', error);
     // If the discord user is already connected to a charmverse account this code will be run
     res.status(400).json({
       error: 'Connection to Discord failed. Another CharmVerse account is already associated with this Discord account.'
