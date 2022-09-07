@@ -1,11 +1,11 @@
 import { Page, PageType } from '@prisma/client';
-import { TargetPageTree, PagesMap } from './interfaces';
+import { TargetPageTree, PagesMap, IPageWithPermissions, PageNode } from './interfaces';
 
-export interface findParentOfTypeOptions {
+export interface FindParentOfTypeOptions<P extends PageNode> {
   pageType: PageType;
   pageId?: string;
-  pageMap?: PagesMap;
-  targetPageTree?: TargetPageTree;
+  pageMap?: PagesMap<P>;
+  targetPageTree?: TargetPageTree<P>;
 }
 
 /**
@@ -13,9 +13,12 @@ export interface findParentOfTypeOptions {
  * Traverses parents until a matching item is found
  * @returns
  */
-export function findParentOfType ({ pageType, targetPageTree }: Required<Pick<findParentOfTypeOptions, 'pageType' | 'targetPageTree'>>): string | null
-export function findParentOfType({ pageType, pageId, pageMap }: Required<Pick<findParentOfTypeOptions, 'pageType' | 'pageId' | 'pageMap'>>): string | null
-export function findParentOfType ({ pageType, pageId, pageMap, targetPageTree }: findParentOfTypeOptions): string | null {
+export function findParentOfType<P extends PageNode = PageNode>({ pageType, targetPageTree }:
+  Required<Pick<FindParentOfTypeOptions<P>, 'targetPageTree' | 'pageType'>>): string | null
+export function findParentOfType<P extends PageNode = PageNode>({ pageType, pageId, pageMap }:
+  Required<Pick<FindParentOfTypeOptions<P>, 'pageType' | 'pageId' | 'pageMap'>>): string | null
+export function findParentOfType<P extends PageNode = PageNode> ({ pageType, pageId, pageMap, targetPageTree }:
+  FindParentOfTypeOptions<P>):string | null {
 
   if (pageMap) {
     let currentNode = pageMap[pageId as string];
@@ -40,7 +43,7 @@ export function findParentOfType ({ pageType, pageId, pageMap, targetPageTree }:
 
     const length = targetPageTree.parents.length;
 
-    for (let i = length - 1; i >= 0; i--) {
+    for (let i = 0; i < length; i++) {
       const parent = targetPageTree.parents[i];
 
       if (parent?.type === pageType) {
