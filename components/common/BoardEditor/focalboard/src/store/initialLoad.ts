@@ -4,7 +4,7 @@ import charmClient from 'charmClient';
 
 import { Subscription } from '../wsclient';
 
-import { RootState } from './index';
+import type { RootState } from './index';
 
 export const initialLoad = createAsyncThunk(
   'initialLoad',
