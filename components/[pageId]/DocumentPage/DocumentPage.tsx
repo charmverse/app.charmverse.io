@@ -20,7 +20,6 @@ import { useRouter } from 'next/router';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 import BountyProperties from './components/BountyProperties';
-import CreateVoteBox from './components/CreateVoteBox';
 import PageBanner from './components/PageBanner';
 import { PageTemplateBanner } from './components/PageTemplateBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';

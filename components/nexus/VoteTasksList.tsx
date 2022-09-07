@@ -40,7 +40,6 @@ export function VoteTasksListRow (
 
   const voteLink = `/${spaceDomain}/${pagePath}?voteId=${id}`;
   const voteLocation = `${pageTitle || 'Untitled'} in ${spaceName}`;
-  const voteTitleToUse = voteTask.context === 'proposal' ? 'Proposal' : voteTitle;
 
   function removeVoteFromTask (voteId: string) {
     mutateTasks((tasks) => {
@@ -60,6 +59,7 @@ export function VoteTasksListRow (
   };
 
   const deleteVote: VoteDetailProps['deleteVote'] = async (voteId) => {
+    // This is guaranteed to be inline votes so no need to add guard against proposal type votes
     await charmClient.votes.deleteVote(voteId);
     removeVoteFromTask(voteId);
   };
@@ -90,7 +90,7 @@ export function VoteTasksListRow (
             fontSize={{ sm: 16, xs: 18 }}
           >
             <VoteIcon {...voteTask} />
-            {voteTitleToUse}
+            {voteTitle}
           </Grid>
           <Grid
             item

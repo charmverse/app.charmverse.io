@@ -98,24 +98,30 @@ export function VotesProvider ({ children }: { children: ReactNode }) {
   }
 
   async function deleteVote (voteId: string) {
-    await charmClient.votes.deleteVote(voteId);
-    if (currentPageId) {
-      delete votes[voteId];
-      setVotes({ ...votes });
+    const vote = votes[voteId];
+    if (vote.context === 'inline') {
+      await charmClient.votes.deleteVote(voteId);
+      if (currentPageId) {
+        delete votes[voteId];
+        setVotes({ ...votes });
+      }
+      removeVoteFromTask(voteId);
     }
-    removeVoteFromTask(voteId);
   }
 
   async function cancelVote (voteId: string) {
-    await charmClient.votes.cancelVote(voteId);
-    if (currentPageId) {
-      votes[voteId] = {
-        ...votes[voteId],
-        status: 'Cancelled'
-      };
-      setVotes({ ...votes });
+    const vote = votes[voteId];
+    if (vote.context === 'inline') {
+      await charmClient.votes.cancelVote(voteId);
+      if (currentPageId) {
+        votes[voteId] = {
+          ...votes[voteId],
+          status: 'Cancelled'
+        };
+        setVotes({ ...votes });
+      }
+      removeVoteFromTask(voteId);
     }
-    removeVoteFromTask(voteId);
   }
 
   useEffect(() => {
