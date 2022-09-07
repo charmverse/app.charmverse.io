@@ -226,10 +226,11 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
               <MenuItem
                 key={newStatus}
                 disabled={(
+                  // A user can be both author and reviewer, so check if they are allowed to change the status either as reviewer or author
                   !currentUserGroups
                     .some(userGroup => proposalStatusTransitionPermission[proposal.status]?.[userGroup]?.includes(newStatus)))
                   // Before moving to review there should atleast be one reviewer
-                  || (proposal.status === 'discussion' && newStatus === 'review' && proposal.reviewers.length === 0)}
+                  || (newStatus === 'review' && proposal.reviewers.length === 0)}
                 onClick={() => updateProposalStatus(newStatus)}
               >
                 <Box display='flex' alignItems='center' gap={1}>

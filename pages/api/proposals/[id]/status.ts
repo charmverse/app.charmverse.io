@@ -45,9 +45,8 @@ async function updateProposalStatusController (req: NextApiRequest, res: NextApi
   }
 
   await updateProposalStatus({
-    currentStatus: proposal.status,
+    proposal,
     newStatus,
-    proposalId,
     userId
   });
 
