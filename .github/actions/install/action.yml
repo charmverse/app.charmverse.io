@@ -34,3 +34,4 @@ runs:
       if: steps.cache_node_modules.outputs.cache-hit != 'true'
       run: |
         npm ci --no-audit --no-fund
+        npx playwright install --with-deps
