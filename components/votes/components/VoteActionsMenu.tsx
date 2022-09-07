@@ -2,7 +2,6 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';
 import { IconButton, ListItemText, Menu, MenuItem } from '@mui/material';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import EditIcon from '@mui/icons-material/Edit';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import { useUser } from 'hooks/useUser';

@@ -35,7 +35,7 @@ export function VotesProvider ({ children }: { children: ReactNode }) {
 
   const cardId = typeof window !== 'undefined' ? (new URLSearchParams(window.location.href)).get('cardId') : null;
 
-  const { data, isValidating } = useSWR(() => currentPageId && !cardId ? `pages/${currentPageId}/votes` : null, async () => charmClient.getVotesByPage(currentPageId), {
+  const { data, isValidating } = useSWR(() => currentPageId && !cardId ? `pages/${currentPageId}/votes` : null, async () => charmClient.votes.getVotesByPage(currentPageId), {
     revalidateOnFocus: false
   });
 
@@ -54,7 +54,7 @@ export function VotesProvider ({ children }: { children: ReactNode }) {
   }
 
   async function castVote (voteId: string, choice: string) {
-    const userVote = await charmClient.castVote(voteId, choice);
+    const userVote = await charmClient.votes.castVote(voteId, choice);
     if (currentPageId) {
       setVotes((_votes) => {
         const vote = _votes[voteId];
@@ -84,7 +84,7 @@ export function VotesProvider ({ children }: { children: ReactNode }) {
       throw new Error('Missing user or space');
     }
 
-    const extendedVote = await charmClient.createVote({
+    const extendedVote = await charmClient.votes.createVote({
       ...votePayload,
       createdBy: user.id,
       spaceId: currentSpace.id
@@ -98,7 +98,7 @@ export function VotesProvider ({ children }: { children: ReactNode }) {
   }
 
   async function deleteVote (voteId: string) {
-    await charmClient.deleteVote(voteId);
+    await charmClient.votes.deleteVote(voteId);
     if (currentPageId) {
       delete votes[voteId];
       setVotes({ ...votes });
@@ -107,7 +107,7 @@ export function VotesProvider ({ children }: { children: ReactNode }) {
   }
 
   async function cancelVote (voteId: string) {
-    await charmClient.cancelVote(voteId);
+    await charmClient.votes.cancelVote(voteId);
     if (currentPageId) {
       votes[voteId] = {
         ...votes[voteId],

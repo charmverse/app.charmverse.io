@@ -53,12 +53,12 @@ export default function VotesTable ({ votes, mutateVotes }: { votes?: (ExtendedV
   }, [votes, activeVote]);
 
   async function deleteVote (voteId: string) {
-    await charmClient.deleteVote(voteId);
+    await charmClient.votes.deleteVote(voteId);
     refreshVotesAndTasks();
   }
 
   async function cancelVote (voteId: string) {
-    await charmClient.cancelVote(voteId);
+    await charmClient.votes.cancelVote(voteId);
     refreshVotesAndTasks();
   }
 
@@ -68,7 +68,7 @@ export default function VotesTable ({ votes, mutateVotes }: { votes?: (ExtendedV
   }
 
   async function castVote (voteId: string, choice: string) {
-    const userVote = await charmClient.castVote(voteId, choice);
+    const userVote = await charmClient.votes.castVote(voteId, choice);
     mutateVotes();
     return userVote;
   }
