@@ -67,25 +67,14 @@ async function updateProposalController (req: NextApiRequest, res: NextApiRespon
     throw new NotFoundError();
   }
 
-  const computed = await computeUserPagePermissions({
-    // Proposal id is the same as page
-    pageId: proposal?.id,
-    userId
-  });
-
-  // TODO: Needs to be updated
-  if (computed.read !== true) {
-    throw new NotFoundError();
-  }
-
   const isCurrentUserProposalAuthor = proposal.authors.some(author => author.userId === userId);
 
-  // TODO: Is this condition needed as the permissions can be obtained from above
+  // A proposal can only be updated when its in private_draft, draft or discussion status and only the proposal author can update it
   if (!isCurrentUserProposalAuthor || (proposal.status !== 'discussion' && proposal.status !== 'private_draft' && proposal.status !== 'draft')) {
     throw new UnauthorisedActionError();
   }
 
-  await updateProposal({ proposal, authors, reviewers });
+  await updateProposal({ proposalId: proposal.id, authors, reviewers });
 
   return res.status(200).end();
 }

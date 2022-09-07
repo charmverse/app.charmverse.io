@@ -357,9 +357,9 @@ export async function createVote ({ userVotes = [], voteOptions = [], spaceId, c
   });
 }
 
-export async function createProposalWithUsers ({ proposalStatus = 'draft', authors, reviewers, userId, spaceId, ...pageCreateInput }: {
+export async function createProposalWithUsers ({ proposalStatus = 'private_draft', authors, reviewers, userId, spaceId, ...pageCreateInput }: {
   authors: string[],
-  reviewers: string[],
+  reviewers: (string | {type: 'role', roleId: string})[],
   spaceId: string,
   userId: string,
   proposalStatus?: ProposalStatus
@@ -404,7 +404,7 @@ export async function createProposalWithUsers ({ proposalStatus = 'draft', autho
           },
           reviewers: {
             createMany: {
-              data: reviewers.map(reviewer => ({ userId: reviewer }))
+              data: reviewers.map(reviewer => typeof reviewer === 'string' ? ({ userId: reviewer }) : ({ roleId: reviewer.roleId }))
             }
           }
         }
