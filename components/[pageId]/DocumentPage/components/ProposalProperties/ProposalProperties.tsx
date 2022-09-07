@@ -108,9 +108,11 @@ export default function ProposalProperties ({ page, proposalId, readOnly }: Prop
         <Grid item xs={8}>
           <Box display='flex' gap={1} alignItems='center'>
             <Typography fontWeight='bold'>Proposal information</Typography>
-            <IconButton size='small' {...bindTrigger(proposalMenuState)}>
-              <MoreHorizIcon fontSize='small' />
-            </IconButton>
+            {!proposal.status.match('vote') && (
+              <IconButton size='small' {...bindTrigger(proposalMenuState)}>
+                <MoreHorizIcon fontSize='small' />
+              </IconButton>
+            )}
           </Box>
         </Grid>
         <Grid item xs={4}>
