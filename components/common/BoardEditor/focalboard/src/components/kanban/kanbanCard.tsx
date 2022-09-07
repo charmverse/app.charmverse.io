@@ -9,6 +9,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { PageContent } from 'models';
+import { isMobile } from 'lib/browser';
 import React, { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { mutate } from 'swr';
@@ -73,6 +74,9 @@ const KanbanCard = React.memo((props: Props) => {
   const { bounties } = useBounties();
   const linkedBounty = bounties.find(bounty => bounty.page?.id === card.id);
 
+  // disable dragging on mobile for now because it prevents scrolling
+  const disableDragging = isMobile() || props.readonly;
+
   const { pages, getPagePermissions } = usePages();
   const cardPage = pages[card.id];
 
@@ -113,9 +117,9 @@ const KanbanCard = React.memo((props: Props) => {
   return (
     <>
       <div
-        ref={props.readonly ? () => null : cardRef}
+        ref={disableDragging ? () => null : cardRef}
         className={className}
-        draggable={!props.readonly}
+        draggable={!disableDragging}
         style={{ opacity: isDragging ? 0.5 : 1 }}
         onClick={props.onClick}
         data-test='kanban-card'
