@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import MoonIcon from '@mui/icons-material/DarkMode';
 import SunIcon from '@mui/icons-material/WbSunny';
 import { Box, IconButton, Tooltip } from '@mui/material';
+import { Space } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
 import charmClient from 'charmClient';
 import { updateBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
@@ -28,6 +29,7 @@ import { useUser } from 'hooks/useUser';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import { validate } from 'uuid';
 import PublicBountiesPage from './PublicBountiesPage';
 
 const LayoutContainer = styled.div`
@@ -47,7 +49,7 @@ export default function PublicPage () {
   const dispatch = useAppDispatch();
   const { pages, setCurrentPageId } = usePages();
   const [loadingSpace, setLoadingSpace] = useState(true);
-  const [currentSpace] = useCurrentSpace();
+  const [currentSpace, setCurrentSpace] = useCurrentSpace();
   const [, setSpaces] = useSpaces();
   const [, setTitleState] = usePageTitle();
   // keep track of the pageId by path since currentPageId may change when a page is viewed inside a modal
@@ -57,20 +59,27 @@ export default function PublicPage () {
 
   async function onLoad () {
 
-    if (isBountiesPage) {
-      // The other part of this logic for setting current space is in hooks/useCurrentSpace
-      const spaceDomain = (router.query.pageId as string[])[0];
-      try {
-        const space = await charmClient.getPublicSpaceInfo(spaceDomain);
-        setSpaces([space]);
-      }
-      catch (err) {
-        setPageNotFound(true);
-      }
+    const spaceDomain = (router.query.pageId as string[])[0];
+
+    let foundSpace: Space;
+
+    try {
+      foundSpace = await charmClient.getPublicSpaceInfo(spaceDomain);
+      setCurrentSpace(foundSpace);
     }
-    else {
+    catch (err) {
+      setPageNotFound(true);
+      return;
+    }
+
+    if (!isBountiesPage) {
       try {
+
         const { page: rootPage, cards, boards, space, views } = await charmClient.getPublicPage(pageIdOrPath);
+
+        if (validate(router.query.pageId?.[0] || '')) {
+          router.replace(`/share/${foundSpace.domain}/${rootPage.path}`);
+        }
 
         setTitleState(rootPage.title);
         setCurrentPageId(rootPage.id);
@@ -156,7 +165,11 @@ export default function PublicPage () {
               width: '100%'
             }}
             >
-              <PageTitleWithBreadcrumbs />
+              {
+                basePageId && (
+                  <PageTitleWithBreadcrumbs pageId={basePageId} spaceDomain={currentSpace?.domain} />
+                )
+              }
               <Box display='flex' alignItems='center'>
                 {/** dark mode toggle */}
                 <Tooltip title={theme.palette.mode === 'dark' ? 'Light mode' : 'Dark mode'} arrow placement='top'>

@@ -183,7 +183,7 @@ function EmptyPageTitle () {
   return <div></div>;
 }
 
-export default function PageTitleWithBreadcrumbs ({ pageId }: { pageId?: string }) {
+export default function PageTitleWithBreadcrumbs ({ pageId, spaceDomain }: { pageId?: string, spaceDomain?: string }) {
   const router = useRouter();
 
   if (router.route === '/share/[...pageId]' && router.query?.pageId?.[1] === 'bounties') {
@@ -193,10 +193,10 @@ export default function PageTitleWithBreadcrumbs ({ pageId }: { pageId?: string 
     return <BountyPageTitle basePath={`/${router.query.domain}`} />;
   }
   else if (router.route === '/[domain]/[pageId]') {
-    return <DocumentPageTitle basePath={`/${router.query.domain}`} pageId={pageId} />;
+    return <DocumentPageTitle basePath={`/${spaceDomain}`} pageId={pageId} />;
   }
   else if (router.route === '/share/[...pageId]') {
-    return <DocumentPageTitle basePath={`/share/${(router.query.pageId as string[])[0]}`} pageId={pageId} />;
+    return <DocumentPageTitle basePath={`/share/${spaceDomain}`} pageId={pageId} />;
   }
   else if (NEXUS_ROUTES.includes(router.route)) {
     return <NexusPageTitle route={router.route} />;
