@@ -1,22 +1,21 @@
 import { Page, PageOperations, Role } from '@prisma/client';
 import charmClient from 'charmClient';
+import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
+import useRefState from 'hooks/useRefState';
+import { Block } from 'lib/focalboard/block';
 import { IPageWithPermissions } from 'lib/pages';
 import { IPagePermissionFlags, PageOperationType } from 'lib/permissions/pages';
 import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 import { permissionTemplates } from 'lib/permissions/pages/page-permission-mapping';
+import { isTruthy } from 'lib/utilities/types';
 import { useRouter } from 'next/router';
 import * as React from 'react';
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
-import useSWR from 'swr';
-import { isTruthy } from 'lib/utilities/types';
-import useRefState from 'hooks/useRefState';
-import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { untitledPage } from 'seedData';
-import { Block } from 'lib/focalboard/block';
+import useSWR from 'swr';
 import { useCurrentSpace } from './useCurrentSpace';
-import { useSpaces } from './useSpaces';
-import { useUser } from './useUser';
 import useIsAdmin from './useIsAdmin';
+import { useUser } from './useUser';
 
 export type LinkedPage = (Page & {children: LinkedPage[], parent: null | LinkedPage});
 
@@ -52,31 +51,26 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
 
   const isAdmin = useIsAdmin();
   const [isEditing, setIsEditing] = useState(false);
-  const [spaceFromUrl] = useCurrentSpace();
+  const [currentSpace] = useCurrentSpace();
   const [pages, pagesRef, setPages] = useRefState<PagesContext['pages']>({});
   const [currentPageId, setCurrentPageId] = useState<string>('');
   const router = useRouter();
   const { user } = useUser();
 
-  // retrieve space for public pages
-  const [spaces] = useSpaces();
-  const publicPageSpace = router.route === '/share/[...pageId]' ? spaces[0] : null;
-  const space = spaceFromUrl || publicPageSpace;
+  const { data, mutate } = useSWR(() => currentSpace ? `pages/${currentSpace?.id}` : null, () => {
 
-  const { data, mutate } = useSWR(() => space ? `pages/${space?.id}` : null, () => {
-
-    if (!space) {
+    if (!currentSpace) {
       return [];
     }
 
     const isPublicBountiesPage = (router.route === '/share/[...pageId]') && (router.query.pageId?.[1] === 'bounties');
     if (isPublicBountiesPage) {
       // retrieve the pages we need for public bounties
-      return charmClient.bounties.listBounties(space.id, true)
+      return charmClient.bounties.listBounties(currentSpace.id, true)
         .then(bounties => bounties.map(bounty => bounty.page).filter(isTruthy));
     }
     else {
-      return charmClient.getPages(space.id);
+      return charmClient.getPages(currentSpace.id);
     }
   }, { refreshInterval });
 
