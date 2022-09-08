@@ -165,11 +165,7 @@ export default function PublicPage () {
               width: '100%'
             }}
             >
-              {
-                basePageId && (
-                  <PageTitleWithBreadcrumbs pageId={basePageId} spaceDomain={currentSpace?.domain} />
-                )
-              }
+              <PageTitleWithBreadcrumbs pageId={basePageId} spaceDomain={currentSpace?.domain} />
               <Box display='flex' alignItems='center'>
                 {/** dark mode toggle */}
                 <Tooltip title={theme.palette.mode === 'dark' ? 'Light mode' : 'Dark mode'} arrow placement='top'>
