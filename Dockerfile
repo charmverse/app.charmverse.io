@@ -5,7 +5,9 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 COPY *.json ./
-RUN npm ci --no-audit --no-fund --omit dev
+RUN npm ci --no-audit --no-fund \
+           --legacy-peer-deps   \
+           --omit dev
 
 COPY . ./
 RUN npm run build:prisma
@@ -25,6 +27,8 @@ CMD ["npm", "run", "start"]
 # Create TESTING image
 FROM serving_app AS testing_app
 
-RUN npm ci --no-audit --no-fund --include dev
+RUN npm ci --no-audit --no-fund \
+           --legacy-peer-deps   \
+           --include dev
 
 CMD ["npm", "run", "start:test"]
