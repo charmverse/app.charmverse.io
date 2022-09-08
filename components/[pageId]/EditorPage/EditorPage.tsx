@@ -12,7 +12,7 @@ import BoardPage from '../BoardPage';
 import DocumentPage from '../DocumentPage';
 
 export default function EditorPage ({ pageId }: { pageId: string }) {
-  const { setIsEditing, pages, setCurrentPageId, setPages, getPagePermissions } = usePages();
+  const { setIsEditing, pages, currentPageId, setCurrentPageId, setPages, getPagePermissions } = usePages();
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
   const [space] = useCurrentSpace();
@@ -25,7 +25,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
   useEffect(() => {
     async function main () {
       setIsAccessDenied(false);
-      if (pageId && pagesLoaded && space) {
+      if (pageId && pagesLoaded && space && pageId !== currentPageId) {
         try {
           const page = await charmClient.getPage(pageId, space.id);
           if (page) {
