@@ -6,7 +6,8 @@ WORKDIR /app
 
 COPY *.json ./
 RUN npm ci --no-audit --no-fund \
-           --legacy-peer-deps
+           --legacy-peer-deps   \
+           --ignore-scripts
 
 COPY . ./
 RUN npm run build:prisma
