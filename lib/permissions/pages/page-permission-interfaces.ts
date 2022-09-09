@@ -30,7 +30,7 @@ export interface IPagePermissionUserRequest extends IPagePermissionRequest {
  * Provide one of userId, spaceId or roleId
  * @pageId can be passed in the body or externally
  */
-export type IPagePermissionToCreate = Pick<PagePermission, 'permissionLevel'> & Partial<Pick<PagePermission, 'permissions' | 'userId' | 'spaceId' | 'roleId' | 'public' | 'pageId'>>
+export type IPagePermissionToCreate = Pick<PagePermission, 'permissionLevel'> & Partial<Pick<PagePermission, 'permissions' | 'userId' | 'spaceId' | 'roleId' | 'public' | 'pageId' | 'inheritedFromPermission' | 'id'>>
 export type IPagePermissionToInherit = Pick<PagePermission, 'pageId' | 'inheritedFromPermission'>
 
 export type IPagePermissionUpdate = Pick<PagePermission, 'permissionLevel'> & Partial<Pick<PagePermission, 'permissions'>>

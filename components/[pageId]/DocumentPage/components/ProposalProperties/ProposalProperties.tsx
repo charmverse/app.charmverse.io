@@ -17,17 +17,27 @@ import { proposalStatusTransitionRecord, proposalStatusTransitionPermission, PRO
 import { ProposalStatus } from '@prisma/client';
 import UserDisplay from 'components/common/UserDisplay';
 import DoneIcon from '@mui/icons-material/Done';
+import PublishToSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/PublishToSnapshot';
+import { useState } from 'react';
+import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
+import CreateVoteModal from 'components/votes/components/CreateVoteModal';
 import { ProposalStatusChip } from '../../../../proposals/components/ProposalStatusBadge';
 
 interface ProposalPropertiesProps {
-  proposalId: string,
   readOnly?: boolean
+  pageId: string
+  proposalId: string
 }
 
 const proposalStatuses = Object.keys(proposalStatusTransitionRecord);
 
-export default function ProposalProperties ({ proposalId, readOnly }: ProposalPropertiesProps) {
+export default function ProposalProperties ({ pageId, proposalId, readOnly }: ProposalPropertiesProps) {
   const { data: proposal, mutate: refreshProposal } = useSWR(`proposal/${proposalId}`, () => charmClient.proposals.getProposal(proposalId));
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  function openVoteModal () {
+    setIsModalOpen(true);
+  }
 
   const [contributors] = useContributors();
   const { roles = [], roleups } = useRoles();
@@ -43,6 +53,7 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
   const { status } = proposal;
 
   const isProposalAuthor = (user && proposal.authors.some(author => author.userId === user.id));
+
   const isProposalReviewer = (user && (proposal.reviewers.some(reviewer => {
     if (reviewer.userId) {
       return reviewer.userId === user.id;
@@ -97,9 +108,11 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
         <Grid item xs={8}>
           <Box display='flex' gap={1} alignItems='center'>
             <Typography fontWeight='bold'>Proposal information</Typography>
-            <IconButton size='small' {...bindTrigger(proposalMenuState)}>
-              <MoreHorizIcon fontSize='small' />
-            </IconButton>
+            {!proposal.status.match('vote') && (
+              <IconButton size='small' {...bindTrigger(proposalMenuState)}>
+                <MoreHorizIcon fontSize='small' />
+              </IconButton>
+            )}
           </Box>
         </Grid>
         <Grid item xs={4}>
@@ -141,7 +154,8 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
               onChange={async (_, _contributors) => {
                 // Must have atleast one author of proposal
                 if ((_contributors as Contributor[]).length !== 0) {
-                  await charmClient.proposals.updateProposal(proposal.id, {
+                  await charmClient.proposals.updateProposal({
+                    proposalId: proposal.id,
                     authors: (_contributors as Contributor[]).map(contributor => contributor.id),
                     reviewers: proposal.reviewers.map(reviewer => ({ group: reviewer.roleId ? 'role' : 'user', id: reviewer.roleId ?? reviewer.userId as string }))
                   });
@@ -185,7 +199,8 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
                   disableCloseOnSelect={true}
                   excludedIds={proposal.reviewers.map(reviewer => (reviewer.roleId ?? reviewer.userId) as string)}
                   onChange={async (e, options) => {
-                    await charmClient.proposals.updateProposal(proposal.id, {
+                    await charmClient.proposals.updateProposal({
+                      proposalId: proposal.id,
                       authors: proposal.authors.map(author => author.userId),
                       reviewers: options.map(option => ({ group: option.group, id: option.id }))
                     });
@@ -207,6 +222,12 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
       <Menu {...bindMenu(proposalMenuState)}>
         {
           proposalStatusTransitionRecord[proposal.status]?.map(newStatus => {
+
+            // Show the custom Create button rather than Move to Vote Active
+            if (proposal.status === 'reviewed' && newStatus === 'vote_active') {
+              return null;
+            }
+
             const currentStatusIndex = proposalStatuses.indexOf(proposal.status);
             const newStatusIndex = proposalStatuses.indexOf(newStatus);
 
@@ -219,7 +240,7 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
             }
             else {
               icon = currentStatusIndex < newStatusIndex ? <ArrowForwardIcon fontSize='small' /> : <ArrowBackIcon fontSize='small' />;
-              label = <Typography>Move to {PROPOSAL_STATUS_LABELS[newStatus]}</Typography>;
+              label = <Typography>{PROPOSAL_STATUS_LABELS[newStatus]}</Typography>;
             }
 
             return (
@@ -241,7 +262,36 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
             );
           })
         }
+        {
+          proposal.status === 'reviewed' && (
+            <>
+              <MenuItem disabled={!isProposalAuthor}>
+                <PublishToSnapshot pageId={pageId} />
+              </MenuItem>
+              <MenuItem
+                disabled={!isProposalAuthor}
+                onClick={openVoteModal}
+              >
+                <Box display='flex' alignItems='center' gap={1}>
+                  <HowToVoteOutlinedIcon fontSize='small' />
+                  Create Vote
+                </Box>
+              </MenuItem>
+            </>
+          )
+        }
       </Menu>
+      <CreateVoteModal
+        isProposal={true}
+        open={isModalOpen}
+        onCreateVote={async () => {
+          await updateProposalStatus('vote_active');
+          setIsModalOpen(false);
+        }}
+        onClose={() => {
+          setIsModalOpen(false);
+        }}
+      />
     </Box>
   );
 }

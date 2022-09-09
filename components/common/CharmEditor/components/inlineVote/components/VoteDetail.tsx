@@ -44,7 +44,7 @@ export default function VoteDetail ({ cancelVote, castVote, deleteVote, detailed
   const { deadline, totalVotes, description, id, title, userChoice, voteOptions, aggregatedResult } = vote;
   const { user } = useUser();
   const view = useEditorViewContext();
-  const { data: userVotes, mutate } = useSWR(detailed ? `/votes/${id}/user-votes` : null, () => charmClient.getUserVotes(id));
+  const { data: userVotes, mutate } = useSWR(detailed ? `/votes/${id}/user-votes` : null, () => charmClient.votes.getUserVotes(id));
 
   const voteDetailsPopup = usePopupState({ variant: 'popover', popupId: 'inline-votes-detail' });
 

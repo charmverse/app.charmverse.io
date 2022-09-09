@@ -4,7 +4,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { default as client, OctoClient } from '../octoClient';
 import { Board } from '../blocks/board';
 
-import { RootState } from './index';
+import type { RootState } from './index';
 
 export const fetchGlobalTemplates = createAsyncThunk(
   'globalTemplates/fetch',

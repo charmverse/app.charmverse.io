@@ -15,14 +15,22 @@ const NestedPageContainer = styled((props: any) => <div {...props} />)`
   padding: 3px 3px 3px 2px;
   position: relative;
   transition: background 20ms ease-in 0s;
-  &:hover {
-    background-color: ${({ theme }) => theme.palette.background.light};
-  }
-  .actions-menu {
-    opacity: 0;
-  }
-  &:hover .actions-menu {
-    opacity: 1;
+
+  // disable hover UX on ios which converts first click to a hover event
+  @media (pointer: fine) {
+
+    .actions-menu {
+      opacity: 0;
+    }
+
+    &:hover {
+
+      background-color: ${({ theme }) => theme.palette.background.light};
+
+      .actions-menu {
+        opacity: 1;
+      }
+    }
   }
 `;
 

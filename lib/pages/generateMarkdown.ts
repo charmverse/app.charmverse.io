@@ -4,7 +4,7 @@ import { Node } from '@bangle.dev/pm';
 import { Page } from '@prisma/client';
 import { specRegistry } from 'components/common/CharmEditor/specRegistry';
 import { replaceNestedPages } from 'components/common/CharmEditor/components/nestedPage';
-import { PageContent } from 'models';
+import type { PageContent } from 'models';
 
 export async function generateMarkdown (page: Page, withTitle: boolean = false): Promise<string> {
 
