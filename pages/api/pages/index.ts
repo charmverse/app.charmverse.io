@@ -4,7 +4,7 @@ import { prisma } from 'db';
 import log from 'lib/log';
 import { IEventToLog, postToDiscord } from 'lib/log/userEvents';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { getPage, IPageWithPermissions, resolvePageTree } from 'lib/pages/server';
+import { getPage, IPageWithPermissions, PageNotFoundError, resolvePageTree } from 'lib/pages/server';
 import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { createProposal } from 'lib/proposal/createProposal';
@@ -81,7 +81,11 @@ async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
     await (proposalIdForPermissions ? syncProposalPermissions({ proposalId: proposalIdForPermissions as string })
       : setupPermissionsAfterPageCreated(page.id));
 
-    const pageWithPermissions = await getPage(page.id) as IPageWithPermissions;
+    const pageWithPermissions = await getPage(page.id);
+
+    if (!pageWithPermissions) {
+      throw new PageNotFoundError(page.id);
+    }
 
     logFirstWorkspacePageCreation(page);
     logFirstUserPageCreation(page);
