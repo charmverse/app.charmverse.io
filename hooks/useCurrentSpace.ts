@@ -15,16 +15,8 @@ export function useCurrentSpace () {
   const space = useMemo(() => spaces.find(w => w.domain === domain), [domain, spaces]);
 
   const setSpace = useCallback((_space: Space) => {
-
-    const spaceExists = spaces.findIndex(s => s.id === _space.id) !== -1;
-
-    if (!spaceExists) {
-      setSpaces([...spaces, _space]);
-    }
-    else {
-      const newSpaces = spaces.map(s => s.id === _space.id ? _space : s);
-      setSpaces(newSpaces);
-    }
+    const newSpaces = spaces.map(s => s.id === _space.id ? _space : s);
+    setSpaces(newSpaces);
   }, [spaces, setSpaces]);
 
   return [space, setSpace] as const;

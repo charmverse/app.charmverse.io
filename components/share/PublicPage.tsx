@@ -49,7 +49,7 @@ export default function PublicPage () {
   const dispatch = useAppDispatch();
   const { pages, setCurrentPageId } = usePages();
   const [loadingSpace, setLoadingSpace] = useState(true);
-  const [currentSpace, setCurrentSpace] = useCurrentSpace();
+  const [currentSpace] = useCurrentSpace();
   const [, setSpaces] = useSpaces();
   const [, setTitleState] = usePageTitle();
   // keep track of the pageId by path since currentPageId may change when a page is viewed inside a modal
@@ -65,7 +65,7 @@ export default function PublicPage () {
 
     try {
       foundSpace = await charmClient.getPublicSpaceInfo(spaceDomain);
-      setCurrentSpace(foundSpace);
+      setSpaces([foundSpace]);
     }
     catch (err) {
       setPageNotFound(true);
@@ -165,7 +165,7 @@ export default function PublicPage () {
               width: '100%'
             }}
             >
-              <PageTitleWithBreadcrumbs pageId={basePageId} spaceDomain={currentSpace?.domain} />
+              <PageTitleWithBreadcrumbs pageId={basePageId} />
               <Box display='flex' alignItems='center'>
                 {/** dark mode toggle */}
                 <Tooltip title={theme.palette.mode === 'dark' ? 'Light mode' : 'Dark mode'} arrow placement='top'>

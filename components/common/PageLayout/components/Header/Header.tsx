@@ -60,7 +60,6 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
   const [pageMenuAnchorElement, setPageMenuAnchorElement] = useState<null | Element>(null);
   const pageMenuAnchor = useRef();
-  const [currentSpace] = useCurrentSpace();
   const [currentSpacePermissions] = useCurrentSpacePermissions();
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -236,7 +235,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
         width: '100%'
       }}
       >
-        <PageTitleWithBreadcrumbs pageId={basePage?.id} spaceDomain={currentSpace?.domain} />
+        <PageTitleWithBreadcrumbs pageId={basePage?.id} />
         <Box display='flex' alignItems='center' alignSelf='stretch' mr={-1}>
           {
             basePage && isBountyBoard && (
