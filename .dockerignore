@@ -4,13 +4,10 @@
 .gitignore
 .ebextensions*
 .cdk
-.husky
 .vscode
 __e2e__
 __integration-tests__
 .env*
-.eslint*
-.huskyrc.json
 cdk.json
 docker-compose.yml
 Dockerfile
