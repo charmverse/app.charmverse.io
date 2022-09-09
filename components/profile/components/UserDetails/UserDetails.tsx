@@ -20,7 +20,6 @@ import { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { TelegramAccount } from 'pages/api/telegram/connect';
 import { shortenHex } from 'lib/utilities/strings';
 import useENSName from 'hooks/useENSName';
-import { UserAvatar } from 'lib/users/interfaces';
 import { PublicUser } from 'pages/api/public/profile/[userId]';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 import { useUserDetails } from 'components/profile/components/UserDetails/hooks/useUserDetails';
