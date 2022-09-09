@@ -61,7 +61,7 @@ export default function PublicPage () {
 
     const spaceDomain = (router.query.pageId as string[])[0];
 
-    let foundSpace: Space;
+    let foundSpace: Space | null = null;
 
     try {
       foundSpace = await charmClient.getPublicSpaceInfo(spaceDomain);
@@ -69,10 +69,9 @@ export default function PublicPage () {
     }
     catch (err) {
       setPageNotFound(true);
-      return;
     }
 
-    if (!isBountiesPage) {
+    if (!isBountiesPage && foundSpace) {
       try {
 
         const { page: rootPage, cards, boards, space, views } = await charmClient.getPublicPage(pageIdOrPath);
