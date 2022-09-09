@@ -1,15 +1,19 @@
 import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
-import { UpdateProposalRequest } from './interface';
+import { ProposalReviewerInput } from './interface';
 import { generateSyncProposalPermissions } from './syncProposalPermissions';
+
+export interface UpdateProposalRequest {
+  proposalId: string;
+  authors: string[];
+  reviewers: ProposalReviewerInput[];
+}
 
 export async function updateProposal ({
   proposalId,
   authors,
   reviewers
-}: {
-  proposalId: string,
-} & UpdateProposalRequest) {
+}: UpdateProposalRequest) {
   if (authors.length === 0) {
     throw new InvalidStateError('Proposal must have at least 1 author');
   }

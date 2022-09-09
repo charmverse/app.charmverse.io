@@ -11,7 +11,3 @@ export interface ProposalWithUsers extends Proposal {
   reviewers: ProposalReviewer[]
 }
 
-export interface UpdateProposalRequest {
-  authors: string[]
-  reviewers: ProposalReviewerInput[]
-}

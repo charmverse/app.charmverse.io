@@ -142,7 +142,8 @@ export default function ProposalProperties ({ proposalId, readOnly, refreshPage 
               onChange={async (_, _contributors) => {
                 // Must have atleast one author of proposal
                 if ((_contributors as Contributor[]).length !== 0) {
-                  await charmClient.proposals.updateProposal(proposal.id, {
+                  await charmClient.proposals.updateProposal({
+                    proposalId: proposal.id,
                     authors: (_contributors as Contributor[]).map(contributor => contributor.id),
                     reviewers: proposal.reviewers.map(reviewer => ({ group: reviewer.roleId ? 'role' : 'user', id: reviewer.roleId ?? reviewer.userId as string }))
                   });
@@ -187,7 +188,8 @@ export default function ProposalProperties ({ proposalId, readOnly, refreshPage 
                   disableCloseOnSelect={true}
                   excludedIds={proposal.reviewers.map(reviewer => (reviewer.roleId ?? reviewer.userId) as string)}
                   onChange={async (e, options) => {
-                    await charmClient.proposals.updateProposal(proposal.id, {
+                    await charmClient.proposals.updateProposal({
+                      proposalId: proposal.id,
                       authors: proposal.authors.map(author => author.userId),
                       reviewers: options.map(option => ({ group: option.group, id: option.id }))
                     });
