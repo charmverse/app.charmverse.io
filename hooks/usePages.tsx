@@ -15,7 +15,6 @@ import { untitledPage } from 'seedData';
 import useSWR from 'swr';
 import { useCurrentSpace } from './useCurrentSpace';
 import useIsAdmin from './useIsAdmin';
-import { useSpaces } from './useSpaces';
 import { useUser } from './useUser';
 
 export type LinkedPage = (Page & {children: LinkedPage[], parent: null | LinkedPage});
@@ -50,31 +49,26 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
 
   const isAdmin = useIsAdmin();
   const [isEditing, setIsEditing] = useState(false);
-  const [spaceFromUrl] = useCurrentSpace();
+  const [currentSpace] = useCurrentSpace();
   const [pages, pagesRef, setPages] = useRefState<PagesContext['pages']>({});
   const [currentPageId, setCurrentPageId] = useState<string>('');
   const router = useRouter();
   const { user } = useUser();
 
-  // retrieve space for public pages
-  const [spaces] = useSpaces();
-  const publicPageSpace = router.route === '/share/[...pageId]' ? spaces[0] : null;
-  const space = spaceFromUrl || publicPageSpace;
+  const { data, mutate } = useSWR(() => currentSpace ? `pages/${currentSpace?.id}` : null, () => {
 
-  const { data, mutate } = useSWR(() => space ? `pages/${space?.id}` : null, () => {
-
-    if (!space) {
+    if (!currentSpace) {
       return [];
     }
 
     const isPublicBountiesPage = (router.route === '/share/[...pageId]') && (router.query.pageId?.[1] === 'bounties');
     if (isPublicBountiesPage) {
       // retrieve the pages we need for public bounties
-      return charmClient.bounties.listBounties(space.id, true)
+      return charmClient.bounties.listBounties(currentSpace.id, true)
         .then(bounties => bounties.map(bounty => bounty.page).filter(isTruthy));
     }
     else {
-      return charmClient.getPages(space.id);
+      return charmClient.getPages(currentSpace.id);
     }
   }, { refreshInterval });
 
@@ -131,13 +125,13 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     const page = pages[pageId];
     const totalNonArchivedPages = Object.values(pages).filter((p => p?.deletedAt === null && (p?.type === 'page' || p?.type === 'board'))).length;
 
-    if (page && user && space) {
+    if (page && user && currentSpace) {
       const { pageIds } = await charmClient.archivePage(page.id);
       let newPage: null | IPageWithPermissions = null;
       if (totalNonArchivedPages - pageIds.length === 0 && pageIds.length !== 0) {
         newPage = await charmClient.createPage(untitledPage({
           userId: user.id,
-          spaceId: space.id
+          spaceId: currentSpace.id
         }));
       }
 
