@@ -1,9 +1,6 @@
 import PublishIcon from '@mui/icons-material/ElectricBolt';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-import { MenuItem } from '@mui/material';
-import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
-import { Page } from '@prisma/client';
 import charmClient from 'charmClient';
 import Link from 'components/common/Link';
 import { LoadingIcon } from 'components/common/LoadingComponent';
@@ -15,11 +12,12 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 import PublishingForm from './PublishingForm';
 
-export default function PublishToSnapshot ({ page, disabled = false, button = true }: {button?: boolean, disabled?: boolean, page: Page}) {
+export default function PublishToSnapshot ({ pageId }: {pageId: string}) {
+  const { pages, setPages } = usePages();
+  const page = pages[pageId]!;
 
   const [checkingProposal, setCheckingProposal] = useState(!!page.snapshotProposalId);
   const [proposal, setProposal] = useState<SnapshotProposal | null>(null);
-  const { pages, setPages } = usePages();
   const [currentSpace] = useCurrentSpace();
 
   const {
@@ -53,7 +51,7 @@ export default function PublishToSnapshot ({ page, disabled = false, button = tr
 
   }, [page, page?.snapshotProposalId]);
 
-  const content = (
+  return (
     <>
       {
       checkingProposal && (
@@ -98,17 +96,5 @@ export default function PublishToSnapshot ({ page, disabled = false, button = tr
       )
     }
     </>
-  );
-
-  return (
-    button ? (
-      <ListItemButton disabled={disabled}>
-        {content}
-      </ListItemButton>
-    ) : (
-      <MenuItem disabled={disabled}>
-        {content}
-      </MenuItem>
-    )
   );
 }

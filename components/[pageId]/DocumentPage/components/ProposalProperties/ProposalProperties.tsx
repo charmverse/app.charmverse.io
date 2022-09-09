@@ -18,21 +18,20 @@ import { ProposalStatus } from '@prisma/client';
 import UserDisplay from 'components/common/UserDisplay';
 import DoneIcon from '@mui/icons-material/Done';
 import PublishToSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/PublishToSnapshot';
-import { IPageWithPermissions } from 'lib/pages';
 import { useState } from 'react';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
 import { ProposalStatusChip } from '../../../../proposals/components/ProposalStatusBadge';
 
 interface ProposalPropertiesProps {
-  proposalId: string,
   readOnly?: boolean
-  page: IPageWithPermissions
+  pageId: string
+  proposalId: string
 }
 
 const proposalStatuses = Object.keys(proposalStatusTransitionRecord);
 
-export default function ProposalProperties ({ page, proposalId, readOnly }: ProposalPropertiesProps) {
+export default function ProposalProperties ({ pageId, proposalId, readOnly }: ProposalPropertiesProps) {
   const { data: proposal, mutate: refreshProposal } = useSWR(`proposal/${proposalId}`, () => charmClient.proposals.getProposal(proposalId));
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -264,7 +263,9 @@ export default function ProposalProperties ({ page, proposalId, readOnly }: Prop
         {
           proposal.status === 'reviewed' && (
             <>
-              <PublishToSnapshot button={false} disabled={!isProposalAuthor} page={page} />
+              <MenuItem disabled={!isProposalAuthor}>
+                <PublishToSnapshot pageId={pageId} />
+              </MenuItem>
               <MenuItem
                 disabled={!isProposalAuthor}
                 onClick={openVoteModal}
