@@ -3,13 +3,16 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import InputAdornment from '@mui/material/InputAdornment';
 import Input from '@mui/material/OutlinedInput';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import { PageType } from '@prisma/client';
 import charmClient from 'charmClient';
 import { SmallSelect } from 'components/common/form/InputEnumToOptions';
 import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
+import { canReceiveManualPermissionUpdates } from 'lib/pages';
 import { IPagePermissionWithAssignee, PagePermissionLevelType } from 'lib/permissions/pages/page-permission-interfaces';
 import { permissionLevels } from 'lib/permissions/pages/page-permission-mapping';
 import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
@@ -82,11 +85,13 @@ function sortPagePermissions (pagePermissions: IPagePermissionWithAssignee[]):
 
 interface Props {
   pageId: string;
+  pageType: PageType;
   refreshPermissions: () => void;
   pagePermissions: IPagePermissionWithAssignee[];
+  proposalParentId?: string | null;
 }
 
-export default function PagePermissions ({ pageId, pagePermissions, refreshPermissions }: Props) {
+export default function PagePermissions ({ pageId, pagePermissions, refreshPermissions, pageType, proposalParentId }: Props) {
 
   const { pages, getPagePermissions } = usePages();
   const [space] = useCurrentSpace();
@@ -135,12 +140,16 @@ export default function PagePermissions ({ pageId, pagePermissions, refreshPermi
 
   const sortedPermissions = sortPagePermissions(pagePermissions);
 
-  const { custom, ...permissionsWithoutCustom } = permissionLevels as Record<string, string>;
+  // Remove proposal editor as it is not selectable
+  // eslint-disable-next-line camelcase
+  const { custom, proposal_editor, ...permissionsWithoutCustom } = permissionLevels as Record<string, string>;
   const permissionsWithRemove = { ...permissionsWithoutCustom, delete: 'Remove' };
+
+  const canEdit = userPagePermissions?.grant_permissions === true && canReceiveManualPermissionUpdates({ pageType }) && !proposalParentId;
 
   return (
     <Box p={1}>
-      {userPagePermissions?.grant_permissions === true && (
+      {canEdit && (
         <Box mb={1} onClick={() => popupState.open()}>
           <StyledInput
             placeholder='Add people and roles'
@@ -167,7 +176,7 @@ export default function PagePermissions ({ pageId, pagePermissions, refreshPermi
           </Typography>
           <div style={{ width: '160px', textAlign: 'right' }}>
             {
-            userPagePermissions?.grant_permissions === true ? (
+            canEdit ? (
               <SmallSelect
                 renderValue={value => permissionsWithoutCustom[value as string] || 'No access'}
                 onChange={level => updateSpacePagePermissionLevel(level as PagePermissionLevelType)}
@@ -175,12 +184,14 @@ export default function PagePermissions ({ pageId, pagePermissions, refreshPermi
                 defaultValue={spaceLevelPermission?.permissionLevel ?? 'No access'}
               />
             ) : (
-              <Typography
-                color='secondary'
-                variant='caption'
-              >
-                {spaceLevelPermission ? permissionsWithoutCustom[spaceLevelPermission.permissionLevel] : 'No access'}
-              </Typography>
+              <Tooltip title={userPagePermissions?.edit_isPublic && Boolean(proposalParentId) ? 'You can only change this setting from the top proposal page.' : ''}>
+                <Typography
+                  color='secondary'
+                  variant='caption'
+                >
+                  {spaceLevelPermission ? permissionsWithoutCustom[spaceLevelPermission.permissionLevel] : 'No access'}
+                </Typography>
+              </Tooltip>
             )
           }
           </div>
@@ -211,7 +222,7 @@ export default function PagePermissions ({ pageId, pagePermissions, refreshPermi
                 </Typography>
                 <div style={{ width: '160px', textAlign: 'right' }}>
                   {
-                  userPagePermissions?.grant_permissions === true ? (
+                  canEdit ? (
                     <SmallSelect
                       renderValue={value => permissionsWithoutCustom[value as string]}
                       onChange={level => updatePagePermissionLevel(permission, level as PagePermissionLevelType)}
@@ -219,9 +230,11 @@ export default function PagePermissions ({ pageId, pagePermissions, refreshPermi
                       defaultValue={permission.permissionLevel}
                     />
                   ) : (
-                    <Typography color='secondary' variant='caption'>
-                      {permissionLevels[permission.permissionLevel]}
-                    </Typography>
+                    <Tooltip title={userPagePermissions?.edit_isPublic && Boolean(proposalParentId) ? 'You can only change this setting from the top proposal page.' : ''}>
+                      <Typography color='secondary' variant='caption'>
+                        {permissionLevels[permission.permissionLevel]}
+                      </Typography>
+                    </Tooltip>
                   )
                 }
                 </div>

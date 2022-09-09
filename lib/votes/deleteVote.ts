@@ -1,6 +1,6 @@
 import { Vote } from '@prisma/client';
 import log from 'lib/log';
-import { UnauthorisedActionError } from 'lib/utilities/errors';
+import { UnauthorisedActionError, UndesirableOperationError } from 'lib/utilities/errors';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { prisma } from 'db';
 import { getVote } from './getVote';
@@ -11,6 +11,10 @@ export async function deleteVote (id: string, userId: string): Promise<Vote | nu
   if (!vote) {
     log.warn(`Attempt to delete a non-existing vote with id: ${id}`);
     return null;
+  }
+
+  if (vote.context === 'proposal') {
+    throw new UndesirableOperationError("Proposal votes can't be deleted");
   }
 
   const userPermissions = await computeSpacePermissions({
