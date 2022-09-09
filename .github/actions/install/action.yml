@@ -22,6 +22,22 @@ runs:
         restore-keys: |
           ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
 
+    - name: Cache playwright libs
+      id: cache_playwright
+      uses: actions/cache@v2
+      with:
+        path: |
+          /home/runner/.cache/ms-playwright
+        ## Simple implementation, we watch for package.json changes
+        # Generate a new cache whenever packages change.
+        key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-playwright
+
+    - name: Install playwright
+      shell: bash
+      if: steps.cache_playwright.outputs.cache-hit != 'true'
+      run: |
+        sudo npx playwright install-deps chromium chrome
+
     - name: Cache dependencies
       id: cache_node_modules
       uses: actions/cache@v2
