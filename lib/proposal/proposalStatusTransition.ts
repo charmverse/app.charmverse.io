@@ -11,8 +11,8 @@ export const proposalStatusTransitionRecord: Record<ProposalStatus, ProposalStat
 };
 
 export const PROPOSAL_STATUS_LABELS: Record<ProposalStatus, string> = {
-  private_draft: 'Private draft',
-  draft: 'Draft',
+  private_draft: 'Private Draft',
+  draft: 'Public Draft',
   discussion: 'Discussion',
   review: 'In Review',
   reviewed: 'Reviewed',

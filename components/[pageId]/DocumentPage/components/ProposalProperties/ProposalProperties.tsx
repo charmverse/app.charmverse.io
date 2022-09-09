@@ -238,7 +238,7 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly }: Pr
             }
             else {
               icon = currentStatusIndex < newStatusIndex ? <ArrowForwardIcon fontSize='small' /> : <ArrowBackIcon fontSize='small' />;
-              label = <Typography>Move to {PROPOSAL_STATUS_LABELS[newStatus]}</Typography>;
+              label = <Typography>{PROPOSAL_STATUS_LABELS[newStatus]}</Typography>;
             }
 
             return (
