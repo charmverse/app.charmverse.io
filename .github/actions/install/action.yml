@@ -36,7 +36,7 @@ runs:
       shell: bash
       if: steps.cache_playwright.outputs.cache-hit != 'true'
       run: |
-        sudo npx playwright install-deps chromium chrome
+        npx playwright install-deps chromium chrome
 
     - name: Cache dependencies
       id: cache_node_modules
