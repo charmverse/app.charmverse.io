@@ -44,6 +44,31 @@ const updateVoteStatus = async () => {
     }
   });
 
+  const closedProposals = await prisma.vote.findMany({
+    where: {
+      pageId: {
+        in: [...rejectedVotes, ...passedVotes]
+      },
+      context: 'proposal'
+    },
+    select: {
+      pageId: true
+    }
+  });
+
+  const closedProposalIds = closedProposals.map(closedProposal => closedProposal.pageId);
+
+  await prisma.proposal.updateMany({
+    where: {
+      id: {
+        in: closedProposalIds
+      }
+    },
+    data: {
+      status: 'vote_closed'
+    }
+  });
+
   return passedVotes.length + rejectedVotes.length;
 };
 
