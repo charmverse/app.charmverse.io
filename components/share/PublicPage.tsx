@@ -28,6 +28,7 @@ import { useUser } from 'hooks/useUser';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import { findParentOfType } from 'lib/pages/findParentOfType';
 import PublicBountiesPage from './PublicBountiesPage';
 
 const LayoutContainer = styled.div`
@@ -138,6 +139,8 @@ export default function PublicPage () {
 
   const currentPage = pages[basePageId];
 
+  const parentProposalId = findParentOfType({ pageId: basePageId, pageType: 'proposal', pageMap: pages });
+
   return (
     <>
       <Head>
@@ -181,7 +184,7 @@ export default function PublicPage () {
                 ? (
                   <BoardPage page={currentPage} setPage={() => {}} readOnly={true} />
                 ) : (
-                  currentPage && <DocumentPage page={currentPage} setPage={() => {}} readOnly={true} />
+                  currentPage && <DocumentPage page={currentPage} setPage={() => {}} readOnly={true} parentProposalId={parentProposalId} />
                 )
               )
           }

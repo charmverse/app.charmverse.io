@@ -16,7 +16,8 @@ import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/ho
 import { useState } from 'react';
 
 const pagePermissionDescriptions: Record<PagePermissionLevelWithoutCustom, string> = {
-  full_access: 'Workspace members can edit and share pages.',
+  full_access: 'Workspace members can edit pages, share them with the public and manage permissions.',
+  proposal_editor: 'Proposal editors can edit proposals and share them with the public.',
   editor: 'Workspace members can edit but not share pages.',
   view_comment: 'Workspace members can view and comment on pages.',
   view: 'Workspace members can only view pages.'

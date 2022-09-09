@@ -122,9 +122,9 @@ function PageNavigation ({
     const parentId = containerItem.parentId;
 
     setPages(_pages => {
-      const unsortedSiblings: Page[] = Object.values(_pages).filter(isTruthy)
+      const unsortedSiblings = Object.values(_pages).filter(isTruthy)
         .filter((page) => page && page.parentId === parentId && page.id !== droppedItem.id);
-      const siblings: Page[] = sortNodes(unsortedSiblings) as Page[];
+      const siblings = sortNodes(unsortedSiblings);
 
       const droppedPage = _pages[droppedItem.id];
       if (!droppedPage) {

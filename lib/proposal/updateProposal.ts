@@ -1,17 +1,24 @@
-import type { UpdateProposalRequest } from 'charmClient/apis/proposalsApi';
 import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
+import { ProposalReviewerInput } from './interface';
+import { generateSyncProposalPermissions } from './syncProposalPermissions';
+
+export interface UpdateProposalRequest {
+  proposalId: string;
+  authors: string[];
+  reviewers: ProposalReviewerInput[];
+}
 
 export async function updateProposal ({
   proposalId,
   authors,
   reviewers
-}: {
-  proposalId: string,
-} & UpdateProposalRequest) {
+}: UpdateProposalRequest) {
   if (authors.length === 0) {
-    throw new InvalidStateError('Proposal must have atleast 1 author');
+    throw new InvalidStateError('Proposal must have at least 1 author');
   }
+
+  const [deleteArgs, createArgs] = await generateSyncProposalPermissions({ proposalId });
 
   await prisma.$transaction([
     prisma.proposalAuthor.deleteMany({
@@ -21,10 +28,7 @@ export async function updateProposal ({
     }),
     prisma.proposalAuthor.createMany({
       data: authors.map(author => ({ proposalId, userId: author }))
-    })
-  ]);
-
-  await prisma.$transaction([
+    }),
     prisma.proposalReviewer.deleteMany({
       where: {
         proposalId
@@ -36,6 +40,8 @@ export async function updateProposal ({
         userId: reviewer.group === 'user' ? reviewer.id : null,
         roleId: reviewer.group === 'role' ? reviewer.id : null
       }))
-    })
+    }),
+    prisma.pagePermission.deleteMany(deleteArgs),
+    ...createArgs.map(arg => prisma.pagePermission.create(arg))
   ]);
 }

@@ -47,32 +47,34 @@ const SidebarContainer = styled.div`
   background-color: ${({ theme }) => theme.palette.sidebar.background};
   height: 100%;
 
-  .add-a-page {
-    opacity: 0;
-    transition: opacity 0.2s ease-in-out;
-  }
+  // disable hover UX on ios which converts first click to a hover event
+  @media (pointer: fine) {
 
-  ${({ theme }) => theme.breakpoints.up('sm')} {
+    .add-a-page {
+      opacity: 0;
+      transition: opacity 0.2s ease-in-out;
+    }
+
     .sidebar-header .MuiIconButton-root {
       opacity: 0;
     }
-  }
 
-  &:hover {
-    .sidebar-header {
-      .MuiTypography-root {
-        overflow: hidden;
-        text-overflow: ellipsis;
+    &:hover {
+      .sidebar-header {
+        .MuiTypography-root {
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .MuiIconButton-root {
+          opacity: 1;
+        }
       }
-      .MuiIconButton-root {
+      .add-a-page {
         opacity: 1;
       }
     }
   }
 
-  &:hover .add-a-page {
-    opacity: 1;
-  }
 `;
 
 const sidebarItemStyles = ({ theme }: { theme: Theme }) => css`

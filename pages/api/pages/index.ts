@@ -1,17 +1,18 @@
 
 import { Page, Prisma } from '@prisma/client';
 import { prisma } from 'db';
+import log from 'lib/log';
 import { IEventToLog, postToDiscord } from 'lib/log/userEvents';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { IPageWithPermissions, PageWithProposal } from 'lib/pages/server';
+import { getPage, IPageWithPermissions, PageNotFoundError, resolvePageTree } from 'lib/pages/server';
 import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
+import { computeSpacePermissions } from 'lib/permissions/spaces';
+import { createProposal } from 'lib/proposal/createProposal';
+import { syncProposalPermissions } from 'lib/proposal/syncProposalPermissions';
 import { withSessionRoute } from 'lib/session/withSession';
+import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { computeSpacePermissions } from 'lib/permissions/spaces';
-import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
-import log from 'lib/log';
-import { createProposal } from 'lib/proposal/createProposal';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -72,7 +73,19 @@ async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
 
   try {
 
-    const pageWithPermissions = await setupPermissionsAfterPageCreated(page.id);
+    const proposalIdForPermissions = page.type === 'proposal' ? page.id : (page.parentId ? (await resolvePageTree({
+      pageId: page.id
+      // includeDeletedPages: true
+    })).parents.find(p => p.type === 'proposal')?.id : undefined);
+
+    await (proposalIdForPermissions ? syncProposalPermissions({ proposalId: proposalIdForPermissions as string })
+      : setupPermissionsAfterPageCreated(page.id));
+
+    const pageWithPermissions = await getPage(page.id);
+
+    if (!pageWithPermissions) {
+      throw new PageNotFoundError(page.id);
+    }
 
     logFirstWorkspacePageCreation(page);
     logFirstUserPageCreation(page);

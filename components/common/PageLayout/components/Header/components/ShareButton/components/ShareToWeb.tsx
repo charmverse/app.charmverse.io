@@ -6,7 +6,9 @@ import Collapse from '@mui/material/Collapse';
 import InputAdornment from '@mui/material/InputAdornment';
 import Input from '@mui/material/OutlinedInput';
 import Switch from '@mui/material/Switch';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import { PageType } from '@prisma/client';
 import charmClient from 'charmClient';
 import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -44,9 +46,16 @@ interface Props {
   pageId: string;
   pagePermissions: IPagePermissionWithAssignee[];
   refreshPermissions: () => void;
+  proposalParentId?: string | null;
 }
 
-export default function ShareToWeb ({ pageId, pagePermissions, refreshPermissions }: Props) {
+const alerts: Partial<Record<PageType, string>> = {
+  board: "Updates to this board's permissions, including whether it is public, will also apply to its cards.",
+  card_template: ' This template inherits permissions from its parent board.',
+  proposal: 'Proposal permissions update automatically based on the proposal stage and authors / reviewers.'
+};
+
+export default function ShareToWeb ({ pageId, pagePermissions, refreshPermissions, proposalParentId }: Props) {
 
   const router = useRouter();
   const { pages, getPagePermissions } = usePages();
@@ -58,8 +67,12 @@ export default function ShareToWeb ({ pageId, pagePermissions, refreshPermission
 
   const currentPage = pages[pageId];
 
+  const disablePublicToggle = currentPagePermissions.edit_isPublic !== true || Boolean(proposalParentId);
+
   // Current values of the public permission
   const [shareLink, setShareLink] = useState<null | string>(null);
+
+  const shareAlertMessage = currentPage ? alerts[proposalParentId ? 'proposal' : currentPage.type] : undefined;
 
   async function togglePublic () {
     if (publicPermission) {
@@ -120,17 +133,23 @@ export default function ShareToWeb ({ pageId, pagePermissions, refreshPermission
               : 'Publish and share link with anyone'}
           </Typography>
         </Box>
-        <Switch
-          data-test='toggle-public-page'
-          checked={!!publicPermission}
-          disabled={currentPagePermissions?.edit_isPublic !== true}
-          onChange={togglePublic}
-        />
+        <Tooltip title={currentPagePermissions.edit_isPublic && Boolean(proposalParentId) ? 'You can only change this setting from the top proposal page.' : ''}>
+          <Box>
+
+            <Switch
+              data-test='toggle-public-page'
+              checked={!!publicPermission}
+              disabled={disablePublicToggle}
+              onChange={togglePublic}
+            />
+          </Box>
+        </Tooltip>
       </Box>
+
       {
-        (currentPage?.type.match(/board/)) && (
+        shareAlertMessage && (
           <Alert severity='info'>
-            Updates to this board's permissions, including whether it is public, will also apply to its cards.
+            {shareAlertMessage}
           </Alert>
         )
       }

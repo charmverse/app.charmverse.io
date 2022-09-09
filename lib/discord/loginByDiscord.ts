@@ -9,7 +9,7 @@ import log from 'lib/log';
 
 export default async function loginByDiscord ({ code, hostName }: { code: string, hostName?: string }) {
 
-  const domain = hostName?.startsWith('localhost') ? `http://${hostName}` : `https://${hostName}`;
+  const domain = process.env.NODE_ENV === 'development' ? `http://${hostName}` : `https://${hostName}`;
   const discordAccount = await getDiscordAccount(code, `${domain}/api/discord/callback`);
   const discordUser = await prisma.discordUser.findUnique({
     where: {

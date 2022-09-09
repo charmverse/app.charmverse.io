@@ -279,17 +279,14 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{disablePageSpecificFe
 const PageActionListBox = styled.div`
   position: fixed;
   right: 0px;
-  width: 400px;
-  top: 75px;
+  width: 416px;
+  max-width: 100%;
+  top: 56px; // height of MUI Toolbar
   z-index: var(--z-index-drawer);
   height: calc(100% - 80px);
   overflow: auto;
-  margin-right: ${({ theme }) => theme.spacing(1)};
+  padding: 0 ${({ theme }) => theme.spacing(1)};
   background: ${({ theme }) => theme.palette.background.default};
-  display: none;
-  ${({ theme }) => theme.breakpoints.up('md')} {
-    display: block;
-  }
 `;
 
 const defaultContent: PageContent = {
