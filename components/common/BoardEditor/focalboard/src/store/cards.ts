@@ -8,7 +8,7 @@ import { Constants } from '../constants';
 import { IUser } from '../user';
 import { Utils } from '../utils';
 import { getCurrentBoard, getBoard } from './boards';
-import { RootState } from './index';
+import type { RootState } from './index';
 import { initialLoad, initialReadOnlyLoad } from './initialLoad';
 import { getSearchText } from './searchText';
 import { getWorkspaceUsers } from './users';

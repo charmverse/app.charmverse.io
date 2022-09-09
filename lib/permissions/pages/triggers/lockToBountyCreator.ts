@@ -1,4 +1,4 @@
-import { IPageWithPermissions } from 'lib/pages';
+import type { IPageWithPermissions } from 'lib/pages';
 import { prisma } from 'db';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { getPage, resolvePageTree } from 'lib/pages/server';

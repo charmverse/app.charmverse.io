@@ -5,14 +5,14 @@ export const proposalStatusTransitionRecord: Record<ProposalStatus, ProposalStat
   draft: ['private_draft', 'discussion'],
   discussion: ['private_draft', 'draft', 'review'],
   review: ['discussion', 'reviewed'],
-  reviewed: ['discussion'],
+  reviewed: ['vote_active', 'discussion'],
   vote_active: [],
   vote_closed: []
 };
 
 export const PROPOSAL_STATUS_LABELS: Record<ProposalStatus, string> = {
-  private_draft: 'Private draft',
-  draft: 'Draft',
+  private_draft: 'Private Draft',
+  draft: 'Public Draft',
   discussion: 'Discussion',
   review: 'In Review',
   reviewed: 'Reviewed',
@@ -39,6 +39,6 @@ export const proposalStatusTransitionPermission: Partial<Record<ProposalStatus, 
     reviewer: ['reviewed']
   },
   reviewed: {
-    author: ['discussion']
+    author: ['discussion', 'vote_active']
   }
 };

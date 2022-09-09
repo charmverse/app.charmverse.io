@@ -26,11 +26,14 @@ runs:
       id: cache_node_modules
       uses: actions/cache@v2
       with:
-        path: ./node_modules
-        key: node-modules-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch') }}
+        path: |
+          ./node_modules
+          /home/runner/.cache/ms-playwright
+        key: node-modules-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch') }}
 
     - name: Install npm dependencies
       shell: bash
       if: steps.cache_node_modules.outputs.cache-hit != 'true'
       run: |
         npm ci --no-audit --no-fund
+        npx playwright install chromium chrome --with-deps

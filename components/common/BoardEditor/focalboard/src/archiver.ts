@@ -1,5 +1,4 @@
-
-import { IAppWindow } from './types';
+import type { IAppWindow } from './types';
 import { ArchiveUtils, ArchiveHeader, ArchiveLine, BlockArchiveLine } from './blocks/archive';
 import { Block } from './blocks/block';
 import { Board } from './blocks/board';
