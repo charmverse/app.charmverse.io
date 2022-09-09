@@ -109,18 +109,21 @@ async function sendNotification (notification: PendingTasksProps) {
       data: {
         userId: notification.user.id,
         taskId: getGnosisSafeTaskId(task),
+        channel: 'email',
         type: 'multisig'
       }
     })), ...notification.voteTasks.map(voteTask => prisma.userNotification.create({
       data: {
         userId: notification.user.id,
         taskId: voteTask.id,
+        channel: 'email',
         type: 'vote'
       }
     })), ...notification.mentionedTasks.map(mentionedTask => prisma.userNotification.create({
       data: {
         userId: notification.user.id,
         taskId: mentionedTask.mentionId,
+        channel: 'email',
         type: 'mention'
       }
     }))]
