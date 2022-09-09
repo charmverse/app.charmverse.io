@@ -21,14 +21,14 @@ import { ProposalStatusChip } from '../../../../proposals/components/ProposalSta
 
 interface ProposalPropertiesProps {
   proposalId: string,
-  readOnly?: boolean
+  readOnly?: boolean,
+  refreshPage: () => void
 }
 
 const proposalStatuses = Object.keys(proposalStatusTransitionRecord);
 
-export default function ProposalProperties ({ proposalId, readOnly }: ProposalPropertiesProps) {
+export default function ProposalProperties ({ proposalId, readOnly, refreshPage }: ProposalPropertiesProps) {
   const { data: proposal, mutate: refreshProposal } = useSWR(`proposal/${proposalId}`, () => charmClient.proposals.getProposal(proposalId));
-
   const [contributors] = useContributors();
   const { roles = [], roleups } = useRoles();
   const { user } = useUser();
@@ -80,6 +80,7 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
   async function updateProposalStatus (newStatus: ProposalStatus) {
     await charmClient.proposals.updateStatus(proposalId, newStatus);
     refreshProposal();
+    refreshPage();
     proposalMenuState.close();
   }
 
@@ -141,11 +142,13 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
               onChange={async (_, _contributors) => {
                 // Must have atleast one author of proposal
                 if ((_contributors as Contributor[]).length !== 0) {
-                  await charmClient.proposals.updateProposal(proposal.id, {
+                  await charmClient.proposals.updateProposal({
+                    proposalId: proposal.id,
                     authors: (_contributors as Contributor[]).map(contributor => contributor.id),
                     reviewers: proposal.reviewers.map(reviewer => ({ group: reviewer.roleId ? 'role' : 'user', id: reviewer.roleId ?? reviewer.userId as string }))
                   });
                   refreshProposal();
+                  refreshPage();
                 }
               }}
               disabled={readOnly || !canUpdateAuthorsOrReviewers}
@@ -185,7 +188,8 @@ export default function ProposalProperties ({ proposalId, readOnly }: ProposalPr
                   disableCloseOnSelect={true}
                   excludedIds={proposal.reviewers.map(reviewer => (reviewer.roleId ?? reviewer.userId) as string)}
                   onChange={async (e, options) => {
-                    await charmClient.proposals.updateProposal(proposal.id, {
+                    await charmClient.proposals.updateProposal({
+                      proposalId: proposal.id,
                       authors: proposal.authors.map(author => author.userId),
                       reviewers: options.map(option => ({ group: option.group, id: option.id }))
                     });

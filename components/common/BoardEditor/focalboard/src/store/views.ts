@@ -2,7 +2,7 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { BoardView, createBoardView } from '../blocks/boardView';
 import { getCurrentBoard } from './boards';
-import { RootState } from './index';
+import type { RootState } from './index';
 import { initialLoad, initialReadOnlyLoad } from './initialLoad';
 
 type ViewsState = {

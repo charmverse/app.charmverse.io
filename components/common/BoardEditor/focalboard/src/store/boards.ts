@@ -1,7 +1,7 @@
 
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Board } from '../blocks/board';
-import { RootState } from './index';
+import type { RootState } from './index';
 import { initialLoad, initialReadOnlyLoad } from './initialLoad';
 
 type BoardsState = {

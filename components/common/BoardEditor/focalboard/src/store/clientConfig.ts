@@ -5,7 +5,7 @@ import { ClientConfig } from '../config/clientConfig';
 
 import { default as client } from '../octoClient';
 
-import { RootState } from './index';
+import type { RootState } from './index';
 
 export const fetchClientConfig = createAsyncThunk(
   'clientConfig/fetchClientConfig',
