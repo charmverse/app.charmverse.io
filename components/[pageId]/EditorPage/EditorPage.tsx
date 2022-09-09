@@ -54,7 +54,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
       setCurrentPageId('');
     };
 
-  }, [pageId, pagesLoaded, space, user]);
+  }, [pageId, currentPageId, pagesLoaded, space, user]);
 
   const debouncedPageUpdate = debouncePromise(async (updates: Partial<Page>) => {
     setIsEditing(true);
