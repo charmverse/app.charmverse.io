@@ -1,65 +1,40 @@
+import ForumIcon from '@mui/icons-material/Forum';
 import { Alert, Button, Card, Grid, Link, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { ProposalTask } from 'lib/proposal/interface';
 import { GetTasksResponse } from 'pages/api/tasks/list';
-import ForumIcon from '@mui/icons-material/Forum';
 import { KeyedMutator } from 'swr';
-import { ExtendedProposal } from 'lib/proposal/interface';
-import { useUser } from 'hooks/useUser';
-import { useContributors } from 'hooks/useContributors';
-import useRoles from 'hooks/useRoles';
+
+const ProposalActionRecord: Record<ProposalTask['action'], string> = {
+  discuss: 'Discuss',
+  move_to_discussion: 'Move to discussion',
+  review: 'Review',
+  start_vote: 'Start vote',
+  vote: 'Vote'
+};
 
 /**
  * Page only needs to be provided for proposal type proposals
  */
 export function ProposalTasksListRow (
-  props: {proposalTask: ExtendedProposal}
+  props: {proposalTask: ProposalTask}
 ) {
   const {
     proposalTask
   } = props;
-  const { user } = useUser();
-  const { roleups } = useRoles();
 
   const {
-    page: { path: pagePath, title: pageTitle },
-    space: { domain: spaceDomain, name: spaceName },
+    spaceDomain,
+    pagePath,
+    spaceName,
+    pageTitle,
+    action,
     id
   } = proposalTask;
 
   const proposalLink = `/${spaceDomain}/${pagePath}?proposalId=${id}`;
   const proposalLocation = `${pageTitle || 'Untitled'} in ${spaceName}`;
-
-  const isProposalAuthor = (user && proposalTask.authors.some(author => author.userId === user.id));
-  const isProposalReviewer = (user && (proposalTask.reviewers.some(reviewer => {
-    if (reviewer.userId) {
-      return reviewer.userId === user.id;
-    }
-    return roleups.some(role => role.id === reviewer.roleId && role.users.some(_user => _user.id === user.id));
-  })));
-
-  let buttonLabel = '';
-
-  if (isProposalAuthor) {
-    if (proposalTask.status.match('draft')) {
-      buttonLabel = 'Discussion';
-    }
-    else if (proposalTask.status === 'reviewed') {
-      buttonLabel = 'Start vote';
-    }
-  }
-  else if (isProposalReviewer) {
-    if (proposalTask.status === 'review') {
-      buttonLabel = 'Review';
-    }
-  }
-  else if (proposalTask.status === 'discussion') {
-    buttonLabel = 'Discuss';
-  }
-
-  if (proposalTask.status === 'vote_active') {
-    buttonLabel = 'Vote';
-  }
 
   return (
     <Box>
@@ -87,7 +62,7 @@ export function ProposalTasksListRow (
             item
             xs={12}
             sm={12}
-            md={4}
+            md={3}
             sx={{
               fontSize: { xs: 14, sm: 'inherit' }
             }}
@@ -100,11 +75,11 @@ export function ProposalTasksListRow (
             item
             xs={12}
             sm={2}
-            md={1}
+            md={2}
           >
             <Button onClick={() => {
             }}
-            >{buttonLabel}
+            >{ProposalActionRecord[action]}
             </Button>
           </Grid>
         </Grid>

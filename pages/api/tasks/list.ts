@@ -7,7 +7,7 @@ import { getMentionedTasks, MentionedTasksGroup } from 'lib/mentions/getMentione
 import { getVoteTasks } from 'lib/votes/getVoteTasks';
 import { VoteTask } from 'lib/votes/interfaces';
 import { getProposalTasks } from 'lib/proposal/getProposalTasks';
-import { ExtendedProposal } from 'lib/proposal/interface';
+import { ProposalTask } from 'lib/proposal/interface';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -17,7 +17,7 @@ export interface GetTasksResponse {
   gnosis: GnosisSafeTasks[];
   mentioned: MentionedTasksGroup
   votes: VoteTask[]
-  proposals: ExtendedProposal[]
+  proposals: ProposalTask[]
 }
 
 async function getTasks (req: NextApiRequest, res: NextApiResponse<GetTasksResponse>) {
