@@ -13,7 +13,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { ProposalStatusChip } from './ProposalStatusBadge';
 import NoProposalsMessage from './NoProposalsMessage';
-import VoteActionsMenu from './ProposalActionsMenu';
+import ProposalActionsMenu from './ProposalActionsMenu';
 
 export default function ProposalsTable ({ proposals, mutateProposals }: { proposals?: (ProposalWithUsers)[], mutateProposals: () => void }) {
   const { pages, deletePage } = usePages();
@@ -98,7 +98,7 @@ export default function ProposalsTable ({ proposals, mutateProposals }: { propos
               </Tooltip>
             </Grid>
             <Grid item xs={1} display='flex' justifyContent='flex-end'>
-              <VoteActionsMenu
+              <ProposalActionsMenu
                 deleteProposal={deleteProposal}
                 editProposal={(proposalId) => openPage(proposalId)}
                 proposal={proposal}

@@ -2,12 +2,12 @@ import { DataNotFoundError } from 'lib/utilities/errors';
 import sortBy from 'lodash/sortBy';
 import { PageNode, PageNodeWithChildren, PageTreeMappingInput, TargetPageTree } from './interfaces';
 
-export const sortNodes = (nodes: Array<PageNode>) => {
+export function sortNodes <T> (nodes: PageNode<T>[]) {
   return [
     ...sortBy(nodes.filter(node => node.index >= 0), ['index', 'createdAt']),
     ...sortBy(nodes.filter(node => node.index < 0), ['createdAt'])
   ];
-};
+}
 
 /**
  * @targetPageId If provided, the only root node returned will be the one whose child tree contains the target page ID
@@ -59,7 +59,7 @@ export function reducePagesToPageTree<
 
     if (parentNode && includableNode(node)) {
       parentNode.children.push(node);
-      parentNode.children = sortNodes(parentNode.children) as PageNodeWithChildren<T>[];
+      parentNode.children = sortNodes(parentNode.children);
     }
     // If it's a root page always show it
     else if ((node.parentId === null) && !rootPageIds && includableNode(node)) {
@@ -73,7 +73,7 @@ export function reducePagesToPageTree<
 
   return {
     itemMap: map,
-    rootNodes: sortNodes(roots) as PageNodeWithChildren<T>[],
+    rootNodes: sortNodes(roots),
     itemsWithChildren: tempItems
   };
 
@@ -86,7 +86,7 @@ export function mapPageTree<
 T extends PageNode = PageNode> ({ items, rootPageIds, includeDeletedPages, includeProposals = false }: Omit<PageTreeMappingInput<T>, 'targetPageId' | 'includeCards'>): PageNodeWithChildren<T>[] {
   const { rootNodes } = reducePagesToPageTree({ items, rootPageIds, includeCards: false, includeDeletedPages, includeProposals });
 
-  return sortNodes(rootNodes) as PageNodeWithChildren<T>[];
+  return sortNodes(rootNodes);
 }
 
 /**

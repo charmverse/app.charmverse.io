@@ -5,7 +5,7 @@ import { CommentBlock } from '../blocks/commentBlock';
 
 import { initialLoad, initialReadOnlyLoad } from './initialLoad';
 
-import { RootState } from './index';
+import type { RootState } from './index';
 
 const commentsSlice = createSlice({
   name: 'comments',

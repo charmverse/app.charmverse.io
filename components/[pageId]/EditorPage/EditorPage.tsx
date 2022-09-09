@@ -5,6 +5,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
+import { findParentOfType } from 'lib/pages/findParentOfType';
 import debouncePromise from 'lib/utilities/debouncePromise';
 import log from 'loglevel';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -21,6 +22,8 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
   const currentPagePermissions = getPagePermissions(pageId);
 
   const pagesLoaded = Object.keys(pages).length > 0;
+
+  const parentProposalId = findParentOfType({ pageId, pageType: 'proposal', pageMap: pages });
 
   useEffect(() => {
     async function main () {
@@ -127,6 +130,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
         <DocumentPage
           page={memoizedCurrentPage}
           setPage={setPage}
+          parentProposalId={parentProposalId}
         />
       );
     }

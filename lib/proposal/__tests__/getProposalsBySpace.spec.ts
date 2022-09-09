@@ -1,9 +1,8 @@
-import { User, Space } from '@prisma/client';
+import { Space, User } from '@prisma/client';
+import { prisma } from 'db';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { createProposalWithUsers, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
-import { prisma } from 'db';
-import isEqual from 'lodash/isEqual';
 import { getProposalsBySpace } from '../getProposalsBySpace';
 
 let accessibleSpaceUser1: User;
@@ -82,9 +81,10 @@ describe('Get all proposals of a space', () => {
       spaceId: accessibleSpace.id
     });
 
-    expect(isEqual(adminAccessibleProposals.map(adminAccessibleProposal => adminAccessibleProposal.id), [
-      accessibleSpacePageProposal1.id,
-      accessibleSpacePageProposal2.id
-    ])).toBe(true);
+    expect(adminAccessibleProposals.length).toBe(2);
+
+    expect(adminAccessibleProposals.some(p => p.id === accessibleSpacePageProposal1.id)).toBe(true);
+    expect(adminAccessibleProposals.some(p => p.id === accessibleSpacePageProposal2.id)).toBe(true);
+
   });
 });

@@ -3,7 +3,7 @@ import charmClient from 'charmClient';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import useRefState from 'hooks/useRefState';
 import { Block } from 'lib/focalboard/block';
-import { IPageWithPermissions } from 'lib/pages';
+import { IPageWithPermissions, PagesMap } from 'lib/pages';
 import { IPagePermissionFlags, PageOperationType } from 'lib/permissions/pages';
 import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 import { permissionTemplates } from 'lib/permissions/pages/page-permission-mapping';
@@ -18,8 +18,6 @@ import useIsAdmin from './useIsAdmin';
 import { useUser } from './useUser';
 
 export type LinkedPage = (Page & {children: LinkedPage[], parent: null | LinkedPage});
-
-export type PagesMap = Record<string, IPageWithPermissions | undefined>;
 
 export type PagesContext = {
   currentPageId: string,
@@ -127,13 +125,13 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     const page = pages[pageId];
     const totalNonArchivedPages = Object.values(pages).filter((p => p?.deletedAt === null && (p?.type === 'page' || p?.type === 'board'))).length;
 
-    if (page && user && space) {
+    if (page && user && currentSpace) {
       const { pageIds } = await charmClient.archivePage(page.id);
       let newPage: null | IPageWithPermissions = null;
       if (totalNonArchivedPages - pageIds.length === 0 && pageIds.length !== 0) {
         newPage = await charmClient.createPage(untitledPage({
           userId: user.id,
-          spaceId: space.id
+          spaceId: currentSpace.id
         }));
       }
 
