@@ -1,9 +1,11 @@
-import { User, Space } from '@prisma/client';
+import { User, Space, ProposalStatus } from '@prisma/client';
 import { createProposalWithUsers, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
+import { getPage, IPageWithPermissions } from 'lib/pages/server';
 import { updateProposal } from '../updateProposal';
 import { ProposalWithUsers } from '../interface';
+import { proposalPermissionMapping } from '../syncProposalPermissions';
 
 let author1: User;
 let author2: User;
@@ -89,7 +91,7 @@ describe('Update proposal specific data', () => {
     expect(proposalAuthor2).toBeTruthy();
   });
 
-  it('Should throw error if atleast one author is not selected for a proposal', async () => {
+  it('Should throw error if at least one author is not selected for a proposal', async () => {
     // Create a test proposal first
     const pageWithProposal = await createProposalWithUsers({
       spaceId: space.id,
@@ -108,5 +110,52 @@ describe('Update proposal specific data', () => {
         id: reviewer1.id
       }]
     })).rejects.toBeInstanceOf(InvalidStateError);
+  });
+
+  it('Should assign the correct permissions when updating proposal authors and reviewers', async () => {
+
+    const status: ProposalStatus = 'discussion';
+
+    // Create a test proposal first
+    const pageWithProposal = await createProposalWithUsers({
+      spaceId: space.id,
+      proposalStatus: status,
+      userId: author1.id,
+      authors: [],
+      reviewers: []
+    });
+
+    const proposal = await updateProposal({
+      proposalId: pageWithProposal.proposalId as string,
+      authors: [author1.id, author2.id],
+      reviewers: [{
+        group: 'user',
+        id: reviewer1.id
+      }]
+    });
+
+    const { permissions } = await getPage(proposal.id) as IPageWithPermissions;
+
+    const permissionTemplate = proposalPermissionMapping[status];
+
+    if (permissionTemplate.author) {
+      // Check all authors have a permission
+      proposal.authors.forEach((author) => {
+        if (author.userId) {
+          expect(permissions.some(p => p.userId === author.userId && p.permissionLevel === permissionTemplate.author)).toBe(true);
+        }
+      });
+    }
+
+    if (permissionTemplate.reviewer) {
+      proposal.reviewers.forEach((reviewer) => {
+        expect(permissions.some(p => (reviewer.userId ? p.userId === reviewer.userId : p.roleId === reviewer.roleId)
+        && p.permissionLevel === permissionTemplate.author)).toBe(true);
+      });
+    }
+
+    if (permissionTemplate.community) {
+      expect(permissions.some(p => p.spaceId === proposal.spaceId && p.permissionLevel === permissionTemplate.community)).toBe(true);
+    }
   });
 });

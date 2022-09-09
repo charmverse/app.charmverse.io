@@ -135,7 +135,11 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
         />
         <ListItemText primary='View votes' />
       </ListItemButton>
-      <PublishToSnapshot page={basePage as Page} />
+      {basePage && (
+        <ListItemButton>
+          <PublishToSnapshot pageId={basePage.id} />
+        </ListItemButton>
+      )}
       <Divider />
       <ListItemButton onClick={() => {
         setCurrentPageActionDisplay('comments');

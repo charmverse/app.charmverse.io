@@ -14,15 +14,16 @@ export async function updateProposalStatus ({
   userId: string
   newStatus: ProposalStatus,
   proposal: ProposalWithUsers | string
-}) {
+}): Promise<ProposalWithUsers> {
 
   if (typeof proposal === 'string') {
     proposal = await prisma.proposal.findUnique({
       where: {
         id: proposal
       },
-      select: {
-        status: true
+      include: {
+        authors: true,
+        reviewers: true
       }
     }) as ProposalWithUsers;
   }
@@ -74,18 +75,32 @@ export async function updateProposalStatus ({
     throw new InvalidStateError();
   }
 
-  const [deleteArgs, createArgs] = await generateSyncProposalPermissions({ proposalId });
-
-  return prisma.$transaction([
-    prisma.proposal.update({
+  await prisma.$transaction(async () => {
+    await prisma.proposal.update({
       where: {
         id: proposalId
       },
       data: {
         status: newStatus
       }
-    }),
-    prisma.pagePermission.deleteMany(deleteArgs),
-    ...createArgs.map(arg => prisma.pagePermission.create(arg))
-  ]).then(tx => tx[0]);
+    });
+
+    const [deleteArgs, createArgs] = await generateSyncProposalPermissions({ proposalId });
+
+    await prisma.pagePermission.deleteMany(deleteArgs);
+
+    for (const arg of createArgs) {
+      await prisma.pagePermission.create(arg);
+    }
+  });
+
+  return prisma.proposal.findUnique({
+    where: {
+      id: proposalId
+    },
+    include: {
+      authors: true,
+      reviewers: true
+    }
+  }) as Promise<ProposalWithUsers>;
 }
