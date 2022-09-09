@@ -9,7 +9,7 @@ import { createBoard } from './blocks/board';
 import { createBoardView } from './blocks/boardView';
 import { createCard } from './blocks/card';
 import { createCommentBlock } from './blocks/commentBlock';
-import { IAppWindow } from './types';
+import type {IAppWindow} from './types';
 
 declare let window: IAppWindow;
 

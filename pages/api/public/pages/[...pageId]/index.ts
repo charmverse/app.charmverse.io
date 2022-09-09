@@ -216,9 +216,9 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
     const linkedPageIds: string[] = [];
     recurse(page?.content as PageContent, (node) => {
       // Checking if all the mention attributes exist or not, and continue only if they exist
-      if (node.type === 'inlineDatabase' && node.attrs) {
+      if (node?.type === 'inlineDatabase' && node?.attrs) {
         // Some pageids are null
-        if (node.attrs.pageId) {
+        if (node?.attrs.pageId) {
           linkedPageIds.push(node.attrs.pageId);
         }
       }

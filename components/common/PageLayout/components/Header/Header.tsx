@@ -31,6 +31,7 @@ import { useRouter } from 'next/router';
 import { useRef, useState, ReactNode } from 'react';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import ShareButton from './components/ShareButton';
 import BountyShareButton from './components/BountyShareButton/BountyShareButton';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
@@ -135,7 +136,11 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
         />
         <ListItemText primary='View votes' />
       </ListItemButton>
-      <PublishToSnapshot page={basePage as Page} />
+      {basePage && (
+        <ListItemButton>
+          <PublishToSnapshot pageId={basePage.id} />
+        </ListItemButton>
+      )}
       <Divider />
       <ListItemButton onClick={() => {
         setCurrentPageActionDisplay('comments');

@@ -1,7 +1,7 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import { RootState } from './index';
+import type { RootState } from './index';
 
 const searchTextSlice = createSlice({
   name: 'searchText',
