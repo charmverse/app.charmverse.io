@@ -56,25 +56,23 @@ export interface ProposalPermissionsSync {
  */
 export async function generateSyncProposalPermissions ({ proposalId }: ProposalPermissionsSync):
   Promise<[Prisma.PagePermissionDeleteManyArgs, Prisma.PagePermissionCreateArgs[]]> {
-  const [page, proposal] = await Promise.all([
-    prisma.page.findUnique({
-      where: {
-        proposalId
-      },
-      include: {
-        permissions: true
+  const queryResult = await prisma.page.findUnique({
+    where: {
+      proposalId
+    },
+    include: {
+      permissions: true,
+      proposal: {
+        include: {
+          authors: true,
+          reviewers: true
+        }
       }
-    }),
-    prisma.proposal.findUnique({
-      where: {
-        id: proposalId
-      },
-      include: {
-        authors: true,
-        reviewers: true
-      }
-    })
-  ]);
+    }
+  });
+
+  const page = queryResult;
+  const proposal = queryResult?.proposal;
 
   if (!proposal || !page) {
     throw new Error(`Proposal or page with id ${proposalId} not found`);
@@ -150,9 +148,11 @@ export async function generateSyncProposalPermissions ({ proposalId }: ProposalP
       }) : undefined;
 
       // If author is also a reviewer, only assign a permission if this is higher
-      if (assignedAuthor && comparePermissionLevels({
-        base: assignedAuthor.data.permissionLevel as PagePermissionLevel, comparison: reviewerPermissionSetting }) === 'more'
-      ) {
+      const isHigherPermissionLevel = assignedAuthor && comparePermissionLevels({
+        base: assignedAuthor.data.permissionLevel as PagePermissionLevel, comparison: reviewerPermissionSetting
+      }) === 'more';
+
+      if (isHigherPermissionLevel) {
         assignedAuthor.data.permissionLevel = reviewerPermissionSetting;
       }
       else if (!assignedAuthor) {
