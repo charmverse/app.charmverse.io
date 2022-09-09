@@ -11,12 +11,16 @@ export const StyledRow = styled(Box)`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  .row-actions {
-    opacity: 0;
-  }
-  &:hover {
+
+  // disable hover UX on ios which converts first click to a hover event
+  @media (pointer: fine) {
     .row-actions {
-      opacity: 1;
+      opacity: 0;
+    }
+    &:hover {
+      .row-actions {
+        opacity: 1;
+      }
     }
   }
 `;

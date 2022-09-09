@@ -25,7 +25,11 @@ interface ProfileItemProps {
 
 export const ProfileItemContainer = styled(({ visible, ...props }: any) => <Stack {...props} />)<{ visible: boolean }>`
 
-  opacity: ${({ visible }) => (visible ? 1 : 0.25)};
+  .hidden-on-visible {
+    opacity: ${({ visible }) => (visible ? 1 : 0.25)};
+    transition: ${({ theme }) => `${theme.transitions.duration.short}ms opacity ${theme.transitions.easing.easeInOut}`};
+  }
+
   border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
   padding-bottom: ${({ theme }) => theme.spacing(2)};
 
@@ -38,7 +42,6 @@ export const ProfileItemContainer = styled(({ visible, ...props }: any) => <Stac
     transition: ${({ theme }) => `${theme.transitions.duration.short}ms opacity ${theme.transitions.easing.easeInOut}`};
   }
 
-  transition: ${({ theme }) => `${theme.transitions.duration.short}ms opacity ${theme.transitions.easing.easeInOut}`};
 `;
 
 export default function CollectibleRow ({ onClick, collectable, visible, showVisibilityIcon }: ProfileItemProps) {
@@ -49,12 +52,11 @@ export default function CollectibleRow ({ onClick, collectable, visible, showVis
       gap={2}
       flexDirection='row'
     >
-      {collectable.type === 'poap' ? (
-        <Link href={collectable.link} target='_blank' display='flex'>
-          <Avatar size='large' avatar={collectable.image} />
-        </Link>
-      ) : <Avatar isNft size='large' avatar={collectable.image} />}
+      <Link className='hidden-on-visible' href={collectable.link} target='_blank' display='flex'>
+        <Avatar size='large' isNft={collectable.type === 'nft'} avatar={collectable.image} />
+      </Link>
       <Stack
+        className='hidden-on-visible'
         justifyContent='center'
         flexGrow={1}
       >
@@ -77,27 +79,29 @@ export default function CollectibleRow ({ onClick, collectable, visible, showVis
         <Typography variant='subtitle2'>{showDateWithMonthAndYear(collectable.date) ?? '?'}</Typography>
       </Stack>
       {showVisibilityIcon && (
-        <IconButton
-          size='small'
-          className='action'
-          sx={{
-            opacity: {
-              md: 0,
-              sm: 1
-            }
-          }}
-          onClick={onClick}
-        >
-          {visible ? (
-            <Tooltip title={`Hide ${collectable.type.toUpperCase()} from profile`}>
-              <VisibilityIcon fontSize='small' />
-            </Tooltip>
-          ) : (
-            <Tooltip title={`Show ${collectable.type.toUpperCase()} in profile`}>
-              <VisibilityOffIcon fontSize='small' />
-            </Tooltip>
-          )}
-        </IconButton>
+        <Box display='flex' alignItems='center'>
+          <IconButton
+            size='small'
+            className='action'
+            sx={{
+              opacity: {
+                md: 0,
+                sm: 1
+              }
+            }}
+            onClick={onClick}
+          >
+            {visible ? (
+              <Tooltip title={`Hide ${collectable.type.toUpperCase()} from profile`}>
+                <VisibilityIcon fontSize='small' />
+              </Tooltip>
+            ) : (
+              <Tooltip title={`Show ${collectable.type.toUpperCase()} in profile`}>
+                <VisibilityOffIcon fontSize='small' />
+              </Tooltip>
+            )}
+          </IconButton>
+        </Box>
       )}
     </ProfileItemContainer>
   );

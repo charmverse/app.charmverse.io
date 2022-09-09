@@ -460,22 +460,6 @@ class Utils {
     return result;
   }
 
-  static isMobile (): boolean {
-    const toMatch = [
-      /Android/i,
-      /webOS/i,
-      /iPhone/i,
-      /iPad/i,
-      /iPod/i,
-      /BlackBerry/i,
-      /Windows Phone/i
-    ];
-
-    return toMatch.some((toMatchItem) => {
-      return navigator.userAgent.match(toMatchItem);
-    });
-  }
-
   static getBaseURL (absolute?: boolean): string {
     let baseURL = window.baseURL || '';
     baseURL = baseURL.replace(/\/+$/, '');

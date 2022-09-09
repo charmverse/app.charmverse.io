@@ -22,21 +22,21 @@ handler.get(getUserProfile);
 
 async function getUserProfile (req: NextApiRequest, res: NextApiResponse<PublicUser>) {
 
-  const { userPath } = req.query;
+  const { userId } = req.query;
 
-  if (typeof userPath !== 'string') {
+  if (typeof userId !== 'string') {
     throw new InvalidInputError('Please provide a valid user path');
   }
 
   // support lookup by user id or path
-  const condition = isUUID(userPath)
+  const condition = isUUID(userId)
     ? {
       OR: [
-        { id: userPath },
-        { path: userPath }
+        { id: userId },
+        { path: userId }
       ]
     }
-    : { path: userPath };
+    : { path: userId };
 
   const users = await prisma.user.findMany({
     where: condition,
@@ -47,7 +47,7 @@ async function getUserProfile (req: NextApiRequest, res: NextApiResponse<PublicU
   });
 
   // prefer match by user id
-  const userById = users.find(user => user.id === userPath) ?? users[0];
+  const userById = users.find(user => user.id === userId) ?? users[0];
 
   if (!userById) {
     throw new DataNotFoundError('User not found');

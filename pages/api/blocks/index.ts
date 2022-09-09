@@ -119,7 +119,7 @@ async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
           path: getPagePath(),
           title: cardBlock.title,
           icon: cardBlock.fields.icon,
-          type: 'card',
+          type: cardBlock.fields.isTemplate ? 'card_template' : 'card',
           headerImage: cardBlock.fields.headerImage,
           contentText: cardBlock.fields.contentText || '',
           parentId: cardBlock.parentId,

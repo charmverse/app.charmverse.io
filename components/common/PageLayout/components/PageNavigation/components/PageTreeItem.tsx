@@ -13,6 +13,7 @@ import Menu from '@mui/material/Menu';
 import ListItemButton from '@mui/material/ListItemButton';
 import Tooltip from '@mui/material/Tooltip';
 import { Page, PageType } from '@prisma/client';
+import { isTouchScreen } from 'lib/browser';
 import charmClient from 'charmClient';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
@@ -138,7 +139,6 @@ const PageAnchor = styled.a`
     gap: 4px;
     align-items: center;
     justify-content: center;
-    opacity: 0;
     position: absolute;
     bottom: 0px;
     top: 0px;
@@ -150,11 +150,18 @@ const PageAnchor = styled.a`
       width: 20px;
     }
   }
-  &:hover .page-actions {
-    opacity: 1;
-  }
-  &:hover .MuiTypography-root {
-    width: calc(60%);
+
+  // disable hover UX on ios which converts first click to a hover event
+  @media (pointer: fine) {
+    .page-actions {
+      opacity: 0;
+    }
+    &:hover .page-actions {
+      opacity: 1;
+    }
+    &:hover .MuiTypography-root {
+      width: calc(60%);
+    }
   }
 `;
 
@@ -168,7 +175,7 @@ interface PageLinkProps {
   showPicker?: boolean
 }
 
-export function PageLink ({ showPicker = true, children, href, label, labelIcon, pageType, pageId }: PageLinkProps) {
+export function PageLink ({ showPicker = !isTouchScreen(), children, href, label, labelIcon, pageType, pageId }: PageLinkProps) {
 
   const popupState = usePopupState({
     popupId: 'page-emoji',

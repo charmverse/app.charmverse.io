@@ -1,13 +1,12 @@
-import { useEffect } from 'react';
-import { Box, Card, Chip, Divider, Stack, Typography } from '@mui/material';
+import { Chip, Divider, Stack, Typography } from '@mui/material';
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { NftData, ExtendedPoap } from 'lib/blockchain/interfaces';
+import type { ExtendedPoap, NftData } from 'lib/blockchain/interfaces';
+import { useEffect } from 'react';
 import useSWRImmutable from 'swr/immutable';
 import AggregatedData from './components/AggregatedData';
-import CollablandCredentials from './components/CollablandCredentials';
-import CommunityRow, { CommunityDetails } from './components/CommunityRow';
 import CollectableRow, { Collectable } from './components/CollectibleRow';
+import CommunityRow, { CommunityDetails } from './components/CommunityRow';
 import UserDetails, { isPublicUser, UserDetailsProps } from './components/UserDetails';
 import { useCollablandCredentials } from './hooks/useCollablandCredentials';
 
@@ -149,10 +148,10 @@ export default function PublicProfile (props: UserDetailsProps) {
   const communities = (data?.communities ?? [])
     .filter((community) => readOnly ? !community.isHidden : true)
     .map((community) => {
-      return {
-        ...community,
-        bounties: bountyEvents.filter(event => event.subject.workspaceId === community.id)
-      };
+      community.bounties.forEach(bounty => {
+        bounty.hasCredential = bountyEvents.some((event) => event.subject.bountyId === bounty.bountyId);
+      });
+      return community;
     });
 
   const discordCommunities = (credentials?.discordEvents ?? []).map((credential): CommunityDetails => ({

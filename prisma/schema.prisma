@@ -9,16 +9,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum PageType {
-  board
-  bounty
-  page
-  card
-  proposal
-  inline_board
-  inline_linked_board
-}
-
 enum PermissionLevel {
   full_access
   editor
@@ -140,11 +130,6 @@ enum ProposalStatus {
   vote_closed
 }
 
-enum ProposalReviewerGroup {
-  role
-  user
-}
-
 model Space {
   id                          String                            @id @default(uuid()) @db.Uuid
   deletedAt                   DateTime?
@@ -192,6 +177,21 @@ model SpaceApiToken {
   @@unique([token, spaceId])
 }
 
+enum PageType {
+  board
+  board_template
+  bounty
+  bounty_template
+  page
+  page_template
+  card
+  card_template
+  proposal
+  proposal_template
+  inline_board
+  inline_linked_board
+}
+
 model Page {
   id                 String           @id @default(uuid()) @db.Uuid
   deletedAt          DateTime?
@@ -205,6 +205,7 @@ model Page {
   headerImage        String?
   icon               String?
   path               String
+  isTemplate         Boolean?         @default(false)
   parentId           String?          @db.Uuid
   spaceId            String           @db.Uuid
   type               PageType
@@ -331,6 +332,7 @@ model User {
   profileItems      ProfileItem[]
   proposalsAuthored ProposalAuthor[]
   proposalsReviewed ProposalReviewer[]
+  reviewedProposals Proposal[]
 }
 
 model UserNotificationState {
@@ -650,14 +652,17 @@ model Comment {
 }
 
 model Proposal {
-  id        String             @id @default(uuid()) @db.Uuid
-  createdBy String             @db.Uuid
-  spaceId   String             @db.Uuid
-  status    ProposalStatus
-  authors   ProposalAuthor[]
-  reviewers ProposalReviewer[]
-  space     Space              @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  page      Page?
+  id         String             @id @default(uuid()) @db.Uuid
+  createdBy  String             @db.Uuid
+  spaceId    String             @db.Uuid
+  status     ProposalStatus
+  authors    ProposalAuthor[]
+  reviewers  ProposalReviewer[]
+  space      Space              @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  page       Page?
+  reviewedBy String?            @db.Uuid
+  reviewer   User?              @relation(fields: [reviewedBy], references: [id], onDelete: Cascade)
+  reviewedAt DateTime?
 }
 
 model ProposalAuthor {

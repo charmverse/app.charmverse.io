@@ -64,7 +64,7 @@ describe('GET /api/proposals/[id] - Get proposal', () => {
       id: expect.any(String),
       spaceId: space.id,
       createdBy: author.id,
-      status: 'draft',
+      status: 'private_draft',
       authors: expect.arrayContaining([
         expect.objectContaining({
           proposalId: pageWithProposal.proposalId,
@@ -106,7 +106,7 @@ describe('GET /api/proposals/[id] - Get proposal', () => {
 
     (await request(baseUrl)
       .get(`/api/proposals/${pageWithProposal.proposalId}`)
-      .set('Cookie', authorCookie)
+      .set('Cookie', reviewerCookie)
       .expect(404));
   });
 });

@@ -32,6 +32,12 @@ interface CustomColors extends FocalBoardColors, Record<BrandColor, any> {
   },
   emoji: {
     hoverBackground: string
+  },
+  templateBanner: {
+    background: string;
+    text: string;
+    highlightedText: string;
+    fontSize: string;
   }
 }
 
@@ -52,6 +58,7 @@ declare module '@mui/material/styles/createPalette' {
     twitter: Palette['primary'];
     white: Palette['primary'];
     quoteMarker: Palette['primary'];
+
   }
   interface TypeBackground {
     light: string
@@ -207,6 +214,13 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       },
       quoteMarker: {
         main: mode === 'dark' ? '#F3EFF5' : '#111111'
+      },
+      templateBanner: {
+        background: mode === 'dark' ? '#373C3F' : '#FBF8F3',
+        // Slightly transparent text
+        text: mode === 'dark' ? '#FFFFFF70' : '#37352FA6',
+        highlightedText: mode === 'dark' ? '#FFFFFFCF' : '#37352F',
+        fontSize: '14px'
       },
       ...(mode === 'dark' ? darkThemeFocalBoard : lightThemeFocalBoard)
     },
