@@ -24,6 +24,7 @@ export async function markTasks (tasks: MarkTask[], userId: string) {
     await prisma.userNotification.createMany({
       data: tasksNotNotified.map(task => ({
         taskId: task.id,
+        channel: 'webapp',
         type: task.type,
         userId,
         createdAt: new Date()

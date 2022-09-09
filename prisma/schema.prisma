@@ -42,6 +42,11 @@ enum VoteType {
   SingleChoice
 }
 
+enum NotificationChannel {
+  email
+  webapp
+}
+
 enum NotificationType {
   multisig
   mention
@@ -343,11 +348,12 @@ model UserNotificationState {
 }
 
 model UserNotification {
-  taskId    String           @unique
-  createdAt DateTime         @default(now())
-  userId    String           @db.Uuid
+  taskId    String               @unique
+  createdAt DateTime             @default(now())
+  userId    String               @db.Uuid
   type      NotificationType
-  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  channel   NotificationChannel?
+  user      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([taskId, userId])
 }
