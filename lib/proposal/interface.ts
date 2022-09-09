@@ -11,11 +11,6 @@ export interface ProposalWithUsers extends Proposal {
   reviewers: ProposalReviewer[]
 }
 
-export interface ExtendedProposal extends ProposalWithUsers {
-  space: Space
-  page: Page
-}
-
 export interface ProposalTask {
   id: string
   action: 'move_to_discussion' | 'start_vote' | 'review' | 'discuss' | 'vote'
