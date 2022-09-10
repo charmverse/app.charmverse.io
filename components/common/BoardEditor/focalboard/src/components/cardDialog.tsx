@@ -67,8 +67,6 @@ const CardDialog = (props: Props): JSX.Element | null => {
     }
   }, []);
 
-  console.log('Readinly card', readonly)
-
   return card && pages[card.id] ? (
     <>
       <PageDialog
