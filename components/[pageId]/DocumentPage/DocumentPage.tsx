@@ -53,9 +53,10 @@ export interface DocumentPageProps {
 }
 
 function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentProposalId }: DocumentPageProps) {
-  const { pages, getPagePermissions, refreshPage } = usePages();
+  const { pages, getPagePermissions } = usePages();
   const { cancelVote, castVote, deleteVote, votes, isLoading } = useVotes();
   const pagePermissions = getPagePermissions(page.id);
+
   const { draftBounty } = useBounties();
   // Only populate bounty permission data if this is a bounty page
   const [bountyPermissions, setBountyPermissions] = useState<AssignedBountyPermissions | null>(null);

@@ -16,6 +16,7 @@ import CardDialog from 'components/common/BoardEditor/focalboard/src/components/
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import { silentlyUpdateURL } from 'lib/browser';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
+import { usePages } from 'hooks/usePages';
 /**
  *
  * For the original version of this file, see src/boardPage.tsx in focalboard
@@ -27,14 +28,18 @@ interface Props {
   setPage: (p: Partial<Page>) => void;
 }
 
-export default function BoardPage ({ page, setPage, readOnly }: Props) {
+export default function BoardPage ({ page, setPage, readOnly = false }: Props) {
   const router = useRouter();
   const board = useAppSelector(getCurrentBoard);
+  const { getPagePermissions } = usePages();
   const activeView = useAppSelector(getView(router.query.viewId as string));
   const boardViews = useAppSelector(getCurrentBoardViews);
   const clientConfig = useAppSelector(getClientConfig);
   const dispatch = useAppDispatch();
   const [shownCardId, setShownCardId] = useState(router.query.cardId);
+  const pagePermissions = getPagePermissions(page.id);
+
+  const readOnlyBoard = readOnly || !pagePermissions?.edit_content;
 
   useEffect(() => {
     const boardId = page.boardId;
@@ -65,7 +70,7 @@ export default function BoardPage ({ page, setPage, readOnly }: Props) {
   // load initial data for readonly boards - otherwise its loaded in _app.tsx
   // inline linked board will be loaded manually
   useEffect(() => {
-    if (readOnly && page.boardId && page.type !== 'inline_linked_board') {
+    if (readOnlyBoard && page.boardId && page.type !== 'inline_linked_board') {
       dispatch(initialReadOnlyLoad(page.boardId));
     }
   }, [page.boardId]);
@@ -120,7 +125,7 @@ export default function BoardPage ({ page, setPage, readOnly }: Props) {
         <div className='focalboard-body full-page'>
           <CenterPanel
             clientConfig={clientConfig}
-            readonly={Boolean(readOnly)}
+            readonly={Boolean(readOnlyBoard)}
             board={board}
             setPage={setPage}
             showCard={showCard}
@@ -134,7 +139,7 @@ export default function BoardPage ({ page, setPage, readOnly }: Props) {
                 cardId={shownCardId}
                 onClose={() => showCard(undefined)}
                 showCard={(cardId) => showCard(cardId)}
-                readonly={Boolean(readOnly)}
+                readonly={readOnly}
               />
             </RootPortal>
           )}
