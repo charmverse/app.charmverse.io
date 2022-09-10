@@ -4,6 +4,7 @@ import { PageType } from '@prisma/client';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { IPagePermissionFlags } from 'lib/permissions/pages';
 import { SubMenu } from '../@bangle.dev/react-menu/floating-menu';
 import { LinkSubMenu } from '../@bangle.dev/react-menu/LinkSubMenu';
 import { Menu } from '../@bangle.dev/react-menu/Menu';
@@ -20,27 +21,25 @@ interface Props {
   pluginKey: PluginKey;
   inline?: boolean;
   pageType?: PageType;
-  pageId?: string;
+  pagePermissions?: IPagePermissionFlags;
 }
 
 export default function FloatingMenuComponent (
   {
-    pageId, pluginKey, enableComments = true, enableVoting = false, inline = false, pageType }: Props
+    pluginKey, enableComments = true, enableVoting = false, inline = false, pageType, pagePermissions }: Props
 
 ) {
   const { showMessage } = useSnackbar();
-  const { getPagePermissions } = usePages();
-  const permissions = pageId ? getPagePermissions(pageId) : null;
   const [currentUserPermissions] = useCurrentSpacePermissions();
-  const displayInlineCommentButton = !inline && permissions?.comment && enableComments && pageType !== 'card_template';
+  const displayInlineCommentButton = !inline && pagePermissions?.comment && enableComments && pageType !== 'card_template';
 
-  const displayInlineVoteButton = !inline && permissions?.comment && currentUserPermissions?.createVote && enableVoting && pageType !== 'card_template';
+  const displayInlineVoteButton = !inline && pagePermissions?.comment && currentUserPermissions?.createVote && enableVoting && pageType !== 'card_template';
   return (
     <FloatingMenu
       menuKey={pluginKey}
       renderMenuType={(menuType) => {
         const { type } = menuType as {type: SubMenu};
-        if (type as FloatingMenuVariant === 'commentOnlyMenu' && permissions?.comment) {
+        if (type as FloatingMenuVariant === 'commentOnlyMenu' && pagePermissions?.comment) {
           return (
             <Menu>
               <InlineCommentButton enableComments menuKey={pluginKey} />

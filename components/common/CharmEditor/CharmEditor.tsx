@@ -33,6 +33,7 @@ import { useUser } from 'hooks/useUser';
 import { silentlyUpdateURL } from 'lib/browser';
 import { extractDeletedThreadIds } from 'lib/inline-comments/extractDeletedThreadIds';
 import log from 'lib/log';
+import { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
 import debounce from 'lodash/debounce';
 import { PageContent } from 'models';
 import { CSSProperties, memo, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
@@ -312,6 +313,7 @@ interface CharmEditorProps {
   pageId: string;
   containerWidth?: number;
   pageType?: PageType;
+  pagePermissions?: IPagePermissionFlags;
 }
 
 export function convertPageContentToMarkdown (content: PageContent, title?: string): string {
@@ -346,7 +348,8 @@ function CharmEditor (
     enableVoting,
     pageId,
     containerWidth,
-    pageType
+    pageType,
+    pagePermissions
   }:
   CharmEditorProps
 ) {
@@ -569,7 +572,7 @@ function CharmEditor (
         enableVoting={enableVoting}
         pluginKey={floatingMenuPluginKey}
         pageType={pageType}
-        pageId={pageId}
+        pagePermissions={pagePermissions}
       />
       <MentionSuggest pluginKey={mentionPluginKey} />
       <NestedPagesList pluginKey={nestedPagePluginKey} />
