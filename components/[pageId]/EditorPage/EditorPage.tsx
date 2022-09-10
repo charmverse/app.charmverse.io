@@ -28,7 +28,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
   useEffect(() => {
     async function main () {
       setIsAccessDenied(false);
-      if (pageId && currentPageId && pagesLoaded && space && pageId !== currentPageId) {
+      if (pageId && pagesLoaded && space) {
         try {
           const page = await charmClient.getPage(pageId, space.id);
           if (page) {
@@ -58,7 +58,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
       setCurrentPageId('');
     };
 
-  }, [pageId, currentPageId, pagesLoaded, space, user]);
+  }, [pageId, pagesLoaded, space, user]);
 
   const debouncedPageUpdate = debouncePromise(async (updates: Partial<Page>) => {
     setIsEditing(true);
