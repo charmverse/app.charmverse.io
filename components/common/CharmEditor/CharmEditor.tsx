@@ -309,7 +309,7 @@ interface CharmEditorProps {
   pageActionDisplay?: IPageActionDisplayContext['currentPageActionDisplay']
   disablePageSpecificFeatures?: boolean;
   enableVoting?: boolean;
-  pageId?: string | null;
+  pageId: string;
   containerWidth?: number;
   pageType?: PageType;
 }
@@ -569,6 +569,7 @@ function CharmEditor (
         enableVoting={enableVoting}
         pluginKey={floatingMenuPluginKey}
         pageType={pageType}
+        pageId={pageId}
       />
       <MentionSuggest pluginKey={mentionPluginKey} />
       <NestedPagesList pluginKey={nestedPagePluginKey} />
