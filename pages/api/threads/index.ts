@@ -19,8 +19,7 @@ async function startThread (req: NextApiRequest, res: NextApiResponse<ThreadWith
 
   const permissionSet = await computeUserPagePermissions({
     pageId,
-    userId,
-    allowAdminBypass: false
+    userId
   });
 
   if (!permissionSet.comment) {
