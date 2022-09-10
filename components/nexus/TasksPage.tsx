@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { useTheme } from '@emotion/react';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import { useUser } from 'hooks/useUser';
+import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import GnosisTasksList from './GnosisTasksList';
 import MentionedTasksList from './MentionedTasksList';
 import TasksPageHeader from './TasksPageHeader';
@@ -51,7 +52,7 @@ const TASK_TABS = [
   // { icon: <BountyIcon />, label: 'Bounty', type: 'bounty' },
   { icon: <HowToVoteIcon />, label: 'Poll', type: 'vote' },
   { icon: <ForumIcon />, label: 'Discussion', type: 'discussion' },
-  { icon: <ForumIcon />, label: 'Proposal', type: 'proposal' }
+  { icon: <TaskOutlinedIcon />, label: 'Proposal', type: 'proposal' }
 ] as const;
 
 type TaskType = (typeof TASK_TABS)[number]['type'];

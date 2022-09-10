@@ -1,10 +1,10 @@
-import ForumIcon from '@mui/icons-material/Forum';
 import { Alert, Button, Card, Grid, Link, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ProposalTask } from 'lib/proposal/interface';
 import { GetTasksResponse } from 'pages/api/tasks/list';
 import { KeyedMutator } from 'swr';
+import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 
 const ProposalActionRecord: Record<ProposalTask['action'], string> = {
   discuss: 'Discuss',
@@ -117,7 +117,7 @@ export default function ProposalTasksList ({
     return (
       <Card variant='outlined'>
         <Box p={3} textAlign='center'>
-          <ForumIcon />
+          <TaskOutlinedIcon />
           <Typography color='secondary'>You don't have any proposals right now</Typography>
         </Box>
       </Card>
