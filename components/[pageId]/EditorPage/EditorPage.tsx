@@ -28,7 +28,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
   useEffect(() => {
     async function main () {
       setIsAccessDenied(false);
-      if (pageId && pagesLoaded && space && pageId !== currentPageId) {
+      if (pageId && pagesLoaded && space) {
         try {
           const page = await charmClient.getPage(pageId, space.id);
           if (page) {
