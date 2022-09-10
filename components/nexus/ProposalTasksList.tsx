@@ -5,6 +5,7 @@ import { ProposalTask } from 'lib/proposal/interface';
 import { GetTasksResponse } from 'pages/api/tasks/list';
 import { KeyedMutator } from 'swr';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
+import { ProposalStatusChip } from 'components/proposals/components/ProposalStatusBadge';
 
 const ProposalActionRecord: Record<ProposalTask['action'], string> = {
   discuss: 'Discuss',
@@ -30,7 +31,8 @@ export function ProposalTasksListRow (
     spaceName,
     pageTitle,
     action,
-    id
+    id,
+    status
   } = proposalTask;
 
   const proposalLink = `/${spaceDomain}/${pagePath}?proposalId=${id}`;
@@ -44,7 +46,7 @@ export function ProposalTasksListRow (
             item
             xs={12}
             sm={12}
-            md={4}
+            md={3}
             sx={{
               overflow: 'hidden',
               whiteSpace: 'nowrap',
@@ -67,9 +69,12 @@ export function ProposalTasksListRow (
               fontSize: { xs: 14, sm: 'inherit' }
             }}
           >
-            <Link href={proposalLink}>
+            <Link href={proposalLink} justifyContent='center' display='flex'>
               {proposalLocation}
             </Link>
+          </Grid>
+          <Grid item md={3}>
+            <ProposalStatusChip status={status} />
           </Grid>
           <Grid
             item
