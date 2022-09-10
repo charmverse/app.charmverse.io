@@ -20,7 +20,7 @@ interface Props {
   pluginKey: PluginKey;
   inline?: boolean;
   pageType?: PageType;
-  pageId: string;
+  pageId?: string;
 }
 
 export default function FloatingMenuComponent (
@@ -30,17 +30,17 @@ export default function FloatingMenuComponent (
 ) {
   const { showMessage } = useSnackbar();
   const { getPagePermissions } = usePages();
-  const permissions = getPagePermissions(pageId);
+  const permissions = pageId ? getPagePermissions(pageId) : null;
   const [currentUserPermissions] = useCurrentSpacePermissions();
-  const displayInlineCommentButton = !inline && permissions.comment && enableComments && pageType !== 'card_template';
+  const displayInlineCommentButton = !inline && permissions?.comment && enableComments && pageType !== 'card_template';
 
-  const displayInlineVoteButton = !inline && permissions.comment && currentUserPermissions?.createVote && enableVoting && pageType !== 'card_template';
+  const displayInlineVoteButton = !inline && permissions?.comment && currentUserPermissions?.createVote && enableVoting && pageType !== 'card_template';
   return (
     <FloatingMenu
       menuKey={pluginKey}
       renderMenuType={(menuType) => {
         const { type } = menuType as {type: SubMenu};
-        if (type as FloatingMenuVariant === 'commentOnlyMenu' && permissions.comment) {
+        if (type as FloatingMenuVariant === 'commentOnlyMenu' && permissions?.comment) {
           return (
             <Menu>
               <InlineCommentButton enableComments menuKey={pluginKey} />
