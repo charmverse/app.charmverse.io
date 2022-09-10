@@ -121,6 +121,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
         <BoardPage
           page={memoizedCurrentPage}
           setPage={setPage}
+          pagePermissions={currentPagePermissions}
         />
       );
     }

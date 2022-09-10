@@ -17,6 +17,7 @@ import RootPortal from 'components/common/BoardEditor/focalboard/src/components/
 import { silentlyUpdateURL } from 'lib/browser';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 import { usePages } from 'hooks/usePages';
+import { IPagePermissionFlags } from 'lib/permissions/pages';
 /**
  *
  * For the original version of this file, see src/boardPage.tsx in focalboard
@@ -26,18 +27,17 @@ interface Props {
   page: Page;
   readOnly?: boolean;
   setPage: (p: Partial<Page>) => void;
+  pagePermissions?: IPagePermissionFlags;
 }
 
-export default function BoardPage ({ page, setPage, readOnly = false }: Props) {
+export default function BoardPage ({ page, setPage, readOnly = false, pagePermissions }: Props) {
   const router = useRouter();
   const board = useAppSelector(getCurrentBoard);
-  const { getPagePermissions } = usePages();
   const activeView = useAppSelector(getView(router.query.viewId as string));
   const boardViews = useAppSelector(getCurrentBoardViews);
   const clientConfig = useAppSelector(getClientConfig);
   const dispatch = useAppDispatch();
   const [shownCardId, setShownCardId] = useState(router.query.cardId);
-  const pagePermissions = getPagePermissions(page.id);
 
   const readOnlyBoard = readOnly || !pagePermissions?.edit_content;
 
