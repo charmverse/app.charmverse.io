@@ -47,7 +47,6 @@ interface Props {
 
 export default function ShareBountyBoard ({ padding = 1 }: Props) {
 
-  const router = useRouter();
   const [copied, setCopied] = useState<boolean>(false);
   const [spaces, setSpaces] = useSpaces();
   const [space] = useCurrentSpace();

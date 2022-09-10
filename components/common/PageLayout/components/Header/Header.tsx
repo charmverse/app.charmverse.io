@@ -243,7 +243,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
         <Box display='flex' alignItems='center' alignSelf='stretch' mr={-1}>
           {
             isBountyBoard && (
-              <BountyShareButton headerHeight={headerHeight} pageId={basePage.id} />
+              <BountyShareButton headerHeight={headerHeight} />
             )
           }
 
