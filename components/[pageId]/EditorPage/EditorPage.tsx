@@ -51,6 +51,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
         }
       }
     }
+
     main();
 
     return () => {
