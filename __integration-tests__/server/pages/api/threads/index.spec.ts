@@ -1,13 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Bounty, Prisma, Space, Thread, User } from '@prisma/client';
-import { IPageWithPermissions } from 'lib/pages';
-import request from 'supertest';
-import { generatePageToCreateStub } from 'testing/generate-stubs';
-import { baseUrl } from 'testing/mockApiCall';
-import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
-import { createBounty } from 'lib/bounties';
+import { Space, Thread, User } from '@prisma/client';
 import { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads';
+import request from 'supertest';
+import { baseUrl, loginUser } from 'testing/mockApiCall';
+import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { upsertPermission } from '../../../../../lib/permissions/pages';
 
 let nonAdminUser: User;
@@ -23,21 +19,13 @@ beforeAll(async () => {
 
   nonAdminUser = first.user;
   nonAdminUserSpace = first.space;
-  nonAdminCookie = (await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: nonAdminUser.addresses[0]
-    })).headers['set-cookie'][0];
+  nonAdminCookie = await loginUser(nonAdminUser);
 
   const second = await generateUserAndSpaceWithApiToken();
 
   adminUser = second.user;
   adminUserSpace = second.space;
-  adminCookie = (await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: adminUser.addresses[0]
-    })).headers['set-cookie'][0];
+  adminCookie = await loginUser(adminUser);
 });
 
 describe('POST /api/threads - create a thread', () => {
@@ -82,8 +70,8 @@ describe('POST /api/threads - create a thread', () => {
 
   it('should fail if the user does not have a comment permission, and respond 401', async () => {
     const page = await createPage({
-      createdBy: adminUser.id,
-      spaceId: adminUserSpace.id
+      createdBy: nonAdminUser.id,
+      spaceId: nonAdminUserSpace.id
     });
 
     const creationContent: Omit<ThreadCreate, 'userId'> = {
@@ -94,7 +82,7 @@ describe('POST /api/threads - create a thread', () => {
 
     await request(baseUrl)
       .post('/api/threads')
-      .set('Cookie', adminCookie)
+      .set('Cookie', nonAdminCookie)
       .send(creationContent)
       .expect(401);
 
