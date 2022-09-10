@@ -64,7 +64,7 @@ export function ProposalTasksListRow (
             item
             xs={12}
             sm={12}
-            md={3}
+            md={4}
             sx={{
               fontSize: { xs: 14, sm: 'inherit' }
             }}
@@ -73,7 +73,7 @@ export function ProposalTasksListRow (
               {proposalLocation}
             </Link>
           </Grid>
-          <Grid item md={3}>
+          <Grid item md={2} display='flex' justifyContent='center'>
             <ProposalStatusChip status={status} />
           </Grid>
           <Grid
@@ -81,6 +81,8 @@ export function ProposalTasksListRow (
             xs={12}
             sm={2}
             md={2}
+            justifyContent='flex-end'
+            display='flex'
           >
             <Button onClick={() => {
             }}
