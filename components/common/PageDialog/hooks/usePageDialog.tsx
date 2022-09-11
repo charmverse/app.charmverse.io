@@ -34,6 +34,7 @@ export function PageDialogProvider ({ children }: { children: ReactNode }) {
 
   function showPage (_context: PageDialogContext) {
     setProps(_context);
+    return 2;
   }
 
   const value = useMemo(() => ({
