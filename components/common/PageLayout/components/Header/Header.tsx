@@ -242,8 +242,8 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
         <PageTitleWithBreadcrumbs pageId={basePage?.id} />
         <Box display='flex' alignItems='center' alignSelf='stretch' mr={-1}>
           {
-            basePage && isBountyBoard && (
-              <BountyShareButton headerHeight={headerHeight} pageId={basePage.id} />
+            isBountyBoard && (
+              <BountyShareButton headerHeight={headerHeight} />
             )
           }
 
