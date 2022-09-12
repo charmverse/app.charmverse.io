@@ -1,7 +1,4 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
-
-import { IAppWindow } from './types';
+import type { IAppWindow } from './types';
 import { ArchiveUtils, ArchiveHeader, ArchiveLine, BlockArchiveLine } from './blocks/archive';
 import { Block } from './blocks/block';
 import { Board } from './blocks/board';

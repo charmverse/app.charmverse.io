@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import charmClient from 'charmClient';
 import { Page, PageContent } from 'models';
 import { publishIncrementalUpdate } from '../../publisher';
@@ -12,7 +10,6 @@ import { FilterGroup } from './blocks/filterGroup';
 import octoClient, { OctoClient } from './octoClient';
 import { OctoUtils } from './octoUtils';
 import store from './store';
-import { updateView, updateViews } from './store/views';
 import undoManager from './undomanager';
 import { UserSettings } from './userSettings';
 import { IDType, Utils } from './utils';

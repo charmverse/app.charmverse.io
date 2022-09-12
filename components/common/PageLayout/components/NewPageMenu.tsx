@@ -67,7 +67,7 @@ function NewPageMenu ({ addPage, tooltip, ...props }: Props) {
         </MenuItem>
         <MenuItem onClick={() => createPage({ type: 'board' })}>
           <ListItemIcon><StyledDatabaseIcon fontSize='small' /></ListItemIcon>
-          <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Add Board</Typography>
+          <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Add Database</Typography>
         </MenuItem>
       </Menu>
     </>

@@ -64,7 +64,7 @@ export default function ApplicationInput ({ readOnly = false, onCancel, onSubmit
     if (mode === 'create') {
       proposalToSave.bountyId = bountyId;
       proposalToSave.status = 'applied';
-      const createdApplication = await charmClient.createApplication(proposalToSave);
+      const createdApplication = await charmClient.bounties.createApplication(proposalToSave);
       if (onSubmit) {
         onSubmit(createdApplication);
       }
@@ -72,7 +72,7 @@ export default function ApplicationInput ({ readOnly = false, onCancel, onSubmit
       setApplicationMessage('');
     }
     else if (mode === 'update') {
-      await charmClient.updateApplication(proposal?.id as string, proposalToSave);
+      await charmClient.bounties.updateApplication(proposal?.id as string, proposalToSave);
       if (onSubmit) {
         onSubmit(proposalToSave);
       }
@@ -145,9 +145,9 @@ export default function ApplicationInput ({ readOnly = false, onCancel, onSubmit
               />
               {
                 errors?.message && (
-                <Alert severity='error'>
-                  {errors.message.message}
-                </Alert>
+                  <Alert severity='error'>
+                    {errors.message.message}
+                  </Alert>
                 )
               }
 

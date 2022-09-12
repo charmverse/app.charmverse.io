@@ -16,7 +16,7 @@ handler.use(requireUser)
 
 async function togglePageArchiveStatus (req: NextApiRequest, res: NextApiResponse<ModifyChildPagesResponse>) {
   const pageId = req.query.id as string;
-  const { archive } = req.body as {archive: boolean};
+  const { archive } = req.body as { archive: boolean };
   const userId = req.session.user.id;
 
   const permissions = await computeUserPagePermissions({
@@ -56,7 +56,7 @@ async function togglePageArchiveStatus (req: NextApiRequest, res: NextApiRespons
         }
       });
 
-      if (page?.type === 'board') {
+      if (page?.type.match(/board/)) {
         await prisma.block.update({
           where: {
             id: pageId

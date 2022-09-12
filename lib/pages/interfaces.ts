@@ -1,4 +1,9 @@
-import { Block, DocumentSuggestion, Page, PagePermission, Space } from '@prisma/client';
+
+import type { Block, DocumentSuggestion, Page, PagePermission, Space } from '@prisma/client';
+import type { Board } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import type { Card } from 'lib/focalboard/card';
+import type { ProposalWithUsers } from 'lib/proposal/interface';
 
 export interface IPageWithPermissions extends Page {
   permissions: (PagePermission & {sourcePermission: PagePermission | null}) []
@@ -28,10 +33,11 @@ export interface PagesRequest {
 
 export interface PublicPageResponse {
   page: Page;
-  boardPage: Page | null;
-  pageBlock: Block | null;
-  boardBlock: Block | null;
+  boardPages: Page[];
   space: Space;
+  cards: Card[];
+  boards: Board[];
+  views: BoardView[]
 }
 
 // These 2 types are used for reducing a list of pages to a tree
@@ -56,7 +62,8 @@ export interface PageTreeMappingInput<T extends PageNode> {
   rootPageIds?: string[],
   targetPageId?: string,
   includeCards?: boolean,
-  includeDeletedPages?: boolean
+  includeDeletedPages?: boolean,
+  includeProposals?: boolean
 }
 
 export interface PageTreeResolveInput {
@@ -78,3 +85,7 @@ export type TargetPageTreeWithFlatChildren<T extends PageNode = PageNode> = {
   targetPage: PageNodeWithChildren<T>,
   flatChildren: PageNodeWithChildren<T>[]
 }
+
+export type PageWithProposal = (Page & {proposal: ProposalWithUsers | null})
+
+export type PagesMap<P extends IPageWithPermissions | PageNode = IPageWithPermissions> = Record<string, P | undefined>;

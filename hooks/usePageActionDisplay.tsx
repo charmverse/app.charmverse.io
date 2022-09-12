@@ -25,18 +25,12 @@ export function PageActionDisplayProvider ({ children }: { children: ReactNode }
   const { isValidating: isValidatingInlineComments } = useThreads();
   const { isValidating: isValidatingInlineVotes } = useVotes();
   const { cache } = useSWRConfig();
-  const [currentPageActionDisplay, _setCurrentPageActionDisplay] = useState<IPageActionDisplayContext['currentPageActionDisplay']>(null);
+  const [currentPageActionDisplay, setCurrentPageActionDisplay] = useState<IPageActionDisplayContext['currentPageActionDisplay']>(null);
 
-  const setCurrentPageActionDisplay: typeof _setCurrentPageActionDisplay = (value) => {
-    // dont show action for mobile screens
-    if (!smallScreen) {
-      _setCurrentPageActionDisplay(value);
-    }
-  };
-
+  // show page sidebar by default if there are comments or votes
   useEffect(() => {
     const highlightedCommentId = (new URLSearchParams(window.location.search)).get('commentId');
-    if (currentPageId && !isValidatingInlineComments && !isValidatingInlineVotes) {
+    if (currentPageId && !isValidatingInlineComments && !isValidatingInlineVotes && !smallScreen) {
       const cachedInlineVotesData: ExtendedVote[] = cache.get(`pages/${currentPageId}/votes`);
       const cachedInlineCommentData: ThreadWithCommentsAndAuthors[] | undefined = cache.get(`pages/${currentPageId}/threads`);
       // Vote takes precedence over comments, so if a page has in progress votes and unresolved comments, show the votes

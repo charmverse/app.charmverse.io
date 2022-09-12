@@ -9,6 +9,8 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
+import * as collabland from 'lib/collabland';
+import log from 'lib/log';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -48,7 +50,16 @@ async function approveUserApplication (req: NextApiRequest, res: NextApiResponse
     userId
   });
 
-  rollupBountyStatus(approvedApplication.bountyId);
+  await rollupBountyStatus(approvedApplication.bountyId);
+
+  // dont wait for API response
+  collabland.createBountyStartedCredential({
+    bountyId: approvedApplication.bountyId,
+    userId: approvedApplication.createdBy
+  })
+    .catch(error => {
+      log.error('Error creating collabland VC', error);
+    });
 
   return res.status(200).json(approvedApplication);
 }

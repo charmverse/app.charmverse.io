@@ -1,0 +1,31 @@
+services:
+  webapp:
+    build:
+      context: .
+    ports:
+      - "80:3000"
+    command: [ "npm", "run", "${NPM_SCRIPT}" ]
+    labels:
+      com.datadoghq.ad.logs: "[{\"source\": \"nodejs\", \"service\": \"${SERVICE_NAME}\"}]"
+    env_file:
+      - ".env"
+    environment:
+      DATABASE_URL: "postgres://${DB_USER}:${DB_PASSWD}@${DB_HOSTNAME}:5432/${DB_NAME}"
+
+  datadog-agent:
+    image: public.ecr.aws/datadog/agent
+    hostname: datadog-agent
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /proc/:/host/proc/:ro
+      - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
+    env_file:
+      - ".env"
+    environment:
+      DD_LOGS_ENABLED: "true"
+      DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL: "true"
+      DD_CONTAINER_EXCLUDE: "image:public.ecr.aws/datadog/agent"
+      DD_SITE: "datadoghq.com"
+      DD_APM_ENABLED: "true"
+      DD_APM_NON_LOCAL_TRAFFIC: "true"
+      DD_ENV: "${SERVICE_ENV}"

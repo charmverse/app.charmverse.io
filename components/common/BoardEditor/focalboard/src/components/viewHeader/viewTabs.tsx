@@ -1,6 +1,4 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
-import { useState, useCallback, MouseEvent } from 'react';
+import { useState, useCallback, useEffect, MouseEvent, ReactNode } from 'react';
 import { injectIntl, IntlShape } from 'react-intl';
 import { useRouter } from 'next/router';
 import Modal from 'components/common/Modal';
@@ -15,82 +13,98 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import DuplicateIcon from '@mui/icons-material/ContentCopy';
 import EditIcon from '@mui/icons-material/Edit';
+import TuneIcon from '@mui/icons-material/Tune';
 import { usePopupState, bindTrigger, bindMenu } from 'material-ui-popup-state/hooks';
 import { useForm } from 'react-hook-form';
 import { useFocalboardViews } from 'hooks/useFocalboardViews';
 import { Board } from 'lib/focalboard/board';
 import { Box } from '@mui/system';
-import { Typography } from '@mui/material';
 import Link from 'next/link';
 import AddViewMenu from '../addViewMenu';
-import DeleteIcon from '../../widgets/icons/delete';
+import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import mutator from '../../mutator';
 import { iconForViewType } from '../viewMenu';
 import { BoardView, createBoardView } from '../../blocks/boardView';
 import { IDType, Utils } from '../../utils';
+import styled from '@emotion/styled';
+
+const StyledButton = styled(Button)`
+  padding: ${({ theme }) => theme.spacing(0.5, 1)};
+
+  .Icon {
+    width: 20px;
+    height: 20px;
+  }
+`
 
 interface ViewTabsProps {
   intl: IntlShape;
-  board: Board
-  activeView: BoardView
+  viewsBoardId: string
+  activeView?: BoardView | null
   readonly?: boolean;
   views: BoardView[];
   showView: (viewId: string) => void;
+  addViewButton?: ReactNode
+  onViewTabClick?: (viewId: string) => void
+  onDeleteView?: (viewId: string) => void
+  disableUpdatingUrl?: boolean
+  maxTabsShown: number
+  openViewOptions: () => void
 }
 
-const SHOWN_VIEWS = 3;
-
-function ViewTabs ({ board, activeView, intl, readonly, showView, views }: ViewTabsProps) {
+function ViewTabs ({ onDeleteView, openViewOptions, maxTabsShown, onViewTabClick, disableUpdatingUrl, addViewButton, viewsBoardId, activeView, intl, readonly, showView, views }: ViewTabsProps) {
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [currentView, setCurrentView] = useState<BoardView | null>(null);
+  const [dropdownView, setDropdownView] = useState<BoardView | null>(null);
   const renameViewPopupState = usePopupState({ variant: 'popover', popupId: 'rename-view-popup' });
   const showViewsPopupState = usePopupState({ variant: 'popover', popupId: 'show-views-popup' });
   const showViewsTriggerState = bindTrigger(showViewsPopupState);
   const showViewsMenuState = bindMenu(showViewsPopupState);
 
   const { setFocalboardViewsRecord } = useFocalboardViews();
-
+  views = views.filter(view => !view.fields.inline)
   // Find the index of the current view
-  const currentViewId = router.query.viewId || activeView.id;
-  const currentViewIndex = views.findIndex(view => view.id === currentViewId);
-  const shownViews = views.slice(0, SHOWN_VIEWS);
-  let restViews = views.slice(SHOWN_VIEWS);
+  const currentViewIndex = views.findIndex(view => view.id === activeView?.id);
+  const shownViews = views.slice(0, maxTabsShown);
+  let restViews = views.slice(maxTabsShown);
 
   // If the current view index is more than what we can show in the screen
-  if (currentViewIndex >= SHOWN_VIEWS) {
-    const replacedView = shownViews[SHOWN_VIEWS - 1];
+  if (currentViewIndex >= maxTabsShown) {
+    const replacedView = shownViews[maxTabsShown - 1];
     // Replace the current view as the last view of the shown views
-    shownViews[SHOWN_VIEWS - 1] = views[currentViewIndex];
-    restViews = restViews.filter(restView => restView.id !== currentViewId);
+    shownViews[maxTabsShown - 1] = views[currentViewIndex];
+    restViews = restViews.filter(restView => restView.id !== activeView?.id);
     restViews.unshift(replacedView);
   }
 
   const {
     register,
-    handleSubmit
-  } = useForm<{ title: string }>();
+    handleSubmit,
+    setValue
+  } = useForm<{ title: string }>({
+    defaultValues: { title: dropdownView?.title || '' }
+  });
 
   function handleViewClick (event: MouseEvent<HTMLElement>) {
     event.stopPropagation();
-    if (readonly) return;
     const view = views.find(v => v.id === event.currentTarget.id);
-    // event.detail tells us how many times the mouse was clicked
-    if (event.currentTarget.id === currentViewId) {
+    view && onViewTabClick?.(view.id)
+    if (readonly) return;
+    if (event.currentTarget.id === activeView?.id) {
       event.preventDefault();
       setAnchorEl(event.currentTarget);
       if (view) {
-        setCurrentView(view);
+        setDropdownView(view);
       }
     }
     if (view) {
-      setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [board.id]: view.id }));
+      setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [viewsBoardId]: view.id }));
     }
   }
 
   function handleClose () {
     setAnchorEl(null);
-    setCurrentView(null);
+    setDropdownView(null);
   }
 
   function getViewUrl (viewId: string) {
@@ -104,44 +118,51 @@ function ViewTabs ({ board, activeView, intl, readonly, showView, views }: ViewT
   }
 
   const handleDuplicateView = useCallback(() => {
-    if (!currentView) return;
+    if (!dropdownView) return;
 
-    const newView = createBoardView(currentView);
-    newView.title = `${currentView.title} copy`;
+    const newView = createBoardView(dropdownView);
+    newView.title = `${dropdownView.title} copy`;
     newView.id = Utils.createGuid(IDType.View);
     mutator.insertBlock(
       newView,
       'duplicate view',
       async (block) => {
         showView(block.id);
-        setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [board.id]: newView.id }));
+        setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [viewsBoardId]: newView.id }));
       },
       async () => {
-        showView(currentView.id);
+        showView(dropdownView.id);
       }
     );
-  }, [currentView, showView]);
+  }, [dropdownView, showView]);
 
   const handleDeleteView = useCallback(() => {
     Utils.log('deleteView');
-    if (!currentView) return;
+    if (!dropdownView) return;
 
-    const nextView = views.find((o) => o !== currentView);
-    mutator.deleteBlock(currentView, 'delete view');
+    const nextView = views.find((o) => o !== dropdownView);
+    mutator.deleteBlock(dropdownView, 'delete view');
+    onDeleteView?.(dropdownView.id)
+    setAnchorEl(null)
     if (nextView) {
       showView(nextView.id);
-      setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [board.id]: nextView.id }));
+      setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [viewsBoardId]: nextView.id }));
     }
-  }, [views, currentView, showView]);
+  }, [views, dropdownView, showView]);
 
   function handleRenameView () {
     setAnchorEl(null);
     renameViewPopupState.open();
   }
 
+  function handleViewOptions () {
+    openViewOptions();
+    setAnchorEl(null);
+  }
+
   function saveViewTitle (form: { title: string }) {
-    if (currentView) {
-      mutator.changeTitle(currentView.id, currentView.title, form.title);
+    if (dropdownView) {
+      mutator.changeTitle(dropdownView.id, dropdownView.title, form.title);
       renameViewPopupState.close();
     }
   }
@@ -155,57 +176,67 @@ function ViewTabs ({ board, activeView, intl, readonly, showView, views }: ViewT
     defaultMessage: 'Delete view'
   });
 
+  // keep form title updated with dropdownView title
+  useEffect(() => {
+    setValue('title', dropdownView?.title || '');
+  }, [dropdownView]);
+
   return (
     <>
-      <Tabs textColor='primary' indicatorColor='secondary' value={currentViewId} sx={{ minHeight: 40 }}>
+      <Tabs textColor='primary' indicatorColor='secondary' value={activeView?.id ?? false} sx={{ minHeight: 0, mb: '-4px' }}>
         {shownViews.map(view => (
           <Tab
             component='div'
             disableRipple
             key={view.id}
             label={(
-              <Button
+              <StyledButton
                 startIcon={iconForViewType(view.fields.viewType)}
                 onClick={handleViewClick}
                 variant='text'
                 size='small'
-                color={currentViewId === view.id ? 'textPrimary' : 'secondary'}
+                color={activeView?.id === view.id ? 'textPrimary' : 'secondary'}
                 id={view.id}
-                href={currentViewId === view.id ? null : getViewUrl(view.id)}
-                sx={{ px: 1.5 }}
+                href={!disableUpdatingUrl ? (activeView?.id === view.id ? null : getViewUrl(view.id)) : ''}
               >
                 {view.title}
-              </Button>
+              </StyledButton>
           )}
-            sx={{ p: 0 }}
+            sx={{ p: 0, mb: '5px' }}
             value={view.id}
           />
         ))}
         {restViews.length !== 0 && (
-        <Tab
-          component='div'
-          disableRipple
-          label={(
-            <Button
-              variant='text'
-              size='small'
-              color='secondary'
-              {...showViewsTriggerState}
-            >
-              {restViews.length} more...
-            </Button>
-      )}
-        />
+          <Tab
+            component='div'
+            disableRipple
+            sx={{ p: 0, mb: 0.5 }}
+            label={(
+              <Button
+                variant='text'
+                size='small'
+                color='secondary'
+                {...showViewsTriggerState}
+              >
+                {restViews.length} more...
+              </Button>
+            )}
+          />
         )}
       </Tabs>
       <Menu
         anchorEl={anchorEl}
+        disablePortal
         open={Boolean(anchorEl)}
         onClose={handleClose}
       >
         <MenuItem dense onClick={handleRenameView}>
           <ListItemIcon><EditIcon fontSize='small' /></ListItemIcon>
           <ListItemText>Rename</ListItemText>
+        </MenuItem>
+        <MenuItem dense onClick={handleViewOptions}>
+          <ListItemIcon><TuneIcon fontSize='small' /></ListItemIcon>
+          <ListItemText>Edit View</ListItemText>
         </MenuItem>
         <Divider />
         <MenuItem dense onClick={handleDuplicateView}>
@@ -230,20 +261,25 @@ function ViewTabs ({ board, activeView, intl, readonly, showView, views }: ViewT
           mb: 1
         }}
         >
-          {restViews.map(view => (
-            <Link
-              href={getViewUrl(view.id)}
-              passHref
-            >
-              <MenuItem component='a' key={view.id} dense>
-                <ListItemIcon>{iconForViewType(view.fields.viewType)}</ListItemIcon>
-                <ListItemText>{view.title}</ListItemText>
-              </MenuItem>
-            </Link>
-          ))}
+          {restViews.map(view => {
+            const content = <MenuItem onClick={() => {
+              onViewTabClick?.(view.id)
+              showViewsMenuState.onClose()
+            }} component='a' key={view.id} dense>
+              <ListItemIcon>{iconForViewType(view.fields.viewType)}</ListItemIcon>
+              <ListItemText>{view.title}</ListItemText>
+            </MenuItem>
+            return disableUpdatingUrl ? content : <Link
+            href={getViewUrl(view.id)}
+            passHref
+          >
+            {content}
+          </Link>
+          })}
         </Box>
         <Divider />
-        <AddViewMenu
+        {addViewButton}
+        {/* <AddViewMenu
           sx={{
             width: '100%'
           }}
@@ -252,16 +288,16 @@ function ViewTabs ({ board, activeView, intl, readonly, showView, views }: ViewT
           activeView={activeView}
           showView={showView}
           views={views}
-        />
+        /> */}
       </Menu>
 
       {/* Form to rename views */}
-      <Modal open={renameViewPopupState.isOpen} onClose={renameViewPopupState.close} title='Rename the view'>
+      {<Modal open={renameViewPopupState.isOpen} onClose={renameViewPopupState.close} title='Rename the view'>
         <form onSubmit={handleSubmit(saveViewTitle)}>
-          <TextField {...register('title')} defaultValue={currentView?.title} autoFocus />
+          <TextField {...register('title')} autoFocus />
           <Button type='submit'>Save</Button>
         </form>
-      </Modal>
+      </Modal>}
     </>
   );
 }

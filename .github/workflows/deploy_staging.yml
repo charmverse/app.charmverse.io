@@ -27,19 +27,21 @@ jobs:
           npm prune --production
           rm -rf .next/cache
 
-      - name: Add Datadog API Key
-        run: |
-          sed -i 's/{API_KEY}/${{ secrets.DATADOG_API_KEY }}/g' .ebextensions/99_datadog.config
-          sed -i 's/{API_KEY}/${{ secrets.DATADOG_API_KEY }}/g' .ebextensions_cron/99_datadog.config
-
-      - name: Configure Docker npm command
-        run: sed -i 's/start:prod/start:staging/g' .ebextensions/00_env_vars.config
-
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
 
       - name: Set STAGE variable in environment for next steps
         run: echo "STAGE=pr-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
+
+      - name: Set the docker compose env variables
+        uses: mikefarah/yq@master
+        with:
+          cmd: |
+            yq -I 4 -i '
+              (with(.option_settings |
+                  ."aws:elasticbeanstalk:application:environment" |
+                  .COMPOSE_PROJECT_NAME; . = "pr${{ github.event.number }}" | . style="double"))
+              ' .ebextensions/00_env_vars.config
 
       - name: Create a github deployment
         uses: bobheadxi/deployments@v0.5.2

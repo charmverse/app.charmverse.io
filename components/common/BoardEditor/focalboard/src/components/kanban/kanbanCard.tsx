@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import styled from '@emotion/styled';
 import { Box } from '@mui/material';
 import { BountyStatusChip } from 'components/bounties/components/BountyStatusBadge';
@@ -11,6 +9,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { PageContent } from 'models';
+import { isTouchScreen } from 'lib/browser';
 import React, { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { mutate } from 'swr';
@@ -64,7 +63,7 @@ const CurrencyIcon = styled.span`
 const KanbanCard = React.memo((props: Props) => {
   const { card, board } = props;
   const intl = useIntl();
-  const [isDragging, isOver, cardRef] = useSortable('card', card, !props.readonly, props.onDrop);
+  const [isDragging, isOver, cardRef] = useSortable('card', card, !props.readonly && !isTouchScreen(), props.onDrop);
   const visiblePropertyTemplates = props.visiblePropertyTemplates || [];
   let className = props.isSelected ? 'KanbanCard selected' : 'KanbanCard';
   if (props.isManualSort && isOver) {
@@ -120,6 +119,7 @@ const KanbanCard = React.memo((props: Props) => {
         draggable={!props.readonly}
         style={{ opacity: isDragging ? 0.5 : 1 }}
         onClick={props.onClick}
+        data-test='kanban-card'
       >
         {!props.readonly
           && (

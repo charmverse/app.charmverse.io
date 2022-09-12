@@ -5,6 +5,7 @@ import { useEditorState, useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import { commands as trackChangesCommands, Commit, commitToJSON, getTrackPluginState, reset } from '@manuscripts/track-changes';
 import { Box, Button, Divider, Slide } from '@mui/material';
+import { PageType } from '@prisma/client';
 import charmClient from 'charmClient';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
@@ -18,6 +19,7 @@ import { useUser } from 'hooks/useUser';
 import { silentlyUpdateURL } from 'lib/browser';
 import { extractDeletedThreadIds } from 'lib/inline-comments/extractDeletedThreadIds';
 import log from 'lib/log';
+import { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
 import debounce from 'lodash/debounce';
 import { PageContent } from 'models';
 import { CSSProperties, memo, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
@@ -30,8 +32,10 @@ import { CryptoPrice } from './components/CryptoPrice';
 import EmojiSuggest from './components/emojiSuggest';
 import * as floatingMenu from './components/floatingMenu';
 import * as iframe from './components/iframe';
-import InlineCommentThread from './components/inlineComment';
-import InlinePalette from './components/inlinePalette';
+import InlineCommentThread, * as inlineComment from './components/inlineComment';
+import InlineDatabase from './components/inlineDatabase/components/InlineDatabase';
+import InlinePalette, { plugins as inlinePalettePlugins } from './components/inlinePalette';
+import * as inlineVote from './components/inlineVote';
 import InlineVoteList from './components/inlineVote/components/InlineVoteList';
 import Mention, { MentionSuggest } from './components/mention';
 import NestedPage, { NestedPagesList } from './components/nestedPage';
@@ -105,7 +109,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{disablePageSpecificFe
       cursor: pointer;
     }
   `}
-  
+
   /** Don't highlight un-committed blames */
   .track-changes--blame:not(.track-changes--blame-uncommitted) {
     background-color: rgba(57, 255, 20, 0.3);
@@ -125,17 +129,14 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{disablePageSpecificFe
 const PageActionListBox = styled.div`
   position: fixed;
   right: 0px;
-  width: 400px;
-  top: 75px;
+  width: 416px;
+  max-width: 100%;
+  top: 56px; // height of MUI Toolbar
   z-index: var(--z-index-drawer);
   height: calc(100% - 80px);
   overflow: auto;
-  margin-right: ${({ theme }) => theme.spacing(1)};
+  padding: 0 ${({ theme }) => theme.spacing(1)};
   background: ${({ theme }) => theme.palette.background.default};
-  display: none;
-  ${({ theme }) => theme.breakpoints.up('md')} {
-    display: block;
-  }
 `;
 
 const defaultContent: PageContent = {
@@ -158,9 +159,12 @@ interface CharmEditorProps {
   pageActionDisplay?: IPageActionDisplayContext['currentPageActionDisplay']
   disablePageSpecificFeatures?: boolean;
   enableVoting?: boolean;
-  pageId?: string | null;
-  suggestion?: any | null
-  onSuggestModeChange?: () => void
+  suggestion?: any | null;
+  onSuggestModeChange?: () => void;
+  pageId: string;
+  containerWidth?: number;
+  pageType?: PageType;
+  pagePermissions?: IPagePermissionFlags;
 }
 
 export function convertPageContentToMarkdown (content: PageContent, title?: string): string {
@@ -255,7 +259,10 @@ function CharmEditor (
     enableVoting,
     pageId,
     suggestion = null,
-    onSuggestModeChange
+    onSuggestModeChange,
+    containerWidth,
+    pageType,
+    pagePermissions
   }:
   CharmEditorProps
 ) {
@@ -469,13 +476,21 @@ function CharmEditor (
               />
             );
           }
+          case 'inlineDatabase': {
+            return (
+              <InlineDatabase
+                containerWidth={containerWidth}
+                readOnly={readOnly}
+                {...props}
+              />
+            );
+          }
           default: {
             return null;
           }
         }
       }}
     >
-      {pageId && (
       <SuggestModeToggleButton
         onSuggestModeChange={() => setSuggestMode(!suggestMode)}
         suggestMode={suggestMode}
@@ -483,8 +498,13 @@ function CharmEditor (
           onContentChangeDebounced?.(view);
         }}
       />
-      )}
-      <floatingMenu.FloatingMenu enableComments={!disablePageSpecificFeatures} enableVoting={enableVoting} pluginKey={floatingMenuPluginKey} />
+      <floatingMenu.FloatingMenu
+        enableComments={!disablePageSpecificFeatures}
+        enableVoting={enableVoting}
+        pluginKey={floatingMenuPluginKey}
+        pageType={pageType}
+        pagePermissions={pagePermissions}
+      />
       <MentionSuggest pluginKey={mentionPluginKey} />
       <NestedPagesList pluginKey={nestedPagePluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
@@ -492,64 +512,60 @@ function CharmEditor (
       <InlinePalette nestedPagePluginKey={nestedPagePluginKey} disableNestedPage={disablePageSpecificFeatures} />
       {children}
       {!disablePageSpecificFeatures && (
-      <>
-        <Slide
-          direction='left'
-          in={pageActionDisplay === 'comments'}
-          style={{
-            transformOrigin: 'left top'
-          }}
-          easing={{
-            enter: 'ease-in',
-            exit: 'ease-out'
-          }}
-          timeout={250}
-        >
-          <PageActionListBox
-            id='page-thread-list-box'
+        <>
+          <Slide
+            direction='left'
+            in={pageActionDisplay === 'suggestions' && Boolean(suggestion)}
+            style={{
+              transformOrigin: 'left top'
+            }}
+            easing={{
+              enter: 'ease-in',
+              exit: 'ease-out'
+            }}
+            timeout={250}
           >
-            <CommentsSidebar />
-          </PageActionListBox>
-        </Slide>
-        <Slide
-          direction='left'
-          in={pageActionDisplay === 'suggestions' && Boolean(suggestion)}
-          style={{
-            transformOrigin: 'left top'
-          }}
-          easing={{
-            enter: 'ease-in',
-            exit: 'ease-out'
-          }}
-          timeout={250}
-        >
-          <PageActionListBox
-            id='page-suggestions-list-box'
+            <PageActionListBox id='page-suggestions-list-box'>
+              <SuggestionsSidebar suggestion={suggestion} />
+            </PageActionListBox>
+          </Slide>
+          <Slide
+            direction='left'
+            in={pageActionDisplay === 'comments'}
+            style={{
+              transformOrigin: 'left top'
+            }}
+            easing={{
+              enter: 'ease-in',
+              exit: 'ease-out'
+            }}
+            timeout={250}
           >
-            <SuggestionsSidebar suggestion={suggestion} />
-          </PageActionListBox>
-        </Slide>
-        <Slide
-          direction='left'
-          in={pageActionDisplay === 'votes'}
-          style={{
-            transformOrigin: 'left top'
-          }}
-          easing={{
-            enter: 'ease-in',
-            exit: 'ease-out'
-          }}
-          timeout={250}
-        >
-          <PageActionListBox
-            id='page-vote-list-box'
+            <PageActionListBox id='page-thread-list-box'>
+              <CommentsSidebar />
+            </PageActionListBox>
+          </Slide>
+          <Slide
+            direction='left'
+            in={pageActionDisplay === 'votes'}
+            style={{
+              transformOrigin: 'left top'
+            }}
+            easing={{
+              enter: 'ease-in',
+              exit: 'ease-out'
+            }}
+            timeout={250}
           >
-            <PageInlineVotesList />
-          </PageActionListBox>
-        </Slide>
-        <InlineCommentThread pluginKey={inlineCommentPluginKey} />
-        {enableVoting && <InlineVoteList pluginKey={inlineVotePluginKey} />}
-      </>
+            <PageActionListBox
+              id='page-vote-list-box'
+            >
+              <PageInlineVotesList />
+            </PageActionListBox>
+          </Slide>
+          <InlineCommentThread pluginKey={inlineCommentPluginKey} />
+          {enableVoting && <InlineVoteList pluginKey={inlineVotePluginKey} />}
+        </>
       )}
       {!readOnly && <DevTools />}
     </StyledReactBangleEditor>

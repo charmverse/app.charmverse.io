@@ -1,10 +1,8 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 
 import { createIntl } from 'react-intl';
 
 import { Utils, IDType } from './utils';
-import { IAppWindow } from './types';
+import type { IAppWindow } from './types';
 
 declare let window: IAppWindow;
 

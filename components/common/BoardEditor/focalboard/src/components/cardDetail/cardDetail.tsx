@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 
 import { Page } from '@prisma/client'
 import charmClient from 'charmClient'
@@ -9,6 +7,7 @@ import log from 'lib/log'
 import debouncePromise from 'lib/utilities/debouncePromise'
 import { useCallback, useEffect, useRef } from 'react'
 import { Card } from '../../blocks/card'
+import { findParentOfType } from 'lib/pages/findParentOfType';
 
 type Props = {
     card: Card
@@ -47,6 +46,8 @@ function CardDetail (props: Props): JSX.Element|null {
     }
   }, [card]);
 
+  const parentProposalId = findParentOfType({ pageId: card.id, pageType: 'proposal', pageMap: pages });
+
   const page = pages[card?.id];
   if (!card || !page) {
     return null;
@@ -56,6 +57,7 @@ function CardDetail (props: Props): JSX.Element|null {
       page={page}
       setPage={setPage}
       readOnly={readonly}
+      parentProposalId={parentProposalId}
     />
   );
 }

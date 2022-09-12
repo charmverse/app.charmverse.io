@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
@@ -7,7 +5,7 @@ import { CommentBlock } from '../blocks/commentBlock';
 
 import { initialLoad, initialReadOnlyLoad } from './initialLoad';
 
-import { RootState } from './index';
+import type { RootState } from './index';
 
 const commentsSlice = createSlice({
   name: 'comments',

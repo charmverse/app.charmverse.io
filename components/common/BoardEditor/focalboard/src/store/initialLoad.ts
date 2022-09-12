@@ -1,12 +1,10 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 
 import { createAsyncThunk, createSelector } from '@reduxjs/toolkit';
 import charmClient from 'charmClient';
 
 import { Subscription } from '../wsclient';
 
-import { RootState } from './index';
+import type { RootState } from './index';
 
 export const initialLoad = createAsyncThunk(
   'initialLoad',

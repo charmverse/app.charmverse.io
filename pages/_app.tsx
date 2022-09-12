@@ -14,8 +14,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { Web3ReactProvider } from '@web3-react/core';
 import IconButton from '@mui/material/IconButton';
 import RefreshIcon from '@mui/icons-material/Refresh';
-
-import log from 'lib/log';
+import ReactDndProvider from 'components/common/ReactDndProvider';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import RouteGuard from 'components/common/RouteGuard';
 import FocalBoardProvider from 'components/common/BoardEditor/FocalBoardProvider';
@@ -35,22 +34,22 @@ import { SpacesProvider } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
 import { SnackbarProvider } from 'hooks/useSnackbar';
 import HexagonalAvatarMask from 'components/common/HexagonalAvatarMask';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
 
-import '@bangle.dev/tooltip/style.css';
 import '@skiff-org/prosemirror-tables/style/tables.css';
 import '@skiff-org/prosemirror-tables/style/table-popup.css';
 import '@skiff-org/prosemirror-tables/style/table-headers.css';
 import '@skiff-org/prosemirror-tables/style/table-filters.css';
 import 'prosemirror-menu/style/menu.css';
 import 'theme/prosemirror-tables/prosemirror-tables.scss';
+import '@bangle.dev/tooltip/style.css';
+import 'theme/@bangle.dev/styles.scss';
 // fullcalendar css
 import '@fullcalendar/common/main.css';
 import '@fullcalendar/daygrid/main.css';
 // init focalboard
 import '@mattermost/compass-icons/css/compass-icons.css';
-import 'theme/focalboard/focalboard.button.scss';
-import 'theme/focalboard/focalboard.main.scss';
-import 'theme/focalboard/focalboard.typography.scss';
 import 'components/common/BoardEditor/focalboard/src/components/blockIconSelector.scss';
 import 'components/common/BoardEditor/focalboard/src/components/calculations/calculation.scss';
 import 'components/common/BoardEditor/focalboard/src/components/calendar/fullcalendar.scss';
@@ -149,12 +148,15 @@ import 'components/common/BoardEditor/focalboard/src/widgets/propertyMenu.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/switch.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/tooltip.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/valueSelector.scss';
+import 'theme/focalboard/focalboard.button.scss';
+import 'theme/focalboard/focalboard.main.scss';
+import 'theme/focalboard/focalboard.typography.scss';
+
 // Lit Protocol CSS
 import 'lit-share-modal-v3-react-17/dist/ShareModal.css';
 import 'theme/lit-protocol/lit-protocol.scss';
 import 'react-resizable/css/styles.css';
 import { createThemeLightSensitive } from 'theme';
-import 'theme/@bangle.dev/styles.scss';
 import {
   darkTheme,
   lightTheme
@@ -242,40 +244,44 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
     <CacheProvider value={createCache({ key: 'app' })}>
       <ColorModeContext.Provider value={colorModeContext}>
         <ThemeProvider theme={theme}>
-          <Web3ReactProvider getLibrary={getLibrary}>
-            <Web3ConnectionManager>
-              <DataProviders>
-                <FocalBoardProvider>
-                  <IntlProvider>
-                    <SnackbarProvider>
-                      <PageMetaTags />
-                      <CssBaseline enableColorScheme={true} />
-                      <Global styles={cssVariables} />
-                      <RouteGuard>
-                        <ErrorBoundary>
-                          <Snackbar
-                            isOpen={isOldBuild}
-                            message='New CharmVerse platform update available. Please refresh.'
-                            actions={[
-                              <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                <RefreshIcon fontSize='small' />
-                              </IconButton>
-                            ]}
-                            origin={{ vertical: 'top', horizontal: 'center' }}
-                            severity='warning'
-                            handleClose={() => setIsOldBuild(false)}
-                          />
-                          {getLayout(<Component {...pageProps} />)}
-                          <HexagonalAvatarMask id='hexagon-avatar' />
-                          <Snackbar />
-                        </ErrorBoundary>
-                      </RouteGuard>
-                    </SnackbarProvider>
-                  </IntlProvider>
-                </FocalBoardProvider>
-              </DataProviders>
-            </Web3ConnectionManager>
-          </Web3ReactProvider>
+          <LocalizationProvider dateAdapter={AdapterLuxon as any}>
+            <Web3ReactProvider getLibrary={getLibrary}>
+              <Web3ConnectionManager>
+                <ReactDndProvider>
+                  <DataProviders>
+                    <FocalBoardProvider>
+                      <IntlProvider>
+                        <SnackbarProvider>
+                          <PageMetaTags />
+                          <CssBaseline enableColorScheme={true} />
+                          <Global styles={cssVariables} />
+                          <RouteGuard>
+                            <ErrorBoundary>
+                              <Snackbar
+                                isOpen={isOldBuild}
+                                message='New CharmVerse platform update available. Please refresh.'
+                                actions={[
+                                  <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                    <RefreshIcon fontSize='small' />
+                                  </IconButton>
+                                ]}
+                                origin={{ vertical: 'top', horizontal: 'center' }}
+                                severity='warning'
+                                handleClose={() => setIsOldBuild(false)}
+                              />
+                              {getLayout(<Component {...pageProps} />)}
+                              <HexagonalAvatarMask id='hexagon-avatar' />
+                              <Snackbar />
+                            </ErrorBoundary>
+                          </RouteGuard>
+                        </SnackbarProvider>
+                      </IntlProvider>
+                    </FocalBoardProvider>
+                  </DataProviders>
+                </ReactDndProvider>
+              </Web3ConnectionManager>
+            </Web3ReactProvider>
+          </LocalizationProvider>
         </ThemeProvider>
       </ColorModeContext.Provider>
     </CacheProvider>

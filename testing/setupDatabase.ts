@@ -1,14 +1,17 @@
-import { ApplicationStatus, Block, Bounty, BountyStatus, Comment, Page, Prisma, Role, RoleSource, Space, SpaceApiToken, Thread, Transaction, Vote } from '@prisma/client';
+import { ApplicationStatus, Block, Bounty, BountyStatus, Comment, Page, Prisma, ProposalStatus, Role, RoleSource, Thread, Transaction, Vote } from '@prisma/client';
 import { prisma } from 'db';
 import { getBountyOrThrow } from 'lib/bounties';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
-import { IPageWithPermissions } from 'lib/pages';
+import { getPagePath, IPageWithPermissions, PageWithProposal } from 'lib/pages';
 import { BountyPermissions } from 'lib/permissions/bounties';
 import { TargetPermissionGroup } from 'lib/permissions/interfaces';
+import { ProposalReviewerInput } from 'lib/proposal/interface';
+import { upsertPermission } from 'lib/permissions/pages';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { typedKeys } from 'lib/utilities/objects';
 import { BountyWithDetails, IDENTITY_TYPES, LoggedInUser } from 'models';
 import { v4 } from 'uuid';
+import { syncProposalPermissions } from 'lib/proposal/syncProposalPermissions';
 
 export async function generateSpaceUser ({ spaceId, isAdmin }: { spaceId: string, isAdmin: boolean }): Promise<LoggedInUser> {
   return prisma.user.create({
@@ -47,19 +50,15 @@ export async function generateSpaceUser ({ spaceId, isAdmin }: { spaceId: string
  * @param walletAddress
  * @returns
  */
-export async function generateUserAndSpaceWithApiToken (walletAddress: string = v4(), isAdmin = true): Promise<{
-  user: LoggedInUser,
-  space: Space,
-  apiToken: SpaceApiToken
-}> {
+export async function generateUserAndSpaceWithApiToken (walletAddress: string = v4(), isAdmin = true) {
   const user = await createUserFromWallet(walletAddress);
 
   const existingSpaceId = user.spaceRoles?.[0]?.spaceId;
 
-  let space: Space | null = null;
+  let space = null;
 
   if (existingSpaceId) {
-    space = await prisma.space.findUnique({ where: { id: user.spaceRoles?.[0]?.spaceId }, include: { apiToken: true } });
+    space = await prisma.space.findUnique({ where: { id: user.spaceRoles?.[0]?.spaceId }, include: { apiToken: true, spaceRoles: true } });
   }
 
   if (!space) {
@@ -83,7 +82,8 @@ export async function generateUserAndSpaceWithApiToken (walletAddress: string = 
         }
       },
       include: {
-        apiToken: true
+        apiToken: true,
+        spaceRoles: true
       }
     });
   }
@@ -143,7 +143,7 @@ export async function generateBounty ({ content = undefined, contentText = '', s
             createdBy,
             contentText,
             content: content ?? undefined,
-            path: `page-${pageId}`,
+            path: getPagePath(),
             title: title || 'Root',
             type: 'bounty',
             updatedBy: createdBy,
@@ -284,7 +284,7 @@ export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'cre
     data: {
       id: options.id ?? v4(),
       contentText: options.contentText ?? '',
-      path: options.path ?? `page-${v4()}`,
+      path: options.path ?? getPagePath(),
       title: options.title || 'Example',
       type: options.type ?? 'page',
       updatedBy: options.createdBy,
@@ -313,13 +313,14 @@ export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'cre
   });
 }
 
-export async function createVote ({ userVotes = [], voteOptions = [], spaceId, createdBy, pageId, deadline = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), status = 'InProgress', title = 'Vote Title', description = null }: Partial<Vote> & Pick<Vote, 'spaceId' | 'createdBy' | 'pageId'> & {voteOptions?: string[], userVotes?: string[]}) {
+export async function createVote ({ userVotes = [], voteOptions = [], spaceId, createdBy, pageId, deadline = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), status = 'InProgress', title = 'Vote Title', context = 'inline', description = null }: Partial<Vote> & Pick<Vote, 'spaceId' | 'createdBy' | 'pageId'> & {voteOptions?: string[], userVotes?: string[]}) {
   return prisma.vote.create({
     data: {
       deadline,
       status,
       threshold: 50,
       title,
+      context,
       author: {
         connect: {
           id: createdBy
@@ -357,6 +358,75 @@ export async function createVote ({ userVotes = [], voteOptions = [], spaceId, c
       voteOptions: true
     }
   });
+}
+
+export async function createProposalWithUsers ({ proposalStatus = 'private_draft', authors, reviewers, userId, spaceId, ...pageCreateInput }: {
+  authors: string[],
+  reviewers: (string | {type: 'role', roleId: string})[],
+  spaceId: string,
+  userId: string,
+  proposalStatus?: ProposalStatus
+} & Partial<Prisma.PageCreateInput>): Promise<PageWithProposal> {
+  const proposalId = v4();
+
+  const proposalPage = await prisma.page.create({
+    data: {
+      ...pageCreateInput,
+      id: proposalId,
+      author: {
+        connect: {
+          id: userId
+        }
+      },
+      space: {
+        connect: {
+          id: spaceId
+        }
+      },
+      updatedBy: userId,
+      title: 'Page Title',
+      path: 'page-path',
+      contentText: '',
+      type: 'proposal',
+      proposal: {
+        create: {
+          id: proposalId,
+          space: {
+            connect: {
+              id: spaceId
+            }
+          },
+          createdBy: userId,
+          status: proposalStatus,
+          authors: {
+            createMany: {
+              data: [{
+                userId
+              }, ...authors.map(author => ({ userId: author }))]
+            }
+          },
+          reviewers: {
+            createMany: {
+              data: reviewers.map(reviewer => typeof reviewer === 'string' ? ({ userId: reviewer }) : ({ roleId: reviewer.roleId }))
+            }
+          }
+        }
+      }
+    },
+    include: {
+      proposal: {
+        include: {
+          authors: true,
+          reviewers: true
+        }
+      }
+    }
+  });
+
+  // proposal authors will have full_access to the page
+  await syncProposalPermissions({ proposalId });
+
+  return proposalPage;
 }
 
 export async function generateCommentWithThreadAndPage ({ userId, spaceId, commentContent }: {
@@ -447,6 +517,71 @@ export function createBlock (options: Partial<Block> & Pick<Block, 'createdBy' |
       parentId: options.parentId || options.rootId,
       schema: 0,
       id: options.id ?? v4()
+    }
+  });
+}
+
+/**
+ * Creates a proposal with the linked authors and reviewers
+ */
+export async function generateProposal ({ userId, spaceId, proposalStatus, authors, reviewers }:
+  {userId: string, spaceId: string, authors: string[], reviewers: ProposalReviewerInput[], proposalStatus: ProposalStatus}):
+  Promise<PageWithProposal> {
+  const proposalId = v4();
+
+  return prisma.page.create({
+    data: {
+      id: proposalId,
+      contentText: '',
+      path: `path-${v4()}`,
+      title: 'Proposal',
+      type: 'proposal',
+      author: {
+        connect: {
+          id: userId
+        }
+      },
+      updatedBy: userId,
+      space: {
+        connect: {
+          id: spaceId
+        }
+      },
+      proposal: {
+        create: {
+          id: proposalId,
+          createdBy: userId,
+          status: proposalStatus,
+          space: {
+            connect: {
+              id: spaceId
+            }
+          },
+          authors: {
+            createMany: {
+              data: authors.map(authorId => ({ userId: authorId }))
+            }
+          },
+          reviewers: {
+            createMany: {
+              data: (reviewers ?? []).map(r => {
+                return {
+                  userId: r.group === 'user' ? r.id : undefined,
+                  roleId: r.group === 'role' ? r.id : undefined
+                };
+              })
+            }
+          }
+        }
+      }
+    },
+    include: {
+      proposal: {
+        include: {
+          authors: true,
+          reviewers: true
+        }
+      }
     }
   });
 }

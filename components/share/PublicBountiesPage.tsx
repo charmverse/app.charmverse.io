@@ -15,7 +15,7 @@ export default function PublicBountiesPage () {
 
   useEffect(() => {
     if (space) {
-      charmClient.listBounties(space.id, true)
+      charmClient.bounties.listBounties(space.id, true)
         .then(_bounties => {
           setBounties(_bounties);
         });

@@ -2,14 +2,15 @@
 import { Page, PagePermission, PrismaPromise, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { deletePagePermission, IPagePermissionRequest, IPagePermissionToDelete, IPagePermissionWithAssignee, listPagePermissions, setupPermissionsAfterPagePermissionAdded, upsertPermission, computeUserPagePermissions, getPagePermission, IPagePermissionWithSource } from 'lib/permissions/pages';
+import { deletePagePermission, IPagePermissionRequest, IPagePermissionToDelete, IPagePermissionWithAssignee, listPagePermissions, setupPermissionsAfterPagePermissionAdded, upsertPermission, computeUserPagePermissions, getPagePermission, IPagePermissionWithSource, IPagePermissionToCreate } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 import nc from 'next-connect';
 import { PermissionNotFoundError } from 'lib/permissions/pages/errors';
 import { boardPagePermissionUpdated } from 'lib/permissions/pages/triggers';
-import { PageNotFoundError } from 'lib/pages/server';
+import { PageNotFoundError, resolvePageTree } from 'lib/pages/server';
+import { findParentOfType } from 'lib/pages/findParentOfType';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -31,19 +32,24 @@ async function findPagePermissions (req: NextApiRequest, res: NextApiResponse<IP
 
 async function addPagePermission (req: NextApiRequest, res: NextApiResponse<IPagePermissionWithSource>) {
 
-  const { pageId } = req.body;
+  const { pageId, permissionLevel } = req.body as Required<IPagePermissionToCreate>;
 
   const computedPermissions = await computeUserPagePermissions({
     pageId,
     userId: req.session.user.id
   });
 
-  if (computedPermissions.grant_permissions !== true) {
-    throw new ActionNotPermittedError('You cannot manage permissions for this page');
-  }
-
   if (req.body.public === true && computedPermissions.edit_isPublic !== true) {
     throw new ActionNotPermittedError('You cannot make page public.');
+  }
+  else if (req.body.public !== true && computedPermissions.grant_permissions !== true) {
+    throw new ActionNotPermittedError('You cannot manage permissions for this page');
+  }
+  else if (permissionLevel === 'proposal_editor') {
+    throw new ActionNotPermittedError('This permission level can only be created automatically by proposals.');
+  }
+  else if (req.body.public === true && permissionLevel !== 'view') {
+    throw new ActionNotPermittedError('Only view permissions can be provided to public.');
   }
 
   const page = await prisma.page.findUnique({
@@ -56,6 +62,10 @@ async function addPagePermission (req: NextApiRequest, res: NextApiResponse<IPag
     throw new PageNotFoundError(pageId);
   }
 
+  if (page.type === 'proposal' && req.body.public !== true) {
+    throw new ActionNotPermittedError('You cannot manually update permissions for proposals.');
+  }
+
   // Count before and after permissions so we don't trigger the event unless necessary
   const permissionsBefore = await prisma.pagePermission.count({
     where: {
@@ -63,10 +73,21 @@ async function addPagePermission (req: NextApiRequest, res: NextApiResponse<IPag
     }
   });
 
-  const createdPermission = await upsertPermission(pageId, req.body);
+  const pageTree = await resolvePageTree({
+    pageId: page.id,
+    flattenChildren: true
+  });
+
+  const proposalParentId = findParentOfType({ targetPageTree: pageTree, pageType: 'proposal' });
+
+  if (proposalParentId) {
+    throw new ActionNotPermittedError('You cannot manually update permissions for child pages of proposals.');
+  }
+
+  const createdPermission = await upsertPermission(pageId, req.body, pageTree);
 
   // Override behaviour, we always cascade board permissions downwards
-  if (page.type === 'board') {
+  if (page.type.match(/board/)) {
     await boardPagePermissionUpdated({ boardId: pageId, permissionId: createdPermission.id });
 
   }
@@ -101,8 +122,22 @@ async function removePagePermission (req: NextApiRequest, res: NextApiResponse) 
     userId: req.session.user.id
   });
 
-  if (computedPermissions.grant_permissions !== true) {
+  if (permission.public && computedPermissions.edit_isPublic !== true) {
     throw new ActionNotPermittedError('You cannot manage permissions for this page');
+  }
+  else if (!permission.public && computedPermissions.grant_permissions !== true) {
+    throw new ActionNotPermittedError('You cannot manage permissions for this page');
+  }
+
+  const pageTree = await resolvePageTree({
+    pageId: permission.pageId,
+    flattenChildren: true
+  });
+
+  const proposalParentId = findParentOfType({ targetPageTree: pageTree, pageType: 'proposal' });
+
+  if (proposalParentId) {
+    throw new ActionNotPermittedError('You cannot manually update permissions for child pages of proposals.');
   }
 
   await deletePagePermission(permissionId);

@@ -86,6 +86,7 @@
         "allowForLoopAfterthoughts": true
       }
     ],
+    "no-restricted-exports": "off",
     "no-restricted-syntax": "off",
     "no-underscore-dangle": "off",
     "no-unused-vars": "off",
@@ -111,6 +112,14 @@
           ".tsx",
           ".jsx"
         ]
+      }
+    ],
+    "react/jsx-indent": [
+      2,
+      2,
+      {
+        "checkAttributes": true,
+        "indentLogicalExpressions": true
       }
     ],
     "react/jsx-no-bind": "off",

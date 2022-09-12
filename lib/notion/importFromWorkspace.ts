@@ -15,6 +15,7 @@ import promiseRetry from 'promise-retry';
 import { isTruthy } from 'lib/utilities/types';
 import { getFilePath, uploadToS3 } from 'lib/aws/uploadToS3Server';
 import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
+import { getPagePath } from 'lib/pages';
 import { BlockObjectResponse, GetDatabaseResponse, GetPageResponse, RichTextItemResponse, NotionImage } from './types';
 
 // Limit the highest number of pages that can be imported
@@ -522,7 +523,7 @@ async function createPrismaPage ({
   parentId,
   cardId
 }: CreatePageInput) {
-  const pagePathId = Math.random().toString().replace('0.', '');
+
   const pageToCreate: Prisma.PageCreateInput = {
     id,
     content,
@@ -536,7 +537,7 @@ async function createPrismaPage ({
     },
     updatedAt: new Date(),
     updatedBy: createdBy,
-    path: `page-${pagePathId}`,
+    path: getPagePath(),
     space: {
       connect: {
         id: spaceId || undefined

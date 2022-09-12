@@ -1,24 +1,23 @@
 import { getUriWithParam } from 'lib/utilities/strings';
 import { Page } from 'models';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useState, useMemo } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import CenterPanel from 'components/common/BoardEditor/focalboard/src/components/centerPanel';
 import { sendFlashMessage, FlashMessages } from 'components/common/BoardEditor/focalboard/src/components/flashMessages';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { getCurrentBoard, setCurrent as setCurrentBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
-import { getCurrentViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { getClientConfig } from 'components/common/BoardEditor/focalboard/src/store/clientConfig';
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { initialReadOnlyLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
-import { getCurrentBoardViews, getCurrentViewDisplayBy, getCurrentViewGroupBy, getView, setCurrent as setCurrentView } from 'components/common/BoardEditor/focalboard/src/store/views';
+import { getCurrentBoardViews, getView, setCurrent as setCurrentView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import { silentlyUpdateURL } from 'lib/browser';
-import { usePages } from 'hooks/usePages';
-import ReactDndProvider from 'components/common/ReactDndProvider';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
+import { usePages } from 'hooks/usePages';
+import { IPagePermissionFlags } from 'lib/permissions/pages';
 /**
  *
  * For the original version of this file, see src/boardPage.tsx in focalboard
@@ -26,23 +25,21 @@ import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 
 interface Props {
   page: Page;
-  readonly?: boolean;
+  readOnly?: boolean;
   setPage: (p: Partial<Page>) => void;
+  pagePermissions?: IPagePermissionFlags;
 }
 
-export function BoardPage ({ page, setPage, readonly }: Props) {
+export default function BoardPage ({ page, setPage, readOnly = false, pagePermissions }: Props) {
   const router = useRouter();
   const board = useAppSelector(getCurrentBoard);
-  const cards = useAppSelector(getCurrentViewCardsSortedFilteredAndGrouped);
   const activeView = useAppSelector(getView(router.query.viewId as string));
   const boardViews = useAppSelector(getCurrentBoardViews);
-  const groupByProperty = useAppSelector(getCurrentViewGroupBy);
-  const dateDisplayProperty = useAppSelector(getCurrentViewDisplayBy);
   const clientConfig = useAppSelector(getClientConfig);
   const dispatch = useAppDispatch();
   const [shownCardId, setShownCardId] = useState(router.query.cardId);
-  const { pages } = usePages();
-  const accessibleCards = useMemo(() => cards.filter(card => pages[card.id]), [cards, Object.keys(pages).toString()]);
+
+  const readOnlyBoard = readOnly || !pagePermissions?.edit_content;
 
   useEffect(() => {
     const boardId = page.boardId;
@@ -71,8 +68,9 @@ export function BoardPage ({ page, setPage, readonly }: Props) {
   }, [page.boardId, router.query.viewId, boardViews]);
 
   // load initial data for readonly boards - otherwise its loaded in _app.tsx
+  // inline linked board will be loaded manually
   useEffect(() => {
-    if (readonly && page.boardId) {
+    if (readOnlyBoard && page.boardId && page.type !== 'inline_linked_board') {
       dispatch(initialReadOnlyLoad(page.boardId));
     }
   }, [page.boardId]);
@@ -120,58 +118,37 @@ export function BoardPage ({ page, setPage, readonly }: Props) {
   }, [router.query]);
 
   if (board && activeView) {
-    let property = groupByProperty;
-    if ((!property || property.type !== 'select') && activeView.fields.viewType === 'board') {
-      property = board?.fields.cardProperties.find((o: any) => o.type === 'select');
-    }
-
-    let displayProperty = dateDisplayProperty;
-    if (!displayProperty && activeView.fields.viewType === 'calendar') {
-      displayProperty = board.fields.cardProperties.find((o: any) => o.type === 'date');
-    }
 
     return (
-      <div className='focalboard-body full-page'>
-        <CenterPanel
-          clientConfig={clientConfig}
-          readonly={!!readonly}
-          board={board}
-          setPage={setPage}
-          cards={accessibleCards}
-          showCard={showCard}
-          activeView={activeView}
-          groupByProperty={property}
-          dateDisplayProperty={displayProperty}
-          views={boardViews}
-        />
-        {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
-          <RootPortal>
-            <CardDialog
-              board={board}
-              key={shownCardId}
-              cardId={shownCardId}
-              onClose={() => showCard(undefined)}
-              showCard={(cardId) => showCard(cardId)}
-              readonly={Boolean(readonly)}
-            />
-          </RootPortal>
-        )}
-      </div>
+      <>
+        <FlashMessages milliseconds={2000} />
+        <div className='focalboard-body full-page'>
+          <CenterPanel
+            clientConfig={clientConfig}
+            readonly={Boolean(readOnlyBoard)}
+            board={board}
+            setPage={setPage}
+            showCard={showCard}
+            activeView={activeView}
+            views={boardViews}
+          />
+          {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
+            <RootPortal>
+              <CardDialog
+                key={shownCardId}
+                cardId={shownCardId}
+                onClose={() => showCard(undefined)}
+                showCard={(cardId) => showCard(cardId)}
+                readonly={readOnly}
+              />
+            </RootPortal>
+          )}
+        </div>
+        {/** include the root portal for focalboard's popup */}
+        <FocalBoardPortal />
+      </>
     );
   }
 
   return null;
-}
-
-export default function BoardPageWithContext (props: Props) {
-
-  return (
-    <ReactDndProvider>
-      <FlashMessages milliseconds={2000} />
-
-      <BoardPage {...props} />
-      {/** include the root portal for focalboard's popup */}
-      <FocalBoardPortal />
-    </ReactDndProvider>
-  );
 }

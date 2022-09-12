@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 
 import { createSlice, createAsyncThunk, PayloadAction, createSelector } from '@reduxjs/toolkit';
 
@@ -12,7 +10,7 @@ import { Subscription } from '../wsclient';
 
 import { initialLoad } from './initialLoad';
 
-import { RootState } from './index';
+import type { RootState } from './index';
 
 type UsersStatus = {
   workspaceUsers: {[key: string]: IUser}

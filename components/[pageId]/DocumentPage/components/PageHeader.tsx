@@ -84,56 +84,56 @@ function PageHeader ({ headerImage, icon, readOnly, setPage, title }: PageHeader
     <>
       <EditorHeader>
         {icon && (
-        <MenuWrapper>
-          <EmojiIcon size='large' icon={icon} />
-          <Menu>
-            <Menu.Text
-              id='random'
-              icon={<FBEmojiIcon />}
-              name='Random'
-              onClick={() => {
-                updatePageIcon(BlockIcons.shared.randomIcon());
-              }}
-            />
-            <Menu.SubMenu
-              id='pick'
-              icon={<FBEmojiIcon />}
-              name='Pick icon'
-            >
-              <EmojiPicker onSelect={(emoji) => {
-                updatePageIcon(emoji);
-              }}
+          <MenuWrapper>
+            <EmojiIcon size='large' icon={icon} />
+            <Menu>
+              <Menu.Text
+                id='random'
+                icon={<FBEmojiIcon />}
+                name='Random'
+                onClick={() => {
+                  updatePageIcon(BlockIcons.shared.randomIcon());
+                }}
               />
-            </Menu.SubMenu>
-            <Menu.Text
-              id='remove'
-              icon={<DeleteIcon />}
-              name='Remove icon'
-              onClick={() => {
-                updatePageIcon(null);
-              }}
-            />
-          </Menu>
-        </MenuWrapper>
+              <Menu.SubMenu
+                id='pick'
+                icon={<FBEmojiIcon />}
+                name='Pick icon'
+              >
+                <EmojiPicker onSelect={(emoji) => {
+                  updatePageIcon(emoji);
+                }}
+                />
+              </Menu.SubMenu>
+              <Menu.Text
+                id='remove'
+                icon={<DeleteIcon />}
+                name='Remove icon'
+                onClick={() => {
+                  updatePageIcon(null);
+                }}
+              />
+            </Menu>
+          </MenuWrapper>
         )}
         <Controls className='page-controls'>
           {!readOnly && !icon && (
-          <PageControlItem onClick={addPageIcon}>
-            <EmojiEmotionsIcon
-              fontSize='small'
-              sx={{ marginRight: 1 }}
-            />
-            Add icon
-          </PageControlItem>
+            <PageControlItem onClick={addPageIcon}>
+              <EmojiEmotionsIcon
+                fontSize='small'
+                sx={{ marginRight: 1 }}
+              />
+              Add icon
+            </PageControlItem>
           )}
           {!readOnly && !headerImage && (
-          <PageControlItem onClick={addPageHeader}>
-            <ImageIcon
-              fontSize='small'
-              sx={{ marginRight: 1 }}
-            />
-            Add cover
-          </PageControlItem>
+            <PageControlItem onClick={addPageHeader}>
+              <ImageIcon
+                fontSize='small'
+                sx={{ marginRight: 1 }}
+              />
+              Add cover
+            </PageControlItem>
           )}
         </Controls>
       </EditorHeader>

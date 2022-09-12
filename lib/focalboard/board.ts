@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import { PageContent } from 'models';
 import { v4 } from 'uuid';
 import { Block, createBlock } from './block';

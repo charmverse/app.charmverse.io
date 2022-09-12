@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import React, { useEffect, useRef, useState, useMemo, memo } from 'react';
 import { FormattedMessage } from 'react-intl';
 
@@ -13,6 +11,7 @@ import { Constants } from '../../constants';
 import Button from '../../widgets/buttons/button';
 import Editable from '../../widgets/editable';
 import { useSortable } from '../../hooks/sortable';
+import { isTouchScreen } from 'lib/browser';
 
 import PropertyValueElement from '../propertyValueElement';
 
@@ -50,7 +49,8 @@ function TableRow (props: Props) {
   const [title, setTitle] = useState('');
   const isManualSort = activeView.fields.sortOptions.length === 0;
   const isGrouped = Boolean(activeView.fields.groupById);
-  const [isDragging, isOver, cardRef] = useSortable('card', card, !props.readonly && (isManualSort || isGrouped), props.onDrop);
+  const [isDragging, isOver, cardRef] = useSortable('card', card, !isTouchScreen() && !props.readonly && (isManualSort || isGrouped), props.onDrop);
+
   useEffect(() => {
     if (props.focusOnMount) {
       setTimeout(() => titleRef.current?.focus(), 10);

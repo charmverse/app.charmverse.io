@@ -6,7 +6,7 @@ import LoadingComponent from 'components/common/LoadingComponent';
 
 export default function BountyPage () {
 
-  const { bounties, loadingBounties, refreshBounty } = useBounties();
+  const { bounties, loadingBounties } = useBounties();
 
   setTitle('Bounties');
 
@@ -15,7 +15,7 @@ export default function BountyPage () {
   }
 
   return (
-    <BountiesPage bounties={bounties} refreshBounty={refreshBounty} />
+    <BountiesPage bounties={bounties} />
   );
 
 }

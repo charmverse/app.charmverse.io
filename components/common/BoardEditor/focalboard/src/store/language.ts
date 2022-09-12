@@ -1,11 +1,9 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 
 import { getCurrentLanguage, storeLanguage as i18nStoreLanguage } from '../i18n';
 
-import { RootState } from './index';
+import type { RootState } from './index';
 
 export const fetchLanguage = createAsyncThunk(
   'language/fetch',

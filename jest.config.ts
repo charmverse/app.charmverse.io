@@ -39,7 +39,6 @@ export const jestConfig = {
   transform: {
     '^.+\\.(ts)$': 'ts-jest'
   }
-
 };
 
 export default createJestConfig(jestConfig);

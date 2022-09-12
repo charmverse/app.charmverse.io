@@ -194,6 +194,24 @@ describe('reducePagesToPageTree', () => {
     expect(rootNodes[0].children.length).toBe(0);
   });
 
+  it('should filter out proposal type pages by default', async () => {
+
+    const proposal = generatePageNode({
+      type: 'proposal',
+      parentId: null
+    });
+
+    const { rootNodes } = reducePagesToPageTree({
+      items: [root_1, proposal],
+      includeProposals: false
+    });
+
+    expect(rootNodes.length).toBe(1);
+
+    expect(rootNodes[0].id).toBe(root_1.id);
+
+  });
+
   it('should filter out deleted pages by default', async () => {
 
     const root_3 = generatePageNode({
@@ -318,6 +336,24 @@ describe('reducePagesToPageTree', () => {
     expect(rootNodes[0].children[0].children[0].id).toBe(card_page_1.id);
     expect(rootNodes[0].children[0].children[1].id).toBe(card_page_2.id);
   });
+
+  it('should include proposal type pages if this option is true', async () => {
+
+    const proposal = generatePageNode({
+      type: 'proposal',
+      parentId: null
+    });
+
+    const { rootNodes } = reducePagesToPageTree({
+      items: [root_1, proposal],
+      includeProposals: true
+    });
+
+    expect(rootNodes.length).toBe(2);
+
+    expect(rootNodes.some(node => node.id === proposal.id)).toBe(true);
+
+  });
 });
 
 describe('mapPageTree', () => {
@@ -349,6 +385,24 @@ describe('mapPageTree', () => {
 
     // No children should have been passed
     expect(rootList[0].children.length).toBe(0);
+  });
+
+  // This test so we don't accidentally render proposals in the UI page tree
+  it('should ignore proposal type pages by default', async () => {
+
+    const proposal = generatePageNode({
+      type: 'proposal',
+      parentId: null
+    });
+
+    const mappedPages = mapPageTree({
+      items: [root_1, proposal],
+      includeProposals: false
+    });
+
+    expect(mappedPages.length).toBe(1);
+
+    expect(mappedPages[0].id).toBe(root_1.id);
   });
 
   it('should only return the selected root nodes if this is provided as a parameter', async () => {

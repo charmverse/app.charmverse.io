@@ -83,14 +83,14 @@ export default function BountyApplicantTableRow ({
 
   async function approveApplication (applicationId: string) {
     if (!submissionsCapReached) {
-      await charmClient.approveApplication(applicationId);
+      await charmClient.bounties.approveApplication(applicationId);
       refreshBounty(bounty.id);
     }
   }
 
   function makeSubmissionDecision (applicationId: string, decision: ReviewDecision) {
     setApiError(null);
-    charmClient.reviewSubmission(applicationId, decision)
+    charmClient.bounties.reviewSubmission(applicationId, decision)
       .then(() => {
         // Closes the modal
         setReviewDecision(null);
@@ -253,8 +253,9 @@ export default function BountyApplicantTableRow ({
                   <FormLabel><strong>Send a message (optional)</strong></FormLabel>
                   <div className='CommentsList' style={{ padding: 0 }}>
                     <NewCommentInput
-                      initialValue={defaultComment}
+                      $key={editorKey}
                       key={editorKey}
+                      initialValue={defaultComment}
                       username={user?.username}
                       avatar={user?.avatar}
                       onSubmit={onSendClicked}

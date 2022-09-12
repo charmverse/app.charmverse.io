@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import { marked } from 'marked';
 import { IntlShape } from 'react-intl';
 import { DateTime } from 'luxon';
@@ -11,7 +9,7 @@ import { createBoard } from './blocks/board';
 import { createBoardView } from './blocks/boardView';
 import { createCard } from './blocks/card';
 import { createCommentBlock } from './blocks/commentBlock';
-import { IAppWindow } from './types';
+import type {IAppWindow} from './types';
 
 declare let window: IAppWindow;
 
@@ -460,22 +458,6 @@ class Utils {
     }
 
     return result;
-  }
-
-  static isMobile (): boolean {
-    const toMatch = [
-      /Android/i,
-      /webOS/i,
-      /iPhone/i,
-      /iPad/i,
-      /iPod/i,
-      /BlackBerry/i,
-      /Windows Phone/i
-    ];
-
-    return toMatch.some((toMatchItem) => {
-      return navigator.userAgent.match(toMatchItem);
-    });
   }
 
   static getBaseURL (absolute?: boolean): string {
