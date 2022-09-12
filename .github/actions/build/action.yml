@@ -38,7 +38,7 @@ runs:
         context: .
         push: true
         tags: "${{ env.REGISTRY }}/${{ env.REPO }}:${{ github.sha }}"
-        target: SERVING_APP
+        target: running_app
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
