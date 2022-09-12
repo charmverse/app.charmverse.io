@@ -40,11 +40,13 @@ describe('getProposalTasks', () => {
     expect(proposalTasks).toEqual(expect.arrayContaining([
       expect.objectContaining({
         id: draftProposal1.id,
-        status: draftProposal1.proposal?.status
+        status: draftProposal1.proposal?.status,
+        action: 'move_to_discussion'
       }),
       expect.objectContaining({
         id: privateDraftProposal1.id,
-        status: privateDraftProposal1.proposal?.status
+        status: privateDraftProposal1.proposal?.status,
+        action: 'move_to_discussion'
       })
     ]));
   });
@@ -74,7 +76,8 @@ describe('getProposalTasks', () => {
     expect(proposalTasks).toEqual(expect.arrayContaining([
       expect.objectContaining({
         id: reviewedProposal1.id,
-        status: reviewedProposal1.proposal?.status
+        status: reviewedProposal1.proposal?.status,
+        action: 'start_vote'
       })
     ]));
   });
@@ -118,11 +121,13 @@ describe('getProposalTasks', () => {
     expect(proposalTasks).toEqual(expect.arrayContaining([
       expect.objectContaining({
         id: proposalToReviewViaRole.id,
-        status: proposalToReviewViaRole.proposal?.status
+        status: proposalToReviewViaRole.proposal?.status,
+        action: 'review'
       }),
       expect.objectContaining({
         id: proposalToReviewViaUser.id,
-        status: proposalToReviewViaUser.proposal?.status
+        status: proposalToReviewViaUser.proposal?.status,
+        action: 'review'
       })
     ]));
   });
@@ -180,15 +185,18 @@ describe('getProposalTasks', () => {
     expect(proposalTasks).toEqual(expect.arrayContaining([
       expect.objectContaining({
         id: discussionProposal1.id,
-        status: discussionProposal1.proposal?.status
+        status: discussionProposal1.proposal?.status,
+        action: 'discuss'
       }),
       expect.objectContaining({
         id: activeVoteProposal.id,
-        status: activeVoteProposal.proposal?.status
+        status: activeVoteProposal.proposal?.status,
+        action: 'vote'
       }),
       expect.objectContaining({
         id: discussionProposal2.id,
-        status: discussionProposal2.proposal?.status
+        status: discussionProposal2.proposal?.status,
+        action: 'discuss'
       })
     ]));
   });
