@@ -16,7 +16,7 @@ runs:
 
     - name: Build
       shell: bash
-      run: echo "testing env vars $env.TESTVAR lkjlj"
+      run: echo "testing env vars ${{ env.TESTVAR }} lkjlj"
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
