@@ -6,7 +6,6 @@ import { BackIcon } from 'components/common/Icons/BackIcon';
 import { DocumentPageIcon } from 'components/common/Icons/DocumentPageIcon';
 import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { usePages } from 'hooks/usePages';
 import { IPageWithPermissions } from 'lib/pages';
 
 const StyledPageTemplateBanner = styled(Box)<{card?: boolean}>`
@@ -21,15 +20,12 @@ const StyledPageTemplateBanner = styled(Box)<{card?: boolean}>`
   padding: ${({ theme }) => theme.spacing(1.4)};
 `;
 
-export function PageTemplateBanner ({ pageId }: {pageId: string}) {
+export function PageTemplateBanner ({ page }: {page: IPageWithPermissions}) {
   const [space] = useCurrentSpace();
-  const { pages } = usePages();
-
   const theme = useTheme();
-  const page = pages[pageId] as IPageWithPermissions;
 
   const isShowingCard = page.type.match('card') !== null;
-  const board = isShowingCard ? pages[page.parentId as string] as IPageWithPermissions : undefined;
+  const board = isShowingCard ? page : undefined;
 
   const boardPath = board ? `/${space?.domain}/${board?.path}` : undefined;
 

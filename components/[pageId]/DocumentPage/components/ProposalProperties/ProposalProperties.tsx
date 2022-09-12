@@ -40,6 +40,7 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly }: Pr
   }
 
   const [contributors] = useContributors();
+
   const { roles = [], roleups } = useRoles();
   const { user } = useUser();
   const proposalMenuState = usePopupState({ popupId: 'proposal-info', variant: 'popover' });

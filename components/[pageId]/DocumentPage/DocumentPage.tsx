@@ -122,10 +122,6 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
   const router = useRouter();
   const isSharedPage = router.pathname.startsWith('/share');
 
-  const proposalId = page.proposalId || parentProposalId;
-  // We can only edit the proposal from the top level
-  const readonlyProposalProperties = !page.proposalId || Boolean(parentProposalId) || readOnly;
-
   return (
     <ScrollableWindow
       sx={{
@@ -150,7 +146,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
       >
         <div ref={containerRef}>
           {page.deletedAt && <PageDeleteBanner pageId={page.id} />}
-          <PageTemplateBanner pageId={page.id} />
+          <PageTemplateBanner page={page} />
           {page.headerImage && <PageBanner headerImage={page.headerImage} readOnly={cannotEdit} setPage={setPage} />}
           <Container
             top={pageTop}

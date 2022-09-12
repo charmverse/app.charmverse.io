@@ -6,6 +6,7 @@ import { GetTasksResponse } from 'pages/api/tasks/list';
 import { KeyedMutator } from 'swr';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { ProposalStatusChip } from 'components/proposals/components/ProposalStatusBadge';
+import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 
 const ProposalActionRecord: Record<ProposalTask['action'], string> = {
   discuss: 'Discuss',
@@ -21,6 +22,9 @@ const ProposalActionRecord: Record<ProposalTask['action'], string> = {
 export function ProposalTasksListRow (
   props: {proposalTask: ProposalTask}
 ) {
+
+  const { showPage } = usePageDialog();
+
   const {
     proposalTask
   } = props;
@@ -35,7 +39,7 @@ export function ProposalTasksListRow (
     status
   } = proposalTask;
 
-  const proposalLink = `/${spaceDomain}/${pagePath}?proposalId=${id}`;
+  const proposalLink = `/${spaceDomain}/${pagePath}`;
   const proposalLocation = `${pageTitle || 'Untitled'} in ${spaceName}`;
 
   return (
@@ -95,6 +99,9 @@ export function ProposalTasksListRow (
                 }
               }}
               onClick={() => {
+                showPage({
+                  pageId: id
+                });
               }}
             >{ProposalActionRecord[action]}
             </Button>
