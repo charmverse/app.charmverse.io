@@ -69,7 +69,7 @@ export function ProposalTasksListRow (
               fontSize: { xs: 14, sm: 'inherit' }
             }}
           >
-            <Link href={proposalLink} justifyContent='center' display='flex'>
+            <Link href={proposalLink} display='flex'>
               {proposalLocation}
             </Link>
           </Grid>
@@ -81,11 +81,21 @@ export function ProposalTasksListRow (
             xs={12}
             sm={2}
             md={2}
-            justifyContent='flex-end'
+            justifyContent={{
+              xs: 'flex-start',
+              md: 'flex-end'
+            }}
             display='flex'
           >
-            <Button onClick={() => {
-            }}
+            <Button
+              sx={{
+                width: {
+                  xs: 'fit-content',
+                  md: 100
+                }
+              }}
+              onClick={() => {
+              }}
             >{ProposalActionRecord[action]}
             </Button>
           </Grid>
