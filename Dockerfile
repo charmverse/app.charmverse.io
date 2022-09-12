@@ -24,7 +24,7 @@ CMD ["npm", "run", "start:staging"]
 
 
 # Create TESTING image
-FROM serving_app AS testing_app
+FROM running_app AS testing_app
 
 RUN npm ci --no-audit --no-fund --include dev \
            --legacy-peer-deps
