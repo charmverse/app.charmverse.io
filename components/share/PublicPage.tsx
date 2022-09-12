@@ -6,6 +6,8 @@ import { Box, IconButton, Tooltip } from '@mui/material';
 import { Space } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
 import charmClient from 'charmClient';
+import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
+import PageDialogGlobalModal from 'components/common/PageDialog/PageDialogGlobal';
 import { updateBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { addCard } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
@@ -182,11 +184,11 @@ export default function PublicPage () {
           </StyledToolbar>
         </AppBar>
 
-        <PageContainer>
-          <HeaderSpacer />
+        <PageDialogProvider>
+          <PageContainer>
+            <HeaderSpacer />
 
-          {
-            isBountiesPage
+            {isBountiesPage
               ? <PublicBountiesPage />
               : (currentPage?.type.match(/board/)
                 ? (
@@ -194,10 +196,11 @@ export default function PublicPage () {
                 ) : (
                   currentPage && <DocumentPage page={currentPage} setPage={() => {}} readOnly={true} parentProposalId={parentProposalId} />
                 )
-              )
-          }
+              )}
+            <PageDialogGlobalModal />
 
-        </PageContainer>
+          </PageContainer>
+        </PageDialogProvider>
 
       </LayoutContainer>
     </>

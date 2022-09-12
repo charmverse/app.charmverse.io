@@ -31,8 +31,7 @@ async function deleteThreadController (req: NextApiRequest, res: NextApiResponse
 
   const permissionSet = await computeUserPagePermissions({
     pageId: thread.pageId,
-    userId,
-    allowAdminBypass: false
+    userId
   });
 
   if (!permissionSet.comment) {
