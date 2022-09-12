@@ -40,10 +40,11 @@ export default function BountyProperties (props: {
   const { bountyId, pageId, readOnly = false, permissions, refreshBountyPermissions } = props;
   const [paymentMethods] = usePaymentMethods();
   const { draftBounty, bounties, cancelDraftBounty, setBounties, updateBounty } = useBounties();
-  const [availableCryptos, setAvailableCryptos] = useState<Array<string | CryptoCurrency>>([]);
+  const [availableCryptos, setAvailableCryptos] = useState<Array<string | CryptoCurrency>>(['ETH']);
   const [isShowingAdvancedSettings, setIsShowingAdvancedSettings] = useState(false);
   const bountyFromContext = bounties.find(b => b.id === bountyId);
   const [currentBounty, setCurrentBounty] = useState<(BountyCreationData & BountyWithDetails) | null>(null);
+
   const [capSubmissions, setCapSubmissions] = useState(currentBounty?.maxSubmissions !== null);
   const [space] = useCurrentSpace();
   const { user } = useUser();

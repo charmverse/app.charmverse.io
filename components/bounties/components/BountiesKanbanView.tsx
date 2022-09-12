@@ -42,9 +42,9 @@ export default function BountiesKanbanView ({ bounties }: Omit<Props, 'publicMod
   function showBounty (bounty: BountyWithDetails) {
     const newUrl = getUriWithParam(window.location.href, { bountyId: bounty.id });
     silentlyUpdateURL(newUrl);
-    if (bounty?.page.id) {
+    if (bounty?.id) {
       showPage({
-        pageId: bounty?.page.id,
+        bountyId: bounty.id,
         onClose: closePopup
       });
     }
