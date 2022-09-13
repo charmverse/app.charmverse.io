@@ -1,7 +1,7 @@
 import { PageType, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
-import { generateBounty, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createPage, generateBounty, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { togglePublicBounties } from '../togglePublicBounties';
 
@@ -30,7 +30,7 @@ describe('togglePublicBounties', () => {
 
   });
 
-  it('should upsert a public view permission for all pages with a linked bounty that the space can view', async () => {
+  it('should upsert a public view permission for all pages with a linked bounty that the space can view, including the child pages which can inherit permissions', async () => {
 
     const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
 
@@ -82,13 +82,20 @@ describe('togglePublicBounties', () => {
 
     await Promise.all([...privatePages, ...publicPages].map(async p => {
 
-      return generateBounty({
+      const bounty = await generateBounty({
         id: p.id,
         approveSubmitters: true,
         createdBy: user.id,
         spaceId: space.id,
         status: 'open',
         type: p.type,
+        pagePermissions: p.pagePermissions
+      });
+
+      await createPage({
+        createdBy: user.id,
+        spaceId: space.id,
+        parentId: bounty.page.id,
         pagePermissions: p.pagePermissions
       });
 
@@ -101,9 +108,15 @@ describe('togglePublicBounties', () => {
 
     const publicAfterModification = await prisma.page.findMany({
       where: {
-        id: {
-          in: publicPages.map(p => p.id)
-        }
+        OR: [{
+          id: {
+            in: publicPages.map(p => p.id)
+          }
+        }, {
+          parentId: {
+            in: publicPages.map(p => p.id)
+          }
+        }]
       },
       include: {
         permissions: {
@@ -116,9 +129,15 @@ describe('togglePublicBounties', () => {
 
     const privateAfterModification = await prisma.page.findMany({
       where: {
-        id: {
-          in: privatePages.map(p => p.id)
-        }
+        OR: [{
+          id: {
+            in: privatePages.map(p => p.id)
+          }
+        }, {
+          parentId: {
+            in: privatePages.map(p => p.id)
+          }
+        }]
       },
       include: {
         permissions: {
@@ -144,7 +163,7 @@ describe('togglePublicBounties', () => {
     });
   });
 
-  it('should remove the public view permission for all pages with a linked bounty that the space can view', async () => {
+  it('should remove the public view permission for all pages with a linked bounty that the space can view, as well as children of those bounty pages', async () => {
 
     const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
 
@@ -185,13 +204,20 @@ describe('togglePublicBounties', () => {
 
     await Promise.all(publicPages.map(async p => {
 
-      return generateBounty({
+      const bounty = await generateBounty({
         id: p.id,
         approveSubmitters: true,
         createdBy: user.id,
         spaceId: space.id,
         status: 'open',
         type: p.type,
+        pagePermissions: p.pagePermissions
+      });
+
+      await createPage({
+        createdBy: user.id,
+        spaceId: space.id,
+        parentId: bounty.page.id,
         pagePermissions: p.pagePermissions
       });
 
@@ -204,9 +230,15 @@ describe('togglePublicBounties', () => {
 
     const publicAfterModification = await prisma.page.findMany({
       where: {
-        id: {
-          in: publicPages.map(p => p.id)
-        }
+        OR: [{
+          id: {
+            in: publicPages.map(p => p.id)
+          }
+        }, {
+          parentId: {
+            in: publicPages.map(p => p.id)
+          }
+        }]
       },
       include: {
         permissions: {

@@ -278,7 +278,7 @@ export async function generateRole ({ spaceId, createdBy, roleName = `role-${v4(
   return role;
 }
 
-export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'createdBy'>): Promise<IPageWithPermissions> {
+export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'createdBy'> & {pagePermissions?: Prisma.PagePermissionCreateManyPageInput[]}): Promise<IPageWithPermissions> {
   return prisma.page.create({
     data: {
       id: options.id ?? v4(),
@@ -298,6 +298,11 @@ export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'cre
           id: options.spaceId as string
         }
       },
+      permissions: options.pagePermissions ? {
+        createMany: {
+          data: options.pagePermissions
+        }
+      } : undefined,
       parentId: options.parentId,
       deletedAt: options.deletedAt ?? null,
       boardId: options.boardId ?? null
@@ -309,7 +314,7 @@ export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'cre
         }
       }
     }
-  });
+  }) as Promise<IPageWithPermissions>;
 }
 
 export async function createVote ({ userVotes = [], voteOptions = [], spaceId, createdBy, pageId, deadline = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), status = 'InProgress', title = 'Vote Title', context = 'inline', description = null }: Partial<Vote> & Pick<Vote, 'spaceId' | 'createdBy' | 'pageId'> & {voteOptions?: string[], userVotes?: string[]}) {

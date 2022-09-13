@@ -1,15 +1,18 @@
 import { Prisma, Space } from '@prisma/client';
 import { prisma } from 'db';
-import { validate } from 'uuid';
+import { v4, validate } from 'uuid';
+import { multiResolvePageTree } from 'lib/pages/server/resolvePageTree';
+import { PageNodeWithChildren, PageNodeWithPermissions } from 'lib/pages';
+import { hasSameOrMorePermissions, IPagePermissionWithSource } from 'lib/permissions/pages';
 import { DataNotFoundError, InvalidInputError } from '../utilities/errors';
 import { PublicBountyToggle } from './interfaces';
 
 async function generatePublicBountyPermissionArgs ({ publicBountyBoard, spaceId }: PublicBountyToggle<false>):
-Promise<Prisma.PagePermissionDeleteManyArgs | null>
+Promise<[Prisma.PagePermissionDeleteManyArgs | null]>
 async function generatePublicBountyPermissionArgs ({ publicBountyBoard, spaceId }: PublicBountyToggle<true>):
-Promise<Prisma.PagePermissionUpsertArgs[]>
+Promise<[Prisma.PagePermissionDeleteManyArgs | null, Prisma.PagePermissionCreateManyArgs, Prisma.PagePermissionCreateManyArgs]>
 async function generatePublicBountyPermissionArgs ({ publicBountyBoard, spaceId }: PublicBountyToggle):
-Promise<(Prisma.PagePermissionDeleteManyArgs | null) | Prisma.PagePermissionUpsertArgs[]> {
+Promise<[Prisma.PagePermissionDeleteManyArgs | null, Prisma.PagePermissionCreateManyArgs?, Prisma.PagePermissionCreateManyArgs?]> {
   const spaceBountyPages = await prisma.page.findMany({
     where: {
       spaceId,
@@ -26,68 +29,102 @@ Promise<(Prisma.PagePermissionDeleteManyArgs | null) | Prisma.PagePermissionUpse
     select: {
       id: true,
       permissions: {
-        where: {
-          public: true
+        include: {
+          sourcePermission: true
         }
       }
     }
   });
+
+  const bountyTopPageIds = spaceBountyPages.map(({ id }) => id);
+
+  const pageTrees = await multiResolvePageTree({
+    pageIds: bountyTopPageIds,
+    includeDeletedPages: false,
+    flattenChildren: true
+  });
+
+  const childPageIds: string[] = [];
+
+  Object.entries(pageTrees).forEach(([key, value]) => {
+    if (value) {
+      childPageIds.push(...value.flatChildren.map(({ id }) => id));
+    }
+  });
+
+  const deleteArgs: Prisma.PagePermissionDeleteManyArgs = {
+    where: {
+      pageId: {
+        in: [...bountyTopPageIds, ...childPageIds]
+      },
+      public: true
+    }
+  };
 
   if (!publicBountyBoard) {
-    const pagePermissionIdArgs = spaceBountyPages.flatMap(({ permissions }) => permissions.map(({ id }) => id));
-
-    if (pagePermissionIdArgs.length === 0) {
-      return null;
-    }
-
-    const deleteArgs: Prisma.PagePermissionDeleteManyArgs = {
-      where: {
-        OR: [
-          {
-            id: {
-              in: pagePermissionIdArgs
-            }
-          },
-          {
-            inheritedFromPermission: {
-              in: pagePermissionIdArgs
-            }
-          }
-        ]
-      }
-    };
-
-    return deleteArgs;
-
+    return bountyTopPageIds.length === 0 ? [null] : [deleteArgs];
   }
 
-  // If upserting permissions, we don't want to affect existing pages
-  const pageIdArgs = spaceBountyPages.map(({ id }) => id);
+  // We are creating permissions, so we want to create them in 2 steps
 
-  const upsertArgs: Prisma.PagePermissionUpsertArgs[] = pageIdArgs.map((id) => {
-
+  const createArgs: Prisma.PagePermissionCreateManyInput[] = bountyTopPageIds.map((id) => {
     return {
-      where: {
-        public_pageId: {
-          pageId: id,
-          public: true
-        }
-      },
-      create: {
-        page: {
-          connect: {
-            id
-          }
-        },
-        permissionLevel: 'view',
-        public: true
-      },
-      update: {
-      }
+      id: v4(),
+      pageId: id,
+      permissionLevel: 'view',
+      public: true
     };
   });
 
-  return upsertArgs;
+  const childCreateArgs: Prisma.PagePermissionCreateManyInput[] = [];
+
+  /**
+   * We need to create permissions for all child pages of the bounty pages
+   * If this page already has a public permission, we don't need to change it
+   */
+  function extractInheritableChildren (
+    { node,
+      bountyPageId
+    } : {
+      node: PageNodeWithChildren<PageNodeWithPermissions>,
+      bountyPageId: string
+    }
+  ): void {
+    node.children?.forEach(child => {
+      const canInherit = hasSameOrMorePermissions(node.permissions, child.permissions);
+
+      if (canInherit) {
+
+        const sourcePermission = createArgs.find(a => a.pageId === bountyPageId);
+
+        childCreateArgs.push({
+          pageId: child.id,
+          permissionLevel: 'view',
+          public: true,
+          inheritedFromPermission: sourcePermission?.id
+        });
+
+        extractInheritableChildren({
+          node: child,
+          bountyPageId
+        });
+
+      }
+    });
+  }
+
+  bountyTopPageIds.forEach(id => {
+    const tree = pageTrees[id];
+
+    if (tree) {
+      extractInheritableChildren({
+        node: tree.targetPage,
+        bountyPageId: id
+      });
+    }
+  });
+
+  return [deleteArgs, { data: createArgs }, { data: childCreateArgs }];
 
 }
 
@@ -110,12 +147,19 @@ export async function togglePublicBounties ({ spaceId, publicBountyBoard }: Publ
       });
 
       if (publicBountyBoard === true) {
-        const upsertArgs = await generatePublicBountyPermissionArgs({ publicBountyBoard, spaceId });
 
-        await Promise.all(upsertArgs.map((args) => prisma.pagePermission.upsert(args)));
+        const [deleteArgs, createArgs, childCreateArgs] = await generatePublicBountyPermissionArgs({ publicBountyBoard, spaceId });
+
+        if (deleteArgs) {
+          await prisma.pagePermission.deleteMany(deleteArgs);
+        }
+
+        await prisma.pagePermission.createMany(createArgs);
+
+        await prisma.pagePermission.createMany(childCreateArgs);
       }
       else {
-        const deleteArgs = await generatePublicBountyPermissionArgs({ publicBountyBoard, spaceId });
+        const [deleteArgs] = await generatePublicBountyPermissionArgs({ publicBountyBoard, spaceId });
 
         if (deleteArgs) {
           await prisma.pagePermission.deleteMany(deleteArgs);
