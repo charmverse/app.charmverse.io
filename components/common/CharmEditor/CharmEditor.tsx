@@ -258,7 +258,7 @@ function CharmEditor (
     disablePageSpecificFeatures = false,
     enableVoting,
     pageId,
-    suggestion = null,
+    suggestions = null,
     onSuggestModeChange,
     containerWidth,
     pageType,

@@ -97,7 +97,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
       currentPage?.title,
       currentPage?.deletedAt,
       currentPage?.fullWidth,
-      currentPage?.suggestion,
+      currentPage?.suggestions,
       currentPagePermissions
     ]
   );
