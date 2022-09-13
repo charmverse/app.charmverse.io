@@ -1,8 +1,10 @@
 /* eslint-disable camelcase */
 import { Page, Space, User } from '@prisma/client';
+import { InvalidInputError } from 'lib/utilities/errors';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { v4 } from 'uuid';
 import { PageNodeWithChildren } from '../../interfaces';
-import { resolvePageTree } from '../resolvePageTree';
+import { multiResolvePageTree, resolvePageTree } from '../resolvePageTree';
 
 let user: User;
 let space: Space;
@@ -240,6 +242,73 @@ describe('resolvePageTree', () => {
 
     expect(targetPage.children[0].children.length).toBe(1);
     expect(targetPage.children[0].children[0].id).toBe(childPage_1_1_1.id);
+
+  });
+});
+
+describe('multiResolvePageTree', () => {
+
+  it('should return the target page tree for each page in a record with the page ids as key', async () => {
+    const { space: space1, user: user1 } = await generateUserAndSpaceWithApiToken();
+
+    const page1 = await createPage({
+      createdBy: user1.id,
+      spaceId: space1.id
+    });
+
+    const page2 = await createPage({
+      createdBy: user1.id,
+      spaceId: space1.id
+    });
+
+    const result = await multiResolvePageTree({ pageIds: [page1.id, page2.id] });
+
+    expect(result[page1.id]?.targetPage.id).toBe(page1.id);
+
+    expect(result[page2.id]?.targetPage.id).toBe(page2.id);
+  });
+
+  it('should return null if resolution failed for a specific page', async () => {
+
+    const { space: space1, user: user1 } = await generateUserAndSpaceWithApiToken();
+
+    const page1 = await createPage({
+      createdBy: user1.id,
+      spaceId: space1.id
+    });
+
+    const page1Child = await createPage({
+      createdBy: user1.id,
+      spaceId: space1.id,
+      parentId: page1.id
+    });
+
+    const inexistentPageId = v4();
+
+    const result = await multiResolvePageTree({ pageIds: [page1.id, inexistentPageId] });
+
+    expect(result[page1.id]?.targetPage.id).toBe(page1.id);
+    expect(result[page1.id]?.flatChildren[0].id).toBe(page1Child.id);
+
+    expect(result[inexistentPageId]).toBeNull();
+
+  });
+
+  it('should fail if the pages are in a separate space', async () => {
+    const { space: space1, user: user1 } = await generateUserAndSpaceWithApiToken();
+    const { space: space2, user: user2 } = await generateUserAndSpaceWithApiToken();
+
+    const page1 = await createPage({
+      createdBy: user1.id,
+      spaceId: space1.id
+    });
+
+    const page2 = await createPage({
+      createdBy: user2.id,
+      spaceId: space2.id
+    });
+
+    await expect(multiResolvePageTree({ pageIds: [page1.id, page2.id] })).rejects.toBeInstanceOf(InvalidInputError);
 
   });
 });

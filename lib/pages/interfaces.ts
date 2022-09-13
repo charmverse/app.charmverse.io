@@ -42,7 +42,7 @@ export interface PublicPageResponse {
 // Generic type A is optional, we can mount additional properties on basic node definitions
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export type PageNode<A = {}> = Pick<Page, 'id' | 'type' | 'parentId' | 'index' | 'createdAt' | 'deletedAt'> & A
+export type PageNode<A = {}> = Pick<Page, 'id' | 'spaceId' | 'type' | 'parentId' | 'index' | 'createdAt' | 'deletedAt'> & A
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type PageNodeWithChildren<A = {}> = PageNode<{children: PageNodeWithChildren<A>[]}> & A
@@ -64,10 +64,14 @@ export interface PageTreeMappingInput<T extends PageNode> {
   includeProposals?: boolean
 }
 
+/**
+ * @pageNodes An existing list of pages from the database which we can use to build the tree. Used in a context where we want to perform multiple resolvePageTree operations without calling the database multiple times
+ */
 export interface PageTreeResolveInput {
   pageId: string,
   flattenChildren?: boolean,
   includeDeletedPages?: boolean
+  pageNodes?: PageNodeWithPermissions[]
 }
 
 export type TargetPageTree<T extends PageNode = PageNode> = {
