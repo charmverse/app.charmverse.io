@@ -5,7 +5,7 @@ RUN apk add --no-cache libc6-compat git
 WORKDIR /app
 
 COPY *.json ./
-COPY patches ./
+COPY patches/ ./
 RUN ls /app/patches/ && npm ci --no-audit --no-fund --omit dev \
            --legacy-peer-deps
 
