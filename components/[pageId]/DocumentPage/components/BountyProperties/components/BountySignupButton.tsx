@@ -11,15 +11,28 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import charmClient from 'charmClient';
+import { useContributors } from 'hooks/useContributors';
+import { Page } from '@prisma/client';
+import { useRouter } from 'next/router';
 
-export default function BountySignupButton () {
+interface Props {
+  bountyPage: Page
+}
+
+export function BountySignupButton ({ bountyPage }: Props) {
 
   const { account } = useWeb3React();
-  const { user, setUser } = useUser();
+  const { user, setUser, isLoaded: isUserLoaded } = useUser();
+  const router = useRouter();
+  const [contributors] = useContributors();
   const [space] = useCurrentSpace();
   const loginViaTokenGateModal = usePopupState({ variant: 'popover', popupId: 'login-via-token-gate' });
   const { openWalletSelectorModal } = useContext(Web3Connection);
   const [loggingIn, setLoggingIn] = useState(false);
+
+  const isSpaceMember = Boolean(user && contributors.some(c => c.id === user.id));
+  const showSignup = isUserLoaded && (!user || !isSpaceMember);
+  const showSpaceRedirect = isUserLoaded && isSpaceMember;
 
   function loginUser () {
     if (!loggingIn) {
@@ -40,9 +53,24 @@ export default function BountySignupButton () {
 
   return (
     <>
-      <Button color='primary' onClick={loginViaTokenGateModal.open}>
-        Join this workspace to apply
-      </Button>
+      <Box display='flex' justifyContent='center' sx={{ my: 2 }}>
+        {
+        showSignup && (
+          <Button color='primary' onClick={loginViaTokenGateModal.open}>
+            Join this workspace to apply
+          </Button>
+        )
+      }
+
+        {
+        showSpaceRedirect && (
+          <Button color='primary' onClick={loginViaTokenGateModal.open}>
+            View this bounty inside the workspace
+          </Button>
+        )
+      }
+      </Box>
+
       <Modal size='large' open={loginViaTokenGateModal.isOpen} onClose={loginViaTokenGateModal.close} title={`Join the ${space?.name} workspace to apply`}>
         {
           !account
@@ -60,7 +88,7 @@ export default function BountySignupButton () {
             : (
               <TokenGateForm
                 onSuccess={() => {
-                  window.location.reload();
+                  router.push(`/${space?.domain}/${bountyPage.path}`);
                 }}
                 spaceDomain={space?.domain ?? ''}
               />
