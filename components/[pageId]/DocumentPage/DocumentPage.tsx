@@ -200,7 +200,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
                       pageUpdatedBy={page.updatedBy}
                     />
                   )}
-                  {proposalId && <ProposalProperties pageId={proposalId} proposalId={proposalId as string} readOnly={readonlyProposalProperties} />}
+                  {page.type === 'proposal' && page.proposalId && <ProposalProperties pageId={page.proposalId} proposalId={page.proposalId} readOnly={readOnly} />}
                   {(draftBounty || page.bountyId) && (
                     <BountyProperties
                       bountyId={page.bountyId}
