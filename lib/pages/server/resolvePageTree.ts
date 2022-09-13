@@ -89,14 +89,34 @@ export async function resolvePageTree ({ pageId, flattenChildren = false, includ
 
 }
 
-export type MultiPageTreeResolveInput = Pick<PageTreeResolveInput, 'includeDeletedPages'> & {pageIds: string[]}
+export type MultiPageTreeResolveInput<F extends boolean | undefined = boolean> = Pick<PageTreeResolveInput, 'includeDeletedPages'> & {pageIds: string[], flattenChildren?: F}
 
 /**
  * Resolved page trees mapped to the page id
+ * @F Whether to have the flat children
  */
-export type MultiPageTreeResolveOutput = Record<string, TargetPageTreeWithFlatChildren<PageNodeWithPermissions> | null>
+export type MultiPageTreeResolveOutput<F extends boolean | undefined = false>
+ = Record<string,
+ (F extends true ? TargetPageTreeWithFlatChildren<PageNodeWithPermissions> :
+  TargetPageTree<PageNodeWithPermissions>)
+  | null>
 
-export async function multiResolvePageTree ({ pageIds, includeDeletedPages }: MultiPageTreeResolveInput): Promise<MultiPageTreeResolveOutput> {
+export async function multiResolvePageTree({
+  pageIds,
+  includeDeletedPages,
+  flattenChildren
+}: MultiPageTreeResolveInput<false | undefined>): Promise<MultiPageTreeResolveOutput<false | undefined>>
+export async function multiResolvePageTree({
+  pageIds,
+  includeDeletedPages,
+  flattenChildren
+}: MultiPageTreeResolveInput<true>): Promise<MultiPageTreeResolveOutput<true>>
+export async function multiResolvePageTree<F extends boolean | undefined> ({
+  pageIds,
+  includeDeletedPages,
+  flattenChildren
+}: MultiPageTreeResolveInput<F>):
+Promise<MultiPageTreeResolveOutput<F>> {
   const pagesWithSpaceIds = (await prisma.page.findMany({
     where: {
       id: {
@@ -111,8 +131,11 @@ export async function multiResolvePageTree ({ pageIds, includeDeletedPages }: Mu
 
   const uniqueSpaceIds = [...new Set(pagesWithSpaceIds)];
 
-  if (uniqueSpaceIds.length !== 1) {
+  if (uniqueSpaceIds.length > 1) {
     throw new InvalidInputError('All pages must be in the same space');
+  }
+  else if (uniqueSpaceIds.length === 0) {
+    return {};
   }
 
   const spaceId = uniqueSpaceIds[0];
@@ -121,16 +144,16 @@ export async function multiResolvePageTree ({ pageIds, includeDeletedPages }: Mu
 
   const mappedResults = await Promise.all(pageIds.map(id => resolvePageTree({
     pageId: id,
-    flattenChildren: true,
+    flattenChildren: flattenChildren as any,
     includeDeletedPages,
     pageNodes: pagesInSpace
   }).catch(() => null)));
 
   return pageIds.reduce((acc, id, index) => {
 
-    acc[id] = mappedResults[index];
+    acc[id] = mappedResults[index] as any;
 
     return acc;
 
-  }, {} as MultiPageTreeResolveOutput);
+  }, {} as MultiPageTreeResolveOutput<F>);
 }

@@ -285,12 +285,37 @@ describe('multiResolvePageTree', () => {
 
     const inexistentPageId = v4();
 
-    const result = await multiResolvePageTree({ pageIds: [page1.id, inexistentPageId] });
+    const result = await multiResolvePageTree({ pageIds: [page1.id, inexistentPageId], flattenChildren: true });
 
     expect(result[page1.id]?.targetPage.id).toBe(page1.id);
     expect(result[page1.id]?.flatChildren[0].id).toBe(page1Child.id);
 
     expect(result[inexistentPageId]).toBeNull();
+
+  });
+
+  it('should not flatten children by default', async () => {
+
+    const { space: space1, user: user1 } = await generateUserAndSpaceWithApiToken();
+
+    const page1 = await createPage({
+      createdBy: user1.id,
+      spaceId: space1.id
+    });
+
+    const page1Child = await createPage({
+      createdBy: user1.id,
+      spaceId: space1.id,
+      parentId: page1.id
+    });
+
+    const inexistentPageId = v4();
+
+    const result = await multiResolvePageTree({ pageIds: [page1.id, inexistentPageId] });
+
+    expect((result[page1.id] as any).flatChildren).toBeUndefined();
+    // Make sure normal tree still got resolved
+    expect((result[page1.id])?.targetPage.children[0].id).toBe(page1Child.id);
 
   });
 
