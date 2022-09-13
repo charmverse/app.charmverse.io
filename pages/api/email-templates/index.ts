@@ -72,6 +72,7 @@ const templates = {
         username: 'ghostpepper'
       },
       totalTasks: 6,
+      proposalTasks: [],
       mentionedTasks: [
         createMentionTask({
           mentionText: 'cc @ghostpepper',

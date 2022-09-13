@@ -6,6 +6,7 @@ import { getPendingGnosisTasks, GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks'
 import log from 'lib/log';
 import * as mailer from 'lib/mailer';
 import { getMentionedTasks } from 'lib/mentions/getMentionedTasks';
+import { getProposalTasks } from 'lib/proposal/getProposalTasks';
 import { getVoteTasks } from 'lib/votes/getVoteTasks';
 
 export async function sendUserNotifications (): Promise<number> {
@@ -52,11 +53,12 @@ export async function getNotifications (): Promise<PendingTasksProps[]> {
     const gnosisSafeTasks = user.gnosisSafes.length > 0 ? await getPendingGnosisTasks(user.id) : [];
     const mentionedTasks = await getMentionedTasks(user.id);
     const voteTasks = await getVoteTasks(user.id);
+    const proposalTasks = await getProposalTasks(user.id);
 
     const sentTasks = await prisma.userNotification.findMany({
       where: {
         taskId: {
-          in: [...gnosisSafeTasks.map(getGnosisSafeTaskId), ...voteTasks.map(voteTask => voteTask.id)]
+          in: [...gnosisSafeTasks.map(getGnosisSafeTaskId), ...voteTasks.map(voteTask => voteTask.id), ...proposalTasks.map(proposalTask => `${proposalTask.id}.${proposalTask.status}`)]
         }
       },
       select: {
@@ -69,11 +71,12 @@ export async function getNotifications (): Promise<PendingTasksProps[]> {
     const voteTasksNotSent = voteTasks.filter(voteTask => !sentTaskIds.has(voteTask.id));
     const gnosisSafeTasksNotSent = gnosisSafeTasks.filter(gnosisSafeTask => !sentTaskIds.has(getGnosisSafeTaskId(gnosisSafeTask)));
     const myGnosisTasks = gnosisSafeTasksNotSent.filter(gnosisSafeTask => Boolean(gnosisSafeTask.tasks[0].transactions[0].myAction));
+    const proposalTasksNotSent = proposalTasks.filter(proposalTask => !sentTaskIds.has(`${proposalTask.id}.${proposalTask.status}`));
 
-    const totalTasks = myGnosisTasks.length + mentionedTasks.unmarked.length + voteTasksNotSent.length;
+    const totalTasks = myGnosisTasks.length + mentionedTasks.unmarked.length + voteTasksNotSent.length + proposalTasksNotSent.length;
 
     log.debug('Found tasks for notification', {
-      notSent: gnosisSafeTasksNotSent.length + voteTasksNotSent.length + mentionedTasks.unmarked.length,
+      notSent: gnosisSafeTasksNotSent.length + voteTasksNotSent.length + mentionedTasks.unmarked.length + proposalTasksNotSent.length,
       gnosisSafeTasks: gnosisSafeTasks.length,
       myGnosisTasks: myGnosisTasks.length
     });
@@ -84,7 +87,8 @@ export async function getNotifications (): Promise<PendingTasksProps[]> {
       totalTasks,
       // Get only the unmarked mentioned tasks
       mentionedTasks: mentionedTasks.unmarked,
-      voteTasks: voteTasksNotSent
+      voteTasks: voteTasksNotSent,
+      proposalTasks
     };
   }));
 
@@ -116,6 +120,12 @@ async function sendNotification (notification: PendingTasksProps) {
         userId: notification.user.id,
         taskId: voteTask.id,
         type: 'vote'
+      }
+    })), ...notification.proposalTasks.map(proposalTask => prisma.userNotification.create({
+      data: {
+        userId: notification.user.id,
+        taskId: `${proposalTask.id}.${proposalTask.status}`,
+        type: 'proposal'
       }
     })), ...notification.mentionedTasks.map(mentionedTask => prisma.userNotification.create({
       data: {

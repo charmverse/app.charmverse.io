@@ -46,6 +46,7 @@ enum NotificationType {
   multisig
   mention
   vote
+  proposal
 }
 
 enum BountyStatus {
@@ -590,7 +591,7 @@ model PagePermission {
   roleId                  String?             @db.Uuid
   spaceId                 String?             @db.Uuid
   inheritedFromPermission String?             @db.Uuid
-  public                  Boolean? 
+  public                  Boolean?
   sourcePermission        PagePermission?     @relation("InheritedPermissions", fields: [inheritedFromPermission], references: [id], onDelete: Cascade)
   page                    Page                @relation(fields: [pageId], references: [id], onDelete: Cascade)
   role                    Role?               @relation(fields: [roleId], references: [id], onDelete: Cascade)

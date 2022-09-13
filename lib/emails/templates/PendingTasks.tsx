@@ -12,6 +12,8 @@ import { MentionedTask } from 'lib/mentions/interfaces';
 import { VoteTask } from 'lib/votes/interfaces';
 import { DateTime } from 'luxon';
 import { User } from '@prisma/client';
+import { ProposalTask } from 'lib/proposal/interface';
+import { ProposalActionRecord } from 'lib/proposal/proposalActions';
 import { Feedback, Footer, Header, EmailWrapper } from './components';
 
 const charmverseUrl = process.env.DOMAIN;
@@ -27,6 +29,7 @@ export interface PendingTasksProps {
   mentionedTasks: MentionedTask[]
   totalTasks: number
   voteTasks: VoteTask[]
+  proposalTasks: ProposalTask[]
   // eslint-disable-next-line
   user: TemplateUser
 }
@@ -48,10 +51,12 @@ export default function PendingTasks (props: PendingTasksProps) {
   const totalMentionTasks = props.mentionedTasks.length;
   const totalVoteTasks = props.voteTasks.length;
   const totalGnosisSafeTasks = props.gnosisSafeTasks.length;
+  const totalProposalTasks = props.proposalTasks.length;
 
   const nexusDiscussionLink = `${charmverseUrl}/nexus?task=discussion`;
   const nexusVoteLink = `${charmverseUrl}/nexus?task=vote`;
   const nexusMultisigLink = `${charmverseUrl}/nexus?task=multisig`;
+  const nexusProposalLink = `${charmverseUrl}/nexus?task=proposal`;
 
   const mentionSection = totalMentionTasks > 0 ? (
     <>
@@ -80,6 +85,37 @@ export default function PendingTasks (props: PendingTasksProps) {
         />
       ))}
       {totalMentionTasks > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusDiscussionLink} /> : null}
+      <MjmlDivider />
+    </>
+  ) : null;
+
+  const proposalSection = totalProposalTasks > 0 ? (
+    <>
+      <MjmlText>
+        <div style={{
+          marginBottom: 15
+        }}
+        >
+          <a
+            href={nexusProposalLink}
+            style={{
+              marginRight: 15
+            }}
+          >
+            <span style={h2Style}>{totalProposalTasks} Proposal{totalProposalTasks > 1 ? 's' : ''}</span>
+          </a>
+          <a href={nexusProposalLink} style={buttonStyle}>
+            View
+          </a>
+        </div>
+      </MjmlText>
+      {props.proposalTasks.slice(0, MAX_ITEMS_PER_TASK).map(proposalTask => (
+        <ProposalTaskMjml
+          key={proposalTask.id}
+          task={proposalTask}
+        />
+      ))}
+      {totalProposalTasks > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusProposalLink} /> : null}
       <MjmlDivider />
     </>
   ) : null;
@@ -150,6 +186,7 @@ export default function PendingTasks (props: PendingTasksProps) {
           <MjmlText paddingBottom={0} paddingTop={0}>
             <h3>{tasksRequiresYourAttention({ count: props.totalTasks })}.</h3>
           </MjmlText>
+          {proposalSection}
           {multisigSection}
           {voteSection}
           {mentionSection}
@@ -185,6 +222,25 @@ function VoteTaskMjml ({ task }: {task: VoteTask}) {
       >
         Ends {DateTime.fromJSDate(new Date(task.deadline)).toRelative({ base: (DateTime.now()) })}
       </div>
+    </MjmlText>
+  );
+}
+
+function ProposalTaskMjml ({ task }: {task: ProposalTask}) {
+  const pageWorkspaceTitle = `${task.pageTitle || 'Untitled'} | ${task.spaceName}`;
+  return (
+    <MjmlText>
+      <div style={{
+        fontSize: 16,
+        marginBottom: 5,
+        color: greyColor2,
+        fontWeight: 500
+      }}
+      >{pageWorkspaceTitle.length > MAX_CHAR ? `${pageWorkspaceTitle.slice(0, MAX_CHAR)}...` : pageWorkspaceTitle}
+      </div>
+      <a href={`${charmverseUrl}/${task.spaceDomain}/${task.pagePath}`} style={buttonStyle}>
+        {ProposalActionRecord[task.action]}
+      </a>
     </MjmlText>
   );
 }
