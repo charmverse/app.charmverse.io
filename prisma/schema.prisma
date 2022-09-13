@@ -709,6 +709,6 @@ model WorkspaceEvent {
   meta    Json?
   spaceId String  @db.Uuid
   space   Space   @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  pageId  String  @db.Uuid
-  pace    Page    @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  pageId  String? @db.Uuid
+  page    Page?   @relation(fields: [pageId], references: [id], onDelete: Cascade)
 }

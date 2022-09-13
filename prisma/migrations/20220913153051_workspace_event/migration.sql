@@ -5,7 +5,7 @@ CREATE TABLE "WorkspaceEvent" (
     "type" TEXT NOT NULL,
     "meta" JSONB,
     "spaceId" UUID NOT NULL,
-    "pageId" UUID NOT NULL,
+    "pageId" UUID,
 
     CONSTRAINT "WorkspaceEvent_pkey" PRIMARY KEY ("id")
 );

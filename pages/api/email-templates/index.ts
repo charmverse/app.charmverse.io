@@ -88,14 +88,14 @@ const templates = {
       proposalTasks: [
         createProposalTasks({
           action: 'discuss',
-          pageTitle: 'Proposal Page 1',
-          spaceName: 'CharmVerse',
+          pageTitle: 'Should Uniswap provide Rage Trade with an additional use grant',
+          spaceName: 'Uniswap',
           status: 'discussion'
         }),
         createProposalTasks({
           action: 'move_to_discussion',
-          pageTitle: 'Proposal Page 2',
-          spaceName: 'CharmVerse',
+          pageTitle: 'Proposal to add XSTUSD-3CRV to the Gauge Controller',
+          spaceName: 'Curve Finance',
           status: 'private_draft'
         })
       ],
