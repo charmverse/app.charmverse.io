@@ -7,6 +7,7 @@ WORKDIR /app
 COPY *.json ./
 COPY patches/. patches/
 RUN npm set-script prepare "" && \
+    npm set-script lint ""    && \
     npm ci --no-audit --no-fund --omit dev \
            --legacy-peer-deps
 
