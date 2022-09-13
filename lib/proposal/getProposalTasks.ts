@@ -1,4 +1,4 @@
-import { Page, Proposal, Space } from '@prisma/client';
+import { Page, Proposal, ProposalStatus, Space } from '@prisma/client';
 import { prisma } from 'db';
 import { ProposalTask } from './interface';
 
@@ -17,76 +17,81 @@ export function extractProposalData (proposal: Proposal & {
   };
 }
 
+const StatusActionRecord: Record<Exclude<ProposalStatus, 'vote_closed'>, ProposalTask['action']> = {
+  vote_active: 'vote',
+  discussion: 'discuss',
+  review: 'review',
+  reviewed: 'start_vote',
+  draft: 'move_to_discussion',
+  private_draft: 'move_to_discussion'
+};
+
 export async function getProposalTasks (userId: string): Promise<ProposalTask[]> {
-  const moveToDiscussionProposals = await prisma.proposal.findMany({
+  const proposalTasks = await prisma.proposal.findMany({
     where: {
-      status: {
-        in: ['draft', 'private_draft']
-      },
-      authors: {
-        some: {
-          userId
-        }
-      }
-    },
-    include: {
-      page: true,
-      space: true
-    }
-  });
-
-  const startVoteProposals = await prisma.proposal.findMany({
-    where: {
-      status: 'reviewed',
-      authors: {
-        some: {
-          userId
-        }
-      }
-    },
-    include: {
-      page: true,
-      space: true
-    }
-  });
-
-  const toReviewProposals = await prisma.proposal.findMany({
-    where: {
-      status: 'review',
-      reviewers: {
-        some: {
-          OR: [{
-            userId
-          }, {
-            role: {
-              space: {
-                spaceRoles: {
-                  some: {
-                    userId
-                  }
-                }
+      OR: [
+        {
+          status: 'vote_active',
+          space: {
+            spaceRoles: {
+              some: {
+                userId
               }
             }
-          }]
-        }
-      }
-    },
-    include: {
-      page: true,
-      space: true
-    }
-  });
-
-  const toDiscussProposals = await prisma.proposal.findMany({
-    where: {
-      status: 'discussion',
-      space: {
-        spaceRoles: {
-          some: {
-            userId
+          }
+        },
+        {
+          status: 'discussion',
+          space: {
+            spaceRoles: {
+              some: {
+                userId
+              }
+            }
+          }
+        },
+        {
+          status: 'review',
+          reviewers: {
+            some: {
+              OR: [{
+                userId
+              }, {
+                role: {
+                  space: {
+                    spaceRoles: {
+                      some: {
+                        userId
+                      }
+                    }
+                  }
+                }
+              }]
+            }
+          }
+        },
+        {
+          status: 'reviewed',
+          authors: {
+            some: {
+              userId
+            }
+          }
+        },
+        {
+          status: {
+            in: ['draft', 'private_draft']
+          },
+          authors: {
+            some: {
+              userId
+            }
           }
         }
-      }
+      ]
+    },
+    orderBy: {
+      createdBy: 'desc'
     },
     include: {
       page: true,
@@ -94,28 +99,5 @@ export async function getProposalTasks (userId: string): Promise<ProposalTask[]>
     }
   });
 
-  const toVoteProposals = await prisma.proposal.findMany({
-    where: {
-      status: 'vote_active',
-      space: {
-        spaceRoles: {
-          some: {
-            userId
-          }
-        }
-      }
-    },
-    include: {
-      page: true,
-      space: true
-    }
-  });
-
-  return [
-    moveToDiscussionProposals.map(proposal => extractProposalData(proposal, 'move_to_discussion')),
-    startVoteProposals.map(proposal => extractProposalData(proposal, 'start_vote')),
-    toReviewProposals.map(proposal => extractProposalData(proposal, 'review')),
-    toDiscussProposals.map(proposal => extractProposalData(proposal, 'discuss')),
-    toVoteProposals.map(proposal => extractProposalData(proposal, 'vote'))
-  ].flat();
+  return proposalTasks.map(proposal => extractProposalData(proposal, StatusActionRecord[proposal.status as Exclude<ProposalStatus, 'vote_closed'>]));
 }
