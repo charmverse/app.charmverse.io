@@ -144,6 +144,7 @@ function ViewTitle(props: Props) {
               onContentChange={(content: ICharmEditorOutput) => {
                 onDescriptionChange(content.doc);
               }}
+              pageId={board.id}
             />
           </div>
         )}

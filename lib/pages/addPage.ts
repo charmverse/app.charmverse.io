@@ -21,11 +21,10 @@ interface AddPageResponse {
   page: IPageWithPermissions;
 }
 
-export async function addPage ({ createdBy, spaceId, shouldCreateDefaultBoardData, ...page }: NewPageInput): Promise<AddPageResponse> {
+export async function addPage ({ createdBy, spaceId, shouldCreateDefaultBoardData = true, ...page }: NewPageInput): Promise<AddPageResponse> {
 
   const pageId = page?.id || v4();
 
-  shouldCreateDefaultBoardData = shouldCreateDefaultBoardData ?? true;
   const isBoardPage = (page.type?.match(/board/));
 
   const pageProperties: Partial<Page> = {
@@ -62,8 +61,14 @@ export async function addPage ({ createdBy, spaceId, shouldCreateDefaultBoardDat
       result.view = view;
       result.cards = cards;
       await mutator.insertBlocks(
-        [board, view, ...cards],
+        [board, view],
         'add board'
+      );
+
+      // Wait for board creation to succeed before adding cards
+      await mutator.insertBlocks(
+        [...cards],
+        'add cards'
       );
     }
     else {

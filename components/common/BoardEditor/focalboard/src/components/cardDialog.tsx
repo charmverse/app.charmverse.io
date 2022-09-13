@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react';
 import { getCard } from '../store/cards';
 import { useAppSelector } from '../store/hooks';
 import PageDialog from 'components/common/PageDialog';
+import { AllowedPagePermissions } from 'lib/permissions/pages';
 
 type Props = {
   cardId: string
@@ -47,7 +48,7 @@ function CreateBountyButton(props: { pageId: string }) {
 const CardDialog = (props: Props): JSX.Element | null => {
   const { cardId, readonly, onClose } = props;
   const card = useAppSelector(getCard(cardId))
-  const { pages } = usePages()
+  const { pages, getPagePermissions } = usePages()
   const { draftBounty, cancelDraftBounty, bounties } = useBounties()
   const router = useRouter();
   const isSharedPage = router.route.startsWith('/share')

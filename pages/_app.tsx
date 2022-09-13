@@ -34,6 +34,8 @@ import { SpacesProvider } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
 import { SnackbarProvider } from 'hooks/useSnackbar';
 import HexagonalAvatarMask from 'components/common/HexagonalAvatarMask';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
 
 import '@skiff-org/prosemirror-tables/style/tables.css';
 import '@skiff-org/prosemirror-tables/style/table-popup.css';
@@ -242,42 +244,44 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
     <CacheProvider value={createCache({ key: 'app' })}>
       <ColorModeContext.Provider value={colorModeContext}>
         <ThemeProvider theme={theme}>
-          <Web3ReactProvider getLibrary={getLibrary}>
-            <Web3ConnectionManager>
-              <ReactDndProvider>
-                <DataProviders>
-                  <FocalBoardProvider>
-                    <IntlProvider>
-                      <SnackbarProvider>
-                        <PageMetaTags />
-                        <CssBaseline enableColorScheme={true} />
-                        <Global styles={cssVariables} />
-                        <RouteGuard>
-                          <ErrorBoundary>
-                            <Snackbar
-                              isOpen={isOldBuild}
-                              message='New CharmVerse platform update available. Please refresh.'
-                              actions={[
-                                <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                  <RefreshIcon fontSize='small' />
-                                </IconButton>
-                              ]}
-                              origin={{ vertical: 'top', horizontal: 'center' }}
-                              severity='warning'
-                              handleClose={() => setIsOldBuild(false)}
-                            />
-                            {getLayout(<Component {...pageProps} />)}
-                            <HexagonalAvatarMask id='hexagon-avatar' />
-                            <Snackbar />
-                          </ErrorBoundary>
-                        </RouteGuard>
-                      </SnackbarProvider>
-                    </IntlProvider>
-                  </FocalBoardProvider>
-                </DataProviders>
-              </ReactDndProvider>
-            </Web3ConnectionManager>
-          </Web3ReactProvider>
+          <LocalizationProvider dateAdapter={AdapterLuxon as any}>
+            <Web3ReactProvider getLibrary={getLibrary}>
+              <Web3ConnectionManager>
+                <ReactDndProvider>
+                  <DataProviders>
+                    <FocalBoardProvider>
+                      <IntlProvider>
+                        <SnackbarProvider>
+                          <PageMetaTags />
+                          <CssBaseline enableColorScheme={true} />
+                          <Global styles={cssVariables} />
+                          <RouteGuard>
+                            <ErrorBoundary>
+                              <Snackbar
+                                isOpen={isOldBuild}
+                                message='New CharmVerse platform update available. Please refresh.'
+                                actions={[
+                                  <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                    <RefreshIcon fontSize='small' />
+                                  </IconButton>
+                                ]}
+                                origin={{ vertical: 'top', horizontal: 'center' }}
+                                severity='warning'
+                                handleClose={() => setIsOldBuild(false)}
+                              />
+                              {getLayout(<Component {...pageProps} />)}
+                              <HexagonalAvatarMask id='hexagon-avatar' />
+                              <Snackbar />
+                            </ErrorBoundary>
+                          </RouteGuard>
+                        </SnackbarProvider>
+                      </IntlProvider>
+                    </FocalBoardProvider>
+                  </DataProviders>
+                </ReactDndProvider>
+              </Web3ConnectionManager>
+            </Web3ReactProvider>
+          </LocalizationProvider>
         </ThemeProvider>
       </ColorModeContext.Provider>
     </CacheProvider>
