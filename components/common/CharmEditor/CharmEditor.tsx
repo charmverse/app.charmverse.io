@@ -52,7 +52,7 @@ import { checkForEmpty } from './utils';
 export interface ICharmEditorOutput {
   doc: PageContent,
   rawText: string
-  suggestion: any
+  suggestions: any
 }
 
 const StyledReactBangleEditor = styled(ReactBangleEditor)<{disablePageSpecificFeatures?: boolean, suggestMode?: boolean}>`
@@ -305,7 +305,7 @@ function CharmEditor (
 
     const trackPluginState = getTrackPluginState(view.state);
 
-    onContentChange({ doc, rawText, suggestion: commitToJSON(trackPluginState.commit, '') });
+    onContentChange({ doc, rawText, suggestions: commitToJSON(trackPluginState.commit, '') });
 
   }, 100) : undefined;
 

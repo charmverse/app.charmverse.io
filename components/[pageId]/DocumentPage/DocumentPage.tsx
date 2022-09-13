@@ -111,7 +111,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
   const { currentPageActionDisplay } = usePageActionDisplay();
 
   const updatePageContent = useCallback((content: ICharmEditorOutput) => {
-    setPage({ content: content.doc, contentText: content.rawText, suggestion: content.suggestion });
+    setPage({ content: content.doc, contentText: content.rawText, suggestions: content.suggestions });
   }, [setPage]);
 
   const card = cards.find(_card => _card.id === page.id);

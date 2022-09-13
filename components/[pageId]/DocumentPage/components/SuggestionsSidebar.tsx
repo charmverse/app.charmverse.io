@@ -40,7 +40,7 @@ export default function SuggestionsSidebar ({ suggestion }: {suggestion: Commit}
     charmClient.updatePage({
       id: currentPageId,
       content: newState.doc.toJSON(),
-      suggestion: next ? commitToJSON(next, '') as any : null
+      suggestions: next ? commitToJSON(next, '') as any : null
     }).then((newPage) => {
       view.updateState(newState);
       setPages((pages) => ({ ...pages, [newPage.id]: newPage }));

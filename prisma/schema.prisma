@@ -233,7 +233,7 @@ model Page {
   proposal           Proposal?        @relation(fields: [proposalId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   threads            Thread[]
   votes              Vote[]
-  suggestion         Json?
+  suggestions        Json?
 }
 
 model Block {
@@ -597,7 +597,7 @@ model PagePermission {
   roleId                  String?             @db.Uuid
   spaceId                 String?             @db.Uuid
   inheritedFromPermission String?             @db.Uuid
-  public                  Boolean? 
+  public                  Boolean?
   sourcePermission        PagePermission?     @relation("InheritedPermissions", fields: [inheritedFromPermission], references: [id], onDelete: Cascade)
   page                    Page                @relation(fields: [pageId], references: [id], onDelete: Cascade)
   role                    Role?               @relation(fields: [roleId], references: [id], onDelete: Cascade)
