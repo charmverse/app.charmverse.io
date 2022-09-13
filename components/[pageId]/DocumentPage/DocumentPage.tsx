@@ -53,9 +53,10 @@ export interface DocumentPageProps {
 }
 
 function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentProposalId }: DocumentPageProps) {
-  const { pages, getPagePermissions, refreshPage } = usePages();
+  const { pages, getPagePermissions } = usePages();
   const { cancelVote, castVote, deleteVote, votes, isLoading } = useVotes();
   const pagePermissions = getPagePermissions(page.id);
+
   const { draftBounty } = useBounties();
   // Only populate bounty permission data if this is a bounty page
   const [bountyPermissions, setBountyPermissions] = useState<AssignedBountyPermissions | null>(null);
@@ -163,6 +164,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
               enableVoting={true}
               containerWidth={containerWidth}
               pageType={page.type}
+              pagePermissions={pagePermissions}
             >
               <PageHeader
                 headerImage={page.headerImage}
@@ -198,7 +200,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
                       pageUpdatedBy={page.updatedBy}
                     />
                   )}
-                  {page.type === 'proposal' && page.proposalId && <ProposalProperties pageId={page.id} proposalId={page.proposalId} readOnly={readOnly} />}
+                  {page.type === 'proposal' && page.proposalId && <ProposalProperties pageId={page.proposalId} proposalId={page.proposalId} readOnly={readOnly} />}
                   {(draftBounty || page.bountyId) && (
                     <BountyProperties
                       bountyId={page.bountyId}

@@ -1,21 +1,20 @@
 import styled from '@emotion/styled';
-import Box from '@mui/material/Box';
 import Alert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Collapse from '@mui/material/Collapse';
 import InputAdornment from '@mui/material/InputAdornment';
 import Input from '@mui/material/OutlinedInput';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
+import { SpacePermissionConfigurationMode } from '@prisma/client';
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { useSpaces } from 'hooks/useSpaces';
-import { useRouter } from 'next/router';
+import { configurationModeName } from 'lib/permissions/meta/preset-templates';
 import { useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { configurationModeName } from 'lib/permissions/meta/preset-templates';
-import { SpacePermissionConfigurationMode } from '@prisma/client';
 
 const StyledInput = styled(Input)`
   font-size: .8em;
@@ -47,7 +46,6 @@ interface Props {
 
 export default function ShareBountyBoard ({ padding = 1 }: Props) {
 
-  const router = useRouter();
   const [copied, setCopied] = useState<boolean>(false);
   const [spaces, setSpaces] = useSpaces();
   const [space] = useCurrentSpace();

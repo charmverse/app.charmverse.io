@@ -48,6 +48,8 @@ export default function PageDialog (props: Props) {
 
   const parentProposalId = findParentOfType({ pageId: ogCurrentPageId, pageType: 'proposal', pageMap: pages });
 
+  const readOnlyPage = readOnly || !pagePermission?.edit_content;
+
   // keep track if charmeditor is mounted. There is a bug that it calls the update method on closing the modal, but content is empty
   useEffect(() => {
     mounted.current = true;
@@ -177,7 +179,7 @@ export default function PageDialog (props: Props) {
           )}
           onClose={onClose}
         >
-          {page && <DocumentPage insideModal page={page} setPage={setPage} readOnly={props.readOnly} parentProposalId={parentProposalId} />}
+          {page && <DocumentPage insideModal page={page} setPage={setPage} readOnly={readOnlyPage} parentProposalId={parentProposalId} />}
         </Dialog>
 
       )}

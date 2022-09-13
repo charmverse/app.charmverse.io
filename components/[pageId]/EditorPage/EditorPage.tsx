@@ -13,7 +13,7 @@ import BoardPage from '../BoardPage';
 import DocumentPage from '../DocumentPage';
 
 export default function EditorPage ({ pageId }: { pageId: string }) {
-  const { setIsEditing, pages, setCurrentPageId, setPages, getPagePermissions } = usePages();
+  const { setIsEditing, pages, currentPageId, setCurrentPageId, setPages, getPagePermissions } = usePages();
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
   const [space] = useCurrentSpace();
@@ -51,6 +51,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
         }
       }
     }
+
     main();
 
     return () => {
@@ -120,7 +121,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
         <BoardPage
           page={memoizedCurrentPage}
           setPage={setPage}
-          readOnly={currentPagePermissions.edit_content !== true}
+          pagePermissions={currentPagePermissions}
         />
       );
     }
