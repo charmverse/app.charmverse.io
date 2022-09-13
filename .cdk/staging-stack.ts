@@ -67,11 +67,6 @@ export class CdkDeployStack extends Stack {
         value: 'arn:aws:acm:us-east-1:310849459438:certificate/bfea3120-a440-4667-80fd-d285146f2339',
       },
       {
-        namespace: 'aws:autoscaling:launchconfiguration',
-        optionName: 'MetadataOptions',
-        value: 'InstanceMetadataTags=enabled',
-      },
-      {
         // add security group to access
         namespace: 'aws:autoscaling:launchconfiguration',
         optionName: 'SecurityGroups',
