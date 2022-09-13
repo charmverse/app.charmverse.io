@@ -29,6 +29,7 @@ runs:
       run: npm run build
 
     - name: Remove dev dependencies
+      shell: bash
       run: |
         npm prune --production
         rm -rf .next/cache
