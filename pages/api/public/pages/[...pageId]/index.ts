@@ -151,13 +151,15 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
     throw new NotFoundError('Space domain is required');
   }
 
-  const space = await prisma.space.findUnique({ where: { domain: spaceDomain } });
+  const space = await prisma.space.findUnique({
+    where: page ? { id: page.spaceId } : { domain: spaceDomain }
+  });
 
   if (!space) {
     throw new NotFoundError('Space not found');
   }
 
-  if (pagePath) {
+  if (pagePath && !page) {
     page = await prisma.page.findFirst({
       where: {
         deletedAt: null,
