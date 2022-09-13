@@ -54,7 +54,7 @@ export function charmEditorPlugins (
     spaceId = null,
     content = undefined,
     suggestMode = false,
-    suggestion = null,
+    suggestions = null,
     schema
   }:
     {
@@ -68,7 +68,7 @@ export function charmEditorPlugins (
       enableComments?: boolean,
       content?: Node,
       suggestMode?: boolean,
-      suggestion?: any | null,
+      suggestions?: any | null,
       schema?: Schema
     } = {}
 ): () => RawPlugins[] {
@@ -169,7 +169,7 @@ export function charmEditorPlugins (
   if (!readOnly) {
     basePlugins.push(trackPlugin({
       ancestorDoc: content,
-      commit: suggestion && schema ? commitFromJSON(suggestion, schema) : undefined
+      commit: suggestions && schema ? commitFromJSON(suggestions, schema) : undefined
     }));
     basePlugins.push(rowActions.plugins({
       key: actionsPluginKey

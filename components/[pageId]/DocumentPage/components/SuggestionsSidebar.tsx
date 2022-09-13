@@ -22,14 +22,14 @@ export function smoosh<T> (
   return getFromSelector();
 }
 
-export default function SuggestionsSidebar ({ suggestion }: {suggestion: Commit}) {
+export default function SuggestionsSidebar ({ suggestions }: {suggestions: Commit}) {
   const view = useEditorViewContext();
   const { state, update } = view;
   const { currentPageId, setPages } = usePages();
   const { commit } = getTrackPluginState(state);
 
   // The track changes plugin generates an in progress commit with current changes. We always want to ignore this, so we start with commit n-1
-  const commits = suggestion?.prev ? smoosh(suggestion.prev, (c) => ({ updatedAt: c.updatedAt, _id: c._id, changeID: c.changeID })) : [];
+  const commits = suggestions?.prev ? smoosh(suggestions.prev, (c) => ({ updatedAt: c.updatedAt, _id: c._id, changeID: c.changeID })) : [];
 
   function approveSuggestion (changeID: string) {
     const { commit: next, mapping } = rebases.without(commit, [changeID]);

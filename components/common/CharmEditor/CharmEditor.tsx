@@ -331,7 +331,7 @@ function CharmEditor (
       spaceId: currentSpace?.id,
       userId: user?.id,
       content: content ? Node.fromJSON(specRegistry.schema, content) : undefined,
-      suggestion,
+      suggestions,
       schema: specRegistry.schema
     }),
     initialValue: jsonContent,
@@ -515,7 +515,7 @@ function CharmEditor (
         <>
           <Slide
             direction='left'
-            in={pageActionDisplay === 'suggestions' && Boolean(suggestion)}
+            in={pageActionDisplay === 'suggestions' && Boolean(suggestions)}
             style={{
               transformOrigin: 'left top'
             }}
@@ -526,7 +526,7 @@ function CharmEditor (
             timeout={250}
           >
             <PageActionListBox id='page-suggestions-list-box'>
-              <SuggestionsSidebar suggestion={suggestion} />
+              <SuggestionsSidebar suggestions={suggestions} />
             </PageActionListBox>
           </Slide>
           <Slide
