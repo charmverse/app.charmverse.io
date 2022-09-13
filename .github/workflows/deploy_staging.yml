@@ -47,7 +47,7 @@ jobs:
               ' .ebextensions/00_env_vars.config
 
       - name: Set STAGE variable in environment for build and deploy steps
-        run: echo "STAGE=pr${{ github.event.number }}-${{ env.GITHUB_SHA_SHORT }}" >> $GITHUB_ENV
+        run: echo "STAGE=pr-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
 
       - name: Create a github deployment
         uses: bobheadxi/deployments@v0.5.2
