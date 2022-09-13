@@ -186,11 +186,10 @@ export default function PendingTasks (props: PendingTasksProps) {
           <MjmlText paddingBottom={0} paddingTop={0}>
             <h3>{tasksRequiresYourAttention({ count: props.totalTasks })}.</h3>
           </MjmlText>
-          {proposalSection}
           {multisigSection}
+          {proposalSection}
           {voteSection}
           {mentionSection}
-
         </MjmlColumn>
       </MjmlSection>
       <Feedback />
@@ -230,15 +229,16 @@ function ProposalTaskMjml ({ task }: {task: ProposalTask}) {
   const pageWorkspaceTitle = `${task.pageTitle || 'Untitled'} | ${task.spaceName}`;
   return (
     <MjmlText>
-      <div style={{
-        fontSize: 16,
-        marginBottom: 5,
-        color: greyColor2,
-        fontWeight: 500
-      }}
-      >{pageWorkspaceTitle.length > MAX_CHAR ? `${pageWorkspaceTitle.slice(0, MAX_CHAR)}...` : pageWorkspaceTitle}
+      <div style={{ fontWeight: 'bold', color: '#000', marginBottom: 5 }}>
+        {pageWorkspaceTitle.length > MAX_CHAR ? `${pageWorkspaceTitle.slice(0, MAX_CHAR)}...` : pageWorkspaceTitle}
       </div>
-      <a href={`${charmverseUrl}/${task.spaceDomain}/${task.pagePath}`} style={buttonStyle}>
+      <a
+        href={`${charmverseUrl}/${task.spaceDomain}/${task.pagePath}`}
+        style={{
+          ...buttonStyle,
+          lineHeight: '250%'
+        }}
+      >
         {ProposalActionRecord[task.action]}
       </a>
     </MjmlText>
@@ -266,7 +266,6 @@ function MentionTask ({ task: { text, spaceName, pageTitle } }: {task: Mentioned
 
 function MultisigTask ({ task }: { task: GnosisSafeTasks }) {
   log.debug('multi sig task', task);
-  // console.log('multi sig task...', task.tasks[0].transactions);
   return (
     <MjmlText>
       <strong style={{ color: '#000' }}>
