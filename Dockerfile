@@ -6,7 +6,7 @@ WORKDIR /app
 
 COPY *.json ./
 COPY patches ./
-RUN npm ci --no-audit --no-fund --omit dev \
+RUN ls /app/patches/ && npm ci --no-audit --no-fund --omit dev \
            --legacy-peer-deps
 
 COPY . ./
