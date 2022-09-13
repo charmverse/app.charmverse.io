@@ -97,10 +97,9 @@ export async function generateUserAndSpaceWithApiToken (walletAddress: string = 
   };
 }
 
-export async function generateBounty ({ content = undefined, contentText = '', spaceId, createdBy, status, maxSubmissions, approveSubmitters, title = 'Example', rewardToken = 'ETH', rewardAmount = 1, chainId = 1, bountyPermissions = {}, pagePermissions = [], page = {} }: Pick<Bounty, 'createdBy' | 'spaceId' | 'status' | 'approveSubmitters'> & Partial<Pick<Bounty, 'maxSubmissions' | 'chainId' | 'rewardAmount' | 'rewardToken'>> & Partial<Pick<Page, 'title' | 'content' | 'contentText'>> & {bountyPermissions?: Partial<BountyPermissions>, pagePermissions?: Omit<Prisma.PagePermissionCreateManyInput, 'pageId'>[], page?: Partial<Pick<Page, 'deletedAt'>>}): Promise<BountyWithDetails> {
+export async function generateBounty ({ content = undefined, contentText = '', spaceId, createdBy, status, maxSubmissions, approveSubmitters, title = 'Example', rewardToken = 'ETH', rewardAmount = 1, chainId = 1, bountyPermissions = {}, pagePermissions = [], page = {}, type = 'bounty', id }: Pick<Bounty, 'createdBy' | 'spaceId' | 'status' | 'approveSubmitters'> & Partial<Pick<Bounty, 'id' | 'maxSubmissions' | 'chainId' | 'rewardAmount' | 'rewardToken'>> & Partial<Pick<Page, 'title' | 'content' | 'contentText' | 'type'>> & {bountyPermissions?: Partial<BountyPermissions>, pagePermissions?: Omit<Prisma.PagePermissionCreateManyInput, 'pageId'>[], page?: Partial<Pick<Page, 'deletedAt'>>}): Promise<BountyWithDetails> {
 
-  const pageId = v4();
-  const bountyId = v4();
+  const pageId = id ?? v4();
 
   const bountyPermissionsToAssign: Omit<Prisma.BountyPermissionCreateManyInput, 'bountyId'>[] = typedKeys(bountyPermissions).reduce((createManyInputs, permissionLevel) => {
 
@@ -128,7 +127,7 @@ export async function generateBounty ({ content = undefined, contentText = '', s
     // Step 1 - Initialise bounty with page and bounty permissions
     prisma.bounty.create({
       data: {
-        id: bountyId,
+        id: pageId,
         createdBy,
         chainId,
         rewardAmount,
@@ -145,7 +144,7 @@ export async function generateBounty ({ content = undefined, contentText = '', s
             content: content ?? undefined,
             path: getPagePath(),
             title: title || 'Root',
-            type: 'bounty',
+            type,
             updatedBy: createdBy,
             spaceId,
             deletedAt: page?.deletedAt ?? undefined
@@ -169,7 +168,7 @@ export async function generateBounty ({ content = undefined, contentText = '', s
     })
   ]);
 
-  return getBountyOrThrow(bountyId);
+  return getBountyOrThrow(pageId);
 }
 
 export async function generateComment ({ content, pageId, spaceId, userId, context = '', resolved = false }: Pick<Thread, 'userId' | 'spaceId' | 'pageId'> & Partial<Pick<Thread, 'context' | 'resolved'>> & Pick<Comment, 'content'>): Promise<Comment> {
