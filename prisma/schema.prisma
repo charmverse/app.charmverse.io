@@ -167,6 +167,7 @@ model Space {
   TokenGate                   TokenGate[]
   votes                       Vote[]
   proposals                   Proposal[]
+  workspaceEvents             WorkspaceEvent[]
 }
 
 model SpaceApiToken {
@@ -229,6 +230,7 @@ model Page {
   proposal           Proposal?        @relation(fields: [proposalId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   threads            Thread[]
   votes              Vote[]
+  workspaceEvents    WorkspaceEvent[]
 }
 
 model Block {
@@ -296,45 +298,46 @@ model Vote {
 }
 
 model User {
-  id                String                 @id @default(uuid()) @db.Uuid
-  createdAt         DateTime               @default(now())
-  updatedAt         DateTime               @default(now())
-  addresses         String[]
-  avatar            String?
-  avatarContract    String?
-  avatarTokenId     String?
-  avatarChain       Int?
-  username          String
-  isBot             Boolean?               @default(false)
-  path              String?                @unique
-  identityType      IdentityType?
-  email             String?
-  applications      Application[]
-  blocks            Block[]
-  bounties          Bounty[]
-  bountyPermissions BountyPermission[]
-  comments          Comment[]
-  discordUser       DiscordUser?
-  favorites         FavoritePage[]
-  inviteLinks       InviteLink[]
-  pages             Page[]
-  permissions       PagePermission[]
-  poaps             Poap[]
-  spaces            Space[]
-  spacePermissions  SpacePermission[]
-  spaceRoles        SpaceRole[]
-  telegramUser      TelegramUser?
-  threads           Thread[]
-  profile           UserDetails?
-  gnosisSafes       UserGnosisSafe[]
-  UserNotification  UserNotification[]
-  notificationState UserNotificationState?
-  userVotes         UserVote[]
-  initiatedVotes    Vote[]
-  profileItems      ProfileItem[]
-  proposalsAuthored ProposalAuthor[]
-  proposalsReviewed ProposalReviewer[]
-  reviewedProposals Proposal[]
+  id                   String                 @id @default(uuid()) @db.Uuid
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @default(now())
+  addresses            String[]
+  avatar               String?
+  avatarContract       String?
+  avatarTokenId        String?
+  avatarChain          Int?
+  username             String
+  isBot                Boolean?               @default(false)
+  path                 String?                @unique
+  identityType         IdentityType?
+  email                String?
+  applications         Application[]
+  blocks               Block[]
+  bounties             Bounty[]
+  bountyPermissions    BountyPermission[]
+  comments             Comment[]
+  discordUser          DiscordUser?
+  favorites            FavoritePage[]
+  inviteLinks          InviteLink[]
+  pages                Page[]
+  permissions          PagePermission[]
+  poaps                Poap[]
+  spaces               Space[]
+  spacePermissions     SpacePermission[]
+  spaceRoles           SpaceRole[]
+  telegramUser         TelegramUser?
+  threads              Thread[]
+  profile              UserDetails?
+  gnosisSafes          UserGnosisSafe[]
+  UserNotification     UserNotification[]
+  notificationState    UserNotificationState?
+  userVotes            UserVote[]
+  initiatedVotes       Vote[]
+  profileItems         ProfileItem[]
+  proposalsAuthored    ProposalAuthor[]
+  proposalsReviewed    ProposalReviewer[]
+  reviewedProposals    Proposal[]
+  actedWorkspaceEvents WorkspaceEvent[]
 }
 
 model UserNotificationState {
@@ -696,4 +699,16 @@ model ProfileItem {
   isHidden Boolean?
   metadata Json?
   type     ProfileItemType
+}
+
+model WorkspaceEvent {
+  id      String  @id @default(uuid()) @db.Uuid
+  actorId String? @db.Uuid
+  actor   User?   @relation(fields: [actorId], references: [id], onDelete: Cascade)
+  type    String
+  meta    Json?
+  spaceId String  @db.Uuid
+  space   Space   @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  pageId  String  @db.Uuid
+  pace    Page    @relation(fields: [pageId], references: [id], onDelete: Cascade)
 }
