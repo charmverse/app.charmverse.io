@@ -74,6 +74,11 @@ export class CdkDeployStack extends Stack {
       },
       {
         namespace: 'aws:autoscaling:launchconfiguration',
+        optionName: 'MetadataOptions',
+        value: 'InstanceMetadataTags=enabled',
+      },
+      {
+        namespace: 'aws:autoscaling:launchconfiguration',
         optionName: 'EC2KeyName',
         value: 'northshore-webapp',
       },
