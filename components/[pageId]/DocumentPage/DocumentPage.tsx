@@ -168,7 +168,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
               containerWidth={containerWidth}
               pageType={page.type}
               pagePermissions={pagePermissions}
-              suggestion={page.suggestion}
+              suggestions={page.suggestions}
             >
               <PageHeader
                 headerImage={page.headerImage}

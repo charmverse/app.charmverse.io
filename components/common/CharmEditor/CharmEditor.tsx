@@ -55,7 +55,7 @@ export interface ICharmEditorOutput {
   suggestions: any
 }
 
-const StyledReactBangleEditor = styled(ReactBangleEditor)<{disablePageSpecificFeatures?: boolean, suggestMode?: boolean}>`
+const StyledReactBangleEditor = styled(ReactBangleEditor)<{ disablePageSpecificFeatures?: boolean, suggestMode?: boolean }>`
   position: relative;
 
   /** DONT REMOVE THIS STYLING */
@@ -159,7 +159,7 @@ interface CharmEditorProps {
   pageActionDisplay?: IPageActionDisplayContext['currentPageActionDisplay']
   disablePageSpecificFeatures?: boolean;
   enableVoting?: boolean;
-  suggestion?: any | null;
+  suggestions?: any | null;
   onSuggestModeChange?: () => void;
   pageId: string;
   containerWidth?: number;
