@@ -41,9 +41,9 @@ jobs:
         with:
           cmd: |
             yq -I 4 -i '
-              (with(.option_settings |
-                  ."aws:elasticbeanstalk:application:environment" |
-                  .COMPOSE_PROJECT_NAME; . = "pr${{ github.event.number }}" | . style="double"))
+              with(.option_settings."aws:elasticbeanstalk:application:environment";
+                    .COMPOSE_PROJECT_NAME = "pr${{ github.event.number }}" |
+                    .IMGTAG = "pr${{ github.event.number }}-${{ env.GITHUB_SHA_SHORT }}")
               ' .ebextensions/00_env_vars.config
 
       - name: Set STAGE variable in environment for build and deploy steps
@@ -73,7 +73,7 @@ jobs:
       - name: Deploy to staging
         id: cdk_deploy
         run: |
-          npm install aws-cdk-lib --no-audit --no-fund
+          npm install aws-cdk aws-cdk-lib --no-audit --no-fund
           npm run deploy:staging
 
       - name: update the github deployment status
