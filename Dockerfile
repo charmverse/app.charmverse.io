@@ -1,14 +1,12 @@
 # Install dependencies only when needed
-FROM node:16-alpine AS running_app
+FROM node:16-alpine AS testing_app
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
 RUN apk add --no-cache libc6-compat git
 WORKDIR /app
 
 COPY *.json ./
 COPY patches/. patches/
-RUN npm set-script prepare "" && \
-    npm set-script lint ""    && \
-    npm ci --no-audit --no-fund --omit dev \
+RUN  npm ci --no-audit --no-fund \
            --legacy-peer-deps
 
 COPY . ./
@@ -23,13 +21,12 @@ ENV PORT 3000
 ENV NEXT_TELEMETRY_DISABLED 1
 
 EXPOSE 3000
-CMD ["npm", "run", "start:staging"]
+CMD ["npm", "run", "test"]
 
 
-# Create TESTING image
-FROM running_app AS testing_app
+# Create running image
+FROM testing_app AS running_app
 
-RUN npm ci --no-audit --no-fund --include dev \
-           --legacy-peer-deps
+RUN npm prune --production
 
 CMD ["npm", "run", "start:staging"]
