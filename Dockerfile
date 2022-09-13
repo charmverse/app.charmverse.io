@@ -27,6 +27,7 @@ CMD ["npm", "run", "test"]
 # Create running image
 FROM testing_app AS running_app
 
-RUN npm prune --production
+RUN npm prune --production --no-audit      \
+              --no-fund --legacy-peer-deps
 
 CMD ["npm", "run", "start:staging"]
