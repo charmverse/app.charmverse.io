@@ -35,7 +35,7 @@ runs:
       with:
         context: .
         push: true
-        tags: "${{ env.REGISTRY }}/${{ env.REPO }}:${{ github.sha }}"
+        tags: "${{ env.REGISTRY }}/${{ env.REPO }}:pr${{ github.event.number }}-${{ env.GITHUB_SHA_SHORT }}"
         target: running_app
         cache-from: type=gha
         cache-to: type=gha,mode=max
