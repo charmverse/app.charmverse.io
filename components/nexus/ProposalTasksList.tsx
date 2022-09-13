@@ -23,8 +23,6 @@ export function ProposalTasksListRow (
   props: {proposalTask: ProposalTask}
 ) {
 
-  const { showPage } = usePageDialog();
-
   const {
     proposalTask
   } = props;
@@ -98,11 +96,7 @@ export function ProposalTasksListRow (
                   md: 100
                 }
               }}
-              onClick={() => {
-                showPage({
-                  pageId: id
-                });
-              }}
+              href={proposalLink}
             >{ProposalActionRecord[action]}
             </Button>
           </Grid>
@@ -114,11 +108,9 @@ export function ProposalTasksListRow (
 
 export default function ProposalTasksList ({
   tasks,
-  error,
-  mutateTasks
+  error
 } : {
   error: any
-  mutateTasks: KeyedMutator<GetTasksResponse>
   tasks: GetTasksResponse | undefined
 }) {
 
