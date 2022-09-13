@@ -147,19 +147,26 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
 
   const [spaceDomain, pagePath] = pageIdOrPath;
 
-  if (spaceDomain && pagePath) {
-    const space = await prisma.space.findUnique({ where: { domain: spaceDomain } });
-    if (space) {
-      page = await prisma.page.findFirst({
-        where: {
-          deletedAt: null,
-          space: {
-            domain: spaceDomain
-          },
-          path: pagePath.trim()
-        }
-      });
-    }
+  if (!spaceDomain) {
+    throw new NotFoundError('Space domain is required');
+  }
+
+  const space = await prisma.space.findUnique({ where: { domain: spaceDomain } });
+
+  if (!space) {
+    throw new NotFoundError('Space not found');
+  }
+
+  if (pagePath) {
+    page = await prisma.page.findFirst({
+      where: {
+        deletedAt: null,
+        space: {
+          domain: spaceDomain
+        },
+        path: pagePath.trim()
+      }
+    });
   }
 
   if (!page) {
@@ -170,7 +177,10 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
     pageId: page.id
   });
 
-  if (computed.read !== true) {
+  if (computed.read !== true && page.type !== 'bounty') {
+    throw new NotFoundError('Page not found');
+  }
+  else if (computed.read !== true && page.type === 'bounty' && !space.publicBountyBoard) {
     throw new NotFoundError('Page not found');
   }
 
@@ -234,16 +244,6 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
     boards = linkedBoards;
     cards = linkedCards;
     views = linkedViews;
-  }
-
-  const space = await prisma.space.findFirst({
-    where: {
-      id: page.spaceId!
-    }
-  });
-
-  if (!space) {
-    throw new NotFoundError('Space not found');
   }
 
   return res.status(200).json({
