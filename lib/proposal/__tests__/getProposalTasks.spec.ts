@@ -41,12 +41,12 @@ describe('getProposalTasks', () => {
       expect.objectContaining({
         id: draftProposal1.id,
         status: draftProposal1.proposal?.status,
-        action: 'move_to_discussion'
+        action: 'start_discussion'
       }),
       expect.objectContaining({
         id: privateDraftProposal1.id,
         status: privateDraftProposal1.proposal?.status,
-        action: 'move_to_discussion'
+        action: 'start_discussion'
       })
     ]));
   });

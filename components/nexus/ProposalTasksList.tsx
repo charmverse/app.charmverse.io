@@ -1,19 +1,18 @@
+import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { Alert, Button, Card, Grid, Link, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { ProposalStatusChip } from 'components/proposals/components/ProposalStatusBadge';
 import { ProposalTask } from 'lib/proposal/interface';
 import { GetTasksResponse } from 'pages/api/tasks/list';
-import { KeyedMutator } from 'swr';
-import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
-import { ProposalStatusChip } from 'components/proposals/components/ProposalStatusBadge';
-import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 
 const ProposalActionRecord: Record<ProposalTask['action'], string> = {
   discuss: 'Discuss',
-  move_to_discussion: 'Move to discussion',
+  start_discussion: 'Start discussion',
   review: 'Review',
   start_vote: 'Start vote',
-  vote: 'Vote'
+  vote: 'Vote',
+  start_review: 'Start review'
 };
 
 /**

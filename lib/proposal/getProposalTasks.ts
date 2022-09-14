@@ -17,31 +17,52 @@ export function extractProposalData (proposal: Proposal & {
   };
 }
 
-const StatusActionRecord: Record<Exclude<ProposalStatus, 'vote_closed'>, ProposalTask['action']> = {
+const StatusActionRecord: Record<Exclude<ProposalStatus, 'vote_closed' | 'discussion'>, ProposalTask['action']> = {
   vote_active: 'vote',
-  discussion: 'discuss',
   review: 'review',
   reviewed: 'start_vote',
-  draft: 'move_to_discussion',
-  private_draft: 'move_to_discussion'
+  draft: 'start_discussion',
+  private_draft: 'start_discussion'
 };
 
 export async function getProposalTasks (userId: string): Promise<ProposalTask[]> {
+  const startReviewTasks = await prisma.proposal.findMany({
+    where: {
+      status: 'discussion',
+      authors: {
+        some: {
+          userId
+        }
+      }
+    },
+    include: {
+      page: true,
+      space: true
+    }
+  });
+
+  const discussionTasks = await prisma.proposal.findMany({
+    where: {
+      status: 'discussion',
+      space: {
+        spaceRoles: {
+          some: {
+            userId
+          }
+        }
+      }
+    },
+    include: {
+      page: true,
+      space: true
+    }
+  });
+
   const proposalTasks = await prisma.proposal.findMany({
     where: {
       OR: [
         {
           status: 'vote_active',
-          space: {
-            spaceRoles: {
-              some: {
-                userId
-              }
-            }
-          }
-        },
-        {
-          status: 'discussion',
           space: {
             spaceRoles: {
               some: {
@@ -90,14 +111,15 @@ export async function getProposalTasks (userId: string): Promise<ProposalTask[]>
         }
       ]
     },
-    orderBy: {
-      createdBy: 'desc'
-    },
     include: {
       page: true,
       space: true
     }
   });
 
-  return proposalTasks.map(proposal => extractProposalData(proposal, StatusActionRecord[proposal.status as Exclude<ProposalStatus, 'vote_closed'>]));
+  return [
+    ...discussionTasks.map(discussionTask => extractProposalData(discussionTask, 'discuss')),
+    ...startReviewTasks.map(startReviewTask => extractProposalData(startReviewTask, 'start_review')),
+    ...proposalTasks.map(proposal => extractProposalData(proposal, StatusActionRecord[proposal.status as keyof typeof StatusActionRecord]))
+  ];
 }

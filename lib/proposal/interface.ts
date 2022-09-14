@@ -13,7 +13,7 @@ export interface ProposalWithUsers extends Proposal {
 
 export interface ProposalTask {
   id: string
-  action: 'move_to_discussion' | 'start_vote' | 'review' | 'discuss' | 'vote'
+  action: 'start_discussion' | 'start_vote' | 'review' | 'discuss' | 'vote' | 'start_review'
   spaceDomain: string
   spaceName: string
   pageTitle: string
