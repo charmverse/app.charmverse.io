@@ -1,18 +1,23 @@
-import { Proposal, ProposalStatus, WorkspaceEvent } from '@prisma/client';
+import { Page, ProposalStatus, Space, WorkspaceEvent } from '@prisma/client';
 import { prisma } from 'db';
 import { ProposalWithUsers } from './interface';
 
+export type ProposalTask = {
+  id: string
+  action: 'discuss' |
+    'start_discussion' |
+    'review' |
+    'start_vote' |
+    'vote' |
+    'start_review'
+  pageTitle: string
+  spaceName: string
+  spaceDomain: string
+  pagePath: string
+}
+
 export async function getProposalTasksFromWorkspaceEvents (userId: string, workspaceEvents: WorkspaceEvent[]) {
-  const proposalTasks: {
-    id: string
-    action:
-      'discuss' |
-      'start_discussion' |
-      'review' |
-      'start_vote' |
-      'vote' |
-      'start_review'
-  }[] = [];
+  const proposalTasks: ProposalTask[] = [];
 
   // Sort the events based on their created date to help in deduping
   workspaceEvents.sort((we1, we2) => we1.createdAt > we2.createdAt ? 1 : -1);
@@ -25,7 +30,9 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
     },
     include: {
       authors: true,
-      reviewers: true
+      reviewers: true,
+      space: true,
+      page: true
     }
   });
 
@@ -59,7 +66,10 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
   // Get all the roleId assigned to this user
   const roleIds = spaceRoles.map(spaceRole => spaceRole.spaceRoleToRole[0].role.id);
 
-  const proposalsRecord: Record<string, ProposalWithUsers> = {};
+  const proposalsRecord: Record<string, ProposalWithUsers & {
+    space: Space
+    page: Page | null
+  }> = {};
 
   proposals.forEach(proposal => {
     proposalsRecord[proposal.id] = proposal;
@@ -88,22 +98,30 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
         return roleIds.includes(reviewer.roleId as string);
       });
 
+      const proposalTask: Omit<ProposalTask, 'action'> = {
+        id: proposal.id,
+        pagePath: (proposal.page as Page).path,
+        pageTitle: (proposal.page as Page).title,
+        spaceDomain: proposal.space.domain,
+        spaceName: proposal.space.name
+      };
+
       if (isAuthor) {
         if (newStatus === 'draft' || newStatus === 'private_draft') {
           proposalTasks.push({
-            id: proposal.id,
+            ...proposalTask,
             action: 'start_discussion'
           });
         }
         else if (newStatus === 'reviewed') {
           proposalTasks.push({
-            id: proposal.id,
+            ...proposalTask,
             action: 'start_vote'
           });
         }
         else if (newStatus === 'discussion') {
           proposalTasks.push({
-            id: proposal.id,
+            ...proposalTask,
             action: 'start_review'
           });
         }
@@ -111,20 +129,20 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
       else if (isContributor) {
         if (newStatus === 'discussion') {
           proposalTasks.push({
-            id: proposal.id,
+            ...proposalTask,
             action: 'discuss'
           });
         }
         else if (newStatus === 'vote_active') {
           proposalTasks.push({
-            id: proposal.id,
+            ...proposalTask,
             action: 'vote'
           });
         }
       }
       else if (isReviewer && newStatus === 'review') {
         proposalTasks.push({
-          id: proposal.id,
+          ...proposalTask,
           action: 'review'
         });
       }

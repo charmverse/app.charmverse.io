@@ -80,13 +80,13 @@ export async function getNotifications (): Promise<PendingTasksProps[]> {
     const voteTasksNotSent = voteTasks.filter(voteTask => !sentTaskIds.has(voteTask.id));
     const gnosisSafeTasksNotSent = gnosisSafeTasks.filter(gnosisSafeTask => !sentTaskIds.has(getGnosisSafeTaskId(gnosisSafeTask)));
     const myGnosisTasks = gnosisSafeTasksNotSent.filter(gnosisSafeTask => Boolean(gnosisSafeTask.tasks[0].transactions[0].myAction));
-
-    const proposalTasks = await getProposalTasksFromWorkspaceEvents(user.id, workspaceEvents);
+    const workspaceEventsNotSent = workspaceEvents.filter(workspaceEvent => !sentTaskIds.has(workspaceEvent.id));
+    const proposalTasks = await getProposalTasksFromWorkspaceEvents(user.id, workspaceEventsNotSent);
 
     const totalTasks = myGnosisTasks.length + mentionedTasks.unmarked.length + voteTasksNotSent.length + proposalTasks.length;
 
     log.debug('Found tasks for notification', {
-      notSent: gnosisSafeTasksNotSent.length + voteTasksNotSent.length + mentionedTasks.unmarked.length,
+      notSent: gnosisSafeTasksNotSent.length + voteTasksNotSent.length + mentionedTasks.unmarked.length + proposalTasks.length,
       gnosisSafeTasks: gnosisSafeTasks.length,
       myGnosisTasks: myGnosisTasks.length
     });
@@ -125,6 +125,13 @@ async function sendNotification (notification: PendingTasksProps) {
         taskId: getGnosisSafeTaskId(task),
         channel: 'email',
         type: 'multisig'
+      }
+    })), ...notification.proposalTasks.map(proposalTask => prisma.userNotification.create({
+      data: {
+        userId: notification.user.id,
+        taskId: proposalTask.id,
+        channel: 'email',
+        type: 'proposal'
       }
     })), ...notification.voteTasks.map(voteTask => prisma.userNotification.create({
       data: {
