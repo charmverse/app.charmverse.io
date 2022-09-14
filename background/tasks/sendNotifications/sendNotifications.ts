@@ -6,6 +6,7 @@ import { getPendingGnosisTasks, GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks'
 import log from 'lib/log';
 import * as mailer from 'lib/mailer';
 import { getMentionedTasks } from 'lib/mentions/getMentionedTasks';
+import { getProposalTasksFromWorkspaceEvents } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';
 import { getVoteTasks } from 'lib/votes/getVoteTasks';
 
 export async function sendUserNotifications (): Promise<number> {
@@ -24,6 +25,16 @@ export async function sendUserNotifications (): Promise<number> {
 const getGnosisSafeTaskId = (task: GnosisSafeTasks) => task.tasks[0].transactions[0].id;
 
 export async function getNotifications (): Promise<PendingTasksProps[]> {
+
+  const workspaceEvents = await prisma.workspaceEvent.findMany({
+    where: {
+      createdAt: {
+        lte: new Date(),
+        gte: new Date(Date.now() - 1000 * 60 * 60 * 24)
+      },
+      type: 'proposal_status_change'
+    }
+  });
 
   const usersWithSafes = await prisma.user.findMany({
     where: {
@@ -70,7 +81,9 @@ export async function getNotifications (): Promise<PendingTasksProps[]> {
     const gnosisSafeTasksNotSent = gnosisSafeTasks.filter(gnosisSafeTask => !sentTaskIds.has(getGnosisSafeTaskId(gnosisSafeTask)));
     const myGnosisTasks = gnosisSafeTasksNotSent.filter(gnosisSafeTask => Boolean(gnosisSafeTask.tasks[0].transactions[0].myAction));
 
-    const totalTasks = myGnosisTasks.length + mentionedTasks.unmarked.length + voteTasksNotSent.length;
+    const proposalTasks = await getProposalTasksFromWorkspaceEvents(user.id, workspaceEvents);
+
+    const totalTasks = myGnosisTasks.length + mentionedTasks.unmarked.length + voteTasksNotSent.length + proposalTasks.length;
 
     log.debug('Found tasks for notification', {
       notSent: gnosisSafeTasksNotSent.length + voteTasksNotSent.length + mentionedTasks.unmarked.length,
@@ -84,7 +97,8 @@ export async function getNotifications (): Promise<PendingTasksProps[]> {
       totalTasks,
       // Get only the unmarked mentioned tasks
       mentionedTasks: mentionedTasks.unmarked,
-      voteTasks: voteTasksNotSent
+      voteTasks: voteTasksNotSent,
+      proposalTasks
     };
   }));
 
