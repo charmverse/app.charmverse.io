@@ -20,12 +20,12 @@ const StyledPageTemplateBanner = styled(Box)<{card?: boolean}>`
   padding: ${({ theme }) => theme.spacing(1.4)};
 `;
 
-export function PageTemplateBanner ({ page }: {page: IPageWithPermissions}) {
+export function PageTemplateBanner ({ page, parentPage }: {parentPage?: IPageWithPermissions | null, page: IPageWithPermissions}) {
   const [space] = useCurrentSpace();
   const theme = useTheme();
 
   const isShowingCard = page.type.match('card') !== null;
-  const board = isShowingCard ? page : undefined;
+  const board = isShowingCard ? parentPage : undefined;
 
   const boardPath = board ? `/${space?.domain}/${board?.path}` : undefined;
 

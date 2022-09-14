@@ -62,6 +62,10 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
   const [bountyPermissions, setBountyPermissions] = useState<AssignedBountyPermissions | null>(null);
   const [containerRef, { width: containerWidth }] = useElementSize();
 
+  const proposalId = page.proposalId || parentProposalId;
+  // We can only edit the proposal from the top level
+  const readonlyProposalProperties = !page.proposalId || Boolean(parentProposalId) || readOnly;
+
   async function refreshBountyPermissions (bountyId: string) {
     setBountyPermissions(await charmClient.bounties.computePermissions({
       resourceId: bountyId
@@ -147,7 +151,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
       >
         <div ref={containerRef}>
           {page.deletedAt && <PageDeleteBanner pageId={page.id} />}
-          <PageTemplateBanner page={page} />
+          <PageTemplateBanner parentPage={page.parentId ? pages[page.parentId] : null} page={page} />
           {page.headerImage && <PageBanner headerImage={page.headerImage} readOnly={cannotEdit} setPage={setPage} />}
           <Container
             top={pageTop}
@@ -200,7 +204,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
                       pageUpdatedBy={page.updatedBy}
                     />
                   )}
-                  {page.type === 'proposal' && page.proposalId && <ProposalProperties pageId={page.proposalId} proposalId={page.proposalId} readOnly={readOnly} />}
+                  {proposalId && <ProposalProperties pageId={proposalId} proposalId={proposalId as string} readOnly={readonlyProposalProperties} />}
                   {(draftBounty || page.bountyId) && (
                     <BountyProperties
                       bountyId={page.bountyId}

@@ -3,39 +3,33 @@ import { Alert, Button, Card, Grid, Link, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ProposalStatusChip } from 'components/proposals/components/ProposalStatusBadge';
-import { ProposalTask } from 'lib/proposal/interface';
+import type { ProposalTask } from 'lib/proposal/getProposalTasks';
 import { GetTasksResponse } from 'pages/api/tasks/list';
 
 const ProposalActionRecord: Record<ProposalTask['action'], string> = {
   discuss: 'Discuss',
-  start_discussion: 'Start discussion',
+  start_discussion: 'To discuss',
   review: 'Review',
   start_vote: 'Start vote',
   vote: 'Vote',
-  start_review: 'Start review'
+  start_review: 'To review'
 };
 
 /**
  * Page only needs to be provided for proposal type proposals
  */
 export function ProposalTasksListRow (
-  props: {proposalTask: ProposalTask}
+  {
+    proposalTask: {
+      spaceDomain,
+      pagePath,
+      spaceName,
+      pageTitle,
+      action,
+      status
+    }
+  }: {proposalTask: ProposalTask}
 ) {
-
-  const {
-    proposalTask
-  } = props;
-
-  const {
-    spaceDomain,
-    pagePath,
-    spaceName,
-    pageTitle,
-    action,
-    id,
-    status
-  } = proposalTask;
-
   const proposalLink = `/${spaceDomain}/${pagePath}`;
   const proposalLocation = `${pageTitle || 'Untitled'} in ${spaceName}`;
 

@@ -60,7 +60,7 @@ type TaskType = (typeof TASK_TABS)[number]['type'];
 export default function TasksPage () {
   const router = useRouter();
   const { user } = useUser();
-  const [currentTask, setCurrentTask] = useState<TaskType>((router.query?.task ?? 'multisig') as TaskType);
+  const [currentTaskType, setCurrentTaskType] = useState<TaskType>((router.query?.task ?? 'multisig') as TaskType);
   const { error, mutate: mutateTasks, tasks } = useTasks();
   const theme = useTheme();
 
@@ -91,7 +91,7 @@ export default function TasksPage () {
         <Grid item xs={12} sm={6}>
           <Box display='flex' alignItems='center' justifyContent={{ sm: 'flex-end', xs: 'flex-start' }} gap={{ sm: 2, xs: 1 }}>
             <NotifyMeButton />
-            {currentTask === 'multisig' ? <SnoozeButton /> : null }
+            {currentTaskType === 'multisig' ? <SnoozeButton /> : null }
           </Box>
         </Grid>
       </Grid>
@@ -99,7 +99,7 @@ export default function TasksPage () {
       <Tabs
         sx={tabStyles}
         indicatorColor='primary'
-        value={TASK_TABS.findIndex(taskTab => taskTab.type === currentTask)}
+        value={TASK_TABS.findIndex(taskTab => taskTab.type === currentTaskType)}
       >
         {TASK_TABS.map(task => (
           <Tab
@@ -132,12 +132,23 @@ export default function TasksPage () {
             )}
             onClick={() => {
               silentlyUpdateURL(`${window.location.origin}/nexus?task=${task.type}`);
-              setCurrentTask(task.type);
+              setCurrentTaskType(task.type);
             }}
           />
         ))}
       </Tabs>
-      {currentTask === 'multisig' ? <GnosisTasksList error={error} mutateTasks={mutateTasks} tasks={tasks} /> : currentTask === 'discussion' ? <MentionedTasksList mutateTasks={mutateTasks} error={error} tasks={tasks} /> : currentTask === 'vote' ? <VoteTasksList mutateTasks={mutateTasks} error={error} tasks={tasks} /> : currentTask === 'proposal' ? <ProposalTasksList error={error} tasks={tasks} /> : null}
+      {
+        currentTaskType === 'multisig' && <GnosisTasksList error={error} mutateTasks={mutateTasks} tasks={tasks} />
+      }
+      {
+        currentTaskType === 'discussion' && <MentionedTasksList mutateTasks={mutateTasks} error={error} tasks={tasks} />
+      }
+      {
+        currentTaskType === 'vote' && <VoteTasksList mutateTasks={mutateTasks} error={error} tasks={tasks} />
+      }
+      {
+        currentTaskType === 'proposal' && <ProposalTasksList error={error} tasks={tasks} />
+      }
     </>
   );
 }

@@ -1,6 +1,15 @@
 import { Page, Proposal, ProposalStatus, Space } from '@prisma/client';
 import { prisma } from 'db';
-import { ProposalTask } from './interface';
+
+export interface ProposalTask {
+  id: string
+  action: 'start_discussion' | 'start_vote' | 'review' | 'discuss' | 'vote' | 'start_review'
+  spaceDomain: string
+  spaceName: string
+  pageTitle: string
+  pagePath: string
+  status: ProposalStatus
+}
 
 export function extractProposalData (proposal: Proposal & {
   space: Space,
@@ -26,41 +35,27 @@ const StatusActionRecord: Record<Exclude<ProposalStatus, 'vote_closed' | 'discus
 };
 
 export async function getProposalTasks (userId: string): Promise<ProposalTask[]> {
-  const startReviewTasks = await prisma.proposal.findMany({
-    where: {
-      status: 'discussion',
-      authors: {
-        some: {
-          userId
-        }
-      }
-    },
-    include: {
-      page: true,
-      space: true
-    }
-  });
-
-  const discussionTasks = await prisma.proposal.findMany({
-    where: {
-      status: 'discussion',
-      space: {
-        spaceRoles: {
-          some: {
-            userId
-          }
-        }
-      }
-    },
-    include: {
-      page: true,
-      space: true
-    }
-  });
-
   const proposalTasks = await prisma.proposal.findMany({
     where: {
       OR: [
+        {
+          status: 'discussion',
+          authors: {
+            some: {
+              userId
+            }
+          }
+        },
+        {
+          status: 'discussion',
+          space: {
+            spaceRoles: {
+              some: {
+                userId
+              }
+            }
+          }
+        },
         {
           status: 'vote_active',
           space: {
@@ -112,14 +107,16 @@ export async function getProposalTasks (userId: string): Promise<ProposalTask[]>
       ]
     },
     include: {
+      authors: true,
       page: true,
       space: true
     }
   });
 
-  return [
-    ...discussionTasks.map(discussionTask => extractProposalData(discussionTask, 'discuss')),
-    ...startReviewTasks.map(startReviewTask => extractProposalData(startReviewTask, 'start_review')),
-    ...proposalTasks.map(proposal => extractProposalData(proposal, StatusActionRecord[proposal.status as keyof typeof StatusActionRecord]))
-  ];
+  return proposalTasks.map(proposal => {
+    if (proposal.status === 'discussion') {
+      return proposal.authors.map(author => author.userId === userId) ? extractProposalData(proposal, 'start_review') : extractProposalData(proposal, 'discuss');
+    }
+    return extractProposalData(proposal, StatusActionRecord[proposal.status as keyof typeof StatusActionRecord]);
+  });
 }
