@@ -112,15 +112,35 @@ export default function TasksPage () {
               px: 1.5,
               fontSize: 14,
               minHeight: 0,
+              mb: {
+                xs: 1,
+                md: 0
+              },
               '&.MuiTab-root': {
-                color: theme.palette.secondary.main
+                color: theme.palette.secondary.main,
+                display: 'flex',
+                flexDirection: {
+                  xs: 'column',
+                  md: 'row'
+                }
+              },
+              '& .MuiSvgIcon-root': {
+                mr: {
+                  xs: 0
+                }
               }
             }}
             label={(
               <Badge
                 sx={{
                   '& .MuiBadge-badge': {
-                    right: '-3px'
+                    right: {
+                      md: '-3px',
+                      xs: 15
+                    },
+                    top: {
+                      xs: -20
+                    }
                   }
                 }}
                 invisible={notificationCount[task.type] === 0}

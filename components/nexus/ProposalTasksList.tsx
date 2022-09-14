@@ -64,7 +64,15 @@ export function ProposalTasksListRow (
               fontSize: { xs: 14, sm: 'inherit' }
             }}
           >
-            <Link href={proposalLink} display='flex'>
+            <Link
+              href={proposalLink}
+              display='flex'
+              sx={{
+                color: {
+                  xs: 'inherit'
+                }
+              }}
+            >
               {proposalLocation}
             </Link>
           </Grid>
@@ -77,7 +85,6 @@ export function ProposalTasksListRow (
             sm={2}
             md={2}
             justifyContent={{
-              xs: 'flex-start',
               md: 'flex-end'
             }}
             display='flex'
@@ -85,7 +92,7 @@ export function ProposalTasksListRow (
             <Button
               sx={{
                 width: {
-                  xs: 'fit-content',
+                  xs: '100%',
                   md: 100
                 }
               }}
