@@ -5,6 +5,8 @@ import { NftData } from 'lib/blockchain/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import { RPCList } from 'connectors';
+import { SupportedChainId, SupportedChainIds } from 'lib/blockchain/provider/alchemy';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -40,7 +42,9 @@ async function getNFTsMiddleware (req: NextApiRequest, res: NextApiResponse<NftD
   }
 
   const { addresses } = user;
-  const mappedNfts = await getNFTs(addresses);
+  const mappedNfts = (await Promise.all(
+    RPCList.filter(rpc => SupportedChainIds.includes(rpc.chainId as any)).map(rpc => getNFTs(addresses, rpc.chainId as SupportedChainId))
+  )).flat();
 
   res.status(200).json(mappedNfts.map(nft => ({
     ...nft,
