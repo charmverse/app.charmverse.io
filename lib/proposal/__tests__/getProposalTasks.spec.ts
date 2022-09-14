@@ -186,7 +186,7 @@ describe('getProposalTasks', () => {
       expect.objectContaining({
         id: discussionProposal1.id,
         status: discussionProposal1.proposal?.status,
-        action: 'discuss'
+        action: 'start_review'
       }),
       expect.objectContaining({
         id: activeVoteProposal.id,
@@ -196,7 +196,7 @@ describe('getProposalTasks', () => {
       expect.objectContaining({
         id: discussionProposal2.id,
         status: discussionProposal2.proposal?.status,
-        action: 'discuss'
+        action: 'start_review'
       })
     ]));
   });
