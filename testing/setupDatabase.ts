@@ -1,17 +1,17 @@
-import { ApplicationStatus, Block, Bounty, BountyStatus, Comment, Page, Prisma, ProposalStatus, Role, RoleSource, Thread, Transaction, Vote } from '@prisma/client';
+import type { ApplicationStatus, Block, Bounty, BountyStatus, Comment, Page, Prisma, ProposalStatus, Role, RoleSource, Thread, Transaction, Vote } from '@prisma/client';
 import { prisma } from 'db';
-import { getBountyOrThrow } from 'lib/bounties';
+import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
-import { getPagePath, IPageWithPermissions, PageWithProposal } from 'lib/pages';
-import { BountyPermissions } from 'lib/permissions/bounties';
-import { TargetPermissionGroup } from 'lib/permissions/interfaces';
-import { ProposalReviewerInput } from 'lib/proposal/interface';
-import { upsertPermission } from 'lib/permissions/pages';
+import type { IPageWithPermissions, PageWithProposal } from 'lib/pages/interfaces';
+import { getPagePath } from 'lib/pages/utils';
+import type { BountyPermissions } from 'lib/permissions/bounties';
+import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
+import type { ProposalReviewerInput } from 'lib/proposal/interface';
+import { syncProposalPermissions } from 'lib/proposal/syncProposalPermissions';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { typedKeys } from 'lib/utilities/objects';
 import { BountyWithDetails, IDENTITY_TYPES, LoggedInUser } from 'models';
 import { v4 } from 'uuid';
-import { syncProposalPermissions } from 'lib/proposal/syncProposalPermissions';
 
 export async function generateSpaceUser ({ spaceId, isAdmin }: { spaceId: string, isAdmin: boolean }): Promise<LoggedInUser> {
   return prisma.user.create({
