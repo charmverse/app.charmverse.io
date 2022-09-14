@@ -20,6 +20,7 @@ function BountyCard ({ bounty, page, onClick }: Props) {
         height: 150,
         display: 'grid' // make child full height,
       }}
+      data-test={`bounty-card-${bounty?.id}`}
     >
       <Box
         sx={{

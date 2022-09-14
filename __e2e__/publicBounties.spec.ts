@@ -1,7 +1,5 @@
-import { Browser, chromium, test } from '@playwright/test';
-import { createBounty } from 'lib/bounties';
-import { togglePublicBounties } from 'lib/spaces/togglePublicBounties';
-import { baseUrl, createUserAndSpace } from './utilities';
+import { Browser, chromium, test, expect } from '@playwright/test';
+import { baseUrl, createUserAndSpace, generateBounty } from './utilities';
 
 let browser: Browser;
 
@@ -13,26 +11,70 @@ test.beforeAll(async () => {
 test('visit a public bounty a page public', async () => {
 
   // Arrange ------------------
-  const userContext = await browser.newContext({ permissions: ['clipboard-read', 'clipboard-write'] });
-  const page = await userContext.newPage();
+  const loggedInUserContext = await browser.newContext();
+  const publicContext = await browser.newContext();
 
-  const { space, pages: spacePages } = await createUserAndSpace({ browserPage: page });
+  const loggedInPage = await loggedInUserContext.newPage();
+  const publicPage = await publicContext.newPage();
 
-  const bounty = await createBounty({
+  const { space } = await createUserAndSpace({ browserPage: loggedInPage, permissionConfigurationMode: 'open' });
+
+  const bounty = await generateBounty({
     spaceId: space.id,
     createdBy: space.createdBy,
     status: 'open',
+    approveSubmitters: false,
     rewardAmount: 100,
-    rewardToken: 'ETH'
+    rewardToken: 'ETH',
+    bountyPermissions: {
+      submitter: [{
+        group: 'space',
+        id: space.id
+      }]
+    },
+    pagePermissions: [
+      {
+        permissionLevel: 'view',
+        spaceId: space.id
+      }, {
+        permissionLevel: 'view',
+        public: true
+      }
+    ]
   });
 
-  await togglePublicBounties({ publicBountyBoard: true, spaceId: space.id });
+  // await togglePublicBounties({ publicBountyBoard: true, spaceId: space.id });
 
-  const bountyBoard = `${baseUrl}/${space.domain}/bounties`;
+  const publicSharePrefix = `${baseUrl}/share/${space.domain}`;
+
+  const bountyBoard = `${publicSharePrefix}/bounties`;
 
   // Act
-  await page.goto(bountyBoard);
 
-  await page.pause();
+  // Test a logged in user viewing the public board, and a public user viewing the public board
+  await Promise.all([loggedInPage, publicPage].map(async (page) => {
+
+    await page.goto(bountyBoard);
+
+    const bountyCard = page.locator(`data-test=bounty-card-${bounty.id}`);
+
+    await expect(bountyCard).toBeVisible();
+
+    await bountyCard.click();
+
+    // 4. Open the card and make sure it renders content
+    await page.waitForURL(`${bountyBoard}*bountyId*`);
+
+    const cardPopup = page.locator('div.Dialog');
+
+    await expect(cardPopup).toBeVisible();
+    const documentTitle = cardPopup.locator('data-test=editor-page-title');
+
+    await expect(documentTitle).toBeVisible();
+
+    const spaceActionButton = page.locator('data-test=public-bounty-space-action');
+
+    await expect(spaceActionButton).toBeVisible();
+  }));
 
 });

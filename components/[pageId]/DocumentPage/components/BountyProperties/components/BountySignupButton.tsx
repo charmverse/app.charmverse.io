@@ -53,7 +53,7 @@ export function BountySignupButton ({ bountyPage }: Props) {
 
   return (
     <>
-      <Box display='flex' justifyContent='center' sx={{ my: 2 }}>
+      <Box display='flex' justifyContent='center' sx={{ my: 2 }} data-test='public-bounty-space-action'>
         {
         showSignup && (
           <Button color='primary' onClick={loginViaTokenGateModal.open}>
