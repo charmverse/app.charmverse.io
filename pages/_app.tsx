@@ -33,7 +33,6 @@ import { PageTitleProvider, usePageTitle } from 'hooks/usePageTitle';
 import { SpacesProvider } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
 import { SnackbarProvider } from 'hooks/useSnackbar';
-import HexagonalAvatarMask from 'components/common/HexagonalAvatarMask';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
 
@@ -166,6 +165,7 @@ import cssVariables from 'theme/cssVariables';
 import 'theme/styles.scss';
 
 import charmClient from 'charmClient';
+import GlobalComponents from 'components/_app/GlobalComponents';
 
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
 
@@ -270,8 +270,8 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
                                 handleClose={() => setIsOldBuild(false)}
                               />
                               {getLayout(<Component {...pageProps} />)}
-                              <HexagonalAvatarMask id='hexagon-avatar' />
-                              <Snackbar />
+
+                              <GlobalComponents />
                             </ErrorBoundary>
                           </RouteGuard>
                         </SnackbarProvider>

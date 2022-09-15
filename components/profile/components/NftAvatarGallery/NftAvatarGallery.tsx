@@ -1,15 +1,15 @@
-import { useMyNfts } from 'hooks/useMyNfts';
 import Skeleton from '@mui/material/Skeleton';
 import Stack from '@mui/material/Stack';
-import { Dialog, DialogTitle, CircularProgress, DialogContent, Typography, Grid, Box } from '@mui/material';
+import { CircularProgress, Grid, Box } from '@mui/material';
 
 import { NftData } from 'lib/blockchain/interfaces';
 import { useUser } from 'hooks/useUser';
 import styled from '@emotion/styled';
+import EmptyAvatarGallery from 'components/profile/components/NftAvatarGallery/RenderEmptyAvatarGallery';
 import NftGalleryItem from './NftGalleryItem';
 
 const ProgressContainer = styled.div`
-  position: 'absolute';
+  position: absolute;
   top: 0;
   right: 0;
   left: 0;
@@ -21,14 +21,14 @@ const ProgressContainer = styled.div`
 
 type Props = {
   onSelect?: (avatar: NftData) => void
-  isVisible: boolean;
-  onClose: () => void;
   isSaving?: boolean;
+  nfts: NftData[] | undefined;
+  isLoading?: boolean;
+  emptyMessage?: string
 };
 
-export default function NftAvatarGallery ({ onSelect, isVisible, onClose, isSaving }: Props) {
+export default function NftAvatarGallery ({ onSelect, isSaving, nfts, isLoading, emptyMessage }: Props) {
   const { user } = useUser();
-  const { nfts, isLoading } = useMyNfts(user?.id ?? '');
 
   const getIsSelected = (nft: NftData) => {
     if (!user) {
@@ -41,41 +41,30 @@ export default function NftAvatarGallery ({ onSelect, isVisible, onClose, isSavi
   };
 
   return (
-    <Dialog onClose={onClose} open={isVisible} scroll='paper'>
-      <DialogTitle>Your NFTs gallery</DialogTitle>
-
-      <DialogContent dividers sx={{ position: 'relative' }}>
-        {isLoading ? (
-          <Grid container spacing={1}>
-            {[0, 1, 2].map(id => (
-              <Grid key={id} item xs={6} sm={3} sx={{ minWidth: 110 }}>
-                <Stack spacing={1}>
-                  <Skeleton variant='rectangular' width={100} height={80} />
-                  <Skeleton variant='text' sx={{ fontSize: '1rem' }} />
-                </Stack>
-              </Grid>
-            ))}
+    <Box position='relative'>
+      <Grid container spacing={1}>
+        {isLoading ? [0, 1, 2].map(id => (
+          <Grid key={id} item xs={6} sm={3} sx={{ minWidth: 110 }}>
+            <Stack spacing={1}>
+              <Skeleton variant='rectangular' width={100} height={80} />
+              <Skeleton variant='text' sx={{ fontSize: '1rem' }} />
+            </Stack>
           </Grid>
-        ) : (
-          <Grid container spacing={1}>
-            {nfts?.length ? nfts.map(nft => (
-              <Grid key={`${nft.contract}-${nft.tokenId}`} item xs={6} sm={3} sx={{ minWidth: 110 }}>
-                <NftGalleryItem nft={nft} onClick={() => onSelect?.(nft)} isSelected={getIsSelected(nft)} />
-              </Grid>
-            )) : (
-              <Box p={4} textAlign='center' flex={1}>
-                <Typography>You do not own any NFTs</Typography>
-              </Box>
-            )}
-          </Grid>
-        )}
+        ))
+          : nfts?.length ? nfts.map(nft => (
+            <Grid key={`${nft.contract}-${nft.tokenId}`} item xs={6} sm={3} sx={{ minWidth: 110 }}>
+              <NftGalleryItem nft={nft} onClick={() => onSelect?.(nft)} isSelected={getIsSelected(nft)} />
+            </Grid>
+          )) : (
+            <EmptyAvatarGallery emptyMessage={emptyMessage} />
+          )}
+      </Grid>
 
-        {isSaving && (
-          <ProgressContainer>
-            <CircularProgress />
-          </ProgressContainer>
-        )}
-      </DialogContent>
-    </Dialog>
+      {isSaving && (
+        <ProgressContainer>
+          <CircularProgress />
+        </ProgressContainer>
+      )}
+    </Box>
   );
 }

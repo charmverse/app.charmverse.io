@@ -12,7 +12,7 @@ export async function getNFT (contractAddress: string, tokenId: string, chainId:
   return mapNftFromAlchemy(nft, chainId);
 }
 
-function mapNftFromAlchemy (nft: alchemyApi.AlchemyNft, chainId: number): NftData {
+function mapNftFromAlchemy (nft: alchemyApi.AlchemyNft, chainId: alchemyApi.SupportedChainId): NftData {
   return {
     id: `${nft.contract.address}:${nft.id.tokenId}`,
     tokenId: nft.id.tokenId,
