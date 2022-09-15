@@ -34,7 +34,7 @@ async function updateAvatar (req: NextApiRequest, res: NextApiResponse<LoggedInU
   // Provided NFT data
   if (isNftAvatar) {
     const user = await getUserProfile('id', req.session.user.id);
-    const owners = await alchemyApi.getOwners(avatarContract, avatarTokenId, avatarChain as alchemyApi.SupportedChainId);
+    const owners = await alchemyApi.getOwners(avatarContract, avatarTokenId, avatarChain);
 
     const isOwner = user?.addresses.some(a => {
       return owners.find(o => o.toLowerCase() === a.toLowerCase());
@@ -44,7 +44,7 @@ async function updateAvatar (req: NextApiRequest, res: NextApiResponse<LoggedInU
       throw new InvalidInputError('You do not own selected NFT');
     }
 
-    const nft = await getNFT(avatarContract, avatarTokenId, avatarChain as alchemyApi.SupportedChainId);
+    const nft = await getNFT(avatarContract, avatarTokenId, avatarChain);
 
     if (nft.image) {
       avatarUrl = nft.image;
