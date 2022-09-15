@@ -1,7 +1,7 @@
 
 import styled from '@emotion/styled';
+import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { Box, Typography } from '@mui/material';
-import ForumIcon from '@mui/icons-material/Forum';
 
 const EmptyProposalContainerBox = styled(Box)`
   position: relative;
@@ -25,7 +25,7 @@ export default function NoProposalsMessage ({ message }: { message: string }) {
   return (
     <EmptyProposalContainerBox>
       <Center>
-        <ForumIcon
+        <TaskOutlinedIcon
           fontSize='large'
           color='secondary'
           sx={{
