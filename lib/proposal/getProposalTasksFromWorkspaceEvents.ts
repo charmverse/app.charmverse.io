@@ -2,19 +2,33 @@ import { Page, ProposalStatus, Space, WorkspaceEvent } from '@prisma/client';
 import { prisma } from 'db';
 import { ProposalWithUsers } from './interface';
 
+type ProposalTaskAction = 'discuss' |
+  'start_discussion' |
+  'review' |
+  'start_vote' |
+  'vote' |
+  'start_review';
+
 export type ProposalTask = {
   id: string
-  action: 'discuss' |
-    'start_discussion' |
-    'review' |
-    'start_vote' |
-    'vote' |
-    'start_review'
+  action: ProposalTaskAction
   pageTitle: string
   spaceName: string
   spaceDomain: string
   pagePath: string
 }
+
+type ProposalRecord = Record<string, ProposalWithUsers & {
+  space: Pick<Space, 'domain' | 'name'>
+  page: Pick<Page, 'path' | 'title'> | null
+}>
+
+type ProposalStatusChangeMetaData = {
+  newStatus: ProposalStatus
+  oldStatus: ProposalStatus
+}
+
+type ProposalStatusChangeWorkspaceEvent = WorkspaceEvent & { type: 'proposal_status_change' } & { meta: ProposalStatusChangeMetaData }
 
 export async function getProposalTasksFromWorkspaceEvents (userId: string, workspaceEvents: WorkspaceEvent[]) {
   const proposalTasks: ProposalTask[] = [];
@@ -24,15 +38,27 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
 
   const proposals = await prisma.proposal.findMany({
     where: {
-      id: {
-        in: workspaceEvents.map(workspaceEvent => workspaceEvent.pageId)
+      page: {
+        id: {
+          in: workspaceEvents.map(workspaceEvent => workspaceEvent.pageId)
+        }
       }
     },
     include: {
       authors: true,
       reviewers: true,
-      space: true,
-      page: true
+      space: {
+        select: {
+          domain: true,
+          name: true
+        }
+      },
+      page: {
+        select: {
+          path: true,
+          title: true
+        }
+      }
     }
   });
 
@@ -68,10 +94,10 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
     ? spaceRole.spaceRoleToRole[0].role.id
     : null).filter(roleId => roleId);
 
-  const proposalsRecord: Record<string, ProposalWithUsers & {
-    space: Space
-    page: Page | null
-  }> = {};
+  const proposalsRecord: ProposalRecord = proposals.reduce<ProposalRecord>((record, proposal) => {
+    record[proposal.id] = proposal;
+    return record;
+  }, {});
 
   proposals.forEach(proposal => {
     proposalsRecord[proposal.id] = proposal;
@@ -88,10 +114,7 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
 
     // If an even for this proposal was already handled no need to process further
     if (!visitedProposals.has(proposal.id)) {
-      const { newStatus } = workspaceEvent.meta as {
-        newStatus: ProposalStatus
-        oldStatus: ProposalStatus
-      };
+      const { meta: { newStatus } } = workspaceEvent as ProposalStatusChangeWorkspaceEvent;
 
       const isAuthor = proposal.authors.find(author => author.userId === userId);
       const isContributor = spaceIds.includes(workspaceEvent.spaceId);
