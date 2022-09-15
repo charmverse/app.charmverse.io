@@ -12,35 +12,36 @@ import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
 //   console.warn(err);
 // });
 
-importWorkspacePages({
-  exportName: 'space-tame-magenta-elephant-1663276172748',
-  targetSpaceIdOrDomain: 'ill-solana-urial'
-}).then((result) => {
-  console.log('Created ', result.pages, ' pages');
-});
+// importWorkspacePages({
+//   exportName: 'space-tame-magenta-elephant-1663276172748',
+//   targetSpaceIdOrDomain: 'ill-solana-urial'
+// }).then((result) => {
+//   console.log('Created ', result.pages, ' pages');
+// });
 
 // });
 
-// async function exportImport ({ sourceSpaceIdOrDomain, targetSpaceIdOrDomain }:
-//   {sourceSpaceIdOrDomain: string, targetSpaceIdOrDomain: string}): Promise<true> {
-//   const { data } = await exportWorkspacePages({
-//     sourceSpaceIdOrDomain
-//   });
+async function exportImport ({ sourceSpaceIdOrDomain, targetSpaceIdOrDomain }:
+  {sourceSpaceIdOrDomain: string, targetSpaceIdOrDomain: string}): Promise<true> {
+  const { data } = await exportWorkspacePages({
+    sourceSpaceIdOrDomain
+  });
 
-//   const result = await importWorkspacePages({
-//     targetSpaceIdOrDomain,
-//     exportData: data
-//   });
+  const result = await importWorkspacePages({
+    targetSpaceIdOrDomain,
+    exportData: data
+  });
 
-//   console.log('Success ! Imported ', result.pages);
+  console.log('Success ! Imported ', result.pages);
 
-//   return true;
-// }
+  return true;
+}
 
 // exportImport({
-//   sourceSpaceIdOrDomain: 'tame-magenta-elephant',
-//   targetSpaceIdOrDomain: 'zesty-salmon-takin'
+//   sourceSpaceIdOrDomain: 'gerals-station',
+//   targetSpaceIdOrDomain: 'cvt-melboudi-admin-test'
 // }).then(() => {
+
 //   console.log('Job done');
 // });
 
