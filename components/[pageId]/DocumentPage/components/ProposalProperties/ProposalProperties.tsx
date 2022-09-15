@@ -94,25 +94,7 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly }: Pr
 
   async function updateProposalStatus (newStatus: ProposalStatus) {
     await charmClient.proposals.updateStatus(proposalId, newStatus);
-    const refreshedProposal = await refreshProposal();
-
-    if (currentSpace && refreshedProposal) {
-      const cacheKey = `proposals/${currentSpace.id}`;
-      // Get useSWR cache by key
-      const cachedProposals = cache.get(cacheKey) as ProposalWithUsers[];
-      // Will be undefined if the data hasn't been fetched yet
-      if (cachedProposals) {
-        const proposals = cachedProposals.map(cachedProposal => {
-          // Return the new proposal if id matches
-          if (cachedProposal.id === refreshedProposal.id) {
-            return refreshedProposal;
-          }
-          return cachedProposal;
-        });
-        // Update the proposals cache
-        cache.set(cacheKey, proposals);
-      }
-    }
+    await refreshProposal();
     proposalMenuState.close();
   }
 
