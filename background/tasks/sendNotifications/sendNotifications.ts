@@ -82,7 +82,7 @@ export async function getNotifications (): Promise<PendingTasksProps[]> {
     const gnosisSafeTasksNotSent = gnosisSafeTasks.filter(gnosisSafeTask => !sentTaskIds.has(getGnosisSafeTaskId(gnosisSafeTask)));
     const myGnosisTasks = gnosisSafeTasksNotSent.filter(gnosisSafeTask => Boolean(gnosisSafeTask.tasks[0].transactions[0].myAction));
     const workspaceEventsNotSent = workspaceEvents.filter(workspaceEvent => !sentTaskIds.has(workspaceEvent.id));
-    const proposalTasks = await getProposalTasksFromWorkspaceEvents(user.id, workspaceEventsNotSent);
+    const proposalTasks = workspaceEventsNotSent.length !== 0 ? await getProposalTasksFromWorkspaceEvents(user.id, workspaceEventsNotSent) : [];
 
     const totalTasks = myGnosisTasks.length + mentionedTasks.unmarked.length + voteTasksNotSent.length + proposalTasks.length;
 

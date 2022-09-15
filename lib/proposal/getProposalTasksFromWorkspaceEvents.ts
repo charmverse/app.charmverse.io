@@ -64,7 +64,9 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
 
   const spaceIds = spaceRoles.map(spaceRole => spaceRole.spaceId);
   // Get all the roleId assigned to this user
-  const roleIds = spaceRoles.map(spaceRole => spaceRole.spaceRoleToRole[0].role.id);
+  const roleIds = spaceRoles.map(spaceRole => spaceRole.spaceRoleToRole.length !== 0
+    ? spaceRole.spaceRoleToRole[0].role.id
+    : null).filter(roleId => roleId);
 
   const proposalsRecord: Record<string, ProposalWithUsers & {
     space: Space
