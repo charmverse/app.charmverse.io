@@ -1,7 +1,8 @@
 import { GET } from 'adapters/http';
 import orderBy from 'lodash/orderBy';
 
-export type SupportedChainId = 1 | 4 | 5 | 137 | 80001 | 42161;
+export const SupportedChainIds = [1, 4, 5, 137, 80001, 42161] as const;
+export type SupportedChainId = typeof SupportedChainIds[number]
 
 interface NftMedia {
   bytes: number;
