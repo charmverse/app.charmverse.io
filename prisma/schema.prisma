@@ -42,6 +42,11 @@ enum VoteType {
   SingleChoice
 }
 
+enum NotificationChannel {
+  email
+  webapp
+}
+
 enum NotificationType {
   multisig
   mention
@@ -90,6 +95,7 @@ enum RoleSource {
 
 enum PagePermissionLevel {
   full_access
+  proposal_editor
   editor
   view_comment
   view
@@ -343,11 +349,12 @@ model UserNotificationState {
 }
 
 model UserNotification {
-  taskId    String           @unique
-  createdAt DateTime         @default(now())
-  userId    String           @db.Uuid
+  taskId    String               @unique
+  createdAt DateTime             @default(now())
+  userId    String               @db.Uuid
   type      NotificationType
-  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  channel   NotificationChannel?
+  user      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([taskId, userId])
 }
@@ -589,7 +596,7 @@ model PagePermission {
   roleId                  String?             @db.Uuid
   spaceId                 String?             @db.Uuid
   inheritedFromPermission String?             @db.Uuid
-  public                  Boolean?
+  public                  Boolean? 
   sourcePermission        PagePermission?     @relation("InheritedPermissions", fields: [inheritedFromPermission], references: [id], onDelete: Cascade)
   page                    Page                @relation(fields: [pageId], references: [id], onDelete: Cascade)
   role                    Role?               @relation(fields: [roleId], references: [id], onDelete: Cascade)

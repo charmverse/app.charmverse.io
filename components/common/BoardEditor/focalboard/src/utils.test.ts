@@ -2,7 +2,7 @@
 import { createIntl } from 'react-intl';
 
 import { Utils, IDType } from './utils';
-import { IAppWindow } from './types';
+import type { IAppWindow } from './types';
 
 declare let window: IAppWindow;
 

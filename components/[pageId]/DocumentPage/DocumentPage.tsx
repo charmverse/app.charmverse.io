@@ -20,7 +20,6 @@ import { useRouter } from 'next/router';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 import BountyProperties from './components/BountyProperties';
-import CreateVoteBox from './components/CreateVoteBox';
 import PageBanner from './components/PageBanner';
 import { PageTemplateBanner } from './components/PageTemplateBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
@@ -49,17 +48,23 @@ export interface DocumentPageProps {
   page: IPageWithPermissions,
   setPage: (p: Partial<Page>) => void,
   readOnly?: boolean,
-  insideModal?: boolean
+  insideModal?: boolean,
+  parentProposalId?: string | null
 }
 
-function DocumentPage ({ page, setPage, insideModal, readOnly = false }: DocumentPageProps) {
+function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentProposalId }: DocumentPageProps) {
   const { pages, getPagePermissions } = usePages();
   const { cancelVote, castVote, deleteVote, votes, isLoading } = useVotes();
   const pagePermissions = getPagePermissions(page.id);
+
   const { draftBounty } = useBounties();
   // Only populate bounty permission data if this is a bounty page
   const [bountyPermissions, setBountyPermissions] = useState<AssignedBountyPermissions | null>(null);
   const [containerRef, { width: containerWidth }] = useElementSize();
+
+  const proposalId = page.proposalId || parentProposalId;
+  // We can only edit the proposal from the top level
+  const readonlyProposalProperties = !page.proposalId || Boolean(parentProposalId) || readOnly;
 
   async function refreshBountyPermissions (bountyId: string) {
     setBountyPermissions(await charmClient.bounties.computePermissions({
@@ -146,7 +151,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
       >
         <div ref={containerRef}>
           {page.deletedAt && <PageDeleteBanner pageId={page.id} />}
-          <PageTemplateBanner pageId={page.id} />
+          <PageTemplateBanner parentPage={page.parentId ? pages[page.parentId] : null} page={page} />
           {page.headerImage && <PageBanner headerImage={page.headerImage} readOnly={cannotEdit} setPage={setPage} />}
           <Container
             top={pageTop}
@@ -163,6 +168,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
               enableVoting={true}
               containerWidth={containerWidth}
               pageType={page.type}
+              pagePermissions={pagePermissions}
             >
               <PageHeader
                 headerImage={page.headerImage}
@@ -198,7 +204,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
                       pageUpdatedBy={page.updatedBy}
                     />
                   )}
-                  {page.proposalId && <ProposalProperties readOnly={readOnly} proposalId={page.proposalId} />}
+                  {proposalId && <ProposalProperties pageId={proposalId} proposalId={proposalId as string} readOnly={readonlyProposalProperties} />}
                   {(draftBounty || page.bountyId) && (
                     <BountyProperties
                       bountyId={page.bountyId}
@@ -219,10 +225,6 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false }: Documen
                 </div>
               </div>
             </CharmEditor>
-
-            {page.type === 'proposal' && !isLoading && !pageVote && (
-              <CreateVoteBox />
-            )}
           </Container>
         </div>
       </Box>

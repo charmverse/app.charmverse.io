@@ -13,6 +13,7 @@ import NftAvatarGalleryPopup from 'components/profile/components/NftAvatarGaller
 
 import type { NftData } from 'lib/blockchain/interfaces';
 import type { UserAvatar } from 'lib/users/interfaces';
+import { SupportedChainId } from 'lib/blockchain/provider/alchemy';
 
 const StyledBox = styled(Box)`
   display: inline-block;
@@ -70,7 +71,7 @@ export default function LargeAvatar (props: LargeAvatarProps) {
       avatar: nft.image,
       avatarContract: nft.contract,
       avatarTokenId: nft.tokenId,
-      avatarChain: nft.chainId
+      avatarChain: nft.chainId as SupportedChainId
     };
 
     updateAvatar?.(userAvatar);

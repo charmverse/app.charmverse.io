@@ -3,7 +3,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { initialLoad, initialReadOnlyLoad } from './initialLoad';
 
-import { RootState } from './index';
+import type { RootState } from './index';
 
 const globalErrorSlice = createSlice({
   name: 'globalError',

@@ -17,11 +17,12 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import Avatar from 'components/common/Avatar';
 import Link from 'components/common/Link';
+import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { ProfileItemContainer } from './CollectibleRow';
 
 const TASK_TABS = [
   { icon: <HowToVoteIcon />, label: 'Votes', type: 'vote' },
-  { icon: <ForumIcon />, label: 'Proposals', type: 'proposal' },
+  { icon: <TaskOutlinedIcon />, label: 'Proposals', type: 'proposal' },
   { icon: <BountyIcon />, label: 'Bounties', type: 'bounty' }
 ] as const;
 

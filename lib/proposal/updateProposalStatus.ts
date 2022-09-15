@@ -1,8 +1,10 @@
 import { ProposalStatus } from '@prisma/client';
 import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
+import { MissingDataError } from 'lib/utilities/errors';
 import { ProposalWithUsers } from './interface';
 import { proposalStatusTransitionRecord } from './proposalStatusTransition';
+import { generateSyncProposalPermissions } from './syncProposalPermissions';
 
 export async function updateProposalStatus ({
   proposal,
@@ -11,8 +13,25 @@ export async function updateProposalStatus ({
 }: {
   userId: string
   newStatus: ProposalStatus,
-  proposal: ProposalWithUsers
-}) {
+  proposal: ProposalWithUsers | string
+}): Promise<ProposalWithUsers> {
+
+  if (typeof proposal === 'string') {
+    proposal = await prisma.proposal.findUnique({
+      where: {
+        id: proposal
+      },
+      include: {
+        authors: true,
+        reviewers: true
+      }
+    }) as ProposalWithUsers;
+  }
+
+  if (!proposal) {
+    throw new MissingDataError(`Proposal with id ${proposal} not found`);
+  }
+
   const currentStatus = proposal.status;
   const proposalId = proposal.id;
 
@@ -52,12 +71,36 @@ export async function updateProposalStatus ({
     throw new InvalidStateError();
   }
 
-  return prisma.proposal.update({
+  if (!proposalStatusTransitionRecord[proposal.status].includes(newStatus)) {
+    throw new InvalidStateError();
+  }
+
+  await prisma.$transaction(async () => {
+    await prisma.proposal.update({
+      where: {
+        id: proposalId
+      },
+      data: {
+        status: newStatus
+      }
+    });
+
+    const [deleteArgs, createArgs] = await generateSyncProposalPermissions({ proposalId });
+
+    await prisma.pagePermission.deleteMany(deleteArgs);
+
+    for (const arg of createArgs) {
+      await prisma.pagePermission.create(arg);
+    }
+  });
+
+  return prisma.proposal.findUnique({
     where: {
       id: proposalId
     },
-    data: {
-      status: newStatus
+    include: {
+      authors: true,
+      reviewers: true
     }
-  });
+  }) as Promise<ProposalWithUsers>;
 }

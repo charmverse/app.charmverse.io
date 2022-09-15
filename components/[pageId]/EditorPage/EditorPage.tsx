@@ -5,6 +5,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
+import { findParentOfType } from 'lib/pages/findParentOfType';
 import debouncePromise from 'lib/utilities/debouncePromise';
 import log from 'loglevel';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -12,7 +13,7 @@ import BoardPage from '../BoardPage';
 import DocumentPage from '../DocumentPage';
 
 export default function EditorPage ({ pageId }: { pageId: string }) {
-  const { setIsEditing, pages, setCurrentPageId, setPages, getPagePermissions } = usePages();
+  const { setIsEditing, pages, currentPageId, setCurrentPageId, setPages, getPagePermissions } = usePages();
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
   const [space] = useCurrentSpace();
@@ -21,6 +22,8 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
   const currentPagePermissions = getPagePermissions(pageId);
 
   const pagesLoaded = Object.keys(pages).length > 0;
+
+  const parentProposalId = findParentOfType({ pageId, pageType: 'proposal', pageMap: pages });
 
   useEffect(() => {
     async function main () {
@@ -48,6 +51,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
         }
       }
     }
+
     main();
 
     return () => {
@@ -117,7 +121,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
         <BoardPage
           page={memoizedCurrentPage}
           setPage={setPage}
-          readOnly={currentPagePermissions.edit_content !== true}
+          pagePermissions={currentPagePermissions}
         />
       );
     }
@@ -127,6 +131,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
         <DocumentPage
           page={memoizedCurrentPage}
           setPage={setPage}
+          parentProposalId={parentProposalId}
         />
       );
     }

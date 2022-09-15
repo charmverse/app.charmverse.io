@@ -21,7 +21,7 @@ handler
   .put(updateAvatar);
 
 async function updateAvatar (req: NextApiRequest, res: NextApiResponse<LoggedInUser | {error: string}>) {
-  const { avatar, avatarTokenId, avatarContract } = req.body as UserAvatar;
+  const { avatar, avatarTokenId, avatarContract, avatarChain = 1 } = req.body as UserAvatar;
   const { id: userId } = req.session.user;
 
   let avatarUrl = avatar || null;
@@ -32,7 +32,7 @@ async function updateAvatar (req: NextApiRequest, res: NextApiResponse<LoggedInU
     throw new InvalidInputError('Invalid avatar data');
   }
 
-  const chainId = 1;
+  const chainId = avatarChain || 1;
   const isNftAvatar = avatar && updatedTokenId && updatedContract;
 
   // Provided NFT data

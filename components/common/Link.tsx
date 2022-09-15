@@ -8,9 +8,10 @@ import { SxProps } from '@mui/system';
 import styled from '@emotion/styled';
 
 const hoverStyle: { [key: string]: string } = {
-  blue: 'color: #111;',
-  white: 'color: #ccc;',
-  primary: 'opacity: 0.8;'
+  blue: 'color: #111',
+  white: 'color: #ccc',
+  primary: 'opacity: 0.8',
+  inherit: 'inherit'
 };
 
 const StyledMuiLink = styled(MuiLink)`
@@ -36,6 +37,10 @@ type Props = {
 };
 
 export default function Link ({ href, onClick, children, sx, className, color = 'primary', external, target }: Props) {
+
+  if (!href) {
+    return <div>{children}</div>;
+  }
 
   return (
     external ? (

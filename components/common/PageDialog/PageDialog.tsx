@@ -20,6 +20,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useBounties } from 'hooks/useBounties';
 import { IPageWithPermissions } from 'lib/pages';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
+import { findParentOfType } from 'lib/pages/findParentOfType';
 
 interface Props {
   page?: IPageWithPermissions | null;
@@ -36,7 +37,7 @@ export default function PageDialog (props: Props) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'page-dialog' });
   const router = useRouter();
   const { refreshBounty } = useBounties();
-  const { currentPageId, setCurrentPageId, setPages, getPagePermissions, deletePage } = usePages();
+  const { currentPageId, setCurrentPageId, setPages, getPagePermissions, deletePage, pages } = usePages();
   const pagePermission = page ? getPagePermissions(page.id) : null;
   const { showMessage } = useSnackbar();
   // extract domain from shared pages: /share/<domain>/<page_path>
@@ -44,6 +45,10 @@ export default function PageDialog (props: Props) {
   const fullPageUrl = router.route.startsWith('/share') ? `/share/${domain}/${page?.path}` : `/${domain}/${page?.path}`;
 
   const ogCurrentPageId = useMemo(() => currentPageId, []);
+
+  const parentProposalId = findParentOfType({ pageId: ogCurrentPageId, pageType: 'proposal', pageMap: pages });
+
+  const readOnlyPage = readOnly || !pagePermission?.edit_content;
 
   // keep track if charmeditor is mounted. There is a bug that it calls the update method on closing the modal, but content is empty
   useEffect(() => {
@@ -174,7 +179,7 @@ export default function PageDialog (props: Props) {
           )}
           onClose={onClose}
         >
-          {page && <DocumentPage insideModal page={page} setPage={setPage} readOnly={props.readOnly} />}
+          {page && <DocumentPage insideModal page={page} setPage={setPage} readOnly={readOnlyPage} parentProposalId={parentProposalId} />}
         </Dialog>
 
       )}
