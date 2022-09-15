@@ -72,7 +72,7 @@ Promise<{data: WorkspaceExport, path: string}> {
     // eslint-disable-next-line no-console
     console.log('Processing page ', pageIndexes[node.id], ' / ', totalPages);
 
-    if (node.type === 'board' || node.type === 'inline_board' || node.type === 'inline_linked_board') {
+    if (node.type.match('board')) {
       const boardblocks = await prisma.block.findMany({
         where: {
           rootId: node.id as string,
@@ -87,7 +87,7 @@ Promise<{data: WorkspaceExport, path: string}> {
         views: boardblocks.filter(block => block.type === 'view') as Block[]
       };
     }
-    else if (node.type === 'card') {
+    else if (node.type.match('card')) {
       const cardBlock = await prisma.block.findFirst({
         where: {
           id: node.id as string,
