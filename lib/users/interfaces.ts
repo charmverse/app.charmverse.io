@@ -1,7 +1,8 @@
+import { SupportedChainId } from 'lib/blockchain/provider/alchemy';
 
 export interface UserAvatar {
   avatar: string | null;
   avatarContract: string | null;
   avatarTokenId: string | null;
-  avatarChain: number | null;
+  avatarChain: SupportedChainId | null;
 }
