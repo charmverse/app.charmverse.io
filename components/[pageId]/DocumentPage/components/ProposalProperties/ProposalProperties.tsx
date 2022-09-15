@@ -9,7 +9,7 @@ import useRoles from 'hooks/useRoles';
 import { useUser } from 'hooks/useUser';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { ListSpaceRolesResponse } from 'pages/api/roles';
-import useSWR from 'swr';
+import useSWR, { useSWRConfig } from 'swr';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
@@ -21,6 +21,8 @@ import PublishToSnapshot from 'components/common/PageLayout/components/Header/co
 import { useState } from 'react';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { ProposalWithUsers } from 'lib/proposal/interface';
 import { ProposalStatusChip } from '../../../../proposals/components/ProposalStatusBadge';
 
 interface ProposalPropertiesProps {
@@ -34,6 +36,8 @@ const proposalStatuses = Object.keys(proposalStatusTransitionRecord);
 export default function ProposalProperties ({ pageId, proposalId, readOnly }: ProposalPropertiesProps) {
   const { data: proposal, mutate: refreshProposal } = useSWR(`proposal/${proposalId}`, () => charmClient.proposals.getProposal(proposalId));
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { cache } = useSWRConfig();
+  const [currentSpace] = useCurrentSpace();
 
   function openVoteModal () {
     setIsModalOpen(true);
@@ -90,7 +94,25 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly }: Pr
 
   async function updateProposalStatus (newStatus: ProposalStatus) {
     await charmClient.proposals.updateStatus(proposalId, newStatus);
-    refreshProposal();
+    const refreshedProposal = await refreshProposal();
+
+    if (currentSpace && refreshedProposal) {
+      const cacheKey = `proposals/${currentSpace.id}`;
+      // Get useSWR cache by key
+      const cachedProposals = cache.get(cacheKey) as ProposalWithUsers[];
+      // Will be undefined if the data hasn't been fetched yet
+      if (cachedProposals) {
+        const proposals = cachedProposals.map(cachedProposal => {
+          // Return the new proposal if id matches
+          if (cachedProposal.id === refreshedProposal.id) {
+            return refreshedProposal;
+          }
+          return cachedProposal;
+        });
+        // Update the proposals cache
+        cache.set(cacheKey, proposals);
+      }
+    }
     proposalMenuState.close();
   }
 
