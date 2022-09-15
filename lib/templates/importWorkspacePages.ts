@@ -68,6 +68,8 @@ Promise<{pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyArg
 
   const pageArgs: Prisma.PageCreateArgs[] = [];
 
+  const blockArgs: Prisma.BlockCreateManyInput[] = [];
+
   // 2 way hashmap to find link between new and old page ids
   const oldNewHashmap: Record<string, string> = {
   };
@@ -75,17 +77,15 @@ Promise<{pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyArg
   /**
    * Mutates the pages, updating their ids
    */
-  function recursivePagePrep ({ node }: {node: ExportedPage}) {
+  function recursivePagePrep ({ node, newParentId }: {node: ExportedPage, newParentId: string | null}) {
     const newId = v4();
 
     oldNewHashmap[newId] = node.id;
     oldNewHashmap[node.id] = newId;
 
-    node.id = newId;
-
     flatPages.push(node);
 
-    const { children, permissions, createdBy, spaceId, cardId, proposalId, bountyId, blocks, ...pageWithoutJoins } = node;
+    const { children, permissions, createdBy, updatedBy, spaceId, cardId, proposalId, parentId, bountyId, blocks, ...pageWithoutJoins } = node;
 
     typedKeys(pageWithoutJoins).forEach(key => {
       if (pageWithoutJoins[key] == null) {
@@ -93,17 +93,21 @@ Promise<{pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyArg
       }
     });
 
-    pageArgs.push({
+    const newPageContent: Prisma.PageCreateArgs = {
       data: {
         ...pageWithoutJoins,
+        id: newId,
+        boardId: node.type.match('board') ? newId : undefined,
+        parentId: newParentId ?? undefined,
         content: node.content as Prisma.InputJsonValue ?? undefined,
         path: getPagePath(),
         space: {
           connect: {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            // eslint-disable @typescript-eslint/no-non-null-assertion
             id: space!.id
           }
         },
+        updatedBy: space!.createdBy,
         author: {
           connect: {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -111,16 +115,73 @@ Promise<{pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyArg
           }
         }
       }
-    });
+    };
 
-    node.children?.forEach(child => {
-      child.parentId = newId;
-      recursivePagePrep({ node: child });
-    });
+    if (node.type.match('card')) {
+
+      const cardBlock = node.blocks?.card;
+
+      if (cardBlock) {
+        cardBlock.id = newId;
+        cardBlock.rootId = newParentId as string;
+        cardBlock.parentId = newParentId as string;
+        // eslint-disable @typescript-eslint/no-non-null-assertion
+        cardBlock.updatedAt = undefined as any;
+        cardBlock.createdAt = undefined as any;
+        cardBlock.updatedBy = space!.createdBy;
+        cardBlock.createdBy = space!.createdBy;
+        cardBlock.spaceId = space!.id;
+
+        pageArgs.push(newPageContent);
+        blockArgs.push(cardBlock as Prisma.BlockCreateManyInput);
+
+        node.children?.forEach(child => {
+          recursivePagePrep({ node: child, newParentId: newId });
+        });
+
+      }
+    }
+    else if (node.type.match('board')) {
+
+      const boardBlock = node.blocks?.board;
+      const viewBlocks = node.blocks?.views;
+
+      if (boardBlock && !!viewBlocks?.length) {
+        [boardBlock, ...viewBlocks].forEach(block => {
+          if (block.type === 'board') {
+            block.id = newId;
+          }
+          else {
+            block.id = v4();
+          }
+
+          block.rootId = newId;
+          block.parentId = block.type === 'board' ? '' : newId;
+          // eslint-disable @typescript-eslint/no-non-null-assertion
+          block.updatedAt = undefined as any;
+          block.createdAt = undefined as any;
+          block.createdBy = space!.createdBy;
+          block.updatedBy = space!.updatedBy;
+          block.spaceId = space!.id;
+          blockArgs.push(block as Prisma.BlockCreateManyInput);
+        });
+        pageArgs.push(newPageContent);
+
+        node.children?.forEach(child => {
+          recursivePagePrep({ node: child, newParentId: newId });
+        });
+      }
+    }
+    else if (node.type === 'page') {
+      pageArgs.push(newPageContent);
+      node.children?.forEach(child => {
+        recursivePagePrep({ node: child, newParentId: newId });
+      });
+    }
   }
 
   dataToImport.pages.forEach(page => {
-    recursivePagePrep({ node: page });
+    recursivePagePrep({ node: page, newParentId: null });
   });
 
   updateReferences({
@@ -131,7 +192,7 @@ Promise<{pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyArg
   return {
     pageArgs,
     blockArgs: {
-      data: []
+      data: blockArgs
     }
   };
 
@@ -151,7 +212,8 @@ export async function importWorkspacePages ({ targetSpaceIdOrDomain, exportData,
       // eslint-disable-next-line no-console
       console.log(`Creating page ${createdPages}/${pagesToCreate}: ${p.data.type} // ${p.data.title}`);
       return prisma.page.create(p);
-    })
+    }),
+    prisma.block.createMany(blockArgs)
   ]);
 
   //  const blocks = await prisma.block.createMany(blockArgs);
