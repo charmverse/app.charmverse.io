@@ -21,21 +21,20 @@ handler
   .put(updateAvatar);
 
 async function updateAvatar (req: NextApiRequest, res: NextApiResponse<LoggedInUser | {error: string}>) {
-  const { avatar, avatarTokenId, avatarContract } = req.body as UserAvatar;
+  const { avatar, avatarTokenId, avatarContract, avatarChain } = req.body as UserAvatar;
   const { id: userId } = req.session.user;
 
-  if (!avatar || !avatarContract || !avatarTokenId) {
+  if (!avatar || !avatarContract || !avatarTokenId || !avatarChain) {
     throw new InvalidInputError('Invalid avatar data');
   }
 
   let avatarUrl = avatar || '';
-  const chainId = 1;
-  const isNftAvatar = avatarContract && avatarTokenId;
+  const isNftAvatar = avatarContract && avatarTokenId && avatarChain;
 
   // Provided NFT data
   if (isNftAvatar) {
     const user = await getUserProfile('id', req.session.user.id);
-    const owners = await alchemyApi.getOwners(avatarContract, avatarTokenId, chainId);
+    const owners = await alchemyApi.getOwners(avatarContract, avatarTokenId, avatarChain);
 
     const isOwner = user?.addresses.some(a => {
       return owners.find(o => o.toLowerCase() === a.toLowerCase());
@@ -45,7 +44,7 @@ async function updateAvatar (req: NextApiRequest, res: NextApiResponse<LoggedInU
       throw new InvalidInputError('You do not own selected NFT');
     }
 
-    const nft = await getNFT(avatarContract, avatarTokenId, chainId);
+    const nft = await getNFT(avatarContract, avatarTokenId, avatarChain);
 
     if (nft.image) {
       avatarUrl = nft.image;
@@ -64,7 +63,7 @@ async function updateAvatar (req: NextApiRequest, res: NextApiResponse<LoggedInU
       avatar: uploadedAvatar,
       avatarContract: avatarContract || null,
       avatarTokenId: avatarTokenId || null,
-      avatarChain: isNftAvatar ? chainId : null
+      avatarChain: avatarChain || null
     }
   });
 
