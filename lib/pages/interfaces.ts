@@ -42,7 +42,7 @@ export interface PublicPageResponse {
 // Generic type A is optional, we can mount additional properties on basic node definitions
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export type PageNode<A = {}> = Pick<Page, 'id' | 'type' | 'parentId' | 'boardId' | 'cardId' | 'index' | 'createdAt' | 'deletedAt'> & A
+export type PageNode<A = {}> = Pick<Page, 'id' | 'type' | 'parentId' | 'index' | 'createdAt' | 'deletedAt'> & Partial<Pick<Page, 'id' | 'type' | 'parentId' | 'boardId' | 'cardId'>> & A
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type PageNodeWithChildren<A = {}> = PageNode<{children: PageNodeWithChildren<A>[]}> & A
