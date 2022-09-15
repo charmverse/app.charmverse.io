@@ -30,6 +30,8 @@ jobs:
           - 5432:5432
     steps:
       - uses: actions/checkout@v2
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v3.x
 
       - name: Install dependencies and build app
         uses: ./.github/actions/install
@@ -99,6 +101,9 @@ jobs:
                     .COMPOSE_PROJECT_NAME = "pr${{ github.event.number }}" |
                     .IMGTAG = "pr${{ github.event.number }}-${{ env.GITHUB_SHA_SHORT }}")
               ' .ebextensions_cron/00_env_vars.config
+
+            cat .ebextensions/00_env_vars.config
+            cat .ebextensions_cron/00_env_vars.config
 
       - name: Package Webapp
         run: cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
