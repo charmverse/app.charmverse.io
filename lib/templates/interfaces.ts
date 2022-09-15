@@ -14,3 +14,9 @@ export type ExportedPage = PageNodeWithChildren<IPageWithPermissions & Partial<P
 export interface WorkspaceExport {
   pages: ExportedPage[]
 }
+
+export interface WorkspaceImport {
+  exportData?: WorkspaceExport,
+  exportName?: string
+  targetSpaceIdOrDomain: string
+}

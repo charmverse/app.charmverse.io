@@ -1,4 +1,4 @@
-import { Block } from '@prisma/client';
+import { Block, PageType } from '@prisma/client';
 import { prisma } from 'db';
 import type { PageNodeWithChildren } from 'lib/pages';
 import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
@@ -13,6 +13,10 @@ export interface ExportWorkspacePage {
   sourceSpaceIdOrDomain: string;
   exportName?: string
 }
+
+const excludedPageTypes: PageType[] = ['bounty', 'bounty_template', 'proposal', 'proposal_template',
+// Todo delete later
+  'board', 'board_template', 'card', 'card_template'];
 
 /**
  * @abstract Does not currently support bounty or proposal pages
@@ -33,7 +37,11 @@ Promise<{data: WorkspaceExport, path: string}> {
   const rootPages = await prisma.page.findMany({
     where: {
       spaceId: space.id,
-      parentId: null
+      deletedAt: null,
+      parentId: null,
+      type: {
+        notIn: excludedPageTypes
+      }
     }
   });
 
@@ -75,9 +83,14 @@ Promise<{data: WorkspaceExport, path: string}> {
       };
     }
 
-    await Promise.all((node.children ?? []).map(async child => {
-      await recursiveResolveBlocks({ node: child });
-    }));
+    node.children = node.children?.filter(child => !excludedPageTypes.includes(child.type)) ?? [];
+
+    await Promise.all(
+      (node.children ?? [])
+        .map(async child => {
+          await recursiveResolveBlocks({ node: child });
+        })
+    );
   }
 
   await Promise.all(mappedTrees.map(async tree => {
