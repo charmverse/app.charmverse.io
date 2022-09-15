@@ -6,10 +6,8 @@ import GridHeader from 'components/common/Grid/GridHeader';
 import LoadingComponent from 'components/common/LoadingComponent';
 import useTasks from 'components/nexus/hooks/useTasks';
 import { usePages } from 'hooks/usePages';
-import { IPageWithPermissions } from 'lib/pages';
 import { ProposalWithUsers } from 'lib/proposal/interface';
 import { humanFriendlyDate, toMonthDate } from 'lib/utilities/dates';
-import { useCallback, useEffect, useState } from 'react';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { ProposalStatusChip } from './ProposalStatusBadge';
 import NoProposalsMessage from './NoProposalsMessage';
@@ -18,35 +16,24 @@ import ProposalActionsMenu from './ProposalActionsMenu';
 export default function ProposalsTable ({ proposals, mutateProposals }: { proposals?: (ProposalWithUsers)[], mutateProposals: () => void }) {
   const { pages, deletePage } = usePages();
   const { mutate: mutateTasks } = useTasks();
-  const [activePage, setActivePage] = useState<IPageWithPermissions | null>(null);
 
   const { showPage } = usePageDialog();
 
-  const openPage = useCallback((pageId: string) => {
-    const page = pages[pageId];
-    if (page) {
-      setActivePage(page);
-    }
-  }, [pages]);
+  function openPage (pageId: string) {
+    showPage({
+      pageId,
+      onClose () {
+        mutateTasks();
+        mutateProposals();
+      }
+    });
+  }
 
   async function deleteProposal (proposalId: string) {
     await deletePage({ pageId: proposalId });
     mutateTasks();
     mutateProposals();
   }
-
-  useEffect(() => {
-    if (activePage) {
-      showPage({
-        pageId: activePage.id,
-        onClose () {
-          setActivePage(null);
-          mutateTasks();
-          mutateProposals();
-        }
-      });
-    }
-  }, [activePage]);
 
   return (
     <>
