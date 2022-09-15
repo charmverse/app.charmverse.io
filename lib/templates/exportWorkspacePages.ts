@@ -14,9 +14,7 @@ export interface ExportWorkspacePage {
   exportName?: string
 }
 
-const excludedPageTypes: PageType[] = ['bounty', 'bounty_template', 'proposal', 'proposal_template',
-// Todo delete later
-  'board', 'board_template', 'card', 'card_template'];
+const excludedPageTypes: PageType[] = ['bounty', 'bounty_template', 'proposal', 'proposal_template'];
 
 /**
  * @abstract Does not currently support bounty or proposal pages
@@ -47,13 +45,32 @@ Promise<{data: WorkspaceExport, path: string}> {
 
   // Replace by multi resolve page tree in future
   const mappedTrees = await Promise.all(rootPages.map(async page => {
-    return resolvePageTree({ pageId: page.id, flattenChildren: false, fullPage: true });
+    return resolvePageTree({ pageId: page.id, flattenChildren: true, fullPage: true });
   }));
+
+  // Console reporting for manual exports
+  const pageIndexes = mappedTrees.reduce((acc, val) => {
+
+    let pageCount = Object.keys(acc).length;
+
+    [val.targetPage, ...val.flatChildren].forEach(p => {
+      pageCount += 1;
+      acc[p.id] = pageCount;
+    });
+
+    return acc;
+  }, {} as Record<string, number>);
+
+  const totalPages = Object.keys(pageIndexes).length;
 
   /**
    * Mutates the given node to provision its block data
    */
-  async function recursiveResolveBlocks ({ node }: {node: PageNodeWithChildren<ExportedPage>}): Promise<void> {
+  async function recursiveResolveBlocks ({ node }:
+    {node: PageNodeWithChildren<ExportedPage>}): Promise<void> {
+
+    // eslint-disable-next-line no-console
+    console.log('Processing page ', pageIndexes[node.id], ' / ', totalPages);
 
     if (node.type === 'board' || node.type === 'inline_board' || node.type === 'inline_linked_board') {
       const boardblocks = await prisma.block.findMany({
@@ -87,13 +104,13 @@ Promise<{data: WorkspaceExport, path: string}> {
 
     await Promise.all(
       (node.children ?? [])
-        .map(async child => {
+        .map(async (child) => {
           await recursiveResolveBlocks({ node: child });
         })
     );
   }
 
-  await Promise.all(mappedTrees.map(async tree => {
+  await Promise.all(mappedTrees.map(async (tree) => {
     await recursiveResolveBlocks({ node: tree.targetPage });
   }));
 
