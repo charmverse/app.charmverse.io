@@ -136,10 +136,11 @@ export default function TasksPage () {
                 sx={{
                   '& .MuiBadge-badge': {
                     right: {
-                      md: '-3px',
+                      md: -3,
                       xs: 15
                     },
                     top: {
+                      md: 0,
                       xs: -20
                     }
                   }
