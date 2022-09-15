@@ -18,6 +18,10 @@ export const StyledPageIcon = styled(EmojiIcon)`
   width: 24px;
   margin-right: 4px;
   color: ${({ theme }) => theme.palette.secondary.light};
+  &::before {
+    // fixes vertical layout for svg icons
+    content: '\\200B';
+  }
   // style focalboard icons;
   .Icon {
     height: 22px;

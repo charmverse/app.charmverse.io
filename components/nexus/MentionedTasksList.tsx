@@ -143,7 +143,8 @@ export default function MentionedTasksList ({ tasks, error, mutateTasks }: Menti
             mentioned: {
               marked: [...unmarked, ..._tasks.mentioned.marked],
               unmarked: []
-            }
+            },
+            proposals: _tasks.proposals
           } : undefined;
         }, {
           revalidate: false
