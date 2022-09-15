@@ -1,28 +1,26 @@
-import { Divider, Grid, Menu, MenuItem, IconButton, Typography } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import DoneIcon from '@mui/icons-material/Done';
+import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { Divider, Grid, IconButton, Menu, MenuItem, Typography } from '@mui/material';
 import { Box } from '@mui/system';
+import { ProposalStatus } from '@prisma/client';
 import charmClient from 'charmClient';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import { InputSearchContributorBase } from 'components/common/form/InputSearchContributor';
 import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
+import PublishToSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/PublishToSnapshot';
+import UserDisplay from 'components/common/UserDisplay';
+import CreateVoteModal from 'components/votes/components/CreateVoteModal';
 import { Contributor, useContributors } from 'hooks/useContributors';
 import useRoles from 'hooks/useRoles';
 import { useUser } from 'hooks/useUser';
+import { proposalStatusTransitionPermission, proposalStatusTransitionRecord, ProposalUserGroup, PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { ListSpaceRolesResponse } from 'pages/api/roles';
-import useSWR, { useSWRConfig } from 'swr';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { proposalStatusTransitionRecord, proposalStatusTransitionPermission, PROPOSAL_STATUS_LABELS, ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';
-import { ProposalStatus } from '@prisma/client';
-import UserDisplay from 'components/common/UserDisplay';
-import DoneIcon from '@mui/icons-material/Done';
-import PublishToSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/PublishToSnapshot';
 import { useState } from 'react';
-import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
-import CreateVoteModal from 'components/votes/components/CreateVoteModal';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { ProposalWithUsers } from 'lib/proposal/interface';
+import useSWR from 'swr';
 import { ProposalStatusChip } from '../../../../proposals/components/ProposalStatusBadge';
 
 interface ProposalPropertiesProps {
@@ -36,8 +34,6 @@ const proposalStatuses = Object.keys(proposalStatusTransitionRecord);
 export default function ProposalProperties ({ pageId, proposalId, readOnly }: ProposalPropertiesProps) {
   const { data: proposal, mutate: refreshProposal } = useSWR(`proposal/${proposalId}`, () => charmClient.proposals.getProposal(proposalId));
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { cache } = useSWRConfig();
-  const [currentSpace] = useCurrentSpace();
 
   function openVoteModal () {
     setIsModalOpen(true);
@@ -94,25 +90,7 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly }: Pr
 
   async function updateProposalStatus (newStatus: ProposalStatus) {
     await charmClient.proposals.updateStatus(proposalId, newStatus);
-    const refreshedProposal = await refreshProposal();
-
-    if (currentSpace && refreshedProposal) {
-      const cacheKey = `proposals/${currentSpace.id}`;
-      // Get useSWR cache by key
-      const cachedProposals = cache.get(cacheKey) as ProposalWithUsers[];
-      // Will be undefined if the data hasn't been fetched yet
-      if (cachedProposals) {
-        const proposals = cachedProposals.map(cachedProposal => {
-          // Return the new proposal if id matches
-          if (cachedProposal.id === refreshedProposal.id) {
-            return refreshedProposal;
-          }
-          return cachedProposal;
-        });
-        // Update the proposals cache
-        cache.set(cacheKey, proposals);
-      }
-    }
+    await refreshProposal();
     proposalMenuState.close();
   }
 

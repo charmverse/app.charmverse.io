@@ -18,9 +18,9 @@ import ProposalActionsMenu from './ProposalActionsMenu';
 export default function ProposalsTable ({ proposals, mutateProposals }: { proposals?: (ProposalWithUsers)[], mutateProposals: () => void }) {
   const { pages, deletePage } = usePages();
   const { mutate: mutateTasks } = useTasks();
-  const [activePage, setActivePage] = useState<IPageWithPermissions | null>(null);
+  const { showPage, props } = usePageDialog();
 
-  const { showPage } = usePageDialog();
+  const [activePage, setActivePage] = useState<IPageWithPermissions | null>(props.pageId ? pages[props.pageId] ?? null : null);
 
   const openPage = useCallback((pageId: string) => {
     const page = pages[pageId];
@@ -36,17 +36,24 @@ export default function ProposalsTable ({ proposals, mutateProposals }: { propos
   }
 
   useEffect(() => {
-    if (activePage) {
-      showPage({
-        pageId: activePage.id,
-        onClose () {
-          setActivePage(null);
-          mutateTasks();
-          mutateProposals();
-        }
-      });
-    }
+    showPage({
+      pageId: activePage?.id,
+      onClose () {
+        setActivePage(null);
+        mutateTasks();
+        mutateProposals();
+      }
+    });
   }, [activePage]);
+
+  useEffect(() => {
+    if (props.pageId) {
+      const page = pages[props.pageId];
+      if (page) {
+        setActivePage(page);
+      }
+    }
+  }, [props.pageId]);
 
   return (
     <>
