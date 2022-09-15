@@ -26,6 +26,7 @@ const getGnosisSafeTaskId = (task: GnosisSafeTasks) => task.tasks[0].transaction
 
 export async function getNotifications (): Promise<PendingTasksProps[]> {
 
+  // Get all the workspace events within the past day
   const workspaceEvents = await prisma.workspaceEvent.findMany({
     where: {
       createdAt: {

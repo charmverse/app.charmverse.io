@@ -19,8 +19,8 @@ export type ProposalTask = {
 export async function getProposalTasksFromWorkspaceEvents (userId: string, workspaceEvents: WorkspaceEvent[]) {
   const proposalTasks: ProposalTask[] = [];
 
-  // Sort the events based on their created date to help in deduping
-  workspaceEvents.sort((we1, we2) => we1.createdAt > we2.createdAt ? 1 : -1);
+  // Sort the events in descending order based on their created date to help in de-duping
+  workspaceEvents.sort((we1, we2) => we1.createdAt > we2.createdAt ? -1 : 1);
 
   const proposals = await prisma.proposal.findMany({
     where: {
@@ -78,11 +78,13 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
   // A single proposal might trigger multiple workspace events
   // We want to register them as a single event
   // This set keeps track of the proposals encountered
+  // Since the events were already sorted in descending order, only the latest one will be processed
   const visitedProposals: Set<string> = new Set();
 
   for (const workspaceEvent of workspaceEvents) {
     const proposal = proposalsRecord[workspaceEvent.pageId];
 
+    // If an even for this proposal was already handled no need to process further
     if (!visitedProposals.has(proposal.id)) {
       const { newStatus } = workspaceEvent.meta as {
         newStatus: ProposalStatus
@@ -99,7 +101,7 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
       });
 
       const proposalTask: Omit<ProposalTask, 'action'> = {
-        id: proposal.id,
+        id: workspaceEvent.id,
         pagePath: (proposal.page as Page).path,
         pageTitle: (proposal.page as Page).title,
         spaceDomain: proposal.space.domain,
