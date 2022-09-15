@@ -12,6 +12,7 @@ import { InputSearchContributorBase } from 'components/common/form/InputSearchCo
 import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
 import PublishToSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/PublishToSnapshot';
 import UserDisplay from 'components/common/UserDisplay';
+import useTasks from 'components/nexus/hooks/useTasks';
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
 import { Contributor, useContributors } from 'hooks/useContributors';
 import useRoles from 'hooks/useRoles';
@@ -34,6 +35,7 @@ const proposalStatuses = Object.keys(proposalStatusTransitionRecord);
 export default function ProposalProperties ({ pageId, proposalId, readOnly }: ProposalPropertiesProps) {
   const { data: proposal, mutate: refreshProposal } = useSWR(`proposal/${proposalId}`, () => charmClient.proposals.getProposal(proposalId));
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { mutate: mutateTasks } = useTasks();
 
   function openVoteModal () {
     setIsModalOpen(true);
@@ -93,6 +95,7 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly }: Pr
     await charmClient.proposals.updateStatus(proposalId, newStatus);
     await refreshProposal();
     proposalMenuState.close();
+    mutateTasks();
   }
 
   return (

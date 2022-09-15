@@ -126,7 +126,8 @@ export default function TasksPage () {
               },
               '& .MuiSvgIcon-root': {
                 mr: {
-                  xs: 0
+                  xs: 0,
+                  md: 1
                 }
               }
             }}
