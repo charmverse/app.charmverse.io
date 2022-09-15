@@ -68,11 +68,6 @@ jobs:
       - name: Build app
         uses: ./.github/actions/build
 
-      - name: Remove dev dependencies
-        run: |
-          npm prune --production
-          rm -rf .next/cache
-
       - name: Configure env_var to prod settings
         run: |
           sed -i 's/staging/prod/g' .ebextensions/00_env_vars.config
