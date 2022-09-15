@@ -24,17 +24,20 @@ async function updateAvatar (req: NextApiRequest, res: NextApiResponse<LoggedInU
   const { avatar, avatarTokenId, avatarContract, avatarChain } = req.body as UserAvatar;
   const { id: userId } = req.session.user;
 
-  if (!avatar || !avatarContract || !avatarTokenId || !avatarChain) {
+  let avatarUrl = avatar || null;
+  const updatedTokenId = (avatar && avatarTokenId) || null;
+  const updatedContract = (avatar && avatarContract) || null;
+
+  if (!!updatedContract !== !!updatedTokenId) {
     throw new InvalidInputError('Invalid avatar data');
   }
 
-  let avatarUrl = avatar || '';
-  const isNftAvatar = avatarContract && avatarTokenId && avatarChain;
+  const isNftAvatar = avatar && updatedTokenId && updatedContract && avatarChain;
 
   // Provided NFT data
   if (isNftAvatar) {
     const user = await getUserProfile('id', req.session.user.id);
-    const owners = await alchemyApi.getOwners(avatarContract, avatarTokenId, avatarChain);
+    const owners = await alchemyApi.getOwners(updatedContract, updatedTokenId, avatarChain);
 
     const isOwner = user?.addresses.some(a => {
       return owners.find(o => o.toLowerCase() === a.toLowerCase());
@@ -44,15 +47,15 @@ async function updateAvatar (req: NextApiRequest, res: NextApiResponse<LoggedInU
       throw new InvalidInputError('You do not own selected NFT');
     }
 
-    const nft = await getNFT(avatarContract, avatarTokenId, avatarChain);
+    const nft = await getNFT(updatedContract, updatedTokenId, avatarChain);
 
     if (nft.image) {
-      avatarUrl = nft.image;
+      const fileName = getUserS3Folder({ userId, url: getFilenameWithExtension(nft.image) });
+      const { url } = await uploadToS3({ fileName, url: nft.image });
+      avatarUrl = url;
     }
-  }
 
-  const fileName = getUserS3Folder({ userId, url: getFilenameWithExtension(avatarUrl) });
-  const { url: uploadedAvatar } = await uploadToS3({ fileName, url: avatarUrl });
+  }
 
   const user = await prisma.user.update({
     where: {
@@ -60,10 +63,10 @@ async function updateAvatar (req: NextApiRequest, res: NextApiResponse<LoggedInU
     },
     include: sessionUserRelations,
     data: {
-      avatar: uploadedAvatar,
-      avatarContract: avatarContract || null,
-      avatarTokenId: avatarTokenId || null,
-      avatarChain: avatarChain || null
+      avatar: avatarUrl,
+      avatarContract: updatedContract || null,
+      avatarTokenId: updatedTokenId || null,
+      avatarChain: isNftAvatar ? avatarChain : null
     }
   });
 
