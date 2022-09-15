@@ -1,5 +1,6 @@
+import { Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { PageNodeWithPermissions, PageTreeResolveInput, TargetPageTree, TargetPageTreeWithFlatChildren } from '../interfaces';
+import { IPageWithPermissions, PageNodeWithPermissions, PageTreeResolveInput, TargetPageTree, TargetPageTreeWithFlatChildren } from '../interfaces';
 import { mapTargetPageTree, flattenTree } from '../mapPageTree';
 import { PageNotFoundError } from './errors';
 
@@ -11,11 +12,18 @@ import { PageNotFoundError } from './errors';
  *
  * Pass flatten children prop to also receive a flat array of children
  */
+// Normal page node
 export async function resolvePageTree ({ pageId, flattenChildren }:
-  PageTreeResolveInput & {flattenChildren?: undefined | false}): Promise<TargetPageTree<PageNodeWithPermissions>>
+  PageTreeResolveInput & {flattenChildren?: undefined | false, fullPage?: false | undefined}): Promise<TargetPageTree<PageNodeWithPermissions>>
 export async function resolvePageTree ({ pageId, flattenChildren }:
-  PageTreeResolveInput & {flattenChildren: true}): Promise<TargetPageTreeWithFlatChildren<PageNodeWithPermissions>>
-export async function resolvePageTree ({ pageId, flattenChildren = false, includeDeletedPages = false }:
+  PageTreeResolveInput & {flattenChildren: true, fullPage?: false | undefined}): Promise<TargetPageTreeWithFlatChildren<PageNodeWithPermissions>>
+
+// Full pages
+export async function resolvePageTree ({ pageId, flattenChildren, fullPage }:
+    PageTreeResolveInput & {flattenChildren?: undefined | false, fullPage: true}): Promise<TargetPageTree<IPageWithPermissions>>
+export async function resolvePageTree ({ pageId, flattenChildren }:
+    PageTreeResolveInput & {flattenChildren: true, fullPage: true}): Promise<TargetPageTreeWithFlatChildren<IPageWithPermissions>>
+export async function resolvePageTree ({ pageId, flattenChildren = false, includeDeletedPages = false, fullPage }:
   PageTreeResolveInput):
   Promise<TargetPageTree<PageNodeWithPermissions> | TargetPageTreeWithFlatChildren<PageNodeWithPermissions>> {
 
@@ -32,15 +40,20 @@ export async function resolvePageTree ({ pageId, flattenChildren = false, includ
     throw new PageNotFoundError(pageId);
   }
 
-  const pagesInSpace = await prisma.page.findMany({
-    where: {
-      spaceId: pageWithSpaceIdOnly.spaceId,
-      // Soft deleted pages have a value for deletedAt. Active pages are null
-      deletedAt: includeDeletedPages ? undefined : null
-    },
+  const pageQuery: Partial<Prisma.PageFindManyArgs> = fullPage ? {
+    include: {
+      permissions: {
+        include: {
+          sourcePermission: true
+        }
+      }
+    }
+  } : {
     select: {
       id: true,
       parentId: true,
+      boardId: true,
+      cardId: true,
       index: true,
       type: true,
       createdAt: true,
@@ -51,7 +64,16 @@ export async function resolvePageTree ({ pageId, flattenChildren = false, includ
         }
       }
     }
-  });
+  };
+
+  const pagesInSpace = await prisma.page.findMany({
+    where: {
+      spaceId: pageWithSpaceIdOnly.spaceId,
+      // Soft deleted pages have a value for deletedAt. Active pages are null
+      deletedAt: includeDeletedPages ? undefined : null
+    },
+    ...pageQuery
+  }) as any as PageNodeWithPermissions[] | IPageWithPermissions[];
 
   const { parents, targetPage } = mapTargetPageTree<PageNodeWithPermissions>({
     items: pagesInSpace,

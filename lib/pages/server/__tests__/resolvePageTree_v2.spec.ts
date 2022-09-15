@@ -168,6 +168,21 @@ describe('resolvePageTree', () => {
 
   });
 
+  it('should not return the full page content by default', async () => {
+    const { targetPage } = await resolvePageTree({ pageId: root_1.id, fullPage: true });
+
+    expect(targetPage).toMatchObject(expect.objectContaining(root_1));
+
+  });
+
+  it('should return the full page content if the full page option is passed', async () => {
+    const { targetPage } = await resolvePageTree({ pageId: root_1.id });
+
+    expect(targetPage).not.toMatchObject(expect.objectContaining(root_1));
+    expect((targetPage as any as Page).content).toBeUndefined();
+
+  });
+
   it('should ignore deleted pages by default', async () => {
 
     const rootPage = await createPage({
