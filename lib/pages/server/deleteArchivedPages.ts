@@ -2,6 +2,17 @@ import { prisma } from 'db';
 import { DateTime } from 'luxon';
 
 export async function deleteArchivedPages (maxDay: number) {
+  await prisma.proposal.deleteMany({
+    where: {
+      page: {
+        deletedAt: {
+          lte: DateTime.now().minus({
+            days: maxDay
+          }).toISO()
+        }
+      }
+    }
+  });
   const { count: deletedPagesCount } = await prisma.page.deleteMany({
     where: {
       deletedAt: {

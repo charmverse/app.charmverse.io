@@ -142,6 +142,13 @@ async function deletePage (req: NextApiRequest, res: NextApiResponse<ModifyChild
 
   const modifiedChildPageIds = await modifyChildPages(pageId, userId, 'delete');
 
+  // Only top level page can be proposal page
+  await prisma.proposal.delete({
+    where: {
+      id: pageId
+    }
+  });
+
   return res.status(200).json({ pageIds: modifiedChildPageIds, rootBlock });
 }
 
