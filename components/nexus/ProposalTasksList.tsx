@@ -84,7 +84,7 @@ export function ProposalTasksListRow (
           <Grid
             item
             xs={12}
-            sm={2}
+            sm={3}
             md={2}
             justifyContent={{
               md: 'flex-end'
@@ -93,6 +93,7 @@ export function ProposalTasksListRow (
           >
             <Button
               sx={{
+                minWidth: 100,
                 width: {
                   xs: '100%',
                   md: 100
