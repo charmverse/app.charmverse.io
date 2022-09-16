@@ -69,10 +69,6 @@ jobs:
 
       - name: Build app
         uses: ./.github/actions/build
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: us-east-1
 
       - name: Build and Push Docker image
         uses: ./.github/actions/build_docker_image
@@ -92,14 +88,12 @@ jobs:
           cmd: |
             yq -I 4 -i '
               with(.option_settings."aws:elasticbeanstalk:application:environment";
-                    .COMPOSE_PROJECT_NAME = "pr${{ github.event.number }}" |
-                    .IMGTAG = "pr${{ github.event.number }}-${{ env.GITHUB_SHA_SHORT }}")
+                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
               ' .ebextensions/00_env_vars.config
 
             yq -I 4 -i '
               with(.option_settings."aws:elasticbeanstalk:application:environment";
-                    .COMPOSE_PROJECT_NAME = "pr${{ github.event.number }}" |
-                    .IMGTAG = "pr${{ github.event.number }}-${{ env.GITHUB_SHA_SHORT }}")
+                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
               ' .ebextensions_cron/00_env_vars.config
 
             cat .ebextensions/00_env_vars.config
