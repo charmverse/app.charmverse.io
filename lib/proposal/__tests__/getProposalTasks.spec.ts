@@ -10,7 +10,7 @@ describe('getProposalTasks', () => {
     const { user, space } = await generateUserAndSpaceWithApiToken();
 
     // This proposal page was archived, this shouldn't be fetched
-    await generateProposal({
+    const archivedProposal = await generateProposal({
       proposalStatus: 'draft',
       spaceId: space.id,
       authors: [user.id],
@@ -34,6 +34,12 @@ describe('getProposalTasks', () => {
         id: privateDraftProposal1.id,
         status: privateDraftProposal1.proposal?.status,
         action: 'start_discussion'
+      })
+    ]));
+
+    expect(proposalTasks).not.toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        id: archivedProposal.id
       })
     ]));
   });
