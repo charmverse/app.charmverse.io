@@ -64,12 +64,13 @@ const createVoteTasks = ({ voteTitle, deadline, pageTitle, spaceName }: {voteTit
   } as any;
 };
 
-const createProposalTasks = ({ action, pageTitle, spaceName }: Omit<ProposalTask, 'id' | 'spaceDomain' | 'pagePath'>): ProposalTask => {
+const createProposalTasks = ({ action, pageTitle, spaceName, status }: Omit<ProposalTask, 'id' | 'spaceDomain' | 'pagePath'>): ProposalTask => {
   return {
     id: v4(),
     action,
     pagePath: randomName(),
     pageTitle,
+    status,
     spaceDomain: randomName(),
     spaceName
   };
@@ -88,12 +89,14 @@ const templates = {
         createProposalTasks({
           action: 'discuss',
           pageTitle: 'Should Uniswap provide Rage Trade with an additional use grant',
-          spaceName: 'Uniswap'
+          spaceName: 'Uniswap',
+          status: 'discussion'
         }),
         createProposalTasks({
           action: 'start_discussion',
           pageTitle: 'Proposal to add XSTUSD-3CRV to the Gauge Controller',
-          spaceName: 'Curve Finance'
+          spaceName: 'Curve Finance',
+          status: 'private_draft'
         })
       ],
       mentionedTasks: [
