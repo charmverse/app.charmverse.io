@@ -5,6 +5,7 @@ import { setBountyPermissions } from 'lib/permissions/bounties';
 import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
 import { v4 } from 'uuid';
 import { getPagePath } from 'lib/pages';
+import { NotFoundError } from 'lib/middleware';
 import { getBountyOrThrow } from './getBounty';
 import { BountyCreationData } from './interfaces';
 
@@ -40,6 +41,21 @@ export async function createBounty ({
     throw new PositiveNumbersOnlyError();
   }
 
+  const space = await prisma.space.findUnique({
+    where: {
+      id: spaceId
+    },
+    select: {
+      id: true,
+      publicBountyBoard: true
+    }
+
+  });
+
+  if (!space) {
+    throw new NotFoundError(`Space with id ${spaceId} not found`);
+  }
+
   const bountyId = v4();
 
   const bountyCreateInput: Prisma.BountyCreateInput = {
@@ -70,6 +86,22 @@ export async function createBounty ({
 
   const bountyPagePermissionSet: Omit<Prisma.PagePermissionCreateManyInput, 'pageId'>[] = getBountyPagePermissionSet({ createdBy, status, spaceId, permissions, linkedPageId });
 
+  const pagePermissionCreateInputs: Prisma.PagePermissionCreateManyInput[] = bountyPagePermissionSet.map(p => {
+    return {
+      ...p,
+      pageId: bountyId
+    };
+  });
+
+  // We want a smart default so that if a user creates a bounty visible to the space, and public bounty board is enabled, we inject a public permission
+  if (space.publicBountyBoard && pagePermissionCreateInputs.some(p => p.spaceId)) {
+    pagePermissionCreateInputs.push({
+      pageId: bountyId,
+      permissionLevel: 'view',
+      public: true
+    });
+  }
+
   if (!linkedPageId) {
     await prisma.$transaction([
       prisma.bounty.create({
@@ -99,12 +131,7 @@ export async function createBounty ({
         }
       }),
       prisma.pagePermission.createMany({
-        data: bountyPagePermissionSet.map(p => {
-          return {
-            ...p,
-            pageId: bountyId
-          };
-        })
+        data: pagePermissionCreateInputs
       })
     ]);
   }

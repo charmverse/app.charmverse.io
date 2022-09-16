@@ -14,9 +14,10 @@ const bountyStatuses: BountyStatus[] = ['open', 'inProgress', 'complete', 'paid'
 
 interface Props {
   bounties: BountyWithDetails[];
+  publicMode?: boolean
 }
 
-export default function BountiesKanbanView ({ bounties }: Omit<Props, 'publicMode'>) {
+export default function BountiesKanbanView ({ bounties, publicMode }: Props) {
   const { pages } = usePages();
   const { showPage } = usePageDialog();
 
@@ -45,6 +46,7 @@ export default function BountiesKanbanView ({ bounties }: Omit<Props, 'publicMod
     if (bounty?.id) {
       showPage({
         bountyId: bounty.id,
+        readOnly: publicMode,
         onClose: closePopup
       });
     }

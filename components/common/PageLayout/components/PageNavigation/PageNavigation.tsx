@@ -105,7 +105,8 @@ function PageNavigation ({
       path: page.path,
       type: page.type,
       createdAt: page.createdAt,
-      deletedAt: page.deletedAt
+      deletedAt: page.deletedAt,
+      spaceId: page.spaceId
     }));
 
   const pageHash = JSON.stringify(pagesArray);
