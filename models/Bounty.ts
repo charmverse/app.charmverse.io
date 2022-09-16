@@ -1,5 +1,5 @@
-import { Application, Bounty, BountyStatus } from '@prisma/client';
-import { IPageWithPermissions } from 'lib/pages/interfaces';
+import type { Application, Bounty, BountyStatus } from '@prisma/client';
+import type { IPageWithPermissions } from 'lib/pages/interfaces';
 
 export const BOUNTY_LABELS: Record<BountyStatus, string> = {
   suggestion: 'Suggestion',
