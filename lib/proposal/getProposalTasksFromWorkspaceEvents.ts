@@ -1,7 +1,16 @@
 import { Page, ProposalStatus, Space, WorkspaceEvent } from '@prisma/client';
 import { prisma } from 'db';
-import type { ProposalTask } from './getProposalTasks';
 import { ProposalWithUsers } from './interface';
+
+export interface ProposalTask {
+  id: string
+  action: 'start_discussion' | 'start_vote' | 'review' | 'discuss' | 'vote' | 'start_review'
+  spaceDomain: string
+  spaceName: string
+  pageTitle: string
+  pagePath: string
+  status: ProposalStatus
+}
 
 type ProposalRecord = Record<string, ProposalWithUsers & {
   space: Pick<Space, 'domain' | 'name'>
@@ -101,14 +110,14 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
     if (!visitedProposals.has(proposal.id)) {
       const { meta: { newStatus } } = workspaceEvent as ProposalStatusChangeWorkspaceEvent;
 
-      const isAuthor = proposal.authors.find(author => author.userId === userId);
+      const isAuthor = Boolean(proposal.authors.find(author => author.userId === userId));
       const isContributor = spaceIds.includes(workspaceEvent.spaceId);
-      const isReviewer = proposal.reviewers.find(reviewer => {
+      const isReviewer = Boolean(proposal.reviewers.find(reviewer => {
         if (reviewer.userId) {
           return reviewer.userId === userId;
         }
         return roleIds.includes(reviewer.roleId as string);
-      });
+      }));
 
       const proposalTask: Omit<ProposalTask, 'action'> = {
         id: workspaceEvent.id,
@@ -119,46 +128,53 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
         status: proposal.status
       };
 
-      if (isAuthor) {
-        if (newStatus === 'draft' || newStatus === 'private_draft') {
-          proposalTasks.push({
-            ...proposalTask,
-            action: 'start_discussion'
-          });
-        }
-        else if (newStatus === 'reviewed') {
-          proposalTasks.push({
-            ...proposalTask,
-            action: 'start_vote'
-          });
-        }
-        else if (newStatus === 'discussion') {
+      if (newStatus === 'discussion') {
+        if (isAuthor) {
           proposalTasks.push({
             ...proposalTask,
             action: 'start_review'
           });
         }
-      }
-      else if (isContributor) {
-        if (newStatus === 'discussion') {
+        else if (isContributor) {
           proposalTasks.push({
             ...proposalTask,
             action: 'discuss'
           });
         }
-        else if (newStatus === 'vote_active') {
+      }
+      else if (newStatus === 'draft' || newStatus === 'private_draft') {
+        if (isAuthor) {
+          proposalTasks.push({
+            ...proposalTask,
+            action: 'start_discussion'
+          });
+        }
+      }
+      else if (newStatus === 'reviewed') {
+        if (isAuthor) {
+          proposalTasks.push({
+            ...proposalTask,
+            action: 'start_vote'
+          });
+        }
+      }
+      else if (newStatus === 'vote_active') {
+        if (isContributor) {
           proposalTasks.push({
             ...proposalTask,
             action: 'vote'
           });
         }
       }
-      else if (isReviewer && newStatus === 'review') {
-        proposalTasks.push({
-          ...proposalTask,
-          action: 'review'
-        });
+      else if (newStatus === 'review') {
+        if (isReviewer) {
+          proposalTasks.push({
+            ...proposalTask,
+            action: 'review'
+          });
+        }
       }
+
       visitedProposals.add(proposal.id);
     }
   }

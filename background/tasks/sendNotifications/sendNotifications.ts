@@ -68,7 +68,11 @@ export async function getNotifications (): Promise<PendingTasksProps[]> {
     const sentTasks = await prisma.userNotification.findMany({
       where: {
         taskId: {
-          in: [...gnosisSafeTasks.map(getGnosisSafeTaskId), ...voteTasks.map(voteTask => voteTask.id)]
+          in: [
+            ...gnosisSafeTasks.map(getGnosisSafeTaskId),
+            ...voteTasks.map(voteTask => voteTask.id),
+            ...workspaceEvents.map(workspaceEvent => workspaceEvent.id)
+          ]
         }
       },
       select: {
@@ -102,7 +106,6 @@ export async function getNotifications (): Promise<PendingTasksProps[]> {
       proposalTasks
     };
   }));
-
   return notifications.filter(notification => notification.totalTasks > 0);
 }
 
