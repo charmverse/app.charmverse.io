@@ -5,7 +5,7 @@ import { CdkDeployStack } from '../staging-stack';
 
 const app = new cdk.App();
 
-const stackName = 'CharmVerse-staging-' + process.env.STAGE;
+const stackName = 'stg-charmverse-' + process.env.STAGE;
 
 new CdkDeployStack(app, stackName, {
 
