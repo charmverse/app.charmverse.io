@@ -77,7 +77,8 @@ Promise<{pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyArg
   /**
    * Mutates the pages, updating their ids
    */
-  function recursivePagePrep ({ node, newParentId }: {node: ExportedPage, newParentId: string | null}) {
+  function recursivePagePrep ({ node, newParentId, rootSpacePermissionId }:
+    {node: ExportedPage, newParentId: string | null, rootSpacePermissionId?: string}) {
     const newId = v4();
 
     oldNewHashmap[newId] = node.id;
@@ -93,6 +94,11 @@ Promise<{pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyArg
       }
     });
 
+    const newPermissionId = v4();
+
+    // Reassigned when creating the root permission
+    rootSpacePermissionId = rootSpacePermissionId ?? newPermissionId;
+
     const newPageContent: Prisma.PageCreateArgs = {
       data: {
         ...pageWithoutJoins,
@@ -105,6 +111,17 @@ Promise<{pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyArg
           connect: {
             // eslint-disable @typescript-eslint/no-non-null-assertion
             id: space!.id
+          }
+        },
+        permissions: {
+          createMany: {
+            data: [{
+              id: newPermissionId,
+              permissionLevel: space?.defaultPagePermissionGroup ?? 'full_access',
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              spaceId: space!.id,
+              inheritedFromPermission: rootSpacePermissionId === newPermissionId ? undefined : rootSpacePermissionId
+            }]
           }
         },
         updatedBy: space!.createdBy,
@@ -136,7 +153,7 @@ Promise<{pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyArg
         blockArgs.push(cardBlock as Prisma.BlockCreateManyInput);
 
         node.children?.forEach(child => {
-          recursivePagePrep({ node: child, newParentId: newId });
+          recursivePagePrep({ node: child, newParentId: newId, rootSpacePermissionId });
         });
 
       }
@@ -168,14 +185,14 @@ Promise<{pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyArg
         pageArgs.push(newPageContent);
 
         node.children?.forEach(child => {
-          recursivePagePrep({ node: child, newParentId: newId });
+          recursivePagePrep({ node: child, newParentId: newId, rootSpacePermissionId });
         });
       }
     }
     else if (node.type === 'page') {
       pageArgs.push(newPageContent);
       node.children?.forEach(child => {
-        recursivePagePrep({ node: child, newParentId: newId });
+        recursivePagePrep({ node: child, newParentId: newId, rootSpacePermissionId });
       });
     }
   }
