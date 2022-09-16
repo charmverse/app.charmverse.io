@@ -7,6 +7,7 @@ type Props = { children: ReactNode; };
 const domain = process.env.NODE_ENV === 'production'
   ? PLAUSIBLE_DOMAIN
   : 'localhost:3000';
+const isSetUp = !!PLAUSIBLE_DOMAIN;
 const isLocalhost = domain.indexOf('localhost') !== -1;
 
 export default function PlausibleProvider ({ children }: Props) {
@@ -16,7 +17,7 @@ export default function PlausibleProvider ({ children }: Props) {
       trackOutboundLinks
       trackFileDownloads
       // For testing purposes - set tracking localhost to true
-      enabled={isLocalhost || undefined}
+      enabled={isSetUp && (isLocalhost || undefined)}
       trackLocalhost={isLocalhost}
     >
       {children}

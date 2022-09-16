@@ -166,6 +166,7 @@ import 'theme/styles.scss';
 
 import charmClient from 'charmClient';
 import GlobalComponents from 'components/_app/GlobalComponents';
+import PlausibleProvider from 'lib/analytics/plausible/PlausibleProvider';
 
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
 
@@ -241,50 +242,52 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
 
   // DO NOT REMOVE CacheProvider - it protects MUI from Tailwind CSS in settings
   return (
-    <CacheProvider value={createCache({ key: 'app' })}>
-      <ColorModeContext.Provider value={colorModeContext}>
-        <ThemeProvider theme={theme}>
-          <LocalizationProvider dateAdapter={AdapterLuxon as any}>
-            <Web3ReactProvider getLibrary={getLibrary}>
-              <Web3ConnectionManager>
-                <ReactDndProvider>
-                  <DataProviders>
-                    <FocalBoardProvider>
-                      <IntlProvider>
-                        <SnackbarProvider>
-                          <PageMetaTags />
-                          <CssBaseline enableColorScheme={true} />
-                          <Global styles={cssVariables} />
-                          <RouteGuard>
-                            <ErrorBoundary>
-                              <Snackbar
-                                isOpen={isOldBuild}
-                                message='New CharmVerse platform update available. Please refresh.'
-                                actions={[
-                                  <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                    <RefreshIcon fontSize='small' />
-                                  </IconButton>
-                                ]}
-                                origin={{ vertical: 'top', horizontal: 'center' }}
-                                severity='warning'
-                                handleClose={() => setIsOldBuild(false)}
-                              />
-                              {getLayout(<Component {...pageProps} />)}
+    <PlausibleProvider>
+      <CacheProvider value={createCache({ key: 'app' })}>
+        <ColorModeContext.Provider value={colorModeContext}>
+          <ThemeProvider theme={theme}>
+            <LocalizationProvider dateAdapter={AdapterLuxon as any}>
+              <Web3ReactProvider getLibrary={getLibrary}>
+                <Web3ConnectionManager>
+                  <ReactDndProvider>
+                    <DataProviders>
+                      <FocalBoardProvider>
+                        <IntlProvider>
+                          <SnackbarProvider>
+                            <PageMetaTags />
+                            <CssBaseline enableColorScheme={true} />
+                            <Global styles={cssVariables} />
+                            <RouteGuard>
+                              <ErrorBoundary>
+                                <Snackbar
+                                  isOpen={isOldBuild}
+                                  message='New CharmVerse platform update available. Please refresh.'
+                                  actions={[
+                                    <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                      <RefreshIcon fontSize='small' />
+                                    </IconButton>
+                                  ]}
+                                  origin={{ vertical: 'top', horizontal: 'center' }}
+                                  severity='warning'
+                                  handleClose={() => setIsOldBuild(false)}
+                                />
+                                {getLayout(<Component {...pageProps} />)}
 
-                              <GlobalComponents />
-                            </ErrorBoundary>
-                          </RouteGuard>
-                        </SnackbarProvider>
-                      </IntlProvider>
-                    </FocalBoardProvider>
-                  </DataProviders>
-                </ReactDndProvider>
-              </Web3ConnectionManager>
-            </Web3ReactProvider>
-          </LocalizationProvider>
-        </ThemeProvider>
-      </ColorModeContext.Provider>
-    </CacheProvider>
+                                <GlobalComponents />
+                              </ErrorBoundary>
+                            </RouteGuard>
+                          </SnackbarProvider>
+                        </IntlProvider>
+                      </FocalBoardProvider>
+                    </DataProviders>
+                  </ReactDndProvider>
+                </Web3ConnectionManager>
+              </Web3ReactProvider>
+            </LocalizationProvider>
+          </ThemeProvider>
+        </ColorModeContext.Provider>
+      </CacheProvider>
+    </PlausibleProvider>
   );
 }
 

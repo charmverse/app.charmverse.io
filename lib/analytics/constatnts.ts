@@ -1,1 +1,1 @@
-export const PLAUSIBLE_DOMAIN = 'charmverse.io';
+export const PLAUSIBLE_DOMAIN = ''; // TODO: setup plausible account and domain
