@@ -1,22 +1,7 @@
 import { Page, ProposalStatus, Space, WorkspaceEvent } from '@prisma/client';
 import { prisma } from 'db';
+import type { ProposalTask } from './getProposalTasks';
 import { ProposalWithUsers } from './interface';
-
-type ProposalTaskAction = 'discuss' |
-  'start_discussion' |
-  'review' |
-  'start_vote' |
-  'vote' |
-  'start_review';
-
-export type ProposalTask = {
-  id: string
-  action: ProposalTaskAction
-  pageTitle: string
-  spaceName: string
-  spaceDomain: string
-  pagePath: string
-}
 
 type ProposalRecord = Record<string, ProposalWithUsers & {
   space: Pick<Space, 'domain' | 'name'>
@@ -130,7 +115,8 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
         pagePath: (proposal.page as Page).path,
         pageTitle: (proposal.page as Page).title,
         spaceDomain: proposal.space.domain,
-        spaceName: proposal.space.name
+        spaceName: proposal.space.name,
+        status: proposal.status
       };
 
       if (isAuthor) {
