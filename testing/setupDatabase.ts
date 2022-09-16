@@ -2,11 +2,10 @@ import type { ApplicationStatus, Block, Bounty, BountyStatus, Comment, Page, Pri
 import { prisma } from 'db';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
-import type { IPageWithPermissions, PageWithProposal } from 'lib/pages/interfaces';
-import { getPagePath } from 'lib/pages/utils';
-import type { BountyPermissions } from 'lib/permissions/bounties';
-import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
-import type { ProposalReviewerInput } from 'lib/proposal/interface';
+import { getPagePath, IPageWithPermissions, PageWithProposal } from 'lib/pages';
+import { BountyPermissions } from 'lib/permissions/bounties';
+import { TargetPermissionGroup } from 'lib/permissions/interfaces';
+import { ProposalReviewerInput } from 'lib/proposal/interface';
 import { syncProposalPermissions } from 'lib/proposal/syncProposalPermissions';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { typedKeys } from 'lib/utilities/objects';
@@ -544,8 +543,8 @@ export function createBlock (options: Partial<Block> & Pick<Block, 'createdBy' |
 /**
  * Creates a proposal with the linked authors and reviewers
  */
-export async function generateProposal ({ userId, spaceId, proposalStatus, authors, reviewers }:
-  {userId: string, spaceId: string, authors: string[], reviewers: ProposalReviewerInput[], proposalStatus: ProposalStatus}):
+export async function generateProposal ({ userId, spaceId, proposalStatus, authors, reviewers, deletedAt = null }:
+  {deletedAt?: Page['deletedAt'], userId: string, spaceId: string, authors: string[], reviewers: ProposalReviewerInput[], proposalStatus: ProposalStatus}):
   Promise<PageWithProposal> {
   const proposalId = v4();
 
@@ -567,6 +566,7 @@ export async function generateProposal ({ userId, spaceId, proposalStatus, autho
           id: spaceId
         }
       },
+      deletedAt,
       proposal: {
         create: {
           id: proposalId,

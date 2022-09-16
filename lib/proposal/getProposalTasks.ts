@@ -38,6 +38,9 @@ const StatusActionRecord: Record<Exclude<ProposalStatus, 'vote_closed' | 'discus
 export async function getProposalTasks (userId: string): Promise<ProposalTask[]> {
   const proposalTasks = await prisma.proposal.findMany({
     where: {
+      page: {
+        deletedAt: null
+      },
       OR: [
         {
           status: 'discussion',
@@ -63,6 +66,18 @@ export async function getProposalTasks (userId: string): Promise<ProposalTask[]>
             spaceRoles: {
               some: {
                 userId
+              }
+            }
+          },
+          // Only fetch vote active proposal tasks if the user haven't casted a vote yet
+          page: {
+            votes: {
+              some: {
+                userVotes: {
+                  none: {
+                    userId
+                  }
+                }
               }
             }
           }
