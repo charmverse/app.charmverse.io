@@ -79,7 +79,7 @@ export default function BountiesPage ({ publicMode = false, bounties }: Props) {
             ? (
               <BountiesEmptyState />
             ) : (
-              <BountiesKanbanView bounties={bounties} />
+              <BountiesKanbanView publicMode={publicMode} bounties={bounties} />
             )}
         </div>
       </div>
