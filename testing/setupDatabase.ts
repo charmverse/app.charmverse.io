@@ -278,6 +278,22 @@ export async function generateRole ({ spaceId, createdBy, roleName = `role-${v4(
   return role;
 }
 
+export async function generateRoleWithSpaceRole ({ spaceRoleId, spaceId, createdBy }: { spaceRoleId: string, createdBy: string, spaceId: string}) {
+  const role = await generateRole({ spaceId, createdBy });
+
+  const spaceRoleToRole = await prisma.spaceRoleToRole.create({
+    data: {
+      spaceRoleId,
+      roleId: role.id
+    }
+  });
+
+  return {
+    role,
+    spaceRoleToRole
+  };
+}
+
 export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'createdBy'> & {pagePermissions?: Prisma.PagePermissionCreateManyPageInput[]}): Promise<IPageWithPermissions> {
   return prisma.page.create({
     data: {

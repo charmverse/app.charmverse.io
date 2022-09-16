@@ -34,7 +34,10 @@ export default function NewProposalButton ({ mutateProposals }: {mutateProposals
 
       mutateProposals();
       showPage({
-        pageId: newPage.id
+        pageId: newPage.id,
+        onClose () {
+          mutateProposals();
+        }
       });
     }
   }

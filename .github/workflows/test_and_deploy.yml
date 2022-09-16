@@ -61,6 +61,8 @@ jobs:
     needs: test
     steps:
       - uses: actions/checkout@v2
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v3.x
 
       - name: Install dependencies and build app
         uses: ./.github/actions/install
@@ -68,15 +70,34 @@ jobs:
       - name: Build app
         uses: ./.github/actions/build
 
-      - name: Remove dev dependencies
-        run: |
-          npm prune --production
-          rm -rf .next/cache
+      - name: Build and Push Docker image
+        uses: ./.github/actions/build_docker_image
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-1
 
       - name: Configure env_var to prod settings
         run: |
           sed -i 's/staging/prod/g' .ebextensions/00_env_vars.config
           sed -i 's/stg/prd/g' .ebextensions/00_env_vars.config
+
+      - name: Set the docker compose env variables
+        uses: mikefarah/yq@master
+        with:
+          cmd: |
+            yq -I 4 -i '
+              with(.option_settings."aws:elasticbeanstalk:application:environment";
+                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+              ' .ebextensions/00_env_vars.config
+
+            yq -I 4 -i '
+              with(.option_settings."aws:elasticbeanstalk:application:environment";
+                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+              ' .ebextensions_cron/00_env_vars.config
+
+            cat .ebextensions/00_env_vars.config
+            cat .ebextensions_cron/00_env_vars.config
 
       - name: Package Webapp
         run: cat files_to_zip.txt | zip --symlinks -r@ deploy.zip

@@ -1,11 +1,2 @@
-Dockerfile
 docker-compose.yml
 .ebextensions
-.next
-next.base.js
-next.config.js
-node_modules
-package.json
-public
-prisma
-seedData
