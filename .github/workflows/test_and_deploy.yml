@@ -37,22 +37,22 @@ jobs:
       - name: Build app
         uses: ./.github/actions/build
 
-      # - name: Setup test database
-      #   run: bash ./scripts/configure-db.sh
+      - name: Setup test database
+        run: bash ./scripts/configure-db.sh
 
-      # - name: Run basic tests
-      #   run: npm run test:ci
+      - name: Run basic tests
+        run: npm run test:ci
 
-      # - name: Run server integration tests
-      #   run: |
-      #     npm run start:test:ci &
-      #     npm run test:server:ci
+      - name: Run server integration tests
+        run: |
+          npm run start:test:ci &
+          npm run test:server:ci
 
-      # - name: Run browser tests
-      #   run: npm run test:browser:ci
+      - name: Run browser tests
+        run: npm run test:browser:ci
 
-      # - name: Run browser e2e tests
-      #   run: npm run test:e2e:ci
+      - name: Run browser e2e tests
+        run: npm run test:e2e:ci
 
   deploy:
     name: Deploy to production
