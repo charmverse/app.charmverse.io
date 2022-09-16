@@ -15,12 +15,14 @@ export default async function task () {
       deletedBlocksCount,
       archivedBlocksCount,
       archivedPagesCount,
-      deletedProposalsCount
+      deletedProposalsCount,
+      deletedBountiesCount
     } = await deleteArchivedPages(MAX_ARCHIVE_DAYS);
 
     log.info(`Deleted ${deletedPagesCount} pages, ${deletedBlocksCount} blocks`);
 
     gauge('cron.delete-archived.deleted-proposals', deletedProposalsCount);
+    gauge('cron.delete-archived.deleted-bounties', deletedBountiesCount);
     gauge('cron.delete-archived.deleted-pages', deletedPagesCount);
     gauge('cron.delete-archived.deleted-blocks', deletedBlocksCount);
     gauge('cron.delete-archived.archived-pages', archivedPagesCount);
