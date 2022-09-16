@@ -15,6 +15,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import useSWR from 'swr';
 import VoteActionsMenu from 'components/votes/components/VoteActionsMenu';
 import { UserVote } from '@prisma/client';
+import useTasks from 'components/nexus/hooks/useTasks';
 
 export interface VoteDetailProps {
   vote: ExtendedVote;
@@ -45,6 +46,7 @@ export default function VoteDetail ({ cancelVote, castVote, deleteVote, detailed
   const { user } = useUser();
   const view = useEditorViewContext();
   const { data: userVotes, mutate } = useSWR(detailed ? `/votes/${id}/user-votes` : null, () => charmClient.votes.getUserVotes(id));
+  const { mutate: refetchTasks } = useTasks();
 
   const voteDetailsPopup = usePopupState({ variant: 'popover', popupId: 'inline-votes-detail' });
 
@@ -131,6 +133,10 @@ export default function VoteDetail ({ cancelVote, castVote, deleteVote, detailed
               onChange={async () => {
                 if (user) {
                   const userVote = await castVote(id, voteOption.name);
+                  // Only refetch tasks if the user hasn't voted yet
+                  if (!userVoteChoice) {
+                    refetchTasks();
+                  }
                   mutate((_userVotes) => {
                     if (_userVotes) {
                       const existingUserVoteIndex = _userVotes.findIndex(_userVote => _userVote.userId === user.id);

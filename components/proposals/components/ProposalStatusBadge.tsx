@@ -42,7 +42,7 @@ const StyledProposalStatusChip = styled(Chip)<{ status: ProposalStatus }>`
     opacity: 0.5;
   }
   .MuiChip-iconSmall svg {
-    font-size: 1.2rem;
+    font-size: 1rem;
   }
   .MuiChip-label {
     font-weight: 600;
