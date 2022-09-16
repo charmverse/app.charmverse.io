@@ -1,7 +1,8 @@
-import { useTheme } from '@emotion/react';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
-import { Alert, Button, Card, Grid, Link, Typography } from '@mui/material';
+import { Alert, Card, Grid, Typography } from '@mui/material';
 import { Box } from '@mui/system';
+import Button from 'components/common/Button';
+import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ProposalStatusChip } from 'components/proposals/components/ProposalStatusBadge';
 import type { ProposalTask } from 'lib/proposal/getProposalTasks';
@@ -32,8 +33,7 @@ export function ProposalTasksListRow (
   }: {proposalTask: ProposalTask}
 ) {
   const proposalLink = `/${spaceDomain}/${pagePath}`;
-  const proposalLocation = `${pageTitle || 'Untitled'} in ${spaceName}`;
-  const theme = useTheme();
+  const proposalLocation = spaceName;
   return (
     <Box>
       <Card sx={{ width: '100%', px: 2, py: 1, my: 2, borderLeft: 0, borderRight: 0 }} variant='outlined'>
@@ -67,11 +67,9 @@ export function ProposalTasksListRow (
           >
             <Link
               href={proposalLink}
-              display='flex'
               sx={{
-                color: {
-                  xs: 'inherit',
-                  md: theme.palette.link
+                '&.MuiLink-root': {
+                  color: 'inherit'
                 }
               }}
             >

@@ -48,8 +48,8 @@ export default function ProposalActionsMenu ({ deleteProposal, editProposal, pro
           <MenuItem
             dense
             onClick={async () => {
-              await refetchTasks();
               deleteProposal(proposal.id);
+              refetchTasks();
             }}
           >
             <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
