@@ -3,9 +3,15 @@ import Avatar from '@mui/material/Avatar';
 import { stringToColor } from 'lib/utilities/strings';
 import React from 'react';
 
-type AvatarSize = 'xSmall' | 'small' | 'medium' | 'large' | 'xLarge';
+export type AvatarSize = 'xSmall' | 'small' | 'medium' | 'large' | 'xLarge' | '2xLarge';
+export type AvatarVariant = 'circular' | 'rounded' | 'square';
 
-const configBySize: Record<AvatarSize, React.CSSProperties> = {
+const sizeStyleMap: Record<AvatarSize, React.CSSProperties> = {
+  '2xLarge': {
+    height: 150,
+    width: 150,
+    fontSize: '5.625rem'
+  },
   xLarge: {
     height: 96,
     width: 96,
@@ -33,6 +39,26 @@ const configBySize: Record<AvatarSize, React.CSSProperties> = {
   }
 };
 
+const sizeVariantStyleMap: Partial<Record<AvatarSize, Record<AvatarVariant, React.CSSProperties | null>>> = {
+  '2xLarge': {
+    rounded: { borderRadius: '1.625rem' },
+    circular: null,
+    square: null
+  },
+  xLarge: {
+    rounded: { borderRadius: '0.825rem' },
+    circular: null,
+    square: null
+  }
+};
+
+function getAvatarCustomStyles (variant: AvatarVariant | undefined, size: AvatarSize) {
+  const sizeStyles = sizeStyleMap[size];
+  const variantStyles = (variant && sizeVariantStyleMap[size]?.[variant]) || {};
+
+  return { ...sizeStyles, ...variantStyles };
+}
+
 const StyledAvatar = styled(Avatar)`
   color: white !important; // override CSS from Chip avatar
   font-weight: 500;
@@ -47,7 +73,7 @@ export type InitialAvatarProps = {
   avatar: string | null | undefined;
   className?: string;
   name?: string;
-  variant?: 'circular' | 'rounded' | 'square';
+  variant?: AvatarVariant;
   size?: AvatarSize;
   isNft?: boolean;
 };
@@ -60,7 +86,7 @@ export default function InitialAvatar ({ avatar, className, name, variant, size 
   return (
     <AvatarComponent
       className={className}
-      sx={{ backgroundColor: avatar ? 'initial' : stringToColor(nameStr), ...configBySize[size] }}
+      sx={{ backgroundColor: avatar ? 'initial' : stringToColor(nameStr), ...getAvatarCustomStyles(variant, size) }}
       variant={muiVariant}
       src={avatar ?? undefined}
     >
