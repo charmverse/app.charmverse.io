@@ -13,6 +13,7 @@ import charmClient from 'charmClient';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { useContributors } from 'hooks/useContributors';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useRouter } from 'next/router';
 
 interface Props {
   bountyPage: Page
@@ -22,6 +23,7 @@ export function BountySignupButton ({ bountyPage }: Props) {
 
   const { account } = useWeb3React();
   const { user, setUser, isLoaded: isUserLoaded } = useUser();
+  const router = useRouter();
   const [contributors] = useContributors();
   const [space] = useCurrentSpace();
   const loginViaTokenGateModal = usePopupState({ variant: 'popover', popupId: 'login-via-token-gate' });
@@ -62,7 +64,12 @@ export function BountySignupButton ({ bountyPage }: Props) {
 
         {
         showSpaceRedirect && (
-          <Button color='primary' onClick={loginViaTokenGateModal.open}>
+          <Button
+            color='primary'
+            onClick={() => {
+              router.push(`/${space?.domain}/${bountyPage.path}`);
+            }}
+          >
             View this bounty inside the workspace
           </Button>
         )
