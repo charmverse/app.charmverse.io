@@ -6,6 +6,12 @@ async function deleteOrphanProposals () {
       page: null,
     },
   });
+
+  await prisma.bounty.deleteMany({
+    where: {
+      page: null,
+    },
+  });
 }
 
 deleteOrphanProposals()
