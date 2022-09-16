@@ -1,5 +1,6 @@
 import { Page, Proposal, ProposalStatus, Space } from '@prisma/client';
 import { prisma } from 'db';
+import { isTruthy } from 'lib/utilities/types';
 
 export interface ProposalTask {
   id: string
@@ -14,16 +15,16 @@ export interface ProposalTask {
 export function extractProposalData (proposal: Proposal & {
   space: Space,
   page: Page | null
-}, action: ProposalTask['action']): ProposalTask {
-  return {
+}, action: ProposalTask['action']): ProposalTask | null {
+  return proposal.page ? {
     id: proposal.id,
-    pagePath: proposal.page!.path,
-    pageTitle: proposal.page!.title,
+    pagePath: proposal.page.path,
+    pageTitle: proposal.page.title,
     spaceDomain: proposal.space.domain,
     spaceName: proposal.space.name,
     status: proposal.status,
     action
-  };
+  } : null;
 }
 
 const StatusActionRecord: Record<Exclude<ProposalStatus, 'vote_closed' | 'discussion'>, ProposalTask['action']> = {
@@ -133,5 +134,5 @@ export async function getProposalTasks (userId: string): Promise<ProposalTask[]>
       return proposal.authors.map(author => author.userId === userId) ? extractProposalData(proposal, 'start_review') : extractProposalData(proposal, 'discuss');
     }
     return extractProposalData(proposal, StatusActionRecord[proposal.status as keyof typeof StatusActionRecord]);
-  });
+  }).filter(isTruthy);
 }
