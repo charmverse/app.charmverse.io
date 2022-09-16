@@ -6,6 +6,38 @@ import { v4 } from 'uuid';
 import { getProposalTasks } from '../getProposalTasks';
 
 describe('getProposalTasks', () => {
+  it('Should only return non archived proposals', async () => {
+    const { user, space } = await generateUserAndSpaceWithApiToken();
+
+    // This proposal page was archived, this shouldn't be fetched
+    await generateProposal({
+      proposalStatus: 'draft',
+      spaceId: space.id,
+      authors: [user.id],
+      reviewers: [],
+      userId: user.id,
+      deletedAt: new Date()
+    });
+
+    const privateDraftProposal1 = await generateProposal({
+      proposalStatus: 'private_draft',
+      spaceId: space.id,
+      authors: [user.id],
+      reviewers: [],
+      userId: user.id
+    });
+
+    const proposalTasks = await getProposalTasks(user.id);
+
+    expect(proposalTasks).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        id: privateDraftProposal1.id,
+        status: privateDraftProposal1.proposal?.status,
+        action: 'start_discussion'
+      })
+    ]));
+  });
+
   it('Should get draft and private draft proposals where the user is one of the authors', async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken();
     const user2 = await createUserFromWallet(v4());

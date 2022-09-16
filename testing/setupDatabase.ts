@@ -6,12 +6,11 @@ import { getPagePath, IPageWithPermissions, PageWithProposal } from 'lib/pages';
 import { BountyPermissions } from 'lib/permissions/bounties';
 import { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import { ProposalReviewerInput } from 'lib/proposal/interface';
-import { upsertPermission } from 'lib/permissions/pages';
+import { syncProposalPermissions } from 'lib/proposal/syncProposalPermissions';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { typedKeys } from 'lib/utilities/objects';
 import { BountyWithDetails, IDENTITY_TYPES, LoggedInUser } from 'models';
 import { v4 } from 'uuid';
-import { syncProposalPermissions } from 'lib/proposal/syncProposalPermissions';
 
 export async function generateSpaceUser ({ spaceId, isAdmin }: { spaceId: string, isAdmin: boolean }): Promise<LoggedInUser> {
   return prisma.user.create({
@@ -540,8 +539,8 @@ export function createBlock (options: Partial<Block> & Pick<Block, 'createdBy' |
 /**
  * Creates a proposal with the linked authors and reviewers
  */
-export async function generateProposal ({ userId, spaceId, proposalStatus, authors, reviewers }:
-  {userId: string, spaceId: string, authors: string[], reviewers: ProposalReviewerInput[], proposalStatus: ProposalStatus}):
+export async function generateProposal ({ userId, spaceId, proposalStatus, authors, reviewers, deletedAt = null }:
+  {deletedAt?: Page['deletedAt'], userId: string, spaceId: string, authors: string[], reviewers: ProposalReviewerInput[], proposalStatus: ProposalStatus}):
   Promise<PageWithProposal> {
   const proposalId = v4();
 
@@ -563,6 +562,7 @@ export async function generateProposal ({ userId, spaceId, proposalStatus, autho
           id: spaceId
         }
       },
+      deletedAt,
       proposal: {
         create: {
           id: proposalId,
