@@ -1,13 +1,11 @@
 import { Box, Button, Tooltip } from '@mui/material';
 import { Application, Bounty } from '@prisma/client';
 import { useBounties } from 'hooks/useBounties';
-import { useContributors } from 'hooks/useContributors';
 import { useUser } from 'hooks/useUser';
 import { submissionsCapReached } from 'lib/applications/shared';
 import { AssignedBountyPermissions } from 'lib/bounties';
 import { useState } from 'react';
 import ApplicationInput from './components/ApplicationInput';
-import SignupButton from './components/BountySignupButton';
 import SubmissionInput from './components/SubmissionInput';
 
 interface BountyApplicationFormProps {
@@ -20,8 +18,7 @@ interface BountyApplicationFormProps {
 export default function BountyApplicantForm (props: BountyApplicationFormProps) {
   const { refreshSubmissions, bounty, permissions, submissions } = props;
   const { refreshBounty } = useBounties();
-  const [contributors] = useContributors();
-  const { user, isLoaded: isUserLoaded } = useUser();
+  const { user } = useUser();
   const [showApplication, setShowApplication] = useState(false);
   const userApplication = submissions.find(s => s.createdBy === user?.id);
 
@@ -41,21 +38,7 @@ export default function BountyApplicantForm (props: BountyApplicationFormProps) 
       ? 'You do not have the correct role to work on this bounty'
       : (capReached ? 'The submissions cap has been reached. This bounty is closed to new submissions.' : '');
 
-  const isSpaceMember = Boolean(user && contributors.some(c => c.id === user.id));
-  const showSignup = isUserLoaded && (!user || !isSpaceMember);
-
-  if (showSignup) {
-    return (
-      <Box display='flex' justifyContent='center' my={3}>
-        <Tooltip placement='top' title='Verify your wallet' arrow>
-          <SignupButton />
-        </Tooltip>
-      </Box>
-    );
-
-  // Submissions cap exists and user has not applied yet
-  }
-  else if (!userApplication && bounty.approveSubmitters) {
+  if (!userApplication && bounty.approveSubmitters) {
     return (
       !showApplication ? (
         <Box display='flex' justifyContent='center' my={3}>

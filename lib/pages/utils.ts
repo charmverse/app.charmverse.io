@@ -1,4 +1,4 @@
-import { PageType } from '@prisma/client';
+import type { PageType } from '@prisma/client';
 
 export function getPagePath () {
   return `page-${Math.random().toString().replace('0.', '')}`;

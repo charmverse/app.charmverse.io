@@ -1,6 +1,6 @@
-import { ApplicationStatus, Block, Bounty, BountyStatus, Comment, Page, Prisma, ProposalStatus, Role, RoleSource, Thread, Transaction, Vote } from '@prisma/client';
+import type { ApplicationStatus, Block, Bounty, BountyStatus, Comment, Page, Prisma, ProposalStatus, Role, RoleSource, Thread, Transaction, Vote } from '@prisma/client';
 import { prisma } from 'db';
-import { getBountyOrThrow } from 'lib/bounties';
+import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import { getPagePath, IPageWithPermissions, PageWithProposal } from 'lib/pages';
 import { BountyPermissions } from 'lib/permissions/bounties';
@@ -96,10 +96,9 @@ export async function generateUserAndSpaceWithApiToken (walletAddress: string = 
   };
 }
 
-export async function generateBounty ({ content = undefined, contentText = '', spaceId, createdBy, status, maxSubmissions, approveSubmitters, title = 'Example', rewardToken = 'ETH', rewardAmount = 1, chainId = 1, bountyPermissions = {}, pagePermissions = [], page = {} }: Pick<Bounty, 'createdBy' | 'spaceId' | 'status' | 'approveSubmitters'> & Partial<Pick<Bounty, 'maxSubmissions' | 'chainId' | 'rewardAmount' | 'rewardToken'>> & Partial<Pick<Page, 'title' | 'content' | 'contentText'>> & {bountyPermissions?: Partial<BountyPermissions>, pagePermissions?: Omit<Prisma.PagePermissionCreateManyInput, 'pageId'>[], page?: Partial<Pick<Page, 'deletedAt'>>}): Promise<BountyWithDetails> {
+export async function generateBounty ({ content = undefined, contentText = '', spaceId, createdBy, status, maxSubmissions, approveSubmitters, title = 'Example', rewardToken = 'ETH', rewardAmount = 1, chainId = 1, bountyPermissions = {}, pagePermissions = [], page = {}, type = 'bounty', id }: Pick<Bounty, 'createdBy' | 'spaceId' | 'status' | 'approveSubmitters'> & Partial<Pick<Bounty, 'id' | 'maxSubmissions' | 'chainId' | 'rewardAmount' | 'rewardToken'>> & Partial<Pick<Page, 'title' | 'content' | 'contentText' | 'type'>> & {bountyPermissions?: Partial<BountyPermissions>, pagePermissions?: Omit<Prisma.PagePermissionCreateManyInput, 'pageId'>[], page?: Partial<Pick<Page, 'deletedAt'>>}): Promise<BountyWithDetails> {
 
-  const pageId = v4();
-  const bountyId = v4();
+  const pageId = id ?? v4();
 
   const bountyPermissionsToAssign: Omit<Prisma.BountyPermissionCreateManyInput, 'bountyId'>[] = typedKeys(bountyPermissions).reduce((createManyInputs, permissionLevel) => {
 
@@ -127,7 +126,7 @@ export async function generateBounty ({ content = undefined, contentText = '', s
     // Step 1 - Initialise bounty with page and bounty permissions
     prisma.bounty.create({
       data: {
-        id: bountyId,
+        id: pageId,
         createdBy,
         chainId,
         rewardAmount,
@@ -144,7 +143,7 @@ export async function generateBounty ({ content = undefined, contentText = '', s
             content: content ?? undefined,
             path: getPagePath(),
             title: title || 'Root',
-            type: 'bounty',
+            type,
             updatedBy: createdBy,
             spaceId,
             deletedAt: page?.deletedAt ?? undefined
@@ -168,7 +167,7 @@ export async function generateBounty ({ content = undefined, contentText = '', s
     })
   ]);
 
-  return getBountyOrThrow(bountyId);
+  return getBountyOrThrow(pageId);
 }
 
 export async function generateComment ({ content, pageId, spaceId, userId, context = '', resolved = false }: Pick<Thread, 'userId' | 'spaceId' | 'pageId'> & Partial<Pick<Thread, 'context' | 'resolved'>> & Pick<Comment, 'content'>): Promise<Comment> {
@@ -294,7 +293,7 @@ export async function generateRoleWithSpaceRole ({ spaceRoleId, spaceId, created
   };
 }
 
-export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'createdBy'>): Promise<IPageWithPermissions> {
+export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'createdBy'> & {pagePermissions?: Prisma.PagePermissionCreateManyPageInput[]}): Promise<IPageWithPermissions> {
   return prisma.page.create({
     data: {
       id: options.id ?? v4(),
@@ -314,6 +313,11 @@ export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'cre
           id: options.spaceId as string
         }
       },
+      permissions: options.pagePermissions ? {
+        createMany: {
+          data: options.pagePermissions
+        }
+      } : undefined,
       parentId: options.parentId,
       deletedAt: options.deletedAt ?? null,
       boardId: options.boardId ?? null
@@ -325,7 +329,7 @@ export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'cre
         }
       }
     }
-  });
+  }) as Promise<IPageWithPermissions>;
 }
 
 export async function createVote ({ userVotes = [], voteOptions = [], spaceId, createdBy, pageId, deadline = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), status = 'InProgress', title = 'Vote Title', context = 'inline', description = null }: Partial<Vote> & Pick<Vote, 'spaceId' | 'createdBy' | 'pageId'> & {voteOptions?: string[], userVotes?: string[]}) {
