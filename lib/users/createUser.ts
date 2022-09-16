@@ -27,7 +27,7 @@ export async function createUserFromWallet (address: string): Promise<LoggedInUs
       data: {
         addresses: [address],
         identityType: IDENTITY_TYPES[0],
-        username: ens || shortenHex(address),
+        username,
         path: isUserPathAvailable ? username : null
       },
       include: sessionUserRelations
