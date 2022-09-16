@@ -1,7 +1,7 @@
 import { SpaceRole } from '@prisma/client';
 import { prisma } from 'db';
 import { createUserFromWallet } from 'lib/users/createUser';
-import { generateProposal, generateRoleWithSpaceRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createVote, generateProposal, generateRoleWithSpaceRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { getProposalTasks } from '../getProposalTasks';
 
@@ -192,6 +192,29 @@ describe('getProposalTasks', () => {
       authors: [user.id],
       reviewers: [],
       userId: user.id
+    });
+
+    await createVote({
+      createdBy: user.id,
+      pageId: activeVoteProposal.id,
+      spaceId: space.id
+    });
+
+    const activeVoteWithUserVoteProposal = await generateProposal({
+      proposalStatus: 'vote_active',
+      spaceId: space.id,
+      authors: [user.id],
+      reviewers: [],
+      userId: user.id
+    });
+
+    // User has voted on this proposal
+    // So this shouldn't be returned as a proposal task
+    await createVote({
+      createdBy: user.id,
+      pageId: activeVoteWithUserVoteProposal.id,
+      spaceId: space.id,
+      userVotes: ['1']
     });
 
     // The user isn't an author, but it should be returned as its in discussion
