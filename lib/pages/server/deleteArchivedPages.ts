@@ -2,7 +2,7 @@ import { prisma } from 'db';
 import { DateTime } from 'luxon';
 
 export async function deleteArchivedPages (maxDay: number) {
-  await prisma.proposal.deleteMany({
+  const { count: deletedProposalsCount } = await prisma.proposal.deleteMany({
     where: {
       page: {
         deletedAt: {
@@ -50,6 +50,7 @@ export async function deleteArchivedPages (maxDay: number) {
   });
 
   return {
+    deletedProposalsCount,
     deletedBlocksCount,
     deletedPagesCount,
     archivedBlocksCount,
