@@ -37,6 +37,9 @@ const StatusActionRecord: Record<Exclude<ProposalStatus, 'vote_closed' | 'discus
 export async function getProposalTasks (userId: string): Promise<ProposalTask[]> {
   const proposalTasks = await prisma.proposal.findMany({
     where: {
+      page: {
+        deletedAt: null
+      },
       OR: [
         {
           status: 'discussion',
