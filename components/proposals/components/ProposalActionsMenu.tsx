@@ -2,6 +2,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import EditIcon from '@mui/icons-material/Edit';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { IconButton, ListItemText, Menu, MenuItem } from '@mui/material';
+import useTasks from 'components/nexus/hooks/useTasks';
 import { useUser } from 'hooks/useUser';
 import { ProposalWithUsers } from 'lib/proposal/interface';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
@@ -15,7 +16,7 @@ interface VoteActionsProps {
 export default function ProposalActionsMenu ({ deleteProposal, editProposal, proposal }: VoteActionsProps) {
   const { user } = useUser();
   const actionsPopup = usePopupState({ variant: 'popover', popupId: 'proposal-action' });
-
+  const { mutate: refetchTasks } = useTasks();
   return (
     <>
       {proposal.authors.some(author => author.userId === user?.id) && (
@@ -46,7 +47,8 @@ export default function ProposalActionsMenu ({ deleteProposal, editProposal, pro
         {deleteProposal && (
           <MenuItem
             dense
-            onClick={() => {
+            onClick={async () => {
+              await refetchTasks();
               deleteProposal(proposal.id);
             }}
           >
