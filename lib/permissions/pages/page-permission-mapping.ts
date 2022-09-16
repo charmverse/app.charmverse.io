@@ -25,7 +25,7 @@ export const permissionDescriptions: Record<PageOperationType, string> = {
 
 export const permissionTemplates: Record<keyof typeof PagePermissionLevel, PageOperationType []> = {
   full_access: Object.keys(PageOperations) as PageOperationType [],
-  proposal_editor: ['read', 'comment', 'edit_content', 'edit_isPublic'],
+  proposal_editor: ['read', 'comment', 'edit_content', 'edit_isPublic', 'delete'],
   editor: ['read', 'edit_content', 'comment'],
   view_comment: ['read', 'comment'],
   view: ['read'],
