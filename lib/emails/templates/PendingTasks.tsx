@@ -33,15 +33,6 @@ export interface PendingTasksProps {
   user: TemplateUser
 }
 
-const ProposalActionRecord: Record<ProposalTask['action'], string> = {
-  discuss: 'Discuss',
-  start_discussion: 'To discuss',
-  review: 'Review',
-  start_review: 'To review',
-  start_vote: 'Start vote',
-  vote: 'Vote'
-};
-
 function ViewAllText ({ href }: {href: string}) {
   return (
     <MjmlText>
@@ -238,17 +229,8 @@ function ProposalTaskMjml ({ task }: {task: ProposalTask}) {
   return (
     <MjmlText>
       <div style={{ fontWeight: 'bold', color: '#000', marginBottom: 5 }}>
-        {pageWorkspaceTitle.length > MAX_CHAR ? `${pageWorkspaceTitle.slice(0, MAX_CHAR)}...` : pageWorkspaceTitle}
+        {pageWorkspaceTitle}
       </div>
-      <a
-        href={`${charmverseUrl}/${task.spaceDomain}/${task.pagePath}`}
-        style={{
-          ...buttonStyle,
-          lineHeight: '250%'
-        }}
-      >
-        {ProposalActionRecord[task.action]}
-      </a>
     </MjmlText>
   );
 }
