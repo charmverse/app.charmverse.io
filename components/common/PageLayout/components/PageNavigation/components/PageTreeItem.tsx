@@ -236,7 +236,12 @@ function EmojiMenu ({ popupState, pageId, pageType }: { popupState: any, pageId:
   }, [pageId, setPages]);
 
   return (
-    <Menu {...bindMenu(popupState)}>
+    <Menu
+      {...bindMenu(popupState)}
+      onClick={(e) => {
+        e.stopPropagation();
+      }}
+    >
       <EmojiPicker onSelect={onSelectEmoji} />
     </Menu>
   );
