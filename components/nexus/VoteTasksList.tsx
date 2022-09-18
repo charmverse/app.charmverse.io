@@ -131,7 +131,7 @@ export function VoteTasksListRow (
         </Grid>
       </Card>
       <Modal
-        title='Vote details'
+        title='Poll details'
         size='large'
         open={isVoteModalOpen}
         onClose={() => {

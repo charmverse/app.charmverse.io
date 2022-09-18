@@ -79,7 +79,7 @@ export default function VoteDetail ({ cancelVote, castVote, deleteVote, detailed
     <StyledDiv detailed={detailed} id={`vote.${vote.id}`}>
       <Box display='flex' justifyContent='space-between' alignItems='center'>
         <Typography variant='h6' fontWeight='bold'>
-          {!isProposal ? title : 'Vote on this proposal'}
+          {!isProposal ? title : 'Poll on this proposal'}
         </Typography>
         <VoteActionsMenu deleteVote={deleteVote} cancelVote={cancelVote} vote={vote} removeFromPage={removeFromPage} />
       </Box>
@@ -198,7 +198,7 @@ export default function VoteDetail ({ cancelVote, castVote, deleteVote, detailed
           ))}
         </List>
       )}
-      <Modal title='Vote details' size='large' open={voteDetailsPopup.isOpen} onClose={voteDetailsPopup.close}>
+      <Modal title='Poll details' size='large' open={voteDetailsPopup.isOpen} onClose={voteDetailsPopup.close}>
         <VoteDetail
           vote={vote}
           detailed={true}
