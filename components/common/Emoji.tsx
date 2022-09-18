@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { isMac } from 'lib/browser';
 import { ComponentProps, ReactNode, memo } from 'react';
 import twemoji from 'twemoji';
 
@@ -47,10 +48,7 @@ export const Emoji = styled.div<{ size?: ImgSize }>`
 
 // Use system font for Mac OS, but Twitter emojis for everyone else
 export function getTwitterEmoji (emoji: string): string | null {
-
-  // using deprectead feature, navigator.userAgent doesnt exist yet in FF - https://developer.mozilla.org/en-US/docs/Web/API/Navigator/platform
-  const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-  if (isMac) return null;
+  if (isMac()) return null;
 
   // @ts-ignore - library type is incorrect
   const html = twemoji.parse(emoji, {
