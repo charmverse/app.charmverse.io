@@ -172,7 +172,7 @@ export function VoteTasksList ({ error, tasks, mutateTasks }: VoteTasksListProps
       <Card variant='outlined'>
         <Box p={3} textAlign='center'>
           <HowToVote />
-          <Typography color='secondary'>You don't have any votes right now</Typography>
+          <Typography color='secondary'>You don't have any polls right now</Typography>
         </Box>
       </Card>
     );

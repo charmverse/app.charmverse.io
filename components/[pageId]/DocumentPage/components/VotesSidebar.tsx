@@ -43,7 +43,7 @@ export default function VotesSidebar () {
         const highlightedVoteDomNode = document.getElementById(`vote.${highlightedVoteId}`);
         if (highlightedVoteDomNode) {
           setTimeout(() => {
-            setCurrentPageActionDisplay('votes');
+            setCurrentPageActionDisplay('polls');
             setVoteFilter('all');
             // Remove query parameters from url
             silentlyUpdateURL(window.location.href.split('?')[0]);
@@ -73,7 +73,7 @@ export default function VotesSidebar () {
     >
       <Box display='flex' gap={1}>
         <PageActionToggle />
-        <Typography fontWeight={600} fontSize={20}>Votes</Typography>
+        <Typography fontWeight={600} fontSize={20}>Polls</Typography>
       </Box>
       <ViewOptions
         showPosition={true}
@@ -85,7 +85,7 @@ export default function VotesSidebar () {
       />
       <StyledSidebar>
         {sortedVotes.length === 0
-          ? <NoVotesMessage message={`No ${voteFilter === 'completed' ? 'completed' : 'in progress'} votes yet`} />
+          ? <NoVotesMessage message={`No ${voteFilter === 'completed' ? 'completed' : 'in progress'} polls yet`} />
           : sortedVotes.map(inlineVote => (
             <VoteDetail
               cancelVote={cancelVote}
