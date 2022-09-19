@@ -1,27 +1,23 @@
 import { prisma } from 'db';
-import { getCompletedApplicationsOfUser } from 'lib/applications/getCompletedApplicationsOfUser';
 import log from 'lib/log';
 import { getSpacesOfUser } from 'lib/spaces/getSpacesOfUser';
 import { DataNotFoundError } from 'lib/utilities/errors';
-import { isUUID } from 'lib/utilities/strings';
 import { isTruthy } from 'lib/utilities/types';
 import { getAllOrganizations, getProfile } from 'lib/deepdao/client';
 import { DeepDaoProfile, DeepDaoVote } from 'lib/deepdao/interfaces';
 import { CommunityDetails } from 'components/profile/components/CommunityRow';
-import { UserCommunity } from './interfaces';
-import { sortCommunities } from './sortCommunities';
+import { UserCommunity, ProfileBountyEvent } from './interfaces';
+import { combineCommunityData } from './combineCommunityData';
 
 export type AggregatedProfileData = Pick<DeepDaoProfile, 'totalProposals' | 'totalVotes'> & {
   bounties: number;
   communities: CommunityDetails[];
 };
 
-export async function getAggregatedData (userPath: string, apiToken?: string): Promise<AggregatedProfileData> {
+export async function getAggregatedData (userId: string, apiToken?: string): Promise<AggregatedProfileData> {
   const user = await prisma.user.findFirst({
-    where: isUUID(userPath as string) ? {
-      id: userPath as string
-    } : {
-      path: userPath as string
+    where: {
+      id: userId as string
     }
   });
 
@@ -37,17 +33,47 @@ export async function getAggregatedData (userPath: string, apiToken?: string): P
       }))
   )).filter(isTruthy);
 
-  const allOrganizations = await getAllOrganizations(apiToken);
+  const [
+    allOrganizations,
+    bountiesCreated,
+    bountyApplications,
+    userWorkspaces
+  ] = await Promise.all([
+    getAllOrganizations(apiToken),
+    prisma.bounty.findMany({
+      where: {
+        createdBy: user.id
+      },
+      include: {
+        page: true,
+        space: true
+      }
+    }),
+    prisma.application.findMany({
+      where: {
+        createdBy: userId,
+        status: {
+          in: ['inProgress', 'complete', 'review', 'paid']
+        }
+      },
+      include: {
+        bounty: {
+          include: {
+            page: true,
+            space: true
+          }
+        }
+      }
+    }),
+    getSpacesOfUser(user.id)
+  ]);
 
   const daoLogos = allOrganizations.data.resources.reduce<Record<string, string | null>>((logos, org) => {
     logos[org.organizationId] = org.logo;
     return logos;
   }, {});
 
-  const [completedBountiesCount, userWorkspaces] = await Promise.all([
-    getCompletedApplicationsOfUser(user.id),
-    getSpacesOfUser(user.id)
-  ]);
+  const completedApplications = bountyApplications.filter(application => application.status === 'complete' || application.status === 'paid');
 
   const hiddenItems = (await prisma.profileItem.findMany({
     where: {
@@ -71,6 +97,11 @@ export async function getAggregatedData (userPath: string, apiToken?: string): P
       }
     },
     select: {
+      page: {
+        select: {
+          title: true
+        }
+      },
       spaceId: true,
       description: true,
       title: true,
@@ -120,22 +151,42 @@ export async function getAggregatedData (userPath: string, apiToken?: string): P
       createdAt: vote.createdAt.toString(),
       description: vote.description ?? '',
       organizationId: vote.spaceId,
-      title: vote.title,
+      title: vote.title || vote.page?.title,
       voteId: vote.id,
       successful: vote.status === 'Passed'
     } as DeepDaoVote))
   ];
 
-  const sortedCommunities = sortCommunities({
+  const bounties: ProfileBountyEvent[] = [
+    ...bountiesCreated.map((bounty): ProfileBountyEvent => ({
+      bountyId: bounty.id,
+      bountyPath: `/${bounty.space.domain}/${bounty.page?.path}`,
+      bountyTitle: bounty.page?.title,
+      createdAt: bounty.createdAt.toISOString(),
+      organizationId: bounty.spaceId,
+      eventName: 'bounty_created'
+    })),
+    ...bountyApplications.map((app): ProfileBountyEvent => ({
+      bountyId: app.bounty.id,
+      bountyPath: `/${app.bounty.space.domain}/${app.bounty.page?.path}`,
+      bountyTitle: app.bounty.page?.title,
+      createdAt: app.createdAt.toISOString(),
+      organizationId: app.spaceId,
+      eventName: (app.status === 'complete' || app.status === 'paid') ? 'bounty_completed' : 'bounty_started'
+    }))
+  ];
+
+  const sortedCommunities = combineCommunityData({
     communities,
+    bounties,
     proposals,
     votes
   });
 
   return {
+    communities: sortedCommunities,
     totalProposals: profiles.reduce((acc, profile) => acc + profile.data.totalProposals, 0),
     totalVotes: profiles.reduce((acc, profile) => acc + profile.data.totalVotes, 0),
-    communities: sortedCommunities,
-    bounties: completedBountiesCount
+    bounties: completedApplications.length
   };
 }

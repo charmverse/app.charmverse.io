@@ -1,0 +1,15 @@
+.dockerignore
+.env*
+.github
+.gitignore
+.ebextensions*
+.cdk
+.vscode
+__e2e__
+__integration-tests__
+cdk.json
+docker-compose.yml
+Dockerfile
+files_to_zip.txt
+jest.config*
+jest.setup*

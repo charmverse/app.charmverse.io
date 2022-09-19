@@ -35,8 +35,9 @@ export function generatePageNode ({
   index = -1,
   deletedAt = null,
   createdAt = new Date(),
-  title = 'Untitled'
-}: Partial<PageNode<Pick<Page, 'title' | 'type' | 'deletedAt'>>>): PageNode<Pick<Page, 'title' | 'type' | 'deletedAt'>> {
+  title = 'Untitled',
+  spaceId = v4()
+}: Partial<PageNode<Pick<Page, 'title'>>>): PageNode<Pick<Page, 'title'>> {
   return {
     id,
     type,
@@ -44,7 +45,8 @@ export function generatePageNode ({
     index,
     createdAt,
     deletedAt,
-    title
+    title,
+    spaceId
   };
 }
 

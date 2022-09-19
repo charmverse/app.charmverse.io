@@ -53,7 +53,7 @@ export const darkModeColors: BrandColorScheme = {
 };
 
 export const lightModeColors: BrandColorScheme = {
-  gray: '#E7E7E6', // Ligh Gray
+  gray: '#E7E7E6', // Light Gray
   turquoise: '#C2DCF2', // Light Turquoise
   orange: '#F4D8D0', // Light Orange
   yellow: '#EFE9CB', // Light Yellow

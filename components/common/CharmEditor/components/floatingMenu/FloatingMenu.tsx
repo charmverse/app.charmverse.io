@@ -1,38 +1,45 @@
 import { PluginKey } from '@bangle.dev/core';
 import { FloatingMenu } from '@bangle.dev/react-menu';
+import { PageType } from '@prisma/client';
+import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
-import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
+import { IPagePermissionFlags } from 'lib/permissions/pages';
 import { SubMenu } from '../@bangle.dev/react-menu/floating-menu';
 import { LinkSubMenu } from '../@bangle.dev/react-menu/LinkSubMenu';
 import { Menu } from '../@bangle.dev/react-menu/Menu';
-import { BoldButton, CalloutButton, CodeButton, InlineCommentButton, FloatingLinkButton, HeadingButton, ItalicButton, ParagraphButton, StrikeButton, UnderlineButton, InlineVoteButton } from '../@bangle.dev/react-menu/MenuButtons';
+import { BoldButton, CalloutButton, CodeButton, FloatingLinkButton, HeadingButton, InlineCommentButton, InlineVoteButton, ItalicButton, ParagraphButton, StrikeButton, UnderlineButton } from '../@bangle.dev/react-menu/MenuButtons';
 import { MenuGroup } from '../@bangle.dev/react-menu/MenuGroup';
 import { InlineCommentSubMenu } from '../inlineComment/InlineComment.components';
 import InlineVoteSubMenu from '../inlineVote/components/InlineVoteSubmenu';
 
 type FloatingMenuVariant = 'defaultMenu' | 'linkSubMenu' | 'inlineCommentSubMenu' | 'commentOnlyMenu';
 
+interface Props {
+  enableComments?: boolean;
+  enableVoting?: boolean;
+  pluginKey: PluginKey;
+  inline?: boolean;
+  pageType?: PageType;
+  pagePermissions?: IPagePermissionFlags;
+}
+
 export default function FloatingMenuComponent (
   {
-    pluginKey, enableComments = true, enableVoting = false, inline = false }:
-    {enableComments?: boolean, enableVoting?: boolean, pluginKey: PluginKey, inline?: boolean
-  }
+    pluginKey, enableComments = true, enableVoting = false, inline = false, pageType, pagePermissions }: Props
+
 ) {
   const { showMessage } = useSnackbar();
-  const { getPagePermissions, currentPageId } = usePages();
-  const permissions = currentPageId ? getPagePermissions(currentPageId) : new AllowedPagePermissions();
   const [currentUserPermissions] = useCurrentSpacePermissions();
-  const displayInlineCommentButton = !inline && permissions.comment && enableComments;
+  const displayInlineCommentButton = !inline && pagePermissions?.comment && enableComments && pageType !== 'card_template';
 
-  const displayInlineVoteButton = !inline && permissions.comment && currentUserPermissions?.createVote && enableVoting;
+  const displayInlineVoteButton = !inline && pagePermissions?.comment && currentUserPermissions?.createVote && enableVoting && pageType !== 'card_template';
   return (
     <FloatingMenu
       menuKey={pluginKey}
       renderMenuType={(menuType) => {
         const { type } = menuType as {type: SubMenu};
-        if (type as FloatingMenuVariant === 'commentOnlyMenu' && permissions.comment) {
+        if (type as FloatingMenuVariant === 'commentOnlyMenu' && pagePermissions?.comment) {
           return (
             <Menu>
               <InlineCommentButton enableComments menuKey={pluginKey} />

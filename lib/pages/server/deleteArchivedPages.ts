@@ -2,24 +2,32 @@ import { prisma } from 'db';
 import { DateTime } from 'luxon';
 
 export async function deleteArchivedPages (maxDay: number) {
-  const { count: deletedPagesCount } = await prisma.page.deleteMany({
+  const whereQuery = {
+    deletedAt: {
+      lte: DateTime.now().minus({
+        days: maxDay
+      }).toISO()
+    }
+  } as const;
+
+  const { count: deletedBountiesCount } = await prisma.bounty.deleteMany({
     where: {
-      deletedAt: {
-        lte: DateTime.now().minus({
-          days: maxDay
-        }).toISO()
-      }
+      page: whereQuery
     }
   });
 
-  const { count: deletedBlocksCount } = await prisma.block.deleteMany({
+  const { count: deletedProposalsCount } = await prisma.proposal.deleteMany({
     where: {
-      deletedAt: {
-        lte: DateTime.now().minus({
-          days: maxDay
-        }).toISO()
-      }
+      page: whereQuery
     }
+  });
+
+  const { count: deletedPagesCount } = await prisma.page.deleteMany({
+    where: whereQuery
+  });
+
+  const { count: deletedBlocksCount } = await prisma.block.deleteMany({
+    where: whereQuery
   });
 
   const archivedPagesCount = await prisma.page.count({
@@ -39,9 +47,11 @@ export async function deleteArchivedPages (maxDay: number) {
   });
 
   return {
+    deletedProposalsCount,
     deletedBlocksCount,
     deletedPagesCount,
     archivedBlocksCount,
-    archivedPagesCount
+    archivedPagesCount,
+    deletedBountiesCount
   };
 }

@@ -10,7 +10,7 @@ import { Subscription } from '../wsclient';
 
 import { initialLoad } from './initialLoad';
 
-import { RootState } from './index';
+import type { RootState } from './index';
 
 type UsersStatus = {
   workspaceUsers: {[key: string]: IUser}

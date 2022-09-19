@@ -1,15 +1,12 @@
 import HowToVote from '@mui/icons-material/HowToVote';
 import { Alert, Box, Card, Grid, Typography } from '@mui/material';
-import { Page } from '@prisma/client';
-import TaskIcon from '@mui/icons-material/TaskOutlined';
-import VoteIcon from 'components/votes/components/VoteIcon';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import VoteDetail, { VoteDetailProps } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';
-import { usePages } from 'hooks/usePages';
+import VoteIcon from 'components/votes/components/VoteIcon';
 import { VoteTask } from 'lib/votes/interfaces';
 import { DateTime } from 'luxon';
 import { GetTasksResponse } from 'pages/api/tasks/list';
@@ -43,7 +40,6 @@ export function VoteTasksListRow (
 
   const voteLink = `/${spaceDomain}/${pagePath}?voteId=${id}`;
   const voteLocation = `${pageTitle || 'Untitled'} in ${spaceName}`;
-  const voteTitleToUse = voteTask.context === 'proposal' ? 'Proposal' : voteTitle;
 
   function removeVoteFromTask (voteId: string) {
     mutateTasks((tasks) => {
@@ -57,18 +53,19 @@ export function VoteTasksListRow (
   }
 
   const castVote: VoteDetailProps['castVote'] = async (voteId, choice) => {
-    const userVote = await charmClient.castVote(voteId, choice);
+    const userVote = await charmClient.votes.castVote(voteId, choice);
     removeVoteFromTask(voteId);
     return userVote;
   };
 
   const deleteVote: VoteDetailProps['deleteVote'] = async (voteId) => {
-    await charmClient.deleteVote(voteId);
+    // This is guaranteed to be inline votes so no need to add guard against proposal type votes
+    await charmClient.votes.deleteVote(voteId);
     removeVoteFromTask(voteId);
   };
 
   const cancelVote: VoteDetailProps['cancelVote'] = async (voteId) => {
-    await charmClient.cancelVote(voteId);
+    await charmClient.votes.cancelVote(voteId);
     removeVoteFromTask(voteId);
   };
 
@@ -93,7 +90,7 @@ export function VoteTasksListRow (
             fontSize={{ sm: 16, xs: 18 }}
           >
             <VoteIcon {...voteTask} />
-            {voteTitleToUse}
+            {voteTitle}
           </Grid>
           <Grid
             item
@@ -134,7 +131,7 @@ export function VoteTasksListRow (
         </Grid>
       </Card>
       <Modal
-        title='Vote details'
+        title='Poll details'
         size='large'
         open={isVoteModalOpen}
         onClose={() => {
@@ -175,7 +172,7 @@ export function VoteTasksList ({ error, tasks, mutateTasks }: VoteTasksListProps
       <Card variant='outlined'>
         <Box p={3} textAlign='center'>
           <HowToVote />
-          <Typography color='secondary'>You don't have any votes right now</Typography>
+          <Typography color='secondary'>You don't have any polls right now</Typography>
         </Box>
       </Card>
     );

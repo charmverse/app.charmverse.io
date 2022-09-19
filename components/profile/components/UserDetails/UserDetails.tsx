@@ -20,10 +20,10 @@ import { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { TelegramAccount } from 'pages/api/telegram/connect';
 import { shortenHex } from 'lib/utilities/strings';
 import useENSName from 'hooks/useENSName';
-import { UserAvatar } from 'lib/users/interfaces';
-import { PublicUser } from 'pages/api/public/profile/[userPath]';
+import { PublicUser } from 'pages/api/public/profile/[userId]';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 import { useUserDetails } from 'components/profile/components/UserDetails/hooks/useUserDetails';
+import { useUpdateProfileAvatar } from 'components/profile/components/UserDetails/hooks/useUpdateProfileAvatar';
 import DescriptionModal from '../DescriptionModal';
 import UserPathModal from '../UserPathModal';
 import SocialModal from '../SocialModal';
@@ -63,7 +63,8 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
     setTimeout(() => setIsDiscordUsernameCopied(false), 1000);
   };
 
-  const { handleUserUpdate, handleNftAvatarUpdate, isSaving } = useUserDetails({ readOnly, user, updateUser });
+  const { updateProfileAvatar, isSaving: isSavingAvatar } = useUpdateProfileAvatar();
+  const { handleUserUpdate } = useUserDetails({ readOnly, user, updateUser });
 
   const onLinkCopy = () => {
     setIsPersonalLinkCopied(true);
@@ -135,11 +136,11 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
         <Avatar
           name={user?.username || ''}
           image={user?.avatar}
-          updateAvatar={(avatar: UserAvatar) => avatar.avatarContract ? handleNftAvatarUpdate(avatar) : handleUserUpdate(avatar)}
+          updateAvatar={updateProfileAvatar}
           editable={!readOnly}
           variant='circular'
           canSetNft
-          isSaving={isSaving}
+          isSaving={isSavingAvatar}
           isNft={hasNftAvatar(user)}
         />
         <Grid container direction='column' spacing={0.5}>

@@ -1,3 +1,4 @@
+import { SupportedChainId } from './provider/alchemy';
 
 export interface NftData {
   id: string;
@@ -6,7 +7,7 @@ export interface NftData {
   contract: string;
   title: string;
   description: string;
-  chainId: number;
+  chainId: SupportedChainId;
   image: string;
   imageRaw: string;
   imageThumb?: string;

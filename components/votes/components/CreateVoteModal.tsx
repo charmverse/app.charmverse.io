@@ -2,8 +2,6 @@ import { FormControlLabel, IconButton, ListItem, Radio, RadioGroup, TextField, T
 import { Box } from '@mui/system';
 import { VoteType } from '@prisma/client';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
 import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Modal from 'components/common/Modal';
@@ -148,7 +146,7 @@ export default function CreateVoteModal ({ open = true, onClose, onCreateVote, i
     || (new Set(options.map(option => option.name)).size !== options.length);
 
   return (
-    <Modal title='Create a vote' size='large' open={open} onClose={onClose ?? (() => {})}>
+    <Modal title={isProposal ? 'Create a vote' : 'Create a poll'} size='large' open={open} onClose={onClose ?? (() => {})}>
       <Box
         flexDirection='column'
         gap={1.5}
@@ -186,37 +184,35 @@ export default function CreateVoteModal ({ open = true, onClose, onCreateVote, i
           <Box flexDirection='column' display='flex' flexGrow={1}>
             <FieldLabel>Deadline</FieldLabel>
             {/* This as any statement is to save time. We are providing an official adapter from MUI Library as outlined here https://mui.com/x/react-date-pickers/date-picker/#basic-usage */}
-            <LocalizationProvider dateAdapter={AdapterLuxon as any}>
-              <DateTimePicker
-                minDate={DateTime.fromMillis(Date.now())}
-                value={deadline}
-                onAccept={async (value) => {
-                  if (value) {
-                    setDeadline(value);
-                  }
-                }}
-                onChange={(value) => {
-                  if (value) {
-                    setDeadline(value);
-                  }
-                }}
-                renderInput={(props) => (
-                  <TextField
-                    {...props}
-                    inputProps={{
-                      ...props.inputProps,
-                      readOnly: true
-                    }}
-                    fullWidth
-                    onClick={() => {
-                      setIsDateTimePickerOpen((_isDateTimePickerOpen) => !_isDateTimePickerOpen);
-                    }}
-                  />
-                )}
-                onClose={() => setIsDateTimePickerOpen(false)}
-                open={isDateTimePickerOpen}
-              />
-            </LocalizationProvider>
+            <DateTimePicker
+              minDate={DateTime.fromMillis(Date.now())}
+              value={deadline}
+              onAccept={async (value) => {
+                if (value) {
+                  setDeadline(value);
+                }
+              }}
+              onChange={(value) => {
+                if (value) {
+                  setDeadline(value);
+                }
+              }}
+              renderInput={(props) => (
+                <TextField
+                  {...props}
+                  inputProps={{
+                    ...props.inputProps,
+                    readOnly: true
+                  }}
+                  fullWidth
+                  onClick={() => {
+                    setIsDateTimePickerOpen((_isDateTimePickerOpen) => !_isDateTimePickerOpen);
+                  }}
+                />
+              )}
+              onClose={() => setIsDateTimePickerOpen(false)}
+              open={isDateTimePickerOpen}
+            />
           </Box>
           <Box flexDirection='column' display='flex' flexGrow={1}>
             <FieldLabel>Pass Threshold (%)</FieldLabel>

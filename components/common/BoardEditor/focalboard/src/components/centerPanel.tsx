@@ -182,7 +182,7 @@ function CenterPanel (props: Props) {
   //   })
   // }
 
-  const addCard = async (groupByOptionId?: string, show = false, properties: Record<string, string> = {}, insertLast = true): Promise<void> => {
+  const addCard = async (groupByOptionId?: string, show = false, properties: Record<string, string> = {}, insertLast = true, isTemplate = false): Promise<void> => {
     const { activeView, board } = props;
 
     if (!activeView) {
@@ -210,6 +210,7 @@ function CenterPanel (props: Props) {
     }
 
     card.fields.contentOrder = [];
+    card.fields.isTemplate = isTemplate;
 
     mutator.performAsUndoGroup(async () => {
       const newCardOrder = insertLast ? [...activeView.fields.cardOrder, card.id] : [card.id, ...activeView.fields.cardOrder];
@@ -228,7 +229,10 @@ function CenterPanel (props: Props) {
               revalidate: false
             });
           }
-          if (show) {
+
+          if (isTemplate) {
+            showCard(block.id)
+          } else if (show) {
             props.addCard(createCard(block));
             props.updateView({ ...activeView, fields: { ...activeView.fields, cardOrder: newCardOrder } });
             showCard(block.id);
@@ -244,29 +248,6 @@ function CenterPanel (props: Props) {
         }
       );
     });
-  };
-
-  const addCardTemplate = async () => {
-    const { board, activeView } = props;
-
-    const cardTemplate = createCard();
-    cardTemplate.fields.isTemplate = true;
-    cardTemplate.parentId = board.id;
-    cardTemplate.rootId = board.rootId;
-
-    await mutator.insertBlock(
-      cardTemplate,
-      'add card template',
-      async (newBlock: Block) => {
-        const newTemplate = createCard(newBlock);
-        // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.CreateCardTemplate, {board: board.id, view: activeView.id, card: newTemplate.id})
-        props.addTemplate(newTemplate);
-        showCard(newTemplate.id);
-      },
-      async () => {
-        showCard(undefined);
-      }
-    );
   };
 
   const editCardTemplate = (cardTemplateId: string) => {
@@ -507,9 +488,10 @@ function CenterPanel (props: Props) {
           groupByProperty={groupByProperty}
           dateDisplayProperty={dateDisplayProperty}
           addCard={() => addCard('', true)}
+          showCard={showCard}
           showView={showView}
           // addCardFromTemplate={addCardFromTemplate}
-          addCardTemplate={addCardTemplate}
+          addCardTemplate={() => addCard('', true, {}, false, true)}
           editCardTemplate={editCardTemplate}
           readonly={props.readonly}
           embeddedBoardPath={props.embeddedBoardPath}

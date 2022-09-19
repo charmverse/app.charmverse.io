@@ -51,7 +51,7 @@ describe('GET /api/public/profile/[userPath]', () => {
 
   it('Should combine several responses', async () => {
 
-    await generateBountyWithSingleApplication({
+    const bounty = await generateBountyWithSingleApplication({
       bountyCap: 1,
       applicationStatus: 'complete',
       spaceId: space.id,
@@ -123,8 +123,9 @@ describe('GET /api/public/profile/[userPath]', () => {
         isHidden: false,
         logo: null,
         joinDate: proposal1.createdAt,
-        votes: [{ ...vote1, type: 'vote' }, { ...vote2, type: 'vote' }],
-        proposals: [{ ...proposal1, type: 'proposal' }, { ...proposal2, type: 'proposal' }],
+        votes: [vote1, vote2],
+        proposals: [proposal1, proposal2],
+        bounties: [],
         latestEventDate: vote2.createdAt
       }, {
         id: '2',
@@ -132,18 +133,34 @@ describe('GET /api/public/profile/[userPath]', () => {
         isHidden: false,
         logo: null,
         joinDate: vote3.createdAt,
-        votes: [{ ...vote3, type: 'vote' }],
+        votes: [vote3],
         proposals: [],
+        bounties: [],
         latestEventDate: vote3.createdAt
       }, {
         id: space.id,
         joinDate: space.spaceRoles[0].createdAt.toISOString(),
+        latestEventDate: bounty.createdAt.toISOString(),
         name: space.name,
         isHidden: false,
         logo: null,
         votes: [],
         proposals: [],
-        latestEventDate: ''
+        bounties: [{
+          bountyId: bounty.id,
+          createdAt: bounty.applications[0].createdAt.toISOString(),
+          eventName: 'bounty_completed',
+          organizationId: space.id,
+          bountyPath: `/${space.domain}/${bounty.page?.path}`,
+          bountyTitle: bounty.page?.title
+        }, {
+          bountyId: bounty.id,
+          createdAt: bounty.createdAt.toISOString(),
+          eventName: 'bounty_created',
+          organizationId: space.id,
+          bountyPath: `/${space.domain}/${bounty.page?.path}`,
+          bountyTitle: bounty.page?.title
+        }]
       }]
     });
   });

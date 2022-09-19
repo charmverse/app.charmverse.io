@@ -3,7 +3,8 @@ import { PageOperationType } from './page-permission-interfaces';
 
 export const permissionLevels: Record<keyof typeof PagePermissionLevel, string> = {
   full_access: 'Full access',
-  editor: 'Edit',
+  proposal_editor: 'Edit proposal',
+  editor: 'Editor',
   view_comment: 'View and comment',
   view: 'View',
   custom: 'Custom'
@@ -24,6 +25,7 @@ export const permissionDescriptions: Record<PageOperationType, string> = {
 
 export const permissionTemplates: Record<keyof typeof PagePermissionLevel, PageOperationType []> = {
   full_access: Object.keys(PageOperations) as PageOperationType [],
+  proposal_editor: ['read', 'comment', 'edit_content', 'edit_isPublic', 'delete'],
   editor: ['read', 'edit_content', 'comment'],
   view_comment: ['read', 'comment'],
   view: ['read'],

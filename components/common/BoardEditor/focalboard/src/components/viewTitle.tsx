@@ -120,7 +120,7 @@ function ViewTitle(props: Props) {
           )}
       </div>
 
-      <div className='title'>
+      <div className='title' data-test='board-title'>
         <BlockIconSelector readonly={props.readonly} block={board} setPage={props.setPage} />
         <Editable
           className='title'
@@ -144,6 +144,7 @@ function ViewTitle(props: Props) {
               onContentChange={(content: ICharmEditorOutput) => {
                 onDescriptionChange(content.doc);
               }}
+              pageId={board.id}
             />
           </div>
         )}

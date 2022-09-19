@@ -1,7 +1,7 @@
 
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Board } from '../blocks/board';
-import { RootState } from './index';
+import type { RootState } from './index';
 import { initialLoad, initialReadOnlyLoad } from './initialLoad';
 
 type BoardsState = {
@@ -21,7 +21,6 @@ const boardsSlice = createSlice({
       state.boards[action.payload.id] = action.payload;
     },
     updateBoards: (state, action: PayloadAction<Board[]>) => {
-      console.log({boards: action.payload});
 
       for (const board of action.payload) {
         /* if (board.deletedAt !== 0 && board.deletedAt !== null) {

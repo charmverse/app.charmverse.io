@@ -15,6 +15,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import useSWR from 'swr';
 import VoteActionsMenu from 'components/votes/components/VoteActionsMenu';
 import { UserVote } from '@prisma/client';
+import useTasks from 'components/nexus/hooks/useTasks';
 
 export interface VoteDetailProps {
   vote: ExtendedVote;
@@ -44,7 +45,8 @@ export default function VoteDetail ({ cancelVote, castVote, deleteVote, detailed
   const { deadline, totalVotes, description, id, title, userChoice, voteOptions, aggregatedResult } = vote;
   const { user } = useUser();
   const view = useEditorViewContext();
-  const { data: userVotes, mutate } = useSWR(detailed ? `/votes/${id}/user-votes` : null, () => charmClient.getUserVotes(id));
+  const { data: userVotes, mutate } = useSWR(detailed ? `/votes/${id}/user-votes` : null, () => charmClient.votes.getUserVotes(id));
+  const { mutate: refetchTasks } = useTasks();
 
   const voteDetailsPopup = usePopupState({ variant: 'popover', popupId: 'inline-votes-detail' });
 
@@ -57,7 +59,7 @@ export default function VoteDetail ({ cancelVote, castVote, deleteVote, detailed
       gap: 1
     }}
     >
-      <span>Votes</span> <Chip size='small' label={totalVotes} />
+      <span>Polls</span> <Chip size='small' label={totalVotes} />
     </Box>
   );
 
@@ -77,7 +79,7 @@ export default function VoteDetail ({ cancelVote, castVote, deleteVote, detailed
     <StyledDiv detailed={detailed} id={`vote.${vote.id}`}>
       <Box display='flex' justifyContent='space-between' alignItems='center'>
         <Typography variant='h6' fontWeight='bold'>
-          {!isProposal ? title : 'Vote on this proposal'}
+          {!isProposal ? title : 'Poll on this proposal'}
         </Typography>
         <VoteActionsMenu deleteVote={deleteVote} cancelVote={cancelVote} vote={vote} removeFromPage={removeFromPage} />
       </Box>
@@ -131,6 +133,10 @@ export default function VoteDetail ({ cancelVote, castVote, deleteVote, detailed
               onChange={async () => {
                 if (user) {
                   const userVote = await castVote(id, voteOption.name);
+                  // Only refetch tasks if the user hasn't voted yet
+                  if (!userVoteChoice) {
+                    refetchTasks();
+                  }
                   mutate((_userVotes) => {
                     if (_userVotes) {
                       const existingUserVoteIndex = _userVotes.findIndex(_userVote => _userVote.userId === user.id);
@@ -192,7 +198,7 @@ export default function VoteDetail ({ cancelVote, castVote, deleteVote, detailed
           ))}
         </List>
       )}
-      <Modal title='Vote details' size='large' open={voteDetailsPopup.isOpen} onClose={voteDetailsPopup.close}>
+      <Modal title='Poll details' size='large' open={voteDetailsPopup.isOpen} onClose={voteDetailsPopup.close}>
         <VoteDetail
           vote={vote}
           detailed={true}

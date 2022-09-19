@@ -1,30 +1,35 @@
 
 import { Stack, Typography, IconButton, Collapse, Tabs, Tab, Tooltip } from '@mui/material';
 import { Box } from '@mui/system';
-import { ReactNode, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
+import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import CheckIcon from '@mui/icons-material/VerifiedUser';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import ForumIcon from '@mui/icons-material/Forum';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import { showDateWithMonthAndYear } from 'lib/utilities/dates';
 import { DeepDaoProposal, DeepDaoVote } from 'lib/deepdao/interfaces';
-import { UserCommunity } from 'lib/profile/interfaces';
+import { UserCommunity, ProfileBountyEvent } from 'lib/profile/interfaces';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import Avatar from 'components/common/Avatar';
-import { ProfileItemContainer } from './ProfileItems';
+import Link from 'components/common/Link';
+import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
+import { ProfileItemContainer } from './CollectibleRow';
 
 const TASK_TABS = [
   { icon: <HowToVoteIcon />, label: 'Votes', type: 'vote' },
-  { icon: <ForumIcon />, label: 'Proposals', type: 'proposal' },
-  { icon: <ForumIcon />, label: 'VCs', type: 'verifiable_credential' }
+  { icon: <TaskOutlinedIcon />, label: 'Proposals', type: 'proposal' },
+  { icon: <BountyIcon />, label: 'Bounties', type: 'bounty' }
 ] as const;
 
 export type CommunityDetails = UserCommunity & {
   proposals: DeepDaoProposal[];
   votes: DeepDaoVote[];
+  bounties: ProfileBountyEvent[];
   joinDate: string;
   latestEventDate?: string;
 }
@@ -49,7 +54,8 @@ function CountIcon ({ label, icon, count }: { label: string, icon: ReactNode, co
   );
 }
 
-function TaskTab ({ task, onClick }: { task: typeof TASK_TABS[number], onClick: () => void }) {
+function TaskTab ({ task, value, onClick }: { task: typeof TASK_TABS[number], value: number, onClick: () => void }) {
+
   return (
     <Tab
       iconPosition='start'
@@ -64,6 +70,7 @@ function TaskTab ({ task, onClick }: { task: typeof TASK_TABS[number], onClick: 
         }
       }}
       label={task.label}
+      value={value}
       onClick={onClick}
     />
   );
@@ -72,7 +79,7 @@ function TaskTab ({ task, onClick }: { task: typeof TASK_TABS[number], onClick: 
 interface EventRowProps {
   eventNumber: number;
   icon: ReactNode;
-  title: string;
+  title: string | ReactNode;
   createdAt: string;
 }
 
@@ -87,7 +94,7 @@ function EventRow (event: EventRowProps) {
         alignSelf='flex-start'
       >
         {event.icon}
-        <Typography fontWeight={500}>{event.eventNumber}.</Typography>
+        <Typography variant='body2' color='secondary'>{event.eventNumber || ' '}.</Typography>
       </Stack>
       <Stack
         gap={0.5}
@@ -100,7 +107,7 @@ function EventRow (event: EventRowProps) {
           alignItems: 'flex-start'
         }}
       >
-        <Typography sx={{ flexGrow: 1 }}>
+        <Typography variant='body2' sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
           {event.title}
         </Typography>
         <Typography variant='subtitle1' color='secondary' textAlign={{ sm: 'left', md: 'right' }} minWidth={100}>{showDateWithMonthAndYear(event.createdAt, true)}</Typography>
@@ -154,20 +161,29 @@ function ProposalsPanel ({ events }: { events: DeepDaoProposal[] }) {
   );
 }
 
-function VerifiableCredentialsPanel ({ events }: { events: DeepDaoProposal[] }) {
-
+function BountyEventsPanel ({ events }: { events: ProfileBountyEvent[] }) {
   return (
     <>
       {
         events.sort((eventA, eventB) => eventA.createdAt > eventB.createdAt ? -1 : 1)
           .map((event, index) => (
             <EventRow
-              key={event.proposalId}
+              key={event.bountyId}
               createdAt={event.createdAt}
-              title={event.title}
-              icon={event.outcome === event.voteChoice
-                ? <ThumbUpIcon color='success' sx={{ fontSize: '16px' }} />
-                : <ThumbDownIcon color='error' sx={{ fontSize: '16px' }} />}
+              title={(
+                <>
+                  {bountyStatus(event.eventName)}:&nbsp;
+                  <Link href={event.bountyPath} color='inherit'>
+                    <strong>{event.bountyTitle || 'Untitled'}</strong>
+                  </Link>
+                  {event.hasCredential && (
+                    <Tooltip color='success' title='Verified with Collab.land'>
+                      <CheckIcon fontSize='small' />
+                    </Tooltip>
+                  )}
+                </>
+              )}
+              icon={null}
               eventNumber={index + 1}
             />
           ))
@@ -176,14 +192,35 @@ function VerifiableCredentialsPanel ({ events }: { events: DeepDaoProposal[] }) 
   );
 }
 
+function bountyStatus (status: ProfileBountyEvent['eventName']) {
+  switch (status) {
+    case 'bounty_created':
+      return 'Created';
+    case 'bounty_completed':
+      return 'Completed';
+    case 'bounty_started':
+      return 'Started';
+    default:
+      return 'Event';
+  }
+}
+
 export default function CommunityRow ({ community, showVisibilityIcon, visible, onClick }: CommunityRowProps) {
-  const [isCollapsed, setIsCollapsed] = useState(true);
-  const [currentTab, setCurrentTab] = useState<typeof TASK_TABS[number]['type']>('vote');
 
   const hasVotes = community.votes.length > 0;
   const hasProposals = community.proposals.length > 0;
-  const hasVCs = false;
-  const isCollapsible = hasVotes || hasProposals || hasVCs;
+  const hasBounties = community.bounties.length > 0;
+  const isCollapsible = hasVotes || hasProposals || hasBounties;
+  const defaultTab = hasVotes ? 0 : hasProposals ? 1 : hasBounties ? 2 : null;
+
+  const [currentTab, setCurrentTab] = useState<number>(0);
+  const [isCollapsed, setIsCollapsed] = useState(true);
+
+  useEffect(() => {
+    if (defaultTab !== null) {
+      setCurrentTab(defaultTab);
+    }
+  }, [defaultTab]);
 
   function toggleCollapse () {
     if (isCollapsible) {
@@ -192,12 +229,7 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
   }
 
   return (
-    <ProfileItemContainer
-      gap={0.5}
-      sx={{
-        opacity: visible ? 1 : 0.25
-      }}
-    >
+    <ProfileItemContainer visible={visible}>
       <Box
         display='flex'
         gap={2}
@@ -206,6 +238,7 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
         onClick={toggleCollapse}
       >
         <Avatar
+          className='hidden-on-visible'
           avatar={community.logo}
           name={community.name}
           variant='rounded'
@@ -217,7 +250,7 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
           justifyContent='space-between'
           flexGrow={1}
         >
-          <Box>
+          <Box className='hidden-on-visible'>
             <Typography
               sx={{
                 fontSize: {
@@ -236,7 +269,7 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
             )}
             <CountIcon icon={<HowToVoteIcon />} label='Votes' count={community.votes.length} />
             <CountIcon icon={<ForumIcon />} label='Proposals' count={community.proposals.length} />
-            <CountIcon icon={<ForumIcon />} label='VCs' count={community.proposals.length} />
+            <CountIcon icon={<BountyIcon />} label='Bounties' count={community.bounties.length} />
           </Box>
           <Box display='flex' alignItems='center' gap={0.5}>
             {showVisibilityIcon && (
@@ -265,7 +298,7 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
               </Tooltip>
             )}
             {isCollapsible && (
-              <IconButton size='small'>
+              <IconButton className='hidden-on-visible' size='small'>
                 {isCollapsed ? <ExpandMoreIcon fontSize='small' /> : <ExpandLessIcon fontSize='small' />}
               </IconButton>
             )}
@@ -274,22 +307,22 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
       </Box>
 
       <Collapse in={!isCollapsed}>
-        <Box>
+        <Box className='hidden-on-visible'>
           <Tabs
             sx={{
               mb: 2
             }}
             indicatorColor='primary'
-            value={TASK_TABS.findIndex(taskTab => taskTab.type === currentTab)}
+            value={currentTab}
           >
-            {hasVotes && <TaskTab task={TASK_TABS[0]} onClick={() => setCurrentTab(TASK_TABS[0].type)} />}
-            {hasProposals && <TaskTab task={TASK_TABS[1]} onClick={() => setCurrentTab(TASK_TABS[1].type)} />}
-            {hasVCs && <TaskTab task={TASK_TABS[2]} onClick={() => setCurrentTab(TASK_TABS[2].type)} />}
+            {hasVotes && <TaskTab task={TASK_TABS[0]} value={0} onClick={() => setCurrentTab(0)} />}
+            {hasProposals && <TaskTab task={TASK_TABS[1]} value={1} onClick={() => setCurrentTab(1)} />}
+            {hasBounties && <TaskTab task={TASK_TABS[2]} value={2} onClick={() => setCurrentTab(2)} />}
           </Tabs>
           <Stack gap={2}>
-            {currentTab === 'vote' && <VotesPanel events={community.votes} />}
-            {currentTab === 'proposal' && <ProposalsPanel events={community.proposals} />}
-            {currentTab === 'verifiable_credential' && <VerifiableCredentialsPanel events={community.proposals} />}
+            {currentTab === 0 && <VotesPanel events={community.votes} />}
+            {currentTab === 1 && <ProposalsPanel events={community.proposals} />}
+            {currentTab === 2 && <BountyEventsPanel events={community.bounties} />}
           </Stack>
         </Box>
       </Collapse>

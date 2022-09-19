@@ -1,4 +1,3 @@
-import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { useRef, ReactNode, useState } from 'react';
 import Avatar from 'components/common/Avatar';
@@ -7,30 +6,20 @@ import Box from '@mui/material/Box';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
-import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
 import { AvatarEditMenu } from 'components/settings/workspace/AvatarEditMenu';
-import NftAvatarGallery from 'components/profile/components/NftAvatarGallery';
+
+import { useS3UploadInput } from 'hooks/useS3UploadInput';
+import NftAvatarGalleryPopup from 'components/profile/components/NftAvatarGallery/NftAvatarGalleryPopup';
+
 import type { NftData } from 'lib/blockchain/interfaces';
 import type { UserAvatar } from 'lib/users/interfaces';
+import { SupportedChainId } from 'lib/blockchain/provider/alchemy';
 
 const StyledBox = styled(Box)`
   display: inline-block;
 `;
 
-const baseAvatarStyles = css`
-  font-size: 90px;
-  width: 150px;
-  height: 150px;
-`;
-
-const StyledAvatar = styled(Avatar)`
-  ${baseAvatarStyles}
-  ${({ variant }) => variant === 'rounded' && 'border-radius: 25px'};
-`;
-
 const StyledAvatarWithIcons = styled(AvatarWithIcons)`
-  ${baseAvatarStyles}
-  ${({ variant }) => variant === 'rounded' && 'border-radius: 25px'};
   &:hover .edit-avatar-icon, .delete-avatar-icon {
     display: initial;
   }
@@ -73,30 +62,16 @@ const getIcons = (editIcon: ReactNode, deleteIcon: ReactNode, avatar: string | n
 
 export default function LargeAvatar (props: LargeAvatarProps) {
   const { name, image, updateAvatar, variant, editable, canSetNft, isSaving, updateImage, isNft } = props;
-  const inputFile = useRef<HTMLInputElement>(null);
   const editIconRef = useRef(null);
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [isGalleryVisible, setIsGalleryVisible] = useState(false);
-
-  function onUploadClick () {
-    inputFile?.current?.click();
-  }
-
-  function onEditClick (event: React.MouseEvent<HTMLElement>) {
-    if (canSetNft) {
-      setMenuAnchorEl(event.currentTarget);
-    }
-    else {
-      onUploadClick();
-    }
-  }
 
   function onNftSelect (nft: NftData) {
     const userAvatar: UserAvatar = {
       avatar: nft.image,
       avatarContract: nft.contract,
       avatarTokenId: nft.tokenId,
-      avatarChain: nft.chainId
+      avatarChain: nft.chainId as SupportedChainId
     };
 
     updateAvatar?.(userAvatar);
@@ -118,13 +93,25 @@ export default function LargeAvatar (props: LargeAvatarProps) {
     updateAvatar?.(userAvatar);
   }
 
+  const { inputRef, openFilePicker, onFileChange } = useS3UploadInput(updateImageAvatar);
+
+  function onEditClick (event: React.MouseEvent<HTMLElement>) {
+    if (canSetNft) {
+      setMenuAnchorEl(event.currentTarget);
+    }
+    else {
+      openFilePicker();
+    }
+  }
+
   if (!editable) {
     return (
-      <StyledAvatar
+      <Avatar
         avatar={image}
         name={name}
         variant={variant}
         isNft={isNft}
+        size='2xLarge'
       />
     );
   }
@@ -150,21 +137,8 @@ export default function LargeAvatar (props: LargeAvatarProps) {
         type='file'
         hidden
         accept='image/*'
-        ref={inputFile}
-        onChange={async (e) => {
-          const firstFile = e.target.files?.[0];
-          if (!firstFile) {
-            return;
-          }
-
-          const { url } = await uploadToS3(firstFile);
-
-          updateImageAvatar(url);
-
-          // This is a fix for when trying to select the same file again after
-          // having removed it.
-          e.target.value = '';
-        }}
+        ref={inputRef}
+        onChange={onFileChange}
       />
       <StyledAvatarWithIcons
         avatar={image}
@@ -172,16 +146,17 @@ export default function LargeAvatar (props: LargeAvatarProps) {
         variant={variant}
         icons={icons}
         isNft={isNft}
+        size='2xLarge'
       />
       {canSetNft && (
         <>
           <AvatarEditMenu
             anchorEl={menuAnchorEl}
             onClose={() => setMenuAnchorEl(null)}
-            onUploadClick={onUploadClick}
+            onUploadClick={openFilePicker}
             onNftClick={() => setIsGalleryVisible(true)}
           />
-          <NftAvatarGallery isVisible={isGalleryVisible} onClose={() => setIsGalleryVisible(false)} onSelect={onNftSelect} isSaving={isSaving} />
+          <NftAvatarGalleryPopup isVisible={isGalleryVisible} onClose={() => setIsGalleryVisible(false)} onSelect={onNftSelect} isSaving={isSaving} />
         </>
       )}
     </StyledBox>

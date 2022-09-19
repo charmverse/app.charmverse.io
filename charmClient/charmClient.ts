@@ -1,44 +1,46 @@
 
 import {
   Block, InviteLink, Page, PagePermissionLevel, PaymentMethod, Prisma,
-  Role, Space, TelegramUser, TokenGate, TokenGateToRole, User, UserDetails, UserGnosisSafe, UserVote
+  Role, Space, TelegramUser, TokenGate, TokenGateToRole, User, UserDetails, UserGnosisSafe
 } from '@prisma/client';
 import * as http from 'adapters/http';
 import type { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/focalboard/src/blocks/block';
 import type { IUser } from 'components/common/BoardEditor/focalboard/src/user';
 import type { FiatCurrency, IPairQuote } from 'connectors';
+import { ExtendedPoap } from 'lib/blockchain/interfaces';
 import type { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
-import type { AggregatedProfileData } from 'lib/profile';
 import type { FailedImportsError } from 'lib/notion/types';
 import type { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
+import type { AssignedPermissionsQuery } from 'lib/permissions/interfaces';
+import type { SpacePermissionConfigurationUpdate } from 'lib/permissions/meta/interfaces';
 import type { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee, IPagePermissionWithSource, SpaceDefaultPublicPageToggle } from 'lib/permissions/pages/page-permission-interfaces';
 import type { SpacePermissionFlags, SpacePermissionModification } from 'lib/permissions/spaces';
+import type { AggregatedProfileData } from 'lib/profile';
 import type { MarkTask } from 'lib/tasks/markTasks';
 import type { MultipleThreadsInput, ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import type { TokenGateEvaluationAttempt, TokenGateEvaluationResult, TokenGateVerification, TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { encodeFilename } from 'lib/utilities/encodeFilename';
-import { ExtendedPoap } from 'lib/blockchain/interfaces';
-import type { ExtendedVote, UserVoteExtendedDTO, VoteDTO } from 'lib/votes/interfaces';
 import type { Contributor, LoggedInUser, PageContent } from 'models';
 import type { ServerBlockFields } from 'pages/api/blocks';
 import type { ConnectDiscordPayload, ConnectDiscordResponse } from 'pages/api/discord/connect';
 import type { ImportDiscordRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
 import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import type { InviteLinkPopulated } from 'pages/api/invites/index';
-import type { PublicUser } from 'pages/api/public/profile/[userPath]';
+import type { PublicUser } from 'pages/api/public/profile/[userId]';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 import type { GetTasksStateResponse, UpdateTasksState } from 'pages/api/tasks/state';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 import type { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
-import type { AssignedPermissionsQuery } from '../lib/permissions/interfaces';
-import type { SpacePermissionConfigurationUpdate } from '../lib/permissions/meta/interfaces';
-import { BountiesApi } from './apis/bountiesApi';
 import { BlockchainApi } from './apis/blockchainApi';
+import { BountiesApi } from './apis/bountiesApi';
+import { CollablandApi } from './apis/collablandApi';
 import { ProfileApi } from './apis/profileApi';
+import { ProposalsApi } from './apis/proposalsApi';
+import { VotesApi } from './apis/votesApi';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -46,11 +48,18 @@ type BlockUpdater = (blocks: FBBlock[]) => void;
 // CharmClient is the client interface to the server APIs
 //
 class CharmClient {
+
   blockchain = new BlockchainApi();
+
+  bounties = new BountiesApi();
+
+  collabland = new CollablandApi();
+
+  votes = new VotesApi();
 
   profile = new ProfileApi();
 
-  bounties = new BountiesApi();
+  proposals = new ProposalsApi();
 
   async login (address: string) {
     const user = await http.POST<LoggedInUser>('/api/session/login', {
@@ -590,40 +599,8 @@ class CharmClient {
     return http.POST('/api/tasks/mark', tasks);
   }
 
-  getAggregatedData (userPath: string) {
-    return http.GET<AggregatedProfileData>(`/api/public/profile/${userPath}/aggregate`);
-  }
-
-  getVotesByPage (pageId: string) {
-    return http.GET<ExtendedVote[]>(`/api/pages/${pageId}/votes`);
-  }
-
-  getVotesBySpace (spaceId: string) {
-    return http.GET<ExtendedVote[]>(`/api/spaces/${spaceId}/votes`);
-  }
-
-  createVote (votePayload: VoteDTO) {
-    return http.POST<ExtendedVote>('/api/votes', votePayload);
-  }
-
-  cancelVote (voteId: string) {
-    return http.PUT(`/api/votes/${voteId}`, {
-      status: 'Cancelled'
-    });
-  }
-
-  deleteVote (voteId: string) {
-    return http.DELETE(`/api/votes/${voteId}`);
-  }
-
-  castVote (voteId: string, choice: string) {
-    return http.POST<UserVote>(`/api/votes/${voteId}/cast`, {
-      choice
-    });
-  }
-
-  getUserVotes (voteId: string) {
-    return http.GET<UserVoteExtendedDTO[]>(`/api/votes/${voteId}/user-votes`);
+  getAggregatedData (userId: string) {
+    return http.GET<AggregatedProfileData>(`/api/public/profile/${userId}/aggregate`);
   }
 }
 

@@ -1,7 +1,8 @@
-import { Block, Page, PagePermission, Space } from '@prisma/client';
-import { Board } from 'lib/focalboard/board';
-import { BoardView } from 'lib/focalboard/boardView';
-import { Card } from 'lib/focalboard/card';
+import type { Block, Page, PagePermission, Space } from '@prisma/client';
+import type { Board } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import type { Card } from 'lib/focalboard/card';
+import type { ProposalWithUsers } from 'lib/proposal/interface';
 
 export interface IPageWithPermissions extends Page {
   permissions: (PagePermission & {sourcePermission: PagePermission | null}) []
@@ -41,7 +42,7 @@ export interface PublicPageResponse {
 // Generic type A is optional, we can mount additional properties on basic node definitions
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export type PageNode<A = {}> = Pick<Page, 'id' | 'type' | 'parentId' | 'index' | 'createdAt' | 'deletedAt'> & A
+export type PageNode<A = {}> = Pick<Page, 'id' | 'spaceId' | 'type' | 'parentId' | 'index' | 'createdAt' | 'deletedAt'> & A
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type PageNodeWithChildren<A = {}> = PageNode<{children: PageNodeWithChildren<A>[]}> & A
@@ -59,13 +60,18 @@ export interface PageTreeMappingInput<T extends PageNode> {
   rootPageIds?: string[],
   targetPageId?: string,
   includeCards?: boolean,
-  includeDeletedPages?: boolean
+  includeDeletedPages?: boolean,
+  includeProposals?: boolean
 }
 
+/**
+ * @pageNodes An existing list of pages from the database which we can use to build the tree. Used in a context where we want to perform multiple resolvePageTree operations without calling the database multiple times
+ */
 export interface PageTreeResolveInput {
   pageId: string,
   flattenChildren?: boolean,
   includeDeletedPages?: boolean
+  pageNodes?: PageNodeWithPermissions[]
 }
 
 export type TargetPageTree<T extends PageNode = PageNode> = {
@@ -81,3 +87,7 @@ export type TargetPageTreeWithFlatChildren<T extends PageNode = PageNode> = {
   targetPage: PageNodeWithChildren<T>,
   flatChildren: PageNodeWithChildren<T>[]
 }
+
+export type PageWithProposal = (Page & {proposal: ProposalWithUsers | null})
+
+export type PagesMap<P extends IPageWithPermissions | PageNode = IPageWithPermissions> = Record<string, P | undefined>;

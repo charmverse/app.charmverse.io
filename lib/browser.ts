@@ -1,5 +1,5 @@
 
-export function isMobile (): boolean {
+export function isTouchScreen (): boolean {
   const toMatch = [
     /Android/i,
     /webOS/i,

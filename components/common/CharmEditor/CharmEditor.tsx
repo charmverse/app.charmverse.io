@@ -18,6 +18,7 @@ import { EditorState, EditorView, Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import { Box, Divider, Slide } from '@mui/material';
+import { PageType } from '@prisma/client';
 import charmClient from 'charmClient';
 import * as codeBlock from 'components/common/CharmEditor/components/@bangle.dev/base-components/code-block';
 import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
@@ -32,6 +33,7 @@ import { useUser } from 'hooks/useUser';
 import { silentlyUpdateURL } from 'lib/browser';
 import { extractDeletedThreadIds } from 'lib/inline-comments/extractDeletedThreadIds';
 import log from 'lib/log';
+import { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
 import debounce from 'lodash/debounce';
 import { PageContent } from 'models';
 import { CSSProperties, memo, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
@@ -42,13 +44,12 @@ import * as columnLayout from './components/columnLayout';
 import LayoutColumn from './components/columnLayout/Column';
 import LayoutRow from './components/columnLayout/Row';
 import { CryptoPrice } from './components/CryptoPrice';
-import InlineDatabase from './components/inlineDatabase/components/InlineDatabase';
-import * as inlineDatabase from './components/inlineDatabase';
 import * as disclosure from './components/disclosure';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
 import * as floatingMenu from './components/floatingMenu';
 import * as iframe from './components/iframe';
 import InlineCommentThread, * as inlineComment from './components/inlineComment';
+import InlineDatabase from './components/inlineDatabase/components/InlineDatabase';
 import InlinePalette, { plugins as inlinePalettePlugins } from './components/inlinePalette';
 import * as inlineVote from './components/inlineVote';
 import InlineVoteList from './components/inlineVote/components/InlineVoteList';
@@ -279,17 +280,14 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{disablePageSpecificFe
 const PageActionListBox = styled.div`
   position: fixed;
   right: 0px;
-  width: 400px;
-  top: 75px;
+  width: 416px;
+  max-width: 100%;
+  top: 56px; // height of MUI Toolbar
   z-index: var(--z-index-drawer);
   height: calc(100% - 80px);
   overflow: auto;
-  margin-right: ${({ theme }) => theme.spacing(1)};
+  padding: 0 ${({ theme }) => theme.spacing(1)};
   background: ${({ theme }) => theme.palette.background.default};
-  display: none;
-  ${({ theme }) => theme.breakpoints.up('md')} {
-    display: block;
-  }
 `;
 
 const defaultContent: PageContent = {
@@ -312,8 +310,10 @@ interface CharmEditorProps {
   pageActionDisplay?: IPageActionDisplayContext['currentPageActionDisplay']
   disablePageSpecificFeatures?: boolean;
   enableVoting?: boolean;
-  pageId?: string | null;
+  pageId: string;
   containerWidth?: number;
+  pageType?: PageType;
+  pagePermissions?: IPagePermissionFlags;
 }
 
 export function convertPageContentToMarkdown (content: PageContent, title?: string): string {
@@ -347,7 +347,9 @@ function CharmEditor (
     disablePageSpecificFeatures = false,
     enableVoting,
     pageId,
-    containerWidth
+    containerWidth,
+    pageType,
+    pagePermissions
   }:
   CharmEditorProps
 ) {
@@ -565,7 +567,13 @@ function CharmEditor (
         }
       }}
     >
-      <floatingMenu.FloatingMenu enableComments={!disablePageSpecificFeatures} enableVoting={enableVoting} pluginKey={floatingMenuPluginKey} />
+      <floatingMenu.FloatingMenu
+        enableComments={!disablePageSpecificFeatures}
+        enableVoting={enableVoting}
+        pluginKey={floatingMenuPluginKey}
+        pageType={pageType}
+        pagePermissions={pagePermissions}
+      />
       <MentionSuggest pluginKey={mentionPluginKey} />
       <NestedPagesList pluginKey={nestedPagePluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
@@ -594,7 +602,7 @@ function CharmEditor (
           </Slide>
           <Slide
             direction='left'
-            in={pageActionDisplay === 'votes'}
+            in={pageActionDisplay === 'polls'}
             style={{
               transformOrigin: 'left top'
             }}

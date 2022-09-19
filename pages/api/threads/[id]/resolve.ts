@@ -39,8 +39,7 @@ async function resolveThread (req: NextApiRequest, res: NextApiResponse<ThreadWi
 
   const permissionSet = await computeUserPagePermissions({
     pageId: thread.pageId,
-    userId,
-    allowAdminBypass: false
+    userId
   });
 
   if (!permissionSet.comment) {

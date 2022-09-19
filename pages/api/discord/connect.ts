@@ -19,13 +19,13 @@ const handler = nc({
 });
 
 export interface ConnectDiscordPayload {
-  code: string
+  code: string;
 }
 
 export interface ConnectDiscordResponse {
-  discordUser: DiscordUser,
-  avatar: string | null,
-  username: string | null
+  discordUser: DiscordUser;
+  avatar: string | null;
+  username: string | null;
 }
 
 // TODO: Add nonce for oauth state
@@ -41,7 +41,8 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
   let discordAccount: DiscordAccount;
 
   try {
-    discordAccount = await getDiscordAccount(code, req.headers.host?.startsWith('localhost') ? `http://${req.headers.host}/api/discord/callback` : 'https://app.charmverse.io/api/discord/callback');
+    const domain = req.headers.host?.startsWith('localhost') ? `http://${req.headers.host}` : `https://${req.headers.host}`;
+    discordAccount = await getDiscordAccount(code, `${domain}/api/discord/callback`);
   }
   catch (error) {
     log.warn('Error while connecting to Discord', error);
@@ -69,7 +70,7 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
     });
   }
   catch (error) {
-    log.warn('Error while connecting to Discord', error);
+    log.warn('Error while creating Discord record - probably a duplicate account', error);
     // If the discord user is already connected to a charmverse account this code will be run
     res.status(400).json({
       error: 'Connection to Discord failed. Another CharmVerse account is already associated with this Discord account.'
@@ -80,7 +81,12 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
   const avatarUrl = discordAccount.avatar ? `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png` : undefined;
   let avatar: string | null = null;
   if (avatarUrl) {
-    ({ url: avatar } = await uploadToS3({ fileName: getUserS3Folder({ userId, url: avatarUrl }), url: avatarUrl }));
+    try {
+      ({ url: avatar } = await uploadToS3({ fileName: getUserS3Folder({ userId, url: avatarUrl }), url: avatarUrl }));
+    }
+    catch (err) {
+      log.warn('Error while uploading avatar to S3', err);
+    }
   }
 
   const updatedUser = await prisma.user.update({

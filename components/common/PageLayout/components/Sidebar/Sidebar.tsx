@@ -1,33 +1,33 @@
-import styled from '@emotion/styled';
 import { css, Theme } from '@emotion/react';
-import { Divider } from '@mui/material';
+import styled from '@emotion/styled';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import BountyIcon from '@mui/icons-material/RequestPageOutlined';
-import SettingsIcon from '@mui/icons-material/Settings';
+import DeleteIcon from '@mui/icons-material/Delete';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
-import VoteIcon from '@mui/icons-material/HowToVoteOutlined';
+import BountyIcon from '@mui/icons-material/RequestPageOutlined';
+import SearchIcon from '@mui/icons-material/Search';
+import SettingsIcon from '@mui/icons-material/Settings';
+import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
+import { Divider } from '@mui/material';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
-import SearchIcon from '@mui/icons-material/Search';
 import Typography from '@mui/material/Typography';
+import { BoxProps } from '@mui/system';
 import { Page } from '@prisma/client';
+import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useUser } from 'hooks/useUser';
+import { addPageAndRedirect, NewPageInput } from 'lib/pages';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { LoggedInUser } from 'models';
 import { useRouter } from 'next/router';
-import { useState, useCallback } from 'react';
-import Link from 'components/common/Link';
-import { addPageAndRedirect, NewPageInput } from 'lib/pages';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { BoxProps } from '@mui/system';
-import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
-import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useCallback, useState } from 'react';
 import { headerHeight } from '../Header/Header';
 import NewPageMenu from '../NewPageMenu';
-import Workspaces from './Workspaces';
 import PageNavigation from '../PageNavigation';
-import TrashModal from '../TrashModal';
 import SearchInWorkspaceModal from '../SearchInWorkspaceModal';
+import TrashModal from '../TrashModal';
+import Workspaces from './Workspaces';
 
 const WorkspaceLabel = styled.div`
   display: flex;
@@ -47,32 +47,34 @@ const SidebarContainer = styled.div`
   background-color: ${({ theme }) => theme.palette.sidebar.background};
   height: 100%;
 
-  .add-a-page {
-    opacity: 0;
-    transition: opacity 0.2s ease-in-out;
-  }
+  // disable hover UX on ios which converts first click to a hover event
+  @media (pointer: fine) {
 
-  ${({ theme }) => theme.breakpoints.up('sm')} {
+    .add-a-page {
+      opacity: 0;
+      transition: opacity 0.2s ease-in-out;
+    }
+
     .sidebar-header .MuiIconButton-root {
       opacity: 0;
     }
-  }
 
-  &:hover {
-    .sidebar-header {
-      .MuiTypography-root {
-        overflow: hidden;
-        text-overflow: ellipsis;
+    &:hover {
+      .sidebar-header {
+        .MuiTypography-root {
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .MuiIconButton-root {
+          opacity: 1;
+        }
       }
-      .MuiIconButton-root {
+      .add-a-page {
         opacity: 1;
       }
     }
   }
 
-  &:hover .add-a-page {
-    opacity: 1;
-  }
 `;
 
 const sidebarItemStyles = ({ theme }: { theme: Theme }) => css`
@@ -211,10 +213,10 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               label='Bounties'
             />
             <SidebarLink
-              href={`/${space.domain}/votes`}
-              active={router.pathname.startsWith('/[domain]/votes')}
-              icon={<VoteIcon fontSize='small' />}
-              label='Votes'
+              href={`/${space.domain}/proposals`}
+              active={router.pathname.startsWith('/[domain]/proposals')}
+              icon={<TaskOutlinedIcon fontSize='small' />}
+              label='Proposals'
             />
             <Divider sx={{ mx: 2, my: 1 }} />
             <SidebarBox

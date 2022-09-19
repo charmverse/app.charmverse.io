@@ -1,16 +1,23 @@
 services:
   webapp:
-    build:
-      context: .
+    image: "310849459438.dkr.ecr.us-east-1.amazonaws.com/charmverse-web3-workspace:${IMGTAG}"
     ports:
       - "80:3000"
     command: [ "npm", "run", "${NPM_SCRIPT}" ]
     labels:
       com.datadoghq.ad.logs: "[{\"source\": \"nodejs\", \"service\": \"${SERVICE_NAME}\"}]"
+    volumes:
+      - $PWD/.env:/app/.env
     env_file:
       - ".env"
     environment:
       DATABASE_URL: "postgres://${DB_USER}:${DB_PASSWD}@${DB_HOSTNAME}:5432/${DB_NAME}"
+    profiles:
+      - dev
+      - stg
+      - tst
+      - prd
+      - webapp
 
   datadog-agent:
     image: public.ecr.aws/datadog/agent
@@ -19,6 +26,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /proc/:/host/proc/:ro
       - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
+      - $PWD/.env:/app/.env
     env_file:
       - ".env"
     environment:
@@ -28,4 +36,7 @@ services:
       DD_SITE: "datadoghq.com"
       DD_APM_ENABLED: "true"
       DD_APM_NON_LOCAL_TRAFFIC: "true"
-      DD_CONTAINER_ENV_AS_TAGS: '{"NODE_ENV":"env"}'
+      DD_ENV: "${SERVICE_ENV}"
+    profiles:
+      - prd
+      - tst
