@@ -1,4 +1,4 @@
-import { SuggestPluginState } from 'lib/prosemirror/interfaces';
+import type { SuggestPluginState } from 'lib/prosemirror/interfaces';
 
 export interface MentionPluginState extends SuggestPluginState {
 }

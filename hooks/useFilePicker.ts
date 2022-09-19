@@ -1,4 +1,5 @@
-import { ChangeEvent, useRef } from 'react';
+import type { ChangeEvent } from 'react';
+import { useRef } from 'react';
 
 export function useFilePicker (onFile: (file: File) => void) {
   const inputRef = useRef<HTMLInputElement>(null);

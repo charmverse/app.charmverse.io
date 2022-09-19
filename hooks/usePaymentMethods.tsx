@@ -1,6 +1,7 @@
-import { PaymentMethod } from '@prisma/client';
-import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
+import type { PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
+import type { Dispatch, ReactNode, SetStateAction } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useCurrentSpace } from './useCurrentSpace';
 
 type IContext = [

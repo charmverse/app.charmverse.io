@@ -1,5 +1,5 @@
 import { prisma } from 'db';
-import { IPagePermissionWithAssignee } from '../page-permission-interfaces';
+import type { IPagePermissionWithAssignee } from '../page-permission-interfaces';
 
 export async function listPagePermissions (pageId: string): Promise<IPagePermissionWithAssignee []> {
   const permissions = await prisma.pagePermission.findMany({

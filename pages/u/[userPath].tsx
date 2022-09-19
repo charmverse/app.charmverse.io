@@ -1,13 +1,14 @@
-import { ReactElement, useEffect } from 'react';
+import { Box } from '@mui/material';
+import charmClient from 'charmClient';
+import ErrorPage from 'components/common/errors/ErrorPage';
+import LoadingComponent from 'components/common/LoadingComponent';
 import PageLayout from 'components/nexus/components/NexusLayout';
 import PublicProfile from 'components/profile/PublicProfile';
-import LoadingComponent from 'components/common/LoadingComponent';
-import ErrorPage from 'components/common/errors/ErrorPage';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useRouter } from 'next/router';
+import type { ReactElement } from 'react';
+import { useEffect } from 'react';
 import useSWR from 'swr';
-import charmClient from 'charmClient';
-import { Box } from '@mui/material';
 
 export default function UserProfilePage () {
   const router = useRouter();

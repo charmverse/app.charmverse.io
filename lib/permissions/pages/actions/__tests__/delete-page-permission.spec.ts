@@ -1,7 +1,8 @@
 
-import { Space, User } from '@prisma/client';
+import type { Space, User } from '@prisma/client';
 import { prisma } from 'db';
-import { getPage, IPageWithPermissions } from 'lib/pages/server';
+import type { IPageWithPermissions } from 'lib/pages/server';
+import { getPage } from 'lib/pages/server';
 import { ExpectedAnError } from 'testing/errors';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';

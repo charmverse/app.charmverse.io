@@ -1,5 +1,5 @@
 
-import { UserVote, Vote, VoteOptions } from '@prisma/client';
+import type { UserVote, Vote, VoteOptions } from '@prisma/client';
 import { prisma } from 'db';
 import { InvalidInputError, UndesirableOperationError } from 'lib/utilities/errors';
 import { isVotingClosed } from './utils';

@@ -1,9 +1,10 @@
 
 import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { SpacePermissionWithAssignee, removeSpaceOperations, SpacePermissionFlags } from 'lib/permissions/spaces';
+import type { SpacePermissionFlags } from 'lib/permissions/spaces';
+import { SpacePermissionWithAssignee, removeSpaceOperations } from 'lib/permissions/spaces';
 import { computeGroupSpacePermissions } from 'lib/permissions/spaces/computeGroupSpacePermissions';
 import { requireCustomPermissionMode } from 'lib/middleware/requireCustomPermissionMode';
 

@@ -1,11 +1,14 @@
 
+import type {
+  Theme
+} from 'components/common/BoardEditor/focalboard/src/theme';
 import {
-  Theme,
   darkTheme as originalDarkTheme,
   lightTheme as originalLightTheme
 } from 'components/common/BoardEditor/focalboard/src/theme';
 
-import { darkModeColors, lightModeColors, BrandColorScheme } from 'theme/colors';
+import type { BrandColorScheme } from 'theme/colors';
+import { darkModeColors, lightModeColors } from 'theme/colors';
 
 /**
  * Automatically generate property names that are in sync with our brand colours

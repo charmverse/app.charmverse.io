@@ -1,19 +1,20 @@
 import styled from '@emotion/styled';
-import { useRef, ReactNode, useState } from 'react';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import Box from '@mui/material/Box';
+import IconButton from '@mui/material/IconButton';
 import Avatar from 'components/common/Avatar';
 import AvatarWithIcons from 'components/common/AvatarWithIcons';
-import Box from '@mui/material/Box';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import IconButton from '@mui/material/IconButton';
 import { AvatarEditMenu } from 'components/settings/workspace/AvatarEditMenu';
+import type { ReactNode } from 'react';
+import { useRef, useState } from 'react';
 
-import { useS3UploadInput } from 'hooks/useS3UploadInput';
 import NftAvatarGalleryPopup from 'components/profile/components/NftAvatarGallery/NftAvatarGalleryPopup';
+import { useS3UploadInput } from 'hooks/useS3UploadInput';
 
 import type { NftData } from 'lib/blockchain/interfaces';
+import type { SupportedChainId } from 'lib/blockchain/provider/alchemy';
 import type { UserAvatar } from 'lib/users/interfaces';
-import { SupportedChainId } from 'lib/blockchain/provider/alchemy';
 
 const StyledBox = styled(Box)`
   display: inline-block;

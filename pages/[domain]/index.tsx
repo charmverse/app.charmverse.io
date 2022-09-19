@@ -1,4 +1,4 @@
-import { Page } from '@prisma/client';
+import type { Page } from '@prisma/client';
 import { filterVisiblePages } from 'components/common/PageLayout/components/PageNavigation/PageNavigation';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { getKey } from 'hooks/useLocalStorage';

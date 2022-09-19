@@ -12,13 +12,15 @@ import {
   strike,
   underline
 } from '@bangle.dev/base-components';
-import { BangleEditorState, NodeView, Plugin, RawPlugins } from '@bangle.dev/core';
+import type { RawPlugins } from '@bangle.dev/core';
+import { BangleEditorState, NodeView, Plugin } from '@bangle.dev/core';
 import { markdownSerializer } from '@bangle.dev/markdown';
-import { EditorState, EditorView, Node, PluginKey } from '@bangle.dev/pm';
+import type { EditorState, EditorView } from '@bangle.dev/pm';
+import { Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import { Box, Divider, Slide } from '@mui/material';
-import { PageType } from '@prisma/client';
+import type { PageType } from '@prisma/client';
 import charmClient from 'charmClient';
 import * as codeBlock from 'components/common/CharmEditor/components/@bangle.dev/base-components/code-block';
 import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
@@ -26,17 +28,18 @@ import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import CommentsSidebar from 'components/[pageId]/DocumentPage/components/CommentsSidebar';
 import PageInlineVotesList from 'components/[pageId]/DocumentPage/components/VotesSidebar';
-import { CryptoCurrency, FiatCurrency } from 'connectors';
+import type { CryptoCurrency, FiatCurrency } from 'connectors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
+import type { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
 import { useUser } from 'hooks/useUser';
 import { silentlyUpdateURL } from 'lib/browser';
 import { extractDeletedThreadIds } from 'lib/inline-comments/extractDeletedThreadIds';
 import log from 'lib/log';
-import { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
+import type { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
 import debounce from 'lodash/debounce';
-import { PageContent } from 'models';
-import { CSSProperties, memo, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import type { PageContent } from 'models';
+import type { CSSProperties, ReactNode } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useSWRConfig } from 'swr';
 import Callout, * as callout from './components/callout';
 import { userDataPlugin } from './components/charm/charm.plugins';

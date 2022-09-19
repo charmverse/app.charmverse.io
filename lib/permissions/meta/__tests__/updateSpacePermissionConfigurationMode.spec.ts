@@ -3,7 +3,7 @@ import { ExpectedAnError } from 'testing/errors';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { prisma } from 'db';
-import { Space } from '@prisma/client';
+import type { Space } from '@prisma/client';
 import { computeGroupSpacePermissions } from '../../spaces/computeGroupSpacePermissions';
 import { updateSpacePermissionConfigurationMode } from '../updateSpacePermissionConfigurationMode';
 

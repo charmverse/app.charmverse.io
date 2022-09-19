@@ -1,5 +1,5 @@
-import { Page, Space, SpaceApiToken, User } from '@prisma/client';
-import { InvalidCustomPropertyKeyError, InvalidCustomPropertyValueError, Page as ApiPage, PageProperty, PageQuery, PaginatedQuery, PaginatedResponse, UnsupportedKeysError } from 'lib/public-api';
+import type { Page, Space, SpaceApiToken, User } from '@prisma/client';
+import type { InvalidCustomPropertyKeyError, InvalidCustomPropertyValueError, Page as ApiPage, PageProperty, PageQuery, PaginatedQuery, PaginatedResponse, UnsupportedKeysError } from 'lib/public-api';
 import { createDatabase, createDatabaseCardPage } from 'lib/public-api/createDatabaseCardPage';
 import { uniqueValues } from 'lib/utilities/array';
 import request from 'supertest';

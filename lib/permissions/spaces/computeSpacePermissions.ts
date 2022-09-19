@@ -2,9 +2,9 @@ import { SpaceOperation } from '@prisma/client';
 import { prisma } from 'db';
 import { hasAccessToSpace } from '../../middleware';
 import { SpaceMembershipRequiredError } from '../errors';
-import { PermissionComputeRequest } from '../interfaces';
+import type { PermissionComputeRequest } from '../interfaces';
 import { AvailableSpacePermissions } from './availableSpacePermissions';
-import { SpacePermissionFlags } from './interfaces';
+import type { SpacePermissionFlags } from './interfaces';
 
 export async function computeSpacePermissions ({
   allowAdminBypass,

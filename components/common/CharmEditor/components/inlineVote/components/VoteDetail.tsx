@@ -8,13 +8,13 @@ import Modal from 'components/common/Modal';
 import VoteStatusChip from 'components/votes/components/VoteStatusChip';
 import { useUser } from 'hooks/useUser';
 import { removeInlineVoteMark } from 'lib/inline-votes/removeInlineVoteMark';
-import { ExtendedVote } from 'lib/votes/interfaces';
+import type { ExtendedVote } from 'lib/votes/interfaces';
 import { isVotingClosed } from 'lib/votes/utils';
 import { DateTime } from 'luxon';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import useSWR from 'swr';
 import VoteActionsMenu from 'components/votes/components/VoteActionsMenu';
-import { UserVote } from '@prisma/client';
+import type { UserVote } from '@prisma/client';
 import useTasks from 'components/nexus/hooks/useTasks';
 
 export interface VoteDetailProps {

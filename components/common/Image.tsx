@@ -1,5 +1,5 @@
 
-import { ComponentProps } from 'react';
+import type { ComponentProps } from 'react';
 import Box from '@mui/material/Box';
 import styled from '@emotion/styled';
 import NextImage from 'next/image';

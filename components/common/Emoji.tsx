@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
-import { ComponentProps, ReactNode, memo } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
+import { memo } from 'react';
 import twemoji from 'twemoji';
 
 type ImgSize = 'large' | 'small';

@@ -1,7 +1,7 @@
-import { Board } from 'lib/focalboard/board';
-import { Page } from '@prisma/client';
-import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
+import type { Page } from '@prisma/client';
 import charmClient from 'charmClient';
+import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
+import type { Board } from 'lib/focalboard/board';
 import { mutate } from 'swr';
 import { createDefaultViewsAndCards } from './addPage';
 

@@ -5,7 +5,8 @@ import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import { FormValues, schema } from 'components/common/CreateSpaceForm';
+import type { FormValues } from 'components/common/CreateSpaceForm';
+import { schema } from 'components/common/CreateSpaceForm';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Link from 'components/common/Link';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
@@ -23,7 +24,8 @@ import { useUser } from 'hooks/useUser';
 import isSpaceAdmin from 'lib/users/isSpaceAdmin';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
-import { ReactElement, useState } from 'react';
+import type { ReactElement } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 export default function WorkspaceSettings () {

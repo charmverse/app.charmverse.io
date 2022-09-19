@@ -8,7 +8,7 @@ import { useVotes } from 'hooks/useVotes';
 import { highlightDomElement, silentlyUpdateURL } from 'lib/browser';
 import { findTotalInlineVotes } from 'lib/inline-votes/findTotalInlineVotes';
 import { isTruthy } from 'lib/utilities/types';
-import { ExtendedVote } from 'lib/votes/interfaces';
+import type { ExtendedVote } from 'lib/votes/interfaces';
 import { useEffect, useState } from 'react';
 import { StyledSidebar as CommentsSidebar } from './CommentsSidebar';
 import PageActionToggle from './PageActionToggle';

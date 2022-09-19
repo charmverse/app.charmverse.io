@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertColor } from '@mui/material/Alert';
+import type { AlertColor } from '@mui/material/Alert';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import charmClient from 'charmClient';
 import Button from '@mui/material/Button';
@@ -8,7 +8,7 @@ import { ethers } from 'ethers';
 import { BigNumber } from '@ethersproject/bignumber';
 import { getChainById } from 'connectors';
 import { isValidChainAddress } from 'lib/tokens/validation';
-import { SupportedChainId } from 'lib/blockchain/provider/alchemy';
+import type { SupportedChainId } from 'lib/blockchain/provider/alchemy';
 import ERC20ABI from '../../../../../../../abis/ERC20ABI.json';
 
 interface Props {

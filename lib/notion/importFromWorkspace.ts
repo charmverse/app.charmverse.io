@@ -1,22 +1,23 @@
 import { Client } from '@notionhq/client';
-import { BlockNode, CalloutNode, ColumnBlockNode, ColumnLayoutNode, DisclosureDetailsNode, ListItemNode, MentionNode, Page, PageContent, TableNode, TableRowNode, TextContent } from 'models';
-import { ListBlockChildrenParameters } from '@notionhq/client/build/src/api-endpoints';
-import { PageType, Prisma } from '@prisma/client';
+import type { ListBlockChildrenParameters } from '@notionhq/client/build/src/api-endpoints';
+import type { PageType, Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { v4 as uuid } from 'uuid';
-import log from 'lib/log';
+import { getFilePath, uploadToS3 } from 'lib/aws/uploadToS3Server';
+import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MIN_EMBED_WIDTH, VIDEO_ASPECT_RATIO } from 'lib/embed/constants';
 import { extractEmbedLink } from 'lib/embed/extractEmbedLink';
-import { MIN_EMBED_WIDTH, MAX_EMBED_WIDTH, VIDEO_ASPECT_RATIO, MIN_EMBED_HEIGHT } from 'lib/embed/constants';
-import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/image/constants';
-import { createBoard, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import { createBoard } from 'lib/focalboard/board';
 import { createBoardView } from 'lib/focalboard/boardView';
 import { createCard } from 'lib/focalboard/card';
-import promiseRetry from 'promise-retry';
-import { isTruthy } from 'lib/utilities/types';
-import { getFilePath, uploadToS3 } from 'lib/aws/uploadToS3Server';
-import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
+import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/image/constants';
+import log from 'lib/log';
 import { getPagePath } from 'lib/pages';
-import { BlockObjectResponse, GetDatabaseResponse, GetPageResponse, RichTextItemResponse, NotionImage } from './types';
+import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
+import { isTruthy } from 'lib/utilities/types';
+import type { BlockNode, CalloutNode, ColumnBlockNode, ColumnLayoutNode, DisclosureDetailsNode, ListItemNode, MentionNode, Page, PageContent, TableNode, TableRowNode, TextContent } from 'models';
+import promiseRetry from 'promise-retry';
+import { v4 as uuid } from 'uuid';
+import type { BlockObjectResponse, GetDatabaseResponse, GetPageResponse, NotionImage, RichTextItemResponse } from './types';
 
 // Limit the highest number of pages that can be imported
 const IMPORTED_PAGES_LIMIT = 10000;

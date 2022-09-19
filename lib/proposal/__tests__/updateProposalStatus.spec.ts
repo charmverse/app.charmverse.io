@@ -1,7 +1,7 @@
-import { ProposalStatus, Role, Space, User } from '@prisma/client';
+import type { ProposalStatus, Role, Space, User } from '@prisma/client';
 import { createProposalWithUsers, generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { InvalidStateError } from 'lib/middleware';
-import { IPageWithPermissions } from 'lib/pages';
+import type { IPageWithPermissions } from 'lib/pages';
 import { getPage } from 'lib/pages/server';
 import { updateProposalStatus } from '../updateProposalStatus';
 import { proposalPermissionMapping } from '../syncProposalPermissions';

@@ -1,4 +1,4 @@
-import { SupportedChainId } from 'lib/blockchain/provider/alchemy';
+import type { SupportedChainId } from 'lib/blockchain/provider/alchemy';
 
 export interface UserAvatar {
   avatar: string | null;

@@ -1,4 +1,4 @@
-import { PageType, Prisma } from '@prisma/client';
+import type { PageType, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { createPage, generateBounty, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';

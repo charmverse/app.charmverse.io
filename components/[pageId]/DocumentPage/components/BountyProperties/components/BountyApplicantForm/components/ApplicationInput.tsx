@@ -4,7 +4,7 @@ import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
-import { Application } from '@prisma/client';
+import type { Application } from '@prisma/client';
 import charmClient from 'charmClient';
 import { useBounties } from 'hooks/useBounties';
 import { useLocalStorage } from 'hooks/useLocalStorage';

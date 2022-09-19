@@ -1,5 +1,6 @@
 import { Autocomplete, Box, TextField } from '@mui/material';
-import { FiatCurrencyList, FiatCurrency } from 'connectors';
+import type { FiatCurrency } from 'connectors';
+import { FiatCurrencyList } from 'connectors';
 
 const currencyOptions = Object.keys(FiatCurrencyList);
 

@@ -1,5 +1,6 @@
-import { EditorView, MarkType, Mark, Transaction } from '@bangle.dev/pm';
-import { findChildrenByMark, NodeWithPos } from 'prosemirror-utils';
+import type { EditorView, MarkType, Mark, Transaction } from '@bangle.dev/pm';
+import type { NodeWithPos } from 'prosemirror-utils';
+import { findChildrenByMark } from 'prosemirror-utils';
 
 export function removeInlineVoteMark (view: EditorView, voteId: string) {
   const doc = view.state.doc;

@@ -1,22 +1,22 @@
-import NotionIcon from 'public/images/notion_logo.svg';
-import SvgIcon from '@mui/material/SvgIcon';
-import CircularProgress from '@mui/material/CircularProgress';
-import { Alert, Box, Typography } from '@mui/material';
-import Button from 'components/common/Button';
-import Modal from 'components/common/Modal';
 import CompleteIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Dangerous';
 import WarningIcon from '@mui/icons-material/HourglassBottom';
+import { Alert, Box, Typography } from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
+import SvgIcon from '@mui/material/SvgIcon';
 import charmClient from 'charmClient';
-import { useSWRConfig } from 'swr';
-import { useState, useEffect } from 'react';
-import { useSnackbar } from 'hooks/useSnackbar';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { FailedImportsError } from 'lib/notion/types';
-import { getCookie, deleteCookie } from 'lib/browser';
-import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/notion/constants';
-import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
+import Button from 'components/common/Button';
+import Modal from 'components/common/Modal';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useSnackbar } from 'hooks/useSnackbar';
+import { deleteCookie, getCookie } from 'lib/browser';
+import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/notion/constants';
+import type { FailedImportsError } from 'lib/notion/types';
+import NotionIcon from 'public/images/notion_logo.svg';
+import { useEffect, useState } from 'react';
+import { useSWRConfig } from 'swr';
 
 interface NotionResponseState {
   error?: string;

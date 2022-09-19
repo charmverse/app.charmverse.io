@@ -1,7 +1,8 @@
 import { useWeb3React } from '@web3-react/core';
 import charmClient from 'charmClient';
-import { LoggedInUser } from 'models';
-import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import type { LoggedInUser } from 'models';
+import type { ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 type IContext = {
   user: LoggedInUser | null,

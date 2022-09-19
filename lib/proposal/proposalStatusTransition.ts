@@ -1,4 +1,4 @@
-import { ProposalStatus } from '@prisma/client';
+import type { ProposalStatus } from '@prisma/client';
 
 export const proposalStatusTransitionRecord: Record<ProposalStatus, ProposalStatus[]> = {
   private_draft: ['draft', 'discussion'],

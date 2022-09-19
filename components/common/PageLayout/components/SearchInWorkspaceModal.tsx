@@ -13,7 +13,7 @@ import Link from 'components/common/Link';
 import { useBounties } from 'hooks/useBounties';
 import { usePages } from 'hooks/usePages';
 import { useRouter } from 'next/router';
-import { IPageWithPermissions } from 'lib/pages';
+import type { IPageWithPermissions } from 'lib/pages';
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
 

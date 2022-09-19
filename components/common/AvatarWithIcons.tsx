@@ -1,8 +1,9 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
-import Avatar, { InitialAvatarProps } from './Avatar';
+import type { InitialAvatarProps } from './Avatar';
+import Avatar from './Avatar';
 
 const StyledStack = styled(Stack)`
   position: absolute;

@@ -1,6 +1,6 @@
-import { PageContent } from 'models';
+import type { PageContent } from 'models';
 import { safeInsert } from '@bangle.dev/utils';
-import { EditorState, Node, Transaction } from '@bangle.dev/pm';
+import type { EditorState, Node, Transaction } from '@bangle.dev/pm';
 
 export function checkForEmpty (content: PageContent | null) {
   return !content?.content

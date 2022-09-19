@@ -1,5 +1,5 @@
-import { RawSpecs } from '@bangle.dev/core';
-import { DOMOutputSpec } from '@bangle.dev/pm';
+import type { RawSpecs } from '@bangle.dev/core';
+import type { DOMOutputSpec } from '@bangle.dev/pm';
 import log from 'lib/log';
 import { nestedPageNodeName, nestedPageSuggestMarkName } from './nestedPage.constants';
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';

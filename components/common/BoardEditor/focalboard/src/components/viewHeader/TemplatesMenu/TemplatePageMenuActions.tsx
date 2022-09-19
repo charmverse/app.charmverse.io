@@ -1,10 +1,10 @@
-import Menu from '@mui/material/Menu';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
-import {DeleteIcon} from 'components/common/Icons/DeleteIcon';
-import { EditIcon } from 'components/common/Icons/EditIcon';
 import { Page } from '@prisma/client';
+import { DeleteIcon } from 'components/common/Icons/DeleteIcon';
+import { EditIcon } from 'components/common/Icons/EditIcon';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 
 type Props = {

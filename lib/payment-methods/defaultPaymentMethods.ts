@@ -1,5 +1,5 @@
+import type { PaymentMethod, Space } from '@prisma/client';
 import { prisma } from 'db';
-import { PaymentMethod, Prisma, Space } from '@prisma/client';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
 const defaultPaymentMethods: Pick<PaymentMethod, 'chainId' | 'contractAddress' | 'tokenLogo' | 'tokenSymbol' | 'tokenName' | 'tokenDecimals'> [] = [

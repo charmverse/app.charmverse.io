@@ -1,7 +1,9 @@
-import { Page, PageOperations, Prisma } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
+import { Page, PageOperations } from '@prisma/client';
 import { prisma } from 'db';
 import { AllowedPagePermissions } from './available-page-permissions.class';
-import { IPagePermissionFlags, IPagePermissionUserRequest, IPageWithNestedSpaceRole, PageOperationType } from './page-permission-interfaces';
+import type { IPagePermissionFlags, IPagePermissionUserRequest, IPageWithNestedSpaceRole } from './page-permission-interfaces';
+import { PageOperationType } from './page-permission-interfaces';
 import { permissionTemplates } from './page-permission-mapping';
 
 /**
