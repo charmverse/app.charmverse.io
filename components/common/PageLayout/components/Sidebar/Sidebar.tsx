@@ -221,7 +221,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               label='Proposals'
             />
             <Divider sx={{ mx: 2, my: 1 }} />
-            <Tooltip title={`Click or press ${openSearchLabel} to search`}>
+            <Tooltip title={<>Search and jump to a page <br />{openSearchLabel}</>} placement='right'>
               <div>
                 <SidebarBox
                   onClick={searchInWorkspaceModalState.open}
