@@ -125,7 +125,7 @@ export function ViewOptions ({ voteSort, voteFilter, setVoteFilter, setVoteSort,
       <InputLabel>Sort</InputLabel>
       <Select variant='outlined' value={voteSort} onChange={(e) => setVoteSort(e.target.value as VoteSort)} sx={{ mr: 2 }}>
         {showPosition && <MenuItem value='position'>Position</MenuItem>}
-        {showVotes && <MenuItem value='highest_votes'>Votes</MenuItem>}
+        {showVotes && <MenuItem value='highest_votes'>Most voted</MenuItem>}
         <MenuItem value='latest_deadline'>Deadline</MenuItem>
         <MenuItem value='latest_created'>Created</MenuItem>
       </Select>
