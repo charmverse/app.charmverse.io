@@ -119,7 +119,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
               mr: 1
             }}
           />
-          <ListItemText primary='Create a vote' />
+          <ListItemText primary='Create a poll' />
         </ListItemButton>
       )}
       <ListItemButton
@@ -134,7 +134,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
             mr: 1
           }}
         />
-        <ListItemText primary='View votes' />
+        <ListItemText primary='View polls' />
       </ListItemButton>
       {basePage && (
         <ListItemButton>

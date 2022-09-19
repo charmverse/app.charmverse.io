@@ -67,7 +67,7 @@ export default function InlineVoteList ({ pluginKey }: {pluginKey: PluginKey<Inl
   if ((currentPageActionDisplay !== 'votes' || cardId) && show && inProgressVoteIds.length !== 0) {
     return (
       <Modal
-        title='Vote details'
+        title='Poll details'
         size='large'
         open={true}
         onClose={() => {
