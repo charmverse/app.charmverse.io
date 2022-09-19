@@ -1,6 +1,6 @@
 import { BountyWithDetails } from 'models';
 import { prisma } from 'db';
-import { includePagePermissions } from 'lib/pages/server';
+import { includePagePermissions } from 'lib/pages/server/getAccessiblePages';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
 export async function getBounty (bountyId: string): Promise<BountyWithDetails | null> {

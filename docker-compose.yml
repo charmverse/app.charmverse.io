@@ -12,6 +12,12 @@ services:
       - ".env"
     environment:
       DATABASE_URL: "postgres://${DB_USER}:${DB_PASSWD}@${DB_HOSTNAME}:5432/${DB_NAME}"
+    profiles:
+      - dev
+      - stg
+      - tst
+      - prd
+      - webapp
 
   datadog-agent:
     image: public.ecr.aws/datadog/agent
@@ -31,3 +37,6 @@ services:
       DD_APM_ENABLED: "true"
       DD_APM_NON_LOCAL_TRAFFIC: "true"
       DD_ENV: "${SERVICE_ENV}"
+    profiles:
+      - prd
+      - tst

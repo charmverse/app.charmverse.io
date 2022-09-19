@@ -31,3 +31,4 @@ RUN npm prune --production --no-audit      \
               --no-fund --legacy-peer-deps
 
 CMD ["npm", "run", "start:staging"]
+

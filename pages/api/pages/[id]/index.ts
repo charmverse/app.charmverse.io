@@ -38,31 +38,8 @@ async function getPageRoute (req: NextApiRequest, res: NextApiResponse<IPageWith
     userId
   });
 
-  if (permissions.read !== true && page.type !== 'bounty') {
+  if (permissions.read !== true) {
     throw new ActionNotPermittedError('You do not have permission to view this page');
-  }
-  else if (permissions.read !== true && page.type === 'bounty') {
-    const bounty = await prisma.bounty.findUnique({
-      where: {
-        id: page.bountyId as string
-      },
-      include: {
-        permissions: true,
-        space: true
-      }
-    });
-
-    if (!bounty) {
-      throw new NotFoundError(`Bounty with id ${page.bountyId} not found`);
-    }
-
-    // We surface space-accessible bounties to the public if the space has enabled the public bounty board option
-    if (bounty.space.publicBountyBoard && bounty.permissions.some(p => p.spaceId === bounty.spaceId)) {
-      return res.status(200).json(page);
-    }
-    else {
-      throw new NotFoundError(`Bounty with id ${page.bountyId} not found`);
-    }
   }
 
   return res.status(200).json(page);

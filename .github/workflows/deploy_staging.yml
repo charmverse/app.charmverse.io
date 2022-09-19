@@ -16,13 +16,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
 
@@ -36,13 +29,12 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: us-east-1
 
-      # - name: Remove dev dependencies
-      #   run: |
-      #     npm prune --production
-      #     rm -rf .next/cache
-
-      - name: Set STAGE variable in environment for next steps
-        run: echo "STAGE=pr${{ github.event.number }}-${{ env.GITHUB_SHA_SHORT }}" >> $GITHUB_ENV
+      - name: Build and Push Docker image
+        uses: ./.github/actions/build_docker_image
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-1
 
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
@@ -51,8 +43,11 @@ jobs:
             yq -I 4 -i '
               with(.option_settings."aws:elasticbeanstalk:application:environment";
                     .COMPOSE_PROJECT_NAME = "pr${{ github.event.number }}" |
-                    .IMGTAG = "pr${{ github.event.number }}-${{ env.GITHUB_SHA_SHORT }}")
+                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
               ' .ebextensions/00_env_vars.config
+
+      - name: Set STAGE variable in environment for build and deploy steps
+        run: echo "STAGE=pr-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
 
       - name: Create a github deployment
         uses: bobheadxi/deployments@v0.5.2

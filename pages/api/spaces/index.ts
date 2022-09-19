@@ -62,7 +62,7 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
   ]);
 
   const updatedSpace = await updateSpacePermissionConfigurationMode({
-    permissionConfigurationMode: 'collaborative',
+    permissionConfigurationMode: data.permissionConfigurationMode ?? 'collaborative',
     spaceId: space.id
   });
 

@@ -9,6 +9,7 @@ import { usePages } from 'hooks/usePages';
 import { KeyedMutator } from 'swr';
 import { ProposalWithUsers } from 'lib/proposal/interface';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
+import useTasks from 'components/nexus/hooks/useTasks';
 
 export default function NewProposalButton ({ mutateProposals }: {mutateProposals: KeyedMutator<ProposalWithUsers[]>}) {
   const { user } = useUser();
@@ -16,6 +17,7 @@ export default function NewProposalButton ({ mutateProposals }: {mutateProposals
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const { showPage } = usePageDialog();
   const { setPages } = usePages();
+  const { mutate } = useTasks();
 
   const canCreateProposal = !!userSpacePermissions?.createPage;
 
@@ -33,8 +35,12 @@ export default function NewProposalButton ({ mutateProposals }: {mutateProposals
       }));
 
       mutateProposals();
+      mutate();
       showPage({
-        pageId: newPage.id
+        pageId: newPage.id,
+        onClose () {
+          mutateProposals();
+        }
       });
     }
   }

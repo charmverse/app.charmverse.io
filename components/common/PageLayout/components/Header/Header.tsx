@@ -119,12 +119,12 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
               mr: 1
             }}
           />
-          <ListItemText primary='Create a vote' />
+          <ListItemText primary='Create a poll' />
         </ListItemButton>
       )}
       <ListItemButton
         onClick={() => {
-          setCurrentPageActionDisplay('votes');
+          setCurrentPageActionDisplay('polls');
           setPageMenuOpen(false);
         }}
       >
@@ -134,7 +134,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
             mr: 1
           }}
         />
-        <ListItemText primary='View votes' />
+        <ListItemText primary='View polls' />
       </ListItemButton>
       {basePage && (
         <ListItemButton>
@@ -268,7 +268,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
                     setPageMenuAnchorElement(pageMenuAnchor.current || null);
                   }}
                 >
-                  <Tooltip title='View comments, votes, export content and more' arrow>
+                  <Tooltip title='View comments, polls, export content and more' arrow>
                     <MoreHorizIcon color='secondary' />
                   </Tooltip>
                 </IconButton>
