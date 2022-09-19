@@ -21,14 +21,15 @@ export async function createUserFromWallet (address: string): Promise<LoggedInUs
   else {
     const ens: string | null = await getENSName(address);
     const username = ens || shortenHex(address);
-    const isUserPathAvailable = await isProfilePathAvailable(username);
+    const userPath = username.replace('...', '-');
+    const isUserPathAvailable = await isProfilePathAvailable(userPath);
 
     const newUser = await prisma.user.create({
       data: {
         addresses: [address],
         identityType: IDENTITY_TYPES[0],
         username,
-        path: isUserPathAvailable ? username : null
+        path: isUserPathAvailable ? userPath : null
       },
       include: sessionUserRelations
     });
