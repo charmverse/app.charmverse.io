@@ -16,7 +16,6 @@ import CardDialog from 'components/common/BoardEditor/focalboard/src/components/
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import { silentlyUpdateURL } from 'lib/browser';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
-import { usePages } from 'hooks/usePages';
 import { IPagePermissionFlags } from 'lib/permissions/pages';
 /**
  *

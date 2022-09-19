@@ -19,6 +19,7 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
+import CardActions from 'components/common/BoardEditor/focalboard/src/components/cardDetail/CardActions/CardActions';
 import BountyProperties from './components/BountyProperties';
 import PageBanner from './components/PageBanner';
 import { PageTemplateBanner } from './components/PageTemplateBanner';
@@ -193,17 +194,26 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
                 <div className='CardDetail content'>
                   {/* Property list */}
                   {card && board && (
-                    <CardDetailProperties
-                      board={board}
-                      card={card}
-                      cards={cards}
-                      activeView={activeView}
-                      views={boardViews}
-                      readonly={cannotEdit}
-                      pageUpdatedAt={page.updatedAt.toString()}
-                      pageUpdatedBy={page.updatedBy}
-                    />
+                    <>
+                      <CardDetailProperties
+                        board={board}
+                        card={card}
+                        cards={cards}
+                        activeView={activeView}
+                        views={boardViews}
+                        readonly={cannotEdit}
+                        pageUpdatedAt={page.updatedAt.toString()}
+                        pageUpdatedBy={page.updatedBy}
+                      />
+                      <CardActions
+                        pageId={page.id}
+                        board={board}
+                        activeView={activeView}
+                        readonly={cannotEdit}
+                      />
+                    </>
                   )}
+
                   {proposalId && <ProposalProperties pageId={proposalId} proposalId={proposalId as string} readOnly={readonlyProposalProperties} />}
                   {(draftBounty || page.bountyId) && (
                     <BountyProperties
