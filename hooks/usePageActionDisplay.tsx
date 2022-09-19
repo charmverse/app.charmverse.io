@@ -8,7 +8,7 @@ import { usePages } from './usePages';
 import { useThreads } from './useThreads';
 
 export interface IPageActionDisplayContext {
-  currentPageActionDisplay: null | 'votes' | 'comments',
+  currentPageActionDisplay: null | 'polls' | 'comments',
   setCurrentPageActionDisplay: React.Dispatch<React.SetStateAction<IPageActionDisplayContext['currentPageActionDisplay']>>
 }
 
@@ -37,7 +37,7 @@ export function PageActionDisplayProvider ({ children }: { children: ReactNode }
       if (!highlightedCommentId && cachedInlineVotesData && cachedInlineVotesData.find(inlineVote => inlineVote.status === 'InProgress'
       // We don't want to open the sidebar for a proposal-type vote
       && inlineVote.context !== 'proposal')) {
-        setCurrentPageActionDisplay('votes');
+        setCurrentPageActionDisplay('polls');
       }
       // For some reason we cant get the threads map using useThreads, its empty even after isValidating is true (data has loaded)
       else if (highlightedCommentId || (cachedInlineCommentData && cachedInlineCommentData.find(thread => thread && !thread.resolved))) {

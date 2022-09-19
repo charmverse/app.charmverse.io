@@ -124,7 +124,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
       )}
       <ListItemButton
         onClick={() => {
-          setCurrentPageActionDisplay('votes');
+          setCurrentPageActionDisplay('polls');
           setPageMenuOpen(false);
         }}
       >
@@ -268,7 +268,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
                     setPageMenuAnchorElement(pageMenuAnchor.current || null);
                   }}
                 >
-                  <Tooltip title='View comments, votes, export content and more' arrow>
+                  <Tooltip title='View comments, polls, export content and more' arrow>
                     <MoreHorizIcon color='secondary' />
                   </Tooltip>
                 </IconButton>
