@@ -39,7 +39,7 @@ jobs:
             yq -I 4 -i '
               with(.option_settings."aws:elasticbeanstalk:application:environment";
                     .COMPOSE_PROJECT_NAME = "pr${{ github.event.number }}" |
-                    .IMGTAG = "pr${{ github.event.number }}-${{ env.GITHUB_SHA_SHORT }}")
+                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
               ' .ebextensions/00_env_vars.config
 
       - name: Set STAGE variable in environment for build and deploy steps

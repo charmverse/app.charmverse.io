@@ -223,7 +223,7 @@ describe('listAvailableBounties', () => {
 
   });
 
-  it('should display all space-accessible and public bounties to a non-logged in user, if the space has activated public bounty boards', async () => {
+  it('should display all public bounties to a non-logged in user, if the space has activated public bounty boards', async () => {
     const { space: otherSpace, user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     await prisma.space.update({
@@ -284,15 +284,15 @@ describe('listAvailableBounties', () => {
       spaceId: otherSpace.id
     });
 
-    expect(bounties.length).toBe(2);
+    expect(bounties.length).toBe(1);
 
     expect(bounties.every(b => b.id !== invisibleBounty.id)).toBe(true);
-    expect(bounties.some(b => b.id === spaceBounty.id)).toBe(true);
+    expect(bounties.every(b => b.id !== spaceBounty.id)).toBe(true);
     expect(bounties.some(b => b.id === publicBounty.id)).toBe(true);
 
   });
 
-  it('should display all space-accessible and public bounties to a non-space member, if the space has activated public bounty boards', async () => {
+  it('should display all public bounties to a non-space member, if the space has activated public bounty boards', async () => {
     const { space: otherSpace, user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, false);
     const { user: userInDifferentSpace } = await generateUserAndSpaceWithApiToken(undefined, false);
 
@@ -353,10 +353,10 @@ describe('listAvailableBounties', () => {
       userId: userInDifferentSpace.id
     });
 
-    expect(bounties.length).toBe(2);
+    expect(bounties.length).toBe(1);
 
     expect(bounties.every(b => b.id !== invisibleBounty.id)).toBe(true);
-    expect(bounties.some(b => b.id === spaceBounty.id)).toBe(true);
+    expect(bounties.every(b => b.id !== spaceBounty.id)).toBe(true);
     expect(bounties.some(b => b.id === publicBounty.id)).toBe(true);
 
   });

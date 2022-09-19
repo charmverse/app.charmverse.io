@@ -74,7 +74,7 @@ export async function listAvailableBounties ({ spaceId, userId }: AvailableResou
   }
 
   // Make sure a requesting user has access to the space, otherwise treat them as a member of the public
-  if (!userId || (userId && ((await hasAccessToSpace({ userId, spaceId })).error !== undefined))) {
+  if (!userId || (userId && (await hasAccessToSpace({ userId, spaceId })).error !== undefined)) {
     // If public bounty board is disabled, return empty list, otherwise return bounties user can access all bounties
     return !space.publicBountyBoard ? [] : prisma.bounty.findMany({
       where: {
@@ -85,12 +85,7 @@ export async function listAvailableBounties ({ spaceId, userId }: AvailableResou
           deletedAt: null,
           permissions: {
             some: {
-              // Returns bounties accessible to the whole spaces
-              OR: [{
-                spaceId
-              }, {
-                public: true
-              }]
+              public: true
             }
           }
         }

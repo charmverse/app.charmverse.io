@@ -17,9 +17,10 @@ function BountyCard ({ bounty, page, onClick }: Props) {
       onClick={onClick}
       className='KanbanCard'
       sx={{
-        height: 150,
+        height: 'fit-content',
         display: 'grid' // make child full height,
       }}
+      data-test={`bounty-card-${bounty?.id}`}
     >
       <Box
         sx={{

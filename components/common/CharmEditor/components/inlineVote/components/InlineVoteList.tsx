@@ -64,10 +64,10 @@ export default function InlineVoteList ({ pluginKey }: {pluginKey: PluginKey<Inl
     }
   }, [votes, isValidating, isLoading, view, hasRemovedCompletedVoteMarks]);
 
-  if ((currentPageActionDisplay !== 'votes' || cardId) && show && inProgressVoteIds.length !== 0) {
+  if ((currentPageActionDisplay !== 'polls' || cardId) && show && inProgressVoteIds.length !== 0) {
     return (
       <Modal
-        title='Vote details'
+        title='Poll details'
         size='large'
         open={true}
         onClose={() => {

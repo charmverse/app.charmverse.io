@@ -1,4 +1,4 @@
-import { PageLink } from 'lib/pages';
+import type { PageLink } from 'lib/pages';
 import { nestedPageMarkdownEnclosure } from './nestedPage.constants';
 
 /**
@@ -36,6 +36,7 @@ export async function replaceNestedPages (convertedToMarkdown: string): Promise<
   const nestedPageMarkers = parseNestedPagesToReplace(convertedToMarkdown);
 
   const isServer = typeof window === 'undefined';
+
   // Dynamic import allows this function to be loaded in the client-side without triggering a server-side import
   const linkGetter = isServer
   // Server-side method

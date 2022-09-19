@@ -97,7 +97,7 @@ export default function PendingTasks (props: PendingTasksProps) {
               marginRight: 15
             }}
           >
-            <span style={h2Style}>{totalVoteTasks} Vote{totalVoteTasks > 1 ? 's' : ''}</span>
+            <span style={h2Style}>{totalVoteTasks} Poll{totalVoteTasks > 1 ? 's' : ''}</span>
           </a>
           <a href={nexusVoteLink} style={buttonStyle}>
             Vote now

@@ -10,10 +10,19 @@ export default async function task () {
   log.debug('Running delete-archived cron job');
 
   try {
-    const { deletedPagesCount, deletedBlocksCount, archivedBlocksCount, archivedPagesCount } = await deleteArchivedPages(MAX_ARCHIVE_DAYS);
+    const {
+      deletedPagesCount,
+      deletedBlocksCount,
+      archivedBlocksCount,
+      archivedPagesCount,
+      deletedProposalsCount,
+      deletedBountiesCount
+    } = await deleteArchivedPages(MAX_ARCHIVE_DAYS);
 
     log.info(`Deleted ${deletedPagesCount} pages, ${deletedBlocksCount} blocks`);
 
+    gauge('cron.delete-archived.deleted-proposals', deletedProposalsCount);
+    gauge('cron.delete-archived.deleted-bounties', deletedBountiesCount);
     gauge('cron.delete-archived.deleted-pages', deletedPagesCount);
     gauge('cron.delete-archived.deleted-blocks', deletedBlocksCount);
     gauge('cron.delete-archived.archived-pages', archivedPagesCount);
