@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
+import type { ComponentProps, ReactNode } from 'react';
+import { memo } from 'react';
 import { isMac } from 'lib/browser';
-import { ComponentProps, ReactNode, memo } from 'react';
 import twemoji from 'twemoji';
 
 type ImgSize = 'large' | 'small';

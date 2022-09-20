@@ -1,8 +1,8 @@
-import { Application, ApplicationStatus } from '@prisma/client';
+import type { Application, ApplicationStatus } from '@prisma/client';
 import { prisma } from 'db';
 import { DataNotFoundError, InvalidInputError, UndesirableOperationError, WrongStateError } from 'lib/utilities/errors';
 import { getApplication } from '../getApplication';
-import { ReviewDecision, SubmissionReview } from '../interfaces';
+import type { ReviewDecision, SubmissionReview } from '../interfaces';
 
 const submissionStatusAfterDecision: Record<ReviewDecision, ApplicationStatus> = {
   approve: 'complete',

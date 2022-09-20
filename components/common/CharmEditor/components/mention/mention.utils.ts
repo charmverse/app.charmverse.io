@@ -1,7 +1,7 @@
-import { Command } from '@bangle.dev/pm';
+import type { Command } from '@bangle.dev/pm';
 import { suggestTooltip } from '@bangle.dev/tooltip';
-import { SuggestPluginState } from 'lib/prosemirror/interfaces';
-import { PluginKey } from 'prosemirror-state';
+import type { SuggestPluginState } from 'lib/prosemirror/interfaces';
+import type { PluginKey } from 'prosemirror-state';
 import { v4 } from 'uuid';
 import { UserDataPluginKey } from '../charm/charm.plugins';
 

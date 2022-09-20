@@ -1,9 +1,9 @@
-import { MouseEvent, ReactNode } from 'react';
+import type { MouseEvent, ReactNode } from 'react';
 import NextLink from 'next/link';
 import MuiLink from '@mui/material/Link';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
-import { Theme } from '@mui/material';
-import { SxProps } from '@mui/system';
+import type { Theme } from '@mui/material';
+import type { SxProps } from '@mui/system';
 
 import styled from '@emotion/styled';
 

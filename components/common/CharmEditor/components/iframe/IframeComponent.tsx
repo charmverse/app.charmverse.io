@@ -1,5 +1,6 @@
-import { NodeViewProps, Plugin, RawSpecs } from '@bangle.dev/core';
-import { EditorState, EditorView, Node, Schema, Slice, Transaction } from '@bangle.dev/pm';
+import type { NodeViewProps, RawSpecs } from '@bangle.dev/core';
+import { Plugin } from '@bangle.dev/core';
+import type { EditorState, EditorView, Node, Schema, Slice, Transaction } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
@@ -9,7 +10,8 @@ import { ListItem, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MAX_EMBED_HEIGHT, VIDEO_ASPECT_RATIO, MIN_EMBED_WIDTH } from 'lib/embed/constants';
 import { extractEmbedLink } from 'lib/embed/extractEmbedLink';
-import { HTMLAttributes, useState, memo } from 'react';
+import type { HTMLAttributes } from 'react';
+import { useState, memo } from 'react';
 import BlockAligner from '../BlockAligner';
 import IFrameSelector from './IFrameSelector';
 import Resizable from '../Resizable';

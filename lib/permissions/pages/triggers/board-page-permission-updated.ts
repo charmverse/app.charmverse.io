@@ -1,10 +1,10 @@
-import { PagePermission, Prisma, PrismaPromise } from '@prisma/client';
+import type { PagePermission, Prisma, PrismaPromise } from '@prisma/client';
 import { prisma } from 'db';
 import { flattenTree } from 'lib/pages/mapPageTree';
 import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
-import { BoardPagePermissionUpdated } from '../interfaces';
+import type { BoardPagePermissionUpdated } from '../interfaces';
 
 /**
  * Generates the prisma operations for the board and its descendants

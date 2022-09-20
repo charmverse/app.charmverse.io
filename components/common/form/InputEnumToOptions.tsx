@@ -1,5 +1,6 @@
 import FormControl from '@mui/material/FormControl';
-import Select, { SelectProps } from '@mui/material/Select';
+import type { SelectProps } from '@mui/material/Select';
+import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import { useEffect, useState } from 'react';

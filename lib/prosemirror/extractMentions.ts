@@ -1,5 +1,5 @@
 import { shortenHex } from 'lib/utilities/strings';
-import { PageContent } from 'models';
+import type { PageContent } from 'models';
 
 /**
  * Extract all mention ids from page content (json)

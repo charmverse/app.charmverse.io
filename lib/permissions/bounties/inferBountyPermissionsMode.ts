@@ -1,5 +1,5 @@
 import { typedKeys } from 'lib/utilities/objects';
-import { BountyPermissions, InferredBountyPermissionMode } from './interfaces';
+import type { BountyPermissions, InferredBountyPermissionMode } from './interfaces';
 
 // Utility for inferring if a bounty is for a space or for roles
 export function inferBountyPermissionsMode (permissions: Partial<BountyPermissions>): InferredBountyPermissionMode {

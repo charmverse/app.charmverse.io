@@ -1,7 +1,8 @@
-import { PagePermission, PagePermissionLevel, Space, User } from '@prisma/client';
+import type { PagePermission, PagePermissionLevel, Space, User } from '@prisma/client';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { upsertPermission } from 'lib/permissions/pages/actions/upsert-permission';
-import { IPageWithPermissions, PageNotFoundError } from 'lib/pages/server';
+import type { IPageWithPermissions } from 'lib/pages/server';
+import { PageNotFoundError } from 'lib/pages/server';
 import { v4 } from 'uuid';
 import { ExpectedAnError } from 'testing/errors';
 import { prisma } from 'db';

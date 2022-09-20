@@ -8,7 +8,7 @@ import PrimaryButton from 'components/common/PrimaryButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { getSnapshotSpace } from 'lib/snapshot/get-space';
-import { SystemError } from 'lib/utilities/errors';
+import type { SystemError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';

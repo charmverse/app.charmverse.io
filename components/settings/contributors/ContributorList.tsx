@@ -3,10 +3,11 @@ import charmClient from 'charmClient';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useContributors } from 'hooks/useContributors';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
-import { Contributor } from 'models';
+import type { Contributor } from 'models';
 import { useState } from 'react';
 import Legend from '../Legend';
-import ContributorListItem, { RoleAction } from './ContributorListItem';
+import type { RoleAction } from './ContributorListItem';
+import ContributorListItem from './ContributorListItem';
 
 interface Props {
   isAdmin: boolean;

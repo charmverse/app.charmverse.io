@@ -1,9 +1,9 @@
 
-import { PagePermissionLevel, Space } from '@prisma/client';
+import type { PagePermissionLevel, Space } from '@prisma/client';
 import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { setSpaceDefaultPagePermission } from 'lib/spaces/setSpaceDefaultPagePermission';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { requireCustomPermissionMode } from 'lib/middleware/requireCustomPermissionMode';
 

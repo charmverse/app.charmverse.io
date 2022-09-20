@@ -4,8 +4,9 @@ import { InsecureOperationError, InvalidInputError, MissingDataError } from 'lib
 import { uniqueValues } from 'lib/utilities/array';
 import { hasAccessToSpace } from 'lib/middleware';
 import { InvalidPermissionGranteeError } from '../errors';
-import { AssignablePermissionGroups } from '../interfaces';
-import { SpacePermissionFlags, SpacePermissionModification, SpacePermissionWithAssignee } from './interfaces';
+import type { AssignablePermissionGroups } from '../interfaces';
+import type { SpacePermissionFlags, SpacePermissionModification } from './interfaces';
+import { SpacePermissionWithAssignee } from './interfaces';
 import { generateSpacePermissionQuery } from './utility';
 import { computeGroupSpacePermissions } from './computeGroupSpacePermissions';
 

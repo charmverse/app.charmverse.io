@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { SpacePermissionModification, SpacePermissionWithAssignee } from 'lib/permissions/spaces';
+import type { RoleAssignment, RoleWithMembers } from 'lib/roles';
+import { assignRole } from 'lib/roles';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { assignRole, RoleAssignment, RoleWithMembers } from 'lib/roles';
 
 describe('POST /api/roles/assignment - Assign a user to a role', () => {
 

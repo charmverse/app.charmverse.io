@@ -1,8 +1,8 @@
-import { Prisma } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { InvalidInputError } from 'lib/utilities/errors';
-import { IPageWithPermissions, PageNodeWithPermissions, PageTreeResolveInput, TargetPageTree, TargetPageTreeWithFlatChildren } from '../interfaces';
-import { mapTargetPageTree, flattenTree } from '../mapPageTree';
+import type { IPageWithPermissions, PageNodeWithPermissions, PageTreeResolveInput, TargetPageTree, TargetPageTreeWithFlatChildren } from '../interfaces';
+import { flattenTree, mapTargetPageTree } from '../mapPageTree';
 import { PageNotFoundError } from './errors';
 
 function generatePagesQuery ({ spaceId, includeDeletedPages, fullPage }: {spaceId: string, includeDeletedPages?: boolean, fullPage?: boolean}) {

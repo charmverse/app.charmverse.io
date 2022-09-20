@@ -1,4 +1,5 @@
-import { Box, SxProps } from '@mui/material';
+import type { SxProps } from '@mui/material';
+import { Box } from '@mui/material';
 
 export default function TokenLogo ({ src, height = 25, sx }: { src: string, height?: number | string, sx?: SxProps }) {
   return (

@@ -6,7 +6,7 @@ import GridHeader from 'components/common/Grid/GridHeader';
 import LoadingComponent from 'components/common/LoadingComponent';
 import useTasks from 'components/nexus/hooks/useTasks';
 import { usePages } from 'hooks/usePages';
-import { ProposalWithUsers } from 'lib/proposal/interface';
+import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { humanFriendlyDate, toMonthDate } from 'lib/utilities/dates';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { ProposalStatusChip } from './ProposalStatusBadge';

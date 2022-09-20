@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { Box, Typography } from '@mui/material';
 import { CommentOutlined } from '@mui/icons-material';
 

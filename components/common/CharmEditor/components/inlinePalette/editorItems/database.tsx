@@ -1,12 +1,12 @@
 import { rafCommandExec } from '@bangle.dev/utils';
-import { EditorState } from '@bangle.dev/pm';
-import { PageType } from '@prisma/client';
+import type { EditorState } from '@bangle.dev/pm';
+import type { PageType } from '@prisma/client';
 import DatabaseIcon from '@mui/icons-material/TableChart';
 import { addPage } from 'lib/pages';
 import { insertNode } from '../../../utils';
 import { palettePluginKey } from '../config';
 import { replaceSuggestionMarkWith } from '../inlinePalette';
-import { PaletteItemTypeNoGroup, PromisedCommand } from '../paletteItem';
+import type { PaletteItemTypeNoGroup, PromisedCommand } from '../paletteItem';
 
 interface DatabaseItemsProps {
   addNestedPage: (type?: PageType) => Promise<void>;

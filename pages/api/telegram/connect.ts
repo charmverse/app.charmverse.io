@@ -1,12 +1,12 @@
-import nc from 'next-connect';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import type { TelegramUser, User } from '@prisma/client';
 import { prisma } from 'db';
-import { NextApiRequest, NextApiResponse } from 'next';
-import { withSessionRoute } from 'lib/session/withSession';
-import log from 'lib/log';
-import { TelegramUser, User } from '@prisma/client';
 import { getUserS3Folder, uploadToS3 } from 'lib/aws/uploadToS3Server';
+import log from 'lib/log';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { withSessionRoute } from 'lib/session/withSession';
 import { IDENTITY_TYPES } from 'models';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc({
   onError,

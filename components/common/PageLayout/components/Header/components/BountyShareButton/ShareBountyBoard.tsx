@@ -7,7 +7,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Input from '@mui/material/OutlinedInput';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
-import { SpacePermissionConfigurationMode } from '@prisma/client';
+import type { SpacePermissionConfigurationMode } from '@prisma/client';
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';

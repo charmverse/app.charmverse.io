@@ -1,4 +1,4 @@
-import { SpaceRole } from '@prisma/client';
+import type { SpaceRole } from '@prisma/client';
 import { prisma } from 'db';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { createVote, generateProposal, generateRoleWithSpaceRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';

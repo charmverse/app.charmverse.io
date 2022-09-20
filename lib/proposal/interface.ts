@@ -1,5 +1,6 @@
-import { Proposal, ProposalAuthor, ProposalReviewer, ProposalStatus } from '@prisma/client';
-import { AssignablePermissionGroups } from 'lib/permissions/interfaces';
+import type { Proposal, ProposalAuthor, ProposalReviewer } from '@prisma/client';
+import { ProposalStatus } from '@prisma/client';
+import type { AssignablePermissionGroups } from 'lib/permissions/interfaces';
 
 export interface ProposalReviewerInput {
   group: Extract<AssignablePermissionGroups, 'role' | 'user'>

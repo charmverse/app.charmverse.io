@@ -1,7 +1,8 @@
-import { Browser, chromium, expect, test } from '@playwright/test';
+import type { Browser } from '@playwright/test';
+import { chromium, expect, test } from '@playwright/test';
 import type { IPageWithPermissions } from 'lib/pages/interfaces';
 import { prisma } from 'db';
-import { Page } from '@prisma/client';
+import type { Page } from '@prisma/client';
 import { createUserAndSpace, baseUrl } from './utilities';
 
 let browser: Browser;

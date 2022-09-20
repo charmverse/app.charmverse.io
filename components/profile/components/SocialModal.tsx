@@ -1,16 +1,16 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
+import GitHubIcon from '@mui/icons-material/GitHub';
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import TwitterIcon from '@mui/icons-material/Twitter';
+import { Box, Grid, SvgIcon, Typography } from '@mui/material';
+import TextField from '@mui/material/TextField';
+import Button from 'components/common/Button';
+import { DialogTitle, Modal } from 'components/common/Modal';
+import DiscordIcon from 'public/images/discord_logo.svg';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { Box, Grid, SvgIcon, Typography } from '@mui/material';
-import Button from 'components/common/Button';
-import TextField from '@mui/material/TextField';
-import { Modal, DialogTitle } from 'components/common/Modal';
-import TwitterIcon from '@mui/icons-material/Twitter';
-import GitHubIcon from '@mui/icons-material/GitHub';
-import DiscordIcon from 'public/images/discord_logo.svg';
-import LinkedInIcon from '@mui/icons-material/LinkedIn';
-import { Social } from '../interfaces';
+import * as yup from 'yup';
+import type { Social } from '../interfaces';
 
 export const schema = yup.object({
   twitterURL: yup.string().notRequired().ensure().trim()

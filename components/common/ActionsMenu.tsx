@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Box } from '@mui/material';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 const StyledActionsMenu = styled(Box)`
   opacity: 0;

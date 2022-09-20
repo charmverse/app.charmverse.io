@@ -1,6 +1,6 @@
 
 import { prisma } from 'db';
-import { BountyWithDetails } from '../../models/Bounty';
+import type { BountyWithDetails } from '../../models/Bounty';
 import { getBountyOrThrow } from './getBounty';
 import { rollupBountyStatus } from './rollupBountyStatus';
 

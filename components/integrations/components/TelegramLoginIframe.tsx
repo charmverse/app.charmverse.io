@@ -1,6 +1,6 @@
 
 import * as React from 'react';
-import { TelegramAccount } from 'pages/api/telegram/connect';
+import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 const TELEGRAM_BOT_ID = '5238575648'; // TODO: figure out env vars in github actions process.env.NEXT_PUBLIC_TELEGRAM_BOT_ID;
 

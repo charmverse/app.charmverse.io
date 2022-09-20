@@ -1,6 +1,6 @@
 
-import React from 'react';
 import { render, screen } from '@testing-library/react';
+import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 
 import '@testing-library/jest-dom';
@@ -8,7 +8,7 @@ import userEvent from '@testing-library/user-event';
 
 import { TestBlockFactory } from '../../test/testBlockFactory';
 
-import { wrapIntl, mockStateStore } from '../../testUtils';
+import { mockStateStore, wrapIntl } from '../../testUtils';
 
 import { Archiver } from '../../archiver';
 

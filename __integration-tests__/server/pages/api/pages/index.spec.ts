@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Prisma, Space, User } from '@prisma/client';
-import { IPageWithPermissions } from 'lib/pages';
+import type { IPageWithPermissions } from 'lib/pages';
 import { addSpaceOperations } from 'lib/permissions/spaces';
 import request from 'supertest';
 import { generatePageToCreateStub } from 'testing/generate-stubs';

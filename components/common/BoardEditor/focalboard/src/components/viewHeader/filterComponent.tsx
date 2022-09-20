@@ -1,10 +1,10 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import { FilterClause, FilterCondition, createFilterClause } from '../../blocks/filterClause';
-import { createFilterGroup, isAFilterGroupInstance } from '../../blocks/filterGroup';
 import { Board, IPropertyTemplate } from '../../blocks/board';
 import { BoardView } from '../../blocks/boardView';
+import { createFilterClause, FilterClause, FilterCondition } from '../../blocks/filterClause';
+import { createFilterGroup, isAFilterGroupInstance } from '../../blocks/filterGroup';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';

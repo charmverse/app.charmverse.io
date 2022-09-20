@@ -1,9 +1,9 @@
 import { Box, Tooltip } from '@mui/material';
-import { Bounty } from '@prisma/client';
+import type { Bounty } from '@prisma/client';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { useBounties } from 'hooks/useBounties';
-import { ApplicationWithTransactions } from 'lib/applications/actions';
+import type { ApplicationWithTransactions } from 'lib/applications/actions';
 import { eToNumber } from 'lib/utilities/numbers';
 import { useSnackbar } from 'hooks/useSnackbar';
 import BountyPaymentButton from './BountyPaymentButton';

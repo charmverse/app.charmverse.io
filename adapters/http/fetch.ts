@@ -1,4 +1,4 @@
-import { Response as NodeFetchResponse } from 'node-fetch';
+import type { Response as NodeFetchResponse } from 'node-fetch';
 
 type RequestInit = Parameters<typeof fetch>[1];
 

@@ -1,11 +1,10 @@
-import React from 'react';
 
-import {
-  CalculationOptions,
-  CommonCalculationOptionProps,
-  optionsByType
-} from '../../calculations/options';
 import { IPropertyTemplate, PropertyType } from '../../../blocks/board';
+import {
+    CalculationOptions,
+    CommonCalculationOptionProps,
+    optionsByType
+} from '../../calculations/options';
 
 import { Option, OptionProps } from './kanbanOption';
 

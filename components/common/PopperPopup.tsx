@@ -1,4 +1,5 @@
-import { Popover, PopoverProps } from '@mui/material';
+import type { PopoverProps } from '@mui/material';
+import { Popover } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import { bindPopover, bindToggle } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';

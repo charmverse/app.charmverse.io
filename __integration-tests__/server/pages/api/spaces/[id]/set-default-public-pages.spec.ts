@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Space, User } from '@prisma/client';
+import type { Space } from '@prisma/client';
+import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 
 describe('POST /api/spaces/[id]/set-default-public-page - Set whether newly created root pages in a space should be public by default', () => {
   it('should update the space default if user is admin, and return the space, responding with 200', async () => {

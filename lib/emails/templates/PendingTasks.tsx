@@ -4,15 +4,15 @@ import {
   MjmlText,
   MjmlDivider
 } from 'mjml-react';
-import { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
+import type { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
 import { shortenHex } from 'lib/utilities/strings';
 import { lightModeColors, darkModeColors, greyColor2 } from 'theme/colors';
 import log from 'lib/log';
-import { MentionedTask } from 'lib/mentions/interfaces';
-import { VoteTask } from 'lib/votes/interfaces';
+import type { MentionedTask } from 'lib/mentions/interfaces';
+import type { VoteTask } from 'lib/votes/interfaces';
 import { DateTime } from 'luxon';
-import { User } from '@prisma/client';
-import { ProposalTask } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';
+import type { User } from '@prisma/client';
+import type { ProposalTask } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';
 import { ProposalStatusColors } from 'components/proposals/components/ProposalStatusBadge';
 import { Feedback, Footer, Header, EmailWrapper } from './components';
 

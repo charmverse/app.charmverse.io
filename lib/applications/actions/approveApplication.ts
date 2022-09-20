@@ -1,9 +1,9 @@
-import { Application } from '@prisma/client';
+import type { Application } from '@prisma/client';
 import { prisma } from 'db';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import { DataNotFoundError, LimitReachedError, UndesirableOperationError } from 'lib/utilities/errors';
 import { getApplication } from '../getApplication';
-import { ApplicationActionRequest } from '../interfaces';
+import type { ApplicationActionRequest } from '../interfaces';
 import { submissionsCapReached } from '../shared';
 
 export async function approveApplication ({ applicationOrApplicationId, userId }: ApplicationActionRequest): Promise<Application> {

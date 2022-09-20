@@ -1,9 +1,8 @@
-import React from 'react';
 import { useIntl } from 'react-intl';
 
+import { IPropertyTemplate } from '../../../blocks/board';
 import { Card } from '../../../blocks/card';
 import Button from '../../../widgets/buttons/button';
-import { IPropertyTemplate } from '../../../blocks/board';
 
 import Calculations from '../../calculations/calculations';
 
@@ -53,5 +52,6 @@ function KanbanCalculation (props: Props): JSX.Element {
 }
 
 export {
-  KanbanCalculation
+    KanbanCalculation
 };
+

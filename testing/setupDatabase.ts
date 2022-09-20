@@ -1,15 +1,17 @@
-import { ApplicationStatus, Block, Bounty, BountyStatus, Comment, Page, Prisma, ProposalStatus, Role, RoleSource, Thread, Transaction, Vote, WorkspaceEvent } from '@prisma/client';
+import type { ApplicationStatus, Block, Bounty, BountyStatus, Comment, Page, Prisma, ProposalStatus, Role, RoleSource, Thread, Transaction, Vote, WorkspaceEvent } from '@prisma/client';
 import { prisma } from 'db';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
-import { getPagePath, IPageWithPermissions, PageWithProposal } from 'lib/pages';
-import { BountyPermissions } from 'lib/permissions/bounties';
-import { TargetPermissionGroup } from 'lib/permissions/interfaces';
-import { ProposalReviewerInput } from 'lib/proposal/interface';
+import type { IPageWithPermissions, PageWithProposal } from 'lib/pages';
+import { getPagePath } from 'lib/pages';
+import type { BountyPermissions } from 'lib/permissions/bounties';
+import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
+import type { ProposalReviewerInput } from 'lib/proposal/interface';
 import { syncProposalPermissions } from 'lib/proposal/syncProposalPermissions';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { typedKeys } from 'lib/utilities/objects';
-import { BountyWithDetails, IDENTITY_TYPES, LoggedInUser } from 'models';
+import type { BountyWithDetails, LoggedInUser } from 'models';
+import { IDENTITY_TYPES } from 'models';
 import { v4 } from 'uuid';
 import { boardWithCardsArgs } from './generate-board-stub';
 

@@ -1,13 +1,13 @@
-import React from 'react';
-import { render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 import { createIntl } from 'react-intl';
 
-import { wrapDNDIntl } from '../../testUtils';
+import { IPropertyOption } from '../../blocks/board';
 import Mutator from '../../mutator';
 import { TestBlockFactory } from '../../test/testBlockFactory';
-import { IPropertyOption } from '../../blocks/board';
+import { wrapDNDIntl } from '../../testUtils';
 
 import KanbanHiddenColumnItem from './kanbanHiddenColumnItem';
 

@@ -1,16 +1,16 @@
-import { Bounty, Page, Prisma, Space } from '@prisma/client';
-import { BountyWithDetails, LoggedInUser } from 'models';
-import { v4 } from 'uuid';
-import { Page as BrowserPage } from '@playwright/test';
-import type { IPageWithPermissions } from 'lib/pages/interfaces';
-import { baseUrl } from 'testing/mockApiCall';
-import type { BountyPermissions } from 'lib/bounties/interfaces';
-import { getPagePath } from 'lib/pages/utils';
-import { TargetPermissionGroup } from 'lib/permissions/interfaces';
-import { typedKeys } from 'lib/utilities/objects';
+import type { Page as BrowserPage } from '@playwright/test';
+import type { Bounty, Page, Prisma, Space } from '@prisma/client';
 import { prisma } from 'db';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
+import type { BountyPermissions } from 'lib/bounties/interfaces';
+import type { IPageWithPermissions } from 'lib/pages/interfaces';
+import { getPagePath } from 'lib/pages/utils';
+import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import { createUserFromWallet } from 'lib/users/createUser';
+import { typedKeys } from 'lib/utilities/objects';
+import type { BountyWithDetails, LoggedInUser } from 'models';
+import { baseUrl } from 'testing/mockApiCall';
+import { v4 } from 'uuid';
 
 export { baseUrl } from 'testing/mockApiCall';
 

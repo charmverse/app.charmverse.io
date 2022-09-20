@@ -1,7 +1,8 @@
-import { PageContent } from 'models';
+import type { PageContent } from 'models';
 import { v4 } from 'uuid';
-import { Block, createBlock } from './block';
-import { Card } from './card';
+import type { Block } from './block';
+import { createBlock } from './block';
+import type { Card } from './card';
 
 type PropertyType = 'text' | 'number' | 'select' | 'multiSelect' | 'date' | 'person' | 'file' | 'checkbox' | 'url' | 'email' | 'phone' | 'createdTime' | 'createdBy' | 'updatedTime' | 'updatedBy'
 

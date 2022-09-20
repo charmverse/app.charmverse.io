@@ -1,4 +1,5 @@
-import { BountyPermissionLevel, Space, User } from '@prisma/client';
+import type { Space, User } from '@prisma/client';
+import { BountyPermissionLevel } from '@prisma/client';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 import { ExpectedAnError } from 'testing/errors';

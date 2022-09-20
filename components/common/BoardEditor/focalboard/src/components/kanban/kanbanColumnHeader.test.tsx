@@ -1,12 +1,12 @@
-import React from 'react';
 import { fireEvent, render, screen, within } from '@testing-library/react';
-import { createIntl } from 'react-intl';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
+import { createIntl } from 'react-intl';
 
-import Mutator from '../../mutator';
-import { wrapDNDIntl } from '../../testUtils';
-import { TestBlockFactory } from '../../test/testBlockFactory';
 import { IPropertyOption } from '../../blocks/board';
+import Mutator from '../../mutator';
+import { TestBlockFactory } from '../../test/testBlockFactory';
+import { wrapDNDIntl } from '../../testUtils';
 
 import KanbanColumnHeader from './kanbanColumnHeader';
 

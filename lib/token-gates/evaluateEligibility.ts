@@ -1,10 +1,10 @@
-import { Role } from '@prisma/client';
+import type { Role } from '@prisma/client';
 import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
 import { DataNotFoundError, MissingDataError } from 'lib/utilities/errors';
 import { LitNodeClient } from 'lit-js-sdk';
 import { validate } from 'uuid';
-import { TokenGateEvaluationAttempt, TokenGateEvaluationResult, TokenGateJwt } from './interfaces';
+import type { TokenGateEvaluationAttempt, TokenGateEvaluationResult, TokenGateJwt } from './interfaces';
 
 const litClient = new LitNodeClient({
   debug: false

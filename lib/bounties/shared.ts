@@ -1,8 +1,8 @@
 /* Any method here can be used across client and server */
-import { BountyStatus, Prisma } from '@prisma/client';
-import { BountyWithDetails } from 'models';
+import type { BountyStatus, Prisma } from '@prisma/client';
+import type { BountyWithDetails } from 'models';
 import { isTruthy } from 'lib/utilities/types';
-import { BountyPagePermissionSetRequest } from 'lib/bounties/interfaces';
+import type { BountyPagePermissionSetRequest } from 'lib/bounties/interfaces';
 
 export function requesterCanDeleteBounty ({ bounty, requesterIsAdmin, requesterCreatedBounty }: {
   bounty: BountyWithDetails,

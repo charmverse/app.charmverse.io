@@ -1,4 +1,4 @@
-import { Vote } from '@prisma/client';
+import type { Vote } from '@prisma/client';
 import log from 'lib/log';
 import { UnauthorisedActionError, UndesirableOperationError } from 'lib/utilities/errors';
 import { computeSpacePermissions } from 'lib/permissions/spaces';

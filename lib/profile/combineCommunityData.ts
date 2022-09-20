@@ -1,6 +1,6 @@
 import type { CommunityDetails } from 'components/profile/components/CommunityRow';
-import { DeepDaoProposal, DeepDaoVote } from 'lib/deepdao/interfaces';
-import { UserCommunity, ProfileBountyEvent } from './interfaces';
+import type { DeepDaoProposal, DeepDaoVote } from 'lib/deepdao/interfaces';
+import type { ProfileBountyEvent, UserCommunity } from './interfaces';
 
 interface CommunitiesData {
   communities: UserCommunity[];

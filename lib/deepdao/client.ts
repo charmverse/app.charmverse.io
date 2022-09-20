@@ -1,6 +1,6 @@
 import log from 'loglevel';
 import fetch from 'adapters/http/fetch.server';
-import { DeepDaoOrganizationDetails, DeepDaoParticipationScore, DeepDaoProfile } from './interfaces';
+import type { DeepDaoOrganizationDetails, DeepDaoParticipationScore, DeepDaoProfile } from './interfaces';
 
 type ApiResponse<T> = { data: T };
 

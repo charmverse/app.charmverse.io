@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { NftData } from 'lib/blockchain/interfaces';
-import Avatar from 'components/common/Avatar';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { Box, Card, Stack, Typography } from '@mui/material';
+import Avatar from 'components/common/Avatar';
+import type { NftData } from 'lib/blockchain/interfaces';
+import { useState } from 'react';
 
 type Props = {
   nft: NftData;

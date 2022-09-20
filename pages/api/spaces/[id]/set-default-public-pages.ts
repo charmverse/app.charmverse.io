@@ -1,11 +1,11 @@
 
-import { Space } from '@prisma/client';
+import type { Space } from '@prisma/client';
 import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireCustomPermissionMode } from 'lib/middleware/requireCustomPermissionMode';
-import { SpaceDefaultPublicPageToggle } from 'lib/permissions/pages';
+import type { SpaceDefaultPublicPageToggle } from 'lib/permissions/pages';
 import { toggleSpaceDefaultPublicPage } from 'lib/permissions/pages/actions/toggleSpaceDefaultPublicPage';
 import { withSessionRoute } from 'lib/session/withSession';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

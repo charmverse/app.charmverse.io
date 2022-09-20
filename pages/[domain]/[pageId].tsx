@@ -1,5 +1,5 @@
 
-import { Page } from '@prisma/client';
+import type { Page } from '@prisma/client';
 import getPageLayout from 'components/common/PageLayout/getLayout';
 import EditorPage from 'components/[pageId]/EditorPage/EditorPage';
 import { usePages } from 'hooks/usePages';
