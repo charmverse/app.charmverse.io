@@ -23,5 +23,8 @@
   "editor.detectIndentation": false,
   "editor.tabSize": 2,
   "jestrunner.configPath": "jest.config-server.ts",
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "cSpell.words": [
+    "Mainnets"
+  ]
 }

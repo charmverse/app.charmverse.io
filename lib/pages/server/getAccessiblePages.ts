@@ -1,6 +1,6 @@
-import { Prisma } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { IPageWithPermissions, PagesRequest } from '../interfaces';
+import type { IPageWithPermissions, PagesRequest } from '../interfaces';
 
 /**
  * Utility for getting permissions of a page

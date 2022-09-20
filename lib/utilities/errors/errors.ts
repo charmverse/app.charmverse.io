@@ -90,11 +90,12 @@ export class ExternalServiceError extends SystemError {
 }
 
 export class UnknownError extends SystemError {
-  constructor () {
+  constructor (err?: any) {
     super({
       message: 'Something went wrong.',
       errorType: 'Unknown',
-      severity: 'error'
+      severity: 'error',
+      error: err
     });
   }
 }

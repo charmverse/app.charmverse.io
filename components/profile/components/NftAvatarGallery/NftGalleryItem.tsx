@@ -1,14 +1,8 @@
-import React, { useState } from 'react';
-import styled from '@emotion/styled';
+import { useState } from 'react';
 import { NftData } from 'lib/blockchain/interfaces';
 import Avatar from 'components/common/Avatar';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { Box, Card, Stack, Typography } from '@mui/material';
-
-const StyledAvatarItem = styled(Avatar)`
-  width: 80px;
-  height: 80px;
-`;
 
 type Props = {
   nft: NftData;
@@ -34,7 +28,7 @@ export default function NftGalleryItem ({ nft, isSelected, onClick }: Props) {
     >
       <Stack>
         <Box sx={{ alignItems: 'center', justifyContent: 'center', display: 'flex' }}>
-          <StyledAvatarItem avatar={nft.image ?? nft.imageThumb} isNft size='large' />
+          <Avatar avatar={nft.image ?? nft.imageThumb} isNft size='xLarge' />
         </Box>
 
         <Typography noWrap variant='subtitle1'>

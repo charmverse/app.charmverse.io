@@ -6,6 +6,15 @@ export type ChildModificationAction = 'delete' | 'restore' | 'archive'
 
 export async function modifyChildPages (parentId: string, userId: string, action: ChildModificationAction) {
 
+  // Only top level page can be proposal page
+  await prisma.proposal.deleteMany({
+    where: {
+      page: {
+        id: parentId
+      }
+    }
+  });
+
   const { flatChildren } = await resolvePageTree({
     pageId: parentId,
     flattenChildren: true,

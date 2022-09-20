@@ -602,7 +602,7 @@ function CharmEditor (
           </Slide>
           <Slide
             direction='left'
-            in={pageActionDisplay === 'votes'}
+            in={pageActionDisplay === 'polls'}
             style={{
               transformOrigin: 'left top'
             }}

@@ -1,33 +1,34 @@
-import styled from '@emotion/styled';
 import { css, Theme } from '@emotion/react';
-import { Divider } from '@mui/material';
+import styled from '@emotion/styled';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import BountyIcon from '@mui/icons-material/RequestPageOutlined';
-import SettingsIcon from '@mui/icons-material/Settings';
+import DeleteIcon from '@mui/icons-material/Delete';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
+import BountyIcon from '@mui/icons-material/RequestPageOutlined';
+import SearchIcon from '@mui/icons-material/Search';
+import SettingsIcon from '@mui/icons-material/Settings';
+import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
+import { Divider, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
-import SearchIcon from '@mui/icons-material/Search';
 import Typography from '@mui/material/Typography';
+import { BoxProps } from '@mui/system';
 import { Page } from '@prisma/client';
+import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
+import useKeydownPress from 'hooks/useKeydownPress';
 import { useUser } from 'hooks/useUser';
+import { addPageAndRedirect, NewPageInput } from 'lib/pages';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { LoggedInUser } from 'models';
 import { useRouter } from 'next/router';
-import { useState, useCallback } from 'react';
-import Link from 'components/common/Link';
-import { addPageAndRedirect, NewPageInput } from 'lib/pages';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { BoxProps } from '@mui/system';
-import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
-import { usePopupState } from 'material-ui-popup-state/hooks';
-import ForumIcon from '@mui/icons-material/Forum';
+import { useCallback, useState } from 'react';
 import { headerHeight } from '../Header/Header';
 import NewPageMenu from '../NewPageMenu';
-import Workspaces from './Workspaces';
 import PageNavigation from '../PageNavigation';
-import TrashModal from '../TrashModal';
 import SearchInWorkspaceModal from '../SearchInWorkspaceModal';
+import TrashModal from '../TrashModal';
+import Workspaces from './Workspaces';
 
 const WorkspaceLabel = styled.div`
   display: flex;
@@ -176,6 +177,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const [showingTrash, setShowingTrash] = useState(false);
 
   const searchInWorkspaceModalState = usePopupState({ variant: 'popover', popupId: 'search-in-workspace-modal' });
+  const openSearchLabel = useKeydownPress(searchInWorkspaceModalState.toggle, { key: 'p', ctrl: true });
 
   const favoritePageIds = favorites.map(f => f.pageId);
 
@@ -215,15 +217,20 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
             <SidebarLink
               href={`/${space.domain}/proposals`}
               active={router.pathname.startsWith('/[domain]/proposals')}
-              icon={<ForumIcon fontSize='small' />}
+              icon={<TaskOutlinedIcon fontSize='small' />}
               label='Proposals'
             />
             <Divider sx={{ mx: 2, my: 1 }} />
-            <SidebarBox
-              onClick={searchInWorkspaceModalState.open}
-              icon={<SearchIcon color='secondary' fontSize='small' />}
-              label='Quick Find'
-            />
+            <Tooltip title={<>Search and jump to a page <br />{openSearchLabel}</>} placement='right'>
+              <div>
+                <SidebarBox
+                  onClick={searchInWorkspaceModalState.open}
+                  icon={<SearchIcon color='secondary' fontSize='small' />}
+                  label='Quick Find'
+                />
+              </div>
+            </Tooltip>
+
             <SearchInWorkspaceModal
               isOpen={searchInWorkspaceModalState.isOpen}
               close={searchInWorkspaceModalState.close}

@@ -23,12 +23,14 @@ import { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import debouncePromise from 'lib/utilities/debouncePromise';
 import { isTruthy } from 'lib/utilities/types';
 import { BountyWithDetails } from 'models';
+import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import BountyApplicantForm from './components/BountyApplicantForm';
 import BountyApplicantsTable from './components/BountyApplicantsTable';
 import BountyPropertiesHeader from './components/BountyPropertiesHeader';
 import BountySuggestionApproval from './components/BountySuggestionApproval';
 import MissingPagePermissions from './components/MissingPagePermissions';
+import { BountySignupButton } from './components/BountySignupButton';
 
 export default function BountyProperties (props: {
   readOnly?: boolean,
@@ -37,7 +39,7 @@ export default function BountyProperties (props: {
   permissions: AssignedBountyPermissions | null,
   refreshBountyPermissions: (bountyId: string) => void
 }) {
-  const { bountyId, pageId, readOnly = false, permissions, refreshBountyPermissions } = props;
+  const { bountyId, pageId, readOnly: parentReadOnly = false, permissions, refreshBountyPermissions } = props;
   const [paymentMethods] = usePaymentMethods();
   const { draftBounty, bounties, cancelDraftBounty, setBounties, updateBounty } = useBounties();
   const [availableCryptos, setAvailableCryptos] = useState<Array<string | CryptoCurrency>>(['ETH']);
@@ -49,6 +51,13 @@ export default function BountyProperties (props: {
   const [space] = useCurrentSpace();
   const { user } = useUser();
   const { setPages, pages } = usePages();
+
+  const router = useRouter();
+
+  const isPublic = router.asPath.split('/')[1] === 'share';
+  const readOnly = parentReadOnly || isPublic;
+
+  const bountyPage = pages[pageId];
 
   const bountyPermissions = permissions?.bountyPermissions || currentBounty?.permissions;
 
@@ -460,7 +469,7 @@ export default function BountyProperties (props: {
       />
 
       {// Bounty creator cannot apply to their own bounty
-        permissions && currentBounty.createdBy !== user?.id && (
+        permissions && !isPublic && currentBounty.createdBy !== user?.id && (
           <>
             <BountyApplicantForm
               bounty={currentBounty}
@@ -474,6 +483,12 @@ export default function BountyProperties (props: {
               }}
             />
           </>
+        )
+      }
+
+      {
+        isPublic && bountyPage && (
+          <BountySignupButton bountyPage={bountyPage} />
         )
       }
 
