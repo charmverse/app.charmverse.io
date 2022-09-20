@@ -59,7 +59,7 @@ export default function VoteDetail ({ cancelVote, castVote, deleteVote, detailed
       gap: 1
     }}
     >
-      <span>Votes</span> <Chip size='small' label={totalVotes} />
+      <span>Polls</span> <Chip size='small' label={totalVotes} />
     </Box>
   );
 

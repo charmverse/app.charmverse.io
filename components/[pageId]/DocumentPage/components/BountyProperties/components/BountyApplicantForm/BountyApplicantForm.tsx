@@ -38,6 +38,12 @@ export default function BountyApplicantForm (props: BountyApplicationFormProps) 
       ? 'You do not have the correct role to work on this bounty'
       : (capReached ? 'The submissions cap has been reached. This bounty is closed to new submissions.' : '');
 
+  async function submitApplication () {
+    setShowApplication(false);
+    await refreshSubmissions();
+    await refreshBounty(bounty.id);
+  }
+
   if (!userApplication && bounty.approveSubmitters) {
     return (
       !showApplication ? (
@@ -59,9 +65,7 @@ export default function BountyApplicantForm (props: BountyApplicationFormProps) 
         <ApplicationInput
           bountyId={bounty.id}
           mode='create'
-          onSubmit={() => {
-            setShowApplication(false);
-          }}
+          onSubmit={submitApplication}
           onCancel={() => {
             setShowApplication(false);
           }}
@@ -86,11 +90,7 @@ export default function BountyApplicantForm (props: BountyApplicationFormProps) 
 
           <SubmissionInput
             bountyId={bounty.id}
-            onSubmit={async () => {
-              await refreshSubmissions();
-              await refreshBounty(bounty.id);
-              setShowApplication(false);
-            }}
+            onSubmit={submitApplication}
             submission={userApplication}
             permissions={permissions}
             expandedOnLoad={true}
@@ -125,11 +125,7 @@ export default function BountyApplicantForm (props: BountyApplicationFormProps) 
       ) : (
         <SubmissionInput
           bountyId={bounty.id}
-          onSubmit={async () => {
-            await refreshSubmissions();
-            await refreshBounty(bounty.id);
-            setShowApplication(false);
-          }}
+          onSubmit={submitApplication}
           onCancel={() => {
             setShowApplication(false);
           }}
