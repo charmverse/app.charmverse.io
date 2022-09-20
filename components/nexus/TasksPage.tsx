@@ -169,7 +169,7 @@ export default function TasksPage () {
         currentTaskType === 'vote' && <VoteTasksList mutateTasks={mutateTasks} error={error} tasks={tasks} />
       }
       {
-        currentTaskType === 'proposal' && <ProposalTasksList error={error} tasks={tasks} />
+        currentTaskType === 'proposal' && <ProposalTasksList error={error} tasks={tasks} mutateTasks={mutateTasks} />
       }
     </>
   );
