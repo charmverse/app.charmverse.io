@@ -146,7 +146,7 @@ export default function CreateVoteModal ({ open = true, onClose, onCreateVote, i
     || (new Set(options.map(option => option.name)).size !== options.length);
 
   return (
-    <Modal title='Create a vote' size='large' open={open} onClose={onClose ?? (() => {})}>
+    <Modal title={isProposal ? 'Create a vote' : 'Create a poll'} size='large' open={open} onClose={onClose ?? (() => {})}>
       <Box
         flexDirection='column'
         gap={1.5}
