@@ -1,6 +1,6 @@
 import { useTheme } from '@emotion/react';
 import CheckIcon from '@mui/icons-material/Check';
-import { Divider, Stack, Typography } from '@mui/material';
+import { Divider, Grid, Stack, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import type { ProposalStatus } from '@prisma/client';
 import charmClient from 'charmClient';
@@ -31,64 +31,69 @@ export default function ProposalStepper (
   }
 
   return (
-    <Box display='flex' gap={1}>
+    <Grid container>
       {proposalStatuses.map((status, statusIndex) => {
         const canChangeStatus = (currentStatus === 'discussion' && status === 'review' ? proposal.reviewers.length !== 0 : true) && proposalUserGroups.some(
           proposalUserGroup => proposalStatusTransitionPermission[currentStatus]?.[proposalUserGroup]?.includes(status)
         );
 
         return (
-          <Box display='flex' position='relative' gap={1} alignItems='center'>
-            <Stack
-              alignItems='center'
-              gap={1}
-              sx={{
-                flexGrow: 1
-              }}
-            >
-              <Box
-                sx={{
-                  width: 30,
-                  height: 30,
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: canChangeStatus ? 'pointer' : 'initial',
-                  background: status === currentStatus
-                    ? theme.palette.purple.main : canChangeStatus
-                      ? theme.palette.teal.main : theme.palette.gray.main
-                }}
-                onClick={() => {
-                  if (canChangeStatus) {
-                    updateProposalStatus(status);
-                  }
-                }}
+          <>
+            <Grid item md={12 / 13} display='flex' position='relative' gap={1} alignItems='center'>
+              <Stack
+                alignItems='center'
+                height='100%'
+                gap={1}
               >
-                {currentStatusIndex >= statusIndex ? <CheckIcon />
-                  : (
-                    <Typography sx={{
-                      fontWeight: 500
-                    }}
-                    >
-                      {statusIndex}
-                    </Typography>
-                  )}
-              </Box>
-              <Typography sx={{
-                fontWeight: currentStatusIndex === statusIndex ? 'bold' : 'initial'
+                <Box
+                  sx={{
+                    width: 30,
+                    height: 30,
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: canChangeStatus ? 'pointer' : 'initial',
+                    background: status === currentStatus
+                      ? theme.palette.purple.main : canChangeStatus
+                        ? theme.palette.teal.main : theme.palette.gray.main
+                  }}
+                  onClick={() => {
+                    if (canChangeStatus) {
+                      updateProposalStatus(status);
+                    }
+                  }}
+                >
+                  {currentStatusIndex >= statusIndex ? <CheckIcon />
+                    : (
+                      <Typography sx={{
+                        fontWeight: 500
+                      }}
+                      >
+                        {statusIndex}
+                      </Typography>
+                    )}
+                </Box>
+                <Typography
+                  textAlign='center'
+                  sx={{
+                    fontWeight: currentStatusIndex === statusIndex ? 'bold' : 'initial'
+                  }}
+                >
+                  {PROPOSAL_STATUS_LABELS[status as ProposalStatus]}
+                </Typography>
+              </Stack>
+            </Grid>
+            <Grid item md={12 / 13}>
+              <Divider sx={{
+                position: 'relative',
+                top: 15
               }}
-              >
-                {PROPOSAL_STATUS_LABELS[status as ProposalStatus]}
-              </Typography>
-            </Stack>
-            <Divider sx={{
-              position: 'absolute'
-            }}
-            />
-          </Box>
+              />
+            </Grid>
+          </>
         );
       })}
-    </Box>
+    </Grid>
   );
 }
