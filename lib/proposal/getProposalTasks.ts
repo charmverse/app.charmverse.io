@@ -35,7 +35,16 @@ const StatusActionRecord: Record<Exclude<ProposalStatus, 'vote_closed' | 'discus
   private_draft: 'start_discussion'
 };
 
-export async function getProposalTasks (userId: string): Promise<ProposalTask[]> {
+export async function getProposalTasks (userId: string): Promise<{
+  marked: ProposalTask[],
+  unmarked: ProposalTask[]
+}> {
+  const userNotifications = await prisma.userNotification.findMany({
+    where: {
+      userId
+    }
+  });
+
   const proposalTasks = await prisma.proposal.findMany({
     where: {
       page: {
@@ -129,10 +138,26 @@ export async function getProposalTasks (userId: string): Promise<ProposalTask[]>
     }
   });
 
-  return proposalTasks.map(proposal => {
+  const userNotificationIds = new Set(userNotifications.map(userNotification => userNotification.taskId));
+
+  const proposalsRecord: {marked: ProposalTask[], unmarked: ProposalTask[]} = {
+    marked: [],
+    unmarked: []
+  };
+
+  proposalTasks.map(proposal => {
     if (proposal.status === 'discussion') {
       return proposal.authors.map(author => author.userId === userId) ? extractProposalData(proposal, 'start_review') : extractProposalData(proposal, 'discuss');
     }
     return extractProposalData(proposal, StatusActionRecord[proposal.status as keyof typeof StatusActionRecord]);
-  }).filter(isTruthy);
+  }).filter(isTruthy).forEach(proposalTask => {
+    if (!userNotificationIds.has(proposalTask.id)) {
+      proposalsRecord.unmarked.push(proposalTask);
+    }
+    else {
+      proposalsRecord.marked.push(proposalTask);
+    }
+  });
+
+  return proposalsRecord;
 }
