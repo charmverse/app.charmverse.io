@@ -33,7 +33,8 @@ beforeAll(async () => {
     title: 'Root 1',
     index: 1,
     createdBy: user.id,
-    spaceId: space.id
+    spaceId: space.id,
+    content: { content: '' }
   });
 
   page_1_1 = await createPage({
@@ -171,17 +172,17 @@ describe('resolvePageTree', () => {
   });
 
   it('should not return the full page content by default', async () => {
-    const { targetPage } = await resolvePageTree({ pageId: root_1.id, fullPage: true });
-
-    expect(targetPage).toMatchObject(expect.objectContaining(root_1));
-
-  });
-
-  it('should return the full page content if the full page option is passed', async () => {
     const { targetPage } = await resolvePageTree({ pageId: root_1.id });
 
     expect(targetPage).not.toMatchObject(expect.objectContaining(root_1));
     expect((targetPage as any as Page).content).toBeUndefined();
+
+  });
+
+  it('should return the full page content if the full page option is passed', async () => {
+    const { targetPage } = await resolvePageTree({ pageId: root_1.id, fullPage: true });
+
+    expect(targetPage).toMatchObject(expect.objectContaining(root_1));
 
   });
 
