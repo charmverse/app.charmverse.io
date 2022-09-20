@@ -1,11 +1,10 @@
-import { SpacePermissionFlags, SpacePermissionModification, SpacePermissionWithAssignee } from 'lib/permissions/spaces';
+import type { Role, Space, User } from '@prisma/client';
+import { prisma } from 'db';
+import type { IPagePermissionToCreate } from 'lib/permissions/pages';
+import { upsertPermission } from 'lib/permissions/pages';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { createPage, generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
-import { User, Space, Role } from '@prisma/client';
-import { IPagePermissionToCreate, upsertPermission } from 'lib/permissions/pages';
-import { prisma } from 'db';
 
 let user: User;
 let userCookie: string;

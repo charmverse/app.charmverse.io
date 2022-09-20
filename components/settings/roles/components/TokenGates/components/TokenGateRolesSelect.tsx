@@ -1,13 +1,12 @@
-import { Box, Chip, FormControl, MenuItem, Select, Tooltip, Typography } from '@mui/material';
-import { SelectChangeEvent } from '@mui/material/Select';
-import { InfoOutlined as InfoOutlinedIcon } from '@mui/icons-material';
-import { useMemo } from 'react';
 import styled from '@emotion/styled';
-import Button from 'components/common/Button';
+import { InfoOutlined as InfoOutlinedIcon } from '@mui/icons-material';
+import { Box, Chip, FormControl, MenuItem, Select, Tooltip, Typography } from '@mui/material';
+import type { SelectChangeEvent } from '@mui/material/Select';
 import useIsAdmin from 'hooks/useIsAdmin';
-import { isTruthy } from 'lib/utilities/types';
-import { ListSpaceRolesResponse } from 'pages/api/roles';
 import useRoles from 'hooks/useRoles';
+import { isTruthy } from 'lib/utilities/types';
+import type { ListSpaceRolesResponse } from 'pages/api/roles';
+import { useMemo } from 'react';
 
 /**
  * @renderSelected Show selected options in the options menu. Default is true.

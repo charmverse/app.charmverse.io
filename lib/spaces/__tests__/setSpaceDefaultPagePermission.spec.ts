@@ -1,4 +1,4 @@
-import { Space } from '@prisma/client';
+import type { Space } from '@prisma/client';
 import { SpaceNotFoundError } from 'lib/public-api';
 import { ExpectedAnError } from 'testing/errors';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';

@@ -1,6 +1,7 @@
-import { BaseRawMarkSpec, PluginKey, SpecRegistry } from '@bangle.dev/core';
-import { EditorView, keymap } from '@bangle.dev/pm';
-import type { Command, EditorState, Schema } from '@bangle.dev/pm';
+import type { BaseRawMarkSpec, SpecRegistry } from '@bangle.dev/core';
+import { PluginKey } from '@bangle.dev/core';
+import { keymap } from '@bangle.dev/pm';
+import type { Command, EditorState, Schema, EditorView } from '@bangle.dev/pm';
 import { createTooltipDOM } from '@bangle.dev/tooltip';
 import { bangleWarn, valuePlugin } from '@bangle.dev/utils';
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';

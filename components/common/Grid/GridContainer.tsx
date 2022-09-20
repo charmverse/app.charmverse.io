@@ -1,4 +1,4 @@
-import { ComponentProps } from 'react';
+import type { ComponentProps } from 'react';
 import { Grid } from '@mui/material';
 import styled from '@emotion/styled';
 

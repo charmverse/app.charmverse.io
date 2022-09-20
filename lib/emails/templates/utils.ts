@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { render } from 'mjml-react';
 
 export function renderMJML (mjml: React.ReactElement) {

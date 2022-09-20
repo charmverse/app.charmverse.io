@@ -1,8 +1,8 @@
 import { prisma } from 'db';
-import { AssignablePermissionGroups } from '../interfaces';
+import type { AssignablePermissionGroups } from '../interfaces';
 import { AvailableSpacePermissions } from './availableSpacePermissions';
 import { computeGroupSpacePermissions } from './computeGroupSpacePermissions';
-import { SpacePermissionFlags, SpacePermissionModification } from './interfaces';
+import type { SpacePermissionFlags, SpacePermissionModification } from './interfaces';
 import { generateSpacePermissionQuery } from './utility';
 
 /**

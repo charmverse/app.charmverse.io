@@ -1,4 +1,5 @@
-import { PluginKey, TextSelection } from '@bangle.dev/pm';
+import type { PluginKey } from '@bangle.dev/pm';
+import { TextSelection } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { hideSelectionTooltip } from '@bangle.dev/tooltip/selection-tooltip';
 

@@ -1,5 +1,7 @@
-import { RawPlugins, RawSpecs, NodeView } from '@bangle.dev/core';
-import { DOMOutputSpec, keymap, newlineInCode, splitBlock, createParagraphNear, EditorState, EditorView, Transaction, chainCommands } from '@bangle.dev/pm';
+import type { RawPlugins, RawSpecs } from '@bangle.dev/core';
+import { NodeView } from '@bangle.dev/core';
+import type { DOMOutputSpec, EditorState, EditorView, Transaction } from '@bangle.dev/pm';
+import { chainCommands, createParagraphNear, keymap, newlineInCode, splitBlock } from '@bangle.dev/pm';
 import { parentHasDirectParentOfType } from '@bangle.dev/pm-commands';
 import log from 'lib/log';
 

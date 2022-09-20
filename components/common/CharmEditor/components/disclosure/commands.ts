@@ -1,5 +1,6 @@
 
-import { Command, Fragment, Node, TextSelection } from '@bangle.dev/pm';
+import type { Command, Node } from '@bangle.dev/pm';
+import { Fragment, TextSelection } from '@bangle.dev/pm';
 import { findParentNodeOfTypeClosestToPos } from '@bangle.dev/utils';
 
 // Backspace Use case: When a user hits 'backspace' at the beginning of a summary node

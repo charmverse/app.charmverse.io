@@ -1,15 +1,14 @@
-import Box from '@mui/material/Box';
+import { useTheme } from "@emotion/react";
 import Divider from '@mui/material/Divider';
 import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { Page } from "@prisma/client";
 import { AddIcon } from 'components/common/Icons/AddIcon';
-import { useTheme } from "@emotion/react";
 import { DocumentPageIcon } from 'components/common/Icons/DocumentPageIcon';
+import { fancyTrim } from 'lib/utilities/strings';
 import { bindMenu, PopupState } from 'material-ui-popup-state/hooks';
 import { TemplatePageMenuActions } from './TemplatePageMenuActions';
-import { fancyTrim } from 'lib/utilities/strings';
 
 interface Props {
   pages: Page[];

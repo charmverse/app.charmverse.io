@@ -1,6 +1,6 @@
 import { prisma } from 'db';
 import { DataNotFoundError } from 'lib/utilities/errors';
-import { BountyPermissions } from './interfaces';
+import type { BountyPermissions } from './interfaces';
 import { mapBountyPermissions } from './mapBountyPermissions';
 
 /**

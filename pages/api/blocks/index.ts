@@ -1,12 +1,12 @@
 
-import { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-import { Block, Prisma } from '@prisma/client';
+import type { Block, Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { onError, onNoMatch, requireUser, NotFoundError, InvalidStateError } from 'lib/middleware';
-import { withSessionRoute } from 'lib/session/withSession';
+import { InvalidStateError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { getPagePath } from 'lib/pages';
 import { copyAllPagePermissions } from 'lib/permissions/pages/actions/copyPermission';
+import { withSessionRoute } from 'lib/session/withSession';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 // TODO: frontend should tell us which space to use
 export type ServerBlockFields = 'spaceId' | 'updatedBy' | 'createdBy';

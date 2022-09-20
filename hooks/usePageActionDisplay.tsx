@@ -1,11 +1,12 @@
-import { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
-import { ExtendedVote } from 'lib/votes/interfaces';
 import { isSmallScreen } from 'lib/browser';
-import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
+import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
+import type { ExtendedVote } from 'lib/votes/interfaces';
+import type { ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useSWRConfig } from 'swr';
-import { useVotes } from './useVotes';
 import { usePages } from './usePages';
 import { useThreads } from './useThreads';
+import { useVotes } from './useVotes';
 
 export interface IPageActionDisplayContext {
   currentPageActionDisplay: null | 'polls' | 'comments',

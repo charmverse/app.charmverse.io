@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { PagePermission, Space, User } from '@prisma/client';
+import type { PagePermission, Space, User } from '@prisma/client';
 import { prisma } from 'db';
-import { IPageWithPermissions } from 'lib/pages';
+import type { IPageWithPermissions } from 'lib/pages';
 import { getPage } from 'lib/pages/server';
 import { isTruthy } from 'lib/utilities/types';
 import request from 'supertest';

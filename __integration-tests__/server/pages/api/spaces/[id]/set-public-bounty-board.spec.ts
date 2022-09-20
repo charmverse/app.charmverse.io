@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Space, User } from '@prisma/client';
+import type { Space, User } from '@prisma/client';
+import type { PublicBountyToggle } from 'lib/spaces/interfaces';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { SpacePermissionConfigurationUpdate } from 'lib/permissions/meta';
-import { PublicBountyToggle } from 'lib/spaces/interfaces';
 
 let nonAdminUser: User;
 let nonAdminUserCookie: string;

@@ -1,15 +1,17 @@
 import nc from 'next-connect';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import { withSessionRoute } from 'lib/session/withSession';
 import { authenticatedRequest } from 'lib/discord/handleDiscordResponse';
 import { findOrCreateRoles } from 'lib/roles/createRoles';
-import { assignRolesFromDiscord, DiscordGuildMember } from 'lib/discord/assignRoles';
-import { DiscordUser } from '@prisma/client';
+import type { DiscordGuildMember } from 'lib/discord/assignRoles';
+import { assignRolesFromDiscord } from 'lib/discord/assignRoles';
+import type { DiscordUser } from '@prisma/client';
 import log from 'lib/log';
 import { prisma } from 'db';
-import { getDiscordAccount, DiscordAccount } from 'lib/discord/getDiscordAccount';
-import { DiscordServerRole } from 'lib/discord/interface';
+import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
+import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
+import type { DiscordServerRole } from 'lib/discord/interface';
 import { getUserS3Folder, uploadToS3 } from 'lib/aws/uploadToS3Server';
 import { IDENTITY_TYPES } from 'models';
 

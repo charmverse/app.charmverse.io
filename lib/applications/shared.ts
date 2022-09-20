@@ -1,4 +1,4 @@
-import { Application, Bounty } from '@prisma/client';
+import type { Application, Bounty } from '@prisma/client';
 
 export const MINIMUM_APPLICATION_MESSAGE_CHARACTERS = 1;
 

@@ -1,10 +1,10 @@
-import { Page } from '@prisma/client';
+import type { Page } from '@prisma/client';
 import { prisma } from 'db';
 import { v4, validate } from 'uuid';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { getPagePath } from 'lib/pages';
 import { DatabasePageNotFoundError } from './errors';
-import { PageProperty } from './interfaces';
+import type { PageProperty } from './interfaces';
 import { PageFromBlock } from './pageFromBlock.class';
 
 export async function createDatabase (boardInfo: Record<keyof Pick<Page, 'title' | 'createdBy' | 'spaceId'>, string>, boardSchema: PageProperty [] = []): Promise<Page> {

@@ -1,30 +1,45 @@
+import type { Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { InvalidInputError } from 'lib/utilities/errors';
-import { PageNodeWithPermissions, PageTreeResolveInput, TargetPageTree, TargetPageTreeWithFlatChildren } from '../interfaces';
-import { mapTargetPageTree, flattenTree } from '../mapPageTree';
+import type { IPageWithPermissions, PageNodeWithPermissions, PageTreeResolveInput, TargetPageTree, TargetPageTreeWithFlatChildren } from '../interfaces';
+import { flattenTree, mapTargetPageTree } from '../mapPageTree';
 import { PageNotFoundError } from './errors';
 
-function generatePagesQuery ({ spaceId, includeDeletedPages }: {spaceId: string, includeDeletedPages?: boolean}) {
-  return {
-    where: {
-      spaceId,
-      // Soft deleted pages have a value for deletedAt. Active pages are null
-      deletedAt: includeDeletedPages ? undefined : null
-    },
-    select: {
-      id: true,
-      parentId: true,
-      index: true,
-      type: true,
-      createdAt: true,
-      deletedAt: true,
-      spaceId: true,
+function generatePagesQuery ({ spaceId, includeDeletedPages, fullPage }: {spaceId: string, includeDeletedPages?: boolean, fullPage?: boolean}) {
+
+  const pageQueryContent: Partial<Prisma.PageFindManyArgs> = fullPage ? {
+    include: {
       permissions: {
         include: {
           sourcePermission: true
         }
       }
     }
+  } : {
+    select: {
+      id: true,
+      parentId: true,
+      boardId: true,
+      cardId: true,
+      index: true,
+      type: true,
+      createdAt: true,
+      deletedAt: true,
+      permissions: {
+        include: {
+          sourcePermission: true
+        }
+      }
+    }
+  };
+
+  return {
+    where: {
+      spaceId,
+      // Soft deleted pages have a value for deletedAt. Active pages are null
+      deletedAt: includeDeletedPages ? undefined : null
+    },
+    ...pageQueryContent
   };
 }
 
@@ -36,11 +51,17 @@ function generatePagesQuery ({ spaceId, includeDeletedPages }: {spaceId: string,
  *
  * Pass flatten children prop to also receive a flat array of children
  */
-export async function resolvePageTree ({ pageId, flattenChildren, pageNodes }:
-  PageTreeResolveInput & {flattenChildren?: undefined | false}): Promise<TargetPageTree<PageNodeWithPermissions>>
-export async function resolvePageTree ({ pageId, flattenChildren, pageNodes }:
-  PageTreeResolveInput & {flattenChildren: true}): Promise<TargetPageTreeWithFlatChildren<PageNodeWithPermissions>>
-export async function resolvePageTree ({ pageId, flattenChildren = false, includeDeletedPages = false, pageNodes }:
+// Normal page node
+export async function resolvePageTree ({ pageId, flattenChildren, fullPage, pageNodes }:
+  PageTreeResolveInput & {flattenChildren?: undefined | false, fullPage?: false | undefined}): Promise<TargetPageTree<PageNodeWithPermissions>>
+export async function resolvePageTree ({ pageId, flattenChildren, fullPage, pageNodes }:
+  PageTreeResolveInput & {flattenChildren: true, fullPage?: false | undefined}): Promise<TargetPageTreeWithFlatChildren<PageNodeWithPermissions>>
+// Full pages
+export async function resolvePageTree ({ pageId, flattenChildren, fullPage, pageNodes }:
+    PageTreeResolveInput & {flattenChildren?: undefined | false, fullPage: true}): Promise<TargetPageTree<IPageWithPermissions>>
+export async function resolvePageTree ({ pageId, flattenChildren, fullPage, pageNodes }:
+    PageTreeResolveInput & {flattenChildren: true, fullPage: true}): Promise<TargetPageTreeWithFlatChildren<IPageWithPermissions>>
+export async function resolvePageTree ({ pageId, flattenChildren = false, includeDeletedPages = false, fullPage, pageNodes }:
   PageTreeResolveInput):
   Promise<TargetPageTree<PageNodeWithPermissions> | TargetPageTreeWithFlatChildren<PageNodeWithPermissions>> {
 
@@ -57,7 +78,9 @@ export async function resolvePageTree ({ pageId, flattenChildren = false, includ
     throw new PageNotFoundError(pageId);
   }
 
-  const pagesInSpace = pageNodes ?? await prisma.page.findMany(generatePagesQuery({ includeDeletedPages, spaceId: pageWithSpaceIdOnly.spaceId }));
+  const pagesInSpace = (pageNodes ?? await prisma.page.findMany(generatePagesQuery({
+    includeDeletedPages, spaceId: pageWithSpaceIdOnly.spaceId, fullPage
+  }))) as (PageNodeWithPermissions[] | IPageWithPermissions[]);
 
   const { parents, targetPage } = mapTargetPageTree<PageNodeWithPermissions>({
     items: pagesInSpace,
@@ -89,7 +112,7 @@ export async function resolvePageTree ({ pageId, flattenChildren = false, includ
 
 }
 
-export type MultiPageTreeResolveInput<F extends boolean | undefined = boolean> = Pick<PageTreeResolveInput, 'includeDeletedPages'> & {pageIds: string[], flattenChildren?: F}
+export type MultiPageTreeResolveInput<F extends boolean | undefined = boolean> = Pick<PageTreeResolveInput, 'includeDeletedPages' | 'fullPage'> & {pageIds: string[], flattenChildren?: F}
 
 /**
  * Resolved page trees mapped to the page id
@@ -104,17 +127,20 @@ export type MultiPageTreeResolveOutput<F extends boolean | undefined = false>
 export async function multiResolvePageTree({
   pageIds,
   includeDeletedPages,
-  flattenChildren
+  flattenChildren,
+  fullPage
 }: MultiPageTreeResolveInput<false | undefined>): Promise<MultiPageTreeResolveOutput<false | undefined>>
 export async function multiResolvePageTree({
   pageIds,
   includeDeletedPages,
-  flattenChildren
+  flattenChildren,
+  fullPage
 }: MultiPageTreeResolveInput<true>): Promise<MultiPageTreeResolveOutput<true>>
 export async function multiResolvePageTree<F extends boolean | undefined> ({
   pageIds,
   includeDeletedPages,
-  flattenChildren
+  flattenChildren,
+  fullPage
 }: MultiPageTreeResolveInput<F>):
 Promise<MultiPageTreeResolveOutput<F>> {
   const pagesWithSpaceIds = (await prisma.page.findMany({
@@ -140,12 +166,15 @@ Promise<MultiPageTreeResolveOutput<F>> {
 
   const spaceId = uniqueSpaceIds[0];
 
-  const pagesInSpace = await prisma.page.findMany(generatePagesQuery({ includeDeletedPages, spaceId }));
+  const pagesInSpace = await prisma.page.findMany(generatePagesQuery({
+    includeDeletedPages, spaceId
+  })) as (PageNodeWithPermissions[] | IPageWithPermissions[]);
 
   const mappedResults = await Promise.all(pageIds.map(id => resolvePageTree({
     pageId: id,
     flattenChildren: flattenChildren as any,
     includeDeletedPages,
+    fullPage: fullPage as any,
     pageNodes: pagesInSpace
   }).catch(() => null)));
 

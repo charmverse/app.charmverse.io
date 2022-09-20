@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 // https://scastiel.dev/posts/2019-02-19-react-hooks-get-current-state-back-to-the-future/
 export default function useRefState<T> (initialValue: T) {

@@ -7,7 +7,7 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { TokenGate } from '@prisma/client';
+import type { TokenGate } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import charmClient from 'charmClient';
@@ -16,12 +16,13 @@ import TableRow from 'components/common/Table/TableRow';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import log from 'lib/log';
 import getLitChainFromChainId from 'lib/token-gates/getLitChainFromChainId';
-import { TokenGateWithRoles } from 'lib/token-gates/interfaces';
+import type { TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import { shortenHex } from 'lib/utilities/strings';
 import { checkAndSignAuthMessage, humanizeAccessControlConditions } from 'lit-js-sdk';
 import { useEffect, useState } from 'react';
 import { mutate } from 'swr';
-import TestConnectionModal, { TestResult } from './TestConnectionModal';
+import type { TestResult } from './TestConnectionModal';
+import TestConnectionModal from './TestConnectionModal';
 import TokenGateRolesSelect from './TokenGateRolesSelect';
 
 interface Props {

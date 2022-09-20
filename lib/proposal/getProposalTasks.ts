@@ -1,4 +1,4 @@
-import { Page, Proposal, ProposalStatus, Space } from '@prisma/client';
+import type { Page, Proposal, ProposalStatus, Space } from '@prisma/client';
 import { prisma } from 'db';
 import { isTruthy } from 'lib/utilities/types';
 

@@ -2,8 +2,8 @@ import { NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { getVotesByPage } from 'lib/votes';
-import { ExtendedVote } from 'lib/votes/interfaces';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { ExtendedVote } from 'lib/votes/interfaces';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

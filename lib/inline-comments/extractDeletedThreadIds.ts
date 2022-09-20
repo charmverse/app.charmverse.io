@@ -1,5 +1,6 @@
-import { Schema, Node, MarkType } from '@bangle.dev/pm';
-import { findChildrenByMark, NodeWithPos } from 'prosemirror-utils';
+import type { MarkType, Node, Schema } from '@bangle.dev/pm';
+import type { NodeWithPos } from 'prosemirror-utils';
+import { findChildrenByMark } from 'prosemirror-utils';
 
 function extractThreadIds (inlineCommentNodes: NodeWithPos[]) {
   const threadIds: Set<string> = new Set();

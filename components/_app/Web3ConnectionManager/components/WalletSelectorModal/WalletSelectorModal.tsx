@@ -1,19 +1,19 @@
+import MetaMaskOnboarding from '@metamask/onboarding';
 import {
   Grid,
   IconButton,
   Typography
 } from '@mui/material';
-import MetaMaskOnboarding from '@metamask/onboarding';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { AbstractConnector } from '@web3-react/abstract-connector';
-import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
-import Link from 'components/common/Link';
-import ErrorComponent from 'components/common/errors/WalletError';
-import { injected, walletConnect, walletLink } from 'connectors';
 import ArrowSquareOut from '@mui/icons-material/Launch';
-import { useEffect, useRef } from 'react';
-import { Modal, DialogTitle } from 'components/common/Modal';
+import type { AbstractConnector } from '@web3-react/abstract-connector';
+import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
 import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
+import ErrorComponent from 'components/common/errors/WalletError';
+import Link from 'components/common/Link';
+import { DialogTitle, Modal } from 'components/common/Modal';
+import { injected, walletConnect, walletLink } from 'connectors';
+import { useEffect, useRef } from 'react';
 import ConnectorButton from './components/ConnectorButton';
 import processConnectionError from './utils/processConnectionError';
 

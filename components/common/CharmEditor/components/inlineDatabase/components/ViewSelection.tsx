@@ -1,5 +1,5 @@
 import { Box, Card, Divider, MenuItem, Typography } from '@mui/material';
-import { BoardView } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
+import type { BoardView } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import Button from 'components/common/Button';
 

@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
-import { Option as SelectOption, typesByOptions } from '../../calculations/options';
 import { IPropertyTemplate } from '../../../blocks/board';
-import ChevronRight from '../../../widgets/icons/chevronRight';
 import { Constants } from '../../../constants';
+import ChevronRight from '../../../widgets/icons/chevronRight';
+import { Option as SelectOption, typesByOptions } from '../../calculations/options';
 
 type OptionProps = SelectOption & {
     cardProperties: IPropertyTemplate[]
@@ -97,3 +97,4 @@ function Option (props: {data: OptionProps}): JSX.Element {
 
 export { Option };
 export type { OptionProps };
+

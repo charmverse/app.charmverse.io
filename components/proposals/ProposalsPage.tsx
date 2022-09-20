@@ -8,7 +8,8 @@ import { usePages } from 'hooks/usePages';
 import { useState } from 'react';
 import useSWR from 'swr';
 import ProposalsTable from './components/ProposalsTable';
-import ProposalsViewOptions, { ProposalFilter, ProposalSort } from './components/ProposalsViewOptions';
+import type { ProposalFilter, ProposalSort } from './components/ProposalsViewOptions';
+import ProposalsViewOptions from './components/ProposalsViewOptions';
 
 export default function ProposalsPage () {
   const [currentSpace] = useCurrentSpace();

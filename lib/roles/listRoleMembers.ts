@@ -1,6 +1,6 @@
 import { prisma } from 'db';
 import { DataNotFoundError } from 'lib/utilities/errors';
-import { RoleMembersQuery, RoleWithMembers } from './interfaces';
+import type { RoleMembersQuery, RoleWithMembers } from './interfaces';
 
 export async function listRoleMembers ({ roleId }: RoleMembersQuery): Promise<RoleWithMembers> {
   const role = await prisma.role.findFirst({

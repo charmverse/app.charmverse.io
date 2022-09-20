@@ -1,11 +1,12 @@
 
-import { Prisma } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { PageFromBlock, Page, PageProperty, mapProperties, validateUpdateData, getPageInBoard } from 'lib/public-api';
 import { onError, onNoMatch, requireApiKey, SpaceAccessDeniedError } from 'lib/middleware';
-import { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 import { generateMarkdown } from 'lib/pages';
+import type { Page, PageProperty } from 'lib/public-api';
+import { getPageInBoard, mapProperties, PageFromBlock, validateUpdateData } from 'lib/public-api';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

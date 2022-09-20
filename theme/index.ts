@@ -1,10 +1,11 @@
-import { PaletteMode, Theme as MaterialUITheme } from '@mui/material';
+import type { PaletteMode, Theme as MaterialUITheme } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
 import { darken } from '@mui/system';
+import type { BrandColor } from './colors';
 import {
   backgroundColor,
   backgroundColorDarkMode, backgroundDarkColor, backgroundDarkColorDarkMode, backgroundLightColor,
-  backgroundLightColorDarkMode, blueColor, BrandColor,
+  backgroundLightColorDarkMode, blueColor,
   darkBlueColor, darkModeColors, lightModeColors, primaryTextColor,
   primaryTextColorDarkMode, settingsHeaderBackgroundColor,
   settingsHeaderBackgroundColorDarkMode

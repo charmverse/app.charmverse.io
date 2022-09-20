@@ -1,12 +1,13 @@
-import nc from 'next-connect';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { shortenHex } from 'lib/utilities/strings';
-import { withSessionRoute } from 'lib/session/withSession';
-import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from 'db';
-import { IDENTITY_TYPES, IdentityType } from 'models';
-import { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import getENSName from 'lib/blockchain/getENSName';
+import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { withSessionRoute } from 'lib/session/withSession';
+import { shortenHex } from 'lib/utilities/strings';
+import type { IdentityType } from 'models';
+import { IDENTITY_TYPES } from 'models';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc({
   onError,

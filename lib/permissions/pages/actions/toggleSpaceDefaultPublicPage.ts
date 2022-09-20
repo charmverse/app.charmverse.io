@@ -1,7 +1,7 @@
-import { Space } from '@prisma/client';
+import type { Space } from '@prisma/client';
 import { prisma } from 'db';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
-import { SpaceDefaultPublicPageToggle } from '../page-permission-interfaces';
+import type { SpaceDefaultPublicPageToggle } from '../page-permission-interfaces';
 
 export async function toggleSpaceDefaultPublicPage ({ defaultPublicPages, spaceId }: SpaceDefaultPublicPageToggle): Promise<Space> {
 

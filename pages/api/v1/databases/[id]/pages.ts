@@ -1,9 +1,10 @@
 
 import { prisma } from 'db';
 import { onError, onNoMatch, requireApiKey, requireKeys } from 'lib/middleware';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { Page, validateCreationData, DatabasePageNotFoundError, createDatabaseCardPage } from 'lib/public-api';
+import type { Page } from 'lib/public-api';
+import { validateCreationData, DatabasePageNotFoundError, createDatabaseCardPage } from 'lib/public-api';
 import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

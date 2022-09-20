@@ -1,14 +1,14 @@
-import { useContext, useEffect, useState } from 'react';
 import { useWeb3React } from '@web3-react/core';
-import { useRouter } from 'next/router';
 import getLayout from 'components/common/BaseLayout/BaseLayout';
+import Footer from 'components/login/Footer';
 import LoginPageContent from 'components/login/LoginPageContent';
+import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { getKey } from 'hooks/useLocalStorage';
 import { usePageTitle } from 'hooks/usePageTitle';
-import Footer from 'components/login/Footer';
 import { useSpaces } from 'hooks/useSpaces';
-import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { useUser } from 'hooks/useUser';
+import { useRouter } from 'next/router';
+import { useContext, useEffect, useState } from 'react';
 
 export default function LoginPage () {
   const { account } = useWeb3React();

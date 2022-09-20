@@ -1,7 +1,8 @@
 import { isProfilePathAvailable } from 'lib/profile/isProfilePathAvailable';
 import { prisma } from 'db';
 import { shortenHex } from 'lib/utilities/strings';
-import { IDENTITY_TYPES, LoggedInUser } from 'models';
+import type { LoggedInUser } from 'models';
+import { IDENTITY_TYPES } from 'models';
 import getENSName from 'lib/blockchain/getENSName';
 import { sessionUserRelations } from 'lib/session/config';
 import { mixpanel } from 'lib/analytics/mixpanel/server';
@@ -22,7 +23,7 @@ export async function createUserFromWallet (address: string): Promise<LoggedInUs
   else {
     const ens: string | null = await getENSName(address);
     const username = ens || shortenHex(address);
-    const userPath = username.replace('...', '-');
+    const userPath = username.replace('…', '-');
     const isUserPathAvailable = await isProfilePathAvailable(userPath);
 
     const newUser = await prisma.user.create({

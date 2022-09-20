@@ -1,10 +1,12 @@
 
-import { Page, PagePermission, PrismaPromise, Prisma } from '@prisma/client';
+import type { PagePermission } from '@prisma/client';
+import { Page, PrismaPromise, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { deletePagePermission, IPagePermissionRequest, IPagePermissionToDelete, IPagePermissionWithAssignee, listPagePermissions, setupPermissionsAfterPagePermissionAdded, upsertPermission, computeUserPagePermissions, getPagePermission, IPagePermissionWithSource, IPagePermissionToCreate } from 'lib/permissions/pages';
+import type { IPagePermissionRequest, IPagePermissionToDelete, IPagePermissionWithAssignee, IPagePermissionWithSource, IPagePermissionToCreate } from 'lib/permissions/pages';
+import { deletePagePermission, listPagePermissions, setupPermissionsAfterPagePermissionAdded, upsertPermission, computeUserPagePermissions, getPagePermission } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
 import nc from 'next-connect';
 import { PermissionNotFoundError } from 'lib/permissions/pages/errors';

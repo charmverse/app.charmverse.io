@@ -1,12 +1,12 @@
 
-import { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-import { onError, onNoMatch, requireUser, ApiError } from 'lib/middleware';
-import { withSessionRoute } from 'lib/session/withSession';
+import type { Block } from '@prisma/client';
+import { prisma } from 'db';
+import { ApiError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
-import { Block } from '@prisma/client';
-import { prisma } from 'db';
+import { withSessionRoute } from 'lib/session/withSession';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

@@ -1,8 +1,9 @@
 
 import { prisma } from 'db';
-import { onError, onNoMatch, requireKeys, provisionApiKey } from 'lib/middleware';
-import { NextApiRequest, NextApiResponse } from 'next';
-import nc, { NextHandler } from 'next-connect';
+import { onError, onNoMatch, provisionApiKey, requireKeys } from 'lib/middleware';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import type { NextHandler } from 'next-connect';
+import nc from 'next-connect';
 
 function requireSudoKey (req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
   const { sudoApiKey } = req.query;

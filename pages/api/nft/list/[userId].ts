@@ -1,9 +1,9 @@
 import { prisma } from 'db';
-import { NftData } from 'lib/blockchain/interfaces';
+import type { NftData } from 'lib/blockchain/interfaces';
 import { getNFTs } from 'lib/blockchain/nfts';
 import { InvalidStateError, onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

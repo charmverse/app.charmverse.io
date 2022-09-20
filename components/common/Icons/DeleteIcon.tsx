@@ -1,5 +1,5 @@
 import MuiDeleteIcon from '@mui/icons-material/DeleteOutline';
-import { SvgIconTypeMap } from '@mui/material/SvgIcon';
+import type { SvgIconTypeMap } from '@mui/material/SvgIcon';
 import Box from '@mui/material/Box';
 import { IconWrapper } from './IconWrapper';
 

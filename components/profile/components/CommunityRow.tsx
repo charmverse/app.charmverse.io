@@ -1,23 +1,24 @@
 
-import { Stack, Typography, IconButton, Collapse, Tabs, Tab, Tooltip } from '@mui/material';
-import { Box } from '@mui/system';
-import { ReactNode, useEffect, useState } from 'react';
-import BountyIcon from '@mui/icons-material/RequestPageOutlined';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import CheckIcon from '@mui/icons-material/VerifiedUser';
-import HowToVoteIcon from '@mui/icons-material/HowToVote';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ForumIcon from '@mui/icons-material/Forum';
-import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import HowToVoteIcon from '@mui/icons-material/HowToVote';
+import BountyIcon from '@mui/icons-material/RequestPageOutlined';
+import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
-import { showDateWithMonthAndYear } from 'lib/utilities/dates';
-import { DeepDaoProposal, DeepDaoVote } from 'lib/deepdao/interfaces';
-import { UserCommunity, ProfileBountyEvent } from 'lib/profile/interfaces';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import CheckIcon from '@mui/icons-material/VerifiedUser';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { Collapse, IconButton, Stack, Tab, Tabs, Tooltip, Typography } from '@mui/material';
+import { Box } from '@mui/system';
 import Avatar from 'components/common/Avatar';
 import Link from 'components/common/Link';
-import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
+import type { DeepDaoProposal, DeepDaoVote } from 'lib/deepdao/interfaces';
+import type { ProfileBountyEvent, UserCommunity } from 'lib/profile/interfaces';
+import { showDateWithMonthAndYear } from 'lib/utilities/dates';
+import type { ReactNode } from 'react';
+import { useEffect, useState } from 'react';
 import { ProfileItemContainer } from './CollectibleRow';
 
 const TASK_TABS = [

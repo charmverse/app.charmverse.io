@@ -1,13 +1,13 @@
-import { useContext } from 'react';
+import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import Image from 'components/common/Image';
-import styled from '@emotion/styled';
 import Button from 'components/common/Button';
+import Image from 'components/common/Image';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import splashImage from 'public/images/artwork/world.png';
+import { useContext } from 'react';
 
 export const Container = styled(Box)`
   max-width: 100%;

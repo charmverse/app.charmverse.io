@@ -1,11 +1,11 @@
 
 import { prisma } from 'db';
+import type { ExtendedPoap } from 'lib/blockchain/interfaces';
+import { getPOAPs } from 'lib/blockchain/poaps';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { InvalidStateError } from 'lib/middleware/errors';
-import { getPOAPs } from 'lib/blockchain/poaps';
 import { withSessionRoute } from 'lib/session/withSession';
-import { ExtendedPoap } from 'lib/blockchain/interfaces';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
