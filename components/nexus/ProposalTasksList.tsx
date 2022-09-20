@@ -124,9 +124,8 @@ export default function ProposalTasksList ({
 
   useEffect(() => {
     async function main () {
-      if (proposals.length !== 0) {
-        await charmClient.markTasks(proposals.map(proposal => ({ id: `${proposal.id}.${proposal.status}`, type: 'proposal' })));
-        mutateTasks();
+      if (tasks?.proposals && tasks.proposals.unmarked.length !== 0) {
+        await charmClient.markTasks(tasks.proposals.unmarked.map(proposal => ({ id: `${proposal.id}.${proposal.status}`, type: 'proposal' })));
       }
     }
     main();

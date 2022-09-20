@@ -151,7 +151,7 @@ export async function getProposalTasks (userId: string): Promise<{
     }
     return extractProposalData(proposal, StatusActionRecord[proposal.status as keyof typeof StatusActionRecord]);
   }).filter(isTruthy).forEach(proposalTask => {
-    if (!userNotificationIds.has(proposalTask.id)) {
+    if (!userNotificationIds.has(`${proposalTask.id}.${proposalTask.status}`)) {
       proposalsRecord.unmarked.push(proposalTask);
     }
     else {
