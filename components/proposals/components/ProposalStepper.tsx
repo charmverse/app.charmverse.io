@@ -48,7 +48,7 @@ export default function ProposalStepper (
 
         return (
           <>
-            <Grid item md={12 / 13} display='flex' position='relative' alignItems='center'>
+            <Grid item md={12 / 13} display='flex' position='relative' alignItems='center' justifyContent='center'>
               <Stack
                 alignItems='center'
                 height='100%'
@@ -91,21 +91,25 @@ export default function ProposalStepper (
                 <Typography
                   textAlign='center'
                   sx={{
-                    fontWeight: currentStatusIndex === statusIndex ? 'bold' : 'initial'
+                    fontWeight: currentStatusIndex === statusIndex ? 600 : 400,
+                    fontSize: 14,
+                    whiteSpace: 'nowrap'
                   }}
                 >
                   {PROPOSAL_STATUS_LABELS[status as ProposalStatus]}
                 </Typography>
               </Stack>
             </Grid>
-            <Grid item md={12 / 13}>
-              <Divider
-                sx={{
-                  position: 'relative',
-                  top: stepperDimension / 2
-                }}
-              />
-            </Grid>
+            {statusIndex !== proposalStatuses.length - 1 && (
+              <Grid item md={12 / 13}>
+                <Divider
+                  sx={{
+                    position: 'relative',
+                    top: stepperDimension / 2
+                  }}
+                />
+              </Grid>
+            )}
           </>
         );
       })}
