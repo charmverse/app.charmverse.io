@@ -120,10 +120,12 @@ export default function ProposalTasksList ({
   error: any
   tasks: GetTasksResponse | undefined
 }) {
+  const proposals = tasks?.proposals ? [...tasks.proposals.marked, ...tasks.proposals.unmarked] : [];
+
   useEffect(() => {
     async function main () {
-      if (tasks?.proposals && tasks?.proposals?.length !== 0) {
-        await charmClient.markTasks(tasks?.proposals.map(proposal => ({ id: proposal.id, type: 'proposal' })));
+      if (proposals.length !== 0) {
+        await charmClient.markTasks(proposals.map(proposal => ({ id: `${proposal.id}.${proposal.status}`, type: 'proposal' })));
         mutateTasks();
       }
     }
@@ -143,7 +145,7 @@ export default function ProposalTasksList ({
     return <LoadingComponent height='200px' isLoading={true} />;
   }
 
-  const totalProposals = tasks?.proposals.length ?? 0;
+  const totalProposals = proposals.length;
 
   if (totalProposals === 0) {
     return (
@@ -158,7 +160,7 @@ export default function ProposalTasksList ({
 
   return (
     <>
-      {tasks.proposals.map(proposal => <ProposalTasksListRow key={proposal.id} proposalTask={proposal} />)}
+      {proposals.map(proposal => <ProposalTasksListRow key={proposal.id} proposalTask={proposal} />)}
     </>
   );
 }

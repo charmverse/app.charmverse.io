@@ -17,7 +17,10 @@ export interface GetTasksResponse {
   gnosis: GnosisSafeTasks[];
   mentioned: MentionedTasksGroup
   votes: VoteTask[]
-  proposals: ProposalTask[]
+  proposals: {
+    marked: ProposalTask[],
+    unmarked: ProposalTask[]
+  }
 }
 
 async function getTasks (req: NextApiRequest, res: NextApiResponse<GetTasksResponse>) {
