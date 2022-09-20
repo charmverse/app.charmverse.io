@@ -7,7 +7,7 @@ import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import SettingsIcon from '@mui/icons-material/Settings';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
-import { Divider } from '@mui/material';
+import { Divider, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
@@ -16,6 +16,7 @@ import { Page } from '@prisma/client';
 import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
+import useKeydownPress from 'hooks/useKeydownPress';
 import { useUser } from 'hooks/useUser';
 import { addPageAndRedirect, NewPageInput } from 'lib/pages';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -176,6 +177,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const [showingTrash, setShowingTrash] = useState(false);
 
   const searchInWorkspaceModalState = usePopupState({ variant: 'popover', popupId: 'search-in-workspace-modal' });
+  const openSearchLabel = useKeydownPress(searchInWorkspaceModalState.toggle, { key: 'p', ctrl: true });
 
   const favoritePageIds = favorites.map(f => f.pageId);
 
@@ -219,11 +221,16 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               label='Proposals'
             />
             <Divider sx={{ mx: 2, my: 1 }} />
-            <SidebarBox
-              onClick={searchInWorkspaceModalState.open}
-              icon={<SearchIcon color='secondary' fontSize='small' />}
-              label='Quick Find'
-            />
+            <Tooltip title={<>Search and jump to a page <br />{openSearchLabel}</>} placement='right'>
+              <div>
+                <SidebarBox
+                  onClick={searchInWorkspaceModalState.open}
+                  icon={<SearchIcon color='secondary' fontSize='small' />}
+                  label='Quick Find'
+                />
+              </div>
+            </Tooltip>
+
             <SearchInWorkspaceModal
               isOpen={searchInWorkspaceModalState.isOpen}
               close={searchInWorkspaceModalState.close}
