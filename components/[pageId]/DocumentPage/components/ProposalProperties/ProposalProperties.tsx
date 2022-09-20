@@ -13,6 +13,7 @@ import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
 import PublishToSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/PublishToSnapshot';
 import UserDisplay from 'components/common/UserDisplay';
 import useTasks from 'components/nexus/hooks/useTasks';
+import ProposalStepper from 'components/proposals/components/ProposalStepper';
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
 import type { Contributor } from 'hooks/useContributors';
 import { useContributors } from 'hooks/useContributors';
@@ -44,9 +45,9 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly }: Pr
   }
 
   const [contributors] = useContributors();
-
   const { roles = [], roleups } = useRoles();
   const { user } = useUser();
+
   const proposalMenuState = usePopupState({ popupId: 'proposal-info', variant: 'popover' });
 
   const proposalReviewer = contributors?.find(contributor => contributor.id === proposal?.reviewedBy);
@@ -111,6 +112,12 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly }: Pr
       mt={2}
     >
       <Grid container mb={2}>
+        <ProposalStepper
+          proposal={proposal}
+        />
+
+      </Grid>
+      <Grid container mb={2}>
         <Grid item xs={8}>
           <Box display='flex' gap={1} alignItems='center'>
             <Typography fontWeight='bold'>Proposal information</Typography>
@@ -121,21 +128,6 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly }: Pr
             )}
           </Box>
         </Grid>
-        <Grid item xs={4}>
-          <Box sx={{
-            justifyContent: 'flex-end',
-            gap: 1,
-            display: 'flex',
-            alignItems: 'center'
-          }}
-          >
-
-            <Box display='flex'>
-              <ProposalStatusChip status={proposal.status} />
-            </Box>
-          </Box>
-        </Grid>
-
       </Grid>
 
       <Box justifyContent='space-between' gap={2} alignItems='center'>
