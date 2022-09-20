@@ -1,4 +1,4 @@
-import { Page, Proposal, ProposalStatus, Space } from '@prisma/client';
+import { Page, Proposal, ProposalStatus, Space, WorkspaceEvent } from '@prisma/client';
 import { prisma } from 'db';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -36,6 +36,27 @@ const StatusActionRecord: Record<Exclude<ProposalStatus, 'vote_closed' | 'discus
 };
 
 export async function getProposalTasks (userId: string): Promise<ProposalTask[]> {
+  const workspaceEvents = await prisma.workspaceEvent.findMany({
+    where: {
+      type: 'proposal_status_change'
+    },
+    select: {
+      pageId: true,
+      createdAt: true,
+      meta: true
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
+  });
+
+  const workspaceEventsRecord = workspaceEvents.reduce<Record<string, Pick<WorkspaceEvent, 'pageId' | 'createdAt' | 'meta'>>>((record, workspaceEvent) => {
+    if (!record[workspaceEvent.pageId]) {
+      record[workspaceEvent.pageId] = workspaceEvent;
+    }
+    return record;
+  }, {});
+
   const proposalTasks = await prisma.proposal.findMany({
     where: {
       page: {
@@ -73,6 +94,7 @@ export async function getProposalTasks (userId: string): Promise<ProposalTask[]>
           page: {
             votes: {
               some: {
+                context: 'proposal',
                 userVotes: {
                   none: {
                     userId
@@ -134,5 +156,15 @@ export async function getProposalTasks (userId: string): Promise<ProposalTask[]>
       return proposal.authors.map(author => author.userId === userId) ? extractProposalData(proposal, 'start_review') : extractProposalData(proposal, 'discuss');
     }
     return extractProposalData(proposal, StatusActionRecord[proposal.status as keyof typeof StatusActionRecord]);
-  }).filter(isTruthy);
+  }).filter(isTruthy).sort((proposalA, proposalB) => {
+    const proposalALastUpdatedDate = workspaceEventsRecord[proposalA.id]?.createdAt;
+    const proposalBLastUpdatedDate = workspaceEventsRecord[proposalB.id]?.createdAt;
+    if (proposalALastUpdatedDate && proposalBLastUpdatedDate) {
+      return proposalALastUpdatedDate > proposalBLastUpdatedDate ? -1 : 1;
+    }
+    else if (proposalALastUpdatedDate && !proposalBLastUpdatedDate) {
+      return -1;
+    }
+    return 1;
+  });
 }
