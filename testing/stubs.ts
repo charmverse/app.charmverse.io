@@ -2938,22 +2938,25 @@ export function boardWithCardsArgs ({ createdBy, spaceId, parentId }: {createdBy
       }
     });
 
-    pageCreateArgs.push({
-      data: {
-        ...pageWithoutExtraProps,
-        content: undefined,
-        type: rootBoardNode.type as PageType,
-        author: {
-          connect: {
-            id: createdBy
-          }
-        },
-        space: {
-          connect: {
-            id: spaceId
-          }
+    const pageCreateInput: Prisma.PageCreateInput = {
+      ...pageWithoutExtraProps,
+      id: page.type === 'board' ? boardId : v4(),
+      content: undefined,
+      type: rootBoardNode.type as PageType,
+      author: {
+        connect: {
+          id: createdBy
+        }
+      },
+      space: {
+        connect: {
+          id: spaceId
         }
       }
+    };
+
+    pageCreateArgs.push({
+      data: pageCreateInput
     });
 
     const blocks: Block[] = [];
@@ -2968,7 +2971,7 @@ export function boardWithCardsArgs ({ createdBy, spaceId, parentId }: {createdBy
     }
     else if (page.type === 'card') {
       const cardBlock = (page as any as PageWithBlocks).blocks.card!;
-      cardBlock.id = page.id;
+      cardBlock.id = pageCreateInput.id as string;
       blocks.push(cardBlock);
     }
 

@@ -1,5 +1,5 @@
 import { prisma } from 'db';
-import { generateBoard, generateUserAndSpaceWithApiToken } from '../setupDatabase';
+import { createPage, generateBoard, generateUserAndSpaceWithApiToken } from '../setupDatabase';
 
 describe('generateBoard', () => {
   it('should generate a database page with 1 view and 2 nested cards', async () => {
@@ -42,5 +42,21 @@ describe('generateBoard', () => {
     cardBlocks.forEach(card => {
       expect(pages.some(p => p.id === card.id)).toBe(true);
     });
+  });
+
+  it('should generate a board under another page if this option is passed', async () => {
+    const { user, space } = await generateUserAndSpaceWithApiToken(undefined, false);
+    const page = await createPage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    const board = await generateBoard({
+      createdBy: user.id,
+      spaceId: space.id,
+      parentId: page.id
+    });
+
+    expect(board.parentId).toBe(page.id);
   });
 });
