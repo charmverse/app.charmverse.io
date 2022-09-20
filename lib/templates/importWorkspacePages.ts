@@ -1,13 +1,13 @@
-import { Page, Prisma } from '@prisma/client';
+import type { Page, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { getPagePath } from 'lib/pages/utils';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
-import { PageContent } from 'models';
+import type { PageContent } from 'models';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { v4, validate } from 'uuid';
-import { ExportedPage, WorkspaceExport, WorkspaceImport } from './interfaces';
+import type { ExportedPage, WorkspaceExport, WorkspaceImport } from './interfaces';
 
 interface UpdateRefs {
   oldNewHashMap: Record<string, string>,

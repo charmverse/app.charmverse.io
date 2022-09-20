@@ -1,5 +1,6 @@
-import { Browser, chromium, expect, test } from '@playwright/test';
-import { Block, Page } from '@prisma/client';
+import type { Browser } from '@playwright/test';
+import { chromium, expect, test } from '@playwright/test';
+import type { Block, Page } from '@prisma/client';
 import { prisma } from 'db';
 import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
 import { baseUrl, createUserAndSpace } from './utilities';
