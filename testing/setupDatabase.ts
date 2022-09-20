@@ -11,6 +11,7 @@ import { createUserFromWallet } from 'lib/users/createUser';
 import { typedKeys } from 'lib/utilities/objects';
 import { BountyWithDetails, IDENTITY_TYPES, LoggedInUser } from 'models';
 import { v4 } from 'uuid';
+import { boardWithCardsArgs } from './stubs';
 
 export async function generateSpaceUser ({ spaceId, isAdmin }: { spaceId: string, isAdmin: boolean }): Promise<LoggedInUser> {
   return prisma.user.create({
@@ -604,4 +605,15 @@ export async function generateProposal ({ userId, spaceId, proposalStatus, autho
       }
     }
   });
+}
+
+export async function generateBoard ({ createdBy, spaceId, parentId }: {createdBy: string, spaceId: string, parentId?: string}): Promise<Page> {
+
+  const { pageArgs, blockArgs } = boardWithCardsArgs({ createdBy, spaceId, parentId });
+
+  return prisma.$transaction([
+    ...pageArgs.map(p => prisma.page.create(p)),
+    prisma.block.createMany(blockArgs)
+  ]).then(result => result[0] as Page);
+
 }
