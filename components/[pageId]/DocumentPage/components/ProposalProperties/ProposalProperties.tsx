@@ -1,7 +1,6 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import DoneIcon from '@mui/icons-material/Done';
-import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Divider, Grid, IconButton, Menu, MenuItem, Typography } from '@mui/material';
 import { Box } from '@mui/system';
@@ -10,11 +9,9 @@ import charmClient from 'charmClient';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import { InputSearchContributorBase } from 'components/common/form/InputSearchContributor';
 import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
-import PublishToSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/PublishToSnapshot';
 import UserDisplay from 'components/common/UserDisplay';
 import useTasks from 'components/nexus/hooks/useTasks';
 import ProposalStepper from 'components/proposals/components/ProposalStepper';
-import CreateVoteModal from 'components/votes/components/CreateVoteModal';
 import type { Contributor } from 'hooks/useContributors';
 import { useContributors } from 'hooks/useContributors';
 import useRoles from 'hooks/useRoles';
@@ -23,7 +20,6 @@ import type { ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';
 import { proposalStatusTransitionPermission, proposalStatusTransitionRecord, PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
-import { useState } from 'react';
 import useSWR from 'swr';
 
 interface ProposalPropertiesProps {
@@ -36,12 +32,7 @@ const proposalStatuses = Object.keys(proposalStatusTransitionRecord);
 
 export default function ProposalProperties ({ pageId, proposalId, readOnly }: ProposalPropertiesProps) {
   const { data: proposal, mutate: refreshProposal } = useSWR(`proposal/${proposalId}`, () => charmClient.proposals.getProposal(proposalId));
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const { mutate: mutateTasks } = useTasks();
-
-  function openVoteModal () {
-    setIsModalOpen(true);
-  }
 
   const [contributors] = useContributors();
   const { roles = [], roleups } = useRoles();
@@ -261,36 +252,7 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly }: Pr
             );
           })
         }
-        {
-          proposal.status === 'reviewed' && (
-            <>
-              <MenuItem disabled={!isProposalAuthor}>
-                <PublishToSnapshot pageId={pageId} />
-              </MenuItem>
-              <MenuItem
-                disabled={!isProposalAuthor}
-                onClick={openVoteModal}
-              >
-                <Box display='flex' alignItems='center' gap={1}>
-                  <HowToVoteOutlinedIcon fontSize='small' />
-                  Create Vote
-                </Box>
-              </MenuItem>
-            </>
-          )
-        }
       </Menu>
-      <CreateVoteModal
-        isProposal={true}
-        open={isModalOpen}
-        onCreateVote={async () => {
-          await updateProposalStatus('vote_active');
-          setIsModalOpen(false);
-        }}
-        onClose={() => {
-          setIsModalOpen(false);
-        }}
-      />
     </Box>
   );
 }

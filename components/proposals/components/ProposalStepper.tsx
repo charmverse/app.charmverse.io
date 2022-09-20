@@ -5,9 +5,11 @@ import { Box } from '@mui/system';
 import type { ProposalStatus } from '@prisma/client';
 import charmClient from 'charmClient';
 import useTasks from 'components/nexus/hooks/useTasks';
+import CreateVoteModal from 'components/votes/components/CreateVoteModal';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import type { ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';
 import { proposalStatusTransitionPermission, proposalStatusTransitionRecord, PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
+import { useState } from 'react';
 import type { KeyedMutator } from 'swr';
 
 const proposalStatuses = Object.keys(proposalStatusTransitionRecord) as ProposalStatus[];
@@ -19,6 +21,7 @@ export default function ProposalStepper (
   const { status: currentStatus } = proposal;
   const theme = useTheme();
   const { mutate: mutateTasks } = useTasks();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const currentStatusIndex = proposalStatuses.indexOf(currentStatus);
 
@@ -30,6 +33,12 @@ export default function ProposalStepper (
     }
   }
 
+  function openVoteModal () {
+    setIsModalOpen(true);
+  }
+
+  const stepperDimension = 25;
+
   return (
     <Grid container>
       {proposalStatuses.map((status, statusIndex) => {
@@ -39,7 +48,7 @@ export default function ProposalStepper (
 
         return (
           <>
-            <Grid item md={12 / 13} display='flex' position='relative' gap={1} alignItems='center'>
+            <Grid item md={12 / 13} display='flex' position='relative' alignItems='center'>
               <Stack
                 alignItems='center'
                 height='100%'
@@ -47,8 +56,8 @@ export default function ProposalStepper (
               >
                 <Box
                   sx={{
-                    width: 30,
-                    height: 30,
+                    width: stepperDimension,
+                    height: stepperDimension,
                     borderRadius: '50%',
                     display: 'flex',
                     alignItems: 'center',
@@ -60,7 +69,12 @@ export default function ProposalStepper (
                   }}
                   onClick={() => {
                     if (canChangeStatus) {
-                      updateProposalStatus(status);
+                      if (status === 'vote_active') {
+                        openVoteModal();
+                      }
+                      else {
+                        updateProposalStatus(status);
+                      }
                     }
                   }}
                 >
@@ -85,15 +99,27 @@ export default function ProposalStepper (
               </Stack>
             </Grid>
             <Grid item md={12 / 13}>
-              <Divider sx={{
-                position: 'relative',
-                top: 15
-              }}
+              <Divider
+                sx={{
+                  position: 'relative',
+                  top: stepperDimension / 2
+                }}
               />
             </Grid>
           </>
         );
       })}
+      <CreateVoteModal
+        isProposal={true}
+        open={isModalOpen}
+        onCreateVote={async () => {
+          await updateProposalStatus('vote_active');
+          setIsModalOpen(false);
+        }}
+        onClose={() => {
+          setIsModalOpen(false);
+        }}
+      />
     </Grid>
   );
 }
