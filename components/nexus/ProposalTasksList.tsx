@@ -126,6 +126,18 @@ export default function ProposalTasksList ({
     async function main () {
       if (tasks?.proposals && tasks.proposals.unmarked.length !== 0) {
         await charmClient.markTasks(tasks.proposals.unmarked.map(proposal => ({ id: `${proposal.id}.${proposal.status}`, type: 'proposal' })));
+        mutateTasks((_tasks) => {
+          const unmarked = _tasks?.proposals.unmarked ?? [];
+          return _tasks ? {
+            ..._tasks,
+            proposals: {
+              marked: [...unmarked, ..._tasks.proposals.marked],
+              unmarked: []
+            }
+          } : undefined;
+        }, {
+          revalidate: false
+        });
       }
     }
     main();
