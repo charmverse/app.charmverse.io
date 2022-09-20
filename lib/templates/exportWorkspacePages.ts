@@ -70,7 +70,7 @@ Promise<{data: WorkspaceExport, path: string}> {
     {node: PageNodeWithChildren<ExportedPage>}): Promise<void> {
 
     // eslint-disable-next-line no-console
-    console.log('Processing page ', pageIndexes[node.id], ' / ', totalPages);
+    // console.log('Processing page ', pageIndexes[node.id], ' / ', totalPages);
 
     if (node.type.match('board')) {
       const boardblocks = await prisma.block.findMany({
