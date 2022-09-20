@@ -1,14 +1,15 @@
-import { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
-import { ExtendedVote } from 'lib/votes/interfaces';
 import { isSmallScreen } from 'lib/browser';
-import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
+import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
+import type { ExtendedVote } from 'lib/votes/interfaces';
+import type { ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useSWRConfig } from 'swr';
-import { useVotes } from './useVotes';
 import { usePages } from './usePages';
 import { useThreads } from './useThreads';
+import { useVotes } from './useVotes';
 
 export interface IPageActionDisplayContext {
-  currentPageActionDisplay: null | 'votes' | 'comments',
+  currentPageActionDisplay: null | 'polls' | 'comments',
   setCurrentPageActionDisplay: React.Dispatch<React.SetStateAction<IPageActionDisplayContext['currentPageActionDisplay']>>
 }
 
@@ -37,7 +38,7 @@ export function PageActionDisplayProvider ({ children }: { children: ReactNode }
       if (!highlightedCommentId && cachedInlineVotesData && cachedInlineVotesData.find(inlineVote => inlineVote.status === 'InProgress'
       // We don't want to open the sidebar for a proposal-type vote
       && inlineVote.context !== 'proposal')) {
-        setCurrentPageActionDisplay('votes');
+        setCurrentPageActionDisplay('polls');
       }
       // For some reason we cant get the threads map using useThreads, its empty even after isValidating is true (data has loaded)
       else if (highlightedCommentId || (cachedInlineCommentData && cachedInlineCommentData.find(thread => thread && !thread.resolved))) {

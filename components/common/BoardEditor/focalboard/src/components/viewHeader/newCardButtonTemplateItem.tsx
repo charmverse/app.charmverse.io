@@ -2,16 +2,16 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
 
-import mutator from '../../mutator';
 import { BoardView } from '../../blocks/boardView';
 import { Card } from '../../blocks/card';
+import mutator from '../../mutator';
 import IconButton from '../../widgets/buttons/iconButton';
+import CheckIcon from '../../widgets/icons/check';
 import DeleteIcon from '../../widgets/icons/delete';
 import EditIcon from '../../widgets/icons/edit';
 import OptionsIcon from '../../widgets/icons/options';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
-import CheckIcon from '../../widgets/icons/check';
 
 type Props = {
     cardTemplate: Card

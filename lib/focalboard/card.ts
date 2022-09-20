@@ -1,5 +1,6 @@
 
-import { Block, createBlock } from './block';
+import type { Block } from './block';
+import { createBlock } from './block';
 
 type CardFields = {
     icon?: string

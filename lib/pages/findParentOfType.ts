@@ -1,5 +1,5 @@
-import { Page, PageType } from '@prisma/client';
-import { TargetPageTree, PagesMap, IPageWithPermissions, PageNode } from './interfaces';
+import type { PageType } from '@prisma/client';
+import type { PageNode, PagesMap, TargetPageTree } from './interfaces';
 
 export interface FindParentOfTypeOptions<P extends PageNode> {
   pageType: PageType;

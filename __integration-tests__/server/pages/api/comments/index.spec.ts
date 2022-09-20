@@ -1,15 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Bounty, Prisma, Space, Thread, User } from '@prisma/client';
-import { IPageWithPermissions } from 'lib/pages';
-import request from 'supertest';
-import { generatePageToCreateStub } from 'testing/generate-stubs';
-import { baseUrl } from 'testing/mockApiCall';
-import { createPage, generateUserAndSpaceWithApiToken, generateCommentWithThreadAndPage } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
-import { createBounty } from 'lib/bounties';
-import { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads';
+import type { Space, User } from '@prisma/client';
+import type { CommentCreate, CommentWithUser } from 'lib/comments';
 import { upsertPermission } from 'lib/permissions/pages';
-import { CommentCreate, CommentWithUser } from 'lib/comments';
+import request from 'supertest';
+import { baseUrl } from 'testing/mockApiCall';
+import { generateCommentWithThreadAndPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 let nonAdminUser: User;
 let nonAdminUserSpace: Space;

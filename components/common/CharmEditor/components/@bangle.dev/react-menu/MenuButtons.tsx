@@ -174,7 +174,7 @@ export function InlineCommentButton ({
 }
 
 export function InlineVoteButton ({
-  hints = ['Vote'],
+  hints = ['Poll'],
   hintPos = 'top',
   children = <HowToVoteIcon sx={{
     fontSize: 12,
@@ -191,7 +191,7 @@ export function InlineVoteButton ({
       commandFn={createInlineVote}
       enable={enableVotes}
       menuKey={menuKey}
-      hints={['Vote']}
+      hints={['Poll']}
       subMenu='inlineVoteSubMenu'
     >
       {children}

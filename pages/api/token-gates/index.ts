@@ -1,12 +1,12 @@
 
-import { Space } from '@prisma/client';
+import type { Space } from '@prisma/client';
 import { prisma } from 'db';
 import { hasAccessToSpace, onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { TokenGateWithRoles } from 'lib/token-gates/interfaces';
+import type { TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
-import { AccessControlCondition } from 'lit-js-sdk';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { AccessControlCondition } from 'lit-js-sdk';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

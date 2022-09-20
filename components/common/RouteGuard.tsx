@@ -1,8 +1,9 @@
-import { ReactNode, useState, useContext, useEffect } from 'react';
+import type { ReactNode } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useWeb3React } from '@web3-react/core';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
-import { User } from '@prisma/client';
+import type { User } from '@prisma/client';
 import { getKey } from 'hooks/useLocalStorage';
 import { useUser } from 'hooks/useUser';
 import { useSpaces } from 'hooks/useSpaces';

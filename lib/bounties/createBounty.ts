@@ -1,4 +1,4 @@
-import { BountyStatus, Prisma } from '@prisma/client';
+import type { BountyStatus, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { getBountyPagePermissionSet } from 'lib/bounties/shared';
 import { setBountyPermissions } from 'lib/permissions/bounties';
@@ -7,7 +7,7 @@ import { v4 } from 'uuid';
 import { getPagePath } from 'lib/pages';
 import { NotFoundError } from 'lib/middleware';
 import { getBountyOrThrow } from './getBounty';
-import { BountyCreationData } from './interfaces';
+import type { BountyCreationData } from './interfaces';
 
 /**
  * You can create a bounty suggestion using only title, spaceId and createdBy. You will see many unit tests using this limited dataset, which will then default the bounty to suggestion status. Your logic should account for this.

@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client';
 import client from './graphql-client';
-import { SnapshotSpace } from './interfaces';
+import type { SnapshotSpace } from './interfaces';
 
 export async function getSnapshotSpace (spaceDomain: string): Promise<SnapshotSpace | null> {
   const { data } = await client.query({

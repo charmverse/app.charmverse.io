@@ -3,7 +3,7 @@ import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import FieldLabel from 'components/common/form/FieldLabel';
-import { SnapshotVotingStrategy } from 'lib/snapshot';
+import type { SnapshotVotingStrategy } from 'lib/snapshot';
 import { useEffect, useState } from 'react';
 
 export interface Props {

@@ -1,8 +1,9 @@
 import { InvalidInputError } from 'lib/utilities/errors';
 import { prisma } from 'db';
-import { AssignedPermissionsQuery, PermissionAssigneeId } from '../interfaces';
+import type { AssignedPermissionsQuery } from '../interfaces';
+import { PermissionAssigneeId } from '../interfaces';
 import { AvailableSpacePermissions } from './availableSpacePermissions';
-import { SpacePermissionFlags } from './interfaces';
+import type { SpacePermissionFlags } from './interfaces';
 import { groupIsValid } from './utility';
 
 export async function computeGroupSpacePermissions ({ id, group, resourceId }:

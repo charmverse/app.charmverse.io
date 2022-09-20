@@ -1,5 +1,6 @@
-import { PageOperations, PagePermissionLevel } from '@prisma/client';
-import { PageOperationType } from './page-permission-interfaces';
+import type { PagePermissionLevel } from '@prisma/client';
+import { PageOperations } from '@prisma/client';
+import type { PageOperationType } from './page-permission-interfaces';
 
 export const permissionLevels: Record<keyof typeof PagePermissionLevel, string> = {
   full_access: 'Full access',
@@ -25,7 +26,7 @@ export const permissionDescriptions: Record<PageOperationType, string> = {
 
 export const permissionTemplates: Record<keyof typeof PagePermissionLevel, PageOperationType []> = {
   full_access: Object.keys(PageOperations) as PageOperationType [],
-  proposal_editor: ['read', 'comment', 'edit_content', 'edit_isPublic'],
+  proposal_editor: ['read', 'comment', 'edit_content', 'edit_isPublic', 'delete'],
   editor: ['read', 'edit_content', 'comment'],
   view_comment: ['read', 'comment'],
   view: ['read'],

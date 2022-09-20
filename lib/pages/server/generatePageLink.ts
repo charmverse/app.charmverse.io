@@ -1,6 +1,6 @@
-import { Page, Space } from '@prisma/client';
+import type { Page, Space } from '@prisma/client';
 import { prisma } from 'db';
-import { PageLink } from '../interfaces';
+import type { PageLink } from '../interfaces';
 import { PageNotFoundError } from './errors';
 
 export async function generatePageLink (pageIdOrPageWithSpaceId: string | (Page & {space: Space})): Promise<PageLink> {

@@ -1,4 +1,4 @@
-import { User } from '@prisma/client';
+import type { User } from '@prisma/client';
 import request from 'supertest';
 import { v4 } from 'uuid';
 

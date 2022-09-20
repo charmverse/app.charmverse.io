@@ -1,11 +1,49 @@
-import { SpaceRole } from '@prisma/client';
+import type { SpaceRole } from '@prisma/client';
 import { prisma } from 'db';
 import { createUserFromWallet } from 'lib/users/createUser';
-import { generateProposal, generateRoleWithSpaceRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createVote, generateProposal, generateRoleWithSpaceRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { getProposalTasks } from '../getProposalTasks';
 
 describe('getProposalTasks', () => {
+  it('Should only return non archived proposals', async () => {
+    const { user, space } = await generateUserAndSpaceWithApiToken();
+
+    // This proposal page was archived, this shouldn't be fetched
+    const archivedProposal = await generateProposal({
+      proposalStatus: 'draft',
+      spaceId: space.id,
+      authors: [user.id],
+      reviewers: [],
+      userId: user.id,
+      deletedAt: new Date()
+    });
+
+    const privateDraftProposal1 = await generateProposal({
+      proposalStatus: 'private_draft',
+      spaceId: space.id,
+      authors: [user.id],
+      reviewers: [],
+      userId: user.id
+    });
+
+    const proposalTasks = await getProposalTasks(user.id);
+
+    expect(proposalTasks).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        id: privateDraftProposal1.id,
+        status: privateDraftProposal1.proposal?.status,
+        action: 'start_discussion'
+      })
+    ]));
+
+    expect(proposalTasks).not.toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        id: archivedProposal.id
+      })
+    ]));
+  });
+
   it('Should get draft and private draft proposals where the user is one of the authors', async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken();
     const user2 = await createUserFromWallet(v4());
@@ -160,6 +198,29 @@ describe('getProposalTasks', () => {
       authors: [user.id],
       reviewers: [],
       userId: user.id
+    });
+
+    await createVote({
+      createdBy: user.id,
+      pageId: activeVoteProposal.id,
+      spaceId: space.id
+    });
+
+    const activeVoteWithUserVoteProposal = await generateProposal({
+      proposalStatus: 'vote_active',
+      spaceId: space.id,
+      authors: [user.id],
+      reviewers: [],
+      userId: user.id
+    });
+
+    // User has voted on this proposal
+    // So this shouldn't be returned as a proposal task
+    await createVote({
+      createdBy: user.id,
+      pageId: activeVoteWithUserVoteProposal.id,
+      spaceId: space.id,
+      userVotes: ['1']
     });
 
     // The user isn't an author, but it should be returned as its in discussion

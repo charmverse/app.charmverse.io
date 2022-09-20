@@ -19,7 +19,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Popover from '@mui/material/Popover';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
-import { Page } from '@prisma/client';
+import type { Page } from '@prisma/client';
 import charmClient from 'charmClient';
 import PublishToSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/PublishToSnapshot';
 import { useColorMode } from 'context/darkMode';
@@ -28,7 +28,8 @@ import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
 import { useRouter } from 'next/router';
-import { useRef, useState, ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import { useRef, useState } from 'react';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -119,12 +120,12 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
               mr: 1
             }}
           />
-          <ListItemText primary='Create a vote' />
+          <ListItemText primary='Create a poll' />
         </ListItemButton>
       )}
       <ListItemButton
         onClick={() => {
-          setCurrentPageActionDisplay('votes');
+          setCurrentPageActionDisplay('polls');
           setPageMenuOpen(false);
         }}
       >
@@ -134,7 +135,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
             mr: 1
           }}
         />
-        <ListItemText primary='View votes' />
+        <ListItemText primary='View polls' />
       </ListItemButton>
       {basePage && (
         <ListItemButton>
@@ -268,7 +269,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
                     setPageMenuAnchorElement(pageMenuAnchor.current || null);
                   }}
                 >
-                  <Tooltip title='View comments, votes, export content and more' arrow>
+                  <Tooltip title='View comments, polls, export content and more' arrow>
                     <MoreHorizIcon color='secondary' />
                   </Tooltip>
                 </IconButton>

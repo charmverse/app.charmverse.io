@@ -1,8 +1,8 @@
-import { ProposalStatus } from '@prisma/client';
+import type { ProposalStatus } from '@prisma/client';
 import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
 import { MissingDataError } from 'lib/utilities/errors';
-import { ProposalWithUsers } from './interface';
+import type { ProposalWithUsers } from './interface';
 import { proposalStatusTransitionRecord } from './proposalStatusTransition';
 import { generateSyncProposalPermissions } from './syncProposalPermissions';
 
@@ -34,6 +34,7 @@ export async function updateProposalStatus ({
 
   const currentStatus = proposal.status;
   const proposalId = proposal.id;
+  const proposalSpaceId = proposal.spaceId;
 
   // Going from review to review, mark the reviewer in the proposal
   if (currentStatus === 'review' && newStatus === 'reviewed') {
@@ -76,6 +77,18 @@ export async function updateProposalStatus ({
   }
 
   await prisma.$transaction(async () => {
+    await prisma.workspaceEvent.create({
+      data: {
+        type: 'proposal_status_change',
+        actorId: userId,
+        pageId: proposalId,
+        spaceId: proposalSpaceId,
+        meta: {
+          newStatus,
+          oldStatus: currentStatus
+        }
+      }
+    });
     await prisma.proposal.update({
       where: {
         id: proposalId

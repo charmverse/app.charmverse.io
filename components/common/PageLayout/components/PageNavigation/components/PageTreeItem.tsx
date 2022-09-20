@@ -5,14 +5,15 @@ import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import TreeItem, { treeItemClasses, TreeItemContentProps } from '@mui/lab/TreeItem';
+import type { TreeItemContentProps } from '@mui/lab/TreeItem';
+import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
 import IconButton from '@mui/material/IconButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
 import ListItemButton from '@mui/material/ListItemButton';
 import Tooltip from '@mui/material/Tooltip';
-import { Page, PageType } from '@prisma/client';
+import type { Page, PageType } from '@prisma/client';
 import { isTouchScreen } from 'lib/browser';
 import charmClient from 'charmClient';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
@@ -24,10 +25,11 @@ import type { Identifier } from 'dnd-core';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { IPageWithPermissions } from 'lib/pages';
+import type { IPageWithPermissions } from 'lib/pages';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import Link from 'next/link';
-import React, { forwardRef, memo, ReactNode, SyntheticEvent, useCallback, useMemo } from 'react';
+import type { ReactNode, SyntheticEvent } from 'react';
+import React, { forwardRef, memo, useCallback, useMemo } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { greyColor2 } from 'theme/colors';
 import AddNewCard from '../../AddNewCard';
@@ -236,7 +238,12 @@ function EmojiMenu ({ popupState, pageId, pageType }: { popupState: any, pageId:
   }, [pageId, setPages]);
 
   return (
-    <Menu {...bindMenu(popupState)}>
+    <Menu
+      {...bindMenu(popupState)}
+      onClick={(e) => {
+        e.stopPropagation();
+      }}
+    >
       <EmojiPicker onSelect={onSelectEmoji} />
     </Menu>
   );

@@ -5,9 +5,12 @@ import type { ExtendedPoap, NftData } from 'lib/blockchain/interfaces';
 import { useEffect } from 'react';
 import useSWRImmutable from 'swr/immutable';
 import AggregatedData from './components/AggregatedData';
-import CollectableRow, { Collectable } from './components/CollectibleRow';
-import CommunityRow, { CommunityDetails } from './components/CommunityRow';
-import UserDetails, { isPublicUser, UserDetailsProps } from './components/UserDetails';
+import type { Collectable } from './components/CollectibleRow';
+import CollectableRow from './components/CollectibleRow';
+import type { CommunityDetails } from './components/CommunityRow';
+import CommunityRow from './components/CommunityRow';
+import type { UserDetailsProps } from './components/UserDetails';
+import UserDetails, { isPublicUser } from './components/UserDetails';
 import { useCollablandCredentials } from './hooks/useCollablandCredentials';
 import CollablandCredentials from './components/CollablandCredentials';
 
@@ -24,13 +27,14 @@ function transformPoap (poap: ExtendedPoap): Collectable {
 }
 
 function transformNft (nft: NftData): Collectable {
+  const tokenId = nft.tokenId.startsWith('0x') ? parseInt(nft.tokenId, 16) : nft.tokenId;
   return {
     type: 'nft',
     date: nft.timeLastUpdated,
     id: nft.id,
     image: nft.image ?? nft.imageThumb,
     title: nft.title,
-    link: `https://opensea.io/assets/ethereum/${nft.contract}/${nft.tokenId}`,
+    link: nft.chainId === 42161 ? `https://stratosnft.io/assets/${nft.contract}/${tokenId}` : `https://opensea.io/assets/${nft.chainId === 1 ? 'ethereum' : 'matic'}/${nft.contract}/${tokenId}`,
     isHidden: nft.isHidden
   };
 }

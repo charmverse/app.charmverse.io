@@ -1,6 +1,7 @@
 import charmClient from 'charmClient';
-import { Contributor } from 'models';
-import { createContext, useContext, useEffect, useMemo, useState, ReactNode } from 'react';
+import type { Contributor } from 'models';
+import type { ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import { useCurrentSpace } from './useCurrentSpace';
 

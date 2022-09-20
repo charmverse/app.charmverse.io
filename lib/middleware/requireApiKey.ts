@@ -1,7 +1,7 @@
-import { Space, SpaceApiToken, User } from '@prisma/client';
+import type { Space, SpaceApiToken, User } from '@prisma/client';
 import { prisma } from 'db';
-import { NextApiRequest, NextApiResponse } from 'next';
-import { NextHandler } from 'next-connect';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import type { NextHandler } from 'next-connect';
 import crypto from 'node:crypto';
 import { ApiError } from 'lib/middleware/errors';
 import log from 'lib/log';

@@ -1,12 +1,13 @@
 
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { Prisma, Space } from '@prisma/client';
+import type { Prisma, Space } from '@prisma/client';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { gettingStartedPageContent } from 'seedData';
-import { postToDiscord, IEventToLog } from 'lib/log/userEvents';
+import type { IEventToLog } from 'lib/log/userEvents';
+import { postToDiscord } from 'lib/log/userEvents';
 import { setupDefaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMethods';
 import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import { convertJsonPagesToPrisma } from 'lib/pages/server/convertJsonPagesToPrisma';

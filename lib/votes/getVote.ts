@@ -2,7 +2,7 @@ import { VoteStatus } from '@prisma/client';
 import { prisma } from 'db';
 import { aggregateVoteResult } from './aggregateVoteResult';
 import { calculateVoteStatus } from './calculateVoteStatus';
-import { ExtendedVote } from './interfaces';
+import type { ExtendedVote } from './interfaces';
 
 export async function getVote (id: string, userId: string): Promise<ExtendedVote | null> {
   const vote = await prisma.vote.findUnique({

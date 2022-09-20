@@ -2,7 +2,7 @@ import { v4 } from 'uuid';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { prisma } from 'db';
 import { PageFromBlock } from '../pageFromBlock.class';
-import { PageProperty } from '../interfaces';
+import type { PageProperty } from '../interfaces';
 
 const exampleBoardSchema: PageProperty [] = [
   {

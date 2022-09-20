@@ -1,4 +1,5 @@
-import { ListItemText, ListItemTextProps } from '@mui/material';
+import type { ListItemTextProps } from '@mui/material';
+import { ListItemText } from '@mui/material';
 
 export function StyledListItemText (props: ListItemTextProps) {
   return (

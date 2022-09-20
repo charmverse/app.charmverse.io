@@ -6,11 +6,12 @@ import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
 import ReviewsOutlinedIcon from '@mui/icons-material/ReviewsOutlined';
-import { Chip, ChipProps } from '@mui/material';
-import { ProposalStatus } from '@prisma/client';
+import type { ChipProps } from '@mui/material';
+import { Chip } from '@mui/material';
+import type { ProposalStatus } from '@prisma/client';
 import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
-import { ReactNode } from 'react';
-import { BrandColor } from 'theme/colors';
+import type { ReactNode } from 'react';
+import type { BrandColor } from 'theme/colors';
 
 const PROPOSAL_STATUS_ICONS : Record<ProposalStatus, ReactNode> = {
   private_draft: <LockOutlinedIcon />,
@@ -42,7 +43,7 @@ const StyledProposalStatusChip = styled(Chip)<{ status: ProposalStatus }>`
     opacity: 0.5;
   }
   .MuiChip-iconSmall svg {
-    font-size: 1.2rem;
+    font-size: 1rem;
   }
   .MuiChip-label {
     font-weight: 600;

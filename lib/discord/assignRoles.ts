@@ -1,6 +1,6 @@
-import { Role } from '@prisma/client';
+import type { Role } from '@prisma/client';
 import { prisma } from 'db';
-import { DiscordAccount } from './getDiscordAccount';
+import type { DiscordAccount } from './getDiscordAccount';
 
 export interface DiscordGuildMember {
   user?: DiscordAccount

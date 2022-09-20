@@ -1,8 +1,8 @@
-import { Application } from '@prisma/client';
+import type { Application } from '@prisma/client';
 import { prisma } from 'db';
 import { DataNotFoundError, MissingDataError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { getApplication } from '../getApplication';
-import { SubmissionUpdateData } from '../interfaces';
+import type { SubmissionUpdateData } from '../interfaces';
 import { submissionIsEditable } from '../shared';
 
 export async function updateSubmission ({ submissionId, submissionContent }: SubmissionUpdateData): Promise<Application> {

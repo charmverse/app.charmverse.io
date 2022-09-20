@@ -1,6 +1,6 @@
 import { prisma } from 'db';
 import { generateAccessibleBountiesQuery } from 'lib/bounties';
-import { ApplicationWithTransactions } from '../interfaces';
+import type { ApplicationWithTransactions } from '../interfaces';
 
 /**
  * Returns only valid applications

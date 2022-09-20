@@ -1,10 +1,10 @@
-import { Space, User } from '@prisma/client';
+import type { Space, User } from '@prisma/client';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { ExpectedAnError } from 'testing/errors';
 import { v4 } from 'uuid';
 import { createDatabase, createDatabaseCardPage } from '../createDatabaseCardPage';
 import { PageFromBlock } from '../pageFromBlock.class';
-import { PageProperty } from '../interfaces';
+import type { PageProperty } from '../interfaces';
 import { getDatabaseRoot } from '../getPageInBoard';
 
 let user: User;

@@ -5,9 +5,10 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Modal from 'components/common/Modal';
-import { ExtendedVote } from 'lib/votes/interfaces';
+import type { ExtendedVote } from 'lib/votes/interfaces';
 import { DateTime } from 'luxon';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
+import { useEffect, useState } from 'react';
 import { usePages } from 'hooks/usePages';
 import { useVotes } from 'hooks/useVotes';
 import AddCircle from '@mui/icons-material/AddCircle';
@@ -146,7 +147,7 @@ export default function CreateVoteModal ({ open = true, onClose, onCreateVote, i
     || (new Set(options.map(option => option.name)).size !== options.length);
 
   return (
-    <Modal title='Create a vote' size='large' open={open} onClose={onClose ?? (() => {})}>
+    <Modal title={isProposal ? 'Create a vote' : 'Create a poll'} size='large' open={open} onClose={onClose ?? (() => {})}>
       <Box
         flexDirection='column'
         gap={1.5}

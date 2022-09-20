@@ -1,5 +1,8 @@
-import { Browser, chromium, expect, test } from '@playwright/test';
+import type { Browser } from '@playwright/test';
+import { chromium, expect, test } from '@playwright/test';
 import type { IPageWithPermissions } from 'lib/pages/interfaces';
+import { prisma } from 'db';
+import type { Page } from '@prisma/client';
 import { createUserAndSpace, baseUrl } from './utilities';
 
 let browser: Browser;
@@ -13,6 +16,7 @@ test.describe.serial('Make a page public and visit it', async () => {
   // Will be set by the first test
   let shareUrl = '';
   let boardPage: IPageWithPermissions;
+  let cardPage: Page;
   let pages: IPageWithPermissions[] = [];
 
   test('make a page public', async () => {
@@ -29,6 +33,13 @@ test.describe.serial('Make a page public and visit it', async () => {
 
     boardPage = pages.find(p => p.type === 'board' && p.title.match(/tasks/i) !== null) as IPageWithPermissions;
 
+    cardPage = await prisma.page.findFirst({
+      where: {
+        type: 'card',
+        parentId: boardPage?.id
+      }
+    }) as Page;
+
     const targetPage = `${baseUrl}/${domain}/${boardPage?.path}`;
 
     await page.goto(targetPage);
@@ -37,7 +48,7 @@ test.describe.serial('Make a page public and visit it', async () => {
     // Part A - Prepare the page as a logged in user
     // 1. Make sure the board page exists and cards are visible
 
-    await expect(page.locator('data-test=kanban-card').first()).toBeVisible();
+    await expect(page.locator(`data-test=kanban-card-${cardPage.id}`)).toBeVisible();
 
     // 2. Open the share dialog and make the page public
     const permissionDialog = page.locator('data-test=toggle-page-permissions-dialog');
@@ -93,7 +104,7 @@ test.describe.serial('Make a page public and visit it', async () => {
     expect(await boardTitle.inputValue()).toBe(boardPage?.title);
 
     // 3. Wait for the card, click on it
-    const cardToOpen = page.locator('data-test=kanban-card').first();
+    const cardToOpen = page.locator(`data-test=kanban-card-${cardPage.id}`);
     await expect(cardToOpen).toBeVisible();
 
     await cardToOpen.click();

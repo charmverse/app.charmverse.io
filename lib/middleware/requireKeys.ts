@@ -1,6 +1,6 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { NextHandler } from 'next-connect';
-import { ISystemError } from 'lib/utilities/errors';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import type { NextHandler } from 'next-connect';
+import type { ISystemError } from 'lib/utilities/errors';
 import { ApiError } from 'lib/middleware';
 
 /**

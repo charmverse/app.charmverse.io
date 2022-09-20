@@ -1,8 +1,9 @@
 
-import { getAggregatedData, AggregatedProfileData } from 'lib/profile';
+import type { AggregatedProfileData } from 'lib/profile';
+import { getAggregatedData } from 'lib/profile';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

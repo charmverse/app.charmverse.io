@@ -2,7 +2,7 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { Bounty } from '@prisma/client';
+import type { Bounty } from '@prisma/client';
 import charmClient from 'charmClient';
 import { Modal } from 'components/common/Modal';
 import { useBounties } from 'hooks/useBounties';

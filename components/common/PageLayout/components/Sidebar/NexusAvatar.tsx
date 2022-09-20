@@ -1,6 +1,6 @@
 
 import styled from '@emotion/styled';
-import { LoggedInUser } from 'models';
+import type { LoggedInUser } from 'models';
 import { useRouter } from 'next/router';
 import Avatar from 'components/common/Avatar';
 import Tooltip from '@mui/material/Tooltip';

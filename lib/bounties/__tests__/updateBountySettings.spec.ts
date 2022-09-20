@@ -1,10 +1,10 @@
 
-import { Bounty, Space, User } from '@prisma/client';
+import type { Bounty, Space, User } from '@prisma/client';
 import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { ExpectedAnError } from 'testing/errors';
 import { createBounty } from '../createBounty';
-import { UpdateableBountyFields } from '../interfaces';
+import type { UpdateableBountyFields } from '../interfaces';
 import { updateBountySettings } from '../updateBountySettings';
 import { InvalidInputError, PositiveNumbersOnlyError } from '../../utilities/errors';
 

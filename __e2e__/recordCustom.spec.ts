@@ -1,7 +1,3 @@
-import { chromium } from '@playwright/test';
-import { LoggedInUser } from 'models';
-import { v4 } from 'uuid';
-import { createUserAndSpace, baseUrl } from './utilities';
 
 // Run the test server with npm run start:test, then execute 'dotenv -e .env.test.local -- ts-node __e2e__/record-custom.spec.ts'
 // Once the page loads, click 'Record' to start recording your interaction with the app

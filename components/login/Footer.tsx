@@ -1,14 +1,14 @@
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
 import styled from '@emotion/styled';
-import Link from '@mui/material/Link';
-import IconButton from '@mui/material/IconButton';
-import TwitterIcon from '@mui/icons-material/Twitter';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
-import DiscordIcon from 'public/images/discord_logo.svg';
+import TwitterIcon from '@mui/icons-material/Twitter';
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
+import Link from '@mui/material/Link';
 import SvgIcon from '@mui/material/SvgIcon';
+import Typography from '@mui/material/Typography';
+import DiscordIcon from 'public/images/discord_logo.svg';
 
 import { Container } from './LoginPageContent';
 

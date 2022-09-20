@@ -6,7 +6,7 @@ import { addPage } from 'lib/pages';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import { useRouter } from 'next/router';
-import { Page } from '@prisma/client';
+import type { Page } from '@prisma/client';
 
 export default function useNestedPage () {
   const [space] = useCurrentSpace();

@@ -1,9 +1,9 @@
 import { link } from '@bangle.dev/base-components';
-import { PluginKey } from '@bangle.dev/core';
-import { Node, Plugin, ResolvedPos } from '@bangle.dev/pm';
+import type { PluginKey } from '@bangle.dev/core';
+import type { Node, Plugin, ResolvedPos } from '@bangle.dev/pm';
 import { floatingMenu } from '@bangle.dev/react-menu';
 import { hasComponentInSchema } from '@bangle.dev/react-menu/helper';
-import { NodeSelection } from 'prosemirror-state';
+import type { NodeSelection } from 'prosemirror-state';
 import { queryIsSelectionAroundInlineVote } from '../inlineVote';
 import { markName as inlineVoteMarkName } from '../inlineVote/inlineVote.constants';
 

@@ -11,14 +11,15 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
-import { SpaceOperation } from '@prisma/client';
+import type { SpaceOperation } from '@prisma/client';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePreventReload } from 'hooks/usePreventReload';
-import { AssignablePermissionGroups } from 'lib/permissions/interfaces';
-import { AvailableSpacePermissions, spaceOperationLabels, spaceOperations, SpacePermissionFlags } from 'lib/permissions/spaces/client';
+import type { AssignablePermissionGroups } from 'lib/permissions/interfaces';
+import type { SpacePermissionFlags } from 'lib/permissions/spaces/client';
+import { AvailableSpacePermissions, spaceOperationLabels, spaceOperations } from 'lib/permissions/spaces/client';
 import { useForm } from 'react-hook-form';
+import type { BooleanSchema } from 'yup';
 import * as yup from 'yup';
-import { BooleanSchema } from 'yup';
 
 const fields: Record<SpaceOperation, BooleanSchema> = spaceOperations().reduce((_schema: Record<SpaceOperation, BooleanSchema>, op) => {
   _schema[op] = yup.boolean();

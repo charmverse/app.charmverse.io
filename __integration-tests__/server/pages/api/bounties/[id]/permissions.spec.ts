@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { BountyPermissionLevel, Space, User } from '@prisma/client';
-import { AssignedBountyPermissions } from 'lib/bounties';
+import type { Space, User } from '@prisma/client';
+import { BountyPermissionLevel } from '@prisma/client';
+import type { AssignedBountyPermissions } from 'lib/bounties';
 import { typedKeys } from 'lib/utilities/objects';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';

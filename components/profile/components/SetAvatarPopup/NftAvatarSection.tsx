@@ -1,10 +1,9 @@
-import React from 'react';
-import { useMyNfts } from 'hooks/useMyNfts';
 import { Stack, Typography } from '@mui/material';
+import { useMyNfts } from 'hooks/useMyNfts';
 
 import NftAvatarGallery from 'components/profile/components/NftAvatarGallery';
 import { useUser } from 'hooks/useUser';
-import { NftData } from 'lib/blockchain/interfaces';
+import type { NftData } from 'lib/blockchain/interfaces';
 
 type Props = {
   onSelect?: (avatar: NftData) => void

@@ -1,4 +1,4 @@
-import { ComponentProps } from 'react';
+import type { ComponentProps } from 'react';
 import Alert from '@mui/material/Alert';
 import { Modal, DialogTitle } from './Modal';
 
