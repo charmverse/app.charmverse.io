@@ -19,8 +19,12 @@ const excludedPageTypes: PageType[] = ['bounty', 'bounty_template', 'proposal', 
 /**
  * @abstract Does not currently support bounty or proposal pages
  */
+export async function exportWorkspacePages ({ sourceSpaceIdOrDomain }: Pick<ExportWorkspacePage, 'sourceSpaceIdOrDomain'>):
+  Promise<{data: WorkspaceExport}>
+export async function exportWorkspacePages ({ sourceSpaceIdOrDomain, exportName }: Required<ExportWorkspacePage>
+): Promise<{data: WorkspaceExport, path: string}>
 export async function exportWorkspacePages ({ sourceSpaceIdOrDomain, exportName }: ExportWorkspacePage):
-Promise<{data: WorkspaceExport, path: string}> {
+  Promise<{data: WorkspaceExport, path?: string}> {
 
   const isUuid = validate(sourceSpaceIdOrDomain);
 
@@ -123,11 +127,18 @@ Promise<{data: WorkspaceExport, path: string}> {
     await fs.mkdir(exportFolder);
   }
 
-  const exportFilePath = path.join(exportFolder, `${exportName ?? `space-${space.domain}-${Date.now()}`}.json`);
-
   const exportData: WorkspaceExport = {
     pages: mappedTrees.map(t => t.targetPage)
   };
+
+  if (!exportName) {
+    return {
+      data: exportData
+    };
+  }
+
+  // Continue writing only if an export name was provided
+  const exportFilePath = path.join(exportFolder, `${exportName}.json`);
 
   await fs.writeFile(exportFilePath, JSON.stringify(exportData, null, 2));
 

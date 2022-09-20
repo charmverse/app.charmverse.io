@@ -176,4 +176,19 @@ describe('exportWorkspacePages', () => {
     expect(data.pages[0].id).toBe(returnedPage.id);
   });
 
+  it('should write the export to the given filename if provided', async () => {
+    const exportName = 'test-export';
+
+    const { data, path: exportedPath } = await exportWorkspacePages({
+      sourceSpaceIdOrDomain: space.id,
+      exportName
+    });
+
+    const file = await fs.readFile(exportedPath, 'utf8');
+
+    const stringifiedData = JSON.stringify(data, null, 2);
+
+    expect(file).toEqual(stringifiedData);
+  });
+
 });
