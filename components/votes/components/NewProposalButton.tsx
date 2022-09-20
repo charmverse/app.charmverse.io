@@ -6,8 +6,8 @@ import { useUser } from 'hooks/useUser';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { addPage } from 'lib/pages/addPage';
 import { usePages } from 'hooks/usePages';
-import { KeyedMutator } from 'swr';
-import { ProposalWithUsers } from 'lib/proposal/interface';
+import type { KeyedMutator } from 'swr';
+import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import useTasks from 'components/nexus/hooks/useTasks';
 

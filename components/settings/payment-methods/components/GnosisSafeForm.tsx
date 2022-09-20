@@ -3,18 +3,18 @@ import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
+import type { PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
+import { FormError } from 'components/common/form/FormError.class';
 import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
 import { getChainById } from 'connectors';
-import { PaymentMethod } from '@prisma/client';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { isValidChainAddress } from 'lib/tokens/validation';
-import { ISystemError } from 'lib/utilities/errors';
+import type { ISystemError } from 'lib/utilities/errors';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
-import { FormError } from 'components/common/form/FormError.class';
 
 export type FormMode = 'create' | 'update';
 

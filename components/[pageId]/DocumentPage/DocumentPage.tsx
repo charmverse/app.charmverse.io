@@ -12,9 +12,9 @@ import { useBounties } from 'hooks/useBounties';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
 import { useVotes } from 'hooks/useVotes';
-import { AssignedBountyPermissions } from 'lib/bounties';
-import { IPageWithPermissions } from 'lib/pages';
-import { Page, PageContent } from 'models';
+import type { AssignedBountyPermissions } from 'lib/bounties';
+import type { IPageWithPermissions } from 'lib/pages';
+import type { Page, PageContent } from 'models';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { memo, useCallback, useEffect, useState } from 'react';
@@ -22,9 +22,9 @@ import { useElementSize } from 'usehooks-ts';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import BountyProperties from './components/BountyProperties';
 import PageBanner from './components/PageBanner';
-import { PageTemplateBanner } from './components/PageTemplateBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
 import PageHeader from './components/PageHeader';
+import { PageTemplateBanner } from './components/PageTemplateBanner';
 import { ProposalProperties } from './components/ProposalProperties';
 
 const CharmEditor = dynamic(() => import('components/common/CharmEditor'), {

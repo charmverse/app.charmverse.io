@@ -1,6 +1,6 @@
 import PaymentMethodList from 'components/settings/payment-methods/PaymentMethods';
 import SettingsLayout from 'components/settings/Layout';
-import { ReactElement } from 'react';
+import type { ReactElement } from 'react';
 
 export default function PagePaymentMethods () {
   return (

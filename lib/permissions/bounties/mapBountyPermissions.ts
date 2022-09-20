@@ -1,6 +1,6 @@
-import { BountyPermission } from '@prisma/client';
-import { TargetPermissionGroup } from '../interfaces';
-import { BountyPermissions } from './interfaces';
+import type { BountyPermission } from '@prisma/client';
+import type { TargetPermissionGroup } from '../interfaces';
+import type { BountyPermissions } from './interfaces';
 
 export function mapBountyPermissions (bountyPermissions: BountyPermission[]): BountyPermissions {
   const mapping: BountyPermissions = {

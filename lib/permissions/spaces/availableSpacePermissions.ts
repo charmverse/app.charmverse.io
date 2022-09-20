@@ -1,5 +1,5 @@
 import { SpaceOperation } from '@prisma/client';
-import { UserPermissionFlags } from '../interfaces';
+import type { UserPermissionFlags } from '../interfaces';
 import { Permissions } from '../permissions.class';
 
 export class AvailableSpacePermissions extends Permissions<SpaceOperation> implements UserPermissionFlags<SpaceOperation> {

@@ -1,11 +1,12 @@
 import { prisma } from 'db';
-import { assignRolesFromDiscord, DiscordGuildMember } from 'lib/discord/assignRoles';
+import type { DiscordGuildMember } from 'lib/discord/assignRoles';
+import { assignRolesFromDiscord } from 'lib/discord/assignRoles';
 import { handleDiscordResponse } from 'lib/discord/handleDiscordResponse';
-import { DiscordServerRole } from 'lib/discord/interface';
+import type { DiscordServerRole } from 'lib/discord/interface';
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { findOrCreateRoles } from 'lib/roles/createRoles';
 import { withSessionRoute } from 'lib/session/withSession';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc({

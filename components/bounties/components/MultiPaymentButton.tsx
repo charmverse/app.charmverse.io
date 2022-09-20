@@ -1,6 +1,6 @@
 import Button from '@mui/material/Button';
 import { useWeb3React } from '@web3-react/core';
-import { MetaTransactionData } from '@gnosis.pm/safe-core-sdk-types';
+import type { MetaTransactionData } from '@gnosis.pm/safe-core-sdk-types';
 import SafeServiceClient from '@gnosis.pm/safe-service-client';
 import { Tooltip } from '@mui/material';
 import EthersAdapter from '@gnosis.pm/safe-ethers-lib';

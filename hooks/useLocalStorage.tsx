@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 // Add a prefix so if our schema changes, we can invalidate previous content
 const PREFIX = 'charm.v1';

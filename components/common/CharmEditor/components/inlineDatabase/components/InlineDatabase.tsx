@@ -1,7 +1,7 @@
 
-import { NodeViewProps } from '@bangle.dev/core';
+import type { NodeViewProps } from '@bangle.dev/core';
 import styled from '@emotion/styled';
-import { Page } from '@prisma/client';
+import type { Page } from '@prisma/client';
 import charmClient from 'charmClient';
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';

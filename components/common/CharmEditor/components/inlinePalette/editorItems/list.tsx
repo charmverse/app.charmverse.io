@@ -8,7 +8,7 @@ import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
 import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
 import { palettePluginKey } from '../config';
 import { replaceSuggestionMarkWith } from '../inlinePalette';
-import { PaletteItemTypeNoGroup } from '../paletteItem';
+import type { PaletteItemTypeNoGroup } from '../paletteItem';
 
 const {
   toggleTodoList,

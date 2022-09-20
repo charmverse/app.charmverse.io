@@ -1,6 +1,7 @@
-import { Node } from '@bangle.dev/pm';
+import type { Node } from '@bangle.dev/pm';
 import styled from '@emotion/styled';
-import { ReactNode, memo } from 'react';
+import type { ReactNode } from 'react';
+import { memo } from 'react';
 
 // grid-template-columns: repeat(${({ colCount }) => `${colCount}, ${Math.floor(100 / colCount)}`}fr);
 const StyledColumnLayout = styled.div<{colCount: number}>`

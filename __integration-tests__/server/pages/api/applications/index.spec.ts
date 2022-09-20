@@ -1,15 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Application, Space, User } from '@prisma/client';
-import { ApplicationWithTransactions } from 'lib/applications/actions';
-import { ApplicationCreationData, SubmissionCreationData } from 'lib/applications/interfaces';
+import type { Application, Space, User } from '@prisma/client';
+import type { ApplicationCreationData } from 'lib/applications/interfaces';
 import { createBounty } from 'lib/bounties';
+import { addBountyPermissionGroup } from 'lib/permissions/bounties';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateBounty, generateBountyWithSingleApplication, generateSpaceUser, generateTransaction, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
-import { generateSubmissionContent } from 'testing/generate-stubs';
-import { addBountyPermissionGroup } from 'lib/permissions/bounties';
 
 let nonAdminUser: User;
 let nonAdminUserSpace: Space;

@@ -1,10 +1,10 @@
-import * as React from 'react';
-import TextField from '@mui/material/TextField';
-import Autocomplete from '@mui/material/Autocomplete';
-import { VariableSizeList } from 'react-window';
-import Typography from '@mui/material/Typography';
+import type { GetGuildsResponse } from '@guildxyz/sdk';
 import { Avatar, Box, ListItem, ListItemIcon, ListItemText, MenuItem } from '@mui/material';
-import { GetGuildsResponse } from '@guildxyz/sdk';
+import Autocomplete from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import * as React from 'react';
+import { VariableSizeList } from 'react-window';
 
 const LISTBOX_PADDING = 8; // px
 

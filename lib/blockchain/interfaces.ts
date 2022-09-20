@@ -1,4 +1,4 @@
-import { SupportedChainId } from './provider/alchemy';
+import type { SupportedChainId } from './provider/alchemy';
 
 export interface NftData {
   id: string;

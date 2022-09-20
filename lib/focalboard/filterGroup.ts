@@ -1,4 +1,5 @@
-import { FilterClause, createFilterClause } from './filterClause';
+import type { FilterClause } from './filterClause';
+import { createFilterClause } from './filterClause';
 
 type FilterGroupOperation = 'and' | 'or'
 

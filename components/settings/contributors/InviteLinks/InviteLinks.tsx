@@ -1,15 +1,16 @@
-import { usePopupState } from 'material-ui-popup-state/hooks';
-import { Modal } from 'components/common/Modal';
-import useSWR from 'swr';
-import Legend from 'components/settings/Legend';
-import Button from 'components/common/Button';
 import Typography from '@mui/material/Typography';
-import { InviteLinkPopulated } from 'pages/api/invites/index';
-import InviteForm, { FormValues as InviteLinkFormValues } from 'components/settings/contributors/InviteLinks/InviteLinkForm';
+import type { InviteLink } from '@prisma/client';
 import charmClient from 'charmClient';
+import Button from 'components/common/Button';
+import { Modal } from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import type { FormValues as InviteLinkFormValues } from 'components/settings/contributors/InviteLinks/InviteLinkForm';
+import InviteForm from 'components/settings/contributors/InviteLinks/InviteLinkForm';
+import Legend from 'components/settings/Legend';
+import { usePopupState } from 'material-ui-popup-state/hooks';
+import type { InviteLinkPopulated } from 'pages/api/invites/index';
 import { useState } from 'react';
-import { InviteLink } from '@prisma/client';
+import useSWR from 'swr';
 import InvitesTable from './InviteLinksTable';
 
 export default function InviteLinkList ({ isAdmin, spaceId }: { isAdmin: boolean, spaceId: string }) {

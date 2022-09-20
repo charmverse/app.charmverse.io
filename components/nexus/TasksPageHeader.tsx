@@ -1,12 +1,12 @@
-import { IconButton, Divider, Paper, Tooltip, Typography, Box, Grid } from '@mui/material';
-import { useWeb3React } from '@web3-react/core';
-import { useUser } from 'hooks/useUser';
-import Avatar from 'components/common/Avatar';
-import Link from 'next/link';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
-import KeyIcon from '@mui/icons-material/Key';
 import styled from '@emotion/styled';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import KeyIcon from '@mui/icons-material/Key';
+import { Box, Divider, Grid, IconButton, Paper, Tooltip, Typography } from '@mui/material';
+import { useWeb3React } from '@web3-react/core';
+import Avatar from 'components/common/Avatar';
+import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
+import { useUser } from 'hooks/useUser';
+import Link from 'next/link';
 
 const TasksPageHeaderContainer = styled.div`
   display: flex;

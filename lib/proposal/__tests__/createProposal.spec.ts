@@ -1,4 +1,4 @@
-import { Space, User } from '@prisma/client';
+import type { Space, User } from '@prisma/client';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { createProposal } from '../createProposal';
 

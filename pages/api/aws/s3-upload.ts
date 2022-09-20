@@ -2,12 +2,13 @@
 // We can replace with the actual library once next-s3-upload updates their AWS-SDK dependency to V3
 // see this issue for more: https://github.com/ryanto/next-s3-upload/issues/15
 
-import { NextApiRequest, NextApiResponse } from 'next';
-import { STSClient, GetFederationTokenCommand, STSClientConfig } from '@aws-sdk/client-sts';
-import nc from 'next-connect';
-import { v4 as uuid } from 'uuid';
+import type { STSClientConfig } from '@aws-sdk/client-sts';
+import { GetFederationTokenCommand, STSClient } from '@aws-sdk/client-sts';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+import { v4 as uuid } from 'uuid';
 
 type NextRouteHandler = (
   req: NextApiRequest,

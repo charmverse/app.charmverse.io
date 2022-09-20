@@ -1,5 +1,5 @@
+import type { Space } from '@prisma/client';
 import { useRouter } from 'next/router';
-import { Space } from '@prisma/client';
 import { useCallback, useMemo } from 'react';
 import { useSpaces } from './useSpaces';
 

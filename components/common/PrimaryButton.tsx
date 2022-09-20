@@ -1,8 +1,9 @@
-import { ElementType } from 'react';
+import type { ElementType } from 'react';
 import styled from '@emotion/styled';
 import { darken } from '@mui/system';
 import { blueColor } from 'theme/colors';
-import Button, { InputProps, StyledSpinner } from './Button';
+import type { InputProps } from './Button';
+import Button, { StyledSpinner } from './Button';
 
 const StyledButton = styled(Button)`
 

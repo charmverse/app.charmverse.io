@@ -1,13 +1,13 @@
-import { Space } from '@prisma/client';
+import type { Space } from '@prisma/client';
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
+import useRoles from 'hooks/useRoles';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { silentlyUpdateURL } from 'lib/browser';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import useSWRImmutable from 'swr/immutable';
-import useRoles from 'hooks/useRoles';
 
 function routerQueryIsDiscordCallback () {
   const urlSearchParams = new URLSearchParams(window.location.href);

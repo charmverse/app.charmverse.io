@@ -1,8 +1,8 @@
-import { Bounty } from '@prisma/client';
-import { RoleupWithMembers } from 'lib/roles/interfaces';
+import type { Bounty } from '@prisma/client';
+import type { RoleupWithMembers } from 'lib/roles/interfaces';
 import { humaniseList, upperCaseFirstCharacter } from '../../utilities/strings';
-import { TargetPermissionGroup } from '../interfaces';
-import { HumanisedBountyAccessSummary, SupportedHumanisedAccessConditions } from './interfaces';
+import type { TargetPermissionGroup } from '../interfaces';
+import type { HumanisedBountyAccessSummary, SupportedHumanisedAccessConditions } from './interfaces';
 
 /**
  * Returns a human friendly roleup of access conditions

@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { useUser } from 'hooks/useUser';
+import CloseIcon from '@mui/icons-material/Close';
 import { AppBar, Box, Dialog, DialogContent, IconButton, Stack, Toolbar, Typography } from '@mui/material';
 import Avatar from 'components/common/Avatar';
-import CloseIcon from '@mui/icons-material/Close';
 import PrimaryButton from 'components/common/PrimaryButton';
 import NftAvatarSection from 'components/profile/components/SetAvatarPopup/NftAvatarSection';
+import { useUser } from 'hooks/useUser';
+import React, { useEffect, useState } from 'react';
 
 import Slide from '@mui/material/Slide';
-import { TransitionProps } from '@mui/material/transitions';
-import { useS3UploadInput } from 'hooks/useS3UploadInput';
+import type { TransitionProps } from '@mui/material/transitions';
 import { useUpdateProfileAvatar } from 'components/profile/components/UserDetails/hooks/useUpdateProfileAvatar';
+import { useS3UploadInput } from 'hooks/useS3UploadInput';
+import type { NftData } from 'lib/blockchain/interfaces';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
-import { NftData } from 'lib/blockchain/interfaces';
 
 const Transition = React.forwardRef((
   props: TransitionProps & {

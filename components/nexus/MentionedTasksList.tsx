@@ -1,17 +1,17 @@
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import BountyIcon from '@mui/icons-material/RequestPage';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Alert, Box, Card, Grid, Typography } from '@mui/material';
+import type { User } from '@prisma/client';
+import charmClient from 'charmClient';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { MentionedTask } from 'lib/mentions/interfaces';
-import { DateTime } from 'luxon';
 import UserDisplay from 'components/common/UserDisplay';
-import { User } from '@prisma/client';
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import type { MentionedTask } from 'lib/mentions/interfaces';
+import { DateTime } from 'luxon';
+import type { GetTasksResponse } from 'pages/api/tasks/list';
 import { useEffect } from 'react';
-import charmClient from 'charmClient';
-import { GetTasksResponse } from 'pages/api/tasks/list';
-import { KeyedMutator } from 'swr';
-import BountyIcon from '@mui/icons-material/RequestPage';
-import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import type { KeyedMutator } from 'swr';
 
 function MentionedTaskRow (
   {

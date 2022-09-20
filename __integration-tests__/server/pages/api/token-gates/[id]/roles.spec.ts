@@ -1,4 +1,5 @@
-import { Role, Space, SpaceRole, TokenGate, TokenGateToRole, User } from '@prisma/client';
+import type { Role, Space, TokenGate, TokenGateToRole, User } from '@prisma/client';
+import { SpaceRole } from '@prisma/client';
 import { createUserFromWallet } from 'lib/users/createUser';
 import request from 'supertest';
 import { baseUrl } from 'testing/mockApiCall';

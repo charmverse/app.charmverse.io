@@ -1,4 +1,4 @@
-import { Comment, User } from '@prisma/client';
+import type { Comment, User } from '@prisma/client';
 
 export type CommentCreate = Pick<Comment, 'content' | 'threadId' | 'userId'>
 

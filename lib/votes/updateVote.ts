@@ -1,8 +1,9 @@
 import { prisma } from 'db';
-import { Vote } from '@prisma/client';
+import type { Vote } from '@prisma/client';
 import { DataNotFoundError, UndesirableOperationError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
-import { VoteStatusType, VOTE_STATUS } from './interfaces';
+import type { VoteStatusType } from './interfaces';
+import { VOTE_STATUS } from './interfaces';
 
 export async function updateVote (id: string, userId: string, status: VoteStatusType): Promise<Vote> {
   const existingVote = await prisma.vote.findUnique({

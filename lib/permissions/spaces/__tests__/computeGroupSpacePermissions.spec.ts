@@ -1,5 +1,6 @@
 
-import { Space, SpaceOperation, User } from '@prisma/client';
+import type { Space, User } from '@prisma/client';
+import { SpaceOperation } from '@prisma/client';
 import { prisma } from 'db';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';

@@ -1,9 +1,9 @@
-import { Prisma } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { hasAccessToSpace } from '../../middleware';
-import { PermissionComputeRequest } from '../interfaces';
+import type { PermissionComputeRequest } from '../interfaces';
 import { AvailableBountyPermissions } from './availableBountyPermissions';
-import { BountyPermissionFlags } from './interfaces';
+import type { BountyPermissionFlags } from './interfaces';
 import { bountyPermissionMapping } from './mapping';
 
 export async function computeBountyPermissions ({

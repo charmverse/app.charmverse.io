@@ -9,12 +9,14 @@ import {
 } from '@bangle.dev/base-components';
 import debounce from 'lodash/debounce';
 import { Plugin, SpecRegistry } from '@bangle.dev/core';
-import { EditorView, Node, PluginKey } from '@bangle.dev/pm';
+import type { EditorView } from '@bangle.dev/pm';
+import { Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
-import { CSSProperties, ReactNode, useState } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
+import { useState } from 'react';
 import styled from '@emotion/styled';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
-import { PageContent } from 'models';
+import type { PageContent } from 'models';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import * as floatingMenu from './components/floatingMenu';

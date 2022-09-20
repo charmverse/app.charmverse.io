@@ -1,9 +1,9 @@
-import { ComponentProps } from 'react';
-import { Box, Typography } from '@mui/material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import { Box, Typography } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
-import { Modal, DialogTitle } from 'components/common/Modal';
+import { DialogTitle, Modal } from 'components/common/Modal';
+import type { ComponentProps } from 'react';
 
 export interface TestResult {
   message?: string;

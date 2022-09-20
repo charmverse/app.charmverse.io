@@ -1,7 +1,7 @@
-import { LoggedInUser } from 'models';
-import { User, Prisma } from '@prisma/client';
+import type { Prisma, User } from '@prisma/client';
 import { prisma } from 'db';
 import { sessionUserRelations } from 'lib/session/config';
+import type { LoggedInUser } from 'models';
 
 type UserIdentifiers = Extract<keyof User, 'id' | 'addresses'>
 

@@ -1,5 +1,5 @@
-import { useMemo, useState, useEffect } from 'react';
 import LitJsSdk from 'lit-js-sdk';
+import { useEffect, useMemo, useState } from 'react';
 
 function useLitProtocol () {
 

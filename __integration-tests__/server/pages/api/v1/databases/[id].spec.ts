@@ -1,10 +1,11 @@
-import { SpaceApiToken, User, Space } from '@prisma/client';
+import type { SpaceApiToken, User, Space } from '@prisma/client';
 import request from 'supertest';
 // eslint-disable-next-line @next/next/no-server-import-in-page
 
 import { baseUrl } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { createDatabase, DatabasePage } from 'lib/public-api';
+import type { DatabasePage } from 'lib/public-api';
+import { createDatabase } from 'lib/public-api';
 import { v4 } from 'uuid';
 
 let user: User;

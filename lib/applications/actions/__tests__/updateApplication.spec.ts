@@ -1,14 +1,12 @@
 
-import { Application, Bounty, PageOperations, PagePermissionLevel, Space, User } from '@prisma/client';
-import { computeUserPagePermissions, permissionTemplates, upsertPermission } from 'lib/permissions/pages';
-import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
-import { ExpectedAnError } from 'testing/errors';
-import { UserIsNotSpaceMemberError } from 'lib/users/errors';
-import { DataNotFoundError, InvalidInputError, UnauthorisedActionError, LimitReachedError, PositiveNumbersOnlyError, DuplicateDataError, StringTooShortError } from 'lib/utilities/errors';
+import type { Application, Space, User } from '@prisma/client';
 import { createBounty } from 'lib/bounties/createBounty';
-import { createApplication } from '../createApplication';
+import { DataNotFoundError, StringTooShortError } from 'lib/utilities/errors';
+import { ExpectedAnError } from 'testing/errors';
+import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { v4 } from 'uuid';
 import { MINIMUM_APPLICATION_MESSAGE_CHARACTERS } from '../../shared';
+import { createApplication } from '../createApplication';
 import { updateApplication } from '../updateApplication';
 
 let user: User;

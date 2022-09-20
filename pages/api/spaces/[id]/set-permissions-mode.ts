@@ -1,9 +1,10 @@
 
-import { Space } from '@prisma/client';
+import type { Space } from '@prisma/client';
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
-import { SpacePermissionConfigurationUpdate, updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
+import type { SpacePermissionConfigurationUpdate } from 'lib/permissions/meta';
+import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import { withSessionRoute } from 'lib/session/withSession';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

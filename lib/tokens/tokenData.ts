@@ -1,8 +1,9 @@
 import * as http from 'adapters/http';
-import { PaymentMethod } from '@prisma/client';
-import { TokenLogoPaths, CryptoCurrency, CryptoCurrencyList, getChainById, IChainDetails } from 'connectors';
+import type { PaymentMethod } from '@prisma/client';
+import type { CryptoCurrency, IChainDetails } from 'connectors';
+import { TokenLogoPaths, CryptoCurrencyList, getChainById } from 'connectors';
 import { getAlchemyBaseUrl } from 'lib/blockchain/provider/alchemy';
-import { SupportedChainId } from '../blockchain/provider/alchemy';
+import type { SupportedChainId } from '../blockchain/provider/alchemy';
 
 export interface ITokenMetadataRequest {
   chainId: SupportedChainId,

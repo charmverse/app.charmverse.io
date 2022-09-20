@@ -1,16 +1,17 @@
 
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
-import { PluginKey } from 'prosemirror-state';
+import type { PluginKey } from 'prosemirror-state';
 import type { SpacePermissionFlags } from 'lib/permissions/spaces';
 import { rafCommandExec } from '@bangle.dev/utils';
 import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
 import InsertChartIcon from '@mui/icons-material/InsertChart';
-import { PageType } from '@prisma/client';
+import type { PageType } from '@prisma/client';
 import dynamic from 'next/dynamic';
-import { PaletteItemTypeNoGroup, PromisedCommand } from '../paletteItem';
+import type { PaletteItemTypeNoGroup, PromisedCommand } from '../paletteItem';
 import { replaceSuggestionMarkWith } from '../inlinePalette';
 import { palettePluginKey } from '../config';
-import { NestedPagePluginState, nestedPageSuggestMarkName } from '../../nestedPage';
+import type { NestedPagePluginState } from '../../nestedPage';
+import { nestedPageSuggestMarkName } from '../../nestedPage';
 import { insertNode, isAtBeginningOfLine } from '../../../utils';
 
 interface ItemsProps {

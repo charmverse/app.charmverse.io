@@ -1,17 +1,18 @@
 import { usePluginState, useEditorViewContext } from '@bangle.dev/react';
 import { Typography, Divider, MenuItem } from '@mui/material';
 import { Box } from '@mui/system';
-import { Page } from '@prisma/client';
+import type { Page } from '@prisma/client';
 import UserDisplay from 'components/common/UserDisplay';
 import { useContributors } from 'hooks/useContributors';
 import { usePages } from 'hooks/usePages';
 import { safeScrollIntoViewIfNeeded } from 'lib/browser';
-import { PluginKey } from 'prosemirror-state';
+import type { PluginKey } from 'prosemirror-state';
 import { useCallback, useEffect, memo } from 'react';
-import { SuggestTooltipPluginState, hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
+import type { SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggest-tooltip';
+import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import PagesList from '../../PageList';
 import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
-import { MentionPluginState } from '../mention.interfaces';
+import type { MentionPluginState } from '../mention.interfaces';
 import { selectMention } from '../mention.utils';
 
 export function MentionSuggest ({ pluginKey }: {pluginKey: PluginKey<MentionPluginState>}) {

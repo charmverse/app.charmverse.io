@@ -1,5 +1,5 @@
+import type { NftData } from './interfaces';
 import * as alchemyApi from './provider/alchemy';
-import { NftData } from './interfaces';
 
 export async function getNFTs (addresses: string[], chainId: alchemyApi.SupportedChainId = 1) {
   const nfts = await alchemyApi.getNFTs(addresses, chainId);
