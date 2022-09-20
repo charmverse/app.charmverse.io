@@ -5,7 +5,7 @@ import type { LoggedInUser } from 'models';
 import { IDENTITY_TYPES } from 'models';
 import getENSName from 'lib/blockchain/getENSName';
 import { sessionUserRelations } from 'lib/session/config';
-import { mixpanel } from 'lib/analytics/mixpanel/server';
+import { trackUserAction } from 'lib/metrics/mixpanel/server';
 
 export async function createUserFromWallet (address: string): Promise<LoggedInUser> {
   const user = await prisma.user.findFirst({
@@ -36,7 +36,7 @@ export async function createUserFromWallet (address: string): Promise<LoggedInUs
       include: sessionUserRelations
     });
 
-    mixpanel.track('userCreated', { userId: newUser.id, isWallet: true, isDiscord: false });
+    trackUserAction('userCreated', { userId: newUser.id, isWallet: true, isDiscord: false });
 
     return newUser;
 
