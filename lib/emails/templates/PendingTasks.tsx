@@ -6,13 +6,14 @@ import {
 } from 'mjml-react';
 import { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
 import { shortenHex } from 'lib/utilities/strings';
-import { darkModeColors, greyColor2 } from 'theme/colors';
+import { lightModeColors, darkModeColors, greyColor2 } from 'theme/colors';
 import log from 'lib/log';
 import { MentionedTask } from 'lib/mentions/interfaces';
 import { VoteTask } from 'lib/votes/interfaces';
 import { DateTime } from 'luxon';
 import { User } from '@prisma/client';
 import { ProposalTask } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';
+import { ProposalStatusColors } from 'components/proposals/components/ProposalStatusBadge';
 import { Feedback, Footer, Header, EmailWrapper } from './components';
 
 const charmverseUrl = process.env.DOMAIN;
@@ -33,7 +34,7 @@ export interface PendingTasksProps {
   user: TemplateUser
 }
 
-function ViewAllText ({ href }: {href: string}) {
+function ViewAllText ({ href }: { href: string }) {
   return (
     <MjmlText>
       <a
@@ -197,7 +198,7 @@ export default function PendingTasks (props: PendingTasksProps) {
   );
 }
 
-function VoteTaskMjml ({ task }: {task: VoteTask}) {
+function VoteTaskMjml ({ task }: { task: VoteTask }) {
   const pageWorkspaceTitle = `${task.page.title || 'Untitled'} | ${task.space.name}`;
   return (
     <MjmlText>
@@ -224,18 +225,23 @@ function VoteTaskMjml ({ task }: {task: VoteTask}) {
   );
 }
 
-function ProposalTaskMjml ({ task }: {task: ProposalTask}) {
+function ProposalTaskMjml ({ task }: { task: ProposalTask }) {
   const pageWorkspaceTitle = `${task.pageTitle || 'Untitled'} | ${task.spaceName}`;
   return (
     <MjmlText>
       <div style={{ fontWeight: 'bold', color: '#000', marginBottom: 5 }}>
         {pageWorkspaceTitle}
       </div>
+      <div style={{ fontSize: '0.75rem', width: 'fit-content', display: 'flex', alignItems: 'center', height: '24px', borderRadius: '16px', backgroundColor: lightModeColors[ProposalStatusColors[task.status]] }}>
+        <span style={{ textTransform: 'capitalize', paddingLeft: '8px', paddingRight: '8px' }}>
+          {task.status}
+        </span>
+      </div>
     </MjmlText>
   );
 }
 
-function MentionTask ({ task: { text, spaceName, pageTitle } }: {task: MentionedTask}) {
+function MentionTask ({ task: { text, spaceName, pageTitle } }: { task: MentionedTask }) {
   const pageWorkspaceTitle = `${pageTitle || 'Untitled'} | ${spaceName}`;
   return (
     <MjmlText>
