@@ -6,6 +6,7 @@ import type { MentionedTask } from 'lib/mentions/interfaces';
 import randomName from 'lib/utilities/randomName';
 import type { VoteTask } from 'lib/votes/interfaces';
 import { getPagePath } from 'lib/pages';
+import type { ProposalTask } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';
 
 const handler = nc({
   onError,
@@ -63,6 +64,18 @@ const createVoteTasks = ({ voteTitle, deadline, pageTitle, spaceName }: {voteTit
   } as any;
 };
 
+const createProposalTasks = ({ action, pageTitle, spaceName, status }: Omit<ProposalTask, 'id' | 'spaceDomain' | 'pagePath'>): ProposalTask => {
+  return {
+    id: v4(),
+    action,
+    pagePath: randomName(),
+    pageTitle,
+    status,
+    spaceDomain: randomName(),
+    spaceName
+  };
+};
+
 const templates = {
   'Notify the user about tasks': () => {
     return emails.getPendingTasksEmail({
@@ -72,6 +85,20 @@ const templates = {
         username: 'ghostpepper'
       },
       totalTasks: 6,
+      proposalTasks: [
+        createProposalTasks({
+          action: 'discuss',
+          pageTitle: 'Should Uniswap provide Rage Trade with an additional use grant',
+          spaceName: 'Uniswap',
+          status: 'discussion'
+        }),
+        createProposalTasks({
+          action: 'start_discussion',
+          pageTitle: 'Proposal to add XSTUSD-3CRV to the Gauge Controller',
+          spaceName: 'Curve Finance',
+          status: 'private_draft'
+        })
+      ],
       mentionedTasks: [
         createMentionTask({
           mentionText: 'cc @ghostpepper',
@@ -104,19 +131,19 @@ const templates = {
         createVoteTasks({
           deadline: new Date(Date.now() + (26 * 60 * 60 * 1000)),
           pageTitle: 'Product Discussion',
-          spaceName: 'Charmverse',
+          spaceName: 'CharmVerse',
           voteTitle: 'Should we format the text?'
         }),
         createVoteTasks({
           deadline: new Date(Date.now() + (32 * 60 * 60 * 1000)),
           pageTitle: 'Task Board',
-          spaceName: 'Charmverse',
+          spaceName: 'CharmVerse',
           voteTitle: 'Let\'s vote'
         }),
         createVoteTasks({
           deadline: new Date(Date.now() + (52 * 60 * 60 * 1000)),
           pageTitle: 'Product Road Map',
-          spaceName: 'Charmverse Demo',
+          spaceName: 'CharmVerse Demo',
           voteTitle: 'We should all vote on this'
         })
       ],
