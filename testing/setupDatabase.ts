@@ -1,4 +1,4 @@
-import type { ApplicationStatus, Block, Bounty, BountyStatus, Comment, Page, Prisma, ProposalStatus, Role, RoleSource, Thread, Transaction, Vote } from '@prisma/client';
+import { ApplicationStatus, Block, Bounty, BountyStatus, Comment, Page, Prisma, ProposalStatus, Role, RoleSource, Thread, Transaction, Vote, WorkspaceEvent } from '@prisma/client';
 import { prisma } from 'db';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
@@ -602,6 +602,23 @@ export async function generateProposal ({ userId, spaceId, proposalStatus, autho
           reviewers: true
         }
       }
+    }
+  });
+}
+
+export async function generateWorkspaceEvents ({
+  actorId,
+  spaceId,
+  meta,
+  pageId
+}: Pick<WorkspaceEvent, 'actorId' | 'meta' | 'pageId' | 'spaceId'>) {
+  return prisma.workspaceEvent.create({
+    data: {
+      type: 'proposal_status_change',
+      actorId,
+      spaceId,
+      meta: meta ?? undefined,
+      pageId
     }
   });
 }

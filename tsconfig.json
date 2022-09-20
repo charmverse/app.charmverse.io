@@ -1,7 +1,7 @@
 {
   "ts-node": {
     "compilerOptions": {
-      "jsx": "react",
+      "jsx": "react-jsx",
       "module": "commonjs",
       "jsxImportSource": ""
     },
