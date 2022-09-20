@@ -21,7 +21,7 @@ export async function createUserFromWallet (address: string): Promise<LoggedInUs
   else {
     const ens: string | null = await getENSName(address);
     const username = ens || shortenHex(address);
-    const userPath = username.replace('...', '-');
+    const userPath = username.replace('…', '-');
     const isUserPathAvailable = await isProfilePathAvailable(userPath);
 
     const newUser = await prisma.user.create({
