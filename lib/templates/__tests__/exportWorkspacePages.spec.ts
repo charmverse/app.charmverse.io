@@ -77,6 +77,30 @@ describe('exportWorkspacePages', () => {
     expect(exportedBoardPage).toBeTruthy();
   });
 
+  it('should support a space domain for the source space', async () => {
+
+    const { data } = await exportWorkspacePages({
+      sourceSpaceIdOrDomain: space.domain
+    });
+
+    // Copy paste all assertions from the first test which uses space ID
+    // Only 2 root level pages
+    expect(data.pages.length).toBe(2);
+
+    // Verify tree structure
+    const exportedRoot1 = data.pages.find(page => page.id === root_1.id);
+    expect(exportedRoot1).toBeTruthy();
+
+    expect(exportedRoot1?.children.length).toBe(1);
+    expect(exportedRoot1?.children[0].id).toBe(page_1_1.id);
+
+    expect(exportedRoot1?.children[0].children.length).toBe(1);
+    expect(exportedRoot1?.children[0].children[0].id).toBe(page_1_1_1.id);
+
+    const exportedBoardPage = data.pages.find(page => page.id === boardPage.id);
+    expect(exportedBoardPage).toBeTruthy();
+  });
+
   it('should save the block data for boards and cards inside their respective pages', async () => {
     const { data } = await exportWorkspacePages({
       sourceSpaceIdOrDomain: space.id
