@@ -1,18 +1,26 @@
+import { useTheme } from '@emotion/react';
 import CheckIcon from '@mui/icons-material/Check';
 import { Divider, Stack, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import type { ProposalStatus } from '@prisma/client';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
-import { proposalStatusTransitionRecord, PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
+import type { ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';
+import { proposalStatusTransitionPermission, proposalStatusTransitionRecord, PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 
-export default function ProposalStepper ({ proposal }: {proposal: ProposalWithUsers}) {
+const proposalStatuses = Object.keys(proposalStatusTransitionRecord) as ProposalStatus[];
+
+export default function ProposalStepper ({ proposal, proposalUserGroups }: {proposalUserGroups: ProposalUserGroup[], proposal: ProposalWithUsers}) {
   const { status: currentStatus } = proposal;
+  const theme = useTheme();
 
-  const currentStatusIndex = Object.keys(proposalStatusTransitionRecord).findIndex(status => status === currentStatus);
+  const currentStatusIndex = proposalStatuses.indexOf(currentStatus);
 
   return (
     <Box display='flex' gap={1}>
-      {Object.entries(proposalStatusTransitionRecord).map(([status, availableStatuses], statusIndex) => {
+      {proposalStatuses.map((status, statusIndex) => {
+        const canChangeStatus = proposalUserGroups.some(
+          proposalUserGroup => proposalStatusTransitionPermission[currentStatus]?.[proposalUserGroup]?.includes(status)
+        );
         return (
           <Box display='flex' position='relative' gap={1} alignItems='center'>
             <Stack
@@ -30,7 +38,9 @@ export default function ProposalStepper ({ proposal }: {proposal: ProposalWithUs
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  background: 'blue'
+                  background: status === currentStatus
+                    ? theme.palette.purple.main : canChangeStatus
+                      ? theme.palette.teal.main : theme.palette.gray.main
                 }}
               >
                 {currentStatusIndex >= statusIndex ? <CheckIcon />

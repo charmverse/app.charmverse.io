@@ -113,6 +113,7 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly }: Pr
     >
       <Grid container mb={2}>
         <ProposalStepper
+          proposalUserGroups={currentUserGroups}
           proposal={proposal}
         />
 
