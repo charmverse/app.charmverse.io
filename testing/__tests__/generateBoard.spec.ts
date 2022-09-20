@@ -5,16 +5,21 @@ describe('generateBoard', () => {
   it('should generate a database page with 1 view and 2 nested cards', async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken(undefined, false);
 
-    await generateBoard({ createdBy: user.id, spaceId: space.id });
+    const board = await generateBoard({ createdBy: user.id, spaceId: space.id });
 
     const pages = await prisma.page.findMany({
       where: {
         spaceId: space.id
       },
       select: {
-        id: true
+        id: true,
+        parentId: true,
+        type: true
       }
     });
+
+    const boardPage = pages.find(page => page.id === board.id && page.type === 'board');
+    const cardPages = pages.filter(page => page.parentId === board.id && page.type === 'card');
 
     const blocks = await prisma.block.findMany({
       where: {
@@ -28,6 +33,10 @@ describe('generateBoard', () => {
 
     // 1 board plus 2 nested cards
     expect(pages.length).toBe(3);
+
+    // Make sure pages created with correct type
+    expect(boardPage).toBeTruthy();
+    expect(cardPages.length).toBe(2);
 
     // Ensure blocks provisioned correctly
     expect(boardBlocks.length).toBe(1);

@@ -2942,7 +2942,7 @@ export function boardWithCardsArgs ({ createdBy, spaceId, parentId }: {createdBy
       ...pageWithoutExtraProps,
       id: page.type === 'board' ? boardId : v4(),
       content: undefined,
-      type: rootBoardNode.type as PageType,
+      type: page.type as PageType,
       author: {
         connect: {
           id: createdBy
