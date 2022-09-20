@@ -1,5 +1,6 @@
 
-import { Space, SpaceOperation } from '@prisma/client';
+import type { Space } from '@prisma/client';
+import { SpaceOperation } from '@prisma/client';
 import { assignRole } from 'lib/roles';
 import { generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { addSpaceOperations } from '../addSpaceOperations';

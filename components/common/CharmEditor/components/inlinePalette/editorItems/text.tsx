@@ -2,7 +2,8 @@ import {
   bulletList, orderedList,
   paragraph
 } from '@bangle.dev/base-components';
-import { Fragment, setBlockType, EditorState, Transaction } from '@bangle.dev/pm';
+import type { EditorState, Transaction } from '@bangle.dev/pm';
+import { Fragment, setBlockType } from '@bangle.dev/pm';
 import { rafCommandExec } from '@bangle.dev/utils';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
@@ -16,7 +17,7 @@ import {
 } from '../commands';
 import { palettePluginKey } from '../config';
 import { replaceSuggestionMarkWith } from '../inlinePalette';
-import { PaletteItemTypeNoGroup } from '../paletteItem';
+import type { PaletteItemTypeNoGroup } from '../paletteItem';
 
 const { convertToParagraph } = paragraph;
 const {

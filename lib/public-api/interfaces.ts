@@ -1,4 +1,4 @@
-import { Page as PrismaPage } from '@prisma/client';
+import type { Page as PrismaPage } from '@prisma/client';
 
 /**
  * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts

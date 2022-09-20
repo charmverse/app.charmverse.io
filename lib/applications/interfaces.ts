@@ -1,5 +1,5 @@
-import { Application, Bounty, Transaction } from '@prisma/client';
-import { RequiredNotNull } from 'lib/utilities/types';
+import type { Application, Bounty, Transaction } from '@prisma/client';
+import type { RequiredNotNull } from 'lib/utilities/types';
 
 export interface ApplicationCreationData {
   userId: string,

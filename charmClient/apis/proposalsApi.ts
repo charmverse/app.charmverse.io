@@ -1,6 +1,6 @@
-import { ProposalStatus } from '@prisma/client';
+import type { ProposalStatus } from '@prisma/client';
 import * as http from 'adapters/http';
-import { ProposalWithUsers } from 'lib/proposal/interface';
+import type { ProposalWithUsers } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 
 export class ProposalsApi {

@@ -1,4 +1,4 @@
-import { BountyWithDetails } from 'models';
+import type { BountyWithDetails } from 'models';
 import { prisma } from 'db';
 import { includePagePermissions } from 'lib/pages/server/getAccessiblePages';
 import { DataNotFoundError } from 'lib/utilities/errors';

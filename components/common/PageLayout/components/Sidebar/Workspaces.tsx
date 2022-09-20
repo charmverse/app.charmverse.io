@@ -10,7 +10,7 @@ import IconButton from '@mui/material/IconButton';
 import MuiLink from '@mui/material/Link';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { Prisma } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import charmClient from 'charmClient';
 import NextLink from 'next/link';
 import { useState } from 'react';

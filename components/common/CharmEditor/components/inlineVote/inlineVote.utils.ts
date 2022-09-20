@@ -1,4 +1,4 @@
-import { Command, EditorState } from '@bangle.dev/pm';
+import type { Command, EditorState } from '@bangle.dev/pm';
 import { filter } from '@bangle.dev/utils';
 import { markName } from './inlineVote.constants';
 

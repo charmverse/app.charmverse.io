@@ -1,6 +1,7 @@
-import { Space } from '@prisma/client';
+import type { Space } from '@prisma/client';
 import { prisma } from 'db';
-import { getPage, IPageWithPermissions, PageNotFoundError } from 'lib/pages/server';
+import type { IPageWithPermissions } from 'lib/pages/server';
+import { getPage, PageNotFoundError } from 'lib/pages/server';
 import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
 import { copyAllPagePermissions } from '../actions/copyPermission';
 import { generateReplaceIllegalPermissions } from '../actions/replaceIllegalPermissions';

@@ -1,8 +1,8 @@
 import { prisma } from 'db';
 import { ApiError } from 'lib/middleware';
-import { ISystemError } from 'lib/utilities/errors';
-import { NextApiRequest, NextApiResponse } from 'next';
-import { NextHandler } from 'next-connect';
+import type { ISystemError } from 'lib/utilities/errors';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import type { NextHandler } from 'next-connect';
 import { AdministratorOnlyError, UserIsNotSpaceMemberError } from '../users/errors';
 
 /**

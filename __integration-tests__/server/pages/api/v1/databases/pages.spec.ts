@@ -1,4 +1,5 @@
-import request, { Response } from 'supertest';
+import type { Response } from 'supertest';
+import request from 'supertest';
 // eslint-disable-next-line @next/next/no-server-import-in-page
 
 import { baseUrl } from 'testing/mockApiCall';
@@ -6,8 +7,8 @@ import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { createDatabase } from 'lib/public-api/createDatabaseCardPage';
 import { v4 } from 'uuid';
 import { prisma } from 'db';
-import { Space, User, Page, SpaceApiToken } from '@prisma/client';
-import { Page as ApiPage, UnsupportedKeyDetails, UnsupportedKeysError } from 'lib/public-api';
+import type { Space, User, Page, SpaceApiToken } from '@prisma/client';
+import type { Page as ApiPage, UnsupportedKeyDetails, UnsupportedKeysError } from 'lib/public-api';
 
 let database: Page;
 let user: User;

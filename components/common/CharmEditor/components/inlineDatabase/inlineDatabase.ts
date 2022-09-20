@@ -1,5 +1,5 @@
-import { BaseRawNodeSpec } from '@bangle.dev/core';
-import { DOMOutputSpec } from '@bangle.dev/pm';
+import type { BaseRawNodeSpec } from '@bangle.dev/core';
+import type { DOMOutputSpec } from '@bangle.dev/pm';
 
 export function spec () {
   return [

@@ -1,5 +1,7 @@
-import { RawPlugins, RawSpecs, createElement } from '@bangle.dev/core';
-import { DOMOutputSpec, Plugin, PluginKey, keymap, TextSelection } from '@bangle.dev/pm';
+import type { RawPlugins, RawSpecs } from '@bangle.dev/core';
+import { createElement } from '@bangle.dev/core';
+import type { DOMOutputSpec } from '@bangle.dev/pm';
+import { Plugin, PluginKey, keymap, TextSelection } from '@bangle.dev/pm';
 import { hasParentNodeOfType } from '@bangle.dev/utils';
 import { backspaceCmd } from './commands';
 

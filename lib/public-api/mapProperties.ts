@@ -1,5 +1,5 @@
 import { InvalidCustomPropertyKeyError, InvalidCustomPropertyValueError } from './errors';
-import { PageProperty } from './interfaces';
+import type { PageProperty } from './interfaces';
 
 /**
  * Used for mapping human-friendly values to focalboard representation

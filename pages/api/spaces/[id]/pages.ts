@@ -1,8 +1,9 @@
 
 import { onError, onNoMatch } from 'lib/middleware';
-import { getAccessiblePages, IPageWithPermissions } from 'lib/pages/server';
+import type { IPageWithPermissions } from 'lib/pages/server';
+import { getAccessiblePages } from 'lib/pages/server';
 import { withSessionRoute } from 'lib/session/withSession';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

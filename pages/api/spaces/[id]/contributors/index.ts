@@ -3,8 +3,8 @@ import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
-import { Contributor } from 'models';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { Contributor } from 'models';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

@@ -1,9 +1,9 @@
 
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
-import { IPagePermissionUserRequest } from 'lib/permissions/pages/page-permission-interfaces';
+import type { IPagePermissionUserRequest } from 'lib/permissions/pages/page-permission-interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

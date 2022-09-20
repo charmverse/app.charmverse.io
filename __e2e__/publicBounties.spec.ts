@@ -1,4 +1,5 @@
-import { Browser, chromium, test, expect } from '@playwright/test';
+import type { Browser } from '@playwright/test';
+import { chromium, expect, test } from '@playwright/test';
 import { baseUrl, createUserAndSpace, generateBounty } from './utilities';
 
 let browser: Browser;

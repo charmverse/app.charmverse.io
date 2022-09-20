@@ -1,5 +1,5 @@
-import { Page, Prisma, Space } from '@prisma/client';
-import { PageContent } from 'models';
+import type { Page, Space } from '@prisma/client';
+import type { PageContent } from 'models';
 import { v4 as uuid } from 'uuid';
 
 export const spaces: Space[] = [

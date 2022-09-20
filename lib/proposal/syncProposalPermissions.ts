@@ -1,4 +1,4 @@
-import { PagePermissionLevel, Prisma, ProposalStatus } from '@prisma/client';
+import type { PagePermissionLevel, Prisma, ProposalStatus } from '@prisma/client';
 import { prisma } from 'db';
 import type { IPageWithPermissions } from 'lib/pages/interfaces';
 import { resolvePageTree } from 'lib/pages/server';

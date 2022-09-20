@@ -1,6 +1,6 @@
-import { Page, ProposalStatus, Space, WorkspaceEvent } from '@prisma/client';
+import type { Page, ProposalStatus, Space, WorkspaceEvent } from '@prisma/client';
 import { prisma } from 'db';
-import { ProposalWithUsers } from './interface';
+import type { ProposalWithUsers } from './interface';
 
 export interface ProposalTask {
   id: string

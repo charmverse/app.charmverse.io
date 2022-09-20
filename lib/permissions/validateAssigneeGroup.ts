@@ -1,4 +1,4 @@
-import { AssignablePermissionGroupsWithPublic } from './interfaces';
+import type { AssignablePermissionGroupsWithPublic } from './interfaces';
 
 const assignableGroups: Exclude<AssignablePermissionGroupsWithPublic, 'any'>[] = ['user', 'role', 'space', 'public'];
 

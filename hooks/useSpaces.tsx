@@ -1,7 +1,8 @@
-import { ReactNode, createContext, useContext, useState, useEffect, useMemo } from 'react';
-import { Space } from '@prisma/client';
-import { useRouter } from 'next/router';
+import type { Space } from '@prisma/client';
 import charmClient from 'charmClient';
+import { useRouter } from 'next/router';
+import type { ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useUser } from './useUser';
 
 type IContext = [spaces: Space[], setSpaces: (spaces: Space[]) => void, isLoaded: boolean];

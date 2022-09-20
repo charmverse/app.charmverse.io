@@ -1,7 +1,9 @@
-import { BaseRawNodeSpec, NodeViewProps, Plugin } from '@bangle.dev/core';
-import { DOMOutputSpec, EditorState, EditorView, Slice, Transaction } from '@bangle.dev/pm';
+import type { BaseRawNodeSpec, NodeViewProps } from '@bangle.dev/core';
+import { Plugin } from '@bangle.dev/core';
+import type { DOMOutputSpec, EditorState, EditorView, Slice, Transaction } from '@bangle.dev/pm';
 import { useTheme } from '@emotion/react';
-import { HTMLAttributes, memo, useMemo, useState } from 'react';
+import type { HTMLAttributes } from 'react';
+import { memo, useMemo, useState } from 'react';
 import styled from '@emotion/styled';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import { Box, ListItem, Typography } from '@mui/material';

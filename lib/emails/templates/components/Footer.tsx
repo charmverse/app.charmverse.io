@@ -4,7 +4,7 @@ import TwitterIcon from '@mui/icons-material/Twitter';
 import {
   MjmlColumn, MjmlSection, MjmlText
 } from 'mjml-react';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { greyColor2 } from 'theme/colors';
 
 export default function Footer () {

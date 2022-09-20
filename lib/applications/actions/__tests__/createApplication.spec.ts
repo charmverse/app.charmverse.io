@@ -1,12 +1,12 @@
 
-import { Space, User } from '@prisma/client';
+import type { Space, User } from '@prisma/client';
+import { createBounty } from 'lib/bounties/createBounty';
+import { DataNotFoundError, DuplicateDataError, LimitReachedError, StringTooShortError } from 'lib/utilities/errors';
+import { ExpectedAnError } from 'testing/errors';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
-import { ExpectedAnError } from 'testing/errors';
-import { DataNotFoundError, LimitReachedError, DuplicateDataError, StringTooShortError } from 'lib/utilities/errors';
-import { createBounty } from 'lib/bounties/createBounty';
-import { createApplication } from '../createApplication';
 import { MINIMUM_APPLICATION_MESSAGE_CHARACTERS } from '../../shared';
+import { createApplication } from '../createApplication';
 
 let user: User;
 let space: Space;

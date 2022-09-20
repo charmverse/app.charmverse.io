@@ -2,12 +2,13 @@ import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { ReactElement, ReactNode, useEffect, useMemo, useState } from 'react';
+import type { ReactElement, ReactNode } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import createCache from '@emotion/cache';
 import { CacheProvider, Global } from '@emotion/react'; // create a cache so we dont conflict with emotion from react-windowed-select
 import type { ExternalProvider, JsonRpcFetchFunc } from '@ethersproject/providers';
 import { Web3Provider } from '@ethersproject/providers';
-import { PaletteMode } from '@mui/material';
+import type { PaletteMode } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';

@@ -1,9 +1,8 @@
 
-import { Space, User } from '@prisma/client';
-import { prisma } from 'db';
+import type { Space, User } from '@prisma/client';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
-import { createPage, generateUserAndSpaceWithApiToken, generateCommentWithThreadAndPage } from 'testing/setupDatabase';
+import { generateCommentWithThreadAndPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { deleteComment } from '../deleteComment';
 

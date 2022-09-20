@@ -1,11 +1,11 @@
-import { PluginKey } from '@bangle.dev/core';
+import type { PluginKey } from '@bangle.dev/core';
 import { FloatingMenu } from '@bangle.dev/react-menu';
-import { PageType } from '@prisma/client';
+import type { PageType } from '@prisma/client';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { IPagePermissionFlags } from 'lib/permissions/pages';
-import { SubMenu } from '../@bangle.dev/react-menu/floating-menu';
+import type { IPagePermissionFlags } from 'lib/permissions/pages';
+import type { SubMenu } from '../@bangle.dev/react-menu/floating-menu';
 import { LinkSubMenu } from '../@bangle.dev/react-menu/LinkSubMenu';
 import { Menu } from '../@bangle.dev/react-menu/Menu';
 import { BoldButton, CalloutButton, CodeButton, FloatingLinkButton, HeadingButton, InlineCommentButton, InlineVoteButton, ItalicButton, ParagraphButton, StrikeButton, UnderlineButton } from '../@bangle.dev/react-menu/MenuButtons';

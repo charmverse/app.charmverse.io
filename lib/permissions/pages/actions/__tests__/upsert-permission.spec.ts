@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
-import { Role, Space, User } from '@prisma/client';
+import type { Role, Space, User } from '@prisma/client';
 import { prisma } from 'db';
 import { InvalidPermissionGranteeError } from 'lib/permissions/errors';
 import { InsecureOperationError } from 'lib/utilities/errors';

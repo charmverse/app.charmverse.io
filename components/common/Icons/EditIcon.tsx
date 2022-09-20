@@ -1,5 +1,5 @@
 import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
-import { SvgIconTypeMap } from '@mui/material/SvgIcon';
+import type { SvgIconTypeMap } from '@mui/material/SvgIcon';
 import Box from '@mui/material/Box';
 import { IconWrapper } from './IconWrapper';
 

@@ -1,15 +1,16 @@
-import { Page } from '@prisma/client';
+import type { Page } from '@prisma/client';
 import charmClient from 'charmClient';
 import { createBoard } from 'components/common/BoardEditor/focalboard/src/blocks/board';
 import { createBoardView } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
-import { Card, createCard } from 'components/common/BoardEditor/focalboard/src/blocks/card';
+import type { Card } from 'components/common/BoardEditor/focalboard/src/blocks/card';
+import { createCard } from 'components/common/BoardEditor/focalboard/src/blocks/card';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
-import { Board } from 'lib/focalboard/board';
-import { BoardView } from 'lib/focalboard/boardView';
-import { NextRouter } from 'next/router';
+import type { Board } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import type { NextRouter } from 'next/router';
 import { mutate } from 'swr';
 import { v4 } from 'uuid';
-import { IPageWithPermissions } from './interfaces';
+import type { IPageWithPermissions } from './interfaces';
 import { getPagePath } from './utils';
 
 export type NewPageInput = Partial<Page> & { spaceId: string, createdBy: string, shouldCreateDefaultBoardData?: boolean };

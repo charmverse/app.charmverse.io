@@ -1,10 +1,10 @@
-import { Page, Space } from '@prisma/client';
+import type { Page, Space } from '@prisma/client';
 import { prisma } from 'db';
 import { extractMentions } from 'lib/prosemirror/extractMentions';
 import { shortenHex } from 'lib/utilities/strings';
-import { PageContent, User } from 'models';
+import type { PageContent, User } from 'models';
 import { uniq } from 'lodash';
-import { MentionedTask } from './interfaces';
+import type { MentionedTask } from './interfaces';
 
 export type MentionedTasksGroup = {
   marked: MentionedTask[],

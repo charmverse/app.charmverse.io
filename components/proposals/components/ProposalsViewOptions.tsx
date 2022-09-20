@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { InputLabel, MenuItem, Select } from '@mui/material';
-import { ProposalStatus } from '@prisma/client';
+import type { ProposalStatus } from '@prisma/client';
 import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 
 const StyledViewOptions = styled.div`

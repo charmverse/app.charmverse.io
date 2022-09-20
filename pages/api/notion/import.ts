@@ -1,11 +1,11 @@
-import nc from 'next-connect';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import * as http from 'adapters/http';
-import { NextApiRequest, NextApiResponse } from 'next';
-import { importFromWorkspace } from 'lib/notion/importFromWorkspace';
-import { withSessionRoute } from 'lib/session/withSession';
-import { FailedImportsError } from 'lib/notion/types';
 import log from 'lib/log';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { importFromWorkspace } from 'lib/notion/importFromWorkspace';
+import type { FailedImportsError } from 'lib/notion/types';
+import { withSessionRoute } from 'lib/session/withSession';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc({
   onError,

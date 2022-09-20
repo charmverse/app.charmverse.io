@@ -2,11 +2,12 @@ import { IconButton, List, MenuItem, ListItemText, ListItemIcon, Tooltip, Typogr
 import { usePages } from 'hooks/usePages';
 import { ScrollableModal as Modal } from 'components/common/Modal';
 import { checkForEmpty } from 'components/common/CharmEditor/utils';
-import { Page, PageContent } from 'models';
+import type { Page, PageContent } from 'models';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RestoreIcon from '@mui/icons-material/Restore';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { MouseEvent, memo, useMemo, useState, useCallback, useEffect } from 'react';
+import type { MouseEvent } from 'react';
+import { memo, useMemo, useState, useCallback, useEffect } from 'react';
 import { DateTime } from 'luxon';
 import Link from 'next/link';
 import { fancyTrim } from 'lib/utilities/strings';

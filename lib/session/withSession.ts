@@ -1,5 +1,5 @@
 import { withIronSessionApiRoute, withIronSessionSsr } from 'iron-session/next';
-import {
+import type {
   GetServerSidePropsContext,
   GetServerSidePropsResult,
   NextApiHandler

@@ -1,4 +1,4 @@
-import { Page } from '@prisma/client';
+import type { Page } from '@prisma/client';
 import charmClient from 'charmClient';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';

@@ -2,13 +2,13 @@
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import Button from 'components/common/Button';
 import { IPropertyTemplate } from '../../blocks/board';
 import { BoardView } from '../../blocks/boardView';
 import mutator from '../../mutator';
-import Button from 'components/common/Button';
+import CheckIcon from '../../widgets/icons/check';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
-import CheckIcon from '../../widgets/icons/check';
 import { typeDisplayName } from '../../widgets/propertyMenu';
 
 type Props = {

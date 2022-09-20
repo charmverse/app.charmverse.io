@@ -1,6 +1,6 @@
-import fetch from 'node-fetch';
 import log from 'lib/log';
-import { ExtendedPoap } from './interfaces';
+import fetch from 'node-fetch';
+import type { ExtendedPoap } from './interfaces';
 
 const getPOAPsURL = (address: string) => `https://api.poap.tech/actions/scan/${address}`;
 

@@ -1,6 +1,6 @@
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box, List, ListItemButton, ListItemText } from '@mui/material';
-import { Page } from '@prisma/client';
+import type { Page } from '@prisma/client';
 import charmClient from 'charmClient';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
@@ -11,14 +11,15 @@ import log from 'lib/log';
 import debouncePromise from 'lib/utilities/debouncePromise';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
-import { ReactNode, useCallback, useEffect, useRef, useMemo } from 'react';
+import type { ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useMemo } from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
 import InsertLinkIcon from '@mui/icons-material/InsertLink';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { BountyWithDetails } from 'models';
+import type { BountyWithDetails } from 'models';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useBounties } from 'hooks/useBounties';
-import { IPageWithPermissions } from 'lib/pages';
+import type { IPageWithPermissions } from 'lib/pages';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { findParentOfType } from 'lib/pages/findParentOfType';
 

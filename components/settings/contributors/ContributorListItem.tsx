@@ -1,17 +1,17 @@
 
 import styled from '@emotion/styled';
-import { Box, TableCell, TableRow, Typography } from '@mui/material';
-import Button from 'components/common/Button';
 import CheckIcon from '@mui/icons-material/Check';
-import ListItemIcon from '@mui/material/ListItemIcon';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import MenuItem from '@mui/material/MenuItem';
+import { Box, TableCell, TableRow, Typography } from '@mui/material';
+import ListItemIcon from '@mui/material/ListItemIcon';
 import Menu from '@mui/material/Menu';
-import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/hooks';
+import MenuItem from '@mui/material/MenuItem';
 import Avatar from 'components/common/Avatar';
-import { Contributor } from 'models';
-import { humanFriendlyDate } from 'lib/utilities/dates';
+import Button from 'components/common/Button';
 import { StyledListItemText } from 'components/common/StyledListItemText';
+import { humanFriendlyDate } from 'lib/utilities/dates';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import type { Contributor } from 'models';
 
 export const StyledRow = styled(Box)`
   border-bottom: 1px solid ${({ theme }) => theme.palette.divider};

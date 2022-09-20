@@ -1,9 +1,9 @@
 
-import { Space } from '@prisma/client';
+import type { Space } from '@prisma/client';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireSpaceMembership, ActionNotPermittedError } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
