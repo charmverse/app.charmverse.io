@@ -25,7 +25,6 @@ import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/ho
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
 import { useState } from 'react';
 import useSWR from 'swr';
-import { ProposalStatusChip } from '../../../../proposals/components/ProposalStatusBadge';
 
 interface ProposalPropertiesProps {
   readOnly?: boolean
@@ -115,6 +114,7 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly }: Pr
         <ProposalStepper
           proposalUserGroups={currentUserGroups}
           proposal={proposal}
+          refreshProposal={refreshProposal}
         />
 
       </Grid>
