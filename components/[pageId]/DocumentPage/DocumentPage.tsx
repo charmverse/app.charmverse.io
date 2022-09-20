@@ -19,7 +19,7 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
-import CardActions from 'components/common/BoardEditor/focalboard/src/components/cardDetail/CardActions/CardActions';
+import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import BountyProperties from './components/BountyProperties';
 import PageBanner from './components/PageBanner';
 import { PageTemplateBanner } from './components/PageTemplateBanner';
@@ -205,12 +205,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
                         pageUpdatedAt={page.updatedAt.toString()}
                         pageUpdatedBy={page.updatedBy}
                       />
-                      <CardActions
-                        pageId={page.id}
-                        board={board}
-                        activeView={activeView}
-                        readonly={cannotEdit}
-                      />
+                      <AddBountyButton readonly={cannotEdit} cardId={page.id} />
                     </>
                   )}
 
