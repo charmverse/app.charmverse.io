@@ -17,6 +17,7 @@ import type { Page } from 'models';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
+
 /**
  *
  * For the original version of this file, see src/boardPage.tsx in focalboard
