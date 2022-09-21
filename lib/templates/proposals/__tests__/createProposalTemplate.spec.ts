@@ -1,0 +1,2 @@
+import { createProposalTemplate } from '../createProposalTemplate';
+

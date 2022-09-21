@@ -1,26 +1,35 @@
-import type { Prisma } from '@prisma/client';
 import { prisma } from 'db';
+import type { PageWithProposal } from 'lib/pages';
+import { getPagePath } from 'lib/pages';
 import { v4 } from 'uuid';
 
-export interface CreateProposalInput {
-  pageCreateInput: Prisma.PageCreateInput
+export interface CreateProposalTemplateInput {
   spaceId: string
   userId: string
 }
 
-export async function createProposal ({
-  pageCreateInput,
-  userId,
-  spaceId
-}: CreateProposalInput) {
+export async function createProposalTemplate ({ spaceId, userId }: CreateProposalTemplateInput): Promise<PageWithProposal> {
+
   const proposalId = v4();
-  // Making the page id same as proposalId
-  const pageData: Prisma.PageCreateInput = { ...pageCreateInput, id: proposalId };
-  // Using a transaction to ensure both the proposal and page gets created together
-  const createdPage = await prisma.page.create({
+
+  return prisma.page.create({
     data: {
-      ...pageData,
-      type: 'proposal',
+      id: proposalId,
+      path: getPagePath(),
+      contentText: '',
+      title: 'Untitled',
+      updatedBy: userId,
+      author: {
+        connect: {
+          id: userId
+        }
+      },
+      space: {
+        connect: {
+          id: spaceId
+        }
+      },
+      type: 'proposal_template',
       proposal: {
         create: {
           createdBy: userId,
@@ -49,6 +58,4 @@ export async function createProposal ({
       }
     }
   });
-
-  return createdPage;
 }
