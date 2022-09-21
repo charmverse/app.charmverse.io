@@ -3,7 +3,11 @@ import { prisma } from 'db';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { createProposalWithUsers, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
+import { getPagePath } from '../../pages';
+import { createProposalTemplate } from '../../templates/proposals/createProposalTemplate';
+import { createProposal } from '../createProposal';
 import { getProposalsBySpace } from '../getProposalsBySpace';
+import { syncProposalPermissions } from '../syncProposalPermissions';
 
 let accessibleSpaceUser1: User;
 let accessibleSpaceAdminUser: User;
@@ -85,6 +89,51 @@ describe('Get all proposals of a space', () => {
 
     expect(adminAccessibleProposals.some(p => p.id === accessibleSpacePageProposal1.id)).toBe(true);
     expect(adminAccessibleProposals.some(p => p.id === accessibleSpacePageProposal2.id)).toBe(true);
+
+  });
+
+  it('should not return proposal templates', async () => {
+    const { user, space } = await generateUserAndSpaceWithApiToken(undefined, false);
+
+    const proposalPage = await createProposal({
+      spaceId: space.id,
+      userId: user.id,
+      pageCreateInput: {
+        author: {
+          connect: {
+            id: user.id
+          }
+        },
+        updatedBy: user.id,
+        space: {
+          connect: {
+            id: space.id
+          }
+        },
+        contentText: '',
+        content: {},
+        type: 'proposal',
+        path: getPagePath(),
+        title: 'Example proposal'
+      }
+    });
+
+    await syncProposalPermissions({
+      proposalId: proposalPage.id
+    });
+
+    await createProposalTemplate({
+      spaceId: space.id,
+      userId: user.id
+    });
+
+    const proposals = await getProposalsBySpace({
+      userId: user.id,
+      spaceId: space.id
+    });
+
+    expect(proposals.length).toBe(1);
+    expect(proposals[0].id).toBe(proposalPage.id);
 
   });
 });
