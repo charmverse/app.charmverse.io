@@ -1,7 +1,8 @@
-import { ProposalStatus } from '@prisma/client';
+import type { ProposalStatus } from '@prisma/client';
 import { prisma } from 'db';
-import { ProposalWithUsers } from './interface';
-import { proposalStatusTransitionPermission, ProposalUserGroup } from './proposalStatusTransition';
+import type { ProposalWithUsers } from './interface';
+import type { ProposalUserGroup } from './proposalStatusTransition';
+import { proposalStatusTransitionPermission } from './proposalStatusTransition';
 
 export async function validateProposalStatusTransition ({
   proposal,

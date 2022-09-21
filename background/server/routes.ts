@@ -1,4 +1,4 @@
-import Koa from 'koa';
+import type Koa from 'koa';
 import log from 'lib/log';
 import { gauge, count } from 'lib/metrics';
 

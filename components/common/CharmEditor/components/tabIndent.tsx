@@ -1,5 +1,6 @@
-import { RawPlugins, RawSpecs } from '@bangle.dev/core';
-import { DOMOutputSpec, keymap } from '@bangle.dev/pm';
+import type { RawPlugins, RawSpecs } from '@bangle.dev/core';
+import type { DOMOutputSpec } from '@bangle.dev/pm';
+import { keymap } from '@bangle.dev/pm';
 
 const name = 'tabIndent';
 

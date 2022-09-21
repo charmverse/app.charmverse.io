@@ -1,7 +1,8 @@
-import { Space, SpaceOperation, SpacePermissionConfigurationMode } from '@prisma/client';
+import type { Space, SpaceOperation } from '@prisma/client';
+import { SpacePermissionConfigurationMode } from '@prisma/client';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { prisma } from 'db';
-import { SpacePermissionConfigurationUpdate } from './interfaces';
+import type { SpacePermissionConfigurationUpdate } from './interfaces';
 import { permissionTemplates } from './preset-templates';
 import { addSpaceOperations, removeSpaceOperations } from '../spaces';
 

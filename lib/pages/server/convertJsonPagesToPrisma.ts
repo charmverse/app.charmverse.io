@@ -1,6 +1,6 @@
-import { Block, Page, Prisma, Space } from '@prisma/client';
+import type { Block, Page, Prisma, Space } from '@prisma/client';
 import { prisma } from 'db';
-import { PageContent } from 'models';
+import type { PageContent } from 'models';
 import fs from 'node:fs/promises';
 import { v4 } from 'uuid';
 

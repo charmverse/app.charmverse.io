@@ -4,7 +4,7 @@ import BountiesPage from 'components/bounties/BountiesPage';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { BountyWithDetails } from 'models';
+import type { BountyWithDetails } from 'models';
 import { useEffect, useState } from 'react';
 
 export default function PublicBountiesPage () {

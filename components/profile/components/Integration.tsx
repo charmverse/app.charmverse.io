@@ -1,9 +1,9 @@
 import styled from '@emotion/styled';
-import { ReactNode } from 'react';
+import CheckIcon from '@mui/icons-material/Check';
 import { Box, Divider, Grid, Typography } from '@mui/material';
 import Button from 'components/common/Button';
-import CheckIcon from '@mui/icons-material/Check';
-import { IdentityType } from 'models';
+import type { IdentityType } from 'models';
+import type { ReactNode } from 'react';
 
 const IntegrationName = styled(Typography)`
   background-color: ${({ theme }) => theme.palette.background.dark};

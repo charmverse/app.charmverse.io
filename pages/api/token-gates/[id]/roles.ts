@@ -1,10 +1,10 @@
 
-import { TokenGateToRole } from '@prisma/client';
+import type { TokenGateToRole } from '@prisma/client';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { requireSpaceMembership } from 'lib/middleware/requireSpaceMembership';
 import { withSessionRoute } from 'lib/session/withSession';
 import { updateTokenGateRoles } from 'lib/token-gates/updateTokenGateRoles';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

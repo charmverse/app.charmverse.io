@@ -1,6 +1,6 @@
-import { PagePermission, Prisma, PrismaPromise } from '@prisma/client';
+import type { PagePermission, Prisma, PrismaPromise } from '@prisma/client';
 import { prisma } from 'db';
-import { IPageWithPermissions, PageNodeWithChildren, PageNodeWithPermissions } from 'lib/pages/server';
+import type { IPageWithPermissions, PageNodeWithChildren, PageNodeWithPermissions } from 'lib/pages/server';
 import { isTruthy } from 'lib/utilities/types';
 import { replaceIllegalPermissions } from '../actions';
 import { copyAllPagePermissions } from '../actions/copyPermission';

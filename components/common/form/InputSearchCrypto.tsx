@@ -1,10 +1,12 @@
-import { Autocomplete, AutocompleteProps, Box, SxProps, TextField, Typography } from '@mui/material';
-import { CryptoCurrencies, CryptoCurrency } from 'connectors';
+import type { AutocompleteProps, SxProps } from '@mui/material';
+import { Autocomplete, Box, TextField, Typography } from '@mui/material';
+import type { CryptoCurrency } from 'connectors';
+import { CryptoCurrencies } from 'connectors';
 import Modal from 'components/common/Modal';
 import { useEffect, useState } from 'react';
 import uniq from 'lodash/uniq';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { PaymentMethod } from '@prisma/client';
+import type { PaymentMethod } from '@prisma/client';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import AddIcon from '@mui/icons-material/Add';
 import TokenLogo from 'components/common/TokenLogo';

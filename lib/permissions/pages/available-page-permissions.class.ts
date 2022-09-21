@@ -1,6 +1,6 @@
 import { PageOperations } from '@prisma/client';
 import { Permissions } from '../permissions.class';
-import { IPagePermissionFlags, PageOperationType } from './page-permission-interfaces';
+import type { IPagePermissionFlags, PageOperationType } from './page-permission-interfaces';
 
 /**
  * Provides a set of page permissions

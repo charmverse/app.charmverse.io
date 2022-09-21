@@ -1,12 +1,13 @@
 
-import { getBounty, UpdateableBountyFields, updateBountySettings } from 'lib/bounties';
+import type { UpdateableBountyFields } from 'lib/bounties';
+import { getBounty, updateBountySettings } from 'lib/bounties';
 import { rollupBountyStatus } from 'lib/bounties/rollupBountyStatus';
 import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
-import { BountyWithDetails } from 'models';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { BountyWithDetails } from 'models';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

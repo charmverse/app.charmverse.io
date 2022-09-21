@@ -1,10 +1,10 @@
 
-import { Vote } from '@prisma/client';
+import type { Vote } from '@prisma/client';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { createVote as createVoteService, getVote as getVoteService } from 'lib/votes';
-import { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { prisma } from 'db';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';

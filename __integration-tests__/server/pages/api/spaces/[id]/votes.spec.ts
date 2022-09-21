@@ -1,4 +1,4 @@
-import { Space, User } from '@prisma/client';
+import type { Space, User } from '@prisma/client';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';

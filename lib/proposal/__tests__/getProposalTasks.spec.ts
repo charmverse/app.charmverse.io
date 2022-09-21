@@ -1,4 +1,4 @@
-import { SpaceRole } from '@prisma/client';
+import type { SpaceRole } from '@prisma/client';
 import { prisma } from 'db';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { createVote, generateProposal, generateRoleWithSpaceRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
@@ -203,7 +203,8 @@ describe('getProposalTasks', () => {
     await createVote({
       createdBy: user.id,
       pageId: activeVoteProposal.id,
-      spaceId: space.id
+      spaceId: space.id,
+      context: 'proposal'
     });
 
     const activeVoteWithUserVoteProposal = await generateProposal({
@@ -220,7 +221,8 @@ describe('getProposalTasks', () => {
       createdBy: user.id,
       pageId: activeVoteWithUserVoteProposal.id,
       spaceId: space.id,
-      userVotes: ['1']
+      userVotes: ['1'],
+      context: 'proposal'
     });
 
     // The user isn't an author, but it should be returned as its in discussion
@@ -257,7 +259,7 @@ describe('getProposalTasks', () => {
       expect.objectContaining({
         id: discussionProposal2.id,
         status: discussionProposal2.proposal?.status,
-        action: 'start_review'
+        action: 'discuss'
       })
     ]));
   });

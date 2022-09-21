@@ -1,8 +1,9 @@
-import { EditorView, PluginKey } from '@bangle.dev/pm';
+import type { EditorView, PluginKey } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import { MenuItem } from '@mui/material';
-import { ReactNode, useCallback, useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import MenuList from '@mui/material/MenuList';
 import {
   useInlinePaletteItems,
@@ -15,7 +16,7 @@ import {
 } from '../paletteItem';
 import { useEditorItems } from '../useEditorItems';
 import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
-import { NestedPagePluginState } from '../../nestedPage';
+import type { NestedPagePluginState } from '../../nestedPage';
 
 function getItemsAndHints (
   view: EditorView,

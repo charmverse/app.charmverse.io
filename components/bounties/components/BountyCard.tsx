@@ -1,7 +1,7 @@
 import { Box, CardHeader, Typography } from '@mui/material';
-import { Page } from '@prisma/client';
+import type { Page } from '@prisma/client';
 import { fancyTrim } from 'lib/utilities/strings';
-import { BountyWithDetails } from 'models';
+import type { BountyWithDetails } from 'models';
 import { memo } from 'react';
 import BountyStatusBadge from './BountyStatusBadge';
 

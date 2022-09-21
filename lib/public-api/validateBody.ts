@@ -1,5 +1,6 @@
-import { PageQuery, PaginatedQuery, Page } from './interfaces';
-import { UnsupportedKeyDetails, UnsupportedKeysError } from './errors';
+import type { PageQuery, PaginatedQuery, Page } from './interfaces';
+import type { UnsupportedKeyDetails } from './errors';
+import { UnsupportedKeysError } from './errors';
 
 /**
  * Use this in the api to throw an error when an unsupported field is provided

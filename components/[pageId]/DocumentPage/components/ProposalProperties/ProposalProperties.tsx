@@ -1,28 +1,21 @@
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import DoneIcon from '@mui/icons-material/Done';
-import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Divider, Grid, IconButton, Menu, MenuItem, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import { ProposalStatus } from '@prisma/client';
 import charmClient from 'charmClient';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import { InputSearchContributorBase } from 'components/common/form/InputSearchContributor';
 import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
 import PublishToSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/PublishToSnapshot';
 import UserDisplay from 'components/common/UserDisplay';
-import useTasks from 'components/nexus/hooks/useTasks';
-import CreateVoteModal from 'components/votes/components/CreateVoteModal';
-import { Contributor, useContributors } from 'hooks/useContributors';
+import ProposalStepper from 'components/proposals/components/ProposalStepper';
+import type { Contributor } from 'hooks/useContributors';
+import { useContributors } from 'hooks/useContributors';
 import useRoles from 'hooks/useRoles';
 import { useUser } from 'hooks/useUser';
-import { proposalStatusTransitionPermission, proposalStatusTransitionRecord, ProposalUserGroup, PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
+import type { ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import { ListSpaceRolesResponse } from 'pages/api/roles';
-import { useState } from 'react';
+import type { ListSpaceRolesResponse } from 'pages/api/roles';
 import useSWR from 'swr';
-import { ProposalStatusChip } from '../../../../proposals/components/ProposalStatusBadge';
 
 interface ProposalPropertiesProps {
   readOnly?: boolean
@@ -30,21 +23,13 @@ interface ProposalPropertiesProps {
   proposalId: string
 }
 
-const proposalStatuses = Object.keys(proposalStatusTransitionRecord);
-
 export default function ProposalProperties ({ pageId, proposalId, readOnly }: ProposalPropertiesProps) {
   const { data: proposal, mutate: refreshProposal } = useSWR(`proposal/${proposalId}`, () => charmClient.proposals.getProposal(proposalId));
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const { mutate: mutateTasks } = useTasks();
-
-  function openVoteModal () {
-    setIsModalOpen(true);
-  }
 
   const [contributors] = useContributors();
-
   const { roles = [], roleups } = useRoles();
   const { user } = useUser();
+
   const proposalMenuState = usePopupState({ popupId: 'proposal-info', variant: 'popover' });
 
   const proposalReviewer = contributors?.find(contributor => contributor.id === proposal?.reviewedBy);
@@ -91,13 +76,6 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly }: Pr
     };
   });
 
-  async function updateProposalStatus (newStatus: ProposalStatus) {
-    await charmClient.proposals.updateStatus(proposalId, newStatus);
-    await refreshProposal();
-    proposalMenuState.close();
-    mutateTasks();
-  }
-
   return (
     <Box
       className='octo-propertylist'
@@ -109,31 +87,23 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly }: Pr
       mt={2}
     >
       <Grid container mb={2}>
+        <ProposalStepper
+          proposalUserGroups={currentUserGroups}
+          proposal={proposal}
+          refreshProposal={refreshProposal}
+        />
+      </Grid>
+      <Grid container mb={2}>
         <Grid item xs={8}>
           <Box display='flex' gap={1} alignItems='center'>
             <Typography fontWeight='bold'>Proposal information</Typography>
-            {!proposal.status.match('vote') && (
+            {proposal.status === 'reviewed' && (
               <IconButton size='small' {...bindTrigger(proposalMenuState)}>
                 <MoreHorizIcon fontSize='small' />
               </IconButton>
             )}
           </Box>
         </Grid>
-        <Grid item xs={4}>
-          <Box sx={{
-            justifyContent: 'flex-end',
-            gap: 1,
-            display: 'flex',
-            alignItems: 'center'
-          }}
-          >
-
-            <Box display='flex'>
-              <ProposalStatusChip status={proposal.status} />
-            </Box>
-          </Box>
-        </Grid>
-
       </Grid>
 
       <Box justifyContent='space-between' gap={2} alignItems='center'>
@@ -225,77 +195,13 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly }: Pr
       />
       <Menu {...bindMenu(proposalMenuState)}>
         {
-          proposalStatusTransitionRecord[proposal.status]?.map(newStatus => {
-
-            // Show the custom Create button rather than Move to Vote Active
-            if (proposal.status === 'reviewed' && newStatus === 'vote_active') {
-              return null;
-            }
-
-            const currentStatusIndex = proposalStatuses.indexOf(proposal.status);
-            const newStatusIndex = proposalStatuses.indexOf(newStatus);
-
-            let icon = null;
-            let label = null;
-
-            if (newStatus === 'reviewed' && proposal.status === 'review') {
-              icon = <DoneIcon fontSize='small' />;
-              label = <Typography>Approve</Typography>;
-            }
-            else {
-              icon = currentStatusIndex < newStatusIndex ? <ArrowForwardIcon fontSize='small' /> : <ArrowBackIcon fontSize='small' />;
-              label = <Typography>{PROPOSAL_STATUS_LABELS[newStatus]}</Typography>;
-            }
-
-            return (
-              <MenuItem
-                key={newStatus}
-                disabled={(
-                  // A user can be both author and reviewer, so check if they are allowed to change the status either as reviewer or author
-                  !currentUserGroups
-                    .some(userGroup => proposalStatusTransitionPermission[proposal.status]?.[userGroup]?.includes(newStatus)))
-                  // Before moving to review there should atleast be one reviewer
-                  || (newStatus === 'review' && proposal.reviewers.length === 0)}
-                onClick={() => updateProposalStatus(newStatus)}
-              >
-                <Box display='flex' alignItems='center' gap={1}>
-                  {icon}
-                  {label}
-                </Box>
-              </MenuItem>
-            );
-          })
-        }
-        {
           proposal.status === 'reviewed' && (
-            <>
-              <MenuItem disabled={!isProposalAuthor}>
-                <PublishToSnapshot pageId={pageId} />
-              </MenuItem>
-              <MenuItem
-                disabled={!isProposalAuthor}
-                onClick={openVoteModal}
-              >
-                <Box display='flex' alignItems='center' gap={1}>
-                  <HowToVoteOutlinedIcon fontSize='small' />
-                  Create Vote
-                </Box>
-              </MenuItem>
-            </>
+            <MenuItem disabled={!isProposalAuthor}>
+              <PublishToSnapshot pageId={pageId} />
+            </MenuItem>
           )
         }
       </Menu>
-      <CreateVoteModal
-        isProposal={true}
-        open={isModalOpen}
-        onCreateVote={async () => {
-          await updateProposalStatus('vote_active');
-          setIsModalOpen(false);
-        }}
-        onClose={() => {
-          setIsModalOpen(false);
-        }}
-      />
     </Box>
   );
 }

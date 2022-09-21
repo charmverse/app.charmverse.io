@@ -1,4 +1,4 @@
-import { PagePermission, Prisma } from '@prisma/client';
+import type { PagePermission, Prisma } from '@prisma/client';
 import { InvalidPermissionGranteeError } from '../../errors';
 
 /**

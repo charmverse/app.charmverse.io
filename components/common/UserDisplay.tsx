@@ -1,8 +1,10 @@
 import { memo } from 'react';
-import { Box, BoxProps, Typography } from '@mui/material';
+import type { BoxProps } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import useENSName from 'hooks/useENSName';
-import { User } from '@prisma/client';
-import Avatar, { InitialAvatarProps } from 'components/common/Avatar';
+import type { User } from '@prisma/client';
+import type { InitialAvatarProps } from 'components/common/Avatar';
+import Avatar from 'components/common/Avatar';
 import Link from 'components/common/Link';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 

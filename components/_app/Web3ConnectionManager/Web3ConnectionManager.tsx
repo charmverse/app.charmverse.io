@@ -1,10 +1,11 @@
 import { usePopupState } from 'material-ui-popup-state/hooks';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { AbstractConnector } from '@web3-react/abstract-connector';
+import type { AbstractConnector } from '@web3-react/abstract-connector';
 import { useWeb3React } from '@web3-react/core';
 import NetworkModal from 'components/common/PageLayout/components/Account/components/NetworkModal/NetworkModal';
 import { useRouter } from 'next/router';
-import { createContext, PropsWithChildren, useEffect, useState } from 'react';
+import type { PropsWithChildren } from 'react';
+import { createContext, useEffect, useState } from 'react';
 import WalletSelectorModal from './components/WalletSelectorModal';
 import useEagerConnect from './hooks/useEagerConnect';
 import useInactiveListener from './hooks/useInactiveListener';

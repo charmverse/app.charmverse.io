@@ -1,7 +1,8 @@
 import styled from '@emotion/styled';
-import Typography, { TypographyTypeMap } from '@mui/material/Typography';
+import type { TypographyTypeMap } from '@mui/material/Typography';
+import Typography from '@mui/material/Typography';
 import { Box } from '@mui/system';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 const StyledBox = styled(Box)`
   white-space: nowrap;

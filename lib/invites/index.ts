@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { prisma } from 'db';
-import { InviteLink, Space } from '@prisma/client';
+import type { InviteLink, Space } from '@prisma/client';
 
 export type InviteLinkPopulated = InviteLink & { space: Space };
 

@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import DuplicateIcon from '@mui/icons-material/ContentCopy';
 import { Box } from '@mui/material';
 import { BountyStatusChip } from 'components/bounties/components/BountyStatusBadge';
 import { checkForEmpty } from 'components/common/CharmEditor/utils';
@@ -8,12 +9,11 @@ import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { PageContent } from 'models';
 import { isTouchScreen } from 'lib/browser';
+import { PageContent } from 'models';
 import React, { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { mutate } from 'swr';
-import DuplicateIcon from '@mui/icons-material/ContentCopy';
 import { Board, IPropertyTemplate } from '../../blocks/board';
 import { Card } from '../../blocks/card';
 import { useSortable } from '../../hooks/sortable';
@@ -119,7 +119,7 @@ const KanbanCard = React.memo((props: Props) => {
         draggable={!props.readonly}
         style={{ opacity: isDragging ? 0.5 : 1 }}
         onClick={props.onClick}
-        data-test='kanban-card'
+        data-test={`kanban-card-${card.id}`}
       >
         {!props.readonly
           && (

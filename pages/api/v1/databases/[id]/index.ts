@@ -1,10 +1,11 @@
 
-import { Block } from '@prisma/client';
+import type { Block } from '@prisma/client';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
-import { DatabasePage, DatabasePageNotFoundError } from 'lib/public-api';
+import type { DatabasePage } from 'lib/public-api';
+import { DatabasePageNotFoundError } from 'lib/public-api';
 import { filterObjectKeys } from 'lib/utilities/objects';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { validate } from 'uuid';
 

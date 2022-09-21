@@ -6,7 +6,7 @@ import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ProposalStatusChip } from 'components/proposals/components/ProposalStatusBadge';
 import type { ProposalTask } from 'lib/proposal/getProposalTasks';
-import { GetTasksResponse } from 'pages/api/tasks/list';
+import type { GetTasksResponse } from 'pages/api/tasks/list';
 
 const ProposalActionRecord: Record<ProposalTask['action'], string> = {
   discuss: 'Discuss',

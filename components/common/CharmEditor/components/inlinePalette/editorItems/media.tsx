@@ -1,5 +1,6 @@
 
-import { EditorState, Fragment, Node } from '@bangle.dev/pm';
+import type { EditorState, Node } from '@bangle.dev/pm';
+import { Fragment } from '@bangle.dev/pm';
 import { rafCommandExec } from '@bangle.dev/utils';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForwardIos';
 import ImageIcon from '@mui/icons-material/Image';
@@ -13,7 +14,7 @@ import { TextSelection } from 'prosemirror-state';
 import { insertNode, isAtBeginningOfLine } from '../../../utils';
 import { palettePluginKey } from '../config';
 import { replaceSuggestionMarkWith } from '../inlinePalette';
-import { PaletteItemTypeNoGroup } from '../paletteItem';
+import type { PaletteItemTypeNoGroup } from '../paletteItem';
 
 function createTableCell (state: EditorState, text: string) {
   return state.schema.nodes.table_cell.create(undefined, Fragment.fromArray([

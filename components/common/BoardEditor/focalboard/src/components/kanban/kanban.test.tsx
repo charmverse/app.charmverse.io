@@ -1,15 +1,15 @@
 
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
-import userEvent from '@testing-library/user-event';
 
 import { IPropertyOption, IPropertyTemplate } from '../../blocks/board';
+import { mutator } from '../../mutator';
 import { TestBlockFactory } from '../../test/testBlockFactory';
 import { mockDOM, mockStateStore, wrapDNDIntl } from '../../testUtils';
 import { Utils } from '../../utils';
-import { mutator } from '../../mutator';
 
 import Kanban from './kanban';
 

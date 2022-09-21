@@ -1,16 +1,16 @@
 import React, { useCallback } from 'react';
 import { FormattedMessage } from 'react-intl';
 
+import Button from 'components/common/Button';
 import { IPropertyTemplate } from '../../blocks/board';
 import { BoardView, ISortOption } from '../../blocks/boardView';
-import { Constants } from '../../constants';
 import { Card } from '../../blocks/card';
+import { Constants } from '../../constants';
 import mutator from '../../mutator';
-import Button from 'components/common/Button';
-import Menu from '../../widgets/menu';
-import MenuWrapper from '../../widgets/menuWrapper';
 import SortDownIcon from '../../widgets/icons/sortDown';
 import SortUpIcon from '../../widgets/icons/sortUp';
+import Menu from '../../widgets/menu';
+import MenuWrapper from '../../widgets/menuWrapper';
 
 type Props = {
     properties: readonly IPropertyTemplate[]

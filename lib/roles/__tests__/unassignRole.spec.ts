@@ -1,5 +1,5 @@
 
-import { Space, User } from '@prisma/client';
+import type { Space, User } from '@prisma/client';
 import { assignRole } from 'lib/roles';
 import { DataNotFoundError, InvalidInputError, UndesirableOperationError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';

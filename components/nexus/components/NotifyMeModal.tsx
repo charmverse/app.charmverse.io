@@ -1,11 +1,11 @@
-import { useEffect } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
-import { useForm } from 'react-hook-form';
-import { Box, FormHelperText, Stack } from '@mui/material';
-import Button from 'components/common/Button';
+import { Box, FormHelperText } from '@mui/material';
 import TextField from '@mui/material/TextField';
+import Button from 'components/common/Button';
 import { Modal } from 'components/common/Modal';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import * as yup from 'yup';
 
 export const schema = yup.object({
   email: yup.string().ensure().trim()

@@ -1,9 +1,10 @@
 import { NodeView } from '@bangle.dev/core';
 import { Plugin } from '@bangle.dev/pm';
-import { SuggestTooltipRenderOpts, createTooltipDOM, suggestTooltip } from '@bangle.dev/tooltip';
+import type { SuggestTooltipRenderOpts } from '@bangle.dev/tooltip';
+import { createTooltipDOM, suggestTooltip } from '@bangle.dev/tooltip';
 import { PluginKey } from 'prosemirror-state';
 import { mentionSuggestMarkName, mentionTrigger } from './mention.constants';
-import { MentionPluginState } from './mention.interfaces';
+import type { MentionPluginState } from './mention.interfaces';
 import { selectMention } from './mention.utils';
 
 export function mentionPlugins ({

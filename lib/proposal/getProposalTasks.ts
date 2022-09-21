@@ -1,4 +1,4 @@
-import { Page, Proposal, ProposalStatus, Space } from '@prisma/client';
+import type { Page, Proposal, ProposalStatus, Space, WorkspaceEvent } from '@prisma/client';
 import { prisma } from 'db';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -36,7 +36,29 @@ const StatusActionRecord: Record<Exclude<ProposalStatus, 'vote_closed' | 'discus
 };
 
 export async function getProposalTasks (userId: string): Promise<ProposalTask[]> {
-  const proposalTasks = await prisma.proposal.findMany({
+  const workspaceEvents = await prisma.workspaceEvent.findMany({
+    where: {
+      type: 'proposal_status_change'
+    },
+    select: {
+      pageId: true,
+      createdAt: true,
+      meta: true
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
+  });
+
+  // Ensures we only track the latest status change for each proposal
+  const workspaceEventsRecord = workspaceEvents.reduce<Record<string, Pick<WorkspaceEvent, 'pageId' | 'createdAt' | 'meta'>>>((record, workspaceEvent) => {
+    if (!record[workspaceEvent.pageId]) {
+      record[workspaceEvent.pageId] = workspaceEvent;
+    }
+    return record;
+  }, {});
+
+  const proposals = await prisma.proposal.findMany({
     where: {
       page: {
         deletedAt: null
@@ -72,7 +94,8 @@ export async function getProposalTasks (userId: string): Promise<ProposalTask[]>
           // Only fetch vote active proposal tasks if the user haven't casted a vote yet
           page: {
             votes: {
-              some: {
+              every: {
+                context: 'proposal',
                 userVotes: {
                   none: {
                     userId
@@ -129,10 +152,20 @@ export async function getProposalTasks (userId: string): Promise<ProposalTask[]>
     }
   });
 
-  return proposalTasks.map(proposal => {
+  return proposals.map(proposal => {
     if (proposal.status === 'discussion') {
-      return proposal.authors.map(author => author.userId === userId) ? extractProposalData(proposal, 'start_review') : extractProposalData(proposal, 'discuss');
+      return proposal.authors.some(author => author.userId === userId) ? extractProposalData(proposal, 'start_review') : extractProposalData(proposal, 'discuss');
     }
     return extractProposalData(proposal, StatusActionRecord[proposal.status as keyof typeof StatusActionRecord]);
-  }).filter(isTruthy);
+  }).filter(isTruthy).sort((proposalA, proposalB) => {
+    const proposalALastUpdatedDate = workspaceEventsRecord[proposalA.id]?.createdAt;
+    const proposalBLastUpdatedDate = workspaceEventsRecord[proposalB.id]?.createdAt;
+    if (proposalALastUpdatedDate && proposalBLastUpdatedDate) {
+      return proposalALastUpdatedDate > proposalBLastUpdatedDate ? -1 : 1;
+    }
+    else if (proposalALastUpdatedDate && !proposalBLastUpdatedDate) {
+      return -1;
+    }
+    return 1;
+  });
 }

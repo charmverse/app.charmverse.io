@@ -7,10 +7,11 @@ import ModeStandbyIcon from '@mui/icons-material/ModeStandby';
 import PaidIcon from '@mui/icons-material/Paid';
 import { IconButton, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
-import Chip, { ChipProps } from '@mui/material/Chip';
+import type { ChipProps } from '@mui/material/Chip';
+import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
-import { Bounty, BountyStatus } from '@prisma/client';
+import type { Bounty, BountyStatus } from '@prisma/client';
 import TokenLogo from 'components/common/TokenLogo';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
@@ -19,8 +20,8 @@ import { nanofy } from 'lib/utilities/numbers';
 import millify from 'millify';
 import { BOUNTY_LABELS } from 'models/Bounty';
 import Link from 'next/link';
-import { ReactNode } from 'react';
-import { BrandColor } from 'theme/colors';
+import type { ReactNode } from 'react';
+import type { BrandColor } from 'theme/colors';
 
 const BOUNTY_STATUS_ICONS : Record<BountyStatus, ReactNode> = {
   suggestion: <LightbulbIcon />,

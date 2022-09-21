@@ -1,4 +1,4 @@
-import { ReactElement } from 'react';
+import type { ReactElement } from 'react';
 import NexusPageTitle from 'components/nexus/components/NexusPageTitle';
 import PageLayout from 'components/nexus/components/NexusLayout';
 import { setTitle } from 'hooks/usePageTitle';

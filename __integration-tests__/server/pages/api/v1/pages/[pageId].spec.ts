@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Page, Space, SpaceApiToken, User } from '@prisma/client';
-import { createDatabase, createDatabaseCardPage, InvalidCustomPropertyValueError, Page as ApiPage, PageProperty, UnsupportedKeysError } from 'lib/public-api';
+import type { Page, Space, SpaceApiToken, User } from '@prisma/client';
+import type { InvalidCustomPropertyValueError, Page as ApiPage, PageProperty, UnsupportedKeysError } from 'lib/public-api';
+import { createDatabase, createDatabaseCardPage } from 'lib/public-api';
 import request from 'supertest';
 import { baseUrl } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';

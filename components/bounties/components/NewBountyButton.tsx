@@ -1,12 +1,12 @@
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
+import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
-import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
-import { BountyWithDetails } from 'models';
+import type { BountyWithDetails } from 'models';
 
 export default function NewBountyButton () {
   const { user } = useUser();

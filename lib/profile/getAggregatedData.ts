@@ -1,13 +1,13 @@
+import type { CommunityDetails } from 'components/profile/components/CommunityRow';
 import { prisma } from 'db';
+import { getAllOrganizations, getProfile } from 'lib/deepdao/client';
+import type { DeepDaoProfile, DeepDaoVote } from 'lib/deepdao/interfaces';
 import log from 'lib/log';
 import { getSpacesOfUser } from 'lib/spaces/getSpacesOfUser';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
-import { getAllOrganizations, getProfile } from 'lib/deepdao/client';
-import { DeepDaoProfile, DeepDaoVote } from 'lib/deepdao/interfaces';
-import { CommunityDetails } from 'components/profile/components/CommunityRow';
-import { UserCommunity, ProfileBountyEvent } from './interfaces';
 import { combineCommunityData } from './combineCommunityData';
+import type { ProfileBountyEvent, UserCommunity } from './interfaces';
 
 export type AggregatedProfileData = Pick<DeepDaoProfile, 'totalProposals' | 'totalVotes'> & {
   bounties: number;

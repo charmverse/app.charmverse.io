@@ -2,7 +2,7 @@ import type { IPageWithPermissions } from 'lib/pages';
 import { prisma } from 'db';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { getPage, resolvePageTree } from 'lib/pages/server';
-import { PagePermission, PagePermissionLevel } from '@prisma/client';
+import type { PagePermission, PagePermissionLevel } from '@prisma/client';
 import { v4 } from 'uuid';
 import { upsertPermission } from '../actions';
 import { setupPermissionsAfterPageRepositioned } from './page-repositioned';

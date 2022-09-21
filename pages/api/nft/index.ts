@@ -1,5 +1,5 @@
-import { NftData } from 'lib/blockchain/interfaces';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NftData } from 'lib/blockchain/interfaces';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { onError, onNoMatch } from 'lib/middleware';
 import { getNFT } from 'lib/blockchain/nfts';

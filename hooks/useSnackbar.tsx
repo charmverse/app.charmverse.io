@@ -1,5 +1,6 @@
-import { AlertColor, SnackbarOrigin, SnackbarProps } from '@mui/material';
-import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useMemo, useState } from 'react';
+import type { AlertColor, SnackbarOrigin, SnackbarProps } from '@mui/material';
+import type { Dispatch, ReactNode, SetStateAction } from 'react';
+import { createContext, useContext, useMemo, useState } from 'react';
 
 type IContext = {
   isOpen: boolean,

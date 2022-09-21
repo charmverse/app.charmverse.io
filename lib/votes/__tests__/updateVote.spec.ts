@@ -1,4 +1,4 @@
-import { VoteContext, VoteStatus } from '@prisma/client';
+import type { VoteContext, VoteStatus } from '@prisma/client';
 import { addSpaceOperations } from 'lib/permissions/spaces';
 import { DataNotFoundError, UnauthorisedActionError, UndesirableOperationError } from 'lib/utilities/errors';
 import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';

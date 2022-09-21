@@ -1,5 +1,5 @@
 import { ExpectedAnError } from 'testing/errors';
-import { PageProperty } from '../interfaces';
+import type { PageProperty } from '../interfaces';
 import { mapProperties } from '../mapProperties';
 import { InvalidCustomPropertyKeyError, InvalidCustomPropertyValueError, UnsupportedKeysError } from '../errors';
 

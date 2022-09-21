@@ -1,22 +1,22 @@
 /* eslint-disable max-lines */
-import React, { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useDrag, useDrop } from 'react-dnd';
 import { FormattedMessage, IntlShape } from 'react-intl';
-import { useDrop, useDrag } from 'react-dnd';
 
-import { Constants } from '../../constants';
-import { IPropertyOption, IPropertyTemplate, Board, BoardGroup } from '../../blocks/board';
+import { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from '../../blocks/board';
 import { BoardView } from '../../blocks/boardView';
 import { Card } from '../../blocks/card';
+import { Constants } from '../../constants';
 import mutator from '../../mutator';
 import IconButton from '../../widgets/buttons/iconButton';
+import Editable from '../../widgets/editable';
 import AddIcon from '../../widgets/icons/add';
 import DeleteIcon from '../../widgets/icons/delete';
 import HideIcon from '../../widgets/icons/hide';
 import OptionsIcon from '../../widgets/icons/options';
+import Label from '../../widgets/label';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
-import Editable from '../../widgets/editable';
-import Label from '../../widgets/label';
 
 import { KanbanCalculation } from './calculation/calculation';
 

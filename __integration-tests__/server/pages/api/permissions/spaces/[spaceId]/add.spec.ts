@@ -1,8 +1,8 @@
-import { SpacePermissionFlags, SpacePermissionModification, SpacePermissionWithAssignee } from 'lib/permissions/spaces';
+import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
+import type { SpacePermissionFlags, SpacePermissionModification } from 'lib/permissions/spaces';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 
 describe('POST /api/permissions/space/{spaceId}/add - Add space permissions', () => {
 

@@ -1,5 +1,5 @@
 
-import { Space, User } from '@prisma/client';
+import type { Space, User } from '@prisma/client';
 import { createBounty, updateBountySettings } from 'lib/bounties';
 import { LimitReachedError, UndesirableOperationError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';

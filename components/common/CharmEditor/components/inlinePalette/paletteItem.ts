@@ -1,6 +1,6 @@
-import { EditorState, EditorView, Transaction } from '@bangle.dev/pm';
-import { SpaceOperation } from '@prisma/client';
-import { InlinePaletteItem } from './hooks';
+import type { EditorState, EditorView, Transaction } from '@bangle.dev/pm';
+import type { SpaceOperation } from '@prisma/client';
+import type { InlinePaletteItem } from './hooks';
 
 export const PALETTE_ITEM_REGULAR_TYPE = 'REGULAR_TYPE';
 export const PALETTE_ITEM_HINT_TYPE = 'HINT_TYPE';
