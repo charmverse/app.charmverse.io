@@ -24,4 +24,8 @@ export class ProposalsApi {
   createProposalTemplate ({ spaceId }: {spaceId: string}): Promise<IPageWithPermissions> {
     return http.POST('/api/templates/proposal', { spaceId });
   }
+
+  deleteProposalTemplate ({ proposalTemplateId }: {proposalTemplateId: string}): Promise<IPageWithPermissions> {
+    return http.DELETE(`/api/templates/proposal/${proposalTemplateId}`);
+  }
 }
