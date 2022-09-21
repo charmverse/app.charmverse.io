@@ -40,7 +40,6 @@ export function TemplatePageMenuActions ({ deleteTemplate, closeParentPopup, pag
         <MenuItem onClick={(e) => {
           e.stopPropagation();
           popupState.close();
-          closeParentPopup();
           deleteTemplate(pageId);
         }}
         >
