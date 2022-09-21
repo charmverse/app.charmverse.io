@@ -120,7 +120,7 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
       }));
 
       const proposalTask: Omit<ProposalTask, 'action'> = {
-        id: `${workspaceEvent.id}.${userId}`,
+        id: workspaceEvent.id,
         pagePath: (proposal.page as Page).path,
         pageTitle: (proposal.page as Page).title,
         spaceDomain: proposal.space.domain,

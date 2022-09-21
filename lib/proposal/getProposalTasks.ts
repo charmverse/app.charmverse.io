@@ -1,6 +1,7 @@
 import type { Page, Proposal, ProposalStatus, Space, WorkspaceEvent } from '@prisma/client';
 import { prisma } from 'db';
 import { isTruthy } from 'lib/utilities/types';
+import { v4 } from 'uuid';
 import { getProposalAction } from './getProposalAction';
 
 export type ProposalTaskAction = 'start_discussion' | 'start_vote' | 'review' | 'discuss' | 'vote' | 'start_review';
@@ -40,9 +41,9 @@ function sortProposals (proposals: ProposalTask[], workspaceEventsRecord: Worksp
       return proposalALastUpdatedDate > proposalBLastUpdatedDate ? -1 : 1;
     }
     else if (proposalALastUpdatedDate && !proposalBLastUpdatedDate) {
-      return -1;
+      return 1;
     }
-    return 1;
+    return -1;
   });
 }
 
@@ -146,7 +147,8 @@ export async function getProposalTasks (userId: string): Promise<{
       );
 
       const proposalTask = {
-        id: workspaceEvent?.id ?? proposal.id,
+        // Making the id empty to fill them later
+        id: '',
         pagePath: (proposal.page as Page).path,
         pageTitle: (proposal.page as Page).title,
         spaceDomain: proposal.space.domain,
@@ -155,11 +157,17 @@ export async function getProposalTasks (userId: string): Promise<{
         action
       };
 
-      if (workspaceEvent && !userNotificationIds.has(`${workspaceEvent.id}.${userId}`)) {
-        proposalsRecord.unmarked.push(proposalTask);
+      if (workspaceEvent && !userNotificationIds.has(workspaceEvent.id)) {
+        proposalsRecord.unmarked.push({
+          ...proposalTask,
+          id: workspaceEvent.id
+        });
       }
       else {
-        proposalsRecord.marked.push(proposalTask);
+        proposalsRecord.marked.push({
+          ...proposalTask,
+          id: v4()
+        });
       }
     }
   });

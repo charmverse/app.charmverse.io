@@ -72,7 +72,7 @@ export async function getNotifications (): Promise<PendingTasksProps[]> {
           in: [
             ...gnosisSafeTasks.map(getGnosisSafeTaskId),
             ...voteTasks.map(voteTask => voteTask.id),
-            ...workspaceEvents.map(workspaceEvent => `${workspaceEvent.id}.${user.id}`)
+            ...workspaceEvents.map(workspaceEvent => workspaceEvent.id)
           ]
         }
       },
@@ -86,7 +86,7 @@ export async function getNotifications (): Promise<PendingTasksProps[]> {
     const voteTasksNotSent = voteTasks.filter(voteTask => !sentTaskIds.has(voteTask.id));
     const gnosisSafeTasksNotSent = gnosisSafeTasks.filter(gnosisSafeTask => !sentTaskIds.has(getGnosisSafeTaskId(gnosisSafeTask)));
     const myGnosisTasks = gnosisSafeTasksNotSent.filter(gnosisSafeTask => Boolean(gnosisSafeTask.tasks[0].transactions[0].myAction));
-    const workspaceEventsNotSent = workspaceEvents.filter(workspaceEvent => !sentTaskIds.has(`${workspaceEvent.id}.${user.id}`));
+    const workspaceEventsNotSent = workspaceEvents.filter(workspaceEvent => !sentTaskIds.has(workspaceEvent.id));
     const proposalTasks = workspaceEventsNotSent.length !== 0 ? await getProposalTasksFromWorkspaceEvents(user.id, workspaceEventsNotSent) : [];
 
     const totalTasks = myGnosisTasks.length + mentionedTasks.unmarked.length + voteTasksNotSent.length + proposalTasks.length;

@@ -10,7 +10,6 @@ import type { ProposalTask, ProposalTaskAction } from 'lib/proposal/getProposalT
 import { useEffect } from 'react';
 import type { KeyedMutator } from 'swr';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
-import { useUser } from 'hooks/useUser';
 
 const ProposalActionRecord: Record<ProposalTaskAction, string> = {
   discuss: 'Discuss',
@@ -103,6 +102,7 @@ export function ProposalTasksListRow (
                 textAlign: 'center'
               }}
               href={proposalLink}
+              disabled={!action}
             >{action ? ProposalActionRecord[action] : 'No action'}
             </Button>
           </Grid>
@@ -122,12 +122,11 @@ export default function ProposalTasksList ({
   tasks: GetTasksResponse | undefined
 }) {
   const proposals = tasks?.proposals ? [...tasks.proposals.marked, ...tasks.proposals.unmarked] : [];
-  const { user } = useUser();
 
   useEffect(() => {
     async function main () {
-      if (user && tasks?.proposals && tasks.proposals.unmarked.length !== 0) {
-        await charmClient.markTasks(tasks.proposals.unmarked.map(proposal => ({ id: `${proposal.id}.${user.id}`, type: 'proposal' })));
+      if (tasks?.proposals && tasks.proposals.unmarked.length !== 0) {
+        await charmClient.markTasks(tasks.proposals.unmarked.map(proposal => ({ id: proposal.id, type: 'proposal' })));
         mutateTasks((_tasks) => {
           const unmarked = _tasks?.proposals.unmarked ?? [];
           return _tasks ? {
@@ -143,7 +142,7 @@ export default function ProposalTasksList ({
       }
     }
     main();
-  }, [tasks, user]);
+  }, [tasks]);
 
   if (error) {
     return (
