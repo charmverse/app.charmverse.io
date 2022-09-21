@@ -43,7 +43,13 @@ export function TemplatesMenu ({
 
           return (
             <MenuItem sx={{ display: 'flex', justifyContent: 'space-between' }}>
-              <DocumentPageIcon onClick={() => addPageFromTemplate(page.id)} label={fancyTrim(page.title || 'Untitled', maxTitleLength)} />
+              <DocumentPageIcon
+                onClick={() => {
+                  addPageFromTemplate(page.id);
+                  popupState.close();
+                }}
+                label={fancyTrim(page.title || 'Untitled', maxTitleLength)}
+              />
 
               {/* TODO - Revisit nested menu using this npm package https://github.com/steviebaa/mui-nested-menu */}
               {

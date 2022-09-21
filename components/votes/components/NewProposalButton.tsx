@@ -53,13 +53,23 @@ export default function NewProposalButton ({ mutateProposals }: {mutateProposals
   }
 
   async function createProposalFromTemplate (templateId: string) {
-    await charmClient.deletePage(templateId);
-    setProposalTemplates(proposalTemplates.filter(p => p.id !== templateId));
+    if (currentSpace) {
+      const newProposal = await charmClient.proposals.createProposalFromTemplate({
+        spaceId: currentSpace.id,
+        templateId
+      });
 
-    setPages(_pages => {
-      delete _pages[templateId];
-      return _pages;
-    });
+      mutateProposals();
+
+      setPages(_pages => {
+        _pages[newProposal.id] = newProposal;
+        return _pages;
+      });
+
+      showPage({
+        pageId: newProposal.id
+      });
+    }
   }
 
   async function createProposalTemplate () {
@@ -122,7 +132,7 @@ export default function NewProposalButton ({ mutateProposals }: {mutateProposals
         </Button>
       </Tooltip>
       <TemplatesMenu
-        addPageFromTemplate={() => null}
+        addPageFromTemplate={createProposalFromTemplate}
         createTemplate={createProposalTemplate}
         editTemplate={(pageId) => showPage({ pageId })}
         deleteTemplate={deleteProposalTemplate}

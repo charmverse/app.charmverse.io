@@ -3,6 +3,7 @@ import * as http from 'adapters/http';
 import type { IPageWithPermissions } from 'lib/pages';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
+import type { CreateProposalFromTemplateInput, CreateProposalInput } from 'lib/proposal/createProposal';
 
 export class ProposalsApi {
   updateProposal ({ proposalId, authors, reviewers }: UpdateProposalRequest) {
@@ -23,6 +24,10 @@ export class ProposalsApi {
 
   createProposalTemplate ({ spaceId }: {spaceId: string}): Promise<IPageWithPermissions> {
     return http.POST('/api/templates/proposal', { spaceId });
+  }
+
+  createProposalFromTemplate ({ spaceId, templateId }: Omit<CreateProposalFromTemplateInput, 'userId'>): Promise<IPageWithPermissions> {
+    return http.POST('/api/proposals/from-template', { spaceId, templateId });
   }
 
   deleteProposalTemplate ({ proposalTemplateId }: {proposalTemplateId: string}): Promise<IPageWithPermissions> {

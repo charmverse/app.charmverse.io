@@ -13,16 +13,19 @@ export interface CreateProposalInput {
   templateId?: string
 }
 
+export type CreateProposalFromTemplateInput = Required<Omit<CreateProposalInput, 'pageCreateInput'>>
+export type CreateProposalFromPageInput = Required<Omit<CreateProposalInput, 'templateId'>>
+
 export async function createProposal ({
   pageCreateInput,
   userId,
   spaceId
-}: Omit<Required<CreateProposalInput>, 'templateId'>): Promise<IPageWithPermissions & PageWithProposal>
+}: CreateProposalFromPageInput): Promise<IPageWithPermissions & PageWithProposal>
 export async function createProposal ({
   userId,
   spaceId,
   templateId
-}: Omit<Required<CreateProposalInput>, 'pageCreateInput'>): Promise<IPageWithPermissions & PageWithProposal>
+}: CreateProposalFromTemplateInput): Promise<IPageWithPermissions & PageWithProposal>
 export async function createProposal ({
   pageCreateInput,
   userId,
@@ -38,7 +41,7 @@ export async function createProposal ({
     // Making the page id same as proposalId
   }
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  else if (templateId && spaceId !== proposalTemplate!.id) {
+  else if (templateId && spaceId !== proposalTemplate!.spaceId) {
     throw new InsecureOperationError('You cannot copy proposals from a different space');
   }
 
