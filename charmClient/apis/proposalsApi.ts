@@ -1,6 +1,6 @@
 import type { ProposalStatus } from '@prisma/client';
 import * as http from 'adapters/http';
-import type { ProposalWithUsers } from 'lib/proposal/interface';
+import type { ProposalCategory, ProposalWithUsers } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 
 export class ProposalsApi {
@@ -18,5 +18,21 @@ export class ProposalsApi {
 
   getProposalsBySpace (spaceId: string) {
     return http.GET<ProposalWithUsers[]>(`/api/spaces/${spaceId}/proposals`);
+  }
+
+  getProposalCategories (spaceId: string) {
+    return http.GET<ProposalCategory[]>(`/api/spaces/${spaceId}/categories`);
+  }
+
+  createProposalCategory (spaceId: string, category: Omit<ProposalCategory, 'id' | 'spaceId'>) {
+    return http.POST<ProposalCategory[]>(`/api/spaces/${spaceId}/categories`, { ...category });
+  }
+
+  updateProposalCategory (spaceId: string, category: ProposalCategory) {
+    return http.PUT<ProposalCategory[]>(`/api/spaces/${spaceId}/categories/${category.id}`, { ...category });
+  }
+
+  deleteProposalCategories (spaceId: string, categoryId: string) {
+    return http.GET<ProposalCategory[]>(`/api/spaces/${spaceId}/categories/${categoryId}`);
   }
 }
