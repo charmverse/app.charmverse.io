@@ -1,5 +1,6 @@
 import type { Space, User } from '@prisma/client';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { prisma } from 'db';
 import { createProposal } from '../createProposal';
 
 let user: User;
@@ -13,38 +14,37 @@ beforeAll(async () => {
 
 describe('Creates a page and proposal with relevant configuration', () => {
   it('Create a page and returns it with the attached proposal', async () => {
-    const pageWithProposal = await createProposal({
-      pageCreateInput: {
-        author: {
-          connect: {
-            id: user.id
-          }
-        },
-        contentText: '',
-        path: 'path',
-        space: {
-          connect: {
-            id: space.id
-          }
-        },
-        title: 'page-title',
-        type: 'proposal',
-        updatedBy: user.id
-      },
-      spaceId: space.id,
-      userId: user.id
+    const { page, workspaceEvent } = await createProposal({
+      contentText: '',
+      path: 'path',
+      title: 'page-title',
+      createdBy: user.id,
+      spaceId: space.id
     });
 
-    expect(pageWithProposal).toMatchObject(expect.objectContaining({
+    expect(page).toMatchObject(expect.objectContaining({
       title: 'page-title',
-      type: 'proposal',
-      proposal: expect.objectContaining({
-        authors: [{
-          proposalId: pageWithProposal.id,
-          userId: user.id
-        }],
-        reviewers: []
-      })
+      type: 'proposal'
+    }));
+
+    const proposal = await prisma.proposal.findUnique({
+      where: {
+        id: page.proposalId as string
+      },
+      include: {
+        authors: true
+      }
+    });
+
+    expect(proposal).toMatchObject(expect.objectContaining({
+      authors: [{
+        proposalId: proposal?.id,
+        userId: user.id
+      }]
+    }));
+
+    expect(workspaceEvent).toMatchObject(expect.objectContaining({
+      type: 'proposal_create'
     }));
   });
 });
