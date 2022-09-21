@@ -15,20 +15,20 @@ async function deleteProposalTemplateController (req: NextApiRequest, res: NextA
 
   const userId = req.session.user.id;
 
-  const proposalId = req.query.id;
+  const templateId = req.query.id;
 
-  if (!proposalId) {
+  if (!templateId) {
     throw new InvalidInputError('No proposalId provided');
   }
 
   const proposal = await prisma.proposal.findUnique({
     where: {
-      id: proposalId as string
+      id: templateId as string
     }
   });
 
   if (!proposal) {
-    throw new DataNotFoundError(`No proposal found with id ${proposalId}`);
+    throw new DataNotFoundError(`No proposal template found with id ${templateId}`);
   }
 
   const { spaceId } = proposal;
@@ -45,7 +45,7 @@ async function deleteProposalTemplateController (req: NextApiRequest, res: NextA
 
   await prisma.proposal.delete({
     where: {
-      id: proposalId as string
+      id: templateId as string
     }
   });
 

@@ -80,7 +80,7 @@ async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
       // includeDeletedPages: true
     })).parents.find(p => p.type === 'proposal')?.id : undefined;
 
-    // Create proposal provisions proposal permissions, so we only need this operation for child pages of a proposal
+    // Create proposal method provisions proposal permissions, so we only need this operation for child pages of a proposal
     if (proposalIdForPermissions) {
       await syncProposalPermissions({ proposalId: proposalIdForPermissions as string });
     }
