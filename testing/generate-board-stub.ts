@@ -1,5 +1,5 @@
-import { Block, Page, PageType, Prisma } from '@prisma/client';
-import { PageWithBlocks } from 'lib/templates/interfaces';
+import type { Block, Page, PageType, Prisma } from '@prisma/client';
+import type { PageWithBlocks } from 'lib/templates/interfaces';
 import { typedKeys } from 'lib/utilities/objects';
 import { v4 } from 'uuid';
 
