@@ -1,7 +1,7 @@
 
 import type { Block } from '@prisma/client';
 import { prisma } from 'db';
-import { ApiError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { ApiError, ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -31,23 +31,27 @@ async function deleteBlock (req: NextApiRequest, res: NextApiResponse<{deletedCo
     });
   }
 
+  const isPageBlock = rootBlock.type === 'card' || rootBlock.type === 'card_template' || rootBlock.type === 'board';
+
   const permissionsSet = await computeUserPagePermissions({
-    pageId: req.query.id as string,
+    pageId: isPageBlock ? rootBlock.id : rootBlock.rootId,
     userId: req.session.user.id as string
   });
 
-  if (!permissionsSet.delete) {
-    return res.status(401).json({
-      error: 'You are not allowed to perform this action'
-    });
-  }
-
   if (rootBlock.type === 'card' || rootBlock.type === 'card_template' || rootBlock.type === 'board') {
 
+    if (!permissionsSet.delete) {
+      throw new ActionNotPermittedError();
+    }
     const deletedChildPageIds = await modifyChildPages(blockId, userId, 'archive');
     deletedCount = deletedChildPageIds.length;
   }
   else if (rootBlock.type === 'view') {
+
+    if (!permissionsSet.edit_content) {
+      throw new ActionNotPermittedError();
+    }
+
     const viewsCount = await prisma.block.count({
       where: {
         type: 'view',
@@ -70,6 +74,11 @@ async function deleteBlock (req: NextApiRequest, res: NextApiResponse<{deletedCo
     deletedCount = 1;
   }
   else {
+
+    if (!permissionsSet.edit_content) {
+      throw new ActionNotPermittedError();
+    }
+
     await prisma.block.delete({
       where: {
         id: blockId
