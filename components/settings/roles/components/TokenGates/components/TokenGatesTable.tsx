@@ -73,10 +73,12 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
   async function testConnect (tokenGate: TokenGate) {
     setTestResult({ status: 'loading' });
     try {
-
+      if (!litClient) {
+        throw new Error('Lit Protocol client not initialized');
+      }
       const chain = getLitChainFromChainId(chainId);
       const authSig = await checkAndSignAuthMessage({ chain });
-      const jwt = await litClient!.getSignedToken({
+      const jwt = await litClient.getSignedToken({
         resourceId: tokenGate.resourceId as any,
         authSig,
         chain: (tokenGate.conditions as any).chain || 'ethereum',
@@ -136,9 +138,9 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
                 />
               </TableCell>
               <TableCell width={140} sx={{ px: 0, whiteSpace: 'nowrap' }} align='right'>
-                <Tooltip arrow placement='top' title='Test this gate using your own wallet'>
+                <Tooltip arrow placement='top' title={litClient ? 'Test this gate using your own wallet' : 'Lit Protocol client has not initialized'}>
                   <Box component='span' pr={1}>
-                    <Chip onClick={() => testConnect(tokenGate)} sx={{ width: 70 }} clickable color='secondary' size='small' variant='outlined' label='Test' />
+                    <Chip onClick={() => litClient && testConnect(tokenGate)} sx={{ width: 70 }} clickable={Boolean(litClient)} color='secondary' size='small' variant='outlined' label='Test' />
                   </Box>
                 </Tooltip>
                 {isAdmin && (
