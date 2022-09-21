@@ -1,10 +1,10 @@
 import type { BaseEvent } from 'lib/metrics/mixpanel/interfaces';
+import type { IdentityType } from 'models/User';
 
 export interface UserCreatedEvent extends BaseEvent {
-  isWallet: boolean;
-  isDiscord: boolean
+  identityType: IdentityType;
 }
 
 export interface UserEvents {
-  userCreated: UserCreatedEvent;
+  UserCreated: UserCreatedEvent;
 }

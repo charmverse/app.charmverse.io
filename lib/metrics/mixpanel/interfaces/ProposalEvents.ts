@@ -8,7 +8,7 @@ interface ProposalStageEvent extends ProposaEvent {
 }
 
 export interface ProposalEvents {
-  proposalCreated: ProposaEvent
-  proposalStageCreated: ProposalStageEvent
+  ProposalCreated: ProposaEvent
+  ProposalStageCreated: ProposalStageEvent
 }
 

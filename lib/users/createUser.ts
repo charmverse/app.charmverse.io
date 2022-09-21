@@ -36,7 +36,7 @@ export async function createUserFromWallet (address: string): Promise<LoggedInUs
       include: sessionUserRelations
     });
 
-    trackUserAction('userCreated', { userId: newUser.id, isWallet: true, isDiscord: false });
+    trackUserAction('UserCreated', { userId: newUser.id, identityType: 'Wallet' });
 
     return newUser;
 
