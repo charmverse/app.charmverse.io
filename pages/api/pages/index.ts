@@ -66,13 +66,18 @@ async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
 
   try {
 
-    const proposalIdForPermissions = page.type === 'proposal' ? page.id : (page.parentId ? (await resolvePageTree({
+    const proposalIdForPermissions = page.parentId ? (await resolvePageTree({
       pageId: page.id
       // includeDeletedPages: true
-    })).parents.find(p => p.type === 'proposal')?.id : undefined);
+    })).parents.find(p => p.type === 'proposal')?.id : undefined;
 
-    await (proposalIdForPermissions ? syncProposalPermissions({ proposalId: proposalIdForPermissions as string })
-      : setupPermissionsAfterPageCreated(page.id));
+    // Create proposal method provisions proposal permissions, so we only need this operation for child pages of a proposal
+    if (proposalIdForPermissions) {
+      await syncProposalPermissions({ proposalId: proposalIdForPermissions as string });
+    }
+    else if (page.type !== 'proposal') {
+      await setupPermissionsAfterPageCreated(page.id);
+    }
 
     const pageWithPermissions = await getPage(page.id);
 

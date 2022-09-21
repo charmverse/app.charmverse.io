@@ -1,6 +1,7 @@
 import type { IPagePermissionWithSource } from 'lib/permissions/pages';
 import { setupPermissionsAfterPagePermissionAdded, upsertPermission } from 'lib/permissions/pages';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { prisma } from 'db';
 import type { IPageWithPermissions } from '../../interfaces';
 import { getAccessiblePages } from '../getAccessiblePages';
 
@@ -36,6 +37,28 @@ describe('getAccessiblePages', () => {
 
     expect(pages.length).toBe(1);
     expect(pages[0].id).toBe(page1.id);
+
+  });
+
+  it('should return proposal templates independent of their permissions the pages the user has access to', async () => {
+
+    const { space, user: nonAdminUser } = await generateUserAndSpaceWithApiToken(undefined, false);
+
+    const page1 = await createPage({ createdBy: nonAdminUser.id, spaceId: space.id });
+    await upsertPermission(page1.id, {
+      permissionLevel: 'view',
+      spaceId: space.id
+    });
+
+    // No permissions here
+    const proposalPage = await createPage({ createdBy: nonAdminUser.id, spaceId: space.id });
+    await prisma.page.update({ where: { id: proposalPage.id }, data: { type: 'proposal_template' } });
+
+    const pages = await getAccessiblePages({ userId: nonAdminUser.id, spaceId: space.id });
+
+    expect(pages.length).toBe(2);
+    expect(pages.some(p => p.id === page1.id)).toBe(true);
+    expect(pages.some(p => p.id === proposalPage.id)).toBe(true);
 
   });
 
