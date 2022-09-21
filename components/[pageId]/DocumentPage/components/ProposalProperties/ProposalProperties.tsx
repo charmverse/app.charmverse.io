@@ -92,7 +92,6 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly }: Pr
           proposal={proposal}
           refreshProposal={refreshProposal}
         />
-
       </Grid>
       <Grid container mb={2}>
         <Grid item xs={8}>

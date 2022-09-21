@@ -78,13 +78,13 @@ export default function ProposalStepper (
                     }
                   }}
                 >
-                  {currentStatusIndex >= statusIndex ? <CheckIcon />
+                  {currentStatusIndex >= statusIndex ? <CheckIcon fontSize='small' />
                     : (
                       <Typography sx={{
                         fontWeight: 500
                       }}
                       >
-                        {statusIndex}
+                        {statusIndex + 1}
                       </Typography>
                     )}
                 </Box>
