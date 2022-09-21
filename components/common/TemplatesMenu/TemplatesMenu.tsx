@@ -11,6 +11,9 @@ import type { PopupState } from 'material-ui-popup-state/hooks';
 import { bindMenu } from 'material-ui-popup-state/hooks';
 import { TemplatePageMenuActions } from './TemplatePageMenuActions';
 
+/**
+ * @enableItemOptions Defaults to true. Adds an external condition to decide if we enable the menu item options.
+ */
 interface Props {
   pages: Page[];
   createTemplate: () => void;
@@ -20,10 +23,11 @@ interface Props {
   anchorEl?: Element;
   popupState: PopupState;
   boardTitle?: string;
+  enableItemOptions?: boolean;
 }
 
 export function TemplatesMenu ({
-  pages, anchorEl, addPageFromTemplate, createTemplate, deleteTemplate, editTemplate, popupState, boardTitle
+  pages, anchorEl, addPageFromTemplate, createTemplate, deleteTemplate, editTemplate, popupState, boardTitle, enableItemOptions = true
 }: Props) {
 
   const theme = useTheme();
@@ -42,7 +46,10 @@ export function TemplatesMenu ({
               <DocumentPageIcon onClick={() => addPageFromTemplate(page.id)} label={fancyTrim(page.title || 'Untitled', maxTitleLength)} />
 
               {/* TODO - Revisit nested menu using this npm package https://github.com/steviebaa/mui-nested-menu */}
-              <TemplatePageMenuActions editTemplate={editTemplate} deleteTemplate={deleteTemplate} page={page} />
+              {
+                enableItemOptions && <TemplatePageMenuActions editTemplate={editTemplate} deleteTemplate={deleteTemplate} page={page} />
+              }
+
             </MenuItem>
           );
         })
