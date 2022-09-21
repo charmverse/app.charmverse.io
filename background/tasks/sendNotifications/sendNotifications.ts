@@ -2,7 +2,8 @@
 import { prisma } from 'db';
 import * as emails from 'lib/emails';
 import type { PendingTasksProps } from 'lib/emails/templates/PendingTasks';
-import { getPendingGnosisTasks, GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
+import type { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
+import { getPendingGnosisTasks } from 'lib/gnosis/gnosis.tasks';
 import log from 'lib/log';
 import * as mailer from 'lib/mailer';
 import { getMentionedTasks } from 'lib/mentions/getMentionedTasks';

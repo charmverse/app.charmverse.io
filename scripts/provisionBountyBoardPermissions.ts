@@ -22,5 +22,5 @@ async function migrate(): Promise<true> {
   return true;
 }
 
-migrate().then(() => console.log('Job done'))
-.catch((e) => console.error(e));
+// migrate().then(() => console.log('Job done'))
+// .catch((e) => console.error(e));

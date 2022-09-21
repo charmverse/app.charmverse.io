@@ -1,7 +1,7 @@
 
 import log from 'lib/log';
-import { deleteArchivedPages } from 'lib/pages/server/deleteArchivedPages';
 import { gauge } from 'lib/metrics';
+import { deleteArchivedPages } from 'lib/pages/server/deleteArchivedPages';
 
 const MAX_ARCHIVE_DAYS = process.env.MAX_ARCHIVE_DAYS ? parseInt(process.env.MAX_ARCHIVE_DAYS) : 30;
 

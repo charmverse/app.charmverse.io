@@ -1,4 +1,4 @@
-import { Bounty, Page } from '@prisma/client';
+import type { Bounty, Page } from '@prisma/client';
 import { prisma } from 'db';
 import * as client from './collablandClient';
 

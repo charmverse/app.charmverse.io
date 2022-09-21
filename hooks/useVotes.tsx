@@ -1,8 +1,9 @@
-import { UserVote } from '@prisma/client';
+import type { UserVote } from '@prisma/client';
 import charmClient from 'charmClient';
 import useTasks from 'components/nexus/hooks/useTasks';
-import { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
-import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
+import type { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
+import type { ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import { useCurrentSpace } from './useCurrentSpace';
 import { usePages } from './usePages';

@@ -1,9 +1,10 @@
-import { PluginKey } from '@bangle.dev/core';
+import type { PluginKey } from '@bangle.dev/core';
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { safeInsert } from '@bangle.dev/utils';
 import { ContentCopy as DuplicateIcon, DeleteOutlined as DeleteIcon, DragIndicator as DragIndicatorIcon } from '@mui/icons-material';
-import { ListItemIcon, ListItemText, Menu, ListItemButton, MenuProps } from '@mui/material';
-import { Page } from '@prisma/client';
+import type { MenuProps } from '@mui/material';
+import { ListItemIcon, ListItemText, Menu, ListItemButton } from '@mui/material';
+import type { Page } from '@prisma/client';
 import charmClient from 'charmClient';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';

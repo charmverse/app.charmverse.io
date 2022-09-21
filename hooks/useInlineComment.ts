@@ -1,4 +1,4 @@
-import { Node } from '@bangle.dev/pm';
+import type { Node } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { extractTextFromSelection } from 'lib/inline-comments/extractTextFromSelection';
 import { findTotalInlineComments } from 'lib/inline-comments/findTotalInlineComments';

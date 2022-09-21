@@ -1,7 +1,8 @@
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { MarkTask, markTasks } from 'lib/tasks/markTasks';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { MarkTask } from 'lib/tasks/markTasks';
+import { markTasks } from 'lib/tasks/markTasks';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

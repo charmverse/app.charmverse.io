@@ -1,4 +1,4 @@
-import { Application, Bounty, Space, User } from '@prisma/client';
+import type { Application, Bounty, Space, User } from '@prisma/client';
 import { createSubmission } from 'lib/applications/actions';
 import { createTransaction } from 'lib/transactions/createTransaction';
 import { DataNotFoundError } from 'lib/utilities/errors';

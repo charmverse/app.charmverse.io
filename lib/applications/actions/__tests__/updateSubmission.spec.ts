@@ -1,12 +1,12 @@
 
-import { Space, User } from '@prisma/client';
-import { generateUserAndSpaceWithApiToken, generateBountyWithSingleApplication } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
+import type { Space, User } from '@prisma/client';
+import { DataNotFoundError, MissingDataError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
-import { DataNotFoundError, UnauthorisedActionError, MissingDataError } from 'lib/utilities/errors';
+import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { v4 } from 'uuid';
 
 import { generateSubmissionContent } from 'testing/generate-stubs';
-import { SubmissionContent } from '../../interfaces';
+import type { SubmissionContent } from '../../interfaces';
 import { updateSubmission } from '../updateSubmission';
 
 let user: User;

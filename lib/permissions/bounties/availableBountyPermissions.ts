@@ -1,6 +1,6 @@
 import { BountyOperation } from '@prisma/client';
 import { Permissions } from '../permissions.class';
-import { BountyPermissionFlags } from './interfaces';
+import type { BountyPermissionFlags } from './interfaces';
 
 export class AvailableBountyPermissions extends Permissions<BountyOperation> implements BountyPermissionFlags {
 

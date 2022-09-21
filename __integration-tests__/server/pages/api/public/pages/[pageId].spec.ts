@@ -1,9 +1,9 @@
-import { Page, Space, User } from '@prisma/client';
+import type { Page, Space, User } from '@prisma/client';
+import { prisma } from 'db';
+import { upsertPermission } from 'lib/permissions/pages';
 import request from 'supertest';
 import { baseUrl } from 'testing/mockApiCall';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { upsertPermission } from 'lib/permissions/pages';
-import { prisma } from 'db';
 
 let nonAdminUser: User;
 let nonAdminUserSpace: Space;

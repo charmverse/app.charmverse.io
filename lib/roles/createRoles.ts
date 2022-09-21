@@ -1,5 +1,5 @@
 import { prisma } from 'db';
-import { Role, RoleSource } from '@prisma/client';
+import type { Role, RoleSource } from '@prisma/client';
 
 type RolesRecord = Record<string, Role | null>;
 

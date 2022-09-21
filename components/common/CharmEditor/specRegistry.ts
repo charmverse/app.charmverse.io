@@ -13,7 +13,7 @@ import {
   underline
 } from '@bangle.dev/base-components';
 import { SpecRegistry } from '@bangle.dev/core';
-import { PageContent } from 'models';
+import type { PageContent } from 'models';
 import * as codeBlock from './components/@bangle.dev/base-components/code-block';
 import * as columnLayout from './components/columnLayout';
 import { cryptoPriceSpec } from './components/CryptoPrice';

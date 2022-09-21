@@ -1,5 +1,6 @@
 import { memo } from 'react';
-import { alpha, SxProps } from '@mui/system';
+import type { SxProps } from '@mui/system';
+import { alpha } from '@mui/system';
 import { Box } from '@mui/material';
 import { useTheme } from '@emotion/react';
 

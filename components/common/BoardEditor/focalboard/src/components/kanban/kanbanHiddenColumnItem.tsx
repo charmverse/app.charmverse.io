@@ -1,17 +1,16 @@
 /* eslint-disable max-lines */
-import React from 'react';
-import { IntlShape } from 'react-intl';
 import { useDrop } from 'react-dnd';
+import { IntlShape } from 'react-intl';
 
-import mutator from '../../mutator';
-import Button from '../../widgets/buttons/button';
-import Menu from '../../widgets/menu';
-import MenuWrapper from '../../widgets/menuWrapper';
-import ShowIcon from '../../widgets/icons/show';
-import Label from '../../widgets/label';
-import { Card } from '../../blocks/card';
 import { BoardGroup } from '../../blocks/board';
 import { BoardView } from '../../blocks/boardView';
+import { Card } from '../../blocks/card';
+import mutator from '../../mutator';
+import Button from '../../widgets/buttons/button';
+import ShowIcon from '../../widgets/icons/show';
+import Label from '../../widgets/label';
+import Menu from '../../widgets/menu';
+import MenuWrapper from '../../widgets/menuWrapper';
 
 type Props = {
     activeView: BoardView

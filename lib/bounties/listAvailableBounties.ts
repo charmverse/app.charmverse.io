@@ -1,8 +1,8 @@
 import { prisma } from 'db';
-import { BountyWithDetails } from 'models';
+import type { BountyWithDetails } from 'models';
 import { hasAccessToSpace } from 'lib/middleware';
 import { accessiblePagesByPermissionsQuery, includePagePermissions } from 'lib/pages/server';
-import { AvailableResourcesRequest } from '../permissions/interfaces';
+import type { AvailableResourcesRequest } from '../permissions/interfaces';
 import { DataNotFoundError } from '../utilities/errors';
 
 export function generateAccessibleBountiesQuery ({ userId, spaceId }: {userId: string, spaceId: string}) {

@@ -3,8 +3,8 @@ import { prisma } from 'db';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
-import { MultipleThreadsInput } from 'lib/threads';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { MultipleThreadsInput } from 'lib/threads';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

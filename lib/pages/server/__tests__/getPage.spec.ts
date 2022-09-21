@@ -1,10 +1,10 @@
-import { Page, PagePermission, Space, User } from '@prisma/client';
-import { generateUserAndSpaceWithApiToken, createPage } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
+import type { Page, PagePermission, Space, User } from '@prisma/client';
 import { prisma } from 'db';
-import { IPagePermissionWithSource } from 'lib/permissions/pages';
+import type { IPagePermissionWithSource } from 'lib/permissions/pages';
+import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { v4 } from 'uuid';
+import type { IPageWithPermissions } from '../../interfaces';
 import { getPage } from '../getPage';
-import { IPageWithPermissions } from '../../interfaces';
 
 let user: User;
 let space: Space;

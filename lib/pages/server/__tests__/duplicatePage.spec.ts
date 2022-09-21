@@ -1,4 +1,4 @@
-import { Block, Page } from '@prisma/client';
+import type { Block, Page } from '@prisma/client';
 import { prisma } from 'db';
 import { ExpectedAnError } from 'testing/errors';
 import { createBlock, createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';

@@ -1,7 +1,7 @@
 import SettingsLayout from 'components/settings/Layout';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { setTitle } from 'hooks/usePageTitle';
-import { ReactElement } from 'react';
+import type { ReactElement } from 'react';
 import ContributorList from 'components/settings/contributors/ContributorList';
 import useIsAdmin from 'hooks/useIsAdmin';
 

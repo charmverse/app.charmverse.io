@@ -1,6 +1,6 @@
-import { DataNotFoundError, WrongStateError } from 'lib/utilities/errors';
+import type { Application } from '@prisma/client';
 import { prisma } from 'db';
-import { Application } from '@prisma/client';
+import { DataNotFoundError, WrongStateError } from 'lib/utilities/errors';
 import { getApplication } from '../getApplication';
 
 export async function markSubmissionAsPaid (submissionId: string) {

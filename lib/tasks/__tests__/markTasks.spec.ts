@@ -1,4 +1,4 @@
-import { User, UserNotification } from '@prisma/client';
+import type { User, UserNotification } from '@prisma/client';
 import { prisma } from 'db';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';

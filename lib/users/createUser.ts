@@ -1,7 +1,8 @@
 import { isProfilePathAvailable } from 'lib/profile/isProfilePathAvailable';
 import { prisma } from 'db';
 import { shortenHex } from 'lib/utilities/strings';
-import { IDENTITY_TYPES, LoggedInUser } from 'models';
+import type { LoggedInUser } from 'models';
+import { IDENTITY_TYPES } from 'models';
 import getENSName from 'lib/blockchain/getENSName';
 import { sessionUserRelations } from 'lib/session/config';
 

@@ -2,7 +2,7 @@ import { AvailableBountyPermissions, bountyPermissionMapping } from 'lib/permiss
 import { typedKeys } from 'lib/utilities/objects';
 import { AllowedPagePermissions } from './pages/available-page-permissions.class';
 import { permissionTemplates } from './pages/page-permission-mapping';
-import { AssignablePermissionGroupsWithPublic, BountyPagePermissionIntersection, BountyPagePermissionIntersectionQuery } from './interfaces';
+import type { AssignablePermissionGroupsWithPublic, BountyPagePermissionIntersection, BountyPagePermissionIntersectionQuery } from './interfaces';
 
 export function compareBountyPagePermissions ({
   bountyOperations, bountyPermissions, pageOperations, pagePermissions, roleups

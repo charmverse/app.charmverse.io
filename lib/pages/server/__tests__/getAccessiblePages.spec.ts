@@ -1,6 +1,7 @@
-import { IPagePermissionWithSource, setupPermissionsAfterPagePermissionAdded, upsertPermission } from 'lib/permissions/pages';
+import type { IPagePermissionWithSource } from 'lib/permissions/pages';
+import { setupPermissionsAfterPagePermissionAdded, upsertPermission } from 'lib/permissions/pages';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { IPageWithPermissions } from '../../interfaces';
+import type { IPageWithPermissions } from '../../interfaces';
 import { getAccessiblePages } from '../getAccessiblePages';
 
 describe('getAccessiblePages', () => {

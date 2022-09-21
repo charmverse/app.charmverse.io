@@ -1,13 +1,10 @@
 
-import { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-import { Prisma, Space } from '@prisma/client';
-import { prisma } from 'db';
+import type { FiatCurrency } from 'connectors';
+import { pricingGetter } from 'lib/crypto-price/getters';
 import { onError, onNoMatch, requireUserOrSharePage } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { gettingStartedPageContent } from 'seedData';
-import { CryptoCurrency, FiatCurrency } from 'connectors';
-import { pricingGetter } from 'lib/crypto-price/getters';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

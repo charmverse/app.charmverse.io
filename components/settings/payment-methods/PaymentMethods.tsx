@@ -1,12 +1,12 @@
-import { Modal } from 'components/common/Modal';
 import Stack from '@mui/material/Stack';
-import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import Button from 'components/common/Button';
 import Typography from '@mui/material/Typography';
+import Button from 'components/common/Button';
+import { Modal } from 'components/common/Modal';
+import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import Legend from '../Legend';
 import CustomERCTokenForm from './components/CustomERCTokenForm';
 import GnosisSafeForm from './components/GnosisSafeForm';
-import Legend from '../Legend';
 import PaymentMethodList from './components/PaymentMethodList';
 
 export default function PaymentMethods () {

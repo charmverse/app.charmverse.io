@@ -2,11 +2,11 @@ import nc from 'next-connect';
 import { onError, onNoMatch } from 'lib/middleware';
 import * as emails from 'lib/emails/emails';
 import { v4 } from 'uuid';
-import { MentionedTask } from 'lib/mentions/interfaces';
+import type { MentionedTask } from 'lib/mentions/interfaces';
 import randomName from 'lib/utilities/randomName';
-import { VoteTask } from 'lib/votes/interfaces';
+import type { VoteTask } from 'lib/votes/interfaces';
 import { getPagePath } from 'lib/pages';
-import { ProposalTask } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';
+import type { ProposalTask } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';
 
 const handler = nc({
   onError,

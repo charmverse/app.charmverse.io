@@ -1,18 +1,18 @@
-import * as alchemyApi from 'lib/blockchain/provider/alchemy';
 import { prisma } from 'db';
-import { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 import { getUserS3Folder, uploadToS3 } from 'lib/aws/uploadToS3Server';
+import * as alchemyApi from 'lib/blockchain/provider/alchemy';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { sessionUserRelations } from 'lib/session/config';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
-import { LoggedInUser } from 'models';
 import { getNFT } from 'lib/blockchain/nfts';
-import { getUserProfile } from 'lib/users/getUser';
-import { getFilenameWithExtension } from 'lib/utilities/getFilenameWithExtension';
-import { UserAvatar } from 'lib/users/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
+import { getUserProfile } from 'lib/users/getUser';
+import type { UserAvatar } from 'lib/users/interfaces';
 import { InvalidInputError } from 'lib/utilities/errors';
+import { getFilenameWithExtension } from 'lib/utilities/getFilenameWithExtension';
+import type { LoggedInUser } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

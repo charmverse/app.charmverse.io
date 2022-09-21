@@ -1,9 +1,10 @@
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { computeSpacePermissions, SpacePermissionFlags } from 'lib/permissions/spaces';
+import type { SpacePermissionFlags } from 'lib/permissions/spaces';
+import { computeSpacePermissions } from 'lib/permissions/spaces';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

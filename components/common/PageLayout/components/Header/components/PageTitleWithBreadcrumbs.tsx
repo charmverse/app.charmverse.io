@@ -4,7 +4,7 @@ import Link from 'components/common/Link';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePages } from 'hooks/usePages';
 import { useRouter } from 'next/router';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { StyledPageIcon } from '../../PageIcon';
 

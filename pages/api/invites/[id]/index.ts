@@ -1,13 +1,14 @@
 
-import { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
+import type { SpaceRole } from '@prisma/client';
+import { prisma } from 'db';
+import log from 'lib/log';
+import type { IEventToLog } from 'lib/log/userEvents';
+import { postToDiscord } from 'lib/log/userEvents';
 import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { prisma } from 'db';
-import { SpaceRole } from '@prisma/client';
-import { IEventToLog, postToDiscord } from 'lib/log/userEvents';
 import { DataNotFoundError } from 'lib/utilities/errors';
-import log from 'lib/log';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
