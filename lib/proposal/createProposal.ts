@@ -3,6 +3,7 @@ import { prisma } from 'db';
 import { v4 } from 'uuid';
 import { DataNotFoundError, InsecureOperationError } from 'lib/utilities/errors';
 import { getProposal } from './getProposal';
+import { generateSyncProposalPermissions } from './syncProposalPermissions';
 import type { IPageWithPermissions, PageWithProposal } from '../pages';
 import { getPagePath } from '../pages';
 
@@ -120,21 +121,33 @@ export async function createProposal ({
   }
 
   // Using a transaction to ensure both the proposal and page gets created together
-  const createdPage = await prisma.page.create({
-    data: pageData,
-    include: {
-      proposal: {
-        include: {
-          authors: true,
-          reviewers: true
-        }
-      },
-      permissions: {
-        include: {
-          sourcePermission: true
+  const createdPage = await prisma.$transaction(async () => {
+    await prisma.page.create({
+      data: pageData,
+      include: {
+        proposal: {
+          include: {
+            authors: true,
+            reviewers: true
+          }
+        },
+        permissions: {
+          include: {
+            sourcePermission: true
+          }
         }
       }
+    });
+
+    const [deleteArgs, createArgs] = await generateSyncProposalPermissions({ proposalId });
+
+    await prisma.pagePermission.deleteMany(deleteArgs);
+
+    for (const args of createArgs) {
+      await prisma.pagePermission.create(args);
     }
+
+    return getProposal({ proposalId });
   });
 
   return createdPage;
