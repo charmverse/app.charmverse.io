@@ -2,13 +2,22 @@ import { prisma } from 'db';
 import type { IPageWithPermissions, PageWithProposal } from 'lib/pages';
 import { getPagePath } from 'lib/pages';
 import { v4 } from 'uuid';
+import type { ProposalReviewerInput } from '../../proposal/interface';
 
 export interface CreateProposalTemplateInput {
   spaceId: string
   userId: string
+  pageContent?: {
+    title?: string;
+    contentText?: string;
+    content?: any
+  },
+  reviewers?: ProposalReviewerInput[]
 }
 
-export async function createProposalTemplate ({ spaceId, userId }: CreateProposalTemplateInput): Promise<IPageWithPermissions & PageWithProposal> {
+export async function createProposalTemplate ({
+  spaceId, userId, pageContent, reviewers
+}: CreateProposalTemplateInput): Promise<IPageWithPermissions & PageWithProposal> {
 
   const proposalId = v4();
 
@@ -16,8 +25,9 @@ export async function createProposalTemplate ({ spaceId, userId }: CreateProposa
     data: {
       id: proposalId,
       path: getPagePath(),
-      contentText: '',
-      title: 'Untitled',
+      content: pageContent?.content,
+      contentText: pageContent?.contentText ?? '',
+      title: pageContent?.title ?? 'Untitled',
       updatedBy: userId,
       author: {
         connect: {
@@ -44,6 +54,16 @@ export async function createProposalTemplate ({ spaceId, userId }: CreateProposa
                   id: userId
                 }
               }
+            }
+          },
+          reviewers: {
+            createMany: {
+              data: (reviewers ?? []).map(r => {
+                return {
+                  roleId: r.group === 'role' ? r.id : undefined,
+                  userId: r.group === 'user' ? r.id : undefined
+                };
+              })
             }
           }
         }

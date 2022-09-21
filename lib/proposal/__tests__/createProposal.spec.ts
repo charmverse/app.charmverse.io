@@ -1,10 +1,9 @@
 import type { Space, User } from '@prisma/client';
+import { InsecureOperationError } from 'lib/utilities/errors';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { prisma } from 'db';
 import { createProposalTemplate } from '../../templates/proposals/createProposalTemplate';
 import { createProposal } from '../createProposal';
 import { proposalPermissionMapping } from '../syncProposalPermissions';
-import type { PageWithProposal } from '../../pages';
 
 let user: User;
 let space: Space;
@@ -127,5 +126,20 @@ describe('Creates a page and proposal with relevant configuration', () => {
     const privateDraftAuthorPermissionLevel = proposalPermissionMapping.private_draft.author;
 
     expect(pageWithProposal.permissions.some(p => p.userId === user.id && p.permissionLevel === privateDraftAuthorPermissionLevel)).toBe(true);
+  });
+
+  it('should throw an error if trying to use a proposal template from a different space', async () => {
+    const { space: otherSpace, user: otherUser } = await generateUserAndSpaceWithApiToken();
+
+    const proposalTemplate = await createProposalTemplate({
+      spaceId: otherSpace.id,
+      userId: otherUser.id
+    });
+
+    await (expect(createProposal({
+      spaceId: space.id,
+      userId: user.id,
+      templateId: proposalTemplate.id
+    }))).rejects.toBeInstanceOf(InsecureOperationError);
   });
 });
