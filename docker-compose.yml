@@ -62,5 +62,4 @@ services:
       DD_ENV: "${SERVICE_ENV:-tst}"
     profiles:
       - prd
-      - tst
-      - datadogtst
+      - ddtst
