@@ -1,5 +1,6 @@
 import type { ProposalStatus } from '@prisma/client';
 import * as http from 'adapters/http';
+import type { IPageWithPermissions } from 'lib/pages';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 
@@ -18,5 +19,9 @@ export class ProposalsApi {
 
   getProposalsBySpace (spaceId: string) {
     return http.GET<ProposalWithUsers[]>(`/api/spaces/${spaceId}/proposals`);
+  }
+
+  createProposalTemplate ({ spaceId }: {spaceId: string}): Promise<IPageWithPermissions> {
+    return http.POST('/api/templates/proposal', { spaceId });
   }
 }

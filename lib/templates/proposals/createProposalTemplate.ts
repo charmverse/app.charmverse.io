@@ -1,5 +1,5 @@
 import { prisma } from 'db';
-import type { PageWithProposal } from 'lib/pages';
+import type { IPageWithPermissions, PageWithProposal } from 'lib/pages';
 import { getPagePath } from 'lib/pages';
 import { v4 } from 'uuid';
 
@@ -8,7 +8,7 @@ export interface CreateProposalTemplateInput {
   userId: string
 }
 
-export async function createProposalTemplate ({ spaceId, userId }: CreateProposalTemplateInput): Promise<PageWithProposal> {
+export async function createProposalTemplate ({ spaceId, userId }: CreateProposalTemplateInput): Promise<IPageWithPermissions & PageWithProposal> {
 
   const proposalId = v4();
 
@@ -54,6 +54,11 @@ export async function createProposalTemplate ({ spaceId, userId }: CreateProposa
         include: {
           authors: true,
           reviewers: true
+        }
+      },
+      permissions: {
+        include: {
+          sourcePermission: true
         }
       }
     }
