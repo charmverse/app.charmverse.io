@@ -62,7 +62,7 @@ export async function createProposal ({
         }
       },
       contentText: proposalTemplate.contentText,
-      content: proposalTemplate.content as Prisma.InputJsonValue,
+      content: proposalTemplate.content as Prisma.InputJsonValue ?? undefined,
       id: proposalId,
       type: 'proposal',
       path: getPagePath(),
