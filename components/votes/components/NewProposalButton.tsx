@@ -117,14 +117,14 @@ export default function NewProposalButton ({ mutateProposals }: {mutateProposals
       <Tooltip title={!canCreateProposal ? 'You do not have the permission to create a proposal.' : ''}>
         <Button disabled={!canCreateProposal} ref={buttonRef}>
           <Box
-            sx={{ pl: '15px' }}
             onClick={onClickCreate}
           >
             Create Proposal
           </Box>
 
           <Box
-            sx={{ pl: 1 }}
+            // Negative right margin fixes issue with too much whitespace on right of button
+            sx={{ pl: 1, mr: -2 }}
             {...bindTrigger(popupState)}
           >
             <DownIcon />
