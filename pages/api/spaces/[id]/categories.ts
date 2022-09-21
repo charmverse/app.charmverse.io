@@ -1,6 +1,6 @@
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { getProposalCategoriesBySpace } from 'lib/proposal/getProposalCategoriesBySpace';
-import type { ProposalWithUsers } from 'lib/proposal/interface';
+import type { ProposalCategory } from 'lib/proposal/interface';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -11,9 +11,8 @@ handler
   .use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'id' }))
   .get(getCategories);
 
-async function getCategories (req: NextApiRequest, res: NextApiResponse<ProposalWithUsers[]>) {
+async function getCategories (req: NextApiRequest, res: NextApiResponse<ProposalCategory[]>) {
   const spaceId = req.query.id as string;
-  const { id: userId } = req.session.user;
 
   const categories = await getProposalCategoriesBySpace(spaceId);
 

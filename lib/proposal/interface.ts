@@ -6,14 +6,19 @@ export interface ProposalReviewerInput {
   id: string
 }
 
-export interface ProposalWithUsers extends Proposal {
-  authors: ProposalAuthor[],
-  reviewers: ProposalReviewer[]
-}
-
 export interface ProposalCategory {
   id: string;
   title: string;
   color: string;
   spaceId: string;
 }
+
+export interface ProposalWithCategory extends Proposal {
+  category: ProposalCategory | null;
+}
+
+export interface ProposalWithUsers extends Proposal, ProposalWithCategory {
+  authors: ProposalAuthor[],
+  reviewers: ProposalReviewer[]
+}
+
