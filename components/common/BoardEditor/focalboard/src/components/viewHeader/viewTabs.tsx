@@ -134,12 +134,12 @@ function ViewTabs ({ onDeleteView, openViewOptions, maxTabsShown, onViewTabClick
     );
   }, [dropdownView, showView]);
 
-  const handleDeleteView = useCallback(() => {
+  const handleDeleteView = useCallback(async () => {
     Utils.log('deleteView');
     if (!dropdownView) return;
 
     const nextView = views.find((o) => o !== dropdownView);
-    mutator.deleteBlock(dropdownView, 'delete view');
+    await mutator.deleteBlock(dropdownView, 'delete view');
     onDeleteView?.(dropdownView.id)
     setAnchorEl(null)
     if (nextView) {
