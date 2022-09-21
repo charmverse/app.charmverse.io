@@ -33,6 +33,11 @@ import * as emoji from './components/emojiSuggest';
 import * as tabIndent from './components/tabIndent';
 import * as table from './components/table';
 import paragraph from './components/paragraph';
+import {
+  deletion,
+  insertion,
+  formatChange
+} from './fiduswriter/schema/common/track';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -77,5 +82,8 @@ export const specRegistry = new SpecRegistry([
   tabIndent.spec(),
   table.spec(), // OK - only for text content
   disclosure.spec(),
-  inlineDatabase.spec()
+  inlineDatabase.spec(),
+  deletion,
+  insertion,
+  formatChange
 ]);

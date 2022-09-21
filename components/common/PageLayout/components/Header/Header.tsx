@@ -32,7 +32,6 @@ import type { ReactNode } from 'react';
 import { useRef, useState } from 'react';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import ShareButton from './components/ShareButton';
 import BountyShareButton from './components/BountyShareButton/BountyShareButton';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';

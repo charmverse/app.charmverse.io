@@ -67,9 +67,12 @@ import RowActionsMenu, * as rowActions from './components/rowActions';
 import * as tabIndent from './components/tabIndent';
 import * as table from './components/table';
 import * as trailingNode from './components/trailingNode';
+import EditModeButton from './components/EditModeButton';
 import DevTools from './DevTools';
 import { specRegistry } from './specRegistry';
 import { checkForEmpty } from './utils';
+import trackStyles from './fiduswriter/styles';
+import { rejectAll } from './fiduswriter/track/reject_all';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -109,13 +112,18 @@ export function charmEditorPlugins (
 
   const basePlugins: RawPlugins[] = [
     new Plugin({
-      view: () => ({
-        update: (view, prevState) => {
-          if (onContentChange && !view.state.doc.eq(prevState.doc)) {
-            onContentChange(view, prevState.doc);
-          }
+      view: (_view) => {
+        if (readOnly) {
+          rejectAll(_view);
         }
-      })
+        return {
+          update: (view, prevState) => {
+            if (!readOnly && onContentChange && !view.state.doc.eq(prevState.doc)) {
+              onContentChange(view, prevState.doc);
+            }
+          }
+        };
+      }
     }),
     userDataPlugin({
       userId,
@@ -278,6 +286,8 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{disablePageSpecificFe
       cursor: pointer;
     }
   `}
+
+  ${trackStyles}
 `;
 
 const PageActionListBox = styled.div`
@@ -447,9 +457,15 @@ function CharmEditor (
     }
   }, [editorRef.current]);
 
+  const [enabled, setEnabled] = useState(false);
+  function toggleSuggestions () {
+    setEnabled(!enabled);
+  }
+
   return (
     <StyledReactBangleEditor
       disablePageSpecificFeatures={disablePageSpecificFeatures}
+      enableSuggestions={enabled} // pagePermissions?.comment}
       style={{
         ...(style ?? {}),
         width: '100%',
@@ -570,6 +586,7 @@ function CharmEditor (
         }
       }}
     >
+      <EditModeButton enabled={enabled} toggle={toggleSuggestions} />
       <floatingMenu.FloatingMenu
         enableComments={!disablePageSpecificFeatures}
         enableVoting={enableVoting}
