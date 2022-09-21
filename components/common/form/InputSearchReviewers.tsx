@@ -48,6 +48,11 @@ export default function InputSearchReviewers ({
       autoHighlight
       groupBy={(option) => option.group[0].toUpperCase() + option.group.slice(1)}
       getOptionLabel={(groupWithId) => {
+
+        if (!groupWithId) {
+          return '';
+        }
+
         const option = optionsRecord[groupWithId.id] ?? {};
         if (option.group === 'user') {
           return option.username;

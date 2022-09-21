@@ -1,9 +1,13 @@
 import type { Page, Space, User, Vote } from '@prisma/client';
-import { addSpaceOperations } from 'lib/permissions/spaces';
+import { SpaceOperation } from '@prisma/client';
+import { addSpaceOperations, removeSpaceOperations } from 'lib/permissions/spaces';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createPage, createVote, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
+import { prisma } from 'db';
+import { createProposal } from 'lib/proposal/createProposal';
+import { typedKeys } from 'lib/utilities/objects';
 
 let page: Page;
 let space: Space;
@@ -90,4 +94,143 @@ describe('POST /api/votes - Create a new vote', () => {
     })
       .expect(401);
   });
+});
+
+describe('POST /api/votes - Create a proposal vote', () => {
+  it('should allow the user to create a proposal vote if they are a proposal author', async () => {
+
+    const { user: author, space: authorSpace } = await generateUserAndSpaceWithApiToken(undefined, false);
+
+    await removeSpaceOperations({ forSpaceId: authorSpace.id, operations: typedKeys(SpaceOperation), spaceId: authorSpace.id });
+
+    const authorCookie = await loginUser(author);
+
+    const proposal = await createProposal({
+      pageCreateInput: {
+        author: {
+          connect: {
+            id: author.id
+          }
+        },
+        contentText: '',
+        path: 'path',
+        space: {
+          connect: {
+            id: authorSpace.id
+          }
+        },
+        title: 'page-title',
+        type: 'proposal',
+        updatedBy: author.id
+      },
+      spaceId: authorSpace.id,
+      userId: author.id
+    });
+
+    await request(baseUrl)
+      .post('/api/votes')
+      .set('Cookie', authorCookie).send({
+        context: 'proposal',
+        deadline: new Date(),
+        pageId: proposal.id,
+        title: 'new vote',
+        type: 'Approval',
+        threshold: 50,
+        voteOptions: ['1', '2', '3'],
+        createdBy: user.id
+      })
+      .expect(200);
+
+  });
+
+  it('should allow the user to create a proposal vote if they are a space admin who did not author the proposal', async () => {
+
+    const { user: author, space: authorSpace } = await generateUserAndSpaceWithApiToken(undefined, false);
+    const adminUser = await generateSpaceUser({ spaceId: authorSpace.id, isAdmin: true });
+
+    await removeSpaceOperations({ forSpaceId: authorSpace.id, operations: typedKeys(SpaceOperation), spaceId: authorSpace.id });
+
+    const adminCookie = await loginUser(adminUser);
+
+    const proposal = await createProposal({
+      pageCreateInput: {
+        author: {
+          connect: {
+            id: author.id
+          }
+        },
+        contentText: '',
+        path: 'path',
+        space: {
+          connect: {
+            id: authorSpace.id
+          }
+        },
+        title: 'page-title',
+        type: 'proposal',
+        updatedBy: author.id
+      },
+      spaceId: authorSpace.id,
+      userId: author.id
+    });
+
+    await request(baseUrl)
+      .post('/api/votes')
+      .set('Cookie', adminCookie).send({
+        context: 'proposal',
+        deadline: new Date(),
+        pageId: proposal.id,
+        title: 'new vote',
+        type: 'Approval',
+        threshold: 50,
+        voteOptions: ['1', '2', '3'],
+        createdBy: user.id
+      })
+      .expect(200);
+  });
+
+  it('should not allow the user to create a proposal vote if they are not a proposal author', async () => {
+
+    const { user: author, space: authorSpace } = await generateUserAndSpaceWithApiToken(undefined, false);
+    const otherUser = await generateSpaceUser({ isAdmin: false, spaceId: authorSpace.id });
+    const otherUserCookie = await loginUser(otherUser);
+
+    await removeSpaceOperations({ forSpaceId: authorSpace.id, operations: typedKeys(SpaceOperation), spaceId: authorSpace.id });
+
+    const authorCookie = await loginUser(author);
+
+    const proposal = await createProposal({
+      pageCreateInput: {
+        author: {
+          connect: {
+            id: author.id
+          }
+        },
+        contentText: '',
+        path: 'path',
+        space: {
+          connect: {
+            id: authorSpace.id
+          }
+        },
+        title: 'page-title',
+        type: 'proposal',
+        updatedBy: author.id
+      },
+      spaceId: authorSpace.id,
+      userId: author.id
+    });
+
+    await request(baseUrl).post('/api/votes').set('Cookie', otherUserCookie).send({
+      deadline: new Date(),
+      pageId: proposal.id,
+      title: 'new vote',
+      type: 'Approval',
+      threshold: 50,
+      voteOptions: ['1', '2', '3'],
+      createdBy: user.id
+    })
+      .expect(401);
+  });
+
 });
