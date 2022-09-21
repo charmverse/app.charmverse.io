@@ -9,6 +9,7 @@ import Footer from 'components/login/Footer';
 import { useSpaces } from 'hooks/useSpaces';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { useUser } from 'hooks/useUser';
+import { count } from 'lib/metrics';
 
 export default function LoginPage () {
   const { account } = useWeb3React();
@@ -29,16 +30,20 @@ export default function LoginPage () {
   function redirectUserAfterLogin () {
     if (typeof router.query.returnUrl === 'string') {
       router.push(router.query.returnUrl);
+      count('tst_index_returnUrl', 1);
     }
     else if (defaultWorkspace === '/nexus') {
       router.push('/nexus');
+      count('tst_index_nexus', 1);
     }
     else if (spaces.length > 0) {
       const isValidDefaultWorkspace = !!defaultWorkspace && spaces.some(space => defaultWorkspace.startsWith(`/${space.domain}`));
       router.push(isValidDefaultWorkspace ? defaultWorkspace : `/${spaces[0].domain}`);
+      count('tst_index_get_default_workspace', 1);
     }
     else {
       router.push('/signup');
+      count('tst_get_signup', 1);
     }
   }
 
@@ -47,9 +52,11 @@ export default function LoginPage () {
     if (isDataLoaded) {
       // redirect once account exists (user has connected wallet)
       if (account || user) {
+        count('tst_redirect_login', 1);
         redirectUserAfterLogin();
       }
       else {
+        count('tst_show_login', 1);
         setShowLogin(true);
       }
     }
