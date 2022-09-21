@@ -1,4 +1,4 @@
-import type { Page } from '@prisma/client';
+import type { Page, ProposalStatus } from '@prisma/client';
 import { prisma } from 'db';
 import { v4 } from 'uuid';
 
@@ -8,6 +8,7 @@ export async function createProposal (input: Pick<Page, 'createdBy' | 'path' | '
 
   // Making the page id same as proposalId
   const proposalId = v4();
+  const proposalStatus: ProposalStatus = 'private_draft';
 
   // Using a transaction to ensure both the proposal and page gets created together
   const [proposal, page, workspaceEvent] = await prisma.$transaction([
@@ -17,7 +18,7 @@ export async function createProposal (input: Pick<Page, 'createdBy' | 'path' | '
         createdBy,
         id: proposalId,
         spaceId,
-        status: 'private_draft',
+        status: proposalStatus,
         authors: {
           create: {
             userId: createdBy
@@ -36,7 +37,10 @@ export async function createProposal (input: Pick<Page, 'createdBy' | 'path' | '
     }),
     prisma.workspaceEvent.create({
       data: {
-        type: 'proposal_create',
+        type: 'proposal_status_change',
+        meta: {
+          newStatus: proposalStatus
+        },
         actorId: createdBy,
         pageId: proposalId,
         spaceId

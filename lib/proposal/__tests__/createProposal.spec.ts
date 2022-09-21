@@ -44,7 +44,7 @@ describe('Creates a page and proposal with relevant configuration', () => {
     }));
 
     expect(workspaceEvent).toMatchObject(expect.objectContaining({
-      type: 'proposal_create'
+      type: 'proposal_status_change'
     }));
   });
 });
