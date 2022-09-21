@@ -6,12 +6,13 @@ import Button from 'components/common/Button';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ProposalStatusChip } from 'components/proposals/components/ProposalStatusBadge';
-import type { ProposalTask } from 'lib/proposal/getProposalTasks';
+import type { ProposalTask, ProposalTaskAction } from 'lib/proposal/getProposalTasks';
 import { useEffect } from 'react';
 import type { KeyedMutator } from 'swr';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
+import { useUser } from 'hooks/useUser';
 
-const ProposalActionRecord: Record<ProposalTask['action'], string> = {
+const ProposalActionRecord: Record<ProposalTaskAction, string> = {
   discuss: 'Discuss',
   start_discussion: 'To discuss',
   review: 'Review',
@@ -33,7 +34,7 @@ export function ProposalTasksListRow (
       action,
       status
     }
-  }: {proposalTask: ProposalTask}
+  }: { proposalTask: ProposalTask }
 ) {
   const proposalLink = `/${spaceDomain}/${pagePath}`;
   const proposalLocation = spaceName;
@@ -102,7 +103,7 @@ export function ProposalTasksListRow (
                 textAlign: 'center'
               }}
               href={proposalLink}
-            >{ProposalActionRecord[action]}
+            >{action ? ProposalActionRecord[action] : 'No action'}
             </Button>
           </Grid>
         </Grid>
@@ -115,17 +116,18 @@ export default function ProposalTasksList ({
   tasks,
   error,
   mutateTasks
-} : {
+}: {
   mutateTasks: KeyedMutator<GetTasksResponse>
   error: any
   tasks: GetTasksResponse | undefined
 }) {
   const proposals = tasks?.proposals ? [...tasks.proposals.marked, ...tasks.proposals.unmarked] : [];
+  const { user } = useUser();
 
   useEffect(() => {
     async function main () {
-      if (tasks?.proposals && tasks.proposals.unmarked.length !== 0) {
-        await charmClient.markTasks(tasks.proposals.unmarked.map(proposal => ({ id: `${proposal.id}.${proposal.status}`, type: 'proposal' })));
+      if (user && tasks?.proposals && tasks.proposals.unmarked.length !== 0) {
+        await charmClient.markTasks(tasks.proposals.unmarked.map(proposal => ({ id: `${proposal.id}.${user.id}`, type: 'proposal' })));
         mutateTasks((_tasks) => {
           const unmarked = _tasks?.proposals.unmarked ?? [];
           return _tasks ? {
@@ -141,7 +143,7 @@ export default function ProposalTasksList ({
       }
     }
     main();
-  }, [tasks]);
+  }, [tasks, user]);
 
   if (error) {
     return (

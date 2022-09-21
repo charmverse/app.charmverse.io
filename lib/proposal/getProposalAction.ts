@@ -2,20 +2,14 @@ import type { ProposalStatus } from '@prisma/client';
 import type { ProposalTask } from './getProposalTasks';
 
 export function getProposalAction ({
-  authors,
+  isAuthor,
   currentStatus,
-  reviewers,
-  userId,
-  userRoleIds
+  isReviewer
 }: {
   currentStatus: ProposalStatus,
-  authors: string[],
-  reviewers: string[],
-  userId: string,
-  userRoleIds: string[]
+  isAuthor: boolean
+  isReviewer: boolean
 }): ProposalTask['action'] | null {
-  const isAuthor = authors.includes(userId);
-  const isReviewer = reviewers.some(reviewer => userRoleIds.includes(reviewer) || reviewer === userId);
 
   if (currentStatus === 'discussion') {
     if (isAuthor) {

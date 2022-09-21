@@ -3,9 +3,11 @@ import { prisma } from 'db';
 import { isTruthy } from 'lib/utilities/types';
 import { getProposalAction } from './getProposalAction';
 
+export type ProposalTaskAction = 'start_discussion' | 'start_vote' | 'review' | 'discuss' | 'vote' | 'start_review';
+
 export interface ProposalTask {
   id: string
-  action: 'start_discussion' | 'start_vote' | 'review' | 'discuss' | 'vote' | 'start_review' | null
+  action: ProposalTaskAction | null
   spaceDomain: string
   spaceName: string
   pageTitle: string
@@ -28,7 +30,9 @@ export function extractProposalData (proposal: Proposal & {
   } : null;
 }
 
-function sortProposals (proposals: ProposalTask[], workspaceEventsRecord: Record<string, Pick<WorkspaceEvent, 'id' | 'pageId' | 'createdAt' | 'meta'>>) {
+type WorkspaceEventRecord = Record<string, Pick<WorkspaceEvent, 'id' | 'pageId' | 'createdAt' | 'meta'> | null>
+
+function sortProposals (proposals: ProposalTask[], workspaceEventsRecord: WorkspaceEventRecord) {
   proposals.sort((proposalA, proposalB) => {
     const proposalALastUpdatedDate = workspaceEventsRecord[proposalA.id]?.createdAt;
     const proposalBLastUpdatedDate = workspaceEventsRecord[proposalB.id]?.createdAt;
@@ -68,7 +72,7 @@ export async function getProposalTasks (userId: string): Promise<{
   });
 
   // Ensures we only track the latest status change for each proposal
-  const workspaceEventsRecord = workspaceEvents.reduce<Record<string, Pick<WorkspaceEvent, 'pageId' | 'createdAt' | 'meta' | 'id'>>>((record, workspaceEvent) => {
+  const workspaceEventsRecord = workspaceEvents.reduce<WorkspaceEventRecord>((record, workspaceEvent) => {
     if (!record[workspaceEvent.pageId]) {
       record[workspaceEvent.pageId] = workspaceEvent;
     }
@@ -126,20 +130,23 @@ export async function getProposalTasks (userId: string): Promise<{
   };
 
   proposals.forEach(proposal => {
-    if (proposal.page) {
-      const workspaceEvent = workspaceEventsRecord[proposal.id];
+    const workspaceEvent = workspaceEventsRecord[proposal.id];
+    const isReviewer = proposal.reviewers.some(reviewer => reviewer.roleId ? roleIds.includes(reviewer.roleId) : reviewer.userId === userId);
+    const isAuthor = proposal.authors.some(author => author.userId === userId);
+    if (proposal.status.match(/draft/) && !isAuthor) {
+      // No-op
+    }
+    else if (proposal.page) {
       const action = getProposalAction(
         {
           currentStatus: proposal.status,
-          authors: proposal.authors.map(author => author.userId),
-          reviewers: proposal.reviewers.map(reviewer => (reviewer.userId || reviewer.roleId) as string),
-          userId,
-          userRoleIds: roleIds
+          isAuthor,
+          isReviewer
         }
       );
 
       const proposalTask = {
-        id: workspaceEvent.id,
+        id: workspaceEvent?.id ?? proposal.id,
         pagePath: (proposal.page as Page).path,
         pageTitle: (proposal.page as Page).title,
         spaceDomain: proposal.space.domain,
@@ -148,7 +155,7 @@ export async function getProposalTasks (userId: string): Promise<{
         action
       };
 
-      if (!userNotificationIds.has(workspaceEvent.id)) {
+      if (workspaceEvent && !userNotificationIds.has(`${workspaceEvent.id}.${userId}`)) {
         proposalsRecord.unmarked.push(proposalTask);
       }
       else {
