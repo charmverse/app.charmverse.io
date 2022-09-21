@@ -50,6 +50,7 @@ export async function getProposalTasks (userId: string): Promise<ProposalTask[]>
     }
   });
 
+  // Ensures we only track the latest status change for each proposal
   const workspaceEventsRecord = workspaceEvents.reduce<Record<string, Pick<WorkspaceEvent, 'pageId' | 'createdAt' | 'meta'>>>((record, workspaceEvent) => {
     if (!record[workspaceEvent.pageId]) {
       record[workspaceEvent.pageId] = workspaceEvent;
@@ -57,7 +58,7 @@ export async function getProposalTasks (userId: string): Promise<ProposalTask[]>
     return record;
   }, {});
 
-  const proposalTasks = await prisma.proposal.findMany({
+  const proposals = await prisma.proposal.findMany({
     where: {
       page: {
         deletedAt: null
@@ -151,9 +152,9 @@ export async function getProposalTasks (userId: string): Promise<ProposalTask[]>
     }
   });
 
-  return proposalTasks.map(proposal => {
+  return proposals.map(proposal => {
     if (proposal.status === 'discussion') {
-      return proposal.authors.map(author => author.userId === userId) ? extractProposalData(proposal, 'start_review') : extractProposalData(proposal, 'discuss');
+      return proposal.authors.some(author => author.userId === userId) ? extractProposalData(proposal, 'start_review') : extractProposalData(proposal, 'discuss');
     }
     return extractProposalData(proposal, StatusActionRecord[proposal.status as keyof typeof StatusActionRecord]);
   }).filter(isTruthy).sort((proposalA, proposalB) => {
