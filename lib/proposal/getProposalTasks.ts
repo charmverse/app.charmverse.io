@@ -94,7 +94,7 @@ export async function getProposalTasks (userId: string): Promise<ProposalTask[]>
           // Only fetch vote active proposal tasks if the user haven't casted a vote yet
           page: {
             votes: {
-              some: {
+              every: {
                 context: 'proposal',
                 userVotes: {
                   none: {
