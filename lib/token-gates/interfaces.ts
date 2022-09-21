@@ -1,5 +1,5 @@
-import { Role, Space, TokenGate, TokenGateToRole } from '@prisma/client';
-import { AuthSig, Chain } from 'lit-js-sdk';
+import type { Role, Space, TokenGate, TokenGateToRole } from '@prisma/client';
+import type { AuthSig, Chain } from 'lit-js-sdk';
 
 /**
  * @extraData Contains the tokenGate Id as stringified JSON

@@ -2,7 +2,7 @@
 import Typography from '@mui/material/Typography';
 import { useFocalboardViews } from 'hooks/useFocalboardViews';
 import useRefState from 'hooks/useRefState';
-import { Page } from 'models';
+import type { Page } from 'models';
 import { useCallback, useRef, memo, useEffect } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { greyColor2 } from 'theme/colors';

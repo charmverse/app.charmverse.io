@@ -1,7 +1,7 @@
-import { Application } from '@prisma/client';
+import type { Application } from '@prisma/client';
 import { prisma } from 'db';
 import { DataNotFoundError, StringTooShortError } from 'lib/utilities/errors';
-import { ApplicationUpdateData } from '../interfaces';
+import type { ApplicationUpdateData } from '../interfaces';
 import { MINIMUM_APPLICATION_MESSAGE_CHARACTERS } from '../shared';
 
 export async function updateApplication ({ applicationId, message }: ApplicationUpdateData): Promise<Application> {

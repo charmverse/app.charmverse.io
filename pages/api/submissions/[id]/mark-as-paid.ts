@@ -1,5 +1,5 @@
 
-import { Application } from '@prisma/client';
+import type { Application } from '@prisma/client';
 import { prisma } from 'db';
 import { markSubmissionAsPaid } from 'lib/applications/actions/markSubmissionAsPaid';
 import { rollupBountyStatus } from 'lib/bounties/rollupBountyStatus';
@@ -7,7 +7,7 @@ import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

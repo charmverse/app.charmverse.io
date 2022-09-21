@@ -1,6 +1,6 @@
-import { Schema, MarkType, Node } from '@bangle.dev/pm';
+import type { MarkType, Node, Schema } from '@bangle.dev/pm';
+import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import { findChildrenByMark, findChildrenByType } from 'prosemirror-utils';
-import { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 
 export function findTotalInlineComments (
   schema: Schema,

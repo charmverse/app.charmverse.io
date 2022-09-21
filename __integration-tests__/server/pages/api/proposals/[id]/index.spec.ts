@@ -1,11 +1,11 @@
-import { Space, User } from '@prisma/client';
+import type { Space, User } from '@prisma/client';
+import { prisma } from 'db';
 import { upsertPermission } from 'lib/permissions/pages';
-import { ProposalWithUsers } from 'lib/proposal/interface';
+import type { ProposalWithUsers } from 'lib/proposal/interface';
 import request from 'supertest';
 import { baseUrl } from 'testing/mockApiCall';
 import { createProposalWithUsers, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
-import { prisma } from 'db';
 
 let author: User;
 let reviewer: User;

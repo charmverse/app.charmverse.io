@@ -1,5 +1,6 @@
 
-import { DateTime, DateTimeUnit as LuxonTimeUnit } from 'luxon';
+import type { DateTimeUnit as LuxonTimeUnit } from 'luxon';
+import { DateTime } from 'luxon';
 
 export type DateInput = DateTime | Date | string | number;
 

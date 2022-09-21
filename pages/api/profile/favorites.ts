@@ -1,11 +1,11 @@
 
-import { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { withSessionRoute } from 'lib/session/withSession';
 import { sessionUserRelations } from 'lib/session/config';
-import { LoggedInUser } from 'models';
+import { withSessionRoute } from 'lib/session/withSession';
+import type { LoggedInUser } from 'models';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

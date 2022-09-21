@@ -1,4 +1,5 @@
-import { Command, EditorState, toggleMark } from '@bangle.dev/pm';
+import type { Command, EditorState } from '@bangle.dev/pm';
+import { toggleMark } from '@bangle.dev/pm';
 import { filter, isMarkActiveInSelection } from '@bangle.dev/utils';
 import { createHighlightDomElement } from 'lib/browser';
 import { markName } from './inlineComment.constants';

@@ -1,8 +1,8 @@
-import { ProposalStatus } from '@prisma/client';
+import type { ProposalStatus } from '@prisma/client';
 import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
 import { MissingDataError } from 'lib/utilities/errors';
-import { ProposalWithUsers } from './interface';
+import type { ProposalWithUsers } from './interface';
 import { proposalStatusTransitionRecord } from './proposalStatusTransition';
 import { generateSyncProposalPermissions } from './syncProposalPermissions';
 

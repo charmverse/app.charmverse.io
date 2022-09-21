@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable no-use-before-define */
-import { Space, User } from '@prisma/client';
+import type { Space, User } from '@prisma/client';
 import { prisma } from 'db';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { getSpacePublicInfo } from '../getSpacePublicInfo';

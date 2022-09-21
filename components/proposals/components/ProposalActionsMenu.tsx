@@ -4,7 +4,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { IconButton, ListItemText, Menu, MenuItem } from '@mui/material';
 import useTasks from 'components/nexus/hooks/useTasks';
 import { useUser } from 'hooks/useUser';
-import { ProposalWithUsers } from 'lib/proposal/interface';
+import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 
 interface VoteActionsProps {

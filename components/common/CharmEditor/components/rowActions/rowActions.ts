@@ -1,6 +1,7 @@
 
 import { createElement } from '@bangle.dev/core';
-import { EditorView, Plugin, PluginKey } from '@bangle.dev/pm';
+import type { EditorView, PluginKey } from '@bangle.dev/pm';
+import { Plugin } from '@bangle.dev/pm';
 import { NodeSelection } from 'prosemirror-state';
 // @ts-ignore
 import { __serializeForClipboard as serializeForClipboard } from 'prosemirror-view';

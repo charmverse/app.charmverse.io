@@ -1,29 +1,31 @@
 
-import { ethers } from 'ethers';
-import { Modal, DialogTitle } from 'components/common/Modal';
-import Button from 'components/common/Button';
-import Box from '@mui/material/Box';
-import charmClient from 'charmClient';
-import { bindTrigger, bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
-import { MetaTransactionData } from '@gnosis.pm/safe-core-sdk-types';
-import { useBounties } from 'hooks/useBounties';
-import { eToNumber } from 'lib/utilities/numbers';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useEffect, useMemo, useState } from 'react';
+import type { MetaTransactionData } from '@gnosis.pm/safe-core-sdk-types';
 import { Checkbox, List, ListItem, Tooltip, Typography } from '@mui/material';
-import UserDisplay from 'components/common/UserDisplay';
-import { useContributors } from 'hooks/useContributors';
-import { BountyWithDetails } from 'models';
-import { Bounty } from '@prisma/client';
-import { getChainById } from 'connectors';
-import useGnosisSigner from 'hooks/useWeb3Signer';
+import Box from '@mui/material/Box';
+import type { Bounty } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
-import useSWR from 'swr';
-import { getSafesForAddress, SafeData } from 'lib/gnosis';
+import charmClient from 'charmClient';
+import Button from 'components/common/Button';
+import { DialogTitle, Modal } from 'components/common/Modal';
+import UserDisplay from 'components/common/UserDisplay';
+import { getChainById } from 'connectors';
+import { ethers } from 'ethers';
+import { useBounties } from 'hooks/useBounties';
+import { useContributors } from 'hooks/useContributors';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import useGnosisSigner from 'hooks/useWeb3Signer';
+import type { SafeData } from 'lib/gnosis';
+import { getSafesForAddress } from 'lib/gnosis';
+import { eToNumber } from 'lib/utilities/numbers';
 import { shortenHex } from 'lib/utilities/strings';
 import { isTruthy } from 'lib/utilities/types';
-import MultiPaymentButton, { MultiPaymentResult } from './MultiPaymentButton';
+import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import type { BountyWithDetails } from 'models';
+import { useEffect, useMemo, useState } from 'react';
+import useSWR from 'swr';
 import { BountyAmount } from './BountyStatusBadge';
+import type { MultiPaymentResult } from './MultiPaymentButton';
+import MultiPaymentButton from './MultiPaymentButton';
 
 interface TransactionWithMetadata extends MetaTransactionData, Pick<Bounty, 'rewardToken' | 'rewardAmount' | 'chainId'>{
   applicationId: string

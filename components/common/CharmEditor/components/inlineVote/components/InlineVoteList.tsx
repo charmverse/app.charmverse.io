@@ -1,4 +1,4 @@
-import { Mark, MarkType, PluginKey } from '@bangle.dev/pm';
+import type { Mark, MarkType, PluginKey } from '@bangle.dev/pm';
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 
 import { Box } from '@mui/system';
@@ -6,7 +6,8 @@ import { Modal } from 'components/common/Modal';
 import { useVotes } from 'hooks/useVotes';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { findChildrenByMark, NodeWithPos } from 'prosemirror-utils';
+import type { NodeWithPos } from 'prosemirror-utils';
+import { findChildrenByMark } from 'prosemirror-utils';
 import { useEffect, useRef } from 'react';
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import VoteDetail from './VoteDetail';

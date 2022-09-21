@@ -1,4 +1,5 @@
-import { Vote, UserVote, VoteOptions, VoteType } from '@prisma/client';
+import type { Vote, UserVote, VoteOptions } from '@prisma/client';
+import { VoteType } from '@prisma/client';
 
 const YES_OPTION = 'Yes';
 

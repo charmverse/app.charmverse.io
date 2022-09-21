@@ -1,6 +1,8 @@
 
-import { Block, createBlock } from './block';
-import { FilterGroup, createFilterGroup } from './filterGroup';
+import type { Block } from './block';
+import { createBlock } from './block';
+import type { FilterGroup } from './filterGroup';
+import { createFilterGroup } from './filterGroup';
 
 type IViewType = 'board' | 'table' | 'gallery' | 'calendar'
 type ISortOption = { propertyId: '__title' | string, reversed: boolean }

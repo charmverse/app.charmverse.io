@@ -1,12 +1,12 @@
 
+import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import { ModalProps } from 'components/common/Modal';
 import charmClient from 'charmClient';
-import Alert from '@mui/material/Alert';
-import { useBounties } from 'hooks/useBounties';
+import type { ModalProps } from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import { useBounties } from 'hooks/useBounties';
+import { usePaymentMethods } from 'hooks/usePaymentMethods';
 
 type IProps = Pick<ModalProps, 'onClose' | 'open'> & {
   paymentMethodIdToDelete: string | null;

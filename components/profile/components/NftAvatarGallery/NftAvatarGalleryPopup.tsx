@@ -1,9 +1,8 @@
-import React from 'react';
+import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import { useMyNfts } from 'hooks/useMyNfts';
-import { Dialog, DialogTitle, DialogContent } from '@mui/material';
 
-import { NftData } from 'lib/blockchain/interfaces';
 import { useUser } from 'hooks/useUser';
+import type { NftData } from 'lib/blockchain/interfaces';
 import NftAvatarGallery from './NftAvatarGallery';
 
 type Props = {

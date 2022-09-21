@@ -1,10 +1,11 @@
-import { User, Space, ProposalStatus } from '@prisma/client';
+import type { User, Space, ProposalStatus } from '@prisma/client';
 import { createProposalWithUsers, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
-import { getPage, IPageWithPermissions } from 'lib/pages/server';
+import type { IPageWithPermissions } from 'lib/pages/server';
+import { getPage } from 'lib/pages/server';
 import { updateProposal } from '../updateProposal';
-import { ProposalWithUsers } from '../interface';
+import type { ProposalWithUsers } from '../interface';
 import { proposalPermissionMapping } from '../syncProposalPermissions';
 
 let author1: User;

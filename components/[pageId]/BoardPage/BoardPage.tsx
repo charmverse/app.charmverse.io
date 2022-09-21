@@ -1,10 +1,7 @@
-import { getUriWithParam } from 'lib/utilities/strings';
-import { Page } from 'models';
-import { useRouter } from 'next/router';
-import { useCallback, useEffect, useState } from 'react';
-import { useHotkeys } from 'react-hotkeys-hook';
+import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import CenterPanel from 'components/common/BoardEditor/focalboard/src/components/centerPanel';
-import { sendFlashMessage, FlashMessages } from 'components/common/BoardEditor/focalboard/src/components/flashMessages';
+import { FlashMessages, sendFlashMessage } from 'components/common/BoardEditor/focalboard/src/components/flashMessages';
+import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { getCurrentBoard, setCurrent as setCurrentBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { getClientConfig } from 'components/common/BoardEditor/focalboard/src/store/clientConfig';
@@ -12,12 +9,15 @@ import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/fo
 import { initialReadOnlyLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { getCurrentBoardViews, getView, setCurrent as setCurrentView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
-import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
-import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
-import { silentlyUpdateURL } from 'lib/browser';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
-import { usePages } from 'hooks/usePages';
-import { IPagePermissionFlags } from 'lib/permissions/pages';
+import { silentlyUpdateURL } from 'lib/browser';
+import type { IPagePermissionFlags } from 'lib/permissions/pages';
+import { getUriWithParam } from 'lib/utilities/strings';
+import type { Page } from 'models';
+import { useRouter } from 'next/router';
+import { useCallback, useEffect, useState } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
+
 /**
  *
  * For the original version of this file, see src/boardPage.tsx in focalboard

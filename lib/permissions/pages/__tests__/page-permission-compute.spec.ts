@@ -1,9 +1,10 @@
 
-import { PageOperations, PagePermissionLevel, User } from '@prisma/client';
+import type { PagePermissionLevel, User } from '@prisma/client';
+import { PageOperations } from '@prisma/client';
 import { computeUserPagePermissions, permissionTemplates, upsertPermission } from 'lib/permissions/pages';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
-import { PageOperationType } from '../page-permission-interfaces';
+import type { PageOperationType } from '../page-permission-interfaces';
 
 let user: User;
 

@@ -6,7 +6,7 @@ import { BackIcon } from 'components/common/Icons/BackIcon';
 import { DocumentPageIcon } from 'components/common/Icons/DocumentPageIcon';
 import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { IPageWithPermissions } from 'lib/pages';
+import type { IPageWithPermissions } from 'lib/pages';
 
 const StyledPageTemplateBanner = styled(Box)<{card?: boolean}>`
 

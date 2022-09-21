@@ -1,5 +1,5 @@
-import { RawSpecs } from '@bangle.dev/core';
-import { DOMOutputSpec } from '@bangle.dev/pm';
+import type { RawSpecs } from '@bangle.dev/core';
+import type { DOMOutputSpec } from '@bangle.dev/pm';
 import { markName } from './inlineVote.constants';
 
 export function spec (): RawSpecs {

@@ -1,4 +1,4 @@
-import { UserPermissionFlags } from './interfaces';
+import type { UserPermissionFlags } from './interfaces';
 
 /**
  * Defines each operation as a member property queryable as true / false

@@ -1,11 +1,12 @@
 
-import { Page } from '@prisma/client';
+import type { Page } from '@prisma/client';
 import { prisma } from 'db';
 import { hasAccessToSpace, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { getPage, IPageWithPermissions } from 'lib/pages/server';
+import type { IPageWithPermissions } from 'lib/pages/server';
+import { getPage } from 'lib/pages/server';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

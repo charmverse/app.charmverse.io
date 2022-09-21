@@ -1,13 +1,15 @@
+import type { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
+import { getPendingGnosisTasks } from 'lib/gnosis/gnosis.tasks';
+import type { MentionedTasksGroup } from 'lib/mentions/getMentionedTasks';
+import { getMentionedTasks } from 'lib/mentions/getMentionedTasks';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { withSessionRoute } from 'lib/session/withSession';
-import { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-import { getPendingGnosisTasks, GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
-import { getMentionedTasks, MentionedTasksGroup } from 'lib/mentions/getMentionedTasks';
-import { getVoteTasks } from 'lib/votes/getVoteTasks';
-import { VoteTask } from 'lib/votes/interfaces';
-import { getProposalTasks } from 'lib/proposal/getProposalTasks';
 import type { ProposalTask } from 'lib/proposal/getProposalTasks';
+import { getProposalTasks } from 'lib/proposal/getProposalTasks';
+import { withSessionRoute } from 'lib/session/withSession';
+import { getVoteTasks } from 'lib/votes/getVoteTasks';
+import type { VoteTask } from 'lib/votes/interfaces';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

@@ -1,13 +1,14 @@
-import { useEffect, useMemo, useState } from 'react';
-import { ScrollableModal } from 'components/common/Modal';
-import { GetGuildsResponse, guild, user } from '@guildxyz/sdk';
-import { Autocomplete, Box, MenuItem, TextField, Typography } from '@mui/material';
+import type { GetGuildsResponse } from '@guildxyz/sdk';
+import { guild, user } from '@guildxyz/sdk';
+import { Box, MenuItem, Typography } from '@mui/material';
 import charmClient from 'charmClient';
+import { ScrollableModal } from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { mutate } from 'swr';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import GuildXYZIcon from 'public/images/guild_logo.svg';
-import { useSnackbar } from 'hooks/useSnackbar';
+import { useEffect, useState } from 'react';
+import { mutate } from 'swr';
 import { PimpedButton, StyledSpinner } from '../../../common/Button';
 import GuildsAutocomplete from './GuildsAutocomplete';
 

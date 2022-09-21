@@ -1,11 +1,11 @@
 
-import { BountyPermission, BountyPermissionLevel, Space, User } from '@prisma/client';
+import type { BountyPermission, BountyPermissionLevel, Space, User } from '@prisma/client';
 import { prisma } from 'db';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { generateBounty, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { addBountyPermissionGroup } from '../addBountyPermissionGroup';
-import { BountyPermissionAssignment, BulkBountyPermissionAssignment } from '../interfaces';
+import type { BountyPermissionAssignment, BulkBountyPermissionAssignment } from '../interfaces';
 import { queryBountyPermissions } from '../queryBountyPermissions';
 import { setBountyPermissions } from '../setBountyPermissions';
 

@@ -1,10 +1,7 @@
 /* eslint-disable camelcase */
-import { Pages } from '@mui/icons-material';
-import { Page, Space, User } from '@prisma/client';
-import { generatePageNode, generatePageToCreateStub } from 'testing/generate-stubs';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { PageNode, PageNodeWithChildren } from '../interfaces';
-import { mapTargetPageTree, mapPageTree, reducePagesToPageTree } from '../mapPageTree';
+import { generatePageNode } from 'testing/generate-stubs';
+import type { PageNode, PageNodeWithChildren } from '../interfaces';
+import { mapPageTree, mapTargetPageTree, reducePagesToPageTree } from '../mapPageTree';
 
 const root_1 = generatePageNode({
   parentId: null,

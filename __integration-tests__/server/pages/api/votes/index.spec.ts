@@ -1,4 +1,4 @@
-import { Page, Space, User, Vote } from '@prisma/client';
+import type { Page, Space, User, Vote } from '@prisma/client';
 import { addSpaceOperations } from 'lib/permissions/spaces';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';

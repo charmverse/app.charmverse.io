@@ -1,5 +1,5 @@
-import { PagePermission } from '@prisma/client';
-import { IPagePermissionToCreate } from '../page-permission-interfaces';
+import type { PagePermission } from '@prisma/client';
+import type { IPagePermissionToCreate } from '../page-permission-interfaces';
 
 /**
  * Given a list of permissions and a permission, find a permission in the list that targets that group

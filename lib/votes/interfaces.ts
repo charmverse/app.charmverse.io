@@ -1,4 +1,4 @@
-import { Page, Space, User, UserVote, Vote, VoteOptions } from '@prisma/client';
+import type { Page, Space, User, UserVote, Vote, VoteOptions } from '@prisma/client';
 
 export const DEFAULT_THRESHOLD = 50;
 

@@ -8,12 +8,13 @@ import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/sto
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { getViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useRouter } from 'next/router';
-import { IntlShape, useIntl } from 'react-intl';
+import type { IntlShape } from 'react-intl';
+import { useIntl } from 'react-intl';
 import { usePages } from 'hooks/usePages';
 import { isTruthy } from 'lib/utilities/types';
-import { Board } from 'components/common/BoardEditor/focalboard/src/blocks/board';
-import { BoardView } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
-import { Card } from 'components/common/BoardEditor/focalboard/src/blocks/card';
+import type { Board } from 'components/common/BoardEditor/focalboard/src/blocks/board';
+import type { BoardView } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
+import type { Card } from 'components/common/BoardEditor/focalboard/src/blocks/card';
 import { sendFlashMessage } from 'components/common/BoardEditor/focalboard/src/components/flashMessages';
 import { CsvExporter } from 'components/common/BoardEditor/focalboard/src/csvExporter';
 

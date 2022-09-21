@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Space, SpaceApiToken, User } from '@prisma/client';
+import type { Space, SpaceApiToken, User } from '@prisma/client';
 import { prisma } from 'db';
 import { ExpectedAnError } from 'testing/errors';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
@@ -8,7 +8,7 @@ import { InvalidInputError } from 'lib/utilities/errors';
 import { createDatabase, createDatabaseCardPage } from '../createDatabaseCardPage';
 import { DatabasePageNotFoundError, PageNotFoundError } from '../errors';
 import { getDatabaseRoot, getPageInBoard } from '../getPageInBoard';
-import { DatabasePage, Page } from '../interfaces';
+import type { DatabasePage, Page } from '../interfaces';
 
 let user: User;
 let space: Space;

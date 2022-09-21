@@ -6,12 +6,12 @@ import { useIntl } from 'react-intl';
 import CardIcon from '../../widgets/icons/card';
 import Menu from '../../widgets/menu';
 
-import MenuWrapper from '../../widgets/menuWrapper';
-import OptionsIcon from '../../widgets/icons/options';
+import { BoardView } from '../../blocks/boardView';
+import mutator from '../../mutator';
 import IconButton from '../../widgets/buttons/iconButton';
 import CheckIcon from '../../widgets/icons/check';
-import mutator from '../../mutator';
-import { BoardView } from '../../blocks/boardView';
+import OptionsIcon from '../../widgets/icons/options';
+import MenuWrapper from '../../widgets/menuWrapper';
 
 type Props = {
     addCard: () => void

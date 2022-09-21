@@ -1,17 +1,19 @@
-import { useState, ReactNode } from 'react';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import Link from 'next/link';
-import { Box, Stack, SvgIcon, Tooltip, Typography } from '@mui/material';
-import Button from 'components/common/Button';
-import { Modal, DialogTitle } from 'components/common/Modal';
-import DiscordIcon from 'public/images/discord_logo.svg';
-import MetamaskIcon from 'public/images/metamask.svg';
-import IconButton from '@mui/material/IconButton';
+import PersonIcon from '@mui/icons-material/Person';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import TelegramIcon from '@mui/icons-material/Telegram';
-import PersonIcon from '@mui/icons-material/Person';
-import { IdentityType, IDENTITY_TYPES } from 'models';
+import { Box, SvgIcon, Tooltip, Typography } from '@mui/material';
+import IconButton from '@mui/material/IconButton';
+import Button from 'components/common/Button';
+import { DialogTitle, Modal } from 'components/common/Modal';
 import randomName from 'lib/utilities/randomName';
+import type { IdentityType } from 'models';
+import { IDENTITY_TYPES } from 'models';
+import Link from 'next/link';
+import DiscordIcon from 'public/images/discord_logo.svg';
+import MetamaskIcon from 'public/images/metamask.svg';
+import type { ReactNode } from 'react';
+import { useState } from 'react';
 import Integration from './Integration';
 
 export type IntegrationModel = {

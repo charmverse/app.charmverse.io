@@ -1,6 +1,6 @@
 import { prisma } from 'db';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
-import { CommentCreate, CommentWithUser } from './interfaces';
+import type { CommentCreate, CommentWithUser } from './interfaces';
 
 export async function addComment ({ content, threadId, userId }: CommentCreate): Promise<CommentWithUser> {
 

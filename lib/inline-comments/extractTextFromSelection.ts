@@ -1,6 +1,6 @@
-import { EditorView } from '@bangle.dev/pm';
-import { Page } from '@prisma/client';
-import { Contributor } from 'models/User';
+import type { EditorView } from '@bangle.dev/pm';
+import type { Page } from '@prisma/client';
+import type { Contributor } from 'models/User';
 
 export function extractTextFromSelection (view: EditorView, contributors: Contributor[], pages: Record<string, Page | undefined>) {
   // Get the context from current selection

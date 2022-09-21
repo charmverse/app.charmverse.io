@@ -2,7 +2,8 @@
 
 import * as React from 'react';
 import clsx from 'clsx';
-import { TreeItemContentProps, useTreeItem } from '@mui/lab/TreeItem';
+import type { TreeItemContentProps } from '@mui/lab/TreeItem';
+import { useTreeItem } from '@mui/lab/TreeItem';
 
 const TreeItemContent = React.forwardRef<HTMLDivElement, TreeItemContentProps>((props, ref) => {
   const {

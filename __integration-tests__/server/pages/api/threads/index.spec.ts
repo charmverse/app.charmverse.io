@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Space, Thread, User } from '@prisma/client';
-import { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads';
+import type { Space, Thread, User } from '@prisma/client';
+import type { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
