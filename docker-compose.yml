@@ -13,11 +13,34 @@ services:
     environment:
       DATABASE_URL: "postgres://${DB_USER}:${DB_PASSWD}@${DB_HOSTNAME}:5432/${DB_NAME}"
     profiles:
-      - dev
       - stg
       - tst
       - prd
       - webapp
+
+  devapp:
+    build:
+      context: .
+    ports:
+      - "80:3000"
+    command: [ "npm", "run", "start" ]
+    volumes:
+      - $PWD:/app
+    env_file:
+      - ".env"
+    depends_on:
+      - localpostgres
+    profiles:
+      - dev
+
+  localpostgres:
+    image: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ${LOCAL_DATA_DIR:-/home/postgresql}:/var/lib/postgresql/
+    profiles:
+      - dev
 
   datadog-agent:
     image: public.ecr.aws/datadog/agent
@@ -36,7 +59,8 @@ services:
       DD_SITE: "datadoghq.com"
       DD_APM_ENABLED: "true"
       DD_APM_NON_LOCAL_TRAFFIC: "true"
-      DD_ENV: "${SERVICE_ENV}"
+      DD_ENV: "${SERVICE_ENV:-tst}"
     profiles:
       - prd
       - tst
+      - datadogtst
