@@ -138,6 +138,7 @@ export default function NewProposalButton ({ mutateProposals }: {mutateProposals
         deleteTemplate={deleteProposalTemplate}
         pages={proposalTemplates}
         anchorEl={buttonRef.current as Element}
+        boardTitle='Proposals'
         popupState={popupState}
         enableItemOptions={isAdmin}
       />

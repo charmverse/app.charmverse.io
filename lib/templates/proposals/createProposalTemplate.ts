@@ -27,7 +27,7 @@ export async function createProposalTemplate ({
       path: getPagePath(),
       content: pageContent?.content,
       contentText: pageContent?.contentText ?? '',
-      title: pageContent?.title ?? 'Untitled',
+      title: pageContent?.title ?? '',
       updatedBy: userId,
       author: {
         connect: {

@@ -1,31 +1,34 @@
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { IconButton } from '@mui/material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
-import type { Page } from '@prisma/client';
 import { DeleteIcon } from 'components/common/Icons/DeleteIcon';
 import { EditIcon } from 'components/common/Icons/EditIcon';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 
 type Props = {
-  deleteTemplate: (pageId: string) => void
-  editTemplate: (showPage: string) => void
-  page: Page
-  isDefaultTemplate?: boolean
+  deleteTemplate: (pageId: string) => void;
+  editTemplate: (showPage: string) => void;
+  pageId: string;
+  closeParentPopup: () => void;
+  isDefaultTemplate?: boolean;
 }
 
-export function TemplatePageMenuActions ({ deleteTemplate, page, editTemplate, isDefaultTemplate }: Props) {
+export function TemplatePageMenuActions ({ deleteTemplate, closeParentPopup, pageId, editTemplate, isDefaultTemplate }: Props) {
 
-  const popupState = usePopupState({ variant: 'popover', popupId: `template-context-${page?.id}` });
+  const popupState = usePopupState({ variant: 'popover', popupId: `template-context-${pageId}` });
 
   return (
     <>
-      <MoreHorizIcon {...bindTrigger(popupState)} />
+      <IconButton size='small' {...bindTrigger(popupState)}><MoreHorizIcon /></IconButton>
+
       <Menu {...bindMenu(popupState)} open={popupState.isOpen}>
         <MenuItem onClick={(e) => {
           e.stopPropagation();
           popupState.close();
-          editTemplate(page.id);
+          closeParentPopup();
+          editTemplate(pageId);
         }}
         >
           <EditIcon fontSize='small' />
@@ -37,7 +40,8 @@ export function TemplatePageMenuActions ({ deleteTemplate, page, editTemplate, i
         <MenuItem onClick={(e) => {
           e.stopPropagation();
           popupState.close();
-          deleteTemplate(page.id);
+          closeParentPopup();
+          deleteTemplate(pageId);
         }}
         >
           <DeleteIcon fontSize='small' />

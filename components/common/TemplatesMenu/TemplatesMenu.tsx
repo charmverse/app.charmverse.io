@@ -1,11 +1,10 @@
 import { useTheme } from '@emotion/react';
-import Divider from '@mui/material/Divider';
-import ListItemText from '@mui/material/ListItemText';
+import { Box, Divider, ListItemIcon, ListItemText } from '@mui/material';
 import Menu from '@mui/material/Menu';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import MenuItem from '@mui/material/MenuItem';
 import type { Page } from '@prisma/client';
 import { AddIcon } from 'components/common/Icons/AddIcon';
-import { DocumentPageIcon } from 'components/common/Icons/DocumentPageIcon';
 import { fancyTrim } from 'lib/utilities/strings';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 import { bindMenu } from 'material-ui-popup-state/hooks';
@@ -35,33 +34,44 @@ export function TemplatesMenu ({
   const maxTitleLength = 35;
 
   return (
-    <Menu {...bindMenu(popupState)} onClose={popupState.close} anchorEl={anchorEl}>
-      <MenuItem>Templates {boardTitle ? (<>for <b style={{ marginLeft: 4 }}>{boardTitle}</b></>) : ''} </MenuItem>
-      <Divider />
+    <Menu {...bindMenu(popupState)} onClose={popupState.close} anchorEl={anchorEl} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} transformOrigin={{ vertical: 'top', horizontal: 'center' }}>
+      <MenuItem dense sx={{ pointerEvents: 'none' }}>Templates {boardTitle ? (<>for <b style={{ marginLeft: 4 }}>{boardTitle}</b></>) : ''} </MenuItem>
+
       {
         pages.map((page) => {
 
           return (
-            <MenuItem sx={{ display: 'flex', justifyContent: 'space-between' }}>
-              <DocumentPageIcon
-                onClick={() => {
-                  addPageFromTemplate(page.id);
-                  popupState.close();
-                }}
-                label={fancyTrim(page.title || 'Untitled', maxTitleLength)}
-              />
+            <MenuItem
+              dense
+              sx={{ display: 'flex', justifyContent: 'space-between' }}
+              onClick={() => {
+                addPageFromTemplate(page.id);
+                popupState.close();
+              }}
+            >
+              <ListItemIcon><DescriptionOutlinedIcon /></ListItemIcon>
+              <ListItemText>{fancyTrim(page.title || 'Untitled', maxTitleLength)}</ListItemText>
 
               {/* TODO - Revisit nested menu using this npm package https://github.com/steviebaa/mui-nested-menu */}
-              {
-                enableItemOptions && <TemplatePageMenuActions editTemplate={editTemplate} deleteTemplate={deleteTemplate} page={page} />
+              <Box ml={1} onClick={e => e.stopPropagation()}>
+                {
+                enableItemOptions && (
+                  <TemplatePageMenuActions
+                    editTemplate={editTemplate}
+                    deleteTemplate={deleteTemplate}
+                    pageId={page.id}
+                    closeParentPopup={popupState.close}
+                  />
+                )
               }
+              </Box>
 
             </MenuItem>
           );
         })
 }
       <Divider />
-      <MenuItem sx={{ color: `${theme.palette.primary.main} !important` }} onClick={createTemplate}>
+      <MenuItem dense sx={{ color: `${theme.palette.primary.main} !important` }} onClick={createTemplate}>
         <AddIcon />
         <ListItemText>New template</ListItemText>
       </MenuItem>
