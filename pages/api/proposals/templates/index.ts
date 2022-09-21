@@ -26,7 +26,7 @@ async function createProposalTemplateController (req: NextApiRequest, res: NextA
 
   const proposal = await createProposalTemplate({ spaceId, userId });
 
-  res.status(200).send(proposal);
+  res.status(201).send(proposal);
 
 }
 
