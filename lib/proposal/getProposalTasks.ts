@@ -59,7 +59,9 @@ export async function getProposalTasks (userId: string): Promise<{
 
   const workspaceEvents = await prisma.workspaceEvent.findMany({
     where: {
-      type: 'proposal_status_change'
+      type: {
+        in: ['proposal_status_change', 'proposal_create']
+      }
     },
     select: {
       pageId: true,

@@ -68,6 +68,14 @@ async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
       spaceId,
       userId
     });
+    await prisma.workspaceEvent.create({
+      data: {
+        type: 'proposal_create',
+        actorId: userId,
+        pageId: page.id,
+        spaceId
+      }
+    });
   }
   else {
     page = await prisma.page.create({ data: typedPageCreationData });

@@ -121,7 +121,7 @@ export default function ProposalTasksList ({
   error: any
   tasks: GetTasksResponse | undefined
 }) {
-  const proposals = tasks?.proposals ? [...tasks.proposals.marked, ...tasks.proposals.unmarked] : [];
+  const proposals = tasks?.proposals ? [...tasks.proposals.unmarked, ...tasks.proposals.marked] : [];
 
   useEffect(() => {
     async function main () {

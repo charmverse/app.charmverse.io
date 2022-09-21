@@ -139,6 +139,7 @@ enum ProposalStatus {
 
 enum WorkspaceEventType {
   proposal_status_change
+  proposal_create
 }
 
 model Space {
