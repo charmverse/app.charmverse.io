@@ -67,7 +67,6 @@ import RowActionsMenu, * as rowActions from './components/rowActions';
 import * as tabIndent from './components/tabIndent';
 import * as table from './components/table';
 import * as trailingNode from './components/trailingNode';
-import EditModeButton from './components/EditModeButton';
 import DevTools from './DevTools';
 import { specRegistry } from './specRegistry';
 import { checkForEmpty } from './utils';
@@ -583,7 +582,6 @@ function CharmEditor (
         }
       }}
     >
-      {/* <EditModeButton enabled={enabled} toggle={toggleSuggestions} /> */}
       <floatingMenu.FloatingMenu
         enableComments={!disablePageSpecificFeatures}
         enableVoting={enableVoting}

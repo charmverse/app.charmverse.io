@@ -63,9 +63,8 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
 
   }, [pageId, pagesLoaded, space, user]);
 
-  // set edit mode
+  // set page attributes of the primary charm editor
   useEffect(() => {
-    // set edit mode for the first time
     if (!editMode) {
       if (currentPagePermissions?.edit_content) {
         setPageProps({ permissions: currentPagePermissions, editMode: 'editing' });
