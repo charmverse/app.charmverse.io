@@ -40,7 +40,14 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
   const proposalReviewer = contributors?.find(contributor => contributor.id === proposal?.reviewedBy);
 
   if (!proposal) {
-    return null;
+    return !isTemplate ? (
+      <Grid container mt={2} mb={2}>
+        <ProposalStepper
+          proposalUserGroups={[]}
+          refreshProposal={refreshProposal}
+        />
+      </Grid>
+    ) : null;
   }
 
   const { status, category } = proposal;
