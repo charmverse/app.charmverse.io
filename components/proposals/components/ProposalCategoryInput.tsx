@@ -1,10 +1,11 @@
-import { Box, Chip, TextField } from '@mui/material';
+import { Box, Chip, IconButton, TextField } from '@mui/material';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import type { NewProposalCategory, ProposalCategory } from 'lib/proposal/interface';
 import type { HTMLAttributes } from 'react';
 import { useEffect, useRef, useMemo, useState } from 'react';
 import type { BrandColor } from 'theme/colors';
 import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 type TempOption = NewProposalCategory & {
   inputValue: string;
@@ -17,9 +18,10 @@ const filter = createFilterOptions<OptionType>();
 type ProposalCategoryOptionProps = {
   category: OptionType;
   props: HTMLAttributes<HTMLLIElement>;
+  onDelete?: (id: string) => void
 }
 
-function ProposalCategoryOption ({ props, category }: ProposalCategoryOptionProps) {
+function ProposalCategoryOption ({ props, category, onDelete }: ProposalCategoryOptionProps) {
   if ('inputValue' in category) {
     return <li {...props}>{category.title}</li>;
   }
@@ -32,7 +34,16 @@ function ProposalCategoryOption ({ props, category }: ProposalCategoryOptionProp
 
   return (
     <Box {...props as unknown as HTMLAttributes<HTMLDivElement>}>
-      <Chip variant='filled' color={category.color as BrandColor} label={category.title} sx={{ maxWidth: 150, flex: 1, display: 'flex', cursor: 'pointer' }} />
+      <Box justifyContent='space-between' alignItems='center' display='flex' flex={1}>
+        <Chip variant='filled' color={category.color as BrandColor} label={category.title} sx={{ maxWidth: 150, flex: 1, display: 'flex', cursor: 'pointer' }} />
+
+        {!!onDelete && (
+          <IconButton color='secondary' size='small' onClick={() => onDelete(category.id)}>
+            <DeleteIcon />
+          </IconButton>
+        )}
+      </Box>
+
     </Box>
   );
 }
@@ -42,11 +53,12 @@ type Props = {
   options: OptionType[];
   value: ProposalCategory | null;
   canEditCategories?: boolean;
-  onChange: (value: ProposalCategory | null) => void
-  onAddCategory?: (category: NewProposalCategory) => Promise<ProposalCategory>
+  onChange: (value: ProposalCategory | null) => void;
+  onAddCategory?: (category: NewProposalCategory) => Promise<ProposalCategory>;
+  onDeleteCategory?: (categoryId: string) => void;
 };
 
-export default function ProposalCategoryInput ({ disabled, options, canEditCategories, value, onChange, onAddCategory }: Props) {
+export default function ProposalCategoryInput ({ disabled, options, canEditCategories, value, onChange, onAddCategory, onDeleteCategory }: Props) {
   const internalValue = useMemo(() => value ? [value] : [], [value]);
   const newCategoryColorRef = useRef(getRandomThemeColor());
   const [tempValue, setTempValue] = useState<TempOption| null>(null);
@@ -83,6 +95,7 @@ export default function ProposalCategoryInput ({ disabled, options, canEditCateg
 
   return (
     <Autocomplete
+      open={true}
       disabled={disabled}
       value={tempValue ? [tempValue] : internalValue}
       selectOnFocus
@@ -95,7 +108,7 @@ export default function ProposalCategoryInput ({ disabled, options, canEditCateg
       autoHighlight
       clearIcon={null}
       renderOption={(_props, category) => (
-        <ProposalCategoryOption category={category} props={_props} />
+        <ProposalCategoryOption category={category} props={_props} onDelete={canEditCategories ? onDeleteCategory : undefined} />
       )}
       ChipProps={{ color: (tempValue?.color || value?.color || 'gray') as BrandColor }}
       noOptionsText='No categories available'
