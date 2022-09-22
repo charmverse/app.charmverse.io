@@ -15,6 +15,7 @@ type OptionType = TempOption | ProposalCategory;
 const filter = createFilterOptions<OptionType>();
 
 type Props = {
+  disabled?: boolean;
   options: OptionType[];
   value: ProposalCategory | null;
   canEditCategories?: boolean;
@@ -22,7 +23,7 @@ type Props = {
   onAddCategory?: (category: NewProposalCategory) => Promise<ProposalCategory>
 };
 
-export default function ProposalCategoryInput ({ options, canEditCategories, value, onChange, onAddCategory }: Props) {
+export default function ProposalCategoryInput ({ disabled, options, canEditCategories, value, onChange, onAddCategory }: Props) {
   const internalValue = useMemo(() => value ? [value] : [], [value]);
   const newCategoryColorRef = useRef(getRandomThemeColor());
   const [tempValue, setTempValue] = useState<TempOption| null>(null);
@@ -59,6 +60,7 @@ export default function ProposalCategoryInput ({ options, canEditCategories, val
 
   return (
     <Autocomplete
+      disabled={disabled}
       value={tempValue ? [tempValue] : internalValue}
       selectOnFocus
       clearOnBlur

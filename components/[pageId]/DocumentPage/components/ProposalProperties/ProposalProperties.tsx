@@ -54,7 +54,7 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
     return roleups.some(role => role.id === reviewer.roleId && role.users.some(_user => _user.id === user.id));
   })));
 
-  const canUpdateAuthorsOrReviewers = (status === 'draft' || status === 'private_draft' || status === 'discussion') && isProposalAuthor;
+  const canUpdateProperties = (status === 'draft' || status === 'private_draft' || status === 'discussion') && isProposalAuthor;
 
   const reviewerOptionsRecord: Record<string, ({group: 'role'} & ListSpaceRolesResponse) | ({group: 'user'} & Contributor)> = {};
 
@@ -122,6 +122,7 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
           </div>
           <Box display='flex' flex={1}>
             <ProposalCategoryInput
+              disabled={readOnly || !canUpdateProperties}
               options={categories || []}
               canEditCategories={canEditProposalCategories}
               value={category}
@@ -170,7 +171,7 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
                   refreshProposal();
                 }
               }}
-              disabled={readOnly || !canUpdateAuthorsOrReviewers}
+              disabled={readOnly || !canUpdateProperties}
               readOnly={readOnly}
               options={contributors}
               sx={{
@@ -201,7 +202,7 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
                 />
               ) : (
                 <InputSearchReviewers
-                  disabled={readOnly || !canUpdateAuthorsOrReviewers}
+                  disabled={readOnly || !canUpdateProperties}
                   readOnly={readOnly}
                   value={proposal.reviewers.map(reviewer => reviewerOptionsRecord[(reviewer.roleId ?? reviewer.userId) as string])}
                   disableCloseOnSelect={true}
