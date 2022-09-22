@@ -587,7 +587,7 @@ function CharmEditor (
       {!disablePageSpecificFeatures && (
         <>
           <SidebarDrawer id='page-suggestion-list-box' title='Suggestions' open={pageActionDisplay === 'suggestions'}>
-            <SuggestionsSidebar />
+            <SuggestionsSidebar readOnly={!pagePermissions?.edit_content} />
           </SidebarDrawer>
           <SidebarDrawer id='page-comment-list-box' title='Comments' open={pageActionDisplay === 'comments'}>
             <CommentsSidebar />

@@ -1,7 +1,7 @@
 import type { NodeSelection } from '@bangle.dev/pm';
 import { Plugin, PluginKey, Decoration, DecorationSet } from '@bangle.dev/pm';
 
-import { findSelectedChanges } from './find_selected_changes';
+import { findSelectedChanges } from './findSelectedChanges';
 import { deactivateAllSelectedChanges } from './helpers';
 import type { TrackAttribute } from '../../track/interfaces';
 

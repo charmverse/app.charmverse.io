@@ -6,5 +6,6 @@ export interface TrackAttribute {
   username: string;
   date: string;
   type: TrackType;
-  before?: { type: string, attrs: any };
+  before?: { type: string, attrs: any } | string[];
+  after?: { type: string, attrs: any } | string[];
 }

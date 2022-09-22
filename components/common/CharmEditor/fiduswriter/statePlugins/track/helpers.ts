@@ -12,7 +12,8 @@ import {
 import type { TrackAttribute } from '../../track/interfaces';
 
 export function getSelectedChanges (state: EditorState) {
-  const { decos } = key.getState(state) as { decos: typeof DecorationSet.empty };
+  const keyState = key.getState(state) as { decos: typeof DecorationSet.empty } | undefined;
+  const decos = keyState?.decos ?? DecorationSet.empty;
 
   const insertion = decos.find(undefined, undefined, spec => spec === selectedInsertionSpec)[0];
   const deletion = decos.find(undefined, undefined, spec => spec === selectedDeletionSpec)[0];

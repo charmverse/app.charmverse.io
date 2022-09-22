@@ -1,8 +1,8 @@
 import { DecorationSet } from 'prosemirror-view';
 import type { EditorState, Transaction } from '@bangle.dev/pm';
 import { Decoration, PluginKey } from '@bangle.dev/pm';
-import { getFromToMark } from '../state_plugins/track/helpers';
-import { selectedInsertionSpec, selectedDeletionSpec, selectedChangeFormatSpec, selectedChangeBlockSpec } from '../state_plugins/track/plugin';
+import { getFromToMark } from '../statePlugins/track/helpers';
+import { selectedInsertionSpec, selectedDeletionSpec, selectedChangeFormatSpec, selectedChangeBlockSpec } from '../statePlugins/track/plugin';
 import type { TrackAttribute } from './interfaces';
 
 export const key = new PluginKey('track');
