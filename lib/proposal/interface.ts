@@ -6,10 +6,13 @@ export interface ProposalReviewerInput {
   id: string
 }
 
-export interface ProposalCategory {
-  id: string;
+export interface NewProposalCategory {
   title: string;
   color: string;
+}
+
+export interface ProposalCategory extends NewProposalCategory {
+  id: string;
   spaceId: string;
 }
 

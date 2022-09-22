@@ -57,7 +57,8 @@ export async function updateProposal ({
     },
     include: {
       authors: true,
-      reviewers: true
+      reviewers: true,
+      category: true
     }
   }) as Promise<ProposalWithUsers>;
 }

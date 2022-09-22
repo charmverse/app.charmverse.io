@@ -7,14 +7,18 @@ import { InputSearchContributorBase } from 'components/common/form/InputSearchCo
 import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
 import PublishToSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/PublishToSnapshot';
 import UserDisplay from 'components/common/UserDisplay';
+import ProposalCategoryInput from 'components/proposals/components/ProposalCategoryInput';
 import ProposalStepper from 'components/proposals/components/ProposalStepper';
+import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import type { Contributor } from 'hooks/useContributors';
 import { useContributors } from 'hooks/useContributors';
 import useRoles from 'hooks/useRoles';
 import { useUser } from 'hooks/useUser';
+import type { ProposalCategory } from 'lib/proposal/interface';
 import type { ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
+import { useState } from 'react';
 import useSWR from 'swr';
 
 interface ProposalPropertiesProps {
@@ -25,6 +29,8 @@ interface ProposalPropertiesProps {
 
 export default function ProposalProperties ({ pageId, proposalId, readOnly }: ProposalPropertiesProps) {
   const { data: proposal, mutate: refreshProposal } = useSWR(`proposal/${proposalId}`, () => charmClient.proposals.getProposal(proposalId));
+  const { categories, canEditProposalCategories, addCategory } = useProposalCategories();
+  const [category, setCategory] = useState<null | ProposalCategory>(null);
 
   const [contributors] = useContributors();
   const { roles = [], roleups } = useRoles();
@@ -105,6 +111,23 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly }: Pr
           </Box>
         </Grid>
       </Grid>
+
+      <Box justifyContent='space-between' gap={2} alignItems='center' my='6px'>
+        <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
+          <div className='octo-propertyname octo-propertyname--readonly'>
+            <Button>Category</Button>
+          </div>
+          <Box display='flex' flex={1}>
+            <ProposalCategoryInput
+              options={categories || []}
+              canEditCategories={canEditProposalCategories}
+              value={category}
+              onChange={setCategory}
+              onAddCategory={addCategory}
+            />
+          </Box>
+        </Box>
+      </Box>
 
       <Box justifyContent='space-between' gap={2} alignItems='center'>
         <div
@@ -189,6 +212,7 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly }: Pr
           </div>
         </div>
       </Box>
+
       <Divider sx={{
         my: 2
       }}

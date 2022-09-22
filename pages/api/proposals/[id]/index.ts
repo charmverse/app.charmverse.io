@@ -25,7 +25,8 @@ async function getProposalController (req: NextApiRequest, res: NextApiResponse<
     },
     include: {
       authors: true,
-      reviewers: true
+      reviewers: true,
+      category: true
     }
   });
 
