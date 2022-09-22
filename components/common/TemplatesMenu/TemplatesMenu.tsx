@@ -42,6 +42,7 @@ export function TemplatesMenu ({
 
           return (
             <MenuItem
+              key={page.id}
               dense
               sx={{ display: 'flex', justifyContent: 'space-between' }}
               onClick={() => {

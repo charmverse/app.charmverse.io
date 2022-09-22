@@ -47,7 +47,7 @@ export default function ProposalStepper (
         );
 
         return (
-          <>
+          <div key={status}>
             <Grid item md={12 / 13} display='flex' position='relative' alignItems='center' justifyContent='center'>
               <Stack
                 alignItems='center'
@@ -110,7 +110,7 @@ export default function ProposalStepper (
                 />
               </Grid>
             )}
-          </>
+          </div>
         );
       })}
       <CreateVoteModal
