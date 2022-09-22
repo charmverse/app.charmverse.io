@@ -57,6 +57,7 @@ export function ProposalTasksListRow (
             }}
             fontSize={{ sm: 16, xs: 18 }}
           >
+            <TaskOutlinedIcon color='secondary' />
             {pageTitle || 'Untitled'}
           </Grid>
           <Grid
