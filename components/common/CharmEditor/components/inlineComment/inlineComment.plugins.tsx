@@ -62,7 +62,7 @@ export function plugin ({ key } :{
           if (/charm-inline-comment/.test((event.target as HTMLElement).className)) {
             return highlightMarkedElement({
               view,
-              elementId: 'page-thread-list-box',
+              elementId: 'page-comment-list-box',
               key,
               markName,
               prefix: 'thread'
@@ -107,7 +107,7 @@ export function plugin ({ key } :{
             return highlightElement({
               ids,
               view,
-              elementId: 'page-thread-list-box',
+              elementId: 'page-comment-list-box',
               key,
               markName,
               prefix: 'thread'

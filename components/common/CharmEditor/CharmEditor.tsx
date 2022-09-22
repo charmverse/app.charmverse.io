@@ -19,7 +19,7 @@ import type { EditorState, EditorView } from '@bangle.dev/pm';
 import { Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import { Box, Divider, Slide } from '@mui/material';
+import { Box, Divider } from '@mui/material';
 import type { PageType } from '@prisma/client';
 import charmClient from 'charmClient';
 import * as codeBlock from 'components/common/CharmEditor/components/@bangle.dev/base-components/code-block';
@@ -28,6 +28,7 @@ import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import CommentsSidebar from 'components/[pageId]/DocumentPage/components/CommentsSidebar';
 import PageInlineVotesList from 'components/[pageId]/DocumentPage/components/VotesSidebar';
+import SuggestionsSidebar from 'components/[pageId]/DocumentPage/components/SuggestionsSidebar';
 import type { CryptoCurrency, FiatCurrency } from 'connectors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
@@ -72,6 +73,7 @@ import { specRegistry } from './specRegistry';
 import { checkForEmpty } from './utils';
 import trackStyles from './fiduswriter/styles';
 import { rejectAll } from './fiduswriter/track/reject_all';
+import SidebarDrawer from './components/SidebarDrawer';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -287,19 +289,6 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{disablePageSpecificFe
   `}
 
   ${trackStyles}
-`;
-
-const PageActionListBox = styled.div`
-  position: fixed;
-  right: 0px;
-  width: 416px;
-  max-width: 100%;
-  top: 56px; // height of MUI Toolbar
-  z-index: var(--z-index-drawer);
-  height: calc(100% - 80px);
-  overflow: auto;
-  padding: 0 ${({ theme }) => theme.spacing(1)};
-  background: ${({ theme }) => theme.palette.background.default};
 `;
 
 const defaultContent: PageContent = {
@@ -597,42 +586,15 @@ function CharmEditor (
       {children}
       {!disablePageSpecificFeatures && (
         <>
-          <Slide
-            direction='left'
-            in={pageActionDisplay === 'comments'}
-            style={{
-              transformOrigin: 'left top'
-            }}
-            easing={{
-              enter: 'ease-in',
-              exit: 'ease-out'
-            }}
-            timeout={250}
-          >
-            <PageActionListBox
-              id='page-thread-list-box'
-            >
-              <CommentsSidebar />
-            </PageActionListBox>
-          </Slide>
-          <Slide
-            direction='left'
-            in={pageActionDisplay === 'polls'}
-            style={{
-              transformOrigin: 'left top'
-            }}
-            easing={{
-              enter: 'ease-in',
-              exit: 'ease-out'
-            }}
-            timeout={250}
-          >
-            <PageActionListBox
-              id='page-vote-list-box'
-            >
-              <PageInlineVotesList />
-            </PageActionListBox>
-          </Slide>
+          <SidebarDrawer id='page-suggestion-list-box' title='Suggestions' open={pageActionDisplay === 'suggestions'}>
+            <SuggestionsSidebar />
+          </SidebarDrawer>
+          <SidebarDrawer id='page-comment-list-box' title='Comments' open={pageActionDisplay === 'comments'}>
+            <CommentsSidebar />
+          </SidebarDrawer>
+          <SidebarDrawer id='page-vote-list-box' title='Polls' open={pageActionDisplay === 'polls'}>
+            <PageInlineVotesList />
+          </SidebarDrawer>
           <InlineCommentThread pluginKey={inlineCommentPluginKey} />
           {enableVoting && <InlineVoteList pluginKey={inlineVotePluginKey} />}
         </>

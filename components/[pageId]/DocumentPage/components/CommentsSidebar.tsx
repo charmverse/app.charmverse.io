@@ -12,7 +12,6 @@ import { findTotalInlineComments } from 'lib/inline-comments/findTotalInlineComm
 import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import { isTruthy } from 'lib/utilities/types';
 import { useEffect, useState } from 'react';
-import PageActionToggle from './PageActionToggle';
 
 const Center = styled.div`
   position: absolute;
@@ -66,7 +65,7 @@ function getCommentFromThreads (threads: (ThreadWithCommentsAndAuthors | undefin
   return null;
 }
 
-export default function CommentsSidebar ({ sx, inline, ...props }: BoxProps & {inline?: boolean}) {
+export default function CommentsSidebar ({ inline }: BoxProps & {inline?: boolean}) {
 
   const { threads } = useThreads();
   const { user } = useUser();
@@ -151,19 +150,7 @@ export default function CommentsSidebar ({ sx, inline, ...props }: BoxProps & {i
   }, [allThreads, window.location.search]);
 
   return (
-    <StyledPageThreadsBox
-      {...props}
-      sx={{
-        ...(sx ?? {}),
-        display: 'flex',
-        gap: 1,
-        flexDirection: 'column'
-      }}
-    >
-      <Box display='flex' gap={1}>
-        <PageActionToggle />
-        <Typography fontWeight={600} fontSize={20}>Comments</Typography>
-      </Box>
+    <>
       <Box display='flex' alignItems='center' gap={1}>
         <InputLabel>Sort</InputLabel>
         <Select variant='outlined' value={threadSort} onChange={handleThreadListSortChange}>
@@ -185,7 +172,7 @@ export default function CommentsSidebar ({ sx, inline, ...props }: BoxProps & {i
         ) : sortedThreadList.map(resolvedThread => resolvedThread
           && <PageThread showFindButton inline={inline} key={resolvedThread.id} threadId={resolvedThread?.id} />)}
       </StyledSidebar>
-    </StyledPageThreadsBox>
+    </>
   );
 }
 

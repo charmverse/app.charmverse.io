@@ -1,5 +1,6 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
+import { RateReviewOutlined } from '@mui/icons-material';
 import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
 import MoonIcon from '@mui/icons-material/DarkMode';
 import GetAppIcon from '@mui/icons-material/GetApp';
@@ -155,6 +156,19 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
           }}
         />
         <ListItemText primary='View comments' />
+      </ListItemButton>
+      <ListItemButton onClick={() => {
+        setCurrentPageActionDisplay('suggestions');
+        setPageMenuOpen(false);
+      }}
+      >
+        <RateReviewOutlined
+          fontSize='small'
+          sx={{
+            mr: 1
+          }}
+        />
+        <ListItemText primary='View suggestions' />
       </ListItemButton>
       {isExportablePage && (
         <ListItemButton onClick={() => {
