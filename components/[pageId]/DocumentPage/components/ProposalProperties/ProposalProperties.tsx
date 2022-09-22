@@ -21,9 +21,10 @@ interface ProposalPropertiesProps {
   readOnly?: boolean
   pageId: string
   proposalId: string
+  isTemplate: boolean
 }
 
-export default function ProposalProperties ({ pageId, proposalId, readOnly }: ProposalPropertiesProps) {
+export default function ProposalProperties ({ pageId, proposalId, readOnly, isTemplate }: ProposalPropertiesProps) {
   const { data: proposal, mutate: refreshProposal } = useSWR(`proposal/${proposalId}`, () => charmClient.proposals.getProposal(proposalId));
 
   const [contributors] = useContributors();
@@ -86,13 +87,17 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly }: Pr
       }}
       mt={2}
     >
-      <Grid container mb={2}>
-        <ProposalStepper
-          proposalUserGroups={currentUserGroups}
-          proposal={proposal}
-          refreshProposal={refreshProposal}
-        />
-      </Grid>
+      {
+        !isTemplate && (
+          <Grid container mb={2}>
+            <ProposalStepper
+              proposalUserGroups={currentUserGroups}
+              proposal={proposal}
+              refreshProposal={refreshProposal}
+            />
+          </Grid>
+        )
+      }
       <Grid container mb={2}>
         <Grid item xs={8}>
           <Box display='flex' gap={1} alignItems='center'>

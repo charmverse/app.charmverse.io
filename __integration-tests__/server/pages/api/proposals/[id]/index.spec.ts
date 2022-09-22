@@ -3,9 +3,13 @@ import { prisma } from 'db';
 import { upsertPermission } from 'lib/permissions/pages';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import request from 'supertest';
-import { baseUrl } from 'testing/mockApiCall';
-import { createProposalWithUsers, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { baseUrl, loginUser } from 'testing/mockApiCall';
+import { createProposalWithUsers, generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
+import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
+import { createProposalTemplate } from 'lib/templates/proposals/createProposalTemplate';
+import { createProposal } from 'lib/proposal/createProposal';
+import type { PageWithProposal } from '../../../../../../lib/pages';
 
 let author: User;
 let reviewer: User;
@@ -108,5 +112,174 @@ describe('GET /api/proposals/[id] - Get proposal', () => {
       .get(`/api/proposals/${pageWithProposal.proposalId}`)
       .set('Cookie', reviewerCookie)
       .expect(404));
+  });
+
+});
+
+describe('PUT /api/proposals/[id] - Update a proposal', () => {
+
+  it('should update a proposal if the user is an author', async () => {
+
+    const { user: adminUser, space: adminSpace } = await generateUserAndSpaceWithApiToken(undefined, true);
+    const adminCookie = await loginUser(adminUser);
+
+    const role = await generateRole({
+      spaceId: adminSpace.id,
+      createdBy: adminUser.id
+    });
+
+    const pageWithProposal = await createProposal({
+      pageCreateInput: {
+        author: {
+          connect: {
+            id: adminUser.id
+          }
+        },
+        contentText: '',
+        path: 'path',
+        space: {
+          connect: {
+            id: space.id
+          }
+        },
+        title: 'page-title',
+        type: 'proposal',
+        updatedBy: adminUser.id
+      },
+      spaceId: adminSpace.id,
+      userId: adminUser.id
+    });
+
+    const updateContent: Partial<UpdateProposalRequest> = {
+      authors: [adminUser.id],
+      reviewers: [{
+        group: 'user',
+        id: adminUser.id
+      }, {
+        group: 'role',
+        id: role.id
+      }]
+    };
+
+    const updated = (await request(baseUrl)
+      .put(`/api/proposals/${pageWithProposal.proposalId}`)
+      .set('Cookie', adminCookie)
+      .send(updateContent)
+      .expect(200)).body as PageWithProposal;
+
+    // Make sure update went through
+    expect(updated.proposal?.reviewers).toHaveLength(2);
+    expect(updated.proposal?.reviewers.some(r => r.roleId === role.id)).toBe(true);
+    expect(updated.proposal?.reviewers.some(r => r.userId === adminUser.id)).toBe(true);
+  });
+
+  it('should update a proposal if the user is an author', async () => {
+
+    const { user: adminUser, space: adminSpace } = await generateUserAndSpaceWithApiToken(undefined, true);
+    const adminCookie = await loginUser(adminUser);
+
+    const proposalAuthor = await generateSpaceUser({ isAdmin: false, spaceId: adminSpace.id });
+
+    const pageWithProposal = await createProposal({
+      pageCreateInput: {
+        author: {
+          connect: {
+            id: proposalAuthor.id
+          }
+        },
+        contentText: '',
+        path: 'path',
+        space: {
+          connect: {
+            id: adminSpace.id
+          }
+        },
+        title: 'page-title',
+        type: 'proposal',
+        updatedBy: proposalAuthor.id
+      },
+      spaceId: adminSpace.id,
+      userId: proposalAuthor.id
+    });
+
+    const updateContent: Partial<UpdateProposalRequest> = {
+      authors: [adminUser.id],
+      reviewers: [{
+        group: 'user',
+        id: adminUser.id
+      }]
+    };
+
+    await request(baseUrl)
+      .put(`/api/proposals/${pageWithProposal.proposalId}`)
+      .set('Cookie', adminCookie)
+      .send(updateContent)
+      .expect(401);
+
+  });
+
+  it('should update a proposal template if the user is a space admin', async () => {
+
+    const { user: adminUser, space: adminSpace } = await generateUserAndSpaceWithApiToken(undefined, true);
+    const adminCookie = await loginUser(adminUser);
+
+    const role = await generateRole({ createdBy: adminUser.id, spaceId: adminSpace.id });
+
+    const pageWithProposal = await createProposalTemplate({
+      spaceId: adminSpace.id,
+      userId: adminUser.id
+    });
+
+    const updateContent: Partial<UpdateProposalRequest> = {
+      authors: [adminUser.id],
+      reviewers: [{
+        group: 'user',
+        id: adminUser.id
+      }, {
+        group: 'role',
+        id: role.id
+      }]
+    };
+
+    const updated = (await request(baseUrl)
+      .put(`/api/proposals/${pageWithProposal.proposalId}`)
+      .set('Cookie', adminCookie)
+      .send(updateContent)
+      .expect(200)).body as PageWithProposal;
+
+    // Make sure update went through
+    expect(updated.proposal?.reviewers).toHaveLength(2);
+    expect(updated.proposal?.reviewers.some(r => r.roleId === role.id)).toBe(true);
+    expect(updated.proposal?.reviewers.some(r => r.userId === adminUser.id)).toBe(true);
+  });
+
+  it('should fail to update a proposal template if the user is not a space admin', async () => {
+    const { user: adminUser, space: adminSpace } = await generateUserAndSpaceWithApiToken(undefined, false);
+    const nonAdminUser = await generateSpaceUser({ isAdmin: false, spaceId: adminSpace.id });
+
+    const nonAdminCookie = await loginUser(nonAdminUser);
+
+    const pageWithProposal = await createProposalTemplate({
+      spaceId: adminSpace.id,
+      userId: adminUser.id,
+      reviewers: [{
+        group: 'user',
+        id: adminUser.id
+      }]
+    });
+
+    const updateContent: Partial<UpdateProposalRequest> = {
+      authors: [adminUser.id],
+      reviewers: [{
+        group: 'user',
+        id: adminUser.id
+      }]
+    };
+
+    await request(baseUrl)
+      .put(`/api/proposals/${pageWithProposal.proposalId}`)
+      .set('Cookie', nonAdminCookie)
+      .send(updateContent)
+      .expect(401);
   });
 });
