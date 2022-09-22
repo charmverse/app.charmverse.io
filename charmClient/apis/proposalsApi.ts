@@ -26,7 +26,7 @@ export class ProposalsApi {
     return http.POST('/api/proposals/templates', { spaceId });
   }
 
-  createProposalFromTemplate ({ spaceId, templateId }: Omit<CreateProposalFromTemplateInput, 'userId'>): Promise<IPageWithPermissions> {
+  createProposalFromTemplate ({ spaceId, templateId }: Omit<CreateProposalFromTemplateInput, 'createdBy'>): Promise<IPageWithPermissions> {
     return http.POST('/api/proposals/from-template', { spaceId, templateId });
   }
 

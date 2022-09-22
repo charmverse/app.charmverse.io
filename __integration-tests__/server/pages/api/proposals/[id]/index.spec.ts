@@ -128,26 +128,9 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       createdBy: adminUser.id
     });
 
-    const pageWithProposal = await createProposal({
-      pageCreateInput: {
-        author: {
-          connect: {
-            id: adminUser.id
-          }
-        },
-        contentText: '',
-        path: 'path',
-        space: {
-          connect: {
-            id: space.id
-          }
-        },
-        title: 'page-title',
-        type: 'proposal',
-        updatedBy: adminUser.id
-      },
-      spaceId: adminSpace.id,
-      userId: adminUser.id
+    const { page } = await createProposal({
+      createdBy: adminUser.id,
+      spaceId: adminSpace.id
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {
@@ -162,7 +145,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     };
 
     const updated = (await request(baseUrl)
-      .put(`/api/proposals/${pageWithProposal.proposalId}`)
+      .put(`/api/proposals/${page.proposalId}`)
       .set('Cookie', adminCookie)
       .send(updateContent)
       .expect(200)).body as PageWithProposal;
@@ -180,26 +163,9 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
 
     const proposalAuthor = await generateSpaceUser({ isAdmin: false, spaceId: adminSpace.id });
 
-    const pageWithProposal = await createProposal({
-      pageCreateInput: {
-        author: {
-          connect: {
-            id: proposalAuthor.id
-          }
-        },
-        contentText: '',
-        path: 'path',
-        space: {
-          connect: {
-            id: adminSpace.id
-          }
-        },
-        title: 'page-title',
-        type: 'proposal',
-        updatedBy: proposalAuthor.id
-      },
-      spaceId: adminSpace.id,
-      userId: proposalAuthor.id
+    const { page } = await createProposal({
+      createdBy: proposalAuthor.id,
+      spaceId: adminSpace.id
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {
@@ -211,7 +177,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     };
 
     await request(baseUrl)
-      .put(`/api/proposals/${pageWithProposal.proposalId}`)
+      .put(`/api/proposals/${page.proposalId}`)
       .set('Cookie', adminCookie)
       .send(updateContent)
       .expect(401);
