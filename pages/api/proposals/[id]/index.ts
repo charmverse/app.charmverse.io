@@ -1,6 +1,6 @@
 
 import { prisma } from 'db';
-import { NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { hasAccessToSpace, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { updateProposal } from 'lib/proposal/updateProposal';
@@ -8,6 +8,7 @@ import { withSessionRoute } from 'lib/session/withSession';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import { getProposal } from 'lib/proposal/getProposal';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -60,12 +61,30 @@ async function updateProposalController (req: NextApiRequest, res: NextApiRespon
     },
     include: {
       authors: true,
-      reviewers: true
+      reviewers: true,
+      page: {
+        select: {
+          type: true
+        }
+      }
     }
   });
 
   if (!proposal) {
     throw new NotFoundError();
+  }
+
+  // Only admins can update proposal templates
+  if (proposal.page?.type === 'proposal_template') {
+    const { error } = await hasAccessToSpace({
+      spaceId: proposal.spaceId,
+      userId,
+      adminOnly: true
+    });
+
+    if (error) {
+      throw error;
+    }
   }
 
   const isCurrentUserProposalAuthor = proposal.authors.some(author => author.userId === userId);
@@ -77,7 +96,9 @@ async function updateProposalController (req: NextApiRequest, res: NextApiRespon
 
   await updateProposal({ proposalId: proposal.id, authors, reviewers });
 
-  return res.status(200).end();
+  const updatedProposal = await getProposal({ proposalId: proposal.id });
+
+  return res.status(200).send(updatedProposal);
 }
 
 export default withSessionRoute(handler);

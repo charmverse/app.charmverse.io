@@ -11,7 +11,7 @@ import type { IPageWithPermissions } from 'lib/pages';
 const StyledPageTemplateBanner = styled(Box)<{card?: boolean}>`
 
   top: ${({ card }) => card ? '50px' : '55px'};
-  width: ${({ card }) => card ? '100%' : 'calc(100% - 300px)'};
+  width: '100%';
   z-index: var(--z-index-appBar);
   display: flex;
   justify-content: center;
@@ -52,7 +52,7 @@ export function PageTemplateBanner ({ page, parentPage }: {parentPage?: IPageWit
           {
           !isShowingCard ? (
             <span>
-              You're editing a template
+              You're editing a {page.type.split('_template')[0]} template
             </span>
           ) : (
             <>

@@ -357,7 +357,7 @@ model UserNotificationState {
 }
 
 model UserNotification {
-  taskId    String               @unique
+  taskId    String
   createdAt DateTime             @default(now())
   userId    String               @db.Uuid
   type      NotificationType

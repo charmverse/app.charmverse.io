@@ -1,13 +1,10 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable camelcase */
 import type { Page, Space, User } from '@prisma/client';
-import { createPage, generateBoard, generateProposal, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import path from 'node:path';
-import fs from 'node:fs/promises';
-import { exportsFolder } from 'lib/templates/exports/location';
-import type { IPageWithPermissions } from 'lib/pages';
 import { createBounty } from 'lib/bounties';
-import { createProposal } from 'lib/proposal/createProposal';
+import type { IPageWithPermissions } from 'lib/pages';
+import fs from 'node:fs/promises';
+import { createPage, generateBoard, generateProposal, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { exportWorkspacePages } from '../exportWorkspacePages';
 
 let space: Space;

@@ -11,6 +11,7 @@ export async function getProposalsBySpace ({ spaceId, userId }: {
       spaceId,
       page: {
         deletedAt: null,
+        type: 'proposal',
         OR: [{
           permissions: accessiblePagesByPermissionsQuery({
             spaceId,
