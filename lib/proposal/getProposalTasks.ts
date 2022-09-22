@@ -111,6 +111,7 @@ export async function getProposalTasks (userId: string): Promise<{
 
   const pagesWithProposals = await prisma.page.findMany({
     where: {
+      deletedAt: null,
       spaceId: {
         in: spaceIds
       },
