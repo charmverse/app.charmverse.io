@@ -44,7 +44,8 @@ describe('Creates a page and proposal with relevant configuration', () => {
     }, {
       reviewers: [{
         userId: reviewerUser.id
-      }]
+      }],
+      categoryId: null
     });
 
     const { page: resultPage, proposal: { id: proposalId } } = await createProposalFromTemplate({
