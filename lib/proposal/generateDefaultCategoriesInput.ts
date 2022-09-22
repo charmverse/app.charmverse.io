@@ -10,6 +10,6 @@ const titles = [
   'Other'
 ];
 
-export function getDefaultCategories (spaceId: string): Omit<ProposalCategory, 'id'>[] {
+export function generateDefaultCategoriesInput (spaceId: string): Omit<ProposalCategory, 'id'>[] {
   return titles.map(title => ({ title, color: getRandomThemeColor(), spaceId }));
 }
