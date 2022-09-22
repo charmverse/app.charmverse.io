@@ -49,8 +49,8 @@ export async function createProposal (pageProps: ProposalPageInput, proposalProp
         path: getPagePath(),
         title: '',
         updatedBy: createdBy,
-        id: proposalId,
         ...pageProps,
+        id: proposalId,
         type: 'proposal'
       }
     }),
