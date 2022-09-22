@@ -26,7 +26,8 @@ async function getProposalController (req: NextApiRequest, res: NextApiResponse<
     },
     include: {
       authors: true,
-      reviewers: true
+      reviewers: true,
+      category: true
     }
   });
 
@@ -52,7 +53,7 @@ async function updateProposalController (req: NextApiRequest, res: NextApiRespon
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const { authors, reviewers } = req.body;
+  const { authors, reviewers, categoryId } = req.body;
 
   const proposal = await prisma.proposal.findUnique({
     where: {
@@ -93,7 +94,7 @@ async function updateProposalController (req: NextApiRequest, res: NextApiRespon
     throw new UnauthorisedActionError();
   }
 
-  await updateProposal({ proposalId: proposal.id, authors, reviewers });
+  await updateProposal({ proposalId: proposal.id, authors, reviewers, categoryId });
 
   const updatedProposal = await getProposal({ proposalId: proposal.id });
 

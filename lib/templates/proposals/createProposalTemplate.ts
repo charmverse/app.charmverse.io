@@ -73,7 +73,8 @@ export async function createProposalTemplate ({
       proposal: {
         include: {
           authors: true,
-          reviewers: true
+          reviewers: true,
+          category: true
         }
       },
       permissions: {

@@ -63,3 +63,5 @@ export const lightModeColors: BrandColorScheme = {
   red: '#F2CCD6', // Light Red
   pink: '#E8D3ED' // Light Pink
 };
+
+export const brandColorNames = Object.keys(darkModeColors) as BrandColor[];

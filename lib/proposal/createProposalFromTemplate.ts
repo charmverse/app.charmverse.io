@@ -29,6 +29,7 @@ export async function createProposalFromTemplate ({ createdBy, spaceId, template
     spaceId,
     title
   }, {
+    categoryId: proposalTemplate.proposal?.categoryId || null,
     reviewers: (proposalTemplate.proposal?.reviewers ?? []).map(r => {
       return {
         roleId: r.roleId ? r.roleId : undefined,
