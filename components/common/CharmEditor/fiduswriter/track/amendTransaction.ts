@@ -1,14 +1,15 @@
 import { Selection, TextSelection } from 'prosemirror-state';
 import type { EditorState, Node, StepMap, Transaction } from '@bangle.dev/pm';
 import { Slice, ReplaceStep, ReplaceAroundStep, AddMarkStep, RemoveMarkStep, Mapping, CellSelection } from '@bangle.dev/pm';
+import type { TrackAttribute } from './interfaces';
 
 function markInsertion (
   tr: Transaction,
   from: number,
   to: number,
   user: { id: string, username: string },
-  date1: number,
-  date10: number,
+  date1: string,
+  date10: string,
   approved: boolean
 ) {
   const insertionMark = tr.doc.type.schema.marks.insertion.create({ user: user.id, username: user.username, date: date10, approved });
@@ -30,7 +31,7 @@ function markInsertion (
         return false;
       }
       if (node.attrs.track) {
-        const track = [];
+        const track: TrackAttribute[] = [];
         if (!approved) {
           track.push({ type: 'insertion', user: user.id, username: user.username, date: date1 });
         }
@@ -44,7 +45,7 @@ function markInsertion (
   );
 }
 
-function markDeletion (tr: Transaction, from: number, to: number, user: { id: string, username: string }, date1: number, date10: number) {
+function markDeletion (tr: Transaction, from: number, to: number, user: { id: string, username: string }, date1: string, date10: string) {
   const deletionMark = tr.doc.type.schema.marks.deletion.create({ user: user.id, username: user.username, date: date10 });
   let firstTableCellChild = false;
   let listItem = false;
@@ -83,11 +84,11 @@ function markDeletion (tr: Transaction, from: number, to: number, user: { id: st
         );
       }
       else if (
-        !node.attrs.track?.find(t => t.type === 'deletion')
+        !node.attrs.track?.find((t: TrackAttribute) => t.type === 'deletion')
                 && !['bullet_list', 'ordered_list'].includes(node.type.name)
       ) {
         if (node.attrs.track?.find(
-          t => t.type === 'insertion' && t.user === user.id
+          (t: TrackAttribute) => t.type === 'insertion' && t.user === user.id
         )) {
           let removeStep;
           // user has created element. so (s)he is allowed to delete it again.
@@ -150,11 +151,11 @@ function markWrapping (
   user: { id: string, username: string },
   date1: string
 ) {
-  let track = oldNode.attrs.track.slice();
+  let track: TrackAttribute[] = oldNode.attrs.track.slice();
   let blockTrack = track.find(t => t.type === 'block_change');
 
-  if (blockTrack) {
-    track = track.filter(t => t !== blockTrack);
+  if (blockTrack?.before) {
+    track = track.filter((t: TrackAttribute) => t !== blockTrack);
     if (blockTrack.before.type !== newNode.type.name || blockTrack.before.attrs.level !== newNode.attrs.level) {
       blockTrack = { type: 'block_change', user: user.id, username: user.username, date: date1, before: blockTrack.before };
       track.push(blockTrack);
@@ -162,10 +163,10 @@ function markWrapping (
   }
   else {
     blockTrack = { type: 'block_change', user: user.id, username: user.username, date: date1, before: { type: oldNode.type.name, attrs: oldNode.attrs } };
-    if (blockTrack.before.attrs.id) {
+    if (blockTrack.before?.attrs.id) {
       delete blockTrack.before.attrs.id;
     }
-    if (blockTrack.before.attrs.track) {
+    if (blockTrack.before?.attrs.track) {
       delete blockTrack.before.attrs.track;
     }
     track.push(blockTrack);
@@ -179,7 +180,7 @@ export function amendTransaction (tr: Transaction, state: EditorState, user: { i
 
   if (
     !tr.steps.length
-      || (tr.meta && (!Object.keys(tr.meta).every(
+      || ((tr as any).meta && (!Object.keys((tr as any).meta).every(
         // Only replace TRs that have no metadata or only inputType metadata
         metadata => ['inputType', 'uiEvent', 'paste'].includes(metadata)
       )
@@ -205,8 +206,8 @@ export function amendTransaction (tr: Transaction, state: EditorState, user: { i
 export function trackedTransaction (tr: Transaction, state: EditorState, user: { id: string, username: string }, approved: boolean, date: Date) {
   const newTr = state.tr;
   const map = new Mapping();
-  const date10 = Math.floor(date.getTime() / 600000) * 10; // 10 minute interval
-  const date1 = Math.floor(date.getTime() / 60000); // 1 minute interval
+  const date10 = new Date(Math.floor(date.getTime() / 600000) * 10).toISOString(); // 10 minute interval
+  const date1 = new Date(Math.floor(date.getTime() / 60000)).toISOString(); // 1 minute interval
   // We only insert content if this is not directly a tr for cell deletion. This is because tables delete rows by deleting the
   // content of each cell and replacing it with an empty paragraph.
   const cellDeleteTr = ['deleteContentBackward', 'deleteContentForward'].includes(tr.getMeta('inputType')) && (state.selection instanceof CellSelection);
@@ -225,6 +226,7 @@ export function trackedTransaction (tr: Transaction, state: EditorState, user: {
             step.to, // We insert all the same steps, but with "from"/"to" both set to "to" in order not to delete content. Mapped as needed.
             step.to,
             step.slice,
+            // @ts-ignore types are wrong
             step.structure
           )
           : false;
@@ -273,7 +275,7 @@ export function trackedTransaction (tr: Transaction, state: EditorState, user: {
         const to = step.getMap().map(step.gapFrom);
         markInsertion(newTr, from, to, user, date1, date10, false);
       }
-      else if (!step.slice.size || step.slice.content.content.length === 2) { // unwrapped from something
+      else if (!step.slice.size || (step.slice.content as any).content.length === 2) { // unwrapped from something
         const invertStep = originalStep.invert(tr.docs[originalStepIndex]).map(map);
         if (invertStep) {
           map.appendMap(invertStep.getMap());
@@ -285,7 +287,7 @@ export function trackedTransaction (tr: Transaction, state: EditorState, user: {
       else if (step.slice.size === 2 && step.gapFrom - step.from === 1 && step.to - step.gapTo === 1) { // Replaced one wrapping with another
         newTr.step(step);
         const oldNode = doc.nodeAt(step.from);
-        if (oldNode?.attrs.track) {
+        if (oldNode?.attrs.track && step.slice.content?.firstChild) {
           markWrapping(
             newTr,
             step.from,

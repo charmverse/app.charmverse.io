@@ -1,5 +1,6 @@
 import type { Mapping, Node, Transaction } from '@bangle.dev/pm';
 import { ReplaceStep, ReplaceAroundStep, replaceStep, Slice, Selection, TextSelection, EditorState, liftListItem } from '@bangle.dev/pm';
+import type { TrackAttribute } from './interfaces';
 
 export function deleteNode (tr: Transaction, node: Node, nodePos: number, map: Mapping, accept: boolean) { // Delete a node either because a deletion has been accepted or an insertion rejected.
   const newNodePos = map.map(nodePos); const
@@ -28,13 +29,13 @@ export function deleteNode (tr: Transaction, node: Node, nodePos: number, map: M
         );
       }
       else {
-        const track = node.attrs.track.filter(t => t.type !== trackType);
+        const track = node.attrs.track.filter((t: TrackAttribute) => t.type !== trackType);
         tr.setNodeMarkup(newNodePos, undefined, { ...node.attrs, track }, node.marks);
       }
     }
     else {
       // There is a block node right in front of it that cannot be removed. Give up. (table/figure/etc.)
-      const track = node.attrs.track.filter(t => t.type !== trackType);
+      const track = node.attrs.track.filter((t: TrackAttribute) => t.type !== trackType);
       tr.setNodeMarkup(newNodePos, undefined, { ...node.attrs, track }, node.marks);
     }
   }

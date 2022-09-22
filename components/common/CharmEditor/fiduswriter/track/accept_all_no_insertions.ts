@@ -1,29 +1,33 @@
-import type { Node } from '@bangle.dev/pm';
-import { Mapping, RemoveMarkStep, Transform } from '@bangle.dev/pm';
+import type { Node, Transaction } from '@bangle.dev/pm';
+import { Mapping, Mark, RemoveMarkStep, Transform } from '@bangle.dev/pm';
 
 import { deleteNode } from './delete';
+import type { TrackAttribute } from './interfaces';
 
 export function acceptAllNoInsertions (doc: Node) {
   const tr = new Transform(doc); const
     map = new Mapping();
   doc.descendants((node, pos) => {
-    const deletionTrack = node.attrs.track
-      ? node.attrs.track.find(t => t.type === 'deletion')
+
+    const trackAttr: TrackAttribute[] | undefined = node.attrs.track;
+
+    const deletionTrack = trackAttr
+      ? trackAttr.find(t => t.type === 'deletion')
       : node.marks.find(mark => mark.type.name === 'deletion');
-    const insertionTrack = node.attrs.track
-      ? node.attrs.track.find(t => t.type === 'insertion')
+    const insertionTrack = trackAttr
+      ? trackAttr.find(t => t.type === 'insertion')
       : node.marks.find(mark => mark.type.name === 'insertion');
     const formatChangeMark = node.marks.find(mark => mark.type.name === 'format_change');
-    const blockChangeTrack = node.attrs.track
-      ? node.attrs.track.find(t => t.name === 'block_change')
+    const blockChangeTrack = trackAttr
+      ? trackAttr.find(t => t.type === 'block_change')
       : false;
 
     if (deletionTrack) {
-      deleteNode(tr, node, pos, map, true);
+      deleteNode(tr as Transaction, node, pos, map, true);
       return false;
     }
     else if (insertionTrack) {
-      if (node.isInline) {
+      if (node.isInline && insertionTrack instanceof Mark) {
         tr.step(
           new RemoveMarkStep(
             map.map(pos),
@@ -33,7 +37,7 @@ export function acceptAllNoInsertions (doc: Node) {
         );
       }
       else {
-        const track = node.attrs.track.filter(t => t !== insertionTrack);
+        const track = trackAttr?.filter(t => t !== insertionTrack) ?? [];
         tr.setNodeMarkup(map.map(pos), undefined, { ...node.attrs, track }, node.marks);
       }
     }
@@ -47,7 +51,7 @@ export function acceptAllNoInsertions (doc: Node) {
       );
     }
     if (blockChangeTrack) {
-      const track = node.attrs.track.filter(t => t.type !== blockChangeTrack);
+      const track = trackAttr?.filter(t => t !== blockChangeTrack) ?? [];
       tr.setNodeMarkup(map.map(pos), undefined, { ...node.attrs, track }, node.marks);
     }
     return true;

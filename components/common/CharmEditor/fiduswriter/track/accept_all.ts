@@ -4,6 +4,7 @@ import { Mapping, AddMarkStep, RemoveMarkStep, ReplaceStep, Slice } from '@bangl
 import { deactivateAllSelectedChanges } from './helpers';
 
 import { deleteNode } from './delete';
+import type { TrackAttribute } from './interfaces';
 
 export function acceptAll (view: EditorView, from = 0, to = 0) {
   if (!to) {
@@ -16,8 +17,11 @@ export function acceptAll (view: EditorView, from = 0, to = 0) {
       return true;
     }
     let deletedNode = false;
+
+    const trackAttr: TrackAttribute[] | undefined = node.attrs.track;
+
     if (
-      node.attrs.track?.find(t => t.type === 'deletion')
+      trackAttr?.find(t => t.type === 'deletion')
     ) {
       deleteNode(tr, node, pos, map, true);
       deletedNode = true;
@@ -32,8 +36,8 @@ export function acceptAll (view: EditorView, from = 0, to = 0) {
       map.appendMap(delStep.getMap());
       deletedNode = true;
     }
-    else if (node.attrs.track?.find(t => t.type === 'insertion')) {
-      const track = node.attrs.track.filter(t => t.type !== 'insertion');
+    else if (trackAttr?.find(t => t.type === 'insertion')) {
+      const track = trackAttr.filter(t => t.type !== 'insertion');
       tr.setNodeMarkup(map.map(pos), undefined, { ...node.attrs, track }, node.marks);
     }
     else if (node.marks?.find(mark => mark.type.name === 'insertion' && !mark.attrs.approved)) {
@@ -63,11 +67,11 @@ export function acceptAll (view: EditorView, from = 0, to = 0) {
     }
 
     if (
-      !node.isInline && !deletedNode && node.attrs.track
+      !node.isInline && !deletedNode && trackAttr
     ) {
-      const blockChangeTrack = node.attrs.track.find(t => t.type === 'block_change');
+      const blockChangeTrack = trackAttr.find(t => t.type === 'block_change');
       if (blockChangeTrack) {
-        const track = node.attrs.track.filter(t => t !== blockChangeTrack);
+        const track = trackAttr.filter(t => t !== blockChangeTrack);
         tr.setNodeMarkup(map.map(pos), undefined, { ...node.attrs, track }, node.marks);
       }
     }

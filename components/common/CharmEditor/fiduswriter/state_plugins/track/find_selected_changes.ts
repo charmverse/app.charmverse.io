@@ -2,6 +2,7 @@ import type { EditorState, Mark } from '@bangle.dev/pm';
 import {
   getFromToMark
 } from './helpers';
+import type { TrackAttribute } from '../../track/interfaces';
 
 type SelectedChange = { from: any; to: any; } | null;
 interface SelectedChanges {
@@ -52,7 +53,7 @@ export function findSelectedChanges (state: EditorState) {
         }
         if (!insertionMark) {
           insertionMark = node.attrs.track
-            ? node.attrs.track.find(t => t.type === 'insertion')
+            ? node.attrs.track.find((t: TrackAttribute) => t.type === 'insertion')
             : node.marks.find(mark => mark.type.name === 'insertion' && !mark.attrs.approved);
           if (insertionMark) {
             insertionPos = pos;
@@ -63,7 +64,7 @@ export function findSelectedChanges (state: EditorState) {
         }
         if (!deletionMark) {
           deletionMark = node.attrs.track
-            ? node.attrs.track.find(t => t.type === 'deletion')
+            ? node.attrs.track.find((t: TrackAttribute) => t.type === 'deletion')
             : node.marks.find(mark => mark.type.name === 'deletion');
           if (deletionMark) {
             deletionPos = pos;

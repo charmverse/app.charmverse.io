@@ -3,6 +3,7 @@ import type { EditorState, Transaction } from '@bangle.dev/pm';
 import { Decoration, PluginKey } from '@bangle.dev/pm';
 import { getFromToMark } from '../state_plugins/track/helpers';
 import { selectedInsertionSpec, selectedDeletionSpec, selectedChangeFormatSpec, selectedChangeBlockSpec } from '../state_plugins/track/plugin';
+import type { TrackAttribute } from './interfaces';
 
 export const key = new PluginKey('track');
 
@@ -20,14 +21,14 @@ export function setSelectedChanges (state: EditorState, type: string, pos: numbe
     return;
   }
   const mark = node.attrs.track
-    ? node.attrs.track.find(t => t.type === type)
+    ? node.attrs.track.find((t: TrackAttribute) => t.type === type)
     : node.marks.find(m => m.type.name === type);
   if (!mark) {
     return;
   }
   const selectedChange = node.isInline ? getFromToMark(tr.doc, pos, mark) : { from: pos, to: pos + node.nodeSize };
-  let decos = DecorationSet.empty; let
-    spec;
+  let decos = DecorationSet.empty;
+  let spec;
   if (type === 'insertion') {
     spec = selectedInsertionSpec;
   }

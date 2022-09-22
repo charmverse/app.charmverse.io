@@ -4,9 +4,6 @@ import Button from 'components/common/Button';
 import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
 import { usePrimaryCharmEditor } from 'hooks/usePrimaryCharmEditor';
 import type { EditMode } from 'hooks/usePrimaryCharmEditor';
-import type { IPagePermissionFlags } from 'lib/permissions/pages';
-
-type PermissionType = keyof IPagePermissionFlags;
 
 const EDIT_MODE_CONFIG = {
   editing: {

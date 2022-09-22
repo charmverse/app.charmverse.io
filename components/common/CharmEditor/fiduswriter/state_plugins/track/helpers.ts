@@ -9,8 +9,10 @@ import {
   selectedChangeBlockSpec
 } from './plugin';
 
+import type { TrackAttribute } from '../../track/interfaces';
+
 export function getSelectedChanges (state: EditorState) {
-  const { decos } = key.getState(state);
+  const { decos } = key.getState(state) as { decos: typeof DecorationSet.empty };
 
   const insertion = decos.find(undefined, undefined, spec => spec === selectedInsertionSpec)[0];
   const deletion = decos.find(undefined, undefined, spec => spec === selectedDeletionSpec)[0];
@@ -27,7 +29,7 @@ export function setSelectedChanges (state: EditorState, type: string, pos: numbe
     return;
   }
   const mark = node.attrs.track
-    ? node.attrs.track.find(t => t.type === type)
+    ? node.attrs.track.find((t: TrackAttribute) => t.type === type)
     : node.marks.find(m => m.type.name === type);
   if (!mark) {
     return;

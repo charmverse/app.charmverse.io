@@ -1,7 +1,9 @@
+import type { NodeSelection } from '@bangle.dev/pm';
 import { Plugin, PluginKey, Decoration, DecorationSet } from '@bangle.dev/pm';
 
 import { findSelectedChanges } from './find_selected_changes';
 import { deactivateAllSelectedChanges } from './helpers';
+import type { TrackAttribute } from '../../track/interfaces';
 
 export const key = new PluginKey('track');
 export const selectedInsertionSpec = {};
@@ -26,9 +28,9 @@ export function trackPlugin (options: Options) {
         users[options.userId] = options.userName;
         state.doc.descendants(node => {
           if (node.attrs.track) {
-            node.attrs.track.forEach(track => {
+            node.attrs.track.forEach((track: TrackAttribute) => {
               if (
-                !users[track.user] && track.user !== 0
+                !users[track.user] && track.user !== ''
               ) {
                 users[track.user] = track.username;
               }
@@ -77,7 +79,7 @@ export function trackPlugin (options: Options) {
         if (tr.selectionSet) {
           const { insertion, deletion, formatChange } = findSelectedChanges(state);
           decos = DecorationSet.empty;
-          const decoType = tr.selection.node ? Decoration.node : Decoration.inline;
+          const decoType = (tr.selection as NodeSelection).node ? Decoration.node : Decoration.inline;
           if (insertion) {
             decos = decos.add(tr.doc, [decoType(insertion.from, insertion.to, {
               class: 'selected-insertion'
@@ -108,14 +110,14 @@ export function trackPlugin (options: Options) {
           decos
         } = this.getState(state);
         return decos;
-      },
-      handleDOMEvents: {
-        focus: (view, _event) => {
-          const otherView = view === options.editor.view ? options.editor.mod.footnotes.fnEditor.view : options.editor.view;
-          otherView.dispatch(deactivateAllSelectedChanges(otherView.state.tr));
-          return false;
-        }
       }
+      // handleDOMEvents: {
+      //   focus: (view, _event) => {
+      //     // const otherView = view === options.editor.view ? options.editor.mod.footnotes.fnEditor.view : options.editor.view;
+      //     // otherView.dispatch(deactivateAllSelectedChanges(otherView.state.tr));
+      //     return false;
+      //   }
+      // }
     }
   });
 }

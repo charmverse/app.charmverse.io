@@ -5,6 +5,8 @@ import { deactivateAllSelectedChanges } from './helpers';
 
 import { deleteNode } from './delete';
 
+import type { TrackAttribute } from './interfaces';
+
 export function accept (type: string, pos: number, view: EditorView) {
   const tr = view.state.tr.setMeta('track', true); const
     map = new Mapping();
@@ -31,7 +33,7 @@ export function accept (type: string, pos: number, view: EditorView) {
       }
       else if (type === 'insertion') {
         if (node.attrs.track) {
-          const track = node.attrs.track.filter(t => t.type !== 'insertion');
+          const track = node.attrs.track.filter((t: TrackAttribute) => t.type !== 'insertion');
           if (node.attrs.track.length === track) {
             return true;
           }
@@ -63,7 +65,7 @@ export function accept (type: string, pos: number, view: EditorView) {
         }
       }
       else if (type === 'block_change') {
-        const track = node.attrs.track.filter(t => t.type !== 'block_change');
+        const track = node.attrs.track.filter((t: TrackAttribute) => t.type !== 'block_change');
         tr.setNodeMarkup(map.map(nodePos), undefined, { ...node.attrs, track }, node.marks);
       }
       return true;

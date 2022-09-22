@@ -3,13 +3,14 @@ import { Mapping, AddMarkStep, RemoveMarkStep } from '@bangle.dev/pm';
 
 import { deactivateAllSelectedChanges } from './helpers';
 import { deleteNode } from './delete';
+import type { TrackAttribute } from './interfaces';
 
 export function reject (type: string, pos: number, view: EditorView) {
   const tr = view.state.tr.setMeta('track', true); const
     map = new Mapping();
   let reachedEnd = false; let
     inlineChange = false;
-  const trackMark = view.state.doc?.nodeAt(pos).marks.find(mark => mark.type.name === type);
+  const trackMark = view.state.doc?.nodeAt(pos)?.marks.find(mark => mark.type.name === type);
   view.state.doc.nodesBetween(pos, view.state.doc.nodeSize - 2, (node, nodePos) => {
     if (nodePos < pos) {
       return true;
@@ -35,8 +36,8 @@ export function reject (type: string, pos: number, view: EditorView) {
     }
     else if (type === 'deletion') {
       if (node.attrs.track) {
-        const track = node.attrs.track.filter(t => t.type !== 'deletion');
-        tr.setNodeMarkup(map.map(nodePos), null, { ...node.attrs, track }, node.marks);
+        const track = node.attrs.track.filter((t: TrackAttribute) => t.type !== 'deletion');
+        tr.setNodeMarkup(map.map(nodePos), undefined, { ...node.attrs, track }, node.marks);
         reachedEnd = true;
       }
       else {
@@ -49,19 +50,19 @@ export function reject (type: string, pos: number, view: EditorView) {
     }
     else if (type === 'format_change') {
       if (trackMark) {
-        trackMark.attrs.before.forEach(oldMark => tr.step(
+        trackMark.attrs.before.forEach((oldMark: string) => tr.step(
           new AddMarkStep(
             map.map(nodePos),
             map.map(nodePos + node.nodeSize),
             view.state.schema.marks[oldMark].create()
           )
         ));
-        trackMark.attrs.after.forEach(newMark => {
+        trackMark.attrs.after.forEach((newMark: string) => {
           tr.step(
             new RemoveMarkStep(
               map.map(nodePos),
               map.map(nodePos + node.nodeSize),
-              node.marks.find(mark => mark.type.name === newMark)
+              node.marks.find(mark => mark.type.name === newMark)!
             )
           );
         });
@@ -75,8 +76,8 @@ export function reject (type: string, pos: number, view: EditorView) {
       }
     }
     else if (type === 'block_change') {
-      const blockChangeTrack = node.attrs.track?.find(t => t.type === 'block_change');
-      const track = node.attrs.track?.filter(t => t !== blockChangeTrack);
+      const blockChangeTrack = node.attrs.track?.find((t: TrackAttribute) => t.type === 'block_change');
+      const track = node.attrs.track?.filter((t: TrackAttribute) => t !== blockChangeTrack);
       if (!blockChangeTrack) {
         return true;
       }
