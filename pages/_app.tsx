@@ -34,6 +34,7 @@ import { PageTitleProvider, usePageTitle } from 'hooks/usePageTitle';
 import { SpacesProvider } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
 import { SnackbarProvider } from 'hooks/useSnackbar';
+import { PrimaryCharmEditorProvider } from 'hooks/usePrimaryCharmEditor';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
 
@@ -298,9 +299,11 @@ function DataProviders ({ children }: { children: ReactNode }) {
           <BountiesProvider>
             <PaymentMethodsProvider>
               <PagesProvider>
-                <PageTitleProvider>
-                  {children}
-                </PageTitleProvider>
+                <PrimaryCharmEditorProvider>
+                  <PageTitleProvider>
+                    {children}
+                  </PageTitleProvider>
+                </PrimaryCharmEditorProvider>
               </PagesProvider>
             </PaymentMethodsProvider>
           </BountiesProvider>

@@ -36,6 +36,7 @@ import ShareButton from './components/ShareButton';
 import BountyShareButton from './components/BountyShareButton/BountyShareButton';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
 import DatabasePageOptions from './components/DatabasePageOptions';
+import EditingModeToggle from './components/EditingModeToggle';
 
 export const headerHeight = 56;
 
@@ -102,7 +103,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
   }
 
   const isFullWidth = basePage?.fullWidth ?? false;
-  const isBasePageDocument = basePage?.type === 'page' || basePage?.type === 'card' || basePage?.type === 'proposal' || basePage?.type === 'bounty';
+  const isBasePageDocument = ['page', 'card', 'proposal', 'proposal_template', 'bounty'].includes(basePage?.type ?? '');
 
   const documentOptions = (
     <List dense>
@@ -205,14 +206,12 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
     setPageMenuOpen(false);
   }
 
-  const databaseOptions = basePage ? <DatabasePageOptions closeMenu={closeMenu} /> : null;
-
   let pageOptionsList: ReactNode;
   if (isBasePageDocument) {
     pageOptionsList = documentOptions;
   }
   else if (/board/.test(basePage?.type ?? '')) {
-    pageOptionsList = databaseOptions;
+    pageOptionsList = <DatabasePageOptions closeMenu={closeMenu} />;
   }
 
   return (
@@ -241,6 +240,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
       >
         <PageTitleWithBreadcrumbs pageId={basePage?.id} />
         <Box display='flex' alignItems='center' alignSelf='stretch' mr={-1}>
+
           {
             isBountyBoard && (
               <BountyShareButton headerHeight={headerHeight} />
@@ -249,7 +249,10 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
 
           {basePage && (
             <>
-              {basePage?.deletedAt === null && <ShareButton headerHeight={headerHeight} pageId={basePage.id} />}
+              <EditingModeToggle />
+              {basePage?.deletedAt === null && (
+                <ShareButton headerHeight={headerHeight} pageId={basePage.id} />
+              )}
               <IconButton sx={{ display: { xs: 'none', md: 'inline-flex' } }} size='small' onClick={toggleFavorite} color='inherit'>
                 <Tooltip title={isFavorite ? 'Remove from sidebar' : 'Pin this page to your sidebar'} arrow placement='top'>
                   {isFavorite ? <FavoritedIcon color='secondary' /> : <NotFavoritedIcon color='secondary' />}

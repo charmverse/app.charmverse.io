@@ -317,6 +317,7 @@ export type UpdatePageContent = (content: ICharmEditorOutput) => any;
 interface CharmEditorProps {
   content?: PageContent;
   children?: ReactNode;
+  enableSuggestingMode?: boolean;
   onContentChange?: UpdatePageContent;
   readOnly?: boolean;
   style?: CSSProperties;
@@ -351,6 +352,7 @@ export function convertPageContentToMarkdown (content: PageContent, title?: stri
 
 function CharmEditor (
   {
+    enableSuggestingMode = false,
     pageActionDisplay = null,
     content = defaultContent,
     children,
@@ -457,15 +459,10 @@ function CharmEditor (
     }
   }, [editorRef.current]);
 
-  const [enabled, setEnabled] = useState(false);
-  function toggleSuggestions () {
-    setEnabled(!enabled);
-  }
-
   return (
     <StyledReactBangleEditor
       disablePageSpecificFeatures={disablePageSpecificFeatures}
-      enableSuggestions={enabled} // pagePermissions?.comment}
+      enableSuggestions={enableSuggestingMode} // pagePermissions?.comment}
       style={{
         ...(style ?? {}),
         width: '100%',
@@ -586,7 +583,7 @@ function CharmEditor (
         }
       }}
     >
-      <EditModeButton enabled={enabled} toggle={toggleSuggestions} />
+      {/* <EditModeButton enabled={enabled} toggle={toggleSuggestions} /> */}
       <floatingMenu.FloatingMenu
         enableComments={!disablePageSpecificFeatures}
         enableVoting={enableVoting}
