@@ -97,6 +97,7 @@ export function generateAccessiblePagesQuery ({ spaceId, userId, archived }: Pag
         {
           type: 'proposal_template',
           space: {
+            id: spaceId,
             spaceRoles: {
               some: {
                 userId
