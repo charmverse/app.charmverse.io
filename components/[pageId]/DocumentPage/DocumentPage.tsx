@@ -155,7 +155,8 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
         <div ref={containerRef}>
           {page.deletedAt && <PageDeleteBanner pageId={page.id} />}
           <PageTemplateBanner parentPage={page.parentId ? pages[page.parentId] : null} page={page} />
-          {page.headerImage && <PageBanner headerImage={page.headerImage} readOnly={readOnly} setPage={setPage} />}
+          {/* temporary? disable editing of page meta data when in suggestion mode */}
+          {page.headerImage && <PageBanner headerImage={page.headerImage} readOnly={readOnly || enableSuggestingMode} setPage={setPage} />}
           <Container
             top={pageTop}
             fullWidth={page.fullWidth ?? false}
@@ -174,11 +175,12 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
               pageType={page.type}
               pagePermissions={pagePermissions}
             >
+              {/* temporary? disable editing of page title when in suggestion mode */}
               <PageHeader
                 headerImage={page.headerImage}
                 icon={page.icon}
                 title={page.title}
-                readOnly={readOnly}
+                readOnly={readOnly || enableSuggestingMode}
                 setPage={setPage}
               />
               {page.type === 'proposal' && !isLoading && pageVote && (

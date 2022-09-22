@@ -26,7 +26,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
   const pagesLoaded = Object.keys(pages).length > 0;
 
   const parentProposalId = findParentOfType({ pageId, pageType: 'proposal', pageMap: pages });
-  const readOnly = currentPagePermissions?.edit_content === false;
+  const readOnly = (currentPagePermissions?.edit_content === false && editMode !== 'suggesting') || editMode === 'viewing';
 
   useEffect(() => {
     async function main () {
@@ -152,7 +152,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
         // Document page is used in a few places, so it is responsible for retrieving its own permissions
         <DocumentPage
           page={memoizedCurrentPage}
-          readOnly={readOnly || editMode === 'viewing'}
+          readOnly={readOnly}
           setPage={setPage}
           parentProposalId={parentProposalId}
         />
