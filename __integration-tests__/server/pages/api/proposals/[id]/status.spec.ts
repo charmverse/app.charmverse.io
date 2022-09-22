@@ -1,8 +1,8 @@
 import type { Space, User } from '@prisma/client';
 import { prisma } from 'db';
 import request from 'supertest';
-import { baseUrl } from 'testing/mockApiCall';
-import { createProposalWithUsers, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { baseUrl, loginUser } from 'testing/mockApiCall';
+import { createProposalWithUsers, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 
 let author: User;
@@ -39,6 +39,26 @@ beforeAll(async () => {
 });
 
 describe('PUT /api/proposals/[id]/status - Update proposal status', () => {
+
+  it('should allow an admin to update the proposal status and return 200', async () => {
+    const proposalPage = await createProposalWithUsers({
+      spaceId: space.id,
+      userId: author.id,
+      authors: [],
+      reviewers: [reviewer.id]
+    });
+
+    const adminUser = await generateSpaceUser({ spaceId: space.id, isAdmin: true });
+    const adminCookie = await loginUser(adminUser);
+
+    (await request(baseUrl)
+      .put(`/api/proposals/${proposalPage.proposalId}/status`)
+      .set('Cookie', adminCookie)
+      .send({
+        newStatus: 'discussion'
+      })
+      .expect(200));
+  });
   it('should throw error and return 400 if the newStatus is not passed in body', async () => {
     const proposalPage = await createProposalWithUsers({
       spaceId: space.id,
