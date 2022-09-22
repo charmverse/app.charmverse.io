@@ -7,7 +7,6 @@ import { getKey } from 'hooks/useLocalStorage';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import { count } from 'lib/metrics';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
 
@@ -30,20 +29,16 @@ export default function LoginPage () {
   function redirectUserAfterLogin () {
     if (typeof router.query.returnUrl === 'string') {
       router.push(router.query.returnUrl);
-      count('tst_index_returnUrl', 1);
     }
     else if (defaultWorkspace === '/nexus') {
       router.push('/nexus');
-      count('tst_index_nexus', 1);
     }
     else if (spaces.length > 0) {
       const isValidDefaultWorkspace = !!defaultWorkspace && spaces.some(space => defaultWorkspace.startsWith(`/${space.domain}`));
       router.push(isValidDefaultWorkspace ? defaultWorkspace : `/${spaces[0].domain}`);
-      count('tst_index_get_default_workspace', 1);
     }
     else {
       router.push('/signup');
-      count('tst_get_signup', 1);
     }
   }
 
@@ -52,11 +47,9 @@ export default function LoginPage () {
     if (isDataLoaded) {
       // redirect once account exists (user has connected wallet)
       if (account || user) {
-        count('tst_redirect_login', 1);
         redirectUserAfterLogin();
       }
       else {
-        count('tst_show_login', 1);
         setShowLogin(true);
       }
     }
