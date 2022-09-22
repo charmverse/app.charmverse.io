@@ -11,6 +11,7 @@ export async function getProposalsBySpace ({ spaceId, userId }: {
       spaceId,
       page: {
         deletedAt: null,
+        type: 'proposal',
         OR: [{
           permissions: accessiblePagesByPermissionsQuery({
             spaceId,
@@ -31,7 +32,8 @@ export async function getProposalsBySpace ({ spaceId, userId }: {
     },
     include: {
       authors: true,
-      reviewers: true
+      reviewers: true,
+      category: true
     }
   });
 }

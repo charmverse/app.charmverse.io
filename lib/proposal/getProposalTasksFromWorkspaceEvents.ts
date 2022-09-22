@@ -3,26 +3,28 @@ import { prisma } from 'db';
 import type { ProposalWithUsers } from './interface';
 
 export interface ProposalTask {
-  id: string
-  action: 'start_discussion' | 'start_vote' | 'review' | 'discuss' | 'vote' | 'start_review'
-  spaceDomain: string
-  spaceName: string
-  pageTitle: string
-  pagePath: string
-  status: ProposalStatus
+  id: string;
+  action: 'start_discussion' | 'start_vote' | 'review' | 'discuss' | 'vote' | 'start_review';
+  spaceDomain: string;
+  spaceName: string;
+  pageTitle: string;
+  pagePath: string;
+  status: ProposalStatus;
 }
 
-type ProposalRecord = Record<string, ProposalWithUsers & {
-  space: Pick<Space, 'domain' | 'name'>
-  page: Pick<Page, 'path' | 'title'> | null
-}>
+type PopulatedPage = Pick<Page, 'id' | 'path' | 'title'> & {
+  space: Pick<Space, 'domain' | 'name'>;
+  proposal: ProposalWithUsers | null;
+};
+
+type ProposalRecord = Record<string, PopulatedPage | undefined>;
 
 type ProposalStatusChangeMetaData = {
-  newStatus: ProposalStatus
-  oldStatus: ProposalStatus
+  newStatus: ProposalStatus;
+  oldStatus?: ProposalStatus; // by convention, an undefined oldStatus means the proposal was just created
 }
 
-type ProposalStatusChangeWorkspaceEvent = WorkspaceEvent & { type: 'proposal_status_change' } & { meta: ProposalStatusChangeMetaData }
+type ProposalStatusChangeWorkspaceEvent = WorkspaceEvent & { type: 'proposal_status_change' } & { meta: ProposalStatusChangeMetaData };
 
 export async function getProposalTasksFromWorkspaceEvents (userId: string, workspaceEvents: WorkspaceEvent[]) {
   const proposalTasks: ProposalTask[] = [];
@@ -30,27 +32,24 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
   // Sort the events in descending order based on their created date to help in de-duping
   workspaceEvents.sort((we1, we2) => we1.createdAt > we2.createdAt ? -1 : 1);
 
-  const proposals = await prisma.proposal.findMany({
+  const proposalPages = await prisma.page.findMany({
     where: {
-      page: {
-        id: {
-          in: workspaceEvents.map(workspaceEvent => workspaceEvent.pageId)
-        }
+      id: {
+        in: workspaceEvents.map(workspaceEvent => workspaceEvent.pageId)
       }
     },
     include: {
-      authors: true,
-      reviewers: true,
       space: {
         select: {
           domain: true,
           name: true
         }
       },
-      page: {
-        select: {
-          path: true,
-          title: true
+      proposal: {
+        include: {
+          authors: true,
+          reviewers: true,
+          category: true
         }
       }
     }
@@ -88,14 +87,10 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
     ? spaceRole.spaceRoleToRole[0].role.id
     : null).filter(roleId => roleId);
 
-  const proposalsRecord: ProposalRecord = proposals.reduce<ProposalRecord>((record, proposal) => {
+  const proposalsRecord: ProposalRecord = proposalPages.reduce<ProposalRecord>((record, proposal) => {
     record[proposal.id] = proposal;
     return record;
   }, {});
-
-  proposals.forEach(proposal => {
-    proposalsRecord[proposal.id] = proposal;
-  });
 
   // A single proposal might trigger multiple workspace events
   // We want to register them as a single event
@@ -104,15 +99,15 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
   const visitedProposals: Set<string> = new Set();
 
   for (const workspaceEvent of workspaceEvents) {
-    const proposal = proposalsRecord[workspaceEvent.pageId];
+    const page = proposalsRecord[workspaceEvent.pageId];
 
     // If an even for this proposal was already handled no need to process further
-    if (!visitedProposals.has(proposal.id)) {
+    if (page && page.proposal && !visitedProposals.has(page.id)) {
       const { meta: { newStatus } } = workspaceEvent as ProposalStatusChangeWorkspaceEvent;
 
-      const isAuthor = Boolean(proposal.authors.find(author => author.userId === userId));
+      const isAuthor = Boolean(page.proposal.authors.find(author => author.userId === userId));
       const isContributor = spaceIds.includes(workspaceEvent.spaceId);
-      const isReviewer = Boolean(proposal.reviewers.find(reviewer => {
+      const isReviewer = Boolean(page.proposal.reviewers.find(reviewer => {
         if (reviewer.userId) {
           return reviewer.userId === userId;
         }
@@ -121,11 +116,11 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
 
       const proposalTask: Omit<ProposalTask, 'action'> = {
         id: workspaceEvent.id,
-        pagePath: (proposal.page as Page).path,
-        pageTitle: (proposal.page as Page).title,
-        spaceDomain: proposal.space.domain,
-        spaceName: proposal.space.name,
-        status: proposal.status
+        pagePath: page.path,
+        pageTitle: page.title,
+        spaceDomain: page.space.domain,
+        spaceName: page.space.name,
+        status: page.proposal.status
       };
 
       if (newStatus === 'discussion') {
@@ -175,7 +170,7 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
         }
       }
 
-      visitedProposals.add(proposal.id);
+      visitedProposals.add(page.id);
     }
   }
 
