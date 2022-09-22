@@ -42,14 +42,14 @@ describe('POST /api/proposals/from-template - Instantiate a proposal template', 
 
     const proposal = await prisma.proposal.findUnique({
       where: {
-        id: createdProposal.proposalId
+        id: createdProposal.proposalId as string
       },
       include: {
         reviewers: true
       }
     });
 
-    expect(proposal?.reviewers.some(r => r.userId === adminUser.id)).toBe(true);
+    expect(proposal?.reviewers?.some(r => r.userId === adminUser.id)).toBe(true);
 
   });
 
