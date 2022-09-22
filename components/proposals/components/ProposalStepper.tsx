@@ -9,7 +9,7 @@ import CreateVoteModal from 'components/votes/components/CreateVoteModal';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import type { ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';
 import { proposalStatusTransitionPermission, proposalStatusTransitionRecord, PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import type { KeyedMutator } from 'swr';
 
 const proposalStatuses = Object.keys(proposalStatusTransitionRecord) as ProposalStatus[];
@@ -47,7 +47,7 @@ export default function ProposalStepper (
         );
 
         return (
-          <div key={status}>
+          <Fragment key={status}>
             <Grid item md={12 / 13} display='flex' position='relative' alignItems='center' justifyContent='center'>
               <Stack
                 alignItems='center'
@@ -110,7 +110,7 @@ export default function ProposalStepper (
                 />
               </Grid>
             )}
-          </div>
+          </Fragment>
         );
       })}
       <CreateVoteModal
