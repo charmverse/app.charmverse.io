@@ -2,8 +2,8 @@ import type { Proposal, ProposalAuthor, ProposalReviewer } from '@prisma/client'
 import type { AssignablePermissionGroups } from 'lib/permissions/interfaces';
 
 export interface ProposalReviewerInput {
-  group: Extract<AssignablePermissionGroups, 'role' | 'user'>
-  id: string
+  group: Extract<AssignablePermissionGroups, 'role' | 'user'>;
+  id: string;
 }
 
 export interface NewProposalCategory {
@@ -21,7 +21,7 @@ export interface ProposalWithCategory extends Proposal {
 }
 
 export interface ProposalWithUsers extends Proposal, ProposalWithCategory {
-  authors: ProposalAuthor[],
-  reviewers: ProposalReviewer[]
+  authors: ProposalAuthor[];
+  reviewers: ProposalReviewer[];
 }
 
