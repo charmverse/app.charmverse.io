@@ -9,7 +9,7 @@ type OptionalPageProps = 'content' | 'contentText' | 'title';
 
 type ProposalPageInput = Pick<Prisma.PageUncheckedCreateInput, PageProps>
   & Partial<Pick<Prisma.PageUncheckedCreateInput, OptionalPageProps>>;
-type ProposalInput = { reviewers: { roleId?: string; userId?: string }[] };
+type ProposalInput = { reviewers: { roleId?: string; userId?: string }[], categoryId: string | null };
 
 export async function createProposal (pageProps: ProposalPageInput, proposalProps?: ProposalInput) {
 
@@ -28,6 +28,7 @@ export async function createProposal (pageProps: ProposalPageInput, proposalProp
         id: proposalId,
         spaceId,
         status: proposalStatus,
+        categoryId: proposalProps?.categoryId || null,
         authors: {
           create: {
             userId: createdBy

@@ -679,7 +679,7 @@ model Proposal {
   reviewer   User?              @relation(fields: [reviewedBy], references: [id], onDelete: Cascade)
   reviewedAt DateTime?
   categoryId String?            @db.Uuid
-  category   ProposalCategory?  @relation(fields: [categoryId], references: [id])
+  category   ProposalCategory?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
 }
 
 model ProposalAuthor {
