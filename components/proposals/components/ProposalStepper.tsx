@@ -40,7 +40,13 @@ export default function ProposalStepper (
   const stepperDimension = 25;
 
   return (
-    <Grid container>
+    <Grid
+      container
+      flexDirection={{
+        xs: 'column',
+        md: 'row'
+      }}
+    >
       {proposalStatuses.map((status, statusIndex) => {
         const canChangeStatus = (currentStatus === 'discussion' && status === 'review' ? proposal.reviewers.length !== 0 : true) && proposalUserGroups.some(
           proposalUserGroup => proposalStatusTransitionPermission[currentStatus]?.[proposalUserGroup]?.includes(status)
@@ -101,11 +107,38 @@ export default function ProposalStepper (
               </Stack>
             </Grid>
             {statusIndex !== proposalStatuses.length - 1 && (
-              <Grid item md={12 / 13}>
+              <Grid
+                item
+                md={12 / 13}
+                sx={{
+                  '&.MuiGrid-root.MuiGrid-item': {
+                    height: {
+                      xs: 40,
+                      md: 2
+                    }
+                  }
+                }}
+              >
                 <Divider
                   sx={{
-                    position: 'relative',
-                    top: stepperDimension / 2
+                    '&.MuiDivider-root': {
+                      width: {
+                        md: '100%',
+                        xs: 2
+                      },
+                      height: {
+                        xs: 25,
+                        md: 2
+                      },
+                      margin: {
+                        xs: '0 auto'
+                      },
+                      top: {
+                        xs: 5,
+                        md: stepperDimension / 2
+                      }
+                    },
+                    position: 'relative'
                   }}
                 />
               </Grid>
