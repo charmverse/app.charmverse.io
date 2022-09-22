@@ -1,11 +1,12 @@
+import type { Page } from '@prisma/client';
 import { SpaceOperation } from '@prisma/client';
-import type { PageWithProposal } from 'lib/pages';
 import { addSpaceOperations, removeSpaceOperations } from 'lib/permissions/spaces';
 import { createProposalTemplate } from 'lib/templates/proposals/createProposalTemplate';
 import { typedKeys } from 'lib/utilities/objects';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { prisma } from 'db';
 
 describe('POST /api/proposals/from-template - Instantiate a proposal template', () => {
   it('should copy a proposal template if the user can create pages and respond with 201', async () => {
@@ -37,9 +38,18 @@ describe('POST /api/proposals/from-template - Instantiate a proposal template', 
         templateId: proposalTemplate.id,
         spaceId: space.id
       })
-      .expect(201)).body as PageWithProposal;
+      .expect(201)).body as Page;
 
-    expect(createdProposal.proposal?.reviewers.some(r => r.userId === adminUser.id)).toBe(true);
+    const proposal = await prisma.proposal.findUnique({
+      where: {
+        id: createdProposal.proposalId as string
+      },
+      include: {
+        reviewers: true
+      }
+    });
+
+    expect(proposal?.reviewers?.some(r => r.userId === adminUser.id)).toBe(true);
 
   });
 

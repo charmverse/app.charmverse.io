@@ -7,26 +7,10 @@ import { getProposal } from '../getProposal';
 describe('getProposal', () => {
   it('should return the proposal page content, permissions and proposal data', async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken();
-    const pageWithProposal = await createProposal({
-      pageCreateInput: {
-        author: {
-          connect: {
-            id: user.id
-          }
-        },
-        contentText: '',
-        path: 'path',
-        space: {
-          connect: {
-            id: space.id
-          }
-        },
-        title: 'page-title',
-        type: 'proposal',
-        updatedBy: user.id
-      },
+    const { page: pageWithProposal } = await createProposal({
+      createdBy: user.id,
       spaceId: space.id,
-      userId: user.id
+      title: 'page-title'
     });
 
     const proposal = await getProposal({

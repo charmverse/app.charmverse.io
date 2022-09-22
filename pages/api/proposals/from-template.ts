@@ -1,8 +1,8 @@
 
 import { onError, onNoMatch, requireKeys, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
-import type { CreateProposalFromTemplateInput } from 'lib/proposal/createProposal';
-import { createProposal } from 'lib/proposal/createProposal';
+import type { CreateProposalFromTemplateInput } from 'lib/proposal/createProposalFromTemplate';
+import { createProposalFromTemplate } from 'lib/proposal/createProposalFromTemplate';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -31,13 +31,13 @@ async function createProposalFromTemplateController (req: NextApiRequest, res: N
     throw new UnauthorisedActionError('You cannot create new pages');
   }
 
-  const newProposal = await createProposal({
+  const { page: newPage } = await createProposalFromTemplate({
     templateId,
     spaceId,
-    userId
+    createdBy: userId
   });
 
-  return res.status(201).json(newProposal);
+  return res.status(201).json(newPage);
 }
 
 export default withSessionRoute(handler);
