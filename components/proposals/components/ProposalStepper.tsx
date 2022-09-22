@@ -6,30 +6,36 @@ import type { ProposalStatus } from '@prisma/client';
 import charmClient from 'charmClient';
 import useTasks from 'components/nexus/hooks/useTasks';
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
+import useIsAdmin from 'hooks/useIsAdmin';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import type { ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';
 import { proposalStatusTransitionPermission, proposalStatusTransitionRecord, PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import { Fragment, useState } from 'react';
 import type { KeyedMutator } from 'swr';
-import useIsAdmin from 'hooks/useIsAdmin';
 
 const proposalStatuses = Object.keys(proposalStatusTransitionRecord) as ProposalStatus[];
 
 export default function ProposalStepper (
   { refreshProposal, proposal, proposalUserGroups }:
-  { refreshProposal: KeyedMutator<ProposalWithUsers>, proposalUserGroups: ProposalUserGroup[], proposal: ProposalWithUsers}
+  { refreshProposal: KeyedMutator<ProposalWithUsers>, proposalUserGroups: ProposalUserGroup[], proposal?: ProposalWithUsers}
 ) {
-  const { status: currentStatus } = proposal;
+
+  const { status: currentStatus, id: proposalId, reviewers } = proposal ?? {
+    status: null,
+    id: null,
+    reviewers: []
+  };
+
   const theme = useTheme();
   const { mutate: mutateTasks } = useTasks();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const isAdmin = useIsAdmin();
 
-  const currentStatusIndex = proposalStatuses.indexOf(currentStatus);
+  const currentStatusIndex = currentStatus ? proposalStatuses.indexOf(currentStatus) : -1;
 
   async function updateProposalStatus (newStatus: ProposalStatus) {
-    if (newStatus !== currentStatus) {
-      await charmClient.proposals.updateStatus(proposal.id, newStatus);
+    if (newStatus !== currentStatus && proposalId) {
+      await charmClient.proposals.updateStatus(proposalId, newStatus);
       await refreshProposal();
       mutateTasks();
     }
@@ -44,9 +50,9 @@ export default function ProposalStepper (
   return (
     <Grid container>
       {proposalStatuses.map((status, statusIndex) => {
-        const canChangeStatus = (currentStatus === 'discussion' && status === 'review' ? proposal.reviewers.length !== 0 : true) && (proposalUserGroups.some(
+        const canChangeStatus = currentStatus ? (currentStatus === 'discussion' && status === 'review' ? reviewers.length !== 0 : true) && (proposalUserGroups.some(
           proposalUserGroup => proposalStatusTransitionPermission[currentStatus]?.[proposalUserGroup]?.includes(status)
-        ) || isAdmin);
+        ) || isAdmin) : false;
 
         return (
           <Fragment key={status}>

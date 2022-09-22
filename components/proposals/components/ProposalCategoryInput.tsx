@@ -38,7 +38,15 @@ function ProposalCategoryOption ({ props, category, onDelete }: ProposalCategory
         <Chip variant='filled' color={category.color as BrandColor} label={category.title} sx={{ maxWidth: 150, flex: 1, display: 'flex', cursor: 'pointer' }} />
 
         {!!onDelete && (
-          <IconButton color='secondary' size='small' onClick={() => onDelete(category.id)}>
+          <IconButton
+            color='secondary'
+            size='small'
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onDelete(category.id);
+            }}
+          >
             <DeleteIcon />
           </IconButton>
         )}
@@ -146,6 +154,17 @@ export default function ProposalCategoryInput ({ disabled, options, canEditCateg
         }
 
         return filtered;
+      }}
+      isOptionEqualToValue={(option, checkValue) => {
+        if ('inputValue' in option) {
+          return 'inputValue' in checkValue && option.inputValue === checkValue.inputValue;
+        }
+
+        if ('id' in option) {
+          return 'id' in checkValue && option.id === checkValue.id;
+        }
+
+        return false;
       }}
       onChange={(_, values) => {
         onValueChange(values);
