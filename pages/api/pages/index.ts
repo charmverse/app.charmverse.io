@@ -21,7 +21,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser).post(createPage);
 
 async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
-  const data = req.body as Page;
+  const data = req.body as Prisma.PageUncheckedCreateInput;
 
   const spaceId = data.spaceId;
 
@@ -46,42 +46,38 @@ async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
   // We now need to specify this as a ParentPage.connect prisma argument instead of a raw string
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { createdBy, spaceId: droppedSpaceId, ...pageCreationData } = data;
-  const typedPageCreationData = pageCreationData as any as Prisma.PageCreateInput;
-
-  typedPageCreationData.author = {
-    connect: {
-      id: userId
-    }
-  };
-
-  typedPageCreationData.space = {
-    connect: {
-      id: spaceId
-    }
-  };
 
   let page: Page;
 
-  if (typedPageCreationData.type === 'proposal') {
-    page = await createProposal({
-      pageCreateInput: typedPageCreationData,
+  if (pageCreationData.type === 'proposal') {
+    ({ page } = await createProposal({
+      ...pageCreationData,
       spaceId,
-      userId
-    });
+      createdBy
+    }));
   }
   else {
-    page = await prisma.page.create({ data: typedPageCreationData });
+    page = await prisma.page.create({ data: {
+      spaceId,
+      createdBy,
+      ...pageCreationData
+    } });
   }
 
   try {
 
-    const proposalIdForPermissions = page.type === 'proposal' ? page.id : (page.parentId ? (await resolvePageTree({
+    const proposalIdForPermissions = page.parentId ? (await resolvePageTree({
       pageId: page.id
       // includeDeletedPages: true
-    })).parents.find(p => p.type === 'proposal')?.id : undefined);
+    })).parents.find(p => p.type === 'proposal')?.id : undefined;
 
-    await (proposalIdForPermissions ? syncProposalPermissions({ proposalId: proposalIdForPermissions as string })
-      : setupPermissionsAfterPageCreated(page.id));
+    // Create proposal method provisions proposal permissions, so we only need this operation for child pages of a proposal
+    if (proposalIdForPermissions) {
+      await syncProposalPermissions({ proposalId: proposalIdForPermissions as string });
+    }
+    else if (page.type !== 'proposal') {
+      await setupPermissionsAfterPageCreated(page.id);
+    }
 
     const pageWithPermissions = await getPage(page.id);
 

@@ -9,7 +9,7 @@ import React from 'react';
 import { Card } from '../../blocks/card';
 import { getCurrentBoardTemplates } from '../../store/cards';
 import { useAppSelector } from '../../store/hooks';
-import { TemplatesMenu } from './TemplatesMenu';
+import { TemplatesMenu } from 'components/common/TemplatesMenu';
 
 
 type Props = {
