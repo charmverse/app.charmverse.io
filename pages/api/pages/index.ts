@@ -37,7 +37,10 @@ async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
     userId
   });
 
-  if (!permissions.createPage) {
+  if (data.type === 'proposal' && !permissions.createVote) {
+    throw new UnauthorisedActionError('You do not have permission to create a page in this space');
+  }
+  else if (data.type !== 'proposal' && !permissions.createPage) {
     throw new UnauthorisedActionError('You do not have permissions to create a page.');
   }
 
