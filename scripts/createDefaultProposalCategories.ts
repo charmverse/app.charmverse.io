@@ -16,15 +16,15 @@ async function migrateProposal () {
 
   console.log('🔥 Count of spaces without categories:', spacesWithoutCategories.length);
 
-  await Promise.all(spacesWithoutCategories.map(({ id }) => createCategoriesForSpace(id)))
+  await prisma.$transaction(spacesWithoutCategories.map(({ id }) => createCategoriesForSpace(id)))
 
   console.log('🔥 Created default categories for all spaces.');
 }
 
-async function createCategoriesForSpace (id: string) {
+function createCategoriesForSpace (id: string) {
   const categoriesInput = generateDefaultCategoriesInput(id);
 
-  await prisma.proposalCategory.createMany({ data: categoriesInput });
+  return prisma.proposalCategory.createMany({ data: categoriesInput });
 }
 
 migrateProposal();
