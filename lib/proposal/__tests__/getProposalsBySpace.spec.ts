@@ -3,7 +3,6 @@ import { prisma } from 'db';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { createProposalWithUsers, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
-import { getPagePath } from '../../pages';
 import { createProposalTemplate } from '../../templates/proposals/createProposalTemplate';
 import { createProposal } from '../createProposal';
 import { getProposalsBySpace } from '../getProposalsBySpace';
@@ -95,27 +94,12 @@ describe('Get all proposals of a space', () => {
   it('should not return proposal templates', async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken(undefined, false);
 
-    const proposalPage = await createProposal({
+    const { page: proposalPage } = await createProposal({
       spaceId: space.id,
-      userId: user.id,
-      pageCreateInput: {
-        author: {
-          connect: {
-            id: user.id
-          }
-        },
-        updatedBy: user.id,
-        space: {
-          connect: {
-            id: space.id
-          }
-        },
-        contentText: '',
-        content: {},
-        type: 'proposal',
-        path: getPagePath(),
-        title: 'Example proposal'
-      }
+      createdBy: user.id,
+      contentText: '',
+      content: {},
+      title: 'Example proposal'
     });
 
     await syncProposalPermissions({

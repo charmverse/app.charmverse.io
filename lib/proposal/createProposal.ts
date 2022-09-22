@@ -1,154 +1,80 @@
-import type { Prisma } from '@prisma/client';
+import type { ProposalStatus, Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { v4 } from 'uuid';
-import { DataNotFoundError, InsecureOperationError } from 'lib/utilities/errors';
-import { getProposal } from './getProposal';
+import { v4 as uuid } from 'uuid';
 import { generateSyncProposalPermissions } from './syncProposalPermissions';
-import type { IPageWithPermissions, PageWithProposal } from '../pages';
 import { getPagePath } from '../pages';
 
-export interface CreateProposalInput {
-  pageCreateInput?: Prisma.PageCreateInput
-  spaceId: string
-  userId: string
-  templateId?: string
-}
+type PageProps = 'createdBy' | 'spaceId';
+type OptionalPageProps = 'content' | 'contentText' | 'title';
 
-export type CreateProposalFromTemplateInput = Required<Omit<CreateProposalInput, 'pageCreateInput'>>
-export type CreateProposalFromPageInput = Required<Omit<CreateProposalInput, 'templateId'>>
+type ProposalPageInput = Pick<Prisma.PageUncheckedCreateInput, PageProps>
+  & Partial<Pick<Prisma.PageUncheckedCreateInput, OptionalPageProps>>;
+type ProposalInput = { reviewers: { roleId?: string; userId?: string }[] };
 
-export async function createProposal ({
-  pageCreateInput,
-  userId,
-  spaceId
-}: CreateProposalFromPageInput): Promise<IPageWithPermissions & PageWithProposal>
-export async function createProposal ({
-  userId,
-  spaceId,
-  templateId
-}: CreateProposalFromTemplateInput): Promise<IPageWithPermissions & PageWithProposal>
-export async function createProposal ({
-  pageCreateInput,
-  userId,
-  spaceId,
-  templateId
-}: CreateProposalInput): Promise<IPageWithPermissions & PageWithProposal> {
-  const proposalId = v4();
+export async function createProposal (pageProps: ProposalPageInput, proposalProps?: ProposalInput) {
 
-  const proposalTemplate = templateId ? await getProposal({ proposalId: templateId }) : null;
+  const { createdBy, spaceId } = pageProps;
 
-  if (templateId && !proposalTemplate) {
-    throw new DataNotFoundError(`Proposal template with id ${templateId} not found`);
-    // Making the page id same as proposalId
-  }
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  else if (templateId && spaceId !== proposalTemplate!.spaceId) {
-    throw new InsecureOperationError('You cannot copy proposals from a different space');
-  }
-
-  let pageData: Prisma.PageCreateInput;
-
-  if (proposalTemplate) {
-    pageData = {
-      author: {
-        connect: {
-          id: userId
-        }
-      },
-      updatedBy: userId,
-      space: {
-        connect: {
-          id: spaceId
-        }
-      },
-      contentText: proposalTemplate.contentText,
-      content: proposalTemplate.content as Prisma.InputJsonValue ?? undefined,
-      id: proposalId,
-      type: 'proposal',
-      path: getPagePath(),
-      title: `Copy of ${proposalTemplate.title}`,
-      proposal: {
-        create: {
-          id: proposalId,
-          space: {
-            connect: {
-              id: spaceId
-            }
-          },
-          createdBy: userId,
-          status: 'private_draft',
-          authors: {
-            create: {
-              userId
-            }
-          },
-          reviewers: {
-            createMany: {
-              data: (proposalTemplate.proposal?.reviewers ?? []).map(r => {
-                return {
-                  roleId: r.roleId ? r.roleId : undefined,
-                  userId: r.userId ? r.userId : undefined
-                };
-              })
-            }
-          }
-        }
-      }
-    };
-  }
-  else {
-    pageData = {
-      ...pageCreateInput as Prisma.PageCreateInput,
-      id: proposalId,
-      proposal: {
-        create: {
-          id: proposalId,
-          createdBy: userId,
-          status: 'private_draft',
-          space: {
-            connect: {
-              id: spaceId
-            }
-          },
-          authors: {
-            create: {
-              userId
-            }
-          }
-        }
-      }
-    };
-  }
+  // Making the page id same as proposalId
+  const proposalId = uuid();
+  const proposalStatus: ProposalStatus = 'private_draft';
 
   // Using a transaction to ensure both the proposal and page gets created together
-  const createdPage = await prisma.$transaction(async () => {
-    await prisma.page.create({
-      data: pageData,
-      include: {
-        proposal: {
-          include: {
-            authors: true,
-            reviewers: true
+  const [proposal, page, workspaceEvent] = await prisma.$transaction([
+    prisma.proposal.create({
+      data: {
+        // Add page creator as the proposal's first author
+        createdBy,
+        id: proposalId,
+        spaceId,
+        status: proposalStatus,
+        authors: {
+          create: {
+            userId: createdBy
           }
         },
-        permissions: {
-          include: {
-            sourcePermission: true
+        ...proposalProps?.reviewers && {
+          reviewers: {
+            createMany: {
+              data: proposalProps.reviewers
+            }
           }
         }
       }
-    });
+    }),
+    prisma.page.create({
+      data: {
+        proposalId,
+        contentText: '',
+        path: getPagePath(),
+        title: '',
+        updatedBy: createdBy,
+        ...pageProps,
+        id: proposalId,
+        type: 'proposal'
+      }
+    }),
+    prisma.workspaceEvent.create({
+      data: {
+        type: 'proposal_status_change',
+        meta: {
+          newStatus: proposalStatus
+        },
+        actorId: createdBy,
+        pageId: proposalId,
+        spaceId
+      }
+    })
+  ]);
 
-    const [deleteArgs, createArgs] = await generateSyncProposalPermissions({ proposalId });
+  const [deleteArgs, createArgs] = await generateSyncProposalPermissions({ proposalId });
 
-    await prisma.pagePermission.deleteMany(deleteArgs);
+  await prisma.$transaction([
+    prisma.pagePermission.deleteMany(deleteArgs),
+    ...createArgs.map(args => (
+      prisma.pagePermission.create(args)
+    ))
+  ]);
 
-    for (const args of createArgs) {
-      await prisma.pagePermission.create(args);
-    }
-
-    return getProposal({ proposalId });
-  });
-
-  return createdPage;
+  return { page, proposal, workspaceEvent };
 }
