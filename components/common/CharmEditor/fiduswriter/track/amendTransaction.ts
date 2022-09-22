@@ -154,20 +154,23 @@ function markWrapping (
   let track: TrackAttribute[] = oldNode.attrs.track.slice();
   let blockTrack = track.find(t => t.type === 'block_change');
 
-  if (blockTrack?.before) {
+  const trackBefore = blockTrack?.before as undefined | { type: string, attrs: any };
+
+  if (blockTrack) {
     track = track.filter((t: TrackAttribute) => t !== blockTrack);
-    if (blockTrack.before.type !== newNode.type.name || blockTrack.before.attrs.level !== newNode.attrs.level) {
-      blockTrack = { type: 'block_change', user: user.id, username: user.username, date: date1, before: blockTrack.before };
+    if (trackBefore?.type !== newNode.type.name || trackBefore?.attrs.level !== newNode.attrs.level) {
+      blockTrack = { type: 'block_change', user: user.id, username: user.username, date: date1, before: trackBefore };
       track.push(blockTrack);
     }
   }
   else {
     blockTrack = { type: 'block_change', user: user.id, username: user.username, date: date1, before: { type: oldNode.type.name, attrs: oldNode.attrs } };
-    if (blockTrack.before?.attrs.id) {
-      delete blockTrack.before.attrs.id;
+    const _trackBefore = blockTrack.before as { type: string, attrs: any };
+    if (_trackBefore.attrs.id) {
+      delete _trackBefore.attrs.id;
     }
-    if (blockTrack.before?.attrs.track) {
-      delete blockTrack.before.attrs.track;
+    if (_trackBefore.attrs.track) {
+      delete _trackBefore.attrs.track;
     }
     track.push(blockTrack);
   }
@@ -206,8 +209,8 @@ export function amendTransaction (tr: Transaction, state: EditorState, user: { i
 export function trackedTransaction (tr: Transaction, state: EditorState, user: { id: string, username: string }, approved: boolean, date: Date) {
   const newTr = state.tr;
   const map = new Mapping();
-  const date10 = new Date(Math.floor(date.getTime() / 600000) * 10).toISOString(); // 10 minute interval
-  const date1 = new Date(Math.floor(date.getTime() / 60000)).toISOString(); // 1 minute interval
+  const date10 = new Date(Math.floor(date.getTime() / 600000) * 600000).toISOString(); // 10 minute interval
+  const date1 = new Date(Math.floor(date.getTime() / 60000) * 60000).toISOString(); // 1 minute interval
   // We only insert content if this is not directly a tr for cell deletion. This is because tables delete rows by deleting the
   // content of each cell and replacing it with an empty paragraph.
   const cellDeleteTr = ['deleteContentBackward', 'deleteContentForward'].includes(tr.getMeta('inputType')) && (state.selection instanceof CellSelection);

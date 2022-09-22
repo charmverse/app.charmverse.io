@@ -52,9 +52,9 @@ export const deletion: BaseRawMarkSpec = {
         getAttrs (dom) {
           const dataset = (dom as HTMLElement).dataset;
           return {
-            user: parseInt(dataset.user ?? ''),
+            user: dataset.user ?? '',
             username: dataset.username,
-            date: parseInt(dataset.date ?? '')
+            date: dataset.date ?? ''
           };
         }
       }
@@ -116,9 +116,9 @@ export const formatChange: BaseRawMarkSpec = {
         getAttrs (dom) {
           const dataset = (dom as HTMLElement).dataset;
           return {
-            user: parseInt(dataset.user ?? ''),
+            user: dataset.user ?? '',
             username: dataset.username,
-            date: parseInt(dataset.date ?? ''),
+            date: dataset.date ?? '',
             before: parseFormatList(dataset.before),
             after: parseFormatList(dataset.after)
           };
@@ -164,9 +164,9 @@ export const insertion: BaseRawMarkSpec = {
         getAttrs (dom) {
           const dataset = (dom as HTMLElement).dataset;
           return {
-            user: parseInt(dataset.user ?? ''),
+            user: dataset.user ?? '',
             username: dataset.username,
-            date: parseInt(dataset.date ?? ''),
+            date: dataset.date ?? '',
             inline: true,
             approved: false
           };
@@ -177,9 +177,9 @@ export const insertion: BaseRawMarkSpec = {
         getAttrs (dom) {
           const dataset = (dom as HTMLElement).dataset;
           return {
-            user: parseInt(dataset.user ?? ''),
+            user: dataset.user ?? '',
             username: dataset.username,
-            date: parseInt(dataset.date ?? ''),
+            date: dataset.date ?? '',
             inline: true,
             approved: true
           };
