@@ -19,7 +19,7 @@ type ProposalRecord = Record<string, ProposalWithUsers & {
 
 type ProposalStatusChangeMetaData = {
   newStatus: ProposalStatus
-  oldStatus: ProposalStatus
+  oldStatus?: ProposalStatus // by convention, an undefined oldStatus means the proposal was just created
 }
 
 type ProposalStatusChangeWorkspaceEvent = WorkspaceEvent & { type: 'proposal_status_change' } & { meta: ProposalStatusChangeMetaData }

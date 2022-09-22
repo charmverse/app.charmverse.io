@@ -1,11 +1,10 @@
 import type { Page, Space, User, Vote } from '@prisma/client';
 import { SpaceOperation } from '@prisma/client';
-import { addSpaceOperations, removeSpaceOperations } from 'lib/permissions/spaces';
+import { removeSpaceOperations } from 'lib/permissions/spaces';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { createPage, createVote, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
-import { prisma } from 'db';
 import { createProposal } from 'lib/proposal/createProposal';
 import { typedKeys } from 'lib/utilities/objects';
 
@@ -105,26 +104,10 @@ describe('POST /api/votes - Create a proposal vote', () => {
 
     const authorCookie = await loginUser(author);
 
-    const proposal = await createProposal({
-      pageCreateInput: {
-        author: {
-          connect: {
-            id: author.id
-          }
-        },
-        contentText: '',
-        path: 'path',
-        space: {
-          connect: {
-            id: authorSpace.id
-          }
-        },
-        title: 'page-title',
-        type: 'proposal',
-        updatedBy: author.id
-      },
+    const { page: resultPage } = await createProposal({
+      createdBy: author.id,
       spaceId: authorSpace.id,
-      userId: author.id
+      title: 'page-title'
     });
 
     await request(baseUrl)
@@ -132,7 +115,7 @@ describe('POST /api/votes - Create a proposal vote', () => {
       .set('Cookie', authorCookie).send({
         context: 'proposal',
         deadline: new Date(),
-        pageId: proposal.id,
+        pageId: resultPage.id,
         title: 'new vote',
         type: 'Approval',
         threshold: 50,
@@ -152,26 +135,9 @@ describe('POST /api/votes - Create a proposal vote', () => {
 
     const adminCookie = await loginUser(adminUser);
 
-    const proposal = await createProposal({
-      pageCreateInput: {
-        author: {
-          connect: {
-            id: author.id
-          }
-        },
-        contentText: '',
-        path: 'path',
-        space: {
-          connect: {
-            id: authorSpace.id
-          }
-        },
-        title: 'page-title',
-        type: 'proposal',
-        updatedBy: author.id
-      },
-      spaceId: authorSpace.id,
-      userId: author.id
+    const { page: resultPage } = await createProposal({
+      createdBy: author.id,
+      spaceId: authorSpace.id
     });
 
     await request(baseUrl)
@@ -179,7 +145,7 @@ describe('POST /api/votes - Create a proposal vote', () => {
       .set('Cookie', adminCookie).send({
         context: 'proposal',
         deadline: new Date(),
-        pageId: proposal.id,
+        pageId: resultPage.id,
         title: 'new vote',
         type: 'Approval',
         threshold: 50,
@@ -197,33 +163,14 @@ describe('POST /api/votes - Create a proposal vote', () => {
 
     await removeSpaceOperations({ forSpaceId: authorSpace.id, operations: typedKeys(SpaceOperation), spaceId: authorSpace.id });
 
-    const authorCookie = await loginUser(author);
-
-    const proposal = await createProposal({
-      pageCreateInput: {
-        author: {
-          connect: {
-            id: author.id
-          }
-        },
-        contentText: '',
-        path: 'path',
-        space: {
-          connect: {
-            id: authorSpace.id
-          }
-        },
-        title: 'page-title',
-        type: 'proposal',
-        updatedBy: author.id
-      },
-      spaceId: authorSpace.id,
-      userId: author.id
+    const { page: resultPage } = await createProposal({
+      createdBy: author.id,
+      spaceId: authorSpace.id
     });
 
     await request(baseUrl).post('/api/votes').set('Cookie', otherUserCookie).send({
       deadline: new Date(),
-      pageId: proposal.id,
+      pageId: resultPage.id,
       title: 'new vote',
       type: 'Approval',
       threshold: 50,
