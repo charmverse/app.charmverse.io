@@ -1,10 +1,14 @@
 import { useEditorViewContext } from '@bangle.dev/react';
-import { Button, Stack, Typography } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
+import { Check, Close } from '@mui/icons-material';
+import Button from 'components/common/Button';
 import { DateTime } from 'luxon';
 import { Box } from '@mui/system';
 import { usePages } from 'hooks/usePages';
 import charmClient from 'charmClient';
 import type { EditorState } from 'prosemirror-state';
+import { acceptAll } from 'components/common/CharmEditor/fiduswriter/track/acceptAll';
+import { rejectAll } from 'components/common/CharmEditor/fiduswriter/track/rejectAll';
 
 export default function SuggestionsSidebar () {
   const view = useEditorViewContext();
@@ -52,37 +56,55 @@ export default function SuggestionsSidebar () {
     }
   }
 
+  function clickAcceptAll () {
+    acceptAll(view);
+  }
+
+  function clickRejectAll () {
+    rejectAll(view);
+  }
+
   return (
-    <Stack gap={2}>
-      {commits.map(({ updatedAt, _id, changeID }) => {
-        return (
-          <Stack className='commit' key={_id} gap={1}>
-            <Typography variant='subtitle2'>{updatedAt ? DateTime.fromJSDate(new Date(updatedAt)).toRelative({ base: (DateTime.now()) }) : 'N/A'}</Typography>
-            <Typography>
-              {getChangeSummary(state, changeID)?.insertion}
-            </Typography>
-            <Box display='flex' gap={1}>
-              <Button
-                onClick={() => {
-                  approveSuggestion(changeID);
-                }}
-                size='small'
-                variant='outlined'
-              >Approve
-              </Button>
-              <Button
-                size='small'
-                variant='outlined'
-                color='error'
-                onClick={() => {
-                  rejectSuggestion(changeID);
-                }}
-              >Reject
-              </Button>
-            </Box>
-          </Stack>
-        );
-      })}
-    </Stack>
+    <>
+      <Box display='flex' gap={1} flexDirection='row' position='absolute' top={0} right={8}>
+        <Button size='small' startIcon={<Check />} disableElevation variant='text' color='success' onClick={clickAcceptAll}>
+          Accept All
+        </Button>
+        <Button size='small' startIcon={<Close />} disableElevation variant='text' color='error' onClick={clickRejectAll}>
+          Reject All
+        </Button>
+      </Box>
+      <Stack gap={2}>
+        {commits.map(({ updatedAt, _id, changeID }) => {
+          return (
+            <Stack className='commit' key={_id} gap={1}>
+              <Typography variant='subtitle2'>{updatedAt ? DateTime.fromJSDate(new Date(updatedAt)).toRelative({ base: (DateTime.now()) }) : 'N/A'}</Typography>
+              <Typography>
+                {getChangeSummary(state, changeID)?.insertion}
+              </Typography>
+              <Box display='flex' gap={1}>
+                <Button
+                  onClick={() => {
+                    approveSuggestion(changeID);
+                  }}
+                  size='small'
+                  variant='outlined'
+                >Approve
+                </Button>
+                <Button
+                  size='small'
+                  variant='outlined'
+                  color='error'
+                  onClick={() => {
+                    rejectSuggestion(changeID);
+                  }}
+                >Reject
+                </Button>
+              </Box>
+            </Stack>
+          );
+        })}
+      </Stack>
+    </>
   );
 }

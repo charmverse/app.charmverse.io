@@ -113,6 +113,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
     () => pages[pageId],
     [
       pageId,
+      currentPage?.contentText,
       currentPage?.headerImage,
       currentPage?.icon,
       currentPage?.title,

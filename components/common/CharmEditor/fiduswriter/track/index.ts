@@ -3,10 +3,10 @@ export {
 } from './mod';
 export {
   acceptAllNoInsertions
-} from './accept_all_no_insertions';
+} from './acceptAllNoInsertions';
 export {
   amendTransaction,
   trackedTransaction
 } from './amendTransaction';
-export { acceptAll } from './accept_all';
-export { rejectAll } from './reject_all';
+export { acceptAll } from './acceptAll';
+export { rejectAll } from './rejectAll';

@@ -72,7 +72,7 @@ import DevTools from './DevTools';
 import { specRegistry } from './specRegistry';
 import { checkForEmpty } from './utils';
 import trackStyles from './fiduswriter/styles';
-import { rejectAll } from './fiduswriter/track/reject_all';
+import { rejectAll } from './fiduswriter/track/rejectAll';
 import SidebarDrawer from './components/SidebarDrawer';
 
 export interface ICharmEditorOutput {
