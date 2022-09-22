@@ -1,7 +1,7 @@
 
 import type { ProposalStatus } from '@prisma/client';
 import { prisma } from 'db';
-import { NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { hasAccessToSpace, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { updateProposalStatus } from 'lib/proposal/updateProposalStatus';
 import { validateProposalStatusTransition } from 'lib/proposal/validateProposalStatusTransition';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -41,7 +41,7 @@ async function updateProposalStatusController (req: NextApiRequest, res: NextApi
     userId
   });
 
-  if (!isUserAuthorizedToUpdateProposalStatus) {
+  if (!isUserAuthorizedToUpdateProposalStatus && (await hasAccessToSpace({ spaceId: proposal.spaceId, userId, adminOnly: true })).error) {
     throw new UnauthorisedActionError();
   }
 
