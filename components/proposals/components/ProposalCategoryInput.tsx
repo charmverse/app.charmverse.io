@@ -14,6 +14,29 @@ type OptionType = TempOption | ProposalCategory;
 
 const filter = createFilterOptions<OptionType>();
 
+type ProposalCategoryOptionProps = {
+  category: OptionType;
+  props: HTMLAttributes<HTMLLIElement>;
+}
+
+function ProposalCategoryOption ({ props, category }: ProposalCategoryOptionProps) {
+  if ('inputValue' in category) {
+    return <li {...props}>{category.title}</li>;
+  }
+
+  const isCategory = 'color' in category;
+
+  if (!isCategory) {
+    return null;
+  }
+
+  return (
+    <Box {...props as unknown as HTMLAttributes<HTMLDivElement>}>
+      <Chip variant='filled' color={category.color as BrandColor} label={category.title} sx={{ maxWidth: 150, flex: 1, display: 'flex', cursor: 'pointer' }} />
+    </Box>
+  );
+}
+
 type Props = {
   disabled?: boolean;
   options: OptionType[];
@@ -116,28 +139,5 @@ export default function ProposalCategoryInput ({ disabled, options, canEditCateg
         onValueChange(values);
       }}
     />
-  );
-}
-
-type ProposalCategoryOptionProps = {
-  category: OptionType;
-  props: HTMLAttributes<HTMLLIElement>;
-}
-
-function ProposalCategoryOption ({ props, category }: ProposalCategoryOptionProps) {
-  if ('inputValue' in category) {
-    return <li {...props}>{category.title}</li>;
-  }
-
-  const isCategory = 'color' in category;
-
-  if (!isCategory) {
-    return null;
-  }
-
-  return (
-    <Box {...props as unknown as HTMLAttributes<HTMLDivElement>}>
-      <Chip variant='filled' color={category.color as BrandColor} label={category.title} sx={{ maxWidth: 150, flex: 1, display: 'flex', cursor: 'pointer' }} />
-    </Box>
   );
 }

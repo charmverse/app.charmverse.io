@@ -1,6 +1,5 @@
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { createProposalCategory } from 'lib/proposal/createProposalCategory';
-import { deleteProposalCategory } from 'lib/proposal/deleteProposalCategory';
 import { getProposalCategoriesBySpace } from 'lib/proposal/getProposalCategoriesBySpace';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import { withSessionRoute } from 'lib/session/withSession';

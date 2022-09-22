@@ -28,5 +28,5 @@ export function useProposalCategories () {
     return categoryId;
   }
 
-  return { isLoading: !!categories, categories, canEditProposalCategories, addCategory, deleteCategory };
+  return { isLoading: !categories, categories, canEditProposalCategories, addCategory, deleteCategory };
 }
