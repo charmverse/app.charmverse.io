@@ -5,9 +5,6 @@ const updated = {
   spec: () => {
     const spec = paragraph.spec();
     spec.schema.attrs = {
-      // tracked: {
-      //   default: false
-      // },
       track: {
         default: []
       }
