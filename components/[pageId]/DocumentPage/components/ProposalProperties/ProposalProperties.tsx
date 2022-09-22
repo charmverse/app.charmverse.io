@@ -29,7 +29,7 @@ interface ProposalPropertiesProps {
 
 export default function ProposalProperties ({ pageId, proposalId, readOnly, isTemplate }: ProposalPropertiesProps) {
   const { data: proposal, mutate: refreshProposal } = useSWR(`proposal/${proposalId}`, () => charmClient.proposals.getProposal(proposalId));
-  const { categories, canEditProposalCategories, addCategory } = useProposalCategories();
+  const { categories, canEditProposalCategories, addCategory, deleteCategory } = useProposalCategories();
 
   const [contributors] = useContributors();
   const { roles = [], roleups } = useRoles();
@@ -81,6 +81,21 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
     };
   });
 
+  async function onChangeCategory (updatedCategory: ProposalCategory | null) {
+    if (!proposal) {
+      return;
+    }
+
+    await charmClient.proposals.updateProposal({
+      proposalId: proposal.id,
+      authors: proposal.authors.map(author => author.userId),
+      reviewers: proposal.reviewers.map(reviewer => ({ group: reviewer.roleId ? 'role' : 'user', id: reviewer.roleId ?? reviewer.userId as string })),
+      categoryId: updatedCategory?.id || null
+    });
+
+    refreshProposal();
+  }
+
   return (
     <Box
       className='octo-propertylist'
@@ -126,15 +141,8 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
               options={categories || []}
               canEditCategories={canEditProposalCategories}
               value={category}
-              onChange={async (updatedCategory: ProposalCategory | null) => {
-                await charmClient.proposals.updateProposal({
-                  proposalId: proposal.id,
-                  authors: proposal.authors.map(author => author.userId),
-                  reviewers: proposal.reviewers.map(reviewer => ({ group: reviewer.roleId ? 'role' : 'user', id: reviewer.roleId ?? reviewer.userId as string })),
-                  categoryId: updatedCategory?.id || null
-                });
-                refreshProposal();
-              }}
+              onChange={onChangeCategory}
+              onDeleteCategory={deleteCategory}
               onAddCategory={addCategory}
             />
           </Box>
