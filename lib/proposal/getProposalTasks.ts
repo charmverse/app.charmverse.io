@@ -113,6 +113,9 @@ export async function getProposalTasks (userId: string): Promise<{
     where: {
       spaceId: {
         in: spaceIds
+      },
+      page: {
+        deletedAt: null
       }
     },
     include: {
