@@ -95,7 +95,6 @@ export default function ProposalCategoryInput ({ disabled, options, canEditCateg
 
   return (
     <Autocomplete
-      open={true}
       disabled={disabled}
       value={tempValue ? [tempValue] : internalValue}
       selectOnFocus
