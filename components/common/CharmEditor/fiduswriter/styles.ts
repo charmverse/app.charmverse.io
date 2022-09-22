@@ -66,11 +66,11 @@ export default `
     display: block;
   }
 
-  span.user-aaa {
+  span[data-user] {
     border-color: rgba(0,119,190,1);
     text-decoration-color: rgba(0,119,190,1);
   }
-  span.user-aaa.insertion {
+  span.insertion {
     color: rgba(0,119,190,1);
   }
   .user-bg-aaa {

@@ -80,8 +80,7 @@ export const BangleEditor = React.forwardRef<
       (editor.view as any)._updatePluginWatcher = updatePluginWatcher(editor);
       (editor.view as any)._props.dispatchTransaction = (transaction: Transaction) => {
         const view = editor.view;
-        // const trackedUser = { id: user?.id ?? '', username: user?.username ?? '' };
-        const trackedUser = { id: 'aaa', username: user?.username ?? '' };
+        const trackedUser = { id: user?.id ?? '', username: user?.username ?? '' };
         const trackedTr = amendTransaction(transaction, view.state, trackedUser, editorViewPayloadRef.current.enableSuggestions);
         const {state: newState } = view.state.applyTransaction(trackedTr)
         view.updateState(newState);
