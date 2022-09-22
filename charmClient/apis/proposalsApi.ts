@@ -3,7 +3,7 @@ import * as http from 'adapters/http';
 import type { IPageWithPermissions } from 'lib/pages';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
-import type { CreateProposalFromTemplateInput } from 'lib/proposal/createProposal';
+import type { CreateProposalFromTemplateInput } from 'lib/proposal/createProposalFromTemplate';
 
 export class ProposalsApi {
   updateProposal ({ proposalId, authors, reviewers }: UpdateProposalRequest) {

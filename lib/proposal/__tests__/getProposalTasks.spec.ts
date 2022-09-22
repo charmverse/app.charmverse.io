@@ -29,7 +29,7 @@ describe('getProposalTasks', () => {
 
     const proposalTasks = await getProposalTasks(user.id);
 
-    expect(proposalTasks).toEqual(expect.arrayContaining([
+    expect(proposalTasks.marked).toEqual(expect.arrayContaining([
       expect.objectContaining({
         id: privateDraftProposal1.id,
         status: privateDraftProposal1.proposal?.status,
@@ -37,7 +37,7 @@ describe('getProposalTasks', () => {
       })
     ]));
 
-    expect(proposalTasks).not.toEqual(expect.arrayContaining([
+    expect(proposalTasks.marked).not.toEqual(expect.arrayContaining([
       expect.objectContaining({
         id: archivedProposal.id
       })
@@ -75,7 +75,7 @@ describe('getProposalTasks', () => {
 
     const proposalTasks = await getProposalTasks(user.id);
 
-    expect(proposalTasks).toEqual(expect.arrayContaining([
+    expect(proposalTasks.marked).toEqual(expect.arrayContaining([
       expect.objectContaining({
         id: draftProposal1.id,
         status: draftProposal1.proposal?.status,
@@ -111,7 +111,7 @@ describe('getProposalTasks', () => {
 
     const proposalTasks = await getProposalTasks(user.id);
 
-    expect(proposalTasks).toEqual(expect.arrayContaining([
+    expect(proposalTasks.marked).toEqual(expect.arrayContaining([
       expect.objectContaining({
         id: reviewedProposal1.id,
         status: reviewedProposal1.proposal?.status,
@@ -156,7 +156,7 @@ describe('getProposalTasks', () => {
 
     const proposalTasks = await getProposalTasks(user.id);
 
-    expect(proposalTasks).toEqual(expect.arrayContaining([
+    expect(proposalTasks.marked).toEqual(expect.arrayContaining([
       expect.objectContaining({
         id: proposalToReviewViaRole.id,
         status: proposalToReviewViaRole.proposal?.status,
@@ -245,7 +245,7 @@ describe('getProposalTasks', () => {
 
     const proposalTasks = await getProposalTasks(user.id);
 
-    expect(proposalTasks).toEqual(expect.arrayContaining([
+    expect(proposalTasks.marked).toEqual(expect.arrayContaining([
       expect.objectContaining({
         id: discussionProposal1.id,
         status: discussionProposal1.proposal?.status,
