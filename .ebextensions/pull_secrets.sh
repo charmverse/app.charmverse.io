@@ -1,5 +1,8 @@
 #!/bin/bash -e 
 
+# install yq first
+install_yq()
+
 # arguments to this script is the environment namespace that the secret belongs to. 
 SECRETS_ENV=${1:-stg}
 APP_STAGING_DIR="/var/app/staging/"              # this is where amazon puts app to be deployed
