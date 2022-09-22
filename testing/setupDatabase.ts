@@ -439,7 +439,8 @@ export async function createProposalWithUsers ({ proposalStatus = 'private_draft
       proposal: {
         include: {
           authors: true,
-          reviewers: true
+          reviewers: true,
+          category: true
         }
       }
     }
@@ -602,7 +603,8 @@ export async function generateProposal ({ userId, spaceId, proposalStatus, autho
       proposal: {
         include: {
           authors: true,
-          reviewers: true
+          reviewers: true,
+          category: true
         }
       }
     }

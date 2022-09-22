@@ -4,6 +4,7 @@ import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatab
 import { prisma } from 'db';
 import type { IPageWithPermissions } from '../../interfaces';
 import { getAccessiblePages } from '../getAccessiblePages';
+import { createProposalTemplate } from '../../../templates/proposals/createProposalTemplate';
 
 describe('getAccessiblePages', () => {
 
@@ -40,9 +41,11 @@ describe('getAccessiblePages', () => {
 
   });
 
-  it('should return proposal templates independent of their permissions the pages the user has access to', async () => {
+  it('should return proposal templates independent of their permissions the pages the user has access to in the target space', async () => {
 
     const { space, user: nonAdminUser } = await generateUserAndSpaceWithApiToken(undefined, false);
+
+    const { space: secondSpace, user: secondUser } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     const page1 = await createPage({ createdBy: nonAdminUser.id, spaceId: space.id });
     await upsertPermission(page1.id, {
@@ -53,6 +56,17 @@ describe('getAccessiblePages', () => {
     // No permissions here
     const proposalPage = await createPage({ createdBy: nonAdminUser.id, spaceId: space.id });
     await prisma.page.update({ where: { id: proposalPage.id }, data: { type: 'proposal_template' } });
+
+    // SHouldn't show up
+    await createProposalTemplate({
+      spaceId: secondSpace.id,
+      userId: secondUser.id,
+      pageContent: {
+        title: 'Test',
+        content: {},
+        contentText: 'Test'
+      }
+    });
 
     const pages = await getAccessiblePages({ userId: nonAdminUser.id, spaceId: space.id });
 

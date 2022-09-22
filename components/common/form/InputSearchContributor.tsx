@@ -43,7 +43,6 @@ export function InputSearchContributorBase ({ filter, options, disableCloseOnSel
       loading={options.length === 0}
       sx={{ minWidth: 150 }}
       placeholder={filteredOptions.length > 0 ? placeholder : ''}
-      // @ts-ignore - not sure why this fails
       options={filteredOptions}
       autoHighlight
       // user can also be a string if freeSolo=true

@@ -113,7 +113,8 @@ export async function updateProposalStatus ({
     },
     include: {
       authors: true,
-      reviewers: true
+      reviewers: true,
+      category: true
     }
   }) as Promise<ProposalWithUsers>;
 }

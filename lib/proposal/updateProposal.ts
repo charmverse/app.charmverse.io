@@ -7,18 +7,32 @@ export interface UpdateProposalRequest {
   proposalId: string;
   authors: string[];
   reviewers: ProposalReviewerInput[];
+  categoryId?: string | null;
 }
 
 export async function updateProposal ({
   proposalId,
   authors,
-  reviewers
+  reviewers,
+  categoryId
 }: UpdateProposalRequest): Promise<ProposalWithUsers> {
   if (authors.length === 0) {
     throw new InvalidStateError('Proposal must have at least 1 author');
   }
 
   await prisma.$transaction(async () => {
+    // Update category only when it is present in request payload
+    if (categoryId !== undefined) {
+      await prisma.proposal.update({
+        where: {
+          id: proposalId
+        },
+        data: {
+          categoryId
+        }
+      });
+    }
+
     await prisma.proposalAuthor.deleteMany({
       where: {
         proposalId
@@ -57,7 +71,8 @@ export async function updateProposal ({
     },
     include: {
       authors: true,
-      reviewers: true
+      reviewers: true,
+      category: true
     }
   }) as Promise<ProposalWithUsers>;
 }
