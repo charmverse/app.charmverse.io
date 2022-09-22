@@ -18,7 +18,6 @@ import type { ProposalCategory } from 'lib/proposal/interface';
 import type { ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
-import { useState } from 'react';
 import useSWR from 'swr';
 
 interface ProposalPropertiesProps {
@@ -31,7 +30,6 @@ interface ProposalPropertiesProps {
 export default function ProposalProperties ({ pageId, proposalId, readOnly, isTemplate }: ProposalPropertiesProps) {
   const { data: proposal, mutate: refreshProposal } = useSWR(`proposal/${proposalId}`, () => charmClient.proposals.getProposal(proposalId));
   const { categories, canEditProposalCategories, addCategory } = useProposalCategories();
-  const [category, setCategory] = useState<null | ProposalCategory>(null);
 
   const [contributors] = useContributors();
   const { roles = [], roleups } = useRoles();
@@ -45,7 +43,7 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
     return null;
   }
 
-  const { status } = proposal;
+  const { status, category } = proposal;
 
   const isProposalAuthor = (user && proposal.authors.some(author => author.userId === user.id));
 
@@ -127,7 +125,15 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
               options={categories || []}
               canEditCategories={canEditProposalCategories}
               value={category}
-              onChange={setCategory}
+              onChange={async (updatedCategory: ProposalCategory | null) => {
+                await charmClient.proposals.updateProposal({
+                  proposalId: proposal.id,
+                  authors: proposal.authors.map(author => author.userId),
+                  reviewers: proposal.reviewers.map(reviewer => ({ group: reviewer.roleId ? 'role' : 'user', id: reviewer.roleId ?? reviewer.userId as string })),
+                  categoryId: updatedCategory?.id || null
+                });
+                refreshProposal();
+              }}
               onAddCategory={addCategory}
             />
           </Box>

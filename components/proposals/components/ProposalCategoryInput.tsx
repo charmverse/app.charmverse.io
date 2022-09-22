@@ -2,7 +2,7 @@ import { Box, Chip, TextField } from '@mui/material';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import type { NewProposalCategory, ProposalCategory } from 'lib/proposal/interface';
 import type { HTMLAttributes } from 'react';
-import { useRef, useMemo, useState } from 'react';
+import { useEffect, useRef, useMemo, useState } from 'react';
 import type { BrandColor } from 'theme/colors';
 import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';
 
@@ -27,6 +27,12 @@ export default function ProposalCategoryInput ({ options, canEditCategories, val
   const newCategoryColorRef = useRef(getRandomThemeColor());
   const [tempValue, setTempValue] = useState<TempOption| null>(null);
 
+  useEffect(() => {
+    if (tempValue && value) {
+      setTempValue(null);
+    }
+  }, [value, tempValue]);
+
   async function onValueChange (values: OptionType[]) {
     const newValue = values.pop();
 
@@ -42,7 +48,6 @@ export default function ProposalCategoryInput ({ options, canEditCategories, val
       const newCategory = await onAddCategory({ color: newValue.color, title: newValue.inputValue });
 
       onChange(newCategory);
-      setTempValue(null);
       newCategoryColorRef.current = getRandomThemeColor();
       return;
     }

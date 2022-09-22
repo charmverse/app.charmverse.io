@@ -7,8 +7,8 @@ import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import type { CreateProposalFromTemplateInput } from 'lib/proposal/createProposalFromTemplate';
 
 export class ProposalsApi {
-  updateProposal ({ proposalId, authors, reviewers }: UpdateProposalRequest) {
-    return http.PUT(`/api/proposals/${proposalId}`, { authors, reviewers });
+  updateProposal ({ proposalId, authors, reviewers, categoryId }: UpdateProposalRequest) {
+    return http.PUT(`/api/proposals/${proposalId}`, { authors, reviewers, categoryId });
   }
 
   getProposal (proposalId: string) {
