@@ -109,19 +109,21 @@ export async function getProposalTasks (userId: string): Promise<{
     ? spaceRole.spaceRoleToRole[0].role.id
     : null).filter(isTruthy);
 
-  const proposals = await prisma.proposal.findMany({
+  const pagesWithProposals = await prisma.page.findMany({
     where: {
+      deletedAt: null,
       spaceId: {
         in: spaceIds
       },
-      page: {
-        deletedAt: null
-      }
+      type: 'proposal'
     },
     include: {
-      authors: true,
-      reviewers: true,
-      page: true,
+      proposal: {
+        include: {
+          authors: true,
+          reviewers: true
+        }
+      },
       space: true
     }
   });
@@ -133,44 +135,46 @@ export async function getProposalTasks (userId: string): Promise<{
     unmarked: []
   };
 
-  proposals.forEach(proposal => {
-    const workspaceEvent = workspaceEventsRecord[proposal.id];
-    const isReviewer = proposal.reviewers.some(reviewer => reviewer.roleId ? roleIds.includes(reviewer.roleId) : reviewer.userId === userId);
-    const isAuthor = proposal.authors.some(author => author.userId === userId);
-    if (proposal.status.match(/draft/) && !isAuthor) {
-      // No-op
-    }
-    else if (proposal.page) {
-      const action = getProposalAction(
-        {
-          currentStatus: proposal.status,
-          isAuthor,
-          isReviewer
-        }
-      );
-
-      const proposalTask = {
-        // Making the id empty to fill them later
-        id: '',
-        pagePath: (proposal.page as Page).path,
-        pageTitle: (proposal.page as Page).title,
-        spaceDomain: proposal.space.domain,
-        spaceName: proposal.space.name,
-        status: proposal.status,
-        action
-      };
-
-      if (workspaceEvent && !userNotificationIds.has(workspaceEvent.id)) {
-        proposalsRecord.unmarked.push({
-          ...proposalTask,
-          id: workspaceEvent.id
-        });
+  pagesWithProposals.forEach(({ proposal, ...page }) => {
+    if (proposal) {
+      const workspaceEvent = workspaceEventsRecord[proposal.id];
+      const isReviewer = proposal.reviewers.some(reviewer => reviewer.roleId ? roleIds.includes(reviewer.roleId) : reviewer.userId === userId);
+      const isAuthor = proposal.authors.some(author => author.userId === userId);
+      if (proposal?.status.match(/draft/) && !isAuthor) {
+        // No-op
       }
       else {
-        proposalsRecord.marked.push({
-          ...proposalTask,
-          id: v4()
-        });
+        const action = getProposalAction(
+          {
+            currentStatus: proposal.status,
+            isAuthor,
+            isReviewer
+          }
+        );
+
+        const proposalTask = {
+          // Making the id empty to fill them later
+          id: '',
+          pagePath: page.path,
+          pageTitle: page.title,
+          spaceDomain: page.space.domain,
+          spaceName: page.space.name,
+          status: proposal.status,
+          action
+        };
+
+        if (workspaceEvent && !userNotificationIds.has(workspaceEvent.id)) {
+          proposalsRecord.unmarked.push({
+            ...proposalTask,
+            id: workspaceEvent.id
+          });
+        }
+        else {
+          proposalsRecord.marked.push({
+            ...proposalTask,
+            id: v4()
+          });
+        }
       }
     }
   });
