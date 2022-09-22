@@ -32,7 +32,8 @@ export const jestConfig = {
 
   // The glob patterns Jest uses to detect test files
   testMatch: [
-    '**/lib/**/*.spec.ts'
+    '**/lib/**/*.spec.ts',
+    '**/testing/**/*.spec.ts'
   ],
 
   testTimeout: 30000,

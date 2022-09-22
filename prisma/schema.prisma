@@ -51,6 +51,7 @@ enum NotificationType {
   multisig
   mention
   vote
+  proposal
 }
 
 enum BountyStatus {
@@ -136,6 +137,10 @@ enum ProposalStatus {
   vote_closed
 }
 
+enum WorkspaceEventType {
+  proposal_status_change
+}
+
 model Space {
   id                          String                            @id @default(uuid()) @db.Uuid
   deletedAt                   DateTime?
@@ -171,6 +176,7 @@ model Space {
   TokenGate                   TokenGate[]
   votes                       Vote[]
   proposals                   Proposal[]
+  workspaceEvents             WorkspaceEvent[]
 }
 
 model SpaceApiToken {
@@ -233,6 +239,7 @@ model Page {
   proposal           Proposal?        @relation(fields: [proposalId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   threads            Thread[]
   votes              Vote[]
+  workspaceEvents    WorkspaceEvent[]
 }
 
 model Block {
@@ -339,6 +346,7 @@ model User {
   proposalsAuthored ProposalAuthor[]
   proposalsReviewed ProposalReviewer[]
   reviewedProposals Proposal[]
+  workspaceEvents   WorkspaceEvent[]
 }
 
 model UserNotificationState {
@@ -349,7 +357,7 @@ model UserNotificationState {
 }
 
 model UserNotification {
-  taskId    String               @unique
+  taskId    String
   createdAt DateTime             @default(now())
   userId    String               @db.Uuid
   type      NotificationType
@@ -596,7 +604,7 @@ model PagePermission {
   roleId                  String?             @db.Uuid
   spaceId                 String?             @db.Uuid
   inheritedFromPermission String?             @db.Uuid
-  public                  Boolean? 
+  public                  Boolean?
   sourcePermission        PagePermission?     @relation("InheritedPermissions", fields: [inheritedFromPermission], references: [id], onDelete: Cascade)
   page                    Page                @relation(fields: [pageId], references: [id], onDelete: Cascade)
   role                    Role?               @relation(fields: [roleId], references: [id], onDelete: Cascade)
@@ -670,6 +678,8 @@ model Proposal {
   reviewedBy String?            @db.Uuid
   reviewer   User?              @relation(fields: [reviewedBy], references: [id], onDelete: Cascade)
   reviewedAt DateTime?
+  categoryId String?            @db.Uuid
+  category   ProposalCategory?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
 }
 
 model ProposalAuthor {
@@ -701,4 +711,25 @@ model ProfileItem {
   isHidden Boolean?
   metadata Json?
   type     ProfileItemType
+}
+
+model WorkspaceEvent {
+  id        String             @id @default(uuid()) @db.Uuid
+  actorId   String?            @db.Uuid
+  actor     User?              @relation(fields: [actorId], references: [id], onDelete: Cascade)
+  type      WorkspaceEventType
+  meta      Json?
+  spaceId   String             @db.Uuid
+  space     Space              @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  pageId    String             @db.Uuid
+  page      Page               @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  createdAt DateTime           @default(now())
+}
+
+model ProposalCategory {
+  id       String     @id @default(uuid()) @db.Uuid
+  spaceId  String     @db.Uuid
+  title    String
+  color    String
+  Proposal Proposal[]
 }

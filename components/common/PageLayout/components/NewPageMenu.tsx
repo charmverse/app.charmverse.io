@@ -7,8 +7,9 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { Page } from 'models';
-import { MouseEvent, useState, memo } from 'react';
+import type { Page } from 'models';
+import type { MouseEvent } from 'react';
+import { useState, memo } from 'react';
 import { greyColor2 } from 'theme/colors';
 import { StyledDatabaseIcon } from './PageIcon';
 

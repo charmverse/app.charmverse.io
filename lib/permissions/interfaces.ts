@@ -1,6 +1,6 @@
-import { BountyOperation, PageOperations, PagePermission, Role, Space, User } from '@prisma/client';
-import { RoleupWithMembers, RoleWithMembers } from 'lib/roles';
-import { BountyPermissions } from './bounties';
+import type { BountyOperation, PageOperations, PagePermission, Role, Space, User } from '@prisma/client';
+import type { RoleupWithMembers, RoleWithMembers } from 'lib/roles';
+import type { BountyPermissions } from './bounties';
 
 export type Resource = {
   resourceId: string;

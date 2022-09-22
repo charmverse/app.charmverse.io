@@ -1,11 +1,12 @@
+import styled from '@emotion/styled';
+import Box from '@mui/material/Box';
+import Tab from '@mui/material/Tab';
+import Tabs from '@mui/material/Tabs';
+import PageLayout from 'components/common/PageLayout';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { ReactNode, useEffect, useState } from 'react';
-import styled from '@emotion/styled';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import Box from '@mui/material/Box';
-import PageLayout from 'components/common/PageLayout';
+import type { ReactNode } from 'react';
+import { useEffect, useState } from 'react';
 import { SETTINGS_TABS } from './pages';
 
 const ScrollableWindow = styled.div`

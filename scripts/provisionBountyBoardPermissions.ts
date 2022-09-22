@@ -4,7 +4,7 @@ import { prisma } from 'db';
 /**
  * Ensures old bounty boards that were made public before public bounties update that manages permissions
  */
-async function migrate() {
+async function migrate(): Promise<true> {
   const targetSpaces = await prisma.space.findMany({
     where: {
       publicBountyBoard: true
@@ -19,7 +19,8 @@ async function migrate() {
     await togglePublicBounties({spaceId: space.id, publicBountyBoard: true});
   }
 
-
+  return true;
 }
 
-migrate().then(() => console.log('Job done'))
+// migrate().then(() => console.log('Job done'))
+// .catch((e) => console.error(e));

@@ -1,17 +1,16 @@
 
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import Image from 'components/common/Image';
-import Typography from '@mui/material/Typography';
-import Card from '@mui/material/Card';
 import styled from '@emotion/styled';
+import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import Image from 'components/common/Image';
 import PrimaryButton from 'components/common/PrimaryButton';
-import { useWeb3React } from '@web3-react/core';
 import { useRouter } from 'next/router';
 
+import { useUser } from 'hooks/useUser';
 import gatesImage from 'public/images/artwork/gates.png';
 import rocketImage from 'public/images/artwork/rocket.png';
-import { useUser } from 'hooks/useUser';
 
 export const Content = styled(Box)`
   max-width: 100%;

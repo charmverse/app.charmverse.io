@@ -1,6 +1,6 @@
 
 import { prisma } from 'db';
-import { Role, Space, SpaceRole, User } from '@prisma/client';
+import type { Role, Space, SpaceRole, User } from '@prisma/client';
 import { v4 } from 'uuid';
 import { createUserFromWallet } from 'lib/users/createUser';
 

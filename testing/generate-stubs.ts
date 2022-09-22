@@ -1,6 +1,7 @@
-import { Page } from '@prisma/client';
-import { SubmissionContent } from 'lib/applications/interfaces';
-import { PageNode, getPagePath } from 'lib/pages';
+import type { Page } from '@prisma/client';
+import type { SubmissionContent } from 'lib/applications/interfaces';
+import type { PageNode } from 'lib/pages';
+import { getPagePath } from 'lib/pages';
 import { v4 } from 'uuid';
 
 export function generatePageToCreateStub ({

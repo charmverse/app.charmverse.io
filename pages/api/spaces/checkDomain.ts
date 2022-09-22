@@ -1,5 +1,5 @@
 
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { Prisma, Space } from '@prisma/client';
 import { prisma } from 'db';

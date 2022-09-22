@@ -1,14 +1,17 @@
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { Alert, Card, Grid, Typography } from '@mui/material';
 import { Box } from '@mui/system';
+import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ProposalStatusChip } from 'components/proposals/components/ProposalStatusBadge';
-import type { ProposalTask } from 'lib/proposal/getProposalTasks';
-import { GetTasksResponse } from 'pages/api/tasks/list';
+import type { ProposalTask, ProposalTaskAction } from 'lib/proposal/getProposalTasks';
+import { useEffect } from 'react';
+import type { KeyedMutator } from 'swr';
+import type { GetTasksResponse } from 'pages/api/tasks/list';
 
-const ProposalActionRecord: Record<ProposalTask['action'], string> = {
+const ProposalActionRecord: Record<ProposalTaskAction, string> = {
   discuss: 'Discuss',
   start_discussion: 'To discuss',
   review: 'Review',
@@ -30,7 +33,7 @@ export function ProposalTasksListRow (
       action,
       status
     }
-  }: {proposalTask: ProposalTask}
+  }: { proposalTask: ProposalTask }
 ) {
   const proposalLink = `/${spaceDomain}/${pagePath}`;
   const proposalLocation = spaceName;
@@ -54,6 +57,7 @@ export function ProposalTasksListRow (
             }}
             fontSize={{ sm: 16, xs: 18 }}
           >
+            <TaskOutlinedIcon color='secondary' />
             {pageTitle || 'Untitled'}
           </Grid>
           <Grid
@@ -99,7 +103,8 @@ export function ProposalTasksListRow (
                 textAlign: 'center'
               }}
               href={proposalLink}
-            >{ProposalActionRecord[action]}
+              disabled={!action}
+            >{action ? ProposalActionRecord[action] : 'No action'}
             </Button>
           </Grid>
         </Grid>
@@ -110,11 +115,35 @@ export function ProposalTasksListRow (
 
 export default function ProposalTasksList ({
   tasks,
-  error
-} : {
+  error,
+  mutateTasks
+}: {
+  mutateTasks: KeyedMutator<GetTasksResponse>
   error: any
   tasks: GetTasksResponse | undefined
 }) {
+  const proposals = tasks?.proposals ? [...tasks.proposals.unmarked, ...tasks.proposals.marked] : [];
+
+  useEffect(() => {
+    async function main () {
+      if (tasks?.proposals && tasks.proposals.unmarked.length !== 0) {
+        await charmClient.markTasks(tasks.proposals.unmarked.map(proposal => ({ id: proposal.id, type: 'proposal' })));
+        mutateTasks((_tasks) => {
+          const unmarked = _tasks?.proposals.unmarked ?? [];
+          return _tasks ? {
+            ..._tasks,
+            proposals: {
+              marked: [...unmarked, ..._tasks.proposals.marked],
+              unmarked: []
+            }
+          } : undefined;
+        }, {
+          revalidate: false
+        });
+      }
+    }
+    main();
+  }, [tasks]);
 
   if (error) {
     return (
@@ -129,7 +158,7 @@ export default function ProposalTasksList ({
     return <LoadingComponent height='200px' isLoading={true} />;
   }
 
-  const totalProposals = tasks?.proposals.length ?? 0;
+  const totalProposals = proposals.length;
 
   if (totalProposals === 0) {
     return (
@@ -144,7 +173,7 @@ export default function ProposalTasksList ({
 
   return (
     <>
-      {tasks.proposals.map(proposal => <ProposalTasksListRow key={proposal.id} proposalTask={proposal} />)}
+      {proposals.map(proposal => <ProposalTasksListRow key={proposal.id} proposalTask={proposal} />)}
     </>
   );
 }

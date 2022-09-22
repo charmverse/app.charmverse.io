@@ -1,7 +1,8 @@
-import { Autocomplete, AutocompleteProps, TextField } from '@mui/material';
+import type { AutocompleteProps } from '@mui/material';
+import { Autocomplete, TextField } from '@mui/material';
 import UserDisplay from 'components/common/UserDisplay';
 import { useContributors } from 'hooks/useContributors';
-import { Contributor } from 'models';
+import type { Contributor } from 'models';
 import { useEffect, useState } from 'react';
 
 interface IContributorsFilter {
@@ -42,7 +43,6 @@ export function InputSearchContributorBase ({ filter, options, disableCloseOnSel
       loading={options.length === 0}
       sx={{ minWidth: 150 }}
       placeholder={filteredOptions.length > 0 ? placeholder : ''}
-      // @ts-ignore - not sure why this fails
       options={filteredOptions}
       autoHighlight
       // user can also be a string if freeSolo=true

@@ -1,8 +1,8 @@
-import { SpaceRole } from '@prisma/client';
+import type { SpaceRole } from '@prisma/client';
 import { prisma } from 'db';
 import { DataNotFoundError, InsecureOperationError } from 'lib/utilities/errors';
 import { hasAccessToSpace } from '../middleware';
-import { RoleAssignment, RoleWithMembers } from './interfaces';
+import type { RoleAssignment, RoleWithMembers } from './interfaces';
 import { listRoleMembers } from './listRoleMembers';
 
 export async function assignRole ({ roleId, userId }: RoleAssignment): Promise<RoleWithMembers> {

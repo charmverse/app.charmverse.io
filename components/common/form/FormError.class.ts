@@ -1,4 +1,5 @@
-import { SystemError, ISystemErrorInput } from 'lib/utilities/errors';
+import type { ISystemErrorInput } from 'lib/utilities/errors';
+import { SystemError } from 'lib/utilities/errors';
 
 export class FormError extends SystemError {
 

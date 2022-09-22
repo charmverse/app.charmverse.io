@@ -18,7 +18,7 @@ type Props = {
     rightIcon?: boolean
 }
 
-function Button (props: Props): JSX.Element {
+function Button ({ size = 'small', ...props }: Props): JSX.Element {
   const classNames: Record<string, boolean> = {
     Button: true,
     active: Boolean(props.active),
@@ -26,8 +26,8 @@ function Button (props: Props): JSX.Element {
     danger: Boolean(props.danger)
   };
   classNames[`emphasis--${props.emphasis}`] = Boolean(props.emphasis);
-  classNames[`size--${props.size}`] = Boolean(props.size);
   classNames[`${props.className}`] = Boolean(props.className);
+  classNames[`size--${size}`] = true;
 
   return (
     <button

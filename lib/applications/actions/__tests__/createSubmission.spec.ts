@@ -1,5 +1,6 @@
 
-import { BountyStatus, Space, User } from '@prisma/client';
+import type { Space, User } from '@prisma/client';
+import { BountyStatus } from '@prisma/client';
 import { DataNotFoundError, DuplicateDataError, MissingDataError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { generateBounty, generateBountyWithSingleApplication, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';

@@ -5,19 +5,19 @@ import { FormattedMessage, injectIntl, IntlShape } from 'react-intl';
 
 import withScrolling, { createHorizontalStrength, createVerticalStrength } from 'react-dnd-scrolling';
 
+import { Menu, TextField } from '@mui/material';
 import Button from '@mui/material/Button';
-import { TextField, Menu } from '@mui/material';
 import { Box } from '@mui/system';
-import { bindTrigger, bindMenu } from 'material-ui-popup-state';
+import { bindMenu, bindTrigger } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { Board, IPropertyOption, IPropertyTemplate, BoardGroup } from '../../blocks/board';
-import { Card } from '../../blocks/card';
+import { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from '../../blocks/board';
 import { BoardView } from '../../blocks/boardView';
+import { Card } from '../../blocks/card';
 import mutator, { BlockChange } from '../../mutator';
-import { Utils, IDType } from '../../utils';
+import { IDType, Utils } from '../../utils';
 // import Button from '../../widgets/buttons/button'
-import { Constants } from '../../constants';
 import { isTouchScreen } from 'lib/browser';
+import { Constants } from '../../constants';
 
 import { dragAndDropRearrange } from '../cardDetail/cardDetailContentsUtility';
 

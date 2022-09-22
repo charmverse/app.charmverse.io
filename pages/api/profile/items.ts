@@ -1,10 +1,10 @@
 
-import { ProfileItem } from '@prisma/client';
-import { UpdateProfileItemRequest } from 'charmClient/apis/profileApi';
+import type { ProfileItem } from '@prisma/client';
+import type { UpdateProfileItemRequest } from 'charmClient/apis/profileApi';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

@@ -1,6 +1,6 @@
-import { EditorView, MarkType, Node, Schema } from '@bangle.dev/pm';
+import type { EditorView, MarkType, Node, Schema } from '@bangle.dev/pm';
 import { findChildrenByMark, findChildrenByType } from 'prosemirror-utils';
-import { ExtendedVote } from 'lib/votes/interfaces';
+import type { ExtendedVote } from 'lib/votes/interfaces';
 
 export function findTotalInlineVotes (
   view:EditorView,

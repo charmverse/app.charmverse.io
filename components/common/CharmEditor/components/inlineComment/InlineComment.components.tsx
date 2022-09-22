@@ -9,14 +9,15 @@ import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import { checkForEmpty } from 'components/common/CharmEditor/utils';
 import { useInlineComment } from 'hooks/useInlineComment';
 import { usePages } from 'hooks/usePages';
-import { PageContent } from 'models';
-import { PluginKey, TextSelection } from 'prosemirror-state';
+import type { PageContent } from 'models';
+import type { PluginKey } from 'prosemirror-state';
+import { TextSelection } from 'prosemirror-state';
 import React, { useState } from 'react';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import PageThread from '../PageThread';
 import { hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
 import { updateInlineComment } from './inlineComment.utils';
-import { InlineCommentPluginState } from './inlineComment.plugins';
+import type { InlineCommentPluginState } from './inlineComment.plugins';
 
 const ThreadContainer = styled(Paper)`
   max-height: 400px;

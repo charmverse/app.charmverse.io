@@ -3,7 +3,8 @@ import Button from 'components/common/Button';
 import Tooltip from '@mui/material/Tooltip';
 import styled from '@emotion/styled';
 import { useWeb3React } from '@web3-react/core';
-import { RPC, Blockchain } from 'connectors';
+import type { Blockchain } from 'connectors';
+import { RPC } from 'connectors';
 import { greyColor2 } from 'theme/colors';
 
 type Props = {

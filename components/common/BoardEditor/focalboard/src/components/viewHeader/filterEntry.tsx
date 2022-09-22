@@ -1,14 +1,14 @@
+import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import React from 'react';
 import { useIntl } from 'react-intl';
-import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 
-import { FilterClause, areEqual as areFilterClausesEqual } from '../../blocks/filterClause';
+import { Board, IPropertyTemplate } from '../../blocks/board';
+import { BoardView } from '../../blocks/boardView';
+import { areEqual as areFilterClausesEqual, FilterClause } from '../../blocks/filterClause';
 import { createFilterGroup, isAFilterGroupInstance } from '../../blocks/filterGroup';
 import mutator from '../../mutator';
 import { OctoUtils } from '../../octoUtils';
 import { Utils } from '../../utils';
-import { Board, IPropertyTemplate } from '../../blocks/board';
-import { BoardView } from '../../blocks/boardView';
 import Button from '../../widgets/buttons/button';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';

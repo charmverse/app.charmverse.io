@@ -1,8 +1,9 @@
-import { addSpaceOperations, SpacePermissionFlags, SpacePermissionModification } from 'lib/permissions/spaces';
+import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
+import type { SpacePermissionFlags, SpacePermissionModification } from 'lib/permissions/spaces';
+import { addSpaceOperations } from 'lib/permissions/spaces';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 
 describe('POST /api/permissions/space/{spaceId}/remove - Remove space permissions', () => {
 

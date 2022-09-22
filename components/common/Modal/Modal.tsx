@@ -1,4 +1,4 @@
-import { ComponentProps, ReactNode } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import styled from '@emotion/styled';
 import MuiModal from '@mui/material/Modal';
 import Box from '@mui/material/Box';

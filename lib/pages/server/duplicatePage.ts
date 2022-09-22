@@ -1,11 +1,11 @@
-import { PrismaPromise, Prisma, Page, Block } from '@prisma/client';
-import { createBoard } from 'lib/focalboard/board';
-import { createBoardView } from 'lib/focalboard/boardView';
-import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
-import { getPagePath } from 'lib/pages';
-import { v4 } from 'uuid';
+import type { Block, Page, Prisma, PrismaPromise } from '@prisma/client';
 import { prisma } from 'db';
 import { createBlock } from 'lib/focalboard/block';
+import { createBoard } from 'lib/focalboard/board';
+import { createBoardView } from 'lib/focalboard/boardView';
+import { getPagePath } from 'lib/pages';
+import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
+import { v4 } from 'uuid';
 import { getPage, PageNotFoundError } from '.';
 
 export async function duplicatePage (pageId: string, userId: string, parentId?: string) {

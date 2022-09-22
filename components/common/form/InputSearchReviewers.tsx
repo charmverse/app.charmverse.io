@@ -1,11 +1,11 @@
 import { Autocomplete, TextField } from '@mui/material';
-import { Role } from '@prisma/client';
+import type { Role } from '@prisma/client';
 import UserDisplay from 'components/common/UserDisplay';
 import { useContributors } from 'hooks/useContributors';
 import useRoles from 'hooks/useRoles';
-import { Contributor } from 'models/User';
-import { ListSpaceRolesResponse } from 'pages/api/roles';
-import { ComponentProps, SyntheticEvent } from 'react';
+import type { Contributor } from 'models/User';
+import type { ListSpaceRolesResponse } from 'pages/api/roles';
+import type { ComponentProps, SyntheticEvent } from 'react';
 
 type ReducedRole = Role | ListSpaceRolesResponse
 
@@ -48,6 +48,11 @@ export default function InputSearchReviewers ({
       autoHighlight
       groupBy={(option) => option.group[0].toUpperCase() + option.group.slice(1)}
       getOptionLabel={(groupWithId) => {
+
+        if (!groupWithId) {
+          return '';
+        }
+
         const option = optionsRecord[groupWithId.id] ?? {};
         if (option.group === 'user') {
           return option.username;

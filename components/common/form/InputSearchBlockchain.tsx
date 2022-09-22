@@ -1,9 +1,11 @@
-import Autocomplete, { AutocompleteProps } from '@mui/material/Autocomplete';
+import type { AutocompleteProps } from '@mui/material/Autocomplete';
+import Autocomplete from '@mui/material/Autocomplete';
 import Box from '@mui/material/Box';
 import { useEffect, useState } from 'react';
-import { RPCList, IChainDetails } from 'connectors';
+import type { IChainDetails } from 'connectors';
+import { RPCList } from 'connectors';
 import TextField from '@mui/material/TextField';
-import { SxProps } from '@mui/system';
+import type { SxProps } from '@mui/system';
 
 interface Props extends Omit<Partial<AutocompleteProps<IChainDetails, false, true, true>>, 'onChange'>{
   onChange?: (chainId: number) => void;

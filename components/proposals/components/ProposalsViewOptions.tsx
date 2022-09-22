@@ -1,7 +1,9 @@
 import styled from '@emotion/styled';
-import { InputLabel, MenuItem, Select } from '@mui/material';
-import { ProposalStatus } from '@prisma/client';
+import { Chip, InputLabel, MenuItem, Select } from '@mui/material';
+import type { ProposalStatus } from '@prisma/client';
+import type { ProposalCategory } from 'lib/proposal/interface';
 import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
+import type { BrandColor } from 'theme/colors';
 
 const StyledViewOptions = styled.div`
   align-items: center;
@@ -15,17 +17,26 @@ const StyledViewOptions = styled.div`
 export type ProposalSort = 'latest_created'
 export type ProposalFilter = ProposalStatus | 'all'
 
+type Props = {
+  proposalFilter: ProposalFilter;
+  setProposalFilter: (proposalFilter: ProposalFilter) => void;
+  proposalSort: ProposalSort;
+  setProposalSort: (proposalSort: ProposalSort) => void;
+  categoryIdFilter: string | null;
+  setCategoryIdFilter: (val: string) => void;
+  categories: ProposalCategory[];
+}
+
 export default function ProposalsViewOptions ({
   proposalSort,
   setProposalSort,
   proposalFilter,
-  setProposalFilter
-}: {
-  proposalFilter: ProposalFilter,
-  setProposalFilter: (proposalFilter: ProposalFilter) => void
-  proposalSort: ProposalSort,
-  setProposalSort: (proposalSort: ProposalSort) => void
-}) {
+  setProposalFilter,
+  categories,
+  categoryIdFilter,
+  setCategoryIdFilter
+
+}: Props) {
   return (
     <StyledViewOptions>
       <InputLabel>Sort</InputLabel>
@@ -39,6 +50,13 @@ export default function ProposalsViewOptions ({
             .map(([proposalStatus, proposalStatusLabel]) => <MenuItem key={proposalStatus} value={proposalStatus}>{proposalStatusLabel}</MenuItem>)
         }
         <MenuItem value='all'>All</MenuItem>
+      </Select>
+
+      <Select variant='outlined' value={categoryIdFilter || ''} onChange={(e) => setCategoryIdFilter(e.target.value)}>
+        <MenuItem value='all'>All categories</MenuItem>
+        {
+          categories.map(({ id, title, color }) => <MenuItem key={id} value={id}><Chip sx={{ cursor: 'pointer' }} color={color as BrandColor} label={title} /></MenuItem>)
+        }
       </Select>
     </StyledViewOptions>
   );

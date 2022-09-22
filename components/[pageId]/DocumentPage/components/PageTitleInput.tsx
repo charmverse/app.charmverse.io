@@ -2,7 +2,8 @@ import { EditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import { TextField, Typography } from '@mui/material';
 import { TextSelection } from 'prosemirror-state';
-import { ChangeEvent, useContext, useEffect, useRef, useState } from 'react';
+import type { ChangeEvent } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { isTouchScreen } from 'lib/browser';
 
 const StyledPageTitle = styled(TextField)`

@@ -1,16 +1,16 @@
 
-import { Application } from '@prisma/client';
+import type { Application } from '@prisma/client';
+import { prisma } from 'db';
 import { approveApplication } from 'lib/applications/actions';
 import { rollupBountyStatus } from 'lib/bounties/rollupBountyStatus';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { withSessionRoute } from 'lib/session/withSession';
-import { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-import { prisma } from 'db';
-import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
-import { computeBountyPermissions } from 'lib/permissions/bounties';
 import * as collabland from 'lib/collabland';
 import log from 'lib/log';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { computeBountyPermissions } from 'lib/permissions/bounties';
+import { withSessionRoute } from 'lib/session/withSession';
+import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

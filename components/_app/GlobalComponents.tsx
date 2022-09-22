@@ -1,6 +1,5 @@
-import React from 'react';
-import Snackbar from 'components/common/Snackbar';
 import HexagonalAvatarMask from 'components/common/HexagonalAvatarMask';
+import Snackbar from 'components/common/Snackbar';
 import SetAvatarPopup from 'components/profile/components/SetAvatarPopup/SetAvatarPopup';
 
 export default function GlobalComponents () {

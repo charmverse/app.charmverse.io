@@ -1,11 +1,11 @@
-import { Prisma, Space } from '@prisma/client';
+import type { Prisma, Space } from '@prisma/client';
 import { prisma } from 'db';
 import { v4, validate } from 'uuid';
 import { multiResolvePageTree } from 'lib/pages/server/resolvePageTree';
-import { PageNodeWithChildren, PageNodeWithPermissions } from 'lib/pages';
+import type { PageNodeWithChildren, PageNodeWithPermissions } from 'lib/pages';
 import { hasSameOrMorePermissions, IPagePermissionWithSource } from 'lib/permissions/pages';
 import { DataNotFoundError, InvalidInputError } from '../utilities/errors';
-import { PublicBountyToggle } from './interfaces';
+import type { PublicBountyToggle } from './interfaces';
 
 async function generatePublicBountyPermissionArgs ({ publicBountyBoard, spaceId }: PublicBountyToggle<false>):
 Promise<[Prisma.PagePermissionDeleteManyArgs | null]>

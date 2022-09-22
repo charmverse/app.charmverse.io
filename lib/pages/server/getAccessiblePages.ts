@@ -93,6 +93,18 @@ export function generateAccessiblePagesQuery ({ spaceId, userId, archived }: Pag
             userId
           })
         },
+        // Override for proposal templates so any user can instantiate them
+        {
+          type: 'proposal_template',
+          space: {
+            id: spaceId,
+            spaceRoles: {
+              some: {
+                userId
+              }
+            }
+          }
+        },
         // Admin override to always return all pages
         {
           space: {

@@ -1,10 +1,10 @@
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import ElementDeleteIcon from 'components/common/form/ElementDeleteIcon';
 import Avatar from 'components/common/Avatar';
-import { User } from 'models';
+import ElementDeleteIcon from 'components/common/form/ElementDeleteIcon';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
+import type { User } from 'models';
 
 export const StyledRow = styled(Box)`
   border-bottom: 1px solid ${({ theme }) => theme.palette.divider};

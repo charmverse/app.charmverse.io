@@ -1,11 +1,14 @@
-import { ProposalStatus } from '@prisma/client';
+import type { ProposalStatus } from '@prisma/client';
 import * as http from 'adapters/http';
-import { ProposalWithUsers } from 'lib/proposal/interface';
+
+import type { ProposalCategory, ProposalWithUsers } from 'lib/proposal/interface';
+import type { IPageWithPermissions } from 'lib/pages';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
+import type { CreateProposalFromTemplateInput } from 'lib/proposal/createProposalFromTemplate';
 
 export class ProposalsApi {
-  updateProposal ({ proposalId, authors, reviewers }: UpdateProposalRequest) {
-    return http.PUT(`/api/proposals/${proposalId}`, { authors, reviewers });
+  updateProposal ({ proposalId, authors, reviewers, categoryId }: UpdateProposalRequest) {
+    return http.PUT(`/api/proposals/${proposalId}`, { authors, reviewers, categoryId });
   }
 
   getProposal (proposalId: string) {
@@ -18,5 +21,33 @@ export class ProposalsApi {
 
   getProposalsBySpace (spaceId: string) {
     return http.GET<ProposalWithUsers[]>(`/api/spaces/${spaceId}/proposals`);
+  }
+
+  getProposalCategories (spaceId: string) {
+    return http.GET<ProposalCategory[]>(`/api/spaces/${spaceId}/proposal-categories`);
+  }
+
+  createProposalTemplate ({ spaceId }: {spaceId: string}): Promise<IPageWithPermissions> {
+    return http.POST('/api/proposals/templates', { spaceId });
+  }
+
+  createProposalFromTemplate ({ spaceId, templateId }: Omit<CreateProposalFromTemplateInput, 'createdBy'>): Promise<IPageWithPermissions> {
+    return http.POST('/api/proposals/from-template', { spaceId, templateId });
+  }
+
+  deleteProposalTemplate ({ proposalTemplateId }: {proposalTemplateId: string}): Promise<IPageWithPermissions> {
+    return http.DELETE(`/api/proposals/templates/${proposalTemplateId}`);
+  }
+
+  createProposalCategory (spaceId: string, category: Omit<ProposalCategory, 'id' | 'spaceId'>) {
+    return http.POST<ProposalCategory>(`/api/spaces/${spaceId}/proposal-categories`, { ...category });
+  }
+
+  updateProposalCategory (spaceId: string, category: ProposalCategory) {
+    return http.PUT<ProposalCategory>(`/api/spaces/${spaceId}/proposal-categories/${category.id}`, { ...category });
+  }
+
+  deleteProposalCategory (spaceId: string, categoryId: string) {
+    return http.DELETE<{ ok: true }>(`/api/spaces/${spaceId}/proposal-categories/${categoryId}`);
   }
 }

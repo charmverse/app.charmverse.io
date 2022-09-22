@@ -1,4 +1,9 @@
 
+// using deprectead feature, navigator.userAgent doesnt exist yet in FF - https://developer.mozilla.org/en-US/docs/Web/API/Navigator/platform
+export function isMac () {
+  return navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+}
+
 export function isTouchScreen (): boolean {
   const toMatch = [
     /Android/i,

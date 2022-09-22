@@ -1,6 +1,7 @@
-import { Thread, Comment } from '@prisma/client';
-import { PageContent } from 'models';
-import { CommentWithUser } from 'lib/comments/interfaces';
+import type { Thread } from '@prisma/client';
+import { Comment } from '@prisma/client';
+import type { PageContent } from 'models';
+import type { CommentWithUser } from 'lib/comments/interfaces';
 
 export enum ThreadStatus {
   open,

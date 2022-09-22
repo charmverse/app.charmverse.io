@@ -1,52 +1,81 @@
-import { Prisma } from '@prisma/client';
+import type { ProposalStatus, Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { v4 } from 'uuid';
+import { v4 as uuid } from 'uuid';
+import { generateSyncProposalPermissions } from './syncProposalPermissions';
+import { getPagePath } from '../pages';
 
-export async function createProposal ({
-  pageCreateInput,
-  userId,
-  spaceId
-}: {
-  pageCreateInput: Prisma.PageCreateInput
-  spaceId: string
-  userId: string
-}) {
-  const proposalId = v4();
+type PageProps = 'createdBy' | 'spaceId';
+type OptionalPageProps = 'content' | 'contentText' | 'title';
+
+type ProposalPageInput = Pick<Prisma.PageUncheckedCreateInput, PageProps>
+  & Partial<Pick<Prisma.PageUncheckedCreateInput, OptionalPageProps>>;
+type ProposalInput = { reviewers: { roleId?: string; userId?: string }[], categoryId: string | null };
+
+export async function createProposal (pageProps: ProposalPageInput, proposalProps?: ProposalInput) {
+
+  const { createdBy, spaceId } = pageProps;
+
   // Making the page id same as proposalId
-  const pageData: Prisma.PageCreateInput = { ...pageCreateInput, id: proposalId };
+  const proposalId = uuid();
+  const proposalStatus: ProposalStatus = 'private_draft';
+
   // Using a transaction to ensure both the proposal and page gets created together
-  const createdPage = await prisma.page.create({
-    data: {
-      ...pageData,
-      type: 'proposal',
-      proposal: {
-        create: {
-          createdBy: userId,
-          id: proposalId,
-          spaceId,
-          status: 'private_draft',
-          // Add page creator as the proposal's first author
-          authors: {
-            create: {
-              author: {
-                connect: {
-                  id: userId
-                }
-              }
+  const [proposal, page, workspaceEvent] = await prisma.$transaction([
+    prisma.proposal.create({
+      data: {
+        // Add page creator as the proposal's first author
+        createdBy,
+        id: proposalId,
+        spaceId,
+        status: proposalStatus,
+        categoryId: proposalProps?.categoryId || null,
+        authors: {
+          create: {
+            userId: createdBy
+          }
+        },
+        ...proposalProps?.reviewers && {
+          reviewers: {
+            createMany: {
+              data: proposalProps.reviewers
             }
           }
         }
       }
-    },
-    include: {
-      proposal: {
-        include: {
-          authors: true,
-          reviewers: true
-        }
+    }),
+    prisma.page.create({
+      data: {
+        proposalId,
+        contentText: '',
+        path: getPagePath(),
+        title: '',
+        updatedBy: createdBy,
+        ...pageProps,
+        id: proposalId,
+        type: 'proposal'
       }
-    }
-  });
+    }),
+    prisma.workspaceEvent.create({
+      data: {
+        type: 'proposal_status_change',
+        meta: {
+          newStatus: proposalStatus
+        },
+        actorId: createdBy,
+        pageId: proposalId,
+        spaceId
+      }
+    })
+  ]);
 
-  return createdPage;
+  const [deleteArgs, createArgs] = await generateSyncProposalPermissions({ proposalId });
+
+  await prisma.$transaction([
+    prisma.pagePermission.deleteMany(deleteArgs),
+    ...createArgs.map(args => (
+      prisma.pagePermission.create(args)
+    ))
+  ]);
+
+  return { page, proposal, workspaceEvent };
 }

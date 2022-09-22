@@ -6,11 +6,10 @@ import { DownIcon } from 'components/common/Icons/DownIcon';
 import { usePages } from 'hooks/usePages';
 import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import React from 'react';
-import { useIntl } from 'react-intl';
 import { Card } from '../../blocks/card';
 import { getCurrentBoardTemplates } from '../../store/cards';
 import { useAppSelector } from '../../store/hooks';
-import { TemplatesMenu } from './TemplatesMenu';
+import { TemplatesMenu } from 'components/common/TemplatesMenu';
 
 
 type Props = {

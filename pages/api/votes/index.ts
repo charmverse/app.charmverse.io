@@ -1,10 +1,10 @@
 
-import { Vote } from '@prisma/client';
-import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import type { Vote } from '@prisma/client';
+import { hasAccessToSpace, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { createVote as createVoteService, getVote as getVoteService } from 'lib/votes';
-import { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { prisma } from 'db';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
@@ -40,7 +40,13 @@ async function createVote (req: NextApiRequest, res: NextApiResponse<ExtendedVot
     },
     select: {
       id: true,
-      spaceId: true
+      spaceId: true,
+      type: true,
+      proposal: {
+        include: {
+          authors: true
+        }
+      }
     }
   });
 
@@ -48,14 +54,23 @@ async function createVote (req: NextApiRequest, res: NextApiResponse<ExtendedVot
     throw new DataNotFoundError(`Cannot create poll as linked page with id ${pageId} was not found.`);
   }
 
-  const userPermissions = await computeSpacePermissions({
-    allowAdminBypass: true,
-    resourceId: existingPage.spaceId,
-    userId: createdBy
-  });
+  // User must be proposal author or a space admin to create a poll
+  if (existingPage.type === 'proposal' && newVote.context === 'proposal') {
+    if (existingPage.proposal?.authors.every(a => a.userId !== userId) && (await hasAccessToSpace({
+      userId, spaceId: existingPage.spaceId, adminOnly: true })).error) {
+      throw new UnauthorisedActionError(`Cannot create poll as user ${userId} is not an author of the linked proposal.`);
+    }
+  }
+  else {
+    const userPermissions = await computeSpacePermissions({
+      allowAdminBypass: true,
+      resourceId: existingPage.spaceId,
+      userId: createdBy
+    });
 
-  if (!userPermissions.createVote) {
-    throw new UnauthorisedActionError('You do not have permissions to create a vote.');
+    if (!userPermissions.createVote) {
+      throw new UnauthorisedActionError('You do not have permissions to create a vote.');
+    }
   }
 
   const vote = await createVoteService({

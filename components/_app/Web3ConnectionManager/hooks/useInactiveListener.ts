@@ -1,8 +1,8 @@
-import { Web3Provider } from '@ethersproject/providers';
+import type { Web3Provider } from '@ethersproject/providers';
 import { useWeb3React } from '@web3-react/core';
 import { injected } from 'connectors';
-import { useEffect } from 'react';
 import log from 'lib/log';
+import { useEffect } from 'react';
 
 type WindowType = Window & typeof globalThis & { ethereum: Web3Provider }
 

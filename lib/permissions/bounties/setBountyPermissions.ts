@@ -2,7 +2,7 @@ import { BountyPermissionLevel } from '@prisma/client';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import { typedKeys } from '../../utilities/objects';
 import { addBountyPermissionGroup } from './addBountyPermissionGroup';
-import { BountyPermissionAssignment, BountyPermissions, BulkBountyPermissionAssignment } from './interfaces';
+import type { BountyPermissionAssignment, BountyPermissions, BulkBountyPermissionAssignment } from './interfaces';
 import { queryBountyPermissions } from './queryBountyPermissions';
 import { removeBountyPermissionGroup } from './removeBountyPermissionGroup';
 

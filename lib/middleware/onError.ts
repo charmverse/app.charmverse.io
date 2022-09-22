@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import log from 'lib/log';
 import { SystemError } from 'lib/utilities/errors';
 import { UnknownError } from 'lib/middleware';

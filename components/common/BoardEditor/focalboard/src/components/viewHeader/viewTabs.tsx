@@ -1,32 +1,30 @@
-import { useState, useCallback, useEffect, MouseEvent, ReactNode } from 'react';
-import { injectIntl, IntlShape } from 'react-intl';
-import { useRouter } from 'next/router';
-import Modal from 'components/common/Modal';
-import TextField from '@mui/material/TextField';
-import Divider from '@mui/material/Divider';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import Button from 'components/common/Button';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemIcon from '@mui/material/ListItemIcon';
+import styled from '@emotion/styled';
 import DuplicateIcon from '@mui/icons-material/ContentCopy';
+import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import TuneIcon from '@mui/icons-material/Tune';
-import { usePopupState, bindTrigger, bindMenu } from 'material-ui-popup-state/hooks';
-import { useForm } from 'react-hook-form';
-import { useFocalboardViews } from 'hooks/useFocalboardViews';
-import { Board } from 'lib/focalboard/board';
+import Divider from '@mui/material/Divider';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Tab from '@mui/material/Tab';
+import Tabs from '@mui/material/Tabs';
+import TextField from '@mui/material/TextField';
 import { Box } from '@mui/system';
+import Button from 'components/common/Button';
+import Modal from 'components/common/Modal';
+import { useFocalboardViews } from 'hooks/useFocalboardViews';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import Link from 'next/link';
-import AddViewMenu from '../addViewMenu';
-import DeleteIcon from '@mui/icons-material/DeleteOutlined';
-import mutator from '../../mutator';
-import { iconForViewType } from '../viewMenu';
+import { useRouter } from 'next/router';
+import { MouseEvent, ReactNode, useCallback, useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { injectIntl, IntlShape } from 'react-intl';
 import { BoardView, createBoardView } from '../../blocks/boardView';
+import mutator from '../../mutator';
 import { IDType, Utils } from '../../utils';
-import styled from '@emotion/styled';
+import { iconForViewType } from '../viewMenu';
 
 const StyledButton = styled(Button)`
   padding: ${({ theme }) => theme.spacing(0.5, 1)};
@@ -136,12 +134,12 @@ function ViewTabs ({ onDeleteView, openViewOptions, maxTabsShown, onViewTabClick
     );
   }, [dropdownView, showView]);
 
-  const handleDeleteView = useCallback(() => {
+  const handleDeleteView = useCallback(async () => {
     Utils.log('deleteView');
     if (!dropdownView) return;
 
     const nextView = views.find((o) => o !== dropdownView);
-    mutator.deleteBlock(dropdownView, 'delete view');
+    await mutator.deleteBlock(dropdownView, 'delete view');
     onDeleteView?.(dropdownView.id)
     setAnchorEl(null)
     if (nextView) {

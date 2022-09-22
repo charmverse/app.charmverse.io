@@ -1,5 +1,5 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { SvgIconTypeMap } from '@mui/material/SvgIcon';
+import type { SvgIconTypeMap } from '@mui/material/SvgIcon';
 import Box from '@mui/material/Box';
 import { IconWrapper } from './IconWrapper';
 

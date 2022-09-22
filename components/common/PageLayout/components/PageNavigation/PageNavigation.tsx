@@ -9,16 +9,19 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
-import { addPageAndRedirect, IPageWithPermissions, NewPageInput } from 'lib/pages';
+import type { IPageWithPermissions, NewPageInput } from 'lib/pages';
+import { addPageAndRedirect } from 'lib/pages';
 import { mapPageTree, sortNodes } from 'lib/pages/mapPageTree';
 import { isTruthy } from 'lib/utilities/types';
-import { Page, PageContent } from 'models';
+import type { Page, PageContent } from 'models';
 import { useRouter } from 'next/router';
-import { ComponentProps, Dispatch, memo, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo } from 'react';
+import type { ComponentProps, Dispatch, ReactNode, SetStateAction, SyntheticEvent } from 'react';
+import { memo, useCallback, useEffect, useMemo } from 'react';
 import { useDrop } from 'react-dnd';
 
 import { useSnackbar } from 'hooks/useSnackbar';
-import TreeNode, { MenuNode, ParentMenuNode } from './components/TreeNode';
+import type { MenuNode, ParentMenuNode } from './components/TreeNode';
+import TreeNode from './components/TreeNode';
 
 const StyledTreeRoot = styled(TreeRoot)<{ isFavorites?: boolean }>`
   flex-grow: ${props => props.isFavorites ? 0 : 1};

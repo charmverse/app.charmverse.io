@@ -9,9 +9,9 @@ import { InputSearchContributorMultiple } from 'components/common/form/InputSear
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 import Loader from 'components/common/Loader';
 import useRoles from 'hooks/useRoles';
-import { IPagePermissionToCreate, IPagePermissionWithAssignee, PagePermissionLevelType } from 'lib/permissions/pages/page-permission-interfaces';
+import type { IPagePermissionToCreate, IPagePermissionWithAssignee, PagePermissionLevelType } from 'lib/permissions/pages/page-permission-interfaces';
 import { permissionLevels } from 'lib/permissions/pages/page-permission-mapping';
-import { ListSpaceRolesResponse } from 'pages/api/roles';
+import type { ListSpaceRolesResponse } from 'pages/api/roles';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';

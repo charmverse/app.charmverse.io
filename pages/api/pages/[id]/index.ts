@@ -1,15 +1,15 @@
 
-import { Page } from '@prisma/client';
+import type { Page } from '@prisma/client';
 import { prisma } from 'db';
-import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { IPageWithPermissions, ModifyChildPagesResponse } from 'lib/pages';
+import { ActionNotPermittedError, hasAccessToSpace, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import type { IPageWithPermissions, ModifyChildPagesResponse } from 'lib/pages';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
 import { resolvePageTree } from 'lib/pages/server';
 import { getPage } from 'lib/pages/server/getPage';
 import { computeUserPagePermissions, setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UndesirableOperationError } from 'lib/utilities/errors';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -71,12 +71,27 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
     },
     select: {
       id: true,
-      parentId: true
+      parentId: true,
+      type: true,
+      spaceId: true
     }
   });
 
   if (!page) {
     throw new NotFoundError();
+  }
+
+  // Only admins can edit proposal template content
+  if (page.type === 'proposal_template') {
+    const { error } = await hasAccessToSpace({
+      spaceId: page.spaceId,
+      userId,
+      adminOnly: true
+    });
+
+    if (error) {
+      throw error;
+    }
   }
 
   const hasNewParentPage = (updateContent.parentId !== page.parentId && (typeof updateContent.parentId === 'string' || updateContent.parentId === null));

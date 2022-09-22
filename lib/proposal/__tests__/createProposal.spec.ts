@@ -1,6 +1,8 @@
-import { Space, User } from '@prisma/client';
+import type { Space, User } from '@prisma/client';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { prisma } from 'db';
 import { createProposal } from '../createProposal';
+import { proposalPermissionMapping } from '../syncProposalPermissions';
 
 let user: User;
 let space: Space;
@@ -12,39 +14,60 @@ beforeAll(async () => {
 });
 
 describe('Creates a page and proposal with relevant configuration', () => {
-  it('Create a page and returns it with the attached proposal', async () => {
-    const pageWithProposal = await createProposal({
-      pageCreateInput: {
-        author: {
-          connect: {
-            id: user.id
-          }
-        },
-        contentText: '',
-        path: 'path',
-        space: {
-          connect: {
-            id: space.id
-          }
-        },
-        title: 'page-title',
-        type: 'proposal',
-        updatedBy: user.id
-      },
-      spaceId: space.id,
-      userId: user.id
+
+  it('Create a page and proposal', async () => {
+
+    const { page, workspaceEvent } = await createProposal({
+      contentText: '',
+      title: 'page-title',
+      createdBy: user.id,
+      spaceId: space.id
     });
 
-    expect(pageWithProposal).toMatchObject(expect.objectContaining({
+    expect(page).toMatchObject(expect.objectContaining({
       title: 'page-title',
-      type: 'proposal',
-      proposal: expect.objectContaining({
-        authors: [{
-          proposalId: pageWithProposal.id,
-          userId: user.id
-        }],
-        reviewers: []
-      })
+      type: 'proposal'
+    }));
+
+    const proposal = await prisma.proposal.findUnique({
+      where: {
+        id: page.proposalId as string
+      },
+      include: {
+        authors: true
+      }
+    });
+
+    expect(proposal).toMatchObject(expect.objectContaining({
+      authors: [{
+        proposalId: proposal?.id,
+        userId: user.id
+      }]
+    }));
+
+    expect(workspaceEvent).toMatchObject(expect.objectContaining({
+      type: 'proposal_status_change'
     }));
   });
+
+  it('Should provision the proposal permissions', async () => {
+
+    const { page } = await createProposal({
+      createdBy: user.id,
+      contentText: '',
+      spaceId: space.id,
+      title: 'page-title'
+    });
+
+    const permissions = await prisma.pagePermission.findMany({
+      where: {
+        pageId: page.id
+      }
+    });
+
+    const privateDraftAuthorPermissionLevel = proposalPermissionMapping.private_draft.author;
+
+    expect(permissions.some(p => p.userId === user.id && p.permissionLevel === privateDraftAuthorPermissionLevel)).toBe(true);
+  });
+
 });

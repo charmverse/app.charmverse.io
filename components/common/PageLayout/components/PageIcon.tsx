@@ -1,5 +1,5 @@
-import { ReactNode } from 'react';
-import { Page } from '@prisma/client';
+import type { ReactNode } from 'react';
+import type { Page } from '@prisma/client';
 import styled from '@emotion/styled';
 import DatabaseIcon from '@mui/icons-material/TableChart';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';

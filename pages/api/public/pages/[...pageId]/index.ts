@@ -1,16 +1,16 @@
-import { Page } from '@prisma/client';
+import type { Page } from '@prisma/client';
 import { prisma } from 'db';
-import { Board } from 'lib/focalboard/board';
-import { BoardView } from 'lib/focalboard/boardView';
-import { Card } from 'lib/focalboard/card';
+import type { Board } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import type { Card } from 'lib/focalboard/card';
 import { onError, onNoMatch } from 'lib/middleware';
 import { NotFoundError } from 'lib/middleware/errors';
-import { PublicPageResponse } from 'lib/pages';
+import type { PublicPageResponse } from 'lib/pages';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { isUUID } from 'lib/utilities/strings';
-import { PageContent } from 'models';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { PageContent } from 'models';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

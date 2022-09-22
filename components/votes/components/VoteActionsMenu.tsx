@@ -5,7 +5,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import { useUser } from 'hooks/useUser';
-import { VoteContext } from '@prisma/client';
+import type { VoteContext } from '@prisma/client';
 
 interface VoteActionsProps {
   deleteVote?: (voteId: string) => Promise<void>;

@@ -1,24 +1,24 @@
 
-import { Box, Divider, Grid, Tab, Tabs, Typography, Badge } from '@mui/material';
-import KeyIcon from '@mui/icons-material/Key';
-import ForumIcon from '@mui/icons-material/Forum';
-import styled from '@emotion/styled';
-import { useRouter } from 'next/router';
-import { silentlyUpdateURL } from 'lib/browser';
-import { useState } from 'react';
 import { useTheme } from '@emotion/react';
+import styled from '@emotion/styled';
+import ForumIcon from '@mui/icons-material/Forum';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
-import { useUser } from 'hooks/useUser';
+import KeyIcon from '@mui/icons-material/Key';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
-import GnosisTasksList from './GnosisTasksList';
-import MentionedTasksList from './MentionedTasksList';
-import TasksPageHeader from './TasksPageHeader';
+import { Badge, Box, Divider, Grid, Tab, Tabs, Typography } from '@mui/material';
+import { useUser } from 'hooks/useUser';
+import { silentlyUpdateURL } from 'lib/browser';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
 import NexusPageTitle from './components/NexusPageTitle';
 import NotifyMeButton from './components/NotifyMeButton';
 import SnoozeButton from './components/SnoozeButton';
+import GnosisTasksList from './GnosisTasksList';
 import useTasks from './hooks/useTasks';
-import { VoteTasksList } from './VoteTasksList';
+import MentionedTasksList from './MentionedTasksList';
 import ProposalTasksList from './ProposalTasksList';
+import TasksPageHeader from './TasksPageHeader';
+import { VoteTasksList } from './VoteTasksList';
 
 export const tabStyles = {
   mb: 2,
@@ -73,7 +73,7 @@ export default function TasksPage () {
     multisig: (tasks && !hasSnoozedNotifications) ? tasks.gnosis.length : 0,
     vote: tasks ? tasks.votes.length : 0,
     discussion: tasks ? tasks.mentioned.unmarked.length : 0,
-    proposal: tasks ? tasks.proposals.length : 0
+    proposal: tasks ? tasks.proposals.unmarked.length : 0
   };
 
   return (
@@ -169,7 +169,7 @@ export default function TasksPage () {
         currentTaskType === 'vote' && <VoteTasksList mutateTasks={mutateTasks} error={error} tasks={tasks} />
       }
       {
-        currentTaskType === 'proposal' && <ProposalTasksList error={error} tasks={tasks} />
+        currentTaskType === 'proposal' && <ProposalTasksList error={error} tasks={tasks} mutateTasks={mutateTasks} />
       }
     </>
   );

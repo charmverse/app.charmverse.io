@@ -5,9 +5,12 @@ import type { ExtendedPoap, NftData } from 'lib/blockchain/interfaces';
 import { useEffect } from 'react';
 import useSWRImmutable from 'swr/immutable';
 import AggregatedData from './components/AggregatedData';
-import CollectableRow, { Collectable } from './components/CollectibleRow';
-import CommunityRow, { CommunityDetails } from './components/CommunityRow';
-import UserDetails, { isPublicUser, UserDetailsProps } from './components/UserDetails';
+import type { Collectable } from './components/CollectibleRow';
+import CollectableRow from './components/CollectibleRow';
+import type { CommunityDetails } from './components/CommunityRow';
+import CommunityRow from './components/CommunityRow';
+import type { UserDetailsProps } from './components/UserDetails';
+import UserDetails, { isPublicUser } from './components/UserDetails';
 import { useCollablandCredentials } from './hooks/useCollablandCredentials';
 
 function transformPoap (poap: ExtendedPoap): Collectable {

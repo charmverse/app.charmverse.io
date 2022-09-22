@@ -1,10 +1,10 @@
 
-import Button from 'components/common/Button';
 import EmailIcon from '@mui/icons-material/Mail';
-import charmClient from 'charmClient';
 import Tooltip from '@mui/material/Tooltip';
-import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import charmClient from 'charmClient';
+import Button from 'components/common/Button';
 import { useUser } from 'hooks/useUser';
+import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import NotifyMeModal from './NotifyMeModal';
 
 export default function NotifyMeButton () {
