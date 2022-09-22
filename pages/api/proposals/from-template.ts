@@ -31,13 +31,13 @@ async function createProposalFromTemplateController (req: NextApiRequest, res: N
     throw new UnauthorisedActionError('You cannot create new pages');
   }
 
-  const newProposal = await createProposalFromTemplate({
+  const { page: newPage } = await createProposalFromTemplate({
     templateId,
     spaceId,
     createdBy: userId
   });
 
-  return res.status(201).json(newProposal);
+  return res.status(201).json(newPage);
 }
 
 export default withSessionRoute(handler);
