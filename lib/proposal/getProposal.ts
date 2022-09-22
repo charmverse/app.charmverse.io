@@ -1,6 +1,7 @@
 import type { IPageWithPermissions, PageWithProposal } from 'lib/pages';
 import { prisma } from 'db';
 import { DataNotFoundError } from 'lib/utilities/errors';
+import { truncate } from 'fs/promises';
 
 /**
  *
@@ -16,7 +17,8 @@ export async function getProposal ({ proposalId }: {proposalId: string}): Promis
       proposal: {
         include: {
           authors: true,
-          reviewers: true
+          reviewers: true,
+          category: true
         }
       },
       permissions: {

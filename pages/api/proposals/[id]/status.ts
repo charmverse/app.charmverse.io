@@ -26,7 +26,8 @@ async function updateProposalStatusController (req: NextApiRequest, res: NextApi
     },
     include: {
       authors: true,
-      reviewers: true
+      reviewers: true,
+      category: true
     }
   });
 

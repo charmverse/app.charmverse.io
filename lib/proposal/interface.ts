@@ -1,5 +1,4 @@
 import type { Proposal, ProposalAuthor, ProposalReviewer } from '@prisma/client';
-import { ProposalStatus } from '@prisma/client';
 import type { AssignablePermissionGroups } from 'lib/permissions/interfaces';
 
 export interface ProposalReviewerInput {
@@ -7,7 +6,22 @@ export interface ProposalReviewerInput {
   id: string
 }
 
-export interface ProposalWithUsers extends Proposal {
+export interface NewProposalCategory {
+  title: string;
+  color: string;
+}
+
+export interface ProposalCategory extends NewProposalCategory {
+  id: string;
+  spaceId: string;
+}
+
+export interface ProposalWithCategory extends Proposal {
+  category: ProposalCategory | null;
+}
+
+export interface ProposalWithUsers extends Proposal, ProposalWithCategory {
   authors: ProposalAuthor[],
   reviewers: ProposalReviewer[]
 }
+

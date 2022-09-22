@@ -41,6 +41,7 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
     include: {
       authors: true,
       reviewers: true,
+      category: true,
       space: {
         select: {
           domain: true,

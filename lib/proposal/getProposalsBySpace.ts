@@ -32,7 +32,8 @@ export async function getProposalsBySpace ({ spaceId, userId }: {
     },
     include: {
       authors: true,
-      reviewers: true
+      reviewers: true,
+      category: true
     }
   });
 }

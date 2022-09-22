@@ -7,11 +7,14 @@ import { InputSearchContributorBase } from 'components/common/form/InputSearchCo
 import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
 import PublishToSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/PublishToSnapshot';
 import UserDisplay from 'components/common/UserDisplay';
+import ProposalCategoryInput from 'components/proposals/components/ProposalCategoryInput';
 import ProposalStepper from 'components/proposals/components/ProposalStepper';
+import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import type { Contributor } from 'hooks/useContributors';
 import { useContributors } from 'hooks/useContributors';
 import useRoles from 'hooks/useRoles';
 import { useUser } from 'hooks/useUser';
+import type { ProposalCategory } from 'lib/proposal/interface';
 import type { ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
@@ -26,6 +29,7 @@ interface ProposalPropertiesProps {
 
 export default function ProposalProperties ({ pageId, proposalId, readOnly, isTemplate }: ProposalPropertiesProps) {
   const { data: proposal, mutate: refreshProposal } = useSWR(`proposal/${proposalId}`, () => charmClient.proposals.getProposal(proposalId));
+  const { categories, canEditProposalCategories, addCategory } = useProposalCategories();
 
   const [contributors] = useContributors();
   const { roles = [], roleups } = useRoles();
@@ -39,7 +43,7 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
     return null;
   }
 
-  const { status } = proposal;
+  const { status, category } = proposal;
 
   const isProposalAuthor = (user && proposal.authors.some(author => author.userId === user.id));
 
@@ -50,7 +54,7 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
     return roleups.some(role => role.id === reviewer.roleId && role.users.some(_user => _user.id === user.id));
   })));
 
-  const canUpdateAuthorsOrReviewers = (status === 'draft' || status === 'private_draft' || status === 'discussion') && isProposalAuthor;
+  const canUpdateProposalProperties = (status === 'draft' || status === 'private_draft' || status === 'discussion') && isProposalAuthor;
 
   const reviewerOptionsRecord: Record<string, ({group: 'role'} & ListSpaceRolesResponse) | ({group: 'user'} & Contributor)> = {};
 
@@ -111,6 +115,32 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
         </Grid>
       </Grid>
 
+      <Box justifyContent='space-between' gap={2} alignItems='center' my='6px'>
+        <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
+          <div className='octo-propertyname octo-propertyname--readonly'>
+            <Button>Category</Button>
+          </div>
+          <Box display='flex' flex={1}>
+            <ProposalCategoryInput
+              disabled={readOnly || !canUpdateProposalProperties}
+              options={categories || []}
+              canEditCategories={canEditProposalCategories}
+              value={category}
+              onChange={async (updatedCategory: ProposalCategory | null) => {
+                await charmClient.proposals.updateProposal({
+                  proposalId: proposal.id,
+                  authors: proposal.authors.map(author => author.userId),
+                  reviewers: proposal.reviewers.map(reviewer => ({ group: reviewer.roleId ? 'role' : 'user', id: reviewer.roleId ?? reviewer.userId as string })),
+                  categoryId: updatedCategory?.id || null
+                });
+                refreshProposal();
+              }}
+              onAddCategory={addCategory}
+            />
+          </Box>
+        </Box>
+      </Box>
+
       <Box justifyContent='space-between' gap={2} alignItems='center'>
         <div
           className='octo-propertyrow'
@@ -141,7 +171,7 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
                   refreshProposal();
                 }
               }}
-              disabled={readOnly || !canUpdateAuthorsOrReviewers}
+              disabled={readOnly || !canUpdateProposalProperties}
               readOnly={readOnly}
               options={contributors}
               sx={{
@@ -172,7 +202,7 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
                 />
               ) : (
                 <InputSearchReviewers
-                  disabled={readOnly || !canUpdateAuthorsOrReviewers}
+                  disabled={readOnly || !canUpdateProposalProperties}
                   readOnly={readOnly}
                   value={proposal.reviewers.map(reviewer => reviewerOptionsRecord[(reviewer.roleId ?? reviewer.userId) as string])}
                   disableCloseOnSelect={true}
@@ -194,6 +224,7 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
           </div>
         </div>
       </Box>
+
       <Divider sx={{
         my: 2
       }}

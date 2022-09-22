@@ -81,7 +81,8 @@ describe('syncProposalPagePermissions', () => {
           },
           include: {
             authors: true,
-            reviewers: true
+            reviewers: true,
+            category: true
           }
         });
       }
