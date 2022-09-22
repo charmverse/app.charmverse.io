@@ -24,7 +24,7 @@ export class ProposalsApi {
   }
 
   getProposalCategories (spaceId: string) {
-    return http.GET<ProposalCategory[]>(`/api/spaces/${spaceId}/categories`);
+    return http.GET<ProposalCategory[]>(`/api/spaces/${spaceId}/proposal-categories`);
   }
 
   createProposalTemplate ({ spaceId }: {spaceId: string}): Promise<IPageWithPermissions> {
@@ -40,14 +40,14 @@ export class ProposalsApi {
   }
 
   createProposalCategory (spaceId: string, category: Omit<ProposalCategory, 'id' | 'spaceId'>) {
-    return http.POST<ProposalCategory>(`/api/spaces/${spaceId}/categories`, { ...category });
+    return http.POST<ProposalCategory>(`/api/spaces/${spaceId}/proposal-categories`, { ...category });
   }
 
   updateProposalCategory (spaceId: string, category: ProposalCategory) {
-    return http.PUT<ProposalCategory>(`/api/spaces/${spaceId}/categories/${category.id}`, { ...category });
+    return http.PUT<ProposalCategory>(`/api/spaces/${spaceId}/proposal-categories/${category.id}`, { ...category });
   }
 
   deleteProposalCategory (spaceId: string, categoryId: string) {
-    return http.DELETE<{ ok: true }>(`/api/spaces/${spaceId}/categories/${categoryId}`);
+    return http.DELETE<{ ok: true }>(`/api/spaces/${spaceId}/proposal-categories/${categoryId}`);
   }
 }
