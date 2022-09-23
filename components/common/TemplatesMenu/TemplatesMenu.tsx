@@ -23,10 +23,20 @@ interface Props {
   popupState: PopupState;
   boardTitle?: string;
   enableItemOptions?: boolean;
+  enableNewTemplates?: boolean;
 }
 
 export function TemplatesMenu ({
-  pages, anchorEl, addPageFromTemplate, createTemplate, deleteTemplate, editTemplate, popupState, boardTitle, enableItemOptions = true
+  pages,
+  anchorEl,
+  addPageFromTemplate,
+  createTemplate,
+  deleteTemplate,
+  editTemplate,
+  popupState,
+  boardTitle,
+  enableItemOptions,
+  enableNewTemplates
 }: Props) {
 
   const theme = useTheme();
@@ -36,6 +46,17 @@ export function TemplatesMenu ({
   return (
     <Menu {...bindMenu(popupState)} onClose={popupState.close} anchorEl={anchorEl} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} transformOrigin={{ vertical: 'top', horizontal: 'center' }}>
       <MenuItem dense sx={{ pointerEvents: 'none' }}>Templates {boardTitle ? (<>for <b style={{ marginLeft: 4 }}>{boardTitle}</b></>) : ''} </MenuItem>
+
+      {
+        pages.length === 0 && (
+          <MenuItem
+            dense
+            sx={{ display: 'flex', justifyContent: 'space-between' }}
+          >
+            <ListItemText>No templates found</ListItemText>
+          </MenuItem>
+        )
+      }
 
       {
         pages.map((page) => {
@@ -71,11 +92,18 @@ export function TemplatesMenu ({
           );
         })
 }
-      <Divider />
-      <MenuItem dense sx={{ color: `${theme.palette.primary.main} !important` }} onClick={createTemplate}>
-        <AddIcon />
-        <ListItemText>New template</ListItemText>
-      </MenuItem>
+      {
+    enableNewTemplates && (
+      <>
+        <Divider />
+        <MenuItem dense sx={{ color: `${theme.palette.primary.main} !important` }} onClick={createTemplate}>
+          <AddIcon />
+          <ListItemText>New template</ListItemText>
+        </MenuItem>
+      </>
+
+    )
+  }
     </Menu>
   );
 }
