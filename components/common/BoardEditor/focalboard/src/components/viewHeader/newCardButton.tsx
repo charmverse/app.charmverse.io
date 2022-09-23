@@ -25,13 +25,15 @@ type Props = {
 const NewCardButton = React.memo(({addCard, addCardFromTemplate, addCardTemplate, deleteCardTemplate, editCardTemplate, showCard, boardId}: Props): JSX.Element => {
   const cardTemplates: Card[] = useAppSelector(getCurrentBoardTemplates);
   const buttonRef = React.useRef<HTMLButtonElement>(null);
-  const {pages} = usePages()
+  const {pages, getPagePermissions} = usePages()
 
   const cardTemplatesPages = cardTemplates.map(c => pages[c.id]).filter(p => p !== undefined) as Page[]
 
   const popupState = usePopupState({variant: 'popover', popupId: 'templates-menu'});
 
   const boardTitle = boardId ? (pages[boardId]?.title || 'Untitled' ) : undefined;
+
+  const pagePermissions = getPagePermissions(boardId);
 
   return (
     <>
@@ -61,6 +63,8 @@ const NewCardButton = React.memo(({addCard, addCardFromTemplate, addCardTemplate
         anchorEl={buttonRef.current as Element}
         popupState={popupState}
         boardTitle={boardTitle}
+        enableItemOptions={pagePermissions?.edit_content}
+        enableNewTemplates={pagePermissions?.edit_content}
       />
     </>
     

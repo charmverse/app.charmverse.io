@@ -23,10 +23,20 @@ interface Props {
   popupState: PopupState;
   boardTitle?: string;
   enableItemOptions?: boolean;
+  enableNewTemplates?: boolean;
 }
 
 export function TemplatesMenu ({
-  pages, anchorEl, addPageFromTemplate, createTemplate, deleteTemplate, editTemplate, popupState, boardTitle, enableItemOptions = true
+  pages,
+  anchorEl,
+  addPageFromTemplate,
+  createTemplate,
+  deleteTemplate,
+  editTemplate,
+  popupState,
+  boardTitle,
+  enableItemOptions,
+  enableNewTemplates
 }: Props) {
 
   const theme = useTheme();
@@ -71,11 +81,18 @@ export function TemplatesMenu ({
           );
         })
 }
-      <Divider />
-      <MenuItem dense sx={{ color: `${theme.palette.primary.main} !important` }} onClick={createTemplate}>
-        <AddIcon />
-        <ListItemText>New template</ListItemText>
-      </MenuItem>
+      {
+    enableNewTemplates && (
+      <>
+        <Divider />
+        <MenuItem dense sx={{ color: `${theme.palette.primary.main} !important` }} onClick={createTemplate}>
+          <AddIcon />
+          <ListItemText>New template</ListItemText>
+        </MenuItem>
+      </>
+
+    )
+  }
     </Menu>
   );
 }

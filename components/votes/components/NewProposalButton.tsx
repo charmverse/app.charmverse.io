@@ -141,6 +141,7 @@ export default function NewProposalButton ({ mutateProposals }: {mutateProposals
         boardTitle='Proposals'
         popupState={popupState}
         enableItemOptions={isAdmin}
+        enableNewTemplates={isAdmin}
       />
     </>
   );
