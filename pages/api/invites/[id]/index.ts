@@ -4,6 +4,7 @@ import { prisma } from 'db';
 import log from 'lib/log';
 import type { IEventToLog } from 'lib/log/userEvents';
 import { postToDiscord } from 'lib/log/userEvents';
+import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
 import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
@@ -54,6 +55,8 @@ async function acceptInvite (req: NextApiRequest, res: NextApiResponse) {
     });
 
     logInviteAccepted(newRole);
+
+    updateTrackUserProfileById(userId);
 
     await prisma.inviteLink.update({
       where: { id: invite.id },

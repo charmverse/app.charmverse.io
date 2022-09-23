@@ -2,6 +2,7 @@
 import { prisma } from 'db';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
 import { postToDiscord } from 'lib/log/userEvents';
+import { updateTrackUserProfile } from 'lib/metrics/mixpanel/server';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { sessionUserRelations } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -67,6 +68,8 @@ async function updateUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
       ...req.body
     }
   });
+
+  updateTrackUserProfile(user);
 
   return res.status(200).json(user);
 }

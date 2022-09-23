@@ -1,5 +1,6 @@
 import type { Role } from '@prisma/client';
 import { prisma } from 'db';
+import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
 import { DataNotFoundError, InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
 import { verifyJwt } from 'lit-js-sdk';
 import { v4 } from 'uuid';
@@ -123,6 +124,8 @@ export async function applyTokenGates ({ spaceId, userId, tokens, commit }: Toke
       });
     }));
 
+    updateTrackUserProfileById(userId);
+
     return returnValue;
   }
   else {
@@ -153,6 +156,9 @@ export async function applyTokenGates ({ spaceId, userId, tokens, commit }: Toke
         }
       })
     ]);
+
+    updateTrackUserProfileById(userId);
+
     return returnValue;
   }
 

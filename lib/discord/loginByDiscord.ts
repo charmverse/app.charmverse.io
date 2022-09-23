@@ -6,7 +6,7 @@ import { v4 as uuid } from 'uuid';
 import { IDENTITY_TYPES } from 'models';
 import { postToDiscord } from 'lib/log/userEvents';
 import log from 'lib/log';
-import { trackUserAction } from 'lib/metrics/mixpanel/server';
+import { trackUserAction, updateTrackUserProfile } from 'lib/metrics/mixpanel/server';
 
 export default async function loginByDiscord ({ code, hostName }: { code: string, hostName?: string }) {
 
@@ -58,6 +58,7 @@ export default async function loginByDiscord ({ code, hostName }: { code: string
       include: sessionUserRelations
     });
 
+    updateTrackUserProfile(newUser);
     trackUserAction('UserCreated', { userId: newUser.id, identityType: 'Discord' });
     logSignupViaDiscord();
 
