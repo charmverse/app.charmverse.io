@@ -155,7 +155,7 @@ describe('POST /api/votes - Create a proposal vote', () => {
         voteOptions: ['1', '2', '3'],
         createdBy: user.id
       })
-      .expect(200);
+      .expect(201);
 
   });
 
@@ -185,7 +185,7 @@ describe('POST /api/votes - Create a proposal vote', () => {
         voteOptions: ['1', '2', '3'],
         createdBy: user.id
       })
-      .expect(200);
+      .expect(201);
   });
 
   it('should not allow the user to create a proposal vote if they are not a proposal author', async () => {
