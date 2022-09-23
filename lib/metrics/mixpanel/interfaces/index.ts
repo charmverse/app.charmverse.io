@@ -6,12 +6,13 @@ export interface BaseEvent {
   userId: string;
 }
 
-export interface ResourceEvent {
+export interface ResourceEvent extends BaseEvent {
   resourceId: string;
 }
 
-export interface WorkspaceEvent {
-  workspaceId: string;
+export interface SpaceEvent extends BaseEvent {
+  spaceId: string;
+  spaceName?: string;
 }
 
 export interface MixpanelTrackBase {

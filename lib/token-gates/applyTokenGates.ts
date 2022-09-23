@@ -1,5 +1,6 @@
 import type { Role } from '@prisma/client';
 import { prisma } from 'db';
+import { trackUserAction } from 'lib/metrics/mixpanel/server';
 import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
 import { DataNotFoundError, InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
 import { verifyJwt } from 'lit-js-sdk';
@@ -31,6 +32,7 @@ export async function applyTokenGates ({ spaceId, userId, tokens, commit }: Toke
   });
 
   if (!space) {
+    trackUserAction('TokenGateVerification', { result: 'fail', spaceId, userId });
     throw new DataNotFoundError(`Could not find space with id ${spaceId}.`);
   }
 
@@ -38,6 +40,7 @@ export async function applyTokenGates ({ spaceId, userId, tokens, commit }: Toke
 
   // We need to have at least one token gate that succeeded in order to proceed
   if (tokenGates.length === 0) {
+    trackUserAction('TokenGateVerification', { result: 'fail', spaceId, spaceName: space.name, userId });
     throw new DataNotFoundError('No token gates were found for this space.');
   }
 
@@ -63,6 +66,7 @@ export async function applyTokenGates ({ spaceId, userId, tokens, commit }: Toke
   }))).filter(tk => tk !== null) as TokenGateWithRoles[];
 
   if (verifiedTokenGates.length === 0) {
+    trackUserAction('TokenGateVerification', { result: 'fail', spaceId, spaceName: space.name, userId });
     throw new InsecureOperationError('At least one token gate verification must succeed to grant a space membership.');
   }
 
@@ -91,6 +95,8 @@ export async function applyTokenGates ({ spaceId, userId, tokens, commit }: Toke
     space,
     roles: assignedRoles
   };
+
+  trackUserAction('TokenGateVerification', { result: 'pass', spaceId, spaceName: space.name, userId, roles: assignedRoles.map(r => r.name) });
 
   if (!commit) {
     return returnValue;

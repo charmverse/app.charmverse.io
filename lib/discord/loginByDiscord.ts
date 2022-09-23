@@ -24,7 +24,7 @@ export default async function loginByDiscord ({ code, hostName }: { code: string
   });
 
   if (discordUser) {
-
+    trackUserAction('UserLogin', { userId: discordUser.user.id, identityType: 'Discord' });
     return discordUser.user;
   }
   else {

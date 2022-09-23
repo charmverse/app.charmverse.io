@@ -12,15 +12,18 @@ import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import { convertJsonPagesToPrisma } from 'lib/pages/server/convertJsonPagesToPrisma';
 import path from 'node:path';
 import { generateDefaultCategoriesInput } from 'lib/proposal/generateDefaultCategoriesInput';
+import { trackUserAction } from 'lib/metrics/mixpanel/server';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).get(getSpaces).post(createSpace);
 
 async function getSpaces (req: NextApiRequest, res: NextApiResponse<Space[]>) {
+  const userId = req.session.user.id;
+
   const spaceRoles = await prisma.spaceRole.findMany({
     where: {
-      userId: req.session.user.id
+      userId
     },
     include: {
       space: true
@@ -31,6 +34,7 @@ async function getSpaces (req: NextApiRequest, res: NextApiResponse<Space[]>) {
 }
 
 async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
+  const userId = req.session.user.id;
   const data = req.body as Prisma.SpaceCreateInput;
   // add a first page to the space
   // data.pages = {
@@ -74,6 +78,7 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
   await setupDefaultPaymentMethods({ spaceIdOrSpace: space });
 
   logSpaceCreation(space);
+  trackUserAction('SpaceCreated', { userId, spaceId: space.id, spaceName: space.name });
 
   return res.status(200).json(updatedSpace);
 }
