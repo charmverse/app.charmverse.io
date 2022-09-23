@@ -74,7 +74,8 @@ export async function getNotifications (): Promise<PendingTasksProps[]> {
             ...voteTasks.map(voteTask => voteTask.id),
             ...workspaceEvents.map(workspaceEvent => workspaceEvent.id)
           ]
-        }
+        },
+        userId: user.id
       },
       select: {
         taskId: true
