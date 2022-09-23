@@ -16,7 +16,7 @@ let vote: Vote;
 let userCookie: string;
 
 beforeAll(async () => {
-  const { space: generatedSpace, user: generatedUser } = await generateUserAndSpaceWithApiToken(undefined, true);
+  const { space: generatedSpace, user: generatedUser } = await generateUserAndSpaceWithApiToken(undefined, false);
   user = generatedUser;
   space = generatedSpace;
 
@@ -44,18 +44,54 @@ describe('GET /api/votes?id={id} - Get an individual vote', () => {
   });
 });
 
-describe('POST /api/votes - Create a new vote', () => {
-  it('Should create the vote respond 200', async () => {
-    await request(baseUrl).post('/api/votes').set('Cookie', userCookie).send({
+describe('POST /api/votes - Create a new poll', () => {
+  it('Should create the poll if the user has the create poll permission for the page and respond 201', async () => {
+
+    const nonAdminUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
+    const nonAdminUserCookie = await loginUser(nonAdminUser);
+
+    const pageForVote = await createPage({
+      createdBy: nonAdminUser.id,
+      spaceId: space.id,
+      pagePermissions: [{
+        permissionLevel: 'custom',
+        permissions: ['create_poll'],
+        userId: nonAdminUser.id
+      }]
+    });
+
+    await request(baseUrl).post('/api/votes').set('Cookie', nonAdminUserCookie).send({
       deadline: new Date(),
-      pageId: page.id,
+      pageId: pageForVote.id,
       title: 'new vote',
       type: 'Approval',
       threshold: 50,
       voteOptions: ['1', '2', '3'],
-      createdBy: user.id
+      createdBy: nonAdminUser.id
     })
-      .expect(200);
+      .expect(201);
+  });
+
+  it('Should create the poll if the user is an admin for the page and respond 201', async () => {
+
+    const nonAdminUser = await generateSpaceUser({ spaceId: space.id, isAdmin: true });
+    const nonAdminUserCookie = await loginUser(nonAdminUser);
+
+    const pageForVote = await createPage({
+      createdBy: nonAdminUser.id,
+      spaceId: space.id
+    });
+
+    await request(baseUrl).post('/api/votes').set('Cookie', nonAdminUserCookie).send({
+      deadline: new Date(),
+      pageId: pageForVote.id,
+      title: 'new vote',
+      type: 'Approval',
+      threshold: 50,
+      voteOptions: ['1', '2', '3'],
+      createdBy: nonAdminUser.id
+    })
+      .expect(201);
   });
 
   it('Should fail if the vote body doesn\'t have correct fields and respond 400', async () => {

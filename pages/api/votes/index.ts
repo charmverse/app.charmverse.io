@@ -80,7 +80,7 @@ async function createVote (req: NextApiRequest, res: NextApiResponse<ExtendedVot
     createdBy: userId
   } as VoteDTO);
 
-  return res.status(200).json(vote);
+  return res.status(201).json(vote);
 }
 
 export default withSessionRoute(handler);
