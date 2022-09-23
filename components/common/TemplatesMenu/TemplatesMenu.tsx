@@ -48,6 +48,17 @@ export function TemplatesMenu ({
       <MenuItem dense sx={{ pointerEvents: 'none' }}>Templates {boardTitle ? (<>for <b style={{ marginLeft: 4 }}>{boardTitle}</b></>) : ''} </MenuItem>
 
       {
+        pages.length === 0 && (
+          <MenuItem
+            dense
+            sx={{ display: 'flex', justifyContent: 'space-between' }}
+          >
+            <ListItemText>No templates found</ListItemText>
+          </MenuItem>
+        )
+      }
+
+      {
         pages.map((page) => {
 
           return (
