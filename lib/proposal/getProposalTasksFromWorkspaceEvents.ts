@@ -10,6 +10,7 @@ export interface ProposalTask {
   pageTitle: string;
   pagePath: string;
   status: ProposalStatus;
+  pageId: string
 }
 
 type PopulatedPage = Pick<Page, 'id' | 'path' | 'title'> & {
@@ -97,6 +98,8 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
   // This set keeps track of the proposals encountered
   // Since the events were already sorted in descending order, only the latest one will be processed
   const visitedProposals: Set<string> = new Set();
+  // These workspace events should be marked, as a relatively newer event was marked
+  const unmarkedWorkspaceEvents: string[] = [];
 
   for (const workspaceEvent of workspaceEvents) {
     const page = proposalsRecord[workspaceEvent.pageId];
@@ -120,7 +123,8 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
         pageTitle: page.title,
         spaceDomain: page.space.domain,
         spaceName: page.space.name,
-        status: page.proposal.status
+        status: page.proposal.status,
+        pageId: page.id
       };
 
       if (newStatus === 'discussion') {
@@ -172,7 +176,13 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
 
       visitedProposals.add(page.id);
     }
+    else {
+      unmarkedWorkspaceEvents.push(workspaceEvent.id);
+    }
   }
 
-  return proposalTasks;
+  return {
+    proposalTasks,
+    unmarkedWorkspaceEvents
+  };
 }
