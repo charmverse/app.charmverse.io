@@ -19,6 +19,7 @@ import type { ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
 import useSWR from 'swr';
+import useIsAdmin from 'hooks/useIsAdmin';
 
 interface ProposalPropertiesProps {
   readOnly?: boolean
@@ -34,6 +35,7 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
   const [contributors] = useContributors();
   const { roles = [], roleups } = useRoles();
   const { user } = useUser();
+  const isAdmin = useIsAdmin();
 
   const proposalMenuState = usePopupState({ popupId: 'proposal-info', variant: 'popover' });
 
@@ -54,7 +56,7 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
     return roleups.some(role => role.id === reviewer.roleId && role.users.some(_user => _user.id === user.id));
   })));
 
-  const canUpdateProposalProperties = (proposalStatus === 'draft' || proposalStatus === 'private_draft' || proposalStatus === 'discussion') && isProposalAuthor;
+  const canUpdateProposalProperties = (proposalStatus === 'draft' || proposalStatus === 'private_draft' || proposalStatus === 'discussion') && (isProposalAuthor || isAdmin);
 
   const reviewerOptionsRecord: Record<string, ({group: 'role'} & ListSpaceRolesResponse) | ({group: 'user'} & Contributor)> = {};
 
@@ -110,7 +112,7 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
         !isTemplate && (
           <Grid container mb={2}>
             <ProposalStepper
-              proposalUserGroups={currentUserGroups}
+              proposalUserGroups={isAdmin ? ['author', 'reviewer'] : currentUserGroups}
               proposal={proposal}
               refreshProposal={refreshProposal}
             />

@@ -156,7 +156,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     expect(updated.proposal?.reviewers.some(r => r.userId === adminUser.id)).toBe(true);
   });
 
-  it('should update a proposal if the user is an author', async () => {
+  it('should update a proposal if the user is an admin', async () => {
 
     const { user: adminUser, space: adminSpace } = await generateUserAndSpaceWithApiToken(undefined, true);
     const adminCookie = await loginUser(adminUser);
@@ -180,7 +180,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       .put(`/api/proposals/${page.proposalId}`)
       .set('Cookie', adminCookie)
       .send(updateContent)
-      .expect(401);
+      .expect(200);
 
   });
 

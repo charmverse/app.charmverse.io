@@ -48,9 +48,9 @@ export default function ProposalStepper (
   return (
     <Grid container>
       {proposalStatuses.map((status, statusIndex) => {
-        const canChangeStatus = currentStatus ? (currentStatus === 'discussion' && status === 'review' ? reviewers.length !== 0 : true) && proposalUserGroups.some(
+        const canChangeStatus = currentStatus ? (currentStatus === 'discussion' && status === 'review' ? reviewers.length !== 0 : true) && (proposalUserGroups.some(
           proposalUserGroup => proposalStatusTransitionPermission[currentStatus]?.[proposalUserGroup]?.includes(status)
-        ) : false;
+        )) : false;
 
         return (
           <Fragment key={status}>
