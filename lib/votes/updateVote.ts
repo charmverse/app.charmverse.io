@@ -1,7 +1,7 @@
-import { prisma } from 'db';
 import type { Vote } from '@prisma/client';
-import { DataNotFoundError, UndesirableOperationError, UnauthorisedActionError } from 'lib/utilities/errors';
-import { computeSpacePermissions } from 'lib/permissions/spaces';
+import { prisma } from 'db';
+import { DataNotFoundError, UnauthorisedActionError, UndesirableOperationError } from 'lib/utilities/errors';
+import { hasAccessToSpace } from '../middleware';
 import type { VoteStatusType } from './interfaces';
 import { VOTE_STATUS } from './interfaces';
 
@@ -28,15 +28,6 @@ export async function updateVote (id: string, userId: string, status: VoteStatus
 
   if (existingVote.context === 'proposal') {
     throw new UndesirableOperationError("Proposal votes can't be cancelled");
-  }
-
-  const userPermissions = await computeSpacePermissions({
-    allowAdminBypass: true,
-    resourceId: existingVote.spaceId,
-    userId
-  });
-  if (!userPermissions.createVote) {
-    throw new UnauthorisedActionError('You do not have permissions to update the vote.');
   }
 
   const updatedVote = await prisma.vote.update({

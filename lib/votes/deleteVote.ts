@@ -1,8 +1,8 @@
 import type { Vote } from '@prisma/client';
-import log from 'lib/log';
-import { UnauthorisedActionError, UndesirableOperationError } from 'lib/utilities/errors';
-import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { prisma } from 'db';
+import log from 'lib/log';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
+import { UnauthorisedActionError, UndesirableOperationError } from 'lib/utilities/errors';
 import { getVote } from './getVote';
 
 export async function deleteVote (id: string, userId: string): Promise<Vote | null> {
@@ -17,14 +17,14 @@ export async function deleteVote (id: string, userId: string): Promise<Vote | nu
     throw new UndesirableOperationError("Proposal votes can't be deleted");
   }
 
-  const userPermissions = await computeSpacePermissions({
-    allowAdminBypass: true,
-    resourceId: vote.spaceId,
-    userId
+  const { error, isAdmin } = await hasAccessToSpace({
+    spaceId: vote.spaceId,
+    userId,
+    adminOnly: false
   });
 
-  if (!userPermissions.createVote) {
-    throw new UnauthorisedActionError('You do not have permissions to delete the vote.');
+  if (error || (vote.createdBy !== userId && !isAdmin)) {
+    throw new UnauthorisedActionError('You do not have permissions to update the vote.');
   }
 
   return prisma.vote.delete({
