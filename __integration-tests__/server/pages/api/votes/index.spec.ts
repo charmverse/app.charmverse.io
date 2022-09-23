@@ -47,27 +47,24 @@ describe('GET /api/votes?id={id} - Get an individual vote', () => {
 describe('POST /api/votes - Create a new poll', () => {
   it('Should create the poll if the user has the create poll permission for the page and respond 201', async () => {
 
-    const nonAdminUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
-    const nonAdminUserCookie = await loginUser(nonAdminUser);
-
     const pageForVote = await createPage({
-      createdBy: nonAdminUser.id,
+      createdBy: user.id,
       spaceId: space.id,
       pagePermissions: [{
         permissionLevel: 'custom',
         permissions: ['create_poll'],
-        userId: nonAdminUser.id
+        userId: user.id
       }]
     });
 
-    await request(baseUrl).post('/api/votes').set('Cookie', nonAdminUserCookie).send({
+    await request(baseUrl).post('/api/votes').set('Cookie', userCookie).send({
       deadline: new Date(),
       pageId: pageForVote.id,
       title: 'new vote',
       type: 'Approval',
       threshold: 50,
       voteOptions: ['1', '2', '3'],
-      createdBy: nonAdminUser.id
+      createdBy: user.id
     })
       .expect(201);
   });
