@@ -1,6 +1,7 @@
 
 
 import log from 'lib/log';
+import { number } from 'yup';
 import { getNotifications } from '../background/tasks/sendNotifications/sendNotifications';
 
 export async function readUserNotifications (): Promise<number> {
@@ -8,13 +9,19 @@ export async function readUserNotifications (): Promise<number> {
   const notificationsToSend = await getNotifications();
 
   for (const notification of notificationsToSend) {
-    log.info('Debug: notification to user', { userId: notification.user.id, tasks: notification.totalTasks });
+    log.info('Debug: notification to user', {
+      userId: notification.user.id,
+      gnosis: notification.gnosisSafeTasks.length,
+      mentions: notification.mentionedTasks.length,
+      votes: notification.voteTasks.length,
+      proposals: notification.proposalTasks.length
+    });
   }
 
   return notificationsToSend.length;
 }
 
-log.info('Reading notifications **This will not send emails**')
+log.info('Retrieving notifications to debug **This will not send emails**')
 
 readUserNotifications()
   .then((count) => {
