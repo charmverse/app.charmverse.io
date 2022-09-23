@@ -31,7 +31,7 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
       userId: user1.id
     });
 
-    const updatedProposal = await updateProposalStatus({
+    const { proposal: updatedProposal, workspaceEvent: authoredDraftProposalWorkspaceEvent } = await updateProposalStatus({
       proposal: authoredDraftProposal.proposal!,
       newStatus: 'discussion',
       userId: user1.id
@@ -134,7 +134,7 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
       userId: user2.id
     });
 
-    const proposalTasks = await getProposalTasksFromWorkspaceEvents(user1.id, await prisma.workspaceEvent.findMany({
+    const { proposalTasks, unmarkedWorkspaceEvents } = await getProposalTasksFromWorkspaceEvents(user1.id, await prisma.workspaceEvent.findMany({
       where: {
         createdAt: {
           lte: new Date(),
@@ -169,6 +169,9 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
         action: 'review',
         pagePath: reviewProposal.path
       })
+    ]));
+    expect(unmarkedWorkspaceEvents).toEqual(expect.arrayContaining([
+      authoredDraftProposalWorkspaceEvent.id
     ]));
   });
 });

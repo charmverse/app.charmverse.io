@@ -64,7 +64,7 @@ const createVoteTasks = ({ voteTitle, deadline, pageTitle, spaceName }: {voteTit
   } as any;
 };
 
-const createProposalTasks = ({ action, pageTitle, spaceName, status }: Omit<ProposalTask, 'id' | 'spaceDomain' | 'pagePath'>): ProposalTask => {
+const createProposalTasks = ({ action, pageTitle, spaceName, status }: Omit<ProposalTask, 'id' | 'spaceDomain' | 'pagePath' | 'pageId'>): ProposalTask => {
   return {
     id: v4(),
     action,
@@ -72,7 +72,8 @@ const createProposalTasks = ({ action, pageTitle, spaceName, status }: Omit<Prop
     pageTitle,
     status,
     spaceDomain: randomName(),
-    spaceName
+    spaceName,
+    pageId: v4()
   };
 };
 

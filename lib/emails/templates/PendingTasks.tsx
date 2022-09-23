@@ -1,20 +1,18 @@
-import {
-  MjmlSection,
-  MjmlColumn,
-  MjmlText,
-  MjmlDivider
-} from 'mjml-react';
+import type { User } from '@prisma/client';
+import { ProposalStatusColors } from 'components/proposals/components/ProposalStatusBadge';
 import type { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
-import { shortenHex } from 'lib/utilities/strings';
-import { lightModeColors, darkModeColors, greyColor2 } from 'theme/colors';
 import log from 'lib/log';
 import type { MentionedTask } from 'lib/mentions/interfaces';
+import type { ProposalTask } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';
+import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
+import { shortenHex } from 'lib/utilities/strings';
 import type { VoteTask } from 'lib/votes/interfaces';
 import { DateTime } from 'luxon';
-import type { User } from '@prisma/client';
-import type { ProposalTask } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';
-import { ProposalStatusColors } from 'components/proposals/components/ProposalStatusBadge';
-import { Feedback, Footer, Header, EmailWrapper } from './components';
+import {
+  MjmlColumn, MjmlDivider, MjmlSection, MjmlText
+} from 'mjml-react';
+import { darkModeColors, greyColor2, lightModeColors } from 'theme/colors';
+import { EmailWrapper, Feedback, Footer, Header } from './components';
 
 const charmverseUrl = process.env.DOMAIN;
 
@@ -229,12 +227,20 @@ function ProposalTaskMjml ({ task }: { task: ProposalTask }) {
   const pageWorkspaceTitle = `${task.pageTitle || 'Untitled'} | ${task.spaceName}`;
   return (
     <MjmlText>
-      <div style={{ fontWeight: 'bold', color: '#000', marginBottom: 5 }}>
-        {pageWorkspaceTitle}
-      </div>
-      <div style={{ fontSize: '0.75rem', width: 'fit-content', display: 'flex', alignItems: 'center', height: '24px', borderRadius: '16px', backgroundColor: lightModeColors[ProposalStatusColors[task.status]] }}>
-        <span style={{ textTransform: 'capitalize', paddingLeft: '8px', paddingRight: '8px' }}>
-          {task.status}
+      <a
+        href={`${charmverseUrl}/${task.spaceDomain}/${task.pagePath}`}
+        style={{
+          display: 'block'
+        }}
+      >
+        <div style={{ ...h2Style, fontSize: '18px', fontWeight: 'bold', marginBottom: 10, color: '#000' }}>
+          {pageWorkspaceTitle}
+        </div>
+      </a>
+
+      <div style={{ fontSize: '0.75rem', width: 'fit-content', display: 'flex', alignItems: 'center', height: '24px', borderRadius: '16px', backgroundColor: lightModeColors[ProposalStatusColors[task.status]], fontWeight: 500 }}>
+        <span style={{ paddingLeft: '8px', paddingRight: '8px' }}>
+          {PROPOSAL_STATUS_LABELS[task.status]}
         </span>
       </div>
     </MjmlText>

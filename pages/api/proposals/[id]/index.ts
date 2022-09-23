@@ -9,6 +9,7 @@ import { UnauthorisedActionError } from 'lib/utilities/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { getProposal } from 'lib/proposal/getProposal';
+import { AdministratorOnlyError } from 'lib/users/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -74,23 +75,25 @@ async function updateProposalController (req: NextApiRequest, res: NextApiRespon
     throw new NotFoundError();
   }
 
-  // Only admins can update proposal templates
-  if (proposal.page?.type === 'proposal_template') {
-    const { error } = await hasAccessToSpace({
-      spaceId: proposal.spaceId,
-      userId,
-      adminOnly: true
-    });
+  const { error, isAdmin } = await hasAccessToSpace({
+    spaceId: proposal.spaceId,
+    userId,
+    adminOnly: false
+  });
 
-    if (error) {
-      throw error;
-    }
+  if (error) {
+    throw error;
+  }
+
+  // Only admins can update proposal templates
+  if (proposal.page?.type === 'proposal_template' && !isAdmin) {
+    throw new AdministratorOnlyError();
   }
 
   const isCurrentUserProposalAuthor = proposal.authors.some(author => author.userId === userId);
 
   // A proposal can only be updated when its in private_draft, draft or discussion status and only the proposal author can update it
-  if (!isCurrentUserProposalAuthor || (proposal.status !== 'discussion' && proposal.status !== 'private_draft' && proposal.status !== 'draft')) {
+  if ((!isCurrentUserProposalAuthor && !isAdmin) || (proposal.status !== 'discussion' && proposal.status !== 'private_draft' && proposal.status !== 'draft')) {
     throw new UnauthorisedActionError();
   }
 
