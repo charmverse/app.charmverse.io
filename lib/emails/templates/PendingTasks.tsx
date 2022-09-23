@@ -233,7 +233,7 @@ function ProposalTaskMjml ({ task }: { task: ProposalTask }) {
           display: 'block'
         }}
       >
-        <div style={{ ...h2Style, fontSize: '18px', fontWeight: 'bold', marginBottom: 10 }}>
+        <div style={{ ...h2Style, fontSize: '18px', fontWeight: 'bold', marginBottom: 10, color: '#000' }}>
           {pageWorkspaceTitle}
         </div>
       </a>
