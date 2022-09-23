@@ -357,7 +357,7 @@ model UserNotificationState {
 }
 
 model UserNotification {
-  taskId    String               @unique
+  taskId    String
   createdAt DateTime             @default(now())
   userId    String               @db.Uuid
   type      NotificationType
@@ -678,6 +678,8 @@ model Proposal {
   reviewedBy String?            @db.Uuid
   reviewer   User?              @relation(fields: [reviewedBy], references: [id], onDelete: Cascade)
   reviewedAt DateTime?
+  categoryId String?            @db.Uuid
+  category   ProposalCategory?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
 }
 
 model ProposalAuthor {
@@ -722,4 +724,12 @@ model WorkspaceEvent {
   pageId    String             @db.Uuid
   page      Page               @relation(fields: [pageId], references: [id], onDelete: Cascade)
   createdAt DateTime           @default(now())
+}
+
+model ProposalCategory {
+  id       String     @id @default(uuid()) @db.Uuid
+  spaceId  String     @db.Uuid
+  title    String
+  color    String
+  Proposal Proposal[]
 }

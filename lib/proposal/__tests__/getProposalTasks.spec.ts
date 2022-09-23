@@ -29,19 +29,13 @@ describe('getProposalTasks', () => {
 
     const proposalTasks = await getProposalTasks(user.id);
 
-    expect(proposalTasks).toEqual(expect.arrayContaining([
+    expect(proposalTasks.marked).toEqual(expect.arrayContaining([
       expect.objectContaining({
-        id: privateDraftProposal1.id,
         status: privateDraftProposal1.proposal?.status,
         action: 'start_discussion'
       })
     ]));
 
-    expect(proposalTasks).not.toEqual(expect.arrayContaining([
-      expect.objectContaining({
-        id: archivedProposal.id
-      })
-    ]));
   });
 
   it('Should get draft and private draft proposals where the user is one of the authors', async () => {
@@ -75,14 +69,12 @@ describe('getProposalTasks', () => {
 
     const proposalTasks = await getProposalTasks(user.id);
 
-    expect(proposalTasks).toEqual(expect.arrayContaining([
+    expect(proposalTasks.marked).toEqual(expect.arrayContaining([
       expect.objectContaining({
-        id: draftProposal1.id,
         status: draftProposal1.proposal?.status,
         action: 'start_discussion'
       }),
       expect.objectContaining({
-        id: privateDraftProposal1.id,
         status: privateDraftProposal1.proposal?.status,
         action: 'start_discussion'
       })
@@ -111,9 +103,8 @@ describe('getProposalTasks', () => {
 
     const proposalTasks = await getProposalTasks(user.id);
 
-    expect(proposalTasks).toEqual(expect.arrayContaining([
+    expect(proposalTasks.marked).toEqual(expect.arrayContaining([
       expect.objectContaining({
-        id: reviewedProposal1.id,
         status: reviewedProposal1.proposal?.status,
         action: 'start_vote'
       })
@@ -156,14 +147,12 @@ describe('getProposalTasks', () => {
 
     const proposalTasks = await getProposalTasks(user.id);
 
-    expect(proposalTasks).toEqual(expect.arrayContaining([
+    expect(proposalTasks.marked).toEqual(expect.arrayContaining([
       expect.objectContaining({
-        id: proposalToReviewViaRole.id,
         status: proposalToReviewViaRole.proposal?.status,
         action: 'review'
       }),
       expect.objectContaining({
-        id: proposalToReviewViaUser.id,
         status: proposalToReviewViaUser.proposal?.status,
         action: 'review'
       })
@@ -203,7 +192,8 @@ describe('getProposalTasks', () => {
     await createVote({
       createdBy: user.id,
       pageId: activeVoteProposal.id,
-      spaceId: space.id
+      spaceId: space.id,
+      context: 'proposal'
     });
 
     const activeVoteWithUserVoteProposal = await generateProposal({
@@ -220,7 +210,8 @@ describe('getProposalTasks', () => {
       createdBy: user.id,
       pageId: activeVoteWithUserVoteProposal.id,
       spaceId: space.id,
-      userVotes: ['1']
+      userVotes: ['1'],
+      context: 'proposal'
     });
 
     // The user isn't an author, but it should be returned as its in discussion
@@ -243,21 +234,18 @@ describe('getProposalTasks', () => {
 
     const proposalTasks = await getProposalTasks(user.id);
 
-    expect(proposalTasks).toEqual(expect.arrayContaining([
+    expect(proposalTasks.marked).toEqual(expect.arrayContaining([
       expect.objectContaining({
-        id: discussionProposal1.id,
         status: discussionProposal1.proposal?.status,
         action: 'start_review'
       }),
       expect.objectContaining({
-        id: activeVoteProposal.id,
         status: activeVoteProposal.proposal?.status,
         action: 'vote'
       }),
       expect.objectContaining({
-        id: discussionProposal2.id,
         status: discussionProposal2.proposal?.status,
-        action: 'start_review'
+        action: 'discuss'
       })
     ]));
   });

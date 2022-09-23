@@ -1,6 +1,6 @@
 
 import log from 'lib/log';
-import { gauge } from 'lib/metrics';
+import { count } from 'lib/metrics';
 import updateVoteStatus from './updateVoteStatus';
 
 export default async function task () {
@@ -12,7 +12,7 @@ export default async function task () {
 
     log.info(`Updated ${updateCount} votes`);
 
-    gauge('cron.vote-status.updated', updateCount);
+    count('cron.vote-status.updated', updateCount);
   }
   catch (error: any) {
     log.error(`Error running vote status update: ${error.stack || error.message || error}`, { error });

@@ -1,4 +1,4 @@
-import type { ProposalStatus } from '@prisma/client';
+import type { ProposalStatus, WorkspaceEvent } from '@prisma/client';
 import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
 import { MissingDataError } from 'lib/utilities/errors';
@@ -14,7 +14,10 @@ export async function updateProposalStatus ({
   userId: string
   newStatus: ProposalStatus,
   proposal: ProposalWithUsers | string
-}): Promise<ProposalWithUsers> {
+}): Promise<{
+  proposal: ProposalWithUsers,
+  workspaceEvent: WorkspaceEvent
+}> {
 
   if (typeof proposal === 'string') {
     proposal = await prisma.proposal.findUnique({
@@ -76,8 +79,8 @@ export async function updateProposalStatus ({
     throw new InvalidStateError();
   }
 
-  await prisma.$transaction(async () => {
-    await prisma.workspaceEvent.create({
+  return prisma.$transaction(async () => {
+    const createdWorkspaceEvent = await prisma.workspaceEvent.create({
       data: {
         type: 'proposal_status_change',
         actorId: userId,
@@ -89,12 +92,17 @@ export async function updateProposalStatus ({
         }
       }
     });
-    await prisma.proposal.update({
+    const updatedProposal = await prisma.proposal.update({
       where: {
         id: proposalId
       },
       data: {
         status: newStatus
+      },
+      include: {
+        authors: true,
+        reviewers: true,
+        category: true
       }
     });
 
@@ -105,15 +113,10 @@ export async function updateProposalStatus ({
     for (const arg of createArgs) {
       await prisma.pagePermission.create(arg);
     }
+    return {
+      workspaceEvent: createdWorkspaceEvent,
+      proposal: updatedProposal
+    };
   });
 
-  return prisma.proposal.findUnique({
-    where: {
-      id: proposalId
-    },
-    include: {
-      authors: true,
-      reviewers: true
-    }
-  }) as Promise<ProposalWithUsers>;
 }

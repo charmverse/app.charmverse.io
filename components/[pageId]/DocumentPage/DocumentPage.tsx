@@ -208,8 +208,14 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
                       <AddBountyButton readonly={cannotEdit} cardId={page.id} />
                     </>
                   )}
-
-                  {proposalId && <ProposalProperties pageId={proposalId} proposalId={proposalId as string} readOnly={readonlyProposalProperties} />}
+                  {proposalId && (
+                    <ProposalProperties
+                      pageId={proposalId}
+                      proposalId={proposalId}
+                      readOnly={readonlyProposalProperties}
+                      isTemplate={page.type === 'proposal_template'}
+                    />
+                  )}
                   {(draftBounty || page.bountyId) && (
                     <BountyProperties
                       bountyId={page.bountyId}
