@@ -167,6 +167,7 @@ import 'theme/styles.scss';
 
 import charmClient from 'charmClient';
 import GlobalComponents from 'components/_app/GlobalComponents';
+import { isDev } from 'config/constants';
 
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
 
@@ -312,7 +313,7 @@ function DataProviders ({ children }: { children: ReactNode }) {
 
 function PageMetaTags () {
   const [title] = usePageTitle();
-  const prefix = process.env.NODE_ENV === 'development' ? 'DEV | ' : '';
+  const prefix = isDev ? 'DEV | ' : '';
 
   return (
     <Head>
