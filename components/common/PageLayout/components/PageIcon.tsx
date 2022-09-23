@@ -2,11 +2,11 @@ import type { ReactNode } from 'react';
 import type { Page } from '@prisma/client';
 import styled from '@emotion/styled';
 import DatabaseIcon from '@mui/icons-material/TableChart';
-import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
-import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
+import FilledPageIcon from '@mui/icons-material/DescriptionOutlined';
+import EmptyPageIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import EmojiIcon from 'components/common/Emoji';
 import { greyColor2 } from 'theme/colors';
-import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
+import ProposalIcon from '@mui/icons-material/TaskOutlined';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 
 export const StyledDatabaseIcon = styled(DatabaseIcon)`
@@ -39,15 +39,15 @@ export default function PageIcon ({ icon, isEditorEmpty, pageType }: { icon?: Re
     return <StyledPageIcon icon={<StyledDatabaseIcon />} />;
   }
   else if (pageType === 'proposal') {
-    return <StyledPageIcon icon={<TaskOutlinedIcon />} />;
+    return <StyledPageIcon icon={<ProposalIcon />} />;
   }
   else if (pageType === 'bounty') {
     return <StyledPageIcon icon={<BountyIcon />} />;
   }
   else if (isEditorEmpty) {
-    return <StyledPageIcon icon={<InsertDriveFileOutlinedIcon />} />;
+    return <StyledPageIcon icon={<EmptyPageIcon />} />;
   }
   else {
-    return <StyledPageIcon icon={<DescriptionOutlinedIcon />} />;
+    return <StyledPageIcon icon={<FilledPageIcon />} />;
   }
 }
