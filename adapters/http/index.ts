@@ -1,6 +1,6 @@
 import fetch from './fetch';
 
-type Params = { [key: string]: any };
+type Params = { [key: string]: string | string[] };
 
 export function GET<T = Response> (
   requestURL: string,
@@ -9,10 +9,16 @@ export function GET<T = Response> (
 ): Promise<T> {
   const queryStr = Object.keys(data)
     .filter(key => !!data[key])
-    .map(key => `${key}=${encodeURIComponent(data[key])}`)
+    .map(key => {
+      const value = data[key];
+      return typeof value === 'string'
+        ? `${key}=${encodeURIComponent(value)}`
+        : `${value.map(v => `${key}[]=${v}`).join('&')}`;
+    })
     .join('&');
+  const url = `${requestURL}${queryStr ? `?${queryStr}` : ''}`;
   return fetch<T>(
-    requestURL + (queryStr ? `?${queryStr}` : ''),
+    url,
     {
       method: 'GET',
       headers: new Headers({
