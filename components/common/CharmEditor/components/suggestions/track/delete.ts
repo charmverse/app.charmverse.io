@@ -46,7 +46,7 @@ export function deleteNode (tr: Transaction, node: Node, nodePos: number, map: M
       Slice.empty
     );
   }
-  else if (node.type === tr.doc.type.schema.nodes.list_item) {
+  else if (node.type === tr.doc.type.schema.nodes.listItem) {
     const state = EditorState.create({
       doc: tr.doc,
       selection: Selection.findFrom(tr.doc.resolve(newNodePos), 1)

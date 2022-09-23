@@ -1,14 +1,9 @@
 import {
   bold,
-  bulletList,
   code,
   hardBreak,
-  heading,
-  horizontalRule,
   italic,
   link,
-  listItem,
-  orderedList,
   strike,
   underline
 } from '@bangle.dev/base-components';
@@ -28,7 +23,7 @@ import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import CommentsSidebar from 'components/[pageId]/DocumentPage/components/CommentsSidebar';
 import PageInlineVotesList from 'components/[pageId]/DocumentPage/components/VotesSidebar';
-import SuggestionsSidebar from 'components/[pageId]/DocumentPage/components/SuggestionsSidebar';
+import { SuggestionsSidebar } from 'components/[pageId]/DocumentPage/components/SuggestionsSidebar';
 import type { CryptoCurrency, FiatCurrency } from 'connectors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
@@ -43,6 +38,10 @@ import type { PageContent } from 'models';
 import type { CSSProperties, ReactNode } from 'react';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useSWRConfig } from 'swr';
+import * as listItem from './components/listItem/listItem';
+import * as orderedList from './components/orderedList';
+import * as bulletList from './components/bulletList';
+import * as horizontalRule from './components/horizontalRule';
 import Callout, * as callout from './components/callout';
 import { userDataPlugin } from './components/charm/charm.plugins';
 import * as columnLayout from './components/columnLayout';
@@ -60,6 +59,7 @@ import * as inlineVote from './components/inlineVote';
 import InlineVoteList from './components/inlineVote/components/InlineVoteList';
 import Mention, { mentionPluginKeyName, mentionPlugins, MentionSuggest } from './components/mention';
 import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList } from './components/nestedPage';
+import * as heading from './components/heading';
 import paragraph from './components/paragraph';
 import Placeholder from './components/Placeholder';
 import Quote from './components/quote';

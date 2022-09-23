@@ -55,13 +55,14 @@ export function items ({ addNestedPage, nestedPagePluginKey, userSpacePermission
     {
       uid: 'horizontal_rule',
       title: 'Horizontal Rule',
+      keywords: ['divider', 'hr'],
       icon: <HorizontalRuleIcon sx={{ fontSize: 16 }} />,
       description: 'Display horizontal rule',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
           // Execute the animation
           rafCommandExec(view!, (_state, _dispatch) => {
-            const node = _state.schema.nodes.horizontalRule.create();
+            const node = _state.schema.nodes.horizontalRule.create({ track: [] });
             if (_dispatch && isAtBeginningOfLine(state)) {
               _dispatch(_state.tr.replaceSelectionWith(node));
               return true;

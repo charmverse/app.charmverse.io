@@ -1,14 +1,9 @@
 import {
   bold,
-  bulletList,
   code,
   hardBreak,
-  heading,
-  horizontalRule,
   italic,
   link,
-  listItem,
-  orderedList,
   strike,
   underline
 } from '@bangle.dev/base-components';
@@ -31,6 +26,11 @@ import { imageSpec } from './components/ResizableImage';
 import { pdfSpec } from './components/ResizablePDF';
 import * as emoji from './components/emojiSuggest';
 import * as tabIndent from './components/tabIndent';
+import * as horizontalRule from './components/horizontalRule';
+import * as bulletList from './components/bulletList';
+import * as orderedList from './components/orderedList';
+import * as heading from './components/heading';
+import * as listItem from './components/listItem/listItem';
 import * as table from './components/table';
 import paragraph from './components/paragraph';
 import {

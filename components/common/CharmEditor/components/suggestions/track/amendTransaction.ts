@@ -1,7 +1,6 @@
 import { Selection, TextSelection } from 'prosemirror-state';
 import type { EditorState, Node, Transaction } from '@bangle.dev/pm';
 import { Slice, ReplaceStep, ReplaceAroundStep, AddMarkStep, RemoveMarkStep, Mapping, CellSelection } from '@bangle.dev/pm';
-import log from 'lib/log';
 import type { TrackAttribute } from './interfaces';
 
 const SUPPORTED_MARKS = ['italic', 'bold', 'code', 'underline'];
@@ -28,7 +27,7 @@ function markInsertion (
         tr.addMark(Math.max(from, pos), Math.min(pos + node.nodeSize, to), insertionMark);
         return false;
       }
-      else if (pos < from || ['bullet_list', 'ordered_list'].includes(node.type.name)) {
+      else if (pos < from || ['bulletList', 'orderedList'].includes(node.type.name)) {
         return true;
       }
       else if (['table_row', 'table_cell'].includes(node.type.name)) {
@@ -89,7 +88,7 @@ function markDeletion (tr: Transaction, from: number, to: number, user: { id: st
       }
       else if (
         !node.attrs.track?.find((t: TrackAttribute) => t.type === 'deletion')
-                && !['bullet_list', 'ordered_list'].includes(node.type.name)
+                && !['bulletList', 'orderedList'].includes(node.type.name)
       ) {
         if (node.attrs.track?.find(
           (t: TrackAttribute) => t.type === 'insertion' && t.user === user.id
@@ -119,12 +118,12 @@ function markDeletion (tr: Transaction, from: number, to: number, user: { id: st
           if (removeStep && !tr.maybeStep(removeStep).failed) {
             deletionMap.appendMap(removeStep.getMap());
           }
-          if (node.type.name === 'list_item' && listItem) {
+          if (node.type.name === 'listItem' && listItem) {
             listItem = false;
           }
         }
         else if (node.attrs.track) {
-          if (node.type.name === 'list_item') {
+          if (node.type.name === 'listItem') {
             listItem = true;
           }
           else if (listItem) {

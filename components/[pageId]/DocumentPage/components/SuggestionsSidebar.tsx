@@ -4,19 +4,14 @@ import { Box, Stack } from '@mui/material';
 import { Check, Close, RateReviewOutlined } from '@mui/icons-material';
 import { useEffect, useState } from 'react';
 import Button from 'components/common/Button';
-import { useContributors } from 'hooks/useContributors';
-import { accept } from 'components/common/CharmEditor/components/suggestions/track/accept';
 import { acceptAll } from 'components/common/CharmEditor/components/suggestions/track/acceptAll';
-import { reject } from 'components/common/CharmEditor/components/suggestions/track/reject';
 import { rejectAll } from 'components/common/CharmEditor/components/suggestions/track/rejectAll';
 import { getTracksFromDoc } from 'components/common/CharmEditor/components/suggestions/track/getTracks';
-import log from 'lib/log';
-import SuggestionCard from 'components/common/CharmEditor/components/suggestions/SuggestionCard';
+import { SuggestionCard } from 'components/common/CharmEditor/components/suggestions/SuggestionCard';
 import { NoCommentsMessage } from './CommentsSidebar';
 
-export default function SuggestionsSidebar ({ readOnly, state }: { readOnly: boolean, state: EditorState | null }) {
+export function SuggestionsSidebar ({ readOnly, state }: { readOnly: boolean, state: EditorState | null }) {
   const view = useEditorViewContext();
-  const [contributors] = useContributors();
 
   const [suggestions, setSuggestions] = useState<ReturnType<typeof getTracksFromDoc>>([]);
 
@@ -42,14 +37,6 @@ export default function SuggestionsSidebar ({ readOnly, state }: { readOnly: boo
 
   function clickRejectAll () {
     rejectAll(view);
-  }
-
-  function acceptOne (type: string, pos: number) {
-    accept(type, pos, view);
-  }
-
-  function rejectOne (type: string, pos: number) {
-    reject(type, pos, view);
   }
 
   return (

@@ -18,7 +18,7 @@ import { getTracksFromDoc } from './track/getTracks';
 import { hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
 import type { SuggestionPluginState } from './plugins';
 
-import SuggestionCard from './SuggestionCard';
+import { SuggestionCard } from './SuggestionCard';
 
 const ThreadContainer = styled(Paper)`
   max-height: 400px;

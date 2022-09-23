@@ -39,7 +39,7 @@ export function accept (type: string, pos: number, view: EditorView) {
           }
           tr.setNodeMarkup(map.map(nodePos), undefined, { ...node.attrs, track }, node.marks);
           // Special case: first paragraph in list item by same user -- will also be accepted.
-          if (node.type.name === 'list_item' && node.child(0) && node.child(0).type.name === 'paragraph') {
+          if (node.type.name === 'listItem' && node.child(0) && node.child(0).type.name === 'paragraph') {
             reachedEnd = false;
           }
         }

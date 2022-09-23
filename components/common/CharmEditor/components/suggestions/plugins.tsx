@@ -131,14 +131,6 @@ export function plugins ({ onSelectionSet, key, userId, username }:
             view.dispatch(tr);
             renderSuggestionsTooltip(key, { pos: suggestionPos })(view.state, view.dispatch, view);
             return true;
-            // return highlightElement({
-            //   ids,
-            //   view,
-            //   elementId: 'page-suggestion-list-box',
-            //   key,
-            //   markName: 'insertion',
-            //   prefix: 'suggestion'
-            // });
           }
           return false;
         }
