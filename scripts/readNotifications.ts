@@ -9,8 +9,8 @@ export async function readUserNotifications (): Promise<number> {
   const notificationsToSend = await getNotifications();
 
   for (const notification of notificationsToSend) {
-    log.info(`\nNotifications to user id: ${notification.user.id}`
-      + `\n--------------------------------------------------------------g`
+    log.info(`\nNotifications to user: ${notification.user.email}`
+      + `\n--------------------------------------------------------------`
       + `\ngnosis: ${notification.gnosisSafeTasks.length}`
       + `\nmentions: ${notification.mentionedTasks.length}`
       + `\nvotes: ${notification.voteTasks.length}`
