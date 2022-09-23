@@ -1,7 +1,6 @@
 import type { Vote } from '@prisma/client';
 import { prisma } from 'db';
-import { DataNotFoundError, UnauthorisedActionError, UndesirableOperationError } from 'lib/utilities/errors';
-import { hasAccessToSpace } from '../middleware';
+import { DataNotFoundError, UndesirableOperationError } from 'lib/utilities/errors';
 import type { VoteStatusType } from './interfaces';
 import { VOTE_STATUS } from './interfaces';
 

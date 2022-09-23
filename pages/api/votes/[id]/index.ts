@@ -11,6 +11,7 @@ import nc from 'next-connect';
 import type { UpdateVoteDTO } from 'lib/votes/interfaces';
 import { prisma } from 'db';
 import { DataNotFoundError, UnauthorisedActionError } from '../../../../lib/utilities/errors';
+import { computeUserPagePermissions } from '../../../../lib/permissions/pages';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -41,7 +42,8 @@ async function updateVote (req: NextApiRequest, res: NextApiResponse<Vote | { er
     select: {
       id: true,
       spaceId: true,
-      createdBy: true
+      createdBy: true,
+      pageId: true
     }
   });
 
@@ -49,16 +51,15 @@ async function updateVote (req: NextApiRequest, res: NextApiResponse<Vote | { er
     throw new DataNotFoundError(`Cannot update vote as vote with id ${voteId} was not found.`);
   }
 
-  const { error, isAdmin } = await hasAccessToSpace({
-    spaceId: vote.spaceId,
+  const pagePermissions = await computeUserPagePermissions({
     userId,
-    adminOnly: false
+    pageId: vote.pageId,
+    allowAdminBypass: true
   });
 
-  if (error || (vote.createdBy !== userId && !isAdmin)) {
-    throw new UnauthorisedActionError('You do not have permissions to update the vote.');
+  if (!pagePermissions.create_poll) {
+    throw new UnauthorisedActionError('You do not have permissions to delete the vote.');
   }
-
   const updatedVote = await updateVoteService(voteId, req.session.user.id, status);
 
   return res.status(200).json(updatedVote);
@@ -76,22 +77,23 @@ async function deleteVote (req: NextApiRequest, res: NextApiResponse<Vote | null
     select: {
       id: true,
       spaceId: true,
-      createdBy: true
+      createdBy: true,
+      pageId: true
     }
   });
 
   if (!vote) {
-    throw new DataNotFoundError(`Cannot update vote as vote with id ${voteId} was not found.`);
+    throw new DataNotFoundError(`Cannot delete vote as vote with id ${voteId} was not found.`);
   }
 
-  const { error, isAdmin } = await hasAccessToSpace({
-    spaceId: vote.spaceId,
+  const pagePermissions = await computeUserPagePermissions({
     userId,
-    adminOnly: false
+    pageId: vote.pageId,
+    allowAdminBypass: true
   });
 
-  if (error || (vote.createdBy !== userId && !isAdmin)) {
-    throw new UnauthorisedActionError('You do not have permissions to update the vote.');
+  if (!pagePermissions.create_poll) {
+    throw new UnauthorisedActionError('You do not have permissions to delete the vote.');
   }
 
   const deletedVote = await deleteVoteService(voteId, req.session.user.id);
