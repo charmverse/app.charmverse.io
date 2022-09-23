@@ -30,10 +30,9 @@ export default function FloatingMenuComponent (
 
 ) {
   const { showMessage } = useSnackbar();
-  const [currentUserPermissions] = useCurrentSpacePermissions();
   const displayInlineCommentButton = !inline && pagePermissions?.comment && enableComments && pageType !== 'card_template';
 
-  const displayInlineVoteButton = !inline && pagePermissions?.comment && currentUserPermissions?.createVote && enableVoting && pageType !== 'card_template';
+  const displayInlineVoteButton = !inline && pagePermissions?.create_poll && enableVoting && pageType !== 'card_template';
   return (
     <FloatingMenu
       menuKey={pluginKey}
