@@ -197,6 +197,8 @@ const Container = styled(Box)`
 
 # Background Workers (/background folder)
 
+There are several cron tasks managed inside the /background/tasks folder. These run inside their own Beanstalk environment. Visit the folder to see the latest tasks.
+
 ## Notifications
 To debug notifications, you can run a command to read back current tasks:
 ```
