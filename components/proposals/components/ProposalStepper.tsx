@@ -6,7 +6,6 @@ import type { ProposalStatus } from '@prisma/client';
 import charmClient from 'charmClient';
 import useTasks from 'components/nexus/hooks/useTasks';
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
-import useIsAdmin from 'hooks/useIsAdmin';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import type { ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';
 import { proposalStatusTransitionPermission, proposalStatusTransitionRecord, PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
@@ -29,7 +28,6 @@ export default function ProposalStepper (
   const theme = useTheme();
   const { mutate: mutateTasks } = useTasks();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const isAdmin = useIsAdmin();
 
   const currentStatusIndex = currentStatus ? proposalStatuses.indexOf(currentStatus) : -1;
 
@@ -52,7 +50,7 @@ export default function ProposalStepper (
       {proposalStatuses.map((status, statusIndex) => {
         const canChangeStatus = currentStatus ? (currentStatus === 'discussion' && status === 'review' ? reviewers.length !== 0 : true) && (proposalUserGroups.some(
           proposalUserGroup => proposalStatusTransitionPermission[currentStatus]?.[proposalUserGroup]?.includes(status)
-        ) || isAdmin) : false;
+        )) : false;
 
         return (
           <Fragment key={status}>

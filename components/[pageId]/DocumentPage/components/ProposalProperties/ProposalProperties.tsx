@@ -112,7 +112,7 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
         !isTemplate && (
           <Grid container mb={2}>
             <ProposalStepper
-              proposalUserGroups={currentUserGroups}
+              proposalUserGroups={isAdmin ? ['author', 'reviewer'] : currentUserGroups}
               proposal={proposal}
               refreshProposal={refreshProposal}
             />
