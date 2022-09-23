@@ -1,4 +1,4 @@
-import type { EditorView, Node } from '@bangle.dev/pm';
+import type { EditorState, Node } from '@bangle.dev/pm';
 import type { TrackAttribute, TrackType } from './interfaces';
 import { getSelectedChanges } from '../statePlugins/track';
 
@@ -13,16 +13,16 @@ interface GetTracksProps {
   lastNodeTracks: TrackAttribute2[];
 }
 
-export function getTracksFromDoc ({ view }: { view: EditorView }) {
+export function getTracksFromDoc ({ state }: { state: EditorState }) {
 
-  const selectedChanges = getSelectedChanges(view.state);
+  const selectedChanges = getSelectedChanges(state);
 
-  let lastNode = view.state.doc;
+  let lastNode = state.doc;
   let lastNodeTracks: TrackAttribute2[] = [];
 
-  const suggestions: (TrackAttribute2 & { node: Node, view: EditorView, pos: number, active: boolean })[] = [];
+  const suggestions: (TrackAttribute2 & { node: Node, pos: number, active: boolean })[] = [];
 
-  view.state.doc.descendants(
+  state.doc.descendants(
     (node, pos) => {
 
       lastNodeTracks = getTracks({
@@ -35,7 +35,6 @@ export function getTracksFromDoc ({ view }: { view: EditorView }) {
         suggestions.push({
           node,
           pos,
-          view,
           active: selectedChanges[track.type] && selectedChanges[track.type].from === pos,
           ...track
         });

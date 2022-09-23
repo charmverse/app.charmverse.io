@@ -231,7 +231,7 @@ function ThreadCreatedDate ({ createdAt }: {createdAt: Date}) {
   );
 }
 
-const CommentDate = memo<{createdAt: Date, updatedAt?: Date | null}>(({ createdAt, updatedAt }) => {
+export const CommentDate = memo<{createdAt: string, updatedAt?: string | null}>(({ createdAt, updatedAt }) => {
   return (
     <Typography
       sx={{
@@ -245,7 +245,7 @@ const CommentDate = memo<{createdAt: Date, updatedAt?: Date | null}>(({ createdA
     >
       <Tooltip arrow placement='top' title={new Date(createdAt).toLocaleString()}>
         <span>
-          {DateTime.fromJSDate(new Date(createdAt)).toRelative({ base: DateTime.now(), style: 'short' })}
+          {DateTime.fromISO(createdAt).toRelative({ base: DateTime.now(), style: 'short' })}
         </span>
       </Tooltip>
       {updatedAt && (
@@ -361,7 +361,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                     fontSize={14}
                     fontWeight={500}
                   />
-                  <CommentDate createdAt={comment.createdAt} updatedAt={comment.updatedAt} />
+                  <CommentDate createdAt={comment.createdAt.toString()} updatedAt={comment.updatedAt?.toString()} />
                 </Box>
                 <div>
                   {commentIndex === 0 ? (

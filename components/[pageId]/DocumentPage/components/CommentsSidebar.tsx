@@ -11,6 +11,7 @@ import { highlightDomElement, silentlyUpdateURL } from 'lib/browser';
 import { findTotalInlineComments } from 'lib/inline-comments/findTotalInlineComments';
 import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import { isTruthy } from 'lib/utilities/types';
+import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 
 const Center = styled.div`
@@ -22,12 +23,6 @@ const Center = styled.div`
   display: flex;
   align-items: center;
   flex-direction: column;
-`;
-
-const StyledPageThreadsBox = styled(Box)`
-  max-width: 400px;
-  height: 100%;
-  width: 100%;
 `;
 
 export const StyledSidebar = styled(List)`
@@ -168,7 +163,19 @@ export default function CommentsSidebar ({ inline }: BoxProps & {inline?: boolea
       </Box>
       <StyledSidebar className='charm-inline-comment-sidebar'>
         {sortedThreadList.length === 0 ? (
-          <NoCommentsMessage threadType={threadFilter} />
+          <NoCommentsMessage
+            icon={(
+              <CommentOutlinedIcon
+                fontSize='large'
+                color='secondary'
+                sx={{
+                  height: '2em',
+                  width: '2em'
+                }}
+              />
+            )}
+            message={`No ${threadFilter} comments yet`}
+          />
         ) : sortedThreadList.map(resolvedThread => resolvedThread
           && <PageThread showFindButton inline={inline} key={resolvedThread.id} threadId={resolvedThread?.id} />)}
       </StyledSidebar>
@@ -176,19 +183,12 @@ export default function CommentsSidebar ({ inline }: BoxProps & {inline?: boolea
   );
 }
 
-function NoCommentsMessage ({ threadType }: { threadType: string }) {
+export function NoCommentsMessage ({ icon, message }: { icon: ReactNode, message: string }) {
   return (
     <EmptyThreadContainerBox>
       <Center>
-        <CommentOutlinedIcon
-          fontSize='large'
-          color='secondary'
-          sx={{
-            height: '2em',
-            width: '2em'
-          }}
-        />
-        <Typography variant='subtitle1' color='secondary'>No {threadType} comments yet</Typography>
+        {icon }
+        <Typography variant='subtitle1' color='secondary'>{message}</Typography>
       </Center>
     </EmptyThreadContainerBox>
   );

@@ -12,6 +12,7 @@ import { NodeViewWrapper, RenderNodeViewsFunction } from './NodeViewWrapper';
 import { isTouchScreen } from 'lib/browser';
 import { useUser } from 'hooks/useUser';
 import { amendTransaction } from '../../../fiduswriter/track/amendTransaction';
+import log from 'lib/log';
 
 interface BangleEditorProps<PluginMetadata = any>
   extends CoreBangleEditorProps<PluginMetadata> {
@@ -25,7 +26,8 @@ interface BangleEditorProps<PluginMetadata = any>
   editorRef?: RefObject<HTMLDivElement>
   // Components that should be placed underneath the editor
   placeholderComponent?: ReactNode
-  enableSuggestions?: boolean
+  enableSuggestions?: boolean; // requires trackChanges to be true
+  trackChanges?: boolean;
 }
 
 export const BangleEditor = React.forwardRef<
@@ -45,7 +47,8 @@ export const BangleEditor = React.forwardRef<
       onReady = () => {},
       placeholderComponent,
       editorRef,
-      enableSuggestions = false
+      enableSuggestions = false,
+      trackChanges = false
     },
     ref
   ) => {
@@ -60,6 +63,10 @@ export const BangleEditor = React.forwardRef<
     const [editor, setEditor] = useState<CoreBangleEditor>();
     const nodeViews = useNodeViews(renderRef);
     const { user } = useUser();
+
+    if (enableSuggestions && !trackChanges) {
+      log.error('CharmEditor: Suggestions require trackChanges to be enabled');
+    }
 
     // set current
     editorViewPayloadRef.current.enableSuggestions = enableSuggestions;
@@ -78,13 +85,15 @@ export const BangleEditor = React.forwardRef<
         editorViewPayloadRef.current
       );
       (editor.view as any)._updatePluginWatcher = updatePluginWatcher(editor);
-      (editor.view as any)._props.dispatchTransaction = (transaction: Transaction) => {
-        const view = editor.view;
-        const trackedUser = { id: user?.id ?? '', username: user?.username ?? '' };
-        const trackedTr = amendTransaction(transaction, view.state, trackedUser, editorViewPayloadRef.current.enableSuggestions);
-        const {state: newState } = view.state.applyTransaction(trackedTr)
-        view.updateState(newState);
-      };
+      if (trackChanges) {
+        (editor.view as any)._props.dispatchTransaction = (transaction: Transaction) => {
+          const view = editor.view;
+          const trackedUser = { id: user?.id ?? '', username: user?.username ?? '' };
+          const trackedTr = amendTransaction(transaction, view.state, trackedUser, editorViewPayloadRef.current.enableSuggestions);
+          const {state: newState } = view.state.applyTransaction(trackedTr)
+          view.updateState(newState);
+        };
+      }
       onReadyRef.current(editor);
       setEditor(editor);
       return () => {

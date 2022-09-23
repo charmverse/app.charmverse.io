@@ -13,7 +13,7 @@ export const selectedChangeBlockSpec = {};
 
 interface Options {
   userId: string;
-  userName: string;
+  username: string;
 }
 
 export function trackPlugin (options: Options) {
@@ -25,7 +25,7 @@ export function trackPlugin (options: Options) {
         // in the document and that they are registered as past
         // participants for the marginbox filter.
         const users: Record<string, string> = {};
-        users[options.userId] = options.userName;
+        users[options.userId] = options.username;
         state.doc.descendants(node => {
           if (node.attrs.track) {
             node.attrs.track.forEach((track: TrackAttribute) => {
@@ -49,11 +49,11 @@ export function trackPlugin (options: Options) {
         });
 
         // if (options.editor.mod.collab) {
-        //   Object.entries(users).forEach(([id, userName]) => {
+        //   Object.entries(users).forEach(([id, username]) => {
         //     const userId = parseInt(id);
         //     options.editor.mod.collab.colors.ensureUserColor(userId);
         //     if (!options.editor.mod.collab.pastParticipants.find(participant => participant.id === userId)) {
-        //       options.editor.mod.collab.pastParticipants.push({ id: userId, name: userName });
+        //       options.editor.mod.collab.pastParticipants.push({ id: userId, name: username });
         //     }
         //   });
 

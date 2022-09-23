@@ -32,6 +32,7 @@ import SuggestionsSidebar from 'components/[pageId]/DocumentPage/components/Sugg
 import type { CryptoCurrency, FiatCurrency } from 'connectors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
+import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useUser } from 'hooks/useUser';
 import { silentlyUpdateURL } from 'lib/browser';
 import { extractDeletedThreadIds } from 'lib/inline-comments/extractDeletedThreadIds';
@@ -73,6 +74,8 @@ import { specRegistry } from './specRegistry';
 import { checkForEmpty } from './utils';
 import trackStyles from './fiduswriter/styles';
 import { rejectAll } from './fiduswriter/track/rejectAll';
+import { getSelectedChanges } from './fiduswriter/statePlugins/track';
+import { plugins as trackPlugins } from './fiduswriter/plugins';
 import SidebarDrawer from './components/SidebarDrawer';
 
 export interface ICharmEditorOutput {
@@ -91,13 +94,15 @@ const inlineVotePluginKey = new PluginKey(inlineVote.pluginKeyName);
 export function charmEditorPlugins (
   {
     onContentChange,
+    onSelectionSet,
     readOnly,
     disablePageSpecificFeatures = false,
     enableVoting,
     enableComments = true,
     userId = null,
     pageId = null,
-    spaceId = null
+    spaceId = null,
+    username = null
   }:
     {
       spaceId?: string | null,
@@ -105,13 +110,18 @@ export function charmEditorPlugins (
       userId?: string | null,
       readOnly?: boolean,
       onContentChange?: (view: EditorView, prevDoc: EditorState['doc']) => void,
+      onSelectionSet?: (state: EditorState) => void,
       disablePageSpecificFeatures?: boolean,
       enableVoting?: boolean,
-      enableComments?: boolean
+      enableComments?: boolean,
+      username?: string | null
     } = {}
 ): () => RawPlugins[] {
 
   const basePlugins: RawPlugins[] = [
+    // this trackPlugin should be called before the one below which calls onSelectionSet().
+    // TODO: find a cleaner way to combine this logic?
+    (username && userId ? trackPlugins({ userId, username, onSelectionSet }) : []),
     new Plugin({
       view: (_view) => {
         if (readOnly) {
@@ -358,6 +368,7 @@ function CharmEditor (
 ) {
   const { mutate } = useSWRConfig();
   const [currentSpace] = useCurrentSpace();
+  const { setCurrentPageActionDisplay } = usePageActionDisplay();
   // check empty state of page on first load
   const _isEmpty = checkForEmpty(content);
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
@@ -403,16 +414,35 @@ function CharmEditor (
 
   const editorRef = useRef<HTMLDivElement>(null);
 
+  const [suggestionState, setSuggestionState] = useState<EditorState | null>(null);
+
+  function onSelectionSet (state: EditorState) {
+    setSuggestionState(state);
+    // expand the sidebar if the user is selecting a suggestion
+    setCurrentPageActionDisplay(sidebarState => {
+      if (sidebarState) {
+        const selected = getSelectedChanges(state);
+        const hasSelection = Object.values(selected).some((value) => value);
+        if (hasSelection) {
+          return 'suggestions';
+        }
+      }
+      return sidebarState;
+    });
+  }
+
   const state = useEditorState({
     specRegistry,
     plugins: charmEditorPlugins({
       onContentChange: _onContentChange,
+      onSelectionSet,
       readOnly,
       disablePageSpecificFeatures,
       enableVoting,
       pageId,
       spaceId: currentSpace?.id,
-      userId: user?.id
+      userId: user?.id,
+      username: user?.username
     }),
     initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
     dropCursorOpts: {
@@ -450,7 +480,8 @@ function CharmEditor (
   return (
     <StyledReactBangleEditor
       disablePageSpecificFeatures={disablePageSpecificFeatures}
-      enableSuggestions={enableSuggestingMode} // pagePermissions?.comment}
+      enableSuggestions={enableSuggestingMode}
+      trackChanges={true}
       style={{
         ...(style ?? {}),
         width: '100%',
@@ -587,7 +618,7 @@ function CharmEditor (
       {!disablePageSpecificFeatures && (
         <>
           <SidebarDrawer id='page-suggestion-list-box' title='Suggestions' open={pageActionDisplay === 'suggestions'}>
-            <SuggestionsSidebar readOnly={!pagePermissions?.edit_content} />
+            <SuggestionsSidebar readOnly={!pagePermissions?.edit_content} state={suggestionState} />
           </SidebarDrawer>
           <SidebarDrawer id='page-comment-list-box' title='Comments' open={pageActionDisplay === 'comments'}>
             <CommentsSidebar />

@@ -6,13 +6,13 @@ import PageActionToggle from 'components/[pageId]/DocumentPage/components/PageAc
 const PageActionListBox = styled.div`
   position: fixed;
   right: 0px;
-  width: 416px;
+  width: 430px;
   max-width: 100%;
   top: 56px; // height of MUI Toolbar
   z-index: var(--z-index-drawer);
   height: calc(100% - 80px);
   overflow: auto;
-  padding: 0 ${({ theme }) => theme.spacing(1)};
+  padding: ${({ theme }) => theme.spacing(0, 1, 0, 3)};
   background: ${({ theme }) => theme.palette.background.default};
 `;
 

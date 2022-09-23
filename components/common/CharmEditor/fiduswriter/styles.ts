@@ -9,14 +9,14 @@ export default `
   .selected-deletion,
   .selected-format_change,
   .selected-block_change {
-    background-color: var(--editor-active-track-background-color);
+    background-color: var(--charmeditor-active);
   }
 
   .tag.selected-insertion,
   .contributor.selected-insertion,
   .tag.selected-deletion,
   .contributor.selected-deletion {
-    background-color: var(--editor-active-track-background-color);
+    background-color: var(--charmeditor-active);
     color: var(--cs-white-text);
   }
 
