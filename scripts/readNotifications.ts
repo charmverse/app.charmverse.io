@@ -9,13 +9,16 @@ export async function readUserNotifications (): Promise<number> {
   const notificationsToSend = await getNotifications();
 
   for (const notification of notificationsToSend) {
-    log.info('Debug: notification to user', {
-      userId: notification.user.id,
-      gnosis: notification.gnosisSafeTasks.length,
-      mentions: notification.mentionedTasks.length,
-      votes: notification.voteTasks.length,
-      proposals: notification.proposalTasks.length
-    });
+    log.info(`\nNotifications to user id: ${notification.user.id}`
+      + `\n--------------------------------------------------------------g`
+      + `\ngnosis: ${notification.gnosisSafeTasks.length}`
+      + `\nmentions: ${notification.mentionedTasks.length}`
+      + `\nvotes: ${notification.voteTasks.length}`
+      + `\nproposals: ${notification.proposalTasks.length}`
+      + `\n  ${notification.proposalTasks.map(task =>
+          `${task.pageTitle} (${task.spaceName})`).join('\n  ')
+        }`
+    );
   }
 
   return notificationsToSend.length;
@@ -24,8 +27,7 @@ export async function readUserNotifications (): Promise<number> {
 log.info('Retrieving notifications to debug **This will not send emails**')
 
 readUserNotifications()
-  .then((count) => {
-    log.info('Notifications to send:', count);
+  .then(() => {
     process.exit();
   })
   .catch((error) => {
