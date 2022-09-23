@@ -1,4 +1,4 @@
-import { Decoration, DecorationSet, Plugin } from '@bangle.dev/pm';
+import { Decoration, DecorationSet, Plugin, Selection } from '@bangle.dev/pm';
 import type { EditorState, PluginKey } from '@bangle.dev/pm';
 import { RateReviewOutlined } from '@mui/icons-material';
 import { createTooltipDOM, tooltipPlacement } from '@bangle.dev/tooltip';
@@ -125,6 +125,10 @@ export function plugins ({ onSelectionSet, key, userId, username }:
           const iconContainer = (event.target as HTMLElement)?.closest('.charm-row-decoration-suggestions');
           const suggestionPos = iconContainer?.getAttribute('data-pos');
           if (suggestionPos) {
+            const { tr } = view.state;
+            const selectedPos = parseInt(suggestionPos, 0) + 1;
+            tr.setSelection(Selection.near(tr.doc.resolve(selectedPos)));
+            view.dispatch(tr);
             renderSuggestionsTooltip(key, { pos: suggestionPos })(view.state, view.dispatch, view);
             return true;
             // return highlightElement({
