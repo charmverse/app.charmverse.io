@@ -312,10 +312,12 @@ function DataProviders ({ children }: { children: ReactNode }) {
 
 function PageMetaTags () {
   const [title] = usePageTitle();
+  const prefix = process.env.NODE_ENV === 'development' ? 'DEV | ' : '';
+
   return (
     <Head>
       <title>
-        {title ? `${title} | CharmVerse` : 'CharmVerse - the all-in-one web3 workspace'}
+        {`${prefix}${title}` ? `${prefix}${title} | CharmVerse` : 'CharmVerse - the all-in-one web3 workspace'}
       </title>
       {/* viewport meta tag goes in _app.tsx - https://nextjs.org/docs/messages/no-document-viewport-meta */}
       <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
