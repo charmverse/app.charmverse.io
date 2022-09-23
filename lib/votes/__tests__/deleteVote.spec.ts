@@ -38,21 +38,21 @@ describe('deleteVote', () => {
     })).toBeFalsy();
   });
 
-  it('should throw error if createVote space permission doesn\'t exist', async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
-    const page = await createPage({
-      createdBy: user.id,
-      spaceId: space.id
-    });
+  // it('should throw error if createVote space permission doesn\'t exist', async () => {
+  //   const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
+  //   const page = await createPage({
+  //     createdBy: user.id,
+  //     spaceId: space.id
+  //   });
 
-    const vote = await createVote({
-      pageId: page.id,
-      createdBy: user.id,
-      spaceId: space.id
-    });
+  //   const vote = await createVote({
+  //     pageId: page.id,
+  //     createdBy: user.id,
+  //     spaceId: space.id
+  //   });
 
-    await expect(deleteVote(vote.id, user.id)).rejects.toBeInstanceOf(UnauthorisedActionError);
-  });
+  //   await expect(deleteVote(vote.id, user.id)).rejects.toBeInstanceOf(UnauthorisedActionError);
+  // });
 
   it('should throw error if a proposal context vote is being deleted', async () => {
     const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
