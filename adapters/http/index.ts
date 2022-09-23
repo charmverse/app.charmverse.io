@@ -1,6 +1,6 @@
 import fetch from './fetch';
 
-type Params = { [key: string]: string | string[] };
+type Params = { [key: string]: any };
 
 export function GET<T = Response> (
   path: string,
@@ -13,7 +13,7 @@ export function GET<T = Response> (
       const value = data[key];
       return typeof value === 'string'
         ? `${key}=${encodeURIComponent(value)}`
-        : `${value.map(v => `${key}[]=${v}`).join('&')}`;
+        : `${value.map((v: string) => `${key}[]=${v}`).join('&')}`;
     })
     .join('&');
   const url = `${path}${queryStr ? `?${queryStr}` : ''}`;
