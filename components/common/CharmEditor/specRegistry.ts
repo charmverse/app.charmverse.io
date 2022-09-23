@@ -37,7 +37,7 @@ import {
   deletion,
   insertion,
   formatChange
-} from './fiduswriter/schema/common/track';
+} from './components/suggestions/schema/common/track';
 
 export interface ICharmEditorOutput {
   doc: PageContent,

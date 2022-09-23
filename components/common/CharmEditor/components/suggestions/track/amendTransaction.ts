@@ -4,6 +4,8 @@ import { Slice, ReplaceStep, ReplaceAroundStep, AddMarkStep, RemoveMarkStep, Map
 import log from 'lib/log';
 import type { TrackAttribute } from './interfaces';
 
+const SUPPORTED_MARKS = ['italic', 'bold', 'code', 'underline'];
+
 function markInsertion (
   tr: Transaction,
   from: number,
@@ -218,9 +220,12 @@ export function trackedTransaction (tr: Transaction, state: EditorState, user: {
   tr.steps.forEach((originalStep, originalStepIndex) => {
     const step = originalStep.map(map);
     const doc = newTr.doc;
+
     if (!step) {
       return;
     }
+
+    // console.log('step', step);
 
     if (step instanceof ReplaceStep) {
       const newStep = approved
@@ -321,10 +326,8 @@ export function trackedTransaction (tr: Transaction, state: EditorState, user: {
       }
     }
     else if (step instanceof AddMarkStep) {
-      log.info('add mark', step);
       doc.nodesBetween(step.from, step.to, (node, pos) => {
         if (!node.isInline) {
-          log.info('node is not inline');
           return true;
         }
         if (node.marks.find(mark => mark.type.name === 'deletion')) {
@@ -338,10 +341,9 @@ export function trackedTransaction (tr: Transaction, state: EditorState, user: {
           );
         }
         if (
-          ['em', 'strong', 'underline'].includes(step.mark.type.name)
-                    && !node.marks.find(mark => mark.type === step.mark.type)
+          SUPPORTED_MARKS.includes(step.mark.type.name)
+             && !node.marks.find(mark => mark.type === step.mark.type)
         ) {
-          log.info('formatted change!');
           const formatChangeMark = node.marks.find(mark => mark.type.name === 'format_change');
           let after; let
             before;
@@ -394,7 +396,7 @@ export function trackedTransaction (tr: Transaction, state: EditorState, user: {
         }
 
         if (
-          ['em', 'strong', 'underline'].includes(step.mark.type.name)
+          SUPPORTED_MARKS.includes(step.mark.type.name)
                     && node.marks.find(mark => mark.type === step.mark.type)
         ) {
           const formatChangeMark = node.marks.find(mark => mark.type.name === 'format_change');

@@ -72,10 +72,11 @@ import * as trailingNode from './components/trailingNode';
 import DevTools from './DevTools';
 import { specRegistry } from './specRegistry';
 import { checkForEmpty } from './utils';
-import trackStyles from './fiduswriter/styles';
-import { rejectAll } from './fiduswriter/track/rejectAll';
-import { getSelectedChanges } from './fiduswriter/statePlugins/track';
-import { plugins as trackPlugins } from './fiduswriter/plugins';
+import trackStyles from './components/suggestions/styles';
+import { rejectAll } from './components/suggestions/track/rejectAll';
+import { getSelectedChanges } from './components/suggestions/statePlugins/track';
+import { plugins as trackPlugins } from './components/suggestions/plugins';
+import SuggestionsPopup from './components/suggestions/SuggestionPopup';
 import SidebarDrawer from './components/SidebarDrawer';
 
 export interface ICharmEditorOutput {
@@ -90,6 +91,7 @@ const floatingMenuPluginKey = new PluginKey('floatingMenu');
 const nestedPagePluginKey = new PluginKey(nestedPagePluginKeyName);
 const inlineCommentPluginKey = new PluginKey(inlineComment.pluginKeyName);
 const inlineVotePluginKey = new PluginKey(inlineVote.pluginKeyName);
+const suggestionsPluginKey = new PluginKey('suggestions');
 
 export function charmEditorPlugins (
   {
@@ -121,7 +123,7 @@ export function charmEditorPlugins (
   const basePlugins: RawPlugins[] = [
     // this trackPlugin should be called before the one below which calls onSelectionSet().
     // TODO: find a cleaner way to combine this logic?
-    (username && userId ? trackPlugins({ userId, username, onSelectionSet }) : []),
+    (username && userId ? trackPlugins({ userId, username, onSelectionSet, key: suggestionsPluginKey }) : []),
     new Plugin({
       view: (_view) => {
         if (readOnly) {
@@ -628,6 +630,7 @@ function CharmEditor (
           </SidebarDrawer>
           <InlineCommentThread pluginKey={inlineCommentPluginKey} />
           {enableVoting && <InlineVoteList pluginKey={inlineVotePluginKey} />}
+          {!readOnly && <SuggestionsPopup pluginKey={suggestionsPluginKey} />}
         </>
       )}
       {!readOnly && <DevTools />}

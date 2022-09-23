@@ -43,9 +43,9 @@ export default `
   [data-track]::before {
     content: '';
     position: absolute;
-    border-left: 1px solid black;
-    left: -10px;
-    height: 22px;
+    border-left: 2px solid var(--background-dark);
+    left: -8px;
+    height: 24px;
   }
 
   li[data-track]::before {

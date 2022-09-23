@@ -11,7 +11,7 @@ import reactDOM from 'react-dom';
 import { NodeViewWrapper, RenderNodeViewsFunction } from './NodeViewWrapper';
 import { isTouchScreen } from 'lib/browser';
 import { useUser } from 'hooks/useUser';
-import { amendTransaction } from '../../../fiduswriter/track/amendTransaction';
+import { amendTransaction } from '../../suggestions/track/amendTransaction';
 import log from 'lib/log';
 
 interface BangleEditorProps<PluginMetadata = any>

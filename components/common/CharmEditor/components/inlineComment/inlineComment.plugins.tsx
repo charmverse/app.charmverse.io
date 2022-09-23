@@ -11,9 +11,9 @@ import { markName } from './inlineComment.constants';
 import RowDecoration from './components/InlineCommentRowDecoration';
 
 export interface InlineCommentPluginState {
-  tooltipContentDOM: HTMLElement
-  show: boolean
-  ids: string[]
+  tooltipContentDOM: HTMLElement;
+  show: boolean;
+  ids: string[];
 }
 
 export function plugin ({ key } :{
@@ -59,7 +59,8 @@ export function plugin ({ key } :{
       key,
       props: {
         handleClickOn: (view: EditorView, pos: number, node, nodePos, event: MouseEvent) => {
-          if (/charm-inline-comment/.test((event.target as HTMLElement).className)) {
+          const className = (event.target as HTMLElement).className + ((event.target as HTMLElement).parentNode as HTMLElement).className;
+          if (/charm-inline-comment/.test(className)) {
             return highlightMarkedElement({
               view,
               elementId: 'page-comment-list-box',

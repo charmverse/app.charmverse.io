@@ -1,20 +1,17 @@
 import { useEditorViewContext } from '@bangle.dev/react';
 import type { EditorState } from '@bangle.dev/pm';
-import { Box, IconButton, Paper, Stack, Tooltip, Typography } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import { Check, Close, RateReviewOutlined } from '@mui/icons-material';
 import { useEffect, useState } from 'react';
 import Button from 'components/common/Button';
-import type { Contributor } from 'hooks/useContributors';
 import { useContributors } from 'hooks/useContributors';
-import { accept } from 'components/common/CharmEditor/fiduswriter/track/accept';
-import { acceptAll } from 'components/common/CharmEditor/fiduswriter/track/acceptAll';
-import { reject } from 'components/common/CharmEditor/fiduswriter/track/reject';
-import { rejectAll } from 'components/common/CharmEditor/fiduswriter/track/rejectAll';
-import { getTracksFromDoc } from 'components/common/CharmEditor/fiduswriter/track/getTracks';
-import type { TrackType } from 'components/common/CharmEditor/fiduswriter/track/interfaces';
-import UserDisplay from 'components/common/UserDisplay';
-import { CommentDate } from 'components/common/CharmEditor/components/PageThread';
+import { accept } from 'components/common/CharmEditor/components/suggestions/track/accept';
+import { acceptAll } from 'components/common/CharmEditor/components/suggestions/track/acceptAll';
+import { reject } from 'components/common/CharmEditor/components/suggestions/track/reject';
+import { rejectAll } from 'components/common/CharmEditor/components/suggestions/track/rejectAll';
+import { getTracksFromDoc } from 'components/common/CharmEditor/components/suggestions/track/getTracks';
 import log from 'lib/log';
+import SuggestionCard from 'components/common/CharmEditor/components/suggestions/SuggestionCard';
 import { NoCommentsMessage } from './CommentsSidebar';
 
 export default function SuggestionsSidebar ({ readOnly, state }: { readOnly: boolean, state: EditorState | null }) {
@@ -37,7 +34,7 @@ export default function SuggestionsSidebar ({ readOnly, state }: { readOnly: boo
     }
   }, [state]);
 
-  log.debug('suggestions', suggestions);
+  // console.log('suggestions', suggestions);
 
   function clickAcceptAll () {
     acceptAll(view);
@@ -68,48 +65,7 @@ export default function SuggestionsSidebar ({ readOnly, state }: { readOnly: boo
         </Box>
       )}
       <Stack gap={2}>
-        {suggestions.map(({ active, data, node, pos, type }) => {
-          return (
-            <Paper sx={{ p: 2, left: active ? -16 : 0, position: 'relative', transition: 'left ease-in .15s' }} elevation={active ? 4 : 1} variant={active ? undefined : 'outlined'}>
-              <Stack key={pos + type} gap={1}>
-                <Box display='flex' justifyContent='space-between'>
-                  <Box display='flex' alignItems='center' gap={1}>
-                    <SidebarUser user={contributors.find(contributor => contributor.id === data.user)} />
-                    <CommentDate createdAt={data.date} />
-                  </Box>
-                  <Box display='flex' gap={1}>
-                    <Tooltip title='Accept suggestion'>
-                      <IconButton
-                        color='primary'
-                        onClick={() => {
-                          acceptOne(type, pos);
-                        }}
-                        size='small'
-                      >
-                        <Check />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title='Reject suggestion'>
-                      <IconButton
-                        color='primary'
-                        size='small'
-                        onClick={() => {
-                          rejectOne(type, pos);
-                        }}
-                      >
-                        <Close />
-                      </IconButton>
-                    </Tooltip>
-                  </Box>
-                </Box>
-                <Typography variant='body2'>
-                  {type === 'format_change' && data.before instanceof Array && data.after instanceof Array && <FormatChangeDisplay before={data.before} after={data.after} />}
-                  {type !== 'format_change' && <ActionDisplay type={type} nodeType={node.type.name} content={node.textContent} />}
-                </Typography>
-              </Stack>
-            </Paper>
-          );
-        })}
+        {suggestions.map(props => <SuggestionCard key={props.pos + props.type} {...props} />)}
       </Stack>
       {suggestions.length === 0 && (
         <NoCommentsMessage
@@ -128,70 +84,4 @@ export default function SuggestionsSidebar ({ readOnly, state }: { readOnly: boo
       )}
     </>
   );
-}
-
-const FORMAT_MARK_NAMES: Record<string, string> = {
-  em: 'Emphasis',
-  strong: 'Strong',
-  underline: 'Underline'
-};
-
-const VERBS: Record<TrackType, string> = {
-  deletion: 'Delete',
-  insertion: 'Add',
-  block_change: 'Block change',
-  format_change: 'Format'
-};
-
-const ACTIONS: Record<string, string> = {
-  insertion_paragraph: 'New paragraph',
-  insertion_heading: 'New heading',
-  insertion_blockquote: 'Wrapped into blockquote',
-  insertion_codeBlock: 'Added code block',
-  insertion_figure: 'Inserted figure',
-  insertion_list_item: 'New list item',
-  insertion_table: 'Inserted table',
-  deletion_paragraph: 'Merged paragraph',
-  deletion_heading: 'Merged heading',
-  deletion_blockquote: 'Unwrapped blockquote',
-  deletion_codeBlock: 'Removed code block',
-  deletion_list_item: 'Lifted list item',
-  deletion_table: 'Delete table',
-  block_change_paragraph: 'Changed into paragraph',
-  block_change_heading: 'Changed heading level',
-  block_change_codeBlock: 'Changed into code block'
-};
-
-function ActionDisplay ({ type, nodeType, content }: { type: TrackType, nodeType: string, content?: string }) {
-  const nodeActionType = `${type}_${nodeType}`;
-  if (ACTIONS[nodeActionType]) {
-    return <span>{ACTIONS[nodeActionType]}</span>;
-  }
-  else {
-    return <><strong>{VERBS[type]}:</strong> {content}</>;
-  }
-}
-
-function FormatChangeDisplay ({ before, after }: { before: string[], after: string[] }) {
-  if (before.length) {
-    return <><strong>Remove format:</strong> {before.map(markName => FORMAT_MARK_NAMES[markName]).join(', ')}</>;
-  }
-  if (after.length) {
-    return <><strong>Add format:</strong> {after.map(markName => FORMAT_MARK_NAMES[markName]).join(', ')}</>;
-  }
-  return null;
-}
-
-function SidebarUser ({ user }: { user?: Contributor }) {
-  if (!user) return null;
-  return (
-    <UserDisplay
-      component='div'
-      user={user}
-      avatarSize='small'
-      fontSize={14}
-      fontWeight={500}
-    />
-  );
-
 }
