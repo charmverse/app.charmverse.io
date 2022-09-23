@@ -67,6 +67,7 @@ export const getAlchemyBaseUrl = (chainId: SupportedChainId = 1, apiSuffix: Alch
   return `https://${apiSubdomain}.g.alchemy.com/${apiSuffixPath}v2/${apiKey}`;
 };
 
+// Docs: https://docs.alchemy.com/reference/getnfts
 export const getAddressNfts = async (address: string, chainId: SupportedChainId = 1) => {
   const url = `${getAlchemyBaseUrl(chainId)}/getNFTs`;
   const res = await GET<AlchemyNftResponse>(url, { owner: address, filters: ['SPAM', 'AIRDROPS'] });
