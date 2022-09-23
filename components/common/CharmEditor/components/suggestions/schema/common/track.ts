@@ -35,13 +35,13 @@ export const deletion: BaseRawMarkSpec = {
   schema: {
     attrs: {
       user: {
-        default: 0
+        default: ''
       },
       username: {
         default: ''
       },
       date: {
-        default: 0
+        default: ''
       }
     },
     inclusive: false,
@@ -93,13 +93,13 @@ export const formatChange: BaseRawMarkSpec = {
   schema: {
     attrs: {
       user: {
-        default: 0
+        default: ''
       },
       username: {
         default: ''
       },
       date: {
-        default: 0
+        default: ''
       },
       before: {
         default: []
@@ -144,13 +144,13 @@ export const insertion: BaseRawMarkSpec = {
   schema: {
     attrs: {
       user: {
-        default: 0
+        default: ''
       },
       username: {
         default: ''
       },
       date: {
-        default: 0
+        default: ''
       },
       approved: {
         default: true

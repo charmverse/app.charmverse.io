@@ -33,14 +33,16 @@ export default function SuggestionsPopup ({ pluginKey }: { pluginKey: PluginKey<
   const view = useEditorViewContext();
   const {
     tooltipContentDOM,
-    show: isVisible
+    show: isVisible,
+    pos
   } = usePluginState(pluginKey) as SuggestionPluginState;
   const cardId = (new URLSearchParams(window.location.href)).get('cardId');
 
   const { currentPageActionDisplay } = usePageActionDisplay();
   if ((currentPageActionDisplay !== 'suggestions' || cardId) && isVisible) {
     const suggestions = getTracksFromDoc({ state: view.state });
-    const suggestion = suggestions.find(s => s.active);
+    const suggestionPos = parseInt(pos || '', 10);
+    const suggestion = suggestions.find(s => s.pos === suggestionPos || s.active);
     if (!suggestion) {
       return null;
     }

@@ -42,7 +42,6 @@ export function getTracksFromDoc ({ state }: { state: EditorState }) {
       lastNode = node;
     }
   );
-
   return suggestions;
 }
 

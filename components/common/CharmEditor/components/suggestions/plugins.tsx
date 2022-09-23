@@ -11,6 +11,8 @@ import { RowDecoration } from '../inlineComment/components/InlineCommentRowDecor
 export interface SuggestionPluginState {
   tooltipContentDOM: HTMLElement;
   show: boolean;
+  // use pos because we can't generate unique ids for marks - they are merged automatically by PM when calling addMark(), UNLESS there are any unique properties
+  pos?: string;
 }
 
 export function plugins ({ onSelectionSet, key, userId, username }:
@@ -41,7 +43,8 @@ export function plugins ({ onSelectionSet, key, userId, username }:
         init () {
           return {
             show: false,
-            tooltipContentDOM: tooltipDOMSpec.contentDOM
+            tooltipContentDOM: tooltipDOMSpec.contentDOM,
+            pos: undefined
           };
         },
         apply (tr, pluginState) {
@@ -62,7 +65,8 @@ export function plugins ({ onSelectionSet, key, userId, username }:
             }
             return {
               ...pluginState,
-              show: false
+              show: false,
+              pos: undefined
             };
           }
           throw new Error('Unknown type');
@@ -75,9 +79,7 @@ export function plugins ({ onSelectionSet, key, userId, username }:
             || /^(insertion|deletion|format-change)/.test(((event.target as HTMLElement).parentNode as HTMLElement).className)
             || /^(insertion|deletion|format-change)/.test((event.target as any).parentNode?.parentNode?.className);
           if (isSuggestion) {
-            renderSuggestionsTooltip(key, {
-              pos
-            })(view.state, view.dispatch, view);
+            renderSuggestionsTooltip(key, {})(view.state, view.dispatch, view);
             return true;
             // return highlightMarkedElement({
             //   view,
@@ -120,10 +122,10 @@ export function plugins ({ onSelectionSet, key, userId, username }:
           return this.getState(state);
         },
         handleClickOn: (view, pos: number, node, nodePos, event) => {
-          const inlineCommentContainer = (event.target as HTMLElement)?.closest('.charm-row-decoration-suggestions');
-          const ids = inlineCommentContainer?.getAttribute('data-ids')?.split(',') || [];
-          if (ids.length > 0) {
-            renderSuggestionsTooltip(key, {})(view.state, view.dispatch, view);
+          const iconContainer = (event.target as HTMLElement)?.closest('.charm-row-decoration-suggestions');
+          const suggestionPos = iconContainer?.getAttribute('data-pos');
+          if (suggestionPos) {
+            renderSuggestionsTooltip(key, { pos: suggestionPos })(view.state, view.dispatch, view);
             return true;
             // return highlightElement({
             //   ids,
@@ -147,19 +149,19 @@ function getDecorations (state: EditorState) {
   const decorations: Decoration[] = rows.map(row => {
     // inject decoration at the start of the paragraph/header
     const firstPos = row.pos + 1;
-    return Decoration.widget(firstPos, () => renderComponent(), { key: firstPos.toString() });
+    return Decoration.widget(firstPos, () => renderComponent({ pos: row.pos }), { key: firstPos.toString() });
   });
 
   return DecorationSet.create(state.doc, decorations);
 }
 
-function renderComponent () {
+function renderComponent ({ pos }: { pos: number }) {
 
   // const ids = nodesWithMark.map(node => node.marks[0]?.attrs.id).filter(Boolean);
 
   const container = document.createElement('div');
   container.className = 'charm-row-decoration-suggestions charm-row-decoration';
-  // container.setAttribute('data-ids', ids.join(','));
+  container.setAttribute('data-pos', pos.toString());
   reactDOM.render(<RowDecoration count={1} icon={RateReviewOutlined} />, container);
 
   return container;

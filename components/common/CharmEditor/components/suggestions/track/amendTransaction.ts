@@ -1,5 +1,5 @@
 import { Selection, TextSelection } from 'prosemirror-state';
-import type { EditorState, Node, StepMap, Transaction } from '@bangle.dev/pm';
+import type { EditorState, Node, Transaction } from '@bangle.dev/pm';
 import { Slice, ReplaceStep, ReplaceAroundStep, AddMarkStep, RemoveMarkStep, Mapping, CellSelection } from '@bangle.dev/pm';
 import log from 'lib/log';
 import type { TrackAttribute } from './interfaces';
@@ -16,6 +16,7 @@ function markInsertion (
   approved: boolean
 ) {
   const insertionMark = tr.doc.type.schema.marks.insertion.create({ user: user.id, username: user.username, date: date10, approved });
+
   // Add insertion mark also to block nodes (figures, text blocks) but not table cells/rows and lists.
   tr.doc.nodesBetween(
     from,
@@ -132,7 +133,7 @@ function markDeletion (tr: Transaction, from: number, to: number, user: { id: st
             listItem = false;
             return;
           }
-          const track = node.attrs.track.slice();
+          const track = node.attrs.track.slice() as TrackAttribute[];
           track.push({ type: 'deletion', user: user.id, username: user.username, date: date1 });
           tr.setNodeMarkup(deletionMap.map(pos), undefined, { ...node.attrs, track }, node.marks);
         }
