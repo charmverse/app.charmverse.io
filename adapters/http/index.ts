@@ -3,7 +3,7 @@ import fetch from './fetch';
 type Params = { [key: string]: string | string[] };
 
 export function GET<T = Response> (
-  requestURL: string,
+  path: string,
   data: Params = {},
   { headers = {} }: { headers?: any } = {}
 ): Promise<T> {
@@ -16,7 +16,7 @@ export function GET<T = Response> (
         : `${value.map(v => `${key}[]=${v}`).join('&')}`;
     })
     .join('&');
-  const url = `${requestURL}${queryStr ? `?${queryStr}` : ''}`;
+  const url = `${path}${queryStr ? `?${queryStr}` : ''}`;
   return fetch<T>(
     url,
     {
