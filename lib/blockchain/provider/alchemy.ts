@@ -70,7 +70,7 @@ export const getAlchemyBaseUrl = (chainId: SupportedChainId = 1, apiSuffix: Alch
 // Docs: https://docs.alchemy.com/reference/getnfts
 export const getAddressNfts = async (address: string, chainId: SupportedChainId = 1) => {
   const url = `${getAlchemyBaseUrl(chainId, 'nft')}/getNFTs`;
-  const res = await GET<AlchemyNftResponse>(url, { owner: '0x3B60e31CFC48a9074CD5bEbb26C9EAa77650a43F', filters: ['AIRDROPS', 'SPAM'] });
+  const res = await GET<AlchemyNftResponse>(url, { owner: address, filters: ['AIRDROPS', 'SPAM'] });
   return res.ownedNfts;
 };
 
