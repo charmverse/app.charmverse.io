@@ -35,6 +35,7 @@ const ArchivedPageItem = memo<
     }>(({ onRestore, onDelete, disabled, archivedPage }) => {
       const [space] = useCurrentSpace();
       const isEditorEmpty = checkForEmpty(archivedPage.content as PageContent);
+
       return (
         <Link href={`/${space?.domain}/${archivedPage.path}`} passHref key={archivedPage.id}>
           <MenuItem component='a' dense disabled={disabled} sx={{ pl: 4 }}>
