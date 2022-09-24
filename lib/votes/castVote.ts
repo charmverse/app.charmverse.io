@@ -1,6 +1,8 @@
 
 import type { UserVote, Vote, VoteOptions } from '@prisma/client';
+import { VoteContext } from '@prisma/client';
 import { prisma } from 'db';
+import { trackUserAction } from 'lib/metrics/mixpanel/server';
 import { InvalidInputError, UndesirableOperationError } from 'lib/utilities/errors';
 import { isVotingClosed } from './utils';
 
@@ -31,6 +33,10 @@ export async function castVote (choice: string, vote: Vote & {voteOptions: VoteO
       updatedAt: new Date()
     }
   });
+
+  if (vote.context === VoteContext.proposal) {
+    trackUserAction('ProposalVoteCasted', { userId, resourceId: voteId, spaceId: vote.spaceId, platform: 'charmverse' });
+  }
 
   return userVote;
 }

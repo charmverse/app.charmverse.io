@@ -9,7 +9,7 @@ interface ProposalStatusUpdatedEvent extends ProposalEvent {
 }
 
 interface ProposalVoteCastedEvent extends ProposalEvent {
-  paltform: 'charmverse' | 'snapshot'
+  platform: 'charmverse' | 'snapshot'
 }
 
 export interface ProposalEvents {
