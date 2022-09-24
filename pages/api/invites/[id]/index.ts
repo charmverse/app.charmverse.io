@@ -4,6 +4,7 @@ import { prisma } from 'db';
 import log from 'lib/log';
 import type { IEventToLog } from 'lib/log/userEvents';
 import { postToDiscord } from 'lib/log/userEvents';
+import { trackUserAction } from 'lib/metrics/mixpanel/server';
 import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
 import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -57,6 +58,7 @@ async function acceptInvite (req: NextApiRequest, res: NextApiResponse) {
     logInviteAccepted(newRole);
 
     updateTrackUserProfileById(userId);
+    trackUserAction('SpaceJoined', { userId, source: 'invite_link', spaceId: invite.spaceId });
 
     await prisma.inviteLink.update({
       where: { id: invite.id },

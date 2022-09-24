@@ -97,6 +97,7 @@ export async function applyTokenGates ({ spaceId, userId, tokens, commit }: Toke
   };
 
   trackUserAction('TokenGateVerification', { result: 'pass', spaceId, spaceName: space.name, userId, roles: assignedRoles.map(r => r.name) });
+  trackUserAction('SpaceJoined', { spaceId, spaceName: space.name, userId, source: 'token_gate' });
 
   if (!commit) {
     return returnValue;
