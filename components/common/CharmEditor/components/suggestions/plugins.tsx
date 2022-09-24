@@ -4,7 +4,7 @@ import { RateReviewOutlined } from '@mui/icons-material';
 import { createTooltipDOM, tooltipPlacement } from '@bangle.dev/tooltip';
 import reactDOM from 'react-dom';
 import { renderSuggestionsTooltip, referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';
-import { getTracksFromDoc } from './track/getTracks';
+import { getEventsFromDoc } from './getEvents';
 import { trackPlugin } from './statePlugins/track';
 import { RowDecoration } from '../inlineComment/components/InlineCommentRowDecoration';
 
@@ -15,8 +15,8 @@ export interface SuggestionPluginState {
   pos?: string;
 }
 
-export function plugins ({ onSelectionSet, key, userId, username }:
-    { onSelectionSet?: (state: EditorState) => void, key: PluginKey, userId: string, username: string }) {
+export function plugins ({ onSelectionSet, key, readOnly, userId, username }:
+    { onSelectionSet?: (state: EditorState) => void, readOnly: boolean, key: PluginKey, userId: string, username: string }) {
 
   const tooltipDOMSpec = createTooltipDOM();
 
@@ -141,7 +141,7 @@ export function plugins ({ onSelectionSet, key, userId, username }:
 
 function getDecorations (state: EditorState) {
 
-  const rows = getTracksFromDoc({ state });
+  const rows = getEventsFromDoc({ state });
   const decorations: Decoration[] = rows.map(row => {
     // inject decoration at the start of the paragraph/header
     const firstPos = row.pos + 1;

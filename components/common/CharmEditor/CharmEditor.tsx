@@ -123,7 +123,7 @@ export function charmEditorPlugins (
   const basePlugins: RawPlugins[] = [
     // this trackPlugin should be called before the one below which calls onSelectionSet().
     // TODO: find a cleaner way to combine this logic?
-    (username && userId ? trackPlugins({ userId, username, onSelectionSet, key: suggestionsPluginKey }) : []),
+    (username && userId ? trackPlugins({ readOnly, userId, username, onSelectionSet, key: suggestionsPluginKey }) : []),
     new Plugin({
       view: (_view) => {
         if (readOnly) {

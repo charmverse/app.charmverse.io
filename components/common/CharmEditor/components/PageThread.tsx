@@ -10,7 +10,7 @@ import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 import type { MouseEvent } from 'react';
-import { forwardRef, memo, useRef, useState } from 'react';
+import { forwardRef, memo, useRef, useEffect, useState } from 'react';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import type { PageContent } from 'models';
@@ -231,7 +231,20 @@ function ThreadCreatedDate ({ createdAt }: {createdAt: Date}) {
   );
 }
 
-export const CommentDate = memo<{createdAt: string, updatedAt?: string | null}>(({ createdAt, updatedAt }) => {
+export const CommentDate = memo<{ createdAt: string, updatedAt?: string | null }>(({ createdAt, updatedAt }) => {
+
+  const getDateTime = () => DateTime.fromISO(createdAt);
+
+  const [dateTime, setTime] = useState(getDateTime());
+
+  // update once a minute
+  useEffect(() => {
+    const interval = setInterval(() => setTime(getDateTime()), 60 * 1000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
   return (
     <Typography
       sx={{
@@ -245,7 +258,7 @@ export const CommentDate = memo<{createdAt: string, updatedAt?: string | null}>(
     >
       <Tooltip arrow placement='top' title={new Date(createdAt).toLocaleString()}>
         <span>
-          {DateTime.fromISO(createdAt).toRelative({ base: DateTime.now(), style: 'short' })}
+          {dateTime.toRelative({ style: 'short', unit: ['minutes', 'days', 'hours', 'months', 'years'] })}
         </span>
       </Tooltip>
       {updatedAt && (

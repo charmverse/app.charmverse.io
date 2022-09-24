@@ -6,26 +6,26 @@ import { useEffect, useState } from 'react';
 import Button from 'components/common/Button';
 import { acceptAll } from 'components/common/CharmEditor/components/suggestions/track/acceptAll';
 import { rejectAll } from 'components/common/CharmEditor/components/suggestions/track/rejectAll';
-import { getTracksFromDoc } from 'components/common/CharmEditor/components/suggestions/track/getTracks';
+import { getEventsFromDoc } from 'components/common/CharmEditor/components/suggestions/getEvents';
 import { SuggestionCard } from 'components/common/CharmEditor/components/suggestions/SuggestionCard';
 import { NoCommentsMessage } from './CommentsSidebar';
 
 export function SuggestionsSidebar ({ readOnly, state }: { readOnly: boolean, state: EditorState | null }) {
   const view = useEditorViewContext();
 
-  const [suggestions, setSuggestions] = useState<ReturnType<typeof getTracksFromDoc>>([]);
+  const [suggestions, setSuggestions] = useState<ReturnType<typeof getEventsFromDoc>>([]);
 
   // listen to changes on the doc like when suggestions are added/deleted
   useEffect(() => {
     if (view.state) {
-      setSuggestions(getTracksFromDoc({ state: view.state }));
+      setSuggestions(getEventsFromDoc({ state: view.state }));
     }
   }, [view.state.doc]);
 
   // listen to changes from selection (see CharmEditor)
   useEffect(() => {
     if (state) {
-      setSuggestions(getTracksFromDoc({ state }));
+      setSuggestions(getEventsFromDoc({ state }));
     }
   }, [state]);
 
@@ -52,7 +52,13 @@ export function SuggestionsSidebar ({ readOnly, state }: { readOnly: boolean, st
         </Box>
       )}
       <Stack gap={2}>
-        {suggestions.map(props => <SuggestionCard key={props.pos + props.type} {...props} />)}
+        {suggestions.map(props => (
+          <SuggestionCard
+            key={props.pos + props.type}
+            {...props}
+            readOnly={readOnly}
+          />
+        ))}
       </Stack>
       {suggestions.length === 0 && (
         <NoCommentsMessage

@@ -7,7 +7,7 @@ import UserDisplay from 'components/common/UserDisplay';
 import { CommentDate } from '../PageThread';
 import { accept } from './track/accept';
 import { reject } from './track/reject';
-import type { getTracksFromDoc } from './track/getTracks';
+import type { getEventsFromDoc } from './getEvents';
 import type { TrackType } from './track/interfaces';
 
 const FORMAT_MARK_NAMES: Record<string, string> = {
@@ -43,7 +43,9 @@ const ACTIONS: Record<string, string> = {
   block_change_codeBlock: 'Changed into code block'
 };
 
-export function SuggestionCard ({ active, data, node, pos, type }: ReturnType<typeof getTracksFromDoc>[number]) {
+type Props = ReturnType<typeof getEventsFromDoc>[number] & { readOnly?: boolean };
+
+export function SuggestionCard ({ readOnly, active, data, node, pos, type }: Props) {
   const view = useEditorViewContext();
   const [contributors] = useContributors();
 
@@ -63,30 +65,32 @@ export function SuggestionCard ({ active, data, node, pos, type }: ReturnType<ty
             <SidebarUser user={contributors.find(contributor => contributor.id === data.user)} />
             <CommentDate createdAt={data.date} />
           </Box>
-          <Box display='flex' gap={1}>
-            <Tooltip title='Accept suggestion'>
-              <IconButton
-                color='primary'
-                onClick={() => {
-                  acceptOne(type, pos);
-                }}
-                size='small'
-              >
-                <Check />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title='Reject suggestion'>
-              <IconButton
-                color='primary'
-                size='small'
-                onClick={() => {
-                  rejectOne(type, pos);
-                }}
-              >
-                <Close />
-              </IconButton>
-            </Tooltip>
-          </Box>
+          {readOnly ? null : (
+            <Box display='flex' gap={1}>
+              <Tooltip title='Accept suggestion'>
+                <IconButton
+                  color='primary'
+                  onClick={() => {
+                    acceptOne(type, pos);
+                  }}
+                  size='small'
+                >
+                  <Check />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title='Reject suggestion'>
+                <IconButton
+                  color='primary'
+                  size='small'
+                  onClick={() => {
+                    rejectOne(type, pos);
+                  }}
+                >
+                  <Close />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          )}
         </Box>
         <Typography variant='body2'>
           {type === 'format_change' && data.before instanceof Array && data.after instanceof Array && <FormatChangeDisplay before={data.before} after={data.after} />}

@@ -1,20 +1,11 @@
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import { Box, Button, ClickAwayListener, Grow, Paper, TextField } from '@mui/material';
-import { useThreads } from 'hooks/useThreads';
+import { ClickAwayListener, Grow, Paper } from '@mui/material';
 import { createPortal } from 'react-dom';
-import { hideSelectionTooltip } from '@bangle.dev/tooltip/selection-tooltip';
-import charmClient from 'charmClient';
-import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
-import { checkForEmpty } from 'components/common/CharmEditor/utils';
-import { useInlineComment } from 'hooks/useInlineComment';
-import { usePages } from 'hooks/usePages';
-import type { PageContent } from 'models';
 import type { PluginKey } from 'prosemirror-state';
-import { TextSelection } from 'prosemirror-state';
-import React, { useState } from 'react';
+import React from 'react';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
-import { getTracksFromDoc } from './track/getTracks';
+import { getEventsFromDoc } from './getEvents';
 import { hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
 import type { SuggestionPluginState } from './plugins';
 
@@ -40,7 +31,7 @@ export default function SuggestionsPopup ({ pluginKey }: { pluginKey: PluginKey<
 
   const { currentPageActionDisplay } = usePageActionDisplay();
   if ((currentPageActionDisplay !== 'suggestions' || cardId) && isVisible) {
-    const suggestions = getTracksFromDoc({ state: view.state });
+    const suggestions = getEventsFromDoc({ state: view.state });
     const suggestionPos = parseInt(pos || '', 10);
     const suggestion = suggestions.find(s => s.pos === suggestionPos || s.active);
     if (!suggestion) {

@@ -1,6 +1,6 @@
 import type { EditorState, Node } from '@bangle.dev/pm';
-import type { TrackAttribute, TrackType } from './interfaces';
-import { getSelectedChanges } from '../statePlugins/track';
+import type { TrackAttribute, TrackType } from './track/interfaces';
+import { getSelectedChanges } from './statePlugins/track';
 
 interface TrackAttribute2 {
   type: TrackAttribute['type'];
@@ -13,26 +13,26 @@ interface GetTracksProps {
   lastNodeTracks: TrackAttribute2[];
 }
 
-export function getTracksFromDoc ({ state }: { state: EditorState }) {
+export function getEventsFromDoc ({ state }: { state: EditorState }) {
 
   const selectedChanges = getSelectedChanges(state);
 
   let lastNode = state.doc;
   let lastNodeTracks: TrackAttribute2[] = [];
 
-  const suggestions: (TrackAttribute2 & { node: Node, pos: number, active: boolean })[] = [];
+  const trackEvents: (TrackAttribute2 & { node: Node, pos: number, active: boolean })[] = [];
 
   state.doc.descendants(
     (node, pos) => {
 
-      lastNodeTracks = getTracks({
+      lastNodeTracks = getEventsFromNode({
         node,
         lastNode,
         lastNodeTracks
       });
 
       lastNodeTracks.forEach(track => {
-        suggestions.push({
+        trackEvents.push({
           node,
           pos,
           active: selectedChanges[track.type] && selectedChanges[track.type].from === pos,
@@ -42,10 +42,10 @@ export function getTracksFromDoc ({ state }: { state: EditorState }) {
       lastNode = node;
     }
   );
-  return suggestions;
+  return trackEvents;
 }
 
-function getTracks ({ node, lastNode, lastNodeTracks }: GetTracksProps) {
+function getEventsFromNode ({ node, lastNode, lastNodeTracks }: GetTracksProps) {
 
   const trackAttr: TrackAttribute[] | undefined = node.attrs.track;
 
