@@ -29,14 +29,14 @@ describe('Updates the proposal of a page', () => {
       proposalStatus: 'review'
     });
 
-    const updatedProposal = await updateProposalStatus({
+    const { proposal } = await updateProposalStatus({
       proposal: pageWithProposal.proposal!,
       newStatus: 'reviewed',
       userId: user.id
     });
-    expect(updatedProposal.status).toBe('reviewed');
-    expect(updatedProposal.reviewedBy).not.toBeNull();
-    expect(updatedProposal.reviewedAt).not.toBeNull();
+    expect(proposal.status).toBe('reviewed');
+    expect(proposal.reviewedBy).not.toBeNull();
+    expect(proposal.reviewedAt).not.toBeNull();
   });
 
   it('Move a reviewed proposal to discussion status and unassign proposal reviewer and reviewed at fields', async () => {
@@ -48,14 +48,14 @@ describe('Updates the proposal of a page', () => {
       proposalStatus: 'reviewed'
     });
 
-    const updatedProposal = await updateProposalStatus({
+    const { proposal } = await updateProposalStatus({
       proposal: pageWithProposal.proposal!,
       newStatus: 'discussion',
       userId: user.id
     });
-    expect(updatedProposal.status).toBe('discussion');
-    expect(updatedProposal.reviewedBy).toBeNull();
-    expect(updatedProposal.reviewedAt).toBeNull();
+    expect(proposal.status).toBe('discussion');
+    expect(proposal.reviewedBy).toBeNull();
+    expect(proposal.reviewedAt).toBeNull();
   });
 
   it('Throw error when trying to move a draft proposal to review', async () => {
@@ -102,7 +102,7 @@ describe('Updates the proposal of a page', () => {
       reviewers: [reviewer.id, { type: 'role', roleId: reviewerRole.id }]
     });
 
-    const proposal = await updateProposalStatus({
+    const { proposal } = await updateProposalStatus({
       proposal: pageWithProposal.proposalId as string,
       newStatus,
       userId: user.id
