@@ -1,14 +1,20 @@
+import type { ProposalStatus } from '@prisma/client';
 import type { SpaceEvent } from 'lib/metrics/mixpanel/interfaces';
 import type { ResourceEvent } from './index';
 
-interface ProposaEvent extends SpaceEvent, ResourceEvent {}
+interface ProposalEvent extends SpaceEvent, ResourceEvent {}
 
-interface ProposalStageEvent extends ProposaEvent {
-  stageName: string
+interface ProposalStatusUpdatedEvent extends ProposalEvent {
+  status: ProposalStatus;
+}
+
+interface ProposalVoteCastedEvent extends ProposalEvent {
+  paltform: 'charmverse' | 'snapshot'
 }
 
 export interface ProposalEvents {
-  ProposalCreated: ProposaEvent
-  ProposalStageCreated: ProposalStageEvent
+  ProposalCreated: ProposalEvent;
+  ProposalStatusUpdated: ProposalStatusUpdatedEvent;
+  ProposalVoteCasted: ProposalVoteCastedEvent;
 }
 

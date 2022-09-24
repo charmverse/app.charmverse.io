@@ -1,3 +1,4 @@
+import { trackUserAction } from 'lib/metrics/mixpanel/server';
 
 import type { ProposalStatus } from '@prisma/client';
 import { prisma } from 'db';
@@ -50,6 +51,8 @@ async function updateProposalStatusController (req: NextApiRequest, res: NextApi
     newStatus,
     userId
   });
+
+  trackUserAction('ProposalStatusUpdated', { userId, resourceId: proposalId, status: newStatus, spaceId: proposal.spaceId });
 
   return res.status(200).end();
 }

@@ -1,3 +1,4 @@
+import { trackUserAction } from 'lib/metrics/mixpanel/server';
 import type { ProposalStatus, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { v4 as uuid } from 'uuid';
@@ -76,6 +77,8 @@ export async function createProposal (pageProps: ProposalPageInput, proposalProp
       prisma.pagePermission.create(args)
     ))
   ]);
+
+  trackUserAction('ProposalCreated', { userId: createdBy, resourceId: proposal.id, spaceId });
 
   return { page, proposal, workspaceEvent };
 }
