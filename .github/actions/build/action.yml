@@ -17,6 +17,10 @@ runs:
       with:
         path: .next
         key: next-build-${{ github.sha }}
+      run: |
+        git fetch --no-tags --depth=1 origin main
+        git checkout -b main
+        git checkout ${{ github.event.pull_request.head.sha }}
 
     # Re-build prisma types which are cached inside of node_modules
     - name: Re-build Prisma types
