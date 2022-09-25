@@ -40,6 +40,9 @@ jobs:
       - name: Setup test database
         run: bash ./scripts/configure-db.sh
 
+      - name: Run tests on recent changes
+        run: npm run test:ci:changed
+
       - name: Run basic tests
         run: npm run test:ci
 
