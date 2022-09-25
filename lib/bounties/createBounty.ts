@@ -25,6 +25,9 @@ export async function createBounty ({
   permissions
 }: BountyCreationData) {
 
+  // Test commit to trigger CI
+  const test = 1;
+
   const validCreationStatuses: BountyStatus[] = ['suggestion', 'open'];
 
   const statusIsInvalid = status && validCreationStatuses.indexOf(status) === -1;
