@@ -199,7 +199,7 @@ export function amendTransaction (tr: Transaction, state: EditorState, user: { i
     return tr;
   }
   else {
-    // console.log('track', tr.docChanged, tr);
+    // console.log('track transaction', tr);
     return trackedTransaction(
       tr,
       state,
@@ -240,6 +240,7 @@ export function trackedTransaction (tr: Transaction, state: EditorState, user: {
             step.structure
           )
           : false;
+
       // We didn't apply the original step in its original place. We adjust the map accordingly.
       const invertStep = originalStep.invert(tr.docs[originalStepIndex]).map(map);
       if (invertStep) {

@@ -149,7 +149,7 @@ function getDecorations (state: EditorState) {
       rowPos: row.pos,
       firstMarkPos,
       count: row.marks.length
-    }), { key: widgetPos.toString() });
+    }), { key: widgetPos.toString(), side: -1 });
   });
 
   return DecorationSet.create(state.doc, decorations);
