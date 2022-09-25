@@ -5,9 +5,9 @@ runs:
   using: 'composite'
   steps:
     - uses: actions/checkout@v2
-    - run: |
-        git fetch --no-tags --depth=1 origin main
-        git checkout ${{ github.sha }}
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+    - run: git fetch --no-tags --depth=1 origin main
       shell: bash
 
     - uses: actions/setup-node@v3
