@@ -199,12 +199,11 @@ export function amendTransaction (tr: Transaction, state: EditorState, user: { i
     return tr;
   }
   else {
-    // console.log('track suggestion', tr.docChanged, tr);
+    // console.log('track', tr.docChanged, tr);
     return trackedTransaction(
       tr,
       state,
       user,
-      false,
       !trackingEnabled,
       new Date()
     );
