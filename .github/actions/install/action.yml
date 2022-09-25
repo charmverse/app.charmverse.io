@@ -5,11 +5,11 @@ runs:
   using: 'composite'
   steps:
     - uses: actions/checkout@v2
-      shell: bash
-      run: |
+    - run: |
         git fetch --no-tags --depth=1 origin main
         git checkout -b main
         git checkout ${{ github.event.pull_request.head.sha }}
+      shell: bash
 
     - uses: actions/setup-node@v3
       with:
