@@ -25,7 +25,12 @@ export function activateTrack (view: EditorView, type: string, pos: number) {
     const selectedMark = view.domAtPos(pos).node as HTMLElement;
     if (selectedMark) {
       // use a library to scroll since charmeditor is inside a container element
-      scrollIntoView(selectedMark, { scrollMode: 'if-needed', behavior: 'smooth' });
+      try {
+        scrollIntoView(selectedMark, { scrollMode: 'if-needed', behavior: 'smooth' });
+      }
+      catch (err) {
+        // sometimes invalid target when removing elements
+      }
     }
   }
 }
