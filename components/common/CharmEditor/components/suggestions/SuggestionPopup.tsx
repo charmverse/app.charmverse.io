@@ -1,13 +1,13 @@
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import { ClickAwayListener, Grow, Paper } from '@mui/material';
+import { Box, ClickAwayListener, Grow, Paper } from '@mui/material';
 import { createPortal } from 'react-dom';
 import type { PluginKey } from 'prosemirror-state';
 import React from 'react';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { getEventsFromDoc } from './getEvents';
 import { hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
-import type { SuggestionPluginState } from './plugins';
+import type { SuggestionPluginState } from './suggestions.plugins';
 
 import { SuggestionCard } from './SuggestionCard';
 
@@ -25,20 +25,17 @@ export default function SuggestionsPopup ({ pluginKey }: { pluginKey: PluginKey<
   const {
     tooltipContentDOM,
     show: isVisible,
-    pos
+    rowPos
   } = usePluginState(pluginKey) as SuggestionPluginState;
-  const cardId = (new URLSearchParams(window.location.href)).get('cardId');
-
   const { currentPageActionDisplay } = usePageActionDisplay();
-  if ((currentPageActionDisplay !== 'suggestions' || cardId) && isVisible) {
-    const suggestions = getEventsFromDoc({ state: view.state });
-    const suggestionPos = parseInt(pos || '', 10);
-    const suggestion = suggestions.find(s => s.pos === suggestionPos || s.active);
-    if (!suggestion) {
-      return null;
-    }
-    const { active, ...rest } = suggestion; // dont show suggestion card as active
-    // Only show comment thread on inline comment if the page threads list is not active
+
+  const isInPageDialog = (new URLSearchParams(window.location.href)).get('cardId');
+  const popupIsVisible = (currentPageActionDisplay !== 'suggestions' || isInPageDialog) && isVisible;
+
+  if (popupIsVisible) {
+    const rows = getEventsFromDoc({ state: view.state });
+    const activeSuggestion = rows.map(row => row.marks).flat().find(mark => mark.active);
+    const suggestions = activeSuggestion ? [activeSuggestion] : rows.find(row => row.pos === rowPos)?.marks ?? [];
     return createPortal(
       <ClickAwayListener onClickAway={() => {
         hideSuggestionsTooltip(pluginKey)(view.state, view.dispatch, view);
@@ -54,9 +51,14 @@ export default function SuggestionsPopup ({ pluginKey }: { pluginKey: PluginKey<
           }}
           timeout={250}
         >
-          <ThreadContainer elevation={4}>
-            <SuggestionCard active={false} {...rest} />
-          </ThreadContainer>
+          <Box display='flex' flexDirection='column' gap={1}>
+            {suggestions.map(suggestion => (
+              // dont show suggestion card as active when inside popup
+              <ThreadContainer elevation={4} sx={{ background: 'transparent' }}>
+                <SuggestionCard {...suggestion} active={false} />
+              </ThreadContainer>
+            ))}
+          </Box>
         </Grow>
       </ClickAwayListener>,
       tooltipContentDOM

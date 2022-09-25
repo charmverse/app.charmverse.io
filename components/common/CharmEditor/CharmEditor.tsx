@@ -75,7 +75,7 @@ import { checkForEmpty } from './utils';
 import trackStyles from './components/suggestions/styles';
 import { rejectAll } from './components/suggestions/track/rejectAll';
 import { getSelectedChanges } from './components/suggestions/statePlugins/track';
-import { plugins as trackPlugins } from './components/suggestions/plugins';
+import { plugins as trackPlugins } from './components/suggestions/suggestions.plugins';
 import SuggestionsPopup from './components/suggestions/SuggestionPopup';
 import SidebarDrawer from './components/SidebarDrawer';
 
@@ -97,7 +97,7 @@ export function charmEditorPlugins (
   {
     onContentChange,
     onSelectionSet,
-    readOnly,
+    readOnly = false,
     disablePageSpecificFeatures = false,
     enableVoting,
     enableComments = true,
@@ -419,6 +419,7 @@ function CharmEditor (
   const [suggestionState, setSuggestionState] = useState<EditorState | null>(null);
 
   function onSelectionSet (state: EditorState) {
+    // update state that triggers updates in the sidebar
     setSuggestionState(state);
     // expand the sidebar if the user is selecting a suggestion
     setCurrentPageActionDisplay(sidebarState => {
@@ -620,13 +621,13 @@ function CharmEditor (
       {!disablePageSpecificFeatures && (
         <>
           <SidebarDrawer id='page-suggestion-list-box' title='Suggestions' open={pageActionDisplay === 'suggestions'}>
-            <SuggestionsSidebar readOnly={!pagePermissions?.edit_content} state={suggestionState} />
+            {pageActionDisplay === 'suggestions' && <SuggestionsSidebar readOnly={!pagePermissions?.edit_content} state={suggestionState} />}
           </SidebarDrawer>
           <SidebarDrawer id='page-comment-list-box' title='Comments' open={pageActionDisplay === 'comments'}>
-            <CommentsSidebar />
+            {pageActionDisplay === 'comments' && <CommentsSidebar />}
           </SidebarDrawer>
           <SidebarDrawer id='page-vote-list-box' title='Polls' open={pageActionDisplay === 'polls'}>
-            <PageInlineVotesList />
+            {pageActionDisplay === 'polls' && <PageInlineVotesList />}
           </SidebarDrawer>
           <InlineCommentThread pluginKey={inlineCommentPluginKey} />
           {enableVoting && <InlineVoteList pluginKey={inlineVotePluginKey} />}

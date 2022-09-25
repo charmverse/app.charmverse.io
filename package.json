@@ -177,6 +177,7 @@
     "react-select": "^5.2.1",
     "react-window": "^1.8.7",
     "reselect": "^4.0.0",
+    "scroll-into-view-if-needed": "^2.2.29",
     "sharp": "^0.30.5",
     "swagger-ui-react": "4.6.1",
     "swr": "^1.2.1",

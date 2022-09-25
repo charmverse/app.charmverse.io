@@ -6,26 +6,28 @@ import { useEffect, useState } from 'react';
 import Button from 'components/common/Button';
 import { acceptAll } from 'components/common/CharmEditor/components/suggestions/track/acceptAll';
 import { rejectAll } from 'components/common/CharmEditor/components/suggestions/track/rejectAll';
+import type { TrackedEvent } from 'components/common/CharmEditor/components/suggestions/getEvents';
 import { getEventsFromDoc } from 'components/common/CharmEditor/components/suggestions/getEvents';
 import { SuggestionCard } from 'components/common/CharmEditor/components/suggestions/SuggestionCard';
+import { activateTrack } from 'components/common/CharmEditor/components/suggestions/statePlugins/track/helpers';
 import { NoCommentsMessage } from './CommentsSidebar';
 
 export function SuggestionsSidebar ({ readOnly, state }: { readOnly: boolean, state: EditorState | null }) {
   const view = useEditorViewContext();
 
-  const [suggestions, setSuggestions] = useState<ReturnType<typeof getEventsFromDoc>>([]);
+  const [suggestions, setSuggestions] = useState<TrackedEvent[]>([]);
 
   // listen to changes on the doc like when suggestions are added/deleted
   useEffect(() => {
-    if (view.state) {
-      setSuggestions(getEventsFromDoc({ state: view.state }));
-    }
+    const marks = getEventsFromDoc({ state: view.state }).map(r => r.marks).flat();
+    setSuggestions(marks);
   }, [view.state.doc]);
 
   // listen to changes from selection (see CharmEditor)
   useEffect(() => {
     if (state) {
-      setSuggestions(getEventsFromDoc({ state }));
+      const marks = getEventsFromDoc({ state }).map(r => r.marks).flat();
+      setSuggestions(marks);
     }
   }, [state]);
 
@@ -37,6 +39,10 @@ export function SuggestionsSidebar ({ readOnly, state }: { readOnly: boolean, st
 
   function clickRejectAll () {
     rejectAll(view);
+  }
+
+  function highlightMark (mark: TrackedEvent) {
+    activateTrack(view, mark.type, mark.pos);
   }
 
   return (
@@ -52,12 +58,14 @@ export function SuggestionsSidebar ({ readOnly, state }: { readOnly: boolean, st
         </Box>
       )}
       <Stack gap={2}>
-        {suggestions.map(props => (
-          <SuggestionCard
-            key={props.pos + props.type}
-            {...props}
-            readOnly={readOnly}
-          />
+        {suggestions.map(mark => (
+          <div onClick={() => highlightMark(mark)} key={mark.pos}>
+            <SuggestionCard
+              key={mark.pos + mark.type}
+              {...mark}
+              readOnly={readOnly}
+            />
+          </div>
         ))}
       </Stack>
       {suggestions.length === 0 && (

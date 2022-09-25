@@ -12,7 +12,7 @@ export interface SuggestionPluginState {
   tooltipContentDOM: HTMLElement;
   show: boolean;
   // use pos because we can't generate unique ids for marks - they are merged automatically by PM when calling addMark(), UNLESS there are any unique properties
-  pos?: string;
+  rowPos?: number;
 }
 
 export function plugins ({ onSelectionSet, key, readOnly, userId, username }:
@@ -29,9 +29,9 @@ export function plugins ({ onSelectionSet, key, readOnly, userId, username }:
           return false;
         },
         apply (tr, prev, oldState, state) {
-          // react to when something is clicked
-          if (tr.selectionSet && onSelectionSet) {
-            onSelectionSet(state);
+          // react to when something is clicked, or when a selection is set by the sidebar component
+          if ((tr.selectionSet || oldState.selection.eq(state.selection))) {
+            onSelectionSet?.(state);
           }
           return prev;
         }
@@ -44,7 +44,7 @@ export function plugins ({ onSelectionSet, key, readOnly, userId, username }:
           return {
             show: false,
             tooltipContentDOM: tooltipDOMSpec.contentDOM,
-            pos: undefined
+            rowPos: undefined
           };
         },
         apply (tr, pluginState) {
@@ -66,7 +66,7 @@ export function plugins ({ onSelectionSet, key, readOnly, userId, username }:
             return {
               ...pluginState,
               show: false,
-              pos: undefined
+              rowPos: undefined
             };
           }
           throw new Error('Unknown type');
@@ -81,13 +81,6 @@ export function plugins ({ onSelectionSet, key, readOnly, userId, username }:
           if (isSuggestion) {
             renderSuggestionsTooltip(key, {})(view.state, view.dispatch, view);
             return true;
-            // return highlightMarkedElement({
-            //   view,
-            //   elementId: 'page-suggestion-list-box',
-            //   key,
-            //   markName: 'insertion',
-            //   prefix: 'suggestion'
-            // });
           }
           return false;
         }
@@ -114,6 +107,7 @@ export function plugins ({ onSelectionSet, key, readOnly, userId, username }:
           return getDecorations(state);
         },
         apply (tr, old, _, editorState) {
+          // listen for 'track' event so that we update the decorations
           return tr.docChanged ? getDecorations(editorState) : old;
         }
       },
@@ -122,14 +116,19 @@ export function plugins ({ onSelectionSet, key, readOnly, userId, username }:
           return this.getState(state);
         },
         handleClickOn: (view, pos: number, node, nodePos, event) => {
-          const iconContainer = (event.target as HTMLElement)?.closest('.charm-row-decoration-suggestions');
-          const suggestionPos = iconContainer?.getAttribute('data-pos');
-          if (suggestionPos) {
+          const widgetContainer = (event.target as HTMLElement)?.closest('.charm-row-decoration-suggestions');
+          const markPos = widgetContainer?.getAttribute('data-mark-pos');
+          const rowPos = widgetContainer?.getAttribute('data-pos');
+          if (rowPos && markPos) {
             const { tr } = view.state;
-            const selectedPos = parseInt(suggestionPos, 0) + 1;
-            tr.setSelection(Selection.near(tr.doc.resolve(selectedPos)));
+            // set a selection based on the first mark so the tooltip appears in the correct place
+            // Note: for some reason this doesn't work well if the first mark is the top parent; the popup appears in the middle of the editor
+            const markPosInt = parseInt(markPos, 10);
+            // use rowPos so that the suggestions popup can grab all related suggestions
+            const rowPosInt = parseInt(rowPos, 10);
+            tr.setSelection(Selection.near(tr.doc.resolve(markPosInt)));
             view.dispatch(tr);
-            renderSuggestionsTooltip(key, { pos: suggestionPos })(view.state, view.dispatch, view);
+            renderSuggestionsTooltip(key, { rowPos: rowPosInt })(view.state, view.dispatch, view);
             return true;
           }
           return false;
@@ -144,21 +143,25 @@ function getDecorations (state: EditorState) {
   const rows = getEventsFromDoc({ state });
   const decorations: Decoration[] = rows.map(row => {
     // inject decoration at the start of the paragraph/header
-    const firstPos = row.pos + 1;
-    return Decoration.widget(firstPos, () => renderComponent({ pos: row.pos }), { key: firstPos.toString() });
+    const widgetPos = row.pos + 1;
+    const firstMarkPos = row.marks[0].pos;
+    return Decoration.widget(widgetPos, () => renderComponent({
+      rowPos: row.pos,
+      firstMarkPos,
+      count: row.marks.length
+    }), { key: widgetPos.toString() });
   });
 
   return DecorationSet.create(state.doc, decorations);
 }
 
-function renderComponent ({ pos }: { pos: number }) {
-
-  // const ids = nodesWithMark.map(node => node.marks[0]?.attrs.id).filter(Boolean);
+function renderComponent ({ rowPos, firstMarkPos, count }: { rowPos: number, firstMarkPos: number, count: number }) {
 
   const container = document.createElement('div');
   container.className = 'charm-row-decoration-suggestions charm-row-decoration';
-  container.setAttribute('data-pos', pos.toString());
-  reactDOM.render(<RowDecoration count={1} icon={RateReviewOutlined} />, container);
+  container.setAttribute('data-pos', rowPos.toString());
+  container.setAttribute('data-mark-pos', firstMarkPos.toString());
+  reactDOM.render(<RowDecoration count={count} icon={RateReviewOutlined} />, container);
 
   return container;
 }

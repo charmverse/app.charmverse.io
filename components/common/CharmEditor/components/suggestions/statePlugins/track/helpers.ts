@@ -1,5 +1,6 @@
-import type { EditorState, Node, Mark, Transaction } from '@bangle.dev/pm';
-import { Decoration, DecorationSet } from '@bangle.dev/pm';
+import type { EditorState, EditorView, Node, Mark, Transaction } from '@bangle.dev/pm';
+import { Decoration, DecorationSet, Selection } from '@bangle.dev/pm';
+import scrollIntoView from 'scroll-into-view-if-needed';
 
 import {
   key,
@@ -10,6 +11,24 @@ import {
 } from './plugin';
 
 import type { TrackAttribute } from '../../track/interfaces';
+
+export function activateTrack (view: EditorView, type: string, pos: number) {
+
+  const tr = setSelectedChanges(
+    view.state,
+    type,
+    pos
+  );
+
+  if (tr) {
+    view.dispatch(tr);
+    const selectedMark = view.domAtPos(pos).node as HTMLElement;
+    if (selectedMark) {
+      // use a library to scroll since charmeditor is inside a container element
+      scrollIntoView(selectedMark, { scrollMode: 'if-needed', behavior: 'smooth' });
+    }
+  }
+}
 
 export function getSelectedChanges (state: EditorState) {
   const keyState = key.getState(state) as { decos: typeof DecorationSet.empty } | undefined;
@@ -36,8 +55,9 @@ export function setSelectedChanges (state: EditorState, type: string, pos: numbe
     return;
   }
   const selectedChange = node.isInline ? getFromToMark(tr.doc, pos, mark) : { from: pos, to: pos + node.nodeSize };
-  let decos = DecorationSet.empty; let
-    spec;
+
+  let decos = DecorationSet.empty;
+  let spec;
   if (type === 'insertion') {
     spec = selectedInsertionSpec;
   }

@@ -2,16 +2,18 @@ import type { EditorState, Node } from '@bangle.dev/pm';
 import type { TrackAttribute, TrackType } from './track/interfaces';
 import { getSelectedChanges } from './statePlugins/track';
 
-interface TrackAttribute2 {
+type TrackAttribute2 = {
   type: TrackAttribute['type'];
   data: Omit<TrackAttribute, 'type'>;
 }
 
-interface GetTracksProps {
+type GetTracksProps = {
   node: Node;
   lastNode: Node;
   lastNodeTracks: TrackAttribute2[];
 }
+
+export type TrackedEvent = (TrackAttribute2 & { node: Node, pos: number, active: boolean });
 
 export function getEventsFromDoc ({ state }: { state: EditorState }) {
 
@@ -20,10 +22,16 @@ export function getEventsFromDoc ({ state }: { state: EditorState }) {
   let lastNode = state.doc;
   let lastNodeTracks: TrackAttribute2[] = [];
 
-  const trackEvents: (TrackAttribute2 & { node: Node, pos: number, active: boolean })[] = [];
+  const trackMarks: TrackedEvent[] = [];
+
+  const topChildren: { node: Node, pos: number }[] = [];
 
   state.doc.descendants(
-    (node, pos) => {
+    (node, pos, parent) => {
+
+      if (parent === state.doc) {
+        topChildren.push({ node, pos });
+      }
 
       lastNodeTracks = getEventsFromNode({
         node,
@@ -32,7 +40,7 @@ export function getEventsFromDoc ({ state }: { state: EditorState }) {
       });
 
       lastNodeTracks.forEach(track => {
-        trackEvents.push({
+        trackMarks.push({
           node,
           pos,
           active: selectedChanges[track.type] && selectedChanges[track.type].from === pos,
@@ -42,7 +50,15 @@ export function getEventsFromDoc ({ state }: { state: EditorState }) {
       lastNode = node;
     }
   );
-  return trackEvents;
+
+  const result = topChildren.map(({ node, pos }) => {
+    const from = pos;
+    const to = pos + node.nodeSize;
+    const marks = trackMarks.filter(({ pos: markPos }) => markPos >= from && markPos < to);
+    return { node, pos, marks };
+  }).filter(({ marks }) => marks.length > 0);
+
+  return result;
 }
 
 function getEventsFromNode ({ node, lastNode, lastNodeTracks }: GetTracksProps) {

@@ -7,7 +7,7 @@ import UserDisplay from 'components/common/UserDisplay';
 import { CommentDate } from '../PageThread';
 import { accept } from './track/accept';
 import { reject } from './track/reject';
-import type { getEventsFromDoc } from './getEvents';
+import type { getEventsFromDoc, TrackedEvent } from './getEvents';
 import type { TrackType } from './track/interfaces';
 
 const FORMAT_MARK_NAMES: Record<string, string> = {
@@ -43,7 +43,7 @@ const ACTIONS: Record<string, string> = {
   block_change_codeBlock: 'Changed into code block'
 };
 
-type Props = ReturnType<typeof getEventsFromDoc>[number] & { readOnly?: boolean };
+type Props = TrackedEvent & { readOnly?: boolean };
 
 export function SuggestionCard ({ readOnly, active, data, node, pos, type }: Props) {
   const view = useEditorViewContext();

@@ -139,6 +139,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
       }}
     >
       <Box
+        id='document-scroll-container'
         sx={{
           transition: 'width ease-in 0.25s',
           width: {
