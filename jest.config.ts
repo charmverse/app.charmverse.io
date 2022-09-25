@@ -10,6 +10,9 @@ import createJestConfig from 'testing/createJestConfig';
  * */
 export const jestConfig = {
 
+  // Make use of the cache
+  cacheDirectory: '.jest-cache',
+
   // Automatically clear mock calls, instances and results before every test
   clearMocks: true,
 
