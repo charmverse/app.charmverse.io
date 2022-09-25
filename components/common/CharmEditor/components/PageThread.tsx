@@ -258,7 +258,7 @@ export const CommentDate = memo<{ createdAt: string, updatedAt?: string | null }
     >
       <Tooltip arrow placement='top' title={new Date(createdAt).toLocaleString()}>
         <span>
-          {dateTime.toRelative({ style: 'short', unit: ['minutes', 'days', 'hours', 'months', 'years'] })}
+          {dateTime.toRelative({ style: 'short' })}
         </span>
       </Tooltip>
       {updatedAt && (

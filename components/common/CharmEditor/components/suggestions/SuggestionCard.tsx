@@ -7,7 +7,7 @@ import UserDisplay from 'components/common/UserDisplay';
 import { CommentDate } from '../PageThread';
 import { accept } from './track/accept';
 import { reject } from './track/reject';
-import type { getEventsFromDoc, TrackedEvent } from './getEvents';
+import type { TrackedEvent } from './getEvents';
 import type { TrackType } from './track/interfaces';
 
 const FORMAT_MARK_NAMES: Record<string, string> = {
@@ -38,16 +38,22 @@ const ACTIONS: Record<string, string> = {
   deletion_codeBlock: 'Removed code block',
   deletion_listItem: 'Lifted list item',
   deletion_table: 'Delete table',
+  block_change_bulletList: 'Added bullet list item',
+  block_change_orderedList: 'Added ordered list item',
+  block_change_listItem: 'Changed into list item',
   block_change_paragraph: 'Changed into paragraph',
   block_change_heading: 'Changed heading level',
   block_change_codeBlock: 'Changed into code block'
 };
 
-type Props = TrackedEvent & { readOnly?: boolean };
+// isOwner allows owners to always delete their own suggestions
+type Props = TrackedEvent & { readOnly?: boolean, isOwner?: boolean };
 
-export function SuggestionCard ({ readOnly, active, data, node, pos, type }: Props) {
+export function SuggestionCard ({ readOnly, isOwner, active, data, node, pos, type }: Props) {
   const view = useEditorViewContext();
   const [contributors] = useContributors();
+  // get parentNode for lists
+  const parentNode = pos > 0 ? view.state.doc.nodeAt(pos - 1) : null;
 
   function acceptOne (_type: string, _pos: number) {
     accept(_type, _pos, view);
@@ -65,8 +71,8 @@ export function SuggestionCard ({ readOnly, active, data, node, pos, type }: Pro
             <SidebarUser user={contributors.find(contributor => contributor.id === data.user)} />
             <CommentDate createdAt={data.date} />
           </Box>
-          {readOnly ? null : (
-            <Box display='flex' gap={1}>
+          <Box display='flex' gap={1}>
+            {!readOnly && (
               <Tooltip title='Accept suggestion'>
                 <IconButton
                   color='primary'
@@ -78,6 +84,8 @@ export function SuggestionCard ({ readOnly, active, data, node, pos, type }: Pro
                   <Check />
                 </IconButton>
               </Tooltip>
+            )}
+            {(!readOnly || isOwner) && (
               <Tooltip title='Reject suggestion'>
                 <IconButton
                   color='primary'
@@ -89,20 +97,32 @@ export function SuggestionCard ({ readOnly, active, data, node, pos, type }: Pro
                   <Close />
                 </IconButton>
               </Tooltip>
-            </Box>
-          )}
+            )}
+          </Box>
         </Box>
         <Typography variant='body2'>
           {type === 'format_change' && data.before instanceof Array && data.after instanceof Array && <FormatChangeDisplay before={data.before} after={data.after} />}
-          {type !== 'format_change' && <ActionDisplay type={type} nodeType={node.type.name} content={node.textContent} />}
+          {type !== 'format_change' && <FormattedAction type={type} parentNodeType={parentNode?.type.name} nodeType={node.type.name} content={node.textContent} />}
         </Typography>
       </Stack>
     </Paper>
   );
 }
 
-function ActionDisplay ({ type, nodeType, content }: { type: TrackType, nodeType: string, content?: string }) {
-  const nodeActionType = `${type}_${nodeType}`;
+type ActionInfo = {
+  type: TrackType;
+  nodeType: string;
+  parentNodeType?: string;
+  content?: string
+};
+
+// For these types, the nodeType would be 'paragraph' but we want to show the container type instead
+const containerNodeTypes = ['bulletList', 'orderedList', 'listItem'];
+
+function FormattedAction ({ type, nodeType, parentNodeType = '', content }: ActionInfo) {
+  const friendlyNodeType = containerNodeTypes.includes(parentNodeType) ? parentNodeType : nodeType;
+  const nodeActionType = `${type}_${friendlyNodeType}`;
+
   if (ACTIONS[nodeActionType]) {
     return <span>{ACTIONS[nodeActionType]}</span>;
   }

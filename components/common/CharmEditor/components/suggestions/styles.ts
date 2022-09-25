@@ -37,7 +37,7 @@ export default `
   }
 
   [data-track] {
-    position: relative;
+
   }
 
   [data-track]::before {

@@ -4,6 +4,7 @@ import { Box, Stack } from '@mui/material';
 import { Check, Close, RateReviewOutlined } from '@mui/icons-material';
 import { useEffect, useState } from 'react';
 import Button from 'components/common/Button';
+import { useUser } from 'hooks/useUser';
 import { acceptAll } from 'components/common/CharmEditor/components/suggestions/track/acceptAll';
 import { rejectAll } from 'components/common/CharmEditor/components/suggestions/track/rejectAll';
 import type { TrackedEvent } from 'components/common/CharmEditor/components/suggestions/getEvents';
@@ -15,6 +16,7 @@ import { NoCommentsMessage } from './CommentsSidebar';
 export function SuggestionsSidebar ({ readOnly, state }: { readOnly: boolean, state: EditorState | null }) {
   const view = useEditorViewContext();
 
+  const { user } = useUser();
   const [suggestions, setSuggestions] = useState<TrackedEvent[]>([]);
 
   // listen to changes on the doc like when suggestions are added/deleted
@@ -64,6 +66,7 @@ export function SuggestionsSidebar ({ readOnly, state }: { readOnly: boolean, st
               key={mark.pos + mark.type}
               {...mark}
               readOnly={readOnly}
+              isOwner={mark.data.user === user?.id}
             />
           </div>
         ))}

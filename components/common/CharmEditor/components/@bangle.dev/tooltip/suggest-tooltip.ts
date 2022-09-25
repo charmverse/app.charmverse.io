@@ -86,6 +86,7 @@ interface PluginsOptions {
   onArrowRight?: Command;
 }
 export interface SuggestTooltipPluginState {
+
   triggerText: string;
   show: boolean;
   counter: number;
@@ -291,9 +292,7 @@ function tooltipController ({
             }
             return;
           }
-
           renderSuggestionsTooltip(key, {})(view.state, view.dispatch, view);
-
         }
       };
     }

@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import type { PluginKey } from 'prosemirror-state';
 import React from 'react';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
+import { useUser } from 'hooks/useUser';
 import { getEventsFromDoc } from './getEvents';
 import { hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
 import type { SuggestionPluginState } from './suggestions.plugins';
@@ -20,7 +21,7 @@ const ThreadContainer = styled(Paper)`
   overflow: auto;
 `;
 
-export default function SuggestionsPopup ({ pluginKey }: { pluginKey: PluginKey<SuggestionPluginState> }) {
+export default function SuggestionsPopup ({ pluginKey, readOnly }: { pluginKey: PluginKey<SuggestionPluginState>, readOnly: boolean }) {
   const view = useEditorViewContext();
   const {
     tooltipContentDOM,
@@ -28,6 +29,7 @@ export default function SuggestionsPopup ({ pluginKey }: { pluginKey: PluginKey<
     rowPos
   } = usePluginState(pluginKey) as SuggestionPluginState;
   const { currentPageActionDisplay } = usePageActionDisplay();
+  const { user } = useUser();
 
   const isInPageDialog = (new URLSearchParams(window.location.href)).get('cardId');
   const popupIsVisible = (currentPageActionDisplay !== 'suggestions' || isInPageDialog) && isVisible;
@@ -54,8 +56,13 @@ export default function SuggestionsPopup ({ pluginKey }: { pluginKey: PluginKey<
           <Box display='flex' flexDirection='column' gap={1}>
             {suggestions.map(suggestion => (
               // dont show suggestion card as active when inside popup
-              <ThreadContainer elevation={4} sx={{ background: 'transparent' }}>
-                <SuggestionCard {...suggestion} active={false} />
+              <ThreadContainer key={suggestion.pos + suggestion.type} elevation={4} sx={{ background: 'transparent' }}>
+                <SuggestionCard
+                  {...suggestion}
+                  active={false}
+                  readOnly={readOnly}
+                  isOwner={suggestion.data.user === user?.id}
+                />
               </ThreadContainer>
             ))}
           </Box>

@@ -185,7 +185,8 @@ function markWrapping (
 export function amendTransaction (tr: Transaction, state: EditorState, user: { id: string, username: string }, trackingEnabled: boolean) {
 
   if (
-    !tr.steps.length
+    !tr.docChanged
+      || !tr.steps.length
       || ((tr as any).meta && (!Object.keys((tr as any).meta).every(
         // Only replace TRs that have no metadata or only inputType metadata
         metadata => ['inputType', 'uiEvent', 'paste'].includes(metadata)
@@ -198,6 +199,7 @@ export function amendTransaction (tr: Transaction, state: EditorState, user: { i
     return tr;
   }
   else {
+    // console.log('amendTransaction', tr.docChanged, tr);
     return trackedTransaction(
       tr,
       state,

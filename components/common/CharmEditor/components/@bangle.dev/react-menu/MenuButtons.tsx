@@ -1,17 +1,17 @@
 import {
   blockquote,
   bold,
-  bulletList,
   code,
-  heading,
   history,
   italic,
   link,
-  orderedList,
-  paragraph,
   strike,
   underline
 } from '@bangle.dev/base-components';
+import * as orderedList from '../../orderedList';
+import * as bulletList from '../../bulletList';
+import * as heading from '../../heading';
+import paragraph from '../../paragraph';
 import { Command, EditorState, PluginKey } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { BoldIcon, BulletListIcon, CodeIcon, ItalicIcon, LinkIcon, OrderedListIcon, ParagraphIcon, RedoIcon, TodoListIcon, UndoIcon } from '@bangle.dev/react-menu';

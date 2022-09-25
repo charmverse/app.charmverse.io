@@ -631,7 +631,7 @@ function CharmEditor (
           </SidebarDrawer>
           <InlineCommentThread pluginKey={inlineCommentPluginKey} />
           {enableVoting && <InlineVoteList pluginKey={inlineVotePluginKey} />}
-          {!readOnly && <SuggestionsPopup pluginKey={suggestionsPluginKey} />}
+          <SuggestionsPopup pluginKey={suggestionsPluginKey} readOnly={readOnly} />
         </>
       )}
       {!readOnly && <DevTools />}
