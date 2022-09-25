@@ -41,15 +41,15 @@ jobs:
         run: bash ./scripts/configure-db.sh
 
       - name: Run tests on recent changes
-        run: npm run test:ci:changed
+        run: |
+          npm run start:test:ci &
+          npm run test:ci:changed
 
       - name: Run basic tests
         run: npm run test:ci
 
       - name: Run server integration tests
-        run: |
-          npm run start:test:ci &
-          npm run test:server:ci
+        run: npm run test:server:ci
 
       - name: Run browser tests
         run: npm run test:browser:ci
