@@ -43,7 +43,7 @@ jobs:
       - name: Run tests on recent changes
         run: |
           npm run start:test:ci &
-          COMPARE_TO=${{github.event.pull_request.head.sha}} && npm run test:ci:changed
+          COMPARE_TO=${{github.event.pull_request.base.sha}} && npm run test:ci:changed
 
       - name: Run basic tests
         run: npm run test:ci
