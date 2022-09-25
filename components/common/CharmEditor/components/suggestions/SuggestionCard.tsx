@@ -62,6 +62,7 @@ export function SuggestionCard ({ readOnly, isOwner, active, data, node, pos, ty
   function rejectOne (_type: string, _pos: number) {
     reject(_type, _pos, view);
   }
+  // console.log('SuggestionCard', { parentNode, pos, parentPos: pos - 1, node, type });
 
   return (
     <Paper sx={{ p: 2, left: active ? -16 : 0, position: 'relative', transition: 'left ease-in .15s' }} elevation={active ? 4 : 0} variant={active ? undefined : 'outlined'}>
@@ -117,7 +118,7 @@ type ActionInfo = {
 };
 
 // For these types, the nodeType would be 'paragraph' but we want to show the container type instead
-const containerNodeTypes = ['bulletList', 'orderedList', 'listItem'];
+const containerNodeTypes = ['listItem'];
 
 function FormattedAction ({ type, nodeType, parentNodeType = '', content }: ActionInfo) {
   const friendlyNodeType = containerNodeTypes.includes(parentNodeType) ? parentNodeType : nodeType;

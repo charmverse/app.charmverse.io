@@ -153,7 +153,6 @@ export function getSuggestTooltipKey (key: PluginKey) {
 export function replaceSuggestionMarkWith (key: PluginKey, replaceWith: string, setSelection?:boolean): Command {
   return (state, dispatch, view) => {
     const suggestTooltipKey = getSuggestTooltipKey(key)(state);
-    // console.log('replace suggestion mark', suggestTooltipKey);
     return suggestTooltip.replaceSuggestMarkWith(
       suggestTooltipKey,
       replaceWith,

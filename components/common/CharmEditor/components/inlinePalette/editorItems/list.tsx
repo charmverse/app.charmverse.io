@@ -33,7 +33,6 @@ export function items (): PaletteItemTypeNoGroup[] {
             setBlockType(_state.schema.nodes.paragraph)(_state, _dispatch);
             return toggleBulletList()(_view!.state, _view!.dispatch, _view);
           });
-
           return replaceSuggestionMarkWith(palettePluginKey, '')(
             state,
             dispatch,

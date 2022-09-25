@@ -430,7 +430,9 @@ export function replaceSuggestMarkWith (
       const { start, end } = queryMark;
       let tr = state.tr
         .removeStoredMark(markType)
-        .replaceWith(start, end, Fragment.empty);
+        .replaceWith(start, end, Fragment.empty)
+        // set meta so that track plugin ignores this transaction
+        .setMeta('suggestTooltipFeature', true);
 
       if (!maybeNode) {
         return tr;
@@ -450,7 +452,6 @@ export function replaceSuggestMarkWith (
         log.error('suggest-tooltip error', e);
         return tr;
       }
-
       if (node.isText) {
         tr = tr.replaceWith(start, start, node);
       }

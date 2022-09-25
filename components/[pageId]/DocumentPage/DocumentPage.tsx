@@ -142,6 +142,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
         id='document-scroll-container'
         sx={{
           transition: 'width ease-in 0.25s',
+          minWidth: 700,
           width: {
             md: showPageActionSidebar ? 'calc(100% - 430px)' : '100%'
           },
