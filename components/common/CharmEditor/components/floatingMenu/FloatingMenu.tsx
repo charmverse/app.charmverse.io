@@ -2,7 +2,6 @@ import type { PluginKey } from '@bangle.dev/core';
 import { FloatingMenu } from '@bangle.dev/react-menu';
 import type { PageType } from '@prisma/client';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
-import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import type { SubMenu } from '../@bangle.dev/react-menu/floating-menu';
