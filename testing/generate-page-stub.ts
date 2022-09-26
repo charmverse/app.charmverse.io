@@ -1569,13 +1569,15 @@ export function pageContentStub (): Pick<Prisma.PageCreateInput, 'content' |'con
 /**
  * A page stub with a significant amount of content
  */
-export function pageStubToCreate ({ id, parentId, createdBy, spaceId, deletedAt }:
+export function pageStubToCreate ({ id, parentId, createdBy, spaceId, deletedAt, title }:
   {id?: string, createdBy: string, spaceId: string, parentId?: string, deletedAt?: Date, title?: string}): Prisma.PageCreateInput {
 
   const pageContent = pageContentStub();
 
+  const pageId = id ?? v4();
+
   return {
-    id: id ?? v4(),
+    id: pageId ?? v4(),
     deletedAt,
     author: {
       connect: {
@@ -1589,7 +1591,7 @@ export function pageStubToCreate ({ id, parentId, createdBy, spaceId, deletedAt 
       }
     },
     updatedAt: '2022-09-14T14:13:05.326Z',
-    title: 'Bitcoin',
+    title: title ?? `Page ${pageId}`,
     headerImage: null,
     icon: '📚',
     path: `page-${v4()}`,
