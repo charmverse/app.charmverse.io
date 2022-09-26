@@ -27,7 +27,7 @@ async function createProposalFromTemplateController (req: NextApiRequest, res: N
     userId
   });
 
-  if (!permissions.createPage) {
+  if (!permissions.createVote) {
     throw new UnauthorisedActionError('You cannot create new pages');
   }
 

@@ -112,6 +112,7 @@ enum PageOperations {
   edit_path
   grant_permissions
   comment
+  create_poll
 }
 
 enum SpaceOperation {
