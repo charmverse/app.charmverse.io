@@ -42,6 +42,7 @@ export default function FloatingMenuComponent (
           return (
             <Menu>
               <InlineCommentButton enableComments menuKey={pluginKey} />
+              {enableVoting && <InlineVoteButton enableVotes menuKey={pluginKey} />}
             </Menu>
           );
         }
