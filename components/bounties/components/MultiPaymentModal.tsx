@@ -1,6 +1,6 @@
 
 import type { MetaTransactionData } from '@gnosis.pm/safe-core-sdk-types';
-import { Checkbox, List, ListItem, Tooltip, Typography } from '@mui/material';
+import { Autocomplete, Checkbox, List, ListItem, MenuItem, Select, Tooltip, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import type { Bounty } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
@@ -22,6 +22,7 @@ import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state
 import type { BountyWithDetails } from 'models';
 import { useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
+import PropertiesButton from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import { BountyAmount } from './BountyStatusBadge';
 import type { MultiPaymentResult } from './MultiPaymentButton';
 import MultiPaymentButton from './MultiPaymentButton';
@@ -148,16 +149,45 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
           <DialogTitle onClose={popupState.close}>
             Pay Bount{transactions.length > 1 ? 'ies' : 'y'}
           </DialogTitle>
-          <div
-            className='octo-propertyrow'
-            style={{
-              height: 'fit-content'
+          <Box
+            className='octo-propertylist'
+            sx={{
+              '& .MuiInputBase-input': {
+                background: 'none'
+              }
             }}
+            mt={2}
           >
-            <div className='octo-propertyname octo-propertyname--readonly'>
-              <Button>Reward token</Button>
-            </div>
-          </div>
+            {safeInfos && (
+              <Box justifyContent='space-between' gap={2} alignItems='center'>
+                <div
+                  className='octo-propertyrow'
+                  style={{
+                    height: 'fit-content',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}
+                >
+                  <div className='octo-propertyname octo-propertyname--readonly'>
+                    <PropertiesButton>Multisig Wallet</PropertiesButton>
+                  </div>
+                  <Select
+                    onChange={(e) => {
+                      setGnosisSafeData(safeInfos.find(safeInfo => safeInfo.address === e.target.value));
+                    }}
+                    sx={{ flexGrow: 1 }}
+                    value={gnosisSafeData?.address ?? ''}
+                  >
+                    {safeInfos.map(safeInfo => (
+                      <MenuItem key={safeInfo.address} value={safeInfo.address}>
+                        {safeInfo.address}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </div>
+              </Box>
+            )}
+          </Box>
           <Box pb={2}>
             <List>
               {transactions.map(({ title, chainId: _chainId, rewardAmount, rewardToken, userId, applicationId }) => {
