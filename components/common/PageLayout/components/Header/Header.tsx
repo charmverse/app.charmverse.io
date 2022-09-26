@@ -106,6 +106,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
 
   const isFullWidth = basePage?.fullWidth ?? false;
   const isBasePageDocument = ['page', 'card', 'proposal', 'proposal_template', 'bounty'].includes(basePage?.type ?? '');
+  const isBasePageDatabase = /board/.test(basePage?.type ?? '');
 
   const documentOptions = (
     <List dense>
@@ -222,10 +223,11 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
   }
 
   let pageOptionsList: ReactNode;
+
   if (isBasePageDocument) {
     pageOptionsList = documentOptions;
   }
-  else if (/board/.test(basePage?.type ?? '')) {
+  else if (isBasePageDatabase) {
     pageOptionsList = <DatabasePageOptions closeMenu={closeMenu} />;
   }
 
@@ -264,7 +266,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
 
           {basePage && (
             <>
-              <EditingModeToggle />
+              {isBasePageDocument && <EditingModeToggle />}
               {basePage?.deletedAt === null && (
                 <ShareButton headerHeight={headerHeight} pageId={basePage.id} />
               )}

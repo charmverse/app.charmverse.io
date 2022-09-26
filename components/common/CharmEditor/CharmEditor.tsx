@@ -606,8 +606,9 @@ function CharmEditor (
       }}
     >
       <floatingMenu.FloatingMenu
-        enableComments={!disablePageSpecificFeatures}
-        enableVoting={enableVoting}
+      // disable comments and polls in suggestions mode since they dont interact well
+        enableComments={!disablePageSpecificFeatures && !enableSuggestingMode}
+        enableVoting={enableVoting && !enableSuggestingMode}
         pluginKey={floatingMenuPluginKey}
         pageType={pageType}
         pagePermissions={pagePermissions}

@@ -4,7 +4,7 @@ import { Check, Close } from '@mui/icons-material';
 import type { Contributor } from 'hooks/useContributors';
 import { useContributors } from 'hooks/useContributors';
 import UserDisplay from 'components/common/UserDisplay';
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { RelativeDate } from '../PageThread';
 import { accept } from './track/accept';
 import { reject } from './track/reject';
@@ -26,19 +26,31 @@ const VERBS: Record<TrackType, string> = {
 };
 
 const ACTIONS: Record<string, string> = {
-  insertion_paragraph: 'New paragraph',
-  insertion_horizontalRule: 'New horizontal rule',
-  insertion_heading: 'New heading',
   insertion_blockquote: 'Wrapped into callout',
   insertion_codeBlock: 'Added code block',
+  insertion_columnBlock: 'Added column layout',
+  insertion_cryptoPrice: 'Added crypto price',
+  insertion_disclosureSummary: 'Added toggle section',
+  insertion_heading: 'New heading',
+  insertion_horizontalRule: 'New horizontal rule',
+  insertion_iframe: 'Added embed',
+  insertion_image: 'Added image',
   insertion_listItem: 'New list item',
-  insertion_table: 'Inserted table',
-  deletion_paragraph: 'Merged paragraph',
-  deletion_heading: 'Merged heading',
+  insertion_paragraph: 'New paragraph',
+  insertion_pdf: 'Added pdf',
+  insertion_table: 'Added table',
   deletion_blockquote: 'Unwrapped blockquote',
   deletion_codeBlock: 'Removed code block',
+  deletion_columnBlock: 'Removed column layout',
+  deletion_cryptoPrice: 'Removed crypto price',
+  deletion_disclosureSummary: 'Removed toggle section',
+  deletion_heading: 'Merged heading',
+  deletion_iframe: 'Removed embed',
+  deletion_image: 'Removed image',
   deletion_listItem: 'Lifted list item',
-  deletion_table: 'Delete table',
+  deletion_paragraph: 'Merged paragraph',
+  deletion_pdf: 'Removed pdf',
+  deletion_table: 'Revmoed table',
   block_change_bulletList: 'Added bullet list item',
   block_change_orderedList: 'Added ordered list item',
   block_change_listItem: 'Changed into list item',
@@ -46,11 +58,13 @@ const ACTIONS: Record<string, string> = {
   block_change_heading: 'Changed heading level',
   block_change_codeBlock: 'Changed into code block'
 };
+// For these types, the nodeType would be 'paragraph' but we want to show the container type instead
+const containerNodeTypes = ['listItem', 'columnBlock', 'disclosureSummary'];
 
 // isOwner allows owners to always delete their own suggestions
 type Props = TrackedEvent & { readOnly?: boolean, isOwner?: boolean };
 
-export function SuggestionCard ({ readOnly, isOwner, active, data, node, pos, type }: Props) {
+function SuggestionCardComponent ({ readOnly, isOwner, active, data, node, pos, type }: Props) {
   const view = useEditorViewContext();
   const [contributors] = useContributors();
   // get parentNode for lists
@@ -65,7 +79,6 @@ export function SuggestionCard ({ readOnly, isOwner, active, data, node, pos, ty
   function rejectOne (_type: string, _pos: number) {
     reject(_type, _pos, view);
   }
-  // console.log('SuggestionCard', { parentNode, pos, parentPos: pos - 1, node, type });
 
   return (
     <Paper sx={{ p: 2, left: active ? -16 : 0, position: 'relative', transition: 'left ease-in .15s' }} elevation={active ? 4 : 0} variant={active ? undefined : 'outlined'}>
@@ -113,15 +126,14 @@ export function SuggestionCard ({ readOnly, isOwner, active, data, node, pos, ty
   );
 }
 
+export const SuggestionCard = memo(SuggestionCardComponent);
+
 type ActionInfo = {
   type: TrackType;
   nodeType: string;
   parentNodeType?: string;
   content?: string
 };
-
-// For these types, the nodeType would be 'paragraph' but we want to show the container type instead
-const containerNodeTypes = ['listItem'];
 
 function FormattedAction ({ type, nodeType, parentNodeType = '', content }: ActionInfo) {
   const friendlyNodeType = containerNodeTypes.includes(parentNodeType) ? parentNodeType : nodeType;
