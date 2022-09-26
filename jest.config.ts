@@ -17,11 +17,11 @@ export const jestConfig: Config = {
   // Indicates whether the coverage information should be collected while executing the test
   collectCoverage: false,
 
-  globals: {
-    'ts-jest': {
-      isolatedModules: true
-    }
-  },
+  // globals: {
+  //   'ts-jest': {
+  //     isolatedModules: true
+  //   }
+  // },
 
   globalTeardown: './testing/wipeTestData.ts',
 
@@ -45,7 +45,7 @@ export const jestConfig: Config = {
 
   testTimeout: 30000,
   transform: {
-    '^.+\\.(ts)$': 'ts-jest'
+    '^.+\\.(ts)$': '@swc/jest'
   }
 };
 
