@@ -1,6 +1,6 @@
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
+import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import type { BoxProps, SelectProps } from '@mui/material';
 import { Box, InputLabel, List, MenuItem, Select, Typography } from '@mui/material';
 import PageThread from 'components/common/CharmEditor/components/PageThread';
@@ -165,7 +165,7 @@ export default function CommentsSidebar ({ inline }: BoxProps & {inline?: boolea
         {sortedThreadList.length === 0 ? (
           <NoCommentsMessage
             icon={(
-              <CommentOutlinedIcon
+              <MessageOutlinedIcon
                 fontSize='large'
                 color='secondary'
                 sx={{

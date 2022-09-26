@@ -1,7 +1,7 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import { RateReviewOutlined } from '@mui/icons-material';
-import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
+import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import MoonIcon from '@mui/icons-material/DarkMode';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
@@ -149,7 +149,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
         setPageMenuOpen(false);
       }}
       >
-        <CommentOutlinedIcon
+        <MessageOutlinedIcon
           fontSize='small'
           sx={{
             mr: 1

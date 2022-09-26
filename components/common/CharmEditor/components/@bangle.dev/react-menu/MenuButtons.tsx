@@ -22,7 +22,7 @@ import {
 import { filter, rafCommandExec } from '@bangle.dev/utils';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import React, { useCallback } from 'react';
-import InsertCommentOutlinedIcon from '@mui/icons-material/InsertCommentOutlined';
+import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import { createCommentBlock } from 'components/common/BoardEditor/focalboard/src/blocks/commentBlock';
 import { MenuButton } from './Icon';
@@ -149,7 +149,7 @@ export function InlineActionButton ({
 export function InlineCommentButton ({
   hints = ['Comment'],
   hintPos = 'top',
-  children = <InsertCommentOutlinedIcon sx={{
+  children = <MessageOutlinedIcon sx={{
     fontSize: 12,
     position: 'relative'
   }}

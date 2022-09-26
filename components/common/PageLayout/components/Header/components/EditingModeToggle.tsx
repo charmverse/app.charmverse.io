@@ -1,27 +1,21 @@
 import { ListItemIcon, ListItemText, Menu, MenuItem, Tooltip } from '@mui/material';
-import { EditOutlined, ArrowDropDown, RateReviewOutlined, VisibilityOutlined } from '@mui/icons-material';
+import { ArrowDropDown } from '@mui/icons-material';
 import Button from 'components/common/Button';
 import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
-import { usePrimaryCharmEditor } from 'hooks/usePrimaryCharmEditor';
+import { usePrimaryCharmEditor, EDIT_MODE_CONFIG } from 'hooks/usePrimaryCharmEditor';
 import type { EditMode } from 'hooks/usePrimaryCharmEditor';
 
-const EDIT_MODE_CONFIG = {
+const editModeConfig = {
   editing: {
     color: 'primary',
-    permission: 'edit_content',
-    icon: <EditOutlined fontSize='small' />,
     label: 'Editing'
   },
   suggesting: {
     color: 'success',
-    permission: 'comment',
-    icon: <RateReviewOutlined fontSize='small' />,
     label: 'Suggesting'
   },
   viewing: {
     color: 'secondary',
-    permission: 'read',
-    icon: <VisibilityOutlined fontSize='small' />,
     label: 'Viewing'
   }
 } as const;
@@ -38,7 +32,7 @@ export default function EditModeToggle () {
     return null;
   }
 
-  const availableModes = availableEditModes.map((mode) => [mode, EDIT_MODE_CONFIG[mode]] as const);
+  const availableModes = availableEditModes.map((mode) => [mode, editModeConfig[mode]] as const);
 
   return (
     <PopupState variant='popover' popupId='edit-mode-select'>
@@ -52,9 +46,9 @@ export default function EditModeToggle () {
               size='small'
               disableElevation
               variant='outlined'
-              color={EDIT_MODE_CONFIG[editMode].color}
+              color={editModeConfig[editMode].color}
             >
-              {EDIT_MODE_CONFIG[editMode].label}
+              {editModeConfig[editMode].label}
             </Button>
           </Tooltip>
 
@@ -63,7 +57,7 @@ export default function EditModeToggle () {
             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             transformOrigin={{ horizontal: 'right', vertical: 'top' }}
           >
-            {availableModes.map(([mode, { icon, label }]) => (
+            {availableModes.map(([mode, { label }]) => (
               <MenuItem
                 key={mode}
                 dense
@@ -72,8 +66,8 @@ export default function EditModeToggle () {
                   popupState.close();
                 }}
               >
-                <ListItemIcon sx={{ color: editMode === mode ? `${EDIT_MODE_CONFIG[mode].color}.main` : '' }}>
-                  {icon}
+                <ListItemIcon sx={{ color: editMode === mode ? `${editModeConfig[mode].color}.main` : '' }}>
+                  {EDIT_MODE_CONFIG[mode].icon}
                 </ListItemIcon>
                 <ListItemText>
                   {label}

@@ -1,6 +1,6 @@
 
 import { Box, Typography } from '@mui/material';
-import { CommentOutlined } from '@mui/icons-material';
+import { MessageOutlined } from '@mui/icons-material';
 
 export function RowDecoration ({ count, icon: Icon }: { count: number, icon: any }) {
   return (
@@ -25,5 +25,5 @@ export function RowDecoration ({ count, icon: Icon }: { count: number, icon: any
 }
 
 export default function RowIcon ({ count }: { count: number }) {
-  return <RowDecoration icon={CommentOutlined} count={count} />;
+  return <RowDecoration icon={MessageOutlined} count={count} />;
 }

@@ -1,19 +1,23 @@
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import { createContext, useContext, useMemo, useState } from 'react';
-import type { IPagePermissionFlags, PageOperationType } from 'lib/permissions/pages';
+import { EditOutlined, RateReviewOutlined, VisibilityOutlined } from '@mui/icons-material';
+import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
 const EDIT_MODES = ['editing', 'suggesting', 'viewing'] as const;
 export type EditMode = typeof EDIT_MODES[number];
 
-const EDIT_MODE_CONFIG = {
+export const EDIT_MODE_CONFIG = {
   editing: {
-    permission: 'edit_content'
+    permission: 'edit_content',
+    icon: <EditOutlined fontSize='small' />
   },
   suggesting: {
-    permission: 'comment'
+    permission: 'comment',
+    icon: <RateReviewOutlined fontSize='small' />
   },
   viewing: {
-    permission: 'read'
+    permission: 'read',
+    icon: <VisibilityOutlined fontSize='small' />
   }
 } as const;
 

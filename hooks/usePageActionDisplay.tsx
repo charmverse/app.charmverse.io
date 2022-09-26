@@ -8,8 +8,10 @@ import { usePages } from './usePages';
 import { useThreads } from './useThreads';
 import { useVotes } from './useVotes';
 
+export type PageAction = 'polls' | 'comments' | 'suggestions';
+
 export interface IPageActionDisplayContext {
-  currentPageActionDisplay: 'polls' | 'comments' | 'suggestions' | null;
+  currentPageActionDisplay: PageAction | null;
   setCurrentPageActionDisplay: React.Dispatch<React.SetStateAction<IPageActionDisplayContext['currentPageActionDisplay']>>;
 }
 

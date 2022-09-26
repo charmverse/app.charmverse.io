@@ -62,7 +62,7 @@ export function plugin ({ key } :{
           if (/inline-vote/.test(className)) {
             return highlightMarkedElement({
               view,
-              elementId: 'page-vote-list-box',
+              elementId: 'page-action-sidebar',
               key,
               markName,
               prefix: 'vote'
@@ -107,7 +107,7 @@ export function plugin ({ key } :{
             return highlightElement({
               ids,
               view,
-              elementId: 'page-vote-list-box',
+              elementId: 'page-action-sidebar',
               key,
               markName,
               prefix: 'vote'

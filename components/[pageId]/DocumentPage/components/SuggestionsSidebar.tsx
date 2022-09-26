@@ -50,11 +50,11 @@ export function SuggestionsSidebar ({ readOnly, state }: { readOnly: boolean, st
   return (
     <>
       {!readOnly && suggestions.length > 0 && (
-        <Box display='flex' gap={1} flexDirection='row' position='absolute' top={0} right={8}>
-          <Button size='small' startIcon={<Check />} disableElevation variant='text' color='primary' onClick={clickAcceptAll}>
+        <Box display='flex' gap={1} flexDirection='row'>
+          <Button size='small' startIcon={<Check />} disableElevation variant='text' color='secondary' onClick={clickAcceptAll}>
             Accept All
           </Button>
-          <Button size='small' startIcon={<Close />} disableElevation variant='text' color='primary' onClick={clickRejectAll}>
+          <Button size='small' startIcon={<Close />} disableElevation variant='text' color='secondary' onClick={clickRejectAll}>
             Reject All
           </Button>
         </Box>

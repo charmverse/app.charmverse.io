@@ -1,8 +1,11 @@
 import styled from '@emotion/styled';
-import { Box, Slide, Typography } from '@mui/material';
+import { Box, IconButton, Slide, Tooltip, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 import { memo } from 'react';
+import { MessageOutlined, FormatListBulleted, RateReviewOutlined } from '@mui/icons-material';
 import PageActionToggle from 'components/[pageId]/DocumentPage/components/PageActionToggle';
+import type { PageAction } from 'hooks/usePageActionDisplay';
+import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 
 const PageActionListBox = styled.div`
   position: fixed;
@@ -17,7 +20,25 @@ const PageActionListBox = styled.div`
   background: ${({ theme }) => theme.palette.background.default};
 `;
 
-function SidebarDrawer ({ children, id, open, title }: { children: ReactNode, id: string, open: boolean, title: string }) {
+export const SIDEBAR_VIEWS = {
+  comments: {
+    icon: <MessageOutlined fontSize='small' />,
+    tooltip: 'View comments',
+    title: 'Comments'
+  },
+  suggestions: {
+    icon: <RateReviewOutlined fontSize='small' />,
+    tooltip: 'View suggestions',
+    title: 'Suggestions'
+  },
+  polls: {
+    icon: <FormatListBulleted fontSize='small' />,
+    tooltip: 'View polls',
+    title: 'Polls'
+  }
+} as const;
+
+function SidebarDrawerComponent ({ children, id, open, title }: { children: ReactNode, id: string, open: boolean, title: string }) {
 
   return (
     <Slide
@@ -41,9 +62,14 @@ function SidebarDrawer ({ children, id, open, title }: { children: ReactNode, id
           flexDirection: 'column'
         }}
         >
-          <Box display='flex' gap={1}>
+          <Box display='flex' gap={1} alignItems='center'>
             <PageActionToggle />
-            <Typography fontWeight={600} fontSize={20}>{title}</Typography>
+            <Typography flexGrow={1} fontWeight={600} fontSize={20}>{title}</Typography>
+            <Box display='flex' alignItems='center' pr={1} justifyContent='flex-end'>
+              <PageActionIcon view='comments' />
+              <PageActionIcon view='suggestions' />
+              <PageActionIcon view='polls' />
+            </Box>
           </Box>
           {children}
         </Box>
@@ -52,4 +78,19 @@ function SidebarDrawer ({ children, id, open, title }: { children: ReactNode, id
   );
 }
 
-export default memo(SidebarDrawer);
+function PageActionIcon ({ view }: { view: PageAction }) {
+
+  const { currentPageActionDisplay, setCurrentPageActionDisplay } = usePageActionDisplay();
+
+  function setView () {
+    setCurrentPageActionDisplay(view);
+  }
+
+  return (
+    <Tooltip title={SIDEBAR_VIEWS[view].tooltip}>
+      <IconButton color={currentPageActionDisplay === view ? 'inherit' : 'secondary'} size='small' onClick={setView}>{SIDEBAR_VIEWS[view].icon}</IconButton>
+    </Tooltip>
+  );
+}
+
+export const SidebarDrawer = memo(SidebarDrawerComponent);

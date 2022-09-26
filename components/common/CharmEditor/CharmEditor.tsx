@@ -77,7 +77,7 @@ import { rejectAll } from './components/suggestions/track/rejectAll';
 import { getSelectedChanges } from './components/suggestions/statePlugins/track';
 import { plugins as trackPlugins } from './components/suggestions/suggestions.plugins';
 import SuggestionsPopup from './components/suggestions/SuggestionPopup';
-import SidebarDrawer from './components/SidebarDrawer';
+import { SidebarDrawer, SIDEBAR_VIEWS } from './components/SidebarDrawer';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -620,13 +620,9 @@ function CharmEditor (
       {children}
       {!disablePageSpecificFeatures && (
         <>
-          <SidebarDrawer id='page-suggestion-list-box' title='Suggestions' open={pageActionDisplay === 'suggestions'}>
+          <SidebarDrawer id='page-action-sidebar' title={pageActionDisplay ? SIDEBAR_VIEWS[pageActionDisplay].title : ''} open={!!pageActionDisplay}>
             {pageActionDisplay === 'suggestions' && <SuggestionsSidebar readOnly={!pagePermissions?.edit_content} state={suggestionState} />}
-          </SidebarDrawer>
-          <SidebarDrawer id='page-comment-list-box' title='Comments' open={pageActionDisplay === 'comments'}>
             {pageActionDisplay === 'comments' && <CommentsSidebar />}
-          </SidebarDrawer>
-          <SidebarDrawer id='page-vote-list-box' title='Polls' open={pageActionDisplay === 'polls'}>
             {pageActionDisplay === 'polls' && <PageInlineVotesList />}
           </SidebarDrawer>
           <InlineCommentThread pluginKey={inlineCommentPluginKey} />
