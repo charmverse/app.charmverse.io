@@ -22,21 +22,22 @@ CMD ["npm", "run", "start:staging"]
 
 
 # --- Image with code built inside docker from ground up. 
-FROM base_app AS localdev_app
+FROM base_app AS docker_built_server_app
 COPY *.json ./
 COPY patches/. patches/
-RUN  npm ci --no-audit --no-fund \
+RUN  npm ci --no-audit --no-fund --production \
             --legacy-peer-deps
 
 COPY . ./
 RUN npm run build:prisma
 RUN npm run build
-CMD ["npm", "run", "start"]
-
+CMD ["npm", "run", "start:staging"]
 
 # --- Image used locally with compose builds on top of compiled_locally_server_app
-FROM localdev_app AS docker_built_server_app
-RUN  npm prune --production
+FROM docker_built_server_app AS localdev_app
+RUN  npm ci --no-audit --no-fund \
+            --legacy-peer-deps
 
-CMD ["npm", "run", "start:staging"]
+CMD ["npm", "run", "start"]
+
 
