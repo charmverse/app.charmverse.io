@@ -28,7 +28,7 @@ export function pageStubToCreate ({ id, parentId, createdBy, spaceId, deletedAt 
     path: `page-${v4()}`,
     isTemplate: false,
     parentId,
-    type: 'card',
+    type: 'page',
     index: -1,
     fullWidth: false,
     content: {
