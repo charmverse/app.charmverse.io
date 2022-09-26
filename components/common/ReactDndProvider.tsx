@@ -38,7 +38,7 @@ function ModifiedBackend (...args: any) {
   return instance;
 }
 
-export default function ReactDndProvider ({ children }: { children: ReactNode; }) {
+export default function ReactDndProvider ({ children }: { children: ReactNode }) {
   if (isTouchScreen()) {
     return (
       <DndProvider

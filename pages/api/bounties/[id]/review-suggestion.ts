@@ -15,7 +15,7 @@ handler.use(requireUser)
   .use(requireKeys(['decision'], 'body'))
   .post(reviewSuggestionController);
 
-async function reviewSuggestionController (req: NextApiRequest, res: NextApiResponse<BountyWithDetails | {success: true;}>) {
+async function reviewSuggestionController (req: NextApiRequest, res: NextApiResponse<BountyWithDetails | {success: true}>) {
 
   const { id: bountyId } = req.query;
 

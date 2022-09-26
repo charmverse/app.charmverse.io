@@ -290,7 +290,7 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
   );
 }
 
-function DataProviders ({ children }: { children: ReactNode; }) {
+function DataProviders ({ children }: { children: ReactNode }) {
 
   return (
     <UserProvider>

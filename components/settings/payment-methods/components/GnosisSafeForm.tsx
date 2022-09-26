@@ -74,7 +74,7 @@ export default function GnosisSafeForm ({ onSubmit, defaultChainId = 1 }: Props)
     setValue('chainId', _chainId);
   }
 
-  async function addPaymentMethod (paymentMethod: Partial<PaymentMethod & { name: string | null; }>) {
+  async function addPaymentMethod (paymentMethod: Partial<PaymentMethod & { name: string | null }>) {
     setFormError(null);
     paymentMethod.spaceId = space?.id;
     paymentMethod.walletType = 'gnosis';

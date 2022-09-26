@@ -58,7 +58,7 @@ export type CollablandDiscordRole = CollablandCredential<DiscordRoleSubject>;
 
 export type AnyCredentialType = CollablandBountyEvent | CollablandDiscordRole;
 
-export function getCredentials ({ aeToken }: { aeToken: string; }) {
+export function getCredentials ({ aeToken }: { aeToken: string }) {
 
   if (!API_KEY) {
     log.warn('No API Key provided for collab.land');
@@ -77,7 +77,7 @@ export function getCredentials ({ aeToken }: { aeToken: string; }) {
 }
 
 // @ref: https://api-qa.collab.land/explorer/#/VeramoController/VeramoController.requestToIssueVcred
-export function createCredential<T = BountyEventSubject> ({ subject }: { subject: T; }) {
+export function createCredential<T = BountyEventSubject> ({ subject }: { subject: T }) {
 
   if (!API_KEY) {
     log.warn('No API Key provided for collab.land');

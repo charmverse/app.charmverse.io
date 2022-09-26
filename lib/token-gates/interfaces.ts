@@ -19,7 +19,7 @@ export interface LitJwtPayload {
 }
 
 export interface TokenGateWithRoles extends TokenGate {
-  tokenGateToRoles: (TokenGateToRole & {role: Role;})[];
+  tokenGateToRoles: (TokenGateToRole & {role: Role})[];
 }
 
 export interface TokenGateJwt {
@@ -52,7 +52,7 @@ export interface TokenGateEvaluationResult {
 export interface TokenGateVerification {
   userId: string;
   spaceId: string;
-  tokens: (Pick<TokenGateJwt, 'signedToken'> & {tokenGateId: string;})[];
+  tokens: (Pick<TokenGateJwt, 'signedToken'> & {tokenGateId: string})[];
   commit: boolean;
 }
 

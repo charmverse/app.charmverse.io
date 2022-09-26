@@ -20,7 +20,7 @@ export const UserContext = createContext<Readonly<IContext>>({
   setIsLoaded: () => undefined
 });
 
-export function UserProvider ({ children }: { children: ReactNode; }) {
+export function UserProvider ({ children }: { children: ReactNode }) {
   const { account } = useWeb3React();
   const [user, setUser] = useState<LoggedInUser | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);

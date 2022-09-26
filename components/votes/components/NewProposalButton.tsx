@@ -18,7 +18,7 @@ import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useRef, useState } from 'react';
 import type { KeyedMutator } from 'swr';
 
-export default function NewProposalButton ({ mutateProposals }: {mutateProposals: KeyedMutator<ProposalWithUsers[]>;}) {
+export default function NewProposalButton ({ mutateProposals }: {mutateProposals: KeyedMutator<ProposalWithUsers[]>}) {
   const { user } = useUser();
   const [currentSpace] = useCurrentSpace();
   const [userSpacePermissions] = useCurrentSpacePermissions();

@@ -224,7 +224,7 @@ export function charmEditorPlugins (
   return () => basePlugins;
 }
 
-const StyledReactBangleEditor = styled(ReactBangleEditor)<{disablePageSpecificFeatures?: boolean;}>`
+const StyledReactBangleEditor = styled(ReactBangleEditor)<{disablePageSpecificFeatures?: boolean}>`
   position: relative;
 
   /** DONT REMOVE THIS STYLING */
@@ -482,7 +482,7 @@ function CharmEditor (
             return <LayoutColumn node={props.node}>{_children}</LayoutColumn>;
           }
           case 'cryptoPrice': {
-            const attrs = props.attrs as { base: null | CryptoCurrency; quote: null | FiatCurrency; };
+            const attrs = props.attrs as { base: null | CryptoCurrency; quote: null | FiatCurrency };
             return (
               <CryptoPrice
                 preset={{

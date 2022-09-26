@@ -13,7 +13,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 import PublishingForm from './PublishingForm';
 
-export default function PublishToSnapshot ({ pageId }: {pageId: string;}) {
+export default function PublishToSnapshot ({ pageId }: {pageId: string}) {
   const { pages, setPages } = usePages();
   const page = pages[pageId]!;
 

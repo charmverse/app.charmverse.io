@@ -6,7 +6,7 @@ export function removeInlineVoteMark (view: EditorView, voteId: string) {
   const doc = view.state.doc;
   const inlineVoteMarkSchema = view.state.schema.marks['inline-vote'] as MarkType;
   const inlineVoteNodes = findChildrenByMark(doc, inlineVoteMarkSchema);
-  const inlineVoteNodeWithMarks: (NodeWithPos & {mark: Mark;})[] = [];
+  const inlineVoteNodeWithMarks: (NodeWithPos & {mark: Mark})[] = [];
 
   for (const inlineVoteNode of inlineVoteNodes) {
     // Find the inline vote mark for the node

@@ -6,7 +6,7 @@ import NexusSidebar from './NexusSidebar';
 
 const emptySidebar = () => <div></div>;
 
-export default function NexusLayout (props: { children: ReactNode; }) {
+export default function NexusLayout (props: { children: ReactNode }) {
 
   // hide sidebar for public users for now, since they can't create a workspace
   const { user } = useUser();

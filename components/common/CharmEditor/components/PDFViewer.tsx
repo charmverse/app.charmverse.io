@@ -8,7 +8,7 @@ interface Props {
   pageNumber: number;
   width: number;
   url: string;
-  onLoadSuccess: (props: { numPages: number; }) => void;
+  onLoadSuccess: (props: { numPages: number }) => void;
 }
 
 export default function PDFViewer ({ url, onLoadSuccess, pageNumber, width }: Props) {

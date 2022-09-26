@@ -27,7 +27,7 @@ function MentionedTaskRow (
     bountyId,
     type,
     commentId
-  }: MentionedTask & { marked: boolean; }
+  }: MentionedTask & { marked: boolean }
 ) {
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : null;
 

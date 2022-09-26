@@ -9,11 +9,11 @@ export interface Contributor extends Omit<User, 'addresses'> {
 }
 
 interface NestedMemberships {
-  spaceRoleToRole: (SpaceRoleToRole & { role: RoleMembership; })[];
+  spaceRoleToRole: (SpaceRoleToRole & { role: RoleMembership })[];
 }
 
 export interface LoggedInUser extends User {
-  favorites: { pageId: string; }[];
+  favorites: { pageId: string }[];
   spaceRoles: (SpaceRole & NestedMemberships)[];
   ensName?: string;
   discordUser?: DiscordUser | null;

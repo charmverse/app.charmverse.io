@@ -17,10 +17,10 @@ export interface ImportGuildRolesPayload {
   guildIds: number[];
 }
 
-async function importRoles (req: NextApiRequest, res: NextApiResponse<{importedRolesCount: number;} | { error: string; }>) {
+async function importRoles (req: NextApiRequest, res: NextApiResponse<{importedRolesCount: number} | { error: string }>) {
   const { spaceId, guildIds } = req.body as ImportGuildRolesPayload;
   const guilds: GetGuildByIdResponse[] = await Promise.all(guildIds.map(guildId => guild.get(guildId)));
-  const guildRoles: {id: number; name: string;}[] = [];
+  const guildRoles: {id: number; name: string}[] = [];
   guilds.forEach(_guild => {
     guildRoles.push(..._guild.roles.map(role => ({ id: role.id, name: role.name })));
   });

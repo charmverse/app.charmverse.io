@@ -18,7 +18,7 @@ handler
   .use(requireKeys(['deadline', 'pageId', 'voteOptions', 'title', 'type', 'threshold'], 'body'))
   .post(createVote);
 
-async function getVoteById (req: NextApiRequest, res: NextApiResponse<Vote | { error: any; }>) {
+async function getVoteById (req: NextApiRequest, res: NextApiResponse<Vote | { error: any }>) {
   const voteId = req.query.id as string;
   const userId = req.session.user.id;
   const vote = await getVoteService(voteId, userId);
@@ -28,7 +28,7 @@ async function getVoteById (req: NextApiRequest, res: NextApiResponse<Vote | { e
   return res.status(200).json(vote);
 }
 
-async function createVote (req: NextApiRequest, res: NextApiResponse<ExtendedVote | null | { error: any; }>) {
+async function createVote (req: NextApiRequest, res: NextApiResponse<ExtendedVote | null | { error: any }>) {
   const newVote = req.body as VoteDTO;
   const userId = req.session.user.id;
   const pageId = newVote.pageId;

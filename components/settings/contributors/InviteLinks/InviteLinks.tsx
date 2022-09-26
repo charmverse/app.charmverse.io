@@ -13,7 +13,7 @@ import { useState } from 'react';
 import useSWR from 'swr';
 import InvitesTable from './InviteLinksTable';
 
-export default function InviteLinkList ({ isAdmin, spaceId }: { isAdmin: boolean; spaceId: string; }) {
+export default function InviteLinkList ({ isAdmin, spaceId }: { isAdmin: boolean; spaceId: string }) {
   const [removedInviteLink, setRemovedInviteLink] = useState<InviteLink | null>(null);
 
   const { data, mutate } = useSWR(`inviteLinks/${spaceId}`, () => charmClient.getInviteLinks(spaceId));

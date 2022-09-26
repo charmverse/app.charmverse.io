@@ -26,7 +26,7 @@ beforeAll(async () => {
  * Generates a tree where all pages inherit 1 space / full_access from root_1 (except root 2, which is standalone)
  * Each test can then fuzz the tree permissions state
  */
-async function generateTreeWithSpaceFullAccess ({ userId, spaceId }: {userId: string; spaceId: string;}): Promise<{
+async function generateTreeWithSpaceFullAccess ({ userId, spaceId }: {userId: string; spaceId: string}): Promise<{
   root_1: IPageWithPermissions;
   root_2: IPageWithPermissions;
   page_1_1: IPageWithPermissions;

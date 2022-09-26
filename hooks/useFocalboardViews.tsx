@@ -14,7 +14,7 @@ export const FocalboardViewsContext = createContext<Readonly<IContext>>({
   setFocalboardViewsRecord: () => null
 });
 
-export function FocalboardViewsProvider ({ children }: { children: ReactNode; }) {
+export function FocalboardViewsProvider ({ children }: { children: ReactNode }) {
   const [focalboardViewsRecord, setFocalboardViewsRecord] = useLocalStorage<FocalboardViewsRecord>('default-views', {});
 
   const value = useMemo(() => ({

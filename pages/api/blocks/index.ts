@@ -15,7 +15,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).get(getBlocks).post(createBlocks).put(updateBlocks);
 
-async function getBlocks (req: NextApiRequest, res: NextApiResponse<Block[] | { error: string; }>) {
+async function getBlocks (req: NextApiRequest, res: NextApiResponse<Block[] | { error: string }>) {
 
   const referer = req.headers.referer as string;
   const url = new URL(referer);

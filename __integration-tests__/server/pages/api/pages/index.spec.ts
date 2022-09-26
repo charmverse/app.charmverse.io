@@ -30,7 +30,7 @@ describe('POST /api/pages - create page', () => {
       .post('/api/pages')
       .set('Cookie', userCookie)
       .send(pageToCreate)
-      .expect(201) as {body: IPageWithPermissions;};
+      .expect(201) as {body: IPageWithPermissions};
 
     expect(createdPage.spaceId).toBe(pageToCreate.spaceId as string);
     expect(createdPage.path).toBe(pageToCreate.path);
@@ -53,7 +53,7 @@ describe('POST /api/pages - create page', () => {
       .post('/api/pages')
       .set('Cookie', userCookie)
       .send(pageToCreate)
-      .expect(201) as {body: IPageWithPermissions;};
+      .expect(201) as {body: IPageWithPermissions};
 
     expect(createdPage.spaceId).toBe(pageToCreate.spaceId as string);
     expect(createdPage.path).toBe(pageToCreate.path);

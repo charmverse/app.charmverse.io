@@ -8,7 +8,7 @@ import { supportedChains, walletConnect } from 'connectors';
 import NetworkButton from './components/NetworkButton';
 import requestNetworkChange from './utils/requestNetworkChange';
 
-function NetworkModal ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void; }) {
+function NetworkModal ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const { error, connector, active } = useWeb3React();
   // const toast = useToast();
 

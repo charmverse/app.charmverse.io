@@ -42,7 +42,7 @@ export const iframePlugin = new Plugin({
 
 const getTypeFromSchema = (schema: Schema) => schema.nodes[name];
 
-function insertIframeNode (state: EditorState, dispatch: DispatchFn, view: EditorView, attrs?: { [key: string]: any; }) {
+function insertIframeNode (state: EditorState, dispatch: DispatchFn, view: EditorView, attrs?: { [key: string]: any }) {
   const type = getTypeFromSchema(state.schema);
   const newTr = type.create(attrs);
   const { tr } = view.state;
@@ -123,7 +123,7 @@ const StyledEmptyIframeContainer = styled(Box)`
   opacity: 0.5;
 `;
 
-function EmptyIframeContainer (props: HTMLAttributes<HTMLDivElement> & { readOnly: boolean; type: 'video' | 'embed'; }) {
+function EmptyIframeContainer (props: HTMLAttributes<HTMLDivElement> & { readOnly: boolean; type: 'video' | 'embed' }) {
   const theme = useTheme();
   const { type, readOnly, ...rest } = props;
   return (
@@ -162,7 +162,7 @@ const StyledIFrame = styled(Box)`
 `;
 
 function ResizableIframe ({ readOnly, node, updateAttrs, onResizeStop }:
-  NodeViewProps & { readOnly: boolean; onResizeStop?: (view: EditorView) => void; }) {
+  NodeViewProps & { readOnly: boolean; onResizeStop?: (view: EditorView) => void }) {
   const [height, setHeight] = useState(node.attrs.height);
   const view = useEditorViewContext();
 

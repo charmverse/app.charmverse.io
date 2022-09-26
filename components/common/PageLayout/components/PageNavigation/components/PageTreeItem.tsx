@@ -52,7 +52,7 @@ interface PageTreeItemProps {
   children: React.ReactNode;
 }
 
-export const StyledTreeItem = styled(TreeItem, { shouldForwardProp: prop => prop !== 'isActive' })<{ isActive?: boolean; }>(({ isActive, theme }) => ({
+export const StyledTreeItem = styled(TreeItem, { shouldForwardProp: prop => prop !== 'isActive' })<{ isActive?: boolean }>(({ isActive, theme }) => ({
 
   position: 'relative',
   backgroundColor: isActive ? theme.palette.action.focus : 'unset',
@@ -215,7 +215,7 @@ export function PageLink ({ showPicker = !isTouchScreen(), children, href, label
   );
 }
 
-function EmojiMenu ({ popupState, pageId, pageType }: { popupState: any; pageId: string; pageType?: Page['type']; }) {
+function EmojiMenu ({ popupState, pageId, pageType }: { popupState: any; pageId: string; pageType?: Page['type'] }) {
   const { setPages } = usePages();
   const onSelectEmoji = useCallback(async (emoji: string) => {
     if (pageId) {
@@ -249,7 +249,7 @@ function EmojiMenu ({ popupState, pageId, pageType }: { popupState: any; pageId:
   );
 }
 
-const TreeItemComponent = React.forwardRef<React.Ref<HTMLDivElement>, TreeItemContentProps & { isAdjacent?: boolean; }>(
+const TreeItemComponent = React.forwardRef<React.Ref<HTMLDivElement>, TreeItemContentProps & { isAdjacent?: boolean }>(
   ({ isAdjacent, ...props }, ref) => (
     <div id={`page-navigation-${props.nodeId}`} style={{ position: 'relative' }}>
       <TreeItemContent {...props} ref={ref as React.Ref<HTMLDivElement>} />
@@ -384,7 +384,7 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
   );
 });
 
-function PageActionsMenu ({ closeMenu, pageId, pagePath }: { closeMenu: () => void; pageId: string; pagePath: string; }) {
+function PageActionsMenu ({ closeMenu, pageId, pagePath }: { closeMenu: () => void; pageId: string; pagePath: string }) {
   const boards = useAppSelector(getSortedBoards);
   const { deletePage, getPagePermissions, pages } = usePages();
   const { showMessage } = useSnackbar();

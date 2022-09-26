@@ -12,7 +12,7 @@ import { v4 } from 'uuid';
 nock.disableNetConnect();
 
 let user: LoggedInUser;
-let space: Space & { spaceRoles: SpaceRole[]; };
+let space: Space & { spaceRoles: SpaceRole[] };
 
 const walletAddresses = [v4(), v4()];
 

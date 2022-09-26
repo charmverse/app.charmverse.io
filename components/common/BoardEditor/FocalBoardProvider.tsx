@@ -7,7 +7,7 @@ import { initialLoad } from './focalboard/src/store/initialLoad';
 import { useAppDispatch } from './focalboard/src/store/hooks';
 
 // load focalboard data when a workspace is selected
-function FocalBoardWatcher ({ children }: { children: JSX.Element; }) {
+function FocalBoardWatcher ({ children }: { children: JSX.Element }) {
   const dispatch = useAppDispatch();
   const [space] = useCurrentSpace();
   useEffect(() => {
@@ -20,7 +20,7 @@ function FocalBoardWatcher ({ children }: { children: JSX.Element; }) {
   return children;
 }
 
-export default function FocalBoardProvider ({ children }: { children: JSX.Element; }) {
+export default function FocalBoardProvider ({ children }: { children: JSX.Element }) {
 
   return (
     <ReduxProvider store={store}>

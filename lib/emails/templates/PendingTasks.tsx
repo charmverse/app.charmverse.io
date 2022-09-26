@@ -18,7 +18,7 @@ const charmverseUrl = process.env.DOMAIN;
 
 const MAX_ITEMS_PER_TASK = 3;
 const MAX_CHAR = 60;
-type TemplateUser = Pick<User, 'id' | 'username'> & { email: string; };
+type TemplateUser = Pick<User, 'id' | 'username'> & { email: string };
 const buttonStyle = { color: '#ffffff', lineHeight: '120%', textDecoration: 'none', borderRadius: '3px', fontWeight: '600', padding: '10px 30px', background: '#009Fb7' };
 const h2Style = { lineHeight: '1.2em', fontSize: '24px', fontWeight: 'bold', marginTop: '10px' };
 
@@ -32,7 +32,7 @@ export interface PendingTasksProps {
   user: TemplateUser
 }
 
-function ViewAllText ({ href }: { href: string; }) {
+function ViewAllText ({ href }: { href: string }) {
   return (
     <MjmlText>
       <a
@@ -196,7 +196,7 @@ export default function PendingTasks (props: PendingTasksProps) {
   );
 }
 
-function VoteTaskMjml ({ task }: { task: VoteTask; }) {
+function VoteTaskMjml ({ task }: { task: VoteTask }) {
   const pageWorkspaceTitle = `${task.page.title || 'Untitled'} | ${task.space.name}`;
   return (
     <MjmlText>
@@ -223,7 +223,7 @@ function VoteTaskMjml ({ task }: { task: VoteTask; }) {
   );
 }
 
-function ProposalTaskMjml ({ task }: { task: ProposalTask; }) {
+function ProposalTaskMjml ({ task }: { task: ProposalTask }) {
   const pageWorkspaceTitle = `${task.pageTitle || 'Untitled'} | ${task.spaceName}`;
   return (
     <MjmlText>
@@ -247,7 +247,7 @@ function ProposalTaskMjml ({ task }: { task: ProposalTask; }) {
   );
 }
 
-function MentionTask ({ task: { text, spaceName, pageTitle } }: { task: MentionedTask; }) {
+function MentionTask ({ task: { text, spaceName, pageTitle } }: { task: MentionedTask }) {
   const pageWorkspaceTitle = `${pageTitle || 'Untitled'} | ${spaceName}`;
   return (
     <MjmlText>
@@ -266,7 +266,7 @@ function MentionTask ({ task: { text, spaceName, pageTitle } }: { task: Mentione
   );
 }
 
-function MultisigTask ({ task }: { task: GnosisSafeTasks; }) {
+function MultisigTask ({ task }: { task: GnosisSafeTasks }) {
   log.debug('multi sig task', task);
   return (
     <MjmlText>
@@ -278,6 +278,6 @@ function MultisigTask ({ task }: { task: GnosisSafeTasks; }) {
   );
 }
 
-export function tasksRequiresYourAttention ({ count, includeName }: { count: number; includeName?: boolean; }) {
+export function tasksRequiresYourAttention ({ count, includeName }: { count: number; includeName?: boolean }) {
   return `${count} ${includeName ? 'CharmVerse ' : ''}task${count > 1 ? 's' : ''} need${count > 1 ? '' : 's'} your attention`;
 }

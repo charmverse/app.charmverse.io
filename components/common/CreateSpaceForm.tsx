@@ -40,7 +40,7 @@ export const schema = yup.object({
 export type FormValues = yup.InferType<typeof schema>;
 
 interface Props {
-  defaultValues?: { name: string; domain: string; };
+  defaultValues?: { name: string; domain: string };
   onCancel?: () => void;
   onSubmit: (values: Prisma.SpaceCreateInput) => void;
   submitText?: string;
@@ -179,7 +179,7 @@ export function getDomainFromName (name: string) {
   return name.replace(/[\p{P}\p{S}]/gu, '').replace(/\s/g, '-').toLowerCase();
 }
 
-function getDefaultName (): { name: string; domain: string; } {
+function getDefaultName (): { name: string; domain: string } {
   const name = randomName();
   return {
     name,

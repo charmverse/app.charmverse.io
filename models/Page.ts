@@ -77,7 +77,7 @@ export interface DisclosureDetailsNode {
 }
 
 export interface ListItemNode {
-  attrs: {todoChecked?: null | boolean;};
+  attrs: {todoChecked?: null | boolean};
   type: 'listItem';
   // eslint-disable-next-line
   content: (ParagraphNode | BulletListNode)[]
@@ -97,13 +97,13 @@ export interface ColumnLayoutNode {
 export interface BulletListNode {
   type: 'bulletList';
   content: ListItemNode[];
-  attrs?: {tight?: boolean;};
+  attrs?: {tight?: boolean};
 }
 
 export interface OrderedListNode {
   type: 'orderedList';
   content: ListItemNode[];
-  attrs?: {tight?: boolean;};
+  attrs?: {tight?: boolean};
 }
 
 export interface CalloutNode {

@@ -9,4 +9,4 @@ export const BOUNTY_LABELS: Record<BountyStatus, string> = {
   paid: 'Paid'
 };
 
-export type BountyWithDetails = Bounty & {applications: Application []; page: IPageWithPermissions;};
+export type BountyWithDetails = Bounty & {applications: Application []; page: IPageWithPermissions};

@@ -14,7 +14,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.get(getBlockSubtree);
 
-async function getBlockSubtree (req: NextApiRequest, res: NextApiResponse<Block[] | { error: string; }>) {
+async function getBlockSubtree (req: NextApiRequest, res: NextApiResponse<Block[] | { error: string }>) {
   const blockId = req.query.id as string;
   const publicPage = await prisma.page.findFirst({
     where: {

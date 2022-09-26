@@ -17,7 +17,7 @@ export interface PluginState {
   rowNodeOffset?: number;
 }
 
-export function plugins ({ key }: { key: PluginKey; }) {
+export function plugins ({ key }: { key: PluginKey }) {
 
   const tooltipDOM = createElement(['div', { class: 'row-handle' }]);
 
@@ -129,7 +129,7 @@ export function plugins ({ key }: { key: PluginKey; }) {
   ];
 }
 
-function posAtCoords (view: EditorView, coords: { left: number; top: number; }) {
+function posAtCoords (view: EditorView, coords: { left: number; top: number }) {
   const pos = view.posAtCoords(coords);
   if (!pos) {
     return null;
@@ -168,7 +168,7 @@ function rowNodeAtPos (view: EditorView, startPos: number) {
   };
 }
 
-function blockPosAtCoords (view: EditorView, coords: { left: number; top: number; }) {
+function blockPosAtCoords (view: EditorView, coords: { left: number; top: number }) {
 
   const startPos = posAtCoords(view, coords);
   if (!startPos) {

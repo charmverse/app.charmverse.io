@@ -4,7 +4,7 @@ import { injected } from 'connectors';
 import log from 'lib/log';
 import { useEffect } from 'react';
 
-type WindowType = Window & typeof globalThis & { ethereum: Web3Provider; }
+type WindowType = Window & typeof globalThis & { ethereum: Web3Provider }
 
 const useInactiveListener = (suppress = false): void => {
   const { active, activate } = useWeb3React();

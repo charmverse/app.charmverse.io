@@ -49,7 +49,7 @@ interface DispatchFn {
   (tr: Transaction): void;
 }
 
-function insertPDFNode (state: EditorState, dispatch: DispatchFn, view: EditorView, attrs?: { [key: string]: any; }) {
+function insertPDFNode (state: EditorState, dispatch: DispatchFn, view: EditorView, attrs?: { [key: string]: any }) {
   const type = state.schema.nodes.pdf;
   const newTr = type.create(attrs);
   const { tr } = view.state;
@@ -60,7 +60,7 @@ function insertPDFNode (state: EditorState, dispatch: DispatchFn, view: EditorVi
   }
 }
 
-function EmptyPDFContainer ({ readOnly, isSelected, ...props }: HTMLAttributes<HTMLDivElement> & {readOnly: boolean; isSelected?: boolean;}) {
+function EmptyPDFContainer ({ readOnly, isSelected, ...props }: HTMLAttributes<HTMLDivElement> & {readOnly: boolean; isSelected?: boolean}) {
   const theme = useTheme();
 
   return (
@@ -122,7 +122,7 @@ const PDF = memo((props: PDFViewerProps) => {
   const [pageCount, setPageCount] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState(1);
 
-  function onDocumentLoadSuccess ({ numPages }: { numPages : number; }) {
+  function onDocumentLoadSuccess ({ numPages }: { numPages : number }) {
     setPageCount(numPages);
     setPageNumber(pageNumber || 1);
   }
@@ -163,7 +163,7 @@ const PDF = memo((props: PDFViewerProps) => {
 });
 
 function ResizablePDF ({ readOnly, onResizeStop, node, updateAttrs, selected }:
-  NodeViewProps & {readOnly?: boolean; onResizeStop?: (view: EditorView) => void; }) {
+  NodeViewProps & {readOnly?: boolean; onResizeStop?: (view: EditorView) => void }) {
   readOnly = readOnly ?? false;
 
   const url: string = useMemo(() => node.attrs.src, [node.attrs.src]);

@@ -38,7 +38,7 @@ interface RoleRowProps {
   refreshRoles: () => void;
 }
 
-const ScrollableBox = styled.div<{ rows: number; }>`
+const ScrollableBox = styled.div<{ rows: number }>`
   max-height: 300px; // about 5 rows * 60px
   overflow: auto;
   ${({ theme, rows }) => rows > 5 && `border-bottom: 1px solid ${theme.palette.divider}`};

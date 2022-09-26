@@ -20,7 +20,7 @@ interface InlinePaletteRowProps {
   allowHover?: boolean;
 }
 
-const StyledInlinePaletteRow = styled.div<{ disabled: boolean; }>`
+const StyledInlinePaletteRow = styled.div<{ disabled: boolean }>`
   padding: 0.5rem 0;
   cursor: pointer;
   display: flex;

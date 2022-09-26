@@ -12,7 +12,7 @@ import { useTreeItem } from '@mui/lab/TreeItem';
 import PageTreeItem from './PageTreeItem';
 import BoardViewTreeItem from './BoardViewTreeItem';
 
-export type MenuNode = Pick<Page, 'id' | 'spaceId' | 'title' | 'icon' | 'index' | 'parentId' | 'path' | 'type' | 'createdAt' | 'deletedAt'> & { isEmptyContent?: boolean; };
+export type MenuNode = Pick<Page, 'id' | 'spaceId' | 'title' | 'icon' | 'index' | 'parentId' | 'path' | 'type' | 'createdAt' | 'deletedAt'> & { isEmptyContent?: boolean };
 
 export type ParentMenuNode = MenuNode & {
   children: ParentMenuNode[];
@@ -39,7 +39,7 @@ function DraggableTreeNode ({ item, onDropAdjacent, onDropChild, pathPrefix, add
     })
   }));
 
-  const [{ canDrop, isOverCurrent }, drop] = useDrop<ParentMenuNode, any, { canDrop: boolean; isOverCurrent: boolean; }>(() => ({
+  const [{ canDrop, isOverCurrent }, drop] = useDrop<ParentMenuNode, any, { canDrop: boolean; isOverCurrent: boolean }>(() => ({
     accept: 'item',
     drop (droppedItem, monitor) {
       const didDrop = monitor.didDrop();

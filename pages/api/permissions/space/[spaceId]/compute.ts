@@ -14,7 +14,7 @@ handler.use(requireUser)
 
 async function computeSpacePermissionsController (req: NextApiRequest, res: NextApiResponse<SpacePermissionFlags>) {
 
-  const { spaceId } = req.query as {spaceId: string;};
+  const { spaceId } = req.query as {spaceId: string};
 
   const { id: userId } = req.session.user;
 

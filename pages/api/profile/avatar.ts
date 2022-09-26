@@ -20,7 +20,7 @@ handler
   .use(requireUser)
   .put(updateAvatar);
 
-async function updateAvatar (req: NextApiRequest, res: NextApiResponse<LoggedInUser | {error: string;}>) {
+async function updateAvatar (req: NextApiRequest, res: NextApiResponse<LoggedInUser | {error: string}>) {
   const { avatar, avatarTokenId, avatarContract, avatarChain } = req.body as UserAvatar;
   const { id: userId } = req.session.user;
 

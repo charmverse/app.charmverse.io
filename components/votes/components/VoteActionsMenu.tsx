@@ -11,7 +11,7 @@ interface VoteActionsProps {
   deleteVote?: (voteId: string) => Promise<void>;
   cancelVote: (voteId: string) => Promise<void>;
   removeFromPage?: (voteId: string) => void;
-  vote: { createdBy: string; id: string; deadline?: Date; status: string; title: string; context: VoteContext; };
+  vote: { createdBy: string; id: string; deadline?: Date; status: string; title: string; context: VoteContext };
 }
 
 export default function VoteActionsMenu ({ cancelVote, deleteVote, removeFromPage, vote }: VoteActionsProps) {

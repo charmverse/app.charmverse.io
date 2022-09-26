@@ -37,7 +37,7 @@ export interface UpdateTasksState {
   snoozeFor: Date | null;
 }
 
-async function updateTasksState (req: NextApiRequest, res: NextApiResponse<{ ok: true; }>) {
+async function updateTasksState (req: NextApiRequest, res: NextApiResponse<{ ok: true }>) {
   const { snoozeFor, snoozeMessage } = req.body as UpdateTasksState;
   await prisma.userNotificationState.upsert({
     where: {

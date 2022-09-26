@@ -18,7 +18,7 @@ function timestampDifferenceInSeconds (
   return Math.floor(convertToUnixSeconds(first) - convertToUnixSeconds(second));
 }
 
-export function RelativeTime ({ timestamp }: { timestamp: number | Date; }) {
+export function RelativeTime ({ timestamp }: { timestamp: number | Date }) {
   const [, refreshLabel] = useState('');
 
   const now = Date.now();

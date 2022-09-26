@@ -52,9 +52,9 @@ const ShareModalContainer = styled.div`
 // Example: https://github.com/LIT-Protocol/lit-js-sdk/blob/9b956c0f399493ae2d98b20503c5a0825e0b923c/build/manual_tests.html
 // Docs: https://www.npmjs.com/package/lit-share-modal-v3
 
-type ConditionsModalResult = Pick<SigningConditions, 'unifiedAccessControlConditions' | 'permanant'> & { authSigTypes: string[]; chains: string[]; };
+type ConditionsModalResult = Pick<SigningConditions, 'unifiedAccessControlConditions' | 'permanant'> & { authSigTypes: string[]; chains: string[] };
 
-export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean; spaceId: string; }) {
+export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean; spaceId: string }) {
   const deletePopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-delete' });
   const [removedTokenGate, setRemovedTokenGate] = useState<TokenGate | null>(null);
 

@@ -106,7 +106,7 @@ export const getNFT = async (contractAddress: string, tokenId: string, chainId: 
 
 export const getOwners = async (contractAddress: string, tokenId: string, chainId: SupportedChainId = 1) => {
   const url = `${getAlchemyBaseUrl(chainId)}/getOwnersForToken?contractAddress=${contractAddress}&tokenId=${tokenId}`;
-  const res = await GET<{ owners: string[]; }>(url);
+  const res = await GET<{ owners: string[] }>(url);
 
   return res.owners;
 };

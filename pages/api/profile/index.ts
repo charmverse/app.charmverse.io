@@ -19,7 +19,7 @@ handler
   .get(getUser)
   .put(updateUser);
 
-async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any; }>) {
+async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
 
   const { address } = req.body;
 
@@ -43,7 +43,7 @@ async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
   res.status(200).json(user);
 }
 
-async function getUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any; }>) {
+async function getUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
   const profile = await prisma.user.findUnique({
     where: {
       id: req.session.user.id
@@ -56,7 +56,7 @@ async function getUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser |
   return res.status(200).json(profile);
 }
 
-async function updateUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | {error: string;}>) {
+async function updateUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | {error: string}>) {
 
   const user = await prisma.user.update({
     where: {

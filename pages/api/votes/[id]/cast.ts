@@ -16,7 +16,7 @@ handler
   .use(requireKeys(['choice'], 'body'))
   .post(castVote);
 
-async function castVote (req: NextApiRequest, res: NextApiResponse<UserVote | { error: any; }>) {
+async function castVote (req: NextApiRequest, res: NextApiResponse<UserVote | { error: any }>) {
   const { choice } = req.body as UserVoteDTO;
   const voteId = req.query.id as string;
   const userId = req.session.user.id;

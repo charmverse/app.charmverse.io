@@ -5,7 +5,7 @@ import type { Card } from 'lib/focalboard/card';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 
 export interface IPageWithPermissions extends Page {
-  permissions: (PagePermission & {sourcePermission: PagePermission | null;}) [];
+  permissions: (PagePermission & {sourcePermission: PagePermission | null}) [];
 }
 
 export interface PageWithChildren extends IPageWithPermissions {
@@ -45,9 +45,9 @@ export interface PublicPageResponse {
 export type PageNode<A = {}> = Pick<Page, 'id' | 'spaceId' | 'type' | 'parentId' | 'index' | 'createdAt' | 'deletedAt'> & Partial<Pick<Page, 'boardId' | 'cardId'>> & A
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export type PageNodeWithChildren<A = {}> = PageNode<{children: PageNodeWithChildren<A>[];}> & A
+export type PageNodeWithChildren<A = {}> = PageNode<{children: PageNodeWithChildren<A>[]}> & A
 
-export type PageNodeWithPermissions = PageNode<{permissions: (PagePermission & {sourcePermission: PagePermission | null;})[];}>
+export type PageNodeWithPermissions = PageNode<{permissions: (PagePermission & {sourcePermission: PagePermission | null})[]}>
 
 /**
  * @rootPageIds The list of roots we want to track
@@ -89,6 +89,6 @@ export type TargetPageTreeWithFlatChildren<T extends PageNode = PageNode> = {
   flatChildren: PageNodeWithChildren<T>[];
 }
 
-export type PageWithProposal = (Page & {proposal: ProposalWithUsers | null;})
+export type PageWithProposal = (Page & {proposal: ProposalWithUsers | null})
 
 export type PagesMap<P extends IPageWithPermissions | PageNode = IPageWithPermissions> = Record<string, P | undefined>;

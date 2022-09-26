@@ -17,7 +17,7 @@ const FixedWidthStyledBox = styled(StyledBox)`
   max-width: 100%;
 `;
 
-export function CenteredPageContent (props: { children: ReactNode; }) {
+export function CenteredPageContent (props: { children: ReactNode }) {
   return (
     <ScrollableWindow>
       <FixedWidthStyledBox>
@@ -27,7 +27,7 @@ export function CenteredPageContent (props: { children: ReactNode; }) {
   );
 }
 
-export function FullWidthPageContent (props: { children: ReactNode; }) {
+export function FullWidthPageContent (props: { children: ReactNode }) {
 
   return (
     <ScrollableWindow>

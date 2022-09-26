@@ -8,7 +8,7 @@ import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { IPageWithPermissions } from 'lib/pages';
 
-const StyledPageTemplateBanner = styled(Box)<{card?: boolean;}>`
+const StyledPageTemplateBanner = styled(Box)<{card?: boolean}>`
 
   top: ${({ card }) => card ? '50px' : '55px'};
   width: '100%';
@@ -20,7 +20,7 @@ const StyledPageTemplateBanner = styled(Box)<{card?: boolean;}>`
   padding: ${({ theme }) => theme.spacing(1.4)};
 `;
 
-export function PageTemplateBanner ({ page, parentPage }: {parentPage?: IPageWithPermissions | null; page: IPageWithPermissions;}) {
+export function PageTemplateBanner ({ page, parentPage }: {parentPage?: IPageWithPermissions | null; page: IPageWithPermissions}) {
   const [space] = useCurrentSpace();
   const theme = useTheme();
 

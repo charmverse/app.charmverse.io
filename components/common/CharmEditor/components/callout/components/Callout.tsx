@@ -40,7 +40,7 @@ const CalloutEmoji = styled.div`
   }
 `;
 
-export default function Callout ({ children, node, updateAttrs }: NodeViewProps & { children: ReactNode; }) {
+export default function Callout ({ children, node, updateAttrs }: NodeViewProps & { children: ReactNode }) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: MouseEvent<HTMLElement>) => {

@@ -36,7 +36,7 @@ const defaultPaymentMethods: Pick<PaymentMethod, 'chainId' | 'contractAddress' |
  * @createdBy Defaults to the space creator
  */
 export async function setupDefaultPaymentMethods ({ createdBy, spaceIdOrSpace }:
-    {createdBy?: string; spaceIdOrSpace: string | Pick<Space, 'id' | 'createdBy'>;}): Promise<PaymentMethod[]> {
+    {createdBy?: string; spaceIdOrSpace: string | Pick<Space, 'id' | 'createdBy'>}): Promise<PaymentMethod[]> {
 
   const space: Pick<Space, 'id' | 'createdBy'> | null = typeof spaceIdOrSpace === 'string' ? await prisma.space.findUnique({ where: { id: spaceIdOrSpace } }) : spaceIdOrSpace;
 

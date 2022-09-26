@@ -29,7 +29,7 @@ const VotesContext = createContext<Readonly<IContext>>({
   cancelVote: () => undefined as any
 });
 
-export function VotesProvider ({ children }: { children: ReactNode; }) {
+export function VotesProvider ({ children }: { children: ReactNode }) {
   const { currentPageId } = usePages();
   const [votes, setVotes] = useState<IContext['votes']>({});
   const { user } = useUser();

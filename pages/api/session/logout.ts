@@ -8,7 +8,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(logout);
 
-async function logout (req: NextApiRequest, res: NextApiResponse<{ ok: boolean; }>) {
+async function logout (req: NextApiRequest, res: NextApiResponse<{ ok: boolean }>) {
   req.session.destroy();
   res.send({ ok: true });
 }

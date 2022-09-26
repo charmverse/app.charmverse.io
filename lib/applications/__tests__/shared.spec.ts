@@ -222,7 +222,7 @@ describe('bountyCanReceiveNewSubmissionsOrApplications', () => {
 describe('submissionIsEditable', () => {
   it('should return true  if submission status is "inProgress" or "review" AND bounty is "open" or "inProgress"', async () => {
 
-    const validStatusCombinations: {bountyStatus: BountyStatus; submissionStatus: ApplicationStatus;}[] = [
+    const validStatusCombinations: {bountyStatus: BountyStatus; submissionStatus: ApplicationStatus}[] = [
       {
         bountyStatus: 'inProgress',
         submissionStatus: 'inProgress'

@@ -11,7 +11,7 @@ export function applicantIsSubmitter (application: Application): boolean {
   return application.status !== 'applied' && application.status !== 'rejected';
 }
 
-export function submissionIsEditable ({ submission, bounty }: {submission: Application; bounty: Bounty;}) {
+export function submissionIsEditable ({ submission, bounty }: {submission: Application; bounty: Bounty}) {
   if (submission.status !== 'inProgress' && submission.status !== 'review') {
     return false;
   }
@@ -55,7 +55,7 @@ export function countValidSubmissions (submissions: Application[]): number {
 /*
  * Whether a bounty can accept more submissions
  */
-export function submissionsCapReached ({ bounty, submissions }: {bounty: Bounty; submissions: Application[];}): boolean {
+export function submissionsCapReached ({ bounty, submissions }: {bounty: Bounty; submissions: Application[]}): boolean {
   if (bounty.maxSubmissions === null) {
     return false;
   }
@@ -71,7 +71,7 @@ export function submissionsCapReached ({ bounty, submissions }: {bounty: Bounty;
 }
 
 export function bountyCanReceiveNewSubmissionsOrApplications ({ bounty, submissionsAndApplications }:
-  {bounty: Bounty; submissionsAndApplications: Application[];}): boolean {
+  {bounty: Bounty; submissionsAndApplications: Application[]}): boolean {
   if (bounty.status !== 'open') {
     return false;
   }

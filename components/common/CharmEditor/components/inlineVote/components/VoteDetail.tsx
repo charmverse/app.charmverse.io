@@ -26,7 +26,7 @@ export interface VoteDetailProps {
   cancelVote: (voteId: string) => Promise<void>;
 }
 
-const StyledDiv = styled.div<{ detailed: boolean; }>`
+const StyledDiv = styled.div<{ detailed: boolean }>`
   background-color: ${({ theme, detailed }) => detailed && theme.palette.mode !== 'light' ? theme.palette.background.default : theme.palette.background.light};
   padding: ${({ theme }) => theme.spacing(2)};
 `;

@@ -23,7 +23,7 @@ interface ProfileItemProps {
   collectable: Collectable;
 }
 
-export const ProfileItemContainer = styled(({ visible, ...props }: any) => <Stack {...props} />)<{ visible: boolean; }>`
+export const ProfileItemContainer = styled(({ visible, ...props }: any) => <Stack {...props} />)<{ visible: boolean }>`
 
   .hidden-on-visible {
     opacity: ${({ visible }) => (visible ? 1 : 0.25)};

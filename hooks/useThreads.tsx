@@ -31,7 +31,7 @@ export const ThreadsContext = createContext<Readonly<IContext>>({
   refetchThreads: undefined as any
 });
 
-export function ThreadsProvider ({ children }: { children: ReactNode; }) {
+export function ThreadsProvider ({ children }: { children: ReactNode }) {
   const { currentPageId } = usePages();
   const [threads, setThreads] = useState<Record<string, ThreadWithCommentsAndAuthors | undefined>>({});
 

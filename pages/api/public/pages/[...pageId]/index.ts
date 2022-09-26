@@ -133,7 +133,7 @@ async function extractPageArtifacts (linkedPageIds: string[]) {
 
 async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPageResponse>) {
 
-  const { pageId: pageIdOrPath } = req.query as { pageId: string[]; };
+  const { pageId: pageIdOrPath } = req.query as { pageId: string[] };
 
   const isPageId = typeof pageIdOrPath[0] === 'string' && isUUID(pageIdOrPath[0]);
 

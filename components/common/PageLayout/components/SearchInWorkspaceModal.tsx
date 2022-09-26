@@ -177,7 +177,7 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
                   <Stack>
                     <StyledTypographyPage>
                       {
-                        parts.map((part: { text: string; highlight: boolean; }, _index: number) => {
+                        parts.map((part: { text: string; highlight: boolean }, _index: number) => {
                           return (
                             <span
                               style={{

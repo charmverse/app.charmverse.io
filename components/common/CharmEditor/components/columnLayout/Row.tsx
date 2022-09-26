@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { memo } from 'react';
 
 // grid-template-columns: repeat(${({ colCount }) => `${colCount}, ${Math.floor(100 / colCount)}`}fr);
-const StyledColumnLayout = styled.div<{colCount: number;}>`
+const StyledColumnLayout = styled.div<{colCount: number}>`
 
   & > .bangle-nv-child-container {
     height: 100%;
@@ -18,7 +18,7 @@ const StyledColumnLayout = styled.div<{colCount: number;}>`
   }
 `;
 
-function ColumnLayout ({ children, node }: {node: Node; children: ReactNode;}) {
+function ColumnLayout ({ children, node }: {node: Node; children: ReactNode}) {
   const totalChildren = (node.content as any)?.content?.length ?? 3;
   return (
     <StyledColumnLayout colCount={totalChildren}>

@@ -4,7 +4,7 @@ import { alpha } from '@mui/system';
 import { Box } from '@mui/material';
 import { useTheme } from '@emotion/react';
 
-function PlaceHolder ({ show, text = "Type '/' for commands", sx }: { sx?: SxProps; text?: string; show: boolean; }) {
+function PlaceHolder ({ show, text = "Type '/' for commands", sx }: { sx?: SxProps; text?: string; show: boolean }) {
   const theme = useTheme();
   return show ? (
     <Box sx={{

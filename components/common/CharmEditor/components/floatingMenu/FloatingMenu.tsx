@@ -38,7 +38,7 @@ export default function FloatingMenuComponent (
     <FloatingMenu
       menuKey={pluginKey}
       renderMenuType={(menuType) => {
-        const { type } = menuType as {type: SubMenu;};
+        const { type } = menuType as {type: SubMenu};
         if (type as FloatingMenuVariant === 'commentOnlyMenu' && pagePermissions?.comment) {
           return (
             <Menu>

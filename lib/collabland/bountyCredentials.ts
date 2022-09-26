@@ -4,9 +4,9 @@ import * as client from './collablandClient';
 
 const DOMAIN = process.env.DOMAIN || 'https://test.charmverse.io';
 
-interface Space { id: string; domain: string; name: string; }
+interface Space { id: string; domain: string; name: string }
 
-export async function createBountyCreatedCredential ({ bountyId }: { bountyId: string; }) {
+export async function createBountyCreatedCredential ({ bountyId }: { bountyId: string }) {
 
   const bounty = await prisma.bounty.findUniqueOrThrow({
     where: {
@@ -37,7 +37,7 @@ export async function createBountyCreatedCredential ({ bountyId }: { bountyId: s
   }
 }
 
-export async function createBountyStartedCredential ({ bountyId, userId }: { bountyId: string; userId: string; }) {
+export async function createBountyStartedCredential ({ bountyId, userId }: { bountyId: string; userId: string }) {
 
   const bounty = await prisma.bounty.findUniqueOrThrow({
     where: {
@@ -70,7 +70,7 @@ export async function createBountyStartedCredential ({ bountyId, userId }: { bou
 
 }
 
-export async function createBountyCompletedCredential ({ bountyId, userId }: { bountyId: string; userId: string;}) {
+export async function createBountyCompletedCredential ({ bountyId, userId }: { bountyId: string; userId: string}) {
 
   const bounty = await prisma.bounty.findUniqueOrThrow({
     where: {

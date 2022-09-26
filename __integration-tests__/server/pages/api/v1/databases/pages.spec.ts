@@ -16,7 +16,7 @@ let space: Space;
 let apiToken: SpaceApiToken;
 
 // Setup value we can assert against, ignore the rest of the request
-let failedCreateResponse: {body: UnsupportedKeysError;};
+let failedCreateResponse: {body: UnsupportedKeysError};
 
 function invalidCreateRequest (): Promise<Response> {
   return request(baseUrl)

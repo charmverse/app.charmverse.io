@@ -24,7 +24,7 @@ const ContextElement = createContext<Readonly<Context>>({
 
 export const usePageDialog = () => useContext(ContextElement);
 
-export function PageDialogProvider ({ children }: { children: ReactNode; }) {
+export function PageDialogProvider ({ children }: { children: ReactNode }) {
 
   const [props, setProps] = useState<PageDialogContext>({});
 

@@ -26,7 +26,7 @@ export interface CredentialsResult {
   discordEvents: VerifiedCredential<DiscordRoleSubject>[];
 }
 
-export async function getCredentials ({ aeToken }: { aeToken: string; }): Promise<CredentialsResult> {
+export async function getCredentials ({ aeToken }: { aeToken: string }): Promise<CredentialsResult> {
 
   const res = await client.getCredentials({ aeToken });
 

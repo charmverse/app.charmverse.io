@@ -53,7 +53,7 @@ async function getUserProfile (req: NextApiRequest, res: NextApiResponse<PublicU
     throw new DataNotFoundError('User not found');
   }
 
-  function isVisible (item: { id: string; }): boolean {
+  function isVisible (item: { id: string }): boolean {
     return !userById.profileItems.some(profileItem => profileItem.isHidden && profileItem.id === item.id);
   }
 

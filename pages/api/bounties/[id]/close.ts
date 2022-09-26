@@ -17,7 +17,7 @@ handler.use(requireUser)
 
 async function closeBountyController (req: NextApiRequest, res: NextApiResponse<BountyWithDetails>) {
 
-  const { id: bountyId } = req.query as { id: string; };
+  const { id: bountyId } = req.query as { id: string };
 
   const bounty = await getBountyOrThrow(bountyId);
 

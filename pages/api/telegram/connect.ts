@@ -23,7 +23,7 @@ export interface TelegramAccount {
   username: string;
 }
 
-async function connectTelegram (req: NextApiRequest, res: NextApiResponse<TelegramUser | {error: string;}>) {
+async function connectTelegram (req: NextApiRequest, res: NextApiResponse<TelegramUser | {error: string}>) {
   const telegramAccount = req.body as TelegramAccount;
 
   const { id, ...rest } = telegramAccount;

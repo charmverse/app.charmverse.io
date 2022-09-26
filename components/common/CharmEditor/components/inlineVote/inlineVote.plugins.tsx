@@ -116,7 +116,7 @@ export function plugin ({ key } :{
   ];
 }
 
-function getDecorations ({ schema, doc }: { doc: Node; schema: Schema; }) {
+function getDecorations ({ schema, doc }: { doc: Node; schema: Schema }) {
 
   const rows = extractInlineVoteRows(schema, doc);
   const decorations: Decoration[] = rows.map(row => {

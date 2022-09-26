@@ -18,7 +18,7 @@ export const PageActionDisplayContext = createContext<IPageActionDisplayContext>
   setCurrentPageActionDisplay: () => undefined
 });
 
-export function PageActionDisplayProvider ({ children }: { children: ReactNode; }) {
+export function PageActionDisplayProvider ({ children }: { children: ReactNode }) {
 
   // only calculate once
   const smallScreen = useMemo(() => isSmallScreen(), []);

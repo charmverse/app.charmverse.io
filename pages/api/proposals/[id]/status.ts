@@ -15,7 +15,7 @@ handler.use(requireUser)
   .use(requireKeys(['newStatus'], 'body'))
   .put(updateProposalStatusController);
 
-async function updateProposalStatusController (req: NextApiRequest, res: NextApiResponse<{newStatus: ProposalStatus;}>) {
+async function updateProposalStatusController (req: NextApiRequest, res: NextApiResponse<{newStatus: ProposalStatus}>) {
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
   const newStatus = req.body.newStatus as ProposalStatus;

@@ -42,7 +42,7 @@ interface CommunityRowProps {
   onClick: () => void;
 }
 
-function CountIcon ({ label, icon, count }: { label: string; icon: ReactNode; count: number; }) {
+function CountIcon ({ label, icon, count }: { label: string; icon: ReactNode; count: number }) {
   if (count === 0) {
     return null;
   }
@@ -55,7 +55,7 @@ function CountIcon ({ label, icon, count }: { label: string; icon: ReactNode; co
   );
 }
 
-function TaskTab ({ task, value, onClick }: { task: typeof TASK_TABS[number]; value: number; onClick: () => void; }) {
+function TaskTab ({ task, value, onClick }: { task: typeof TASK_TABS[number]; value: number; onClick: () => void }) {
 
   return (
     <Tab
@@ -117,7 +117,7 @@ function EventRow (event: EventRowProps) {
   );
 }
 
-function VotesPanel ({ events }: { events: DeepDaoVote[]; }) {
+function VotesPanel ({ events }: { events: DeepDaoVote[] }) {
 
   return (
     <>
@@ -140,7 +140,7 @@ function VotesPanel ({ events }: { events: DeepDaoVote[]; }) {
   );
 }
 
-function ProposalsPanel ({ events }: { events: DeepDaoProposal[]; }) {
+function ProposalsPanel ({ events }: { events: DeepDaoProposal[] }) {
 
   return (
     <>
@@ -162,7 +162,7 @@ function ProposalsPanel ({ events }: { events: DeepDaoProposal[]; }) {
   );
 }
 
-function BountyEventsPanel ({ events }: { events: ProfileBountyEvent[]; }) {
+function BountyEventsPanel ({ events }: { events: ProfileBountyEvent[] }) {
   return (
     <>
       {

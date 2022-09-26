@@ -12,7 +12,7 @@ export function loginWithTelegram (callback: (user: TelegramAccount) => void) {
   );
 }
 
-export default class TelegramLoginButton extends React.Component<{ widgetVersion?: string; }> {
+export default class TelegramLoginButton extends React.Component<{ widgetVersion?: string }> {
   instance: HTMLDivElement | null = null;
 
   componentDidMount () {

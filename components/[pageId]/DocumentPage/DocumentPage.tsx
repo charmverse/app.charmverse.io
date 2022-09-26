@@ -31,7 +31,7 @@ const CharmEditor = dynamic(() => import('components/common/CharmEditor'), {
   ssr: false
 });
 
-export const Container = styled(Box)<{ top: number; fullWidth?: boolean; }>`
+export const Container = styled(Box)<{ top: number; fullWidth?: boolean }>`
   width: ${({ fullWidth }) => fullWidth ? '100%' : '860px'};
   max-width: 100%;
   margin: 0 auto ${({ top }) => top + 100}px;

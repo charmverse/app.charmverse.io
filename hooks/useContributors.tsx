@@ -11,7 +11,7 @@ type Context = [users: Contributor[], setSpaces: (users: Contributor[]) => void]
 
 const ContributorsContext = createContext<Readonly<Context>>([[], () => undefined]);
 
-export function ContributorsProvider ({ children }: { children: ReactNode; }) {
+export function ContributorsProvider ({ children }: { children: ReactNode }) {
   const [space] = useCurrentSpace();
   const [contributors, setContributors] = useState<Contributor[]>([]);
 

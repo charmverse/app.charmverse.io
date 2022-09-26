@@ -36,19 +36,7 @@
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-inferrable-types": "off",
     "@typescript-eslint/no-empty-interface": "off",
-    "@typescript-eslint/member-delimiter-style": [
-      "error",
-      {
-          "multiline": {
-              "delimiter": "semi",
-              "requireLast": true
-          },
-          "singleline": {
-              "delimiter": "semi",
-              "requireLast": true
-          }
-      }
-    ],
+    "@typescript-eslint/member-delimiter-style": "error",
     "arrow-body-style": "off",
     "arrow-parens": "off",
     "brace-style": [

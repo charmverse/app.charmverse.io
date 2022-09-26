@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { Box, Typography } from '@mui/material';
 import { CommentOutlined } from '@mui/icons-material';
 
-export function RowDecoration ({ children }: { children: ReactNode; }) {
+export function RowDecoration ({ children }: { children: ReactNode }) {
   return (
     <Box
       display='flex'
@@ -15,7 +15,7 @@ export function RowDecoration ({ children }: { children: ReactNode; }) {
   );
 }
 
-export default function RowIcon ({ count }: { count: number; }) {
+export default function RowIcon ({ count }: { count: number }) {
   return (
     <RowDecoration>
       <CommentOutlined

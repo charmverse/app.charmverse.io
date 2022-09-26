@@ -28,7 +28,7 @@ export abstract class Permissions<O extends string> {
 
   private operations: {[key in O]: true};
 
-  constructor ({ allowedOperations }: {allowedOperations: O[];}) {
+  constructor ({ allowedOperations }: {allowedOperations: O[]}) {
     this.operations = allowedOperations.reduce((map, key) => {
       map[key] = true;
       return map;

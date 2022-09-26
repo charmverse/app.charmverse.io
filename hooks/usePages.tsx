@@ -19,7 +19,7 @@ import { useCurrentSpace } from './useCurrentSpace';
 import useIsAdmin from './useIsAdmin';
 import { useUser } from './useUser';
 
-export type LinkedPage = (Page & {children: LinkedPage[]; parent: null | LinkedPage;});
+export type LinkedPage = (Page & {children: LinkedPage[]; parent: null | LinkedPage});
 
 export type PagesContext = {
   currentPageId: string;
@@ -29,7 +29,7 @@ export type PagesContext = {
   isEditing: boolean;
   refreshPage: (pageId: string) => Promise<IPageWithPermissions>;
   setIsEditing: React.Dispatch<React.SetStateAction<boolean>>;
-  deletePage: (data: {pageId: string; board?: Block;}) => Promise<void>;
+  deletePage: (data: {pageId: string; board?: Block}) => Promise<void>;
   getPagePermissions: (pageId: string, page?: IPageWithPermissions) => IPagePermissionFlags;
 };
 
@@ -47,7 +47,7 @@ export const PagesContext = createContext<Readonly<PagesContext>>({
   deletePage: () => Promise.resolve({} as any)
 });
 
-export function PagesProvider ({ children }: { children: ReactNode; }) {
+export function PagesProvider ({ children }: { children: ReactNode }) {
 
   const isAdmin = useIsAdmin();
   const [isEditing, setIsEditing] = useState(false);
@@ -115,7 +115,7 @@ export function PagesProvider ({ children }: { children: ReactNode; }) {
     return computedPermissions;
   }
 
-  async function deletePage ({ pageId, board }: {pageId: string; board?: Block;}) {
+  async function deletePage ({ pageId, board }: {pageId: string; board?: Block}) {
     const page = pages[pageId];
     const totalNonArchivedPages = Object.values(pages).filter((p => p?.deletedAt === null && (p?.type === 'page' || p?.type === 'board'))).length;
 

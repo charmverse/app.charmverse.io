@@ -10,7 +10,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).get(getCurrentSpace);
 
-async function getCurrentSpace (req: NextApiRequest, res: NextApiResponse<Space | null | { error: string; }>) {
+async function getCurrentSpace (req: NextApiRequest, res: NextApiResponse<Space | null | { error: string }>) {
 
   const referer = req.headers.referer as string;
   const url = new URL(referer);

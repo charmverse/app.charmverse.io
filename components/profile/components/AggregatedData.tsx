@@ -1,6 +1,6 @@
 import { Box, Grid, Paper, Typography } from '@mui/material';
 
-export function AggregatedDataItem ({ value, label }: { value: number; label: string; }) {
+export function AggregatedDataItem ({ value, label }: { value: number; label: string }) {
   return (
     <Paper
       sx={{

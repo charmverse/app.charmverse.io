@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { getTwitterEmoji } from 'components/common/Emoji';
 
-function Favicon ({ pageIcon }: { pageIcon?: string | null; }) {
+function Favicon ({ pageIcon }: { pageIcon?: string | null }) {
 
   const favicon = {
     url: '/favicon.png',

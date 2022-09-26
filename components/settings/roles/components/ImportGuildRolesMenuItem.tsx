@@ -12,7 +12,7 @@ import { mutate } from 'swr';
 import { PimpedButton, StyledSpinner } from '../../../common/Button';
 import GuildsAutocomplete from './GuildsAutocomplete';
 
-export default function ImportGuildRolesMenuItem ({ onClose }: {onClose: () => void;}) {
+export default function ImportGuildRolesMenuItem ({ onClose }: {onClose: () => void}) {
   const [showImportedRolesModal, setShowImportedRolesModal] = useState(false);
   const [guilds, setGuilds] = useState<GetGuildsResponse>([]);
   const [fetchingGuilds, setFetchingGuilds] = useState(false);

@@ -121,7 +121,7 @@ export function silentlyUpdateURL (newUrl: string) {
 }
 
 export function getCookie (name: string): string {
-  const cookieMap = document.cookie.split(';').reduce<{ [key: string]: string; }>((cookies, cookie) => {
+  const cookieMap = document.cookie.split(';').reduce<{ [key: string]: string }>((cookies, cookie) => {
     const _name = cookie.trim().split('=')[0];
     const value = cookie.trim().split('=')[1];
     cookies[_name] = decodeURIComponent(value);
@@ -131,7 +131,7 @@ export function getCookie (name: string): string {
 }
 
 // cookies reference: https://developer.mozilla.org/en-US/docs/Web/API/document/cookie
-export function setCookie ({ name, value, expiresInDays = 10 * 365 }: { name: string; value: string; expiresInDays: number; }) {
+export function setCookie ({ name, value, expiresInDays = 10 * 365 }: { name: string; value: string; expiresInDays: number }) {
   const expires = new Date();
   expires.setDate(expires.getDate() + expiresInDays);
   document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires.toUTCString()}; path=/; secure`;

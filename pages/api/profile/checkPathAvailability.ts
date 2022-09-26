@@ -10,7 +10,7 @@ handler
   .use(requireUser)
   .get(checkPathExists);
 
-export async function checkPathExists (req: NextApiRequest, res: NextApiResponse<{ available: boolean;}>) {
+export async function checkPathExists (req: NextApiRequest, res: NextApiResponse<{ available: boolean}>) {
   const path = req.query.path as string;
   const isAvailable = await isProfilePathAvailable(path, req.session.user.id);
 

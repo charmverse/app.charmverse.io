@@ -8,7 +8,7 @@ import { truncate } from 'fs/promises';
  * @param param0
  * @returns
  */
-export async function getProposal ({ proposalId }: {proposalId: string;}): Promise<IPageWithPermissions & PageWithProposal> {
+export async function getProposal ({ proposalId }: {proposalId: string}): Promise<IPageWithPermissions & PageWithProposal> {
   const proposalPage = await prisma.page.findUnique({
     where: {
       proposalId

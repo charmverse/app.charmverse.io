@@ -40,7 +40,7 @@ async function getPageLink (req: NextApiRequest, res: NextApiResponse) {
     throw error;
   }
 
-  const pageLink = await generatePageLink(page as (Page & {space: Space;}));
+  const pageLink = await generatePageLink(page as (Page & {space: Space}));
 
   res.status(200).json(pageLink);
 

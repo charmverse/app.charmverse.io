@@ -9,7 +9,7 @@ type IContext = [spaces: Space[], setSpaces: (spaces: Space[]) => void, isLoaded
 
 export const SpacesContext = createContext<Readonly<IContext>>([[], () => undefined, false]);
 
-export function SpacesProvider ({ children }: { children: ReactNode; }) {
+export function SpacesProvider ({ children }: { children: ReactNode }) {
 
   const { user, isLoaded: isUserLoaded } = useUser();
   const [spaces, setSpaces] = useState<Space[]>([]);

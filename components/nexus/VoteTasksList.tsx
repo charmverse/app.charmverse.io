@@ -24,7 +24,7 @@ interface VoteTasksListProps {
  * Page only needs to be provided for proposal type votes
  */
 export function VoteTasksListRow (
-  props: {voteTask: VoteTask; mutateTasks: KeyedMutator<GetTasksResponse>;}
+  props: {voteTask: VoteTask; mutateTasks: KeyedMutator<GetTasksResponse>}
 ) {
   const {
     voteTask,

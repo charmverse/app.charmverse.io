@@ -120,7 +120,7 @@ export function plugin ({ key } :{
   ];
 }
 
-function getDecorations ({ schema, doc }: { doc: Node; schema: Schema; }) {
+function getDecorations ({ schema, doc }: { doc: Node; schema: Schema }) {
   const rows = extractInlineCommentRows(schema, doc);
   const uniqueCommentIds: Set<string> = new Set();
 

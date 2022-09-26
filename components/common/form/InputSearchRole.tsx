@@ -31,7 +31,7 @@ function filterRoles (roles: ReducedRole[], filter: IRolesFilter): ReducedRole[]
 
 function InputSearchRoleBase ({
   defaultValue, disableCloseOnSelect = false, filter, showWarningOnNoRoles = false, placeholder, ...props
-}: Partial<ComponentProps<typeof Autocomplete>> & { filter?: IRolesFilter; } & { showWarningOnNoRoles?: boolean; }) {
+}: Partial<ComponentProps<typeof Autocomplete>> & { filter?: IRolesFilter } & { showWarningOnNoRoles?: boolean }) {
   const { roles } = useRoles();
   const [space] = useCurrentSpace();
 

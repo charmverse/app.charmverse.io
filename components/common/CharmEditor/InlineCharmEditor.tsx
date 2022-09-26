@@ -102,7 +102,7 @@ export function charmEditorPlugins (
   ];
 }
 
-const StyledReactBangleEditor = styled(ReactBangleEditor)<{ noPadding?: boolean; }>`
+const StyledReactBangleEditor = styled(ReactBangleEditor)<{ noPadding?: boolean }>`
   & {
     padding: ${({ noPadding, theme }) => noPadding ? 0 : theme.spacing(0, 1)};
   }

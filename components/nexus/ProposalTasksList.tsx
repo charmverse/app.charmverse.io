@@ -33,7 +33,7 @@ export function ProposalTasksListRow (
       action,
       status
     }
-  }: { proposalTask: ProposalTask; }
+  }: { proposalTask: ProposalTask }
 ) {
   const proposalLink = `/${spaceDomain}/${pagePath}`;
   const proposalLocation = spaceName;

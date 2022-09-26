@@ -35,7 +35,7 @@ const ContextBorder = styled.div`
   padding-bottom: 2px;
 `;
 
-const StyledPageThread = styled(Paper)<{ inline: string; }>`
+const StyledPageThread = styled(Paper)<{ inline: string }>`
   overflow: ${({ inline }) => inline === 'true' ? 'auto' : 'unset'};
   padding: ${({ theme, inline }) => theme.spacing(inline === 'true' ? 2 : 1)};
   background: ${({ theme }) => theme.palette.background.light};
@@ -50,7 +50,7 @@ const ThreadHeader = styled.div`
   gap: ${({ theme }) => theme.spacing(2)}
 `;
 
-const ThreadCommentListItem = styled(ListItem)<{ highlighted?: string; }>`
+const ThreadCommentListItem = styled(ListItem)<{ highlighted?: string }>`
   background: ${({ highlighted }) => highlighted === 'true' ? 'rgba(46, 170, 220, 0.15)' : 'inherit'};
   display: flex;
   flex-direction: column;
@@ -72,7 +72,7 @@ const ThreadCommentListItem = styled(ListItem)<{ highlighted?: string; }>`
   }
 `;
 
-function ThreadHeaderButton ({ disabled = false, onClick, text, startIcon, ...props }: {disabled?: boolean; onClick: ButtonProps['onClick']; text: string;} & ButtonProps) {
+function ThreadHeaderButton ({ disabled = false, onClick, text, startIcon, ...props }: {disabled?: boolean; onClick: ButtonProps['onClick']; text: string} & ButtonProps) {
   return (
     <Button
       disabled={disabled}
@@ -97,7 +97,7 @@ function ThreadHeaderButton ({ disabled = false, onClick, text, startIcon, ...pr
 
 function AddCommentCharmEditor (
   { sx, threadId, disabled, onClick, readOnly }:
-  {onClick: (cb: () => void) => void; readOnly: boolean; disabled: boolean; threadId: string; sx: SxProps;}
+  {onClick: (cb: () => void) => void; readOnly: boolean; disabled: boolean; threadId: string; sx: SxProps}
 ) {
   const [commentContent, setCommentContent] = useState<PageContent | null>(null);
   const theme = useTheme();
@@ -142,7 +142,7 @@ function AddCommentCharmEditor (
   );
 }
 
-function EditCommentCharmEditor ({ disabled, isEditable, threadId, commentId, onContainerClick, onSave, onCancel }: {disabled: boolean; isEditable: boolean; onCancel: ButtonProps['onClick']; threadId: string; commentId: string; onContainerClick: BoxProps['onClick']; onSave: (cb: () => Promise<void>) => void;}) {
+function EditCommentCharmEditor ({ disabled, isEditable, threadId, commentId, onContainerClick, onSave, onCancel }: {disabled: boolean; isEditable: boolean; onCancel: ButtonProps['onClick']; threadId: string; commentId: string; onContainerClick: BoxProps['onClick']; onSave: (cb: () => Promise<void>) => void}) {
   const [commentContent, setCommentContent] = useState<PageContent | null>(null);
   const isEmpty = checkForEmpty(commentContent);
   const { editComment, threads } = useThreads();
@@ -212,7 +212,7 @@ interface PageThreadProps {
   showFindButton?: boolean;
 }
 
-function ThreadCreatedDate ({ createdAt }: {createdAt: Date;}) {
+function ThreadCreatedDate ({ createdAt }: {createdAt: Date}) {
   return (
     <Tooltip arrow placement='top' title={new Date(createdAt).toLocaleString()}>
       <Typography
@@ -231,7 +231,7 @@ function ThreadCreatedDate ({ createdAt }: {createdAt: Date;}) {
   );
 }
 
-const CommentDate = memo<{createdAt: Date; updatedAt?: Date | null;}>(({ createdAt, updatedAt }) => {
+const CommentDate = memo<{createdAt: Date; updatedAt?: Date | null}>(({ createdAt, updatedAt }) => {
   return (
     <Typography
       sx={{

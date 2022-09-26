@@ -15,8 +15,8 @@ import AddCircle from '@mui/icons-material/AddCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 interface InlineVoteOptionsProps {
-  options: { name: string; }[];
-  setOptions: Dispatch<SetStateAction<{ name: string; }[]>>;
+  options: { name: string }[];
+  setOptions: Dispatch<SetStateAction<{ name: string }[]>>;
 }
 
 function InlineVoteOptions (
@@ -94,7 +94,7 @@ export default function CreateVoteModal ({ open = true, onClose, onCreateVote, i
   const [voteDescription, setVoteDescription] = useState('');
   const [passThreshold, setPassThreshold] = useState<number>(50);
   const [voteType, setVoteType] = useState<VoteType>(VoteType.Approval);
-  const [options, setOptions] = useState<{ name: string; }[]>([]);
+  const [options, setOptions] = useState<{ name: string }[]>([]);
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
 
   const { createVote } = useVotes();
