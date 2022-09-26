@@ -21,6 +21,7 @@ services:
   devapp:
     build:
       context: .
+      target: localdev_app
     ports:
       - "80:3000"
     command: [ "npm", "run", "start" ]
@@ -28,6 +29,7 @@ services:
       - $PWD:/app
     env_file:
       - ".env"
+      - ".env.local"
     depends_on:
       - localpostgres
     profiles:
@@ -38,7 +40,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ${LOCAL_DATA_DIR:-/home/postgresql}:/var/lib/postgresql/
+      - ${PGDATA}:-./psqldata}:/var/lib/postgresql/
     profiles:
       - dev
 
