@@ -1,4 +1,4 @@
-import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createPage, createVote, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import type { Page, Space, User, Vote } from '@prisma/client';
@@ -12,7 +12,7 @@ let vote: Vote;
 let userCookie: string;
 
 beforeAll(async () => {
-  const { space: generatedSpace, user: generatedUser } = await generateUserAndSpaceWithApiToken(undefined, true);
+  const { space: generatedSpace, user: generatedUser } = await generateUserAndSpaceWithApiToken(undefined, false);
   user = generatedUser;
   space = generatedSpace;
 
@@ -43,17 +43,145 @@ describe('GET /api/votes/[id] - Get a single vote', () => {
 });
 
 describe('PUT /api/votes/[id] - Update a single vote', () => {
-  it('Should update vote and respond 200', async () => {
-    await request(baseUrl).put(`/api/votes/${vote.id}`).set('Cookie', userCookie).send({
+  it('Should update vote if the user has create_poll permission for the page and respond 200', async () => {
+    const nonAdminUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
+    const nonAdminCookie = await loginUser(nonAdminUser);
+    const votePage = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      pagePermissions: [{
+        permissionLevel: 'custom',
+        permissions: ['create_poll'],
+        userId: nonAdminUser.id
+      }]
+    });
+
+    const targetVote = await createVote({
+      createdBy: user.id,
+      pageId: votePage.id,
+      spaceId: space.id,
+      voteOptions: ['3', '4'],
+      userVotes: ['3']
+    });
+
+    await request(baseUrl).put(`/api/votes/${targetVote.id}`).set('Cookie', nonAdminCookie).send({
       status: 'Cancelled'
     })
       .expect(200);
   });
+
+  it('Should update vote if the user is an admin of the page space and respond 200', async () => {
+    const adminUser = await generateSpaceUser({ spaceId: space.id, isAdmin: true });
+    const adminCookie = await loginUser(adminUser);
+    const votePage = await createPage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    const targetVote = await createVote({
+      createdBy: user.id,
+      pageId: votePage.id,
+      spaceId: space.id,
+      voteOptions: ['3', '4'],
+      userVotes: ['3']
+    });
+
+    await request(baseUrl).put(`/api/votes/${targetVote.id}`).set('Cookie', adminCookie).send({
+      status: 'Cancelled'
+    })
+      .expect(200);
+  });
+
+  it('Should not update vote if the user does not have create_poll permission for the page and respond 200', async () => {
+    const nonAdminUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
+    const nonAdminCookie = await loginUser(nonAdminUser);
+    const votePage = await createPage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    const targetVote = await createVote({
+      createdBy: user.id,
+      pageId: votePage.id,
+      spaceId: space.id,
+      voteOptions: ['3', '4'],
+      userVotes: ['3']
+    });
+
+    await request(baseUrl).put(`/api/votes/${targetVote.id}`).set('Cookie', nonAdminCookie).send({
+      status: 'Cancelled'
+    })
+      .expect(401);
+  });
 });
 
 describe('DELETE /api/votes/[id] - Delete a single vote', () => {
-  it('Should delete update vote and respond 200', async () => {
-    await request(baseUrl).delete(`/api/votes/${vote.id}`).set('Cookie', userCookie).send()
+  it('Should delete vote if the user has create_poll permission for the page and respond 200', async () => {
+    const nonAdminUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
+    const nonAdminCookie = await loginUser(nonAdminUser);
+    const votePage = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      pagePermissions: [{
+        permissionLevel: 'custom',
+        permissions: ['create_poll'],
+        userId: nonAdminUser.id
+      }]
+    });
+
+    const targetVote = await createVote({
+      createdBy: user.id,
+      pageId: votePage.id,
+      spaceId: space.id,
+      voteOptions: ['3', '4'],
+      userVotes: ['3']
+    });
+
+    await request(baseUrl).delete(`/api/votes/${targetVote.id}`).set('Cookie', nonAdminCookie)
       .expect(200);
+  });
+
+  it('Should update vote if the user is an admin of the page space and respond 200', async () => {
+    const adminUser = await generateSpaceUser({ spaceId: space.id, isAdmin: true });
+    const adminCookie = await loginUser(adminUser);
+    const votePage = await createPage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    const targetVote = await createVote({
+      createdBy: user.id,
+      pageId: votePage.id,
+      spaceId: space.id,
+      voteOptions: ['3', '4'],
+      userVotes: ['3']
+    });
+
+    await request(baseUrl).delete(`/api/votes/${targetVote.id}`).set('Cookie', adminCookie).send({
+      status: 'Cancelled'
+    })
+      .expect(200);
+  });
+
+  it('Should not update vote if the user does not have create_poll permission for the page and respond 200', async () => {
+    const nonAdminUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
+    const nonAdminCookie = await loginUser(nonAdminUser);
+    const votePage = await createPage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    const targetVote = await createVote({
+      createdBy: user.id,
+      pageId: votePage.id,
+      spaceId: space.id,
+      voteOptions: ['3', '4'],
+      userVotes: ['3']
+    });
+
+    await request(baseUrl).delete(`/api/votes/${targetVote.id}`).set('Cookie', nonAdminCookie).send({
+      status: 'Cancelled'
+    })
+      .expect(401);
   });
 });

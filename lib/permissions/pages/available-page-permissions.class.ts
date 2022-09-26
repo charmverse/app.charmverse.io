@@ -15,6 +15,8 @@ export class AllowedPagePermissions extends Permissions<PageOperationType> {
 
   comment: boolean = false;
 
+  create_poll: boolean = false;
+
   edit_position: boolean = false;
 
   edit_content: boolean = false;

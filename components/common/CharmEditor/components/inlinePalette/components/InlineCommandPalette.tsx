@@ -53,7 +53,7 @@ export default function InlineCommandPalette (
 ) {
   const { query, counter, isVisible, tooltipContentDOM } = useInlinePaletteQuery(palettePluginKey);
   const view = useEditorViewContext();
-  const editorItems = useEditorItems({ nestedPagePluginKey });
+  const editorItems = useEditorItems({ disableNestedPage, nestedPagePluginKey });
   const isItemDisabled = useCallback(
     (item) => {
       return typeof item.disabled === 'function'

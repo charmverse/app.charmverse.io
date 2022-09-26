@@ -785,7 +785,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
   }
 
   // Array of tuple, [notion block id, charmverse block id]
-  async function createCharmversePageInMemory (pageIds: [string, string][], failedImportBlocks: Array<[string, number][]>) {
+  async function createCharmversePageInMemory (pageIds: [string, string][], failedImportBlocks: [string, number][][]) {
     // The last item of the pageIds is the notion block id and the optimistic charmverse page id
     const [notionPageId, charmversePageId] = pageIds[pageIds.length - 1];
     // The page might have been recursively created via a link_to_page block
