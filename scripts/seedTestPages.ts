@@ -36,7 +36,18 @@ export async function seedTestPages({spaceDomain, nestedPercent = 50, pagesToCre
     pageInputs.push(page)
   }
 
-  await prisma.$transaction(pageInputs.map(page => prisma.page.create({data: page})))
+  const permissionInputs: Prisma.PagePermissionCreateManyInput[] = pageInputs.map(p => ({
+    pageId: p.id as string,
+    spaceId: space.id,
+    permissionLevel: 'full_access'
+  }))
+
+  await prisma.$transaction([
+    ...pageInputs.map(page => prisma.page.create({data: page})),
+    prisma.pagePermission.createMany({
+      data: permissionInputs
+    })
+  ])
 
   console.log('Created ', pageInputs.length, ' pages')
 
@@ -63,8 +74,17 @@ export async function seedTestBoards({spaceDomain, boardCount = 1, cardCount}: {
     blockCreateArgs.push(blockArgs);
   }
 
+  const permissionInputs: Prisma.PagePermissionCreateManyInput[] = pageCreateArgs.map(p => ({
+    pageId: p.data.id as string,
+    spaceId: space.id,
+    permissionLevel: 'full_access'
+  }))
+
   await prisma.$transaction([
     ...pageCreateArgs.map(p => prisma.page.create(p)),
+    prisma.pagePermission.createMany({
+      data: permissionInputs
+    }),
     ...blockCreateArgs.map(b => prisma.block.createMany(b)) 
   ]);
 
@@ -74,3 +94,9 @@ export async function seedTestBoards({spaceDomain, boardCount = 1, cardCount}: {
 
 }
 
+
+seedTestPages({spaceDomain: 'digital-amethyst-mammal', pagesToCreate: 10, nestedPercent: 92})
+.then(() => {
+  console.log('Done')
+  process.exit(0)
+})

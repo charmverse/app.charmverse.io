@@ -8,7 +8,7 @@ export function pageStubToCreate ({ id, parentId, createdBy, spaceId, deletedAt 
   {id?: string, createdBy: string, spaceId: string, parentId?: string, deletedAt?: Date, title?: string}): Prisma.PageCreateInput {
 
   return {
-    id,
+    id: id ?? v4(),
     deletedAt,
     author: {
       connect: {
