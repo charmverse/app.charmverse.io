@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import { Box, Slide, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
+import { memo } from 'react';
 import PageActionToggle from 'components/[pageId]/DocumentPage/components/PageActionToggle';
 
 const PageActionListBox = styled.div`
@@ -16,9 +17,11 @@ const PageActionListBox = styled.div`
   background: ${({ theme }) => theme.palette.background.default};
 `;
 
-export default function SidebarDrawer ({ children, id, open, title }: { children: ReactNode, id: string, open: boolean, title: string }) {
+function SidebarDrawer ({ children, id, open, title }: { children: ReactNode, id: string, open: boolean, title: string }) {
+
   return (
     <Slide
+      appear={false}
       direction='left'
       in={open}
       style={{
@@ -48,3 +51,5 @@ export default function SidebarDrawer ({ children, id, open, title }: { children
     </Slide>
   );
 }
+
+export default memo(SidebarDrawer);

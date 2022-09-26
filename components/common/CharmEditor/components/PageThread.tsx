@@ -212,26 +212,7 @@ interface PageThreadProps {
   showFindButton?: boolean;
 }
 
-function ThreadCreatedDate ({ createdAt }: {createdAt: Date}) {
-  return (
-    <Tooltip arrow placement='top' title={new Date(createdAt).toLocaleString()}>
-      <Typography
-        sx={{
-          cursor: 'pointer',
-          pl: 1
-        }}
-        color='secondary'
-        variant='subtitle1'
-        display='flex'
-        flexDirection='row'
-      >
-        Started {DateTime.fromJSDate(new Date(createdAt)).toRelative({ base: (DateTime.now()), style: 'short' })}
-      </Typography>
-    </Tooltip>
-  );
-}
-
-export const CommentDate = memo<{ createdAt: string, updatedAt?: string | null }>(({ createdAt, updatedAt }) => {
+export const RelativeDate = memo<{ createdAt: string, prefix?: string, updatedAt?: string | null }>(({ createdAt, prefix, updatedAt }) => {
 
   const getDateTime = () => DateTime.fromISO(createdAt);
 
@@ -340,7 +321,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
     <StyledPageThread inline={inline.toString()} id={`thread.${threadId}`} ref={ref}>
       <div>
         <ThreadHeader>
-          <ThreadCreatedDate createdAt={thread.createdAt} />
+          <RelativeDate prefix='Started ' createdAt={thread.createdAt.toString()} />
         </ThreadHeader>
         {thread.comments.map((comment, commentIndex) => {
           const isEditable = comment.id === editedCommentId;
@@ -374,7 +355,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                     fontSize={14}
                     fontWeight={500}
                   />
-                  <CommentDate createdAt={comment.createdAt.toString()} updatedAt={comment.updatedAt?.toString()} />
+                  <RelativeDate createdAt={comment.createdAt.toString()} updatedAt={comment.updatedAt?.toString()} />
                 </Box>
                 <div>
                   {commentIndex === 0 ? (

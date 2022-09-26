@@ -5,7 +5,7 @@ import type { Contributor } from 'hooks/useContributors';
 import { useContributors } from 'hooks/useContributors';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMemo } from 'react';
-import { CommentDate } from '../PageThread';
+import { RelativeDate } from '../PageThread';
 import { accept } from './track/accept';
 import { reject } from './track/reject';
 import type { TrackedEvent } from './getEvents';
@@ -73,7 +73,7 @@ export function SuggestionCard ({ readOnly, isOwner, active, data, node, pos, ty
         <Box display='flex' justifyContent='space-between'>
           <Box display='flex' alignItems='center' gap={1}>
             <SidebarUser user={contributors.find(contributor => contributor.id === data.user)} />
-            <CommentDate createdAt={data.date} />
+            <RelativeDate createdAt={data.date} />
           </Box>
           <Box display='flex' gap={1}>
             {!readOnly && (
