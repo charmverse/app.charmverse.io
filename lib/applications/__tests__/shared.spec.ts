@@ -6,6 +6,9 @@ import { bountyCanReceiveNewSubmissionsOrApplications, countValidSubmissions, su
 let user: User;
 let space: Space;
 
+const x: string = 5;
+const y = x + 4;
+
 beforeAll(async () => {
   const generated = await generateUserAndSpaceWithApiToken(undefined, true);
   user = generated.user;
