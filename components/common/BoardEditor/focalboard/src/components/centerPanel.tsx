@@ -222,9 +222,10 @@ function CenterPanel (props: Props) {
         'add card',
         async (block: Block) => {
           if (space) {
-            await mutate(`pages/${space.id}`, async (pages: Page[]): Promise<Page[]> => {
+            await mutate(`pages/${space.id}`, async (pages: Record<string, Page>): Promise<Record<string, Page>> => {
               const newPage = await charmClient.getPage(block.id);
-              return [...pages, newPage];
+
+              return { ...pages, [newPage.id]: newPage };
             }, {
               revalidate: false
             });

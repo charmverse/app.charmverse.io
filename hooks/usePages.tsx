@@ -2,17 +2,15 @@ import type { Page, Role } from '@prisma/client';
 import { PageOperations } from '@prisma/client';
 import charmClient from 'charmClient';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
-import useRefState from 'hooks/useRefState';
 import type { Block } from 'lib/focalboard/block';
 import type { IPageWithPermissions, PagesMap } from 'lib/pages';
 import type { IPagePermissionFlags, PageOperationType } from 'lib/permissions/pages';
 import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 import { permissionTemplates } from 'lib/permissions/pages/page-permission-mapping';
-import { isTruthy } from 'lib/utilities/types';
 import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import * as React from 'react';
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useContext, useMemo, useState } from 'react';
 import { untitledPage } from 'seedData';
 import useSWR from 'swr';
 import { useCurrentSpace } from './useCurrentSpace';
@@ -52,26 +50,38 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   const isAdmin = useIsAdmin();
   const [isEditing, setIsEditing] = useState(false);
   const [currentSpace] = useCurrentSpace();
-  const [pages, pagesRef, setPages] = useRefState<PagesContext['pages']>({});
   const [currentPageId, setCurrentPageId] = useState<string>('');
   const router = useRouter();
   const { user } = useUser();
 
-  const { data, mutate } = useSWR(() => currentSpace ? `pages/${currentSpace?.id}` : null, () => {
+  const { data, mutate } = useSWR(() => currentSpace ? `pages/${currentSpace?.id}` : null, async () => {
 
     if (!currentSpace) {
-      return [];
+      return {};
     }
 
-    return charmClient.getPages(currentSpace.id);
+    const pagesRes = await charmClient.getPages(currentSpace.id);
+    const pagesDict: PagesContext['pages'] = {};
+    pagesRes?.forEach((page) => {
+      pagesDict[page.id] = page;
+    }, {});
+
+    return pagesDict;
   }, { refreshInterval });
 
+  const pages = data || {};
+
   const _setPages: Dispatch<SetStateAction<PagesMap>> = (_pages) => {
-    const res = _pages instanceof Function ? _pages(pagesRef.current) : _pages;
-    mutate(() => Object.values(res).filter(isTruthy), {
+    let updatedData: PagesContext['pages'] = {};
+
+    mutate((currentData) => {
+      updatedData = _pages instanceof Function ? _pages(currentData || {}) : _pages;
+      return updatedData;
+    }, {
       revalidate: false
     });
-    return res;
+
+    return updatedData;
   };
 
   /**
@@ -143,7 +153,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
         );
       }
 
-      setPages((_pages) => {
+      _setPages((_pages) => {
         pageIds.forEach(_pageId => {
           _pages[_pageId] = {
             ..._pages[_pageId],
@@ -180,12 +190,6 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     getPagePermissions,
     refreshPage
   }), [currentPageId, isEditing, router, pages, user]);
-
-  useEffect(() => {
-    if (data) {
-      setPages(data.reduce((acc, page) => ({ ...acc, [page.id]: page }), {}) || {});
-    }
-  }, [data]);
 
   return (
     <PagesContext.Provider value={value}>
