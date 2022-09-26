@@ -1,6 +1,5 @@
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
-import styled from '@emotion/styled';
-import { Box, ClickAwayListener, Grow, Paper } from '@mui/material';
+import { Box, ClickAwayListener, Grow } from '@mui/material';
 import { createPortal } from 'react-dom';
 import type { PluginKey } from 'prosemirror-state';
 import React from 'react';
@@ -9,17 +8,9 @@ import { useUser } from 'hooks/useUser';
 import { getEventsFromDoc } from './getEvents';
 import { hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
 import type { SuggestionPluginState } from './suggestions.plugins';
+import { ThreadContainer } from '../inlineComment/inlineComment.components';
 
 import { SuggestionCard } from './SuggestionCard';
-
-const ThreadContainer = styled(Paper)`
-  max-height: 400px;
-  display: flex;
-  gap: ${({ theme }) => theme.spacing(1)};
-  flex-direction: column;
-  min-width: 500px;
-  overflow: auto;
-`;
 
 export default function SuggestionsPopup ({ pluginKey, readOnly }: { pluginKey: PluginKey<SuggestionPluginState>, readOnly: boolean }) {
   const view = useEditorViewContext();

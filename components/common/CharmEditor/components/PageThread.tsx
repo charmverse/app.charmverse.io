@@ -1,7 +1,6 @@
 import styled from '@emotion/styled';
 import type { ButtonProps, SxProps } from '@mui/material';
 import { Box, Collapse, Menu, MenuItem, ListItemText, ListItemIcon, Paper, Typography, Button, ListItem, IconButton, Tooltip } from '@mui/material';
-import { useTheme } from '@emotion/react';
 import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import type { CommentWithUser } from 'lib/comments/interfaces';
 import UserDisplay from 'components/common/UserDisplay';
@@ -38,16 +37,8 @@ const ContextBorder = styled.div`
 const StyledPageThread = styled(Paper)<{ inline: string }>`
   overflow: ${({ inline }) => inline === 'true' ? 'auto' : 'unset'};
   padding: ${({ theme, inline }) => theme.spacing(inline === 'true' ? 2 : 1)};
-  background: ${({ theme }) => theme.palette.background.light};
   width: ${({ inline }) => inline === 'true' ? '500px' : 'inherit'};
   max-height: ${({ inline }) => inline === 'true' ? '350px' : 'fit-content'};
-`;
-
-const ThreadHeader = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: ${({ theme }) => theme.spacing(2)}
 `;
 
 const ThreadCommentListItem = styled(ListItem)<{ highlighted?: string }>`
@@ -100,7 +91,6 @@ function AddCommentCharmEditor (
   {onClick: (cb: () => void) => void, readOnly: boolean, disabled: boolean, threadId: string, sx: SxProps}
 ) {
   const [commentContent, setCommentContent] = useState<PageContent | null>(null);
-  const theme = useTheme();
   const isEmpty = checkForEmpty(commentContent);
   const { addComment, threads } = useThreads();
   const thread = threads[threadId] as ThreadWithCommentsAndAuthors;
@@ -113,8 +103,10 @@ function AddCommentCharmEditor (
     <Box display='flex' px={1} pb={1} sx={sx} flexDirection='column' gap={1} mt={thread.comments.length !== 0 ? 1 : 0}>
       <InlineCharmEditor
         style={{
-          backgroundColor: theme.palette.background.default
+          backgroundColor: 'var(--input-bg)',
+          border: '1px solid var(--input-border)'
         }}
+        placeholderText='Reply...'
         key={thread.comments[thread.comments.length - 1]?.id}
         content={commentContent}
         onContentChange={({ doc }) => {
@@ -318,11 +310,8 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
   }
 
   return (
-    <StyledPageThread inline={inline.toString()} id={`thread.${threadId}`} ref={ref}>
+    <StyledPageThread inline={inline.toString()} variant='outlined' id={`thread.${threadId}`} ref={ref}>
       <div>
-        <ThreadHeader>
-          <RelativeDate prefix='Started ' createdAt={thread.createdAt.toString()} />
-        </ThreadHeader>
         {thread.comments.map((comment, commentIndex) => {
           const isEditable = comment.id === editedCommentId;
           return (

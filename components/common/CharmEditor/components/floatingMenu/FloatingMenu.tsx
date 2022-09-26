@@ -10,7 +10,7 @@ import { LinkSubMenu } from '../@bangle.dev/react-menu/LinkSubMenu';
 import { Menu } from '../@bangle.dev/react-menu/Menu';
 import { BoldButton, CalloutButton, CodeButton, FloatingLinkButton, HeadingButton, InlineCommentButton, InlineVoteButton, ItalicButton, ParagraphButton, StrikeButton, UnderlineButton } from '../@bangle.dev/react-menu/MenuButtons';
 import { MenuGroup } from '../@bangle.dev/react-menu/MenuGroup';
-import { InlineCommentSubMenu } from '../inlineComment/InlineComment.components';
+import { InlineCommentSubMenu } from '../inlineComment/inlineComment.components';
 import InlineVoteSubMenu from '../inlineVote/components/InlineVoteSubmenu';
 
 type FloatingMenuVariant = 'defaultMenu' | 'linkSubMenu' | 'inlineCommentSubMenu' | 'commentOnlyMenu';
