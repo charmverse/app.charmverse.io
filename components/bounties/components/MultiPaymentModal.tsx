@@ -140,6 +140,8 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
 
   const isDisabled = transactions.length === 0;
 
+  const modalProps = bindPopover(popupState);
+
   return (
     <>
       <Tooltip arrow placement='top' title={isDisabled ? `Batch payment requires at least one Completed bounty on the ${getChainById(gnosisSafeChainId || 1)?.chainName} network` : ''}>
@@ -155,7 +157,14 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
         </div>
       </Tooltip>
       {!isDisabled && (
-        <Modal {...bindPopover(popupState)} size='large'>
+        <Modal
+          {...modalProps}
+          size='large'
+          onClose={() => {
+            modalProps.onClose();
+            setGnosisSafeData(undefined);
+          }}
+        >
           <DialogTitle onClose={popupState.close}>
             Pay Bount{transactions.length > 1 ? 'ies' : 'y'}
           </DialogTitle>
@@ -187,10 +196,22 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
                     }}
                     sx={{ flexGrow: 1 }}
                     value={gnosisSafeData?.address ?? ''}
+                    displayEmpty
+                    renderValue={(safeAddress) => {
+                      if (safeAddress.length === 0) {
+                        return (
+                          <Typography
+                            color='secondary'
+                          >Please select your wallet
+                          </Typography>
+                        );
+                      }
+                      return safeDataRecord[safeAddress]?.name ?? safeAddress;
+                    }}
                   >
                     {safeInfos.map(safeInfo => (
                       <MenuItem key={safeInfo.address} value={safeInfo.address}>
-                        {gnosisSafeData ? safeDataRecord[safeInfo.address]?.name ?? gnosisSafeData.address : ''}
+                        {safeDataRecord[safeInfo.address]?.name ?? safeInfo.address}
                       </MenuItem>
                     ))}
                   </Select>
