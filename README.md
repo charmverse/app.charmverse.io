@@ -19,7 +19,7 @@ There are several ways you can contribute:
 
 If you don't have a local Postgres server running, you can install and run it with Docker:
 ```
-docker run -d -v $HOME/postgres:/var/lib/postgresql -p 5432:5432 -e POSTGRES_PASSWORD=postgres postgres
+docker run -d -v $HOME/postgresql/data:/var/lib/postgresql/data -p 5432:5432 -e POSTGRES_PASSWORD=postgres postgres
 ```
 The connection string can be overidden by copying the `.env` file and renaming to `.env.local`:
 ```
