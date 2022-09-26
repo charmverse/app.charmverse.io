@@ -44,7 +44,7 @@ interface JSONObject {
 }
 
 interface OptionsType {
-  levels: Array<number>;
+  levels: number[];
 }
 export const defaultKeys: { [index: string]: string | undefined } = {
   toH1: 'Shift-Ctrl-1',

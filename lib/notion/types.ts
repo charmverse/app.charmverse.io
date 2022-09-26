@@ -60,7 +60,7 @@ export type RichTextItemResponse = ({
 };
 
 export type GetDatabaseResponse = {
-  title: Array<RichTextItemResponse>;
+  title: RichTextItemResponse[];
   icon: {
     type: 'emoji';
     emoji: string;
@@ -105,22 +105,22 @@ export type GetDatabaseResponse = {
   } | {
     type: 'select';
     select: {
-      options: Array<{
+      options: {
         name: string;
         id?: string;
         color?: string;
-      }>;
+      }[];
     };
     id: string;
     name: string;
   } | {
     type: 'multi_select';
     multi_select: {
-      options: Array<{
+      options: {
         name: string;
         id?: string;
         color?: string;
-      }>;
+      }[];
     };
     id: string;
     name: string;
@@ -246,11 +246,11 @@ export type GetPageResponse = {
   };
   properties: Record<string, {
     type: 'title';
-    title: Array<RichTextItemResponse>;
+    title: RichTextItemResponse[];
     id: string;
   } | {
     type: 'rich_text';
-    rich_text: Array<RichTextItemResponse>;
+    rich_text: RichTextItemResponse[];
     id: string;
   }
   >;
@@ -300,7 +300,7 @@ export type GetPageResponse = {
 export type BlockObjectResponse = {
   type: 'paragraph';
   paragraph: {
-    rich_text: Array<RichTextItemResponse>;
+    rich_text: RichTextItemResponse[];
     color: ApiColor;
   };
   object: 'block';
@@ -320,7 +320,7 @@ export type BlockObjectResponse = {
 } | {
   type: 'heading_1';
   heading_1: {
-    rich_text: Array<RichTextItemResponse>;
+    rich_text: RichTextItemResponse[];
     color: ApiColor;
   };
   object: 'block';
@@ -340,7 +340,7 @@ export type BlockObjectResponse = {
 } | {
   type: 'heading_2';
   heading_2: {
-    rich_text: Array<RichTextItemResponse>;
+    rich_text: RichTextItemResponse[];
     color: ApiColor;
   };
   object: 'block';
@@ -360,7 +360,7 @@ export type BlockObjectResponse = {
 } | {
   type: 'heading_3';
   heading_3: {
-    rich_text: Array<RichTextItemResponse>;
+    rich_text: RichTextItemResponse[];
     color: ApiColor;
   };
   object: 'block';
@@ -380,7 +380,7 @@ export type BlockObjectResponse = {
 } | {
   type: 'bulleted_list_item';
   bulleted_list_item: {
-    rich_text: Array<RichTextItemResponse>;
+    rich_text: RichTextItemResponse[];
     color: ApiColor;
   };
   object: 'block';
@@ -400,7 +400,7 @@ export type BlockObjectResponse = {
 } | {
   type: 'numbered_list_item';
   numbered_list_item: {
-    rich_text: Array<RichTextItemResponse>;
+    rich_text: RichTextItemResponse[];
     color: ApiColor;
   };
   object: 'block';
@@ -420,7 +420,7 @@ export type BlockObjectResponse = {
 } | {
   type: 'quote';
   quote: {
-    rich_text: Array<RichTextItemResponse>;
+    rich_text: RichTextItemResponse[];
     color: ApiColor;
   };
   object: 'block';
@@ -440,7 +440,7 @@ export type BlockObjectResponse = {
 } | {
   type: 'to_do';
   to_do: {
-    rich_text: Array<RichTextItemResponse>;
+    rich_text: RichTextItemResponse[];
     color: ApiColor;
     checked: boolean;
   };
@@ -461,7 +461,7 @@ export type BlockObjectResponse = {
 } | {
   type: 'toggle';
   toggle: {
-    rich_text: Array<RichTextItemResponse>;
+    rich_text: RichTextItemResponse[];
     color: ApiColor;
   };
   object: 'block';
@@ -481,7 +481,7 @@ export type BlockObjectResponse = {
 } | {
   type: 'template';
   template: {
-    rich_text: Array<RichTextItemResponse>;
+    rich_text: RichTextItemResponse[];
   };
   object: 'block';
   id: string;
@@ -579,8 +579,8 @@ export type BlockObjectResponse = {
 } | {
   type: 'code';
   code: {
-    rich_text: Array<RichTextItemResponse>;
-    caption: Array<RichTextItemResponse>;
+    rich_text: RichTextItemResponse[];
+    caption: RichTextItemResponse[];
     language: string;
   };
   object: 'block';
@@ -600,7 +600,7 @@ export type BlockObjectResponse = {
 } | {
   type: 'callout';
   callout: {
-    rich_text: Array<RichTextItemResponse>;
+    rich_text: RichTextItemResponse[];
     color: ApiColor;
     icon: {
       type: 'emoji';
@@ -766,7 +766,7 @@ export type BlockObjectResponse = {
 } | {
   type: 'table_row';
   table_row: {
-    cells: Array<Array<RichTextItemResponse>>;
+    cells: RichTextItemResponse[][];
     color: ApiColor;
   };
   object: 'block';
@@ -787,7 +787,7 @@ export type BlockObjectResponse = {
   type: 'embed';
   embed: {
     url: string;
-    caption: Array<RichTextItemResponse>;
+    caption: RichTextItemResponse[];
   };
   object: 'block';
   id: string;
@@ -807,7 +807,7 @@ export type BlockObjectResponse = {
   type: 'bookmark';
   bookmark: {
     url: string;
-    caption: Array<RichTextItemResponse>;
+    caption: RichTextItemResponse[];
   };
   object: 'block';
   id: string;
@@ -830,14 +830,14 @@ export type BlockObjectResponse = {
     external: {
       url: string;
     };
-    caption: Array<RichTextItemResponse>;
+    caption: RichTextItemResponse[];
   } | {
     type: 'file';
     file: {
       url: string;
       expiry_time: string;
     };
-    caption: Array<RichTextItemResponse>;
+    caption: RichTextItemResponse[];
   };
   object: 'block';
   id: string;
@@ -860,14 +860,14 @@ export type BlockObjectResponse = {
     external: {
       url: string;
     };
-    caption: Array<RichTextItemResponse>;
+    caption: RichTextItemResponse[];
   } | {
     type: 'file';
     file: {
       url: string;
       expiry_time: string;
     };
-    caption: Array<RichTextItemResponse>;
+    caption: RichTextItemResponse[];
   };
   object: 'block';
   id: string;
@@ -890,14 +890,14 @@ export type BlockObjectResponse = {
     external: {
       url: string;
     };
-    caption: Array<RichTextItemResponse>;
+    caption: RichTextItemResponse[];
   } | {
     type: 'file';
     file: {
       url: string;
       expiry_time: string;
     };
-    caption: Array<RichTextItemResponse>;
+    caption: RichTextItemResponse[];
   };
   object: 'block';
   id: string;
@@ -920,14 +920,14 @@ export type BlockObjectResponse = {
     external: {
       url: string;
     };
-    caption: Array<RichTextItemResponse>;
+    caption: RichTextItemResponse[];
   } | {
     type: 'file';
     file: {
       url: string;
       expiry_time: string;
     };
-    caption: Array<RichTextItemResponse>;
+    caption: RichTextItemResponse[];
   };
   object: 'block';
   id: string;
@@ -950,14 +950,14 @@ export type BlockObjectResponse = {
     external: {
       url: string;
     };
-    caption: Array<RichTextItemResponse>;
+    caption: RichTextItemResponse[];
   } | {
     type: 'file';
     file: {
       url: string;
       expiry_time: string;
     };
-    caption: Array<RichTextItemResponse>;
+    caption: RichTextItemResponse[];
   };
   object: 'block';
   id: string;
