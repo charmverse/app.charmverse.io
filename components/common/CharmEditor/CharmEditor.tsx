@@ -375,6 +375,10 @@ function CharmEditor (
   const _isEmpty = checkForEmpty(content);
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
   const { user } = useUser();
+
+  const isTemplate = pageType ? pageType.includes('template') : false;
+  const disableNestedPage = disablePageSpecificFeatures || enableSuggestingMode || isTemplate;
+
   // eslint-disable-next-line
   const onThreadResolveDebounced = debounce((pageId: string, doc: EditorState['doc'], prevDoc: EditorState['doc']) => {
     const deletedThreadIds = extractDeletedThreadIds(
@@ -607,17 +611,16 @@ function CharmEditor (
     >
       <floatingMenu.FloatingMenu
       // disable comments and polls in suggestions mode since they dont interact well
-        enableComments={!disablePageSpecificFeatures && !enableSuggestingMode}
-        enableVoting={enableVoting && !enableSuggestingMode}
+        enableComments={!disablePageSpecificFeatures && !enableSuggestingMode && !isTemplate}
+        enableVoting={enableVoting && !enableSuggestingMode && !isTemplate}
         pluginKey={floatingMenuPluginKey}
-        pageType={pageType}
         pagePermissions={pagePermissions}
       />
       <MentionSuggest pluginKey={mentionPluginKey} />
       <NestedPagesList pluginKey={nestedPagePluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
       {!readOnly && <RowActionsMenu pluginKey={actionsPluginKey} />}
-      <InlinePalette nestedPagePluginKey={nestedPagePluginKey} disableNestedPage={disablePageSpecificFeatures} />
+      <InlinePalette nestedPagePluginKey={nestedPagePluginKey} disableNestedPage={disableNestedPage} />
       {children}
       {!disablePageSpecificFeatures && (
         <>

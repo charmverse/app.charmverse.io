@@ -15,7 +15,8 @@ import { items as mediaItems } from './editorItems/media';
 import { items as textItems } from './editorItems/text';
 import { items as otherItems } from './editorItems/other';
 
-export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: PluginKey<NestedPagePluginState>}) {
+export function useEditorItems ({ disableNestedPage, nestedPagePluginKey }:
+    { disableNestedPage: boolean, nestedPagePluginKey?: PluginKey<NestedPagePluginState> }) {
   const { addNestedPage } = useNestedPage();
   const [space] = useCurrentSpace();
   const { user } = useUser();
@@ -29,9 +30,9 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
     const itemGroups: [string, PaletteItemTypeNoGroup[]][] = [
       ['list', listItems()],
       ['media', mediaItems()],
-      ['other', otherItems({ addNestedPage, nestedPagePluginKey, userSpacePermissions, pageType })],
+      ['other', otherItems({ addNestedPage, disableNestedPage, nestedPagePluginKey, userSpacePermissions, pageType })],
       ['text', textItems()],
-      ['database', (user && space) ? databaseItems({ addNestedPage, currentPageId, userId: user.id, space, pageType }) : []]
+      ['database', (user && space && !disableNestedPage) ? databaseItems({ addNestedPage, currentPageId, userId: user.id, space, pageType }) : []]
     ];
 
     const itemList = itemGroups.map(([group, items]) => (

@@ -6,7 +6,6 @@ import { rafCommandExec } from '@bangle.dev/utils';
 import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
 import InsertChartIcon from '@mui/icons-material/InsertChart';
 import type { PageType } from '@prisma/client';
-import dynamic from 'next/dynamic';
 import type { PaletteItemTypeNoGroup, PromisedCommand } from '../paletteItem';
 import { replaceSuggestionMarkWith } from '../inlinePalette';
 import { palettePluginKey } from '../config';
@@ -16,12 +15,15 @@ import { insertNode, isAtBeginningOfLine } from '../../../utils';
 
 interface ItemsProps {
   addNestedPage: () => Promise<void>;
+  disableNestedPage: boolean;
   nestedPagePluginKey?: PluginKey<NestedPagePluginState>;
   userSpacePermissions?: SpacePermissionFlags;
   pageType?: PageType;
 }
 
-export function items ({ addNestedPage, nestedPagePluginKey, userSpacePermissions, pageType }: ItemsProps): PaletteItemTypeNoGroup[] {
+export function items (props: ItemsProps): PaletteItemTypeNoGroup[] {
+
+  const { addNestedPage, disableNestedPage, nestedPagePluginKey, userSpacePermissions, pageType } = props;
   const dynamicOtherItems: PaletteItemTypeNoGroup[] = [
     {
       uid: 'price',
@@ -80,7 +82,7 @@ export function items ({ addNestedPage, nestedPagePluginKey, userSpacePermission
     }
   ];
 
-  if (pageType !== 'card_template') {
+  if (pageType !== 'card_template' && !disableNestedPage) {
     dynamicOtherItems.push({
       uid: 'insert-page',
       title: 'Insert page',
