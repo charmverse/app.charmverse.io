@@ -1,4 +1,3 @@
-import type { Space } from '@prisma/client';
 import Mixpanel from 'mixpanel';
 import type { LoggedInUser } from 'models';
 import type { MixpanelEvent, MixpanelEventName, MixpanelTrackBase, MixpanelUserProfile } from './interfaces/index';
