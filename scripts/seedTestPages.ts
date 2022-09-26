@@ -69,7 +69,7 @@ export async function seedTestBoards({spaceDomain, boardCount = 1, cardCount}: {
   const blockCreateArgs: Prisma.BlockCreateManyArgs[] = [];
 
   for (let i = 0; i < boardCount; i++) {
-    const { pageArgs, blockArgs } = boardWithCardsArgs({ createdBy: space?.createdBy, spaceId: space.id, cardCount });
+    const { pageArgs, blockArgs } = boardWithCardsArgs({ createdBy: space?.createdBy, spaceId: space.id, cardCount, addPageContent: true })
     pageCreateArgs.push(...pageArgs);
     blockCreateArgs.push(blockArgs);
   }
@@ -94,9 +94,53 @@ export async function seedTestBoards({spaceDomain, boardCount = 1, cardCount}: {
 
 }
 
+async function cleanSpacePages({spaceDomain}: {spaceDomain: string}) {
+  const space = await prisma.space.findUnique({
+    where: {
+      domain: spaceDomain
+    }
+  })
 
-seedTestPages({spaceDomain: 'digital-amethyst-mammal', pagesToCreate: 10, nestedPercent: 92})
-.then(() => {
-  console.log('Done')
-  process.exit(0)
-})
+  if (!space) {
+    throw new DataNotFoundError(`Space with domain ${spaceDomain} not found`)
+  }
+
+  await prisma.$transaction([
+    prisma.page.deleteMany({
+      where: {
+        spaceId: space.id
+      }
+    }),
+    prisma.block.deleteMany({
+      where: {
+        spaceId: space.id
+      }
+    })
+  ])
+}
+
+// cleanSpacePages({spaceDomain: 'slim-ivory-tyrannosaurus'})
+//   .then(() => console.log('Done'))
+// .catch(e => {
+//   console.error(e)
+//   process.exit(1)
+// })
+
+// seedTestBoards({spaceDomain: 'slim-ivory-tyrannosaurus', boardCount: 1, cardCount: 10})
+//   .then(() => console.log('Done'))
+// .catch(e => {
+//   console.error(e)
+//   process.exit(1)
+// })
+
+
+// seedTestPages({spaceDomain: 'slim-ivory-tyrannosaurus', pagesToCreate: 100, nestedPercent: 92})
+// .then(() => {
+//   console.log('Done')
+//   process.exit(0)
+// })
+// .catch(e => {
+//   console.error(e)
+//   process.exit(1)
+// })
+
