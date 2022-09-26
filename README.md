@@ -15,8 +15,13 @@ There are several ways you can contribute:
 
 ### Developer setup
 
-1. This application requires a PostgreSQL database while we figure out decentralized storage. The connection string can be overidden by copying the `.env` file and renaming to `.env.local`:
+1. This application requires a PostgreSQL database while we figure out decentralized storage:
 
+To install Postgres with Docker, run:
+```
+docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=postgres postgres
+```
+The connection string can be overidden by copying the `.env` file and renaming to `.env.local`:
 ```
 DATABASE_URL=postgres://postgres:postgres@localhost:5432/charmverse
 ```
