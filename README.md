@@ -17,9 +17,9 @@ There are several ways you can contribute:
 
 1. This application requires a PostgreSQL database while we figure out decentralized storage:
 
-To install Postgres with Docker, run:
+If you don't have a local Postgres server running, you can install and run it with Docker:
 ```
-docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=postgres postgres
+docker run -d -v $HOME/postgres:/var/lib/postgresql -p 5432:5432 -e POSTGRES_PASSWORD=postgres postgres
 ```
 The connection string can be overidden by copying the `.env` file and renaming to `.env.local`:
 ```
