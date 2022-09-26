@@ -34,8 +34,8 @@
   },
   "exclude": [
     "node_modules",
-    "**/focalboard/**/*.test.ts",
-    "**/focalboard/**/*.test.tsx"
+    "**/focalboard/**/*.spec.ts",
+    "**/focalboard/**/*.spec.tsx"
   ],
   "include": [
     "**/*.ts",
