@@ -1,4 +1,5 @@
-import React from 'react';
+import type { MouseEvent } from 'react';
+import { useState } from 'react';
 import type { AlertColor } from '@mui/material/Alert';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import charmClient from 'charmClient';
@@ -9,6 +10,7 @@ import { BigNumber } from '@ethersproject/bignumber';
 import { getChainById } from 'connectors';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import type { SupportedChainId } from 'lib/blockchain/provider/alchemy';
+import { Menu, MenuItem } from '@mui/material';
 import ERC20ABI from '../../../../../../../abis/ERC20ABI.json';
 
 interface Props {
@@ -99,6 +101,14 @@ export default function BountyPaymentButton ({
   onError = () => {}
 }: Props) {
   const { account, library, chainId } = useWeb3React();
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   const [paymentMethods] = usePaymentMethods();
 
@@ -193,15 +203,28 @@ export default function BountyPaymentButton ({
   };
 
   return (
-    <Button
-      color='primary'
-      size='small'
-      onClick={() => {
-        onClick();
-        makePayment();
-      }}
-    >
-      Send Payment
-    </Button>
+    <>
+      <Button
+        color='primary'
+        size='small'
+        onClick={handleClick}
+      >
+        Send Payment
+      </Button>
+      <Menu
+        id='bounty-payment'
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+      >
+        <MenuItem onClick={() => {
+          onClick();
+          makePayment();
+          handleClose();
+        }}
+        >Metamask Wallet
+        </MenuItem>
+      </Menu>
+    </>
   );
 }
