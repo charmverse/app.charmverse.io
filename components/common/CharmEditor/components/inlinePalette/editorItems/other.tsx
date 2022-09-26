@@ -6,7 +6,6 @@ import { rafCommandExec } from '@bangle.dev/utils';
 import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
 import InsertChartIcon from '@mui/icons-material/InsertChart';
 import type { PageType } from '@prisma/client';
-import dynamic from 'next/dynamic';
 import type { PaletteItemTypeNoGroup, PromisedCommand } from '../paletteItem';
 import { replaceSuggestionMarkWith } from '../inlinePalette';
 import { palettePluginKey } from '../config';
@@ -16,12 +15,15 @@ import { insertNode, isAtBeginningOfLine } from '../../../utils';
 
 interface ItemsProps {
   addNestedPage: () => Promise<void>;
+  disableNestedPage: boolean;
   nestedPagePluginKey?: PluginKey<NestedPagePluginState>;
   userSpacePermissions?: SpacePermissionFlags;
   pageType?: PageType;
 }
 
-export function items ({ addNestedPage, nestedPagePluginKey, userSpacePermissions, pageType }: ItemsProps): PaletteItemTypeNoGroup[] {
+export function items (props: ItemsProps): PaletteItemTypeNoGroup[] {
+
+  const { addNestedPage, disableNestedPage, nestedPagePluginKey, userSpacePermissions, pageType } = props;
   const dynamicOtherItems: PaletteItemTypeNoGroup[] = [
     {
       uid: 'price',
@@ -55,13 +57,14 @@ export function items ({ addNestedPage, nestedPagePluginKey, userSpacePermission
     {
       uid: 'horizontal_rule',
       title: 'Horizontal Rule',
+      keywords: ['divider', 'hr'],
       icon: <HorizontalRuleIcon sx={{ fontSize: 16 }} />,
       description: 'Display horizontal rule',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
           // Execute the animation
           rafCommandExec(view!, (_state, _dispatch) => {
-            const node = _state.schema.nodes.horizontalRule.create();
+            const node = _state.schema.nodes.horizontalRule.create({ track: [] });
             if (_dispatch && isAtBeginningOfLine(state)) {
               _dispatch(_state.tr.replaceSelectionWith(node));
               return true;
@@ -79,7 +82,7 @@ export function items ({ addNestedPage, nestedPagePluginKey, userSpacePermission
     }
   ];
 
-  if (pageType !== 'card_template') {
+  if (pageType !== 'card_template' && !disableNestedPage) {
     dynamicOtherItems.push({
       uid: 'insert-page',
       title: 'Insert page',

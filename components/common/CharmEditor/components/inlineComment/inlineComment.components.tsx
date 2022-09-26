@@ -1,6 +1,6 @@
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import { Box, Button, ClickAwayListener, Grow, Paper, TextField } from '@mui/material';
+import { Box, Button, ClickAwayListener, Grow, Paper } from '@mui/material';
 import { useThreads } from 'hooks/useThreads';
 import { createPortal } from 'react-dom';
 import { hideSelectionTooltip } from '@bangle.dev/tooltip/selection-tooltip';
@@ -14,12 +14,13 @@ import type { PluginKey } from 'prosemirror-state';
 import { TextSelection } from 'prosemirror-state';
 import React, { useState } from 'react';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
+import { isTruthy } from 'lib/utilities/types';
 import PageThread from '../PageThread';
 import { hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
 import { updateInlineComment } from './inlineComment.utils';
 import type { InlineCommentPluginState } from './inlineComment.plugins';
 
-const ThreadContainer = styled(Paper)`
+export const ThreadContainer = styled(Paper)`
   max-height: 400px;
   display: flex;
   gap: ${({ theme }) => theme.spacing(1)};
@@ -43,6 +44,7 @@ export default function InlineCommentThread ({ pluginKey }: {pluginKey: PluginKe
   const unResolvedThreads = ids
     .map(threadId => threads[threadId])
     .filter(thread => thread && !thread?.resolved)
+    .filter(isTruthy)
     .sort((threadA, threadB) => threadA && threadB ? (new Date(threadB.createdAt).getTime() - new Date(threadA.createdAt).getTime()) : 0);
 
   if ((currentPageActionDisplay !== 'comments' || cardId) && isVisible && unResolvedThreads.length !== 0) {
@@ -62,10 +64,14 @@ export default function InlineCommentThread ({ pluginKey }: {pluginKey: PluginKe
           }}
           timeout={250}
         >
-          <ThreadContainer elevation={4}>
-            {unResolvedThreads.map(resolvedThread => resolvedThread
-              && <PageThread inline={ids.length === 1} key={resolvedThread.id} threadId={resolvedThread?.id} />)}
-          </ThreadContainer>
+          <Box display='flex' flexDirection='column' gap={1}>
+
+            {unResolvedThreads.map(resolvedThread => (
+              <ThreadContainer elevation={4}>
+                <PageThread inline={ids.length === 1} key={resolvedThread.id} threadId={resolvedThread?.id} />
+              </ThreadContainer>
+            ))}
+          </Box>
         </Grow>
       </ClickAwayListener>,
       tooltipContentDOM

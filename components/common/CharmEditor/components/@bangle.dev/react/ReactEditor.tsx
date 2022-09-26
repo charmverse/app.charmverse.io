@@ -2,7 +2,7 @@ import {
   BangleEditor as CoreBangleEditor,
   BangleEditorProps as CoreBangleEditorProps
 } from '@bangle.dev/core';
-import { Plugin } from '@bangle.dev/pm';
+import { Plugin, Transaction } from '@bangle.dev/pm';
 import { EditorViewContext } from '@bangle.dev/react';
 import { nodeViewUpdateStore, useNodeViews } from '@bangle.dev/react/node-view-helpers';
 import { objectUid } from '@bangle.dev/utils';
@@ -10,6 +10,9 @@ import React, { ReactNode, RefObject, useEffect, useImperativeHandle, useRef, us
 import reactDOM from 'react-dom';
 import { NodeViewWrapper, RenderNodeViewsFunction } from './NodeViewWrapper';
 import { isTouchScreen } from 'lib/browser';
+import { useUser } from 'hooks/useUser';
+import { amendTransaction } from '../../suggestions/track/amendTransaction';
+import log from 'lib/log';
 
 interface BangleEditorProps<PluginMetadata = any>
   extends CoreBangleEditorProps<PluginMetadata> {
@@ -23,6 +26,8 @@ interface BangleEditorProps<PluginMetadata = any>
   editorRef?: RefObject<HTMLDivElement>
   // Components that should be placed underneath the editor
   placeholderComponent?: ReactNode
+  enableSuggestions?: boolean; // requires trackChanges to be true
+  trackChanges?: boolean;
 }
 
 export const BangleEditor = React.forwardRef<
@@ -41,7 +46,9 @@ export const BangleEditor = React.forwardRef<
       style,
       onReady = () => {},
       placeholderComponent,
-      editorRef
+      editorRef,
+      enableSuggestions = false,
+      trackChanges = false
     },
     ref
   ) => {
@@ -50,10 +57,19 @@ export const BangleEditor = React.forwardRef<
     const editorViewPayloadRef = useRef({
       state,
       focusOnInit,
-      pmViewOpts
+      pmViewOpts,
+      enableSuggestions
     });
     const [editor, setEditor] = useState<CoreBangleEditor>();
     const nodeViews = useNodeViews(renderRef);
+    const { user } = useUser();
+
+    if (enableSuggestions && !trackChanges) {
+      log.error('CharmEditor: Suggestions require trackChanges to be enabled');
+    }
+
+    // set current
+    editorViewPayloadRef.current.enableSuggestions = enableSuggestions;
 
     useImperativeHandle(
       ref,
@@ -69,6 +85,15 @@ export const BangleEditor = React.forwardRef<
         editorViewPayloadRef.current
       );
       (editor.view as any)._updatePluginWatcher = updatePluginWatcher(editor);
+      if (trackChanges) {
+        (editor.view as any)._props.dispatchTransaction = (transaction: Transaction) => {
+          const view = editor.view;
+          const trackedUser = { id: user?.id ?? '', username: user?.username ?? '' };
+          const trackedTr = amendTransaction(transaction, view.state, trackedUser, editorViewPayloadRef.current.enableSuggestions);
+          const {state: newState } = view.state.applyTransaction(trackedTr)
+          view.updateState(newState);
+        };
+      }
       onReadyRef.current(editor);
       setEditor(editor);
       return () => {
