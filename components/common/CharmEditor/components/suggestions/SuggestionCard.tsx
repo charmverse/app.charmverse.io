@@ -4,6 +4,7 @@ import { Check, Close } from '@mui/icons-material';
 import type { Contributor } from 'hooks/useContributors';
 import { useContributors } from 'hooks/useContributors';
 import UserDisplay from 'components/common/UserDisplay';
+import { useMemo } from 'react';
 import { CommentDate } from '../PageThread';
 import { accept } from './track/accept';
 import { reject } from './track/reject';
@@ -53,7 +54,9 @@ export function SuggestionCard ({ readOnly, isOwner, active, data, node, pos, ty
   const view = useEditorViewContext();
   const [contributors] = useContributors();
   // get parentNode for lists
-  const parentNode = pos > 0 ? view.state.doc.nodeAt(pos - 1) : null;
+  const parentNode = useMemo(() => (
+    pos > 0 && pos < view.state.doc.nodeSize ? view.state.doc.nodeAt(pos - 1) : null
+  ), [pos]);
 
   function acceptOne (_type: string, _pos: number) {
     accept(_type, _pos, view);

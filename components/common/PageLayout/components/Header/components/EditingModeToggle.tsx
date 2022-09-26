@@ -28,7 +28,7 @@ const EDIT_MODE_CONFIG = {
 
 export default function EditModeToggle () {
 
-  const { permissions, editMode, setPageProps } = usePrimaryCharmEditor();
+  const { availableEditModes, editMode, setPageProps } = usePrimaryCharmEditor();
 
   function setMode (mode: EditMode) {
     setPageProps({ editMode: mode });
@@ -38,9 +38,7 @@ export default function EditModeToggle () {
     return null;
   }
 
-  const availableModes = Object.entries(EDIT_MODE_CONFIG).filter(([, config]) => {
-    return permissions?.[config.permission] ?? false;
-  });
+  const availableModes = availableEditModes.map((mode) => [mode, EDIT_MODE_CONFIG[mode]] as const);
 
   return (
     <PopupState variant='popover' popupId='edit-mode-select'>
