@@ -86,7 +86,7 @@
     "@hookform/resolvers": "^2.8.8",
     "@koa/router": "^10.1.1",
     "@material-ui/pickers": "^3.3.10",
-    "@mattermost/compass-icons": "^0.1.21",
+    "@mattermost/compass-icons": "^0.1.26",
     "@metamask/onboarding": "^1.0.1",
     "@mui/icons-material": "^5.2.5",
     "@mui/lab": "^5.0.0-alpha.66",
