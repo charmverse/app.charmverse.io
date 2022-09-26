@@ -30,7 +30,6 @@ import { generateMarkdown } from 'lib/pages/generateMarkdown';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useRef, useState } from 'react';
-import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import ShareButton from './components/ShareButton';
@@ -55,18 +54,20 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
 
   const router = useRouter();
   const colorMode = useColorMode();
-  const { pages, setPages } = usePages();
+  const { pages, setPages, getPagePermissions } = usePages();
   const { user, setUser } = useUser();
   const theme = useTheme();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
   const [pageMenuAnchorElement, setPageMenuAnchorElement] = useState<null | Element>(null);
   const pageMenuAnchor = useRef();
-  const [currentSpacePermissions] = useCurrentSpacePermissions();
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const basePageId = router.query.pageId as string;
   const basePage = Object.values(pages).find(page => page?.id === basePageId || page?.path === basePageId);
+
+  const pagePermissions = getPagePermissions(basePageId);
+
   const isFavorite = basePage && user?.favorites.some(({ pageId }) => pageId === basePage.id);
   const pageType = basePage?.type;
   const isExportablePage = pageType === 'card' || pageType === 'page' || pageType === 'proposal';
@@ -107,7 +108,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
 
   const documentOptions = (
     <List dense>
-      {currentSpacePermissions?.createVote && (
+      {pagePermissions?.create_poll && (
         <ListItemButton
           onClick={() => {
             setPageMenuOpen(false);
