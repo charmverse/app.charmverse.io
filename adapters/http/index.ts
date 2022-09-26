@@ -7,13 +7,14 @@ export function GET<T = Response> (
   data: Params = {},
   { headers = {} }: { headers?: any } = {}
 ): Promise<T> {
+
   const queryStr = Object.keys(data)
     .filter(key => !!data[key])
     .map(key => {
       const value = data[key];
-      return typeof value === 'string'
-        ? `${key}=${encodeURIComponent(value)}`
-        : `${value.map((v: string) => `${key}[]=${v}`).join('&')}`;
+      return Array.isArray(value)
+        ? `${value.map((v: string) => `${key}[]=${v}`).join('&')}`
+        : `${key}=${encodeURIComponent(value)}`;
     })
     .join('&');
   const url = `${path}${queryStr ? `?${queryStr}` : ''}`;
