@@ -1,8 +1,8 @@
 
 import type { MetaTransactionData } from '@gnosis.pm/safe-core-sdk-types';
-import { Autocomplete, Checkbox, List, ListItem, MenuItem, Select, Tooltip, Typography } from '@mui/material';
+import { Checkbox, List, ListItem, MenuItem, Select, Tooltip, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
-import type { Bounty } from '@prisma/client';
+import type { Bounty, UserGnosisSafe } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
@@ -23,6 +23,7 @@ import type { BountyWithDetails } from 'models';
 import { useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import PropertiesButton from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
+import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import { BountyAmount } from './BountyStatusBadge';
 import type { MultiPaymentResult } from './MultiPaymentButton';
 import MultiPaymentButton from './MultiPaymentButton';
@@ -36,7 +37,7 @@ interface TransactionWithMetadata extends MetaTransactionData, Pick<Bounty, 'rew
 export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDetails[]}) {
   const [isLoading, setIsLoading] = useState(false);
   const [gnosisSafeData, setGnosisSafeData] = useState<SafeData | undefined>(undefined);
-
+  const { data: safesData } = useMultiWalletSigs();
   const { setBounties, setCurrentBounty, currentBountyId } = useBounties();
   const popupState = usePopupState({ variant: 'popover', popupId: 'multi-payment-modal' });
   const [currentSpace] = useCurrentSpace();
@@ -49,6 +50,15 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     () => getSafesForAddress({ signer: signer!, chainId: chainId!, address: account! })
   );
+
+  const safeDataRecord = useMemo(() => {
+    return safesData?.reduce<Record<string, UserGnosisSafe>>((record, userGnosisSafe) => {
+      if (!record[userGnosisSafe.address]) {
+        record[userGnosisSafe.address] = userGnosisSafe;
+      }
+      return record;
+    }, {}) ?? {};
+  }, [safesData]);
 
   const gnosisSafeAddress = gnosisSafeData?.address;
   const gnosisSafeChainId = gnosisSafeData?.chainId;
@@ -180,7 +190,7 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
                   >
                     {safeInfos.map(safeInfo => (
                       <MenuItem key={safeInfo.address} value={safeInfo.address}>
-                        {safeInfo.address}
+                        {gnosisSafeData ? safeDataRecord[safeInfo.address]?.name ?? gnosisSafeData.address : ''}
                       </MenuItem>
                     ))}
                   </Select>
