@@ -13,7 +13,8 @@ import { v4 } from 'uuid';
  * All spaceId, createdBy, updatedBy, id, parentId, rootId parameters are generated in the body of the stub, except for the cardIds which are generated at the end, to ensure the cardBlock corresponds to the pageId
  *
  */
-export function boardWithCardsArgs ({ createdBy, spaceId, parentId }: {createdBy: string, spaceId: string, parentId?: string}):
+export function boardWithCardsArgs ({ createdBy, spaceId, parentId, cardCount = 2 }:
+  {createdBy: string, spaceId: string, parentId?: string, cardCount? : number}):
 {pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyArgs} {
 
   const boardId = v4();
@@ -278,6 +279,17 @@ export function boardWithCardsArgs ({ createdBy, spaceId, parentId }: {createdBy
 
   const pageCreateArgs: Prisma.PageCreateArgs[] = [];
   const blockCreateInput: Prisma.BlockCreateManyInput[] = [];
+
+  const cardPages = rootBoardNode.children;
+
+  for (let i = 3; i <= cardCount; i++) {
+    if (i % 2 === 0) {
+      cardPages.push(cardPages[0]);
+    }
+    else {
+      cardPages.push(cardPages[1]);
+    }
+  }
 
   [rootBoardNode, ...rootBoardNode.children].forEach(page => {
     // Handle the root board node ------------------

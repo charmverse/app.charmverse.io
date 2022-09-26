@@ -611,9 +611,10 @@ export async function generateProposal ({ userId, spaceId, proposalStatus, autho
   });
 }
 
-export async function generateBoard ({ createdBy, spaceId, parentId }: {createdBy: string, spaceId: string, parentId?: string}): Promise<Page> {
+export async function generateBoard ({ createdBy, spaceId, parentId, cardCount }:
+  {createdBy: string, spaceId: string, parentId?: string, cardCount?: number}): Promise<Page> {
 
-  const { pageArgs, blockArgs } = boardWithCardsArgs({ createdBy, spaceId, parentId });
+  const { pageArgs, blockArgs } = boardWithCardsArgs({ createdBy, spaceId, parentId, cardCount });
 
   return prisma.$transaction([
     ...pageArgs.map(p => prisma.page.create(p)),
