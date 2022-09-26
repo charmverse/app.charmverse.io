@@ -1,4 +1,5 @@
 import createJestConfig from 'testing/createJestConfig';
+import type { Config } from 'jest';
 /*
  * For a detailed explanation regarding each configuration property and type check, visit:
  * https://jestjs.io/docs/configuration
@@ -8,13 +9,19 @@ import createJestConfig from 'testing/createJestConfig';
  * Configuration copied from
  * https://nextjs.org/docs/testing
  * */
-export const jestConfig = {
+export const jestConfig: Config = {
 
   // Automatically clear mock calls, instances and results before every test
   clearMocks: true,
 
   // Indicates whether the coverage information should be collected while executing the test
   collectCoverage: false,
+
+  globals: {
+    'ts-jest': {
+      isolatedModules: true
+    }
+  },
 
   globalTeardown: './testing/wipeTestData.ts',
 
