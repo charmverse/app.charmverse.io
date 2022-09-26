@@ -17,7 +17,6 @@ import useGnosisSigner from 'hooks/useWeb3Signer';
 import type { SafeData } from 'lib/gnosis';
 import { getSafesForAddress } from 'lib/gnosis';
 import { eToNumber } from 'lib/utilities/numbers';
-import { shortenHex } from 'lib/utilities/strings';
 import { isTruthy } from 'lib/utilities/types';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import type { BountyWithDetails } from 'models';
@@ -35,6 +34,8 @@ interface TransactionWithMetadata extends MetaTransactionData, Pick<Bounty, 'rew
 
 export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDetails[]}) {
   const [isLoading, setIsLoading] = useState(false);
+  const [gnosisSafeData, setGnosisSafeData] = useState<SafeData | undefined>(undefined);
+
   const { setBounties, setCurrentBounty, currentBountyId } = useBounties();
   const popupState = usePopupState({ variant: 'popover', popupId: 'multi-payment-modal' });
   const [currentSpace] = useCurrentSpace();
@@ -48,17 +49,18 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
     () => getSafesForAddress({ signer: signer!, chainId: chainId!, address: account! })
   );
 
-  // use first multisig wallet
-  const multiSigWallet = (safeInfos || [])[0] as SafeData | undefined;
-  const gnosisSafeAddress = multiSigWallet?.address;
-  const gnosisSafeChainId = multiSigWallet?.chainId;
+  const gnosisSafeAddress = gnosisSafeData?.address;
+  const gnosisSafeChainId = gnosisSafeData?.chainId;
 
   // If the bounty is on the same chain as the gnosis safe and the rewardToken of the bounty is the same as the native currency of the gnosis safe chain
   const transactions: TransactionWithMetadata[] = useMemo(
     () => bounties
       .filter(bounty => {
-        return bounty.chainId === gnosisSafeChainId
-        && bounty.rewardToken === getChainById(gnosisSafeChainId)?.nativeCurrency.symbol;
+        return safeInfos
+          ? safeInfos.find(
+            ({ chainId: safeChainId }) => bounty.chainId === safeChainId && bounty.rewardToken === getChainById(safeChainId)?.nativeCurrency.symbol
+          )
+          : false;
       })
       .map(bounty => {
         return bounty.applications.map(application => {
@@ -81,7 +83,7 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
         }).filter(isTruthy);
       })
       .flat(),
-    [bounties, gnosisSafeChainId]
+    [bounties, safeInfos]
   );
 
   useEffect(() => {
@@ -125,7 +127,7 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
     }
   }
 
-  const isDisabled = !gnosisSafeChainId || !gnosisSafeAddress || transactions.length === 0;
+  const isDisabled = transactions.length === 0;
 
   return (
     <>
@@ -146,6 +148,16 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
           <DialogTitle onClose={popupState.close}>
             Pay Bount{transactions.length > 1 ? 'ies' : 'y'}
           </DialogTitle>
+          <div
+            className='octo-propertyrow'
+            style={{
+              height: 'fit-content'
+            }}
+          >
+            <div className='octo-propertyname octo-propertyname--readonly'>
+              <Button>Reward token</Button>
+            </div>
+          </div>
           <Box pb={2}>
             <List>
               {transactions.map(({ title, chainId: _chainId, rewardAmount, rewardToken, userId, applicationId }) => {
@@ -201,15 +213,15 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
             </List>
           </Box>
           <Box display='flex' gap={2} alignItems='center'>
-            <MultiPaymentButton
-              chainId={gnosisSafeChainId}
-              safeAddress={gnosisSafeAddress}
-              transactions={selectedApplicationIds.map(selectedApplicationId => applicationTransactionRecord[selectedApplicationId])}
-              onSuccess={onPaymentSuccess}
-              isLoading={isLoading}
-            />
-
-            <Typography color='secondary' variant='caption'>Safe address: {shortenHex(gnosisSafeAddress)}</Typography>
+            {(gnosisSafeChainId && gnosisSafeAddress) ? (
+              <MultiPaymentButton
+                chainId={gnosisSafeChainId}
+                safeAddress={gnosisSafeAddress}
+                transactions={selectedApplicationIds.map(selectedApplicationId => applicationTransactionRecord[selectedApplicationId])}
+                onSuccess={onPaymentSuccess}
+                isLoading={isLoading}
+              />
+            ) : <Button disabled>Make Payment ({transactions.length})</Button>}
           </Box>
         </Modal>
       )}
