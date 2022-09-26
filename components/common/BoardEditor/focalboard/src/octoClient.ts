@@ -306,7 +306,7 @@ class OctoClient {
     return [];
   }
 
-  async getUserBlockSubscriptions (userId: string): Promise<Array<Subscription>> {
+  async getUserBlockSubscriptions (userId: string): Promise<Subscription[]> {
     const path = `/api/focalboard/workspaces/${this.workspaceId}/subscriptions/${userId}`;
     const response = await fetch(this.getBaseURL() + path, { headers: this.headers() });
     if (response.status !== 200) {

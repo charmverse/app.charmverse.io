@@ -38,7 +38,7 @@ export async function updateSpacePermissionConfigurationMode ({ permissionConfig
 
     const template = permissionTemplates[permissionConfigurationMode];
 
-    const toAdd: SpaceOperation[] = (Object.entries(template.spaceOperations) as Array<[SpaceOperation, boolean]>)
+    const toAdd: SpaceOperation[] = (Object.entries(template.spaceOperations) as [SpaceOperation, boolean][])
       .filter(([op, value]) => value === true)
       .map(tuple => tuple[0]);
 
@@ -49,7 +49,7 @@ export async function updateSpacePermissionConfigurationMode ({ permissionConfig
         operations: toAdd
       });
     }
-    const toRemove: SpaceOperation[] = (Object.entries(template.spaceOperations) as Array<[SpaceOperation, boolean]>)
+    const toRemove: SpaceOperation[] = (Object.entries(template.spaceOperations) as [SpaceOperation, boolean][])
       .filter(([op, value]) => value === false)
       .map(tuple => tuple[0]);
 
