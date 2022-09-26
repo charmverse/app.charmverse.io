@@ -149,7 +149,7 @@ function validateRootOne (node: PageNodeWithChildren) {
   expect(node.children[2].id).toBe(page_1_3.id);
 }
 
-function generateBoardWithCardsStub (): {board: PageNode, card_1: PageNode, card_2: PageNode, boardAndCards: PageNode[]} {
+function generateBoardWithCardsStub (): {board: PageNode; card_1: PageNode; card_2: PageNode; boardAndCards: PageNode[];} {
   const board = generatePageNode({
     parentId: null,
     title: 'Board',

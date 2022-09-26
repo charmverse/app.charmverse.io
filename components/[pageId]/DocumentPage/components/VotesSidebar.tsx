@@ -139,7 +139,7 @@ export function ViewOptions ({ voteSort, voteFilter, setVoteFilter, setVoteSort,
   );
 }
 
-export function filterVotes <T extends { status: string }> (votes: T[], voteFilter: VoteFilter) {
+export function filterVotes <T extends { status: string; }> (votes: T[], voteFilter: VoteFilter) {
   if (voteFilter === 'completed') {
     return votes.filter(sortedVote => sortedVote.status !== 'InProgress');
   }
@@ -149,7 +149,7 @@ export function filterVotes <T extends { status: string }> (votes: T[], voteFilt
   return votes;
 }
 
-export function sortVotes <T extends Pick<ExtendedVote, 'createdAt' | 'deadline' | 'id'> & { totalVotes?: number }> (
+export function sortVotes <T extends Pick<ExtendedVote, 'createdAt' | 'deadline' | 'id'> & { totalVotes?: number; }> (
   votes: T[],
   voteSort: VoteSort,
   inlineVoteIds: string[] = [],

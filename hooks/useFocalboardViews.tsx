@@ -5,8 +5,8 @@ import { useLocalStorage } from './useLocalStorage';
 type FocalboardViewsRecord = Record<string, null | string>;
 
 interface IContext {
-  focalboardViewsRecord: FocalboardViewsRecord,
-  setFocalboardViewsRecord: React.Dispatch<React.SetStateAction<FocalboardViewsRecord>>
+  focalboardViewsRecord: FocalboardViewsRecord;
+  setFocalboardViewsRecord: React.Dispatch<React.SetStateAction<FocalboardViewsRecord>>;
 }
 
 export const FocalboardViewsContext = createContext<Readonly<IContext>>({
@@ -14,7 +14,7 @@ export const FocalboardViewsContext = createContext<Readonly<IContext>>({
   setFocalboardViewsRecord: () => null
 });
 
-export function FocalboardViewsProvider ({ children }: { children: ReactNode }) {
+export function FocalboardViewsProvider ({ children }: { children: ReactNode; }) {
   const [focalboardViewsRecord, setFocalboardViewsRecord] = useLocalStorage<FocalboardViewsRecord>('default-views', {});
 
   const value = useMemo(() => ({

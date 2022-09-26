@@ -31,7 +31,7 @@ const CharmEditor = dynamic(() => import('components/common/CharmEditor'), {
   ssr: false
 });
 
-export const Container = styled(Box)<{ top: number, fullWidth?: boolean }>`
+export const Container = styled(Box)<{ top: number; fullWidth?: boolean; }>`
   width: ${({ fullWidth }) => fullWidth ? '100%' : '860px'};
   max-width: 100%;
   margin: 0 auto ${({ top }) => top + 100}px;
@@ -46,11 +46,11 @@ export const Container = styled(Box)<{ top: number, fullWidth?: boolean }>`
 `;
 
 export interface DocumentPageProps {
-  page: IPageWithPermissions,
-  setPage: (p: Partial<Page>) => void,
-  readOnly?: boolean,
-  insideModal?: boolean,
-  parentProposalId?: string | null
+  page: IPageWithPermissions;
+  setPage: (p: Partial<Page>) => void;
+  readOnly?: boolean;
+  insideModal?: boolean;
+  parentProposalId?: string | null;
 }
 
 function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentProposalId }: DocumentPageProps) {

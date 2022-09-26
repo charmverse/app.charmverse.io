@@ -10,7 +10,7 @@ export type ModalSize = 'large' | 'fluid' | 'small' | string;
 
 const defaultSize = '400px';
 
-const ModalContainer = styled.div<{ padding?: string, size: ModalSize }>`
+const ModalContainer = styled.div<{ padding?: string; size: ModalSize; }>`
   position: absolute;
   top: 50%;
   left: 50%;
@@ -61,12 +61,12 @@ export enum ModalPosition {
 }
 
 export type ModalProps = Omit<ComponentProps<typeof MuiModal>, 'children' | 'onClose' | 'title'> & {
-  size?: ModalSize,
-  children: any,
-  title?: string | ReactNode,
-  position?: ModalPosition,
-  noPadding?: boolean,
-  onClose: () => void
+  size?: ModalSize;
+  children: any;
+  title?: string | ReactNode;
+  position?: ModalPosition;
+  noPadding?: boolean;
+  onClose: () => void;
 };
 
 export function Modal ({ children, noPadding, position = ModalPosition.center, size = defaultSize, title, ...props }: ModalProps) {
@@ -99,7 +99,7 @@ export function ScrollableModal ({ children, size = defaultSize, title, ...props
   );
 }
 
-export function DialogTitle ({ children, onClose, sx }: { children: ReactNode, onClose?: () => void, sx?: any }) {
+export function DialogTitle ({ children, onClose, sx }: { children: ReactNode; onClose?: () => void; sx?: any; }) {
   return (
     <StyledDialogTitle sx={sx}>
       {children}

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 interface UseResizeProps {
-  initialWidth: number
+  initialWidth: number;
 }
 
 export default function useResize ({ initialWidth }: UseResizeProps) {

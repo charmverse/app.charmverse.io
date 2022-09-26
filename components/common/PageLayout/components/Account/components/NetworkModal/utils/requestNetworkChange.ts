@@ -4,7 +4,7 @@ import type { Blockchain } from 'connectors';
 import { RPC } from 'connectors';
 import log from 'lib/log';
 
-type WindowType = Window & typeof globalThis & { ethereum: ExternalProvider }
+type WindowType = Window & typeof globalThis & { ethereum: ExternalProvider; }
 
 const requestNetworkChange = (targetNetwork: Blockchain, callback?: () => void) => async () => {
   // @ts-ignore Not using .toHexString(), because the method requires unpadded format: '0x1' for mainnet, not '0x01'

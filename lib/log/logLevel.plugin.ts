@@ -46,7 +46,7 @@ export function apply (log: Logger) {
 }
 
 function sendErrorToDiscord (webhook: string, message: any, opt: any) {
-  let fields: { name: string, value?: string }[] = [];
+  let fields: { name: string; value?: string; }[] = [];
   if (opt instanceof Error) {
     fields = [
       { name: 'Error', value: opt.message },

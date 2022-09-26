@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react';
 import PagePermissions from './components/PagePermissions';
 import ShareToWeb from './components/ShareToWeb';
 
-export default function ShareButton ({ headerHeight, pageId }: { headerHeight: number, pageId: string }) {
+export default function ShareButton ({ headerHeight, pageId }: { headerHeight: number; pageId: string; }) {
 
   const { refreshPage, pages } = usePages();
   const popupState = usePopupState({ variant: 'popover', popupId: 'share-menu' });

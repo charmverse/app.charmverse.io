@@ -14,16 +14,16 @@ const handler = nc({
 });
 
 export interface TelegramAccount {
-  auth_date: number
-  first_name: string
-  hash: string
-  id: number
-  last_name: string
-  photo_url: string
-  username: string
+  auth_date: number;
+  first_name: string;
+  hash: string;
+  id: number;
+  last_name: string;
+  photo_url: string;
+  username: string;
 }
 
-async function connectTelegram (req: NextApiRequest, res: NextApiResponse<TelegramUser | {error: string}>) {
+async function connectTelegram (req: NextApiRequest, res: NextApiResponse<TelegramUser | {error: string;}>) {
   const telegramAccount = req.body as TelegramAccount;
 
   const { id, ...rest } = telegramAccount;

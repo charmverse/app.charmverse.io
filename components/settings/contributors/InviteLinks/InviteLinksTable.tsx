@@ -24,7 +24,7 @@ interface Props {
 
 export default function InvitesTable (props: Props) {
 
-  const [copied, setCopied] = useState<{ [id: string]: boolean }>({});
+  const [copied, setCopied] = useState<{ [id: string]: boolean; }>({});
 
   function onCopy (id: string) {
     setCopied({ [id]: true });

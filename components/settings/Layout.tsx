@@ -27,7 +27,7 @@ const NavigationContainer = styled(Box)`
   border-top: 1px solid ${({ theme }) => theme.palette.divider};
 `;
 
-export default function SettingsLayout ({ children }: { children: ReactNode }) {
+export default function SettingsLayout ({ children }: { children: ReactNode; }) {
 
   const router = useRouter();
   const [tab, setTab] = useState(getCurrentTabValue(router.pathname));

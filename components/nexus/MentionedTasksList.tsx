@@ -27,7 +27,7 @@ function MentionedTaskRow (
     bountyId,
     type,
     commentId
-  }: MentionedTask & { marked: boolean }
+  }: MentionedTask & { marked: boolean; }
 ) {
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : null;
 
@@ -125,9 +125,9 @@ function MentionedTaskRow (
 }
 
 interface MentionedTasksListProps {
-  tasks: GetTasksResponse | undefined
-  error: any
-  mutateTasks: KeyedMutator<GetTasksResponse>
+  tasks: GetTasksResponse | undefined;
+  error: any;
+  mutateTasks: KeyedMutator<GetTasksResponse>;
 }
 
 export default function MentionedTasksList ({ tasks, error, mutateTasks }: MentionedTasksListProps) {

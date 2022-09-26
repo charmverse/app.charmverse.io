@@ -46,7 +46,7 @@ interface DispatchFn {
   (tr: Transaction): void;
 }
 
-function insertImageNode (state: EditorState, dispatch: DispatchFn, view: EditorView, attrs?: { [key: string]: any }) {
+function insertImageNode (state: EditorState, dispatch: DispatchFn, view: EditorView, attrs?: { [key: string]: any; }) {
   const type = state.schema.nodes.image;
   const newTr = type.create(attrs);
   const { tr } = view.state;
@@ -57,7 +57,7 @@ function insertImageNode (state: EditorState, dispatch: DispatchFn, view: Editor
   }
 }
 
-function EmptyImageContainer ({ readOnly, isSelected, ...props }: HTMLAttributes<HTMLDivElement> & {readOnly: boolean, isSelected?: boolean}) {
+function EmptyImageContainer ({ readOnly, isSelected, ...props }: HTMLAttributes<HTMLDivElement> & {readOnly: boolean; isSelected?: boolean;}) {
   const theme = useTheme();
 
   return (
@@ -145,8 +145,8 @@ export function imageSpec (): RawSpecs {
 }
 
 interface ResizableImageProps extends NodeViewProps {
-  readOnly?: boolean,
-  onResizeStop?: (view: EditorView) => void
+  readOnly?: boolean;
+  onResizeStop?: (view: EditorView) => void;
 }
 
 function ResizableImage ({ readOnly = false, onResizeStop, node, updateAttrs, selected }: ResizableImageProps) {

@@ -1,7 +1,7 @@
 import type { UserVote, VoteOptions } from '@prisma/client';
 import type { ExtendedVote } from './interfaces';
 
-export function aggregateVoteResult ({ userId, userVotes, voteOptions }: {voteOptions: Pick<VoteOptions, 'name'>[], userVotes: Pick<UserVote, 'choice' | 'userId'>[], userId: string}) {
+export function aggregateVoteResult ({ userId, userVotes, voteOptions }: {voteOptions: Pick<VoteOptions, 'name'>[]; userVotes: Pick<UserVote, 'choice' | 'userId'>[]; userId: string;}) {
   const aggregatedResult: ExtendedVote['aggregatedResult'] = {};
   voteOptions.forEach(voteOption => {
     aggregatedResult[voteOption.name] = 0;

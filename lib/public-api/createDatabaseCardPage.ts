@@ -59,7 +59,7 @@ export async function createDatabase (boardInfo: Record<keyof Pick<Page, 'title'
   return database;
 }
 
-export async function createDatabaseCardPage (pageInfo: Record<keyof Pick<Page, 'title' | 'boardId' | 'createdBy' | 'spaceId'>, string> & {properties: Record<string, string>}): Promise<PageFromBlock> {
+export async function createDatabaseCardPage (pageInfo: Record<keyof Pick<Page, 'title' | 'boardId' | 'createdBy' | 'spaceId'>, string> & {properties: Record<string, string>;}): Promise<PageFromBlock> {
 
   const isValidUUid = validate(pageInfo.boardId);
 

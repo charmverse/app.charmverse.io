@@ -10,7 +10,7 @@ export function compareBountyPagePermissions ({
 
   const permissionsMap: Record<
     string,
-    {bountyPermissions: AvailableBountyPermissions, pagePermissions: AllowedPagePermissions, group: AssignablePermissionGroupsWithPublic}> = {
+    {bountyPermissions: AvailableBountyPermissions; pagePermissions: AllowedPagePermissions; group: AssignablePermissionGroupsWithPublic;}> = {
     };
 
   // Populate each bounty assignee

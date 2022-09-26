@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import Avatar from 'components/common/Avatar';
 
-const StyledAvatar = styled(Avatar)<{ active: boolean }>`
+const StyledAvatar = styled(Avatar)<{ active: boolean; }>`
   border-radius: 8px;
   border: 2px solid ${({ theme }) => theme.palette.sidebar.background};
   &:hover {

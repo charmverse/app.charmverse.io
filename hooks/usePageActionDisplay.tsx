@@ -9,8 +9,8 @@ import { useThreads } from './useThreads';
 import { useVotes } from './useVotes';
 
 export interface IPageActionDisplayContext {
-  currentPageActionDisplay: null | 'polls' | 'comments',
-  setCurrentPageActionDisplay: React.Dispatch<React.SetStateAction<IPageActionDisplayContext['currentPageActionDisplay']>>
+  currentPageActionDisplay: null | 'polls' | 'comments';
+  setCurrentPageActionDisplay: React.Dispatch<React.SetStateAction<IPageActionDisplayContext['currentPageActionDisplay']>>;
 }
 
 export const PageActionDisplayContext = createContext<IPageActionDisplayContext>({
@@ -18,7 +18,7 @@ export const PageActionDisplayContext = createContext<IPageActionDisplayContext>
   setCurrentPageActionDisplay: () => undefined
 });
 
-export function PageActionDisplayProvider ({ children }: { children: ReactNode }) {
+export function PageActionDisplayProvider ({ children }: { children: ReactNode; }) {
 
   // only calculate once
   const smallScreen = useMemo(() => isSmallScreen(), []);

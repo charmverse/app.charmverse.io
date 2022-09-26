@@ -15,7 +15,7 @@ import { items as mediaItems } from './editorItems/media';
 import { items as textItems } from './editorItems/text';
 import { items as otherItems } from './editorItems/other';
 
-export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: PluginKey<NestedPagePluginState>}) {
+export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: PluginKey<NestedPagePluginState>;}) {
   const { addNestedPage } = useNestedPage();
   const [space] = useCurrentSpace();
   const { user } = useUser();

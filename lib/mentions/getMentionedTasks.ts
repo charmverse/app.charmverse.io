@@ -7,11 +7,11 @@ import { uniq } from 'lodash';
 import type { MentionedTask } from './interfaces';
 
 export type MentionedTasksGroup = {
-  marked: MentionedTask[],
-  unmarked: MentionedTask[]
+  marked: MentionedTask[];
+  unmarked: MentionedTask[];
 }
 
-type Mention = Omit<MentionedTask, 'createdBy'> & { userId: string };
+type Mention = Omit<MentionedTask, 'createdBy'> & { userId: string; };
 type SpaceRecord = Record<string, Pick<Space, 'name' | 'domain' | 'id'>>;
 
 interface GetMentionsInput {
@@ -296,7 +296,7 @@ async function getMentionsFromPages ({ userId, username, spaceRecord, spaceIds }
 
 // utils
 
-function sortByDate <T extends { createdAt: string }> (a: T, b: T): number {
+function sortByDate <T extends { createdAt: string; }> (a: T, b: T): number {
   return a.createdAt > b.createdAt ? -1 : 1;
 }
 

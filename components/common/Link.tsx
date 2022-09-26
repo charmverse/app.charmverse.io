@@ -7,7 +7,7 @@ import type { SxProps } from '@mui/system';
 
 import styled from '@emotion/styled';
 
-const hoverStyle: { [key: string]: string } = {
+const hoverStyle: { [key: string]: string; } = {
   blue: 'color: #111',
   white: 'color: #ccc',
   primary: 'opacity: 0.8',

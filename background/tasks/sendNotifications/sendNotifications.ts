@@ -25,7 +25,7 @@ export async function sendUserNotifications (): Promise<number> {
 // note: the email only notifies the first task of each safe
 const getGnosisSafeTaskId = (task: GnosisSafeTasks) => task.tasks[0].transactions[0].id;
 
-export async function getNotifications (): Promise<(PendingTasksProps & {unmarkedWorkspaceEvents: string[]})[]> {
+export async function getNotifications (): Promise<(PendingTasksProps & {unmarkedWorkspaceEvents: string[];})[]> {
 
   // Get all the workspace events within the past day
   const workspaceEvents = await prisma.workspaceEvent.findMany({
@@ -114,7 +114,7 @@ export async function getNotifications (): Promise<(PendingTasksProps & {unmarke
 }
 
 async function sendNotification (notification: PendingTasksProps & {
-  unmarkedWorkspaceEvents: string[]
+  unmarkedWorkspaceEvents: string[];
 }) {
   const template = emails.getPendingTasksEmail(notification);
   const { html, subject } = template;

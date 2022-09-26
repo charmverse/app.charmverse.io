@@ -7,7 +7,7 @@ import { IDENTITY_TYPES } from 'models';
 import { postToDiscord } from 'lib/log/userEvents';
 import log from 'lib/log';
 
-export default async function loginByDiscord ({ code, hostName }: { code: string, hostName?: string }) {
+export default async function loginByDiscord ({ code, hostName }: { code: string; hostName?: string; }) {
 
   const domain = process.env.NODE_ENV === 'development' ? `http://${hostName}` : `https://${hostName}`;
   const discordAccount = await getDiscordAccount(code, `${domain}/api/discord/callback`);

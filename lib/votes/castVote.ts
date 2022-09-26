@@ -4,7 +4,7 @@ import { prisma } from 'db';
 import { InvalidInputError, UndesirableOperationError } from 'lib/utilities/errors';
 import { isVotingClosed } from './utils';
 
-export async function castVote (choice: string, vote: Vote & {voteOptions: VoteOptions[]}, userId: string): Promise<UserVote> {
+export async function castVote (choice: string, vote: Vote & {voteOptions: VoteOptions[];}, userId: string): Promise<UserVote> {
   const voteId = vote.id;
   if (isVotingClosed(vote)) {
     throw new UndesirableOperationError(`Vote with id: ${voteId} is past deadline.`);

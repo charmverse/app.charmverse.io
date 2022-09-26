@@ -5,11 +5,11 @@ import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 type IContext = {
-  user: LoggedInUser | null,
-  setUser: (user: LoggedInUser | any) => void,
-  updateUser: (user: Partial<LoggedInUser>) => void,
-  isLoaded: boolean,
-  setIsLoaded: (isLoaded: boolean) => void
+  user: LoggedInUser | null;
+  setUser: (user: LoggedInUser | any) => void;
+  updateUser: (user: Partial<LoggedInUser>) => void;
+  isLoaded: boolean;
+  setIsLoaded: (isLoaded: boolean) => void;
 };
 
 export const UserContext = createContext<Readonly<IContext>>({
@@ -20,7 +20,7 @@ export const UserContext = createContext<Readonly<IContext>>({
   setIsLoaded: () => undefined
 });
 
-export function UserProvider ({ children }: { children: ReactNode }) {
+export function UserProvider ({ children }: { children: ReactNode; }) {
   const { account } = useWeb3React();
   const [user, setUser] = useState<LoggedInUser | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);

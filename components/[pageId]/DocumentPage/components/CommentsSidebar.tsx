@@ -66,7 +66,7 @@ function getCommentFromThreads (threads: (ThreadWithCommentsAndAuthors | undefin
   return null;
 }
 
-export default function CommentsSidebar ({ sx, inline, ...props }: BoxProps & {inline?: boolean}) {
+export default function CommentsSidebar ({ sx, inline, ...props }: BoxProps & {inline?: boolean;}) {
 
   const { threads } = useThreads();
   const { user } = useUser();
@@ -189,7 +189,7 @@ export default function CommentsSidebar ({ sx, inline, ...props }: BoxProps & {i
   );
 }
 
-function NoCommentsMessage ({ threadType }: { threadType: string }) {
+function NoCommentsMessage ({ threadType }: { threadType: string; }) {
   return (
     <EmptyThreadContainerBox>
       <Center>

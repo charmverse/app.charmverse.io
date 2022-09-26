@@ -30,7 +30,7 @@ export const iframePlugin = new Plugin({
 
 const getTypeFromSchema = (schema: Schema) => schema.nodes[name];
 
-function insertIframeNode (state: EditorState, dispatch: DispatchFn, view: EditorView, attrs?: { [key: string]: any }) {
+function insertIframeNode (state: EditorState, dispatch: DispatchFn, view: EditorView, attrs?: { [key: string]: any; }) {
   const type = getTypeFromSchema(state.schema);
   const newTr = type.create(attrs);
   const { tr } = view.state;

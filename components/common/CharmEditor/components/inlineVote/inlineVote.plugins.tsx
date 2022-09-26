@@ -11,13 +11,13 @@ import { markName } from './inlineVote.constants';
 import RowDecoration from './components/InlineVoteRowDecoration';
 
 export interface InlineVotePluginState {
-  tooltipContentDOM: HTMLElement
-  show: boolean
-  ids: string[]
+  tooltipContentDOM: HTMLElement;
+  show: boolean;
+  ids: string[];
 }
 
 export function plugin ({ key } :{
-  key: PluginKey
+  key: PluginKey;
 }): RawPlugins {
   const tooltipDOMSpec = createTooltipDOM();
   return [
@@ -116,7 +116,7 @@ export function plugin ({ key } :{
   ];
 }
 
-function getDecorations ({ schema, doc }: { doc: Node, schema: Schema }) {
+function getDecorations ({ schema, doc }: { doc: Node; schema: Schema; }) {
 
   const rows = extractInlineVoteRows(schema, doc);
   const decorations: Decoration[] = rows.map(row => {

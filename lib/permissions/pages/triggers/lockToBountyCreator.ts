@@ -7,7 +7,7 @@ import { v4 } from 'uuid';
 import { upsertPermission } from '../actions';
 import { setupPermissionsAfterPageRepositioned } from './page-repositioned';
 
-export async function lockToBountyCreator ({ pageId }: {pageId: string}): Promise<IPageWithPermissions> {
+export async function lockToBountyCreator ({ pageId }: {pageId: string;}): Promise<IPageWithPermissions> {
   const page = await prisma.page.findUnique({
     where: {
       id: pageId

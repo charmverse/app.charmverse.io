@@ -17,7 +17,7 @@ type NextRouteHandler = (
 
 // eslint-disable-next-line no-use-before-define
 type Configure = (options: Options) => Handler;
-type Handler = NextRouteHandler & { configure: Configure };
+type Handler = NextRouteHandler & { configure: Configure; };
 
 type Options = {
   key?: (req: NextApiRequest, filename: string) => string | Promise<string>;

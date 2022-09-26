@@ -41,7 +41,7 @@ export async function applyTokenGates ({ spaceId, userId, tokens, commit }: Toke
   }
 
   const verifiedTokenGates: TokenGateWithRoles[] = (await Promise.all(tokens.map(async tk => {
-    const result = await verifyJwt({ jwt: tk.signedToken }) as {payload: LitJwtPayload, verified: boolean};
+    const result = await verifyJwt({ jwt: tk.signedToken }) as {payload: LitJwtPayload; verified: boolean;};
 
     const matchingTokenGate = tokenGates.find(g => g.id === tk.tokenGateId);
 

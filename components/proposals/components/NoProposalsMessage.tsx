@@ -21,7 +21,7 @@ const Center = styled.div`
   flex-direction: column;
 `;
 
-export default function NoProposalsMessage ({ message }: { message: string }) {
+export default function NoProposalsMessage ({ message }: { message: string; }) {
   return (
     <EmptyProposalContainerBox>
       <Center>

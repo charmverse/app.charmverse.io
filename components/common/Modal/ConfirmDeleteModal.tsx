@@ -7,7 +7,7 @@ import Button from 'components/common/Button';
 import type { ReactNode } from 'react';
 
 type Props = Pick<ModalProps, 'onClose' | 'open' | 'size'> & {
-  question: string | ReactNode,
+  question: string | ReactNode;
   buttonText?: string;
   title?: string;
   onConfirm: () => void;

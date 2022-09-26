@@ -16,7 +16,7 @@ const proposalStatuses = Object.keys(proposalStatusTransitionRecord) as Proposal
 
 export default function ProposalStepper (
   { refreshProposal, proposal, proposalUserGroups }:
-  { refreshProposal: KeyedMutator<ProposalWithUsers>, proposalUserGroups: ProposalUserGroup[], proposal?: ProposalWithUsers}
+  { refreshProposal: KeyedMutator<ProposalWithUsers>; proposalUserGroups: ProposalUserGroup[]; proposal?: ProposalWithUsers;}
 ) {
 
   const { status: currentStatus, id: proposalId, reviewers } = proposal ?? {

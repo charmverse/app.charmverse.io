@@ -26,7 +26,7 @@ const rowHeight = 48;
 
 function TransactionRow (
   { firstNonce, isSnoozed, transaction }:
-  { firstNonce: number, isSnoozed: boolean, transaction: GnosisTransactionPopulated }
+  { firstNonce: number; isSnoozed: boolean; transaction: GnosisTransactionPopulated; }
 ) {
   const [expanded, setExpanded] = useState(false);
   const isReadyToExecute = transaction.confirmations?.length === transaction.threshold;
@@ -206,7 +206,7 @@ function TransactionRow (
 
 function SafeTasks (
   { isSnoozed, address, safeName, safeUrl, tasks }:
-  { isSnoozed: boolean, address: string, safeName: string | null, safeUrl: string, tasks: GnosisTask[] }
+  { isSnoozed: boolean; address: string; safeName: string | null; safeUrl: string; tasks: GnosisTask[]; }
 ) {
   return (
     <>
@@ -278,9 +278,9 @@ function SafeTasks (
 }
 
 interface GnosisTasksSectionProps {
-  tasks: GetTasksResponse | undefined
-  error: any
-  mutateTasks: KeyedMutator<GetTasksResponse>
+  tasks: GetTasksResponse | undefined;
+  error: any;
+  mutateTasks: KeyedMutator<GetTasksResponse>;
 }
 
 export default function GnosisTasksSection ({ error, mutateTasks, tasks }: GnosisTasksSectionProps) {

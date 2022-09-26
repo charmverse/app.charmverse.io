@@ -21,7 +21,7 @@ const Center = styled.div`
   flex-direction: column;
 `;
 
-export default function NoVotesMessage ({ message }: { message: string }) {
+export default function NoVotesMessage ({ message }: { message: string; }) {
   return (
     <EmptyVoteContainerBox>
       <Center>

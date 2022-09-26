@@ -10,7 +10,7 @@ import { getTransactionsforSafes } from './gnosis';
 const providerKey = process.env.ALCHEMY_API_KEY;
 const providerUrl = `https://eth-mainnet.alchemyapi.io/v2/${providerKey}`;
 
-type UserWithGnosisSafeState = User & {notificationState: UserNotificationState | null}
+type UserWithGnosisSafeState = User & {notificationState: UserNotificationState | null;}
 interface ActionUser {
   address: string;
   user?: UserWithGnosisSafeState;
@@ -37,7 +37,7 @@ export interface GnosisTransactionPopulated {
   safeAddress: string;
   safeName: string | null;
   threshold: number;
-  snoozedUsers: UserWithGnosisSafeState[]
+  snoozedUsers: UserWithGnosisSafeState[];
 }
 
 export interface GnosisTask {
@@ -74,7 +74,7 @@ function getTaskDescription (transaction: GnosisTransaction): string {
     const data = transaction.dataDecoded as any;
     switch (data.method) {
       case 'multiSend': {
-        const actions = data.parameters[0].valueDecoded as { to: string, value: string }[];
+        const actions = data.parameters[0].valueDecoded as { to: string; value: string; }[];
         return `MultiSend: ${actions.length} actions`;
       }
 
@@ -89,9 +89,9 @@ function getTaskDescription (transaction: GnosisTransaction): string {
   return 'N/A';
 }
 
-type PaymentAction = { decodedValue: { to: string, value: string }[] }; // TODO: find out the type and name of this action (it is used when there are multiple recipients)
-type DeadlineAction = { name: 'deadline', type: 'uint256', value: number };
-type DataAction = { name: 'data', type: 'bytes[]', value: string[] };
+type PaymentAction = { decodedValue: { to: string; value: string; }[]; }; // TODO: find out the type and name of this action (it is used when there are multiple recipients)
+type DeadlineAction = { name: 'deadline'; type: 'uint256'; value: number; };
+type DataAction = { name: 'data'; type: 'bytes[]'; value: string[]; };
 type TransactionParameter = PaymentAction | DeadlineAction | DataAction;
 
 function getTaskActions (transaction: GnosisTransaction, getRecipient: (address: string) => ActionUser): SendAction[] {

@@ -9,13 +9,13 @@ import type { ComponentProps, SyntheticEvent } from 'react';
 
 type ReducedRole = Role | ListSpaceRolesResponse
 
-type GroupedRole = ReducedRole & {group: 'role'}
-type GroupedContributor = Contributor & {group: 'user'}
+type GroupedRole = ReducedRole & {group: 'role';}
+type GroupedContributor = Contributor & {group: 'user';}
 type GroupedOption = GroupedRole | GroupedContributor
 
 export default function InputSearchReviewers ({
   disableCloseOnSelect = false, excludedIds, ...props
-}: Partial<Omit<ComponentProps<typeof Autocomplete>, 'onChange'>> & { excludedIds?: string[], onChange: (event: SyntheticEvent<Element, Event>, value: GroupedOption[]) => void }) {
+}: Partial<Omit<ComponentProps<typeof Autocomplete>, 'onChange'>> & { excludedIds?: string[]; onChange: (event: SyntheticEvent<Element, Event>, value: GroupedOption[]) => void; }) {
   const { roles } = useRoles();
   const [contributors] = useContributors();
 

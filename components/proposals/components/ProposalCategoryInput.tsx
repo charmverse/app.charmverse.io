@@ -18,7 +18,7 @@ const filter = createFilterOptions<OptionType>();
 type ProposalCategoryOptionProps = {
   category: OptionType;
   props: HTMLAttributes<HTMLLIElement>;
-  onDelete?: (id: string) => void
+  onDelete?: (id: string) => void;
 }
 
 function ProposalCategoryOption ({ props, category, onDelete }: ProposalCategoryOptionProps) {

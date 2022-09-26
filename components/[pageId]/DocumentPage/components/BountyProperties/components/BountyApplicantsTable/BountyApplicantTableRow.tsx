@@ -323,7 +323,7 @@ export default function BountyApplicantTableRow ({
   );
 }
 
-function getContentWithMention ({ myUserId, targetUserId }: { myUserId: string, targetUserId: string }) {
+function getContentWithMention ({ myUserId, targetUserId }: { myUserId: string; targetUserId: string; }) {
   return {
     type: 'doc',
     content: [{

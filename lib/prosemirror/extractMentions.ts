@@ -7,7 +7,7 @@ import type { PageContent } from 'models';
  * @returns An array of mention ids
  */
 export function extractMentions (content: PageContent, username?: string) {
-  const mentions: {id: string, createdAt: string, createdBy: string, text: string, value: string}[] = [];
+  const mentions: {id: string; createdAt: string; createdBy: string; text: string; value: string;}[] = [];
 
   function recurse (node: PageContent, parentNode: PageContent | null) {
     if (node.content) {

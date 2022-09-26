@@ -10,9 +10,9 @@ import ImageSelectorGallery from './ImageSelectorGallery';
 
 interface ImageSelectorProps {
   autoOpen?: boolean;
-  onImageSelect: (imageSrc: string) => void
-  children: ReactNode
-  galleryImages?: { [category: string]: string[] }
+  onImageSelect: (imageSrc: string) => void;
+  children: ReactNode;
+  galleryImages?: { [category: string]: string[]; };
 }
 
 export default function ImageSelector ({ autoOpen = false, children, galleryImages, onImageSelect }: ImageSelectorProps) {

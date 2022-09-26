@@ -21,12 +21,12 @@ export interface VoteDetailProps {
   vote: ExtendedVote;
   detailed?: boolean;
   isProposal?: boolean;
-  castVote: (voteId: string, choice: string) => Promise<UserVote>
-  deleteVote: (voteId: string) => Promise<void>
-  cancelVote: (voteId: string) => Promise<void>
+  castVote: (voteId: string, choice: string) => Promise<UserVote>;
+  deleteVote: (voteId: string) => Promise<void>;
+  cancelVote: (voteId: string) => Promise<void>;
 }
 
-const StyledDiv = styled.div<{ detailed: boolean }>`
+const StyledDiv = styled.div<{ detailed: boolean; }>`
   background-color: ${({ theme, detailed }) => detailed && theme.palette.mode !== 'light' ? theme.palette.background.default : theme.palette.background.light};
   padding: ${({ theme }) => theme.spacing(2)};
 `;

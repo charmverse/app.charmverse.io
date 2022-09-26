@@ -48,8 +48,8 @@ export function getTimeDifference (
 }
 
 export function humanFriendlyDate (date: DateInput, options: {
-  withYear?: boolean,
-  withTime?: boolean} = {
+  withYear?: boolean;
+  withTime?: boolean;} = {
   withYear: false,
   withTime: false
 }): string {

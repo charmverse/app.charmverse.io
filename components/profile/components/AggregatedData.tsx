@@ -1,6 +1,6 @@
 import { Box, Grid, Paper, Typography } from '@mui/material';
 
-export function AggregatedDataItem ({ value, label }: { value: number, label: string }) {
+export function AggregatedDataItem ({ value, label }: { value: number; label: string; }) {
   return (
     <Paper
       sx={{
@@ -39,10 +39,10 @@ export function AggregatedDataItem ({ value, label }: { value: number, label: st
 }
 
 export default function AggregatedData ({ totalBounties, totalCommunities, totalProposals, totalVotes }: {
-  totalCommunities: number
-  totalProposals: number
-  totalVotes: number
-  totalBounties: number
+  totalCommunities: number;
+  totalProposals: number;
+  totalVotes: number;
+  totalBounties: number;
 }) {
   return (
     <Grid container display='flex' gap={2} flexDirection='column'>

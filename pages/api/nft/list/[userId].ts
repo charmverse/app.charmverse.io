@@ -13,7 +13,7 @@ handler
 
 const supportedMainnets = [1, 137, 42161] as const;
 
-async function getNFTsMiddleware (req: NextApiRequest, res: NextApiResponse<NftData[] | {error: string}>) {
+async function getNFTsMiddleware (req: NextApiRequest, res: NextApiResponse<NftData[] | {error: string;}>) {
   // address = '0x155b6485305ccab44ef7da58ac886c62ce105cf9'
   const userId = req.query.userId as string;
 

@@ -22,8 +22,8 @@ import { useEffect, useState } from 'react';
 import BountyApplicantTableRow from './BountyApplicantTableRow';
 
 interface Props {
-  bounty: BountyWithDetails
-  permissions: AssignedBountyPermissions
+  bounty: BountyWithDetails;
+  permissions: AssignedBountyPermissions;
 }
 
 export default function BountySubmissionsTable ({ bounty, permissions }: Props) {

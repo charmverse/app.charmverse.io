@@ -13,7 +13,7 @@ import { getNFTs } from 'lib/blockchain/nfts';
 export type PublicUser = Pick<User, 'id' | 'username' | 'avatar' | 'path'> & {
   profile: UserDetails | null;
   visiblePoaps: Partial<ExtendedPoap>[];
-  visibleNfts: NftData[]
+  visibleNfts: NftData[];
 }
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -53,7 +53,7 @@ async function getUserProfile (req: NextApiRequest, res: NextApiResponse<PublicU
     throw new DataNotFoundError('User not found');
   }
 
-  function isVisible (item: { id: string }): boolean {
+  function isVisible (item: { id: string; }): boolean {
     return !userById.profileItems.some(profileItem => profileItem.isHidden && profileItem.id === item.id);
   }
 

@@ -35,8 +35,8 @@ import * as table from './components/table';
 import paragraph from './components/paragraph';
 
 export interface ICharmEditorOutput {
-  doc: PageContent,
-  rawText: string
+  doc: PageContent;
+  rawText: string;
 }
 
 export const specRegistry = new SpecRegistry([

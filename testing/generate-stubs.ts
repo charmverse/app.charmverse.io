@@ -11,7 +11,7 @@ export function generatePageToCreateStub ({
   parentId,
   id = v4(),
   type
-}: {userId: string} & Pick<Page, 'spaceId'> & Partial<Pick<Page, 'title' | 'parentId' | 'id' | 'type'>>): Partial<Page> {
+}: {userId: string;} & Pick<Page, 'spaceId'> & Partial<Pick<Page, 'title' | 'parentId' | 'id' | 'type'>>): Partial<Page> {
   return {
     id,
     createdBy: userId,

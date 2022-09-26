@@ -7,7 +7,7 @@ import type { NodeSelection } from 'prosemirror-state';
 import { queryIsSelectionAroundInlineVote } from '../inlineVote';
 import { markName as inlineVoteMarkName } from '../inlineVote/inlineVote.constants';
 
-export function plugins ({ key, readOnly, enableComments = true }:{key: PluginKey, readOnly?: boolean, enableComments?: boolean}) {
+export function plugins ({ key, readOnly, enableComments = true }:{key: PluginKey; readOnly?: boolean; enableComments?: boolean;}) {
   const menuPlugins = floatingMenu.plugins({
     key,
     calculateType: (state) => {
@@ -48,7 +48,7 @@ export function plugins ({ key, readOnly, enableComments = true }:{key: PluginKe
       const isInsideTable = state.selection.$anchor
         .parent.type.name.match(/^(table_cell|table_header|horizontalRule)$/);
       if (isInsideTable) {
-        const { path } = (state.selection.$anchor) as ResolvedPos & { path: Node[] };
+        const { path } = (state.selection.$anchor) as ResolvedPos & { path: Node[]; };
         if (path) {
           for (let index = path.length - 1; index > 0; index--) {
             const node = path[index];

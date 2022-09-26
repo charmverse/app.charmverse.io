@@ -80,7 +80,7 @@ const SidebarContainer = styled.div`
 
 `;
 
-const sidebarItemStyles = ({ theme }: { theme: Theme }) => css`
+const sidebarItemStyles = ({ theme }: { theme: Theme; }) => css`
   padding-left: ${theme.spacing(2)};
   padding-right: ${theme.spacing(2)};
   align-items: center;
@@ -110,7 +110,7 @@ const SectionName = styled(Typography)`
   margin-bottom: ${({ theme }) => theme.spacing(1)};
 `;
 
-const StyledSidebarLink = styled(Link)<{ active: boolean }>`
+const StyledSidebarLink = styled(Link)<{ active: boolean; }>`
   ${sidebarItemStyles}
   ${({ active, theme }) => active ? `
     background-color: ${theme.palette.action.selected};
@@ -139,7 +139,7 @@ const SidebarHeader = styled.div(({ theme }) => `
   min-height: ${headerHeight}px;
 `);
 
-const ScrollingContainer = styled.div<{ isScrolled: boolean }>`
+const ScrollingContainer = styled.div<{ isScrolled: boolean; }>`
   flex-grow: 1;
   overflow-y: auto;
   transition: border-color 0.2s ease-out;
@@ -147,7 +147,7 @@ const ScrollingContainer = styled.div<{ isScrolled: boolean }>`
   ${({ isScrolled, theme }) => isScrolled ? `border-top: 1px solid ${theme.palette.divider}` : ''};
 `;
 
-function SidebarLink ({ active, href, icon, label, target }: { active: boolean, href: string, icon: any, label: string, target?: string }) {
+function SidebarLink ({ active, href, icon, label, target }: { active: boolean; href: string; icon: any; label: string; target?: string; }) {
   return (
     <StyledSidebarLink href={href} active={active} target={target}>
       {icon}
@@ -156,7 +156,7 @@ function SidebarLink ({ active, href, icon, label, target }: { active: boolean, 
   );
 }
 
-function SidebarBox ({ icon, label, ...props }: { icon: any, label: string } & BoxProps) {
+function SidebarBox ({ icon, label, ...props }: { icon: any; label: string; } & BoxProps) {
   return (
     <StyledSidebarBox {...props}>
       {icon}

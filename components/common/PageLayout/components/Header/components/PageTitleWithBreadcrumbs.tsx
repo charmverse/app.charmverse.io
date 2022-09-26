@@ -44,7 +44,7 @@ const StyledPageTitle = styled(Typography)`
   max-width: 500px;
 ` as typeof Typography;
 
-function PageTitle ({ children, sx = {} }: { children: ReactNode, sx?: object }) {
+function PageTitle ({ children, sx = {} }: { children: ReactNode; sx?: object; }) {
   return (
     <StyledPageTitle noWrap component='div' sx={sx}>
       {children}
@@ -58,7 +58,7 @@ interface PageBreadCrumb {
   title: string;
 }
 
-function DocumentPageTitle ({ basePath, pageId }: { basePath: string, pageId?: string }) {
+function DocumentPageTitle ({ basePath, pageId }: { basePath: string; pageId?: string; }) {
   const { pages, isEditing } = usePages();
 
   const currentPage = pageId ? pages[pageId] : undefined;
@@ -119,7 +119,7 @@ function DocumentPageTitle ({ basePath, pageId }: { basePath: string, pageId?: s
   );
 }
 
-function BountyPageTitle ({ basePath }: { basePath: string }) {
+function BountyPageTitle ({ basePath }: { basePath: string; }) {
   const [pageTitle] = usePageTitle();
   return (
     <PageTitle>
@@ -150,7 +150,7 @@ function PublicBountyPageTitle () {
   );
 }
 
-function NexusPageTitle ({ route }: { route: string }) {
+function NexusPageTitle ({ route }: { route: string; }) {
   const [pageTitle] = usePageTitle();
 
   // show /nexus as the parent page
@@ -183,7 +183,7 @@ function EmptyPageTitle () {
   return <div></div>;
 }
 
-export default function PageTitleWithBreadcrumbs ({ pageId }: { pageId?: string}) {
+export default function PageTitleWithBreadcrumbs ({ pageId }: { pageId?: string;}) {
   const router = useRouter();
   const [space] = useCurrentSpace();
 

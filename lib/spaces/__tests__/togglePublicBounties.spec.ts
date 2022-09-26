@@ -5,7 +5,7 @@ import { createPage, generateBounty, generateUserAndSpaceWithApiToken } from 'te
 import { v4 } from 'uuid';
 import { togglePublicBounties } from '../togglePublicBounties';
 
-type SyntheticBountyInput = {id: string, type: PageType, pagePermissions: Prisma.PagePermissionCreateManyPageInput[]}
+type SyntheticBountyInput = {id: string; type: PageType; pagePermissions: Prisma.PagePermissionCreateManyPageInput[];}
 
 describe('togglePublicBounties', () => {
 

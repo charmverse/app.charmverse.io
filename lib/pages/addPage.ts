@@ -13,7 +13,7 @@ import { v4 } from 'uuid';
 import type { IPageWithPermissions } from './interfaces';
 import { getPagePath } from './utils';
 
-export type NewPageInput = Partial<Page> & { spaceId: string, createdBy: string, shouldCreateDefaultBoardData?: boolean };
+export type NewPageInput = Partial<Page> & { spaceId: string; createdBy: string; shouldCreateDefaultBoardData?: boolean; };
 
 interface AddPageResponse {
   board: Board | null;
@@ -107,7 +107,7 @@ function createDefaultBoardData ({ boardId }: DefaultBoardProps) {
   };
 }
 
-export function createDefaultViewsAndCards ({ board }: { board: Board }) {
+export function createDefaultViewsAndCards ({ board }: { board: Board; }) {
 
   const view = createBoardView();
   view.fields.viewType = 'board';

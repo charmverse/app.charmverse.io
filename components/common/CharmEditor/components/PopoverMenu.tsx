@@ -12,7 +12,7 @@ interface Props {
   maxHeight?: string;
 }
 
-const StyledPaper = styled(Paper)<{ maxheight: string }>`
+const StyledPaper = styled(Paper)<{ maxheight: string; }>`
   max-height: ${(props) => props.maxheight};
   overflow-y: auto;
 `;

@@ -26,7 +26,7 @@ const StyledAvatarWithIcons = styled(AvatarWithIcons)`
   }
 `;
 
-function StyledIconButton ({ children, ...props }: { children: ReactNode, key: string, onClick: (e: React.MouseEvent<HTMLElement>) => void }) {
+function StyledIconButton ({ children, ...props }: { children: ReactNode; key: string; onClick: (e: React.MouseEvent<HTMLElement>) => void; }) {
   return (
     <IconButton
       sx={{

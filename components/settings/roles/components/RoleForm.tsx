@@ -18,9 +18,9 @@ export const schema = yup.object({
 type FormValues = yup.InferType<typeof schema>
 
 interface Props {
-  submitted?: (value: Partial<Role>) => void
-  role?: Partial<Role>
-  mode: 'create' | 'edit'
+  submitted?: (value: Partial<Role>) => void;
+  role?: Partial<Role>;
+  mode: 'create' | 'edit';
 }
 
 export default function RoleForm ({ role = {}, mode = 'create', submitted = () => {} }: Props) {

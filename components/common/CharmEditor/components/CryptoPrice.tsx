@@ -56,9 +56,9 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
   preset?: Partial<{
     base: CryptoCurrency | null;
     quote: FiatCurrency | null;
-  }>,
-  onQuoteCurrencyChange?: ((currency: FiatCurrency) => void),
-  onBaseCurrencyChange?: ((currency: CryptoCurrency) => void)
+  }>;
+  onQuoteCurrencyChange?: ((currency: FiatCurrency) => void);
+  onBaseCurrencyChange?: ((currency: CryptoCurrency) => void);
 }) {
 
   const [loading, setLoadingState] = useState(false);
@@ -220,7 +220,7 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
   );
 }
 
-type ButtonProps = { children: React.ReactNode, active: boolean, onClick: () => void };
+type ButtonProps = { children: React.ReactNode; active: boolean; onClick: () => void; };
 
 function StyledButton ({ children, active, onClick }: ButtonProps) {
   return (

@@ -3,10 +3,10 @@ export type BaseApiColor = 'gray' | 'turquoise' | 'orange' | 'yellow' | 'teal' |
 export type ApiColor = 'default' & BaseApiColor & `${BaseApiColor}_background`;
 
 export interface FailedImportsError {
-  pageId: string,
-  type: 'page' | 'database',
-  title: string,
-  blocks: [string, number][][]
+  pageId: string;
+  type: 'page' | 'database';
+  title: string;
+  blocks: [string, number][][];
 }
 
 export type NotionImage = {

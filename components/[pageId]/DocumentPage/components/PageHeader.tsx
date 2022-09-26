@@ -55,7 +55,7 @@ const EditorHeader = styled.div`
 `;
 
 interface PageHeaderProps {
-  headerImage: string | null,
+  headerImage: string | null;
   icon: string | null;
   readOnly: boolean;
   title: string;

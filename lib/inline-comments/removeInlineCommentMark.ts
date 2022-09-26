@@ -10,7 +10,7 @@ export function removeInlineCommentMark (view: EditorView, threadId: string, del
 
   const inlineCommentNodes = findChildrenByMark(doc, inlineCommentMarkSchema);
 
-  const inlineCommentNodesWithMarks: (NodeWithPos & {mark: Mark})[] = inlineCommentNodes.map(inlineCommentNode => {
+  const inlineCommentNodesWithMarks: (NodeWithPos & {mark: Mark;})[] = inlineCommentNodes.map(inlineCommentNode => {
     // Find the inline comment mark for the node
     const inlineCommentMark = inlineCommentNode.node.marks.find(mark => (
       mark.type.name === inlineCommentMarkSchema.name

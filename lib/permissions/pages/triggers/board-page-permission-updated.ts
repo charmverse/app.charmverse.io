@@ -12,7 +12,7 @@ import type { BoardPagePermissionUpdated } from '../interfaces';
  * @returns
  */
 export async function generateboardPagePermissionUpdated ({ boardId, permissionId }: BoardPagePermissionUpdated):
- Promise<{updateManyArgs?: Prisma.PagePermissionUpdateManyArgs, createManyArgs?: Prisma.PagePermissionCreateManyArgs}> {
+ Promise<{updateManyArgs?: Prisma.PagePermissionUpdateManyArgs; createManyArgs?: Prisma.PagePermissionCreateManyArgs;}> {
 
   const permissionUpdates: Prisma.PagePermissionUpdateArgs [] = [];
 

@@ -18,7 +18,7 @@ handler
   .put(updateVote)
   .delete(deleteVote);
 
-async function getVote (req: NextApiRequest, res: NextApiResponse<Vote | { error: any }>) {
+async function getVote (req: NextApiRequest, res: NextApiResponse<Vote | { error: any; }>) {
   const voteId = req.query.id as string;
   const vote = await getVoteService(voteId, req.session.user.id);
   if (!vote) {
@@ -27,7 +27,7 @@ async function getVote (req: NextApiRequest, res: NextApiResponse<Vote | { error
   return res.status(200).json(vote);
 }
 
-async function updateVote (req: NextApiRequest, res: NextApiResponse<Vote | { error: any }>) {
+async function updateVote (req: NextApiRequest, res: NextApiResponse<Vote | { error: any; }>) {
   const voteId = req.query.id as string;
   const { status } = req.body as UpdateVoteDTO;
   const updatedVote = await updateVoteService(voteId, req.session.user.id, status);
@@ -35,7 +35,7 @@ async function updateVote (req: NextApiRequest, res: NextApiResponse<Vote | { er
   return res.status(200).json(updatedVote);
 }
 
-async function deleteVote (req: NextApiRequest, res: NextApiResponse<Vote | null | { error: any }>) {
+async function deleteVote (req: NextApiRequest, res: NextApiResponse<Vote | null | { error: any; }>) {
   const voteId = req.query.id as string;
   const deletedVote = await deleteVoteService(voteId, req.session.user.id);
 

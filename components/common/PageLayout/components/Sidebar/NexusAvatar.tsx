@@ -11,7 +11,7 @@ const AvatarLink = styled(Link)`
   cursor: pointer;
 `;
 
-const MyAvatar = styled(Avatar)<{ active: boolean }>`
+const MyAvatar = styled(Avatar)<{ active: boolean; }>`
   border: 2px solid ${({ theme }) => theme.palette.sidebar.background};
   &:hover {
     box-shadow: 0 0 0 3px ${({ theme }) => theme.palette.sidebar.avatarHighlight};
@@ -21,7 +21,7 @@ const MyAvatar = styled(Avatar)<{ active: boolean }>`
 
 const nexusRoutes = ['/nexus', '/profile', '/integrations'];
 
-export default function NexusAvatar ({ user }: { user: Pick<LoggedInUser, 'avatar' | 'username'> | null }) {
+export default function NexusAvatar ({ user }: { user: Pick<LoggedInUser, 'avatar' | 'username'> | null; }) {
 
   const router = useRouter();
   const isNexusActive = nexusRoutes.some(route => router.pathname === route);

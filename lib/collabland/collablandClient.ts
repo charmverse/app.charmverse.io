@@ -40,7 +40,7 @@ type CollablandCredential<T> = {
     credentialSubject: T;
     issuer: {
       id: string; // 'did:ethr:rinkeby:0x038e829e042560e41de5a1f7c12aded55f95ea903465f7f9c8a805ed83f8cdc936'
-    },
+    };
     id: string; // 'Z6s-qJzLBpNj9oAPKpcCN',
     type: 'VerifiableCredential' | 'GuestPass'[];
     '@context': 'https://www.w3.org/2018/credentials/v1'[];
@@ -48,7 +48,7 @@ type CollablandCredential<T> = {
     proof: {
       'type': 'JwtProof2020';
       'jwt': string;
-    }
+    };
   };
 }
 
@@ -58,7 +58,7 @@ export type CollablandDiscordRole = CollablandCredential<DiscordRoleSubject>;
 
 export type AnyCredentialType = CollablandBountyEvent | CollablandDiscordRole;
 
-export function getCredentials ({ aeToken }: { aeToken: string }) {
+export function getCredentials ({ aeToken }: { aeToken: string; }) {
 
   if (!API_KEY) {
     log.warn('No API Key provided for collab.land');
@@ -77,7 +77,7 @@ export function getCredentials ({ aeToken }: { aeToken: string }) {
 }
 
 // @ref: https://api-qa.collab.land/explorer/#/VeramoController/VeramoController.requestToIssueVcred
-export function createCredential<T = BountyEventSubject> ({ subject }: { subject: T }) {
+export function createCredential<T = BountyEventSubject> ({ subject }: { subject: T; }) {
 
   if (!API_KEY) {
     log.warn('No API Key provided for collab.land');

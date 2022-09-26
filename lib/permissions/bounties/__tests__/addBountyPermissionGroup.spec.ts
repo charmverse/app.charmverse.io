@@ -87,7 +87,7 @@ describe('addBountyPermissionGroup', () => {
       select: {
         permissions: true
       }
-    }) as {permissions: BountyPermission[]};
+    }) as {permissions: BountyPermission[];};
 
     expect(updatedBounty.permissions.length).toBe(1);
 

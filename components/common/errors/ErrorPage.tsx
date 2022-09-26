@@ -22,7 +22,7 @@ const Text = styled(Typography)`
   font-weight: 700;
 `;
 
-export default function ErrorPage ({ message = 'Sorry! there was an error' }: { message?: string }) {
+export default function ErrorPage ({ message = 'Sorry! there was an error' }: { message?: string; }) {
   return (
     <Container>
       <Box sx={{ textAlign: 'center' }}>

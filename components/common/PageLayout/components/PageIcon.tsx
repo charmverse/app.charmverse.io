@@ -31,7 +31,7 @@ export const StyledPageIcon = styled(EmojiIcon)`
   }
 `;
 
-export default function PageIcon ({ icon, isEditorEmpty, pageType }: { icon?: ReactNode, pageType: Page['type'], isEditorEmpty: boolean }) {
+export default function PageIcon ({ icon, isEditorEmpty, pageType }: { icon?: ReactNode; pageType: Page['type']; isEditorEmpty: boolean; }) {
   if (icon) {
     return <StyledPageIcon icon={icon} />;
   }

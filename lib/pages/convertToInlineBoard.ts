@@ -5,7 +5,7 @@ import type { Board } from 'lib/focalboard/board';
 import { mutate } from 'swr';
 import { createDefaultViewsAndCards } from './addPage';
 
-export async function convertToInlineBoard ({ board }: { board: Board }) {
+export async function convertToInlineBoard ({ board }: { board: Board; }) {
   const { view, cards } = createDefaultViewsAndCards({ board });
   await mutator.insertBlocks(
     [view, ...cards],

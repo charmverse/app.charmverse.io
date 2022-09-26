@@ -13,7 +13,7 @@ handler
   .use(requireUser)
   .put(updateUserProfileItems);
 
-async function updateUserProfileItems (req: NextApiRequest, res: NextApiResponse<any | {error: string}>) {
+async function updateUserProfileItems (req: NextApiRequest, res: NextApiResponse<any | {error: string;}>) {
 
   const { profileItems }: UpdateProfileItemRequest = req.body;
 

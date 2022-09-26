@@ -13,7 +13,7 @@ handler
   .use(requireKeys(['address'], 'body'))
   .post(login);
 
-async function login (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
+async function login (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any; }>) {
   const { address } = req.body;
   const user = await prisma.user.findFirst({
     where: {

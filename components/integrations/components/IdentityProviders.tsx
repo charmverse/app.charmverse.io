@@ -31,7 +31,7 @@ const GridContainer = styled.div`
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 `;
 
-function ProviderRow ({ children }: { children: ReactNode }) {
+function ProviderRow ({ children }: { children: ReactNode; }) {
   return (
     <Card sx={{ height: '100%' }}>
       <Stack

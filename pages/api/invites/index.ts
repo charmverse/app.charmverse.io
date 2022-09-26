@@ -7,7 +7,7 @@ import { withSessionRoute } from 'lib/session/withSession';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-export type InviteLinkPopulated = InviteLink & { author: User };
+export type InviteLinkPopulated = InviteLink & { author: User; };
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -27,7 +27,7 @@ async function createInviteLinkEndpoint (req: NextApiRequest, res: NextApiRespon
   });
   return res.status(200).json(invite);
 }
-async function getInviteLinks (req: NextApiRequest, res: NextApiResponse<InviteLinkPopulated[] | { error: string }>) {
+async function getInviteLinks (req: NextApiRequest, res: NextApiResponse<InviteLinkPopulated[] | { error: string; }>) {
 
   const spaceId = req.query.spaceId as string;
   if (!spaceId) {

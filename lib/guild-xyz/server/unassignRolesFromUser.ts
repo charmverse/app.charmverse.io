@@ -2,7 +2,7 @@ import { prisma } from 'db';
 
 export async function unassignRolesFromUser (
   { guildRoleIdCharmverseRoleIdRecord, spaceRoleId, userGuildRoleIds, userGuildRoleIdsInSpace }:
-  { userGuildRoleIdsInSpace: string[], userGuildRoleIds: string[], spaceRoleId: string, guildRoleIdCharmverseRoleIdRecord: Record<string, string> }
+  { userGuildRoleIdsInSpace: string[]; userGuildRoleIds: string[]; spaceRoleId: string; guildRoleIdCharmverseRoleIdRecord: Record<string, string>; }
 ) {
   // Filter the roles that have been imported from guild but user dont have access to, this could mean the user lost access to it
   const roleIdsUserLostAccess: string[] = [];

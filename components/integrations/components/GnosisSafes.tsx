@@ -114,7 +114,7 @@ export default function GnosisSafesList () {
   );
 }
 
-export function GnosisConnectCard ({ loading, onClick }: { loading: boolean, onClick: () => void }) {
+export function GnosisConnectCard ({ loading, onClick }: { loading: boolean; onClick: () => void; }) {
   const router = useRouter();
   const isTasksPage = router.pathname.includes('/tasks');
   return (
@@ -133,7 +133,7 @@ export function GnosisConnectCard ({ loading, onClick }: { loading: boolean, onC
   );
 }
 
-function SafeRow ({ safe, updateWallets }: { safe: Safe, updateWallets: () => void }) {
+function SafeRow ({ safe, updateWallets }: { safe: Safe; updateWallets: () => void; }) {
 
   const deleteConfirmation = usePopupState({ variant: 'popover', popupId: 'delete-confirmation' });
 
@@ -143,7 +143,7 @@ function SafeRow ({ safe, updateWallets }: { safe: Safe, updateWallets: () => vo
     handleSubmit,
     reset,
     setValue
-  } = useForm<{ name: string }>({
+  } = useForm<{ name: string; }>({
     mode: 'onChange',
     defaultValues: { name: safe.name || '' }
   });
@@ -158,7 +158,7 @@ function SafeRow ({ safe, updateWallets }: { safe: Safe, updateWallets: () => vo
     deleteConfirmation.close();
   }
 
-  async function saveSafeName ({ name }: { name: string }) {
+  async function saveSafeName ({ name }: { name: string; }) {
     if (isDirty) {
       const sanitized = name.trim();
       await charmClient.updateMyGnosisSafe({ id: safe.id, name: sanitized });

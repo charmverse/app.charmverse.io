@@ -16,7 +16,7 @@ export function specs () {
   ];
 }
 
-function emojiSpec ({ defaultEmoji = '😃' }: { defaultEmoji?: string } = {}): RawSpecs {
+function emojiSpec ({ defaultEmoji = '😃' }: { defaultEmoji?: string; } = {}): RawSpecs {
   const { parseDOM, toDOM } = domSerializationHelpers(name, {
     tag: 'span',
     parsingPriority: 51,

@@ -13,7 +13,7 @@ const StyledPopper = styled(Popper)`
   z-index: var(--z-index-modal);
 `;
 
-export default function EmojiSuggest ({ pluginKey }: {pluginKey: PluginKey}) {
+export default function EmojiSuggest ({ pluginKey }: {pluginKey: PluginKey;}) {
   const view = useEditorViewContext();
   const {
     tooltipContentDOM,

@@ -28,7 +28,7 @@ const menuPosition: Partial<MenuProps> = {
   }
 };
 
-function Component ({ menuState }: { menuState: PluginState }) {
+function Component ({ menuState }: { menuState: PluginState; }) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'user-role' });
   const view = useEditorViewContext();
   const { deletePage, currentPageId, pages } = usePages();
@@ -152,7 +152,7 @@ function Component ({ menuState }: { menuState: PluginState }) {
   );
 }
 
-export default function RowActionsMenu ({ pluginKey }: { pluginKey: PluginKey }) {
+export default function RowActionsMenu ({ pluginKey }: { pluginKey: PluginKey; }) {
 
   const menuState: PluginState = usePluginState(pluginKey);
 

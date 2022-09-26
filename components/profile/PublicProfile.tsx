@@ -234,7 +234,7 @@ export default function PublicProfile (props: UserDetailsProps) {
   );
 }
 
-function SectionHeader ({ title, count }: { title: string, count: number }) {
+function SectionHeader ({ title, count }: { title: string; count: number; }) {
   return (
     <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
       <Typography

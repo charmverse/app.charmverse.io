@@ -26,7 +26,7 @@ export function keyDisplayValue (key: string) {
 class KeyBinding {
   key: string;
 
-  constructor ({ key }: { key: string }) {
+  constructor ({ key }: { key: string; }) {
     this.key = key;
   }
 

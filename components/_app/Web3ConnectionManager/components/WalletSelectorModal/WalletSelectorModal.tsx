@@ -18,11 +18,11 @@ import ConnectorButton from './components/ConnectorButton';
 import processConnectionError from './utils/processConnectionError';
 
 type Props = {
-  activatingConnector?: AbstractConnector
-  setActivatingConnector: (connector?: AbstractConnector) => void
-  isModalOpen: boolean
-  closeModal: () => void
-  openNetworkModal: () => void
+  activatingConnector?: AbstractConnector;
+  setActivatingConnector: (connector?: AbstractConnector) => void;
+  isModalOpen: boolean;
+  closeModal: () => void;
+  openNetworkModal: () => void;
 }
 
 function WalletSelectorModal ({

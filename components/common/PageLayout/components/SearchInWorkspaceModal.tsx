@@ -75,8 +75,8 @@ type SearchResultItem = {
   };
 
 type SearchInWorkspaceModalProps = {
-    close: () => void,
-    isOpen: boolean,
+    close: () => void;
+    isOpen: boolean;
 };
 
 function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {

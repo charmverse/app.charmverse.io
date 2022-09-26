@@ -21,7 +21,7 @@ export interface IInputSearchCryptoProps extends Omit<Partial<AutocompleteProps<
   hideBackdrop?: boolean; // hide backdrop when modal is open
   cryptoList?: Array<string | CryptoCurrency>;
   chainId?: number; // allow passing this down to the 'new custom token' form
-  sx?: SxProps
+  sx?: SxProps;
 }
 
 const ADD_NEW_CUSTOM = 'ADD_NEW_CUSTOM';

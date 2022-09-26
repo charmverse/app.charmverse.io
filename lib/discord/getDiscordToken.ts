@@ -17,7 +17,7 @@ export async function getDiscordToken (code: string, redirectUrl: string) {
       'Content-Type': 'application/x-www-form-urlencoded'
     },
     skipStringifying: true
-  }) as {access_token: string, expires_in: number, refresh_token: string, scope: string, token_type: string};
+  }) as {access_token: string; expires_in: number; refresh_token: string; scope: string; token_type: string;};
 
   return token;
 }

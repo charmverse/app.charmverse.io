@@ -31,7 +31,7 @@ export function findTotalInlineVotes (
 export function extractInlineVoteRows (
   schema: Schema,
   node: Node
-): { pos: number, nodes: Node[] }[] {
+): { pos: number; nodes: Node[]; }[] {
   const inlineCommentMarkSchema = schema.marks['inline-vote'] as MarkType;
   const paragraphs = findChildrenByType(node, schema.nodes.paragraph);
   const headings = findChildrenByType(node, schema.nodes.heading);

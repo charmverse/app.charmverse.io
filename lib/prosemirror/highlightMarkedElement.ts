@@ -9,7 +9,7 @@ export function highlightMarkedElement ({
   markName,
   key,
   prefix
-}: {view: EditorView, markName: string, key: PluginKey, elementId: string, prefix: string}) {
+}: {view: EditorView; markName: string; key: PluginKey; elementId: string; prefix: string;}) {
   const { $from, $to } = view.state.selection;
   const fromNodeAfter = $from.nodeAfter;
   const toNodeAfter = $to.nodeAfter;
@@ -27,7 +27,7 @@ export function highlightMarkedElement ({
 }
 
 export function highlightElement ({ ids, key, prefix, elementId, view }:
-  { ids: string[], key: PluginKey, prefix: string, elementId: string, markName: string, view: EditorView }) {
+  { ids: string[]; key: PluginKey; prefix: string; elementId: string; markName: string; view: EditorView; }) {
 
   const pageActionListNode = document.getElementById(elementId) as HTMLDivElement;
   // Page action list node might not be present

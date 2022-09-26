@@ -46,7 +46,7 @@ interface GetSafesForAddressProps {
   chainId: number;
 }
 
-export type SafeData = ({ chainId: number } & SafeInfoResponse);
+export type SafeData = ({ chainId: number; } & SafeInfoResponse);
 
 export async function getSafesForAddress ({ signer, chainId, address }: GetSafesForAddressProps): Promise<SafeData[]> {
 

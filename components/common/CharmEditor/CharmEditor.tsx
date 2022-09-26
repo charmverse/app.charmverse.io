@@ -72,8 +72,8 @@ import { specRegistry } from './specRegistry';
 import { checkForEmpty } from './utils';
 
 export interface ICharmEditorOutput {
-  doc: PageContent,
-  rawText: string
+  doc: PageContent;
+  rawText: string;
 }
 
 const actionsPluginKey = new PluginKey('row-actions');
@@ -96,14 +96,14 @@ export function charmEditorPlugins (
     spaceId = null
   }:
     {
-      spaceId?: string | null,
-      pageId?: string | null,
-      userId?: string | null,
-      readOnly?: boolean,
-      onContentChange?: (view: EditorView, prevDoc: EditorState['doc']) => void,
-      disablePageSpecificFeatures?: boolean,
-      enableVoting?: boolean,
-      enableComments?: boolean
+      spaceId?: string | null;
+      pageId?: string | null;
+      userId?: string | null;
+      readOnly?: boolean;
+      onContentChange?: (view: EditorView, prevDoc: EditorState['doc']) => void;
+      disablePageSpecificFeatures?: boolean;
+      enableVoting?: boolean;
+      enableComments?: boolean;
     } = {}
 ): () => RawPlugins[] {
 
@@ -224,7 +224,7 @@ export function charmEditorPlugins (
   return () => basePlugins;
 }
 
-const StyledReactBangleEditor = styled(ReactBangleEditor)<{disablePageSpecificFeatures?: boolean}>`
+const StyledReactBangleEditor = styled(ReactBangleEditor)<{disablePageSpecificFeatures?: boolean;}>`
   position: relative;
 
   /** DONT REMOVE THIS STYLING */
@@ -310,7 +310,7 @@ interface CharmEditorProps {
   onContentChange?: UpdatePageContent;
   readOnly?: boolean;
   style?: CSSProperties;
-  pageActionDisplay?: IPageActionDisplayContext['currentPageActionDisplay']
+  pageActionDisplay?: IPageActionDisplayContext['currentPageActionDisplay'];
   disablePageSpecificFeatures?: boolean;
   enableVoting?: boolean;
   pageId: string;
@@ -482,7 +482,7 @@ function CharmEditor (
             return <LayoutColumn node={props.node}>{_children}</LayoutColumn>;
           }
           case 'cryptoPrice': {
-            const attrs = props.attrs as { base: null | CryptoCurrency, quote: null | FiatCurrency };
+            const attrs = props.attrs as { base: null | CryptoCurrency; quote: null | FiatCurrency; };
             return (
               <CryptoPrice
                 preset={{

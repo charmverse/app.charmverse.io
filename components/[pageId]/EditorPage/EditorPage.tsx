@@ -12,7 +12,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import BoardPage from '../BoardPage';
 import DocumentPage from '../DocumentPage';
 
-export default function EditorPage ({ pageId }: { pageId: string }) {
+export default function EditorPage ({ pageId }: { pageId: string; }) {
   const { setIsEditing, pages, currentPageId, setCurrentPageId, setPages, getPagePermissions } = usePages();
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);

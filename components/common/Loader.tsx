@@ -13,7 +13,7 @@ export interface ILoaderInput {
   message?: string;
   size?: number;
   sx?: any;
-  position?: 'left' | 'right'
+  position?: 'left' | 'right';
 }
 
 export default function Loader ({ message, size, sx, position = 'left' }: ILoaderInput) {

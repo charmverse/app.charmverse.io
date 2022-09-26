@@ -11,7 +11,7 @@ import type { InviteLinkPopulated } from 'lib/invites';
 import { useContext } from 'react';
 import { CenteredBox } from './components/CenteredBox';
 
-export default function InvitationPage ({ invite }: { invite: InviteLinkPopulated }) {
+export default function InvitationPage ({ invite }: { invite: InviteLinkPopulated; }) {
 
   const { user } = useUser();
   const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);

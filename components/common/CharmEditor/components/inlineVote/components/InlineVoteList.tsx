@@ -14,7 +14,7 @@ import VoteDetail from './VoteDetail';
 import { markName } from '../inlineVote.constants';
 import type { InlineVotePluginState } from '../inlineVote.plugins';
 
-export default function InlineVoteList ({ pluginKey }: {pluginKey: PluginKey<InlineVotePluginState>}) {
+export default function InlineVoteList ({ pluginKey }: {pluginKey: PluginKey<InlineVotePluginState>;}) {
   const view = useEditorViewContext();
   const {
     ids,
@@ -33,7 +33,7 @@ export default function InlineVoteList ({ pluginKey }: {pluginKey: PluginKey<Inl
     if (!hasRemovedCompletedVoteMarks.current) {
       const votesList = Object.keys(votes);
       const notIsProgressVotes = new Set(votesList.filter(voteId => votes[voteId].status !== 'InProgress'));
-      const completedVoteNodeWithMarks: (NodeWithPos & {mark: Mark})[] = [];
+      const completedVoteNodeWithMarks: (NodeWithPos & {mark: Mark;})[] = [];
       if (!isValidating && votesList.length !== 0 && !isLoading) {
         const inlineVoteMarkSchema = view.state.schema.marks[markName] as MarkType;
         const inlineVoteNodes = findChildrenByMark(view.state.doc, inlineVoteMarkSchema);

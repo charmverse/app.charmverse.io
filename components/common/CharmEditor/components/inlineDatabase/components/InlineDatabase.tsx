@@ -21,7 +21,7 @@ const CenterPanel = dynamic(() => import('components/common/BoardEditor/focalboa
   ssr: false
 });
 
-const StylesContainer = styled.div<{ containerWidth?: number }>`
+const StylesContainer = styled.div<{ containerWidth?: number; }>`
 
   .BoardComponent {
     overflow: visible;

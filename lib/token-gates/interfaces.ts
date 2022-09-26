@@ -6,20 +6,20 @@ import type { AuthSig, Chain } from 'lit-js-sdk';
  * @orgId The spaceId
  */
 export interface LitJwtPayload {
-  iss: 'LIT',
-  sub: string,
-  chain: Chain,
-  iat: number,
-  exp: number,
-  baseUrl: 'https://app.charmverse.io',
-  path: '0.5762676518678522',
-  orgId: '73ff04b5-6475-4291-a7c6-262f18598a1a',
-  role: 'member',
-  extraData: '{"tokenGateId":"bd177a2f-c980-4595-8079-d4bee95a7924"}'
+  iss: 'LIT';
+  sub: string;
+  chain: Chain;
+  iat: number;
+  exp: number;
+  baseUrl: 'https://app.charmverse.io';
+  path: '0.5762676518678522';
+  orgId: '73ff04b5-6475-4291-a7c6-262f18598a1a';
+  role: 'member';
+  extraData: '{"tokenGateId":"bd177a2f-c980-4595-8079-d4bee95a7924"}';
 }
 
 export interface TokenGateWithRoles extends TokenGate {
-  tokenGateToRoles: (TokenGateToRole & {role: Role})[];
+  tokenGateToRoles: (TokenGateToRole & {role: Role;})[];
 }
 
 export interface TokenGateJwt {
@@ -41,8 +41,8 @@ export interface TokenGateEvaluationResult {
   space: Space;
   walletAddress: string;
   canJoinSpace: boolean;
-  gateTokens: TokenGateJwt[]
-  roles: Role[]
+  gateTokens: TokenGateJwt[];
+  roles: Role[];
 }
 
 /**
@@ -52,8 +52,8 @@ export interface TokenGateEvaluationResult {
 export interface TokenGateVerification {
   userId: string;
   spaceId: string;
-  tokens: (Pick<TokenGateJwt, 'signedToken'> & {tokenGateId: string})[];
-  commit: boolean
+  tokens: (Pick<TokenGateJwt, 'signedToken'> & {tokenGateId: string;})[];
+  commit: boolean;
 }
 
 export interface TokenGateVerificationResult {

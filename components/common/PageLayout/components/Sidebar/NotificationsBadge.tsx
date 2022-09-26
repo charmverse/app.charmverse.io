@@ -2,7 +2,7 @@ import { Badge } from '@mui/material';
 import useTasks from 'components/nexus/hooks/useTasks';
 import { useUser } from 'hooks/useUser';
 
-export default function NotificationsBadge ({ children }: { children: JSX.Element }) {
+export default function NotificationsBadge ({ children }: { children: JSX.Element; }) {
 
   const { user } = useUser();
   const { tasks } = useTasks();

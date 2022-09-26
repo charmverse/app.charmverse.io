@@ -33,7 +33,7 @@ export function ProposalTasksListRow (
       action,
       status
     }
-  }: { proposalTask: ProposalTask }
+  }: { proposalTask: ProposalTask; }
 ) {
   const proposalLink = `/${spaceDomain}/${pagePath}`;
   const proposalLocation = spaceName;
@@ -118,9 +118,9 @@ export default function ProposalTasksList ({
   error,
   mutateTasks
 }: {
-  mutateTasks: KeyedMutator<GetTasksResponse>
-  error: any
-  tasks: GetTasksResponse | undefined
+  mutateTasks: KeyedMutator<GetTasksResponse>;
+  error: any;
+  tasks: GetTasksResponse | undefined;
 }) {
   const proposals = tasks?.proposals ? [...tasks.proposals.unmarked, ...tasks.proposals.marked] : [];
 

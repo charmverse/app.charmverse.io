@@ -14,7 +14,7 @@ const bountyStatuses: BountyStatus[] = ['open', 'inProgress', 'complete', 'paid'
 
 interface Props {
   bounties: BountyWithDetails[];
-  publicMode?: boolean
+  publicMode?: boolean;
 }
 
 export default function BountiesKanbanView ({ bounties, publicMode }: Props) {

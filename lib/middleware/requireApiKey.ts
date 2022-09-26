@@ -9,8 +9,8 @@ import { IDENTITY_TYPES } from 'models';
 
 declare module 'http' {
   interface IncomingMessage {
-    authorizedSpaceId: string
-    botUser: User
+    authorizedSpaceId: string;
+    botUser: User;
   }
 }
 

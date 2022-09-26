@@ -6,7 +6,7 @@ import { useUser } from 'hooks/useUser';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
-export default function PageTitle ({ subPage }: { subPage?: string }) {
+export default function PageTitle ({ subPage }: { subPage?: string; }) {
   const MyNexus = 'My Nexus';
   const { account } = useWeb3React();
   const [isLoggingOut, setIsLoggingOut] = useState(false);

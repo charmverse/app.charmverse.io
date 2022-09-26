@@ -11,7 +11,7 @@ interface Props extends Omit<Partial<AutocompleteProps<IChainDetails, false, tru
   onChange?: (chainId: number) => void;
   defaultChainId?: number; // allow setting a default
   chainId?: number; // allow overriding from the parent
-  sx?: SxProps
+  sx?: SxProps;
 }
 
 export default function InputSearchBlockchain ({

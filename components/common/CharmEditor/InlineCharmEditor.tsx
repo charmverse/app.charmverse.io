@@ -28,8 +28,8 @@ import { checkForEmpty } from './utils';
 import { userDataPlugin } from './components/charm/charm.plugins';
 
 export interface ICharmEditorOutput {
-  doc: PageContent,
-  rawText: string
+  doc: PageContent;
+  rawText: string;
 }
 
 const emojiPluginKey = new PluginKey(emoji.pluginKeyName);
@@ -59,10 +59,10 @@ export function charmEditorPlugins (
     spaceId = null
   }:
     {
-      readOnly?: boolean, onContentChange?: (view: EditorView) => void,
-      spaceId?: string | null,
-      pageId?: string | null,
-      userId?: string | null,
+      readOnly?: boolean; onContentChange?: (view: EditorView) => void;
+      spaceId?: string | null;
+      pageId?: string | null;
+      userId?: string | null;
     } = {}
 ) {
   return () => [
@@ -102,7 +102,7 @@ export function charmEditorPlugins (
   ];
 }
 
-const StyledReactBangleEditor = styled(ReactBangleEditor)<{ noPadding?: boolean }>`
+const StyledReactBangleEditor = styled(ReactBangleEditor)<{ noPadding?: boolean; }>`
   & {
     padding: ${({ noPadding, theme }) => noPadding ? 0 : theme.spacing(0, 1)};
   }

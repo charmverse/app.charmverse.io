@@ -23,7 +23,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import type { MenuNode, ParentMenuNode } from './components/TreeNode';
 import TreeNode from './components/TreeNode';
 
-const StyledTreeRoot = styled(TreeRoot)<{ isFavorites?: boolean }>`
+const StyledTreeRoot = styled(TreeRoot)<{ isFavorites?: boolean; }>`
   flex-grow: ${props => props.isFavorites ? 0 : 1};
   width: 100%;
   overflow-y: auto;
@@ -37,13 +37,13 @@ export function filterVisiblePages (pages: (Page | undefined)[], rootPageIds: st
 }
 
 type TreeRootProps = {
-  children: ReactNode,
-  isFavorites?: boolean,
-  setPages: Dispatch<SetStateAction<Record<string, IPageWithPermissions | undefined>>>
+  children: ReactNode;
+  isFavorites?: boolean;
+  setPages: Dispatch<SetStateAction<Record<string, IPageWithPermissions | undefined>>>;
 } & ComponentProps<typeof TreeView>;
 
 function TreeRoot ({ children, setPages, isFavorites, ...rest }: TreeRootProps) {
-  const [{ canDrop, isOverCurrent }, drop] = useDrop<MenuNode, any, { canDrop: boolean, isOverCurrent: boolean }>(() => ({
+  const [{ canDrop, isOverCurrent }, drop] = useDrop<MenuNode, any, { canDrop: boolean; isOverCurrent: boolean; }>(() => ({
     accept: 'item',
     drop (item, monitor) {
       const didDrop = monitor.didDrop();

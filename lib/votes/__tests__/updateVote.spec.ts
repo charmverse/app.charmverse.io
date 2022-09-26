@@ -5,7 +5,7 @@ import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testin
 import { v4 } from 'uuid';
 import { updateVote } from '../updateVote';
 
-async function setupVoteData (params?: {context?: VoteContext, status?: VoteStatus}) {
+async function setupVoteData (params?: {context?: VoteContext; status?: VoteStatus;}) {
   const { status = 'InProgress', context = 'inline' } = params ?? {};
   const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
 
