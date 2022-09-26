@@ -24,8 +24,7 @@ const esmModules = [
   'node-fetch',
   'data-uri-to-buffer',
   'fetch-blob',
-  'formdata-polyfill',
-  'swagger-ui-react'
+  'formdata-polyfill'
 ];
 
 exports.esmModules = esmModules;
