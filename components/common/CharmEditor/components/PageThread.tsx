@@ -1,7 +1,8 @@
 import styled from '@emotion/styled';
 import type { ButtonProps, SxProps } from '@mui/material';
-import { Box, Collapse, Menu, MenuItem, ListItemText, ListItemIcon, Paper, Typography, Button, ListItem, IconButton, Tooltip } from '@mui/material';
+import { Box, Collapse, Menu, MenuItem, ListItemText, ListItemIcon, Paper, Typography, ListItem, IconButton, Tooltip } from '@mui/material';
 import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
+import Button from 'components/common/Button';
 import type { CommentWithUser } from 'lib/comments/interfaces';
 import UserDisplay from 'components/common/UserDisplay';
 import { usePages } from 'hooks/usePages';
@@ -72,11 +73,6 @@ function ThreadHeaderButton ({ disabled = false, onClick, text, startIcon, ...pr
       variant='outlined'
       color='secondary'
       size='small'
-      sx={{
-        '.label:hover': {
-          color: 'text.primary'
-        }
-      }}
       {...props}
     >
       <span className='label'>
@@ -348,27 +344,27 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                 </Box>
                 <div>
                   {commentIndex === 0 ? (
-                    <ThreadHeaderButton
-                      text={thread.resolved ? 'Un-resolve' : 'Resolve'}
-                      endIcon={(
-                        <MoreHorizIcon
-                          onClick={(e: any) => {
-                            e.stopPropagation();
-                            onClickCommentActions(e, comment);
-                          }}
-                          fontSize='small'
-                        />
-                      )}
-                      disabled={isMutating || !permissions.comment}
-                      onClick={toggleResolved}
-                    />
+                    <Box display='flex' alignItems='center' gap={1}>
+                      <ThreadHeaderButton
+                        text={thread.resolved ? 'Un-resolve' : 'Resolve'}
+                        disabled={isMutating || !permissions.comment}
+                        onClick={toggleResolved}
+                      />
+                      <IconButton
+                        size='small'
+                        onClick={(e: any) => {
+                          onClickCommentActions(e, comment);
+                        }}
+                      >
+                        <MoreHorizIcon fontSize='small' />
+                      </IconButton>
+                    </Box>
                   ) : (comment.userId === user?.id && permissions.comment)
                   && (
                     <IconButton
                       className='comment-actions'
                       size='small'
                       onClick={(e: any) => {
-                        e.stopPropagation();
                         onClickCommentActions(e, comment);
                       }}
                     >
