@@ -273,7 +273,10 @@ export default function CreateVoteModal ({ open = true, onClose, onCreateVote, p
             <Tooltip title={!isProposalAuthor ? 'Only proposal authors can publish to snapshot' : ''}>
               <div>
                 <Button disabled={!isProposalAuthor}>
-                  <PublishToSnapshot typography pageId={proposal.id} />
+                  <PublishToSnapshot
+                    renderContent={({ label, onClick }) => <Typography onClick={onClick}>{label}</Typography>}
+                    pageId={proposal.id}
+                  />
                 </Button>
               </div>
             </Tooltip>

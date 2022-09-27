@@ -1,7 +1,5 @@
 import PublishIcon from '@mui/icons-material/ElectricBolt';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-import { Typography } from '@mui/material';
-import ListItemText from '@mui/material/ListItemText';
 import charmClient from 'charmClient';
 import Link from 'components/common/Link';
 import { LoadingIcon } from 'components/common/LoadingComponent';
@@ -11,10 +9,13 @@ import { usePages } from 'hooks/usePages';
 import type { SnapshotProposal } from 'lib/snapshot';
 import { getSnapshotProposal } from 'lib/snapshot';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import PublishingForm from './PublishingForm';
 
-export default function PublishToSnapshot ({ pageId, typography = false }: { typography?: boolean, pageId: string}) {
+export default function PublishToSnapshot ({ pageId, renderContent }: {
+  renderContent: (props: {onClick?: () => void, label: string}) => ReactNode, pageId: string
+}) {
   const { pages, setPages } = usePages();
   const page = pages[pageId]!;
 
@@ -59,7 +60,9 @@ export default function PublishToSnapshot ({ pageId, typography = false }: { typ
       checkingProposal && (
         <>
           <LoadingIcon size={18} sx={{ mr: 1 }} />
-          {typography ? <Typography>Checking proposal</Typography> : <ListItemText primary='Checking proposal' />}
+          {renderContent({
+            label: 'Checking proposal'
+          })}
         </>
       )
     }
@@ -73,8 +76,10 @@ export default function PublishToSnapshot ({ pageId, typography = false }: { typ
             }}
             onClick={open}
           />
-          {typography ? <Typography onClick={open}>Publish to Snapshot</Typography> : <ListItemText onClick={open} primary='Publish to Snapshot' />}
-
+          {renderContent({
+            label: 'Publish to Snapshot',
+            onClick: open
+          })}
           <Modal size='large' open={isOpen} onClose={close} title={`Publish to Snapshot ${currentSpace?.snapshotDomain ? `(${currentSpace.snapshotDomain})` : ''}`}>
             <PublishingForm onSubmit={close} page={page} />
           </Modal>
@@ -92,7 +97,9 @@ export default function PublishToSnapshot ({ pageId, typography = false }: { typ
             }}
 
           />
-          {typography ? <Typography>View on Snapshot</Typography> : <ListItemText primary='View on Snapshot' />}
+          {renderContent({
+            label: 'View on Snapshot'
+          })}
         </Link>
       )
     }
