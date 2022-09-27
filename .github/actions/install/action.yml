@@ -29,7 +29,7 @@ runs:
         path: |
           ./node_modules
           /home/runner/.cache/ms-playwright
-        key: node-modules-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch') }}
+        key: node-module-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch') }}
 
     - name: Install npm dependencies
       shell: bash
