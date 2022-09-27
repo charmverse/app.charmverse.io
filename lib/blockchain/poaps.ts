@@ -5,7 +5,7 @@ import type { ExtendedPoap } from './interfaces';
 const getPOAPsURL = (address: string) => `https://api.poap.tech/actions/scan/${address}`;
 
 export async function getPOAPs (addresses: string[]): Promise<ExtendedPoap[]> {
-  const requests: Array<Promise<any>> = [];
+  const requests: Promise<any>[] = [];
 
   const apiKey = process.env.POAP_API_KEY;
   if (typeof apiKey !== 'string') {
