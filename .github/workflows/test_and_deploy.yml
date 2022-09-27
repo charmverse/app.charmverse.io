@@ -45,7 +45,7 @@ jobs:
 
       - name: Run server integration tests
         run: |
-          npm run start:test:ci
+          npm run start:test:ci &
           npm run test:server:ci
 
       - name: Run browser tests
