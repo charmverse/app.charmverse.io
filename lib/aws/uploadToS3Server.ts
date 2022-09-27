@@ -4,7 +4,6 @@
 import type { PutObjectCommandInput } from '@aws-sdk/client-s3';
 import { S3Client } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
-import fetch from 'node-fetch';
 import { v4 as uuid } from 'uuid';
 
 const client = new S3Client({
@@ -20,7 +19,9 @@ export async function uploadToS3 ({ fileName, url }: { fileName: string, url: st
   const bucket = process.env.S3_UPLOAD_BUCKET;
 
   const data = await fetch(url);
-  const blob = await data.buffer();
+  const arrayBuffer = await data.arrayBuffer();
+
+  const blob = Buffer.from(arrayBuffer);
 
   const params: PutObjectCommandInput = {
     ACL: 'public-read',

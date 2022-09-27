@@ -53,7 +53,7 @@ export function getUriWithParam (
   baseUrl: string,
   params: Record<string, any>
 ): string {
-  const Url = new URL(baseUrl);
+  const Url = new URL(baseUrl, baseUrl.match('http') ? undefined : window.location.origin);
   const urlParams: URLSearchParams = new URLSearchParams(Url.search);
   for (const key in params) {
     if (params.hasOwnProperty(key)) {

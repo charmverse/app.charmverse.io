@@ -15,8 +15,13 @@ There are several ways you can contribute:
 
 ### Developer setup
 
-1. This application requires a PostgreSQL database while we figure out decentralized storage. The connection string can be overidden by copying the `.env` file and renaming to `.env.local`:
+1. This application requires a PostgreSQL database while we figure out decentralized storage:
 
+If you don't have a local Postgres server running, you can install and run it with Docker:
+```
+docker run -d -v $HOME/postgresql/data:/var/lib/postgresql/data -p 5432:5432 -e POSTGRES_PASSWORD=postgres postgres
+```
+The connection string can be overidden by copying the `.env` file and renaming to `.env.local`:
 ```
 DATABASE_URL=postgres://postgres:postgres@localhost:5432/charmverse
 ```
@@ -192,4 +197,15 @@ const Container = styled(Box)`
 
 // 'sx' property from Material UI:
 <Box sx={{ bgcolor: 'sidebar.background' }} />
+```
+
+
+# Background Workers (/background folder)
+
+There are several cron tasks managed inside the /background/tasks folder. These run inside their own Beanstalk environment. Visit the folder to see the latest tasks.
+
+## Notifications
+To debug notifications, you can run a command to read back current tasks:
+```
+dotenv -e .env.local -- npm run notifications:debug
 ```

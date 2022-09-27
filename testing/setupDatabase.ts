@@ -10,7 +10,8 @@ import type { ProposalReviewerInput } from 'lib/proposal/interface';
 import { syncProposalPermissions } from 'lib/proposal/syncProposalPermissions';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { typedKeys } from 'lib/utilities/objects';
-import type { BountyWithDetails, LoggedInUser } from 'models';
+import type { LoggedInUser } from 'models';
+import type { BountyWithDetails } from 'lib/bounties';
 import { IDENTITY_TYPES } from 'models';
 import { v4 } from 'uuid';
 import { boardWithCardsArgs } from './generate-board-stub';
@@ -611,9 +612,10 @@ export async function generateProposal ({ userId, spaceId, proposalStatus, autho
   });
 }
 
-export async function generateBoard ({ createdBy, spaceId, parentId }: {createdBy: string, spaceId: string, parentId?: string}): Promise<Page> {
+export async function generateBoard ({ createdBy, spaceId, parentId, cardCount }:
+  {createdBy: string, spaceId: string, parentId?: string, cardCount?: number}): Promise<Page> {
 
-  const { pageArgs, blockArgs } = boardWithCardsArgs({ createdBy, spaceId, parentId });
+  const { pageArgs, blockArgs } = boardWithCardsArgs({ createdBy, spaceId, parentId, cardCount });
 
   return prisma.$transaction([
     ...pageArgs.map(p => prisma.page.create(p)),

@@ -51,7 +51,7 @@ const StyledButtonGroup = styled(ButtonGroup)`
 
 function Account (): JSX.Element {
   const { error, account, chainId } = useWeb3React();
-  // console.log(account);
+
   const { openNetworkModal } = useContext(Web3Connection);
   const router = useRouter();
 

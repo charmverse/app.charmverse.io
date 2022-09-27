@@ -1,7 +1,4 @@
-import {
-  bulletList, orderedList,
-  paragraph
-} from '@bangle.dev/base-components';
+
 import type { EditorState, Transaction } from '@bangle.dev/pm';
 import { Fragment, setBlockType } from '@bangle.dev/pm';
 import { rafCommandExec } from '@bangle.dev/utils';
@@ -10,6 +7,9 @@ import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import CodeIcon from '@mui/icons-material/Code';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
 import { TextSelection } from 'prosemirror-state';
+import paragraph from '../../paragraph';
+import * as bulletList from '../../bulletList';
+import * as orderedList from '../../orderedList';
 
 import { insertNode, isAtBeginningOfLine } from '../../../utils';
 import {

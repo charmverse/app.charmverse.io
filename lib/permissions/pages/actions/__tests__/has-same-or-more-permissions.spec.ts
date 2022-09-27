@@ -14,7 +14,7 @@ let role: Role;
 
 // Will return a nested tree of pages and associated permissions
 // Creates as many pages as there are permission sets
-async function setupPagesWithPermissions (permissionSets: Array<Partial<PagePermission>[]>): Promise<IPageWithPermissions []> {
+async function setupPagesWithPermissions (permissionSets: Partial<PagePermission>[][]): Promise<IPageWithPermissions []> {
 
   let currentParentId: string | undefined;
 

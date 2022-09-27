@@ -45,7 +45,7 @@ function PropertyValueElement (props:Props): JSX.Element {
   const emptyDisplayValue = showEmptyPlaceholder ? intl.formatMessage({ id: 'PropertyValueElement.empty', defaultMessage: 'Empty' }) : '';
   const finalDisplayValue = displayValue || emptyDisplayValue;
 
-  const editableFields: Array<PropertyType> = ['text', 'number', 'email', 'url', 'phone'];
+  const editableFields: PropertyType[] = ['text', 'number', 'email', 'url', 'phone'];
   const latestUpdated = (new Date(updatedAt)).getTime() > (new Date(card.updatedAt)).getTime() ? 'page' : 'card';
 
   useEffect(() => {

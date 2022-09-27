@@ -18,10 +18,17 @@ import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenAndChainInfoFromPayments } from 'lib/tokens/tokenData';
 import { nanofy } from 'lib/utilities/numbers';
 import millify from 'millify';
-import { BOUNTY_LABELS } from 'models/Bounty';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import type { BrandColor } from 'theme/colors';
+
+const BOUNTY_LABELS: Record<BountyStatus, string> = {
+  suggestion: 'Suggestion',
+  open: 'Open',
+  inProgress: 'In Progress',
+  complete: 'Complete',
+  paid: 'Paid'
+};
 
 const BOUNTY_STATUS_ICONS : Record<BountyStatus, ReactNode> = {
   suggestion: <LightbulbIcon />,

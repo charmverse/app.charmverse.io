@@ -37,6 +37,9 @@ export function cryptoPriceSpec () {
         },
         quote: {
           default: null
+        },
+        track: {
+          default: []
         }
       },
       group: 'block',

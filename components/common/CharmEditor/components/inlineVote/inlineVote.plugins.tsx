@@ -57,14 +57,18 @@ export function plugin ({ key } :{
         }
       },
       props: {
-        handleClickOn: (view) => {
-          return highlightMarkedElement({
-            view,
-            elementId: 'page-vote-list-box',
-            key,
-            markName,
-            prefix: 'vote'
-          });
+        handleClickOn: (view: EditorView, _, __, ___, event: MouseEvent) => {
+          const className = (event.target as HTMLElement).className + ((event.target as HTMLElement).parentNode as HTMLElement).className;
+          if (/inline-vote/.test(className)) {
+            return highlightMarkedElement({
+              view,
+              elementId: 'page-action-sidebar',
+              key,
+              markName,
+              prefix: 'vote'
+            });
+          }
+          return false;
         }
       }
     }),
@@ -103,7 +107,7 @@ export function plugin ({ key } :{
             return highlightElement({
               ids,
               view,
-              elementId: 'page-vote-list-box',
+              elementId: 'page-action-sidebar',
               key,
               markName,
               prefix: 'vote'

@@ -47,14 +47,18 @@ export const proposalPermissionMapping: Record<ProposalStatus, ProposalStagePage
   }
 };
 
+/**
+ * @isNewProposal - The proposal was just created. Used so we dont't needlessly search for children
+ */
 export interface ProposalPermissionsSync {
   proposalId: string;
+  isNewProposal?: boolean;
 }
 
 /**
  * Generates proposal page permission prisma arguments to be consumed inside updateProposalStatus
  */
-export async function generateSyncProposalPermissions ({ proposalId }: ProposalPermissionsSync):
+export async function generateSyncProposalPermissions ({ proposalId, isNewProposal }: ProposalPermissionsSync):
   Promise<[Prisma.PagePermissionDeleteManyArgs, Prisma.PagePermissionCreateArgs[]]> {
   const queryResult = await prisma.page.findUnique({
     where: {
@@ -80,7 +84,7 @@ export async function generateSyncProposalPermissions ({ proposalId }: ProposalP
 
   // Delete permissions
   // Check if there are children so we don't perform resolve page tree operation for nothing
-  let children = await prisma.page.findMany({
+  let children = isNewProposal ? [] : await prisma.page.findMany({
     where: {
       parentId: page.id
     },
