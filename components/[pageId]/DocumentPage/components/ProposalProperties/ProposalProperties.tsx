@@ -123,11 +123,6 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
         <Grid item xs={8}>
           <Box display='flex' gap={1} alignItems='center'>
             <Typography fontWeight='bold'>Proposal information</Typography>
-            {proposalStatus === 'reviewed' && (
-              <IconButton size='small' {...bindTrigger(proposalMenuState)}>
-                <MoreHorizIcon fontSize='small' />
-              </IconButton>
-            )}
           </Box>
         </Grid>
       </Grid>
@@ -239,15 +234,6 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
         my: 2
       }}
       />
-      <Menu {...bindMenu(proposalMenuState)}>
-        {
-          proposalStatus === 'reviewed' && (
-            <MenuItem disabled={!isProposalAuthor}>
-              <PublishToSnapshot pageId={pageId} />
-            </MenuItem>
-          )
-        }
-      </Menu>
     </Box>
   );
 }

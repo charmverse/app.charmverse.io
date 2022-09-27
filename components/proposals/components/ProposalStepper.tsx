@@ -120,7 +120,7 @@ export default function ProposalStepper (
         );
       })}
       <CreateVoteModal
-        isProposal={true}
+        proposal={proposal}
         open={isModalOpen}
         onCreateVote={async () => {
           await updateProposalStatus('vote_active');
