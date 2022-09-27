@@ -9,7 +9,8 @@ __e2e__
 __integration-tests__
 cdk.json
 docker-compose.yml
-Dockerfile
+Dockerfile*
 files_to_zip.txt
 jest.config*
 jest.setup*
+node_modules
