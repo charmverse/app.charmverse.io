@@ -119,15 +119,21 @@ const KanbanCard = React.memo((props: Props) => {
 
   return (
     <>
-      <div
-        ref={props.readonly ? () => null : cardRef}
-        className={className}
-        draggable={!props.readonly}
-        style={{ opacity: isDragging ? 0.5 : 1 }}
-        onClick={props.onClick}
-        data-test={`kanban-card-${card.id}`}
-      >
-        <Link external href={fullPageUrl} onClick={(e) => e.preventDefault()}>
+      <Link href={fullPageUrl} external>
+        <div
+          ref={props.readonly ? () => null : cardRef}
+          className={className}
+          draggable={!props.readonly}
+          style={{ opacity: isDragging ? 0.5 : 1 }}
+          onClick={(e) => {
+            e.preventDefault();
+            if(props.onClick) {
+              props.onClick(e);
+            }
+          }
+        }
+          data-test={`kanban-card-${card.id}`}
+        >
           {!props.readonly
             && (
             <MenuWrapper
@@ -245,8 +251,8 @@ const KanbanCard = React.memo((props: Props) => {
             <BountyStatusChip status={linkedBounty.status} />
           </BountyFooter>
           )}
-        </Link>
-      </div>
+        </div>
+      </Link>
       {showConfirmationDialogBox && <ConfirmationDialogBox dialogBox={confirmDialogProps} />}
     </>
   );
