@@ -162,10 +162,7 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
         <Modal
           {...modalProps}
           size='large'
-          onClose={() => {
-            modalProps.onClose();
-            setGnosisSafeData(null);
-          }}
+          onClose={modalProps.onClose}
         >
           <DialogTitle onClose={popupState.close}>
             Pay Bount{transactions.length > 1 ? 'ies' : 'y'}
@@ -276,7 +273,7 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
             </List>
           </Box>
           <Box display='flex' gap={2} alignItems='center'>
-            {(gnosisSafeChainId && gnosisSafeAddress) ? (
+            {(gnosisSafeChainId && gnosisSafeAddress) && (
               <MultiPaymentButton
                 chainId={gnosisSafeChainId}
                 safeAddress={gnosisSafeAddress}
@@ -284,7 +281,7 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
                 onSuccess={onPaymentSuccess}
                 isLoading={isLoading}
               />
-            ) : <Button disabled>Make Payment ({transactions.length})</Button>}
+            )}
           </Box>
         </Modal>
       )}
