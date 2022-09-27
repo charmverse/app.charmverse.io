@@ -11,7 +11,7 @@ import { syncProposalPermissions } from 'lib/proposal/syncProposalPermissions';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { typedKeys } from 'lib/utilities/objects';
 import type { LoggedInUser } from 'models';
-import type { BountyWithDetails } from 'lib/bounties/interfaces';
+import type { BountyWithDetails } from 'lib/bounties';
 import { IDENTITY_TYPES } from 'models';
 import { v4 } from 'uuid';
 import { boardWithCardsArgs } from './generate-board-stub';
