@@ -3,7 +3,7 @@ import { prisma } from 'db';
 import type { IPageWithPermissions, PagesRequest } from '../interfaces';
 
 // Feature flag for testing purposes
-const WITHOUT_CONTENT = false;
+const WITHOUT_CONTENT = true;
 
 /**
  * Utility for getting permissions of a page

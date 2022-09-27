@@ -193,7 +193,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   }, [mutate]);
 
   const updatePage = useCallback(async (updates: PageUpdates, revalidateCache = false) => {
-    const updatedPage = await charmClient.updatePage(updates);
+    const updatedPage = await charmClient.pages.updatePage(updates);
     mutatePage(updatedPage, revalidateCache);
 
     return updatedPage;

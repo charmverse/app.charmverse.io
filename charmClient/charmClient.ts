@@ -186,10 +186,6 @@ class CharmClient {
     return http.DELETE<ModifyChildPagesResponse>(`/api/pages/${pageId}`);
   }
 
-  updatePage (pageOpts: Partial<Page>) {
-    return http.PUT<IPageWithPermissions>(`/api/pages/${pageOpts.id}`, pageOpts);
-  }
-
   favoritePage (pageId: string) {
     return http.POST<Partial<LoggedInUser>>('/api/profile/favorites', { pageId });
   }

@@ -134,7 +134,7 @@ function PageNavigation ({
       siblings.forEach((page, _index) => {
         page.index = _index;
         page.parentId = parentId;
-        charmClient.updatePage({
+        charmClient.pages.updatePage({
           id: page.id,
           index: _index,
           parentId
@@ -185,7 +185,7 @@ function PageNavigation ({
 
     mutatePage({ id: droppedItem.id, parentId });
 
-    charmClient.updatePage({
+    charmClient.pages.updatePage({
       id: droppedItem.id,
       index, // send it to the end
       parentId
