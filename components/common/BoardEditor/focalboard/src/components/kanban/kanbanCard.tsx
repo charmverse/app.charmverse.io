@@ -182,7 +182,7 @@ const KanbanCard = React.memo((props: Props) => {
           </MenuWrapper>
           )}
 
-        <div className='octo-icontitle'>
+        <div className={`octo-icontitle ${linkedBounty || visiblePropertyTemplates.length > 0 ? 'octo-title-space' : ''}`}>
           <div>
             {cardPage?.icon ? <PageIcon isEditorEmpty={checkForEmpty(cardPage?.content as PageContent)} pageType='page' icon={cardPage.icon} /> : undefined}
           </div>
