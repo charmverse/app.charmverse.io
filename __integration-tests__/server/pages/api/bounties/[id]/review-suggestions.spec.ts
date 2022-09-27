@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Space, User } from '@prisma/client';
 import { prisma } from 'db';
-import type { BountyWithDetails } from 'models';
+import type { BountyWithDetails } from 'lib/bounties';
 import request from 'supertest';
 import { baseUrl } from 'testing/mockApiCall';
 import { generateBounty, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
