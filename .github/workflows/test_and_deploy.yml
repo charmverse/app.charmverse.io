@@ -40,6 +40,9 @@ jobs:
       - name: Setup test database
         run: bash ./scripts/configure-db.sh
 
+      - name: Typecheck tests
+        run: npm run test:typecheck
+
       - name: Run basic tests
         run: npm run test:ci
 

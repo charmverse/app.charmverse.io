@@ -1,10 +1,13 @@
-import type { Bounty, PageType } from '@prisma/client';
+import type { Bounty, PageType, Application } from '@prisma/client';
 import type { BountyPermissions, BountySubmitter } from 'lib/permissions/bounties';
 import type { Roleup } from 'lib/roles/interfaces';
+import type { IPageWithPermissions } from 'lib/pages/interfaces';
 import type { Resource } from '../permissions/interfaces';
 
 // Re-export bounty permissions interfaces for convenience
 export * from 'lib/permissions/bounties/interfaces';
+
+export type BountyWithDetails = Bounty & {applications: Application [], page: IPageWithPermissions};
 
 export type BountyCreationData = Pick<Bounty, 'spaceId' | 'createdBy'>
   & Partial<Pick<Bounty, 'status'| 'chainId'| 'approveSubmitters'| 'maxSubmissions'| 'rewardAmount'| 'rewardToken'>>

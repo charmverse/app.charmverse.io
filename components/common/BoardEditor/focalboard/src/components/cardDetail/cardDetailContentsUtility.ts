@@ -1,7 +1,7 @@
 export type Position = 'left' | 'right' | 'above' | 'below' | 'aboveRow' | 'belowRow'
 
 type DragAndDropRearrangeData = {
-    contentOrder: Array<string|string[]>,
+    contentOrder: (string | string[])[],
     srcBlockId: string,
     srcBlockX: number,
     srcBlockY: number,
@@ -11,9 +11,9 @@ type DragAndDropRearrangeData = {
     moveTo: Position,
 }
 
-export const dragAndDropRearrange = (data: DragAndDropRearrangeData): Array<string|string[]> => {
+export const dragAndDropRearrange = (data: DragAndDropRearrangeData): (string | string[])[] => {
   const { contentOrder, srcBlockX, srcBlockY, dstBlockX, dstBlockY, moveTo, srcBlockId, dstBlockId } = data;
-  const newContentOrder: Array<string|string[]> = JSON.parse(JSON.stringify(contentOrder));
+  const newContentOrder: (string | string[])[] = JSON.parse(JSON.stringify(contentOrder));
 
   const copySrcBlockX = srcBlockX;
   const copySrcBlockY = srcBlockY;

@@ -70,7 +70,6 @@ const ViewHeader = (props: Props) => {
       cardId: pageId,
       cardPage: pages[pageId] as Page
     });
-    console.log('Created blocks', blocks)
     const newPageId = blocks[0].id;
     await refreshPage(newPageId);
     props.showCard(newPageId)
@@ -78,7 +77,6 @@ const ViewHeader = (props: Props) => {
 
   async function deleteCardTemplate(pageId: string) {
     const card = cardTemplates.find(c => c.id === pageId)
-    console.log('Found card', card, 'page', pages[pageId])
     if (card) {
       await mutator.deleteBlock(card, 'delete card');
       mutate(`pages/${card.spaceId}`);
@@ -186,7 +184,7 @@ const ViewHeader = (props: Props) => {
             <ViewHeaderActionsMenu onClick={() => toggleViewOptions()} />
 
             {/* New card button */}
-            
+
             <NewCardButton
               addCard={props.addCard}
               addCardFromTemplate={addPageFromTemplate}

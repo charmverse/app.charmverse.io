@@ -9,6 +9,7 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
+import { computeUserPagePermissions } from 'lib/permissions/pages';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -62,13 +63,13 @@ async function createVote (req: NextApiRequest, res: NextApiResponse<ExtendedVot
     }
   }
   else {
-    const userPermissions = await computeSpacePermissions({
-      allowAdminBypass: true,
-      resourceId: existingPage.spaceId,
-      userId: createdBy
+    const userPagePermissions = await computeUserPagePermissions({
+      pageId,
+      userId,
+      allowAdminBypass: true
     });
 
-    if (!userPermissions.createVote) {
+    if (!userPagePermissions.create_poll) {
       throw new UnauthorisedActionError('You do not have permissions to create a vote.');
     }
   }
@@ -79,7 +80,7 @@ async function createVote (req: NextApiRequest, res: NextApiResponse<ExtendedVot
     createdBy: userId
   } as VoteDTO);
 
-  return res.status(200).json(vote);
+  return res.status(201).json(vote);
 }
 
 export default withSessionRoute(handler);

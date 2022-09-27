@@ -42,7 +42,8 @@ function specFactory (): RawSpecs {
     name,
     schema: {
       attrs: {
-        language: { default: '' }
+        language: { default: '' },
+        track: { default: [] }
       },
       content: 'text*',
       marks: '',

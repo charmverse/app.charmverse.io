@@ -42,6 +42,9 @@ function specFactory (): RawSpecs {
         },
         alt: {
           default: null
+        },
+        track: {
+          default: []
         }
       },
       group: 'inline',

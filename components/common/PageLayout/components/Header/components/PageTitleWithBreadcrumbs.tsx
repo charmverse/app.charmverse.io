@@ -3,6 +3,7 @@ import { Box, Typography, CircularProgress } from '@mui/material';
 import Link from 'components/common/Link';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePages } from 'hooks/usePages';
+import { usePrimaryCharmEditor } from 'hooks/usePrimaryCharmEditor';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -59,7 +60,8 @@ interface PageBreadCrumb {
 }
 
 function DocumentPageTitle ({ basePath, pageId }: { basePath: string, pageId?: string }) {
-  const { pages, isEditing } = usePages();
+  const { pages } = usePages();
+  const { isSaving } = usePrimaryCharmEditor();
 
   const currentPage = pageId ? pages[pageId] : undefined;
 
@@ -107,7 +109,7 @@ function DocumentPageTitle ({ basePath, pageId }: { basePath: string, pageId?: s
           {currentPage.title || 'Untitled'}
         </PageTitle>
       )}
-      {isEditing && (
+      {isSaving && (
         <Box display='inline-flex' alignItems='center' gap={1} ml={2}>
           <CircularProgress size={12} />
           <Typography variant='subtitle2'>
