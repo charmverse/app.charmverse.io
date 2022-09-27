@@ -1,6 +1,5 @@
-import { FormControlLabel, IconButton, ListItem, MenuItem, Radio, RadioGroup, Stack, TextField, Tooltip, Typography } from '@mui/material';
+import { FormControlLabel, IconButton, ListItem, Radio, RadioGroup, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import type { Proposal } from '@prisma/client';
 import { VoteType } from '@prisma/client';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import Button from 'components/common/Button';
@@ -259,13 +258,11 @@ export default function CreateVoteModal ({ open = true, onClose, onCreateVote, p
           </RadioGroup>
         </Box>
         {voteType === VoteType.SingleChoice && <InlineVoteOptions options={options} setOptions={setOptions} />}
-        <Stack gap={1} flexDirection='row' alignItems='center'>
+        <Stack gap={2} flexDirection='row' alignItems='center'>
           <Button
             onClick={handleSubmit}
             sx={{
-              alignSelf: 'flex-start',
-              marginBottom: '4px',
-              marginRight: '8px'
+              alignSelf: 'flex-start'
             }}
             disabled={disabledSave}
           >
@@ -276,14 +273,13 @@ export default function CreateVoteModal ({ open = true, onClose, onCreateVote, p
             <Tooltip title={!isProposalAuthor ? 'Only proposal authors can publish to snapshot' : ''}>
               <div>
                 <Button disabled={!isProposalAuthor}>
-                  <PublishToSnapshot pageId={proposal.id} />
+                  <PublishToSnapshot typography pageId={proposal.id} />
                 </Button>
               </div>
             </Tooltip>
           )}
         </Stack>
       </Box>
-
     </Modal>
   );
 }

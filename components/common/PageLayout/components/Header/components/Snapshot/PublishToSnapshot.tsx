@@ -1,5 +1,6 @@
 import PublishIcon from '@mui/icons-material/ElectricBolt';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import { Typography } from '@mui/material';
 import ListItemText from '@mui/material/ListItemText';
 import charmClient from 'charmClient';
 import Link from 'components/common/Link';
@@ -13,7 +14,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 import PublishingForm from './PublishingForm';
 
-export default function PublishToSnapshot ({ pageId }: {pageId: string}) {
+export default function PublishToSnapshot ({ pageId, typography = false }: { typography?: boolean, pageId: string}) {
   const { pages, setPages } = usePages();
   const page = pages[pageId]!;
 
@@ -58,7 +59,7 @@ export default function PublishToSnapshot ({ pageId }: {pageId: string}) {
       checkingProposal && (
         <>
           <LoadingIcon size={18} sx={{ mr: 1 }} />
-          <ListItemText primary='Checking proposal' />
+          {typography ? <Typography>Checking proposal</Typography> : <ListItemText primary='Checking proposal' />}
         </>
       )
     }
@@ -72,7 +73,7 @@ export default function PublishToSnapshot ({ pageId }: {pageId: string}) {
             }}
             onClick={open}
           />
-          <ListItemText onClick={open} primary='Publish to Snapshot' />
+          {typography ? <Typography onClick={open}>Publish to Snapshot</Typography> : <ListItemText onClick={open} primary='Publish to Snapshot' />}
 
           <Modal size='large' open={isOpen} onClose={close} title={`Publish to Snapshot ${currentSpace?.snapshotDomain ? `(${currentSpace.snapshotDomain})` : ''}`}>
             <PublishingForm onSubmit={close} page={page} />
@@ -91,8 +92,7 @@ export default function PublishToSnapshot ({ pageId }: {pageId: string}) {
             }}
 
           />
-          <ListItemText primary='View on Snapshot' />
-
+          {typography ? <Typography>View on Snapshot</Typography> : <ListItemText primary='View on Snapshot' />}
         </Link>
       )
     }
