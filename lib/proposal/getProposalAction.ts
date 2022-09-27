@@ -17,11 +17,6 @@ export function getProposalAction ({
     }
     return 'discuss';
   }
-  else if (currentStatus === 'draft' || currentStatus === 'private_draft') {
-    if (isAuthor) {
-      return 'start_discussion';
-    }
-  }
   else if (currentStatus === 'reviewed') {
     if (isAuthor) {
       return 'start_vote';

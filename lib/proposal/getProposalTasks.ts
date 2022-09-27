@@ -115,7 +115,12 @@ export async function getProposalTasks (userId: string): Promise<{
       spaceId: {
         in: spaceIds
       },
-      type: 'proposal'
+      type: 'proposal',
+      proposal: {
+        status: {
+          notIn: ['draft', 'private_draft']
+        }
+      }
     },
     include: {
       proposal: {
@@ -140,41 +145,36 @@ export async function getProposalTasks (userId: string): Promise<{
       const workspaceEvent = workspaceEventsRecord[proposal.id];
       const isReviewer = proposal.reviewers.some(reviewer => reviewer.roleId ? roleIds.includes(reviewer.roleId) : reviewer.userId === userId);
       const isAuthor = proposal.authors.some(author => author.userId === userId);
-      if (proposal?.status.match(/draft/) && !isAuthor) {
-        // No-op
+      const action = getProposalAction(
+        {
+          currentStatus: proposal.status,
+          isAuthor,
+          isReviewer
+        }
+      );
+
+      const proposalTask = {
+        // Making the id empty to fill them later
+        id: '',
+        pagePath: page.path,
+        pageTitle: page.title,
+        spaceDomain: page.space.domain,
+        spaceName: page.space.name,
+        status: proposal.status,
+        action
+      };
+
+      if (workspaceEvent && !userNotificationIds.has(workspaceEvent.id)) {
+        proposalsRecord.unmarked.push({
+          ...proposalTask,
+          id: workspaceEvent.id
+        });
       }
       else {
-        const action = getProposalAction(
-          {
-            currentStatus: proposal.status,
-            isAuthor,
-            isReviewer
-          }
-        );
-
-        const proposalTask = {
-          // Making the id empty to fill them later
-          id: '',
-          pagePath: page.path,
-          pageTitle: page.title,
-          spaceDomain: page.space.domain,
-          spaceName: page.space.name,
-          status: proposal.status,
-          action
-        };
-
-        if (workspaceEvent && !userNotificationIds.has(workspaceEvent.id)) {
-          proposalsRecord.unmarked.push({
-            ...proposalTask,
-            id: workspaceEvent.id
-          });
-        }
-        else {
-          proposalsRecord.marked.push({
-            ...proposalTask,
-            id: v4()
-          });
-        }
+        proposalsRecord.marked.push({
+          ...proposalTask,
+          id: v4()
+        });
       }
     }
   });
