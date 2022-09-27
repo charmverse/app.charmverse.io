@@ -36,8 +36,8 @@ interface TransactionWithMetadata extends MetaTransactionData, Pick<Bounty, 'rew
 
 export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDetails[]}) {
   const [isLoading, setIsLoading] = useState(false);
-  const [gnosisSafeData, setGnosisSafeData] = useState<SafeData | undefined>(undefined);
-  const { data: safesData } = useMultiWalletSigs();
+  const [gnosisSafeData, setGnosisSafeData] = useState<SafeData | null>(null);
+  const { data: userGnosisSafes } = useMultiWalletSigs();
   const { setBounties, setCurrentBounty, currentBountyId } = useBounties();
   const popupState = usePopupState({ variant: 'popover', popupId: 'multi-payment-modal' });
   const [currentSpace] = useCurrentSpace();
@@ -45,20 +45,22 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
   const [contributors] = useContributors();
   const { account, chainId } = useWeb3React();
   const signer = useGnosisSigner();
-  const { data: safeInfos } = useSWR(
+  const { data: safeData } = useSWR(
     (signer && account && chainId) ? `/connected-gnosis-safes/${account}` : null,
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     () => getSafesForAddress({ signer: signer!, chainId: chainId!, address: account! })
   );
 
-  const safeDataRecord = useMemo(() => {
-    return safesData?.reduce<Record<string, UserGnosisSafe>>((record, userGnosisSafe) => {
-      if (!record[userGnosisSafe.address]) {
-        record[userGnosisSafe.address] = userGnosisSafe;
-      }
-      return record;
-    }, {}) ?? {};
-  }, [safesData]);
+  const userGnosisSafeRecord = userGnosisSafes?.reduce<Record<string, UserGnosisSafe>>((record, userGnosisSafe) => {
+    record[userGnosisSafe.address] = userGnosisSafe;
+    return record;
+  }, {}) ?? {};
+
+  useEffect(() => {
+    if (safeData) {
+      setGnosisSafeData(safeData[0]);
+    }
+  }, [safeData]);
 
   const gnosisSafeAddress = gnosisSafeData?.address;
   const gnosisSafeChainId = gnosisSafeData?.chainId;
@@ -67,8 +69,8 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
   const transactions: TransactionWithMetadata[] = useMemo(
     () => bounties
       .filter(bounty => {
-        return safeInfos
-          ? safeInfos.find(
+        return safeData
+          ? safeData.find(
             ({ chainId: safeChainId }) => bounty.chainId === safeChainId && bounty.rewardToken === getChainById(safeChainId)?.nativeCurrency.symbol
           )
           : false;
@@ -94,7 +96,7 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
         }).filter(isTruthy);
       })
       .flat(),
-    [bounties, safeInfos]
+    [bounties, safeData]
   );
 
   useEffect(() => {
@@ -162,7 +164,7 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
           size='large'
           onClose={() => {
             modalProps.onClose();
-            setGnosisSafeData(undefined);
+            setGnosisSafeData(null);
           }}
         >
           <DialogTitle onClose={popupState.close}>
@@ -177,7 +179,7 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
             }}
             mt={2}
           >
-            {safeInfos && (
+            {safeData && (
               <Box justifyContent='space-between' gap={2} alignItems='center'>
                 <div
                   className='octo-propertyrow'
@@ -192,7 +194,7 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
                   </div>
                   <Select
                     onChange={(e) => {
-                      setGnosisSafeData(safeInfos.find(safeInfo => safeInfo.address === e.target.value));
+                      setGnosisSafeData(safeData.find(safeInfo => safeInfo.address === e.target.value) ?? null);
                     }}
                     sx={{ flexGrow: 1 }}
                     value={gnosisSafeData?.address ?? ''}
@@ -206,12 +208,12 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
                           </Typography>
                         );
                       }
-                      return safeDataRecord[safeAddress]?.name ?? safeAddress;
+                      return userGnosisSafeRecord[safeAddress]?.name ?? safeAddress;
                     }}
                   >
-                    {safeInfos.map(safeInfo => (
+                    {safeData.map(safeInfo => (
                       <MenuItem key={safeInfo.address} value={safeInfo.address}>
-                        {safeDataRecord[safeInfo.address]?.name ?? safeInfo.address}
+                        {userGnosisSafeRecord[safeInfo.address]?.name ?? safeInfo.address}
                       </MenuItem>
                     ))}
                   </Select>
