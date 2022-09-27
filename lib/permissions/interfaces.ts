@@ -86,7 +86,7 @@ export interface BountyPagePermissionIntersectionQuery {
   bountyPermissions: Partial<BountyPermissions>;
   pageOperations: PageOperations[];
   pagePermissions: PagePermission[];
-  roleups: Array<RoleupWithMembers | RoleWithMembers>;
+  roleups: (RoleupWithMembers | RoleWithMembers)[];
 }
 
 export interface BountyPagePermissionIntersection {

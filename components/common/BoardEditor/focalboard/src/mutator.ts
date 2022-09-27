@@ -250,7 +250,7 @@ class Mutator {
     );
   }
 
-  async changeCardContentOrder (cardId: string, oldContentOrder: Array<string | string[]>, contentOrder: Array<string | string[]>, description = 'reorder'): Promise<void> {
+  async changeCardContentOrder (cardId: string, oldContentOrder:(string | string[])[], contentOrder: (string | string[])[], description = 'reorder'): Promise<void> {
     await undoManager.perform(
       async () => {
         await charmClient.patchBlock(cardId, { updatedFields: { contentOrder } }, publishIncrementalUpdate);

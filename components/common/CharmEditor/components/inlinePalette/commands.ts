@@ -1,11 +1,12 @@
 import {
-  blockquote,
-  bulletList,
-  heading,
-  orderedList,
-  paragraph
+  blockquote
 } from '@bangle.dev/base-components';
 import { chainCommands } from '@bangle.dev/pm';
+
+import * as heading from '../heading';
+import * as bulletList from '../bulletList';
+import * as orderedList from '../orderedList';
+import paragraph from '../paragraph';
 
 const { insertEmptyParagraphAbove, insertEmptyParagraphBelow } = paragraph;
 const { queryIsBulletListActive } = bulletList;

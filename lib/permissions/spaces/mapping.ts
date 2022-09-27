@@ -3,7 +3,7 @@ import { SpaceOperation } from '@prisma/client';
 export const spaceOperationLabels: Record<SpaceOperation, string> = {
   createPage: 'Create new pages',
   createBounty: 'Create new bounties',
-  createVote: 'Create new polls'
+  createVote: 'Create new proposals'
 };
 
 export function spaceOperations () {

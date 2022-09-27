@@ -14,7 +14,7 @@ export function validatePageQuery (query: PageQuery): true {
     return true;
   }
 
-  const supportedKeys: Array<keyof PageQuery> = ['properties', 'title'];
+  const supportedKeys: (keyof PageQuery)[] = ['properties', 'title'];
 
   const queryKeys = Object.keys(query);
 
@@ -116,7 +116,7 @@ export function validatePaginationQuery (query: PaginatedQuery<PageQuery>): true
     return true;
   }
 
-  const supportedKeys: Array<keyof PaginatedQuery<PageQuery>> = ['cursor', 'limit', 'query'];
+  const supportedKeys: (keyof PaginatedQuery<PageQuery>)[] = ['cursor', 'limit', 'query'];
 
   const queryKeys = Object.keys(query);
 

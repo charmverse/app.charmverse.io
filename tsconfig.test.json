@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "exclude": [
+    "components/common/BoardEditor/focalboard"
+  ],
+  "include": [
+    "node_modules/next/image-types/global.d.ts",
+    "lib/session/withSession.ts",
+    "theme/index.ts",
+    "**/*.spec.ts",
+    "**/*.spec.tsx"
+  ]
+}

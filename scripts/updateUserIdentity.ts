@@ -8,7 +8,7 @@ import { prisma } from '../db';
 
 (async () => {
 
-  const users: Array<Partial<LoggedInUser>> = await prisma.user.findMany({
+  const users: Partial<LoggedInUser>[] = await prisma.user.findMany({
     where: {
       identityType: null
     },

@@ -534,6 +534,7 @@ details {
 
   background-color: var(--background-default);
   cursor: pointer;
+  display: inline;
   position: absolute;
   right: -70px;
   // add a width so that icons are left-aligned even if counts get large

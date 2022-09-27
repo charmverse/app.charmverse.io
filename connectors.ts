@@ -321,7 +321,7 @@ const walletLink = new WalletLinkConnector({
  * @param chainId
  * @returns The native crypto of a chain. If the chain is not found, returns an empty list
  */
-export function getCryptos (chainId: number): Array<string | CryptoCurrency> {
+export function getCryptos (chainId: number): (string | CryptoCurrency)[] {
   const chain = getChainById(chainId);
 
   if (!chain) {
