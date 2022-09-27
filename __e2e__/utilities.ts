@@ -2,7 +2,7 @@ import type { Page as BrowserPage } from '@playwright/test';
 import type { Bounty, Page, Prisma, Space } from '@prisma/client';
 import { prisma } from 'db';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
-import type { BountyPermissions, BountyWithDetails } from 'lib/bounties/interfaces';
+import type { BountyPermissions, BountyWithDetails } from 'lib/bounties';
 import type { IPageWithPermissions } from 'lib/pages/interfaces';
 import { getPagePath } from 'lib/pages/utils';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';

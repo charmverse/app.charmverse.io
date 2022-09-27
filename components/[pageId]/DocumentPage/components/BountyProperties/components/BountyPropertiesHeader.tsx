@@ -1,12 +1,11 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Button from 'components/common/Button';
-import type { BountyWithDetails } from 'lib/bounties/interfaces';
+import type { BountyWithDetails, BountyPermissions } from 'lib/bounties';
 import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge';
 import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
-import type { BountyPermissions } from 'lib/bounties';
 import type { PagePermission } from '@prisma/client';
 import { compareBountyPagePermissions } from 'lib/permissions/compareBountyPagePermissions';
 import type { BountyPagePermissionIntersection } from 'lib/permissions/interfaces';

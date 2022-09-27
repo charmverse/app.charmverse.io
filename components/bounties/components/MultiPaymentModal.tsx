@@ -20,7 +20,7 @@ import { eToNumber } from 'lib/utilities/numbers';
 import { shortenHex } from 'lib/utilities/strings';
 import { isTruthy } from 'lib/utilities/types';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import type { BountyWithDetails } from 'lib/bounties/interfaces';
+import type { BountyWithDetails } from 'lib/bounties';
 import { useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import { BountyAmount } from './BountyStatusBadge';

@@ -17,7 +17,7 @@ import { useContributors } from 'hooks/useContributors';
 import { useUser } from 'hooks/useUser';
 import type { ApplicationWithTransactions } from 'lib/applications/actions';
 import type { ReviewDecision, SubmissionReview } from 'lib/applications/interfaces';
-import type { AssignedBountyPermissions, BountyWithDetails } from 'lib/bounties/interfaces';
+import type { AssignedBountyPermissions, BountyWithDetails } from 'lib/bounties';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 import { useEffect, useState } from 'react';
 import charmClient from 'charmClient';
