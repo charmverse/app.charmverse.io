@@ -64,17 +64,7 @@ export default function VotesSidebar () {
   }, [votes, window.location.search]);
 
   return (
-    <Box sx={{
-      height: 'calc(100%)',
-      gap: 1,
-      display: 'flex',
-      flexDirection: 'column'
-    }}
-    >
-      <Box display='flex' gap={1}>
-        <PageActionToggle />
-        <Typography fontWeight={600} fontSize={20}>Polls</Typography>
-      </Box>
+    <>
       <ViewOptions
         showPosition={true}
         showVotes={true}
@@ -97,7 +87,7 @@ export default function VotesSidebar () {
             />
           ))}
       </StyledSidebar>
-    </Box>
+    </>
   );
 }
 

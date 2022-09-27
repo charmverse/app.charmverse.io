@@ -12,6 +12,11 @@ export function rowSpec (): RawSpecs {
     type: 'node',
     name: 'columnLayout',
     schema: {
+      attrs: {
+        track: {
+          default: []
+        }
+      },
       content: 'columnBlock+',
       isolating: true,
       group: 'block',

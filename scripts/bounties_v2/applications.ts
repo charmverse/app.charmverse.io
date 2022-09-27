@@ -124,7 +124,7 @@ export async function eliminateDuplicateApplications () {
     return summary;
   }, {});
 
-  const duplicates = (Object.values(rollup) as Array<Application[]>).filter(appList => {
+  const duplicates = (Object.values(rollup) as Application[][]).filter(appList => {
     return appList.length >= 2;
   });
 

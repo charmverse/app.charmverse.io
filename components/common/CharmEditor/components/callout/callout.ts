@@ -9,7 +9,8 @@ export function spec (): BaseRawNodeSpec {
   const _spec = quoteSpec();
   _spec.name = 'blockquote';
   _spec.schema.attrs = {
-    emoji: { default: defaultIcon }
+    emoji: { default: defaultIcon },
+    track: { default: [] }
   };
   if (_spec.markdown?.parseMarkdown) {
     _spec.markdown.parseMarkdown.blockquote.block = name;
