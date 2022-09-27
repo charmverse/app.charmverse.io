@@ -343,14 +343,23 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                   <RelativeDate createdAt={comment.createdAt.toString()} updatedAt={comment.updatedAt?.toString()} />
                 </Box>
                 <div>
-                  {commentIndex === 0 ? (
-                    <Box display='flex' alignItems='center' gap={1}>
+                  <Box display='flex' alignItems='center' gap={1}>
+
+                    {commentIndex === 0 && (
+
                       <ThreadHeaderButton
                         text={thread.resolved ? 'Un-resolve' : 'Resolve'}
                         disabled={isMutating || !permissions.comment}
                         onClick={toggleResolved}
                       />
+
+                    )}
+
+                    {
+                    comment.userId === user?.id && (
                       <IconButton
+                        // Show the context menu next to resolve
+                        className={commentIndex === 0 ? '' : 'comment-actions'}
                         size='small'
                         onClick={(e: any) => {
                           onClickCommentActions(e, comment);
@@ -358,19 +367,10 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                       >
                         <MoreHorizIcon fontSize='small' />
                       </IconButton>
-                    </Box>
-                  ) : (comment.userId === user?.id && permissions.comment)
-                  && (
-                    <IconButton
-                      className='comment-actions'
-                      size='small'
-                      onClick={(e: any) => {
-                        onClickCommentActions(e, comment);
-                      }}
-                    >
-                      <MoreHorizIcon fontSize='small' />
-                    </IconButton>
-                  )}
+                    )
+                  }
+
+                  </Box>
                 </div>
               </Box>
               {commentIndex === 0 && (
