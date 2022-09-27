@@ -154,7 +154,7 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
             color='secondary'
             disabled={isDisabled}
           >
-            Batch Payment ({selectedApplicationIds.length})
+            Batch Payment ({transactions.length})
           </Button>
         </div>
       </Tooltip>
