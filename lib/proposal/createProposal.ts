@@ -68,7 +68,7 @@ export async function createProposal (pageProps: ProposalPageInput, proposalProp
     })
   ]);
 
-  const [deleteArgs, createArgs] = await generateSyncProposalPermissions({ proposalId });
+  const [deleteArgs, createArgs] = await generateSyncProposalPermissions({ proposalId, isNewProposal: true });
 
   await prisma.$transaction([
     prisma.pagePermission.deleteMany(deleteArgs),
