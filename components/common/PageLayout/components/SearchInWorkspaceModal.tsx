@@ -9,7 +9,6 @@ import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import { Modal, DialogTitle, ModalPosition } from 'components/common/Modal';
 import Popper from '@mui/material/Popper';
-import Link from 'components/common/Link';
 import { useBounties } from 'hooks/useBounties';
 import { usePages } from 'hooks/usePages';
 import { useRouter } from 'next/router';
@@ -27,7 +26,7 @@ const StyledPopper = styled(Popper)`
   }
 `;
 
-const StyledLink = styled(Link)`
+const StyledBox = styled(Box)`
     padding-left: 0px;
     padding-right: ${({ theme }) => theme.spacing(2)};
     flex-direction: column;
@@ -40,10 +39,6 @@ const StyledLink = styled(Link)`
     padding-top: 10px;
     padding-bottom: 10px;
     border-bottom: 1px solid ${({ theme }) => theme.palette.gray.main};
-    :hover {
-      background-color: ${({ theme }) => theme.palette.action.hover};
-      color: inherit;
-    }
 `;
 
 const baseLine = css`
@@ -142,6 +137,10 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
         onInputChange={(_event, newInputValue) => {
           setIsSearching(!!newInputValue);
         }}
+        onChange={(e, item) => {
+          e.preventDefault();
+          router.push(item.link);
+        }}
         getOptionLabel={option => typeof option === 'object' ? option.name : option}
         open={isSearching}
         disablePortal
@@ -159,15 +158,13 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
           }
         }}
         PopperComponent={StyledPopper}
-        renderOption={(_, option: SearchResultItem, { inputValue }) => {
+        renderOption={(listItemProps, option: SearchResultItem, { inputValue }) => {
           const matches = match(option.name, inputValue, { insideWords: true, findAllOccurrences: true });
           const parts = parse(option.name, matches);
 
           return (
-            <Box>
-              <StyledLink
-                href={option.link}
-              >
+            <li {...listItemProps}>
+              <StyledBox>
                 <Stack direction='row' spacing={1}>
                   {
                     option.type === ResultType.page
@@ -177,9 +174,10 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
                   <Stack>
                     <StyledTypographyPage>
                       {
-                        parts.map((part: { text: string; highlight: boolean; }, _index: number) => {
+                        parts.map((part: { text: string; highlight: boolean; }) => {
                           return (
                             <span
+                              key={part.text}
                               style={{
                                 fontWeight: part.highlight ? 700 : 400
                               }}
@@ -192,8 +190,8 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
                     {option.path && <StyledTypographyPath>{option.path}</StyledTypographyPath>}
                   </Stack>
                 </Stack>
-              </StyledLink>
-            </Box>
+              </StyledBox>
+            </li>
           );
         }}
         renderInput={(params) => (
