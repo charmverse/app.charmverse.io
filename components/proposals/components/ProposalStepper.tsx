@@ -1,7 +1,8 @@
 import { useTheme } from '@emotion/react';
 import CheckIcon from '@mui/icons-material/Check';
-import { Button, Divider, Grid, MenuItem, Select, Stack, Typography } from '@mui/material';
+import { Divider, Grid, MenuItem, Select, Stack, Typography } from '@mui/material';
 import { Box } from '@mui/system';
+import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import type { ProposalStatus } from '@prisma/client';
 import charmClient from 'charmClient';
 import useTasks from 'components/nexus/hooks/useTasks';
@@ -151,24 +152,37 @@ export default function ProposalStepper (
       </Grid>
       <Grid
         container
-        mb={2}
         sx={{
+          width: '100%',
           display: {
             xs: 'flex',
             md: 'none'
           }
         }}
       >
-        <Box justifyContent='space-between' gap={2} alignItems='center' my='6px'>
+        <Box width='100%' justifyContent='space-between' gap={2} alignItems='center' my='6px'>
           <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
             <div className='octo-propertyname octo-propertyname--readonly'>
               <Button>Status</Button>
             </div>
             <Box display='flex' flex={1}>
               <Select
+                fullWidth
                 value={currentStatus ?? ''}
                 onChange={(e) => {
-                  updateProposalStatus(e.target.value as ProposalStatus);
+                  const status = e.target.value as ProposalStatus;
+                  const canChangeStatus = currentStatus ? (currentStatus === 'discussion' && status === 'review' ? reviewers.length !== 0 : true) && (proposalUserGroups.some(
+                    proposalUserGroup => proposalStatusTransitionPermission[currentStatus]?.[proposalUserGroup]?.includes(status as ProposalStatus)
+                  )) : false;
+
+                  if (canChangeStatus) {
+                    if (status === 'vote_active') {
+                      openVoteModal();
+                    }
+                    else {
+                      updateProposalStatus(status);
+                    }
+                  }
                 }}
                 renderValue={(status) => {
                   return <Typography>{PROPOSAL_STATUS_LABELS[status as ProposalStatus]}</Typography>;
