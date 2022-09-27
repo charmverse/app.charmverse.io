@@ -26,9 +26,7 @@ export type PagesContext = {
   pages: PagesMap,
   setPages: Dispatch<SetStateAction<PagesMap>>,
   setCurrentPageId: Dispatch<SetStateAction<string>>,
-  isEditing: boolean
   refreshPage: (pageId: string) => Promise<IPageWithPermissions>
-  setIsEditing: React.Dispatch<React.SetStateAction<boolean>>
   deletePage: (data: {pageId: string, board?: Block}) => Promise<void>
   getPagePermissions: (pageId: string, page?: IPageWithPermissions) => IPagePermissionFlags,
 };
@@ -40,8 +38,6 @@ export const PagesContext = createContext<Readonly<PagesContext>>({
   pages: {},
   setCurrentPageId: () => '',
   setPages: () => undefined,
-  isEditing: true,
-  setIsEditing: () => { },
   getPagePermissions: () => new AllowedPagePermissions(),
   refreshPage: () => Promise.resolve({} as any),
   deletePage: () => Promise.resolve({} as any)
@@ -50,7 +46,6 @@ export const PagesContext = createContext<Readonly<PagesContext>>({
 export function PagesProvider ({ children }: { children: ReactNode }) {
 
   const isAdmin = useIsAdmin();
-  const [isEditing, setIsEditing] = useState(false);
   const [currentSpace] = useCurrentSpace();
   const [pages, pagesRef, setPages] = useRefState<PagesContext['pages']>({});
   const [currentPageId, setCurrentPageId] = useState<string>('');
@@ -171,15 +166,13 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
 
   const value: PagesContext = useMemo(() => ({
     currentPageId,
-    isEditing,
-    setIsEditing,
     deletePage,
     pages,
     setCurrentPageId,
     setPages: _setPages,
     getPagePermissions,
     refreshPage
-  }), [currentPageId, isEditing, router, pages, user]);
+  }), [currentPageId, router, pages, user]);
 
   useEffect(() => {
     if (data) {

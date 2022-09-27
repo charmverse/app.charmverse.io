@@ -12,6 +12,9 @@ export function spec (): BaseRawNodeSpec {
     type: 'node',
     name,
     schema: {
+      attrs: {
+        track: { default: [] }
+      },
       content: 'block*',
       group: 'block',
       defining: true,

@@ -14,7 +14,7 @@ import type { RootState } from './index';
 
 type UsersStatus = {
   workspaceUsers: {[key: string]: IUser}
-  blockSubscriptions: Array<Subscription>
+  blockSubscriptions: Subscription[]
 }
 
 export const fetchUserBlockSubscriptions = createAsyncThunk(

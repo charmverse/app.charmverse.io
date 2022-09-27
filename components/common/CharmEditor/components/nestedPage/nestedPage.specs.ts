@@ -15,6 +15,9 @@ export function nestedPageSpec (): RawSpecs {
         // This property is used to reference the page
         id: {
           default: null
+        },
+        track: {
+          default: []
         }
       },
       group: 'block',

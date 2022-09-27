@@ -57,7 +57,7 @@ type IdentityModalProps = {
     save: (id: string, identityType: IdentityType) => void,
     close: () => void,
     isOpen: boolean,
-    identityTypes: Array<IntegrationModel>,
+    identityTypes: IntegrationModel[],
     identityType: IdentityType,
     username: string,
 };
