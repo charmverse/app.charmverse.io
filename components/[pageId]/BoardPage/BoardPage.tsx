@@ -54,7 +54,7 @@ export default function BoardPage ({ page, setPage, readOnly = false, pagePermis
         query: {
           ...router.query,
           viewId: boardViews[0].id,
-          cardId: router.query.cardId
+          cardId: router.query.cardId ?? ''
         }
       });
       return;
@@ -112,8 +112,13 @@ export default function BoardPage ({ page, setPage, readOnly = false, pagePermis
   });
 
   const showCard = useCallback((cardId?: string) => {
-    const newUrl = getUriWithParam(window.location.href, { cardId });
-    silentlyUpdateURL(newUrl);
+    const newUrl = `${router.pathname}?viewId=${router.query.viewId}&cardId=${cardId}`;
+
+    const pageIdString = typeof router.query.pageId === 'string' ? `&pageId=${router.query.pageId}` : router.query.pageId instanceof Array ? `&pageId=${router.query.pageId[0]}&pageId=${router.query.pageId[1]}` : '';
+
+    const asUrl = `${router.asPath.split('?')[0]}?viewId=${router.query.viewId}&cardId=${cardId}${pageIdString}`;
+
+    silentlyUpdateURL(newUrl, asUrl);
     setShownCardId(cardId);
   }, [router.query]);
 

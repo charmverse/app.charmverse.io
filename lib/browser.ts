@@ -116,8 +116,8 @@ function scrollIntoViewIfNeededPolyfill (
 
 // source: https://github.com/vercel/next.js/discussions/18072
 // update URL without Next.js re-rendering the page
-export function silentlyUpdateURL (newUrl: string) {
-  window.history.replaceState({ ...window.history.state, as: newUrl, url: newUrl }, '', newUrl);
+export function silentlyUpdateURL (newUrl: string, as?: string) {
+  window.history.replaceState({ ...window.history.state, as: as ?? newUrl, url: newUrl }, '', as ?? newUrl);
 }
 
 export function getCookie (name: string): string {
