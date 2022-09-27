@@ -2,13 +2,13 @@ import type { Page as BrowserPage } from '@playwright/test';
 import type { Bounty, Page, Prisma, Space } from '@prisma/client';
 import { prisma } from 'db';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
-import type { BountyPermissions } from 'lib/bounties/interfaces';
+import type { BountyPermissions, BountyWithDetails } from 'lib/bounties';
 import type { IPageWithPermissions } from 'lib/pages/interfaces';
 import { getPagePath } from 'lib/pages/utils';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { typedKeys } from 'lib/utilities/objects';
-import type { BountyWithDetails, LoggedInUser } from 'models';
+import type { LoggedInUser } from 'models';
 import { baseUrl } from 'testing/mockApiCall';
 import { v4 } from 'uuid';
 
