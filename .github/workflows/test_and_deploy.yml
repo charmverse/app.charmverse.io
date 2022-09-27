@@ -100,9 +100,6 @@ jobs:
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
               ' .ebextensions_cron/00_env_vars.config
 
-            cat .ebextensions/00_env_vars.config
-            cat .ebextensions_cron/00_env_vars.config
-
       - name: Package Webapp
         run: cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
 
