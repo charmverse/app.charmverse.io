@@ -114,7 +114,7 @@ export default function BoardPage ({ page, setPage, readOnly = false, pagePermis
   const showCard = useCallback((cardId?: string) => {
     const newUrl = `${router.pathname}?viewId=${router.query.viewId}&cardId=${cardId ?? ''}`;
 
-    const asUrl = `${router.asPath.split('?')[0]}?viewId=${router.query.viewId}&cardId=${cardId ?? ''}`;
+    const asUrl = getUriWithParam(`${router.asPath}`, { viewId: router.query.viewId, cardId }).split(window.location.origin)[1];
 
     silentlyUpdateURL(newUrl, asUrl);
     setShownCardId(cardId);
