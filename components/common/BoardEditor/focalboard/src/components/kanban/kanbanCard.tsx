@@ -3,6 +3,8 @@ import DuplicateIcon from '@mui/icons-material/ContentCopy';
 import { Box } from '@mui/material';
 import { BountyStatusChip } from 'components/bounties/components/BountyStatusBadge';
 import { checkForEmpty } from 'components/common/CharmEditor/utils';
+import { useRouter } from 'next/router';
+import Link from 'components/common/Link';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import { CryptoCurrency, TokenLogoPaths } from 'connectors';
 import { useBounties } from 'hooks/useBounties';
@@ -69,13 +71,17 @@ const KanbanCard = React.memo((props: Props) => {
   if (props.isManualSort && isOver) {
     className += ' dragover';
   }
-  const [space] = useCurrentSpace();
-
+  const [space] = useCurrentSpace();  
+  
   const { bounties } = useBounties();
   const linkedBounty = bounties.find(bounty => bounty.page?.id === card.id);
 
   const { pages, getPagePermissions } = usePages();
   const cardPage = pages[card.id];
+
+  const router = useRouter();
+  const domain = router.query.domain;
+  const fullPageUrl =  `/${domain}/${cardPage?.path}`;
 
   // Check if the current user is an admin, admin means implicit full access
   const pagePermissions = getPagePermissions(card.id);
@@ -106,7 +112,7 @@ const KanbanCard = React.memo((props: Props) => {
       handleDeleteCard();
       return;
     }
-    setShowConfirmationDialogBox(true);
+    setShowConfirmationDialogBox(true); 
   };
 
   const { showMessage } = useSnackbar();
@@ -121,123 +127,125 @@ const KanbanCard = React.memo((props: Props) => {
         onClick={props.onClick}
         data-test={`kanban-card-${card.id}`}
       >
-        {!props.readonly
-          && (
-          <MenuWrapper
-            className='optionsMenu'
-            stopPropagationOnToggle={true}
-          >
-            <IconButton icon={<OptionsIcon />} />
-            <Menu position='bottom-start'>
-              {pagePermissions.delete && pages[card.id]?.deletedAt === null && (
-              <Menu.Text
-                icon={<DeleteIcon />}
-                id='delete'
-                name={intl.formatMessage({ id: 'KanbanCard.delete', defaultMessage: 'Delete' })}
-                onClick={handleDeleteButtonOnClick}
-              />
-              )}
-              <Menu.Text
-                icon={<DuplicateIcon color='secondary' fontSize='small' />}
-                id='duplicate'
-                name={intl.formatMessage({ id: 'KanbanCard.duplicate', defaultMessage: 'Duplicate' })}
-                onClick={() => {
-                  if (pages[card.id] && space) {
-                    mutator.duplicateCard(
-                      {
-                        cardId: card.id,
-                        board,
-                        cardPage: pages[card.id]!,
-                        afterRedo: async (newCardId) => {
-                          props.showCard(newCardId);
-                          mutate(`pages/${space.id}`);
-                        },
-                        beforeUndo: async () => {
-                          props.showCard(undefined);
-                        }
+        <Link external href={fullPageUrl} onClick={(e) => e.preventDefault()}>
+            {!props.readonly
+              && (
+              <MenuWrapper
+                className='optionsMenu'
+                stopPropagationOnToggle={true}
+              >
+                <IconButton icon={<OptionsIcon />} />
+                <Menu position='bottom-start'>
+                  {pagePermissions.delete && pages[card.id]?.deletedAt === null && (
+                  <Menu.Text
+                    icon={<DeleteIcon />}
+                    id='delete'
+                    name={intl.formatMessage({ id: 'KanbanCard.delete', defaultMessage: 'Delete' })}
+                    onClick={handleDeleteButtonOnClick}
+                  />
+                  )}
+                  <Menu.Text
+                    icon={<DuplicateIcon color='secondary' fontSize='small' />}
+                    id='duplicate'
+                    name={intl.formatMessage({ id: 'KanbanCard.duplicate', defaultMessage: 'Duplicate' })}
+                    onClick={() => {
+                      if (pages[card.id] && space) {
+                        mutator.duplicateCard(
+                          {
+                            cardId: card.id,
+                            board,
+                            cardPage: pages[card.id]!,
+                            afterRedo: async (newCardId) => {
+                              props.showCard(newCardId);
+                              mutate(`pages/${space.id}`);
+                            },
+                            beforeUndo: async () => {
+                              props.showCard(undefined);
+                            }
+                          }
+                        );
                       }
-                    );
-                  }
-                }}
-              />
-              <Menu.Text
-                icon={<LinkIcon />}
-                id='copy'
-                name={intl.formatMessage({ id: 'KanbanCard.copyLink', defaultMessage: 'Copy link' })}
-                onClick={() => {
-                  let cardLink = window.location.href;
+                    }}
+                  />
+                  <Menu.Text
+                    icon={<LinkIcon />}
+                    id='copy'
+                    name={intl.formatMessage({ id: 'KanbanCard.copyLink', defaultMessage: 'Copy link' })}
+                    onClick={() => {
+                      let cardLink = window.location.href;
 
-                  const queryString = new URLSearchParams(window.location.search);
-                  if (queryString.get('cardId') !== card.id) {
-                    const newUrl = new URL(window.location.toString());
-                    newUrl.searchParams.set('cardId', card.id);
-                    cardLink = newUrl.toString();
-                  }
+                      const queryString = new URLSearchParams(window.location.search);
+                      if (queryString.get('cardId') !== card.id) {
+                        const newUrl = new URL(window.location.toString());
+                        newUrl.searchParams.set('cardId', card.id);
+                        cardLink = newUrl.toString();
+                      }
 
-                  Utils.copyTextToClipboard(cardLink);
-                  showMessage('Copied card link to clipboard', 'success');
-                }}
-              />
-            </Menu>
-          </MenuWrapper>
-          )}
-
-        <div className='octo-icontitle'>
-          <div>
-            {cardPage?.icon ? <PageIcon isEditorEmpty={checkForEmpty(cardPage?.content as PageContent)} pageType='page' icon={cardPage.icon} /> : undefined}
-          </div>
-          <div
-            key='__title'
-            className='octo-titletext'
-          >
-            {cardPage?.title || intl.formatMessage({ id: 'KanbanCard.untitled', defaultMessage: 'Untitled' })}
-          </div>
-        </div>
-        {visiblePropertyTemplates.map((template) => (
-          <Tooltip
-            key={template.id}
-            title={template.name}
-          >
-            <PropertyValueElement
-              board={board}
-              readOnly={true}
-              card={card}
-              updatedAt={cardPage?.updatedAt.toString() || ''}
-              updatedBy={cardPage?.updatedBy || ''}
-              propertyTemplate={template}
-              showEmptyPlaceholder={false}
-            />
-          </Tooltip>
-        ))}
-        {linkedBounty && (
-        <BountyFooter>
-          <Box sx={{
-            display: 'flex',
-            gap: 0.25
-          }}
-          >
-            <CurrencyIcon>
-              {TokenLogoPaths[linkedBounty.rewardToken as CryptoCurrency] && (
-              <img
-                loading='lazy'
-                height={20}
-                src={TokenLogoPaths[linkedBounty.rewardToken as CryptoCurrency]}
-              />
+                      Utils.copyTextToClipboard(cardLink);
+                      showMessage('Copied card link to clipboard', 'success');
+                    }}
+                  />
+                </Menu>
+              </MenuWrapper>
               )}
-            </CurrencyIcon>
-            <Box sx={{
-              display: 'flex',
-              gap: 0.25
-            }}
-            >
-              <Box component='span'>
-                {linkedBounty.rewardAmount}
+
+            <div className='octo-icontitle'>
+              <div>
+                {cardPage?.icon ? <PageIcon isEditorEmpty={checkForEmpty(cardPage?.content as PageContent)} pageType='page' icon={cardPage.icon} /> : undefined}
+              </div>
+              <div
+                key='__title'
+                className='octo-titletext'
+              >
+                {cardPage?.title || intl.formatMessage({ id: 'KanbanCard.untitled', defaultMessage: 'Untitled' })}
+              </div>
+            </div>
+            {visiblePropertyTemplates.map((template) => (
+              <Tooltip
+                key={template.id}
+                title={template.name}
+              >
+                <PropertyValueElement
+                  board={board}
+                  readOnly={true}
+                  card={card}
+                  updatedAt={cardPage?.updatedAt.toString() || ''}
+                  updatedBy={cardPage?.updatedBy || ''}
+                  propertyTemplate={template}
+                  showEmptyPlaceholder={false}
+                />
+              </Tooltip>
+            ))}
+            {linkedBounty && (
+            <BountyFooter>
+              <Box sx={{
+                display: 'flex',
+                gap: 0.25
+              }}
+              >
+                <CurrencyIcon>
+                  {TokenLogoPaths[linkedBounty.rewardToken as CryptoCurrency] && (
+                  <img
+                    loading='lazy'
+                    height={20}
+                    src={TokenLogoPaths[linkedBounty.rewardToken as CryptoCurrency]}
+                  />
+                  )}
+                </CurrencyIcon>
+                <Box sx={{
+                  display: 'flex',
+                  gap: 0.25
+                }}
+                >
+                  <Box component='span'>
+                    {linkedBounty.rewardAmount}
+                  </Box>
+                </Box>
               </Box>
-            </Box>
-          </Box>
-          <BountyStatusChip status={linkedBounty.status} />
-        </BountyFooter>
-        )}
+              <BountyStatusChip status={linkedBounty.status} />
+            </BountyFooter>
+            )}
+        </Link>
       </div>
       {showConfirmationDialogBox && <ConfirmationDialogBox dialogBox={confirmDialogProps} />}
     </>
