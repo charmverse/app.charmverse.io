@@ -1,9 +1,9 @@
-import type { Prisma, Page } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import type { IPageWithPermissions, PagesRequest } from '../interfaces';
 
 // Feature flag for testing purposes
-const WITHOUT_CONTENT = true;
+const WITHOUT_CONTENT = false;
 
 /**
  * Utility for getting permissions of a page

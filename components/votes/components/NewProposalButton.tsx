@@ -24,7 +24,7 @@ export default function NewProposalButton ({ mutateProposals }: {mutateProposals
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const { showPage } = usePageDialog();
   const isAdmin = useIsAdmin();
-  const { setPages, pages } = usePages();
+  const { mutatePagesRemove, mutatePage, pages } = usePages();
   const { mutate } = useTasks();
 
   // MUI Menu specific content
@@ -46,10 +46,7 @@ export default function NewProposalButton ({ mutateProposals }: {mutateProposals
     await charmClient.deletePage(templateId);
     setProposalTemplates(proposalTemplates.filter(p => p.id !== templateId));
 
-    setPages(_pages => {
-      delete _pages[templateId];
-      return _pages;
-    });
+    mutatePagesRemove([templateId]);
   }
 
   async function createProposalFromTemplate (templateId: string) {
@@ -60,11 +57,7 @@ export default function NewProposalButton ({ mutateProposals }: {mutateProposals
       });
 
       mutateProposals();
-
-      setPages(_pages => {
-        _pages[newProposal.id] = newProposal;
-        return _pages;
-      });
+      mutatePage(newProposal);
 
       showPage({
         pageId: newProposal.id
@@ -76,10 +69,7 @@ export default function NewProposalButton ({ mutateProposals }: {mutateProposals
     if (currentSpace) {
       const newTemplate = await charmClient.proposals.createProposalTemplate({ spaceId: currentSpace.id });
 
-      setPages(_pages => ({
-        ..._pages,
-        [newTemplate.id]: newTemplate
-      }));
+      mutatePage(newTemplate);
       showPage({
         pageId: newTemplate.id
       });
@@ -94,10 +84,7 @@ export default function NewProposalButton ({ mutateProposals }: {mutateProposals
         type: 'proposal'
       });
 
-      setPages(_pages => ({
-        ..._pages,
-        [newPage.id]: newPage
-      }));
+      mutatePage(newPage);
 
       mutateProposals();
       mutate();

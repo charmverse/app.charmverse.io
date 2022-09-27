@@ -2,7 +2,6 @@
 import type { NodeViewProps } from '@bangle.dev/core';
 import styled from '@emotion/styled';
 import type { Page } from '@prisma/client';
-import charmClient from 'charmClient';
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
@@ -108,7 +107,7 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
   const groupByProperty = useAppSelector(getCurrentViewGroupBy);
   const dateDisplayProperty = useAppSelector(getCurrentViewDisplayBy);
   const clientConfig = useAppSelector(getClientConfig);
-  const { pages, setPages, getPagePermissions } = usePages();
+  const { pages, updatePage, getPagePermissions } = usePages();
 
   const [shownCardId, setShownCardId] = useState<string | undefined>('');
 
@@ -123,11 +122,8 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
   }
 
   const debouncedPageUpdate = debouncePromise(async (updates: Partial<Page>) => {
-    const updatedPage = await charmClient.updatePage({ id: pageId, ...updates });
-    setPages((_pages) => ({
-      ..._pages,
-      [pageId]: updatedPage
-    }));
+    const updatedPage = await updatePage({ id: pageId, ...updates });
+
     return updatedPage;
   }, 500);
 

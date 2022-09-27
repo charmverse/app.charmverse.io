@@ -55,7 +55,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
 
   const router = useRouter();
   const colorMode = useColorMode();
-  const { pages, setPages, getPagePermissions } = usePages();
+  const { pages, updatePage, getPagePermissions } = usePages();
   const { user, setUser } = useUser();
   const theme = useTheme();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
@@ -107,6 +107,15 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
   const isFullWidth = basePage?.fullWidth ?? false;
   const isBasePageDocument = ['page', 'card', 'proposal', 'proposal_template', 'bounty'].includes(basePage?.type ?? '');
   const isBasePageDatabase = /board/.test(basePage?.type ?? '');
+
+  const onSwitchChange = () => {
+    if (basePage) {
+      updatePage({
+        id: basePage?.id,
+        fullWidth: !isFullWidth
+      });
+    }
+  };
 
   const documentOptions = (
     <List dense>
@@ -202,14 +211,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
             <Switch
               size='small'
               checked={isFullWidth}
-              onChange={async () => {
-                await charmClient.updatePage({
-                  id: basePage?.id,
-                  fullWidth: !isFullWidth
-                });
-                // @ts-ignore
-                setPages((_pages) => ({ ..._pages, [basePageId]: { ...basePage, fullWidth: !isFullWidth } }));
-              }}
+              onChange={onSwitchChange}
             />
           )}
           label={<Typography variant='body2'>Full Width</Typography>}

@@ -3,14 +3,14 @@ import { PageOperations } from '@prisma/client';
 import charmClient from 'charmClient';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import type { Block } from 'lib/focalboard/block';
-import type { IPageWithPermissions, PagesMap } from 'lib/pages';
+import type { IPageWithPermissions, PagesMap, PageUpdates } from 'lib/pages';
 import type { IPagePermissionFlags, PageOperationType } from 'lib/permissions/pages';
 import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 import { permissionTemplates } from 'lib/permissions/pages/page-permission-mapping';
 import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
+import { useCallback, createContext, useContext, useMemo, useState } from 'react';
 import * as React from 'react';
-import { createContext, useContext, useMemo, useState } from 'react';
 import { untitledPage } from 'seedData';
 import useSWR from 'swr';
 import { useCurrentSpace } from './useCurrentSpace';
@@ -19,13 +19,18 @@ import { useUser } from './useUser';
 
 export type LinkedPage = (Page & {children: LinkedPage[], parent: null | LinkedPage});
 
+export type PageUpdater = (updates: PageUpdates, revalidate?: boolean) => Promise<IPageWithPermissions>
+
 export type PagesContext = {
   currentPageId: string,
   pages: PagesMap,
   setPages: Dispatch<SetStateAction<PagesMap>>,
   setCurrentPageId: Dispatch<SetStateAction<string>>,
-  refreshPage: (pageId: string) => Promise<IPageWithPermissions>
-  deletePage: (data: {pageId: string, board?: Block}) => Promise<void>
+  refreshPage: (pageId: string) => Promise<IPageWithPermissions>,
+  updatePage: PageUpdater,
+  mutatePage: (updates: PageUpdates, revalidate?: boolean) => void,
+  mutatePagesRemove: (pageIds: string[], revalidate?: boolean) => void,
+  deletePage: (data: {pageId: string, board?: Block}) => Promise<void>,
   getPagePermissions: (pageId: string, page?: IPageWithPermissions) => IPagePermissionFlags,
 };
 
@@ -38,6 +43,9 @@ export const PagesContext = createContext<Readonly<PagesContext>>({
   setPages: () => undefined,
   getPagePermissions: () => new AllowedPagePermissions(),
   refreshPage: () => Promise.resolve({} as any),
+  updatePage: () => Promise.resolve({} as any),
+  mutatePage: () => {},
+  mutatePagesRemove: () => {},
   deletePage: () => Promise.resolve({} as any)
 });
 
@@ -164,12 +172,36 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     }
   }
 
+  const mutatePage = useCallback((page: PageUpdates, revalidate = false) => {
+    mutate(pagesData => {
+      const currentPageData = pagesData?.[page.id];
+      if (pagesData) {
+        const updatedData: IPageWithPermissions = currentPageData ? { ...currentPageData, ...page } : page as IPageWithPermissions;
+        return { ...pagesData, [page.id]: updatedData };
+      }
+    }, { revalidate });
+  }, [mutate]);
+
+  const mutatePagesRemove = useCallback((pageIds: string[], revalidate = false) => {
+    mutate(pagesData => {
+      if (pagesData) {
+        const udpatedData = { ...pagesData };
+        pageIds.forEach(id => delete udpatedData[id]);
+        return udpatedData;
+      }
+    }, { revalidate });
+  }, [mutate]);
+
+  const updatePage = useCallback(async (updates: PageUpdates, revalidateCache = false) => {
+    const updatedPage = await charmClient.updatePage(updates);
+    mutatePage(updatedPage, revalidateCache);
+
+    return updatedPage;
+  }, [mutatePage]);
+
   async function refreshPage (pageId: string): Promise<IPageWithPermissions> {
     const freshPageVersion = await charmClient.getPage(pageId);
-    _setPages(_pages => ({
-      ..._pages,
-      [freshPageVersion.id]: freshPageVersion
-    }));
+    mutatePage(freshPageVersion);
 
     return freshPageVersion;
   }
@@ -181,7 +213,10 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     setCurrentPageId,
     setPages: _setPages,
     getPagePermissions,
-    refreshPage
+    refreshPage,
+    updatePage,
+    mutatePage,
+    mutatePagesRemove
   }), [currentPageId, router, pages, user]);
 
   return (

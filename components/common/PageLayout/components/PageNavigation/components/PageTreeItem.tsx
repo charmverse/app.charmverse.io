@@ -15,7 +15,6 @@ import ListItemButton from '@mui/material/ListItemButton';
 import Tooltip from '@mui/material/Tooltip';
 import type { Page, PageType } from '@prisma/client';
 import { isTouchScreen } from 'lib/browser';
-import charmClient from 'charmClient';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
@@ -25,7 +24,6 @@ import type { Identifier } from 'dnd-core';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { IPageWithPermissions } from 'lib/pages';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import Link from 'next/link';
 import type { ReactNode, SyntheticEvent } from 'react';
@@ -216,26 +214,17 @@ export function PageLink ({ showPicker = !isTouchScreen(), children, href, label
 }
 
 function EmojiMenu ({ popupState, pageId, pageType }: { popupState: any, pageId: string, pageType?: Page['type'] }) {
-  const { setPages } = usePages();
+  const { updatePage } = usePages();
   const onSelectEmoji = useCallback(async (emoji: string) => {
     if (pageId) {
-      await charmClient.updatePage({
-        id: pageId,
-        icon: emoji
-      });
-      setPages(_pages => ({
-        ..._pages,
-        [pageId]: {
-          ..._pages[pageId] as IPageWithPermissions,
-          icon: emoji
-        }
-      }));
+      updatePage({ id: pageId, icon: emoji });
+
       if (pageType === 'board') {
         mutator.changeIcon(pageId, emoji, emoji);
       }
     }
     popupState.close();
-  }, [pageId, setPages]);
+  }, [pageId, updatePage]);
 
   return (
     <Menu

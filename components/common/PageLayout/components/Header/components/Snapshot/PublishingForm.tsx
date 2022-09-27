@@ -51,7 +51,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
   // Ensure we don't show any UI until we are done checking
   const [checksComplete, setChecksComplete] = useState(false);
 
-  const { pages, setPages } = usePages();
+  const { mutatePage } = usePages();
 
   const [configurationError, setConfigurationError] = useState<SystemError | null>(null);
 
@@ -222,10 +222,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
       snapshotProposalId: receipt.id
     });
 
-    setPages({
-      ...pages,
-      [page.id]: updatedPage
-    });
+    mutatePage(updatedPage);
 
     onSubmit();
     setPublishing(false);

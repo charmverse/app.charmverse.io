@@ -86,7 +86,7 @@ function CenterPanel (props: Props) {
 
   const router = useRouter();
   const [space] = useCurrentSpace();
-  const { pages } = usePages();
+  const { pages, updatePage } = usePages();
   const _groupByProperty = useAppSelector(getCurrentViewGroupBy);
   const _dateDisplayProperty = useAppSelector(getCurrentViewDisplayBy);
   const boards = useAppSelector(getSortedBoards);
@@ -402,7 +402,7 @@ function CenterPanel (props: Props) {
   }
 
   async function createDatabase () {
-    const { view } = await convertToInlineBoard({ board });
+    const { view } = await convertToInlineBoard({ board, updatePage });
     showView(view.id);
   }
 
