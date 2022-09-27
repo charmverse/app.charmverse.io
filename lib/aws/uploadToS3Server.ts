@@ -4,7 +4,6 @@
 import type { PutObjectCommandInput } from '@aws-sdk/client-s3';
 import { S3Client } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
-import fetch from 'node-fetch';
 import { v4 as uuid } from 'uuid';
 
 const client = new S3Client({
