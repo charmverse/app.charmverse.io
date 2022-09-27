@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { mutate } from 'swr';
 
-const StyledPageDeleteBanner = styled(Box)<{card?: boolean}>`
+const StyledPageDeleteBanner = styled(Box)<{ card?: boolean }>`
   position: fixed;
   top: ${({ card }) => card ? '50px' : '55px'};
   width: ${({ card }) => card ? '100%' : 'calc(100% - 300px)'};
@@ -18,7 +18,7 @@ const StyledPageDeleteBanner = styled(Box)<{card?: boolean}>`
   padding: ${({ theme }) => theme.spacing(1)};
 `;
 
-export default function PageDeleteBanner ({ pageId }: {pageId: string}) {
+export default function PageDeleteBanner ({ pageId }: { pageId: string }) {
   const [isMutating, setIsMutating] = useState(false);
   const [space] = useCurrentSpace();
   const router = useRouter();

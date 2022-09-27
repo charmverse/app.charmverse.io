@@ -14,10 +14,10 @@ export type PermissionAssigneeId<A extends AssignablePermissionGroups = 'any'> =
     roleId?: string | null | undefined;
     userId?: string | null| undefined;
   }
-  : A extends 'user' ? {userId: string; roleId?: undefined | null; spaceId?: undefined | null}
+  : A extends 'user' ? { userId: string, roleId?: undefined | null, spaceId?: undefined | null }
   // Default case for when we don't know yet
-  : A extends 'role' ? {userId?: undefined | null; roleId: string; spaceId?: undefined | null}
-  : A extends 'space' ? {userId?: undefined | null; roleId?: undefined | null; spaceId: string}
+  : A extends 'role' ? { userId?: undefined | null, roleId: string, spaceId?: undefined | null }
+  : A extends 'space' ? { userId?: undefined | null, roleId?: undefined | null, spaceId: string }
   : never
 
 export type PermissionAssignee<A extends AssignablePermissionGroups = 'any'> =
@@ -27,9 +27,9 @@ export type PermissionAssignee<A extends AssignablePermissionGroups = 'any'> =
     user?: User;
   }
   // Default case for when we don't know yet
-  : A extends 'user' ? {user: User; role?: null | undefined; space?: null | undefined}
-  : A extends 'role' ? {user?: null | undefined; role: Role; space?: null | undefined}
-  : A extends 'space' ? {user?: null | undefined; role?: null | undefined; space: Space}
+  : A extends 'user' ? { user: User, role?: null | undefined, space?: null | undefined }
+  : A extends 'role' ? { user?: null | undefined, role: Role, space?: null | undefined }
+  : A extends 'space' ? { user?: null | undefined, role?: null | undefined, space: Space }
   : never
 
 /**
@@ -70,7 +70,7 @@ export type TargetPermissionGroup<G extends Exclude<AssignablePermissionGroupsWi
 
 // A permission mapping is a mapping of a permission group to a list of operations
 // Example is page permission {editor: ['view', 'edit', 'comment']}
-export type OperationGroupMapping<G extends string, O extends string> = {[key in G]: Readonly<O[]>}
+export type OperationGroupMapping<G extends string, O extends string> = { [key in G]: Readonly<O[]> }
 
 /**
  * @publicOnly If true, ensures that authenticated requests will be treated as unauthenticated requests, only returning publicly available resources

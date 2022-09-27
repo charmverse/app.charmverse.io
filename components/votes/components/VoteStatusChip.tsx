@@ -2,7 +2,7 @@ import type { ComponentProps } from 'react';
 import { Chip } from '@mui/material';
 import type { VoteStatus } from '@prisma/client';
 
-const VoteStatusConfig: Record<VoteStatus | 'Draft', { label: string; color: ComponentProps<typeof Chip>['color'] }> = {
+const VoteStatusConfig: Record<VoteStatus | 'Draft', { label: string, color: ComponentProps<typeof Chip>['color'] }> = {
   Cancelled: {
     label: 'Cancelled',
     color: 'gray'

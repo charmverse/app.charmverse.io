@@ -130,7 +130,7 @@ export async function getProposalTasks (userId: string): Promise<{
 
   const userNotificationIds = new Set(userNotifications.map(userNotification => userNotification.taskId));
 
-  const proposalsRecord: {marked: ProposalTask[]; unmarked: ProposalTask[]} = {
+  const proposalsRecord: { marked: ProposalTask[], unmarked: ProposalTask[] } = {
     marked: [],
     unmarked: []
   };

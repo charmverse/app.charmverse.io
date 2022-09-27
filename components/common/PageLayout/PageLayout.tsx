@@ -36,7 +36,7 @@ const closedMixin = (theme: Theme) => ({
   width: 0
 }) as const;
 
-export const AppBar = styled(MuiAppBar, { shouldForwardProp: (prop: string) => prop !== 'sidebarWidth' && prop !== 'open' })<{ open: boolean; sidebarWidth: number }>`
+export const AppBar = styled(MuiAppBar, { shouldForwardProp: (prop: string) => prop !== 'sidebarWidth' && prop !== 'open' })<{ open: boolean, sidebarWidth: number }>`
 
   background: transparent;
   box-shadow: none;
@@ -60,7 +60,7 @@ export const AppBar = styled(MuiAppBar, { shouldForwardProp: (prop: string) => p
 const Drawer = styled(MuiDrawer, { shouldForwardProp: prop => prop !== 'open' && prop !== 'sidebarWidth' })
   // @ts-ignore mixin isnt typesafe
   // eslint-disable-next-line no-unexpected-multiline
-  <{ open: boolean; sidebarWidth: number }>(({ sidebarWidth, theme, open }) => ({
+  <{ open: boolean, sidebarWidth: number }>(({ sidebarWidth, theme, open }) => ({
     width: sidebarWidth,
     flexShrink: 0,
     whiteSpace: 'nowrap',

@@ -56,7 +56,7 @@ const StyledProposalStatusChip = styled(Chip)<{ status: ProposalStatus }>`
 export function ProposalStatusChip ({
   status,
   size = 'small'
-}: { size?: ChipProps['size']; status: ProposalStatus }) {
+}: { size?: ChipProps['size'], status: ProposalStatus }) {
   return (
     <StyledProposalStatusChip
       size={size}

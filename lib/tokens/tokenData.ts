@@ -17,7 +17,7 @@ export interface ITokenMetadata {
   logo?: string;
 }
 
-export type TokenInfo = Pick<PaymentMethod, 'tokenName' | 'tokenSymbol' | 'tokenLogo'> & {isContract: boolean};
+export type TokenInfo = Pick<PaymentMethod, 'tokenName' | 'tokenSymbol' | 'tokenLogo'> & { isContract: boolean };
 
 /**
  * Call external provider to get information about a specific cryptocurrency
@@ -83,8 +83,8 @@ export function getTokenInfo (paymentMethods: PaymentMethod[], symbolOrAddress: 
   return tokenInfo;
 }
 
-type TokenAndChain = TokenInfo & { chain: IChainDetails; canonicalLogo: string };
-type getTokenAndChainInfoFromPaymentsProps = { chainId: number; methods: PaymentMethod[]; symbolOrAddress: string }
+type TokenAndChain = TokenInfo & { chain: IChainDetails, canonicalLogo: string };
+type getTokenAndChainInfoFromPaymentsProps = { chainId: number, methods: PaymentMethod[], symbolOrAddress: string }
 
 export function getTokenAndChainInfoFromPayments ({ chainId, methods, symbolOrAddress }: getTokenAndChainInfoFromPaymentsProps): TokenAndChain {
   const paymentMethod = methods.find(method => (

@@ -22,7 +22,8 @@ export function includePagePermissions (): Prisma.PageInclude & {
   };
 }
 
-export function accessiblePagesByPermissionsQuery ({ spaceId, userId }: {spaceId: string; userId: string}): Prisma.PagePermissionListRelationFilter {
+export function accessiblePagesByPermissionsQuery ({ spaceId, userId }:
+  { spaceId: string, userId: string }): Prisma.PagePermissionListRelationFilter {
   return {
     some: {
       OR: [

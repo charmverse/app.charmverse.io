@@ -12,7 +12,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).delete(deleteBlock);
 
-async function deleteBlock (req: NextApiRequest, res: NextApiResponse<{deletedCount: number; rootBlock: Block} | {error: string}>) {
+async function deleteBlock (req: NextApiRequest, res: NextApiResponse<{ deletedCount: number, rootBlock: Block } | { error: string }>) {
   const blockId = req.query.id as string;
   const userId = req.session.user.id as string;
 

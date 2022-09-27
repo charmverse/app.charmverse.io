@@ -69,7 +69,7 @@ export interface IBountyBadgeProps {
 export function BountyStatusChip ({
   status,
   size = 'small'
-}: { size?: ChipProps['size']; status: BountyStatus }) {
+}: { size?: ChipProps['size'], status: BountyStatus }) {
   return (
     <StyledBountyStatusChip
       size={size}
@@ -124,7 +124,7 @@ export default function BountyStatusBadgeWrapper ({ truncate = false, hideStatus
   }
 }
 
-export function BountyAmount ({ bounty, truncate = false }: { bounty: Pick<Bounty, 'rewardAmount' | 'rewardToken' | 'chainId'>; truncate?: boolean }) {
+export function BountyAmount ({ bounty, truncate = false }: { bounty: Pick<Bounty, 'rewardAmount' | 'rewardToken' | 'chainId'>, truncate?: boolean }) {
 
   const [paymentMethods] = usePaymentMethods();
   const tokenInfo = getTokenAndChainInfoFromPayments({

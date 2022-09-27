@@ -3,7 +3,7 @@ import { VoteType } from '@prisma/client';
 
 const YES_OPTION = 'Yes';
 
-export const getVotesByState = (votes: (Omit<Vote, 'pageId' | 'status' | 'createdBy' | 'context'> & {userVotes: (Pick<UserVote, 'choice'>)[]; voteOptions: VoteOptions[]})[]) => {
+export const getVotesByState = (votes: (Omit<Vote, 'pageId' | 'status' | 'createdBy' | 'context'> & { userVotes: (Pick<UserVote, 'choice'>)[], voteOptions: VoteOptions[] })[]) => {
 
   const passedVotes: string[] = [];
   const rejectedVotes: string[] = [];

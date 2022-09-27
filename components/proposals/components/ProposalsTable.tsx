@@ -14,7 +14,7 @@ import { ProposalStatusChip } from './ProposalStatusBadge';
 import NoProposalsMessage from './NoProposalsMessage';
 import ProposalActionsMenu from './ProposalActionsMenu';
 
-export default function ProposalsTable ({ proposals, mutateProposals }: { proposals?: (ProposalWithUsers)[]; mutateProposals: () => void }) {
+export default function ProposalsTable ({ proposals, mutateProposals }: { proposals?: (ProposalWithUsers)[], mutateProposals: () => void }) {
   const { pages, deletePage } = usePages();
   const { mutate: mutateTasks } = useTasks();
   const { showPage } = usePageDialog();

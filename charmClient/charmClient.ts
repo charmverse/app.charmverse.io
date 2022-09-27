@@ -127,7 +127,7 @@ class CharmClient {
     return http.GET<Space[]>('/api/spaces');
   }
 
-  checkDomain (params: { spaceId?: string; domain: string }) {
+  checkDomain (params: { spaceId?: string, domain: string }) {
     return http.GET<CheckDomainResponse>('/api/spaces/checkDomain', params);
   }
 
@@ -135,11 +135,11 @@ class CharmClient {
     return http.GET<Contributor[]>(`/api/spaces/${spaceId}/contributors`);
   }
 
-  updateContributor ({ spaceId, userId, isAdmin }: { spaceId: string; userId: string; isAdmin: boolean }) {
+  updateContributor ({ spaceId, userId, isAdmin }: { spaceId: string, userId: string, isAdmin: boolean }) {
     return http.PUT<Contributor[]>(`/api/spaces/${spaceId}/contributors/${userId}`, { isAdmin });
   }
 
-  removeContributor ({ spaceId, userId }: { spaceId: string; userId: string }) {
+  removeContributor ({ spaceId, userId }: { spaceId: string, userId: string }) {
     return http.DELETE<Contributor[]>(`/api/spaces/${spaceId}/contributors/${userId}`);
   }
 
@@ -207,7 +207,7 @@ class CharmClient {
     return http.GET('/api/profile/gnosis-safes');
   }
 
-  updateMyGnosisSafe (wallet: { id: string; name: string }): Promise<UserGnosisSafe[]> {
+  updateMyGnosisSafe (wallet: { id: string, name: string }): Promise<UserGnosisSafe[]> {
     return http.PUT(`/api/profile/gnosis-safes/${wallet.id}`, wallet);
   }
 
@@ -235,8 +235,8 @@ class CharmClient {
     return http.POST<InviteLinkPopulated[]>(`/api/invites/${id}`);
   }
 
-  importFromNotion (payload: { code: string; spaceId: string }) {
-    return http.POST<{failedImports: FailedImportsError[]}>('/api/notion/import', payload);
+  importFromNotion (payload: { code: string, spaceId: string }) {
+    return http.POST<{ failedImports: FailedImportsError[] }>('/api/notion/import', payload);
   }
 
   connectTelegram (telegramAccount: TelegramAccount) {
@@ -260,7 +260,7 @@ class CharmClient {
   }
 
   importRolesFromGuild (payload: ImportGuildRolesPayload) {
-    return http.POST<{importedRolesCount: number}>('/api/guild-xyz/importRoles', payload);
+    return http.POST<{ importedRolesCount: number }>('/api/guild-xyz/importRoles', payload);
   }
 
   async getWorkspaceUsers (spaceId: string): Promise<IUser[]> {
@@ -331,7 +331,7 @@ class CharmClient {
   }
 
   async deleteBlock (blockId: string, updater: BlockUpdater): Promise<void> {
-    const { rootBlock } = await http.DELETE<{deletedCount: number; rootBlock: Block}>(`/api/blocks/${blockId}`);
+    const { rootBlock } = await http.DELETE<{ deletedCount: number, rootBlock: Block }>(`/api/blocks/${blockId}`);
     const fbBlock = this.blockToFBBlock(rootBlock);
     fbBlock.deletedAt = new Date().getTime();
     updater([fbBlock]);
@@ -381,7 +381,7 @@ class CharmClient {
   }
 
   // AWS
-  uploadToS3 (file: File): Promise<{ token: any; bucket: string; key: string; region: string }> {
+  uploadToS3 (file: File): Promise<{ token: any, bucket: string, key: string, region: string }> {
     return http.GET('/api/aws/s3-upload', { filename: encodeFilename(file.name) });
   }
 
@@ -407,7 +407,7 @@ class CharmClient {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  verifyTokenGate (verification: Omit<TokenGateVerification, 'userId'>): Promise<{ error?: string; success?: boolean }> {
+  verifyTokenGate (verification: Omit<TokenGateVerification, 'userId'>): Promise<{ error?: string, success?: boolean }> {
 
     return http.POST('/api/token-gates/verify', verification);
   }
@@ -421,8 +421,8 @@ class CharmClient {
   //   return http.POST(`/api/token-gates/${id}/verify`, { jwt });
   // }
 
-  unlockTokenGate ({ id, jwt }: { id: string; jwt: string }):
-    Promise<{ error?: string; success?: boolean; space: Space }> {
+  unlockTokenGate ({ id, jwt }: { id: string, jwt: string }):
+    Promise<{ error?: string, success?: boolean, space: Space }> {
 
     return http.POST(`/api/token-gates/${id}/verify`, { commit: true, jwt });
   }
@@ -475,11 +475,11 @@ class CharmClient {
     return http.GET('/api/roles', { spaceId });
   }
 
-  assignRole (data: {spaceId: string; roleId: string; userId: string}): Promise<Role []> {
+  assignRole (data: { spaceId: string, roleId: string, userId: string }): Promise<Role []> {
     return http.POST('/api/roles/assignment', data);
   }
 
-  unassignRole (data: {spaceId: string; roleId: string; userId: string}): Promise<Role []> {
+  unassignRole (data: { spaceId: string, roleId: string, userId: string }): Promise<Role []> {
     return http.DELETE('/api/roles/assignment', data);
   }
 
@@ -502,7 +502,7 @@ class CharmClient {
     return http.DELETE('/api/permissions', { permissionId });
   }
 
-  restrictPagePermissions ({ pageId }: {pageId: string}): Promise<IPageWithPermissions> {
+  restrictPagePermissions ({ pageId }: { pageId: string }): Promise<IPageWithPermissions> {
     return http.POST(`/api/pages/${pageId}/restrict-permissions`, {});
   }
 
@@ -531,7 +531,7 @@ class CharmClient {
     });
   }
 
-  computeUserSpacePermissions ({ spaceId }: {spaceId: string}): Promise<SpacePermissionFlags> {
+  computeUserSpacePermissions ({ spaceId }: { spaceId: string }): Promise<SpacePermissionFlags> {
     return http.GET<SpacePermissionFlags>(`/api/permissions/space/${spaceId}/compute`);
   }
 
@@ -571,7 +571,7 @@ class CharmClient {
     return http.PUT(`/api/spaces/${spaceId}/snapshot`, data);
   }
 
-  setDefaultPagePermission ({ spaceId, pagePermissionLevel }:{spaceId: string; pagePermissionLevel: PagePermissionLevel | null}) {
+  setDefaultPagePermission ({ spaceId, pagePermissionLevel }:{ spaceId: string, pagePermissionLevel: PagePermissionLevel | null }) {
     return http.POST<Space>(`/api/spaces/${spaceId}/set-default-page-permissions`, {
       pagePermissionLevel
     });

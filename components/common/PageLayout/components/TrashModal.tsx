@@ -18,7 +18,7 @@ import { mutate } from 'swr';
 import { useRouter } from 'next/router';
 import PageIcon from './PageIcon';
 
-const PageArchivedDate = memo<{date: Date; title: string}>(({ date, title }) => {
+const PageArchivedDate = memo<{ date: Date, title: string }>(({ date, title }) => {
   return (
     <ListItemText secondary={DateTime.fromJSDate(new Date(date)).toRelative({ base: (DateTime.now()) })}>
       {fancyTrim(title, 34) || 'Untitled'}
@@ -68,7 +68,7 @@ const ArchivedPageItem = memo<
       );
     });
 
-export default function TrashModal ({ onClose, isOpen }: {onClose: () => void; isOpen: boolean}) {
+export default function TrashModal ({ onClose, isOpen }: { onClose: () => void, isOpen: boolean }) {
   const [archivedPages, setArchivedPages] = useState<Record<string, Page>>({});
   const [isMutating, setIsMutating] = useState(false);
   const [searchText, setSearchText] = useState('');

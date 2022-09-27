@@ -56,7 +56,7 @@ async function getUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser |
   return res.status(200).json(profile);
 }
 
-async function updateUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | {error: string}>) {
+async function updateUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: string }>) {
 
   const user = await prisma.user.update({
     where: {

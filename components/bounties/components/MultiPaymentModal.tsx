@@ -33,7 +33,7 @@ interface TransactionWithMetadata extends MetaTransactionData, Pick<Bounty, 'rew
   title: string;
 }
 
-export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDetails[]}) {
+export default function MultiPaymentModal ({ bounties }: { bounties: BountyWithDetails[] }) {
   const [isLoading, setIsLoading] = useState(false);
   const { setBounties, setCurrentBounty, currentBountyId } = useBounties();
   const popupState = usePopupState({ variant: 'popover', popupId: 'multi-payment-modal' });

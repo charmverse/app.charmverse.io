@@ -19,13 +19,13 @@ export const schema = yup.object({
 export type FormValues = yup.InferType<typeof schema>;
 
 interface FormProps {
-  defaultValues?: { name: string; domain: string };
+  defaultValues?: { name: string, domain: string };
   onClose?: () => void;
   onSubmit: (values: FormValues) => void;
   submitText?: string;
 }
 
-const maxAgeOptions: { value: FormValues['maxAgeMinutes']; label: string }[] = [
+const maxAgeOptions: { value: FormValues['maxAgeMinutes'], label: string }[] = [
   { value: 1 * 30, label: '30 minutes' },
   { value: 1 * 60, label: '1 hour' },
   { value: 6 * 60, label: '6 hours' },
@@ -35,7 +35,7 @@ const maxAgeOptions: { value: FormValues['maxAgeMinutes']; label: string }[] = [
   { value: -1, label: 'Never' }
 ];
 
-const maxUsesOptions: { value: FormValues['maxUses']; label: string }[] = [
+const maxUsesOptions: { value: FormValues['maxUses'], label: string }[] = [
   { value: -1, label: 'No limit' },
   { value: 1, label: '1 use' },
   { value: 5, label: '5 uses' },

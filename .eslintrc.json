@@ -37,7 +37,22 @@
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-inferrable-types": "off",
     "@typescript-eslint/no-empty-interface": "off",
-    "@typescript-eslint/member-delimiter-style": "error",
+    "@typescript-eslint/member-delimiter-style": [
+      "error",
+      {
+        "multiline": {
+          "delimiter": "semi",
+          "requireLast": true
+        },
+        "singleline": {
+          "delimiter": "comma",
+          "requireLast": false
+        },
+        "multilineDetection": "brackets"
+      }
+    ],
+    "@typescript-eslint/object-curly-spacing": ["error", "always"],
+    "object-curly-spacing": "off",
     "arrow-body-style": "off",
     "arrow-parens": "off",
     "brace-style": [

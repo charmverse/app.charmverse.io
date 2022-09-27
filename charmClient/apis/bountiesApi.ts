@@ -24,7 +24,7 @@ export class BountiesApi {
     return http.GET(`/api/bounties/${resourceId}/permissions`);
   }
 
-  reviewSuggestion ({ bountyId, decision }: SuggestionAction): Promise<BountyWithDetails | {success: true}> {
+  reviewSuggestion ({ bountyId, decision }: SuggestionAction): Promise<BountyWithDetails | { success: true }> {
     return http.POST<BountyWithDetails>(`/api/bounties/${bountyId}/review-suggestion`, { decision });
   }
 
@@ -68,7 +68,7 @@ export class BountiesApi {
     return http.POST<Application>('/api/submissions', content);
   }
 
-  updateSubmission ({ submissionId, content }: { submissionId: string; content: SubmissionContent }): Promise<Application> {
+  updateSubmission ({ submissionId, content }: { submissionId: string, content: SubmissionContent }): Promise<Application> {
     return http.PUT<Application>(`/api/submissions/${submissionId}`, content);
   }
 

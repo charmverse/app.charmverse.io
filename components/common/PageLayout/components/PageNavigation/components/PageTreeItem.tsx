@@ -215,7 +215,7 @@ export function PageLink ({ showPicker = !isTouchScreen(), children, href, label
   );
 }
 
-function EmojiMenu ({ popupState, pageId, pageType }: { popupState: any; pageId: string; pageType?: Page['type'] }) {
+function EmojiMenu ({ popupState, pageId, pageType }: { popupState: any, pageId: string, pageType?: Page['type'] }) {
   const { setPages } = usePages();
   const onSelectEmoji = useCallback(async (emoji: string) => {
     if (pageId) {
@@ -384,7 +384,7 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
   );
 });
 
-function PageActionsMenu ({ closeMenu, pageId, pagePath }: { closeMenu: () => void; pageId: string; pagePath: string }) {
+function PageActionsMenu ({ closeMenu, pageId, pagePath }: { closeMenu: () => void, pageId: string, pagePath: string }) {
   const boards = useAppSelector(getSortedBoards);
   const { deletePage, getPagePermissions, pages } = usePages();
   const { showMessage } = useSnackbar();

@@ -58,7 +58,7 @@ export class SpaceNotFoundError extends SystemError {
  */
 export class InvalidCustomPropertyKeyError extends SystemError<UnsupportedKeyDetails> {
 
-  constructor (errorInfo: {key: string | string []; boardSchema: PageProperty []}) {
+  constructor (errorInfo: { key: string | string [], boardSchema: PageProperty [] }) {
 
     const allowedKeys = errorInfo.boardSchema.reduce((keys: string [], schema) => {
       keys.push(schema.name);
@@ -95,9 +95,9 @@ export class InvalidCustomPropertyKeyError extends SystemError<UnsupportedKeyDet
 /**
  * Used when an option does not exist in a list
  */
-export class InvalidCustomPropertyValueError extends SystemError<{validOptions: any []}> {
+export class InvalidCustomPropertyValueError extends SystemError<{ validOptions: any [] }> {
 
-  constructor (errorInfo: {key: string; value: any; boardSchema: PageProperty []}) {
+  constructor (errorInfo: { key: string, value: any, boardSchema: PageProperty [] }) {
 
     const allowedValues = errorInfo.boardSchema.find(schema => schema.name === errorInfo.key)?.options.map(opt => opt.value) ?? [];
 

@@ -8,9 +8,9 @@ export * from 'lib/permissions/bounties/interfaces';
 
 export type BountyCreationData = Pick<Bounty, 'spaceId' | 'createdBy'>
   & Partial<Pick<Bounty, 'status'| 'chainId'| 'approveSubmitters'| 'maxSubmissions'| 'rewardAmount'| 'rewardToken'>>
-  & {permissions?: Partial<BountyPermissions>; pageType?: PageType; linkedPageId?: string};
+  & { permissions?: Partial<BountyPermissions>, pageType?: PageType, linkedPageId?: string };
 
-export type UpdateableBountyFields = Partial<Pick<Bounty, 'chainId' | 'rewardAmount' | 'rewardToken' | 'approveSubmitters' | 'maxSubmissions'>> & {permissions?: Partial<BountyPermissions>}
+export type UpdateableBountyFields = Partial<Pick<Bounty, 'chainId' | 'rewardAmount' | 'rewardToken' | 'approveSubmitters' | 'maxSubmissions'>> & { permissions?: Partial<BountyPermissions> }
 
 export interface BountyUpdate {
   bountyId: string;
@@ -33,7 +33,7 @@ export type SuggestionAction = SuggestionApproveAction | SuggestionRejectAction
 /**
  * Calculate pool for resource permissions as is, or pass simulated permissions to calculate pool
  */
-export type BountySubmitterPoolCalculation = Partial<Resource & {permissions: Partial<BountyPermissions>}>
+export type BountySubmitterPoolCalculation = Partial<Resource & { permissions: Partial<BountyPermissions> }>
 
 /**
  * Used to represent how many potential applicants exist.

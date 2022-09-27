@@ -54,7 +54,7 @@ export function DELETE<T> (
 export function POST<T> (
   requestURL: string,
   data: Params | string = {},
-  { headers = {}, noHeaders, skipStringifying }: { headers?: any; noHeaders?: boolean; skipStringifying?: boolean } = {}
+  { headers = {}, noHeaders, skipStringifying }: { headers?: any, noHeaders?: boolean, skipStringifying?: boolean } = {}
 ): Promise<T> {
   return fetch<T>(
     requestURL,

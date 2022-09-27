@@ -45,7 +45,7 @@ const StyledPageTitle = styled(Typography)`
   max-width: 500px;
 ` as typeof Typography;
 
-function PageTitle ({ children, sx = {} }: { children: ReactNode; sx?: object }) {
+function PageTitle ({ children, sx = {} }: { children: ReactNode, sx?: object }) {
   return (
     <StyledPageTitle noWrap component='div' sx={sx}>
       {children}
@@ -185,7 +185,7 @@ function EmptyPageTitle () {
   return <div></div>;
 }
 
-export default function PageTitleWithBreadcrumbs ({ pageId }: { pageId?: string}) {
+export default function PageTitleWithBreadcrumbs ({ pageId }: { pageId?: string }) {
   const router = useRouter();
   const [space] = useCurrentSpace();
 

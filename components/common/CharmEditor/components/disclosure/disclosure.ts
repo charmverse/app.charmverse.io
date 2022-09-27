@@ -62,7 +62,7 @@ export function plugins (): RawPlugins {
   };
 }
 
-function ContainerPlugin ({ type, contentDOM }: { type: string; contentDOM: DOMOutputSpec }) {
+function ContainerPlugin ({ type, contentDOM }: { type: string, contentDOM: DOMOutputSpec }) {
   return new Plugin({
     key: new PluginKey(`${type}-NodeView`),
     props: {

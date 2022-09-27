@@ -107,16 +107,16 @@ export function charmEditorPlugins (
     username = null
   }:
     {
-      spaceId?: string | null,
-      pageId?: string | null,
-      userId?: string | null,
-      readOnly?: boolean,
-      onContentChange?: (view: EditorView, prevDoc: EditorState['doc']) => void,
-      onSelectionSet?: (state: EditorState) => void,
-      disablePageSpecificFeatures?: boolean,
-      enableVoting?: boolean,
-      enableComments?: boolean,
-      username?: string | null
+      spaceId?: string | null;
+      pageId?: string | null;
+      userId?: string | null;
+      readOnly?: boolean;
+      onContentChange?: (view: EditorView, prevDoc: EditorState['doc']) => void;
+      onSelectionSet?: (state: EditorState) => void;
+      disablePageSpecificFeatures?: boolean;
+      enableVoting?: boolean;
+      enableComments?: boolean;
+      username?: string | null;
     } = {}
 ): () => RawPlugins[] {
 
@@ -245,7 +245,7 @@ export function charmEditorPlugins (
   return () => basePlugins;
 }
 
-const StyledReactBangleEditor = styled(ReactBangleEditor)<{disablePageSpecificFeatures?: boolean}>`
+const StyledReactBangleEditor = styled(ReactBangleEditor)<{ disablePageSpecificFeatures?: boolean }>`
   position: relative;
 
   /** DONT REMOVE THIS STYLING */
@@ -521,7 +521,7 @@ function CharmEditor (
             return <LayoutColumn node={props.node}>{_children}</LayoutColumn>;
           }
           case 'cryptoPrice': {
-            const attrs = props.attrs as { base: null | CryptoCurrency; quote: null | FiatCurrency };
+            const attrs = props.attrs as { base: null | CryptoCurrency, quote: null | FiatCurrency };
             return (
               <CryptoPrice
                 preset={{

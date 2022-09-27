@@ -84,7 +84,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   }, [isLoading, account, user, spaces]);
 
   // authCheck runs before each page load and redirects to login if user is not logged in
-  async function authCheck (url: string): Promise<{ authorized: boolean; redirect?: UrlObject; user?: User }> {
+  async function authCheck (url: string): Promise<{ authorized: boolean, redirect?: UrlObject, user?: User }> {
     const path = url.split('?')[0];
 
     const firstPathSegment = path.split('/').filter(pathElem => {

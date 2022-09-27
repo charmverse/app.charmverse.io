@@ -9,7 +9,7 @@ import type { ApplicationWithTransactions } from '../interfaces';
  */
 export async function listAccessibleApplications (
   { bountyId, spaceId, userId }:
-    { bountyId: string; userId: string; spaceId: string }
+    { bountyId: string, userId: string, spaceId: string }
 ): Promise<ApplicationWithTransactions[]> {
 
   return prisma.application.findMany({

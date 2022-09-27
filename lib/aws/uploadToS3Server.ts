@@ -15,7 +15,7 @@ const client = new S3Client({
   region: process.env.S3_UPLOAD_REGION
 });
 
-export async function uploadToS3 ({ fileName, url }: { fileName: string; url: string }) {
+export async function uploadToS3 ({ fileName, url }: { fileName: string, url: string }) {
 
   const bucket = process.env.S3_UPLOAD_BUCKET;
 
@@ -45,10 +45,10 @@ function generateFilename (url: string) {
   return decodeURIComponent(new URL(url).pathname.split('/').pop() || '')?.replace(/\s/g, '-') || uuid();
 }
 
-export function getFilePath ({ spaceId, url }: { spaceId: string; url: string }) {
+export function getFilePath ({ spaceId, url }: { spaceId: string, url: string }) {
   return `spaces/${spaceId}/${uuid()}/${generateFilename(url)}`;
 }
 
-export function getUserS3Folder ({ userId, url }: { userId: string; url: string }) {
+export function getUserS3Folder ({ userId, url }: { userId: string, url: string }) {
   return `user-content/${userId}/${uuid()}/${generateFilename(url)}`;
 }

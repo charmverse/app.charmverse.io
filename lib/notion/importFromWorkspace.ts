@@ -32,7 +32,7 @@ function convertRichText (richTexts: RichTextItemResponse[]): {
   const inlineLinkedPages: MentionNode[] = [];
 
   richTexts.forEach((richText) => {
-    const marks: { type: string; attrs?: Record<string, string> }[] = [];
+    const marks: { type: string, attrs?: Record<string, string> }[] = [];
     if (richText.type !== 'mention') {
       if (richText.annotations.strikethrough) {
         marks.push({ type: 'strike' });
@@ -107,7 +107,7 @@ interface ChildBlockListResponse {
   next_cursor: string | null;
 }
 
-type BlockWithChildren = BlockObjectResponse & { children: string[]; pageId: string };
+type BlockWithChildren = BlockObjectResponse & { children: string[], pageId: string };
 
 // eslint-disable-next-line
 const BlocksWithChildrenRegex = /(heading_1|heading_2|heading_3|table|toggle|bulleted_list_item|callout|numbered_list_item|to_do|quote|column_list|column)/;
@@ -569,7 +569,7 @@ async function createPrismaPage ({
   return page;
 }
 
-function convertToPlainText (chunks: {plain_text: string}[]) {
+function convertToPlainText (chunks: { plain_text: string }[]) {
   return chunks.reduce((prev: string, cur: { plain_text: string }) => prev + cur.plain_text, '');
 }
 
@@ -726,7 +726,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
           focalboardPropertiesRecord[property.id] = cardProperty.id;
           cardProperties.push(cardProperty);
           if (property.type === 'select' || property.type === 'multi_select') {
-            (property as any)[property.type].options.forEach((option: {id: string; name: string; color: string}) => {
+            (property as any)[property.type].options.forEach((option: { id: string, name: string, color: string }) => {
               cardProperty.options.push({
                 value: option.name,
                 color: `propColor${option.color.charAt(0).toUpperCase() + option.color.slice(1)}`,
@@ -1035,7 +1035,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         const charmverseDatabasePage = charmversePagesRecord[notionPage.parent.database_id];
 
         if (charmverseDatabasePage.boardId) {
-          const titleProperty = Object.values(notionPage.properties).find(value => value.type === 'title') as {title: {plain_text: string}[]};
+          const titleProperty = Object.values(notionPage.properties).find(value => value.type === 'title') as { title: { plain_text: string }[] };
           const emoji = notionPage.icon?.type === 'emoji' ? notionPage.icon.emoji : null;
 
           const title = convertToPlainText(titleProperty.title);
@@ -1056,10 +1056,10 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
               }
               else if (property.type === 'multi_select') {
                 cardProperties[properties[property.id]] = property[property.type]
-                  .map((multiSelect: {id: string}) => multiSelect.id);
+                  .map((multiSelect: { id: string }) => multiSelect.id);
               }
               else if (property.type === 'date') {
-                const dateValue: {from?: number; to?: number} = {};
+                const dateValue: { from?: number, to?: number } = {};
                 if (property[property.type].start) {
                   dateValue.from = (new Date(property[property.type].start)).getTime();
                 }
@@ -1288,7 +1288,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
 }
 
 // if image is stored in notion s3, it will expire so we need to re-upload it to our s3
-function getPersistentImageUrl ({ image, spaceId }: { image: NotionImage; spaceId: string }): Promise<string | null> {
+function getPersistentImageUrl ({ image, spaceId }: { image: NotionImage, spaceId: string }): Promise<string | null> {
   const url = image.type === 'external' ? image.external.url : image.type === 'file' ? image.file.url : null;
   const isNotionS3 = url?.includes('amazonaws.com/secure.notion-static.com');
   if (url && isNotionS3) {

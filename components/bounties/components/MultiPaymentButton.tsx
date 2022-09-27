@@ -9,7 +9,7 @@ import { getChainById } from 'connectors';
 import useGnosisSafes from 'hooks/useGnosisSafes';
 
 export interface MultiPaymentResult {
-  transactions: (MetaTransactionData & {applicationId: string})[];
+  transactions: (MetaTransactionData & { applicationId: string })[];
   txHash: string;
 }
 
@@ -17,7 +17,7 @@ interface Props {
   chainId: number;
   onSuccess: (result: MultiPaymentResult) => void;
   safeAddress: string;
-  transactions: (MetaTransactionData & {applicationId: string})[];
+  transactions: (MetaTransactionData & { applicationId: string })[];
   isLoading: boolean;
 }
 

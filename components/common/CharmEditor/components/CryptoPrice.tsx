@@ -223,7 +223,7 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
   );
 }
 
-type ButtonProps = { children: React.ReactNode; active: boolean; onClick: () => void };
+type ButtonProps = { children: React.ReactNode, active: boolean, onClick: () => void };
 
 function StyledButton ({ children, active, onClick }: ButtonProps) {
   return (

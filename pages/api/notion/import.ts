@@ -30,7 +30,7 @@ interface NotionApiResponse {
 
 async function importNotion (req: NextApiRequest, res: NextApiResponse<{
   failedImports: FailedImportsError[];
-} | {error: string}>) {
+} | { error: string }>) {
 
   const spaceId = req.body.spaceId as string;
   const tempAuthCode = req.body.code;

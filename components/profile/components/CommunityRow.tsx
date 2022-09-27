@@ -42,7 +42,7 @@ interface CommunityRowProps {
   onClick: () => void;
 }
 
-function CountIcon ({ label, icon, count }: { label: string; icon: ReactNode; count: number }) {
+function CountIcon ({ label, icon, count }: { label: string, icon: ReactNode, count: number }) {
   if (count === 0) {
     return null;
   }
@@ -55,7 +55,7 @@ function CountIcon ({ label, icon, count }: { label: string; icon: ReactNode; co
   );
 }
 
-function TaskTab ({ task, value, onClick }: { task: typeof TASK_TABS[number]; value: number; onClick: () => void }) {
+function TaskTab ({ task, value, onClick }: { task: typeof TASK_TABS[number], value: number, onClick: () => void }) {
 
   return (
     <Tab

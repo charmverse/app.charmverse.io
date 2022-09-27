@@ -10,7 +10,7 @@ export type ModalSize = 'large' | 'fluid' | 'small' | string;
 
 const defaultSize = '400px';
 
-const ModalContainer = styled.div<{ padding?: string; size: ModalSize }>`
+const ModalContainer = styled.div<{ padding?: string, size: ModalSize }>`
   position: absolute;
   top: 50%;
   left: 50%;
@@ -99,7 +99,7 @@ export function ScrollableModal ({ children, size = defaultSize, title, ...props
   );
 }
 
-export function DialogTitle ({ children, onClose, sx }: { children: ReactNode; onClose?: () => void; sx?: any }) {
+export function DialogTitle ({ children, onClose, sx }: { children: ReactNode, onClose?: () => void, sx?: any }) {
   return (
     <StyledDialogTitle sx={sx}>
       {children}

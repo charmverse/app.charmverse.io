@@ -41,7 +41,7 @@ function pluginsFactory () {
     placement: 'bottom-start'
   };
 
-  return ({ schema, specRegistry }: {schema: Schema; specRegistry: SpecRegistry}) => {
+  return ({ schema, specRegistry }: { schema: Schema, specRegistry: SpecRegistry }) => {
     const { trigger: _trigger } = specRegistry.options[markName];
     const suggestTooltipKey = new PluginKey('inlinePaletteTooltipKey');
 

@@ -5,7 +5,7 @@ import { accessiblePagesByPermissionsQuery, includePagePermissions } from 'lib/p
 import type { AvailableResourcesRequest } from '../permissions/interfaces';
 import { DataNotFoundError } from '../utilities/errors';
 
-export function generateAccessibleBountiesQuery ({ userId, spaceId }: {userId: string; spaceId: string}) {
+export function generateAccessibleBountiesQuery ({ userId, spaceId }: { userId: string, spaceId: string }) {
   return [
     {
       space: {

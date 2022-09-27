@@ -11,7 +11,7 @@ type IContext = {
   bounties: BountyWithDetails[];
   setBounties: Dispatch<SetStateAction<BountyWithDetails[]>>;
   draftBounty?: BountyCreationData | null;
-  createDraftBounty: (data: { pageId: string; spaceId: string; userId: string }) => void;
+  createDraftBounty: (data: { pageId: string, spaceId: string, userId: string }) => void;
   cancelDraftBounty: () => void;
   currentBountyId: string | null;
   updateCurrentBountyId: (bountyId: string | null) => void;
@@ -111,7 +111,7 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
     }
   }
 
-  function createDraftBounty ({ pageId, spaceId, userId }: { pageId: string; spaceId: string; userId: string }) {
+  function createDraftBounty ({ pageId, spaceId, userId }: { pageId: string, spaceId: string, userId: string }) {
     setDraftBounty({
       chainId: 1,
       status: 'open',

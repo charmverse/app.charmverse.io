@@ -57,7 +57,7 @@ function insertImageNode (state: EditorState, dispatch: DispatchFn, view: Editor
   }
 }
 
-function EmptyImageContainer ({ readOnly, isSelected, ...props }: HTMLAttributes<HTMLDivElement> & {readOnly: boolean; isSelected?: boolean}) {
+function EmptyImageContainer ({ readOnly, isSelected, ...props }: HTMLAttributes<HTMLDivElement> & { readOnly: boolean, isSelected?: boolean }) {
   const theme = useTheme();
 
   return (

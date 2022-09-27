@@ -32,7 +32,7 @@ export const StyledArticleIcon = styled(ArticleIcon)`
   font-size: 22px;
 `;
 
-type Props = { addPage: (p: Partial<Page>) => void; tooltip: string; sx?: any };
+type Props = { addPage: (p: Partial<Page>) => void, tooltip: string, sx?: any };
 
 function NewPageMenu ({ addPage, tooltip, ...props }: Props) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);

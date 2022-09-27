@@ -278,6 +278,6 @@ function MultisigTask ({ task }: { task: GnosisSafeTasks }) {
   );
 }
 
-export function tasksRequiresYourAttention ({ count, includeName }: { count: number; includeName?: boolean }) {
+export function tasksRequiresYourAttention ({ count, includeName }: { count: number, includeName?: boolean }) {
   return `${count} ${includeName ? 'CharmVerse ' : ''}task${count > 1 ? 's' : ''} need${count > 1 ? '' : 's'} your attention`;
 }

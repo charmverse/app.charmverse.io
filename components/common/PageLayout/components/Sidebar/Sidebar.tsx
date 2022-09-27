@@ -147,7 +147,7 @@ const ScrollingContainer = styled.div<{ isScrolled: boolean }>`
   ${({ isScrolled, theme }) => isScrolled ? `border-top: 1px solid ${theme.palette.divider}` : ''};
 `;
 
-function SidebarLink ({ active, href, icon, label, target }: { active: boolean; href: string; icon: any; label: string; target?: string }) {
+function SidebarLink ({ active, href, icon, label, target }: { active: boolean, href: string, icon: any, label: string, target?: string }) {
   return (
     <StyledSidebarLink href={href} active={active} target={target}>
       {icon}
@@ -156,7 +156,7 @@ function SidebarLink ({ active, href, icon, label, target }: { active: boolean; 
   );
 }
 
-function SidebarBox ({ icon, label, ...props }: { icon: any; label: string } & BoxProps) {
+function SidebarBox ({ icon, label, ...props }: { icon: any, label: string } & BoxProps) {
   return (
     <StyledSidebarBox {...props}>
       {icon}

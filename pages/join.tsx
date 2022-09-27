@@ -17,7 +17,7 @@ import { useRouter } from 'next/router';
 import type { ChangeEvent, ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 
-export function AlternateRouteButton ({ href, children }: { href: string; children: ReactNode }) {
+export function AlternateRouteButton ({ href, children }: { href: string, children: ReactNode }) {
   const [spaces] = useSpaces();
   const showMySpacesLink = spaces.length > 0;
   return (

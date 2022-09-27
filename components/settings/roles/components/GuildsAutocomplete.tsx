@@ -10,7 +10,7 @@ const LISTBOX_PADDING = 8; // px
 
 type ItemData = [React.HTMLAttributes<HTMLLIElement>, GetGuildsResponse[0]];
 
-function renderRow (props: {data: ItemData[]; index: number; style: React.CSSProperties}) {
+function renderRow (props: { data: ItemData[], index: number, style: React.CSSProperties }) {
   const { data, index, style } = props;
   const [itemProps, guild] = data[index];
   const inlineStyle = {
@@ -93,7 +93,7 @@ function useResetCache (data: number) {
 }
 
 // Adapter for react-window
-const ListboxComponent = React.forwardRef<HTMLDivElement, {children: ItemData[]}>((props, ref) => {
+const ListboxComponent = React.forwardRef<HTMLDivElement, { children: ItemData[] }>((props, ref) => {
   const { children, ...other } = props;
   const itemData: ItemData[] = [];
   children.forEach((item) => {
@@ -127,7 +127,7 @@ const ListboxComponent = React.forwardRef<HTMLDivElement, {children: ItemData[]}
 
 export default function GuildsAutocomplete (
   { disabled, selectedGuildIds, onChange, guilds }:
-  { disabled: boolean; onChange: (guildIds: number[]) => void; selectedGuildIds: number[]; guilds: GetGuildsResponse}
+  { disabled: boolean, onChange: (guildIds: number[]) => void, selectedGuildIds: number[], guilds: GetGuildsResponse }
 ) {
   const guildRecord = React.useMemo(() => {
     return guilds.reduce<Record<string, GetGuildsResponse[0]>>((record, guild) => ({

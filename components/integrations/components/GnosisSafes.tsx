@@ -114,7 +114,7 @@ export default function GnosisSafesList () {
   );
 }
 
-export function GnosisConnectCard ({ loading, onClick }: { loading: boolean; onClick: () => void }) {
+export function GnosisConnectCard ({ loading, onClick }: { loading: boolean, onClick: () => void }) {
   const router = useRouter();
   const isTasksPage = router.pathname.includes('/tasks');
   return (
@@ -133,7 +133,7 @@ export function GnosisConnectCard ({ loading, onClick }: { loading: boolean; onC
   );
 }
 
-function SafeRow ({ safe, updateWallets }: { safe: Safe; updateWallets: () => void }) {
+function SafeRow ({ safe, updateWallets }: { safe: Safe, updateWallets: () => void }) {
 
   const deleteConfirmation = usePopupState({ variant: 'popover', popupId: 'delete-confirmation' });
 

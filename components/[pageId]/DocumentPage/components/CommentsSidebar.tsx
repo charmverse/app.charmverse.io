@@ -60,7 +60,7 @@ function getCommentFromThreads (threads: (ThreadWithCommentsAndAuthors | undefin
   return null;
 }
 
-export default function CommentsSidebar ({ inline }: BoxProps & {inline?: boolean}) {
+export default function CommentsSidebar ({ inline }: BoxProps & { inline?: boolean }) {
 
   const { threads } = useThreads();
   const { user } = useUser();

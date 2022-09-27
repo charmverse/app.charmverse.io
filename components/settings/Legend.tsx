@@ -25,7 +25,7 @@ const StyledTypography = styled(Typography)`
   font-weight: bold;
 `;
 
-function Legend ({ children, helperText, ...props }: TypographyTypeMap['props'] & {children: string | ReactNode; helperText?: string | ReactNode}) {
+function Legend ({ children, helperText, ...props }: TypographyTypeMap['props'] & { children: string | ReactNode, helperText?: string | ReactNode }) {
   return (
     <StyledBox>
       <StyledTypography {...props}>

@@ -4,7 +4,7 @@ import type { InviteLink, Space } from '@prisma/client';
 
 export type InviteLinkPopulated = InviteLink & { space: Space };
 
-export async function getInviteLink (code: string): Promise<{ invite?: InviteLinkPopulated; expired?: boolean }> {
+export async function getInviteLink (code: string): Promise<{ invite?: InviteLinkPopulated, expired?: boolean }> {
 
   const invite = await prisma.inviteLink.findUnique({
     where: {

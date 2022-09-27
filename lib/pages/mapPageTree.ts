@@ -14,7 +14,7 @@ export function sortNodes <T> (nodes: PageNode<T>[]) {
  * @includeCards - Defaults to false
  */
 export function reducePagesToPageTree<
-    T extends PageNode = PageNode> ({ items, rootPageIds, includeCards = false, includeDeletedPages, includeProposals }: Omit<PageTreeMappingInput<T>, 'targetPageId'>): {itemMap: { [key: string]: number}; itemsWithChildren: PageNodeWithChildren<T>[]; rootNodes: PageNodeWithChildren<T>[]} {
+    T extends PageNode = PageNode> ({ items, rootPageIds, includeCards = false, includeDeletedPages, includeProposals }: Omit<PageTreeMappingInput<T>, 'targetPageId'>): { itemMap: { [key: string]: number }, itemsWithChildren: PageNodeWithChildren<T>[], rootNodes: PageNodeWithChildren<T>[] } {
 
   function includableNode (node: PageNode): boolean {
     if (!includeDeletedPages && node.deletedAt) {
@@ -93,7 +93,7 @@ T extends PageNode = PageNode> ({ items, rootPageIds, includeDeletedPages, inclu
  * Given a list of pages, resolve only the tree specific to the target page
  * @return parents is the array of parent pages from nearest parent to the root. target page is the target page along with all child pages as a tree
  */
-export function mapTargetPageTree<T extends PageNode = PageNode> ({ items, targetPageId, includeDeletedPages }: Omit<PageTreeMappingInput<T>, 'rootPageIds'> & {targetPageId: string}): TargetPageTree<T> {
+export function mapTargetPageTree<T extends PageNode = PageNode> ({ items, targetPageId, includeDeletedPages }: Omit<PageTreeMappingInput<T>, 'rootPageIds'> & { targetPageId: string }): TargetPageTree<T> {
 
   const { itemMap, itemsWithChildren } = reducePagesToPageTree({ items, includeCards: true, includeDeletedPages });
 
@@ -101,7 +101,7 @@ export function mapTargetPageTree<T extends PageNode = PageNode> ({ items, targe
    * Goes from the page to its root, and generates a list of references corresponding to the path
    * @childIdChain A list of page IDs going from the target page to the first child of the root
    */
-  function resolveRootId (currentNodeId: string, childIdChain: string[] = []): {rootId: string; childIdChain: string[]} {
+  function resolveRootId (currentNodeId: string, childIdChain: string[] = []): { rootId: string, childIdChain: string[] } {
 
     const currentNode = itemsWithChildren[itemMap[currentNodeId]];
 
