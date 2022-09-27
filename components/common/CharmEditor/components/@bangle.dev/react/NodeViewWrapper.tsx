@@ -1,4 +1,4 @@
-import { NodeView, NodeViewProps } from '@bangle.dev/core';
+import type { NodeView, NodeViewProps } from '@bangle.dev/core';
 import React from 'react';
 
 export type RenderNodeViewsFunction = (
@@ -6,7 +6,6 @@ export type RenderNodeViewsFunction = (
 ) => React.ReactNode;
 
 interface PropsType {
-  debugKey: string;
   nodeView: NodeView;
   renderNodeViews: RenderNodeViewsFunction;
   nodeViewUpdateStore: WeakMap<NodeView, () => void>;
@@ -24,7 +23,7 @@ export class NodeViewWrapper extends React.Component<PropsType, StateType> {
   constructor (props: PropsType) {
     super(props);
     this.update = () => {
-      this.setState((_state, props) => ({
+      this.setState(() => ({
         nodeViewProps: props.nodeView.getNodeViewProps()
       }));
     };
