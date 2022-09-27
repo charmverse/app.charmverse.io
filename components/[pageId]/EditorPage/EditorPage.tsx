@@ -34,7 +34,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
       setIsAccessDenied(false);
       if (pageId && pagesLoaded && space) {
         try {
-          const page = await charmClient.getPage(pageId, space.id);
+          const page = await charmClient.pages.getPage(pageId, space.id);
           if (page) {
             mutatePage(page);
             setPageNotFound(false);

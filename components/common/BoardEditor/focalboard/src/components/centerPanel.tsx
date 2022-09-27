@@ -223,7 +223,7 @@ function CenterPanel (props: Props) {
         async (block: Block) => {
           if (space) {
             await mutate(`pages/${space.id}`, async (pages: Record<string, Page>): Promise<Record<string, Page>> => {
-              const newPage = await charmClient.getPage(block.id);
+              const newPage = await charmClient.pages.getPage(block.id);
 
               return { ...pages, [newPage.id]: newPage };
             }, {

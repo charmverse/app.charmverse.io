@@ -200,7 +200,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   }, [mutatePage]);
 
   async function refreshPage (pageId: string): Promise<IPageWithPermissions> {
-    const freshPageVersion = await charmClient.getPage(pageId);
+    const freshPageVersion = await charmClient.pages.getPage(pageId);
     mutatePage(freshPageVersion);
 
     return freshPageVersion;

@@ -4,6 +4,7 @@ import type {
   Role, Space, TelegramUser, TokenGate, TokenGateToRole, User, UserDetails, UserGnosisSafe
 } from '@prisma/client';
 import * as http from 'adapters/http';
+import { PagesApi } from 'charmClient/apis/pagesApi';
 import type { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/focalboard/src/blocks/block';
 import type { IUser } from 'components/common/BoardEditor/focalboard/src/user';
 import type { FiatCurrency, IPairQuote } from 'connectors';
@@ -60,6 +61,8 @@ class CharmClient {
   profile = new ProfileApi();
 
   proposals = new ProposalsApi();
+
+  pages = new PagesApi();
 
   async login (address: string) {
     const user = await http.POST<LoggedInUser>('/api/session/login', {
@@ -169,10 +172,6 @@ class CharmClient {
 
   createPage (pageOpts: Partial<Page>) {
     return http.POST<IPageWithPermissions>('/api/pages', pageOpts);
-  }
-
-  getPage (pageIdOrPath: string, spaceId?:string) {
-    return http.GET<IPageWithPermissions>(`/api/pages/${pageIdOrPath}?spaceId=${spaceId}`);
   }
 
   archivePage (pageId: string) {

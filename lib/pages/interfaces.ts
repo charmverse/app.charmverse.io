@@ -1,4 +1,4 @@
-import type { Block, Page, PagePermission, Space } from '@prisma/client';
+import type { Block, Page, PagePermission, Prisma, Space } from '@prisma/client';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
@@ -87,6 +87,12 @@ export type TargetPageTreeWithFlatChildren<T extends PageNode = PageNode> = {
   parents: PageNodeWithChildren<T>[],
   targetPage: PageNodeWithChildren<T>,
   flatChildren: PageNodeWithChildren<T>[]
+}
+
+export type PageDetails = {
+  id: string;
+  content: Prisma.JsonValue | null;
+  contentText: string | null;
 }
 
 export type PageWithProposal = (Page & {proposal: ProposalWithUsers | null})
