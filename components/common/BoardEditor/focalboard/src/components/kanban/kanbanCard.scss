@@ -9,7 +9,8 @@
   border-radius: 3px;
   margin-bottom: 10px;
   padding: 12px 16px;
-  box-shadow: rgb(15 15 15 / 10%) 0px 0px 0px 1px, rgb(15 15 15 / 10%) 0px 2px 4px;
+  box-shadow: rgb(15 15 15 / 10%) 0px 0px 0px 1px,
+    rgb(15 15 15 / 10%) 0px 2px 4px;
   //0px 2px 1px -1px rgb(0 0 0 / 20%), 0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%);
   // box-shadow: rgba(var(--center-channel-color-rgb), 0.1) 0 0 0 1px,
   //   rgba(var(--center-channel-color-rgb), 0.1) 0 2px 4px;
@@ -20,7 +21,7 @@
 
   transition: background 100ms ease-out 0s;
 
-  [data-theme='dark'] & {
+  [data-theme="dark"] & {
     border-color: transparent;
   }
 
@@ -48,7 +49,7 @@
   }
 
   .octo-propertyvalue {
-    input[value=''] {
+    input[value=""] {
       display: none;
     }
 
@@ -67,10 +68,13 @@
     flex: 1 1 auto;
     font-weight: 600;
     line-height: 20px;
-    margin-bottom: 8px;
     display: flex;
     align-items: flex-start;
     width: 90%;
+
+    &.octo-title-space {
+      margin-bottom: 8px;
+    }
 
     .octo-icon {
       font-size: 16px;
