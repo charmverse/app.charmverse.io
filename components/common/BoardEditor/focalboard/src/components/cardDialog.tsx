@@ -17,11 +17,11 @@ type Props = {
   cardId: string
   onClose: () => void
   showCard: (cardId?: string) => void
-  readonly: boolean
+  readOnly: boolean
 }
 
 const CardDialog = (props: Props): JSX.Element | null => {
-  const { cardId, readonly, onClose } = props;
+  const { cardId, readOnly, onClose } = props;
   const card = useAppSelector(getCard(cardId))
   const { pages } = usePages()
   const { bounties } = useBounties()
@@ -34,7 +34,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
     <>
       <PageDialog
         onClose={onClose}
-        readOnly={readonly}
+        readOnly={readOnly}
         bounty={bounty}
         page={cardPage}
       />

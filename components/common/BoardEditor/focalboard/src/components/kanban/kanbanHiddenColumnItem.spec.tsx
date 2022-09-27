@@ -35,7 +35,7 @@ describe('src/components/kanban/kanbanHiddenColumnItem', () => {
           option,
           cards: [card]
         }}
-        readonly={false}
+        readOnly={false}
         onDrop={jest.fn()}
         intl={intl}
       />
@@ -50,7 +50,7 @@ describe('src/components/kanban/kanbanHiddenColumnItem', () => {
           option,
           cards: [card]
         }}
-        readonly={true}
+        readOnly={true}
         onDrop={jest.fn()}
         intl={intl}
       />
@@ -65,7 +65,7 @@ describe('src/components/kanban/kanbanHiddenColumnItem', () => {
           option,
           cards: [card]
         }}
-        readonly={false}
+        readOnly={false}
         onDrop={jest.fn()}
         intl={intl}
       />
@@ -83,7 +83,7 @@ describe('src/components/kanban/kanbanHiddenColumnItem', () => {
           option,
           cards: [card]
         }}
-        readonly={false}
+        readOnly={false}
         onDrop={jest.fn()}
         intl={intl}
       />

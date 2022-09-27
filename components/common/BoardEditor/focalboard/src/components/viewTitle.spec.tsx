@@ -52,7 +52,7 @@ describe('components/viewTitle', () => {
         <ReduxProvider store={store}>
           <ViewTitle
             board={board}
-            readonly={false}
+            readOnly={false}
             setPage={() => {}}
           />
         </ReduxProvider>
@@ -69,7 +69,7 @@ describe('components/viewTitle', () => {
         <ReduxProvider store={store}>
           <ViewTitle
             board={board}
-            readonly={true}
+            readOnly={true}
             setPage={() => {}}
           />
         </ReduxProvider>
@@ -87,7 +87,7 @@ describe('components/viewTitle', () => {
         <ReduxProvider store={store}>
           <ViewTitle
             board={board}
-            readonly={false}
+            readOnly={false}
             setPage={() => {}}
           />
         </ReduxProvider>
@@ -108,7 +108,7 @@ describe('components/viewTitle', () => {
         <ReduxProvider store={store}>
           <ViewTitle
             board={board}
-            readonly={false}
+            readOnly={false}
             setPage={() => {}}
           />
         </ReduxProvider>
@@ -129,7 +129,7 @@ describe('components/viewTitle', () => {
         <ReduxProvider store={store}>
           <ViewTitle
             board={board}
-            readonly={false}
+            readOnly={false}
             setPage={() => {}}
           />
         </ReduxProvider>
@@ -148,7 +148,7 @@ describe('components/viewTitle', () => {
         <ReduxProvider store={store}>
           <ViewTitle
             board={board}
-            readonly={false}
+            readOnly={false}
             setPage={() => {}}
           />
         </ReduxProvider>

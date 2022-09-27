@@ -39,7 +39,7 @@ interface ViewTabsProps {
   intl: IntlShape;
   viewsBoardId: string
   activeView?: BoardView | null
-  readonly?: boolean;
+  readOnly?: boolean;
   views: BoardView[];
   showView: (viewId: string) => void;
   addViewButton?: ReactNode
@@ -50,7 +50,7 @@ interface ViewTabsProps {
   openViewOptions: () => void
 }
 
-function ViewTabs ({ onDeleteView, openViewOptions, maxTabsShown, onViewTabClick, disableUpdatingUrl, addViewButton, viewsBoardId, activeView, intl, readonly, showView, views }: ViewTabsProps) {
+function ViewTabs ({ onDeleteView, openViewOptions, maxTabsShown, onViewTabClick, disableUpdatingUrl, addViewButton, viewsBoardId, activeView, intl, readOnly, showView, views }: ViewTabsProps) {
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [dropdownView, setDropdownView] = useState<BoardView | null>(null);
@@ -87,7 +87,7 @@ function ViewTabs ({ onDeleteView, openViewOptions, maxTabsShown, onViewTabClick
     event.stopPropagation();
     const view = views.find(v => v.id === event.currentTarget.id);
     view && onViewTabClick?.(view.id)
-    if (readonly) return;
+    if (readOnly) return;
     if (event.currentTarget.id === activeView?.id) {
       event.preventDefault();
       setAnchorEl(event.currentTarget);

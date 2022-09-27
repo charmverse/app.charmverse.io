@@ -76,7 +76,7 @@ describe('components/cardDialog', () => {
             cardId={card.id}
             onClose={jest.fn()}
             showCard={jest.fn()}
-            readonly={false}
+            readOnly={false}
           />
         </ReduxProvider>
       ));
@@ -94,7 +94,7 @@ describe('components/cardDialog', () => {
             cardId={card.id}
             onClose={jest.fn()}
             showCard={jest.fn()}
-            readonly={true}
+            readOnly={true}
           />
         </ReduxProvider>
       ));
@@ -112,7 +112,7 @@ describe('components/cardDialog', () => {
             cardId={card.id}
             onClose={closeFn}
             showCard={jest.fn()}
-            readonly={false}
+            readOnly={false}
           />
         </ReduxProvider>
       ));
@@ -131,7 +131,7 @@ describe('components/cardDialog', () => {
             cardId={card.id}
             onClose={jest.fn()}
             showCard={jest.fn()}
-            readonly={false}
+            readOnly={false}
           />
         </ReduxProvider>
       ));
@@ -150,7 +150,7 @@ describe('components/cardDialog', () => {
             cardId={card.id}
             onClose={jest.fn()}
             showCard={jest.fn()}
-            readonly={false}
+            readOnly={false}
           />
         </ReduxProvider>
       ));
@@ -183,7 +183,7 @@ describe('components/cardDialog', () => {
             cardId={card.id}
             onClose={jest.fn()}
             showCard={jest.fn()}
-            readonly={false}
+            readOnly={false}
           />
         </ReduxProvider>
       ));
@@ -217,7 +217,7 @@ describe('components/cardDialog', () => {
             cardId={card.id}
             onClose={jest.fn()}
             showCard={jest.fn()}
-            readonly={false}
+            readOnly={false}
           />
         </ReduxProvider>
       ));
@@ -238,7 +238,7 @@ describe('components/cardDialog', () => {
             cardId={card.id}
             onClose={jest.fn()}
             showCard={jest.fn()}
-            readonly={false}
+            readOnly={false}
           />
         </ReduxProvider>
       ));
@@ -274,7 +274,7 @@ describe('components/cardDialog', () => {
             cardId={card.id}
             onClose={jest.fn()}
             showCard={jest.fn()}
-            readonly={false}
+            readOnly={false}
           />
         </ReduxProvider>
       ));

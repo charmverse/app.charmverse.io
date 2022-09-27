@@ -81,7 +81,7 @@ describe('src/components/gallery/GalleryCard', () => {
             visibleTitle={true}
             isSelected={true}
             visibleBadges={false}
-            readonly={false}
+            readOnly={false}
             isManualSort={true}
             onDrop={jest.fn()}
           />
@@ -103,7 +103,7 @@ describe('src/components/gallery/GalleryCard', () => {
             visibleTitle={true}
             isSelected={true}
             visibleBadges={false}
-            readonly={false}
+            readOnly={false}
             isManualSort={true}
             onDrop={jest.fn()}
           />
@@ -124,7 +124,7 @@ describe('src/components/gallery/GalleryCard', () => {
             visibleTitle={true}
             isSelected={true}
             visibleBadges={false}
-            readonly={false}
+            readOnly={false}
             isManualSort={true}
             onDrop={jest.fn()}
           />
@@ -150,7 +150,7 @@ describe('src/components/gallery/GalleryCard', () => {
             visibleTitle={true}
             isSelected={true}
             visibleBadges={false}
-            readonly={false}
+            readOnly={false}
             isManualSort={true}
             onDrop={jest.fn()}
           />
@@ -175,7 +175,7 @@ describe('src/components/gallery/GalleryCard', () => {
             visibleTitle={true}
             isSelected={true}
             visibleBadges={false}
-            readonly={false}
+            readOnly={false}
             isManualSort={true}
             onDrop={jest.fn()}
           />
@@ -199,7 +199,7 @@ describe('src/components/gallery/GalleryCard', () => {
             visibleTitle={true}
             isSelected={true}
             visibleBadges={false}
-            readonly={false}
+            readOnly={false}
             isManualSort={true}
             onDrop={jest.fn()}
           />
@@ -243,7 +243,7 @@ describe('src/components/gallery/GalleryCard', () => {
             visibleTitle={true}
             isSelected={true}
             visibleBadges={false}
-            readonly={false}
+            readOnly={false}
             isManualSort={true}
             onDrop={jest.fn()}
           />
@@ -292,7 +292,7 @@ describe('src/components/gallery/GalleryCard', () => {
             visibleTitle={true}
             isSelected={true}
             visibleBadges={false}
-            readonly={false}
+            readOnly={false}
             isManualSort={true}
             onDrop={jest.fn()}
           />
@@ -336,7 +336,7 @@ describe('src/components/gallery/GalleryCard', () => {
             visibleTitle={true}
             isSelected={true}
             visibleBadges={false}
-            readonly={false}
+            readOnly={false}
             isManualSort={true}
             onDrop={jest.fn()}
           />
@@ -357,7 +357,7 @@ describe('src/components/gallery/GalleryCard', () => {
             visibleTitle={true}
             isSelected={true}
             visibleBadges={false}
-            readonly={true}
+            readOnly={true}
             isManualSort={true}
             onDrop={jest.fn()}
           />
@@ -399,7 +399,7 @@ describe('src/components/gallery/GalleryCard', () => {
             visibleTitle={true}
             isSelected={true}
             visibleBadges={false}
-            readonly={false}
+            readOnly={false}
             isManualSort={true}
             onDrop={jest.fn()}
           />
@@ -420,7 +420,7 @@ describe('src/components/gallery/GalleryCard', () => {
             visibleTitle={true}
             isSelected={true}
             visibleBadges={false}
-            readonly={true}
+            readOnly={true}
             isManualSort={true}
             onDrop={jest.fn()}
           />

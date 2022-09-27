@@ -74,7 +74,7 @@ describe('components/cardDetail/CardDetailProperties', () => {
         pageUpdatedBy=''
         activeView={view}
         views={views}
-        readonly={false}
+        readOnly={false}
       />
     ));
 
