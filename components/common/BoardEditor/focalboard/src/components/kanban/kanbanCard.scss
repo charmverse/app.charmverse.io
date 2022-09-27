@@ -73,7 +73,7 @@
     width: 90%;
 
     &.octo-title-space {
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     .octo-icon {
@@ -88,6 +88,7 @@
 
     .octo-titletext {
       padding-top: 2px;
+      padding-bottom: 2px;
       display: -webkit-box; // stylelint-disable-line
       overflow: hidden;
       text-overflow: ellipsis;
