@@ -80,8 +80,8 @@ const KanbanCard = React.memo((props: Props) => {
   const cardPage = pages[card.id];
 
   const router = useRouter();
-  const domain = router.query.domain;
-  const fullPageUrl =  `/${domain}/${cardPage?.path}`;
+  const domain = router.query.domain  || /^\/share\/(.*)\//.exec(router.asPath)?.[1];
+  const fullPageUrl = router.route.startsWith('/share') ? `/share/${domain}/${cardPage?.path}` : `/${domain}/${cardPage?.path}`;
 
   // Check if the current user is an admin, admin means implicit full access
   const pagePermissions = getPagePermissions(card.id);
