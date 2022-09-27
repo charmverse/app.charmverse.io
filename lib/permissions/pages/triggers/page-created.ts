@@ -82,18 +82,30 @@ export async function setupPermissionsAfterPageCreated (pageId: string): Promise
 
     const { updateManyOperations: illegalPermissionReplaceOperations } = generateReplaceIllegalPermissions(tree);
 
-    await prisma.$transaction(async () => {
+    await prisma.$transaction(async (tx) => {
       for (const op of illegalPermissionReplaceOperations) {
-        await prisma.pagePermission.updateMany(op);
+        await tx.pagePermission.updateMany(op);
       }
-      const refreshedParent = await getPage(parent.id) as IPageWithPermissions;
-      await prisma.pagePermission.createMany(
-        copyAllPagePermissions({
-          inheritFrom: true,
-          newPageId: pageId,
-          permissions: refreshedParent.permissions
-        })
-      );
+      const refreshedParent = await tx.page.findUniqueOrThrow({
+        where: {
+          id: parent.id
+        },
+        include: {
+          permissions: {
+            include: {
+              sourcePermission: true
+            }
+          }
+        }
+      });
+
+      const pagePermissionArgs = copyAllPagePermissions({
+        inheritFrom: true,
+        newPageId: pageId,
+        permissions: refreshedParent.permissions
+      });
+
+      await tx.pagePermission.createMany(pagePermissionArgs);
 
     });
   }
