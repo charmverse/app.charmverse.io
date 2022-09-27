@@ -18,6 +18,7 @@ export function highlightMarkedElement ({
     view.dispatch(tr);
     return false;
   }
+
   if (fromNodeAfter) {
     const inlineActionMark = view.state.doc.type.schema.marks[markName].isInSet(fromNodeAfter.marks);
     const actionId = inlineActionMark?.attrs.id;
@@ -34,7 +35,6 @@ export function highlightElement ({ ids, key, prefix, elementId, view }:
   const isShowingActionList = pageActionListNode.style.visibility !== 'hidden';
   // Check if we are inside a card page modal
   const cardId = (new URLSearchParams(window.location.href)).get('cardId');
-
   if (ids.length > 0) {
     // If we are showing the thread list on the right, then navigate to the appropriate thread and highlight it
     if (isShowingActionList && !cardId) {

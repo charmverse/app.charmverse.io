@@ -54,12 +54,12 @@ export const getIdentityIcon = (identityType: IdentityType | null) => {
 };
 
 type IdentityModalProps = {
-    save: (id: string, identityType: IdentityType) => void;
-    close: () => void;
-    isOpen: boolean;
-    identityTypes: Array<IntegrationModel>;
-    identityType: IdentityType;
-    username: string;
+    save: (id: string, identityType: IdentityType) => void,
+    close: () => void,
+    isOpen: boolean,
+    identityTypes: IntegrationModel[],
+    identityType: IdentityType,
+    username: string,
 };
 
 function IdentityModal (props: IdentityModalProps) {

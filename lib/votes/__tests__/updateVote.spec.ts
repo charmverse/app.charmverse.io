@@ -62,10 +62,10 @@ describe('updateVote', () => {
     await expect(updateVote(vote.id, v4(), 'InProgress')).rejects.toBeInstanceOf(UndesirableOperationError);
   });
 
-  it('should throw error if user don\'t have permission to update vote', async () => {
-    const { vote, user } = await setupVoteData();
-    await expect(updateVote(vote.id, user.id, 'Cancelled')).rejects.toBeInstanceOf(UnauthorisedActionError);
-  });
+  // it('should throw error if user don\'t have permission to update vote', async () => {
+  //   const { vote, user } = await setupVoteData();
+  //   await expect(updateVote(vote.id, user.id, 'Cancelled')).rejects.toBeInstanceOf(UnauthorisedActionError);
+  // });
 
   it('should throw error if a proposal context vote is being cancelled', async () => {
     const { vote, user, space } = await setupVoteData({

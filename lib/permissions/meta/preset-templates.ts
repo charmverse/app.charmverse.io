@@ -74,7 +74,7 @@ export function getTemplateExplanation (template: SpacePermissionConfigurationMo
   const templateData = permissionTemplates[template];
 
   // Handle space operations
-  for (const [operation, can] of Object.entries(templateData.spaceOperations) as Array<[SpaceOperation, boolean]>) {
+  for (const [operation, can] of Object.entries(templateData.spaceOperations) as [SpaceOperation, boolean][]) {
 
     const qualifier = can ? 'can' : 'cannot';
 

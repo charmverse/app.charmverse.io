@@ -10,6 +10,7 @@ import VoteDetail from 'components/common/CharmEditor/components/inlineVote/comp
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { useBounties } from 'hooks/useBounties';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
+import { usePrimaryCharmEditor } from 'hooks/usePrimaryCharmEditor';
 import { usePages } from 'hooks/usePages';
 import { useVotes } from 'hooks/useVotes';
 import type { AssignedBountyPermissions } from 'lib/bounties';
@@ -59,6 +60,9 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
   const pagePermissions = getPagePermissions(page.id);
 
   const { draftBounty } = useBounties();
+  const { currentPageActionDisplay } = usePageActionDisplay();
+  const { editMode } = usePrimaryCharmEditor();
+
   // Only populate bounty permission data if this is a bounty page
   const [bountyPermissions, setBountyPermissions] = useState<AssignedBountyPermissions | null>(null);
   const [containerRef, { width: containerWidth }] = useElementSize();
@@ -79,8 +83,8 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
     }
   }, [page.bountyId]);
 
-  const cannotEdit = readOnly || !pagePermissions?.edit_content;
   const cannotComment = readOnly || !pagePermissions?.comment;
+  const enableSuggestingMode = editMode === 'suggesting' && !readOnly && pagePermissions?.comment;
 
   const pageVote = Object.values(votes).find(v => v.context === 'proposal');
 
@@ -114,8 +118,6 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
     pageTop = 200;
   }
 
-  const { currentPageActionDisplay } = usePageActionDisplay();
-
   const updatePageContent = useCallback((content: ICharmEditorOutput) => {
     setPage({ content: content.doc, contentText: content.rawText });
   }, [setPage]);
@@ -137,10 +139,14 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
       }}
     >
       <Box
+        id='document-scroll-container'
         sx={{
           transition: 'width ease-in 0.25s',
+          minWidth: {
+            md: 700
+          },
           width: {
-            md: showPageActionSidebar ? 'calc(100% - 416px)' : '100%'
+            md: showPageActionSidebar ? 'calc(100% - 430px)' : '100%'
           },
           height: {
             md: showPageActionSidebar ? 'calc(100vh - 65px)' : '100%'
@@ -153,29 +159,32 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
         <div ref={containerRef}>
           {page.deletedAt && <PageDeleteBanner pageId={page.id} />}
           <PageTemplateBanner parentPage={page.parentId ? pages[page.parentId] : null} page={page} />
-          {page.headerImage && <PageBanner headerImage={page.headerImage} readOnly={cannotEdit} setPage={setPage} />}
+          {/* temporary? disable editing of page meta data when in suggestion mode */}
+          {page.headerImage && <PageBanner headerImage={page.headerImage} readOnly={readOnly || enableSuggestingMode} setPage={setPage} />}
           <Container
             top={pageTop}
             fullWidth={page.fullWidth ?? false}
           >
             <CharmEditor
-              key={page.id}
+              key={page.id + editMode}
               content={page.content as PageContent}
               onContentChange={updatePageContent}
-              readOnly={cannotEdit}
+              readOnly={readOnly}
               pageActionDisplay={!insideModal ? currentPageActionDisplay : null}
               pageId={page.id}
               disablePageSpecificFeatures={isSharedPage}
+              enableSuggestingMode={enableSuggestingMode}
               enableVoting={true}
               containerWidth={containerWidth}
               pageType={page.type}
               pagePermissions={pagePermissions}
             >
+              {/* temporary? disable editing of page title when in suggestion mode */}
               <PageHeader
                 headerImage={page.headerImage}
                 icon={page.icon}
                 title={page.title}
-                readOnly={cannotEdit}
+                readOnly={readOnly || enableSuggestingMode}
                 setPage={setPage}
               />
               {page.type === 'proposal' && !isLoading && pageVote && (
@@ -201,11 +210,11 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
                         cards={cards}
                         activeView={activeView}
                         views={boardViews}
-                        readonly={cannotEdit}
+                        readonly={readOnly}
                         pageUpdatedAt={page.updatedAt.toString()}
                         pageUpdatedBy={page.updatedBy}
                       />
-                      <AddBountyButton readonly={cannotEdit} cardId={page.id} />
+                      <AddBountyButton readonly={readOnly} cardId={page.id} />
                     </>
                   )}
                   {proposalId && (
@@ -220,7 +229,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
                     <BountyProperties
                       bountyId={page.bountyId}
                       pageId={page.id}
-                      readOnly={cannotEdit}
+                      readOnly={readOnly}
                       permissions={bountyPermissions}
                       refreshBountyPermissions={refreshBountyPermissions}
                     />

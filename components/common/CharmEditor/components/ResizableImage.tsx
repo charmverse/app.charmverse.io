@@ -112,6 +112,9 @@ export function imageSpec (): RawSpecs {
         size: {
           // Making sure default size is middle of max and min range
           default: (MIN_IMAGE_WIDTH + MAX_IMAGE_WIDTH) / 2
+        },
+        track: {
+          default: []
         }
       },
       group: 'block',

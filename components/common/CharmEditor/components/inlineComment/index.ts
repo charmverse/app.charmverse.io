@@ -1,4 +1,4 @@
-import InlineCommentThread from './InlineComment.components';
+import InlineCommentThread from './inlineComment.components';
 
 export * from './inlineComment.specs';
 export * from './inlineComment.plugins';

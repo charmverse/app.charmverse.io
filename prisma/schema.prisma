@@ -112,6 +112,7 @@ enum PageOperations {
   edit_path
   grant_permissions
   comment
+  create_poll
 }
 
 enum SpaceOperation {
@@ -177,6 +178,7 @@ model Space {
   votes                       Vote[]
   proposals                   Proposal[]
   workspaceEvents             WorkspaceEvent[]
+  proposalCategory            ProposalCategory[]
 }
 
 model SpaceApiToken {
@@ -729,7 +731,8 @@ model WorkspaceEvent {
 model ProposalCategory {
   id       String     @id @default(uuid()) @db.Uuid
   spaceId  String     @db.Uuid
+  space    Space      @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   title    String
   color    String
-  Proposal Proposal[]
+  proposal Proposal[]
 }

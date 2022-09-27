@@ -33,6 +33,9 @@ export function mentionSpecs (): RawSpecs {
           },
           createdBy: {
             default: null
+          },
+          track: {
+            default: []
           }
         },
         inline: true,

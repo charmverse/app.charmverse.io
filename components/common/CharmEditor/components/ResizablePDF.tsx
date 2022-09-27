@@ -96,6 +96,9 @@ export function pdfSpec () {
         },
         size: {
           default: MAX_PDF_WIDTH
+        },
+        track: {
+          default: []
         }
       },
       group: 'block',

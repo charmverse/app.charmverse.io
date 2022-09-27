@@ -1,14 +1,9 @@
 import {
   bold,
-  bulletList,
   code,
   hardBreak,
-  heading,
-  horizontalRule,
   italic,
   link,
-  listItem,
-  orderedList,
   strike,
   underline
 } from '@bangle.dev/base-components';
@@ -19,7 +14,7 @@ import type { EditorState, EditorView } from '@bangle.dev/pm';
 import { Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import { Box, Divider, Slide } from '@mui/material';
+import { Box, Divider } from '@mui/material';
 import type { PageType } from '@prisma/client';
 import charmClient from 'charmClient';
 import * as codeBlock from 'components/common/CharmEditor/components/@bangle.dev/base-components/code-block';
@@ -28,9 +23,11 @@ import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import CommentsSidebar from 'components/[pageId]/DocumentPage/components/CommentsSidebar';
 import PageInlineVotesList from 'components/[pageId]/DocumentPage/components/VotesSidebar';
+import { SuggestionsSidebar } from 'components/[pageId]/DocumentPage/components/SuggestionsSidebar';
 import type { CryptoCurrency, FiatCurrency } from 'connectors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
+import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useUser } from 'hooks/useUser';
 import { silentlyUpdateURL } from 'lib/browser';
 import { extractDeletedThreadIds } from 'lib/inline-comments/extractDeletedThreadIds';
@@ -41,6 +38,10 @@ import type { PageContent } from 'models';
 import type { CSSProperties, ReactNode } from 'react';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useSWRConfig } from 'swr';
+import * as listItem from './components/listItem/listItem';
+import * as orderedList from './components/orderedList';
+import * as bulletList from './components/bulletList';
+import * as horizontalRule from './components/horizontalRule';
 import Callout, * as callout from './components/callout';
 import { userDataPlugin } from './components/charm/charm.plugins';
 import * as columnLayout from './components/columnLayout';
@@ -58,6 +59,7 @@ import * as inlineVote from './components/inlineVote';
 import InlineVoteList from './components/inlineVote/components/InlineVoteList';
 import Mention, { mentionPluginKeyName, mentionPlugins, MentionSuggest } from './components/mention';
 import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList } from './components/nestedPage';
+import * as heading from './components/heading';
 import paragraph from './components/paragraph';
 import Placeholder from './components/Placeholder';
 import Quote from './components/quote';
@@ -70,6 +72,12 @@ import * as trailingNode from './components/trailingNode';
 import DevTools from './DevTools';
 import { specRegistry } from './specRegistry';
 import { checkForEmpty } from './utils';
+import trackStyles from './components/suggestions/styles';
+import { rejectAll } from './components/suggestions/track/rejectAll';
+import { getSelectedChanges } from './components/suggestions/statePlugins/track';
+import { plugins as trackPlugins } from './components/suggestions/suggestions.plugins';
+import SuggestionsPopup from './components/suggestions/SuggestionPopup';
+import { SidebarDrawer, SIDEBAR_VIEWS } from './components/SidebarDrawer';
 
 export interface ICharmEditorOutput {
   doc: PageContent;
@@ -83,39 +91,52 @@ const floatingMenuPluginKey = new PluginKey('floatingMenu');
 const nestedPagePluginKey = new PluginKey(nestedPagePluginKeyName);
 const inlineCommentPluginKey = new PluginKey(inlineComment.pluginKeyName);
 const inlineVotePluginKey = new PluginKey(inlineVote.pluginKeyName);
+const suggestionsPluginKey = new PluginKey('suggestions');
 
 export function charmEditorPlugins (
   {
     onContentChange,
-    readOnly,
+    onSelectionSet,
+    readOnly = false,
     disablePageSpecificFeatures = false,
     enableVoting,
     enableComments = true,
     userId = null,
     pageId = null,
-    spaceId = null
+    spaceId = null,
+    username = null
   }:
     {
-      spaceId?: string | null;
-      pageId?: string | null;
-      userId?: string | null;
-      readOnly?: boolean;
-      onContentChange?: (view: EditorView, prevDoc: EditorState['doc']) => void;
-      disablePageSpecificFeatures?: boolean;
-      enableVoting?: boolean;
-      enableComments?: boolean;
+      spaceId?: string | null,
+      pageId?: string | null,
+      userId?: string | null,
+      readOnly?: boolean,
+      onContentChange?: (view: EditorView, prevDoc: EditorState['doc']) => void,
+      onSelectionSet?: (state: EditorState) => void,
+      disablePageSpecificFeatures?: boolean,
+      enableVoting?: boolean,
+      enableComments?: boolean,
+      username?: string | null
     } = {}
 ): () => RawPlugins[] {
 
   const basePlugins: RawPlugins[] = [
+    // this trackPlugin should be called before the one below which calls onSelectionSet().
+    // TODO: find a cleaner way to combine this logic?
+    (username && userId ? trackPlugins({ readOnly, userId, username, onSelectionSet, key: suggestionsPluginKey }) : []),
     new Plugin({
-      view: () => ({
-        update: (view, prevState) => {
-          if (onContentChange && !view.state.doc.eq(prevState.doc)) {
-            onContentChange(view, prevState.doc);
-          }
+      view: (_view) => {
+        if (readOnly) {
+          rejectAll(_view);
         }
-      })
+        return {
+          update: (view, prevState) => {
+            if (!readOnly && onContentChange && !view.state.doc.eq(prevState.doc)) {
+              onContentChange(view, prevState.doc);
+            }
+          }
+        };
+      }
     }),
     userDataPlugin({
       userId,
@@ -278,19 +299,8 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{disablePageSpecificFe
       cursor: pointer;
     }
   `}
-`;
 
-const PageActionListBox = styled.div`
-  position: fixed;
-  right: 0px;
-  width: 416px;
-  max-width: 100%;
-  top: 56px; // height of MUI Toolbar
-  z-index: var(--z-index-drawer);
-  height: calc(100% - 80px);
-  overflow: auto;
-  padding: 0 ${({ theme }) => theme.spacing(1)};
-  background: ${({ theme }) => theme.palette.background.default};
+  ${trackStyles}
 `;
 
 const defaultContent: PageContent = {
@@ -307,6 +317,7 @@ export type UpdatePageContent = (content: ICharmEditorOutput) => any;
 interface CharmEditorProps {
   content?: PageContent;
   children?: ReactNode;
+  enableSuggestingMode?: boolean;
   onContentChange?: UpdatePageContent;
   readOnly?: boolean;
   style?: CSSProperties;
@@ -341,6 +352,7 @@ export function convertPageContentToMarkdown (content: PageContent, title?: stri
 
 function CharmEditor (
   {
+    enableSuggestingMode = false,
     pageActionDisplay = null,
     content = defaultContent,
     children,
@@ -358,10 +370,15 @@ function CharmEditor (
 ) {
   const { mutate } = useSWRConfig();
   const [currentSpace] = useCurrentSpace();
+  const { setCurrentPageActionDisplay } = usePageActionDisplay();
   // check empty state of page on first load
   const _isEmpty = checkForEmpty(content);
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
   const { user } = useUser();
+
+  const isTemplate = pageType ? pageType.includes('template') : false;
+  const disableNestedPage = disablePageSpecificFeatures || enableSuggestingMode || isTemplate;
+
   // eslint-disable-next-line
   const onThreadResolveDebounced = debounce((pageId: string, doc: EditorState['doc'], prevDoc: EditorState['doc']) => {
     const deletedThreadIds = extractDeletedThreadIds(
@@ -403,16 +420,36 @@ function CharmEditor (
 
   const editorRef = useRef<HTMLDivElement>(null);
 
+  const [suggestionState, setSuggestionState] = useState<EditorState | null>(null);
+
+  function onSelectionSet (state: EditorState) {
+    // update state that triggers updates in the sidebar
+    setSuggestionState(state);
+    // expand the sidebar if the user is selecting a suggestion
+    setCurrentPageActionDisplay(sidebarState => {
+      if (sidebarState) {
+        const selected = getSelectedChanges(state);
+        const hasSelection = Object.values(selected).some((value) => value);
+        if (hasSelection) {
+          return 'suggestions';
+        }
+      }
+      return sidebarState;
+    });
+  }
+
   const state = useEditorState({
     specRegistry,
     plugins: charmEditorPlugins({
       onContentChange: _onContentChange,
+      onSelectionSet,
       readOnly,
       disablePageSpecificFeatures,
       enableVoting,
       pageId,
       spaceId: currentSpace?.id,
-      userId: user?.id
+      userId: user?.id,
+      username: user?.username
     }),
     initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
     dropCursorOpts: {
@@ -450,6 +487,8 @@ function CharmEditor (
   return (
     <StyledReactBangleEditor
       disablePageSpecificFeatures={disablePageSpecificFeatures}
+      enableSuggestions={enableSuggestingMode}
+      trackChanges={true}
       style={{
         ...(style ?? {}),
         width: '100%',
@@ -571,58 +610,28 @@ function CharmEditor (
       }}
     >
       <floatingMenu.FloatingMenu
-        enableComments={!disablePageSpecificFeatures}
-        enableVoting={enableVoting}
+      // disable comments and polls in suggestions mode since they dont interact well
+        enableComments={!disablePageSpecificFeatures && !enableSuggestingMode && !isTemplate}
+        enableVoting={enableVoting && !enableSuggestingMode && !isTemplate}
         pluginKey={floatingMenuPluginKey}
-        pageType={pageType}
         pagePermissions={pagePermissions}
       />
       <MentionSuggest pluginKey={mentionPluginKey} />
       <NestedPagesList pluginKey={nestedPagePluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
       {!readOnly && <RowActionsMenu pluginKey={actionsPluginKey} />}
-      <InlinePalette nestedPagePluginKey={nestedPagePluginKey} disableNestedPage={disablePageSpecificFeatures} />
+      <InlinePalette nestedPagePluginKey={nestedPagePluginKey} disableNestedPage={disableNestedPage} />
       {children}
       {!disablePageSpecificFeatures && (
         <>
-          <Slide
-            direction='left'
-            in={pageActionDisplay === 'comments'}
-            style={{
-              transformOrigin: 'left top'
-            }}
-            easing={{
-              enter: 'ease-in',
-              exit: 'ease-out'
-            }}
-            timeout={250}
-          >
-            <PageActionListBox
-              id='page-thread-list-box'
-            >
-              <CommentsSidebar />
-            </PageActionListBox>
-          </Slide>
-          <Slide
-            direction='left'
-            in={pageActionDisplay === 'polls'}
-            style={{
-              transformOrigin: 'left top'
-            }}
-            easing={{
-              enter: 'ease-in',
-              exit: 'ease-out'
-            }}
-            timeout={250}
-          >
-            <PageActionListBox
-              id='page-vote-list-box'
-            >
-              <PageInlineVotesList />
-            </PageActionListBox>
-          </Slide>
+          <SidebarDrawer id='page-action-sidebar' title={pageActionDisplay ? SIDEBAR_VIEWS[pageActionDisplay].title : ''} open={!!pageActionDisplay}>
+            {pageActionDisplay === 'suggestions' && <SuggestionsSidebar readOnly={!pagePermissions?.edit_content} state={suggestionState} />}
+            {pageActionDisplay === 'comments' && <CommentsSidebar />}
+            {pageActionDisplay === 'polls' && <PageInlineVotesList />}
+          </SidebarDrawer>
           <InlineCommentThread pluginKey={inlineCommentPluginKey} />
           {enableVoting && <InlineVoteList pluginKey={inlineVotePluginKey} />}
+          <SuggestionsPopup pluginKey={suggestionsPluginKey} readOnly={readOnly} />
         </>
       )}
       {!readOnly && <DevTools />}

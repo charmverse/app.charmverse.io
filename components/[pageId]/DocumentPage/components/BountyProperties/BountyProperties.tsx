@@ -43,7 +43,7 @@ export default function BountyProperties (props: {
   const { bountyId, pageId, readOnly: parentReadOnly = false, permissions, refreshBountyPermissions } = props;
   const [paymentMethods] = usePaymentMethods();
   const { draftBounty, bounties, cancelDraftBounty, setBounties, updateBounty } = useBounties();
-  const [availableCryptos, setAvailableCryptos] = useState<Array<string | CryptoCurrency>>(['ETH']);
+  const [availableCryptos, setAvailableCryptos] = useState<(string | CryptoCurrency)[]>(['ETH']);
   const [isShowingAdvancedSettings, setIsShowingAdvancedSettings] = useState(false);
   const bountyFromContext = bounties.find(b => b.id === bountyId);
   const [currentBounty, setCurrentBounty] = useState<(BountyCreationData & BountyWithDetails) | null>(null);

@@ -19,7 +19,7 @@ export interface IInputSearchCryptoProps extends Omit<Partial<AutocompleteProps<
   defaultValue?: CryptoCurrency | string;
   value?: CryptoCurrency | string; // allow parent to override value
   hideBackdrop?: boolean; // hide backdrop when modal is open
-  cryptoList?: Array<string | CryptoCurrency>;
+  cryptoList?: (string | CryptoCurrency)[];
   chainId?: number; // allow passing this down to the 'new custom token' form
   sx?: SxProps;
 }

@@ -80,6 +80,9 @@ export function spec (): RawSpecs {
         // Type of iframe, it could either be video or embed
         type: {
           default: 'embed'
+        },
+        track: {
+          default: []
         }
       },
       group: 'block',

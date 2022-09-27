@@ -2,6 +2,7 @@ import type { Block, Page, PageType, Prisma } from '@prisma/client';
 import type { PageWithBlocks } from 'lib/templates/interfaces';
 import { typedKeys } from 'lib/utilities/objects';
 import { v4 } from 'uuid';
+import { pageContentStub } from './generate-page-stub';
 
 /**
  * We are currently lacking a way to generate fresh boards purely from the server side (apart from importing them) as this is currently orchestrated by the client-side focal board libraries
@@ -13,8 +14,9 @@ import { v4 } from 'uuid';
  * All spaceId, createdBy, updatedBy, id, parentId, rootId parameters are generated in the body of the stub, except for the cardIds which are generated at the end, to ensure the cardBlock corresponds to the pageId
  *
  */
-export function boardWithCardsArgs ({ createdBy, spaceId, parentId }: {createdBy: string; spaceId: string; parentId?: string}):
-{pageArgs: Prisma.PageCreateArgs[]; blockArgs: Prisma.BlockCreateManyArgs} {
+export function boardWithCardsArgs ({ createdBy, spaceId, parentId, cardCount = 2, addPageContent }:
+  {createdBy: string, spaceId: string, parentId?: string, cardCount? : number, addPageContent?: boolean}):
+{pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyArgs} {
 
   const boardId = v4();
 
@@ -279,6 +281,25 @@ export function boardWithCardsArgs ({ createdBy, spaceId, parentId }: {createdBy
   const pageCreateArgs: Prisma.PageCreateArgs[] = [];
   const blockCreateInput: Prisma.BlockCreateManyInput[] = [];
 
+  const cardPages = rootBoardNode.children;
+
+  for (let i = 3; i <= cardCount; i++) {
+    if (i % 2 === 0) {
+      cardPages.push(cardPages[0]);
+    }
+    else {
+      cardPages.push(cardPages[1]);
+    }
+  }
+
+  const pageContent: Pick<Prisma.PageCreateInput, 'content' | 'contentText'> = addPageContent ? pageContentStub() : {
+    contentText: '',
+    content: {
+      type: 'doc',
+      content: []
+    }
+  };
+
   [rootBoardNode, ...rootBoardNode.children].forEach(page => {
     // Handle the root board node ------------------
     const {
@@ -303,7 +324,7 @@ export function boardWithCardsArgs ({ createdBy, spaceId, parentId }: {createdBy
     const pageCreateInput: Prisma.PageCreateInput = {
       ...pageWithoutExtraProps,
       id: page.type === 'board' ? boardId : v4(),
-      content: undefined,
+      ...pageContent,
       type: page.type as PageType,
       author: {
         connect: {
