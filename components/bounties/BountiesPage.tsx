@@ -2,7 +2,7 @@ import { Box, Grid, Typography } from '@mui/material';
 import { BountyStatus } from '@prisma/client';
 import Button from 'components/common/Button';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
-import type { BountyWithDetails } from 'models';
+import type { BountyWithDetails } from 'lib/bounties/interfaces';
 import { useMemo } from 'react';
 import { CSVLink } from 'react-csv';
 import MultiPaymentModal from './components/MultiPaymentModal';

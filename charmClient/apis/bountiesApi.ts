@@ -1,11 +1,10 @@
 import type { Application, Space } from '@prisma/client';
 import * as http from 'adapters/http';
 import type { ApplicationWithTransactions, ReviewDecision, SubmissionContent, SubmissionCreationData } from 'lib/applications/interfaces';
-import type { AssignedBountyPermissions, BountyCreationData, BountyUpdate, SuggestionAction } from 'lib/bounties/interfaces';
+import type { AssignedBountyPermissions, BountyCreationData, BountyUpdate, SuggestionAction, BountyWithDetails } from 'lib/bounties/interfaces';
 import type { Resource } from 'lib/permissions/interfaces';
 import type { PublicBountyToggle } from 'lib/spaces/interfaces';
 import type { TransactionCreationData } from 'lib/transactions/interface';
-import type { BountyWithDetails } from 'models';
 
 export class BountiesApi {
 

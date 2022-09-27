@@ -4,7 +4,7 @@ import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog'
 import { usePages } from 'hooks/usePages';
 import { silentlyUpdateURL } from 'lib/browser';
 import { getUriWithParam } from 'lib/utilities/strings';
-import type { BountyWithDetails } from 'models';
+import type { BountyWithDetails } from 'lib/bounties/interfaces';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import BountyCard from './BountyCard';

@@ -6,7 +6,7 @@ import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middlewar
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
-import type { BountyWithDetails } from 'models';
+import type { BountyWithDetails } from 'lib/bounties/interfaces';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 

@@ -11,7 +11,7 @@ import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
-import type { BountyWithDetails } from 'models';
+import type { BountyWithDetails } from 'lib/bounties/interfaces';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import * as collabland from 'lib/collabland';
 import nc from 'next-connect';

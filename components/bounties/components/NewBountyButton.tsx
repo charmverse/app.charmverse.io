@@ -6,7 +6,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
-import type { BountyWithDetails } from 'models';
+import type { BountyWithDetails } from 'lib/bounties/interfaces';
 
 export default function NewBountyButton () {
   const { user } = useUser();

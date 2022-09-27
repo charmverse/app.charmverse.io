@@ -2,7 +2,7 @@ import type { ApplicationStatus, BountyStatus } from '@prisma/client';
 import { prisma } from 'db';
 import { submissionsCapReached } from 'lib/applications/shared';
 import { includePagePermissions } from 'lib/pages/server';
-import type { BountyWithDetails } from 'models';
+import type { BountyWithDetails } from 'lib/bounties/interfaces';
 import { countValueOccurrences } from '../utilities/numbers';
 import { getBountyOrThrow } from './getBounty';
 

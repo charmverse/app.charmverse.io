@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Button from 'components/common/Button';
-import type { BountyWithDetails } from 'models';
+import type { BountyWithDetails } from 'lib/bounties/interfaces';
 import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge';
 import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';

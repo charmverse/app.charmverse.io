@@ -16,7 +16,7 @@ import { useCallback, useEffect, useRef, useMemo } from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
 import InsertLinkIcon from '@mui/icons-material/InsertLink';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import type { BountyWithDetails } from 'models';
+import type { BountyWithDetails } from 'lib/bounties/interfaces';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useBounties } from 'hooks/useBounties';
 import type { IPageWithPermissions } from 'lib/pages';
