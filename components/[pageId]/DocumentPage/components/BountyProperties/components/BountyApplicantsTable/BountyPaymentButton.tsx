@@ -1,23 +1,25 @@
+import { BigNumber } from '@ethersproject/bignumber';
+import { Divider, Menu, MenuItem } from '@mui/material';
+import type { AlertColor } from '@mui/material/Alert';
+import Button from '@mui/material/Button';
+import type { UserGnosisSafe } from '@prisma/client';
+import { useWeb3React } from '@web3-react/core';
+import charmClient from 'charmClient';
+import { getChainById } from 'connectors';
+import { ethers } from 'ethers';
+import { useBountyPayment, useMultiBountyPayment } from 'hooks/useMultiBountyPayment';
+import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
+import { usePaymentMethods } from 'hooks/usePaymentMethods';
+import useGnosisSigner from 'hooks/useWeb3Signer';
+import type { SupportedChainId } from 'lib/blockchain/provider/alchemy';
+import type { BountyWithDetails } from 'lib/bounties';
+import type { SafeData } from 'lib/gnosis';
+import { getSafesForAddress } from 'lib/gnosis';
+import { isValidChainAddress } from 'lib/tokens/validation';
+import { shortenHex } from 'lib/utilities/strings';
 import type { MouseEvent } from 'react';
 import { useMemo, useState } from 'react';
-import type { AlertColor } from '@mui/material/Alert';
-import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import charmClient from 'charmClient';
-import Button from '@mui/material/Button';
-import { useWeb3React } from '@web3-react/core';
-import { ethers } from 'ethers';
-import { BigNumber } from '@ethersproject/bignumber';
-import { getChainById } from 'connectors';
-import { isValidChainAddress } from 'lib/tokens/validation';
-import type { SupportedChainId } from 'lib/blockchain/provider/alchemy';
-import { Divider, Menu, MenuItem } from '@mui/material';
-import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
-import type { UserGnosisSafe } from '@prisma/client';
-import useGnosisSigner from 'hooks/useWeb3Signer';
 import useSWR from 'swr';
-import { getSafesForAddress } from 'lib/gnosis';
-import { shortenHex } from 'lib/utilities/strings';
-import FieldLabel from 'components/common/form/FieldLabel';
 import ERC20ABI from '../../../../../../../abis/ERC20ABI.json';
 
 interface Props {
@@ -28,6 +30,7 @@ interface Props {
   onSuccess?: (txId: string, chainId: number) => void;
   onClick?: () => void;
   onError?: (err: string, severity?: AlertColor) => void;
+  bounty: BountyWithDetails;
 }
 
 function extractWalletErrorMessage (error: any): string {
@@ -98,8 +101,38 @@ async function switchActiveNetwork (chainId: number) {
   }
 }
 
+function SafeMenuItem ({
+  label,
+  safeInfo,
+  bounty,
+  onClick
+}: {
+  safeInfo: SafeData;
+  label: string;
+  bounty: BountyWithDetails;
+  onClick: () => void;
+}) {
+  const { onPaymentSuccess, transactions } = useMultiBountyPayment({ bounties: [bounty] });
+  const { makePayment } = useBountyPayment({
+    chainId: safeInfo.chainId,
+    onSuccess: onPaymentSuccess,
+    safeAddress: safeInfo.address,
+    transactions
+  });
+
+  return (
+    <MenuItem onClick={() => {
+      onClick();
+      makePayment();
+    }}
+    >{label}
+    </MenuItem>
+  );
+}
+
 export default function BountyPaymentButton ({
   receiver,
+  bounty,
   amount,
   chainIdToUse,
   tokenSymbolOrAddress,
@@ -255,13 +288,16 @@ export default function BountyPaymentButton ({
         }
         {
           safeInfos?.map(safeInfo => (
-            <MenuItem onClick={() => {
-              // onClick();
-              // makePayment();
-              handleClose();
-            }}
-            >{safeDataRecord[safeInfo.address]?.name ?? shortenHex(safeInfo.address)}
-            </MenuItem>
+            <SafeMenuItem
+              key={safeInfo.address}
+              bounty={bounty}
+              label={safeDataRecord[safeInfo.address]?.name ?? shortenHex(safeInfo.address)}
+              onClick={() => {
+                onClick();
+                handleClose();
+              }}
+              safeInfo={safeInfo}
+            />
           ))
         }
       </Menu>
