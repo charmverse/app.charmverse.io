@@ -4,7 +4,7 @@ import charmClient from 'charmClient';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
 import { getCardComments } from 'components/common/BoardEditor/focalboard/src/store/comments';
-import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
@@ -24,6 +24,8 @@ import AddBountyButton from 'components/common/BoardEditor/focalboard/src/compon
 import { usePageDetails } from 'hooks/usePageDetails';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { noop } from 'lodash';
+import { getPreviewImageFromContent } from 'lib/pages/getPreviewImageFromContent';
+import { updateCard } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import BountyProperties from './components/BountyProperties';
 import PageBanner from './components/PageBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
@@ -134,6 +136,17 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
   const showPageActionSidebar = (currentPageActionDisplay !== null) && !insideModal;
   const router = useRouter();
   const isSharedPage = router.pathname.startsWith('/share');
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (pageDetails && page.type === 'card') {
+      const fallbackPreviewUrl = getPreviewImageFromContent(pageDetails.content as PageContent);
+
+      if (fallbackPreviewUrl !== card?.fallbackPreviewUrl) {
+        dispatch(updateCard({ id: page.id, fallbackPreviewUrl }));
+      }
+    }
+  }, [pageDetails, page, card?.fallbackPreviewUrl]);
 
   return (
     <ScrollableWindow
