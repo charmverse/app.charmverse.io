@@ -13,9 +13,12 @@ import { useState, useEffect, useMemo } from 'react';
 import useSWR from 'swr';
 import useGnosisSigner from 'hooks/useWeb3Signer';
 import type { MetaTransactionData } from '@gnosis.pm/safe-core-sdk-types';
+import EthersAdapter from '@gnosis.pm/safe-ethers-lib';
+import SafeServiceClient from '@gnosis.pm/safe-service-client';
 import { useBounties } from './useBounties';
 import { useCurrentSpace } from './useCurrentSpace';
 import useMultiWalletSigs from './useMultiWalletSigs';
+import useGnosisSafes from './useGnosisSafes';
 
 export interface TransactionWithMetadata extends MetaTransactionData, Pick<Bounty, 'rewardToken' | 'rewardAmount' | 'chainId'>{
   applicationId: string;
@@ -128,5 +131,57 @@ export function useMultiBountyPayment ({ bounties, postPaymentSuccess }:
     gnosisSafeAddress,
     gnosisSafeData,
     setGnosisSafeData
+  };
+}
+
+export function useBountyPayment ({
+  chainId, safeAddress, transactions, onSuccess
+}: {
+  chainId: number;
+  onSuccess: (result: MultiPaymentResult) => void;
+  safeAddress: string;
+  transactions: (MetaTransactionData & { applicationId: string })[];
+}) {
+
+  const { account, library } = useWeb3React();
+
+  const [safe] = useGnosisSafes([safeAddress]);
+  const network = getChainById(chainId);
+  if (!network?.gnosisUrl) {
+    throw new Error(`Unsupported Gnosis network: ${chainId}`);
+  }
+  async function makePayment () {
+    if (!safe || !account || !network?.gnosisUrl) {
+      return;
+    }
+    const safeTransaction = await safe.createTransaction(transactions.map(transaction => (
+      {
+        data: transaction.data,
+        to: transaction.to,
+        value: transaction.value,
+        operation: transaction.operation
+      }
+    )));
+    await safe.signTransaction(safeTransaction);
+    const txHash = await safe.getTransactionHash(safeTransaction);
+    const signer = await library.getSigner(account);
+    const ethAdapter = new EthersAdapter({
+      ethers,
+      signer
+    });
+    const safeService = new SafeServiceClient({ txServiceUrl: network.gnosisUrl, ethAdapter });
+    await safeService.proposeTransaction({
+      safeAddress,
+      safeTransaction,
+      safeTxHash: txHash,
+      senderAddress: account,
+      origin
+    });
+    onSuccess({ transactions, txHash });
+  }
+
+  return {
+    safe,
+    makePayment
   };
 }
