@@ -24,3 +24,10 @@ export interface ExtendedPoap {
   created: string;
   name: string;
 }
+
+export interface AuthSig {
+  sig: string;
+  derivedVia: 'web3.eth.personal.sign';
+  signedMessage: string;
+  address: string;
+}

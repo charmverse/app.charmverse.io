@@ -11,16 +11,18 @@ import { isSpaceDomain } from 'lib/spaces';
 import charmClient from 'charmClient';
 import type { UrlObject } from 'url';
 import log from 'lib/log';
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import type { AuthSig } from '../../lib/blockchain/interfaces';
 
 // Pages shared to the public that don't require user login
-const publicPages = ['/', 'invite', 'share', 'api-docs', 'u'];
+const publicPages = ['/', 'invite', 'share', 'api-docs', 'u', 'authenticate'];
 const accountPages = ['profile'];
 
 export default function RouteGuard ({ children }: { children: ReactNode }) {
   const router = useRouter();
   const [authorized, setAuthorized] = useState(true);
   const { triedEager } = useContext(Web3Connection);
-  const { account } = useWeb3React();
+  const { account, walletAuthSignature, sign } = useWeb3AuthSig();
   const { user, setUser, isLoaded } = useUser();
   const [spaces,, isSpacesLoaded] = useSpaces();
   const isWalletLoading = (!triedEager && !account);
@@ -81,10 +83,11 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       router.events.off('routeChangeStart', hideContent);
       router.events.off('routeChangeComplete', authCheckAndRedirect);
     };
-  }, [isLoading, account, user, spaces]);
+  }, [isLoading, account, walletAuthSignature, user, spaces]);
 
   // authCheck runs before each page load and redirects to login if user is not logged in
   async function authCheck (url: string): Promise<{ authorized: boolean, redirect?: UrlObject, user?: User }> {
+
     const path = url.split('?')[0];
 
     const firstPathSegment = path.split('/').filter(pathElem => {
@@ -109,8 +112,20 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
         }
       };
     }
+    else if (account && !walletAuthSignature) {
+
+      return {
+        authorized: true,
+        redirect: {
+          pathname: '/authenticate',
+          query: { returnUrl: router.asPath }
+        }
+      };
+
+    }
     // condition: no session, but a wallet is connected
     else if (!user && account) {
+
       log.info('[RouteGuard]: log in user by wallet address');
       const _user = await charmClient.login(account).catch(() => null);
       if (_user) {
