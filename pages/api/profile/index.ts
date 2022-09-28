@@ -35,9 +35,8 @@ async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
     logSignupViaWallet();
   }
 
-  const { spaceRoles, ...userData } = user;
-  req.session.user = userData;
-  await updateGuildRolesForUser(userData.addresses, spaceRoles);
+  req.session.user = { id: user.id };
+  await updateGuildRolesForUser(user.addresses, user.spaceRoles);
   await req.session.save();
 
   res.status(200).json(user);
