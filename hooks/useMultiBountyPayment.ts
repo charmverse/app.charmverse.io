@@ -1,24 +1,20 @@
-import type { Bounty, UserGnosisSafe } from '@prisma/client';
+import type { MetaTransactionData } from '@gnosis.pm/safe-core-sdk-types';
+import type { Bounty } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
 import charmClient from 'charmClient';
 import type { MultiPaymentResult } from 'components/bounties/components/MultiPaymentButton';
 import { getChainById } from 'connectors';
 import { ethers } from 'ethers';
+import useGnosisSigner from 'hooks/useWeb3Signer';
 import type { BountyWithDetails } from 'lib/bounties';
 import type { SafeData } from 'lib/gnosis';
 import { getSafesForAddress } from 'lib/gnosis';
 import { eToNumber } from 'lib/utilities/numbers';
 import { isTruthy } from 'lib/utilities/types';
-import { useState, useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
-import useGnosisSigner from 'hooks/useWeb3Signer';
-import type { MetaTransactionData } from '@gnosis.pm/safe-core-sdk-types';
-import EthersAdapter from '@gnosis.pm/safe-ethers-lib';
-import SafeServiceClient from '@gnosis.pm/safe-service-client';
 import { useBounties } from './useBounties';
 import { useCurrentSpace } from './useCurrentSpace';
-import useMultiWalletSigs from './useMultiWalletSigs';
-import useGnosisSafes from './useGnosisSafes';
 
 export interface TransactionWithMetadata extends MetaTransactionData, Pick<Bounty, 'rewardToken' | 'rewardAmount' | 'chainId'>{
   applicationId: string;
@@ -30,7 +26,6 @@ export function useMultiBountyPayment ({ bounties, postPaymentSuccess }:
   { postPaymentSuccess?: () => void, bounties: BountyWithDetails[], selectedApplicationIds?: string[] }) {
   const [isLoading, setIsLoading] = useState(false);
   const [gnosisSafeData, setGnosisSafeData] = useState<SafeData | null>(null);
-  const { data: userGnosisSafes } = useMultiWalletSigs();
   const { setBounties, setCurrentBounty, currentBountyId } = useBounties();
   const [currentSpace] = useCurrentSpace();
   const { account, chainId } = useWeb3React();
@@ -40,11 +35,6 @@ export function useMultiBountyPayment ({ bounties, postPaymentSuccess }:
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     () => getSafesForAddress({ signer: signer!, chainId: chainId!, address: account! })
   );
-
-  const userGnosisSafeRecord = userGnosisSafes?.reduce<Record<string, UserGnosisSafe>>((record, userGnosisSafe) => {
-    record[userGnosisSafe.address] = userGnosisSafe;
-    return record;
-  }, {}) ?? {};
 
   useEffect(() => {
     if (safeData) {
@@ -124,64 +114,11 @@ export function useMultiBountyPayment ({ bounties, postPaymentSuccess }:
     isLoading,
     isDisabled,
     transactions,
-    userGnosisSafeRecord,
     onPaymentSuccess,
     gnosisSafeChainId,
-    safeData,
     gnosisSafeAddress,
+    safeData,
     gnosisSafeData,
     setGnosisSafeData
-  };
-}
-
-export function useBountyPayment ({
-  chainId, safeAddress, transactions, onSuccess
-}: {
-  chainId: number;
-  onSuccess: (result: MultiPaymentResult) => void;
-  safeAddress: string;
-  transactions: (MetaTransactionData & { applicationId: string })[];
-}) {
-
-  const { account, library } = useWeb3React();
-
-  const [safe] = useGnosisSafes([safeAddress]);
-  const network = getChainById(chainId);
-  if (!network?.gnosisUrl) {
-    throw new Error(`Unsupported Gnosis network: ${chainId}`);
-  }
-  async function makePayment () {
-    if (!safe || !account || !network?.gnosisUrl) {
-      return;
-    }
-    const safeTransaction = await safe.createTransaction(transactions.map(transaction => (
-      {
-        data: transaction.data,
-        to: transaction.to,
-        value: transaction.value,
-        operation: transaction.operation
-      }
-    )));
-    await safe.signTransaction(safeTransaction);
-    const txHash = await safe.getTransactionHash(safeTransaction);
-    const signer = await library.getSigner(account);
-    const ethAdapter = new EthersAdapter({
-      ethers,
-      signer
-    });
-    const safeService = new SafeServiceClient({ txServiceUrl: network.gnosisUrl, ethAdapter });
-    await safeService.proposeTransaction({
-      safeAddress,
-      safeTransaction,
-      safeTxHash: txHash,
-      senderAddress: account,
-      origin
-    });
-    onSuccess({ transactions, txHash });
-  }
-
-  return {
-    safe,
-    makePayment
   };
 }

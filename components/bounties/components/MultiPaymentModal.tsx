@@ -1,6 +1,7 @@
 
 import { Checkbox, List, ListItem, MenuItem, Select, Tooltip, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
+import type { UserGnosisSafe } from '@prisma/client';
 import Button from 'components/common/Button';
 import { DialogTitle, Modal } from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
@@ -8,6 +9,7 @@ import { getChainById } from 'connectors';
 import { useContributors } from 'hooks/useContributors';
 import type { TransactionWithMetadata } from 'hooks/useMultiBountyPayment';
 import { useMultiBountyPayment } from 'hooks/useMultiBountyPayment';
+import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import type { BountyWithDetails } from 'lib/bounties';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
@@ -18,12 +20,12 @@ export default function MultiPaymentModal ({ bounties }: { bounties: BountyWithD
   const [selectedApplicationIds, setSelectedApplicationIds] = useState<string[]>([]);
   const popupState = usePopupState({ variant: 'popover', popupId: 'multi-payment-modal' });
   const modalProps = bindPopover(popupState);
+  const { data: userGnosisSafes } = useMultiWalletSigs();
 
   const {
     isDisabled,
     onPaymentSuccess,
     transactions,
-    userGnosisSafeRecord,
     gnosisSafeAddress,
     gnosisSafeChainId,
     safeData,
@@ -35,6 +37,11 @@ export default function MultiPaymentModal ({ bounties }: { bounties: BountyWithD
       setSelectedApplicationIds([]);
       popupState.close();
     } });
+
+  const userGnosisSafeRecord = userGnosisSafes?.reduce<Record<string, UserGnosisSafe>>((record, userGnosisSafe) => {
+    record[userGnosisSafe.address] = userGnosisSafe;
+    return record;
+  }, {}) ?? {};
 
   const [contributors] = useContributors();
 

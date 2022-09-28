@@ -7,7 +7,8 @@ import { useWeb3React } from '@web3-react/core';
 import charmClient from 'charmClient';
 import { getChainById } from 'connectors';
 import { ethers } from 'ethers';
-import { useBountyPayment, useMultiBountyPayment } from 'hooks/useMultiBountyPayment';
+import { useGnosisPayment } from 'hooks/useGnosisPayment';
+import { useMultiBountyPayment } from 'hooks/useMultiBountyPayment';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import useGnosisSigner from 'hooks/useWeb3Signer';
@@ -113,7 +114,7 @@ function SafeMenuItem ({
   onClick: () => void;
 }) {
   const { onPaymentSuccess, transactions } = useMultiBountyPayment({ bounties: [bounty] });
-  const { makePayment } = useBountyPayment({
+  const { makePayment } = useGnosisPayment({
     chainId: safeInfo.chainId,
     onSuccess: onPaymentSuccess,
     safeAddress: safeInfo.address,
