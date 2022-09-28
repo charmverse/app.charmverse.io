@@ -1,5 +1,5 @@
 import { test } from '@playwright/test';
-import { mockWeb3 } from './utilities';
+import { baseUrl, mockWeb3 } from './utilities';
 
 test('signup - allows user to sign up and create a workspace using Metamask wallet', async ({ page }) => {
 
@@ -21,7 +21,8 @@ test('signup - allows user to sign up and create a workspace using Metamask wall
 
   const uniqueDomain = Math.random().toString().replace('.', '');
 
-  await page.goto('http://localhost:3000/');
+  await page.goto(baseUrl);
+
   // wait for the welcome page to appear (login page will be automatically skipped once the wallet is connected)
   await page.waitForURL('**/signup');
   await page.locator('data-test=goto-create-workspace').click();
