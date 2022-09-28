@@ -145,7 +145,7 @@ function PropertyValueElement (props:Props): JSX.Element {
     return (
       <UserProperty
         value={propertyValue?.toString()}
-        readonly={readOnly}
+        readOnly={readOnly}
         onChange={(newValue) => {
           mutator.changePropertyValue(card, propertyTemplate.id, newValue);
         }}
@@ -171,7 +171,7 @@ function PropertyValueElement (props:Props): JSX.Element {
     return (
       <URLProperty
         value={value.toString()}
-        readonly={readOnly}
+        readOnly={readOnly}
         placeholder={emptyDisplayValue}
         onChange={setValue}
         onSave={() => {

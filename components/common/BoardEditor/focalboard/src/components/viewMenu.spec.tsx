@@ -70,7 +70,7 @@ describe('/components/viewMenu', () => {
             board={board}
             activeView={activeView}
             views={views}
-            readonly={false}
+            readOnly={false}
           />
         </Router>
       </ReduxProvider>
@@ -91,7 +91,7 @@ describe('/components/viewMenu', () => {
             board={board}
             activeView={activeView}
             views={views}
-            readonly={true}
+            readOnly={true}
           />
         </Router>
       </ReduxProvider>

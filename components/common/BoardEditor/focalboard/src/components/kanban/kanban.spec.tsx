@@ -101,7 +101,7 @@ describe('src/component/kanban/kanban', () => {
             }
           ]}
           selectedCardIds={[]}
-          readonly={false}
+          readOnly={false}
           onCardClicked={jest.fn()}
           addCard={jest.fn()}
           showCard={jest.fn()}
@@ -134,7 +134,7 @@ describe('src/component/kanban/kanban', () => {
             }
           ]}
           selectedCardIds={[]}
-          readonly={false}
+          readOnly={false}
           onCardClicked={jest.fn()}
           addCard={jest.fn()}
           showCard={jest.fn()}
@@ -169,7 +169,7 @@ describe('src/component/kanban/kanban', () => {
             }
           ]}
           selectedCardIds={[]}
-          readonly={false}
+          readOnly={false}
           onCardClicked={jest.fn()}
           addCard={jest.fn()}
           showCard={jest.fn()}
@@ -214,7 +214,7 @@ describe('src/component/kanban/kanban', () => {
             }
           ]}
           selectedCardIds={[]}
-          readonly={false}
+          readOnly={false}
           onCardClicked={jest.fn()}
           addCard={jest.fn()}
           showCard={jest.fn()}
@@ -259,7 +259,7 @@ describe('src/component/kanban/kanban', () => {
             }
           ]}
           selectedCardIds={[]}
-          readonly={false}
+          readOnly={false}
           onCardClicked={jest.fn()}
           addCard={jest.fn()}
           showCard={jest.fn()}
@@ -305,7 +305,7 @@ describe('src/component/kanban/kanban', () => {
             }
           ]}
           selectedCardIds={[]}
-          readonly={false}
+          readOnly={false}
           onCardClicked={jest.fn()}
           addCard={mockedAddCard}
           showCard={jest.fn()}
@@ -342,7 +342,7 @@ describe('src/component/kanban/kanban', () => {
             }
           ]}
           selectedCardIds={[]}
-          readonly={false}
+          readOnly={false}
           onCardClicked={jest.fn()}
           addCard={jest.fn()}
           showCard={jest.fn()}
@@ -379,7 +379,7 @@ describe('src/component/kanban/kanban', () => {
             }
           ]}
           selectedCardIds={[]}
-          readonly={false}
+          readOnly={false}
           onCardClicked={jest.fn()}
           addCard={jest.fn()}
           showCard={jest.fn()}
@@ -423,7 +423,7 @@ describe('src/component/kanban/kanban', () => {
             }
           ]}
           selectedCardIds={[]}
-          readonly={false}
+          readOnly={false}
           onCardClicked={jest.fn()}
           addCard={jest.fn()}
           showCard={jest.fn()}
