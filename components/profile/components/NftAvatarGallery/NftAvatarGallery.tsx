@@ -20,11 +20,11 @@ const ProgressContainer = styled.div`
 `;
 
 type Props = {
-  onSelect?: (avatar: NftData) => void
+  onSelect?: (avatar: NftData) => void;
   isSaving?: boolean;
   nfts: NftData[] | undefined;
   isLoading?: boolean;
-  emptyMessage?: string
+  emptyMessage?: string;
 };
 
 export default function NftAvatarGallery ({ onSelect, isSaving, nfts, isLoading, emptyMessage }: Props) {

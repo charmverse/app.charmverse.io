@@ -65,7 +65,7 @@ export async function removeBountyPermissionGroup ({ assignee, level, resourceId
     select: {
       permissions: true
     }
-  }) as {permissions: BountyPermission[]};
+  }) as { permissions: BountyPermission[] };
 
   if (!bounty) {
     throw new DataNotFoundError(`Bounty with id ${resourceId} not found`);

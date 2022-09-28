@@ -17,7 +17,7 @@ type Props = {
     comments: readonly CommentBlock[]
     rootId: string
     cardId: string
-    readonly: boolean
+    readOnly: boolean
 }
 
 const CommentsList = React.memo((props: Props) => {
@@ -46,7 +46,7 @@ const CommentsList = React.memo((props: Props) => {
   return (
     <div className='CommentsList'>
       {/* New comment */}
-      {!props.readonly && (
+      {!props.readOnly && (
         <NewCommentInput
           $key={editorKey}
           key={editorKey}
@@ -61,12 +61,12 @@ const CommentsList = React.memo((props: Props) => {
           key={comment.id}
           comment={comment}
           contributor={contributors.find(_contributor => _contributor.id === comment.createdBy)}
-          readonly={props.readonly}
+          readOnly={props.readOnly}
         />
       ))}
 
       {/* horizontal divider below comments */}
-      {!(comments.length === 0 && props.readonly) && <hr className='CommentsList__divider' />}
+      {!(comments.length === 0 && props.readOnly) && <hr className='CommentsList__divider' />}
     </div>
   );
 });

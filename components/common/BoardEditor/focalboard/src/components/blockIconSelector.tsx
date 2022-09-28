@@ -15,7 +15,7 @@ import MenuWrapper from '../widgets/menuWrapper';
 type Props = {
     block: Board|Card
     size?: 's' | 'm' | 'l'
-    readonly?: boolean
+    readOnly?: boolean
     setPage?: (page: Partial<Page>) => void
 }
 
@@ -39,15 +39,15 @@ const BlockIconSelector = React.memo((props: Props) => {
   }
 
   let className = `octo-icon size-${size || 'm'}`;
-  if (props.readonly) {
+  if (props.readOnly) {
     className += ' readonly';
   }
   const iconElement = <PageIcon size='large' icon={block.fields.icon} />;
 
   return (
     <div className='BlockIconSelector'>
-      {props.readonly && iconElement}
-      {!props.readonly
+      {props.readOnly && iconElement}
+      {!props.readOnly
             && (
             <MenuWrapper>
               {iconElement}

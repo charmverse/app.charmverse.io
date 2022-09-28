@@ -13,13 +13,13 @@ export function humaniseBountyAccessConditions ({
   roles,
   bounty
 }: {
-  permissionLevel: SupportedHumanisedAccessConditions
+  permissionLevel: SupportedHumanisedAccessConditions;
   // The array present on the target key (creator, reviewer, submitter or viewer) of a Bounty Permissions object
   // For submitters, we currently only support roles or whole space
-  assignees: TargetPermissionGroup[]
+  assignees: TargetPermissionGroup[];
   // Full list of roles in space (or at least role data for assigned roles)
-  roles: RoleupWithMembers[]
-  bounty: Bounty
+  roles: RoleupWithMembers[];
+  bounty: Bounty;
 }): HumanisedBountyAccessSummary {
   const hasSpacePermission = assignees.some(({ group }) => group === 'space');
 

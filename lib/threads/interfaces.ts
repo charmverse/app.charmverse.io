@@ -12,7 +12,7 @@ export type ThreadStatusType = keyof typeof ThreadStatus
 
 export interface ThreadStatusUpdate {
   id: string;
-  status: ThreadStatusType
+  status: ThreadStatusType;
 }
 
 /**
@@ -26,10 +26,10 @@ export interface ThreadCreate {
 }
 
 export interface ThreadWithCommentsAndAuthors extends Thread {
-  comments: CommentWithUser[]
+  comments: CommentWithUser[];
 }
 
 export interface MultipleThreadsInput {
-  threadIds: string[]
-  pageId: string
+  threadIds: string[];
+  pageId: string;
 }

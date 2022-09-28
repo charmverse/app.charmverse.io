@@ -5,9 +5,9 @@ import Typography from '@mui/material/Typography';
 import * as React from 'react';
 
 interface TabPanelProps extends React.HTMLAttributes<HTMLDivElement> {
-  children: React.ReactNode,
-  value: React.ReactNode
-  index: number
+  children: React.ReactNode;
+  value: React.ReactNode;
+  index: number;
 }
 
 function TabPanel (props: TabPanelProps) {
@@ -31,8 +31,8 @@ function TabPanel (props: TabPanelProps) {
 }
 
 interface MultiTabsProps {
-  tabs: [string, React.ReactNode][]
-  disabled?: boolean
+  tabs: [string, React.ReactNode][];
+  disabled?: boolean;
 }
 
 export default function MultiTabs (props: MultiTabsProps) {

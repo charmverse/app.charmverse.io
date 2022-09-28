@@ -1,5 +1,5 @@
 import { link } from '@bangle.dev/base-components';
-import { EditorView } from '@bangle.dev/pm';
+import type { EditorView } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -11,7 +11,7 @@ import { MenuInput } from 'components/common/MenuInput';
 import React, { useRef, useState } from 'react';
 import { MenuButton } from './Icon';
 
-export function LinkSubMenu ({ showMessage, getIsTop = () => true }: {showMessage: (msg: string) => void, getIsTop?: () => boolean}) {
+export function LinkSubMenu ({ showMessage, getIsTop = () => true }: { showMessage: (msg: string) => void, getIsTop?: () => boolean }) {
   const view = useEditorViewContext();
   const result = link.queryLinkAttrs()(view.state);
   const originalHref = (result && result.href) || '';
@@ -36,7 +36,7 @@ function LinkMenu ({
   originalHref = '',
   showMessage
 }: {
-  showMessage: (msg: string) => void,
+  showMessage: (msg: string) => void;
   getIsTop: () => boolean;
   view: EditorView;
   originalHref?: string;

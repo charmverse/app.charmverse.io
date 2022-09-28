@@ -1,10 +1,10 @@
 import { useTheme } from '@emotion/react';
 import CheckIcon from '@mui/icons-material/Check';
-import { Divider, Grid, MenuItem, Select, Stack, Typography } from '@mui/material';
+import { Divider, Grid, MenuItem, Select, Stack, Tooltip, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import type { ProposalStatus } from '@prisma/client';
 import charmClient from 'charmClient';
+import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import useTasks from 'components/nexus/hooks/useTasks';
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
@@ -27,8 +27,9 @@ const proposalStatusTooltips: Record<ProposalStatus, string> = {
 
 export default function ProposalStepper (
   { refreshProposal, proposal, proposalUserGroups }:
-  { refreshProposal: KeyedMutator<ProposalWithUsers>, proposalUserGroups: ProposalUserGroup[], proposal?: ProposalWithUsers}
+  { refreshProposal: KeyedMutator<ProposalWithUsers>, proposalUserGroups: ProposalUserGroup[], proposal?: ProposalWithUsers }
 ) {
+
   const { status: currentStatus, id: proposalId, reviewers } = proposal ?? {
     status: null,
     id: null,
@@ -79,40 +80,42 @@ export default function ProposalStepper (
                   height='100%'
                   gap={1}
                 >
-                  <Box
-                    sx={{
-                      width: stepperDimension,
-                      height: stepperDimension,
-                      borderRadius: '50%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: canChangeStatus ? 'pointer' : 'initial',
-                      background: status === currentStatus
-                        ? theme.palette.purple.main : canChangeStatus
-                          ? theme.palette.teal.main : theme.palette.gray.main
-                    }}
-                    onClick={() => {
-                      if (canChangeStatus) {
-                        if (status === 'vote_active') {
-                          openVoteModal();
+                  <Tooltip title={canChangeStatus ? proposalStatusTooltips[status] : ''}>
+                    <Box
+                      sx={{
+                        width: stepperDimension,
+                        height: stepperDimension,
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: canChangeStatus ? 'pointer' : 'initial',
+                        background: status === currentStatus
+                          ? theme.palette.purple.main : canChangeStatus
+                            ? theme.palette.teal.main : theme.palette.gray.main
+                      }}
+                      onClick={() => {
+                        if (canChangeStatus) {
+                          if (status === 'vote_active') {
+                            openVoteModal();
+                          }
+                          else {
+                            updateProposalStatus(status);
+                          }
                         }
-                        else {
-                          updateProposalStatus(status);
-                        }
-                      }
-                    }}
-                  >
-                    {currentStatusIndex >= statusIndex ? <CheckIcon fontSize='small' />
-                      : (
-                        <Typography sx={{
-                          fontWeight: 500
-                        }}
-                        >
-                          {statusIndex + 1}
-                        </Typography>
-                      )}
-                  </Box>
+                      }}
+                    >
+                      {currentStatusIndex >= statusIndex ? <CheckIcon fontSize='small' />
+                        : (
+                          <Typography sx={{
+                            fontWeight: 500
+                          }}
+                          >
+                            {statusIndex + 1}
+                          </Typography>
+                        )}
+                    </Box>
+                  </Tooltip>
                   <Typography
                     textAlign='center'
                     sx={{
@@ -139,7 +142,7 @@ export default function ProposalStepper (
           );
         })}
         <CreateVoteModal
-          isProposal={true}
+          proposal={proposal}
           open={isModalOpen}
           onCreateVote={async () => {
             await updateProposalStatus('vote_active');

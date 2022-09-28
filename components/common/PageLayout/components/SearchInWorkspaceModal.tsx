@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import { Box, Typography } from '@mui/material';
+import { ListItem, Typography } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
@@ -26,7 +26,8 @@ const StyledPopper = styled(Popper)`
   }
 `;
 
-const StyledBox = styled(Box)`
+const StyledListItem = styled(ListItem)`
+  &.MuiAutocomplete-option {
     padding-left: 0px;
     padding-right: ${({ theme }) => theme.spacing(2)};
     flex-direction: column;
@@ -39,6 +40,11 @@ const StyledBox = styled(Box)`
     padding-top: 10px;
     padding-bottom: 10px;
     border-bottom: 1px solid ${({ theme }) => theme.palette.gray.main};
+
+    &:hover, &.Mui-focused {
+      color: inherit;
+    }
+  }
 `;
 
 const baseLine = css`
@@ -67,11 +73,12 @@ type SearchResultItem = {
     link: string;
     type: ResultType;
     path? :string;
+    id: string;
   };
 
 type SearchInWorkspaceModalProps = {
-    close: () => void,
-    isOpen: boolean,
+    close: () => void;
+    isOpen: boolean;
 };
 
 function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
@@ -101,17 +108,20 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
   };
 
   const pageSearchResultItems: SearchResultItem[] = pageList
+    .filter((page): page is IPageWithPermissions => !!page)
     .map(page => ({
-      name: page?.title || 'Untitled',
-      path: getPagePath(page!),
-      link: `/${router.query.domain}/${page!.path}`,
-      type: ResultType.page
+      name: page.title || 'Untitled',
+      path: getPagePath(page),
+      link: `/${router.query.domain}/${page.path}`,
+      type: ResultType.page,
+      id: page.id
     }));
 
   const bountySearchResultItems: SearchResultItem[] = bounties.map(bounty => ({
     name: bounty.page?.title || '',
     link: `/${router.query.domain}/${bounty.page?.id}`,
-    type: ResultType.bounty
+    type: ResultType.bounty,
+    id: bounty.id
   }));
 
   const searchResultItems: SearchResultItem[] = [
@@ -137,10 +147,7 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
         onInputChange={(_event, newInputValue) => {
           setIsSearching(!!newInputValue);
         }}
-        onChange={(e, item) => {
-          e.preventDefault();
-          router.push(item.link);
-        }}
+        onChange={(_e, item) => router.push(item.link)}
         getOptionLabel={option => typeof option === 'object' ? option.name : option}
         open={isSearching}
         disablePortal
@@ -163,21 +170,19 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
           const parts = parse(option.name, matches);
 
           return (
-            <li {...listItemProps}>
-              <StyledBox>
-                <Stack direction='row' spacing={1}>
-                  {
+            <StyledListItem {...listItemProps} key={option.id}>
+              <Stack direction='row' spacing={1}>
+                {
                     option.type === ResultType.page
                       ? <InsertDriveFileOutlinedIcon fontSize='small' style={{ marginTop: '2px' }} />
                       : <BountyIcon fontSize='small' style={{ marginTop: '2px' }} />
                   }
-                  <Stack>
-                    <StyledTypographyPage>
-                      {
-                        parts.map((part: { text: string; highlight: boolean; }) => {
+                <Stack>
+                  <StyledTypographyPage>
+                    {
+                        parts.map((part: { text: string, highlight: boolean }) => {
                           return (
                             <span
-                              key={part.text}
                               style={{
                                 fontWeight: part.highlight ? 700 : 400
                               }}
@@ -186,12 +191,11 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
                           );
                         })
                       }
-                    </StyledTypographyPage>
-                    {option.path && <StyledTypographyPath>{option.path}</StyledTypographyPath>}
-                  </Stack>
+                  </StyledTypographyPage>
+                  {option.path && <StyledTypographyPath>{option.path}</StyledTypographyPath>}
                 </Stack>
-              </StyledBox>
-            </li>
+              </Stack>
+            </StyledListItem>
           );
         }}
         renderInput={(params) => (

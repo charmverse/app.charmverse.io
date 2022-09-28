@@ -125,9 +125,9 @@ function MentionedTaskRow (
 }
 
 interface MentionedTasksListProps {
-  tasks: GetTasksResponse | undefined
-  error: any
-  mutateTasks: KeyedMutator<GetTasksResponse>
+  tasks: GetTasksResponse | undefined;
+  error: any;
+  mutateTasks: KeyedMutator<GetTasksResponse>;
 }
 
 export default function MentionedTasksList ({ tasks, error, mutateTasks }: MentionedTasksListProps) {

@@ -9,7 +9,7 @@ export function highlightMarkedElement ({
   markName,
   key,
   prefix
-}: {view: EditorView, markName: string, key: PluginKey, elementId: string, prefix: string}) {
+}: { view: EditorView, markName: string, key: PluginKey, elementId: string, prefix: string }) {
   const { $from, $to } = view.state.selection;
   const fromNodeAfter = $from.nodeAfter;
   const toNodeAfter = $to.nodeAfter;

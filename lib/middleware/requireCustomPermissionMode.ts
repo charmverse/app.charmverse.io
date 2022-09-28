@@ -8,7 +8,7 @@ import type { PermissionAssigneeId } from '../permissions/interfaces';
 /**
  * Call to endpoint using this can only proceed if the space permission mode is custom
  */
-export function requireCustomPermissionMode ({ spaceIdKey, keyLocation }: {spaceIdKey: string, keyLocation: 'body' | 'query'}) {
+export function requireCustomPermissionMode ({ spaceIdKey, keyLocation }: { spaceIdKey: string, keyLocation: 'body' | 'query' }) {
 
   return async (req: NextApiRequest, res: NextApiResponse<ISystemError>, next: NextHandler) => {
 

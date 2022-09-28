@@ -6,7 +6,7 @@ import type { NftData } from 'lib/blockchain/interfaces';
 import NftAvatarGallery from './NftAvatarGallery';
 
 type Props = {
-  onSelect?: (avatar: NftData) => void
+  onSelect?: (avatar: NftData) => void;
   isVisible: boolean;
   onClose: () => void;
   isSaving?: boolean;

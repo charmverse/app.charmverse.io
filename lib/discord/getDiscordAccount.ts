@@ -2,12 +2,12 @@ import * as http from 'adapters/http';
 import { getDiscordToken } from './getDiscordToken';
 
 export interface DiscordAccount {
-  id: string
-  username: string
-  discriminator: string
-  avatar?: string
-  verified?: boolean
-  bot?: boolean
+  id: string;
+  username: string;
+  discriminator: string;
+  avatar?: string;
+  verified?: boolean;
+  bot?: boolean;
 }
 
 export async function getDiscordAccount (code: string, redirectUrl: string) {

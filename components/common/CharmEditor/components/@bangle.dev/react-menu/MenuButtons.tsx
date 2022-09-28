@@ -8,14 +8,10 @@ import {
   strike,
   underline
 } from '@bangle.dev/base-components';
-import * as orderedList from '../../orderedList';
-import * as bulletList from '../../bulletList';
-import * as heading from '../../heading';
-import paragraph from '../../paragraph';
-import { Command, EditorState, PluginKey } from '@bangle.dev/pm';
+import type { Command, EditorState, PluginKey } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { BoldIcon, BulletListIcon, CodeIcon, ItalicIcon, LinkIcon, OrderedListIcon, ParagraphIcon, RedoIcon, TodoListIcon, UndoIcon } from '@bangle.dev/react-menu';
-import { HintPos } from '@bangle.dev/react-menu/dist/types';
+import type { HintPos } from '@bangle.dev/react-menu/dist/types';
 import {
   defaultKeys as floatingMenuKeys, focusFloatingMenuInput
 } from '@bangle.dev/react-menu/floating-menu';
@@ -24,9 +20,13 @@ import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import React, { useCallback } from 'react';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
-import { createCommentBlock } from 'components/common/BoardEditor/focalboard/src/blocks/commentBlock';
+import paragraph from '../../paragraph';
+import * as heading from '../../heading';
+import * as bulletList from '../../bulletList';
+import * as orderedList from '../../orderedList';
 import { MenuButton } from './Icon';
-import { SubMenu, toggleSubMenu } from './floating-menu';
+import type { SubMenu } from './floating-menu';
+import { toggleSubMenu } from './floating-menu';
 import { createInlineVote } from '../../inlineVote';
 import { createInlineComment } from '../../inlineComment';
 
@@ -87,7 +87,6 @@ export function BoldButton ({
   return (
     <MenuButton
       {...props}
-      hintPos={hintPos}
       onMouseDown={onSelect}
       hints={hints}
       isActive={queryIsBoldActive()(view.state)}
@@ -107,7 +106,7 @@ export function InlineActionButton ({
   subMenu,
   commandFn,
   ...props
-}: ButtonProps & {commandFn: () => Command, subMenu: SubMenu, menuKey: PluginKey, enable: boolean}) {
+}: ButtonProps & { commandFn: () => Command, subMenu: SubMenu, menuKey: PluginKey, enable: boolean }) {
   const view = useEditorViewContext();
 
   const onMouseDown = useCallback(
@@ -115,10 +114,10 @@ export function InlineActionButton ({
       e.preventDefault();
       const command = filter(
         (state: EditorState) => commandFn()(state),
-        (_state, dispatch, view) => {
-          if (dispatch) {
-            toggleSubMenu(menuKey, subMenu)(view!.state, view!.dispatch, view);
-            rafCommandExec(view!, focusFloatingMenuInput(menuKey));
+        (_state, dispatch, _view) => {
+          if (dispatch && _view) {
+            toggleSubMenu(menuKey, subMenu)(_view.state, _view.dispatch, _view);
+            rafCommandExec(_view, focusFloatingMenuInput(menuKey));
           }
           return true;
         }
@@ -135,7 +134,6 @@ export function InlineActionButton ({
   return (
     <MenuButton
       {...props}
-      hintPos={hintPos}
       onMouseDown={onMouseDown}
       hints={hints}
       // Figure out when the button will be disabled
@@ -157,7 +155,7 @@ export function InlineCommentButton ({
   menuKey,
   enableComments,
   ...props
-}: ButtonProps & {menuKey: PluginKey, enableComments: boolean}) {
+}: ButtonProps & { menuKey: PluginKey, enableComments: boolean }) {
 
   return (
     <InlineActionButton
@@ -184,7 +182,7 @@ export function InlineVoteButton ({
   menuKey,
   enableVotes,
   ...props
-}: ButtonProps & {menuKey: PluginKey, enableVotes: boolean}) {
+}: ButtonProps & { menuKey: PluginKey, enableVotes: boolean }) {
   return (
     <InlineActionButton
       {...props}
@@ -218,7 +216,6 @@ export function StrikeButton ({
   return (
     <MenuButton
       {...props}
-      hintPos={hintPos}
       onMouseDown={onSelect}
       hints={hints}
       isActive={queryIsStrikeActive()(view.state)}
@@ -248,7 +245,6 @@ export function UnderlineButton ({
   return (
     <MenuButton
       {...props}
-      hintPos={hintPos}
       onMouseDown={onSelect}
       hints={hints}
       isActive={queryIsUnderlineActive()(view.state)}
@@ -285,7 +281,6 @@ export function CalloutButton ({
   return (
     <MenuButton
       {...props}
-      hintPos={hintPos}
       onMouseDown={onSelect}
       hints={hints}
       isActive={blockquote.commands.queryIsBlockquoteActive()(view.state)}
@@ -319,7 +314,6 @@ export function ItalicButton ({
   return (
     <MenuButton
       {...props}
-      hintPos={hintPos}
       onMouseDown={onSelect}
       hints={hints}
       isActive={queryIsItalicActive()(view.state)}
@@ -351,7 +345,6 @@ export function UndoButton ({
   return (
     <MenuButton
       {...props}
-      hintPos={hintPos}
       onMouseDown={onSelect}
       hints={hints}
       isDisabled={!view.editable || !undo()(view.state)}
@@ -382,7 +375,6 @@ export function RedoButton ({
   return (
     <MenuButton
       {...props}
-      hintPos={hintPos}
       onMouseDown={onSelect}
       hints={hints}
       isDisabled={!view.editable || !redo()(view.state)}
@@ -413,7 +405,6 @@ export function CodeButton ({
   return (
     <MenuButton
       {...props}
-      hintPos={hintPos}
       onMouseDown={onSelect}
       hints={hints}
       isActive={queryIsCodeActive()(view.state)}
@@ -445,7 +436,6 @@ export function BulletListButton ({
   return (
     <MenuButton
       {...props}
-      hintPos={hintPos}
       onMouseDown={onSelect}
       hints={hints}
       isDisabled={!view.editable}
@@ -480,7 +470,6 @@ export function OrderedListButton ({
   return (
     <MenuButton
       {...props}
-      hintPos={hintPos}
       onMouseDown={onSelect}
       hints={hints}
       isDisabled={!view.editable}
@@ -513,7 +502,6 @@ export function TodoListButton ({
   return (
     <MenuButton
       {...props}
-      hintPos={hintPos}
       onMouseDown={onSelect}
       hints={hints}
       isDisabled={!view.editable}
@@ -559,7 +547,6 @@ export function HeadingButton ({
   return (
     <MenuButton
       {...props}
-      hintPos={hintPos}
       onMouseDown={onSelect}
       hints={hints}
       isActive={queryIsHeadingActive(level)(view.state)}
@@ -592,7 +579,6 @@ export function ParagraphButton ({
   return (
     <MenuButton
       {...props}
-      hintPos={hintPos}
       onMouseDown={onSelect}
       hints={hints}
       isActive={queryIsTopLevelParagraph()(view.state)}
@@ -616,10 +602,10 @@ export function FloatingLinkButton ({
       e.preventDefault();
       const command = filter(
         (state: EditorState) => createLink('')(state),
-        (_state, dispatch, view) => {
-          if (dispatch) {
-            toggleSubMenu(menuKey, 'linkSubMenu')(view!.state, view!.dispatch, view);
-            rafCommandExec(view!, focusFloatingMenuInput(menuKey));
+        (_state, dispatch, _view) => {
+          if (dispatch && _view) {
+            toggleSubMenu(menuKey, 'linkSubMenu')(_view.state, _view.dispatch, _view);
+            rafCommandExec(_view, focusFloatingMenuInput(menuKey));
           }
           return true;
         }
@@ -637,7 +623,6 @@ export function FloatingLinkButton ({
     <MenuButton
       onMouseDown={onMouseDown}
       hints={hints}
-      hintPos={hintPos}
       isActive={queryIsLinkActive()(view.state)}
       isDisabled={!view.editable || !createLink('')(view.state)}
     >

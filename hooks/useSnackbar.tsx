@@ -3,16 +3,16 @@ import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import { createContext, useContext, useMemo, useState } from 'react';
 
 type IContext = {
-  isOpen: boolean,
-  actions?: ReactNode[],
-  setIsOpen: Dispatch<SetStateAction<boolean>>
-  message: string | null
-  origin: SnackbarOrigin,
-  setMessage: Dispatch<SetStateAction<string | null>>
-  severity: AlertColor
-  setSeverity: Dispatch<SetStateAction<AlertColor>>
-  showMessage: (msg: string, newSeverity?: AlertColor) => void
-  handleClose: SnackbarProps['onClose']
+  isOpen: boolean;
+  actions?: ReactNode[];
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
+  message: string | null;
+  origin: SnackbarOrigin;
+  setMessage: Dispatch<SetStateAction<string | null>>;
+  severity: AlertColor;
+  setSeverity: Dispatch<SetStateAction<AlertColor>>;
+  showMessage: (msg: string, newSeverity?: AlertColor) => void;
+  handleClose: SnackbarProps['onClose'];
 }
 
 export const SnackbarContext = createContext<Readonly<IContext>>({
@@ -28,7 +28,7 @@ export const SnackbarContext = createContext<Readonly<IContext>>({
   showMessage: () => {}
 });
 
-export function SnackbarProvider ({ children }: {children: ReactNode}) {
+export function SnackbarProvider ({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(true);
   const [actions, setActions] = useState<ReactNode[]>([]);
   const [origin, setOrigin] = useState<SnackbarOrigin>({ vertical: 'bottom', horizontal: 'left' });

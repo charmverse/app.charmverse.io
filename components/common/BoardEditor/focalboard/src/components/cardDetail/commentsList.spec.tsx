@@ -59,7 +59,7 @@ describe('components/cardDetail/CommentsList', () => {
             comments={[comment1, comment2]}
             rootId='root_id'
             cardId='card_id'
-            readonly={false}
+            readOnly={false}
           />
         )}
       </ReduxProvider>
@@ -100,7 +100,7 @@ describe('components/cardDetail/CommentsList', () => {
             comments={[comment1, comment2]}
             rootId='root_id'
             cardId='card_id'
-            readonly={true}
+            readOnly={true}
           />
         )}
       </ReduxProvider>

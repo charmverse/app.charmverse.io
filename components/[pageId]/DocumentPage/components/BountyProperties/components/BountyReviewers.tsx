@@ -11,8 +11,8 @@ import { useMemo, useState } from 'react';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
 type ReviewersData = {
-  roles: ({ id: string, name: string, users: Contributor[] })[]
-  users: ({ id: string, name: string, profilePic?: string | null, hasNftAvatar?: boolean })[]
+  roles: ({ id: string, name: string, users: Contributor[] })[];
+  users: ({ id: string, name: string, profilePic?: string | null, hasNftAvatar?: boolean })[];
 }
 
 interface BountyReviewersProps {

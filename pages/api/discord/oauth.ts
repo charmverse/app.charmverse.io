@@ -15,8 +15,8 @@ handler.get(oauth);
 
 async function oauth (req: NextApiRequest, res: NextApiResponse) {
   const query = req.query as {
-    redirect: string,
-    type: 'connect' | 'server' | 'login'
+    redirect: string;
+    type: 'connect' | 'server' | 'login';
   };
   const state = encodeURIComponent(JSON.stringify({
     redirect: query.redirect,

@@ -6,7 +6,7 @@ import log from 'lib/log';
  * @see https://discord.com/developers/docs/resources/webhook#webhook-object-jsonform-params
  */
 export interface IDiscordMessage {
-  content: string
+  content: string;
 }
 
 /// ------ Event types
@@ -19,9 +19,9 @@ export type EventType = 'create_user' | 'create_workspace'| 'first_user_create_p
  * @origin the website from where this request originated
  */
 export interface IEventToLog {
-  funnelStage: FunnelEvent
-  eventType: EventType
-  message: string
+  funnelStage: FunnelEvent;
+  eventType: EventType;
+  message: string;
 }
 
 const isProdEnvironment = process.env.NODE_ENV === 'production';
