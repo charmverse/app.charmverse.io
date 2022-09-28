@@ -412,7 +412,7 @@ function CharmEditor (
 
   function _onContentChange (view: EditorView, prevDoc: Node<any>) {
     // @ts-ignore missing types from the @bangle.dev/react package
-    setIsEmpty(checkForEmpty(view.state.doc.toJSON() as PageContent));
+    setIsEmpty(checkIsContentEmpty(view.state.doc.toJSON() as PageContent));
     if (onContentChangeDebounced) {
       onContentChangeDebounced(view, prevDoc);
     }

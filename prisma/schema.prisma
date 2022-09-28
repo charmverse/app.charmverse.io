@@ -216,6 +216,7 @@ model Page {
   title              String
   content            Json?
   contentText        String
+  hasContent         Boolean          @default(false)
   headerImage        String?
   icon               String?
   path               String

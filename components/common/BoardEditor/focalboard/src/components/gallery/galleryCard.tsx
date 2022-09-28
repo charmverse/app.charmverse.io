@@ -25,6 +25,7 @@ import MenuWrapper from '../../widgets/menuWrapper';
 import Tooltip from '../../widgets/tooltip';
 import { sendFlashMessage } from '../flashMessages';
 import PropertyValueElement from '../propertyValueElement';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 
 type Props = {
   board: Board
@@ -162,7 +163,7 @@ const GalleryCard = React.memo((props: Props) => {
       {props.visibleTitle
         && (
         <div className='gallery-title'>
-          {cardPage?.icon ? <PageIcon isEditorEmpty={checkForEmpty(cardPage?.content as PageContent)} pageType='card' icon={cardPage.icon} /> : undefined}
+          {cardPage?.icon ? <PageIcon isEditorEmpty={checkIsContentEmpty(cardPage?.content as PageContent)} pageType='card' icon={cardPage.icon} /> : undefined}
           <div key='__title'>
             {cardPage?.title
               || (
@@ -201,7 +202,4 @@ const GalleryCard = React.memo((props: Props) => {
 });
 
 export default GalleryCard;
-function checkForEmpty(arg0: PageContent): boolean {
-  throw new Error('Function not implemented.');
-}
 
