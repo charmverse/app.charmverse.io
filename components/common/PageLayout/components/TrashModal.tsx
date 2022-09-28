@@ -1,7 +1,6 @@
 import { IconButton, List, MenuItem, ListItemText, ListItemIcon, Tooltip, Typography, TextField, Box } from '@mui/material';
 import { usePages } from 'hooks/usePages';
 import { ScrollableModal as Modal } from 'components/common/Modal';
-import { checkForEmpty } from 'components/common/CharmEditor/utils';
 import type { Page, PageContent } from 'models';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RestoreIcon from '@mui/icons-material/Restore';
@@ -16,6 +15,7 @@ import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/sto
 import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { mutate } from 'swr';
 import { useRouter } from 'next/router';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import PageIcon from './PageIcon';
 
 const PageArchivedDate = memo<{ date: Date, title: string }>(({ date, title }) => {
@@ -34,7 +34,7 @@ const ArchivedPageItem = memo<
   onDelete: (e: MouseEvent<HTMLButtonElement, MouseEvent>, pageId: string) => void;
     }>(({ onRestore, onDelete, disabled, archivedPage }) => {
       const [space] = useCurrentSpace();
-      const isEditorEmpty = checkForEmpty(archivedPage.content as PageContent);
+      const isEditorEmpty = checkIsContentEmpty(archivedPage.content as PageContent);
 
       return (
         <Link href={`/${space?.domain}/${archivedPage.path}`} passHref key={archivedPage.id}>

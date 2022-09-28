@@ -38,6 +38,7 @@ import type { PageContent } from 'models';
 import type { CSSProperties, ReactNode } from 'react';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useSWRConfig } from 'swr';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import * as listItem from './components/listItem/listItem';
 import * as orderedList from './components/orderedList';
 import * as bulletList from './components/bulletList';
@@ -71,7 +72,6 @@ import * as table from './components/table';
 import * as trailingNode from './components/trailingNode';
 import DevTools from './DevTools';
 import { specRegistry } from './specRegistry';
-import { checkForEmpty } from './utils';
 import trackStyles from './components/suggestions/styles';
 import { rejectAll } from './components/suggestions/track/rejectAll';
 import { getSelectedChanges } from './components/suggestions/statePlugins/track';
@@ -372,7 +372,7 @@ function CharmEditor (
   const [currentSpace] = useCurrentSpace();
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   // check empty state of page on first load
-  const _isEmpty = checkForEmpty(content);
+  const _isEmpty = checkIsContentEmpty(content);
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
   const { user } = useUser();
 

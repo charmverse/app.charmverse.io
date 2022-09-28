@@ -1,8 +1,7 @@
 import type { NodeViewProps } from '@bangle.dev/core';
-import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import { Box, Typography } from '@mui/material';
-import { checkForEmpty } from 'components/common/CharmEditor/utils';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import { useContributors } from 'hooks/useContributors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -39,7 +38,7 @@ export default function Mention ({ node }: NodeViewProps) {
     value = page && (
       <MentionContainer color='inherit' href={`/${space?.domain}/${page.path}`}>
         <Box display='flex' alignItems='center'>
-          <PageIcon icon={page.icon} isEditorEmpty={checkForEmpty(page.content as PageContent)} pageType={page.type} />
+          <PageIcon icon={page.icon} isEditorEmpty={checkIsContentEmpty(page.content as PageContent)} pageType={page.type} />
           <Typography component='span' fontWeight={600}>{page.title || 'Untitled'}</Typography>
         </Box>
       </MentionContainer>

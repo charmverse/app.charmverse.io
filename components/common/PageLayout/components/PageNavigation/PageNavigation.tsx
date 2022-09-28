@@ -4,7 +4,6 @@ import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
 import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
 import TreeView from '@mui/lab/TreeView';
 import charmClient from 'charmClient';
-import { checkForEmpty } from 'components/common/CharmEditor/utils';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
@@ -20,6 +19,7 @@ import { memo, useCallback, useEffect, useMemo } from 'react';
 import { useDrop } from 'react-dnd';
 
 import { useSnackbar } from 'hooks/useSnackbar';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import type { MenuNode, ParentMenuNode } from './components/TreeNode';
 import TreeNode from './components/TreeNode';
 
@@ -98,7 +98,7 @@ function PageNavigation ({
       title: page.title,
       icon: page.icon,
       index: page.index,
-      isEmptyContent: checkForEmpty(page.content as PageContent),
+      isEmptyContent: checkIsContentEmpty(page.content as PageContent),
       parentId: page.parentId,
       path: page.path,
       type: page.type,

@@ -7,7 +7,6 @@ import { usePages } from 'hooks/usePages';
 import { mutate } from 'swr';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
-import { checkForEmpty } from 'components/common/CharmEditor/utils';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { Board, IPropertyTemplate } from '../../blocks/board';
 import { Card } from '../../blocks/card';
@@ -202,3 +201,7 @@ const GalleryCard = React.memo((props: Props) => {
 });
 
 export default GalleryCard;
+function checkForEmpty(arg0: PageContent): boolean {
+  throw new Error('Function not implemented.');
+}
+

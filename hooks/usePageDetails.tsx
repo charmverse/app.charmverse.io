@@ -40,8 +40,5 @@ export function usePageDetails (pageIdOrPath: string, spaceId?: string) {
     };
   }, []);
 
-  // update details + mutate state methods
-  // console.log('🔥PD:', pageDetails);
-
   return { pageDetails, error, updatePageDetails, debouncedUpdatePageDetails };
 }

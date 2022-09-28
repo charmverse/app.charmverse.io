@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useMemo, memo } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
-import { checkForEmpty } from 'components/common/CharmEditor/utils';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import { PageContent } from 'models';
 import { Card } from '../../blocks/card';
 import { Board, IPropertyTemplate } from '../../blocks/board';
@@ -93,7 +93,7 @@ function TableRow (props: Props) {
       >
         <div className='octo-icontitle'>
 
-          <PageIcon isEditorEmpty={content ? checkForEmpty(content) : true} pageType='page' icon={pageIcon} />
+          <PageIcon isEditorEmpty={content ? checkIsContentEmpty(content) : true} pageType='page' icon={pageIcon} />
 
           <Editable
             ref={titleRef}
