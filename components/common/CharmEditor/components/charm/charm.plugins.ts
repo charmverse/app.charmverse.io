@@ -1,6 +1,6 @@
 import { Plugin, PluginKey } from 'prosemirror-state';
 
-export type UserDataPluginState = {userId: string | null, spaceId: string | null, pageId: string | null}
+export type UserDataPluginState = { userId: string | null, spaceId: string | null, pageId: string | null }
 export const UserDataPluginKey = new PluginKey<UserDataPluginState>('charm-state');
 
 export function userDataPlugin ({ userId, spaceId, pageId }: UserDataPluginState) {

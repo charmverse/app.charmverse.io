@@ -22,12 +22,12 @@ export const schema = yup.object({
   permissionLevel: yup.string()
 });
 
-type FormValues = yup.InferType<typeof schema> & {type: 'role' | 'user', permissionLevel: PagePermissionLevelType}
+type FormValues = yup.InferType<typeof schema> & { type: 'role' | 'user', permissionLevel: PagePermissionLevelType }
 
 interface Props {
-  pageId: string
-  existingPermissions: IPagePermissionWithAssignee []
-  permissionsAdded?: () => any
+  pageId: string;
+  existingPermissions: IPagePermissionWithAssignee [];
+  permissionsAdded?: () => any;
 }
 
 export default function AddPagePermissionsForm ({ pageId, existingPermissions = [], permissionsAdded = () => {} }: Props) {
@@ -41,7 +41,7 @@ export default function AddPagePermissionsForm ({ pageId, existingPermissions = 
   const [selectedUserIds, setSelectedUserIds] = useState<string []>([]);
   const [selectedRoleIds, setSelectedRoleIds] = useState<string []>([]);
 
-  const [permissionBeingAdded, setPermissionBeingAdded] = useState<{index: number, total: number} | null>(null);
+  const [permissionBeingAdded, setPermissionBeingAdded] = useState<{ index: number, total: number } | null>(null);
 
   useEffect(() => {
 
@@ -85,7 +85,7 @@ export default function AddPagePermissionsForm ({ pageId, existingPermissions = 
     ];
 
     async function recursivePermissionAssign ({ currentIndex = 0, total, permissions }:
-      {currentIndex?: number, total: number, permissions: IPagePermissionToCreate[]}): Promise<true> {
+      { currentIndex?: number, total: number, permissions: IPagePermissionToCreate[] }): Promise<true> {
       if (permissions.length === 0) {
         setPermissionBeingAdded(null);
         return true;

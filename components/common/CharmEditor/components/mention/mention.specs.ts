@@ -4,11 +4,11 @@ import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
 import { mentionNodeName, mentionSuggestMarkName, mentionTrigger } from './mention.constants';
 
 export interface MentionSpecSchemaAttrs {
-  value: string
-  type: 'user' | 'page'
-  id: string
-  createdAt: Date
-  createdBy: string
+  value: string;
+  type: 'user' | 'page';
+  id: string;
+  createdAt: Date;
+  createdBy: string;
 }
 
 export function mentionSpecs (): RawSpecs {
@@ -33,6 +33,9 @@ export function mentionSpecs (): RawSpecs {
           },
           createdBy: {
             default: null
+          },
+          track: {
+            default: []
           }
         },
         inline: true,

@@ -24,9 +24,9 @@ interface Props {
   receiver: string;
   amount: string;
   tokenSymbolOrAddress: string;
-  chainIdToUse: number
+  chainIdToUse: number;
   onSuccess?: (txId: string, chainId: number) => void;
-  onClick?: () => void
+  onClick?: () => void;
   onError?: (err: string, severity?: AlertColor) => void;
 }
 

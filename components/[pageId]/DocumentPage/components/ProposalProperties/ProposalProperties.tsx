@@ -12,6 +12,7 @@ import ProposalStepper from 'components/proposals/components/ProposalStepper';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import type { Contributor } from 'hooks/useContributors';
 import { useContributors } from 'hooks/useContributors';
+import useIsAdmin from 'hooks/useIsAdmin';
 import useRoles from 'hooks/useRoles';
 import { useUser } from 'hooks/useUser';
 import type { ProposalCategory } from 'lib/proposal/interface';
@@ -19,13 +20,12 @@ import type { ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
 import useSWR from 'swr';
-import useIsAdmin from 'hooks/useIsAdmin';
 
 interface ProposalPropertiesProps {
-  readOnly?: boolean
-  pageId: string
-  proposalId: string
-  isTemplate: boolean
+  readOnly?: boolean;
+  pageId: string;
+  proposalId: string;
+  isTemplate: boolean;
 }
 
 export default function ProposalProperties ({ pageId, proposalId, readOnly, isTemplate }: ProposalPropertiesProps) {
@@ -58,7 +58,7 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
 
   const canUpdateProposalProperties = (proposalStatus === 'draft' || proposalStatus === 'private_draft' || proposalStatus === 'discussion') && (isProposalAuthor || isAdmin);
 
-  const reviewerOptionsRecord: Record<string, ({group: 'role'} & ListSpaceRolesResponse) | ({group: 'user'} & Contributor)> = {};
+  const reviewerOptionsRecord: Record<string, ({ group: 'role' } & ListSpaceRolesResponse) | ({ group: 'user' } & Contributor)> = {};
 
   const currentUserGroups: ProposalUserGroup[] = [];
   if (isProposalAuthor) {
@@ -110,7 +110,10 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
     >
       {
         !isTemplate && (
-          <Grid container mb={2}>
+          <Grid
+            container
+            mb={2}
+          >
             <ProposalStepper
               proposalUserGroups={isAdmin ? ['author', 'reviewer'] : currentUserGroups}
               proposal={proposal}
@@ -123,11 +126,6 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
         <Grid item xs={8}>
           <Box display='flex' gap={1} alignItems='center'>
             <Typography fontWeight='bold'>Proposal information</Typography>
-            {proposalStatus === 'reviewed' && (
-              <IconButton size='small' {...bindTrigger(proposalMenuState)}>
-                <MoreHorizIcon fontSize='small' />
-              </IconButton>
-            )}
           </Box>
         </Grid>
       </Grid>
@@ -239,15 +237,6 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
         my: 2
       }}
       />
-      <Menu {...bindMenu(proposalMenuState)}>
-        {
-          proposalStatus === 'reviewed' && (
-            <MenuItem disabled={!isProposalAuthor}>
-              <PublishToSnapshot pageId={pageId} />
-            </MenuItem>
-          )
-        }
-      </Menu>
     </Box>
   );
 }

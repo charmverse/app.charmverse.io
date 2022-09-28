@@ -10,10 +10,10 @@ import { isTruthy } from 'lib/utilities/types';
 import { IconButton } from '@mui/material';
 
 interface Props {
-  onChange: (choices: string []) => void
-  title?: string,
-  minimumOptions?: number,
-  defaultOptions?: string[]
+  onChange: (choices: string []) => void;
+  title?: string;
+  minimumOptions?: number;
+  defaultOptions?: string[];
 }
 
 /**

@@ -48,7 +48,7 @@ const StyledInput = styled(Input)`
  * @param pagePermissions
  */
 function sortPagePermissions (pagePermissions: IPagePermissionWithAssignee[]):
-  (IPagePermissionWithAssignee & {displayName: string})[] {
+  (IPagePermissionWithAssignee & { displayName: string })[] {
   const sortedPermissions = pagePermissions
     .filter(permission => {
       return !permission.spaceId && !permission.public;

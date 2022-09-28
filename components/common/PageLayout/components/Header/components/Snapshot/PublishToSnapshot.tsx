@@ -1,6 +1,5 @@
 import PublishIcon from '@mui/icons-material/ElectricBolt';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-import ListItemText from '@mui/material/ListItemText';
 import charmClient from 'charmClient';
 import Link from 'components/common/Link';
 import { LoadingIcon } from 'components/common/LoadingComponent';
@@ -10,10 +9,13 @@ import { usePages } from 'hooks/usePages';
 import type { SnapshotProposal } from 'lib/snapshot';
 import { getSnapshotProposal } from 'lib/snapshot';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import PublishingForm from './PublishingForm';
 
-export default function PublishToSnapshot ({ pageId }: {pageId: string}) {
+export default function PublishToSnapshot ({ pageId, renderContent }: {
+  renderContent: (props: { onClick?: () => void, label: string }) => ReactNode; pageId: string;
+}) {
   const { pages, setPages } = usePages();
   const page = pages[pageId]!;
 
@@ -58,7 +60,9 @@ export default function PublishToSnapshot ({ pageId }: {pageId: string}) {
       checkingProposal && (
         <>
           <LoadingIcon size={18} sx={{ mr: 1 }} />
-          <ListItemText primary='Checking proposal' />
+          {renderContent({
+            label: 'Checking proposal'
+          })}
         </>
       )
     }
@@ -72,8 +76,10 @@ export default function PublishToSnapshot ({ pageId }: {pageId: string}) {
             }}
             onClick={open}
           />
-          <ListItemText onClick={open} primary='Publish to Snapshot' />
-
+          {renderContent({
+            label: 'Publish to Snapshot',
+            onClick: open
+          })}
           <Modal size='large' open={isOpen} onClose={close} title={`Publish to Snapshot ${currentSpace?.snapshotDomain ? `(${currentSpace.snapshotDomain})` : ''}`}>
             <PublishingForm onSubmit={close} page={page} />
           </Modal>
@@ -91,8 +97,9 @@ export default function PublishToSnapshot ({ pageId }: {pageId: string}) {
             }}
 
           />
-          <ListItemText primary='View on Snapshot' />
-
+          {renderContent({
+            label: 'View on Snapshot'
+          })}
         </Link>
       )
     }

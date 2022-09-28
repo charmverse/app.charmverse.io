@@ -15,15 +15,14 @@ import { useBounties } from 'hooks/useBounties';
 import { useUser } from 'hooks/useUser';
 import type { ApplicationWithTransactions } from 'lib/applications/actions';
 import { countValidSubmissions, submissionsCapReached as submissionsCapReachedFn } from 'lib/applications/shared';
-import type { AssignedBountyPermissions } from 'lib/bounties/interfaces';
+import type { AssignedBountyPermissions, BountyWithDetails } from 'lib/bounties';
 import { isBountyLockable } from 'lib/bounties/shared';
-import type { BountyWithDetails } from 'models';
 import { useEffect, useState } from 'react';
 import BountyApplicantTableRow from './BountyApplicantTableRow';
 
 interface Props {
-  bounty: BountyWithDetails
-  permissions: AssignedBountyPermissions
+  bounty: BountyWithDetails;
+  permissions: AssignedBountyPermissions;
 }
 
 export default function BountySubmissionsTable ({ bounty, permissions }: Props) {

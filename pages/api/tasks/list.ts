@@ -17,12 +17,12 @@ handler.use(requireUser).get(getTasks);
 
 export interface GetTasksResponse {
   gnosis: GnosisSafeTasks[];
-  mentioned: MentionedTasksGroup
-  votes: VoteTask[]
+  mentioned: MentionedTasksGroup;
+  votes: VoteTask[];
   proposals: {
-    marked: ProposalTask[],
-    unmarked: ProposalTask[]
-  }
+    marked: ProposalTask[];
+    unmarked: ProposalTask[];
+  };
 }
 
 async function getTasks (req: NextApiRequest, res: NextApiResponse<GetTasksResponse>) {

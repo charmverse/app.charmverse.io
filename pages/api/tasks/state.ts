@@ -33,8 +33,8 @@ async function getTasksState (req: NextApiRequest, res: NextApiResponse<GetTasks
 }
 
 export interface UpdateTasksState {
-  snoozeMessage: string | null
-  snoozeFor: Date | null
+  snoozeMessage: string | null;
+  snoozeFor: Date | null;
 }
 
 async function updateTasksState (req: NextApiRequest, res: NextApiResponse<{ ok: true }>) {

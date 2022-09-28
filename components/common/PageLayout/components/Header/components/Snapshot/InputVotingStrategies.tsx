@@ -7,8 +7,8 @@ import type { SnapshotVotingStrategy } from 'lib/snapshot';
 import { useEffect, useState } from 'react';
 
 export interface Props {
-  onChange?: (option: SnapshotVotingStrategy[]) => void
-  strategies: SnapshotVotingStrategy[]
+  onChange?: (option: SnapshotVotingStrategy[]) => void;
+  strategies: SnapshotVotingStrategy[];
 }
 
 const MAX_CONCURRENT_STRATEGIES = 8;

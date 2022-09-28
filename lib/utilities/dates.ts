@@ -8,7 +8,7 @@ export type DateTimeFormat = 'relative' | 'absolute'
 
 export type TimeUnit = 'millisecond' | 'second' | 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year'
 
-const SystemToLuxonUnitMapping: {[key in TimeUnit]: LuxonTimeUnit} = {
+const SystemToLuxonUnitMapping: { [key in TimeUnit]: LuxonTimeUnit } = {
   millisecond: 'millisecond',
   second: 'second',
   minute: 'minute',
@@ -48,8 +48,8 @@ export function getTimeDifference (
 }
 
 export function humanFriendlyDate (date: DateInput, options: {
-  withYear?: boolean,
-  withTime?: boolean} = {
+  withYear?: boolean;
+  withTime?: boolean; } = {
   withYear: false,
   withTime: false
 }): string {

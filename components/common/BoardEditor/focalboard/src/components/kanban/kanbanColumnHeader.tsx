@@ -26,7 +26,7 @@ type Props = {
     group: BoardGroup
     groupByProperty?: IPropertyTemplate
     intl: IntlShape
-    readonly: boolean
+    readOnly: boolean
     addCard: (groupByOptionId?: string, show?: boolean) => Promise<void>
     propertyNameChanged: (option: IPropertyOption, text: string) => Promise<void>
     onDropToColumn: (srcOption: IPropertyOption, card?: Card, dstOption?: IPropertyOption) => void
@@ -83,7 +83,7 @@ export default function KanbanColumnHeader (props: Props): JSX.Element {
       ref={headerRef}
       style={{ opacity: isDragging ? 0.5 : 1 }}
       className={className}
-      draggable={!props.readonly}
+      draggable={!props.readOnly}
     >
       {groupByProperty && !group.option.id
                 && (
@@ -118,7 +118,7 @@ export default function KanbanColumnHeader (props: Props): JSX.Element {
                     onCancel={() => {
                       setGroupTitle(group.option.value);
                     }}
-                    readonly={props.readonly}
+                    readOnly={props.readOnly}
                     spellCheck={true}
                   />
                 </Label>
@@ -131,7 +131,7 @@ export default function KanbanColumnHeader (props: Props): JSX.Element {
         onMenuClose={props.onCalculationMenuClose}
         onMenuOpen={props.onCalculationMenuOpen}
         cardProperties={board.fields.cardProperties}
-        readonly={props.readonly}
+        readOnly={props.readOnly}
         onChange={(data: {calculation: string, propertyId: string}) => {
           if (data.calculation === calculationValue && data.propertyId === calculationProperty.id) {
             return;
@@ -149,7 +149,7 @@ export default function KanbanColumnHeader (props: Props): JSX.Element {
         }}
       />
       <div className='octo-spacer' />
-      {!props.readonly
+      {!props.readOnly
                 && (
                 <>
                   <MenuWrapper>

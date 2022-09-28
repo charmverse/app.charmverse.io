@@ -3,8 +3,8 @@ import Box from '@mui/material/Box';
 import type { PropsWithChildren, ReactNode } from 'react';
 
 type Props = {
-  title: string | ReactNode
-  titleRightElement?: ReactNode
+  title: string | ReactNode;
+  titleRightElement?: ReactNode;
 }
 
 export default function Section ({

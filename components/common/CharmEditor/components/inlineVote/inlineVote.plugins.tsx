@@ -11,13 +11,13 @@ import { markName } from './inlineVote.constants';
 import RowDecoration from './components/InlineVoteRowDecoration';
 
 export interface InlineVotePluginState {
-  tooltipContentDOM: HTMLElement
-  show: boolean
-  ids: string[]
+  tooltipContentDOM: HTMLElement;
+  show: boolean;
+  ids: string[];
 }
 
 export function plugin ({ key } :{
-  key: PluginKey
+  key: PluginKey;
 }): RawPlugins {
   const tooltipDOMSpec = createTooltipDOM();
   return [
@@ -57,14 +57,18 @@ export function plugin ({ key } :{
         }
       },
       props: {
-        handleClickOn: (view) => {
-          return highlightMarkedElement({
-            view,
-            elementId: 'page-vote-list-box',
-            key,
-            markName,
-            prefix: 'vote'
-          });
+        handleClickOn: (view: EditorView, _, __, ___, event: MouseEvent) => {
+          const className = (event.target as HTMLElement).className + ((event.target as HTMLElement).parentNode as HTMLElement).className;
+          if (/inline-vote/.test(className)) {
+            return highlightMarkedElement({
+              view,
+              elementId: 'page-action-sidebar',
+              key,
+              markName,
+              prefix: 'vote'
+            });
+          }
+          return false;
         }
       }
     }),
@@ -103,7 +107,7 @@ export function plugin ({ key } :{
             return highlightElement({
               ids,
               view,
-              elementId: 'page-vote-list-box',
+              elementId: 'page-action-sidebar',
               key,
               markName,
               prefix: 'vote'

@@ -17,7 +17,7 @@ type Props = {
     onChange: (data: { calculation: string, propertyId: string }) => void
     value: string
     property: IPropertyTemplate
-    readonly: boolean
+    readOnly: boolean
 }
 
 function KanbanCalculation (props: Props): JSX.Element {
@@ -34,7 +34,7 @@ function KanbanCalculation (props: Props): JSX.Element {
       </Button>
 
       {
-                !props.readonly && props.menuOpen && (
+                !props.readOnly && props.menuOpen && (
                 <KanbanCalculationOptions
                   value={props.value}
                   property={props.property}

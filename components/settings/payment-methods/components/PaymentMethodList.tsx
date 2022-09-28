@@ -16,7 +16,7 @@ import { useState } from 'react';
 import CompositeDeletePaymentMethod from './DeletePaymentMethodModal';
 
 interface IProps {
-  paymentMethods: PaymentMethod[]
+  paymentMethods: PaymentMethod[];
 }
 
 const getGnosisSafeUrl = (address: string) => `https://gnosis-safe.io/app/rin:${address}/balances`;

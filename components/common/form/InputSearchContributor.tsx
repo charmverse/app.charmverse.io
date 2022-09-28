@@ -6,8 +6,8 @@ import type { Contributor } from 'models';
 import { useEffect, useState } from 'react';
 
 interface IContributorsFilter {
-  mode: 'include' | 'exclude',
-  userIds: string []
+  mode: 'include' | 'exclude';
+  userIds: string [];
 }
 
 function filterContributors (contributors: Contributor [], filter: IContributorsFilter): Contributor[] {
@@ -30,7 +30,7 @@ type BooleanField = boolean | undefined;
 interface Props extends Omit<AutocompleteProps<Contributor, BooleanField, BooleanField, BooleanField>, 'options' | 'renderInput'> {
   filter?: IContributorsFilter;
   options: Contributor[];
-  disableCloseOnSelect?: boolean
+  disableCloseOnSelect?: boolean;
 }
 
 export function InputSearchContributorBase ({ filter, options, disableCloseOnSelect, placeholder, ...props }: Props) {
@@ -70,9 +70,9 @@ export function InputSearchContributorBase ({ filter, options, disableCloseOnSel
 }
 
 interface IInputSearchContributorProps {
-  onChange: (id: string) => void
-  defaultValue?: string,
-  filter?: IContributorsFilter
+  onChange: (id: string) => void;
+  defaultValue?: string;
+  filter?: IContributorsFilter;
 }
 
 export function InputSearchContributor ({ defaultValue, onChange, ...props }: IInputSearchContributorProps) {
@@ -108,10 +108,10 @@ export function InputSearchContributor ({ defaultValue, onChange, ...props }: II
 }
 
 interface IInputSearchContributorMultipleProps extends Partial<Omit<AutocompleteProps<Contributor, true, true, true>, 'onChange'>> {
-  onChange: (id: string[]) => void
-  defaultValue?: string[]
-  filter?: IContributorsFilter
-  disableCloseOnSelect?: boolean
+  onChange: (id: string[]) => void;
+  defaultValue?: string[];
+  filter?: IContributorsFilter;
+  disableCloseOnSelect?: boolean;
 }
 
 export function InputSearchContributorMultiple ({ onChange, disableCloseOnSelect, defaultValue, ...props }: IInputSearchContributorMultipleProps) {

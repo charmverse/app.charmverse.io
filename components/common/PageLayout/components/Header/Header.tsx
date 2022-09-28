@@ -1,6 +1,7 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
+import { RateReviewOutlined } from '@mui/icons-material';
+import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import MoonIcon from '@mui/icons-material/DarkMode';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
@@ -31,11 +32,11 @@ import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useRef, useState } from 'react';
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import ShareButton from './components/ShareButton';
 import BountyShareButton from './components/BountyShareButton/BountyShareButton';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
 import DatabasePageOptions from './components/DatabasePageOptions';
+import EditingModeToggle from './components/EditingModeToggle';
 
 export const headerHeight = 56;
 
@@ -104,7 +105,8 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
   }
 
   const isFullWidth = basePage?.fullWidth ?? false;
-  const isBasePageDocument = basePage?.type === 'page' || basePage?.type === 'card' || basePage?.type === 'proposal' || basePage?.type === 'bounty';
+  const isBasePageDocument = ['page', 'card', 'proposal', 'proposal_template', 'bounty'].includes(basePage?.type ?? '');
+  const isBasePageDatabase = /board/.test(basePage?.type ?? '');
 
   const documentOptions = (
     <List dense>
@@ -140,7 +142,10 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
       </ListItemButton>
       {basePage && (
         <ListItemButton>
-          <PublishToSnapshot pageId={basePage.id} />
+          <PublishToSnapshot
+            pageId={basePage.id}
+            renderContent={({ label, onClick }) => <ListItemText primary={label} onClick={onClick} />}
+          />
         </ListItemButton>
       )}
       <Divider />
@@ -149,13 +154,26 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
         setPageMenuOpen(false);
       }}
       >
-        <CommentOutlinedIcon
+        <MessageOutlinedIcon
           fontSize='small'
           sx={{
             mr: 1
           }}
         />
         <ListItemText primary='View comments' />
+      </ListItemButton>
+      <ListItemButton onClick={() => {
+        setCurrentPageActionDisplay('suggestions');
+        setPageMenuOpen(false);
+      }}
+      >
+        <RateReviewOutlined
+          fontSize='small'
+          sx={{
+            mr: 1
+          }}
+        />
+        <ListItemText primary='View suggestions' />
       </ListItemButton>
       {isExportablePage && (
         <ListItemButton onClick={() => {
@@ -207,14 +225,13 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
     setPageMenuOpen(false);
   }
 
-  const databaseOptions = basePage ? <DatabasePageOptions closeMenu={closeMenu} /> : null;
-
   let pageOptionsList: ReactNode;
+
   if (isBasePageDocument) {
     pageOptionsList = documentOptions;
   }
-  else if (/board/.test(basePage?.type ?? '')) {
-    pageOptionsList = databaseOptions;
+  else if (isBasePageDatabase) {
+    pageOptionsList = <DatabasePageOptions closeMenu={closeMenu} />;
   }
 
   return (
@@ -243,6 +260,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
       >
         <PageTitleWithBreadcrumbs pageId={basePage?.id} />
         <Box display='flex' alignItems='center' alignSelf='stretch' mr={-1}>
+
           {
             isBountyBoard && (
               <BountyShareButton headerHeight={headerHeight} />
@@ -251,7 +269,10 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
 
           {basePage && (
             <>
-              {basePage?.deletedAt === null && <ShareButton headerHeight={headerHeight} pageId={basePage.id} />}
+              {isBasePageDocument && <EditingModeToggle />}
+              {basePage?.deletedAt === null && (
+                <ShareButton headerHeight={headerHeight} pageId={basePage.id} />
+              )}
               <IconButton sx={{ display: { xs: 'none', md: 'inline-flex' } }} size='small' onClick={toggleFavorite} color='inherit'>
                 <Tooltip title={isFavorite ? 'Remove from sidebar' : 'Pin this page to your sidebar'} arrow placement='top'>
                   {isFavorite ? <FavoritedIcon color='secondary' /> : <NotFavoritedIcon color='secondary' />}

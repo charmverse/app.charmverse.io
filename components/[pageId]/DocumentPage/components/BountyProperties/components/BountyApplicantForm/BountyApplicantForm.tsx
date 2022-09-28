@@ -9,10 +9,10 @@ import ApplicationInput from './components/ApplicationInput';
 import SubmissionInput from './components/SubmissionInput';
 
 interface BountyApplicationFormProps {
-  permissions: AssignedBountyPermissions
-  bounty: Bounty
-  submissions: Application[]
-  refreshSubmissions: () => Promise<void>
+  permissions: AssignedBountyPermissions;
+  bounty: Bounty;
+  submissions: Application[];
+  refreshSubmissions: () => Promise<void>;
 }
 
 export default function BountyApplicantForm (props: BountyApplicationFormProps) {

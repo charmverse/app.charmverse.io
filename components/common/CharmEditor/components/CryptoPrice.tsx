@@ -37,6 +37,9 @@ export function cryptoPriceSpec () {
         },
         quote: {
           default: null
+        },
+        track: {
+          default: []
         }
       },
       group: 'block',
@@ -56,9 +59,9 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
   preset?: Partial<{
     base: CryptoCurrency | null;
     quote: FiatCurrency | null;
-  }>,
-  onQuoteCurrencyChange?: ((currency: FiatCurrency) => void),
-  onBaseCurrencyChange?: ((currency: CryptoCurrency) => void)
+  }>;
+  onQuoteCurrencyChange?: ((currency: FiatCurrency) => void);
+  onBaseCurrencyChange?: ((currency: CryptoCurrency) => void);
 }) {
 
   const [loading, setLoadingState] = useState(false);

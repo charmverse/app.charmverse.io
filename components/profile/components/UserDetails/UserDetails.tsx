@@ -83,12 +83,12 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
 
   const hasAnySocialInformation = (model: Social) => model.twitterURL || model.githubURL || model.discordUsername || model.linkedinURL;
 
-  const identityTypes: Array<IntegrationModel> = useMemo(() => {
+  const identityTypes: IntegrationModel[] = useMemo(() => {
     if (isPublicUser(user)) {
       return [];
     }
 
-    const types: Array<IntegrationModel> = [];
+    const types: IntegrationModel[] = [];
     if (user?.addresses) {
       types.push({
         type: IDENTITY_TYPES[0],

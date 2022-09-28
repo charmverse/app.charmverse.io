@@ -1,4 +1,4 @@
-import { FormControlLabel, IconButton, ListItem, Radio, RadioGroup, TextField, Tooltip, Typography } from '@mui/material';
+import { FormControlLabel, IconButton, ListItem, Radio, RadioGroup, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { VoteType } from '@prisma/client';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
@@ -13,6 +13,9 @@ import { usePages } from 'hooks/usePages';
 import { useVotes } from 'hooks/useVotes';
 import AddCircle from '@mui/icons-material/AddCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
+import PublishToSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/PublishToSnapshot';
+import type { ProposalWithUsers } from 'lib/proposal/interface';
+import { useUser } from 'hooks/useUser';
 
 interface InlineVoteOptionsProps {
   options: { name: string }[];
@@ -86,17 +89,17 @@ interface CreateVoteModalProps {
   onClose?: () => void;
   onCreateVote?: (vote: ExtendedVote) => void;
   open?: boolean;
-  isProposal?: boolean;
+  proposal?: ProposalWithUsers;
 }
 
-export default function CreateVoteModal ({ open = true, onClose, onCreateVote, isProposal }: CreateVoteModalProps) {
+export default function CreateVoteModal ({ open = true, onClose, onCreateVote, proposal }: CreateVoteModalProps) {
   const [voteTitle, setVoteTitle] = useState('');
   const [voteDescription, setVoteDescription] = useState('');
   const [passThreshold, setPassThreshold] = useState<number>(50);
   const [voteType, setVoteType] = useState<VoteType>(VoteType.Approval);
   const [options, setOptions] = useState<{ name: string }[]>([]);
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
-
+  const { user } = useUser();
   const { createVote } = useVotes();
 
   useEffect(() => {
@@ -133,7 +136,7 @@ export default function CreateVoteModal ({ open = true, onClose, onCreateVote, i
       pageId: cardId ?? currentPageId,
       threshold: +passThreshold,
       type: voteType,
-      context: isProposal ? 'proposal' : 'inline'
+      context: proposal ? 'proposal' : 'inline'
     });
 
     if (onCreateVote) {
@@ -142,19 +145,21 @@ export default function CreateVoteModal ({ open = true, onClose, onCreateVote, i
   };
 
   const disabledSave = passThreshold > 100
-    || (!isProposal && voteTitle.length === 0)
+    || (!proposal && voteTitle.length === 0)
     || (voteType === VoteType.SingleChoice && (options.findIndex(option => option.name.length === 0) !== -1))
     || (new Set(options.map(option => option.name)).size !== options.length);
 
+  const isProposalAuthor = (proposal?.authors.find(author => author.userId === user?.id) ?? false);
+
   return (
-    <Modal title={isProposal ? 'Create a vote' : 'Create a poll'} size='large' open={open} onClose={onClose ?? (() => {})}>
+    <Modal title={proposal ? 'Create a vote' : 'Create a poll'} size='large' open={open} onClose={onClose ?? (() => {})}>
       <Box
         flexDirection='column'
         gap={1.5}
         m={1}
         display='flex'
       >
-        {!isProposal && (
+        {!proposal && (
           <Box flexDirection='column' display='flex'>
             <FieldLabel>Title</FieldLabel>
             <TextField
@@ -168,7 +173,7 @@ export default function CreateVoteModal ({ open = true, onClose, onCreateVote, i
           </Box>
         )}
 
-        {!isProposal && (
+        {!proposal && (
           <Box flexDirection='column' display='flex'>
             <TextField
               placeholder='Details (Optional)'
@@ -253,17 +258,30 @@ export default function CreateVoteModal ({ open = true, onClose, onCreateVote, i
           </RadioGroup>
         </Box>
         {voteType === VoteType.SingleChoice && <InlineVoteOptions options={options} setOptions={setOptions} />}
-        <Button
-          onClick={handleSubmit}
-          sx={{
-            alignSelf: 'flex-start',
-            marginBottom: '4px',
-            marginRight: '8px'
-          }}
-          disabled={disabledSave}
-        >
-          Create
-        </Button>
+        <Stack gap={2} flexDirection='row' alignItems='center'>
+          <Button
+            onClick={handleSubmit}
+            sx={{
+              alignSelf: 'flex-start'
+            }}
+            disabled={disabledSave}
+          >
+            Create
+          </Button>
+          or
+          {proposal?.status === 'reviewed' && (
+            <Tooltip title={!isProposalAuthor ? 'Only proposal authors can publish to snapshot' : ''}>
+              <div>
+                <Button disabled={!isProposalAuthor}>
+                  <PublishToSnapshot
+                    renderContent={({ label, onClick }) => <Typography onClick={onClick}>{label}</Typography>}
+                    pageId={proposal.id}
+                  />
+                </Button>
+              </div>
+            </Tooltip>
+          )}
+        </Stack>
       </Box>
     </Modal>
   );

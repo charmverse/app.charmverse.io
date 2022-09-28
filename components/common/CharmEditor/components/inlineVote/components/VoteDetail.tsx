@@ -11,6 +11,7 @@ import { removeInlineVoteMark } from 'lib/inline-votes/removeInlineVoteMark';
 import type { ExtendedVote } from 'lib/votes/interfaces';
 import { isVotingClosed } from 'lib/votes/utils';
 import { DateTime } from 'luxon';
+import React from 'react';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import useSWR from 'swr';
 import VoteActionsMenu from 'components/votes/components/VoteActionsMenu';
@@ -21,9 +22,9 @@ export interface VoteDetailProps {
   vote: ExtendedVote;
   detailed?: boolean;
   isProposal?: boolean;
-  castVote: (voteId: string, choice: string) => Promise<UserVote>
-  deleteVote: (voteId: string) => Promise<void>
-  cancelVote: (voteId: string) => Promise<void>
+  castVote: (voteId: string, choice: string) => Promise<UserVote>;
+  deleteVote: (voteId: string) => Promise<void>;
+  cancelVote: (voteId: string) => Promise<void>;
 }
 
 const StyledDiv = styled.div<{ detailed: boolean }>`
@@ -176,7 +177,7 @@ export default function VoteDetail ({ cancelVote, castVote, deleteVote, detailed
       {detailed && userVotes && (
         <List>
           {userVotes.map(userVote => (
-            <>
+            <React.Fragment key={userVote.userId}>
               <ListItem
                 dense
                 sx={{
@@ -194,7 +195,7 @@ export default function VoteDetail ({ cancelVote, castVote, deleteVote, detailed
                 <Typography fontWeight={500} color='secondary'>{userVote.choice}</Typography>
               </ListItem>
               <Divider />
-            </>
+            </React.Fragment>
           ))}
         </List>
       )}

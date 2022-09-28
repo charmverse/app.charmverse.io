@@ -36,7 +36,7 @@ type Props = {
   // addCardFromTemplate: (cardTemplateId: string) => void
   addCardTemplate: () => void
   editCardTemplate: (cardTemplateId: string) => void
-  readonly: boolean
+  readOnly: boolean
   dateDisplayProperty?: IPropertyTemplate
   addViewButton?: ReactNode
   onViewTabClick?: (viewId: string) => void
@@ -70,7 +70,6 @@ const ViewHeader = (props: Props) => {
       cardId: pageId,
       cardPage: pages[pageId] as Page
     });
-    console.log('Created blocks', blocks)
     const newPageId = blocks[0].id;
     await refreshPage(newPageId);
     props.showCard(newPageId)
@@ -78,7 +77,6 @@ const ViewHeader = (props: Props) => {
 
   async function deleteCardTemplate(pageId: string) {
     const card = cardTemplates.find(c => c.id === pageId)
-    console.log('Found card', card, 'page', pages[pageId])
     if (card) {
       await mutator.deleteBlock(card, 'delete card');
       mutate(`pages/${card.spaceId}`);
@@ -93,7 +91,7 @@ const ViewHeader = (props: Props) => {
         onViewTabClick={props.onViewTabClick}
         addViewButton={props.addViewButton}
         views={views}
-        readonly={props.readonly}
+        readOnly={props.readOnly}
         showView={showView}
         viewsBoardId={viewsBoardId}
         activeView={activeView}
@@ -104,7 +102,7 @@ const ViewHeader = (props: Props) => {
 
       {/* add a view */}
 
-      {!props.readonly && views.length <= maxTabsShown && (
+      {!props.readOnly && views.length <= maxTabsShown && (
         props.addViewButton
       )}
 
@@ -112,7 +110,7 @@ const ViewHeader = (props: Props) => {
 
       <div className='view-actions'>
 
-      {!props.readonly && activeView && activeBoard
+      {!props.readOnly && activeView && activeBoard
         && (
           <>
 
@@ -180,13 +178,13 @@ const ViewHeader = (props: Props) => {
 
       {/* Options menu */}
 
-      {!props.readonly && activeView
+      {!props.readOnly && activeView
         && (
           <>
             <ViewHeaderActionsMenu onClick={() => toggleViewOptions()} />
 
             {/* New card button */}
-            
+
             <NewCardButton
               addCard={props.addCard}
               addCardFromTemplate={addPageFromTemplate}

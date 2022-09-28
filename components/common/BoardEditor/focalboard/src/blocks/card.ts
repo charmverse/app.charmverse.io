@@ -5,7 +5,7 @@ type CardFields = {
     icon?: string
     isTemplate?: boolean
     properties: Record<string, string | string[]>
-    contentOrder: Array<string | string[]>
+    contentOrder: (string | string[])[]
 }
 
 type Card = Block & {
@@ -16,7 +16,7 @@ type Card = Block & {
  * Returns a focalboard-ready card data stub
  */
 function createCard (block?: Partial<Block>): Card {
-  const contentOrder: Array<string|string[]> = [];
+  const contentOrder: (string | string[])[] = [];
   const contentIds = block?.fields?.contentOrder?.filter((id: any) => id !== null);
 
   if (contentIds?.length > 0) {

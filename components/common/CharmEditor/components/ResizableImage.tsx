@@ -57,7 +57,7 @@ function insertImageNode (state: EditorState, dispatch: DispatchFn, view: Editor
   }
 }
 
-function EmptyImageContainer ({ readOnly, isSelected, ...props }: HTMLAttributes<HTMLDivElement> & {readOnly: boolean, isSelected?: boolean}) {
+function EmptyImageContainer ({ readOnly, isSelected, ...props }: HTMLAttributes<HTMLDivElement> & { readOnly: boolean, isSelected?: boolean }) {
   const theme = useTheme();
 
   return (
@@ -112,6 +112,9 @@ export function imageSpec (): RawSpecs {
         size: {
           // Making sure default size is middle of max and min range
           default: (MIN_IMAGE_WIDTH + MAX_IMAGE_WIDTH) / 2
+        },
+        track: {
+          default: []
         }
       },
       group: 'block',
@@ -145,8 +148,8 @@ export function imageSpec (): RawSpecs {
 }
 
 interface ResizableImageProps extends NodeViewProps {
-  readOnly?: boolean,
-  onResizeStop?: (view: EditorView) => void
+  readOnly?: boolean;
+  onResizeStop?: (view: EditorView) => void;
 }
 
 function ResizableImage ({ readOnly = false, onResizeStop, node, updateAttrs, selected }: ResizableImageProps) {

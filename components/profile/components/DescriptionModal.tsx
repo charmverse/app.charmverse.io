@@ -14,10 +14,10 @@ export const schema = yup.object({
 export type FormValues = yup.InferType<typeof schema>;
 
 type DescriptionModalProps = {
-    currentDescription: string | null | undefined,
-    save: (description: string) => void,
-    close: () => void,
-    isOpen: boolean,
+    currentDescription: string | null | undefined;
+    save: (description: string) => void;
+    close: () => void;
+    isOpen: boolean;
 };
 
 function DescriptionModal (props: DescriptionModalProps) {

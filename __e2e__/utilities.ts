@@ -2,20 +2,20 @@ import type { Page as BrowserPage } from '@playwright/test';
 import type { Bounty, Page, Prisma, Space } from '@prisma/client';
 import { prisma } from 'db';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
-import type { BountyPermissions } from 'lib/bounties/interfaces';
+import type { BountyPermissions, BountyWithDetails } from 'lib/bounties';
 import type { IPageWithPermissions } from 'lib/pages/interfaces';
 import { getPagePath } from 'lib/pages/utils';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { typedKeys } from 'lib/utilities/objects';
-import type { BountyWithDetails, LoggedInUser } from 'models';
+import type { LoggedInUser } from 'models';
 import { baseUrl } from 'testing/mockApiCall';
 import { v4 } from 'uuid';
 
 export { baseUrl } from 'testing/mockApiCall';
 
-export async function createUser ({ browserPage, walletAddress }: {browserPage: BrowserPage,
-  walletAddress?: string}): Promise<LoggedInUser> {
+export async function createUser ({ browserPage, walletAddress }: { browserPage: BrowserPage;
+  walletAddress?: string; }): Promise<LoggedInUser> {
 
   return browserPage.request.post(`${baseUrl}/api/profile`, {
     data: {
@@ -24,7 +24,7 @@ export async function createUser ({ browserPage, walletAddress }: {browserPage: 
   }).then(res => res.json());
 }
 
-export async function createSpace ({ browserPage, createdBy, permissionConfigurationMode }: {browserPage: BrowserPage} & Pick<Space, 'createdBy'> & Partial<Pick<Space, 'permissionConfigurationMode'>>): Promise<Space> {
+export async function createSpace ({ browserPage, createdBy, permissionConfigurationMode }: { browserPage: BrowserPage } & Pick<Space, 'createdBy'> & Partial<Pick<Space, 'permissionConfigurationMode'>>): Promise<Space> {
   return browserPage.request.post(`${baseUrl}/api/spaces`, {
     data: {
       author: {
@@ -52,7 +52,7 @@ export async function createSpace ({ browserPage, createdBy, permissionConfigura
   }).then(res => res.json());
 }
 
-export async function getPages ({ browserPage, spaceId }: {browserPage: BrowserPage, spaceId: string}): Promise<IPageWithPermissions[]> {
+export async function getPages ({ browserPage, spaceId }: { browserPage: BrowserPage, spaceId: string }): Promise<IPageWithPermissions[]> {
   return browserPage.request.get(`${baseUrl}/api/spaces/${spaceId}/pages`).then(res => res.json());
 }
 
@@ -66,9 +66,9 @@ export async function createUserAndSpace ({
   walletAddress = v4(),
   permissionConfigurationMode = 'collaborative'
 }: {
-  browserPage: BrowserPage,
+  browserPage: BrowserPage;
   walletAddress?: string;
-} & Partial<Pick<Space, 'permissionConfigurationMode'>>): Promise<{user: LoggedInUser, space: Space, pages: IPageWithPermissions[]}> {
+} & Partial<Pick<Space, 'permissionConfigurationMode'>>): Promise<{ user: LoggedInUser, space: Space, pages: IPageWithPermissions[] }> {
   const user = await createUser({ browserPage, walletAddress });
   const space = await createSpace({ browserPage, createdBy: user.id, permissionConfigurationMode });
   const pages: IPageWithPermissions[] = await getPages({ browserPage, spaceId: space.id });
@@ -80,7 +80,7 @@ export async function createUserAndSpace ({
   };
 }
 
-export async function generateBounty ({ content = undefined, contentText = '', spaceId, createdBy, status, maxSubmissions, approveSubmitters, title = 'Example', rewardToken = 'ETH', rewardAmount = 1, chainId = 1, bountyPermissions = {}, pagePermissions = [], page = {}, type = 'bounty', id }: Pick<Bounty, 'createdBy' | 'spaceId' | 'status' | 'approveSubmitters'> & Partial<Pick<Bounty, 'id' | 'maxSubmissions' | 'chainId' | 'rewardAmount' | 'rewardToken'>> & Partial<Pick<Page, 'title' | 'content' | 'contentText' | 'type'>> & {bountyPermissions?: Partial<BountyPermissions>, pagePermissions?: Omit<Prisma.PagePermissionCreateManyInput, 'pageId'>[], page?: Partial<Pick<Page, 'deletedAt'>>}): Promise<BountyWithDetails> {
+export async function generateBounty ({ content = undefined, contentText = '', spaceId, createdBy, status, maxSubmissions, approveSubmitters, title = 'Example', rewardToken = 'ETH', rewardAmount = 1, chainId = 1, bountyPermissions = {}, pagePermissions = [], page = {}, type = 'bounty', id }: Pick<Bounty, 'createdBy' | 'spaceId' | 'status' | 'approveSubmitters'> & Partial<Pick<Bounty, 'id' | 'maxSubmissions' | 'chainId' | 'rewardAmount' | 'rewardToken'>> & Partial<Pick<Page, 'title' | 'content' | 'contentText' | 'type'>> & { bountyPermissions?: Partial<BountyPermissions>, pagePermissions?: Omit<Prisma.PagePermissionCreateManyInput, 'pageId'>[], page?: Partial<Pick<Page, 'deletedAt'>> }): Promise<BountyWithDetails> {
 
   const pageId = id ?? v4();
 

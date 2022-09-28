@@ -1,8 +1,5 @@
 import type { PluginKey } from '@bangle.dev/core';
 import { FloatingMenu } from '@bangle.dev/react-menu';
-import type { PageType } from '@prisma/client';
-import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
-import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import type { SubMenu } from '../@bangle.dev/react-menu/floating-menu';
@@ -10,7 +7,7 @@ import { LinkSubMenu } from '../@bangle.dev/react-menu/LinkSubMenu';
 import { Menu } from '../@bangle.dev/react-menu/Menu';
 import { BoldButton, CalloutButton, CodeButton, FloatingLinkButton, HeadingButton, InlineCommentButton, InlineVoteButton, ItalicButton, ParagraphButton, StrikeButton, UnderlineButton } from '../@bangle.dev/react-menu/MenuButtons';
 import { MenuGroup } from '../@bangle.dev/react-menu/MenuGroup';
-import { InlineCommentSubMenu } from '../inlineComment/InlineComment.components';
+import { InlineCommentSubMenu } from '../inlineComment/inlineComment.components';
 import InlineVoteSubMenu from '../inlineVote/components/InlineVoteSubmenu';
 
 type FloatingMenuVariant = 'defaultMenu' | 'linkSubMenu' | 'inlineCommentSubMenu' | 'commentOnlyMenu';
@@ -20,28 +17,28 @@ interface Props {
   enableVoting?: boolean;
   pluginKey: PluginKey;
   inline?: boolean;
-  pageType?: PageType;
   pagePermissions?: IPagePermissionFlags;
 }
 
 export default function FloatingMenuComponent (
   {
-    pluginKey, enableComments = true, enableVoting = false, inline = false, pageType, pagePermissions }: Props
+    pluginKey, enableComments = true, enableVoting = false, inline = false, pagePermissions }: Props
 
 ) {
   const { showMessage } = useSnackbar();
-  const displayInlineCommentButton = !inline && pagePermissions?.comment && enableComments && pageType !== 'card_template';
+  const displayInlineCommentButton = !inline && pagePermissions?.comment && enableComments;
 
-  const displayInlineVoteButton = !inline && pagePermissions?.create_poll && enableVoting && pageType !== 'card_template';
+  const displayInlineVoteButton = !inline && pagePermissions?.create_poll && enableVoting;
   return (
     <FloatingMenu
       menuKey={pluginKey}
       renderMenuType={(menuType) => {
-        const { type } = menuType as {type: SubMenu};
+        const { type } = menuType as { type: SubMenu };
         if (type as FloatingMenuVariant === 'commentOnlyMenu' && pagePermissions?.comment) {
           return (
             <Menu>
               <InlineCommentButton enableComments menuKey={pluginKey} />
+              {enableVoting && <InlineVoteButton enableVotes menuKey={pluginKey} />}
             </Menu>
           );
         }

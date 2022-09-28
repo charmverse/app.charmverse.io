@@ -11,13 +11,13 @@ import { markName } from './inlineComment.constants';
 import RowDecoration from './components/InlineCommentRowDecoration';
 
 export interface InlineCommentPluginState {
-  tooltipContentDOM: HTMLElement
-  show: boolean
-  ids: string[]
+  tooltipContentDOM: HTMLElement;
+  show: boolean;
+  ids: string[];
 }
 
 export function plugin ({ key } :{
-  key: PluginKey
+  key: PluginKey;
 }): RawPlugins {
   const tooltipDOMSpec = createTooltipDOM();
   return [
@@ -59,10 +59,11 @@ export function plugin ({ key } :{
       key,
       props: {
         handleClickOn: (view: EditorView, pos: number, node, nodePos, event: MouseEvent) => {
-          if (/charm-inline-comment/.test((event.target as HTMLElement).className)) {
+          const className = (event.target as HTMLElement).className + ((event.target as HTMLElement).parentNode as HTMLElement).className;
+          if (/charm-inline-comment/.test(className)) {
             return highlightMarkedElement({
               view,
-              elementId: 'page-thread-list-box',
+              elementId: 'page-action-sidebar',
               key,
               markName,
               prefix: 'thread'
@@ -107,7 +108,7 @@ export function plugin ({ key } :{
             return highlightElement({
               ids,
               view,
-              elementId: 'page-thread-list-box',
+              elementId: 'page-action-sidebar',
               key,
               markName,
               prefix: 'thread'

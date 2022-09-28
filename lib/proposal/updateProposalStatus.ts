@@ -11,12 +11,12 @@ export async function updateProposalStatus ({
   newStatus,
   userId
 }: {
-  userId: string
-  newStatus: ProposalStatus,
-  proposal: ProposalWithUsers | string
+  userId: string;
+  newStatus: ProposalStatus;
+  proposal: ProposalWithUsers | string;
 }): Promise<{
-  proposal: ProposalWithUsers,
-  workspaceEvent: WorkspaceEvent
+  proposal: ProposalWithUsers;
+  workspaceEvent: WorkspaceEvent;
 }> {
 
   if (typeof proposal === 'string') {

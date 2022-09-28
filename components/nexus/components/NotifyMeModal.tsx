@@ -16,10 +16,10 @@ export const schema = yup.object({
 export type FormValues = yup.InferType<typeof schema>;
 
 type Props = {
-  currentValue: string | null | undefined,
-  save: (path: string) => void,
-  close: () => void,
-  isOpen: boolean,
+  currentValue: string | null | undefined;
+  save: (path: string) => void;
+  close: () => void;
+  isOpen: boolean;
 };
 
 export default function NotifyMeModal (props: Props) {
