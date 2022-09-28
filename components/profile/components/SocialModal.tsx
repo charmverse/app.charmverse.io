@@ -26,10 +26,10 @@ export const schema = yup.object({
 export type FormValues = yup.InferType<typeof schema>;
 
 type SocialModalProps = {
-    social: Social,
-    save: (social: Social) => void,
-    close: () => void,
-    isOpen: boolean,
+    social: Social;
+    save: (social: Social) => void;
+    close: () => void;
+    isOpen: boolean;
 };
 
 function SocialModal (props: SocialModalProps) {

@@ -12,9 +12,9 @@ import { useMemo } from 'react';
  * @renderSelected Show selected options in the options menu. Default is true.
  */
 interface Props {
-  onChange: (roleIds: string[]) => void
-  selectedRoleIds: string[]
-  onDelete: (roleId: string) => void
+  onChange: (roleIds: string[]) => void;
+  selectedRoleIds: string[];
+  onDelete: (roleId: string) => void;
 }
 
 const StyledFormControl = styled(FormControl)`

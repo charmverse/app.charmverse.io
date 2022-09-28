@@ -132,7 +132,7 @@ type ActionInfo = {
   type: TrackType;
   nodeType: string;
   parentNodeType?: string;
-  content?: string
+  content?: string;
 };
 
 function FormattedAction ({ type, nodeType, parentNodeType = '', content }: ActionInfo) {

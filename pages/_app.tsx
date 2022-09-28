@@ -173,11 +173,11 @@ import { isDev } from 'config/constants';
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
 
 type NextPageWithLayout = NextPage & {
-  getLayout: (page: ReactElement) => ReactElement
+  getLayout: (page: ReactElement) => ReactElement;
 }
 
 type AppPropsWithLayout = AppProps & {
-  Component: NextPageWithLayout
+  Component: NextPageWithLayout;
 }
 
 export default function App ({ Component, pageProps }: AppPropsWithLayout) {

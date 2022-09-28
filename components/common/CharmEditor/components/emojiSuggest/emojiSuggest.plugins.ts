@@ -14,7 +14,7 @@ export const commands = {
 function pluginsFactory ({
   key
 }: {
-  key: PluginKey
+  key: PluginKey;
 }) {
   return ({
     specRegistry

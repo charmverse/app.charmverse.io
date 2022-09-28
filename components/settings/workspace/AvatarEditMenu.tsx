@@ -2,10 +2,10 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 
 type Props = {
-  onUploadClick: () => void
-  onNftClick: () => void
-  onClose: () => void
-  anchorEl: HTMLElement | null
+  onUploadClick: () => void;
+  onNftClick: () => void;
+  onClose: () => void;
+  anchorEl: HTMLElement | null;
 };
 
 export function AvatarEditMenu ({ onUploadClick, onNftClick, onClose, anchorEl }: Props) {

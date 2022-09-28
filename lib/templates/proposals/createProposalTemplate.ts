@@ -5,14 +5,14 @@ import { v4 } from 'uuid';
 import type { ProposalReviewerInput } from '../../proposal/interface';
 
 export interface CreateProposalTemplateInput {
-  spaceId: string
-  userId: string
+  spaceId: string;
+  userId: string;
   pageContent?: {
     title?: string;
     contentText?: string;
-    content?: any
-  },
-  reviewers?: ProposalReviewerInput[]
+    content?: any;
+  };
+  reviewers?: ProposalReviewerInput[];
 }
 
 export async function createProposalTemplate ({

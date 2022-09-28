@@ -49,7 +49,7 @@ export const AnonUserDisplay = memo(AnonUserDisplayComponent);
  */
 interface UserDisplayProps extends StyleProps {
   user: Omit<User, 'addresses'>;
-  linkToProfile?: boolean
+  linkToProfile?: boolean;
 }
 
 function UserDisplay ({ user, linkToProfile = false, ...props }: UserDisplayProps) {

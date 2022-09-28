@@ -3,14 +3,14 @@ import type { Block } from './block';
 import { createBlock } from './block';
 
 type CardFields = {
-    icon?: string
-    isTemplate?: boolean
-    properties: Record<string, string | string[]>
-    contentOrder: (string | string[])[]
+    icon?: string;
+    isTemplate?: boolean;
+    properties: Record<string, string | string[]>;
+    contentOrder: (string | string[])[];
 }
 
 type Card = Block & {
-    fields: CardFields
+    fields: CardFields;
 }
 
 function createCard (block?: Partial<Block>): Card {

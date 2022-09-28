@@ -9,8 +9,8 @@ import type { ComponentProps, SyntheticEvent } from 'react';
 
 type ReducedRole = Role | ListSpaceRolesResponse
 
-type GroupedRole = ReducedRole & {group: 'role'}
-type GroupedContributor = Contributor & {group: 'user'}
+type GroupedRole = ReducedRole & { group: 'role' }
+type GroupedContributor = Contributor & { group: 'user' }
 type GroupedOption = GroupedRole | GroupedContributor
 
 export default function InputSearchReviewers ({

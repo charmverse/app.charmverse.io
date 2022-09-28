@@ -278,9 +278,9 @@ function SafeTasks (
 }
 
 interface GnosisTasksSectionProps {
-  tasks: GetTasksResponse | undefined
-  error: any
-  mutateTasks: KeyedMutator<GetTasksResponse>
+  tasks: GetTasksResponse | undefined;
+  error: any;
+  mutateTasks: KeyedMutator<GetTasksResponse>;
 }
 
 export default function GnosisTasksSection ({ error, mutateTasks, tasks }: GnosisTasksSectionProps) {

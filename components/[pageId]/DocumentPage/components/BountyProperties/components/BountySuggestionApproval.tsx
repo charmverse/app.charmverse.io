@@ -10,7 +10,7 @@ import useIsAdmin from 'hooks/useIsAdmin';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 
 interface Props {
-  bounty: Bounty
+  bounty: Bounty;
 }
 
 export default function BountySuggestionApproval ({ bounty }: Props) {

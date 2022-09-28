@@ -10,8 +10,8 @@ import { v4, validate } from 'uuid';
 import type { ExportedPage, WorkspaceExport, WorkspaceImport } from './interfaces';
 
 interface UpdateRefs {
-  oldNewHashMap: Record<string, string>,
-  pages: Page[]
+  oldNewHashMap: Record<string, string>;
+  pages: Page[];
 }
 
 /**
@@ -46,7 +46,7 @@ interface WorkspaceImportResult {
 }
 
 export async function generateImportWorkspacePages ({ targetSpaceIdOrDomain, exportData, exportName }: WorkspaceImport):
-Promise<{pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyArgs}> {
+Promise<{ pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyArgs }> {
   const isUuid = validate(targetSpaceIdOrDomain);
 
   const space = await prisma.space.findUnique({
@@ -78,7 +78,7 @@ Promise<{pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyArg
    * Mutates the pages, updating their ids
    */
   function recursivePagePrep ({ node, newParentId, rootSpacePermissionId }:
-    {node: ExportedPage, newParentId: string | null, rootSpacePermissionId?: string}) {
+    { node: ExportedPage, newParentId: string | null, rootSpacePermissionId?: string }) {
     const newId = v4();
 
     oldNewHashmap[newId] = node.id;

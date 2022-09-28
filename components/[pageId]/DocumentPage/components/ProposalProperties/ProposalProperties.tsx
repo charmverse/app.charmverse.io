@@ -22,10 +22,10 @@ import type { ListSpaceRolesResponse } from 'pages/api/roles';
 import useSWR from 'swr';
 
 interface ProposalPropertiesProps {
-  readOnly?: boolean
-  pageId: string
-  proposalId: string
-  isTemplate: boolean
+  readOnly?: boolean;
+  pageId: string;
+  proposalId: string;
+  isTemplate: boolean;
 }
 
 export default function ProposalProperties ({ pageId, proposalId, readOnly, isTemplate }: ProposalPropertiesProps) {
@@ -58,7 +58,7 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
 
   const canUpdateProposalProperties = (proposalStatus === 'draft' || proposalStatus === 'private_draft' || proposalStatus === 'discussion') && (isProposalAuthor || isAdmin);
 
-  const reviewerOptionsRecord: Record<string, ({group: 'role'} & ListSpaceRolesResponse) | ({group: 'user'} & Contributor)> = {};
+  const reviewerOptionsRecord: Record<string, ({ group: 'role' } & ListSpaceRolesResponse) | ({ group: 'user' } & Contributor)> = {};
 
   const currentUserGroups: ProposalUserGroup[] = [];
   if (isProposalAuthor) {

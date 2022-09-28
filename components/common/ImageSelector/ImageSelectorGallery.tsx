@@ -2,8 +2,8 @@ import styled from '@emotion/styled';
 import { grey } from '@mui/material/colors';
 
 interface ImageSelectorGalleryProps {
-  items: Record<string, string[]>
-  onImageClick: (imageSrc: string) => void
+  items: Record<string, string[]>;
+  onImageClick: (imageSrc: string) => void;
 }
 
 const GalleryGroup = styled.div`

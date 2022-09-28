@@ -14,13 +14,13 @@ const Alert = forwardRef<HTMLDivElement, AlertProps>((props, ref) => {
 });
 
 interface CustomizedSnackbarProps {
-  autoHideDuration?: number
-  severity?: AlertColor,
-  message?: string,
-  actions?: ReactNode[],
-  origin?: SnackbarOrigin,
-  handleClose?: SnackbarProps['onClose'],
-  isOpen?: boolean
+  autoHideDuration?: number;
+  severity?: AlertColor;
+  message?: string;
+  actions?: ReactNode[];
+  origin?: SnackbarOrigin;
+  handleClose?: SnackbarProps['onClose'];
+  isOpen?: boolean;
 }
 
 export default function CustomizedSnackbar (props: CustomizedSnackbarProps) {

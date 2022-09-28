@@ -23,7 +23,7 @@ export class BountiesApi {
     return http.GET(`/api/bounties/${resourceId}/permissions`);
   }
 
-  reviewSuggestion ({ bountyId, decision }: SuggestionAction): Promise<BountyWithDetails | {success: true}> {
+  reviewSuggestion ({ bountyId, decision }: SuggestionAction): Promise<BountyWithDetails | { success: true }> {
     return http.POST<BountyWithDetails>(`/api/bounties/${bountyId}/review-suggestion`, { decision });
   }
 

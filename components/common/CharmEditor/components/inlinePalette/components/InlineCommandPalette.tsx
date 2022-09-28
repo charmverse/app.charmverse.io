@@ -49,7 +49,7 @@ const InlinePaletteGroup = styled.div`
 `;
 
 export default function InlineCommandPalette (
-  { nestedPagePluginKey, disableNestedPage = false }: {nestedPagePluginKey?: PluginKey<NestedPagePluginState>, disableNestedPage?: boolean}
+  { nestedPagePluginKey, disableNestedPage = false }: { nestedPagePluginKey?: PluginKey<NestedPagePluginState>, disableNestedPage?: boolean }
 ) {
   const { query, counter, isVisible, tooltipContentDOM } = useInlinePaletteQuery(palettePluginKey);
   const view = useEditorViewContext();

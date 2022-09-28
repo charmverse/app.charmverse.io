@@ -16,7 +16,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 
 interface Props {
-  bountyPage: Page
+  bountyPage: Page;
 }
 
 export function BountySignupButton ({ bountyPage }: Props) {

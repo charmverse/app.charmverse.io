@@ -32,11 +32,11 @@ import MissingPagePermissions from './components/MissingPagePermissions';
 import { BountySignupButton } from './components/BountySignupButton';
 
 export default function BountyProperties (props: {
-  readOnly?: boolean,
-  bountyId: string | null,
-  pageId: string,
-  permissions: AssignedBountyPermissions | null,
-  refreshBountyPermissions: (bountyId: string) => void
+  readOnly?: boolean;
+  bountyId: string | null;
+  pageId: string;
+  permissions: AssignedBountyPermissions | null;
+  refreshBountyPermissions: (bountyId: string) => void;
 }) {
   const { bountyId, pageId, readOnly: parentReadOnly = false, permissions, refreshBountyPermissions } = props;
   const [paymentMethods] = usePaymentMethods();
@@ -522,10 +522,10 @@ function rollupPermissions ({
   assignedRoleSubmitters,
   spaceId
 }: {
-  selectedReviewerUsers: string[],
-  selectedReviewerRoles: string[],
-  assignedRoleSubmitters: string[],
-  spaceId: string
+  selectedReviewerUsers: string[];
+  selectedReviewerRoles: string[];
+  assignedRoleSubmitters: string[];
+  spaceId: string;
 }): Pick<BountyPermissions, 'reviewer' | 'submitter'> {
   const reviewers = [
     ...selectedReviewerUsers.map(uid => {

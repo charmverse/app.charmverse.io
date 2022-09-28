@@ -10,7 +10,7 @@ import { getTransactionsforSafes } from './gnosis';
 const providerKey = process.env.ALCHEMY_API_KEY;
 const providerUrl = `https://eth-mainnet.alchemyapi.io/v2/${providerKey}`;
 
-type UserWithGnosisSafeState = User & {notificationState: UserNotificationState | null}
+type UserWithGnosisSafeState = User & { notificationState: UserNotificationState | null }
 interface ActionUser {
   address: string;
   user?: UserWithGnosisSafeState;
@@ -37,7 +37,7 @@ export interface GnosisTransactionPopulated {
   safeAddress: string;
   safeName: string | null;
   threshold: number;
-  snoozedUsers: UserWithGnosisSafeState[]
+  snoozedUsers: UserWithGnosisSafeState[];
 }
 
 export interface GnosisTask {

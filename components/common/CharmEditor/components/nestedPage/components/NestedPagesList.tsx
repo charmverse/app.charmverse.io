@@ -12,7 +12,7 @@ import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
 import PagesList from '../../PageList';
 import type { NestedPagePluginState } from '../nestedPage.interfaces';
 
-function NestedPagesList ({ pluginKey }: {pluginKey: PluginKey<NestedPagePluginState>}) {
+function NestedPagesList ({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginState> }) {
   const { pages } = usePages();
   const view = useEditorViewContext();
   const {
