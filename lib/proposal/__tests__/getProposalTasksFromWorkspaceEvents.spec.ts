@@ -31,7 +31,7 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
       userId: user1.id
     });
 
-    const { proposal: updatedProposal, workspaceEvent: authoredDraftProposalWorkspaceEvent } = await updateProposalStatus({
+    const { proposal: updatedProposal } = await updateProposalStatus({
       proposal: authoredDraftProposal.proposal!,
       newStatus: 'discussion',
       userId: user1.id
@@ -48,7 +48,7 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     // Should create a single proposal task where action is review
     const reviewProposal = await generateProposal({
       authors: [user2.id],
-      proposalStatus: 'discussion',
+      proposalStatus: 'draft',
       reviewers: [{
         group: 'user',
         id: user1.id
@@ -57,8 +57,14 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
       userId: user2.id
     });
 
-    await updateProposalStatus({
+    const { proposal: updatedReviewProposal, workspaceEvent: reviewProposalWorkspaceEvent } = await updateProposalStatus({
       proposal: reviewProposal.proposal!,
+      newStatus: 'discussion',
+      userId: user2.id
+    });
+
+    await updateProposalStatus({
+      proposal: updatedReviewProposal,
       newStatus: 'review',
       userId: user2.id
     });
@@ -146,10 +152,6 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
 
     expect(proposalTasks).toEqual(expect.arrayContaining([
       expect.objectContaining<Partial<ProposalTask>>({
-        action: 'start_discussion',
-        pagePath: authoredDraftProposal.path
-      }),
-      expect.objectContaining<Partial<ProposalTask>>({
         action: 'vote',
         pagePath: voteActiveProposal.path
       }),
@@ -170,8 +172,16 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
         pagePath: reviewProposal.path
       })
     ]));
+
+    expect(proposalTasks).toEqual(expect.not.arrayContaining([
+      expect.objectContaining<Partial<ProposalTask>>({
+        action: 'start_discussion',
+        pagePath: authoredDraftProposal.path
+      })
+    ]));
+
     expect(unmarkedWorkspaceEvents).toEqual(expect.arrayContaining([
-      authoredDraftProposalWorkspaceEvent.id
+      reviewProposalWorkspaceEvent.id
     ]));
   });
 });

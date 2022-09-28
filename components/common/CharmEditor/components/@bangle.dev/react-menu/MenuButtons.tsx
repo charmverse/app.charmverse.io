@@ -106,7 +106,7 @@ export function InlineActionButton ({
   subMenu,
   commandFn,
   ...props
-}: ButtonProps & {commandFn: () => Command, subMenu: SubMenu, menuKey: PluginKey, enable: boolean}) {
+}: ButtonProps & { commandFn: () => Command, subMenu: SubMenu, menuKey: PluginKey, enable: boolean }) {
   const view = useEditorViewContext();
 
   const onMouseDown = useCallback(
@@ -155,7 +155,7 @@ export function InlineCommentButton ({
   menuKey,
   enableComments,
   ...props
-}: ButtonProps & {menuKey: PluginKey, enableComments: boolean}) {
+}: ButtonProps & { menuKey: PluginKey, enableComments: boolean }) {
 
   return (
     <InlineActionButton
@@ -182,7 +182,7 @@ export function InlineVoteButton ({
   menuKey,
   enableVotes,
   ...props
-}: ButtonProps & {menuKey: PluginKey, enableVotes: boolean}) {
+}: ButtonProps & { menuKey: PluginKey, enableVotes: boolean }) {
   return (
     <InlineActionButton
       {...props}
