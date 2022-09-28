@@ -28,6 +28,7 @@ export default function LoginPage () {
 
   function redirectUserAfterLogin () {
     if (typeof router.query.returnUrl === 'string') {
+      // console.log('redirecting to', router.query.returnUrl);
       router.push(router.query.returnUrl);
     }
     else if (defaultWorkspace === '/nexus') {
@@ -38,15 +39,17 @@ export default function LoginPage () {
       router.push(isValidDefaultWorkspace ? defaultWorkspace : `/${spaces[0].domain}`);
     }
     else {
+      // console.log('Send to signup');
       router.push('/signup');
     }
   }
-
+  // console.log('Render login component', { account, triedEager, spaces, isDataLoaded });
   useEffect(() => {
     // redirect user once wallet is connected
     if (isDataLoaded) {
       // redirect once account exists (user has connected wallet)
       if (account || user) {
+        // console.log('Redirect user after login', account, user, spaces);
         redirectUserAfterLogin();
       }
       else {

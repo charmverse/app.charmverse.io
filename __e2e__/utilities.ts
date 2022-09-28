@@ -11,6 +11,7 @@ import { typedKeys } from 'lib/utilities/objects';
 import type { LoggedInUser } from 'models';
 import { baseUrl } from 'testing/mockApiCall';
 import { v4 } from 'uuid';
+import { readFileSync } from 'fs';
 
 export { baseUrl } from 'testing/mockApiCall';
 
@@ -201,4 +202,17 @@ export async function generateUserAndSpace (walletAddress: string = v4(), isAdmi
     user,
     space
   };
+}
+
+// load web3 mock library https:// massimilianomirra.com/notes/mocking-window-ethereum-in-playwright-for-end-to-end-dapp-testing
+export async function mockWeb3 (page: BrowserPage, fn: () => void) {
+  await page.addInitScript({
+    content:
+      `console.log("loading mock lib");\n${readFileSync(
+        require.resolve('@depay/web3-mock/dist/umd/index.bundle.js'),
+        'utf-8'
+      )
+      }\n`
+      + `(${fn.toString()})();`
+  });
 }
