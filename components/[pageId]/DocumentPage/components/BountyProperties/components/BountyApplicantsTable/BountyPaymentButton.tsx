@@ -265,29 +265,38 @@ export default function BountyPaymentButton ({
       <Button
         color='primary'
         size='small'
-        onClick={handleClick}
+        onClick={(e) => {
+          if (safeInfos?.length === 0) {
+            onClick();
+            makePayment();
+          }
+          else {
+            handleClick(e);
+          }
+        }}
       >
         Send Payment
       </Button>
-      <Menu
-        id='bounty-payment'
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-      >
-        <MenuItem onClick={() => {
-          onClick();
-          makePayment();
-          handleClose();
-        }}
-        >Metamask Wallet
-        </MenuItem>
-        {
+      {safeInfos?.length !== 0 && (
+        <Menu
+          id='bounty-payment'
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleClose}
+        >
+          <MenuItem onClick={() => {
+            onClick();
+            makePayment();
+            handleClose();
+          }}
+          >Metamask Wallet
+          </MenuItem>
+          {
           safeInfos && (
             <Divider />
           )
         }
-        {
+          {
           safeInfos?.map(safeInfo => (
             <SafeMenuItem
               key={safeInfo.address}
@@ -301,7 +310,8 @@ export default function BountyPaymentButton ({
             />
           ))
         }
-      </Menu>
+        </Menu>
+      )}
     </>
   );
 }
