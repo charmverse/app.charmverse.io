@@ -1,18 +1,22 @@
-import {
-  BangleEditor as CoreBangleEditor,
+import type {
   BangleEditorProps as CoreBangleEditorProps
 } from '@bangle.dev/core';
-import { Plugin, Transaction } from '@bangle.dev/pm';
+import {
+  BangleEditor as CoreBangleEditor
+} from '@bangle.dev/core';
+import type { Plugin, Transaction } from '@bangle.dev/pm';
 import { EditorViewContext } from '@bangle.dev/react';
 import { nodeViewUpdateStore, useNodeViews } from '@bangle.dev/react/node-view-helpers';
 import { objectUid } from '@bangle.dev/utils';
-import React, { ReactNode, RefObject, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import type { ReactNode, RefObject } from 'react';
+import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import reactDOM from 'react-dom';
-import { NodeViewWrapper, RenderNodeViewsFunction } from './NodeViewWrapper';
 import { isTouchScreen } from 'lib/browser';
 import { useUser } from 'hooks/useUser';
-import { amendTransaction } from '../../suggestions/track/amendTransaction';
 import log from 'lib/log';
+import { NodeViewWrapper } from './NodeViewWrapper';
+import type { RenderNodeViewsFunction } from './NodeViewWrapper';
+import { amendTransaction } from '../../suggestions/track/amendTransaction';
 
 interface BangleEditorProps<PluginMetadata = any>
   extends CoreBangleEditorProps<PluginMetadata> {
@@ -22,13 +26,32 @@ interface BangleEditorProps<PluginMetadata = any>
   className?: string;
   style?: React.CSSProperties;
   onReady?: (editor: CoreBangleEditor<PluginMetadata>) => void;
-  editorViewRef?: typeof useRef;
   editorRef?: RefObject<HTMLDivElement>
   // Components that should be placed underneath the editor
   placeholderComponent?: ReactNode
   enableSuggestions?: boolean; // requires trackChanges to be true
   trackChanges?: boolean;
 }
+
+const updatePluginWatcher = (editor: CoreBangleEditor) => {
+  return (watcher: Plugin, remove = false) => {
+    if (editor.destroyed) {
+      return;
+    }
+
+    let state = editor.view.state;
+
+    const newPlugins = remove
+      ? state.plugins.filter((p) => p !== watcher)
+      : [...state.plugins, watcher];
+
+    state = state.reconfigure({
+      plugins: newPlugins
+    });
+
+    editor.view.updateState(state);
+  };
+};
 
 export const BangleEditor = React.forwardRef<
   CoreBangleEditor | undefined,
@@ -80,24 +103,24 @@ export const BangleEditor = React.forwardRef<
     );
 
     useEffect(() => {
-      const editor = new CoreBangleEditor(
+      const _editor = new CoreBangleEditor(
         renderRef.current!,
         editorViewPayloadRef.current
       );
-      (editor.view as any)._updatePluginWatcher = updatePluginWatcher(editor);
+      (_editor.view as any)._updatePluginWatcher = updatePluginWatcher(_editor);
       if (trackChanges) {
-        (editor.view as any)._props.dispatchTransaction = (transaction: Transaction) => {
-          const view = editor.view;
+        (_editor.view as any)._props.dispatchTransaction = (transaction: Transaction) => {
+          const view = _editor.view;
           const trackedUser = { id: user?.id ?? '', username: user?.username ?? '' };
           const trackedTr = amendTransaction(transaction, view.state, trackedUser, editorViewPayloadRef.current.enableSuggestions);
-          const {state: newState } = view.state.applyTransaction(trackedTr)
+          const { state: newState } = view.state.applyTransaction(trackedTr);
           view.updateState(newState);
         };
       }
-      onReadyRef.current(editor);
-      setEditor(editor);
+      onReadyRef.current(_editor);
+      setEditor(_editor);
       return () => {
-        editor.destroy();
+        _editor.destroy();
       };
     }, [ref]);
 
@@ -117,7 +140,6 @@ export const BangleEditor = React.forwardRef<
         {nodeViews.map((nodeView) => {
           return reactDOM.createPortal(
             <NodeViewWrapper
-              debugKey={objectUid.get(nodeView)}
               nodeViewUpdateStore={nodeViewUpdateStore}
               nodeView={nodeView}
               renderNodeViews={renderNodeViews!}
@@ -130,23 +152,3 @@ export const BangleEditor = React.forwardRef<
     );
   }
 );
-
-const updatePluginWatcher = (editor: CoreBangleEditor) => {
-  return (watcher: Plugin, remove = false) => {
-    if (editor.destroyed) {
-      return;
-    }
-
-    let state = editor.view.state;
-
-    const newPlugins = remove
-      ? state.plugins.filter((p) => p !== watcher)
-      : [...state.plugins, watcher];
-
-    state = state.reconfigure({
-      plugins: newPlugins
-    });
-
-    editor.view.updateState(state);
-  };
-};
