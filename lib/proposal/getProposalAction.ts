@@ -6,9 +6,9 @@ export function getProposalAction ({
   currentStatus,
   isReviewer
 }: {
-  currentStatus: ProposalStatus,
-  isAuthor: boolean
-  isReviewer: boolean
+  currentStatus: ProposalStatus;
+  isAuthor: boolean;
+  isReviewer: boolean;
 }): ProposalTask['action'] | null {
 
   if (currentStatus === 'discussion') {

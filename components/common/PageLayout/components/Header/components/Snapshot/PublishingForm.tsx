@@ -33,8 +33,8 @@ async function getSnapshotClient () {
 }
 
 interface Props {
-  onSubmit: () => void,
-  page: Page
+  onSubmit: () => void;
+  page: Page;
 }
 
 const MAX_SNAPSHOT_PROPOSAL_CHARACTERS = 14400;

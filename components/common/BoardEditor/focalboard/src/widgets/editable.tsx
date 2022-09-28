@@ -6,7 +6,7 @@ export type EditableProps = {
     placeholderText?: string
     className?: string
     saveOnEsc?: boolean
-    readonly?: boolean
+    readOnly?: boolean
     spellCheck?: boolean
     autoExpand?: boolean
 
@@ -79,13 +79,13 @@ export function useEditable (
     saveOnBlur.current = true;
   };
 
-  const { value, onChange, className, placeholderText, readonly } = props;
+  const { value, onChange, className, placeholderText, readOnly } = props;
   let error = false;
   if (props.validator) {
     error = !props.validator(value || '');
   }
   return {
-    className: `Editable ${error ? 'error ' : ''}${readonly ? 'readonly ' : ''}${className}`,
+    className: `Editable ${error ? 'error ' : ''}${readOnly ? 'readonly ' : ''}${className}`,
     placeholder: placeholderText,
     onChange: (e: React.ChangeEvent<ElementType>) => {
       onChange(e.target.value);
@@ -110,7 +110,7 @@ export function useEditable (
         blur();
       }
     },
-    readOnly: readonly,
+    readOnly,
     spellCheck: props.spellCheck,
     onFocus: props.onFocus
   };

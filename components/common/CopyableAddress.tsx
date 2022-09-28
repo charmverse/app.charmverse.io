@@ -11,9 +11,9 @@ const StyledButton = styled(Button)`
 `;
 
 type Props = {
-  address: string
-  decimals?: number,
-  sx?: any
+  address: string;
+  decimals?: number;
+  sx?: any;
 }
 
 export default function CopyableAddress ({ address, decimals = 3, ...rest }: Props) {

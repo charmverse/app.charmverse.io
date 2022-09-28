@@ -64,7 +64,7 @@ const ThreadCommentListItem = styled(ListItem)<{ highlighted?: string }>`
   }
 `;
 
-function ThreadHeaderButton ({ disabled = false, onClick, text, startIcon, ...props }: {disabled?: boolean, onClick: ButtonProps['onClick'], text: string} & ButtonProps) {
+function ThreadHeaderButton ({ disabled = false, onClick, text, startIcon, ...props }: { disabled?: boolean, onClick: ButtonProps['onClick'], text: string } & ButtonProps) {
   return (
     <Button
       disabled={disabled}
@@ -84,7 +84,7 @@ function ThreadHeaderButton ({ disabled = false, onClick, text, startIcon, ...pr
 
 function AddCommentCharmEditor (
   { sx, threadId, disabled, onClick, readOnly }:
-  {onClick: (cb: () => void) => void, readOnly: boolean, disabled: boolean, threadId: string, sx: SxProps}
+  { onClick: (cb: () => void) => void, readOnly: boolean, disabled: boolean, threadId: string, sx: SxProps }
 ) {
   const [commentContent, setCommentContent] = useState<PageContent | null>(null);
   const isEmpty = checkForEmpty(commentContent);
@@ -130,7 +130,7 @@ function AddCommentCharmEditor (
   );
 }
 
-function EditCommentCharmEditor ({ disabled, isEditable, threadId, commentId, onContainerClick, onSave, onCancel }: {disabled: boolean, isEditable: boolean, onCancel: ButtonProps['onClick'], threadId: string, commentId: string, onContainerClick: BoxProps['onClick'], onSave: (cb: () => Promise<void>) => void}) {
+function EditCommentCharmEditor ({ disabled, isEditable, threadId, commentId, onContainerClick, onSave, onCancel }: { disabled: boolean, isEditable: boolean, onCancel: ButtonProps['onClick'], threadId: string, commentId: string, onContainerClick: BoxProps['onClick'], onSave: (cb: () => Promise<void>) => void }) {
   const [commentContent, setCommentContent] = useState<PageContent | null>(null);
   const isEmpty = checkForEmpty(commentContent);
   const { editComment, threads } = useThreads();
@@ -343,14 +343,23 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                   <RelativeDate createdAt={comment.createdAt.toString()} updatedAt={comment.updatedAt?.toString()} />
                 </Box>
                 <div>
-                  {commentIndex === 0 ? (
-                    <Box display='flex' alignItems='center' gap={1}>
+                  <Box display='flex' alignItems='center' gap={1}>
+
+                    {commentIndex === 0 && (
+
                       <ThreadHeaderButton
                         text={thread.resolved ? 'Un-resolve' : 'Resolve'}
                         disabled={isMutating || !permissions.comment}
                         onClick={toggleResolved}
                       />
+
+                    )}
+
+                    {
+                    comment.userId === user?.id && (
                       <IconButton
+                        // Show the context menu next to resolve
+                        className={commentIndex === 0 ? '' : 'comment-actions'}
                         size='small'
                         onClick={(e: any) => {
                           onClickCommentActions(e, comment);
@@ -358,19 +367,10 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                       >
                         <MoreHorizIcon fontSize='small' />
                       </IconButton>
-                    </Box>
-                  ) : (comment.userId === user?.id && permissions.comment)
-                  && (
-                    <IconButton
-                      className='comment-actions'
-                      size='small'
-                      onClick={(e: any) => {
-                        onClickCommentActions(e, comment);
-                      }}
-                    >
-                      <MoreHorizIcon fontSize='small' />
-                    </IconButton>
-                  )}
+                    )
+                  }
+
+                  </Box>
                 </div>
               </Box>
               {commentIndex === 0 && (

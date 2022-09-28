@@ -65,7 +65,7 @@ describe('components/viewHeader/viewHeader', () => {
             addCardFromTemplate={jest.fn()}
             addCardTemplate={jest.fn()}
             editCardTemplate={jest.fn()}
-            readonly={false}
+            readOnly={false}
           />
         </ReduxProvider>
       )
@@ -86,7 +86,7 @@ describe('components/viewHeader/viewHeader', () => {
             addCardFromTemplate={jest.fn()}
             addCardTemplate={jest.fn()}
             editCardTemplate={jest.fn()}
-            readonly={true}
+            readOnly={true}
           />
         </ReduxProvider>
       )

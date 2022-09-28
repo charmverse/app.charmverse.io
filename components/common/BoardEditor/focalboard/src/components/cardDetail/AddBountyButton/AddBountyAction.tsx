@@ -10,11 +10,11 @@ import React, { useEffect, useMemo } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 type Props = {
-  readonly: boolean;
+  readOnly: boolean;
   cardId: string;
 };
 
-export default function AddBountyAction({ readonly, cardId }: Props) {
+export default function AddBountyAction({ readOnly, cardId }: Props) {
   const router = useRouter();
   const { pages } = usePages();
   const [spacePermissions] = useCurrentSpacePermissions();
@@ -40,7 +40,7 @@ export default function AddBountyAction({ readonly, cardId }: Props) {
     cardPage &&
     !hasBounty &&
     !draftBounty &&
-    !readonly &&
+    !readOnly &&
     cardPage.type.match('template') === null &&
     spacePermissions?.createBounty &&
     space &&

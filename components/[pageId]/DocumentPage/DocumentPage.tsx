@@ -47,11 +47,11 @@ export const Container = styled(Box)<{ top: number, fullWidth?: boolean }>`
 `;
 
 export interface DocumentPageProps {
-  page: IPageWithPermissions,
-  setPage: (p: Partial<Page>) => void,
-  readOnly?: boolean,
-  insideModal?: boolean,
-  parentProposalId?: string | null
+  page: IPageWithPermissions;
+  setPage: (p: Partial<Page>) => void;
+  readOnly?: boolean;
+  insideModal?: boolean;
+  parentProposalId?: string | null;
 }
 
 function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentProposalId }: DocumentPageProps) {
@@ -210,11 +210,11 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
                         cards={cards}
                         activeView={activeView}
                         views={boardViews}
-                        readonly={readOnly}
+                        readOnly={readOnly}
                         pageUpdatedAt={page.updatedAt.toString()}
                         pageUpdatedBy={page.updatedBy}
                       />
-                      <AddBountyButton readonly={readOnly} cardId={page.id} />
+                      <AddBountyButton readOnly={readOnly} cardId={page.id} />
                     </>
                   )}
                   {proposalId && (
@@ -239,7 +239,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
                       comments={comments}
                       rootId={card?.rootId ?? page.id}
                       cardId={card?.id ?? page.id}
-                      readonly={cannotComment}
+                      readOnly={cannotComment}
                     />
                   )}
                 </div>

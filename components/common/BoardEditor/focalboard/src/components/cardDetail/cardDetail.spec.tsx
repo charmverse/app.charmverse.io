@@ -66,7 +66,7 @@ describe('components/cardDetail/CardDetail', () => {
         {wrapIntl(
           <CardDetail
             card={card}
-            readonly={false}
+            readOnly={false}
           />
         )}
       </ReduxProvider>
@@ -105,7 +105,7 @@ describe('components/cardDetail/CardDetail', () => {
         {wrapIntl(
           <CardDetail
             card={card}
-            readonly={true}
+            readOnly={true}
           />
         )}
       </ReduxProvider>

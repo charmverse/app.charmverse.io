@@ -118,9 +118,9 @@ export default function ProposalTasksList ({
   error,
   mutateTasks
 }: {
-  mutateTasks: KeyedMutator<GetTasksResponse>
-  error: any
-  tasks: GetTasksResponse | undefined
+  mutateTasks: KeyedMutator<GetTasksResponse>;
+  error: any;
+  tasks: GetTasksResponse | undefined;
 }) {
   const proposals = tasks?.proposals ? [...tasks.proposals.unmarked, ...tasks.proposals.marked] : [];
 

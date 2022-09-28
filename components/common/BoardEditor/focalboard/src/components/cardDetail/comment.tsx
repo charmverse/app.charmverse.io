@@ -18,7 +18,7 @@ import { Contributor } from 'models';
 type Props = {
   comment: Block;
   contributor?: Pick<Contributor, 'username' | 'avatar' | 'hasNftAvatar'>;
-  readonly: boolean;
+  readOnly: boolean;
 }
 
 const Comment: FC<Props> = (props: Props) => {
@@ -41,7 +41,7 @@ const Comment: FC<Props> = (props: Props) => {
           </div>
         </Tooltip>
 
-        {!props.readonly && (
+        {!props.readOnly && (
           <MenuWrapper>
             <IconButton icon={<OptionsIcon />} />
             <Menu position='left'>

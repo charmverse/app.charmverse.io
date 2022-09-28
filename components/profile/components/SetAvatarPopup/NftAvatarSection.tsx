@@ -6,7 +6,7 @@ import { useUser } from 'hooks/useUser';
 import type { NftData } from 'lib/blockchain/interfaces';
 
 type Props = {
-  onSelect?: (avatar: NftData) => void
+  onSelect?: (avatar: NftData) => void;
   isSaving?: boolean;
 };
 

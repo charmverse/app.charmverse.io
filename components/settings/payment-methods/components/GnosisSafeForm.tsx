@@ -19,8 +19,8 @@ import * as yup from 'yup';
 export type FormMode = 'create' | 'update';
 
 interface Props {
-  onSubmit: (paymentMethod: Partial<PaymentMethod>) => any,
-  defaultChainId?: number
+  onSubmit: (paymentMethod: Partial<PaymentMethod>) => any;
+  defaultChainId?: number;
 }
 
 export const schema = yup.object({

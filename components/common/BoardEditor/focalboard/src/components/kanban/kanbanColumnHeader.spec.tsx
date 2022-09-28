@@ -44,7 +44,7 @@ describe('src/components/kanban/kanbanColumnHeader', () => {
           cards: [card]
         }}
         intl={intl}
-        readonly={false}
+        readOnly={false}
         addCard={jest.fn()}
         propertyNameChanged={jest.fn()}
         onDropToColumn={jest.fn()}
@@ -66,7 +66,7 @@ describe('src/components/kanban/kanbanColumnHeader', () => {
           cards: [card]
         }}
         intl={intl}
-        readonly={true}
+        readOnly={true}
         addCard={jest.fn()}
         propertyNameChanged={jest.fn()}
         onDropToColumn={jest.fn()}
@@ -89,7 +89,7 @@ describe('src/components/kanban/kanbanColumnHeader', () => {
           cards: [card]
         }}
         intl={intl}
-        readonly={false}
+        readOnly={false}
         addCard={jest.fn()}
         propertyNameChanged={mockedPropertyNameChanged}
         onDropToColumn={jest.fn()}
@@ -117,7 +117,7 @@ describe('src/components/kanban/kanbanColumnHeader', () => {
           cards: [card]
         }}
         intl={intl}
-        readonly={false}
+        readOnly={false}
         addCard={jest.fn()}
         propertyNameChanged={jest.fn()}
         onDropToColumn={jest.fn()}
@@ -142,7 +142,7 @@ describe('src/components/kanban/kanbanColumnHeader', () => {
           cards: [card]
         }}
         intl={intl}
-        readonly={false}
+        readOnly={false}
         addCard={jest.fn()}
         propertyNameChanged={jest.fn()}
         onDropToColumn={jest.fn()}
@@ -170,7 +170,7 @@ describe('src/components/kanban/kanbanColumnHeader', () => {
           cards: [card]
         }}
         intl={intl}
-        readonly={false}
+        readOnly={false}
         addCard={jest.fn()}
         propertyNameChanged={jest.fn()}
         onDropToColumn={jest.fn()}
@@ -198,7 +198,7 @@ describe('src/components/kanban/kanbanColumnHeader', () => {
           cards: [card]
         }}
         intl={intl}
-        readonly={false}
+        readOnly={false}
         addCard={jest.fn()}
         propertyNameChanged={jest.fn()}
         onDropToColumn={jest.fn()}
@@ -228,7 +228,7 @@ describe('src/components/kanban/kanbanColumnHeader', () => {
           cards: [card]
         }}
         intl={intl}
-        readonly={false}
+        readOnly={false}
         addCard={mockedAddCard}
         propertyNameChanged={jest.fn()}
         onDropToColumn={jest.fn()}
@@ -254,7 +254,7 @@ describe('src/components/kanban/kanbanColumnHeader', () => {
           cards: [card]
         }}
         intl={intl}
-        readonly={false}
+        readOnly={false}
         addCard={jest.fn()}
         propertyNameChanged={jest.fn()}
         onDropToColumn={jest.fn()}
@@ -278,7 +278,7 @@ describe('src/components/kanban/kanbanColumnHeader', () => {
           cards: [card]
         }}
         intl={intl}
-        readonly={false}
+        readOnly={false}
         addCard={jest.fn()}
         propertyNameChanged={jest.fn()}
         onDropToColumn={jest.fn()}

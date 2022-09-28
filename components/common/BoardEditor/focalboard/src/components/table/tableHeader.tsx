@@ -18,7 +18,7 @@ import TableHeaderMenu from './tableHeaderMenu';
 import { iconForPropertyType } from '../viewHeader/viewHeaderPropertiesMenu';
 
 type Props = {
-    readonly: boolean
+    readOnly: boolean
     sorted: 'up'|'down'|'none'
     name: React.ReactNode
     board: Board
@@ -33,7 +33,7 @@ type Props = {
 }
 
 function TableHeader (props: Props): JSX.Element {
-  const [isDragging, isOver, columnRef] = useSortable('column', props.template, !props.readonly, props.onDrop);
+  const [isDragging, isOver, columnRef] = useSortable('column', props.template, !props.readOnly, props.onDrop);
   const columnWidth = (templateId: string): number => {
     return Math.max(Constants.minColumnWidth, (props.activeView.fields.columnWidths[templateId] || 0) + props.offset);
   };
@@ -59,7 +59,7 @@ function TableHeader (props: Props): JSX.Element {
       style={{ overflow: 'unset', width: columnWidth(props.template.id), opacity: isDragging ? 0.5 : 1 }}
       ref={props.template.id === Constants.titleColumnId ? () => null : columnRef}
     >
-      <MenuWrapper disabled={props.readonly}>
+      <MenuWrapper disabled={props.readOnly}>
         <Label>
           <div style={{ marginRight: 4, display: 'flex' }}>{iconForPropertyType(props.type, {
             sx: {
@@ -83,7 +83,7 @@ function TableHeader (props: Props): JSX.Element {
 
       <div className='octo-spacer' />
 
-      {!props.readonly
+      {!props.readOnly
                 && (
                 <HorizontalGrip
                   templateId={props.template.id}

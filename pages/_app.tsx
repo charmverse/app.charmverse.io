@@ -173,11 +173,11 @@ import { isDev } from 'config/constants';
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
 
 type NextPageWithLayout = NextPage & {
-  getLayout: (page: ReactElement) => ReactElement
+  getLayout: (page: ReactElement) => ReactElement;
 }
 
 type AppPropsWithLayout = AppProps & {
-  Component: NextPageWithLayout
+  Component: NextPageWithLayout;
 }
 
 export default function App ({ Component, pageProps }: AppPropsWithLayout) {
@@ -321,7 +321,7 @@ function PageMetaTags () {
   return (
     <Head>
       <title>
-        {`${prefix}${title}` ? `${prefix}${title} | CharmVerse` : 'CharmVerse - the all-in-one web3 workspace'}
+        {title ? `${prefix}${title} | CharmVerse` : `${prefix}CharmVerse - the all-in-one web3 workspace'}`}
       </title>
       {/* viewport meta tag goes in _app.tsx - https://nextjs.org/docs/messages/no-document-viewport-meta */}
       <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />

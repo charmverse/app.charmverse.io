@@ -22,15 +22,15 @@ interface NotionApiResponse {
     user: {
       id: string;
       person: {
-        email: string
+        email: string;
       };
-    }
-  }
+    };
+  };
 }
 
 async function importNotion (req: NextApiRequest, res: NextApiResponse<{
-  failedImports: FailedImportsError[],
-} | {error: string}>) {
+  failedImports: FailedImportsError[];
+} | { error: string }>) {
 
   const spaceId = req.body.spaceId as string;
   const tempAuthCode = req.body.code;

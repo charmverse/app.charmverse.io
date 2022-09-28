@@ -40,8 +40,8 @@ import {
 } from './components/suggestions/schema/common/track';
 
 export interface ICharmEditorOutput {
-  doc: PageContent,
-  rawText: string
+  doc: PageContent;
+  rawText: string;
 }
 
 export const specRegistry = new SpecRegistry([

@@ -54,7 +54,7 @@ export default function BoardPage ({ page, setPage, readOnly = false, pagePermis
         query: {
           ...router.query,
           viewId: boardViews[0].id,
-          cardId: router.query.cardId
+          cardId: router.query.cardId ?? ''
         }
       });
       return;
@@ -112,8 +112,11 @@ export default function BoardPage ({ page, setPage, readOnly = false, pagePermis
   });
 
   const showCard = useCallback((cardId?: string) => {
-    const newUrl = getUriWithParam(window.location.href, { cardId });
-    silentlyUpdateURL(newUrl);
+    const newUrl = `${router.pathname}?viewId=${router.query.viewId}&cardId=${cardId ?? ''}`;
+
+    const asUrl = getUriWithParam(`${router.asPath}`, { viewId: router.query.viewId, cardId }).split(window.location.origin)[1];
+
+    silentlyUpdateURL(newUrl, asUrl);
     setShownCardId(cardId);
   }, [router.query]);
 
@@ -125,7 +128,7 @@ export default function BoardPage ({ page, setPage, readOnly = false, pagePermis
         <div className='focalboard-body full-page'>
           <CenterPanel
             clientConfig={clientConfig}
-            readonly={Boolean(readOnlyBoard)}
+            readOnly={Boolean(readOnlyBoard)}
             board={board}
             setPage={setPage}
             showCard={showCard}
@@ -139,7 +142,7 @@ export default function BoardPage ({ page, setPage, readOnly = false, pagePermis
                 cardId={shownCardId}
                 onClose={() => showCard(undefined)}
                 showCard={(cardId) => showCard(cardId)}
-                readonly={readOnly}
+                readOnly={readOnly}
               />
             </RootPortal>
           )}

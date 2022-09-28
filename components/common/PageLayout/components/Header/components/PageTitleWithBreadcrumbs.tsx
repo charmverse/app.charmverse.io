@@ -185,7 +185,7 @@ function EmptyPageTitle () {
   return <div></div>;
 }
 
-export default function PageTitleWithBreadcrumbs ({ pageId }: { pageId?: string}) {
+export default function PageTitleWithBreadcrumbs ({ pageId }: { pageId?: string }) {
   const router = useRouter();
   const [space] = useCurrentSpace();
 

@@ -15,7 +15,7 @@ handler.use(requireUser)
   .post(updateTokenGateRolesHandler);
 
 async function updateTokenGateRolesHandler (req: NextApiRequest, res: NextApiResponse<TokenGateToRole[]>) {
-  const { roleIds } = req.body as {roleIds: string[]};
+  const { roleIds } = req.body as { roleIds: string[] };
   const tokenGateId = req.query.id as string;
   const tokenGateToRoles = await updateTokenGateRoles(roleIds, tokenGateId);
 

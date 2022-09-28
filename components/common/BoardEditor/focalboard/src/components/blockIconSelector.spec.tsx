@@ -58,7 +58,7 @@ describe('components/blockIconSelector', () => {
     const { container } = render(wrapIntl(
       <BlockIconSelector
         block={board}
-        readonly={true}
+        readOnly={true}
       />
     ));
     expect(container).toMatchSnapshot();

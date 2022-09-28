@@ -15,7 +15,7 @@ handler.use(requireUser)
   .put(requireKeys(['resolved'], 'body'), resolveThread);
 
 export interface ResolveThreadRequest {
-  resolved: boolean
+  resolved: boolean;
 }
 
 async function resolveThread (req: NextApiRequest, res: NextApiResponse<ThreadWithCommentsAndAuthors>) {

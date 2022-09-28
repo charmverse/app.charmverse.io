@@ -36,7 +36,7 @@ type Props = {
   isSelected: boolean
   visibleBadges: boolean
   onClick?: (e: React.MouseEvent<HTMLDivElement>) => void
-  readonly: boolean
+  readOnly: boolean
   onDrop: (srcCard: Card, dstCard: Card) => void
   showCard: (cardId?: string) => void
   isManualSort: boolean
@@ -63,7 +63,7 @@ const CurrencyIcon = styled.span`
 const KanbanCard = React.memo((props: Props) => {
   const { card, board } = props;
   const intl = useIntl();
-  const [isDragging, isOver, cardRef] = useSortable('card', card, !props.readonly && !isTouchScreen(), props.onDrop);
+  const [isDragging, isOver, cardRef] = useSortable('card', card, !props.readOnly && !isTouchScreen(), props.onDrop);
   const visiblePropertyTemplates = props.visiblePropertyTemplates || [];
   let className = props.isSelected ? 'KanbanCard selected' : 'KanbanCard';
   if (props.isManualSort && isOver) {
@@ -114,14 +114,14 @@ const KanbanCard = React.memo((props: Props) => {
   return (
     <>
       <div
-        ref={props.readonly ? () => null : cardRef}
+        ref={props.readOnly ? () => null : cardRef}
         className={className}
-        draggable={!props.readonly}
+        draggable={!props.readOnly}
         style={{ opacity: isDragging ? 0.5 : 1 }}
         onClick={props.onClick}
         data-test={`kanban-card-${card.id}`}
       >
-        {!props.readonly
+        {!props.readOnly
           && (
           <MenuWrapper
             className='optionsMenu'
@@ -182,7 +182,7 @@ const KanbanCard = React.memo((props: Props) => {
           </MenuWrapper>
           )}
 
-        <div className='octo-icontitle'>
+        <div className={`octo-icontitle ${linkedBounty || visiblePropertyTemplates.length > 0 ? 'octo-title-space' : ''}`}>
           <div>
             {cardPage?.icon ? <PageIcon isEditorEmpty={checkForEmpty(cardPage?.content as PageContent)} pageType='page' icon={cardPage.icon} /> : undefined}
           </div>

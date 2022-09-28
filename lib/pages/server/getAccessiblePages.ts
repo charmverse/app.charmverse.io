@@ -9,9 +9,9 @@ import type { IPageWithPermissions, PagesRequest } from '../interfaces';
 export function includePagePermissions (): Prisma.PageInclude & {
   permissions: {
     include: {
-      sourcePermission: true
-    }
-  }
+      sourcePermission: true;
+    };
+  };
   } {
   return {
     permissions: {
@@ -22,7 +22,8 @@ export function includePagePermissions (): Prisma.PageInclude & {
   };
 }
 
-export function accessiblePagesByPermissionsQuery ({ spaceId, userId }: {spaceId: string, userId: string}): Prisma.PagePermissionListRelationFilter {
+export function accessiblePagesByPermissionsQuery ({ spaceId, userId }:
+  { spaceId: string, userId: string }): Prisma.PagePermissionListRelationFilter {
   return {
     some: {
       OR: [

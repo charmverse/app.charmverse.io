@@ -20,7 +20,7 @@ import { eToNumber } from 'lib/utilities/numbers';
 import { shortenHex } from 'lib/utilities/strings';
 import { isTruthy } from 'lib/utilities/types';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import type { BountyWithDetails } from 'models';
+import type { BountyWithDetails } from 'lib/bounties';
 import { useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import { BountyAmount } from './BountyStatusBadge';
@@ -28,12 +28,12 @@ import type { MultiPaymentResult } from './MultiPaymentButton';
 import MultiPaymentButton from './MultiPaymentButton';
 
 interface TransactionWithMetadata extends MetaTransactionData, Pick<Bounty, 'rewardToken' | 'rewardAmount' | 'chainId'>{
-  applicationId: string
-  userId: string
-  title: string
+  applicationId: string;
+  userId: string;
+  title: string;
 }
 
-export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDetails[]}) {
+export default function MultiPaymentModal ({ bounties }: { bounties: BountyWithDetails[] }) {
   const [isLoading, setIsLoading] = useState(false);
   const { setBounties, setCurrentBounty, currentBountyId } = useBounties();
   const popupState = usePopupState({ variant: 'popover', popupId: 'multi-payment-modal' });

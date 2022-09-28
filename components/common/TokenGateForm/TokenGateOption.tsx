@@ -13,9 +13,9 @@ import { humanizeAccessControlConditions } from 'lit-js-sdk';
 import { useEffect, useState } from 'react';
 
 interface Props {
-  tokenGate: TokenGateWithRoles,
-  validGate?: boolean | null,
-  isVerifying: boolean,
+  tokenGate: TokenGateWithRoles;
+  validGate?: boolean | null;
+  isVerifying: boolean;
 }
 
 export default function TokenGateOption ({ tokenGate, validGate, isVerifying }: Props) {

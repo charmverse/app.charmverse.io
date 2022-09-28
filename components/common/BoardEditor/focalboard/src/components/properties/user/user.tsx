@@ -9,7 +9,7 @@ import { getSelectBaseStyle } from '../../../theme';
 
 type Props = {
   value: string,
-  readonly: boolean,
+  readOnly: boolean,
   onChange: (value: string) => void,
 }
 
@@ -28,7 +28,7 @@ function UserProperty (props: Props): JSX.Element | null {
     return acc;
   }, {})
 
-  if (props.readonly) {
+  if (props.readOnly) {
     if (contributorMap[props.value]) {
       return (
         <div className='UserProperty octo-propertyvalue'>

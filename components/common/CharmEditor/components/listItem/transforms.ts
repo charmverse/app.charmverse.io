@@ -105,7 +105,7 @@ export function liftSelectionList (
 ) {
   const { from, to } = state.selection;
   const { paragraph } = state.schema.nodes;
-  const listCol: { node: Node; pos: number }[] = [];
+  const listCol: { node: Node, pos: number }[] = [];
   tr.doc.nodesBetween(from, to, (node, pos) => {
     if (node.type === paragraph) {
       listCol.push({ node, pos });
