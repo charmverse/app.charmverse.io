@@ -10,7 +10,7 @@ export interface MenuButtonProps {
   isDisabled?: boolean;
   hints: string[];
   onMouseDown?: React.MouseEventHandler;
-  disableButton?: boolean
+  disableButton?: boolean;
 }
 
 const StyledMenuButton = styled.div<{ active: boolean }>`

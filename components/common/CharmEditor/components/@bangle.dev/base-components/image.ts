@@ -24,9 +24,9 @@ const name = 'image';
 const getTypeFromSchema = (schema: Schema) => schema.nodes[name];
 
 export interface ImageNodeSchemaAttrs {
-  caption: null | string
-  src: null | string
-  alt: null | string
+  caption: null | string;
+  src: null | string;
+  alt: null | string;
 }
 
 function specFactory (): RawSpecs {
