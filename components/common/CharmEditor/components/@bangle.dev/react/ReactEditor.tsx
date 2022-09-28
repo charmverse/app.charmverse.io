@@ -26,9 +26,9 @@ interface BangleEditorProps<PluginMetadata = any>
   className?: string;
   style?: React.CSSProperties;
   onReady?: (editor: CoreBangleEditor<PluginMetadata>) => void;
-  editorRef?: RefObject<HTMLDivElement>
+  editorRef?: RefObject<HTMLDivElement>;
   // Components that should be placed underneath the editor
-  placeholderComponent?: ReactNode
+  placeholderComponent?: ReactNode;
   enableSuggestions?: boolean; // requires trackChanges to be true
   trackChanges?: boolean;
 }

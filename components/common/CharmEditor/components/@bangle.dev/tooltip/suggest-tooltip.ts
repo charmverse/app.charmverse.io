@@ -212,7 +212,7 @@ function pluginsFactory ({
 
 export function referenceElement (
   pluginKey: PluginKey,
-  getActiveMarkPos: (state: EditorState) => { start: number; end: number }
+  getActiveMarkPos: (state: EditorState) => { start: number, end: number }
 ): GetReferenceElementFunction {
   return (view) => {
     return {
