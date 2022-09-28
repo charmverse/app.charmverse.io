@@ -31,7 +31,6 @@ import type { InviteLinkPopulated } from 'pages/api/invites/index';
 import type { PublicUser } from 'pages/api/public/profile/[userId]';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
-import type { GetTasksResponse } from 'pages/api/tasks/list';
 import type { GetTasksStateResponse, UpdateTasksState } from 'pages/api/tasks/state';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 import type { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
@@ -40,6 +39,7 @@ import { BountiesApi } from './apis/bountiesApi';
 import { CollablandApi } from './apis/collablandApi';
 import { ProfileApi } from './apis/profileApi';
 import { ProposalsApi } from './apis/proposalsApi';
+import { TasksApi } from './apis/tasksApi';
 import { VotesApi } from './apis/votesApi';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
@@ -60,6 +60,8 @@ class CharmClient {
   profile = new ProfileApi();
 
   proposals = new ProposalsApi();
+
+  tasks = new TasksApi();
 
   async login (address: string) {
     const user = await http.POST<LoggedInUser>('/api/session/login', {
@@ -453,10 +455,6 @@ class CharmClient {
 
   updateTasksState (payload: UpdateTasksState) {
     return http.PUT('/api/tasks/state', payload);
-  }
-
-  getTasks (): Promise<GetTasksResponse> {
-    return http.GET('/api/tasks/list');
   }
 
   createRole (role: Partial<Role>): Promise<Role> {
