@@ -1,22 +1,35 @@
-import { expect, test } from '@playwright/test';
-import { v4 } from 'uuid';
-import { baseUrl } from './utilities';
+import { chromium, test } from '@playwright/test';
+import type { Browser } from '@playwright/test';
+import { baseUrl, generateUserAndSpace, mockWeb3 } from './utils';
 
-test('login - sets a cookie inside the user browser', async ({ page }) => {
+let browser: Browser;
 
-  // Arrange
-  const walletAddress = v4();
+test.beforeAll(async () => {
+  // Set headless to false in chromium.launch to visually debug the test
+  browser = await chromium.launch();
+});
+test('login - allows user to login and see their workspace', async () => {
 
-  // Act
-  await page.request.post(`${baseUrl}/api/profile`, {
-    data: {
-      address: walletAddress
-    }
+  const sandbox = await browser.newContext();
+  const page = await sandbox.newPage();
+  const { space, walletAddress } = await generateUserAndSpace();
+
+  await mockWeb3(page, { walletAddress }, context => {
+
+    // @ts-ignore
+    Web3Mock.mock({
+      blockchain: 'ethereum',
+      accounts: {
+        return: [context.walletAddress]
+      }
+    });
+
   });
 
-  const cookies = await page.context().cookies();
+  await page.goto(baseUrl);
 
-  // Assert
-  expect(cookies.some(cookie => cookie.name === 'charm.sessionId')).toBe(true);
+  // should redirect to workspace
+  await page.waitForURL(`**/${space.domain}`);
+  await page.locator('text=[Your DAO]sdfdfddf Home').first().waitFor();
 
 });

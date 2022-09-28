@@ -1,13 +1,23 @@
-import { test } from '@playwright/test';
-import { baseUrl, mockWeb3 } from './utilities';
+import { chromium, test } from '@playwright/test';
+import type { Browser } from '@playwright/test';
+import { Wallet } from 'ethers';
+import { baseUrl, mockWeb3 } from './utils';
 
-test('signup - allows user to sign up and create a workspace using Metamask wallet', async ({ page }) => {
+let browser: Browser;
 
-  // Arrange
+test.beforeAll(async () => {
+  // Set headless to false in chromium.launch to visually debug the test
+  browser = await chromium.launch();
+});
+
+test('signup - allows user to sign up and create a workspace using Metamask wallet', async () => {
+
+  const sandbox = await browser.newContext();
+  const page = await sandbox.newPage();
 
   await mockWeb3(page, () => {
 
-    const walletAddress = '0xd73b04b0e696b0945283defa3eee453814758f1a';
+    const walletAddress = Wallet.createRandom().address;
 
     // @ts-ignore
     Web3Mock.mock({

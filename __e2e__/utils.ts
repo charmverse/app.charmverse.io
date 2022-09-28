@@ -11,6 +11,7 @@ import { typedKeys } from 'lib/utilities/objects';
 import type { LoggedInUser } from 'models';
 import { baseUrl } from 'testing/mockApiCall';
 import { v4 } from 'uuid';
+import { Wallet } from 'ethers';
 import { readFileSync } from 'fs';
 
 export { baseUrl } from 'testing/mockApiCall';
@@ -64,18 +65,19 @@ export async function getPages ({ browserPage, spaceId }: { browserPage: Browser
  */
 export async function createUserAndSpace ({
   browserPage,
-  walletAddress = v4(),
+  walletAddress = Wallet.createRandom().address,
   permissionConfigurationMode = 'collaborative'
 }: {
   browserPage: BrowserPage;
   walletAddress?: string;
-} & Partial<Pick<Space, 'permissionConfigurationMode'>>): Promise<{ user: LoggedInUser, space: Space, pages: IPageWithPermissions[] }> {
+} & Partial<Pick<Space, 'permissionConfigurationMode'>>) {
   const user = await createUser({ browserPage, walletAddress });
   const space = await createSpace({ browserPage, createdBy: user.id, permissionConfigurationMode });
   const pages: IPageWithPermissions[] = await getPages({ browserPage, spaceId: space.id });
 
   return {
     space,
+    walletAddress,
     user,
     pages
   };
@@ -155,12 +157,11 @@ export async function generateBounty ({ content = undefined, contentText = '', s
   return getBountyOrThrow(pageId);
 }
 
-/**
- * Simple utility to provide a user and space object inside test code
- * @param walletAddress
- * @returns
- */
-export async function generateUserAndSpace (walletAddress: string = v4(), isAdmin = true) {
+interface CreateUserAndSpaceOptions {
+  walletAddress?: string;
+  isAdmin?: boolean;
+}
+export async function generateUserAndSpace ({ isAdmin, walletAddress = Wallet.createRandom().address }: CreateUserAndSpaceOptions = {}) {
   const user = await createUserFromWallet(walletAddress);
 
   const existingSpaceId = user.spaceRoles?.[0]?.spaceId;
@@ -190,22 +191,22 @@ export async function generateUserAndSpace (walletAddress: string = v4(), isAdmi
             isAdmin
           }
         }
-      },
-      include: {
-        apiToken: true,
-        spaceRoles: true
       }
     });
   }
 
   return {
     user,
-    space
+    space,
+    walletAddress
   };
 }
 
 // load web3 mock library https:// massimilianomirra.com/notes/mocking-window-ethereum-in-playwright-for-end-to-end-dapp-testing
-export async function mockWeb3 (page: BrowserPage, fn: () => void) {
+// optionally pass in a context object to be available to the callback
+export async function mockWeb3<T = any> (page: BrowserPage, context: T | ((context: T) => void), callback?: (context: T) => void) {
+  callback ||= context as (context: T) => void;
+  context = typeof context === 'function' ? {} as T : context;
   await page.addInitScript({
     content:
       `${readFileSync(
@@ -224,6 +225,6 @@ export async function mockWeb3 (page: BrowserPage, fn: () => void) {
         };
 
       `
-      + `(${fn.toString()})();`
+      + `(${callback.toString()})(${JSON.stringify(context)});`
   });
 }
