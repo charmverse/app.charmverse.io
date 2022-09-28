@@ -65,6 +65,7 @@ function selectPageFields () {
       snapshotProposalId: true,
       fullWidth: true,
       bountyId: true,
+      hasContent: true,
       ...permissions
     }
   };

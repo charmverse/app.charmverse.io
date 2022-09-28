@@ -2,8 +2,6 @@ import { ListItemIcon, MenuItem, Typography } from '@mui/material';
 import type { Page } from '@prisma/client';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import PageTitle from 'components/common/PageLayout/components/PageTitle';
-import type { PageContent } from 'models';
-import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 
 interface Props {
   activeItemIndex?: number;
@@ -26,8 +24,6 @@ export default function PagesList ({ activeItemIndex = -1, pages, onSelectPage }
     ) : (
       <div>
         {pages.map((page, pageIndex) => {
-          const docContent = ((page.content) as PageContent);
-          const isEditorEmpty = checkIsContentEmpty(docContent);
           return (
             <MenuItem
               data-value={page.id}
@@ -39,7 +35,7 @@ export default function PagesList ({ activeItemIndex = -1, pages, onSelectPage }
             >
               <>
                 <ListItemIcon>
-                  <PageIcon icon={page.icon} isEditorEmpty={isEditorEmpty} pageType={page.type} />
+                  <PageIcon icon={page.icon} isEditorEmpty={!page.hasContent} pageType={page.type} />
                 </ListItemIcon>
                 <PageTitle
                   hasContent={page.title.length === 0}

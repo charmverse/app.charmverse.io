@@ -138,7 +138,7 @@ const GalleryCard = React.memo((props: Props) => {
       {props.visibleTitle
         && (
         <div className='gallery-title'>
-          {cardPage?.icon ? <PageIcon isEditorEmpty={checkIsContentEmpty(cardPage?.content as PageContent)} pageType='card' icon={cardPage.icon} /> : undefined}
+          {cardPage?.icon ? <PageIcon isEditorEmpty={!cardPage?.hasContent} pageType='card' icon={cardPage.icon} /> : undefined}
           <div key='__title'>
             {cardPage?.title
               || (

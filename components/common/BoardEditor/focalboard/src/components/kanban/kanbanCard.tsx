@@ -2,7 +2,6 @@ import styled from '@emotion/styled';
 import DuplicateIcon from '@mui/icons-material/ContentCopy';
 import { Box } from '@mui/material';
 import { BountyStatusChip } from 'components/bounties/components/BountyStatusBadge';
-import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import { CryptoCurrency, TokenLogoPaths } from 'connectors';
 import { useBounties } from 'hooks/useBounties';
@@ -184,7 +183,7 @@ const KanbanCard = React.memo((props: Props) => {
 
         <div className={`octo-icontitle ${linkedBounty || visiblePropertyTemplates.length > 0 ? 'octo-title-space' : ''}`}>
           <div>
-            {cardPage?.icon ? <PageIcon isEditorEmpty={checkIsContentEmpty(cardPage?.content as PageContent)} pageType='page' icon={cardPage.icon} /> : undefined}
+            {cardPage?.icon ? <PageIcon isEditorEmpty={!cardPage?.hasContent} pageType='page' icon={cardPage.icon} /> : undefined}
           </div>
           <div
             key='__title'

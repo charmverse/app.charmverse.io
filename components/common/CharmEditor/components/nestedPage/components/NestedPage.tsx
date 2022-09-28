@@ -38,7 +38,6 @@ export default function NestedPage ({ node }: NodeViewProps) {
   const [space] = useCurrentSpace();
   const { pages } = usePages();
   const nestedPage = pages[node.attrs.id];
-  const isEditorEmpty = checkIsContentEmpty(nestedPage?.content as PageContent);
 
   const isPublicShareMode = window.location.href.match(`${window.location.origin}/share/`) !== null;
 
@@ -49,7 +48,7 @@ export default function NestedPage ({ node }: NodeViewProps) {
   return (
     <NestedPageContainer href={nestedPage ? `/${appPath}` : ''} color='inherit' data-id={`page-${nestedPage?.id}`} data-title={nestedPage?.title} data-path={fullPath}>
       <div>
-        {nestedPage && <PageIcon isEditorEmpty={isEditorEmpty} icon={nestedPage.icon} pageType={nestedPage.type} />}
+        {nestedPage && <PageIcon isEditorEmpty={!nestedPage.hasContent} icon={nestedPage.icon} pageType={nestedPage.type} />}
       </div>
       <Typography fontWeight={600}>
         {nestedPage ? nestedPage.title || 'Untitled' : 'Page not found'}

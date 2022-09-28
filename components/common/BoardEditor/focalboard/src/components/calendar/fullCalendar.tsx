@@ -125,7 +125,7 @@ function CalendarFullView (props: Props): JSX.Element|null {
     return (
       <div>
         <div className='octo-icontitle'>
-          <PageIcon isEditorEmpty={checkIsContentEmpty(page?.content as PageContent)} pageType='page' icon={event.extendedProps.icon} />
+          <PageIcon isEditorEmpty={!page?.hasContent} pageType='page' icon={event.extendedProps.icon} />
           <div
             className='fc-event-title'
             key='__title'

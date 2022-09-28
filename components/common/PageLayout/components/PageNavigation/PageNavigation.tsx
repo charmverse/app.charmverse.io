@@ -12,14 +12,13 @@ import type { IPageWithPermissions, NewPageInput, PageUpdates } from 'lib/pages'
 import { addPageAndRedirect } from 'lib/pages';
 import { mapPageTree, sortNodes } from 'lib/pages/mapPageTree';
 import { isTruthy } from 'lib/utilities/types';
-import type { Page, PageContent } from 'models';
+import type { Page } from 'models';
 import { useRouter } from 'next/router';
 import type { ComponentProps, ReactNode, SyntheticEvent } from 'react';
 import { memo, useCallback, useEffect, useMemo } from 'react';
 import { useDrop } from 'react-dnd';
 
 import { useSnackbar } from 'hooks/useSnackbar';
-import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import type { MenuNode, ParentMenuNode } from './components/TreeNode';
 import TreeNode from './components/TreeNode';
 
@@ -98,7 +97,7 @@ function PageNavigation ({
       title: page.title,
       icon: page.icon,
       index: page.index,
-      isEmptyContent: checkIsContentEmpty(page.content as PageContent),
+      isEmptyContent: !page.hasContent,
       parentId: page.parentId,
       path: page.path,
       type: page.type,
