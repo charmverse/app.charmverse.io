@@ -19,7 +19,7 @@ handler.use(requireUser)
 async function setDefaultPagePermission (req: NextApiRequest, res: NextApiResponse<Space>) {
 
   const { id: spaceId } = req.query;
-  const { pagePermissionLevel } = req.body as {pagePermissionLevel: PagePermissionLevel};
+  const { pagePermissionLevel } = req.body as { pagePermissionLevel: PagePermissionLevel };
 
   const {
     error

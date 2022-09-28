@@ -2,7 +2,7 @@
 import type { Bounty, Space, User } from '@prisma/client';
 import { createBounty } from 'lib/bounties';
 import { addBountyPermissionGroup } from 'lib/permissions/bounties';
-import type { BountyWithDetails } from 'models';
+import type { BountyWithDetails } from 'lib/bounties';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';

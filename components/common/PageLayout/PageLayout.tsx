@@ -86,7 +86,7 @@ const LayoutContainer = styled.div`
 
 interface PageLayoutProps {
   children: React.ReactNode;
-  sidebar?: ((p: { closeSidebar: () => void }) => JSX.Element)
+  sidebar?: ((p: { closeSidebar: () => void }) => JSX.Element);
   sidebarWidth?: number;
 }
 

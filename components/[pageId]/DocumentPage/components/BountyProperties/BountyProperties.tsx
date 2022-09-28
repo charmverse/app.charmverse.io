@@ -18,12 +18,10 @@ import { usePages } from 'hooks/usePages';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
 import type { ApplicationWithTransactions } from 'lib/applications/interfaces';
-import type { AssignedBountyPermissions, BountyPermissions, UpdateableBountyFields } from 'lib/bounties';
-import type { BountyCreationData } from 'lib/bounties/interfaces';
+import type { AssignedBountyPermissions, BountyPermissions, UpdateableBountyFields, BountyCreationData, BountyWithDetails } from 'lib/bounties';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import debouncePromise from 'lib/utilities/debouncePromise';
 import { isTruthy } from 'lib/utilities/types';
-import type { BountyWithDetails } from 'models';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import BountyApplicantForm from './components/BountyApplicantForm';
@@ -34,11 +32,11 @@ import MissingPagePermissions from './components/MissingPagePermissions';
 import { BountySignupButton } from './components/BountySignupButton';
 
 export default function BountyProperties (props: {
-  readOnly?: boolean,
-  bountyId: string | null,
-  pageId: string,
-  permissions: AssignedBountyPermissions | null,
-  refreshBountyPermissions: (bountyId: string) => void
+  readOnly?: boolean;
+  bountyId: string | null;
+  pageId: string;
+  permissions: AssignedBountyPermissions | null;
+  refreshBountyPermissions: (bountyId: string) => void;
 }) {
   const { bountyId, pageId, readOnly: parentReadOnly = false, permissions, refreshBountyPermissions } = props;
   const [paymentMethods] = usePaymentMethods();
@@ -519,10 +517,10 @@ function rollupPermissions ({
   assignedRoleSubmitters,
   spaceId
 }: {
-  selectedReviewerUsers: string[],
-  selectedReviewerRoles: string[],
-  assignedRoleSubmitters: string[],
-  spaceId: string
+  selectedReviewerUsers: string[];
+  selectedReviewerRoles: string[];
+  assignedRoleSubmitters: string[];
+  spaceId: string;
 }): Pick<BountyPermissions, 'reviewer' | 'submitter'> {
   const reviewers = [
     ...selectedReviewerUsers.map(uid => {

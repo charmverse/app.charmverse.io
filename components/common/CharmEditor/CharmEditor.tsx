@@ -80,8 +80,8 @@ import SuggestionsPopup from './components/suggestions/SuggestionPopup';
 import { SidebarDrawer, SIDEBAR_VIEWS } from './components/SidebarDrawer';
 
 export interface ICharmEditorOutput {
-  doc: PageContent,
-  rawText: string
+  doc: PageContent;
+  rawText: string;
 }
 
 const actionsPluginKey = new PluginKey('row-actions');
@@ -107,16 +107,16 @@ export function charmEditorPlugins (
     username = null
   }:
     {
-      spaceId?: string | null,
-      pageId?: string | null,
-      userId?: string | null,
-      readOnly?: boolean,
-      onContentChange?: (view: EditorView, prevDoc: EditorState['doc']) => void,
-      onSelectionSet?: (state: EditorState) => void,
-      disablePageSpecificFeatures?: boolean,
-      enableVoting?: boolean,
-      enableComments?: boolean,
-      username?: string | null
+      spaceId?: string | null;
+      pageId?: string | null;
+      userId?: string | null;
+      readOnly?: boolean;
+      onContentChange?: (view: EditorView, prevDoc: EditorState['doc']) => void;
+      onSelectionSet?: (state: EditorState) => void;
+      disablePageSpecificFeatures?: boolean;
+      enableVoting?: boolean;
+      enableComments?: boolean;
+      username?: string | null;
     } = {}
 ): () => RawPlugins[] {
 
@@ -245,7 +245,7 @@ export function charmEditorPlugins (
   return () => basePlugins;
 }
 
-const StyledReactBangleEditor = styled(ReactBangleEditor)<{disablePageSpecificFeatures?: boolean}>`
+const StyledReactBangleEditor = styled(ReactBangleEditor)<{ disablePageSpecificFeatures?: boolean }>`
   position: relative;
 
   /** DONT REMOVE THIS STYLING */
@@ -321,7 +321,7 @@ interface CharmEditorProps {
   onContentChange?: UpdatePageContent;
   readOnly?: boolean;
   style?: CSSProperties;
-  pageActionDisplay?: IPageActionDisplayContext['currentPageActionDisplay']
+  pageActionDisplay?: IPageActionDisplayContext['currentPageActionDisplay'];
   disablePageSpecificFeatures?: boolean;
   enableVoting?: boolean;
   pageId: string;

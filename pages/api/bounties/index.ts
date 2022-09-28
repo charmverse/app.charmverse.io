@@ -1,7 +1,7 @@
 
 import type { Bounty } from '@prisma/client';
 import { prisma } from 'db';
-import type { BountyCreationData } from 'lib/bounties';
+import type { BountyCreationData, BountyWithDetails } from 'lib/bounties';
 import { createBounty, listAvailableBounties } from 'lib/bounties';
 import type { IEventToLog } from 'lib/log/userEvents';
 import { postToDiscord } from 'lib/log/userEvents';
@@ -11,7 +11,6 @@ import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
-import type { BountyWithDetails } from 'models';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import * as collabland from 'lib/collabland';
 import nc from 'next-connect';

@@ -20,7 +20,7 @@ export interface PaletteItemTypeNoGroup {
   uid: string;
   title: string;
   type?: string;
-  requiredSpacePermission?: SpaceOperation,
+  requiredSpacePermission?: SpaceOperation;
   description: string;
   keywords?: string[];
   disabled?: ((state: EditorState<any>) => boolean) | boolean;

@@ -35,8 +35,8 @@ type FormValues = yup.InferType<typeof schema>
  */
 interface Props {
   targetGroup: AssignablePermissionGroups;
-  id: string,
-  callback?: () => void
+  id: string;
+  callback?: () => void;
 }
 
 export default function SpacePermissions ({ targetGroup, id, callback = () => null }: Props) {

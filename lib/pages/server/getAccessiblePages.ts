@@ -12,9 +12,9 @@ const WITHOUT_CONTENT = true;
 export function includePagePermissions (): Prisma.PageInclude & {
   permissions: {
     include: {
-      sourcePermission: true
-    }
-  }
+      sourcePermission: true;
+    };
+  };
   } {
   return {
     permissions: {
@@ -70,7 +70,8 @@ function selectPageFields () {
   };
 }
 
-export function accessiblePagesByPermissionsQuery ({ spaceId, userId }: {spaceId: string, userId: string}): Prisma.PagePermissionListRelationFilter {
+export function accessiblePagesByPermissionsQuery ({ spaceId, userId }:
+  { spaceId: string, userId: string }): Prisma.PagePermissionListRelationFilter {
   return {
     some: {
       OR: [

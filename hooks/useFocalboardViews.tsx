@@ -5,8 +5,8 @@ import { useLocalStorage } from './useLocalStorage';
 type FocalboardViewsRecord = Record<string, null | string>;
 
 interface IContext {
-  focalboardViewsRecord: FocalboardViewsRecord,
-  setFocalboardViewsRecord: React.Dispatch<React.SetStateAction<FocalboardViewsRecord>>
+  focalboardViewsRecord: FocalboardViewsRecord;
+  setFocalboardViewsRecord: React.Dispatch<React.SetStateAction<FocalboardViewsRecord>>;
 }
 
 export const FocalboardViewsContext = createContext<Readonly<IContext>>({

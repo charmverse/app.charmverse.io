@@ -29,7 +29,7 @@ export const ThreadContainer = styled(Paper)`
   overflow: auto;
 `;
 
-export default function InlineCommentThread ({ pluginKey }: {pluginKey: PluginKey<InlineCommentPluginState>}) {
+export default function InlineCommentThread ({ pluginKey }: { pluginKey: PluginKey<InlineCommentPluginState> }) {
   const view = useEditorViewContext();
   const {
     tooltipContentDOM,
@@ -80,7 +80,7 @@ export default function InlineCommentThread ({ pluginKey }: {pluginKey: PluginKe
   return null;
 }
 
-export function InlineCommentSubMenu ({ pluginKey }: {pluginKey: PluginKey}) {
+export function InlineCommentSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
   const view = useEditorViewContext();
   const [commentContent, setCommentContent] = useState<PageContent>({
     type: 'doc',

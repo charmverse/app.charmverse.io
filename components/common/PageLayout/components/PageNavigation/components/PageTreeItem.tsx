@@ -172,7 +172,7 @@ interface PageLinkProps {
   labelIcon?: React.ReactNode;
   pageType?: Page['type']; // optional since we use this for views as well
   pageId?: string;
-  showPicker?: boolean
+  showPicker?: boolean;
 }
 
 export function PageLink ({ showPicker = !isTouchScreen(), children, href, label, labelIcon, pageType, pageId }: PageLinkProps) {

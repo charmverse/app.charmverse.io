@@ -15,7 +15,7 @@ import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
 import type { MentionPluginState } from '../mention.interfaces';
 import { selectMention } from '../mention.utils';
 
-export function MentionSuggest ({ pluginKey }: {pluginKey: PluginKey<MentionPluginState>}) {
+export function MentionSuggest ({ pluginKey }: { pluginKey: PluginKey<MentionPluginState> }) {
   const { suggestTooltipKey } = usePluginState(pluginKey) as MentionPluginState;
   const { show: isVisible } = usePluginState(suggestTooltipKey) as SuggestTooltipPluginState;
   if (isVisible) {
@@ -24,7 +24,7 @@ export function MentionSuggest ({ pluginKey }: {pluginKey: PluginKey<MentionPlug
   return null;
 }
 
-function MentionSuggestMenu ({ pluginKey }: {pluginKey: PluginKey}) {
+function MentionSuggestMenu ({ pluginKey }: { pluginKey: PluginKey }) {
   const [contributors] = useContributors();
   const view = useEditorViewContext();
   const {

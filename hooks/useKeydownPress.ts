@@ -4,7 +4,7 @@ import { useEffect, useMemo } from 'react';
 type KeyConfig = {
   key?: string;
   shift?: boolean;
-  ctrl?: boolean
+  ctrl?: boolean;
 };
 
 export default function useKeydownPress (callback: VoidFunction, { key, ctrl, shift }: KeyConfig = {}) {

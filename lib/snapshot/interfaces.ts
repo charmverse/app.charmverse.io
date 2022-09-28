@@ -1,7 +1,7 @@
 export interface SnapshotVotingStrategy {
   name: string;
   network: string;
-  params: any
+  params: any;
 }
 
 /**
@@ -21,7 +21,7 @@ export interface SnapshotSpace {
   name: string;
   network: string;
   private: boolean;
-  strategies: SnapshotVotingStrategy[]
+  strategies: SnapshotVotingStrategy[];
   // TBC - Check out validation
   // validation:
 }
@@ -38,7 +38,7 @@ export interface SnapshotProposal {
   snapshot: string;
   state: SnapshotProposalState;
   author: string;
-  space: Pick<SnapshotSpace, 'id' | 'name'>
+  space: Pick<SnapshotSpace, 'id' | 'name'>;
 }
 
 export interface SnapshotReceipt {
@@ -46,8 +46,8 @@ export interface SnapshotReceipt {
   ipfs: string;
   relayer: {
     address: string;
-    receipt: string
-  }
+    receipt: string;
+  };
 }
 
 // Comes from snapshot.js https://github.com/snapshot-labs/snapshot/blob/fd1f2ba15543583861df750b0958d1794cc625bb/src/components/Modal/VotingType.vue

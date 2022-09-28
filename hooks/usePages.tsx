@@ -17,21 +17,21 @@ import { useCurrentSpace } from './useCurrentSpace';
 import useIsAdmin from './useIsAdmin';
 import { useUser } from './useUser';
 
-export type LinkedPage = (Page & {children: LinkedPage[], parent: null | LinkedPage});
+export type LinkedPage = (Page & { children: LinkedPage[], parent: null | LinkedPage });
 
 export type PageUpdater = (updates: PageUpdates, revalidate?: boolean) => Promise<IPageWithPermissions>
 
 export type PagesContext = {
-  currentPageId: string,
-  pages: PagesMap,
-  setPages: Dispatch<SetStateAction<PagesMap>>,
-  setCurrentPageId: Dispatch<SetStateAction<string>>,
-  refreshPage: (pageId: string) => Promise<IPageWithPermissions>,
-  updatePage: PageUpdater,
-  mutatePage: (updates: PageUpdates, revalidate?: boolean) => void,
-  mutatePagesRemove: (pageIds: string[], revalidate?: boolean) => void,
-  deletePage: (data: {pageId: string, board?: Block}) => Promise<void>,
-  getPagePermissions: (pageId: string, page?: IPageWithPermissions) => IPagePermissionFlags,
+  currentPageId: string;
+  pages: PagesMap;
+  setPages: Dispatch<SetStateAction<PagesMap>>;
+  setCurrentPageId: Dispatch<SetStateAction<string>>;
+  refreshPage: (pageId: string) => Promise<IPageWithPermissions>;
+  updatePage: PageUpdater;
+  mutatePage: (updates: PageUpdates, revalidate?: boolean) => void;
+  mutatePagesRemove: (pageIds: string[], revalidate?: boolean) => void;
+  deletePage: (data: { pageId: string, board?: Block }) => Promise<void>;
+  getPagePermissions: (pageId: string, page?: IPageWithPermissions) => IPagePermissionFlags;
 };
 
 const refreshInterval = 1000 * 5 * 60; // 5 minutes
@@ -128,7 +128,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     return computedPermissions;
   }
 
-  async function deletePage ({ pageId, board }: {pageId: string, board?: Block}) {
+  async function deletePage ({ pageId, board }: { pageId: string, board?: Block }) {
     const page = pages[pageId];
     const totalNonArchivedPages = Object.values(pages).filter((p => p?.deletedAt === null && (p?.type === 'page' || p?.type === 'board'))).length;
 

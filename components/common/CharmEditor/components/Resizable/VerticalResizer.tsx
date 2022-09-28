@@ -5,13 +5,13 @@ import ResizableBox from './ResizableBox';
 import ResizableContainer from './ResizableContainer';
 
 interface ResizerProps {
-  width: number
-  height: number
-  children: ReactNode
-  onResize?: ResizableProps['onResize']
-  minConstraints?: ResizableProps['minConstraints']
-  maxConstraints?: ResizableProps['maxConstraints']
-  onResizeStop?: ResizableProps['onResizeStop']
+  width: number;
+  height: number;
+  children: ReactNode;
+  onResize?: ResizableProps['onResize'];
+  minConstraints?: ResizableProps['minConstraints'];
+  maxConstraints?: ResizableProps['maxConstraints'];
+  onResizeStop?: ResizableProps['onResizeStop'];
 }
 
 function VerticalResizer (props: ResizerProps) {

@@ -10,7 +10,7 @@ export interface ProposalTask {
   pageTitle: string;
   pagePath: string;
   status: ProposalStatus;
-  pageId: string
+  pageId: string;
 }
 
 type PopulatedPage = Pick<Page, 'id' | 'path' | 'title'> & {

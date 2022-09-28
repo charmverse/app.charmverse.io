@@ -14,12 +14,12 @@ export interface MenuOption<T = any> {
 }
 
 interface Props {
-  selectedValue: string,
-  title?: string
-  loading?: boolean,
-  valueUpdated: (value: string) => void,
-  options: MenuOption[]
-  closeOnSelect?: boolean
+  selectedValue: string;
+  title?: string;
+  loading?: boolean;
+  valueUpdated: (value: string) => void;
+  options: MenuOption[];
+  closeOnSelect?: boolean;
 }
 
 export default function SelectMenu ({

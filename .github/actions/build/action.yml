@@ -16,7 +16,7 @@ runs:
       uses: actions/cache@v2
       with:
         path: .next
-        key: next-build-${{ github.sha }}
+        key: nextjs-build-${{ github.sha }}
 
     # Re-build prisma types which are cached inside of node_modules
     - name: Re-build Prisma types

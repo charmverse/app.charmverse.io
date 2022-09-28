@@ -27,7 +27,7 @@ export class ProposalsApi {
     return http.GET<ProposalCategory[]>(`/api/spaces/${spaceId}/proposal-categories`);
   }
 
-  createProposalTemplate ({ spaceId }: {spaceId: string}): Promise<IPageWithPermissions> {
+  createProposalTemplate ({ spaceId }: { spaceId: string }): Promise<IPageWithPermissions> {
     return http.POST('/api/proposals/templates', { spaceId });
   }
 
@@ -35,7 +35,7 @@ export class ProposalsApi {
     return http.POST('/api/proposals/from-template', { spaceId, templateId });
   }
 
-  deleteProposalTemplate ({ proposalTemplateId }: {proposalTemplateId: string}): Promise<IPageWithPermissions> {
+  deleteProposalTemplate ({ proposalTemplateId }: { proposalTemplateId: string }): Promise<IPageWithPermissions> {
     return http.DELETE(`/api/proposals/templates/${proposalTemplateId}`);
   }
 

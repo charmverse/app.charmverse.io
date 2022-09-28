@@ -17,9 +17,9 @@ import { useState } from 'react';
 import Integration from './Integration';
 
 export type IntegrationModel = {
-  username: string,
-  type: IdentityType,
-  isInUse: boolean,
+  username: string;
+  type: IdentityType;
+  isInUse: boolean;
   icon: ReactNode;
 };
 
@@ -54,12 +54,12 @@ export const getIdentityIcon = (identityType: IdentityType | null) => {
 };
 
 type IdentityModalProps = {
-    save: (id: string, identityType: IdentityType) => void,
-    close: () => void,
-    isOpen: boolean,
-    identityTypes: IntegrationModel[],
-    identityType: IdentityType,
-    username: string,
+    save: (id: string, identityType: IdentityType) => void;
+    close: () => void;
+    isOpen: boolean;
+    identityTypes: IntegrationModel[];
+    identityType: IdentityType;
+    username: string;
 };
 
 function IdentityModal (props: IdentityModalProps) {

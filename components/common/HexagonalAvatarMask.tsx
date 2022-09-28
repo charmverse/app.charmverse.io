@@ -1,7 +1,7 @@
 import React from 'react';
 
 type Props = {
-  id: string
+  id: string;
 }
 
 export default function HexagonalAvatarMask ({ id }: Props) {

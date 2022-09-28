@@ -7,8 +7,8 @@ import type { ReactNode } from 'react';
 
 interface PdfSelectorProps {
   autoOpen?: boolean;
-  onPdfSelect: (pdfSrc: string) => void
-  children: ReactNode
+  onPdfSelect: (pdfSrc: string) => void;
+  children: ReactNode;
 }
 
 export default function PdfSelector ({ autoOpen = false, children, onPdfSelect }: PdfSelectorProps) {
