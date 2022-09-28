@@ -17,7 +17,6 @@ import type { SpacePermissionConfigurationUpdate } from 'lib/permissions/meta/in
 import type { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee, IPagePermissionWithSource, SpaceDefaultPublicPageToggle } from 'lib/permissions/pages/page-permission-interfaces';
 import type { SpacePermissionFlags, SpacePermissionModification } from 'lib/permissions/spaces';
 import type { AggregatedProfileData } from 'lib/profile';
-import type { MarkTask } from 'lib/tasks/markTasks';
 import type { MultipleThreadsInput, ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import type { TokenGateEvaluationAttempt, TokenGateEvaluationResult, TokenGateVerification, TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
@@ -31,7 +30,6 @@ import type { InviteLinkPopulated } from 'pages/api/invites/index';
 import type { PublicUser } from 'pages/api/public/profile/[userId]';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
-import type { GetTasksStateResponse, UpdateTasksState } from 'pages/api/tasks/state';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 import type { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
 import { BlockchainApi } from './apis/blockchainApi';
@@ -449,14 +447,6 @@ class CharmClient {
     return http.DELETE(`/api/payment-methods/${paymentMethodId}`);
   }
 
-  getTasksState (): Promise<GetTasksStateResponse> {
-    return http.GET('/api/tasks/state');
-  }
-
-  updateTasksState (payload: UpdateTasksState) {
-    return http.PUT('/api/tasks/state', payload);
-  }
-
   createRole (role: Partial<Role>): Promise<Role> {
     return http.POST('/api/roles', role);
   }
@@ -591,10 +581,6 @@ class CharmClient {
 
   getBuildId () {
     return http.GET<{ buildId: string }>('/api/build-id');
-  }
-
-  markTasks (tasks: MarkTask[]) {
-    return http.POST('/api/tasks/mark', tasks);
   }
 
   getAggregatedData (userId: string) {

@@ -134,7 +134,7 @@ export default function MentionedTasksList ({ tasks, error, mutateTasks }: Menti
   useEffect(() => {
     async function main () {
       if (tasks?.mentioned && tasks.mentioned.unmarked.length !== 0) {
-        await charmClient.markTasks(tasks.mentioned.unmarked.map(unmarkedMentions => ({ id: unmarkedMentions.mentionId, type: 'mention' })));
+        await charmClient.tasks.markTasks(tasks.mentioned.unmarked.map(unmarkedMentions => ({ id: unmarkedMentions.mentionId, type: 'mention' })));
         mutateTasks((_tasks) => {
           const unmarked = _tasks?.mentioned.unmarked ?? [];
           return _tasks ? {
