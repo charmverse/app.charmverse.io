@@ -13,6 +13,7 @@ import { ethers } from 'ethers';
 import { useBounties } from 'hooks/useBounties';
 import { useContributors } from 'hooks/useContributors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import useGnosisSigner from 'hooks/useWeb3Signer';
 import type { SafeData } from 'lib/gnosis';
 import { getSafesForAddress } from 'lib/gnosis';
@@ -22,8 +23,6 @@ import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state
 import type { BountyWithDetails } from 'models';
 import { useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
-import PropertiesButton from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
-import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import { BountyAmount } from './BountyStatusBadge';
 import type { MultiPaymentResult } from './MultiPaymentButton';
 import MultiPaymentButton from './MultiPaymentButton';
@@ -168,53 +167,43 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
             Pay Bount{transactions.length > 1 ? 'ies' : 'y'}
           </DialogTitle>
           <Box
-            className='octo-propertylist'
-            sx={{
-              '& .MuiInputBase-input': {
-                background: 'none'
-              }
-            }}
             mt={2}
           >
             {safeData && (
-              <Box justifyContent='space-between' gap={2} alignItems='center'>
-                <div
-                  className='octo-propertyrow'
-                  style={{
-                    height: 'fit-content',
-                    display: 'flex',
-                    alignItems: 'center'
+              <Box justifyContent='space-between' gap={2} alignItems='center' display='flex'>
+                <Typography
+                  variant='subtitle1'
+                  sx={{
+                    whiteSpace: 'nowrap'
+                  }}
+                >Multisig Wallet
+                </Typography>
+                <Select
+                  onChange={(e) => {
+                    setGnosisSafeData(safeData.find(safeInfo => safeInfo.address === e.target.value) ?? null);
+                  }}
+                  sx={{ flexGrow: 1 }}
+                  value={gnosisSafeData?.address ?? ''}
+                  displayEmpty
+                  fullWidth
+                  renderValue={(safeAddress) => {
+                    if (safeAddress.length === 0) {
+                      return (
+                        <Typography
+                          color='secondary'
+                        >Please select your wallet
+                        </Typography>
+                      );
+                    }
+                    return userGnosisSafeRecord[safeAddress]?.name ?? safeAddress;
                   }}
                 >
-                  <div className='octo-propertyname octo-propertyname--readonly'>
-                    <PropertiesButton>Multisig Wallet</PropertiesButton>
-                  </div>
-                  <Select
-                    onChange={(e) => {
-                      setGnosisSafeData(safeData.find(safeInfo => safeInfo.address === e.target.value) ?? null);
-                    }}
-                    sx={{ flexGrow: 1 }}
-                    value={gnosisSafeData?.address ?? ''}
-                    displayEmpty
-                    renderValue={(safeAddress) => {
-                      if (safeAddress.length === 0) {
-                        return (
-                          <Typography
-                            color='secondary'
-                          >Please select your wallet
-                          </Typography>
-                        );
-                      }
-                      return userGnosisSafeRecord[safeAddress]?.name ?? safeAddress;
-                    }}
-                  >
-                    {safeData.map(safeInfo => (
-                      <MenuItem key={safeInfo.address} value={safeInfo.address}>
-                        {userGnosisSafeRecord[safeInfo.address]?.name ?? safeInfo.address}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </div>
+                  {safeData.map(safeInfo => (
+                    <MenuItem key={safeInfo.address} value={safeInfo.address}>
+                      {userGnosisSafeRecord[safeInfo.address]?.name ?? safeInfo.address}
+                    </MenuItem>
+                  ))}
+                </Select>
               </Box>
             )}
           </Box>
