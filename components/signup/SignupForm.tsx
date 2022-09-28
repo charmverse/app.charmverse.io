@@ -4,6 +4,7 @@ import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
+import Link from 'components/common/Link';
 import Image from 'components/common/Image';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useRouter } from 'next/router';
@@ -43,14 +44,6 @@ export default function SignupPageContent () {
   const router = useRouter();
   const { user } = useUser();
 
-  async function createWorkspace () {
-    router.push('/createWorkspace');
-  }
-
-  async function joinWorkspace () {
-    router.push('/join');
-  }
-
   const welcomeMessage = `Welcome, ${user && user.username}!`;
 
   return (
@@ -65,24 +58,28 @@ export default function SignupPageContent () {
       </Box>
       <Grid container spacing={6} alignItems='stretch' sx={{ mb: 6 }}>
         <Grid item xs sx={{ height: '100%', margin: 'auto' }}>
-          <AdventureCard onClick={createWorkspace}>
-            <ImageContainer>
-              <Image src={rocketImage} />
-            </ImageContainer>
-            <PrimaryButton size='large'>
-              Create a new workspace
-            </PrimaryButton>
-          </AdventureCard>
+          <Link href='/createWorkspace'>
+            <AdventureCard>
+              <ImageContainer>
+                <Image src={rocketImage} />
+              </ImageContainer>
+              <PrimaryButton size='large' data-test='goto-create-workspace'>
+                Create a new workspace
+              </PrimaryButton>
+            </AdventureCard>
+          </Link>
         </Grid>
         <Grid item xs>
-          <AdventureCard onClick={joinWorkspace}>
-            <ImageContainer>
-              <Image src={gatesImage} />
-            </ImageContainer>
-            <PrimaryButton size='large'>
-              Join an existing workspace
-            </PrimaryButton>
-          </AdventureCard>
+          <Link href='/join'>
+            <AdventureCard>
+              <ImageContainer>
+                <Image src={gatesImage} />
+              </ImageContainer>
+              <PrimaryButton size='large'>
+                Join an existing workspace
+              </PrimaryButton>
+            </AdventureCard>
+          </Link>
         </Grid>
       </Grid>
     </Content>

@@ -208,11 +208,22 @@ export async function generateUserAndSpace (walletAddress: string = v4(), isAdmi
 export async function mockWeb3 (page: BrowserPage, fn: () => void) {
   await page.addInitScript({
     content:
-      `console.log("loading mock lib");\n${readFileSync(
+      `${readFileSync(
         require.resolve('@depay/web3-mock/dist/umd/index.bundle.js'),
         'utf-8'
-      )
-      }\n`
+      )}\n`
+      + `
+
+        Web3Mock.mock('ethereum');
+
+        // mock deprecatd apis not handled by web3-mock
+        window.ethereum.enable = () => Promise.resolve();
+
+        window.ethereum.send = (method, opts) => {
+          return window.ethereum.request({ method }, opts);
+        };
+
+      `
       + `(${fn.toString()})();`
   });
 }
