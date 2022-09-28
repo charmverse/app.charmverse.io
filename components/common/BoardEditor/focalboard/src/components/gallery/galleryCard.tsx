@@ -42,7 +42,6 @@ type Props = {
 
 const GalleryCard = React.memo((props: Props) => {
   const { card, board } = props;
-
   const { pages, getPagePermissions } = usePages();
   const [space] = useCurrentSpace();
   const intl = useIntl();
@@ -57,31 +56,7 @@ const GalleryCard = React.memo((props: Props) => {
     className += ' dragover';
   }
 
-  let galleryImageUrl: null | string | undefined = cardPage?.headerImage;
-  const cardPageContent = cardPage?.content as PageContent;
-
-  if (cardPageContent && !galleryImageUrl) {
-    if (cardPageContent?.content) {
-      for (let index = 0; index < cardPageContent.content.length; index++) {
-        const item = cardPageContent.content[index];
-        if (item.type === 'paragraph') {
-          const imageNode = item.content?.[0];
-          if (imageNode?.type === 'image') {
-            if (imageNode.attrs?.src) {
-              galleryImageUrl = imageNode.attrs.src;
-              break;
-            }
-          }
-        }
-        else if (item.type === 'image') {
-          if (item.attrs?.src) {
-            galleryImageUrl = item.attrs.src;
-            break;
-          }
-        }
-      }
-    }
-  }
+  const galleryImageUrl: null | string | undefined = cardPage?.headerImage || card.fallbackPreviewUrl;
 
   const { showMessage } = useSnackbar();
 

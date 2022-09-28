@@ -111,7 +111,7 @@ async function updatePageHandler (req: NextApiRequest, res: NextApiResponse<IPag
     }
   }
 
-  const pageWithPermission = await updatePage(pageId, userId, req.body);
+  const pageWithPermission = await updatePage(page, userId, req.body);
 
   if (hasNewParentPage) {
     const updatedPage = await setupPermissionsAfterPageRepositioned(pageId);

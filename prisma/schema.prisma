@@ -246,22 +246,23 @@ model Page {
 }
 
 model Block {
-  id        String    @id @db.Uuid
-  deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  createdBy String    @db.Uuid
-  updatedAt DateTime  @default(now())
-  updatedBy String    @db.Uuid
-  spaceId   String    @db.Uuid
-  parentId  String
-  rootId    String    @db.Uuid
-  schema    Int
-  type      String
-  title     String
-  fields    Json
-  user      User      @relation(fields: [createdBy], references: [id])
-  space     Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  page      Page?
+  id                 String    @id @db.Uuid
+  deletedAt          DateTime?
+  createdAt          DateTime  @default(now())
+  createdBy          String    @db.Uuid
+  updatedAt          DateTime  @default(now())
+  updatedBy          String    @db.Uuid
+  spaceId            String    @db.Uuid
+  parentId           String
+  rootId             String    @db.Uuid
+  schema             Int
+  type               String
+  title              String
+  fields             Json
+  fallbackPreviewUrl String?
+  user               User      @relation(fields: [createdBy], references: [id])
+  space              Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  page               Page?
 }
 
 model UserVote {
