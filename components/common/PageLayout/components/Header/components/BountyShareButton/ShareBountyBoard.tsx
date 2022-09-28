@@ -41,7 +41,7 @@ const CopyButton = styled((props: any) => <Button color='secondary' variant='out
 `;
 
 interface Props {
-  padding?: number
+  padding?: number;
 }
 
 export default function ShareBountyBoard ({ padding = 1 }: Props) {

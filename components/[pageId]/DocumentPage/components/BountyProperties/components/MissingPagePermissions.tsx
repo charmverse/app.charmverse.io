@@ -13,7 +13,7 @@ import { useContributors } from 'hooks/useContributors';
 
 interface Props {
   bountyPermissions: Partial<BountyPermissions>;
-  pagePermissions: IPagePermissionWithSource[]
+  pagePermissions: IPagePermissionWithSource[];
   target: Extract<BountyPermissionLevel, 'reviewer' | 'submitter'>;
 }
 

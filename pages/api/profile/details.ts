@@ -37,7 +37,7 @@ async function getUserDetails (req: NextApiRequest, res: NextApiResponse<UserDet
   return res.status(200).json(details);
 }
 
-async function updateUserDetails (req: NextApiRequest, res: NextApiResponse<UserDetails | {error: string}>) {
+async function updateUserDetails (req: NextApiRequest, res: NextApiResponse<UserDetails | { error: string }>) {
   const details = await prisma.userDetails.upsert({
     where: {
       id: req.session.user.id

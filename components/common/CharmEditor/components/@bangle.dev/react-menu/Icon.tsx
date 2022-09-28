@@ -1,4 +1,4 @@
-import { HintPos } from '@bangle.dev/react-menu/dist/types';
+
 import styled from '@emotion/styled';
 import { ListItem, Tooltip } from '@mui/material';
 import React from 'react';
@@ -9,10 +9,8 @@ export interface MenuButtonProps {
   isActive?: boolean;
   isDisabled?: boolean;
   hints: string[];
-  hintPos?: HintPos;
-  hintBreakWhiteSpace?: boolean;
   onMouseDown?: React.MouseEventHandler;
-  disableButton?: boolean
+  disableButton?: boolean;
 }
 
 const StyledMenuButton = styled.div<{ active: boolean }>`
@@ -63,7 +61,7 @@ export function MenuButton ({
         ))
       }
         </div>
-)}
+      )}
       arrow
       placement='top'
     >

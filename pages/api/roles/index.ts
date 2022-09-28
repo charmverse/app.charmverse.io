@@ -22,7 +22,7 @@ export type ListSpaceRolesResponse = (Pick<Role, 'id' | 'name' | 'source'> & {
           user: User;
       };
   }[];
-  spacePermissions: SpacePermission[]
+  spacePermissions: SpacePermission[];
 })
 
 async function listSpaceRoles (req: NextApiRequest, res: NextApiResponse<ListSpaceRolesResponse[]>) {

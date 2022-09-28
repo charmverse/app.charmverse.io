@@ -14,7 +14,7 @@ type Props = {
     board: Board
     cards: Card[]
     activeView: BoardView
-    readonly: boolean
+    readOnly: boolean
     addCard: (show: boolean) => Promise<void>
     selectedCardIds: string[]
     onCardClicked: (e: React.MouseEvent, card: Card) => void
@@ -64,7 +64,7 @@ function Gallery (props: Props): JSX.Element {
             visibleTitle={visibleTitle}
             visibleBadges={visibleBadges}
             isSelected={props.selectedCardIds.includes(card.id)}
-            readonly={props.readonly}
+            readOnly={props.readOnly}
             onDrop={onDropToCard}
             isManualSort={isManualSort}
           />
@@ -73,7 +73,7 @@ function Gallery (props: Props): JSX.Element {
 
       {/* Add New row */}
 
-      {!props.readonly
+      {!props.readOnly
                 && (
                 <div
                   className='octo-gallery-new'

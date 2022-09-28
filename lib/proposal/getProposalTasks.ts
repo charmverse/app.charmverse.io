@@ -7,18 +7,18 @@ import { getProposalAction } from './getProposalAction';
 export type ProposalTaskAction = 'start_discussion' | 'start_vote' | 'review' | 'discuss' | 'vote' | 'start_review';
 
 export interface ProposalTask {
-  id: string
-  action: ProposalTaskAction | null
-  spaceDomain: string
-  spaceName: string
-  pageTitle: string
-  pagePath: string
-  status: ProposalStatus
+  id: string;
+  action: ProposalTaskAction | null;
+  spaceDomain: string;
+  spaceName: string;
+  pageTitle: string;
+  pagePath: string;
+  status: ProposalStatus;
 }
 
 export function extractProposalData (proposal: Proposal & {
-  space: Space,
-  page: Page | null
+  space: Space;
+  page: Page | null;
 }, action: ProposalTask['action']): ProposalTask | null {
   return proposal.page ? {
     id: proposal.id,
@@ -48,8 +48,8 @@ function sortProposals (proposals: ProposalTask[], workspaceEventsRecord: Worksp
 }
 
 export async function getProposalTasks (userId: string): Promise<{
-  marked: ProposalTask[],
-  unmarked: ProposalTask[]
+  marked: ProposalTask[];
+  unmarked: ProposalTask[];
 }> {
   const userNotifications = await prisma.userNotification.findMany({
     where: {
@@ -115,7 +115,12 @@ export async function getProposalTasks (userId: string): Promise<{
       spaceId: {
         in: spaceIds
       },
-      type: 'proposal'
+      type: 'proposal',
+      proposal: {
+        status: {
+          notIn: ['draft', 'private_draft']
+        }
+      }
     },
     include: {
       proposal: {
@@ -130,7 +135,7 @@ export async function getProposalTasks (userId: string): Promise<{
 
   const userNotificationIds = new Set(userNotifications.map(userNotification => userNotification.taskId));
 
-  const proposalsRecord: {marked: ProposalTask[], unmarked: ProposalTask[]} = {
+  const proposalsRecord: { marked: ProposalTask[], unmarked: ProposalTask[] } = {
     marked: [],
     unmarked: []
   };
@@ -140,41 +145,36 @@ export async function getProposalTasks (userId: string): Promise<{
       const workspaceEvent = workspaceEventsRecord[proposal.id];
       const isReviewer = proposal.reviewers.some(reviewer => reviewer.roleId ? roleIds.includes(reviewer.roleId) : reviewer.userId === userId);
       const isAuthor = proposal.authors.some(author => author.userId === userId);
-      if (proposal?.status.match(/draft/) && !isAuthor) {
-        // No-op
+      const action = getProposalAction(
+        {
+          currentStatus: proposal.status,
+          isAuthor,
+          isReviewer
+        }
+      );
+
+      const proposalTask = {
+        // Making the id empty to fill them later
+        id: '',
+        pagePath: page.path,
+        pageTitle: page.title,
+        spaceDomain: page.space.domain,
+        spaceName: page.space.name,
+        status: proposal.status,
+        action
+      };
+
+      if (workspaceEvent && !userNotificationIds.has(workspaceEvent.id)) {
+        proposalsRecord.unmarked.push({
+          ...proposalTask,
+          id: workspaceEvent.id
+        });
       }
       else {
-        const action = getProposalAction(
-          {
-            currentStatus: proposal.status,
-            isAuthor,
-            isReviewer
-          }
-        );
-
-        const proposalTask = {
-          // Making the id empty to fill them later
-          id: '',
-          pagePath: page.path,
-          pageTitle: page.title,
-          spaceDomain: page.space.domain,
-          spaceName: page.space.name,
-          status: proposal.status,
-          action
-        };
-
-        if (workspaceEvent && !userNotificationIds.has(workspaceEvent.id)) {
-          proposalsRecord.unmarked.push({
-            ...proposalTask,
-            id: workspaceEvent.id
-          });
-        }
-        else {
-          proposalsRecord.marked.push({
-            ...proposalTask,
-            id: v4()
-          });
-        }
+        proposalsRecord.marked.push({
+          ...proposalTask,
+          id: v4()
+        });
       }
     }
   });

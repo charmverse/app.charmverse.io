@@ -14,7 +14,7 @@ handler.use(requireUser)
 async function duplicatePageRoute (req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
   const pageId = req.query.id as string;
   const userId = req.session.user.id;
-  const { parentId } = req.body as {parentId: string};
+  const { parentId } = req.body as { parentId: string };
 
   const permissions = await computeUserPagePermissions({
     pageId,

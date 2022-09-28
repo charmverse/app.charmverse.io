@@ -6,18 +6,18 @@ import { getAlchemyBaseUrl } from 'lib/blockchain/provider/alchemy';
 import type { SupportedChainId } from '../blockchain/provider/alchemy';
 
 export interface ITokenMetadataRequest {
-  chainId: SupportedChainId,
-  contractAddress: string
+  chainId: SupportedChainId;
+  contractAddress: string;
 }
 
 export interface ITokenMetadata {
-  decimals: number,
-  name: string,
-  symbol: string,
-  logo?: string
+  decimals: number;
+  name: string;
+  symbol: string;
+  logo?: string;
 }
 
-export type TokenInfo = Pick<PaymentMethod, 'tokenName' | 'tokenSymbol' | 'tokenLogo'> & {isContract: boolean};
+export type TokenInfo = Pick<PaymentMethod, 'tokenName' | 'tokenSymbol' | 'tokenLogo'> & { isContract: boolean };
 
 /**
  * Call external provider to get information about a specific cryptocurrency

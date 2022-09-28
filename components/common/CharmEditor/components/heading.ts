@@ -471,8 +471,8 @@ function isCollapsible (match: ContentNodeWithPos) {
 
 function findCollapseFragment (matchNode: Node, doc: Node) {
   // Find the last child that will be inside of the collapse
-  let start: { index: number; offset: number; node: Node } | undefined;
-  let end: { index: number; offset: number; node: Node } | undefined;
+  let start: { index: number, offset: number, node: Node } | undefined;
+  let end: { index: number, offset: number, node: Node } | undefined;
   let isDone = false;
 
   const breakCriteria = (node: Node) => {

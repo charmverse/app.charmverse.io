@@ -4,7 +4,7 @@ import { FiatCurrencyList } from 'connectors';
 
 const currencyOptions = Object.keys(FiatCurrencyList);
 
-export function InputSearchCurrency ({ onChange }: {onChange: (value: FiatCurrency) => any}) {
+export function InputSearchCurrency ({ onChange }: { onChange: (value: FiatCurrency) => any }) {
 
   function emitValue (value: string) {
     if (value !== null && currencyOptions.indexOf(value) >= 0) {

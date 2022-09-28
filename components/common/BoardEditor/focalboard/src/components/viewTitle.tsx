@@ -26,7 +26,7 @@ const StyledEditable = styled(Editable)`
 
 type Props = {
   board: Board
-  readonly: boolean
+  readOnly: boolean
   setPage: (page: Partial<Page>) => void
 }
 
@@ -61,7 +61,7 @@ function ViewTitle(props: Props) {
   return (
     <div className='ViewTitle'>
       <div className='add-buttons add-visible'>
-        {!props.readonly && !board.fields.headerImage
+        {!props.readOnly && !board.fields.headerImage
           && (
             <div className='add-buttons'>
               <Button
@@ -80,7 +80,7 @@ function ViewTitle(props: Props) {
               </Button>
             </div>
           )}
-        {!props.readonly && !board.fields.icon
+        {!props.readOnly && !board.fields.icon
           && (
             <Button
               onClick={() => {
@@ -94,7 +94,7 @@ function ViewTitle(props: Props) {
               />
             </Button>
           )}
-        {!props.readonly && board.fields.showDescription
+        {!props.readOnly && board.fields.showDescription
           && (
             <Button
               onClick={onHideDescription}
@@ -106,7 +106,7 @@ function ViewTitle(props: Props) {
               />
             </Button>
           )}
-        {!props.readonly && !board.fields.showDescription
+        {!props.readOnly && !board.fields.showDescription
           && (
             <Button
               onClick={onShowDescription}
@@ -121,7 +121,7 @@ function ViewTitle(props: Props) {
       </div>
 
       <div className='title' data-test='board-title'>
-        <BlockIconSelector readonly={props.readonly} block={board} setPage={props.setPage} />
+        <BlockIconSelector readOnly={props.readOnly} block={board} setPage={props.setPage} />
         <Editable
           className='title'
           value={title}
@@ -130,7 +130,7 @@ function ViewTitle(props: Props) {
           saveOnEsc={true}
           onSave={onEditTitleSave}
           onCancel={onEditTitleCancel}
-          readonly={props.readonly}
+          readOnly={props.readOnly}
           spellCheck={true}
         />
       </div>
@@ -176,7 +176,7 @@ export function InlineViewTitle (props: Props) {
         onChange={(newTitle) => setTitle(newTitle)}
         saveOnEsc={true}
         onSave={onEditTitleSave}
-        readonly={props.readonly}
+        readOnly={props.readOnly}
         spellCheck={true}
       />
     </div>

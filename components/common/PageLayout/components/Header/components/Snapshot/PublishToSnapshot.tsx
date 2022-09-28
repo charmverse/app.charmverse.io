@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react';
 import PublishingForm from './PublishingForm';
 
 export default function PublishToSnapshot ({ pageId, renderContent }: {
-  renderContent: (props: {onClick?: () => void, label: string}) => ReactNode, pageId: string
+  renderContent: (props: { onClick?: () => void, label: string }) => ReactNode; pageId: string;
 }) {
   const { pages, setPages } = usePages();
   const page = pages[pageId]!;

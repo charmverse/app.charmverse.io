@@ -16,7 +16,7 @@ type Props = {
     activeView: BoardView
     group: BoardGroup
     intl: IntlShape
-    readonly: boolean
+    readOnly: boolean
     onDrop: (card: Card) => void
 }
 
@@ -44,7 +44,7 @@ export default function KanbanHiddenColumnItem (props: Props): JSX.Element {
       className={className}
     >
       <MenuWrapper
-        disabled={props.readonly}
+        disabled={props.readOnly}
       >
         <Label
           key={group.option.id || 'empty'}

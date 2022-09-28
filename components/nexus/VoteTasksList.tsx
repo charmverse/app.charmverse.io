@@ -15,16 +15,16 @@ import { useState } from 'react';
 import type { KeyedMutator } from 'swr';
 
 interface VoteTasksListProps {
-  tasks: GetTasksResponse | undefined
-  error: any
-  mutateTasks: KeyedMutator<GetTasksResponse>
+  tasks: GetTasksResponse | undefined;
+  error: any;
+  mutateTasks: KeyedMutator<GetTasksResponse>;
 }
 
 /**
  * Page only needs to be provided for proposal type votes
  */
 export function VoteTasksListRow (
-  props: {voteTask: VoteTask, mutateTasks: KeyedMutator<GetTasksResponse>}
+  props: { voteTask: VoteTask, mutateTasks: KeyedMutator<GetTasksResponse> }
 ) {
   const {
     voteTask,

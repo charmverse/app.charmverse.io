@@ -4,7 +4,7 @@ import {
 } from './helpers';
 import type { TrackAttribute } from '../../track/interfaces';
 
-type SelectedChange = { from: any; to: any; } | null;
+type SelectedChange = { from: any, to: any } | null;
 interface SelectedChanges {
   insertion: SelectedChange;
   deletion: SelectedChange;
