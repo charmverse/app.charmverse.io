@@ -96,7 +96,8 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
    * Returns markdown content if valid length, or null if not
    */
   async function checkMarkdownLength (): Promise<string | null> {
-    const content = await generateMarkdown(page!, false);
+    const pageWithDetails = await charmClient.pages.getPage(page.id);
+    const content = await generateMarkdown(pageWithDetails, false);
 
     const markdownCharacterLength = content.length;
 
@@ -174,7 +175,8 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
     setFormError(null);
     setPublishing(true);
 
-    const content = await generateMarkdown(page!, false);
+    const pageWithDetails = await charmClient.pages.getPage(page.id);
+    const content = await generateMarkdown(pageWithDetails, false);
 
     let receipt: SnapshotReceipt;
 

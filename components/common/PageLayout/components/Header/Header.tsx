@@ -31,7 +31,6 @@ import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useRef, useState } from 'react';
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
-import type { PageMeta } from 'lib/pages';
 import ShareButton from './components/ShareButton';
 import BountyShareButton from './components/BountyShareButton/BountyShareButton';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
@@ -85,7 +84,13 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
   }
 
   async function exportMarkdown () {
-    const markdownContent = await generateMarkdown(basePage as PageMeta);
+    if (!basePage) {
+      return;
+    }
+
+    // getPage to get content
+    const page = await charmClient.pages.getPage(basePage.id);
+    const markdownContent = await generateMarkdown(page);
 
     if (markdownContent) {
       const data = new Blob([markdownContent], { type: 'text/plain' });
