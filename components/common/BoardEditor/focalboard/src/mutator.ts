@@ -1,6 +1,6 @@
 import charmClient from 'charmClient';
-import { PageMeta } from 'lib/pages';
-import { Page, PageContent } from 'models';
+import type { PageMeta } from 'lib/pages';
+import type { Page, PageContent } from 'models';
 import { publishIncrementalUpdate } from '../../publisher';
 import { BlockIcons } from './blockIcons';
 import { Block, BlockPatch, createPatchesFromBlocks } from './blocks/block';
