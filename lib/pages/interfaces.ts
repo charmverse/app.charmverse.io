@@ -89,11 +89,12 @@ export type TargetPageTreeWithFlatChildren<T extends PageNode = PageNode> = {
   flatChildren: PageNodeWithChildren<T>[];
 }
 
+// Page without content and contentText props - used for list of pages (on the client)
 export type PageMeta = Omit<IPageWithPermissions, 'content' | 'contentText'>
 
 export type PageDetails = {
   id: string;
-  content: Prisma.JsonValue | null;
+  content: string | number | boolean | Record<string, any> | any[] | null;
   contentText: string;
 }
 

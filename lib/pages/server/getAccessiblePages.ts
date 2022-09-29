@@ -26,19 +26,8 @@ export function includePagePermissions (): Prisma.PageInclude & {
 }
 
 function selectPageFields () {
-  const permissions = {
-    permissions: {
-      include: {
-        sourcePermission: true
-      }
-    } };
-
   if (!WITHOUT_CONTENT) {
-    return {
-      include: {
-        ...permissions
-      }
-    };
+    return includePagePermissions();
   }
 
   return {
@@ -66,7 +55,7 @@ function selectPageFields () {
       fullWidth: true,
       bountyId: true,
       hasContent: true,
-      ...permissions
+      ...includePagePermissions()
     }
   };
 }
