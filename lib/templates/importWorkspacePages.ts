@@ -109,7 +109,6 @@ Promise<{ pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyAr
         boardId: node.type.match('board') ? newId : undefined,
         parentId: newParentId ?? undefined,
         content: node.content as Prisma.InputJsonValue ?? undefined,
-        hasContent: node.content ? !checkIsContentEmpty(node.content as PageContent) : false,
         path: getPagePath(),
         space: {
           connect: {

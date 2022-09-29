@@ -54,7 +54,6 @@ export async function createProposal (pageProps: ProposalPageInput, proposalProp
         title: '',
         updatedBy: createdBy,
         ...pageProps,
-        hasContent: !checkIsContentEmpty(pageProps.content as PageContent),
         id: proposalId,
         type: 'proposal'
       }

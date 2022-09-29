@@ -530,7 +530,6 @@ async function createPrismaPage ({
   const pageToCreate: Prisma.PageCreateInput = {
     id,
     content,
-    hasContent: !checkIsContentEmpty(content as PageContent),
     // TODO: Generate content text
     contentText: '',
     createdAt: new Date(),

@@ -29,7 +29,6 @@ export async function duplicatePage (pageId: string, userId: string, parentId?: 
       updatedBy: userId,
       title: `${page.title} (copy)`,
       content: page.content ?? undefined,
-      hasContent: page.content ? !checkIsContentEmpty(page.content as PageContent) : false,
       contentText: page.contentText,
       headerImage: page.headerImage,
       icon: page.icon,

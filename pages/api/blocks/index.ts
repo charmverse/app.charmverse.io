@@ -167,7 +167,6 @@ async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
           parentId: cardBlock.parentId,
           updatedAt: cardBlock.updatedAt,
           content: cardBlock.fields.content ?? undefined,
-          hasContent: cardBlock.fields.content ? !checkIsContentEmpty(cardBlock.fields.content) : false,
           permissions: {
             createMany: initialPermissions
           }

@@ -71,7 +71,6 @@ async function createPageHandler (req: NextApiRequest, res: NextApiResponse<IPag
     page = await createPage({ data: {
       spaceId,
       createdBy,
-      hasContent: !checkIsContentEmpty(pageCreationData.content as PageContent),
       ...pageCreationData
     } });
   }

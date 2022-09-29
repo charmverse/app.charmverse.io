@@ -27,7 +27,6 @@ export async function createProposalTemplate ({
       id: proposalId,
       path: getPagePath(),
       content: pageContent?.content,
-      hasContent: !checkIsContentEmpty(pageContent?.content),
       contentText: pageContent?.contentText ?? '',
       title: pageContent?.title ?? '',
       updatedBy: userId,
