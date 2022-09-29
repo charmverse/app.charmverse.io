@@ -1,5 +1,6 @@
 import type { Block, Page, Prisma, Space } from '@prisma/client';
 import { prisma } from 'db';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import type { PageContent } from 'models';
 import fs from 'node:fs/promises';
 import { v4 } from 'uuid';
@@ -52,6 +53,7 @@ async function convertFolderContent ({
   oldNewHashmap[newPageId] = pageContent.id;
 
   pageContent.id = newPageId;
+  pageContent.hasContent = !checkIsContentEmpty(pageContent.content as PageContent);
 
   if (pageContent.type === 'board') {
     pageContent.boardId = pageContent.id;

@@ -1,6 +1,8 @@
 import type { ProposalStatus, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { v4 as uuid } from 'uuid';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
+import type { PageContent } from 'models';
 import { generateSyncProposalPermissions } from './syncProposalPermissions';
 import { getPagePath } from '../pages';
 
@@ -51,6 +53,7 @@ export async function createProposal (pageProps: ProposalPageInput, proposalProp
         title: '',
         updatedBy: createdBy,
         ...pageProps,
+        hasContent: !checkIsContentEmpty(pageProps.content as PageContent),
         id: proposalId,
         type: 'proposal'
       }

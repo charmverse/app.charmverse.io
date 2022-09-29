@@ -12,6 +12,7 @@ import { createCard } from 'lib/focalboard/card';
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/image/constants';
 import log from 'lib/log';
 import { getPagePath } from 'lib/pages';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
 import { isTruthy } from 'lib/utilities/types';
 import type { BlockNode, CalloutNode, ColumnBlockNode, ColumnLayoutNode, DisclosureDetailsNode, ListItemNode, MentionNode, Page, PageContent, TableNode, TableRowNode, TextContent } from 'models';
@@ -528,6 +529,7 @@ async function createPrismaPage ({
   const pageToCreate: Prisma.PageCreateInput = {
     id,
     content,
+    hasContent: !checkIsContentEmpty(content as PageContent),
     // TODO: Generate content text
     contentText: '',
     createdAt: new Date(),

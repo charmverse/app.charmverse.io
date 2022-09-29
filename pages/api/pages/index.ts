@@ -5,6 +5,7 @@ import log from 'lib/log';
 import type { IEventToLog } from 'lib/log/userEvents';
 import { postToDiscord } from 'lib/log/userEvents';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import type { IPageWithPermissions } from 'lib/pages/server';
 import { getPage, PageNotFoundError, resolvePageTree } from 'lib/pages/server';
 import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
@@ -13,6 +14,7 @@ import { createProposal } from 'lib/proposal/createProposal';
 import { syncProposalPermissions } from 'lib/proposal/syncProposalPermissions';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
+import type { PageContent } from 'models';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -44,6 +46,8 @@ async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
     throw new UnauthorisedActionError('You do not have permissions to create a page.');
   }
 
+  data.hasContent = !checkIsContentEmpty(data.content as PageContent);
+
   // Remove parent ID and pass it to the creation input
   // This became necessary after adding a formal parentPage relation related to page.parentId
   // We now need to specify this as a ParentPage.connect prisma argument instead of a raw string
@@ -66,6 +70,7 @@ async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
     page = await prisma.page.create({ data: {
       spaceId,
       createdBy,
+      hasContent: !checkIsContentEmpty(pageCreationData.content as PageContent),
       ...pageCreationData
     } });
   }

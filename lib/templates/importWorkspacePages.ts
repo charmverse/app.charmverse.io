@@ -1,5 +1,6 @@
 import type { Page, Prisma } from '@prisma/client';
 import { prisma } from 'db';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import { getPagePath } from 'lib/pages/utils';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
@@ -106,6 +107,7 @@ Promise<{ pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyAr
         boardId: node.type.match('board') ? newId : undefined,
         parentId: newParentId ?? undefined,
         content: node.content as Prisma.InputJsonValue ?? undefined,
+        hasContent: node.content ? !checkIsContentEmpty(node.content as PageContent) : false,
         path: getPagePath(),
         space: {
           connect: {

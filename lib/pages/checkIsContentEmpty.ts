@@ -1,6 +1,6 @@
 import type { PageContent } from 'models';
 
-export function checkIsContentEmpty (content: PageContent | null) {
+export function checkIsContentEmpty (content: PageContent | null | undefined) {
   return !content?.content
   || content.content.length === 0
   || (content.content.length === 1

@@ -128,6 +128,7 @@ export async function createDatabaseCardPage (pageInfo: Record<keyof Pick<Page, 
         }
       },
       content: { type: 'doc', content: [] },
+      hasContent: false,
       contentText: '',
       path: getPagePath(),
       type: 'card',

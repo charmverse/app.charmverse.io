@@ -10,10 +10,11 @@ import type { ProposalReviewerInput } from 'lib/proposal/interface';
 import { syncProposalPermissions } from 'lib/proposal/syncProposalPermissions';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { typedKeys } from 'lib/utilities/objects';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser, PageContent } from 'models';
 import type { BountyWithDetails } from 'lib/bounties';
 import { IDENTITY_TYPES } from 'models';
 import { v4 } from 'uuid';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import { boardWithCardsArgs } from './generate-board-stub';
 
 export async function generateSpaceUser ({ spaceId, isAdmin }: { spaceId: string, isAdmin: boolean }): Promise<LoggedInUser> {
@@ -307,6 +308,7 @@ export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'cre
       type: options.type ?? 'page',
       updatedBy: options.createdBy,
       content: options.content as Prisma.InputJsonObject,
+      hasContent: options.content ? !checkIsContentEmpty(options.content as PageContent) : false,
       author: {
         connect: {
           id: options.createdBy

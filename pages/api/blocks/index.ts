@@ -3,6 +3,7 @@ import type { Block, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { InvalidStateError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { getPagePath } from 'lib/pages';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import { copyAllPagePermissions } from 'lib/permissions/pages/actions/copyPermission';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -164,6 +165,7 @@ async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
           parentId: cardBlock.parentId,
           updatedAt: cardBlock.updatedAt,
           content: cardBlock.fields.content ?? undefined,
+          hasContent: cardBlock.fields.content ? !checkIsContentEmpty(cardBlock.fields.content) : false,
           permissions: {
             createMany: initialPermissions
           }

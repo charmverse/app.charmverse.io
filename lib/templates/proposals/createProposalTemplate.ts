@@ -1,6 +1,7 @@
 import { prisma } from 'db';
 import type { IPageWithPermissions, PageWithProposal } from 'lib/pages';
 import { getPagePath } from 'lib/pages';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import { v4 } from 'uuid';
 import type { ProposalReviewerInput } from '../../proposal/interface';
 
@@ -26,6 +27,7 @@ export async function createProposalTemplate ({
       id: proposalId,
       path: getPagePath(),
       content: pageContent?.content,
+      hasContent: !checkIsContentEmpty(pageContent?.content),
       contentText: pageContent?.contentText ?? '',
       title: pageContent?.title ?? '',
       updatedBy: userId,
