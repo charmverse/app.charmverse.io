@@ -35,16 +35,6 @@ afterAll(() => {
 
 describe('GET /api/public/profile/[userPath]', () => {
 
-  it('should throw a not found error if userPath doesn\'t return any user', async () => {
-    try {
-      await getAggregatedData(v4(), 'dummy_key');
-      throw new ExpectedAnError();
-    }
-    catch (err) {
-      expect(err).toBeInstanceOf(DataNotFoundError);
-    }
-  });
-
   it('Should combine several responses', async () => {
 
     const bounty = await generateBountyWithSingleApplication({
