@@ -15,7 +15,7 @@ export const Container = styled(Box)`
   margin: 0 auto;
 `;
 
-export default function LoginPageContent () {
+export function LoginPageContent () {
   const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
   const returnUrl = new URLSearchParams(decodeURIComponent(window.location.search)).get('returnUrl');
 

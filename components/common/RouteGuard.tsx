@@ -12,7 +12,6 @@ import charmClient from 'charmClient';
 import type { UrlObject } from 'url';
 import log from 'lib/log';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import type { AuthSig } from '../../lib/blockchain/interfaces';
 
 // Pages shared to the public that don't require user login
 const publicPages = ['/', 'invite', 'share', 'api-docs', 'u', 'authenticate'];
@@ -22,7 +21,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   const router = useRouter();
   const [authorized, setAuthorized] = useState(true);
   const { triedEager } = useContext(Web3Connection);
-  const { account, walletAuthSignature, sign } = useWeb3AuthSig();
+  const { account, walletAuthSignature } = useWeb3AuthSig();
   const { user, setUser, isLoaded } = useUser();
   const [spaces,, isSpacesLoaded] = useSpaces();
   const isWalletLoading = (!triedEager && !account);
@@ -102,7 +101,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       return { authorized: true };
     }
     // condition: no user session and no wallet address
-    else if (!user && !account) {
+    else if ((!user && !account)) {
       log.info('[RouteGuard]: redirect to login');
       return {
         authorized: true,
@@ -112,12 +111,13 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
         }
       };
     }
+    // condition: account but no valid wallet signature
     else if (account && !walletAuthSignature) {
 
       return {
         authorized: true,
         redirect: {
-          pathname: '/authenticate',
+          pathname: '/',
           query: { returnUrl: router.asPath }
         }
       };
