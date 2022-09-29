@@ -18,6 +18,11 @@ export async function updatePage (page: CurrentPageData, userId: string, updates
     updatedBy: userId
   };
 
+  if (data.id) {
+    // avoid overriding page id
+    delete data.id;
+  }
+
   // check if content is empty only if it got changed
   if ('content' in updates) {
     data.hasContent = !checkIsContentEmpty(updates.content as PageContent);
