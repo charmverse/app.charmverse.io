@@ -748,6 +748,7 @@ class Mutator {
         }
   ): Promise<[Block[], string]> {
     const blocks = await charmClient.getSubtree(cardId, 2);
+    const pageDetails = await charmClient.pages.getPageDetails(cardId);
     const [newBlocks1, newCard] = OctoUtils.duplicateBlockTree(blocks, cardId) as [Block[], Card, Record<string, string>];
 
     const newBlocks = newBlocks1.filter((o) => o.type !== 'comment');
@@ -769,8 +770,8 @@ class Mutator {
     newCard.parentId = board.id;
     newCard.fields.icon = cardPage.icon || undefined;
     newCard.fields.headerImage = cardPage.headerImage || undefined;
-    newCard.fields.content = cardPage.content;
-    newCard.fields.contentText = cardPage.contentText;
+    newCard.fields.content = pageDetails.content;
+    newCard.fields.contentText = pageDetails.contentText;
 
     await this.insertBlocks(
       newBlocks,
