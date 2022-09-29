@@ -13,6 +13,7 @@ import { baseUrl } from 'testing/mockApiCall';
 import { v4 } from 'uuid';
 import { Wallet } from 'ethers';
 import { readFileSync } from 'fs';
+import { createPage } from 'testing/setupDatabase';
 
 export { baseUrl } from 'testing/mockApiCall';
 
@@ -166,13 +167,12 @@ export async function generateUserAndSpace ({ isAdmin, walletAddress = Wallet.cr
 
   const existingSpaceId = user.spaceRoles?.[0]?.spaceId;
 
-  let space = null;
+  let space: Space;
 
   if (existingSpaceId) {
-    space = await prisma.space.findUnique({ where: { id: user.spaceRoles?.[0]?.spaceId }, include: { apiToken: true, spaceRoles: true } });
+    space = await prisma.space.findUniqueOrThrow({ where: { id: user.spaceRoles?.[0]?.spaceId }, include: { apiToken: true, spaceRoles: true } });
   }
-
-  if (!space) {
+  else {
     space = await prisma.space.create({
       data: {
         name: 'Example space',
@@ -195,7 +195,18 @@ export async function generateUserAndSpace ({ isAdmin, walletAddress = Wallet.cr
     });
   }
 
+  const page = await createPage({
+    spaceId: space.id,
+    createdBy: user.id,
+    title: 'Test Page',
+    pagePermissions: [{
+      spaceId: space.id,
+      permissionLevel: 'full_access'
+    }]
+  });
+
   return {
+    page,
     user,
     space,
     walletAddress

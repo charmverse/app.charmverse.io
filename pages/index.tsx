@@ -1,4 +1,5 @@
 import { useWeb3React } from '@web3-react/core';
+import type { Space } from '@prisma/client';
 import getLayout from 'components/common/BaseLayout/BaseLayout';
 import Footer from 'components/login/Footer';
 import LoginPageContent from 'components/login/LoginPageContent';
@@ -28,28 +29,26 @@ export default function LoginPage () {
 
   function redirectUserAfterLogin () {
     if (typeof router.query.returnUrl === 'string') {
-      // console.log('redirecting to', router.query.returnUrl);
       router.push(router.query.returnUrl);
     }
     else if (defaultWorkspace === '/nexus') {
       router.push('/nexus');
     }
     else if (spaces.length > 0) {
-      const isValidDefaultWorkspace = !!defaultWorkspace && spaces.some(space => defaultWorkspace.startsWith(`/${space.domain}`));
-      router.push(isValidDefaultWorkspace ? defaultWorkspace : `/${spaces[0].domain}`);
+      router.push(getDefaultWorkspaceUrl(spaces));
     }
     else {
-      // console.log('Send to signup');
+      // Note that a user logging in will be redirected to /signup, because the 'user' and 'spaces' are loaded async after the wallet address appears.
+      // TODO: Find a way to connect the state between hooks (wallet address and loaded user)
       router.push('/signup');
     }
   }
-  // console.log('Render login component', { account, triedEager, spaces, isDataLoaded });
+
   useEffect(() => {
     // redirect user once wallet is connected
     if (isDataLoaded) {
       // redirect once account exists (user has connected wallet)
       if (account || user) {
-        // console.log('Redirect user after login', account, user, spaces);
         redirectUserAfterLogin();
       }
       else {
@@ -70,4 +69,10 @@ export default function LoginPage () {
       </>
     )
   );
+}
+
+export function getDefaultWorkspaceUrl (spaces: Space[]) {
+  const defaultWorkspace = typeof window !== 'undefined' && localStorage.getItem(getKey('last-workspace'));
+  const isValidDefaultWorkspace = !!defaultWorkspace && spaces.some(space => defaultWorkspace.startsWith(`/${space.domain}`));
+  return isValidDefaultWorkspace ? defaultWorkspace : `/${spaces[0].domain}`;
 }

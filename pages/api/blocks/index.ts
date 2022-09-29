@@ -2,7 +2,7 @@
 import type { Block, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { InvalidStateError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { getPagePath } from 'lib/pages';
+import { getPagePath } from 'lib/pages/utils';
 import { copyAllPagePermissions } from 'lib/permissions/pages/actions/copyPermission';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { NextApiRequest, NextApiResponse } from 'next';

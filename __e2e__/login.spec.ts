@@ -12,7 +12,7 @@ test('login - allows user to login and see their workspace', async () => {
 
   const sandbox = await browser.newContext();
   const page = await sandbox.newPage();
-  const { space, walletAddress } = await generateUserAndSpace();
+  const { space, page: docPage, walletAddress } = await generateUserAndSpace();
 
   await mockWeb3(page, { walletAddress }, context => {
 
@@ -29,7 +29,7 @@ test('login - allows user to login and see their workspace', async () => {
   await page.goto(baseUrl);
 
   // should redirect to workspace
-  await page.waitForURL(`**/${space.domain}`);
+  await page.waitForURL(`**/${space.domain}/${docPage.path}`);
   await page.locator('text=[Your DAO]sdfdfddf Home').first().waitFor();
 
 });
