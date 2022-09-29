@@ -5,7 +5,7 @@ import { v4 } from 'uuid';
 import type { MentionedTask } from 'lib/mentions/interfaces';
 import randomName from 'lib/utilities/randomName';
 import type { VoteTask } from 'lib/votes/interfaces';
-import { getPagePath } from 'lib/pages';
+import { getPagePath } from 'lib/pages/utils';
 import type { ProposalTask } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';
 
 const handler = nc({
