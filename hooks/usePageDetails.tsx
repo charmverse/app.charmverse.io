@@ -6,6 +6,7 @@ import type { PageContent } from 'models';
 import { useCallback, useEffect, useMemo } from 'react';
 import useSWR from 'swr';
 import { usePages } from 'hooks/usePages';
+import { getPreviewImageFromContent } from 'lib/pages/getPreviewImageFromContent';
 
 export function usePageDetails (pageIdOrPath: string, spaceId?: string) {
   const { data: pageDetails, error, mutate: mutateDetails } = useSWR(pageIdOrPath ? [`pages/details/${pageIdOrPath}`, spaceId] : null, () => charmClient.pages.getPageDetails(pageIdOrPath, spaceId));
@@ -29,12 +30,13 @@ export function usePageDetails (pageIdOrPath: string, spaceId?: string) {
     };
 
     const hasContent = !checkIsContentEmpty(updatedPage.content as PageContent);
+    const galleryImg = getPreviewImageFromContent(updatedPage.content as PageContent);
 
     // Update pages context data only when hasContent value changed
     mutatePagesList(pages => {
       const currentPageData = pages?.[pageId];
-      if (currentPageData && currentPageData.hasContent !== hasContent) {
-        return { ...pages, [pageId]: { ...currentPageData, hasContent } };
+      if (currentPageData && (currentPageData.hasContent !== hasContent || currentPageData.galleryImg !== galleryImg)) {
+        return { ...pages, [pageId]: { ...currentPageData, hasContent, galleryImg } };
       }
 
       return pages;

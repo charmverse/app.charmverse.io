@@ -298,8 +298,7 @@ class CharmClient {
       createdAt: new Date(block.createdAt).getTime(),
       updatedAt: new Date(block.updatedAt).getTime(),
       type: block.type as FBBlock['type'],
-      fields: block.fields as FBBlock['fields'],
-      fallbackPreviewUrl: block.fallbackPreviewUrl || ''
+      fields: block.fields as FBBlock['fields']
     };
   }
 
@@ -312,7 +311,6 @@ class CharmClient {
       type: fbBlock.type,
       title: fbBlock.title,
       fields: fbBlock.fields,
-      fallbackPreviewUrl: fbBlock.fallbackPreviewUrl || '',
       deletedAt: fbBlock.deletedAt === 0 ? null : fbBlock.deletedAt ? new Date(fbBlock.deletedAt) : null,
       createdAt: (!fbBlock.createdAt || fbBlock.createdAt === 0) ? new Date() : new Date(fbBlock.createdAt),
       updatedAt: (!fbBlock.updatedAt || fbBlock.updatedAt === 0) ? new Date() : new Date(fbBlock.updatedAt)

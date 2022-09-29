@@ -36,7 +36,6 @@ interface Block {
     createdAt: number
     updatedAt: number
     deletedAt: number | null
-    fallbackPreviewUrl?: string
 }
 
 function createBlock (block?: Partial<Block>): Block {
@@ -54,8 +53,7 @@ function createBlock (block?: Partial<Block>): Block {
     title: block?.title || '',
     createdAt: block?.createdAt || now,
     updatedAt: block?.updatedAt || now,
-    deletedAt: block?.deletedAt || null,
-    fallbackPreviewUrl: block?.fallbackPreviewUrl || ''
+    deletedAt: block?.deletedAt || null
   };
 }
 

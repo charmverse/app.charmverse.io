@@ -4,6 +4,7 @@ import type { IPageWithPermissions } from 'lib/pages/server';
 import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import type { PageContent } from 'models';
 import { getPreviewImageFromContent } from 'lib/pages/getPreviewImageFromContent';
+import { date } from 'yup/lib/locale';
 
 type CurrentPageData = {
   id: string;
@@ -17,34 +18,27 @@ export async function updatePage (page: CurrentPageData, userId: string, updates
     updatedBy: userId
   };
 
-  let fallbackPreviewUrl: string | null = null;
-
   // check if content is empty only if it got changed
   if ('content' in updates) {
     data.hasContent = !checkIsContentEmpty(updates.content as PageContent);
 
     if (page.type === 'card') {
-      fallbackPreviewUrl = getPreviewImageFromContent(updates.content as PageContent);
+      data.galleryImg = getPreviewImageFromContent(updates.content as PageContent);
     }
   }
 
-  return prisma.$transaction(async tx => {
-    if (typeof fallbackPreviewUrl === 'string') {
-      await tx.block.update({ where: { id: page.id }, data: { fallbackPreviewUrl } });
-    }
-
-    return tx.page.update({
-      where: {
-        id: page.id
-      },
-      data,
-      include: {
-        permissions: {
-          include: {
-            sourcePermission: true
-          }
+  return prisma.page.update({
+    where: {
+      id: page.id
+    },
+    data,
+    include: {
+      permissions: {
+        include: {
+          sourcePermission: true
         }
       }
-    });
+    }
   });
+
 }

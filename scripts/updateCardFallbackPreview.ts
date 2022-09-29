@@ -3,7 +3,7 @@ import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import { getPreviewImageFromContent } from 'lib/pages/getPreviewImageFromContent';
 import { PageContent } from 'models';
 
-async function updateCardFallbackPreview () {
+async function updatePageGalleryUrl () {
   const pages = await prisma.page.findMany({
     where: {
       type: 'card'
@@ -15,18 +15,18 @@ async function updateCardFallbackPreview () {
   });
 
   const pagesWithContent = pages.filter(p => !checkIsContentEmpty(p.content as PageContent))
-  const cardsWithFallbackImage = pagesWithContent.map(p => ({ id: p.id, fallbackPreviewUrl: getPreviewImageFromContent(p.content as PageContent) }) )
-    .filter(p => !!p.fallbackPreviewUrl)
+  const cardsWithFallbackImage = pagesWithContent.map(p => ({ id: p.id, galleryImg: getPreviewImageFromContent(p.content as PageContent) }) )
+    .filter(p => !!p.galleryImg)
 
-  console.log('🔥 Count of cards with fallback url:', cardsWithFallbackImage.length);
+  console.log('🔥 Count of cards with gallery url:', cardsWithFallbackImage.length);
 
-  await prisma.$transaction(cardsWithFallbackImage.map(({ id, fallbackPreviewUrl }) => prisma.block.update({
+  await prisma.$transaction(cardsWithFallbackImage.map(({ id, galleryImg }) => prisma.page.update({
     where: { id },
-    data: { fallbackPreviewUrl }
+    data: { galleryImg }
   })))
 
-  console.log('🔥 Updated fallbackPreviewUrl for all cards with image in content.');
+  console.log('🔥 Updated galleryUrl for all cards with image in content.');
 }
 
 
-updateCardFallbackPreview();
+updatePageGalleryUrl();

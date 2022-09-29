@@ -216,6 +216,7 @@ model Page {
   title              String
   content            Json?
   contentText        String
+  galleryImg         String?
   hasContent         Boolean          @default(false)
   headerImage        String?
   icon               String?
@@ -259,7 +260,6 @@ model Block {
   type               String
   title              String
   fields             Json
-  fallbackPreviewUrl String?
   user               User      @relation(fields: [createdBy], references: [id])
   space              Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   page               Page?
