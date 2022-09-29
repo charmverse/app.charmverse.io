@@ -19,6 +19,7 @@ async function getBlocks (req: NextApiRequest, res: NextApiResponse<Block[] | { 
 
   const referer = req.headers.referer as string;
   const url = new URL(referer);
+
   url.hash = '';
   url.search = '';
   const pathnameParts = referer ? url.pathname.split('/') : [];

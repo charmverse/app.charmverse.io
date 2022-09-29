@@ -29,7 +29,7 @@ test('login - allows user to login and see their workspace', async () => {
   await page.goto(baseUrl);
 
   // should redirect to workspace
-  await page.waitForURL(`**/${space.domain}/${docPage.path}`);
-  await page.locator('text=[Your DAO]sdfdfddf Home').first().waitFor();
+  await page.waitForURL(`*/${space.domain}/${docPage.path}`);
+  await page.locator('text=[Your DAO] Home').first().waitFor();
 
 });
