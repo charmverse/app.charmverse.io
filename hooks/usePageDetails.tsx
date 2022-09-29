@@ -8,7 +8,7 @@ import useSWR, { mutate } from 'swr';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
 export function usePageDetails (pageIdOrPath: string, spaceId?: string) {
-  const { data: pageDetails, error, mutate: mutateDetails } = useSWR([`pages/details/${pageIdOrPath}`, spaceId], () => charmClient.pages.getPageDetails(pageIdOrPath, spaceId));
+  const { data: pageDetails, error, mutate: mutateDetails } = useSWR(pageIdOrPath ? [`pages/details/${pageIdOrPath}`, spaceId] : null, () => charmClient.pages.getPageDetails(pageIdOrPath, spaceId));
   const [currentSpace] = useCurrentSpace();
 
   const mutatePageDetails = useCallback((updates: PageDetailsUpdates, revalidate = false) => {

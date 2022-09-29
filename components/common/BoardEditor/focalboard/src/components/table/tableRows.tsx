@@ -55,7 +55,7 @@ function TableRows (props: Props): JSX.Element {
             board={board}
             activeView={activeView}
             card={card}
-            content={cardPage?.content as PageContent}
+            hasContent={cardPage?.hasContent}
             isSelected={props.selectedCardIds.includes(card.id)}
             focusOnMount={props.cardIdToFocusOnRender === card.id}
             pageIcon={cardPage.icon}
