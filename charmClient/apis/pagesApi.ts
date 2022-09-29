@@ -11,8 +11,9 @@ export class PagesApi {
     return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`);
   }
 
-  getPage (pageIdOrPath: string, spaceId?:string) {
-    return http.GET<IPageWithPermissions>(`/api/pages/${pageIdOrPath}?spaceId=${spaceId}`);
+  getPage (pageIdOrPath: string, spaceId?: string) {
+    const query = spaceId ? `?spaceId=${spaceId}` : '';
+    return http.GET<IPageWithPermissions>(`/api/pages/${pageIdOrPath}${query}`);
   }
 
   updatePage (pageOpts: Partial<Page>) {
