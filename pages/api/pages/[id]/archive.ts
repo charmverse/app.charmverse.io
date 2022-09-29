@@ -1,12 +1,12 @@
 
-import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { computeUserPagePermissions, setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages';
-import { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-import { withSessionRoute } from 'lib/session/withSession';
 import { prisma } from 'db';
+import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import type { ModifyChildPagesResponse } from 'lib/pages';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
-import { ModifyChildPagesResponse } from 'lib/pages';
+import { computeUserPagePermissions, setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages';
+import { withSessionRoute } from 'lib/session/withSession';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -16,7 +16,7 @@ handler.use(requireUser)
 
 async function togglePageArchiveStatus (req: NextApiRequest, res: NextApiResponse<ModifyChildPagesResponse>) {
   const pageId = req.query.id as string;
-  const { archive } = req.body as {archive: boolean};
+  const { archive } = req.body as { archive: boolean };
   const userId = req.session.user.id;
 
   const permissions = await computeUserPagePermissions({
@@ -56,7 +56,7 @@ async function togglePageArchiveStatus (req: NextApiRequest, res: NextApiRespons
         }
       });
 
-      if (page?.type === 'board') {
+      if (page?.type.match(/board/)) {
         await prisma.block.update({
           where: {
             id: pageId

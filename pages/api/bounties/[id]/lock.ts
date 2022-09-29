@@ -4,8 +4,8 @@ import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
-import { BountyWithDetails } from 'models';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { BountyWithDetails } from 'lib/bounties';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

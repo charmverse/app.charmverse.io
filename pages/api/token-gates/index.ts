@@ -1,11 +1,12 @@
 
-import { Space } from '@prisma/client';
+import type { Space } from '@prisma/client';
 import { prisma } from 'db';
 import { hasAccessToSpace, onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { TokenGateWithRoles } from 'lib/token-gates/interfaces';
+import type { TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { AccessControlCondition } from 'lit-js-sdk';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -24,6 +25,13 @@ async function saveTokenGate (req: NextApiRequest, res: NextApiResponse) {
   });
   if (error) {
     throw error;
+  }
+
+  // Make sure token gate has at least 1 condition.
+  const hasValidCondition = (req.body.conditions?.unifiedAccessControlConditions as AccessControlCondition[])?.some(c => Boolean(c.chain));
+
+  if (!hasValidCondition) {
+    throw new InvalidInputError('Your token gate must contain at least one condition.');
   }
 
   const result = await prisma.tokenGate.create({

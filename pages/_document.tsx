@@ -12,12 +12,13 @@ class MyDocument extends Document {
         <Head>
           <meta name='theme-color' content={blueColor} />
           <link rel='icon' href='/favicon.png' />
-          <meta name='description' content='The First Web 3 Native All-in-one Workspace' />
+          <meta name='description' content='web3 operations platform handling docs, tasks, bounties, proposals, and votes.' />
           <meta property='og:title' content='CharmVerse' />
-          <meta property='og:image' content='https://app.charmverse.io/images/charmverse_logo_sm_black.png' />
+          <meta property='og:image' content='https://app.charmverse.io/images/logo_black_lightgrey_opengraph.png' />
+          <meta property='og:description' content='web3 operations platform handling docs, tasks, bounties, proposals, and votes.' />
           <meta property='twitter:title' content='CharmVerse' />
-          <meta property='twitter:description' content='The First Web 3 Native All-in-one Workspace' />
-          <meta property='twitter:image' content='https://app.charmverse.io/images/charmverse_logo_sm_black.png' />
+          <meta property='twitter:description' content='web3 operations platform handling docs, tasks, bounties, proposals, and votes.' />
+          <meta property='twitter:image' content='https://app.charmverse.io/images/logo_black_lightgrey_opengraph.png' />
         </Head>
         <body>
           <Main />

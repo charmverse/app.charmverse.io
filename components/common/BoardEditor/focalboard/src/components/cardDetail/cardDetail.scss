@@ -1,168 +1,174 @@
 .CardDetail {
-    
-    .title {
-        width: 100%;
+
+  .title {
+    width: 100%;
+  }
+
+  hr {
+    width: 100%;
+    height: 1px;
+    border: 0;
+    color: rgba(var(--center-channel-color-rgb), 0.09);
+    background-color: rgba(var(--center-channel-color-rgb), 0.09);
+    margin-bottom: 8px;
+  }
+
+  .add-buttons {
+    display: flex;
+    flex-direction: column;
+    min-height: 32px;
+    color: rgba(var(--center-channel-color-rgb), 0.4);
+    align-items: flex-start;
+
+    .Button {
+      opacity: 0;
     }
 
-    hr {
-      width: 100%;
-      height: 1px;
-      border: 0;
-      color: rgba(var(--center-channel-color-rgb), 0.09);
-      background-color: rgba(var(--center-channel-color-rgb), 0.09);
-      margin-bottom: 8px;
+    &:hover {
+      .Button {
+        opacity: 1;
+      }
     }
+  }
 
-    .add-buttons {
-        display: flex;
-        flex-direction: column;
-        min-height: 32px;
-        color: rgba(var(--center-channel-color-rgb), 0.4);
-        align-items: flex-start;
+  .octo-propertylist {
+    display: flex;
+    flex-direction: column;
+  }
 
-        .Button {
-            opacity: 0;
+  .octo-propertyrow {
+    display: flex;
+    align-items: center;
+    margin: 6px 0;
+    height: 32px;
+
+    .Switch {
+      margin-left: 8px;
+      width: 40px;
+      height: 24px;
+      box-sizing: border-box;
+      padding: 2px;
+
+      .octo-switch-inner {
+        width: 20px;
+        height: 20px;
+      }
+
+      &.on {
+        .octo-switch-inner {
+          transform: translateX(16px) translateY(0);
         }
+      }
+    }
+
+    .octo-propertyvalue {
+      font-size: 14px;
+      padding: 4px 8px;
+      height: 32px;
+
+      &.octo-propertyvalue--readonly {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      &:not(.readonly) {
+        min-width: 180px;
+        transition: background 100ms ease-out 0s;
+        cursor: pointer;
+        border-radius: 4px;
 
         &:hover {
-            .Button {
-              opacity: 1;
-            }
+          background-color: rgba(var(--center-channel-color-rgb), 0.08);
         }
-    }
+      }
 
-    .octo-propertylist {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .octo-propertyrow {
+      .MenuWrapper {
         display: flex;
         align-items: center;
-        margin: 6px 0;
-        height: 32px;
-
-        .Switch {
-            margin-left: 8px;
-            width: 40px;
-            height: 24px;
-            box-sizing: border-box;
-            padding: 2px;
-
-            .octo-switch-inner {
-                width: 20px;
-                height: 20px;
-            }
-
-            &.on {
-                .octo-switch-inner {
-                    transform: translateX(16px) translateY(0);
-                }
-            }
-        }
-
-        .octo-propertyvalue {
-            font-size: 14px;
-            padding: 4px 8px;
-            height: 32px;
-
-            &.octo-propertyvalue--readonly {
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-
-            &:not(.readonly) {
-                min-width: 180px;
-                transition: background 100ms ease-out 0s;
-                cursor: pointer;
-                border-radius: 4px;
-
-                &:hover {
-                    background-color: rgba(var(--center-channel-color-rgb), 0.08);
-                }
-            }
-
-            .MenuWrapper {
-                display: flex;
-                align-items: center;
-            }
-        }
-
-        .Label {
-          flex-shrink: 1;
-          min-width: 0px;
-          height: 22px;
-          border-radius: 3px;
-          padding-left: 6px;
-          padding-right: 6px;
-          font-size: 14px;
-          line-height: 120%;
-          margin-right: 5px;
-          margin-bottom: 5px;
-          width: fit-content;
-        }
+      }
     }
 
-    .UserProperty {
-        .react-select__value-container {
-            padding: 0;
-        }
+    .Label {
+      flex-shrink: 1;
+      min-width: 0px;
+      height: 22px;
+      border-radius: 3px;
+      padding-left: 6px;
+      padding-right: 6px;
+      font-size: 14px;
+      line-height: 120%;
+      margin-right: 5px;
+      margin-bottom: 5px;
+      width: fit-content;
+    }
+  }
 
-        .react-select__control {
-            margin-top: 0;
-        }
+  .UserProperty {
+    .react-select__value-container {
+      padding: 0;
     }
 
-    .octo-propertyrow {
-        .octo-propertyname {
-            flex: 0 0 150px;
-        }
+    .react-select__control {
+      margin-top: 0;
     }
+  }
 
+  .octo-propertyrow {
     .octo-propertyname {
-        font-weight: 600;
-        span {
-          text-overflow: ellipsis;
-          overflow: hidden;
-          white-space: nowrap;
-        }
-        
-        width: 150px;
-        margin-right: 5px;
-        color: rgba(var(--center-channel-color-rgb), 0.6);
+      flex: 0 0 150px;
+    }
+  }
 
+  .octo-propertyname {
+    font-weight: 600;
+
+    span {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    &.octo-propertyname--readonly .Button:hover {
+      background: transparent;
+      cursor: text;
+    }
+
+    width: 150px;
+    margin-right: 5px;
+    color: rgba(var(--center-channel-color-rgb), 0.6);
+
+    .Button {
+      width: 100%;
+      padding: 4px 8px;
+      text-align: left;
+      justify-content: unset;
+    }
+
+    &.add-property {
+      margin: 8px 0 0;
+      color: rgba(var(--center-channel-color-rgb), 0.4);
+    }
+  }
+
+  &.content-blocks {
+
+    &:hover,
+    &:focus-within {
+      .CardDetailContentsMenu {
         .Button {
-            width: 100%;
-            height: 100%;
-            padding: 4px 8px;
-            text-align: left;
-            justify-content: unset;
+          opacity: 1;
         }
-
-        &.add-property {
-            margin: 8px 0 0;
-            color: rgba(var(--center-channel-color-rgb), 0.4);
-        }
+      }
     }
 
-    &.content-blocks {
-        &:hover,
-        &:focus-within {
-            .CardDetailContentsMenu {
-                .Button {
-                    opacity: 1;
-                }
-            }
-        }
+    .CardDetailContentsMenu {
+      margin-left: 48px;
 
-        .CardDetailContentsMenu {
-            margin-left: 48px;
-
-            .Button {
-                opacity: 0;
-                color: rgba(var(--center-channel-color-rgb), 0.6);
-            }
-        }
+      .Button {
+        opacity: 0;
+        color: rgba(var(--center-channel-color-rgb), 0.6);
+      }
     }
+  }
 }

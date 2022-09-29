@@ -1,14 +1,12 @@
 
-import { Bounty, PageOperations, PagePermissionLevel, Space, User } from '@prisma/client';
-import { computeUserPagePermissions, permissionTemplates, upsertPermission } from 'lib/permissions/pages';
-import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
-import { ExpectedAnError } from 'testing/errors';
-import { UserIsNotSpaceMemberError } from 'lib/users/errors';
-import { DataNotFoundError, InvalidInputError, UnauthorisedActionError, LimitReachedError, PositiveNumbersOnlyError, DuplicateDataError, StringTooShortError } from 'lib/utilities/errors';
+import type { Space, User } from '@prisma/client';
 import { createBounty } from 'lib/bounties/createBounty';
-import { createApplication } from '../createApplication';
+import { DataNotFoundError, DuplicateDataError, LimitReachedError, StringTooShortError } from 'lib/utilities/errors';
+import { ExpectedAnError } from 'testing/errors';
+import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { v4 } from 'uuid';
 import { MINIMUM_APPLICATION_MESSAGE_CHARACTERS } from '../../shared';
+import { createApplication } from '../createApplication';
 
 let user: User;
 let space: Space;
@@ -24,7 +22,6 @@ describe('createApplication', () => {
   it('should create an application in applied status', async () => {
 
     const bounty = await createBounty({
-      title: 'My bounty',
       createdBy: user.id,
       spaceId: space.id
     });
@@ -58,7 +55,6 @@ describe('createApplication', () => {
   it('should fail if the user already has an application for this bounty', async () => {
 
     const bounty = await createBounty({
-      title: 'My bounty',
       createdBy: user.id,
       spaceId: space.id
     });
@@ -86,7 +82,6 @@ describe('createApplication', () => {
   it(`should fail if the application message has less than ${MINIMUM_APPLICATION_MESSAGE_CHARACTERS} characters`, async () => {
 
     const bounty = await createBounty({
-      title: 'My bounty',
       createdBy: user.id,
       spaceId: space.id
     });
@@ -108,7 +103,6 @@ describe('createApplication', () => {
   it('should fail if the cap of applications for the bounty has been reached', async () => {
 
     const bounty = await createBounty({
-      title: 'My bounty',
       createdBy: user.id,
       spaceId: space.id,
       status: 'suggestion',

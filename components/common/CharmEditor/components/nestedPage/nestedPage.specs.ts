@@ -1,5 +1,5 @@
-import { RawSpecs } from '@bangle.dev/core';
-import { DOMOutputSpec } from '@bangle.dev/pm';
+import type { RawSpecs } from '@bangle.dev/core';
+import type { DOMOutputSpec } from '@bangle.dev/pm';
 import log from 'lib/log';
 import { nestedPageNodeName, nestedPageSuggestMarkName } from './nestedPage.constants';
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
@@ -15,6 +15,9 @@ export function nestedPageSpec (): RawSpecs {
         // This property is used to reference the page
         id: {
           default: null
+        },
+        track: {
+          default: []
         }
       },
       group: 'block',

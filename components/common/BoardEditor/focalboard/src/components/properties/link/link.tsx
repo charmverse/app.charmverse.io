@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 
 import React, { ReactNode } from 'react';
 
@@ -10,7 +8,7 @@ import LinkIcon from '@mui/icons-material/Link';
 
 type Props = {
     value: string
-    readonly?: boolean
+    readOnly?: boolean
     placeholder?: string
     onChange: (value: string) => void
     onSave: () => void
@@ -43,7 +41,7 @@ function URLProperty (props: Props): JSX.Element {
           placeholderText={props.placeholder}
           value={props.value}
           autoExpand={false}
-          readonly={props.readonly}
+          readOnly={props.readOnly}
           onChange={props.onChange}
           onSave={props.onSave}
           onCancel={props.onCancel}

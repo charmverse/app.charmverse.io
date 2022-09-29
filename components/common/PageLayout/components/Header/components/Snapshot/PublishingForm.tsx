@@ -1,11 +1,11 @@
 import { Typography } from '@mui/material';
-import Alert, { AlertColor } from '@mui/material/Alert';
+import type { AlertColor } from '@mui/material/Alert';
+import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import { DateTimePicker } from '@mui/x-date-pickers';
-import { Page } from '@prisma/client';
-import snapshot from '@snapshot-labs/snapshot.js';
+import type { Page } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
 import charmClient from 'charmClient';
 import FieldLabel from 'components/common/form/FieldLabel';
@@ -16,7 +16,8 @@ import PrimaryButton from 'components/common/PrimaryButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
-import { getSnapshotSpace, SnapshotReceipt, SnapshotSpace, SnapshotVotingMode, SnapshotVotingModeType, SnapshotVotingStrategy } from 'lib/snapshot';
+import type { SnapshotReceipt, SnapshotSpace, SnapshotVotingModeType, SnapshotVotingStrategy } from 'lib/snapshot';
+import { getSnapshotSpace, SnapshotVotingMode } from 'lib/snapshot';
 import { ExternalServiceError, SystemError, UnknownError } from 'lib/utilities/errors';
 import { DateTime } from 'luxon';
 import { useEffect, useState } from 'react';
@@ -24,12 +25,16 @@ import { getChainById } from 'connectors';
 import ConnectSnapshot from './ConnectSnapshot';
 import InputVotingStrategies from './InputVotingStrategies';
 
-const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
-const client = new snapshot.Client712(hub);
+async function getSnapshotClient () {
+  const snapshot = (await import('@snapshot-labs/snapshot.js')).default;
+
+  const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
+  return new snapshot.Client712(hub);
+}
 
 interface Props {
-  onSubmit: () => void,
-  page: Page
+  onSubmit: () => void;
+  page: Page;
 }
 
 const MAX_SNAPSHOT_PROPOSAL_CHARACTERS = 14400;
@@ -76,6 +81,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
   async function setCurrentBlockNumberAsDefault () {
     if (snapshotSpace) {
       try {
+        const snapshot = (await import('@snapshot-labs/snapshot.js')).default;
         const provider = await snapshot.utils.getProvider(snapshotSpace.network);
         const blockNum = await provider.getBlockNumber();
         setSnapshotBlockNumber(blockNum);
@@ -185,6 +191,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
     }
 
     try {
+      const client = await getSnapshotClient();
       receipt = await client.proposal(library, account as string, {
         space: space?.snapshotDomain as any,
         type: snapshotVoteMode,
@@ -244,7 +251,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
             </Box>
             {
           !snapshotSpace && (
-          <ConnectSnapshot />
+            <ConnectSnapshot />
           )
         }
           </>

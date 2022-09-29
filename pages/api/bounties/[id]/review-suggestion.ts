@@ -5,8 +5,8 @@ import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
-import { BountyWithDetails } from 'models';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { BountyWithDetails } from 'lib/bounties';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -15,7 +15,7 @@ handler.use(requireUser)
   .use(requireKeys(['decision'], 'body'))
   .post(reviewSuggestionController);
 
-async function reviewSuggestionController (req: NextApiRequest, res: NextApiResponse<BountyWithDetails | {success: true}>) {
+async function reviewSuggestionController (req: NextApiRequest, res: NextApiResponse<BountyWithDetails | { success: true }>) {
 
   const { id: bountyId } = req.query;
 

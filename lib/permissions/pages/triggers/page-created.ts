@@ -1,10 +1,11 @@
-import { getPage, IPageWithPermissions, PageNodeWithPermissions, PageNotFoundError } from 'lib/pages/server';
+import type { Space } from '@prisma/client';
 import { prisma } from 'db';
-import { Space } from '@prisma/client';
+import type { IPageWithPermissions } from 'lib/pages/server';
+import { getPage, PageNotFoundError } from 'lib/pages/server';
 import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
-import { upsertPermission } from '../actions/upsert-permission';
-import { generateReplaceIllegalPermissions, replaceIllegalPermissions } from '../actions/replaceIllegalPermissions';
 import { copyAllPagePermissions } from '../actions/copyPermission';
+import { generateReplaceIllegalPermissions } from '../actions/replaceIllegalPermissions';
+import { upsertPermission } from '../actions/upsert-permission';
 
 export async function setupPermissionsAfterPageCreated (pageId: string): Promise<IPageWithPermissions> {
   const page = await getPage(pageId);

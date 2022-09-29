@@ -7,7 +7,7 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { TokenGate } from '@prisma/client';
+import type { TokenGate } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import charmClient from 'charmClient';
@@ -16,12 +16,13 @@ import TableRow from 'components/common/Table/TableRow';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import log from 'lib/log';
 import getLitChainFromChainId from 'lib/token-gates/getLitChainFromChainId';
-import { TokenGateWithRoles } from 'lib/token-gates/interfaces';
+import type { TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import { shortenHex } from 'lib/utilities/strings';
 import { checkAndSignAuthMessage, humanizeAccessControlConditions } from 'lit-js-sdk';
 import { useEffect, useState } from 'react';
 import { mutate } from 'swr';
-import TestConnectionModal, { TestResult } from './TestConnectionModal';
+import type { TestResult } from './TestConnectionModal';
+import TestConnectionModal from './TestConnectionModal';
 import TokenGateRolesSelect from './TokenGateRolesSelect';
 
 interface Props {
@@ -72,10 +73,12 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
   async function testConnect (tokenGate: TokenGate) {
     setTestResult({ status: 'loading' });
     try {
-
+      if (!litClient) {
+        throw new Error('Lit Protocol client not initialized');
+      }
       const chain = getLitChainFromChainId(chainId);
       const authSig = await checkAndSignAuthMessage({ chain });
-      const jwt = await litClient!.getSignedToken({
+      const jwt = await litClient.getSignedToken({
         resourceId: tokenGate.resourceId as any,
         authSig,
         chain: (tokenGate.conditions as any).chain || 'ethereum',
@@ -109,7 +112,7 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
             <TableCell sx={{ px: 0 }}>Description</TableCell>
             <TableCell>
               <Tooltip arrow placement='top' title='Automatically assign these roles to new users'>
-                <span>Included Roles</span>
+                <Typography fontSize='small' noWrap>Assigned Roles</Typography>
               </Tooltip>
             </TableCell>
             <TableCell />
@@ -135,9 +138,9 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
                 />
               </TableCell>
               <TableCell width={140} sx={{ px: 0, whiteSpace: 'nowrap' }} align='right'>
-                <Tooltip arrow placement='top' title='Test this gate using your own wallet'>
+                <Tooltip arrow placement='top' title={litClient ? 'Test this gate using your own wallet' : 'Lit Protocol client has not initialized'}>
                   <Box component='span' pr={1}>
-                    <Chip onClick={() => testConnect(tokenGate)} sx={{ width: 70 }} clickable color='secondary' size='small' variant='outlined' label='Test' />
+                    <Chip onClick={() => litClient && testConnect(tokenGate)} sx={{ width: 70 }} clickable={Boolean(litClient)} color='secondary' size='small' variant='outlined' label='Test' />
                   </Box>
                 </Tooltip>
                 {isAdmin && (

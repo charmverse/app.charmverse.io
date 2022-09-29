@@ -1,27 +1,32 @@
-import { Page } from '@prisma/client';
+import type { Page } from '@prisma/client';
 import charmClient from 'charmClient';
 import ErrorPage from 'components/common/errors/ErrorPage';
-import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
+import { findParentOfType } from 'lib/pages/findParentOfType';
 import debouncePromise from 'lib/utilities/debouncePromise';
 import log from 'loglevel';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { usePrimaryCharmEditor } from 'hooks/usePrimaryCharmEditor';
 import BoardPage from '../BoardPage';
 import DocumentPage from '../DocumentPage';
 
 export default function EditorPage ({ pageId }: { pageId: string }) {
-  const { setIsEditing, pages, setCurrentPageId, setPages, getPagePermissions } = usePages();
+  const { pages, currentPageId, setCurrentPageId, setPages, getPagePermissions } = usePages();
+  const { editMode, resetPageProps, setPageProps } = usePrimaryCharmEditor();
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
   const [space] = useCurrentSpace();
   const [isAccessDenied, setIsAccessDenied] = useState(false);
-  const [user] = useUser();
-  const currentPagePermissions = getPagePermissions(pageId);
+  const { user } = useUser();
+  const currentPagePermissions = useMemo(() => getPagePermissions(pageId), [pageId]);
 
   const pagesLoaded = Object.keys(pages).length > 0;
+
+  const parentProposalId = findParentOfType({ pageId, pageType: 'proposal', pageMap: pages });
+  const readOnly = (currentPagePermissions?.edit_content === false && editMode !== 'suggesting') || editMode === 'viewing';
 
   useEffect(() => {
     async function main () {
@@ -49,6 +54,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
         }
       }
     }
+
     main();
 
     return () => {
@@ -57,8 +63,26 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
 
   }, [pageId, pagesLoaded, space, user]);
 
+  // set page attributes of the primary charm editor
+  useEffect(() => {
+    if (!editMode) {
+      if (currentPagePermissions?.edit_content) {
+        setPageProps({ permissions: currentPagePermissions, editMode: 'editing' });
+      }
+      else {
+        setPageProps({ permissions: currentPagePermissions, editMode: 'viewing' });
+      }
+    }
+    else {
+      setPageProps({ permissions: currentPagePermissions });
+    }
+    return () => {
+      resetPageProps();
+    };
+  }, [currentPagePermissions]);
+
   const debouncedPageUpdate = debouncePromise(async (updates: Partial<Page>) => {
-    setIsEditing(true);
+    setPageProps({ isSaving: true });
     const updatedPage = await charmClient.updatePage(updates);
     setPages((_pages) => ({
       ..._pages,
@@ -79,7 +103,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
         log.error('Error saving page', err);
       })
       .finally(() => {
-        setIsEditing(false);
+        setPageProps({ isSaving: false });
       });
   }, [pageId]);
 
@@ -87,7 +111,16 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
   const currentPage = pages[pageId];
   const memoizedCurrentPage = useMemo(
     () => pages[pageId],
-    [pageId, currentPage?.headerImage, currentPage?.icon, currentPage?.title, currentPage?.deletedAt, currentPage?.fullWidth]
+    [
+      pageId,
+      JSON.stringify(currentPage?.content),
+      currentPage?.headerImage,
+      currentPage?.icon,
+      currentPage?.title,
+      currentPage?.deletedAt,
+      currentPage?.fullWidth,
+      currentPagePermissions
+    ]
   );
 
   if (isAccessDenied) {
@@ -105,21 +138,23 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
     return <ErrorPage message={'Sorry, you don\'t have access to this page'} />;
   }
   else if (currentPagePermissions.read === true) {
-    if (currentPage?.type === 'board') {
+    if (currentPage?.type === 'board' || currentPage?.type === 'inline_board' || currentPage?.type === 'inline_linked_board') {
       return (
         <BoardPage
           page={memoizedCurrentPage}
           setPage={setPage}
-          readonly={currentPagePermissions.edit_content !== true}
+          pagePermissions={currentPagePermissions}
         />
       );
     }
     else {
       return (
+        // Document page is used in a few places, so it is responsible for retrieving its own permissions
         <DocumentPage
           page={memoizedCurrentPage}
+          readOnly={readOnly}
           setPage={setPage}
-          readOnly={currentPagePermissions.edit_content !== true}
+          parentProposalId={parentProposalId}
         />
       );
     }

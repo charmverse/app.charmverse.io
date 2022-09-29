@@ -1,10 +1,12 @@
-import { Autocomplete, AutocompleteProps, Box, SxProps, TextField, Typography } from '@mui/material';
-import { CryptoCurrencies, CryptoCurrency } from 'connectors';
+import type { AutocompleteProps, SxProps } from '@mui/material';
+import { Autocomplete, Box, TextField, Typography } from '@mui/material';
+import type { CryptoCurrency } from 'connectors';
+import { CryptoCurrencies } from 'connectors';
 import Modal from 'components/common/Modal';
 import { useEffect, useState } from 'react';
 import uniq from 'lodash/uniq';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { PaymentMethod } from '@prisma/client';
+import type { PaymentMethod } from '@prisma/client';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import AddIcon from '@mui/icons-material/Add';
 import TokenLogo from 'components/common/TokenLogo';
@@ -17,9 +19,9 @@ export interface IInputSearchCryptoProps extends Omit<Partial<AutocompleteProps<
   defaultValue?: CryptoCurrency | string;
   value?: CryptoCurrency | string; // allow parent to override value
   hideBackdrop?: boolean; // hide backdrop when modal is open
-  cryptoList?: Array<string | CryptoCurrency>;
+  cryptoList?: (string | CryptoCurrency)[];
   chainId?: number; // allow passing this down to the 'new custom token' form
-  sx?: SxProps
+  sx?: SxProps;
 }
 
 const ADD_NEW_CUSTOM = 'ADD_NEW_CUSTOM';

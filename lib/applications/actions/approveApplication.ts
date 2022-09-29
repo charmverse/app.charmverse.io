@@ -1,9 +1,9 @@
-import { Application } from '@prisma/client';
+import type { Application } from '@prisma/client';
 import { prisma } from 'db';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
-import { DataNotFoundError, LimitReachedError } from 'lib/utilities/errors';
+import { DataNotFoundError, LimitReachedError, UndesirableOperationError } from 'lib/utilities/errors';
 import { getApplication } from '../getApplication';
-import { ApplicationActionRequest } from '../interfaces';
+import type { ApplicationActionRequest } from '../interfaces';
 import { submissionsCapReached } from '../shared';
 
 export async function approveApplication ({ applicationOrApplicationId, userId }: ApplicationActionRequest): Promise<Application> {
@@ -16,6 +16,10 @@ export async function approveApplication ({ applicationOrApplicationId, userId }
   const bounty = await getBountyOrThrow(application.bountyId);
 
   const capReached = submissionsCapReached({ bounty, submissions: bounty.applications });
+
+  if (application.createdBy === userId) {
+    throw new UndesirableOperationError('You cannot approve your own application');
+  }
 
   if (capReached) {
     throw new LimitReachedError(`This application cannot be approved as the limit of active submissions of ${bounty.maxSubmissions} has been reached.`);

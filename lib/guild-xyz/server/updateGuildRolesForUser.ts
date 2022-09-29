@@ -1,4 +1,4 @@
-import { Role, SpaceRole } from '@prisma/client';
+import type { Role, SpaceRole } from '@prisma/client';
 import log from 'lib/log';
 import { prisma } from 'db';
 import { getGuildRoleIds } from '../getGuildRoleIds';

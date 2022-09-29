@@ -1,13 +1,13 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { NextHandler } from 'next-connect';
-import { ISystemError } from 'lib/utilities/errors';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import type { NextHandler } from 'next-connect';
+import type { ISystemError } from 'lib/utilities/errors';
 import { ApiError } from 'lib/middleware';
 
 /**
  * Generates a request handler that checks for target keys
  * @nullableKeys Keys which are considered to pass required check if they have a null value. Defaults to empty list
  */
-export function requireKeys<T> (keys: Array<keyof T>, location: 'body' | 'query') {
+export function requireKeys<T> (keys: (keyof T)[], location: 'body' | 'query') {
   return (req: NextApiRequest, res: NextApiResponse<ISystemError>, next: NextHandler) => {
 
     const toVerify = location === 'query' ? req.query : req.body;

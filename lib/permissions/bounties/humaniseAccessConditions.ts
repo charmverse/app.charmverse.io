@@ -1,8 +1,8 @@
-import { Bounty } from '@prisma/client';
-import { RoleupWithMembers } from 'lib/roles/interfaces';
+import type { Bounty } from '@prisma/client';
+import type { RoleupWithMembers } from 'lib/roles/interfaces';
 import { humaniseList, upperCaseFirstCharacter } from '../../utilities/strings';
-import { TargetPermissionGroup } from '../interfaces';
-import { HumanisedBountyAccessSummary, SupportedHumanisedAccessConditions } from './interfaces';
+import type { TargetPermissionGroup } from '../interfaces';
+import type { HumanisedBountyAccessSummary, SupportedHumanisedAccessConditions } from './interfaces';
 
 /**
  * Returns a human friendly roleup of access conditions
@@ -13,13 +13,13 @@ export function humaniseBountyAccessConditions ({
   roles,
   bounty
 }: {
-  permissionLevel: SupportedHumanisedAccessConditions
+  permissionLevel: SupportedHumanisedAccessConditions;
   // The array present on the target key (creator, reviewer, submitter or viewer) of a Bounty Permissions object
   // For submitters, we currently only support roles or whole space
-  assignees: TargetPermissionGroup[]
+  assignees: TargetPermissionGroup[];
   // Full list of roles in space (or at least role data for assigned roles)
-  roles: RoleupWithMembers[]
-  bounty: Bounty
+  roles: RoleupWithMembers[];
+  bounty: Bounty;
 }): HumanisedBountyAccessSummary {
   const hasSpacePermission = assignees.some(({ group }) => group === 'space');
 

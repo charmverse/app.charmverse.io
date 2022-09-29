@@ -3,16 +3,23 @@ import fetch from './fetch';
 type Params = { [key: string]: any };
 
 export function GET<T = Response> (
-  requestURL: string,
+  path: string,
   data: Params = {},
   { headers = {} }: { headers?: any } = {}
 ): Promise<T> {
+
   const queryStr = Object.keys(data)
     .filter(key => !!data[key])
-    .map(key => `${key}=${encodeURIComponent(data[key])}`)
+    .map(key => {
+      const value = data[key];
+      return Array.isArray(value)
+        ? `${value.map((v: string) => `${key}[]=${v}`).join('&')}`
+        : `${key}=${encodeURIComponent(value)}`;
+    })
     .join('&');
-  return fetch(
-    requestURL + (queryStr ? `?${queryStr}` : ''),
+  const url = `${path}${queryStr ? `?${queryStr}` : ''}`;
+  return fetch<T>(
+    url,
     {
       method: 'GET',
       headers: new Headers({
@@ -29,7 +36,7 @@ export function DELETE<T> (
   data: Params = {},
   { headers = {} }: { headers?: any } = {}
 ): Promise<T> {
-  return fetch(
+  return fetch<T>(
     requestURL,
     {
       body: JSON.stringify(data),
@@ -49,7 +56,7 @@ export function POST<T> (
   data: Params | string = {},
   { headers = {}, noHeaders, skipStringifying }: { headers?: any, noHeaders?: boolean, skipStringifying?: boolean } = {}
 ): Promise<T> {
-  return fetch(
+  return fetch<T>(
     requestURL,
     {
       body: !skipStringifying ? JSON.stringify(data) : data as string,
@@ -69,7 +76,7 @@ export function PUT<T> (
   data: Params = {},
   { headers = {} }: { headers?: any } = {}
 ): Promise<T> {
-  return fetch(
+  return fetch<T>(
     requestURL,
     {
       body: JSON.stringify(data),

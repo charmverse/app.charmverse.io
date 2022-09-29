@@ -1,9 +1,11 @@
 import uniqBy from 'lodash/uniqBy';
-import { Signer, ethers } from 'ethers';
+import type { Signer } from 'ethers';
+import { ethers } from 'ethers';
 import { RPC, getChainById } from 'connectors';
-import { UserGnosisSafe } from '@prisma/client';
+import type { UserGnosisSafe } from '@prisma/client';
 import EthersAdapter from '@gnosis.pm/safe-ethers-lib';
-import SafeServiceClient, { SafeMultisigTransactionResponse, SafeInfoResponse } from '@gnosis.pm/safe-service-client';
+import type { SafeMultisigTransactionResponse, SafeInfoResponse } from '@gnosis.pm/safe-service-client';
+import SafeServiceClient from '@gnosis.pm/safe-service-client';
 import log from 'lib/log';
 
 export type GnosisTransaction = SafeMultisigTransactionResponse;// AllTransactionsListResponse['results'][0];
@@ -44,9 +46,9 @@ interface GetSafesForAddressProps {
   chainId: number;
 }
 
-type Result = ({ chainId: number } & SafeInfoResponse)[];
+export type SafeData = ({ chainId: number } & SafeInfoResponse);
 
-export async function getSafesForAddress ({ signer, chainId, address }: GetSafesForAddressProps): Promise<Result> {
+export async function getSafesForAddress ({ signer, chainId, address }: GetSafesForAddressProps): Promise<SafeData[]> {
 
   const serviceUrl = getGnosisRPCUrl(chainId);
   if (!serviceUrl) {

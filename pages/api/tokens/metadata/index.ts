@@ -1,9 +1,11 @@
 import { ApiError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { getTokenMetaData, ITokenMetadata } from 'lib/tokens/tokenData';
+import type { ITokenMetadata } from 'lib/tokens/tokenData';
+import { getTokenMetaData } from 'lib/tokens/tokenData';
 import { isValidChainAddress } from 'lib/tokens/validation';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import type { SupportedChainId } from 'lib/blockchain/provider/alchemy';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -29,7 +31,7 @@ async function loadTokenMetaData (req: NextApiRequest, res: NextApiResponse<ITok
   }
 
   const tokenMetaData = await getTokenMetaData({
-    chainId: parsedChainId,
+    chainId: parsedChainId as SupportedChainId,
     contractAddress: contractAddress as string
   });
 

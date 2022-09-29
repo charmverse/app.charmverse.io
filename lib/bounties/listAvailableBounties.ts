@@ -1,11 +1,11 @@
 import { prisma } from 'db';
-import { BountyWithDetails } from 'models';
+import type { BountyWithDetails } from 'lib/bounties';
 import { hasAccessToSpace } from 'lib/middleware';
 import { accessiblePagesByPermissionsQuery, includePagePermissions } from 'lib/pages/server';
-import { AvailableResourcesRequest } from '../permissions/interfaces';
+import type { AvailableResourcesRequest } from '../permissions/interfaces';
 import { DataNotFoundError } from '../utilities/errors';
 
-export function generateAccessibleBountiesQuery ({ userId, spaceId }: {userId: string, spaceId: string}) {
+export function generateAccessibleBountiesQuery ({ userId, spaceId }: { userId: string, spaceId: string }) {
   return [
     {
       space: {
@@ -74,7 +74,7 @@ export async function listAvailableBounties ({ spaceId, userId }: AvailableResou
   }
 
   // Make sure a requesting user has access to the space, otherwise treat them as a member of the public
-  if (!userId || (userId && ((await hasAccessToSpace({ userId, spaceId })).error !== undefined))) {
+  if (!userId || (userId && (await hasAccessToSpace({ userId, spaceId })).error !== undefined)) {
     // If public bounty board is disabled, return empty list, otherwise return bounties user can access all bounties
     return !space.publicBountyBoard ? [] : prisma.bounty.findMany({
       where: {
@@ -82,14 +82,10 @@ export async function listAvailableBounties ({ spaceId, userId }: AvailableResou
         page: {
           // Prevents returning bounties from other spaces
           spaceId,
+          deletedAt: null,
           permissions: {
             some: {
-              // Returns bounties accessible to the whole spaces
-              OR: [{
-                spaceId
-              }, {
-                public: true
-              }]
+              public: true
             }
           }
         }
@@ -106,6 +102,9 @@ export async function listAvailableBounties ({ spaceId, userId }: AvailableResou
   return prisma.bounty.findMany({
     where: {
       spaceId,
+      page: {
+        deletedAt: null
+      },
       OR: [
         // Admin override
         {

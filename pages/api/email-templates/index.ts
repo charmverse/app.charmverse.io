@@ -2,23 +2,25 @@ import nc from 'next-connect';
 import { onError, onNoMatch } from 'lib/middleware';
 import * as emails from 'lib/emails/emails';
 import { v4 } from 'uuid';
-import { MentionedTask } from 'lib/mentions/interfaces';
+import type { MentionedTask } from 'lib/mentions/interfaces';
 import randomName from 'lib/utilities/randomName';
-import { VoteTask } from 'lib/votes/interfaces';
+import type { VoteTask } from 'lib/votes/interfaces';
+import { getPagePath } from 'lib/pages/utils';
+import type { ProposalTask } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';
 
 const handler = nc({
   onError,
   onNoMatch
 });
 
-const createMentionTask = ({ pageTitle, spaceName, mentionText }: {spaceName: string, mentionText: string, pageTitle: string}): MentionedTask => {
+const createMentionTask = ({ pageTitle, spaceName, mentionText }: { spaceName: string, mentionText: string, pageTitle: string }): MentionedTask => {
   return {
     mentionId: v4(),
     createdAt: new Date().toISOString(),
     pageId: v4(),
     spaceId: v4(),
     spaceDomain: randomName(),
-    pagePath: `page-${Math.random().toString().replace('0.', '')}`,
+    pagePath: getPagePath(),
     spaceName,
     pageTitle,
     text: mentionText,
@@ -36,17 +38,20 @@ const createMentionTask = ({ pageTitle, spaceName, mentionText }: {spaceName: st
       avatar: '',
       path: '',
       isBot: false,
-      identityType: 'Discord'
+      identityType: 'Discord',
+      avatarContract: null,
+      avatarTokenId: null,
+      avatarChain: null
     }
   };
 };
 
-const createVoteTasks = ({ voteTitle, deadline, pageTitle, spaceName }: {voteTitle: string, deadline: VoteTask['deadline'], spaceName: string, pageTitle: string}): VoteTask => {
+const createVoteTasks = ({ voteTitle, deadline, pageTitle, spaceName }: { voteTitle: string, deadline: VoteTask['deadline'], spaceName: string, pageTitle: string }): VoteTask => {
   return {
     deadline,
     id: v4(),
     page: {
-      path: `page-${Math.random().toString().replace('0.', '')}`,
+      path: getPagePath(),
       title: pageTitle
     } as any,
     space: {
@@ -59,6 +64,19 @@ const createVoteTasks = ({ voteTitle, deadline, pageTitle, spaceName }: {voteTit
   } as any;
 };
 
+const createProposalTasks = ({ action, pageTitle, spaceName, status }: Omit<ProposalTask, 'id' | 'spaceDomain' | 'pagePath' | 'pageId'>): ProposalTask => {
+  return {
+    id: v4(),
+    action,
+    pagePath: randomName(),
+    pageTitle,
+    status,
+    spaceDomain: randomName(),
+    spaceName,
+    pageId: v4()
+  };
+};
+
 const templates = {
   'Notify the user about tasks': () => {
     return emails.getPendingTasksEmail({
@@ -68,6 +86,20 @@ const templates = {
         username: 'ghostpepper'
       },
       totalTasks: 6,
+      proposalTasks: [
+        createProposalTasks({
+          action: 'discuss',
+          pageTitle: 'Should Uniswap provide Rage Trade with an additional use grant',
+          spaceName: 'Uniswap',
+          status: 'discussion'
+        }),
+        createProposalTasks({
+          action: 'start_discussion',
+          pageTitle: 'Proposal to add XSTUSD-3CRV to the Gauge Controller',
+          spaceName: 'Curve Finance',
+          status: 'private_draft'
+        })
+      ],
       mentionedTasks: [
         createMentionTask({
           mentionText: 'cc @ghostpepper',
@@ -100,19 +132,19 @@ const templates = {
         createVoteTasks({
           deadline: new Date(Date.now() + (26 * 60 * 60 * 1000)),
           pageTitle: 'Product Discussion',
-          spaceName: 'Charmverse',
+          spaceName: 'CharmVerse',
           voteTitle: 'Should we format the text?'
         }),
         createVoteTasks({
           deadline: new Date(Date.now() + (32 * 60 * 60 * 1000)),
           pageTitle: 'Task Board',
-          spaceName: 'Charmverse',
+          spaceName: 'CharmVerse',
           voteTitle: 'Let\'s vote'
         }),
         createVoteTasks({
           deadline: new Date(Date.now() + (52 * 60 * 60 * 1000)),
           pageTitle: 'Product Road Map',
-          spaceName: 'Charmverse Demo',
+          spaceName: 'CharmVerse Demo',
           voteTitle: 'We should all vote on this'
         })
       ],

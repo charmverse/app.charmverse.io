@@ -2,7 +2,9 @@ import { EditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import { TextField, Typography } from '@mui/material';
 import { TextSelection } from 'prosemirror-state';
-import { ChangeEvent, useContext, useEffect, useRef, useState } from 'react';
+import type { ChangeEvent } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
+import { isTouchScreen } from 'lib/browser';
 
 const StyledPageTitle = styled(TextField)`
   &.MuiFormControl-root {
@@ -62,15 +64,16 @@ export default function PageTitle ({ value, onChange, readOnly }: PageTitleProps
   }
 
   if (readOnly) {
-    return <StyledReadOnlyTitle>{value}</StyledReadOnlyTitle>;
+    return <StyledReadOnlyTitle data-test='editor-page-title'>{value || 'Untitled'}</StyledReadOnlyTitle>;
   }
   return (
     <StyledPageTitle
+      data-test='editor-page-title'
       inputRef={titleInput}
       value={title}
       onChange={_onChange}
       placeholder='Untitled'
-      autoFocus={!readOnly}
+      autoFocus={!readOnly && !isTouchScreen()}
       multiline
       variant='standard'
       onKeyDown={(e) => {

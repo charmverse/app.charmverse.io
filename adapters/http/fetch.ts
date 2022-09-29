@@ -1,8 +1,7 @@
-import { Response as NodeFetchResponse } from 'node-fetch';
 
 type RequestInit = Parameters<typeof fetch>[1];
 
-export function transformResponse (response: Response | NodeFetchResponse) {
+export function transformResponse (response: Response) {
   if (response.status >= 400) {
     const contentType = response.headers.get('content-type') as string;
     // necessary to capture the regular response for embedded blocks
@@ -24,6 +23,6 @@ export function transformResponse (response: Response | NodeFetchResponse) {
     });
 }
 
-export default function fetchWrapper (resource: string, init?: RequestInit) {
-  return fetch(resource, init).then(transformResponse);
+export default function fetchWrapper<T> (resource: string, init?: RequestInit): Promise<T> {
+  return fetch(resource, init).then(transformResponse) as Promise<T>;
 }

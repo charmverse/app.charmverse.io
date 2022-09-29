@@ -1,4 +1,4 @@
-import { UserPermissionFlags } from './interfaces';
+import type { UserPermissionFlags } from './interfaces';
 
 /**
  * Defines each operation as a member property queryable as true / false
@@ -26,9 +26,9 @@ export abstract class Permissions<O extends string> {
     }, {} as UserPermissionFlags<O>);
   }
 
-  private operations: {[key in O]: true};
+  private operations: { [key in O]: true };
 
-  constructor ({ allowedOperations }: {allowedOperations: O[]}) {
+  constructor ({ allowedOperations }: { allowedOperations: O[] }) {
     this.operations = allowedOperations.reduce((map, key) => {
       map[key] = true;
       return map;

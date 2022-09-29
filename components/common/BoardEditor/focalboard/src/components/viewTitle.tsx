@@ -1,11 +1,8 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import ImageIcon from '@mui/icons-material/Image';
-import CharmEditor, { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
+import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
-import { randomIntFromInterval } from 'lib/utilities/random';
 import { Page, PageContent } from 'models';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, KeyboardEvent } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { BlockIcons } from '../blockIcons';
 import { Board } from '../blocks/board';
@@ -16,14 +13,24 @@ import EmojiIcon from '../widgets/icons/emoji';
 import HideIcon from '../widgets/icons/hide';
 import ShowIcon from '../widgets/icons/show';
 import BlockIconSelector from './blockIconSelector';
+import dynamic from 'next/dynamic';
+import styled from '@emotion/styled';
+
+const CharmEditor = dynamic(() => import('components/common/CharmEditor'), {
+  ssr: false
+})
+
+const StyledEditable = styled(Editable)`
+  font-size: 22px !important;
+`;
 
 type Props = {
-    board: Board
-    readonly: boolean
-    setPage: (page: Partial<Page>) => void
+  board: Board
+  readOnly: boolean
+  setPage: (page: Partial<Page>) => void
 }
 
-function ViewTitle (props: Props) {
+function ViewTitle(props: Props) {
   const { board } = props;
 
   const [title, setTitle] = useState(board.title);
@@ -54,67 +61,67 @@ function ViewTitle (props: Props) {
   return (
     <div className='ViewTitle'>
       <div className='add-buttons add-visible'>
-        {!props.readonly && !board.fields.headerImage
-                  && (
-                  <div className='add-buttons'>
-                    <Button
-                      onClick={() => setRandomHeaderImage()}
-                      icon={(
-                        <ImageIcon
-                          fontSize='small'
-                          sx={{ marginRight: 1 }}
-                        />
-)}
-                    >
-                      <FormattedMessage
-                        id='CardDetail.add-cover'
-                        defaultMessage='Add cover'
-                      />
-                    </Button>
-                  </div>
-                  )}
-        {!props.readonly && !board.fields.icon
-                    && (
-                    <Button
-                      onClick={() => {
-                        props.setPage({ icon: onAddRandomIcon() });
-                      }}
-                      icon={<EmojiIcon />}
-                    >
-                      <FormattedMessage
-                        id='TableComponent.add-icon'
-                        defaultMessage='Add icon'
-                      />
-                    </Button>
-                    )}
-        {!props.readonly && board.fields.showDescription
-                    && (
-                    <Button
-                      onClick={onHideDescription}
-                      icon={<HideIcon />}
-                    >
-                      <FormattedMessage
-                        id='ViewTitle.hide-description'
-                        defaultMessage='hide description'
-                      />
-                    </Button>
-                    )}
-        {!props.readonly && !board.fields.showDescription
-                    && (
-                    <Button
-                      onClick={onShowDescription}
-                      icon={<ShowIcon />}
-                    >
-                      <FormattedMessage
-                        id='ViewTitle.show-description'
-                        defaultMessage='show description'
-                      />
-                    </Button>
-                    )}
+        {!props.readOnly && !board.fields.headerImage
+          && (
+            <div className='add-buttons'>
+              <Button
+                onClick={() => setRandomHeaderImage()}
+                icon={(
+                  <ImageIcon
+                    fontSize='small'
+                    sx={{ marginRight: 1 }}
+                  />
+                )}
+              >
+                <FormattedMessage
+                  id='CardDetail.add-cover'
+                  defaultMessage='Add cover'
+                />
+              </Button>
+            </div>
+          )}
+        {!props.readOnly && !board.fields.icon
+          && (
+            <Button
+              onClick={() => {
+                props.setPage({ icon: onAddRandomIcon() });
+              }}
+              icon={<EmojiIcon />}
+            >
+              <FormattedMessage
+                id='TableComponent.add-icon'
+                defaultMessage='Add icon'
+              />
+            </Button>
+          )}
+        {!props.readOnly && board.fields.showDescription
+          && (
+            <Button
+              onClick={onHideDescription}
+              icon={<HideIcon />}
+            >
+              <FormattedMessage
+                id='ViewTitle.hide-description'
+                defaultMessage='hide description'
+              />
+            </Button>
+          )}
+        {!props.readOnly && !board.fields.showDescription
+          && (
+            <Button
+              onClick={onShowDescription}
+              icon={<ShowIcon />}
+            >
+              <FormattedMessage
+                id='ViewTitle.show-description'
+                defaultMessage='show description'
+              />
+            </Button>
+          )}
       </div>
 
-      <div className='title'>
-        <BlockIconSelector readonly={props.readonly} block={board} setPage={props.setPage} />
+      <div className='title' data-test='board-title'>
+        <BlockIconSelector readOnly={props.readOnly} block={board} setPage={props.setPage} />
         <Editable
           className='title'
           value={title}
@@ -123,23 +130,55 @@ function ViewTitle (props: Props) {
           saveOnEsc={true}
           onSave={onEditTitleSave}
           onCancel={onEditTitleCancel}
-          readonly={props.readonly}
+          readOnly={props.readOnly}
           spellCheck={true}
         />
       </div>
 
       {board.fields.showDescription
-                && (
-                <div className='description'>
-                  <CharmEditor
-                    disablePageSpecificFeatures
-                    content={board.fields.description}
-                    onContentChange={(content: ICharmEditorOutput) => {
-                      onDescriptionChange(content.doc);
-                    }}
-                  />
-                </div>
-                )}
+        && (
+          <div className='description'>
+            <CharmEditor
+              disablePageSpecificFeatures
+              content={board.fields.description}
+              onContentChange={(content: ICharmEditorOutput) => {
+                onDescriptionChange(content.doc);
+              }}
+              pageId={board.id}
+            />
+          </div>
+        )}
+    </div>
+  );
+}
+
+export function InlineViewTitle (props: Props) {
+
+  const { board } = props;
+
+  const [title, setTitle] = useState(board.title);
+  const onEditTitleSave = useCallback(() => {
+    mutator.changeTitle(board.id, board.title, title);
+    props.setPage({ title });
+  }, [board.id, board.title, title]);
+
+  // cancel key events, such as "Delete" or "Backspace" so that prosemiror doesnt pick them up on inline dbs
+  function cancelEvent (e: KeyboardEvent<HTMLDivElement>) {
+    e.stopPropagation();
+  }
+
+  return (
+    <div onKeyDown={cancelEvent}>
+      <StyledEditable
+        className='title'
+        value={title}
+        placeholderText='Untitled'
+        onChange={(newTitle) => setTitle(newTitle)}
+        saveOnEsc={true}
+        onSave={onEditTitleSave}
+        readOnly={props.readOnly}
+        spellCheck={true}
+      />
     </div>
   );
 }

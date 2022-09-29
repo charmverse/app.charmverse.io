@@ -5,7 +5,7 @@ import { computeUserPagePermissions } from 'lib/permissions/pages/page-permissio
 import { withSessionRoute } from 'lib/session/withSession';
 import { deleteThread } from 'lib/threads';
 import { DataNotFoundError } from 'lib/utilities/errors';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -31,8 +31,7 @@ async function deleteThreadController (req: NextApiRequest, res: NextApiResponse
 
   const permissionSet = await computeUserPagePermissions({
     pageId: thread.pageId,
-    userId,
-    allowAdminBypass: false
+    userId
   });
 
   if (!permissionSet.comment) {

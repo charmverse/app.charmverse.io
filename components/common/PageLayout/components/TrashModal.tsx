@@ -2,11 +2,12 @@ import { IconButton, List, MenuItem, ListItemText, ListItemIcon, Tooltip, Typogr
 import { usePages } from 'hooks/usePages';
 import { ScrollableModal as Modal } from 'components/common/Modal';
 import { checkForEmpty } from 'components/common/CharmEditor/utils';
-import { Page, PageContent } from 'models';
+import type { Page, PageContent } from 'models';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RestoreIcon from '@mui/icons-material/Restore';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { MouseEvent, memo, useMemo, useState, useCallback, useEffect } from 'react';
+import type { MouseEvent } from 'react';
+import { memo, useMemo, useState, useCallback, useEffect } from 'react';
 import { DateTime } from 'luxon';
 import Link from 'next/link';
 import { fancyTrim } from 'lib/utilities/strings';
@@ -17,7 +18,7 @@ import { mutate } from 'swr';
 import { useRouter } from 'next/router';
 import PageIcon from './PageIcon';
 
-const PageArchivedDate = memo<{date: Date, title: string}>(({ date, title }) => {
+const PageArchivedDate = memo<{ date: Date, title: string }>(({ date, title }) => {
   return (
     <ListItemText secondary={DateTime.fromJSDate(new Date(date)).toRelative({ base: (DateTime.now()) })}>
       {fancyTrim(title, 34) || 'Untitled'}
@@ -27,13 +28,14 @@ const PageArchivedDate = memo<{date: Date, title: string}>(({ date, title }) => 
 
 const ArchivedPageItem = memo<
 {
-  archivedPage: Page,
-  disabled: boolean,
-  onRestore:(e: MouseEvent<HTMLButtonElement, MouseEvent>, pageId: string) => void,
-  onDelete: (e: MouseEvent<HTMLButtonElement, MouseEvent>, pageId: string) => void
+  archivedPage: Page;
+  disabled: boolean;
+  onRestore:(e: MouseEvent<HTMLButtonElement, MouseEvent>, pageId: string) => void;
+  onDelete: (e: MouseEvent<HTMLButtonElement, MouseEvent>, pageId: string) => void;
     }>(({ onRestore, onDelete, disabled, archivedPage }) => {
       const [space] = useCurrentSpace();
       const isEditorEmpty = checkForEmpty(archivedPage.content as PageContent);
+
       return (
         <Link href={`/${space?.domain}/${archivedPage.path}`} passHref key={archivedPage.id}>
           <MenuItem component='a' dense disabled={disabled} sx={{ pl: 4 }}>
@@ -66,7 +68,7 @@ const ArchivedPageItem = memo<
       );
     });
 
-export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, isOpen: boolean}) {
+export default function TrashModal ({ onClose, isOpen }: { onClose: () => void, isOpen: boolean }) {
   const [archivedPages, setArchivedPages] = useState<Record<string, Page>>({});
   const [isMutating, setIsMutating] = useState(false);
   const [searchText, setSearchText] = useState('');
@@ -106,7 +108,7 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
       });
 
       await mutate(`pages/${space.id}`);
-      dispatch(initialLoad());
+      dispatch(initialLoad({ spaceId: space.id }));
     }
   }
 
@@ -167,12 +169,12 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
             <Typography variant='body2' color='secondary'>{Object.keys(archivedPages).length} pages</Typography>
           </Box>
           { archivedPagesExist && (
-          <TextField
-            placeholder='Filter by page title...'
-            fullWidth
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-          />
+            <TextField
+              placeholder='Filter by page title...'
+              fullWidth
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+            />
           )}
         </Box>
       )}

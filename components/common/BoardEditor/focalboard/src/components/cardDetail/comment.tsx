@@ -1,10 +1,9 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import React, { FC } from 'react';
 import { useIntl } from 'react-intl';
+import { Box, Typography } from '@mui/material';
 
 import Avatar from 'components/common/Avatar';
-import { useContributors } from 'hooks/useContributors';
+import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import { Block } from '../../blocks/block';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
@@ -13,25 +12,22 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
-import { getUser } from '../../store/users';
-import { useAppSelector } from '../../store/hooks';
 import Tooltip from '../../widgets/tooltip';
+import { Contributor } from 'models';
+import OptionsIcon from '../../widgets/icons/options';
+import { DeleteIcon } from 'components/common/Icons/DeleteIcon';
 
 type Props = {
-    comment: Block
-    userId: string
-    userImageUrl: string
-    readonly: boolean
+  comment: Block;
+  contributor?: Pick<Contributor, 'username' | 'avatar' | 'hasNftAvatar'>;
+  readOnly: boolean;
 }
 
 const Comment: FC<Props> = (props: Props) => {
-  const { comment, userId, userImageUrl } = props;
+  const { comment, contributor } = props;
   const intl = useIntl();
-  const html = Utils.htmlFromMarkdown(comment.title);
-  const user = useAppSelector(getUser(userId));
+  const html = comment.title && Utils.htmlFromMarkdown(comment.title);
   const date = new Date(comment.createdAt);
-  const [contributors] = useContributors();
-  const contributor = contributors.find(_contributor => _contributor.id === userId);
 
   return (
     <div
@@ -39,37 +35,43 @@ const Comment: FC<Props> = (props: Props) => {
       className='Comment comment'
     >
       <div className='comment-header'>
-        {contributor ? <Avatar size='small' name={contributor.username as string} avatar={contributor.avatar} /> : (
-          <img
-            className='comment-avatar'
-            src={userImageUrl}
-          />
-        )}
-        <div className='comment-username'>{user?.username}</div>
+        <Avatar size='xSmall' name={contributor?.username} avatar={contributor?.avatar} isNft={contributor?.hasNftAvatar} />
+        <div className='comment-username'>{contributor?.username}</div>
         <Tooltip title={Utils.displayDateTime(date, intl)}>
           <div className='comment-date'>
             {Utils.relativeDisplayDateTime(date, intl)}
           </div>
         </Tooltip>
 
-        {!props.readonly && (
-        <MenuWrapper>
-          <IconButton icon={<MoreHorizIcon fontSize='small' />} />
-          <Menu position='left'>
-            <Menu.Text
-              icon={<DeleteOutlineIcon fontSize='small' />}
-              id='delete'
-              name={intl.formatMessage({ id: 'Comment.delete', defaultMessage: 'Delete' })}
-              onClick={() => mutator.deleteBlock(comment)}
-            />
-          </Menu>
-        </MenuWrapper>
+        {!props.readOnly && (
+          <MenuWrapper>
+            <IconButton icon={<OptionsIcon />} />
+            <Menu position='left'>
+              <Menu.Text
+                icon={<DeleteIcon />}
+                id='delete'
+                name={intl.formatMessage({ id: 'Comment.delete', defaultMessage: 'Delete' })}
+                onClick={() => mutator.deleteBlock(comment)}
+              />
+            </Menu>
+          </MenuWrapper>
         )}
       </div>
-      <div
-        className='comment-text'
-        dangerouslySetInnerHTML={{ __html: html }}
-      />
+      <Box ml={3}>
+        {comment.fields.content ? (
+          <InlineCharmEditor
+            content={comment.fields.content}
+            readOnly
+            style={{ fontSize: '14px' }}
+          />
+        ) : (
+          // support old model until we completely migrate to new model
+          <Typography
+            sx={{ fontSize: '14px', pl: 1 }}
+            dangerouslySetInnerHTML={{ __html: html }}
+          />
+        )}
+      </Box>
     </div>
   );
 };

@@ -1,11 +1,14 @@
 import styled from '@emotion/styled';
-import { Theme } from '@mui/material';
+import type { Theme } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import MuiDrawer from '@mui/material/Drawer';
+import { FocalboardViewsProvider } from 'hooks/useFocalboardViews';
 import { VotesProvider } from 'hooks/useVotes';
 import { PageActionDisplayProvider } from 'hooks/usePageActionDisplay';
 import { ThreadsProvider } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
+import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
+import PageDialogGlobalModal from 'components/common/PageDialog/PageDialogGlobal';
 import Head from 'next/head';
 import * as React from 'react';
 import { isSmallScreen } from 'lib/browser';
@@ -83,7 +86,7 @@ const LayoutContainer = styled.div`
 
 interface PageLayoutProps {
   children: React.ReactNode;
-  sidebar?: ((p: { closeSidebar: () => void }) => JSX.Element)
+  sidebar?: ((p: { closeSidebar: () => void }) => JSX.Element);
   sidebarWidth?: number;
 }
 
@@ -91,7 +94,7 @@ function PageLayout ({ sidebarWidth = 300, children, sidebar: SidebarOverride }:
 
   const smallScreen = React.useMemo(() => isSmallScreen(), []);
   const [open, setOpen] = React.useState(!smallScreen);
-  const [user] = useUser();
+  const { user } = useUser();
 
   const handleDrawerOpen = React.useCallback(() => {
     setOpen(true);
@@ -107,31 +110,37 @@ function PageLayout ({ sidebarWidth = 300, children, sidebar: SidebarOverride }:
         <CurrentPageFavicon />
       </Head>
       <LayoutContainer>
-        <ThreadsProvider>
-          <VotesProvider>
-            <PageActionDisplayProvider>
-              <AppBar open={open} sidebarWidth={sidebarWidth} position='fixed'>
-                <Header
-                  open={open}
-                  openSidebar={handleDrawerOpen}
-                />
-              </AppBar>
-              <Drawer
-                sidebarWidth={sidebarWidth}
-                variant='permanent'
-                open={open}
-              >
-                {SidebarOverride
-                  ? <SidebarOverride closeSidebar={handleDrawerClose} />
-                  : <Sidebar closeSidebar={handleDrawerClose} favorites={user?.favorites || []} />}
-              </Drawer>
-              <PageContainer>
-                <HeaderSpacer />
-                {children}
-              </PageContainer>
-            </PageActionDisplayProvider>
-          </VotesProvider>
-        </ThreadsProvider>
+        <FocalboardViewsProvider>
+          <ThreadsProvider>
+            <VotesProvider>
+              <PageDialogProvider>
+                <PageActionDisplayProvider>
+                  <AppBar open={open} sidebarWidth={sidebarWidth} position='fixed'>
+                    <Header
+                      open={open}
+                      openSidebar={handleDrawerOpen}
+                    />
+                  </AppBar>
+                  <Drawer
+                    sidebarWidth={sidebarWidth}
+                    variant='permanent'
+                    open={open}
+                  >
+                    {SidebarOverride
+                      ? <SidebarOverride closeSidebar={handleDrawerClose} />
+                      : <Sidebar closeSidebar={handleDrawerClose} favorites={user?.favorites || []} />}
+                  </Drawer>
+                  <PageContainer>
+                    <HeaderSpacer />
+                    {children}
+                  </PageContainer>
+                  <PageDialogGlobalModal />
+                </PageActionDisplayProvider>
+              </PageDialogProvider>
+            </VotesProvider>
+          </ThreadsProvider>
+
+        </FocalboardViewsProvider>
       </LayoutContainer>
     </>
   );

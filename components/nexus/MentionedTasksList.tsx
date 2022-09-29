@@ -1,17 +1,17 @@
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import BountyIcon from '@mui/icons-material/RequestPage';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Alert, Box, Card, Grid, Typography } from '@mui/material';
+import type { User } from '@prisma/client';
+import charmClient from 'charmClient';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { MentionedTask } from 'lib/mentions/interfaces';
-import { DateTime } from 'luxon';
 import UserDisplay from 'components/common/UserDisplay';
-import { User } from '@prisma/client';
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import type { MentionedTask } from 'lib/mentions/interfaces';
+import { DateTime } from 'luxon';
+import type { GetTasksResponse } from 'pages/api/tasks/list';
 import { useEffect } from 'react';
-import charmClient from 'charmClient';
-import { GetTasksResponse } from 'pages/api/tasks/list';
-import { KeyedMutator } from 'swr';
-import BountyIcon from '@mui/icons-material/RequestPage';
-import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import type { KeyedMutator } from 'swr';
 
 function MentionedTaskRow (
   {
@@ -25,7 +25,6 @@ function MentionedTaskRow (
     createdBy,
     text,
     bountyId,
-    bountyTitle,
     type,
     commentId
   }: MentionedTask & { marked: boolean }
@@ -35,13 +34,13 @@ function MentionedTaskRow (
   let mentionLink = '';
   let mentionTitle = '';
 
-  if (type === 'bounty') {
-    mentionLink = `${baseUrl}/${spaceDomain}/bounties/${bountyId}?mentionId=${mentionId}`;
-    mentionTitle = `${bountyTitle || 'Untitled'} in ${spaceName}`;
+  if (type === 'bounty' && bountyId) {
+    mentionLink = `${baseUrl}/${spaceDomain}/bounties?bountyId=${bountyId}`;
+    mentionTitle = `${pageTitle} in ${spaceName}`;
   }
   else if (type === 'page') {
     mentionLink = `${baseUrl}/${spaceDomain}/${pagePath}?${commentId ? `commentId=${commentId}` : `mentionId=${mentionId}`}`;
-    mentionTitle = `${pageTitle || 'Untitled'} in ${spaceName}`;
+    mentionTitle = `${pageTitle} in ${spaceName}`;
   }
 
   return (
@@ -126,25 +125,25 @@ function MentionedTaskRow (
 }
 
 interface MentionedTasksListProps {
-  tasks: GetTasksResponse | undefined
-  error: any
-  mutateTasks: KeyedMutator<GetTasksResponse>
+  tasks: GetTasksResponse | undefined;
+  error: any;
+  mutateTasks: KeyedMutator<GetTasksResponse>;
 }
 
 export default function MentionedTasksList ({ tasks, error, mutateTasks }: MentionedTasksListProps) {
   useEffect(() => {
     async function main () {
       if (tasks?.mentioned && tasks.mentioned.unmarked.length !== 0) {
-        await charmClient.markTasks(tasks.mentioned.unmarked.map(unmarkedMentions => ({ id: unmarkedMentions.mentionId, type: 'mention' })));
+        await charmClient.tasks.markTasks(tasks.mentioned.unmarked.map(unmarkedMentions => ({ id: unmarkedMentions.mentionId, type: 'mention' })));
         mutateTasks((_tasks) => {
           const unmarked = _tasks?.mentioned.unmarked ?? [];
           return _tasks ? {
-            gnosis: _tasks.gnosis,
             votes: _tasks.votes,
             mentioned: {
               marked: [...unmarked, ..._tasks.mentioned.marked],
               unmarked: []
-            }
+            },
+            proposals: _tasks.proposals
           } : undefined;
         }, {
           revalidate: false

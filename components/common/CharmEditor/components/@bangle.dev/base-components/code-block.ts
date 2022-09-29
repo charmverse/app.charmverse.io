@@ -1,11 +1,12 @@
 import type { RawPlugins, RawSpecs } from '@bangle.dev/core';
-import {
+import type {
   DOMOutputSpecArray,
   EditorState,
   EditorView,
-  keymap,
   Node,
-  Schema,
+  Schema } from '@bangle.dev/pm';
+import {
+  keymap,
   setBlockType,
   textblockTypeInputRule
 } from '@bangle.dev/pm';
@@ -42,7 +43,8 @@ function specFactory (): RawSpecs {
     name,
     schema: {
       attrs: {
-        language: { default: '' }
+        language: { default: '' },
+        track: { default: [] }
       },
       content: 'text*',
       marks: '',
@@ -107,8 +109,8 @@ function pluginsFactory ({
               keybindings.tab,
               filter(
                 queryIsCodeActiveBlock(),
-                (state: EditorState, dispatch?: Function, view?: EditorView) => {
-                  if (dispatch) {
+                (state: EditorState, dispatch, view?: EditorView) => {
+                  if (dispatch && view) {
                     dispatch(state.tr.insertText('\t'));
                     view?.focus();
                   }

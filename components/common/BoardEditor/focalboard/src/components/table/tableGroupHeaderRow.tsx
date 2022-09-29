@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 /* eslint-disable max-lines */
 import React, { useState, useEffect } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -26,7 +24,7 @@ type Props = {
     activeView: BoardView
     group: BoardGroup
     groupByProperty?: IPropertyTemplate
-    readonly: boolean
+    readOnly: boolean
     hideGroup: (groupByOptionId: string) => void
     addCard: (groupByOptionId?: string) => Promise<void>
     propertyNameChanged: (option: IPropertyOption, text: string) => Promise<void>
@@ -37,7 +35,7 @@ const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
   const { board, activeView, group, groupByProperty } = props;
   const [groupTitle, setGroupTitle] = useState(group.option.value);
 
-  const [isDragging, isOver, groupHeaderRef] = useSortable('groupHeader', group.option, !props.readonly, props.onDrop);
+  const [isDragging, isOver, groupHeaderRef] = useSortable('groupHeader', group.option, !props.readOnly, props.onDrop);
   const intl = useIntl();
 
   useEffect(() => {
@@ -68,8 +66,8 @@ const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
       >
         <IconButton
           icon={<DisclosureTriangle />}
-          onClick={() => (props.readonly ? {} : props.hideGroup(group.option.id || 'undefined'))}
-          className={props.readonly ? 'readonly' : ''}
+          onClick={() => (props.readOnly ? {} : props.hideGroup(group.option.id || 'undefined'))}
+          className={props.readOnly ? 'readonly' : ''}
         />
 
         {!group.option.id
@@ -105,14 +103,14 @@ const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
                         onCancel={() => {
                           setGroupTitle(group.option.value);
                         }}
-                        readonly={props.readonly || !group.option.id}
+                        readOnly={props.readOnly || !group.option.id}
                         spellCheck={true}
                       />
                     </Label>
                     )}
       </div>
       <Button>{`${group.cards.length}`}</Button>
-      {!props.readonly
+      {!props.readOnly
                 && (
                 <>
                   <MenuWrapper>

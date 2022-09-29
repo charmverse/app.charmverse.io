@@ -2,8 +2,9 @@
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
-import { createThread, ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads';
+import { createThread } from 'lib/threads';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -19,8 +20,7 @@ async function startThread (req: NextApiRequest, res: NextApiResponse<ThreadWith
 
   const permissionSet = await computeUserPagePermissions({
     pageId,
-    userId,
-    allowAdminBypass: false
+    userId
   });
 
   if (!permissionSet.comment) {

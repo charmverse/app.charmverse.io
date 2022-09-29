@@ -2,24 +2,29 @@ import HowToVote from '@mui/icons-material/HowToVote';
 import { Alert, Box, Card, Grid, Typography } from '@mui/material';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import VoteDetail, { VoteDetailProps } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
+import type { VoteDetailProps } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
+import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';
-import { VoteTask } from 'lib/votes/interfaces';
+import VoteIcon from 'components/votes/components/VoteIcon';
+import type { VoteTask } from 'lib/votes/interfaces';
 import { DateTime } from 'luxon';
-import { GetTasksResponse } from 'pages/api/tasks/list';
+import type { GetTasksResponse } from 'pages/api/tasks/list';
 import { useState } from 'react';
-import { KeyedMutator } from 'swr';
+import type { KeyedMutator } from 'swr';
 
 interface VoteTasksListProps {
-  tasks: GetTasksResponse | undefined
-  error: any
-  mutateTasks: KeyedMutator<GetTasksResponse>
+  tasks: GetTasksResponse | undefined;
+  error: any;
+  mutateTasks: KeyedMutator<GetTasksResponse>;
 }
 
+/**
+ * Page only needs to be provided for proposal type votes
+ */
 export function VoteTasksListRow (
-  props: {voteTask: VoteTask, mutateTasks: KeyedMutator<GetTasksResponse>}
+  props: { voteTask: VoteTask, mutateTasks: KeyedMutator<GetTasksResponse> }
 ) {
   const {
     voteTask,
@@ -49,18 +54,19 @@ export function VoteTasksListRow (
   }
 
   const castVote: VoteDetailProps['castVote'] = async (voteId, choice) => {
-    const userVote = await charmClient.castVote(voteId, choice);
+    const userVote = await charmClient.votes.castVote(voteId, choice);
     removeVoteFromTask(voteId);
     return userVote;
   };
 
   const deleteVote: VoteDetailProps['deleteVote'] = async (voteId) => {
-    await charmClient.deleteVote(voteId);
+    // This is guaranteed to be inline votes so no need to add guard against proposal type votes
+    await charmClient.votes.deleteVote(voteId);
     removeVoteFromTask(voteId);
   };
 
   const cancelVote: VoteDetailProps['cancelVote'] = async (voteId) => {
-    await charmClient.cancelVote(voteId);
+    await charmClient.votes.cancelVote(voteId);
     removeVoteFromTask(voteId);
   };
 
@@ -84,6 +90,7 @@ export function VoteTasksListRow (
             }}
             fontSize={{ sm: 16, xs: 18 }}
           >
+            <VoteIcon {...voteTask} />
             {voteTitle}
           </Grid>
           <Grid
@@ -125,7 +132,7 @@ export function VoteTasksListRow (
         </Grid>
       </Card>
       <Modal
-        title='Vote details'
+        title='Poll details'
         size='large'
         open={isVoteModalOpen}
         onClose={() => {
@@ -166,7 +173,7 @@ export function VoteTasksList ({ error, tasks, mutateTasks }: VoteTasksListProps
       <Card variant='outlined'>
         <Box p={3} textAlign='center'>
           <HowToVote />
-          <Typography color='secondary'>You don't have any votes right now</Typography>
+          <Typography color='secondary'>You don't have any polls right now</Typography>
         </Box>
       </Card>
     );

@@ -1,23 +1,23 @@
 
-import { useEffect, useRef, useState } from 'react';
-import { Box, IconButton, Menu, MenuItem, TextField } from '@mui/material';
-import Button from 'components/common/Button';
-import SnoozeIcon from '@mui/icons-material/Snooze';
-import { DateTimePicker } from '@mui/x-date-pickers';
-import { DateTime } from 'luxon';
-import charmClient from 'charmClient';
-import Tooltip from '@mui/material/Tooltip';
-import { bindPopover, bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import Modal from 'components/common/Modal';
 import CancelIcon from '@mui/icons-material/Cancel';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { humanFriendlyDate } from 'lib/utilities/dates';
+import SnoozeIcon from '@mui/icons-material/Snooze';
+import { Box, IconButton, Menu, MenuItem, TextField } from '@mui/material';
+import Tooltip from '@mui/material/Tooltip';
+import { DateTimePicker } from '@mui/x-date-pickers';
+import charmClient from 'charmClient';
+import Button from 'components/common/Button';
+import Modal from 'components/common/Modal';
 import { useUser } from 'hooks/useUser';
-import { LoggedInUser } from 'models';
+import { humanFriendlyDate } from 'lib/utilities/dates';
+import { DateTime } from 'luxon';
+import { bindMenu, bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import type { LoggedInUser } from 'models';
+import { useEffect, useRef, useState } from 'react';
 import useTasksState from '../hooks/useTasksState';
 
 export default function SnoozeButton () {
-  const [, setUser] = useUser();
+  const { setUser } = useUser();
   const { isLoading, snoozedForDate, snoozedMessage, mutate: mutateTasks } = useTasksState();
 
   const isSnoozed = snoozedForDate !== null;
@@ -60,7 +60,7 @@ export default function SnoozeButton () {
   async function removeSnoozedForDate () {
     resetState();
     setShowLoading(true);
-    await charmClient.updateTasksState({
+    await charmClient.tasks.updateTasksState({
       snoozeFor: null,
       snoozeMessage: null
     });
@@ -100,7 +100,7 @@ export default function SnoozeButton () {
     resetState();
     setShowLoading(true);
     const newSnoozedForDate = getSnoozedDate();
-    await charmClient.updateTasksState({
+    await charmClient.tasks.updateTasksState({
       snoozeFor: newSnoozedForDate.toJSDate(),
       snoozeMessage: _snoozeMessage
     });

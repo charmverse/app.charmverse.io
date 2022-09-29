@@ -1,20 +1,23 @@
 import * as http from 'adapters/http';
-import { PaymentMethod } from '@prisma/client';
-import { TokenLogoPaths, CryptoCurrency, CryptoCurrencyList, getChainById, IChainDetails } from 'connectors';
+import type { PaymentMethod } from '@prisma/client';
+import type { CryptoCurrency, IChainDetails } from 'connectors';
+import { TokenLogoPaths, CryptoCurrencyList, getChainById } from 'connectors';
+import { getAlchemyBaseUrl } from 'lib/blockchain/provider/alchemy';
+import type { SupportedChainId } from '../blockchain/provider/alchemy';
 
 export interface ITokenMetadataRequest {
-  chainId: number,
-  contractAddress: string
+  chainId: SupportedChainId;
+  contractAddress: string;
 }
 
 export interface ITokenMetadata {
-  decimals: number,
-  name: string,
-  symbol: string,
-  logo?: string
+  decimals: number;
+  name: string;
+  symbol: string;
+  logo?: string;
 }
 
-export type TokenInfo = Pick<PaymentMethod, 'tokenName' | 'tokenSymbol' | 'tokenLogo'> & {isContract: boolean};
+export type TokenInfo = Pick<PaymentMethod, 'tokenName' | 'tokenSymbol' | 'tokenLogo'> & { isContract: boolean };
 
 /**
  * Call external provider to get information about a specific cryptocurrency
@@ -26,29 +29,12 @@ export function getTokenMetaData ({ chainId, contractAddress }: ITokenMetadataRe
       reject(new Error('Please provide a valid chainId and contractAddress'));
     }
 
-    const apiKey = process.env.ALCHEMY_API_KEY;
-
-    const alchemyApis: Record<number, string> = {
-      1: 'eth-mainnet',
-      4: 'eth-rinkeby',
-      5: 'eth-goerli',
-      137: 'polygon-mainnet',
-      80001: 'polygon-mumbai',
-      42161: 'arb-mainnet'
-    };
-
-    const apiSubdomain = alchemyApis[chainId];
-
-    if (!apiSubdomain) {
-      reject(new Error('Chain not supported'));
-      return;
+    let baseUrl = '';
+    try {
+      baseUrl = getAlchemyBaseUrl(chainId);
     }
-
-    const baseUrl = `https://${apiSubdomain}.g.alchemy.com/v2/${apiKey}`;
-
-    if (!apiKey) {
-      reject('Alchemy API key is missing when requesting token data');
-      return;
+    catch (e: unknown) {
+      reject(e);
     }
 
     http.POST(baseUrl, {

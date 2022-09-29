@@ -1,13 +1,11 @@
 
-import { Space } from '@prisma/client';
-import { prisma } from 'db';
-import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
-import { getSpacePublicInfo } from 'lib/spaces/getSpacePublicInfo';
+import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
+import { getSpacePublicInfo } from 'lib/spaces/getSpacePublicInfo';
+import type { PublicSpaceInfo } from 'lib/spaces/interfaces';
 import { DataNotFoundError } from 'lib/utilities/errors';
-import { PublicSpaceInfo } from 'lib/spaces/interfaces';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

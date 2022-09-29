@@ -3,15 +3,16 @@ import { Box } from '@mui/system';
 import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
-import { ReactNode, useState } from 'react';
+import type { ReactNode } from 'react';
+import { useState } from 'react';
 import { PimpedButton } from '../Button';
 import ImageSelectorGallery from './ImageSelectorGallery';
 
 interface ImageSelectorProps {
   autoOpen?: boolean;
-  onImageSelect: (imageSrc: string) => void
-  children: ReactNode
-  galleryImages?: { [category: string]: string[] }
+  onImageSelect: (imageSrc: string) => void;
+  children: ReactNode;
+  galleryImages?: { [category: string]: string[] };
 }
 
 export default function ImageSelector ({ autoOpen = false, children, galleryImages, onImageSelect }: ImageSelectorProps) {
@@ -95,7 +96,7 @@ export default function ImageSelector ({ autoOpen = false, children, galleryImag
             ]}
           />
         </Box>
-  )}
+      )}
     >
       {children}
     </PopperPopup>

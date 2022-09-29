@@ -1,10 +1,10 @@
 import { BangleEditorState } from '@bangle.dev/core';
 import { markdownSerializer } from '@bangle.dev/markdown';
 import { Node } from '@bangle.dev/pm';
-import { Page } from '@prisma/client';
-import { specRegistry } from 'components/common/CharmEditor/CharmEditor';
+import type { Page } from '@prisma/client';
 import { replaceNestedPages } from 'components/common/CharmEditor/components/nestedPage';
-import { PageContent } from 'models';
+import { specRegistry } from 'components/common/CharmEditor/specRegistry';
+import type { PageContent } from 'models';
 
 export async function generateMarkdown (page: Page, withTitle: boolean = false): Promise<string> {
 

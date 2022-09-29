@@ -1,8 +1,9 @@
-import { ReactNode, useState, useContext, useEffect } from 'react';
+import type { ReactNode } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useWeb3React } from '@web3-react/core';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
-import { User } from '@prisma/client';
+import type { User } from '@prisma/client';
 import { getKey } from 'hooks/useLocalStorage';
 import { useUser } from 'hooks/useUser';
 import { useSpaces } from 'hooks/useSpaces';
@@ -20,11 +21,11 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   const [authorized, setAuthorized] = useState(true);
   const { triedEager } = useContext(Web3Connection);
   const { account } = useWeb3React();
-  const [user, setUser, isUserRequestComplete] = useUser();
-  const [spaces, _, isSpacesLoaded] = useSpaces();
+  const { user, setUser, isLoaded } = useUser();
+  const [spaces,, isSpacesLoaded] = useSpaces();
   const isWalletLoading = (!triedEager && !account);
   const isRouterLoading = !router.isReady;
-  const isLoading = !isUserRequestComplete || isWalletLoading || isRouterLoading || !isSpacesLoaded;
+  const isLoading = !isLoaded || isWalletLoading || isRouterLoading || !isSpacesLoaded;
 
   if (typeof window !== 'undefined') {
     const pathSegments: string[] = router.asPath.split('?')[0].split('/').filter(segment => !!segment);

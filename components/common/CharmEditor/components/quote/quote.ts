@@ -1,5 +1,5 @@
 import { type BaseRawNodeSpec } from '@bangle.dev/core';
-import {
+import type {
   DOMOutputSpec,
   Node
 } from '@bangle.dev/pm';
@@ -12,6 +12,9 @@ export function spec (): BaseRawNodeSpec {
     type: 'node',
     name,
     schema: {
+      attrs: {
+        track: { default: [] }
+      },
       content: 'block*',
       group: 'block',
       defining: true,

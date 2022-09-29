@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 
 import React from 'react';
 
@@ -8,20 +6,20 @@ import { useIntl } from 'react-intl';
 import CardIcon from '../../widgets/icons/card';
 import Menu from '../../widgets/menu';
 
-import MenuWrapper from '../../widgets/menuWrapper';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { BoardView } from '../../blocks/boardView';
+import mutator from '../../mutator';
 import IconButton from '../../widgets/buttons/iconButton';
 import CheckIcon from '../../widgets/icons/check';
-import mutator from '../../mutator';
-import { useAppSelector } from '../../store/hooks';
-import { getCurrentView } from '../../store/views';
+import MenuWrapper from '../../widgets/menuWrapper';
 
 type Props = {
     addCard: () => void
+    view: BoardView
 }
 
 const EmptyCardButton = React.memo((props: Props) => {
-  const currentView = useAppSelector(getCurrentView);
+  const currentView = props.view;
   const intl = useIntl();
 
   return (

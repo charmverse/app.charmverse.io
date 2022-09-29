@@ -1,9 +1,9 @@
 import { prisma } from 'db';
 import { includePagePermissions } from 'lib/pages/server';
 import { WrongStateError } from 'lib/utilities/errors';
-import { BountyWithDetails } from 'models';
+import type { BountyWithDetails } from 'lib/bounties';
 import { getBountyOrThrow } from './getBounty';
-import { SuggestionAction, SuggestionApproveAction, SuggestionRejectAction } from './interfaces';
+import type { SuggestionAction, SuggestionApproveAction, SuggestionRejectAction } from './interfaces';
 
 /**
  * Returns true if we reject bounty (and it's deleted)

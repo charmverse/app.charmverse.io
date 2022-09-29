@@ -1,6 +1,7 @@
-import { Node } from '@bangle.dev/pm';
+import type { Node } from '@bangle.dev/pm';
 import styled from '@emotion/styled';
-import { ReactNode, memo } from 'react';
+import type { ReactNode } from 'react';
+import { memo } from 'react';
 
 const StyledColumnBlock = styled.div`
   border-radius: ${({ theme }) => theme.spacing(0.5)};
@@ -23,7 +24,7 @@ const StyledColumnBlock = styled.div`
   }
 `;
 
-function ColumnBlock ({ children, node }: {node: Node, children: ReactNode}) {
+function ColumnBlock ({ children, node }: { node: Node, children: ReactNode }) {
   return (
     <StyledColumnBlock>
       <div>

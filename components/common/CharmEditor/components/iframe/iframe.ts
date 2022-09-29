@@ -1,5 +1,6 @@
-import { Plugin, RawSpecs } from '@bangle.dev/core';
-import { EditorState, EditorView, Node, Schema, Slice, Transaction } from '@bangle.dev/pm';
+import type { RawSpecs } from '@bangle.dev/core';
+import { Plugin } from '@bangle.dev/core';
+import type { EditorState, EditorView, Node, Schema, Slice, Transaction } from '@bangle.dev/pm';
 
 import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT } from 'lib/embed/constants';
 import { extractEmbedLink } from 'lib/embed/extractEmbedLink';
@@ -79,6 +80,9 @@ export function spec (): RawSpecs {
         // Type of iframe, it could either be video or embed
         type: {
           default: 'embed'
+        },
+        track: {
+          default: []
         }
       },
       group: 'block',

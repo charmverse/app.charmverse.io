@@ -1,18 +1,18 @@
-import {
-  MjmlSection,
-  MjmlColumn,
-  MjmlText,
-  MjmlDivider
-} from 'mjml-react';
-import { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
-import { shortenHex } from 'lib/utilities/strings';
-import { darkModeColors, greyColor2 } from 'theme/colors';
+import type { User } from '@prisma/client';
+import { ProposalStatusColors } from 'components/proposals/components/ProposalStatusBadge';
+import type { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
 import log from 'lib/log';
-import { MentionedTask } from 'lib/mentions/interfaces';
-import { VoteTask } from 'lib/votes/interfaces';
+import type { MentionedTask } from 'lib/mentions/interfaces';
+import type { ProposalTask } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';
+import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
+import { shortenHex } from 'lib/utilities/strings';
+import type { VoteTask } from 'lib/votes/interfaces';
 import { DateTime } from 'luxon';
-import { User } from '@prisma/client';
-import { Feedback, Footer, Header, EmailWrapper } from './components';
+import {
+  MjmlColumn, MjmlDivider, MjmlSection, MjmlText
+} from 'mjml-react';
+import { darkModeColors, greyColor2, lightModeColors } from 'theme/colors';
+import { EmailWrapper, Feedback, Footer, Header } from './components';
 
 const charmverseUrl = process.env.DOMAIN;
 
@@ -24,14 +24,15 @@ const h2Style = { lineHeight: '1.2em', fontSize: '24px', fontWeight: 'bold', mar
 
 export interface PendingTasksProps {
   gnosisSafeTasks: GnosisSafeTasks[];
-  mentionedTasks: MentionedTask[]
-  totalTasks: number
-  voteTasks: VoteTask[]
+  mentionedTasks: MentionedTask[];
+  totalTasks: number;
+  voteTasks: VoteTask[];
+  proposalTasks: ProposalTask[];
   // eslint-disable-next-line
   user: TemplateUser
 }
 
-function ViewAllText ({ href }: {href: string}) {
+function ViewAllText ({ href }: { href: string }) {
   return (
     <MjmlText>
       <a
@@ -48,10 +49,12 @@ export default function PendingTasks (props: PendingTasksProps) {
   const totalMentionTasks = props.mentionedTasks.length;
   const totalVoteTasks = props.voteTasks.length;
   const totalGnosisSafeTasks = props.gnosisSafeTasks.length;
+  const totalProposalTasks = props.proposalTasks.length;
 
   const nexusDiscussionLink = `${charmverseUrl}/nexus?task=discussion`;
   const nexusVoteLink = `${charmverseUrl}/nexus?task=vote`;
   const nexusMultisigLink = `${charmverseUrl}/nexus?task=multisig`;
+  const nexusProposalLink = `${charmverseUrl}/nexus?task=proposal`;
 
   const mentionSection = totalMentionTasks > 0 ? (
     <>
@@ -84,6 +87,37 @@ export default function PendingTasks (props: PendingTasksProps) {
     </>
   ) : null;
 
+  const proposalSection = totalProposalTasks > 0 ? (
+    <>
+      <MjmlText>
+        <div style={{
+          marginBottom: 15
+        }}
+        >
+          <a
+            href={nexusProposalLink}
+            style={{
+              marginRight: 15
+            }}
+          >
+            <span style={h2Style}>{totalProposalTasks} Proposal{totalProposalTasks > 1 ? 's' : ''}</span>
+          </a>
+          <a href={nexusProposalLink} style={buttonStyle}>
+            View
+          </a>
+        </div>
+      </MjmlText>
+      {props.proposalTasks.slice(0, MAX_ITEMS_PER_TASK).map(proposalTask => (
+        <ProposalTaskMjml
+          key={proposalTask.id}
+          task={proposalTask}
+        />
+      ))}
+      {totalProposalTasks > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusProposalLink} /> : null}
+      <MjmlDivider />
+    </>
+  ) : null;
+
   const voteSection = totalVoteTasks > 0 ? (
     <>
       <MjmlText>
@@ -97,7 +131,7 @@ export default function PendingTasks (props: PendingTasksProps) {
               marginRight: 15
             }}
           >
-            <span style={h2Style}>{totalVoteTasks} Vote{totalVoteTasks > 1 ? 's' : ''}</span>
+            <span style={h2Style}>{totalVoteTasks} Poll{totalVoteTasks > 1 ? 's' : ''}</span>
           </a>
           <a href={nexusVoteLink} style={buttonStyle}>
             Vote now
@@ -151,9 +185,9 @@ export default function PendingTasks (props: PendingTasksProps) {
             <h3>{tasksRequiresYourAttention({ count: props.totalTasks })}.</h3>
           </MjmlText>
           {multisigSection}
+          {proposalSection}
           {voteSection}
           {mentionSection}
-
         </MjmlColumn>
       </MjmlSection>
       <Feedback />
@@ -162,7 +196,7 @@ export default function PendingTasks (props: PendingTasksProps) {
   );
 }
 
-function VoteTaskMjml ({ task }: {task: VoteTask}) {
+function VoteTaskMjml ({ task }: { task: VoteTask }) {
   const pageWorkspaceTitle = `${task.page.title || 'Untitled'} | ${task.space.name}`;
   return (
     <MjmlText>
@@ -189,7 +223,31 @@ function VoteTaskMjml ({ task }: {task: VoteTask}) {
   );
 }
 
-function MentionTask ({ task: { text, spaceName, pageTitle } }: {task: MentionedTask}) {
+function ProposalTaskMjml ({ task }: { task: ProposalTask }) {
+  const pageWorkspaceTitle = `${task.pageTitle || 'Untitled'} | ${task.spaceName}`;
+  return (
+    <MjmlText>
+      <a
+        href={`${charmverseUrl}/${task.spaceDomain}/${task.pagePath}`}
+        style={{
+          display: 'block'
+        }}
+      >
+        <div style={{ ...h2Style, fontSize: '18px', fontWeight: 'bold', marginBottom: 10, color: '#000' }}>
+          {pageWorkspaceTitle}
+        </div>
+      </a>
+
+      <div style={{ fontSize: '0.75rem', width: 'fit-content', display: 'flex', alignItems: 'center', height: '24px', borderRadius: '16px', backgroundColor: lightModeColors[ProposalStatusColors[task.status]], fontWeight: 500 }}>
+        <span style={{ paddingLeft: '8px', paddingRight: '8px' }}>
+          {PROPOSAL_STATUS_LABELS[task.status]}
+        </span>
+      </div>
+    </MjmlText>
+  );
+}
+
+function MentionTask ({ task: { text, spaceName, pageTitle } }: { task: MentionedTask }) {
   const pageWorkspaceTitle = `${pageTitle || 'Untitled'} | ${spaceName}`;
   return (
     <MjmlText>
@@ -210,7 +268,6 @@ function MentionTask ({ task: { text, spaceName, pageTitle } }: {task: Mentioned
 
 function MultisigTask ({ task }: { task: GnosisSafeTasks }) {
   log.debug('multi sig task', task);
-  // console.log('multi sig task...', task.tasks[0].transactions);
   return (
     <MjmlText>
       <strong style={{ color: '#000' }}>

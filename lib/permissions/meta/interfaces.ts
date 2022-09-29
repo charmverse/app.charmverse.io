@@ -1,4 +1,4 @@
-import { Space, SpaceOperation, SpacePermissionConfigurationMode } from '@prisma/client';
+import type { Space, SpaceOperation, SpacePermissionConfigurationMode } from '@prisma/client';
 
 export interface SpacePermissionConfigurationUpdate {
   spaceId: string;
@@ -7,6 +7,6 @@ export interface SpacePermissionConfigurationUpdate {
 export type SpaceConfigurationPreset = Exclude<SpacePermissionConfigurationMode, 'custom'>
 
 export interface SpacePermissionTemplate {
-  spaceOperations: Record<SpaceOperation, boolean>
-  pagePermissionDefaults: Pick<Space, 'defaultPagePermissionGroup' | 'defaultPublicPages' | 'publicBountyBoard'>
+  spaceOperations: Record<SpaceOperation, boolean>;
+  pagePermissionDefaults: Pick<Space, 'defaultPagePermissionGroup' | 'defaultPublicPages' | 'publicBountyBoard'>;
 }

@@ -1,17 +1,18 @@
 
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
-import { Page } from 'models';
+import type { Page } from 'models';
 import { useCallback, memo, useEffect } from 'react';
 import { usePages } from 'hooks/usePages';
-import { PluginKey } from 'prosemirror-state';
+import type { PluginKey } from 'prosemirror-state';
 import { safeScrollIntoViewIfNeeded } from 'lib/browser';
 import { insertNestedPage } from 'lib/prosemirror/insertNestedPage';
-import { hideSuggestionsTooltip, SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggest-tooltip';
+import type { SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggest-tooltip';
+import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
-import { PagesList } from '../../PageList';
-import { NestedPagePluginState } from '../nestedPage.interfaces';
+import PagesList from '../../PageList';
+import type { NestedPagePluginState } from '../nestedPage.interfaces';
 
-function NestedPagesList ({ pluginKey }: {pluginKey: PluginKey<NestedPagePluginState>}) {
+function NestedPagesList ({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginState> }) {
   const { pages } = usePages();
   const view = useEditorViewContext();
   const {

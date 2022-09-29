@@ -1,9 +1,9 @@
-import { Page, Space, User } from '@prisma/client';
+import type { Page, Space, User } from '@prisma/client';
+import { prisma } from 'db';
+import { upsertPermission } from 'lib/permissions/pages';
 import request from 'supertest';
 import { baseUrl } from 'testing/mockApiCall';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { upsertPermission } from 'lib/permissions/pages';
-import { prisma } from 'db';
 
 let nonAdminUser: User;
 let nonAdminUserSpace: Space;
@@ -27,7 +27,8 @@ describe('GET /api/public/pages/[pageId] - Load public page', () => {
       createdBy: nonAdminUser.id,
       spaceId: nonAdminUserSpace.id,
       contentText: exampleText,
-      path: pagePath
+      path: pagePath,
+      content: {}
     });
 
     const publicPermission = await upsertPermission((await page).id, {
@@ -37,7 +38,7 @@ describe('GET /api/public/pages/[pageId] - Load public page', () => {
 
     const foundPage = (await request(baseUrl)
       .get(`/api/public/pages/${page.id}`)
-      .expect(200)).body as {page: Page};
+      .expect(200)).body as { page: Page };
 
     expect(foundPage.page.contentText).toBe(exampleText);
 
@@ -54,7 +55,8 @@ describe('GET /api/public/pages/[pageId] - Load public page', () => {
       createdBy: nonAdminUser.id,
       spaceId: nonAdminUserSpace.id,
       contentText: exampleText,
-      path: pagePath
+      path: pagePath,
+      content: {}
     });
 
     const publicPermission = await upsertPermission((await page).id, {
@@ -64,7 +66,7 @@ describe('GET /api/public/pages/[pageId] - Load public page', () => {
 
     const foundPage = (await request(baseUrl)
       .get(`/api/public/pages/${nonAdminUserSpace.domain}/${pagePath}`)
-      .expect(200)).body as {page: Page};
+      .expect(200)).body as { page: Page };
 
     expect(foundPage.page.contentText).toBe(exampleText);
 
@@ -80,7 +82,8 @@ describe('GET /api/public/pages/[pageId] - Load public page', () => {
       createdBy: nonAdminUser.id,
       spaceId: nonAdminUserSpace.id,
       contentText: exampleText,
-      path: pagePath
+      path: pagePath,
+      content: {}
     });
 
     await request(baseUrl)

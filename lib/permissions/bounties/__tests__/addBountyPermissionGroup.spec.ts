@@ -1,4 +1,5 @@
-import { BountyPermission, BountyPermissionLevel, Space, User } from '@prisma/client';
+import type { BountyPermission, Space, User } from '@prisma/client';
+import { BountyPermissionLevel } from '@prisma/client';
 import { prisma } from 'db';
 import { DataNotFoundError, InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
@@ -86,7 +87,7 @@ describe('addBountyPermissionGroup', () => {
       select: {
         permissions: true
       }
-    }) as {permissions: BountyPermission[]};
+    }) as { permissions: BountyPermission[] };
 
     expect(updatedBounty.permissions.length).toBe(1);
 

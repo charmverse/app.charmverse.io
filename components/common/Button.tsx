@@ -3,7 +3,8 @@ import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import NextLink from 'next/link';
 import MuiLink from '@mui/material/Link';
-import { ComponentProps, ElementType, forwardRef, MouseEventHandler } from 'react';
+import type { ComponentProps, ElementType, MouseEventHandler } from 'react';
+import { forwardRef } from 'react';
 
 const StyledButton = styled(Button)`
   white-space: nowrap;
@@ -46,10 +47,17 @@ const PimpedButtonWithNextLink = forwardRef<HTMLButtonElement, InputProps<Elemen
     // @ts-ignore
     const mouseOnClick = onClick as MouseEventHandler<HTMLAnchorElement>;
     return (
-      <NextLink href={href} passHref>
+      <NextLink
+        href={href}
+        passHref
+      >
         {/** use an anchor tag to catch the ref passed down by NextLink.
        *  see https://github.com/vercel/next.js/issues/7915 */}
-        <MuiLink target={target} id={id} onClick={mouseOnClick}>
+        <MuiLink
+          target={target}
+          id={id}
+          onClick={mouseOnClick}
+        >
           <PimpedButton {...props}>{children}</PimpedButton>
         </MuiLink>
       </NextLink>

@@ -1,20 +1,20 @@
 import styled from '@emotion/styled';
-import { ListItemButton } from '@mui/material';
-import Box from '@mui/material/Box';
 import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
 import ImageIcon from '@mui/icons-material/Image';
+import { ListItemButton } from '@mui/material';
+import Box from '@mui/material/Box';
 import { BlockIcons } from 'components/common/BoardEditor/focalboard/src/blockIcons';
+import { randomEmojiList } from 'components/common/BoardEditor/focalboard/src/emojiList';
 import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import FBEmojiIcon from 'components/common/BoardEditor/focalboard/src/widgets/icons/emoji';
 import Menu from 'components/common/BoardEditor/focalboard/src/widgets/menu';
 import MenuWrapper from 'components/common/BoardEditor/focalboard/src/widgets/menuWrapper';
-import { randomEmojiList } from 'components/common/BoardEditor/focalboard/src/emojiList';
-import { randomIntFromInterval } from 'lib/utilities/random';
-import { Page } from 'models';
-import { ChangeEvent, memo } from 'react';
-import { useIntl } from 'react-intl';
 import EmojiIcon from 'components/common/Emoji';
+import { DeleteIcon } from 'components/common/Icons/DeleteIcon';
+import { randomIntFromInterval } from 'lib/utilities/random';
+import type { Page } from 'models';
+import type { ChangeEvent } from 'react';
+import { memo } from 'react';
 import { randomBannerImage } from './PageBanner';
 import PageTitleInput from './PageTitleInput';
 
@@ -55,7 +55,7 @@ const EditorHeader = styled.div`
 `;
 
 interface PageHeaderProps {
-  headerImage: string | null,
+  headerImage: string | null;
   icon: string | null;
   readOnly: boolean;
   title: string;
@@ -63,7 +63,6 @@ interface PageHeaderProps {
 }
 
 function PageHeader ({ headerImage, icon, readOnly, setPage, title }: PageHeaderProps) {
-  const intl = useIntl();
 
   function addPageIcon () {
     const _icon = randomEmojiList[randomIntFromInterval(0, randomEmojiList.length - 1)];
@@ -86,56 +85,56 @@ function PageHeader ({ headerImage, icon, readOnly, setPage, title }: PageHeader
     <>
       <EditorHeader>
         {icon && (
-        <MenuWrapper>
-          <EmojiIcon size='large' icon={icon} />
-          <Menu>
-            <Menu.Text
-              id='random'
-              icon={<FBEmojiIcon />}
-              name={intl.formatMessage({ id: 'ViewTitle.random-icon', defaultMessage: 'Random' })}
-              onClick={() => {
-                updatePageIcon(BlockIcons.shared.randomIcon());
-              }}
-            />
-            <Menu.SubMenu
-              id='pick'
-              icon={<FBEmojiIcon />}
-              name={intl.formatMessage({ id: 'ViewTitle.pick-icon', defaultMessage: 'Pick icon' })}
-            >
-              <EmojiPicker onSelect={(emoji) => {
-                updatePageIcon(emoji);
-              }}
+          <MenuWrapper>
+            <EmojiIcon size='large' icon={icon} />
+            <Menu>
+              <Menu.Text
+                id='random'
+                icon={<FBEmojiIcon />}
+                name='Random'
+                onClick={() => {
+                  updatePageIcon(BlockIcons.shared.randomIcon());
+                }}
               />
-            </Menu.SubMenu>
-            <Menu.Text
-              id='remove'
-              icon={<DeleteOutlineIcon fontSize='small' color='secondary' />}
-              name={intl.formatMessage({ id: 'ViewTitle.remove-icon', defaultMessage: 'Remove icon' })}
-              onClick={() => {
-                updatePageIcon(null);
-              }}
-            />
-          </Menu>
-        </MenuWrapper>
+              <Menu.SubMenu
+                id='pick'
+                icon={<FBEmojiIcon />}
+                name='Pick icon'
+              >
+                <EmojiPicker onSelect={(emoji) => {
+                  updatePageIcon(emoji);
+                }}
+                />
+              </Menu.SubMenu>
+              <Menu.Text
+                id='remove'
+                icon={<DeleteIcon />}
+                name='Remove icon'
+                onClick={() => {
+                  updatePageIcon(null);
+                }}
+              />
+            </Menu>
+          </MenuWrapper>
         )}
         <Controls className='page-controls'>
           {!readOnly && !icon && (
-          <PageControlItem onClick={addPageIcon}>
-            <EmojiEmotionsIcon
-              fontSize='small'
-              sx={{ marginRight: 1 }}
-            />
-            Add icon
-          </PageControlItem>
+            <PageControlItem onClick={addPageIcon}>
+              <EmojiEmotionsIcon
+                fontSize='small'
+                sx={{ marginRight: 1 }}
+              />
+              Add icon
+            </PageControlItem>
           )}
           {!readOnly && !headerImage && (
-          <PageControlItem onClick={addPageHeader}>
-            <ImageIcon
-              fontSize='small'
-              sx={{ marginRight: 1 }}
-            />
-            Add cover
-          </PageControlItem>
+            <PageControlItem onClick={addPageHeader}>
+              <ImageIcon
+                fontSize='small'
+                sx={{ marginRight: 1 }}
+              />
+              Add cover
+            </PageControlItem>
           )}
         </Controls>
       </EditorHeader>

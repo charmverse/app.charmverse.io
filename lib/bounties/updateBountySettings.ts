@@ -1,10 +1,10 @@
 import { prisma } from 'db';
 import { DataNotFoundError, InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
-import { BountyWithDetails } from 'models';
+import type { BountyWithDetails } from 'lib/bounties';
 import { countValidSubmissions } from '../applications/shared';
 import { setBountyPermissions } from '../permissions/bounties';
 import { getBountyOrThrow } from './getBounty';
-import { BountyUpdate } from './interfaces';
+import type { BountyUpdate } from './interfaces';
 
 export async function updateBountySettings ({
   bountyId,

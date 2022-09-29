@@ -1,5 +1,5 @@
-import { Box, CircularProgress, Typography } from '@mui/material';
 import styled from '@emotion/styled';
+import { Box, CircularProgress, Typography } from '@mui/material';
 
 const Container = styled(Box)`
   display: flex;
@@ -13,7 +13,7 @@ export interface ILoaderInput {
   message?: string;
   size?: number;
   sx?: any;
-  position?: 'left' | 'right'
+  position?: 'left' | 'right';
 }
 
 export default function Loader ({ message, size, sx, position = 'left' }: ILoaderInput) {

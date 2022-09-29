@@ -1,10 +1,10 @@
 
 import { postToDiscord } from 'lib/log/userEvents';
-import { InvalidStateError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { applyTokenGates } from 'lib/token-gates/applyTokenGates';
-import { TokenGateVerification } from 'lib/token-gates/interfaces';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { TokenGateVerification } from 'lib/token-gates/interfaces';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

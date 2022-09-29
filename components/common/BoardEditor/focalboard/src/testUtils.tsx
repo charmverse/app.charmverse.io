@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import { IntlProvider } from 'react-intl';
 import React from 'react';
 import { DndProvider } from 'react-dnd';
@@ -56,7 +54,7 @@ export function mockStateStore (middleware:Middleware[], state:unknown): MockSto
 
 export type BlocksById<BlockType> = {[key: string]: BlockType}
 
-export function blocksById<BlockType extends Block> (blocks: Array<BlockType>): BlocksById<BlockType> {
+export function blocksById<BlockType extends Block> (blocks: BlockType[]): BlocksById<BlockType> {
   return blocks.reduce((res, block) => {
     res[block.id] = block;
     return res;

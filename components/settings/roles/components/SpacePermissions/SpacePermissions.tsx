@@ -1,5 +1,4 @@
 
-import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
@@ -12,13 +11,15 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
-import { SpaceOperation } from '@prisma/client';
+import type { SpaceOperation } from '@prisma/client';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { AssignablePermissionGroups } from 'lib/permissions/interfaces';
-import { AvailableSpacePermissions, spaceOperationLabels, spaceOperations, SpacePermissionFlags } from 'lib/permissions/spaces/client';
+import { usePreventReload } from 'hooks/usePreventReload';
+import type { AssignablePermissionGroups } from 'lib/permissions/interfaces';
+import type { SpacePermissionFlags } from 'lib/permissions/spaces/client';
+import { AvailableSpacePermissions, spaceOperationLabels, spaceOperations } from 'lib/permissions/spaces/client';
 import { useForm } from 'react-hook-form';
+import type { BooleanSchema } from 'yup';
 import * as yup from 'yup';
-import { BooleanSchema } from 'yup';
 
 const fields: Record<SpaceOperation, BooleanSchema> = spaceOperations().reduce((_schema: Record<SpaceOperation, BooleanSchema>, op) => {
   _schema[op] = yup.boolean();
@@ -34,8 +35,8 @@ type FormValues = yup.InferType<typeof schema>
  */
 interface Props {
   targetGroup: AssignablePermissionGroups;
-  id: string,
-  callback?: () => void
+  id: string;
+  callback?: () => void;
 }
 
 export default function SpacePermissions ({ targetGroup, id, callback = () => null }: Props) {
@@ -45,12 +46,10 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
   const [space] = useCurrentSpace();
 
   const isAdmin = useIsAdmin();
-
+  // custom onChange is used for switches so isDirty from useForm doesn't change it value
+  const [touched, setTouched] = useState<boolean>(false);
   const {
-    register,
     handleSubmit,
-    reset,
-    formState: { errors, isValid },
     setValue,
     watch
   } = useForm<FormValues>({
@@ -58,6 +57,8 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
     defaultValues: assignedPermissions ?? new AvailableSpacePermissions().empty,
     resolver: yupResolver(schema)
   });
+
+  usePreventReload(touched);
 
   const newValues = watch();
 
@@ -85,7 +86,7 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
     refreshGroupPermissions();
   }, []);
 
-  const settingsChanged = assignedPermissions !== null && (Object.entries(assignedPermissions) as Array<[SpaceOperation, boolean]>)
+  const settingsChanged = assignedPermissions !== null && (Object.entries(assignedPermissions) as [SpaceOperation, boolean][])
     .some(([operation, hasAccess]) => {
       const newValue = newValues[operation];
       return newValue !== hasAccess;
@@ -99,7 +100,7 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
       const permissionsToRemove: SpaceOperation[] = [];
 
       // Only get new values
-      (Object.entries(formValues) as Array<[SpaceOperation, boolean]>).forEach(([operation, hasAccess]) => {
+      (Object.entries(formValues) as [SpaceOperation, boolean][]).forEach(([operation, hasAccess]) => {
         if (assignedPermissions[operation] !== hasAccess) {
 
           if (hasAccess === true) {
@@ -135,6 +136,7 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
       // Force a refresh of rendered components
       setAssignedPermissions(newPermissionState);
       callback();
+      setTouched(false);
     }
   }
 
@@ -179,14 +181,14 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
                     control={(
                       <Switch
                         disabled={!isAdmin}
-//                        checked={newValues[operation]}
+                        defaultChecked={userCanPerformAction}
                         onChange={(ev) => {
                           const { checked: nowHasAccess } = ev.target;
                           setValue(operation, nowHasAccess);
+                          setTouched(true);
                         }}
-                        defaultChecked={userCanPerformAction}
                       />
-                  )}
+                    )}
                     label={actionLabel}
                   />
                 </Grid>

@@ -1,11 +1,8 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
-import React from 'react';
 import { useIntl } from 'react-intl';
 
+import { IPropertyTemplate } from '../../../blocks/board';
 import { Card } from '../../../blocks/card';
 import Button from '../../../widgets/buttons/button';
-import { IPropertyTemplate } from '../../../blocks/board';
 
 import Calculations from '../../calculations/calculations';
 
@@ -20,7 +17,7 @@ type Props = {
     onChange: (data: { calculation: string, propertyId: string }) => void
     value: string
     property: IPropertyTemplate
-    readonly: boolean
+    readOnly: boolean
 }
 
 function KanbanCalculation (props: Props): JSX.Element {
@@ -37,7 +34,7 @@ function KanbanCalculation (props: Props): JSX.Element {
       </Button>
 
       {
-                !props.readonly && props.menuOpen && (
+                !props.readOnly && props.menuOpen && (
                 <KanbanCalculationOptions
                   value={props.value}
                   property={props.property}
@@ -55,5 +52,6 @@ function KanbanCalculation (props: Props): JSX.Element {
 }
 
 export {
-  KanbanCalculation
+    KanbanCalculation
 };
+

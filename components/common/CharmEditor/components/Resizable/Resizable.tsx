@@ -1,7 +1,8 @@
-import { NodeViewProps } from '@bangle.dev/core';
-import { EditorView } from '@bangle.dev/pm';
+import type { NodeViewProps } from '@bangle.dev/core';
+import type { EditorView } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
-import { ReactNode, useCallback, useState, memo, useRef } from 'react';
+import type { ReactNode } from 'react';
+import { useCallback, useState, memo, useRef } from 'react';
 import BlockAligner from '../BlockAligner';
 import HorizontalResizer from './HorizontalResizer';
 

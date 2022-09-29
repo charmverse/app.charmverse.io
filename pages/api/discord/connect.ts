@@ -1,15 +1,17 @@
 import nc from 'next-connect';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import { withSessionRoute } from 'lib/session/withSession';
 import { authenticatedRequest } from 'lib/discord/handleDiscordResponse';
 import { findOrCreateRoles } from 'lib/roles/createRoles';
-import { assignRolesFromDiscord, DiscordGuildMember } from 'lib/discord/assignRoles';
-import { DiscordUser } from '@prisma/client';
+import type { DiscordGuildMember } from 'lib/discord/assignRoles';
+import { assignRolesFromDiscord } from 'lib/discord/assignRoles';
+import type { DiscordUser } from '@prisma/client';
 import log from 'lib/log';
 import { prisma } from 'db';
-import { getDiscordAccount, DiscordAccount } from 'lib/discord/getDiscordAccount';
-import { DiscordServerRole } from 'lib/discord/interface';
+import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
+import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
+import type { DiscordServerRole } from 'lib/discord/interface';
 import { getUserS3Folder, uploadToS3 } from 'lib/aws/uploadToS3Server';
 import { IDENTITY_TYPES } from 'models';
 
@@ -19,17 +21,17 @@ const handler = nc({
 });
 
 export interface ConnectDiscordPayload {
-  code: string
+  code: string;
 }
 
 export interface ConnectDiscordResponse {
-  discordUser: DiscordUser,
-  avatar: string | null,
-  username: string | null
+  discordUser: DiscordUser;
+  avatar: string | null;
+  username: string | null;
 }
 
 // TODO: Add nonce for oauth state
-async function connectDiscord (req: NextApiRequest, res: NextApiResponse<ConnectDiscordResponse | {error: string}>) {
+async function connectDiscord (req: NextApiRequest, res: NextApiResponse<ConnectDiscordResponse | { error: string }>) {
   const { code } = req.body as ConnectDiscordPayload;
   if (!code) {
     res.status(400).json({
@@ -41,7 +43,8 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
   let discordAccount: DiscordAccount;
 
   try {
-    discordAccount = await getDiscordAccount(code, req.headers.host?.startsWith('localhost') ? `http://${req.headers.host}/api/discord/callback` : 'https://app.charmverse.io/api/discord/callback');
+    const domain = req.headers.host?.startsWith('localhost') ? `http://${req.headers.host}` : `https://${req.headers.host}`;
+    discordAccount = await getDiscordAccount(code, `${domain}/api/discord/callback`);
   }
   catch (error) {
     log.warn('Error while connecting to Discord', error);
@@ -69,7 +72,7 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
     });
   }
   catch (error) {
-    log.warn('Error while connecting to Discord', error);
+    log.warn('Error while creating Discord record - probably a duplicate account', error);
     // If the discord user is already connected to a charmverse account this code will be run
     res.status(400).json({
       error: 'Connection to Discord failed. Another CharmVerse account is already associated with this Discord account.'
@@ -80,7 +83,12 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
   const avatarUrl = discordAccount.avatar ? `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png` : undefined;
   let avatar: string | null = null;
   if (avatarUrl) {
-    ({ url: avatar } = await uploadToS3({ fileName: getUserS3Folder({ userId, url: avatarUrl }), url: avatarUrl }));
+    try {
+      ({ url: avatar } = await uploadToS3({ fileName: getUserS3Folder({ userId, url: avatarUrl }), url: avatarUrl }));
+    }
+    catch (err) {
+      log.warn('Error while uploading avatar to S3', err);
+    }
   }
 
   const updatedUser = await prisma.user.update({

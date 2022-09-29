@@ -1,21 +1,23 @@
 import { Client } from '@notionhq/client';
-import { BlockNode, CalloutNode, ColumnBlockNode, ColumnLayoutNode, DisclosureDetailsNode, ListItemNode, MentionNode, Page, PageContent, TableNode, TableRowNode, TextContent } from 'models';
-import { ListBlockChildrenParameters } from '@notionhq/client/build/src/api-endpoints';
-import { PageType, Prisma } from '@prisma/client';
+import type { ListBlockChildrenParameters } from '@notionhq/client/build/src/api-endpoints';
+import type { PageType, Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { v4 as uuid } from 'uuid';
-import log from 'lib/log';
+import { getFilePath, uploadToS3 } from 'lib/aws/uploadToS3Server';
+import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MIN_EMBED_WIDTH, VIDEO_ASPECT_RATIO } from 'lib/embed/constants';
 import { extractEmbedLink } from 'lib/embed/extractEmbedLink';
-import { MIN_EMBED_WIDTH, MAX_EMBED_WIDTH, VIDEO_ASPECT_RATIO, MIN_EMBED_HEIGHT } from 'lib/embed/constants';
-import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/image/constants';
-import { createBoard, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import { createBoard } from 'lib/focalboard/board';
 import { createBoardView } from 'lib/focalboard/boardView';
 import { createCard } from 'lib/focalboard/card';
-import promiseRetry from 'promise-retry';
-import { isTruthy } from 'lib/utilities/types';
-import { getFilePath, uploadToS3 } from 'lib/aws/uploadToS3Server';
+import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/image/constants';
+import log from 'lib/log';
+import { getPagePath } from 'lib/pages/utils';
 import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
-import { BlockObjectResponse, GetDatabaseResponse, GetPageResponse, RichTextItemResponse, NotionImage } from './types';
+import { isTruthy } from 'lib/utilities/types';
+import type { BlockNode, CalloutNode, ColumnBlockNode, ColumnLayoutNode, DisclosureDetailsNode, ListItemNode, MentionNode, Page, PageContent, TableNode, TableRowNode, TextContent } from 'models';
+import promiseRetry from 'promise-retry';
+import { v4 as uuid } from 'uuid';
+import type { BlockObjectResponse, GetDatabaseResponse, GetPageResponse, NotionImage, RichTextItemResponse } from './types';
 
 // Limit the highest number of pages that can be imported
 const IMPORTED_PAGES_LIMIT = 10000;
@@ -23,8 +25,8 @@ const BLOCKS_FETCHED_PER_REQUEST = 100;
 const MAX_CHILD_BLOCK_DEPTH = 10;
 
 function convertRichText (richTexts: RichTextItemResponse[]): {
-  contents: (TextContent | MentionNode)[],
-  inlineLinkedPages: MentionNode[]
+  contents: (TextContent | MentionNode)[];
+  inlineLinkedPages: MentionNode[];
 } {
   const contents: (TextContent | MentionNode)[] = [];
   const inlineLinkedPages: MentionNode[] = [];
@@ -100,9 +102,9 @@ function convertRichText (richTexts: RichTextItemResponse[]): {
 }
 
 interface ChildBlockListResponse {
-  request: ListBlockChildrenParameters,
-  results: BlockObjectResponse[],
-  next_cursor: string | null
+  request: ListBlockChildrenParameters;
+  results: BlockObjectResponse[];
+  next_cursor: string | null;
 }
 
 type BlockWithChildren = BlockObjectResponse & { children: string[], pageId: string };
@@ -120,13 +122,13 @@ async function populateDoc (
     onChildDatabase,
     onChildPage
   }: {
-    parentNode: BlockNode,
-    block: BlockWithChildren,
-    blocksRecord: Record<string, BlockWithChildren>,
-    spaceId: string,
-    onLinkToPage: (pageLink: string, parentNode: BlockNode, inlineLink: boolean) => Promise<string | null>,
-    onChildDatabase: (block: BlockWithChildren, parentNode: BlockNode) => Promise<void>,
-    onChildPage: (block: BlockWithChildren, parentNode: BlockNode) => Promise<void>
+    parentNode: BlockNode;
+    block: BlockWithChildren;
+    blocksRecord: Record<string, BlockWithChildren>;
+    spaceId: string;
+    onLinkToPage: (pageLink: string, parentNode: BlockNode, inlineLink: boolean) => Promise<string | null>;
+    onChildDatabase: (block: BlockWithChildren, parentNode: BlockNode) => Promise<void>;
+    onChildPage: (block: BlockWithChildren, parentNode: BlockNode) => Promise<void>;
   },
   _parentInfo: [string, number][]
 ) {
@@ -499,7 +501,7 @@ type CreatePageInput = {
   createdBy: string;
   boardId?: string;
   parentId?: string | null;
-  cardId?: string
+  cardId?: string;
 }
 // &  {userId: string, spaceId: string, pageId: string, title: string};
 
@@ -522,7 +524,7 @@ async function createPrismaPage ({
   parentId,
   cardId
 }: CreatePageInput) {
-  const pagePathId = Math.random().toString().replace('0.', '');
+
   const pageToCreate: Prisma.PageCreateInput = {
     id,
     content,
@@ -536,7 +538,7 @@ async function createPrismaPage ({
     },
     updatedAt: new Date(),
     updatedBy: createdBy,
-    path: `page-${pagePathId}`,
+    path: getPagePath(),
     space: {
       connect: {
         id: spaceId || undefined
@@ -567,36 +569,36 @@ async function createPrismaPage ({
   return page;
 }
 
-function convertToPlainText (chunks: {plain_text: string}[]) {
+function convertToPlainText (chunks: { plain_text: string }[]) {
   return chunks.reduce((prev: string, cur: { plain_text: string }) => prev + cur.plain_text, '');
 }
 
 export async function importFromWorkspace ({ workspaceName, workspaceIcon, accessToken, userId, spaceId }:
-  { accessToken: string, spaceId: string, userId: string,
-    workspaceName: string,
-    workspaceIcon: string
+  { accessToken: string; spaceId: string; userId: string;
+    workspaceName: string;
+    workspaceIcon: string;
   }) {
   const charmversePagesRecord: Record<string, CreatePageInput> = {};
   const charmverseCardsRecord: Record<string, {
-    card: Prisma.BlockCreateManyInput
-    page: CreatePageInput,
-    notionPageId: string
+    card: Prisma.BlockCreateManyInput;
+    page: CreatePageInput;
+    notionPageId: string;
   }> = {};
 
   const blocksRecord: Record<string, BlockWithChildren> = {};
 
   const linkedPages: Record<string, string> = {};
   const focalboardRecord: Record<string, {
-    board: Prisma.BlockCreateManyInput,
-    view: Prisma.BlockCreateManyInput,
-    properties: Record<string, string>
+    board: Prisma.BlockCreateManyInput;
+    view: Prisma.BlockCreateManyInput;
+    properties: Record<string, string>;
   }> = {};
   const pagesWithoutIntegrationAccess: Set<string> = new Set();
   const failedImportsRecord: Record<string, {
-    pageId: string,
-    type: 'page' | 'database',
-    title: string,
-    blocks: [string, number][][]
+    pageId: string;
+    type: 'page' | 'database';
+    title: string;
+    blocks: [string, number][][];
   }> = {};
   const notionPagesRecord: Record<string, GetPageResponse | GetDatabaseResponse> = {};
 
@@ -724,7 +726,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
           focalboardPropertiesRecord[property.id] = cardProperty.id;
           cardProperties.push(cardProperty);
           if (property.type === 'select' || property.type === 'multi_select') {
-            (property as any)[property.type].options.forEach((option: {id: string, name: string, color: string}) => {
+            (property as any)[property.type].options.forEach((option: { id: string, name: string, color: string }) => {
               cardProperty.options.push({
                 value: option.name,
                 color: `propColor${option.color.charAt(0).toUpperCase() + option.color.slice(1)}`,
@@ -783,7 +785,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
   }
 
   // Array of tuple, [notion block id, charmverse block id]
-  async function createCharmversePageInMemory (pageIds: [string, string][], failedImportBlocks: Array<[string, number][]>) {
+  async function createCharmversePageInMemory (pageIds: [string, string][], failedImportBlocks: [string, number][][]) {
     // The last item of the pageIds is the notion block id and the optimistic charmverse page id
     const [notionPageId, charmversePageId] = pageIds[pageIds.length - 1];
     // The page might have been recursively created via a link_to_page block
@@ -1033,7 +1035,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         const charmverseDatabasePage = charmversePagesRecord[notionPage.parent.database_id];
 
         if (charmverseDatabasePage.boardId) {
-          const titleProperty = Object.values(notionPage.properties).find(value => value.type === 'title') as {title: {plain_text: string}[]};
+          const titleProperty = Object.values(notionPage.properties).find(value => value.type === 'title') as { title: { plain_text: string }[] };
           const emoji = notionPage.icon?.type === 'emoji' ? notionPage.icon.emoji : null;
 
           const title = convertToPlainText(titleProperty.title);
@@ -1054,10 +1056,10 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
               }
               else if (property.type === 'multi_select') {
                 cardProperties[properties[property.id]] = property[property.type]
-                  .map((multiSelect: {id: string}) => multiSelect.id);
+                  .map((multiSelect: { id: string }) => multiSelect.id);
               }
               else if (property.type === 'date') {
-                const dateValue: {from?: number, to?: number} = {};
+                const dateValue: { from?: number, to?: number } = {};
                 if (property[property.type].start) {
                   dateValue.from = (new Date(property[property.type].start)).getTime();
                 }

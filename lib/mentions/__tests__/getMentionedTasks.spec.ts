@@ -1,5 +1,5 @@
-import { Comment, Bounty, Page, Space, User } from '@prisma/client';
-import { createPage, generateBounty, generateComment, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import type { Comment, Block, Bounty, Page, Space, User } from '@prisma/client';
+import { createPage, createBlock, generateBounty, generateComment, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { prisma } from 'db';
 import { getMentionedTasks } from '../getMentionedTasks';
@@ -14,8 +14,9 @@ let bounty1: Bounty;
 let bounty2: Bounty;
 let comment1: Comment;
 let comment2: Comment;
+let commentBlock: Block;
 
-const mentionIds = new Array(12).fill(0).map(() => v4());
+const mentionIds = new Array(13).fill(0).map(() => v4());
 
 beforeAll(async () => {
   const generated1 = await generateUserAndSpaceWithApiToken();
@@ -124,6 +125,16 @@ beforeAll(async () => {
     content: { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'mention', attrs: { id: mentionIds[11], type: 'user', value: user1.id, createdAt: new Date().toISOString(), createdBy: user2.id } }] }] }
   });
 
+  commentBlock = await createBlock({
+    type: 'comment',
+    spaceId: space2.id,
+    createdBy: user2.id,
+    rootId: page2.id,
+    fields: {
+      content: { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'mention', attrs: { id: mentionIds[12], type: 'user', value: user1.id, createdAt: new Date().toISOString(), createdBy: user2.id } }] }] }
+    }
+  });
+
   await prisma.userNotification.createMany({
     data: [
       {
@@ -136,30 +147,37 @@ beforeAll(async () => {
 });
 
 describe('getMentionedTasks', () => {
+
   it('Should return marked and unmarked mention tasks', async () => {
 
     const { marked, unmarked } = await getMentionedTasks(user1.id);
 
+    function expectSome <T> (arr: T[], condition: (item: T) => boolean) {
+      expect(arr.some(condition)).toBeTruthy();
+    }
+
     expect(marked.length).toBe(1);
-    expect(unmarked.length).toBe(5);
-    expect(marked[0].mentionId).toBe(mentionIds[0]);
-    expect(marked[0].pageId).toBe(page1.id);
+    expect(unmarked.length).toBe(6);
 
-    expect(unmarked[0].mentionId).toBe(mentionIds[11]);
-    expect(unmarked[0].pageId).toBe(page2.id);
-    expect(unmarked[0].commentId).toBe(comment2.id);
+    expectSome(marked, (item) => item.mentionId === mentionIds[0] && item.pageId === page1.id);
 
-    expect(unmarked[1].mentionId).toBe(mentionIds[8]);
-    expect(unmarked[1].commentId).toBe(comment1.id);
-    expect(unmarked[1].pageId).toBe(page1.id);
+    expectSome(unmarked, (item) => (
+      item.mentionId === mentionIds[11]
+      && item.pageId === page2.id
+      && item.commentId === comment2.id));
 
-    expect(unmarked[2].mentionId).toBe(mentionIds[7]);
-    expect(unmarked[2].bountyId).toBe(bounty2.id);
+    expectSome(unmarked, (item) => (
+      item.mentionId === mentionIds[8]
+      && item.pageId === page1.id
+      && item.commentId === comment1.id));
 
-    expect(unmarked[3].mentionId).toBe(mentionIds[4]);
-    expect(unmarked[3].bountyId).toBe(bounty1.id);
+    expectSome(unmarked, (item) => item.mentionId === mentionIds[7] && item.bountyId === bounty2.id);
 
-    expect(unmarked[4].mentionId).toBe(mentionIds[3]);
-    expect(unmarked[4].pageId).toBe(page2.id);
+    expectSome(unmarked, (item) => item.mentionId === mentionIds[4] && item.bountyId === bounty1.id);
+
+    expectSome(unmarked, (item) => item.mentionId === mentionIds[3] && item.pageId === page2.id);
+
+    // finds the comment block mention
+    expectSome(unmarked, (item) => item.mentionId === mentionIds[12] && item.pageId === page2.id);
   });
 });

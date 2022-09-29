@@ -1,22 +1,22 @@
-import NotionIcon from 'public/images/notion_logo.svg';
-import SvgIcon from '@mui/material/SvgIcon';
-import CircularProgress from '@mui/material/CircularProgress';
-import { Alert, Box, Typography } from '@mui/material';
-import Button from 'components/common/Button';
-import Modal from 'components/common/Modal';
 import CompleteIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Dangerous';
 import WarningIcon from '@mui/icons-material/HourglassBottom';
+import { Alert, Box, Typography } from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
+import SvgIcon from '@mui/material/SvgIcon';
 import charmClient from 'charmClient';
-import { useSWRConfig } from 'swr';
-import { useState, useEffect } from 'react';
-import { useSnackbar } from 'hooks/useSnackbar';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { FailedImportsError } from 'lib/notion/types';
-import { getCookie, deleteCookie } from 'lib/browser';
-import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/notion/constants';
-import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
+import Button from 'components/common/Button';
+import Modal from 'components/common/Modal';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useSnackbar } from 'hooks/useSnackbar';
+import { deleteCookie, getCookie } from 'lib/browser';
+import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/notion/constants';
+import type { FailedImportsError } from 'lib/notion/types';
+import NotionIcon from 'public/images/notion_logo.svg';
+import { useEffect, useState } from 'react';
+import { useSWRConfig } from 'swr';
 
 interface NotionResponseState {
   error?: string;
@@ -50,7 +50,7 @@ export default function ImportNotionWorkspace () {
           mutate(`pages/${space.id}`);
           // Fetch all the focalboard blocks,
           // TODO: Refactor to only return the imported blocks
-          dispatch(initialLoad());
+          dispatch(initialLoad({ spaceId: space.id }));
           if (failedImports.length === 0) {
             showMessage('Notion workspace successfully imported');
             closeModal();
@@ -106,36 +106,36 @@ export default function ImportNotionWorkspace () {
       <Modal open={modalOpen} onClose={closeModal} size='fluid'>
         <Box display='flex' alignItems='center' gap={2} flexDirection='column'>
           {notionState.loading && (
-          <>
-            <CircularProgress size={30} />
-            <Typography sx={{ mb: 0 }}>
-              Importing your files from Notion. This might take a few minutes...
-            </Typography>
-          </>
+            <>
+              <CircularProgress size={30} />
+              <Typography sx={{ mb: 0 }}>
+                Importing your files from Notion. This might take a few minutes...
+              </Typography>
+            </>
           )}
           {!notionState.loading && notionState.failedImports?.length && (
-          <>
-            <CompleteIcon color='success' fontSize='large' />
-            <Typography sx={{ mb: 0 }}>
-              Import complete! Pages where we encountered issues are highlighted below.
-            </Typography>
-          </>
+            <>
+              <CompleteIcon color='success' fontSize='large' />
+              <Typography sx={{ mb: 0 }}>
+                Import complete! Pages where we encountered issues are highlighted below.
+              </Typography>
+            </>
           )}
           {notionState.warning && (
-          <>
-            <WarningIcon color='orange' fontSize='large' />
-            <Typography sx={{ mb: 0 }} align='center'>
-              {notionState.warning}
-            </Typography>
-          </>
+            <>
+              <WarningIcon color='orange' fontSize='large' />
+              <Typography sx={{ mb: 0 }} align='center'>
+                {notionState.warning}
+              </Typography>
+            </>
           )}
           {notionState.error && (
-          <>
-            <ErrorIcon color='error' fontSize='large' />
-            <Typography sx={{ mb: 0 }} align='center'>
-              {notionState.error}
-            </Typography>
-          </>
+            <>
+              <ErrorIcon color='error' fontSize='large' />
+              <Typography sx={{ mb: 0 }} align='center'>
+                {notionState.error}
+              </Typography>
+            </>
           )}
         </Box>
         {notionState.failedImports && notionState.failedImports?.length > 0 && (

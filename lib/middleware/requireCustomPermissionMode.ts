@@ -1,13 +1,14 @@
 import { prisma } from 'db';
-import { DataNotFoundError, InvalidInputError, ISystemError, UnauthorisedActionError } from 'lib/utilities/errors';
-import { NextApiRequest, NextApiResponse } from 'next';
-import { NextHandler } from 'next-connect';
-import { PermissionAssigneeId } from '../permissions/interfaces';
+import type { ISystemError } from 'lib/utilities/errors';
+import { DataNotFoundError, InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import type { NextHandler } from 'next-connect';
+import type { PermissionAssigneeId } from '../permissions/interfaces';
 
 /**
  * Call to endpoint using this can only proceed if the space permission mode is custom
  */
-export function requireCustomPermissionMode ({ spaceIdKey, keyLocation }: {spaceIdKey: string, keyLocation: 'body' | 'query'}) {
+export function requireCustomPermissionMode ({ spaceIdKey, keyLocation }: { spaceIdKey: string, keyLocation: 'body' | 'query' }) {
 
   return async (req: NextApiRequest, res: NextApiResponse<ISystemError>, next: NextHandler) => {
 

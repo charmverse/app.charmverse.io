@@ -1,7 +1,8 @@
-import { Space, SpaceOperation, SpacePermissionConfigurationMode } from '@prisma/client';
+import type { Space, SpaceOperation } from '@prisma/client';
+import { SpacePermissionConfigurationMode } from '@prisma/client';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { prisma } from 'db';
-import { SpacePermissionConfigurationUpdate } from './interfaces';
+import type { SpacePermissionConfigurationUpdate } from './interfaces';
 import { permissionTemplates } from './preset-templates';
 import { addSpaceOperations, removeSpaceOperations } from '../spaces';
 
@@ -37,7 +38,7 @@ export async function updateSpacePermissionConfigurationMode ({ permissionConfig
 
     const template = permissionTemplates[permissionConfigurationMode];
 
-    const toAdd: SpaceOperation[] = (Object.entries(template.spaceOperations) as Array<[SpaceOperation, boolean]>)
+    const toAdd: SpaceOperation[] = (Object.entries(template.spaceOperations) as [SpaceOperation, boolean][])
       .filter(([op, value]) => value === true)
       .map(tuple => tuple[0]);
 
@@ -48,7 +49,7 @@ export async function updateSpacePermissionConfigurationMode ({ permissionConfig
         operations: toAdd
       });
     }
-    const toRemove: SpaceOperation[] = (Object.entries(template.spaceOperations) as Array<[SpaceOperation, boolean]>)
+    const toRemove: SpaceOperation[] = (Object.entries(template.spaceOperations) as [SpaceOperation, boolean][])
       .filter(([op, value]) => value === false)
       .map(tuple => tuple[0]);
 

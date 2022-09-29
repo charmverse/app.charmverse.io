@@ -1,15 +1,13 @@
-import { Autocomplete, AutocompleteProps, Box, BoxProps, TextField, Typography } from '@mui/material';
+import type { AutocompleteProps } from '@mui/material';
+import { Autocomplete, TextField } from '@mui/material';
+import UserDisplay from 'components/common/UserDisplay';
 import { useContributors } from 'hooks/useContributors';
-import { Contributor, User } from 'models';
-import Avatar from 'components/common/Avatar';
-import { HTMLAttributes, useState, useEffect, ElementType } from 'react';
-import { Web3Provider } from '@ethersproject/providers';
-import { useWeb3React } from '@web3-react/core';
-import { useSWRConfig } from 'swr';
+import type { Contributor } from 'models';
+import { useEffect, useState } from 'react';
 
 interface IContributorsFilter {
-  mode: 'include' | 'exclude',
-  userIds: string []
+  mode: 'include' | 'exclude';
+  userIds: string [];
 }
 
 function filterContributors (contributors: Contributor [], filter: IContributorsFilter): Contributor[] {
@@ -32,15 +30,10 @@ type BooleanField = boolean | undefined;
 interface Props extends Omit<AutocompleteProps<Contributor, BooleanField, BooleanField, BooleanField>, 'options' | 'renderInput'> {
   filter?: IContributorsFilter;
   options: Contributor[];
-  disableCloseOnSelect?: boolean
+  disableCloseOnSelect?: boolean;
 }
 
-function InputSearchContributorBase ({ filter, options, disableCloseOnSelect, placeholder, ...props }: Props) {
-
-  const { chainId } = useWeb3React<Web3Provider>();
-
-  const { cache } = useSWRConfig();
-
+export function InputSearchContributorBase ({ filter, options, disableCloseOnSelect, placeholder, ...props }: Props) {
   const filteredOptions = filter ? filterContributors(options, filter) : options;
 
   return (
@@ -50,13 +43,12 @@ function InputSearchContributorBase ({ filter, options, disableCloseOnSelect, pl
       loading={options.length === 0}
       sx={{ minWidth: 150 }}
       placeholder={filteredOptions.length > 0 ? placeholder : ''}
-      // @ts-ignore - not sure why this fails
       options={filteredOptions}
       autoHighlight
       // user can also be a string if freeSolo=true
-      getOptionLabel={(user) => cache.get(`@"ENS",102~,"${(user as Contributor).username}",${chainId},`) ?? (user as Contributor).username}
+      getOptionLabel={(user) => (user as Contributor).username}
       renderOption={(_props, user) => (
-        <ReviewerOption
+        <UserDisplay
           {..._props as any}
           user={user}
         />
@@ -78,9 +70,9 @@ function InputSearchContributorBase ({ filter, options, disableCloseOnSelect, pl
 }
 
 interface IInputSearchContributorProps {
-  onChange: (id: string) => void
-  defaultValue?: string,
-  filter?: IContributorsFilter
+  onChange: (id: string) => void;
+  defaultValue?: string;
+  filter?: IContributorsFilter;
 }
 
 export function InputSearchContributor ({ defaultValue, onChange, ...props }: IInputSearchContributorProps) {
@@ -116,10 +108,10 @@ export function InputSearchContributor ({ defaultValue, onChange, ...props }: II
 }
 
 interface IInputSearchContributorMultipleProps extends Partial<Omit<AutocompleteProps<Contributor, true, true, true>, 'onChange'>> {
-  onChange: (id: string[]) => void
-  defaultValue?: string[]
-  filter?: IContributorsFilter
-  disableCloseOnSelect?: boolean
+  onChange: (id: string[]) => void;
+  defaultValue?: string[];
+  filter?: IContributorsFilter;
+  disableCloseOnSelect?: boolean;
 }
 
 export function InputSearchContributorMultiple ({ onChange, disableCloseOnSelect, defaultValue, ...props }: IInputSearchContributorMultipleProps) {
@@ -152,14 +144,5 @@ export function InputSearchContributorMultiple ({ onChange, disableCloseOnSelect
       {...props}
       options={contributors}
     />
-  );
-}
-
-export function ReviewerOption ({ user, avatarSize, fontSize, fontWeight, ...props }: { fontSize?: string | number, fontWeight?: number | string, user: Omit<User, 'addresses'>, avatarSize?: 'small' | 'medium' } & HTMLAttributes<HTMLLIElement> & {component?: ElementType} & BoxProps) {
-  return (
-    <Box display='flex' gap={1} {...props} component={props.component ?? 'li'}>
-      <Avatar size={avatarSize} name={user.username as string} avatar={user.avatar} />
-      <Typography fontSize={fontSize} fontWeight={fontWeight}>{user.username}</Typography>
-    </Box>
   );
 }

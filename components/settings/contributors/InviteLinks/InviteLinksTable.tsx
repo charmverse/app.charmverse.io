@@ -1,19 +1,20 @@
-import { useState } from 'react';
+import AllInclusiveIcon from '@mui/icons-material/AllInclusive';
+import DeleteIcon from '@mui/icons-material/Close';
+import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
 import Table from '@mui/material/Table';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
-import Countdown from 'react-countdown';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import DeleteIcon from '@mui/icons-material/Close';
-import AllInclusiveIcon from '@mui/icons-material/AllInclusive';
 import Tooltip from '@mui/material/Tooltip';
-import Chip from '@mui/material/Chip';
+import Typography from '@mui/material/Typography';
 import ButtonChip from 'components/common/ButtonChip';
-import { InviteLinkPopulated } from 'pages/api/invites/index';
 import TableRow from 'components/common/Table/TableRow';
+import UserDisplay from 'components/common/UserDisplay';
+import type { InviteLinkPopulated } from 'pages/api/invites/index';
+import { useState } from 'react';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+import Countdown from 'react-countdown';
 
 interface Props {
   isAdmin: boolean;
@@ -31,7 +32,7 @@ export default function InvitesTable (props: Props) {
   }
 
   return (
-    <Table aria-label='simple table'>
+    <Table size='small' aria-label='simple table'>
       <TableHead>
         <TableRow>
           <TableCell sx={{ px: 0 }}>Inviter</TableCell>
@@ -45,7 +46,7 @@ export default function InvitesTable (props: Props) {
         {props.invites.map((row) => (
           <TableRow key={row.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
             <TableCell sx={{ px: 0 }}>
-              <Typography><strong>{row.author.username}</strong></Typography>
+              <UserDisplay sx={{ my: 1 }} user={row.author} avatarSize='small' />
             </TableCell>
             {/* <TableCell><Typography>{row.code}</Typography></TableCell> */}
             <TableCell>
@@ -69,17 +70,17 @@ export default function InvitesTable (props: Props) {
                 </Box>
               </Tooltip>
               {props.isAdmin && (
-              <Tooltip arrow placement='top' title='Delete'>
-                <ButtonChip
-                  className='row-actions'
-                  icon={<DeleteIcon />}
-                  clickable
-                  color='secondary'
-                  size='small'
-                  variant='outlined'
-                  onClick={() => props.onDelete(row)}
-                />
-              </Tooltip>
+                <Tooltip arrow placement='top' title='Delete'>
+                  <ButtonChip
+                    className='row-actions'
+                    icon={<DeleteIcon />}
+                    clickable
+                    color='secondary'
+                    size='small'
+                    variant='outlined'
+                    onClick={() => props.onDelete(row)}
+                  />
+                </Tooltip>
               )}
             </TableCell>
           </TableRow>

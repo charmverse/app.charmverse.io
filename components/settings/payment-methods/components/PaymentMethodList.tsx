@@ -3,20 +3,20 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import Tooltip from '@mui/material/Tooltip';
-import { PaymentMethod } from '@prisma/client';
+import type { PaymentMethod } from '@prisma/client';
 import ElementDeleteIcon from 'components/common/form/ElementDeleteIcon';
 import Link from 'components/common/Link';
 import TableRow from 'components/common/Table/TableRow';
-import { getChainExplorerLink } from 'connectors';
 import TokenLogo from 'components/common/TokenLogo';
+import { getChainExplorerLink } from 'connectors';
 import useIsAdmin from 'hooks/useIsAdmin';
+import { getTokenAndChainInfo } from 'lib/tokens/tokenData';
 import { shortenHex } from 'lib/utilities/strings';
 import { useState } from 'react';
-import { getTokenAndChainInfo } from 'lib/tokens/tokenData';
 import CompositeDeletePaymentMethod from './DeletePaymentMethodModal';
 
 interface IProps {
-  paymentMethods: PaymentMethod[]
+  paymentMethods: PaymentMethod[];
 }
 
 const getGnosisSafeUrl = (address: string) => `https://gnosis-safe.io/app/rin:${address}/balances`;

@@ -1,12 +1,10 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
-import React, { useState } from 'react';
+import { useState } from 'react';
 
-import { Option as SelectOption, typesByOptions } from '../../calculations/options';
-import { IPropertyTemplate } from '../../../blocks/board';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { IPropertyTemplate } from '../../../blocks/board';
 
 import { Constants } from '../../../constants';
+import { Option as SelectOption, typesByOptions } from '../../calculations/options';
 
 type OptionProps = SelectOption & {
     cardProperties: IPropertyTemplate[]
@@ -100,3 +98,4 @@ function Option (props: {data: OptionProps}): JSX.Element {
 
 export { Option };
 export type { OptionProps };
+

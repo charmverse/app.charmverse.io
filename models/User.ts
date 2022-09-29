@@ -1,28 +1,25 @@
-import type { DiscordUser, FavoritePage, Poap, SpaceRole, User, Role as RoleMembership, SpaceRoleToRole, TelegramUser, UserNotificationState } from '@prisma/client';
+import type { DiscordUser, FavoritePage, Role as RoleMembership, SpaceRole, SpaceRoleToRole, TelegramUser, User, UserNotificationState } from '@prisma/client';
 
 export { FavoritePage, SpaceRole, User };
 
 export interface Contributor extends Omit<User, 'addresses'> {
   isAdmin: boolean;
   joinDate: string;
+  hasNftAvatar?: boolean;
 }
 
 interface NestedMemberships {
-  spaceRoleToRole: (SpaceRoleToRole & { role: RoleMembership })[]
+  spaceRoleToRole: (SpaceRoleToRole & { role: RoleMembership })[];
 }
 
 export interface LoggedInUser extends User {
   favorites: { pageId: string }[];
-  spaceRoles: (SpaceRole & NestedMemberships)[]
+  spaceRoles: (SpaceRole & NestedMemberships)[];
   ensName?: string;
-  discordUser?: DiscordUser | null
-  telegramUser?: TelegramUser | null
-  notificationState?: UserNotificationState | null
-}
-
-export interface ExtendedPoap extends Poap {
-  imageURL: string;
-  isHidden: boolean;
+  discordUser?: DiscordUser | null;
+  telegramUser?: TelegramUser | null;
+  notificationState?: UserNotificationState | null;
+  isNew?: boolean;
 }
 
 export const IDENTITY_TYPES = ['Wallet', 'Discord', 'Telegram', 'RandomName'] as const;

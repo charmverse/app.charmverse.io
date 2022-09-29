@@ -1,12 +1,12 @@
-import nc from 'next-connect';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import type { TelegramUser, User } from '@prisma/client';
 import { prisma } from 'db';
-import { NextApiRequest, NextApiResponse } from 'next';
-import { withSessionRoute } from 'lib/session/withSession';
-import log from 'lib/log';
-import { TelegramUser, User } from '@prisma/client';
 import { getUserS3Folder, uploadToS3 } from 'lib/aws/uploadToS3Server';
+import log from 'lib/log';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { withSessionRoute } from 'lib/session/withSession';
 import { IDENTITY_TYPES } from 'models';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc({
   onError,
@@ -14,16 +14,16 @@ const handler = nc({
 });
 
 export interface TelegramAccount {
-  auth_date: number
-  first_name: string
-  hash: string
-  id: number
-  last_name: string
-  photo_url: string
-  username: string
+  auth_date: number;
+  first_name: string;
+  hash: string;
+  id: number;
+  last_name: string;
+  photo_url: string;
+  username: string;
 }
 
-async function connectTelegram (req: NextApiRequest, res: NextApiResponse<TelegramUser | {error: string}>) {
+async function connectTelegram (req: NextApiRequest, res: NextApiResponse<TelegramUser | { error: string }>) {
   const telegramAccount = req.body as TelegramAccount;
 
   const { id, ...rest } = telegramAccount;

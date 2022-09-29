@@ -3,13 +3,14 @@ import log from 'lib/log';
 import groupBy from 'lodash/groupBy';
 import intersection from 'lodash/intersection';
 import { prisma } from 'db';
-import { User, UserGnosisSafe, UserNotificationState } from '@prisma/client';
-import { getTransactionsforSafes, GnosisTransaction } from './gnosis';
+import type { User, UserGnosisSafe, UserNotificationState } from '@prisma/client';
+import type { GnosisTransaction } from './gnosis';
+import { getTransactionsforSafes } from './gnosis';
 
 const providerKey = process.env.ALCHEMY_API_KEY;
 const providerUrl = `https://eth-mainnet.alchemyapi.io/v2/${providerKey}`;
 
-type UserWithGnosisSafeState = User & {notificationState: UserNotificationState | null}
+type UserWithGnosisSafeState = User & { notificationState: UserNotificationState | null }
 interface ActionUser {
   address: string;
   user?: UserWithGnosisSafeState;
@@ -36,7 +37,7 @@ export interface GnosisTransactionPopulated {
   safeAddress: string;
   safeName: string | null;
   threshold: number;
-  snoozedUsers: UserWithGnosisSafeState[]
+  snoozedUsers: UserWithGnosisSafeState[];
 }
 
 export interface GnosisTask {

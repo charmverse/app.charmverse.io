@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import { Utils } from '../utils';
 
 type FilterCondition = 'includes' | 'notIncludes' | 'isEmpty' | 'isNotEmpty'

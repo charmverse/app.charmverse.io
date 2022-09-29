@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import React from 'react';
 import { useDragLayer } from 'react-dnd';
 import useEfficientDragLayer from 'hooks/useEffecientDragLayer';
@@ -21,7 +19,7 @@ type Props = {
     offset: number,
     resizingColumn: string,
     selectedCardIds: string[]
-    readonly: boolean
+    readOnly: boolean
     cardIdToFocusOnRender: string
     showCard: (cardId?: string) => void
     addCard: (groupByOptionId?: string) => Promise<void>
@@ -74,7 +72,7 @@ function TableRows (props: Props): JSX.Element {
             onClick={props.onCardClicked}
             saveTitle={saveTitle}
             showCard={props.showCard}
-            readonly={props.readonly}
+            readOnly={props.readOnly}
             onDrop={props.onDrop}
             offset={props.offset}
             resizingColumn={props.resizingColumn}

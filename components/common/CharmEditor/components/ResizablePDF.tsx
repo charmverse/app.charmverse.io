@@ -1,21 +1,23 @@
-import { BaseRawNodeSpec, NodeViewProps, Plugin } from '@bangle.dev/core';
-import { DOMOutputSpec, EditorState, EditorView, Slice, Transaction } from '@bangle.dev/pm';
+import type { BaseRawNodeSpec, NodeViewProps } from '@bangle.dev/core';
+import { Plugin } from '@bangle.dev/core';
+import type { DOMOutputSpec, EditorState, EditorView, Slice, Transaction } from '@bangle.dev/pm';
 import { useTheme } from '@emotion/react';
+import type { HTMLAttributes } from 'react';
+import { memo, useMemo, useState } from 'react';
 import styled from '@emotion/styled';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import { Box, ListItem, Typography } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import charmClient from 'charmClient';
-import { HTMLAttributes, memo, useMemo, useState } from 'react';
 import PdfSelector from 'components/common/PdfSelector';
 import { MIN_PDF_WIDTH, MAX_PDF_WIDTH } from 'lib/image/constants';
-import { Document, Page, pdfjs } from 'react-pdf';
+import dynamic from 'next/dynamic';
 import Resizable from './Resizable/Resizable';
 
-// https://github.com/wojtekmaj/react-pdf/issues/321#issuecomment-451291757
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+const PDFViewer = dynamic(() => import('./PDFViewer'), {
+  ssr: false
+});
 
 const StyledEmptyPDFContainer = styled(Box)`
   display: flex;
@@ -58,7 +60,7 @@ function insertPDFNode (state: EditorState, dispatch: DispatchFn, view: EditorVi
   }
 }
 
-function EmptyPDFContainer ({ readOnly, isSelected, ...props }: HTMLAttributes<HTMLDivElement> & {readOnly: boolean, isSelected?: boolean}) {
+function EmptyPDFContainer ({ readOnly, isSelected, ...props }: HTMLAttributes<HTMLDivElement> & { readOnly: boolean, isSelected?: boolean }) {
   const theme = useTheme();
 
   return (
@@ -94,6 +96,9 @@ export function pdfSpec () {
         },
         size: {
           default: MAX_PDF_WIDTH
+        },
+        track: {
+          default: []
         }
       },
       group: 'block',
@@ -111,8 +116,8 @@ export function pdfSpec () {
 }
 
 type PDFViewerProps = {
-  url: string,
-  width: number
+  url: string;
+  width: number;
 };
 
 const PDF = memo((props: PDFViewerProps) => {
@@ -139,12 +144,12 @@ const PDF = memo((props: PDFViewerProps) => {
 
   return (
     <Box>
-      <Document
-        file={{ url }}
+      <PDFViewer
         onLoadSuccess={onDocumentLoadSuccess}
-      >
-        <Page pageNumber={pageNumber} width={width} />
-      </Document>
+        pageNumber={pageNumber}
+        url={url}
+        width={width}
+      />
       <div>
         <p>
           Page {pageNumber || (pageCount ? 1 : '--')} of {pageCount || '--'}
@@ -161,7 +166,7 @@ const PDF = memo((props: PDFViewerProps) => {
 });
 
 function ResizablePDF ({ readOnly, onResizeStop, node, updateAttrs, selected }:
-  NodeViewProps & {readOnly?: boolean, onResizeStop?: (view: EditorView) => void }) {
+  NodeViewProps & { readOnly?: boolean, onResizeStop?: (view: EditorView) => void }) {
   readOnly = readOnly ?? false;
 
   const url: string = useMemo(() => node.attrs.src, [node.attrs.src]);

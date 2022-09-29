@@ -1,5 +1,10 @@
 
-export function isMobile (): boolean {
+// using deprectead feature, navigator.userAgent doesnt exist yet in FF - https://developer.mozilla.org/en-US/docs/Web/API/Navigator/platform
+export function isMac () {
+  return navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+}
+
+export function isTouchScreen (): boolean {
   const toMatch = [
     /Android/i,
     /webOS/i,
@@ -111,8 +116,8 @@ function scrollIntoViewIfNeededPolyfill (
 
 // source: https://github.com/vercel/next.js/discussions/18072
 // update URL without Next.js re-rendering the page
-export function silentlyUpdateURL (newUrl: string) {
-  window.history.replaceState({ ...window.history.state, as: newUrl, url: newUrl }, '', newUrl);
+export function silentlyUpdateURL (newUrl: string, as?: string) {
+  window.history.replaceState({ ...window.history.state, as: as ?? newUrl, url: newUrl }, '', as ?? newUrl);
 }
 
 export function getCookie (name: string): string {

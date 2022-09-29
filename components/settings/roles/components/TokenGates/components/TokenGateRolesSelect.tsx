@@ -1,20 +1,20 @@
-import { Box, Chip, FormControl, MenuItem, Select } from '@mui/material';
-import { SelectChangeEvent } from '@mui/material/Select';
-import { useMemo } from 'react';
 import styled from '@emotion/styled';
-import Button from 'components/common/Button';
+import { InfoOutlined as InfoOutlinedIcon } from '@mui/icons-material';
+import { Box, Chip, FormControl, MenuItem, Select, Tooltip, Typography } from '@mui/material';
+import type { SelectChangeEvent } from '@mui/material/Select';
 import useIsAdmin from 'hooks/useIsAdmin';
-import { isTruthy } from 'lib/utilities/types';
-import { ListSpaceRolesResponse } from 'pages/api/roles';
 import useRoles from 'hooks/useRoles';
+import { isTruthy } from 'lib/utilities/types';
+import type { ListSpaceRolesResponse } from 'pages/api/roles';
+import { useMemo } from 'react';
 
 /**
  * @renderSelected Show selected options in the options menu. Default is true.
  */
 interface Props {
-  onChange: (roleIds: string[]) => void
-  selectedRoleIds: string[]
-  onDelete: (roleId: string) => void
+  onChange: (roleIds: string[]) => void;
+  selectedRoleIds: string[];
+  onDelete: (roleId: string) => void;
 }
 
 const StyledFormControl = styled(FormControl)`
@@ -50,6 +50,19 @@ export default function TokenGateRolesSelect ({ onDelete, selectedRoleIds, onCha
 
   const isAdmin = useIsAdmin();
 
+  if (roles?.length === 0) {
+    return (
+      <Box display='flex' justifyContent='center'>
+        <Tooltip title='Add roles to enable this feature'>
+          <InfoOutlinedIcon
+            color='secondary'
+            fontSize='small'
+          />
+        </Tooltip>
+      </Box>
+    );
+  }
+
   return (
     <StyledFormControl size='small'>
       <Select<string[]>
@@ -62,7 +75,7 @@ export default function TokenGateRolesSelect ({ onDelete, selectedRoleIds, onCha
         disabled={!isAdmin || roles?.length === 0}
         renderValue={(roleIds) => (
           (roleIds.length === 0) ? (
-            <Button disabled size='small' variant='text' color='secondary'>+ Add roles</Button>
+            <Typography color='secondary' fontSize='small'>+ Assign role</Typography>
           ) : (
             <Box display='flex' flexWrap='wrap' gap={0.5} maxWidth={400}>
               {

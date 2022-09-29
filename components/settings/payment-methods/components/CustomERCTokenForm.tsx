@@ -4,16 +4,17 @@ import Progress from '@mui/material/CircularProgress';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
-import { PaymentMethod } from '@prisma/client';
+import type { PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { FormError } from 'components/common/form/FormError.class';
 import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import { ITokenMetadataRequest } from 'lib/tokens/tokenData';
+import type { SupportedChainId } from 'lib/blockchain/provider/alchemy';
+import type { ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { isValidChainAddress } from 'lib/tokens/validation';
-import { ISystemError } from 'lib/utilities/errors';
+import type { ISystemError } from 'lib/utilities/errors';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -75,7 +76,7 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
     const newContractAddress = watch(({ contractAddress, chainId }, { value, name }) => {
 
       if ((name === 'contractAddress' || name === 'chainId') && isValidChainAddress(contractAddress as string)) {
-        loadToken({ chainId: chainId as number, contractAddress: contractAddress as string });
+        loadToken({ chainId: chainId as SupportedChainId, contractAddress: contractAddress as string });
       }
       // Remove the current token as the contract address is being modified
       else if (name === 'contractAddress' && !isValidChainAddress(contractAddress as string)) {
@@ -267,9 +268,9 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
                     />
                     {
                       (errors?.tokenLogo || (validTokenLogoAddressFormat && !logoLoadSuccess)) && (
-                      <Alert severity='error'>
-                        Invalid token logo url
-                      </Alert>
+                        <Alert severity='error'>
+                          Invalid token logo url
+                        </Alert>
                       )
                     }
                   </Grid>

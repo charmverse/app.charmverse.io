@@ -1,5 +1,5 @@
-import { SpaceOperation, SpacePermissionConfigurationMode } from '@prisma/client';
-import { SpaceConfigurationPreset, SpacePermissionTemplate } from './interfaces';
+import type { SpaceOperation, SpacePermissionConfigurationMode } from '@prisma/client';
+import type { SpaceConfigurationPreset, SpacePermissionTemplate } from './interfaces';
 import { spaceOperationLabels } from '../spaces/mapping';
 
 const readOnly: SpacePermissionTemplate = {
@@ -74,7 +74,7 @@ export function getTemplateExplanation (template: SpacePermissionConfigurationMo
   const templateData = permissionTemplates[template];
 
   // Handle space operations
-  for (const [operation, can] of Object.entries(templateData.spaceOperations) as Array<[SpaceOperation, boolean]>) {
+  for (const [operation, can] of Object.entries(templateData.spaceOperations) as [SpaceOperation, boolean][]) {
 
     const qualifier = can ? 'can' : 'cannot';
 

@@ -1,23 +1,26 @@
 import styled from '@emotion/styled';
-import { Box, Collapse, Menu, MenuItem, ListItemText, ListItemIcon, Paper, Typography, Button, ListItem, IconButton, ButtonProps, Tooltip, SxProps } from '@mui/material';
-import { useTheme } from '@emotion/react';
-import { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
-import { CommentWithUser } from 'lib/comments/interfaces';
+import type { ButtonProps, SxProps } from '@mui/material';
+import { Box, Collapse, Menu, MenuItem, ListItemText, ListItemIcon, Paper, Typography, ListItem, IconButton, Tooltip } from '@mui/material';
+import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
+import Button from 'components/common/Button';
+import type { CommentWithUser } from 'lib/comments/interfaces';
 import UserDisplay from 'components/common/UserDisplay';
 import { usePages } from 'hooks/usePages';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
-import { forwardRef, memo, MouseEvent, useState } from 'react';
+import type { MouseEvent } from 'react';
+import { forwardRef, memo, useRef, useEffect, useState } from 'react';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
-import { PageContent } from 'models';
+import type { PageContent } from 'models';
 import { removeInlineCommentMark } from 'lib/inline-comments/removeInlineCommentMark';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { DateTime } from 'luxon';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { usePopupState, bindMenu } from 'material-ui-popup-state/hooks';
-import { BoxProps } from '@mui/system';
+import type { BoxProps } from '@mui/system';
+import { usePreventReload } from 'hooks/usePreventReload';
 import InlineCharmEditor from '../InlineCharmEditor';
 import { checkForEmpty } from '../utils';
 import { scrollToThread } from './inlineComment/inlineComment.utils';
@@ -35,16 +38,8 @@ const ContextBorder = styled.div`
 const StyledPageThread = styled(Paper)<{ inline: string }>`
   overflow: ${({ inline }) => inline === 'true' ? 'auto' : 'unset'};
   padding: ${({ theme, inline }) => theme.spacing(inline === 'true' ? 2 : 1)};
-  background: ${({ theme }) => theme.palette.background.light};
   width: ${({ inline }) => inline === 'true' ? '500px' : 'inherit'};
   max-height: ${({ inline }) => inline === 'true' ? '350px' : 'fit-content'};
-`;
-
-const ThreadHeader = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: ${({ theme }) => theme.spacing(2)}
 `;
 
 const ThreadCommentListItem = styled(ListItem)<{ highlighted?: string }>`
@@ -69,7 +64,7 @@ const ThreadCommentListItem = styled(ListItem)<{ highlighted?: string }>`
   }
 `;
 
-function ThreadHeaderButton ({ disabled = false, onClick, text, startIcon, ...props }: {disabled?: boolean, onClick: ButtonProps['onClick'], text: string} & ButtonProps) {
+function ThreadHeaderButton ({ disabled = false, onClick, text, startIcon, ...props }: { disabled?: boolean, onClick: ButtonProps['onClick'], text: string } & ButtonProps) {
   return (
     <Button
       disabled={disabled}
@@ -78,11 +73,6 @@ function ThreadHeaderButton ({ disabled = false, onClick, text, startIcon, ...pr
       variant='outlined'
       color='secondary'
       size='small'
-      sx={{
-        '.label:hover': {
-          color: 'text.primary'
-        }
-      }}
       {...props}
     >
       <span className='label'>
@@ -94,24 +84,30 @@ function ThreadHeaderButton ({ disabled = false, onClick, text, startIcon, ...pr
 
 function AddCommentCharmEditor (
   { sx, threadId, disabled, onClick, readOnly }:
-  {onClick: (cb: () => void) => void, readOnly: boolean, disabled: boolean, threadId: string, sx: SxProps}
+  { onClick: (cb: () => void) => void, readOnly: boolean, disabled: boolean, threadId: string, sx: SxProps }
 ) {
   const [commentContent, setCommentContent] = useState<PageContent | null>(null);
-  const theme = useTheme();
   const isEmpty = checkForEmpty(commentContent);
   const { addComment, threads } = useThreads();
   const thread = threads[threadId] as ThreadWithCommentsAndAuthors;
+
+  const touched = useRef(false);
+
+  usePreventReload(touched.current);
 
   return (
     <Box display='flex' px={1} pb={1} sx={sx} flexDirection='column' gap={1} mt={thread.comments.length !== 0 ? 1 : 0}>
       <InlineCharmEditor
         style={{
-          backgroundColor: theme.palette.background.default
+          backgroundColor: 'var(--input-bg)',
+          border: '1px solid var(--input-border)'
         }}
+        placeholderText='Reply...'
         key={thread.comments[thread.comments.length - 1]?.id}
         content={commentContent}
         onContentChange={({ doc }) => {
           setCommentContent(doc);
+          touched.current = true;
         }}
         readOnly={readOnly || disabled}
       />
@@ -134,7 +130,7 @@ function AddCommentCharmEditor (
   );
 }
 
-function EditCommentCharmEditor ({ disabled, isEditable, threadId, commentId, onContainerClick, onSave, onCancel }: {disabled: boolean, isEditable: boolean, onCancel: ButtonProps['onClick'], threadId: string, commentId: string, onContainerClick: BoxProps['onClick'], onSave: (cb: () => Promise<void>) => void}) {
+function EditCommentCharmEditor ({ disabled, isEditable, threadId, commentId, onContainerClick, onSave, onCancel }: { disabled: boolean, isEditable: boolean, onCancel: ButtonProps['onClick'], threadId: string, commentId: string, onContainerClick: BoxProps['onClick'], onSave: (cb: () => Promise<void>) => void }) {
   const [commentContent, setCommentContent] = useState<PageContent | null>(null);
   const isEmpty = checkForEmpty(commentContent);
   const { editComment, threads } = useThreads();
@@ -204,26 +200,20 @@ interface PageThreadProps {
   showFindButton?: boolean;
 }
 
-function ThreadCreatedDate ({ createdAt }: {createdAt: Date}) {
-  return (
-    <Tooltip arrow placement='top' title={new Date(createdAt).toLocaleString()}>
-      <Typography
-        sx={{
-          cursor: 'pointer',
-          pl: 1
-        }}
-        color='secondary'
-        variant='subtitle1'
-        display='flex'
-        flexDirection='row'
-      >
-        Started {DateTime.fromJSDate(new Date(createdAt)).toRelative({ base: (DateTime.now()), style: 'short' })}
-      </Typography>
-    </Tooltip>
-  );
-}
+export const RelativeDate = memo<{ createdAt: string, prefix?: string, updatedAt?: string | null }>(({ createdAt, prefix, updatedAt }) => {
 
-const CommentDate = memo<{createdAt: Date, updatedAt?: Date | null}>(({ createdAt, updatedAt }) => {
+  const getDateTime = () => DateTime.fromISO(createdAt);
+
+  const [dateTime, setTime] = useState(getDateTime());
+
+  // update once a minute
+  useEffect(() => {
+    const interval = setInterval(() => setTime(getDateTime()), 60 * 1000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
   return (
     <Typography
       sx={{
@@ -237,15 +227,15 @@ const CommentDate = memo<{createdAt: Date, updatedAt?: Date | null}>(({ createdA
     >
       <Tooltip arrow placement='top' title={new Date(createdAt).toLocaleString()}>
         <span>
-          {DateTime.fromJSDate(new Date(createdAt)).toRelative({ base: DateTime.now(), style: 'short' })}
+          {dateTime.toRelative({ style: 'short' })}
         </span>
       </Tooltip>
       {updatedAt && (
-      <Tooltip arrow placement='top' title={new Date(updatedAt).toLocaleString()}>
-        <span style={{ marginLeft: '4px' }}>
-          (edited)
-        </span>
-      </Tooltip>
+        <Tooltip arrow placement='top' title={new Date(updatedAt).toLocaleString()}>
+          <span style={{ marginLeft: '4px' }}>
+            (edited)
+          </span>
+        </Tooltip>
       )}
     </Typography>
   );
@@ -254,7 +244,7 @@ const CommentDate = memo<{createdAt: Date, updatedAt?: Date | null}>(({ createdA
 const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton = false, threadId, inline = false }, ref) => {
   showFindButton = showFindButton ?? (!inline);
   const { deleteThread, resolveThread, deleteComment, threads } = useThreads();
-  const [user] = useUser();
+  const { user } = useUser();
   const [isMutating, setIsMutating] = useState(false);
   const [editedCommentId, setEditedCommentId] = useState<null | string>(null);
   const { getPagePermissions, currentPageId } = usePages();
@@ -316,11 +306,8 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
   }
 
   return (
-    <StyledPageThread inline={inline.toString()} id={`thread.${threadId}`} ref={ref}>
+    <StyledPageThread inline={inline.toString()} variant='outlined' id={`thread.${threadId}`} ref={ref}>
       <div>
-        <ThreadHeader>
-          <ThreadCreatedDate createdAt={thread.createdAt} />
-        </ThreadHeader>
         {thread.comments.map((comment, commentIndex) => {
           const isEditable = comment.id === editedCommentId;
           return (
@@ -353,37 +340,37 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                     fontSize={14}
                     fontWeight={500}
                   />
-                  <CommentDate createdAt={comment.createdAt} updatedAt={comment.updatedAt} />
+                  <RelativeDate createdAt={comment.createdAt.toString()} updatedAt={comment.updatedAt?.toString()} />
                 </Box>
                 <div>
-                  {commentIndex === 0 ? (
-                    <ThreadHeaderButton
-                      text={thread.resolved ? 'Un-resolve' : 'Resolve'}
-                      endIcon={(
-                        <MoreHorizIcon
-                          onClick={(e: any) => {
-                            e.stopPropagation();
-                            onClickCommentActions(e, comment);
-                          }}
-                          fontSize='small'
-                        />
-                      )}
-                      disabled={isMutating || !permissions.comment}
-                      onClick={toggleResolved}
-                    />
-                  ) : (comment.userId === user?.id && permissions.comment)
-                  && (
-                    <IconButton
-                      className='comment-actions'
-                      size='small'
-                      onClick={(e: any) => {
-                        e.stopPropagation();
-                        onClickCommentActions(e, comment);
-                      }}
-                    >
-                      <MoreHorizIcon fontSize='small' />
-                    </IconButton>
-                  )}
+                  <Box display='flex' alignItems='center' gap={1}>
+
+                    {commentIndex === 0 && (
+
+                      <ThreadHeaderButton
+                        text={thread.resolved ? 'Un-resolve' : 'Resolve'}
+                        disabled={isMutating || !permissions.comment}
+                        onClick={toggleResolved}
+                      />
+
+                    )}
+
+                    {
+                    comment.userId === user?.id && (
+                      <IconButton
+                        // Show the context menu next to resolve
+                        className={commentIndex === 0 ? '' : 'comment-actions'}
+                        size='small'
+                        onClick={(e: any) => {
+                          onClickCommentActions(e, comment);
+                        }}
+                      >
+                        <MoreHorizIcon fontSize='small' />
+                      </IconButton>
+                    )
+                  }
+
+                  </Box>
                 </div>
               </Box>
               {commentIndex === 0 && (

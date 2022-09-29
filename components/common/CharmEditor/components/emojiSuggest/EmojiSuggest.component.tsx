@@ -2,17 +2,18 @@ import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { useTheme } from '@emotion/react';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import Popper from '@mui/material/Popper';
-import { BaseEmoji, Picker } from 'emoji-mart';
+import type { BaseEmoji } from 'emoji-mart';
+import { Picker } from 'emoji-mart';
 import styled from '@emotion/styled';
 import { useCallback } from 'react';
-import { PluginKey } from 'prosemirror-state';
+import type { PluginKey } from 'prosemirror-state';
 import { selectEmoji } from './emojiSuggest.plugins';
 
 const StyledPopper = styled(Popper)`
   z-index: var(--z-index-modal);
 `;
 
-export default function EmojiSuggest ({ pluginKey }: {pluginKey: PluginKey}) {
+export default function EmojiSuggest ({ pluginKey }: { pluginKey: PluginKey }) {
   const view = useEditorViewContext();
   const {
     tooltipContentDOM,

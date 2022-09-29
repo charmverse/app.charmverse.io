@@ -1,5 +1,6 @@
-import { ISystemErrorInput, SystemError } from 'lib/utilities/errors';
-import { PageProperty } from './interfaces';
+import type { ISystemErrorInput } from 'lib/utilities/errors';
+import { SystemError } from 'lib/utilities/errors';
+import type { PageProperty } from './interfaces';
 
 export class PageNotFoundError extends SystemError {
 
@@ -24,9 +25,9 @@ export class DatabasePageNotFoundError extends SystemError {
 }
 
 export interface UnsupportedKeyDetails<E = any> {
-  unsupportedKeys: string [],
-  allowedKeys: string [],
-  example: E
+  unsupportedKeys: string [];
+  allowedKeys: string [];
+  example: E;
 }
 
 export class UnsupportedKeysError<D = any> extends SystemError<UnsupportedKeyDetails> {
@@ -57,7 +58,7 @@ export class SpaceNotFoundError extends SystemError {
  */
 export class InvalidCustomPropertyKeyError extends SystemError<UnsupportedKeyDetails> {
 
-  constructor (errorInfo: {key: string | string [], boardSchema: PageProperty []}) {
+  constructor (errorInfo: { key: string | string [], boardSchema: PageProperty [] }) {
 
     const allowedKeys = errorInfo.boardSchema.reduce((keys: string [], schema) => {
       keys.push(schema.name);
@@ -94,9 +95,9 @@ export class InvalidCustomPropertyKeyError extends SystemError<UnsupportedKeyDet
 /**
  * Used when an option does not exist in a list
  */
-export class InvalidCustomPropertyValueError extends SystemError<{validOptions: any []}> {
+export class InvalidCustomPropertyValueError extends SystemError<{ validOptions: any [] }> {
 
-  constructor (errorInfo: {key: string, value: any, boardSchema: PageProperty []}) {
+  constructor (errorInfo: { key: string, value: any, boardSchema: PageProperty [] }) {
 
     const allowedValues = errorInfo.boardSchema.find(schema => schema.name === errorInfo.key)?.options.map(opt => opt.value) ?? [];
 

@@ -1,5 +1,5 @@
 import { addSpaceOperations } from 'lib/permissions/spaces';
-import { UnauthorisedActionError } from 'lib/utilities/errors';
+import { UnauthorisedActionError, UndesirableOperationError } from 'lib/utilities/errors';
 import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { prisma } from 'db';
@@ -38,19 +38,26 @@ describe('deleteVote', () => {
     })).toBeFalsy();
   });
 
-  it('should throw error if createVote space permission doesn\'t exist', async () => {
+  it('should throw error if a proposal context vote is being deleted', async () => {
     const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
     const page = await createPage({
       createdBy: user.id,
       spaceId: space.id
     });
 
+    await addSpaceOperations({
+      forSpaceId: space.id,
+      spaceId: space.id,
+      operations: ['createVote']
+    });
+
     const vote = await createVote({
+      context: 'proposal',
       pageId: page.id,
       createdBy: user.id,
       spaceId: space.id
     });
 
-    await expect(deleteVote(vote.id, user.id)).rejects.toBeInstanceOf(UnauthorisedActionError);
+    await expect(deleteVote(vote.id, user.id)).rejects.toBeInstanceOf(UndesirableOperationError);
   });
 });

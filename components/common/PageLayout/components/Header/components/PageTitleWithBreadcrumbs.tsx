@@ -3,8 +3,9 @@ import { Box, Typography, CircularProgress } from '@mui/material';
 import Link from 'components/common/Link';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePages } from 'hooks/usePages';
+import { usePrimaryCharmEditor } from 'hooks/usePrimaryCharmEditor';
 import { useRouter } from 'next/router';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { StyledPageIcon } from '../../PageIcon';
 
@@ -58,10 +59,11 @@ interface PageBreadCrumb {
   title: string;
 }
 
-function DocumentPageTitle ({ basePath }: { basePath: string }) {
-  const { currentPageId, pages, isEditing } = usePages();
+function DocumentPageTitle ({ basePath, pageId }: { basePath: string, pageId?: string }) {
+  const { pages } = usePages();
+  const { isSaving } = usePrimaryCharmEditor();
 
-  const currentPage = pages[currentPageId];
+  const currentPage = pageId ? pages[pageId] : undefined;
 
   // find parent pages
   let activePage = currentPage;
@@ -107,7 +109,7 @@ function DocumentPageTitle ({ basePath }: { basePath: string }) {
           {currentPage.title || 'Untitled'}
         </PageTitle>
       )}
-      {isEditing && (
+      {isSaving && (
         <Box display='inline-flex' alignItems='center' gap={1} ml={2}>
           <CircularProgress size={12} />
           <Typography variant='subtitle2'>
@@ -183,8 +185,9 @@ function EmptyPageTitle () {
   return <div></div>;
 }
 
-export default function PageTitleWithBreadcrumbs () {
+export default function PageTitleWithBreadcrumbs ({ pageId }: { pageId?: string }) {
   const router = useRouter();
+  const [space] = useCurrentSpace();
 
   if (router.route === '/share/[...pageId]' && router.query?.pageId?.[1] === 'bounties') {
     return <PublicBountyPageTitle />;
@@ -193,10 +196,10 @@ export default function PageTitleWithBreadcrumbs () {
     return <BountyPageTitle basePath={`/${router.query.domain}`} />;
   }
   else if (router.route === '/[domain]/[pageId]') {
-    return <DocumentPageTitle basePath={`/${router.query.domain}`} />;
+    return <DocumentPageTitle basePath={`/${space?.domain}`} pageId={pageId} />;
   }
   else if (router.route === '/share/[...pageId]') {
-    return <DocumentPageTitle basePath={`/share/${(router.query.pageId as string[])[0]}`} />;
+    return <DocumentPageTitle basePath={`/share/${space?.domain}`} pageId={pageId} />;
   }
   else if (NEXUS_ROUTES.includes(router.route)) {
     return <NexusPageTitle route={router.route} />;

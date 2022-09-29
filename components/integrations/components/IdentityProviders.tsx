@@ -1,15 +1,16 @@
-import { User } from '@prisma/client';
+import type { User } from '@prisma/client';
 import styled from '@emotion/styled';
 import { Alert, Box, Card, Divider, Grid, Stack, SvgIcon, Tooltip, Typography } from '@mui/material';
 import { useWeb3React } from '@web3-react/core';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { injected, walletConnect, walletLink } from 'connectors';
-import { ReactNode, useContext, useState } from 'react';
+import type { ReactNode } from 'react';
+import { useContext, useState } from 'react';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { useUser } from 'hooks/useUser';
-import { LoggedInUser } from 'models';
-import { TelegramAccount } from 'pages/api/telegram/connect';
+import type { LoggedInUser } from 'models';
+import type { TelegramAccount } from 'pages/api/telegram/connect';
 import DiscordIcon from 'public/images/discord_logo.svg';
 import TelegramIcon from 'public/images/telegram_logo.svg';
 import TelegramLoginIframe, { loginWithTelegram } from './TelegramLoginIframe';
@@ -49,7 +50,7 @@ function ProviderRow ({ children }: { children: ReactNode }) {
 export default function IdentityProviders () {
   const { account, connector } = useWeb3React();
   const { openWalletSelectorModal } = useContext(Web3Connection);
-  const [user, setUser] = useUser();
+  const { user, setUser } = useUser();
   const [isConnectingTelegram, setIsConnectingTelegram] = useState(false);
   const [isLoggingOut] = useState(false);
   const [telegramError, setTelegramError] = useState('');

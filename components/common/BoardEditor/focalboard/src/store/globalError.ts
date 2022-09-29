@@ -1,11 +1,9 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { initialLoad, initialReadOnlyLoad } from './initialLoad';
 
-import { RootState } from './index';
+import type { RootState } from './index';
 
 const globalErrorSlice = createSlice({
   name: 'globalError',

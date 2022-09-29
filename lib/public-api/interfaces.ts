@@ -1,4 +1,4 @@
-import { Page as PrismaPage } from '@prisma/client';
+import type { Page as PrismaPage } from '@prisma/client';
 
 /**
  * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
@@ -38,13 +38,13 @@ import { Page as PrismaPage } from '@prisma/client';
 
 export interface PageProperty {
   id: string;
-  name: string
-  type: string
+  name: string;
+  type: string;
   options: {
-    id: string
-    color: string
-    value: string
-  } []
+    id: string;
+    color: string;
+    value: string;
+  } [];
 }
 
 /**
@@ -89,9 +89,9 @@ export interface PageProperty {
  *
  */
 export interface DatabasePage extends Pick<PrismaPage, 'id' | 'createdAt' | 'updatedAt' | 'type' | 'title' | 'spaceId'> {
-  url: string
-  type: 'board'
-  schema: PageProperty []
+  url: string;
+  type: 'board';
+  schema: PageProperty [];
 }
 
 /**
@@ -155,15 +155,15 @@ export interface PageContentFormats {
  *
  */
 export interface Page {
-  id: string
-  createdAt: string
-  updatedAt: string
-  databaseId: string
-  spaceId: string
-  content: PageContentFormats
-  title: string
-  isTemplate: boolean
-  properties: Record<string, string | number>
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  databaseId: string;
+  spaceId: string;
+  content: PageContentFormats;
+  title: string;
+  isTemplate: boolean;
+  properties: Record<string, string | number>;
 }
 
 /**
@@ -200,13 +200,13 @@ export type PageQuery = Partial<Pick<Page, 'title' | 'properties'>>
  * @property cursor undefined if hasNext is false
  */
 export interface PaginatedResponse<T> {
-  data: T[]
-  hasNext: boolean
-  cursor?: string
+  data: T[];
+  hasNext: boolean;
+  cursor?: string;
 }
 
 export type PaginatedQuery<T> = {
-  cursor?: string
-  limit?: number
-  query: T
+  cursor?: string;
+  limit?: number;
+  query: T;
 }

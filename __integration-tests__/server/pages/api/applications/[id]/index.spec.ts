@@ -1,12 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Application, Bounty, Space, User } from '@prisma/client';
-import request from 'supertest';
-import { baseUrl } from 'testing/mockApiCall';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { ApplicationCreationData, ApplicationUpdateData } from 'lib/applications/interfaces';
+import type { Application, Space, User } from '@prisma/client';
+import type { ApplicationCreationData, ApplicationUpdateData } from 'lib/applications/interfaces';
 import { createBounty } from 'lib/bounties';
-import { createApplication } from 'lib/applications/actions';
-import { addBountyPermissionGroup } from 'lib/permissions/bounties';
+import request from 'supertest';
+import { baseUrl, loginUser } from 'testing/mockApiCall';
+import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 let nonAdminUser: User;
 let nonAdminUserSpace: Space;
@@ -28,12 +26,24 @@ describe('PUT /api/applications/{applicationId} - update an application', () => 
 
   it('should update the application and respond with 200', async () => {
 
+    const submitterUser = await generateSpaceUser({
+      spaceId: nonAdminUserSpace.id,
+      isAdmin: false
+    });
+
+    const submitterCookie = await loginUser(submitterUser);
+
     const bounty = await createBounty({
       createdBy: nonAdminUser.id,
       spaceId: nonAdminUserSpace.id,
-      title: 'Example title',
       status: 'open',
-      rewardAmount: 1
+      rewardAmount: 1,
+      permissions: {
+        submitter: [{
+          group: 'space',
+          id: nonAdminUserSpace.id
+        }]
+      }
     });
 
     const creationContent: Partial<ApplicationCreationData> = {
@@ -41,18 +51,9 @@ describe('PUT /api/applications/{applicationId} - update an application', () => 
       message: "I'm volunteering for this as it's in my field of expertise"
     };
 
-    await addBountyPermissionGroup({
-      level: 'submitter',
-      assignee: {
-        group: 'user',
-        id: nonAdminUser.id
-      },
-      resourceId: bounty.id
-    });
-
     const createdApplication = (await request(baseUrl)
       .post('/api/applications')
-      .set('Cookie', nonAdminCookie)
+      .set('Cookie', submitterCookie)
       .send(creationContent)
       .expect(201)).body;
 
@@ -62,7 +63,7 @@ describe('PUT /api/applications/{applicationId} - update an application', () => 
 
     const updatedApplication = (await request(baseUrl)
       .put(`/api/applications/${createdApplication.id}`)
-      .set('Cookie', nonAdminCookie)
+      .set('Cookie', submitterCookie)
       .send(update)
       .expect(200)).body;
 
@@ -79,12 +80,24 @@ describe('PUT /api/applications/{applicationId} - update an application', () => 
 
     const { user: otherUser, space: otherSpace } = await generateUserAndSpaceWithApiToken();
 
+    const submitterUser = await generateSpaceUser({
+      spaceId: otherSpace.id,
+      isAdmin: false
+    });
+
+    const submitterCookie = await loginUser(submitterUser);
+
     const bounty = await createBounty({
       createdBy: otherUser.id,
       spaceId: otherSpace.id,
-      title: 'Example title',
       status: 'open',
-      rewardAmount: 1
+      rewardAmount: 1,
+      permissions: {
+        submitter: [{
+          group: 'space',
+          id: otherSpace.id
+        }]
+      }
     });
 
     const creationContent: Partial<ApplicationCreationData> = {
@@ -92,11 +105,11 @@ describe('PUT /api/applications/{applicationId} - update an application', () => 
       message: "I'm volunteering for this as it's in my field of expertise"
     };
 
-    // Use method here so we don't have to generate a second cookie
-    const createdApplication = await createApplication({
-      ...creationContent,
-      userId: otherUser.id
-    } as ApplicationCreationData);
+    const createdApplication = (await request(baseUrl)
+      .post('/api/applications')
+      .set('Cookie', submitterCookie)
+      .send(creationContent)
+      .expect(201)).body;
 
     const update: Partial<ApplicationUpdateData> = {
       message: 'This is my new application message'

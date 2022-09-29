@@ -1,23 +1,23 @@
-import React, { useState } from 'react';
-import { Alert, Box, Card, Chip, Collapse, Divider, Grid, Typography } from '@mui/material';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import EmailIcon from '@mui/icons-material/Email';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import PeopleIcon from '@mui/icons-material/People';
+import { Alert, Box, Card, Chip, Collapse, Divider, Grid, Typography } from '@mui/material';
+import Tooltip from '@mui/material/Tooltip';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import UserDisplay, { AnonUserDisplay } from 'components/common/UserDisplay';
-import { shortenHex } from 'lib/utilities/strings';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
+import { useSnackbar } from 'hooks/useSnackbar';
+import { useUser } from 'hooks/useUser';
 import useGnosisSigner from 'hooks/useWeb3Signer';
 import { importSafesFromWallet } from 'lib/gnosis/gnosis.importSafes';
-import { GnosisTask, GnosisTransactionPopulated } from 'lib/gnosis/gnosis.tasks';
+import type { GnosisSafeTasks, GnosisTask, GnosisTransactionPopulated } from 'lib/gnosis/gnosis.tasks';
+import { shortenHex } from 'lib/utilities/strings';
 import { DateTime } from 'luxon';
-import Tooltip from '@mui/material/Tooltip';
-import { useUser } from 'hooks/useUser';
-import EmailIcon from '@mui/icons-material/Email';
-import { GetTasksResponse } from 'pages/api/tasks/list';
-import { KeyedMutator } from 'swr';
+import { useState } from 'react';
+import type { KeyedMutator } from 'swr';
 import { GnosisConnectCard } from '../integrations/components/GnosisSafes';
 import useTasksState from './hooks/useTasksState';
 
@@ -180,12 +180,12 @@ function TransactionRow (
                   <UserDisplay avatarSize='small' user={snoozedUser} />
                   <Box display='flex' gap={1} alignItems='center'>
                     {snoozedUser.notificationState?.snoozeMessage && (
-                    <Tooltip arrow placement='top' title={snoozedUser.notificationState.snoozeMessage}>
-                      <EmailIcon
-                        fontSize='small'
-                        color='secondary'
-                      />
-                    </Tooltip>
+                      <Tooltip arrow placement='top' title={snoozedUser.notificationState.snoozeMessage}>
+                        <EmailIcon
+                          fontSize='small'
+                          color='secondary'
+                        />
+                      </Tooltip>
                     )}
                     <Typography variant='subtitle1' color='secondary'>
                       for {DateTime.fromJSDate(new Date(snoozedUser.notificationState?.snoozedUntil as Date))
@@ -277,20 +277,21 @@ function SafeTasks (
 }
 
 interface GnosisTasksSectionProps {
-  tasks: GetTasksResponse | undefined
-  error: any
-  mutateTasks: KeyedMutator<GetTasksResponse>
+  tasks: GnosisSafeTasks[] | undefined;
+  error: any;
+  mutateTasks: KeyedMutator<GnosisSafeTasks[]>;
 }
 
 export default function GnosisTasksSection ({ error, mutateTasks, tasks }: GnosisTasksSectionProps) {
   const { data: safeData, mutate } = useMultiWalletSigs();
   const { snoozedForDate } = useTasksState();
-  const [user] = useUser();
+  const { user } = useUser();
   const gnosisSigner = useGnosisSigner();
 
   const isSnoozed = snoozedForDate !== null;
 
   const [isLoadingSafes, setIsLoadingSafes] = useState(false);
+  const { showMessage } = useSnackbar();
 
   async function importSafes () {
     if (gnosisSigner && user) {
@@ -300,8 +301,14 @@ export default function GnosisTasksSection ({ error, mutateTasks, tasks }: Gnosi
           signer: gnosisSigner,
           addresses: user.addresses
         });
-        await mutate();
+        const safes = await mutate();
         await mutateTasks();
+        if (!safes || safes.length === 0) {
+          showMessage('You don\'t have any gnosis safes connected to your wallet');
+        }
+        else {
+          showMessage(`Successfully connected ${safes.length} safes`, 'success');
+        }
       }
       finally {
         setIsLoadingSafes(false);
@@ -312,9 +319,7 @@ export default function GnosisTasksSection ({ error, mutateTasks, tasks }: Gnosi
     }
   }
 
-  const safesWithTasks = tasks?.gnosis;
-
-  if (!safesWithTasks) {
+  if (!tasks) {
     if (error) {
       return (
         <Box>
@@ -331,7 +336,7 @@ export default function GnosisTasksSection ({ error, mutateTasks, tasks }: Gnosi
 
   return (
     <>
-      {safesWithTasks.map(safe => (
+      {tasks.map(safe => (
         <SafeTasks
           isSnoozed={isSnoozed}
           key={safe.safeAddress}

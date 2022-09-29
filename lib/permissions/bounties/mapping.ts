@@ -1,5 +1,6 @@
-import { BountyPermissionLevel, BountyOperation } from '@prisma/client';
-import { OperationGroupMapping } from '../interfaces';
+import type { BountyOperation } from '@prisma/client';
+import { BountyPermissionLevel } from '@prisma/client';
+import type { OperationGroupMapping } from '../interfaces';
 
 export function bountyPermissionLevels () {
   return Object.keys(BountyPermissionLevel) as BountyPermissionLevel[];
@@ -14,7 +15,7 @@ class BountyPermissionLevelOperationMapping implements OperationGroupMapping<Bou
   readonly submitter: Readonly<BountyOperation[]>;
 
   constructor () {
-    this.creator = ['delete', 'lock', 'approve_applications', 'grant_permissions', 'review'];
+    this.creator = ['lock', 'approve_applications', 'grant_permissions', 'review'];
     this.reviewer = ['review', 'approve_applications'];
     this.submitter = ['work'];
   }

@@ -1,4 +1,5 @@
-import { Popover, PopoverProps } from '@mui/material';
+import type { PopoverProps } from '@mui/material';
+import { Popover } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import { bindPopover, bindToggle } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -8,11 +9,12 @@ interface PopperPopupProps {
   popupContent: React.ReactNode;
   children?: React.ReactNode | null;
   autoOpen?: boolean;
+  closeOnClick?: boolean;
 }
 
 export default function PopperPopup (props: PopperPopupProps) {
 
-  const { popupContent, children, autoOpen = false } = props;
+  const { closeOnClick = false, popupContent, children, autoOpen = false } = props;
 
   const popupState = usePopupState({ variant: 'popper', popupId: 'iframe-selector' });
   const toggleRef = useRef(null);
@@ -29,6 +31,12 @@ export default function PopperPopup (props: PopperPopupProps) {
     }
   };
 
+  if (closeOnClick) {
+    popoverProps.onClick = () => {
+      popupState.close();
+    };
+  }
+
   useEffect(() => {
     if (autoOpen && toggleRef.current) {
       popupState.setAnchorEl(toggleRef.current);
@@ -41,9 +49,9 @@ export default function PopperPopup (props: PopperPopupProps) {
   return (
     <div ref={toggleRef}>
       {children && (
-      <div {...bindToggle(popupState)}>
-        {children}
-      </div>
+        <div {...bindToggle(popupState)}>
+          {children}
+        </div>
       )}
       <Popover
         disableRestoreFocus

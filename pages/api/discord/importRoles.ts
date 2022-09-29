@@ -1,13 +1,13 @@
-import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from 'db';
-import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
-import nc from 'next-connect';
-import { withSessionRoute } from 'lib/session/withSession';
+import type { DiscordGuildMember } from 'lib/discord/assignRoles';
+import { assignRolesFromDiscord } from 'lib/discord/assignRoles';
 import { handleDiscordResponse } from 'lib/discord/handleDiscordResponse';
+import type { DiscordServerRole } from 'lib/discord/interface';
+import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { findOrCreateRoles } from 'lib/roles/createRoles';
-import { assignRolesFromDiscord, DiscordGuildMember } from 'lib/discord/assignRoles';
-import { DiscordServerRole } from 'lib/discord/interface';
-import { RateLimit } from 'async-sema';
+import { withSessionRoute } from 'lib/session/withSession';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc({
   onError,
@@ -15,13 +15,11 @@ const handler = nc({
 });
 
 export interface ImportDiscordRolesPayload {
-  spaceId: string,
-  guildId: string,
+  spaceId: string;
+  guildId: string;
 }
 
 export type ImportRolesResponse = { importedRoleCount: number };
-
-const MEMBERS_PER_REQUEST = 100;
 
 async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRolesResponse | { error: string }>) {
   const { spaceId, guildId } = req.body as ImportDiscordRolesPayload;
@@ -55,34 +53,51 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
     return;
   }
 
-  let lastUserId = '0';
-  let discordGuildMembersResponse = await handleDiscordResponse<DiscordGuildMember[]>(`https://discord.com/api/v8/guilds/${guildId}/members?limit=${MEMBERS_PER_REQUEST}`);
-
-  while (discordGuildMembersResponse.status === 'success' && discordGuildMembersResponse.data.length > 0) {
-    discordGuildMembers.push(...discordGuildMembersResponse.data);
-    const guildMember = discordGuildMembersResponse.data[discordGuildMembersResponse.data.length - 1];
-    if (!guildMember.user) {
-      throw new Error('Guild member does not have a user property');
-    }
-    lastUserId = guildMember.user.id;
-    discordGuildMembersResponse = await handleDiscordResponse<DiscordGuildMember[]>(`https://discord.com/api/v8/guilds/${guildId}/members?limit=${MEMBERS_PER_REQUEST}&after=${lastUserId}`);
-  }
-
-  if (discordGuildMembersResponse.status !== 'success') {
-    res.status(discordGuildMembersResponse.status).json({ error: discordGuildMembersResponse.error });
-  }
-  else {
-    const rolesRecord = await findOrCreateRoles(discordServerRoles, spaceId, req.session.user.id);
-    // Remove the roles imported from guild.xyz
-    for (const roleId of Object.keys(rolesRecord)) {
-      const role = rolesRecord[roleId];
-      if (role?.sourceId && role.source === 'guild_xyz') {
-        delete rolesRecord[roleId];
+  const discordConnectedMembers = await prisma.user.findMany({
+    where: {
+      spaceRoles: {
+        some: {
+          spaceId
+        }
+      },
+      discordUser: {
+        isNot: null
       }
+    },
+    select: {
+      discordUser: {
+        select: {
+          discordId: true
+        }
+      },
+      id: true
     }
-    await assignRolesFromDiscord(rolesRecord, discordGuildMembers, spaceId);
-    res.status(200).json({ importedRoleCount: discordServerRoles.length });
+  });
+
+  const discordGuildMemberResponses = await Promise.all(
+    discordConnectedMembers.map(
+      discordConnectedMember => handleDiscordResponse<DiscordGuildMember>(
+        `https://discord.com/api/v8/guilds/${guildId}/members/${discordConnectedMember.discordUser!.discordId}`
+      )
+    )
+  ) as { status: 'success', data: DiscordGuildMember | null }[];
+
+  discordGuildMemberResponses.forEach(discordGuildMemberResponse => {
+    if (discordGuildMemberResponse.status === 'success' && discordGuildMemberResponse.data) {
+      discordGuildMembers.push(discordGuildMemberResponse.data);
+    }
+  });
+
+  const rolesRecord = await findOrCreateRoles(discordServerRoles, spaceId, req.session.user.id);
+  // Remove the roles imported from guild.xyz
+  for (const roleId of Object.keys(rolesRecord)) {
+    const role = rolesRecord[roleId];
+    if (role?.sourceId && role.source === 'guild_xyz') {
+      delete rolesRecord[roleId];
+    }
   }
+  await assignRolesFromDiscord(rolesRecord, discordGuildMembers, spaceId);
+  res.status(200).json({ importedRoleCount: discordServerRoles.length });
 }
 
 handler.use(requireUser).use(requireSpaceMembership({ adminOnly: true })).post(importRoles);

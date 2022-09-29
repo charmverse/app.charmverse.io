@@ -1,5 +1,6 @@
-import { PagePermission } from '@prisma/client';
+import type { PagePermission, PagePermissionLevel } from '@prisma/client';
 import { AllowedPagePermissions } from '../available-page-permissions.class';
+import type { PageOperationType } from '../page-permission-interfaces';
 import { permissionTemplates } from '../page-permission-mapping';
 import { findExistingPermissionForGroup } from './find-existing-permission-for-group';
 
@@ -26,4 +27,33 @@ export function hasSameOrMorePermissions (basePermissions: PagePermission [], co
     }
   }
   return true;
+}
+
+interface PermissionLevelComparison {
+  base: PagePermissionLevel | PageOperationType[];
+  comparison: PagePermissionLevel | PageOperationType[];
+}
+
+type PermissionLevelComparisonResult = 'equal' | 'more' | 'less' | 'different';
+
+export function comparePermissionLevels ({ base, comparison }: PermissionLevelComparison): PermissionLevelComparisonResult {
+  const baseOperations = base instanceof Array ? base : permissionTemplates[base];
+  const compareOperations = comparison instanceof Array ? comparison : permissionTemplates[comparison];
+
+  const basePermissions = new AllowedPagePermissions(baseOperations);
+  const comparePermissions = new AllowedPagePermissions(compareOperations);
+
+  const compareHasBase = comparePermissions.hasPermissions(baseOperations);
+
+  if (compareHasBase) {
+    return compareOperations.length === baseOperations.length ? 'equal' : 'more';
+  }
+
+  const baseHasCompare = basePermissions.hasPermissions(compareOperations);
+
+  if (baseHasCompare) {
+    return 'less';
+  }
+
+  return 'different';
 }

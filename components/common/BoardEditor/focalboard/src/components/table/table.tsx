@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import React, { useCallback } from 'react';
 
 import { FormattedMessage } from 'react-intl';
@@ -28,7 +26,7 @@ type Props = {
     views: BoardView[]
     visibleGroups: BoardGroup[]
     groupByProperty?: IPropertyTemplate
-    readonly: boolean
+    readOnly: boolean
     cardIdToFocusOnRender: string
     showCard: (cardId?: string) => void
     addCard: (groupByOptionId?: string) => Promise<void>
@@ -206,7 +204,7 @@ function Table (props: Props): JSX.Element {
           offset={offset}
           resizingColumn={resizingColumn}
           columnRefs={columnRefs}
-          readonly={props.readonly}
+          readOnly={props.readOnly}
         />
 
         {/* Table rows */}
@@ -220,7 +218,7 @@ function Table (props: Props): JSX.Element {
                           activeView={activeView}
                           groupByProperty={groupByProperty}
                           group={group}
-                          readonly={props.readonly}
+                          readOnly={props.readOnly}
                           columnRefs={columnRefs}
                           selectedCardIds={props.selectedCardIds}
                           cardIdToFocusOnRender={props.cardIdToFocusOnRender}
@@ -245,7 +243,7 @@ function Table (props: Props): JSX.Element {
                       columnRefs={columnRefs}
                       cards={cards}
                       selectedCardIds={props.selectedCardIds}
-                      readonly={props.readonly}
+                      readOnly={props.readOnly}
                       cardIdToFocusOnRender={props.cardIdToFocusOnRender}
                       offset={offset}
                       resizingColumn={resizingColumn}
@@ -259,7 +257,7 @@ function Table (props: Props): JSX.Element {
 
         {/* Add New row */}
         <div className='octo-table-footer'>
-          {!props.readonly && !activeView.fields.groupById
+          {!props.readOnly && !activeView.fields.groupById
                     && (
                     <div
                       className='octo-table-cell'
@@ -281,7 +279,7 @@ function Table (props: Props): JSX.Element {
           activeView={activeView}
           resizingColumn={resizingColumn}
           offset={offset}
-          readonly={props.readonly}
+          readOnly={props.readOnly}
         />
       </div>
     </div>

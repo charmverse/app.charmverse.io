@@ -1,6 +1,6 @@
-import { EditorState, EditorView, Transaction } from '@bangle.dev/pm';
-import { SpaceOperation } from '@prisma/client';
-import { InlinePaletteItem } from './hooks';
+import type { EditorState, EditorView, Transaction } from '@bangle.dev/pm';
+import type { SpaceOperation } from '@prisma/client';
+import type { InlinePaletteItem } from './hooks';
 
 export const PALETTE_ITEM_REGULAR_TYPE = 'REGULAR_TYPE';
 export const PALETTE_ITEM_HINT_TYPE = 'HINT_TYPE';
@@ -16,21 +16,23 @@ type EditorExecuteCommand = (arg: {
 /**
  * @requiredSpacePermission Optional parameter. If this is provided, the palette item should not be available to a user without this space permission.
  */
-export interface PaletteItemType {
+export interface PaletteItemTypeNoGroup {
   uid: string;
   title: string;
   type?: string;
-  requiredSpacePermission?: SpaceOperation,
+  requiredSpacePermission?: SpaceOperation;
   description: string;
   keywords?: string[];
   disabled?: ((state: EditorState<any>) => boolean) | boolean;
   hidden?: boolean | ((state: EditorState) => boolean);
   editorExecuteCommand: EditorExecuteCommand;
-  group: string;
-  highPriority?: boolean;
   skipFiltering?: boolean;
-  _isItemDisabled?: boolean
-  icon?: JSX.Element | null | undefined
+  _isItemDisabled?: boolean;
+  icon?: JSX.Element | null | undefined;
+}
+
+export interface PaletteItemType extends PaletteItemTypeNoGroup {
+  group: string;
 }
 
 export class PaletteItem implements PaletteItemType {
@@ -58,8 +60,6 @@ export class PaletteItem implements PaletteItemType {
 
   group: string;
 
-  highPriority: boolean;
-
   skipFiltering: boolean;
 
   icon?: JSX.Element | null | undefined;
@@ -80,7 +80,6 @@ export class PaletteItem implements PaletteItemType {
       requiredSpacePermission,
       editorExecuteCommand,
       group,
-      highPriority,
       skipFiltering,
       icon,
       ...otherKeys
@@ -109,7 +108,6 @@ export class PaletteItem implements PaletteItemType {
     this.hidden = hidden ?? false;
     this.editorExecuteCommand = editorExecuteCommand;
     this.group = group;
-    this.highPriority = highPriority ?? false;
     this.skipFiltering = skipFiltering ?? false;
     this._isItemDisabled = false;
     this.icon = icon;

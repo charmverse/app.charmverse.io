@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 
 import { useEffect, useCallback } from 'react';
 
@@ -7,7 +5,7 @@ import { ImageBlock, createImageBlock } from '../../blocks/imageBlock';
 import octoClient from '../../octoClient';
 import mutator from '../../mutator';
 
-export default function useImagePaste (cardId: string, contentOrder: Array<string | string[]>, rootId: string): void {
+export default function useImagePaste (cardId: string, contentOrder: (string | string[])[], rootId: string): void {
   const uploadItems = useCallback(async (items: FileList) => {
     let newImage: File|null = null;
     const uploads: Promise<string|undefined>[] = [];

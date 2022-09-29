@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
-import fetch from 'node-fetch';
+
+export {};
 
 // use this file and test api keys
 

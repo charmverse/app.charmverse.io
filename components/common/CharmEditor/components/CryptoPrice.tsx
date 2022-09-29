@@ -1,5 +1,5 @@
-import { BaseRawNodeSpec } from '@bangle.dev/core';
-import { DOMOutputSpec } from '@bangle.dev/pm';
+import type { BaseRawNodeSpec } from '@bangle.dev/core';
+import type { DOMOutputSpec } from '@bangle.dev/pm';
 import Button from 'components/common/Button';
 import Autorenew from '@mui/icons-material/Autorenew';
 import ArrowDropDown from '@mui/icons-material/ArrowDropDown';
@@ -7,7 +7,8 @@ import { Box, Card, CardContent, CardActions, CircularProgress, IconButton, Typo
 import { useEffect, useState } from 'react';
 import { InputSearchCurrency } from 'components/common/form/InputSearchCurrency';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
-import { CryptoCurrency, FiatCurrency, IPairQuote, CryptoCurrencies, getChainById } from 'connectors';
+import type { CryptoCurrency, FiatCurrency, IPairQuote } from 'connectors';
+import { CryptoCurrencies, getChainById } from 'connectors';
 import { formatMoney } from 'lib/utilities/formatting';
 import { RelativeTime } from 'components/common/RelativeTime';
 import { CoinLogoAndTicker } from 'components/common/CoinLogoAndTicker';
@@ -36,6 +37,9 @@ export function cryptoPriceSpec () {
         },
         quote: {
           default: null
+        },
+        track: {
+          default: []
         }
       },
       group: 'block',
@@ -55,9 +59,9 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
   preset?: Partial<{
     base: CryptoCurrency | null;
     quote: FiatCurrency | null;
-  }>,
-  onQuoteCurrencyChange?: ((currency: FiatCurrency) => void),
-  onBaseCurrencyChange?: ((currency: CryptoCurrency) => void)
+  }>;
+  onQuoteCurrencyChange?: ((currency: FiatCurrency) => void);
+  onBaseCurrencyChange?: ((currency: CryptoCurrency) => void);
 }) {
 
   const [loading, setLoadingState] = useState(false);

@@ -1,9 +1,9 @@
-import { Command } from '@bangle.dev/pm';
+import type { Command } from '@bangle.dev/pm';
 import { focusFloatingMenuInput } from '@bangle.dev/react-menu/floating-menu';
 import { hasComponentInSchema } from '@bangle.dev/react-menu/helper';
 import { querySelectionTooltipType, hideSelectionTooltip, updateSelectionTooltipType } from '@bangle.dev/tooltip/selection-tooltip';
 import { rafCommandExec } from '@bangle.dev/utils';
-import { PluginKey } from 'prosemirror-state';
+import type { PluginKey } from 'prosemirror-state';
 import { markName as inlineCommentMarkName } from '../../inlineComment/inlineComment.constants';
 import { markName as inlineVoteMarkName } from '../../inlineVote/inlineVote.constants';
 

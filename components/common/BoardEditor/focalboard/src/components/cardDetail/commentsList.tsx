@@ -1,19 +1,15 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import React, { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { useContributors } from 'hooks/useContributors';
+import { useUser } from 'hooks/useUser';
 import Avatar from 'components/common/Avatar';
 import { CommentBlock, createCommentBlock } from '../../blocks/commentBlock';
 import mutator from '../../mutator';
-import { useAppSelector } from '../../store/hooks';
 import { Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
 
-import { MarkdownEditor } from '../markdownEditor';
-
-import { IUser } from '../../user';
-import { getMe } from '../../store/users';
+import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 
 import Comment from './comment';
 
@@ -21,83 +17,100 @@ type Props = {
     comments: readonly CommentBlock[]
     rootId: string
     cardId: string
-    readonly: boolean
+    readOnly: boolean
 }
 
 const CommentsList = React.memo((props: Props) => {
-  const [newComment, setNewComment] = useState('');
-  const me = useAppSelector<IUser|null>(getMe);
+  const {user} = useUser();
+  const [contributors] = useContributors();
+  const [editorKey, setEditorKey] = useState(0); // a key to allow us to reset charmeditor contents
 
-  const onSendClicked = () => {
-    const commentText = newComment;
-    if (commentText) {
-      const { rootId, cardId } = props;
-      Utils.log(`Send comment: ${commentText}`);
-      Utils.assertValue(cardId);
+  const onSendClicked = (newComment: CommentBlock['fields']) => {
+    const { rootId, cardId } = props;
+    Utils.log(`Send comment: ${newComment.contentText}`);
+    Utils.assertValue(cardId);
 
-      const comment = createCommentBlock();
-      comment.parentId = cardId;
-      comment.rootId = rootId;
-      comment.title = commentText;
-      mutator.insertBlock(comment, 'add comment');
-      setNewComment('');
-    }
+    const comment = createCommentBlock();
+    const { content, contentText } = newComment;
+    comment.parentId = cardId;
+    comment.rootId = rootId;
+    comment.title = contentText || '';
+    comment.fields = { content }
+    mutator.insertBlock(comment, 'add comment');
+    // clear the editor
+    setEditorKey(key => key + 1);
   };
 
   const { comments } = props;
-  const intl = useIntl();
-
-  const newCommentComponent = (
-    <div className='CommentsList__new'>
-      <img
-        className='comment-avatar'
-        src={Utils.getProfilePicture(me?.id)}
-      />
-      <MarkdownEditor
-        className='newcomment'
-        text={newComment}
-        placeholderText={intl.formatMessage({ id: 'CardDetail.new-comment-placeholder', defaultMessage: 'Add a comment...' })}
-        onChange={(value: string) => {
-          if (newComment !== value) {
-            setNewComment(value);
-          }
-        }}
-      />
-
-      {newComment
-            && (
-            <Button
-              filled={true}
-              onClick={onSendClicked}
-            >
-              <FormattedMessage
-                id='CommentsList.send'
-                defaultMessage='Send'
-              />
-            </Button>
-            )}
-    </div>
-  );
 
   return (
     <div className='CommentsList'>
       {/* New comment */}
-      {!props.readonly && newCommentComponent}
+      {!props.readOnly && (
+        <NewCommentInput
+          $key={editorKey}
+          key={editorKey}
+          avatar={user?.avatar}
+          username={user?.username}
+          onSubmit={onSendClicked}
+        />
+      )}
 
       {comments.slice(0).reverse().map((comment) => (
         <Comment
           key={comment.id}
           comment={comment}
-          userImageUrl={Utils.getProfilePicture(comment.updatedBy)}
-          userId={comment.updatedBy}
-          readonly={props.readonly}
+          contributor={contributors.find(_contributor => _contributor.id === comment.createdBy)}
+          readOnly={props.readOnly}
         />
       ))}
 
       {/* horizontal divider below comments */}
-      {!(comments.length === 0 && props.readonly) && <hr className='CommentsList__divider' />}
+      {!(comments.length === 0 && props.readOnly) && <hr className='CommentsList__divider' />}
     </div>
   );
 });
+
+interface NewCommentProps {
+  initialValue?: any | null;
+  $key?: string | number;
+  username?: string;
+  avatar?: string | null;
+  onSubmit: (i: CommentBlock['fields']) => void;
+}
+
+export function NewCommentInput ({ initialValue = null, $key, username, avatar, onSubmit }: NewCommentProps) {
+
+  const intl = useIntl();
+  const [newComment, setNewComment] = useState<CommentBlock['fields'] | null>(initialValue);
+
+  return (
+    <div className='CommentsList__new'>
+      <Avatar size='xSmall' name={username} avatar={avatar} />
+      <InlineCharmEditor
+        content={newComment?.content}
+        key={$key} // use the size of comments so it resets when the new one is added
+        onContentChange={({ doc, rawText }) => {
+          setNewComment({ content: doc, contentText: rawText });
+        }}
+        placeholderText={intl.formatMessage({ id: 'CardDetail.new-comment-placeholder', defaultMessage: 'Add a comment...' })}
+        style={{ fontSize: '14px' }}
+      />
+
+      {newComment && (
+        <Button
+          filled={true}
+          onClick={() => onSubmit(newComment)}
+        >
+          <FormattedMessage
+            id='CommentsList.send'
+            defaultMessage='Send'
+          />
+        </Button>
+      )}
+    </div>
+  );
+}
+
 
 export default CommentsList;

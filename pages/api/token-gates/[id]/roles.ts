@@ -1,10 +1,10 @@
 
-import { TokenGateToRole } from '@prisma/client';
+import type { TokenGateToRole } from '@prisma/client';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { requireSpaceMembership } from 'lib/middleware/requireSpaceMembership';
 import { withSessionRoute } from 'lib/session/withSession';
 import { updateTokenGateRoles } from 'lib/token-gates/updateTokenGateRoles';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -15,7 +15,7 @@ handler.use(requireUser)
   .post(updateTokenGateRolesHandler);
 
 async function updateTokenGateRolesHandler (req: NextApiRequest, res: NextApiResponse<TokenGateToRole[]>) {
-  const { roleIds } = req.body as {roleIds: string[]};
+  const { roleIds } = req.body as { roleIds: string[] };
   const tokenGateId = req.query.id as string;
   const tokenGateToRoles = await updateTokenGateRoles(roleIds, tokenGateId);
 

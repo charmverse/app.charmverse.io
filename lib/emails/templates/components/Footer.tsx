@@ -4,7 +4,7 @@ import TwitterIcon from '@mui/icons-material/Twitter';
 import {
   MjmlColumn, MjmlSection, MjmlText
 } from 'mjml-react';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { greyColor2 } from 'theme/colors';
 
 export default function Footer () {
@@ -42,7 +42,7 @@ export default function Footer () {
   );
 }
 
-function SocialIcon (props: { children: ReactNode; href: string }) {
+function SocialIcon (props: { children: ReactNode, href: string }) {
   return (
     <a style={{ padding: '0 5px', color: greyColor2 }} href={props.href} rel='noreferrer'>
       {props.children}

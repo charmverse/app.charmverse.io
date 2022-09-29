@@ -1,13 +1,12 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
-import { FilterClause, createFilterClause } from './filterClause';
+import type { FilterClause } from './filterClause';
+import { createFilterClause } from './filterClause';
 
 type FilterGroupOperation = 'and' | 'or'
 
 // A FilterGroup has 2 forms: (A or B or C) OR (A and B and C)
 type FilterGroup = {
-    operation: FilterGroupOperation
-    filters: (FilterClause | FilterGroup)[]
+    operation: FilterGroupOperation;
+    filters: (FilterClause | FilterGroup)[];
 }
 
 function isAFilterGroupInstance (object: (FilterClause | FilterGroup)): object is FilterGroup {

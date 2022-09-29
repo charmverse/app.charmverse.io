@@ -1,30 +1,30 @@
+import styled from '@emotion/styled';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
+import DoneIcon from '@mui/icons-material/Done';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import LockOpenIcon from '@mui/icons-material/LockOpen';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Tooltip, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import DoneIcon from '@mui/icons-material/Done';
 import Menu from '@mui/material/Menu';
-import Chip from '@mui/material/Chip';
 import MenuItem from '@mui/material/MenuItem';
-import LockOpenIcon from '@mui/icons-material/LockOpen';
 import Button from 'components/common/Button';
 import { InputSearchContributorMultiple } from 'components/common/form/InputSearchContributor';
 import Modal from 'components/common/Modal';
-import { bindMenu, bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import { useState } from 'react';
-import styled from '@emotion/styled';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useContributors } from 'hooks/useContributors';
-import GuildXYZIcon from 'public/images/guild_logo.svg';
-import { ListSpaceRolesResponse } from 'pages/api/roles';
-import useIsAdmin from 'hooks/useIsAdmin';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import useIsAdmin from 'hooks/useIsAdmin';
 import { spaceOperationLabels } from 'lib/permissions/spaces/client';
+import { bindMenu, bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import type { ListSpaceRolesResponse } from 'pages/api/roles';
+import GuildXYZIcon from 'public/images/guild_logo.svg';
+import { useState } from 'react';
 import RoleForm from './RoleForm';
 import RoleMemberRow from './RoleMemberRow';
 import SpacePermissions from './SpacePermissions';
@@ -86,7 +86,7 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
 
   return (
     <Box mb={3}>
-      <Box display='flex' justifyContent='space-between' alignItems='center'>
+      <Box display='flex' justifyContent='space-between' alignItems='center' pb={0.5}>
         <Box display='flex' gap={1} alignItems='center'>
           <Typography variant='h6' sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
             {role.name} {role.source === 'guild_xyz' ? (
@@ -162,16 +162,16 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
       >
         {/* We can only rename roles if not managed by Guild.xyv */}
         {role.source !== 'guild_xyz' && (
-        <MenuItem
-          sx={{ padding: '3px 12px' }}
-          onClick={() => {
-            popupState.open();
-            menuState.close();
-          }}
-        >
-          <ListItemIcon><EditOutlinedIcon fontSize='small' /></ListItemIcon>
-          <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Rename</Typography>
-        </MenuItem>
+          <MenuItem
+            sx={{ padding: '3px 12px' }}
+            onClick={() => {
+              popupState.open();
+              menuState.close();
+            }}
+          >
+            <ListItemIcon><EditOutlinedIcon fontSize='small' /></ListItemIcon>
+            <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Rename</Typography>
+          </MenuItem>
         )}
         {/* Only admins can update role space permissions */}
         <MenuItem

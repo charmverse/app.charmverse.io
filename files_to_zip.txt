@@ -1,13 +1,3 @@
-Dockerfile
-Dockerrun.aws.json
+docker-compose.yml
 .ebextensions
-.env
-.env.staging
-.next
-next.base.js
-next.config.js
-node_modules
-package.json
-public
-prisma
-seedData
+Dockerfile

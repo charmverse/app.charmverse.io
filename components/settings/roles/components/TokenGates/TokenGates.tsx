@@ -1,25 +1,25 @@
-import Typography from '@mui/material/Typography';
-import { useState } from 'react';
-import { v4 as uuid } from 'uuid';
-import { useRouter } from 'next/router';
-import { useWeb3React } from '@web3-react/core';
-import { ResourceId, checkAndSignAuthMessage, SigningConditions } from 'lit-js-sdk';
-// import ShareModal from 'lit-share-modal-v3-react-17';
-import Modal, { ErrorModal } from 'components/common/Modal';
-import { usePopupState, bindPopover, bindTrigger } from 'material-ui-popup-state/hooks';
-import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
-import { TokenGate } from '@prisma/client';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
-import charmClient from 'charmClient';
-import styled from '@emotion/styled';
 import { useTheme } from '@emotion/react';
+import styled from '@emotion/styled';
 import { Box } from '@mui/material';
+import Typography from '@mui/material/Typography';
+import type { TokenGate } from '@prisma/client';
+import { useWeb3React } from '@web3-react/core';
+import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
+import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import { useSnackbar } from 'hooks/useSnackbar';
-import useSWR from 'swr';
+import Modal, { ErrorModal } from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import LitShareModal from 'lit-share-modal-v3-react-17';
+import { useSnackbar } from 'hooks/useSnackbar';
 import getLitChainFromChainId from 'lib/token-gates/getLitChainFromChainId';
+import type { ResourceId, SigningConditions } from 'lit-js-sdk';
+import { checkAndSignAuthMessage } from 'lit-js-sdk';
+import LitShareModal from 'lit-share-modal-v3-react-17';
+import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+import useSWR from 'swr';
+import { v4 as uuid } from 'uuid';
 import Legend from '../../../Legend';
 import TokenGatesTable from './components/TokenGatesTable';
 
@@ -50,8 +50,9 @@ const ShareModalContainer = styled.div`
 `;
 
 // Example: https://github.com/LIT-Protocol/lit-js-sdk/blob/9b956c0f399493ae2d98b20503c5a0825e0b923c/build/manual_tests.html
+// Docs: https://www.npmjs.com/package/lit-share-modal-v3
 
-type ConditionsModalResult = Pick<SigningConditions, 'accessControlConditions' | 'chain' | 'permanant'>;
+type ConditionsModalResult = Pick<SigningConditions, 'unifiedAccessControlConditions' | 'permanant'> & { authSigTypes: string[], chains: string[] };
 
 export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, spaceId: string }) {
   const deletePopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-delete' });
@@ -103,6 +104,7 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
     const authSig = await checkAndSignAuthMessage({ chain });
     await litClient!.saveSigningCondition({
       ...conditions,
+      chain,
       authSig,
       resourceId
     });
@@ -165,19 +167,19 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
       </Modal>
       <ErrorModal message={apiError} open={errorPopupState.isOpen} onClose={errorPopupState.close} />
       {removedTokenGate && (
-      <ConfirmDeleteModal
-        title='Delete token gate'
-        onClose={closeTokenGateDeleteModal}
-        open={deletePopupState.isOpen}
-        buttonText='Delete token gate'
-        question='Are you sure you want to delete this invite link?'
-        onConfirm={async () => {
-          await charmClient.deleteTokenGate(removedTokenGate.id);
-          // update the list of links
-          await mutate();
-          setRemovedTokenGate(null);
-        }}
-      />
+        <ConfirmDeleteModal
+          title='Delete token gate'
+          onClose={closeTokenGateDeleteModal}
+          open={deletePopupState.isOpen}
+          buttonText='Delete token gate'
+          question='Are you sure you want to delete this invite link?'
+          onConfirm={async () => {
+            await charmClient.deleteTokenGate(removedTokenGate.id);
+            // update the list of links
+            await mutate();
+            setRemovedTokenGate(null);
+          }}
+        />
       )}
     </>
   );

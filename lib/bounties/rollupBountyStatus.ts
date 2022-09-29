@@ -1,8 +1,8 @@
-import { ApplicationStatus, BountyStatus } from '@prisma/client';
+import type { ApplicationStatus, BountyStatus } from '@prisma/client';
 import { prisma } from 'db';
 import { submissionsCapReached } from 'lib/applications/shared';
 import { includePagePermissions } from 'lib/pages/server';
-import { BountyWithDetails } from 'models';
+import type { BountyWithDetails } from 'lib/bounties';
 import { countValueOccurrences } from '../utilities/numbers';
 import { getBountyOrThrow } from './getBounty';
 

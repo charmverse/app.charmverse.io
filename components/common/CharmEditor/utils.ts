@@ -1,6 +1,6 @@
-import { PageContent } from 'models';
+import type { PageContent } from 'models';
 import { safeInsert } from '@bangle.dev/utils';
-import { EditorState, Node, Transaction } from '@bangle.dev/pm';
+import type { EditorState, Node, Transaction } from '@bangle.dev/pm';
 
 export function checkForEmpty (content: PageContent | null) {
   return !content?.content
@@ -26,6 +26,12 @@ export function insertNode (state: EditorState, dispatch: ((tr: Transaction<any>
   }
 
   return true;
+}
+
+export function isAtBeginningOfLine (state: EditorState) {
+  // @ts-ignore types package is missing $cursor property as of 1.2.8
+  const parentOffset = state.selection.$cursor.parentOffset;
+  return parentOffset === 0;
 }
 
 export const safeRequestAnimationFrame = typeof window !== 'undefined' && window.requestAnimationFrame

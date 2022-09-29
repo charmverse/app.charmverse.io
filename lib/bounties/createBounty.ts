@@ -1,12 +1,13 @@
-import { BountyStatus, Prisma } from '@prisma/client';
+import type { BountyStatus, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { getBountyPagePermissionSet } from 'lib/bounties/shared';
 import { setBountyPermissions } from 'lib/permissions/bounties';
 import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
-import { BountyWithDetails } from 'models';
 import { v4 } from 'uuid';
+import { getPagePath } from 'lib/pages/utils';
+import { NotFoundError } from 'lib/middleware';
 import { getBountyOrThrow } from './getBounty';
-import { BountyCreationData } from './interfaces';
+import type { BountyCreationData } from './interfaces';
 
 /**
  * You can create a bounty suggestion using only title, spaceId and createdBy. You will see many unit tests using this limited dataset, which will then default the bounty to suggestion status. Your logic should account for this.
@@ -40,6 +41,21 @@ export async function createBounty ({
     throw new PositiveNumbersOnlyError();
   }
 
+  const space = await prisma.space.findUnique({
+    where: {
+      id: spaceId
+    },
+    select: {
+      id: true,
+      publicBountyBoard: true
+    }
+
+  });
+
+  if (!space) {
+    throw new NotFoundError(`Space with id ${spaceId} not found`);
+  }
+
   const bountyId = v4();
 
   const bountyCreateInput: Prisma.BountyCreateInput = {
@@ -70,6 +86,22 @@ export async function createBounty ({
 
   const bountyPagePermissionSet: Omit<Prisma.PagePermissionCreateManyInput, 'pageId'>[] = getBountyPagePermissionSet({ createdBy, status, spaceId, permissions, linkedPageId });
 
+  const pagePermissionCreateInputs: Prisma.PagePermissionCreateManyInput[] = bountyPagePermissionSet.map(p => {
+    return {
+      ...p,
+      pageId: bountyId
+    };
+  });
+
+  // We want a smart default so that if a user creates a bounty visible to the space, and public bounty board is enabled, we inject a public permission
+  if (space.publicBountyBoard && pagePermissionCreateInputs.some(p => p.spaceId)) {
+    pagePermissionCreateInputs.push({
+      pageId: bountyId,
+      permissionLevel: 'view',
+      public: true
+    });
+  }
+
   if (!linkedPageId) {
     await prisma.$transaction([
       prisma.bounty.create({
@@ -78,7 +110,7 @@ export async function createBounty ({
           page: {
             create: {
               id: bountyId,
-              path: `page-${Math.random().toString().replace('0.', '')}`,
+              path: getPagePath(),
               title: '',
               contentText: '',
               content: undefined,
@@ -99,12 +131,7 @@ export async function createBounty ({
         }
       }),
       prisma.pagePermission.createMany({
-        data: bountyPagePermissionSet.map(p => {
-          return {
-            ...p,
-            pageId: bountyId
-          };
-        })
+        data: pagePermissionCreateInputs
       })
     ]);
   }
@@ -123,15 +150,15 @@ export async function createBounty ({
           type: 'card',
           bountyId
         }
-      }),
-      prisma.pagePermission.createMany({
-        data: bountyPagePermissionSet.map(p => {
-          return {
-            ...p,
-            pageId: linkedPageId
-          };
-        })
       })
+      // prisma.pagePermission.createMany({
+      //   data: bountyPagePermissionSet.map(p => {
+      //     return {
+      //       ...p,
+      //       pageId: linkedPageId
+      //     };
+      //   })
+      // })
     ]);
   }
 

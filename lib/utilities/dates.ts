@@ -1,5 +1,6 @@
 
-import { DateTime, DateTimeUnit as LuxonTimeUnit } from 'luxon';
+import type { DateTimeUnit as LuxonTimeUnit } from 'luxon';
+import { DateTime } from 'luxon';
 
 export type DateInput = DateTime | Date | string | number;
 
@@ -7,7 +8,7 @@ export type DateTimeFormat = 'relative' | 'absolute'
 
 export type TimeUnit = 'millisecond' | 'second' | 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year'
 
-const SystemToLuxonUnitMapping: {[key in TimeUnit]: LuxonTimeUnit} = {
+const SystemToLuxonUnitMapping: { [key in TimeUnit]: LuxonTimeUnit } = {
   millisecond: 'millisecond',
   second: 'second',
   minute: 'minute',
@@ -47,8 +48,8 @@ export function getTimeDifference (
 }
 
 export function humanFriendlyDate (date: DateInput, options: {
-  withYear?: boolean,
-  withTime?: boolean} = {
+  withYear?: boolean;
+  withTime?: boolean; } = {
   withYear: false,
   withTime: false
 }): string {
@@ -78,4 +79,11 @@ export function toMonthDate (date: DateInput): string {
   const parsedDate = convertToLuxonDate(date);
 
   return parsedDate.toFormat('MMM d');
+}
+
+export function showDateWithMonthAndYear (dateInput: Date | string, showDate?: boolean) {
+  const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+  return `${date.toLocaleString('default', {
+    month: 'long'
+  })}${showDate ? ` ${date.getDate()},` : ''} ${date.getFullYear()}`;
 }

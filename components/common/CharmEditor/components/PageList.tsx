@@ -1,15 +1,29 @@
 import { ListItemIcon, MenuItem, Typography } from '@mui/material';
-import { Page } from '@prisma/client';
+import type { Page } from '@prisma/client';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import PageTitle from 'components/common/PageLayout/components/PageTitle';
-import { PageContent } from 'models';
+import type { PageContent } from 'models';
 import { checkForEmpty } from '../utils';
 
-export function PagesList (
-  { activeItemIndex = -1, pages, onSelectPage }: { activeItemIndex?: number, pages: Page[], onSelectPage: (page: Page) => void }
-) {
+interface Props {
+  activeItemIndex?: number;
+  pages: Page[];
+  onSelectPage: (page: Page) => void;
+}
+
+export default function PagesList ({ activeItemIndex = -1, pages, onSelectPage }: Props) {
   return (
-    pages.length === 0 ? <Typography sx={{ ml: 2, mb: 1 }} variant='subtitle2' color='secondary'>No pages found</Typography> : (
+    pages.length === 0 ? (
+      <Typography
+        style={{
+          marginLeft: 16,
+          marginBottom: 8
+        }}
+        variant='subtitle2'
+        color='secondary'
+      >No pages found
+      </Typography>
+    ) : (
       <div>
         {pages.map((page, pageIndex) => {
           const docContent = ((page.content) as PageContent);

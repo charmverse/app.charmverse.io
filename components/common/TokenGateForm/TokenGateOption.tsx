@@ -5,17 +5,17 @@ import CardContent from '@mui/material/CardContent';
 import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import { SxProps, Theme } from '@mui/system';
+import type { SxProps, Theme } from '@mui/system';
 import { useWeb3React } from '@web3-react/core';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { TokenGateWithRoles } from 'lib/token-gates/interfaces';
+import type { TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import { humanizeAccessControlConditions } from 'lit-js-sdk';
 import { useEffect, useState } from 'react';
 
 interface Props {
-  tokenGate: TokenGateWithRoles,
-  validGate?: boolean | null,
-  isVerifying: boolean,
+  tokenGate: TokenGateWithRoles;
+  validGate?: boolean | null;
+  isVerifying: boolean;
 }
 
 export default function TokenGateOption ({ tokenGate, validGate, isVerifying }: Props) {

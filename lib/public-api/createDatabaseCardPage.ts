@@ -1,9 +1,10 @@
-import { Page } from '@prisma/client';
+import type { Page } from '@prisma/client';
 import { prisma } from 'db';
 import { v4, validate } from 'uuid';
 import { InvalidInputError } from 'lib/utilities/errors';
+import { getPagePath } from 'lib/pages/utils';
 import { DatabasePageNotFoundError } from './errors';
-import { PageProperty } from './interfaces';
+import type { PageProperty } from './interfaces';
 import { PageFromBlock } from './pageFromBlock.class';
 
 export async function createDatabase (boardInfo: Record<keyof Pick<Page, 'title' | 'createdBy' | 'spaceId'>, string>, boardSchema: PageProperty [] = []): Promise<Page> {
@@ -58,7 +59,7 @@ export async function createDatabase (boardInfo: Record<keyof Pick<Page, 'title'
   return database;
 }
 
-export async function createDatabaseCardPage (pageInfo: Record<keyof Pick<Page, 'title' | 'boardId' | 'createdBy' | 'spaceId'>, string> & {properties: Record<string, string>}): Promise<PageFromBlock> {
+export async function createDatabaseCardPage (pageInfo: Record<keyof Pick<Page, 'title' | 'boardId' | 'createdBy' | 'spaceId'>, string> & { properties: Record<string, string> }): Promise<PageFromBlock> {
 
   const isValidUUid = validate(pageInfo.boardId);
 
@@ -128,7 +129,7 @@ export async function createDatabaseCardPage (pageInfo: Record<keyof Pick<Page, 
       },
       content: { type: 'doc', content: [] },
       contentText: '',
-      path: `page-${Math.random().toString().replace('0.', '')}`,
+      path: getPagePath(),
       type: 'card',
       title: pageInfo.title || '',
       parentId: pageInfo.boardId,

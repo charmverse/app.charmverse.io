@@ -9,14 +9,19 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
-import { addPageAndRedirect, IPageWithPermissions, NewPageInput } from 'lib/pages';
+import type { IPageWithPermissions, NewPageInput } from 'lib/pages';
+import { addPageAndRedirect } from 'lib/pages';
 import { mapPageTree, sortNodes } from 'lib/pages/mapPageTree';
 import { isTruthy } from 'lib/utilities/types';
-import { Page, PageContent } from 'models';
+import type { Page, PageContent } from 'models';
 import { useRouter } from 'next/router';
-import { ComponentProps, Dispatch, memo, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo } from 'react';
+import type { ComponentProps, Dispatch, ReactNode, SetStateAction, SyntheticEvent } from 'react';
+import { memo, useCallback, useEffect, useMemo } from 'react';
 import { useDrop } from 'react-dnd';
-import TreeNode, { MenuNode, ParentMenuNode } from './components/TreeNode';
+
+import { useSnackbar } from 'hooks/useSnackbar';
+import type { MenuNode, ParentMenuNode } from './components/TreeNode';
+import TreeNode from './components/TreeNode';
 
 const StyledTreeRoot = styled(TreeRoot)<{ isFavorites?: boolean }>`
   flex-grow: ${props => props.isFavorites ? 0 : 1};
@@ -32,9 +37,9 @@ export function filterVisiblePages (pages: (Page | undefined)[], rootPageIds: st
 }
 
 type TreeRootProps = {
-  children: ReactNode,
-  isFavorites?: boolean,
-  setPages: Dispatch<SetStateAction<Record<string, IPageWithPermissions | undefined>>>
+  children: ReactNode;
+  isFavorites?: boolean;
+  setPages: Dispatch<SetStateAction<Record<string, IPageWithPermissions | undefined>>>;
 } & ComponentProps<typeof TreeView>;
 
 function TreeRoot ({ children, setPages, isFavorites, ...rest }: TreeRootProps) {
@@ -88,8 +93,9 @@ function PageNavigation ({
   const router = useRouter();
   const { pages, currentPageId, setPages } = usePages();
   const [space] = useCurrentSpace();
-  const [user] = useUser();
+  const { user } = useUser();
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${space!.id}.expanded-pages`, []);
+  const { showMessage } = useSnackbar();
 
   const pagesArray: MenuNode[] = filterVisiblePages(Object.values(pages))
     .map((page): MenuNode => ({
@@ -102,7 +108,8 @@ function PageNavigation ({
       path: page.path,
       type: page.type,
       createdAt: page.createdAt,
-      deletedAt: page.deletedAt
+      deletedAt: page.deletedAt,
+      spaceId: page.spaceId
     }));
 
   const pageHash = JSON.stringify(pagesArray);
@@ -119,9 +126,9 @@ function PageNavigation ({
     const parentId = containerItem.parentId;
 
     setPages(_pages => {
-      const unsortedSiblings: Page[] = Object.values(_pages).filter(isTruthy)
+      const unsortedSiblings = Object.values(_pages).filter(isTruthy)
         .filter((page) => page && page.parentId === parentId && page.id !== droppedItem.id);
-      const siblings: Page[] = sortNodes(unsortedSiblings) as Page[];
+      const siblings = sortNodes(unsortedSiblings);
 
       const droppedPage = _pages[droppedItem.id];
       if (!droppedPage) {
@@ -154,31 +161,53 @@ function PageNavigation ({
 
   const onDropChild = useCallback((droppedItem: MenuNode, containerItem: MenuNode) => {
 
-    if (containerItem.type === 'board') {
+    if (containerItem.type.match(/board/)) {
       return;
     }
 
+    // Prevent a page becoming child of itself
     if (droppedItem.id === containerItem?.id) {
       return;
     }
+
+    // Make sure the new parent is not in the children of this page
+    let currentNode: MenuNode | undefined = containerItem;
+    while (currentNode) {
+      if (currentNode.parentId === droppedItem.id) {
+        return;
+      }
+      // We reached the current node. It's fine to reorder under a parent or root
+      else if (currentNode.id === droppedItem.id || !currentNode.parentId) {
+        break;
+      }
+      else {
+        currentNode = pages[currentNode.parentId];
+      }
+    }
+
     const index = 1000; // send it to the end
-    const parentId = containerItem.id;
-    // console.log('onDropChild:', droppedItem.title, 'under', containerItem.title);
-    charmClient.updatePage({
-      id: droppedItem.id,
-      index, // send it to the end
-      parentId
-    });
+    const parentId = (containerItem as MenuNode)?.id ?? null;
+
+    const page = pages[droppedItem.id] as IPageWithPermissions;
 
     setPages(_pages => ({
       ..._pages,
       [droppedItem.id]: {
-        ..._pages[droppedItem.id]!,
-        index,
+        ...page,
         parentId
       }
     }));
-  }, []);
+
+    charmClient.updatePage({
+      id: droppedItem.id,
+      index, // send it to the end
+      parentId
+    })
+      .catch(err => {
+        showMessage(err.message, 'error');
+      });
+
+  }, [pages]);
 
   useEffect(() => {
     const currentPage = pages[currentPageId];

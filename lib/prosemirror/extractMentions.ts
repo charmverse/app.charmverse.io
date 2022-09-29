@@ -1,5 +1,5 @@
 import { shortenHex } from 'lib/utilities/strings';
-import { PageContent } from 'models';
+import type { PageContent } from 'models';
 
 /**
  * Extract all mention ids from page content (json)
@@ -7,7 +7,7 @@ import { PageContent } from 'models';
  * @returns An array of mention ids
  */
 export function extractMentions (content: PageContent, username?: string) {
-  const mentions: {id: string, createdAt: string, createdBy: string, text: string, value: string}[] = [];
+  const mentions: { id: string, createdAt: string, createdBy: string, text: string, value: string }[] = [];
 
   function recurse (node: PageContent, parentNode: PageContent | null) {
     if (node.content) {

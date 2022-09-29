@@ -25,11 +25,34 @@
   ],
   "rules": {
     "@next/next/no-img-element": "off",
+    "@typescript-eslint/array-type": "error",
     "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/consistent-type-imports": [
+      "error",
+      {
+        "prefer": "type-imports"
+      }
+    ],
     "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-inferrable-types": "off",
     "@typescript-eslint/no-empty-interface": "off",
+    "@typescript-eslint/member-delimiter-style": [
+      "error",
+      {
+        "multiline": {
+          "delimiter": "semi",
+          "requireLast": true
+        },
+        "singleline": {
+          "delimiter": "comma",
+          "requireLast": false
+        },
+        "multilineDetection": "brackets"
+      }
+    ],
+    "@typescript-eslint/object-curly-spacing": ["error", "always"],
+    "object-curly-spacing": "off",
     "arrow-body-style": "off",
     "arrow-parens": "off",
     "brace-style": [
@@ -86,6 +109,7 @@
         "allowForLoopAfterthoughts": true
       }
     ],
+    "no-restricted-exports": "off",
     "no-restricted-syntax": "off",
     "no-underscore-dangle": "off",
     "no-unused-vars": "off",
@@ -111,6 +135,14 @@
           ".tsx",
           ".jsx"
         ]
+      }
+    ],
+    "react/jsx-indent": [
+      2,
+      2,
+      {
+        "checkAttributes": true,
+        "indentLogicalExpressions": true
       }
     ],
     "react/jsx-no-bind": "off",

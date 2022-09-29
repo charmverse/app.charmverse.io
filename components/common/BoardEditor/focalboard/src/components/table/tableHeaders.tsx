@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import React, { useCallback, useMemo } from 'react';
 
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -26,7 +24,7 @@ type Props = {
     cards: Card[]
     activeView: BoardView
     views: BoardView[]
-    readonly: boolean
+    readOnly: boolean
     resizingColumn: string;
     offset: number;
     columnRefs: Map<string, React.RefObject<HTMLDivElement>>
@@ -139,7 +137,7 @@ function TableHeaders (props: Props): JSX.Element {
         type='text'
         name='Title'
         sorted={titleSorted}
-        readonly={props.readonly}
+        readOnly={props.readOnly}
         board={board}
         activeView={activeView}
         cards={cards}
@@ -162,7 +160,7 @@ function TableHeaders (props: Props): JSX.Element {
             type={template.type}
             name={template.name}
             sorted={sorted}
-            readonly={props.readonly}
+            readOnly={props.readOnly}
             board={board}
             activeView={activeView}
             cards={cards}
@@ -181,7 +179,7 @@ function TableHeaders (props: Props): JSX.Element {
         style={{ flexGrow: 1, borderRight: '0 none' }}
       >
 
-        {!props.readonly
+        {!props.readOnly
                     && (
                     <MenuWrapper>
                       <Button>

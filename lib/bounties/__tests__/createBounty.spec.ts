@@ -1,13 +1,14 @@
 
-import { Bounty, Role, Space, User } from '@prisma/client';
+import type { Bounty, Role, Space, User } from '@prisma/client';
 import { InvalidInputError } from 'lib/utilities/errors/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
+import { prisma } from 'db';
 import { queryBountyPermissions } from '../../permissions/bounties';
 import { PositiveNumbersOnlyError } from '../../utilities/errors/numbers';
 import { createBounty } from '../createBounty';
-import { BountyCreationData } from '../interfaces';
+import type { BountyCreationData } from '../interfaces';
 
 let user: User;
 let space: Space;
@@ -287,7 +288,66 @@ describe('createBounty / permissions setup', () => {
     expect(roleViewPermission).toBe(true);
   });
 
-  it('should upgrade existing page permissions for the group, but leave them unchanged if they are higher', () => {
+  // Implicit relation: When creating the bounty page, we infer starting page permissions from who can submit
+  it('should add a public page permission if the bounty is accessible to the space and public bounty board is enabled, ', async () => {
+    const { space: publicBountySpace, user: _user } = await generateUserAndSpaceWithApiToken();
+
+    await prisma.space.update({
+      where: {
+        id: publicBountySpace.id
+      },
+      data: {
+        publicBountyBoard: true
+      }
+    });
+
+    const bounty = await createBounty({
+      createdBy: _user.id,
+      spaceId: publicBountySpace.id,
+      status: 'open',
+      rewardAmount: 1,
+      chainId: 1,
+      rewardToken: 'ETH',
+      permissions: {
+        submitter: [{
+          group: 'space',
+          id: publicBountySpace.id
+        }]
+      }
+    });
+
+    expect(bounty.page.permissions.some(p => p.public)).toBe(true);
+
+  });
+
+  it('should not add public page permission if the bounty is accessible to the space and public bounty board is disabled, ', async () => {
+    const { space: publicBountySpace, user: _user } = await generateUserAndSpaceWithApiToken();
+
+    await prisma.space.update({
+      where: {
+        id: publicBountySpace.id
+      },
+      data: {
+        publicBountyBoard: false
+      }
+    });
+
+    const bounty = await createBounty({
+      createdBy: _user.id,
+      spaceId: publicBountySpace.id,
+      status: 'open',
+      rewardAmount: 1,
+      chainId: 1,
+      rewardToken: 'ETH',
+      permissions: {
+        submitter: [{
+          group: 'space',
+          id: publicBountySpace.id
+        }]
+      }
+    });
+
+    expect(bounty.page.permissions.some(p => p.public)).toBe(false);
 
   });
 });

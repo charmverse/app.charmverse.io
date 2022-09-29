@@ -1,24 +1,22 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 /* eslint-disable max-lines */
-import React, { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useDrag, useDrop } from 'react-dnd';
 import { FormattedMessage, IntlShape } from 'react-intl';
-import { useDrop, useDrag } from 'react-dnd';
 
-import { Constants } from '../../constants';
-import { IPropertyOption, IPropertyTemplate, Board, BoardGroup } from '../../blocks/board';
-import { BoardView } from '../../blocks/boardView';
-import { Card } from '../../blocks/card';
-import mutator from '../../mutator';
-import IconButton from '../../widgets/buttons/iconButton';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import HideIcon from '../../widgets/icons/hide';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from '../../blocks/board';
+import { BoardView } from '../../blocks/boardView';
+import { Card } from '../../blocks/card';
+import { Constants } from '../../constants';
+import mutator from '../../mutator';
+import IconButton from '../../widgets/buttons/iconButton';
+import Editable from '../../widgets/editable';
+import HideIcon from '../../widgets/icons/hide';
+import Label from '../../widgets/label';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
-import Editable from '../../widgets/editable';
-import Label from '../../widgets/label';
 
 import { KanbanCalculation } from './calculation/calculation';
 
@@ -30,7 +28,7 @@ type Props = {
     group: BoardGroup
     groupByProperty?: IPropertyTemplate
     intl: IntlShape
-    readonly: boolean
+    readOnly: boolean
     addCard: (groupByOptionId?: string, show?: boolean) => Promise<void>
     propertyNameChanged: (option: IPropertyOption, text: string) => Promise<void>
     onDropToColumn: (srcOption: IPropertyOption, card?: Card, dstOption?: IPropertyOption) => void
@@ -87,7 +85,7 @@ export default function KanbanColumnHeader (props: Props): JSX.Element {
       ref={headerRef}
       style={{ opacity: isDragging ? 0.5 : 1 }}
       className={className}
-      draggable={!props.readonly}
+      draggable={!props.readOnly}
     >
       {groupByProperty && !group.option.id
                 && (
@@ -122,7 +120,7 @@ export default function KanbanColumnHeader (props: Props): JSX.Element {
                     onCancel={() => {
                       setGroupTitle(group.option.value);
                     }}
-                    readonly={props.readonly}
+                    readOnly={props.readOnly}
                     spellCheck={true}
                   />
                 </Label>
@@ -135,7 +133,7 @@ export default function KanbanColumnHeader (props: Props): JSX.Element {
         onMenuClose={props.onCalculationMenuClose}
         onMenuOpen={props.onCalculationMenuOpen}
         cardProperties={board.fields.cardProperties}
-        readonly={props.readonly}
+        readOnly={props.readOnly}
         onChange={(data: {calculation: string, propertyId: string}) => {
           if (data.calculation === calculationValue && data.propertyId === calculationProperty.id) {
             return;
@@ -153,7 +151,7 @@ export default function KanbanColumnHeader (props: Props): JSX.Element {
         }}
       />
       <div className='octo-spacer' />
-      {!props.readonly
+      {!props.readOnly
                 && (
                 <>
                   <MenuWrapper>

@@ -9,7 +9,13 @@ html {
 .focalboard-body {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+
+  &.full-page {
+    flex-grow: 1;
+    overflow: hidden;
+    height: 100%;
+  }
+
   width: 100%;
   margin: 0;
   padding: 0;
@@ -23,7 +29,8 @@ html {
   input,
   textarea,
   select {
-    font-size: 100%; /* Normalize */
+    font-size: 100%;
+    /* Normalize */
   }
 
   input,
@@ -200,4 +207,48 @@ html {
       width: 48px;
     }
   }
+}
+
+.CalendarContainer {
+
+  /* fullcalendar */
+  --fc-border-color: var(--prop-gray);
+  --fc-today-bg-color: rgba(var(--button-bg-rgb), 0.08);
+
+  a,
+  a:hover {
+    color: rgba(var(--center-channel-color-rgb), 0.64);
+    text-decoration: none;
+  }
+
+  // make cursor a pointer when hovering cards
+  .fc-event {
+    cursor: pointer;
+  }
+
+  // fix extra spacing issues when embedded inline in a page
+  .fc-daygrid-day-frame:before,
+  .fc-daygrid-day-events:before,
+  .fc-daygrid-event-harness:before,
+  .fc-daygrid-day-frame:after,
+  .fc-daygrid-day-events:after,
+  .fc-daygrid-event-harness:after {
+    font-size: 0;
+  }
+
+  // brighten the "Add event" button in dark mode
+  .CalendarContainer .fc-day .dateContainer .addEvent {
+    color: rgba(var(--center-channel-color-rgb), .8);
+  }
+
+  td,
+  th {
+    background-color: transparent;
+  }
+
+  // font size of month
+  .fc .fc-toolbar-title {
+    font-size: 1em;
+  }
+
 }

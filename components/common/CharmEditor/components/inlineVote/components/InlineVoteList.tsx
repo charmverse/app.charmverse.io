@@ -1,4 +1,4 @@
-import { Mark, MarkType, PluginKey } from '@bangle.dev/pm';
+import type { Mark, MarkType, PluginKey } from '@bangle.dev/pm';
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 
 import { Box } from '@mui/system';
@@ -6,14 +6,15 @@ import { Modal } from 'components/common/Modal';
 import { useVotes } from 'hooks/useVotes';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { findChildrenByMark, NodeWithPos } from 'prosemirror-utils';
+import type { NodeWithPos } from 'prosemirror-utils';
+import { findChildrenByMark } from 'prosemirror-utils';
 import { useEffect, useRef } from 'react';
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import VoteDetail from './VoteDetail';
 import { markName } from '../inlineVote.constants';
 import type { InlineVotePluginState } from '../inlineVote.plugins';
 
-export default function InlineVoteList ({ pluginKey }: {pluginKey: PluginKey<InlineVotePluginState>}) {
+export default function InlineVoteList ({ pluginKey }: { pluginKey: PluginKey<InlineVotePluginState> }) {
   const view = useEditorViewContext();
   const {
     ids,
@@ -32,7 +33,7 @@ export default function InlineVoteList ({ pluginKey }: {pluginKey: PluginKey<Inl
     if (!hasRemovedCompletedVoteMarks.current) {
       const votesList = Object.keys(votes);
       const notIsProgressVotes = new Set(votesList.filter(voteId => votes[voteId].status !== 'InProgress'));
-      const completedVoteNodeWithMarks: (NodeWithPos & {mark: Mark})[] = [];
+      const completedVoteNodeWithMarks: (NodeWithPos & { mark: Mark })[] = [];
       if (!isValidating && votesList.length !== 0 && !isLoading) {
         const inlineVoteMarkSchema = view.state.schema.marks[markName] as MarkType;
         const inlineVoteNodes = findChildrenByMark(view.state.doc, inlineVoteMarkSchema);
@@ -64,10 +65,10 @@ export default function InlineVoteList ({ pluginKey }: {pluginKey: PluginKey<Inl
     }
   }, [votes, isValidating, isLoading, view, hasRemovedCompletedVoteMarks]);
 
-  if ((currentPageActionDisplay !== 'votes' || cardId) && show && inProgressVoteIds.length !== 0) {
+  if ((currentPageActionDisplay !== 'polls' || cardId) && show && inProgressVoteIds.length !== 0) {
     return (
       <Modal
-        title='Vote details'
+        title='Poll details'
         size='large'
         open={true}
         onClose={() => {

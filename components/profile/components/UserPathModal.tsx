@@ -1,14 +1,14 @@
-import { useEffect } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Check, Close } from '@mui/icons-material';
-import * as yup from 'yup';
-import { useForm } from 'react-hook-form';
 import { Box, InputAdornment, Stack } from '@mui/material';
-import Button from 'components/common/Button';
 import TextField from '@mui/material/TextField';
-import { Modal, DialogTitle } from 'components/common/Modal';
 import charmClient from 'charmClient';
+import Button from 'components/common/Button';
+import { DialogTitle, Modal } from 'components/common/Modal';
 import debouncePromise from 'lib/utilities/debouncePromise';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import * as yup from 'yup';
 
 async function validatePath (path: string) {
   const result = await charmClient.checkNexusPath(path);
@@ -36,10 +36,10 @@ export const schema = yup.object({
 export type FormValues = yup.InferType<typeof schema>;
 
 type Props = {
-  currentValue: string | null | undefined,
-  save: (path: string) => void,
-  close: () => void,
-  isOpen: boolean,
+  currentValue: string | null | undefined;
+  save: (path: string) => void;
+  close: () => void;
+  isOpen: boolean;
 };
 
 export default function UserPathModal (props: Props) {
@@ -69,7 +69,7 @@ export default function UserPathModal (props: Props) {
     save(values.path);
   }
 
-  const hostname = typeof window !== 'undefined' ? window.location.origin : '';
+  const hostname = typeof window !== 'undefined' ? `${window.location.origin}/u` : '';
   const pathValue = watch('path');
 
   let statusIcon = null;

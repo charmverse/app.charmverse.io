@@ -1,6 +1,7 @@
-import { PagePermission, Prisma } from '@prisma/client';
+import type { PagePermission, Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { IPageWithPermissions, PageNodeWithChildren, PageNodeWithPermissions, TargetPageTree, TargetPageTreeWithFlatChildren } from 'lib/pages/interfaces';
+import type { IPageWithPermissions, PageNodeWithChildren, PageNodeWithPermissions, TargetPageTree } from 'lib/pages/interfaces';
+import { TargetPageTreeWithFlatChildren } from 'lib/pages/interfaces';
 import { flattenTree } from 'lib/pages/mapPageTree';
 import { getPage } from 'lib/pages/server';
 import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
@@ -12,7 +13,7 @@ import { hasSameOrMorePermissions } from './has-same-or-more-permissions';
  * Detects permissions to replace and emits the updateMany arguments for a Prisma transaction
  */
 export function generateReplaceIllegalPermissions ({ parents, targetPage }: TargetPageTree<PageNodeWithPermissions>):
- {updateManyOperations:Prisma.PagePermissionUpdateManyArgs[]} {
+ { updateManyOperations:Prisma.PagePermissionUpdateManyArgs[] } {
 
   const parentMap = parents.reduce((acc, parent, index) => {
     acc[parent.id] = index;
@@ -41,7 +42,7 @@ export function generateReplaceIllegalPermissions ({ parents, targetPage }: Targ
   const pagePermissionsToDisconnect: Prisma.Enumerable<Prisma.PagePermissionWhereInput> = [];
 
   // Permission inheritance references to update
-  const oldNewMap: {oldSourcePermissionId: string, newSourcePermissionId: string}[] = [];
+  const oldNewMap: { oldSourcePermissionId: string, newSourcePermissionId: string }[] = [];
 
   /**
    * 1. Go up the tree to find where we went wrong
@@ -204,8 +205,8 @@ export function generateReplaceIllegalPermissions ({ parents, targetPage }: Targ
   };
 }
 
-export async function replaceIllegalPermissions ({ pageId }: {pageId: string}):
- Promise<IPageWithPermissions & PageNodeWithChildren<PageNodeWithPermissions> & {tree: TargetPageTree<PageNodeWithPermissions>}> {
+export async function replaceIllegalPermissions ({ pageId }: { pageId: string }):
+ Promise<IPageWithPermissions & PageNodeWithChildren<PageNodeWithPermissions> & { tree: TargetPageTree<PageNodeWithPermissions> }> {
 
   const { parents, targetPage } = await resolvePageTree({ pageId });
 
@@ -219,7 +220,7 @@ export async function replaceIllegalPermissions ({ pageId }: {pageId: string}):
 
       const pageWithChildren: IPageWithPermissions
       & PageNodeWithChildren<PageNodeWithPermissions>
-      & {tree: TargetPageTree<PageNodeWithPermissions>} = {
+      & { tree: TargetPageTree<PageNodeWithPermissions> } = {
         ...pageAfterPermissionsUpdate,
         children: targetPage.children,
         tree: {

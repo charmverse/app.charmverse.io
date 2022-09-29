@@ -1,9 +1,9 @@
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import type { IPageWithPermissions } from 'lib/pages/server';
 import { duplicatePage } from 'lib/pages/server/duplicatePage';
-import { IPageWithPermissions } from 'lib/pages/server';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -14,7 +14,7 @@ handler.use(requireUser)
 async function duplicatePageRoute (req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
   const pageId = req.query.id as string;
   const userId = req.session.user.id;
-  const { parentId } = req.body as {parentId: string};
+  const { parentId } = req.body as { parentId: string };
 
   const permissions = await computeUserPagePermissions({
     pageId,

@@ -1,7 +1,7 @@
 import { Box, CardHeader, Typography } from '@mui/material';
-import { Page } from '@prisma/client';
+import type { Page } from '@prisma/client';
 import { fancyTrim } from 'lib/utilities/strings';
-import { BountyWithDetails } from 'models';
+import type { BountyWithDetails } from 'lib/bounties';
 import { memo } from 'react';
 import BountyStatusBadge from './BountyStatusBadge';
 
@@ -17,9 +17,10 @@ function BountyCard ({ bounty, page, onClick }: Props) {
       onClick={onClick}
       className='KanbanCard'
       sx={{
-        height: 150,
+        height: 'fit-content',
         display: 'grid' // make child full height,
       }}
+      data-test={`bounty-card-${bounty?.id}`}
     >
       <Box
         sx={{
@@ -35,7 +36,7 @@ function BountyCard ({ bounty, page, onClick }: Props) {
           <Typography paragraph={true}>
             {fancyTrim(page?.contentText, 50)}
           </Typography>
-          <BountyStatusBadge bounty={bounty} hideStatus={true} />
+          <BountyStatusBadge bounty={bounty} hideStatus={true} truncate />
         </Box>
       </Box>
     </Box>

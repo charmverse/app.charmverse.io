@@ -1,10 +1,10 @@
 
-import { PaymentMethod } from '@prisma/client';
+import type { PaymentMethod } from '@prisma/client';
 import { prisma } from 'db';
 import { hasAccessToSpace, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -41,7 +41,7 @@ async function deletePaymentMethod (req: NextApiRequest, res: NextApiResponse) {
       id
     }
   });
-  return res.status(200).json({});
+  return res.status(200).end();
 }
 
 export default withSessionRoute(handler);

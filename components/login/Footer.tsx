@@ -1,14 +1,14 @@
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
 import styled from '@emotion/styled';
-import Link from '@mui/material/Link';
-import IconButton from '@mui/material/IconButton';
-import TwitterIcon from '@mui/icons-material/Twitter';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
-import DiscordIcon from 'public/images/discord_logo.svg';
+import TwitterIcon from '@mui/icons-material/Twitter';
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
+import Link from '@mui/material/Link';
 import SvgIcon from '@mui/material/SvgIcon';
+import Typography from '@mui/material/Typography';
+import DiscordIcon from 'public/images/discord_logo.svg';
 
 import { Container } from './LoginPageContent';
 
@@ -22,8 +22,8 @@ const LinkHeader = styled(Typography)`
   text-transform: uppercase;
   font-size: 1.3em;
   font-weight: bold;
-  margin: 1em 0;
-  border-top: 4px solid ${({ theme }) => theme.palette.divider};
+  margin-bottom: 1em;
+  border-top: 3px solid ${({ theme }) => theme.palette.divider};
   padding-top: .5em;
 `;
 
@@ -45,9 +45,9 @@ const StyledIconButton = styled(IconButton)`
 
 export default function Footer () {
   return (
-    <Background mt={6} sx={{ flexGrow: 1 }}>
-      <Container py={6} px={3}>
-        <Grid container spacing={12}>
+    <Background mt={6} sx={{ flexGrow: 1, textAlign: { xs: 'center', sm: 'left' } }}>
+      <Container py={9} px={3}>
+        <Grid container spacing={6}>
           <Grid item xs={12} sm={4}>
             <LinkHeader>
               Links
@@ -62,11 +62,11 @@ export default function Footer () {
             <StyledLink href='mailto:hello@charmverse.io'>hello@charmverse.io</StyledLink>
             <Typography color='secondary'>New York, NY</Typography>
           </Grid>
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={12} sm={4} alignItems='center'>
             <LinkHeader>
               Social
             </LinkHeader>
-            <Box display='flex' alignItems='center'>
+            <Box display='flex' alignItems='center' sx={{ justifyContent: { xs: 'center', sm: 'left' } }}>
               <StyledIconButton href='https://www.linkedin.com/company/charmverse' target='_blank'>
                 <LinkedInIcon />
               </StyledIconButton>

@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import { IntlShape } from 'react-intl';
 
 import { BoardView } from './blocks/boardView';
@@ -7,7 +5,7 @@ import { Board, IPropertyTemplate } from './blocks/board';
 import { Card } from './blocks/card';
 import { OctoUtils } from './octoUtils';
 import { Utils } from './utils';
-import { IAppWindow } from './types';
+import type { IAppWindow } from './types';
 
 declare let window: IAppWindow;
 

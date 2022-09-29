@@ -1,8 +1,9 @@
-import { BountyPermission, BountyPermissionLevel, Prisma } from '@prisma/client';
+import type { BountyPermission, Prisma } from '@prisma/client';
+import { BountyPermissionLevel } from '@prisma/client';
 import { prisma } from 'db';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { assigneeGroupIsValid } from '../validateAssigneeGroup';
-import { BountyPermissionAssignment, BountyPermissions } from './interfaces';
+import type { BountyPermissionAssignment, BountyPermissions } from './interfaces';
 import { mapBountyPermissions } from './mapBountyPermissions';
 
 /**
@@ -64,7 +65,7 @@ export async function removeBountyPermissionGroup ({ assignee, level, resourceId
     select: {
       permissions: true
     }
-  }) as {permissions: BountyPermission[]};
+  }) as { permissions: BountyPermission[] };
 
   if (!bounty) {
     throw new DataNotFoundError(`Bounty with id ${resourceId} not found`);

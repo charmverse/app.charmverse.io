@@ -1,8 +1,9 @@
-import { EditorView, PluginKey } from '@bangle.dev/pm';
+import type { EditorView, PluginKey } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import { MenuItem } from '@mui/material';
-import { ReactNode, useCallback, useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import MenuList from '@mui/material/MenuList';
 import {
   useInlinePaletteItems,
@@ -15,7 +16,7 @@ import {
 } from '../paletteItem';
 import { useEditorItems } from '../useEditorItems';
 import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
-import { NestedPagePluginState } from '../../nestedPage';
+import type { NestedPagePluginState } from '../../nestedPage';
 
 function getItemsAndHints (
   view: EditorView,
@@ -23,15 +24,13 @@ function getItemsAndHints (
   editorItems: PaletteItem[],
   isItemDisabled: (paletteItem: PaletteItem) => boolean
 ) {
-  let items = [...editorItems];
-  if (!items.every((item) => item instanceof PaletteItem)) {
-    throw new Error(
-      `uid: "${items.find((item) => !(item instanceof PaletteItem))?.uid
-      }" must be an instance of PaletteItem `
-    );
+
+  const invalidItem = editorItems.find((item) => !(item instanceof PaletteItem));
+  if (invalidItem) {
+    throw new Error(`uid: "${invalidItem.uid}" must be an instance of PaletteItem`);
   }
 
-  items = items.filter((item) => typeof item.hidden === 'function' ? !item.hidden(view.state) : !item.hidden);
+  let items = editorItems.filter((item) => typeof item.hidden === 'function' ? !item.hidden(view.state) : !item.hidden);
 
   // TODO This is hacky
   items.forEach((item) => {
@@ -40,25 +39,7 @@ function getItemsAndHints (
   items = items
     .filter(
       (item) => queryMatch(item, query) && item.type === PALETTE_ITEM_REGULAR_TYPE
-    )
-    .sort((a, b) => {
-      let result = fieldExistenceSort(a, b, 'highPriority');
-
-      if (result !== 0) {
-        return result;
-      }
-
-      result = fieldExistenceSort(a, b, '_isItemDisabled', true);
-
-      if (result !== 0) {
-        return result;
-      }
-
-      if (a.group === b.group) {
-        return a.title.localeCompare(b.title);
-      }
-      return a.group.localeCompare(b.group);
-    });
+    );
   return { items };
 }
 
@@ -68,11 +49,11 @@ const InlinePaletteGroup = styled.div`
 `;
 
 export default function InlineCommandPalette (
-  { nestedPagePluginKey, disableNestedPage = false }: {nestedPagePluginKey?: PluginKey<NestedPagePluginState>, disableNestedPage?: boolean}
+  { nestedPagePluginKey, disableNestedPage = false }: { nestedPagePluginKey?: PluginKey<NestedPagePluginState>, disableNestedPage?: boolean }
 ) {
   const { query, counter, isVisible, tooltipContentDOM } = useInlinePaletteQuery(palettePluginKey);
   const view = useEditorViewContext();
-  const editorItems = useEditorItems({ nestedPagePluginKey });
+  const editorItems = useEditorItems({ disableNestedPage, nestedPagePluginKey });
   const isItemDisabled = useCallback(
     (item) => {
       return typeof item.disabled === 'function'

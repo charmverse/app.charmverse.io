@@ -1,14 +1,16 @@
 import type { BaseRawMarkSpec, RawPlugins } from '@bangle.dev/core';
-import {
+import type {
   Command,
-  EditorState, Fragment, keymap, MarkType,
+  EditorState, MarkType, Schema } from '@bangle.dev/pm';
+import { Fragment, keymap,
   Node,
   Plugin,
-  PluginKey, Schema,
+  PluginKey,
   Selection
 } from '@bangle.dev/pm';
-import { createTooltipDOM, tooltipPlacement, TooltipRenderOpts } from '@bangle.dev/tooltip';
-import { GetReferenceElementFunction } from '@bangle.dev/tooltip/tooltip-placement';
+import type { TooltipRenderOpts } from '@bangle.dev/tooltip';
+import { createTooltipDOM, tooltipPlacement } from '@bangle.dev/tooltip';
+import type { GetReferenceElementFunction } from '@bangle.dev/tooltip/tooltip-placement';
 import { triggerInputRule } from '@bangle.dev/tooltip/trigger-input-rule';
 import { createObject, filter, findFirstMarkPosition, isChromeWithSelectionBug, safeInsert } from '@bangle.dev/utils';
 import log from 'lib/log';
@@ -86,6 +88,7 @@ interface PluginsOptions {
   onArrowRight?: Command;
 }
 export interface SuggestTooltipPluginState {
+
   triggerText: string;
   show: boolean;
   counter: number;
@@ -209,7 +212,7 @@ function pluginsFactory ({
 
 export function referenceElement (
   pluginKey: PluginKey,
-  getActiveMarkPos: (state: EditorState) => { start: number; end: number }
+  getActiveMarkPos: (state: EditorState) => { start: number, end: number }
 ): GetReferenceElementFunction {
   return (view) => {
     return {
@@ -227,7 +230,8 @@ export function referenceElement (
         // so that it doesn't hide the text
         const end = view.coordsAtPos(markPos.end > -1 ? markPos.end : startPos);
 
-        let { left, right, top, bottom } = end;
+        const { left, top, bottom } = end;
+        let { right } = end;
         right = left;
         return {
           width: right - left,
@@ -291,9 +295,7 @@ function tooltipController ({
             }
             return;
           }
-
           renderSuggestionsTooltip(key, {})(view.state, view.dispatch, view);
-
         }
       };
     }
@@ -431,7 +433,9 @@ export function replaceSuggestMarkWith (
       const { start, end } = queryMark;
       let tr = state.tr
         .removeStoredMark(markType)
-        .replaceWith(start, end, Fragment.empty);
+        .replaceWith(start, end, Fragment.empty)
+        // set meta so that track plugin ignores this transaction
+        .setMeta('suggestTooltipFeature', true);
 
       if (!maybeNode) {
         return tr;
@@ -451,7 +455,6 @@ export function replaceSuggestMarkWith (
         log.error('suggest-tooltip error', e);
         return tr;
       }
-
       if (node.isText) {
         tr = tr.replaceWith(start, start, node);
       }
@@ -469,9 +472,9 @@ export function replaceSuggestMarkWith (
         tr = tr.replaceWith(start, start, fragment);
         // This problem affects Chrome v58+. See: https://github.com/ProseMirror/prosemirror/issues/710
         if (isChromeWithSelectionBug) {
-          const selection = document.getSelection();
-          if (selection) {
-            selection.empty();
+          const _selection = document.getSelection();
+          if (_selection) {
+            _selection.empty();
           }
         }
 

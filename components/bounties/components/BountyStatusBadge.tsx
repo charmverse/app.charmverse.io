@@ -7,19 +7,28 @@ import ModeStandbyIcon from '@mui/icons-material/ModeStandby';
 import PaidIcon from '@mui/icons-material/Paid';
 import { IconButton, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
-import Chip, { ChipProps } from '@mui/material/Chip';
+import type { ChipProps } from '@mui/material/Chip';
+import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
-import { Bounty, BountyStatus } from '@prisma/client';
+import type { Bounty, BountyStatus } from '@prisma/client';
 import TokenLogo from 'components/common/TokenLogo';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenAndChainInfoFromPayments } from 'lib/tokens/tokenData';
+import { nanofy } from 'lib/utilities/numbers';
 import millify from 'millify';
-import { BOUNTY_LABELS } from 'models/Bounty';
 import Link from 'next/link';
-import { ReactNode } from 'react';
-import { BrandColor } from 'theme/colors';
+import type { ReactNode } from 'react';
+import type { BrandColor } from 'theme/colors';
+
+const BOUNTY_LABELS: Record<BountyStatus, string> = {
+  suggestion: 'Suggestion',
+  open: 'Open',
+  inProgress: 'In Progress',
+  complete: 'Complete',
+  paid: 'Paid'
+};
 
 const BOUNTY_STATUS_ICONS : Record<BountyStatus, ReactNode> = {
   suggestion: <LightbulbIcon />,
@@ -131,7 +140,11 @@ export function BountyAmount ({ bounty, truncate = false }: { bounty: Pick<Bount
     symbolOrAddress: bounty.rewardToken
   });
 
-  const tooltip = `${tokenInfo.tokenName} (${tokenInfo.tokenSymbol})`;
+  const formattedAmount = Intl.NumberFormat(undefined, { maximumSignificantDigits: 3 }).format(bounty.rewardAmount);
+
+  const truncatedAmount = bounty.rewardAmount < 1 ? nanofy({ number: bounty.rewardAmount, spaceUnit: false }) : millify(bounty.rewardAmount);
+
+  const tooltip = `${formattedAmount} ${tokenInfo.tokenName} (${tokenInfo.tokenSymbol})`;
 
   return (
     <Tooltip arrow placement='top' title={bounty.rewardAmount === 0 ? '' : tooltip}>
@@ -172,7 +185,7 @@ export function BountyAmount ({ bounty, truncate = false }: { bounty: Pick<Bount
                   variant='h6'
                   fontSize={18}
                 >
-                  {truncate ? millify(bounty.rewardAmount) : bounty.rewardAmount}
+                  {truncate ? truncatedAmount : bounty.rewardAmount}
                 </Typography>
               </>
             )

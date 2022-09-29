@@ -1,23 +1,27 @@
 
-import { Page, Prisma } from '@prisma/client';
+import type { Page, Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { IEventToLog, postToDiscord } from 'lib/log/userEvents';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { IPageWithPermissions } from 'lib/pages/server';
-import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
-import { withSessionRoute } from 'lib/session/withSession';
-import { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-import { computeSpacePermissions } from 'lib/permissions/spaces';
-import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 import log from 'lib/log';
+import type { IEventToLog } from 'lib/log/userEvents';
+import { postToDiscord } from 'lib/log/userEvents';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import type { IPageWithPermissions } from 'lib/pages/server';
+import { getPage, PageNotFoundError, resolvePageTree } from 'lib/pages/server';
+import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
+import { computeSpacePermissions } from 'lib/permissions/spaces';
+import { createProposal } from 'lib/proposal/createProposal';
+import { syncProposalPermissions } from 'lib/proposal/syncProposalPermissions';
+import { withSessionRoute } from 'lib/session/withSession';
+import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).post(createPage);
 
 async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
-  const data = req.body as Page;
+  const data = req.body as Prisma.PageUncheckedCreateInput;
 
   const spaceId = data.spaceId;
 
@@ -33,32 +37,59 @@ async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
     userId
   });
 
-  if (!permissions.createPage) {
+  if (data.type === 'proposal' && !permissions.createVote) {
+    throw new UnauthorisedActionError('You do not have permission to create a page in this space');
+  }
+  else if (data.type !== 'proposal' && !permissions.createPage) {
     throw new UnauthorisedActionError('You do not have permissions to create a page.');
   }
 
   // Remove parent ID and pass it to the creation input
   // This became necessary after adding a formal parentPage relation related to page.parentId
   // We now need to specify this as a ParentPage.connect prisma argument instead of a raw string
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { createdBy, spaceId: droppedSpaceId, ...pageCreationData } = data;
-  const typedPageCreationData = pageCreationData as any as Prisma.PageCreateInput;
 
-  typedPageCreationData.author = {
-    connect: {
-      id: userId
-    }
-  };
+  let page: Page;
 
-  typedPageCreationData.space = {
-    connect: {
-      id: spaceId
-    }
-  };
+  if (pageCreationData.type === 'proposal_template') {
+    throw new UnauthorisedActionError('You cannot create a proposal template using this endpoint.');
+  }
+  else if (pageCreationData.type === 'proposal') {
+    ({ page } = await createProposal({
+      ...pageCreationData,
+      spaceId,
+      createdBy
+    }));
+  }
+  else {
+    page = await prisma.page.create({ data: {
+      spaceId,
+      createdBy,
+      ...pageCreationData
+    } });
+  }
 
-  const page = await prisma.page.create({ data: typedPageCreationData });
   try {
 
-    const pageWithPermissions = await setupPermissionsAfterPageCreated(page.id);
+    const proposalIdForPermissions = page.parentId ? (await resolvePageTree({
+      pageId: page.id
+      // includeDeletedPages: true
+    })).parents.find(p => p.type === 'proposal')?.id : undefined;
+
+    // Create proposal method provisions proposal permissions, so we only need this operation for child pages of a proposal
+    if (proposalIdForPermissions) {
+      await syncProposalPermissions({ proposalId: proposalIdForPermissions as string });
+    }
+    else if (page.type !== 'proposal') {
+      await setupPermissionsAfterPageCreated(page.id);
+    }
+
+    const pageWithPermissions = await getPage(page.id);
+
+    if (!pageWithPermissions) {
+      throw new PageNotFoundError(page.id);
+    }
 
     logFirstWorkspacePageCreation(page);
     logFirstUserPageCreation(page);

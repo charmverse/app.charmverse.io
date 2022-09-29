@@ -1,16 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Bounty, Prisma, Space, Thread, User } from '@prisma/client';
-import { IPageWithPermissions } from 'lib/pages';
-import request from 'supertest';
-import { generatePageToCreateStub } from 'testing/generate-stubs';
-import { baseUrl } from 'testing/mockApiCall';
-import { createPage, generateUserAndSpaceWithApiToken, generateCommentWithThreadAndPage, generateSpaceUser } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
-import { createBounty } from 'lib/bounties';
-import { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads';
-import { upsertPermission } from 'lib/permissions/pages';
-import { CommentCreate, CommentWithUser } from 'lib/comments';
+import type { Space, User } from '@prisma/client';
 import { prisma } from 'db';
+import { upsertPermission } from 'lib/permissions/pages';
+import request from 'supertest';
+import { baseUrl, loginUser } from 'testing/mockApiCall';
+import { generateCommentWithThreadAndPage, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 let nonAdminUser: User;
 let nonAdminUserSpace: Space;
@@ -64,18 +58,14 @@ describe('PUT /api/threads/{id} - update a comment', () => {
       .expect(200);
   });
 
-  it('should fail if the user does not have comment permission, even if they are a space admin, and respond 401', async () => {
+  it('should fail if the user does not have comment permission and respond 401', async () => {
 
     const otherAdminUser = await generateSpaceUser({
       spaceId: nonAdminUserSpace.id,
-      isAdmin: true
+      isAdmin: false
     });
 
-    const otherAdminCookie = (await request(baseUrl)
-      .post('/api/session/login')
-      .send({
-        address: otherAdminUser.addresses[0]
-      })).headers['set-cookie'][0];
+    const otherAdminCookie = await loginUser(otherAdminUser);
 
     const { thread, page, comment } = await generateCommentWithThreadAndPage({
       commentContent: 'Message',
@@ -127,7 +117,7 @@ describe('DELETE /api/threads/{id} - delete a thread', () => {
 
     const otherAdminUser = await generateSpaceUser({
       spaceId: nonAdminUserSpace.id,
-      isAdmin: true
+      isAdmin: false
     });
 
     const otherAdminCookie = (await request(baseUrl)

@@ -1,4 +1,4 @@
-import { ComponentProps, ReactNode } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import styled from '@emotion/styled';
 import MuiModal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
@@ -61,12 +61,12 @@ export enum ModalPosition {
 }
 
 export type ModalProps = Omit<ComponentProps<typeof MuiModal>, 'children' | 'onClose' | 'title'> & {
-  size?: ModalSize,
-  children: any,
-  title?: string | ReactNode,
-  position?: ModalPosition,
-  noPadding?: boolean,
-  onClose: () => void
+  size?: ModalSize;
+  children: any;
+  title?: string | ReactNode;
+  position?: ModalPosition;
+  noPadding?: boolean;
+  onClose: () => void;
 };
 
 export function Modal ({ children, noPadding, position = ModalPosition.center, size = defaultSize, title, ...props }: ModalProps) {

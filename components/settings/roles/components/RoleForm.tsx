@@ -3,13 +3,13 @@ import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
-import { Role } from '@prisma/client';
+import type { Role } from '@prisma/client';
 import Button from 'components/common/Button';
 import useRoles from 'hooks/useRoles';
+import type { ISystemError } from 'lib/utilities/errors';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
-import { ISystemError } from 'lib/utilities/errors';
-import { useState } from 'react';
 
 export const schema = yup.object({
   name: yup.string().required('Please provide a valid role name')
@@ -18,9 +18,9 @@ export const schema = yup.object({
 type FormValues = yup.InferType<typeof schema>
 
 interface Props {
-  submitted?: (value: Partial<Role>) => void
-  role?: Partial<Role>
-  mode: 'create' | 'edit'
+  submitted?: (value: Partial<Role>) => void;
+  role?: Partial<Role>;
+  mode: 'create' | 'edit';
 }
 
 export default function RoleForm ({ role = {}, mode = 'create', submitted = () => {} }: Props) {

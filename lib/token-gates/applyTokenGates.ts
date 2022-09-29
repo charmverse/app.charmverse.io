@@ -1,9 +1,9 @@
-import { Role } from '@prisma/client';
+import type { Role } from '@prisma/client';
 import { prisma } from 'db';
 import { DataNotFoundError, InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
 import { verifyJwt } from 'lit-js-sdk';
 import { v4 } from 'uuid';
-import { LitJwtPayload, TokenGateVerification, TokenGateVerificationResult, TokenGateWithRoles } from './interfaces';
+import type { LitJwtPayload, TokenGateVerification, TokenGateVerificationResult, TokenGateWithRoles } from './interfaces';
 
 export async function applyTokenGates ({ spaceId, userId, tokens, commit }: TokenGateVerification): Promise<TokenGateVerificationResult> {
 
@@ -41,7 +41,7 @@ export async function applyTokenGates ({ spaceId, userId, tokens, commit }: Toke
   }
 
   const verifiedTokenGates: TokenGateWithRoles[] = (await Promise.all(tokens.map(async tk => {
-    const result = await verifyJwt({ jwt: tk.signedToken }) as {payload: LitJwtPayload, verified: boolean};
+    const result = await verifyJwt({ jwt: tk.signedToken }) as { payload: LitJwtPayload, verified: boolean };
 
     const matchingTokenGate = tokenGates.find(g => g.id === tk.tokenGateId);
 

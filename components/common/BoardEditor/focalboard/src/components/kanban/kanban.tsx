@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 /* eslint-disable max-lines */
 // import Button from '../../widgets/buttons/button'
 import React, { useCallback, useState } from 'react';
@@ -7,17 +5,18 @@ import { FormattedMessage, injectIntl, IntlShape } from 'react-intl';
 
 import withScrolling, { createHorizontalStrength, createVerticalStrength } from 'react-dnd-scrolling';
 
+import { Menu, TextField } from '@mui/material';
 import Button from '@mui/material/Button';
-import { TextField, Menu } from '@mui/material';
 import { Box } from '@mui/system';
-import { bindTrigger, bindMenu } from 'material-ui-popup-state';
+import { bindMenu, bindTrigger } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { Board, IPropertyOption, IPropertyTemplate, BoardGroup } from '../../blocks/board';
-import { Card } from '../../blocks/card';
+import { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from '../../blocks/board';
 import { BoardView } from '../../blocks/boardView';
+import { Card } from '../../blocks/card';
 import mutator, { BlockChange } from '../../mutator';
-import { Utils, IDType } from '../../utils';
+import { IDType, Utils } from '../../utils';
 // import Button from '../../widgets/buttons/button'
+import { isTouchScreen } from 'lib/browser';
 import { Constants } from '../../constants';
 
 import { dragAndDropRearrange } from '../cardDetail/cardDetailContentsUtility';
@@ -70,7 +69,7 @@ type Props = {
     hiddenGroups: BoardGroup[]
     selectedCardIds: string[]
     intl: IntlShape
-    readonly: boolean
+    readOnly: boolean
     onCardClicked: (e: React.MouseEvent, card: Card) => void
     addCard: (groupByOptionId?: string, show?:boolean, props?: any, insertLast?: boolean) => Promise<void>
     showCard: (cardId?: string) => void
@@ -225,10 +224,10 @@ function Kanban (props: Props) {
   };
 
   const ScrollingComponent = withScrolling('div');
-  const hStrength = createHorizontalStrength(Utils.isMobile() ? 60 : 250);
-  const vStrength = createVerticalStrength(Utils.isMobile() ? 60 : 250);
+  const hStrength = createHorizontalStrength(isTouchScreen() ? 60 : 250);
+  const vStrength = createVerticalStrength(isTouchScreen() ? 60 : 250);
 
-  const menuTriggerProps = !props.readonly ? bindTrigger(popupState) : {};
+  const menuTriggerProps = !props.readOnly ? bindTrigger(popupState) : {};
   return (
     <Box
       className='Kanban'
@@ -248,7 +247,7 @@ function Kanban (props: Props) {
             intl={props.intl}
             groupByProperty={groupByProperty}
             addCard={props.addCard}
-            readonly={props.readonly}
+            readOnly={props.readOnly}
             propertyNameChanged={propertyNameChanged}
             onDropToColumn={onDropToColumn}
             calculationMenuOpen={showCalculationsMenu.get(group.option.id) || false}
@@ -314,12 +313,13 @@ function Kanban (props: Props) {
             >
               {group.cards.map((card) => (
                 <KanbanCard
+
                   card={card}
                   board={board}
                   visiblePropertyTemplates={visiblePropertyTemplates}
                   visibleBadges={visibleBadges}
                   key={card.id}
-                  readonly={props.readonly}
+                  readOnly={props.readOnly}
                   isSelected={props.selectedCardIds.includes(card.id)}
                   onClick={(e) => {
                       props.onCardClicked(e, card);
@@ -329,7 +329,7 @@ function Kanban (props: Props) {
                   isManualSort={isManualSort}
                 />
               ))}
-              {!props.readonly
+              {!props.readOnly
                           && (
                           <Button
                             size='small'
@@ -351,7 +351,7 @@ function Kanban (props: Props) {
 
           {/* Add whitespace underneath "Add a group" button */}
 
-          {!props.readonly
+          {!props.readOnly
                       && (
                       <div className='octo-board-header-cell narrow'>
                       </div>
@@ -368,7 +368,7 @@ function Kanban (props: Props) {
                         group={group}
                         activeView={activeView}
                         intl={props.intl}
-                        readonly={props.readonly}
+                        readOnly={props.readOnly}
                         onDrop={(card: Card) => onDropToColumn(group.option, card)}
                       />
                     ))}

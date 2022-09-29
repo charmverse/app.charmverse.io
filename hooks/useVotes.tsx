@@ -1,8 +1,9 @@
-import { UserVote } from '@prisma/client';
+import type { UserVote } from '@prisma/client';
 import charmClient from 'charmClient';
 import useTasks from 'components/nexus/hooks/useTasks';
-import { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
-import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
+import type { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
+import type { ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import { useCurrentSpace } from './useCurrentSpace';
 import { usePages } from './usePages';
@@ -31,11 +32,11 @@ const VotesContext = createContext<Readonly<IContext>>({
 export function VotesProvider ({ children }: { children: ReactNode }) {
   const { currentPageId } = usePages();
   const [votes, setVotes] = useState<IContext['votes']>({});
-  const [user] = useUser();
+  const { user } = useUser();
 
   const cardId = typeof window !== 'undefined' ? (new URLSearchParams(window.location.href)).get('cardId') : null;
 
-  const { data, isValidating } = useSWR(() => currentPageId && !cardId ? `pages/${currentPageId}/votes` : null, async () => charmClient.getVotesByPage(currentPageId), {
+  const { data, isValidating } = useSWR(() => currentPageId && !cardId ? `pages/${currentPageId}/votes` : null, async () => charmClient.votes.getVotesByPage(currentPageId), {
     revalidateOnFocus: false
   });
 
@@ -54,7 +55,7 @@ export function VotesProvider ({ children }: { children: ReactNode }) {
   }
 
   async function castVote (voteId: string, choice: string) {
-    const userVote = await charmClient.castVote(voteId, choice);
+    const userVote = await charmClient.votes.castVote(voteId, choice);
     if (currentPageId) {
       setVotes((_votes) => {
         const vote = _votes[voteId];
@@ -84,7 +85,7 @@ export function VotesProvider ({ children }: { children: ReactNode }) {
       throw new Error('Missing user or space');
     }
 
-    const extendedVote = await charmClient.createVote({
+    const extendedVote = await charmClient.votes.createVote({
       ...votePayload,
       createdBy: user.id,
       spaceId: currentSpace.id
@@ -98,24 +99,30 @@ export function VotesProvider ({ children }: { children: ReactNode }) {
   }
 
   async function deleteVote (voteId: string) {
-    await charmClient.deleteVote(voteId);
-    if (currentPageId) {
-      delete votes[voteId];
-      setVotes({ ...votes });
+    const vote = votes[voteId];
+    if (vote.context === 'inline') {
+      await charmClient.votes.deleteVote(voteId);
+      if (currentPageId) {
+        delete votes[voteId];
+        setVotes({ ...votes });
+      }
+      removeVoteFromTask(voteId);
     }
-    removeVoteFromTask(voteId);
   }
 
   async function cancelVote (voteId: string) {
-    await charmClient.cancelVote(voteId);
-    if (currentPageId) {
-      votes[voteId] = {
-        ...votes[voteId],
-        status: 'Cancelled'
-      };
-      setVotes({ ...votes });
+    const vote = votes[voteId];
+    if (vote.context === 'inline') {
+      await charmClient.votes.cancelVote(voteId);
+      if (currentPageId) {
+        votes[voteId] = {
+          ...votes[voteId],
+          status: 'Cancelled'
+        };
+        setVotes({ ...votes });
+      }
+      removeVoteFromTask(voteId);
     }
-    removeVoteFromTask(voteId);
   }
 
   useEffect(() => {

@@ -9,12 +9,16 @@
 # production
 *.zip
 
+# test
+playwright-report
+
+
 # misc
 .DS_Store
 .env
 .env.local
 .env.production
-tsconfig.tsbuildinfo
+*.tsbuildinfo
 
 ./pages/api/script/*
 
@@ -37,3 +41,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 todo.md
+/test-results/
+/playwright-report/
+/playwright/.cache/

@@ -1,4 +1,5 @@
-import { ApplicationStatus, BountyStatus, Space, User } from '@prisma/client';
+import type { ApplicationStatus, Space, User } from '@prisma/client';
+import { BountyStatus } from '@prisma/client';
 import { generateBounty, generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { bountyCanReceiveNewSubmissionsOrApplications, countValidSubmissions, submissionIsEditable, submissionsCapReached } from '../shared';
 
@@ -221,7 +222,7 @@ describe('bountyCanReceiveNewSubmissionsOrApplications', () => {
 describe('submissionIsEditable', () => {
   it('should return true  if submission status is "inProgress" or "review" AND bounty is "open" or "inProgress"', async () => {
 
-    const validStatusCombinations: {bountyStatus: BountyStatus, submissionStatus: ApplicationStatus}[] = [
+    const validStatusCombinations: { bountyStatus: BountyStatus, submissionStatus: ApplicationStatus }[] = [
       {
         bountyStatus: 'inProgress',
         submissionStatus: 'inProgress'

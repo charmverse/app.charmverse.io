@@ -1,14 +1,15 @@
-import { useContext, useEffect, useState } from 'react';
 import { useWeb3React } from '@web3-react/core';
-import { useRouter } from 'next/router';
+import type { Space } from '@prisma/client';
 import getLayout from 'components/common/BaseLayout/BaseLayout';
+import Footer from 'components/login/Footer';
 import LoginPageContent from 'components/login/LoginPageContent';
+import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { getKey } from 'hooks/useLocalStorage';
 import { usePageTitle } from 'hooks/usePageTitle';
-import Footer from 'components/login/Footer';
 import { useSpaces } from 'hooks/useSpaces';
-import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { useUser } from 'hooks/useUser';
+import { useRouter } from 'next/router';
+import { useContext, useEffect, useState } from 'react';
 
 export default function LoginPage () {
   const { account } = useWeb3React();
@@ -16,12 +17,12 @@ export default function LoginPage () {
   const router = useRouter();
   const defaultWorkspace = typeof window !== 'undefined' && localStorage.getItem(getKey('last-workspace'));
   const [, setTitleState] = usePageTitle();
-  const [user, setUser, isUserLoaded] = useUser();
-  const [spaces, setSpaces, isSpacesLoaded] = useSpaces();
+  const { user, isLoaded } = useUser();
+  const [spaces,, isSpacesLoaded] = useSpaces();
   const [showLogin, setShowLogin] = useState(false); // capture isLoaded state to prevent render on route change
   const isLogInWithDiscord = typeof router.query.code === 'string' && router.query.discord === '1' && router.query.type === 'login';
 
-  const isDataLoaded = triedEager && isSpacesLoaded && isUserLoaded;
+  const isDataLoaded = triedEager && isSpacesLoaded && isLoaded;
   useEffect(() => {
     setTitleState('Welcome');
   }, []);
@@ -34,10 +35,11 @@ export default function LoginPage () {
       router.push('/nexus');
     }
     else if (spaces.length > 0) {
-      const isValidDefaultWorkspace = !!defaultWorkspace && spaces.some(space => defaultWorkspace.startsWith(`/${space.domain}`));
-      router.push(isValidDefaultWorkspace ? defaultWorkspace : `/${spaces[0].domain}`);
+      router.push(getDefaultWorkspaceUrl(spaces));
     }
     else {
+      // Note that a user logging in will be redirected to /signup, because the 'user' and 'spaces' are loaded async after the wallet address appears.
+      // TODO: Find a way to connect the state between hooks (wallet address and loaded user)
       router.push('/signup');
     }
   }
@@ -67,4 +69,10 @@ export default function LoginPage () {
       </>
     )
   );
+}
+
+export function getDefaultWorkspaceUrl (spaces: Space[]) {
+  const defaultWorkspace = typeof window !== 'undefined' && localStorage.getItem(getKey('last-workspace'));
+  const isValidDefaultWorkspace = !!defaultWorkspace && spaces.some(space => defaultWorkspace.startsWith(`/${space.domain}`));
+  return isValidDefaultWorkspace ? defaultWorkspace : `/${spaces[0].domain}`;
 }

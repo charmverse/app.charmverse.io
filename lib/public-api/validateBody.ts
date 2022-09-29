@@ -1,5 +1,6 @@
-import { PageQuery, PaginatedQuery, Page } from './interfaces';
-import { UnsupportedKeyDetails, UnsupportedKeysError } from './errors';
+import type { PageQuery, PaginatedQuery, Page } from './interfaces';
+import type { UnsupportedKeyDetails } from './errors';
+import { UnsupportedKeysError } from './errors';
 
 /**
  * Use this in the api to throw an error when an unsupported field is provided
@@ -13,7 +14,7 @@ export function validatePageQuery (query: PageQuery): true {
     return true;
   }
 
-  const supportedKeys: Array<keyof PageQuery> = ['properties', 'title'];
+  const supportedKeys: (keyof PageQuery)[] = ['properties', 'title'];
 
   const queryKeys = Object.keys(query);
 
@@ -115,7 +116,7 @@ export function validatePaginationQuery (query: PaginatedQuery<PageQuery>): true
     return true;
   }
 
-  const supportedKeys: Array<keyof PaginatedQuery<PageQuery>> = ['cursor', 'limit', 'query'];
+  const supportedKeys: (keyof PaginatedQuery<PageQuery>)[] = ['cursor', 'limit', 'query'];
 
   const queryKeys = Object.keys(query);
 

@@ -2,26 +2,26 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { CircularProgress, Menu, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
-import { SpacePermissionConfigurationMode } from '@prisma/client';
+import type { SpacePermissionConfigurationMode } from '@prisma/client';
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
+import ShareBountyBoard from 'components/common/PageLayout/components/Header/components/BountyShareButton/ShareBountyBoard';
+import InviteLinkList from 'components/settings/contributors/InviteLinks/InviteLinks';
 import Legend from 'components/settings/Legend';
 import ImportGuildRolesMenuItem from 'components/settings/roles/components/ImportGuildRolesMenuItem';
-import useRoles from 'hooks/useRoles';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
+import useRoles from 'hooks/useRoles';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useRef, useState } from 'react';
-import InviteLinkList from 'components/settings/contributors/InviteLinks/InviteLinks';
-import ShareBountyBoard from 'components/common/PageLayout/components/Header/BountyShareButton/ShareBountyBoard';
 import ImportDiscordRolesMenuItem from './components/ImportDiscordRolesMenuItem';
 import RoleForm from './components/RoleForm';
 import RoleRow from './components/RoleRow';
-import { useImportDiscordRoles } from './hooks/useImportDiscordRoles';
+import SpacePermissions from './components/SpacePermissions';
 import DefaultPagePermissions from './components/SpacePermissions/components/DefaultPagePermissions';
 import PermissionConfigurationMode from './components/SpacePermissions/components/PermissionConfigurationMode';
-import SpacePermissions from './components/SpacePermissions';
 import TokenGates from './components/TokenGates';
+import { useImportDiscordRoles } from './hooks/useImportDiscordRoles';
 
 export default function RoleSettings () {
   const {
@@ -109,6 +109,7 @@ export default function RoleSettings () {
           key={role.id}
         />
       ))}
+      {roles?.length === 0 && <Typography color='secondary'>No roles yet</Typography>}
 
       {/* Token gates section */}
       <TokenGates isAdmin={isAdmin} spaceId={space?.id as string} />

@@ -1,17 +1,17 @@
 
 import styled from '@emotion/styled';
-import { Box, TableCell, TableRow, Typography } from '@mui/material';
-import Button from 'components/common/Button';
 import CheckIcon from '@mui/icons-material/Check';
-import ListItemIcon from '@mui/material/ListItemIcon';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import MenuItem from '@mui/material/MenuItem';
+import { Box, TableCell, TableRow, Typography } from '@mui/material';
+import ListItemIcon from '@mui/material/ListItemIcon';
 import Menu from '@mui/material/Menu';
-import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/hooks';
+import MenuItem from '@mui/material/MenuItem';
 import Avatar from 'components/common/Avatar';
-import { Contributor } from 'models';
-import { humanFriendlyDate } from 'lib/utilities/dates';
+import Button from 'components/common/Button';
 import { StyledListItemText } from 'components/common/StyledListItemText';
+import { humanFriendlyDate } from 'lib/utilities/dates';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import type { Contributor } from 'models';
 
 export const StyledRow = styled(Box)`
   border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
@@ -58,7 +58,7 @@ export default function ContributorRow ({ isAdmin, isSpaceOwner, contributor, on
     <TableRow>
       <TableCell>
         <Box display='flex' alignItems='center'>
-          <Avatar name={contributor.username} avatar={contributor?.avatar} />
+          <Avatar name={contributor.username} avatar={contributor?.avatar} isNft={contributor?.hasNftAvatar} />
           <Box pl={2}>
             <Typography variant='body1'><strong>{contributor.username}</strong></Typography>
           </Box>
@@ -93,27 +93,27 @@ export default function ContributorRow ({ isAdmin, isSpaceOwner, contributor, on
                   onClick={() => handleMenuItemClick(action)}
                 >
                   {action === 'makeAdmin' && (
-                  <StyledListItemText
-                    primary='Admin'
-                    secondary='Can access all settings and invite new members to the workspace'
-                  />
+                    <StyledListItemText
+                      primary='Admin'
+                      secondary='Can access all settings and invite new members to the workspace'
+                    />
                   )}
                   {action === 'makeContributor' && (
-                  <StyledListItemText
-                    primary='Contributor'
-                    secondary='Cannot change workspace settings or invite new members to the workspace'
-                  />
+                    <StyledListItemText
+                      primary='Contributor'
+                      secondary='Cannot change workspace settings or invite new members to the workspace'
+                    />
                   )}
                   {action === 'removeFromSpace' && (
-                  <StyledListItemText
-                    primaryTypographyProps={{ fontWeight: 500, color: 'error' }}
-                    primary='Remove from team'
-                  />
+                    <StyledListItemText
+                      primaryTypographyProps={{ fontWeight: 500, color: 'error' }}
+                      primary='Remove from team'
+                    />
                   )}
                   {action === activeRoleAction && (
-                  <ListItemIcon>
-                    <CheckIcon fontSize='small' />
-                  </ListItemIcon>
+                    <ListItemIcon>
+                      <CheckIcon fontSize='small' />
+                    </ListItemIcon>
                   )}
                 </MenuItem>
               ))}

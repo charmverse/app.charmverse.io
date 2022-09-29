@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { PagePermission, Role, Space, User } from '@prisma/client';
+import type { PagePermission, Role, Space, User } from '@prisma/client';
 import { prisma } from 'db';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
-import { getPage, IPageWithPermissions } from 'lib/pages/server';
-import { hasSameOrMorePermissions } from '../has-same-or-more-permissions';
+import type { IPageWithPermissions } from 'lib/pages/server';
+import { getPage } from 'lib/pages/server';
+import { hasSameOrMorePermissions, comparePermissionLevels } from '../has-same-or-more-permissions';
 import { upsertPermission } from '../upsert-permission';
 
 let user: User;
@@ -13,7 +14,7 @@ let role: Role;
 
 // Will return a nested tree of pages and associated permissions
 // Creates as many pages as there are permission sets
-async function setupPagesWithPermissions (permissionSets: Array<Partial<PagePermission>[]>): Promise<IPageWithPermissions []> {
+async function setupPagesWithPermissions (permissionSets: Partial<PagePermission>[][]): Promise<IPageWithPermissions []> {
 
   let currentParentId: string | undefined;
 
@@ -132,5 +133,27 @@ describe('hasSameOrMorePermissions', () => {
     const hasEqualOrMorePermissions = hasSameOrMorePermissions(root!.permissions, child!.permissions);
 
     expect(hasEqualOrMorePermissions).toBe(false);
+  });
+});
+
+describe('comparePermissionLevels', () => {
+  it('should return "more" if the comparison permission level provides more operations than the base permission level', () => {
+    const comparison = comparePermissionLevels({ base: 'view', comparison: 'full_access' });
+    expect(comparison).toBe('more');
+  });
+
+  it('should return "less" if the comparison permission level provides less operations than the base permission level', () => {
+    const comparison = comparePermissionLevels({ base: 'full_access', comparison: 'view' });
+    expect(comparison).toBe('less');
+  });
+
+  it('should return "equal" if the comparison permission level provides the same operations as the base permission level', () => {
+    const comparison = comparePermissionLevels({ base: 'full_access', comparison: 'full_access' });
+    expect(comparison).toBe('equal');
+  });
+
+  it('should return "different" if at least one set of operations does not fully intersect with the other', () => {
+    const comparison = comparePermissionLevels({ base: 'view', comparison: ['edit_content'] });
+    expect(comparison).toBe('different');
   });
 });

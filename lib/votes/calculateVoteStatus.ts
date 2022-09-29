@@ -1,6 +1,7 @@
-import { UserVote, Vote, VoteStatus, VoteType } from '@prisma/client';
+import type { UserVote, Vote } from '@prisma/client';
+import { VoteStatus, VoteType } from '@prisma/client';
 
-export function calculateVoteStatus ({ deadline, type, status, threshold, userVotes }:{userVotes: Pick<UserVote, 'choice'>[], threshold: Vote['threshold'], status: Vote['status'], type: Vote['type'], deadline: Vote['deadline']}) {
+export function calculateVoteStatus ({ deadline, type, status, threshold, userVotes }:{ userVotes: Pick<UserVote, 'choice'>[], threshold: Vote['threshold'], status: Vote['status'], type: Vote['type'], deadline: Vote['deadline'] }) {
   const userVoteFrequencyRecord = userVotes.reduce<Record<string, number>>((currentFrequencyRecord, userVote) => {
     if (!currentFrequencyRecord[userVote.choice]) {
       currentFrequencyRecord[userVote.choice] = 1;

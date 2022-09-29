@@ -1,10 +1,11 @@
-import { PaletteMode, Theme as MaterialUITheme } from '@mui/material';
+import type { PaletteMode, Theme as MaterialUITheme } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
 import { darken } from '@mui/system';
+import type { BrandColor } from './colors';
 import {
   backgroundColor,
   backgroundColorDarkMode, backgroundDarkColor, backgroundDarkColorDarkMode, backgroundLightColor,
-  backgroundLightColorDarkMode, blueColor, BrandColor,
+  backgroundLightColorDarkMode, blueColor,
   darkBlueColor, darkModeColors, lightModeColors, primaryTextColor,
   primaryTextColorDarkMode, settingsHeaderBackgroundColor,
   settingsHeaderBackgroundColorDarkMode
@@ -20,19 +21,25 @@ type FocalBoardColors = typeof darkThemeFocalBoard;
 
 interface CustomColors extends FocalBoardColors, Record<BrandColor, any> {
   settingsHeader: {
-    background: string
+    background: string;
   };
   sidebar: {
     avatarHighlight: string;
     background: string;
   };
   code: {
-    color: string
-    background: string
-  },
+    color: string;
+    background: string;
+  };
   emoji: {
-    hoverBackground: string
-  }
+    hoverBackground: string;
+  };
+  templateBanner: {
+    background: string;
+    text: string;
+    highlightedText: string;
+    fontSize: string;
+  };
 }
 
 // define custom colors: https://material-ui.com/customization/palette/
@@ -52,10 +59,11 @@ declare module '@mui/material/styles/createPalette' {
     twitter: Palette['primary'];
     white: Palette['primary'];
     quoteMarker: Palette['primary'];
+
   }
   interface TypeBackground {
-    light: string
-    dark: string
+    light: string;
+    dark: string;
   }
 }
 
@@ -105,10 +113,6 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       h1: {
         fontSize: '2rem',
         fontWeight: 700
-      },
-      h2: {
-        fontSize: '1.05rem',
-        fontWeight: 500
       },
       subtitle1: {
         fontSize: '0.85rem',
@@ -212,9 +216,25 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       quoteMarker: {
         main: mode === 'dark' ? '#F3EFF5' : '#111111'
       },
+      templateBanner: {
+        background: mode === 'dark' ? '#373C3F' : '#FBF8F3',
+        // Slightly transparent text
+        text: mode === 'dark' ? '#FFFFFF70' : '#37352FA6',
+        highlightedText: mode === 'dark' ? '#FFFFFFCF' : '#37352F',
+        fontSize: '14px'
+      },
       ...(mode === 'dark' ? darkThemeFocalBoard : lightThemeFocalBoard)
     },
     components: {
+      MuiAvatar: {
+        styleOverrides: {
+          root: ({ ownerState, theme }) => ({
+            ...(ownerState.variant === 'rounded' && {
+              borderRadius: 10
+            })
+          })
+        }
+      },
       MuiAutocomplete: {
         styleOverrides: {
           popper: {
@@ -270,13 +290,6 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
           html: {
             // this makes the text look lighter
             MozOsxFontSmoothing: 'none'
-          }
-        }
-      },
-      MuiListItemButton: {
-        styleOverrides: {
-          root: {
-            padding: '8px'
           }
         }
       },

@@ -1,24 +1,19 @@
 
-import { prisma } from 'db';
-import { getBounty, UpdateableBountyFields, updateBountySettings } from 'lib/bounties';
+import type { UpdateableBountyFields, BountyWithDetails } from 'lib/bounties';
+import { getBounty, updateBountySettings } from 'lib/bounties';
 import { rollupBountyStatus } from 'lib/bounties/rollupBountyStatus';
-import { requesterCanDeleteBounty } from 'lib/bounties/shared';
 import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
-import { typedKeys } from 'lib/utilities/objects';
-import { BountyWithDetails } from 'models';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
   .get(getBountyController)
-  .put(updateBounty)
-  .delete(deleteBounty);
+  .put(updateBounty);
 
 async function getBountyController (req: NextApiRequest, res: NextApiResponse<BountyWithDetails>) {
   const { id } = req.query;
@@ -89,54 +84,6 @@ async function updateBounty (req: NextApiRequest, res: NextApiResponse<BountyWit
   const rolledUpBounty = await rollupBountyStatus(bounty.id);
 
   res.status(200).json(rolledUpBounty);
-
-}
-
-async function deleteBounty (req: NextApiRequest, res: NextApiResponse) {
-  const { id } = req.query;
-
-  const bounty = await getBounty(id as string);
-
-  if (!bounty) {
-    throw new DataNotFoundError(`Bounty with id ${id} not found.`);
-  }
-
-  const userId = req.session.user.id;
-
-  const { isAdmin } = await hasAccessToSpace({
-    spaceId: bounty.spaceId,
-    userId,
-    adminOnly: false
-  });
-
-  const permissions = await computeBountyPermissions({
-    allowAdminBypass: true,
-    resourceId: bounty.id,
-    userId
-  });
-
-  if (!permissions.delete) {
-    throw new UnauthorisedActionError('You do not have permissions to delete this bounty.');
-  }
-
-  // Permission Filtering Policy: No submissions must exist for a bounty to be deleted by non admin.
-  const canDeleteBounty = requesterCanDeleteBounty({
-    bounty,
-    requesterCreatedBounty: bounty.createdBy === userId,
-    requesterIsAdmin: !!isAdmin
-  });
-
-  if (!canDeleteBounty) {
-    throw new UnauthorisedActionError('You cannot delete this bounty suggestion.');
-  }
-
-  await prisma.bounty.delete({
-    where: {
-      id: id as string
-    }
-  });
-
-  res.status(200).json({ success: true });
 
 }
 

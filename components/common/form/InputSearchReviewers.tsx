@@ -1,27 +1,22 @@
-import { Web3Provider } from '@ethersproject/providers';
-import { Autocomplete, TextField, Typography } from '@mui/material';
-import { Role } from '@prisma/client';
-import { useWeb3React } from '@web3-react/core';
+import { Autocomplete, TextField } from '@mui/material';
+import type { Role } from '@prisma/client';
+import UserDisplay from 'components/common/UserDisplay';
 import { useContributors } from 'hooks/useContributors';
 import useRoles from 'hooks/useRoles';
-import { Contributor } from 'models/User';
-import { ListSpaceRolesResponse } from 'pages/api/roles';
-import { ComponentProps, SyntheticEvent } from 'react';
-import { useSWRConfig } from 'swr';
-import { ReviewerOption } from './InputSearchContributor';
+import type { Contributor } from 'models/User';
+import type { ListSpaceRolesResponse } from 'pages/api/roles';
+import type { ComponentProps, SyntheticEvent } from 'react';
 
 type ReducedRole = Role | ListSpaceRolesResponse
 
-type GroupedRole = ReducedRole & {group: 'role'}
-type GroupedContributor = Contributor & {group: 'user'}
+type GroupedRole = ReducedRole & { group: 'role' }
+type GroupedContributor = Contributor & { group: 'user' }
 type GroupedOption = GroupedRole | GroupedContributor
 
 export default function InputSearchReviewers ({
   disableCloseOnSelect = false, excludedIds, ...props
 }: Partial<Omit<ComponentProps<typeof Autocomplete>, 'onChange'>> & { excludedIds?: string[], onChange: (event: SyntheticEvent<Element, Event>, value: GroupedOption[]) => void }) {
   const { roles } = useRoles();
-  const { chainId } = useWeb3React<Web3Provider>();
-  const { cache } = useSWRConfig();
   const [contributors] = useContributors();
 
   const excludedIdsSet = new Set(excludedIds);
@@ -48,16 +43,21 @@ export default function InputSearchReviewers ({
       noOptionsText='No options available'
       // @ts-ignore - not sure why this fails
       options={
-        options
+      options
       }
       autoHighlight
       groupBy={(option) => option.group[0].toUpperCase() + option.group.slice(1)}
       getOptionLabel={(groupWithId) => {
-        const option = optionsRecord[groupWithId.id];
-        if (option.group === 'user') {
-          return cache.get(`@"ENS",102~,"${option.username}",${chainId},`) ?? option.username;
+
+        if (!groupWithId) {
+          return '';
         }
-        return option.name;
+
+        const option = optionsRecord[groupWithId.id] ?? {};
+        if (option.group === 'user') {
+          return option.username;
+        }
+        return option.name ?? '';
       }}
       renderOption={(_props, option) => {
         if (option.group === 'role') {
@@ -68,7 +68,7 @@ export default function InputSearchReviewers ({
           );
         }
         return (
-          <ReviewerOption
+          <UserDisplay
             {..._props as any}
             user={option}
             avatarSize='small'

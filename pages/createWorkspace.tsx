@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import { useRouter } from 'next/router';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -11,7 +11,7 @@ import { AlternateRouteButton } from './join';
 
 export default function CreateSpace () {
 
-  const [user, setUser] = useUser();
+  const { user, setUser } = useUser();
   const [spaces, setSpaces] = useSpaces();
   const router = useRouter();
 

@@ -1,12 +1,13 @@
 
-import { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { withSessionRoute } from 'lib/session/withSession';
 import { prisma } from 'db';
+import type { CommentCreate } from 'lib/comments';
+import { addComment } from 'lib/comments';
+import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
-import { CommentCreate, addComment } from 'lib/comments';
+import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

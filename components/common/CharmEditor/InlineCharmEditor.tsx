@@ -9,12 +9,14 @@ import {
 } from '@bangle.dev/base-components';
 import debounce from 'lodash/debounce';
 import { Plugin, SpecRegistry } from '@bangle.dev/core';
-import { EditorView, Node, PluginKey } from '@bangle.dev/pm';
+import type { EditorView } from '@bangle.dev/pm';
+import { Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
-import { CSSProperties, ReactNode, useState } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
+import { useState } from 'react';
 import styled from '@emotion/styled';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
-import { PageContent } from 'models';
+import type { PageContent } from 'models';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import * as floatingMenu from './components/floatingMenu';
@@ -26,8 +28,8 @@ import { checkForEmpty } from './utils';
 import { userDataPlugin } from './components/charm/charm.plugins';
 
 export interface ICharmEditorOutput {
-  doc: PageContent,
-  rawText: string
+  doc: PageContent;
+  rawText: string;
 }
 
 const emojiPluginKey = new PluginKey(emoji.pluginKeyName);
@@ -57,10 +59,10 @@ export function charmEditorPlugins (
     spaceId = null
   }:
     {
-      readOnly?: boolean, onContentChange?: (view: EditorView) => void,
-      spaceId?: string | null,
-      pageId?: string | null,
-      userId?: string | null,
+      readOnly?: boolean; onContentChange?: (view: EditorView) => void;
+      spaceId?: string | null;
+      pageId?: string | null;
+      userId?: string | null;
     } = {}
 ) {
   return () => [
@@ -142,7 +144,7 @@ export default function CharmEditor (
   CharmEditorProps
 ) {
   const [currentSpace] = useCurrentSpace();
-  const [currentUser] = useUser();
+  const { user } = useUser();
 
   const _isEmpty = !content || checkForEmpty(content);
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
@@ -170,6 +172,7 @@ export default function CharmEditor (
       // well, we tried
     }
   }
+
   const initialValue = contentJSON ? Node.fromJSON(specRegistry.schema, contentJSON) : '';
 
   const state = useEditorState({
@@ -178,7 +181,7 @@ export default function CharmEditor (
       onContentChange: _onContentChange,
       readOnly,
       spaceId: currentSpace?.id,
-      userId: currentUser?.id
+      userId: user?.id
     }),
     initialValue,
     dropCursorOpts: {
@@ -202,6 +205,7 @@ export default function CharmEditor (
       placeholderComponent={(
         <Placeholder
           sx={{
+            fontSize: style?.fontSize,
             zIndex: 20,
             top: noPadding ? 2 : 8,
             left: noPadding ? 0 : 8,

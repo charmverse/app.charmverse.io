@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client';
 import client from './graphql-client';
-import { SnapshotProposal, SnapshotSpace } from './interfaces';
+import type { SnapshotProposal } from './interfaces';
 
 export async function getSnapshotProposal (proposalId: string): Promise<SnapshotProposal | null> {
   const { data } = await client.query({

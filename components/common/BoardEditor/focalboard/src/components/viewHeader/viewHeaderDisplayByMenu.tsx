@@ -1,16 +1,14 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import Button from 'components/common/Button';
 import { IPropertyTemplate } from '../../blocks/board';
 import { BoardView } from '../../blocks/boardView';
 import mutator from '../../mutator';
-import Button from '../../widgets/buttons/button';
+import CheckIcon from '../../widgets/icons/check';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
-import CheckIcon from '../../widgets/icons/check';
 import { typeDisplayName } from '../../widgets/propertyMenu';
 
 type Props = {
@@ -31,7 +29,7 @@ const ViewHeaderDisplayByMenu = React.memo((props: Props) => {
 
   return (
     <MenuWrapper>
-      <Button>
+      <Button color='secondary' size='small' variant='text'>
         <FormattedMessage
           id='ViewHeader.display-by'
           defaultMessage='Display by: {property}'

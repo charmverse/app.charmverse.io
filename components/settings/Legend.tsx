@@ -1,7 +1,8 @@
 import styled from '@emotion/styled';
-import Typography, { TypographyTypeMap } from '@mui/material/Typography';
+import type { TypographyTypeMap } from '@mui/material/Typography';
+import Typography from '@mui/material/Typography';
 import { Box } from '@mui/system';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 const StyledBox = styled(Box)`
   white-space: nowrap;
@@ -24,16 +25,16 @@ const StyledTypography = styled(Typography)`
   font-weight: bold;
 `;
 
-function Legend ({ children, helperText, ...props }: TypographyTypeMap['props'] & {children: string | ReactNode, helperText?: string | ReactNode}) {
+function Legend ({ children, helperText, ...props }: TypographyTypeMap['props'] & { children: string | ReactNode, helperText?: string | ReactNode }) {
   return (
     <StyledBox>
       <StyledTypography {...props}>
         {children}
       </StyledTypography>
       {helperText && (
-      <Typography color='secondary' mt={0.5} variant='caption' component='p'>
-        {helperText}
-      </Typography>
+        <Typography color='secondary' mt={0.5} variant='caption' component='p'>
+          {helperText}
+        </Typography>
       )}
     </StyledBox>
   );

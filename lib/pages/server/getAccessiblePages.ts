@@ -1,6 +1,6 @@
-import { Prisma } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { IPageWithPermissions, PagesRequest } from '../interfaces';
+import type { IPageWithPermissions, PagesRequest } from '../interfaces';
 
 /**
  * Utility for getting permissions of a page
@@ -9,9 +9,9 @@ import { IPageWithPermissions, PagesRequest } from '../interfaces';
 export function includePagePermissions (): Prisma.PageInclude & {
   permissions: {
     include: {
-      sourcePermission: true
-    }
-  }
+      sourcePermission: true;
+    };
+  };
   } {
   return {
     permissions: {
@@ -22,7 +22,8 @@ export function includePagePermissions (): Prisma.PageInclude & {
   };
 }
 
-export function accessiblePagesByPermissionsQuery ({ spaceId, userId }: {spaceId: string, userId: string}): Prisma.PagePermissionListRelationFilter {
+export function accessiblePagesByPermissionsQuery ({ spaceId, userId }:
+  { spaceId: string, userId: string }): Prisma.PagePermissionListRelationFilter {
   return {
     some: {
       OR: [
@@ -92,6 +93,18 @@ export function generateAccessiblePagesQuery ({ spaceId, userId, archived }: Pag
             spaceId,
             userId
           })
+        },
+        // Override for proposal templates so any user can instantiate them
+        {
+          type: 'proposal_template',
+          space: {
+            id: spaceId,
+            spaceRoles: {
+              some: {
+                userId
+              }
+            }
+          }
         },
         // Admin override to always return all pages
         {

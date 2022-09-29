@@ -1,14 +1,14 @@
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import { useWeb3React } from '@web3-react/core';
-import { Error } from 'components/common/Error';
+import ErrorComponent from 'components/common/errors/WalletError';
 import { Modal, DialogTitle } from 'components/common/Modal';
 import processConnectionError from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/utils/processConnectionError';
 import { supportedChains, walletConnect } from 'connectors';
 import NetworkButton from './components/NetworkButton';
 import requestNetworkChange from './utils/requestNetworkChange';
 
-function NetworkModal ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+function NetworkModal ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
   const { error, connector, active } = useWeb3React();
   // const toast = useToast();
 
@@ -25,7 +25,7 @@ function NetworkModal ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
         It doesn't matter which supported chain you're connected to, it's only
         used to know your address and sign messages so each will work equally.
       </Typography>
-      <Error error={error} processError={processConnectionError} />
+      <ErrorComponent error={error} processError={processConnectionError} />
       <Grid container spacing={2}>
         {supportedChains.map((chain) => (
           <Grid item key={chain} xs={12} sm={6}>

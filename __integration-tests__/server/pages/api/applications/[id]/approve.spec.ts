@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Space, User } from '@prisma/client';
+import type { Space, User } from '@prisma/client';
 import { addBountyPermissionGroup } from 'lib/permissions/bounties';
 import { assignRole } from 'lib/roles';
 import request from 'supertest';

@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -25,7 +23,7 @@ type Props = {
     cards: Card[]
     activeView?: BoardView
     views: BoardView[]
-    readonly: boolean
+    readOnly: boolean
     pageUpdatedBy: string
     pageUpdatedAt: string
 }
@@ -137,7 +135,7 @@ const CardDetailProperties = React.memo((props: Props) => {
   }
 
   return (
-    <div className='octo-propertylist CardDetailProperties'>
+    <div className='octo-propertylist'>
       {board.fields.cardProperties.map((propertyTemplate: IPropertyTemplate) => {
         const propertyValue = card.fields.properties[propertyTemplate.id];
         return (
@@ -145,8 +143,8 @@ const CardDetailProperties = React.memo((props: Props) => {
             key={`${propertyTemplate.id}-${propertyTemplate.type}-${propertyValue}`}
             className='octo-propertyrow'
           >
-            {props.readonly && <div className='octo-propertyname octo-propertyname--readonly'>{propertyTemplate.name}</div>}
-            {!props.readonly
+            {props.readOnly && <div className='octo-propertyname octo-propertyname--readonly'>{propertyTemplate.name}</div>}
+            {!props.readOnly
                             && (
                             <MenuWrapper isOpen={propertyTemplate.id === newTemplateId}>
                               <div className='octo-propertyname'><Button>{propertyTemplate.name}</Button></div>
@@ -160,7 +158,7 @@ const CardDetailProperties = React.memo((props: Props) => {
                             </MenuWrapper>
                             )}
             <PropertyValueElement
-              readOnly={props.readonly}
+              readOnly={props.readOnly}
               card={card}
               board={board}
               updatedAt={pageUpdatedAt}
@@ -178,7 +176,7 @@ const CardDetailProperties = React.memo((props: Props) => {
         />
       )}
 
-      {!props.readonly && props.activeView
+      {!props.readOnly && props.activeView
                 && (
                 <div className='octo-propertyname add-property'>
                   <MenuWrapper>

@@ -1,7 +1,7 @@
 import { prisma } from 'db';
 import { aggregateVoteResult } from './aggregateVoteResult';
 import { calculateVoteStatus } from './calculateVoteStatus';
-import { VoteTask } from './interfaces';
+import type { VoteTask } from './interfaces';
 
 export async function getVoteTasks (userId: string): Promise<VoteTask[]> {
   const votes = await prisma.vote.findMany({
@@ -13,6 +13,7 @@ export async function getVoteTasks (userId: string): Promise<VoteTask[]> {
           }
         }
       },
+      context: 'inline',
       status: 'InProgress',
       // No need to fetch votes that have been casted by the user
       userVotes: {

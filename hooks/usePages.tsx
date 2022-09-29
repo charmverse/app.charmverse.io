@@ -1,33 +1,34 @@
-import { Page, PageOperations, Role } from '@prisma/client';
+import type { Page, Role } from '@prisma/client';
+import { PageOperations } from '@prisma/client';
 import charmClient from 'charmClient';
-import { IPageWithPermissions } from 'lib/pages';
-import { IPagePermissionFlags, PageOperationType } from 'lib/permissions/pages';
+import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
+import useRefState from 'hooks/useRefState';
+import type { Block } from 'lib/focalboard/block';
+import type { IPageWithPermissions, PagesMap } from 'lib/pages';
+import type { IPagePermissionFlags, PageOperationType } from 'lib/permissions/pages';
 import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 import { permissionTemplates } from 'lib/permissions/pages/page-permission-mapping';
-import { useRouter } from 'next/router';
-import * as React from 'react';
-import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
-import useSWR from 'swr';
 import { isTruthy } from 'lib/utilities/types';
-import useRefState from 'hooks/useRefState';
+import { useRouter } from 'next/router';
+import type { Dispatch, ReactNode, SetStateAction } from 'react';
+import * as React from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { untitledPage } from 'seedData';
+import useSWR from 'swr';
 import { useCurrentSpace } from './useCurrentSpace';
-import { useSpaces } from './useSpaces';
-import { useUser } from './useUser';
 import useIsAdmin from './useIsAdmin';
+import { useUser } from './useUser';
 
-export type LinkedPage = (Page & {children: LinkedPage[], parent: null | LinkedPage});
-
-export type PagesMap = Record<string, IPageWithPermissions | undefined>;
+export type LinkedPage = (Page & { children: LinkedPage[], parent: null | LinkedPage });
 
 export type PagesContext = {
-  currentPageId: string,
-  pages: PagesMap,
-  setPages: Dispatch<SetStateAction<PagesMap>>,
-  setCurrentPageId: Dispatch<SetStateAction<string>>,
-  isEditing: boolean
-  refreshPage: (pageId: string) => Promise<IPageWithPermissions>
-  setIsEditing: React.Dispatch<React.SetStateAction<boolean>>
-  getPagePermissions: (pageId: string, page?: IPageWithPermissions) => IPagePermissionFlags,
+  currentPageId: string;
+  pages: PagesMap;
+  setPages: Dispatch<SetStateAction<PagesMap>>;
+  setCurrentPageId: Dispatch<SetStateAction<string>>;
+  refreshPage: (pageId: string) => Promise<IPageWithPermissions>;
+  deletePage: (data: { pageId: string, board?: Block }) => Promise<void>;
+  getPagePermissions: (pageId: string, page?: IPageWithPermissions) => IPagePermissionFlags;
 };
 
 const refreshInterval = 1000 * 5 * 60; // 5 minutes
@@ -37,42 +38,27 @@ export const PagesContext = createContext<Readonly<PagesContext>>({
   pages: {},
   setCurrentPageId: () => '',
   setPages: () => undefined,
-  isEditing: true,
-  setIsEditing: () => { },
   getPagePermissions: () => new AllowedPagePermissions(),
-  refreshPage: () => Promise.resolve({} as any)
+  refreshPage: () => Promise.resolve({} as any),
+  deletePage: () => Promise.resolve({} as any)
 });
 
 export function PagesProvider ({ children }: { children: ReactNode }) {
 
   const isAdmin = useIsAdmin();
-  const [isEditing, setIsEditing] = useState(false);
-  const [spaceFromUrl] = useCurrentSpace();
+  const [currentSpace] = useCurrentSpace();
   const [pages, pagesRef, setPages] = useRefState<PagesContext['pages']>({});
   const [currentPageId, setCurrentPageId] = useState<string>('');
   const router = useRouter();
-  const [user] = useUser();
+  const { user } = useUser();
 
-  // retrieve space for public pages
-  const [spaces] = useSpaces();
-  const publicPageSpace = router.route === '/share/[...pageId]' ? spaces[0] : null;
-  const space = spaceFromUrl || publicPageSpace;
+  const { data, mutate } = useSWR(() => currentSpace ? `pages/${currentSpace?.id}` : null, () => {
 
-  const { data, mutate } = useSWR(() => space ? `pages/${space?.id}` : null, () => {
-
-    if (!space) {
+    if (!currentSpace) {
       return [];
     }
 
-    const isPublicBountiesPage = (router.route === '/share/[...pageId]') && (router.query.pageId?.[1] === 'bounties');
-    if (isPublicBountiesPage) {
-      // retrieve the pages we need for public bounties
-      return charmClient.listBounties(space.id, true)
-        .then(bounties => bounties.map(bounty => bounty.page).filter(isTruthy));
-    }
-    else {
-      return charmClient.getPages(space.id);
-    }
+    return charmClient.getPages(currentSpace.id);
   }, { refreshInterval });
 
   const _setPages: Dispatch<SetStateAction<PagesMap>> = (_pages) => {
@@ -124,6 +110,50 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     return computedPermissions;
   }
 
+  async function deletePage ({ pageId, board }: { pageId: string, board?: Block }) {
+    const page = pages[pageId];
+    const totalNonArchivedPages = Object.values(pages).filter((p => p?.deletedAt === null && (p?.type === 'page' || p?.type === 'board'))).length;
+
+    if (page && user && currentSpace) {
+      const { pageIds } = await charmClient.archivePage(page.id);
+      let newPage: null | IPageWithPermissions = null;
+      if (totalNonArchivedPages - pageIds.length === 0 && pageIds.length !== 0) {
+        newPage = await charmClient.createPage(untitledPage({
+          userId: user.id,
+          spaceId: currentSpace.id
+        }));
+      }
+
+      // Delete the page associated with the card
+      if (board) {
+        mutator.deleteBlock(
+          board,
+          'Delete board',
+          async () => {
+            // success
+          },
+          async () => {
+            // error
+          }
+        );
+      }
+
+      setPages((_pages) => {
+        pageIds.forEach(_pageId => {
+          _pages[_pageId] = {
+            ..._pages[_pageId],
+            deletedAt: new Date()
+          } as IPageWithPermissions;
+        });
+        // If a new page was created add that to state
+        if (newPage) {
+          _pages[newPage.id] = newPage;
+        }
+        return { ..._pages };
+      });
+    }
+  }
+
   async function refreshPage (pageId: string): Promise<IPageWithPermissions> {
     const freshPageVersion = await charmClient.getPage(pageId);
     _setPages(_pages => ({
@@ -136,14 +166,13 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
 
   const value: PagesContext = useMemo(() => ({
     currentPageId,
-    isEditing,
-    setIsEditing,
+    deletePage,
     pages,
     setCurrentPageId,
     setPages: _setPages,
     getPagePermissions,
     refreshPage
-  }), [currentPageId, isEditing, router, pages, user]);
+  }), [currentPageId, router, pages, user]);
 
   useEffect(() => {
     if (data) {

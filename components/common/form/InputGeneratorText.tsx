@@ -10,10 +10,10 @@ import { isTruthy } from 'lib/utilities/types';
 import { IconButton } from '@mui/material';
 
 interface Props {
-  onChange: (choices: string []) => void
-  title?: string,
-  minimumOptions?: number,
-  defaultOptions?: string[]
+  onChange: (choices: string []) => void;
+  title?: string;
+  minimumOptions?: number;
+  defaultOptions?: string[];
 }
 
 /**
@@ -91,9 +91,9 @@ export default function InputGeneratorText ({ onChange, title = 'Options', minim
             />
             {
               keys.length > 1 && (
-              <IconButton size='small' onClick={() => removeRow(key)}>
-                <DeleteIcon />
-              </IconButton>
+                <IconButton size='small' onClick={() => removeRow(key)}>
+                  <DeleteIcon />
+                </IconButton>
               )
             }
           </Grid>

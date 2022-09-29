@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 
@@ -7,7 +5,7 @@ import { ClientConfig } from '../config/clientConfig';
 
 import { default as client } from '../octoClient';
 
-import { RootState } from './index';
+import type { RootState } from './index';
 
 export const fetchClientConfig = createAsyncThunk(
   'clientConfig/fetchClientConfig',

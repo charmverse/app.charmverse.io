@@ -1,13 +1,10 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
-import React from 'react';
 
-import {
-  CalculationOptions,
-  CommonCalculationOptionProps,
-  optionsByType
-} from '../../calculations/options';
 import { IPropertyTemplate, PropertyType } from '../../../blocks/board';
+import {
+    CalculationOptions,
+    CommonCalculationOptionProps,
+    optionsByType
+} from '../../calculations/options';
 
 import { Option, OptionProps } from './kanbanOption';
 

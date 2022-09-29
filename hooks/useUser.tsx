@@ -1,16 +1,24 @@
 import { useWeb3React } from '@web3-react/core';
 import charmClient from 'charmClient';
-import { LoggedInUser } from 'models';
-import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
+import type { LoggedInUser } from 'models';
+import type { ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-type IContext = [
-  user: LoggedInUser | null,
-  setUser: (user: LoggedInUser | any) => void,
-  isLoaded: boolean,
-  setIsLoaded: (isLoaded: boolean) => void
-];
+type IContext = {
+  user: LoggedInUser | null;
+  setUser: (user: LoggedInUser | any) => void;
+  updateUser: (user: Partial<LoggedInUser>) => void;
+  isLoaded: boolean;
+  setIsLoaded: (isLoaded: boolean) => void;
+};
 
-export const UserContext = createContext<Readonly<IContext>>([null, () => undefined, false, () => undefined]);
+export const UserContext = createContext<Readonly<IContext>>({
+  user: null,
+  setUser: () => undefined,
+  updateUser: () => undefined,
+  isLoaded: false,
+  setIsLoaded: () => undefined
+});
 
 export function UserProvider ({ children }: { children: ReactNode }) {
   const { account } = useWeb3React();
@@ -31,7 +39,11 @@ export function UserProvider ({ children }: { children: ReactNode }) {
     }
   }, [account]);
 
-  const value = useMemo(() => [user, setUser, isLoaded, setIsLoaded] as IContext, [user, isLoaded]);
+  const updateUser = useCallback((updatedUser: Partial<LoggedInUser>) => {
+    setUser(u => u ? { ...u, ...updatedUser } : null);
+  }, []);
+
+  const value = useMemo(() => ({ user, setUser, isLoaded, setIsLoaded, updateUser }) as IContext, [user, isLoaded]);
 
   return (
     <UserContext.Provider value={value}>

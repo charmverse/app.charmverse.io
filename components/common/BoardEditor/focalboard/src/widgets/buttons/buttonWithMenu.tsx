@@ -1,9 +1,8 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import React from 'react';
-
+import Box from '@mui/material/Box';
 import DropdownIcon from '../icons/dropdown';
 import MenuWrapper from '../menuWrapper';
+import Button from 'components/common/Button';
 
 type Props = {
     onClick?: (e: React.MouseEvent<HTMLDivElement>) => void
@@ -14,21 +13,22 @@ type Props = {
 
 function ButtonWithMenu (props: Props): JSX.Element {
   return (
-    <div
+    <Button
+      disableElevation
+      size='small'
       onClick={props.onClick}
-      className='Button filled'
-      title={props.title}
     >
-      <div className='button-text'>
-        {props.text}
-      </div>
-      {/* <MenuWrapper stopPropagationOnToggle={true}>
-                <div className='button-dropdown'>
-                    <DropdownIcon/>
-                </div>
-                {props.children}
-            </MenuWrapper> */}
-    </div>
+      {props.text}
+      <MenuWrapper stopPropagationOnToggle={true}>
+        <Box
+          sx={{pl: 1}}
+          className='button-dropdown'
+        >
+          <DropdownIcon  />
+        </Box>
+        {props.children}
+      </MenuWrapper>
+    </Button>
   );
 }
 

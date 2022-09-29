@@ -1,7 +1,8 @@
-import { ReactNode, createContext, useContext, useState, useEffect, useMemo } from 'react';
-import { Space } from '@prisma/client';
-import { useRouter } from 'next/router';
+import type { Space } from '@prisma/client';
 import charmClient from 'charmClient';
+import { useRouter } from 'next/router';
+import type { ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useUser } from './useUser';
 
 type IContext = [spaces: Space[], setSpaces: (spaces: Space[]) => void, isLoaded: boolean];
@@ -10,7 +11,7 @@ export const SpacesContext = createContext<Readonly<IContext>>([[], () => undefi
 
 export function SpacesProvider ({ children }: { children: ReactNode }) {
 
-  const [user, _, isUserLoaded] = useUser();
+  const { user, isLoaded: isUserLoaded } = useUser();
   const [spaces, setSpaces] = useState<Space[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const router = useRouter();

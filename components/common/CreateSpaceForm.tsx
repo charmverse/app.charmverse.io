@@ -10,8 +10,9 @@ import FieldLabel from 'components/common/form/FieldLabel';
 import Avatar from 'components/settings/workspace/LargeAvatar';
 import Divider from '@mui/material/Divider';
 import { useUser } from 'hooks/useUser';
-import { Prisma } from '@prisma/client';
-import { useState, ChangeEvent } from 'react';
+import type { Prisma } from '@prisma/client';
+import type { ChangeEvent } from 'react';
+import { useState } from 'react';
 import { DialogTitle } from 'components/common/Modal';
 import { useForm } from 'react-hook-form';
 import { DOMAIN_BLACKLIST } from 'lib/spaces';
@@ -47,7 +48,7 @@ interface Props {
 
 export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit, onCancel, submitText }: Props) {
 
-  const [user] = useUser();
+  const { user } = useUser();
   const [saveError, setSaveError] = useState<any | null>(null);
   const {
     register,
@@ -154,10 +155,13 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
             fullWidth
             error={!!errors.domain}
             helperText={errors.domain?.message}
+            inputProps={{
+              'data-test': 'workspace-domain-input'
+            }}
           />
         </Grid>
         <Grid item sx={{ display: 'flex', justifyContent: 'center' }}>
-          <PrimaryButton disabled={!watchName || !watchDomain} type='submit'>
+          <PrimaryButton disabled={!watchName || !watchDomain} type='submit' data-test='create-workspace'>
             {submitText || 'Create Workspace'}
           </PrimaryButton>
         </Grid>

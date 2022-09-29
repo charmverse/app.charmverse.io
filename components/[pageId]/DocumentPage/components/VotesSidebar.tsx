@@ -1,18 +1,17 @@
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import { Box, InputLabel, List, MenuItem, Select, Typography } from '@mui/material';
-import { uniq } from 'lodash';
+import { Box, InputLabel, MenuItem, Select, Typography } from '@mui/material';
 import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
-import { useVotes } from 'hooks/useVotes';
+import NoVotesMessage from 'components/votes/components/NoVotesMessage';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
+import { useVotes } from 'hooks/useVotes';
 import { highlightDomElement, silentlyUpdateURL } from 'lib/browser';
 import { findTotalInlineVotes } from 'lib/inline-votes/findTotalInlineVotes';
 import { isTruthy } from 'lib/utilities/types';
-import { ExtendedVote } from 'lib/votes/interfaces';
+import type { ExtendedVote } from 'lib/votes/interfaces';
 import { useEffect, useState } from 'react';
-import NoVotesMessage from 'components/votes/components/NoVotesMessage';
-import PageActionToggle from './PageActionToggle';
 import { StyledSidebar as CommentsSidebar } from './CommentsSidebar';
+import PageActionToggle from './PageActionToggle';
 
 const StyledSidebar = styled(CommentsSidebar)`
   height: calc(100%);
@@ -30,7 +29,8 @@ export default function VotesSidebar () {
   const inlineVoteIds = voteSort === 'position' ? findTotalInlineVotes(view, view.state.doc, votes).voteIds : [];
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
 
-  const filteredVotes = filterVotes(votesArray, voteFilter);
+  // Don't show a proposal vote inside the votes
+  const filteredVotes = filterVotes(votesArray, voteFilter).filter(v => v.context !== 'proposal');
 
   const sortedVotes = sortVotes(filteredVotes, voteSort, inlineVoteIds, votes);
 
@@ -39,11 +39,11 @@ export default function VotesSidebar () {
     const highlightedVoteId = (new URLSearchParams(window.location.search)).get('voteId');
     if (highlightedVoteId) {
       const highlightedVote = votes[highlightedVoteId];
-      if (highlightedVote) {
+      if (highlightedVote && votes[highlightedVoteId].context !== 'proposal') {
         const highlightedVoteDomNode = document.getElementById(`vote.${highlightedVoteId}`);
         if (highlightedVoteDomNode) {
           setTimeout(() => {
-            setCurrentPageActionDisplay('votes');
+            setCurrentPageActionDisplay('polls');
             setVoteFilter('all');
             // Remove query parameters from url
             silentlyUpdateURL(window.location.href.split('?')[0]);
@@ -64,17 +64,7 @@ export default function VotesSidebar () {
   }, [votes, window.location.search]);
 
   return (
-    <Box sx={{
-      height: 'calc(100%)',
-      gap: 1,
-      display: 'flex',
-      flexDirection: 'column'
-    }}
-    >
-      <Box display='flex' gap={1}>
-        <PageActionToggle />
-        <Typography fontWeight={600} fontSize={20}>Votes</Typography>
-      </Box>
+    <>
       <ViewOptions
         showPosition={true}
         showVotes={true}
@@ -85,7 +75,7 @@ export default function VotesSidebar () {
       />
       <StyledSidebar>
         {sortedVotes.length === 0
-          ? <NoVotesMessage message={`No ${voteFilter === 'completed' ? 'completed' : 'in progress'} votes yet`} />
+          ? <NoVotesMessage message={`No ${voteFilter === 'completed' ? 'completed' : 'in progress'} polls yet`} />
           : sortedVotes.map(inlineVote => (
             <VoteDetail
               cancelVote={cancelVote}
@@ -97,7 +87,7 @@ export default function VotesSidebar () {
             />
           ))}
       </StyledSidebar>
-    </Box>
+    </>
   );
 }
 
@@ -125,7 +115,7 @@ export function ViewOptions ({ voteSort, voteFilter, setVoteFilter, setVoteSort,
       <InputLabel>Sort</InputLabel>
       <Select variant='outlined' value={voteSort} onChange={(e) => setVoteSort(e.target.value as VoteSort)} sx={{ mr: 2 }}>
         {showPosition && <MenuItem value='position'>Position</MenuItem>}
-        {showVotes && <MenuItem value='highest_votes'>Votes</MenuItem>}
+        {showVotes && <MenuItem value='highest_votes'>Most voted</MenuItem>}
         <MenuItem value='latest_deadline'>Deadline</MenuItem>
         <MenuItem value='latest_created'>Created</MenuItem>
       </Select>

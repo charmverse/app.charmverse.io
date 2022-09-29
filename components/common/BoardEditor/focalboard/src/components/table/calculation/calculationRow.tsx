@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import React, { useState } from 'react';
 
 import { Constants } from '../../../constants';
@@ -21,7 +19,7 @@ type Props = {
     activeView: BoardView
     resizingColumn: string
     offset: number
-    readonly: boolean
+    readOnly: boolean
 }
 
 function CalculationRow (props: Props): JSX.Element {
@@ -48,7 +46,7 @@ function CalculationRow (props: Props): JSX.Element {
   return (
     <div
       className='CalculationRow octo-table-row'
-      onMouseEnter={() => setHovered(!props.readonly)}
+      onMouseEnter={() => setHovered(!props.readOnly)}
       onMouseLeave={() => setHovered(false)}
     >
       {
@@ -61,9 +59,9 @@ function CalculationRow (props: Props): JSX.Element {
                     <Calculation
                       key={template.id}
                       style={style}
-                      class={`octo-table-cell ${props.readonly ? 'disabled' : ''}`}
+                      class={`octo-table-cell ${props.readOnly ? 'disabled' : ''}`}
                       value={value}
-                      menuOpen={Boolean(props.readonly ? false : showOptions.get(template.id))}
+                      menuOpen={Boolean(props.readOnly ? false : showOptions.get(template.id))}
                       onMenuClose={() => toggleOptions(template.id, false)}
                       onMenuOpen={() => toggleOptions(template.id, true)}
                       onChange={(v: string) => {

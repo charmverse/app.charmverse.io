@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 
 import { useState, useCallback, useEffect } from 'react';
 import { useIntl } from 'react-intl';
@@ -47,7 +45,7 @@ function PropertyValueElement (props:Props): JSX.Element {
   const emptyDisplayValue = showEmptyPlaceholder ? intl.formatMessage({ id: 'PropertyValueElement.empty', defaultMessage: 'Empty' }) : '';
   const finalDisplayValue = displayValue || emptyDisplayValue;
 
-  const editableFields: Array<PropertyType> = ['text', 'number', 'email', 'url', 'phone'];
+  const editableFields: PropertyType[] = ['text', 'number', 'email', 'url', 'phone'];
   const latestUpdated = (new Date(updatedAt)).getTime() > (new Date(card.updatedAt)).getTime() ? 'page' : 'card';
 
   useEffect(() => {
@@ -147,7 +145,7 @@ function PropertyValueElement (props:Props): JSX.Element {
     return (
       <UserProperty
         value={propertyValue?.toString()}
-        readonly={readOnly}
+        readOnly={readOnly}
         onChange={(newValue) => {
           mutator.changePropertyValue(card, propertyTemplate.id, newValue);
         }}
@@ -173,7 +171,7 @@ function PropertyValueElement (props:Props): JSX.Element {
     return (
       <URLProperty
         value={value.toString()}
-        readonly={readOnly}
+        readOnly={readOnly}
         placeholder={emptyDisplayValue}
         onChange={setValue}
         onSave={() => {

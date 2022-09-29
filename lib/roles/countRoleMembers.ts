@@ -1,7 +1,7 @@
 import { prisma } from 'db';
-import { Roleup } from './interfaces';
+import type { Roleup } from './interfaces';
 
-export async function countRoleMembers ({ roleId }: {roleId: string}): Promise<Roleup> {
+export async function countRoleMembers ({ roleId }: { roleId: string }): Promise<Roleup> {
 
   const role = await prisma.role.findUnique({
     where: {

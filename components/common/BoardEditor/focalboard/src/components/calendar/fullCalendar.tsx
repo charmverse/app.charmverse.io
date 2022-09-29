@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 
 import React, { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
@@ -29,7 +27,7 @@ type Props = {
     board: Board
     cards: Card[]
     activeView: BoardView
-    readonly: boolean
+    readOnly: boolean
     initialDate?: Date
     dateDisplayProperty?: IPropertyTemplate
     showCard: (cardId: string) => void
@@ -65,8 +63,8 @@ const timeZoneOffset = (date: number): number => {
 
 function CalendarFullView (props: Props): JSX.Element|null {
   const intl = useIntl();
-  const { board, cards, activeView, dateDisplayProperty, readonly } = props;
-  const isSelectable = !readonly;
+  const { board, cards, activeView, dateDisplayProperty, readOnly } = props;
+  const isSelectable = !readOnly;
 
   const visiblePropertyTemplates = useMemo(() => (
         activeView.fields.visiblePropertyIds.map((id) => board.fields.cardProperties.find((t) => t.id === id)).filter((i) => i) as IPropertyTemplate[]
@@ -80,11 +78,11 @@ function CalendarFullView (props: Props): JSX.Element|null {
   const { pages } = usePages();
 
   const isEditable = useCallback(() : boolean => {
-    if (readonly || !dateDisplayProperty || (dateDisplayProperty.type === 'createdTime' || dateDisplayProperty.type === 'updatedTime')) {
+    if (readOnly || !dateDisplayProperty || (dateDisplayProperty.type === 'createdTime' || dateDisplayProperty.type === 'updatedTime')) {
       return false;
     }
     return true;
-  }, [readonly, dateDisplayProperty]);
+  }, [readOnly, dateDisplayProperty]);
 
   const myEventsList = useMemo(() => (
     cards.flatMap((card): EventInput[] => {

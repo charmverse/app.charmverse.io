@@ -1,12 +1,10 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 import { default as client, OctoClient } from '../octoClient';
 import { Board } from '../blocks/board';
 
-import { RootState } from './index';
+import type { RootState } from './index';
 
 export const fetchGlobalTemplates = createAsyncThunk(
   'globalTemplates/fetch',

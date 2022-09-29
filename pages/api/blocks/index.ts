@@ -1,10 +1,12 @@
 
-import { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-import { Block, Prisma } from '@prisma/client';
+import type { Block, Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { InvalidStateError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { getPagePath } from 'lib/pages/utils';
+import { copyAllPagePermissions } from 'lib/permissions/pages/actions/copyPermission';
 import { withSessionRoute } from 'lib/session/withSession';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 // TODO: frontend should tell us which space to use
 export type ServerBlockFields = 'spaceId' | 'updatedBy' | 'createdBy';
@@ -14,50 +16,61 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser).get(getBlocks).post(createBlocks).put(updateBlocks);
 
 async function getBlocks (req: NextApiRequest, res: NextApiResponse<Block[] | { error: string }>) {
+
   const referer = req.headers.referer as string;
   const url = new URL(referer);
+
   url.hash = '';
   url.search = '';
   const pathnameParts = referer ? url.pathname.split('/') : [];
   const spaceDomain = pathnameParts[1];
   if (!spaceDomain) {
-    return res.status(400).json({ error: 'spaceId is required' });
+    throw new InvalidStateError('invalid referrer url');
   }
   // publicly shared focalboard
   if (spaceDomain === 'share') {
     const pageId = pathnameParts[2];
     if (!pageId) {
-      return res.status(400).json({ error: 'pageId is required' });
+      throw new InvalidStateError('invalid referrer url');
     }
     const page = await prisma.page.findUnique({ where: { id: pageId } });
     if (!page) {
-      return res.status(404).json({ error: 'page not found' });
+      throw new NotFoundError('page not found');
     }
     const blocks = page.boardId ? await prisma.block.findMany({ where: { rootId: page.boardId } }) : [];
     return res.status(200).json(blocks);
   }
 
-  const space = await prisma.space.findUnique({
-    where: {
-      domain: spaceDomain
+  else {
+    let spaceId = req.query.spaceId as string | undefined;
+
+    // TODO: Once all clients are updated to pass in spaceId, we should remove this way of looking up the space id
+    if (!spaceId) {
+      const space = await prisma.space.findUnique({
+        where: {
+          domain: spaceDomain
+        }
+      });
+      spaceId = space?.id;
     }
-  });
-  if (space) {
+
+    if (!spaceId) {
+      throw new NotFoundError('workspace not found');
+    }
+
     const blocks = await prisma.block.findMany({
       where: {
+        spaceId,
         id: req.query.id
           ? req.query.id as string
           : req.query.ids
             ? {
               in: req.query.ids as string[]
             }
-            : undefined,
-        spaceId: space.id
-      }
+            : undefined }
     });
     return res.status(200).json(blocks);
   }
-  return res.status(400).json({ error: 'spaceId is invalid' });
 }
 
 async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>) {
@@ -85,7 +98,45 @@ async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
       }));
       const cardBlocks = newBlocks.filter(newBlock => newBlock.type === 'card');
 
-      const cardPages: Prisma.PageCreateInput[] = cardBlocks.map(cardBlock => {
+      const parentBoardIds = cardBlocks.map(block => block.parentId).filter(id => Boolean(id));
+
+      const parentPages = await prisma.page.findMany({
+        where: {
+          id: {
+            in: parentBoardIds
+          }
+        },
+        select: {
+          id: true,
+          permissions: {
+            include: {
+              sourcePermission: true
+            }
+          }
+        }
+      });
+
+      const cardPages: (Prisma.PageCreateInput | null)[] = cardBlocks.map(cardBlock => {
+
+        const parentBoard = parentPages.find(p => p.id === cardBlock.parentId);
+
+        if (!parentBoard) {
+          return null;
+        }
+
+        // Since we are certain the card is leaf node, we can instantiate permissions directly here without the need for complex checks
+        const initialPermissions = copyAllPagePermissions({
+          permissions: parentBoard.permissions, inheritFrom: true, newPageId: cardBlock.id });
+
+        initialPermissions.data = (initialPermissions.data as any[]).map(permission => {
+
+          delete permission.pageId;
+
+          return {
+            ...permission
+          };
+        });
+
         const cardPage: Prisma.PageCreateInput = {
           author: {
             connect: {
@@ -105,22 +156,17 @@ async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
             }
           },
           createdAt: cardBlock.createdAt,
-          path: `page-${Math.random().toString().replace('0.', '')}`,
+          path: getPagePath(),
           title: cardBlock.title,
           icon: cardBlock.fields.icon,
-          type: 'card',
+          type: cardBlock.fields.isTemplate ? 'card_template' : 'card',
           headerImage: cardBlock.fields.headerImage,
           contentText: cardBlock.fields.contentText || '',
           parentId: cardBlock.parentId,
           updatedAt: cardBlock.updatedAt,
           content: cardBlock.fields.content ?? undefined,
           permissions: {
-            create: [
-              {
-                permissionLevel: 'full_access',
-                spaceId: cardBlock.spaceId
-              }
-            ]
+            createMany: initialPermissions
           }
         };
         delete cardBlock.fields.content;
@@ -132,13 +178,15 @@ async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
       await prisma.block.createMany({
         data: newBlocks
       });
-      if (cardPages.length !== 0) {
-        for (const cardPage of cardPages) {
+
+      for (const cardPage of cardPages) {
+        if (cardPage) {
           await prisma.page.create({
             data: cardPage
           });
         }
       }
+
       return res.status(200).json(newBlocks);
     }
   }

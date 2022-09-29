@@ -1,20 +1,21 @@
 import { usePluginState, useEditorViewContext } from '@bangle.dev/react';
 import { Typography, Divider, MenuItem } from '@mui/material';
 import { Box } from '@mui/system';
-import { Page } from '@prisma/client';
-import { ReviewerOption } from 'components/common/form/InputSearchContributor';
+import type { Page } from '@prisma/client';
+import UserDisplay from 'components/common/UserDisplay';
 import { useContributors } from 'hooks/useContributors';
 import { usePages } from 'hooks/usePages';
 import { safeScrollIntoViewIfNeeded } from 'lib/browser';
-import { PluginKey } from 'prosemirror-state';
+import type { PluginKey } from 'prosemirror-state';
 import { useCallback, useEffect, memo } from 'react';
-import { SuggestTooltipPluginState, hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
-import { PagesList } from '../../PageList';
+import type { SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggest-tooltip';
+import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
+import PagesList from '../../PageList';
 import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
-import { MentionPluginState } from '../mention.interfaces';
+import type { MentionPluginState } from '../mention.interfaces';
 import { selectMention } from '../mention.utils';
 
-export function MentionSuggest ({ pluginKey }: {pluginKey: PluginKey<MentionPluginState>}) {
+export function MentionSuggest ({ pluginKey }: { pluginKey: PluginKey<MentionPluginState> }) {
   const { suggestTooltipKey } = usePluginState(pluginKey) as MentionPluginState;
   const { show: isVisible } = usePluginState(suggestTooltipKey) as SuggestTooltipPluginState;
   if (isVisible) {
@@ -23,7 +24,7 @@ export function MentionSuggest ({ pluginKey }: {pluginKey: PluginKey<MentionPlug
   return null;
 }
 
-function MentionSuggestMenu ({ pluginKey }: {pluginKey: PluginKey}) {
+function MentionSuggestMenu ({ pluginKey }: { pluginKey: PluginKey }) {
   const [contributors] = useContributors();
   const view = useEditorViewContext();
   const {
@@ -60,6 +61,7 @@ function MentionSuggestMenu ({ pluginKey }: {pluginKey: PluginKey}) {
   return (
     <PopoverMenu
       container={tooltipContentDOM}
+      maxHeight='300px'
       isOpen={isVisible}
       onClose={() => {
         hideSuggestionsTooltip(suggestTooltipKey)(view.state, view.dispatch, view);
@@ -68,8 +70,6 @@ function MentionSuggestMenu ({ pluginKey }: {pluginKey: PluginKey}) {
     >
       <Box
         sx={{
-          overflow: 'auto',
-          maxHeight: 300,
           py: 1
         }}
       >
@@ -88,10 +88,8 @@ function MentionSuggestMenu ({ pluginKey }: {pluginKey: PluginKey}) {
                   data-type='user'
                   className={isSelected ? 'mention-selected' : ''}
                 >
-                  <ReviewerOption
-                    style={{
-                      alignItems: 'center'
-                    }}
+                  <UserDisplay
+                    fontSize={14}
                     user={contributor}
                     avatarSize='small'
                   />

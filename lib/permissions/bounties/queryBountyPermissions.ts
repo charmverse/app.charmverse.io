@@ -1,12 +1,12 @@
 import { prisma } from 'db';
 import { DataNotFoundError } from 'lib/utilities/errors';
-import { BountyPermissions } from './interfaces';
+import type { BountyPermissions } from './interfaces';
 import { mapBountyPermissions } from './mapBountyPermissions';
 
 /**
  * Returns all existing permissions for a bounty, mapped to their level
  */
-export async function queryBountyPermissions ({ bountyId }: {bountyId: string}): Promise<BountyPermissions> {
+export async function queryBountyPermissions ({ bountyId }: { bountyId: string }): Promise<BountyPermissions> {
 
   const bounty = await prisma.bounty.findUnique({
     where: {

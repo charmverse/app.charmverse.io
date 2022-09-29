@@ -1,33 +1,23 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 
 import { createAsyncThunk, createSelector } from '@reduxjs/toolkit';
 import charmClient from 'charmClient';
 
 import { Subscription } from '../wsclient';
 
-import { RootState } from './index';
+import type { RootState } from './index';
 
 export const initialLoad = createAsyncThunk(
   'initialLoad',
-  async () => {
+  async ({ spaceId }: { spaceId: string }) => {
 
-    const [workspace, workspaceUsers, blocks, userWorkspaces] = await Promise.all([
-      charmClient.getWorkspace(),
-      charmClient.getWorkspaceUsers(),
-      charmClient.getAllBlocks(),
-      charmClient.getUserWorkspaces()
+    const [workspaceUsers, blocks] = await Promise.all([
+      charmClient.getWorkspaceUsers(spaceId),
+      charmClient.getAllBlocks(spaceId)
     ]);
 
-    // if no workspace, either bad id, or user doesn't have access
-    if (workspace === undefined) {
-      throw new Error('Workspace undefined');
-    }
     return {
-      workspace,
       workspaceUsers,
-      blocks,
-      userWorkspaces
+      blocks
     };
   }
 );
@@ -40,7 +30,7 @@ export const initialReadOnlyLoad = createAsyncThunk(
   }
 );
 
-export const getUserBlockSubscriptions = (state: RootState): Array<Subscription> => state.users.blockSubscriptions;
+export const getUserBlockSubscriptions = (state: RootState): Subscription[] => state.users.blockSubscriptions;
 
 export const getUserBlockSubscriptionList = createSelector(
   getUserBlockSubscriptions,

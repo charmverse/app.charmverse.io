@@ -1,5 +1,7 @@
-import { Plugin, RawPlugins } from '@bangle.dev/core';
-import { Decoration, DecorationSet, PluginKey, EditorState, EditorView, Node, Schema } from '@bangle.dev/pm';
+import type { RawPlugins } from '@bangle.dev/core';
+import { Plugin } from '@bangle.dev/core';
+import type { PluginKey, EditorState, EditorView, Node, Schema } from '@bangle.dev/pm';
+import { Decoration, DecorationSet } from '@bangle.dev/pm';
 import { createTooltipDOM, tooltipPlacement } from '@bangle.dev/tooltip';
 import { highlightMarkedElement, highlightElement } from 'lib/prosemirror/highlightMarkedElement';
 import { extractInlineCommentRows } from 'lib/inline-comments/findTotalInlineComments';
@@ -9,13 +11,13 @@ import { markName } from './inlineComment.constants';
 import RowDecoration from './components/InlineCommentRowDecoration';
 
 export interface InlineCommentPluginState {
-  tooltipContentDOM: HTMLElement
-  show: boolean
-  ids: string[]
+  tooltipContentDOM: HTMLElement;
+  show: boolean;
+  ids: string[];
 }
 
 export function plugin ({ key } :{
-  key: PluginKey
+  key: PluginKey;
 }): RawPlugins {
   const tooltipDOMSpec = createTooltipDOM();
   return [
@@ -57,10 +59,11 @@ export function plugin ({ key } :{
       key,
       props: {
         handleClickOn: (view: EditorView, pos: number, node, nodePos, event: MouseEvent) => {
-          if (/charm-inline-comment/.test((event.target as HTMLElement).className)) {
+          const className = (event.target as HTMLElement).className + ((event.target as HTMLElement).parentNode as HTMLElement).className;
+          if (/charm-inline-comment/.test(className)) {
             return highlightMarkedElement({
               view,
-              elementId: 'page-thread-list-box',
+              elementId: 'page-action-sidebar',
               key,
               markName,
               prefix: 'thread'
@@ -105,7 +108,7 @@ export function plugin ({ key } :{
             return highlightElement({
               ids,
               view,
-              elementId: 'page-thread-list-box',
+              elementId: 'page-action-sidebar',
               key,
               markName,
               prefix: 'thread'
@@ -120,22 +123,26 @@ export function plugin ({ key } :{
 
 function getDecorations ({ schema, doc }: { doc: Node, schema: Schema }) {
   const rows = extractInlineCommentRows(schema, doc);
-  const decorations: Decoration[] = rows.map(row => {
+  const uniqueCommentIds: Set<string> = new Set();
+
+  const decorations: Decoration[] = [];
+
+  rows.forEach(row => {
     // inject decoration at the start of the paragraph/header
     const firstPos = row.pos + 1;
-    return Decoration.widget(firstPos, () => renderComponent(row.nodes), { key: firstPos.toString() + row.nodes.length });
+    const commentIds = row.nodes.map(node => node.marks[0]?.attrs.id).filter(Boolean);
+    const newIds = commentIds.filter(commentId => !uniqueCommentIds.has(commentId));
+    commentIds.forEach(commentId => uniqueCommentIds.add(commentId));
+
+    if (newIds.length !== 0) {
+      const container = document.createElement('div');
+      container.className = 'charm-row-decoration-comments charm-row-decoration';
+      container.setAttribute('data-ids', newIds.join(','));
+      reactDOM.render(<RowDecoration count={newIds.length} />, container);
+
+      decorations.push(Decoration.widget(firstPos, () => container, { key: commentIds.join(',') }));
+    }
   });
+
   return DecorationSet.create(doc, decorations);
-}
-
-function renderComponent (nodesWithMark: Node[]) {
-
-  const ids = nodesWithMark.map(node => node.marks[0]?.attrs.id).filter(Boolean);
-
-  const container = document.createElement('div');
-  container.className = 'charm-row-decoration-comments charm-row-decoration';
-  container.setAttribute('data-ids', ids.join(','));
-  reactDOM.render(<RowDecoration count={ids.length} />, container);
-
-  return container;
 }

@@ -1,11 +1,12 @@
 import styled from '@emotion/styled';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { ListItem } from '@mui/material';
-import { ReactNode, memo, forwardRef } from 'react';
+import type { ReactNode } from 'react';
+import { memo, forwardRef } from 'react';
 
 interface BlockAlignerProps {
-  children: ReactNode
-  onDelete: () => void
+  children: ReactNode;
+  onDelete: () => void;
 }
 
 const StyledBlockAligner = styled.div`

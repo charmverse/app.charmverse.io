@@ -1,19 +1,34 @@
-import { NodeViewProps } from '@bangle.dev/core';
+import type { NodeViewProps } from '@bangle.dev/core';
 import { useTheme } from '@emotion/react';
+import styled from '@emotion/styled';
 import { Box, Typography } from '@mui/material';
 import { checkForEmpty } from 'components/common/CharmEditor/utils';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import { useContributors } from 'hooks/useContributors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
-import { PageContent } from 'models';
-import Link from 'next/link';
-import { ReactNode } from 'react';
-import { MentionSpecSchemaAttrs } from '../mention.specs';
+import type { PageContent } from 'models';
+import Link from 'components/common/Link';
+import type { ReactNode } from 'react';
+import type { MentionSpecSchemaAttrs } from '../mention.specs';
+
+const MentionContainer = styled(Link)`
+
+  border-radius: 1px;
+  display: inline-block;
+
+  // disable hover UX on ios which converts first click to a hover event
+  @media (pointer: fine) {
+
+    &:hover {
+      box-shadow: ${({ theme }) => `0 0 0 2px ${theme.palette.background.light}`};
+      background-color: ${({ theme }) => theme.palette.background.light};
+    }
+  }
+`;
 
 export default function Mention ({ node }: NodeViewProps) {
   const attrs = node.attrs as MentionSpecSchemaAttrs;
-  const theme = useTheme();
   const [contributors] = useContributors();
   const { pages } = usePages();
   const contributor = contributors.find(_contributor => _contributor.id === attrs.value);
@@ -22,47 +37,28 @@ export default function Mention ({ node }: NodeViewProps) {
   if (attrs.type === 'page') {
     const page = pages[attrs.value];
     value = page && (
-    <Link
-      href={`/${space?.domain}/${page.path}`}
-      passHref
-    >
-      <Box sx={{
-        display: 'flex',
-        alignItems: 'center',
-        position: 'relative',
-        top: 5,
-        cursor: 'pointer'
-      }}
-      >
-        <PageIcon icon={page.icon} isEditorEmpty={checkForEmpty(page.content as PageContent)} pageType={page.type} />
-        <div>{page.title || 'Untitled'}</div>
-      </Box>
-    </Link>
+      <MentionContainer color='inherit' href={`/${space?.domain}/${page.path}`}>
+        <Box display='flex' alignItems='center'>
+          <PageIcon icon={page.icon} isEditorEmpty={checkForEmpty(page.content as PageContent)} pageType={page.type} />
+          <Typography component='span' fontWeight={600}>{page.title || 'Untitled'}</Typography>
+        </Box>
+      </MentionContainer>
     );
   }
   else if (attrs.type === 'user') {
     value = (
-      <Typography fontSize='inherit' fontWeight='inherit'>
-        <span style={{ opacity: 0.6 }}>@</span>
-        <span style={{ opacity: 0.75 }}>{contributor?.username}</span>
-      </Typography>
+      <MentionContainer color='secondary' href={`/u/${contributor?.path || contributor?.id}`}>
+        <Typography component='span' fontWeight={600}>
+          <span style={{ opacity: 0.5 }}>@</span>
+          {contributor?.username}
+        </Typography>
+      </MentionContainer>
     );
   }
 
   return value ? (
-    <Box
-      component='span'
-      sx={{
-        borderRadius: theme.spacing(0.5),
-        fontWeight: 600,
-        opacity: 0.75,
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 0.75
-      }}
-      id={`${attrs.type}-${attrs.id}`}
-    >
+    <span id={`${attrs.type}-${attrs.id}`}>
       {value}
-    </Box>
+    </span>
   ) : null;
 }

@@ -1,7 +1,7 @@
+import { useTheme } from '@emotion/react';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { IconButton } from '@mui/material';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { useTheme } from '@emotion/react';
 
 export default function PageActionToggle () {
   const { currentPageActionDisplay, setCurrentPageActionDisplay } = usePageActionDisplay();
@@ -9,7 +9,7 @@ export default function PageActionToggle () {
   return (
     <IconButton
       onClick={() => {
-        setCurrentPageActionDisplay(currentPageActionDisplay === null ? 'votes' : null);
+        setCurrentPageActionDisplay(currentPageActionDisplay === null ? 'polls' : null);
       }}
       size='small'
       sx={{

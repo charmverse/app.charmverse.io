@@ -1,10 +1,7 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import { Block, BlockPatch } from './blocks/block';
 import { ISharing } from './blocks/sharing';
-import { IWorkspace } from './blocks/workspace';
 import { OctoUtils } from './octoUtils';
-import { IUser, UserWorkspace } from './user';
+import { IUser } from './user';
 import { Utils } from './utils';
 import { ClientConfig } from './config/clientConfig';
 import { UserSettings } from './userSettings';
@@ -309,7 +306,7 @@ class OctoClient {
     return [];
   }
 
-  async getUserBlockSubscriptions (userId: string): Promise<Array<Subscription>> {
+  async getUserBlockSubscriptions (userId: string): Promise<Subscription[]> {
     const path = `/api/focalboard/workspaces/${this.workspaceId}/subscriptions/${userId}`;
     const response = await fetch(this.getBaseURL() + path, { headers: this.headers() });
     if (response.status !== 200) {

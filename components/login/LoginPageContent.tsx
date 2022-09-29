@@ -1,13 +1,13 @@
-import { useContext } from 'react';
+import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import Image from 'components/common/Image';
-import styled from '@emotion/styled';
 import Button from 'components/common/Button';
+import Image from 'components/common/Image';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import splashImage from 'public/images/artwork/world.png';
+import { useContext } from 'react';
 
 export const Container = styled(Box)`
   max-width: 100%;
@@ -62,12 +62,14 @@ export default function LoginPageContent () {
             <Typography sx={{ fontSize: 20, mb: 6 }}>
               Tasks, docs, bounties, and more
             </Typography>
-            <Box display='flex' gap={2} alignItems='center'>
-              <PrimaryButton size='large' loading={!triedEager} onClick={openWalletSelectorModal}>
+            <Box display={{ sm: 'flex' }} gap={2} alignItems='center'>
+              <PrimaryButton sx={{ width: { xs: '100%', sm: 'auto' } }} size='large' loading={!triedEager} onClick={openWalletSelectorModal}>
                 Connect Wallet
               </PrimaryButton>
-              <Typography color='secondary' variant='body2'>or</Typography>
-              <Button variant='outlined' size='large' href={`/api/discord/oauth?type=login&redirect=${returnUrl ?? '/'}`}>
+              <Typography color='secondary' variant='body2' sx={{ lineHeight: '40px' }}>
+                or
+              </Typography>
+              <Button sx={{ width: '100%' }} variant='outlined' size='large' href={`/api/discord/oauth?type=login&redirect=${returnUrl ?? '/'}`}>
                 Connect Discord
               </Button>
             </Box>

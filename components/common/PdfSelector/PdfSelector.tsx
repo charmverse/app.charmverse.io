@@ -3,12 +3,12 @@ import { Box } from '@mui/system';
 import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 interface PdfSelectorProps {
   autoOpen?: boolean;
-  onPdfSelect: (pdfSrc: string) => void
-  children: ReactNode
+  onPdfSelect: (pdfSrc: string) => void;
+  children: ReactNode;
 }
 
 export default function PdfSelector ({ autoOpen = false, children, onPdfSelect }: PdfSelectorProps) {
@@ -52,7 +52,7 @@ export default function PdfSelector ({ autoOpen = false, children, onPdfSelect }
           ]}
           />
         </Box>
-  )}
+      )}
     >
       {children}
     </PopperPopup>

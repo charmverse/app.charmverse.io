@@ -1,15 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Application, Space, User } from '@prisma/client';
-import { ApplicationWithTransactions } from 'lib/applications/actions';
-import { ApplicationCreationData, SubmissionCreationData } from 'lib/applications/interfaces';
+import type { Application, Space, User } from '@prisma/client';
+import type { ApplicationCreationData } from 'lib/applications/interfaces';
 import { createBounty } from 'lib/bounties';
+import { addBountyPermissionGroup } from 'lib/permissions/bounties';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateBounty, generateBountyWithSingleApplication, generateSpaceUser, generateTransaction, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
-import { generateSubmissionContent } from 'testing/generate-stubs';
-import { addBountyPermissionGroup } from 'lib/permissions/bounties';
 
 let nonAdminUser: User;
 let nonAdminUserSpace: Space;
@@ -78,6 +76,13 @@ describe('GET /api/applications - retrieve all applications for a bounty', () =>
 describe('POST /api/applications - create an application', () => {
   it('should create the application and respond with 201', async () => {
 
+    const submitterUser = await generateSpaceUser({
+      spaceId: nonAdminUserSpace.id,
+      isAdmin: false
+    });
+
+    const submitterCookie = await loginUser(submitterUser);
+
     const bounty = await createBounty({
       createdBy: nonAdminUser.id,
       spaceId: nonAdminUserSpace.id,
@@ -93,15 +98,15 @@ describe('POST /api/applications - create an application', () => {
     await addBountyPermissionGroup({
       level: 'submitter',
       assignee: {
-        group: 'user',
-        id: nonAdminUser.id
+        group: 'space',
+        id: nonAdminUserSpace.id
       },
       resourceId: bounty.id
     });
 
     const createdApplication = (await request(baseUrl)
       .post('/api/applications')
-      .set('Cookie', nonAdminCookie)
+      .set('Cookie', submitterCookie)
       .send(creationContent)
       .expect(201)).body;
 
@@ -110,6 +115,37 @@ describe('POST /api/applications - create an application', () => {
         ...creationContent
       })
     );
+
+  });
+
+  it('should fail if the creator tries to apply to their own bounty and respond with 401', async () => {
+
+    const bounty = await createBounty({
+      createdBy: nonAdminUser.id,
+      spaceId: nonAdminUserSpace.id,
+      status: 'open',
+      rewardAmount: 1
+    });
+
+    const creationContent: Partial<ApplicationCreationData> = {
+      bountyId: bounty.id,
+      message: "I'm volunteering for this as it's in my field of expertise"
+    };
+
+    await addBountyPermissionGroup({
+      level: 'submitter',
+      assignee: {
+        group: 'space',
+        id: nonAdminUserSpace.id
+      },
+      resourceId: bounty.id
+    });
+
+    await request(baseUrl)
+      .post('/api/applications')
+      .set('Cookie', nonAdminCookie)
+      .send(creationContent)
+      .expect(401);
 
   });
 

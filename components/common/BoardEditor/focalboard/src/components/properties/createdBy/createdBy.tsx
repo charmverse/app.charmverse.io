@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 
 import React from 'react';
 
@@ -13,7 +11,7 @@ function CreatedBy (props: Props): JSX.Element {
   return (
     <UserProperty
       value={props.userID}
-      readonly={true} // created by is an immutable property, so will always be readonly
+      readOnly={true} // created by is an immutable property, so will always be readonly
       onChange={() => {}}
     />
   );

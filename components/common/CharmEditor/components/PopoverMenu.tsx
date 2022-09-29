@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import styled from '@emotion/styled';
 import { ClickAwayListener, Grow, MenuItem, Paper } from '@mui/material';
 import Portal from '@mui/material/Portal';
@@ -9,14 +9,15 @@ interface Props {
   onClose: () => void;
   children: ReactNode;
   width?: number;
+  maxHeight?: string;
 }
 
-const StyledPaper = styled(Paper)`
-  max-height: 40vh;
+const StyledPaper = styled(Paper)<{ maxheight: string }>`
+  max-height: ${(props) => props.maxheight};
   overflow-y: auto;
 `;
 
-export default function PopoverMenu ({ children, container, isOpen, width = 250, onClose }: Props) {
+export default function PopoverMenu ({ children, container, maxHeight = '40vh', isOpen, width = 250, onClose }: Props) {
   if (!isOpen) {
     return null;
   }
@@ -29,7 +30,7 @@ export default function PopoverMenu ({ children, container, isOpen, width = 250,
             transformOrigin: 'left top'
           }}
         >
-          <StyledPaper sx={{ width }}>
+          <StyledPaper maxheight={maxHeight} sx={{ width }}>
             {children}
           </StyledPaper>
         </Grow>

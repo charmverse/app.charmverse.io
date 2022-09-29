@@ -1,4 +1,4 @@
-import { RawSpecs } from '@bangle.dev/core';
+import type { RawSpecs } from '@bangle.dev/core';
 import * as tables from '@skiff-org/prosemirror-tables';
 
 export * from '@skiff-org/prosemirror-tables';
@@ -10,9 +10,18 @@ export function spec (): RawSpecs {
     cellContentGroup: 'block',
     tableGroup: 'block'
   });
+
   const specs = Object.entries(schemas).map(([name, schema]): RawSpecs => ({
     name,
-    schema,
+    schema: {
+      ...schema,
+      attrs: {
+        ...schema.attrs || {},
+        track: {
+          default: []
+        }
+      }
+    },
     type: 'node',
     markdown: {
       toMarkdown: (state, node) => {

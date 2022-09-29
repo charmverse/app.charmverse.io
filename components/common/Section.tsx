@@ -1,10 +1,10 @@
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import { PropsWithChildren, ReactNode } from 'react';
+import type { PropsWithChildren, ReactNode } from 'react';
 
 type Props = {
-  title: string | ReactNode
-  titleRightElement?: ReactNode
+  title: string | ReactNode;
+  titleRightElement?: ReactNode;
 }
 
 export default function Section ({

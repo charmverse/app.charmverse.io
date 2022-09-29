@@ -1,6 +1,6 @@
 
-import useSWR from 'swr';
 import charmClient from 'charmClient';
+import useSWR from 'swr';
 
 export default function useMultiWalletSigs () {
 

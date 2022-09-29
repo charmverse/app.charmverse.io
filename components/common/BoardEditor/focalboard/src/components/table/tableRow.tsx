@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import React, { useEffect, useRef, useState, useMemo, memo } from 'react';
 import { FormattedMessage } from 'react-intl';
 
@@ -13,6 +11,7 @@ import { Constants } from '../../constants';
 import Button from '../../widgets/buttons/button';
 import Editable from '../../widgets/editable';
 import { useSortable } from '../../hooks/sortable';
+import { isTouchScreen } from 'lib/browser';
 
 import PropertyValueElement from '../propertyValueElement';
 
@@ -26,7 +25,7 @@ type Props = {
     isSelected: boolean
     focusOnMount: boolean
     showCard: (cardId: string) => void
-    readonly: boolean
+    readOnly: boolean
     offset: number
     pageUpdatedAt: string
     pageUpdatedBy: string
@@ -50,7 +49,8 @@ function TableRow (props: Props) {
   const [title, setTitle] = useState('');
   const isManualSort = activeView.fields.sortOptions.length === 0;
   const isGrouped = Boolean(activeView.fields.groupById);
-  const [isDragging, isOver, cardRef] = useSortable('card', card, !props.readonly && (isManualSort || isGrouped), props.onDrop);
+  const [isDragging, isOver, cardRef] = useSortable('card', card, !isTouchScreen() && !props.readOnly && (isManualSort || isGrouped), props.onDrop);
+
   useEffect(() => {
     if (props.focusOnMount) {
       setTimeout(() => titleRef.current?.focus(), 10);
@@ -102,7 +102,7 @@ function TableRow (props: Props) {
             onChange={(newTitle: string) => setTitle(newTitle)}
             onSave={(saveType) => saveTitle(saveType, card.id, title)}
             onCancel={() => setTitle(card.title || '')}
-            readonly={props.readonly}
+            readOnly={props.readOnly}
             spellCheck={true}
           />
         </div>
@@ -127,7 +127,7 @@ function TableRow (props: Props) {
             ref={columnRefs.get(template.id)}
           >
             <PropertyValueElement
-              readOnly={props.readonly}
+              readOnly={props.readOnly}
               card={card}
               board={board}
               propertyTemplate={template}

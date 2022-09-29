@@ -1,11 +1,8 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
-import React from 'react';
 
 import { IPropertyTemplate } from '../../blocks/board';
+import { BoardView } from '../../blocks/boardView';
 import { FilterClause } from '../../blocks/filterClause';
 import { createFilterGroup } from '../../blocks/filterGroup';
-import { BoardView } from '../../blocks/boardView';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';

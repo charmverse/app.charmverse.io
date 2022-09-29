@@ -1,28 +1,28 @@
-import { useState } from 'react';
-import { Page } from '@prisma/client';
+import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import { useUser } from 'hooks/useUser';
+import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
+import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
-import { useBounties } from 'hooks/useBounties';
-import charmClient from 'charmClient';
-import { BountyWithDetails } from 'models';
-import PageDialog from 'components/common/Page/PageDialog';
+import { usePages } from 'hooks/usePages';
+import { useUser } from 'hooks/useUser';
+import type { BountyWithDetails } from 'lib/bounties';
 
 export default function NewBountyButton () {
-  const [user] = useUser();
+  const { user } = useUser();
   const [currentSpace] = useCurrentSpace();
-  const [page, setPage] = useState<Page | null>(null);
   const [currentUserPermissions] = useCurrentSpacePermissions();
   const suggestBounties = currentUserPermissions?.createBounty === false;
   const { setBounties } = useBounties();
+  const { setPages } = usePages();
+  const { showPage } = usePageDialog();
 
   async function onClickCreate () {
     if (currentSpace && user) {
       let createdBounty: BountyWithDetails;
 
       if (suggestBounties) {
-        createdBounty = await charmClient.createBounty({
+        createdBounty = await charmClient.bounties.createBounty({
           chainId: 1,
           status: 'suggestion',
           spaceId: currentSpace.id,
@@ -38,7 +38,7 @@ export default function NewBountyButton () {
         });
       }
       else {
-        createdBounty = await charmClient.createBounty({
+        createdBounty = await charmClient.bounties.createBounty({
           chainId: 1,
           status: 'open',
           spaceId: currentSpace.id,
@@ -53,17 +53,18 @@ export default function NewBountyButton () {
           }
         });
       }
+      setPages((pages) => ({ ...pages, [createdBounty.page.id]: createdBounty.page }));
       setBounties((bounties) => [...bounties, createdBounty]);
-      setPage(createdBounty.page);
+      showPage({
+        pageId: createdBounty.page.id,
+        hideToolsMenu: suggestBounties
+      });
     }
   }
 
   return (
-    <>
-      <Button onClick={onClickCreate}>
-        {suggestBounties ? 'Suggest Bounty' : 'Create Bounty'}
-      </Button>
-      {page && <PageDialog page={page} onClose={() => setPage(null)} />}
-    </>
+    <Button onClick={onClickCreate}>
+      {suggestBounties ? 'Suggest Bounty' : 'Create Bounty'}
+    </Button>
   );
 }

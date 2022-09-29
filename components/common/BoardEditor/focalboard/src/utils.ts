@@ -1,5 +1,3 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 import { marked } from 'marked';
 import { IntlShape } from 'react-intl';
 import { DateTime } from 'luxon';
@@ -11,11 +9,10 @@ import { createBoard } from './blocks/board';
 import { createBoardView } from './blocks/boardView';
 import { createCard } from './blocks/card';
 import { createCommentBlock } from './blocks/commentBlock';
-import { IAppWindow } from './types';
+import type {IAppWindow} from './types';
 
 declare let window: IAppWindow;
 
-const imageURLForUser = typeof window === 'undefined' ? undefined : (window as any).Components?.imageURLForUser;
 const IconClass = 'octo-icon';
 const OpenButtonClass = 'open-button';
 const SpacerClass = 'octo-spacer';
@@ -57,12 +54,6 @@ class Utils {
         break;
     }
     return ret;
-  }
-
-  static getProfilePicture (userId?: string): string {
-    const defaultImageUrl = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" style="fill: rgb(192, 192, 192);"><rect width="100" height="100" /></svg>';
-
-    return imageURLForUser && userId ? imageURLForUser(userId) : defaultImageUrl;
   }
 
   static randomArray (size: number): Uint8Array {
@@ -467,22 +458,6 @@ class Utils {
     }
 
     return result;
-  }
-
-  static isMobile (): boolean {
-    const toMatch = [
-      /Android/i,
-      /webOS/i,
-      /iPhone/i,
-      /iPad/i,
-      /iPod/i,
-      /BlackBerry/i,
-      /Windows Phone/i
-    ];
-
-    return toMatch.some((toMatchItem) => {
-      return navigator.userAgent.match(toMatchItem);
-    });
   }
 
   static getBaseURL (absolute?: boolean): string {

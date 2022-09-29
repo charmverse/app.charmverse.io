@@ -1,9 +1,8 @@
-import { Vote } from '@prisma/client';
 import { prisma } from 'db';
 import { accessiblePagesByPermissionsQuery } from 'lib/pages/server';
 import { aggregateVoteResult } from './aggregateVoteResult';
 import { calculateVoteStatus } from './calculateVoteStatus';
-import { ExtendedVote, SpaceVotesRequest } from './interfaces';
+import type { ExtendedVote, SpaceVotesRequest } from './interfaces';
 
 export async function getVotesBySpace ({ spaceId, userId }: SpaceVotesRequest): Promise<ExtendedVote[]> {
   const spaceVotes = await prisma.vote.findMany({

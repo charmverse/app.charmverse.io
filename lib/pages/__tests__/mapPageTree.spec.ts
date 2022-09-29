@@ -1,9 +1,7 @@
 /* eslint-disable camelcase */
-import { Page, Space, User } from '@prisma/client';
-import { generatePageNode, generatePageToCreateStub } from 'testing/generate-stubs';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { PageNode, PageNodeWithChildren } from '../interfaces';
-import { mapTargetPageTree, mapPageTree, reducePagesToPageTree } from '../mapPageTree';
+import { generatePageNode } from 'testing/generate-stubs';
+import type { PageNode, PageNodeWithChildren } from '../interfaces';
+import { mapPageTree, mapTargetPageTree, reducePagesToPageTree } from '../mapPageTree';
 
 const root_1 = generatePageNode({
   parentId: null,
@@ -151,7 +149,7 @@ function validateRootOne (node: PageNodeWithChildren) {
   expect(node.children[2].id).toBe(page_1_3.id);
 }
 
-function generateBoardWithCardsStub (): {board: PageNode, card_1: PageNode, card_2: PageNode, boardAndCards: PageNode[]} {
+function generateBoardWithCardsStub (): { board: PageNode, card_1: PageNode, card_2: PageNode, boardAndCards: PageNode[] } {
   const board = generatePageNode({
     parentId: null,
     title: 'Board',
@@ -191,6 +189,84 @@ describe('reducePagesToPageTree', () => {
 
     // No children should have been passed
     expect(rootNodes[0].children.length).toBe(0);
+  });
+
+  it('should filter out proposal type pages by default', async () => {
+
+    const proposal = generatePageNode({
+      type: 'proposal',
+      parentId: null
+    });
+
+    const { rootNodes } = reducePagesToPageTree({
+      items: [root_1, proposal],
+      includeProposals: false
+    });
+
+    expect(rootNodes.length).toBe(1);
+
+    expect(rootNodes[0].id).toBe(root_1.id);
+
+  });
+
+  it('should filter out deleted pages by default', async () => {
+
+    const root_3 = generatePageNode({
+      parentId: null,
+      title: 'Root 3',
+      deletedAt: new Date(),
+      index: 2
+    });
+
+    const page_3_1 = generatePageNode({
+      parentId: root_3.id,
+      title: 'Page 3.1',
+      deletedAt: new Date()
+    });
+
+    const { rootNodes } = reducePagesToPageTree({
+      items: [...pages, root_3, page_3_1]
+    });
+
+    expect(rootNodes.length).toBe(2);
+
+    expect(rootNodes.every(node => node.id !== root_3.id)).toBe(true);
+  });
+
+  it('should include deleted pages if this option is requested', async () => {
+
+    const root_3 = generatePageNode({
+      parentId: null,
+      title: 'Root 3',
+      deletedAt: new Date(),
+      index: 2
+    });
+
+    const page_3_1 = generatePageNode({
+      parentId: root_3.id,
+      title: 'Page 3.1',
+      deletedAt: new Date()
+    });
+
+    const page_3_1_1 = generatePageNode({
+      parentId: page_3_1.id,
+      title: 'Page 3.1.1',
+      deletedAt: new Date()
+    });
+
+    const { rootNodes } = reducePagesToPageTree({
+      items: [...pages, root_3, page_3_1, page_3_1_1],
+      includeDeletedPages: true
+    });
+
+    expect(rootNodes.length).toBe(3);
+
+    expect(rootNodes[2].id).toBe(root_3.id);
+
+    expect(rootNodes[2].children.length).toBe(1);
+    expect(rootNodes[2].children[0].id).toBe(page_3_1.id);
+    expect(rootNodes[2].children[0].children.length).toBe(1);
+    expect(rootNodes[2].children[0].children[0].id).toBe(page_3_1_1.id);
   });
 
   it('should include card type pages if this setting is provided', async () => {
@@ -257,6 +333,24 @@ describe('reducePagesToPageTree', () => {
     expect(rootNodes[0].children[0].children[0].id).toBe(card_page_1.id);
     expect(rootNodes[0].children[0].children[1].id).toBe(card_page_2.id);
   });
+
+  it('should include proposal type pages if this option is true', async () => {
+
+    const proposal = generatePageNode({
+      type: 'proposal',
+      parentId: null
+    });
+
+    const { rootNodes } = reducePagesToPageTree({
+      items: [root_1, proposal],
+      includeProposals: true
+    });
+
+    expect(rootNodes.length).toBe(2);
+
+    expect(rootNodes.some(node => node.id === proposal.id)).toBe(true);
+
+  });
 });
 
 describe('mapPageTree', () => {
@@ -288,6 +382,24 @@ describe('mapPageTree', () => {
 
     // No children should have been passed
     expect(rootList[0].children.length).toBe(0);
+  });
+
+  // This test so we don't accidentally render proposals in the UI page tree
+  it('should ignore proposal type pages by default', async () => {
+
+    const proposal = generatePageNode({
+      type: 'proposal',
+      parentId: null
+    });
+
+    const mappedPages = mapPageTree({
+      items: [root_1, proposal],
+      includeProposals: false
+    });
+
+    expect(mappedPages.length).toBe(1);
+
+    expect(mappedPages[0].id).toBe(root_1.id);
   });
 
   it('should only return the selected root nodes if this is provided as a parameter', async () => {

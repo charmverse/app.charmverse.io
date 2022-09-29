@@ -1,0 +1,66 @@
+services:
+  webapp:
+    image: "310849459438.dkr.ecr.us-east-1.amazonaws.com/charmverse-web3-workspace:${IMGTAG}"
+    ports:
+      - "80:3000"
+    command: [ "npm", "run", "${NPM_SCRIPT}" ]
+    labels:
+      com.datadoghq.ad.logs: "[{\"source\": \"nodejs\", \"service\": \"${SERVICE_NAME}\"}]"
+    volumes:
+      - $PWD/.env:/app/.env
+    env_file:
+      - ".env"
+    environment:
+      DATABASE_URL: "postgres://${DB_USER}:${DB_PASSWD}@${DB_HOSTNAME}:5432/${DB_NAME}"
+    profiles:
+      - stg
+      - tst
+      - prd
+      - webapp
+
+  devapp:
+    build:
+      context: .
+    ports:
+      - "80:3000"
+    command: [ "npm", "run", "start" ]
+    volumes:
+      - $PWD:/app
+    env_file:
+      - ".env"
+    depends_on:
+      - localpostgres
+    profiles:
+      - dev
+
+  localpostgres:
+    image: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ${LOCAL_DATA_DIR:-/home/postgresql}:/var/lib/postgresql/
+    profiles:
+      - dev
+
+  datadog-agent:
+    image: public.ecr.aws/datadog/agent
+    hostname: datadog-agent
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /proc/:/host/proc/:ro
+      - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
+      - $PWD/.env:/app/.env
+    env_file:
+      - ".env"
+    environment:
+      DD_LOGS_ENABLED: "true"
+      DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL: "true"
+      DD_CONTAINER_EXCLUDE: "image:public.ecr.aws/datadog/agent"
+      DD_SITE: "datadoghq.com"
+      DD_APM_ENABLED: "true"
+      DD_APM_NON_LOCAL_TRAFFIC: "true"
+      DD_ENV: "${SERVICE_ENV:-tst}"
+      DD_DOGSTATSD_NON_LOCAL_TRAFFIC: "true"
+    profiles:
+      - prd
+      - ddtst

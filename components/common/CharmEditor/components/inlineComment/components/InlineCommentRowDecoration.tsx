@@ -1,8 +1,8 @@
-import { ReactNode } from 'react';
-import { Box, Typography } from '@mui/material';
-import { CommentOutlined } from '@mui/icons-material';
 
-export function RowDecoration ({ children }: { children: ReactNode }) {
+import { Box, Typography } from '@mui/material';
+import { MessageOutlined } from '@mui/icons-material';
+
+export function RowDecoration ({ count, icon: Icon }: { count: number, icon: any }) {
   return (
     <Box
       display='flex'
@@ -10,15 +10,7 @@ export function RowDecoration ({ children }: { children: ReactNode }) {
       alignItems='center'
       sx={{ cursor: 'pointer' }}
     >
-      {children}
-    </Box>
-  );
-}
-
-export default function RowIcon ({ count }: { count: number }) {
-  return (
-    <RowDecoration>
-      <CommentOutlined
+      <Icon
         color='secondary'
         fontSize='small'
       />
@@ -28,6 +20,10 @@ export default function RowIcon ({ count }: { count: number }) {
       >
         {count}
       </Typography>
-    </RowDecoration>
+    </Box>
   );
+}
+
+export default function RowIcon ({ count }: { count: number }) {
+  return <RowDecoration icon={MessageOutlined} count={count} />;
 }

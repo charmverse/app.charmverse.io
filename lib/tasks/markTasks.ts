@@ -1,9 +1,9 @@
-import { NotificationType } from '@prisma/client';
+import type { NotificationType } from '@prisma/client';
 import { prisma } from 'db';
 
 export interface MarkTask {
-  id: string,
-  type: NotificationType
+  id: string;
+  type: NotificationType;
 }
 
 export async function markTasks (tasks: MarkTask[], userId: string) {
@@ -24,6 +24,7 @@ export async function markTasks (tasks: MarkTask[], userId: string) {
     await prisma.userNotification.createMany({
       data: tasksNotNotified.map(task => ({
         taskId: task.id,
+        channel: 'webapp' as const,
         type: task.type,
         userId,
         createdAt: new Date()

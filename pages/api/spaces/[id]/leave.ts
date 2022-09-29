@@ -2,14 +2,14 @@
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).post(leaveWorkspace);
 
-async function leaveWorkspace (req: NextApiRequest, res: NextApiResponse<{ok: boolean}>) {
+async function leaveWorkspace (req: NextApiRequest, res: NextApiResponse<{ ok: boolean }>) {
   const spaceId = req.query.id as string;
   const userId = req.session.user.id;
   await prisma.spaceRole.delete({

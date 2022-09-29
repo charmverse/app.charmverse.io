@@ -1,6 +1,7 @@
-import { Role, Space, SpaceOperation, SpacePermission, User } from '@prisma/client';
+import type { SpaceOperation, SpacePermission } from '@prisma/client';
+import { Role, Space, User } from '@prisma/client';
 import { RequiredNotNull } from 'lib/utilities/types';
-import { PermissionAssignee, AssignablePermissionGroups, PermissionAssigneeId, UserPermissionFlags } from '../interfaces';
+import type { PermissionAssignee, AssignablePermissionGroups, PermissionAssigneeId, UserPermissionFlags } from '../interfaces';
 
 export type SpacePermissionModification<A extends AssignablePermissionGroups | 'any' = 'any'> = Pick<SpacePermission, 'forSpaceId' | 'operations'>
 & PermissionAssigneeId<A>

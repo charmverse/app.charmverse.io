@@ -1,23 +1,21 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
 
-import DocumentPage from 'components/[pageId]/DocumentPage';
-import { ReactNode, useCallback, useEffect, useRef } from 'react';
-import { usePages } from 'hooks/usePages';
-import log from 'lib/log';
-import { Prisma, Page } from '@prisma/client';
-import charmClient from 'charmClient';
-import debouncePromise from 'lib/utilities/debouncePromise';
-import { BountyWithDetails } from 'models';
-import { Card } from '../../blocks/card';
+import { Page } from '@prisma/client'
+import charmClient from 'charmClient'
+import DocumentPage from 'components/[pageId]/DocumentPage'
+import { usePages } from 'hooks/usePages'
+import log from 'lib/log'
+import debouncePromise from 'lib/utilities/debouncePromise'
+import { useCallback, useEffect, useRef } from 'react'
+import { Card } from '../../blocks/card'
+import { findParentOfType } from 'lib/pages/findParentOfType';
 
 type Props = {
     card: Card
-    readonly: boolean
+    readOnly: boolean
 }
 
 function CardDetail (props: Props): JSX.Element|null {
-  const { card, readonly } = props;
+  const { card, readOnly } = props;
 
   const mounted = useRef(false);
 
@@ -48,6 +46,8 @@ function CardDetail (props: Props): JSX.Element|null {
     }
   }, [card]);
 
+  const parentProposalId = findParentOfType({ pageId: card.id, pageType: 'proposal', pageMap: pages });
+
   const page = pages[card?.id];
   if (!card || !page) {
     return null;
@@ -56,7 +56,8 @@ function CardDetail (props: Props): JSX.Element|null {
     <DocumentPage
       page={page}
       setPage={setPage}
-      readOnly={readonly}
+      readOnly={readOnly}
+      parentProposalId={parentProposalId}
     />
   );
 }

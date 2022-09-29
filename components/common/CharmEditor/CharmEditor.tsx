@@ -1,68 +1,87 @@
 import {
   bold,
-  bulletList,
   code,
   hardBreak,
-  heading,
-  horizontalRule,
   italic,
   link,
-  listItem,
-  orderedList,
   strike,
   underline
 } from '@bangle.dev/base-components';
-import { BangleEditorState, NodeView, Plugin, RawPlugins, SpecRegistry } from '@bangle.dev/core';
+import type { RawPlugins } from '@bangle.dev/core';
+import { BangleEditorState, NodeView, Plugin } from '@bangle.dev/core';
 import { markdownSerializer } from '@bangle.dev/markdown';
-import { EditorView, Node, PluginKey } from '@bangle.dev/pm';
+import type { EditorState, EditorView } from '@bangle.dev/pm';
+import { Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import { Box, Divider, Slide } from '@mui/material';
+import { Box, Divider } from '@mui/material';
+import type { PageType } from '@prisma/client';
+import charmClient from 'charmClient';
 import * as codeBlock from 'components/common/CharmEditor/components/@bangle.dev/base-components/code-block';
 import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
-import PageInlineVotesList from 'components/[pageId]/DocumentPage/components/VotesSidebar';
 import CommentsSidebar from 'components/[pageId]/DocumentPage/components/CommentsSidebar';
-import { CryptoCurrency, FiatCurrency } from 'connectors';
+import PageInlineVotesList from 'components/[pageId]/DocumentPage/components/VotesSidebar';
+import { SuggestionsSidebar } from 'components/[pageId]/DocumentPage/components/SuggestionsSidebar';
+import type { CryptoCurrency, FiatCurrency } from 'connectors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
+import type { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
+import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useUser } from 'hooks/useUser';
 import { silentlyUpdateURL } from 'lib/browser';
+import { extractDeletedThreadIds } from 'lib/inline-comments/extractDeletedThreadIds';
+import log from 'lib/log';
+import type { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
 import debounce from 'lodash/debounce';
-import { PageContent } from 'models';
-import { CSSProperties, memo, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import type { PageContent } from 'models';
+import type { CSSProperties, ReactNode } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { useSWRConfig } from 'swr';
+import * as listItem from './components/listItem/listItem';
+import * as orderedList from './components/orderedList';
+import * as bulletList from './components/bulletList';
+import * as horizontalRule from './components/horizontalRule';
 import Callout, * as callout from './components/callout';
 import { userDataPlugin } from './components/charm/charm.plugins';
 import * as columnLayout from './components/columnLayout';
 import LayoutColumn from './components/columnLayout/Column';
 import LayoutRow from './components/columnLayout/Row';
-import { CryptoPrice, cryptoPriceSpec } from './components/CryptoPrice';
+import { CryptoPrice } from './components/CryptoPrice';
 import * as disclosure from './components/disclosure';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
 import * as floatingMenu from './components/floatingMenu';
 import * as iframe from './components/iframe';
 import InlineCommentThread, * as inlineComment from './components/inlineComment';
-import InlinePalette, { plugins as inlinePalettePlugins, spec as inlinePaletteSpecs } from './components/inlinePalette';
+import InlineDatabase from './components/inlineDatabase/components/InlineDatabase';
+import InlinePalette, { plugins as inlinePalettePlugins } from './components/inlinePalette';
 import * as inlineVote from './components/inlineVote';
 import InlineVoteList from './components/inlineVote/components/InlineVoteList';
-import Mention, { mentionPluginKeyName, mentionPlugins, mentionSpecs, MentionSuggest } from './components/mention';
-import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList, nestedPageSpec } from './components/nestedPage';
+import Mention, { mentionPluginKeyName, mentionPlugins, MentionSuggest } from './components/mention';
+import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList } from './components/nestedPage';
+import * as heading from './components/heading';
+import paragraph from './components/paragraph';
 import Placeholder from './components/Placeholder';
-import Quote, * as quote from './components/quote';
-import ResizableImage, { imageSpec } from './components/ResizableImage';
-import ResizablePDF, { pdfSpec } from './components/ResizablePDF';
+import Quote from './components/quote';
+import ResizableImage from './components/ResizableImage';
+import ResizablePDF from './components/ResizablePDF';
 import RowActionsMenu, * as rowActions from './components/rowActions';
 import * as tabIndent from './components/tabIndent';
 import * as table from './components/table';
 import * as trailingNode from './components/trailingNode';
-import paragraph from './components/paragraph';
 import DevTools from './DevTools';
+import { specRegistry } from './specRegistry';
 import { checkForEmpty } from './utils';
+import trackStyles from './components/suggestions/styles';
+import { rejectAll } from './components/suggestions/track/rejectAll';
+import { getSelectedChanges } from './components/suggestions/statePlugins/track';
+import { plugins as trackPlugins } from './components/suggestions/suggestions.plugins';
+import SuggestionsPopup from './components/suggestions/SuggestionPopup';
+import { SidebarDrawer, SIDEBAR_VIEWS } from './components/SidebarDrawer';
 
 export interface ICharmEditorOutput {
-  doc: PageContent,
-  rawText: string
+  doc: PageContent;
+  rawText: string;
 }
 
 const actionsPluginKey = new PluginKey('row-actions');
@@ -72,79 +91,52 @@ const floatingMenuPluginKey = new PluginKey('floatingMenu');
 const nestedPagePluginKey = new PluginKey(nestedPagePluginKeyName);
 const inlineCommentPluginKey = new PluginKey(inlineComment.pluginKeyName);
 const inlineVotePluginKey = new PluginKey(inlineVote.pluginKeyName);
-
-export const specRegistry = new SpecRegistry([
-  // Comments to the right of each spec show if it supports markdown export
-  // OK => Component exports markdown
-  // ?? => Could not test component or identify it
-  // NO => Not supported
-  //
-  // MAKE SURE THIS IS ALWAYS AT THE TOP! Or deleting all contents will leave the wrong component in the editor
-  paragraph.spec(), // OK
-  mentionSpecs(), // NO
-  inlineComment.spec(),
-  inlineVote.spec(),
-  bold.spec(), // OK
-  bulletList.spec(), // OK
-  hardBreak.spec(), // OK
-  horizontalRule.spec(), // OK
-  italic.spec(), // OK
-  link.spec(), // OK
-  listItem.spec(), // OK
-  orderedList.spec(), // OK
-  strike.spec(), // OK
-  underline.spec(), // OK
-  emoji.specs(), // OK
-  code.spec(), // OK
-  codeBlock.spec(), // OK
-  iframe.spec(), // OK
-  heading.spec(), // OK
-  inlinePaletteSpecs(), // Not required
-  callout.spec(), // OK
-  cryptoPriceSpec(), // NO
-  pdfSpec(), // NO
-  imageSpec(), // OK
-  columnLayout.rowSpec(), // NO
-  columnLayout.columnSpec(), // NO
-  nestedPageSpec(), // NO
-  quote.spec(), // OK
-  tabIndent.spec(),
-  table.spec(), // OK - only for text content
-  disclosure.spec()
-]);
+const suggestionsPluginKey = new PluginKey('suggestions');
 
 export function charmEditorPlugins (
   {
     onContentChange,
-    readOnly,
+    onSelectionSet,
+    readOnly = false,
     disablePageSpecificFeatures = false,
     enableVoting,
     enableComments = true,
     userId = null,
     pageId = null,
-    spaceId = null
+    spaceId = null,
+    username = null
   }:
     {
-      spaceId?: string | null,
-      pageId?: string | null,
-      userId?: string | null,
-      readOnly?: boolean,
-      onContentChange?: (view: EditorView) => void,
-      disablePageSpecificFeatures?: boolean,
-      enableVoting?: boolean,
-      enableComments?: boolean
+      spaceId?: string | null;
+      pageId?: string | null;
+      userId?: string | null;
+      readOnly?: boolean;
+      onContentChange?: (view: EditorView, prevDoc: EditorState['doc']) => void;
+      onSelectionSet?: (state: EditorState) => void;
+      disablePageSpecificFeatures?: boolean;
+      enableVoting?: boolean;
+      enableComments?: boolean;
+      username?: string | null;
     } = {}
 ): () => RawPlugins[] {
 
   const basePlugins: RawPlugins[] = [
+    // this trackPlugin should be called before the one below which calls onSelectionSet().
+    // TODO: find a cleaner way to combine this logic?
+    (username && userId ? trackPlugins({ readOnly, userId, username, onSelectionSet, key: suggestionsPluginKey }) : []),
     new Plugin({
-      view: () => ({
-        update: (view, prevState) => {
-          if (onContentChange && !view.state.doc.eq(prevState.doc)) {
-            onContentChange(view);
-          }
+      view: (_view) => {
+        if (readOnly) {
+          rejectAll(_view);
         }
-      })
+        return {
+          update: (view, prevState) => {
+            if (!readOnly && onContentChange && !view.state.doc.eq(prevState.doc)) {
+              onContentChange(view, prevState.doc);
+            }
+          }
+        };
+      }
     }),
     userDataPlugin({
       userId,
@@ -210,6 +202,10 @@ export function charmEditorPlugins (
       containerDOM: ['blockquote', { class: 'charm-quote' }],
       contentDOM: ['div']
     }),
+    NodeView.createPlugin({
+      name: 'inlineDatabase',
+      containerDOM: ['div', { draggable: 'false' }]
+    }),
     tabIndent.plugins(),
     table.tableEditing({ allowTableNodeSelection: true }),
     table.columnHandles(),
@@ -249,7 +245,7 @@ export function charmEditorPlugins (
   return () => basePlugins;
 }
 
-const StyledReactBangleEditor = styled(ReactBangleEditor)<{disablePageSpecificFeatures?: boolean}>`
+const StyledReactBangleEditor = styled(ReactBangleEditor)<{ disablePageSpecificFeatures?: boolean }>`
   position: relative;
 
   /** DONT REMOVE THIS STYLING */
@@ -303,22 +299,8 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{disablePageSpecificFe
       cursor: pointer;
     }
   `}
-`;
 
-const PageActionListBox = styled.div`
-  position: fixed;
-  right: 0px;
-  width: 400px;
-  top: 75px;
-  z-index: var(--z-index-drawer);
-  height: calc(100% - 80px);
-  overflow: auto;
-  margin-right: ${({ theme }) => theme.spacing(1)};
-  background: ${({ theme }) => theme.palette.background.default};
-  display: none;
-  ${({ theme }) => theme.breakpoints.up('md')} {
-    display: block;
-  }
+  ${trackStyles}
 `;
 
 const defaultContent: PageContent = {
@@ -335,13 +317,17 @@ export type UpdatePageContent = (content: ICharmEditorOutput) => any;
 interface CharmEditorProps {
   content?: PageContent;
   children?: ReactNode;
+  enableSuggestingMode?: boolean;
   onContentChange?: UpdatePageContent;
   readOnly?: boolean;
   style?: CSSProperties;
-  pageActionDisplay?: IPageActionDisplayContext['currentPageActionDisplay']
+  pageActionDisplay?: IPageActionDisplayContext['currentPageActionDisplay'];
   disablePageSpecificFeatures?: boolean;
   enableVoting?: boolean;
-  pageId?: string | null;
+  pageId: string;
+  containerWidth?: number;
+  pageType?: PageType;
+  pagePermissions?: IPagePermissionFlags;
 }
 
 export function convertPageContentToMarkdown (content: PageContent, title?: string): string {
@@ -366,6 +352,7 @@ export function convertPageContentToMarkdown (content: PageContent, title?: stri
 
 function CharmEditor (
   {
+    enableSuggestingMode = false,
     pageActionDisplay = null,
     content = defaultContent,
     children,
@@ -374,42 +361,95 @@ function CharmEditor (
     readOnly = false,
     disablePageSpecificFeatures = false,
     enableVoting,
-    pageId
+    pageId,
+    containerWidth,
+    pageType,
+    pagePermissions
   }:
   CharmEditorProps
 ) {
-
+  const { mutate } = useSWRConfig();
   const [currentSpace] = useCurrentSpace();
+  const { setCurrentPageActionDisplay } = usePageActionDisplay();
   // check empty state of page on first load
   const _isEmpty = checkForEmpty(content);
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
-  const [currentUser] = useUser();
-  const onContentChangeDebounced = onContentChange ? debounce((view: EditorView) => {
+  const { user } = useUser();
+
+  const isTemplate = pageType ? pageType.includes('template') : false;
+  const disableNestedPage = disablePageSpecificFeatures || enableSuggestingMode || isTemplate;
+
+  // eslint-disable-next-line
+  const onThreadResolveDebounced = debounce((pageId: string, doc: EditorState['doc'], prevDoc: EditorState['doc']) => {
+    const deletedThreadIds = extractDeletedThreadIds(
+      specRegistry.schema,
+      doc,
+      prevDoc
+    );
+    if (deletedThreadIds.length) {
+      charmClient.resolveMultipleThreads({
+        threadIds: deletedThreadIds,
+        pageId
+      }).then(() => {
+        charmClient.getPageThreads(pageId).then((threads) => {
+          mutate(`pages/${pageId}/threads`, threads);
+        }).catch((err) => {
+          log.warn(`Failed to fetch threads for page ${pageId}`, err);
+        });
+      }).catch((err) => {
+        log.warn('Failed to auto resolve threads', err);
+      });
+    }
+  }, 1000);
+  const onContentChangeDebounced = onContentChange ? debounce((view: EditorView, prevDoc?: EditorState['doc']) => {
     const doc = view.state.doc.toJSON() as PageContent;
     const rawText = view.state.doc.textContent as string;
+    if (pageId && prevDoc) {
+      onThreadResolveDebounced(pageId, view.state.doc, prevDoc);
+    }
     onContentChange({ doc, rawText });
   }, 100) : undefined;
 
-  function _onContentChange (view: EditorView) {
+  function _onContentChange (view: EditorView, prevDoc: Node<any>) {
     // @ts-ignore missing types from the @bangle.dev/react package
     setIsEmpty(checkForEmpty(view.state.doc.toJSON() as PageContent));
     if (onContentChangeDebounced) {
-      onContentChangeDebounced(view);
+      onContentChangeDebounced(view, prevDoc);
     }
   }
 
   const editorRef = useRef<HTMLDivElement>(null);
 
+  const [suggestionState, setSuggestionState] = useState<EditorState | null>(null);
+
+  function onSelectionSet (state: EditorState) {
+    // update state that triggers updates in the sidebar
+    setSuggestionState(state);
+    // expand the sidebar if the user is selecting a suggestion
+    setCurrentPageActionDisplay(sidebarState => {
+      if (sidebarState) {
+        const selected = getSelectedChanges(state);
+        const hasSelection = Object.values(selected).some((value) => value);
+        if (hasSelection) {
+          return 'suggestions';
+        }
+      }
+      return sidebarState;
+    });
+  }
+
   const state = useEditorState({
     specRegistry,
     plugins: charmEditorPlugins({
       onContentChange: _onContentChange,
+      onSelectionSet,
       readOnly,
       disablePageSpecificFeatures,
       enableVoting,
       pageId,
       spaceId: currentSpace?.id,
-      userId: currentUser?.id
+      userId: user?.id,
+      username: user?.username
     }),
     initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
     dropCursorOpts: {
@@ -447,6 +487,8 @@ function CharmEditor (
   return (
     <StyledReactBangleEditor
       disablePageSpecificFeatures={disablePageSpecificFeatures}
+      enableSuggestions={enableSuggestingMode}
+      trackChanges={true}
       style={{
         ...(style ?? {}),
         width: '100%',
@@ -552,60 +594,45 @@ function CharmEditor (
               />
             );
           }
+          case 'inlineDatabase': {
+            return (
+              <InlineDatabase
+                containerWidth={containerWidth}
+                readOnly={readOnly}
+                {...props}
+              />
+            );
+          }
           default: {
             return null;
           }
         }
       }}
     >
-      <floatingMenu.FloatingMenu enableComments={!disablePageSpecificFeatures} enableVoting={enableVoting} pluginKey={floatingMenuPluginKey} />
+      <floatingMenu.FloatingMenu
+      // disable comments and polls in suggestions mode since they dont interact well
+        enableComments={!disablePageSpecificFeatures && !enableSuggestingMode && !isTemplate}
+        enableVoting={enableVoting && !enableSuggestingMode && !isTemplate}
+        pluginKey={floatingMenuPluginKey}
+        pagePermissions={pagePermissions}
+      />
       <MentionSuggest pluginKey={mentionPluginKey} />
       <NestedPagesList pluginKey={nestedPagePluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
       {!readOnly && <RowActionsMenu pluginKey={actionsPluginKey} />}
-      <InlinePalette nestedPagePluginKey={nestedPagePluginKey} disableNestedPage={disablePageSpecificFeatures} />
+      <InlinePalette nestedPagePluginKey={nestedPagePluginKey} disableNestedPage={disableNestedPage} />
       {children}
       {!disablePageSpecificFeatures && (
-      <>
-        <Slide
-          direction='left'
-          in={pageActionDisplay === 'comments'}
-          style={{
-            transformOrigin: 'left top'
-          }}
-          easing={{
-            enter: 'ease-in',
-            exit: 'ease-out'
-          }}
-          timeout={250}
-        >
-          <PageActionListBox
-            id='page-thread-list-box'
-          >
-            <CommentsSidebar />
-          </PageActionListBox>
-        </Slide>
-        <Slide
-          direction='left'
-          in={pageActionDisplay === 'votes'}
-          style={{
-            transformOrigin: 'left top'
-          }}
-          easing={{
-            enter: 'ease-in',
-            exit: 'ease-out'
-          }}
-          timeout={250}
-        >
-          <PageActionListBox
-            id='page-vote-list-box'
-          >
-            <PageInlineVotesList />
-          </PageActionListBox>
-        </Slide>
-        <InlineCommentThread pluginKey={inlineCommentPluginKey} />
-        {enableVoting && <InlineVoteList pluginKey={inlineVotePluginKey} />}
-      </>
+        <>
+          <SidebarDrawer id='page-action-sidebar' title={pageActionDisplay ? SIDEBAR_VIEWS[pageActionDisplay].title : ''} open={!!pageActionDisplay}>
+            {pageActionDisplay === 'suggestions' && <SuggestionsSidebar readOnly={!pagePermissions?.edit_content} state={suggestionState} />}
+            {pageActionDisplay === 'comments' && <CommentsSidebar />}
+            {pageActionDisplay === 'polls' && <PageInlineVotesList />}
+          </SidebarDrawer>
+          <InlineCommentThread pluginKey={inlineCommentPluginKey} />
+          {enableVoting && <InlineVoteList pluginKey={inlineVotePluginKey} />}
+          <SuggestionsPopup pluginKey={suggestionsPluginKey} readOnly={readOnly} />
+        </>
       )}
       {!readOnly && <DevTools />}
     </StyledReactBangleEditor>

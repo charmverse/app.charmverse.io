@@ -1,7 +1,7 @@
 import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import { Space } from '@prisma/client';
+import type { Space } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
 import charmClient from 'charmClient';
 import Link from 'components/common/Link';
@@ -11,7 +11,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import getLitChainFromChainId from 'lib/token-gates/getLitChainFromChainId';
-import { TokenGateEvaluationResult, TokenGateWithRoles } from 'lib/token-gates/interfaces';
+import type { TokenGateEvaluationResult, TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import { checkAndSignAuthMessage } from 'lit-js-sdk';
 import { useEffect, useState } from 'react';
 import TokenGateOption from './TokenGateOption';
@@ -27,7 +27,7 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
   const { account, chainId } = useWeb3React();
   const { showMessage } = useSnackbar();
   const [spaces, setSpaces] = useSpaces();
-  const [user, setUser] = useUser();
+  const { user, setUser } = useUser();
 
   const [tokenGates, setTokenGates] = useState<TokenGateWithRoles[] | null>(null);
 

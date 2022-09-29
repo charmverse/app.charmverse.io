@@ -1,9 +1,9 @@
-import { Application } from '@prisma/client';
+import type { Application } from '@prisma/client';
+import { prisma } from 'db';
 import { getBountyOrThrow } from 'lib/bounties';
 import { DuplicateDataError, LimitReachedError, StringTooShortError } from 'lib/utilities/errors';
-import { prisma } from 'db';
-import { ApplicationCreationData } from '../interfaces';
-import { submissionsCapReached, MINIMUM_APPLICATION_MESSAGE_CHARACTERS } from '../shared';
+import type { ApplicationCreationData } from '../interfaces';
+import { MINIMUM_APPLICATION_MESSAGE_CHARACTERS, submissionsCapReached } from '../shared';
 
 export async function createApplication ({ bountyId, message, userId }: ApplicationCreationData): Promise<Application> {
   const bounty = await getBountyOrThrow(bountyId);

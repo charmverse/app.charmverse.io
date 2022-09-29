@@ -1,10 +1,10 @@
 
-import { Bounty, Space, User } from '@prisma/client';
+import type { Bounty, Space, User } from '@prisma/client';
 import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { ExpectedAnError } from 'testing/errors';
 import { createBounty } from '../createBounty';
-import { UpdateableBountyFields } from '../interfaces';
+import type { UpdateableBountyFields } from '../interfaces';
 import { updateBountySettings } from '../updateBountySettings';
 import { InvalidInputError, PositiveNumbersOnlyError } from '../../utilities/errors';
 
@@ -25,11 +25,8 @@ describe('updateBountySettings', () => {
       createdBy: user.id,
       spaceId: space.id,
       // Different values from what will be updated
-      title: 'My bounty',
       approveSubmitters: true,
       chainId: 2,
-      description: 'Old description',
-      descriptionNodes: '{"type":"doc","content":[{"type":"paragraph","content":[{"text":"Old description","type":"text"}]}]}',
       maxSubmissions: 3,
       rewardAmount: 4,
       rewardToken: 'ETH'
@@ -61,7 +58,6 @@ describe('updateBountySettings', () => {
     const bounty = await createBounty({
       createdBy: user.id,
       spaceId: space.id,
-      title: 'My bounty',
       status: 'suggestion'
     });
 
@@ -83,7 +79,6 @@ describe('updateBountySettings', () => {
     const bounty = await createBounty({
       createdBy: user.id,
       spaceId: space.id,
-      title: 'My bounty',
       status: 'suggestion'
     });
 
