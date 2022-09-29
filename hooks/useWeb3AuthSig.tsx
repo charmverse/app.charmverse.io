@@ -5,11 +5,11 @@ import type { ethers } from 'ethers';
 import { toUtf8Bytes, hexlify, getAddress } from 'ethers/lib/utils';
 import { SiweMessage } from 'lit-siwe';
 import type { ReactNode } from 'react';
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { useCallback, createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { box } from 'tweetnacl';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import naclUtil from 'tweetnacl-util';
-import { useLocalStorage } from './useLocalStorage';
+import { useLocalStorage, PREFIX } from './useLocalStorage';
 import useWeb3Signer from './useWeb3Signer';
 import { useSnackbar } from './useSnackbar';
 import { InvalidStateError } from '../lib/middleware';
@@ -33,10 +33,10 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
   const { account, library } = useWeb3React();
 
   const [_, setLitAuthSignature] = useLocalStorage<AuthSig | null>('lit-auth-signature', null, true);
-  const [walletProvider, setWalletProvider] = useLocalStorage<string>('lit-web3-provider', 'coinbase', true);
 
   const [litCommKey, setLitCommKey] = useLocalStorage<{ publicKey: string, secretKey: string } | null>('lit-comms-keypair', null, true);
-  const [walletAuthSignature, setWalletAuthSignature] = useState(useLocalStorage<AuthSig | null>(`wallet-auth-sig-${account}`, null)[0]);
+
+  const [walletAuthSignature, setWalletAuthSignature] = useState<AuthSig | null>(null);
 
   // External
   // Inform the user that we have an account but not auth signature
@@ -45,9 +45,17 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
     //  Automagic lit signature update only
 
     if (account) {
-      setLitAuthSignature(walletAuthSignature);
+      const storedWalletSignature = window.localStorage.getItem(`${PREFIX}.wallet-auth-sig-${account}`);
+
+      if (storedWalletSignature) {
+        setLitAuthSignature(JSON.parse(storedWalletSignature));
+        setWalletAuthSignature(JSON.parse(storedWalletSignature));
+      }
     }
-  }, [account, walletAuthSignature]);
+    else {
+      setWalletAuthSignature(null);
+    }
+  }, [account]);
 
   async function sign (): Promise<AuthSig> {
 
@@ -88,11 +96,12 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
 
     const generated: AuthSig = {
       sig: newSignature,
-      derivedVia: 'web3.eth.personal.sign',
+      derivedVia: 'charmverse.sign',
       signedMessage: body,
       address: signatureAddress
     };
 
+    window.localStorage.setItem(`${PREFIX}.wallet-auth-sig-${account}`, JSON.stringify(generated));
     setWalletAuthSignature(generated);
 
     if (!litCommKey) {
@@ -104,8 +113,6 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
     }
 
     return generated;
-
-    // const commsKeyPair = box.keyPair();
   }
 
   const value = useMemo(() => ({ account, walletAuthSignature, sign }) as IContext, [account, walletAuthSignature]);

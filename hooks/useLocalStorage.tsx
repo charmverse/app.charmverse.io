@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 // Add a prefix so if our schema changes, we can invalidate previous content
-const PREFIX = 'charm.v1';
+export const PREFIX = 'charm.v1';
 
 // localStorage hook inspiration: https://blog.logrocket.com/using-localstorage-react-hooks/
 

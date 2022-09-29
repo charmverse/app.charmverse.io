@@ -27,7 +27,7 @@ export interface ExtendedPoap {
 
 export interface AuthSig {
   sig: string;
-  derivedVia: 'web3.eth.personal.sign';
+  derivedVia: string;
   signedMessage: string;
   address: string;
 }
