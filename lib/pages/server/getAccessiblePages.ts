@@ -1,6 +1,8 @@
-import type { Prisma } from '@prisma/client';
+import type { Page, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import type { IPageWithPermissions, PagesRequest } from '../interfaces';
+
+type PageFieldsWithoutContent = Record<keyof Omit<Page, 'content' | 'contentText'>, true>
 
 // Feature flag for testing purposes
 const WITHOUT_CONTENT = true;
@@ -30,7 +32,7 @@ function selectPageFields () {
     return includePagePermissions();
   }
 
-  return {
+  const select: { select: PageFieldsWithoutContent } = {
     select: {
       id: true,
       deletedAt: true,
@@ -55,9 +57,12 @@ function selectPageFields () {
       fullWidth: true,
       bountyId: true,
       hasContent: true,
+      galleryImg: true,
       ...includePagePermissions()
     }
   };
+
+  return select;
 }
 
 export function accessiblePagesByPermissionsQuery ({ spaceId, userId }:

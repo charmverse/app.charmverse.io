@@ -1,6 +1,7 @@
 import type { Block, Page, Prisma, Space } from '@prisma/client';
 import { prisma } from 'db';
 import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
+import { getPreviewImageFromContent } from 'lib/pages/getPreviewImageFromContent';
 import type { PageContent } from 'models';
 import fs from 'node:fs/promises';
 import { v4 } from 'uuid';
@@ -54,6 +55,7 @@ async function convertFolderContent ({
 
   pageContent.id = newPageId;
   pageContent.hasContent = !checkIsContentEmpty(pageContent.content as PageContent);
+  pageContent.galleryImg = getPreviewImageFromContent(pageContent.content as PageContent);
 
   if (pageContent.type === 'board') {
     pageContent.boardId = pageContent.id;
