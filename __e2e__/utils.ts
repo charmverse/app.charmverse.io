@@ -71,10 +71,10 @@ export async function createUserAndSpace ({
 }: {
   browserPage: BrowserPage;
   walletAddress?: string;
-} & Partial<Pick<Space, 'permissionConfigurationMode'>>) {
+} & Partial<Pick<Space, 'permissionConfigurationMode'>>): Promise<{ user: LoggedInUser, walletAddress?: string, space: Space, pages: IPageWithPermissions[] }> {
   const user = await createUser({ browserPage, walletAddress });
   const space = await createSpace({ browserPage, createdBy: user.id, permissionConfigurationMode });
-  const pages: IPageWithPermissions[] = await getPages({ browserPage, spaceId: space.id });
+  const pages = await getPages({ browserPage, spaceId: space.id });
 
   return {
     space,
