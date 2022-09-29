@@ -19,12 +19,12 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import type { BountyWithDetails } from 'lib/bounties';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useBounties } from 'hooks/useBounties';
-import type { IPageWithPermissions, PageUpdates } from 'lib/pages';
+import type { PageMeta, PageUpdates } from 'lib/pages';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { findParentOfType } from 'lib/pages/findParentOfType';
 
 interface Props {
-  page?: IPageWithPermissions | null;
+  page?: PageMeta | null;
   onClose: () => void;
   readOnly?: boolean;
   bounty?: BountyWithDetails | null;

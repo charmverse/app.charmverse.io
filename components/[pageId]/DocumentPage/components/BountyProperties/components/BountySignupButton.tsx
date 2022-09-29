@@ -8,15 +8,15 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import { useContext, useEffect, useState } from 'react';
 
-import type { Page } from '@prisma/client';
 import charmClient from 'charmClient';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { useContributors } from 'hooks/useContributors';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
+import type { PageMeta } from 'lib/pages';
 
 interface Props {
-  bountyPage: Page;
+  bountyPage: PageMeta;
 }
 
 export function BountySignupButton ({ bountyPage }: Props) {

@@ -2,11 +2,12 @@ import { ListItemIcon, MenuItem, Typography } from '@mui/material';
 import type { Page } from '@prisma/client';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import PageTitle from 'components/common/PageLayout/components/PageTitle';
+import type { PageMeta } from 'lib/pages';
 
 interface Props {
   activeItemIndex?: number;
-  pages: Page[];
-  onSelectPage: (page: Page) => void;
+  pages: PageMeta[];
+  onSelectPage: (page: PageMeta) => void;
 }
 
 export default function PagesList ({ activeItemIndex = -1, pages, onSelectPage }: Props) {

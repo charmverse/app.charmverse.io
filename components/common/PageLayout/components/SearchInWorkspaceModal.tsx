@@ -13,9 +13,9 @@ import Link from 'components/common/Link';
 import { useBounties } from 'hooks/useBounties';
 import { usePages } from 'hooks/usePages';
 import { useRouter } from 'next/router';
-import type { IPageWithPermissions } from 'lib/pages';
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
+import type { PageMeta } from 'lib/pages';
 
 const StyledPopper = styled(Popper)`
   position: initial !important;
@@ -88,11 +88,11 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
 
   const pageList = Object.values(pages);
 
-  const getPagePath = (page: IPageWithPermissions) => {
+  const getPagePath = (page: PageMeta) => {
     if (!pages) return '';
 
     const pathElements: string[] = [];
-    let currentPage: IPageWithPermissions | undefined = { ...page };
+    let currentPage: PageMeta | undefined = { ...page };
 
     while (currentPage && currentPage.parentId) {
       const pageId: string = currentPage.parentId;

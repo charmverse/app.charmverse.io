@@ -110,7 +110,6 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
     () => pages[pageId],
     [
       pageId,
-      JSON.stringify(currentPage?.content),
       currentPage?.headerImage,
       currentPage?.icon,
       currentPage?.title,

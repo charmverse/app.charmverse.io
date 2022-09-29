@@ -20,7 +20,6 @@ import ListItemText from '@mui/material/ListItemText';
 import Popover from '@mui/material/Popover';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
-import type { Page } from '@prisma/client';
 import charmClient from 'charmClient';
 import PublishToSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/PublishToSnapshot';
 import { useColorMode } from 'context/darkMode';
@@ -32,6 +31,7 @@ import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useRef, useState } from 'react';
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
+import type { PageMeta } from 'lib/pages';
 import ShareButton from './components/ShareButton';
 import BountyShareButton from './components/BountyShareButton/BountyShareButton';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
@@ -85,7 +85,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
   }
 
   async function exportMarkdown () {
-    const markdownContent = await generateMarkdown(basePage as Page);
+    const markdownContent = await generateMarkdown(basePage as PageMeta);
 
     if (markdownContent) {
       const data = new Blob([markdownContent], { type: 'text/plain' });

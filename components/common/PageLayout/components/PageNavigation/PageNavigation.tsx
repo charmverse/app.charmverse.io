@@ -8,7 +8,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
-import type { IPageWithPermissions, NewPageInput, PageUpdates } from 'lib/pages';
+import type { IPageWithPermissions, NewPageInput, PageMeta, PageUpdates } from 'lib/pages';
 import { addPageAndRedirect } from 'lib/pages';
 import { mapPageTree, sortNodes } from 'lib/pages/mapPageTree';
 import { isTruthy } from 'lib/utilities/types';
@@ -28,7 +28,7 @@ const StyledTreeRoot = styled(TreeRoot)<{ isFavorites?: boolean }>`
   overflow-y: auto;
 `;
 
-export function filterVisiblePages (pages: (Page | undefined)[], rootPageIds: string[] = []) {
+export function filterVisiblePages (pages: (PageMeta | undefined)[], rootPageIds: string[] = []) {
   return pages
     .filter((page): page is IPageWithPermissions => isTruthy(
       page && (page.type === 'board' || page.type === 'page' || rootPageIds?.includes(page.id))

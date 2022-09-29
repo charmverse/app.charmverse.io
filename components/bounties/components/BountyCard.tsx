@@ -1,13 +1,13 @@
 import { Box, CardHeader, Typography } from '@mui/material';
-import type { Page } from '@prisma/client';
 import { fancyTrim } from 'lib/utilities/strings';
 import type { BountyWithDetails } from 'lib/bounties';
 import { memo } from 'react';
+import type { PageMeta } from 'lib/pages';
 import BountyStatusBadge from './BountyStatusBadge';
 
 interface Props {
   bounty: BountyWithDetails;
-  page: Page;
+  page: PageMeta;
   onClick?: () => void;
 }
 

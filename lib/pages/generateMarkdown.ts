@@ -1,12 +1,12 @@
 import { BangleEditorState } from '@bangle.dev/core';
 import { markdownSerializer } from '@bangle.dev/markdown';
 import { Node } from '@bangle.dev/pm';
-import type { Page } from '@prisma/client';
 import { replaceNestedPages } from 'components/common/CharmEditor/components/nestedPage';
 import { specRegistry } from 'components/common/CharmEditor/specRegistry';
+import type { PageMeta } from 'lib/pages';
 import type { PageContent } from 'models';
 
-export async function generateMarkdown (page: Page, withTitle: boolean = false): Promise<string> {
+export async function generateMarkdown (page: PageMeta, withTitle: boolean = false): Promise<string> {
 
   const isExportablePage = page && (page.type === 'page' || page.type === 'card');
 

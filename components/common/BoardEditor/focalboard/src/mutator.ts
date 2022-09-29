@@ -1,4 +1,5 @@
 import charmClient from 'charmClient';
+import { PageMeta } from 'lib/pages';
 import { Page, PageContent } from 'models';
 import { publishIncrementalUpdate } from '../../publisher';
 import { BlockIcons } from './blockIcons';
@@ -739,7 +740,7 @@ class Mutator {
     }: {
           cardId: string,
           board: Board,
-          cardPage: Page,
+          cardPage: PageMeta,
           description?: string,
           asTemplate?: boolean,
           afterRedo?: (newCardId: string) => Promise<void>,

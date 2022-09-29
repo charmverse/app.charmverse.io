@@ -14,7 +14,6 @@ import { usePrimaryCharmEditor } from 'hooks/usePrimaryCharmEditor';
 import { usePages } from 'hooks/usePages';
 import { useVotes } from 'hooks/useVotes';
 import type { AssignedBountyPermissions } from 'lib/bounties';
-import type { IPageWithPermissions } from 'lib/pages';
 import type { Page, PageContent } from 'models';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
@@ -26,6 +25,7 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { noop } from 'lodash';
 import { getPreviewImageFromContent } from 'lib/pages/getPreviewImageFromContent';
 import { updateCard } from 'components/common/BoardEditor/focalboard/src/store/cards';
+import type { PageMeta } from 'lib/pages';
 import BountyProperties from './components/BountyProperties';
 import PageBanner from './components/PageBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
@@ -52,7 +52,7 @@ export const Container = styled(Box)<{ top: number, fullWidth?: boolean }>`
 `;
 
 export interface DocumentPageProps {
-  page: IPageWithPermissions;
+  page: PageMeta;
   setPage: (p: Partial<Page>) => void;
   readOnly?: boolean;
   insideModal?: boolean;

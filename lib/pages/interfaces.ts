@@ -89,15 +89,17 @@ export type TargetPageTreeWithFlatChildren<T extends PageNode = PageNode> = {
   flatChildren: PageNodeWithChildren<T>[];
 }
 
+export type PageMeta = Omit<IPageWithPermissions, 'content' | 'contentText'>
+
 export type PageDetails = {
   id: string;
   content: Prisma.JsonValue | null;
   contentText: string;
 }
 
-export type PageWithProposal = (Page & { proposal: ProposalWithUsers | null })
+export type PageWithProposal = (Page & { proposal: ProposalWithUsers | null });
 
-export type PagesMap<P extends IPageWithPermissions | PageNode = IPageWithPermissions> = Record<string, P | undefined>;
+export type PagesMap<P extends PageMeta | PageNode = PageMeta> = Record<string, P | undefined>;
 
 export type PageUpdates = Partial<Page> & { id: string };
 export type PageDetailsUpdates = Partial<PageDetails> & { id: string };

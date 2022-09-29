@@ -158,10 +158,6 @@ class CharmClient {
     return http.GET<Block []>(`/api/blocks/views/${pageId}`);
   }
 
-  getPages (spaceId: string) {
-    return http.GET<IPageWithPermissions[]>(`/api/spaces/${spaceId}/pages`);
-  }
-
   getArchivedPages (spaceId: string) {
     return http.GET<IPageWithPermissions[]>(`/api/spaces/${spaceId}/pages?archived=true`);
   }

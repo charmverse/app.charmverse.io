@@ -1,6 +1,5 @@
 
 import Box from '@mui/material/Box';
-import { Page } from '@prisma/client';
 import Button from 'components/common/Button';
 import { DownIcon } from 'components/common/Icons/DownIcon';
 import { usePages } from 'hooks/usePages';
@@ -10,6 +9,7 @@ import { Card } from '../../blocks/card';
 import { getCurrentBoardTemplates } from '../../store/cards';
 import { useAppSelector } from '../../store/hooks';
 import { TemplatesMenu } from 'components/common/TemplatesMenu';
+import { PageMeta } from 'lib/pages';
 
 
 type Props = {
@@ -27,7 +27,7 @@ const NewCardButton = React.memo(({addCard, addCardFromTemplate, addCardTemplate
   const buttonRef = React.useRef<HTMLButtonElement>(null);
   const {pages, getPagePermissions} = usePages()
 
-  const cardTemplatesPages = cardTemplates.map(c => pages[c.id]).filter(p => p !== undefined) as Page[]
+  const cardTemplatesPages = cardTemplates.map(c => pages[c.id]).filter(p => p !== undefined) as PageMeta[]
 
   const popupState = usePopupState({variant: 'popover', popupId: 'templates-menu'});
 

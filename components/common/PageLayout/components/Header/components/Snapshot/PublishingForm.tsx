@@ -5,7 +5,6 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import { DateTimePicker } from '@mui/x-date-pickers';
-import type { Page } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
 import charmClient from 'charmClient';
 import FieldLabel from 'components/common/form/FieldLabel';
@@ -22,6 +21,7 @@ import { ExternalServiceError, SystemError, UnknownError } from 'lib/utilities/e
 import { DateTime } from 'luxon';
 import { useEffect, useState } from 'react';
 import { getChainById } from 'connectors';
+import type { PageMeta } from 'lib/pages';
 import ConnectSnapshot from './ConnectSnapshot';
 import InputVotingStrategies from './InputVotingStrategies';
 
@@ -34,7 +34,7 @@ async function getSnapshotClient () {
 
 interface Props {
   onSubmit: () => void;
-  page: Page;
+  page: PageMeta;
 }
 
 const MAX_SNAPSHOT_PROPOSAL_CHARACTERS = 14400;

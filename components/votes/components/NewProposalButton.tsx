@@ -1,6 +1,5 @@
 import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
-import type { Page } from '@prisma/client';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { DownIcon } from 'components/common/Icons/DownIcon';
@@ -12,6 +11,7 @@ import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
+import type { PageMeta } from 'lib/pages';
 import { addPage } from 'lib/pages/addPage';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
@@ -31,11 +31,11 @@ export default function NewProposalButton ({ mutateProposals }: { mutateProposal
   const buttonRef = useRef<HTMLButtonElement>(null);
   const popupState = usePopupState({ variant: 'popover', popupId: 'templates-menu' });
 
-  const [proposalTemplates, setProposalTemplates] = useState<Page[]>([]);
+  const [proposalTemplates, setProposalTemplates] = useState<PageMeta[]>([]);
 
   useEffect(() => {
     if (pages) {
-      setProposalTemplates(Object.values(pages).filter(p => p?.type === 'proposal_template') as Page[]);
+      setProposalTemplates(Object.values(pages).filter(p => p?.type === 'proposal_template') as PageMeta[]);
     }
 
   }, [pages]);
