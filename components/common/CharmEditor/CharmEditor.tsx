@@ -328,6 +328,7 @@ interface CharmEditorProps {
   containerWidth?: number;
   pageType?: PageType;
   pagePermissions?: IPagePermissionFlags;
+  placeholder?: JSX.Element | undefined | null;
 }
 
 export function convertPageContentToMarkdown (content: PageContent, title?: string): string {
@@ -364,7 +365,8 @@ function CharmEditor (
     pageId,
     containerWidth,
     pageType,
-    pagePermissions
+    pagePermissions,
+    placeholder
   }:
   CharmEditorProps
 ) {
@@ -501,13 +503,15 @@ function CharmEditor (
         plugins: []
       }}
       placeholderComponent={(
-        <Placeholder
-          sx={{
-            // This fixes the placeholder and cursor not being aligned
-            top: -34
-          }}
-          show={isEmpty && !readOnly}
-        />
+        placeholder || (
+          <Placeholder
+            sx={{
+              // This fixes the placeholder and cursor not being aligned
+              top: -34
+            }}
+            show={isEmpty && !readOnly}
+          />
+        )
       )}
       state={state}
       renderNodeViews={({ children: _children, ...props }) => {
