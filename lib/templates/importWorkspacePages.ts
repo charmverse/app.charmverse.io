@@ -9,6 +9,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { v4, validate } from 'uuid';
 import log from 'lib/log';
+import { createPage } from 'lib/pages/server/createPage';
 import type { ExportedPage, WorkspaceExport, WorkspaceImport } from './interfaces';
 
 interface UpdateRefs {
@@ -230,7 +231,7 @@ export async function importWorkspacePages ({ targetSpaceIdOrDomain, exportData,
     ...pageArgs.map(p => {
       createdPages += 1;
       log.debug(`Creating page ${createdPages}/${pagesToCreate}: ${p.data.type} // ${p.data.title}`);
-      return prisma.page.create(p);
+      return createPage(p);
     }),
     prisma.block.createMany(blockArgs)
   ]);

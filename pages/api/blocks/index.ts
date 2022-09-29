@@ -3,6 +3,7 @@ import type { Block, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { InvalidStateError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
+import { createPage } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 import { copyAllPagePermissions } from 'lib/permissions/pages/actions/copyPermission';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -183,7 +184,7 @@ async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
 
       for (const cardPage of cardPages) {
         if (cardPage) {
-          await prisma.page.create({
+          await createPage({
             data: cardPage
           });
         }

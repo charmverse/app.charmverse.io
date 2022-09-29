@@ -6,7 +6,7 @@ import type { IPageWithPermissions, ModifyChildPagesResponse } from 'lib/pages';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
 import { resolvePageTree } from 'lib/pages/server';
 import { getPage } from 'lib/pages/server/getPage';
-import { updatePage } from 'lib/pages/updatePage';
+import { updatePage } from 'lib/pages/server/updatePage';
 import { computeUserPagePermissions, setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UndesirableOperationError } from 'lib/utilities/errors';
