@@ -14,12 +14,12 @@ async function updatePageHasContent () {
 
   console.log('🔥 Count of pages with content:', pagesWithContent.length);
 
-  await prisma.$transaction(pagesWithContent.map(({ id }) => prisma.page.update({
-    where: { id },
-    data: { hasContent: true }
-  })))
+  const updated = await prisma.page.updateMany({
+    where: { id: { in: pagesWithContent.map(p => p.id) } },
+    data:  { hasContent: true }
+  })
 
-  console.log('🔥 Updated hasContent for all pages with content.');
+  console.log(`🔥 Updated hasContent for ${updated.count} pages with content.`);
 }
 
 

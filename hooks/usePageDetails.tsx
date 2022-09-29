@@ -9,7 +9,7 @@ import { usePages } from 'hooks/usePages';
 import { getPreviewImageFromContent } from 'lib/pages/getPreviewImageFromContent';
 
 export function usePageDetails (pageIdOrPath: string, spaceId?: string) {
-  const { data: pageDetails, error, mutate: mutateDetails } = useSWR(pageIdOrPath ? [`pages/details/${pageIdOrPath}`, spaceId] : null, () => charmClient.pages.getPageDetails(pageIdOrPath, spaceId));
+  const { data: pageDetails, error, mutate: mutateDetails } = useSWR(pageIdOrPath ? `pages/details/${pageIdOrPath}` : null, () => charmClient.pages.getPageDetails(pageIdOrPath, spaceId));
   const { mutatePagesList } = usePages();
 
   const mutatePageDetails = useCallback((updates: PageDetailsUpdates, revalidate = false) => {
