@@ -1,19 +1,16 @@
-import type { ReactNode } from 'react';
-import { useState, useContext, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import { useWeb3React } from '@web3-react/core';
-import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import type { User } from '@prisma/client';
+import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { getKey } from 'hooks/useLocalStorage';
-import { useUser } from 'hooks/useUser';
 import { useSpaces } from 'hooks/useSpaces';
-import { isSpaceDomain } from 'lib/spaces';
-import charmClient from 'charmClient';
-import type { UrlObject } from 'url';
-import log from 'lib/log';
+import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import type { AuthSig } from '../../lib/blockchain/interfaces';
-import type { SystemError } from '../../lib/utilities/errors';
+import log from 'lib/log';
+import { isSpaceDomain } from 'lib/spaces';
+import { useRouter } from 'next/router';
+import type { ReactNode } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import type { UrlObject } from 'url';
+import { lowerCaseEqual } from 'lib/utilities/strings';
 
 // Pages shared to the public that don't require user login
 const publicPages = ['/', 'invite', 'share', 'api-docs', 'u', 'authenticate'];
@@ -114,7 +111,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       };
     }
     // condition: account but no valid wallet signature
-    else if (account && walletAuthSignature?.address !== account) {
+    else if (account && !lowerCaseEqual(walletAuthSignature?.address as string, account)) {
 
       return {
         authorized: true,

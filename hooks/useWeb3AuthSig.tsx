@@ -7,6 +7,7 @@ import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { box } from 'tweetnacl';
 import naclUtil from 'tweetnacl-util';
+import { lowerCaseEqual } from 'lib/utilities/strings';
 import { ExternalServiceError } from '../lib/utilities/errors';
 import { PREFIX, useLocalStorage } from './useLocalStorage';
 
@@ -27,7 +28,8 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
 
   const { account, library } = useWeb3React();
 
-  const [_, setLitAuthSignature] = useLocalStorage<AuthSig | null>('lit-auth-signature', null, true);
+  const [, setLitAuthSignature] = useLocalStorage<AuthSig | null>('lit-auth-signature', null, true);
+  const [, setLitProvider] = useLocalStorage<string | null>('lit-web3-provider', null, true);
 
   const [litCommKey, setLitCommKey] = useLocalStorage<{ publicKey: string, secretKey: string } | null>('lit-comms-keypair', null, true);
 
@@ -36,6 +38,7 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
   function setSignature (signature: AuthSig | null, writeToLocalStorage?: boolean) {
     // Ensures Lit signature is always in sync
     setLitAuthSignature(signature);
+    setLitProvider('metamask');
     setWalletAuthSignature(signature);
     if (writeToLocalStorage) {
       window.localStorage.setItem(`${PREFIX}.wallet-auth-sig-${account}`, JSON.stringify(signature));
@@ -65,6 +68,10 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
 
   async function sign (): Promise<AuthSig> {
 
+    if (!account) {
+      throw new ExternalServiceError('No account detected');
+    }
+
     const signer = library.getSigner(account);
 
     if (!signer) {
@@ -91,7 +98,7 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
 
     const signatureAddress = verifyMessage(body, newSignature as string).toLowerCase();
 
-    if (signatureAddress !== account?.toLowerCase()) {
+    if (!lowerCaseEqual(signatureAddress, account)) {
       throw new Error('Signature address does not match account');
     }
 

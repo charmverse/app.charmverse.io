@@ -21,31 +21,13 @@ export const Container = styled(Box)`
 `;
 
 interface Props {
-  loginSuccess: () => void;
+  loginSuccess: (authSig: AuthSig) => void;
 }
 
 export function LoginPageContent ({ loginSuccess }: Props) {
   const { account, walletAuthSignature } = useWeb3AuthSig();
   const { setUser } = useUser();
   const returnUrl = new URLSearchParams(decodeURIComponent(window.location.search)).get('returnUrl');
-
-  const showSignatureRequest = account && walletAuthSignature?.address !== account;
-
-  async function userVerifiedWallet (authSig: AuthSig) {
-    charmClient.login(account as string, authSig)
-      .then((_user) => {
-        setUser(_user);
-        loginSuccess();
-      })
-      .catch((err) => {
-        charmClient.createUser({
-          address: account as string
-        }).then((_user) => {
-          setUser(_user);
-          loginSuccess();
-        });
-      });
-  }
 
   return (
     <Container px={3}>

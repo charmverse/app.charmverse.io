@@ -29,10 +29,12 @@ export function WalletSign ({ signSuccess, buttonText }: Props) {
 
   useEffect(() => {
     if (userClickedConnect && account) {
+      setIsSigning(true);
       setUserClickedConnect(false);
       sign()
         .then(signSuccess)
-        .catch(() => setSignatureFailed(true));
+        .catch(() => setSignatureFailed(true))
+        .finally(() => setIsSigning(false));
     }
   }, [userClickedConnect, account]);
 

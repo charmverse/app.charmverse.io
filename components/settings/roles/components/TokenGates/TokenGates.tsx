@@ -10,9 +10,10 @@ import Button from 'components/common/Button';
 import Modal, { ErrorModal } from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import type { AuthSig } from 'lib/blockchain/interfaces';
 import getLitChainFromChainId from 'lib/token-gates/getLitChainFromChainId';
 import type { ResourceId, SigningConditions } from 'lit-js-sdk';
-import { checkAndSignAuthMessage } from 'lit-js-sdk';
 import LitShareModal from 'lit-share-modal-v3-react-17';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
@@ -61,6 +62,7 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
   const theme = useTheme();
   const litClient = useLitProtocol();
   const { chainId } = useWeb3React();
+  const { walletAuthSignature } = useWeb3AuthSig();
   const router = useRouter();
   const popupState = usePopupState({ variant: 'popover', popupId: 'token-gate' });
   const errorPopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-error' });
@@ -101,11 +103,10 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
 
     const chain = getLitChainFromChainId(chainId);
 
-    const authSig = await checkAndSignAuthMessage({ chain });
     await litClient!.saveSigningCondition({
       ...conditions,
       chain,
-      authSig,
+      authSig: walletAuthSignature as AuthSig,
       resourceId
     });
     await charmClient.saveTokenGate({

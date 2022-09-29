@@ -8,8 +8,11 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import type { AuthSig } from 'lib/blockchain/interfaces';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
+import { lowerCaseEqual } from 'lib/utilities/strings';
+import charmClient from 'charmClient';
 
 export default function LoginPage () {
   const { account, walletAuthSignature } = useWeb3AuthSig();
@@ -18,7 +21,7 @@ export default function LoginPage () {
   const router = useRouter();
   const defaultWorkspace = typeof window !== 'undefined' && localStorage.getItem(getKey('last-workspace'));
   const [, setTitleState] = usePageTitle();
-  const { user, isLoaded } = useUser();
+  const { user, setUser, isLoaded } = useUser();
   const [spaces,, isSpacesLoaded] = useSpaces();
 
   const [showLogin, setShowLogin] = useState(false); // capture isLoaded state to prevent render on route change
@@ -45,20 +48,43 @@ export default function LoginPage () {
     }
   }
 
+  async function loginUser (authSig: AuthSig) {
+    charmClient.login(account as string, authSig)
+      .then((_user) => {
+        setUser(_user);
+        redirectUserAfterLogin();
+      })
+      .catch((err) => {
+        charmClient.createUser({
+          address: account as string
+        }).then((_user) => {
+          setUser(_user);
+          redirectUserAfterLogin();
+        });
+      });
+  }
+
   useEffect(() => {
 
     // redirect user once wallet is connected
     if (isDataLoaded) {
       // redirect once account exists (user has connected wallet)
-      if (user && (isLogInWithDiscord || (account && walletAuthSignature?.address === account))) {
+      if (user && (isLogInWithDiscord
+        || (account && user.addresses.some(a => a === account) && lowerCaseEqual(walletAuthSignature?.address as string, account)))) {
         redirectUserAfterLogin();
 
       }
+      else if (account && walletAuthSignature && lowerCaseEqual(walletAuthSignature?.address as string, account)) {
+        loginUser(walletAuthSignature);
+
+      }
       else {
+        setUser(null);
+        charmClient.logout();
         setShowLogin(true);
       }
     }
-  }, [account, isDataLoaded]);
+  }, [account, walletAuthSignature, isDataLoaded]);
 
   if (!showLogin) {
     return null;
@@ -67,11 +93,9 @@ export default function LoginPage () {
   return (
     isLogInWithDiscord ? null : getLayout(
       <>
-        <LoginPageContent loginSuccess={() => {
+        <LoginPageContent loginSuccess={(authSig) => {
           showMessage('Wallet verified. Logging you in', 'success');
-          setTimeout(() => {
-            redirectUserAfterLogin();
-          }, 1500);
+          loginUser(authSig);
         }}
         />
         <Footer />
