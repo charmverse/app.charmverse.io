@@ -122,7 +122,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       }
     }
     // condition: user connected but the wallet address is new
-    else if (user && account && !user.addresses.includes(account)) {
+    else if (user && account && !user.wallets.some(w => w.address === account)) {
       log.info('[RouteGuard]: unknown address');
       const _user = await charmClient.login(account).catch(() => null);
       // log in existing user
@@ -130,7 +130,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
         return { authorized: true, user: _user };
       }
       // add the address to current profile
-      else if (user.addresses.length === 0) {
+      else if (user.wallets.length === 0) {
         const __user = await charmClient.updateUser({ addresses: [account] });
         return { authorized: true, user: __user };
       }

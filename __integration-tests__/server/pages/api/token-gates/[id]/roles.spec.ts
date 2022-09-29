@@ -6,10 +6,11 @@ import { baseUrl } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { prisma } from 'db';
+import type { LoggedInUser } from 'models';
 
 // User 1 is admin
-let user1: User;
-let user2: User;
+let user1: LoggedInUser;
+let user2: LoggedInUser;
 let space: Space;
 let cookie1: string;
 let cookie2: string;
@@ -95,12 +96,12 @@ beforeAll(async () => {
   const loggedInResponse1 = await request(baseUrl)
     .post('/api/session/login')
     .send({
-      address: user1.addresses[0]
+      address: user1.wallets[0].address
     });
   const loggedInResponse2 = await request(baseUrl)
     .post('/api/session/login')
     .send({
-      address: user2.addresses[0]
+      address: user2.wallets[0].address
     });
 
   cookie1 = loggedInResponse1.headers['set-cookie'][0];

@@ -39,8 +39,8 @@ async function updateAvatar (req: NextApiRequest, res: NextApiResponse<LoggedInU
     const user = await getUserProfile('id', req.session.user.id);
     const owners = await alchemyApi.getOwners(updatedContract, updatedTokenId, avatarChain);
 
-    const isOwner = user?.addresses.some(a => {
-      return owners.find(o => o.toLowerCase() === a.toLowerCase());
+    const isOwner = user?.wallets.some(a => {
+      return owners.find(o => o.toLowerCase() === a.address.toLowerCase());
     });
 
     if (!isOwner) {

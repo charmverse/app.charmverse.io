@@ -15,7 +15,7 @@ describe('POST /api/permissions/space/{spaceId}/add - Add space permissions', ()
       spaceId: space.id
     };
 
-    const adminCookie = await loginUser(adminUser);
+    const adminCookie = await loginUser(adminUser.wallets[0].address);
 
     const updatedPermissions = (await request(baseUrl)
       .post(`/api/permissions/space/${space.id}/add`)
@@ -47,7 +47,7 @@ describe('POST /api/permissions/space/{spaceId}/add - Add space permissions', ()
       roleId: role.id
     };
 
-    const nonAdminCookie = await loginUser(adminUser);
+    const nonAdminCookie = await loginUser(adminUser.wallets[0].address);
 
     await request(baseUrl)
       .post(`/api/permissions/space/${space.id}/add`)
@@ -71,7 +71,7 @@ describe('POST /api/permissions/space/{spaceId}/add - Add space permissions', ()
       userId: adminUser.id
     };
 
-    const nonAdminCookie = await loginUser(adminUser);
+    const nonAdminCookie = await loginUser(adminUser.wallets[0].address);
 
     await request(baseUrl)
       .post(`/api/permissions/space/${space.id}/add`)
@@ -90,7 +90,7 @@ describe('POST /api/permissions/space/{spaceId}/add - Add space permissions', ()
       spaceId: space.id
     };
 
-    const nonAdminCookie = await loginUser(nonAdminUser);
+    const nonAdminCookie = await loginUser(nonAdminUser.wallets[0].address);
 
     await request(baseUrl)
       .post(`/api/permissions/space/${space.id}/add`)
@@ -114,7 +114,7 @@ describe('POST /api/permissions/space/{spaceId}/add - Add space permissions', ()
       spaceId: space.id
     };
 
-    const nonAdminCookie = await loginUser(adminUser);
+    const nonAdminCookie = await loginUser(adminUser.wallets[0].address);
 
     await request(baseUrl)
       .post(`/api/permissions/space/${space.id}/add`)

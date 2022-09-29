@@ -3,7 +3,6 @@ import { prisma } from 'db';
 import type { ExtendedPoap } from 'lib/blockchain/interfaces';
 import { getPOAPs } from 'lib/blockchain/poaps';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { InvalidStateError } from 'lib/middleware/errors';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -26,20 +25,13 @@ async function getUserPoaps (req: NextApiRequest, res: NextApiResponse<ExtendedP
     }
   })).map(p => p.id);
 
-  const user = await prisma.user.findUnique({
+  const wallets = await prisma.userWallet.findMany({
     where: {
-      id: req.session.user.id
-    },
-    select: {
-      addresses: true
+      userId: req.session.user.id
     }
   });
 
-  if (!user) {
-    throw new InvalidStateError('User not found');
-  }
-
-  const poaps = await getPOAPs(user.addresses);
+  const poaps = await getPOAPs(wallets.map(w => w.address));
   const poapsWithHidden = poaps.map(poap => ({
     ...poap,
     isHidden: hiddenPoapIDs.includes(poap.id)

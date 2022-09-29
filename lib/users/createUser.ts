@@ -9,8 +9,10 @@ import { sessionUserRelations } from 'lib/session/config';
 export async function createUserFromWallet (address: string): Promise<LoggedInUser> {
   const user = await prisma.user.findFirst({
     where: {
-      addresses: {
-        has: address
+      wallets: {
+        some: {
+          address
+        }
       }
     },
     include: sessionUserRelations
@@ -27,10 +29,14 @@ export async function createUserFromWallet (address: string): Promise<LoggedInUs
 
     const newUser = await prisma.user.create({
       data: {
-        addresses: [address],
         identityType: IDENTITY_TYPES[0],
         username,
-        path: isUserPathAvailable ? userPath : null
+        path: isUserPathAvailable ? userPath : null,
+        wallets: {
+          create: {
+            address
+          }
+        }
       },
       include: sessionUserRelations
     });

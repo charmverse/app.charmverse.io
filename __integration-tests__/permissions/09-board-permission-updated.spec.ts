@@ -8,8 +8,9 @@ import { generatePageToCreateStub } from 'testing/generate-stubs';
 import { baseUrl } from 'testing/mockApiCall';
 import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
+import type { LoggedInUser } from 'models';
 
-let user: User;
+let user: LoggedInUser;
 let space: Space;
 let cookie: string;
 
@@ -22,7 +23,7 @@ beforeAll(async () => {
   const loggedInResponse = await request(baseUrl)
     .post('/api/session/login')
     .send({
-      address: user.addresses[0]
+      address: user.wallets[0].address
     });
 
   cookie = loggedInResponse.headers['set-cookie'][0];

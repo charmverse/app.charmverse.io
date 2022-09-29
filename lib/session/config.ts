@@ -39,5 +39,6 @@ export const sessionUserRelations = {
   },
   discordUser: true,
   telegramUser: true,
-  notificationState: true
+  notificationState: true,
+  wallets: true
 } as const;

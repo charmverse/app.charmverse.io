@@ -48,7 +48,7 @@ export default function GnosisSafesList () {
       try {
         await importSafesFromWallet({
           signer: gnosisSigner,
-          addresses: user.addresses,
+          addresses: user.wallets.map(w => w.address),
           getWalletName
         });
         await mutate();

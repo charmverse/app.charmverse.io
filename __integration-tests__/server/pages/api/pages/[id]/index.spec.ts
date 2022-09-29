@@ -22,7 +22,7 @@ describe('PUT /api/pages/{id} - update page', () => {
       userId: adminUser.id
     });
 
-    const adminCookie = await loginUser(adminUser);
+    const adminCookie = await loginUser(adminUser.wallets[0].address);
 
     const body = (await request(baseUrl)
       .put(`/api/pages/${template.id}`)
@@ -40,7 +40,7 @@ describe('PUT /api/pages/{id} - update page', () => {
       userId: nonAdminUser.id
     });
 
-    const adminCookie = await loginUser(nonAdminUser);
+    const adminCookie = await loginUser(nonAdminUser.wallets[0].address);
 
     await request(baseUrl)
       .put(`/api/pages/${template.id}`)

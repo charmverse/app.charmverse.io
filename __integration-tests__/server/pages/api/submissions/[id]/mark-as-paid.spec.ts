@@ -5,8 +5,9 @@ import { addBountyPermissionGroup } from 'lib/permissions/bounties';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateBountyWithSingleApplication, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import type { LoggedInUser } from 'models';
 
-let nonAdminUser: User;
+let nonAdminUser: LoggedInUser;
 let nonAdminUserSpace: Space;
 let nonAdminCookie: string;
 
@@ -15,7 +16,7 @@ beforeAll(async () => {
 
   nonAdminUser = generated.user;
   nonAdminUserSpace = generated.space;
-  nonAdminCookie = await loginUser(nonAdminUser);
+  nonAdminCookie = await loginUser(nonAdminUser.wallets[0].address);
 });
 
 describe('POST /api/submissions/{submissionId}/mark-as-paid - Update submission status to "paid"', () => {
@@ -24,7 +25,7 @@ describe('POST /api/submissions/{submissionId}/mark-as-paid - Update submission 
 
     const reviewer = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
 
-    const reviewerCookie = await loginUser(reviewer);
+    const reviewerCookie = await loginUser(reviewer.wallets[0].address);
 
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,
@@ -57,7 +58,7 @@ describe('POST /api/submissions/{submissionId}/mark-as-paid - Update submission 
 
     const adminUser = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: true });
 
-    const adminUserCookie = await loginUser(adminUser);
+    const adminUserCookie = await loginUser(adminUser.wallets[0].address);
 
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,
@@ -81,7 +82,7 @@ describe('POST /api/submissions/{submissionId}/mark-as-paid - Update submission 
 
     const user = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
 
-    const userCookie = await loginUser(user);
+    const userCookie = await loginUser(user.wallets[0].address);
 
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,

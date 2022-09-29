@@ -139,7 +139,11 @@ async function getBounties (req: NextApiRequest, res: NextApiResponse) {
       } : undefined
     },
     include: {
-      author: true,
+      author: {
+        include: {
+          wallets: true
+        }
+      },
       applications: true,
       space: true,
       page: true
@@ -166,7 +170,7 @@ async function getBounties (req: NextApiRequest, res: NextApiResponse) {
     description: bounty.page?.contentText || '',
     id: bounty.id,
     issuer: {
-      address: bounty.author.addresses[0]
+      address: bounty.author.wallets[0]?.address
     },
     recipients: getRecipients(bounty),
     reward: {

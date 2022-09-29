@@ -6,8 +6,9 @@ import { typedKeys } from 'lib/utilities/objects';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateBounty, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import type { LoggedInUser } from 'models';
 
-let nonAdminUser: User;
+let nonAdminUser: LoggedInUser;
 let nonAdminUserSpace: Space;
 let nonAdminCookie: string;
 
@@ -19,7 +20,7 @@ beforeAll(async () => {
   nonAdminCookie = (await request(baseUrl)
     .post('/api/session/login')
     .send({
-      address: nonAdminUser.addresses[0]
+      address: nonAdminUser.wallets[0].address
     })).headers['set-cookie'][0];
 });
 
@@ -29,7 +30,7 @@ describe('GET /api/bounties/{bountyId}/permissions - Return assigned and individ
 
     const extraUser = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
 
-    const extraUserCookie = await loginUser(extraUser);
+    const extraUserCookie = await loginUser(extraUser.wallets[0].address);
 
     const bounty = await generateBounty({
       spaceId: nonAdminUserSpace.id,
@@ -62,7 +63,7 @@ describe('GET /api/bounties/{bountyId}/permissions - Return assigned and individ
 
     const extraUser = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
 
-    const extraUserCookie = await loginUser(extraUser);
+    const extraUserCookie = await loginUser(extraUser.wallets[0].address);
 
     // Bounty with a base permission set
     const bounty = await generateBounty({

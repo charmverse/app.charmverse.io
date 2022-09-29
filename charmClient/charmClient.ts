@@ -86,7 +86,7 @@ class CharmClient {
     });
   }
 
-  updateUser (data: Partial<User>) {
+  updateUser (data: Partial<User> & { addresses?: string[] }) {
     return http.PUT<LoggedInUser>('/api/profile', data);
   }
 

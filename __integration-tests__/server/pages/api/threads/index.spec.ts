@@ -4,13 +4,14 @@ import type { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { upsertPermission } from '../../../../../lib/permissions/pages';
+import type { LoggedInUser } from 'models';
+import { upsertPermission } from 'lib/permissions/pages';
 
-let nonAdminUser: User;
+let nonAdminUser: LoggedInUser;
 let nonAdminUserSpace: Space;
 let nonAdminCookie: string;
 
-let adminUser: User;
+let adminUser: LoggedInUser;
 let adminUserSpace: Space;
 let adminCookie: string;
 
@@ -19,13 +20,13 @@ beforeAll(async () => {
 
   nonAdminUser = first.user;
   nonAdminUserSpace = first.space;
-  nonAdminCookie = await loginUser(nonAdminUser);
+  nonAdminCookie = await loginUser(nonAdminUser.wallets[0].address);
 
   const second = await generateUserAndSpaceWithApiToken();
 
   adminUser = second.user;
   adminUserSpace = second.space;
-  adminCookie = await loginUser(adminUser);
+  adminCookie = await loginUser(adminUser.wallets[0].address);
 });
 
 describe('POST /api/threads - create a thread', () => {

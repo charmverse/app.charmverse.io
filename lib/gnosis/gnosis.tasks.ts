@@ -3,7 +3,7 @@ import log from 'lib/log';
 import groupBy from 'lodash/groupBy';
 import intersection from 'lodash/intersection';
 import { prisma } from 'db';
-import type { User, UserGnosisSafe, UserNotificationState } from '@prisma/client';
+import type { User, UserGnosisSafe, UserNotificationState, UserWallet } from '@prisma/client';
 import type { GnosisTransaction } from './gnosis';
 import { getTransactionsforSafes } from './gnosis';
 
@@ -122,10 +122,10 @@ interface TransactionToTaskProps {
   myAddresses: string[];
   transaction: GnosisTransaction;
   safe: UserGnosisSafe;
-  users: UserWithGnosisSafeState[];
+  wallets: (UserWallet & { user: UserWithGnosisSafeState })[];
 }
 
-function transactionToTask ({ myAddresses, transaction, safe, users }: TransactionToTaskProps): GnosisTransactionPopulated {
+function transactionToTask ({ myAddresses, transaction, safe, wallets }: TransactionToTaskProps): GnosisTransactionPopulated {
   const actions = getTaskActions(transaction, getRecipient);
   const gnosisUrl = getGnosisTransactionUrl(transaction.safe);
   const confirmedAddresses = transaction.confirmations?.map(confirmation => confirmation.owner) ?? [];
@@ -143,17 +143,17 @@ function transactionToTask ({ myAddresses, transaction, safe, users }: Transacti
   }
 
   function getRecipient (address: string) {
-    const user = users.find(u => u.addresses.includes(address));
+    const user = wallets.find(w => w.address === address)?.user;
     return { address, user };
   }
 
   const confirmations = transaction.confirmations?.map(confirmation => getRecipient(confirmation.owner)) ?? [];
   const snoozedUsers: UserWithGnosisSafeState[] = [];
-  users.forEach(user => {
+  wallets.forEach(({ user }) => {
     if (
       user.notificationState
       && user.notificationState.snoozedUntil !== null
-      && !confirmations.find(confirmation => user.addresses.includes(confirmation.address))
+      && !confirmations.find(confirmation => wallets.some(w => w.userId === user.id && w.address === confirmation.address))
       && user.notificationState.snoozedUntil.toString() > new Date().toString()) {
       snoozedUsers.push(user);
     }
@@ -181,18 +181,18 @@ interface TransactionsToTaskProps {
   transactions: GnosisTransaction[];
   safes: UserGnosisSafe[];
   myUserId: string;
-  users: UserWithGnosisSafeState[];
+  wallets: (UserWallet & { user: UserWithGnosisSafeState })[];
 }
 
-function transactionsToTasks ({ transactions, safes, myUserId, users }: TransactionsToTaskProps): GnosisSafeTasks[] {
-  const myAddresses = users.find(user => user.id === myUserId)?.addresses ?? [];
+function transactionsToTasks ({ transactions, safes, myUserId, wallets }: TransactionsToTaskProps): GnosisSafeTasks[] {
+  const myAddresses = (wallets.filter(wallet => wallet.userId === myUserId) ?? []).map(w => w.address);
   const safesByAddress = safes.reduce<Record<string, UserGnosisSafe>>((acc, safe) => ({ ...acc, [safe.address]: safe }), {});
 
   const mapped = transactions.map(transaction => transactionToTask({
     myAddresses,
     safe: safesByAddress[transaction.safe],
     transaction,
-    users
+    wallets
   }));
 
   return Object.values(groupBy(mapped, 'safeAddress'))
@@ -231,18 +231,22 @@ export async function getPendingGnosisTasks (myUserId: string) {
   const transactions = await getTransactionsforSafes(safeOwner, safes);
 
   const userAddresses = safes.map(safe => safe.owners).flat();
-  const users = await prisma.user.findMany({
+  const wallets = await prisma.userWallet.findMany({
     where: {
-      addresses: {
-        hasSome: userAddresses
+      address: {
+        in: userAddresses
       }
     },
     include: {
-      notificationState: true
+      user: {
+        include: {
+          notificationState: true
+        }
+      }
     }
   });
 
-  const tasks = transactionsToTasks({ transactions, safes, myUserId, users });
+  const tasks = transactionsToTasks({ transactions, safes, myUserId, wallets });
 
   return tasks;
 }

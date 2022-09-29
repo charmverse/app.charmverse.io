@@ -52,7 +52,7 @@ beforeAll(async () => {
     voteOptions: ['1', '2']
   });
 
-  userCookie = await loginUser(generatedUser1);
+  userCookie = await loginUser(generatedUser1.wallets[0].address);
 });
 
 describe('POST /api/votes/[id]/cast - Cast a vote using one of the provided options', () => {

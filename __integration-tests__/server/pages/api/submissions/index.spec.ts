@@ -6,8 +6,9 @@ import request from 'supertest';
 import { generateSubmissionContent } from 'testing/generate-stubs';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateBounty, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import type { LoggedInUser } from 'models';
 
-let nonAdminUser: User;
+let nonAdminUser: LoggedInUser;
 let nonAdminUserSpace: Space;
 let nonAdminCookie: string;
 
@@ -19,7 +20,7 @@ beforeAll(async () => {
   nonAdminCookie = (await request(baseUrl)
     .post('/api/session/login')
     .send({
-      address: nonAdminUser.addresses[0]
+      address: nonAdminUser.wallets[0].address
     })).headers['set-cookie'][0];
 });
 
@@ -49,7 +50,7 @@ describe('POST /api/submissions - create a submission', () => {
       resourceId: bounty.id
     });
 
-    const extraUserCookie = await loginUser(extraUser);
+    const extraUserCookie = await loginUser(extraUser.wallets[0].address);
 
     const createdSubmission = (await request(baseUrl)
       .post('/api/submissions')
@@ -80,7 +81,7 @@ describe('POST /api/submissions - create a submission', () => {
       submissionContent
     };
 
-    const extraUserCookie = await loginUser(extraUser);
+    const extraUserCookie = await loginUser(extraUser.wallets[0].address);
 
     await request(baseUrl)
       .post('/api/submissions')

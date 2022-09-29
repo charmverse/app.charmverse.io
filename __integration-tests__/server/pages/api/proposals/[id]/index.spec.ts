@@ -9,10 +9,11 @@ import { v4 } from 'uuid';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import { createProposalTemplate } from 'lib/templates/proposals/createProposalTemplate';
 import { createProposal } from 'lib/proposal/createProposal';
-import type { PageWithProposal } from '../../../../../../lib/pages';
+import type { PageWithProposal } from 'lib/pages';
+import type { LoggedInUser } from 'models';
 
-let author: User;
-let reviewer: User;
+let author: LoggedInUser;
+let reviewer: LoggedInUser;
 let space: Space;
 let authorCookie: string;
 let reviewerCookie: string;
@@ -27,13 +28,13 @@ beforeAll(async () => {
   authorCookie = (await request(baseUrl)
     .post('/api/session/login')
     .send({
-      address: author.addresses[0]
+      address: author.wallets[0].address
     })).headers['set-cookie'][0];
 
   reviewerCookie = (await request(baseUrl)
     .post('/api/session/login')
     .send({
-      address: reviewer.addresses[0]
+      address: reviewer.wallets[0].address
     })).headers['set-cookie'][0];
 
   await prisma.spaceRole.create({
@@ -121,7 +122,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
   it('should update a proposal if the user is an author', async () => {
 
     const { user: adminUser, space: adminSpace } = await generateUserAndSpaceWithApiToken(undefined, true);
-    const adminCookie = await loginUser(adminUser);
+    const adminCookie = await loginUser(adminUser.wallets[0].address);
 
     const role = await generateRole({
       spaceId: adminSpace.id,
@@ -159,7 +160,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
   it('should update a proposal if the user is an admin', async () => {
 
     const { user: adminUser, space: adminSpace } = await generateUserAndSpaceWithApiToken(undefined, true);
-    const adminCookie = await loginUser(adminUser);
+    const adminCookie = await loginUser(adminUser.wallets[0].address);
 
     const proposalAuthor = await generateSpaceUser({ isAdmin: false, spaceId: adminSpace.id });
 
@@ -187,7 +188,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
   it('should update a proposal template if the user is a space admin', async () => {
 
     const { user: adminUser, space: adminSpace } = await generateUserAndSpaceWithApiToken(undefined, true);
-    const adminCookie = await loginUser(adminUser);
+    const adminCookie = await loginUser(adminUser.wallets[0].address);
 
     const role = await generateRole({ createdBy: adminUser.id, spaceId: adminSpace.id });
 
@@ -223,7 +224,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     const { user: adminUser, space: adminSpace } = await generateUserAndSpaceWithApiToken(undefined, false);
     const nonAdminUser = await generateSpaceUser({ isAdmin: false, spaceId: adminSpace.id });
 
-    const nonAdminCookie = await loginUser(nonAdminUser);
+    const nonAdminCookie = await loginUser(nonAdminUser.wallets[0].address);
 
     const pageWithProposal = await createProposalTemplate({
       spaceId: adminSpace.id,

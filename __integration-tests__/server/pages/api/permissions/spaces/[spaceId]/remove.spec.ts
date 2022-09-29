@@ -17,7 +17,7 @@ describe('POST /api/permissions/space/{spaceId}/remove - Remove space permission
       spaceId: space.id
     });
 
-    const adminCookie = await loginUser(adminUser);
+    const adminCookie = await loginUser(adminUser.wallets[0].address);
 
     const toRemove: SpacePermissionModification = {
       forSpaceId: space.id,
@@ -55,7 +55,7 @@ describe('POST /api/permissions/space/{spaceId}/remove - Remove space permission
       roleId: role.id
     };
 
-    const nonAdminCookie = await loginUser(adminUser);
+    const nonAdminCookie = await loginUser(adminUser.wallets[0].address);
 
     await request(baseUrl)
       .post(`/api/permissions/space/${space.id}/remove`)
@@ -79,7 +79,7 @@ describe('POST /api/permissions/space/{spaceId}/remove - Remove space permission
       userId: adminUser.id
     };
 
-    const nonAdminCookie = await loginUser(adminUser);
+    const nonAdminCookie = await loginUser(adminUser.wallets[0].address);
 
     await request(baseUrl)
       .post(`/api/permissions/space/${space.id}/remove`)
@@ -99,7 +99,7 @@ describe('POST /api/permissions/space/{spaceId}/remove - Remove space permission
       spaceId: space.id
     };
 
-    const nonAdminCookie = await loginUser(nonAdminUser);
+    const nonAdminCookie = await loginUser(nonAdminUser.wallets[0].address);
 
     await request(baseUrl)
       .post(`/api/permissions/space/${space.id}/remove`)
@@ -123,7 +123,7 @@ describe('POST /api/permissions/space/{spaceId}/remove - Remove space permission
       spaceId: space.id
     };
 
-    const nonAdminCookie = await loginUser(adminUser);
+    const nonAdminCookie = await loginUser(adminUser.wallets[0].address);
 
     await request(baseUrl)
       .post(`/api/permissions/space/${space.id}/remove`)

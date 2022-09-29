@@ -5,13 +5,14 @@ import { addBountyPermissionGroup } from 'lib/permissions/bounties';
 import type { BountyWithDetails } from 'lib/bounties';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
+import type { LoggedInUser } from 'models';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-let nonAdminUser: User;
+let nonAdminUser: LoggedInUser;
 let nonAdminUserSpace: Space;
 let nonAdminCookie: string;
 
-let adminUser: User;
+let adminUser: LoggedInUser;
 let adminUserSpace: Space;
 let adminCookie: string;
 
@@ -20,13 +21,13 @@ beforeAll(async () => {
 
   nonAdminUser = first.user;
   nonAdminUserSpace = first.space;
-  nonAdminCookie = await loginUser(nonAdminUser);
+  nonAdminCookie = await loginUser(nonAdminUser.wallets[0].address);
 
   const second = await generateUserAndSpaceWithApiToken();
 
   adminUser = second.user;
   adminUserSpace = second.space;
-  adminCookie = await loginUser(adminUser);
+  adminCookie = await loginUser(adminUser.wallets[0].address);
 });
 
 describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
@@ -110,7 +111,7 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
       spaceId: nonAdminUserSpace.id
     });
 
-    const randomSpaceUserCookie = await loginUser(randomSpaceUser);
+    const randomSpaceUserCookie = await loginUser(randomSpaceUser.wallets[0].address);
 
     const createdBounty = await createBounty({
       createdBy: adminUser.id,
@@ -139,7 +140,7 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
       spaceId: nonAdminUserSpace.id
     });
 
-    const bountyCreatorCookie = await loginUser(bountyCreator);
+    const bountyCreatorCookie = await loginUser(bountyCreator.wallets[0].address);
 
     const createdBounty = await createBounty({
       createdBy: bountyCreator.id,
@@ -178,7 +179,7 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
       spaceId: nonAdminUserSpace.id
     });
 
-    const bountyCreatorCookie = await loginUser(bountyCreator);
+    const bountyCreatorCookie = await loginUser(bountyCreator.wallets[0].address);
 
     const createdBounty = await createBounty({
       createdBy: bountyCreator.id,

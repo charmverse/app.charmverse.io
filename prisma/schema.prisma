@@ -349,6 +349,13 @@ model User {
   proposalsReviewed ProposalReviewer[]
   reviewedProposals Proposal[]
   workspaceEvents   WorkspaceEvent[]
+  wallets           UserWallet[]
+}
+
+model UserWallet {
+  address String @unique
+  userId  String @db.Uuid
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model UserNotificationState {

@@ -4,12 +4,13 @@ import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import type { LoggedInUser } from 'models';
 
-let nonAdminUser: User;
+let nonAdminUser: LoggedInUser;
 let nonAdminUserSpace: Space;
 let nonAdminCookie: string;
 
-let adminUser: User;
+let adminUser: LoggedInUser;
 let adminUserSpace: Space;
 let adminCookie: string;
 
@@ -20,7 +21,7 @@ beforeAll(async () => {
   nonAdminCookie = (await request(baseUrl)
     .post('/api/session/login')
     .send({
-      address: nonAdminUser.addresses[0]
+      address: nonAdminUser.wallets[0].address
     })).headers['set-cookie'][0];
 
   const generated2 = await generateUserAndSpaceWithApiToken(undefined, true);
@@ -29,7 +30,7 @@ beforeAll(async () => {
   adminCookie = (await request(baseUrl)
     .post('/api/session/login')
     .send({
-      address: adminUser.addresses[0]
+      address: adminUser.wallets[0].address
     })).headers['set-cookie'][0];
 });
 
@@ -64,7 +65,7 @@ describe('POST /api/spaces/[id]/set-default-page-permissions - Set default page 
       permissionConfigurationMode: 'collaborative'
     });
 
-    const userCookie = await loginUser(extraAdminUser);
+    const userCookie = await loginUser(extraAdminUser.wallets[0].address);
 
     await request(baseUrl)
       .post(`/api/spaces/${extraSpace.id}/set-default-page-permissions`)

@@ -3,8 +3,9 @@ import type { Space, User } from '@prisma/client';
 import request from 'supertest';
 import { baseUrl } from 'testing/mockApiCall';
 import { generateCommentWithThreadAndPage, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import type { LoggedInUser } from 'models';
 
-let nonAdminUser: User;
+let nonAdminUser: LoggedInUser;
 let nonAdminUserSpace: Space;
 let nonAdminCookie: string;
 
@@ -16,7 +17,7 @@ beforeAll(async () => {
   nonAdminCookie = (await request(baseUrl)
     .post('/api/session/login')
     .send({
-      address: nonAdminUser.addresses[0]
+      address: nonAdminUser.wallets[0].address
     })).headers['set-cookie'][0];
 
   const second = await generateUserAndSpaceWithApiToken();
@@ -49,7 +50,7 @@ describe('PUT /api/comments/{id} - update a comment', () => {
     const otherAdminCookie = (await request(baseUrl)
       .post('/api/session/login')
       .send({
-        address: otherAdminUser.addresses[0]
+        address: otherAdminUser.wallets[0].address
       })).headers['set-cookie'][0];
 
     const { thread, page, comment } = await generateCommentWithThreadAndPage({
@@ -94,7 +95,7 @@ describe('DELETE /api/comments/{id} - delete a comment', () => {
     const otherAdminCookie = (await request(baseUrl)
       .post('/api/session/login')
       .send({
-        address: otherAdminUser.addresses[0]
+        address: otherAdminUser.wallets[0].address
       })).headers['set-cookie'][0];
 
     const { thread, page, comment } = await generateCommentWithThreadAndPage({

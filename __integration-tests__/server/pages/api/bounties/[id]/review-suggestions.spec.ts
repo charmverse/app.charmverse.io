@@ -5,8 +5,9 @@ import type { BountyWithDetails } from 'lib/bounties';
 import request from 'supertest';
 import { baseUrl } from 'testing/mockApiCall';
 import { generateBounty, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import type { LoggedInUser } from 'models';
 
-let nonAdminUser: User;
+let nonAdminUser: LoggedInUser;
 let nonAdminUserSpace: Space;
 let nonAdminCookie: string;
 
@@ -18,7 +19,7 @@ beforeAll(async () => {
   nonAdminCookie = (await request(baseUrl)
     .post('/api/session/login')
     .send({
-      address: nonAdminUser.addresses[0]
+      address: nonAdminUser.wallets[0].address
     })).headers['set-cookie'][0];
 });
 
@@ -31,7 +32,7 @@ describe('POST /api/bounties/{submissionId}/close-submissions - close a bounty t
     const adminCookie = (await request(baseUrl)
       .post('/api/session/login')
       .send({
-        address: admin.addresses[0]
+        address: admin.wallets[0].address
       })).headers['set-cookie'][0];
 
     const bounty = await generateBounty({
@@ -61,7 +62,7 @@ describe('POST /api/bounties/{submissionId}/close-submissions - close a bounty t
     const adminCookie = (await request(baseUrl)
       .post('/api/session/login')
       .send({
-        address: admin.addresses[0]
+        address: admin.wallets[0].address
       })).headers['set-cookie'][0];
 
     const bounty = await generateBounty({

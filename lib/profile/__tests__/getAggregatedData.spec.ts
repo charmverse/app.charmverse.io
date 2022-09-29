@@ -8,11 +8,12 @@ import fetchMock from 'fetch-mock-jest';
 import { ExpectedAnError } from 'testing/errors';
 import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
+import { Wallet } from 'ethers';
 
 let user: LoggedInUser;
 let space: Space & { spaceRoles: SpaceRole[] };
 
-const walletAddresses = [v4(), v4()];
+const walletAddresses = [Wallet.createRandom().address, Wallet.createRandom().address];
 
 beforeAll(async () => {
 
@@ -20,14 +21,14 @@ beforeAll(async () => {
   user = generated.user;
   space = generated.space;
 
-  await prisma.user.update({
-    where: {
-      id: user.id
-    },
-    // Update wallet address so we can get cumulative results
-    data: {
-      addresses: walletAddresses
-    }
+  await prisma.userWallet.createMany({
+    data: [{
+      userId: user.id,
+      address: walletAddresses[0]
+    }, {
+      userId: user.id,
+      address: walletAddresses[1]
+    }]
   });
 });
 
