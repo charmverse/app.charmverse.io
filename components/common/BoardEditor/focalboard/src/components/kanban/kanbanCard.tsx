@@ -4,7 +4,7 @@ import { Box } from '@mui/material';
 import { BountyStatusChip } from 'components/bounties/components/BountyStatusBadge';
 import { checkForEmpty } from 'components/common/CharmEditor/utils';
 import { useRouter } from 'next/router';
-import Link from 'components/common/Link';
+import Link from '@mui/material/Link';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import { CryptoCurrency, TokenLogoPaths } from 'connectors';
 import { useBounties } from 'hooks/useBounties';
@@ -119,7 +119,7 @@ const KanbanCard = React.memo((props: Props) => {
 
   return (
     <>
-      <Link href={fullPageUrl} external>
+      <Link href={fullPageUrl} draggable={false}>
         <div
           ref={props.readOnly ? () => null : cardRef}
           className={className}
