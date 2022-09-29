@@ -8,7 +8,7 @@ import LinkIcon from '../../../widgets/icons/Link';
 
 type Props = {
     value: string
-    readonly?: boolean
+    readOnly?: boolean
     placeholder?: string
     onChange: (value: string) => void
     onSave: () => void
@@ -41,7 +41,7 @@ function URLProperty (props: Props): JSX.Element {
           placeholderText={props.placeholder}
           value={props.value}
           autoExpand={false}
-          readonly={props.readonly}
+          readOnly={props.readOnly}
           onChange={props.onChange}
           onSave={props.onSave}
           onCancel={props.onCancel}

@@ -156,7 +156,7 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
           }}
           hideBanner
           clientConfig={clientConfig}
-          readonly={readOnly}
+          readOnly={readOnly}
           board={board}
           embeddedBoardPath={pages[pageId]?.path}
           setPage={debouncedPageUpdate}
@@ -175,7 +175,7 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
             cardId={shownCardId}
             onClose={() => showCard(undefined)}
             showCard={(cardId) => showCard(cardId)}
-            readonly={readOnly}
+            readOnly={readOnly}
           />
         </RootPortal>
       )}

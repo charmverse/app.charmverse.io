@@ -69,7 +69,7 @@ type Props = {
     hiddenGroups: BoardGroup[]
     selectedCardIds: string[]
     intl: IntlShape
-    readonly: boolean
+    readOnly: boolean
     onCardClicked: (e: React.MouseEvent, card: Card) => void
     addCard: (groupByOptionId?: string, show?:boolean, props?: any, insertLast?: boolean) => Promise<void>
     showCard: (cardId?: string) => void
@@ -227,7 +227,7 @@ function Kanban (props: Props) {
   const hStrength = createHorizontalStrength(isTouchScreen() ? 60 : 250);
   const vStrength = createVerticalStrength(isTouchScreen() ? 60 : 250);
 
-  const menuTriggerProps = !props.readonly ? bindTrigger(popupState) : {};
+  const menuTriggerProps = !props.readOnly ? bindTrigger(popupState) : {};
   return (
     <Box
       className='Kanban'
@@ -247,7 +247,7 @@ function Kanban (props: Props) {
             intl={props.intl}
             groupByProperty={groupByProperty}
             addCard={props.addCard}
-            readonly={props.readonly}
+            readOnly={props.readOnly}
             propertyNameChanged={propertyNameChanged}
             onDropToColumn={onDropToColumn}
             calculationMenuOpen={showCalculationsMenu.get(group.option.id) || false}
@@ -319,7 +319,7 @@ function Kanban (props: Props) {
                   visiblePropertyTemplates={visiblePropertyTemplates}
                   visibleBadges={visibleBadges}
                   key={card.id}
-                  readonly={props.readonly}
+                  readOnly={props.readOnly}
                   isSelected={props.selectedCardIds.includes(card.id)}
                   onClick={(e) => {
                       props.onCardClicked(e, card);
@@ -329,7 +329,7 @@ function Kanban (props: Props) {
                   isManualSort={isManualSort}
                 />
               ))}
-              {!props.readonly
+              {!props.readOnly
                           && (
                           <Button
                             size='small'
@@ -351,7 +351,7 @@ function Kanban (props: Props) {
 
           {/* Add whitespace underneath "Add a group" button */}
 
-          {!props.readonly
+          {!props.readOnly
                       && (
                       <div className='octo-board-header-cell narrow'>
                       </div>
@@ -368,7 +368,7 @@ function Kanban (props: Props) {
                         group={group}
                         activeView={activeView}
                         intl={props.intl}
-                        readonly={props.readonly}
+                        readOnly={props.readOnly}
                         onDrop={(card: Card) => onDropToColumn(group.option, card)}
                       />
                     ))}

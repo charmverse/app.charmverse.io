@@ -52,7 +52,7 @@ describe('components/cardDetail/comment', () => {
         <Comment
           comment={comment}
           contributor={contributor}
-          readonly={false}
+          readOnly={false}
         />
       </ReduxProvider>
     ));
@@ -67,7 +67,7 @@ describe('components/cardDetail/comment', () => {
         <Comment
           comment={comment}
           contributor={contributor}
-          readonly={true}
+          readOnly={true}
         />
       </ReduxProvider>
     ));
@@ -80,7 +80,7 @@ describe('components/cardDetail/comment', () => {
         <Comment
           comment={comment}
           contributor={contributor}
-          readonly={false}
+          readOnly={false}
         />
       </ReduxProvider>
     ));

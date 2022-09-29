@@ -11,11 +11,11 @@ import { PageUpdates } from 'lib/pages'
 
 type Props = {
     card: Card
-    readonly: boolean
+    readOnly: boolean
 }
 
 function CardDetail (props: Props): JSX.Element|null {
-  const { card, readonly } = props;
+  const { card, readOnly } = props;
 
   const mounted = useRef(false);
 
@@ -52,7 +52,7 @@ function CardDetail (props: Props): JSX.Element|null {
     <DocumentPage
       page={page}
       setPage={setPage}
-      readOnly={readonly}
+      readOnly={readOnly}
       parentProposalId={parentProposalId}
     />
   );

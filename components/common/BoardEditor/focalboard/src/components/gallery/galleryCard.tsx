@@ -35,7 +35,7 @@ type Props = {
   visibleTitle: boolean
   isSelected: boolean
   visibleBadges: boolean
-  readonly: boolean
+  readOnly: boolean
   isManualSort: boolean
   onDrop: (srcCard: Card, dstCard: Card) => void
 }
@@ -45,7 +45,7 @@ const GalleryCard = React.memo((props: Props) => {
   const { pages, getPagePermissions } = usePages();
   const [space] = useCurrentSpace();
   const intl = useIntl();
-  const [isDragging, isOver, cardRef] = useSortable('card', card, props.isManualSort && !props.readonly && !isTouchScreen(), props.onDrop);
+  const [isDragging, isOver, cardRef] = useSortable('card', card, props.isManualSort && !props.readOnly && !isTouchScreen(), props.onDrop);
   const comments = useAppSelector(getCardComments(card.id));
   const cardPage = pages[card.id];
 
@@ -69,7 +69,7 @@ const GalleryCard = React.memo((props: Props) => {
       style={{ opacity: isDragging ? 0.5 : 1 }}
       ref={cardRef}
     >
-      {!props.readonly
+      {!props.readOnly
         && (
         <MenuWrapper
           className='optionsMenu'

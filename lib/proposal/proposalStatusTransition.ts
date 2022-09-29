@@ -36,7 +36,7 @@ export const proposalStatusTransitionPermission: Partial<Record<ProposalStatus, 
   },
   review: {
     author: ['discussion'],
-    reviewer: ['reviewed']
+    reviewer: ['reviewed', 'discussion']
   },
   reviewed: {
     author: ['discussion', 'vote_active']

@@ -23,7 +23,7 @@ type Props = {
     isSelected: boolean
     focusOnMount: boolean
     showCard: (cardId: string) => void
-    readonly: boolean
+    readOnly: boolean
     offset: number
     pageUpdatedAt: string
     pageUpdatedBy: string
@@ -47,7 +47,7 @@ function TableRow (props: Props) {
   const [title, setTitle] = useState('');
   const isManualSort = activeView.fields.sortOptions.length === 0;
   const isGrouped = Boolean(activeView.fields.groupById);
-  const [isDragging, isOver, cardRef] = useSortable('card', card, !isTouchScreen() && !props.readonly && (isManualSort || isGrouped), props.onDrop);
+  const [isDragging, isOver, cardRef] = useSortable('card', card, !isTouchScreen() && !props.readOnly && (isManualSort || isGrouped), props.onDrop);
 
   useEffect(() => {
     if (props.focusOnMount) {
@@ -100,7 +100,7 @@ function TableRow (props: Props) {
             onChange={(newTitle: string) => setTitle(newTitle)}
             onSave={(saveType) => saveTitle(saveType, card.id, title)}
             onCancel={() => setTitle(card.title || '')}
-            readonly={props.readonly}
+            readOnly={props.readOnly}
             spellCheck={true}
           />
         </div>
@@ -125,7 +125,7 @@ function TableRow (props: Props) {
             ref={columnRefs.get(template.id)}
           >
             <PropertyValueElement
-              readOnly={props.readonly}
+              readOnly={props.readOnly}
               card={card}
               board={board}
               propertyTemplate={template}

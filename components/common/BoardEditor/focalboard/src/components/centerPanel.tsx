@@ -54,7 +54,7 @@ type Props = {
   views: BoardView[]
   hideBanner?: boolean
   intl: IntlShape
-  readonly: boolean
+  readOnly: boolean
   addCard: (card: Card) => void
   setPage: (p: Partial<Page>) => void
   updateView: (view: BoardView) => void
@@ -122,7 +122,7 @@ function CenterPanel (props: Props) {
 
   const backgroundRef = React.createRef<HTMLDivElement>();
   const keydownHandler = (keyName: string, e: KeyboardEvent) => {
-    if (e.target !== document.body || props.readonly) {
+    if (e.target !== document.body || props.readOnly) {
       return;
     }
 
@@ -452,7 +452,7 @@ function CenterPanel (props: Props) {
           <PageBanner
             focalBoard
             headerImage={board.fields.headerImage}
-            readOnly={props.readonly}
+            readOnly={props.readOnly}
             setPage={({ headerImage }) => setRandomHeaderImage(board, headerImage!)}
           />
         </Box>
@@ -462,7 +462,7 @@ function CenterPanel (props: Props) {
           <ViewTitle
             key={board.id + board.title}
             board={board}
-            readonly={props.readonly}
+            readOnly={props.readOnly}
             setPage={props.setPage}
           />
         )}
@@ -494,7 +494,7 @@ function CenterPanel (props: Props) {
           // addCardFromTemplate={addCardFromTemplate}
           addCardTemplate={() => addCard('', true, {}, false, true)}
           editCardTemplate={editCardTemplate}
-          readonly={props.readonly}
+          readOnly={props.readOnly}
           embeddedBoardPath={props.embeddedBoardPath}
         />
       </div>
@@ -506,7 +506,7 @@ function CenterPanel (props: Props) {
               <InlineViewTitle
                 key={activePage.id + activePage.title}
                 board={activeBoard}
-                readonly={props.readonly}
+                readOnly={props.readOnly}
                 setPage={props.setPage}
               />
             )}
@@ -524,7 +524,7 @@ function CenterPanel (props: Props) {
             )}
             {!activeView && state.showSettings === 'create-linked-view' && (
               <SourceSelection
-                readOnly={props.readonly}
+                readOnly={props.readOnly}
                 onSelectSource={createLinkedView}
                 onCreateDatabase={createDatabase}
                 showCreateDatabase={views.length === 0}
@@ -539,7 +539,7 @@ function CenterPanel (props: Props) {
                 visibleGroups={visibleGroups}
                 hiddenGroups={hiddenGroups}
                 selectedCardIds={state.selectedCardIds}
-                readonly={props.readonly}
+                readOnly={props.readOnly}
                 onCardClicked={cardClicked}
                 addCard={addCard}
                 showCard={showCard}
@@ -554,7 +554,7 @@ function CenterPanel (props: Props) {
                 views={props.views}
                 visibleGroups={visibleGroups}
                 selectedCardIds={state.selectedCardIds}
-                readonly={props.readonly}
+                readOnly={props.readOnly}
                 cardIdToFocusOnRender={state.cardIdToFocusOnRender}
                 showCard={showCard}
                 addCard={addCard}
@@ -566,7 +566,7 @@ function CenterPanel (props: Props) {
                 board={activeBoard}
                 cards={cards}
                 activeView={activeView}
-                readonly={props.readonly}
+                readOnly={props.readOnly}
                 dateDisplayProperty={dateDisplayProperty}
                 showCard={showCard}
                 addCard={(properties: Record<string, string>) => {
@@ -580,7 +580,7 @@ function CenterPanel (props: Props) {
                 board={activeBoard}
                 cards={cards}
                 activeView={activeView}
-                readonly={props.readonly}
+                readOnly={props.readOnly}
                 onCardClicked={cardClicked}
                 selectedCardIds={state.selectedCardIds}
                 addCard={(show) => addCard('', show)}
