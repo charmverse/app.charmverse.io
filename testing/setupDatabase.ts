@@ -10,12 +10,11 @@ import type { ProposalReviewerInput } from 'lib/proposal/interface';
 import { syncProposalPermissions } from 'lib/proposal/syncProposalPermissions';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { typedKeys } from 'lib/utilities/objects';
-import type { LoggedInUser, PageContent } from 'models';
+import type { LoggedInUser } from 'models';
 import type { BountyWithDetails } from 'lib/bounties';
 import { IDENTITY_TYPES } from 'models';
 import { v4 } from 'uuid';
-import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
-import { createPage } from 'lib/pages/server/createPage';
+import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import { boardWithCardsArgs } from './generate-board-stub';
 
 export async function generateSpaceUser ({ spaceId, isAdmin }: { spaceId: string, isAdmin: boolean }): Promise<LoggedInUser> {
@@ -299,8 +298,8 @@ export async function generateRoleWithSpaceRole ({ spaceRoleId, spaceId, created
   };
 }
 
-export function createNewPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'createdBy'> & { pagePermissions?: Prisma.PagePermissionCreateManyPageInput[] }): Promise<IPageWithPermissions> {
-  return createPage({
+export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'createdBy'> & { pagePermissions?: Prisma.PagePermissionCreateManyPageInput[] }): Promise<IPageWithPermissions> {
+  return createPageDb({
     data: {
       id: options.id ?? v4(),
       contentText: options.contentText ?? '',
@@ -309,7 +308,6 @@ export function createNewPage (options: Partial<Page> & Pick<Page, 'spaceId' | '
       type: options.type ?? 'page',
       updatedBy: options.createdBy,
       content: options.content as Prisma.InputJsonObject,
-      hasContent: options.content ? !checkIsContentEmpty(options.content as PageContent) : false,
       author: {
         connect: {
           id: options.createdBy
@@ -395,7 +393,7 @@ export async function createProposalWithUsers ({ proposalStatus = 'private_draft
 } & Partial<Prisma.PageCreateInput>): Promise<PageWithProposal> {
   const proposalId = v4();
 
-  const proposalPage: PageWithProposal = await createPage({
+  const proposalPage: PageWithProposal = await createPageDb({
     data: {
       ...pageCreateInput,
       id: proposalId,
@@ -462,7 +460,7 @@ export async function generateCommentWithThreadAndPage ({ userId, spaceId, comme
   commentContent: string;
 }): Promise<{ page: Page, thread: Thread, comment: Comment }> {
 
-  const page = await createNewPage({
+  const page = await createPage({
     createdBy: userId,
     spaceId
   });
@@ -556,7 +554,7 @@ export async function generateProposal ({ userId, spaceId, proposalStatus, autho
   Promise<PageWithProposal> {
   const proposalId = v4();
 
-  return createPage({
+  return createPageDb({
     data: {
       id: proposalId,
       contentText: '',
@@ -621,7 +619,7 @@ export async function generateBoard ({ createdBy, spaceId, parentId, cardCount }
   const { pageArgs, blockArgs } = boardWithCardsArgs({ createdBy, spaceId, parentId, cardCount });
 
   return prisma.$transaction([
-    ...pageArgs.map(p => createPage(p)),
+    ...pageArgs.map(p => createPageDb(p)),
     prisma.block.createMany(blockArgs)
   ]).then(result => result[0] as Page);
 }
