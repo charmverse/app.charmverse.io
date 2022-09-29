@@ -1,23 +1,18 @@
 import { verifyMessage } from '@ethersproject/wallet';
-import { user } from '@guildxyz/sdk';
 import { useWeb3React } from '@web3-react/core';
-import type { ethers } from 'ethers';
-import { toUtf8Bytes, hexlify, getAddress } from 'ethers/lib/utils';
+import { getAddress, toUtf8Bytes } from 'ethers/lib/utils';
+import type { AuthSig } from 'lib/blockchain/interfaces';
 import { SiweMessage } from 'lit-siwe';
 import type { ReactNode } from 'react';
-import { useCallback, createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { box } from 'tweetnacl';
-import type { AuthSig } from 'lib/blockchain/interfaces';
 import naclUtil from 'tweetnacl-util';
-import { useLocalStorage, PREFIX } from './useLocalStorage';
-import useWeb3Signer from './useWeb3Signer';
-import { useSnackbar } from './useSnackbar';
-import { InvalidStateError } from '../lib/middleware';
 import { ExternalServiceError } from '../lib/utilities/errors';
+import { PREFIX, useLocalStorage } from './useLocalStorage';
 
 type IContext = {
   account?: string | null;
-  walletAuthSignature?: string | null;
+  walletAuthSignature?: AuthSig | null;
   sign: () => Promise<AuthSig | null>;
 };
 

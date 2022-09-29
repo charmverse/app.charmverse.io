@@ -12,6 +12,7 @@ import charmClient from 'charmClient';
 import type { UrlObject } from 'url';
 import log from 'lib/log';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import type { AuthSig } from '../../lib/blockchain/interfaces';
 
 // Pages shared to the public that don't require user login
 const publicPages = ['/', 'invite', 'share', 'api-docs', 'u', 'authenticate'];
@@ -127,7 +128,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     else if (!user && account) {
 
       log.info('[RouteGuard]: log in user by wallet address');
-      const _user = await charmClient.login(account).catch(() => null);
+      const _user = await charmClient.login(account, walletAuthSignature as AuthSig).catch(() => null);
       if (_user) {
         return { authorized: true, user: _user };
       }
@@ -139,7 +140,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     // condition: user connected but the wallet address is new
     else if (user && account && !user.addresses.includes(account)) {
       log.info('[RouteGuard]: unknown address');
-      const _user = await charmClient.login(account).catch(() => null);
+      const _user = await charmClient.login(account, walletAuthSignature as AuthSig).catch(() => null);
       // log in existing user
       if (_user) {
         return { authorized: true, user: _user };
