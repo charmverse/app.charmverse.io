@@ -307,7 +307,7 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
         />
       );
     }
-  }, [labelIcon, pageType]);
+  }, [labelIcon, pageType, isEmptyContent]);
 
   const ContentProps = useMemo(() => ({ isAdjacent, className: hasSelectedChildView ? 'Mui-selected' : undefined }), [isAdjacent, hasSelectedChildView]);
   const TransitionProps = useMemo(() => ({ timeout: 50 }), []);
