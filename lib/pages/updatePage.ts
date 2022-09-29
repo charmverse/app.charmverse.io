@@ -1,10 +1,9 @@
 import { prisma } from 'db';
-import type { Block, PageType, Prisma } from '@prisma/client';
+import type { PageType, Prisma } from '@prisma/client';
 import type { IPageWithPermissions } from 'lib/pages/server';
 import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import type { PageContent } from 'models';
 import { getPreviewImageFromContent } from 'lib/pages/getPreviewImageFromContent';
-import { date } from 'yup/lib/locale';
 
 type CurrentPageData = {
   id: string;

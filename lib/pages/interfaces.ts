@@ -1,4 +1,4 @@
-import type { Block, Page, PagePermission, Prisma, Space } from '@prisma/client';
+import type { Block, Page, PagePermission, Space } from '@prisma/client';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
@@ -27,6 +27,7 @@ export interface PagesRequest {
   userId?: string;
   archived?: boolean;
   pageIds?: string[];
+  meta?: boolean;
 }
 
 export interface PublicPageResponse {

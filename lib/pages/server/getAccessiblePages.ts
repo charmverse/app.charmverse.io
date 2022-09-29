@@ -4,9 +4,6 @@ import type { IPageWithPermissions, PagesRequest } from '../interfaces';
 
 type PageFieldsWithoutContent = Record<keyof Omit<Page, 'content' | 'contentText'>, true>
 
-// Feature flag for testing purposes
-const WITHOUT_CONTENT = true;
-
 /**
  * Utility for getting permissions of a page
  * @returns
@@ -27,9 +24,11 @@ export function includePagePermissions (): Prisma.PageInclude & {
   };
 }
 
-function selectPageFields () {
-  if (!WITHOUT_CONTENT) {
-    return includePagePermissions();
+function selectPageFields (meta: boolean) {
+  if (!meta) {
+    return {
+      include: includePagePermissions()
+    };
   }
 
   const select: { select: PageFieldsWithoutContent } = {
@@ -65,8 +64,8 @@ function selectPageFields () {
   return select;
 }
 
-export function accessiblePagesByPermissionsQuery ({ spaceId, userId }:
-  { spaceId: string, userId: string }): Prisma.PagePermissionListRelationFilter {
+export function accessiblePagesByPermissionsQuery ({ spaceId, userId, omitContent }:
+  { spaceId: string, userId: string, omitContent?: boolean }): Prisma.PagePermissionListRelationFilter {
   return {
     some: {
       OR: [
@@ -103,7 +102,7 @@ export function accessiblePagesByPermissionsQuery ({ spaceId, userId }:
   };
 }
 
-export function generateAccessiblePagesQuery ({ spaceId, userId, archived }: PagesRequest): Prisma.PageFindManyArgs {
+export function generateAccessiblePagesQuery ({ spaceId, userId, archived, meta }: PagesRequest): Prisma.PageFindManyArgs {
   // Return only pages with public permissions
   if (!userId) {
     return {
@@ -163,12 +162,12 @@ export function generateAccessiblePagesQuery ({ spaceId, userId, archived }: Pag
       ],
       ...archivedQuery
     },
-    ...selectPageFields()
+    ...selectPageFields(meta || false)
   };
 }
 
-export async function getAccessiblePages ({ spaceId, userId, archived = false }: PagesRequest): Promise<IPageWithPermissions[]> {
+export async function getAccessiblePages ({ spaceId, userId, archived = false, meta = false }: PagesRequest): Promise<IPageWithPermissions[]> {
   return prisma.page.findMany(
-    generateAccessiblePagesQuery({ spaceId, userId, archived })
+    generateAccessiblePagesQuery({ spaceId, userId, archived, meta })
   ) as any as Promise<IPageWithPermissions[]>;
 }

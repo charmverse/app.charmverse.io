@@ -8,7 +8,8 @@ export interface UpdateProfileItemRequest {
 
 export class PagesApi {
   getPages (spaceId: string) {
-    return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`);
+    // meta=true - TEMP param to keep backward compatibility with old clients
+    return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages?meta=true`);
   }
 
   getPage (pageIdOrPath: string, spaceId?: string) {
