@@ -11,7 +11,8 @@ import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import { useCallback, createContext, useContext, useMemo, useState } from 'react';
 import { untitledPage } from 'seedData';
-import useSWR from 'swr';
+import type { KeyedMutator } from 'swr';
+import useSWR, { mutate } from 'swr';
 import { useCurrentSpace } from './useCurrentSpace';
 import useIsAdmin from './useIsAdmin';
 import { useUser } from './useUser';
@@ -31,6 +32,7 @@ export type PagesContext = {
   mutatePagesRemove: (pageIds: string[], revalidate?: boolean) => void;
   deletePage: (data: { pageId: string, board?: Block }) => Promise<void>;
   getPagePermissions: (pageId: string, page?: PageMeta) => IPagePermissionFlags;
+  mutatePagesList: KeyedMutator<PagesMap<PageMeta>>;
 };
 
 const refreshInterval = 1000 * 5 * 60; // 5 minutes
@@ -45,18 +47,18 @@ export const PagesContext = createContext<Readonly<PagesContext>>({
   updatePage: () => Promise.resolve({} as any),
   mutatePage: () => {},
   mutatePagesRemove: () => {},
-  deletePage: () => Promise.resolve({} as any)
+  deletePage: () => Promise.resolve({} as any),
+  mutatePagesList: () => Promise.resolve({} as any)
 });
 
 export function PagesProvider ({ children }: { children: ReactNode }) {
-
   const isAdmin = useIsAdmin();
   const [currentSpace] = useCurrentSpace();
   const [currentPageId, setCurrentPageId] = useState<string>('');
   const router = useRouter();
   const { user } = useUser();
 
-  const { data, mutate } = useSWR(() => currentSpace ? `pages/${currentSpace?.id}` : null, async () => {
+  const { data, mutate: mutatePagesList } = useSWR(() => currentSpace ? getPagesListCacheKey(currentSpace.id) : null, async () => {
 
     if (!currentSpace) {
       return {};
@@ -76,7 +78,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   const _setPages: Dispatch<SetStateAction<PagesMap>> = (_pages) => {
     let updatedData: PagesContext['pages'] = {};
 
-    mutate((currentData) => {
+    mutatePagesList((currentData) => {
       updatedData = _pages instanceof Function ? _pages(currentData || {}) : _pages;
       return updatedData;
     }, {
@@ -172,7 +174,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   }
 
   const mutatePage = useCallback((page: PageUpdates, revalidate = false) => {
-    mutate(pagesData => {
+    mutatePagesList(pagesData => {
       const currentPageData = pagesData?.[page.id];
       if (pagesData) {
         const updatedData: PageMeta = currentPageData ? { ...currentPageData, ...page } : page as PageMeta;
@@ -182,7 +184,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   }, [mutate]);
 
   const mutatePagesRemove = useCallback((pageIds: string[], revalidate = false) => {
-    mutate(pagesData => {
+    mutatePagesList(pagesData => {
       if (pagesData) {
         const udpatedData = { ...pagesData };
         pageIds.forEach(id => delete udpatedData[id]);
@@ -215,7 +217,8 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     refreshPage,
     updatePage,
     mutatePage,
-    mutatePagesRemove
+    mutatePagesRemove,
+    mutatePagesList
   }), [currentPageId, router, pages, user]);
 
   return (
@@ -223,6 +226,10 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
       {children}
     </PagesContext.Provider>
   );
+}
+
+export function getPagesListCacheKey (spaceId: string) {
+  return `pages/${spaceId}`;
 }
 
 export const usePages = () => useContext(PagesContext);

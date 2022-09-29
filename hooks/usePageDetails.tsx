@@ -1,15 +1,15 @@
 import charmClient from 'charmClient';
-import type { IPageWithPermissions, PageDetails, PageDetailsUpdates, PagesMap } from 'lib/pages';
+import type { PageDetails, PageDetailsUpdates } from 'lib/pages';
 import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import debounce from 'lodash/debounce';
 import type { PageContent } from 'models';
 import { useCallback, useEffect, useMemo } from 'react';
-import useSWR, { mutate } from 'swr';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import useSWR from 'swr';
+import { usePages } from 'hooks/usePages';
 
 export function usePageDetails (pageIdOrPath: string, spaceId?: string) {
   const { data: pageDetails, error, mutate: mutateDetails } = useSWR(pageIdOrPath ? [`pages/details/${pageIdOrPath}`, spaceId] : null, () => charmClient.pages.getPageDetails(pageIdOrPath, spaceId));
-  const [currentSpace] = useCurrentSpace();
+  const { mutatePagesList } = usePages();
 
   const mutatePageDetails = useCallback((updates: PageDetailsUpdates, revalidate = false) => {
     mutateDetails(pageDetailsData => {
@@ -17,7 +17,7 @@ export function usePageDetails (pageIdOrPath: string, spaceId?: string) {
     }, {
       revalidate
     });
-  }, [mutate]);
+  }, [mutateDetails]);
 
   const updatePageDetails = useCallback(async (updates: PageDetailsUpdates) => {
     const pageId = updates.id;
@@ -31,7 +31,7 @@ export function usePageDetails (pageIdOrPath: string, spaceId?: string) {
     const hasContent = !checkIsContentEmpty(updatedPage.content as PageContent);
 
     // Update pages context data only when hasContent value changed
-    mutate<PagesMap<IPageWithPermissions>>(`pages/${currentSpace?.id}`, pages => {
+    mutatePagesList(pages => {
       const currentPageData = pages?.[pageId];
       if (currentPageData && currentPageData.hasContent !== hasContent) {
         return { ...pages, [pageId]: { ...currentPageData, hasContent } };
