@@ -3,7 +3,7 @@ import { prisma } from 'db';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import type { IPageWithPermissions, PageWithProposal } from 'lib/pages';
-import { getPagePath } from 'lib/pages';
+import { getPagePath } from 'lib/pages/utils';
 import type { BountyPermissions } from 'lib/permissions/bounties';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import type { ProposalReviewerInput } from 'lib/proposal/interface';

@@ -3,7 +3,7 @@ import { prisma } from 'db';
 import { createBlock } from 'lib/focalboard/block';
 import { createBoard } from 'lib/focalboard/board';
 import { createBoardView } from 'lib/focalboard/boardView';
-import { getPagePath } from 'lib/pages';
+import { getPagePath } from 'lib/pages/utils';
 import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
 import type { PageContent } from 'models';

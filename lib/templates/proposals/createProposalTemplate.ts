@@ -1,7 +1,7 @@
 import { prisma } from 'db';
 import type { IPageWithPermissions, PageWithProposal } from 'lib/pages';
-import { getPagePath } from 'lib/pages';
 import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
+import { getPagePath } from 'lib/pages/utils';
 import { v4 } from 'uuid';
 import type { ProposalReviewerInput } from '../../proposal/interface';
 
