@@ -1,43 +1,65 @@
-import Box from '@mui/material/Box';
 import Alert from '@mui/material/Alert';
-import Button from 'components/common/Button';
-import Typography from '@mui/material/Typography';
-import { useState } from 'react';
+import Box from '@mui/material/Box';
+import PrimaryButton from 'components/common/PrimaryButton';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import type { AuthSig } from 'lib/blockchain/interfaces';
+import { useContext, useEffect, useState } from 'react';
+import { Web3Connection } from '../_app/Web3ConnectionManager';
 
 interface Props {
-  onSuccess: () => void;
+  signSuccess: (authSig: AuthSig) => void;
+  buttonText?: string;
 }
 
-export function WalletSign ({ onSuccess }: Props) {
+export function WalletSign ({ signSuccess, buttonText }: Props) {
 
   const { account, sign } = useWeb3AuthSig();
+  const { openWalletSelectorModal, triedEager, isWalletSelectorModalOpen } = useContext(Web3Connection);
   const [signatureFailed, setSignatureFailed] = useState(false);
-
   const [isSigning, setIsSigning] = useState(false);
+
+  // We want to avoid auto-firing the sign workflow if the user is already with a connected wallet
+  const [userClickedConnect, setUserClickedConnect] = useState(false);
+
+  useEffect(() => {
+    if (isWalletSelectorModalOpen) {
+      setUserClickedConnect(true);
+    }
+  }, [isWalletSelectorModalOpen]);
+
+  useEffect(() => {
+    if (userClickedConnect && account) {
+      setUserClickedConnect(false);
+      sign()
+        .then(signSuccess)
+        .catch(() => setSignatureFailed(true));
+    }
+  }, [userClickedConnect, account]);
 
   async function generateWalletAuth () {
     setIsSigning(true);
     setSignatureFailed(false);
     sign()
-      .then(onSuccess)
+      .then(signSuccess)
       .catch(err => setSignatureFailed(true))
       .finally(() => setIsSigning(false));
   }
 
   if (!account) {
-    return null;
+    return (
+      <PrimaryButton sx={{ width: { xs: '100%', sm: 'auto' } }} size='large' loading={!triedEager} onClick={openWalletSelectorModal}>
+        Connect Wallet
+      </PrimaryButton>
+    );
   }
 
   return (
     <Box>
-      <Typography variant='h2'>Sign your wallet</Typography>
-
       {signatureFailed && (
         <Alert severity='warning'>Wallet signature failed. Please try again</Alert>
       )}
 
-      <Button onClick={generateWalletAuth} loading={isSigning}>Sign wallet</Button>
+      <PrimaryButton onClick={generateWalletAuth} loading={isSigning}>{buttonText ?? 'Verify wallet'}</PrimaryButton>
     </Box>
   );
 }

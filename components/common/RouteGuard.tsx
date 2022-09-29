@@ -13,6 +13,7 @@ import type { UrlObject } from 'url';
 import log from 'lib/log';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { AuthSig } from '../../lib/blockchain/interfaces';
+import type { SystemError } from '../../lib/utilities/errors';
 
 // Pages shared to the public that don't require user login
 const publicPages = ['/', 'invite', 'share', 'api-docs', 'u', 'authenticate'];
@@ -113,7 +114,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       };
     }
     // condition: account but no valid wallet signature
-    else if (account && !walletAuthSignature) {
+    else if (account && walletAuthSignature?.address !== account) {
 
       return {
         authorized: true,
@@ -123,38 +124,6 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
         }
       };
 
-    }
-    // condition: no session, but a wallet is connected
-    else if (!user && account) {
-
-      log.info('[RouteGuard]: log in user by wallet address');
-      const _user = await charmClient.login(account, walletAuthSignature as AuthSig).catch(() => null);
-      if (_user) {
-        return { authorized: true, user: _user };
-      }
-      else {
-        const __user = await charmClient.createUser({ address: account });
-        return { authorized: true, user: __user };
-      }
-    }
-    // condition: user connected but the wallet address is new
-    else if (user && account && !user.addresses.includes(account)) {
-      log.info('[RouteGuard]: unknown address');
-      const _user = await charmClient.login(account, walletAuthSignature as AuthSig).catch(() => null);
-      // log in existing user
-      if (_user) {
-        return { authorized: true, user: _user };
-      }
-      // add the address to current profile
-      else if (user.addresses.length === 0) {
-        const __user = await charmClient.updateUser({ addresses: [account] });
-        return { authorized: true, user: __user };
-      }
-      // create a new user
-      else {
-        const __user = await charmClient.createUser({ address: account });
-        return { authorized: true, user: __user };
-      }
     }
     // condition: user accesses account pages (profile, tasks)
     else if (accountPages.some(basePath => firstPathSegment === basePath)) {

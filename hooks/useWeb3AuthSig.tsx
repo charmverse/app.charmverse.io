@@ -13,13 +13,13 @@ import { PREFIX, useLocalStorage } from './useLocalStorage';
 type IContext = {
   account?: string | null;
   walletAuthSignature?: AuthSig | null;
-  sign: () => Promise<AuthSig | null>;
+  sign: () => Promise<AuthSig>;
 };
 
 export const Web3Context = createContext<Readonly<IContext>>({
   account: null,
   walletAuthSignature: null,
-  sign: () => Promise.resolve(null)
+  sign: () => Promise.resolve({} as AuthSig)
 });
 
 // a wrapper around account and library from web3react
@@ -33,6 +33,15 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
 
   const [walletAuthSignature, setWalletAuthSignature] = useState<AuthSig | null>(null);
 
+  function setSignature (signature: AuthSig | null, writeToLocalStorage?: boolean) {
+    // Ensures Lit signature is always in sync
+    setLitAuthSignature(signature);
+    setWalletAuthSignature(signature);
+    if (writeToLocalStorage) {
+      window.localStorage.setItem(`${PREFIX}.wallet-auth-sig-${account}`, JSON.stringify(signature));
+    }
+  }
+
   // External
   // Inform the user that we have an account but not auth signature
 
@@ -40,15 +49,17 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
     //  Automagic lit signature update only
 
     if (account) {
-      const storedWalletSignature = window.localStorage.getItem(`${PREFIX}.wallet-auth-sig-${account}`);
 
-      if (storedWalletSignature) {
-        setLitAuthSignature(JSON.parse(storedWalletSignature));
-        setWalletAuthSignature(JSON.parse(storedWalletSignature));
+      try {
+        const storedWalletSignature = JSON.parse(window.localStorage.getItem(`${PREFIX}.wallet-auth-sig-${account}`) as string) as AuthSig;
+        setSignature(storedWalletSignature);
+      }
+      catch (err) {
+        setSignature(null);
       }
     }
     else {
-      setWalletAuthSignature(null);
+      setSignature(null);
     }
   }, [account]);
 
@@ -78,11 +89,6 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
 
     const newSignature = await signer.signMessage(messageBytes);
 
-    // .('personal_sign', [
-    //   hexlify(messageBytes),
-    //   account?.toLowerCase()
-    // ]);
-
     const signatureAddress = verifyMessage(body, newSignature as string).toLowerCase();
 
     if (signatureAddress !== account?.toLowerCase()) {
@@ -96,8 +102,7 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
       address: signatureAddress
     };
 
-    window.localStorage.setItem(`${PREFIX}.wallet-auth-sig-${account}`, JSON.stringify(generated));
-    setWalletAuthSignature(generated);
+    setSignature(generated, true);
 
     if (!litCommKey) {
       const commsKeyPair = box.keyPair();

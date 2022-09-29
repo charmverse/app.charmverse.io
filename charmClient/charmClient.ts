@@ -7,7 +7,7 @@ import * as http from 'adapters/http';
 import type { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/focalboard/src/blocks/block';
 import type { IUser } from 'components/common/BoardEditor/focalboard/src/user';
 import type { FiatCurrency, IPairQuote } from 'connectors';
-import type { ExtendedPoap } from 'lib/blockchain/interfaces';
+import type { AuthSig, ExtendedPoap } from 'lib/blockchain/interfaces';
 import type { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
 import type { FailedImportsError } from 'lib/notion/types';
 import type { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
@@ -61,9 +61,10 @@ class CharmClient {
 
   proposals = new ProposalsApi();
 
-  async login (address: string) {
+  async login (address: string, walletSignature: AuthSig) {
     const user = await http.POST<LoggedInUser>('/api/session/login', {
-      address
+      address,
+      walletSignature
     });
     return user;
   }

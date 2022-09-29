@@ -1,9 +1,10 @@
 import getLayout from 'components/common/BaseLayout/BaseLayout';
-import { LoginPageContent, WalletSign } from 'components/login';
+import { LoginPageContent } from 'components/login';
 import Footer from 'components/login/Footer';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { getKey } from 'hooks/useLocalStorage';
 import { usePageTitle } from 'hooks/usePageTitle';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
@@ -13,6 +14,7 @@ import { useContext, useEffect, useState } from 'react';
 export default function LoginPage () {
   const { account, walletAuthSignature } = useWeb3AuthSig();
   const { triedEager } = useContext(Web3Connection);
+  const { showMessage } = useSnackbar();
   const router = useRouter();
   const defaultWorkspace = typeof window !== 'undefined' && localStorage.getItem(getKey('last-workspace'));
   const [, setTitleState] = usePageTitle();
@@ -21,8 +23,6 @@ export default function LoginPage () {
 
   const [showLogin, setShowLogin] = useState(false); // capture isLoaded state to prevent render on route change
   const isLogInWithDiscord = typeof router.query.code === 'string' && router.query.discord === '1' && router.query.type === 'login';
-
-  const [showSignatureRequest, setShowSignatureRequest] = useState(false);
 
   const isDataLoaded = triedEager && isSpacesLoaded && isLoaded;
   useEffect(() => {
@@ -50,21 +50,15 @@ export default function LoginPage () {
     // redirect user once wallet is connected
     if (isDataLoaded) {
       // redirect once account exists (user has connected wallet)
-      if (account && !walletAuthSignature) {
-        setShowSignatureRequest(true);
-      }
-      else if (account || user) {
+      if (user && (isLogInWithDiscord || (account && walletAuthSignature?.address === account))) {
         redirectUserAfterLogin();
+
       }
       else {
         setShowLogin(true);
       }
     }
-  }, [account, isDataLoaded, user, walletAuthSignature, showSignatureRequest]);
-
-  if (showSignatureRequest) {
-    return (<WalletSign onSuccess={() => setShowSignatureRequest(false)} />);
-  }
+  }, [account, isDataLoaded]);
 
   if (!showLogin) {
     return null;
@@ -73,7 +67,13 @@ export default function LoginPage () {
   return (
     isLogInWithDiscord ? null : getLayout(
       <>
-        <LoginPageContent />
+        <LoginPageContent loginSuccess={() => {
+          showMessage('Wallet verified. Logging you in', 'success');
+          setTimeout(() => {
+            redirectUserAfterLogin();
+          }, 1500);
+        }}
+        />
         <Footer />
       </>
     )

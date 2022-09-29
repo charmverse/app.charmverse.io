@@ -7,7 +7,12 @@ import Image from 'components/common/Image';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import splashImage from 'public/images/artwork/world.png';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useUser } from 'hooks/useUser';
+import { WalletSign } from './WalletSign';
+import type { AuthSig } from '../../lib/blockchain/interfaces';
+import charmClient from '../../charmClient';
 
 export const Container = styled(Box)`
   max-width: 100%;
@@ -15,9 +20,32 @@ export const Container = styled(Box)`
   margin: 0 auto;
 `;
 
-export function LoginPageContent () {
-  const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
+interface Props {
+  loginSuccess: () => void;
+}
+
+export function LoginPageContent ({ loginSuccess }: Props) {
+  const { account, walletAuthSignature } = useWeb3AuthSig();
+  const { setUser } = useUser();
   const returnUrl = new URLSearchParams(decodeURIComponent(window.location.search)).get('returnUrl');
+
+  const showSignatureRequest = account && walletAuthSignature?.address !== account;
+
+  async function userVerifiedWallet (authSig: AuthSig) {
+    charmClient.login(account as string, authSig)
+      .then((_user) => {
+        setUser(_user);
+        loginSuccess();
+      })
+      .catch((err) => {
+        charmClient.createUser({
+          address: account as string
+        }).then((_user) => {
+          setUser(_user);
+          loginSuccess();
+        });
+      });
+  }
 
   return (
     <Container px={3}>
@@ -63,15 +91,16 @@ export function LoginPageContent () {
               Tasks, docs, bounties, and more
             </Typography>
             <Box display={{ sm: 'flex' }} gap={2} alignItems='center'>
-              <PrimaryButton sx={{ width: { xs: '100%', sm: 'auto' } }} size='large' loading={!triedEager} onClick={openWalletSelectorModal}>
-                Connect Wallet
-              </PrimaryButton>
-              <Typography color='secondary' variant='body2' sx={{ lineHeight: '40px' }}>
-                or
-              </Typography>
-              <Button sx={{ width: '100%' }} variant='outlined' size='large' href={`/api/discord/oauth?type=login&redirect=${returnUrl ?? '/'}`}>
-                Connect Discord
-              </Button>
+              <Box>
+                <WalletSign signSuccess={loginSuccess} />
+                <Typography color='secondary' variant='body2' sx={{ lineHeight: '40px' }}>
+                  or
+                </Typography>
+                <Button sx={{ width: '100%' }} variant='outlined' size='large' href={`/api/discord/oauth?type=login&redirect=${returnUrl ?? '/'}`}>
+                  Connect Discord
+                </Button>
+              </Box>
+
             </Box>
           </Box>
         </Grid>
