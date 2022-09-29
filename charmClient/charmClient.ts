@@ -18,7 +18,6 @@ import type { SpacePermissionConfigurationUpdate } from 'lib/permissions/meta/in
 import type { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee, IPagePermissionWithSource, SpaceDefaultPublicPageToggle } from 'lib/permissions/pages/page-permission-interfaces';
 import type { SpacePermissionFlags, SpacePermissionModification } from 'lib/permissions/spaces';
 import type { AggregatedProfileData } from 'lib/profile';
-import type { MarkTask } from 'lib/tasks/markTasks';
 import type { MultipleThreadsInput, ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import type { TokenGateEvaluationAttempt, TokenGateEvaluationResult, TokenGateVerification, TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
@@ -32,8 +31,6 @@ import type { InviteLinkPopulated } from 'pages/api/invites/index';
 import type { PublicUser } from 'pages/api/public/profile/[userId]';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
-import type { GetTasksResponse } from 'pages/api/tasks/list';
-import type { GetTasksStateResponse, UpdateTasksState } from 'pages/api/tasks/state';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 import type { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
 import { BlockchainApi } from './apis/blockchainApi';
@@ -41,6 +38,7 @@ import { BountiesApi } from './apis/bountiesApi';
 import { CollablandApi } from './apis/collablandApi';
 import { ProfileApi } from './apis/profileApi';
 import { ProposalsApi } from './apis/proposalsApi';
+import { TasksApi } from './apis/tasksApi';
 import { VotesApi } from './apis/votesApi';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
@@ -63,6 +61,8 @@ class CharmClient {
   proposals = new ProposalsApi();
 
   pages = new PagesApi();
+
+  tasks = new TasksApi();
 
   async login (address: string) {
     const user = await http.POST<LoggedInUser>('/api/session/login', {
@@ -440,18 +440,6 @@ class CharmClient {
     return http.DELETE(`/api/payment-methods/${paymentMethodId}`);
   }
 
-  getTasksState (): Promise<GetTasksStateResponse> {
-    return http.GET('/api/tasks/state');
-  }
-
-  updateTasksState (payload: UpdateTasksState) {
-    return http.PUT('/api/tasks/state', payload);
-  }
-
-  getTasks (): Promise<GetTasksResponse> {
-    return http.GET('/api/tasks/list');
-  }
-
   createRole (role: Partial<Role>): Promise<Role> {
     return http.POST('/api/roles', role);
   }
@@ -586,10 +574,6 @@ class CharmClient {
 
   getBuildId () {
     return http.GET<{ buildId: string }>('/api/build-id');
-  }
-
-  markTasks (tasks: MarkTask[]) {
-    return http.POST('/api/tasks/mark', tasks);
   }
 
   getAggregatedData (userId: string) {
