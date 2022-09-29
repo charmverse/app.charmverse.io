@@ -21,14 +21,11 @@ beforeAll(async () => {
   user = generated.user;
   space = generated.space;
 
-  await prisma.userWallet.createMany({
-    data: [{
-      userId: user.id,
-      address: walletAddresses[0]
-    }, {
+  await prisma.userWallet.create({
+    data: {
       userId: user.id,
       address: walletAddresses[1]
-    }]
+    }
   });
 });
 
