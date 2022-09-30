@@ -54,18 +54,6 @@ function getImageFromBinary (userId: string, imageSource: string) {
 
   const fileContent = Buffer.from(rawFileContent, 'base64');
 
-  // // Break the buffer string into chunks of 1 kilobyte
-  // const chunkSize = 1024 * 1;
-
-  // const bufferLength = fileContent.length;
-
-  // const bufferChunks = [];
-
-  // for (let i = 0; i < bufferLength; i += chunkSize) {
-  //   const chunk = fileContent.slice(i, i + chunkSize);
-  //   bufferChunks.push(chunk);
-  // }
-
   return { path: fileName, content: fileContent };
 }
 
