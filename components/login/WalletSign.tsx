@@ -4,6 +4,7 @@ import PrimaryButton from 'components/common/PrimaryButton';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import { useContext, useEffect, useState } from 'react';
+import { lowerCaseEqual } from 'lib/utilities/strings';
 import { Web3Connection } from '../_app/Web3ConnectionManager';
 
 interface Props {
@@ -13,7 +14,7 @@ interface Props {
 
 export function WalletSign ({ signSuccess, buttonText }: Props) {
 
-  const { account, sign } = useWeb3AuthSig();
+  const { account, walletAuthSignature, sign } = useWeb3AuthSig();
   const { openWalletSelectorModal, triedEager, isWalletSelectorModalOpen } = useContext(Web3Connection);
   const [signatureFailed, setSignatureFailed] = useState(false);
   const [isSigning, setIsSigning] = useState(false);
@@ -28,7 +29,7 @@ export function WalletSign ({ signSuccess, buttonText }: Props) {
   }, [isWalletSelectorModalOpen]);
 
   useEffect(() => {
-    if (userClickedConnect && account) {
+    if (userClickedConnect && account && !lowerCaseEqual(account, walletAuthSignature?.address as string)) {
       setIsSigning(true);
       setUserClickedConnect(false);
       sign()
