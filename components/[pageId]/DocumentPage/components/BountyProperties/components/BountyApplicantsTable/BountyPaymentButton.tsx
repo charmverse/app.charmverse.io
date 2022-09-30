@@ -133,14 +133,12 @@ export default function BountyPaymentButton ({
     () => getSafesForAddress({ signer: signer!, chainId: chainIdToUse, address: account! })
   );
 
-  const safeDataRecord = useMemo(() => {
-    return safesData?.reduce<Record<string, UserGnosisSafe>>((record, userGnosisSafe) => {
-      if (!record[userGnosisSafe.address]) {
-        record[userGnosisSafe.address] = userGnosisSafe;
-      }
-      return record;
-    }, {}) ?? {};
-  }, [safesData]);
+  const safeDataRecord = safesData?.reduce<Record<string, UserGnosisSafe>>((record, userGnosisSafe) => {
+    if (!record[userGnosisSafe.address]) {
+      record[userGnosisSafe.address] = userGnosisSafe;
+    }
+    return record;
+  }, {}) ?? {};
 
   const [paymentMethods] = usePaymentMethods();
 
