@@ -21,8 +21,8 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { usePopupState, bindMenu } from 'material-ui-popup-state/hooks';
 import type { BoxProps } from '@mui/system';
 import { usePreventReload } from 'hooks/usePreventReload';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import InlineCharmEditor from '../InlineCharmEditor';
-import { checkForEmpty } from '../utils';
 import { scrollToThread } from './inlineComment/inlineComment.utils';
 
 const ContextBorder = styled.div`
@@ -87,7 +87,7 @@ function AddCommentCharmEditor (
   { onClick: (cb: () => void) => void, readOnly: boolean, disabled: boolean, threadId: string, sx: SxProps }
 ) {
   const [commentContent, setCommentContent] = useState<PageContent | null>(null);
-  const isEmpty = checkForEmpty(commentContent);
+  const isEmpty = checkIsContentEmpty(commentContent);
   const { addComment, threads } = useThreads();
   const thread = threads[threadId] as ThreadWithCommentsAndAuthors;
 
@@ -132,7 +132,7 @@ function AddCommentCharmEditor (
 
 function EditCommentCharmEditor ({ disabled, isEditable, threadId, commentId, onContainerClick, onSave, onCancel }: { disabled: boolean, isEditable: boolean, onCancel: ButtonProps['onClick'], threadId: string, commentId: string, onContainerClick: BoxProps['onClick'], onSave: (cb: () => Promise<void>) => void }) {
   const [commentContent, setCommentContent] = useState<PageContent | null>(null);
-  const isEmpty = checkForEmpty(commentContent);
+  const isEmpty = checkIsContentEmpty(commentContent);
   const { editComment, threads } = useThreads();
   const thread = threads[threadId] as ThreadWithCommentsAndAuthors;
   const comment = thread.comments.find(_comment => _comment.id === commentId) as CommentWithUser;

@@ -15,6 +15,7 @@ import type { BountyWithDetails } from 'lib/bounties';
 import { IDENTITY_TYPES } from 'models';
 import { v4 } from 'uuid';
 import { Wallet } from 'ethers';
+import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import { boardWithCardsArgs } from './generate-board-stub';
 
 export async function generateSpaceUser ({ spaceId, isAdmin }: { spaceId: string, isAdmin: boolean }): Promise<LoggedInUser> {
@@ -312,7 +313,7 @@ export async function generateRoleWithSpaceRole ({ spaceRoleId, spaceId, created
 }
 
 export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'createdBy'> & { pagePermissions?: Prisma.PagePermissionCreateManyPageInput[] }): Promise<IPageWithPermissions> {
-  return prisma.page.create({
+  return createPageDb({
     data: {
       id: options.id ?? v4(),
       contentText: options.contentText ?? '',
@@ -406,7 +407,7 @@ export async function createProposalWithUsers ({ proposalStatus = 'private_draft
 } & Partial<Prisma.PageCreateInput>): Promise<PageWithProposal> {
   const proposalId = v4();
 
-  const proposalPage = await prisma.page.create({
+  const proposalPage: PageWithProposal = await createPageDb({
     data: {
       ...pageCreateInput,
       id: proposalId,
@@ -567,7 +568,7 @@ export async function generateProposal ({ userId, spaceId, proposalStatus, autho
   Promise<PageWithProposal> {
   const proposalId = v4();
 
-  return prisma.page.create({
+  return createPageDb({
     data: {
       id: proposalId,
       contentText: '',
@@ -632,7 +633,7 @@ export async function generateBoard ({ createdBy, spaceId, parentId, cardCount }
   const { pageArgs, blockArgs } = boardWithCardsArgs({ createdBy, spaceId, parentId, cardCount });
 
   return prisma.$transaction([
-    ...pageArgs.map(p => prisma.page.create(p)),
+    ...pageArgs.map(p => createPageDb(p)),
     prisma.block.createMany(blockArgs)
   ]).then(result => result[0] as Page);
 }

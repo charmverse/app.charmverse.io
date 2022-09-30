@@ -14,13 +14,15 @@ import { usePrimaryCharmEditor } from 'hooks/usePrimaryCharmEditor';
 import { usePages } from 'hooks/usePages';
 import { useVotes } from 'hooks/useVotes';
 import type { AssignedBountyPermissions } from 'lib/bounties';
-import type { IPageWithPermissions } from 'lib/pages';
 import type { Page, PageContent } from 'models';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
+import { usePageDetails } from 'hooks/usePageDetails';
+import type { PageMeta } from 'lib/pages';
+import LoadingComponent from 'components/common/LoadingComponent';
 import BountyProperties from './components/BountyProperties';
 import PageBanner from './components/PageBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
@@ -47,7 +49,7 @@ export const Container = styled(Box)<{ top: number, fullWidth?: boolean }>`
 `;
 
 export interface DocumentPageProps {
-  page: IPageWithPermissions;
+  page: PageMeta;
   setPage: (p: Partial<Page>) => void;
   readOnly?: boolean;
   insideModal?: boolean;
@@ -58,6 +60,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
   const { pages, getPagePermissions } = usePages();
   const { cancelVote, castVote, deleteVote, votes, isLoading } = useVotes();
   const pagePermissions = getPagePermissions(page.id);
+  const { pageDetails, debouncedUpdatePageDetails } = usePageDetails(page.id);
 
   const { draftBounty } = useBounties();
   const { currentPageActionDisplay } = usePageActionDisplay();
@@ -119,7 +122,8 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
   }
 
   const updatePageContent = useCallback((content: ICharmEditorOutput) => {
-    setPage({ content: content.doc, contentText: content.rawText });
+    debouncedUpdatePageDetails({ id: page.id, content: content.doc, contentText: content.rawText });
+    // setPage({ content: content.doc, contentText: content.rawText });
   }, [setPage]);
 
   const card = cards.find(_card => _card.id === page.id);
@@ -166,10 +170,10 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
             fullWidth={page.fullWidth ?? false}
           >
             <CharmEditor
-              key={page.id + editMode}
-              content={page.content as PageContent}
+              key={page.id + editMode + !!pageDetails}
+              content={pageDetails?.content as PageContent}
               onContentChange={updatePageContent}
-              readOnly={readOnly}
+              readOnly={readOnly || !pageDetails}
               pageActionDisplay={!insideModal ? currentPageActionDisplay : null}
               pageId={page.id}
               disablePageSpecificFeatures={isSharedPage}
@@ -178,6 +182,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
               containerWidth={containerWidth}
               pageType={page.type}
               pagePermissions={pagePermissions}
+              placeholder={!pageDetails ? <LoadingComponent isLoading /> : null}
             >
               {/* temporary? disable editing of page title when in suggestion mode */}
               <PageHeader
@@ -245,6 +250,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
                 </div>
               </div>
             </CharmEditor>
+
           </Container>
         </div>
       </Box>

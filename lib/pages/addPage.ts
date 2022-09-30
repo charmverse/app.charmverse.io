@@ -5,6 +5,7 @@ import { createBoardView } from 'components/common/BoardEditor/focalboard/src/bl
 import type { Card } from 'components/common/BoardEditor/focalboard/src/blocks/card';
 import { createCard } from 'components/common/BoardEditor/focalboard/src/blocks/card';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
+import { getPagesListCacheKey } from 'hooks/usePages';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { NextRouter } from 'next/router';
@@ -78,8 +79,8 @@ export async function addPage ({ createdBy, spaceId, shouldCreateDefaultBoardDat
     }
   }
 
-  await mutate(`pages/${spaceId}`, (pages: Page[]) => {
-    return [...pages, newPage];
+  await mutate(getPagesListCacheKey(spaceId), (pages: Record<string, Page>) => {
+    return { ...pages, [newPage.id]: newPage };
   }, {
     // revalidate pages for board since we create 3 default ones
     revalidate: Boolean(isBoardPage)

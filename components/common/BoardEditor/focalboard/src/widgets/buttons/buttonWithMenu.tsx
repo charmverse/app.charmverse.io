@@ -1,8 +1,8 @@
 import React from 'react';
 import Box from '@mui/material/Box';
-import DropdownIcon from '../icons/dropdown';
 import MenuWrapper from '../menuWrapper';
 import Button from 'components/common/Button';
+import ArrowDropDownOutlinedIcon from '@mui/icons-material/ArrowDropDownOutlined';
 
 type Props = {
     onClick?: (e: React.MouseEvent<HTMLDivElement>) => void
@@ -24,7 +24,7 @@ function ButtonWithMenu (props: Props): JSX.Element {
           sx={{pl: 1}}
           className='button-dropdown'
         >
-          <DropdownIcon  />
+          <ArrowDropDownOutlinedIcon fontSize='small'  />
         </Box>
         {props.children}
       </MenuWrapper>

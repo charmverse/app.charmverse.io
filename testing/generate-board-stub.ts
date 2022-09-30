@@ -31,6 +31,7 @@ export function boardWithCardsArgs ({ createdBy, spaceId, parentId, cardCount = 
     updatedBy: createdBy,
     title: 'My blog',
     content: null,
+    hasContent: false,
     contentText: '',
     headerImage: null,
     icon: '📝',

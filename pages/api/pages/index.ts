@@ -5,22 +5,25 @@ import log from 'lib/log';
 import type { IEventToLog } from 'lib/log/userEvents';
 import { postToDiscord } from 'lib/log/userEvents';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import type { IPageWithPermissions } from 'lib/pages/server';
 import { getPage, PageNotFoundError, resolvePageTree } from 'lib/pages/server';
+import { createPage } from 'lib/pages/server/createPage';
 import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { createProposal } from 'lib/proposal/createProposal';
 import { syncProposalPermissions } from 'lib/proposal/syncProposalPermissions';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
+import type { PageContent } from 'models';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).post(createPage);
+handler.use(requireUser).post(createPageHandler);
 
-async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
+async function createPageHandler (req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
   const data = req.body as Prisma.PageUncheckedCreateInput;
 
   const spaceId = data.spaceId;
@@ -44,6 +47,8 @@ async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
     throw new UnauthorisedActionError('You do not have permissions to create a page.');
   }
 
+  data.hasContent = !checkIsContentEmpty(data.content as PageContent);
+
   // Remove parent ID and pass it to the creation input
   // This became necessary after adding a formal parentPage relation related to page.parentId
   // We now need to specify this as a ParentPage.connect prisma argument instead of a raw string
@@ -63,7 +68,7 @@ async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
     }));
   }
   else {
-    page = await prisma.page.create({ data: {
+    page = await createPage({ data: {
       spaceId,
       createdBy,
       ...pageCreationData

@@ -38,6 +38,7 @@ import type { PageContent } from 'models';
 import type { CSSProperties, ReactNode } from 'react';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useSWRConfig } from 'swr';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import * as listItem from './components/listItem/listItem';
 import * as orderedList from './components/orderedList';
 import * as bulletList from './components/bulletList';
@@ -71,7 +72,6 @@ import * as table from './components/table';
 import * as trailingNode from './components/trailingNode';
 import DevTools from './DevTools';
 import { specRegistry } from './specRegistry';
-import { checkForEmpty } from './utils';
 import trackStyles from './components/suggestions/styles';
 import { rejectAll } from './components/suggestions/track/rejectAll';
 import { getSelectedChanges } from './components/suggestions/statePlugins/track';
@@ -328,6 +328,7 @@ interface CharmEditorProps {
   containerWidth?: number;
   pageType?: PageType;
   pagePermissions?: IPagePermissionFlags;
+  placeholder?: JSX.Element | undefined | null;
 }
 
 export function convertPageContentToMarkdown (content: PageContent, title?: string): string {
@@ -364,7 +365,8 @@ function CharmEditor (
     pageId,
     containerWidth,
     pageType,
-    pagePermissions
+    pagePermissions,
+    placeholder
   }:
   CharmEditorProps
 ) {
@@ -372,7 +374,7 @@ function CharmEditor (
   const [currentSpace] = useCurrentSpace();
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   // check empty state of page on first load
-  const _isEmpty = checkForEmpty(content);
+  const _isEmpty = checkIsContentEmpty(content);
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
   const { user } = useUser();
 
@@ -412,7 +414,7 @@ function CharmEditor (
 
   function _onContentChange (view: EditorView, prevDoc: Node<any>) {
     // @ts-ignore missing types from the @bangle.dev/react package
-    setIsEmpty(checkForEmpty(view.state.doc.toJSON() as PageContent));
+    setIsEmpty(checkIsContentEmpty(view.state.doc.toJSON() as PageContent));
     if (onContentChangeDebounced) {
       onContentChangeDebounced(view, prevDoc);
     }
@@ -501,13 +503,15 @@ function CharmEditor (
         plugins: []
       }}
       placeholderComponent={(
-        <Placeholder
-          sx={{
-            // This fixes the placeholder and cursor not being aligned
-            top: -34
-          }}
-          show={isEmpty && !readOnly}
-        />
+        placeholder || (
+          <Placeholder
+            sx={{
+              // This fixes the placeholder and cursor not being aligned
+              top: -34
+            }}
+            show={isEmpty && !readOnly}
+          />
+        )
       )}
       state={state}
       renderNodeViews={({ children: _children, ...props }) => {

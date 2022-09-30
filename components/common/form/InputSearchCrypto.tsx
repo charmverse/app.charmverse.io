@@ -11,7 +11,7 @@ import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import AddIcon from '@mui/icons-material/Add';
 import TokenLogo from 'components/common/TokenLogo';
 import { getTokenInfo, getTokenAndChainInfoFromPayments } from 'lib/tokens/tokenData';
-import CustomERCTokenForm from 'components/settings/payment-methods/components/CustomERCTokenForm';
+import CustomERCTokenForm from 'components/common/form/CustomERCTokenForm';
 
 export interface IInputSearchCryptoProps extends Omit<Partial<AutocompleteProps<string, true, true, true>>, 'onChange' | 'defaultValue' | 'value'> {
   onChange?: (value: CryptoCurrency) => void;

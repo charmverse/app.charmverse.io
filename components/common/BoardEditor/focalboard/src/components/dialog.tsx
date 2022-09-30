@@ -1,13 +1,13 @@
-import React from 'react'
-import { useHotkeys } from 'react-hotkeys-hook'
-import { useIntl } from 'react-intl'
+import React from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
+import { useIntl } from 'react-intl';
 
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
-import Modal from '@mui/material/Modal'
-import PopperPopup from 'components/common/PopperPopup'
-import IconButton from '../widgets/buttons/iconButton'
-import CloseIcon from '../widgets/icons/close'
-import MuiIconButton from "@mui/material/IconButton"
+import CloseIcon from '@mui/icons-material/Close';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import MuiIconButton from "@mui/material/IconButton";
+import Modal from '@mui/material/Modal';
+import PopperPopup from 'components/common/PopperPopup';
+import IconButton from '../widgets/buttons/iconButton';
 
 type Props = {
   children: React.ReactNode

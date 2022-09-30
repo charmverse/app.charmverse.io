@@ -86,7 +86,7 @@ function CenterPanel (props: Props) {
 
   const router = useRouter();
   const [space] = useCurrentSpace();
-  const { pages } = usePages();
+  const { pages, updatePage } = usePages();
   const _groupByProperty = useAppSelector(getCurrentViewGroupBy);
   const _dateDisplayProperty = useAppSelector(getCurrentViewDisplayBy);
   const boards = useAppSelector(getSortedBoards);
@@ -222,9 +222,10 @@ function CenterPanel (props: Props) {
         'add card',
         async (block: Block) => {
           if (space) {
-            await mutate(`pages/${space.id}`, async (pages: Page[]): Promise<Page[]> => {
-              const newPage = await charmClient.getPage(block.id);
-              return [...pages, newPage];
+            await mutate(`pages/${space.id}`, async (pages: Record<string, Page>): Promise<Record<string, Page>> => {
+              const newPage = await charmClient.pages.getPage(block.id);
+
+              return { ...pages, [newPage.id]: newPage };
             }, {
               revalidate: false
             });
@@ -401,7 +402,7 @@ function CenterPanel (props: Props) {
   }
 
   async function createDatabase () {
-    const { view } = await convertToInlineBoard({ board });
+    const { view } = await convertToInlineBoard({ board, updatePage });
     showView(view.id);
   }
 

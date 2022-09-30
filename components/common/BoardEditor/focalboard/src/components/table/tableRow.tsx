@@ -2,8 +2,6 @@ import React, { useEffect, useRef, useState, useMemo, memo } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
-import { checkForEmpty } from 'components/common/CharmEditor/utils';
-import { PageContent } from 'models';
 import { Card } from '../../blocks/card';
 import { Board, IPropertyTemplate } from '../../blocks/board';
 import { BoardView } from '../../blocks/boardView';
@@ -16,7 +14,7 @@ import { isTouchScreen } from 'lib/browser';
 import PropertyValueElement from '../propertyValueElement';
 
 type Props = {
-    content?: PageContent
+    hasContent?: boolean
     board: Board
     activeView: BoardView
     card: Card
@@ -44,7 +42,7 @@ export const columnWidth = (resizingColumn: string, columnWidths: Record<string,
 };
 
 function TableRow (props: Props) {
-  const { content, board, activeView, columnRefs, card, pageIcon, pageTitle, pageUpdatedAt, pageUpdatedBy, saveTitle } = props;
+  const { hasContent, board, activeView, columnRefs, card, pageIcon, pageTitle, pageUpdatedAt, pageUpdatedBy, saveTitle } = props;
   const titleRef = useRef<{ focus(selectAll?: boolean): void }>(null);
   const [title, setTitle] = useState('');
   const isManualSort = activeView.fields.sortOptions.length === 0;
@@ -93,7 +91,7 @@ function TableRow (props: Props) {
       >
         <div className='octo-icontitle'>
 
-          <PageIcon isEditorEmpty={content ? checkForEmpty(content) : true} pageType='page' icon={pageIcon} />
+          <PageIcon isEditorEmpty={!hasContent} pageType='page' icon={pageIcon} />
 
           <Editable
             ref={titleRef}
