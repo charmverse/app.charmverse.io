@@ -14,7 +14,7 @@ interface Props {
 
 export function WalletSign ({ signSuccess, buttonText }: Props) {
 
-  const { account, walletAuthSignature, sign } = useWeb3AuthSig();
+  const { account, sign, getStoredSignature } = useWeb3AuthSig();
   const { openWalletSelectorModal, triedEager, isWalletSelectorModalOpen } = useContext(Web3Connection);
   const [signatureFailed, setSignatureFailed] = useState(false);
   const [isSigning, setIsSigning] = useState(false);
@@ -29,7 +29,7 @@ export function WalletSign ({ signSuccess, buttonText }: Props) {
   }, [isWalletSelectorModalOpen]);
 
   useEffect(() => {
-    if (userClickedConnect && account && !lowerCaseEqual(account, walletAuthSignature?.address as string)) {
+    if (userClickedConnect && account && !lowerCaseEqual(getStoredSignature(account)?.address as string, account)) {
       setIsSigning(true);
       setUserClickedConnect(false);
       sign()

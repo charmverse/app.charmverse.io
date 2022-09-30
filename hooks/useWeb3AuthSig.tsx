@@ -17,13 +17,15 @@ type IContext = {
   walletAuthSignature?: AuthSig | null;
   sign: () => Promise<AuthSig>;
   triedEager: boolean;
+  getStoredSignature: (account: string) => AuthSig | null;
 };
 
 export const Web3Context = createContext<Readonly<IContext>>({
   account: null,
   walletAuthSignature: null,
   sign: () => Promise.resolve({} as AuthSig),
-  triedEager: false
+  triedEager: false,
+  getStoredSignature: () => null
 });
 
 // a wrapper around account and library from web3react
@@ -38,6 +40,24 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
   const [litCommKey, setLitCommKey] = useLocalStorage<{ publicKey: string, secretKey: string } | null>('lit-comms-keypair', null, true);
 
   const [walletAuthSignature, setWalletAuthSignature] = useState<AuthSig | null>(null);
+
+  /**
+   * Retrieve signature from localstorage for a specific wallet address
+   * @param account
+   * @returns
+   */
+  function getStoredSignature (walletAddress: string) {
+    const stored = window.localStorage.getItem(`${PREFIX}.wallet-auth-sig-${walletAddress}`);
+
+    if (stored) {
+      return JSON.parse(stored) as AuthSig;
+    }
+    else {
+      return null;
+
+    }
+
+  }
 
   function setSignature (signature: AuthSig | null, writeToLocalStorage?: boolean) {
     // Ensures Lit signature is always in sync
@@ -126,7 +146,9 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
     return generated;
   }
 
-  const value = useMemo(() => ({ account, walletAuthSignature, triedEager, sign }) as IContext, [account, walletAuthSignature, triedEager]);
+  const value = useMemo(() => ({
+    account, walletAuthSignature, triedEager, sign, getStoredSignature
+  }) as IContext, [account, walletAuthSignature, triedEager]);
 
   return (
     <Web3Context.Provider value={value}>
