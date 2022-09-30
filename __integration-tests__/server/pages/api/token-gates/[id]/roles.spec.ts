@@ -2,7 +2,7 @@ import type { Role, Space, TokenGate, TokenGateToRole, User } from '@prisma/clie
 import { SpaceRole } from '@prisma/client';
 import { createUserFromWallet } from 'lib/users/createUser';
 import request from 'supertest';
-import { baseUrl } from 'testing/mockApiCall';
+import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { prisma } from 'db';
@@ -92,19 +92,9 @@ beforeAll(async () => {
     }
   });
 
-  const loggedInResponse1 = await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: user1.addresses[0]
-    });
-  const loggedInResponse2 = await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: user2.addresses[0]
-    });
+  cookie1 = await loginUser(user1);
+  cookie1 = await loginUser(user2);
 
-  cookie1 = loggedInResponse1.headers['set-cookie'][0];
-  cookie2 = loggedInResponse2.headers['set-cookie'][0];
 });
 
 describe('first', () => {
