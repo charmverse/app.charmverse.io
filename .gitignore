@@ -18,6 +18,7 @@ playwright-report
 .env
 .env.local
 .env.production
+.env.staging.local
 *.tsbuildinfo
 
 ./pages/api/script/*
