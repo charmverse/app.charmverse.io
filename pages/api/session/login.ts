@@ -1,5 +1,6 @@
 import { prisma } from 'db';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
+import { trackUserAction } from 'lib/metrics/mixpanel/server';
 import { onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { sessionUserRelations } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -31,6 +32,8 @@ async function login (req: NextApiRequest, res: NextApiResponse<LoggedInUser | {
   req.session.user = { id: user.id };
   await updateGuildRolesForUser(user.addresses, user.spaceRoles);
   await req.session.save();
+
+  trackUserAction('sign_in', { userId: user.id, identityType: 'Wallet' });
 
   return res.status(200).json(user);
 }
