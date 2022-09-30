@@ -1,34 +1,6 @@
 #!/bin/bash -e 
 
-# install yq first
-install_yq()
-
-# arguments to this script is the environment namespace that the secret belongs to. 
-SECRETS_ENV=${1:-stg}
-APP_STAGING_DIR="/var/app/staging/"              # this is where amazon puts app to be deployed
-SECRETS_FILE="${APP_STAGING_DIR}/.env-secrets"   # What we gonna generate
-SECRETS_APP_NAMESPACE="/io.cv.app"
-SECRETS_NAMESPACE="$SECRETS_APP_NAMESPACE/$SECRETS_ENV"
-
-# remove previously generated secrets and generate again
-[ -f "$SECRETS_FILE" ] && rm "$SECRETS_FILE"
-
-grep -v 
-for env_var_name in "${!serets_to_lookup[@]}"; do 
-    secret_name=${serets_to_lookup[$env_var_name]%:*}
-    secret_json_keyname=${serets_to_lookup[$env_var_name]#*:}
-
-    secret_value=$(aws secretsmanager get-secret-value         \
-                                --region us-east-1             \
-                                --secret-id "$secret_name"     \
-                                --query "SecretString"         \
-                   | jq -r --arg keyname $secret_json_keyname '. | fromjson | .[$keyname]')
-
-    echo "$env_var_name=$secret_value" >> $SECRETS_FILE
-done
-
-
-function install_yq {
+function install_yq() {
     yq_version="v4.27.5"
     yq_binary_name="yq_linux_amd64"
     # if i can't find yq in my path...i'll just install
@@ -55,3 +27,62 @@ FILES
     fi
     which yq
 }
+
+
+# install yq first
+install_yq;
+
+# arguments to this script is the environment namespace that the secret belongs to. 
+SECRETS_ENV=${1:-stg}
+SECRETS_NAMESPACE="/io.cv.app/$SECRETS_ENV"
+APP_STAGING_DIR="/var/app/staging/"              # this is where amazon puts app to be deployed
+
+
+# Only do this if there are mustash template secrets in the .env file
+if grep "{{resolve:secretsmanager:" $APP_STAGING_DIR/.env; then 
+
+    # generate a new file without the mustash template holders
+    grep -v "resolve:secretsmanager" $APP_STAGING_DIR/.env > $APP_STAGING_DIR/.env.new
+
+    pattern='^(.+):.*resolve:secretsmanager:(.*):SecretString:([^:]+)}}'
+    grep "resolve:secretsmanager" $APP_STAGING_DIR/.env | while read -r line; do
+    #grep "resolve:secretsmanager" 00_env_vars.config | while read -r line; do
+        [[ $line =~ $pattern ]] && { 
+            export env_var_name=${BASH_REMATCH[1]}
+            secret_name=${BASH_REMATCH[2]}
+            secret_json_key=${BASH_REMATCH[3]}
+
+            export secret_value=$(aws secretsmanager get-secret-value         \
+                                        --region us-east-1             \
+                                        --secret-id "$secret_name"     \
+                                        --query "SecretString"         \
+                           | jq -r --arg keyname $secret_json_key '. | fromjson | .[$keyname]')
+
+            yq -I 4 -i 'with(.option_settings."aws:elasticbeanstalk:application:environment";
+                          .[env(env_var_name)] = env(secret_value) | . style="double" )
+                       ' $APP_STAGING_DIR/.env.new
+        }
+
+    #                      .DD_API_KEY = "bob" | . style="double")
+    done
+
+    bk_file_name=$(mktemp -t $APP_STAGING_DIR/._env_bk_XXXXX)
+    mv $APP_STAGING_DIR/.env $bk_file_name
+    mv $APP_STAGING_DIR/.env.new $APP_STAGING_DIR/.env
+
+fi 
+
+# for env_var_name in "${!serets_to_lookup[@]}"; do 
+#     secret_name=${serets_to_lookup[$env_var_name]%:*}
+#     secret_json_keyname=${serets_to_lookup[$env_var_name]#*:}
+
+#     secret_value=$(aws secretsmanager get-secret-value         \
+#                                 --region us-east-1             \
+#                                 --secret-id "$secret_name"     \
+#                                 --query "SecretString"         \
+#                    | jq -r --arg keyname $secret_json_keyname '. | fromjson | .[$keyname]')
+
+#     echo "$env_var_name=$secret_value" >> $SECRETS_FILE
+# done
+
+
