@@ -4,7 +4,12 @@ import useSWRImmutable from 'swr/immutable';
 
 export default function useTasks () {
   const { user } = useUser();
-  const { data: tasks, error: serverError, mutate } = useSWRImmutable(user ? `/tasks/list/${user.id}` : null, () => charmClient.getTasks(), {
+  const { data: tasks, error: serverError, mutate } = useSWRImmutable(user ? `/tasks/list/${user.id}` : null, () => charmClient.tasks.getTasksList(), {
+    // 10 minutes
+    refreshInterval: 1000 * 10 * 60
+  });
+
+  const { data: gnosisTasks, error: gnosisTasksServerError, mutate: mutateGnosisTasks } = useSWRImmutable(user ? `/tasks/gnosis/${user.id}` : null, () => charmClient.tasks.getGnosisTasks(), {
     // 10 minutes
     refreshInterval: 1000 * 10 * 60
   });
@@ -12,5 +17,5 @@ export default function useTasks () {
   const error = serverError?.message || serverError;
   const isLoading = !tasks;
 
-  return { tasks, mutate, error, isLoading };
+  return { tasks, gnosisTasks, gnosisTasksServerError, mutateGnosisTasks, mutate, error, isLoading };
 }

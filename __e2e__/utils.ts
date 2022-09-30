@@ -11,6 +11,9 @@ import { typedKeys } from 'lib/utilities/objects';
 import type { LoggedInUser } from 'models';
 import { baseUrl } from 'testing/mockApiCall';
 import { v4 } from 'uuid';
+import { Wallet } from 'ethers';
+import { readFileSync } from 'fs';
+import { createPage } from 'testing/setupDatabase';
 
 export { baseUrl } from 'testing/mockApiCall';
 
@@ -63,18 +66,19 @@ export async function getPages ({ browserPage, spaceId }: { browserPage: Browser
  */
 export async function createUserAndSpace ({
   browserPage,
-  walletAddress = v4(),
+  walletAddress = Wallet.createRandom().address,
   permissionConfigurationMode = 'collaborative'
 }: {
   browserPage: BrowserPage;
   walletAddress?: string;
-} & Partial<Pick<Space, 'permissionConfigurationMode'>>): Promise<{ user: LoggedInUser, space: Space, pages: IPageWithPermissions[] }> {
+} & Partial<Pick<Space, 'permissionConfigurationMode'>>): Promise<{ user: LoggedInUser, walletAddress?: string, space: Space, pages: IPageWithPermissions[] }> {
   const user = await createUser({ browserPage, walletAddress });
   const space = await createSpace({ browserPage, createdBy: user.id, permissionConfigurationMode });
-  const pages: IPageWithPermissions[] = await getPages({ browserPage, spaceId: space.id });
+  const pages = await getPages({ browserPage, spaceId: space.id });
 
   return {
     space,
+    walletAddress,
     user,
     pages
   };
@@ -154,23 +158,21 @@ export async function generateBounty ({ content = undefined, contentText = '', s
   return getBountyOrThrow(pageId);
 }
 
-/**
- * Simple utility to provide a user and space object inside test code
- * @param walletAddress
- * @returns
- */
-export async function generateUserAndSpace (walletAddress: string = v4(), isAdmin = true) {
+interface CreateUserAndSpaceOptions {
+  walletAddress?: string;
+  isAdmin?: boolean;
+}
+export async function generateUserAndSpace ({ isAdmin, walletAddress = Wallet.createRandom().address }: CreateUserAndSpaceOptions = {}) {
   const user = await createUserFromWallet(walletAddress);
 
   const existingSpaceId = user.spaceRoles?.[0]?.spaceId;
 
-  let space = null;
+  let space: Space;
 
   if (existingSpaceId) {
-    space = await prisma.space.findUnique({ where: { id: user.spaceRoles?.[0]?.spaceId }, include: { apiToken: true, spaceRoles: true } });
+    space = await prisma.space.findUniqueOrThrow({ where: { id: user.spaceRoles?.[0]?.spaceId }, include: { apiToken: true, spaceRoles: true } });
   }
-
-  if (!space) {
+  else {
     space = await prisma.space.create({
       data: {
         name: 'Example space',
@@ -189,16 +191,51 @@ export async function generateUserAndSpace (walletAddress: string = v4(), isAdmi
             isAdmin
           }
         }
-      },
-      include: {
-        apiToken: true,
-        spaceRoles: true
       }
     });
   }
 
+  const page = await createPage({
+    spaceId: space.id,
+    createdBy: user.id,
+    title: 'Test Page',
+    pagePermissions: [{
+      spaceId: space.id,
+      permissionLevel: 'full_access'
+    }]
+  });
+
   return {
+    page,
     user,
-    space
+    space,
+    walletAddress
   };
+}
+
+// load web3 mock library https:// massimilianomirra.com/notes/mocking-window-ethereum-in-playwright-for-end-to-end-dapp-testing
+// optionally pass in a context object to be available to the callback
+export async function mockWeb3<T = any> (page: BrowserPage, context: T | ((context: T) => void), callback?: (context: T) => void) {
+  callback ||= context as (context: T) => void;
+  context = typeof context === 'function' ? {} as T : context;
+  await page.addInitScript({
+    content:
+      `${readFileSync(
+        require.resolve('@depay/web3-mock/dist/umd/index.bundle.js'),
+        'utf-8'
+      )}\n`
+      + `
+
+        Web3Mock.mock('ethereum');
+
+        // mock deprecatd apis not handled by web3-mock
+        window.ethereum.enable = () => Promise.resolve();
+
+        window.ethereum.send = (method, opts) => {
+          return window.ethereum.request({ method }, opts);
+        };
+
+      `
+      + `(${callback.toString()})(${JSON.stringify(context)});`
+  });
 }

@@ -78,6 +78,7 @@ export default function SetAvatarPopup () {
             color='inherit'
             onClick={close}
             aria-label='close'
+            data-test='close-profile-avatar'
           >
             <CloseIcon />
           </IconButton>

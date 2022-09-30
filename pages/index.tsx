@@ -13,6 +13,7 @@ import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 import charmClient from 'charmClient';
+import type { Space } from '@prisma/client';
 
 export default function LoginPage () {
   const { account, walletAuthSignature } = useWeb3AuthSig();
@@ -40,10 +41,11 @@ export default function LoginPage () {
       router.push('/nexus');
     }
     else if (spaces.length > 0) {
-      const isValidDefaultWorkspace = !!defaultWorkspace && spaces.some(space => defaultWorkspace.startsWith(`/${space.domain}`));
-      router.push(isValidDefaultWorkspace ? defaultWorkspace : `/${spaces[0].domain}`);
+      router.push(getDefaultWorkspaceUrl(spaces));
     }
     else {
+      // Note that a user logging in will be redirected to /signup, because the 'user' and 'spaces' are loaded async after the wallet address appears.
+      // TODO: Find a way to connect the state between hooks (wallet address and loaded user)
       router.push('/signup');
     }
   }
@@ -99,4 +101,10 @@ export default function LoginPage () {
       </>
     )
   );
+}
+
+export function getDefaultWorkspaceUrl (spaces: Space[]) {
+  const defaultWorkspace = typeof window !== 'undefined' && localStorage.getItem(getKey('last-workspace'));
+  const isValidDefaultWorkspace = !!defaultWorkspace && spaces.some(space => defaultWorkspace.startsWith(`/${space.domain}`));
+  return isValidDefaultWorkspace ? defaultWorkspace : `/${spaces[0].domain}`;
 }
