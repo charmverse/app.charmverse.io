@@ -116,10 +116,10 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
       return;
     }
 
-    // if (inputValue === '') {
-    //   setOptions(value ? [value] : []);
-    //   return undefined;
-    // }
+    if (inputValue.replace(/\s/, '') === '') {
+      setOptions(value ? [value] : []);
+      return undefined;
+    }
 
     const allPages = Object.values(pages).filter(isTruthy);
 
