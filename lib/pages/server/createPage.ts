@@ -6,13 +6,15 @@ import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import { getPreviewImageFromContent } from 'lib/pages/getPreviewImageFromContent';
 
 export function createPage<T> ({ data, include }: Prisma.PageCreateArgs): PrismaPromise<Page & T> {
-  const pageData = {
-    ...data,
-    hasContent: data.content ? !checkIsContentEmpty(data.content as PageContent) : false,
-    galleryImg: getPreviewImageFromContent(data.content as PageContent)
+  const createArgs: Prisma.PageCreateArgs = {
+    data: {
+      ...data,
+      hasContent: data.content ? !checkIsContentEmpty(data.content as PageContent) : false,
+      galleryImg: getPreviewImageFromContent(data.content as PageContent)
+    }
   };
 
-  const includeData = include || {
+  const includeData = typeof include !== undefined ? include : {
     permissions: {
       include: {
         sourcePermission: true
@@ -20,9 +22,8 @@ export function createPage<T> ({ data, include }: Prisma.PageCreateArgs): Prisma
     }
   };
 
-  return prisma.page.create({
-    data: pageData,
-    include: includeData
-  }) as unknown as PrismaPromise<Page & T>;
+  createArgs.include = includeData;
+
+  return prisma.page.create(createArgs) as unknown as PrismaPromise<Page & T>;
 
 }

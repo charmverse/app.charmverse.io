@@ -56,7 +56,8 @@ export async function createProposal (pageProps: ProposalPageInput, proposalProp
         ...pageProps,
         id: proposalId,
         type: 'proposal'
-      }
+      },
+      include: null
     }),
     prisma.workspaceEvent.create({
       data: {
