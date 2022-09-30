@@ -258,7 +258,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
         width: '100%'
       }}
       >
-        <PageTitleWithBreadcrumbs pageId={basePage?.id} />
+        <PageTitleWithBreadcrumbs pageId={basePage?.id} pageType={basePage?.type} />
         <Box display='flex' alignItems='center' alignSelf='stretch' mr={-1}>
 
           {

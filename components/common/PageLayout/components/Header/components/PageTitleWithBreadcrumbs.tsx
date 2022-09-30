@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import type { PageType } from '@prisma/client';
 import { Box, Typography, CircularProgress } from '@mui/material';
 import Link from 'components/common/Link';
 import { usePageTitle } from 'hooks/usePageTitle';
@@ -121,6 +122,20 @@ function DocumentPageTitle ({ basePath, pageId }: { basePath: string, pageId?: s
   );
 }
 
+function ProposalPageTitle ({ basePath }: { basePath: string }) {
+  const [pageTitle] = usePageTitle();
+  return (
+    <PageTitle>
+      <BreadCrumb>
+        <Link href={`${basePath}/proposals`}>
+          Proposals
+        </Link>
+      </BreadCrumb>
+      {pageTitle || 'Untitled'}
+    </PageTitle>
+  );
+}
+
 function BountyPageTitle ({ basePath }: { basePath: string }) {
   const [pageTitle] = usePageTitle();
   return (
@@ -130,7 +145,7 @@ function BountyPageTitle ({ basePath }: { basePath: string }) {
           Bounties
         </Link>
       </BreadCrumb>
-      {pageTitle}
+      {pageTitle || 'Untitled'}
     </PageTitle>
   );
 }
@@ -185,15 +200,18 @@ function EmptyPageTitle () {
   return <div></div>;
 }
 
-export default function PageTitleWithBreadcrumbs ({ pageId }: { pageId?: string }) {
+export default function PageTitleWithBreadcrumbs ({ pageId, pageType }: { pageId?: string, pageType?: PageType }) {
   const router = useRouter();
   const [space] = useCurrentSpace();
 
   if (router.route === '/share/[...pageId]' && router.query?.pageId?.[1] === 'bounties') {
     return <PublicBountyPageTitle />;
   }
-  else if (router.route === '/[domain]/bounties/[bountyId]') {
+  else if (pageType === 'bounty') {
     return <BountyPageTitle basePath={`/${router.query.domain}`} />;
+  }
+  else if (pageType === 'proposal') {
+    return <ProposalPageTitle basePath={`/${router.query.domain}`} />;
   }
   else if (router.route === '/[domain]/[pageId]') {
     return <DocumentPageTitle basePath={`/${space?.domain}`} pageId={pageId} />;
