@@ -73,7 +73,7 @@ function SafeMenuItem ({
   label: string;
   bounty: BountyWithDetails;
   onClick: () => void;
-  onError: (err: string, severity?: string) => void;
+  onError: (err: string, severity?: AlertColor) => void;
 }) {
   const { onPaymentSuccess, transactions } = useMultiBountyPayment({ bounties: [bounty] });
   const { makePayment } = useGnosisPayment({
