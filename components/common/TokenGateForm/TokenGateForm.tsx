@@ -28,7 +28,7 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
   const { account } = useWeb3React();
   const { showMessage } = useSnackbar();
   const [spaces, setSpaces] = useSpaces();
-  const { user, setUser } = useUser();
+  const { user, setUser, loginFromWeb3Account } = useUser();
   const { walletAuthSignature } = useWeb3AuthSig();
 
   const [tokenGates, setTokenGates] = useState<TokenGateWithRoles[] | null>(null);
@@ -65,6 +65,10 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
     setTokenGateResult(null);
     setIsVerifyingGates(true);
 
+    if (!user) {
+      await loginFromWeb3Account();
+    }
+
     try {
       const verifyResult = await charmClient.evalueTokenGateEligibility({
         authSig,
@@ -84,19 +88,6 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
 
   async function onSubmit () {
     setJoiningSpace(true);
-
-    if (!user || !user.addresses.some(a => a === account)) {
-      try {
-        // Refresh the user account. This was required as otherwise the user would not be able to see the first page upon joining the space
-        const refreshedProfile = await charmClient.login({ address: account as string, walletSignature: walletAuthSignature as AuthSig });
-
-        setUser(refreshedProfile);
-      }
-      catch (err) {
-        const newProfile = await charmClient.login({ address: account as string, walletSignature: walletAuthSignature as AuthSig });
-        setUser(newProfile);
-      }
-    }
 
     try {
       await charmClient.verifyTokenGate({
