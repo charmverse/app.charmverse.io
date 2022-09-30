@@ -148,7 +148,7 @@ describe('getAccessiblePages', () => {
 
   });
 
-  it.only('Should return a page based on search', async () => {
+  it('Should return a page based on search', async () => {
 
     const { user: adminUser, space } = await generateUserAndSpaceWithApiToken(undefined, true);
 
