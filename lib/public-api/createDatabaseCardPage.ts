@@ -3,6 +3,7 @@ import { prisma } from 'db';
 import { v4, validate } from 'uuid';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { getPagePath } from 'lib/pages/utils';
+import { createPage } from 'lib/pages/server/createPage';
 import { DatabasePageNotFoundError } from './errors';
 import type { PageProperty } from './interfaces';
 import { PageFromBlock } from './pageFromBlock.class';
@@ -11,7 +12,7 @@ export async function createDatabase (boardInfo: Record<keyof Pick<Page, 'title'
 
   const boardId = v4();
 
-  const database = await prisma.page.create({
+  const database = await createPage({
     data: {
       id: boardId,
       title: 'Example title',
@@ -112,7 +113,7 @@ export async function createDatabaseCardPage (pageInfo: Record<keyof Pick<Page, 
     }
   });
 
-  await prisma.page.create({
+  await createPage({
     data: {
       author: {
         connect: {
@@ -128,6 +129,7 @@ export async function createDatabaseCardPage (pageInfo: Record<keyof Pick<Page, 
         }
       },
       content: { type: 'doc', content: [] },
+      hasContent: false,
       contentText: '',
       path: getPagePath(),
       type: 'card',

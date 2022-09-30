@@ -1,6 +1,5 @@
 
 import { Page } from '@prisma/client'
-import charmClient from 'charmClient'
 import DocumentPage from 'components/[pageId]/DocumentPage'
 import { usePages } from 'hooks/usePages'
 import log from 'lib/log'
@@ -8,6 +7,7 @@ import debouncePromise from 'lib/utilities/debouncePromise'
 import { useCallback, useEffect, useRef } from 'react'
 import { Card } from '../../blocks/card'
 import { findParentOfType } from 'lib/pages/findParentOfType';
+import { PageUpdates } from 'lib/pages'
 
 type Props = {
     card: Card
@@ -26,14 +26,10 @@ function CardDetail (props: Props): JSX.Element|null {
     };
   }, []);
 
-  const { pages, setPages } = usePages();
+  const { pages, updatePage } = usePages();
 
-  const debouncedPageUpdate = debouncePromise(async (updates: Partial<Page>) => {
-    const updatedPage = await charmClient.updatePage(updates);
-    setPages((_pages) => ({
-      ..._pages,
-      [card.id]: updatedPage
-    }));
+  const debouncedPageUpdate = debouncePromise(async (updates: PageUpdates) => {
+    const updatedPage = await updatePage(updates);
     return updatedPage;
   }, 500);
 

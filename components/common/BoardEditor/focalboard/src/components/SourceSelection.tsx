@@ -1,16 +1,13 @@
-import { Box, Collapse, Divider, IconButton, ListItemIcon, MenuItem, Stack, Typography } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { Box, Collapse, IconButton, ListItemIcon, MenuItem, Stack, Typography } from '@mui/material';
+import { useState } from 'react';
 import Button from 'components/common/Button';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import { Page } from '@prisma/client';
 import styled from '@emotion/styled';
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { usePages } from 'hooks/usePages';
 import PagesList from 'components/common/CharmEditor/components/PageList';
 import { isTruthy } from 'lib/utilities/types';
-import { useRouter } from 'next/router';
 
 type SidebarState = 'select-source' | null;
 
