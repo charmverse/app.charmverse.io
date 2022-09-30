@@ -143,13 +143,13 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   }
 
   if (isLoading) {
-    return <h1>LOADING</h1>;
+    return null;
   }
   return (
     <span>
       {authorized
         ? children
-        : <h1>BANNED</h1>}
+        : null}
     </span>
   );
 }
