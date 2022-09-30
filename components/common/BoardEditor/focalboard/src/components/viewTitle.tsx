@@ -9,12 +9,12 @@ import { Board } from '../blocks/board';
 import mutator from '../mutator';
 import Button from '../widgets/buttons/button';
 import Editable from '../widgets/editable';
-import EmojiIcon from '../widgets/icons/emoji';
-import HideIcon from '../widgets/icons/hide';
-import ShowIcon from '../widgets/icons/show';
 import BlockIconSelector from './blockIconSelector';
 import dynamic from 'next/dynamic';
 import styled from '@emotion/styled';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
+import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
 
 const CharmEditor = dynamic(() => import('components/common/CharmEditor'), {
   ssr: false
@@ -86,7 +86,14 @@ function ViewTitle(props: Props) {
               onClick={() => {
                 props.setPage({ icon: onAddRandomIcon() });
               }}
-              icon={<EmojiIcon />}
+              icon={
+                <EmojiEmotionsOutlinedIcon
+                  fontSize='small'
+                  sx={{
+                    mr: 1
+                  }}
+                />
+              }
             >
               <FormattedMessage
                 id='TableComponent.add-icon'
@@ -98,7 +105,9 @@ function ViewTitle(props: Props) {
           && (
             <Button
               onClick={onHideDescription}
-              icon={<HideIcon />}
+              icon={<VisibilityOffOutlinedIcon sx={{
+                mr: 1
+              }}/>}
             >
               <FormattedMessage
                 id='ViewTitle.hide-description'
@@ -110,7 +119,9 @@ function ViewTitle(props: Props) {
           && (
             <Button
               onClick={onShowDescription}
-              icon={<ShowIcon />}
+              icon={<VisibilityOutlinedIcon sx={{
+                mr: 1
+              }}/>}
             >
               <FormattedMessage
                 id='ViewTitle.show-description'

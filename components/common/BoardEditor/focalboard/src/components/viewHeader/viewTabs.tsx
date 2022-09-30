@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import DuplicateIcon from '@mui/icons-material/ContentCopy';
-import DeleteIcon from '@mui/icons-material/DeleteOutlined';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import EditIcon from '@mui/icons-material/Edit';
 import TuneIcon from '@mui/icons-material/Tune';
 import Divider from '@mui/material/Divider';
@@ -243,7 +243,7 @@ function ViewTabs ({ onDeleteView, openViewOptions, maxTabsShown, onViewTabClick
         </MenuItem>
         {views.length !== 1 && (
         <MenuItem dense onClick={handleDeleteView}>
-          <ListItemIcon><DeleteIcon /></ListItemIcon>
+          <ListItemIcon><DeleteOutlineIcon fontSize='small' /></ListItemIcon>
           <ListItemText>{deleteViewText}</ListItemText>
         </MenuItem>
         )}

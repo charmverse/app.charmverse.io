@@ -6,10 +6,11 @@ import { useBounties } from 'hooks/useBounties';
 import type { ApplicationWithTransactions } from 'lib/applications/actions';
 import { eToNumber } from 'lib/utilities/numbers';
 import { useSnackbar } from 'hooks/useSnackbar';
+import type { BountyWithDetails } from 'lib/bounties';
 import BountyPaymentButton from './BountyPaymentButton';
 
 interface Props {
-  bounty: Bounty;
+  bounty: BountyWithDetails;
   submission: ApplicationWithTransactions;
   isExpanded: boolean;
   expandRow: () => void;
@@ -53,6 +54,7 @@ export default function BountyApplicantActions ({ bounty, isExpanded, submission
               amount={eToNumber(bounty.rewardAmount)}
               tokenSymbolOrAddress={bounty.rewardToken}
               chainIdToUse={bounty.chainId}
+              bounty={bounty}
             />
           )}
           {!submission.walletAddress && (
