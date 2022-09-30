@@ -25,7 +25,7 @@ async function updatePageHasContent () {
 
   for (let page of pagesToUpdate) {
     try {
-      const imageFile = getImageFromBinary(page.createdBy, page.galleryImage);
+      const imageFile = getImageFromBinary(page.galleryImage);
       const pathInS3 = getUserS3FilePath({ userId: page.createdBy, url: imageFile.path });
       const { fileUrl } = await uploadFileToS3({ pathInS3, content: imageFile.content });
 
@@ -37,7 +37,7 @@ async function updatePageHasContent () {
       console.log(`🔥 Updated gallery image: ${fileUrl}`);
     }
     catch (e) {
-      const imageFile = getImageFromBinary(page.createdBy, page.galleryImage);
+      const imageFile = getImageFromBinary(page.galleryImage);
       const pathInS3 = getUserS3FilePath({ userId: page.createdBy, url: imageFile.path });
       console.error('Could not upload or set gallery image:', { imageFile, pathInS3 });
       throw e;
@@ -45,10 +45,10 @@ async function updatePageHasContent () {
   }
 }
 
-function getImageFromBinary (userId: string, imageSource: string) {
+function getImageFromBinary (imageSource: string) {
 
   const fileExtension = imageSource.split('image/')[1].split(';')[0];
-  const fileName = getUserS3FilePath({ userId, url: `${uuid()}.${fileExtension}` });
+  const fileName = `${uuid()}.${fileExtension}`;
 
   const rawFileContent = imageSource.split(';base64,')[1];
 
