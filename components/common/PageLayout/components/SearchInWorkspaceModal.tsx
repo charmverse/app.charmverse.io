@@ -104,7 +104,6 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
   const { pages } = usePages();
   const [space] = useCurrentSpace();
   const [isSearching, setIsSearching] = useState(false);
-  const [value, setValue] = useState<SearchResultItem | null>(null);
   const [inputValue, setInputValue] = useState('');
   const [options, setOptions] = useState<SearchResultItem[]>([]);
 
@@ -117,7 +116,7 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
     }
 
     if (inputValue.replace(/\s/, '') === '') {
-      setOptions(value ? [value] : []);
+      setOptions([]);
       return undefined;
     }
 
@@ -139,7 +138,7 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
     return () => {
       throttledSearch.cancel();
     };
-  }, [value, !!space, inputValue]);
+  }, [!!space, inputValue]);
 
   return (
     <Modal
