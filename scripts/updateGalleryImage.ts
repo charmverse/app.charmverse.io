@@ -19,16 +19,13 @@ async function updatePageHasContent () {
     }
   });
 
-  console.log(pages)
-
   const pagesToUpdate = pages.filter(p => p.galleryImage?.includes('data:image')) as { createdBy: string, id: string, galleryImage: string }[];
 
   console.log('🔥 Count of pages to update:', pagesToUpdate.length, 'of', pages.length);
 
   for (let page of pagesToUpdate) {
     try {
-      const imageSource = page.galleryImage;
-      const imageFile = getImageFromBinary(page.createdBy, imageSource);
+      const imageFile = getImageFromBinary(page.createdBy, page.galleryImage);
       const pathInS3 = getUserS3FilePath({ userId: page.createdBy, url: imageFile.path });
       const { fileUrl } = await uploadFileToS3({ pathInS3, content: imageFile.content });
 
@@ -40,7 +37,9 @@ async function updatePageHasContent () {
       console.log(`🔥 Updated gallery image: ${fileUrl}`);
     }
     catch (e) {
-      console.error('Could not upload or set gallery image:', page);
+      const imageFile = getImageFromBinary(page.createdBy, page.galleryImage);
+      const pathInS3 = getUserS3FilePath({ userId: page.createdBy, url: imageFile.path });
+      console.error('Could not upload or set gallery image:', { imageFile, pathInS3 });
       throw e;
     }
   }

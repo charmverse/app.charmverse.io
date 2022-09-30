@@ -51,7 +51,10 @@ export async function uploadUrlToS3 ({ pathInS3, url }: { pathInS3: string, url:
 }
 
 function generateFilename (url: string) {
-  return decodeURIComponent(new URL(url).pathname.split('/').pop() || '')?.replace(/\+/g, '_').replace(/\s/g, '-') || uuid();
+  // strip out url base
+  const filename = url.includes('http') ? decodeURIComponent(new URL(url).pathname.split('/').pop() || '') : url;
+  const sanitized = filename.replace(/\+/g, '_').replace(/\s/g, '-');
+  return sanitized || uuid();
 }
 
 export function getFilePath ({ spaceId, url }: { spaceId: string, url: string }) {
