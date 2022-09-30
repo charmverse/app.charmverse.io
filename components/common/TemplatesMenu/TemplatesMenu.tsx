@@ -94,14 +94,13 @@ export function TemplatesMenu ({
 }
       {
     enableNewTemplates && (
-      <>
-        <Divider />
-        <MenuItem dense sx={{ color: `${theme.palette.primary.main} !important` }} onClick={createTemplate}>
+      [
+        <Divider key='templates-menu-divider' />,
+        <MenuItem key='templates-menu-new-item' dense sx={{ color: `${theme.palette.primary.main} !important` }} onClick={createTemplate}>
           <AddIcon />
           <ListItemText>New template</ListItemText>
         </MenuItem>
-      </>
-
+      ]
     )
   }
     </Menu>
