@@ -31,7 +31,7 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
   const { showMessage } = useSnackbar();
   const [spaces, setSpaces] = useSpaces();
   const { user, setUser } = useUser();
-  const { walletAuthSignature } = useWeb3AuthSig();
+  const { walletAuthSignature, sign } = useWeb3AuthSig();
 
   const [tokenGates, setTokenGates] = useState<TokenGateWithRoles[] | null>(null);
 
@@ -62,14 +62,14 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
     }
   }, [spaceDomain]);
 
-  async function evaluateEligibility () {
+  async function evaluateEligibility (authSig: AuthSig) {
     // Reset the current state
     setTokenGateResult(null);
     setIsVerifyingGates(true);
 
     try {
       const verifyResult = await charmClient.evalueTokenGateEligibility({
-        authSig: walletAuthSignature as AuthSig,
+        authSig,
         spaceIdOrDomain: spaceDomain
       });
       setTokenGateResult(verifyResult);
