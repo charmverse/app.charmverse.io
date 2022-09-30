@@ -12,6 +12,7 @@ import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import { convertJsonPagesToPrisma } from 'lib/pages/server/convertJsonPagesToPrisma';
 import path from 'node:path';
 import { generateDefaultCategoriesInput } from 'lib/proposal/generateDefaultCategoriesInput';
+import { createPage } from 'lib/pages/server/createPage';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -61,7 +62,7 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
 
   await prisma.$transaction([
     ...seedPagesTransactionInput.blocksToCreate.map(input => prisma.block.create({ data: input })),
-    ...seedPagesTransactionInput.pagesToCreate.map(input => prisma.page.create({ data: input })),
+    ...seedPagesTransactionInput.pagesToCreate.map(input => createPage({ data: input })),
     ...defaultCategories.map(input => prisma.proposalCategory.create({ data: input }))
   ]);
 

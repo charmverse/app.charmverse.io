@@ -23,6 +23,7 @@ import NewCardButton from './newCardButton';
 import ViewHeaderActionsMenu from './viewHeaderActionsMenu';
 import ViewHeaderDisplayByMenu from './viewHeaderDisplayByMenu';
 import ViewHeaderSortMenu from './viewHeaderSortMenu';
+import { PageMeta } from 'lib/pages';
 
 type Props = {
   activeBoard?: Board
@@ -68,7 +69,7 @@ const ViewHeader = (props: Props) => {
     const [blocks] = await mutator.duplicateCard({
       board: props.activeBoard as Board,
       cardId: pageId,
-      cardPage: pages[pageId] as Page
+      cardPage: pages[pageId] as PageMeta
     });
     const newPageId = blocks[0].id;
     await refreshPage(newPageId);

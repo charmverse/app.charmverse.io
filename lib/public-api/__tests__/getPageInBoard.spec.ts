@@ -5,6 +5,7 @@ import { ExpectedAnError } from 'testing/errors';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { InvalidInputError } from 'lib/utilities/errors';
+import { createPage } from 'lib/pages/server/createPage';
 import { createDatabase, createDatabaseCardPage } from '../createDatabaseCardPage';
 import { DatabasePageNotFoundError, PageNotFoundError } from '../errors';
 import { getDatabaseRoot, getPageInBoard } from '../getPageInBoard';
@@ -107,7 +108,7 @@ describe('getPageInBoard', () => {
 
   it('should throw a page not found error when the page does not have the board type', async () => {
 
-    const page = await prisma.page.create({
+    const page = await createPage({
       data: {
         title: 'Example title',
         contentText: '',

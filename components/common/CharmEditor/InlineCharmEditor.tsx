@@ -19,12 +19,12 @@ import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor
 import type { PageContent } from 'models';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import * as floatingMenu from './components/floatingMenu';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
 import Mention, { mentionPlugins, mentionSpecs, MentionSuggest, mentionPluginKeyName } from './components/mention';
 import * as tabIndent from './components/tabIndent';
 import Placeholder from './components/Placeholder';
-import { checkForEmpty } from './utils';
 import { userDataPlugin } from './components/charm/charm.plugins';
 
 export interface ICharmEditorOutput {
@@ -146,7 +146,7 @@ export default function CharmEditor (
   const [currentSpace] = useCurrentSpace();
   const { user } = useUser();
 
-  const _isEmpty = !content || checkForEmpty(content);
+  const _isEmpty = !content || checkIsContentEmpty(content);
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
 
   const onContentChangeDebounced = onContentChange ? debounce((view: EditorView) => {
@@ -156,7 +156,7 @@ export default function CharmEditor (
   }, 100) : undefined;
 
   function _onContentChange (view: EditorView) {
-    setIsEmpty(checkForEmpty(view.state.doc.toJSON() as PageContent));
+    setIsEmpty(checkIsContentEmpty(view.state.doc.toJSON() as PageContent));
     // @ts-ignore missing types from the @bangle.dev/react package
     if (onContentChangeDebounced) {
       onContentChangeDebounced(view);

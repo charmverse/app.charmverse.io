@@ -50,6 +50,14 @@ const cardsSlice = createSlice({
           state.cards[card.id] = card;
         }
       }
+    },
+    updateCard: (state, { payload }: PayloadAction<Partial<Card>>) => {
+      if (payload.id) {
+        const card = state.cards[payload.id];
+        if (card) {
+          state.cards[payload.id] = { ...card, ...payload }
+        }
+      }
     }
   },
   extraReducers: (builder) => {
@@ -95,7 +103,7 @@ const cardsSlice = createSlice({
   }
 });
 
-export const { updateCards, addCard, addTemplate, setCurrent } = cardsSlice.actions;
+export const { updateCards, updateCard, addCard, addTemplate, setCurrent } = cardsSlice.actions;
 export const { reducer } = cardsSlice;
 
 export const getCards = (state: RootState): {[key: string]: Card} => state.cards.cards;

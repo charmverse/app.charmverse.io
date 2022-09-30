@@ -23,7 +23,7 @@ export default function PageDialogGlobal () {
 
   useEffect(() => {
     if (pageIdToFetch) {
-      charmClient.getPage(pageIdToFetch)
+      charmClient.pages.getPage(pageIdToFetch)
         .then(_page => {
           setPage(_page);
         })

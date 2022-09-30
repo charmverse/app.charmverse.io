@@ -2,7 +2,6 @@ import styled from '@emotion/styled';
 import DuplicateIcon from '@mui/icons-material/ContentCopy';
 import { Box } from '@mui/material';
 import { BountyStatusChip } from 'components/bounties/components/BountyStatusBadge';
-import { checkForEmpty } from 'components/common/CharmEditor/utils';
 import { useRouter } from 'next/router';
 import Link from '@mui/material/Link';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
@@ -197,7 +196,7 @@ const KanbanCard = React.memo((props: Props) => {
 
           <div className='octo-icontitle'>
             <div>
-              {cardPage?.icon ? <PageIcon isEditorEmpty={checkForEmpty(cardPage?.content as PageContent)} pageType='page' icon={cardPage.icon} /> : undefined}
+              {cardPage?.icon ? <PageIcon isEditorEmpty={!cardPage.hasContent} pageType='page' icon={cardPage.icon} /> : undefined}
             </div>
             <div
               key='__title'
