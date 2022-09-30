@@ -139,7 +139,7 @@ export default function PageDialog (props: Props) {
               )}
               <ListItemButton
                 onClick={() => {
-                  Utils.copyTextToClipboard(window.location.href);
+                  Utils.copyTextToClipboard(window.location.origin + fullPageUrl);
                   showMessage('Copied card link to clipboard', 'success');
                 }}
               >

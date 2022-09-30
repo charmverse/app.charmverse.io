@@ -5,18 +5,18 @@ import { useUser } from 'hooks/useUser';
 export default function NotificationsBadge ({ children }: { children: JSX.Element }) {
 
   const { user } = useUser();
-  const { tasks } = useTasks();
+  const { tasks, gnosisTasks } = useTasks();
 
   const userNotificationState = user?.notificationState;
 
-  const voteTasks = tasks?.votes.length ?? 0;
-  const mentionTasks = tasks?.mentioned.unmarked.length ?? 0;
+  const voteTasksCount = tasks?.votes.length ?? 0;
+  const mentionTasksCount = tasks?.mentioned.unmarked.length ?? 0;
   // If the user has snoozed multisig tasks don't count them
   const excludeGnosisTasks = userNotificationState?.snoozedUntil && new Date(userNotificationState.snoozedUntil) > new Date();
-  const gnosisTasks = excludeGnosisTasks ? 0 : tasks?.gnosis.length ?? 0;
-  const proposalTasks = tasks?.proposals.unmarked.length ?? 0;
+  const gnosisTasksCount = excludeGnosisTasks ? 0 : gnosisTasks?.length ?? 0;
+  const proposalTasksCount = tasks?.proposals.unmarked.length ?? 0;
 
-  const totalTasks = voteTasks + mentionTasks + gnosisTasks + proposalTasks;
+  const totalTasks = voteTasksCount + mentionTasksCount + gnosisTasksCount + proposalTasksCount;
 
   return (
     <Badge

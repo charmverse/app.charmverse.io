@@ -2,7 +2,7 @@ import type { Page } from '@prisma/client';
 import { prisma } from 'db';
 import { v4, validate } from 'uuid';
 import { InvalidInputError } from 'lib/utilities/errors';
-import { getPagePath } from 'lib/pages';
+import { getPagePath } from 'lib/pages/utils';
 import { DatabasePageNotFoundError } from './errors';
 import type { PageProperty } from './interfaces';
 import { PageFromBlock } from './pageFromBlock.class';

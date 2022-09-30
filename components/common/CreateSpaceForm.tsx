@@ -155,10 +155,13 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
             fullWidth
             error={!!errors.domain}
             helperText={errors.domain?.message}
+            inputProps={{
+              'data-test': 'workspace-domain-input'
+            }}
           />
         </Grid>
         <Grid item sx={{ display: 'flex', justifyContent: 'center' }}>
-          <PrimaryButton disabled={!watchName || !watchDomain} type='submit'>
+          <PrimaryButton disabled={!watchName || !watchDomain} type='submit' data-test='create-workspace'>
             {submitText || 'Create Workspace'}
           </PrimaryButton>
         </Grid>

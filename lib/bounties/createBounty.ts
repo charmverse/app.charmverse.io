@@ -4,7 +4,7 @@ import { getBountyPagePermissionSet } from 'lib/bounties/shared';
 import { setBountyPermissions } from 'lib/permissions/bounties';
 import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
 import { v4 } from 'uuid';
-import { getPagePath } from 'lib/pages';
+import { getPagePath } from 'lib/pages/utils';
 import { NotFoundError } from 'lib/middleware';
 import { getBountyOrThrow } from './getBounty';
 import type { BountyCreationData } from './interfaces';
