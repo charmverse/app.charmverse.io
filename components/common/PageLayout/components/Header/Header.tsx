@@ -155,12 +155,15 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
         <ListItemText primary='View polls' />
       </ListItemButton>
       {basePage && (
-        <ListItemButton>
-          <PublishToSnapshot
-            pageId={basePage.id}
-            renderContent={({ label, onClick }) => <ListItemText primary={label} onClick={onClick} />}
-          />
-        </ListItemButton>
+        <PublishToSnapshot
+          pageId={basePage.id}
+          renderContent={({ label, onClick, icon }) => (
+            <ListItemButton onClick={onClick}>
+              {icon}
+              <ListItemText primary={label} />
+            </ListItemButton>
+          )}
+        />
       )}
       <Divider />
       <ListItemButton onClick={() => {
