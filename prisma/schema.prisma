@@ -1,7 +1,7 @@
 generator client {
   provider        = "prisma-client-js"
   binaryTargets   = ["linux-musl", "darwin", "native"]
-  previewFeatures = ["interactiveTransactions"]
+  previewFeatures = ["interactiveTransactions", "fullTextSearch"]
 }
 
 datasource db {
@@ -216,7 +216,7 @@ model Page {
   title              String
   content            Json?
   contentText        String
-  galleryImage         String?
+  galleryImage       String?
   hasContent         Boolean          @default(false)
   headerImage        String?
   icon               String?
@@ -247,22 +247,22 @@ model Page {
 }
 
 model Block {
-  id                 String    @id @db.Uuid
-  deletedAt          DateTime?
-  createdAt          DateTime  @default(now())
-  createdBy          String    @db.Uuid
-  updatedAt          DateTime  @default(now())
-  updatedBy          String    @db.Uuid
-  spaceId            String    @db.Uuid
-  parentId           String
-  rootId             String    @db.Uuid
-  schema             Int
-  type               String
-  title              String
-  fields             Json
-  user               User      @relation(fields: [createdBy], references: [id])
-  space              Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  page               Page?
+  id        String    @id @db.Uuid
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  createdBy String    @db.Uuid
+  updatedAt DateTime  @default(now())
+  updatedBy String    @db.Uuid
+  spaceId   String    @db.Uuid
+  parentId  String
+  rootId    String    @db.Uuid
+  schema    Int
+  type      String
+  title     String
+  fields    Json
+  user      User      @relation(fields: [createdBy], references: [id])
+  space     Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  page      Page?
 }
 
 model UserVote {

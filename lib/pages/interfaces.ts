@@ -22,14 +22,6 @@ export interface PageLink {
   url: string;
 }
 
-export interface PagesRequest {
-  spaceId: string;
-  userId?: string;
-  archived?: boolean;
-  pageIds?: string[];
-  meta?: boolean;
-}
-
 export interface PublicPageResponse {
   page: Page;
   boardPages: Page[];
