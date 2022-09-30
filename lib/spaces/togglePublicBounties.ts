@@ -1,9 +1,9 @@
 import type { Prisma, Space } from '@prisma/client';
 import { prisma } from 'db';
-import { v4, validate } from 'uuid';
-import { multiResolvePageTree } from 'lib/pages/server/resolvePageTree';
 import type { PageNodeWithChildren, PageNodeWithPermissions } from 'lib/pages';
-import { hasSameOrMorePermissions, IPagePermissionWithSource } from 'lib/permissions/pages';
+import { multiResolvePageTree } from 'lib/pages/server/resolvePageTree';
+import { hasSameOrMorePermissions } from 'lib/permissions/pages';
+import { v4, validate } from 'uuid';
 import { DataNotFoundError, InvalidInputError } from '../utilities/errors';
 import type { PublicBountyToggle } from './interfaces';
 
@@ -138,8 +138,8 @@ export async function togglePublicBounties ({ spaceId, publicBountyBoard }: Publ
   }
 
   try {
-    const spaceAfterUpdate = await prisma.$transaction(async () => {
-      const updatedSpace = await prisma.space.update({
+    const spaceAfterUpdate = await prisma.$transaction(async (tx) => {
+      const updatedSpace = await tx.space.update({
         where: { id: spaceId },
         data: {
           publicBountyBoard
@@ -151,18 +151,18 @@ export async function togglePublicBounties ({ spaceId, publicBountyBoard }: Publ
         const [deleteArgs, createArgs, childCreateArgs] = await generatePublicBountyPermissionArgs({ publicBountyBoard, spaceId });
 
         if (deleteArgs) {
-          await prisma.pagePermission.deleteMany(deleteArgs);
+          await tx.pagePermission.deleteMany(deleteArgs);
         }
 
-        await prisma.pagePermission.createMany(createArgs);
+        await tx.pagePermission.createMany(createArgs);
 
-        await prisma.pagePermission.createMany(childCreateArgs);
+        await tx.pagePermission.createMany(childCreateArgs);
       }
       else {
         const [deleteArgs] = await generatePublicBountyPermissionArgs({ publicBountyBoard, spaceId });
 
         if (deleteArgs) {
-          await prisma.pagePermission.deleteMany(deleteArgs);
+          await tx.pagePermission.deleteMany(deleteArgs);
         }
       }
 

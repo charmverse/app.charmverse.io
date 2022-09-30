@@ -20,10 +20,10 @@ export async function updateProposal ({
     throw new InvalidStateError('Proposal must have at least 1 author');
   }
 
-  await prisma.$transaction(async () => {
+  await prisma.$transaction(async (tx) => {
     // Update category only when it is present in request payload
     if (categoryId !== undefined) {
-      await prisma.proposal.update({
+      await tx.proposal.update({
         where: {
           id: proposalId
         },
@@ -33,20 +33,20 @@ export async function updateProposal ({
       });
     }
 
-    await prisma.proposalAuthor.deleteMany({
+    await tx.proposalAuthor.deleteMany({
       where: {
         proposalId
       }
     });
-    await prisma.proposalAuthor.createMany({
+    await tx.proposalAuthor.createMany({
       data: authors.map(author => ({ proposalId, userId: author }))
     });
-    await prisma.proposalReviewer.deleteMany({
+    await tx.proposalReviewer.deleteMany({
       where: {
         proposalId
       }
     });
-    await prisma.proposalReviewer.createMany({
+    await tx.proposalReviewer.createMany({
       data: reviewers.map(reviewer => ({
         proposalId,
         userId: reviewer.group === 'user' ? reviewer.id : null,
@@ -56,11 +56,11 @@ export async function updateProposal ({
 
     const [deleteArgs, createArgs] = await generateSyncProposalPermissions({ proposalId });
 
-    await prisma.pagePermission.deleteMany(deleteArgs);
+    await tx.pagePermission.deleteMany(deleteArgs);
 
     // Replicate serial execution of a normal transaction as we must ensure the order of page permission creations for child inheritance
     for (const arg of createArgs) {
-      await prisma.pagePermission.create(arg);
+      await tx.pagePermission.create(arg);
     }
 
   });
