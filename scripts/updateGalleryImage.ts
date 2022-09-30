@@ -8,32 +8,33 @@ import { v4 as uuid } from 'uuid';
 async function updatePageHasContent () {
   const pages = await prisma.page.findMany({
     where: {
-      headerImage: {
+      galleryImage: {
         not: null
       }
     },
     select: {
       createdBy: true,
       id: true,
-      headerImage: true
+      galleryImage: true
     }
   });
 
+  console.log(pages)
 
-  const pagesToUpdate = pages.filter(p => p.headerImage?.includes('data:image')) as { createdBy: string, id: string, headerImage: string }[];
+  const pagesToUpdate = pages.filter(p => p.galleryImage?.includes('data:image')) as { createdBy: string, id: string, galleryImage: string }[];
 
-  console.log('🔥 Count of pages to update:', pagesToUpdate.length);
+  console.log('🔥 Count of pages to update:', pagesToUpdate.length, 'of', pages.length);
 
   for (let page of pagesToUpdate) {
     try {
-      const imageSource = page.headerImage;
+      const imageSource = page.galleryImage;
       const imageFile = getImageFromBinary(page.createdBy, imageSource);
       const pathInS3 = getUserS3FilePath({ userId: page.createdBy, url: imageFile.path });
       const { fileUrl } = await uploadFileToS3({ pathInS3, content: imageFile.content });
 
       await prisma.page.update({
         where: { id: page.id },
-        data:  { headerImage: fileUrl }
+        data:  { galleryImage: fileUrl }
       });
 
       console.log(`🔥 Updated gallery image: ${fileUrl}`);
