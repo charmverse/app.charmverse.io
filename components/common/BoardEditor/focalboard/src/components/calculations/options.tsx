@@ -5,7 +5,8 @@ import { CSSObject } from '@emotion/serialize';
 import { useIntl, IntlShape } from 'react-intl';
 
 import { getSelectBaseStyle } from '../../theme';
-import ChevronUp from '../../widgets/icons/chevronUp';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+
 import { IPropertyTemplate } from '../../blocks/board';
 
 type Option = {
@@ -150,7 +151,7 @@ const styles = {
 const DropdownIndicator: typeof components.DropdownIndicator = (props) => {
   return (
     <components.DropdownIndicator {...props}>
-      <ChevronUp />
+      <ExpandLessIcon fontSize='small' />
     </components.DropdownIndicator>
   );
 };
