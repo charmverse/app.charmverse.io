@@ -6,7 +6,7 @@ import { BackIcon } from 'components/common/Icons/BackIcon';
 import { DocumentPageIcon } from 'components/common/Icons/DocumentPageIcon';
 import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { IPageWithPermissions } from 'lib/pages';
+import type { PageMeta } from 'lib/pages';
 
 const StyledPageTemplateBanner = styled(Box)<{ card?: boolean }>`
 
@@ -20,7 +20,7 @@ const StyledPageTemplateBanner = styled(Box)<{ card?: boolean }>`
   padding: ${({ theme }) => theme.spacing(1.4)};
 `;
 
-export function PageTemplateBanner ({ page, parentPage }: { parentPage?: IPageWithPermissions | null, page: IPageWithPermissions }) {
+export function PageTemplateBanner ({ page, parentPage }: { parentPage?: PageMeta | null, page: PageMeta }) {
   const [space] = useCurrentSpace();
   const theme = useTheme();
 

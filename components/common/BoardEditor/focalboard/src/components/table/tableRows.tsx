@@ -2,7 +2,6 @@ import React from 'react';
 import { useDragLayer } from 'react-dnd';
 import useEfficientDragLayer from 'hooks/useEffecientDragLayer';
 
-import charmClient from 'charmClient';
 import { usePages } from 'hooks/usePages';
 import { PageContent } from 'models';
 import { Card } from '../../blocks/card';
@@ -29,17 +28,11 @@ type Props = {
 
 function TableRows (props: Props): JSX.Element {
   const { board, cards, activeView } = props;
-  const { pages, setPages } = usePages();
+  const { pages, updatePage } = usePages();
 
   const saveTitle = React.useCallback(async (saveType: string, cardId: string, title: string) => {
-    const updatedPage = await charmClient.updatePage({
-      id: cardId,
-      title
-    });
-    setPages((pages) => ({
-      ...pages,
-      [cardId]: updatedPage
-    }));
+    await updatePage({ id: cardId, title });
+
     if (saveType === 'onEnter') {
       const card = cards.find(card => card.id === cardId);
       if (card && cards.length > 0 && cards[cards.length - 1] === card) {
@@ -62,7 +55,7 @@ function TableRows (props: Props): JSX.Element {
             board={board}
             activeView={activeView}
             card={card}
-            content={cardPage?.content as PageContent}
+            hasContent={cardPage?.hasContent}
             isSelected={props.selectedCardIds.includes(card.id)}
             focusOnMount={props.cardIdToFocusOnRender === card.id}
             pageIcon={cardPage.icon}

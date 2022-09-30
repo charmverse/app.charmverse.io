@@ -14,7 +14,7 @@ export default function NewBountyButton () {
   const [currentUserPermissions] = useCurrentSpacePermissions();
   const suggestBounties = currentUserPermissions?.createBounty === false;
   const { setBounties } = useBounties();
-  const { setPages } = usePages();
+  const { mutatePage } = usePages();
   const { showPage } = usePageDialog();
 
   async function onClickCreate () {
@@ -53,7 +53,7 @@ export default function NewBountyButton () {
           }
         });
       }
-      setPages((pages) => ({ ...pages, [createdBounty.page.id]: createdBounty.page }));
+      mutatePage(createdBounty.page);
       setBounties((bounties) => [...bounties, createdBounty]);
       showPage({
         pageId: createdBounty.page.id,

@@ -4,6 +4,7 @@ import type {
   Role, Space, TelegramUser, TokenGate, TokenGateToRole, User, UserDetails, UserGnosisSafe
 } from '@prisma/client';
 import * as http from 'adapters/http';
+import { PagesApi } from 'charmClient/apis/pagesApi';
 import type { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/focalboard/src/blocks/block';
 import type { IUser } from 'components/common/BoardEditor/focalboard/src/user';
 import type { FiatCurrency, IPairQuote } from 'connectors';
@@ -58,6 +59,8 @@ class CharmClient {
   profile = new ProfileApi();
 
   proposals = new ProposalsApi();
+
+  pages = new PagesApi();
 
   tasks = new TasksApi();
 
@@ -155,10 +158,6 @@ class CharmClient {
     return http.GET<Block []>(`/api/blocks/views/${pageId}`);
   }
 
-  getPages (spaceId: string) {
-    return http.GET<IPageWithPermissions[]>(`/api/spaces/${spaceId}/pages`);
-  }
-
   getArchivedPages (spaceId: string) {
     return http.GET<IPageWithPermissions[]>(`/api/spaces/${spaceId}/pages?archived=true`);
   }
@@ -171,10 +170,6 @@ class CharmClient {
     return http.POST<IPageWithPermissions>('/api/pages', pageOpts);
   }
 
-  getPage (pageId: string, spaceId?:string) {
-    return http.GET<IPageWithPermissions>(`/api/pages/${pageId}?spaceId=${spaceId}`);
-  }
-
   archivePage (pageId: string) {
     return http.PUT<ModifyChildPagesResponse>(`/api/pages/${pageId}/archive`, { archive: true });
   }
@@ -185,10 +180,6 @@ class CharmClient {
 
   deletePage (pageId: string) {
     return http.DELETE<ModifyChildPagesResponse>(`/api/pages/${pageId}`);
-  }
-
-  updatePage (pageOpts: Partial<Page>) {
-    return http.PUT<IPageWithPermissions>(`/api/pages/${pageOpts.id}`, pageOpts);
   }
 
   favoritePage (pageId: string) {

@@ -13,37 +13,37 @@ import { getSelectBaseStyle } from '../theme';
 import Menu from './menu';
 import MenuWrapper from './menuWrapper';
 import IconButton from './buttons/iconButton';
-import OptionsIcon from './icons/options';
-import DeleteIcon from './icons/delete';
-import CloseIcon from './icons/close';
+import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import Label from './label';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 
 interface FormatOptionLabelMeta<Option> {
-    context: 'menu' | 'value';
-    inputValue: string;
-    selectValue: Options<Option>;
-  }
+  context: 'menu' | 'value';
+  inputValue: string;
+  selectValue: Options<Option>;
+}
 
 type Props = {
-    options: IPropertyOption[]
-    value?: IPropertyOption | IPropertyOption[]
-    emptyValue: string
-    onCreate: (value: string) => void
-    onChange: (value: string | string[]) => void
-    onChangeColor: (option: IPropertyOption, color: string) => void
-    onDeleteOption: (option: IPropertyOption) => void
-    isMulti?: boolean
-    onDeleteValue?: (value: IPropertyOption) => void
-    onBlur?: () => void
+  options: IPropertyOption[]
+  value?: IPropertyOption | IPropertyOption[]
+  emptyValue: string
+  onCreate: (value: string) => void
+  onChange: (value: string | string[]) => void
+  onChangeColor: (option: IPropertyOption, color: string) => void
+  onDeleteOption: (option: IPropertyOption) => void
+  isMulti?: boolean
+  onDeleteValue?: (value: IPropertyOption) => void
+  onBlur?: () => void
 }
 
 type LabelProps = {
-    option: IPropertyOption
-    meta: FormatOptionLabelMeta<IPropertyOption>
-    onChangeColor: (option: IPropertyOption, color: string) => void
-    onDeleteOption: (option: IPropertyOption) => void
-    onDeleteValue?: (value: IPropertyOption) => void
-    isMulti?: boolean
+  option: IPropertyOption
+  meta: FormatOptionLabelMeta<IPropertyOption>
+  onChangeColor: (option: IPropertyOption, color: string) => void
+  onDeleteOption: (option: IPropertyOption) => void
+  onDeleteValue?: (value: IPropertyOption) => void
+  isMulti?: boolean
 }
 
 const ValueSelectorLabel = React.memo((props: LabelProps): JSX.Element => {
@@ -61,14 +61,14 @@ const ValueSelectorLabel = React.memo((props: LabelProps): JSX.Element => {
       >
         <span className='Label-text'>{option.value}</span>
         {onDeleteValue
-                    && (
-                    <IconButton
-                      onClick={() => onDeleteValue(option)}
-                      icon={<CloseIcon />}
-                      title='Clear'
-                      className='margin-left delete-value'
-                    />
-                    )}
+          && (
+            <IconButton
+              onClick={() => onDeleteValue(option)}
+              icon={<CloseOutlinedIcon fontSize="small" />}
+              title='Clear'
+              className='margin-left delete-value'
+            />
+          )}
       </Label>
     );
   }
@@ -80,12 +80,12 @@ const ValueSelectorLabel = React.memo((props: LabelProps): JSX.Element => {
       <MenuWrapper stopPropagationOnToggle={true}>
         <IconButton
           title={intl.formatMessage({ id: 'ValueSelectorLabel.openMenu', defaultMessage: 'Open menu' })}
-          icon={<OptionsIcon />}
+          icon={<MoreHorizOutlinedIcon fontSize='small' />}
         />
         <Menu position='bottom'>
           <Menu.Text
             id='delete'
-            icon={<DeleteIcon />}
+            icon={<DeleteOutlinedIcon fontSize="small" />}
             name={intl.formatMessage({ id: 'BoardComponent.delete', defaultMessage: 'Delete' })}
             onClick={() => props.onDeleteOption(option)}
           />
@@ -106,7 +106,7 @@ const ValueSelectorLabel = React.memo((props: LabelProps): JSX.Element => {
 
 const valueSelectorStyle = {
   ...getSelectBaseStyle(),
-  option: (provided: CSSObject, state: {isFocused: boolean}): CSSObject => ({
+  option: (provided: CSSObject, state: { isFocused: boolean }): CSSObject => ({
     ...provided,
     background: state.isFocused ? 'rgba(var(--center-channel-color-rgb), 0.1)' : 'rgb(var(--center-channel-bg-rgb))',
     color: state.isFocused ? 'rgb(var(--center-channel-color-rgb))' : 'rgb(var(--center-channel-color-rgb))',
@@ -159,7 +159,7 @@ const valueSelectorStyle = {
   })
 };
 
-function ValueSelector (props: Props): JSX.Element {
+function ValueSelector(props: Props): JSX.Element {
   const intl = useIntl();
   return (
     <CreatableSelect

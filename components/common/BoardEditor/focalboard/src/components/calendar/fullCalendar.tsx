@@ -9,7 +9,6 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 
 import { usePages } from 'hooks/usePages';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
-import { checkForEmpty } from 'components/common/CharmEditor/utils';
 import { PageContent } from 'models';
 import mutator from '../../mutator';
 
@@ -20,6 +19,7 @@ import { DateProperty, createDatePropertyFromString } from '../properties/dateRa
 import Tooltip from '../../widgets/tooltip';
 import PropertyValueElement from '../propertyValueElement';
 import { Constants } from '../../constants';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 
 const oneDay = 60 * 60 * 24 * 1000;
 
@@ -125,7 +125,7 @@ function CalendarFullView (props: Props): JSX.Element|null {
     return (
       <div>
         <div className='octo-icontitle'>
-          <PageIcon isEditorEmpty={checkForEmpty(page?.content as PageContent)} pageType='page' icon={event.extendedProps.icon} />
+          <PageIcon isEditorEmpty={!page?.hasContent} pageType='page' icon={event.extendedProps.icon} />
           <div
             className='fc-event-title'
             key='__title'

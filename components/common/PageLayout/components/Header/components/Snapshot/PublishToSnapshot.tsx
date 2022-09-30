@@ -16,7 +16,7 @@ import PublishingForm from './PublishingForm';
 export default function PublishToSnapshot ({ pageId, renderContent }: {
   renderContent: (props: { onClick?: () => void, label: string }) => ReactNode; pageId: string;
 }) {
-  const { pages, setPages } = usePages();
+  const { pages, mutatePage } = usePages();
   const page = pages[pageId]!;
 
   const [checkingProposal, setCheckingProposal] = useState(!!page.snapshotProposalId);
@@ -34,10 +34,7 @@ export default function PublishToSnapshot ({ pageId, renderContent }: {
 
     if (!snapshotProposal) {
       const pageWithoutSnapshotId = await charmClient.updatePageSnapshotData(page.id, { snapshotProposalId: null });
-      setPages({
-        ...pages,
-        [page.id]: pageWithoutSnapshotId
-      });
+      mutatePage(pageWithoutSnapshotId);
     }
 
     setProposal(snapshotProposal);

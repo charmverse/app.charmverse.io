@@ -7,7 +7,6 @@ import { usePages } from 'hooks/usePages';
 import { mutate } from 'swr';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
-import { checkForEmpty } from 'components/common/CharmEditor/utils';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { Board, IPropertyTemplate } from '../../blocks/board';
 import { Card } from '../../blocks/card';
@@ -18,14 +17,15 @@ import { getCardComments } from '../../store/comments';
 import { useAppSelector } from '../../store/hooks';
 import { Utils } from '../../utils';
 import IconButton from '../../widgets/buttons/iconButton';
-import DeleteIcon from '../../widgets/icons/delete';
-import LinkIcon from '../../widgets/icons/Link';
-import OptionsIcon from '../../widgets/icons/options';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import LinkIcon from '@mui/icons-material/Link';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
 import Tooltip from '../../widgets/tooltip';
 import { sendFlashMessage } from '../flashMessages';
 import PropertyValueElement from '../propertyValueElement';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 
 type Props = {
   board: Board
@@ -42,7 +42,6 @@ type Props = {
 
 const GalleryCard = React.memo((props: Props) => {
   const { card, board } = props;
-
   const { pages, getPagePermissions } = usePages();
   const [space] = useCurrentSpace();
   const intl = useIntl();
@@ -57,31 +56,7 @@ const GalleryCard = React.memo((props: Props) => {
     className += ' dragover';
   }
 
-  let galleryImageUrl: null | string | undefined = cardPage?.headerImage;
-  const cardPageContent = cardPage?.content as PageContent;
-
-  if (cardPageContent && !galleryImageUrl) {
-    if (cardPageContent?.content) {
-      for (let index = 0; index < cardPageContent.content.length; index++) {
-        const item = cardPageContent.content[index];
-        if (item.type === 'paragraph') {
-          const imageNode = item.content?.[0];
-          if (imageNode?.type === 'image') {
-            if (imageNode.attrs?.src) {
-              galleryImageUrl = imageNode.attrs.src;
-              break;
-            }
-          }
-        }
-        else if (item.type === 'image') {
-          if (item.attrs?.src) {
-            galleryImageUrl = item.attrs.src;
-            break;
-          }
-        }
-      }
-    }
-  }
+  const galleryImageUrl: null | string | undefined = cardPage?.headerImage || cardPage?.galleryImage;
 
   const { showMessage } = useSnackbar();
 
@@ -100,11 +75,11 @@ const GalleryCard = React.memo((props: Props) => {
           className='optionsMenu'
           stopPropagationOnToggle={true}
         >
-          <IconButton icon={<OptionsIcon />} />
+          <IconButton icon={<MoreHorizIcon />} />
           <Menu position='left'>
             {pagePermissions.delete && pages[card.id]?.deletedAt === null && (
             <Menu.Text
-              icon={<DeleteIcon />}
+              icon={<DeleteOutlineIcon />}
               id='delete'
               name={intl.formatMessage({ id: 'GalleryCard.delete', defaultMessage: 'Delete' })}
               onClick={() => mutator.deleteBlock(card, 'delete card')}
@@ -163,7 +138,7 @@ const GalleryCard = React.memo((props: Props) => {
       {props.visibleTitle
         && (
         <div className='gallery-title'>
-          {cardPage?.icon ? <PageIcon isEditorEmpty={checkForEmpty(cardPage?.content as PageContent)} pageType='card' icon={cardPage.icon} /> : undefined}
+          {cardPage?.icon ? <PageIcon isEditorEmpty={!cardPage?.hasContent} pageType='card' icon={cardPage.icon} /> : undefined}
           <div key='__title'>
             {cardPage?.title
               || (
@@ -202,3 +177,4 @@ const GalleryCard = React.memo((props: Props) => {
 });
 
 export default GalleryCard;
+

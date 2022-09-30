@@ -5,12 +5,12 @@ import { Board, IPropertyTemplate, PropertyType } from '../../blocks/board';
 import { Constants } from '../../constants';
 import { Card } from '../../blocks/card';
 import { BoardView } from '../../blocks/boardView';
-import SortDownIcon from '../../widgets/icons/sortDown';
-import SortUpIcon from '../../widgets/icons/sortUp';
 import MenuWrapper from '../../widgets/menuWrapper';
 import Label from '../../widgets/label';
 import { useSortable } from '../../hooks/sortable';
 import { Utils } from '../../utils';
+import ArrowDownwardOutlinedIcon from '@mui/icons-material/ArrowDownwardOutlined';
+import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
 
 import HorizontalGrip from './horizontalGrip';
 
@@ -69,8 +69,8 @@ function TableHeader (props: Props): JSX.Element {
           })}
           </div>
           <Typography component='div' variant='subtitle1'>{props.name}</Typography>
-          {props.sorted === 'up' && <SortUpIcon />}
-          {props.sorted === 'down' && <SortDownIcon />}
+          {props.sorted === 'up' && <ArrowUpwardOutlinedIcon />}
+          {props.sorted === 'down' && <ArrowDownwardOutlinedIcon />}
         </Label>
         <TableHeaderMenu
           board={props.board}

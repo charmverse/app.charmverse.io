@@ -10,3 +10,4 @@ export function canReceiveManualPermissionUpdates ({ pageType }: { pageType: Pag
   }
   return true;
 }
+

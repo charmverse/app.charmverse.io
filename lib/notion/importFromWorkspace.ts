@@ -11,6 +11,8 @@ import { createBoardView } from 'lib/focalboard/boardView';
 import { createCard } from 'lib/focalboard/card';
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/image/constants';
 import log from 'lib/log';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
+import { createPage } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
 import { isTruthy } from 'lib/utilities/types';
@@ -562,7 +564,7 @@ async function createPrismaPage ({
   }
 
   // eslint-disable-next-line
-  let page = await prisma.page.create({ data: pageToCreate });
+  let page = await createPage({ data: pageToCreate });
 
   page = await setupPermissionsAfterPageCreated(page.id);
 
