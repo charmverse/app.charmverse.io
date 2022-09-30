@@ -24,7 +24,7 @@ type Props = {
     cards: Card[]
     activeView: BoardView
     views: BoardView[]
-    readonly: boolean
+    readOnly: boolean
     resizingColumn: string;
     offset: number;
     columnRefs: Map<string, React.RefObject<HTMLDivElement>>
@@ -137,7 +137,7 @@ function TableHeaders (props: Props): JSX.Element {
         type='text'
         name='Title'
         sorted={titleSorted}
-        readonly={props.readonly}
+        readOnly={props.readOnly}
         board={board}
         activeView={activeView}
         cards={cards}
@@ -160,7 +160,7 @@ function TableHeaders (props: Props): JSX.Element {
             type={template.type}
             name={template.name}
             sorted={sorted}
-            readonly={props.readonly}
+            readOnly={props.readOnly}
             board={board}
             activeView={activeView}
             cards={cards}
@@ -179,7 +179,7 @@ function TableHeaders (props: Props): JSX.Element {
         style={{ flexGrow: 1, borderRight: '0 none' }}
       >
 
-        {!props.readonly
+        {!props.readOnly
                     && (
                     <MenuWrapper>
                       <Button>

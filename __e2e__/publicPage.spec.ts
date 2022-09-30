@@ -3,7 +3,7 @@ import { chromium, expect, test } from '@playwright/test';
 import type { IPageWithPermissions } from 'lib/pages/interfaces';
 import { prisma } from 'db';
 import type { Page } from '@prisma/client';
-import { createUserAndSpace, baseUrl } from './utilities';
+import { createUserAndSpace, baseUrl } from './utils';
 
 let browser: Browser;
 

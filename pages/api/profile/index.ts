@@ -36,9 +36,8 @@ async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
     logSignupViaWallet();
   }
 
-  const { spaceRoles, ...userData } = user;
-  req.session.user = userData;
-  await updateGuildRolesForUser(userData.addresses, spaceRoles);
+  req.session.user = { id: user.id };
+  await updateGuildRolesForUser(user.addresses, user.spaceRoles);
   await req.session.save();
 
   res.status(200).json(user);
@@ -57,7 +56,7 @@ async function getUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser |
   return res.status(200).json(profile);
 }
 
-async function updateUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | {error: string}>) {
+async function updateUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: string }>) {
 
   const user = await prisma.user.update({
     where: {

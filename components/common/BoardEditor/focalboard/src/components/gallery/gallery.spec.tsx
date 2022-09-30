@@ -52,7 +52,7 @@
 //           board={board}
 //           cards={[card, card2]}
 //           activeView={activeView}
-//           readonly={false}
+//           readOnly={false}
 //           addCard={jest.fn()}
 //           selectedCardIds={[card.id]}
 //           onCardClicked={jest.fn()}
@@ -71,7 +71,7 @@
 //           board={board}
 //           cards={[card, card2]}
 //           activeView={activeView}
-//           readonly={false}
+//           readOnly={false}
 //           addCard={mockAddCard}
 //           selectedCardIds={[card.id]}
 //           onCardClicked={jest.fn()}
@@ -93,7 +93,7 @@
 //           board={board}
 //           cards={[card, card2]}
 //           activeView={activeView}
-//           readonly={true}
+//           readOnly={true}
 //           addCard={jest.fn()}
 //           selectedCardIds={[card.id]}
 //           onCardClicked={jest.fn()}
@@ -109,7 +109,7 @@
 //           board={board}
 //           cards={[card, card2]}
 //           activeView={activeView}
-//           readonly={false}
+//           readOnly={false}
 //           addCard={jest.fn()}
 //           selectedCardIds={[]}
 //           onCardClicked={jest.fn()}

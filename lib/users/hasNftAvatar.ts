@@ -1,9 +1,9 @@
 
 export type CheckAvatar = {
-  avatar?: string | null
+  avatar?: string | null;
   avatarContract?: string | null;
   avatarTokenId?: string | null;
-   avatarChain?: number | null
+   avatarChain?: number | null;
 }
 
 export const hasNftAvatar = (data: CheckAvatar | null) => {

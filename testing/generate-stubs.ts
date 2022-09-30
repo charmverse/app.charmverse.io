@@ -1,7 +1,7 @@
 import type { Page } from '@prisma/client';
 import type { SubmissionContent } from 'lib/applications/interfaces';
 import type { PageNode } from 'lib/pages';
-import { getPagePath } from 'lib/pages';
+import { getPagePath } from 'lib/pages/utils';
 import { v4 } from 'uuid';
 
 export function generatePageToCreateStub ({
@@ -11,7 +11,7 @@ export function generatePageToCreateStub ({
   parentId,
   id = v4(),
   type
-}: {userId: string} & Pick<Page, 'spaceId'> & Partial<Pick<Page, 'title' | 'parentId' | 'id' | 'type'>>): Partial<Page> {
+}: { userId: string } & Pick<Page, 'spaceId'> & Partial<Pick<Page, 'title' | 'parentId' | 'id' | 'type'>>): Partial<Page> {
   return {
     id,
     createdBy: userId,

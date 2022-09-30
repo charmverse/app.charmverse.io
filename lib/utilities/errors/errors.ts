@@ -22,12 +22,12 @@ type ErrorType = keyof typeof ErrorCodes
  * @error used for providing structured JSON or a stack trace
  */
 export interface ISystemError<E = any> {
-  code: number,
-  errorType: ErrorType
-  message: string,
-  errorConstructor: string
-  severity: ErrorSeverity
-  error: E
+  code: number;
+  errorType: ErrorType;
+  message: string;
+  errorConstructor: string;
+  severity: ErrorSeverity;
+  error: E;
 }
 
 export type ISystemErrorInput<E = any> = Pick<ISystemError<E>, 'message' | 'errorType'> & Partial<Pick<ISystemError<E>, 'severity' | 'error'>>

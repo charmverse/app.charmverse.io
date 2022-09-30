@@ -4,9 +4,9 @@ import type { BountyWithDetails, BountyPagePermissionSetRequest } from 'lib/boun
 import { isTruthy } from 'lib/utilities/types';
 
 export function requesterCanDeleteBounty ({ bounty, requesterIsAdmin, requesterCreatedBounty }: {
-  bounty: BountyWithDetails,
-  requesterIsAdmin: boolean,
-  requesterCreatedBounty: boolean
+  bounty: BountyWithDetails;
+  requesterIsAdmin: boolean;
+  requesterCreatedBounty: boolean;
 }): boolean {
 
   if (requesterIsAdmin) {

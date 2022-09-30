@@ -17,7 +17,6 @@ import type { SpacePermissionConfigurationUpdate } from 'lib/permissions/meta/in
 import type { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee, IPagePermissionWithSource, SpaceDefaultPublicPageToggle } from 'lib/permissions/pages/page-permission-interfaces';
 import type { SpacePermissionFlags, SpacePermissionModification } from 'lib/permissions/spaces';
 import type { AggregatedProfileData } from 'lib/profile';
-import type { MarkTask } from 'lib/tasks/markTasks';
 import type { MultipleThreadsInput, ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import type { TokenGateEvaluationAttempt, TokenGateEvaluationResult, TokenGateVerification, TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
@@ -31,8 +30,6 @@ import type { InviteLinkPopulated } from 'pages/api/invites/index';
 import type { PublicUser } from 'pages/api/public/profile/[userId]';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
-import type { GetTasksResponse } from 'pages/api/tasks/list';
-import type { GetTasksStateResponse, UpdateTasksState } from 'pages/api/tasks/state';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 import type { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
 import { BlockchainApi } from './apis/blockchainApi';
@@ -40,6 +37,7 @@ import { BountiesApi } from './apis/bountiesApi';
 import { CollablandApi } from './apis/collablandApi';
 import { ProfileApi } from './apis/profileApi';
 import { ProposalsApi } from './apis/proposalsApi';
+import { TasksApi } from './apis/tasksApi';
 import { VotesApi } from './apis/votesApi';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
@@ -60,6 +58,8 @@ class CharmClient {
   profile = new ProfileApi();
 
   proposals = new ProposalsApi();
+
+  tasks = new TasksApi();
 
   async login (address: string) {
     const user = await http.POST<LoggedInUser>('/api/session/login', {
@@ -236,7 +236,7 @@ class CharmClient {
   }
 
   importFromNotion (payload: { code: string, spaceId: string }) {
-    return http.POST<{failedImports: FailedImportsError[]}>('/api/notion/import', payload);
+    return http.POST<{ failedImports: FailedImportsError[] }>('/api/notion/import', payload);
   }
 
   connectTelegram (telegramAccount: TelegramAccount) {
@@ -260,7 +260,7 @@ class CharmClient {
   }
 
   importRolesFromGuild (payload: ImportGuildRolesPayload) {
-    return http.POST<{importedRolesCount: number}>('/api/guild-xyz/importRoles', payload);
+    return http.POST<{ importedRolesCount: number }>('/api/guild-xyz/importRoles', payload);
   }
 
   async getWorkspaceUsers (spaceId: string): Promise<IUser[]> {
@@ -331,7 +331,7 @@ class CharmClient {
   }
 
   async deleteBlock (blockId: string, updater: BlockUpdater): Promise<void> {
-    const { rootBlock } = await http.DELETE<{deletedCount: number, rootBlock: Block}>(`/api/blocks/${blockId}`);
+    const { rootBlock } = await http.DELETE<{ deletedCount: number, rootBlock: Block }>(`/api/blocks/${blockId}`);
     const fbBlock = this.blockToFBBlock(rootBlock);
     fbBlock.deletedAt = new Date().getTime();
     updater([fbBlock]);
@@ -447,18 +447,6 @@ class CharmClient {
     return http.DELETE(`/api/payment-methods/${paymentMethodId}`);
   }
 
-  getTasksState (): Promise<GetTasksStateResponse> {
-    return http.GET('/api/tasks/state');
-  }
-
-  updateTasksState (payload: UpdateTasksState) {
-    return http.PUT('/api/tasks/state', payload);
-  }
-
-  getTasks (): Promise<GetTasksResponse> {
-    return http.GET('/api/tasks/list');
-  }
-
   createRole (role: Partial<Role>): Promise<Role> {
     return http.POST('/api/roles', role);
   }
@@ -475,11 +463,11 @@ class CharmClient {
     return http.GET('/api/roles', { spaceId });
   }
 
-  assignRole (data: {spaceId: string, roleId: string, userId: string}): Promise<Role []> {
+  assignRole (data: { spaceId: string, roleId: string, userId: string }): Promise<Role []> {
     return http.POST('/api/roles/assignment', data);
   }
 
-  unassignRole (data: {spaceId: string, roleId: string, userId: string}): Promise<Role []> {
+  unassignRole (data: { spaceId: string, roleId: string, userId: string }): Promise<Role []> {
     return http.DELETE('/api/roles/assignment', data);
   }
 
@@ -502,7 +490,7 @@ class CharmClient {
     return http.DELETE('/api/permissions', { permissionId });
   }
 
-  restrictPagePermissions ({ pageId }: {pageId: string}): Promise<IPageWithPermissions> {
+  restrictPagePermissions ({ pageId }: { pageId: string }): Promise<IPageWithPermissions> {
     return http.POST(`/api/pages/${pageId}/restrict-permissions`, {});
   }
 
@@ -531,7 +519,7 @@ class CharmClient {
     });
   }
 
-  computeUserSpacePermissions ({ spaceId }: {spaceId: string}): Promise<SpacePermissionFlags> {
+  computeUserSpacePermissions ({ spaceId }: { spaceId: string }): Promise<SpacePermissionFlags> {
     return http.GET<SpacePermissionFlags>(`/api/permissions/space/${spaceId}/compute`);
   }
 
@@ -571,7 +559,7 @@ class CharmClient {
     return http.PUT(`/api/spaces/${spaceId}/snapshot`, data);
   }
 
-  setDefaultPagePermission ({ spaceId, pagePermissionLevel }:{spaceId: string, pagePermissionLevel: PagePermissionLevel | null}) {
+  setDefaultPagePermission ({ spaceId, pagePermissionLevel }:{ spaceId: string, pagePermissionLevel: PagePermissionLevel | null }) {
     return http.POST<Space>(`/api/spaces/${spaceId}/set-default-page-permissions`, {
       pagePermissionLevel
     });
@@ -593,10 +581,6 @@ class CharmClient {
 
   getBuildId () {
     return http.GET<{ buildId: string }>('/api/build-id');
-  }
-
-  markTasks (tasks: MarkTask[]) {
-    return http.POST('/api/tasks/mark', tasks);
   }
 
   getAggregatedData (userId: string) {

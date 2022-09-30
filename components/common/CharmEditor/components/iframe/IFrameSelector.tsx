@@ -6,10 +6,10 @@ import type { ReactNode } from 'react';
 import { useState } from 'react';
 
 interface IFrameSelectorProps {
-  onIFrameSelect: (videoSrc: string) => void
-  children: ReactNode
-  tabs?: [string, ReactNode][]
-  type: 'embed' | 'video'
+  onIFrameSelect: (videoSrc: string) => void;
+  children: ReactNode;
+  tabs?: [string, ReactNode][];
+  type: 'embed' | 'video';
 }
 
 export default function IFrameSelector (props: IFrameSelectorProps) {

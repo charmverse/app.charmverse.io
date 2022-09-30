@@ -22,9 +22,9 @@ export interface VoteDetailProps {
   vote: ExtendedVote;
   detailed?: boolean;
   isProposal?: boolean;
-  castVote: (voteId: string, choice: string) => Promise<UserVote>
-  deleteVote: (voteId: string) => Promise<void>
-  cancelVote: (voteId: string) => Promise<void>
+  castVote: (voteId: string, choice: string) => Promise<UserVote>;
+  deleteVote: (voteId: string) => Promise<void>;
+  cancelVote: (voteId: string) => Promise<void>;
 }
 
 const StyledDiv = styled.div<{ detailed: boolean }>`

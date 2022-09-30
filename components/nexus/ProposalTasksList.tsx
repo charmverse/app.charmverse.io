@@ -118,16 +118,16 @@ export default function ProposalTasksList ({
   error,
   mutateTasks
 }: {
-  mutateTasks: KeyedMutator<GetTasksResponse>
-  error: any
-  tasks: GetTasksResponse | undefined
+  mutateTasks: KeyedMutator<GetTasksResponse>;
+  error: any;
+  tasks: GetTasksResponse | undefined;
 }) {
   const proposals = tasks?.proposals ? [...tasks.proposals.unmarked, ...tasks.proposals.marked] : [];
 
   useEffect(() => {
     async function main () {
       if (tasks?.proposals && tasks.proposals.unmarked.length !== 0) {
-        await charmClient.markTasks(tasks.proposals.unmarked.map(proposal => ({ id: proposal.id, type: 'proposal' })));
+        await charmClient.tasks.markTasks(tasks.proposals.unmarked.map(proposal => ({ id: proposal.id, type: 'proposal' })));
         mutateTasks((_tasks) => {
           const unmarked = _tasks?.proposals.unmarked ?? [];
           return _tasks ? {

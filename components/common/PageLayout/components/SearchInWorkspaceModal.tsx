@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import { Box, Typography } from '@mui/material';
+import { ListItem, Typography } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
@@ -9,7 +9,6 @@ import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import { Modal, DialogTitle, ModalPosition } from 'components/common/Modal';
 import Popper from '@mui/material/Popper';
-import Link from 'components/common/Link';
 import { useBounties } from 'hooks/useBounties';
 import { usePages } from 'hooks/usePages';
 import { useRouter } from 'next/router';
@@ -27,7 +26,8 @@ const StyledPopper = styled(Popper)`
   }
 `;
 
-const StyledLink = styled(Link)`
+const StyledListItem = styled(ListItem)`
+  &.MuiAutocomplete-option {
     padding-left: 0px;
     padding-right: ${({ theme }) => theme.spacing(2)};
     flex-direction: column;
@@ -40,10 +40,11 @@ const StyledLink = styled(Link)`
     padding-top: 10px;
     padding-bottom: 10px;
     border-bottom: 1px solid ${({ theme }) => theme.palette.gray.main};
-    :hover {
-      background-color: ${({ theme }) => theme.palette.action.hover};
+
+    &:hover, &.Mui-focused {
       color: inherit;
     }
+  }
 `;
 
 const baseLine = css`
@@ -72,11 +73,12 @@ type SearchResultItem = {
     link: string;
     type: ResultType;
     path? :string;
+    id: string;
   };
 
 type SearchInWorkspaceModalProps = {
-    close: () => void,
-    isOpen: boolean,
+    close: () => void;
+    isOpen: boolean;
 };
 
 function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
@@ -106,17 +108,20 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
   };
 
   const pageSearchResultItems: SearchResultItem[] = pageList
+    .filter((page): page is IPageWithPermissions => !!page)
     .map(page => ({
-      name: page?.title || 'Untitled',
-      path: getPagePath(page!),
-      link: `/${router.query.domain}/${page!.path}`,
-      type: ResultType.page
+      name: page.title || 'Untitled',
+      path: getPagePath(page),
+      link: `/${router.query.domain}/${page.path}`,
+      type: ResultType.page,
+      id: page.id
     }));
 
   const bountySearchResultItems: SearchResultItem[] = bounties.map(bounty => ({
     name: bounty.page?.title || '',
     link: `/${router.query.domain}/${bounty.page?.id}`,
-    type: ResultType.bounty
+    type: ResultType.bounty,
+    id: bounty.id
   }));
 
   const searchResultItems: SearchResultItem[] = [
@@ -142,6 +147,7 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
         onInputChange={(_event, newInputValue) => {
           setIsSearching(!!newInputValue);
         }}
+        onChange={(_e, item) => router.push(item.link)}
         getOptionLabel={option => typeof option === 'object' ? option.name : option}
         open={isSearching}
         disablePortal
@@ -159,25 +165,22 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
           }
         }}
         PopperComponent={StyledPopper}
-        renderOption={(_, option: SearchResultItem, { inputValue }) => {
+        renderOption={(listItemProps, option: SearchResultItem, { inputValue }) => {
           const matches = match(option.name, inputValue, { insideWords: true, findAllOccurrences: true });
           const parts = parse(option.name, matches);
 
           return (
-            <Box>
-              <StyledLink
-                href={option.link}
-              >
-                <Stack direction='row' spacing={1}>
-                  {
+            <StyledListItem {...listItemProps} key={option.id}>
+              <Stack direction='row' spacing={1}>
+                {
                     option.type === ResultType.page
                       ? <InsertDriveFileOutlinedIcon fontSize='small' style={{ marginTop: '2px' }} />
                       : <BountyIcon fontSize='small' style={{ marginTop: '2px' }} />
                   }
-                  <Stack>
-                    <StyledTypographyPage>
-                      {
-                        parts.map((part: { text: string; highlight: boolean; }, _index: number) => {
+                <Stack>
+                  <StyledTypographyPage>
+                    {
+                        parts.map((part: { text: string, highlight: boolean }) => {
                           return (
                             <span
                               style={{
@@ -188,12 +191,11 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
                           );
                         })
                       }
-                    </StyledTypographyPage>
-                    {option.path && <StyledTypographyPath>{option.path}</StyledTypographyPath>}
-                  </Stack>
+                  </StyledTypographyPage>
+                  {option.path && <StyledTypographyPath>{option.path}</StyledTypographyPath>}
                 </Stack>
-              </StyledLink>
-            </Box>
+              </Stack>
+            </StyledListItem>
           );
         }}
         renderInput={(params) => (

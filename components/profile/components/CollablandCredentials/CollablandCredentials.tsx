@@ -5,7 +5,7 @@ import Image from 'next/image';
 import collablandLogo from 'public/images/collabland_logo.jpeg';
 import { useCollablandCredentials } from '../../hooks/useCollablandCredentials';
 
-export default function CollablandCredentials ({ error }: { error?: any}) {
+export default function CollablandCredentials ({ error }: { error?: any }) {
 
   const { getCollablandLogin } = useCollablandCredentials();
   const connectUrl = getCollablandLogin();

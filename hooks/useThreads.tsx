@@ -8,15 +8,15 @@ import useSWR from 'swr';
 import { usePages } from './usePages';
 
 type IContext = {
-  isValidating: boolean,
-  threads: Record<string, ThreadWithCommentsAndAuthors | undefined>,
-  setThreads: Dispatch<SetStateAction<Record<string, ThreadWithCommentsAndAuthors | undefined>>>,
-  addComment: (threadId: string, commentContent: PageContent) => Promise<void>,
-  editComment: (threadId: string, commentId: string, commentContent: PageContent) => Promise<void>,
-  deleteComment: (threadId: string, commentId: string) => Promise<void>,
-  resolveThread: (threadId: string) => Promise<void>,
-  deleteThread: (threadId: string) => Promise<void>,
-  refetchThreads: KeyedMutator<ThreadWithCommentsAndAuthors[]>
+  isValidating: boolean;
+  threads: Record<string, ThreadWithCommentsAndAuthors | undefined>;
+  setThreads: Dispatch<SetStateAction<Record<string, ThreadWithCommentsAndAuthors | undefined>>>;
+  addComment: (threadId: string, commentContent: PageContent) => Promise<void>;
+  editComment: (threadId: string, commentId: string, commentContent: PageContent) => Promise<void>;
+  deleteComment: (threadId: string, commentId: string) => Promise<void>;
+  resolveThread: (threadId: string) => Promise<void>;
+  deleteThread: (threadId: string) => Promise<void>;
+  refetchThreads: KeyedMutator<ThreadWithCommentsAndAuthors[]>;
 };
 
 export const ThreadsContext = createContext<Readonly<IContext>>({

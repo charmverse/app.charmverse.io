@@ -16,7 +16,7 @@ handler.use(requireUser)
 
 async function updateCommentController (req: NextApiRequest, res: NextApiResponse) {
   const { content } = req.body as {
-    content: PageContent,
+    content: PageContent;
   };
 
   const commentId = req.query.id as string;

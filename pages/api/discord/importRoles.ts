@@ -15,8 +15,8 @@ const handler = nc({
 });
 
 export interface ImportDiscordRolesPayload {
-  spaceId: string,
-  guildId: string,
+  spaceId: string;
+  guildId: string;
 }
 
 export type ImportRolesResponse = { importedRoleCount: number };
@@ -80,7 +80,7 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
         `https://discord.com/api/v8/guilds/${guildId}/members/${discordConnectedMember.discordUser!.discordId}`
       )
     )
-  ) as {status: 'success', data: DiscordGuildMember | null}[];
+  ) as { status: 'success', data: DiscordGuildMember | null }[];
 
   discordGuildMemberResponses.forEach(discordGuildMemberResponse => {
     if (discordGuildMemberResponse.status === 'success' && discordGuildMemberResponse.data) {

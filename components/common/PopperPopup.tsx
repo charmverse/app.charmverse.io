@@ -9,7 +9,7 @@ interface PopperPopupProps {
   popupContent: React.ReactNode;
   children?: React.ReactNode | null;
   autoOpen?: boolean;
-  closeOnClick?: boolean
+  closeOnClick?: boolean;
 }
 
 export default function PopperPopup (props: PopperPopupProps) {

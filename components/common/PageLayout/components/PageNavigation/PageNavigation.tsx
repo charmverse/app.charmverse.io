@@ -37,9 +37,9 @@ export function filterVisiblePages (pages: (Page | undefined)[], rootPageIds: st
 }
 
 type TreeRootProps = {
-  children: ReactNode,
-  isFavorites?: boolean,
-  setPages: Dispatch<SetStateAction<Record<string, IPageWithPermissions | undefined>>>
+  children: ReactNode;
+  isFavorites?: boolean;
+  setPages: Dispatch<SetStateAction<Record<string, IPageWithPermissions | undefined>>>;
 } & ComponentProps<typeof TreeView>;
 
 function TreeRoot ({ children, setPages, isFavorites, ...rest }: TreeRootProps) {

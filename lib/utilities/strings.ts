@@ -95,9 +95,9 @@ export function humaniseList ({
   conjunction,
   capitaliseFirstCharacter
 }: {
-  content: string[],
-  conjunction: 'and' | 'or',
-  capitaliseFirstCharacter: boolean
+  content: string[];
+  conjunction: 'and' | 'or';
+  capitaliseFirstCharacter: boolean;
 }): string {
 
   if (content.length === 1) {
@@ -132,7 +132,7 @@ export function humaniseList ({
  * Append an 's' to a value's descriptor if it is not equal to 1
  * Default values will return an empty string
  */
-export function conditionalPlural ({ word = '', count = 1 }: {word: string, count: number}): string {
+export function conditionalPlural ({ word = '', count = 1 }: { word: string, count: number }): string {
   if (count !== 1) {
     return `${word}s`;
   }

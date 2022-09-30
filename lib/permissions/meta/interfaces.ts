@@ -7,6 +7,6 @@ export interface SpacePermissionConfigurationUpdate {
 export type SpaceConfigurationPreset = Exclude<SpacePermissionConfigurationMode, 'custom'>
 
 export interface SpacePermissionTemplate {
-  spaceOperations: Record<SpaceOperation, boolean>
-  pagePermissionDefaults: Pick<Space, 'defaultPagePermissionGroup' | 'defaultPublicPages' | 'publicBountyBoard'>
+  spaceOperations: Record<SpaceOperation, boolean>;
+  pagePermissionDefaults: Pick<Space, 'defaultPagePermissionGroup' | 'defaultPublicPages' | 'publicBountyBoard'>;
 }

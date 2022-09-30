@@ -5,8 +5,8 @@ import type { ReactNode } from 'react';
 import { memo, forwardRef } from 'react';
 
 interface BlockAlignerProps {
-  children: ReactNode
-  onDelete: () => void
+  children: ReactNode;
+  onDelete: () => void;
 }
 
 const StyledBlockAligner = styled.div`

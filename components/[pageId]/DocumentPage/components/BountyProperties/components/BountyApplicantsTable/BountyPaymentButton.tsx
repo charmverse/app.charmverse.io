@@ -1,24 +1,38 @@
-import React from 'react';
-import type { AlertColor } from '@mui/material/Alert';
-import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import charmClient from 'charmClient';
-import Button from '@mui/material/Button';
-import { useWeb3React } from '@web3-react/core';
-import { ethers } from 'ethers';
 import { BigNumber } from '@ethersproject/bignumber';
+import { Divider, Menu, MenuItem } from '@mui/material';
+import type { AlertColor } from '@mui/material/Alert';
+import Button from '@mui/material/Button';
+import type { UserGnosisSafe } from '@prisma/client';
+import { useWeb3React } from '@web3-react/core';
+import charmClient from 'charmClient';
 import { getChainById } from 'connectors';
-import { isValidChainAddress } from 'lib/tokens/validation';
+import { ethers } from 'ethers';
+import { useGnosisPayment } from 'hooks/useGnosisPayment';
+import { useMultiBountyPayment } from 'hooks/useMultiBountyPayment';
+import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
+import { usePaymentMethods } from 'hooks/usePaymentMethods';
+import useGnosisSigner from 'hooks/useWeb3Signer';
 import type { SupportedChainId } from 'lib/blockchain/provider/alchemy';
-import ERC20ABI from '../../../../../../../abis/ERC20ABI.json';
+import type { BountyWithDetails } from 'lib/bounties';
+import type { SafeData } from 'lib/gnosis';
+import { getSafesForAddress } from 'lib/gnosis';
+import { isValidChainAddress } from 'lib/tokens/validation';
+import { shortenHex } from 'lib/utilities/strings';
+import type { MouseEvent } from 'react';
+import { useMemo, useState } from 'react';
+import useSWR from 'swr';
+import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
+import ERC20ABI from 'abis/ERC20ABI.json';
 
 interface Props {
   receiver: string;
   amount: string;
   tokenSymbolOrAddress: string;
-  chainIdToUse: number
+  chainIdToUse: number;
   onSuccess?: (txId: string, chainId: number) => void;
-  onClick?: () => void
+  onClick?: () => void;
   onError?: (err: string, severity?: AlertColor) => void;
+  bounty: BountyWithDetails;
 }
 
 function extractWalletErrorMessage (error: any): string {
@@ -48,49 +62,52 @@ function extractWalletErrorMessage (error: any): string {
   }
 }
 
-/**
- * See
- * https://stackoverflow.com/a/68267546
- * @param chainId
- * @returns
- */
-async function switchActiveNetwork (chainId: number) {
-  try {
-    await (window as any).ethereum.request({
-      method: 'wallet_switchEthereumChain',
-      params: [{ chainId: ethers.utils.hexValue(chainId) }]
-    });
-    return;
-  }
-  catch (error: any) {
-    if (error.code === 4902) {
+function SafeMenuItem ({
+  label,
+  safeInfo,
+  bounty,
+  onClick,
+  onError = () => {}
+}: {
+  safeInfo: SafeData;
+  label: string;
+  bounty: BountyWithDetails;
+  onClick: () => void;
+  onError: (err: string, severity?: AlertColor) => void;
+}) {
+  const { onPaymentSuccess, transactions } = useMultiBountyPayment({ bounties: [bounty] });
+  const { makePayment } = useGnosisPayment({
+    chainId: safeInfo.chainId,
+    onSuccess: onPaymentSuccess,
+    safeAddress: safeInfo.address,
+    transactions
+  });
 
-      const chainInfo = getChainById(chainId);
-
-      if (!chainInfo) {
-        throw new Error('Unsupported chain');
+  return (
+    <MenuItem onClick={async () => {
+      onClick();
+      try {
+        await makePayment();
       }
+      catch (error: any) {
+        const errorMessage = extractWalletErrorMessage(error);
 
-      return (window as any).ethereum.request({
-        method: 'wallet_addEthereumChain',
-        params: [
-          {
-            ...chainInfo,
-            chainId: ethers.utils.hexValue(chainInfo?.chainId)
-          }
-
-        ]
-      });
-
-    }
-    else {
-      throw error;
-    }
-  }
+        if (errorMessage === 'underlying network changed') {
+          onError("You've changed your active network.\r\nRe-select 'Make payment' to complete this transaction", 'warning');
+        }
+        else {
+          onError(errorMessage);
+        }
+      }
+    }}
+    >{label}
+    </MenuItem>
+  );
 }
 
 export default function BountyPaymentButton ({
   receiver,
+  bounty,
   amount,
   chainIdToUse,
   tokenSymbolOrAddress,
@@ -98,7 +115,30 @@ export default function BountyPaymentButton ({
   onClick = () => null,
   onError = () => {}
 }: Props) {
+  const { data: safesData } = useMultiWalletSigs();
+  const signer = useGnosisSigner();
   const { account, library, chainId } = useWeb3React();
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const { data: safeInfos } = useSWR(
+    (signer && account) ? `/connected-gnosis-safes/${account}/${chainIdToUse}` : null,
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    () => getSafesForAddress({ signer: signer!, chainId: chainIdToUse, address: account! })
+  );
+
+  const safeDataRecord = safesData?.reduce<Record<string, UserGnosisSafe>>((record, userGnosisSafe) => {
+    if (!record[userGnosisSafe.address]) {
+      record[userGnosisSafe.address] = userGnosisSafe;
+    }
+    return record;
+  }, {}) ?? {};
 
   const [paymentMethods] = usePaymentMethods();
 
@@ -130,10 +170,10 @@ export default function BountyPaymentButton ({
         await switchActiveNetwork(chainToUse.chainId);
       }
 
-      const signer = library.getSigner(account);
+      const web3signer = library.getSigner(account);
 
       if (chainToUse.nativeCurrency.symbol === tokenSymbolOrAddress) {
-        const tx = await signer.sendTransaction({
+        const tx = await web3signer.sendTransaction({
           to: receiver,
           value: ethers.utils.parseEther(amount)
         });
@@ -141,7 +181,7 @@ export default function BountyPaymentButton ({
         onSuccess(tx.hash, chainToUse.chainId);
       }
       else if (isValidChainAddress(tokenSymbolOrAddress)) {
-        const tokenContract = new ethers.Contract(tokenSymbolOrAddress, ERC20ABI, signer);
+        const tokenContract = new ethers.Contract(tokenSymbolOrAddress, ERC20ABI, web3signer);
 
         const paymentMethod = paymentMethods.find(method => (
           method.contractAddress === tokenSymbolOrAddress || method.id === tokenSymbolOrAddress
@@ -193,15 +233,58 @@ export default function BountyPaymentButton ({
   };
 
   return (
-    <Button
-      color='primary'
-      size='small'
-      onClick={() => {
-        onClick();
-        makePayment();
-      }}
-    >
-      Send Payment
-    </Button>
+    <>
+      <Button
+        color='primary'
+        size='small'
+        onClick={(e) => {
+          if (safeInfos?.length === 0) {
+            onClick();
+            makePayment();
+          }
+          else {
+            handleClick(e);
+          }
+        }}
+      >
+        Send Payment
+      </Button>
+      {safeInfos?.length !== 0 && (
+        <Menu
+          id='bounty-payment'
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleClose}
+        >
+          <MenuItem onClick={() => {
+            onClick();
+            makePayment();
+            handleClose();
+          }}
+          >Metamask Wallet
+          </MenuItem>
+          {
+          safeInfos && (
+            <Divider />
+          )
+        }
+          {
+          safeInfos?.map(safeInfo => (
+            <SafeMenuItem
+              key={safeInfo.address}
+              bounty={bounty}
+              label={safeDataRecord[safeInfo.address]?.name ?? shortenHex(safeInfo.address)}
+              onClick={() => {
+                onClick();
+                handleClose();
+              }}
+              onError={onError}
+              safeInfo={safeInfo}
+            />
+          ))
+        }
+        </Menu>
+      )}
+    </>
   );
 }

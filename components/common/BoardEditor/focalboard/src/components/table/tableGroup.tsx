@@ -15,7 +15,7 @@ type Props = {
     activeView: BoardView
     groupByProperty?: IPropertyTemplate
     group: BoardGroup
-    readonly: boolean
+    readOnly: boolean
     columnRefs: Map<string, React.RefObject<HTMLDivElement>>
     selectedCardIds: string[]
     cardIdToFocusOnRender: string
@@ -63,7 +63,7 @@ const TableGroup = React.memo((props: Props): JSX.Element => {
         groupByProperty={groupByProperty}
         hideGroup={props.hideGroup}
         addCard={props.addCard}
-        readonly={props.readonly}
+        readOnly={props.readOnly}
         propertyNameChanged={props.propertyNameChanged}
         onDrop={props.onDropToGroupHeader}
       />
@@ -76,7 +76,7 @@ const TableGroup = React.memo((props: Props): JSX.Element => {
               columnRefs={props.columnRefs}
               cards={group.cards}
               selectedCardIds={props.selectedCardIds}
-              readonly={props.readonly}
+              readOnly={props.readOnly}
               cardIdToFocusOnRender={props.cardIdToFocusOnRender}
               showCard={props.showCard}
               resizingColumn=''

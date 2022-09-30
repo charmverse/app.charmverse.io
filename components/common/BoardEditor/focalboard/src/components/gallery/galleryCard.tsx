@@ -18,9 +18,9 @@ import { getCardComments } from '../../store/comments';
 import { useAppSelector } from '../../store/hooks';
 import { Utils } from '../../utils';
 import IconButton from '../../widgets/buttons/iconButton';
-import DeleteIcon from '../../widgets/icons/delete';
-import LinkIcon from '../../widgets/icons/Link';
-import OptionsIcon from '../../widgets/icons/options';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import LinkIcon from '@mui/icons-material/Link';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
 import Tooltip from '../../widgets/tooltip';
@@ -35,7 +35,7 @@ type Props = {
   visibleTitle: boolean
   isSelected: boolean
   visibleBadges: boolean
-  readonly: boolean
+  readOnly: boolean
   isManualSort: boolean
   onDrop: (srcCard: Card, dstCard: Card) => void
 }
@@ -46,7 +46,7 @@ const GalleryCard = React.memo((props: Props) => {
   const { pages, getPagePermissions } = usePages();
   const [space] = useCurrentSpace();
   const intl = useIntl();
-  const [isDragging, isOver, cardRef] = useSortable('card', card, props.isManualSort && !props.readonly && !isTouchScreen(), props.onDrop);
+  const [isDragging, isOver, cardRef] = useSortable('card', card, props.isManualSort && !props.readOnly && !isTouchScreen(), props.onDrop);
   const comments = useAppSelector(getCardComments(card.id));
   const cardPage = pages[card.id];
 
@@ -94,17 +94,17 @@ const GalleryCard = React.memo((props: Props) => {
       style={{ opacity: isDragging ? 0.5 : 1 }}
       ref={cardRef}
     >
-      {!props.readonly
+      {!props.readOnly
         && (
         <MenuWrapper
           className='optionsMenu'
           stopPropagationOnToggle={true}
         >
-          <IconButton icon={<OptionsIcon />} />
+          <IconButton icon={<MoreHorizIcon />} />
           <Menu position='left'>
             {pagePermissions.delete && pages[card.id]?.deletedAt === null && (
             <Menu.Text
-              icon={<DeleteIcon />}
+              icon={<DeleteOutlineIcon />}
               id='delete'
               name={intl.formatMessage({ id: 'GalleryCard.delete', defaultMessage: 'Delete' })}
               onClick={() => mutator.deleteBlock(card, 'delete card')}

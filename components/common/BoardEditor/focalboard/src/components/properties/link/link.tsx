@@ -4,11 +4,11 @@ import React, { ReactNode } from 'react';
 import Editable from '../../../widgets/editable';
 
 import { Utils } from '../../../utils';
-import LinkIcon from '../../../widgets/icons/Link';
+import LinkIcon from '@mui/icons-material/Link';
 
 type Props = {
     value: string
-    readonly?: boolean
+    readOnly?: boolean
     placeholder?: string
     onChange: (value: string) => void
     onSave: () => void
@@ -28,7 +28,7 @@ function URLProperty (props: Props): JSX.Element {
         rel='noreferrer'
         onClick={(event) => event.stopPropagation()}
       >
-        <LinkIcon />
+        <LinkIcon fontSize='small' />
       </a>
     );
   }
@@ -41,7 +41,7 @@ function URLProperty (props: Props): JSX.Element {
           placeholderText={props.placeholder}
           value={props.value}
           autoExpand={false}
-          readonly={props.readonly}
+          readOnly={props.readOnly}
           onChange={props.onChange}
           onSave={props.onSave}
           onCancel={props.onCancel}

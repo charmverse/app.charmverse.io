@@ -7,15 +7,15 @@ import { Board } from '../blocks/board';
 import { Card } from '../blocks/card';
 import mutator from '../mutator';
 import EmojiPicker from '../widgets/emojiPicker';
-import DeleteIcon from '../widgets/icons/delete';
-import EmojiIcon from '../widgets/icons/emoji';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import Menu from '../widgets/menu';
 import MenuWrapper from '../widgets/menuWrapper';
+import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
 
 type Props = {
     block: Board|Card
     size?: 's' | 'm' | 'l'
-    readonly?: boolean
+    readOnly?: boolean
     setPage?: (page: Partial<Page>) => void
 }
 
@@ -39,22 +39,22 @@ const BlockIconSelector = React.memo((props: Props) => {
   }
 
   let className = `octo-icon size-${size || 'm'}`;
-  if (props.readonly) {
+  if (props.readOnly) {
     className += ' readonly';
   }
   const iconElement = <PageIcon size='large' icon={block.fields.icon} />;
 
   return (
     <div className='BlockIconSelector'>
-      {props.readonly && iconElement}
-      {!props.readonly
+      {props.readOnly && iconElement}
+      {!props.readOnly
             && (
             <MenuWrapper>
               {iconElement}
               <Menu>
                 <Menu.Text
                   id='random'
-                  icon={<EmojiIcon />}
+                  icon={<EmojiEmotionsOutlinedIcon />}
                   name={intl.formatMessage({ id: 'ViewTitle.random-icon', defaultMessage: 'Random' })}
                   onClick={() => {
                     setPage && setPage({ icon: onAddRandomIcon() });
@@ -62,7 +62,7 @@ const BlockIconSelector = React.memo((props: Props) => {
                 />
                 <Menu.SubMenu
                   id='pick'
-                  icon={<EmojiIcon />}
+                  icon={<EmojiEmotionsOutlinedIcon />}
                   name={intl.formatMessage({ id: 'ViewTitle.pick-icon', defaultMessage: 'Pick icon' })}
                 >
                   <EmojiPicker onSelect={(emoji) => {
@@ -73,7 +73,7 @@ const BlockIconSelector = React.memo((props: Props) => {
                 </Menu.SubMenu>
                 <Menu.Text
                   id='remove'
-                  icon={<DeleteIcon />}
+                  icon={<DeleteOutlineIcon fontSize='small' />}
                   name={intl.formatMessage({ id: 'ViewTitle.remove-icon', defaultMessage: 'Remove icon' })}
                   onClick={() => {
                     onRemoveIcon();

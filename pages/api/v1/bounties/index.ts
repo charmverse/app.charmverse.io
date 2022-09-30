@@ -77,7 +77,7 @@ export interface PublicApiBounty {
   createdAt: string;
   description: string;
   issuer: {
-    address: string
+    address: string;
   };
   reward: {
     amount: number;
@@ -88,7 +88,7 @@ export interface PublicApiBounty {
   title: string;
   url: string;
   recipients: {
-    address: string
+    address: string;
   }[];
 }
 

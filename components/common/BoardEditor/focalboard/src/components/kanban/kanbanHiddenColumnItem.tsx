@@ -7,7 +7,7 @@ import { BoardView } from '../../blocks/boardView';
 import { Card } from '../../blocks/card';
 import mutator from '../../mutator';
 import Button from '../../widgets/buttons/button';
-import ShowIcon from '../../widgets/icons/show';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import Label from '../../widgets/label';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
@@ -16,7 +16,7 @@ type Props = {
     activeView: BoardView
     group: BoardGroup
     intl: IntlShape
-    readonly: boolean
+    readOnly: boolean
     onDrop: (card: Card) => void
 }
 
@@ -44,7 +44,7 @@ export default function KanbanHiddenColumnItem (props: Props): JSX.Element {
       className={className}
     >
       <MenuWrapper
-        disabled={props.readonly}
+        disabled={props.readOnly}
       >
         <Label
           key={group.option.id || 'empty'}
@@ -55,7 +55,7 @@ export default function KanbanHiddenColumnItem (props: Props): JSX.Element {
         <Menu>
           <Menu.Text
             id='show'
-            icon={<ShowIcon />}
+            icon={<VisibilityOutlinedIcon fontSize="small" />}
             name={intl.formatMessage({ id: 'BoardComponent.show', defaultMessage: 'Show' })}
             onClick={() => mutator.unhideViewColumn(activeView, group.option.id)}
           />

@@ -22,8 +22,8 @@ const StyledActionsMenu = styled(Box)`
 `;
 
 interface ActionsMenuProps {
-  onClick: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void
-  children?: ReactNode
+  onClick: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
+  children?: ReactNode;
 }
 
 export default function ActionsMenu ({ onClick, children }: ActionsMenuProps) {

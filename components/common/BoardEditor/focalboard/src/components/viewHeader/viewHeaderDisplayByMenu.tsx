@@ -6,7 +6,7 @@ import Button from 'components/common/Button';
 import { IPropertyTemplate } from '../../blocks/board';
 import { BoardView } from '../../blocks/boardView';
 import mutator from '../../mutator';
-import CheckIcon from '../../widgets/icons/check';
+import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
 import { typeDisplayName } from '../../widgets/propertyMenu';
@@ -51,7 +51,7 @@ const ViewHeaderDisplayByMenu = React.memo((props: Props) => {
             key={date.id}
             id={date.id}
             name={date.name}
-            rightIcon={activeView.fields.dateDisplayPropertyId === date.id ? <CheckIcon /> : undefined}
+            rightIcon={activeView.fields.dateDisplayPropertyId === date.id ? <CheckOutlinedIcon fontSize="small" /> : undefined}
             onClick={(id) => {
               if (activeView.fields.dateDisplayPropertyId === id) {
                 return;
@@ -66,7 +66,7 @@ const ViewHeaderDisplayByMenu = React.memo((props: Props) => {
                       key='createdDate'
                       id='createdDate'
                       name={createdDateName}
-                      rightIcon={<CheckIcon />}
+                      rightIcon={<CheckOutlinedIcon fontSize="small" />}
                       onClick={() => {}}
                     />
                     )}

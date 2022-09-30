@@ -5,11 +5,11 @@ import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 type IContext = {
-  user: LoggedInUser | null,
-  setUser: (user: LoggedInUser | any) => void,
-  updateUser: (user: Partial<LoggedInUser>) => void,
-  isLoaded: boolean,
-  setIsLoaded: (isLoaded: boolean) => void
+  user: LoggedInUser | null;
+  setUser: (user: LoggedInUser | any) => void;
+  updateUser: (user: Partial<LoggedInUser>) => void;
+  isLoaded: boolean;
+  setIsLoaded: (isLoaded: boolean) => void;
 };
 
 export const UserContext = createContext<Readonly<IContext>>({

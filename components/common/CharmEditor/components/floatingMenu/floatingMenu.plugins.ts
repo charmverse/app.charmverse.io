@@ -7,7 +7,7 @@ import type { NodeSelection } from 'prosemirror-state';
 import { queryIsSelectionAroundInlineVote } from '../inlineVote';
 import { markName as inlineVoteMarkName } from '../inlineVote/inlineVote.constants';
 
-export function plugins ({ key, readOnly, enableComments = true }:{key: PluginKey, readOnly?: boolean, enableComments?: boolean}) {
+export function plugins ({ key, readOnly, enableComments = true }:{ key: PluginKey, readOnly?: boolean, enableComments?: boolean }) {
   const menuPlugins = floatingMenu.plugins({
     key,
     calculateType: (state) => {

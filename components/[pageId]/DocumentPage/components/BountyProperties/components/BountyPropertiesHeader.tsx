@@ -19,10 +19,10 @@ import { useState } from 'react';
  * Permissions left optional so this component can initialise without them
  */
 interface Props {
-  bounty: BountyWithDetails,
-  bountyPermissions?: Partial<BountyPermissions>,
-  pagePermissions?: PagePermission[]
-  pageId: string
+  bounty: BountyWithDetails;
+  bountyPermissions?: Partial<BountyPermissions>;
+  pagePermissions?: PagePermission[];
+  pageId: string;
 }
 
 export default function BountyPropertiesHeader ({ bounty, bountyPermissions, pagePermissions, pageId }: Props) {

@@ -11,7 +11,7 @@ import { addCard } from 'components/common/BoardEditor/focalboard/src/store/card
 import { mutate } from 'swr';
 import { memo } from 'react';
 
-function AddNewCard ({ pageId }: {pageId: string}) {
+function AddNewCard ({ pageId }: { pageId: string }) {
   const router = useRouter();
   const [space] = useCurrentSpace();
   const { pages } = usePages();

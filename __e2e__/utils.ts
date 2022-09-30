@@ -11,11 +11,14 @@ import { typedKeys } from 'lib/utilities/objects';
 import type { LoggedInUser } from 'models';
 import { baseUrl } from 'testing/mockApiCall';
 import { v4 } from 'uuid';
+import { Wallet } from 'ethers';
+import { readFileSync } from 'fs';
+import { createPage } from 'testing/setupDatabase';
 
 export { baseUrl } from 'testing/mockApiCall';
 
-export async function createUser ({ browserPage, walletAddress }: {browserPage: BrowserPage,
-  walletAddress?: string}): Promise<LoggedInUser> {
+export async function createUser ({ browserPage, walletAddress }: { browserPage: BrowserPage;
+  walletAddress?: string; }): Promise<LoggedInUser> {
 
   return browserPage.request.post(`${baseUrl}/api/profile`, {
     data: {
@@ -24,7 +27,7 @@ export async function createUser ({ browserPage, walletAddress }: {browserPage: 
   }).then(res => res.json());
 }
 
-export async function createSpace ({ browserPage, createdBy, permissionConfigurationMode }: {browserPage: BrowserPage} & Pick<Space, 'createdBy'> & Partial<Pick<Space, 'permissionConfigurationMode'>>): Promise<Space> {
+export async function createSpace ({ browserPage, createdBy, permissionConfigurationMode }: { browserPage: BrowserPage } & Pick<Space, 'createdBy'> & Partial<Pick<Space, 'permissionConfigurationMode'>>): Promise<Space> {
   return browserPage.request.post(`${baseUrl}/api/spaces`, {
     data: {
       author: {
@@ -52,7 +55,7 @@ export async function createSpace ({ browserPage, createdBy, permissionConfigura
   }).then(res => res.json());
 }
 
-export async function getPages ({ browserPage, spaceId }: {browserPage: BrowserPage, spaceId: string}): Promise<IPageWithPermissions[]> {
+export async function getPages ({ browserPage, spaceId }: { browserPage: BrowserPage, spaceId: string }): Promise<IPageWithPermissions[]> {
   return browserPage.request.get(`${baseUrl}/api/spaces/${spaceId}/pages`).then(res => res.json());
 }
 
@@ -63,24 +66,25 @@ export async function getPages ({ browserPage, spaceId }: {browserPage: BrowserP
  */
 export async function createUserAndSpace ({
   browserPage,
-  walletAddress = v4(),
+  walletAddress = Wallet.createRandom().address,
   permissionConfigurationMode = 'collaborative'
 }: {
-  browserPage: BrowserPage,
+  browserPage: BrowserPage;
   walletAddress?: string;
-} & Partial<Pick<Space, 'permissionConfigurationMode'>>): Promise<{user: LoggedInUser, space: Space, pages: IPageWithPermissions[]}> {
+} & Partial<Pick<Space, 'permissionConfigurationMode'>>): Promise<{ user: LoggedInUser, walletAddress?: string, space: Space, pages: IPageWithPermissions[] }> {
   const user = await createUser({ browserPage, walletAddress });
   const space = await createSpace({ browserPage, createdBy: user.id, permissionConfigurationMode });
-  const pages: IPageWithPermissions[] = await getPages({ browserPage, spaceId: space.id });
+  const pages = await getPages({ browserPage, spaceId: space.id });
 
   return {
     space,
+    walletAddress,
     user,
     pages
   };
 }
 
-export async function generateBounty ({ content = undefined, contentText = '', spaceId, createdBy, status, maxSubmissions, approveSubmitters, title = 'Example', rewardToken = 'ETH', rewardAmount = 1, chainId = 1, bountyPermissions = {}, pagePermissions = [], page = {}, type = 'bounty', id }: Pick<Bounty, 'createdBy' | 'spaceId' | 'status' | 'approveSubmitters'> & Partial<Pick<Bounty, 'id' | 'maxSubmissions' | 'chainId' | 'rewardAmount' | 'rewardToken'>> & Partial<Pick<Page, 'title' | 'content' | 'contentText' | 'type'>> & {bountyPermissions?: Partial<BountyPermissions>, pagePermissions?: Omit<Prisma.PagePermissionCreateManyInput, 'pageId'>[], page?: Partial<Pick<Page, 'deletedAt'>>}): Promise<BountyWithDetails> {
+export async function generateBounty ({ content = undefined, contentText = '', spaceId, createdBy, status, maxSubmissions, approveSubmitters, title = 'Example', rewardToken = 'ETH', rewardAmount = 1, chainId = 1, bountyPermissions = {}, pagePermissions = [], page = {}, type = 'bounty', id }: Pick<Bounty, 'createdBy' | 'spaceId' | 'status' | 'approveSubmitters'> & Partial<Pick<Bounty, 'id' | 'maxSubmissions' | 'chainId' | 'rewardAmount' | 'rewardToken'>> & Partial<Pick<Page, 'title' | 'content' | 'contentText' | 'type'>> & { bountyPermissions?: Partial<BountyPermissions>, pagePermissions?: Omit<Prisma.PagePermissionCreateManyInput, 'pageId'>[], page?: Partial<Pick<Page, 'deletedAt'>> }): Promise<BountyWithDetails> {
 
   const pageId = id ?? v4();
 
@@ -154,23 +158,21 @@ export async function generateBounty ({ content = undefined, contentText = '', s
   return getBountyOrThrow(pageId);
 }
 
-/**
- * Simple utility to provide a user and space object inside test code
- * @param walletAddress
- * @returns
- */
-export async function generateUserAndSpace (walletAddress: string = v4(), isAdmin = true) {
+interface CreateUserAndSpaceOptions {
+  walletAddress?: string;
+  isAdmin?: boolean;
+}
+export async function generateUserAndSpace ({ isAdmin, walletAddress = Wallet.createRandom().address }: CreateUserAndSpaceOptions = {}) {
   const user = await createUserFromWallet(walletAddress);
 
   const existingSpaceId = user.spaceRoles?.[0]?.spaceId;
 
-  let space = null;
+  let space: Space;
 
   if (existingSpaceId) {
-    space = await prisma.space.findUnique({ where: { id: user.spaceRoles?.[0]?.spaceId }, include: { apiToken: true, spaceRoles: true } });
+    space = await prisma.space.findUniqueOrThrow({ where: { id: user.spaceRoles?.[0]?.spaceId }, include: { apiToken: true, spaceRoles: true } });
   }
-
-  if (!space) {
+  else {
     space = await prisma.space.create({
       data: {
         name: 'Example space',
@@ -189,16 +191,51 @@ export async function generateUserAndSpace (walletAddress: string = v4(), isAdmi
             isAdmin
           }
         }
-      },
-      include: {
-        apiToken: true,
-        spaceRoles: true
       }
     });
   }
 
+  const page = await createPage({
+    spaceId: space.id,
+    createdBy: user.id,
+    title: 'Test Page',
+    pagePermissions: [{
+      spaceId: space.id,
+      permissionLevel: 'full_access'
+    }]
+  });
+
   return {
+    page,
     user,
-    space
+    space,
+    walletAddress
   };
+}
+
+// load web3 mock library https:// massimilianomirra.com/notes/mocking-window-ethereum-in-playwright-for-end-to-end-dapp-testing
+// optionally pass in a context object to be available to the callback
+export async function mockWeb3<T = any> (page: BrowserPage, context: T | ((context: T) => void), callback?: (context: T) => void) {
+  callback ||= context as (context: T) => void;
+  context = typeof context === 'function' ? {} as T : context;
+  await page.addInitScript({
+    content:
+      `${readFileSync(
+        require.resolve('@depay/web3-mock/dist/umd/index.bundle.js'),
+        'utf-8'
+      )}\n`
+      + `
+
+        Web3Mock.mock('ethereum');
+
+        // mock deprecatd apis not handled by web3-mock
+        window.ethereum.enable = () => Promise.resolve();
+
+        window.ethereum.send = (method, opts) => {
+          return window.ethereum.request({ method }, opts);
+        };
+
+      `
+      + `(${callback.toString()})(${JSON.stringify(context)});`
+  });
 }

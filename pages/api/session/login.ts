@@ -28,10 +28,8 @@ async function login (req: NextApiRequest, res: NextApiResponse<LoggedInUser | {
     return res.status(401).send({ error: 'No user has been associated with this wallet address' });
   }
 
-  // strip out large fields so we dont break the cookie
-  const { discordUser, spaceRoles, telegramUser, ...userData } = user;
-  req.session.user = userData;
-  await updateGuildRolesForUser(userData.addresses, spaceRoles);
+  req.session.user = { id: user.id };
+  await updateGuildRolesForUser(user.addresses, user.spaceRoles);
   await req.session.save();
 
   return res.status(200).json(user);

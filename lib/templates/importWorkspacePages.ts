@@ -7,11 +7,12 @@ import type { PageContent } from 'models';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { v4, validate } from 'uuid';
+import log from 'lib/log';
 import type { ExportedPage, WorkspaceExport, WorkspaceImport } from './interfaces';
 
 interface UpdateRefs {
-  oldNewHashMap: Record<string, string>,
-  pages: Page[]
+  oldNewHashMap: Record<string, string>;
+  pages: Page[];
 }
 
 /**
@@ -46,7 +47,7 @@ interface WorkspaceImportResult {
 }
 
 export async function generateImportWorkspacePages ({ targetSpaceIdOrDomain, exportData, exportName }: WorkspaceImport):
-Promise<{pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyArgs}> {
+Promise<{ pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyArgs }> {
   const isUuid = validate(targetSpaceIdOrDomain);
 
   const space = await prisma.space.findUnique({
@@ -78,7 +79,7 @@ Promise<{pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyArg
    * Mutates the pages, updating their ids
    */
   function recursivePagePrep ({ node, newParentId, rootSpacePermissionId }:
-    {node: ExportedPage, newParentId: string | null, rootSpacePermissionId?: string}) {
+    { node: ExportedPage, newParentId: string | null, rootSpacePermissionId?: string }) {
     const newId = v4();
 
     oldNewHashmap[newId] = node.id;
@@ -226,8 +227,7 @@ export async function importWorkspacePages ({ targetSpaceIdOrDomain, exportData,
   await prisma.$transaction([
     ...pageArgs.map(p => {
       createdPages += 1;
-      // eslint-disable-next-line no-console
-      console.log(`Creating page ${createdPages}/${pagesToCreate}: ${p.data.type} // ${p.data.title}`);
+      log.debug(`Creating page ${createdPages}/${pagesToCreate}: ${p.data.type} // ${p.data.title}`);
       return prisma.page.create(p);
     }),
     prisma.block.createMany(blockArgs)

@@ -86,8 +86,8 @@ Promise<[Prisma.PagePermissionDeleteManyArgs | null, Prisma.PagePermissionCreate
     { node,
       bountyPageId
     } : {
-      node: PageNodeWithChildren<PageNodeWithPermissions>,
-      bountyPageId: string
+      node: PageNodeWithChildren<PageNodeWithPermissions>;
+      bountyPageId: string;
     }
   ): void {
     node.children?.forEach(child => {
