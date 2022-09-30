@@ -4,19 +4,12 @@ import type { AuthSig } from 'lib/blockchain/interfaces';
 import { isValidWalletSignature } from 'lib/blockchain/signAndVerify';
 import { MissingDataError } from '../utilities/errors';
 
-const isProdEnv = process.env.NODE_ENV === 'production';
-
 export type Web3LoginRequest = {
   address: string;
   walletSignature: AuthSig;
 };
 
 export function requireWalletSignature (req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
-
-  if (!isProdEnv) {
-    next();
-    return;
-  }
 
   const { address, walletSignature } = req.body as Web3LoginRequest;
 
