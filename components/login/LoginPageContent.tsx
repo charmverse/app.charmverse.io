@@ -4,15 +4,9 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Button from 'components/common/Button';
 import Image from 'components/common/Image';
-import PrimaryButton from 'components/common/PrimaryButton';
-import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import splashImage from 'public/images/artwork/world.png';
-import { useContext, useState } from 'react';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import { useUser } from 'hooks/useUser';
-import { WalletSign } from './WalletSign';
 import type { AuthSig } from '../../lib/blockchain/interfaces';
-import charmClient from '../../charmClient';
+import { WalletSign } from './WalletSign';
 
 export const Container = styled(Box)`
   max-width: 100%;
@@ -21,12 +15,10 @@ export const Container = styled(Box)`
 `;
 
 interface Props {
-  loginSuccess: (authSig: AuthSig) => void;
+  walletSigned: (authSig: AuthSig) => void;
 }
 
-export function LoginPageContent ({ loginSuccess }: Props) {
-  const { account, walletAuthSignature } = useWeb3AuthSig();
-  const { setUser } = useUser();
+export function LoginPageContent ({ walletSigned }: Props) {
   const returnUrl = new URLSearchParams(decodeURIComponent(window.location.search)).get('returnUrl');
 
   return (
@@ -74,7 +66,7 @@ export function LoginPageContent ({ loginSuccess }: Props) {
             </Typography>
             <Box display={{ sm: 'flex' }} gap={2} alignItems='center'>
               <Box>
-                <WalletSign signSuccess={loginSuccess} />
+                <WalletSign signSuccess={walletSigned} />
                 <Typography color='secondary' variant='body2' sx={{ lineHeight: '40px' }}>
                   or
                 </Typography>

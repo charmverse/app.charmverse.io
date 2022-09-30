@@ -1,8 +1,9 @@
-import { useWeb3React } from '@web3-react/core';
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import charmClient from 'charmClient';
 import type { LoggedInUser } from 'models';
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { lowerCaseEqual } from '../lib/utilities/strings';
 
 type IContext = {
   user: LoggedInUser | null;
@@ -21,12 +22,16 @@ export const UserContext = createContext<Readonly<IContext>>({
 });
 
 export function UserProvider ({ children }: { children: ReactNode }) {
-  const { account } = useWeb3React();
+  const { account } = useWeb3AuthSig();
   const [user, setUser] = useState<LoggedInUser | null>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(true);
 
-  useEffect(() => {
-    if (!user) {
+  async function refreshUser (walletAddress: string) {
+    if (user && !user?.addresses.some(a => lowerCaseEqual(a, walletAddress))) {
+      await charmClient.logout();
+      setUser(null);
+    }
+    else if (!user) {
       setIsLoaded(false);
       // try retrieving the user from session
       charmClient.getUser()
@@ -36,6 +41,13 @@ export function UserProvider ({ children }: { children: ReactNode }) {
         .finally(() => {
           setIsLoaded(true);
         });
+    }
+  }
+
+  useEffect(() => {
+
+    if (account) {
+      refreshUser(account);
     }
   }, [account]);
 

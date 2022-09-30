@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import { useWeb3React } from '@web3-react/core';
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import PrimaryButton from 'components/common/PrimaryButton';
@@ -7,7 +7,7 @@ import TokenGateForm from 'components/common/TokenGateForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import { useContext, useEffect, useState } from 'react';
-
+import { lowerCaseEqual } from 'lib/utilities/strings';
 import type { Page } from '@prisma/client';
 import charmClient from 'charmClient';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
@@ -21,7 +21,7 @@ interface Props {
 
 export function BountySignupButton ({ bountyPage }: Props) {
 
-  const { account } = useWeb3React();
+  const { account, walletAuthSignature } = useWeb3AuthSig();
   const { user, setUser, isLoaded: isUserLoaded } = useUser();
   const router = useRouter();
   const [contributors] = useContributors();
@@ -35,9 +35,9 @@ export function BountySignupButton ({ bountyPage }: Props) {
   const showSpaceRedirect = isUserLoaded && isSpaceMember;
 
   function loginUser () {
-    if (!loggingIn) {
+    if (!loggingIn && account && walletAuthSignature && lowerCaseEqual(walletAuthSignature?.address as string, account as string)) {
       setLoggingIn(true);
-      charmClient.login(account as string)
+      charmClient.login({ address: account as string, walletSignature: walletAuthSignature })
         .then(loggedInProfile => {
           setUser(loggedInProfile);
           setLoggingIn(false);
@@ -103,3 +103,7 @@ export function BountySignupButton ({ bountyPage }: Props) {
     </>
   );
 }
+function lowerCaseEquals (arg0: string, arg1: string) {
+  throw new Error('Function not implemented.');
+}
+

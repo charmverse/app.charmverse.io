@@ -1,16 +1,15 @@
 import type { User } from '@prisma/client';
-import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { getKey } from 'hooks/useLocalStorage';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import log from 'lib/log';
 import { isSpaceDomain } from 'lib/spaces';
+import { lowerCaseEqual } from 'lib/utilities/strings';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { UrlObject } from 'url';
-import { lowerCaseEqual } from 'lib/utilities/strings';
 
 // Pages shared to the public that don't require user login
 const publicPages = ['/', 'invite', 'share', 'api-docs', 'u', 'authenticate'];
@@ -19,8 +18,7 @@ const accountPages = ['profile'];
 export default function RouteGuard ({ children }: { children: ReactNode }) {
   const router = useRouter();
   const [authorized, setAuthorized] = useState(true);
-  const { triedEager } = useContext(Web3Connection);
-  const { account, walletAuthSignature } = useWeb3AuthSig();
+  const { account, walletAuthSignature, triedEager } = useWeb3AuthSig();
   const { user, setUser, isLoaded } = useUser();
   const [spaces,, isSpacesLoaded] = useSpaces();
   const isWalletLoading = (!triedEager && !account);
@@ -45,12 +43,14 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
+
     // wait to listen to events until data is loaded
     if (isLoading) {
       return;
     }
 
     async function authCheckAndRedirect (path: string) {
+
       const result = await authCheck(path);
 
       setAuthorized(result.authorized);
@@ -143,13 +143,13 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   }
 
   if (isLoading) {
-    return null;
+    return <h1>LOADING</h1>;
   }
   return (
     <span>
       {authorized
         ? children
-        : null}
+        : <h1>BANNED</h1>}
     </span>
   );
 }

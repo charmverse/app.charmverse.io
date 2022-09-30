@@ -10,23 +10,27 @@ import naclUtil from 'tweetnacl-util';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 import { ExternalServiceError } from '../lib/utilities/errors';
 import { PREFIX, useLocalStorage } from './useLocalStorage';
+import { Web3Connection } from '../components/_app/Web3ConnectionManager';
 
 type IContext = {
   account?: string | null;
   walletAuthSignature?: AuthSig | null;
   sign: () => Promise<AuthSig>;
+  triedEager: boolean;
 };
 
 export const Web3Context = createContext<Readonly<IContext>>({
   account: null,
   walletAuthSignature: null,
-  sign: () => Promise.resolve({} as AuthSig)
+  sign: () => Promise.resolve({} as AuthSig),
+  triedEager: false
 });
 
 // a wrapper around account and library from web3react
 export function Web3AccountProvider ({ children }: { children: ReactNode }) {
 
   const { account, library } = useWeb3React();
+  const { triedEager } = useContext(Web3Connection);
 
   const [, setLitAuthSignature] = useLocalStorage<AuthSig | null>('lit-auth-signature', null, true);
   const [, setLitProvider] = useLocalStorage<string | null>('lit-web3-provider', null, true);
@@ -122,7 +126,7 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
     return generated;
   }
 
-  const value = useMemo(() => ({ account, walletAuthSignature, sign }) as IContext, [account, walletAuthSignature]);
+  const value = useMemo(() => ({ account, walletAuthSignature, triedEager, sign }) as IContext, [account, walletAuthSignature, triedEager]);
 
   return (
     <Web3Context.Provider value={value}>

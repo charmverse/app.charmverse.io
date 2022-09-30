@@ -102,7 +102,7 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
       const spaceExists = spaces.some(s => s.id === tokenGateResult?.space.id);
 
       // Refresh the user account. This was required as otherwise the user would not be able to see the first page upon joining the space
-      const refreshedProfile = await charmClient.login(account as string, walletAuthSignature as AuthSig);
+      const refreshedProfile = await charmClient.login({ address: account as string, walletSignature: walletAuthSignature as AuthSig });
 
       setUser(refreshedProfile);
 

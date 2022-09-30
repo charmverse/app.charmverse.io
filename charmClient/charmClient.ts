@@ -35,6 +35,7 @@ import type { GetTasksResponse } from 'pages/api/tasks/list';
 import type { GetTasksStateResponse, UpdateTasksState } from 'pages/api/tasks/state';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 import type { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
+import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import { BlockchainApi } from './apis/blockchainApi';
 import { BountiesApi } from './apis/bountiesApi';
 import { CollablandApi } from './apis/collablandApi';
@@ -61,7 +62,7 @@ class CharmClient {
 
   proposals = new ProposalsApi();
 
-  async login (address: string, walletSignature: AuthSig) {
+  async login ({ address, walletSignature }: Web3LoginRequest) {
     const user = await http.POST<LoggedInUser>('/api/session/login', {
       address,
       walletSignature
@@ -81,9 +82,10 @@ class CharmClient {
     return http.GET<PublicUser>(`/api/public/profile/${path}`);
   }
 
-  createUser ({ address }: { address: string }) {
+  createUser ({ address, walletSignature }: Web3LoginRequest) {
     return http.POST<LoggedInUser>('/api/profile', {
-      address
+      address,
+      walletSignature
     });
   }
 

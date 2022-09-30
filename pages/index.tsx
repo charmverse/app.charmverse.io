@@ -49,14 +49,15 @@ export default function LoginPage () {
   }
 
   async function loginUser (authSig: AuthSig) {
-    charmClient.login(account as string, authSig)
+    charmClient.login({ address: account as string, walletSignature: authSig })
       .then((_user) => {
         setUser(_user);
         redirectUserAfterLogin();
       })
       .catch((err) => {
         charmClient.createUser({
-          address: account as string
+          address: account as string,
+          walletSignature: authSig
         }).then((_user) => {
           setUser(_user);
           redirectUserAfterLogin();
@@ -72,15 +73,11 @@ export default function LoginPage () {
       if (user && (isLogInWithDiscord
         || (account && user.addresses.some(a => a === account) && lowerCaseEqual(walletAuthSignature?.address as string, account)))) {
         redirectUserAfterLogin();
-
       }
       else if (account && walletAuthSignature && lowerCaseEqual(walletAuthSignature?.address as string, account)) {
         loginUser(walletAuthSignature);
-
       }
       else {
-        setUser(null);
-        charmClient.logout();
         setShowLogin(true);
       }
     }
@@ -93,7 +90,7 @@ export default function LoginPage () {
   return (
     isLogInWithDiscord ? null : getLayout(
       <>
-        <LoginPageContent loginSuccess={(authSig) => {
+        <LoginPageContent walletSigned={(authSig) => {
           showMessage('Wallet verified. Logging you in', 'success');
           loginUser(authSig);
         }}
