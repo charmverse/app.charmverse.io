@@ -37,8 +37,6 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
   const [, setLitAuthSignature] = useLocalStorage<AuthSig | null>('lit-auth-signature', null, true);
   const [, setLitProvider] = useLocalStorage<string | null>('lit-web3-provider', null, true);
 
-  const [litCommKey, setLitCommKey] = useLocalStorage<{ publicKey: string, secretKey: string } | null>('lit-comms-keypair', null, true);
-
   const [walletAuthSignature, setWalletAuthSignature] = useState<AuthSig | null>(null);
 
   /**
@@ -134,14 +132,6 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
     };
 
     setSignature(generated, true);
-
-    if (!litCommKey) {
-      const commsKeyPair = box.keyPair();
-      setLitCommKey({
-        publicKey: naclUtil.encodeBase64(commsKeyPair.publicKey),
-        secretKey: naclUtil.encodeBase64(commsKeyPair.secretKey)
-      });
-    }
 
     return generated;
   }
