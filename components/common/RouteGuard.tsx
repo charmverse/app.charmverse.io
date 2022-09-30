@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react';
 import type { UrlObject } from 'url';
 
 // Pages shared to the public that don't require user login
-const publicPages = ['/', 'invite', 'share', 'api-docs', 'u', 'authenticate'];
+const publicPages = ['/', 'share', 'api-docs', 'u', 'authenticate'];
 const accountPages = ['profile'];
 
 export default function RouteGuard ({ children }: { children: ReactNode }) {
