@@ -14,8 +14,6 @@ import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
 import Tooltip from '../../widgets/tooltip';
 import { Contributor } from 'models';
-import OptionsIcon from '../../widgets/icons/options';
-import { DeleteIcon } from 'components/common/Icons/DeleteIcon';
 
 type Props = {
   comment: Block;
@@ -45,10 +43,10 @@ const Comment: FC<Props> = (props: Props) => {
 
         {!props.readOnly && (
           <MenuWrapper>
-            <IconButton icon={<OptionsIcon />} />
+            <IconButton icon={<MoreHorizIcon />} />
             <Menu position='left'>
               <Menu.Text
-                icon={<DeleteIcon />}
+                icon={<DeleteOutlineIcon />}
                 id='delete'
                 name={intl.formatMessage({ id: 'Comment.delete', defaultMessage: 'Delete' })}
                 onClick={() => mutator.deleteBlock(comment)}

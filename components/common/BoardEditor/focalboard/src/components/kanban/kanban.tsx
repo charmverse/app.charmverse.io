@@ -31,7 +31,7 @@ interface NewGroupTextFieldProps {
   onClick: (groupName: string) => void
 }
 
-function NewGroupTextField (props: NewGroupTextFieldProps) {
+function NewGroupTextField(props: NewGroupTextFieldProps) {
   const { onClick } = props;
   const [groupName, setGroupName] = useState('');
   return (
@@ -61,21 +61,21 @@ function NewGroupTextField (props: NewGroupTextFieldProps) {
 }
 
 type Props = {
-    board: Board
-    activeView: BoardView
-    cards: Card[]
-    groupByProperty?: IPropertyTemplate
-    visibleGroups: BoardGroup[]
-    hiddenGroups: BoardGroup[]
-    selectedCardIds: string[]
-    intl: IntlShape
-    readOnly: boolean
-    onCardClicked: (e: React.MouseEvent, card: Card) => void
-    addCard: (groupByOptionId?: string, show?:boolean, props?: any, insertLast?: boolean) => Promise<void>
-    showCard: (cardId?: string) => void
+  board: Board
+  activeView: BoardView
+  cards: Card[]
+  groupByProperty?: IPropertyTemplate
+  visibleGroups: BoardGroup[]
+  hiddenGroups: BoardGroup[]
+  selectedCardIds: string[]
+  intl: IntlShape
+  readOnly: boolean
+  onCardClicked: (e: React.MouseEvent, card: Card) => void
+  addCard: (groupByOptionId?: string, show?: boolean, props?: any, insertLast?: boolean) => Promise<void>
+  showCard: (cardId?: string) => void
 }
 
-function Kanban (props: Props) {
+function Kanban(props: Props) {
   const { board, activeView, cards, groupByProperty, visibleGroups, hiddenGroups } = props;
   const popupState = usePopupState({ variant: 'popper', popupId: 'new-group' });
   const propertyValues = groupByProperty?.options || [];
@@ -284,14 +284,14 @@ function Kanban (props: Props) {
         {/* Hidden column header */}
 
         {hiddenGroups.length > 0
-                    && (
-                    <div className='octo-board-header-cell narrow'>
-                      <FormattedMessage
-                        id='BoardComponent.hidden-columns'
-                        defaultMessage='Hidden columns'
-                      />
-                    </div>
-                    )}
+          && (
+            <div className='octo-board-header-cell narrow'>
+              <FormattedMessage
+                id='BoardComponent.hidden-columns'
+                defaultMessage='Hidden columns'
+              />
+            </div>
+          )}
       </div>
 
       {/* Main content */}
@@ -322,58 +322,58 @@ function Kanban (props: Props) {
                   readOnly={props.readOnly}
                   isSelected={props.selectedCardIds.includes(card.id)}
                   onClick={(e) => {
-                      props.onCardClicked(e, card);
-                    }}
+                    props.onCardClicked(e, card);
+                  }}
                   onDrop={onDropToCard}
                   showCard={props.showCard}
                   isManualSort={isManualSort}
                 />
               ))}
               {!props.readOnly
-                          && (
-                          <Button
-                            size='small'
-                            variant='text'
-                            color='secondary'
-                            sx={{ justifyContent: 'flex-start' }}
-                            onClick={() => {
-                              props.addCard(group.option.id, true, {}, true);
-                            }}
-                          >
-                            <FormattedMessage
-                              id='BoardComponent.new'
-                              defaultMessage='+ New'
-                            />
-                          </Button>
-                          )}
+                && (
+                  <Button
+                    size='small'
+                    variant='text'
+                    color='secondary'
+                    sx={{ justifyContent: 'flex-start' }}
+                    onClick={() => {
+                      props.addCard(group.option.id, true, {}, true);
+                    }}
+                  >
+                    <FormattedMessage
+                      id='BoardComponent.new'
+                      defaultMessage='+ New'
+                    />
+                  </Button>
+                )}
             </KanbanColumn>
           ))}
 
           {/* Add whitespace underneath "Add a group" button */}
 
           {!props.readOnly
-                      && (
-                      <div className='octo-board-header-cell narrow'>
-                      </div>
-                      )}
+            && (
+              <div className='octo-board-header-cell narrow'>
+              </div>
+            )}
 
           {/* Hidden columns */}
 
           {hiddenGroups.length > 0
-                  && (
-                  <div className='octo-board-column narrow'>
-                    {hiddenGroups.map((group) => (
-                      <KanbanHiddenColumnItem
-                        key={group.option.id}
-                        group={group}
-                        activeView={activeView}
-                        intl={props.intl}
-                        readOnly={props.readOnly}
-                        onDrop={(card: Card) => onDropToColumn(group.option, card)}
-                      />
-                    ))}
-                  </div>
-                  )}
+            && (
+              <div className='octo-board-column narrow'>
+                {hiddenGroups.map((group) => (
+                  <KanbanHiddenColumnItem
+                    key={group.option.id}
+                    group={group}
+                    activeView={activeView}
+                    intl={props.intl}
+                    readOnly={props.readOnly}
+                    onDrop={(card: Card) => onDropToColumn(group.option, card)}
+                  />
+                ))}
+              </div>
+            )}
         </div>
       </ScrollingComponent>
     </Box>

@@ -8,9 +8,9 @@ import { Card } from '../blocks/card';
 import mutator from '../mutator';
 import EmojiPicker from '../widgets/emojiPicker';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import EmojiIcon from '../widgets/icons/emoji';
 import Menu from '../widgets/menu';
 import MenuWrapper from '../widgets/menuWrapper';
+import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
 
 type Props = {
     block: Board|Card
@@ -54,7 +54,7 @@ const BlockIconSelector = React.memo((props: Props) => {
               <Menu>
                 <Menu.Text
                   id='random'
-                  icon={<EmojiIcon />}
+                  icon={<EmojiEmotionsOutlinedIcon />}
                   name={intl.formatMessage({ id: 'ViewTitle.random-icon', defaultMessage: 'Random' })}
                   onClick={() => {
                     setPage && setPage({ icon: onAddRandomIcon() });
@@ -62,7 +62,7 @@ const BlockIconSelector = React.memo((props: Props) => {
                 />
                 <Menu.SubMenu
                   id='pick'
-                  icon={<EmojiIcon />}
+                  icon={<EmojiEmotionsOutlinedIcon />}
                   name={intl.formatMessage({ id: 'ViewTitle.pick-icon', defaultMessage: 'Pick icon' })}
                 >
                   <EmojiPicker onSelect={(emoji) => {

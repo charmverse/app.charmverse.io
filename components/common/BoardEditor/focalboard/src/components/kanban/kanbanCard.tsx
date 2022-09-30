@@ -30,8 +30,6 @@ import MenuWrapper from '../../widgets/menuWrapper';
 import Tooltip from '../../widgets/tooltip';
 import ConfirmationDialogBox, { ConfirmationDialogBoxProps } from '../confirmationDialogBox';
 import PropertyValueElement from '../propertyValueElement';
-import OptionsIcon from '../../widgets/icons/options';
-import { DeleteIcon } from 'components/common/Icons/DeleteIcon';
 
 type Props = {
   card: Card
@@ -142,11 +140,11 @@ const KanbanCard = React.memo((props: Props) => {
               className='optionsMenu'
               stopPropagationOnToggle={true}
             >
-              <IconButton icon={<OptionsIcon />} />
+              <IconButton icon={<MoreHorizIcon />} />
               <Menu position='bottom-start'>
                 {pagePermissions.delete && pages[card.id]?.deletedAt === null && (
                 <Menu.Text
-                  icon={<DeleteIcon />}
+                  icon={<DeleteOutlineIcon />}
                   id='delete'
                   name={intl.formatMessage({ id: 'KanbanCard.delete', defaultMessage: 'Delete' })}
                   onClick={handleDeleteButtonOnClick}
