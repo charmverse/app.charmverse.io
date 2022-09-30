@@ -54,7 +54,7 @@ async function convertFolderContent ({
   oldNewHashmap[newPageId] = pageContent.id;
 
   pageContent.id = newPageId;
-  pageContent.galleryImg = getPreviewImageFromContent(pageContent.content as PageContent);
+  pageContent.galleryImage = getPreviewImageFromContent(pageContent.content as PageContent);
 
   if (pageContent.type === 'board') {
     pageContent.boardId = pageContent.id;

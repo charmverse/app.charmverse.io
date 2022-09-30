@@ -56,7 +56,7 @@ function selectPageFields (meta: boolean) {
       fullWidth: true,
       bountyId: true,
       hasContent: true,
-      galleryImg: true,
+      galleryImage: true,
       ...includePagePermissions()
     }
   };

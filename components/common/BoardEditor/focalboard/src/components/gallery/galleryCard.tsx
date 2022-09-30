@@ -56,7 +56,7 @@ const GalleryCard = React.memo((props: Props) => {
     className += ' dragover';
   }
 
-  const galleryImageUrl: null | string | undefined = cardPage?.headerImage || cardPage?.galleryImg;
+  const galleryImageUrl: null | string | undefined = cardPage?.headerImage || cardPage?.galleryImage;
 
   const { showMessage } = useSnackbar();
 

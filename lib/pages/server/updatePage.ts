@@ -27,7 +27,7 @@ export async function updatePage (page: CurrentPageData, userId: string, updates
     data.hasContent = !checkIsContentEmpty(updates.content as PageContent);
 
     if (page.type === 'card') {
-      data.galleryImg = getPreviewImageFromContent(updates.content as PageContent);
+      data.galleryImage = getPreviewImageFromContent(updates.content as PageContent);
     }
   }
 

@@ -10,7 +10,7 @@ export function createPage<T> ({ data, include }: Prisma.PageCreateArgs): Prisma
     data: {
       ...data,
       hasContent: data.content ? !checkIsContentEmpty(data.content as PageContent) : false,
-      galleryImg: getPreviewImageFromContent(data.content as PageContent)
+      galleryImage: getPreviewImageFromContent(data.content as PageContent)
     }
   };
 

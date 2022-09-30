@@ -15,14 +15,14 @@ async function updatePageGalleryUrl () {
   });
 
   const pagesWithContent = pages.filter(p => !checkIsContentEmpty(p.content as PageContent))
-  const cardsWithFallbackImage = pagesWithContent.map(p => ({ id: p.id, galleryImg: getPreviewImageFromContent(p.content as PageContent) }) )
-    .filter(p => !!p.galleryImg)
+  const cardsWithFallbackImage = pagesWithContent.map(p => ({ id: p.id, galleryImage: getPreviewImageFromContent(p.content as PageContent) }) )
+    .filter(p => !!p.galleryImage)
 
   console.log('🔥 Count of cards with gallery url:', cardsWithFallbackImage.length);
 
-  await prisma.$transaction(cardsWithFallbackImage.map(({ id, galleryImg }) => prisma.page.update({
+  await prisma.$transaction(cardsWithFallbackImage.map(({ id, galleryImage }) => prisma.page.update({
     where: { id },
-    data: { galleryImg }
+    data: { galleryImage }
   })))
 
   console.log('🔥 Updated galleryUrl for all cards with image in content.');

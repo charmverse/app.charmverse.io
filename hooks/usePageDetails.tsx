@@ -30,13 +30,13 @@ export function usePageDetails (pageIdOrPath: string, spaceId?: string) {
     };
 
     const hasContent = !checkIsContentEmpty(updatedPage.content as PageContent);
-    const galleryImg = getPreviewImageFromContent(updatedPage.content as PageContent);
+    const galleryImage = getPreviewImageFromContent(updatedPage.content as PageContent);
 
     // Update pages context data only when hasContent value changed
     mutatePagesList(pages => {
       const currentPageData = pages?.[pageId];
-      if (currentPageData && (currentPageData.hasContent !== hasContent || currentPageData.galleryImg !== galleryImg)) {
-        return { ...pages, [pageId]: { ...currentPageData, hasContent, galleryImg } };
+      if (currentPageData && (currentPageData.hasContent !== hasContent || currentPageData.galleryImage !== galleryImage)) {
+        return { ...pages, [pageId]: { ...currentPageData, hasContent, galleryImage } };
       }
 
       return pages;
