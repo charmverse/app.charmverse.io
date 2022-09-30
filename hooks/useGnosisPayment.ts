@@ -5,6 +5,7 @@ import { useWeb3React } from '@web3-react/core';
 import type { MultiPaymentResult } from 'components/bounties/components/MultiPaymentButton';
 import { getChainById } from 'connectors';
 import { ethers } from 'ethers';
+import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import useGnosisSafes from './useGnosisSafes';
 
 export type GnosisPaymentProps = {
@@ -18,7 +19,7 @@ export function useGnosisPayment ({
   chainId, safeAddress, transactions, onSuccess
 }: GnosisPaymentProps) {
 
-  const { account, library } = useWeb3React();
+  const { account, chainId: connectedChainId, library } = useWeb3React();
 
   const [safe] = useGnosisSafes([safeAddress]);
   const network = getChainById(chainId);
@@ -26,9 +27,15 @@ export function useGnosisPayment ({
     throw new Error(`Unsupported Gnosis network: ${chainId}`);
   }
   async function makePayment () {
+
+    if (chainId !== connectedChainId) {
+      await switchActiveNetwork(chainId);
+    }
+
     if (!safe || !account || !network?.gnosisUrl) {
       return;
     }
+
     const safeTransaction = await safe.createTransaction(transactions.map(transaction => (
       {
         data: transaction.data,
