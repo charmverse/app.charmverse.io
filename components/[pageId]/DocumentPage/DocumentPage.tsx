@@ -21,6 +21,8 @@ import { useRouter } from 'next/router';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
+import { useSpaces } from 'hooks/useSpaces';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import BountyProperties from './components/BountyProperties';
 import PageBanner from './components/PageBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
@@ -58,6 +60,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
   const { pages, getPagePermissions } = usePages();
   const { cancelVote, castVote, deleteVote, votes, isLoading } = useVotes();
   const pagePermissions = getPagePermissions(page.id);
+  const [currentSpace] = useCurrentSpace();
 
   const { draftBounty } = useBounties();
   const { currentPageActionDisplay } = usePageActionDisplay();
@@ -82,6 +85,17 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
       refreshBountyPermissions(page.bountyId);
     }
   }, [page.bountyId]);
+
+  useEffect(() => {
+    const anchor = document.querySelector(`a[href="/${currentSpace?.domain}/${page.path}"]`);
+    if (anchor) {
+      setTimeout(() => {
+        anchor.scrollIntoView({
+          behavior: 'smooth'
+        });
+      }, 1000);
+    }
+  }, []);
 
   const cannotComment = readOnly || !pagePermissions?.comment;
   const enableSuggestingMode = editMode === 'suggesting' && !readOnly && pagePermissions?.comment;
