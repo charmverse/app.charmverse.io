@@ -131,7 +131,7 @@ function ProposalPageTitle ({ basePath }: { basePath: string }) {
           Proposals
         </Link>
       </BreadCrumb>
-      {pageTitle}
+      {pageTitle || 'Untitled'}
     </PageTitle>
   );
 }
@@ -145,7 +145,7 @@ function BountyPageTitle ({ basePath }: { basePath: string }) {
           Bounties
         </Link>
       </BreadCrumb>
-      {pageTitle}
+      {pageTitle || 'Untitled'}
     </PageTitle>
   );
 }
