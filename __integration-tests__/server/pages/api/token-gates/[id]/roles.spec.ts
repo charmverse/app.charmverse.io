@@ -93,18 +93,18 @@ beforeAll(async () => {
   });
 
   cookie1 = await loginUser(user1);
-  cookie1 = await loginUser(user2);
+  cookie2 = await loginUser(user2);
 
 });
 
-describe('first', () => {
-  it('Should fail if correct keys aren\'t provided in body', async () => {
+describe('POST /token-gates/{tokenGateId}/rolesn- assign roles to token gate', () => {
+  it('Should fail if correct keys are not provided in body', async () => {
     const response = await request(baseUrl).post(`/api/token-gates/${tokenGate.id}/roles`).set('Cookie', cookie1).send({});
     expect(response.statusCode).toBe(400);
     expect(response.body.message).toBe('Key roleIds is required in request body and must not be an empty value');
   });
 
-  it('Should fail if the user isn\'t an admin of the space', async () => {
+  it('Should fail if the user is not an admin of the space', async () => {
     const response = await request(baseUrl).post(`/api/token-gates/${tokenGate.id}/roles`).set('Cookie', cookie2).send({ spaceId: space.id, roleIds: [] });
     expect(response.statusCode).toBe(401);
     expect(response.body.message).toBe('Only space administrators can perform this action');
