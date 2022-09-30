@@ -28,8 +28,8 @@ async function updatePageHasContent () {
     try {
       const imageSource = page.headerImage;
       const imageFile = getImageFromBinary(page.createdBy, imageSource);
-      const s3ImageUrl = getUserS3FilePath(imageFile.name);
-      const { fileUrl } = await uploadFileToS3({ fileName: imageFile.name, fileContent: imageFile.content });
+      const pathInS3 = getUserS3FilePath({ userId: page.createdBy, url: imageFile.path });
+      const { fileUrl } = await uploadFileToS3({ pathInS3, content: imageFile.content });
 
       await prisma.page.update({
         where: { id: page.id },
@@ -54,19 +54,19 @@ function getImageFromBinary (userId: string, imageSource: string) {
 
   const fileContent = Buffer.from(rawFileContent, 'base64');
 
-  // Break the buffer string into chunks of 1 kilobyte
-  const chunkSize = 1024 * 1;
+  // // Break the buffer string into chunks of 1 kilobyte
+  // const chunkSize = 1024 * 1;
 
-  const bufferLength = fileContent.length;
+  // const bufferLength = fileContent.length;
 
-  const bufferChunks = [];
+  // const bufferChunks = [];
 
-  for (let i = 0; i < bufferLength; i += chunkSize) {
-    const chunk = fileContent.slice(i, i + chunkSize);
-    bufferChunks.push(chunk);
-  }
+  // for (let i = 0; i < bufferLength; i += chunkSize) {
+  //   const chunk = fileContent.slice(i, i + chunkSize);
+  //   bufferChunks.push(chunk);
+  // }
 
-  return { name: fileName, content: bufferChunks };
+  return { path: fileName, content: fileContent };
 }
 
 
