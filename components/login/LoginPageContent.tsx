@@ -65,15 +65,14 @@ export function LoginPageContent ({ walletSigned }: Props) {
               Tasks, docs, bounties, and more
             </Typography>
             <Box display={{ sm: 'flex' }} gap={2} alignItems='center'>
-              <Box>
-                <WalletSign signSuccess={walletSigned} />
-                <Typography color='secondary' variant='body2' sx={{ lineHeight: '40px' }}>
-                  or
-                </Typography>
-                <Button sx={{ width: '100%' }} variant='outlined' size='large' href={`/api/discord/oauth?type=login&redirect=${returnUrl ?? '/'}`}>
-                  Connect Discord
-                </Button>
-              </Box>
+
+              <WalletSign signSuccess={walletSigned} />
+              <Typography color='secondary' variant='body2' sx={{ lineHeight: '40px' }}>
+                or
+              </Typography>
+              <Button sx={{ width: '100%' }} variant='outlined' size='large' href={`/api/discord/oauth?type=login&redirect=${returnUrl ?? '/'}`}>
+                Connect Discord
+              </Button>
 
             </Box>
           </Box>
