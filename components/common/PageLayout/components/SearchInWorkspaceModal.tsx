@@ -107,7 +107,7 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
   const [inputValue, setInputValue] = useState('');
   const [options, setOptions] = useState<SearchResultItem[]>([]);
 
-  const throttledSearch = throttle(getSearchResults, 100);
+  const throttledSearch = throttle(getSearchResults, 200);
 
   useEffect(() => {
 
