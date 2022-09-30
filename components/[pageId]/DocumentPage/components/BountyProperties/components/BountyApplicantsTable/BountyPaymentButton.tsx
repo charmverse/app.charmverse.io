@@ -21,7 +21,8 @@ import { shortenHex } from 'lib/utilities/strings';
 import type { MouseEvent } from 'react';
 import { useMemo, useState } from 'react';
 import useSWR from 'swr';
-import ERC20ABI from '../../../../../../../abis/ERC20ABI.json';
+import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
+import ERC20ABI from 'abis/ERC20ABI.json';
 
 interface Props {
   receiver: string;
@@ -61,57 +62,18 @@ function extractWalletErrorMessage (error: any): string {
   }
 }
 
-/**
- * See
- * https://stackoverflow.com/a/68267546
- * @param chainId
- * @returns
- */
-async function switchActiveNetwork (chainId: number) {
-  try {
-    await (window as any).ethereum.request({
-      method: 'wallet_switchEthereumChain',
-      params: [{ chainId: ethers.utils.hexValue(chainId) }]
-    });
-    return;
-  }
-  catch (error: any) {
-    if (error.code === 4902) {
-
-      const chainInfo = getChainById(chainId);
-
-      if (!chainInfo) {
-        throw new Error('Unsupported chain');
-      }
-
-      return (window as any).ethereum.request({
-        method: 'wallet_addEthereumChain',
-        params: [
-          {
-            ...chainInfo,
-            chainId: ethers.utils.hexValue(chainInfo?.chainId)
-          }
-
-        ]
-      });
-
-    }
-    else {
-      throw error;
-    }
-  }
-}
-
 function SafeMenuItem ({
   label,
   safeInfo,
   bounty,
-  onClick
+  onClick,
+  onError = () => {}
 }: {
   safeInfo: SafeData;
   label: string;
   bounty: BountyWithDetails;
   onClick: () => void;
+  onError: (err: string, severity?: AlertColor) => void;
 }) {
   const { onPaymentSuccess, transactions } = useMultiBountyPayment({ bounties: [bounty] });
   const { makePayment } = useGnosisPayment({
@@ -122,9 +84,21 @@ function SafeMenuItem ({
   });
 
   return (
-    <MenuItem onClick={() => {
+    <MenuItem onClick={async () => {
       onClick();
-      makePayment();
+      try {
+        await makePayment();
+      }
+      catch (error: any) {
+        const errorMessage = extractWalletErrorMessage(error);
+
+        if (errorMessage === 'underlying network changed') {
+          onError("You've changed your active network.\r\nRe-select 'Make payment' to complete this transaction", 'warning');
+        }
+        else {
+          onError(errorMessage);
+        }
+      }
     }}
     >{label}
     </MenuItem>
@@ -154,19 +128,17 @@ export default function BountyPaymentButton ({
   };
 
   const { data: safeInfos } = useSWR(
-    (signer && account && chainId) ? `/connected-gnosis-safes/${account}` : null,
+    (signer && account) ? `/connected-gnosis-safes/${account}/${chainIdToUse}` : null,
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    () => getSafesForAddress({ signer: signer!, chainId: chainId!, address: account! })
+    () => getSafesForAddress({ signer: signer!, chainId: chainIdToUse, address: account! })
   );
 
-  const safeDataRecord = useMemo(() => {
-    return safesData?.reduce<Record<string, UserGnosisSafe>>((record, userGnosisSafe) => {
-      if (!record[userGnosisSafe.address]) {
-        record[userGnosisSafe.address] = userGnosisSafe;
-      }
-      return record;
-    }, {}) ?? {};
-  }, [safesData]);
+  const safeDataRecord = safesData?.reduce<Record<string, UserGnosisSafe>>((record, userGnosisSafe) => {
+    if (!record[userGnosisSafe.address]) {
+      record[userGnosisSafe.address] = userGnosisSafe;
+    }
+    return record;
+  }, {}) ?? {};
 
   const [paymentMethods] = usePaymentMethods();
 
@@ -306,6 +278,7 @@ export default function BountyPaymentButton ({
                 onClick();
                 handleClose();
               }}
+              onError={onError}
               safeInfo={safeInfo}
             />
           ))
