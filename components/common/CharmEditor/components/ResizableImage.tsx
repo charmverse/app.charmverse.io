@@ -188,43 +188,43 @@ function ResizableImage ({ readOnly = false, onResizeStop, node, updateAttrs, se
       );
     }
   }
-  else if (imageSource.startsWith('data') && !uploadingImage && !readOnly && onResizeStop && !uploadFailed) {
-    setUploadingImage(true);
+  // else if (imageSource.startsWith('data') && !uploadingImage && !readOnly && onResizeStop && !uploadFailed) {
+  //   setUploadingImage(true);
 
-    const fileExtension = imageSource.split('image/')[1].split(';')[0];
-    const fileName = `${v4()}.${fileExtension}`;
+  //   const fileExtension = imageSource.split('image/')[1].split(';')[0];
+  //   const fileName = `${v4()}.${fileExtension}`;
 
-    const rawFileContent = imageSource.split(';base64,')[1];
+  //   const rawFileContent = imageSource.split(';base64,')[1];
 
-    const fileContent = Buffer.from(rawFileContent, 'base64');
+  //   const fileContent = Buffer.from(rawFileContent, 'base64');
 
-    // Break the buffer string into chunks of 1 kilobyte
-    const chunkSize = 1024 * 1;
+  //   // Break the buffer string into chunks of 1 kilobyte
+  //   const chunkSize = 1024 * 1;
 
-    const bufferLength = fileContent.length;
+  //   const bufferLength = fileContent.length;
 
-    const bufferChunks = [];
+  //   const bufferChunks = [];
 
-    for (let i = 0; i < bufferLength; i += chunkSize) {
-      const chunk = fileContent.slice(i, i + chunkSize);
-      bufferChunks.push(chunk);
-    }
+  //   for (let i = 0; i < bufferLength; i += chunkSize) {
+  //     const chunk = fileContent.slice(i, i + chunkSize);
+  //     bufferChunks.push(chunk);
+  //   }
 
-    const file: File = new File(bufferChunks, fileName, { type: `image/${fileExtension}` });
+  //   const file: File = new File(bufferChunks, fileName, { type: `image/${fileExtension}` });
 
-    uploadToS3(file)
-      .then(({ url }) => {
-        updateAttrs({
-          src: url
-        });
-      })
-      .catch(() => {
-        setUploadFailed(true);
-      })
-      .finally(() => {
-        setUploadingImage(false);
-      });
-  }
+  //   uploadToS3(file)
+  //     .then(({ url }) => {
+  //       updateAttrs({
+  //         src: url
+  //       });
+  //     })
+  //     .catch(() => {
+  //       setUploadFailed(true);
+  //     })
+  //     .finally(() => {
+  //       setUploadingImage(false);
+  //     });
+  // }
   if (uploadFailed) {
     return <Alert severity='warning'>Image upload failed</Alert>;
   }
