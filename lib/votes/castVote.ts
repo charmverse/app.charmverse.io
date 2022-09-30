@@ -35,7 +35,7 @@ export async function castVote (choice: string, vote: Vote & { voteOptions: Vote
   });
 
   if (vote.context === VoteContext.proposal) {
-    trackUserAction('ProposalVoteCasted', { userId, resourceId: voteId, spaceId: vote.spaceId, platform: 'charmverse' });
+    trackUserAction('new_vote_created', { userId, resourceId: voteId, spaceId: vote.spaceId, platform: 'charmverse' });
   }
 
   return userVote;

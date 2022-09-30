@@ -1,3 +1,4 @@
+import { capitalize } from 'lodash';
 import Mixpanel from 'mixpanel';
 import type { LoggedInUser } from 'models';
 import type { MixpanelEvent, MixpanelEventName, MixpanelTrackBase, MixpanelUserProfile } from './interfaces/index';
@@ -16,8 +17,14 @@ export function trackUserAction<T extends MixpanelEventName> (eventName: T, para
     distinct_id: userId,
     ...restParams
   };
+  const humanReadableEventName = eventNameToHumanFormat(eventName);
 
-  mixpanelInstance?.track(eventName, mixpanelTrackParams);
+  try {
+    mixpanelInstance?.track(humanReadableEventName, mixpanelTrackParams);
+  }
+  catch (e) {
+    // Failed to send mixpanel event
+  }
 }
 
 export function updateTrackUserProfile (user: LoggedInUser) {
@@ -30,4 +37,9 @@ export function updateTrackUserProfile (user: LoggedInUser) {
   };
 
   mixpanelInstance?.people.set(user.id, profile);
+}
+
+// format event_name to Event name
+function eventNameToHumanFormat (eventName: MixpanelEventName) {
+  return capitalize(eventName.toLowerCase().replace('_', ' '));
 }

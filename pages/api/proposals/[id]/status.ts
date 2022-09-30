@@ -52,7 +52,7 @@ async function updateProposalStatusController (req: NextApiRequest, res: NextApi
     userId
   });
 
-  trackUserAction('ProposalStatusUpdated', { userId, resourceId: proposalId, status: newStatus, spaceId: proposal.spaceId });
+  trackUserAction('new_proposal_stage', { userId, resourceId: proposalId, status: newStatus, spaceId: proposal.spaceId });
 
   return res.status(200).end();
 }

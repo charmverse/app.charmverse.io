@@ -37,7 +37,7 @@ export async function createUserFromWallet (address: string): Promise<LoggedInUs
     });
 
     updateTrackUserProfile(newUser);
-    trackUserAction('UserCreated', { userId: newUser.id, identityType: 'Wallet' });
+    trackUserAction('sign_up', { userId: newUser.id, identityType: 'Wallet' });
 
     return newUser;
 

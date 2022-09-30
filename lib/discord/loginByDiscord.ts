@@ -24,7 +24,7 @@ export default async function loginByDiscord ({ code, hostName }: { code: string
   });
 
   if (discordUser) {
-    trackUserAction('UserLogin', { userId: discordUser.user.id, identityType: 'Discord' });
+    trackUserAction('sign_in', { userId: discordUser.user.id, identityType: 'Discord' });
     return discordUser.user;
   }
   else {
@@ -59,7 +59,7 @@ export default async function loginByDiscord ({ code, hostName }: { code: string
     });
 
     updateTrackUserProfile(newUser);
-    trackUserAction('UserCreated', { userId: newUser.id, identityType: 'Discord' });
+    trackUserAction('sign_up', { userId: newUser.id, identityType: 'Discord' });
     logSignupViaDiscord();
 
     return newUser;

@@ -58,7 +58,7 @@ async function acceptInvite (req: NextApiRequest, res: NextApiResponse) {
     logInviteAccepted(newRole);
 
     updateTrackUserProfileById(userId);
-    trackUserAction('SpaceJoined', { userId, source: 'invite_link', spaceId: invite.spaceId });
+    trackUserAction('join_a_workspace', { userId, source: 'invite_link', spaceId: invite.spaceId });
 
     await prisma.inviteLink.update({
       where: { id: invite.id },

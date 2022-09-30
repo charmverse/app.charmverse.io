@@ -7,18 +7,18 @@ export interface UserCreatedEvent extends BaseEvent {
 
 export interface TokenGateVerificationEvent extends BaseEvent, SpaceEvent {
   roles?: string[];
-  result: 'pass' | 'fail'
+  result: 'pass' | 'fail';
 }
 
 export interface SpaceJoined extends SpaceEvent {
-  source: 'invite_link' | 'public_bounty_token_gate' | 'token_gate'
+  source: 'invite_link' | 'public_bounty_token_gate' | 'token_gate';
 }
 
 export interface UserEvents {
-  UserCreated: UserCreatedEvent;
-  UserLogin: UserCreatedEvent;
-  SpaceLoaded: SpaceEvent;
-  SpaceCreated: SpaceEvent;
-  SpaceJoined: SpaceJoined;
-  TokenGateVerification: TokenGateVerificationEvent;
+  sign_up: UserCreatedEvent;
+  sign_in: UserCreatedEvent;
+  load_a_workspace: SpaceEvent;
+  create_new_workspace: SpaceEvent;
+  join_a_workspace: SpaceJoined;
+  token_gate_verification: TokenGateVerificationEvent;
 }

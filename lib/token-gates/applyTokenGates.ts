@@ -32,7 +32,7 @@ export async function applyTokenGates ({ spaceId, userId, tokens, commit }: Toke
   });
 
   if (!space) {
-    trackUserAction('TokenGateVerification', { result: 'fail', spaceId, userId });
+    trackUserAction('token_gate_verification', { result: 'fail', spaceId, userId });
     throw new DataNotFoundError(`Could not find space with id ${spaceId}.`);
   }
 
@@ -40,7 +40,7 @@ export async function applyTokenGates ({ spaceId, userId, tokens, commit }: Toke
 
   // We need to have at least one token gate that succeeded in order to proceed
   if (tokenGates.length === 0) {
-    trackUserAction('TokenGateVerification', { result: 'fail', spaceId, spaceName: space.name, userId });
+    trackUserAction('token_gate_verification', { result: 'fail', spaceId, spaceName: space.name, userId });
     throw new DataNotFoundError('No token gates were found for this space.');
   }
 
@@ -66,7 +66,7 @@ export async function applyTokenGates ({ spaceId, userId, tokens, commit }: Toke
   }))).filter(tk => tk !== null) as TokenGateWithRoles[];
 
   if (verifiedTokenGates.length === 0) {
-    trackUserAction('TokenGateVerification', { result: 'fail', spaceId, spaceName: space.name, userId });
+    trackUserAction('token_gate_verification', { result: 'fail', spaceId, spaceName: space.name, userId });
     throw new InsecureOperationError('At least one token gate verification must succeed to grant a space membership.');
   }
 
@@ -96,8 +96,8 @@ export async function applyTokenGates ({ spaceId, userId, tokens, commit }: Toke
     roles: assignedRoles
   };
 
-  trackUserAction('TokenGateVerification', { result: 'pass', spaceId, spaceName: space.name, userId, roles: assignedRoles.map(r => r.name) });
-  trackUserAction('SpaceJoined', { spaceId, spaceName: space.name, userId, source: 'token_gate' });
+  trackUserAction('token_gate_verification', { result: 'pass', spaceId, spaceName: space.name, userId, roles: assignedRoles.map(r => r.name) });
+  trackUserAction('join_a_workspace', { spaceId, spaceName: space.name, userId, source: 'token_gate' });
 
   if (!commit) {
     return returnValue;

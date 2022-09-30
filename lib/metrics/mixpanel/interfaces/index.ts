@@ -25,7 +25,7 @@ export interface MixpanelUserProfile {
   $name: string;
   discordConnected: boolean;
   walletConnected: boolean;
-  spaces?: string[]
+  spaces?: string[];
 }
 
 export type MixpanelEvent = UserEvents & ProposalEvents
