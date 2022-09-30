@@ -36,7 +36,12 @@ export function updateTrackUserProfile (user: LoggedInUser) {
     spaces: user.spaceRoles.map(sr => sr.spaceId)
   };
 
-  mixpanelInstance?.people.set(user.id, profile);
+  try {
+    mixpanelInstance?.people.set(user.id, profile);
+  }
+  catch (e) {
+    // Failed to update mixpanel profile
+  }
 }
 
 // format event_name to Event name
