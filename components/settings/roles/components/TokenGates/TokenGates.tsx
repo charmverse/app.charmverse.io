@@ -70,7 +70,7 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
   const [apiError, setApiError] = useState<string>('');
   const { data, mutate } = useSWR(`tokenGates/${spaceId}`, () => charmClient.getTokenGates({ spaceId }));
 
-  const shareLink = `https://app.charmverse.io/join?domain=${router.query.domain}`;
+  const shareLink = `${window.location.origin}/join?domain=${router.query.domain}`;
 
   function onSubmit (conditions: ConditionsModalResult) {
     setApiError('');

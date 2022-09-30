@@ -7,15 +7,13 @@ import charmClient from 'charmClient';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import PrimaryButton from 'components/common/PrimaryButton';
+import { WalletSign } from 'components/login';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import getLitChainFromChainId from 'lib/token-gates/getLitChainFromChainId';
 import type { TokenGateEvaluationResult, TokenGateWithRoles } from 'lib/token-gates/interfaces';
-import { checkAndSignAuthMessage } from 'lit-js-sdk';
 import { useEffect, useState } from 'react';
-import { WalletSign } from 'components/login';
 import type { AuthSig } from '../../../lib/blockchain/interfaces';
 import TokenGateOption from './TokenGateOption';
 
@@ -27,11 +25,11 @@ interface Props {
 
 export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel }: Props) {
 
-  const { account, chainId } = useWeb3React();
+  const { account } = useWeb3React();
   const { showMessage } = useSnackbar();
   const [spaces, setSpaces] = useSpaces();
   const { user, setUser } = useUser();
-  const { walletAuthSignature, sign } = useWeb3AuthSig();
+  const { walletAuthSignature } = useWeb3AuthSig();
 
   const [tokenGates, setTokenGates] = useState<TokenGateWithRoles[] | null>(null);
 
@@ -86,6 +84,20 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
 
   async function onSubmit () {
     setJoiningSpace(true);
+
+    if (!user || !user.addresses.some(a => a === account)) {
+      try {
+        // Refresh the user account. This was required as otherwise the user would not be able to see the first page upon joining the space
+        const refreshedProfile = await charmClient.login({ address: account as string, walletSignature: walletAuthSignature as AuthSig });
+
+        setUser(refreshedProfile);
+      }
+      catch (err) {
+        const newProfile = await charmClient.login({ address: account as string, walletSignature: walletAuthSignature as AuthSig });
+        setUser(newProfile);
+      }
+    }
+
     try {
       await charmClient.verifyTokenGate({
         commit: true,
@@ -100,11 +112,6 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
 
       showMessage(`You have joined the ${tokenGateResult?.space.name} workspace.`, 'success');
       const spaceExists = spaces.some(s => s.id === tokenGateResult?.space.id);
-
-      // Refresh the user account. This was required as otherwise the user would not be able to see the first page upon joining the space
-      const refreshedProfile = await charmClient.login({ address: account as string, walletSignature: walletAuthSignature as AuthSig });
-
-      setUser(refreshedProfile);
 
       // Refresh spaces as otherwise the redirect will not work
       if (!spaceExists) {
@@ -179,7 +186,7 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
       <Grid item>
         {
           !tokenGateResult?.canJoinSpace ? (
-            <WalletSign signSuccess={evaluateEligibility} />
+            <WalletSign signSuccess={evaluateEligibility} buttonStyle={{ width: '100%' }} />
           ) : (
             <PrimaryButton
               size='large'
