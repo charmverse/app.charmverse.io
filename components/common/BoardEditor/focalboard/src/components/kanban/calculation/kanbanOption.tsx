@@ -1,8 +1,9 @@
 import { useState } from 'react';
 
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { IPropertyTemplate } from '../../../blocks/board';
+
 import { Constants } from '../../../constants';
-import ChevronRight from '../../../widgets/icons/chevronRight';
 import { Option as SelectOption, typesByOptions } from '../../calculations/options';
 
 type OptionProps = SelectOption & {
@@ -61,7 +62,7 @@ function Option (props: {data: OptionProps}): JSX.Element {
       }}
     >
       <span>
-        {props.data.label} {props.data.value !== 'count' && <ChevronRight />}
+        {props.data.label} {props.data.value !== 'count' && <ChevronRightIcon fontSize='small' />}
       </span>
 
       {

@@ -18,9 +18,9 @@ import { getCardComments } from '../../store/comments';
 import { useAppSelector } from '../../store/hooks';
 import { Utils } from '../../utils';
 import IconButton from '../../widgets/buttons/iconButton';
-import DeleteIcon from '../../widgets/icons/delete';
-import LinkIcon from '../../widgets/icons/Link';
-import OptionsIcon from '../../widgets/icons/options';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import LinkIcon from '@mui/icons-material/Link';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
 import Tooltip from '../../widgets/tooltip';
@@ -100,11 +100,11 @@ const GalleryCard = React.memo((props: Props) => {
           className='optionsMenu'
           stopPropagationOnToggle={true}
         >
-          <IconButton icon={<OptionsIcon />} />
+          <IconButton icon={<MoreHorizIcon />} />
           <Menu position='left'>
             {pagePermissions.delete && pages[card.id]?.deletedAt === null && (
             <Menu.Text
-              icon={<DeleteIcon />}
+              icon={<DeleteOutlineIcon />}
               id='delete'
               name={intl.formatMessage({ id: 'GalleryCard.delete', defaultMessage: 'Delete' })}
               onClick={() => mutator.deleteBlock(card, 'delete card')}
