@@ -6,6 +6,8 @@ import { S3Client } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import { v4 as uuid } from 'uuid';
 
+const bucket = process.env.S3_UPLOAD_BUCKET;
+
 const client = new S3Client({
   credentials: {
     accessKeyId: process.env.S3_UPLOAD_KEY as string,
@@ -14,20 +16,13 @@ const client = new S3Client({
   region: process.env.S3_UPLOAD_REGION
 });
 
-export async function uploadToS3 ({ fileName, url }: { fileName: string, url: string }) {
-
-  const bucket = process.env.S3_UPLOAD_BUCKET;
-
-  const data = await fetch(url);
-  const arrayBuffer = await data.arrayBuffer();
-
-  const blob = Buffer.from(arrayBuffer);
+export async function uploadFileToS3 (file: { pathInS3: string, content: Buffer }) {
 
   const params: PutObjectCommandInput = {
     ACL: 'public-read',
     Bucket: bucket,
-    Key: fileName,
-    Body: blob
+    Key: file.pathInS3,
+    Body: file.content
   };
 
   const s3Upload = new Upload({
@@ -36,20 +31,33 @@ export async function uploadToS3 ({ fileName, url }: { fileName: string, url: st
   });
 
   await s3Upload.done();
-  const location = `https://s3.amazonaws.com/${bucket}/${fileName}`;
-  return {
-    url: location
-  };
+
+  const fileUrl = `https://s3.amazonaws.com/${bucket}/${file.pathInS3}`;
+  return { fileUrl };
+}
+
+export async function uploadUrlToS3 ({ pathInS3, url }: { pathInS3: string, url: string }) {
+
+  const data = await fetch(url);
+  const arrayBuffer = await data.arrayBuffer();
+
+  const blob = Buffer.from(arrayBuffer);
+
+  const { fileUrl } = await uploadFileToS3({
+    pathInS3,
+    content: blob
+  });
+  return { url: fileUrl };
 }
 
 function generateFilename (url: string) {
-  return decodeURIComponent(new URL(url).pathname.split('/').pop() || '')?.replace(/\s/g, '-') || uuid();
+  return decodeURIComponent(new URL(url).pathname.split('/').pop() || '')?.replace(/\+/g, '_').replace(/\s/g, '-') || uuid();
 }
 
 export function getFilePath ({ spaceId, url }: { spaceId: string, url: string }) {
   return `spaces/${spaceId}/${uuid()}/${generateFilename(url)}`;
 }
 
-export function getUserS3Folder ({ userId, url }: { userId: string, url: string }) {
+export function getUserS3FilePath ({ userId, url }: { userId: string, url: string }) {
   return `user-content/${userId}/${uuid()}/${generateFilename(url)}`;
 }
