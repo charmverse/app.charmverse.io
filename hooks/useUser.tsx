@@ -1,11 +1,11 @@
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import charmClient from 'charmClient';
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { LoggedInUser } from 'models';
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { lowerCaseEqual } from '../lib/utilities/strings';
-import { MissingWeb3AccountError, MissingWeb3SignatureError } from '../lib/utilities/errors';
-import type { AuthSig } from '../lib/blockchain/interfaces';
+import type { AuthSig } from 'lib/blockchain/interfaces';
+import { MissingWeb3AccountError } from 'lib/utilities/errors';
+import { lowerCaseEqual } from 'lib/utilities/strings';
 
 type IContext = {
   user: LoggedInUser | null;
@@ -14,7 +14,7 @@ type IContext = {
   isLoaded: boolean;
   setIsLoaded: (isLoaded: boolean) => void;
   loginFromWeb3Account:() => Promise<LoggedInUser>;
-  refreshUser: () => Promise<void>;
+  refreshUserWithWeb3Account: () => Promise<void>;
 };
 
 export const UserContext = createContext<Readonly<IContext>>({
@@ -24,7 +24,7 @@ export const UserContext = createContext<Readonly<IContext>>({
   isLoaded: false,
   setIsLoaded: () => undefined,
   loginFromWeb3Account: () => Promise.resolve() as any,
-  refreshUser: () => Promise.resolve()
+  refreshUserWithWeb3Account: () => Promise.resolve()
 });
 
 export function UserProvider ({ children }: { children: ReactNode }) {
@@ -63,7 +63,7 @@ export function UserProvider ({ children }: { children: ReactNode }) {
    *
    * Logs out current user if the web 3 account is not the same as the current user, otherwise refreshes them
    */
-  async function refreshUser () {
+  async function refreshUserWithWeb3Account () {
     if (!account) {
       throw new MissingWeb3AccountError();
     }
@@ -87,7 +87,7 @@ export function UserProvider ({ children }: { children: ReactNode }) {
   useEffect(() => {
 
     if (account) {
-      refreshUser();
+      refreshUserWithWeb3Account();
     }
   }, [account]);
 
@@ -102,7 +102,7 @@ export function UserProvider ({ children }: { children: ReactNode }) {
     setIsLoaded,
     updateUser,
     loginFromWeb3Account,
-    refreshUser }) as IContext, [user, isLoaded]);
+    refreshUserWithWeb3Account }) as IContext, [user, isLoaded]);
 
   return (
     <UserContext.Provider value={value}>
