@@ -4,10 +4,9 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Button from 'components/common/Button';
 import Image from 'components/common/Image';
-import PrimaryButton from 'components/common/PrimaryButton';
-import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import splashImage from 'public/images/artwork/world.png';
-import { useContext } from 'react';
+import type { AuthSig } from '../../lib/blockchain/interfaces';
+import { WalletSign } from './WalletSign';
 
 export const Container = styled(Box)`
   max-width: 100%;
@@ -15,8 +14,11 @@ export const Container = styled(Box)`
   margin: 0 auto;
 `;
 
-export default function LoginPageContent () {
-  const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
+interface Props {
+  walletSigned: (authSig: AuthSig) => void;
+}
+
+export function LoginPageContent ({ walletSigned }: Props) {
   const returnUrl = new URLSearchParams(decodeURIComponent(window.location.search)).get('returnUrl');
 
   return (
@@ -63,15 +65,15 @@ export default function LoginPageContent () {
               Tasks, docs, bounties, and more
             </Typography>
             <Box display={{ sm: 'flex' }} gap={2} alignItems='center'>
-              <PrimaryButton sx={{ width: { xs: '100%', sm: 'auto' } }} size='large' loading={!triedEager} onClick={openWalletSelectorModal}>
-                Connect Wallet
-              </PrimaryButton>
+
+              <WalletSign buttonStyle={{ width: { xs: '100%', sm: 'auto' } }} signSuccess={walletSigned} />
               <Typography color='secondary' variant='body2' sx={{ lineHeight: '40px' }}>
                 or
               </Typography>
               <Button sx={{ width: '100%' }} variant='outlined' size='large' href={`/api/discord/oauth?type=login&redirect=${returnUrl ?? '/'}`}>
                 Connect Discord
               </Button>
+
             </Box>
           </Box>
         </Grid>

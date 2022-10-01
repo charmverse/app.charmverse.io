@@ -134,6 +134,7 @@ import 'theme/styles.scss';
 import charmClient from 'charmClient';
 import GlobalComponents from 'components/_app/GlobalComponents';
 import { isDev } from 'config/constants';
+import { Web3AccountProvider } from '../hooks/useWeb3AuthSig';
 
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
 
@@ -215,38 +216,40 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
           <LocalizationProvider dateAdapter={AdapterLuxon as any}>
             <Web3ReactProvider getLibrary={getLibrary}>
               <Web3ConnectionManager>
-                <ReactDndProvider>
-                  <DataProviders>
-                    <FocalBoardProvider>
-                      <IntlProvider>
-                        <SnackbarProvider>
-                          <PageMetaTags />
-                          <CssBaseline enableColorScheme={true} />
-                          <Global styles={cssVariables} />
-                          <RouteGuard>
-                            <ErrorBoundary>
-                              <Snackbar
-                                isOpen={isOldBuild}
-                                message='New CharmVerse platform update available. Please refresh.'
-                                actions={[
-                                  <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                    <RefreshIcon fontSize='small' />
-                                  </IconButton>
-                                ]}
-                                origin={{ vertical: 'top', horizontal: 'center' }}
-                                severity='warning'
-                                handleClose={() => setIsOldBuild(false)}
-                              />
-                              {getLayout(<Component {...pageProps} />)}
+                <Web3AccountProvider>
+                  <ReactDndProvider>
+                    <DataProviders>
+                      <FocalBoardProvider>
+                        <IntlProvider>
+                          <SnackbarProvider>
+                            <PageMetaTags />
+                            <CssBaseline enableColorScheme={true} />
+                            <Global styles={cssVariables} />
+                            <RouteGuard>
+                              <ErrorBoundary>
+                                <Snackbar
+                                  isOpen={isOldBuild}
+                                  message='New CharmVerse platform update available. Please refresh.'
+                                  actions={[
+                                    <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                      <RefreshIcon fontSize='small' />
+                                    </IconButton>
+                                  ]}
+                                  origin={{ vertical: 'top', horizontal: 'center' }}
+                                  severity='warning'
+                                  handleClose={() => setIsOldBuild(false)}
+                                />
+                                {getLayout(<Component {...pageProps} />)}
 
-                              <GlobalComponents />
-                            </ErrorBoundary>
-                          </RouteGuard>
-                        </SnackbarProvider>
-                      </IntlProvider>
-                    </FocalBoardProvider>
-                  </DataProviders>
-                </ReactDndProvider>
+                                <GlobalComponents />
+                              </ErrorBoundary>
+                            </RouteGuard>
+                          </SnackbarProvider>
+                        </IntlProvider>
+                      </FocalBoardProvider>
+                    </DataProviders>
+                  </ReactDndProvider>
+                </Web3AccountProvider>
               </Web3ConnectionManager>
             </Web3ReactProvider>
           </LocalizationProvider>
@@ -259,6 +262,7 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
 function DataProviders ({ children }: { children: ReactNode }) {
 
   return (
+
     <UserProvider>
       <SpacesProvider>
         <ContributorsProvider>
@@ -276,6 +280,7 @@ function DataProviders ({ children }: { children: ReactNode }) {
         </ContributorsProvider>
       </SpacesProvider>
     </UserProvider>
+
   );
 }
 
