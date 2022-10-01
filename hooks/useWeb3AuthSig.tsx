@@ -58,13 +58,16 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
   }
 
   function setSignature (signature: AuthSig | null, writeToLocalStorage?: boolean) {
+
+    if (writeToLocalStorage) {
+      window.localStorage.setItem(`${PREFIX}.wallet-auth-sig-${account}`, JSON.stringify(signature));
+    }
+
     // Ensures Lit signature is always in sync
     setLitAuthSignature(signature);
     setLitProvider('metamask');
     setWalletAuthSignature(signature);
-    if (writeToLocalStorage) {
-      window.localStorage.setItem(`${PREFIX}.wallet-auth-sig-${account}`, JSON.stringify(signature));
-    }
+
   }
 
   // External

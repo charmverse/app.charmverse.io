@@ -4,7 +4,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import { lowerCaseEqual } from 'lib/utilities/strings';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useRef } from 'react';
 import { Web3Connection } from '../_app/Web3ConnectionManager';
 
 interface Props {
@@ -22,29 +22,37 @@ export function WalletSign ({ signSuccess, buttonText, buttonStyle, buttonSize }
   const [isSigning, setIsSigning] = useState(false);
 
   // We want to avoid auto-firing the sign workflow if the user is already with a connected wallet
-  const [userClickedConnect, setUserClickedConnect] = useState(false);
+  const userClickedConnect = useRef<boolean>(false);
 
   useEffect(() => {
-    if (isWalletSelectorModalOpen) {
-      setUserClickedConnect(true);
+    if (isWalletSelectorModalOpen && !userClickedConnect.current) {
+      userClickedConnect.current = true;
     }
   }, [isWalletSelectorModalOpen]);
 
   useEffect(() => {
-    if (userClickedConnect && account && !lowerCaseEqual(getStoredSignature(account)?.address as string, account)) {
-      setUserClickedConnect(false);
+    if (userClickedConnect.current && !isSigning && account && !lowerCaseEqual(getStoredSignature(account)?.address as string, account)) {
+
+      userClickedConnect.current = false;
       generateWalletAuth();
     }
-  }, [userClickedConnect, account]);
+  }, [account]);
 
   async function generateWalletAuth () {
+
+    if (isSigning) {
+      return;
+    }
+
     setIsSigning(true);
 
     if (account && walletAuthSignature && lowerCaseEqual(walletAuthSignature.address, account)) {
+
       signSuccess(walletAuthSignature);
       setIsSigning(false);
     }
     else {
+
       sign()
         .then(signSuccess)
         .catch(() => showMessage('Wallet signature failed', 'warning'))

@@ -28,7 +28,7 @@ export const UserContext = createContext<Readonly<IContext>>({
 });
 
 export function UserProvider ({ children }: { children: ReactNode }) {
-  const { account, walletAuthSignature, sign, getStoredSignature } = useWeb3AuthSig();
+  const { account, sign, getStoredSignature } = useWeb3AuthSig();
   const [user, setUser] = useState<LoggedInUser | null>(null);
   const [isLoaded, setIsLoaded] = useState(true);
 
@@ -40,7 +40,7 @@ export function UserProvider ({ children }: { children: ReactNode }) {
 
     let signature = getStoredSignature(account) as AuthSig;
 
-    if (!signature || !lowerCaseEqual(walletAuthSignature?.address, account)) {
+    if (!signature || !lowerCaseEqual(signature?.address, account)) {
       signature = await sign();
     }
 
