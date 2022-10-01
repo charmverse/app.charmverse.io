@@ -10,11 +10,13 @@ const StyledColumnLayout = styled.div<{ colCount: number }>`
     height: 100%;
   }
 
-  & > .bangle-nv-child-container > .bangle-nv-content {
-    display: grid;
-    gap: ${({ theme }) => theme.spacing(3)};
-    grid-auto-columns: minmax(0, 1fr);
-    grid-auto-flow: column;
+  ${({ theme }) => theme.breakpoints.up('md')} {
+    & > .bangle-nv-child-container > .bangle-nv-content {
+      display: grid;
+      gap: ${({ theme }) => theme.spacing(3)};
+      grid-auto-columns: minmax(0, 1fr);
+      grid-auto-flow: column;
+    }
   }
 `;
 
