@@ -1,4 +1,3 @@
-import Box from '@mui/material/Box';
 import type { SxProps, Theme } from '@mui/system';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -8,9 +7,6 @@ import { lowerCaseEqual } from 'lib/utilities/strings';
 import { useContext, useEffect, useState } from 'react';
 import { Web3Connection } from '../_app/Web3ConnectionManager';
 
-/**
- * @autoReuseSignature Set to true so that
- */
 interface Props {
   signSuccess: (authSig: AuthSig) => void;
   buttonText?: string;
