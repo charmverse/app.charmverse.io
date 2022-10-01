@@ -66,7 +66,7 @@ export function LoginPageContent ({ walletSigned }: Props) {
             </Typography>
             <Box display={{ sm: 'flex' }} gap={2} alignItems='center'>
 
-              <WalletSign signSuccess={walletSigned} />
+              <WalletSign buttonStyle={{ width: { xs: '100%', sm: 'auto' } }} signSuccess={walletSigned} />
               <Typography color='secondary' variant='body2' sx={{ lineHeight: '40px' }}>
                 or
               </Typography>
