@@ -1,30 +1,24 @@
+import { useWeb3React } from '@web3-react/core';
+import type { Space } from '@prisma/client';
 import getLayout from 'components/common/BaseLayout/BaseLayout';
-import { LoginPageContent } from 'components/login';
 import Footer from 'components/login/Footer';
+import LoginPageContent from 'components/login/LoginPageContent';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { getKey } from 'hooks/useLocalStorage';
 import { usePageTitle } from 'hooks/usePageTitle';
-import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import type { AuthSig } from 'lib/blockchain/interfaces';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
-import { lowerCaseEqual } from 'lib/utilities/strings';
-import charmClient from 'charmClient';
-import type { Space } from '@prisma/client';
 
 export default function LoginPage () {
-  const { account, walletAuthSignature } = useWeb3AuthSig();
+  const { account } = useWeb3React();
   const { triedEager } = useContext(Web3Connection);
-  const { showMessage } = useSnackbar();
   const router = useRouter();
   const defaultWorkspace = typeof window !== 'undefined' && localStorage.getItem(getKey('last-workspace'));
   const [, setTitleState] = usePageTitle();
-  const { user, setUser, isLoaded } = useUser();
+  const { user, isLoaded } = useUser();
   const [spaces,, isSpacesLoaded] = useSpaces();
-
   const [showLogin, setShowLogin] = useState(false); // capture isLoaded state to prevent render on route change
   const isLogInWithDiscord = typeof router.query.code === 'string' && router.query.discord === '1' && router.query.type === 'login';
 
@@ -50,40 +44,18 @@ export default function LoginPage () {
     }
   }
 
-  async function loginUser (authSig: AuthSig) {
-    charmClient.login({ address: account as string, walletSignature: authSig })
-      .then((_user) => {
-        setUser(_user);
-        redirectUserAfterLogin();
-      })
-      .catch((err) => {
-        charmClient.createUser({
-          address: account as string,
-          walletSignature: authSig
-        }).then((_user) => {
-          setUser(_user);
-          redirectUserAfterLogin();
-        });
-      });
-  }
-
   useEffect(() => {
-
     // redirect user once wallet is connected
     if (isDataLoaded) {
       // redirect once account exists (user has connected wallet)
-      if (user && (isLogInWithDiscord
-        || (account && user.addresses.some(a => a === account) && lowerCaseEqual(walletAuthSignature?.address as string, account)))) {
+      if (account || user) {
         redirectUserAfterLogin();
-      }
-      else if (account && walletAuthSignature && lowerCaseEqual(walletAuthSignature?.address as string, account)) {
-        loginUser(walletAuthSignature);
       }
       else {
         setShowLogin(true);
       }
     }
-  }, [account, walletAuthSignature, isDataLoaded]);
+  }, [account, isDataLoaded, user]);
 
   if (!showLogin) {
     return null;
@@ -92,11 +64,7 @@ export default function LoginPage () {
   return (
     isLogInWithDiscord ? null : getLayout(
       <>
-        <LoginPageContent walletSigned={(authSig) => {
-          showMessage('Wallet verified. Logging you in', 'success');
-          loginUser(authSig);
-        }}
-        />
+        <LoginPageContent />
         <Footer />
       </>
     )
