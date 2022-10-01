@@ -2,7 +2,7 @@ import { Client } from '@notionhq/client';
 import type { ListBlockChildrenParameters } from '@notionhq/client/build/src/api-endpoints';
 import type { PageType, Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { getFilePath, uploadToS3 } from 'lib/aws/uploadToS3Server';
+import { getFilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MIN_EMBED_WIDTH, VIDEO_ASPECT_RATIO } from 'lib/embed/constants';
 import { extractEmbedLink } from 'lib/embed/extractEmbedLink';
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
@@ -1294,8 +1294,8 @@ function getPersistentImageUrl ({ image, spaceId }: { image: NotionImage, spaceI
   const url = image.type === 'external' ? image.external.url : image.type === 'file' ? image.file.url : null;
   const isNotionS3 = url?.includes('amazonaws.com/secure.notion-static.com');
   if (url && isNotionS3) {
-    const fileName = getFilePath({ url, spaceId });
-    return uploadToS3({ fileName, url }).then(r => r.url).catch(error => {
+    const pathInS3 = getFilePath({ url, spaceId });
+    return uploadUrlToS3({ pathInS3, url }).then(r => r.url).catch(error => {
       log.warn('could not upload image to s3', { error });
       return url;
     });

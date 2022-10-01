@@ -6,9 +6,9 @@ import type { STSClientConfig } from '@aws-sdk/client-sts';
 import { GetFederationTokenCommand, STSClient } from '@aws-sdk/client-sts';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { getUserS3FilePath } from 'lib/aws/uploadToS3Server';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { v4 as uuid } from 'uuid';
 
 type NextRouteHandler = (
   req: NextApiRequest,
@@ -48,7 +48,7 @@ const makeRouteHandler = (options: Options = {}): Handler => {
 
       const key = options.key
         ? await Promise.resolve(options.key(req, filename))
-        : `user-content/${userId}/${uuid()}/${filename.replace(/\+/g, '_').replace(/\s/g, '-')}`;
+        : getUserS3FilePath({ userId, url: filename });
 
       const policy = {
         Statement: [

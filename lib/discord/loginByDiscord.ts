@@ -1,6 +1,6 @@
 import { prisma } from 'db';
 import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
-import { getUserS3Folder, uploadToS3 } from 'lib/aws/uploadToS3Server';
+import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import { sessionUserRelations } from 'lib/session/config';
 import { v4 as uuid } from 'uuid';
 import { IDENTITY_TYPES } from 'models';
@@ -34,7 +34,7 @@ export default async function loginByDiscord ({ code, hostName }: { code: string
     const userId = uuid();
     if (avatarUrl) {
       try {
-        ({ url: avatar } = await uploadToS3({ fileName: getUserS3Folder({ userId, url: avatarUrl }), url: avatarUrl }));
+        ({ url: avatar } = await uploadUrlToS3({ pathInS3: getUserS3FilePath({ userId, url: avatarUrl }), url: avatarUrl }));
       }
       catch (error) {
         log.warn('Error while uploading avatar to S3', error);
