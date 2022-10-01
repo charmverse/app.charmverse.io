@@ -28,18 +28,19 @@ export const UserContext = createContext<Readonly<IContext>>({
 });
 
 export function UserProvider ({ children }: { children: ReactNode }) {
-  const { account, walletAuthSignature, sign } = useWeb3AuthSig();
+  const { account, walletAuthSignature, sign, getStoredSignature } = useWeb3AuthSig();
   const [user, setUser] = useState<LoggedInUser | null>(null);
   const [isLoaded, setIsLoaded] = useState(true);
 
   async function loginFromWeb3Account () {
 
-    let signature = walletAuthSignature as AuthSig;
-
     if (!account) {
       throw new MissingWeb3AccountError();
     }
-    else if (!walletAuthSignature || !lowerCaseEqual(walletAuthSignature?.address, account)) {
+
+    let signature = getStoredSignature(account) as AuthSig;
+
+    if (!signature || !lowerCaseEqual(walletAuthSignature?.address, account)) {
       signature = await sign();
     }
 
@@ -52,7 +53,7 @@ export function UserProvider ({ children }: { children: ReactNode }) {
       return refreshedProfile;
     }
     catch (err) {
-      const newProfile = await charmClient.login({ address: account as string, walletSignature: signature });
+      const newProfile = await charmClient.createUser({ address: account as string, walletSignature: signature });
       setUser(newProfile);
       return newProfile;
     }
