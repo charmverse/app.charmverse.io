@@ -2,7 +2,6 @@ import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import type { Space } from '@prisma/client';
-import { useWeb3React } from '@web3-react/core';
 import charmClient from 'charmClient';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -11,7 +10,6 @@ import { WalletSign } from 'components/login';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { TokenGateEvaluationResult, TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import { useEffect, useState } from 'react';
 import type { AuthSig } from '../../../lib/blockchain/interfaces';
@@ -25,11 +23,9 @@ interface Props {
 
 export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel }: Props) {
 
-  const { account } = useWeb3React();
   const { showMessage } = useSnackbar();
   const [spaces, setSpaces] = useSpaces();
-  const { user, setUser, loginFromWeb3Account } = useUser();
-  const { walletAuthSignature } = useWeb3AuthSig();
+  const { user, loginFromWeb3Account, refreshUser } = useUser();
 
   const [tokenGates, setTokenGates] = useState<TokenGateWithRoles[] | null>(null);
 
@@ -102,6 +98,9 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
       });
 
       showMessage(`You have joined the ${tokenGateResult?.space.name} workspace.`, 'success');
+
+      await refreshUser();
+
       const spaceExists = spaces.some(s => s.id === tokenGateResult?.space.id);
 
       // Refresh spaces as otherwise the redirect will not work
@@ -109,7 +108,6 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
         setSpaces([...spaces, tokenGateResult?.space as Space]);
       }
       onSuccess(tokenGateResult?.space as Space);
-      // onSuccess(tokenGateResult?.space as Space);
     }
     catch (err: any) {
       showMessage(err?.message ?? (err ?? 'An unknown error occurred'), 'error');

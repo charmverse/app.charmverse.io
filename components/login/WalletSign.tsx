@@ -8,6 +8,9 @@ import { lowerCaseEqual } from 'lib/utilities/strings';
 import { useContext, useEffect, useState } from 'react';
 import { Web3Connection } from '../_app/Web3ConnectionManager';
 
+/**
+ * @autoReuseSignature Set to true so that
+ */
 interface Props {
   signSuccess: (authSig: AuthSig) => void;
   buttonText?: string;
@@ -17,7 +20,7 @@ interface Props {
 
 export function WalletSign ({ signSuccess, buttonText, buttonStyle, buttonSize }: Props) {
 
-  const { account, sign, getStoredSignature } = useWeb3AuthSig();
+  const { account, sign, getStoredSignature, walletAuthSignature } = useWeb3AuthSig();
   const { openWalletSelectorModal, triedEager, isWalletSelectorModalOpen } = useContext(Web3Connection);
   const { showMessage } = useSnackbar();
   const [isSigning, setIsSigning] = useState(false);
@@ -40,10 +43,17 @@ export function WalletSign ({ signSuccess, buttonText, buttonStyle, buttonSize }
 
   async function generateWalletAuth () {
     setIsSigning(true);
-    sign()
-      .then(signSuccess)
-      .catch(() => showMessage('Wallet signature failed', 'warning'))
-      .finally(() => setIsSigning(false));
+
+    if (account && walletAuthSignature && lowerCaseEqual(walletAuthSignature.address, account)) {
+      signSuccess(walletAuthSignature);
+      setIsSigning(false);
+    }
+    else {
+      sign()
+        .then(signSuccess)
+        .catch(() => showMessage('Wallet signature failed', 'warning'))
+        .finally(() => setIsSigning(false));
+    }
   }
 
   if (!account) {

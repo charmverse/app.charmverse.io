@@ -14,6 +14,7 @@ type IContext = {
   isLoaded: boolean;
   setIsLoaded: (isLoaded: boolean) => void;
   loginFromWeb3Account:() => Promise<LoggedInUser>;
+  refreshUser: () => Promise<void>;
 };
 
 export const UserContext = createContext<Readonly<IContext>>({
@@ -22,7 +23,8 @@ export const UserContext = createContext<Readonly<IContext>>({
   updateUser: () => undefined,
   isLoaded: false,
   setIsLoaded: () => undefined,
-  loginFromWeb3Account: () => Promise.resolve() as any
+  loginFromWeb3Account: () => Promise.resolve() as any,
+  refreshUser: () => Promise.resolve()
 });
 
 export function UserProvider ({ children }: { children: ReactNode }) {
@@ -37,7 +39,7 @@ export function UserProvider ({ children }: { children: ReactNode }) {
     if (!account) {
       throw new MissingWeb3AccountError();
     }
-    else if (!walletAuthSignature) {
+    else if (!walletAuthSignature || !lowerCaseEqual(walletAuthSignature?.address, account)) {
       signature = await sign();
     }
 
@@ -56,12 +58,20 @@ export function UserProvider ({ children }: { children: ReactNode }) {
     }
   }
 
-  async function refreshUser (walletAddress: string) {
-    if (user && !user?.addresses.some(a => lowerCaseEqual(a, walletAddress))) {
+  /**
+   * Used to sync current user with current web 3 account
+   *
+   * Logs out current user if the web 3 account is not the same as the current user, otherwise refreshes them
+   */
+  async function refreshUser () {
+    if (!account) {
+      throw new MissingWeb3AccountError();
+    }
+    else if (user && !user?.addresses.some(a => lowerCaseEqual(a, account))) {
       await charmClient.logout();
       setUser(null);
     }
-    else if (!user) {
+    else {
       setIsLoaded(false);
       // try retrieving the user from session
       charmClient.getUser()
@@ -77,7 +87,7 @@ export function UserProvider ({ children }: { children: ReactNode }) {
   useEffect(() => {
 
     if (account) {
-      refreshUser(account);
+      refreshUser();
     }
   }, [account]);
 
@@ -85,7 +95,14 @@ export function UserProvider ({ children }: { children: ReactNode }) {
     setUser(u => u ? { ...u, ...updatedUser } : null);
   }, []);
 
-  const value = useMemo(() => ({ user, setUser, isLoaded, setIsLoaded, updateUser, loginFromWeb3Account }) as IContext, [user, isLoaded]);
+  const value = useMemo(() => ({
+    user,
+    setUser,
+    isLoaded,
+    setIsLoaded,
+    updateUser,
+    loginFromWeb3Account,
+    refreshUser }) as IContext, [user, isLoaded]);
 
   return (
     <UserContext.Provider value={value}>
