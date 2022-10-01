@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import type { Page } from '@prisma/client';
 import { filterVisiblePages } from 'components/common/PageLayout/components/PageNavigation/PageNavigation';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -15,7 +14,7 @@ export default function RedirectToMainPage () {
   const { pages } = usePages();
   const defaultPageKey: string = space?.domain ? getKey(`last-page-${space.domain}`) : '';
   const defaultPage = defaultPageKey ? (typeof window !== 'undefined' && localStorage.getItem(defaultPageKey)) : null;
-  const staticCommonPages = ['bounties', 'votes', 'settings/workspace', 'settings/contributors', 'settings/roles'];
+  const staticCommonPages = ['bounties', 'votes', 'settings/workspace', 'settings/contributors', 'settings/roles', 'settings/payment-methods'];
 
   useEffect(() => {
     const isCommonDefaultPage = defaultPage && staticCommonPages.some(page => defaultPage.includes(`/${page}`));
@@ -37,9 +36,6 @@ export default function RedirectToMainPage () {
       // make sure this page is part of this space in case user is navigating to a new space
       if (firstPage && space && firstPage?.spaceId === space.id) {
         router.push(`/${space.domain}/${firstPage.path}`);
-      }
-      else {
-        console.log('Failing redirect to first page of', space?.domain);
       }
     }
 
