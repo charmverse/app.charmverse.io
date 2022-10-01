@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import type { Page, Role } from '@prisma/client';
 import { PageOperations } from '@prisma/client';
 import charmClient from 'charmClient';
@@ -58,11 +59,13 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   const router = useRouter();
   const { user } = useUser();
 
-  const { data, mutate: mutatePagesList } = useSWR(() => currentSpace ? getPagesListCacheKey(currentSpace.id) : null, async () => {
+  const { data: pages, mutate: mutatePagesList } = useSWR(() => currentSpace ? getPagesListCacheKey(currentSpace.id) : null, async () => {
 
     if (!currentSpace) {
       return {};
     }
+
+    console.log('Refreshing pages', currentSpace.domain);
 
     const pagesRes = await charmClient.pages.getPages(currentSpace.id);
     const pagesDict: PagesContext['pages'] = {};
@@ -70,10 +73,11 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
       pagesDict[page.id] = page;
     }, {});
 
-    return pagesDict;
-  }, { refreshInterval });
+    console.log(pagesDict);
 
-  const pages = data || {};
+    return pagesDict;
+  /// Testing with fallback data
+  }, { refreshInterval, fallbackData: {} });
 
   const _setPages: Dispatch<SetStateAction<PagesMap>> = (_pages) => {
     let updatedData: PagesContext['pages'] = {};
