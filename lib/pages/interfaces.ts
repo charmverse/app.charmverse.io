@@ -2,10 +2,15 @@ import type { Block, Page, PagePermission, Space } from '@prisma/client';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
+import type { PagePermissionMeta } from 'lib/permissions/interfaces';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 
 export interface IPageWithPermissions extends Page {
   permissions: (PagePermission & { sourcePermission: PagePermission | null }) [];
+}
+
+export type PageWithPermissionsMeta = Page & {
+  permissions: PagePermissionMeta[];
 }
 
 export interface PageWithChildren extends IPageWithPermissions {
@@ -91,7 +96,7 @@ export type TargetPageTreeWithFlatChildren<T extends PageNode = PageNode> = {
 }
 
 // Page without content and contentText props - used for list of pages (on the client)
-export type PageMeta = Omit<IPageWithPermissions, 'content' | 'contentText'>
+export type PageMeta = Omit<PageWithPermissionsMeta, 'content' | 'contentText'>
 
 export type PageDetails = {
   id: string;

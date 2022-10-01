@@ -6,9 +6,8 @@ import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge'
 import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
-import type { PagePermission } from '@prisma/client';
 import { compareBountyPagePermissions } from 'lib/permissions/compareBountyPagePermissions';
-import type { BountyPagePermissionIntersection } from 'lib/permissions/interfaces';
+import type { BountyPagePermissionIntersection, PagePermissionMeta } from 'lib/permissions/interfaces';
 import useRoles from 'hooks/useRoles';
 import charmClient from 'charmClient';
 import { usePages } from 'hooks/usePages';
@@ -21,7 +20,7 @@ import { useState } from 'react';
 interface Props {
   bounty: BountyWithDetails;
   bountyPermissions?: Partial<BountyPermissions>;
-  pagePermissions?: PagePermission[];
+  pagePermissions?: PagePermissionMeta[];
   pageId: string;
 }
 

@@ -1,8 +1,10 @@
 import type { Page, Prisma } from '@prisma/client';
 import { prisma } from 'db';
+import type { PagePermissionMeta } from 'lib/permissions/interfaces';
 import type { IPageWithPermissions, PagesRequest } from '../interfaces';
 
-type PageFieldsWithoutContent = Record<keyof Omit<Page, 'content' | 'contentText'>, true>
+type PermissionsSelect = Record<keyof PagePermissionMeta, true>
+type PageFieldsWithoutContent = Record<keyof Omit<Page, 'content' | 'contentText'>, true>;
 
 /**
  * Utility for getting permissions of a page
@@ -19,6 +21,23 @@ export function includePagePermissions (): Prisma.PageInclude & {
     permissions: {
       include: {
         sourcePermission: true
+      }
+    }
+  };
+}
+
+export function includePagePermissionsMeta (): { permissions: { select: PermissionsSelect } } {
+  return {
+    permissions: {
+      select: {
+        pageId: true,
+        userId: true,
+        id: true,
+        permissionLevel: true,
+        permissions: true,
+        roleId: true,
+        spaceId: true,
+        public: true
       }
     }
   };
@@ -57,7 +76,7 @@ function selectPageFields (meta: boolean) {
       bountyId: true,
       hasContent: true,
       galleryImage: true,
-      ...includePagePermissions()
+      ...includePagePermissionsMeta()
     }
   };
 
