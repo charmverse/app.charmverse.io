@@ -76,9 +76,9 @@ function CalculationRow (props: Props): JSX.Element {
                         setHovered(false);
                       }}
                       cards={props.cards}
-                      property={template}
                       hovered={hovered}
                       optionsComponent={TableCalculationOptions}
+                      property={template}
                     />
                   );
                 })

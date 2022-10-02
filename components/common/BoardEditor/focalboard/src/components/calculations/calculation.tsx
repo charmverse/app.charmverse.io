@@ -13,18 +13,18 @@ import { Options, optionDisplayNameString } from './options';
 import Calculations from './calculations';
 
 type Props = {
-    style: CSSProperties;
-    class: string;
-    value: string;
-    menuOpen: boolean;
-    onMenuClose: () => void;
-    onMenuOpen: () => void;
-    onChange: (value: string) => void;
-    cards: readonly Card[];
-    property: IPropertyTemplate;
-    hovered: boolean;
-    // eslint-disable-next-line react/no-unused-prop-types
-    optionsComponent: React.ComponentType<CommonCalculationOptionProps>;
+  style: CSSProperties;
+  class: string;
+  value: string;
+  menuOpen: boolean;
+  onMenuClose: () => void;
+  onMenuOpen: () => void;
+  onChange: (value: string) => void;
+  cards: readonly Card[];
+  property: IPropertyTemplate;
+  hovered: boolean;
+  // eslint-disable-next-line react/no-unused-prop-types
+  optionsComponent: React.ComponentType<CommonCalculationOptionProps>;
 }
 
 function Calculation (props: Props): JSX.Element {

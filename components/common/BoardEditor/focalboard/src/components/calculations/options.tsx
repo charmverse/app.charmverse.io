@@ -8,8 +8,6 @@ import { useIntl } from 'react-intl';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { getSelectBaseStyle } from '../../theme';
 
-import type { IPropertyTemplate } from '../../blocks/board';
-
 type Option = {
     label: string;
     value: string;

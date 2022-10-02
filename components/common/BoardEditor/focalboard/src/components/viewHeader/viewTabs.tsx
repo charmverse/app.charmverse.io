@@ -66,7 +66,7 @@ function ViewTabs (props: ViewTabsProps) {
     intl,
     readOnly,
     showView,
-    views } = props;
+    views: viewsProp } = props;
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [dropdownView, setDropdownView] = useState<BoardView | null>(null);
@@ -76,7 +76,7 @@ function ViewTabs (props: ViewTabsProps) {
   const showViewsMenuState = bindMenu(showViewsPopupState);
 
   const { setFocalboardViewsRecord } = useFocalboardViews();
-  views = views.filter(view => !view.fields.inline);
+  const views = viewsProp.filter(view => !view.fields.inline);
   // Find the index of the current view
   const currentViewIndex = views.findIndex(view => view.id === activeView?.id);
   const shownViews = views.slice(0, maxTabsShown);

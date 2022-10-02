@@ -18,7 +18,9 @@ import { createBoardView } from 'lib/focalboard/boardView';
 import Hotkeys from 'react-hot-keys';
 import { mutate } from 'swr';
 import { convertToInlineBoard } from 'lib/pages/convertToInlineBoard';
+import type { WrappedComponentProps } from 'react-intl';
 import { injectIntl } from 'react-intl';
+import type { ConnectedProps } from 'react-redux';
 import { connect } from 'react-redux';
 import charmClient from 'charmClient';
 import dynamic from 'next/dynamic';
@@ -45,7 +47,8 @@ import ViewSidebar from './viewSidebar/viewSidebar';
 
 const CalendarFullView = dynamic(() => import('./calendar/fullCalendar'), { ssr: false });
 
-type Props = {
+// eslint-disable-next-line no-use-before-define
+type Props = WrappedComponentProps & PropsFromRedux & {
   board: Board;
   embeddedBoardPath?: string;
   // cards: Card[]
@@ -568,5 +571,8 @@ export function groupCardsByOptions (cards: Card[], optionIds: string[], groupBy
   return groups;
 }
 
-// @ts-ignore
-export default connect(undefined, { addCard: _addCard, addTemplate, updateView })(injectIntl(CenterPanel));
+const connector = connect(undefined, { addCard: _addCard, addTemplate, updateView });
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export default connector(injectIntl(CenterPanel));
