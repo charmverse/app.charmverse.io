@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { Board, IPropertyTemplate, PropertyType } from '../../blocks/board';
-import { Card } from '../../blocks/card';
-import { BoardView } from '../../blocks/boardView';
+import type { Board, IPropertyTemplate, PropertyType } from '../../blocks/board';
+import type { Card } from '../../blocks/card';
+import type { BoardView } from '../../blocks/boardView';
 
 import mutator from '../../mutator';
 import Button from '../../widgets/buttons/button';
@@ -12,20 +12,21 @@ import PropertyMenu, { PropertyTypes, typeDisplayName } from '../../widgets/prop
 
 import Calculations from '../calculations/calculations';
 import PropertyValueElement from '../propertyValueElement';
-import ConfirmationDialogBox, { ConfirmationDialogBoxProps } from '../confirmationDialogBox';
+import type { ConfirmationDialogBoxProps } from '../confirmationDialogBox';
+import ConfirmationDialogBox from '../confirmationDialogBox';
 import { sendFlashMessage } from '../flashMessages';
 import Menu from '../../widgets/menu';
 import { IDType, Utils } from '../../utils';
 
 type Props = {
-    board: Board
-    card: Card
-    cards: Card[]
-    activeView?: BoardView
-    views: BoardView[]
-    readOnly: boolean
-    pageUpdatedBy: string
-    pageUpdatedAt: string
+    board: Board;
+    card: Card;
+    cards: Card[];
+    activeView?: BoardView;
+    views: BoardView[];
+    readOnly: boolean;
+    pageUpdatedBy: string;
+    pageUpdatedAt: string;
 }
 
 const CardDetailProperties = React.memo((props: Props) => {
@@ -145,18 +146,20 @@ const CardDetailProperties = React.memo((props: Props) => {
           >
             {props.readOnly && <div className='octo-propertyname octo-propertyname--readonly'>{propertyTemplate.name}</div>}
             {!props.readOnly
-                            && (
-                            <MenuWrapper isOpen={propertyTemplate.id === newTemplateId}>
-                              <div className='octo-propertyname'><Button>{propertyTemplate.name}</Button></div>
-                              <PropertyMenu
-                                propertyId={propertyTemplate.id}
-                                propertyName={propertyTemplate.name}
-                                propertyType={propertyTemplate.type}
-                                onTypeAndNameChanged={(newType: PropertyType, newName: string) => onPropertyChangeSetAndOpenConfirmationDialog(newType, newName, propertyTemplate)}
-                                onDelete={() => onPropertyDeleteSetAndOpenConfirmationDialog(propertyTemplate)}
-                              />
-                            </MenuWrapper>
-                            )}
+              && (
+                <MenuWrapper isOpen={propertyTemplate.id === newTemplateId}>
+                  <div className='octo-propertyname'><Button>{propertyTemplate.name}</Button></div>
+                  <PropertyMenu
+                    propertyId={propertyTemplate.id}
+                    propertyName={propertyTemplate.name}
+                    propertyType={propertyTemplate.type}
+                    onTypeAndNameChanged={(newType: PropertyType, newName: string) => {
+                      onPropertyChangeSetAndOpenConfirmationDialog(newType, newName, propertyTemplate);
+                    }}
+                    onDelete={() => onPropertyDeleteSetAndOpenConfirmationDialog(propertyTemplate)}
+                  />
+                </MenuWrapper>
+              )}
             <PropertyValueElement
               readOnly={props.readOnly}
               card={card}
@@ -178,31 +181,31 @@ const CardDetailProperties = React.memo((props: Props) => {
 
       {!props.readOnly && props.activeView
                 && (
-                <div className='octo-propertyname add-property'>
-                  <MenuWrapper>
-                    <Button>
-                      <FormattedMessage
-                        id='CardDetail.add-property'
-                        defaultMessage='+ Add a property'
-                      />
-                    </Button>
-                    <Menu position='bottom-start'>
-                      <PropertyTypes
-                        label={intl.formatMessage({ id: 'PropertyMenu.selectType', defaultMessage: 'Select property type' })}
-                        onTypeSelected={async (type) => {
-                          const template: IPropertyTemplate = {
-                            id: Utils.createGuid(IDType.BlockID),
-                            name: typeDisplayName(intl, type),
-                            type,
-                            options: []
-                          };
-                          const templateId = await mutator.insertPropertyTemplate(board, activeView!, -1, template);
-                          setNewTemplateId(templateId);
-                        }}
-                      />
-                    </Menu>
-                  </MenuWrapper>
-                </div>
+                  <div className='octo-propertyname add-property'>
+                    <MenuWrapper>
+                      <Button>
+                        <FormattedMessage
+                          id='CardDetail.add-property'
+                          defaultMessage='+ Add a property'
+                        />
+                      </Button>
+                      <Menu position='bottom-start'>
+                        <PropertyTypes
+                          label={intl.formatMessage({ id: 'PropertyMenu.selectType', defaultMessage: 'Select property type' })}
+                          onTypeSelected={async (type) => {
+                            const template: IPropertyTemplate = {
+                              id: Utils.createGuid(IDType.BlockID),
+                              name: typeDisplayName(intl, type),
+                              type,
+                              options: []
+                            };
+                            const templateId = await mutator.insertPropertyTemplate(board, activeView!, -1, template);
+                            setNewTemplateId(templateId);
+                          }}
+                        />
+                      </Menu>
+                    </MenuWrapper>
+                  </div>
                 )}
     </div>
   );

@@ -1,5 +1,6 @@
 
-import { Position, dragAndDropRearrange } from './cardDetailContentsUtility';
+import type { Position } from './cardDetailContentsUtility';
+import { dragAndDropRearrange } from './cardDetailContentsUtility';
 
 describe('components/cardDetail/cardDetailContentsUtility', () => {
   test('Testing moving first item in the row to the end', () => {

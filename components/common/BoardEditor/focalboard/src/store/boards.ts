@@ -1,13 +1,14 @@
 
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Board } from '../blocks/board';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import { createSelector, createSlice } from '@reduxjs/toolkit';
+import type { Board } from '../blocks/board';
 import type { RootState } from './index';
 import { initialLoad, initialReadOnlyLoad } from './initialLoad';
 
 type BoardsState = {
-    current: string
-    boards: {[key: string]: Board}
-    templates: {[key: string]: Board}
+    current: string;
+    boards: { [key: string]: Board };
+    templates: { [key: string]: Board };
 }
 
 const boardsSlice = createSlice({
@@ -66,7 +67,7 @@ const boardsSlice = createSlice({
 
 export const { updateBoards, setCurrent, addBoard } = boardsSlice.actions;
 export const { reducer } = boardsSlice;
-export const getBoards = (state: RootState): {[key: string]: Board} => state.boards.boards;
+export const getBoards = (state: RootState): { [key: string]: Board } => state.boards.boards;
 
 export const getSortedBoards = createSelector(
   getBoards,
@@ -75,7 +76,7 @@ export const getSortedBoards = createSelector(
   }
 );
 
-export const getTemplates = (state: RootState): {[key: string]: Board} => state.boards.templates;
+export const getTemplates = (state: RootState): { [key: string]: Board } => state.boards.templates;
 
 export const getSortedTemplates = createSelector(
   getTemplates,
@@ -94,7 +95,7 @@ export const getCurrentBoard = createSelector(
   (state: RootState) => state.boards.current,
   getBoards,
   getTemplates,
-  (boardId: string, boards: {[key: string]: Board}, templates: {
+  (boardId: string, boards: { [key: string]: Board }, templates: {
       [key: string]: Board;
     }) => {
     return boards[boardId] || templates[boardId];

@@ -4,7 +4,7 @@ import { render } from '@testing-library/react';
 import { TestBlockFactory } from '../../test/testBlockFactory';
 import '@testing-library/jest-dom';
 import { wrapIntl } from '../../testUtils';
-import { IPropertyTemplate } from '../../blocks/board';
+import type { IPropertyTemplate } from '../../blocks/board';
 
 import CalendarView from './fullCalendar';
 

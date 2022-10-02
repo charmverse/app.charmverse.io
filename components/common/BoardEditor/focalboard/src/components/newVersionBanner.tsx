@@ -15,7 +15,7 @@ function NewVersionBanner () {
 
   const newVersionReload = (e: any) => {
     e.preventDefault();
-    location.reload();
+    window.location.reload();
   };
 
   return (

@@ -1,5 +1,6 @@
 
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 import { getCurrentLanguage, storeLanguage as i18nStoreLanguage } from '../i18n';
 
@@ -20,7 +21,7 @@ export const storeLanguage = createAsyncThunk(
 
 const languageSlice = createSlice({
   name: 'language',
-  initialState: { value: 'en' } as {value: string},
+  initialState: { value: 'en' } as { value: string },
   reducers: {
     setLanguage: (state, action: PayloadAction<string>) => {
       state.value = action.payload;

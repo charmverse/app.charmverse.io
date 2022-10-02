@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { CalculationOptions, CommonCalculationOptionProps, optionsByType } from '../../calculations/options';
+import type { CommonCalculationOptionProps } from '../../calculations/options';
+import { CalculationOptions, optionsByType } from '../../calculations/options';
 
 export function TableCalculationOptions (props: CommonCalculationOptionProps): JSX.Element {
   const options = [...optionsByType.get('common')!];

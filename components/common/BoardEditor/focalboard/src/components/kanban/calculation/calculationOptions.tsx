@@ -1,16 +1,18 @@
 
-import { IPropertyTemplate, PropertyType } from '../../../blocks/board';
+import type { IPropertyTemplate, PropertyType } from '../../../blocks/board';
+import type {
+  CommonCalculationOptionProps } from '../../calculations/options';
 import {
-    CalculationOptions,
-    CommonCalculationOptionProps,
-    optionsByType
+  CalculationOptions,
+  optionsByType
 } from '../../calculations/options';
 
-import { Option, OptionProps } from './kanbanOption';
+import type { OptionProps } from './kanbanOption';
+import { Option } from './kanbanOption';
 
 type Props = CommonCalculationOptionProps & {
-    cardProperties: IPropertyTemplate[]
-    onChange: (data: {calculation: string, propertyId: string}) => void
+    cardProperties: IPropertyTemplate[];
+    onChange: (data: { calculation: string, propertyId: string }) => void;
 }
 
 // contains mapping of property types which are effectly the same as other property type.

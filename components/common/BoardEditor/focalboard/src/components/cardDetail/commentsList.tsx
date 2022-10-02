@@ -4,24 +4,24 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { useContributors } from 'hooks/useContributors';
 import { useUser } from 'hooks/useUser';
 import Avatar from 'components/common/Avatar';
-import { CommentBlock, createCommentBlock } from '../../blocks/commentBlock';
+import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
+import type { CommentBlock } from '../../blocks/commentBlock';
+import { createCommentBlock } from '../../blocks/commentBlock';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
 
-import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
-
 import Comment from './comment';
 
 type Props = {
-    comments: readonly CommentBlock[]
-    rootId: string
-    cardId: string
-    readOnly: boolean
+    comments: readonly CommentBlock[];
+    rootId: string;
+    cardId: string;
+    readOnly: boolean;
 }
 
 const CommentsList = React.memo((props: Props) => {
-  const {user} = useUser();
+  const { user } = useUser();
   const [contributors] = useContributors();
   const [editorKey, setEditorKey] = useState(0); // a key to allow us to reset charmeditor contents
 
@@ -35,7 +35,7 @@ const CommentsList = React.memo((props: Props) => {
     comment.parentId = cardId;
     comment.rootId = rootId;
     comment.title = contentText || '';
-    comment.fields = { content }
+    comment.fields = { content };
     mutator.insertBlock(comment, 'add comment');
     // clear the editor
     setEditorKey(key => key + 1);
@@ -111,6 +111,5 @@ export function NewCommentInput ({ initialValue = null, $key, username, avatar, 
     </div>
   );
 }
-
 
 export default CommentsList;
