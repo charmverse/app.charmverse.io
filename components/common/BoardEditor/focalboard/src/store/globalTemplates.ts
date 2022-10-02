@@ -1,8 +1,8 @@
 
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-import { default as client, OctoClient } from '../octoClient';
-import { Board } from '../blocks/board';
+import client, { OctoClient } from '../octoClient';
+import type { Board } from '../blocks/board';
 
 import type { RootState } from './index';
 
@@ -18,7 +18,7 @@ export const fetchGlobalTemplates = createAsyncThunk(
 
 const globalTemplatesSlice = createSlice({
   name: 'globalTemplates',
-  initialState: { value: [] } as {value: Board[]},
+  initialState: { value: [] } as { value: Board[] },
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(fetchGlobalTemplates.fulfilled, (state, action) => {

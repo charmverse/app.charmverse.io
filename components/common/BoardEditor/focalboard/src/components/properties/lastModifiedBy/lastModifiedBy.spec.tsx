@@ -6,7 +6,7 @@ import { render } from '@testing-library/react';
 import configureStore from 'redux-mock-store';
 
 import { createCard } from '../../../blocks/card';
-import { IUser } from '../../../user';
+import type { IUser } from '../../../user';
 
 import { createBoard } from '../../../blocks/board';
 

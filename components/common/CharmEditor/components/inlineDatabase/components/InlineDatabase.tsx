@@ -147,21 +147,20 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
     <>
       <StylesContainer className='focalboard-body' containerWidth={containerWidth}>
         <CenterPanel
+          // @ts-ignore types are wrong for some reason (disableUpdatingUrl should be a prop)
           disableUpdatingUrl
-          onViewTabClick={(viewId) => {
+          onViewTabClick={(viewId: string) => {
             setCurrentViewId(viewId);
           }}
-          onDeleteView={(viewId) => {
+          onDeleteView={(viewId: string) => {
             setCurrentViewId(views.filter(view => view.id !== viewId)?.[0]?.id ?? null);
           }}
           hideBanner
-          clientConfig={clientConfig}
           readOnly={readOnly}
           board={board}
           embeddedBoardPath={pages[pageId]?.path}
           setPage={debouncedPageUpdate}
           showCard={showCard}
-          showInlineTitle={true}
           activeView={currentView}
           views={views}
           // Show more tabs on shared inline database as the space gets increased
@@ -174,7 +173,6 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
             key={shownCardId}
             cardId={shownCardId}
             onClose={() => showCard(undefined)}
-            showCard={(cardId) => showCard(cardId)}
             readOnly={readOnly}
           />
         </RootPortal>

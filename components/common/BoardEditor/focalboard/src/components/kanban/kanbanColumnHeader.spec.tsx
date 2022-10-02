@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { createIntl } from 'react-intl';
 
-import { IPropertyOption } from '../../blocks/board';
+import type { IPropertyOption } from '../../blocks/board';
 import Mutator from '../../mutator';
 import { TestBlockFactory } from '../../test/testBlockFactory';
 import { wrapDNDIntl } from '../../testUtils';
@@ -31,7 +31,7 @@ describe('src/components/kanban/kanbanColumnHeader', () => {
     color: 'propColorDefault'
   };
   beforeAll(() => {
-    console.error = jest.fn();
+
   });
   beforeEach(jest.resetAllMocks);
   test('should match snapshot', () => {

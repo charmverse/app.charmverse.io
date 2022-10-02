@@ -1,13 +1,15 @@
 
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { BoardView, createBoardView } from '../blocks/boardView';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import { createSelector, createSlice } from '@reduxjs/toolkit';
+import type { BoardView } from '../blocks/boardView';
+import { createBoardView } from '../blocks/boardView';
 import { getCurrentBoard } from './boards';
 import type { RootState } from './index';
 import { initialLoad, initialReadOnlyLoad } from './initialLoad';
 
 type ViewsState = {
-    current: string
-    views: {[key: string]: BoardView}
+    current: string;
+    views: { [key: string]: BoardView };
 }
 
 const viewsSlice = createSlice({
@@ -57,7 +59,7 @@ const viewsSlice = createSlice({
 export const { updateViews, setCurrent, updateView, addView } = viewsSlice.actions;
 export const { reducer } = viewsSlice;
 
-export const getViews = (state: RootState): {[key: string]: BoardView} => state.views.views;
+export const getViews = (state: RootState): { [key: string]: BoardView } => state.views.views;
 export const getSortedViews = createSelector(
   getViews,
   (views) => {

@@ -11,8 +11,8 @@ import LabelOption from './labelOption';
 import { useMenuContext } from './menuContext';
 
 type Props = {
-    children: React.ReactNode
-    position?: 'bottom-start' | 'bottom-end' | 'top-start' | 'top' | 'bottom' | 'left' | 'right'
+    children: React.ReactNode;
+    position?: 'bottom-start' | 'bottom-end' | 'top-start' | 'top' | 'bottom' | 'left' | 'right';
 }
 
 const StyledPopper = styled(Popper)`
@@ -71,7 +71,7 @@ function Menu (props: Props) {
               id='menu-cancel'
               name='Cancel'
               className='menu-cancel'
-              onClick={() => void 0}
+              onClick={() => undefined}
             />
           </div>
         </div>

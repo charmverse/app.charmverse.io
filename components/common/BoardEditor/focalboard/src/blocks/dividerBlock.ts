@@ -1,8 +1,9 @@
-import { Block, createBlock } from './block';
-import { ContentBlock } from './contentBlock';
+import type { Block } from './block';
+import { createBlock } from './block';
+import type { ContentBlock } from './contentBlock';
 
 type DividerBlock = ContentBlock & {
-    type: 'divider'
+    type: 'divider';
 }
 
 function createDividerBlock (block?: Block): DividerBlock {

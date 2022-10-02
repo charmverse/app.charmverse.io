@@ -1,11 +1,12 @@
 
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
 import type { RootState } from './index';
 
 const searchTextSlice = createSlice({
   name: 'searchText',
-  initialState: { value: '' } as {value: string},
+  initialState: { value: '' } as { value: string },
   reducers: {
     setSearchText: (state, action: PayloadAction<string>) => {
       state.value = action.payload;

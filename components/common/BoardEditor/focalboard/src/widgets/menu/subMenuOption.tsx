@@ -6,11 +6,11 @@ import ArrowDropDownOutlinedIcon from '@mui/icons-material/ArrowDropDownOutlined
 import Menu from '.';
 
 type SubMenuOptionProps = {
-    id: string,
-    name: string,
-    position?: 'bottom' | 'top' | 'left' | 'left-bottom'
-    icon?: React.ReactNode
-    children: React.ReactNode
+    id: string;
+    name: string;
+    position?: 'bottom' | 'top' | 'left' | 'left-bottom';
+    icon?: React.ReactNode;
+    children: React.ReactNode;
 }
 
 const StyledPopper = styled(Popper)`
@@ -68,10 +68,10 @@ function SubMenuOption (props: SubMenuOptionProps): JSX.Element {
         setIsOpen(true);
       }}
     >
-      {(props.position === 'left' || props.position === 'left-bottom') && <ArrowDropDownOutlinedIcon fontSize="small" />}
+      {(props.position === 'left' || props.position === 'left-bottom') && <ArrowDropDownOutlinedIcon fontSize='small' />}
       {props.icon ?? <div className='noicon' />}
       <div className='menu-name'>{props.name}</div>
-      {props.position !== 'left' && props.position !== 'left-bottom' && <ArrowDropDownOutlinedIcon fontSize="small" />}
+      {props.position !== 'left' && props.position !== 'left-bottom' && <ArrowDropDownOutlinedIcon fontSize='small' />}
       <StyledPopper anchorEl={node.current} open={isOpen} placement='right-start'>
         <div
           ref={popperRef}

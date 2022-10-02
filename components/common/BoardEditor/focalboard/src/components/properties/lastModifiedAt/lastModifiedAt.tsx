@@ -10,7 +10,7 @@ import { CommentBlock } from '../../../blocks/commentBlock';
 import { Utils } from '../../../utils';
 
 type Props = {
-    updatedAt: string
+    updatedAt: string;
 }
 
 function LastModifiedAt (props: Props): JSX.Element {

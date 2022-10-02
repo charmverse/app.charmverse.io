@@ -9,9 +9,9 @@ import 'isomorphic-fetch';
 
 import { TestBlockFactory } from '../../test/testBlockFactory';
 import { FetchMock } from '../../test/fetchMock';
-import { BoardView } from '../../blocks/boardView';
+import type { BoardView } from '../../blocks/boardView';
 
-import { IUser } from '../../user';
+import type { IUser } from '../../user';
 
 import { Utils, IDType } from '../../utils';
 

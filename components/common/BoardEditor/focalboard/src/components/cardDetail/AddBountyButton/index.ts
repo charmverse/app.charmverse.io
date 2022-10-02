@@ -1,3 +1,3 @@
-import AddBountyAction from './AddBountyAction'
+import AddBountyAction from './AddBountyAction';
 
 export default AddBountyAction;

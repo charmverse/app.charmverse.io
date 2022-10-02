@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 
-import { IPropertyOption, IPropertyTemplate } from '../../../blocks/board';
+import type { IPropertyOption, IPropertyTemplate } from '../../../blocks/board';
 
 import Label from '../../../widgets/label';
 
@@ -23,12 +23,15 @@ function MultiSelectProperty (props: Props): JSX.Element {
   const { propertyTemplate, emptyValue, propertyValue, isEditable, onChange, onChangeColor, onDeleteOption, onCreate, onDeleteValue } = props;
   const [open, setOpen] = useState(false);
 
-  const values = Array.isArray(propertyValue) && propertyValue.length > 0 ? propertyValue.map((v) => propertyTemplate.options.find((o) => o!.id === v)).filter((v): v is IPropertyOption => Boolean(v)) : [];
+  const values = Array.isArray(propertyValue) && propertyValue.length > 0
+    ? propertyValue.map((v) => propertyTemplate.options.find((o) => o!.id === v)).filter((v): v is IPropertyOption => Boolean(v))
+    : [];
 
   if (!isEditable || !open) {
     return (
       <div
         className='octo-propertyvalue'
+        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
         data-testid='multiselect-non-editable'
         onClick={() => setOpen(true)}
@@ -42,10 +45,10 @@ function MultiSelectProperty (props: Props): JSX.Element {
           </Label>
         ))}
         {values.length === 0 && (
-        <Label
-          color='empty'
-        >{emptyValue}
-        </Label>
+          <Label
+            color='empty'
+          >{emptyValue}
+          </Label>
         )}
       </div>
     );
