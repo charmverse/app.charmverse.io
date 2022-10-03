@@ -10,11 +10,12 @@ import { getUserProfile } from 'lib/users/getUser';
 import type { LoggedInUser } from 'models';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import { requireWalletSignature } from 'lib/middleware/requireWalletSignature';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
-  .post(createUser)
+  .post(requireWalletSignature, createUser)
   .use(requireUser)
   .get(getUser)
   .put(updateUser);
@@ -35,9 +36,8 @@ async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
     logSignupViaWallet();
   }
 
-  const { spaceRoles, ...userData } = user;
-  req.session.user = userData;
-  await updateGuildRolesForUser(userData.addresses, spaceRoles);
+  req.session.user = { id: user.id };
+  await updateGuildRolesForUser(user.addresses, user.spaceRoles);
   await req.session.save();
 
   res.status(200).json(user);
@@ -56,7 +56,7 @@ async function getUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser |
   return res.status(200).json(profile);
 }
 
-async function updateUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | {error: string}>) {
+async function updateUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: string }>) {
 
   const user = await prisma.user.update({
     where: {

@@ -1,38 +1,38 @@
 import React, { forwardRef, useImperativeHandle, useLayoutEffect, useRef } from 'react';
 
 export type EditableProps = {
-    onChange: (value: string) => void
-    value?: string
-    placeholderText?: string
-    className?: string
-    saveOnEsc?: boolean
-    readonly?: boolean
-    spellCheck?: boolean
-    autoExpand?: boolean
+    onChange: (value: string) => void;
+    value?: string;
+    placeholderText?: string;
+    className?: string;
+    saveOnEsc?: boolean;
+    readOnly?: boolean;
+    spellCheck?: boolean;
+    autoExpand?: boolean;
 
-    validator?: (value: string) => boolean
-    onCancel?: () => void
-    onSave?: (saveType: 'onEnter'|'onEsc'|'onBlur') => void
-    onFocus?: () => void
+    validator?: (value: string) => boolean;
+    onCancel?: () => void;
+    onSave?: (saveType: 'onEnter'|'onEsc'|'onBlur') => void;
+    onFocus?: () => void;
 }
 
 export type Focusable = {
-    focus: (selectAll?: boolean) => void
+    focus: (selectAll?: boolean) => void;
 }
 
 export type ElementType = HTMLInputElement | HTMLTextAreaElement
 
 export type ElementProps = {
-    className: string,
-    placeholder?: string,
-    onChange: (e: React.ChangeEvent<ElementType>) => void,
-    value?: string,
-    title?: string,
-    onBlur: () => void,
-    onKeyDown: (e: React.KeyboardEvent<ElementType>) => void,
-    readOnly?: boolean,
-    spellCheck?: boolean,
-    onFocus?: () => void,
+    className: string;
+    placeholder?: string;
+    onChange: (e: React.ChangeEvent<ElementType>) => void;
+    value?: string;
+    title?: string;
+    onBlur: () => void;
+    onKeyDown: (e: React.KeyboardEvent<ElementType>) => void;
+    readOnly?: boolean;
+    spellCheck?: boolean;
+    onFocus?: () => void;
 }
 
 export function useEditable (
@@ -79,13 +79,13 @@ export function useEditable (
     saveOnBlur.current = true;
   };
 
-  const { value, onChange, className, placeholderText, readonly } = props;
+  const { value, onChange, className, placeholderText, readOnly } = props;
   let error = false;
   if (props.validator) {
     error = !props.validator(value || '');
   }
   return {
-    className: `Editable ${error ? 'error ' : ''}${readonly ? 'readonly ' : ''}${className}`,
+    className: `Editable ${error ? 'error ' : ''}${readOnly ? 'readonly ' : ''}${className}`,
     placeholder: placeholderText,
     onChange: (e: React.ChangeEvent<ElementType>) => {
       onChange(e.target.value);
@@ -110,7 +110,7 @@ export function useEditable (
         blur();
       }
     },
-    readOnly: readonly,
+    readOnly,
     spellCheck: props.spellCheck,
     onFocus: props.onFocus
   };

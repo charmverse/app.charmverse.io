@@ -1,36 +1,38 @@
+/* eslint-disable max-len */
 import ImageIcon from '@mui/icons-material/Image';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
-import { Page, PageContent } from 'models';
-import React, { useCallback, useState, KeyboardEvent } from 'react';
+import type { Page, PageContent } from 'models';
+import type { KeyboardEvent } from 'react';
+import React, { useCallback, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
+import dynamic from 'next/dynamic';
+import styled from '@emotion/styled';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
+import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
 import { BlockIcons } from '../blockIcons';
-import { Board } from '../blocks/board';
+import type { Board } from '../blocks/board';
 import mutator from '../mutator';
 import Button from '../widgets/buttons/button';
 import Editable from '../widgets/editable';
-import EmojiIcon from '../widgets/icons/emoji';
-import HideIcon from '../widgets/icons/hide';
-import ShowIcon from '../widgets/icons/show';
 import BlockIconSelector from './blockIconSelector';
-import dynamic from 'next/dynamic';
-import styled from '@emotion/styled';
 
 const CharmEditor = dynamic(() => import('components/common/CharmEditor'), {
   ssr: false
-})
+});
 
 const StyledEditable = styled(Editable)`
   font-size: 22px !important;
 `;
 
 type Props = {
-  board: Board
-  readonly: boolean
-  setPage: (page: Partial<Page>) => void
+  board: Board;
+  readOnly: boolean;
+  setPage: (page: Partial<Page>) => void;
 }
 
-function ViewTitle(props: Props) {
+function ViewTitle (props: Props) {
   const { board } = props;
 
   const [title, setTitle] = useState(board.title);
@@ -61,7 +63,7 @@ function ViewTitle(props: Props) {
   return (
     <div className='ViewTitle'>
       <div className='add-buttons add-visible'>
-        {!props.readonly && !board.fields.headerImage
+        {!props.readOnly && !board.fields.headerImage
           && (
             <div className='add-buttons'>
               <Button
@@ -80,13 +82,20 @@ function ViewTitle(props: Props) {
               </Button>
             </div>
           )}
-        {!props.readonly && !board.fields.icon
+        {!props.readOnly && !board.fields.icon
           && (
             <Button
               onClick={() => {
                 props.setPage({ icon: onAddRandomIcon() });
               }}
-              icon={<EmojiIcon />}
+              icon={(
+                <EmojiEmotionsOutlinedIcon
+                  fontSize='small'
+                  sx={{
+                    mr: 1
+                  }}
+                />
+              )}
             >
               <FormattedMessage
                 id='TableComponent.add-icon'
@@ -94,11 +103,16 @@ function ViewTitle(props: Props) {
               />
             </Button>
           )}
-        {!props.readonly && board.fields.showDescription
+        {!props.readOnly && board.fields.showDescription
           && (
             <Button
               onClick={onHideDescription}
-              icon={<HideIcon />}
+              icon={(
+                <VisibilityOffOutlinedIcon sx={{
+                  mr: 1
+                }}
+                />
+              )}
             >
               <FormattedMessage
                 id='ViewTitle.hide-description'
@@ -106,11 +120,16 @@ function ViewTitle(props: Props) {
               />
             </Button>
           )}
-        {!props.readonly && !board.fields.showDescription
+        {!props.readOnly && !board.fields.showDescription
           && (
             <Button
               onClick={onShowDescription}
-              icon={<ShowIcon />}
+              icon={(
+                <VisibilityOutlinedIcon sx={{
+                  mr: 1
+                }}
+                />
+              )}
             >
               <FormattedMessage
                 id='ViewTitle.show-description'
@@ -121,7 +140,7 @@ function ViewTitle(props: Props) {
       </div>
 
       <div className='title' data-test='board-title'>
-        <BlockIconSelector readonly={props.readonly} block={board} setPage={props.setPage} />
+        <BlockIconSelector readOnly={props.readOnly} block={board} setPage={props.setPage} />
         <Editable
           className='title'
           value={title}
@@ -130,7 +149,7 @@ function ViewTitle(props: Props) {
           saveOnEsc={true}
           onSave={onEditTitleSave}
           onCancel={onEditTitleCancel}
-          readonly={props.readonly}
+          readOnly={props.readOnly}
           spellCheck={true}
         />
       </div>
@@ -176,7 +195,7 @@ export function InlineViewTitle (props: Props) {
         onChange={(newTitle) => setTitle(newTitle)}
         saveOnEsc={true}
         onSave={onEditTitleSave}
-        readonly={props.readonly}
+        readOnly={props.readOnly}
         spellCheck={true}
       />
     </div>

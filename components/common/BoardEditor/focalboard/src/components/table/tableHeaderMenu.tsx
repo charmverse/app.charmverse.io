@@ -1,23 +1,24 @@
 //
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import { useIntl } from 'react-intl';
 
 import { Constants } from '../../constants';
-import { Board } from '../../blocks/board';
-import { BoardView } from '../../blocks/boardView';
-import { Card } from '../../blocks/card';
+import type { Board } from '../../blocks/board';
+import type { BoardView } from '../../blocks/boardView';
+import type { Card } from '../../blocks/card';
 import mutator from '../../mutator';
 import Menu from '../../widgets/menu';
 
 type Props = {
-    templateId: string
-    board: Board
-    activeView: BoardView
-    views: BoardView[]
-    cards: Card[]
+    templateId: string;
+    board: Board;
+    activeView: BoardView;
+    views: BoardView[];
+    cards: Card[];
 }
 
-const TableHeaderMenu: FC<Props> = (props: Props): JSX.Element => {
+function TableHeaderMenu (props: Props): JSX.Element {
   const { board, activeView, templateId, views, cards } = props;
   const intl = useIntl();
   return (
@@ -66,26 +67,29 @@ const TableHeaderMenu: FC<Props> = (props: Props): JSX.Element => {
       />
       {props.templateId !== Constants.titleColumnId
                 && (
-                <>
-                  <Menu.Text
-                    id='hide'
-                    name={intl.formatMessage({ id: 'TableHeaderMenu.hide', defaultMessage: 'Hide' })}
-                    onClick={() => mutator.changeViewVisibleProperties(activeView.id, activeView.fields.visiblePropertyIds, activeView.fields.visiblePropertyIds.filter((o: string) => o !== templateId))}
-                  />
-                  <Menu.Text
-                    id='duplicate'
-                    name={intl.formatMessage({ id: 'TableHeaderMenu.duplicate', defaultMessage: 'Duplicate' })}
-                    onClick={() => mutator.duplicatePropertyTemplate(board, activeView, templateId)}
-                  />
-                  <Menu.Text
-                    id='delete'
-                    name={intl.formatMessage({ id: 'TableHeaderMenu.delete', defaultMessage: 'Delete' })}
-                    onClick={() => mutator.deleteProperty(board, views, cards, templateId)}
-                  />
-                </>
+                  <>
+                    <Menu.Text
+                      id='hide'
+                      name={intl.formatMessage({ id: 'TableHeaderMenu.hide', defaultMessage: 'Hide' })}
+                      onClick={() => {
+                        const viewIds = activeView.fields.visiblePropertyIds.filter((o: string) => o !== templateId);
+                        mutator.changeViewVisibleProperties(activeView.id, activeView.fields.visiblePropertyIds, viewIds);
+                      }}
+                    />
+                    <Menu.Text
+                      id='duplicate'
+                      name={intl.formatMessage({ id: 'TableHeaderMenu.duplicate', defaultMessage: 'Duplicate' })}
+                      onClick={() => mutator.duplicatePropertyTemplate(board, activeView, templateId)}
+                    />
+                    <Menu.Text
+                      id='delete'
+                      name={intl.formatMessage({ id: 'TableHeaderMenu.delete', defaultMessage: 'Delete' })}
+                      onClick={() => mutator.deleteProperty(board, views, cards, templateId)}
+                    />
+                  </>
                 )}
     </Menu>
   );
-};
+}
 
 export default TableHeaderMenu;

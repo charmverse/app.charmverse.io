@@ -1,25 +1,21 @@
-import { Box, Collapse, Divider, IconButton, ListItemIcon, MenuItem, Stack, Typography } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { Box, Collapse, IconButton, ListItemIcon, MenuItem, Stack, Typography } from '@mui/material';
+import { useState } from 'react';
 import Button from 'components/common/Button';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import { Page } from '@prisma/client';
 import styled from '@emotion/styled';
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { usePages } from 'hooks/usePages';
 import PagesList from 'components/common/CharmEditor/components/PageList';
 import { isTruthy } from 'lib/utilities/types';
-import { useRouter } from 'next/router';
 
 type SidebarState = 'select-source' | null;
 
 interface Props {
   onCreateDatabase?: () => void;
   onSelectSource: (selected: { boardId: string }) => void;
-  sidebarState?: SidebarState;
   showCreateDatabase?: boolean;
-  readOnly?: boolean
+  readOnly?: boolean;
 }
 
 const StyledSidebar = styled.div`
@@ -54,48 +50,46 @@ export default function SourceSelection (props: Props) {
   }
 
   return (
-    <>
-      <Box display='flex'>
-        <Box flexGrow={1} display='flex' justifyContent='center' alignItems='center'>
-          <Stack alignItems='center' spacing={0}>
-            <HelpOutlineIcon color='secondary' fontSize='large' />
-            <Typography color='secondary'><strong>No data source</strong></Typography>
-            <Typography display='flex' alignItems='center' color='secondary' variant='body2'>
-              <Button
-                color='secondary'
-                component='span'
-                onClick={openSidebar}
-                variant='text'
-                sx={{ fontSize: 'inherit', textDecoration: 'underline' }}
-                disabled={props.readOnly}
-              >
-                Select a data source
-              </Button>to continue
-            </Typography>
-          </Stack>
-        </Box>
-        <Collapse in={props.readOnly === true ? false : Boolean(sidebarState)} orientation='horizontal'>
-          <StyledSidebar>
-            <Box px={2} pt={1} pb={1} display='flex' justifyContent='space-between' alignItems='center'>
-              <Typography fontWeight='bold'>Select data source</Typography>
-              <IconButton onClick={closeSidebar} size='small'>
-                <CloseIcon fontSize='small' />
-              </IconButton>
-            </Box>
-            <SidebarContent>
-              <PagesList pages={boardPages} onSelectPage={page => props.onSelectSource({ boardId: page.id })} />
-            </SidebarContent>
-            {props.showCreateDatabase && (
-              <MenuItem onClick={props.onCreateDatabase}>
-                <ListItemIcon><AddIcon color='secondary' /></ListItemIcon>
-                <Typography variant='body2' color='secondary'>
-                  New database
-                </Typography>
-              </MenuItem>
-            )}
-          </StyledSidebar>
-        </Collapse>
+    <Box display='flex'>
+      <Box flexGrow={1} display='flex' justifyContent='center' alignItems='center'>
+        <Stack alignItems='center' spacing={0}>
+          <HelpOutlineIcon color='secondary' fontSize='large' />
+          <Typography color='secondary'><strong>No data source</strong></Typography>
+          <Typography display='flex' alignItems='center' color='secondary' variant='body2'>
+            <Button
+              color='secondary'
+              component='span'
+              onClick={openSidebar}
+              variant='text'
+              sx={{ fontSize: 'inherit', textDecoration: 'underline' }}
+              disabled={props.readOnly}
+            >
+              Select a data source
+            </Button>to continue
+          </Typography>
+        </Stack>
       </Box>
-    </>
+      <Collapse in={props.readOnly === true ? false : Boolean(sidebarState)} orientation='horizontal'>
+        <StyledSidebar>
+          <Box px={2} pt={1} pb={1} display='flex' justifyContent='space-between' alignItems='center'>
+            <Typography fontWeight='bold'>Select data source</Typography>
+            <IconButton onClick={closeSidebar} size='small'>
+              <CloseIcon fontSize='small' />
+            </IconButton>
+          </Box>
+          <SidebarContent>
+            <PagesList pages={boardPages} onSelectPage={page => props.onSelectSource({ boardId: page.id })} />
+          </SidebarContent>
+          {props.showCreateDatabase && (
+            <MenuItem onClick={props.onCreateDatabase}>
+              <ListItemIcon><AddIcon color='secondary' /></ListItemIcon>
+              <Typography variant='body2' color='secondary'>
+                New database
+              </Typography>
+            </MenuItem>
+          )}
+        </StyledSidebar>
+      </Collapse>
+    </Box>
   );
 }

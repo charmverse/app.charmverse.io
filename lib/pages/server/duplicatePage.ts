@@ -3,9 +3,12 @@ import { prisma } from 'db';
 import { createBlock } from 'lib/focalboard/block';
 import { createBoard } from 'lib/focalboard/board';
 import { createBoardView } from 'lib/focalboard/boardView';
-import { getPagePath } from 'lib/pages';
+import { getPagePath } from 'lib/pages/utils';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
+import type { PageContent } from 'models';
 import { v4 } from 'uuid';
+import { createPage } from 'lib/pages/server/createPage';
 import { getPage, PageNotFoundError } from '.';
 
 export async function duplicatePage (pageId: string, userId: string, parentId?: string) {
@@ -19,7 +22,7 @@ export async function duplicatePage (pageId: string, userId: string, parentId?: 
 
   const parentIdToAssign = parentId ?? page.parentId;
 
-  const transactions: PrismaPromise<any>[] = [prisma.page.create({
+  const transactions: PrismaPromise<any>[] = [createPage({
     data: {
       id: createdPageId,
       parentId: parentIdToAssign,

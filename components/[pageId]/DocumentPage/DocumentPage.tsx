@@ -10,16 +10,19 @@ import VoteDetail from 'components/common/CharmEditor/components/inlineVote/comp
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { useBounties } from 'hooks/useBounties';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
+import { usePrimaryCharmEditor } from 'hooks/usePrimaryCharmEditor';
 import { usePages } from 'hooks/usePages';
 import { useVotes } from 'hooks/useVotes';
 import type { AssignedBountyPermissions } from 'lib/bounties';
-import type { IPageWithPermissions } from 'lib/pages';
 import type { Page, PageContent } from 'models';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
+import { usePageDetails } from 'hooks/usePageDetails';
+import type { PageMeta } from 'lib/pages';
+import LoadingComponent from 'components/common/LoadingComponent';
 import BountyProperties from './components/BountyProperties';
 import PageBanner from './components/PageBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
@@ -46,19 +49,23 @@ export const Container = styled(Box)<{ top: number, fullWidth?: boolean }>`
 `;
 
 export interface DocumentPageProps {
-  page: IPageWithPermissions,
-  setPage: (p: Partial<Page>) => void,
-  readOnly?: boolean,
-  insideModal?: boolean,
-  parentProposalId?: string | null
+  page: PageMeta;
+  setPage: (p: Partial<Page>) => void;
+  readOnly?: boolean;
+  insideModal?: boolean;
+  parentProposalId?: string | null;
 }
 
 function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentProposalId }: DocumentPageProps) {
   const { pages, getPagePermissions } = usePages();
   const { cancelVote, castVote, deleteVote, votes, isLoading } = useVotes();
   const pagePermissions = getPagePermissions(page.id);
+  const { pageDetails, debouncedUpdatePageDetails } = usePageDetails(page.id);
 
   const { draftBounty } = useBounties();
+  const { currentPageActionDisplay } = usePageActionDisplay();
+  const { editMode } = usePrimaryCharmEditor();
+
   // Only populate bounty permission data if this is a bounty page
   const [bountyPermissions, setBountyPermissions] = useState<AssignedBountyPermissions | null>(null);
   const [containerRef, { width: containerWidth }] = useElementSize();
@@ -79,8 +86,8 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
     }
   }, [page.bountyId]);
 
-  const cannotEdit = readOnly || !pagePermissions?.edit_content;
   const cannotComment = readOnly || !pagePermissions?.comment;
+  const enableSuggestingMode = editMode === 'suggesting' && !readOnly && pagePermissions?.comment;
 
   const pageVote = Object.values(votes).find(v => v.context === 'proposal');
 
@@ -114,10 +121,9 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
     pageTop = 200;
   }
 
-  const { currentPageActionDisplay } = usePageActionDisplay();
-
   const updatePageContent = useCallback((content: ICharmEditorOutput) => {
-    setPage({ content: content.doc, contentText: content.rawText });
+    debouncedUpdatePageDetails({ id: page.id, content: content.doc, contentText: content.rawText });
+    // setPage({ content: content.doc, contentText: content.rawText });
   }, [setPage]);
 
   const card = cards.find(_card => _card.id === page.id);
@@ -137,10 +143,14 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
       }}
     >
       <Box
+        id='document-scroll-container'
         sx={{
           transition: 'width ease-in 0.25s',
+          minWidth: {
+            md: 700
+          },
           width: {
-            md: showPageActionSidebar ? 'calc(100% - 416px)' : '100%'
+            md: showPageActionSidebar ? 'calc(100% - 430px)' : '100%'
           },
           height: {
             md: showPageActionSidebar ? 'calc(100vh - 65px)' : '100%'
@@ -153,29 +163,33 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
         <div ref={containerRef}>
           {page.deletedAt && <PageDeleteBanner pageId={page.id} />}
           <PageTemplateBanner parentPage={page.parentId ? pages[page.parentId] : null} page={page} />
-          {page.headerImage && <PageBanner headerImage={page.headerImage} readOnly={cannotEdit} setPage={setPage} />}
+          {/* temporary? disable editing of page meta data when in suggestion mode */}
+          {page.headerImage && <PageBanner headerImage={page.headerImage} readOnly={readOnly || enableSuggestingMode} setPage={setPage} />}
           <Container
             top={pageTop}
             fullWidth={page.fullWidth ?? false}
           >
             <CharmEditor
-              key={page.id}
-              content={page.content as PageContent}
+              key={page.id + editMode + !!pageDetails}
+              content={pageDetails?.content as PageContent}
               onContentChange={updatePageContent}
-              readOnly={cannotEdit}
+              readOnly={readOnly || !pageDetails}
               pageActionDisplay={!insideModal ? currentPageActionDisplay : null}
               pageId={page.id}
               disablePageSpecificFeatures={isSharedPage}
+              enableSuggestingMode={enableSuggestingMode}
               enableVoting={true}
               containerWidth={containerWidth}
               pageType={page.type}
               pagePermissions={pagePermissions}
+              placeholder={!pageDetails ? <LoadingComponent isLoading /> : null}
             >
+              {/* temporary? disable editing of page title when in suggestion mode */}
               <PageHeader
                 headerImage={page.headerImage}
                 icon={page.icon}
                 title={page.title}
-                readOnly={cannotEdit}
+                readOnly={readOnly || enableSuggestingMode}
                 setPage={setPage}
               />
               {page.type === 'proposal' && !isLoading && pageVote && (
@@ -201,11 +215,11 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
                         cards={cards}
                         activeView={activeView}
                         views={boardViews}
-                        readonly={cannotEdit}
+                        readOnly={readOnly}
                         pageUpdatedAt={page.updatedAt.toString()}
                         pageUpdatedBy={page.updatedBy}
                       />
-                      <AddBountyButton readonly={cannotEdit} cardId={page.id} />
+                      <AddBountyButton readOnly={readOnly} cardId={page.id} />
                     </>
                   )}
                   {proposalId && (
@@ -220,7 +234,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
                     <BountyProperties
                       bountyId={page.bountyId}
                       pageId={page.id}
-                      readOnly={cannotEdit}
+                      readOnly={readOnly}
                       permissions={bountyPermissions}
                       refreshBountyPermissions={refreshBountyPermissions}
                     />
@@ -230,12 +244,13 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
                       comments={comments}
                       rootId={card?.rootId ?? page.id}
                       cardId={card?.id ?? page.id}
-                      readonly={cannotComment}
+                      readOnly={cannotComment}
                     />
                   )}
                 </div>
               </div>
             </CharmEditor>
+
           </Container>
         </div>
       </Box>

@@ -11,6 +11,7 @@ import { getCurrentBoardViews, getView, setCurrent as setCurrentView } from 'com
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 import { silentlyUpdateURL } from 'lib/browser';
+import type { PageMeta } from 'lib/pages';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { getUriWithParam } from 'lib/utilities/strings';
 import type { Page } from 'models';
@@ -24,7 +25,7 @@ import { useHotkeys } from 'react-hotkeys-hook';
  */
 
 interface Props {
-  page: Page;
+  page: PageMeta;
   readOnly?: boolean;
   setPage: (p: Partial<Page>) => void;
   pagePermissions?: IPagePermissionFlags;
@@ -54,7 +55,7 @@ export default function BoardPage ({ page, setPage, readOnly = false, pagePermis
         query: {
           ...router.query,
           viewId: boardViews[0].id,
-          cardId: router.query.cardId
+          cardId: router.query.cardId ?? ''
         }
       });
       return;
@@ -112,8 +113,11 @@ export default function BoardPage ({ page, setPage, readOnly = false, pagePermis
   });
 
   const showCard = useCallback((cardId?: string) => {
-    const newUrl = getUriWithParam(window.location.href, { cardId });
-    silentlyUpdateURL(newUrl);
+    const newUrl = `${router.pathname}?viewId=${router.query.viewId}&cardId=${cardId ?? ''}`;
+
+    const asUrl = getUriWithParam(`${router.asPath}`, { viewId: router.query.viewId, cardId }).split(window.location.origin)[1];
+
+    silentlyUpdateURL(newUrl, asUrl);
     setShownCardId(cardId);
   }, [router.query]);
 
@@ -124,8 +128,7 @@ export default function BoardPage ({ page, setPage, readOnly = false, pagePermis
         <FlashMessages milliseconds={2000} />
         <div className='focalboard-body full-page'>
           <CenterPanel
-            clientConfig={clientConfig}
-            readonly={Boolean(readOnlyBoard)}
+            readOnly={Boolean(readOnlyBoard)}
             board={board}
             setPage={setPage}
             showCard={showCard}
@@ -138,8 +141,7 @@ export default function BoardPage ({ page, setPage, readOnly = false, pagePermis
                 key={shownCardId}
                 cardId={shownCardId}
                 onClose={() => showCard(undefined)}
-                showCard={(cardId) => showCard(cardId)}
-                readonly={readOnly}
+                readOnly={readOnly}
               />
             </RootPortal>
           )}

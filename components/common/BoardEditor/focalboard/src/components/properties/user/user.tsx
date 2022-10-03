@@ -1,16 +1,17 @@
 
 import Select from 'react-select';
-import { CSSObject } from '@emotion/serialize';
+import type { CSSObject } from '@emotion/serialize';
 
-import { useContributors, Contributor } from 'hooks/useContributors';
+import type { Contributor } from 'hooks/useContributors';
+import { useContributors } from 'hooks/useContributors';
 import UserDisplay from 'components/common/UserDisplay';
 
 import { getSelectBaseStyle } from '../../../theme';
 
 type Props = {
-  value: string,
-  readonly: boolean,
-  onChange: (value: string) => void,
+  value: string;
+  readOnly: boolean;
+  onChange: (value: string) => void;
 }
 
 const selectStyles = {
@@ -26,9 +27,9 @@ function UserProperty (props: Props): JSX.Element | null {
   const contributorMap = contributors.reduce<Record<string, Contributor>>((acc, contributor) => {
     acc[contributor.id] = contributor;
     return acc;
-  }, {})
+  }, {});
 
-  if (props.readonly) {
+  if (props.readOnly) {
     if (contributorMap[props.value]) {
       return (
         <div className='UserProperty octo-propertyvalue'>
@@ -47,6 +48,7 @@ function UserProperty (props: Props): JSX.Element | null {
       backspaceRemovesValue={true}
       className='UserProperty octo-propertyvalue'
       classNamePrefix='react-select'
+      // eslint-disable-next-line react/no-unstable-nested-components
       formatOptionLabel={u => <UserDisplay user={u} avatarSize='small' fontSize='small' />}
       styles={selectStyles}
       placeholder='Empty'

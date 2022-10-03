@@ -1,5 +1,4 @@
-import type { RequestInfo, RequestInit } from 'node-fetch';
-import fetch from 'node-fetch';
+
 import { transformResponse } from './fetch';
 
 export default function fetchWrapper<T> (url: RequestInfo, init?: RequestInit): Promise<T> {

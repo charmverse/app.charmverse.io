@@ -13,7 +13,7 @@ import { getNFTs } from 'lib/blockchain/nfts';
 export type PublicUser = Pick<User, 'id' | 'username' | 'avatar' | 'path'> & {
   profile: UserDetails | null;
   visiblePoaps: Partial<ExtendedPoap>[];
-  visibleNfts: NftData[]
+  visibleNfts: NftData[];
 }
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

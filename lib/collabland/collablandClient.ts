@@ -40,7 +40,7 @@ type CollablandCredential<T> = {
     credentialSubject: T;
     issuer: {
       id: string; // 'did:ethr:rinkeby:0x038e829e042560e41de5a1f7c12aded55f95ea903465f7f9c8a805ed83f8cdc936'
-    },
+    };
     id: string; // 'Z6s-qJzLBpNj9oAPKpcCN',
     type: 'VerifiableCredential' | 'GuestPass'[];
     '@context': 'https://www.w3.org/2018/credentials/v1'[];
@@ -48,7 +48,7 @@ type CollablandCredential<T> = {
     proof: {
       'type': 'JwtProof2020';
       'jwt': string;
-    }
+    };
   };
 }
 

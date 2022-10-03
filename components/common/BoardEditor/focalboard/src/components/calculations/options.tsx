@@ -1,17 +1,17 @@
 import Select, { components } from 'react-select';
 
-import { CSSObject } from '@emotion/serialize';
+import type { CSSObject } from '@emotion/serialize';
 
-import { useIntl, IntlShape } from 'react-intl';
+import type { IntlShape } from 'react-intl';
+import { useIntl } from 'react-intl';
 
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { getSelectBaseStyle } from '../../theme';
-import ChevronUp from '../../widgets/icons/chevronUp';
-import { IPropertyTemplate } from '../../blocks/board';
 
 type Option = {
-    label: string
-    value: string
-    displayName: string
+    label: string;
+    value: string;
+    displayName: string;
 }
 
 export const Options:Record<string, Option> = {
@@ -147,27 +147,26 @@ const styles = {
   })
 };
 
-const DropdownIndicator: typeof components.DropdownIndicator = (props) => {
+const DropdownIndicator: typeof components.DropdownIndicator = function DropdownIndicator (props) {
   return (
     <components.DropdownIndicator {...props}>
-      <ChevronUp />
+      <ExpandLessIcon fontSize='small' />
     </components.DropdownIndicator>
   );
 };
 
 // Calculation option props shared by all implementations of calculation options
 type CommonCalculationOptionProps = {
-    value: string,
-    menuOpen: boolean
-    onClose?: () => void
-    components?: {[key:string]: (props: any) => JSX.Element}
-    onChange: (data: any) => void
-    property?: IPropertyTemplate
+    value: string;
+    menuOpen: boolean;
+    onClose?: () => void;
+    components?: { [key:string]: (props: any) => JSX.Element };
+    onChange: (data: any) => void;
 }
 
 // Props used by the base calculation option component
 type BaseCalculationOptionProps = CommonCalculationOptionProps & {
-    options: Option[]
+    options: Option[];
 }
 
 function CalculationOptions (props: BaseCalculationOptionProps): JSX.Element {

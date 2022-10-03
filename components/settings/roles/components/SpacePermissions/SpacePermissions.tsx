@@ -35,8 +35,8 @@ type FormValues = yup.InferType<typeof schema>
  */
 interface Props {
   targetGroup: AssignablePermissionGroups;
-  id: string,
-  callback?: () => void
+  id: string;
+  callback?: () => void;
 }
 
 export default function SpacePermissions ({ targetGroup, id, callback = () => null }: Props) {
@@ -86,7 +86,7 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
     refreshGroupPermissions();
   }, []);
 
-  const settingsChanged = assignedPermissions !== null && (Object.entries(assignedPermissions) as Array<[SpaceOperation, boolean]>)
+  const settingsChanged = assignedPermissions !== null && (Object.entries(assignedPermissions) as [SpaceOperation, boolean][])
     .some(([operation, hasAccess]) => {
       const newValue = newValues[operation];
       return newValue !== hasAccess;
@@ -100,7 +100,7 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
       const permissionsToRemove: SpaceOperation[] = [];
 
       // Only get new values
-      (Object.entries(formValues) as Array<[SpaceOperation, boolean]>).forEach(([operation, hasAccess]) => {
+      (Object.entries(formValues) as [SpaceOperation, boolean][]).forEach(([operation, hasAccess]) => {
         if (assignedPermissions[operation] !== hasAccess) {
 
           if (hasAccess === true) {

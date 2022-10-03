@@ -4,9 +4,10 @@ import { FormattedMessage } from 'react-intl';
 import { useDragLayer, useDrop } from 'react-dnd';
 import useEfficientDragLayer from 'hooks/useEffecientDragLayer';
 
-import { IPropertyOption, IPropertyTemplate, Board, BoardGroup } from '../../blocks/board';
-import { createBoardView, BoardView } from '../../blocks/boardView';
-import { Card } from '../../blocks/card';
+import type { IPropertyOption, IPropertyTemplate, Board, BoardGroup } from '../../blocks/board';
+import type { BoardView } from '../../blocks/boardView';
+import { createBoardView } from '../../blocks/boardView';
+import type { Card } from '../../blocks/card';
 import { Constants } from '../../constants';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
@@ -19,18 +20,18 @@ import TableGroup from './tableGroup';
 import CalculationRow from './calculation/calculationRow';
 
 type Props = {
-    selectedCardIds: string[]
-    board: Board
-    cards: Card[]
-    activeView: BoardView
-    views: BoardView[]
-    visibleGroups: BoardGroup[]
-    groupByProperty?: IPropertyTemplate
-    readonly: boolean
-    cardIdToFocusOnRender: string
-    showCard: (cardId?: string) => void
-    addCard: (groupByOptionId?: string) => Promise<void>
-    onCardClicked: (e: React.MouseEvent, card: Card) => void
+  selectedCardIds: string[];
+  board: Board;
+  cards: Card[];
+  activeView: BoardView;
+  views: BoardView[];
+  visibleGroups: BoardGroup[];
+  groupByProperty?: IPropertyTemplate;
+  readOnly: boolean;
+  cardIdToFocusOnRender: string;
+  showCard: (cardId?: string) => void;
+  addCard: (groupByOptionId?: string) => Promise<void>;
+  onCardClicked: (e: React.MouseEvent, card: Card) => void;
 }
 
 function Table (props: Props): JSX.Element {
@@ -52,7 +53,7 @@ function Table (props: Props): JSX.Element {
   });
 
   const visiblePropertyTemplates = React.useMemo(() => (
-        activeView.fields.visiblePropertyIds.map((id) => board.fields.cardProperties.find((t) => t.id === id)).filter((i) => i) as IPropertyTemplate[]
+    activeView.fields.visiblePropertyIds.map((id) => board.fields.cardProperties.find((t) => t.id === id)).filter((i) => i) as IPropertyTemplate[]
   ), [board.fields.cardProperties, activeView.fields.visiblePropertyIds]);
 
   const columnRefs = React.useMemo(() => {
@@ -119,11 +120,6 @@ function Table (props: Props): JSX.Element {
     }
   }, [activeView, visibleGroups]);
 
-  const onDropToCard = useCallback((srcCard: Card, dstCard: Card) => {
-    Utils.log(`onDropToCard: ${dstCard.title}`);
-    onDropToGroup(srcCard, dstCard.fields.properties[activeView.fields.groupById!] as string, dstCard.id);
-  }, [activeView]);
-
   const onDropToGroup = useCallback((srcCard: Card, groupID: string, dstCardID: string) => {
     Utils.log(`onDropToGroup: ${srcCard.title}`);
     const { selectedCardIds } = props;
@@ -186,6 +182,11 @@ function Table (props: Props): JSX.Element {
     }
   }, [activeView, cards, props.selectedCardIds, groupByProperty]);
 
+  const onDropToCard = useCallback((srcCard: Card, dstCard: Card) => {
+    Utils.log(`onDropToCard: ${dstCard.title}`);
+    onDropToGroup(srcCard, dstCard.fields.properties[activeView.fields.groupById!] as string, dstCard.id);
+  }, [activeView]);
+
   const propertyNameChanged = useCallback(async (option: IPropertyOption, text: string): Promise<void> => {
     await mutator.changePropertyOptionValue(board, groupByProperty!, option, text);
   }, [board, groupByProperty]);
@@ -204,73 +205,73 @@ function Table (props: Props): JSX.Element {
           offset={offset}
           resizingColumn={resizingColumn}
           columnRefs={columnRefs}
-          readonly={props.readonly}
+          readOnly={props.readOnly}
         />
 
         {/* Table rows */}
         <div className='table-row-container'>
           {activeView.fields.groupById
-                    && visibleGroups.map((group) => {
-                      return (
-                        <TableGroup
-                          key={group.option.id}
-                          board={board}
-                          activeView={activeView}
-                          groupByProperty={groupByProperty}
-                          group={group}
-                          readonly={props.readonly}
-                          columnRefs={columnRefs}
-                          selectedCardIds={props.selectedCardIds}
-                          cardIdToFocusOnRender={props.cardIdToFocusOnRender}
-                          hideGroup={hideGroup}
-                          addCard={props.addCard}
-                          showCard={props.showCard}
-                          propertyNameChanged={propertyNameChanged}
-                          onCardClicked={props.onCardClicked}
-                          onDropToGroupHeader={onDropToGroupHeader}
-                          onDropToCard={onDropToCard}
-                          onDropToGroup={onDropToGroup}
-                        />
-                      );
-                    })}
+            && visibleGroups.map((group) => {
+              return (
+                <TableGroup
+                  key={group.option.id}
+                  board={board}
+                  activeView={activeView}
+                  groupByProperty={groupByProperty}
+                  group={group}
+                  readOnly={props.readOnly}
+                  columnRefs={columnRefs}
+                  selectedCardIds={props.selectedCardIds}
+                  cardIdToFocusOnRender={props.cardIdToFocusOnRender}
+                  hideGroup={hideGroup}
+                  addCard={props.addCard}
+                  showCard={props.showCard}
+                  propertyNameChanged={propertyNameChanged}
+                  onCardClicked={props.onCardClicked}
+                  onDropToGroupHeader={onDropToGroupHeader}
+                  onDropToCard={onDropToCard}
+                  onDropToGroup={onDropToGroup}
+                />
+              );
+            })}
 
           {/* No Grouping, Rows, one per card */}
           {!activeView.fields.groupById
-                    && (
-                    <TableRows
-                      board={board}
-                      activeView={activeView}
-                      columnRefs={columnRefs}
-                      cards={cards}
-                      selectedCardIds={props.selectedCardIds}
-                      readonly={props.readonly}
-                      cardIdToFocusOnRender={props.cardIdToFocusOnRender}
-                      offset={offset}
-                      resizingColumn={resizingColumn}
-                      showCard={props.showCard}
-                      addCard={props.addCard}
-                      onCardClicked={props.onCardClicked}
-                      onDrop={onDropToCard}
-                    />
-                    )}
+            && (
+              <TableRows
+                board={board}
+                activeView={activeView}
+                columnRefs={columnRefs}
+                cards={cards}
+                selectedCardIds={props.selectedCardIds}
+                readOnly={props.readOnly}
+                cardIdToFocusOnRender={props.cardIdToFocusOnRender}
+                offset={offset}
+                resizingColumn={resizingColumn}
+                showCard={props.showCard}
+                addCard={props.addCard}
+                onCardClicked={props.onCardClicked}
+                onDrop={onDropToCard}
+              />
+            )}
         </div>
 
         {/* Add New row */}
         <div className='octo-table-footer'>
-          {!props.readonly && !activeView.fields.groupById
-                    && (
-                    <div
-                      className='octo-table-cell'
-                      onClick={() => {
-                        props.addCard('');
-                      }}
-                    >
-                      <FormattedMessage
-                        id='TableComponent.plus-new'
-                        defaultMessage='+ New'
-                      />
-                    </div>
-                    )}
+          {!props.readOnly && !activeView.fields.groupById
+            && (
+              <div
+                className='octo-table-cell'
+                onClick={() => {
+                  props.addCard('');
+                }}
+              >
+                <FormattedMessage
+                  id='TableComponent.plus-new'
+                  defaultMessage='+ New'
+                />
+              </div>
+            )}
         </div>
 
         <CalculationRow
@@ -279,7 +280,7 @@ function Table (props: Props): JSX.Element {
           activeView={activeView}
           resizingColumn={resizingColumn}
           offset={offset}
-          readonly={props.readonly}
+          readOnly={props.readOnly}
         />
       </div>
     </div>

@@ -5,7 +5,7 @@ import { getPage } from 'lib/pages/server';
 import type { IPagePermissionToCreate, IPagePermissionWithSource } from 'lib/permissions/pages';
 import request from 'supertest';
 import { generatePageToCreateStub } from 'testing/generate-stubs';
-import { baseUrl } from 'testing/mockApiCall';
+import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 
@@ -20,14 +20,7 @@ beforeAll(async () => {
 
   user = generated.user;
   space = generated.space;
-
-  const loggedInResponse = await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: user.addresses[0]
-    });
-
-  cookie = loggedInResponse.headers['set-cookie'][0];
+  cookie = await loginUser(user);
 
 });
 

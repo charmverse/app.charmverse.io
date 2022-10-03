@@ -24,10 +24,10 @@ const h2Style = { lineHeight: '1.2em', fontSize: '24px', fontWeight: 'bold', mar
 
 export interface PendingTasksProps {
   gnosisSafeTasks: GnosisSafeTasks[];
-  mentionedTasks: MentionedTask[]
-  totalTasks: number
-  voteTasks: VoteTask[]
-  proposalTasks: ProposalTask[]
+  mentionedTasks: MentionedTask[];
+  totalTasks: number;
+  voteTasks: VoteTask[];
+  proposalTasks: ProposalTask[];
   // eslint-disable-next-line
   user: TemplateUser
 }

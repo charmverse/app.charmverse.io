@@ -34,6 +34,7 @@ import { PageTitleProvider, usePageTitle } from 'hooks/usePageTitle';
 import { SpacesProvider } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
 import { SnackbarProvider } from 'hooks/useSnackbar';
+import { PrimaryCharmEditorProvider } from 'hooks/usePrimaryCharmEditor';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
 
@@ -49,7 +50,6 @@ import 'theme/@bangle.dev/styles.scss';
 import '@fullcalendar/common/main.css';
 import '@fullcalendar/daygrid/main.css';
 // init focalboard
-import '@mattermost/compass-icons/css/compass-icons.css';
 import 'components/common/BoardEditor/focalboard/src/components/blockIconSelector.scss';
 import 'components/common/BoardEditor/focalboard/src/components/calculations/calculation.scss';
 import 'components/common/BoardEditor/focalboard/src/components/calendar/fullcalendar.scss';
@@ -103,40 +103,6 @@ import 'components/common/BoardEditor/focalboard/src/widgets/editable.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/editableArea.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/editableDayPicker.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/add.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/board.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/calendar.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/card.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/check.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/close.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/delete.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/disclosureTriangle.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/divider.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/dot.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/dropdown.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/edit.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/emoji.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/focalboard_logo.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/gallery.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/grip.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/hamburger.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/help.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/hide.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/hideSidebar.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/image.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/link.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/logo.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/logoWithName.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/logoWithNameWhite.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/options.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/settings.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/show.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/showSidebar.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/sortDown.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/sortUp.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/submenuTriangle.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/table.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/icons/text.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/label.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/menu/colorOption.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/menu/labelOption.scss';
@@ -168,15 +134,16 @@ import 'theme/styles.scss';
 import charmClient from 'charmClient';
 import GlobalComponents from 'components/_app/GlobalComponents';
 import { isDev } from 'config/constants';
+import { Web3AccountProvider } from '../hooks/useWeb3AuthSig';
 
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
 
 type NextPageWithLayout = NextPage & {
-  getLayout: (page: ReactElement) => ReactElement
+  getLayout: (page: ReactElement) => ReactElement;
 }
 
 type AppPropsWithLayout = AppProps & {
-  Component: NextPageWithLayout
+  Component: NextPageWithLayout;
 }
 
 export default function App ({ Component, pageProps }: AppPropsWithLayout) {
@@ -249,38 +216,40 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
           <LocalizationProvider dateAdapter={AdapterLuxon as any}>
             <Web3ReactProvider getLibrary={getLibrary}>
               <Web3ConnectionManager>
-                <ReactDndProvider>
-                  <DataProviders>
-                    <FocalBoardProvider>
-                      <IntlProvider>
-                        <SnackbarProvider>
-                          <PageMetaTags />
-                          <CssBaseline enableColorScheme={true} />
-                          <Global styles={cssVariables} />
-                          <RouteGuard>
-                            <ErrorBoundary>
-                              <Snackbar
-                                isOpen={isOldBuild}
-                                message='New CharmVerse platform update available. Please refresh.'
-                                actions={[
-                                  <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                    <RefreshIcon fontSize='small' />
-                                  </IconButton>
-                                ]}
-                                origin={{ vertical: 'top', horizontal: 'center' }}
-                                severity='warning'
-                                handleClose={() => setIsOldBuild(false)}
-                              />
-                              {getLayout(<Component {...pageProps} />)}
+                <Web3AccountProvider>
+                  <ReactDndProvider>
+                    <DataProviders>
+                      <FocalBoardProvider>
+                        <IntlProvider>
+                          <SnackbarProvider>
+                            <PageMetaTags />
+                            <CssBaseline enableColorScheme={true} />
+                            <Global styles={cssVariables} />
+                            <RouteGuard>
+                              <ErrorBoundary>
+                                <Snackbar
+                                  isOpen={isOldBuild}
+                                  message='New CharmVerse platform update available. Please refresh.'
+                                  actions={[
+                                    <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                      <RefreshIcon fontSize='small' />
+                                    </IconButton>
+                                  ]}
+                                  origin={{ vertical: 'top', horizontal: 'center' }}
+                                  severity='warning'
+                                  handleClose={() => setIsOldBuild(false)}
+                                />
+                                {getLayout(<Component {...pageProps} />)}
 
-                              <GlobalComponents />
-                            </ErrorBoundary>
-                          </RouteGuard>
-                        </SnackbarProvider>
-                      </IntlProvider>
-                    </FocalBoardProvider>
-                  </DataProviders>
-                </ReactDndProvider>
+                                <GlobalComponents />
+                              </ErrorBoundary>
+                            </RouteGuard>
+                          </SnackbarProvider>
+                        </IntlProvider>
+                      </FocalBoardProvider>
+                    </DataProviders>
+                  </ReactDndProvider>
+                </Web3AccountProvider>
               </Web3ConnectionManager>
             </Web3ReactProvider>
           </LocalizationProvider>
@@ -293,21 +262,25 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
 function DataProviders ({ children }: { children: ReactNode }) {
 
   return (
+
     <UserProvider>
       <SpacesProvider>
         <ContributorsProvider>
           <BountiesProvider>
             <PaymentMethodsProvider>
               <PagesProvider>
-                <PageTitleProvider>
-                  {children}
-                </PageTitleProvider>
+                <PrimaryCharmEditorProvider>
+                  <PageTitleProvider>
+                    {children}
+                  </PageTitleProvider>
+                </PrimaryCharmEditorProvider>
               </PagesProvider>
             </PaymentMethodsProvider>
           </BountiesProvider>
         </ContributorsProvider>
       </SpacesProvider>
     </UserProvider>
+
   );
 }
 
@@ -318,7 +291,7 @@ function PageMetaTags () {
   return (
     <Head>
       <title>
-        {`${prefix}${title}` ? `${prefix}${title} | CharmVerse` : 'CharmVerse - the all-in-one web3 workspace'}
+        {title ? `${prefix}${title} | CharmVerse` : `${prefix}CharmVerse - the all-in-one web3 workspace'}`}
       </title>
       {/* viewport meta tag goes in _app.tsx - https://nextjs.org/docs/messages/no-document-viewport-meta */}
       <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />

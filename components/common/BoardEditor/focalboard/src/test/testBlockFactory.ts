@@ -1,15 +1,23 @@
 
-import { Board, IPropertyOption, IPropertyTemplate, createBoard } from '../blocks/board';
-import { BoardView, createBoardView } from '../blocks/boardView';
-import { Card, createCard } from '../blocks/card';
-import { CommentBlock, createCommentBlock } from '../blocks/commentBlock';
-import { DividerBlock, createDividerBlock } from '../blocks/dividerBlock';
+import type { Board, IPropertyOption, IPropertyTemplate } from '../blocks/board';
+import { createBoard } from '../blocks/board';
+import type { BoardView } from '../blocks/boardView';
+import { createBoardView } from '../blocks/boardView';
+import type { Card } from '../blocks/card';
+import { createCard } from '../blocks/card';
+import type { CommentBlock } from '../blocks/commentBlock';
+import { createCommentBlock } from '../blocks/commentBlock';
+import type { DividerBlock } from '../blocks/dividerBlock';
+import { createDividerBlock } from '../blocks/dividerBlock';
 import { createFilterClause } from '../blocks/filterClause';
 import { createFilterGroup } from '../blocks/filterGroup';
-import { ImageBlock, createImageBlock } from '../blocks/imageBlock';
-import { TextBlock, createTextBlock } from '../blocks/textBlock';
-import { CheckboxBlock, createCheckboxBlock } from '../blocks/checkboxBlock';
-import { Block } from '../blocks/block';
+import type { ImageBlock } from '../blocks/imageBlock';
+import { createImageBlock } from '../blocks/imageBlock';
+import type { TextBlock } from '../blocks/textBlock';
+import { createTextBlock } from '../blocks/textBlock';
+import type { CheckboxBlock } from '../blocks/checkboxBlock';
+import { createCheckboxBlock } from '../blocks/checkboxBlock';
+import type { Block } from '../blocks/block';
 
 class TestBlockFactory {
   static createBoard (): Board {

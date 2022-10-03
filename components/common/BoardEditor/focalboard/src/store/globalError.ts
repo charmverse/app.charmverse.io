@@ -1,5 +1,6 @@
 
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
 import { initialLoad, initialReadOnlyLoad } from './initialLoad';
 
@@ -7,7 +8,7 @@ import type { RootState } from './index';
 
 const globalErrorSlice = createSlice({
   name: 'globalError',
-  initialState: { value: '' } as {value: string},
+  initialState: { value: '' } as { value: string },
   reducers: {
     setGlobalError: (state, action: PayloadAction<string>) => {
       state.value = action.payload;

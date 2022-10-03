@@ -60,7 +60,7 @@ function insertPDFNode (state: EditorState, dispatch: DispatchFn, view: EditorVi
   }
 }
 
-function EmptyPDFContainer ({ readOnly, isSelected, ...props }: HTMLAttributes<HTMLDivElement> & {readOnly: boolean, isSelected?: boolean}) {
+function EmptyPDFContainer ({ readOnly, isSelected, ...props }: HTMLAttributes<HTMLDivElement> & { readOnly: boolean, isSelected?: boolean }) {
   const theme = useTheme();
 
   return (
@@ -96,6 +96,9 @@ export function pdfSpec () {
         },
         size: {
           default: MAX_PDF_WIDTH
+        },
+        track: {
+          default: []
         }
       },
       group: 'block',
@@ -113,8 +116,8 @@ export function pdfSpec () {
 }
 
 type PDFViewerProps = {
-  url: string,
-  width: number
+  url: string;
+  width: number;
 };
 
 const PDF = memo((props: PDFViewerProps) => {
@@ -163,7 +166,7 @@ const PDF = memo((props: PDFViewerProps) => {
 });
 
 function ResizablePDF ({ readOnly, onResizeStop, node, updateAttrs, selected }:
-  NodeViewProps & {readOnly?: boolean, onResizeStop?: (view: EditorView) => void }) {
+  NodeViewProps & { readOnly?: boolean, onResizeStop?: (view: EditorView) => void }) {
   readOnly = readOnly ?? false;
 
   const url: string = useMemo(() => node.attrs.src, [node.attrs.src]);

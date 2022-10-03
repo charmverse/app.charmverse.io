@@ -8,9 +8,11 @@ import { usePages } from './usePages';
 import { useThreads } from './useThreads';
 import { useVotes } from './useVotes';
 
+export type PageAction = 'polls' | 'comments' | 'suggestions';
+
 export interface IPageActionDisplayContext {
-  currentPageActionDisplay: null | 'polls' | 'comments',
-  setCurrentPageActionDisplay: React.Dispatch<React.SetStateAction<IPageActionDisplayContext['currentPageActionDisplay']>>
+  currentPageActionDisplay: PageAction | null;
+  setCurrentPageActionDisplay: React.Dispatch<React.SetStateAction<IPageActionDisplayContext['currentPageActionDisplay']>>;
 }
 
 export const PageActionDisplayContext = createContext<IPageActionDisplayContext>({
@@ -31,6 +33,10 @@ export function PageActionDisplayProvider ({ children }: { children: ReactNode }
   // show page sidebar by default if there are comments or votes
   useEffect(() => {
     const highlightedCommentId = (new URLSearchParams(window.location.search)).get('commentId');
+    if (currentPageActionDisplay) {
+      // dont redirect if sidebar is already open
+      return;
+    }
     if (currentPageId && !isValidatingInlineComments && !isValidatingInlineVotes && !smallScreen) {
       const cachedInlineVotesData: ExtendedVote[] = cache.get(`pages/${currentPageId}/votes`);
       const cachedInlineCommentData: ThreadWithCommentsAndAuthors[] | undefined = cache.get(`pages/${currentPageId}/threads`);

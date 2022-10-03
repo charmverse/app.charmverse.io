@@ -1,20 +1,21 @@
 
-import { createSlice, createAsyncThunk, PayloadAction, createSelector } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-import { default as client } from '../octoClient';
-import { IUser } from '../user';
+import client from '../octoClient';
+import type { IUser } from '../user';
 
 import { Utils } from '../utils';
 
-import { Subscription } from '../wsclient';
+import type { Subscription } from '../wsclient';
 
 import { initialLoad } from './initialLoad';
 
 import type { RootState } from './index';
 
 type UsersStatus = {
-  workspaceUsers: {[key: string]: IUser}
-  blockSubscriptions: Array<Subscription>
+  workspaceUsers: { [key: string]: IUser };
+  blockSubscriptions: Subscription[];
 }
 
 export const fetchUserBlockSubscriptions = createAsyncThunk(
@@ -33,7 +34,7 @@ const usersSlice = createSlice({
   initialState,
   reducers: {
     setWorkspaceUsers: (state, action: PayloadAction<IUser[]>) => {
-      state.workspaceUsers = action.payload.reduce((acc: {[key: string]: IUser}, user: IUser) => {
+      state.workspaceUsers = action.payload.reduce((acc: { [key: string]: IUser }, user: IUser) => {
         acc[user.id] = user;
         return acc;
       }, {});
@@ -48,7 +49,7 @@ const usersSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(initialLoad.fulfilled, (state, action) => {
-      state.workspaceUsers = action.payload.workspaceUsers.reduce((acc: {[key: string]: IUser}, user: IUser) => {
+      state.workspaceUsers = action.payload.workspaceUsers.reduce((acc: { [key: string]: IUser }, user: IUser) => {
         acc[user.id] = user;
         return acc;
       }, {});
@@ -62,7 +63,7 @@ const usersSlice = createSlice({
 export const { setWorkspaceUsers } = usersSlice.actions;
 export const { reducer } = usersSlice;
 
-export const getWorkspaceUsers = (state: RootState): {[key: string]: IUser} => state.users.workspaceUsers;
+export const getWorkspaceUsers = (state: RootState): { [key: string]: IUser } => state.users.workspaceUsers;
 
 export const getUser = (userId: string): (state: RootState) => IUser|undefined => {
   return (state: RootState): IUser|undefined => {

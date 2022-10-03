@@ -53,7 +53,7 @@ export function getUriWithParam (
   baseUrl: string,
   params: Record<string, any>
 ): string {
-  const Url = new URL(baseUrl);
+  const Url = new URL(baseUrl, baseUrl.match('http') ? undefined : window.location.origin);
   const urlParams: URLSearchParams = new URLSearchParams(Url.search);
   for (const key in params) {
     if (params.hasOwnProperty(key)) {
@@ -95,9 +95,9 @@ export function humaniseList ({
   conjunction,
   capitaliseFirstCharacter
 }: {
-  content: string[],
-  conjunction: 'and' | 'or',
-  capitaliseFirstCharacter: boolean
+  content: string[];
+  conjunction: 'and' | 'or';
+  capitaliseFirstCharacter: boolean;
 }): string {
 
   if (content.length === 1) {
@@ -132,9 +132,13 @@ export function humaniseList ({
  * Append an 's' to a value's descriptor if it is not equal to 1
  * Default values will return an empty string
  */
-export function conditionalPlural ({ word = '', count = 1 }: {word: string, count: number}): string {
+export function conditionalPlural ({ word = '', count = 1 }: { word: string, count: number }): string {
   if (count !== 1) {
     return `${word}s`;
   }
   return word;
+}
+
+export function lowerCaseEqual (firstString?: string | null, secondString?: string | null): boolean {
+  return firstString?.toLowerCase() === secondString?.toLowerCase();
 }

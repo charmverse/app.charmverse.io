@@ -1,18 +1,18 @@
 
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
-import type { Page } from 'models';
 import { useCallback, memo, useEffect } from 'react';
 import { usePages } from 'hooks/usePages';
 import type { PluginKey } from 'prosemirror-state';
 import { safeScrollIntoViewIfNeeded } from 'lib/browser';
 import { insertNestedPage } from 'lib/prosemirror/insertNestedPage';
+import type { PageMeta } from 'lib/pages';
 import type { SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
 import PagesList from '../../PageList';
 import type { NestedPagePluginState } from '../nestedPage.interfaces';
 
-function NestedPagesList ({ pluginKey }: {pluginKey: PluginKey<NestedPagePluginState>}) {
+function NestedPagesList ({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginState> }) {
   const { pages } = usePages();
   const view = useEditorViewContext();
   const {
@@ -29,7 +29,7 @@ function NestedPagesList ({ pluginKey }: {pluginKey: PluginKey<NestedPagePluginS
   const activeItemIndex = ((counter < 0 ? ((counter % totalItems) + totalItems) : counter) % totalItems);
 
   const onSelectPage = useCallback(
-    (page: Page) => {
+    (page: PageMeta) => {
       insertNestedPage(pluginKey, view, page.id);
     },
     [view]
@@ -45,7 +45,7 @@ function NestedPagesList ({ pluginKey }: {pluginKey: PluginKey<NestedPagePluginS
   return (
     <PopoverMenu container={tooltipContentDOM} isOpen={isVisible} onClose={onClose} width={460}>
       <GroupLabel>Select a page</GroupLabel>
-      <PagesList activeItemIndex={activeItemIndex} pages={filteredPages as Page[]} onSelectPage={onSelectPage} />
+      <PagesList activeItemIndex={activeItemIndex} pages={filteredPages as PageMeta[]} onSelectPage={onSelectPage} />
     </PopoverMenu>
   );
 }

@@ -2,7 +2,9 @@
 import type { Block, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { InvalidStateError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { getPagePath } from 'lib/pages';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
+import { createPage } from 'lib/pages/server/createPage';
+import { getPagePath } from 'lib/pages/utils';
 import { copyAllPagePermissions } from 'lib/permissions/pages/actions/copyPermission';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -19,6 +21,7 @@ async function getBlocks (req: NextApiRequest, res: NextApiResponse<Block[] | { 
 
   const referer = req.headers.referer as string;
   const url = new URL(referer);
+
   url.hash = '';
   url.search = '';
   const pathnameParts = referer ? url.pathname.split('/') : [];
@@ -180,7 +183,7 @@ async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
 
       for (const cardPage of cardPages) {
         if (cardPage) {
-          await prisma.page.create({
+          await createPage({
             data: cardPage
           });
         }

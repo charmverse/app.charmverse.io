@@ -14,11 +14,7 @@ beforeAll(async () => {
 
   user = generated.user;
   space = generated.space;
-  cookie = (await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: user.addresses[0]
-    })).headers['set-cookie'][0];
+  cookie = await loginUser(user);
 });
 
 describe('POST /api/pages/{pageId}/restrict-permissions - Lock down bounty page permissions to the creator', () => {

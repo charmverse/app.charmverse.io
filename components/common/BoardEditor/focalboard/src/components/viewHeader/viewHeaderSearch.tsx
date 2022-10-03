@@ -16,7 +16,7 @@ function ViewHeaderSearch (): JSX.Element {
   const intl = useIntl();
   const router = useRouter();
 
-  const searchFieldRef = useRef<{focus(selectAll?: boolean): void}>(null);
+  const searchFieldRef = useRef<{ focus(selectAll?: boolean): void }>(null);
   const [isSearching, setIsSearching] = useState(Boolean(searchText));
   const [searchValue, setSearchValue] = useState(searchText);
   const [currentView, setCurrentView] = useState(router.query.viewId as string);

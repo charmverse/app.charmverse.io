@@ -9,30 +9,34 @@ import { findParentOfType } from 'lib/pages/findParentOfType';
 import debouncePromise from 'lib/utilities/debouncePromise';
 import log from 'loglevel';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { usePrimaryCharmEditor } from 'hooks/usePrimaryCharmEditor';
+import type { PageUpdates } from 'lib/pages';
 import BoardPage from '../BoardPage';
 import DocumentPage from '../DocumentPage';
 
 export default function EditorPage ({ pageId }: { pageId: string }) {
-  const { setIsEditing, pages, currentPageId, setCurrentPageId, setPages, getPagePermissions } = usePages();
+  const { pages, setCurrentPageId, mutatePage, getPagePermissions, updatePage } = usePages();
+  const { editMode, resetPageProps, setPageProps } = usePrimaryCharmEditor();
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
   const [space] = useCurrentSpace();
   const [isAccessDenied, setIsAccessDenied] = useState(false);
   const { user } = useUser();
-  const currentPagePermissions = getPagePermissions(pageId);
+  const currentPagePermissions = useMemo(() => getPagePermissions(pageId), [pageId]);
 
   const pagesLoaded = Object.keys(pages).length > 0;
 
   const parentProposalId = findParentOfType({ pageId, pageType: 'proposal', pageMap: pages });
+  const readOnly = (currentPagePermissions?.edit_content === false && editMode !== 'suggesting') || editMode === 'viewing';
 
   useEffect(() => {
     async function main () {
       setIsAccessDenied(false);
       if (pageId && pagesLoaded && space) {
         try {
-          const page = await charmClient.getPage(pageId, space.id);
+          const page = await charmClient.pages.getPage(pageId, space.id);
           if (page) {
-            setPages((_pages) => ({ ..._pages, [page.id]: page }));
+            mutatePage(page);
             setPageNotFound(false);
             setCurrentPageId(page.id);
             setTitleState(page.title);
@@ -60,13 +64,27 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
 
   }, [pageId, pagesLoaded, space, user]);
 
-  const debouncedPageUpdate = debouncePromise(async (updates: Partial<Page>) => {
-    setIsEditing(true);
-    const updatedPage = await charmClient.updatePage(updates);
-    setPages((_pages) => ({
-      ..._pages,
-      [pageId]: updatedPage
-    }));
+  // set page attributes of the primary charm editor
+  useEffect(() => {
+    if (!editMode) {
+      if (currentPagePermissions?.edit_content) {
+        setPageProps({ permissions: currentPagePermissions, editMode: 'editing' });
+      }
+      else {
+        setPageProps({ permissions: currentPagePermissions, editMode: 'viewing' });
+      }
+    }
+    else {
+      setPageProps({ permissions: currentPagePermissions });
+    }
+    return () => {
+      resetPageProps();
+    };
+  }, [currentPagePermissions]);
+
+  const debouncedPageUpdate = debouncePromise(async (updates: PageUpdates) => {
+    setPageProps({ isSaving: true });
+    const updatedPage = await updatePage(updates);
     return updatedPage;
   }, 500);
 
@@ -82,7 +100,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
         log.error('Error saving page', err);
       })
       .finally(() => {
-        setIsEditing(false);
+        setPageProps({ isSaving: false });
       });
   }, [pageId]);
 
@@ -130,6 +148,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
         // Document page is used in a few places, so it is responsible for retrieving its own permissions
         <DocumentPage
           page={memoizedCurrentPage}
+          readOnly={readOnly}
           setPage={setPage}
           parentProposalId={parentProposalId}
         />

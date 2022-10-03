@@ -13,7 +13,7 @@ import { useContributors } from 'hooks/useContributors';
 
 interface Props {
   bountyPermissions: Partial<BountyPermissions>;
-  pagePermissions: IPagePermissionWithSource[]
+  pagePermissions: IPagePermissionWithSource[];
   target: Extract<BountyPermissionLevel, 'reviewer' | 'submitter'>;
 }
 
@@ -42,7 +42,7 @@ export default function MissingPagePermissions ({ bountyPermissions, pagePermiss
     return null;
   }
 
-  const missingPermissionsWithName: Array<TargetPermissionGroup & {name: string}> = assigneesMissingPermissions.map(assignee => {
+  const missingPermissionsWithName: (TargetPermissionGroup & { name: string })[] = assigneesMissingPermissions.map(assignee => {
     return {
       ...assignee,
       name: (assignee.group === 'user' ? contributors.find(c => c.id === assignee.id)?.username : roleups?.find(r => r.id === assignee.id)?.name) as string

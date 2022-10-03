@@ -4,9 +4,10 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import AddIcon from '@mui/icons-material/Add';
 import IconButton from '@mui/material/IconButton';
 
-import { IPropertyTemplate, Board } from '../../blocks/board';
-import { createBoardView, BoardView, ISortOption } from '../../blocks/boardView';
-import { Card } from '../../blocks/card';
+import type { IPropertyTemplate, Board } from '../../blocks/board';
+import type { BoardView, ISortOption } from '../../blocks/boardView';
+import { createBoardView } from '../../blocks/boardView';
+import type { Card } from '../../blocks/card';
 import { Constants } from '../../constants';
 import mutator from '../../mutator';
 import Button from '../../widgets/buttons/button';
@@ -20,14 +21,14 @@ import { OctoUtils } from '../../octoUtils';
 import TableHeader from './tableHeader';
 
 type Props = {
-    board: Board
-    cards: Card[]
-    activeView: BoardView
-    views: BoardView[]
-    readonly: boolean
+    board: Board;
+    cards: Card[];
+    activeView: BoardView;
+    views: BoardView[];
+    readOnly: boolean;
     resizingColumn: string;
     offset: number;
-    columnRefs: Map<string, React.RefObject<HTMLDivElement>>
+    columnRefs: Map<string, React.RefObject<HTMLDivElement>>;
 }
 
 function TableHeaders (props: Props): JSX.Element {
@@ -137,7 +138,7 @@ function TableHeaders (props: Props): JSX.Element {
         type='text'
         name='Title'
         sorted={titleSorted}
-        readonly={props.readonly}
+        readOnly={props.readOnly}
         board={board}
         activeView={activeView}
         cards={cards}
@@ -160,7 +161,7 @@ function TableHeaders (props: Props): JSX.Element {
             type={template.type}
             name={template.name}
             sorted={sorted}
-            readonly={props.readonly}
+            readOnly={props.readOnly}
             board={board}
             activeView={activeView}
             cards={cards}
@@ -179,28 +180,28 @@ function TableHeaders (props: Props): JSX.Element {
         style={{ flexGrow: 1, borderRight: '0 none' }}
       >
 
-        {!props.readonly
+        {!props.readOnly
                     && (
-                    <MenuWrapper>
-                      <Button>
-                        <AddIcon fontSize='small' />
-                      </Button>
-                      <Menu>
-                        <PropertyTypes
-                          label={intl.formatMessage({ id: 'PropertyMenu.selectType', defaultMessage: 'Select property type' })}
-                          onTypeSelected={async (type) => {
-                            const template: IPropertyTemplate = {
-                              id: Utils.createGuid(IDType.BlockID),
-                              name: typeDisplayName(intl, type),
-                              type,
-                              options: []
-                            };
-                            const templateId = await mutator.insertPropertyTemplate(board, activeView, -1, template);
+                      <MenuWrapper>
+                        <Button>
+                          <AddIcon fontSize='small' />
+                        </Button>
+                        <Menu>
+                          <PropertyTypes
+                            label={intl.formatMessage({ id: 'PropertyMenu.selectType', defaultMessage: 'Select property type' })}
+                            onTypeSelected={async (type) => {
+                              const template: IPropertyTemplate = {
+                                id: Utils.createGuid(IDType.BlockID),
+                                name: typeDisplayName(intl, type),
+                                type,
+                                options: []
+                              };
+                              const templateId = await mutator.insertPropertyTemplate(board, activeView, -1, template);
                             // setNewTemplateId(templateId)
-                          }}
-                        />
-                      </Menu>
-                    </MenuWrapper>
+                            }}
+                          />
+                        </Menu>
+                      </MenuWrapper>
                     )}
       </div>
     </div>

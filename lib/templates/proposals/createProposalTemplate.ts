@@ -1,18 +1,19 @@
-import { prisma } from 'db';
 import type { IPageWithPermissions, PageWithProposal } from 'lib/pages';
-import { getPagePath } from 'lib/pages';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
+import { createPage } from 'lib/pages/server/createPage';
+import { getPagePath } from 'lib/pages/utils';
 import { v4 } from 'uuid';
 import type { ProposalReviewerInput } from '../../proposal/interface';
 
 export interface CreateProposalTemplateInput {
-  spaceId: string
-  userId: string
+  spaceId: string;
+  userId: string;
   pageContent?: {
     title?: string;
     contentText?: string;
-    content?: any
-  },
-  reviewers?: ProposalReviewerInput[]
+    content?: any;
+  };
+  reviewers?: ProposalReviewerInput[];
 }
 
 export async function createProposalTemplate ({
@@ -21,7 +22,7 @@ export async function createProposalTemplate ({
 
   const proposalId = v4();
 
-  return prisma.page.create({
+  return createPage({
     data: {
       id: proposalId,
       path: getPagePath(),

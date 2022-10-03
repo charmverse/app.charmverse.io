@@ -1,47 +1,37 @@
 import React from 'react';
-import { useDragLayer } from 'react-dnd';
-import useEfficientDragLayer from 'hooks/useEffecientDragLayer';
 
-import charmClient from 'charmClient';
 import { usePages } from 'hooks/usePages';
-import { PageContent } from 'models';
-import { Card } from '../../blocks/card';
-import { Board } from '../../blocks/board';
-import { BoardView } from '../../blocks/boardView';
+import type { Card } from '../../blocks/card';
+import type { Board } from '../../blocks/board';
+import type { BoardView } from '../../blocks/boardView';
 
 import TableRow from './tableRow';
 
 type Props = {
-    board: Board
-    activeView: BoardView
-    columnRefs: Map<string, React.RefObject<HTMLDivElement>>
-    cards: readonly Card[]
-    offset: number,
-    resizingColumn: string,
-    selectedCardIds: string[]
-    readonly: boolean
-    cardIdToFocusOnRender: string
-    showCard: (cardId?: string) => void
-    addCard: (groupByOptionId?: string) => Promise<void>
-    onCardClicked: (e: React.MouseEvent, card: Card) => void
-    onDrop: (srcCard: Card, dstCard: Card) => void
+    board: Board;
+    activeView: BoardView;
+    columnRefs: Map<string, React.RefObject<HTMLDivElement>>;
+    cards: readonly Card[];
+    offset: number;
+    resizingColumn: string;
+    selectedCardIds: string[];
+    readOnly: boolean;
+    cardIdToFocusOnRender: string;
+    showCard: (cardId?: string) => void;
+    addCard: (groupByOptionId?: string) => Promise<void>;
+    onCardClicked: (e: React.MouseEvent, card: Card) => void;
+    onDrop: (srcCard: Card, dstCard: Card) => void;
 }
 
 function TableRows (props: Props): JSX.Element {
   const { board, cards, activeView } = props;
-  const { pages, setPages } = usePages();
+  const { pages, updatePage } = usePages();
 
   const saveTitle = React.useCallback(async (saveType: string, cardId: string, title: string) => {
-    const updatedPage = await charmClient.updatePage({
-      id: cardId,
-      title
-    });
-    setPages((pages) => ({
-      ...pages,
-      [cardId]: updatedPage
-    }));
+    await updatePage({ id: cardId, title });
+
     if (saveType === 'onEnter') {
-      const card = cards.find(card => card.id === cardId);
+      const card = cards.find(c => c.id === cardId);
       if (card && cards.length > 0 && cards[cards.length - 1] === card) {
         props.addCard(activeView.fields.groupById ? card.fields.properties[activeView.fields.groupById!] as string : '');
       }
@@ -62,7 +52,7 @@ function TableRows (props: Props): JSX.Element {
             board={board}
             activeView={activeView}
             card={card}
-            content={cardPage?.content as PageContent}
+            hasContent={cardPage?.hasContent}
             isSelected={props.selectedCardIds.includes(card.id)}
             focusOnMount={props.cardIdToFocusOnRender === card.id}
             pageIcon={cardPage.icon}
@@ -72,7 +62,7 @@ function TableRows (props: Props): JSX.Element {
             onClick={props.onCardClicked}
             saveTitle={saveTitle}
             showCard={props.showCard}
-            readonly={props.readonly}
+            readOnly={props.readOnly}
             onDrop={props.onDrop}
             offset={props.offset}
             resizingColumn={props.resizingColumn}

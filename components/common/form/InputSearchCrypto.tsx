@@ -11,7 +11,7 @@ import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import AddIcon from '@mui/icons-material/Add';
 import TokenLogo from 'components/common/TokenLogo';
 import { getTokenInfo, getTokenAndChainInfoFromPayments } from 'lib/tokens/tokenData';
-import CustomERCTokenForm from 'components/settings/payment-methods/components/CustomERCTokenForm';
+import CustomERCTokenForm from 'components/common/form/CustomERCTokenForm';
 
 export interface IInputSearchCryptoProps extends Omit<Partial<AutocompleteProps<string, true, true, true>>, 'onChange' | 'defaultValue' | 'value'> {
   onChange?: (value: CryptoCurrency) => void;
@@ -19,9 +19,9 @@ export interface IInputSearchCryptoProps extends Omit<Partial<AutocompleteProps<
   defaultValue?: CryptoCurrency | string;
   value?: CryptoCurrency | string; // allow parent to override value
   hideBackdrop?: boolean; // hide backdrop when modal is open
-  cryptoList?: Array<string | CryptoCurrency>;
+  cryptoList?: (string | CryptoCurrency)[];
   chainId?: number; // allow passing this down to the 'new custom token' form
-  sx?: SxProps
+  sx?: SxProps;
 }
 
 const ADD_NEW_CUSTOM = 'ADD_NEW_CUSTOM';

@@ -2,7 +2,7 @@
 import { createAsyncThunk, createSelector } from '@reduxjs/toolkit';
 import charmClient from 'charmClient';
 
-import { Subscription } from '../wsclient';
+import type { Subscription } from '../wsclient';
 
 import type { RootState } from './index';
 
@@ -30,7 +30,7 @@ export const initialReadOnlyLoad = createAsyncThunk(
   }
 );
 
-export const getUserBlockSubscriptions = (state: RootState): Array<Subscription> => state.users.blockSubscriptions;
+export const getUserBlockSubscriptions = (state: RootState): Subscription[] => state.users.blockSubscriptions;
 
 export const getUserBlockSubscriptionList = createSelector(
   getUserBlockSubscriptions,

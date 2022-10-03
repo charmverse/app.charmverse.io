@@ -39,10 +39,10 @@ export function AggregatedDataItem ({ value, label }: { value: number, label: st
 }
 
 export default function AggregatedData ({ totalBounties, totalCommunities, totalProposals, totalVotes }: {
-  totalCommunities: number
-  totalProposals: number
-  totalVotes: number
-  totalBounties: number
+  totalCommunities: number;
+  totalProposals: number;
+  totalVotes: number;
+  totalBounties: number;
 }) {
   return (
     <Grid container display='flex' gap={2} flexDirection='column'>

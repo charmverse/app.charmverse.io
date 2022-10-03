@@ -1,11 +1,11 @@
 import { usePluginState, useEditorViewContext } from '@bangle.dev/react';
 import { Typography, Divider, MenuItem } from '@mui/material';
 import { Box } from '@mui/system';
-import type { Page } from '@prisma/client';
 import UserDisplay from 'components/common/UserDisplay';
 import { useContributors } from 'hooks/useContributors';
 import { usePages } from 'hooks/usePages';
 import { safeScrollIntoViewIfNeeded } from 'lib/browser';
+import type { PageMeta } from 'lib/pages';
 import type { PluginKey } from 'prosemirror-state';
 import { useCallback, useEffect, memo } from 'react';
 import type { SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggest-tooltip';
@@ -15,7 +15,7 @@ import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
 import type { MentionPluginState } from '../mention.interfaces';
 import { selectMention } from '../mention.utils';
 
-export function MentionSuggest ({ pluginKey }: {pluginKey: PluginKey<MentionPluginState>}) {
+export function MentionSuggest ({ pluginKey }: { pluginKey: PluginKey<MentionPluginState> }) {
   const { suggestTooltipKey } = usePluginState(pluginKey) as MentionPluginState;
   const { show: isVisible } = usePluginState(suggestTooltipKey) as SuggestTooltipPluginState;
   if (isVisible) {
@@ -24,7 +24,7 @@ export function MentionSuggest ({ pluginKey }: {pluginKey: PluginKey<MentionPlug
   return null;
 }
 
-function MentionSuggestMenu ({ pluginKey }: {pluginKey: PluginKey}) {
+function MentionSuggestMenu ({ pluginKey }: { pluginKey: PluginKey }) {
   const [contributors] = useContributors();
   const view = useEditorViewContext();
   const {
@@ -103,7 +103,7 @@ function MentionSuggestMenu ({ pluginKey }: {pluginKey: PluginKey}) {
         }}
         />
         <GroupLabel>Pages</GroupLabel>
-        <PagesList activeItemIndex={selectedGroup === 'pages' ? activeItemIndex : -1} pages={filteredPages as Page[]} onSelectPage={(page) => onSelectMention(page.id, 'page')} />
+        <PagesList activeItemIndex={selectedGroup === 'pages' ? activeItemIndex : -1} pages={filteredPages as PageMeta[]} onSelectPage={(page) => onSelectMention(page.id, 'page')} />
       </Box>
     </PopoverMenu>
   );

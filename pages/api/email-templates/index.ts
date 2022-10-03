@@ -5,7 +5,7 @@ import { v4 } from 'uuid';
 import type { MentionedTask } from 'lib/mentions/interfaces';
 import randomName from 'lib/utilities/randomName';
 import type { VoteTask } from 'lib/votes/interfaces';
-import { getPagePath } from 'lib/pages';
+import { getPagePath } from 'lib/pages/utils';
 import type { ProposalTask } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';
 
 const handler = nc({
@@ -13,7 +13,7 @@ const handler = nc({
   onNoMatch
 });
 
-const createMentionTask = ({ pageTitle, spaceName, mentionText }: {spaceName: string, mentionText: string, pageTitle: string}): MentionedTask => {
+const createMentionTask = ({ pageTitle, spaceName, mentionText }: { spaceName: string, mentionText: string, pageTitle: string }): MentionedTask => {
   return {
     mentionId: v4(),
     createdAt: new Date().toISOString(),
@@ -46,7 +46,7 @@ const createMentionTask = ({ pageTitle, spaceName, mentionText }: {spaceName: st
   };
 };
 
-const createVoteTasks = ({ voteTitle, deadline, pageTitle, spaceName }: {voteTitle: string, deadline: VoteTask['deadline'], spaceName: string, pageTitle: string}): VoteTask => {
+const createVoteTasks = ({ voteTitle, deadline, pageTitle, spaceName }: { voteTitle: string, deadline: VoteTask['deadline'], spaceName: string, pageTitle: string }): VoteTask => {
   return {
     deadline,
     id: v4(),

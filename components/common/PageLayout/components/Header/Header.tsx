@@ -1,6 +1,7 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
+import { RateReviewOutlined } from '@mui/icons-material';
+import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import MoonIcon from '@mui/icons-material/DarkMode';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
@@ -19,7 +20,6 @@ import ListItemText from '@mui/material/ListItemText';
 import Popover from '@mui/material/Popover';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
-import type { Page } from '@prisma/client';
 import charmClient from 'charmClient';
 import PublishToSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/PublishToSnapshot';
 import { useColorMode } from 'context/darkMode';
@@ -31,11 +31,11 @@ import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useRef, useState } from 'react';
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import ShareButton from './components/ShareButton';
 import BountyShareButton from './components/BountyShareButton/BountyShareButton';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
 import DatabasePageOptions from './components/DatabasePageOptions';
+import EditingModeToggle from './components/EditingModeToggle';
 
 export const headerHeight = 56;
 
@@ -54,7 +54,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
 
   const router = useRouter();
   const colorMode = useColorMode();
-  const { pages, setPages, getPagePermissions } = usePages();
+  const { pages, updatePage, getPagePermissions } = usePages();
   const { user, setUser } = useUser();
   const theme = useTheme();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
@@ -84,7 +84,13 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
   }
 
   async function exportMarkdown () {
-    const markdownContent = await generateMarkdown(basePage as Page);
+    if (!basePage) {
+      return;
+    }
+
+    // getPage to get content
+    const page = await charmClient.pages.getPage(basePage.id);
+    const markdownContent = await generateMarkdown(page);
 
     if (markdownContent) {
       const data = new Blob([markdownContent], { type: 'text/plain' });
@@ -104,7 +110,17 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
   }
 
   const isFullWidth = basePage?.fullWidth ?? false;
-  const isBasePageDocument = basePage?.type === 'page' || basePage?.type === 'card' || basePage?.type === 'proposal' || basePage?.type === 'bounty';
+  const isBasePageDocument = ['page', 'card', 'proposal', 'proposal_template', 'bounty'].includes(basePage?.type ?? '');
+  const isBasePageDatabase = /board/.test(basePage?.type ?? '');
+
+  const onSwitchChange = () => {
+    if (basePage) {
+      updatePage({
+        id: basePage?.id,
+        fullWidth: !isFullWidth
+      });
+    }
+  };
 
   const documentOptions = (
     <List dense>
@@ -139,9 +155,15 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
         <ListItemText primary='View polls' />
       </ListItemButton>
       {basePage && (
-        <ListItemButton>
-          <PublishToSnapshot pageId={basePage.id} />
-        </ListItemButton>
+        <PublishToSnapshot
+          pageId={basePage.id}
+          renderContent={({ label, onClick, icon }) => (
+            <ListItemButton onClick={onClick}>
+              {icon}
+              <ListItemText primary={label} />
+            </ListItemButton>
+          )}
+        />
       )}
       <Divider />
       <ListItemButton onClick={() => {
@@ -149,13 +171,26 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
         setPageMenuOpen(false);
       }}
       >
-        <CommentOutlinedIcon
+        <MessageOutlinedIcon
           fontSize='small'
           sx={{
             mr: 1
           }}
         />
         <ListItemText primary='View comments' />
+      </ListItemButton>
+      <ListItemButton onClick={() => {
+        setCurrentPageActionDisplay('suggestions');
+        setPageMenuOpen(false);
+      }}
+      >
+        <RateReviewOutlined
+          fontSize='small'
+          sx={{
+            mr: 1
+          }}
+        />
+        <ListItemText primary='View suggestions' />
       </ListItemButton>
       {isExportablePage && (
         <ListItemButton onClick={() => {
@@ -187,14 +222,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
             <Switch
               size='small'
               checked={isFullWidth}
-              onChange={async () => {
-                await charmClient.updatePage({
-                  id: basePage?.id,
-                  fullWidth: !isFullWidth
-                });
-                // @ts-ignore
-                setPages((_pages) => ({ ..._pages, [basePageId]: { ...basePage, fullWidth: !isFullWidth } }));
-              }}
+              onChange={onSwitchChange}
             />
           )}
           label={<Typography variant='body2'>Full Width</Typography>}
@@ -207,14 +235,13 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
     setPageMenuOpen(false);
   }
 
-  const databaseOptions = basePage ? <DatabasePageOptions closeMenu={closeMenu} /> : null;
-
   let pageOptionsList: ReactNode;
+
   if (isBasePageDocument) {
     pageOptionsList = documentOptions;
   }
-  else if (/board/.test(basePage?.type ?? '')) {
-    pageOptionsList = databaseOptions;
+  else if (isBasePageDatabase) {
+    pageOptionsList = <DatabasePageOptions closeMenu={closeMenu} />;
   }
 
   return (
@@ -241,8 +268,9 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
         width: '100%'
       }}
       >
-        <PageTitleWithBreadcrumbs pageId={basePage?.id} />
+        <PageTitleWithBreadcrumbs pageId={basePage?.id} pageType={basePage?.type} />
         <Box display='flex' alignItems='center' alignSelf='stretch' mr={-1}>
+
           {
             isBountyBoard && (
               <BountyShareButton headerHeight={headerHeight} />
@@ -251,7 +279,10 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
 
           {basePage && (
             <>
-              {basePage?.deletedAt === null && <ShareButton headerHeight={headerHeight} pageId={basePage.id} />}
+              {isBasePageDocument && <EditingModeToggle />}
+              {basePage?.deletedAt === null && (
+                <ShareButton headerHeight={headerHeight} pageId={basePage.id} />
+              )}
               <IconButton sx={{ display: { xs: 'none', md: 'inline-flex' } }} size='small' onClick={toggleFavorite} color='inherit'>
                 <Tooltip title={isFavorite ? 'Remove from sidebar' : 'Pin this page to your sidebar'} arrow placement='top'>
                   {isFavorite ? <FavoritedIcon color='secondary' /> : <NotFavoritedIcon color='secondary' />}

@@ -3,16 +3,18 @@ import { prisma } from 'db';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import type { IPageWithPermissions, PageWithProposal } from 'lib/pages';
-import { getPagePath } from 'lib/pages';
+import { getPagePath } from 'lib/pages/utils';
 import type { BountyPermissions } from 'lib/permissions/bounties';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import type { ProposalReviewerInput } from 'lib/proposal/interface';
 import { syncProposalPermissions } from 'lib/proposal/syncProposalPermissions';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { typedKeys } from 'lib/utilities/objects';
-import type { BountyWithDetails, LoggedInUser } from 'models';
+import type { LoggedInUser } from 'models';
+import type { BountyWithDetails } from 'lib/bounties';
 import { IDENTITY_TYPES } from 'models';
 import { v4 } from 'uuid';
+import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import { boardWithCardsArgs } from './generate-board-stub';
 
 export async function generateSpaceUser ({ spaceId, isAdmin }: { spaceId: string, isAdmin: boolean }): Promise<LoggedInUser> {
@@ -99,7 +101,7 @@ export async function generateUserAndSpaceWithApiToken (walletAddress: string = 
   };
 }
 
-export async function generateBounty ({ content = undefined, contentText = '', spaceId, createdBy, status, maxSubmissions, approveSubmitters, title = 'Example', rewardToken = 'ETH', rewardAmount = 1, chainId = 1, bountyPermissions = {}, pagePermissions = [], page = {}, type = 'bounty', id }: Pick<Bounty, 'createdBy' | 'spaceId' | 'status' | 'approveSubmitters'> & Partial<Pick<Bounty, 'id' | 'maxSubmissions' | 'chainId' | 'rewardAmount' | 'rewardToken'>> & Partial<Pick<Page, 'title' | 'content' | 'contentText' | 'type'>> & {bountyPermissions?: Partial<BountyPermissions>, pagePermissions?: Omit<Prisma.PagePermissionCreateManyInput, 'pageId'>[], page?: Partial<Pick<Page, 'deletedAt'>>}): Promise<BountyWithDetails> {
+export async function generateBounty ({ content = undefined, contentText = '', spaceId, createdBy, status, maxSubmissions, approveSubmitters, title = 'Example', rewardToken = 'ETH', rewardAmount = 1, chainId = 1, bountyPermissions = {}, pagePermissions = [], page = {}, type = 'bounty', id }: Pick<Bounty, 'createdBy' | 'spaceId' | 'status' | 'approveSubmitters'> & Partial<Pick<Bounty, 'id' | 'maxSubmissions' | 'chainId' | 'rewardAmount' | 'rewardToken'>> & Partial<Pick<Page, 'title' | 'content' | 'contentText' | 'type'>> & { bountyPermissions?: Partial<BountyPermissions>, pagePermissions?: Omit<Prisma.PagePermissionCreateManyInput, 'pageId'>[], page?: Partial<Pick<Page, 'deletedAt'>> }): Promise<BountyWithDetails> {
 
   const pageId = id ?? v4();
 
@@ -197,7 +199,7 @@ export async function generateComment ({ content, pageId, spaceId, userId, conte
   return thread.comments?.[0];
 }
 
-export function generateTransaction ({ applicationId, chainId = '4', transactionId = '123' }: {applicationId: string} & Partial<Transaction>): Promise<Transaction> {
+export function generateTransaction ({ applicationId, chainId = '4', transactionId = '123' }: { applicationId: string } & Partial<Transaction>): Promise<Transaction> {
   return prisma.transaction.create({
     data: {
       chainId,
@@ -212,9 +214,9 @@ export function generateTransaction ({ applicationId, chainId = '4', transaction
 }
 
 export async function generateBountyWithSingleApplication ({ applicationStatus, bountyCap, userId, spaceId, bountyStatus }:
-  {applicationStatus: ApplicationStatus, bountyCap: number | null, userId: string, spaceId: string, bountyStatus?: BountyStatus,
+  { applicationStatus: ApplicationStatus; bountyCap: number | null; userId: string; spaceId: string; bountyStatus?: BountyStatus;
     // This should be deleted on future PR. Left for backwards compatibility for now
-    reviewer?: string}):
+    reviewer?: string; }):
   Promise<BountyWithDetails> {
   const createdBounty = await prisma.bounty.create({
     data: {
@@ -263,7 +265,7 @@ export async function generateBountyWithSingleApplication ({ applicationStatus, 
 /**
  * @roleName uses UUID to ensure role names do not conflict
  */
-export async function generateRole ({ spaceId, createdBy, roleName = `role-${v4()}`, source }: {spaceId: string, roleName?: string, createdBy: string, source?: RoleSource}): Promise<Role> {
+export async function generateRole ({ spaceId, createdBy, roleName = `role-${v4()}`, source }: { spaceId: string, roleName?: string, createdBy: string, source?: RoleSource }): Promise<Role> {
   const role = await prisma.role.create({
     data: {
       name: roleName,
@@ -280,7 +282,7 @@ export async function generateRole ({ spaceId, createdBy, roleName = `role-${v4(
   return role;
 }
 
-export async function generateRoleWithSpaceRole ({ spaceRoleId, spaceId, createdBy }: { spaceRoleId: string, createdBy: string, spaceId: string}) {
+export async function generateRoleWithSpaceRole ({ spaceRoleId, spaceId, createdBy }: { spaceRoleId: string, createdBy: string, spaceId: string }) {
   const role = await generateRole({ spaceId, createdBy });
 
   const spaceRoleToRole = await prisma.spaceRoleToRole.create({
@@ -296,8 +298,8 @@ export async function generateRoleWithSpaceRole ({ spaceRoleId, spaceId, created
   };
 }
 
-export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'createdBy'> & {pagePermissions?: Prisma.PagePermissionCreateManyPageInput[]}): Promise<IPageWithPermissions> {
-  return prisma.page.create({
+export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'createdBy'> & { pagePermissions?: Prisma.PagePermissionCreateManyPageInput[] }): Promise<IPageWithPermissions> {
+  return createPageDb({
     data: {
       id: options.id ?? v4(),
       contentText: options.contentText ?? '',
@@ -335,7 +337,7 @@ export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'cre
   }) as Promise<IPageWithPermissions>;
 }
 
-export async function createVote ({ userVotes = [], voteOptions = [], spaceId, createdBy, pageId, deadline = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), status = 'InProgress', title = 'Vote Title', context = 'inline', description = null }: Partial<Vote> & Pick<Vote, 'spaceId' | 'createdBy' | 'pageId'> & {voteOptions?: string[], userVotes?: string[]}) {
+export async function createVote ({ userVotes = [], voteOptions = [], spaceId, createdBy, pageId, deadline = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), status = 'InProgress', title = 'Vote Title', context = 'inline', description = null }: Partial<Vote> & Pick<Vote, 'spaceId' | 'createdBy' | 'pageId'> & { voteOptions?: string[], userVotes?: string[] }) {
   return prisma.vote.create({
     data: {
       deadline,
@@ -383,15 +385,15 @@ export async function createVote ({ userVotes = [], voteOptions = [], spaceId, c
 }
 
 export async function createProposalWithUsers ({ proposalStatus = 'private_draft', authors, reviewers, userId, spaceId, ...pageCreateInput }: {
-  authors: string[],
-  reviewers: (string | {type: 'role', roleId: string})[],
-  spaceId: string,
-  userId: string,
-  proposalStatus?: ProposalStatus
+  authors: string[];
+  reviewers: (string | { type: 'role', roleId: string })[];
+  spaceId: string;
+  userId: string;
+  proposalStatus?: ProposalStatus;
 } & Partial<Prisma.PageCreateInput>): Promise<PageWithProposal> {
   const proposalId = v4();
 
-  const proposalPage = await prisma.page.create({
+  const proposalPage: PageWithProposal = await createPageDb({
     data: {
       ...pageCreateInput,
       id: proposalId,
@@ -453,10 +455,10 @@ export async function createProposalWithUsers ({ proposalStatus = 'private_draft
 }
 
 export async function generateCommentWithThreadAndPage ({ userId, spaceId, commentContent }: {
-  userId: string,
-  spaceId: string,
-  commentContent: string
-}): Promise<{page: Page, thread: Thread, comment: Comment}> {
+  userId: string;
+  spaceId: string;
+  commentContent: string;
+}): Promise<{ page: Page, thread: Thread, comment: Comment }> {
 
   const page = await createPage({
     createdBy: userId,
@@ -548,11 +550,11 @@ export function createBlock (options: Partial<Block> & Pick<Block, 'createdBy' |
  * Creates a proposal with the linked authors and reviewers
  */
 export async function generateProposal ({ userId, spaceId, proposalStatus, authors, reviewers, deletedAt = null }:
-  {deletedAt?: Page['deletedAt'], userId: string, spaceId: string, authors: string[], reviewers: ProposalReviewerInput[], proposalStatus: ProposalStatus}):
+  { deletedAt?: Page['deletedAt'], userId: string, spaceId: string, authors: string[], reviewers: ProposalReviewerInput[], proposalStatus: ProposalStatus }):
   Promise<PageWithProposal> {
   const proposalId = v4();
 
-  return prisma.page.create({
+  return createPageDb({
     data: {
       id: proposalId,
       contentText: '',
@@ -612,12 +614,12 @@ export async function generateProposal ({ userId, spaceId, proposalStatus, autho
 }
 
 export async function generateBoard ({ createdBy, spaceId, parentId, cardCount }:
-  {createdBy: string, spaceId: string, parentId?: string, cardCount?: number}): Promise<Page> {
+  { createdBy: string, spaceId: string, parentId?: string, cardCount?: number }): Promise<Page> {
 
   const { pageArgs, blockArgs } = boardWithCardsArgs({ createdBy, spaceId, parentId, cardCount });
 
   return prisma.$transaction([
-    ...pageArgs.map(p => prisma.page.create(p)),
+    ...pageArgs.map(p => createPageDb(p)),
     prisma.block.createMany(blockArgs)
   ]).then(result => result[0] as Page);
 }

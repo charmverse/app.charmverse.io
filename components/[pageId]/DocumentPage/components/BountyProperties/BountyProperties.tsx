@@ -18,12 +18,10 @@ import { usePages } from 'hooks/usePages';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
 import type { ApplicationWithTransactions } from 'lib/applications/interfaces';
-import type { AssignedBountyPermissions, BountyPermissions, UpdateableBountyFields } from 'lib/bounties';
-import type { BountyCreationData } from 'lib/bounties/interfaces';
+import type { AssignedBountyPermissions, BountyPermissions, UpdateableBountyFields, BountyCreationData, BountyWithDetails } from 'lib/bounties';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import debouncePromise from 'lib/utilities/debouncePromise';
 import { isTruthy } from 'lib/utilities/types';
-import type { BountyWithDetails } from 'models';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import BountyApplicantForm from './components/BountyApplicantForm';
@@ -34,16 +32,16 @@ import MissingPagePermissions from './components/MissingPagePermissions';
 import { BountySignupButton } from './components/BountySignupButton';
 
 export default function BountyProperties (props: {
-  readOnly?: boolean,
-  bountyId: string | null,
-  pageId: string,
-  permissions: AssignedBountyPermissions | null,
-  refreshBountyPermissions: (bountyId: string) => void
+  readOnly?: boolean;
+  bountyId: string | null;
+  pageId: string;
+  permissions: AssignedBountyPermissions | null;
+  refreshBountyPermissions: (bountyId: string) => void;
 }) {
   const { bountyId, pageId, readOnly: parentReadOnly = false, permissions, refreshBountyPermissions } = props;
   const [paymentMethods] = usePaymentMethods();
   const { draftBounty, bounties, cancelDraftBounty, setBounties, updateBounty } = useBounties();
-  const [availableCryptos, setAvailableCryptos] = useState<Array<string | CryptoCurrency>>(['ETH']);
+  const [availableCryptos, setAvailableCryptos] = useState<(string | CryptoCurrency)[]>(['ETH']);
   const [isShowingAdvancedSettings, setIsShowingAdvancedSettings] = useState(false);
   const bountyFromContext = bounties.find(b => b.id === bountyId);
   const [currentBounty, setCurrentBounty] = useState<(BountyCreationData & BountyWithDetails) | null>(null);
@@ -51,7 +49,7 @@ export default function BountyProperties (props: {
   const [capSubmissions, setCapSubmissions] = useState(currentBounty?.maxSubmissions !== null);
   const [space] = useCurrentSpace();
   const { user } = useUser();
-  const { setPages, pages } = usePages();
+  const { mutatePage, pages } = usePages();
 
   const router = useRouter();
 
@@ -141,12 +139,7 @@ export default function BountyProperties (props: {
     if (currentBounty) {
       const createdBounty = await charmClient.bounties.createBounty(currentBounty);
       setBounties((_bounties) => [..._bounties, createdBounty]);
-      setPages(_pages => ({ ..._pages,
-        [pageId]: {
-          ..._pages[pageId]!,
-          bountyId: createdBounty.id
-        }
-      }));
+      mutatePage({ id: pageId, bountyId: createdBounty.id });
       cancelDraftBounty();
     }
   }
@@ -364,7 +357,7 @@ export default function BountyProperties (props: {
             </div>
             <TextField
               required
-              value={currentBounty?.maxSubmissions}
+              defaultValue={currentBounty?.maxSubmissions}
               type='number'
               size='small'
               inputProps={{ step: 1, min: 1 }}
@@ -524,10 +517,10 @@ function rollupPermissions ({
   assignedRoleSubmitters,
   spaceId
 }: {
-  selectedReviewerUsers: string[],
-  selectedReviewerRoles: string[],
-  assignedRoleSubmitters: string[],
-  spaceId: string
+  selectedReviewerUsers: string[];
+  selectedReviewerRoles: string[];
+  assignedRoleSubmitters: string[];
+  spaceId: string;
 }): Pick<BountyPermissions, 'reviewer' | 'submitter'> {
   const reviewers = [
     ...selectedReviewerUsers.map(uid => {

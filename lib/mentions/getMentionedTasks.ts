@@ -7,8 +7,8 @@ import { uniq } from 'lodash';
 import type { MentionedTask } from './interfaces';
 
 export type MentionedTasksGroup = {
-  marked: MentionedTask[],
-  unmarked: MentionedTask[]
+  marked: MentionedTask[];
+  unmarked: MentionedTask[];
 }
 
 type Mention = Omit<MentionedTask, 'createdBy'> & { userId: string };

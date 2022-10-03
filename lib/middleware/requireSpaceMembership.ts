@@ -8,7 +8,7 @@ import { AdministratorOnlyError, UserIsNotSpaceMemberError } from '../users/erro
 /**
  * Allow an endpoint to be consumed if it originates from a share page
  */
-export function requireSpaceMembership (options: {adminOnly: boolean, spaceIdKey?: string} = { adminOnly: false }) {
+export function requireSpaceMembership (options: { adminOnly: boolean, spaceIdKey?: string } = { adminOnly: false }) {
   return async (req: NextApiRequest, res: NextApiResponse<ISystemError>, next: NextHandler) => {
 
     // Where to find the space ID
