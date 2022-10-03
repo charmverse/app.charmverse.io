@@ -89,10 +89,10 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
     }
 
     const types: IntegrationModel[] = [];
-    if (user?.addresses) {
+    if (user?.wallets) {
       types.push({
         type: IDENTITY_TYPES[0],
-        username: ENSName || user.addresses[0],
+        username: ENSName || user.wallets[0].address,
         isInUse: user.identityType === IDENTITY_TYPES[0],
         icon: getIdentityIcon(IDENTITY_TYPES[0])
       });

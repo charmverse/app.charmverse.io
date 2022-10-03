@@ -4,8 +4,9 @@ import type { IPageWithPermissions } from 'lib/pages';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateBounty, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import type { LoggedInUser } from 'models';
 
-let user: User;
+let user: LoggedInUser;
 let space: Space;
 let cookie: string;
 
@@ -14,7 +15,7 @@ beforeAll(async () => {
 
   user = generated.user;
   space = generated.space;
-  cookie = await loginUser(user);
+  cookie = await loginUser(user.id);
 });
 
 describe('POST /api/pages/{pageId}/restrict-permissions - Lock down bounty page permissions to the creator', () => {
@@ -75,7 +76,7 @@ describe('POST /api/pages/{pageId}/restrict-permissions - Lock down bounty page 
       spaceId: space.id
     });
 
-    const adminCookie = await loginUser(adminUser);
+    const adminCookie = await loginUser(adminUser.id);
 
     const bounty = await generateBounty({
       createdBy: user.id,
@@ -122,7 +123,7 @@ describe('POST /api/pages/{pageId}/restrict-permissions - Lock down bounty page 
       isAdmin: false
     });
 
-    const nonAdminCookie = await loginUser(extraNonAdminUser);
+    const nonAdminCookie = await loginUser(extraNonAdminUser.id);
 
     const bounty = await generateBounty({
       createdBy: user.id,

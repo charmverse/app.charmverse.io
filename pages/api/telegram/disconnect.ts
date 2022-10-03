@@ -28,7 +28,8 @@ async function disconnectTelegram (req: NextApiRequest, res: NextApiResponse) {
       id: req.session.user.id
     },
     include: {
-      discordUser: true
+      discordUser: true,
+      wallets: true
     }
   });
 
@@ -47,8 +48,8 @@ async function disconnectTelegram (req: NextApiRequest, res: NextApiResponse) {
   let newIdentityProvider: IdentityType;
 
   let ens: string | null = null;
-  if (user.addresses[0]) {
-    ens = await getENSName(user.addresses[0]);
+  if (user.wallets[0].address) {
+    ens = await getENSName(user.wallets[0].address);
   }
 
   if (ens) {
@@ -65,7 +66,7 @@ async function disconnectTelegram (req: NextApiRequest, res: NextApiResponse) {
     newIdentityProvider = IDENTITY_TYPES[1];
   }
   else {
-    newUserName = shortenHex(user.addresses[0]);
+    newUserName = shortenHex(user.wallets[0].address);
     newIdentityProvider = IDENTITY_TYPES[0];
   }
 

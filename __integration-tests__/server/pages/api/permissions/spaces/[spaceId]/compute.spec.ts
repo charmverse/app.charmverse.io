@@ -17,7 +17,7 @@ describe('GET /api/permissions/space/{spaceId}/compute - Compute user space perm
       operations: ['createBounty']
     });
 
-    const adminCookie = await loginUser(nonAdminUser);
+    const adminCookie = await loginUser(nonAdminUser.id);
 
     const computedPermissions = (await request(baseUrl)
       .get(`/api/permissions/space/${space.id}/compute`)
@@ -34,7 +34,7 @@ describe('GET /api/permissions/space/{spaceId}/compute - Compute user space perm
 
     const { space, user: adminUser } = await generateUserAndSpaceWithApiToken(undefined, true);
 
-    const adminCookie = await loginUser(adminUser);
+    const adminCookie = await loginUser(adminUser.id);
 
     // No need to assign permissions
     const computedPermissions = (await request(baseUrl)
@@ -60,7 +60,7 @@ describe('GET /api/permissions/space/{spaceId}/compute - Compute user space perm
       spaceId: space.id
     };
 
-    const nonMemberCookie = await loginUser(userInOtherSpace);
+    const nonMemberCookie = await loginUser(userInOtherSpace.id);
 
     const computedPermissions = (await request(baseUrl)
       .get(`/api/permissions/space/${space.id}/compute`)

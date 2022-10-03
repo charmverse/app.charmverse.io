@@ -8,8 +8,9 @@ import { generatePageToCreateStub } from 'testing/generate-stubs';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
+import type { LoggedInUser } from 'models';
 
-let user: User;
+let user: LoggedInUser;
 let space: Space;
 let cookie: string;
 
@@ -20,7 +21,7 @@ beforeAll(async () => {
 
   user = generated.user;
   space = generated.space;
-  cookie = await loginUser(user);
+  cookie = await loginUser(user.id);
 
 });
 

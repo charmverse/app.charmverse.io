@@ -42,7 +42,8 @@ async function getUserProfile (req: NextApiRequest, res: NextApiResponse<PublicU
     where: condition,
     include: {
       profile: true,
-      profileItems: true
+      profileItems: true,
+      wallets: true
     }
   });
 
@@ -57,13 +58,14 @@ async function getUserProfile (req: NextApiRequest, res: NextApiResponse<PublicU
     return !userById.profileItems.some(profileItem => profileItem.isHidden && profileItem.id === item.id);
   }
 
-  const allPoaps = await getPOAPs(userById.addresses);
-  const allNfts = await getNFTs(userById.addresses);
+  const allPoaps = await getPOAPs(userById.wallets.map(w => w.address));
+  const allNfts = await getNFTs(userById.wallets.map(w => w.address));
 
   const visiblePoaps = allPoaps.filter(isVisible);
   const visibleNfts = allNfts.filter(isVisible);
 
   delete (userById as any).profileItems;
+  delete (userById as any).wallets;
 
   res.status(200).json({
     ...userById,

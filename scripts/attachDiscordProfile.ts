@@ -32,8 +32,10 @@ async function attachDiscordToProfile ({
 
   const targetUser = await prisma.user.findFirst({
     where: {
-      addresses: {
-        has: walletAddress
+      wallets: {
+        some: {
+          address: walletAddress
+        }
       }
     }
   });

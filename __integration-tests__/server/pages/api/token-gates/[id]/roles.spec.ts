@@ -6,10 +6,11 @@ import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { prisma } from 'db';
+import type { LoggedInUser } from 'models';
 
 // User 1 is admin
-let user1: User;
-let user2: User;
+let user1: LoggedInUser;
+let user2: LoggedInUser;
 let space: Space;
 let cookie1: string;
 let cookie2: string;
@@ -92,8 +93,8 @@ beforeAll(async () => {
     }
   });
 
-  cookie1 = await loginUser(user1);
-  cookie2 = await loginUser(user2);
+  cookie1 = await loginUser(user1.id);
+  cookie2 = await loginUser(user2.id);
 
 });
 

@@ -9,7 +9,9 @@ import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 
-let user: User;
+import type { LoggedInUser } from 'models';
+
+let user: LoggedInUser;
 let space: Space;
 let cookie: string;
 
@@ -18,7 +20,7 @@ beforeAll(async () => {
 
   user = generated.user;
   space = generated.space;
-  cookie = await loginUser(user);
+  cookie = await loginUser(user.id);
 
 });
 

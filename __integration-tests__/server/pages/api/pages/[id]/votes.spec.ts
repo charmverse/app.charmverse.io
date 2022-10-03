@@ -7,7 +7,7 @@ import { upsertPermission } from 'lib/permissions/pages';
 describe('GET /api/pages/{id}/votes - Get all the votes for a specific page', () => {
   it('should get votes of a page for the admin user and return it, responding with 200', async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken(v4(), true);
-    const userCookie = await loginUser(user);
+    const userCookie = await loginUser(user.id);
     const page = await createPage({
       createdBy: user.id,
       spaceId: space.id
@@ -46,7 +46,7 @@ describe('GET /api/pages/{id}/votes - Get all the votes for a specific page', ()
 
     await request(baseUrl)
       .get(`/api/pages/${page.id}/votes`)
-      .set('Cookie', await loginUser(user))
+      .set('Cookie', await loginUser(user.id))
       .expect(200);
   });
 
@@ -66,7 +66,7 @@ describe('GET /api/pages/{id}/votes - Get all the votes for a specific page', ()
 
     await request(baseUrl)
       .get(`/api/pages/${page.id}/votes`)
-      .set('Cookie', await loginUser(user))
+      .set('Cookie', await loginUser(user.id))
       .expect(404);
   });
 
@@ -87,7 +87,7 @@ describe('GET /api/pages/{id}/votes - Get all the votes for a specific page', ()
 
     await request(baseUrl)
       .get(`/api/pages/${page.id}/votes`)
-      .set('Cookie', await loginUser(userNotInSpace))
+      .set('Cookie', await loginUser(userNotInSpace.id))
       .expect(404);
   });
 });

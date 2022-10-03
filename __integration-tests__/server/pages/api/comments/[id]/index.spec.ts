@@ -3,8 +3,9 @@ import type { Space, User } from '@prisma/client';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateCommentWithThreadAndPage, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import type { LoggedInUser } from 'models';
 
-let nonAdminUser: User;
+let nonAdminUser: LoggedInUser;
 let nonAdminUserSpace: Space;
 let nonAdminCookie: string;
 
@@ -13,7 +14,7 @@ beforeAll(async () => {
 
   nonAdminUser = first.user;
   nonAdminUserSpace = first.space;
-  nonAdminCookie = await loginUser(nonAdminUser);
+  nonAdminCookie = await loginUser(nonAdminUser.id);
 
   const second = await generateUserAndSpaceWithApiToken();
 });
@@ -42,7 +43,7 @@ describe('PUT /api/comments/{id} - update a comment', () => {
       isAdmin: true
     });
 
-    const otherAdminCookie = await loginUser(otherAdminUser);
+    const otherAdminCookie = await loginUser(otherAdminUser.id);
 
     const { thread, page, comment } = await generateCommentWithThreadAndPage({
       commentContent: 'Message',
@@ -83,7 +84,7 @@ describe('DELETE /api/comments/{id} - delete a comment', () => {
       isAdmin: true
     });
 
-    const otherAdminCookie = await loginUser(otherAdminUser);
+    const otherAdminCookie = await loginUser(otherAdminUser.id);
 
     const { thread, page, comment } = await generateCommentWithThreadAndPage({
       commentContent: 'Message',

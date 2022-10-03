@@ -60,7 +60,7 @@ export default function SubmissionInput (
     defaultValues: {
       submission: submission?.submission as string,
       submissionNodes: submission?.submissionNodes as any as JSON,
-      walletAddress: (submission?.walletAddress ?? user?.addresses?.[0]) as any
+      walletAddress: (submission?.walletAddress ?? user?.wallets[0]?.address)
     },
     resolver: yupResolver(schema)
   });

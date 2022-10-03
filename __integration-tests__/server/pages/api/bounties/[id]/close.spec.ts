@@ -5,8 +5,9 @@ import type { BountyWithDetails } from 'lib/bounties';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateBountyWithSingleApplication, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import type { LoggedInUser } from 'models';
 
-let nonAdminUser: User;
+let nonAdminUser: LoggedInUser;
 let nonAdminUserSpace: Space;
 let nonAdminCookie: string;
 
@@ -15,7 +16,7 @@ beforeAll(async () => {
 
   nonAdminUser = generated.user;
   nonAdminUserSpace = generated.space;
-  nonAdminCookie = await loginUser(nonAdminUser);
+  nonAdminCookie = await loginUser(nonAdminUser.id);
 });
 
 describe('POST /api/bounties/{submissionId}/close - close a bounty', () => {
@@ -56,7 +57,7 @@ describe('POST /api/bounties/{submissionId}/close - close a bounty', () => {
       isAdmin: true
     });
 
-    const adminCookie = await loginUser(adminUser);
+    const adminCookie = await loginUser(adminUser.id);
 
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,
@@ -82,7 +83,7 @@ describe('POST /api/bounties/{submissionId}/close - close a bounty', () => {
       isAdmin: false
     });
 
-    const extraNonAdminUserCookie = await loginUser(extraNonAdminUser);
+    const extraNonAdminUserCookie = await loginUser(extraNonAdminUser.id);
 
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,

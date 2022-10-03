@@ -1,18 +1,17 @@
 import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import type { Page, Space, User, Vote } from '@prisma/client';
+import type { Page, Space, Vote } from '@prisma/client';
 
 let page: Page;
 let space: Space;
-let user: User;
 let vote: Vote;
 
 let userCookie: string;
 
 beforeAll(async () => {
   const { space: generatedSpace, user: generatedUser } = await generateUserAndSpaceWithApiToken(undefined, true);
-  user = generatedUser;
+  const user = generatedUser;
   space = generatedSpace;
 
   page = await createPage({
@@ -28,7 +27,7 @@ beforeAll(async () => {
     userVotes: ['3']
   });
 
-  userCookie = await loginUser(user);
+  userCookie = await loginUser(user.id);
 });
 
 describe('GET /api/votes/[id]/user-votes - Get all the user votes casted for an individual vote', () => {

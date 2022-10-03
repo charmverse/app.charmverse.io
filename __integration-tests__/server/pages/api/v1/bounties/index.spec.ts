@@ -48,10 +48,10 @@ describe('GET /api/v1/bounties', () => {
         description: (bountyWithPaidApplication as unknown as PublicApiBounty).description,
         id: bountyWithPaidApplication.id,
         issuer: {
-          address: user.addresses[0]
+          address: user.wallets[0].address
         },
         recipients: [{
-          address: user.addresses[0]
+          address: user.wallets[0].address
         }],
         reward: {
           amount: bountyWithPaidApplication.rewardAmount,
@@ -72,7 +72,7 @@ describe('GET /api/v1/bounties', () => {
         description: (bountyWithInProgressWork as unknown as PublicApiBounty).description,
         id: bountyWithInProgressWork.id,
         issuer: {
-          address: secondUser.addresses[0]
+          address: secondUser.wallets[0].address
         },
         // Empty recipients list
         recipients: [],

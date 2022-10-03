@@ -6,12 +6,13 @@ import { addSpaceOperations } from 'lib/permissions/spaces';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import type { LoggedInUser } from 'models';
 
-let nonAdminUser: User;
+let nonAdminUser: LoggedInUser;
 let nonAdminUserSpace: Space;
 let nonAdminCookie: string;
 
-let adminUser: User;
+let adminUser: LoggedInUser;
 let adminUserSpace: Space;
 let adminCookie: string;
 
@@ -20,13 +21,13 @@ beforeAll(async () => {
 
   nonAdminUser = first.user;
   nonAdminUserSpace = first.space;
-  nonAdminCookie = await loginUser(nonAdminUser);
+  nonAdminCookie = await loginUser(nonAdminUser.id);
 
   const second = await generateUserAndSpaceWithApiToken();
 
   adminUser = second.user;
   adminUserSpace = second.space;
-  adminCookie = await loginUser(adminUser);
+  adminCookie = await loginUser(adminUser.id);
 });
 
 describe('GET /api/bounties?spaceId={spaceId} - list space bounties', () => {
@@ -124,7 +125,7 @@ describe('GET /api/bounties?spaceId={spaceId} - list space bounties', () => {
 
     const { space: otherSpace, user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, false);
 
-    const otherUserCookie = await loginUser(otherUser);
+    const otherUserCookie = await loginUser(otherUser.id);
 
     await prisma.space.update({
       where: {
@@ -295,7 +296,7 @@ describe('POST /api/bounties - create a bounty', () => {
       userId: differentUser.id
     });
 
-    const cookie = await loginUser(differentUser);
+    const cookie = await loginUser(differentUser.id);
 
     const createdBounty = (await request(baseUrl)
       .post('/api/bounties')
