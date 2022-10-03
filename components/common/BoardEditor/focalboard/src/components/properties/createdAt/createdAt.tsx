@@ -6,7 +6,7 @@ import { useIntl } from 'react-intl';
 import { Utils } from '../../../utils';
 
 type Props = {
-    createdAt: number
+    createdAt: number;
 }
 
 function CreatedAt (props: Props): JSX.Element {

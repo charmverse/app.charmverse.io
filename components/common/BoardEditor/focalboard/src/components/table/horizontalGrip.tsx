@@ -2,7 +2,7 @@ import React from 'react';
 import { useDrag } from 'react-dnd';
 
 type Props = {
-    templateId: string
+    templateId: string;
     onAutoSizeColumn: (columnID: string) => void;
 }
 

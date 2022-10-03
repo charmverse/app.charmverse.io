@@ -129,3 +129,23 @@ export class UndesirableOperationError extends SystemError {
     });
   }
 }
+
+export class MissingWeb3AccountError extends SystemError {
+  constructor () {
+    super({
+      message: 'No connected wallet detected. This is required to proceed.',
+      errorType: 'Invalid input',
+      severity: 'warning'
+    });
+  }
+}
+
+export class MissingWeb3SignatureError extends SystemError {
+  constructor () {
+    super({
+      message: 'This operation requires a signature from your connected wallet.',
+      errorType: 'Insecure operation',
+      severity: 'warning'
+    });
+  }
+}

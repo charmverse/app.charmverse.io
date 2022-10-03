@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 
-import { Block } from '../blocks/block';
-import wsClient, { WSClient } from '../wsclient';
+import type { Block } from '../blocks/block';
+import type { WSClient } from '../wsclient';
+import wsClient from '../wsclient';
 
 export default function useCardListener (onChange: (blocks: Block[]) => void, onReconnect: () => void): void {
   useEffect(() => {

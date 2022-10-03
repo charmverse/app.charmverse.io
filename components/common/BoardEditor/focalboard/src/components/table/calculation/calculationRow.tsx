@@ -2,34 +2,37 @@ import React, { useState } from 'react';
 
 import { Constants } from '../../../constants';
 
-import { Board, createBoard, IPropertyTemplate } from '../../../blocks/board';
+import type { Board, IPropertyTemplate } from '../../../blocks/board';
+import { createBoard } from '../../../blocks/board';
 
 import mutator from '../../../mutator';
 import Calculation from '../../calculations/calculation';
 import { columnWidth } from '../tableRow';
-import { BoardView } from '../../../blocks/boardView';
-import { Card } from '../../../blocks/card';
+import type { BoardView } from '../../../blocks/boardView';
+import type { Card } from '../../../blocks/card';
 import { Options } from '../../calculations/options';
 
 import { TableCalculationOptions } from './tableCalculationOptions';
 
 type Props = {
-    board: Board
-    cards: Card[]
-    activeView: BoardView
-    resizingColumn: string
-    offset: number
-    readOnly: boolean
+    board: Board;
+    cards: Card[];
+    activeView: BoardView;
+    resizingColumn: string;
+    offset: number;
+    readOnly: boolean;
 }
 
 function CalculationRow (props: Props): JSX.Element {
+
+  const [showOptions, setShowOptions] = useState<Map<string, boolean>>(new Map<string, boolean>());
+
   const toggleOptions = (templateId: string, show: boolean) => {
     const newShowOptions = new Map<string, boolean>(showOptions);
     newShowOptions.set(templateId, show);
     setShowOptions(newShowOptions);
   };
 
-  const [showOptions, setShowOptions] = useState<Map<string, boolean>>(new Map<string, boolean>());
   const titleTemplate: IPropertyTemplate = {
     id: Constants.titleColumnId
   } as IPropertyTemplate;
@@ -73,9 +76,9 @@ function CalculationRow (props: Props): JSX.Element {
                         setHovered(false);
                       }}
                       cards={props.cards}
-                      property={template}
                       hovered={hovered}
                       optionsComponent={TableCalculationOptions}
+                      property={template}
                     />
                   );
                 })

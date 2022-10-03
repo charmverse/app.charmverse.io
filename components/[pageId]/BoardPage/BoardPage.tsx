@@ -128,7 +128,6 @@ export default function BoardPage ({ page, setPage, readOnly = false, pagePermis
         <FlashMessages milliseconds={2000} />
         <div className='focalboard-body full-page'>
           <CenterPanel
-            clientConfig={clientConfig}
             readOnly={Boolean(readOnlyBoard)}
             board={board}
             setPage={setPage}
@@ -142,7 +141,6 @@ export default function BoardPage ({ page, setPage, readOnly = false, pagePermis
                 key={shownCardId}
                 cardId={shownCardId}
                 onClose={() => showCard(undefined)}
-                showCard={(cardId) => showCard(cardId)}
                 readOnly={readOnly}
               />
             </RootPortal>

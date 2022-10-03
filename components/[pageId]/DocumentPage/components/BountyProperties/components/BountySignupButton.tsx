@@ -1,19 +1,19 @@
 import { Box } from '@mui/material';
-import { useWeb3React } from '@web3-react/core';
+import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import PrimaryButton from 'components/common/PrimaryButton';
 import TokenGateForm from 'components/common/TokenGateForm';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useUser } from 'hooks/useUser';
-import { useContext, useEffect, useState } from 'react';
-
-import charmClient from 'charmClient';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { useContributors } from 'hooks/useContributors';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useUser } from 'hooks/useUser';
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import type { PageMeta } from 'lib/pages';
+import { lowerCaseEqual } from 'lib/utilities/strings';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
-import type { PageMeta } from 'lib/pages';
+import { useContext, useEffect, useState } from 'react';
 
 interface Props {
   bountyPage: PageMeta;
@@ -21,7 +21,7 @@ interface Props {
 
 export function BountySignupButton ({ bountyPage }: Props) {
 
-  const { account } = useWeb3React();
+  const { account, walletAuthSignature } = useWeb3AuthSig();
   const { user, setUser, isLoaded: isUserLoaded } = useUser();
   const router = useRouter();
   const [contributors] = useContributors();
@@ -35,9 +35,9 @@ export function BountySignupButton ({ bountyPage }: Props) {
   const showSpaceRedirect = isUserLoaded && isSpaceMember;
 
   function loginUser () {
-    if (!loggingIn) {
+    if (!loggingIn && account && walletAuthSignature && lowerCaseEqual(walletAuthSignature?.address as string, account as string)) {
       setLoggingIn(true);
-      charmClient.login(account as string)
+      charmClient.login({ address: account as string, walletSignature: walletAuthSignature })
         .then(loggedInProfile => {
           setUser(loggedInProfile);
           setLoggingIn(false);
@@ -103,3 +103,4 @@ export function BountySignupButton ({ bountyPage }: Props) {
     </>
   );
 }
+

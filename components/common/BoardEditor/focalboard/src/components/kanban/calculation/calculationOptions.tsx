@@ -1,16 +1,19 @@
 
-import { IPropertyTemplate, PropertyType } from '../../../blocks/board';
+import type { IPropertyTemplate, PropertyType } from '../../../blocks/board';
+import type {
+  CommonCalculationOptionProps } from '../../calculations/options';
 import {
-    CalculationOptions,
-    CommonCalculationOptionProps,
-    optionsByType
+  CalculationOptions,
+  optionsByType
 } from '../../calculations/options';
 
-import { Option, OptionProps } from './kanbanOption';
+import type { OptionProps } from './kanbanOption';
+import { Option } from './kanbanOption';
 
 type Props = CommonCalculationOptionProps & {
-    cardProperties: IPropertyTemplate[]
-    onChange: (data: {calculation: string, propertyId: string}) => void
+    cardProperties: IPropertyTemplate[];
+    onChange: (data: { calculation: string, propertyId: string }) => void;
+    property: IPropertyTemplate;
 }
 
 // contains mapping of property types which are effectly the same as other property type.
@@ -35,7 +38,7 @@ export function KanbanCalculationOptions (props: Props): JSX.Element {
           cardProperties: props.cardProperties,
           onChange: props.onChange,
           activeValue: props.value,
-          activeProperty: props.property!
+          activeProperty: props.property
         });
       }
     });
@@ -67,7 +70,6 @@ export function KanbanCalculationOptions (props: Props): JSX.Element {
         menuOpen={props.menuOpen}
         onClose={props.onClose}
         onChange={props.onChange}
-        property={props.property}
         options={options}
         components={{ Option }}
       />

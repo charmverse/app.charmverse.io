@@ -1,16 +1,16 @@
 import React from 'react';
 
 import { Typography } from '@mui/material';
-import { Board, IPropertyTemplate, PropertyType } from '../../blocks/board';
+import ArrowDownwardOutlinedIcon from '@mui/icons-material/ArrowDownwardOutlined';
+import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
+import type { Board, IPropertyTemplate, PropertyType } from '../../blocks/board';
 import { Constants } from '../../constants';
-import { Card } from '../../blocks/card';
-import { BoardView } from '../../blocks/boardView';
+import type { Card } from '../../blocks/card';
+import type { BoardView } from '../../blocks/boardView';
 import MenuWrapper from '../../widgets/menuWrapper';
 import Label from '../../widgets/label';
 import { useSortable } from '../../hooks/sortable';
 import { Utils } from '../../utils';
-import ArrowDownwardOutlinedIcon from '@mui/icons-material/ArrowDownwardOutlined';
-import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
 
 import HorizontalGrip from './horizontalGrip';
 
@@ -18,18 +18,18 @@ import TableHeaderMenu from './tableHeaderMenu';
 import { iconForPropertyType } from '../viewHeader/viewHeaderPropertiesMenu';
 
 type Props = {
-    readOnly: boolean
-    sorted: 'up'|'down'|'none'
-    name: React.ReactNode
-    board: Board
-    activeView: BoardView
-    cards: Card[]
-    views: BoardView[]
-    template: IPropertyTemplate
-    offset: number
-    type: PropertyType
-    onDrop: (template: IPropertyTemplate, container: IPropertyTemplate) => void
-    onAutoSizeColumn: (columnID: string, headerWidth: number) => void
+    readOnly: boolean;
+    sorted: 'up'|'down'|'none';
+    name: React.ReactNode;
+    board: Board;
+    activeView: BoardView;
+    cards: Card[];
+    views: BoardView[];
+    template: IPropertyTemplate;
+    offset: number;
+    type: PropertyType;
+    onDrop: (template: IPropertyTemplate, container: IPropertyTemplate) => void;
+    onAutoSizeColumn: (columnID: string, headerWidth: number) => void;
 }
 
 function TableHeader (props: Props): JSX.Element {
@@ -85,10 +85,10 @@ function TableHeader (props: Props): JSX.Element {
 
       {!props.readOnly
                 && (
-                <HorizontalGrip
-                  templateId={props.template.id}
-                  onAutoSizeColumn={onAutoSizeColumn}
-                />
+                  <HorizontalGrip
+                    templateId={props.template.id}
+                    onAutoSizeColumn={onAutoSizeColumn}
+                  />
                 )}
     </div>
   );

@@ -1,6 +1,7 @@
 import React, { forwardRef, useEffect, useRef } from 'react';
 
-import { EditableProps, Focusable, useEditable } from './editable';
+import type { EditableProps, Focusable } from './editable';
+import { useEditable } from './editable';
 
 function getBorderWidth (style: CSSStyleDeclaration): number {
   return parseInt(style.borderTopWidth || '0', 10) + parseInt(style.borderBottomWidth || '0', 10);

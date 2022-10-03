@@ -1,19 +1,19 @@
-import { Block } from './block';
+import type { Block } from './block';
 
 interface ArchiveHeader {
-    version: number
-    date: number
+    version: number;
+    date: number;
 }
 
 interface ArchiveLine {
-    type: string,
-    data: unknown,
+    type: string;
+    data: unknown;
 }
 
 // This schema allows the expansion of additional line types in the future
 interface BlockArchiveLine extends ArchiveLine {
-    type: 'block',
-    data: Block
+    type: 'block';
+    data: Block;
 }
 
 class ArchiveUtils {
@@ -50,6 +50,7 @@ class ArchiveUtils {
         for (const lineString of lineStrings) {
           if (!lineString) {
             // Ignore empty lines, e.g. last line
+            // eslint-disable-next-line no-continue
             continue;
           }
           const line = JSON.parse(lineString) as ArchiveLine;
@@ -63,6 +64,8 @@ class ArchiveUtils {
               blocks.push(block);
               break;
             }
+            default:
+              // do nothing
           }
 
           lineNum += 1;

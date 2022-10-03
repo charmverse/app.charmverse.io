@@ -2,37 +2,40 @@
 import React, { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 
-import FullCalendar, { EventClickArg, EventChangeArg, EventInput, EventContentArg, DayCellContentArg } from '@fullcalendar/react';
+import type { EventClickArg, EventChangeArg, EventInput, EventContentArg, DayCellContentArg } from '@fullcalendar/react';
+import FullCalendar from '@fullcalendar/react';
 
 import interactionPlugin from '@fullcalendar/interaction';
 import dayGridPlugin from '@fullcalendar/daygrid';
 
 import { usePages } from 'hooks/usePages';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
-import { PageContent } from 'models';
 import mutator from '../../mutator';
 
-import { Board, IPropertyTemplate } from '../../blocks/board';
-import { BoardView } from '../../blocks/boardView';
-import { Card } from '../../blocks/card';
-import { DateProperty, createDatePropertyFromString } from '../properties/dateRange/dateRange';
+import type { Board, IPropertyTemplate } from '../../blocks/board';
+import type { BoardView } from '../../blocks/boardView';
+import type { Card } from '../../blocks/card';
+import type { DateProperty } from '../properties/dateRange/dateRange';
+import { createDatePropertyFromString } from '../properties/dateRange/dateRange';
 import Tooltip from '../../widgets/tooltip';
 import PropertyValueElement from '../propertyValueElement';
-import { Constants } from '../../constants';
-import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 
 const oneDay = 60 * 60 * 24 * 1000;
 
 type Props = {
-    board: Board
-    cards: Card[]
-    activeView: BoardView
-    readOnly: boolean
-    initialDate?: Date
-    dateDisplayProperty?: IPropertyTemplate
-    showCard: (cardId: string) => void
-    addCard: (properties: Record<string, string>) => void
+    board: Board;
+    cards: Card[];
+    activeView: BoardView;
+    readOnly: boolean;
+    initialDate?: Date;
+    dateDisplayProperty?: IPropertyTemplate;
+    showCard: (cardId: string) => void;
+    addCard: (properties: Record<string, string>) => void;
 }
+
+const timeZoneOffset = (date: number): number => {
+  return new Date(date).getTimezoneOffset() * 60 * 1000;
+};
 
 function createDatePropertyFromCalendarDates (start: Date, end: Date) : DateProperty {
   // save as noon local, expected from the date picker
@@ -56,10 +59,6 @@ function createDatePropertyFromCalendarDate (start: Date) : DateProperty {
   const dateProperty : DateProperty = { from: dateFrom };
   return dateProperty;
 }
-
-const timeZoneOffset = (date: number): number => {
-  return new Date(date).getTimezoneOffset() * 60 * 1000;
-};
 
 function CalendarFullView (props: Props): JSX.Element|null {
   const intl = useIntl();
@@ -102,7 +101,9 @@ function CalendarFullView (props: Props): JSX.Element|null {
         // date properties are stored as 12 pm UTC, convert to 12 am (00) UTC for calendar
         dateFrom = dateProperty.from ? new Date(dateProperty.from + (dateProperty.includeTime ? 0 : timeZoneOffset(dateProperty.from))) : new Date();
         dateFrom.setHours(0, 0, 0, 0);
-        const dateToNumber = dateProperty.to ? dateProperty.to + (dateProperty.includeTime ? 0 : timeZoneOffset(dateProperty.to)) : dateFrom.getTime();
+        const dateToNumber = dateProperty.to
+          ? dateProperty.to + (dateProperty.includeTime ? 0 : timeZoneOffset(dateProperty.to))
+          : dateFrom.getTime();
         dateTo = new Date(dateToNumber + oneDay); // Add one day.
         dateTo.setHours(0, 0, 0, 0);
       }
@@ -175,7 +176,7 @@ function CalendarFullView (props: Props): JSX.Element|null {
     }
   }, [cards, dateDisplayProperty]);
 
-  const onNewEvent = useCallback((args: {start: Date, end: Date}) => {
+  const onNewEvent = useCallback((args: { start: Date, end: Date }) => {
     let dateProperty: DateProperty;
     if (args.start === args.end) {
       dateProperty = createDatePropertyFromCalendarDate(args.start);
@@ -245,7 +246,6 @@ function CalendarFullView (props: Props): JSX.Element|null {
         eventClick={eventClick}
         eventContent={renderEventContent}
         eventChange={eventChange}
-
         selectable={isSelectable}
         selectMirror={true}
         select={onNewEvent}

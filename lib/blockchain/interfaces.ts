@@ -24,3 +24,10 @@ export interface ExtendedPoap {
   created: string;
   name: string;
 }
+
+export interface AuthSig {
+  sig: string;
+  derivedVia: string;
+  signedMessage: string;
+  address: string;
+}

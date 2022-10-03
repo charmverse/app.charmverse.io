@@ -1,8 +1,9 @@
-import { Block, createBlock } from './block';
+import type { Block } from './block';
+import { createBlock } from './block';
 
 type IContentBlockWithCords = {
-    block: Block,
-    cords: {x: number, y?: number, z?: number}
+    block: Block;
+    cords: { x: number, y?: number, z?: number };
 }
 
 type ContentBlock = Block

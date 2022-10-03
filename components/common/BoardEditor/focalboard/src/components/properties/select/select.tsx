@@ -1,21 +1,21 @@
 
 import React, { useState } from 'react';
 
-import { IPropertyOption, IPropertyTemplate } from '../../../blocks/board';
+import type { IPropertyOption, IPropertyTemplate } from '../../../blocks/board';
 
 import Label from '../../../widgets/label';
 import ValueSelector from '../../../widgets/valueSelector';
 
 type Props = {
-    emptyValue?: string
-    propertyValue: string
-    propertyTemplate: IPropertyTemplate
-    onCreate?: (value: string) => void
-    onChange?: (value: string) => void
-    onChangeColor?: (option: IPropertyOption, color: string) => void
-    onDeleteOption?: (option: IPropertyOption) => void
+    emptyValue?: string;
+    propertyValue: string;
+    propertyTemplate: IPropertyTemplate;
+    onCreate?: (value: string) => void;
+    onChange?: (value: string) => void;
+    onChangeColor?: (option: IPropertyOption, color: string) => void;
+    onDeleteOption?: (option: IPropertyOption) => void;
     onDeleteValue?: () => void;
-    isEditable: boolean
+    isEditable: boolean;
 }
 
 const SelectProperty = React.memo((props: Props) => {
@@ -32,6 +32,7 @@ const SelectProperty = React.memo((props: Props) => {
       <div
         className='octo-propertyvalue'
         data-testid='select-non-editable'
+        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
         onClick={() => setOpen(true)}
       >

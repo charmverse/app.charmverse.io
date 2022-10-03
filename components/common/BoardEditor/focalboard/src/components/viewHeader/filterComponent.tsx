@@ -1,9 +1,10 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import { Board, IPropertyTemplate } from '../../blocks/board';
-import { BoardView } from '../../blocks/boardView';
-import { createFilterClause, FilterClause, FilterCondition } from '../../blocks/filterClause';
+import type { Board, IPropertyTemplate } from '../../blocks/board';
+import type { BoardView } from '../../blocks/boardView';
+import type { FilterClause, FilterCondition } from '../../blocks/filterClause';
+import { createFilterClause } from '../../blocks/filterClause';
 import { createFilterGroup, isAFilterGroupInstance } from '../../blocks/filterGroup';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
@@ -14,9 +15,9 @@ import Modal from '../modal';
 import FilterEntry from './filterEntry';
 
 type Props = {
-    board: Board
-    activeView: BoardView
-    onClose: () => void
+    board: Board;
+    activeView: BoardView;
+    onClose: () => void;
 }
 
 const FilterComponent = React.memo((props: Props): JSX.Element => {

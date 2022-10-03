@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 
 import userEvent from '@testing-library/user-event';
 
-import { IPropertyTemplate } from '../../../blocks/board';
+import type { IPropertyTemplate } from '../../../blocks/board';
 
 import { wrapIntl } from '../../../testUtils';
 

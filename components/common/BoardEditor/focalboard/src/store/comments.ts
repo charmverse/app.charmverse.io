@@ -1,7 +1,8 @@
 
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
-import { CommentBlock } from '../blocks/commentBlock';
+import type { CommentBlock } from '../blocks/commentBlock';
 
 import { initialLoad, initialReadOnlyLoad } from './initialLoad';
 
@@ -9,7 +10,7 @@ import type { RootState } from './index';
 
 const commentsSlice = createSlice({
   name: 'comments',
-  initialState: { comments: {} } as {comments: {[key: string]: CommentBlock}},
+  initialState: { comments: {} } as { comments: { [key: string]: CommentBlock } },
   reducers: {
     updateComments: (state, action: PayloadAction<CommentBlock[]>) => {
       for (const comment of action.payload) {
